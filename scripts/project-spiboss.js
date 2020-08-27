@@ -48,8 +48,8 @@ var weap3 = new Weapon("mount-purple-weapon");
 var weap4 = new Weapon("spiroct-weapon");
 var weap5 = new Weapon("spiroct-weapon");
 weap1.reload = 50;
-weap1.x = 20;
-weap1.y = -2;
+weap1.x = 10;
+weap1.y = -20;
 weap1.rotate = true;
 weap1.shake = 1;
 weap1.rotateSpeed = 1;
@@ -57,35 +57,35 @@ weap1.shots = 5;
 weap1.shotDelay = 6;
 weap1.bullet = sa;
 weap2.reload = 20;
-weap2.x = 5;
-weap2.y = 20;
+weap2.x = 25;
+weap2.y = 13;
 weap2.rotate = true;
 weap2.shake = 1;
 weap2.rotateSpeed = 5;
 weap2.bullet = sapBull1;
 weap3.reload = 20;
-weap3.x = 15;
-weap3.y = 20;
+weap3.x = 20;
+weap3.y = 15;
 weap3.rotate = true;
 weap3.shake = 1;
 weap3.rotateSpeed = 5;
 weap3.bullet = sapBull1;
 weap4.reload = 23;
-weap4.x = 12;
-weap4.y = 10;
+weap4.x = 15;
+weap4.y = 23;
 weap4.rotate = true;
 weap4.shake = 1;
 weap4.rotateSpeed = 3;
 weap4.bullet = sapBull2;
 weap5.reload = 23;
-weap5.x = 18;
-weap5.y = 10;
+weap5.x = 25;
+weap5.y = 5;
 weap5.rotate = true;
 weap5.shake = 1;
 weap5.rotateSpeed = 3;
 weap5.bullet = sapBull2;
 prspiboss.constructor = () => {
-	const unit = extend(LegsUnit, {})
+	const unit = extend(BuilderLegsUnit, {})
 
 	return unit;
 }
@@ -96,3 +96,4 @@ for(var i = 0; i<weaps.length; i++){
 	weaps[0].alternate = true;
 	prspiboss.weapons.add(weaps[i]);
 };
+prspiboss.groundLayer = Layer.legUnit;
