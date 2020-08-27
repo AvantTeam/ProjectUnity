@@ -6,7 +6,6 @@ legCount: 8
 legMoveSpace: 1
 legPairOffset: 4
 legLength: 40
-rotateShooting: false
 legExtension: -15
 legBaseOffset: 15
 landShake: 4
@@ -16,3 +15,8 @@ rippleScale: 2
 legSpeed: 0.2
 legSplashDamage: 50
 legSplashRange: 35
+hovering: true
+armor: 13
+allowLegStep: true
+visualElevation: 0.5
+
