@@ -1,0 +1,35 @@
+{
+	type: Reconstructor
+	size: 11
+	consumes: {
+		power: 5
+		items: {
+			items: [
+				thorium/1000
+				surge-alloy/400
+				plastanium/600
+				phase-fabric/350
+			]
+		}
+		liquid: {
+			liquid: cryofluid
+			amount: 5
+		}
+	}
+	requirements: [
+		graphite/1600
+		silicon/2000
+		metaglass/900
+		thorium/600
+		lead/1200
+		plastanium/3600
+	]
+
+	constructTime: 20000
+
+	upgrades: [
+		[gummy, project-spiboss]
+	]
+	category: units
+	research: tetrative-reconstructor
+}
