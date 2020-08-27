@@ -1,0 +1,19 @@
+drag: 0.1
+speed: 0.4
+hitsize: 15
+health: 15000
+
+legCount; 8
+legMoveSpace: 1
+legPairOffset: 4
+legLength: 40
+rotateShooting: false
+legExtension: -15
+legBaseOffset: 15
+landShake: 4
+legSpeed: 0.1
+legLengthScl: 1
+rippleScale: 2
+legSpeed: 0.2
+legSplashDamage: 50
+legSplashRange: 35
