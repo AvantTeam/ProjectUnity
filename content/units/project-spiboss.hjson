@@ -2,7 +2,6 @@ drag: 0.1
 speed: 0.4
 hitsize: 15
 health: 15000
-
 legCount: 8
 legMoveSpace: 1
 legPairOffset: 4
