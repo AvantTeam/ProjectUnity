@@ -1,0 +1,95 @@
+{
+	"name": "arachnopodidae",
+	"type": "BuilderLegsUnit",
+	"speed": 0.4,
+	"health": 13000,
+	"armor": 6.5,
+	"hitsize": 28,
+	"flying": false,
+	"hovering": true,
+	"allowLegStep": true,
+	"visualElevation": 0.5,
+	"legCount": 8,
+	"legLength": 41,
+	"legMoveSpace": 0.6,
+	"legSpeed": 0.06,
+	"legPairOffset": 0,
+	"legBaseOffset": 9,
+	"legExtension": -3,
+	"kinematicScl": 0.6,
+	"groundLayer": 63,
+	"weapons": [
+		{
+			"name": "gummy-main-sapper",
+			"x": 18,
+			"y": -4.75,
+			"shootY": 5,
+			"reload": 17,
+			"rotate": true,
+			"shots": 3,
+			"inaccuracy": 12,
+			"bullet": {
+				"type": SapBulletType,
+				"damage": 16,
+				"sapStrength": 0.3,
+				"lifetime": 36,
+				"length": 137,
+				"width": 0.7,
+				"color": "bf92f9",
+				"hitColor": "bf92f9"
+			}
+		},
+		{
+			"name": "gummy-small-sapper",
+			"x": 9.75,
+			"y": 8,
+			"shootY": 3,
+			"reload": 12,
+			"rotate": true,
+			"bullet": {
+				"type": SapBulletType,
+				"damage": 8,
+				"sapStrength": 0.2,
+				"lifetime": 30,
+				"length": 98,
+				"color": "bf92f9",
+				"hitColor": "bf92f9"
+			}
+		},
+		{
+			"name": "gummy-small-sapper",
+			"x": -15.25,
+			"y": 4.25,
+			"shootY": 3,
+			"reload": 12,
+			"rotate": true,
+			"flipSprite": true,
+			"bullet": {
+				"type": SapBulletType,
+				"damage": 8,
+				"sapStrength": 0.2,
+				"lifetime": 30,
+				"length": 98,
+				"color": "bf92f9",
+				"hitColor": "bf92f9"
+			}
+		},
+		{
+			"name": "gummy-tesla",
+			"x": 9.75,
+			"y": -12,
+			"shootY": 6,
+			"reload": 34,
+			"rotate": true,
+			"shots": 4,
+			"inaccuracy": 12,
+			"bullet": {
+				"type": LightningBulletType,
+				"damage": 27,
+				"lightningLength": 29,
+				"lightningLengthRand": 4,
+				"lightningColor": "bf92f9"
+			}
+		}
+	]
+}
