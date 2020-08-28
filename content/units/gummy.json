@@ -17,7 +17,7 @@
 	"legBaseOffset": 9,
 	"legExtension": -3,
 	"kinematicScl": 0.6,
-	"groundLayer": 60,
+	"groundLayer": 76,
 	"rippleScale": 2,
 	"landShake": 1.2,
 	"legSplashDamage": 32,
