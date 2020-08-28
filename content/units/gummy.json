@@ -1,5 +1,4 @@
 {
-	"name": "arachnopodidae",
 	"type": "BuilderLegsUnit",
 	"speed": 0.4,
 	"health": 13000,
@@ -34,7 +33,7 @@
 			"inaccuracy": 12,
 			"rotateSpeed": 9,
 			"bullet": {
-				"type": SapBulletType,
+				"type": "SapBulletType",
 				"damage": 16,
 				"sapStrength": 0.3,
 				"lifetime": 36,
@@ -52,7 +51,7 @@
 			"reload": 12,
 			"rotate": true,
 			"bullet": {
-				"type": SapBulletType,
+				"type": "SapBulletType",
 				"damage": 8,
 				"sapStrength": 0.2,
 				"lifetime": 30,
@@ -70,7 +69,7 @@
 			"rotate": true,
 			"flipSprite": true,
 			"bullet": {
-				"type": SapBulletType,
+				"type": "SapBulletType",
 				"damage": 8,
 				"sapStrength": 0.2,
 				"lifetime": 30,
@@ -90,7 +89,7 @@
 			"inaccuracy": 12,
 			"rotateSpeed": 1.2,
 			"bullet": {
-				"type": LightningBulletType,
+				"type": "LightningBulletType",
 				"damage": 32,
 				"lightningLength": 29,
 				"lightningLengthRand": 4,
