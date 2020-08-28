@@ -14,3 +14,6 @@ loadFile(groundUnits, "ground-units");
 
 var flyingUnits = ["caelifera"];
 loadFile(flyingUnits, "flying-units");
+
+var turrets = ["orb-turret"];
+loadFile(turrets, "turrets");
