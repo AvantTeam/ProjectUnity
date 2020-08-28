@@ -1,10 +1,16 @@
-// Custom assets
-//require("unity/customeffects");
-require("unity/copterbase");
+/* File "handler" */
+function loadFile(array, dir){
+	for(var file of array){
+		require("unity/" + dir + "/" + file);
+		print("Successfully loaded " + file + ".js");
+	}
+}
 
-// LegsUnit
-//require("unity/gummy");
-require("unity/project-spiboss");
+var libraries = ["copterbase"];
+loadFile(libraries, "libraries");
 
-// CopterUnit
-require("unity/caelifera");
+var groundUnits = ["project-spiboss"];
+loadFile(groundUnits, "ground-units");
+
+var flyingUnits = ["caelifera"];
+loadFile(flyingUnits, "flying-units");
