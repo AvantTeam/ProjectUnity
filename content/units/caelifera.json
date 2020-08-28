@@ -1,0 +1,45 @@
+{
+	"speed": 2.3,
+	"rotateSpeed": 4,
+	"baseRotateSpeed": 4,
+	"drag": 0.01,
+	"accel": 0.6,
+	"fallSpeed": 0.005,
+	"health": 150,
+	"engineSize": 0,
+	"flying": true,
+	"hovering": true,
+	"lowAltitude": true,
+	"hitSize": 15;
+	"weapons": [
+		{
+			"name": "caelifera-gun",
+			"reload": 6,
+			"y": 20,
+			"shootSound": "pew",
+			"ejectEffect": "shellEjectSmall",
+			"bullet": {
+				"type": "BasicBulletType",
+				"speed": 5,
+				"lifetime": 30,
+				"damage": 6,
+				"shrinkY": 0.2
+			}
+		},
+		{
+			"name": "caelifera-launcher",
+			"reload": 30,
+			"y": 6,
+			"shootSound": "shootSnap",
+			"ejectEffect": "shellEjectMedium",
+			"bullet": {
+				"type": "MissileBulletType",
+				"speed": 3,
+				"lifetime": 50,
+				"splashDamage": 20,
+				"splashDamageRadius": 6,
+				"drag": -0.01
+			}
+		}
+	]
+}
