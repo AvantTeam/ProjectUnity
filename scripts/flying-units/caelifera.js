@@ -1,4 +1,4 @@
-const copter = require("unity/libraries/copterbase");
+const copter = require("unity/copterbase");
 const att = {
 	init(){
 		this.rotor = [{
@@ -12,24 +12,20 @@ const att = {
 		}];
 		this.fallRotateSpeed = 2.5;
 	}
-}
-
+};
 const caelifera = extendContent(UnitType, "caelifera", {
 	init(){
 		this.super$init();
 		att.init();
 	},
-
 	getAttributes(){
 		return att;
 	},
-
 	draw(unit){
 		this.super$draw(unit);
 		copter.drawRotor(unit);
 	}
 });
-
 caelifera.constructor = prov(() => {
 	const unit = extend(UnitEntity, {
 		update(){
