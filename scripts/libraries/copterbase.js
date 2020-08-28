@@ -23,7 +23,6 @@ module.exports = {
 		}
 		Draw.mixcol();
 	},
-	
 	onFall(unit){
 		const att = unit.type.getAttributes();
 		unit.rotation += att.fallRotateSpeed * Mathf.signs[unit.id % 2];
