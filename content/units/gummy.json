@@ -17,7 +17,11 @@
 	"legBaseOffset": 9,
 	"legExtension": -3,
 	"kinematicScl": 0.6,
-	"groundLayer": 63,
+	"groundLayer": 60,
+	"rippleScale": 2,
+	"landShake": 1.2,
+	"legSplashDamage": 32,
+	"legSplashRange": 30,
 	"weapons": [
 		{
 			"name": "gummy-main-sapper",
@@ -28,6 +32,7 @@
 			"rotate": true,
 			"shots": 3,
 			"inaccuracy": 12,
+			"rotateSpeed": 9,
 			"bullet": {
 				"type": SapBulletType,
 				"damage": 16,
@@ -83,9 +88,10 @@
 			"rotate": true,
 			"shots": 4,
 			"inaccuracy": 12,
+			"rotateSpeed": 1.2,
 			"bullet": {
 				"type": LightningBulletType,
-				"damage": 27,
+				"damage": 32,
 				"lightningLength": 29,
 				"lightningLengthRand": 4,
 				"lightningColor": "bf92f9"
