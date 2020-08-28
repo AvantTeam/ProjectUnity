@@ -1,4 +1,4 @@
-this.global.bullets = {};
+this.global.unitybullets = {};
 
 const zetacolor=Color.valueOf("82ffe8");
 const gravsuck = newEffect(20, e => {
@@ -57,7 +57,7 @@ gravityTrap.collidesTiles = false;
 gravityTrap.collides = false;
 gravityTrap.collidesAir = false;
 gravityTrap.keepVelocity = false;
-this.global.bullets.gravityTrap = gravityTrap;
+this.global.unitybullets.gravityTrap = gravityTrap;
 
 //Credits to EyeofDarkness
 const arcCharge = newEffect(27, e => {
@@ -116,7 +116,7 @@ arcCasterBullet.collides = true;
 arcCasterBullet.collidesTiles = false;
 arcCasterBullet.collidesAir = true;
 arcCasterBullet.pierce = true;
-this.global.bullets.arcCasterBullet = arcCasterBullet;
+this.global.unitybullets.arcCasterBullet = arcCasterBullet;
 
 var t = this;
 
@@ -238,7 +238,7 @@ forceSmall.collidesTiles = false;
 forceSmall.collides = false;
 forceSmall.collidesAir = false;
 forceSmall.keepVelocity = false;
-this.global.bullets.forceSmall = forceSmall;
+this.global.unitybullets.forceSmall = forceSmall;
 
 function fillLight(x, y, sides, radius, center, edge){
   var centerf = center.toFloatBits(); var edgef = edge.toFloatBits();
@@ -292,7 +292,7 @@ effectZone.collidesTiles = false;
 effectZone.collides = false;
 effectZone.collidesAir = false;
 effectZone.keepVelocity = false;
-this.global.bullets.effectZone = effectZone;
+this.global.unitybullets.effectZone = effectZone;
 
 const healFx = this.global.fx.healFx;
 const healSpread = this.global.fx.healSpread;
@@ -330,7 +330,7 @@ healZone.collidesTiles = false;
 healZone.collides = false;
 healZone.collidesAir = false;
 healZone.keepVelocity = false;
-this.global.bullets.healZone = healZone;
+this.global.unitybullets.healZone = healZone;
 
 const distcolor = Color.valueOf("4c00ff");
 const distortFx = newEffect(18, e => {
@@ -384,7 +384,7 @@ distZone.collidesTiles = false;
 distZone.collides = false;
 distZone.collidesAir = false;
 distZone.keepVelocity = false;
-this.global.bullets.distZone = distZone;
+this.global.unitybullets.distZone = distZone;
 
 const shader = this.global.shaders.space;
 const whirl = this.global.fx.whirl;
@@ -444,7 +444,7 @@ blackhole.bulletShrink = 0;
 blackhole.hitSize = 12;
 blackhole.despawnEffect = Fx.none;
 blackhole.keepVelocity = false;
-this.global.bullets.blackhole = blackhole;
+this.global.unitybullets.blackhole = blackhole;
 
 const whirlSmall = this.global.fx.whirlSmall;
 const blackholeSmall = extend(BasicBulletType, {
@@ -502,7 +502,7 @@ blackholeSmall.bulletShrink = 0;
 blackholeSmall.hitSize = 6;
 blackholeSmall.despawnEffect = Fx.none;
 blackholeSmall.keepVelocity = false;
-this.global.bullets.blackholeSmall = blackholeSmall;
+this.global.unitybullets.blackholeSmall = blackholeSmall;
 
 const grenade = extend(BasicBulletType,{
   draw(b){
@@ -530,7 +530,7 @@ grenade.hitShake = 4;
 grenade.hitEffect = Fx.flakExplosionBig;
 grenade.bulletSprite = "unity-b-grenade";
 
-this.global.bullets.grenade = grenade;
+this.global.unitybullets.grenade = grenade;
 
 const flashSpark = this.global.fx.flashSpark;
 
@@ -609,7 +609,7 @@ flashbang.bulletSprite = "unity-b-flashbang";
 flashbang.frontColor = Color.white;
 flashbang.backColor = Color.lightGray;
 
-this.global.bullets.flashbang = flashbang;
+this.global.unitybullets.flashbang = flashbang;
 
 const molotov = extend(BasicBulletType,{
   draw(b){
@@ -655,7 +655,7 @@ molotov.incendChance = 1;
 molotov.incendAmount = 35;
 molotov.incendSpread = 35;
 
-this.global.bullets.molotov = molotov;
+this.global.unitybullets.molotov = molotov;
 
 const empBlast = this.global.fx.empBlast;
 const empjam = extendContent(StatusEffect,"empjam",{
@@ -716,7 +716,7 @@ emp.lightningLength = 15;
 emp.splashDamage = 60;
 emp.splashDamageRadius = 60;
 
-this.global.bullets.emp = emp;
+this.global.unitybullets.emp = emp;
 
 const spear = extend(BasicBulletType,{
   draw(b){
@@ -781,7 +781,7 @@ spear.backColor = Pal.lancerLaser.cpy();
 spear.bulletWidth = 26;
 spear.bulletHeight = 36;
 
-this.global.bullets.spear = spear;
+this.global.unitybullets.spear = spear;
 
 const spear2 = extend(BasicBulletType,{
   draw(b){
@@ -868,7 +868,7 @@ spear2.backColor = Pal.surge.cpy();
 spear2.bulletWidth = 26;
 spear2.bulletHeight = 36;
 
-this.global.bullets.spear2 = spear2;
+this.global.unitybullets.spear2 = spear2;
 
 const ballstun = extendContent(StatusEffect,"ballstun",{
   update(unit, time){
@@ -913,7 +913,7 @@ ball.bulletSprite = "unity-b-ball";
 ball.status = ballstun;
 ball.statusDuration = 140;
 
-this.global.bullets.ball = ball;
+this.global.unitybullets.ball = ball;
 
 
 const spawnStart = newEffect(15, e => {
@@ -952,7 +952,7 @@ spawnZone.collidesTiles = false;
 spawnZone.collides = false;
 spawnZone.collidesAir = false;
 spawnZone.keepVelocity = false;
-this.global.bullets.spawnZone = spawnZone;
+this.global.unitybullets.spawnZone = spawnZone;
 
 const japok = extend(BombBulletType, {
   hit(b, x, y){
@@ -980,7 +980,7 @@ japok.instantDisappear = true;
 japok.hitEffect = Fx.none;
 japok.despawnEffect = Fx.none;
 japok.hitSound = Sounds.none;
-this.global.bullets.japok = japok;
+this.global.unitybullets.japok = japok;
 
 const rageStart = newEffect(100, e => {
   Draw.color(Color.purple, Color.white, e.fout());
@@ -1009,7 +1009,7 @@ rageZone.collidesTiles = false;
 rageZone.collides = false;
 rageZone.collidesAir = false;
 rageZone.keepVelocity = false;
-this.global.bullets.rageZone = rageZone;
+this.global.unitybullets.rageZone = rageZone;
 
 const arrayTrail = newEffect(15, e => {
   Draw.color(e.color);
@@ -1041,7 +1041,7 @@ fragArrayPiece.despawnEffect = Fx.hitMeltdown;
 fragArrayPiece.status = StatusEffects.burning;
 fragArrayPiece.homingPower = 0.03;
 fragArrayPiece.homingRange = 150;
-this.global.bullets.fragArrayPiece = fragArrayPiece;
+this.global.unitybullets.fragArrayPiece = fragArrayPiece;
 
 const fragArray = extend(BasicBulletType, {
   init(b){
@@ -1061,7 +1061,7 @@ fragArray.collidesTiles = false;
 fragArray.collides = false;
 fragArray.collidesAir = false;
 fragArray.keepVelocity = false;
-this.global.bullets.fragArray = fragArray;
+this.global.unitybullets.fragArray = fragArray;
 
 const meltColor = Color.valueOf("ff9c5a");
 const meltChargeFx = this.global.fx.meltChargeFx;
@@ -1108,7 +1108,7 @@ meltCharge.collidesTiles = false;
 meltCharge.collides = false;
 meltCharge.collidesAir = false;
 meltCharge.keepVelocity = false;
-this.global.bullets.meltCharge = meltCharge;
+this.global.unitybullets.meltCharge = meltCharge;
 
 const arrayHealStart = newEffect(100, e => {
   Draw.color(Pal.heal, Color.white, e.fout());
@@ -1137,7 +1137,7 @@ arrayHealZone.collidesTiles = false;
 arrayHealZone.collides = false;
 arrayHealZone.collidesAir = false;
 arrayHealZone.keepVelocity = false;
-this.global.bullets.arrayHealZone = arrayHealZone;
+this.global.unitybullets.arrayHealZone = arrayHealZone;
 
 const burstArrayPiece = extend(BasicBulletType, {
   draw(b){
@@ -1163,7 +1163,7 @@ burstArrayPiece.hitShake = 2;
 burstArrayPiece.hitEffect = Fx.hitLancer;
 burstArrayPiece.despawnEffect = Fx.hitLancer;
 burstArrayPiece.status = empjam;
-this.global.bullets.burstArrayPiece = burstArrayPiece;
+this.global.unitybullets.burstArrayPiece = burstArrayPiece;
 
 const burstArray = extend(BasicBulletType, {
   init(b){
@@ -1181,7 +1181,7 @@ burstArray.collidesTiles = false;
 burstArray.collides = false;
 burstArray.collidesAir = false;
 burstArray.keepVelocity = false;
-this.global.bullets.burstArray = burstArray;
+this.global.unitybullets.burstArray = burstArray;
 
 const wormSmall = extend(MissileBulletType, {
   hit(b,x,y){
@@ -1221,7 +1221,7 @@ wormSmall.trailColor = Color.valueOf("c4ceff");
 wormSmall.bulletWidth = 8;
 wormSmall.bulletHeight = 15;
 
-this.global.bullets.wormSmall = wormSmall;
+this.global.unitybullets.wormSmall = wormSmall;
 
 const spawnWellTrail = this.global.fx.spawnWellTrail;
 const spawnWell = extend(BasicBulletType, {
@@ -1270,7 +1270,7 @@ spawnWell.collidesTiles = false;
 spawnWell.collides = false;
 spawnWell.collidesAir = false;
 spawnWell.keepVelocity = false;
-this.global.bullets.spawnWell = spawnWell;
+this.global.unitybullets.spawnWell = spawnWell;
 
 const spawnErad = extend(BasicBulletType, {
   draw(b){
@@ -1310,7 +1310,7 @@ spawnErad.bulletHeight = 16;
 spawnErad.fragBullet = spawnWell;
 spawnErad.fragBullets = 1;
 
-this.global.bullets.spawnErad = spawnErad;
+this.global.unitybullets.spawnErad = spawnErad;
 
 const plusErad = extend(BasicBulletType, {
   draw(b){
@@ -1343,7 +1343,7 @@ plusErad.hitShake = 2;
 plusErad.hitEffect = Fx.none;
 plusErad.despawnEffect = Fx.none;
 
-this.global.bullets.plusErad = plusErad;
+this.global.unitybullets.plusErad = plusErad;
 
 const plusCharge = extend(BasicBulletType, {
   init(b){
@@ -1372,7 +1372,7 @@ plusCharge.collidesTiles = false;
 plusCharge.collides = false;
 plusCharge.collidesAir = false;
 plusCharge.keepVelocity = false;
-this.global.bullets.plusCharge = plusCharge;
+this.global.unitybullets.plusCharge = plusCharge;
 
 //This by EyeOfDarkness
 const bulletSize = 5.5;
@@ -1569,7 +1569,7 @@ singularityBullet.bulletHeight = 12;
 singularityBullet.bulletShrink = 0;
 singularityBullet.hitSize = 9;
 singularityBullet.despawnEffect = Fx.none;
-this.global.bullets.singularityBullet = singularityBullet;
+this.global.unitybullets.singularityBullet = singularityBullet;
 
 const bholErad = extend(BasicBulletType, {
   init(b){
@@ -1587,7 +1587,7 @@ bholErad.collidesTiles = false;
 bholErad.collides = false;
 bholErad.collidesAir = false;
 bholErad.keepVelocity = false;
-this.global.bullets.bholErad = bholErad;
+this.global.unitybullets.bholErad = bholErad;
 
 const despawnedBulletBig = newEffect(24, e => {
   const scales = [8.6, 7, 5.5, 4.3, 4.1, 3.9];
@@ -1695,7 +1695,7 @@ superBlackhole.bulletShrink = 0;
 superBlackhole.hitSize = 19;
 superBlackhole.drawSize = 290;
 superBlackhole.despawnEffect = despawnedBulletBig;
-this.global.bullets.superBlackhole = superBlackhole;
+this.global.unitybullets.superBlackhole = superBlackhole;
 
 const triEradPiece = extend(BasicBulletType, {
   draw(b){
@@ -1722,7 +1722,7 @@ triEradPiece.hitShake = 0;
 triEradPiece.hitEffect = Fx.hitLancer;
 triEradPiece.despawnEffect = Fx.hitLancer;
 triEradPiece.status = empjam;
-this.global.bullets.triEradPiece = triEradPiece;
+this.global.unitybullets.triEradPiece = triEradPiece;
 
 const triErad = extend(BasicBulletType, {
   draw(b){
@@ -1755,7 +1755,7 @@ triErad.hitShake = 2;
 triErad.hitEffect = Fx.none;
 triErad.despawnEffect = Fx.none;
 
-this.global.bullets.triErad = triErad;
+this.global.unitybullets.triErad = triErad;
 
 const triCharge = extend(BasicBulletType, {
   init(b){
@@ -1786,4 +1786,4 @@ triCharge.collidesTiles = false;
 triCharge.collides = false;
 triCharge.collidesAir = false;
 triCharge.keepVelocity = false;
-this.global.bullets.triCharge = triCharge;
+this.global.unitybullets.triCharge = triCharge;
