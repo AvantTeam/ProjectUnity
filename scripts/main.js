@@ -1,5 +1,5 @@
 //CUSTOM ASSETS
-require("project-unity/customfx");
+require("unity/customfx");
 
 //UNITS
-require("project-unity/project-spiboss")
+require("unity/project-spiboss")
