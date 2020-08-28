@@ -3,7 +3,6 @@
 require("unity/copterbase");
 
 // LegsUnit
-//require("unity/gummy");
 require("unity/project-spiboss");
 
 // CopterUnit
