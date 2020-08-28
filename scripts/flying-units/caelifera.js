@@ -10,6 +10,7 @@ const att = {
 			bladeCount: 4,
 			speed: 59
 		}];
+		
 		this.fallRotateSpeed = 2.5;
 	}
 }
@@ -19,9 +20,11 @@ const caelifera = extendContent(UnitType, "caelifera", {
 		this.super$init();
 		att.init();
 	},
+	
 	getAttributes(){
 		return att;
 	},
+	
 	draw(unit){
 		this.super$draw(unit);
 		copter.drawRotor(unit);
@@ -32,10 +35,12 @@ caelifera.constructor = prov(() => {
 	const unit = extend(UnitEntity, {
 		update(){
 			this.super$update();
+			
 			if(this.dead){
 				copter.onFall(this);
 			}
 		}
 	});
+	
 	return unit;
 });
