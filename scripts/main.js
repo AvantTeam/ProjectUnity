@@ -6,7 +6,7 @@ function loadFile(array, dir){
 	}
 }
 
-var libraries = ["copterbase"];
+var libraries = ["copterbase", "loader"];
 loadFile(libraries, "libraries");
 
 var groundUnits = ["project-spiboss"];

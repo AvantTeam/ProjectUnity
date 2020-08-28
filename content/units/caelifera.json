@@ -1,16 +1,14 @@
 {
 	"speed": 2.3,
-	"rotateSpeed": 4,
-	"baseRotateSpeed": 4,
 	"drag": 0.01,
-	"accel": 0.6,
+	"accel": 0.04,
 	"fallSpeed": 0.005,
 	"health": 150,
 	"engineSize": 0,
 	"flying": true,
-	"hovering": true,
 	"lowAltitude": true,
-	"hitSize": 15;
+	"hitsize": 15,
+	"range": 140,
 	"weapons": [
 		{
 			"name": "caelifera-gun",
@@ -31,7 +29,7 @@
 			"name": "caelifera-launcher",
 			"reload": 30,
 			"x": 4.5,
-			"y": -1.5,
+			"y": 0.5,
 			"shootSound": "shootSnap",
 			"ejectEffect": "shellEjectMedium",
 			"bullet": {
