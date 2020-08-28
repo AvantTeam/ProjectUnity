@@ -46,7 +46,7 @@ const loaderBlock = extendContent(Block, "loader-block", {
 			};
 		}));
 	},
-	
+  
 	isHidden(){
 		return true;
 	}
