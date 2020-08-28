@@ -15,7 +15,8 @@
 		{
 			"name": "caelifera-gun",
 			"reload": 6,
-			"y": 20,
+			"x": 5.25,
+			"y": 6.5,
 			"shootSound": "pew",
 			"ejectEffect": "shellEjectSmall",
 			"bullet": {
@@ -29,7 +30,8 @@
 		{
 			"name": "caelifera-launcher",
 			"reload": 30,
-			"y": 6,
+			"x": 4.5,
+			"y": -1.5,
 			"shootSound": "shootSnap",
 			"ejectEffect": "shellEjectMedium",
 			"bullet": {

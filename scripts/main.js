@@ -1,5 +1,5 @@
 // Custom assets
-require("unity/customeffects");
+//require("unity/customeffects");
 require("unity/copterbase");
 
 // LegsUnit
