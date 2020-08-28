@@ -1,4 +1,4 @@
-const copter = require("unity/copterbase");
+const copter = require("unity/libraries/copterbase");
 const att = {
 	init(){
 		this.rotor = [{
