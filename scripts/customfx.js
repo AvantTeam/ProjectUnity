@@ -1,6 +1,6 @@
 var t = this;
-var shieldColor = Color.valueOf("ffd37f").a(0.7);
-const shieldInColor = Color.black.cpy().a(0);
+var shieldColor = Color.valueOf("ffd37f").alpha(0.7);
+const shieldInColor = Color.black.cpy().alpha(0);
 const spaceshader = this.global.shaders.space;
 
 const bitcolor1 = Color.valueOf("00e5ff");
@@ -133,7 +133,7 @@ this.global.fx = {
 				radius = e.data * 1.3;
 			}
 		
-			fillLight(e.x, e.y, Lines.circleVertices(radius), radius, shieldInColor, shieldColor.lerp(Color.white.cpy().a(0.6), e.fout() / 2).a(e.fout()*0.6));
+			fillLight(e.x, e.y, Lines.circleVertices(radius), radius, shieldInColor, shieldColor.lerp(Color.white.cpy().alpha(0.6), e.fout() / 2).alpha(e.fout()*0.6));
 		}
 		catch(err){
 			print(err);
@@ -155,14 +155,14 @@ this.global.fx = {
 		}
 	}),
 	healFx: newEffect(25, e => {
-		Draw.color(Pal.surge, Pal.heal.cpy().a(0), e.fin());
+		Draw.color(Pal.surge, Pal.heal.cpy().alpha(0), e.fin());
 		Lines.stroke(1);
 		var offset = e.fin() * 5;
 		Lines.lineAngle(e.x - 1.5, e.y + offset, 0, 3);
 		Lines.lineAngle(e.x, e.y - 1.5 + offset, 90, 3);
 	}),
 	healSpread: newEffect(25, e => {
-		Draw.color(Pal.surge, Pal.heal.cpy().a(0), e.fin());
+		Draw.color(Pal.surge, Pal.heal.cpy().alpha(0), e.fin());
 		Lines.stroke(1);
 		var offset = e.fin() * 5;
 		Angles.randLenVectors(e.id, 1, 6 + 5 * e.fin(), floatc2((x, y) => {
@@ -242,7 +242,7 @@ this.global.fx = {
 		}
 	}),
 	smokeRise: newEffectSize(150, 150, e => {
-		Draw.color(Color.gray, Pal.darkishGray.cpy().a(0), e.fin());
+		Draw.color(Color.gray, Pal.darkishGray.cpy().alpha(0), e.fin());
 		var size = 7 + e.fin() * 8;
 		Draw.rect("circle", e.x+e.fin() * 26, e.y + e.fin() * 30, size, size);
 	}),
@@ -254,8 +254,8 @@ this.global.fx = {
 		}));
 	}),
 	flashbang: newEffectSize(5, 170, e => {
-		fillLight(e.x, e.y, Lines.circleVertices(85), 85, Color.white, Color.white.cpy().a(0));
-		fillLight(e.x, e.y, Lines.circleVertices(85), 85, Color.white, Color.white.cpy().a(0));
+		fillLight(e.x, e.y, Lines.circleVertices(85), 85, Color.white, Color.white.cpy().alpha(0));
+		fillLight(e.x, e.y, Lines.circleVertices(85), 85, Color.white, Color.white.cpy().alpha(0));
 		Draw.color();
 	}),
 	flashSpark: newEffect(40, e => {
@@ -337,7 +337,7 @@ this.global.fx = {
 		Lines.circle(e.x, e.y, e.finpow() * 5);
 	}),
 	chargeShine: newEffect(20, e => {
-		Draw.color(Pal.accent, Color.white.cpy().a(0), 1 - e.fout() * 2);
+		Draw.color(Pal.accent, Color.white.cpy().alpha(0), 1 - e.fout() * 2);
 		Lines.stroke(e.fout());
 		Angles.randLenVectors(e.id, 2 + e.id % 2, 30 * e.fout(), floatc2((x, y) => {
 			drawSpark(e.x + x, e.y + y, e.finpow() * 5, e.finpow() * 13, 0);
