@@ -43,7 +43,7 @@ const newEffectSize = (life, size, renderer) => new Effects.Effect(life, size, n
 
 const meltColor = Color.valueOf("ff9c5a");
 const distcolor = Color.valueOf("4c00ff");
-this.global.fx = {
+this.global.unityfx = {
 	evalfx: newEffect(30, e => {
 		if(e.data == null || !e.data.text || !e.data.parent) return;
 		try{
