@@ -8,7 +8,5 @@
 	"rotateSpeed": 1.6,
 	"hitsize": 19,
 	"armor": 3,
-	"rotateShooting": false,
-	"targetGround": false,
-	"targetAir": false,
+	"rotateShooting": true,
 }

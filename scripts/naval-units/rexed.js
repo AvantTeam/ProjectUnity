@@ -20,7 +20,7 @@ missile.width = 7;
 missile.height = 7;
 
 var artillery = extend(ArtilleryBulletType, {});
-artillery.hitEffect = Fx.sapExplosion;
+artillery.hitEffect = Fx.blastExplosion;
 artillery.knockback = 1.2;
 artillery.speed = 2.9;
 artillery.lifetime = 120;
@@ -39,11 +39,11 @@ var mainCannon = new Weapon("rexed-main");
 
 mainCannon.reload = 120;
 mainCannon.x = 0;
-mainCannon.mirror = false;
 mainCannon.y = -6;
-mainCannon.rotate = false;
+mainCannon.rotate = true;
 mainCannon.shake = 3;
 mainCannon.rotateSpeed = 1;
+mainCannon.mirror = false;
 mainCannon.bullet = artillery
 
 var missiles = new Weapon("missiles-mount");
@@ -53,7 +53,7 @@ missiles.x = 3.5;
 missiles.y = 5;
 missiles.rotate = true;
 missiles.shake = 3;
-mainCannon.rotateSpeed = 4;
+missiles.rotateSpeed = 4;
 missiles.bullet = missile
 
 rexed.constructor = () => {
@@ -67,3 +67,5 @@ rexed.constructor = () => {
 rexed.abilities.add(new ForceFieldAbility(65, 0.1, 300, 450));
 rexed.weapons.add(mainCannon);
 rexed.weapons.add(missiles);
+
+print(rexed.weapons.lenght)

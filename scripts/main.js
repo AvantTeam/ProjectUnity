@@ -15,7 +15,7 @@ loadFile(groundUnits, "ground-units");
 var flyingUnits = ["caelifera"];
 loadFile(flyingUnits, "flying-units");
 
-var navalUnits = ["rexed"];
+var navalUnits = ["rexed", "storm"];
 loadFile(navalUnits, "naval-units")
 
 var blocks = ["recursive-reconstructor"];
