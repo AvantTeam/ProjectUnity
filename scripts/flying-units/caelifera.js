@@ -19,11 +19,11 @@ const caelifera = extendContent(UnitType, "caelifera", {
 		this.super$init();
 		att.init();
 	},
-
+	
 	getAttributes(){
 		return att;
 	},
-
+	
 	draw(unit){
 		this.super$draw(unit);
 		copter.drawRotor(unit);

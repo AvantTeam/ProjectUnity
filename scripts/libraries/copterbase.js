@@ -19,7 +19,7 @@ module.exports = {
 				Draw.rect(region, unit.x + offx, unit.y + offy, w, h, angle);
 			}
 			Draw.alpha(Vars.state.isPaused() ? 1 : Time.time() % 2);
-			Draw.rect(topRegion, unit.x + offx, unit.y + offy, unit.rotation);
+			Draw.rect(topRegion, unit.x + offx, unit.y + offy, unit.rotation - 90);
 		}
 		Draw.mixcol();
 	},
