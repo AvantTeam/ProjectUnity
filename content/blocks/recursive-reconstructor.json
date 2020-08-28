@@ -1,0 +1,33 @@
+{
+	"type": "Reconstructor",
+	"size": 11,
+	"consumes": {
+		"power": 5,
+		"items": {
+			"items": [
+				{"item": "thorium", "amount": 1000},
+				{"item": "surge-alloy", "amount": 400},
+				{"item": "plastanium", "amount": 600},
+				{"item": "phase-fabric", "amount": 350}
+			]
+		},
+		"liquid": {
+			"liquid": "cryofluid",
+			"amount": 5
+		}
+	},
+	"requirements": [
+		{"item": "graphite", "amount": 1600},
+		{"item": "silicon", "amount": 2000},
+		{"item": "metaglass", "amount": 900},
+		{"item": "thorium", "amount": 600},
+		{"item": "lead", "amount": 1200},
+		{"item": "plastanium", "amount": 3600}
+	],
+	"constructTime": 20000,
+	"upgrades": [
+		["gummy", "project-spiboss"]
+	],
+	"category": "units",
+	"research": "tetrative-reconstructor"
+}
