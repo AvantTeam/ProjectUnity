@@ -1,9 +1,3 @@
-const prspiboss = extendContent(UnitType, "project-spiboss", {
-	load() {
-		this.super$load();
-		this.region = Core.atlas.find(this.name);
-	}
-});
 var sapBull1 = extend(SapBulletType, {});
 sapBull1.sapStrength = 0.8;
 sapBull1.length = 90;
@@ -14,6 +8,7 @@ sapBull1.despawnEffect = Fx.none;
 sapBull1.width = 0.7;
 sapBull1.lifetime = 35;
 sapBull1.knockback = -1.5;
+
 var sapBull2 = extend(SapBulletType, {});
 sapBull2.sapStrength = 0.9;
 sapBull2.length = 90;
@@ -24,6 +19,7 @@ sapBull2.despawnEffect = Fx.none;
 sapBull2.width = 0.75;
 sapBull2.lifetime = 35;
 sapBull2.knockback = -1.5;
+
 var sa = extend(ArtilleryBulletType, {});
 sa.hitEffect = Fx.sapExplosion;
 sa.knockback = 0.8;
@@ -42,11 +38,8 @@ sa.smokeEffect = Fx.shootBigSmoke2;
 sa.shake = 5;
 sa.status = StatusEffects.sapped;
 sa.statusDuration = 60 * 10;
+
 var weap1 = new Weapon("large-purple-mount");
-var weap2 = new Weapon("mount-purple-weapon");
-var weap3 = new Weapon("mount-purple-weapon");
-var weap4 = new Weapon("spiroct-weapon");
-var weap5 = new Weapon("spiroct-weapon");
 weap1.reload = 50;
 weap1.x = 10;
 weap1.y = -20;
@@ -56,6 +49,8 @@ weap1.rotateSpeed = 1;
 weap1.shots = 5;
 weap1.shotDelay = 6;
 weap1.bullet = sa;
+
+var weap2 = new Weapon("mount-purple-weapon");
 weap2.reload = 20;
 weap2.x = 25;
 weap2.y = 13;
@@ -63,6 +58,8 @@ weap2.rotate = true;
 weap2.shake = 1;
 weap2.rotateSpeed = 5;
 weap2.bullet = sapBull1;
+
+var weap3 = new Weapon("mount-purple-weapon");
 weap3.reload = 20;
 weap3.x = 20;
 weap3.y = 15;
@@ -70,6 +67,8 @@ weap3.rotate = true;
 weap3.shake = 1;
 weap3.rotateSpeed = 5;
 weap3.bullet = sapBull1;
+
+var weap4 = new Weapon("spiroct-weapon");
 weap4.reload = 23;
 weap4.x = 15;
 weap4.y = 23;
@@ -77,6 +76,8 @@ weap4.rotate = true;
 weap4.shake = 1;
 weap4.rotateSpeed = 3;
 weap4.bullet = sapBull2;
+
+var weap5 = new Weapon("spiroct-weapon");
 weap5.reload = 23;
 weap5.x = 25;
 weap5.y = 5;
@@ -84,16 +85,25 @@ weap5.rotate = true;
 weap5.shake = 1;
 weap5.rotateSpeed = 3;
 weap5.bullet = sapBull2;
-prspiboss.constructor = () => {
-	const unit = extend(BuilderLegsUnit, {})
 
+const prspiboss = extendContent(UnitType, "project-spiboss", {
+	load(){
+		this.super$load();
+		this.region = Core.atlas.find(this.name);
+	}
+});
+
+prspiboss.constructor = () => {
+	const unit = extend(BuilderLegsUnit, {});
 	return unit;
 }
-var weaps = [weap1, weap2, weap3, weap4, weap5];
+
 //prspiboss.defaultController = new BuilderAI();
-for(var i = 0; i<weaps.length; i++){
+var weaps = [weap1, weap2, weap3, weap4, weap5];
+for(var i = 0; i < weaps.length; i++){
 	weaps[i].alternate = false;
 	weaps[0].alternate = true;
 	prspiboss.weapons.add(weaps[i]);
-};
+}
+
 prspiboss.groundLayer = Layer.legUnit;

@@ -12,20 +12,24 @@ const att = {
 		}];
 		this.fallRotateSpeed = 2.5;
 	}
-};
+}
+
 const caelifera = extendContent(UnitType, "caelifera", {
 	init(){
 		this.super$init();
 		att.init();
 	},
+
 	getAttributes(){
 		return att;
 	},
+
 	draw(unit){
 		this.super$draw(unit);
 		copter.drawRotor(unit);
 	}
 });
+
 caelifera.constructor = prov(() => {
 	const unit = extend(UnitEntity, {
 		update(){
