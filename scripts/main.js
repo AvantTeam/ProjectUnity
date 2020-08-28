@@ -1,5 +1,10 @@
-//CUSTOM ASSETS
+// Custom assets
 require("unity/customeffects");
+require("unity/copterbase");
 
-//UNITS
-require("unity/project-spiboss")
+// LegsUnit
+//require("unity/gummy");
+require("unity/project-spiboss");
+
+// CopterUnit
+require("unity/caelifera");

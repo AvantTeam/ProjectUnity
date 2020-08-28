@@ -1,7 +1,7 @@
 var t = this;
 var shieldColor = Color.valueOf("ffd37f").alpha(0.7);
 const shieldInColor = Color.black.cpy().alpha(0);
-const spaceshader = this.global.shaders.space;
+//const spaceshader = this.global.shaders.space;
 
 const bitcolor1 = Color.valueOf("00e5ff");
 const bitcolor2 = Color.valueOf("ff65db");
