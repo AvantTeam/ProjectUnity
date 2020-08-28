@@ -3,5 +3,6 @@
 	"displayName": "Project Unity",
 	"author":"Alot of People",
 	"description": "Founder: Eye of Darkness\nCollaborators:\n   JerichoFletcher\n   GlennFolker\n   Gdeft\n   sk7725\n   younggam\n   Kapzduke\n   MEEP of Faith\n   TrinityXYZ\n   ThePythonGuy",
-	"version": "1.0.1"
+	"version": "1.0.1",
+	"minGameVersion": "104.6"
 }
