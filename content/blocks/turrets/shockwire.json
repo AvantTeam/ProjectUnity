@@ -1,0 +1,19 @@
+{
+  "size": 2,
+  "health": 1320,
+  "range": 125,
+  "reloadTime": 90,
+  "shootCone": 0.1,
+  "inaccuracy": 0,
+  "consumes": {
+    "power": 3.6
+  },
+  "requirements": [
+    {"item": "copper", "amount": 50},
+    {"item": "lead", "amount": 55},
+    {"item": "titanium", "amount": 20},
+    {"item": "silicon", "amount": 30}
+  ],
+  "category": "turret",
+  "research": "arc"
+}
