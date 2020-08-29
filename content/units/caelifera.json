@@ -3,7 +3,7 @@
 	"drag": 0.08,
 	"accel": 0.04,
 	"fallSpeed": 0.005,
-	"health": 150,
+	"health": 75,
 	"engineSize": 0,
 	"flying": true,
 	"hitsize": 12,
@@ -20,7 +20,7 @@
 				"type": "BasicBulletType",
 				"speed": 5,
 				"lifetime": 30,
-				"damage": 6,
+				"damage": 7,
 				"shrinkY": 0.2
 			}
 		},
@@ -35,7 +35,7 @@
 				"type": "MissileBulletType",
 				"speed": 3,
 				"lifetime": 50,
-				"splashDamage": 20,
+				"splashDamage": 40,
 				"splashDamageRadius": 6,
 				"drag": -0.01
 			}
