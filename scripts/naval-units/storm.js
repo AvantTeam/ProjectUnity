@@ -1,12 +1,10 @@
 const storm = extendContent(UnitType, "storm", {
-
-	load() {
+	load(){
 
 		this.super$load();
 		this.region = Core.atlas.find(this.name);
 
 	}
-	
 });
 
 // Bullets
@@ -61,7 +59,7 @@ igniter.rotate = true;
 igniter.shake = 5;
 igniter.rotateSpeed = 1;
 igniter.mirror = false;
-igniter.bullet = laser
+igniter.bullet = laser;
 
 
 var mainCannons = new Weapon("storm-main");
@@ -73,7 +71,7 @@ mainCannons.rotate = true;
 mainCannons.shake = 3;
 mainCannons.rotateSpeed = 1;
 mainCannons.mirror = true;
-mainCannons.bullet = artillery
+mainCannons.bullet = artillery;
 
 var missiles = new Weapon("missiles-mount");
 
@@ -83,7 +81,7 @@ missiles.y = 12;
 missiles.rotate = true;
 missiles.shake = 2;
 missiles.rotateSpeed = 4;
-missiles.bullet = missile
+missiles.bullet = missile;
 
 var missiles2 = new Weapon("missiles-mount");
 
@@ -93,11 +91,10 @@ missiles2.y = -8;
 missiles2.rotate = true;
 missiles2.shake = 2;
 missiles2.rotateSpeed = 4;
-missiles2.bullet = missile
+missiles2.bullet = missile;
 
 
 storm.constructor = () => {
-
 	const unit = extend(CommanderUnitWaterMove, {
 		update(unit) {
 			this.super$update();
