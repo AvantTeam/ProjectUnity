@@ -1,12 +1,14 @@
+this.global.unity = {};
+
 /* File "handler" */
 function loadFile(array, dir){
 	for(var file of array){
-		require("unity/" + dir + "/" + file);
+		this.global.unity[file] = require("unity/" + dir + "/" + file);
 		print("Successfully loaded " + file + ".js");
 	}
 }
 
-var libraries = ["copterbase", "loader"];
+var libraries = ["copterbase", "loader", "chainlaser"];
 loadFile(libraries, "libraries");
 
 var groundUnits = ["project-spiboss"];
@@ -18,8 +20,8 @@ loadFile(flyingUnits, "flying-units");
 var navalUnits = ["rexed", "storm"];
 loadFile(navalUnits, "naval-units")
 
-var blocks = ["recursive-reconstructor"];
+var blocks = ["recursivereconstructor"];
 loadFile(blocks, "blocks");
 
-var turrets = ["orb-turret"];
+var turrets = ["orb", "shockwire"];
 loadFile(turrets, "turrets");
