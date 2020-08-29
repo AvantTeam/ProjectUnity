@@ -1,0 +1,12 @@
+{
+	"speed": 0.6,
+	"health": 1370,
+	"engineSize": 5,
+	"engineOffset": 12,
+	"accel": 0.2,
+	"baseRotateSpeed": 0.1,
+	"rotateSpeed": 1.6,
+	"hitsize": 19,
+	"armor": 3,
+	"rotateShooting": true,
+}

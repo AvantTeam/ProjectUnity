@@ -41,8 +41,8 @@ sa.statusDuration = 60 * 10;
 
 const weap1 = new Weapon("large-purple-mount");
 weap1.reload = 50;
-weap1.x = 10;
-weap1.y = -20;
+weap1.x = 13;
+weap1.y = -17;
 weap1.rotate = true;
 weap1.shake = 1;
 weap1.rotateSpeed = 1;
@@ -53,7 +53,7 @@ weap1.bullet = sa;
 const weap2 = new Weapon("mount-purple-weapon");
 weap2.reload = 20;
 weap2.x = 25;
-weap2.y = 13;
+weap2.y = 10;
 weap2.rotate = true;
 weap2.shake = 1;
 weap2.rotateSpeed = 5;
@@ -62,7 +62,7 @@ weap2.bullet = sapBull1;
 const weap3 = new Weapon("mount-purple-weapon");
 weap3.reload = 20;
 weap3.x = 20;
-weap3.y = 15;
+weap3.y = 13;
 weap3.rotate = true;
 weap3.shake = 1;
 weap3.rotateSpeed = 5;
@@ -71,7 +71,7 @@ weap3.bullet = sapBull1;
 const weap4 = new Weapon("spiroct-weapon");
 weap4.reload = 23;
 weap4.x = 15;
-weap4.y = 23;
+weap4.y = 18;
 weap4.rotate = true;
 weap4.shake = 1;
 weap4.rotateSpeed = 3;
@@ -106,4 +106,4 @@ for(var i = 0; i < weaps.length; i++){
 	prspiboss.weapons.add(weaps[i]);
 }
 
-prspiboss.groundLayer = Layer.legUnit;
+prspiboss.groundLayer = Layer.legUnit + 3;

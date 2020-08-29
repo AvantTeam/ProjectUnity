@@ -1,6 +1,7 @@
 {
-	"type": "Reconstructor",
 	"size": 11,
+	"hasLiquids": true,
+	"liquidCapacity": 360,
 	"consumes": {
 		"power": 5,
 		"items": {

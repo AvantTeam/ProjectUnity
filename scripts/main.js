@@ -14,3 +14,12 @@ loadFile(groundUnits, "ground-units");
 
 var flyingUnits = ["caelifera"];
 loadFile(flyingUnits, "flying-units");
+
+var navalUnits = ["rexed", "storm"];
+loadFile(navalUnits, "naval-units")
+
+var blocks = ["recursive-reconstructor"];
+loadFile(blocks, "blocks");
+
+var turrets = ["orb-turret"];
+loadFile(turrets, "turrets");
