@@ -6,7 +6,7 @@
 	"accel": 0.2,
 	"baseRotateSpeed": 0.05,
 	"rotateSpeed": 0.7,
-	"hitsize": 45,
+	"hitsize": 48,
 	"armor": 7,
 	"rotateShooting": true,
 }
