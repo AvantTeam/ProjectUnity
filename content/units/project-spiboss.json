@@ -8,7 +8,7 @@
 	"legPairOffset": 0.7,
 	"legGroupSize": 3,
 	"legLength": 55,
-	"legExtension": -15,
+	"legExtension": -12,
 	"legBaseOffset": 22,
 	"landShake": 2.4,
 	"legLengthScl": 1,
