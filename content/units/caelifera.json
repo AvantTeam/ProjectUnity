@@ -1,13 +1,12 @@
 {
-	"speed": 2.3,
-	"drag": 0.01,
+	"speed": 3.2,
+	"drag": 0.08,
 	"accel": 0.04,
 	"fallSpeed": 0.005,
 	"health": 150,
 	"engineSize": 0,
 	"flying": true,
-	"lowAltitude": true,
-	"hitsize": 15,
+	"hitsize": 12,
 	"range": 140,
 	"weapons": [
 		{
