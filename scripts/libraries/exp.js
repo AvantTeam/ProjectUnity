@@ -9,7 +9,7 @@ const lib = require("unity/libraries/exp-body");
 module.exports = {
   extend(Type, build, name, obj, objb){
     if(obj == undefined) obj = {};
-    if(obj2 == undefined) obj2 = {};
+    if(objb == undefined) objb = {};
     const block = Object.create(lib.body);
     const def = Object.create(lib.def);
     Object.assign(def, obj, block);
