@@ -56,6 +56,7 @@ const orb = extend(BulletType, {
 		Draw.color();
 		Fill.circle(b.x, b.y, 2.5);
 	},
+	
 	update(b){
 		this.super$update(b);
 		if(b.timer.get(1, 7)){

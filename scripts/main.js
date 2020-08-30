@@ -23,5 +23,5 @@ loadFile(navalUnits, "naval-units")
 const blocks = ["recursivereconstructor"];
 loadFile(blocks, "blocks");
 
-var turrets = ["orb", "shockwire", "burnade"];
+const turrets = ["orb", "shockwire", "burnade"];
 loadFile(turrets, "turrets");
