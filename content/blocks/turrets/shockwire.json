@@ -1,18 +1,18 @@
 {
   "size": 2,
-  "health": 1320,
+  "health": 1400,
   "range": 125,
-  "reloadTime": 90,
-  "shootCone": 0.1,
+  "reloadTime": 140,
+  "coolantMultiplier": 3,
+  "shootCone": 1,
+  "shootDuration": 200,
   "inaccuracy": 0,
-  "consumes": {
-    "power": 3.6
-  },
+  "powerUse": 3.6,
   "requirements": [
-    {"item": "copper", "amount": 50},
-    {"item": "lead", "amount": 55},
-    {"item": "titanium", "amount": 20},
-    {"item": "silicon", "amount": 30}
+    {"item": "copper", "amount": 150},
+    {"item": "lead", "amount": 145},
+    {"item": "titanium", "amount": 160},
+    {"item": "silicon", "amount": 130}
   ],
   "category": "turret",
   "research": "arc"
