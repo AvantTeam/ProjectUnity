@@ -90,8 +90,17 @@ module.exports = {
     /*
     objb.totalExp = () => {
 
-    }
+    }*/
     objb = Object.assign(objb, {
+      totalExp(){
+        return this._exp;
+      },
+      setExp(a){
+        this._exp = a;
+      },
+      incExp(a){
+        this._exp += a;
+      },
       updateTile(){
         expblock.setEXPStats(this);
         if(typeof this["customUpdate"]==="function") this.customUpdate();
@@ -105,12 +114,13 @@ module.exports = {
         this.super$write(stream);
         stream.i(this._exp);
       }
-    });*/
+    });
     //Extend Building
     print("Created Building: " + Object.keys(objb));
-    expblock.entityType = () => {
-      const ent = extendContent(build, expblock, objb);
+    expblock.entityType = (ent) => {
+      ent = extendContent(build, expblock, objb);
       ent._exp = 0;
+      /*
       ent.totalExp = ()=>{
         return ent._exp;
       }
@@ -119,7 +129,7 @@ module.exports = {
       }
       ent.incExp = (a)=>{
         ent._exp += a;
-      }
+      }*/
       return ent;
     }
 
