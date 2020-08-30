@@ -8,23 +8,20 @@ function loadFile(array, dir){
 	}
 }
 
-var libraries = ["copterbase", "loader", "chainlaser"];
+const libraries = ["copterbase", "loader", "chainlaser"];
 loadFile(libraries, "libraries");
 
-var groundUnits = ["project-spiboss"];
+const groundUnits = ["project-spiboss"];
 loadFile(groundUnits, "ground-units");
 
-var flyingUnits = ["caelifera"];
+const flyingUnits = ["caelifera", "schistocerca"];
 loadFile(flyingUnits, "flying-units");
 
-var navalUnits = ["rexed", "storm"];
+const navalUnits = ["rexed", "storm"];
 loadFile(navalUnits, "naval-units")
 
-var blocks = ["recursivereconstructor"];
+const blocks = ["recursivereconstructor"];
 loadFile(blocks, "blocks");
 
-var turrets = ["orb-turret", "burnade"];
-loadFile(turrets, "turrets");
-
-var turrets = ["orb", "shockwire"];
+const turrets = ["orb-turret", "burnade", "shockwire"];
 loadFile(turrets, "turrets");

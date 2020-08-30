@@ -1,0 +1,54 @@
+{
+	"speed": 3.5,
+	"drag": 0.07,
+	"accel": 0.03,
+	"fallSpeed": 0.005,
+	"health": 130,
+	"engineSize": 0,
+	"flying": true,
+	"hitsize": 12,
+	"range": 165,
+	"weapons": [
+		{
+			"name": "schistocerca-gun",
+			"x": 1.5,
+			"y": 11,
+			"shootSound": "pew",
+			"ejectEffect": "shellEjectSmall",
+			"reload": 8,
+			"bullet": {
+				"type": "BasicBulletType",
+				"speed": 4,
+				"lifetime": 36,
+				"damage": 5,
+				"shrinkY": 0.2
+			}
+		},
+		{
+			"name": "schistocerca-gun",
+			"x": 4,
+			"y": 8.75,
+			"shootSound": "shootSnap",
+			"ejectEffect": "shellEjectSmall",
+			"reload": 12,
+			"bullet": {
+				"type": "BasicBulletType",
+				"width": 7,
+				"height": 9,
+				"speed": 4,
+				"lifetime": 36,
+				"damage": 8,
+				"shrinkY": 0.2
+			}
+		},
+		{
+			"name": "schistocerca-gun-big",
+			"x": 6.75,
+			"y": 5.75,
+			"shootSound": "shootBig",
+			"ejectEffect": "shellEjectMedium",
+			"reload": 30,
+			"bullet": "standardIncendiaryBig"
+		}
+	]
+}
