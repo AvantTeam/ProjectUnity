@@ -8,7 +8,7 @@ function loadFile(array, dir){
 	}
 }
 
-const libraries = ["copterbase", "loader", "chainlaser"];
+const libraries = ["copterbase", "loader", "chainlaser", "exp"];
 loadFile(libraries, "libraries");
 
 const groundUnits = ["project-spiboss"];
@@ -23,5 +23,5 @@ loadFile(navalUnits, "naval-units")
 const blocks = ["recursivereconstructor"];
 loadFile(blocks, "blocks");
 
-const turrets = ["orb", "shockwire", "burnade"];
+const turrets = ["orb", "shockwire", "burnade", "burnade-test"];
 loadFile(turrets, "turrets");
