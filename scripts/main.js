@@ -8,7 +8,7 @@ function loadFile(array, dir){
 	}
 }
 
-const libraries = ["copterbase", "loader", "chainlaser", "exp-body", "exp"];
+const libraries = ["copterbase", "loader", "chainlaser", "exp"];
 loadFile(libraries, "libraries");
 
 const groundUnits = ["project-spiboss"];
