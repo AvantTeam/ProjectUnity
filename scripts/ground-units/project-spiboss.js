@@ -48,6 +48,7 @@ weap1.shake = 1;
 weap1.rotateSpeed = 1;
 weap1.shots = 5;
 weap1.shotDelay = 6;
+weap1.shootSound = Sounds.artillery;
 weap1.bullet = sa;
 weap1.shootSound = Sounds.artillery;
 
