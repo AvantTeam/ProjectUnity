@@ -21,5 +21,5 @@ loadFile(navalUnits, "naval-units")
 var blocks = ["recursive-reconstructor"];
 loadFile(blocks, "blocks");
 
-var turrets = ["orb-turret"];
+var turrets = ["orb-turret", "burnade"];
 loadFile(turrets, "turrets");
