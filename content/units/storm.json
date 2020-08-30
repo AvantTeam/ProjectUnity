@@ -8,5 +8,12 @@
 	"rotateSpeed": 0.7,
 	"hitsize": 41,
 	"armor": 7,
+	"immunities": [
+		"wet"
+	],
+	"trailY": -26,
+	"trailX": 15,
+	"trailLength": 45,
+	"trailScl": 2,
 	"rotateShooting": true,
 }
