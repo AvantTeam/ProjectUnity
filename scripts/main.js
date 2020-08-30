@@ -23,10 +23,8 @@ loadFile(navalUnits, "naval-units")
 var blocks = ["recursivereconstructor"];
 loadFile(blocks, "blocks");
 
-<<<<<<< HEAD
 var turrets = ["orb-turret", "burnade"];
 loadFile(turrets, "turrets");
-=======
+
 var turrets = ["orb", "shockwire"];
 loadFile(turrets, "turrets");
->>>>>>> 743b95b1141f54035f30687bf8ed13f1478e2f41
