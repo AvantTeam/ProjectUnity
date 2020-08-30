@@ -10,6 +10,11 @@ const burnadeTest = lib.extend(ItemTurret, ItemTurret.ItemTurretBuild, "burnade-
 		this.ammo(Items.coal, Bullets.basicFlame, Items.pyratite, Bullets.pyraFlame);
 	}
 }, {
+  updateTile(){
+    this.block.setEXPStats(this);
+    //if(typeof this["customUpdate"]==="function") this.customUpdate();
+    this.super$updateTile();
+  },
   shoot(type){
     this.incExp(2);
     this.super$shoot(type);
