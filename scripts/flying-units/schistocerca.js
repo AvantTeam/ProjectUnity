@@ -1,14 +1,18 @@
 const att = {
 	init(){
-		this.rotor = [{
-			bladeRegion: Core.atlas.find("unity-caelifera-rotor-blade"),
-			topRegion: Core.atlas.find("unity-caelifera-rotor-top"),
-			x: 0,
-			y: 6,
-			scale: 1,
-			bladeCount: 4,
-			speed: 29
-		}];
+		this.rotor = [];
+		
+		for(var i = 0; i < 2; i++){
+			this.rotor.push({
+				bladeRegion: Core.atlas.find("unity-schistocerca-rotor-blade"),
+				topRegion: Core.atlas.find("unity-schistocerca-rotor-top"),
+				x: 0,
+				y: 6.5,
+				scale: 1,
+				bladeCount: 3,
+				speed: 29 * Mathf.signs[i]
+			});
+		}
 		
 		this.fallRotateSpeed = 2.5;
 	}
@@ -16,7 +20,7 @@ const att = {
 
 const copterBase = this.global.copterBase;
 
-const caelifera = extendContent(UnitType, "caelifera", {
+const schistocerca = extendContent(UnitType, "schistocerca", {
 	init(){
 		this.super$init();
 		att.init();
@@ -32,7 +36,7 @@ const caelifera = extendContent(UnitType, "caelifera", {
 	}
 });
 
-caelifera.constructor = prov(() => {
+schistocerca.constructor = prov(() => {
 	const unit = extend(UnitEntity, {
 		update(){
 			this.super$update();

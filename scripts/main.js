@@ -6,20 +6,20 @@ function loadFile(array, dir){
 	}
 }
 
-var libraries = ["copterbase", "loader"];
+const libraries = ["copterbase", "loader"];
 loadFile(libraries, "libraries");
 
-var groundUnits = ["project-spiboss"];
+const groundUnits = ["project-spiboss"];
 loadFile(groundUnits, "ground-units");
 
-var flyingUnits = ["caelifera"];
+const flyingUnits = ["caelifera", "schistocerca"];
 loadFile(flyingUnits, "flying-units");
 
-var navalUnits = ["rexed", "storm"];
+const navalUnits = ["rexed", "storm"];
 loadFile(navalUnits, "naval-units")
 
-var blocks = ["recursive-reconstructor"];
+const blocks = ["recursive-reconstructor"];
 loadFile(blocks, "blocks");
 
-var turrets = ["orb-turret"];
+const turrets = ["orb-turret"];
 loadFile(turrets, "turrets");

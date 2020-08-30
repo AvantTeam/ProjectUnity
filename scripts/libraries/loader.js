@@ -5,6 +5,7 @@ const loaderBlock = extendContent(Block, "loader-block", {
 	
 	init(){
 		Core.app.post(run(() => {
+			// Air Factory
 			try{
 				const airFac = Blocks.airFactory;
 				
@@ -18,6 +19,7 @@ const loaderBlock = extendContent(Block, "loader-block", {
 						Items.titanium, 25
 					)
 				);
+				
 				var newPlan = [];
 				for(var i = 0; i < airFac.plans.length; i++){
 					newPlan.push(airFac.plans[i]);
@@ -41,6 +43,25 @@ const loaderBlock = extendContent(Block, "loader-block", {
 				airFac.consumes.add(extendContent(ConsumeItemDynamic, func(e => {
 					return e.currentPlan != -1 ? (airFac.plans[e.currentPlan]).requirements : ItemStack.empty
 				}), {}));
+			}catch(e){
+				print(e);
+			};
+			
+			// Additive Reconstructor
+			try{
+				const addReconstructor = Blocks.additiveReconstructor;
+				
+				var newUpgrades = [];
+				for(var i = 0; i < addReconstructor.upgrades.length; i++){
+					newUpgrades.push(addReconstructor.upgrades[i]);
+				}
+				newUpgrades.push(
+					[
+						Vars.content.getByName(ContentType.unit, "unity-caelifera"),
+						Vars.content.getByName(ContentType.unit, "unity-schistocerca")
+					]
+				);
+				addReconstructor.upgrades = newUpgrades;
 			}catch(e){
 				print(e);
 			};
