@@ -65,9 +65,7 @@ missiles.rotateSpeed = 4;
 missiles.bullet = missile;
 
 rexed.constructor = () => {
-
-	const unit = extend(CommanderUnitWaterMove, {})
-
+	const unit = extend(CommanderUnitWaterMove, {});
 	return unit;
 
 };

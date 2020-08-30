@@ -45,24 +45,24 @@ const orb = extend(BulletType, {
   update(b){
     this.super$update(b);
     Units.nearbyEnemies(b.team, b.x - this.scanRadius, b.y - this.scanRadius, this.scanRadius * 2, this.scanRadius * 2, cons(unit => {
-      if(b.timer.get(1, 9)){
-        Lightning.create(b.team, Pal.surge, Mathf.random(18, 36), b.x, b.y, b.angleTo(unit), Mathf.random(5, 9));
+      if(b.timer.get(1, 7)){
+        Lightning.create(b.team, Pal.surge, Mathf.random(22, 42), b.x, b.y, b.angleTo(unit), Mathf.random(7, 13));
       }
     }));
   }
 });
 orb.lifetime = 240;
-orb.speed = 1.2;
+orb.speed = 1.24;
 orb.damage = 23;
 orb.pierce = true;
 orb.hittable = false;
 orb.hitEffect = orbHit;
-orb.scanRadius = 4 * Vars.tilesize;
+orb.scanRadius = 5 * Vars.tilesize;
 
 const orbTurret = extendContent(ChargeTurret, "orb", {});
 orbTurret.shootType = orb;
 orbTurret.heatColor = Pal.surge;
 orbTurret.shootEffect = orbShoot;
-orbTurret.smokeEffect = orbShootSmoke;
+orbTurret.smokeEffect = Fx.none;
 orbTurret.chargeEffect = orbCharge;
 orbTurret.chargeBeginEffect = orbChargeBegin;

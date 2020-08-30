@@ -114,8 +114,7 @@ storm.constructor = () => {
 		update(unit) {
 			this.super$update();
 		}
-	})
-
+	});
 	return unit;
 }
 

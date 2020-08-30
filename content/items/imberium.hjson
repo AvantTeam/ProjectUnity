@@ -1,0 +1,8 @@
+{
+	"type": "material",
+	"name": "Imberium",
+	"color": "deff8a",
+	"radioactivity": 0.6,
+	"hardness": 3,
+	"cost": 5
+}

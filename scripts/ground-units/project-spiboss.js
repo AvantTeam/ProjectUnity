@@ -48,7 +48,9 @@ weap1.shake = 1;
 weap1.rotateSpeed = 1;
 weap1.shots = 5;
 weap1.shotDelay = 6;
+weap1.shootSound = Sounds.artillery;
 weap1.bullet = sa;
+weap1.shootSound = Sounds.artillery;
 
 const weap2 = new Weapon("mount-purple-weapon");
 weap2.reload = 20;
@@ -58,6 +60,7 @@ weap2.rotate = true;
 weap2.shake = 1;
 weap2.rotateSpeed = 5;
 weap2.bullet = sapBull1;
+weap2.shootSound = Sounds.flame;
 
 const weap3 = new Weapon("mount-purple-weapon");
 weap3.reload = 20;
@@ -67,6 +70,7 @@ weap3.rotate = true;
 weap3.shake = 1;
 weap3.rotateSpeed = 5;
 weap3.bullet = sapBull1;
+weap3.shootSound = Sounds.flame;
 
 const weap4 = new Weapon("spiroct-weapon");
 weap4.reload = 23;
@@ -76,6 +80,7 @@ weap4.rotate = true;
 weap4.shake = 1;
 weap4.rotateSpeed = 3;
 weap4.bullet = sapBull2;
+weap4.shootSound = Sounds.flame;
 
 const weap5 = new Weapon("spiroct-weapon");
 weap5.reload = 23;
@@ -85,6 +90,7 @@ weap5.rotate = true;
 weap5.shake = 1;
 weap5.rotateSpeed = 3;
 weap5.bullet = sapBull2;
+weap5.shootSound = Sounds.flame;
 
 const prspiboss = extendContent(UnitType, "project-spiboss", {
 	load(){
