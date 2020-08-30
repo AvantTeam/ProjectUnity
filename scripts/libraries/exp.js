@@ -12,10 +12,11 @@ module.exports = {
     if(objb == undefined) objb = {};
     const block = Object.create(lib.body);
     const def = Object.create(lib.def);
-    Object.assign(def, obj, block);
+    obj = Object.assign(def, obj, block);
+    print("Created Block: " + Object.keys(obj));
     //const rec=JSON.parse(JSON.stringify(recipes));
     //Object.assign(obj, block);
-    const expblock = extendContent(Type, name, def);
+    const expblock = extendContent(Type, name, obj);
 
     Object.assign(objb, {
       _exp: 0,
