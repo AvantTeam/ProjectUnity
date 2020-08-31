@@ -19,7 +19,7 @@ const att = {
 	}
 }
 
-const copterBase = this.global.unity.copterBase;
+const copterBase = this.global.unity.copterbase;
 
 const schistocerca = extendContent(UnitType, "schistocerca", {
 	init(){

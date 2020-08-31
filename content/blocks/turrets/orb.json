@@ -9,7 +9,7 @@
 	"chargeTime": 65,
 	"chargeEffects": 5,
 	"chargeMaxDelay": 25,
-	"powerUse": 6.4,
+	"powerUse": 10.4,
 	"requirements": [
 		{"item": "copper", "amount": 55},
 		{"item": "lead", "amount": 30},
