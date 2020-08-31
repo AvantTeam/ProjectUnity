@@ -49,7 +49,6 @@ amphibi.constructor = () => {
 					unit.kill()
 				} else {
 					time = time - 1
-					print(time)
 				}
 			}
 		}
@@ -78,7 +77,6 @@ amphibiGround.constructor = () => {
 					unit.kill()
 				} else {
 					time = time - 1
-					print(time)
 				}
 			}
 		}
