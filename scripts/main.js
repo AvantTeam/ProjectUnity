@@ -1,27 +1,95 @@
 this.global.unity = {};
 
-/* File "handler" */
-function loadFile(array, dir){
-	for(var file of array){
-		this.global.unity[file] = require("unity/" + dir + "/" + file);
-		print("Successfully loaded " + file + ".js");
+const loadFile = (prev, array) => {
+	var results = [];
+	var names = [];
+	
+	var p = prev;
+	
+	for(var i = 0; i < array.length; i++){
+		var file = array[i];
+		if(typeof(file) === "object"){
+			//p += prev + file.name + "/";
+			p.push(file.name);
+			results = results.concat(loadFile(p, file.childs).res);
+			p.pop();
+		}else{
+			var temp = p.join("/") + "/" + file;
+			results.push(temp);
+			names.push(file);
+		};
+	};
+	
+	return {
+		res: results,
+		name: names
+	};
+};
+
+const script = [
+	{
+		name: "libraries",
+		childs: [
+			"copterbase",
+			"loader",
+			"chainlaser",
+			"exp"
+		]
+	},
+	{
+		name: "global",
+		childs: [
+			{
+				name: "blocks",
+				childs: [
+					"recursivereconstructor"
+				]
+			},
+			{
+				name: "flying-units",
+				childs: [
+					"caelifera",
+					"schistocerca"
+				]
+			},
+			{
+				name: "ground-units",
+				childs: [
+					"project-spiboss"
+				]
+			},
+			{
+				name: "naval-units",
+				childs: [
+					"rexed",
+					"storm"
+				]
+			},
+			{
+				name: "turrets",
+				childs: [
+					"burnade",
+					"burnade-test"
+				]
+			}
+		]
+	},
+	{
+		name: "imber",
+		childs: [
+			{
+				name: "turrets",
+				childs: [
+					"orb",
+					"shockwire"
+				]
+			}
+		]
 	}
-}
-
-const libraries = ["copterbase", "loader", "chainlaser", "exp"];
-loadFile(libraries, "libraries");
-
-const groundUnits = ["project-spiboss"];
-loadFile(groundUnits, "ground-units");
-
-const flyingUnits = ["caelifera", "schistocerca"];
-loadFile(flyingUnits, "flying-units");
-
-const navalUnits = ["rexed", "storm"];
-loadFile(navalUnits, "naval-units")
-
-const blocks = ["recursivereconstructor"];
-loadFile(blocks, "blocks");
-
-const turrets = ["orb", "shockwire", "burnade", "burnade-test"];
-loadFile(turrets, "turrets");
+];
+const loadedScript = loadFile([], script);
+for(var i = 0; i < loadedScript.res.length; i++){
+	var res = loadedScript.res[i];
+	var name = loadedScript.name[i];
+	this.global.unity[name] = require("unity/" + res);
+};
