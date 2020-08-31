@@ -8,13 +8,14 @@ const loadFile = (prev, array) => {
 	
 	for(var i = 0; i < array.length; i++){
 		var file = array[i];
+		
 		if(typeof(file) === "object"){
-			//p += prev + file.name + "/";
 			p.push(file.name);
 			results = results.concat(loadFile(p, file.childs).res);
 			p.pop();
 		}else{
 			var temp = p.join("/") + "/" + file;
+			
 			results.push(temp);
 			names.push(file);
 		};
@@ -36,6 +37,7 @@ const script = [
 			"exp"
 		]
 	},
+	
 	{
 		name: "global",
 		childs: [
@@ -45,6 +47,7 @@ const script = [
 					"recursivereconstructor"
 				]
 			},
+			
 			{
 				name: "flying-units",
 				childs: [
@@ -52,12 +55,14 @@ const script = [
 					"schistocerca"
 				]
 			},
+			
 			{
 				name: "ground-units",
 				childs: [
 					"project-spiboss"
 				]
 			},
+			
 			{
 				name: "naval-units",
 				childs: [
@@ -65,6 +70,7 @@ const script = [
 					"storm"
 				]
 			},
+			
 			{
 				name: "turrets",
 				childs: [
@@ -74,6 +80,7 @@ const script = [
 			}
 		]
 	},
+	
 	{
 		name: "imber",
 		childs: [
