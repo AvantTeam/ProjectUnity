@@ -15,7 +15,7 @@ const att = {
 	}
 }
 
-const copterBase = this.global.unity.copterBase;
+const copterBase = this.global.unity.copterbase;
 
 const caelifera = extendContent(UnitType, "caelifera", {
 	init(){
