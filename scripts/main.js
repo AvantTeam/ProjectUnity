@@ -3,12 +3,12 @@ this.global.unity = {};
 const loadFile = (prev, array) => {
 	var results = [];
 	var names = [];
-	
+
 	var p = prev;
-	
+
 	for(var i = 0; i < array.length; i++){
 		var file = array[i];
-		
+
 		if(typeof(file) === "object"){
 			p.push(file.name);
 			var temp = loadFile(p, file.childs);
@@ -21,7 +21,7 @@ const loadFile = (prev, array) => {
 			names.push(file);
 		};
 	};
-	
+
 	return {
 		res: results,
 		fileNames: names
@@ -38,7 +38,7 @@ const script = [
 			"exp"
 		]
 	},
-	
+
 	{
 		name: "global",
 		childs: [
@@ -48,7 +48,7 @@ const script = [
 					"recursivereconstructor"
 				]
 			},
-			
+
 			{
 				name: "flying-units",
 				childs: [
@@ -57,14 +57,14 @@ const script = [
 					"anthophila"
 				]
 			},
-			
+
 			{
 				name: "ground-units",
 				childs: [
 					"project-spiboss"
 				]
 			},
-			
+
 			{
 				name: "naval-units",
 				childs: [
@@ -72,17 +72,16 @@ const script = [
 					"storm"
 				]
 			},
-			
+
 			{
 				name: "turrets",
 				childs: [
-					"burnade",
-					"burnade-test"
+					"burnade"
 				]
 			}
 		]
 	},
-	
+
 	{
 		name: "imber",
 		childs: [
@@ -94,7 +93,19 @@ const script = [
 				]
 			}
 		]
-	}
+	},
+
+    {
+        name: "koruh",
+        childs: [
+            {
+                name: "turrets",
+                childs: [
+                    "laser"
+                ]
+            }
+        ]
+    }
 ];
 const loadedScript = loadFile([], script);
 for(var i = 0; i < loadedScript.res.length; i++){
