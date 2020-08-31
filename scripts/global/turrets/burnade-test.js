@@ -21,7 +21,7 @@ const burnadeTest = lib.extend(ItemTurret, ItemTurret.ItemTurretBuild, "burnade-
   shoot(type){
     //Increment EXP, replace this with whenever you want the block to gain EXP.
     this.incExp(20);
-    print("Reload: "+burnadeTest.reloadTime);
+    print("Reload: " + burnadeTest.reloadTime);
     this.super$shoot(type);
   }
 });

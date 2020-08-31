@@ -24,11 +24,12 @@ const shockBeam = extend(ContinuousLaserBulletType, {
 	},
 	
 	update(b){
-		if(b.timer.get(1, 8)){
+		if(b.timer.get(1, 7)){
 			if(b.owner.target == null) return;
-			Lightning.create(b.team, this.color, Mathf.random(this.damage / 2, this.damage), b.x, b.y, b.angleTo(b.owner.target), Mathf.floorPositive(b.dst(b.owner.target) / Vars.tilesize + 3));
+			Lightning.create(b.team, this.color, Mathf.random(this.damage / 1.6, this.damage), b.x, b.y, b.angleTo(b.owner.target), Mathf.floorPositive(b.dst(b.owner.target) / Vars.tilesize + 3));
 		}
 	},
+	
 	draw(b){
 		var target = b.owner.target;
 		if(target == null) return;
@@ -40,16 +41,16 @@ const shockBeam = extend(ContinuousLaserBulletType, {
 		Drawf.light(b.team, b.x, b.y, b.x + target.x, b.y + target.y, 15 * b.fout(), this.lightColor, 0.6);
 	}
 });
-shockBeam.damage = 90;
+shockBeam.damage = 95;
 shockBeam.speed = 0.0001;
 shockBeam.despawnEffect = Fx.none;
 shockBeam.pierce = true;
 shockBeam.hitSize = 0;
 shockBeam.status = StatusEffects.shocked;
 shockBeam.statusDuration = 3 * 60;
-shockBeam.width = 0.44;
+shockBeam.width = 0.42;
 shockBeam.length = 120;
-shockBeam.color = Color.white.cpy();
+shockBeam.color = Pal.surge.cpy();
 shockBeam.hittable = false;
 shockBeam.hitEffect = Fx.hitLiquid;
 

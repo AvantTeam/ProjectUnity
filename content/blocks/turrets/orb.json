@@ -4,7 +4,7 @@
 	"range": 145,
 	"reloadTime": 150,
 	"shootCone": 0.1,
-	"shots": 3,
+	"shots": 1,
 	"inaccuracy": 12,
 	"chargeTime": 65,
 	"chargeEffects": 5,

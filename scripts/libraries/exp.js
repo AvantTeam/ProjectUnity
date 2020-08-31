@@ -8,13 +8,13 @@
 //objb: what will override the building.
 
 function clone(obj){
-  if (obj === null || typeof(obj) !== 'object')
+  if(obj === null || typeof(obj) !== 'object')
   return obj;
 
   var copy = obj.constructor();
 
-  for (var attr in obj) {
-    if (obj.hasOwnProperty(attr)) {
+  for(var attr in obj){
+    if(obj.hasOwnProperty(attr)){
       copy[attr] = obj[attr];
     }
   }
@@ -26,9 +26,6 @@ module.exports = {
   extend(Type, build, name, obj, objb){
     if(obj == undefined) obj = {};
     if(objb == undefined) objb = {};
-    //var block = JSON.parse(lbodyStr);
-    //var def = JSON.parse(ldefStr);
-    //print("Def: " + Object.keys(def));
     obj = Object.assign({
       //start
       maxLevel: 20,
@@ -36,7 +33,6 @@ module.exports = {
       levelMaxColor: Color.white,
       exp0Color: Color.valueOf("84ff00"),
       expMaxColor: Color.valueOf("84ff00"),
-      //levelFunction: "Mathf.sqrt(exp*0.1)+exp*0.001",
       expFields: [],
       //type, field, start, intensity
       linearInc: [],
@@ -52,43 +48,50 @@ module.exports = {
     }, obj, {
       //start
       getLevel(exp){
-        return Math.min(Mathf.floorPositive(Mathf.sqrt(exp*0.1)), this.maxLevel);
+        return Math.min(Mathf.floorPositive(Mathf.sqrt(exp * 0.1)), this.maxLevel);
       },
+	  
       getRequiredEXP(lvl){
-        return lvl*lvl*10;
+        return lvl * lvl * 10;
       },
+	  
       getLvlf(exp){
         var lvl = this.getLevel(exp);
         if(lvl >= this.maxLevel) return 1;
         var last = this.getRequiredEXP(lvl);
-        var next = this.getRequiredEXP(lvl+1);
+        var next = this.getRequiredEXP(lvl + 1);
         return (exp - last)/(next - last);
       },
+	  
       setEXPStats(build){
         var exp = build.totalExp();
         var lvl = this.getLevel(exp);
-        if(this.linearInc.length == 1) this[this.linearInc[0]] = Math.max(this.linearIncStart[0] + this.linearIncMul[0]*lvl, 0);
+        if(this.linearInc.length == 1) this[this.linearInc[0]] = Math.max(this.linearIncStart[0] + this.linearIncMul[0] * lvl, 0);
         else if(this.linearInc.length > 0) this.linearEXP(tile, lvl);
         if(this.expInc.length == 1) this[this.expInc[0]] = Math.max(this.expIncStart[0] + Mathf.pow(this.expIncMul[0], lvl), 0);
         else if(this.expInc.length > 0) this.expEXP(tile, lvl);
-        if(this.rootInc.length == 1) this[this.rootInc[0]] = Math.max(this.rootIncStart[0] + Mathf.sqrt(this.rootIncMul[0]*lvl), 0);
+        if(this.rootInc.length == 1) this[this.rootInc[0]] = Math.max(this.rootIncStart[0] + Mathf.sqrt(this.rootIncMul[0] * lvl), 0);
         else if(this.rootInc.length > 0) this.rootEXP(tile, lvl);
       },
+	  
       linearEXP(tile, lvl){
-        for(var i=0; i<this.linearInc.length; i++){
-          this[this.linearInc[i]] = Math.max(this.linearIncStart[i] + this.linearIncMul[i]*lvl, 0);
+        for(var i = 0; i < this.linearInc.length; i++){
+          this[this.linearInc[i]] = Math.max(this.linearIncStart[i] + this.linearIncMul[i] * lvl, 0);
         }
       },
+	  
       expEXP(tile, lvl){
-        for(var i=0; i<this.expInc.length; i++){
+        for(var i = 0; i < this.expInc.length; i++){
           this[this.expInc[i]] = Math.max(this.expIncStart[i] + Mathf.pow(this.expIncMul[i], lvl), 0);
         }
       },
+	  
       rootEXP(tile, lvl){
-        for(var i=0; i<this.rootInc.length; i++){
-          this[this.rootInc[i]] = Math.max(this.rootIncStart[i] + Mathf.sqrt(this.rootIncMul[i]*lvl), 0);
+        for(var i = 0; i < this.rootInc.length; i++){
+          this[this.rootInc[i]] = Math.max(this.rootIncStart[i] + Mathf.sqrt(this.rootIncMul[i] * lvl), 0);
         }
       },
+	  
       setBars(){
         this.super$setBars();
         this.bars.add("level", func(build => {
@@ -102,7 +105,7 @@ module.exports = {
         }));
         this.bars.add("exp", func(build => {
           return new Bar(
-            prov(() => (build.totalExp()<this.maxExp)?Core.bundle.get("explib.exp"):Core.bundle.get("explib.max")),
+            prov(() => (build.totalExp()<this.maxExp) ? Core.bundle.get("explib.exp") : Core.bundle.get("explib.max")),
             prov(() => Tmp.c1.set(this.exp0Color).lerp(this.expMaxColor, this.getLvlf(build.totalExp()))),
             floatp(() => {
               return this.getLvlf(build.totalExp());
@@ -113,45 +116,43 @@ module.exports = {
       //end
     });
     print("Created Block: " + Object.keys(obj));
-    //const rec=JSON.parse(JSON.stringify(recipes));
-    //Object.assign(obj, block);
     const expblock = extendContent(Type, name, obj);
     expblock.maxExp = expblock.getRequiredEXP(expblock.maxLevel);
-    for(var i=0; i<expblock.expFields.length; i++){
+	
+    for(var i = 0; i < expblock.expFields.length; i++){
       var tobj = expblock.expFields[i];
       if(tobj.type == undefined) tobj.type = "linear";
       expblock[tobj.type + "Inc"].push(tobj.field);
-      expblock[tobj.type + "IncStart"].push((tobj.start == undefined)?0:tobj.start);
-      expblock[tobj.type + "IncMul"].push((tobj.intensity == undefined)?1:tobj.intensity);
+      expblock[tobj.type + "IncStart"].push((tobj.start == undefined) ? 0 : tobj.start);
+      expblock[tobj.type + "IncMul"].push((tobj.intensity == undefined) ? 1 : tobj.intensity);
     }
-    //print(expblock.linearInc);
-    //print(expblock.linearIncStart);
-    //print(expblock.linearIncMul);
-    /*
-    objb.totalExp = () => {
 
-    }*/
     objb = Object.assign(objb, {
       totalExp(){
         return this._exp;
       },
+	  
       setExp(a){
         this._exp = a;
       },
+	  
       incExp(a){
         if(this._exp > expblock.maxExp) return;
         this._exp += a;
         if(this._exp > expblock.maxExp) this._exp = expblock.maxExp;
       },
+	  
       updateTile(){
         expblock.setEXPStats(this);
-        if(typeof this["customUpdate"]==="function") this.customUpdate();
+        if(typeof this["customUpdate"] === "function") this.customUpdate();
         else this.super$updateTile();
       },
+	  
       read(stream, version){
         this.super$read(stream, version);
         this._exp = stream.i();
       },
+	  
       write(stream){
         this.super$write(stream);
         stream.i(this._exp);
@@ -159,22 +160,9 @@ module.exports = {
     });
     //Extend Building
     print("Prep Building: " + Object.keys(objb));
-    //var b = JSON.stringify(objb);
-    //print("Created Building: " + JSON.stringify(objb));
-    //print("Created Building2: " + b);
     expblock.entityType = (ent) => {
       ent = extendContent(build, expblock, clone(objb));
       ent._exp = 0;
-      /*
-      ent.totalExp = ()=>{
-        return ent._exp;
-      }
-      ent.setExp = (a)=>{
-        ent._exp = a;
-      }
-      ent.incExp = (a)=>{
-        ent._exp += a;
-      }*/
       return ent;
     }
 
