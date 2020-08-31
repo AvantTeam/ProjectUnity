@@ -35,14 +35,16 @@ module.exports = {
       level0Color: Pal.accent,
       levelMaxColor: Color.white,
       exp0Color: Color.valueOf("84ff00"),
-      expMaxColor: Color.white,
+      expMaxColor: Color.valueOf("84ff00"),
       //levelFunction: "Mathf.sqrt(exp*0.1)+exp*0.001",
+      expFields: [],
+      //type, field, start, intensity
       linearInc: [],
       linearIncStart: [],
       linearIncMul: [],
       expInc: [],
       expIncStart: [],
-      expIncBase: [],
+      expIncMul: [],
       rootInc: [],
       rootIncMul: [],
       rootIncStart: []
@@ -57,6 +59,7 @@ module.exports = {
       },
       getLvlf(exp){
         var lvl = this.getLevel(exp);
+        if(lvl >= this.maxLevel) return 1;
         var last = this.getRequiredEXP(lvl);
         var next = this.getRequiredEXP(lvl+1);
         return (exp - last)/(next - last);
@@ -64,15 +67,26 @@ module.exports = {
       setEXPStats(build){
         var exp = build.totalExp();
         var lvl = this.getLevel(exp);
-        print("Build: "+build);
-        print("Exp: "+exp);
-        print("Lvl: "+lvl);
         if(this.linearInc.length == 1) this[this.linearInc[0]] = Math.max(this.linearIncStart[0] + this.linearIncMul[0]*lvl, 0);
         else if(this.linearInc.length > 0) this.linearEXP(tile, lvl);
+        if(this.expInc.length == 1) this[this.expInc[0]] = Math.max(this.expIncStart[0] + Mathf.pow(this.expIncMul[0], lvl), 0);
+        else if(this.expInc.length > 0) this.expEXP(tile, lvl);
+        if(this.rootInc.length == 1) this[this.rootInc[0]] = Math.max(this.rootIncStart[0] + Mathf.sqrt(this.rootIncMul[0]*lvl), 0);
+        else if(this.rootInc.length > 0) this.rootEXP(tile, lvl);
       },
       linearEXP(tile, lvl){
         for(var i=0; i<this.linearInc.length; i++){
           this[this.linearInc[i]] = Math.max(this.linearIncStart[i] + this.linearIncMul[i]*lvl, 0);
+        }
+      },
+      expEXP(tile, lvl){
+        for(var i=0; i<this.expInc.length; i++){
+          this[this.expInc[i]] = Math.max(this.expIncStart[i] + Mathf.pow(this.expIncMul[i], lvl), 0);
+        }
+      },
+      rootEXP(tile, lvl){
+        for(var i=0; i<this.rootInc.length; i++){
+          this[this.rootInc[i]] = Math.max(this.rootIncStart[i] + Mathf.sqrt(this.rootIncMul[i]*lvl), 0);
         }
       },
       setBars(){
@@ -88,7 +102,7 @@ module.exports = {
         }));
         this.bars.add("exp", func(build => {
           return new Bar(
-            prov(() => Core.bundle.get("explib.exp")),
+            prov(() => (build.totalExp()<this.maxExp)?Core.bundle.get("explib.exp"):Core.bundle.get("explib.max")),
             prov(() => Tmp.c1.set(this.exp0Color).lerp(this.expMaxColor, this.getLvlf(build.totalExp()))),
             floatp(() => {
               return this.getLvlf(build.totalExp());
@@ -102,7 +116,16 @@ module.exports = {
     //const rec=JSON.parse(JSON.stringify(recipes));
     //Object.assign(obj, block);
     const expblock = extendContent(Type, name, obj);
-
+    expblock.maxExp = expblock.getRequiredEXP(expblock.maxLevel);
+    for(var i=0; i<expblock.expFields.length; i++){
+      var tobj = expblock.expFields[i];
+      expblock[tobj.type + "Inc"].push(tobj.field);
+      expblock[tobj.type + "IncStart"].push(tobj.start);
+      expblock[tobj.type + "IncMul"].push(tobj.intensity);
+    }
+    //print(expblock.linearInc);
+    //print(expblock.linearIncStart);
+    //print(expblock.linearIncMul);
     /*
     objb.totalExp = () => {
 
@@ -115,7 +138,9 @@ module.exports = {
         this._exp = a;
       },
       incExp(a){
+        if(this._exp > expblock.maxExp) return;
         this._exp += a;
+        if(this._exp > expblock.maxExp) this._exp = expblock.maxExp;
       },
       updateTile(){
         expblock.setEXPStats(this);
