@@ -23,5 +23,8 @@ const burnadeTest = lib.extend(ItemTurret, ItemTurret.ItemTurretBuild, "burnade-
     this.incExp(20);
     print("Reload: " + burnadeTest.reloadTime);
     this.super$shoot(type);
+  },
+  levelUp(level){
+    print("You leveled up to level " + level);
   }
 });

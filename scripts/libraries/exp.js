@@ -34,7 +34,11 @@ module.exports = {
       exp0Color: Color.valueOf("84ff00"),
       expMaxColor: Color.valueOf("84ff00"),
       expFields: [],
+      hasLevelEffect: true,
+      levelUpFx: Fx.upgradeCore,
+      levelUpSound: Sounds.message,
       //type, field, start, intensity
+      //below are legacy arrays
       linearInc: [],
       linearIncStart: [],
       linearIncMul: [],
@@ -43,7 +47,9 @@ module.exports = {
       expIncMul: [],
       rootInc: [],
       rootIncMul: [],
-      rootIncStart: []
+      rootIncStart: [],
+      hasLevelFunction: false,
+      hasCustomUpdate: false
       //end
     }, obj, {
       //start
@@ -127,6 +133,9 @@ module.exports = {
       expblock[tobj.type + "IncMul"].push((tobj.intensity == undefined) ? 1 : tobj.intensity);
     }
 
+    expblock.hasLevelFunction = (typeof objb["levelUp"] === "function");
+    expblock.hasCustomUpdate = (typeof objb["customUpdate"] === "function");
+
     objb = Object.assign(objb, {
       totalExp(){
         return this._exp;
@@ -147,14 +156,20 @@ module.exports = {
       },
 
       incExp(a){
-        if(this._exp > expblock.maxExp) return;
+        if(this._exp >= expblock.maxExp) return;
         this._exp += a;
         if(this._exp > expblock.maxExp) this._exp = expblock.maxExp;
+        if(!expblock.hasLevelEffect) return;
+        if(expblock.getLevel(this._exp - a) != expblock.getLevel(this._exp)){
+          expblock.levelUpFx.at(this.x, this.y, expblock.size);
+          expblock.levelUpSound.at(this.x, this.y);
+          if(expblock.hasLevelFunction) this.levelUp(expblock.getLevel(this._exp));
+        }
       },
 
       updateTile(){
         expblock.setEXPStats(this);
-        if(typeof this["customUpdate"] === "function") this.customUpdate();
+        if(expblock.hasCustomUpdate) this.customUpdate();
         else this.super$updateTile();
       },
 
