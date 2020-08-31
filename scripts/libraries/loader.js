@@ -46,7 +46,50 @@ const loaderBlock = extendContent(Block, "loader-block", {
 			}catch(e){
 				print(e);
 			};
-			
+
+			// Naval Factory
+			try{
+				const NavalFac = Blocks.navalFactory;
+				
+				NavalFac.consumes.remove(ConsumeType.item);
+				
+				const amphibi = new UnitFactory.UnitPlan(
+					Vars.content.getByName(ContentType.unit, "unity-amphibi-naval"),
+					60 * 25,
+					ItemStack.with(
+						Items.silicon, 15,
+						Items.metaglass, 30,
+						Items.titanium, 25
+					)
+				);
+				
+				var newPlan = [];
+				for(var i = 0; i < NavalFac.plans.length; i++){
+					newPlan.push(NavalFac.plans[i]);
+				};
+				newPlan.push(amphibi);
+				NavalFac.plans = newPlan;
+				
+				NavalFac.config(java.lang.Integer, (tile, i) => {
+					tile.currentPlan = (Math.floor(i) < 0 || Math.floor(i) >= NavalFac.plans.length) ? -1 : Math.floor(i);
+					tile.progress = 0;
+				});
+				
+				for(var i = 0; i < NavalFac.plans.length; i++){
+					for(var j = 0; j < NavalFac.plans[i].requirements.length; j++){
+						var stack = NavalFac.plans[i].requirements[j];
+						NavalFac.capacities[stack.item.id] = Math.max(NavalFac.capacities[stack.item.id], stack.amount * 2);
+						NavalFac.itemCapacity = Math.max(NavalFac.itemCapacity, stack.amount * 2);
+					}
+				};
+				
+				NavalFac.consumes.add(extendContent(ConsumeItemDynamic, func(e => {
+					return e.currentPlan != -1 ? (NavalFac.plans[e.currentPlan]).requirements : ItemStack.empty
+				}), {}));
+			}catch(e){
+				print(e);
+			};
+
 			// Additive Reconstructor
 			try{
 				const addReconstructor = Blocks.additiveReconstructor;

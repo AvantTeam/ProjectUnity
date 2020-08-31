@@ -61,6 +61,7 @@ const script = [
 				name: "ground-units",
 				childs: [
 					"project-spiboss"
+					//"amphibi-ground"
 				]
 			},
 			
@@ -68,7 +69,8 @@ const script = [
 				name: "naval-units",
 				childs: [
 					"rexed",
-					"storm"
+					"storm",
+					"amphibi" //naval version no legs
 				]
 			},
 			

@@ -1,0 +1,19 @@
+{
+	"speed": 1.3,
+	"health": 365,
+	"engineSize": 5,
+	"engineOffset": 12,
+	"accel": 0.3,
+	"baseRotateSpeed": 0.2,
+	"rotateSpeed": 1.6,
+	"hitsize": 17,
+	"armor": 2,
+	"immunities": [
+		"wet"
+	],
+	"trailY": -5,
+	"trailX": 3,
+	"trailLength": 13,
+	"trailScl": 1.75,
+	"rotateShooting": true,
+}
