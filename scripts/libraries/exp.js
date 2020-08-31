@@ -119,6 +119,7 @@ module.exports = {
     expblock.maxExp = expblock.getRequiredEXP(expblock.maxLevel);
     for(var i=0; i<expblock.expFields.length; i++){
       var tobj = expblock.expFields[i];
+      if(tobj.type == undefined) tobj.type = "linear";
       expblock[tobj.type + "Inc"].push(tobj.field);
       expblock[tobj.type + "IncStart"].push((tobj.start == undefined)?0:tobj.start);
       expblock[tobj.type + "IncMul"].push((tobj.intensity == undefined)?1:tobj.intensity);
