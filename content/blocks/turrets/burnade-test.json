@@ -1,15 +1,15 @@
 {
-  "size": 3,
-  "health": 1500,
-  "range": 60,
-  "reloadTime": 60,
-  "shootCone": 5,
-  "requirements": [
-    {"item": "copper", "amount": 60},
-    {"item": "lead", "amount": 50},
-    {"item": "graphite", "amount": 80},
-    {"item": "silicon", "amount": 10}
-  ],
-  "category": "turret",
-  "research": "scorch"
+	"size": 3,
+	"health": 1500,
+	"range": 60,
+	"reloadTime": 60,
+	"shootCone": 5,
+	"requirements": [
+		{"item": "copper", "amount": 60},
+		{"item": "lead", "amount": 50},
+		{"item": "graphite", "amount": 80},
+		{"item": "silicon", "amount": 10}
+	],
+	"category": "turret",
+	"research": "scorch"
 }
