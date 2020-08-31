@@ -50,11 +50,11 @@ module.exports = {
       getLevel(exp){
         return Math.min(Mathf.floorPositive(Mathf.sqrt(exp * 0.1)), this.maxLevel);
       },
-	  
+
       getRequiredEXP(lvl){
         return lvl * lvl * 10;
       },
-	  
+
       getLvlf(exp){
         var lvl = this.getLevel(exp);
         if(lvl >= this.maxLevel) return 1;
@@ -62,7 +62,7 @@ module.exports = {
         var next = this.getRequiredEXP(lvl + 1);
         return (exp - last)/(next - last);
       },
-	  
+
       setEXPStats(build){
         var exp = build.totalExp();
         var lvl = this.getLevel(exp);
@@ -73,25 +73,25 @@ module.exports = {
         if(this.rootInc.length == 1) this[this.rootInc[0]] = Math.max(this.rootIncStart[0] + Mathf.sqrt(this.rootIncMul[0] * lvl), 0);
         else if(this.rootInc.length > 0) this.rootEXP(tile, lvl);
       },
-	  
+
       linearEXP(tile, lvl){
         for(var i = 0; i < this.linearInc.length; i++){
           this[this.linearInc[i]] = Math.max(this.linearIncStart[i] + this.linearIncMul[i] * lvl, 0);
         }
       },
-	  
+
       expEXP(tile, lvl){
         for(var i = 0; i < this.expInc.length; i++){
           this[this.expInc[i]] = Math.max(this.expIncStart[i] + Mathf.pow(this.expIncMul[i], lvl), 0);
         }
       },
-	  
+
       rootEXP(tile, lvl){
         for(var i = 0; i < this.rootInc.length; i++){
           this[this.rootInc[i]] = Math.max(this.rootIncStart[i] + Mathf.sqrt(this.rootIncMul[i] * lvl), 0);
         }
       },
-	  
+
       setBars(){
         this.super$setBars();
         this.bars.add("level", func(build => {
@@ -118,7 +118,7 @@ module.exports = {
     print("Created Block: " + Object.keys(obj));
     const expblock = extendContent(Type, name, obj);
     expblock.maxExp = expblock.getRequiredEXP(expblock.maxLevel);
-	
+
     for(var i = 0; i < expblock.expFields.length; i++){
       var tobj = expblock.expFields[i];
       if(tobj.type == undefined) tobj.type = "linear";
@@ -131,28 +131,38 @@ module.exports = {
       totalExp(){
         return this._exp;
       },
-	  
+
+      totalLevel(){
+        return expblock.getLevel(this._exp);
+      },
+      expf(){
+        return expblock.getLvlf(this._exp);
+      },
+      levelf(){
+        return this._exp / expblock.maxExp;
+      },
+
       setExp(a){
         this._exp = a;
       },
-	  
+
       incExp(a){
         if(this._exp > expblock.maxExp) return;
         this._exp += a;
         if(this._exp > expblock.maxExp) this._exp = expblock.maxExp;
       },
-	  
+
       updateTile(){
         expblock.setEXPStats(this);
         if(typeof this["customUpdate"] === "function") this.customUpdate();
         else this.super$updateTile();
       },
-	  
+
       read(stream, version){
         this.super$read(stream, version);
         this._exp = stream.i();
       },
-	  
+
       write(stream){
         this.super$write(stream);
         stream.i(this._exp);
