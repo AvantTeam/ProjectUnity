@@ -6,6 +6,22 @@
 //name: the name of your block.
 //obj: what will override the block; add exp params here.
 //objb: what will override the building.
+
+function clone(obj){
+  if (obj === null || typeof(obj) !== 'object')
+  return obj;
+
+  var copy = obj.constructor();
+
+  for (var attr in obj) {
+    if (obj.hasOwnProperty(attr)) {
+      copy[attr] = obj[attr];
+    }
+  }
+
+  return copy;
+}
+
 module.exports = {
   extend(Type, build, name, obj, objb){
     if(obj == undefined) obj = {};
@@ -116,9 +132,12 @@ module.exports = {
       }
     });
     //Extend Building
-    print("Created Building: " + Object.keys(objb));
+    print("Prep Building: " + Object.keys(objb));
+    //var b = JSON.stringify(objb);
+    //print("Created Building: " + JSON.stringify(objb));
+    //print("Created Building2: " + b);
     expblock.entityType = (ent) => {
-      ent = extendContent(build, expblock, objb);
+      ent = extendContent(build, expblock, clone(objb));
       ent._exp = 0;
       /*
       ent.totalExp = ()=>{
