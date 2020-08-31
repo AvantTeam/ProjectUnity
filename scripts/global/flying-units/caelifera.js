@@ -7,7 +7,8 @@ const att = {
 			y: 6,
 			scale: 1,
 			bladeCount: 4,
-			speed: 29
+			speed: 29,
+			rotOffset: 0
 		}];
 
 		this.fallRotateSpeed = 2.5;
