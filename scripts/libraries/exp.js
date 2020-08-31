@@ -30,9 +30,9 @@ module.exports = {
       //start
       maxLevel: 20,
       level0Color: Pal.accent,
-      levelMaxColor: Color.white,
+      levelMaxColor: Pal.surge,
       exp0Color: Color.valueOf("84ff00"),
-      expMaxColor: Color.valueOf("84ff00"),
+      expMaxColor: Color.valueOf("90ff00"),
       expFields: [],
       //type, field, start, intensity
       linearInc: [],
@@ -135,9 +135,11 @@ module.exports = {
       totalLevel(){
         return expblock.getLevel(this._exp);
       },
+      
       expf(){
         return expblock.getLvlf(this._exp);
       },
+
       levelf(){
         return this._exp / expblock.maxExp;
       },
