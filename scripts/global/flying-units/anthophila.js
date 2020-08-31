@@ -29,7 +29,7 @@ const att = {
 	}
 }
 
-const copterBase = this.global.unity.copterBase;
+const copterBase = this.global.unity.copterbase;
 
 const anthophila = extendContent(UnitType, "anthophila", {
 	init(){

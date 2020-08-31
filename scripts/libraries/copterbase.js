@@ -1,4 +1,4 @@
-this.global.unity.copterBase = {
+module.exports = {
 	drawRotor(unit){
 		const att = unit.type.getAttributes();
 

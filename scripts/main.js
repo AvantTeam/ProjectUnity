@@ -11,11 +11,12 @@ const loadFile = (prev, array) => {
 		
 		if(typeof(file) === "object"){
 			p.push(file.name);
-			results = results.concat(loadFile(p, file.childs).res);
+			var temp = loadFile(p, file.childs);
+			results = results.concat(temp.res);
+			names = names.concat(temp.fileNames);
 			p.pop();
 		}else{
 			var temp = p.join("/") + "/" + file;
-			
 			results.push(temp);
 			names.push(file);
 		};
@@ -23,7 +24,7 @@ const loadFile = (prev, array) => {
 	
 	return {
 		res: results,
-		name: names
+		fileNames: names
 	};
 };
 
@@ -98,6 +99,6 @@ const script = [
 const loadedScript = loadFile([], script);
 for(var i = 0; i < loadedScript.res.length; i++){
 	var res = loadedScript.res[i];
-	var name = loadedScript.name[i];
+	var name = loadedScript.fileNames[i];
 	this.global.unity[name] = require("unity/" + res);
 };
