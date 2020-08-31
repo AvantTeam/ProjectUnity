@@ -165,8 +165,8 @@ module.exports = {
         if(expblock.getLevel(this._exp - a) != expblock.getLevel(this._exp)){
           expblock.levelUpFx.at(this.x, this.y, expblock.size);
           expblock.levelUpSound.at(this.x, this.y);
+          if(expblock.hasLevelFunction) this.levelUp(expblock.getLevel(this._exp));
         }
-        if(expblock.hasLevelFunction) this.levelUp(expblock.getLevel(this._exp));
       },
 
       updateTile(){
