@@ -65,6 +65,50 @@ const loaderBlock = extendContent(Block, "loader-block", {
 			}catch(e){
 				print(e);
 			};
+			
+			// Exponential Reconstructor
+			try{
+				const expReconstructor = Blocks.exponentialReconstructor;
+				
+				var newUpgrades = [];
+				for(var i = 0; i < expReconstructor.upgrades.length; i++){
+					newUpgrades.push(expReconstructor.upgrades[i]);
+				}
+				newUpgrades.push(
+					[
+						UnitTypes.bryde,
+						Vars.content.getByName(ContentType.unit, "unity-rexed")
+					]
+				);
+				expReconstructor.upgrades = newUpgrades;
+			}catch(e){
+				print(e);
+			};
+			
+			// Tetrative Reconstructor
+			try{
+				const tetraReconstructor = Blocks.tetrativeReconstructor;
+				
+				var newUpgrades = [];
+				for(var i = 0; i < tetraReconstructor.upgrades.length; i++){
+					newUpgrades.push(tetraReconstructor.upgrades[i]);
+				}
+				newUpgrades.push(
+					[
+						Vars.content.getByName(ContentType.unit, "unity-rexed"),
+						Vars.content.getByName(ContentType.unit, "unity-storm")
+					]
+				);
+				newUpgrades.push(
+					[
+						UnitTypes.arkyid,
+						Vars.content.getByName(ContentType.unit, "unity-gummy")
+					]
+				);
+				tetraReconstructor.upgrades = newUpgrades;
+			}catch(e){
+				print(e);
+			};
 		}));
 	},
 	

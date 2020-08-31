@@ -1,0 +1,22 @@
+{
+	"type": "PowerTurret",
+	"size": 2,
+	"health": 600,
+	"range": 150,
+	"reloadTime": 48,
+	"shootCone": 15,
+	"shots": 3,
+	"burstSpacing": 2,
+	"shootSound": "spark",
+	"powerUse": 2.5,
+	"recoilAmount": 2.5,
+	"shootType": {
+		"type": "LightningBulletType",
+		"damage": 32
+	},
+	"requirements": [
+		{"item": "copper", "amount": 1}
+	],
+	"category": "turret",
+	"research": "arc"
+}
