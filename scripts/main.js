@@ -52,7 +52,8 @@ const script = [
 				name: "flying-units",
 				childs: [
 					"caelifera",
-					"schistocerca"
+					"schistocerca",
+					"anthophila"
 				]
 			},
 			

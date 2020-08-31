@@ -66,6 +66,25 @@ const loaderBlock = extendContent(Block, "loader-block", {
 				print(e);
 			};
 			
+			// Multiplicative Reconstructor
+			try{
+				const mulReconstructor = Blocks.multiplicativeReconstructor;
+				
+				var newUpgrades = [];
+				for(var i = 0; i < mulReconstructor.upgrades.length; i++){
+					newUpgrades.push(mulReconstructor.upgrades[i]);
+				}
+				newUpgrades.push(
+					[
+						Vars.content.getByName(ContentType.unit, "unity-schistocerca"),
+						Vars.content.getByName(ContentType.unit, "unity-anthophila")
+					]
+				);
+				mulReconstructor.upgrades = newUpgrades;
+			}catch(e){
+				print(e);
+			};
+			
 			// Exponential Reconstructor
 			try{
 				const expReconstructor = Blocks.exponentialReconstructor;

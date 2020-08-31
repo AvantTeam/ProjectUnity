@@ -17,7 +17,7 @@ this.global.unity.copterBase = {
 			var h = region.getHeight() * rotor.scale * Draw.scl;
 
 			for(var j = 0; j < rotor.bladeCount; j++){
-				var angle = ((unit.id * 24) + (Time.time() * rotor.speed) + ((360 / rotor.bladeCount) * j)) % 360;
+				var angle = ((unit.id * 24) + (Time.time() * rotor.speed) + ((360 / rotor.bladeCount) * j) + rotor.rotOffset) % 360;
 
 				Draw.alpha(Vars.state.isPaused() ? 1 : Time.time() % 2);
 				Draw.rect(region, unit.x + offx, unit.y + offy, w, h, angle);

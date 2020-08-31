@@ -1,0 +1,33 @@
+{
+	"speed": 3.8,
+	"drag": 0.07,
+	"accel": 0.03,
+	"fallSpeed": 0.005,
+	"health": 450,
+	"engineSize": 0,
+	"flying": true,
+	"hitsize": 12,
+	"range": 165,
+	"weapons": [
+		{
+			"name": "anthophila-gun",
+			"x": 4.25,
+			"y": 14,
+			"reload": 15,
+			"shootSound": "shootBig",
+			"bullet": "standardThoriumBig"
+		},
+		{
+			"name": "anthophila-tesla",
+			"x": 7.75,
+			"y": 8.25,
+			"reload": 30,
+			"shots": 5,
+			"shootSound": "spark",
+			"bullet": {
+				"type": "LightningBulletType",
+				"damage": 30
+			}
+		}
+	]
+}
