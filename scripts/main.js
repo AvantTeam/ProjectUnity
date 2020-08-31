@@ -32,7 +32,8 @@ const script = [
 		childs: [
 			"copterbase",
 			"loader",
-			"chainlaser"
+			"chainlaser",
+			"exp"
 		]
 	},
 	{
@@ -62,6 +63,25 @@ const script = [
 				childs: [
 					"rexed",
 					"storm"
+				]
+			},
+			{
+				name: "turrets",
+				childs: [
+					"burnade",
+					"burnade-test"
+				]
+			}
+		]
+	},
+	{
+		name: "imber",
+		childs: [
+			{
+				name: "turrets",
+				childs: [
+					"orb",
+					"shockwire"
 				]
 			}
 		]
