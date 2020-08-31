@@ -120,8 +120,8 @@ module.exports = {
     for(var i=0; i<expblock.expFields.length; i++){
       var tobj = expblock.expFields[i];
       expblock[tobj.type + "Inc"].push(tobj.field);
-      expblock[tobj.type + "IncStart"].push(tobj.start);
-      expblock[tobj.type + "IncMul"].push(tobj.intensity);
+      expblock[tobj.type + "IncStart"].push((tobj.start == undefined)?0:tobj.start);
+      expblock[tobj.type + "IncMul"].push((tobj.intensity == undefined)?1:tobj.intensity);
     }
     //print(expblock.linearInc);
     //print(expblock.linearIncStart);
