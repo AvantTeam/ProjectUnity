@@ -1,1 +1,1 @@
-//redirects light. Has a function taking in the source "line" and outputting a new source "line". A line consists of 2 vectors, just like in geometry: one that defines direction, one for starting point.
+//redirects light. Has a function taking in the source "line" and outputting a new source "line". A line is (1~8, str, lifetime).
