@@ -32,17 +32,27 @@ const shockBeam = extend(ContinuousLaserBulletType, {
 
 	draw(b){
 		var target = b.owner.target;
-		if(target == null) return;
+		if(target != null){
+    		Draw.color(this.color);
+    		Drawf.laser(b.team, Core.atlas.find("laser"), Core.atlas.find("laser-end"), b.x, b.y, target.x, target.y, this.width * b.fout());
+    		Draw.reset();
 
-		Draw.color(this.color);
-		Drawf.laser(b.team, Core.atlas.find("laser"), Core.atlas.find("laser-end"), b.x, b.y, target.x, target.y, this.width * b.fout());
-		Draw.reset();
+    		Drawf.light(b.team, b.x, b.y, b.x + target.x, b.y + target.y, 15 * b.fout(), this.lightColor, 0.6);
+        }else if(b.data instanceof Position){
+            var data = b.data;
+            Tmp.v1.set(data);
 
-		Drawf.light(b.team, b.x, b.y, b.x + target.x, b.y + target.y, 15 * b.fout(), this.lightColor, 0.6);
+            Draw.color(this.color);
+            Drawf.laser(b.team, Core.atlas.find("laser"), Core.atlas.find("laser-end"), b.x, b.y, Tmp.v1.x, Tmp.v1.y, this.width * b.fout());
+            Draw.reset();
+
+            Drawf.light(b.team, b.x, b.y, b.x + Tmp.v1.x, b.y + Tmp.v1.y, 15 * b.fout(), this.color, 0.6);
+        }
 	}
 });
 shockBeam.damage = 95;
 shockBeam.speed = 0.0001;
+shockBeam.shootEffect = Fx.none;
 shockBeam.despawnEffect = Fx.none;
 shockBeam.pierce = true;
 shockBeam.hitSize = 0;

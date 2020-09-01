@@ -5,6 +5,10 @@ const laser = extend(BulletType, {
         return this.damage + (b.owner.totalLevel() * 10);
     },
 
+    getColor(b){
+        return Tmp.c1.set(Color.white).lerp(Pal.lancerLaser, b.owner.totalLevel() / 10);
+    },
+
     collision(other, x, y){
         this.hit(this.base(), x, y);
         if(other instanceof Healthc){
@@ -52,14 +56,16 @@ const laser = extend(BulletType, {
     },
 
     draw(b){
-        var target = b.owner.target;
-        if(target == null) return;
+        if(b.data instanceof Position){
+            var data = b.data;
+            Tmp.v1.set(data);
 
-        Draw.color(this.color);
-        Drawf.laser(b.team, Core.atlas.find("laser"), Core.atlas.find("laser-end"), b.x, b.y, target.x, target.y, this.width * b.fout());
-        Draw.reset();
+            Draw.color(this.getColor(b));
+            Drawf.laser(b.team, Core.atlas.find("laser"), Core.atlas.find("laser-end"), b.x, b.y, Tmp.v1.x, Tmp.v1.y, this.width * b.fout());
+            Draw.reset();
 
-        Drawf.light(b.team, b.x, b.y, b.x + target.x, b.y + target.y, 15 * b.fout(), this.lightColor, 0.6);
+            Drawf.light(b.team, b.x, b.y, b.x + Tmp.v1.x, b.y + Tmp.v1.y, 15 * b.fout() + 5, this.getColor(b), 0.6);
+        }
     }
 });
 laser.damage = 30;
@@ -72,16 +78,15 @@ laser.status = StatusEffects.shocked;
 laser.statusDuration = 3 * 60;
 laser.width = 0.7;
 laser.length = 150;
-laser.color = Color.white.cpy();
 laser.hittable = false;
 laser.hitEffect = Fx.hitLiquid;
 
 const laserTurret = lib.extend(PowerTurret, PowerTurret.PowerTurretBuild, "laser-turret", {
-    maxLevel: 15,
+    maxLevel: 10,
     expFields: [{
-        type: "exp",
+        type: "linear",
         field: "reloadTime",
-        start: 30,
+        start: 35,
         intensity: -2
     }]
 }, {});
