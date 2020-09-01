@@ -1,14 +1,15 @@
 {
-	"type": "PowerTurret",
-	"size": 2,
-	"health": 600,
-	"range": 150,
-	"reloadTime": 48,
-	"shootCone": 15,
-	"shots": 3,
+	"size": 3,
+	"health": 1440,
+	"range": 180,
+	"reloadTime": 60,
+	"chargeTime": 16,
+	"shootCone": 5,
+	"shots": 5,
 	"burstSpacing": 2,
 	"shootSound": "spark",
-	"powerUse": 2.5,
+	"shootShake": 3,
+	"powerUse": 3,
 	"recoilAmount": 2.5,
 	"shootType": {
 		"type": "LightningBulletType",
@@ -18,5 +19,5 @@
 		{"item": "copper", "amount": 1}
 	],
 	"category": "turret",
-	"research": "arc"
+	"research": "mage"
 }

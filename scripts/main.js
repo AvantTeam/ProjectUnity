@@ -108,7 +108,19 @@ const script = [
                 ]
             }
         ]
-    }
+    },
+	
+	{
+		name: "monolith",
+		childs: [
+			{
+				name: "turrets",
+				childs: [
+					"oracle"
+				]
+			}
+		]
+	}
 ];
 const loadedScript = loadFile([], script);
 for(var i = 0; i < loadedScript.res.length; i++){
