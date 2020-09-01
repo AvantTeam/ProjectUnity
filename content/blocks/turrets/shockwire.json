@@ -5,6 +5,7 @@
 	"reloadTime": 140,
 	"coolantMultiplier": 3,
 	"shootCone": 1,
+    "firingMoveFract": 0.15,
 	"shootDuration": 200,
 	"inaccuracy": 0,
 	"powerUse": 8.6,
