@@ -79,7 +79,7 @@ const script = [
 				name: "turrets",
 				childs: [
 					"burnade",
-          "burnade-test"
+					"burnade-test"
 				]
 			}
 		]
