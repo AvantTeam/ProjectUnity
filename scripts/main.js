@@ -32,6 +32,17 @@ const script = [
 	{
 		name: "libraries",
 		childs: [
+      {
+        name: "light",
+        childs: [
+          "light",
+          "lightSource",
+          "lightReflector",
+          "lightReflector",
+          "lightRouter",
+          "lightRepeater"
+        ]
+      },
 			"copterbase",
 			"loader",
 			"chainlaser",
@@ -109,7 +120,7 @@ const script = [
             }
         ]
     },
-	
+
 	{
 		name: "monolith",
 		childs: [
