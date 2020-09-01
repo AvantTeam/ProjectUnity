@@ -130,7 +130,7 @@ module.exports = {
 						floatp(() => {
 							return this.getLevel(build.totalExp()) / this.maxLevel;
 						})
-					)
+					);
 				}));
 				
 				this.bars.add("exp", func(build => {
@@ -140,7 +140,7 @@ module.exports = {
 						floatp(() => {
 							return this.getLvlf(build.totalExp());
 						})
-					)
+					);
 				}));
 			}
 			//end
@@ -214,7 +214,7 @@ module.exports = {
 		});
 		//Extend Building
 		print("Prep Building: " + Object.keys(objb));
-		expblock.entitytype = (ent) => {
+		expblock.entityType = ent => {
 			ent = extendContent(build, expblock, clone(objb));
 			ent._exp = 0;
 			return ent;
