@@ -1,11 +1,4 @@
-const amphibi = extendContent(UnitType, "amphibi-naval", {
-	load(){
-		this.super$load();
-		this.region = Core.atlas.find(this.name);
-	}
-});
-
-var artillery = extend(ArtilleryBulletType, {});
+const artillery = extend(ArtilleryBulletType, {});
 
 artillery.hitEffect = Fx.blastExplosion;
 artillery.knockback = 0.8;
@@ -22,10 +15,10 @@ artillery.smokeEffect = Fx.shootBigSmoke2;
 artillery.shake = 4.5;
 artillery.statusDuration = 60 * 10;
 
-var artilleryWeapon = new Weapon("artillery");
+const artilleryWeapon = new Weapon("artillery");
 
 artilleryWeapon.reload = 35;
-artilleryWeapon.x = 3.5;
+artilleryWeapon.x = 5.5;
 artilleryWeapon.y = -4;
 artilleryWeapon.shots = 2;
 artilleryWeapon.shotDelay = 3;
@@ -35,24 +28,44 @@ artilleryWeapon.shake = 3;
 artilleryWeapon.rotateSpeed = 4;
 artilleryWeapon.bullet = artillery;
 
-var transformTime = 10
+var transformTime = 10;
+
+const amphibi = extendContent(UnitType, "amphibi-naval", {
+	load(){
+		this.super$load();
+		this.region = Core.atlas.find(this.name);
+	}
+});
 
 amphibi.constructor = () => {
-	var time = transformTime
-	const unit = extend(CommanderUnitWaterMove, {
-		update() {
+	//var time = transformTime;
+	var unit = extend(CommanderUnitWaterMove, {
+		setTransTimeC(a){
+			this._timeTrnsC = a;
+		},
+		update(){
 			this.super$update();
-			if (!(unit.floorOn().isLiquid) || unit.floorOn() == Blocks.sandWater || unit.floorOn() == Blocks.darksandTaintedWater || unit.floorOn() == Blocks.darksandWater) {
+			if(!(this.floorOn().isLiquid) || (this.floorOn() instanceof ShallowLiquid)){
 				
-				if (time < 0 || time > transformTime) {
-					var GroundUnit = amphibiGround.create(unit.team);GroundUnit.set(unit.x,unit.y);GroundUnit.add();
-					unit.kill()
-				} else {
-					time = time - 1
+				if(this._timeTrnsC < 0 || this._timeTrnsC > transformTime){
+					var groundUnit = amphibiGround.create(this.team);
+					groundUnit.set(this.x, this.y);
+					groundUnit.rotation = this.rotation;
+					groundUnit.add();
+					groundUnit.vel.set(this.vel);
+					if(this.isPlayer()){
+						//groundUnit.controller(this.controller);
+						groundUnit.controller = this.controller;
+						if(groundUnit.controller.unit() != groundUnit.base()) groundUnit.controller.unit(groundUnit.base());
+					};
+					this.remove();
+				}else{
+					this._timeTrnsC -= Time.delta;
 				}
 			}
 		}
 	});
+	unit.setTransTimeC(transformTime);
 
 	return unit;
 };
@@ -67,20 +80,33 @@ const amphibiGround = extendContent(UnitType, "amphibi", {
 });
 
 amphibiGround.constructor = () => {
-	var time = transformTime
-	const unit = extend(BuilderLegsUnit, {
-		update() {
+	//var time = transformTime;
+	var unit = extend(LegsUnit, {
+		setTransTimeC(a){
+			this._timeTrnsC = a;
+		},
+		update(){
 			this.super$update();
-			if (unit.floorOn().isLiquid && !(unit.floorOn() == Blocks.sandWater || unit.floorOn() == Blocks.darksandTaintedWater || unit.floorOn() == Blocks.darksandWater)) {
-				if (time < 0 || time > transformTime) {
-					var GroundUnit = amphibi.create(unit.team);GroundUnit.set(unit.x,unit.y);GroundUnit.add();
-					unit.kill()
-				} else {
-					time = time - 1
+			if(this.floorOn().isLiquid && !(this.floorOn() instanceof ShallowLiquid)){
+				if(this._timeTrnsC < 0 || this._timeTrnsC > transformTime){
+					var navalUnit = amphibi.create(this.team);
+					navalUnit.set(this.x, this.y);
+					navalUnit.rotation = this.rotation;
+					navalUnit.add();
+					navalUnit.vel.set(this.vel);
+					if(this.isPlayer()){
+						//navalUnit.controller(this.controller);
+						navalUnit.controller = this.controller;
+						if(navalUnit.controller.unit() != navalUnit.base()) navalUnit.controller.unit(navalUnit.base());
+					};
+					this.remove();
+				}else{
+					this._timeTrnsC -= Time.delta;
 				}
 			}
 		}
 	});
+	unit.setTransTimeC(transformTime);
 
 	return unit;
 };
