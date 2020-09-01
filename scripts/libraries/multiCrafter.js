@@ -313,10 +313,11 @@ multi.configurable = true;
 multi.hasItems = true;
 multi.hasLiquids = true;
 multi.hasPower = true;
-multi.dumpToggle=false;
-multi.size=3;
-multi.entityType=prov(()=>extend(GenericCrafter.GenericCrafterBuild,{
+multi.dumpToggle = false;
+multi.size = 3;
+multi.entityType = prov(() => extend(GenericCrafter.GenericCrafterBuild,
+{
 
 }));
-multi.buildVisibility=BuildVisibility.sandboxOnly;
-multi.category=Category.crafting;
+multi.buildVisibility = BuildVisibility.sandboxOnly;
+multi.category = Category.crafting;
