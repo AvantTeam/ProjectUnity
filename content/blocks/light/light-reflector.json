@@ -7,5 +7,6 @@
 		{"item": "metaglass", "amount": 10}
 	],
 	"research": "light-lamp",
-  "solid": true
+  "solid": true,
+  "rotate": true
 }

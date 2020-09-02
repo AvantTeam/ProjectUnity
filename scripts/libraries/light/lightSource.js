@@ -138,7 +138,7 @@ module.exports = {
 
       drawLightLasers(){
         if(this == null || !this.isAdded() || this.lightPower() <= 1) return;
-        Draw.z(Layer.effect);
+        Draw.z(Layer.effect - 1);
 
         var now = null;
         var next = null;
@@ -208,14 +208,15 @@ module.exports = {
           if(furthest.bc() == null) return true;
           if(furthest.bc().block.lightReflector){
             //print("Light reflector!");
-            next = [furthest.block().calcReflection(ld[0]), ld[1], ld[2] - i, ld[3]];
+            var tr = furthest.bc().calcReflection(ld[0]);
+            if(tr >= 0) next = [tr, ld[1], ld[2] - i, ld[3]];
           }
           else if(furthest.bc().block.lightDivisor){
             next = [ld[0], ld[1] / 2, ld[2] - i, ld[3]];
-            next2 = [furthest.block().calcReflection(ld[0]), ld[1] / 2, ld[2] - i, ld[3]];
+            next2 = [furthest.bc().calcReflection(ld[0]), ld[1] / 2, ld[2] - i, ld[3]];
           }
           else if(furthest.bc().block.lightRepeater){
-            next = [ld[0], ld[1], furthest.block().lightStrength, furthest.block().calcColor(ld[3])];
+            next = [ld[0], ld[1], furthest.bc().calcLength(ld[2]), furthest.bc().calcColor(ld[3])];
           }
           else if(furthest.bc().block.consumesLight){
             furthest.bc().addSource([source, ld[1]]);
