@@ -1,0 +1,16 @@
+{
+	"size": 1,
+	"health": 40,
+  "hasPower": true,
+  "consumesPower": true,
+  "consumes": {
+    "power": 1
+  },
+	"requirements": [
+		{"item": "lead", "amount": 5},
+		{"item": "metaglass", "amount": 10}
+	],
+	"research": "power-node",
+  "rotate": true,
+  "category": "logic"
+}

@@ -1,28 +1,26 @@
 this.global.unity = {};
 
-const loadFile = (prev, array) =>
-{
+const loadFile = (prev, array) =>	{
     var results = [];
     var names = [];
 
     var p = prev;
 
-    for (var i = 0; i < array.length; i++)
-    {
+    for (var i = 0; i < array.length; i++){
         var file = array[i];
 
-        if (typeof(file) === "object")
-        {
+        if (typeof(file) === "object"){
             p.push(file.name);
             var temp = loadFile(p, file.childs);
-            results = results.concat(temp.res);
+
+			results = results.concat(temp.res);
             names = names.concat(temp.fileNames);
-            p.pop();
-        }
-        else
-        {
+
+			p.pop();
+        }else{
             var temp = p.join("/") + "/" + file;
-            results.push(temp);
+
+			results.push(temp);
             names.push(file);
         };
     };
@@ -42,10 +40,9 @@ const script = [
                 childs: [
                     "light",
                     "lightSource",
-                    "lightReflector",
-                    "lightReflector",
-                    "lightRouter",
-                    "lightRepeater"
+                    "lightConsumer",
+                    "lightCombiner",
+                    "lightRouter"
                 ]
             },
             "copterbase",
@@ -62,7 +59,9 @@ const script = [
             {
                 name: "blocks",
                 childs: [
-                    "recursivereconstructor"
+                    "recursivereconstructor",
+                    "light-lamp",
+                    "light-test"
                 ]
             },
 
@@ -95,7 +94,6 @@ const script = [
             {
                 name: "turrets",
                 childs: [
-                    "burnade",
                     "burnade-test"
                 ]
             }
@@ -105,35 +103,39 @@ const script = [
     {
         name: "imber",
         childs: [
-        {
-            name: "turrets",
-            childs: [
-                "orb",
-                "shockwire"
-            ]
-        }]
+			{
+				name: "turrets",
+				childs: [
+					"orb",
+					"shockwire"
+				]
+			}
+		]
     },
 
     {
         name: "koruh",
         childs: [
-        {
-            name: "turrets",
-            childs: [
-                "laser"
-            ]
-        }]
+			{
+				name: "turrets",
+				childs: [
+					"laser",
+                    "inferno"
+				]
+			}
+		]
     },
 
     {
         name: "monolith",
         childs: [
-        {
-            name: "turrets",
-            childs: [
-                "oracle"
-            ]
-        }]
+			{
+				name: "turrets",
+				childs: [
+					"oracle"
+				]
+			}
+		]
     }
 ];
 const loadedScript = loadFile([], script);
