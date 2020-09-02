@@ -38,7 +38,7 @@ const script = [
 			"exp"
 		]
 	},
-
+	
 	{
 		name: "global",
 		childs: [
@@ -84,7 +84,7 @@ const script = [
 			}
 		]
 	},
-
+	
 	{
 		name: "imber",
 		childs: [
@@ -97,7 +97,7 @@ const script = [
 			}
 		]
 	},
-
+	
     {
         name: "koruh",
         childs: [
