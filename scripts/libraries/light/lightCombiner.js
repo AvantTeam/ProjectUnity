@@ -1,1 +1,1 @@
-//extends lightconsumer
+//extends lightConsumer

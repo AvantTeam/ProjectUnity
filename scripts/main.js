@@ -40,10 +40,9 @@ const script = [
                 childs: [
                     "light",
                     "lightSource",
-                    "lightReflector",
-                    "lightReflector",
-                    "lightRouter",
-                    "lightRepeater"
+                    "lightConsumer",
+                    "lightCombiner",
+                    "lightRouter"
                 ]
             },
             "copterbase",
