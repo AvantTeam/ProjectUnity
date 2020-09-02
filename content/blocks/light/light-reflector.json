@@ -1,0 +1,10 @@
+{
+	"size": 1,
+	"health": 40,
+  "update": true,
+  "category": "logic",
+	"requirements": [
+		{"item": "metaglass", "amount": 10}
+	],
+	"research": "light-lamp"
+}

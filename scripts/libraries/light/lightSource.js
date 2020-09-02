@@ -28,15 +28,17 @@ module.exports = {
       lightLength: 50,
       //The absolute distance a light can reach, regardless of lightRepeaters
       maxLightLength: 500,
+      //the max reflections this light has, everything that affects this light is consided a reflection
+      maxReflections: 50,
       lightColor: Color.white,
       //whether to scale lightStrength with the input power status
       scaleStatus: true,
       //whether to display angle configuration
       angleConfig: false,
       //defaults
+      dirs: [[1,0], [1,1], [0,1], [-1,1], [-1,0], [-1,-1], [0,-1], [1,-1]],
       update: true,
-      rotate: true,
-      category: Category.logic
+      rotate: true
 			//end
 		}, obj, {
 			//start
@@ -58,6 +60,7 @@ module.exports = {
 		print("Created Block: " + Object.keys(obj));
 		const lightblock = extendContent(type, name, obj);
 		lightblock.configurable = lightblock.angleConfig;
+    lightblock.reflowTimer = lightblock.timers++;
     if(lightblock.angleConfig) lightblock.rotate = false;
     if(lightblock.size%2 == 0) print("[scarlet]Even - sized light blocks are not supported! Continue anyways?[]");
 
@@ -65,14 +68,16 @@ module.exports = {
 		lightblock.hasCustomUpdate = (typeof objb["customUpdate"] === "function");
 
 		objb = Object.assign(objb, {
-      //angle strength lengthleft color
-      _lightData: [0, 0, lightblock.lightLength, lightblock.lightColor],
+      //angle strengthPercentage lengthleft color
+      _lightData: [0, 100, lightblock.lightLength, lightblock.lightColor],
       //array of tiles
       _ls: [],
       //array of _lightData for each _ls
       _lsData: [],
+      _lCons: [],
       //only used in angleConfig
       _angle: 0,
+      _strength: 0,
       _lightInit: false,
 
       setInit(a){
@@ -86,10 +91,11 @@ module.exports = {
         return (lightblock.rotate)?this.rotDeg():this._angle*45;
       },
       getAngle(){
-        return (lightblock.rotate)?this.rotation:this._angle;
+        return (lightblock.rotate)?this.rotation*2:this._angle;
       },
       setAngle(a){
         this._angle = a;
+        this.lightMarchStart(lightblock.lightLength, lightblock.maxLightLength);
       },
 
       lightData(){
@@ -99,12 +105,12 @@ module.exports = {
         this._lightData = d;
       },
       setPower(a){
-        this._lightData[1] = a;
+        this._strength = a;
       },
 
       lightPower(){
         if(!this._lightInit) return this.targetStrength();
-        return this._lightData[0];
+        return this._strength;
       },
 
       targetStrength(){
@@ -115,6 +121,7 @@ module.exports = {
 			updateTile(){
         this.setPower(this.targetStrength());
         if(!this.initDone()) this.lightMarchStart(lightblock.lightLength, lightblock.maxLightLength);
+        else if(this.timer.get(lightblock.reflowTimer, 30) && this.lightPower() > 1) this.lightMarchStart(lightblock.lightLength, lightblock.maxLightLength);
 
 				if(lightblock.hasCustomUpdate) this.customUpdate();
 				else this.super$updateTile();
@@ -129,9 +136,100 @@ module.exports = {
 				stream.b(this._angle);
 			},
 
+      drawLightLasers(){
+        if(this == null || !this.isAdded() || this.lightPower() <= 1) return;
+        Draw.z(Layer.effect);
+
+        var now = null;
+        var next = null;
+        for(var i=0; i<this._ls.length; i++){
+          if(this._lsData[i] == null) continue;
+          //print("Drawing Data: "+this._lsData[i]);
+          Draw.color(this._lsData[i][3], this._lsData[i][1]/100*(this.lightPower()/lightblock.lightStrength));
+          Lines.stroke(1+this.lightPower()/1000);
+          now = this._ls[i];
+          next = this._ls[i+1];
+          if(i == this._ls.length - 1){
+            //TODO draw fraying light
+            Lines.lineAngle(this._ls[i].worldx(), this._ls[i].worldy(), this._lsData[i][0]*45, this._lsData[i][2]);
+          }
+          else{
+            if(this._lsData[i+1] == null){
+              //obstructed
+              Lines.line(this._ls[i].worldx(), this._ls[i].worldy(), this._ls[i+1].worldx() - 4 * lightblock.dirs[this._lsData[i][0]][0], this._ls[i+1].worldy() - lightblock.dirs[this._lsData[i][0]][1]);
+            }
+            else{
+              //light go brrrrrrrr
+              Lines.line(this._ls[i].worldx(), this._ls[i].worldy(), this._ls[i+1].worldx(), this._ls[i+1].worldy());
+            }
+          }
+        }
+        Draw.color();
+      },
+
       lightMarchStart(length, maxLength){
         //idk
+        this._lightData[0] = this.getAngle();
+        this._lightData[1] = 100;
+        //TODO make it more efficient
+        for(var i=0; i<this._lCons.length; i++){
+          this._lCons[i].removeSource(this);
+        }
+        this._ls = [];
+        this._lsData = [];
+        this._lCons = [];
+        this._ls.push(this.tile);
+        this._lsData.push(this.lightData());
+        this.pointMarch(this.tile, this.lightData(), length, maxLength, 0, this);
         this.setInit(true);
+        print(this._ls.toString());
+        print(this._lsData.toString());
+      },
+      pointMarch(tile, ld, length, maxLength, num, source){
+        if(length <= 0 || maxLength <= 0 || num > lightblock.maxReflections || ld[1] < 5) return;
+        const dir = lightblock.dirs[ld[0]];
+        var next = null;
+        var next2 = null;
+        var furthest = null;
+        var i = 0;
+        var hit = Vars.world.raycast(tile.x, tile.y, tile.x + length*dir[0], tile.y + length*dir[1], (x, y)=>{
+          furthest = Vars.world.tile(x, y);
+          if(furthest == tile || furthest == null) return false;
+          i++;
+          if(!furthest.solid()) return false;
+          if(furthest.block().lightReflector || furthest.block().name == "unity-light-test"){
+            print("Light reflector!");
+            next = [furthest.block().calcReflection(ld[0]), ld[1], ld[2] - i, ld[3]];
+          }
+          else if(furthest.block().lightDivisor){
+            next = [ld[0], ld[1] / 2, ld[2] - i, ld[3]];
+            next2 = [furthest.block().calcReflection(ld[0]), ld[1] / 2, ld[2] - i, ld[3]];
+          }
+          else if(furthest.block().lightRepeater){
+            next = [ld[0], ld[1], furthest.block().lightStrength, furthest.block().calcColor(ld[3])];
+          }
+          else if(furthest.block().consumesLight){
+            furthest.bc().addSource(source);
+            this._lCons.push(furthest.bc());
+          }
+          return true;
+        });
+        if(!hit) return;
+        if(next == null){
+          //the block hit is solid or a consumer
+          this._ls.push(furthest);
+          this._lsData.push(null);//obstructor
+        }
+        else if(next2 == null){
+          //the block hit reflecc
+          this._ls.push(furthest);
+          this._lsData.push(next);//obstructor
+          this.pointMarch(furthest, next, length-i, maxLength-i, ++num, source);
+        }
+        else{
+          //the light go S P L I T
+          //TODO
+        }
       }
 		});
 		//Extend Building
@@ -139,7 +237,12 @@ module.exports = {
 		lightblock.entityType = ent => {
 			ent = extendContent(build, lightblock, clone(objb));
 			ent._angle = 0;
+      ent._lightInit = false;
+      Events.run(Trigger.draw, () => {
+        if(ent != null) ent.drawLightLasers();
+      });
 			return ent;
+
 		};
 
 		return lightblock;

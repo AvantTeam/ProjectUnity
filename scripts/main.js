@@ -60,7 +60,9 @@ const script = [
             {
                 name: "blocks",
                 childs: [
-                    "recursivereconstructor"
+                    "recursivereconstructor",
+                    "light-lamp",
+                    "light-test"
                 ]
             },
 
