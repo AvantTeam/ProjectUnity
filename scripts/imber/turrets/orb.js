@@ -17,12 +17,13 @@ const orbShoot = new Effect(21, e => {
 
 const orbTrail = new Effect(43, e => {
 	var originalZ = Draw.z();
-	
+
 	Draw.z(Layer.bullet - 0.01);
-	
+    Drawf.light(e.x, e.y, 4.7 * e.fout() + 3, Pal.surge, 0.6);
+
 	Draw.color(Pal.surge);
 	Fill.circle(e.x, e.y, e.fout() * 2.7);
-	
+
 	Draw.z(originalZ);
 });
 
@@ -50,13 +51,15 @@ const orbChargeBegin = new Effect(71, e => {
 
 const orb = extend(BulletType, {
 	draw(b){
-		Draw.color(Pal.surge);
+        Drawf.light(b.x, b.y, 16, this.color, 0.6);
+
+		Draw.color(this.color);
 		Fill.circle(b.x, b.y, 4);
-		
+
 		Draw.color();
 		Fill.circle(b.x, b.y, 2.5);
 	},
-	
+
 	update(b){
 		this.super$update(b);
 		if(b.timer.get(1, 7)){
@@ -64,7 +67,11 @@ const orb = extend(BulletType, {
 				Lightning.create(b.team, Pal.surge, Mathf.random(22, 42), b.x, b.y, b.angleTo(unit), Mathf.random(7, 13));
 			}));
 		}
-	}
+	},
+
+    drawLight(b){
+
+    }
 });
 orb.lifetime = 240;
 orb.speed = 1.24;
@@ -72,6 +79,7 @@ orb.damage = 23;
 orb.pierce = true;
 orb.hittable = false;
 orb.hitEffect = orbHit;
+orb.color = Pal.surge;
 orb.trailEffect = orbTrail;
 orb.trailChance = 0.5;
 orb.scanRadius = 5 * Vars.tilesize;
