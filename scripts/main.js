@@ -12,14 +12,14 @@ const loadFile = (prev, array) =>	{
         if (typeof(file) === "object"){
             p.push(file.name);
             var temp = loadFile(p, file.childs);
-            
+
 			results = results.concat(temp.res);
             names = names.concat(temp.fileNames);
-            
+
 			p.pop();
         }else{
             var temp = p.join("/") + "/" + file;
-            
+
 			results.push(temp);
             names.push(file);
         };
@@ -74,7 +74,7 @@ const script = [
                     "anthophila"
                 ]
             },
-			
+
             {
                 name: "ground-units",
                 childs: [
@@ -91,11 +91,10 @@ const script = [
                     "amphibi" //naval version no legs
                 ]
             },
-			
+
             {
                 name: "turrets",
                 childs: [
-                    "burnade",
                     "burnade-test"
                 ]
             }
@@ -121,7 +120,8 @@ const script = [
 			{
 				name: "turrets",
 				childs: [
-					"laser"
+					"laser",
+                    "inferno"
 				]
 			}
 		]
