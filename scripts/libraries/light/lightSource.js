@@ -217,8 +217,8 @@ module.exports = {
           else if(furthest.bc().block.lightRepeater){
             next = [ld[0], ld[1], furthest.block().lightStrength, furthest.block().calcColor(ld[3])];
           }
-          else if(furthest.block().consumesLight){
-            furthest.bc().addSource(source);
+          else if(furthest.bc().block.consumesLight){
+            furthest.bc().addSource([source, ld[1]]);
             this._lCons.push(furthest.bc());
           }
           return true;
