@@ -6,5 +6,6 @@
 	"requirements": [
 		{"item": "metaglass", "amount": 10}
 	],
-	"research": "light-lamp"
+	"research": "light-lamp",
+  "solid": true
 }
