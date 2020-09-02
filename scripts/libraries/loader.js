@@ -1,3 +1,5 @@
+const Integer = java.lang.Integer;
+
 const loaderBlock = extendContent(Block, "loader-block", {
 	load(){
 		this.region = Core.atlas.white();
@@ -27,7 +29,7 @@ const loaderBlock = extendContent(Block, "loader-block", {
 				newPlan.push(caelifera);
 				airFac.plans = newPlan;
 				
-				airFac.config(java.lang.Integer, (tile, i) => {
+				airFac.config(Integer, (tile, i) => {
 					tile.currentPlan = (Math.floor(i) < 0 || Math.floor(i) >= airFac.plans.length) ? -1 : Math.floor(i);
 					tile.progress = 0;
 				});
@@ -70,7 +72,7 @@ const loaderBlock = extendContent(Block, "loader-block", {
 				newPlan.push(amphibi);
 				NavalFac.plans = newPlan;
 				
-				NavalFac.config(java.lang.Integer, (tile, i) => {
+				NavalFac.config(Integer, (tile, i) => {
 					tile.currentPlan = (Math.floor(i) < 0 || Math.floor(i) >= NavalFac.plans.length) ? -1 : Math.floor(i);
 					tile.progress = 0;
 				});
