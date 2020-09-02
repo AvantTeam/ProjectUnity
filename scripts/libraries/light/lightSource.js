@@ -145,18 +145,26 @@ module.exports = {
         for(var i=0; i<this._ls.length; i++){
           if(this._lsData[i] == null) continue;
           //print("Drawing Data: "+this._lsData[i]);
-          Draw.color(this._lsData[i][3], this._lsData[i][1]/100*(this.lightPower()/lightblock.lightStrength));
+          var a = this._lsData[i][1]/100*(this.lightPower()/lightblock.lightStrength);
+          Draw.color(this._lsData[i][3], a);
           Lines.stroke(1+this.lightPower()/1000);
           now = this._ls[i];
           next = this._ls[i+1];
           if(i == this._ls.length - 1){
-            //TODO draw fraying light
-            Lines.lineAngle(this._ls[i].worldx(), this._ls[i].worldy(), this._lsData[i][0]*45, this._lsData[i][2]);
+            //I'm sorry. okay?
+            Draw.alpha(a);
+            Lines.lineAngle(this._ls[i].worldx(), this._ls[i].worldy(), this._lsData[i][0]*45, this._lsData[i][2]*Vars.tilesize);
+            Draw.alpha(a*0.5);
+            Lines.lineAngle(this._ls[i].worldx(), this._ls[i].worldy(), this._lsData[i][2]*Vars.tilesize, this._lsData[i][0]*45, 4);
+            Draw.alpha(a*0.25);
+            Lines.lineAngle(this._ls[i].worldx(), this._ls[i].worldy(), this._lsData[i][2]*Vars.tilesize + 4, this._lsData[i][0]*45, 2);
+            Draw.alpha(a*0.125);
+            Lines.lineAngle(this._ls[i].worldx(), this._ls[i].worldy(), this._lsData[i][2]*Vars.tilesize + 6, this._lsData[i][0]*45, 2);
           }
           else{
             if(this._lsData[i+1] == null){
               //obstructed
-              Lines.line(this._ls[i].worldx(), this._ls[i].worldy(), this._ls[i+1].worldx() - 4 * lightblock.dirs[this._lsData[i][0]][0], this._ls[i+1].worldy() - lightblock.dirs[this._lsData[i][0]][1]);
+              Lines.line(this._ls[i].worldx(), this._ls[i].worldy(), this._ls[i+1].worldx() - 4 * lightblock.dirs[this._lsData[i][0]][0], this._ls[i+1].worldy() - 4 * lightblock.dirs[this._lsData[i][0]][1]);
             }
             else{
               //light go brrrrrrrr
@@ -179,7 +187,7 @@ module.exports = {
         this._lsData = [];
         this._lCons = [];
         this._ls.push(this.tile);
-        this._lsData.push(this.lightData());
+        this._lsData.push([this.getAngle(), 100, this._lightData[2], this._lightData[3]]);
         this.pointMarch(this.tile, this.lightData(), length, maxLength, 0, this);
         this.setInit(true);
         print(this._ls.toString());
@@ -197,15 +205,16 @@ module.exports = {
           if(furthest == tile || furthest == null) return false;
           i++;
           if(!furthest.solid()) return false;
-          if(furthest.block().lightReflector || furthest.block().name == "unity-light-test"){
-            print("Light reflector!");
+          if(furthest.bc() == null) return true;
+          if(furthest.bc().block.lightReflector){
+            //print("Light reflector!");
             next = [furthest.block().calcReflection(ld[0]), ld[1], ld[2] - i, ld[3]];
           }
-          else if(furthest.block().lightDivisor){
+          else if(furthest.bc().block.lightDivisor){
             next = [ld[0], ld[1] / 2, ld[2] - i, ld[3]];
             next2 = [furthest.block().calcReflection(ld[0]), ld[1] / 2, ld[2] - i, ld[3]];
           }
-          else if(furthest.block().lightRepeater){
+          else if(furthest.bc().block.lightRepeater){
             next = [ld[0], ld[1], furthest.block().lightStrength, furthest.block().calcColor(ld[3])];
           }
           else if(furthest.block().consumesLight){
