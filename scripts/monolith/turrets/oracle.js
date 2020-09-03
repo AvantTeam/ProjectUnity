@@ -30,14 +30,18 @@ oracle.entityType = () => extendContent(ChargeTurret.ChargeTurretBuild, oracle, 
 			this.heat = 1;
 			
 			for(var i = 0; i < oracle.shots; i++){
-				this.bullet(ammo, this.rotation + Mathf.range(oracle.inaccuracy));
+				Time.run(i * 2, () => {
+					this.bullet(ammo, this.rotation + Mathf.range(oracle.inaccuracy));
+				});
 			};
 			for(var i = 0; i < 3; i++){
-				this.bullet(laser, this.rotation + Mathf.range(laser.inaccuracy));
+				Time.run(i, () => {
+					this.bullet(laser, this.rotation + Mathf.range(laser.inaccuracy));
+					Sounds.laser.at(this.tile, Mathf.random(0.7, 0.9));
+				});
 			};
 			
 			this.effects();
-			Sounds.laser.at(this.tile, Mathf.random(0.9, 1.1));
 			
 			this.shooting = false;
 		});
