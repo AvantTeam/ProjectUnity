@@ -49,7 +49,6 @@ const script = [
             "loader",
             "chainlaser",
             "exp",
-            "multiCrafter"
         ]
     },
 
@@ -62,7 +61,9 @@ const script = [
 					"multi-test",
                     "recursivereconstructor",
                     "light-lamp",
-                    "light-test"
+                    "light-reflector",
+					"ores",
+                    "multi-test-younggam"
                 ]
             },
 
