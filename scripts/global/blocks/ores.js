@@ -35,10 +35,22 @@ const umbriumOre = extendContent(OreBlock, "umbrium", {
 		this.super$init();
 	},
 	createIcons(packer){
-		//for(var i = 0; i < this.variants; i++)
 		createIconsC(packer, this);
 	}
 });
 umbriumOre.oreScale = 23.77;
 umbriumOre.oreThreshold = 0.813;
 umbriumOre.oreDefault = true;
+
+const luminumOre = extendContent(OreBlock, "luminum", {
+	init(){
+		this.itemDrop = Vars.content.getByName(ContentType.item, "unity-luminum");
+		this.super$init();
+	},
+	createIcons(packer){
+		createIconsC(packer, this);
+	}
+});
+luminumOre.oreScale = 23.77;
+luminumOre.oreThreshold = 0.810;
+luminumOre.oreDefault = true;
