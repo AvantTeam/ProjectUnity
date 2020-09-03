@@ -66,6 +66,7 @@ module.exports = {
 
 		//lightblock.hasLevelFunction = (typeof objb["levelUp"] === "function");
 		lightblock.hasCustomUpdate = (typeof objb["customUpdate"] === "function");
+    lightblock.hasCustomRW = (typeof objb["customRead"] === "function");
 
 		objb = Object.assign(objb, {
       //angle strengthPercentage lengthleft color
@@ -130,10 +131,12 @@ module.exports = {
 			read(stream, version){
 				this.super$read(stream, version);
 				this._angle = stream.b();
+        if(lightblock.hasCustomRW) this.customRead(stream, version);
 			},
 			write(stream){
 				this.super$write(stream);
 				stream.b(this._angle);
+        if(lightblock.hasCustomRW) this.customWrite(stream);
 			},
 
       drawLight(){
@@ -195,8 +198,8 @@ module.exports = {
         this._lsData.push([this.getAngle(), 100, this._lightData[2], this._lightData[3]]);
         this.pointMarch(this.tile, this.lightData(), length, maxLength, 0, this);
         this.setInit(true);
-        print(this._ls.toString());
-        print(this._lsData.toString());
+        //print(this._ls.toString());
+        //print(this._lsData.toString());
       },
       pointMarch(tile, ld, length, maxLength, num, source){
         if(length <= 0 || maxLength <= 0 || num > lightblock.maxReflections || ld[1] < 5) return;
@@ -221,7 +224,7 @@ module.exports = {
             next2 = [furthest.bc().calcReflection(ld[0]), ld[1] / 2, ld[2] - i, ld[3]];
           }
           else if(furthest.bc().block.lightRepeater){
-            var tl = furthest.bc().calcLight(ld);
+            var tl = furthest.bc().calcLight(ld, i);
             next = [tl[0], tl[1], tl[2], tl[3]];
           }
           else if(furthest.bc().block.consumesLight){

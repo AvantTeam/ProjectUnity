@@ -159,6 +159,7 @@ module.exports = {
 
 		expblock.hasLevelFunction = (typeof objb["levelUp"] === "function");
 		expblock.hasCustomUpdate = (typeof objb["customUpdate"] === "function");
+    expblock.hasCustomRW = (typeof objb["customRead"] === "function");
 
 		objb = Object.assign(objb, {
 			totalExp(){
@@ -205,11 +206,13 @@ module.exports = {
 			read(stream, version){
 				this.super$read(stream, version);
 				this._exp = stream.i();
+        if(expblock.hasCustomRW) this.customRead(stream, version);
 			},
 
 			write(stream){
 				this.super$write(stream);
 				stream.i(this._exp);
+        if(expblock.hasCustomRW) this.customWrite(stream);
 			}
 		});
 		//Extend Building

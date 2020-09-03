@@ -9,5 +9,7 @@
 	],
 	"research": "light-lamp",
   "solid": true,
-  "rotate": false
+  "rotate": false,
+  "configurable": true,
+  "saveConfig": true
 }

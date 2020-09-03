@@ -9,5 +9,7 @@
 	],
 	"research": "light-filter",
   "solid": true,
-  "rotate": false
+  "rotate": false,
+  "configurable": true,
+  "saveConfig": true
 }
