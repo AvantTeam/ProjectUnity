@@ -2,10 +2,12 @@
 	"size": 3,
 	"health": 1440,
 	"range": 180,
-	"reloadTime": 60,
-	"chargeTime": 16,
+	"reloadTime": 72,
+	"chargeTime": 30,
+	"chargeMaxDelay": 4,
+	"chargeEffects": 12,
 	"shootCone": 5,
-	"shots": 5,
+	"shots": 8,
 	"burstSpacing": 2,
 	"shootSound": "spark",
 	"shootShake": 3,
@@ -13,7 +15,8 @@
 	"recoilAmount": 2.5,
 	"shootType": {
 		"type": "LightningBulletType",
-		"damage": 32
+		"damage": 32,
+		"shootEffect": "lightningShoot"
 	},
 	"requirements": [
 		{"item": "copper", "amount": 1}
