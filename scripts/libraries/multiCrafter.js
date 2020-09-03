@@ -603,8 +603,11 @@ multi.entityType = prov(() => extendContent(GenericCrafter.GenericCrafterBuild, 
                     var item = itemIter.next();
                     if (eItems.has(item))
                     {
-                        this.dump(item);
-                        break;
+                        if (this.put(items[i].item))
+                        {
+                            this.items.remove(items[i].item, 1);
+                            break;
+                        }
                     }
                 }
             }
