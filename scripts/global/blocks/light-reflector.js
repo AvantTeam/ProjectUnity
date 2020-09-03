@@ -124,7 +124,7 @@ filter.entityType = () => {
       }
     },
     config(){
-      return this._color;
+      return java.lang.Short(this._color);
     },
     addColorButton(table, i){
       var button = table.button(Tex.whiteui, Styles.clearToggleTransi, 24, () => {
@@ -184,8 +184,11 @@ const filterInv = extendContent(Block, "light-inverted-filter", {
 });
 
 filterInv.config(Short, (build, value) => {
-  print(value);
+  //print(value);
 	build.setFilterColor(value);
+});
+filterInv.configClear((build) => {
+  build.setFilterColor(0);
 });
 
 filterInv.entityType = () => {
@@ -216,7 +219,7 @@ filterInv.entityType = () => {
       }
     },
     config(){
-      return this._color;
+      return java.lang.Short(this._color);
     },
     addColorButton(table, i){
       var button = table.button(Tex.whiteui, Styles.clearToggleTransi, 24, () => {
