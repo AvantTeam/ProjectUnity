@@ -216,7 +216,8 @@ module.exports = {
             next2 = [furthest.bc().calcReflection(ld[0]), ld[1] / 2, ld[2] - i, ld[3]];
           }
           else if(furthest.bc().block.lightRepeater){
-            next = [ld[0], ld[1], furthest.bc().calcLength(ld[2]), furthest.bc().calcColor(ld[3])];
+            var tl = furthest.bc().calcLight(ld);
+            next = [tl[0], tl[1], tl[2], tl[3]];
           }
           else if(furthest.bc().block.consumesLight){
             furthest.bc().addSource([source, ld[1]]);
