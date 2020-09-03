@@ -1,6 +1,0 @@
-{
-	"requirements": [
-		{"item": "copper", "amount": 1}
-	],
-	"buildVisibility": "shown"
-}
