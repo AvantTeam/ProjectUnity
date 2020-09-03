@@ -89,7 +89,11 @@ const filter = extendContent(Block, "light-filter", {
 
 const Short = java.lang.Short;
 filter.config(Short, (build, value) => {
+  print(value);
 	build.setFilterColor(value);
+});
+filter.configClear((build) => {
+  build.setFilterColor(0);
 });
 
 filter.entityType = () => {
@@ -180,6 +184,7 @@ const filterInv = extendContent(Block, "light-inverted-filter", {
 });
 
 filterInv.config(Short, (build, value) => {
+  print(value);
 	build.setFilterColor(value);
 });
 
