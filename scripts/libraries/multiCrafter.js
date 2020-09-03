@@ -1,4 +1,4 @@
-var multi = extendContent(GenericCrafter, "multi",
+/*var multi = extendContent(GenericCrafter, "multi",
 {
     tmpRecs: [
     { //1  you can skip recipe properties
@@ -320,4 +320,5 @@ multi.entityType = prov(() => extend(GenericCrafter.GenericCrafterBuild,
 
 }));
 multi.buildVisibility = BuildVisibility.sandboxOnly;
-multi.category = Category.crafting;
+multi.category = Category.crafting;*/
+
