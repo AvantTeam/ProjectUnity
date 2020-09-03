@@ -164,6 +164,39 @@ var multi = extendContent(GenericCrafter, "multi",
     },
     powerBarI: false,
     powerBarO: false,
+    _invFrag: extend(BlockInventoryFragment,
+    {
+        _built: false,
+        isBuilt()
+        {
+            return this._built;
+        },
+        visible: false,
+        isShown()
+        {
+            return this.visible;
+        },
+        showFor(t)
+        {
+            this.visible = true;
+            this.super$showFor(t);
+        },
+        hide()
+        {
+            this.visible = false;
+            this.super$hide();
+        },
+        build(parent)
+        {
+            print("asdf");
+            this._built = true;
+            this.super$build(parent);
+        }
+    }),
+    getInvFrag()
+    {
+        return this._invFrag;
+    },
     init()
     {
         for (var i = 0; i < this.tmpRecs.length; i++)
@@ -352,8 +385,6 @@ multi.entityType = prov(() => extendContent(GenericCrafter.GenericCrafterBuild, 
         if (typeof this.block["getInputItemSet"] !== "function") return false;
         if (this.items.get(item) >= this.getMaximumAccepted(item)) return false;
         var ret = this.block.getInputItemSet();
-        print(ret);
-        print(ret.contains(item));
         return ret.contains(item);
     },
     acceptLiquid(source, liquid, amount)
@@ -427,23 +458,23 @@ multi.entityType = prov(() => extendContent(GenericCrafter.GenericCrafterBuild, 
     },
     getPowerProduction()
     {
-        var i = this.getToggle();
+        var i = this._toggle;
         if (i < 0 || typeof this.block["getRecipes"] !== "function") return 0;
         var oPower = this.block.getRecipes()[i].output.power;
-        if (oPower > 0 && this.getCond())
+        if (oPower > 0 && this._cond)
         {
             if (this.block.getRecipes()[i].input.power > 0)
             {
-                this.setPowerStat(this.efficiency());
+                this._powerStat = this.efficiency();
                 return oPower * this.efficiency();
             }
             else
             {
-                this.setPowerStat(1);
+                this._powerStat = 1;
                 return oPower;
             }
         }
-        this.setPowerStat(0);
+        this._powerStat = 0;
         return 0;
     },
     getProgressIncreaseA(i, baseTime)
@@ -477,12 +508,12 @@ multi.entityType = prov(() => extendContent(GenericCrafter.GenericCrafterBuild, 
         var liquids = recs[i].output.liquids;
         for (var j = 0, len = items.length; j < len; j++)
         {
-            if (this.items.get(items[j].item) + items[j].amount > this.itemCapacity) return true;
+            if (this.items.get(items[j].item) + items[j].amount > this.getMaximumAccepted(items[j].item)) return true;
         }
         //liquids
         for (var j = 0, len = liquids.length; j < len; j++)
         {
-            if (this.liquids.get(liquids[j].liquid) + liquids[j].amount > this.liquidCapacity) return true;
+            if (this.liquids.get(liquids[j].liquid) + liquids[j].amount > this.block.liquidCapacity) return true;
         }
         return false;
     },
@@ -498,14 +529,14 @@ multi.entityType = prov(() => extendContent(GenericCrafter.GenericCrafterBuild, 
     {
         const recs = this.block.getRecipes();
         var excute = this.checkCond(i);
-        this.saveCond(excute);
+        this._cond = excute;
         if (excute)
         {
             //do produce
-            if (this.getProgress(i) != 0 && this.getProgress(i) != null)
+            if (this.progressArr[i] != 0 && this.progressArr[i] != null)
             {
-                this.progress = this.getProgress(i);
-                this.saveProgress(i, 0);
+                this.progress = this.progressArr[i];
+                this.progressArr[i] = 0;
             }
             this.progress += this.getProgressIncreaseA(i, recs[i].craftTime);
             this.totalProgress += this.delta();
@@ -547,12 +578,12 @@ multi.entityType = prov(() => extendContent(GenericCrafter.GenericCrafterBuild, 
     {
         if (typeof this.block["getRecipes"] !== "function") return;
         const recs = this.block.getRecipes();
-        /*if (!this.invFrag.isShown() && Vars.control.input.frag.config.isShown() && Vars.control.input.frag.config.getSelectedTile() == tile)
-        {
-            this.invFrag.showFor(tile);
-        }*/
+        var invIsShown = this.block.getInvFrag().isShown(),
+            configIsShown = Vars.control.input.frag.config.isShown();
+        if (!invIsShown && configIsShown && Vars.control.input.frag.config.getSelectedTile() == this) this.block.getInvFrag().showFor(this);
+        else if (invIsShown && !configIsShown) this.block.getInvFrag().hide();
         var recLen = recs.length;
-        var current = this.getToggle();
+        var current = this._toggle;
         //to not rewrite whole update
         if (typeof this["customUpdate"] === "function") this.customUpdate();
         //calls customCons and customProd
@@ -628,23 +659,24 @@ multi.entityType = prov(() => extendContent(GenericCrafter.GenericCrafterBuild, 
     },
     shouldIdleSound()
     {
-        return this.getCond();
+        return this._cond;
     },
     shouldConsume()
     {
-        return this.getCond() && this.enabled;
+        return this._cond && this.enabled;
     },
     buildConfiguration(table)
     {
         if (typeof this.block["getRecipes"] !== "function") return;
-        const recs = this.block.getRecipes();
-        /*if (!this.invFrag.isBuilt()) this.invFrag.build(table.getParent());
-        if (this.invFrag.isShown())
+        const recs = this.block.getRecipes(),
+            invFrag = this.block.getInvFrag();
+        if (!invFrag.isBuilt()) invFrag.build(table.parent);
+        if (invFrag.isShown())
         {
-            this.invFrag.hide();
+            invFrag.hide();
             Vars.control.input.frag.config.hideConfig();
             return;
-        }*/
+        }
         var group = new ButtonGroup();
         group.setMinCheckCount(0);
         group.setMaxCheckCount(1);
@@ -657,7 +689,7 @@ multi.entityType = prov(() => extendContent(GenericCrafter.GenericCrafterBuild, 
                 var output = recs[i].output;
                 var button = table.button(Tex.whiteui, Styles.clearToggleTransi, 40, run(() => that.configure(button.isChecked() ? i : -1))).group(group).get();
                 button.getStyle().imageUp = new TextureRegionDrawable(output.items.length > 0 ? output.items[0].item.icon(Cicon.small) : output.liquids.length > 0 ? output.liquids[0].liquid.icon(Cicon.small) : output.power > 0 ? Icon.power : Icon.cancel);
-                button.update(run(() => button.setChecked(that.getToggle() == i)));
+                button.update(run(() => button.setChecked(that._toggle == i)));
             })(i, this);
         }
         table.row();
@@ -718,42 +750,27 @@ multi.entityType = prov(() => extendContent(GenericCrafter.GenericCrafterBuild, 
     },
     configured(player, value)
     {
-        if (this.getToggle() >= 0) this.saveProgress(this.getToggle(), this.progress);
-        if (value == -1) this.saveCond(false);
+        if (this._toggle >= 0) this.progressArr[this._toggle] = this.progress;
+        if (value == -1) this._cond = false;
         this.progress = 0;
-        this.setToggle(value);
+        this._toggle = value;
     },
-    setToggle(a)
+    onConfigureTileTapped(other)
     {
-        this._toggle = a;
+        if (this != other) this.block.getInvFrag().hide();
+        return true;
     },
     getToggle()
     {
         return this._toggle;
     },
     _toggle: 0,
-    saveProgress(c, d)
-    {
-        this._progressArr[c] = d;
-    },
-    getProgress(e)
-    {
-        return this._progressArr[e];
-    },
-    _progressArr: [],
-    saveCond(f)
-    {
-        this._cond = f;
-    },
+    progressArr: [],
     getCond()
     {
         return this._cond;
     },
     _cond: false,
-    setPowerStat(g)
-    {
-        this._powerStat = g;
-    },
     getPowerStat()
     {
         return this._powerStat;
