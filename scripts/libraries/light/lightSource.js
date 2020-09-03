@@ -136,6 +136,11 @@ module.exports = {
 				stream.b(this._angle);
 			},
 
+      drawLight(){
+        //TODO make light draw on beams
+        Drawf.light(this.team, this.x, this.y, (this.lightPower()*0.1 + 60)*this.power.status, lightblock.lightColor, 0.8);
+      },
+
       drawLightLasers(){
         if(this == null || !this.isAdded() || this.lightPower() <= 1) return;
         Draw.z(Layer.effect - 1);
