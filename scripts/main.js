@@ -61,7 +61,7 @@ const script = [
                 childs: [
                     "recursivereconstructor",
                     "light-lamp",
-                    "light-test"
+                    "light-reflector"
                 ]
             },
 

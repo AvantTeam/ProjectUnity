@@ -1,12 +1,13 @@
 {
 	"size": 1,
-	"health": 40,
+	"health": 60,
   "update": true,
   "category": "logic",
 	"requirements": [
+    {"item": "graphite", "amount": 10},
 		{"item": "metaglass", "amount": 10}
 	],
-	"research": "light-lamp",
+	"research": "light-filter",
   "solid": true,
-  "rotate": true
+  "rotate": false
 }
