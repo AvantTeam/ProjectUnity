@@ -3,7 +3,27 @@ laser.length = 180;
 laser.sideAngle = 45;
 laser.inaccuracy = 8;
 
+const charge = new Effect(30, e => {
+	Draw.color(Pal.lancerLaser);
+	
+	var angle = Mathf.randomSeed(e.id, 360) + Time.time();
+	var dist = (1 - e.finpow()) * 20;
+	
+	Tmp.v1.trns(angle, dist);
+	
+	Fill.circle(e.x + Tmp.v1.x, e.y + Tmp.v1.y, e.fin() * 5);
+});
+
+const chargeBegin = new Effect(40, e => {
+	Draw.color(Pal.lancerLaser);
+	
+	Fill.circle(e.x, e.y, e.fin() * 6);
+});
+
 const oracle = extendContent(ChargeTurret, "oracle", {});
+oracle.chargeEffect = charge;
+oracle.chargeBeginEffect = chargeBegin;
+
 oracle.entityType = () => extendContent(ChargeTurret.ChargeTurretBuild, oracle, {
 	shoot(ammo){
 		this.useAmmo();
@@ -37,6 +57,8 @@ oracle.entityType = () => extendContent(ChargeTurret.ChargeTurretBuild, oracle, 
 			for(var i = 0; i < 3; i++){
 				Time.run(i, () => {
 					this.bullet(laser, this.rotation + Mathf.range(laser.inaccuracy));
+					
+					Fx.hitLancer.at(this.x + oracle.tr.x, this.y + oracle.tr.y, this.rotation);
 					Sounds.laser.at(this.tile, Mathf.random(0.7, 0.9));
 				});
 			};
