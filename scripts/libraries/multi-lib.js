@@ -25,14 +25,14 @@ function MultiCrafterBuild() {
             //아이템
             for (var j = 0, len = items.length; j < len; j++) {
                 (function(that, stack) {
-                    table.add(new ReqImage(new ItemImage(stack.item.icon(Cicon.medium), stack.amount), boolp(() => that.items != null && that.items.has(stack.item, stack.amount)))).size(8 * 4);
+                    table.add(new ReqImage(new ItemImage(stack.item.icon(Cicon.medium), stack.amount), () => that.items != null && that.items.has(stack.item, stack.amount))).size(8 * 4);
                 })(this, items[j]);
             }
             z += len;
             //액체
             for (var l = 0, len = liquids.length; l < len; l++) {
                 (function(that, stack) {
-                    table.add(new ReqImage(new ItemImage(stack.liquid.icon(Cicon.medium), stack.amount), boolp(() => that.liquids != null && that.liquids.get(stack.liquid) > stack.amount))).size(8 * 4);
+                    table.add(new ReqImage(new ItemImage(stack.liquid.icon(Cicon.medium), stack.amount), () => that.liquids != null && that.liquids.get(stack.liquid) > stack.amount)).size(8 * 4);
                 })(this, liquids[l]);
             }
             z += len;
@@ -110,17 +110,28 @@ function MultiCrafterBuild() {
         return false;
     };
     this.checkCond = function(i) {
-        if (this.power.status <= 0 && this.block.getRecipes()[i].input.power > 0) return false;
+        if (this.power.status <= 0 && this.block.getRecipes()[i].input.power > 0) {
+            this._condValid = false;
+            this._cond = false;
+            return false;
+        }
         //check power
-        else if (this.checkinput(i)) return false;
-        else if (this.checkoutput(i)) return false;
-        else return true;
+        else if (this.checkinput(i)) {
+            this._condValid = false;
+            this._cond = false;
+            return false;
+        } else if (this.checkoutput(i)) {
+            this._condValid = true;
+            this._cond = false;
+            return false;
+        }
+        this._condValid = true;
+        this._cond = true;
+        return true;
     };
     this.customCons = function(i) {
         const recs = this.block.getRecipes();
-        var excute = this.checkCond(i);
-        this._cond = excute;
-        if (excute) {
+        if (this.checkCond(i)) {
             //do produce
             if (this.progressArr[i] != 0 && this.progressArr[i] != null) {
                 this.progress = this.progressArr[i];
@@ -222,10 +233,10 @@ function MultiCrafterBuild() {
             }
         }
     };
-    this.shouldIdleSound = function() {
-        return this._cond;
-    };
     this.shouldConsume = function() {
+        return this._condValid && this.productionValid();
+    };
+    this.productionValid = function() {
         return this._cond && this.enabled;
     };
     this.buildConfiguration = function(table) {
@@ -246,9 +257,9 @@ function MultiCrafterBuild() {
             //representative images
             (function(i, that) {
                 var output = recs[i].output;
-                var button = table.button(Tex.whiteui, Styles.clearToggleTransi, 40, run(() => that.configure(button.isChecked() ? i : -1))).group(group).get();
+                var button = table.button(Tex.whiteui, Styles.clearToggleTransi, 40, () => that.configure(button.isChecked() ? i : -1)).group(group).get();
                 button.getStyle().imageUp = new TextureRegionDrawable(output.items.length > 0 ? output.items[0].item.icon(Cicon.small) : output.liquids.length > 0 ? output.liquids[0].liquid.icon(Cicon.small) : output.power > 0 ? Icon.power : Icon.cancel);
-                button.update(run(() => button.setChecked(that._toggle == i)));
+                button.update(() => button.setChecked(that._toggle == i));
             })(i, this);
         }
         table.row();
@@ -294,14 +305,34 @@ function MultiCrafterBuild() {
         }
     };
     this.configured = function(player, value) {
+        if (isNaN(value)) {
+            this._toggle = -1;
+            this._cond = false;
+            this._condValid = false;
+            return;
+        }
         if (this._toggle >= 0) this.progressArr[this._toggle] = this.progress;
-        if (value == -1) this._cond = false;
+        if (value == -1) {
+            this._condValid = false;
+            this._cond = false;
+        }
         this.progress = 0;
         this._toggle = value;
     };
     this.onConfigureTileTapped = function(other) {
         if (this != other) this.block.getInvFrag().hide();
         return true;
+    };
+    this.created = function() {
+        var that = this;
+        this.cons = extendContent(ConsumeModule, this, {
+            _entity: that,
+            status() {
+                if (this._entity.productionValid()) return BlockStatus.active;
+                if (this._entity.getCondValid()) return BlockStatus.noOutput;
+                return BlockStatus.noInput;
+            }
+        });
     };
     this.getToggle = function() {
         return this._toggle;
@@ -312,6 +343,10 @@ function MultiCrafterBuild() {
         return this._cond;
     };
     this._cond = false;
+    this._condValid = false;
+    this.getCondValid = function() {
+        return this._condValid;
+    };
     this.getPowerStat = function() {
         return this._powerStat;
     };
@@ -519,19 +554,19 @@ function MultiCrafterBlock() {
             this.bars.remove("power");
         }
         if (this.powerBarO) {
-            this.bars.add("poweroutput", func(entity =>
-                new Bar(prov(() => Core.bundle.format("bar.poweroutput", entity.getPowerProduction() * 60 * entity.timeScale)), prov(() => Pal.powerBar), floatp(() => typeof entity["getPowerStat"] === "function" ? entity.getPowerStat() : 0))
-            ));
+            this.bars.add("poweroutput", entity =>
+                new Bar(() => Core.bundle.format("bar.poweroutput", entity.getPowerProduction() * 60 * entity.timeScale), () => Pal.powerBar, () => typeof entity["getPowerStat"] === "function" ? entity.getPowerStat() : 0)
+            );
         }
         //display every Liquids that can contain
         var i = 0;
         if (!this._liquidSet.isEmpty()) {
-            this._liquidSet.each(cons(k => {
-                this.bars.add("liquid" + i, func(entity =>
-                    new Bar(prov(() => k.localizedName), prov(() => k.barColor == null ? k.color : k.barColor), floatp(() => entity.liquids.get(k) / this.liquidCapacity))
-                ));
+            this._liquidSet.each(k => {
+                this.bars.add("liquid" + i, entity =>
+                    new Bar(() => k.localizedName, () => k.barColor == null ? k.color : k.barColor, () => entity.liquids.get(k) / this.liquidCapacity)
+                );
                 i++;
-            }));
+            });
         }
     };
     this.outputsItems = function() {
@@ -543,7 +578,7 @@ module.exports = {
         const block = new MultiCrafterBlock();
         Object.assign(block, def);
         const multi = extendContent(Type, name, block);
-        multi.entityType = prov(() => extendContent(GenericCrafter.GenericCrafterBuild, multi, Object.assign(new MultiCrafterBuild(), entityDef)));
+        multi.entityType = () => extendContent(GenericCrafter.GenericCrafterBuild, multi, Object.assign(new MultiCrafterBuild(), entityDef));
         multi.consumes.add(extend(ConsumePower, {
             requestedPower(entity) {
                 if (typeof entity["getToggle"] !== "function") return 0;
@@ -560,5 +595,6 @@ module.exports = {
         multi.hasPower = true;
         multi.dumpToggle = false;
         multi.tmpRecs = recipes;
+        return multi;
     }
 };
