@@ -465,16 +465,16 @@ multi.entityType = prov(() => extendContent(GenericCrafter.GenericCrafterBuild, 
         {
             if (this.block.getRecipes()[i].input.power > 0)
             {
-                this._powerStat=this.efficiency();
+                this._powerStat = this.efficiency();
                 return oPower * this.efficiency();
             }
             else
             {
-                this._powerStat=1;
+                this._powerStat = 1;
                 return oPower;
             }
         }
-        this._powerStat=0;
+        this._powerStat = 0;
         return 0;
     },
     getProgressIncreaseA(i, baseTime)
@@ -529,14 +529,14 @@ multi.entityType = prov(() => extendContent(GenericCrafter.GenericCrafterBuild, 
     {
         const recs = this.block.getRecipes();
         var excute = this.checkCond(i);
-        this._cond=excute;
+        this._cond = excute;
         if (excute)
         {
             //do produce
             if (this.progressArr[i] != 0 && this.progressArr[i] != null)
             {
                 this.progress = this.progressArr[i];
-                this.progressArr[i]= 0;
+                this.progressArr[i] = 0;
             }
             this.progress += this.getProgressIncreaseA(i, recs[i].craftTime);
             this.totalProgress += this.delta();
@@ -750,10 +750,10 @@ multi.entityType = prov(() => extendContent(GenericCrafter.GenericCrafterBuild, 
     },
     configured(player, value)
     {
-        if (this._toggle >= 0) this.progressArr[this._toggle]=this.progress;
-        if (value == -1) this._cond=false;
+        if (this._toggle >= 0) this.progressArr[this._toggle] = this.progress;
+        if (value == -1) this._cond = false;
         this.progress = 0;
-        this._toggle=value;
+        this._toggle = value;
     },
     onConfigureTileTapped(other)
     {
