@@ -13,8 +13,8 @@ const createIconsC = (packer, block) => {
 				if(color.a > 0.001){
 					color.set(0, 0, 0, 0.3);
 					image.draw(x, y, color);
-				}
-			}
+				};
+			};
 		};
 		
 		image.draw(shadow);
@@ -25,7 +25,7 @@ const createIconsC = (packer, block) => {
 		if(i == 0){
 			packer.add(MultiPacker.PageType.editor, "editor-block-" + block.name + "-full", image);
 			packer.add(MultiPacker.PageType.main, "block-" + block.name + "-full", image);
-		}
+		};
 	}
 };
 
@@ -34,6 +34,7 @@ const umbriumOre = extendContent(OreBlock, "umbrium", {
 		this.itemDrop = Vars.content.getByName(ContentType.item, "unity-umbrium");
 		this.super$init();
 	},
+	
 	createIcons(packer){
 		createIconsC(packer, this);
 	}
@@ -47,6 +48,7 @@ const luminumOre = extendContent(OreBlock, "luminum", {
 		this.itemDrop = Vars.content.getByName(ContentType.item, "unity-luminum");
 		this.super$init();
 	},
+	
 	createIcons(packer){
 		createIconsC(packer, this);
 	}
