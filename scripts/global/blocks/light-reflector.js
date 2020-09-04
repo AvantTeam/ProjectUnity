@@ -60,14 +60,24 @@ reflector90.entityType = () => {
 const colors = [Color.white, Color.red, Color.green, Color.blue];
 const ncolors = [Color.black, Color.cyan, Color.magenta, Color.yellow];
 
+const Integer = java.lang.Integer;
+
 const filter = extendContent(Block, "light-filter", {
   drawRequestRegion(req, list) {
 		const scl = Vars.tilesize * req.animScale;
-		Draw.rect(this.baseRegion, req.drawx(), req.drawy(), scl, scl);
+		Draw.rect(this.region, req.drawx(), req.drawy(), scl, scl);
+    /*
+    Draw.color(colors[req.config], 0.7);
+    Draw.rect(this.lightRegion, req.drawx(), req.drawy(), scl, scl);
+    Draw.color();*/
     //rest in drawconfigwhatever
 	},
   drawRequestConfig(req, list){
+    this.drawRequestConfigTop(req, list);
+  },
+  drawRequestConfigTop(req, list){
     //req.config
+    if(req.config == null) return;
     const scl = Vars.tilesize * req.animScale;
     Draw.color(colors[req.config], 0.7);
     Draw.rect(this.lightRegion, req.drawx(), req.drawy(), scl, scl);
@@ -87,9 +97,7 @@ const filter = extendContent(Block, "light-filter", {
   }
 });
 
-const Short = java.lang.Short;
-filter.config(Short, (build, value) => {
-  print(value);
+filter.config(Integer, (build, value) => {
 	build.setFilterColor(value);
 });
 filter.configClear((build) => {
@@ -97,7 +105,7 @@ filter.configClear((build) => {
 });
 
 filter.entityType = () => {
-  return extend(Building, {
+  const ent = extend(Building, {
     _color: 0,
     getFilterColor(){
       return this._color;
@@ -112,25 +120,29 @@ filter.entityType = () => {
     draw(){
       Draw.rect(filter.baseRegion, this.x, this.y);
       Draw.color(colors[this._color], 0.7);
+      Draw.z(Layer.effect + 2);
       Draw.rect(filter.lightRegion, this.x, this.y);
       Draw.color();
+      Draw.reset();
     },
 
     configured(player, value){
       this.super$configured(player, value);
+      this._color = value;
+      //print("Configured: "+value);
 
       if(!Vars.headless){
         Vars.renderer.minimap.update(this.tile);
       }
     },
     config(){
-      return new Short(this._color);
+      return new Integer(this._color);
     },
     addColorButton(table, i){
       var button = table.button(Tex.whiteui, Styles.clearToggleTransi, 24, () => {
         //print(i);
         this._color = i;
-        this.configure(new Short(i));
+        this.configure(new Integer(i));
         Vars.control.input.frag.config.hideConfig();
       }).size(40).get();
       button.update(() => {
@@ -152,18 +164,22 @@ filter.entityType = () => {
       this.super$write(stream);
       stream.b(this._color);
     }
-  })
+  });
+  ent._color = 0;
+  return ent;
 }
 
-
+//Inverse filter
 const filterInv = extendContent(Block, "light-inverted-filter", {
   drawRequestRegion(req, list) {
 		const scl = Vars.tilesize * req.animScale;
-		Draw.rect(this.baseRegion, req.drawx(), req.drawy(), scl, scl);
-    //rest in drawconfigwhatever
+		Draw.rect(this.region, req.drawx(), req.drawy(), scl, scl);
 	},
   drawRequestConfig(req, list){
-    //req.config
+    this.drawRequestConfigTop(req, list);
+  },
+  drawRequestConfigTop(req, list){
+    if(req.config == null) return;
     const scl = Vars.tilesize * req.animScale;
     Draw.color(colors[req.config], 0.7);
     Draw.rect(this.lightRegion, req.drawx(), req.drawy(), scl, scl);
@@ -183,8 +199,7 @@ const filterInv = extendContent(Block, "light-inverted-filter", {
   }
 });
 
-filterInv.config(Short, (build, value) => {
-  //print(value);
+filterInv.config(Integer, (build, value) => {
 	build.setFilterColor(value);
 });
 filterInv.configClear((build) => {
@@ -192,7 +207,7 @@ filterInv.configClear((build) => {
 });
 
 filterInv.entityType = () => {
-  return extend(Building, {
+  const ent = extend(Building, {
     _color: 0,
     getFilterColor(){
       return this._color;
@@ -207,25 +222,29 @@ filterInv.entityType = () => {
     draw(){
       Draw.rect(filterInv.baseRegion, this.x, this.y);
       Draw.color(colors[this._color], 0.7);
+      Draw.z(Layer.effect + 2);
       Draw.rect(filter.lightRegion, this.x, this.y);
       Draw.color();
+      Draw.reset();
     },
 
     configured(player, value){
       this.super$configured(player, value);
+      this._color = value;
+      //print("Configured: "+value);
 
       if(!Vars.headless){
         Vars.renderer.minimap.update(this.tile);
       }
     },
     config(){
-      return java.lang.Short(this._color);
+      return new Integer(this._color);
     },
     addColorButton(table, i){
       var button = table.button(Tex.whiteui, Styles.clearToggleTransi, 24, () => {
         //print(i);
         this._color = i;
-        this.configure(this.config());
+        this.configure(new Integer(i));
         Vars.control.input.frag.config.hideConfig();
       }).size(40).get();
       button.update(() => {
@@ -247,5 +266,7 @@ filterInv.entityType = () => {
       this.super$write(stream);
       stream.b(this._color);
     }
-  })
+  });
+  ent._color = 0;
+  return ent;
 }
