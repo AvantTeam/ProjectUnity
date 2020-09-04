@@ -1,0 +1,31 @@
+{
+	"outputItem": {"item": "dark-alloy", "amount": 3},
+	"size": 4,
+	"hasLiquids": false,
+	"hasPower": true,
+	"hasItems": true,
+	"craftTime": 140,
+	"consumes": {
+		"power": 3.2,
+		"items": {
+			"items": [
+				{"item": "lead", "amount": 4},
+				{"item": "silicon", "amount": 3},
+				{"item": "phase-fabric", "amount": 1},
+				{"item": "umbrium", "amount": 2}
+			]
+		}
+	},
+	"requirements": [
+		{"item": "graphite", "amount": 320},
+		{"item": "umbrium", "amount": 220},
+		{"item": "silicon", "amount": 370},
+		{"item": "titanium", "amount": 280},
+		{"item": "thorium", "amount": 90},
+		{"item": "surge-alloy", "amount": 120}
+	],
+	"category": "crafting",
+	"research": "alloy-smelter",
+	"idleSound": "respawning",
+	"idleSoundVolume": 0.6
+}

@@ -100,7 +100,19 @@ const script = [
             }
         ]
     },
-
+	
+	{
+        name: "dark",
+        childs: [
+			{
+				name: "factories",
+				childs: [
+					"darkalloyfactory"
+				]
+			}
+		]
+    },
+	
     {
         name: "imber",
         childs: [
