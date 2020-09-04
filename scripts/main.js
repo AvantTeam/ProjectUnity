@@ -120,7 +120,8 @@ const script = [
 				name: "turrets",
 				childs: [
 					"orb",
-					"shockwire"
+					"shockwire",
+					"plasma"
 				]
 			}
 		]
