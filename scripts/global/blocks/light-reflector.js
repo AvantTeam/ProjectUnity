@@ -124,13 +124,13 @@ filter.entityType = () => {
       }
     },
     config(){
-      return java.lang.Short(this._color);
+      return new Short(this._color);
     },
     addColorButton(table, i){
       var button = table.button(Tex.whiteui, Styles.clearToggleTransi, 24, () => {
         //print(i);
         this._color = i;
-        this.configure(this.config());
+        this.configure(new Short(i));
         Vars.control.input.frag.config.hideConfig();
       }).size(40).get();
       button.update(() => {
