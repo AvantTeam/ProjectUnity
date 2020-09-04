@@ -2,7 +2,7 @@
 	"type": "PowerTurret",
 	"size": 2,
 	"health": 600,
-	"range": 150,
+	"range": 120,
 	"reloadTime": 48,
 	"shootCone": 15,
 	"shots": 3,
@@ -12,7 +12,8 @@
 	"recoilAmount": 2.5,
 	"shootType": {
 		"type": "LightningBulletType",
-		"damage": 32
+		"lightningLength": 20,
+		"damage": 26
 	},
 	"requirements": [
 		{"item": "copper", "amount": 1}
