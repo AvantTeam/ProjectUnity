@@ -147,6 +147,7 @@ module.exports = {
       drawLightLasers(){
         if(this == null || !this.isAdded() || this.lightPower() <= 1) return;
         Draw.z(Layer.effect - 1);
+        Draw.blend(Blending.additive);
 
         var now = null;
         var next = null;
@@ -180,6 +181,7 @@ module.exports = {
             }
           }
         }
+        Draw.blend();
         Draw.color();
       },
 
@@ -225,6 +227,7 @@ module.exports = {
           }
           else if(furthest.bc().block.lightRepeater){
             var tl = furthest.bc().calcLight(ld, i);
+            if(tl == null) return true;
             next = [tl[0], tl[1], tl[2], tl[3]];
           }
           else if(furthest.bc().block.consumesLight){
