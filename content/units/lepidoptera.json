@@ -1,0 +1,87 @@
+{
+	"speed": 1.5,
+	"drag": 0.07,
+	"accel": 0.03,
+	"fallSpeed": 0.001,
+	"health": 1700,
+	"engineSize": 0,
+	"flying": true,
+	"hitsize": 45,
+	"range": 165,
+	"weapons": [
+		{
+			"name": "lepidoptera-gun",
+			"x": 17,
+			"y": 14,
+			"shootSound": "pew",
+			"ejectEffect": "shellEjectSmall",
+			"reload": 5,
+			"bullet": {
+				"type": "MissileBulletType",
+				"width": 5,
+				"length": 5,
+				"trailColor": "FF7733",
+				"weaveScale": 2,
+				"weaveMag": -2,
+				"lifetime": 100,
+				"speed": 2,
+				"splashDamageRadius": 2,
+				"splashDamage": 10,
+				"frontColor": "FF7733",
+				"backColor": "FF7733",
+				"homingPower": 2,
+				"homingRange": 100,
+				"shrinkY": 0.2
+			}
+		},
+		{
+			"name": "lepidoptera-gun",
+			"x": 14,
+			"y": 27,
+			"shootSound": "shootSnap",
+			"ejectEffect": "shellEjectSmall",
+			"reload": 10,
+			"bullet": {
+				"type": "MissileBulletType",
+				"width": 5,
+				"length": 5,
+				"trailColor": "FF7733",
+				"weaveScale": 6,
+				"weaveMag": -6,
+				"lifetime": 100,
+				"speed": 2,
+				"splashDamageRadius": 2,
+				"splashDamage": 10,
+				"frontColor": "FF7733",
+				"backColor": "FF7733",
+				"homingPower": 2,
+				"homingRange": 100,
+				"shrinkY": 0.2
+			}
+		},
+		{
+			"name": "lepidoptera-gun-big",
+			"y": 3,
+			"shootSound": "shootBig",
+			"ejectEffect": "shellEjectMedium",
+			"reload": 15,
+			"bullet": {
+				"type": "MissileBulletType",
+				"width": 10,
+				"length": 10,
+				"trailColor": "FF7733",
+				"weaveScale": 5,
+				"weaveMag": -5,
+				"lifetime": 100,
+				"speed": 2,
+				"splashDamageRadius": 5,
+				"splashDamage": 30,
+				"frontColor": "FF7733",
+				"backColor": "FF7733",
+				"homingPower": 2,
+				"homingRange": 100,
+				"shrinkY": 0.2
+			}
+		}
+	]
+}
