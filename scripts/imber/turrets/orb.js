@@ -17,12 +17,14 @@ const orbShoot = new Effect(21, e => {
 
 const orbTrail = new Effect(43, e => {
 	var originalZ = Draw.z();
+	
+	Tmp.v1.trns(Mathf.randomSeed(e.id) * 360, Mathf.randomSeed(e.id * 341) * 12 * e.fin());
 
 	Draw.z(Layer.bullet - 0.01);
-    Drawf.light(e.x, e.y, 4.7 * e.fout() + 3, Pal.surge, 0.6);
+    Drawf.light(e.x + Tmp.v1.x, e.y + Tmp.v1.y, 4.7 * e.fout() + 3, Pal.surge, 0.6);
 
 	Draw.color(Pal.surge);
-	Fill.circle(e.x, e.y, e.fout() * 2.7);
+	Fill.circle(e.x + Tmp.v1.x, e.y + Tmp.v1.y, e.fout() * 2.7);
 
 	Draw.z(originalZ);
 });
@@ -64,7 +66,7 @@ const orb = extend(BulletType, {
 		this.super$update(b);
 		if(b.timer.get(1, 7)){
 			Units.nearbyEnemies(b.team, b.x - this.scanRadius, b.y - this.scanRadius, this.scanRadius * 2, this.scanRadius * 2, cons(unit => {
-				Lightning.create(b.team, Pal.surge, Mathf.random(22, 42), b.x, b.y, b.angleTo(unit), Mathf.random(7, 13));
+				Lightning.create(b.team, Pal.surge, Mathf.random(17, 33), b.x, b.y, b.angleTo(unit), Mathf.random(7, 13));
 			}));
 		}
 	},
@@ -81,7 +83,7 @@ orb.hittable = false;
 orb.hitEffect = orbHit;
 orb.color = Pal.surge;
 orb.trailEffect = orbTrail;
-orb.trailChance = 0.5;
+orb.trailChance = 0.4;
 orb.scanRadius = 5 * Vars.tilesize;
 
 const orbTurret = extendContent(ChargeTurret, "orb", {});

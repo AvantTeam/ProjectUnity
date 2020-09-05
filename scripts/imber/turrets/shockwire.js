@@ -15,8 +15,8 @@ const shockBeam = extend(ContinuousLaserBulletType, {
 			var tile = target;
 
 			if(tile.collide(b)){
-			tile.collision(b);
-			this.hit(b, tile.x, tile.y);
+				tile.collision(b);
+				this.hit(b, tile.x, tile.y);
 			}
 		}else{
 			b.data = new Vec2().trns(b.rotation(), this.length).add(b.x, b.y);
@@ -24,9 +24,12 @@ const shockBeam = extend(ContinuousLaserBulletType, {
 	},
 
 	update(b){
-		if(b.timer.get(1, 7)){
-			if(b.owner.target == null) return;
-			Lightning.create(b.team, this.color, Mathf.random(this.damage / 1.6, this.damage), b.x, b.y, b.angleTo(b.owner.target), Mathf.floorPositive(b.dst(b.owner.target) / Vars.tilesize + 3));
+		if(b.timer.get(1, 5)){
+			if(b.owner.target == null || b.owner == null) return;
+			Lightning.create(b.team, this.color, Mathf.random(this.damage / 1.8, this.damage / 1.2), b.x, b.y, b.angleTo(b.owner.target), Mathf.floorPositive(b.dst(b.owner.target) / Vars.tilesize + 3));
+			if(b.owner.target instanceof Healthc){
+				b.owner.target.damage(this.damage);
+			}
 		}
 	},
 
@@ -50,7 +53,7 @@ const shockBeam = extend(ContinuousLaserBulletType, {
         }
 	}
 });
-shockBeam.damage = 95;
+shockBeam.damage = 35;
 shockBeam.speed = 0.0001;
 shockBeam.shootEffect = Fx.none;
 shockBeam.despawnEffect = Fx.none;

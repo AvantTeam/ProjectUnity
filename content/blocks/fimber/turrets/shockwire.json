@@ -13,7 +13,8 @@
 		{"item": "copper", "amount": 150},
 		{"item": "lead", "amount": 145},
 		{"item": "titanium", "amount": 160},
-		{"item": "silicon", "amount": 130}
+		{"item": "silicon", "amount": 130},
+		{"item": "imberium", "amount": 70},
 	],
 	"category": "turret",
 	"research": "meltdown"

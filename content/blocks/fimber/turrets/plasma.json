@@ -9,11 +9,12 @@
 	"inaccuracy": 0,
 	"powerUse": 15.2,
 	"requirements": [
-		{"item": "copper", "amount": 270},
+		{"item": "copper", "amount": 280},
 		{"item": "lead", "amount": 320},
 		{"item": "graphite", "amount": 310},
 		{"item": "silicon", "amount": 290},
-		{"item": "spark-alloy", "amount": 250}
+		{"item": "imberium", "amount": 260},
+		{"item": "surge-alloy", "amount": 120}
 	],
 	"category": "turret",
 	"research": "shockwire"

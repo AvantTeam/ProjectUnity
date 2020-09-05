@@ -14,7 +14,8 @@
 		{"item": "copper", "amount": 55},
 		{"item": "lead", "amount": 30},
 		{"item": "graphite", "amount": 25},
-		{"item": "silicon", "amount": 35}
+		{"item": "silicon", "amount": 35},
+		{"item": "imberium", "amount": 20},
 	],
 	"category": "turret",
 	"research": "cyclone"
