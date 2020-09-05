@@ -149,17 +149,18 @@ module.exports = {
         Draw.z(Layer.effect - 1);
         Draw.blend(Blending.additive);
 
-        var now = null;
-        var next = null;
+        //var now = null;
+        //var next = null;
         for(var i=0; i<this._ls.length; i++){
           if(this._lsData[i] == null) continue;
           //print("Drawing Data: "+this._lsData[i]);
           var a = this._lsData[i][1]/100*(this.lightPower()/lightblock.lightStrength);
           Draw.color(this._lsData[i][3], a);
-          Lines.stroke(1+this.lightPower()/1000);
-          now = this._ls[i];
-          next = this._ls[i+1];
-          if(i == this._ls.length - 1){
+          if(Core.settings.getBool("bloom")) Draw.z((a>0.99)?(Layer.effect - 1):(Layer.bullet - 2));
+          Lines.stroke(1 + Math.max(this.lightPower()/1000, 20));
+          //now = this._ls[i];
+          //next = this._ls[i+1];
+          if(i == this._ls.length - 1 || this._ls[i+1] == null){
             //I'm sorry. okay?
             Draw.alpha(a);
             Lines.lineAngle(this._ls[i].worldx(), this._ls[i].worldy(), this._lsData[i][0]*45, this._lsData[i][2]*Vars.tilesize);
@@ -204,7 +205,7 @@ module.exports = {
         //print(this._lsData.toString());
       },
       pointMarch(tile, ld, length, maxLength, num, source){
-        if(length <= 0 || maxLength <= 0 || num > lightblock.maxReflections || ld[1] < 5) return;
+        if(length <= 0 || maxLength <= 0 || num > lightblock.maxReflections || ld[1]*source.lightPower() < 1) return;
         const dir = lightblock.dirs[ld[0]];
         var next = null;
         var next2 = null;
@@ -245,12 +246,20 @@ module.exports = {
         else if(next2 == null){
           //the block hit reflecc
           this._ls.push(furthest);
-          this._lsData.push(next);//obstructor
+          this._lsData.push(next);//mirror
           this.pointMarch(furthest, next, length-i, maxLength-i, ++num, source);
         }
         else{
           //the light go S P L I T
           //TODO
+          this._ls.push(furthest);
+          this._lsData.push(next);//mirror
+          this.pointMarch(furthest, next, length-i, maxLength-i, ++num, source);
+          this._ls.push(null);//cheaty yep
+          this._lsData.push(null);
+          this._ls.push(furthest);
+          this._lsData.push(next2);//mirror mirror on the wall
+          this.pointMarch(furthest, next2, length-i, maxLength-i, ++num, source);
         }
       }
 		});
