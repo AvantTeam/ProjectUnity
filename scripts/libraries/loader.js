@@ -147,7 +147,7 @@ const loaderBlock = extendContent(Block, "loader-block", {
 				newUpgrades.push(
 					[
 						Vars.content.getByName(ContentType.unit, "unity-anthophila"),
-						Vars.content.getByName(ContentType.unit, "unity-vespula")
+						Vars.content.getByName(ContentType.unit, "unity-vespula"),
 					]
 				);
 				expReconstructor.upgrades = newUpgrades;
@@ -173,6 +173,12 @@ const loaderBlock = extendContent(Block, "loader-block", {
 					[
 						UnitTypes.arkyid,
 						Vars.content.getByName(ContentType.unit, "unity-gummy")
+					]
+				);
+				newUpgrades.push(
+					[
+						Vars.content.getByName(ContentType.unit, "unity-vespula"),
+						Vars.content.getByName(ContentType.unit, "unity-lepidoptera")
 					]
 				);
 				tetraReconstructor.upgrades = newUpgrades;
