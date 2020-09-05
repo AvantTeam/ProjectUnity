@@ -157,7 +157,7 @@ module.exports = {
           var a = this._lsData[i][1]/100*(this.lightPower()/lightblock.lightStrength);
           Draw.color(this._lsData[i][3], a);
           if(Core.settings.getBool("bloom")) Draw.z((a>0.99)?(Layer.effect - 1):(Layer.bullet - 2));
-          Lines.stroke(1 + Math.max(this.lightPower()/1000, 20));
+          Lines.stroke(1 + Math.min(this.lightPower()/1000, 10));
           //now = this._ls[i];
           //next = this._ls[i+1];
           if(i == this._ls.length - 1 || this._ls[i+1] == null){
