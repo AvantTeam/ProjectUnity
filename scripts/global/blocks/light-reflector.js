@@ -119,7 +119,7 @@ filter.entityType = () => {
     calcLight(ld, i){
       var tc = ld[3].cpy().mul(colors[this._color]);
       var val = Mathf.floorPositive(tc.value()*ld[1]);
-      if(val < 5) return null;
+      if(val < 0.1) return null;
       return [ld[0], val, ld[2] - i, tc];
     },
     draw(){
@@ -228,7 +228,7 @@ filterInv.entityType = () => {
       //TODO: prevent dark light scientifically
       var tc = ld[3].cpy().mul(ncolors[this._color]);
       var val = Mathf.floorPositive(tc.value()*ld[1]);
-      if(val < 5) return null;
+      if(val < 0.1) return null;
       return [ld[0], val, ld[2] - i, tc];
     },
     draw(){
@@ -272,4 +272,59 @@ filterInv.entityType = () => {
   });
   ent._color = 0;
   return ent;
+}
+
+
+const divisor = extendContent(Block, "light-divisor", {
+  drawRequestRegion(req, list) {
+		const scl = Vars.tilesize * req.animScale;
+		Draw.rect(this.angleRegion[req.rotation%2], req.drawx(), req.drawy(), scl, scl);
+	},
+  load(){
+    this.super$load();
+    this.angleRegion = [];
+    this.angleRegion.push(Core.atlas.find(this.name));
+    this.angleRegion.push(Core.atlas.find(this.name) + "-" + 2);
+  },
+  lightDivisor(){
+    return true;
+  }
+});
+
+divisor.entityType = () => {
+  return extend(Building, {
+    calcReflection(dir){
+      return ref1[this.rotation%2][dir];
+    },
+    draw(){
+      Draw.rect(divisor.angleRegion[this.rotation%2], this.x, this.y);
+    }
+  })
+}
+
+const divisor90 = extendContent(Block, "light-divisor-1", {
+  drawRequestRegion(req, list) {
+		const scl = Vars.tilesize * req.animScale;
+		Draw.rect(this.angleRegion[req.rotation%2], req.drawx(), req.drawy(), scl, scl);
+	},
+  load(){
+    this.super$load();
+    this.angleRegion = [];
+    this.angleRegion.push(Core.atlas.find(divisor.name) + "-" + 1);
+    this.angleRegion.push(Core.atlas.find(divisor.name) + "-" + 3);
+  },
+  lightDivisor(){
+    return true;
+  }
+});
+
+divisor90.entityType = () => {
+  return extend(Building, {
+    calcReflection(dir){
+      return ref2[this.rotation%2][dir];
+    },
+    draw(){
+      Draw.rect(divisor90.angleRegion[this.rotation%2], this.x, this.y);
+    }
+  })
 }

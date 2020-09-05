@@ -1,0 +1,13 @@
+{
+	"size": 1,
+	"health": 80,
+  "update": true,
+  "category": "logic",
+	"requirements": [
+		{"item": "metaglass", "amount": 10},
+    {"item": "titanium", "amount": 2}
+	],
+	"research": "light-reflector",
+  "solid": true,
+  "rotate": true
+}
