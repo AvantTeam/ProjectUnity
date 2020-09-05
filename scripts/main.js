@@ -71,7 +71,8 @@ const script = [
                 childs: [
                     "caelifera",
                     "schistocerca",
-                    "anthophila"
+                    "anthophila",
+					"vespula"
                 ]
             },
 

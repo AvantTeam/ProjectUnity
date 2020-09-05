@@ -144,6 +144,12 @@ const loaderBlock = extendContent(Block, "loader-block", {
 						Vars.content.getByName(ContentType.unit, "unity-rexed")
 					]
 				);
+				newUpgrades.push(
+					[
+						Vars.content.getByName(ContentType.unit, "unity-anthophila"),
+						Vars.content.getByName(ContentType.unit, "unity-vespula")
+					]
+				);
 				expReconstructor.upgrades = newUpgrades;
 			}catch(e){
 				print(e);

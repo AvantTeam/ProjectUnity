@@ -13,7 +13,7 @@ const att = {
 
 		this.fallRotateSpeed = 2.5;
 	}
-}
+};
 
 const copterBase = this.global.unity.copterbase;
 

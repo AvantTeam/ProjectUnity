@@ -23,11 +23,11 @@ const att = {
 				speed: 29 * Mathf.signs[i],
 				rotOffset: i * 180
 			});
-		}
+		};
 		
 		this.fallRotateSpeed = 2;
 	}
-}
+};
 
 const copterBase = this.global.unity.copterbase;
 

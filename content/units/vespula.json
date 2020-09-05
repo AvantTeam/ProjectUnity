@@ -1,0 +1,38 @@
+{
+	"speed": 2.8,
+	"drag": 0.07,
+	"accel": 0.03,
+	"fallSpeed": 0.003,
+	"health": 900,
+	"engineSize": 0,
+	"flying": true,
+	"hitsize": 30,
+	"range": 165,
+	"weapons": [
+		{
+			"name": "vespula-gun",
+			"reload": 15,
+			"shots": 4,
+			"shotDelay": 2,
+			"shootSound": "shootSnap",
+			"bullet": "standardThorium"
+		},
+		{
+			"name": "vespula-laser-gun",
+			"reload": 45,
+			"shootSound": "laser",
+			"bullet": {
+				"type": "LaserBulletType",
+				"sideAngle": 45,
+				"length": 200,
+				"damage": 240
+			}
+		},
+		{
+			"name": "vespula-gun-big",
+			"reload": 12,
+			"shootSound": "shootBig",
+			"bullet": "standardDenseBig"
+		}
+	]
+}
