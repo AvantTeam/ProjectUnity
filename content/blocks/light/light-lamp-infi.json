@@ -1,0 +1,11 @@
+{
+	"size": 1,
+	"health": 40,
+  "hasPower": false,
+  "consumesPower": false,
+	"requirements": [
+	],
+	"buildVisibility": "sandboxOnly",
+  "rotate": true,
+  "category": "logic"
+}

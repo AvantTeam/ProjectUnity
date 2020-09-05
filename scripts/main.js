@@ -1,5 +1,5 @@
 this.global.unity = {};
-
+Vars.enableConsole = true;
 const loadFile = (prev, array) =>	{
     var results = [];
     var names = [];
@@ -101,7 +101,7 @@ const script = [
             }
         ]
     },
-	
+
 	{
         name: "dark",
         childs: [
@@ -113,7 +113,7 @@ const script = [
 			}
 		]
     },
-	
+
     {
         name: "imber",
         childs: [
@@ -121,7 +121,8 @@ const script = [
 				name: "turrets",
 				childs: [
 					"orb",
-					"shockwire"
+					"shockwire",
+					"plasma"
 				]
 			}
 		]

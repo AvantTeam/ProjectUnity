@@ -99,6 +99,9 @@ const filter = extendContent(Block, "light-filter", {
 
 filter.config(Integer, (build, value) => {
 	build.setFilterColor(value);
+  if(!Vars.headless){
+    Vars.renderer.minimap.update(build.tile);
+  }
 });
 filter.configClear((build) => {
   build.setFilterColor(0);
@@ -114,8 +117,10 @@ filter.entityType = () => {
       this._color = c;
     },
     calcLight(ld, i){
-      //TODO: prevent dark light scientifically
-      return [ld[0], ld[1], ld[2] - i, ld[3].cpy().mul(colors[this._color])];
+      var tc = ld[3].cpy().mul(colors[this._color]);
+      var val = Mathf.floorPositive(tc.value()*ld[1]);
+      if(val < 0.1) return null;
+      return [ld[0], val, ld[2] - i, tc];
     },
     draw(){
       Draw.rect(filter.baseRegion, this.x, this.y);
@@ -126,6 +131,7 @@ filter.entityType = () => {
       Draw.reset();
     },
 
+    /*
     configured(player, value){
       this.super$configured(player, value);
       this._color = value;
@@ -134,7 +140,7 @@ filter.entityType = () => {
       if(!Vars.headless){
         Vars.renderer.minimap.update(this.tile);
       }
-    },
+    },*/
     config(){
       return new Integer(this._color);
     },
@@ -201,6 +207,9 @@ const filterInv = extendContent(Block, "light-inverted-filter", {
 
 filterInv.config(Integer, (build, value) => {
 	build.setFilterColor(value);
+  if(!Vars.headless){
+    Vars.renderer.minimap.update(build.tile);
+  }
 });
 filterInv.configClear((build) => {
   build.setFilterColor(0);
@@ -217,7 +226,10 @@ filterInv.entityType = () => {
     },
     calcLight(ld, i){
       //TODO: prevent dark light scientifically
-      return [ld[0], ld[1], ld[2] - i, ld[3].cpy().mul(ncolors[this._color])];
+      var tc = ld[3].cpy().mul(ncolors[this._color]);
+      var val = Mathf.floorPositive(tc.value()*ld[1]);
+      if(val < 0.1) return null;
+      return [ld[0], val, ld[2] - i, tc];
     },
     draw(){
       Draw.rect(filterInv.baseRegion, this.x, this.y);
@@ -228,15 +240,6 @@ filterInv.entityType = () => {
       Draw.reset();
     },
 
-    configured(player, value){
-      this.super$configured(player, value);
-      this._color = value;
-      //print("Configured: "+value);
-
-      if(!Vars.headless){
-        Vars.renderer.minimap.update(this.tile);
-      }
-    },
     config(){
       return new Integer(this._color);
     },
@@ -269,4 +272,59 @@ filterInv.entityType = () => {
   });
   ent._color = 0;
   return ent;
+}
+
+
+const divisor = extendContent(Block, "light-divisor", {
+  drawRequestRegion(req, list) {
+		const scl = Vars.tilesize * req.animScale;
+		Draw.rect(this.angleRegion[req.rotation%2], req.drawx(), req.drawy(), scl, scl);
+	},
+  load(){
+    this.super$load();
+    this.angleRegion = [];
+    this.angleRegion.push(Core.atlas.find(this.name));
+    this.angleRegion.push(Core.atlas.find(this.name) + "-" + 2);
+  },
+  lightDivisor(){
+    return true;
+  }
+});
+
+divisor.entityType = () => {
+  return extend(Building, {
+    calcReflection(dir){
+      return ref1[this.rotation%2][dir];
+    },
+    draw(){
+      Draw.rect(divisor.angleRegion[this.rotation%2], this.x, this.y);
+    }
+  })
+}
+
+const divisor90 = extendContent(Block, "light-divisor-1", {
+  drawRequestRegion(req, list) {
+		const scl = Vars.tilesize * req.animScale;
+		Draw.rect(this.angleRegion[req.rotation%2], req.drawx(), req.drawy(), scl, scl);
+	},
+  load(){
+    this.super$load();
+    this.angleRegion = [];
+    this.angleRegion.push(Core.atlas.find(divisor.name) + "-" + 1);
+    this.angleRegion.push(Core.atlas.find(divisor.name) + "-" + 3);
+  },
+  lightDivisor(){
+    return true;
+  }
+});
+
+divisor90.entityType = () => {
+  return extend(Building, {
+    calcReflection(dir){
+      return ref2[this.rotation%2][dir];
+    },
+    draw(){
+      Draw.rect(divisor90.angleRegion[this.rotation%2], this.x, this.y);
+    }
+  })
 }

@@ -367,6 +367,7 @@ function MultiCrafterBuild() {
 function MultiCrafterBlock() {
     this.tempRecs = [];
     this.recs = [];
+    this.infoStyle = null
     this.getRecipes = function() {
         return this.recs;
     };
@@ -508,42 +509,56 @@ function MultiCrafterBlock() {
         this.super$init();
         this.consumesPower = this.powerBarI;
         this.outputsPower = this.powerBarO;
+        this.infoStyle = Core.scene.getStyle(Button.ButtonStyle);
     };
-    this.setStats = function() {
-        this.super$setStats();
-        this.stats.remove(BlockStat.powerUse);
-        this.stats.remove(BlockStat.productionTime);
+    this.displayInfo = function(table) {
+        this.super$displayInfo(table);
         var recLen = this.recs.length;
-        //crafTimes
         for (var i = 0; i < recLen; i++) {
             var rec = this.recs[i];
             var outputItems = rec.output.items,
                 inputItems = rec.input.items;
             var outputLiquids = rec.output.liquids,
                 inputLiquids = rec.input.liquids;
-            this.stats.add(BlockStat.productionTime, i + 1, StatUnit.none);
-            this.stats.add(BlockStat.productionTime, rec.craftTime / 60, StatUnit.seconds);
-            this.stats.add(BlockStat.input, i + 1, StatUnit.none);
-            //items
-            for (var l = 0, len = inputItems.length; l < len; l++) this.stats.add(BlockStat.input, inputItems[l]);
-            //liquids
-            for (var l = 0, len = inputLiquids.length; l < len; l++) this.stats.add(BlockStat.input, inputLiquids[l].liquid, inputLiquids[l].amount, false);
-            this.stats.add(BlockStat.output, i + 1, StatUnit.none);
-            //items
-            for (var jj = 0, len = outputItems.length; jj < len; jj++) this.stats.add(BlockStat.output, outputItems[jj]);
-            //liquids
-            for (var jj = 0, len = outputLiquids.length; jj < len; jj++) this.stats.add(BlockStat.output, outputLiquids[jj].liquid, outputLiquids[jj].amount, false);
-            if (this.powerBarI) {
-                this.stats.add(BlockStat.powerUse, i + 1, StatUnit.none);
-                if (this.recs[i].input.power > 0) this.stats.add(BlockStat.powerUse, this.recs[i].input.power * 60, StatUnit.powerSecond);
-                else this.stats.add(BlockStat.powerUse, 0, StatUnit.powerSecond);
-            }
-            if (this.powerBarO) {
-                this.stats.add(BlockStat.basePowerGeneration, i + 1, StatUnit.none);
-                if (this.recs[i].output.power > 0) this.stats.add(BlockStat.basePowerGeneration, this.recs[i].output.power * 60, StatUnit.powerSecond);
-                else this.stats.add(BlockStat.basePowerGeneration, 0, StatUnit.powerSecond);
-            }
+            table.table(this.infoStyle.up, part => {
+                part.add("[accent]" + BlockStat.input.localized()).left().row();
+                part.table(cons(row => {
+                    for (var l = 0, len = inputItems.length; l < len; l++) row.add(new ItemDisplay(inputItems[l].item, inputItems[l].amount, true)).padRight(5);
+                })).left().row();
+                part.table(cons(row => {
+                    for (var l = 0, len = inputLiquids.length; l < len; l++) row.add(new LiquidDisplay(inputLiquids[l].liquid, inputLiquids[l].amount, false));
+                })).left().row();
+                if (this.powerBarI) {
+                    part.table(cons(row => {
+                        row.add("[lightgray]" + BlockStat.powerUse.localized() + ":[]").padRight(4);
+                        (new NumberValue(this.recs[i].input.power * 60, StatUnit.powerSecond)).display(row);
+                    })).left().row();
+                }
+                part.add("[accent]" + BlockStat.output.localized()).left().row();
+                part.table(cons(row => {
+                    for (var jj = 0, len = outputItems.length; jj < len; jj++) row.add(new ItemDisplay(outputItems[jj].item, outputItems[jj].amount, true)).padRight(5);
+                })).left().row();
+                part.table(cons(row => {
+                    for (var jj = 0, len = outputLiquids.length; jj < len; jj++) row.add(new LiquidDisplay(outputLiquids[jj].liquid, outputLiquids[jj].amount, false));
+                })).left().row();
+                if (this.powerBarO) {
+                    part.table(cons(row => {
+                        row.add("[lightgray]" + BlockStat.basePowerGeneration.localized() + ":[]").padRight(4);
+                        (new NumberValue(this.recs[i].output.power * 60, StatUnit.powerSecond)).display(row);
+                    })).left().row();
+                }
+                part.table(cons(row => {
+                    row.add("[lightgray]" + BlockStat.productionTime.localized() + ":[]").padRight(4);
+                    (new NumberValue(rec.craftTime / 60, StatUnit.seconds)).display(row);
+                })).left().row();
+            }).color(Pal.accent).left();
+            table.add().size(18).row();
         }
+    };
+    this.setStats = function() {
+        this.super$setStats();
+        this.stats.remove(BlockStat.powerUse);
+        this.stats.remove(BlockStat.productionTime);
     };
     this.setBars = function() {
         this.super$setBars();
@@ -572,6 +587,7 @@ function MultiCrafterBlock() {
     this.outputsItems = function() {
         return this.hasOutputItem;
     };
+    this.saveConfig = true;
 };
 module.exports = {
     MultiCrafter(Type, name, recipes, def, entityDef) {
