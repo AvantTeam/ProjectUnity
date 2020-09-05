@@ -72,7 +72,8 @@ const script = [
                     "caelifera",
                     "schistocerca",
                     "anthophila",
-					"vespula"
+					"vespula",
+					"lepidoptera"
                 ]
             },
 
