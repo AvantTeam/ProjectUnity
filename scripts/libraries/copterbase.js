@@ -81,6 +81,7 @@ module.exports = {
 		
 		copter.constructor = () => {
 			var unit = extend(entity, obju);
+			return unit;
 		};
 		
 		return copter;
