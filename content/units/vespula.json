@@ -8,6 +8,7 @@
 	"flying": true,
 	"hitsize": 30,
 	"range": 165,
+	"lowAltitude": true,
 	"weapons": [
 		{
 			"name": "vespula-gun",
