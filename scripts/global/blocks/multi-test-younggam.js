@@ -111,6 +111,7 @@ const multiTest1 = multiLib.MultiCrafter(GenericCrafter, "multi-test-1", [{
 }, {
 
 });
+multiTest1.dumpToggle=true;
 const multiTest2 = multiLib.MultiCrafter(GenericCrafter, "multi-test-2", [{ //1  you can skip recipe properties
         input: {
             items: ["sand/1", "lead/1"],
