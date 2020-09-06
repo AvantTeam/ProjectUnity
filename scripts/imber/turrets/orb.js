@@ -1,7 +1,7 @@
 const orbHit = new Effect(12, e => {
 	Draw.color(Pal.surge);
 	Lines.stroke(e.fout() * 1.5);
-	Angles.randLenVectors(e.id, 8, e.finpow() * 17, e.rotation, 360, new Floatc2({get: function(x, y){
+	Angles.randLenVectors(e.id, 8, e.finpow() * 17, e.rotation, 360, new Floatc2({get(x, y){
 		var ang = Mathf.angle(x, y);
 		Lines.lineAngle(e.x + x, e.y + y, ang, e.fout() * 4 + 1);
 	}}));
@@ -31,14 +31,14 @@ const orbTrail = new Effect(43, e => {
 
 const orbShootSmoke = new Effect(26, e => {
 	Draw.color(Pal.surge);
-	Angles.randLenVectors(e.id, 7, 80, e.rotation, 0, new Floatc2({get: function(x, y){
+	Angles.randLenVectors(e.id, 7, 80, e.rotation, 0, new Floatc2({get(x, y){
 		Fill.circle(e.x + x, e.y + y, e.fout() * 4);
 	}}));
 });
 
 const orbCharge = new Effect(38, e => {
 	Draw.color(Pal.surge);
-	Angles.randLenVectors(e.id, 2, 1 + 20 * e.fout(), e.rotation, 120, new Floatc2({get: function(x, y){
+	Angles.randLenVectors(e.id, 2, 1 + 20 * e.fout(), e.rotation, 120, new Floatc2({get(x, y){
 		Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fslope() * 3 + 1);
 	}}));
 });
