@@ -12,7 +12,6 @@ module.exports = {
 				this.super$load();
 				
 				obj.rotor.forEach(r => {
-					
 					if(typeof(r.rotOffset) === "undefined") r.rotOffset = 0;
 					
 					if(typeof(r.speed) === "undefined") r.speed = 29;
