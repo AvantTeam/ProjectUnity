@@ -80,8 +80,8 @@ const script = [
             {
                 name: "ground-units",
                 childs: [
-                    "project-spiboss"
-                    //"amphibi-ground"
+                    "project-spiboss",
+                    "arcaetana"
                 ]
             },
 
