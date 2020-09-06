@@ -49,6 +49,7 @@ const script = [
             "loader",
             "chainlaser",
             "exp",
+			//"multi-lib"
         ]
     },
 
@@ -62,7 +63,7 @@ const script = [
                     "light-lamp",
                     "light-reflector",
 					"ores",
-                    "multi-test-younggam"
+                    //"multi-test-younggam"
                 ]
             },
 
