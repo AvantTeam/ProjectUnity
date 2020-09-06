@@ -19,7 +19,9 @@
 		"shootEffect": "lightningShoot"
 	},
 	"requirements": [
-		{"item": "copper", "amount": 1}
+		{"item": "silicon", "amount": 175},
+		{"item": "titanium", "amount": 150},
+		{"item": "monolith-alloy", "amount": 75}
 	],
 	"category": "turret",
 	"research": "mage"

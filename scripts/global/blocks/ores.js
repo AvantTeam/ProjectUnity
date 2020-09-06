@@ -56,3 +56,17 @@ const luminumOre = extendContent(OreBlock, "luminum", {
 luminumOre.oreScale = 23.77;
 luminumOre.oreThreshold = 0.810;
 luminumOre.oreDefault = true;
+
+const monoliteOre = extendContent(OreBlock, "monolite", {
+	init(){
+		this.itemDrop = Vars.content.getByName(ContentType.item, "unity-monolite");
+		this.super$init();
+	},
+	
+	createIcons(packer){
+		createIconsC(packer, this);
+	}
+});
+monoliteOre.oreScale = 23.77;
+monoliteOre.oreThreshold = 0.807;
+monoliteOre.oreDefault = true;
