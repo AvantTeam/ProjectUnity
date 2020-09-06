@@ -180,10 +180,12 @@ function MultiCrafterBuild() {
             this.items.each(item => this.itemHas++);
         }
         const recs = this.block.getRecipes();
-        var invIsShown = this.block.getInvFrag().isShown(),
-            configIsShown = Vars.control.input.frag.config.isShown();
-        if (!invIsShown && configIsShown && Vars.control.input.frag.config.getSelectedTile() == this) this.block.getInvFrag().showFor(this);
-        else if (invIsShown && !configIsShown) this.block.getInvFrag().hide();
+        if (!Vars.headless) {
+            var invIsShown = this.block.getInvFrag().isShown(),
+                configIsShown = Vars.control.input.frag.config.isShown();
+            if (!invIsShown && configIsShown && Vars.control.input.frag.config.getSelectedTile() == this) this.block.getInvFrag().showFor(this);
+            else if (invIsShown && !configIsShown) this.block.getInvFrag().hide();
+        }
         var recLen = recs.length;
         var current = this._toggle;
         //to not rewrite whole update
@@ -231,8 +233,8 @@ function MultiCrafterBuild() {
     };
     this.updateTableAlign = function(table) {
         var pos = Core.input.mouseScreen(this.x, this.y - this.block.size * 4 - 1).y;
-        var relative = Core.input.mouseScreen(this.x, this.y + this.block.size * 4 );
-        table.setPosition(relative.x, Math.min(pos, relative.y - Math.ceil(this.itemHas / 3) * 48 -4), Align.top);
+        var relative = Core.input.mouseScreen(this.x, this.y + this.block.size * 4);
+        table.setPosition(relative.x, Math.min(pos, relative.y - Math.ceil(this.itemHas / 3) * 48 - 4), Align.top);
     };
     this.buildConfiguration = function(table) {
         if (typeof this.block["getRecipes"] !== "function") return;
