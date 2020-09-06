@@ -11,7 +11,7 @@ const att = {
 					y: -3,
 					scale: 1.3,
 					bladeCount: 4,
-					speed: 20 * Mathf.signs[i] * Mathf.signs[i],
+					speed: 19 * Mathf.signs[i] * Mathf.signs[j],
 					rotOffset: 0
 				});
 			};
@@ -25,8 +25,8 @@ const att = {
 					x: 8.5 * Mathf.signs[i],
 					y: -20,
 					scale: 0.60,
-					bladeCount: 4,
-					speed: 24 * Mathf.signs[i] * Mathf.signs[i],
+					bladeCount: 3,
+					speed: 24 * Mathf.signs[i] * Mathf.signs[j],
 					rotOffset: 0
 				});
 			};
@@ -40,12 +40,13 @@ const att = {
 					x: 25 * Mathf.signs[i],
 					y: 22,
 					scale: 0.85,
-					bladeCount: 3,
+					bladeCount: 2,
 					speed: 29 * Mathf.signs[i] * Mathf.signs[j],
 					rotOffset: 0
 				});
 			};
 		};
+		
 		this.fallRotateSpeed = 0.5;
 	}
 };
@@ -68,7 +69,7 @@ const lepidoptera = extendContent(UnitType, "lepidoptera", {
 	}
 });
 
-lepidoptera.constructor = prov(() => {
+lepidoptera.constructor = () => {
 	const unit = extend(UnitEntity, {
 		update(){
 			this.super$update();
@@ -80,4 +81,4 @@ lepidoptera.constructor = prov(() => {
 	});
 	
 	return unit;
-})
+};
