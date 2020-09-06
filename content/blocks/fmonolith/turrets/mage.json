@@ -16,7 +16,9 @@
 		"damage": 26
 	},
 	"requirements": [
-		{"item": "copper", "amount": 1}
+		{"item": "lead", "amount": 75},
+		{"item": "silicon", "amount": 50},
+		{"item": "monolite", "amount": 25}
 	],
 	"category": "turret",
 	"research": "arc"
