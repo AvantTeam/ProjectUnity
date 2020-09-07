@@ -70,3 +70,17 @@ const monoliteOre = extendContent(OreBlock, "monolite", {
 monoliteOre.oreScale = 23.77;
 monoliteOre.oreThreshold = 0.807;
 monoliteOre.oreDefault = true;
+
+const imberiumOre = extendContent(OreBlock, "imberium", {
+	init(){
+		this.itemDrop = Vars.content.getByName(ContentType.item, "unity-imberium");
+		this.super$init();
+	},
+	
+	createIcons(packer){
+		createIconsC(packer, this);
+	}
+});
+imberiumOre.oreScale = 23.77;
+imberiumOre.oreThreshold = 0.807;
+imberiumOre.oreDefault = true;

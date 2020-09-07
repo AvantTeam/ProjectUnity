@@ -1,0 +1,30 @@
+{
+	"outputItem": {"item": "spark-alloy", "amount": 4},
+	"size": 4,
+	"hasLiquids": false,
+	"hasPower": true,
+	"hasItems": true,
+	"craftTime": 160,
+	"consumes": {
+		"power": 2.6,
+		"items": {
+			"items": [
+				{"item": "surge-alloy", "amount": 3},
+				{"item": "titanium", "amount": 4},
+				{"item": "plastanium", "amount": 2},
+				{"item": "imberium", "amount": 2}
+			]
+		}
+	},
+	"requirements": [
+		{"item": "graphite", "amount": 340},
+		{"item": "imberium", "amount": 270},
+		{"item": "silicon", "amount": 250},
+		{"item": "thorium", "amount": 120},
+		{"item": "surge-alloy", "amount": 100}
+	],
+	"category": "crafting",
+	"research": "alloy-smelter",
+	"idleSound": "machine",
+	"idleSoundVolume": 0.6
+}

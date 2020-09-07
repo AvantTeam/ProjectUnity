@@ -14,7 +14,7 @@
 		{"item": "lead", "amount": 320},
 		{"item": "graphite", "amount": 310},
 		{"item": "silicon", "amount": 290},
-		{"item": "imberium", "amount": 260},
+		{"item": "spark-alloy", "amount": 50},
 		{"item": "surge-alloy", "amount": 120}
 	],
 	"category": "turret",

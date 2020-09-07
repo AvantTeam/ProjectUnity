@@ -2,7 +2,7 @@
 const chargeTriangles = new Effect(96, e => {
 	Draw.color(Pal.surge);
 	
-	Angles.randLenVectors(e.id, 5, e.finpow() * 24, e.rotation, 360, new Floatc2({get(x, y){
+	Angles.randLenVectors(e.id, 5, (1 - e.finpow()) * 24, e.rotation, 360, new Floatc2({get(x, y){
 		Drawf.tri(e.x + x, e.y + y, e.fout() * 10, e.fout() * 11, e.rotation);
 		Drawf.tri(e.x + x, e.y + y, e.fout() * 8, e.fout() * 9, e.rotation);
 	}}));
@@ -44,10 +44,16 @@ const plasmaFrag = extend(BulletType, {
 		if(!b) return;
 		
 		this.lifetime = 230 + Mathf.random(40);
+
+		if(typeof(b) === "undefined") return;
+    
+    	b.data = new Trail(10);
 		//print("Frag lifetime: " + this.lifetime);
 	},
 	
 	draw(b){
+		b.data.draw(this.colors[0], 8 * 0.5);
+
 		Draw.color(this.colors[0]);
 		Drawf.tri(b.x, b.y, 10, 11, b.rotation());
 	},
@@ -55,13 +61,16 @@ const plasmaFrag = extend(BulletType, {
 	update(b){
 		this.super$update(b);
 		
+		b.data.update(b.x, b.y);
+
 		var target = Units.closestTarget(b.team, b.x, b.y, 8 * Vars.tilesize);
 		if(target != null && b.timer.get(1, 12)){
 			Lightning.create(b.team, Pal.surge, 56, b.x, b.y, b.angleTo(target), b.dst(target) / Vars.tilesize + 2);
 		}
 	}
 });
-plasmaFrag.speed = 0.001;
+plasmaFrag.speed = 4;
+plasmaFrag.drag = 0.05;
 plasmaFrag.damage = 20;
 plasmaFrag.colors = [Pal.surge, Color.valueOf("f2e87b"), Color.valueOf("d89e6b"), Color.white];
 plasmaFrag.hitColor = plasmaFrag.colors[1];
@@ -70,25 +79,42 @@ plasmaFrag.hitEffect = fragDisappear;
 plasmaFrag.despawnEffect = fragDisappear;
 
 const plasma = extend(BulletType, {
+	init(b){
+		//this.super$init(b);
+
+    	if(typeof(b) === "undefined") return;
+    
+    	b.data = new Trail(10);
+  	},
+
 	draw(b){
+		b.data.draw(this.colors[0], 13 * 0.5);
+
 		Draw.color(this.colors[0]);
 		Drawf.tri(b.x, b.y, 16, 20, b.rotation());
 	},
 	
+	update(b){
+		this.super$update(b);
+
+		b.data.update(b.x, b.y);
+	},
+
 	despawned(b){
 		this.hit(b);
 	},
 	
 	hit(b, x, y){
 		this.super$hit(b, b.x, b.y);
+
 		unecessaryCircle.at(b.x, b.y, b.rotation(), this.hitColor);
 		
-		for(var i = 0; i < 10; i++){
+		/*for(var i = 0; i < 10; i++){
 			var sr = 8 //scatter range
 			//print("Bullet despawned at:" + b.x + ", " + b.y);
 			//print("Frag created at:" + (b.x + Mathf.range(sr) * 8) + ", " + (b.y + Mathf.range(sr) * 8));
 			plasmaFrag.create(b, b.x + Mathf.range(sr) * 8, b.y + Mathf.range(sr) * 8, Mathf.random(360));
-		}
+		}*/
 	}
 });
 plasma.lifetime = 190;
@@ -96,6 +122,9 @@ plasma.speed = 4;
 plasma.damage = 280;
 plasma.colors = [Pal.surge, Color.valueOf("f2e87b"), Color.valueOf("d89e6b"), Color.white];
 plasma.hitColor = plasma.colors[1];
+plasma.fragBullet = plasmaFrag;
+plasma.fragBullets = 10;
+
 //plasma.strokes = [1.1, 0.9, 0.7, 0.5];
 
 const plasmaTurret = extendContent(ChargeTurret, "plasma", {});

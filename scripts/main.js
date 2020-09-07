@@ -126,7 +126,14 @@ const script = [
 					"shockwire",
 					"plasma"
 				]
-			}
+			},
+
+            {
+                name: "factories",
+                childs: [
+                    "sparkalloyfactory"
+                ]
+            }
 		]
     },
 
