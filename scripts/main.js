@@ -162,3 +162,13 @@ for (var i = 0; i < loadedScript.res.length; i++)
     var name = loadedScript.fileNames[i];
     this.global.unity[name] = require("unity/" + res);
 };
+
+//COLOR VOMIT AGAIN
+if(!Vars.headless){
+  Core.app.post(() => {
+    var mod = Vars.mods.locateMod("unity");
+    var change = "mod."+ modName + ".";
+    mod.meta.displayName = Core.bundle.get(change+"name");
+    mod.meta.description = Core.bundle.get(change+"description");
+  });
+}
