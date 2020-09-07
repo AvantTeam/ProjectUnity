@@ -223,8 +223,11 @@ module.exports = {
             if(tr >= 0) next = [tr, ld[1], ld[2] - i, ld[3]];
           }
           else if(furthest.bc().block.lightDivisor){
-            next = [ld[0], ld[1] / 2, ld[2] - i, ld[3]];
-            next2 = [furthest.bc().calcReflection(ld[0]), ld[1] / 2, ld[2] - i, ld[3]];
+            var tr = furthest.bc().calcReflection(ld[0]);
+            if(tr >= 0){
+              next = [ld[0], ld[1] / 2, ld[2] - i, ld[3]];
+              next2 = [tr, ld[1] / 2, ld[2] - i, ld[3]];
+            }
           }
           else if(furthest.bc().block.lightRepeater){
             var tl = furthest.bc().calcLight(ld, i);
