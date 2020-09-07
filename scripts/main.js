@@ -6,10 +6,10 @@ const loadFile = (prev, array) =>	{
 
     var p = prev;
 
-    for (var i = 0; i < array.length; i++){
+    for(var i = 0; i < array.length; i++){
         var file = array[i];
 
-        if (typeof(file) === "object"){
+        if(typeof(file) === "object"){
             p.push(file.name);
             var temp = loadFile(p, file.childs);
 
@@ -156,19 +156,17 @@ const script = [
     }
 ];
 const loadedScript = loadFile([], script);
-for (var i = 0; i < loadedScript.res.length; i++)
-{
+for (var i = 0; i < loadedScript.res.length; i++){
     var res = loadedScript.res[i];
     var name = loadedScript.fileNames[i];
     this.global.unity[name] = require("unity/" + res);
 };
 
-//COLOR VOMIT AGAIN
 if(!Vars.headless){
-  Core.app.post(() => {
-    var mod = Vars.mods.locateMod("unity");
-    var change = "mod."+ "unity" + ".";
-    mod.meta.displayName = Core.bundle.get(change + "name");
-    mod.meta.description = Core.bundle.get(change + "description");
-  });
-}
+	Core.app.post(() => {
+		var mod = Vars.mods.locateMod("unity");
+		var change = "mod."+ mod.meta.name + ".";
+		mod.meta.displayName = Core.bundle.get(change + "name");
+		mod.meta.description = Core.bundle.get(change + "description");
+	});
+};
