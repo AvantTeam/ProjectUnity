@@ -1,0 +1,37 @@
+{
+	"outputItem": {
+		"item": "monolith-alloy",
+		"amount": 3
+	},
+	"size": 4,
+	"hasLiquids": true,
+	"hasItems": true,
+	"hasPower": true,
+	"flameColor": "lancerLaser",
+	"consumes": {
+		"power": 3.6,
+		"items": {
+			"items": [
+				{"item": "silicon", "amount": 3},
+				{"item": "graphite", "amount": 2},
+				{"item": "monolite", "amount": 2}
+			]
+		},
+		"liquid": {
+			"liquid": "cryofluid",
+			"amount": 0.1
+		}
+	},
+	"requirements": [
+		{"item": "metaglass", "amount": 160},
+		{"item": "monolite", "amount": 240},
+		{"item": "silicon", "amount": 400},
+		{"item": "plastanium", "amount": 120},
+		{"item": "thorium", "amount": 90},
+		{"item": "surge-alloy", "amount": 120}
+	],
+	"category": "crafting",
+	"research": "alloy-smelter",
+	"idleSound": "machine",
+	"idleSoundVolume": 0.6
+}

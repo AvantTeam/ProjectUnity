@@ -147,6 +147,12 @@ const script = [
         name: "monolith",
         childs: [
 			{
+				name: "factories",
+				childs: [
+					"monolithalloyfactory"
+				]
+			},
+			{
 				name: "turrets",
 				childs: [
 					"oracle"
