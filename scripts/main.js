@@ -62,6 +62,7 @@ const script = [
                     "recursivereconstructor",
                     "light-lamp",
                     "light-reflector",
+                    "walls",
 					"ores",
                     "multi-test-younggam"
                 ]
