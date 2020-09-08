@@ -11,8 +11,9 @@ const itemFilter = extendContent(Router, "light-item-filter", {
 });
 
 itemFilter.entityType = () => {
-  const ent = extend(Router.RouterBuild, itemFilter, {
+  const ent = extendContent(Router.RouterBuild, itemFilter, {
     getItemColor(){
+      if(this.items.first() == null) return Color.white;
       return this.items.first().color;
     },
     calcLight(ld, i){
