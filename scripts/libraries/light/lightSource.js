@@ -250,19 +250,19 @@ module.exports = {
           //the block hit reflecc
           this._ls.push(furthest);
           this._lsData.push(next);//mirror
-          this.pointMarch(furthest, next, length-i, maxLength-i, ++num, source);
+          this.pointMarch(furthest, next, ld[2]-i, maxLength-i, ++num, source);
         }
         else{
           //the light go S P L I T
           //TODO
           this._ls.push(furthest);
           this._lsData.push(next);//mirror
-          this.pointMarch(furthest, next, length-i, maxLength-i, ++num, source);
+          this.pointMarch(furthest, next, ld[2]-i, maxLength-i, ++num, source);
           this._ls.push(null);//cheaty yep
           this._lsData.push(null);
           this._ls.push(furthest);
           this._lsData.push(next2);//mirror mirror on the wall
-          this.pointMarch(furthest, next2, length-i, maxLength-i, ++num, source);
+          this.pointMarch(furthest, next2, ld[2]-i, maxLength-i, ++num, source);
         }
       }
 		});
