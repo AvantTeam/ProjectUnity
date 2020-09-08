@@ -27,9 +27,9 @@ module.exports = {
       //The distance light does before dissapating
       lightLength: 50,
       //The absolute distance a light can reach, regardless of lightRepeaters
-      maxLightLength: 500,
+      maxLightLength: 5000,
       //the max reflections this light has, everything that affects this light is consided a reflection
-      maxReflections: 50,
+      maxReflections: 128,
       lightColor: Color.white,
       //whether to scale lightStrength with the input power status
       scaleStatus: true,
@@ -205,7 +205,7 @@ module.exports = {
         //print(this._lsData.toString());
       },
       pointMarch(tile, ld, length, maxLength, num, source){
-        if(length <= 0 || maxLength <= 0 || num > lightblock.maxReflections || ld[1]*source.lightPower() < 1) return;
+        if(length <= 0 || maxLength <= 0 || ld[1]*source.lightPower() < 1) return;
         const dir = lightblock.dirs[ld[0]];
         var next = null;
         var next2 = null;
@@ -241,7 +241,7 @@ module.exports = {
           return true;
         });
         if(!hit) return;
-        if(next == null){
+        if(next == null || num > lightblock.maxReflections){
           //the block hit is solid or a consumer
           this._ls.push(furthest);
           this._lsData.push(null);//obstructor
