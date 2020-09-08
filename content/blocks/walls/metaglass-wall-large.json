@@ -1,0 +1,14 @@
+{
+	"size": 2,
+	"health": 1400,
+  "update": true,
+  "category": "defense",
+	"requirements": [
+    {"item": "lead", "amount": 24},
+		{"item": "metaglass", "amount": 24}
+	],
+	"research": "metaglass-wall",
+  "solid": true,
+  "rotate": false,
+  "absorbLasers": true
+}

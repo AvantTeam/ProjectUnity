@@ -223,8 +223,11 @@ module.exports = {
             if(tr >= 0) next = [tr, ld[1], ld[2] - i, ld[3]];
           }
           else if(furthest.bc().block.lightDivisor){
-            next = [ld[0], ld[1] / 2, ld[2] - i, ld[3]];
-            next2 = [furthest.bc().calcReflection(ld[0]), ld[1] / 2, ld[2] - i, ld[3]];
+            var tr = furthest.bc().calcReflection(ld[0]);
+            if(tr >= 0){
+              next = [ld[0], ld[1] / 2, ld[2] - i, ld[3]];
+              next2 = [tr, ld[1] / 2, ld[2] - i, ld[3]];
+            }
           }
           else if(furthest.bc().block.lightRepeater){
             var tl = furthest.bc().calcLight(ld, i);
@@ -247,19 +250,19 @@ module.exports = {
           //the block hit reflecc
           this._ls.push(furthest);
           this._lsData.push(next);//mirror
-          this.pointMarch(furthest, next, length-i, maxLength-i, ++num, source);
+          this.pointMarch(furthest, next, ld[2]-i, maxLength-i, ++num, source);
         }
         else{
           //the light go S P L I T
           //TODO
           this._ls.push(furthest);
           this._lsData.push(next);//mirror
-          this.pointMarch(furthest, next, length-i, maxLength-i, ++num, source);
+          this.pointMarch(furthest, next, ld[2]-i, maxLength-i, ++num, source);
           this._ls.push(null);//cheaty yep
           this._lsData.push(null);
           this._ls.push(furthest);
           this._lsData.push(next2);//mirror mirror on the wall
-          this.pointMarch(furthest, next2, length-i, maxLength-i, ++num, source);
+          this.pointMarch(furthest, next2, ld[2]-i, maxLength-i, ++num, source);
         }
       }
 		});
