@@ -1,0 +1,14 @@
+{
+	"size": 1,
+	"health": 60,
+  "update": true,
+  "category": "logic",
+	"requirements": [
+    {"item": "graphite", "amount": 5},
+		{"item": "metaglass", "amount": 20},
+    {"item": "silicon", "amount": 10}
+	],
+	"research": "light-inverted-filter",
+  "solid": true,
+  "rotate": false
+}

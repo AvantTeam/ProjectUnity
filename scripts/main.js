@@ -62,6 +62,7 @@ const script = [
                     "recursivereconstructor",
                     "light-lamp",
                     "light-reflector",
+                    "light-extra",
                     "walls",
 					"ores",
                     "multi-test-younggam"
@@ -92,7 +93,9 @@ const script = [
                 childs: [
                     "rexed",
                     "storm",
-                    "amphibi" //naval version no legs
+                    // naval units with no legs
+                    "amphibi",
+                    "craber" 
                 ]
             },
 
