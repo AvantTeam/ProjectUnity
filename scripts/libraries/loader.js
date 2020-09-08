@@ -103,7 +103,13 @@ const loaderBlock = extendContent(Block, "loader-block", {
 				newUpgrades.push(
 					[
 						Vars.content.getByName(ContentType.unit, "unity-caelifera"),
-						Vars.content.getByName(ContentType.unit, "unity-schistocerca")
+						Vars.content.getByName(ContentType.unit, "unity-schistocerca"),
+					]
+				);
+				newUpgrades.push(
+					[
+						Vars.content.getByName(ContentType.unit, "unity-amphibi-naval"),
+						Vars.content.getByName(ContentType.unit, "unity-craber-naval")
 					]
 				);
 				addReconstructor.upgrades = newUpgrades;
