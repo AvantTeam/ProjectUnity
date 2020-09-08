@@ -91,7 +91,9 @@ const script = [
                 childs: [
                     "rexed",
                     "storm",
-                    "amphibi" //naval version no legs
+                    // naval units with no legs
+                    "amphibi",
+                    "craber" 
                 ]
             },
 
