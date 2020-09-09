@@ -108,8 +108,18 @@ const multiTest1 = multiLib.MultiCrafter(GenericCrafter, "multi-test-1", [{
     }
 ], {
 
-}, {
-
+},//for entity, they need constructor for extra properties
+function Extra(){
+    this._obj={
+        a:Time.time()
+    };
+    this.getObj=function(){
+        return this._obj;
+    };
+    this.add=function(){
+        this.super$add();
+        print(this._obj.a);
+    }
 });
 multiTest1.dumpToggle=true;
 const multiTest2 = multiLib.MultiCrafter(GenericCrafter, "multi-test-2", [{ //1  you can skip recipe properties

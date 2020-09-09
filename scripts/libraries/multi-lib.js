@@ -632,11 +632,11 @@ function MultiCrafterBlock() {
     this.saveConfig = true;
 };
 module.exports = {
-    MultiCrafter(Type, name, recipes, def, entityDef) {
+    MultiCrafter(Type, name, recipes, def, ExtraEntityDef) {
         const block = new MultiCrafterBlock();
         Object.assign(block, def);
         const multi = extendContent(Type, name, block);
-        multi.entityType = () => extendContent(GenericCrafter.GenericCrafterBuild, multi, Object.assign(new MultiCrafterBuild(), entityDef));
+        multi.entityType = () => extendContent(GenericCrafter.GenericCrafterBuild, multi, Object.assign(new MultiCrafterBuild(), new ExtraEntityDef()));
         multi.consumes.add(extend(ConsumePower, {
             requestedPower(entity) {
                 if(typeof entity["getToggle"] !== "function") return 0;
