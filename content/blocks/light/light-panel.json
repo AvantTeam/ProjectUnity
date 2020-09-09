@@ -1,0 +1,15 @@
+{
+	"size": 1,
+	"health": 100,
+  "update": true,
+  "category": "logic",
+	"requirements": [
+    {"item": "copper", "amount": 15},
+    {"item": "graphite", "amount": 10},
+		{"item": "silicon", "amount": 15}
+	],
+	"research": "light-lamp",
+  "solid": true,
+  "rotate": false,
+  "powerProduction": 1
+}

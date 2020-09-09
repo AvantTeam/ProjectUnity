@@ -33,3 +33,31 @@ itemFilter.entityType = () => {
   });
   return ent;
 }
+
+const conslib = require("unity/libraries/light/lightConsumer");
+
+const panel = conslib.extend(SolarGenerator, SolarGenerator.SolarGeneratorBuild, "light-panel", {
+  lightStrength: 80,
+  scaleStatus: true,
+  //The original Block extension object.
+  load(){
+    this.super$load();
+    this.lightRegion = Core.atlas.find("unity-light-center");
+  }
+}, {
+  //The original Building extension object.
+  draw(){
+    Draw.z(Layer.block);
+    Draw.rect(panel.region, this.x, this.y);
+    Draw.z(Layer.effect - 2);
+    Draw.color(this.lightSumColor(), this.lastLightStatus());
+    Draw.blend(Blending.additive);
+    Draw.rect(panel.lightRegion, this.x, this.y);
+    Draw.color();
+    Draw.blend();
+    Draw.reset();
+  },
+  updateTile(){
+    this.productionEfficiency = this.enabled?this.lightStatus():0;
+  }
+});

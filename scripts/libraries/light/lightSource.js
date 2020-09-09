@@ -235,7 +235,7 @@ module.exports = {
             next = [tl[0], tl[1], tl[2], tl[3]];
           }
           else if(furthest.bc().block.consumesLight){
-            furthest.bc().addSource([source, ld[1]]);
+            furthest.bc().addSource([source, ld]);
             this._lCons.push(furthest.bc());
           }
           return true;
