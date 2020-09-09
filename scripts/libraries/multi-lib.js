@@ -12,15 +12,7 @@ function MultiCrafterBuild() {
     };
     this.removeStack = function(item, amount) {
         var ret = this.super$removeStack(item, amount);
-        if(!this.block.doDumpToggle()) {
-            var i = ret;
-            this.itemQueue = this.itemQueue.filter(a => {
-                if(i > 0 && a == item) {
-                    i--;
-                    return false;
-                } else return true;
-            });
-        }
+        if(!this.items.has(item)) this.toOutputItemSet.remove(item);
         return ret;
     };
     this.displayConsumption = function(table) {
@@ -173,14 +165,16 @@ function MultiCrafterBuild() {
             for(var aa = 0, amount = outputItems[a].amount; aa < amount; aa++) {
                 var oItem = outputItems[a].item
                 if(!this.put(oItem)) {
+                    if(!eItems.has(oItem)) this.toOutputItemSet.add(oItem);
                     eItems.add(oItem, 1);
-                    if(!this.block.doDumpToggle()) this.itemQueue.push(oItem);
                 }
             }
         }
         //produce liquids
         for(var j = 0, len = outputLiquids.length; j < len; j++) {
-            this.handleLiquid(this, outputLiquids[j].liquid, outputLiquids[j].amount);
+            var oLiquid = outputLiquids[j].liquid;
+            if(eLiquids.get(oLiquid) <= 0.001) this.toOutputLiquidset.add(oLiquid);
+            this.handleLiquid(this, oLiquid, outputLiquids[j].amount);
         }
         this.block.craftEffect.at(this.x, this.y);
         this.progress = 0;
@@ -210,41 +204,36 @@ function MultiCrafterBuild() {
         var eItems = this.items;
         var eLiquids = this.liquids;
         //dump
-        var itemTimer = this.timer.get(this.block.dumpTime);
-        if(this.block.doDumpToggle() && current > -1) {
-            var items = recs[current].output.items;
-            if(itemTimer) {
-                for(var i = 0, len = items.length; i < len; i++) {
-                    if(eItems.has(items[i].item)) {
-                        if(this.put(items[i].item)) {
-                            this.items.remove(items[i].item, 1);
-                            break;
-                        }
-                    }
-                }
-            }
-            var liquids = recs[current].output.liquids;
-            for(var i = 0, len = liquids.length; i < len; i++) {
-                if(eLiquids.get(liquids[i].liquid) > 0.001) {
-                    this.dumpLiquid(liquids[i].liquid);
+        if(this.block.doDumpToggle() && current == -1) return;
+        var que = this.toOutputItemSet.orderedItems(),
+            len = que.size,
+            itemEntry = this.dumpItemEntry;
+        //this is my best optimizing O(1)~O(n)
+        if(this.timer.get(this.block.dumpTime) && len > 0) {
+            for(var i = 0; i < len; i++) {
+                var candidate = que.get((i + itemEntry) % len);
+                if(this.put(candidate)) {
+                    eItems.remove(candidate, 1);
+                    if(!eItems.has(candidate)) this.toOutputItemSet.remove(candidate);
                     break;
                 }
             }
-        } else {
-            //TODO 반복문 줄이기
-            var que = this.itemQueue;
-            if(itemTimer && que.length > 0 && this.put(que[0])) this.items.remove(que.shift(), 1);
-            if(eLiquids.total() > 0.001) {
-                var liquidIter = this.block.getOutputLiquidSet().iterator();
-                while(liquidIter.hasNext) {
-                    var liquid = liquidIter.next();
-                    if(eLiquids.get(liquid) > 0.001) {
-                        this.dumpLiquid(liquid);
-                        break;
-                    }
-                }
+            if(i != len) this.dumpItemEntry = (i + itemEntry) % len;
+        }
+        var que = this.toOutputLiquidset.orderedItems(),
+            len = que.size;
+        if(len > 0) {
+            for(var i = 0; i < len; i++) {
+                var liquid = que.get(i);
+                this.dumpLiquid(liquid);
+                if(eLiquids.get(liquid) <= 0.001) this.toOutputLiquidset.remove(liquid);
+                break;
             }
         }
+    };
+    this.onProximityUpdate = function() {
+        this.noSleep();
+        this.dumpItemEntry[1] = true;
     };
     this.shouldConsume = function() {
         return this._condValid && this.productionValid();
@@ -329,10 +318,27 @@ function MultiCrafterBuild() {
             this._condValid = false;
             return;
         }
-        if(this._toggle >= 0) this.progressArr[this._toggle] = this.progress;
+        var current = this._toggle;
+        if(current >= 0) this.progressArr[current] = this.progress;
         if(value == -1) {
             this._condValid = false;
             this._cond = false;
+        }
+        if(this.block.doDumpToggle()) {
+            this.toOutputItemSet.clear();
+            this.toOutputLiquidset.clear();
+            if(value > -1) {
+                var oItems = this.block.getRecipes()[value].output.items;
+                var oLiquids = this.block.getRecipes()[value].output.liquids;
+                for(var i = 0, len = oItems.length; i < len; i++) {
+                    var item = oItems[i].item;
+                    if(this.items.has(item)) this.toOutputItemSet.add(item);
+                }
+                for(var i = 0, len = oLiquids.length; i < len; i++) {
+                    var liquid = oLiquids[i].liquid;
+                    if(this.liquids.get(liquid) > 0.001) this.toOutputLiquidset.add(liquid);
+                }
+            }
         }
         this.progress = 0;
         this._toggle = value;
@@ -369,7 +375,9 @@ function MultiCrafterBuild() {
         return this._powerStat;
     };
     this._powerStat = 0;
-    this.itemQueue = [];
+    this.toOutputItemSet = new OrderedSet();
+    this.toOutputLiquidset = new OrderedSet();
+    this.dumpItemEntry = 0;
     this.itemHas = 0;
     this.config = function() {
         return this._toggle;
@@ -377,23 +385,27 @@ function MultiCrafterBuild() {
     this.write = function(write) {
         this.super$write(write);
         write.s(this._toggle);
-        if(!this.block.doDumpToggle()) {
-            var que = this.itemQueue;
-            write.b(que.length);
-            for(var i = 0; i < que.length; i++) write.s(que[i].id);
-        }
+        var queItem = this.toOutputItemSet.orderedItems(),
+            len = queItem.size;
+        write.s(len);
+        for(var i = 0; i < len; i++) write.s(queItem.get(i).id);
+        var queLiquid = this.toOutputLiquidset.orderedItems(),
+            len = queLiquid.size;
+        write.s(len);
+        for(var i = 0; i < len; i++) write.s(queLiquid.get(i).id);
     };
     this.read = function(read, revision) {
         this.super$read(read, revision);
         this._toggle = read.s();
-        var vs = Vars.content,
-            ci = ContentType.item;
-        if(!this.block.doDumpToggle()) {
-            var count = read.b(),
-                que = [];
-            for(var i = 0; i < count; i++) que.push(vs.getByID(ci, read.s()));
-            this.itemQueue = que;
-        }
+        this.toOutputItemSet.clear();
+        this.toOutputLiquidset.clear();
+        var len = read.s(),
+            vc = Vars.content,
+            ci = ContentType.item,
+            cl = ContentType.liquid;
+        for(var i = 0; i < len; i++) this.toOutputItemSet.add(vc.getByID(ci, read.s()));
+        var len = read.s();
+        for(var i = 0; i < len; i++) this.toOutputLiquidset.add(vc.getByID(cl, read.s()));
     };
 };
 
@@ -542,7 +554,7 @@ function MultiCrafterBlock() {
         this.super$init();
         this.consumesPower = this.powerBarI;
         this.outputsPower = this.powerBarO;
-        this.timers++;
+        this.timers += 2;
         if(!Vars.headless) this.infoStyle = Core.scene.getStyle(Button.ButtonStyle);
     };
     this.displayInfo = function(table) {

@@ -31,9 +31,9 @@ const lamp = lib.extend(GenericCrafter, GenericCrafter.GenericCrafterBuild, "lig
 
 const lampInfi = lib.extend(GenericCrafter, GenericCrafter.GenericCrafterBuild, "light-lamp-infi", {
   lightLength: 150,
-  lightStrength: 6000000,
+  lightStrength: 600000,
   scaleStatus: false,
-  maxLightLength: 750,
+  maxLightLength: 7500,
   //The original Block extension object.
   drawRequestRegion(req, list){
 		const scl = Vars.tilesize * req.animScale;
