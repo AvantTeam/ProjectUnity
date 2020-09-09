@@ -24,7 +24,8 @@ module.exports = {
       //range of light this block accepts
       lightFilter: Color.white,
       //whether light status exceeds 1
-      scaleStatus: false
+      scaleStatus: false,
+      lightOptional: false
 			//end
 		}, obj, {
 			//start
@@ -126,6 +127,17 @@ module.exports = {
       },
       lastSumColor(){
         return this._lastColor;
+      },
+
+      //utility methods - use AFTER UPDATE
+      updateCons(){
+        this.lightPower();
+      },
+      consValid(){
+        return this.cons.valid() && (lightblock.lightOptional || this._lastLightPower >= lightblock.lightStrength);
+      },
+      consOptionalValid(){
+        return this.cons.optionalValid() && (!lightblock.lightOptional || this._lastLightPower >= lightblock.lightStrength);
       }
 		});
 		//Extend Building
