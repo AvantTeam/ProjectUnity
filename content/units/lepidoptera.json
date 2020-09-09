@@ -1,5 +1,5 @@
 {
-	"speed": 2,
+	"speed": 3,
 	"drag": 0.07,
 	"accel": 0.03,
 	"fallSpeed": 0.001,
@@ -10,6 +10,15 @@
 	"range": 300,
 	"lowAltitude": true,
 	"weapons": [
+		{
+			"name": "lepidoptera-gun",
+			"x": 14,
+			"y": 27,
+			"shootSound": "shootBig",
+			"ejectEffect": "shellEjectBig",
+			"reload": 6,
+			"bullet": "standardThoriumBig"
+		},
 		{
 			"name": "lepidoptera-launcher",
 			"x": 17,
@@ -36,29 +45,23 @@
 			}
 		},
 		{
-			"name": "lepidoptera-gun",
-			"x": 14,
-			"y": 27,
-			"shootSound": "shootBig",
-			"ejectEffect": "shellEjectBig",
-			"reload": 6,
-			"bullet": "standardThoriumBig"
-		},
-		{
 			"name": "lepidoptera-gun-big",
+			"rotate": true,
+			"rotateSpeed": 3,
 			"x": 8,
 			"y": 3,
 			"shootSound": "shotgun",
 			"ejectEffect": "none",
 			"shots": 3,
-			"spacing": 30,
+			"spacing": 15,
 			"shotDelay": 0,
 			"reload": 30,
 			"bullet": {
 				"type": "ShrapnelBulletType",
 				"toColor": "ffd2ae",
 				"damage": 150,
-				"keepVelocity": false
+				"keepVelocity": false,
+				"length": 150
 			}
 		}
 	]

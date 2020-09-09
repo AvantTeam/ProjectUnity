@@ -1,9 +1,9 @@
 {
-	"speed": 2.8,
+	"speed": 3.5,
 	"drag": 0.07,
 	"accel": 0.03,
 	"fallSpeed": 0.003,
-	"health": 900,
+	"health": 1400,
 	"engineSize": 0,
 	"flying": true,
 	"hitsize": 30,
