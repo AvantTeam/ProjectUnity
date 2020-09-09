@@ -91,7 +91,7 @@ function MultiCrafterBuild() {
         //items
         var items = recs[i].input.items;
         var liquids = recs[i].input.liquids;
-        this.items.has(items);
+        if(this.items.has(items)) return true;
         //liquids
         for(var j = 0, len = liquids.length; j < len; j++) {
             if(this.liquids.get(liquids[j].liquid) < liquids[j].amount) return true;
