@@ -1,6 +1,7 @@
 const copterAI = () => extend(FlyingAI, {
 	attack(circleLength){
 		this.moveTo(this.target, this.unit.range() * 0.8);
+		this.unit.lookAt(this.target);
 	}
 });
 
