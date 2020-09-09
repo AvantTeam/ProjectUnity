@@ -231,10 +231,6 @@ function MultiCrafterBuild() {
             }
         }
     };
-    this.onProximityUpdate = function() {
-        this.noSleep();
-        this.dumpItemEntry[1] = true;
-    };
     this.shouldConsume = function() {
         return this._condValid && this.productionValid();
     };
