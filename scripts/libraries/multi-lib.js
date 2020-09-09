@@ -91,9 +91,7 @@ function MultiCrafterBuild() {
         //items
         var items = recs[i].input.items;
         var liquids = recs[i].input.liquids;
-        for(var j = 0, len = items.length; j < len; j++) {
-            if(this.items.get(items[j].item) < items[j].amount) return true;
-        }
+        this.items.has(items);
         //liquids
         for(var j = 0, len = liquids.length; j < len; j++) {
             if(this.liquids.get(liquids[j].liquid) < liquids[j].amount) return true;
@@ -550,6 +548,7 @@ function MultiCrafterBlock() {
         this.super$init();
         this.consumesPower = this.powerBarI;
         this.outputsPower = this.powerBarO;
+        this.consumers=new ConsumeItems(this.recs[1].input.items);
         this.timers += 2;
         if(!Vars.headless) this.infoStyle = Core.scene.getStyle(Button.ButtonStyle);
     };
@@ -593,6 +592,7 @@ function MultiCrafterBlock() {
                     row.add("[lightgray]" + BlockStat.productionTime.localized() + ":[]").padRight(4);
                     (new NumberValue(rec.craftTime / 60, StatUnit.seconds)).display(row);
                 })).left().row();
+                if(typeof this["customDisplay"] === "function") this.customDisplay(part, i);
             }).color(Pal.accent).left();
             table.add().size(18).row();
         }
