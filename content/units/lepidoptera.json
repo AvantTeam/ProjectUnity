@@ -3,7 +3,7 @@
 	"drag": 0.07,
 	"accel": 0.03,
 	"fallSpeed": 0.001,
-	"health": 3200,
+	"health": 9500,
 	"engineSize": 0,
 	"flying": true,
 	"hitsize": 45,
@@ -16,7 +16,7 @@
 			"y": 27,
 			"shootSound": "shootBig",
 			"ejectEffect": "shellEjectBig",
-			"reload": 6,
+			"reload": 10,
 			"bullet": "standardThoriumBig"
 		},
 		{
@@ -27,7 +27,7 @@
 			"ejectEffect": "shellEjectMedium",
 			"shots": 2,
 			"spacing": 2,
-			"reload": 12,
+			"reload": 20,
 			"bullet": {
 				"type": "MissileBulletType",
 				"width": 8,
@@ -39,7 +39,7 @@
 				"speed": 6,
 				"drag": -0.01,
 				"splashDamageRadius": 12,
-				"splashDamage": 84,
+				"splashDamage": 48,
 				"frontColor": "ffd2ae",
 				"backColor": "e58956"
 			}
@@ -55,7 +55,7 @@
 			"shots": 3,
 			"spacing": 15,
 			"shotDelay": 0,
-			"reload": 30,
+			"reload": 45,
 			"bullet": {
 				"type": "ShrapnelBulletType",
 				"toColor": "ffd2ae",
