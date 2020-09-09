@@ -45,6 +45,7 @@ const script = [
                     "lightRouter"
                 ]
             },
+			//"wormlib",
             "copterbase",
             "loader",
             "chainlaser",
@@ -138,6 +139,13 @@ const script = [
                     "sparkalloyfactory"
                 ]
             }
+			
+			/*{
+				name: "units",
+				childs: [
+					"arcnelidia"
+				]
+			}*/
 		]
     },
 
