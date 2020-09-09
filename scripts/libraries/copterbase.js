@@ -1,3 +1,9 @@
+const copterAI = () => extend(FlyingAI, {
+	attack(circleLength){
+		this.moveTo(this.target, this.unit.range() * 0.8);
+	}
+});
+
 module.exports = {
 	extend(entity, name, obj, obju){
 		if(typeof(obj) === "undefined") obj = {};
@@ -65,6 +71,7 @@ module.exports = {
 		});
 		
 		var copter = extendContent(UnitType, name, obj);
+		copter.defaultController = copterAI;
 		
 		obju = Object.assign(obju, {
 			update(){
@@ -75,7 +82,21 @@ module.exports = {
 				};
 				
 				if(typeof(obju.customUpdate) === "function") this.customUpdate();
-			}
+			},
+			
+			/*moveAt(vector, accel){
+				if(typeof(accel) === "undefined") accel = this.type.accel;
+				
+				var mx = Core.input.axis(Binding.move_x);
+				var my = Core.input.axis(Binding.move_y);
+				
+				var strafePenalty = Mathf.lerp(1, this.type.strafePenalty, Angles.angleDist(this.vel.angle(), this.rotation) / 180);
+				var speed = this.type.speed * strafePenalty;
+				
+				Tmp.v1.set(mx, my).nor().scl(speed);
+				
+				this.super$moveAt(Tmp.v1, accel);
+			}*/
 		});
 		
 		copter.constructor = () => {
