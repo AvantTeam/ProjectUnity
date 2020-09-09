@@ -76,7 +76,8 @@ module.exports = {
       addSource(sarr){
         var index = this._src.indexOf(sarr[0]);
         if(index >= 0){
-          this._srcStr[index] += sarr[1];
+          this._srcStr[index][1] += sarr[1][1];
+          this._srcStr[index][3] = this._srcStr[index][3].cpy().add(sarr[1][3].cpy().mul(sarr[1][1]/100));
         }
         else{
           this._src.push(sarr[0]);
@@ -120,7 +121,7 @@ module.exports = {
         this._lastColor = Color.black.cpy();
         this.validateSource();
         for(var i=0; i<this._src.length; i++){
-          this._lastColor.add(this._srcStr[i][3].cpy().mul(this._srcStr[i][1]/100));
+          this._lastColor.add(this._srcStr[i][3].cpy().mul(this._src[i].lpowerf()*this._srcStr[i][1]/100));
           if(this._lastColor.equals(Color.white)) break;
         }
         return this._lastColor;

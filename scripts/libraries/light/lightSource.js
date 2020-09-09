@@ -113,6 +113,9 @@ module.exports = {
         if(!this._lightInit) return this.targetStrength();
         return this._strength;
       },
+      lpowerf(){
+        return this.lightPower()/lightblock.lightStrength;
+      },
 
       targetStrength(){
         if(!this.cons.valid()) return 0;
