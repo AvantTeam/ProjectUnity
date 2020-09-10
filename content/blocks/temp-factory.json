@@ -1,0 +1,68 @@
+{
+	"name": "temp factory",
+	"type": "UnitFactory",
+	"size": 2,
+	"consumes": {
+		"power": 1
+	},
+	"buildVisibility": "sandboxOnly",
+	"category": "units",
+	"plans": [
+		{
+			"unit": "gummy",
+			"time": 1,
+			"requirements": [
+				{"item": "copper", "amount": 1}
+			]
+		},
+		{
+			"unit": "project-spiboss",
+			"time": 1,
+			"requirements": [
+				{"item": "lead", "amount": 1}
+			]
+		},
+		{
+			"unit": "caelifera",
+			"time": 1,
+			"requirements": [
+				{"item": "lead", "amount": 1}
+			]
+		},
+		{
+			"unit": "schistocerca",
+			"time": 1,
+			"requirements": [
+				{"item": "lead", "amount": 1}
+			]
+		},
+		{
+			"unit": "anthophila",
+			"time": 1,
+			"requirements": [
+				{"item": "lead", "amount": 1}
+			]
+		},
+		{
+			"unit": "arcaetana",
+			"time": 1,
+			"requirements": [
+				{"item": "lead", "amount": 1}
+			]
+		},
+		{
+			"unit": "amphibi",
+			"time": 1,
+			"requirements": [
+				{"item": "lead", "amount": 1}
+			]
+		},
+		{
+			"unit": "arcnelidia",
+			"time": 1,
+			"requirements": [
+				{"item": "lead", "amount": 1}
+			]
+		}
+	]
+}

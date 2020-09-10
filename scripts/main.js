@@ -43,7 +43,7 @@ const script = [
 					"lightConsumer", "lightCombiner", "lightRouter"
                 ]
             },
-			//"wormlib",
+			"wormlib",
             "copterbase",
             "loader",
             "chainlaser",
@@ -130,14 +130,14 @@ const script = [
                 childs: [
                     "sparkalloyfactory"
                 ]
-            }
+            },
 			
-			/*{
+			{
 				name: "units",
 				childs: [
 					"arcnelidia"
 				]
-			}*/
+			}
 		]
     },
 

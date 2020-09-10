@@ -13,83 +13,20 @@ const setUndefined = (mount) => {
 	if(mount.side == undefined) mount.side = false;
 };
 
-/*const updateSegmentVLocal = (unitBase, baseVelocity) => {
-	for(var j = 0; j < unitBase.getSegmentLength(); j++){
-		var seg = unitBase.getSegmentPositions();
-		var segV = unitBase.getSegmentVelocities();
-		var segU = unitBase.getSegments();
-		
-		segV[j].limit(unitBase.type.speed);
-		
-		var angleB = j != 0 ? Angles.angle(seg[j].x, seg[j].y, seg[j - 1].x, seg[j - 1].y) : Angles.angle(seg[j].x, seg[j].y, unitBase.x, unitBase.y);
-		var velocity = j != 0 ? segV[j - 1].len() : baseVelocity.len();
-		
-		var trueVel = Math.max(velocity, segV[j].len());
-		
-		tempVec1.trns(angleB, trueVel);
-		
-		segU[j].vel.set(tempVec1);
-		segV[j].add(tempVec1);
-		segV[j].setLength(trueVel);
-	}
-	for(var p = 0; p < unitBase.getSegmentLength(); p++){
-		unitBase.getSegmentVelocities()[p].scl(Time.delta);
-	}
-};
+//sk's object cloner.
+const clone = obj => {
+	if(obj === null || typeof(obj) !== "object") return obj;
 
-const updateSegmentsLocal = (unitBase) => {
-	//var parent = unitBase;
-	var segmentOffset = (typeof(unitBase.type.segmentOffsetF) == "function") ? unitBase.type.segmentOffsetF() : unitBase.type.hitsize * 2;
-	tempVec1.trns(Angles.angle(unitBase.getSegmentPositions()[0].x, unitBase.getSegmentPositions()[0].y, unitBase.x, unitBase.y) + 180, segmentOffset);
-	tempVec1.add(unitBase.x, unitBase.y);
-	unitBase.getSegmentPositions()[0].set(tempVec1);
-	for(var i = 1; i < unitBase.getSegmentLength(); i++){
-		var seg = unitBase.getSegmentPositions();
-		
-		var angle = Angles.angle(seg[i].x, seg[i].y, seg[i - 1].x, seg[i - 1].y);
-		tempVec1.trns(angle, segmentOffset);
-		seg[i].set(seg[i - 1]);
-		seg[i].sub(tempVec1);
+	var copy = obj.constructor();
+
+	for(var attr in obj){
+		if(obj.hasOwnProperty(attr)){
+			copy[attr] = obj[attr];
+		}
 	};
-	for(var v = 0; v < unitBase.getSegmentLength(); v++){
-		var seg = unitBase.getSegmentPositions();
-		var segV = unitBase.getSegmentVelocities();
-		var segU = unitBase.getSegments();
-		
-		seg[v].add(segV[v]);
-		var angleD = v == 0 ? Angles.angle(seg[v].x, seg[v].y, unitBase.x, unitBase.y) : Angles.angle(seg[v].x, seg[v].y, seg[v - 1].x, seg[v - 1].y);
-		segV[v].scl(Mathf.clamp(1 - unitBase.drag * Time.delta));
-		segU[v].set(seg[v].x, seg[v].y);
-		segU[v].rotation = angleD;
-		segU[v].updateCustom();
-	}
-};*/
 
-/*const setSegmentsLocal = (unitType, unitBase, segmentLength) => {
-	//unitBase.resetSegments(segmentLength);
-	//unitBase._segmentVelocities = [];
-	//unitBase._segmentUnits = [];
-	//unitBase._segmentLength = segmentLength;
-	var parent = unitBase;
-	for(var i = 0; i < segmentLength; i++){
-		var typeS = i == segmentLength - 1 ? 1 : 0;
-		//unitBase._segments[i] = new Vec2(unitBase.x, unitBase.y);
-		//unitBase._segmentVelocities[i] = new Vec2();
-		//unitBase.getSegmentPositions()[i] = new Vec2(unitBase.x, unitBase.y);
-		//unitBase.getSegmentVelocities()[i] = new Vec2();
-		//unitBase.getSegments()[i] = segmentUnit.get();
-		//unitBase._segmentUnits[i].add();
-		unitBase.getSegments()[i].setSegmentType(typeS);
-		unitBase.getSegments()[i].type = unitType;
-		unitBase.getSegments()[i].team = unitBase.team;
-		unitBase.getSegments()[i].afterSync();
-		//unitBase.getSegments()[i].setTrueParent(unitBase);
-		unitBase.getSegments()[i].setParent(parent);
-		unitBase.getSegments()[i].add();
-		unitBase.getSegments()[i].heal();
-		parent = unitBase.getSegments()[i];
-	}
-};*/
+	return copy;
+};
 
 const segmentUnit = prov(() => {
 	return extend(UnitEntity, {
@@ -113,6 +50,17 @@ const segmentUnit = prov(() => {
 			this.added = true;
 			
 			this.updateLastPosition();
+		},
+		
+		setStats(type){
+			this.type = type;
+			this.maxHealth = type.health;
+			this.drag = type.drag;
+			this.armor = type.armor;
+			this.hitSize = type.hitsize;
+			this.hovering = type.hovering;
+			if(this.controller == null) this.controller(type.createController()); 
+			if(this.mounts.length != type.weapons.size) this.setupWeapons(type); 
 		},
 		
 		remove(){
@@ -152,6 +100,17 @@ const segmentUnit = prov(() => {
 				this.getTrueParent().controller = next;
 				if(this.getTrueParent().controller.unit() != this.getTrueParent().base()) this.getTrueParent().controller.unit(this.getTrueParent().base());
 			}
+		},
+		
+		heal(amount){
+			if(amount == undefined){
+				this.dead = false;
+				this.health = this.maxHealth;
+				return;
+			};
+			
+			this.health += amount;
+			this.clampHealth();
 		},
 		
 		setSegmentType(val){
@@ -318,6 +277,16 @@ const segmentUnit = prov(() => {
 			Draw.reset();
 		},
 		
+		drawShadowC(){
+			var region = this._segmentType == 0 ? this.type.segmentRegionF() : this.type.tailRegionF();
+			
+			Draw.color(UnitType.shadowColor);
+			
+			var e = Math.max(this.elevation, this.type.visualElevation);
+			Draw.rect(region, this.x + (UnitType.shadowTX * e), this.y + (UnitType.shadowTY * e), this.rotation - 90);
+			Draw.color();
+		},
+		
 		draw(){
 			
 		},
@@ -346,23 +315,26 @@ const segmentUnit = prov(() => {
 });
 
 module.exports = {
-	setUniversal(unitType, baseClass, segmentLength, obj){
+	setUniversal(unitType, baseClass, obj){
 		//unitType.segmentRegion = null;
 		//unitType.tailRegion = null;
 		//unitType.segmentRegionF = () => segmentRegion;
 		//unitType.tailRegionF = () => tailRegion;
-		obj = Object.assign(obj, {
-			setEffects(length){
-				this._segmentLength = length;
+		obj = Object.assign({
+			getSegmentLength(){
+				return 9;
+			}
+		}, obj, {
+			setEffects(){
 				this._segmentUnits = [];
 				this._segments = [];
 				this._segmentVelocities = [];
 				this._lastVelocityC = new Vec2();
-				for(var i = 0; i < length; i++){
+				for(var i = 0; i < this.getSegmentLength(); i++){
 					this._segments[i] = new Vec2();
 					this._segmentVelocities[i] = new Vec2();
-					this._segmentUnits[i] = segmentUnit.get();
-					this._segmentUnits[i].setTrueParent(this);
+					//this._segmentUnits[i] = segmentUnit.get();
+					//this._segmentUnits[i].setTrueParent(this);
 				}
 			},
 			update(){
@@ -420,56 +392,51 @@ module.exports = {
 					segU[v].updateCustom();
 				}
 			},
-			write(writes){
+			//TODO: save segment position
+			/*write(writes){
 				this.super$write(writes);
 				
-				writes.s(this._segmentLength);
-				
-				for(var i = 0; i < this._segmentLength; i++){
-					writes.f(this._segments[i].x);
-					writes.f(this._segments[i].y);
+				for(var i = 0; i < this.getSegmentLength(); i++){
+					writes.f(this.getSegmentPositions()[i].x);
+					writes.f(this.getSegmentPositions()[i].y);
 				}
 			},
 			read(reads){
 				this.super$read(reads);
 				
-				this._segmentLength = reads.s();
-				
-				if(typeof(this._segments) == "undefined") this._segments = [];
-				
-				for(var i = 0; i < this._segmentLength; i++){
-					if(this._segments[i] == null) this._segments[i] = new Vec2();
-					this._segments[i].x = reads.f();
-					this._segments[i].y = reads.f();
+				for(var i = 0; i < this.getSegmentLength(); i++){
+					if(this.getSegmentPositions[i] == null) this.getSegmentPositions[i] = new Vec2();
+					this.getSegmentPositions()[i].x = reads.f();
+					this.getSegmentPositions[i].y = reads.f();
 				}
-			},
+			},*/
 			clipSize(){
 				var segmentOffset = (typeof(this.type.segmentOffsetF) == "function") ? this.type.segmentOffsetF() : this.type.hitsize * 2;
 				return this.getSegmentLength() * segmentOffset * 2;
 			},
+			
+			drawOcclusionC(){
+				for(var i = 0; i < this.getSegmentLength(); i++){
+					this.type.drawOcclusion(this.getSegments()[i]);
+				}
+			},
+			
 			add(){
 				this.super$add();
 				
-				//setSegmentsLocal(this.type, this, this._segmentLength);
 				var parent = this;
-				for(var i = 0; i < segmentLength; i++){
-					var typeS = i == segmentLength - 1 ? 1 : 0;
-					//this._segments[i] = new Vec2(this.x, this.y);
-					//this._segmentVelocities[i] = new Vec2();
-					//this.getSegmentPositions()[i] = new Vec2(this.x, this.y);
-					//this.getSegmentVelocities()[i] = new Vec2();
-					//this.getSegments()[i] = segmentUnit.get();
-					//this._segmentUnits[i].add();
+				for(var i = 0; i < this.getSegmentLength(); i++){
+					var typeS = i == this.getSegmentLength() - 1 ? 1 : 0;
+					this.getSegments()[i] = segmentUnit.get();
 					this.getSegments()[i].setSegmentType(typeS);
 					this.getSegments()[i].type = this.type;
 					this.getSegments()[i].controller = this.type.createController();
-					this.getSegments()[i].set(this.type, this.type.createController());
 					this.getSegments()[i].controller.unit(this.getSegments()[i]);
 					this.getSegments()[i].team = this.team;
-					this.getSegments()[i].afterSync();
-					//this.getSegments()[i].setTrueParent(this);
+					this.getSegments()[i].setTrueParent(this);
 					this.getSegments()[i].setParent(parent);
 					this.getSegments()[i].add();
+					this.getSegments()[i].afterSync();
 					this.getSegments()[i].heal();
 					parent = this.getSegments()[i];
 				}
@@ -482,25 +449,16 @@ module.exports = {
 				return this._segments;
 			},
 			
-			getSegmentLength(){
-				return this._segmentLength;
-			},
-			
 			getSegmentVelocities(){
 				return this._segmentVelocities;
 			}
 		});
 		
-		unitType.constructor = () => {
-			const uSegmentLength = segmentLength;
-			var unit = extend(baseClass, obj);
-			unit.setEffects(uSegmentLength);
-			//unit._segmentUnits = [];
-			//unit._segments = [];
-			//unit._segmentVelocities = [];
-			//unit._segmentLength = segmentLength;
+		unitType.constructor = prov(unit => {
+			unit = extend(baseClass, clone(obj));
+			unit.setEffects();
 			return unit;
-		}
+		});
 	},
 	//called when finishing setting segment weapons
 	//currently unusable, uses the main unit type weapons instead.
@@ -526,18 +484,12 @@ module.exports = {
 		};
 		weaponSeq.set(mapped);
 	},
-	//add() in entity
-	/*setSegments(unitType, unitBase, segmentLength){
-		setSegmentsLocal(unitType, unitBase, segmentLength);
-	},*/
-	//update(unit) in unit type
-	/*updateSegments(unitBase){
-		updateSegmentsLocal(unitBase);
-	},*/
+	
 	//drawBody(unit) in unit type
 	drawSegments(unitBase){
 		var originZ = Draw.z();
 		
+		if(typeof(unitBase.getSegmentLength) != "function") return;
 		for(var i = 0; i < unitBase.getSegmentLength(); i++){
 			Draw.z(originZ - ((i + 1) / 40));
 			unitBase.getSegments()[i].drawBodyC();
@@ -545,5 +497,18 @@ module.exports = {
 		};
 		
 		Draw.z(originZ);
+	},
+	
+	//drawShadow(unit) in unit type
+	drawShadowSegments(unitBase){
+		if(typeof(unitBase.getSegmentLength) != "function") return;
+		for(var i = 0; i < unitBase.getSegmentLength(); i++){
+			unitBase.getSegments()[i].drawShadowC();
+		};
+	},
+	
+	//drawOcclusion(unit) in unit type
+	drawOcclusionSegments(unitBase){
+		if(typeof(unitBase.drawOcclusionC) == "function") unitBase.drawOcclusionC();
 	}
 };
