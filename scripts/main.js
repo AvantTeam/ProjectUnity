@@ -39,10 +39,8 @@ const script = [
                 name: "light",
                 childs: [
                     "light",
-                    "lightSource",
-                    "lightConsumer",
-                    "lightCombiner",
-                    "lightRouter"
+					"lightSource",
+					"lightConsumer", "lightCombiner", "lightRouter"
                 ]
             },
 			//"wormlib",
@@ -61,9 +59,9 @@ const script = [
                 name: "blocks",
                 childs: [
                     "recursivereconstructor",
-                    "light-lamp",
-                    "light-reflector",
-                    "light-extra",
+                    
+					"light-lamp", "light-reflector", "light-extra",
+					
                     "walls",
 					"ores",
                     "multi-test-younggam"
@@ -73,11 +71,7 @@ const script = [
             {
                 name: "flying-units",
                 childs: [
-                    "caelifera",
-                    "schistocerca",
-                    "anthophila",
-					"vespula",
-					"lepidoptera"
+                    "caelifera", "schistocerca", "anthophila", "vespula", "lepidoptera"
                 ]
             },
 
@@ -92,11 +86,9 @@ const script = [
             {
                 name: "naval-units",
                 childs: [
-                    "rexed",
-                    "storm",
-                    // naval units with no legs
-                    "amphibi",
-                    "craber" 
+                    "rexed", "storm",
+                    
+                    "amphibi", "craber" 
                 ]
             },
 
@@ -175,6 +167,12 @@ const script = [
 				name: "turrets",
 				childs: [
 					"oracle"
+				]
+			},
+			{
+				name: "units",
+				childs: [
+					"electron"
 				]
 			}
 		]
