@@ -72,7 +72,10 @@ const infl = conslib.extend(SolarGenerator, SolarGenerator.SolarGeneratorBuild, 
   }
 }, {
   //The original Building extension object.
-  _connected: [false, false, false, false],
+  _c0: false,
+  _c1: false,
+  _c2: false,
+  _c3: false,
   draw(){
     Draw.z(Layer.block);
     Draw.rect(infl.region, this.x, this.y);
@@ -80,9 +83,10 @@ const infl = conslib.extend(SolarGenerator, SolarGenerator.SolarGeneratorBuild, 
     Draw.color(this.lightSumColor(), 1);
     Draw.blend(Blending.additive);
     Draw.rect(infl.topRegion, this.x, this.y);
-    for(var i=0; i<4; i++){
-      if(this._connected[i]) Drawf.tri(this.x + Geometry.d4x[i]*2, this.y + Geometry.d4y[i]*2, 3, 6, i*90);
-    }
+    if(this._c0) Drawf.tri(this.x + Geometry.d4x[0]*2, this.y + Geometry.d4y[0]*2, 3, 6, 0);
+    if(this._c1) Drawf.tri(this.x + Geometry.d4x[1]*2, this.y + Geometry.d4y[1]*2, 3, 6, 90);
+    if(this._c2) Drawf.tri(this.x + Geometry.d4x[2]*2, this.y + Geometry.d4y[2]*2, 3, 6, 180);
+    if(this._c3) Drawf.tri(this.x + Geometry.d4x[3]*2, this.y + Geometry.d4y[3]*2, 3, 6, 270);
     Draw.color();
     Draw.blend();
     Draw.reset();
@@ -93,9 +97,9 @@ const infl = conslib.extend(SolarGenerator, SolarGenerator.SolarGeneratorBuild, 
       var build = this.tile.getNearbyEntity(i);
       if(build != null && build.block.name == "unity-light-filter"){
         build.setCont(this);
-        this._connected[i] = true;
+        this["_c"+i] = true;
       }
-      else this._connected[i] = false;
+      else this["_c"+i] = false;
     }
   },
   getFilterColor(){
