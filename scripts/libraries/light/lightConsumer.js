@@ -125,7 +125,7 @@ module.exports = {
           this._lastColor.add(this._srcStr[i][3].cpy().mul(/*this._src[i].lpowerf()**/this._srcStr[i][1]/100));
           if(this._lastColor.equals(Color.white)) break;
         }
-        this._lastColor = this._lastColor.shiftValue(1-this._lastColor.value());
+        if(!this._lastColor.equals(Color.black)) this._lastColor = this._lastColor.shiftValue(1-this._lastColor.value());
         return this._lastColor;
       },
       lastSumColor(){

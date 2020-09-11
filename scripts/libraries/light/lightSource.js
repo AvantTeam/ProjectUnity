@@ -127,7 +127,10 @@ module.exports = {
 			updateTile(){
         this.setPower(this.targetStrength());
         if(!this.initDone()) this.lightMarchStart(lightblock.lightLength, lightblock.maxLightLength);
-        else if(this.timer.get(lightblock.reflowTimer, lightblock.lightInterval) && this.lightPower() > 1) this.lightMarchStart(lightblock.lightLength, lightblock.maxLightLength);
+        else if(this.timer.get(lightblock.reflowTimer, lightblock.lightInterval)){
+          if(this.lightPower() > 1) this.lightMarchStart(lightblock.lightLength, lightblock.maxLightLength);
+          else this.clearCons();
+        }
 
 				if(lightblock.hasCustomUpdate) this.customUpdate();
 				else this.super$updateTile();
@@ -191,6 +194,11 @@ module.exports = {
         Draw.color();
       },
 
+      clearCons(){
+        for(var i=0; i<this._lCons.length; i++){
+          this._lCons[i].removeSource(this);
+        }
+      },
       lightMarchStart(length, maxLength){
         //idk
         this._lightData[0] = this.getAngle();
