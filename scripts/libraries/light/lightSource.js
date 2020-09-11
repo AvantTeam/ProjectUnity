@@ -35,6 +35,8 @@ module.exports = {
       scaleStatus: true,
       //whether to display angle configuration
       angleConfig: false,
+      //The interval light is updated
+      lightInterval: 10,
       //defaults
       dirs: [[1,0], [1,1], [0,1], [-1,1], [-1,0], [-1,-1], [0,-1], [1,-1]],
       update: true,
@@ -125,7 +127,7 @@ module.exports = {
 			updateTile(){
         this.setPower(this.targetStrength());
         if(!this.initDone()) this.lightMarchStart(lightblock.lightLength, lightblock.maxLightLength);
-        else if(this.timer.get(lightblock.reflowTimer, 30) && this.lightPower() > 1) this.lightMarchStart(lightblock.lightLength, lightblock.maxLightLength);
+        else if(this.timer.get(lightblock.reflowTimer, lightblock.lightInterval) && this.lightPower() > 1) this.lightMarchStart(lightblock.lightLength, lightblock.maxLightLength);
 
 				if(lightblock.hasCustomUpdate) this.customUpdate();
 				else this.super$updateTile();
