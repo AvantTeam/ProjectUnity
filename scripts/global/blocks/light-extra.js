@@ -61,3 +61,47 @@ const panel = conslib.extend(SolarGenerator, SolarGenerator.SolarGeneratorBuild,
     this.productionEfficiency = this.enabled?this.lightStatus():0;
   }
 });
+
+const infl = conslib.extend(SolarGenerator, SolarGenerator.SolarGeneratorBuild, "light-influencer", {
+  lightStrength: 1,
+  scaleStatus: true,
+  //The original Block extension object.
+  load(){
+    this.super$load();
+    this.topRegion = Core.atlas.find(this.name + "-top");
+  }
+}, {
+  //The original Building extension object.
+  _connected: [false, false, false, false],
+  draw(){
+    Draw.z(Layer.block);
+    Draw.rect(infl.region, this.x, this.y);
+    Draw.z(Layer.effect - 2);
+    Draw.color(this.lightSumColor(), 1);
+    Draw.blend(Blending.additive);
+    Draw.rect(infl.topRegion, this.x, this.y);
+    for(var i=0; i<4; i++){
+      if(this._connected[i]) Drawf.tri(this.x + Geometry.d4x[i]*2, this.y + Geometry.d4y[i]*2, 3, 6, i*90);
+    }
+    Draw.color();
+    Draw.blend();
+    Draw.reset();
+  },
+  onProximityUpdate(){
+    this.super$onProximityUpdate();
+    for(var i=0; i<4; i++){
+      var build = this.tile.getNearbyEntity(i);
+      if(build != null && build.block.name == "unity-light-filter"){
+        build.setCont(this);
+        this._connected[i] = true;
+      }
+      else this._connected[i] = false;
+    }
+  },
+  getFilterColor(){
+    return this.lightSumColor();
+  },
+  updateTile(){
+    this.productionEfficiency = 0;
+  }
+});

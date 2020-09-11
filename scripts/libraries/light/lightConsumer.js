@@ -59,7 +59,7 @@ module.exports = {
 		//lightblock.hasCustomUpdate = (typeof objb["customUpdate"] === "function");
     //lightblock.hasCustomRW = (typeof objb["customRead"] === "function");
 
-		objb = Object.assign(objb, {
+		objb = Object.assign(clone(objb), {
       //angle strengthPercentage lengthleft color
       _src: [],
       _srcStr: [],
@@ -121,7 +121,7 @@ module.exports = {
         this._lastColor = Color.black.cpy();
         this.validateSource();
         for(var i=0; i<this._src.length; i++){
-          this._lastColor.add(this._srcStr[i][3].cpy().mul(this._src[i].lpowerf()*this._srcStr[i][1]/100));
+          this._lastColor.add(this._srcStr[i][3].cpy().mul(/*this._src[i].lpowerf()**/this._srcStr[i][1]/100));
           if(this._lastColor.equals(Color.white)) break;
         }
         return this._lastColor;

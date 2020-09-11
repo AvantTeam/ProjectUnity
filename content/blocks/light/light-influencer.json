@@ -1,0 +1,15 @@
+{
+	"size": 1,
+	"health": 60,
+  "update": true,
+  "category": "logic",
+	"requirements": [
+    {"item": "lead", "amount": 15},
+    {"item": "metaglass", "amount": 10},
+		{"item": "silicon", "amount": 5}
+	],
+	"research": "light-divisor-1",
+  "solid": true,
+  "rotate": false,
+  "powerProduction": 1
+}
