@@ -4,7 +4,7 @@ const loaderBlock = extendContent(Block, "loader-block", {
 	load(){
 		this.region = Core.atlas.white();
 	},
-	
+
 	init(){
 		Core.app.post(run(() => {
 			// Air Factory
@@ -12,7 +12,7 @@ const loaderBlock = extendContent(Block, "loader-block", {
 				const airFac = Blocks.airFactory;
 				
 				airFac.consumes.remove(ConsumeType.item);
-				
+
 				const caelifera = new UnitFactory.UnitPlan(
 					Vars.content.getByName(ContentType.unit, "unity-caelifera"),
 					60 * 25,
@@ -21,19 +21,19 @@ const loaderBlock = extendContent(Block, "loader-block", {
 						Items.titanium, 25
 					)
 				);
-				
+
 				var newPlan = [];
 				for(var i = 0; i < airFac.plans.length; i++){
 					newPlan.push(airFac.plans[i]);
 				};
 				newPlan.push(caelifera);
 				airFac.plans = newPlan;
-				
+
 				airFac.config(Integer, (tile, i) => {
 					tile.currentPlan = (Math.floor(i) < 0 || Math.floor(i) >= airFac.plans.length) ? -1 : Math.floor(i);
 					tile.progress = 0;
 				});
-				
+
 				for(var i = 0; i < airFac.plans.length; i++){
 					for(var j = 0; j < airFac.plans[i].requirements.length; j++){
 						var stack = airFac.plans[i].requirements[j];
@@ -41,7 +41,7 @@ const loaderBlock = extendContent(Block, "loader-block", {
 						airFac.itemCapacity = Math.max(airFac.itemCapacity, stack.amount * 2);
 					}
 				};
-				
+
 				airFac.consumes.add(extendContent(ConsumeItemDynamic, func(e => {
 					return e.currentPlan != -1 ? (airFac.plans[e.currentPlan]).requirements : ItemStack.empty
 				}), {}));
@@ -52,9 +52,9 @@ const loaderBlock = extendContent(Block, "loader-block", {
 			// Naval Factory
 			try{
 				const NavalFac = Blocks.navalFactory;
-				
+
 				NavalFac.consumes.remove(ConsumeType.item);
-				
+
 				const amphibi = new UnitFactory.UnitPlan(
 					Vars.content.getByName(ContentType.unit, "unity-amphibi-naval"),
 					60 * 25,
@@ -64,19 +64,19 @@ const loaderBlock = extendContent(Block, "loader-block", {
 						Items.titanium, 25
 					)
 				);
-				
+
 				var newPlan = [];
 				for(var i = 0; i < NavalFac.plans.length; i++){
 					newPlan.push(NavalFac.plans[i]);
 				};
 				newPlan.push(amphibi);
 				NavalFac.plans = newPlan;
-				
+
 				NavalFac.config(Integer, (tile, i) => {
 					tile.currentPlan = (Math.floor(i) < 0 || Math.floor(i) >= NavalFac.plans.length) ? -1 : Math.floor(i);
 					tile.progress = 0;
 				});
-				
+
 				for(var i = 0; i < NavalFac.plans.length; i++){
 					for(var j = 0; j < NavalFac.plans[i].requirements.length; j++){
 						var stack = NavalFac.plans[i].requirements[j];
@@ -84,7 +84,7 @@ const loaderBlock = extendContent(Block, "loader-block", {
 						NavalFac.itemCapacity = Math.max(NavalFac.itemCapacity, stack.amount * 2);
 					}
 				};
-				
+
 				NavalFac.consumes.add(extendContent(ConsumeItemDynamic, func(e => {
 					return e.currentPlan != -1 ? (NavalFac.plans[e.currentPlan]).requirements : ItemStack.empty
 				}), {}));
@@ -95,7 +95,7 @@ const loaderBlock = extendContent(Block, "loader-block", {
 			// Additive Reconstructor
 			try{
 				const addReconstructor = Blocks.additiveReconstructor;
-				
+
 				var newUpgrades = [];
 				for(var i = 0; i < addReconstructor.upgrades.length; i++){
 					newUpgrades.push(addReconstructor.upgrades[i]);
@@ -116,11 +116,11 @@ const loaderBlock = extendContent(Block, "loader-block", {
 			}catch(e){
 				print(e);
 			};
-			
+
 			// Multiplicative Reconstructor
 			try{
 				const mulReconstructor = Blocks.multiplicativeReconstructor;
-				
+
 				var newUpgrades = [];
 				for(var i = 0; i < mulReconstructor.upgrades.length; i++){
 					newUpgrades.push(mulReconstructor.upgrades[i]);
@@ -135,11 +135,11 @@ const loaderBlock = extendContent(Block, "loader-block", {
 			}catch(e){
 				print(e);
 			};
-			
+
 			// Exponential Reconstructor
 			try{
 				const expReconstructor = Blocks.exponentialReconstructor;
-				
+
 				var newUpgrades = [];
 				for(var i = 0; i < expReconstructor.upgrades.length; i++){
 					newUpgrades.push(expReconstructor.upgrades[i]);
@@ -160,11 +160,11 @@ const loaderBlock = extendContent(Block, "loader-block", {
 			}catch(e){
 				print(e);
 			};
-			
+
 			// Tetrative Reconstructor
 			try{
 				const tetraReconstructor = Blocks.tetrativeReconstructor;
-				
+
 				var newUpgrades = [];
 				for(var i = 0; i < tetraReconstructor.upgrades.length; i++){
 					newUpgrades.push(tetraReconstructor.upgrades[i]);
@@ -193,7 +193,7 @@ const loaderBlock = extendContent(Block, "loader-block", {
 			};
 		}));
 	},
-	
+
 	isHidden(){
 		return true;
 	}

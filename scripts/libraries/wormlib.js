@@ -38,20 +38,20 @@ const segmentUnit = prov(() => {
 			};
 			return true;
 		},
-		
+
 		add(){
 			if(this.added == true) return;
-			
+
 			Groups.all.add(this);
 			Groups.unit.add(this);
 			Groups.sync.add(this);
 			Groups.draw.add(this);
-			
+
 			this.added = true;
-			
+
 			this.updateLastPosition();
 		},
-		
+
 		setStats(type){
 			this.type = type;
 			this.maxHealth = type.health;
@@ -59,37 +59,37 @@ const segmentUnit = prov(() => {
 			this.armor = type.armor;
 			this.hitSize = type.hitsize;
 			this.hovering = type.hovering;
-			if(this.controller == null) this.controller(type.createController()); 
-			if(this.mounts.length != type.weapons.size) this.setupWeapons(type); 
+			if(this.controller == null) this.controller(type.createController());
+			if(this.mounts.length != type.weapons.size) this.setupWeapons(type);
 		},
-		
+
 		remove(){
 			if(!this.added) return;
-			
+
 			Groups.all.remove(this);
 			Groups.unit.remove(this);
 			Groups.sync.remove(this);
 			Groups.draw.remove(this);
-			
+
 			this.added = false;
-			
+
 			this.controller.removed(this.base());
-			
+
 			if(Vars.net.client()){
 				Vars.netClient.addRemovedEntity(this.id);
 			}
 		},
-		
+
 		damage(amount, effect){
 			if(this.getTrueParent() == null) return;
-			
+
 			if(effect == undefined){
 				this.getTrueParent().damage(amount);
 			}else{
 				this.getTrueParent().damage(amount, effect);
 			}
 		},
-		
+
 		//both the setter and the getter!
 		controller(next){
 			if(next == undefined) return this.controller;
@@ -101,26 +101,26 @@ const segmentUnit = prov(() => {
 				if(this.getTrueParent().controller.unit() != this.getTrueParent().base()) this.getTrueParent().controller.unit(this.getTrueParent().base());
 			}
 		},
-		
+
 		heal(amount){
 			if(amount == undefined){
 				this.dead = false;
 				this.health = this.maxHealth;
 				return;
 			};
-			
+
 			this.health += amount;
 			this.clampHealth();
 		},
-		
+
 		setSegmentType(val){
 			this._segmentType = val;
 		},
-		
+
 		/*setupWeapons(def){
-			
+
 		},*/
-		
+
 		setupWeapons(def){
 			this.super$setupWeapons(def);
 			for(var i = 0; i < this.mounts.length; i++){
@@ -130,19 +130,19 @@ const segmentUnit = prov(() => {
 				//setUndefined(mount);
 			}
 		},
-		
+
 		setWeaponsB(weaponSeq){
 			this.mounts = [];
 			weaponSeq.each(w => {
 				this.mounts.push(new WeaponMount(w));
 			});
 		},
-		
+
 		//dont save this unit
 		serialize(){
 			return false;
 		},
-		
+
 		update(){
 			if(this.getParent() == null || this.getParent().dead){
 				this.deactivated = true;
@@ -150,7 +150,7 @@ const segmentUnit = prov(() => {
 				this.remove();
 			}
 		},
-		
+
 		updateCustom(){
 			if(this.getTrueParent() != null){
 				this.health = this.getTrueParent().health;
@@ -158,24 +158,24 @@ const segmentUnit = prov(() => {
 				this.hitTime = this.getTrueParent().hitTime;
 			};
 			//print(this.dead + ":" + this.deactivated);
-			
+
 			if(!Vars.net.client() && !this.dead && !this.deactivated && this.controller != null){
 				this.controller.updateUnit();
 			};
-			
+
 			if(this.controller == null){
 				this.resetController();
 			};
-			
+
 			if(!this.controller.isValidController()){
 				this.resetController();
 			};
-			
+
 			this.updateWeaponsC();
-			
+
 			this.updateStatusC();
 		},
-		
+
 		updateStatusC(){
 			if(this.getTrueParent() == null || this.getTrueParent().dead) return;
 			if(!this.statuses.isEmpty()){
@@ -186,14 +186,14 @@ const segmentUnit = prov(() => {
 			};
 			this.statuses.clear();
 		},
-		
+
 		//pain
 		updateWeaponsC(){
 			var can = this.canShoot();
 			for(var i = 0; i < this.mounts.length; i++){
 				var mount = this.mounts[i];
 				if(mount == null) continue;
-				
+
 				var weapon = mount.weapon;
 				//print("PRINT:" + mount.reload + ":" + Time.delta + ":" + this.reloadMultiplier);
 				//setUndefined(mount);
@@ -218,7 +218,7 @@ const segmentUnit = prov(() => {
 					var mountY = this.y + Angles.trnsy(rotation, weapon.x, weapon.y);
 					var shootX = mountX + Angles.trnsx(weaponRotation, weapon.shootX, weapon.shootY);
 					var shootY = mountY + Angles.trnsy(weaponRotation, weapon.shootX, weapon.shootY);
-					
+
 					var shootAngle = weapon.rotate ? (weaponRotation + 90.0) : (Angles.angle(shootX, shootY, mount.aimX, mount.aimY) + this.rotation - this.angleTo(mount.aimX, mount.aimY));
 					this.shoot(weapon, shootX, shootY, mount.aimX, mount.aimY, shootAngle, Mathf.sign(weapon.x));
 					mount.reload = weapon.reload;
@@ -227,7 +227,7 @@ const segmentUnit = prov(() => {
 				}
 			}
 		},
-		
+
 		shoot(weapon, x, y, aimX, aimY, rotation, side){
 			weapon.shootSound.at(x, y, Mathf.random(0.8, 1.0));
 			var ammo = weapon.bullet;
@@ -262,52 +262,52 @@ const segmentUnit = prov(() => {
 			ammo.shootEffect.at(x, y, rotation, parentize ? this : 0);
 			ammo.smokeEffect.at(x, y, rotation, parentize ? this : 0);
 		},
-		
+
 		bullet(weapon, x, y, angle, lifescl){
 			weapon.bullet.create(this, this.team, x, y, angle, (1.0 - weapon.velocityRnd) + Mathf.random(weapon.velocityRnd), lifescl);
 		},
-		
+
 		drawBodyC(){
 			this.type.applyColor(this);
-			
+
 			var region = this._segmentType == 0 ? this.type.segmentRegionF() : this.type.tailRegionF();
 
 			Draw.rect(region, this, this.rotation - 90);
 
 			Draw.reset();
 		},
-		
+
 		drawShadowC(){
 			var region = this._segmentType == 0 ? this.type.segmentRegionF() : this.type.tailRegionF();
-			
+
 			Draw.color(UnitType.shadowColor);
-			
+
 			var e = Math.max(this.elevation, this.type.visualElevation);
 			Draw.rect(region, this.x + (UnitType.shadowTX * e), this.y + (UnitType.shadowTY * e), this.rotation - 90);
 			Draw.color();
 		},
-		
+
 		draw(){
-			
+
 		},
-		
+
 		trueDraw(){
 			this.super$draw();
 		},
-		
+
 		setTrueParent(parent){
 			this._shootSequence = 0;
 			this._trueParentUnit = parent;
 		},
-		
+
 		getTrueParent(){
 			return this._trueParentUnit;
 		},
-		
+
 		setParent(parent){
 			this._parentUnit = parent;
 		},
-		
+
 		getParent(){
 			return this._parentUnit;
 		}
@@ -348,16 +348,16 @@ module.exports = {
 					var seg = this.getSegmentPositions();
 					var segV = this.getSegmentVelocities();
 					var segU = this.getSegments();
-					
+
 					segV[j].limit(this.type.speed);
-					
+
 					var angleB = j != 0 ? Angles.angle(seg[j].x, seg[j].y, seg[j - 1].x, seg[j - 1].y) : Angles.angle(seg[j].x, seg[j].y, this.x, this.y);
 					var velocity = j != 0 ? segV[j - 1].len() : vec.len();
-					
+
 					var trueVel = Math.max(velocity, segV[j].len());
-					
+
 					tempVec1.trns(angleB, trueVel);
-					
+
 					segU[j].vel.set(tempVec1);
 					segV[j].add(tempVec1);
 					segV[j].setLength(trueVel);
@@ -373,7 +373,7 @@ module.exports = {
 				this.getSegmentPositions()[0].set(tempVec1);
 				for(var i = 1; i < this.getSegmentLength(); i++){
 					var seg = this.getSegmentPositions();
-					
+
 					var angle = Angles.angle(seg[i].x, seg[i].y, seg[i - 1].x, seg[i - 1].y);
 					tempVec1.trns(angle, segmentOffset);
 					seg[i].set(seg[i - 1]);
@@ -383,7 +383,7 @@ module.exports = {
 					var seg = this.getSegmentPositions();
 					var segV = this.getSegmentVelocities();
 					var segU = this.getSegments();
-					
+
 					seg[v].add(segV[v]);
 					var angleD = v == 0 ? Angles.angle(seg[v].x, seg[v].y, this.x, this.y) : Angles.angle(seg[v].x, seg[v].y, seg[v - 1].x, seg[v - 1].y);
 					segV[v].scl(Mathf.clamp(1 - this.drag * Time.delta));
@@ -395,7 +395,7 @@ module.exports = {
 			//TODO: save segment position
 			/*write(writes){
 				this.super$write(writes);
-				
+
 				for(var i = 0; i < this.getSegmentLength(); i++){
 					writes.f(this.getSegmentPositions()[i].x);
 					writes.f(this.getSegmentPositions()[i].y);
@@ -403,7 +403,7 @@ module.exports = {
 			},
 			read(reads){
 				this.super$read(reads);
-				
+
 				for(var i = 0; i < this.getSegmentLength(); i++){
 					if(this.getSegmentPositions[i] == null) this.getSegmentPositions[i] = new Vec2();
 					this.getSegmentPositions()[i].x = reads.f();
@@ -414,16 +414,16 @@ module.exports = {
 				var segmentOffset = (typeof(this.type.segmentOffsetF) == "function") ? this.type.segmentOffsetF() : this.type.hitsize * 2;
 				return this.getSegmentLength() * segmentOffset * 2;
 			},
-			
+
 			drawOcclusionC(){
 				for(var i = 0; i < this.getSegmentLength(); i++){
 					this.type.drawOcclusion(this.getSegments()[i]);
 				}
 			},
-			
+
 			add(){
 				this.super$add();
-				
+
 				var parent = this;
 				for(var i = 0; i < this.getSegmentLength(); i++){
 					var typeS = i == this.getSegmentLength() - 1 ? 1 : 0;
@@ -444,16 +444,16 @@ module.exports = {
 			getSegments(){
 				return this._segmentUnits;
 			},
-			
+
 			getSegmentPositions(){
 				return this._segments;
 			},
-			
+
 			getSegmentVelocities(){
 				return this._segmentVelocities;
 			}
 		});
-		
+
 		unitType.constructor = prov(unit => {
 			unit = extend(baseClass, clone(obj));
 			unit.setEffects();
@@ -467,14 +467,14 @@ module.exports = {
 		for(var i = 0; i < weaponSeq.size; i++){
 			var w = weaponSeq.get(i);
 			mapped.add(w);
-			
+
 			if(w.mirror){
 				var copy = w.copy();
 				copy.x *= -1;
 				copy.shootX *= -1;
 				copy.flipSprite = !copy.flipSprite;
 				mapped.add(copy);
-				
+
 				w.reload *= 2;
 				copy.reload *= 2;
 
@@ -484,21 +484,21 @@ module.exports = {
 		};
 		weaponSeq.set(mapped);
 	},
-	
+
 	//drawBody(unit) in unit type
 	drawSegments(unitBase){
 		var originZ = Draw.z();
-		
+
 		if(typeof(unitBase.getSegmentLength) != "function") return;
 		for(var i = 0; i < unitBase.getSegmentLength(); i++){
 			Draw.z(originZ - ((i + 1) / 40));
 			unitBase.getSegments()[i].drawBodyC();
 			unitBase.getSegments()[i].type.drawWeapons(unitBase.getSegments()[i]);
 		};
-		
+
 		Draw.z(originZ);
 	},
-	
+
 	//drawShadow(unit) in unit type
 	drawShadowSegments(unitBase){
 		if(typeof(unitBase.getSegmentLength) != "function") return;
@@ -506,7 +506,7 @@ module.exports = {
 			unitBase.getSegments()[i].drawShadowC();
 		};
 	},
-	
+
 	//drawOcclusion(unit) in unit type
 	drawOcclusionSegments(unitBase){
 		if(typeof(unitBase.drawOcclusionC) == "function") unitBase.drawOcclusionC();
