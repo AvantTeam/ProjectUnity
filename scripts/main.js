@@ -59,9 +59,9 @@ const script = [
                 name: "blocks",
                 childs: [
                     "recursivereconstructor",
-                    
+
 					"light-lamp", "light-reflector", "light-extra",
-					
+
                     "walls",
 					"ores",
                     "multi-test-younggam"
@@ -87,8 +87,8 @@ const script = [
                 name: "naval-units",
                 childs: [
                     "rexed", "storm",
-                    
-                    "amphibi", "craber" 
+
+                    "amphibi", "craber"
                 ]
             },
 
@@ -131,7 +131,7 @@ const script = [
                     "sparkalloyfactory"
                 ]
             },
-			
+
 			{
 				name: "units",
 				childs: [
