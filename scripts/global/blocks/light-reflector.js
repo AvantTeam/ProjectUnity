@@ -233,22 +233,46 @@ filterInv.configClear((build) => {
 filterInv.entityType = () => {
   const ent = extend(Building, {
     _color: 0,
+    _cont: null,
     getFilterColor(){
       return this._color;
     },
     setFilterColor(c){
       this._color = c;
     },
+    getTrueColor(){
+      if(this._cont == null) return ncolors[this._color];
+      else{
+        if(!this._cont.isValid()){
+          this._cont = null;
+          return ncolors[this._color];
+        }
+        else return this._cont.getFilterColor().cpy().inv();
+      }
+    },
+    getRawColor(){
+      if(this._cont == null) return colors[this._color];
+      else{
+        if(!this._cont.isValid()){
+          this._cont = null;
+          return colors[this._color];
+        }
+        else return this._cont.getFilterColor();
+      }
+    },
+    setCont(b){
+      this._cont = b;
+    },
     calcLight(ld, i){
       //TODO: prevent dark light scientifically
-      var tc = ld[3].cpy().mul(ncolors[this._color]);
+      var tc = ld[3].cpy().mul(this.getTrueColor());
       var val = Mathf.floorPositive(tc.value()*ld[1]);
       if(val < 0.1) return null;
       return [ld[0], val, ld[2] - i, tc];
     },
     draw(){
       Draw.rect(filterInv.baseRegion, this.x, this.y);
-      Draw.color(colors[this._color], 0.7);
+      Draw.color(this.getRawColor(), 0.7);
       Draw.z(Layer.effect + 2);
       Draw.rect(filter.lightRegion, this.x, this.y);
       Draw.color();
@@ -286,6 +310,7 @@ filterInv.entityType = () => {
     }
   });
   ent._color = 0;
+  ent._cont = null;
   return ent;
 }
 

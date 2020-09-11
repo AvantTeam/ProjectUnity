@@ -80,7 +80,7 @@ const infl = conslib.extend(SolarGenerator, SolarGenerator.SolarGeneratorBuild, 
     Draw.z(Layer.block);
     Draw.rect(infl.region, this.x, this.y);
     Draw.z(Layer.effect - 2);
-    Draw.color(this.lightSumColor(), 1);
+    Draw.color(this.lastSumColor(), 1);
     Draw.blend(Blending.additive);
     Draw.rect(infl.topRegion, this.x, this.y);
     if(this._c0) Drawf.tri(this.x + Geometry.d4x[0]*2, this.y + Geometry.d4y[0]*2, 3, 6, 0);
@@ -95,7 +95,7 @@ const infl = conslib.extend(SolarGenerator, SolarGenerator.SolarGeneratorBuild, 
     this.super$onProximityUpdate();
     for(var i=0; i<4; i++){
       var build = this.tile.getNearbyEntity(i);
-      if(build != null && build.block.name == "unity-light-filter"){
+      if(build != null && (build.block.name == "unity-light-filter" || build.block.name == "unity-light-inverted-filter")){
         build.setCont(this);
         this["_c"+i] = true;
       }
@@ -103,9 +103,10 @@ const infl = conslib.extend(SolarGenerator, SolarGenerator.SolarGeneratorBuild, 
     }
   },
   getFilterColor(){
-    return this.lightSumColor();
+    return this.lastSumColor();
   },
   updateTile(){
+    this.lightSumColor();
     this.productionEfficiency = 0;
   }
 });
