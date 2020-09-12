@@ -161,6 +161,18 @@ const script = [
 		]
     },
 
+	{
+		name: "light",
+		childs: [
+			{
+				name: "turrets",
+				childs: [
+					"reflector"
+				]
+			}
+		]
+	},
+
     {
         name: "monolith",
         childs: [

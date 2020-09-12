@@ -1,4 +1,3 @@
-//TODO finish it 
 const chargeTriangles = new Effect(96, e => {
 	Draw.color(Pal.surge);
 	
@@ -69,9 +68,10 @@ const plasmaFrag = extend(BulletType, {
 		}
 	}
 });
-plasmaFrag.speed = 4;
+plasmaFrag.speed = 4.5;
 plasmaFrag.drag = 0.05;
 plasmaFrag.damage = 20;
+plasmaFrag.collides = false;
 plasmaFrag.colors = [Pal.surge, Color.valueOf("f2e87b"), Color.valueOf("d89e6b"), Color.white];
 plasmaFrag.hitColor = plasmaFrag.colors[1];
 plasmaFrag.shootEffect = fragAppear;
@@ -123,9 +123,7 @@ plasma.damage = 280;
 plasma.colors = [Pal.surge, Color.valueOf("f2e87b"), Color.valueOf("d89e6b"), Color.white];
 plasma.hitColor = plasma.colors[1];
 plasma.fragBullet = plasmaFrag;
-plasma.fragBullets = 10;
-
-//plasma.strokes = [1.1, 0.9, 0.7, 0.5];
+plasma.fragBullets = Mathf.random(6, 9));
 
 const plasmaTurret = extendContent(ChargeTurret, "plasma", {});
 plasmaTurret.shootType = plasma;
