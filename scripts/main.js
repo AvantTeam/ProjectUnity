@@ -105,6 +105,13 @@ const script = [
         name: "dark",
         childs: [
 			{
+				name: "turrets",
+				childs: [
+					"fallout",
+					"catastrophe"
+				]
+			},
+			{
 				name: "factories",
 				childs: [
 					"darkalloyfactory"
