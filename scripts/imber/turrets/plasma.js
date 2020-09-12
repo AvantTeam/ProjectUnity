@@ -123,7 +123,8 @@ plasma.damage = 280;
 plasma.colors = [Pal.surge, Color.valueOf("f2e87b"), Color.valueOf("d89e6b"), Color.white];
 plasma.hitColor = plasma.colors[1];
 plasma.fragBullet = plasmaFrag;
-plasma.fragBullets = Mathf.random(6, 9));
+//must be a constant value gdeft
+plasma.fragBullets = 8;
 
 const plasmaTurret = extendContent(ChargeTurret, "plasma", {});
 plasmaTurret.shootType = plasma;
