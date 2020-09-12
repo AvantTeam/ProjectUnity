@@ -10,6 +10,7 @@
 	"chargeEffects": 5,
 	"chargeMaxDelay": 25,
 	"powerUse": 10.4,
+	"targetAir": false,
 	"requirements": [
 		{"item": "copper", "amount": 55},
 		{"item": "lead", "amount": 30},
