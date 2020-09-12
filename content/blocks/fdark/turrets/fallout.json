@@ -1,0 +1,31 @@
+{
+	"size": 5,
+	"health": 3975,
+	"range": 215,
+	"reloadTime": 110,
+	"coolantMultiplier": 0.8,
+	"shootCone": 40,
+	"shootDuration": 230,
+	"powerUse": 19,
+	"shootShake": 3,
+	"firingMoveFract": 0.2,
+	"shootEffect": "shootBigSmoke2",
+	"recoilAmount": 4,
+	"hasPower": true,
+	"shootSound": "laserbig",
+	"heatColor": "e04300",
+	"rotatespeed": 3.5,
+	"activeSound": "beam",
+	"activeSoundVolume": 2.2,
+	"hasLiquids": true,
+	"requirements": [
+		{ "item": "copper", "amount": 450 },
+		{ "item": "lead", "amount": 350 },
+		{ "item": "graphite", "amount": 390 },
+		{ "item": "silicon", "amount": 360 },
+		{ "item": "titanium", "amount": 250 },
+		{ "item": "umbrium", "amount": 370 },
+		{ "item": "surge-alloy", "amount": 360 }
+	],
+	"category": "turret"
+}
