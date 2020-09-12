@@ -1,0 +1,37 @@
+{
+	"outputItem": {"item": "terminum", "amount": 1},
+	"size": 6,
+	"hasLiquids": false,
+	"hasPower": true,
+	"hasItems": true,
+	"craftTime": 310,
+	"consumes": {
+		"power": 45.2,
+		"items": {
+			"items": [
+				{"item": "plague-alloy", "amount": 3},
+				{"item": "dark-alloy", "amount": 3},
+				{"item": "light-alloy", "amount": 3},
+				{"item": "advance-alloy", "amount": 3},
+				{"item": "monolith-alloy", "amount": 3},
+				{"item": "spark-alloy", "amount": 3}
+			]
+		}
+	},
+	"requirements": [
+		{"item": "lead", "amount": 810},
+		{"item": "graphite", "amount": 720},
+		{"item": "silicon", "amount": 520},
+		{"item": "phase-fabric", "amount": 430},
+		{"item": "surge-alloy", "amount": 320},
+		{"item": "plague-alloy", "amount": 120},
+		{"item": "dark-alloy", "amount": 120},
+		{"item": "light-alloy", "amount": 120},
+		{"item": "advance-alloy", "amount": 120},
+		{"item": "monolith-alloy", "amount": 120},
+		{"item": "spark-alloy", "amount": 120}
+	],
+	"category": "crafting",
+	"idleSound": "respawning",
+	"idleSoundVolume": 0.6
+}

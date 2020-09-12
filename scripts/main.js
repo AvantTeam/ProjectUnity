@@ -195,7 +195,19 @@ const script = [
 				]
 			}
 		]
-    }
+    },
+	
+	{
+		name: "end",
+		childs: [
+			{
+				name: "factories",
+				childs: [
+					"terminalcrucible"
+				]
+			}
+		]
+	}
 ];
 const loadedScript = loadFile([], script);
 for(var i = 0; i < loadedScript.res.length; i++){
