@@ -30,8 +30,8 @@ const lamp = lib.extend(GenericCrafter, GenericCrafter.GenericCrafterBuild, "lig
 });
 
 const oilLamp = lib.extend(GenericCrafter, GenericCrafter.GenericCrafterBuild, "oil-lamp", {
-  lightLength: 100,
-  lightStrength: 360,
+  lightLength: 150,
+  lightStrength: 750,
   angleConfig: true,
   //The original Block extension object.
   drawRequestRegion(req, list){
