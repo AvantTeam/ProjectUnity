@@ -83,11 +83,19 @@ laser.hitEffect = Fx.hitLiquid;
 
 const laserTurret = lib.extend(PowerTurret, PowerTurret.PowerTurretBuild, "laser-turret", {
     maxLevel: 10,
-    expFields: [{
-        type: "linear",
-        field: "reloadTime",
-        start: 35,
-        intensity: -2
-    }]
+    expFields: [
+        {
+            type: "linear",
+            field: "reloadTime",
+            start: 35,
+            intensity: -2
+        },
+        {
+            type: "bool",
+            field: "targetAir",
+            start: false,
+            intensity: 5
+        }
+    ]
 }, {});
 laserTurret.shootType = laser;
