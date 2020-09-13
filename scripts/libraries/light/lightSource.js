@@ -281,7 +281,7 @@ module.exports = {
 		});
 		//Extend Building
 		print("Prep Building: " + Object.keys(objb));
-		lightblock.entityType = ent => {
+		lightblock.buildType = ent => {
 			ent = extendContent(build, lightblock, clone(objb));
 			ent._angle = 0;
       ent._lightInit = false;

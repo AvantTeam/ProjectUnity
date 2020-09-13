@@ -233,7 +233,7 @@ module.exports = {
 		});
 		//Extend Building
 		print("Prep Building: " + Object.keys(objb));
-		expblock.entityType = ent => {
+		expblock.buildType = ent => {
 			ent = extendContent(build, expblock, clone(objb));
 			ent._exp = 0;
 			return ent;

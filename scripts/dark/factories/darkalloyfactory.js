@@ -6,11 +6,11 @@ const craftingEffect = new Effect(67, 35, e => {
 });
 
 const darkAlloyForge = extendContent(GenericSmelter, "dark-alloy-forge", {});
-darkAlloyForge.entityType = () => {
+darkAlloyForge.buildType = () => {
 	return extendContent(GenericSmelter.SmelterBuild, darkAlloyForge, {
 		updateTile(){
 			this.super$updateTile();
-			
+
 			if(this.consValid() && Mathf.chanceDelta(0.76)){
 				craftingEffect.at(this.getX(), this.getY(), Mathf.random(360));
 			}

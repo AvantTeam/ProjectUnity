@@ -14,16 +14,16 @@ const sparkAlloyForge = extendContent(GenericSmelter, "spark-alloy-forge", {});
 
 sparkAlloyForge.craftEffect = new Effect(30, e => {
 	Draw.color(Pal.surge);
-	
+
 	Lines.stroke(e.fslope());
 	Lines.circle(e.x, e.y, e.fin() * 20);
 });
 
-sparkAlloyForge.entityType = () => {
+sparkAlloyForge.buildType = () => {
 	return extendContent(GenericSmelter.SmelterBuild, sparkAlloyForge, {
 		updateTile(){
 			this.super$updateTile();
-			
+
 			if(this.consValid() && Mathf.chanceDelta(0.3)){
 				sparkCraftingEffect.at(this.getX(), this.getY(), Mathf.random(360));
 			}

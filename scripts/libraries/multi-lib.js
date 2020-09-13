@@ -632,7 +632,7 @@ module.exports = {
         const block = new MultiCrafterBlock();
         Object.assign(block, def);
         const multi = extendContent(Type, name, block);
-        multi.entityType = () => extendContent(GenericCrafter.GenericCrafterBuild, multi, Object.assign(new MultiCrafterBuild(), new ExtraEntityDef()));
+        multi.buildType = () => extendContent(GenericCrafter.GenericCrafterBuild, multi, Object.assign(new MultiCrafterBuild(), new ExtraEntityDef()));
         multi.consumes.add(extend(ConsumePower, {
             requestedPower(entity) {
                 if(typeof entity["getToggle"] !== "function") return 0;

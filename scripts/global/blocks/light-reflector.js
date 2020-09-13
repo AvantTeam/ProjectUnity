@@ -18,7 +18,7 @@ const reflector = extendContent(Block, "light-reflector", {
   }
 });
 
-reflector.entityType = () => {
+reflector.buildType = () => {
   return extend(Building, {
     calcReflection(dir){
       return ref1[this.rotation%2][dir];
@@ -45,7 +45,7 @@ const reflector90 = extendContent(Block, "light-reflector-1", {
   }
 });
 
-reflector90.entityType = () => {
+reflector90.buildType = () => {
   return extend(Building, {
     calcReflection(dir){
       return ref2[this.rotation%2][dir];
@@ -107,7 +107,7 @@ filter.configClear((build) => {
   build.setFilterColor(0);
 });
 
-filter.entityType = () => {
+filter.buildType = () => {
   const ent = extend(Building, {
     _color: 0,
     _cont: null,
@@ -230,7 +230,7 @@ filterInv.configClear((build) => {
   build.setFilterColor(0);
 });
 
-filterInv.entityType = () => {
+filterInv.buildType = () => {
   const ent = extend(Building, {
     _color: 0,
     _cont: null,
@@ -331,7 +331,7 @@ const divisor = extendContent(Block, "light-divisor", {
   }
 });
 
-divisor.entityType = () => {
+divisor.buildType = () => {
   return extend(Building, {
     calcReflection(dir){
       return ref1[this.rotation%2][dir];
@@ -358,7 +358,7 @@ const divisor90 = extendContent(Block, "light-divisor-1", {
   }
 });
 
-divisor90.entityType = () => {
+divisor90.buildType = () => {
   return extend(Building, {
     calcReflection(dir){
       return ref2[this.rotation%2][dir];
