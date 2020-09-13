@@ -43,6 +43,7 @@ const script = [
 					"lightConsumer", "lightCombiner", "lightRouter"
                 ]
             },
+			
 			"wormlib",
             "copterbase",
             "loader",
@@ -97,7 +98,10 @@ const script = [
                 childs: [
                     "burnade-test"
                 ]
-            }
+            },
+			
+			"planets",
+			"maps",
         ]
     },
 
@@ -111,6 +115,7 @@ const script = [
 					"catastrophe"
 				]
 			},
+			
 			{
 				name: "factories",
 				childs: [
@@ -182,12 +187,14 @@ const script = [
 					"monolithalloyfactory"
 				]
 			},
+			
 			{
 				name: "turrets",
 				childs: [
 					"oracle"
 				]
 			},
+			
 			{
 				name: "units",
 				childs: [
