@@ -29,34 +29,48 @@ const lamp = lib.extend(GenericCrafter, GenericCrafter.GenericCrafterBuild, "lig
   }
 });
 
-const lampInfi = lib.extend(GenericCrafter, GenericCrafter.GenericCrafterBuild, "light-lamp-infi", {
-  lightLength: 150,
-  lightStrength: 600000,
-  scaleStatus: false,
-  maxLightLength: 7500,
+const oilLamp = lib.extend(GenericCrafter, GenericCrafter.GenericCrafterBuild, "oil-lamp", {
+  lightLength: 100,
+  lightStrength: 360,
+  angleConfig: true,
   //The original Block extension object.
   drawRequestRegion(req, list){
-		const scl = Vars.tilesize * req.animScale;
+		const scl = Vars.tilesize * req.animScale * 3;
 		Draw.rect(this.baseRegion, req.drawx(), req.drawy(), scl, scl);
-    Draw.rect(this.topRegion, req.drawx(), req.drawy(), scl, scl, req.rotation*90);
+    //Draw.rect(this.topRegion, req.drawx(), req.drawy(), scl, scl, req.rotation*90);
 	},
+  drawRequestConfig(req, list){
+    this.drawRequestConfigTop(req, list);
+  },
+  drawRequestConfigTop(req, list){
+    //req.config
+    const scl = Vars.tilesize * req.animScale * 3;
+    Draw.rect(this.topRegion, req.drawx(), req.drawy(), scl, scl, (req.config == null)?0:req.config*45);
+  },
   load(){
     this.super$load();
     this.baseRegion = Core.atlas.find(this.name + "-base");
-    this.topRegion = Core.atlas.find(lamp.name + "-top");
-    this.lightRegion = Core.atlas.find("unity-light-center");
+    this.topRegion = Core.atlas.find(this.name + "-top");
+    this.liquidRegion = Core.atlas.find(this.name + "-liquid");
+    this.lightRegion = Core.atlas.find(this.name + "-light");
   }
 }, {
   //The original Building extension object.
   draw(){
     Draw.z(Layer.block);
-    Draw.rect(lampInfi.baseRegion, this.x, this.y);
-    if(this.lightPower() > lampInfi.lightStrength/2){
+    Draw.rect(oilLamp.baseRegion, this.x, this.y);
+    if(this.liquids.total() > 0.001){
+      Draw.color(Liquids.oil.color);
+      Draw.alpha(this.liquids.get(Liquids.oil) / oilLamp.liquidCapacity);
+      Draw.rect(oilLamp.liquidRegion, this.x, this.y);
+      Draw.color();
+    }
+    if(this.lightPower() > oilLamp.lightStrength/2){
       Draw.z(Layer.effect - 2);
-      Draw.rect(lampInfi.lightRegion, this.x, this.y);
+      Draw.rect(oilLamp.lightRegion, this.x, this.y);
     }
     Draw.z(Layer.effect + 2);
-    Draw.rect(lampInfi.topRegion, this.x, this.y, this.rotation*90);
+    Draw.rect(oilLamp.topRegion, this.x, this.y, this.getAngleDeg());
     Draw.reset();
   }
 });
@@ -87,6 +101,38 @@ const laser = lib.extend(GenericCrafter, GenericCrafter.GenericCrafterBuild, "li
     }
     Draw.z(Layer.effect + 2);
     Draw.rect(laser.topRegion, this.x, this.y, this.rotation*90);
+    Draw.reset();
+  }
+});
+
+const lampInfi = lib.extend(GenericCrafter, GenericCrafter.GenericCrafterBuild, "light-lamp-infi", {
+  lightLength: 150,
+  lightStrength: 600000,
+  scaleStatus: false,
+  maxLightLength: 7500,
+  //The original Block extension object.
+  drawRequestRegion(req, list){
+		const scl = Vars.tilesize * req.animScale;
+		Draw.rect(this.baseRegion, req.drawx(), req.drawy(), scl, scl);
+    Draw.rect(this.topRegion, req.drawx(), req.drawy(), scl, scl, req.rotation*90);
+	},
+  load(){
+    this.super$load();
+    this.baseRegion = Core.atlas.find(this.name + "-base");
+    this.topRegion = Core.atlas.find(lamp.name + "-top");
+    this.lightRegion = Core.atlas.find("unity-light-center");
+  }
+}, {
+  //The original Building extension object.
+  draw(){
+    Draw.z(Layer.block);
+    Draw.rect(lampInfi.baseRegion, this.x, this.y);
+    if(this.lightPower() > lampInfi.lightStrength/2){
+      Draw.z(Layer.effect - 2);
+      Draw.rect(lampInfi.lightRegion, this.x, this.y);
+    }
+    Draw.z(Layer.effect + 2);
+    Draw.rect(lampInfi.topRegion, this.x, this.y, this.rotation*90);
     Draw.reset();
   }
 });

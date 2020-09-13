@@ -1,5 +1,7 @@
 //light source, does all the calculations at placement and when any block has been placed.
 //calc method: first raytrace, then if updated check if block placement area(x, y) intersects with each straight line from the source(aka the theta is the same).
+const Integer = java.lang.Integer;
+
 
 const clone = obj => {
 	if(obj === null || typeof(obj) !== 'object')
@@ -61,9 +63,8 @@ module.exports = {
 		});
 		print("Created Block: " + Object.keys(obj));
 		const lightblock = extendContent(type, name, obj);
-		lightblock.configurable = lightblock.angleConfig;
+
     lightblock.reflowTimer = lightblock.timers++;
-    if(lightblock.angleConfig) lightblock.rotate = false;
     if(lightblock.size%2 == 0) print("[scarlet]Even - sized light blocks are not supported! Continue anyways?[]");
 
 		//lightblock.hasLevelFunction = (typeof objb["levelUp"] === "function");
@@ -99,6 +100,9 @@ module.exports = {
       setAngle(a){
         this._angle = a;
         this.lightMarchStart(lightblock.lightLength, lightblock.maxLightLength);
+      },
+      addAngle(a){
+        this.setAngle((this._angle + a + 8)%8);
       },
 
       lightData(){
@@ -228,7 +232,7 @@ module.exports = {
           furthest = Vars.world.tile(x, y);
           if(furthest == tile || furthest == null) return false;
           i++;
-          if(!furthest.solid()) return false;
+          if(!furthest.solid() || (furthest.block() == lightblock && tile == source.tile)) return false;
           if(furthest.bc() == null) return true;
           if(furthest.bc().block.lightReflector){
             //print("Light reflector!");
@@ -279,6 +283,31 @@ module.exports = {
         }
       }
 		});
+
+    if(lightblock.angleConfig){
+      lightblock.rotate = false;
+      lightblock.configurable = true;
+      lightblock.saveConfig = true;
+      lightblock.config(Integer, (build, value) => {
+      	build.addAngle(value);
+      });
+
+      objb =  Object.assign(objb, {
+        config(){
+          return new Integer(this._angle);
+        },
+        buildConfiguration(table){
+          table.button(Icon.leftOpen, Styles.clearTransi, 34, () => {
+            this.configure(new Integer(1));
+          }).size(40);
+          table.button(Icon.rightOpen, Styles.clearTransi, 34, () => {
+            this.configure(new Integer(-1));
+          }).size(40);
+        }
+      });
+    }
+
+
 		//Extend Building
 		print("Prep Building: " + Object.keys(objb));
 		lightblock.buildType = ent => {

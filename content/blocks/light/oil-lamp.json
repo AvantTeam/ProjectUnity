@@ -1,0 +1,22 @@
+{
+	"size": 3,
+	"health": 240,
+  "hasPower": true,
+  "consumesPower": true,
+  "hasLiquids": true,
+  "consumes": {
+    "power": 1.8,
+    "liquid": {
+			"liquid": "oil",
+			"amount": 0.1
+		}
+  },
+	"requirements": [
+		{"item": "lead", "amount": 20},
+		{"item": "metaglass", "amount": 20},
+    {"item": "titanium", "amount": 15}
+	],
+	"research": "light-lamp",
+  "rotate": false,
+  "category": "logic"
+}
