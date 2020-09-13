@@ -127,7 +127,7 @@ module.exports = {
 			updateTile(){
         this.setPower(this.targetStrength());
         if(!this.initDone()) this.lightMarchStart(lightblock.lightLength, lightblock.maxLightLength);
-        else if(this.timer.get(lightblock.reflowTimer, lightblock.lightInterval)){
+        else if(lightblock.lightInterval <= 0 || this.timer.get(lightblock.reflowTimer, lightblock.lightInterval)){
           if(this.lightPower() > 1) this.lightMarchStart(lightblock.lightLength, lightblock.maxLightLength);
           else this.clearCons();
         }
