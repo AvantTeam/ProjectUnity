@@ -56,6 +56,10 @@ module.exports = {
 			rootIncMul: [],
 			rootIncStart: [],
 
+      boolInc:[],
+      boolIncStart:[],
+      boolIncMul:[],
+
 			hasLevelFunction: false,
 			hasCustomUpdate: false
 			//end
@@ -100,6 +104,12 @@ module.exports = {
 				}else if(this.rootInc.length > 0){
 					this.rootEXP(tile, lvl);
 				};
+
+        if(this.boolInc.length == 1){
+					this[this.boolInc[0]] = (this.boolIncStart[0])?(lvl < this.boolIncMul[0]):(lvl >= this.boolIncMul[0]);
+				}else if(this.boolInc.length > 0){
+					this.boolEXP(tile, lvl);
+				};
 			},
 
 			linearEXP(tile, lvl){
@@ -117,6 +127,12 @@ module.exports = {
 			rootEXP(tile, lvl){
 				for(var i = 0; i < this.rootInc.length; i++){
 					this[this.rootInc[i]] = Math.max(this.rootIncStart[i] + Mathf.sqrt(this.rootIncMul[i] * lvl), 0);
+				};
+			},
+
+      boolEXP(tile, lvl){
+				for(var i = 0; i < this.boolInc.length; i++){
+					this[this.boolInc[i]] = (this.boolIncStart[i])?(lvl < this.boolIncMul[i]):(lvl >= this.boolIncMul[i]);
 				};
 			},
 
