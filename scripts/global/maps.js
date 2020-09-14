@@ -2,6 +2,8 @@ const mapAccretion = new JavaAdapter(SectorPreset, {}, "accretion", this.global.
 mapAccretion.alwaysUnlocked = true;
 mapAccretion.captureWave = 25;
 
+print(this.global.unity.planets.megalith.sectors.get(30));
+
 module.exports = {
 	accretion: mapAccretion
 };

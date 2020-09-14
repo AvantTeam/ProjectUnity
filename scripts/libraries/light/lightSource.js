@@ -61,7 +61,6 @@ module.exports = {
 			}
 			//end
 		});
-		print("Created Block: " + Object.keys(obj));
 		const lightblock = extendContent(type, name, obj);
 
     lightblock.reflowTimer = lightblock.timers++;
@@ -309,7 +308,6 @@ module.exports = {
 
 
 		//Extend Building
-		print("Prep Building: " + Object.keys(objb));
 		lightblock.buildType = ent => {
 			ent = extendContent(build, lightblock, clone(objb));
 			ent._angle = 0;

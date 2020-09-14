@@ -161,7 +161,6 @@ module.exports = {
 			}
 			//end
 		});
-		print("Created Block: " + Object.keys(obj));
 		const expblock = extendContent(type, name, obj);
 		expblock.maxExp = expblock.getRequiredEXP(expblock.maxLevel);
 
@@ -232,7 +231,6 @@ module.exports = {
 			}
 		});
 		//Extend Building
-		print("Prep Building: " + Object.keys(objb));
 		expblock.buildType = ent => {
 			ent = extendContent(build, expblock, clone(objb));
 			ent._exp = 0;
