@@ -25,7 +25,7 @@ const megalithGen = extend(PlanetGenerator, {
 		tile.floor = this.getBlock(pos);
 		tile.block = tile.floor.asFloor().wall;
 		
-		if(rid.getValue(pos.x, pos.y, pos.z, 22) > 0.32){
+		if(this.rid.getValue(pos.x, pos.y, pos.z, 22) > 0.32){
 			tile.block = Blocks.air;
 		};
 	},
