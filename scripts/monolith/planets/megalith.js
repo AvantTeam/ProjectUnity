@@ -263,8 +263,8 @@ megalithGen.rid = new Packages.arc.util.noise.RidgedPerlin(1, 2);
 megalithGen.basegen = new BaseGenerator();
 
 const megalith = new JavaAdapter(Planet, {}, "megalith", Planets.sun, 3, 1);
-megalith.generator = megalithGen;
 megalith.meshLoader = () => new HexMesh(megalith, 6);
+megalith.generator = megalithGen;
 megalith.atmosphereColor = Color.valueOf("0f3ad2");
 megalith.startSector = 30;
 

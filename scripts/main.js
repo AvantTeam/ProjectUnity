@@ -101,7 +101,7 @@ const script = [
             },
 			
 			"planets",
-			"maps",
+			"maps"
         ]
     },
 
