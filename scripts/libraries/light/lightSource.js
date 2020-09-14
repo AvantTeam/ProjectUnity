@@ -38,7 +38,7 @@ module.exports = {
       //whether to display angle configuration
       angleConfig: false,
       //The interval light is updated
-      lightInterval: 10,
+      lightInterval: 20,
       //defaults
       dirs: [[1,0], [1,1], [0,1], [-1,1], [-1,0], [-1,-1], [0,-1], [1,-1]],
       update: true,
