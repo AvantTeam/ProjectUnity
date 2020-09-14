@@ -240,22 +240,22 @@ const megalithGen = extend(PlanetGenerator, {
 });
 const b = Blocks;
 megalithGen.arr = [
-	[b.darksandWater, b.iceSnow, b.stone, b.snow, b.iceSnow, b.snow, b.iceSnow, b.snow, b.snow, b.iceSnow, b.ice, b.ice, b.ice],
-	[b.darksandWater, b.ice, b.snow, b.snow, b.iceSnow, b.stone, b.snow, b.iceSnow, b.snow, b.stone, b.iceSnow, b.ice, b.ice],
-	[b.water, b.darksandWater, b.darksand, b.stone, b.snow, b.snow, b.stone, b.snow, b.snow, b.snow, b.iceSnow, b.iceSnow, b.ice],
-	[b.water, b.darksandWater, b.darksandWater, b.stone, b.darksand, b.darksand, b.stone, b.snow, b.stone, b.snow, b.stone, b.snow, b.iceSnow],
+	[b.water, b.darksandWater, b.snow, b.snow, b.snow, b.snow, b.snow, b.iceSnow, b.iceSnow, b.iceSnow, b.iceSnow, b.ice, b.ice, b.ice, b.ice],
+	[b.water, b.darksandWater, b.darksand, b.stone, b.snow, b.snow, b.snow, b.snow, b.iceSnow, b.iceSnow, b.iceSnow, b.iceSnow, b.ice, b.ice, b.ice],
+	[b.water, b.water, b.darksandWater, b.darksand, b.darksand, b.stone, b.stone, b.snow, b.snow, b.iceSnow, b.iceSnow, b.iceSnow, b.iceSnow, b.ice, b.ice],
+	[b.water, b.water, b.darksandWater, b.darksand, b.darksand, b.darksand, b.stone, b.stone, b.stone, b.iceSnow, b.iceSnow, b.iceSnow, b.iceSnow, b.ice, b.ice],
 	
-	[b.deepwater, b.water, b.darksandWater, b.darksand, b.darksand, b.stone, b.stone, b.stone, b.stone, b.basalt, b.snow, b.snow, b.iceSnow],
-	[b.deepwater, b.water, b.darksandWater, b.stone, b.darksand, b.stone, b.stone, b.stone, b.basalt, b.basalt, b.stone, b.snow, b.snow],
-	[b.deepwater, b.water, b.darksandWater, b.darksand, b.stone, b.stone, b.basalt, b.stone, b.stone, b.basalt, b.stone, b.basalt, b.snow],
-	[b.deepwater, b.water, b.darksandWater, b.darksand, b.darksand, b.stone, b.basalt, b.stone, b.basalt, b.basalt, b.snow, b.snow, b.iceSnow],
+	[b.deepwater, b.water, b.darksandWater, b.darksand, b.darksand, b.darksand, b.stone, b.stone, b.stone, b.basalt, b.snow, b.snow, b.iceSnow, b.iceSnow, b.ice],
+	[b.deepwater, b.water, b.darksandWater, b.darksand, b.darksand, b.darksand, b.stone, b.stone, b.stone, b.basalt, b.basalt, b.snow, b.snow, b.iceSnow, b.ice],
+	[b.deepwater, b.water, b.darksandWater, b.darksand, b.darksand, b.darksand, b.stone, b.stone, b.stone, b.basalt, b.basalt, b.snow, b.snow, b.iceSnow, b.ice],
+	[b.deepwater, b.water, b.darksandWater, b.darksand, b.darksand, b.darksand, b.stone, b.stone, b.stone, b.basalt, b.snow, b.snow, b.iceSnow, b.iceSnow, b.ice],
 	
-	[b.water, b.darksandWater, b.darksandWater, b.darksand, b.darksand, b.stone, b.stone, b.snow, b.iceSnow, b.snow, b.snow, b.snow, b.iceSnow],
-	[b.water, b.darksandWater, b.darksand, b.stone, b.snow, b.snow, b.iceSnow, b.snow, b.snow, b.snow, b.iceSnow, b.stone, b.ice],
-	[b.darksandWater, b.ice, b.snow, b.snow, b.iceSnow, b.snow, b.stone, b.iceSnow, b.snow, b.stone, b.iceSnow, b.ice, b.ice],
-	[b.darksandWater, b.iceSnow, b.snow, b.snow, b.stone, b.snow, b.iceSnow, b.snow, b.snow, b.iceSnow, b.ice, b.ice, b.ice]
+	[b.water, b.water, b.darksandWater, b.darksand, b.darksand, b.darksand, b.stone, b.stone, b.stone, b.iceSnow, b.iceSnow, b.iceSnow, b.iceSnow, b.ice, b.ice],
+	[b.water, b.water, b.darksandWater, b.darksand, b.darksand, b.stone, b.stone, b.snow, b.snow, b.iceSnow, b.iceSnow, b.iceSnow, b.iceSnow, b.ice, b.ice],
+	[b.water, b.darksandWater, b.darksand, b.stone, b.snow, b.snow, b.snow, b.snow, b.iceSnow, b.iceSnow, b.iceSnow, b.iceSnow, b.ice, b.ice, b.ice],
+	[b.water, b.darksandWater, b.snow, b.snow, b.snow, b.snow, b.snow, b.iceSnow, b.iceSnow, b.iceSnow, b.iceSnow, b.ice, b.ice, b.ice, b.ice]
 ];
-megalithGen.water = megalithGen.water = 2 / megalithGen.arr[0].length;;
+megalithGen.water = 2 / megalithGen.arr[0].length;;
 megalithGen.simplex = new Packages.arc.util.noise.Simplex();
 megalithGen.waterOffset = 0.07;
 megalithGen.scl = 6;
