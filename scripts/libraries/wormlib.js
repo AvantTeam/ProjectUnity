@@ -11,7 +11,7 @@ var mainID = 3;
 const addMapping = provider => {
 	for(var i = 0; i < EntityMapping.idMap.length; i++){
 		if(EntityMapping.idMap[i] == undefined){
-			print("EntityMapping: (" + i + "): " + provider);
+			//print("EntityMapping: (" + i + "): " + provider);
 			EntityMapping.idMap[i] = provider;
 			break;
 		}
