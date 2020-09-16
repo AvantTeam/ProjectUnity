@@ -1,8 +1,22 @@
 //Segmented Unit Library. by Eye of Darkness.
-//UnitType must have the function: segmentRegionF, tailRegionF (TextureRegion) and segmentOffsetF (Number)
+//UnitType must have the function: segmentRegionF, tailRegionF (TextureRegion) and setTypeID, getTypeID segmentOffsetF (Number)
 //TODO: clean up, remove unnessasary functions, test controlling, segment weapons, collision, test damage, and serverside testing
 const tempVec1 = new Vec2();
 const tempVec2 = new Vec2();
+
+var segmentID = 3;
+
+var mainID = 3;
+
+const addMapping = provider => {
+	for(var i = 0; i < EntityMapping.idMap.length; i++){
+		if(EntityMapping.idMap[i] == undefined){
+			//print("EntityMapping: (" + i + "): " + provider);
+			EntityMapping.idMap[i] = provider;
+			break;
+		}
+	}
+};
 
 const setUndefined = (mount) => {
 	if(mount.reload == undefined) mount.reload = 0.0;
@@ -101,6 +115,20 @@ const segmentUnit = prov(() => {
 				if(this.getTrueParent().controller.unit() != this.getTrueParent().base()) this.getTrueParent().controller.unit(this.getTrueParent().base());
 			}
 		},
+		
+		isPlayer(){
+			if(this.getTrueParent() == null) return false;
+			return this.getTrueParent().controller instanceof Player;
+		},
+		
+		getPlayer(){
+			if(this.getTrueParent() == null) return null;
+			return this.isPlayer() ? this.getTrueParent().controller : null;
+		},
+		
+		classId(){
+			return segmentID;
+		},
 
 		heal(amount){
 			if(amount == undefined){
@@ -111,6 +139,12 @@ const segmentUnit = prov(() => {
 
 			this.health += amount;
 			this.clampHealth();
+		},
+		
+		kill(){
+			if(this.dead || Vars.net.client()) return;
+			if(this.getTrueParent() == null) Call.unitDeath(this.getTrueParent().id);
+			Call.unitDeath(this.id);
 		},
 
 		setSegmentType(val){
@@ -126,7 +160,7 @@ const segmentUnit = prov(() => {
 			for(var i = 0; i < this.mounts.length; i++){
 				var mount = this.mounts[i];
 				if(mount == null) continue;
-				print(mount);
+				//print(mount);
 				//setUndefined(mount);
 			}
 		},
@@ -314,151 +348,341 @@ const segmentUnit = prov(() => {
 	});
 });
 
+//EntityMapping.idMap.push(segmentUnit);
+addMapping(segmentUnit);
+
+segmentID = EntityMapping.idMap.indexOf(segmentUnit) != -1 ? EntityMapping.idMap.indexOf(segmentUnit) : 3;
+
+const defaultUnit = prov(s => {
+	s = extend(UnitEntity, {
+		getSegmentLength(){
+			return typeof(this.type.segmentLength) == "function" ? this.type.segmentLength() : 9;
+		},
+		setEffects(){
+			this._segmentUnits = [];
+			this._segments = [];
+			this._segmentVelocities = [];
+			this._lastVelocityC = new Vec2();
+			for(var i = 0; i < this.getSegmentLength(); i++){
+				this._segments[i] = new Vec2();
+				this._segmentVelocities[i] = new Vec2();
+			}
+		},
+		update(){
+			this._lastVelocityC.set(this.vel);
+			this.super$update();
+			this.updateSegmentVLocal(this._lastVelocityC);
+			this.updateSegmentsLocal();
+		},
+		updateSegmentVLocal(vec){
+			for(var j = 0; j < this.getSegmentLength(); j++){
+				var seg = this.getSegmentPositions();
+				var segV = this.getSegmentVelocities();
+				var segU = this.getSegments();
+
+				segV[j].limit(this.type.speed);
+
+				var angleB = j != 0 ? Angles.angle(seg[j].x, seg[j].y, seg[j - 1].x, seg[j - 1].y) : Angles.angle(seg[j].x, seg[j].y, this.x, this.y);
+				var velocity = j != 0 ? segV[j - 1].len() : vec.len();
+
+				var trueVel = Math.max(velocity, segV[j].len());
+
+				tempVec1.trns(angleB, trueVel);
+
+				segU[j].vel.set(tempVec1);
+				segV[j].add(tempVec1);
+				segV[j].setLength(trueVel);
+			}
+			for(var p = 0; p < this.getSegmentLength(); p++){
+				this.getSegmentVelocities()[p].scl(Time.delta);
+			}
+		},
+		updateSegmentsLocal(){
+			var segmentOffset = (typeof(this.type.segmentOffsetF) == "function") ? this.type.segmentOffsetF() : this.type.hitsize * 2;
+			tempVec1.trns(Angles.angle(this.getSegmentPositions()[0].x, this.getSegmentPositions()[0].y, this.x, this.y) + 180, segmentOffset);
+			tempVec1.add(this.x, this.y);
+			this.getSegmentPositions()[0].set(tempVec1);
+			for(var i = 1; i < this.getSegmentLength(); i++){
+				var seg = this.getSegmentPositions();
+
+				var angle = Angles.angle(seg[i].x, seg[i].y, seg[i - 1].x, seg[i - 1].y);
+				tempVec1.trns(angle, segmentOffset);
+				seg[i].set(seg[i - 1]);
+				seg[i].sub(tempVec1);
+			};
+			for(var v = 0; v < this.getSegmentLength(); v++){
+				var seg = this.getSegmentPositions();
+				var segV = this.getSegmentVelocities();
+				var segU = this.getSegments();
+
+				seg[v].add(segV[v]);
+				var angleD = v == 0 ? Angles.angle(seg[v].x, seg[v].y, this.x, this.y) : Angles.angle(seg[v].x, seg[v].y, seg[v - 1].x, seg[v - 1].y);
+				segV[v].scl(Mathf.clamp(1 - this.drag * Time.delta));
+				segU[v].set(seg[v].x, seg[v].y);
+				segU[v].rotation = angleD;
+				segU[v].updateCustom();
+			}
+		},
+		//TODO: save segment position
+		/*write(writes){
+			this.super$write(writes);
+
+			for(var i = 0; i < this.getSegmentLength(); i++){
+				writes.f(this.getSegmentPositions()[i].x);
+				writes.f(this.getSegmentPositions()[i].y);
+			}
+		},
+		read(reads){
+			this.super$read(reads);
+
+			for(var i = 0; i < this.getSegmentLength(); i++){
+				//if(this.getSegmentPositions()[i] == null) this.getSegmentPositions()[i] = new Vec2();
+				this.getSegmentPositions()[i].x = reads.f();
+				this.getSegmentPositions()[i].y = reads.f();
+			}
+		},*/
+		classId(){
+			return mainID;
+		},
+		clipSize(){
+			var segmentOffset = (typeof(this.type.segmentOffsetF) == "function") ? this.type.segmentOffsetF() : this.type.hitsize * 2;
+			return this.getSegmentLength() * segmentOffset * 2;
+		},
+
+		drawOcclusionC(){
+			for(var i = 0; i < this.getSegmentLength(); i++){
+				this.type.drawOcclusion(this.getSegments()[i]);
+			}
+		},
+
+		add(){
+			this.super$add();
+			
+			this.setEffects();
+
+			var parent = this;
+			for(var i = 0; i < this.getSegmentLength(); i++){
+				var typeS = i == this.getSegmentLength() - 1 ? 1 : 0;
+				this.getSegments()[i] = segmentUnit.get();
+				this.getSegments()[i].setSegmentType(typeS);
+				this.getSegments()[i].type = this.type;
+				this.getSegments()[i].controller = this.type.createController();
+				this.getSegments()[i].controller.unit(this.getSegments()[i]);
+				this.getSegments()[i].team = this.team;
+				this.getSegments()[i].setTrueParent(this);
+				this.getSegments()[i].setParent(parent);
+				this.getSegments()[i].add();
+				this.getSegments()[i].afterSync();
+				this.getSegments()[i].heal();
+				parent = this.getSegments()[i];
+			}
+		},
+		getSegments(){
+			return this._segmentUnits;
+		},
+
+		getSegmentPositions(){
+			return this._segments;
+		},
+
+		getSegmentVelocities(){
+			return this._segmentVelocities;
+		}
+	});
+	//s.setEffects();
+	return s;
+});
+
+//EntityMapping.idMap.push(defaultUnit);
+addMapping(defaultUnit);
+
+mainID = EntityMapping.idMap.indexOf(defaultUnit) != -1 ? EntityMapping.idMap.indexOf(defaultUnit) : 3;
+//print(mainID);
+
 module.exports = {
-	setUniversal(unitType, baseClass, obj){
+	//its recommended to set custom to false to not fill the EntityMapping array. only use for units with special effects
+	setUniversal(unitType, baseClass, custom, obj){
 		//unitType.segmentRegion = null;
 		//unitType.tailRegion = null;
 		//unitType.segmentRegionF = () => segmentRegion;
 		//unitType.tailRegionF = () => tailRegion;
-		obj = Object.assign({
-			getSegmentLength(){
-				return 9;
-			}
-		}, obj, {
-			setEffects(){
-				this._segmentUnits = [];
-				this._segments = [];
-				this._segmentVelocities = [];
-				this._lastVelocityC = new Vec2();
-				for(var i = 0; i < this.getSegmentLength(); i++){
-					this._segments[i] = new Vec2();
-					this._segmentVelocities[i] = new Vec2();
-					//this._segmentUnits[i] = segmentUnit.get();
-					//this._segmentUnits[i].setTrueParent(this);
+		if(custom){
+			obj = Object.assign({
+				getSegmentLength(){
+					return 9;
 				}
-			},
-			update(){
-				this._lastVelocityC.set(this.vel);
-				this.super$update();
-				this.updateSegmentVLocal(this._lastVelocityC);
-				this.updateSegmentsLocal();
-			},
-			updateSegmentVLocal(vec){
-				for(var j = 0; j < this.getSegmentLength(); j++){
-					var seg = this.getSegmentPositions();
-					var segV = this.getSegmentVelocities();
-					var segU = this.getSegments();
+			}, obj, {
+				setEffects(){
+					this._segmentUnits = [];
+					this._segments = [];
+					this._segmentVelocities = [];
+					this._lastVelocityC = new Vec2();
+					for(var i = 0; i < this.getSegmentLength(); i++){
+						this._segments[i] = new Vec2();
+						this._segmentVelocities[i] = new Vec2();
+						//this._segmentUnits[i] = segmentUnit.get();
+						//this._segmentUnits[i].setTrueParent(this);
+					}
+				},
+				update(){
+					this._lastVelocityC.set(this.vel);
+					this.super$update();
+					this.updateSegmentVLocal(this._lastVelocityC);
+					this.updateSegmentsLocal();
+				},
+				updateSegmentVLocal(vec){
+					for(var j = 0; j < this.getSegmentLength(); j++){
+						var seg = this.getSegmentPositions();
+						var segV = this.getSegmentVelocities();
+						var segU = this.getSegments();
 
-					segV[j].limit(this.type.speed);
+						segV[j].limit(this.type.speed);
 
-					var angleB = j != 0 ? Angles.angle(seg[j].x, seg[j].y, seg[j - 1].x, seg[j - 1].y) : Angles.angle(seg[j].x, seg[j].y, this.x, this.y);
-					var velocity = j != 0 ? segV[j - 1].len() : vec.len();
+						var angleB = j != 0 ? Angles.angle(seg[j].x, seg[j].y, seg[j - 1].x, seg[j - 1].y) : Angles.angle(seg[j].x, seg[j].y, this.x, this.y);
+						var velocity = j != 0 ? segV[j - 1].len() : vec.len();
 
-					var trueVel = Math.max(velocity, segV[j].len());
+						var trueVel = Math.max(velocity, segV[j].len());
 
-					tempVec1.trns(angleB, trueVel);
+						tempVec1.trns(angleB, trueVel);
 
-					segU[j].vel.set(tempVec1);
-					segV[j].add(tempVec1);
-					segV[j].setLength(trueVel);
+						segU[j].vel.set(tempVec1);
+						segV[j].add(tempVec1);
+						segV[j].setLength(trueVel);
+					}
+					for(var p = 0; p < this.getSegmentLength(); p++){
+						this.getSegmentVelocities()[p].scl(Time.delta);
+					}
+				},
+				updateSegmentsLocal(){
+					var segmentOffset = (typeof(this.type.segmentOffsetF) == "function") ? this.type.segmentOffsetF() : this.type.hitsize * 2;
+					tempVec1.trns(Angles.angle(this.getSegmentPositions()[0].x, this.getSegmentPositions()[0].y, this.x, this.y) + 180, segmentOffset);
+					tempVec1.add(this.x, this.y);
+					this.getSegmentPositions()[0].set(tempVec1);
+					for(var i = 1; i < this.getSegmentLength(); i++){
+						var seg = this.getSegmentPositions();
+	
+						var angle = Angles.angle(seg[i].x, seg[i].y, seg[i - 1].x, seg[i - 1].y);
+						tempVec1.trns(angle, segmentOffset);
+						seg[i].set(seg[i - 1]);
+						seg[i].sub(tempVec1);
+					};
+					for(var v = 0; v < this.getSegmentLength(); v++){
+						var seg = this.getSegmentPositions();
+						var segV = this.getSegmentVelocities();
+						var segU = this.getSegments();
+	
+						seg[v].add(segV[v]);
+						var angleD = v == 0 ? Angles.angle(seg[v].x, seg[v].y, this.x, this.y) : Angles.angle(seg[v].x, seg[v].y, seg[v - 1].x, seg[v - 1].y);
+						segV[v].scl(Mathf.clamp(1 - this.drag * Time.delta));
+						segU[v].set(seg[v].x, seg[v].y);
+						segU[v].rotation = angleD;
+						segU[v].updateCustom();
+					}
+				},
+				write(writes){
+					this.super$write(writes);
+	
+					for(var i = 0; i < this.getSegmentLength(); i++){
+						writes.f(this.getSegmentPositions()[i].x);
+						writes.f(this.getSegmentPositions()[i].y);
+					}
+				},
+				read(reads){
+					this.super$read(reads);
+	
+					for(var i = 0; i < this.getSegmentLength(); i++){
+						//if(this.getSegmentPositions()[i] == null) this.getSegmentPositions()[i] = new Vec2();
+						this.getSegmentPositions()[i].x = reads.f();
+						this.getSegmentPositions()[i].y = reads.f();
+					}
+				},
+				
+				clipSize(){
+					var segmentOffset = (typeof(this.type.segmentOffsetF) == "function") ? this.type.segmentOffsetF() : this.type.hitsize * 2;
+					return this.getSegmentLength() * segmentOffset * 2;
+				},
+	
+				drawOcclusionC(){
+					for(var i = 0; i < this.getSegmentLength(); i++){
+						this.type.drawOcclusion(this.getSegments()[i]);
+					}
+				},
+	
+				add(){
+					this.super$add();
+	
+					var parent = this;
+					for(var i = 0; i < this.getSegmentLength(); i++){
+						var typeS = i == this.getSegmentLength() - 1 ? 1 : 0;
+						this.getSegments()[i] = segmentUnit.get();
+						this.getSegments()[i].setSegmentType(typeS);
+						this.getSegments()[i].type = this.type;
+						this.getSegments()[i].controller = this.type.createController();
+						this.getSegments()[i].controller.unit(this.getSegments()[i]);
+						this.getSegments()[i].team = this.team;
+						this.getSegments()[i].setTrueParent(this);
+						this.getSegments()[i].setParent(parent);
+						this.getSegments()[i].add();
+						this.getSegments()[i].afterSync();
+						this.getSegments()[i].heal();
+						parent = this.getSegments()[i];
+					}
+				},
+				
+				classId(){
+					return (typeof(this.type.getTypeID) == "function") ? this.type.getTypeID() : this.super$classId();
+				},
+				
+				getSegments(){
+					return this._segmentUnits;
+				},
+	
+				getSegmentPositions(){
+					return this._segments;
+				},
+	
+				getSegmentVelocities(){
+					return this._segmentVelocities;
 				}
-				for(var p = 0; p < this.getSegmentLength(); p++){
-					this.getSegmentVelocities()[p].scl(Time.delta);
-				}
-			},
-			updateSegmentsLocal(){
-				var segmentOffset = (typeof(this.type.segmentOffsetF) == "function") ? this.type.segmentOffsetF() : this.type.hitsize * 2;
-				tempVec1.trns(Angles.angle(this.getSegmentPositions()[0].x, this.getSegmentPositions()[0].y, this.x, this.y) + 180, segmentOffset);
-				tempVec1.add(this.x, this.y);
-				this.getSegmentPositions()[0].set(tempVec1);
-				for(var i = 1; i < this.getSegmentLength(); i++){
-					var seg = this.getSegmentPositions();
-
-					var angle = Angles.angle(seg[i].x, seg[i].y, seg[i - 1].x, seg[i - 1].y);
-					tempVec1.trns(angle, segmentOffset);
-					seg[i].set(seg[i - 1]);
-					seg[i].sub(tempVec1);
-				};
-				for(var v = 0; v < this.getSegmentLength(); v++){
-					var seg = this.getSegmentPositions();
-					var segV = this.getSegmentVelocities();
-					var segU = this.getSegments();
-
-					seg[v].add(segV[v]);
-					var angleD = v == 0 ? Angles.angle(seg[v].x, seg[v].y, this.x, this.y) : Angles.angle(seg[v].x, seg[v].y, seg[v - 1].x, seg[v - 1].y);
-					segV[v].scl(Mathf.clamp(1 - this.drag * Time.delta));
-					segU[v].set(seg[v].x, seg[v].y);
-					segU[v].rotation = angleD;
-					segU[v].updateCustom();
-				}
-			},
-			//TODO: save segment position
-			/*write(writes){
-				this.super$write(writes);
-
-				for(var i = 0; i < this.getSegmentLength(); i++){
-					writes.f(this.getSegmentPositions()[i].x);
-					writes.f(this.getSegmentPositions()[i].y);
-				}
-			},
-			read(reads){
-				this.super$read(reads);
-
-				for(var i = 0; i < this.getSegmentLength(); i++){
-					if(this.getSegmentPositions[i] == null) this.getSegmentPositions[i] = new Vec2();
-					this.getSegmentPositions()[i].x = reads.f();
-					this.getSegmentPositions[i].y = reads.f();
-				}
-			},*/
-			clipSize(){
-				var segmentOffset = (typeof(this.type.segmentOffsetF) == "function") ? this.type.segmentOffsetF() : this.type.hitsize * 2;
-				return this.getSegmentLength() * segmentOffset * 2;
-			},
-
-			drawOcclusionC(){
-				for(var i = 0; i < this.getSegmentLength(); i++){
-					this.type.drawOcclusion(this.getSegments()[i]);
-				}
-			},
-
-			add(){
-				this.super$add();
-
-				var parent = this;
-				for(var i = 0; i < this.getSegmentLength(); i++){
-					var typeS = i == this.getSegmentLength() - 1 ? 1 : 0;
-					this.getSegments()[i] = segmentUnit.get();
-					this.getSegments()[i].setSegmentType(typeS);
-					this.getSegments()[i].type = this.type;
-					this.getSegments()[i].controller = this.type.createController();
-					this.getSegments()[i].controller.unit(this.getSegments()[i]);
-					this.getSegments()[i].team = this.team;
-					this.getSegments()[i].setTrueParent(this);
-					this.getSegments()[i].setParent(parent);
-					this.getSegments()[i].add();
-					this.getSegments()[i].afterSync();
-					this.getSegments()[i].heal();
-					parent = this.getSegments()[i];
-				}
-			},
-			getSegments(){
-				return this._segmentUnits;
-			},
-
-			getSegmentPositions(){
-				return this._segments;
-			},
-
-			getSegmentVelocities(){
-				return this._segmentVelocities;
-			}
-		});
-
-		unitType.constructor = prov(unit => {
-			unit = extend(baseClass, clone(obj));
-			unit.setEffects();
-			return unit;
-		});
+			});
+			
+			/*var sf = prov(unit => {
+				unit = extend(baseClass, clone(obj));
+				unit.setEffects();
+				return unit;
+			});
+			
+			EntityMapping.idMap.push(sf);
+			
+			var se = EntityMapping.idMap.indexOf(sf) != -1 ? EntityMapping.idMap.indexOf(sf) : 3;
+			
+			if(typeof(unitType.setTypeID) == "function") unitType.setTypeID(se);*/
+			
+			/*unitType.constructor = prov(unit => {
+				unit = extend(baseClass, clone(obj));
+				unit.setEffects();
+				return unit;
+			});*/
+			
+			unitType.constructor = prov(unit => {
+				unit = extend(baseClass, clone(obj));
+				unit.setEffects();
+				return unit;
+			});
+			
+			//EntityMapping.idMap.push(unitType.constructor);
+			addMapping(unitType.constructor);
+			
+			var se = EntityMapping.idMap.indexOf(unitType.constructor) != -1 ? EntityMapping.idMap.indexOf(unitType.constructor) : 3;
+			
+			if(typeof(unitType.setTypeID) == "function") unitType.setTypeID(se);
+		}else{
+			unitType.constructor = defaultUnit;
+		}
+	},
+	
+	addConstructor(provider){
+		addMapping(provider);
 	},
 	//called when finishing setting segment weapons
 	//currently unusable, uses the main unit type weapons instead.

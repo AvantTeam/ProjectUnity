@@ -22,6 +22,12 @@ const arcnelidiaType = extendContent(UnitType, "arcnelidia", {
 		this.segmentRegion = Core.atlas.find(this.name + "-segment");
 		this.tailRegion = Core.atlas.find(this.name + "-tail");
 	},
+	setTypeID(id){
+		this.idType = id;
+	},
+	getTypeID(){
+		return this.idType;
+	},
 	segmentOffsetF(){
 		return this.segmentOffset;
 	},
@@ -44,6 +50,7 @@ const arcnelidiaType = extendContent(UnitType, "arcnelidia", {
 		wormLib.drawOcclusionSegments(unit);
 	}
 });
+arcnelidiaType.idType = 3;
 arcnelidiaType.segmentOffset = 23;
 arcnelidiaType.weapons.add(aWLightning);
 arcnelidiaType.hitsize = 10;
@@ -58,4 +65,4 @@ arcnelidiaType.armor = 5;
 arcnelidiaType.flying = true;
 arcnelidiaType.visualElevation = 0.8;
 arcnelidiaType.range = 210;
-wormLib.setUniversal(arcnelidiaType, UnitEntity, {});
+wormLib.setUniversal(arcnelidiaType, UnitEntity, false, {});
