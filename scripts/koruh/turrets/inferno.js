@@ -18,7 +18,7 @@ const shootPyraBlaze = new Effect(32, e => {
 
 const coalBlaze = extend(BulletType, {
     hit(b, x, y){
-        this.super$hit(b, x, y);
+        this.super$hit(b, b.x, b.y);
         b.owner.incExp(0.5);
     }
 });
@@ -38,7 +38,7 @@ coalBlaze.hittable = false;
 
 const pyraBlaze = extend(BulletType, {
     hit(b, x, y){
-        this.super$hit(b, x, y);
+        this.super$hit(b, b.x, b.y);
         b.owner.incExp(0.5);
     }
 });

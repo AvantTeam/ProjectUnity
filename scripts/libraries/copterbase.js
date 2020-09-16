@@ -53,8 +53,8 @@ module.exports = {
 					var offx = Angles.trnsx(unit.rotation - 90, r.x, r.y);
 					var offy = Angles.trnsy(unit.rotation - 90, r.x, r.y);
 
-					var w = region.getWidth() * r.scale * Draw.scl;
-					var h = region.getHeight() * r.scale * Draw.scl;
+					var w = region.width * r.scale * Draw.scl;
+					var h = region.height * r.scale * Draw.scl;
 
 					for(var j = 0; j < r.bladeCount; j++){
 						var angle = ((unit.id * 24) + (Time.time() * r.speed) + ((360 / r.bladeCount) * j) + r.rotOffset) % 360;

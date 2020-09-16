@@ -37,7 +37,6 @@ elecBullet.damage = 3;
 elecBullet.shootEffect = Fx.hitLancer;
 
 const elecWeap = extendContent(Weapon, "unity-electron-shotgun", {});
-elecWeap.mirror = true;
 elecWeap.reload = 60;
 elecWeap.recoil = 2.5;
 elecWeap.x = 5.25;

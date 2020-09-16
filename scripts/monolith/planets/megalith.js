@@ -25,7 +25,7 @@ const megalithGen = extend(PlanetGenerator, {
 		tile.floor = this.getBlock(pos);
 		tile.block = tile.floor.asFloor().wall;
 		
-		if(rid.getValue(pos.x, pos.y, pos.z, 22) > 0.32){
+		if(this.rid.getValue(pos.x, pos.y, pos.z, 22) > 0.32){
 			tile.block = Blocks.air;
 		};
 	},
@@ -240,22 +240,22 @@ const megalithGen = extend(PlanetGenerator, {
 });
 const b = Blocks;
 megalithGen.arr = [
-	[b.darksandWater, b.iceSnow, b.stone, b.snow, b.iceSnow, b.snow, b.iceSnow, b.snow, b.snow, b.iceSnow, b.ice, b.ice, b.ice],
-	[b.darksandWater, b.ice, b.snow, b.snow, b.iceSnow, b.stone, b.snow, b.iceSnow, b.snow, b.stone, b.iceSnow, b.ice, b.ice],
-	[b.water, b.darksandWater, b.darksand, b.stone, b.snow, b.snow, b.stone, b.snow, b.snow, b.snow, b.iceSnow, b.iceSnow, b.ice],
-	[b.water, b.darksandWater, b.darksandWater, b.stone, b.darksand, b.darksand, b.stone, b.snow, b.stone, b.snow, b.stone, b.snow, b.iceSnow],
+	[b.water, b.darksandWater, b.snow, b.snow, b.snow, b.snow, b.snow, b.iceSnow, b.iceSnow, b.iceSnow, b.iceSnow, b.ice, b.ice, b.ice, b.ice],
+	[b.water, b.darksandWater, b.darksand, b.stone, b.snow, b.snow, b.snow, b.snow, b.iceSnow, b.iceSnow, b.iceSnow, b.iceSnow, b.ice, b.ice, b.ice],
+	[b.water, b.water, b.darksandWater, b.darksand, b.darksand, b.stone, b.stone, b.snow, b.snow, b.iceSnow, b.iceSnow, b.iceSnow, b.iceSnow, b.ice, b.ice],
+	[b.water, b.water, b.darksandWater, b.darksand, b.darksand, b.darksand, b.stone, b.stone, b.stone, b.iceSnow, b.iceSnow, b.iceSnow, b.iceSnow, b.ice, b.ice],
 	
-	[b.deepwater, b.water, b.darksandWater, b.darksand, b.darksand, b.stone, b.stone, b.stone, b.stone, b.basalt, b.snow, b.snow, b.iceSnow],
-	[b.deepwater, b.water, b.darksandWater, b.stone, b.darksand, b.stone, b.stone, b.stone, b.basalt, b.basalt, b.stone, b.snow, b.snow],
-	[b.deepwater, b.water, b.darksandWater, b.darksand, b.stone, b.stone, b.basalt, b.stone, b.stone, b.basalt, b.stone, b.basalt, b.snow],
-	[b.deepwater, b.water, b.darksandWater, b.darksand, b.darksand, b.stone, b.basalt, b.stone, b.basalt, b.basalt, b.snow, b.snow, b.iceSnow],
+	[b.deepwater, b.water, b.darksandWater, b.darksand, b.darksand, b.darksand, b.stone, b.stone, b.stone, b.basalt, b.snow, b.snow, b.iceSnow, b.iceSnow, b.ice],
+	[b.deepwater, b.water, b.darksandWater, b.darksand, b.darksand, b.darksand, b.stone, b.stone, b.stone, b.basalt, b.basalt, b.snow, b.snow, b.iceSnow, b.ice],
+	[b.deepwater, b.water, b.darksandWater, b.darksand, b.darksand, b.darksand, b.stone, b.stone, b.stone, b.basalt, b.basalt, b.snow, b.snow, b.iceSnow, b.ice],
+	[b.deepwater, b.water, b.darksandWater, b.darksand, b.darksand, b.darksand, b.stone, b.stone, b.stone, b.basalt, b.snow, b.snow, b.iceSnow, b.iceSnow, b.ice],
 	
-	[b.water, b.darksandWater, b.darksandWater, b.darksand, b.darksand, b.stone, b.stone, b.snow, b.iceSnow, b.snow, b.snow, b.snow, b.iceSnow],
-	[b.water, b.darksandWater, b.darksand, b.stone, b.snow, b.snow, b.iceSnow, b.snow, b.snow, b.snow, b.iceSnow, b.stone, b.ice],
-	[b.darksandWater, b.ice, b.snow, b.snow, b.iceSnow, b.snow, b.stone, b.iceSnow, b.snow, b.stone, b.iceSnow, b.ice, b.ice],
-	[b.darksandWater, b.iceSnow, b.snow, b.snow, b.stone, b.snow, b.iceSnow, b.snow, b.snow, b.iceSnow, b.ice, b.ice, b.ice]
+	[b.water, b.water, b.darksandWater, b.darksand, b.darksand, b.darksand, b.stone, b.stone, b.stone, b.iceSnow, b.iceSnow, b.iceSnow, b.iceSnow, b.ice, b.ice],
+	[b.water, b.water, b.darksandWater, b.darksand, b.darksand, b.stone, b.stone, b.snow, b.snow, b.iceSnow, b.iceSnow, b.iceSnow, b.iceSnow, b.ice, b.ice],
+	[b.water, b.darksandWater, b.darksand, b.stone, b.snow, b.snow, b.snow, b.snow, b.iceSnow, b.iceSnow, b.iceSnow, b.iceSnow, b.ice, b.ice, b.ice],
+	[b.water, b.darksandWater, b.snow, b.snow, b.snow, b.snow, b.snow, b.iceSnow, b.iceSnow, b.iceSnow, b.iceSnow, b.ice, b.ice, b.ice, b.ice]
 ];
-megalithGen.water = megalithGen.water = 2 / megalithGen.arr[0].length;;
+megalithGen.water = 2 / megalithGen.arr[0].length;;
 megalithGen.simplex = new Packages.arc.util.noise.Simplex();
 megalithGen.waterOffset = 0.07;
 megalithGen.scl = 6;
@@ -263,8 +263,8 @@ megalithGen.rid = new Packages.arc.util.noise.RidgedPerlin(1, 2);
 megalithGen.basegen = new BaseGenerator();
 
 const megalith = new JavaAdapter(Planet, {}, "megalith", Planets.sun, 3, 1);
-megalith.generator = megalithGen;
 megalith.meshLoader = () => new HexMesh(megalith, 6);
+megalith.generator = megalithGen;
 megalith.atmosphereColor = Color.valueOf("0f3ad2");
 megalith.startSector = 30;
 
