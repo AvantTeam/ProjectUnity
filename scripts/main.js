@@ -198,7 +198,7 @@ const script = [
 			{
 				name: "units",
 				childs: [
-					"electron"
+					"electron", "neutron"
 				]
 			}
 		]

@@ -1,0 +1,8 @@
+{
+	"speed": 0.42,
+	"hitsize": 11,
+	"health": 600,
+	"flying": false,
+	"armor": 3.5,
+	"rotateSpeed": 2.6
+}
