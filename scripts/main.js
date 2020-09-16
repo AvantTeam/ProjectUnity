@@ -220,7 +220,12 @@ const loadedScript = loadFile([], script);
 for(var i = 0; i < loadedScript.res.length; i++){
     var res = loadedScript.res[i];
     var name = loadedScript.fileNames[i];
-    this.global.unity[name] = require("unity/" + res);
+	try{
+		var content = require("unity/" + res);
+		if(typeof(content) !== "undefined"){
+			this.global.unity[name] = content;
+		};
+	};
 };
 
 if(!Vars.headless){
