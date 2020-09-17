@@ -18,17 +18,17 @@
 	"heatColor": "ffffff",
 	"rotatespeed": 1.1,
 	"activeSound": "phoenix-sound",
-	"activeSoundVolume": 5,
+	"activeSoundVolume": 2.4,
 	"expanded": true,
 	"requirements": [
-		{ "item": "copper", "amount": 1300 },
-		{ "item": "lead", "amount": 980 },
+		{ "item": "copper", "amount": 1250 },
+		{ "item": "lead", "amount": 1320 },
 		{ "item": "graphite", "amount": 1100 },
-		{ "item": "titanium", "amount": 750 },
-		{ "item": "surge-alloy", "amount": 960 },
-		{ "item": "silicon", "amount": 900 },
+		{ "item": "titanium", "amount": 1340 },
+		{ "item": "surge-alloy", "amount": 1240 },
+		{ "item": "silicon", "amount": 1350 },
 		{ "item": "thorium", "amount": 770 },
-		{ "item": "dark-alloy", "amount": 270 }
+		{ "item": "dark-alloy", "amount": 370 }
 	],
 	"category": "turret"
 }
