@@ -1,6 +1,6 @@
 this.global.unity = {};
 Vars.enableConsole = true;
-const loadFile = (prev, array) =>	{
+const loadFile = (prev, array) => {
     var results = [];
     var names = [];
 
@@ -13,14 +13,14 @@ const loadFile = (prev, array) =>	{
             p.push(file.name);
             var temp = loadFile(p, file.childs);
 
-			results = results.concat(temp.res);
+            results = results.concat(temp.res);
             names = names.concat(temp.fileNames);
 
-			p.pop();
+            p.pop();
         }else{
             var temp = p.join("/") + "/" + file;
 
-			results.push(temp);
+            results.push(temp);
             names.push(file);
         };
     };
@@ -39,20 +39,20 @@ const script = [
                 name: "light",
                 childs: [
                     "light",
-					"lightSource",
-					"lightConsumer", "lightCombiner", "lightRouter"
+                    "lightSource",
+                    "lightConsumer", "lightCombiner", "lightRouter"
                 ]
             },
-			
-			"wormlib",
+            
+            "wormlib",
             "copterbase",
             "loader",
             "chainlaser",
             "exp",
-			"multi-lib"
+            "multi-lib"
         ]
     },
-
+    
     {
         name: "global",
         childs: [
@@ -61,10 +61,10 @@ const script = [
                 childs: [
                     "recursivereconstructor",
 
-					"light-lamp", "light-reflector", "light-extra",
+                    "light-lamp", "light-reflector", "light-extra",
 
                     "walls",
-					"ores",
+                    "ores",
                     "multi-test-younggam"
                 ]
             },
@@ -99,43 +99,43 @@ const script = [
                     "burnade-test"
                 ]
             },
-			
-			"planets",
-			"maps"
+            
+            "planets",
+            "maps"
         ]
     },
 
-	{
+    {
         name: "dark",
         childs: [
-			{
-				name: "turrets",
-				childs: [
-					"fallout",
-					"catastrophe"
-				]
-			},
-			
-			{
-				name: "factories",
-				childs: [
-					"darkalloyfactory"
-				]
-			}
-		]
+            {
+                name: "turrets",
+                childs: [
+                    "fallout",
+                    "catastrophe"
+                ]
+            },
+            
+            {
+                name: "factories",
+                childs: [
+                    "darkalloyfactory"
+                ]
+            }
+        ]
     },
 
     {
         name: "imber",
         childs: [
-			{
-				name: "turrets",
-				childs: [
-					"orb",
-					"shockwire",
-					"plasma"
-				]
-			},
+            {
+                name: "turrets",
+                childs: [
+                    "orb",
+                    "shockwire",
+                    "plasma"
+                ]
+            },
 
             {
                 name: "factories",
@@ -144,95 +144,95 @@ const script = [
                 ]
             },
 
-			{
-				name: "units",
-				childs: [
-					"arcnelidia"
-				]
-			}
-		]
+            {
+                name: "units",
+                childs: [
+                    "arcnelidia"
+                ]
+            }
+        ]
     },
 
     {
         name: "koruh",
         childs: [
-			{
-				name: "turrets",
-				childs: [
-					"laser",
+            {
+                name: "turrets",
+                childs: [
+                    "laser",
                     "inferno"
-				]
-			}
-		]
+                ]
+            }
+        ]
     },
 
-	{
-		name: "light",
-		childs: [
-			{
-				name: "turrets",
-				childs: [
-					"reflector"
-				]
-			}
-		]
-	},
+    {
+        name: "light",
+        childs: [
+            {
+                name: "turrets",
+                childs: [
+                    "reflector"
+                ]
+            }
+        ]
+    },
 
     {
         name: "monolith",
         childs: [
-			{
-				name: "factories",
-				childs: [
-					"monolithalloyfactory"
-				]
-			},
-			
-			{
-				name: "turrets",
-				childs: [
-					"oracle"
-				]
-			},
-			
-			{
-				name: "units",
-				childs: [
-					"electron", "neutron"
-				]
-			}
-		]
+            {
+                name: "factories",
+                childs: [
+                    "monolithalloyfactory"
+                ]
+            },
+            
+            {
+                name: "turrets",
+                childs: [
+                    "oracle"
+                ]
+            },
+            
+            {
+                name: "units",
+                childs: [
+                    "electron", "neutron"
+                ]
+            }
+        ]
     },
-	
-	{
-		name: "end",
-		childs: [
-			{
-				name: "factories",
-				childs: [
-					"terminalcrucible"
-				]
-			}
-		]
-	}
+    
+    {
+        name: "end",
+        childs: [
+            {
+                name: "factories",
+                childs: [
+                    "terminalcrucible"
+                ]
+            }
+        ]
+    }
 ];
 const loadedScript = loadFile([], script);
 for(var i = 0; i < loadedScript.res.length; i++){
     var res = loadedScript.res[i];
     var name = loadedScript.fileNames[i];
-	try{
-		var content = require("unity/" + res);
-		if(typeof(content) !== "undefined"){
-			this.global.unity[name] = content;
-		};
-	}catch(e){};
+    try{
+        var content = require("unity/" + res);
+        if(typeof(content) !== "undefined"){
+            this.global.unity[name] = content;
+        };
+    }catch(e){};
 };
 
 if(!Vars.headless){
-	Core.app.post(() => {
-		var mod = Vars.mods.locateMod("unity");
-		var change = "mod."+ mod.meta.name + ".";
-		mod.meta.displayName = Core.bundle.get(change + "name");
-		mod.meta.description = Core.bundle.get(change + "description");
-	});
+    Core.app.post(() => {
+        var mod = Vars.mods.locateMod("unity");
+        var change = "mod."+ mod.meta.name + ".";
+        mod.meta.displayName = Core.bundle.get(change + "name");
+        mod.meta.description = Core.bundle.get(change + "description");
+    });
 };
