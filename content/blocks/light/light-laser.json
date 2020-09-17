@@ -11,7 +11,7 @@
     {"item": "silicon", "amount": 5},
     {"item": "titanium", "amount": 5}
 	],
-	"research": "light-lamp",
+	"buildVisibility": "sandboxOnly",
   "rotate": true,
   "category": "logic"
 }
