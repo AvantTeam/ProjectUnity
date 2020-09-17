@@ -122,9 +122,14 @@ module.exports = {
         return this.lightPower()/lightblock.lightStrength;
       },
 
+      getPowerStatus(){
+        if((!lightblock.hasPower) || this.power == null) return 1;
+        return this.power.status;
+      },
+
       targetStrength(){
         if(!this.cons.valid()) return 0;
-        return (lightblock.scaleStatus)?lightblock.lightStrength * this.power.status:lightblock.lightStrength;
+        return (lightblock.scaleStatus)?lightblock.lightStrength * this.getPowerStatus():lightblock.lightStrength;
       },
 
 			updateTile(){
@@ -152,7 +157,7 @@ module.exports = {
 
       drawLight(){
         //TODO make light draw on beams
-        Drawf.light(this.team, this.x, this.y, (this.lightPower()*0.1 + 60)*this.power.status, lightblock.lightColor, 0.8);
+        Drawf.light(this.team, this.x, this.y, (this.lightPower()*0.1 + 60)*this.getPowerStatus(), lightblock.lightColor, 0.8);
       },
 
       drawLightLasers(){
