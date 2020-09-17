@@ -2,7 +2,7 @@ const tmpCol = new Color();
 
 const pow6In = new Interp.PowIn(6);
 
-const catastropheLaser = extendContent(ContinuousLaserBulletType, 140, {
+const catastropheLaser = extendContent(ContinuousLaserBulletType, 240, {
 	update(b){
 		this.super$update(b);
 		

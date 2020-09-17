@@ -1,4 +1,4 @@
-const falloutLaser = extendContent(ContinuousLaserBulletType, 85, {
+const falloutLaser = extendContent(ContinuousLaserBulletType, 95, {
 	update(b){
 		this.super$update(b);
 		
