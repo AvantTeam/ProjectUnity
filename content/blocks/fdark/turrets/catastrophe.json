@@ -14,10 +14,8 @@
 	"cooldown": 0.012,
 	"hasPower": true,
 	"hasLiquids": true,
-	"shootSound": "laser-big-extended",
 	"heatColor": "ffffff",
 	"rotatespeed": 1.1,
-	"activeSound": "phoenix-sound",
 	"activeSoundVolume": 2.4,
 	"expanded": true,
 	"requirements": [

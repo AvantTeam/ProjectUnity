@@ -112,7 +112,8 @@ const script = [
                 name: "turrets",
                 childs: [
                     "fallout",
-                    "catastrophe"
+                    "catastrophe",
+					"calamity"
                 ]
             },
             
