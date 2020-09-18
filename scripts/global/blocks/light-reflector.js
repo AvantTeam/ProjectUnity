@@ -56,11 +56,78 @@ reflector90.buildType = () => {
   })
 }
 
+const h = [1, 1, 1, 1, 1, 1, 1, 1];//tmp
+const Integer = java.lang.Integer;
+const refomni = [ref[1], h, ref[2], h, ref[3], h, ref[0], h];
+
+const omnimirror = extendContent(Block, "light-omnimirror", {
+  drawRequestRegion(req, list) {
+		const scl = Vars.tilesize * req.animScale;
+		Draw.rect(this.baseRegion, req.drawx(), req.drawy(), scl, scl);
+	},
+  drawRequestConfig(req, list){
+    this.drawRequestConfigTop(req, list);
+  },
+  drawRequestConfigTop(req, list){
+    const scl = Vars.tilesize * req.animScale;
+    Draw.rect(this.topRegion, req.drawx(), req.drawy(), scl, scl, (req.config == null)?(0 + req.rotation*90):(req.config*22.5 + req.rotation*90));
+  },
+  load(){
+    this.super$load();
+    this.baseRegion = Core.atlas.find(this.name + "-base");
+    this.topRegion = Core.atlas.find(this.name + "-mirror");
+  },
+  lightReflector(){
+    return true;
+  }
+});
+omnimirror.config(Integer, (build, value) => {
+  build.addAngle(value);
+});
+omnimirror.buildType = () => {
+  const ent = extend(Building, {
+    _rotconf: 0,
+    addAngle(a){
+      this._rotconf += a;
+      this._rotconf = this._rotconf % 8;
+    },
+
+    calcReflection(dir){
+      return refomni[(this.rotation*4+this._rotconf)%8][dir];
+    },
+    draw(){
+      Draw.rect(omnimirror.baseRegion, this.x, this.y);
+      Draw.rect(omnimirror.topRegion, this.x, this.y, this._rotconf*22.5 + this.rotation*90);
+    },
+
+    config(){
+      return new Integer(this._rotconf);
+    },
+
+    buildConfiguration(table){
+      table.button(Icon.leftOpen, Styles.clearTransi, 34, () => {
+        this.configure(new Integer(1));
+      }).size(40);
+      table.button(Icon.rightOpen, Styles.clearTransi, 34, () => {
+        this.configure(new Integer(-1));
+      }).size(40);
+    },
+
+    read(stream, version){
+      this.super$read(stream, version);
+      this._rotconf = stream.b();
+    },
+    write(stream){
+      this.super$write(stream);
+      stream.b(this._rotconf % 8);
+    }
+  });
+  return ent;
+}
+
 
 const colors = [Color.white, Color.red, Color.green, Color.blue];
 const ncolors = [Color.black, Color.cyan, Color.magenta, Color.yellow];
-
-const Integer = java.lang.Integer;
 
 const filter = extendContent(Block, "light-filter", {
   drawRequestRegion(req, list) {
