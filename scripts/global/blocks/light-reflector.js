@@ -90,7 +90,7 @@ omnimirror.buildType = () => {
     _rotconf: 0,
     addAngle(a){
       this._rotconf += a;
-      this._rotconf = this._rotconf % 8;
+      this._rotconf = (this._rotconf%8 + 8) % 8;
     },
 
     calcReflection(dir){
