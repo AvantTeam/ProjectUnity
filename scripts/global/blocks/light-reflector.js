@@ -58,7 +58,7 @@ reflector90.buildType = () => {
 
 const h = [1, 1, 1, 1, 1, 1, 1, 1];//tmp
 const Integer = java.lang.Integer;
-const refomni = [ref[1], h, ref[2], h, ref[3], h, ref[0], h];
+const refomni = [ref[1], [1, 0, 7, 6, 5, 4, 3, 2], ref[2], [3, 2, 1, 0, 7, 6, 5, 4], ref[3], [5, 4, 3, 2, 1, 0, 7, 6], ref[0], [7, 6, 5, 4, 3, 2, 2, 0]];
 
 const omnimirror = extendContent(Block, "light-omnimirror", {
   drawRequestRegion(req, list) {
@@ -98,7 +98,9 @@ omnimirror.buildType = () => {
     },
     draw(){
       Draw.rect(omnimirror.baseRegion, this.x, this.y);
+      Draw.z(Layer.effect + 2);
       Draw.rect(omnimirror.topRegion, this.x, this.y, this._rotconf*22.5 + this.rotation*90);
+      Draw.reset();
     },
 
     config(){
