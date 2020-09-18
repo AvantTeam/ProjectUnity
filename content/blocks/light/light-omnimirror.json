@@ -1,0 +1,15 @@
+{
+	"size": 1,
+	"health": 80,
+  "update": true,
+  "category": "logic",
+	"requirements": [
+		{"item": "metaglass", "amount": 10},
+    {"item": "silicon", "amount": 5}
+	],
+	"research": "light-reflector-1",
+  "solid": true,
+  "rotate": true,
+  "configurable": true,
+  "saveConfig": true
+}
