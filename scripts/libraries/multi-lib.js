@@ -545,10 +545,14 @@ function MultiCrafterBlock() {
                 }
             }
         }
-        this.super$init();
+        if(!this.powerBarI) {
+            this.consumes.remove(ConsumeType.power);
+            this.hasPower = false;
+        }
         this.consumesPower = this.powerBarI;
         this.outputsPower = this.powerBarO;
-        this.consumers=new ConsumeItems(this.recs[1].input.items);
+        this.super$init();
+        if(!this._outputLiquidSet.isEmpty()) this.outputsLiquid = true;
         this.timers += 2;
         if(!Vars.headless) this.infoStyle = Core.scene.getStyle(Button.ButtonStyle);
     };
@@ -599,7 +603,7 @@ function MultiCrafterBlock() {
     };
     this.setStats = function() {
         this.super$setStats();
-        this.stats.remove(BlockStat.powerUse);
+        if(this.powerBarI) this.stats.remove(BlockStat.powerUse);
         this.stats.remove(BlockStat.productionTime);
     };
     this.setBars = function() {
@@ -607,12 +611,8 @@ function MultiCrafterBlock() {
         //initialize
         this.bars.remove("liquid");
         this.bars.remove("items");
-        if(!this.powerBarI) {
-            this.bars.remove("power");
-        }
-        if(this.powerBarO) {
-            this.bars.add("poweroutput", entity => new Bar(() => Core.bundle.format("bar.poweroutput", entity.getPowerProduction() * 60 * entity.timeScale), () => Pal.powerBar, () => typeof entity["getPowerStat"] === "function" ? entity.getPowerStat() : 0));
-        }
+        if(!this.powerBarI) this.bars.remove("power");
+        if(this.powerBarO) this.bars.add("poweroutput", entity => new Bar(() => Core.bundle.format("bar.poweroutput", entity.getPowerProduction() * 60 * entity.timeScale), () => Pal.powerBar, () => typeof entity["getPowerStat"] === "function" ? entity.getPowerStat() : 0));
         //display every Liquids that can contain
         var i = 0;
         if(!this._liquidSet.isEmpty()) {
