@@ -165,6 +165,8 @@ module.exports = {
         Draw.z(Layer.effect - 1);
         Draw.blend(Blending.additive);
 
+        const w = 1 + Math.min(this.lightPower()/1000, 10);
+        Lines.stroke(w);
         //var now = null;
         //var next = null;
         for(var i=0; i<this._ls.length; i++){
@@ -173,19 +175,25 @@ module.exports = {
           var a = this._lsData[i][1]/100*(this.lightPower()/lightblock.lightStrength);
           Draw.color(this._lsData[i][3], a);
           if(Core.settings.getBool("bloom")) Draw.z((a>0.99)?(Layer.effect - 1):(Layer.bullet - 2));
-          Lines.stroke(1 + Math.min(this.lightPower()/1000, 10));
+
           //now = this._ls[i];
           //next = this._ls[i+1];
           if(i == this._ls.length - 1 || this._ls[i+1] == null){
             //I'm sorry. okay?
-            Draw.alpha(a);
-            Lines.lineAngle(this._ls[i].worldx(), this._ls[i].worldy(), this._lsData[i][0]*45, this._lsData[i][2]*Vars.tilesize);
-            Draw.alpha(a*0.5);
+            //Draw.alpha(a);
+            //var scl = (this._lsData[i][0]%2==0)?Vars.tilesize:Vars.tilesize*1.414;
+            //Lines.lineAngle(this._ls[i].worldx(), this._ls[i].worldy(), this._lsData[i][0]*45, this._lsData[i][2]*scl);
+            /*Draw.alpha(a*0.5);
             Lines.lineAngle(this._ls[i].worldx(), this._ls[i].worldy(), this._lsData[i][2]*Vars.tilesize, this._lsData[i][0]*45, 4);
             Draw.alpha(a*0.25);
             Lines.lineAngle(this._ls[i].worldx(), this._ls[i].worldy(), this._lsData[i][2]*Vars.tilesize + 4, this._lsData[i][0]*45, 2);
             Draw.alpha(a*0.125);
-            Lines.lineAngle(this._ls[i].worldx(), this._ls[i].worldy(), this._lsData[i][2]*Vars.tilesize + 6, this._lsData[i][0]*45, 2);
+            Lines.lineAngle(this._ls[i].worldx(), this._ls[i].worldy(), this._lsData[i][2]*Vars.tilesize + 6, this._lsData[i][0]*45, 2);*/
+            if(this._lsData[i][2] < 1) continue;
+            Lines.line(this._ls[i].worldx(), this._ls[i].worldy(), this._ls[i].worldx() + (this._lsData[i][2]-1) * Vars.tilesize * lightblock.dirs[this._lsData[i][0]][0], this._ls[i].worldy() + (this._lsData[i][2]-1) * Vars.tilesize * lightblock.dirs[this._lsData[i][0]][1]);
+            //Draw.alpha(a*0.5);
+            const shift = (this._lsData[i][0]%2 == 0)? w/2 : w/2.8285;
+            Drawf.tri(this._ls[i].worldx() + ((this._lsData[i][2]-1) * Vars.tilesize + shift) * lightblock.dirs[this._lsData[i][0]][0], this._ls[i].worldy() + ((this._lsData[i][2]-1) * Vars.tilesize + shift) * lightblock.dirs[this._lsData[i][0]][1], w, (this._lsData[i][0]%2 == 0)?8:11.313, this._lsData[i][0]*45);
           }
           else{
             if(this._lsData[i+1] == null){

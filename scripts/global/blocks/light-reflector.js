@@ -94,7 +94,7 @@ omnimirror.buildType = () => {
     },
 
     calcReflection(dir){
-      return refomni[(this.rotation*4+this._rotconf)%8][dir];
+      return refomni[(this.rotation*4+this._rotconf+8)%8][dir];
     },
     draw(){
       Draw.rect(omnimirror.baseRegion, this.x, this.y);
