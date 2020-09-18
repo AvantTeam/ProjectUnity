@@ -38,12 +38,11 @@ const oilLamp = lib.extend(GenericCrafter, GenericCrafter.GenericCrafterBuild, "
 		const scl = Vars.tilesize * req.animScale * 3;
 		Draw.rect(this.baseRegion, req.drawx(), req.drawy(), scl, scl);
     //Draw.rect(this.topRegion, req.drawx(), req.drawy(), scl, scl, req.rotation*90);
+    if(req.config != null){
+      this.drawRequestConfig(req, list);
+    }
 	},
   drawRequestConfig(req, list){
-    this.drawRequestConfigTop(req, list);
-  },
-  drawRequestConfigTop(req, list){
-    //req.config
     const scl = Vars.tilesize * req.animScale * 3;
     Draw.rect(this.topRegion, req.drawx(), req.drawy(), scl, scl, (req.config == null)?0:req.config*45);
   },

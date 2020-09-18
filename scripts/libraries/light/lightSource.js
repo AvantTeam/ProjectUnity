@@ -292,6 +292,7 @@ module.exports = {
       lightblock.rotate = false;
       lightblock.configurable = true;
       lightblock.saveConfig = true;
+      lightblock.lastConfig = new Integer(0);
       lightblock.config(Integer, (build, value) => {
       	build.addAngle(value);
       });

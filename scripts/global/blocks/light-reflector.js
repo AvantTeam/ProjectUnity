@@ -64,11 +64,11 @@ const omnimirror = extendContent(Block, "light-omnimirror", {
   drawRequestRegion(req, list) {
 		const scl = Vars.tilesize * req.animScale;
 		Draw.rect(this.baseRegion, req.drawx(), req.drawy(), scl, scl);
+    if(req.config != null){
+      this.drawRequestConfig(req, list);
+    }
 	},
   drawRequestConfig(req, list){
-    this.drawRequestConfigTop(req, list);
-  },
-  drawRequestConfigTop(req, list){
     const scl = Vars.tilesize * req.animScale;
     Draw.rect(this.topRegion, req.drawx(), req.drawy(), scl, scl, (req.config == null)?(0 + req.rotation*90):(req.config*22.5 + req.rotation*90));
   },
@@ -81,6 +81,7 @@ const omnimirror = extendContent(Block, "light-omnimirror", {
     return true;
   }
 });
+omnimirror.lastConfig = new Integer(0);
 omnimirror.config(Integer, (build, value) => {
   build.addAngle(value);
 });
@@ -138,10 +139,18 @@ const filter = extendContent(Block, "light-filter", {
     Draw.rect(this.lightRegion, req.drawx(), req.drawy(), scl, scl);
     Draw.color();*/
     //rest in drawconfigwhatever
+    if(req.config != null){
+      this.drawRequestConfig(req, list);
+    }
 	},
   drawRequestConfig(req, list){
-    this.drawRequestConfigTop(req, list);
+    if(req.config == null) return;
+    const scl = Vars.tilesize * req.animScale;
+    Draw.color(colors[req.config], 0.7);
+    Draw.rect(this.lightRegion, req.drawx(), req.drawy(), scl, scl);
+    Draw.color();
   },
+  /*
   drawRequestConfigTop(req, list){
     //req.config
     if(req.config == null) return;
@@ -149,7 +158,7 @@ const filter = extendContent(Block, "light-filter", {
     Draw.color(colors[req.config], 0.7);
     Draw.rect(this.lightRegion, req.drawx(), req.drawy(), scl, scl);
     Draw.color();
-  },
+  },*/
   minimapColor(tile){
     return colors[tile.bc().getFilterColor()].rgba();
   },
@@ -262,17 +271,25 @@ const filterInv = extendContent(Block, "light-inverted-filter", {
   drawRequestRegion(req, list) {
 		const scl = Vars.tilesize * req.animScale;
 		Draw.rect(this.region, req.drawx(), req.drawy(), scl, scl);
+    if(req.config != null){
+      this.drawRequestConfig(req, list);
+    }
 	},
   drawRequestConfig(req, list){
-    this.drawRequestConfigTop(req, list);
-  },
-  drawRequestConfigTop(req, list){
     if(req.config == null) return;
     const scl = Vars.tilesize * req.animScale;
     Draw.color(colors[req.config], 0.7);
     Draw.rect(this.lightRegion, req.drawx(), req.drawy(), scl, scl);
     Draw.color();
   },
+  /*
+  drawRequestConfigTop(req, list){
+    if(req.config == null) return;
+    const scl = Vars.tilesize * req.animScale;
+    Draw.color(colors[req.config], 0.7);
+    Draw.rect(this.lightRegion, req.drawx(), req.drawy(), scl, scl);
+    Draw.color();
+  },*/
   minimapColor(tile){
     return ncolors[tile.bc().getFilterColor()].rgba();
   },
