@@ -1,5 +1,5 @@
 //Segmented Unit Library. by Eye of Darkness.
-//UnitType must have the function: segmentRegionF, tailRegionF (TextureRegion) and setTypeID, getTypeID segmentOffsetF (Number)
+//UnitType must have the function: segmentRegionF, tailRegionF (TextureRegion), setTypeID, getTypeID segmentOffsetF (Number) and getSegmentWeapon (Seq)
 //TODO: clean up, remove unnessasary functions, test controlling, segment weapons, collision, test damage, and serverside testing
 const tempVec1 = new Vec2();
 const tempVec2 = new Vec2();
@@ -18,7 +18,7 @@ const addMapping = provider => {
 	}
 };
 
-const setUndefined = (mount) => {
+const setUndefined = mount => {
 	if(mount.reload == undefined) mount.reload = 0.0;
 	if(mount.rotation == undefined) mount.rotation = 0.0;
 	if(mount.targetRotation == undefined) mount.targetRotation = 0.0;
@@ -26,6 +26,10 @@ const setUndefined = (mount) => {
 	if(mount.aimY == undefined) mount.aimY = 0.0;
 	if(mount.side == undefined) mount.side = false;
 };
+
+/*const drawWeaponsC = unitBase => {
+	
+};*/
 
 //sk's object cloner.
 const clone = obj => {
@@ -87,7 +91,8 @@ const segmentUnit = prov(() => {
 
 			this.added = false;
 
-			this.controller.removed(this.base());
+			//this.controller.removed(this.self());
+			this.controller.removed(this);
 
 			if(Vars.net.client()){
 				Vars.netClient.addRemovedEntity(this.id);
@@ -109,10 +114,10 @@ const segmentUnit = prov(() => {
 			if(next == undefined) return this.controller;
 			if(!(next instanceof Player)){
 				this.controller = next;
-				if(this.controller.unit() != this.base()) this.controller.unit(this.base());
+				if(this.controller.unit() != this) this.controller.unit(this);
 			}else if(this.getTrueParent() != null){
 				this.getTrueParent().controller = next;
-				if(this.getTrueParent().controller.unit() != this.getTrueParent().base()) this.getTrueParent().controller.unit(this.getTrueParent().base());
+				if(this.getTrueParent().controller.unit() != this.getTrueParent()) this.getTrueParent().controller.unit(this.getTrueParent());
 			}
 		},
 		
@@ -156,13 +161,29 @@ const segmentUnit = prov(() => {
 		},*/
 
 		setupWeapons(def){
-			this.super$setupWeapons(def);
-			for(var i = 0; i < this.mounts.length; i++){
+			if(!(typeof(def.getSegmentWeapon) == "function")){
+				this.super$setupWeapons(def);
+			}else{
+				//weapons must be sorted.
+				/*this.mounts = [];
+				//this.mounts = java.util.Arrays.copyOf(this.mounts, def.getSegmentWeapon().size);
+				for(var i = 0; i < def.getSegmentWeapon().size; i++){
+					this.mounts[i] = new WeaponMount(def.getSegmentWeapon().get(i));
+				};*/
+				var tmpSeq = new Seq();
+				
+				for(var i = 0; i < def.getSegmentWeapon().size; i++){
+					tmpSeq.add(new WeaponMount(def.getSegmentWeapon().get(i)));
+				};
+				
+				this.mounts = tmpSeq.toArray(WeaponMount);
+			};
+			/*for(var i = 0; i < this.mounts.length; i++){
 				var mount = this.mounts[i];
 				if(mount == null) continue;
 				//print(mount);
 				//setUndefined(mount);
-			}
+			}*/
 		},
 
 		setWeaponsB(weaponSeq){
@@ -364,7 +385,7 @@ const defaultUnit = prov(s => {
 			this._segmentVelocities = [];
 			this._lastVelocityC = new Vec2();
 			for(var i = 0; i < this.getSegmentLength(); i++){
-				this._segments[i] = new Vec2();
+				this._segments[i] = new Vec2(this.x, this.y);
 				this._segmentVelocities[i] = new Vec2();
 			}
 		},
@@ -464,6 +485,7 @@ const defaultUnit = prov(s => {
 			for(var i = 0; i < this.getSegmentLength(); i++){
 				var typeS = i == this.getSegmentLength() - 1 ? 1 : 0;
 				this.getSegments()[i] = segmentUnit.get();
+				this.getSegments()[i].elevation = this.elevation;
 				this.getSegments()[i].setSegmentType(typeS);
 				this.getSegments()[i].type = this.type;
 				this.getSegments()[i].controller = this.type.createController();
@@ -614,8 +636,10 @@ module.exports = {
 					var parent = this;
 					for(var i = 0; i < this.getSegmentLength(); i++){
 						var typeS = i == this.getSegmentLength() - 1 ? 1 : 0;
+						this.getSegmentPositions()[i].set(this.x, this.y);
 						this.getSegments()[i] = segmentUnit.get();
 						this.getSegments()[i].setSegmentType(typeS);
+						this.getSegments()[i].elevation = this.elevation;
 						this.getSegments()[i].type = this.type;
 						this.getSegments()[i].controller = this.type.createController();
 						this.getSegments()[i].controller.unit(this.getSegments()[i]);
@@ -684,8 +708,7 @@ module.exports = {
 	addConstructor(provider){
 		addMapping(provider);
 	},
-	//called when finishing setting segment weapons
-	//currently unusable, uses the main unit type weapons instead.
+	//called when finishing setting segment weapons.
 	sortWeapons(weaponSeq){
 		var mapped = new Seq();
 		for(var i = 0; i < weaponSeq.size; i++){
@@ -715,8 +738,9 @@ module.exports = {
 
 		if(typeof(unitBase.getSegmentLength) != "function") return;
 		for(var i = 0; i < unitBase.getSegmentLength(); i++){
-			Draw.z(originZ - ((i + 1) / 40));
+			Draw.z(originZ - ((i + 1) / 60));
 			unitBase.getSegments()[i].drawBodyC();
+			//drawWeaponsC(unitBase.getSegments()[i]);
 			unitBase.getSegments()[i].type.drawWeapons(unitBase.getSegments()[i]);
 		};
 

@@ -226,7 +226,9 @@ for(var i = 0; i < loadedScript.res.length; i++){
         if(typeof(content) !== "undefined"){
             this.global.unity[name] = content;
         };
-    }catch(e){};
+    }catch(e){
+		print(e);
+	};
 };
 
 if(!Vars.headless){
