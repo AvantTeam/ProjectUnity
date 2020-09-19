@@ -15,6 +15,16 @@ function MultiCrafterBuild() {
         if(!this.items.has(item)) this.toOutputItemSet.remove(item);
         return ret;
     };
+    this.handleItem = function(source, item) {
+        var current = this._toggle;
+        if((this.block.doDumpToggle() ? current > -1 && this.block.getRecipes()[current].output.items.some(a => a.item == item) : this.block.getOutputItemSet().contains(item)) && !this.items.has(item)) this.toOutputItemSet.add(item);
+        this.items.add(item, 1);
+    };
+    this.handleStack = function(item, amount, tile, source) {
+        var current = this._toggle;
+        if((this.block.doDumpToggle() ? current > -1 && this.block.getRecipes()[current].output.items.some(a => a.item == item) : this.block.getOutputItemSet().contains(item)) && !this.items.has(item)) this.toOutputItemSet.add(item);
+        this.items.add(item, amount);
+    }
     this.displayConsumption = function(table) {
         if(typeof this.block["getRecipes"] !== "function") return;
         const recs = this.block.getRecipes();
@@ -184,12 +194,6 @@ function MultiCrafterBuild() {
             this.items.each(item => this.itemHas++);
         }
         const recs = this.block.getRecipes();
-        if(!Vars.headless) {
-            var invIsShown = this.block.getInvFrag().isShown(),
-                configIsShown = Vars.control.input.frag.config.isShown();
-            if(!invIsShown && configIsShown && Vars.control.input.frag.config.getSelectedTile() == this) this.block.getInvFrag().showFor(this);
-            else if(invIsShown && !configIsShown) this.block.getInvFrag().hide();
-        }
         var recLen = recs.length;
         var current = this._toggle;
         //to not rewrite whole update
@@ -239,6 +243,7 @@ function MultiCrafterBuild() {
         var pos = Core.input.mouseScreen(this.x, this.y - this.block.size * 4 - 1).y;
         var relative = Core.input.mouseScreen(this.x, this.y + this.block.size * 4);
         table.setPosition(relative.x, Math.min(pos, relative.y - Math.ceil(this.itemHas / 3) * 48 - 4), Align.top);
+        if(!this.block.getInvFrag().isShown() && Vars.control.input.frag.config.getSelectedTile() == this && this.items.total() > 0) this.block.getInvFrag().showFor(this);
     };
     this.buildConfiguration = function(table) {
         if(typeof this.block["getRecipes"] !== "function") return;
@@ -339,7 +344,7 @@ function MultiCrafterBuild() {
     };
     this.onConfigureTileTapped = function(other) {
         if(this != other) this.block.getInvFrag().hide();
-        return true;
+        return this.items.total() > 0 ? true : this != other;
     };
     this.created = function() {
         var that = this;
