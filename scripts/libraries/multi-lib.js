@@ -37,6 +37,7 @@ function MultiCrafterBuild() {
         for(var i = 0; i < recLen; i++) {
             var items = recs[i].input.items;
             var liquids = recs[i].input.liquids;
+            if(!recs[i].output.items.every(a=>a.item.unlockedNow())||!recs[i].output.liquids.every(b=>b.liquid.unlockedNow())) continue;
             //아이템
             for(var j = 0, len = items.length; j < len; j++) {
                 (function(that, stack) {
@@ -259,10 +260,13 @@ function MultiCrafterBuild() {
         group.setMinCheckCount(0);
         group.setMaxCheckCount(1);
         var recLen = recs.length;
+        var exit=[];
         for(var i = 0; i < recLen; i++) {
             //representative images
             (function(i, that) {
                 var output = recs[i].output;
+                exit[i]=(!output.items.every(a=>a.item.unlockedNow())||!output.liquids.every(b=>b.liquid.unlockedNow()))
+                if(exit[i]) return;
                 var button = table.button(Tex.whiteui, Styles.clearToggleTransi, 40, () => that.configure(button.isChecked() ? i : -1)).group(group).get();
                 button.getStyle().imageUp = new TextureRegionDrawable(output.items.length > 0 ? output.items[0].item.icon(Cicon.small) : output.liquids.length > 0 ? output.liquids[0].liquid.icon(Cicon.small) : output.power > 0 ? Icon.power : Icon.cancel);
                 button.update(() => button.setChecked(that._toggle == i));
@@ -289,6 +293,7 @@ function MultiCrafterBuild() {
         }
         for(var i = 0; i < max; i++) {
             for(var j = 0; j < recLen; j++) {
+                if(exit[j]) continue;
                 var output = recs[j].output;
                 var outputItemLen = output.items.length;
                 var outputLiquidLen = output.liquids.length;
