@@ -239,7 +239,9 @@ if(!Vars.headless){
         mod.meta.description = Core.bundle.get(change + "description");
     });
     try{
-      Core.app.openURI("https://youtu.be/H01BwSD9eyQ");
+      if(Mathf.chance(0.05)) Core.app.openURI((Mathf.chance(0.7))?"https://youtu.be/dQw4w9WgXcQ":"https://youtu.be/H01BwSD9eyQ");
     }
-    catch(err){}
+    catch(err){
+        print(err);
+    }
 };
