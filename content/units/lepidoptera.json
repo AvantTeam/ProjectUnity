@@ -2,7 +2,7 @@
 	"speed": 3,
 	"drag": 0.07,
 	"accel": 0.03,
-	"fallSpeed": 0.001,
+	"fallSpeed": 0.003,
 	"health": 9500,
 	"engineSize": 0,
 	"flying": true,
