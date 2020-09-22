@@ -1,5 +1,5 @@
 //Segmented Unit Library. by Eye of Darkness.
-//UnitType must have the function: segmentRegionF, tailRegionF (TextureRegion), setTypeID, getTypeID segmentOffsetF (Number) and getSegmentWeapon (Seq)
+//UnitType must have the function: segmentRegionF, tailRegionF, getSegmentCellR (TextureRegion), setTypeID, getTypeID segmentOffsetF (Number) and getSegmentWeapon (Seq)
 //TODO: clean up, remove unnessasary functions, test controlling, segment weapons, collision, test damage, and serverside testing
 const tempVec1 = new Vec2();
 const tempVec2 = new Vec2();
@@ -212,6 +212,10 @@ const segmentUnit = prov(() => {
 				this.maxHealth = this.getTrueParent().maxHealth;
 				this.hitTime = this.getTrueParent().hitTime;
 			};
+			
+			if(this.team != this.getTrueParent().team){
+				this.team = this.getTrueParent().team;
+			};
 			//print(this.dead + ":" + this.deactivated);
 
 			if(!Vars.net.client() && !this.dead && !this.deactivated && this.controller != null){
@@ -328,7 +332,15 @@ const segmentUnit = prov(() => {
 			var region = this._segmentType == 0 ? this.type.segmentRegionF() : this.type.tailRegionF();
 
 			Draw.rect(region, this, this.rotation - 90);
+			
+			if(typeof(this.type.getSegmentCellR) == "function") this.drawCellC();
 
+			Draw.reset();
+		},
+		
+		drawCellC(){
+			Draw.color(this.type.cellColor(this));
+			Draw.rect(this.type.getSegmentCellR(), this.x, this.y, this.rotation - 90);
 			Draw.reset();
 		},
 

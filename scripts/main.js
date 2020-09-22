@@ -238,10 +238,10 @@ if(!Vars.headless){
         mod.meta.displayName = Core.bundle.get(change + "name");
         mod.meta.description = Core.bundle.get(change + "description");
     });
-    try{
-      if(Mathf.chance(0.05)) Core.app.openURI((Mathf.chance(0.7))?"https://youtu.be/dQw4w9WgXcQ":"https://youtu.be/H01BwSD9eyQ");
+    /*try{
+		if(Mathf.chance(0.05)) Core.app.openURI((Mathf.chance(0.7))?"https://youtu.be/dQw4w9WgXcQ":"https://youtu.be/H01BwSD9eyQ");
     }
     catch(err){
         print(err);
-    }
+    }*/
 };
