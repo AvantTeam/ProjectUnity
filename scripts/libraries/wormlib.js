@@ -141,7 +141,8 @@ const segmentUnit = prov(() => {
 				this.health = this.maxHealth;
 				return;
 			};
-
+			
+			if(this.getTrueParent() != null) this.getTrueParent().heal(amount);
 			this.health += amount;
 			this.clampHealth();
 		},
