@@ -211,6 +211,7 @@ const segmentUnit = prov(() => {
 				this.health = this.getTrueParent().health;
 				this.maxHealth = this.getTrueParent().maxHealth;
 				this.hitTime = this.getTrueParent().hitTime;
+				this.ammo = this.getTrueParent().ammo;
 			};
 			
 			if(this.team != this.getTrueParent().team){
@@ -295,6 +296,7 @@ const segmentUnit = prov(() => {
 					this.shoot(weapon, shootX, shootY, mount.aimX, mount.aimY, shootAngle, Mathf.sign(weapon.x));
 					mount.reload = weapon.reload;
 					this.ammo--;
+					if(this.getTrueParent() != null) this.getTrueParent().ammo -= 1;
 					if(this.ammo < 0) this.ammo = 0;
 				};
 			};
@@ -346,7 +348,7 @@ const segmentUnit = prov(() => {
 
 			Draw.rect(region, this, this.rotation - 90);
 			
-			if(typeof(this.type.getSegmentCellR) == "function") this.drawCellC();
+			if(typeof(this.type.getSegmentCellR) == "function" && this._segmentType == 0) this.drawCellC();
 
 			Draw.reset();
 		},
@@ -354,7 +356,6 @@ const segmentUnit = prov(() => {
 		drawCellC(){
 			Draw.color(this.type.cellColor(this));
 			Draw.rect(this.type.getSegmentCellR(), this.x, this.y, this.rotation - 90);
-			Draw.reset();
 		},
 
 		drawShadowC(){

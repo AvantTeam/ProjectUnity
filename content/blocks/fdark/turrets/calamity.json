@@ -15,7 +15,7 @@
 	"hasPower": true,
 	"hasLiquids": true,
 	"heatColor": "ffffff",
-	"rotatespeed": 0.97,
+	"rotateSpeed": 0.97,
 	"activeSoundVolume": 3,
 	"expanded": true,
 	"requirements": [

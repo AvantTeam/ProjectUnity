@@ -14,7 +14,7 @@
 	"hasPower": true,
 	"shootSound": "laserbig",
 	"heatColor": "e04300",
-	"rotatespeed": 3.5,
+	"rotateSpeed": 3.5,
 	"activeSound": "beam",
 	"activeSoundVolume": 2.2,
 	"hasLiquids": true,
