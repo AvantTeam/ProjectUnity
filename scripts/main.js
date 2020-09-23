@@ -43,7 +43,7 @@ const script = [
                     "lightConsumer", "lightCombiner", "lightRouter"
                 ]
             },
-            
+
             "wormlib",
             "copterbase",
             "loader",
@@ -52,7 +52,7 @@ const script = [
             "multi-lib"
         ]
     },
-    
+
     {
         name: "global",
         childs: [
@@ -99,7 +99,7 @@ const script = [
                     "burnade-test"
                 ]
             },
-            
+
             "planets",
             "maps"
         ]
@@ -116,7 +116,7 @@ const script = [
 					"calamity"
                 ]
             },
-            
+
             {
                 name: "factories",
                 childs: [
@@ -188,14 +188,14 @@ const script = [
                     "monolithalloyfactory"
                 ]
             },
-            
+
             {
                 name: "turrets",
                 childs: [
                     "oracle"
                 ]
             },
-            
+
             {
                 name: "units",
                 childs: [
@@ -204,7 +204,7 @@ const script = [
             }
         ]
     },
-    
+
     {
         name: "end",
         childs: [
@@ -238,4 +238,10 @@ if(!Vars.headless){
         mod.meta.displayName = Core.bundle.get(change + "name");
         mod.meta.description = Core.bundle.get(change + "description");
     });
+    /*try{
+		if(Mathf.chance(0.05)) Core.app.openURI((Mathf.chance(0.7))?"https://youtu.be/dQw4w9WgXcQ":"https://youtu.be/H01BwSD9eyQ");
+    }
+    catch(err){
+        print(err);
+    }*/
 };

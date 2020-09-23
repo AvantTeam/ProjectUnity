@@ -1,5 +1,5 @@
 //Segmented Unit Library. by Eye of Darkness.
-//UnitType must have the function: segmentRegionF, tailRegionF (TextureRegion), setTypeID, getTypeID segmentOffsetF (Number) and getSegmentWeapon (Seq)
+//UnitType must have the function: segmentRegionF, tailRegionF, getSegmentCellR (TextureRegion), setTypeID, getTypeID segmentOffsetF (Number) and getSegmentWeapon (Seq)
 //TODO: clean up, remove unnessasary functions, test controlling, segment weapons, collision, test damage, and serverside testing
 const tempVec1 = new Vec2();
 const tempVec2 = new Vec2();
@@ -212,6 +212,10 @@ const segmentUnit = prov(() => {
 				this.maxHealth = this.getTrueParent().maxHealth;
 				this.hitTime = this.getTrueParent().hitTime;
 			};
+			
+			if(this.team != this.getTrueParent().team){
+				this.team = this.getTrueParent().team;
+			};
 			//print(this.dead + ":" + this.deactivated);
 
 			if(!Vars.net.client() && !this.dead && !this.deactivated && this.controller != null){
@@ -241,46 +245,59 @@ const segmentUnit = prov(() => {
 			};
 			this.statuses.clear();
 		},
-
-		//pain
+		
+		//extra pain
 		updateWeaponsC(){
 			var can = this.canShoot();
+			
 			for(var i = 0; i < this.mounts.length; i++){
 				var mount = this.mounts[i];
 				if(mount == null) continue;
-
+				
 				var weapon = mount.weapon;
-				//print("PRINT:" + mount.reload + ":" + Time.delta + ":" + this.reloadMultiplier);
-				//setUndefined(mount);
 				mount.reload = Math.max(mount.reload - Time.delta * this.reloadMultiplier, 0);
-				if(weapon.otherSide != -1 && weapon.alternate && mount.side == weapon.flipSprite && mount.reload + Time.delta > weapon.reload / 2.0 && mount.reload <= weapon.reload / 2.0){
+				
+				var weaponRotation = (this.rotation - 90) + (weapon.rotate ? mount.rotation : 0);
+				var mountX = this.x + Angles.trnsx(this.rotation - 90, weapon.x, weapon.y);
+				var mountY = this.y + Angles.trnsy(this.rotation - 90, weapon.x, weapon.y);
+				var shootX = mountX + Angles.trnsx(weaponRotation, weapon.shootX, weapon.shootY);
+				var shootY = mountY + Angles.trnsy(weaponRotation, weapon.shootX, weapon.shootY);
+				var shootAngle = weapon.rotate ? weaponRotation + 90 : Angles.angle(shootX, shootY, mount.aimX, mount.aimY) + (this.rotation - this.angleTo(mount.aimX, mount.aimY));
+				
+				if(weapon.continuous && mount.bullet != null){
+					if(!mount.bullet.isAdded() || mount.bullet.time >= mount.bullet.lifetime){
+						mount.bullet = null;
+					}else{
+						mount.bullet.rotation(shootAngle);
+						mount.bullet.set(shootX, shootY);
+						this.vel.add(Tmp.v1.trns(shootAngle + 180, mount.bullet.type.recoil));
+					};
+				}else{
+					mount.heat = Math.max(mount.heat - Time.delta * this.reloadMultiplier / weapon.cooldownTime, 0);
+				};
+				
+				if(weapon.otherSide != -1 && weapon.alternate && mount.side == weapon.flipSprite && mount.reload + Time.delta > weapon.reload / 2 && mount.reload <= weapon.reload / 2){
 					this.mounts[weapon.otherSide].side = !(this.mounts[weapon.otherSide].side);
 					mount.side = !mount.side;
 				};
+				
 				if(weapon.rotate && (mount.rotate || mount.shoot) && can){
-					var axisX = this.x + Angles.trnsx(this.rotation - 90.0, weapon.x, weapon.y);
-					var axisY = this.y + Angles.trnsy(this.rotation - 90.0, weapon.x, weapon.y);
+					var axisX = this.x + Angles.trnsx(this.rotation - 90, weapon.x, weapon.y);
+					var axisY = this.y + Angles.trnsy(this.rotation - 90, weapon.x, weapon.y);
 					mount.targetRotation = Angles.angle(axisX, axisY, mount.aimX, mount.aimY) - this.rotation;
 					mount.rotation = Angles.moveToward(mount.rotation, mount.targetRotation, weapon.rotateSpeed * Time.delta);
 				}else if(!weapon.rotate){
-					mount.rotation = 0.0;
+					mount.rotation = 0;
 					mount.targetRotation = this.angleTo(mount.aimX, mount.aimY);
 				};
-				if(mount.shoot && can && (this.ammo > 0.0 || !Vars.state.rules.unitAmmo || this.team.rules().infiniteAmmo) && (!weapon.alternate || mount.side == weapon.flipSprite) && (this.vel.len() >= mount.weapon.minShootVelocity || (Vars.net.active() && !this.isLocal())) && mount.reload <= 0.0001 && Angles.within(weapon.rotate ? mount.rotation : this.rotation, mount.targetRotation, mount.weapon.shootCone)){
-					var rotation = this.rotation - 90.0;
-					var weaponRotation = rotation + (weapon.rotate ? mount.rotation : 0.0);
-					var mountX = this.x + Angles.trnsx(rotation, weapon.x, weapon.y);
-					var mountY = this.y + Angles.trnsy(rotation, weapon.x, weapon.y);
-					var shootX = mountX + Angles.trnsx(weaponRotation, weapon.shootX, weapon.shootY);
-					var shootY = mountY + Angles.trnsy(weaponRotation, weapon.shootX, weapon.shootY);
-
-					var shootAngle = weapon.rotate ? (weaponRotation + 90.0) : (Angles.angle(shootX, shootY, mount.aimX, mount.aimY) + this.rotation - this.angleTo(mount.aimX, mount.aimY));
+				
+				if(mount.shoot && can && (this.ammo > 0 || !Vars.state.rules.unitAmmo || this.team.rules().infiniteAmmo) && (!weapon.alternate || mount.side == weapon.flipSprite) && (this.vel.len() >= mount.weapon.minShootVelocity || (Vars.net.active() && !this.isLocal())) && mount.reload <= 0.0001 && Angles.within(weapon.rotate ? mount.rotation : this.rotation, mount.targetRotation, mount.weapon.shootCone)){
 					this.shoot(weapon, shootX, shootY, mount.aimX, mount.aimY, shootAngle, Mathf.sign(weapon.x));
 					mount.reload = weapon.reload;
 					this.ammo--;
-					if(this.ammo < 0.0) this.ammo = 0.0;
-				}
-			}
+					if(this.ammo < 0) this.ammo = 0;
+				};
+			};
 		},
 
 		shoot(weapon, x, y, aimX, aimY, rotation, side){
@@ -328,7 +345,15 @@ const segmentUnit = prov(() => {
 			var region = this._segmentType == 0 ? this.type.segmentRegionF() : this.type.tailRegionF();
 
 			Draw.rect(region, this, this.rotation - 90);
+			
+			if(typeof(this.type.getSegmentCellR) == "function") this.drawCellC();
 
+			Draw.reset();
+		},
+		
+		drawCellC(){
+			Draw.color(this.type.cellColor(this));
+			Draw.rect(this.type.getSegmentCellR(), this.x, this.y, this.rotation - 90);
 			Draw.reset();
 		},
 
