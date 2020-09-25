@@ -213,7 +213,14 @@ const script = [
                 childs: [
                     "terminalcrucible"
                 ]
-            }
+            },
+			
+			{
+				name: "units",
+				childs: [
+					"devourer"
+				]
+			}
         ]
     }
 ];

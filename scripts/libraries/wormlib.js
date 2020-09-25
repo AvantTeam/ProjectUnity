@@ -77,7 +77,7 @@ const segmentUnit = prov(() => {
 			this.maxHealth = type.health;
 			this.drag = type.drag;
 			this.armor = type.armor;
-			this.hitSize = type.hitsize;
+			this.hitSize = type.hitSize;
 			this.hovering = type.hovering;
 			if(this.controller == null) this.controller(type.createController());
 			if(this.mounts.length != type.weapons.size) this.setupWeapons(type);
@@ -333,7 +333,7 @@ const segmentUnit = prov(() => {
 						var qF = f;
 						var qIn = weapon.inaccuracy;
 						var qLf = lifeScl;
-						if(qAs.isAdded()) return;
+						if(!qAs.isAdded()) return;
 						qM.bullet = qAs.bullet(qW, qX, qY, qF + Mathf.range(qIn), qLf);
 					});
 					this._shootSequence++;
@@ -360,7 +360,7 @@ const segmentUnit = prov(() => {
 				this.vel.add(Tmp.v1.trns(rotation + 180, ammo.recoil));
 				Effect.shake(weapon.shake, weapon.shake, x, y);
 				mount.heat = 1;
-			}
+			};
 			var parentize = ammo.keepVelocity;
 			//Effect.shake(weapon.shake, weapon.shake, x, y);
 			weapon.ejectEffect.at(x, y, rotation * side);
@@ -392,7 +392,7 @@ const segmentUnit = prov(() => {
 		drawShadowC(){
 			var region = this._segmentType == 0 ? this.type.segmentRegionF() : this.type.tailRegionF();
 
-			Draw.color(UnitType.shadowColor);
+			Draw.color(Pal.shadow);
 
 			var e = Math.max(this.elevation, this.type.visualElevation);
 			Draw.rect(region, this.x + (UnitType.shadowTX * e), this.y + (UnitType.shadowTY * e), this.rotation - 90);
@@ -401,6 +401,12 @@ const segmentUnit = prov(() => {
 
 		draw(){
 
+		},
+		
+		collision(other, x, y){
+			this.super$collision(other, x, y);
+			
+			if(this.getTrueParent() != null) this.getTrueParent().handleCollisionC(this, other, x, y);
 		},
 
 		trueDraw(){
@@ -474,16 +480,17 @@ const defaultUnit = prov(s => {
 
 				tempVec1.trns(angleB, trueVel);
 
-				segU[j].vel.set(tempVec1);
+				//segU[j].vel.set(tempVec1);
 				segV[j].add(tempVec1);
 				segV[j].setLength(trueVel);
-			}
+				segU[j].vel.set(segV[j]);
+			};
 			for(var p = 0; p < this.getSegmentLength(); p++){
 				this.getSegmentVelocities()[p].scl(Time.delta);
 			}
 		},
 		updateSegmentsLocal(){
-			var segmentOffset = (typeof(this.type.segmentOffsetF) == "function") ? this.type.segmentOffsetF() : this.type.hitsize * 2;
+			var segmentOffset = (typeof(this.type.segmentOffsetF) == "function") ? this.type.segmentOffsetF() : this.type.hitSize * 2;
 			tempVec1.trns(Angles.angle(this.getSegmentPositions()[0].x, this.getSegmentPositions()[0].y, this.x, this.y) + 180, segmentOffset);
 			tempVec1.add(this.x, this.y);
 			this.getSegmentPositions()[0].set(tempVec1);
@@ -530,7 +537,7 @@ const defaultUnit = prov(s => {
 			return mainID;
 		},
 		clipSize(){
-			var segmentOffset = (typeof(this.type.segmentOffsetF) == "function") ? this.type.segmentOffsetF() : this.type.hitsize * 2;
+			var segmentOffset = (typeof(this.type.segmentOffsetF) == "function") ? this.type.segmentOffsetF() : this.type.hitSize * 2;
 			return this.getSegmentLength() * segmentOffset * 2;
 		},
 
@@ -577,6 +584,10 @@ const defaultUnit = prov(s => {
 
 		getSegmentVelocities(){
 			return this._segmentVelocities;
+		},
+		
+		handleCollisionC(originUnit, other, x, y){
+			
 		}
 	});
 	//s.setEffects();
@@ -598,6 +609,10 @@ module.exports = {
 		//unitType.tailRegionF = () => tailRegion;
 		if(custom){
 			obj = Object.assign({
+				handleCollisionC(originUnit, other, x, y){
+					
+				},
+				
 				getSegmentLength(){
 					return 9;
 				},
@@ -650,16 +665,17 @@ module.exports = {
 
 						tempVec1.trns(angleB, trueVel);
 
-						segU[j].vel.set(tempVec1);
+						//segU[j].vel.set(tempVec1);
 						segV[j].add(tempVec1);
 						segV[j].setLength(trueVel);
-					}
+						segU[j].vel.set(segV[j]);
+					};
 					for(var p = 0; p < this.getSegmentLength(); p++){
 						this.getSegmentVelocities()[p].scl(Time.delta);
 					}
 				},
 				updateSegmentsLocal(){
-					var segmentOffset = (typeof(this.type.segmentOffsetF) == "function") ? this.type.segmentOffsetF() : this.type.hitsize * 2;
+					var segmentOffset = (typeof(this.type.segmentOffsetF) == "function") ? this.type.segmentOffsetF() : this.type.hitSize * 2;
 					tempVec1.trns(Angles.angle(this.getSegmentPositions()[0].x, this.getSegmentPositions()[0].y, this.x, this.y) + 180, segmentOffset);
 					tempVec1.add(this.x, this.y);
 					this.getSegmentPositions()[0].set(tempVec1);
@@ -703,7 +719,7 @@ module.exports = {
 				},
 				
 				clipSize(){
-					var segmentOffset = (typeof(this.type.segmentOffsetF) == "function") ? this.type.segmentOffsetF() : this.type.hitsize * 2;
+					var segmentOffset = (typeof(this.type.segmentOffsetF) == "function") ? this.type.segmentOffsetF() : this.type.hitSize * 2;
 					return this.getSegmentLength() * segmentOffset * 2;
 				},
 	
