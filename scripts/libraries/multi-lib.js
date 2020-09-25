@@ -37,7 +37,7 @@ function MultiCrafterBuild() {
         for(var i = 0; i < recLen; i++) {
             var items = recs[i].input.items;
             var liquids = recs[i].input.liquids;
-            if(!recs[i].output.items.every(a=>a.item.unlockedNow())||!recs[i].output.liquids.every(b=>b.liquid.unlockedNow())) continue;
+            if(!recs[i].output.items.every(a => a.item.unlockedNow()) || !recs[i].output.liquids.every(b => b.liquid.unlockedNow())) continue;
             //아이템
             for(var j = 0, len = items.length; j < len; j++) {
                 (function(that, stack) {
@@ -260,12 +260,12 @@ function MultiCrafterBuild() {
         group.setMinCheckCount(0);
         group.setMaxCheckCount(1);
         var recLen = recs.length;
-        var exit=[];
+        var exit = [];
         for(var i = 0; i < recLen; i++) {
             //representative images
             (function(i, that) {
                 var output = recs[i].output;
-                exit[i]=(!output.items.every(a=>a.item.unlockedNow())||!output.liquids.every(b=>b.liquid.unlockedNow()))
+                exit[i] = (!output.items.every(a => a.item.unlockedNow()) || !output.liquids.every(b => b.liquid.unlockedNow()))
                 if(exit[i]) return;
                 var button = table.button(Tex.whiteui, Styles.clearToggleTransi, 40, () => that.configure(button.isChecked() ? i : -1)).group(group).get();
                 button.getStyle().imageUp = new TextureRegionDrawable(output.items.length > 0 ? output.items[0].item.icon(Cicon.small) : output.liquids.length > 0 ? output.liquids[0].liquid.icon(Cicon.small) : output.power > 0 ? Icon.power : Icon.cancel);
@@ -575,6 +575,8 @@ function MultiCrafterBlock() {
                 inputItems = rec.input.items;
             var outputLiquids = rec.output.liquids,
                 inputLiquids = rec.input.liquids;
+            var inputPower = rec.input.power,
+                outputPower = rec.output.power
             table.table(this.infoStyle.up, part => {
                 part.add("[accent]" + BlockStat.input.localized()).left().row();
                 part.table(cons(row => {
@@ -583,7 +585,7 @@ function MultiCrafterBlock() {
                 part.table(cons(row => {
                     for(var l = 0, len = inputLiquids.length; l < len; l++) row.add(new LiquidDisplay(inputLiquids[l].liquid, inputLiquids[l].amount, false));
                 })).left().row();
-                if(this.powerBarI) {
+                if(inputPower > 0) {
                     part.table(cons(row => {
                         row.add("[lightgray]" + BlockStat.powerUse.localized() + ":[]").padRight(4);
                         (new NumberValue(this.recs[i].input.power * 60, StatUnit.powerSecond)).display(row);
@@ -596,7 +598,7 @@ function MultiCrafterBlock() {
                 part.table(cons(row => {
                     for(var jj = 0, len = outputLiquids.length; jj < len; jj++) row.add(new LiquidDisplay(outputLiquids[jj].liquid, outputLiquids[jj].amount, false));
                 })).left().row();
-                if(this.powerBarO) {
+                if(outputPower > 0) {
                     part.table(cons(row => {
                         row.add("[lightgray]" + BlockStat.basePowerGeneration.localized() + ":[]").padRight(4);
                         (new NumberValue(this.recs[i].output.power * 60, StatUnit.powerSecond)).display(row);
