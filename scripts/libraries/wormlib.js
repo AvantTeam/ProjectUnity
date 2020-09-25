@@ -59,6 +59,8 @@ const segmentUnit = prov(() => {
 
 		add(){
 			if(this.added == true) return;
+			
+			this._isBugged = true;
 
 			Groups.all.add(this);
 			Groups.unit.add(this);
@@ -204,6 +206,14 @@ const segmentUnit = prov(() => {
 				this.deactivated = true;
 				this.dead = true;
 				this.remove();
+				return;
+			};
+			if(this.getTrueParent() != null && this._isBugged){
+				if(this.getTrueParent().getSegments().indexOf(this) == -1){
+					this.remove();
+				}else{
+					this._isBugged = false;
+				}
 			}
 		},
 
@@ -294,7 +304,7 @@ const segmentUnit = prov(() => {
 				};
 				
 				if(mount.shoot && can && (this.ammo > 0 || !Vars.state.rules.unitAmmo || this.team.rules().infiniteAmmo) && (!weapon.alternate || mount.side == weapon.flipSprite) && (this.vel.len() >= mount.weapon.minShootVelocity || (Vars.net.active() && !this.isLocal())) && mount.reload <= 0.0001 && Angles.within(weapon.rotate ? mount.rotation : this.rotation, mount.targetRotation, mount.weapon.shootCone)){
-					this.shoot(weapon, shootX, shootY, mount.aimX, mount.aimY, shootAngle, Mathf.sign(weapon.x));
+					this.shoot(mount, weapon, shootX, shootY, mount.aimX, mount.aimY, shootAngle, Mathf.sign(weapon.x));
 					mount.reload = weapon.reload;
 					this.ammo--;
 					if(this.getTrueParent() != null) this.getTrueParent().ammo -= 1;
@@ -302,44 +312,64 @@ const segmentUnit = prov(() => {
 				};
 			};
 		},
-
-		shoot(weapon, x, y, aimX, aimY, rotation, side){
+		
+		//Even more pain
+		shoot(mount, weapon, x, y, aimX, aimY, rotation, side){
 			weapon.shootSound.at(x, y, Mathf.random(0.8, 1.0));
 			var ammo = weapon.bullet;
 			var lifeScl = ammo.scaleVelocity ? Mathf.clamp(Mathf.dst(x, y, aimX, aimY) / ammo.range()) : 1.0;
 			//this.sequenceNum = 0;
 			this._shootSequence = 0;
 			var as = this;
-			if(weapon.shotDelay > 0.01){
+			if(weapon.shotDelay + weapon.firstShotDelay > 0.01){
 				Angles.shotgun(weapon.shots, weapon.spacing, rotation, f => {
-					Time.run(this._shootSequence * weapon.shotDelay, () => {
+					Time.run((this._shootSequence * weapon.shotDelay) + weapon.firstShotDelay, () => {
 						//to prevent it from redefining, hopefully.
 						var qAs = as;
 						var qW = weapon;
+						var qM = mount;
 						var qX = x;
 						var qY = y;
 						var qF = f;
 						var qIn = weapon.inaccuracy;
 						var qLf = lifeScl;
-						qAs.bullet(qW, qX, qY, qF + Mathf.range(qIn), qLf);
+						if(qAs.isAdded()) return;
+						qM.bullet = qAs.bullet(qW, qX, qY, qF + Mathf.range(qIn), qLf);
 					});
 					this._shootSequence++;
 				});
 			}else{
-				Angles.shotgun(weapon.shots, weapon.spacing, rotation, f => {as.bullet(weapon, x, y, f + Mathf.range(weapon.inaccuracy), lifeScl)});
+				Angles.shotgun(weapon.shots, weapon.spacing, rotation, f => {mount.bullet = as.bullet(weapon, x, y, f + Mathf.range(weapon.inaccuracy), lifeScl)});
 			};
-			if(this instanceof Velc){
+			/*if(this instanceof Velc){
 				this.vel.add(Tmp.v1.trns(rotation + 180.0, ammo.recoil));
-			};
+			};*/
+			if(weapon.firstShotDelay > 0){
+				Time.run(weapon.firstShotDelay, () => {
+					var qAs = as;
+					if(!qAs.isAdded()) return;
+					var qM = mount;
+					var qX = x;
+					var qY = y;
+
+					qAs.vel.add(Tmp.v1.trns(rotation + 180, qM.weapon.bullet.recoil));
+					Effect.shake(qM.weapon.shake, qM.weapon.shake, qX, qY);
+					mount.heat = 1;
+				});
+			}else{
+				this.vel.add(Tmp.v1.trns(rotation + 180, ammo.recoil));
+				Effect.shake(weapon.shake, weapon.shake, x, y);
+				mount.heat = 1;
+			}
 			var parentize = ammo.keepVelocity;
-			Effect.shake(weapon.shake, weapon.shake, x, y);
+			//Effect.shake(weapon.shake, weapon.shake, x, y);
 			weapon.ejectEffect.at(x, y, rotation * side);
 			ammo.shootEffect.at(x, y, rotation, parentize ? this : 0);
 			ammo.smokeEffect.at(x, y, rotation, parentize ? this : 0);
 		},
 
 		bullet(weapon, x, y, angle, lifescl){
-			weapon.bullet.create(this, this.team, x, y, angle, (1.0 - weapon.velocityRnd) + Mathf.random(weapon.velocityRnd), lifescl);
+			return weapon.bullet.create(this, this.team, x, y, angle, (1.0 - weapon.velocityRnd) + Mathf.random(weapon.velocityRnd), lifescl);
 		},
 
 		drawBodyC(){
@@ -411,12 +441,14 @@ const defaultUnit = prov(s => {
 			this._segments = [];
 			this._segmentVelocities = [];
 			this._lastVelocityC = new Vec2();
+			this._lastVelocityD = new Vec2();
 			for(var i = 0; i < this.getSegmentLength(); i++){
 				this._segments[i] = new Vec2(this.x, this.y);
 				this._segmentVelocities[i] = new Vec2();
 			}
 		},
 		update(){
+			this._lastVelocityD.set(this._lastVelocityC);
 			this._lastVelocityC.set(this.vel);
 			this.super$update();
 			this.updateSegmentVLocal(this._lastVelocityC);
@@ -432,8 +464,13 @@ const defaultUnit = prov(s => {
 
 				var angleB = j != 0 ? Angles.angle(seg[j].x, seg[j].y, seg[j - 1].x, seg[j - 1].y) : Angles.angle(seg[j].x, seg[j].y, this.x, this.y);
 				var velocity = j != 0 ? segV[j - 1].len() : vec.len();
-
-				var trueVel = Math.max(velocity, segV[j].len());
+				
+				//var trueVel = Math.max(velocity, segV[j].len()), this.vel.len();
+				tempVec2.set(this.vel);
+				tempVec2.add(vec);
+				tempVec2.add(this._lastVelocityD);
+				tempVec2.scl(1 / 3);
+				var trueVel = Math.max(Math.max(velocity, segV[j].len()), tempVec2.len());
 
 				tempVec1.trns(angleB, trueVel);
 
@@ -498,12 +535,16 @@ const defaultUnit = prov(s => {
 		},
 
 		drawOcclusionC(){
+			var originZ = Draw.z();
 			for(var i = 0; i < this.getSegmentLength(); i++){
+				Draw.z(originZ - ((i + 1) / 500));
 				this.type.drawOcclusion(this.getSegments()[i]);
-			}
+			};
+			Draw.z(originZ);
 		},
 
 		add(){
+			if(this.added == true) return;
 			this.super$add();
 			
 			this.setEffects();
@@ -559,6 +600,14 @@ module.exports = {
 			obj = Object.assign({
 				getSegmentLength(){
 					return 9;
+				},
+				
+				updateAlt(){
+					
+				},
+				
+				setEffectsAlt(){
+					
 				}
 			}, obj, {
 				setEffects(){
@@ -566,18 +615,20 @@ module.exports = {
 					this._segments = [];
 					this._segmentVelocities = [];
 					this._lastVelocityC = new Vec2();
+					this._lastVelocityD = new Vec2();
+					this.setEffectsAlt();
 					for(var i = 0; i < this.getSegmentLength(); i++){
 						this._segments[i] = new Vec2();
 						this._segmentVelocities[i] = new Vec2();
-						//this._segmentUnits[i] = segmentUnit.get();
-						//this._segmentUnits[i].setTrueParent(this);
 					}
 				},
 				update(){
+					this._lastVelocityD.set(this._lastVelocityC);
 					this._lastVelocityC.set(this.vel);
 					this.super$update();
 					this.updateSegmentVLocal(this._lastVelocityC);
 					this.updateSegmentsLocal();
+					this.updateAlt();
 				},
 				updateSegmentVLocal(vec){
 					for(var j = 0; j < this.getSegmentLength(); j++){
@@ -590,7 +641,12 @@ module.exports = {
 						var angleB = j != 0 ? Angles.angle(seg[j].x, seg[j].y, seg[j - 1].x, seg[j - 1].y) : Angles.angle(seg[j].x, seg[j].y, this.x, this.y);
 						var velocity = j != 0 ? segV[j - 1].len() : vec.len();
 
-						var trueVel = Math.max(velocity, segV[j].len());
+						//var trueVel = Math.max(velocity, segV[j].len());
+						tempVec2.set(this.vel);
+						tempVec2.add(vec);
+						tempVec2.add(this._lastVelocityD);
+						tempVec2.scl(1 / 3);
+						var trueVel = Math.max(Math.max(velocity, segV[j].len()), tempVec2.len());
 
 						tempVec1.trns(angleB, trueVel);
 
@@ -652,13 +708,22 @@ module.exports = {
 				},
 	
 				drawOcclusionC(){
-					for(var i = 0; i < this.getSegmentLength(); i++){
+					/*for(var i = 0; i < this.getSegmentLength(); i++){
 						this.type.drawOcclusion(this.getSegments()[i]);
-					}
+					}*/
+					var originZ = Draw.z();
+					for(var i = 0; i < this.getSegmentLength(); i++){
+						Draw.z(originZ - ((i + 1) / 500));
+						this.type.drawOcclusion(this.getSegments()[i]);
+					};
+					Draw.z(originZ);
 				},
 	
 				add(){
+					if(this.added == true) return;
 					this.super$add();
+					
+					//print("SSSSS");
 	
 					var parent = this;
 					for(var i = 0; i < this.getSegmentLength(); i++){
@@ -765,7 +830,7 @@ module.exports = {
 
 		if(typeof(unitBase.getSegmentLength) != "function") return;
 		for(var i = 0; i < unitBase.getSegmentLength(); i++){
-			Draw.z(originZ - ((i + 1) / 60));
+			Draw.z(originZ - ((i + 1) / 500));
 			unitBase.getSegments()[i].drawBodyC();
 			//drawWeaponsC(unitBase.getSegments()[i]);
 			unitBase.getSegments()[i].type.drawWeapons(unitBase.getSegments()[i]);
