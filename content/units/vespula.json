@@ -6,7 +6,7 @@
 	"health": 4000,
 	"engineSize": 0,
 	"flying": true,
-	"hitsize": 30,
+	"hitSize": 30,
 	"range": 165,
 	"lowAltitude": true,
 	"weapons": [

@@ -6,7 +6,7 @@
 	"health": 75,
 	"engineSize": 0,
 	"flying": true,
-	"hitsize": 12,
+	"hitSize": 12,
 	"range": 140,
 	"weapons": [
 		{

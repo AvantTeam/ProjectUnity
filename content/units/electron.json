@@ -1,6 +1,6 @@
 {
 	"speed": 0.5,
-	"hitsize": 8,
+	"hitSize": 8,
 	"health": 200,
 	"flying": false
 }

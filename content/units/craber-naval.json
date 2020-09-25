@@ -6,7 +6,7 @@
 	"accel": 0.26,
 	"baseRotateSpeed": 0.2,
 	"rotateSpeed": 1.6,
-	"hitsize": 16,
+	"hitSize": 16,
 	"armor": 2,
 	"immunities": [
 		"wet"

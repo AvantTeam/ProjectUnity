@@ -1,7 +1,7 @@
 {
 	"speed": 0.4,
 	"drag": 0.12,
-	"hitsize": 29,
+	"hitSize": 29,
 	"flying": false,
 	"hovering": true,
 	"allowLegStep": true,

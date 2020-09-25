@@ -3,7 +3,7 @@
 	"speed": 0.4,	
 	"health": 13000,	
 	"armor": 6.5,	
-	"hitsize": 28,	
+	"hitSize": 28,	
 	"flying": false,	
 	"hovering": true,	
 	"allowLegStep": true,	

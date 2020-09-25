@@ -1,7 +1,7 @@
 {
 	"drag": 0.1,
 	"speed": 0.4,
-	"hitsize": 34,
+	"hitSize": 34,
 	"health": 20000,
 	"legCount": 10,
 	"legMoveSpace": 0.7,

@@ -82,7 +82,7 @@ arcnelidiaType.segWeapSeq.add(aWLightningB);
 arcnelidiaType.idType = 3;
 arcnelidiaType.segmentOffset = 23;
 arcnelidiaType.weapons.add(aWLightning);
-arcnelidiaType.hitsize = 17;
+arcnelidiaType.hitSize = 17;
 arcnelidiaType.health = 800;
 arcnelidiaType.speed = 4;
 arcnelidiaType.accel = 0.035;
