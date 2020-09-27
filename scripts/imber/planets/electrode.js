@@ -240,20 +240,20 @@ const electrodeGen = extend(PlanetGenerator, {
 });
 const b = Blocks;
 electrodeGen.arr = [
-	[b.darksandWater, b.iceSnow, b.stone, b.snow, b.iceSnow, b.snow, b.iceSnow, b.snow, b.snow, b.iceSnow, b.ice, b.ice, b.ice],
-	[b.darksandWater, b.ice, b.snow, b.snow, b.iceSnow, b.stone, b.snow, b.iceSnow, b.snow, b.stone, b.iceSnow, b.ice, b.ice],
-	[b.water, b.darksandWater, b.darksand, b.stone, b.snow, b.snow, b.stone, b.snow, b.snow, b.snow, b.iceSnow, b.iceSnow, b.ice],
-	[b.water, b.darksandWater, b.darksandWater, b.stone, b.darksand, b.darksand, b.stone, b.snow, b.stone, b.snow, b.stone, b.snow, b.iceSnow],
+	[b.metalFloor2, b.metalFloorDamaged, b.darkMetal, b.deepwater, b.metalFloorDamaged, b.deepwater, b.metalFloorDamaged, b.deepwater, b.deepwater, b.metalFloorDamaged, b.ice, b.ice, b.ice],
+	[b.metalFloor2, b.ice, b.deepwater, b.deepwater, b.metalFloorDamaged, b.darkMetal, b.deepwater, b.metalFloorDamaged, b.deepwater, b.darkMetal, b.metalFloorDamaged, b.ice, b.ice],
+	[b.water, b.metalFloor2, b.darksand, b.darkMetal, b.deepwater, b.deepwater, b.darkMetal, b.deepwater, b.deepwater, b.deepwater, b.metalFloorDamaged, b.metalFloorDamaged, b.ice],
+	[b.water, b.metalFloor2, b.metalFloor2, b.darkMetal, b.darksand, b.darksand, b.darkMetal, b.deepwater, b.darkMetal, b.deepwater, b.darkMetal, b.deepwater, b.metalFloorDamaged],
 	
-	[b.deepwater, b.water, b.darksandWater, b.darksand, b.darksand, b.stone, b.stone, b.stone, b.stone, b.basalt, b.snow, b.snow, b.iceSnow],
-	[b.deepwater, b.water, b.darksandWater, b.stone, b.darksand, b.stone, b.stone, b.stone, b.basalt, b.basalt, b.stone, b.snow, b.snow],
-	[b.deepwater, b.water, b.darksandWater, b.darksand, b.stone, b.stone, b.basalt, b.stone, b.stone, b.basalt, b.stone, b.basalt, b.snow],
-	[b.deepwater, b.water, b.darksandWater, b.darksand, b.darksand, b.stone, b.basalt, b.stone, b.basalt, b.basalt, b.snow, b.snow, b.iceSnow],
+	[b.deepwater, b.water, b.metalFloor2, b.darksand, b.darksand, b.darkMetal, b.darkMetal, b.darkMetal, b.darkMetal, b.basalt, b.deepwater, b.deepwater, b.metalFloorDamaged],
+	[b.deepwater, b.water, b.metalFloor2, b.darkMetal, b.darksand, b.darkMetal, b.darkMetal, b.darkMetal, b.basalt, b.basalt, b.darkMetal, b.deepwater, b.deepwater],
+	[b.deepwater, b.water, b.metalFloor2, b.darksand, b.darkMetal, b.darkMetal, b.basalt, b.darkMetal, b.darkMetal, b.basalt, b.darkMetal, b.basalt, b.deepwater],
+	[b.deepwater, b.water, b.metalFloor2, b.darksand, b.darksand, b.darkMetal, b.basalt, b.darkMetal, b.basalt, b.basalt, b.deepwater, b.deepwater, b.metalFloorDamaged],
 	
-	[b.water, b.darksandWater, b.darksandWater, b.darksand, b.darksand, b.stone, b.stone, b.snow, b.iceSnow, b.snow, b.snow, b.snow, b.iceSnow],
-	[b.water, b.darksandWater, b.darksand, b.stone, b.snow, b.snow, b.iceSnow, b.snow, b.snow, b.snow, b.iceSnow, b.stone, b.ice],
-	[b.darksandWater, b.ice, b.snow, b.snow, b.iceSnow, b.snow, b.stone, b.iceSnow, b.snow, b.stone, b.iceSnow, b.ice, b.ice],
-	[b.darksandWater, b.iceSnow, b.snow, b.snow, b.stone, b.snow, b.iceSnow, b.snow, b.snow, b.iceSnow, b.ice, b.ice, b.ice]
+	[b.water, b.metalFloor2, b.metalFloor2, b.darksand, b.darksand, b.darkMetal, b.darkMetal, b.deepwater, b.metalFloorDamaged, b.deepwater, b.deepwater, b.deepwater, b.metalFloorDamaged],
+	[b.water, b.metalFloor2, b.darksand, b.darkMetal, b.deepwater, b.deepwater, b.metalFloorDamaged, b.deepwater, b.deepwater, b.deepwater, b.metalFloorDamaged, b.darkMetal, b.ice],
+	[b.metalFloor2, b.ice, b.deepwater, b.deepwater, b.metalFloorDamaged, b.deepwater, b.darkMetal, b.metalFloorDamaged, b.deepwater, b.darkMetal, b.metalFloorDamaged, b.ice, b.ice],
+	[b.metalFloor2, b.metalFloorDamaged, b.deepwater, b.deepwater, b.darkMetal, b.deepwater, b.metalFloorDamaged, b.deepwater, b.deepwater, b.metalFloorDamaged, b.ice, b.ice, b.ice]
 ];
 electrodeGen.water = electrodeGen.water = 2 / electrodeGen.arr[0].length;;
 electrodeGen.simplex = new Packages.arc.util.noise.Simplex();
@@ -265,7 +265,7 @@ electrodeGen.basegen = new BaseGenerator();
 const electrode = new JavaAdapter(Planet, {}, "electrode", Planets.sun, 3, 1);
 electrode.generator = electrodeGen;
 electrode.meshLoader = () => new HexMesh(electrode, 6);
-electrode.atmosphereColor = Color.valueOf("ffee59");
+electrode.atmosphereColor = Color.valueOf("d7de0d");
 electrode.startSector = 30;
 
 module.exports = electrode;
