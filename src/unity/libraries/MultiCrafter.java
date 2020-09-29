@@ -182,6 +182,7 @@ public class MultiCrafter extends GenericCrafter{
 		private boolean cond=false;
 		private boolean condValid=false;
 		public float productionEfficiency=0f;
+		public final ObjectSet toOutputItemSet=
 	}
 
 	class ExtraBlockInventoryFragment extends BlockInventoryFragment{
