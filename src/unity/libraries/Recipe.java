@@ -28,33 +28,23 @@ public class Recipe{
 		}
 
 		public InputContents(ItemStack[] items, LiquidStack[] liquids){
-			this.items = items;
-			this.liquids = liquids;
-			power = 0;
+			this(items, liquids, 0f);
 		}
 
 		public InputContents(ItemStack[] items){
-			this.items = items;
-			liquids = new LiquidStack[]{};
-			power = 0;
+			this(items, new LiquidStack[]{});
 		}
 
 		public InputContents(LiquidStack[] liquids){
-			items = with();
-			this.liquids = liquids;
-			power = 0;
+			this(with(), liquids);
 		}
 
 		public InputContents(float power){
-			items = with();
-			liquids = new LiquidStack[]{};
-			this.power = power;
+			this(with(), new LiquidStack[]{}, power);
 		}
 
 		public InputContents(){
-			items = with();
-			liquids = new LiquidStack[]{};
-			power = 0;
+			this(0f);
 		}
 	}
 
@@ -70,33 +60,23 @@ public class Recipe{
 		}
 
 		public OutputContents(ItemStack[] items, LiquidStack[] liquids){
-			this.items = items;
-			this.liquids = liquids;
-			power = 0;
+			this(items, liquids, 0f);
 		}
 
 		public OutputContents(ItemStack[] items){
-			this.items = items;
-			liquids = new LiquidStack[]{};
-			power = 0;
+			this(items, new LiquidStack[]{});
 		}
 
 		public OutputContents(LiquidStack[] liquids){
-			items = with();
-			this.liquids = liquids;
-			power = 0;
+			this(with(), liquids);
 		}
 
 		public OutputContents(float power){
-			items = with();
-			liquids = new LiquidStack[]{};
-			this.power = power;
+			this(with(), new LiquidStack[]{}, power);
 		}
 
 		public OutputContents(){
-			items = with();
-			liquids = new LiquidStack[]{};
-			power = 0;
+			this(0f);
 		}
 	}
 }
