@@ -25,12 +25,12 @@ import static mindustry.Vars.*;
 public class MultiCrafter extends GenericCrafter{
 	public final Recipe[] recs;
 	private ButtonStyle infoStyle = null;
-	private ObjectSet liquidSet = new ObjectSet();
+	private ObjectSet<Liquid> liquidSet = new ObjectSet();
 	private boolean hasOutputItem = false;
-	private ObjectSet inputItemSet = new ObjectSet();
-	private ObjectSet inputLiquidSet = new ObjectSet();
-	private ObjectSet outputItemSet = new ObjectSet();
-	private ObjectSet outputLiquidSet = new ObjectSet();
+	private ObjectSet<Item> inputItemSet = new ObjectSet();
+	private ObjectSet<Liquid> inputLiquidSet = new ObjectSet();
+	private ObjectSet<Item> outputItemSet = new ObjectSet();
+	private ObjectSet<Liquid> outputLiquidSet = new ObjectSet();
 	private boolean dumpToggle = false;
 	private boolean powerBarI = false;
 	private boolean powerBarO = false;
@@ -45,6 +45,8 @@ public class MultiCrafter extends GenericCrafter{
 		hasPower = false;
 		saveConfig = true;
 	}
+
+	public Recipe[] getRecipe(){ return recs; }
 
 	@Override
 	public void init(){
@@ -157,12 +159,10 @@ public class MultiCrafter extends GenericCrafter{
 				() -> bundle.format("bar.poweroutput",
 					Strings.fixed(entity.getPowerProduction() * 60 * entity.timeScale(), 1)),
 				() -> Pal.powerBar, () -> entity.productionEfficiency));
-		int i = 0;
 		if (!liquidSet.isEmpty()){
 			liquidSet.each(k -> {
-				bars.add("liquid" + i, entity -> new Bar(() -> k.localizedName, () -> k.barColor(),
+				bars.add(k.localizedName, entity -> new Bar(() -> k.localizedName, () -> k.barColor(),
 					() -> entity.liquids.get(k) / liquidCapacity));
-				i++;
 			});
 		}
 	}
@@ -178,11 +178,11 @@ public class MultiCrafter extends GenericCrafter{
 
 	public class MultiCrafterBuild extends GenericCrafterBuild{
 		private short toggle = 0;
-		private float[] progressArr=new float[recs.length];
-		private boolean cond=false;
-		private boolean condValid=false;
-		public float productionEfficiency=0f;
-		public final ObjectSet toOutputItemSet=
+		private float[] progressArr = new float[recs.length];
+		private boolean cond = false;
+		private boolean condValid = false;
+		public float productionEfficiency = 0f;
+		//public final ObjectSet toOutputItemSet=
 	}
 
 	class ExtraBlockInventoryFragment extends BlockInventoryFragment{
