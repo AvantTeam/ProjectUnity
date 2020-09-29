@@ -23,8 +23,6 @@ import static arc.Core.*;
 import static mindustry.Vars.*;
 import static mindustry.type.ItemStack.*;
 
-import com.google.common.base.Objects;
-
 public class MultiCrafter extends GenericCrafter{
 	public final Recipe[] recs;
 	private ButtonStyle infoStyle = null;
@@ -185,19 +183,19 @@ public class MultiCrafter extends GenericCrafter{
 		private boolean cond = false;
 		private boolean condValid = false;
 		public float productionEfficiency = 0f;
-		private OrderedSet<item> toOutputItemSet=new OrderedSet();
-		private OrderedSet<liquid> toOutputLiquidSet=new OrderedSet();
+		private OrderedSet<Item> toOutputItemSet=new OrderedSet();
+		private OrderedSet<Liquid> toOutputLiquidSet=new OrderedSet();
 		private int dumpItemEntry=0;
 		private int itemHas=0;
 		@Override
 		public boolean acceptItem(Building source,Item item) {
-			if(!block instanceof MultiCrafter) return false;
+			if(!(block instanceof MultiCrafter)) return false;
 			if(items.get(item)>=getMaximumAccepted(item)) return false;
 			return outputItemSet.contains(item);
 		}
 		@Override
 		public boolean acceptLiquid(Building source,Liquid liquid, float amount) {
-			if(!block instanceof MultiCrafter) return false;
+			if(!(block instanceof MultiCrafter)) return false;
 			if(liquids.get(liquid)+amount>block.liquidCapacity) return false;
 			return inputLiquidSet.contains(liquid);
 		}
