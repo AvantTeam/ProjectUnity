@@ -10,12 +10,12 @@ import mindustry.type.*;
 import unity.libraries.*;
 import unity.libraries.Recipe.*;
 
+import static mindustry.Vars.*;
 import static mindustry.type.ItemStack.*;
-
-import java.awt.event.ItemEvent;
 
 public class Main extends Mod{
 	public void init(){
+		enableConsole=true;
 		// Log.log(LogLevel.info,"[@]: @",,);
 	}
 
@@ -46,9 +46,9 @@ public class Main extends Mod{
 		terminum.radioactivity = 1.32f;
 		// normal
 		Item contagium = new Item("contagium", Color.valueOf("68985e"));
-		terminum.radioactivity = 0.7f;
-		terminum.hardness = 3;
-		terminum.cost = 1.5f;
+		contagium.radioactivity = 0.7f;
+		contagium.hardness = 3;
+		contagium.cost = 1.5f;
 		Item imberium = new Item("imberium", Color.valueOf("f6ff7d"));
 		imberium.radioactivity = 0.6f;
 		imberium.hardness = 3;
@@ -70,20 +70,38 @@ public class Main extends Mod{
 		xenium.radioactivity = 0.6f;
 		xenium.hardness = 2;
 		xenium.cost = 0.8f;
-		MultiCrafter a = new MultiCrafter("multi-test-1",
-			new Recipe[]{new Recipe(new InputContents(), new OutputContents(5.25f), 12),
-				new Recipe(
-					new InputContents(with(Items.coal, 1, Items.sand, 1),
-						new LiquidStack[]{new LiquidStack(Liquids.water, 5)}, 1),
-					new OutputContents(new LiquidStack[]{new LiquidStack(Liquids.slag, 5)}), 60),
-				new Recipe(
-					new InputContents(with(Items.pyratite, 1, Items.blastCompound, 1),
-						new LiquidStack[]{new LiquidStack(Liquids.water, 5)}, 1),
-					new OutputContents(with(Items.scrap, 1, Items.plastanium, 2, Items.sporePod, 2),
-						new LiquidStack[]{new LiquidStack(Liquids.oil, 5)}),
-					72),}){
-			{
+		MultiCrafter a = new MultiCrafter("multi-test-1", new Recipe[]{
+			// 1
+			new Recipe(new InputContents(), new OutputContents(5.25f), 12),
+			// 2
+			new Recipe(
+				new InputContents(with(Items.coal, 1, Items.sand, 1),
+					new LiquidStack[]{new LiquidStack(Liquids.water, 5)}, 1),
+				new OutputContents(new LiquidStack[]{new LiquidStack(Liquids.slag, 5)}), 60),
+			// 3
+			new Recipe(
+				new InputContents(with(Items.pyratite, 1, Items.blastCompound, 1),
+					new LiquidStack[]{new LiquidStack(Liquids.water, 5)}, 1),
+				new OutputContents(with(Items.scrap, 1, Items.plastanium, 2, Items.sporePod, 2),
+					new LiquidStack[]{new LiquidStack(Liquids.oil, 5)}),
+				72),
+			// 4
+			new Recipe(new InputContents(with(Items.sand, 1)), new OutputContents(with(Items.silicon, 1)), 30),
+			// 5
+			new Recipe(new InputContents(with(Items.sand, 1, Items.lead, 2),
+				new LiquidStack[]{new LiquidStack(Liquids.water, 5)}), new OutputContents(with(contagium, 1)), 12),
+			// 6
+			new Recipe(
+				new InputContents(with(Items.coal, 1, Items.sand, 1),
+					new LiquidStack[]{new LiquidStack(Liquids.water, 5)}, 1),
+				new OutputContents(with(Items.thorium, 1, Items.surgealloy, 1),
+					new LiquidStack[]{new LiquidStack(Liquids.slag, 5)}),
+				60),
 
+		}){
+			{
+				requirements(Category.crafting, with(Items.copper, 10));
+				size = 3;
 			}
 		};
 		Log.log(LogLevel.info, "[@]: @", a.name, String.valueOf(a.recs[1].output.items.length));
