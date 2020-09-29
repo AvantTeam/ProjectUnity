@@ -23,7 +23,7 @@ public class UnityBlocks implements ContentList{
 	
 	@Override
 	public void load(){
-		oreUmbrium = new OreBlock(xenium){{
+		oreUmbrium = new OreBlock(umbrium){{
 			oreScale = 23.77f;
 			oreThreshold = 0.813f;
 			oreDefault = true;
