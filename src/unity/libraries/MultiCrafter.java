@@ -21,6 +21,7 @@ import unity.libraries.Recipe.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
+import static mindustry.type.ItemStack.*;
 
 public class MultiCrafter extends GenericCrafter{
 	public final Recipe[] recs;
