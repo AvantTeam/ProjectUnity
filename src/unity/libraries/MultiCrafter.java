@@ -18,6 +18,7 @@ import mindustry.world.consumers.ConsumePower;
 import mindustry.ui.*;
 import mindustry.ui.fragments.BlockInventoryFragment;
 import unity.libraries.Recipe.*;
+import java.util.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
@@ -183,32 +184,49 @@ public class MultiCrafter extends GenericCrafter{
 		private boolean cond = false;
 		private boolean condValid = false;
 		public float productionEfficiency = 0f;
-		private OrderedSet<Item> toOutputItemSet=new OrderedSet();
-		private OrderedSet<Liquid> toOutputLiquidSet=new OrderedSet();
-		private int dumpItemEntry=0;
-		private int itemHas=0;
+		private OrderedSet<Item> toOutputItemSet = new OrderedSet();
+		private OrderedSet<Liquid> toOutputLiquidSet = new OrderedSet();
+		private int dumpItemEntry = 0;
+		private int itemHas = 0;
+
 		@Override
-		public boolean acceptItem(Building source,Item item) {
-			if(!(block instanceof MultiCrafter)) return false;
-			if(items.get(item)>=getMaximumAccepted(item)) return false;
-			return outputItemSet.contains(item);
+		public boolean acceptItem(Building source, Item item){
+			if (!(block instanceof MultiCrafter)) return false;
+			if (items.get(item) >= getMaximumAccepted(item)) return false;
+			return inputItemSet.contains(item);
 		}
+
 		@Override
-		public boolean acceptLiquid(Building source,Liquid liquid, float amount) {
-			if(!(block instanceof MultiCrafter)) return false;
-			if(liquids.get(liquid)+amount>block.liquidCapacity) return false;
+		public boolean acceptLiquid(Building source, Liquid liquid, float amount){
+			if (!(block instanceof MultiCrafter)) return false;
+			if (liquids.get(liquid) + amount > block.liquidCapacity) return false;
 			return inputLiquidSet.contains(liquid);
 		}
+
 		@Override
-		public int removeStack(Item item,int amount) {
-			int ret=super.removeStack(item,amount);
-			if(!items.has(item)&&items!=null) toOutputItemSet.remove(item);
+		public int removeStack(Item item, int amount){
+			int ret = super.removeStack(item, amount);
+			if (!items.has(item) && items != null) toOutputItemSet.remove(item);
 			return ret;
 		}
+
 		@Override
-		public void handleItem(Building source,Item item) {
-			short current=toggle;
-			//if((dumpToggle?cu))
+		public void handleItem(Building source, Item item){
+			short current = toggle;
+			if ((dumpToggle ? current > -1 && Arrays.stream(recs[current].output.items).anyMatch(i -> i.item == item)
+				: outputItemSet.contains(item)) && !items.has(item)) toOutputItemSet.add(item);
+			items.add(item,1);
+		}
+		@Override
+		public void handleStack(Item item,int amount,Teamc source) {
+			short current = toggle;
+			if ((dumpToggle ? current > -1 && Arrays.stream(recs[current].output.items).anyMatch(i -> i.item == item)
+				: outputItemSet.contains(item)) && !items.has(item)) toOutputItemSet.add(item);
+			items.add(item,amount);
+		}
+		@Override
+		public void displayConsumption(Table table) {
+			
 		}
 	}
 
