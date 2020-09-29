@@ -178,10 +178,10 @@ public class MultiCrafter extends GenericCrafter{
 
 	public class MultiCrafterBuild extends GenericCrafterBuild{
 		private short toggle = 0;
-		private float[] progressArr=new float[recs.length];
-		private boolean cond=false;
-		private boolean condValid=false;
-		public float productionEfficiency=0f;
+		private float[] progressArr = new float[recs.length];
+		private boolean cond = false;
+		private boolean condValid = false;
+		public float productionEfficiency = 0f;
 		public final ObjectSet toOutputItemSet=
 	}
 

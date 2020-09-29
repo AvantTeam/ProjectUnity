@@ -1,0 +1,9 @@
+{
+	"name": "unity",
+	"displayName": "Project Unity",
+	"author": "A lot of People",
+	"description": "Founder: Eye of Darkness\nCollaborators:\n younggam\n   JerichoFletcher\n   GlennFolker\n   Gdeft\n   [pink]sk7725[]\n  Kapzduke\n   MEEP of Faith\n   TrinityXYZ\n   ThePythonGuy\n   Xusk\n   ThirstyBoi\n",
+	"version": 0.1,
+	"minGameVersion": 106,
+	"main": "unity.Main"
+}

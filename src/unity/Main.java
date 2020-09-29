@@ -17,12 +17,13 @@ import static mindustry.type.ItemStack.*;
 
 public class Main extends Mod{
 	private ContentList[] content = {
-		new UnityItems()
+		new UnityItems(),
+		new UnityBlocks()
 	};
 	
 	@Override
 	public void init(){
-		enableConsole=true;
+		enableConsole = true;
 		// Log.log(LogLevel.info,"[@]: @",,);
 	}
 
