@@ -21,6 +21,7 @@ import unity.libraries.Recipe.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
+import static mindustry.type.ItemStack.*;
 
 import com.google.common.base.Objects;
 

@@ -10,6 +10,7 @@ import unity.libraries.*;
 import unity.libraries.Recipe.*;
 
 import static unity.content.UnityItems.*;
+import static mindustry.type.ItemStack.*;
 
 public class UnityBlocks implements ContentList{
 	public static Block
@@ -82,5 +83,3 @@ public class UnityBlocks implements ContentList{
 		}};
 	}
 }
-
-import static mindustry.type.ItemStack.*;
