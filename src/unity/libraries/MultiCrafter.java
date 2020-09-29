@@ -22,19 +22,21 @@ import unity.libraries.Recipe.*;
 import static arc.Core.*;
 import static mindustry.Vars.*;
 
+import com.google.common.base.Objects;
+
 public class MultiCrafter extends GenericCrafter{
 	public final Recipe[] recs;
 	private ButtonStyle infoStyle = null;
-	private ObjectSet<Liquid> liquidSet = new ObjectSet();
+	public final ObjectSet<Liquid> liquidSet = new ObjectSet();
 	private boolean hasOutputItem = false;
-	private ObjectSet<Item> inputItemSet = new ObjectSet();
-	private ObjectSet<Liquid> inputLiquidSet = new ObjectSet();
-	private ObjectSet<Item> outputItemSet = new ObjectSet();
-	private ObjectSet<Liquid> outputLiquidSet = new ObjectSet();
+	public final ObjectSet<Item> inputItemSet = new ObjectSet();
+	public final ObjectSet<Liquid> inputLiquidSet = new ObjectSet();
+	public final ObjectSet<Item> outputItemSet = new ObjectSet();
+	public final ObjectSet<Liquid> outputLiquidSet = new ObjectSet();
 	private boolean dumpToggle = false;
 	private boolean powerBarI = false;
 	private boolean powerBarO = false;
-	private ExtraBlockInventoryFragment invFrag = new ExtraBlockInventoryFragment();
+	private final ExtraBlockInventoryFragment invFrag = new ExtraBlockInventoryFragment();
 
 	public MultiCrafter(String name, Recipe[] recs){
 		super(name);
@@ -182,7 +184,33 @@ public class MultiCrafter extends GenericCrafter{
 		private boolean cond = false;
 		private boolean condValid = false;
 		public float productionEfficiency = 0f;
-		//public final ObjectSet toOutputItemSet=
+		private OrderedSet<item> toOutputItemSet=new OrderedSet();
+		private OrderedSet<liquid> toOutputLiquidSet=new OrderedSet();
+		private int dumpItemEntry=0;
+		private int itemHas=0;
+		@Override
+		public boolean acceptItem(Building source,Item item) {
+			if(!block instanceof MultiCrafter) return false;
+			if(items.get(item)>=getMaximumAccepted(item)) return false;
+			return outputItemSet.contains(item);
+		}
+		@Override
+		public boolean acceptLiquid(Building source,Liquid liquid, float amount) {
+			if(!block instanceof MultiCrafter) return false;
+			if(liquids.get(liquid)+amount>block.liquidCapacity) return false;
+			return inputLiquidSet.contains(liquid);
+		}
+		@Override
+		public int removeStack(Item item,int amount) {
+			int ret=super.removeStack(item,amount);
+			if(!items.has(item)&&items!=null) toOutputItemSet.remove(item);
+			return ret;
+		}
+		@Override
+		public void handleItem(Building source,Item item) {
+			short current=toggle;
+			//if((dumpToggle?cu))
+		}
 	}
 
 	class ExtraBlockInventoryFragment extends BlockInventoryFragment{
