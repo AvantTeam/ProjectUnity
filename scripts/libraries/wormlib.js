@@ -173,9 +173,10 @@ const segmentUnit = prov(() => {
 				for(var i = 0; i < def.getSegmentWeapon().size; i++){
 					this.mounts[i] = new WeaponMount(def.getSegmentWeapon().get(i));
 				};*/
-				var tmpSeq = new Seq();
+				var tmpSeq = new Seq(def.getSegmentWeapon().size);
 				
 				for(var i = 0; i < def.getSegmentWeapon().size; i++){
+					//tmpSeq.add(new WeaponMount(def.getSegmentWeapon().get(i)));
 					tmpSeq.add(new WeaponMount(def.getSegmentWeapon().get(i)));
 				};
 				
@@ -640,11 +641,19 @@ module.exports = {
 				update(){
 					this._lastVelocityD.set(this._lastVelocityC);
 					this._lastVelocityC.set(this.vel);
-					this.super$update();
+/*needs fixing*/	this.super$update();
 					this.updateSegmentVLocal(this._lastVelocityC);
 					this.updateSegmentsLocal();
 					this.updateAlt();
 				},
+				/*setupWeapons(def){
+					var tmpSeq = new Seq(def.weapons.size);
+					//this.mounts = new WeaponMount[def.weapons.size];
+					for(var i = 0; i < def.weapons.size; i++){
+						tmpSeq.add(new WeaponMount(def.weapons.get(i)));
+					};
+					this.mounts = tmpSeq.toArray(WeaponMount);
+				},*/
 				updateSegmentVLocal(vec){
 					for(var j = 0; j < this.getSegmentLength(); j++){
 						var seg = this.getSegmentPositions();
