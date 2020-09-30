@@ -9,7 +9,6 @@ import mindustry.content.*;
 import unity.libraries.*;
 import unity.libraries.Recipe.*;
 
-import static unity.content.UnityItems.*;
 import static mindustry.type.ItemStack.*;
 
 public class UnityBlocks implements ContentList{
@@ -23,25 +22,25 @@ public class UnityBlocks implements ContentList{
 	
 	@Override
 	public void load(){
-		oreUmbrium = new OreBlock(umbrium){{
+		oreUmbrium = new OreBlock(UnityItems.umbrium){{
 			oreScale = 23.77f;
 			oreThreshold = 0.813f;
 			oreDefault = true;
 		}};
 		
-		oreLuminum = new OreBlock(luminum){{
+		oreLuminum = new OreBlock(UnityItems.luminum){{
 			oreScale = 23.77f;
 			oreThreshold = 0.81f;
 			oreDefault = true;
 		}};
 		
-		oreMonolite = new OreBlock(monolite){{
+		oreMonolite = new OreBlock(UnityItems.monolite){{
 			oreScale = 23.77f;
 			oreThreshold = 0.807f;
 			oreDefault = true;
 		}};
 		
-		oreImberium = new OreBlock(imberium){{
+		oreImberium = new OreBlock(UnityItems.imberium){{
 			oreScale = 23.77f;
 			oreThreshold = 0.807f;
 			oreDefault = true;
