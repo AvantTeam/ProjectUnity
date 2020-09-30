@@ -1,20 +1,29 @@
 package unity.libraries;
 
+import arc.func.*;
 import arc.util.*;
 import arc.util.Log.*;
+import arc.util.io.*;
 import arc.struct.*;
 import arc.scene.*;
+import arc.scene.style.*;
+import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.scene.ui.Button.*;
+import arc.math.*;
+import arc.math.geom.*;
+import arc.graphics.g2d.TextureRegion;
 import mindustry.graphics.Pal;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
+import mindustry.ctype.ContentType;
 import mindustry.type.*;
 import mindustry.world.meta.*;
 import mindustry.world.meta.values.*;
 import mindustry.world.blocks.production.GenericCrafter;
 import mindustry.world.consumers.ConsumePower;
+import mindustry.world.modules.ConsumeModule;
 import mindustry.ui.*;
 import mindustry.ui.fragments.BlockInventoryFragment;
 import unity.libraries.Recipe.*;
@@ -33,26 +42,57 @@ public class MultiCrafter extends GenericCrafter{
 	public final ObjectSet<Liquid> inputLiquidSet = new ObjectSet();
 	public final ObjectSet<Item> outputItemSet = new ObjectSet();
 	public final ObjectSet<Liquid> outputLiquidSet = new ObjectSet();
-	private boolean dumpToggle = false;
+	public final boolean dumpToggle;
 	private boolean powerBarI = false;
 	private boolean powerBarO = false;
 	private final ExtraBlockInventoryFragment invFrag = new ExtraBlockInventoryFragment();
 
-	public MultiCrafter(String name, Recipe[] recs){
+	public MultiCrafter(String name, Recipe[] recs, boolean dumpToggle){
 		super(name);
 		this.recs = recs;
+		this.dumpToggle = dumpToggle;
 		configurable = true;
 		hasItems = true;
 		hasLiquids = true;
 		hasPower = false;
 		saveConfig = true;
+		config(Integer.class, (MultiCrafterBuild tile, Integer value) -> {
+			
+			if (tile.getToggle() >= 0) tile.getProgressArr()[tile.getToggle()] = tile.progress;
+			if (value == -1){
+				tile.setCondValid(false);
+				tile.setCond(false);
+			}
+			if (dumpToggle){
+				tile.toOutputItemSet.clear();
+				tile.toOutputLiquidSet.clear();
+				if (value > -1){
+					ItemStack[] oItems = recs[value].output.items;
+					LiquidStack[] oLiquids = recs[value].output.liquids;
+					for (int i = 0, len = oItems.length; i < len; i++){
+						Item item = oItems[i].item;
+						if (tile.items.has(item)) tile.toOutputItemSet.add(item);
+					}
+					for (int i = 0, len = oLiquids.length; i < len; i++){
+						Liquid liquid = oLiquids[i].liquid;
+						if (tile.liquids.get(liquid) > 0.001f) tile.toOutputLiquidSet.add(liquid);
+					}
+				}
+			}
+			tile.progress = 0;
+			tile.setToggle(value);
+		});
+	}
+
+	public MultiCrafter(String name, Recipe[] recs){
+		this(name, recs, false);
 	}
 
 	public Recipe[] getRecipe(){ return recs; }
 
 	@Override
 	public void init(){
-		for (short i = 0; i < recs.length; i++){
+		for (int i = 0; i < recs.length; i++){
 			InputContents input = recs[i].input;
 			OutputContents output = recs[i].output;
 			if (input.power > 0f) powerBarI = true;
@@ -92,7 +132,7 @@ public class MultiCrafter extends GenericCrafter{
 	public void displayInfo(Table table){
 		super.displayInfo(table);
 		int recLen = recs.length;
-		for (short i = 0; i < recLen; i++){
+		for (int i = 0; i < recLen; i++){
 			Recipe rec = recs[i];
 			ItemStack[] inputItems = rec.input.items;
 			ItemStack[] outputItems = rec.output.items;
@@ -101,7 +141,7 @@ public class MultiCrafter extends GenericCrafter{
 			float inputPower = rec.input.power;
 			float outputPower = rec.output.power;
 			// what the fuck that I need this
-			short ii = i;
+			int ii = i;
 			table.table(infoStyle.up, part -> {
 				part.add("[accent]" + BlockStat.input.localized()).expandX().left().row();
 				part.table(row -> {
@@ -179,15 +219,29 @@ public class MultiCrafter extends GenericCrafter{
 	}
 
 	public class MultiCrafterBuild extends GenericCrafterBuild{
-		private short toggle = 0;
-		private float[] progressArr = new float[recs.length];
-		private boolean cond = false;
-		private boolean condValid = false;
+		protected int toggle = 0;
+		protected float[] progressArr = new float[recs.length];
+		protected boolean cond = false;
+		protected boolean condValid = false;
 		public float productionEfficiency = 0f;
-		private OrderedSet<Item> toOutputItemSet = new OrderedSet();
-		private OrderedSet<Liquid> toOutputLiquidSet = new OrderedSet();
-		private int dumpItemEntry = 0;
-		private int itemHas = 0;
+		public final OrderedSet<Item> toOutputItemSet = new OrderedSet();
+		public final OrderedSet<Liquid> toOutputLiquidSet = new OrderedSet();
+		protected int dumpItemEntry = 0;
+		protected int itemHas = 0;
+
+		public int getToggle(){ return toggle; }
+
+		public void setToggle(int toggle){ this.toggle = toggle; }
+
+		public boolean getCondValid(){ return condValid; }
+
+		public void setCondValid(boolean condValid){ this.condValid = condValid; }
+
+		public boolean getCond(){ return cond; }
+
+		public void setCond(boolean cond){ this.cond = cond; }
+
+		public float[] getProgressArr(){ return progressArr; }
 
 		@Override
 		public boolean acceptItem(Building source, Item item){
@@ -212,21 +266,349 @@ public class MultiCrafter extends GenericCrafter{
 
 		@Override
 		public void handleItem(Building source, Item item){
-			short current = toggle;
+			int current = toggle;
 			if ((dumpToggle ? current > -1 && Arrays.stream(recs[current].output.items).anyMatch(i -> i.item == item)
 				: outputItemSet.contains(item)) && !items.has(item)) toOutputItemSet.add(item);
-			items.add(item,1);
+			items.add(item, 1);
 		}
+
 		@Override
-		public void handleStack(Item item,int amount,Teamc source) {
-			short current = toggle;
+		public void handleStack(Item item, int amount, Teamc source){
+			int current = toggle;
 			if ((dumpToggle ? current > -1 && Arrays.stream(recs[current].output.items).anyMatch(i -> i.item == item)
 				: outputItemSet.contains(item)) && !items.has(item)) toOutputItemSet.add(item);
-			items.add(item,amount);
+			items.add(item, amount);
 		}
+
 		@Override
-		public void displayConsumption(Table table) {
-			
+		public void displayConsumption(Table table){
+			int recLen = recs.length;
+			if (recLen <= 0) return;
+			int z = 0, y = 0, x = 0;
+			table.left();
+			for (int i = 0; i < recLen; i++){
+				ItemStack[] itemStacks = recs[i].input.items;
+				LiquidStack[] liquidStacks = recs[i].input.liquids;
+				if (Arrays.stream(recs[i].output.items).allMatch(stack -> stack.item.unlockedNow())
+					&& Arrays.stream(recs[i].output.liquids).allMatch(stack -> stack.liquid.unlockedNow())){
+					for (int j = 0, len = itemStacks.length; j < len; j++){
+						ItemStack stack = itemStacks[j];
+						table.add(new ReqImage(new ItemImage(stack.item.icon(Cicon.medium), stack.amount),
+							() -> items != null && items.has(stack.item, stack.amount))).size(8 * 4);//.padRight(8);
+					}
+					z += itemStacks.length;
+					for (int j = 0, len = liquidStacks.length; j < len; j++){
+						LiquidStack stack = liquidStacks[j];
+						table.add(new ReqImage(stack.liquid.icon(Cicon.medium),
+							() -> liquids != null && liquids.get(stack.liquid) > stack.amount)).size(8 * 4);
+					}
+					z += liquidStacks.length;
+					if (z == 0){
+						table.image(Icon.cancel).size(8 * 4);
+						x += 1;
+					}
+					if (i < recLen - 1){
+						InputContents next = recs[i + 1].input;
+						y += next.items.length + next.liquids.length;
+						x += z;
+						if (x + y <= 8 && y != 0){
+							table.image(Icon.pause).size(8 * 4);
+							x += 1;
+						}else if (x + y <= 7 && y == 0){
+							table.image(Icon.pause).size(8 * 4);
+							x += 1;
+						}else{
+							table.row();
+							x = 0;
+						}
+					}
+					y = 0;
+					z = 0;
+				}
+			}
+		}
+
+		@Override
+		public float getPowerProduction(){
+			if (toggle < 0 || recs.length <= 0) return 0;
+			float oPower = recs[toggle].output.power;
+			if (oPower > 0 && cond){
+				if (recs[toggle].input.power > 0){
+					productionEfficiency = efficiency();
+					return oPower * efficiency();
+				}else{
+					productionEfficiency = 1;
+					return oPower;
+				}
+			}
+			productionEfficiency = 0;
+			return 0;
+		}
+
+		@Override
+		public float getProgressIncrease(float baseTime){
+			if (toggle < 0) return 0f;
+			else if (recs[toggle].input.power > 0) return super.getProgressIncrease(baseTime);
+			else return 1f / baseTime * delta();
+		}
+
+		protected boolean checkInput(){
+			if (toggle < 0) return false;
+			ItemStack[] itemStacks = recs[toggle].input.items;
+			LiquidStack[] liquidStacks = recs[toggle].input.liquids;
+			if (!items.has(itemStacks)) return true;
+			for (int i = 0, len = liquidStacks.length; i < len; i++){
+				if (liquids.get(liquidStacks[i].liquid) < liquidStacks[i].amount) return true;
+			}
+			return false;
+		}
+
+		protected boolean checkOutput(){
+			if (toggle < 0) return false;
+			ItemStack[] itemStacks = recs[toggle].input.items;
+			LiquidStack[] liquidStacks = recs[toggle].input.liquids;
+			for (int i = 0, len = itemStacks.length; i < len; i++){
+				if (items.get(itemStacks[i].item) + itemStacks[i].amount > getMaximumAccepted(itemStacks[i].item))
+					return true;
+			}
+			for (int i = 0, len = liquidStacks.length; i < len; i++){
+				if (liquids.get(liquidStacks[i].liquid) + liquidStacks[i].amount > liquidCapacity) return true;
+			}
+			return false;
+		}
+
+		protected boolean checkCond(){
+			if (toggle < 0) return false;
+			if (power.status <= 0 && recs[toggle].input.power > 0){
+				condValid = false;
+				cond = false;
+				return false;
+			}else if (checkInput()){
+				condValid = false;
+				cond = false;
+				return false;
+			}else if (checkOutput()){
+				condValid = true;
+				cond = false;
+				return false;
+			}
+			condValid = true;
+			cond = true;
+			return true;
+		}
+
+		protected void customCons(){
+			if (toggle < 0) return;
+			if (checkCond()){
+				if (progressArr[toggle] != 0){
+					progress = progressArr[toggle];
+					progressArr[toggle] = 0;
+				}
+				progress += getProgressIncrease(recs[toggle].craftTime);
+				totalProgress += delta();
+				warmup = Mathf.lerpDelta(warmup, 1, 0.02f);
+				if (Mathf.chance(Time.delta * updateEffectChance))
+					updateEffect.at(getX() + Mathf.range(size * 4), getY() + Mathf.range(size * 4));
+			}else warmup = Mathf.lerp(warmup, 0, 0.02f);
+		}
+
+		protected void customProd(){
+			if (toggle < 0) return;
+			ItemStack[] inputItems = recs[toggle].input.items;
+			LiquidStack[] inputLiquids = recs[toggle].input.liquids;
+			ItemStack[] outputItems = recs[toggle].output.items;
+			LiquidStack[] outputLiquids = recs[toggle].output.liquids;
+			for (int i = 0, len = inputItems.length; i < len; i++) items.remove(inputItems[i]);
+			for (int i = 0, len = inputLiquids.length; i < len; i++)
+				liquids.remove(inputLiquids[i].liquid, inputLiquids[i].amount);
+			for (int i = 0, len = outputItems.length; i < len; i++){
+				for (int j = 0, amount = outputItems[i].amount; j < amount; j++){
+					Item oItem = outputItems[j].item;
+					if (!put(oItem)){
+						if (!items.has(oItem)) toOutputItemSet.add(oItem);
+						items.add(oItem, 1);
+					}
+				}
+			}
+			for (int i = 0, len = outputLiquids.length; i < len; i++){
+				Liquid oLiquid = outputLiquids[i].liquid;
+				if (liquids.get(oLiquid) <= 0.001) toOutputLiquidSet.add(oLiquid);
+				liquids.add(oLiquid, outputLiquids[i].amount);
+			}
+			craftEffect.at(x, y);
+			progress = 0;
+		}
+
+		@Override
+		public void updateTile(){
+			if (recs.length < 0) return;
+			if (timer.get(1, 6)){
+				itemHas = 0;
+				items.each((item, amount) -> itemHas++);
+			}
+			int recLen = recs.length;
+			customUpdate();
+			if (toggle >= 0){
+				customCons();
+				if (progress >= 1) customProd();
+			}
+			if (dumpToggle && toggle < 0) return;
+			Seq<Item> que = toOutputItemSet.orderedItems();
+			int len = que.size, i = 0;
+			if (timer.get(dumpTime) && len > 0){
+				for (; i < len; i++){
+					Item candidate = que.get((i + dumpItemEntry) % len);
+					if (dump(candidate)){
+						if (items.has(candidate)) toOutputItemSet.remove(candidate);
+						break;
+					}
+				}
+				if (i != len) dumpItemEntry = (i + dumpItemEntry) % len;
+			}
+			Seq<Liquid> queL = toOutputLiquidSet.orderedItems();
+			len = queL.size;
+			if (len > 0){
+				for (i = 0; i < len; i++){
+					Liquid liquid = queL.get(i);
+					dumpLiquid(liquid);
+					if (liquids.get(liquid) <= 0.001f) toOutputLiquidSet.remove(liquid);
+					break;
+				}
+			}
+		}
+
+		public void customUpdate(){
+		}
+
+		@Override
+		public boolean shouldConsume(){
+			return condValid && productionValid();
+		}
+
+		@Override
+		public boolean productionValid(){
+			return cond && enabled;
+		}
+
+		@Override
+		public void updateTableAlign(Table table){
+			float pos = input.mouseScreen(x, y - size * 4 - 1).y;
+			Vec2 relative = input.mouseScreen(x, y + size * 4);
+			table.setPosition(relative.x,
+				Math.min(pos, (float) (relative.y - Math.ceil((float) itemHas / 3f) * 48f - 4f)), Align.top);
+			if (!invFrag.isShown() && control.input.frag.config.getSelectedTile() == this && items.total() > 0)
+				invFrag.showFor(this);
+		}
+
+		@Override
+		public void buildConfiguration(Table table){
+			if (recs.length <= 0) return;
+			if (!invFrag.isBuilt()) invFrag.build(table.parent);
+			if (invFrag.isShown()){
+				invFrag.hide();
+				control.input.frag.config.hideConfig();
+				return;
+			}
+			ButtonGroup group = new ButtonGroup();
+			group.setMinCheckCount(0);
+			group.setMaxCheckCount(1);
+			int recLen = recs.length;
+			boolean[] exit = new boolean[recLen];
+			for (int i = 0; i < recLen; i++){
+				int ii = i; //what the fuck
+				OutputContents output = recs[i].output;
+				exit[i] = !(Arrays.stream(output.items).allMatch(stack -> stack.item.unlockedNow())
+					&& Arrays.stream(output.liquids).allMatch(stack -> stack.liquid.unlockedNow()));
+				if (exit[i]) continue;
+				ImageButton button = (ImageButton) table.button(Tex.whiteui, Styles.clearToggleTransi, 40, () -> {})
+					.group(group).get();
+				button.clicked(() -> configure(button.isChecked() ? ii : -1));
+				TextureRegion icon = output.items.length > 0 ? output.items[0].item.icon(Cicon.small)
+					: output.liquids.length > 0 ? output.liquids[0].liquid.icon(Cicon.small) : region;
+				button.getStyle().imageUp = region == icon ? output.power > 0 ? Icon.power : Icon.cancel
+					: new TextureRegionDrawable(icon);
+				button.update(() -> button.setChecked(toggle == ii));
+			}
+			table.row();
+			int[][] lengths = new int[recLen][3];
+			for (int i = 0; i < recLen; i++){
+				OutputContents output = recs[i].output;
+				int outputItemLen = output.items.length;
+				int outputLiquidLen = output.liquids.length;
+				if (outputItemLen > 0) lengths[i][0] = outputItemLen - 1;
+				if (outputLiquidLen > 0){
+					if (outputItemLen > 0) lengths[i][1] = outputLiquidLen;
+					else lengths[i][1] = outputLiquidLen - 1;
+				}
+				if (output.power > 0) lengths[i][2] = 1;
+			}
+			int max = 0;
+			for (int i = 0; i < recLen; i++){
+				int temp = lengths[i][0] + lengths[i][1] + lengths[i][2];
+				max = max < temp ? temp : max;
+			}
+			for (int i = 0; i < max; i++){
+				for (int j = 0; j < recLen; j++){
+					if (exit[j]) continue;
+					OutputContents output = recs[j].output;
+					int outputItemLen = output.items.length;
+					int outputLiquidLen = output.liquids.length;
+					if (lengths[j][0] > 0){
+						table.image(output.items[outputItemLen - lengths[j][0]].item.icon(Cicon.small));
+						lengths[j][0]--;
+					}else if (lengths[j][1] > 0){
+						table.image(output.liquids[outputLiquidLen - lengths[j][1]].liquid.icon(Cicon.small));
+						lengths[j][1]--;
+					}else if (lengths[j][2] > 0){
+						if (output.items.length >= 1 || output.liquids.length >= 1) table.image(Icon.power);
+						else table.image(Tex.clear);
+						lengths[j][2]--;
+					}else table.image(Tex.clear);
+				}
+				table.row();
+			}
+		}
+
+		@Override
+		public boolean onConfigureTileTapped(Building other){
+			if (self() != other) invFrag.hide();
+			return items.total() > 0 ? true : self() != other;
+		}
+
+		@Override
+		public void created(){
+			cons = new ExtraConsumeModule(self());
+		}
+
+		@Override
+		public Object config(){
+			return toggle;
+		}
+
+		@Override
+		public void write(Writes write){
+			super.write(write);
+			write.s(toggle);
+			Seq<Item> queItem = toOutputItemSet.orderedItems();
+			short lenI = (short) queItem.size;
+			write.s(lenI);
+			for (short i = 0; i < lenI; i++) write.s(queItem.get(i).id);
+			Seq<Liquid> queLiquid = toOutputLiquidSet.orderedItems();
+			short lenL = (short) queLiquid.size;
+			write.s(lenL);
+			for (short i = 0; i < lenL; i++) write.s(queLiquid.get(i).id);
+		}
+
+		@Override
+		public void read(Reads read, byte revision){
+			super.read(read, revision);
+			toggle = read.s();
+			toOutputItemSet.clear();
+			toOutputLiquidSet.clear();
+			short lenI = read.s();
+			for (short i = 0; i < lenI; i++) toOutputItemSet.add(content.getByID(ContentType.item, read.s()));
+			short lenL = read.s();
+			for (short i = 0; i < lenL; i++) toOutputLiquidSet.add(content.getByID(ContentType.liquid, read.s()));
 		}
 	}
 
@@ -258,14 +640,29 @@ public class MultiCrafter extends GenericCrafter{
 	}
 
 	class MultiConsumePower extends ConsumePower{
-		public float requestedPower(Building entity){
-			/*
-			 * if(entity.tile().build==null) return 0; 
-			 * int i=entity.getToggle(); 
-			 * if(i<0) return 0; 
-			 * float input=recs[i].input.power; //if(input>0&&entity.cond) return input;
-			 */
+		public float requestedPower(MultiCrafterBuild entity){
+			if (entity.tile().build == null) return 0;
+			int i = entity.getToggle();
+			if (i < 0) return 0;
+			float input = recs[i].input.power;
+			if (input > 0 && entity.getCond()) return input;
 			return 0;
+		}
+	}
+
+	class ExtraConsumeModule extends ConsumeModule{
+		private final MultiCrafterBuild _entity;
+
+		public ExtraConsumeModule(Building entity){
+			super(entity);
+			_entity = (MultiCrafterBuild) entity;
+		}
+
+		@Override
+		public BlockStatus status(){
+			if (_entity.productionValid()) return BlockStatus.active;
+			if (_entity.getCondValid()) return BlockStatus.noOutput;
+			return BlockStatus.noInput;
 		}
 	}
 }
