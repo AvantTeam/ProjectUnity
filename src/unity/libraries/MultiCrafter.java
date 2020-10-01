@@ -36,15 +36,11 @@ import static mindustry.type.ItemStack.*;
 public class MultiCrafter extends GenericCrafter{
 	public final Recipe[] recs;
 	private ButtonStyle infoStyle = null;
-	public final ObjectSet<Liquid> liquidSet = new ObjectSet();
-	private boolean hasOutputItem = false;
-	public final ObjectSet<Item> inputItemSet = new ObjectSet();
-	public final ObjectSet<Liquid> inputLiquidSet = new ObjectSet();
-	public final ObjectSet<Item> outputItemSet = new ObjectSet();
-	public final ObjectSet<Liquid> outputLiquidSet = new ObjectSet();
+	public final ObjectSet<Item> inputItemSet = new ObjectSet(), outputItemSet = new ObjectSet();;
+	public final ObjectSet<Liquid> inputLiquidSet = new ObjectSet(), outputLiquidSet = new ObjectSet(),
+		liquidSet = new ObjectSet();
 	public final boolean dumpToggle;
-	private boolean powerBarI = false;
-	private boolean powerBarO = false;
+	private boolean powerBarI = false, powerBarO = false, hasOutputItem = false;
 	private final CustomBlockInventoryFragment invFrag = new CustomBlockInventoryFragment();
 
 	public MultiCrafter(String name, Recipe[] recs, boolean dumpToggle){
@@ -218,15 +214,12 @@ public class MultiCrafter extends GenericCrafter{
 	}
 
 	public class MultiCrafterBuild extends GenericCrafterBuild{
-		protected int toggle = 0;
+		protected int toggle = 0, dumpItemEntry = 0, itemHas = 0;
 		protected float[] progressArr = new float[recs.length];
-		protected boolean cond = false;
-		protected boolean condValid = false;
+		protected boolean cond = false, condValid = false;
 		public float productionEfficiency = 0f;
 		public final OrderedSet<Item> toOutputItemSet = new OrderedSet();
 		public final OrderedSet<Liquid> toOutputLiquidSet = new OrderedSet();
-		protected int dumpItemEntry = 0;
-		protected int itemHas = 0;
 
 		public int getToggle(){ return toggle; }
 
