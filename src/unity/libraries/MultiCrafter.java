@@ -23,7 +23,7 @@ import mindustry.world.meta.*;
 import mindustry.world.meta.values.*;
 import mindustry.world.blocks.production.GenericCrafter;
 import mindustry.world.consumers.ConsumePower;
-import mindustry.world.modules.ConsumeModule;
+import mindustry.world.modules.*;
 import mindustry.ui.*;
 import mindustry.ui.fragments.BlockInventoryFragment;
 import unity.libraries.Recipe.*;
@@ -45,7 +45,7 @@ public class MultiCrafter extends GenericCrafter{
 	public final boolean dumpToggle;
 	private boolean powerBarI = false;
 	private boolean powerBarO = false;
-	private final ExtraBlockInventoryFragment invFrag = new ExtraBlockInventoryFragment();
+	private final CustomBlockInventoryFragment invFrag = new CustomBlockInventoryFragment();
 
 	public MultiCrafter(String name, Recipe[] recs, boolean dumpToggle){
 		super(name);
@@ -57,7 +57,7 @@ public class MultiCrafter extends GenericCrafter{
 		hasPower = false;
 		saveConfig = true;
 		config(Integer.class, (MultiCrafterBuild tile, Integer value) -> {
-			
+
 			if (tile.getToggle() >= 0) tile.getProgressArr()[tile.getToggle()] = tile.progress;
 			if (value == -1){
 				tile.setCondValid(false);
@@ -107,6 +107,7 @@ public class MultiCrafter extends GenericCrafter{
 				}
 			}
 			if (output.items.length > 0){
+				hasOutputItem = true;
 				for (int j = 0, len = output.items.length; j < len; j++) outputItemSet.add(output.items[j].item);
 			}
 			if (output.liquids.length > 0){
@@ -116,10 +117,8 @@ public class MultiCrafter extends GenericCrafter{
 				}
 			}
 		}
-		if (powerBarI){
-			hasPower = true;
-			consumes.add(new MultiConsumePower());
-		}
+		hasPower = powerBarI || powerBarO;
+		if (powerBarI) consumes.add(new CustomConsumePower());
 		consumesPower = powerBarI;
 		outputsPower = powerBarO;
 		super.init();
@@ -258,29 +257,6 @@ public class MultiCrafter extends GenericCrafter{
 		}
 
 		@Override
-		public int removeStack(Item item, int amount){
-			int ret = super.removeStack(item, amount);
-			if (!items.has(item) && items != null) toOutputItemSet.remove(item);
-			return ret;
-		}
-
-		@Override
-		public void handleItem(Building source, Item item){
-			int current = toggle;
-			if ((dumpToggle ? current > -1 && Arrays.stream(recs[current].output.items).anyMatch(i -> i.item == item)
-				: outputItemSet.contains(item)) && !items.has(item)) toOutputItemSet.add(item);
-			items.add(item, 1);
-		}
-
-		@Override
-		public void handleStack(Item item, int amount, Teamc source){
-			int current = toggle;
-			if ((dumpToggle ? current > -1 && Arrays.stream(recs[current].output.items).anyMatch(i -> i.item == item)
-				: outputItemSet.contains(item)) && !items.has(item)) toOutputItemSet.add(item);
-			items.add(item, amount);
-		}
-
-		@Override
 		public void displayConsumption(Table table){
 			int recLen = recs.length;
 			if (recLen <= 0) return;
@@ -365,8 +341,8 @@ public class MultiCrafter extends GenericCrafter{
 
 		protected boolean checkOutput(){
 			if (toggle < 0) return false;
-			ItemStack[] itemStacks = recs[toggle].input.items;
-			LiquidStack[] liquidStacks = recs[toggle].input.liquids;
+			ItemStack[] itemStacks = recs[toggle].output.items;
+			LiquidStack[] liquidStacks = recs[toggle].output.liquids;
 			for (int i = 0, len = itemStacks.length; i < len; i++){
 				if (items.get(itemStacks[i].item) + itemStacks[i].amount > getMaximumAccepted(itemStacks[i].item))
 					return true;
@@ -422,19 +398,10 @@ public class MultiCrafter extends GenericCrafter{
 			for (int i = 0, len = inputLiquids.length; i < len; i++)
 				liquids.remove(inputLiquids[i].liquid, inputLiquids[i].amount);
 			for (int i = 0, len = outputItems.length; i < len; i++){
-				for (int j = 0, amount = outputItems[i].amount; j < amount; j++){
-					Item oItem = outputItems[j].item;
-					if (!put(oItem)){
-						if (!items.has(oItem)) toOutputItemSet.add(oItem);
-						items.add(oItem, 1);
-					}
-				}
+				for (int j = 0, amount = outputItems[i].amount; j < amount; j++) offload(outputItems[j].item);
 			}
-			for (int i = 0, len = outputLiquids.length; i < len; i++){
-				Liquid oLiquid = outputLiquids[i].liquid;
-				if (liquids.get(oLiquid) <= 0.001) toOutputLiquidSet.add(oLiquid);
-				liquids.add(oLiquid, outputLiquids[i].amount);
-			}
+			for (int i = 0, len = outputLiquids.length; i < len; i++)
+				liquids.add(outputLiquids[i].liquid, outputLiquids[i].amount);
 			craftEffect.at(x, y);
 			progress = 0;
 		}
@@ -457,11 +424,8 @@ public class MultiCrafter extends GenericCrafter{
 			int len = que.size, i = 0;
 			if (timer.get(dumpTime) && len > 0){
 				for (; i < len; i++){
-					Item candidate = que.get((i + dumpItemEntry) % len);
-					if (dump(candidate)){
-						if (items.has(candidate)) toOutputItemSet.remove(candidate);
-						break;
-					}
+					dump(que.get((i + dumpItemEntry) % len));
+					break;
 				}
 				if (i != len) dumpItemEntry = (i + dumpItemEntry) % len;
 			}
@@ -469,9 +433,7 @@ public class MultiCrafter extends GenericCrafter{
 			len = queL.size;
 			if (len > 0){
 				for (i = 0; i < len; i++){
-					Liquid liquid = queL.get(i);
-					dumpLiquid(liquid);
-					if (liquids.get(liquid) <= 0.001f) toOutputLiquidSet.remove(liquid);
+					dumpLiquid(queL.get(i));
 					break;
 				}
 			}
@@ -496,7 +458,7 @@ public class MultiCrafter extends GenericCrafter{
 			Vec2 relative = input.mouseScreen(x, y + size * 4);
 			table.setPosition(relative.x,
 				Math.min(pos, (float) (relative.y - Math.ceil((float) itemHas / 3f) * 48f - 4f)), Align.top);
-			if (!invFrag.isShown() && control.input.frag.config.getSelectedTile() == this && items.total() > 0)
+			if (!invFrag.isShown() && control.input.frag.config.getSelectedTile() == this && items.any())
 				invFrag.showFor(this);
 		}
 
@@ -571,13 +533,26 @@ public class MultiCrafter extends GenericCrafter{
 
 		@Override
 		public boolean onConfigureTileTapped(Building other){
-			if (self() != other) invFrag.hide();
-			return items.total() > 0 ? true : self() != other;
+			if (this != other) invFrag.hide();
+			return items.any() ? true : this != other;
+		}
+
+		protected boolean decideItemSet(Item item){
+			return dumpToggle ? toggle > -1 && Arrays.stream(recs[toggle].output.items).anyMatch(i -> i.item == item)
+				: outputItemSet.contains(item);
+		}
+
+		protected boolean decideLiquidSet(Liquid liquid){
+			return dumpToggle
+				? toggle > -1 && Arrays.stream(recs[toggle].output.liquids).anyMatch(i -> i.liquid == liquid)
+				: outputLiquidSet.contains(liquid);
 		}
 
 		@Override
 		public void created(){
-			cons = new ExtraConsumeModule(self());
+			cons = new CustomConsumeModule(self());
+			items = new CustomItemModule();
+			liquids = new customLiquidModule();
 		}
 
 		@Override
@@ -610,15 +585,127 @@ public class MultiCrafter extends GenericCrafter{
 			short lenL = read.s();
 			for (short i = 0; i < lenL; i++) toOutputLiquidSet.add(content.getByID(ContentType.liquid, read.s()));
 		}
+
+		class CustomItemModule extends ItemModule{
+			@Override
+			public Item take(){
+				for (int i = 0; i < items.length; i++){
+					int index = (i + takeRotation);
+					if (index >= items.length) index -= items.length;
+					if (items[index] > 0){
+						Item ret = content.item(index);
+						items[index]--;
+						total--;
+						takeRotation = index + 1;
+						if (items[index] <= 0 && decideItemSet(ret)) toOutputItemSet.remove(ret);
+						return ret;
+					}
+				}
+				return null;
+			}
+
+			@Override
+			public void endTake(Item item){
+				super.endTake(item);
+				if (items[item.id] <= 0 && decideItemSet(item)) toOutputItemSet.remove(item);
+			}
+
+			@Override
+			public void set(Item item, int amount){
+				super.set(item, amount);
+				if (decideItemSet(item)){
+					if (amount == 0) toOutputItemSet.remove(item);
+					else toOutputItemSet.add(item);
+				}
+			}
+
+			@Override
+			public void add(Item item, int amount){
+				super.add(item, amount);
+				if (decideItemSet(item)){
+					if (items[item.id] <= 0) toOutputItemSet.remove(item);
+					else toOutputItemSet.add(item);
+				}
+			}
+
+			@Override
+			public void remove(Item item, int amount){
+				super.remove(item, amount);
+				if (decideItemSet(item)){
+					if (items[item.id] <= 0) toOutputItemSet.remove(item);
+					else toOutputItemSet.add(item);
+				}
+			}
+
+			@Override
+			public void clear(){
+				super.clear();
+				toOutputItemSet.clear();
+			}
+		}
+
+		class customLiquidModule extends LiquidModule{
+			@Override
+			public void reset(Liquid liquid, float amount){
+				super.reset(liquid, amount);
+				if (decideLiquidSet(liquid)){
+					if (amount > 0.001f) toOutputLiquidSet.add(liquid);
+					else toOutputLiquidSet.remove(liquid);
+				}
+			}
+
+			@Override
+			public void clear(){
+				super.clear();
+				toOutputLiquidSet.clear();
+			}
+
+			@Override
+			public void add(Liquid liquid, float amount){
+				super.add(liquid, amount);
+				if (decideLiquidSet(liquid)){
+					if (get(liquid) > 0.001f) toOutputLiquidSet.add(liquid);
+					else toOutputLiquidSet.remove(liquid);
+				}
+			}
+		}
+
+		class CustomConsumeModule extends ConsumeModule{
+			public CustomConsumeModule(Building entity){
+				super(entity);
+			}
+
+			@Override
+			public BlockStatus status(){
+				if (productionValid()) return BlockStatus.active;
+				if (getCondValid()) return BlockStatus.noOutput;
+				return BlockStatus.noInput;
+			}
+		}
 	}
 
-	class ExtraBlockInventoryFragment extends BlockInventoryFragment{
+	class CustomConsumePower extends ConsumePower{
+		public float requestedPower(MultiCrafterBuild entity){
+			if (entity.tile().build == null) return 0;
+			int i = entity.getToggle();
+			if (i < 0) return 0;
+			float input = recs[i].input.power;
+			if (input > 0 && entity.getCond()) return input;
+			return 0;
+		}
+	}
+
+	class CustomBlockInventoryFragment extends BlockInventoryFragment{
 		private boolean built = false;
 		private boolean visible = false;
 
 		public boolean isBuilt(){ return built; }
 
 		public boolean isShown(){ return visible; }
+
+		{
+			//Events.on(TapEvent.class,e->hide()); waiting for v108...
+		}
 
 		@Override
 		public void showFor(Building t){
@@ -636,33 +723,6 @@ public class MultiCrafter extends GenericCrafter{
 		public void build(Group parent){
 			built = true;
 			super.build(parent);
-		}
-	}
-
-	class MultiConsumePower extends ConsumePower{
-		public float requestedPower(MultiCrafterBuild entity){
-			if (entity.tile().build == null) return 0;
-			int i = entity.getToggle();
-			if (i < 0) return 0;
-			float input = recs[i].input.power;
-			if (input > 0 && entity.getCond()) return input;
-			return 0;
-		}
-	}
-
-	class ExtraConsumeModule extends ConsumeModule{
-		private final MultiCrafterBuild _entity;
-
-		public ExtraConsumeModule(Building entity){
-			super(entity);
-			_entity = (MultiCrafterBuild) entity;
-		}
-
-		@Override
-		public BlockStatus status(){
-			if (_entity.productionValid()) return BlockStatus.active;
-			if (_entity.getCondValid()) return BlockStatus.noOutput;
-			return BlockStatus.noInput;
 		}
 	}
 }

@@ -18,7 +18,7 @@ public class UnityBlocks implements ContentList{
 	/*oreXenium, */oreUmbrium, oreLuminum, oreMonolite, oreImberium,
 	
 	//crafting
-	multiTest1;
+	multiTest1,multiTest2;
 	
 	@Override
 	public void load(){
@@ -75,7 +75,42 @@ public class UnityBlocks implements ContentList{
 				new OutputContents(with(Items.thorium, 1, Items.surgealloy, 1),
 					new LiquidStack[]{new LiquidStack(Liquids.slag, 5)}),
 				60),
-
+			// 7
+			new Recipe(
+				new InputContents(with(Items.pyratite, 1, Items.blastCompound, 1),
+					new LiquidStack[]{new LiquidStack(Liquids.water, 5)}, 1),
+				new OutputContents(with(Items.scrap, 1, Items.plastanium, 2, Items.sporePod, 2),
+					new LiquidStack[]{new LiquidStack(Liquids.oil, 5)}),
+				72),
+			//8
+			new Recipe(new InputContents(with(Items.sand, 1)), new OutputContents(with(Items.silicon, 1)), 30),
+			//9
+			new Recipe(
+				new InputContents(with(Items.sand, 1, Items.lead, 2),
+					new LiquidStack[]{new LiquidStack(Liquids.water, 5)}),
+				new OutputContents(with(UnityItems.contagium, 1)), 12),
+			//10
+			new Recipe(
+				new InputContents(with(Items.coal, 1, Items.sand, 1),
+					new LiquidStack[]{new LiquidStack(Liquids.water, 5)}, 1),
+				new OutputContents(with(Items.thorium, 1, Items.surgealloy, 1),
+					new LiquidStack[]{new LiquidStack(Liquids.slag, 5), new LiquidStack(Liquids.oil, 5)}),
+				60)
+		},true){{
+			requirements(Category.crafting, with(Items.copper, 10));
+			size = 3;
+		}};
+		multiTest2 = new MultiCrafter("multi-test-2", new Recipe[]{
+			//1
+			new Recipe(new InputContents(with(Items.sand, 1, Items.lead, 1)), new OutputContents(), 12f),
+			//2
+			new Recipe(new InputContents(with(Items.coal, 1, Items.sand, 1)),
+				new OutputContents(with(Items.thorium, 1, Items.surgealloy, 2), 10), 60f),
+			//3
+			new Recipe(new InputContents(with(Items.pyratite, 1, Items.blastCompound, 1)),
+				new OutputContents(with(Items.scrap, 1, Items.plastanium, 2, Items.sporePod, 2)), 72f),
+			//4
+			new Recipe(new InputContents(with(Items.sand, 1), 15), new OutputContents(with(Items.silicon, 1), 10), 30)
 		}){{
 			requirements(Category.crafting, with(Items.copper, 10));
 			size = 3;
