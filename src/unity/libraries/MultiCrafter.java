@@ -80,9 +80,7 @@ public class MultiCrafter extends GenericCrafter{
 		});
 	}
 
-	public MultiCrafter(String name, Recipe[] recs){
-		this(name, recs, false);
-	}
+	public MultiCrafter(String name, Recipe[] recs){ this(name, recs, false); }
 
 	public Recipe[] getRecipe(){ return recs; }
 
@@ -205,13 +203,9 @@ public class MultiCrafter extends GenericCrafter{
 	}
 
 	@Override
-	public boolean outputsItems(){
-		return hasOutputItem;
-	}
+	public boolean outputsItems(){ return hasOutputItem; }
 
-	public void customDisplay(Table part, int i){
-
-	}
+	public void customDisplay(Table part, int i){}
 
 	public class MultiCrafterBuild extends GenericCrafterBuild{
 		protected int toggle = 0, dumpItemEntry = 0, itemHas = 0;
@@ -432,18 +426,13 @@ public class MultiCrafter extends GenericCrafter{
 			}
 		}
 
-		public void customUpdate(){
-		}
+		public void customUpdate(){}
 
 		@Override
-		public boolean shouldConsume(){
-			return condValid && productionValid();
-		}
+		public boolean shouldConsume(){ return condValid && productionValid(); }
 
 		@Override
-		public boolean productionValid(){
-			return cond && enabled;
-		}
+		public boolean productionValid(){ return cond && enabled; }
 
 		@Override
 		public void updateTableAlign(Table table){
@@ -549,9 +538,7 @@ public class MultiCrafter extends GenericCrafter{
 		}
 
 		@Override
-		public Object config(){
-			return toggle;
-		}
+		public Object config(){ return toggle; }
 
 		@Override
 		public void write(Writes write){
@@ -664,9 +651,7 @@ public class MultiCrafter extends GenericCrafter{
 		}
 
 		class CustomConsumeModule extends ConsumeModule{
-			public CustomConsumeModule(Building entity){
-				super(entity);
-			}
+			public CustomConsumeModule(Building entity){ super(entity); }
 
 			@Override
 			public BlockStatus status(){
