@@ -1,5 +1,6 @@
 package unity.libraries;
 
+import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -15,10 +16,10 @@ public class CopterUnitType extends UnitType{
 	protected final Rotor[] rotors;
 	protected float fallRotateSpeed = 2.5f;
 
-	public CopterUnitType(String name, Rotor[] rotors){
+	public CopterUnitType(String name,int rotorSize){
 		super(name);
-		this.rotors = rotors;
-		defaultController=()->new CopterAI();
+		rotors=new Rotor[rotorSize];
+		defaultController = () -> new CopterAI();
 	}
 
 	@Override
@@ -45,11 +46,11 @@ public class CopterUnitType extends UnitType{
 			Rotor r = rotors[i];
 			TextureRegion region = r.bladeRegion;
 			float offX = Angles.trnsx(unit.rotation - 90, r.x, r.y);
-			float offY = Angles.trnsx(unit.rotation - 90, r.x, r.y);
+			float offY = Angles.trnsy(unit.rotation - 90, r.x, r.y);
 			float w = region.width * r.scale * Draw.scl;
 			float h = region.height * r.scale * Draw.scl;
 			for (int j = 0; j < r.bladeCount; j++){
-				float angle = (unit.id * 24 + Time.time() * r.speed + (360 / (float) r.bladeCount) * j + r.rotOffset)
+				float angle = (unit.id * 24f + Time.time() * r.speed + (360f / (float) r.bladeCount) * j + r.rotOffset)
 					% 360;
 				Draw.alpha(state.isPaused() ? 1f : Time.time() % 2);
 				Draw.rect(r.bladeOutlineRegion, unit.x + offX, unit.y + offY, w, h, angle);
@@ -68,9 +69,17 @@ public class CopterUnitType extends UnitType{
 		public TextureRegion bladeRegion, topRegion, bladeOutlineRegion, topOutlineRegion;
 		public float x = 0f, y = 0f, scale = 1f;
 		public int rotOffset = 0, speed = 29, bladeCount = 4;
+		public Rotor(float x,float y,float scale,int bladeCount,int speed,int rotOffset) {
+			this.x=x;
+			this.y=y;
+			this.scale=scale;
+			this.bladeCount=bladeCount;
+			this.speed=speed;
+			this.rotOffset=rotOffset;
+		}
 	}
 
-	class CopterAI extends FlyingAI{
+	public class CopterAI extends FlyingAI{
 		@Override
 		protected void attack(float attackLength){
 			moveTo(target, unit.range() * 0.8f);

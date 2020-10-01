@@ -10,6 +10,7 @@ import mindustry.content.TechTree.*;
 import mindustry.ctype.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.gen.*;
 import unity.content.*;
 
 import static mindustry.Vars.*;
