@@ -17,7 +17,8 @@ import static mindustry.Vars.*;
 public class Main extends Mod{
 	private ContentList[] unityContent = {
 		new UnityItems(),
-		new UnityBlocks()
+		new UnityBlocks(),
+		new UnityUnitTypes()
 	};
 
 	@Override
