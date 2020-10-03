@@ -1,4 +1,4 @@
-package unity.libraries;
+package unity.blocks;
 
 import arc.func.*;
 import arc.util.*;
@@ -26,7 +26,7 @@ import mindustry.world.consumers.ConsumePower;
 import mindustry.world.modules.*;
 import mindustry.ui.*;
 import mindustry.ui.fragments.BlockInventoryFragment;
-import unity.libraries.Recipe.*;
+import unity.blocks.Recipe.*;
 import java.util.*;
 
 import static arc.Core.*;

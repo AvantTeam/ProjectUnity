@@ -1,4 +1,4 @@
-package unity.libraries;
+package unity.units;
 
 import arc.math.Mathf;
 import mindustry.gen.*;

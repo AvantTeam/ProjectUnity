@@ -6,8 +6,8 @@ import mindustry.world.blocks.environment.*;
 import mindustry.type.*;
 import mindustry.ctype.*;
 import mindustry.content.*;
-import unity.libraries.*;
-import unity.libraries.Recipe.*;
+import unity.blocks.*;
+import unity.blocks.Recipe.*;
 
 import static mindustry.type.ItemStack.*;
 

@@ -1,4 +1,4 @@
-package unity.libraries;
+package unity.blocks;
 
 import mindustry.content.*;
 import mindustry.type.*;
