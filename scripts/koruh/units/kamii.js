@@ -62,7 +62,20 @@ const kamiController = prov(tmp => {
 		
 		updateUnit(){
 			this.super$updateUnit();
+			//bulletSequenceA();
+		},
+		
+		updateBulletHell(){
 			bulletSequenceA();
+		},
+		
+		updateMovement(){
+			if(this.target != null){
+				this.moveTo(this.target, 190);
+				if(this.unit.within(this.target, 210)){
+					this.updateBulletHell();
+				}
+			}
 		},
 		
 		bulletSequenceA(){
@@ -99,4 +112,5 @@ kami.flying = true;
 kami.health = 1200000;
 kami.range = 520;
 kami.ammoCapacity = 1280000000;
+kami.defaultController = kamiController;
 kami.ammoType = new AmmoTypes.PowerAmmoType(3000);

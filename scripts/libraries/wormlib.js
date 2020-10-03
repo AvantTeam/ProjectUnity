@@ -51,7 +51,7 @@ const segmentUnit = prov(() => {
 		collides(other){
 			if(this.getTrueParent() == null) return true;
 			for(var i = 0; i < this.getSegmentLength(); i++){
-				var entity = this.getSegments()[i];
+				var entity = this.getTrueParent().getSegments()[i];
 				if(entity == other) return false;
 			};
 			return true;
@@ -151,7 +151,7 @@ const segmentUnit = prov(() => {
 		
 		kill(){
 			if(this.dead || Vars.net.client()) return;
-			if(this.getTrueParent() == null) Call.unitDeath(this.getTrueParent().id);
+			if(this.getTrueParent() != null) Call.unitDeath(this.getTrueParent().id);
 			Call.unitDeath(this.id);
 		},
 
