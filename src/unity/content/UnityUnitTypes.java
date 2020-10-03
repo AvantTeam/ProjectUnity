@@ -18,16 +18,20 @@ import unity.units.*;
 import static mindustry.type.ItemStack.*;
 
 public class UnityUnitTypes implements ContentList{
-	private Prov<? extends Unit>[] constructors = new Prov[]{CopterUnit::new};
+	private static Prov<? extends Unit>[] constructors = new Prov[]{CopterUnit::new};
+	private static final int[] classIDs = new int[constructors.length];
 	public static UnitType
 	//flying units
 	anthophila, caelifera, lepidoptera, schistocerca, vespula;
+
+	public static int getClassId(int index){ return classIDs[index]; }
 
 	@Override
 	public void load(){
 		//flyer
 		for (int i = 0, j = 0, len = EntityMapping.idMap.length; i < len; i++){
 			if (EntityMapping.idMap[i] == null){
+				classIDs[j] = i;
 				EntityMapping.idMap[i] = constructors[j++];
 				if (j >= constructors.length) break;
 			}

@@ -16,7 +16,7 @@ import unity.content.*;
 import static mindustry.Vars.*;
 
 public class Main extends Mod{
-	private ContentList[] unityContent = {
+	private final ContentList[] unityContent = {
 		new UnityItems(),
 		new UnityBlocks(),
 		new UnityUnitTypes()
