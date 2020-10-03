@@ -1,5 +1,6 @@
 package unity.blocks;
 
+import java.util.Arrays;
 import arc.func.*;
 import arc.util.*;
 import arc.util.Log.*;
@@ -27,7 +28,6 @@ import mindustry.world.modules.*;
 import mindustry.ui.*;
 import mindustry.ui.fragments.BlockInventoryFragment;
 import unity.blocks.Recipe.*;
-import java.util.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
