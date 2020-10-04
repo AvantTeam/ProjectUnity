@@ -104,6 +104,18 @@ const script = [
             "maps"
         ]
     },
+	
+	{
+		name: "scar",
+		childs: [
+			{
+				name: "units",
+				childs: [
+					"whirlwind"
+				]
+			}
+		]
+	},
 
     {
         name: "dark",
