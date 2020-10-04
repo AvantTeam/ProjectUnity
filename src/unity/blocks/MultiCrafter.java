@@ -42,6 +42,7 @@ public class MultiCrafter extends GenericCrafter{
 	public final boolean dumpToggle;
 	private boolean powerBarI = false, powerBarO = false, hasOutputItem = false;
 	private final CustomBlockInventoryFragment invFrag = new CustomBlockInventoryFragment();
+	private int index = 0;
 
 	public MultiCrafter(String name, Recipe[] recs, boolean dumpToggle){
 		super(name);
@@ -80,9 +81,15 @@ public class MultiCrafter extends GenericCrafter{
 		});
 	}
 
+	public MultiCrafter(String name, int recLen, boolean dumpToggle){ this(name, new Recipe[recLen], dumpToggle); }
+
 	public MultiCrafter(String name, Recipe[] recs){ this(name, recs, false); }
 
-	public Recipe[] getRecipe(){ return recs; }
+	public MultiCrafter(String name, int recLen){ this(name, new Recipe[recLen]); }
+
+	public void addRecipe(InputContents input, OutputContents output, float craftTime){
+		recs[index++] = new Recipe(input, output, craftTime);
+	}
 
 	@Override
 	public void init(){

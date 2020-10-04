@@ -15,11 +15,16 @@ import static mindustry.Vars.*;
 public class CopterUnitType extends UnitType{
 	protected final Rotor[] rotors;
 	protected float fallRotateSpeed = 2.5f;
+	private int index = 0;
 
-	public CopterUnitType(String name,int rotorSize){
+	public CopterUnitType(String name, int rotorSize){
 		super(name);
-		rotors=new Rotor[rotorSize];
+		rotors = new Rotor[rotorSize];
 		defaultController = () -> new CopterAI();
+	}
+
+	public void addRotor(float x, float y, float scale, int bladeCount, int speed, int rotOffset){
+		rotors[index++] = new Rotor(x, y, scale, bladeCount, speed, rotOffset);
 	}
 
 	@Override
@@ -69,13 +74,14 @@ public class CopterUnitType extends UnitType{
 		public TextureRegion bladeRegion, topRegion, bladeOutlineRegion, topOutlineRegion;
 		public float x = 0f, y = 0f, scale = 1f;
 		public int rotOffset = 0, speed = 29, bladeCount = 4;
-		public Rotor(float x,float y,float scale,int bladeCount,int speed,int rotOffset) {
-			this.x=x;
-			this.y=y;
-			this.scale=scale;
-			this.bladeCount=bladeCount;
-			this.speed=speed;
-			this.rotOffset=rotOffset;
+
+		public Rotor(float x, float y, float scale, int bladeCount, int speed, int rotOffset){
+			this.x = x;
+			this.y = y;
+			this.scale = scale;
+			this.bladeCount = bladeCount;
+			this.speed = speed;
+			this.rotOffset = rotOffset;
 		}
 	}
 

@@ -71,11 +71,9 @@ public class UnityUnitTypes implements ContentList{
 						};
 					}
 				});
-				int index = 0;
 				fallRotateSpeed = 2f;
-				rotors[index++] = new Rotor(0f, -13f, 0.6f, 4, 29, 0);
-				for (int i = 0; i < 2; i++)
-					rotors[index++] = new Rotor(13f * Mathf.signs[i], 3f, 1f, 3, 29 * Mathf.signs[i], i * 180);
+				addRotor(0f, -13f, 0.6f, 4, 29, 0);
+				for (int i = 0; i < 2; i++) addRotor(13f * Mathf.signs[i], 3f, 1f, 3, 29 * Mathf.signs[i], i * 180);
 			}
 		};
 		EntityMapping.nameMap.put("caelifera", CopterUnit::new);
@@ -123,7 +121,7 @@ public class UnityUnitTypes implements ContentList{
 						};
 					}
 				});
-				rotors[0] = new Rotor(0f, 6f, 1f, 4, 29, 0);
+				addRotor(0f, 6f, 1f, 4, 29, 0);
 			}
 		};
 		EntityMapping.nameMap.put("lepidoptera", CopterUnit::new);
@@ -200,10 +198,8 @@ public class UnityUnitTypes implements ContentList{
 				fallRotateSpeed = 0.8f;
 				for (int i = 0, index = 0; i < 2; i++){
 					for (int j = 0; j < 2; j++){
-						rotors[index++] = new Rotor(Mathf.signs[i] * 22.5f, 21.25f, 1f, 3,
-							19 * Mathf.signs[i] * Mathf.signs[j], 0);
-						rotors[index++] = new Rotor(Mathf.signs[i] * 17.25f, 1f, 0.8f, 2,
-							23 * Mathf.signs[i] * Mathf.signs[j], 0);
+						addRotor(Mathf.signs[i] * 22.5f, 21.25f, 1f, 3, 19 * Mathf.signs[i] * Mathf.signs[j], 0);
+						addRotor(Mathf.signs[i] * 17.25f, 1f, 0.8f, 2, 23 * Mathf.signs[i] * Mathf.signs[j], 0);
 					}
 				}
 			}
@@ -262,8 +258,8 @@ public class UnityUnitTypes implements ContentList{
 						bullet = Bullets.standardIncendiaryBig;
 					}
 				});
-				for (int i = 0, index = 0; i < 2; i++, index++)
-					rotors[index] = new Rotor(0f, 6.5f, 1f, 3, 29 * Mathf.signs[i], 0);
+				for (int i = 0, index = 0; i < 2; i++, index++) addRotor(0f, 6.5f, 1f, 3, 29 * Mathf.signs[i], 0);
+
 			}
 		};
 		EntityMapping.nameMap.put("vespula", CopterUnit::new);
@@ -314,8 +310,8 @@ public class UnityUnitTypes implements ContentList{
 					}
 				});
 				for (int i = 0, index = 0; i < 2; i++){
-					for (int j = 0; j < 2; j++) rotors[index++] = new Rotor(15f * Mathf.signs[i], 6.75f, 1f, 4,
-						29 * Mathf.signs[i] * Mathf.signs[j], j * 180);
+					for (int j = 0; j < 2; j++)
+						addRotor(15f * Mathf.signs[i], 6.75f, 1f, 4, 29 * Mathf.signs[i] * Mathf.signs[j], j * 180);
 				}
 			}
 		};
