@@ -18,11 +18,14 @@ import unity.units.*;
 import static mindustry.type.ItemStack.*;
 
 public class UnityUnitTypes implements ContentList{
-	private static Prov<? extends Unit>[] constructors = new Prov[]{CopterUnit::new, WormSegmentUnit::new};
+	private static Prov<? extends Unit>[] constructors = new Prov[]{CopterUnit::new, WormSegmentUnit::new,
+		WormDefaultUnit::new};
 	private static final int[] classIDs = new int[constructors.length];
 	public static UnitType
 	//flying units
-	anthophila, caelifera, lepidoptera, schistocerca, vespula;
+	anthophila, caelifera, lepidoptera, schistocerca, vespula,
+		//worm units
+		arcnelidia, devourer;
 
 	public static int getClassId(int index){ return classIDs[index]; }
 
@@ -320,7 +323,60 @@ public class UnityUnitTypes implements ContentList{
 		newPlans[oldPlans.length] = new UnitPlan(caelifera, 60f * 25, with(Items.silicon, 15, Items.titanium, 25));
 		System.arraycopy(oldPlans, 0, newPlans, 0, oldPlans.length);
 		((UnitFactory) Blocks.airFactory).plans = newPlans;
-		//naval
+		//worms
+		EntityMapping.nameMap.put("arcnelidia", WormDefaultUnit::new);
+		arcnelidia = new WormUnitType("arcnelidia"){
+			{
+				setTypeID(3);
+				segmentOffset = 23f;
+				hitsize = 17f;
+				health = 800;
+				speed = 4f;
+				accel = 0.035f;
+				drag = 0.007f;
+				rotateSpeed = 3.2f;
+				engineSize = -1f;
+				faceTarget = false;
+				armor = 5f;
+				flying = true;
+				visualElevation = 0.8f;
+				range = 210f;
+				LightningBulletType aLightningBullet = new LightningBulletType(){
+					{
+						damage = 23f;
+						lightningColor = Pal.surge;
+						lightningLength = 24;
+						lightningLengthRand = 3;
+					}
+				};
+				weapons.add(new Weapon(){
+					{
+						reload = 90f;
+						rotateSpeed = 50f;
+						mirror = true;
+						rotate = true;
+						ignoreRotation = true;
+						minShootVelocity = 2.1f;
+						bullet = aLightningBullet;
+					}
+				});
+				segWeapSeq.add(new Weapon(){
+					{
+						x = 0f;
+						shots = 4;
+						reload = 70f;
+						rotateSpeed = 50f;
+						mirror = false;
+						ignoreRotation = true;
+						bullet = aLightningBullet;
+					}
+				});
+			}
+		};
+		/*EntityMapping.nameMap.put("devourer", WormDefaultUnit::new);
+		devourer=new WormUnitType("devourer", 45) {{
+			
+		}};*/
 
 		//upgraders
 		UnitType[][] oldUpgradesAdditive = ((Reconstructor) Blocks.additiveReconstructor).upgrades;

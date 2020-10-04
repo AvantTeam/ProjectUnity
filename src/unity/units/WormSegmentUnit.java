@@ -18,16 +18,26 @@ import static arc.Core.atlas;
 import static mindustry.Vars.*;
 
 public class WormSegmentUnit extends UnitEntity{
+	public WormUnitType wormType;
 	protected WormDefaultUnit trueParentUnit;
-	protected WormSegmentUnit parentUnit;
+	protected Unit parentUnit;
 	protected boolean isBugged;
 	protected int shootSequence, segmentType;
+
+	public int getSegmentLength(){ return wormType.segmentLength; }
+
+	@Override
+	public void type(UnitType type){
+		super.type(type);
+		if (type instanceof WormUnitType) wormType = (WormUnitType) type;
+		else throw new ClassCastException("you set this unit's type in sneaky way");
+	}
 
 	@Override
 	public boolean collides(Hitboxc other){
 		if (trueParentUnit == null) return true;
-		WormSegmentUnit[] segs = trueParentUnit.getSegments();
-		for (int i = 0, len = ((WormUnitType) type).segmentLength; i < len; i++) if (segs[i] == other) return false;
+		WormSegmentUnit[] segs = trueParentUnit.segmentUnits;
+		for (int i = 0, len = getSegmentLength(); i < len; i++) if (segs[i] == other) return false;
 		return true;
 	}
 
@@ -53,6 +63,8 @@ public class WormSegmentUnit extends UnitEntity{
 		hovering = type.hovering;
 		if (controller == null) controller(type.createController());
 		if (mounts().length != type.weapons.size) setupWeapons(type);
+		if (type instanceof WormUnitType) wormType = (WormUnitType) type;
+		else throw new ClassCastException("you set this unit's type in sneaky way");
 	}
 
 	@Override
@@ -120,7 +132,7 @@ public class WormSegmentUnit extends UnitEntity{
 		if (!(def instanceof WormUnitType)) super.setupWeapons(def);
 		else{
 			Seq<WeaponMount> tmpSeq = new Seq();
-			Seq<Weapon> originSeq = ((WormUnitType) def).getSegmentWeapon();
+			Seq<Weapon> originSeq = ((WormUnitType) def).segWeapSeq;
 			for (int i = 0; i < originSeq.size; i++) tmpSeq.add(new WeaponMount(originSeq.get(i)));
 			mounts = tmpSeq.toArray(WeaponMount.class);
 		}
@@ -137,7 +149,7 @@ public class WormSegmentUnit extends UnitEntity{
 			remove();
 		}
 		if (trueParentUnit != null && isBugged){
-			if (Arrays.stream(trueParentUnit.getSegments()).anyMatch(s -> s == this)) remove();
+			if (Arrays.stream(trueParentUnit.segmentUnits).anyMatch(s -> s == this)) remove();
 			else isBugged = false;
 		}
 	}
@@ -256,10 +268,9 @@ public class WormSegmentUnit extends UnitEntity{
 
 	public void drawBody(){
 		type.applyColor(this);
-		TextureRegion region = segmentType == 0 ? ((WormUnitType) type).segmentRegion()
-			: ((WormUnitType) type).tailRegion();
+		TextureRegion region = segmentType == 0 ? wormType.segmentRegion() : wormType.tailRegion();
 		Draw.rect(region, this, rotation - 90);
-		TextureRegion segCellReg = ((WormUnitType) type).getSegmentCell();
+		TextureRegion segCellReg = wormType.getSegmentCell();
 		if (segCellReg != atlas.find("error") && segmentType == 0) drawCell(segCellReg);
 		Draw.reset();
 	}
@@ -270,8 +281,7 @@ public class WormSegmentUnit extends UnitEntity{
 	}
 
 	public void drawShadow(){
-		TextureRegion region = segmentType == 0 ? ((WormUnitType) type).segmentRegion()
-			: ((WormUnitType) type).tailRegion();
+		TextureRegion region = segmentType == 0 ? wormType.segmentRegion() : wormType.tailRegion();
 		//Draw.color(Pal.shadow); seems not exist in v106
 		float e = Math.max(elevation, type.visualElevation);
 		Draw.rect(region, x + (UnitType.shadowTX * e), y + UnitType.shadowTY * e, rotation - 90f);
@@ -292,5 +302,5 @@ public class WormSegmentUnit extends UnitEntity{
 		trueParentUnit = parent;
 	}
 
-	public void setParent(WormSegmentUnit parent){ parentUnit = parent; }
+	public void setParent(Unit parent){ parentUnit = parent; }
 }

@@ -70,7 +70,7 @@ public class CopterUnitType extends UnitType{
 
 	protected void customDraw(Unit unit){}
 
-	public static class Rotor{
+	class Rotor{
 		public TextureRegion bladeRegion, topRegion, bladeOutlineRegion, topOutlineRegion;
 		public float x = 0f, y = 0f, scale = 1f;
 		public int rotOffset = 0, speed = 29, bladeCount = 4;

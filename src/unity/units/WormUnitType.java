@@ -2,8 +2,9 @@ package unity.units;
 
 import arc.func.*;
 import arc.struct.Seq;
-import arc.graphics.g2d.TextureRegion;
+import arc.graphics.g2d.*;
 import mindustry.type.*;
+import mindustry.gen.*;
 
 import static arc.Core.*;
 
@@ -33,7 +34,27 @@ public class WormUnitType extends UnitType{
 	@Override
 	public void init(){
 		super.init();
-		//TODO
+		sortWeapons(segWeapSeq);
+	}
+
+	public void sortWeapons(Seq<Weapon> weaponSeq){
+		Seq<Weapon> mapped = new Seq();
+		for (int i = 0, len = weaponSeq.size; i < len; i++){
+			Weapon w = weaponSeq.get(i);
+			mapped.add(w);
+			if (w.mirror){
+				Weapon copy = w.copy();
+				copy.x *= -1;
+				copy.shootX *= -1;
+				copy.flipSprite = !copy.flipSprite;
+				mapped.add(copy);
+				w.reload *= 2;
+				copy.reload *= 2;
+				w.otherSide = mapped.size - 1;
+				copy.otherSide = mapped.size - 2;
+			}
+		}
+		weaponSeq.set(mapped);
 	}
 
 	public TextureRegion segmentRegion(){ return segmentRegion; }
@@ -46,7 +67,31 @@ public class WormUnitType extends UnitType{
 
 	public int getTypeID(){ return idType; }
 
-	public float segmentOffset(){ return segmentOffset; }
+	@Override
+	public void drawBody(Unit unit){
+		super.drawBody(unit);
+		float originZ = Draw.z();
+		if (!(unit instanceof WormDefaultUnit)) return;
+		WormDefaultUnit wormUnit = (WormDefaultUnit) unit;
+		for (int i = 0; i < segmentLength; i++){
+			Draw.z(originZ - (i + 1) / 500f);
+			wormUnit.segmentUnits[i].drawBody();
+			drawWeapons(wormUnit.segmentUnits[i]);
+		}
+		Draw.z(originZ);
+	}
 
-	public Seq<Weapon> getSegmentWeapon(){ return segWeapSeq; }
+	@Override
+	public void drawShadow(Unit unit){
+		super.drawShadow(unit);
+		if (!(unit instanceof WormDefaultUnit)) return;
+		WormDefaultUnit wormUnit = (WormDefaultUnit) unit;
+		for (int i = 0; i < segmentLength; i++) wormUnit.segmentUnits[i].drawShadow();
+	}
+
+	@Override
+	public void drawOcclusion(Unit unit){
+		super.drawOcclusion(unit);
+		if (unit instanceof WormDefaultUnit) ((WormDefaultUnit) unit).drawOcclusion();
+	}
 }
