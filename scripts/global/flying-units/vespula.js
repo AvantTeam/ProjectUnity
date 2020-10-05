@@ -13,7 +13,7 @@ for(var i = 0; i < 2; i++){
 	};
 };
 
-const vespula = this.global.unity.copterbase.extend(UnitEntity, "vespula", {
+const vespula = global.unity.copterbase.extend(UnitEntity, "vespula", {
 	rotor: rotors,
 	
 	fallRotateSpeed: 1.2

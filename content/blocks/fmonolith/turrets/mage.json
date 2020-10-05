@@ -1,5 +1,4 @@
 {
-	"type": "PowerTurret",
 	"size": 2,
 	"health": 600,
 	"range": 120,
@@ -14,7 +13,7 @@
 	"shootType": {
 		"type": "LightningBulletType",
 		"lightningLength": 20,
-		"damage": 26
+		"damage": 32
 	},
 	"requirements": [
 		{"item": "lead", "amount": 75},

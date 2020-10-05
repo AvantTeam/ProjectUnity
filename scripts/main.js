@@ -1,4 +1,4 @@
-this.global.unity = {};
+global.unity = {};
 Vars.enableConsole = true;
 const loadFile = (prev, array) => {
     var results = [];
@@ -204,7 +204,7 @@ const script = [
             {
                 name: "turrets",
                 childs: [
-                    "oracle"
+                    "mage", "oracle"
                 ]
             },
 
@@ -243,7 +243,7 @@ for(var i = 0; i < loadedScript.res.length; i++){
     try{
         var content = require("unity/" + res);
         if(typeof(content) !== "undefined"){
-            this.global.unity[name] = content;
+            global.unity[name] = content;
         };
     }catch(e){
 		print(e);
@@ -257,10 +257,4 @@ if(!Vars.headless){
         mod.meta.displayName = Core.bundle.get(change + "name");
         mod.meta.description = Core.bundle.get(change + "description");
     });
-    /*try{
-		if(Mathf.chance(0.05)) Core.app.openURI((Mathf.chance(0.7))?"https://youtu.be/dQw4w9WgXcQ":"https://youtu.be/H01BwSD9eyQ");
-    }
-    catch(err){
-        print(err);
-    }*/
 };

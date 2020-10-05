@@ -19,7 +19,7 @@ for(var i = 0; i < 2; i++){
 	});
 };
 
-const anthophila = this.global.unity.copterbase.extend(UnitEntity, "anthophila", {
+const anthophila = global.unity.copterbase.extend(UnitEntity, "anthophila", {
 	rotor: rotors,
 	
 	fallRotateSpeed: 2
