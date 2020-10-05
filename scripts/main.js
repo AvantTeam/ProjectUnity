@@ -49,7 +49,8 @@ const script = [
             "loader",
             "chainlaser",
             "exp",
-            "multi-lib"
+            "multi-lib",
+			"status"
         ]
     },
 
@@ -111,7 +112,8 @@ const script = [
 			{
 				name: "units",
 				childs: [
-					"whirlwind"
+					"whirlwind",
+					"jetstream"
 				]
 			}
 		]
