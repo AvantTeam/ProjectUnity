@@ -83,7 +83,6 @@ module.exports = {
 
         var copter = extendContent(UnitType, name, obj);
         copter.defaultController = copterAI;
-        copter.omniMovement = false;
 
         obju = Object.assign(obju, {
             update(){
