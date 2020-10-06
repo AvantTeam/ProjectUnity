@@ -109,7 +109,7 @@ const jetstreamLaser = extend(ContinuousLaserBulletType, {
 			b.data[3].fill(0);
 		};
 		//var angDst = Angles.angleDist(b.rotation(), b.data[2]);
-		var angDst = Angles.angleDist(b.rotation(), b.data[2]);
+		var angDst = Angles.angleDist(b.rotation(), b.data[2]) / Time.delta;
 		b.data[3].add(angDst);
 		angDst = b.data[3].rawMean();
 		if(b.owner != null){
