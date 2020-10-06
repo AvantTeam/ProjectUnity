@@ -11,7 +11,7 @@ for(var i = 0; i < 2; i++){
 	});
 };
 
-const schistocerca = global.unity.copterbase.extend(UnitEntity, "schistocerca", {
+const schistocerca = this.global.unity.copterbase.extend(UnitEntity, "schistocerca", {
 	rotor: rotors,
 	
 	fallRotateSpeed: 2.5

@@ -3,7 +3,7 @@
 	"health": 1400,
 	"range": 125,
 	"reloadTime": 140,
-	"coolantMultiplier": 3,
+	"coolantMultiplier": 2,
 	"shootCone": 1,
     "firingMoveFract": 0.15,
 	"shootDuration": 200,

@@ -68,7 +68,7 @@ const orb = extend(BulletType, {
 			Units.nearbyEnemies(b.team, b.x - this.scanRadius, b.y - this.scanRadius, this.scanRadius * 2, this.scanRadius * 2, cons(unit => {
 				Lightning.create(b.team, Pal.surge, Mathf.random(17, 33), b.x, b.y, b.angleTo(unit), Mathf.random(7, 13));
 			}));
-		}
+		};
 	},
 
     drawLight(b){
@@ -88,6 +88,7 @@ orb.scanRadius = 5 * Vars.tilesize;
 
 const orbTurret = extendContent(ChargeTurret, "orb", {});
 orbTurret.shootType = orb;
+orbTurret.shootSound = Sounds.laser;
 orbTurret.heatColor = Pal.turretHeat;
 orbTurret.shootEffect = orbShoot;
 orbTurret.smokeEffect = Fx.none;

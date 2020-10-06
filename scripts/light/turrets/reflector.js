@@ -1,58 +1,65 @@
-/*const mirrorBeam = extend(BulletType, {
+const lightHit = new Effect(18, e => {
+	Draw.color(Color.white);
+
+	Lines.stroke(0.8 + e.fout() * 1.5);
+	Angles.randLenVectors(e.id, 7, e.fin() * 18, e.rotation, 360, new Floatc2({get(x, y){
+		var ang = Mathf.angle(x, y);
+		Lines.lineAngle(e.x + x, e.y + y, ang, e.fout() * 11 + 5);
+	}}));
+});
+
+const lightCharge = new Effect(38, e => {
+	Draw.color(Color.white);
+	Angles.randLenVectors(e.id, 3, e.fout() * 20 + 1, e.rotation, 120, new Floatc2({get(x, y){
+		var ang = Mathf.angle(x, y);
+		Lines.lineAngle(e.x + x, e.y + y, ang, e.fslope() * 5 + 1);
+	}}));
+});
+
+const lightChargeBegin = new Effect(120, e => {
+	Draw.color(Color.lightGray);
+	Fill.circle(e.x, e.y, e.fin() * 3);
+
+	Draw.color();
+	Fill.circle(e.x, e.y, e.fin() * 2);
+});
+
+const lightOvoid = extend(BulletType, {
 	draw(b){
-		if(b.data instanceof Position){
-			var data = b.data;
-			Tmp.v1.set(data);
-			
-			Draw.color(this.color);
-			Drawf.laser(b.team, Core.atlas.find("laser"), Core.atlas.find("laser-end"), b.x, b.y, Tmp.v1.x, Tmp.v1.y, b.fout() * this.width);
-			Draw.reset();
-			
-			Drawf.light(Team.derelict, b.x, b.y, b.x + Tmp.v1.x, b.y + Tmp.v1.y, b.fout() * 15 + 5, this.lightColor, 0.6);
-		}
+		b.data.draw(this.color, 3);
+
+		Draw.color(this.color);
+		Fill.circle(b.x, b.y, 3);
 	},
-	
-	hit(b, x, y){
-		this.super$hit(b, b.x, b.y);
-		//mirrorBeam.create(b, b.x, b.y, b.rotation() * 2);
+
+	update(b){
+		this.super$update(b);
+
+		b.data.update(b.x, b.y);
 	},
-	
+
 	init(b){
 		if(!b) return;
-		this.super$init(b);
-		
-		var target = Damage.linecast(b, b.x, b.y, b.rotation(), this.length);
-		b.data = target;
-		
-		if(target instanceof Hitboxc){
-			var hit = target;
 
-			hit.collision(b, hit.x, hit.y);
-			b.collision(hit, hit.x, hit.y);
-		}else if(target instanceof Building){
-			var tile = target;
-
-			if(tile.collide(b)){
-				tile.collision(b);
-				this.hit(b, tile.x, tile.y);
-			}
-		}else{
-			b.data = new Vec2().trns(b.rotation(), this.length).add(b.x, b.y);
-		}
+		b.data = new Trail(16);
 	}
 });
-//TODO make damage, length, and things based on the light input (unsure)
-mirrorBeam.damage = 69;
-mirrorBeam.speed = 0.0001;
-mirrorBeam.color = Color.white.cpy();
-mirrorBeam.shootEffect = Fx.none;
-mirrorBeam.despawnEffect = Fx.none;
-mirrorBeam.width = 0.82;
-mirrorBeam.length = 120;
+//TODO make damage, epilepsy effects, and things based on the light input (unsure)
+lightOvoid.damage = 160;
+lightOvoid.lifetime = 820;
+lightOvoid.speed = 6.8;
+lightOvoid.color = Color.white.cpy();
+lightOvoid.hitEffect = lightHit;
+lightOvoid.shootEffect = Fx.none;
+lightOvoid.despawnEffect = lightHit;
+lightOvoid.hittable = false;
 
 //TODO lightConsumer after formatting
 const reflector = extendContent(ChargeTurret, "reflector", {
 	//TODO epic stuff and effects (?)
 });
-reflector.shootType = mirrorBeam;
-reflector.consumes.add(new ConsumeLiquidFilter(liquid => liquid.temperature <= 0.5 && liquid.flammability <= 0.1, 0.52)).update(false);*/
+reflector.shootType = lightOvoid;
+reflector.shootSound = Sounds.laser;
+reflector.chargeEffect = lightCharge;
+reflector.chargeBeginEffect = lightChargeBegin;
+reflector.consumes.add(new ConsumeLiquidFilter(liquid => liquid.temperature <= 0.5 && liquid.flammability <= 0.1, 0.52)).update(false);

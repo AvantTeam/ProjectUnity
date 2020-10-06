@@ -26,7 +26,7 @@ for(var i = 0; i < 2; i++){
 	};
 };
 
-const lepidoptera = global.unity.copterbase.extend(UnitEntity, "lepidoptera", {
+const lepidoptera = this.global.unity.copterbase.extend(UnitEntity, "lepidoptera", {
 	rotor: rotors,
 	
 	fallRotateSpeed: 0.8

@@ -15,18 +15,18 @@ const laser = extend(BulletType, {
             var h = other;
             h.damage(this.getDamage(this));
         }else if(other instanceof Unit) {
-            unit = other;
+            var unit = other;
             unit.impulse(Tmp.v3.set(unit).sub(this.x, this.y).nor().scl(this.knockback * 80.0));
             unit.apply(this.status, this.statusDuration);
         }if(!this.pierce){
-         remove();
+			this.remove();
         }else{
             this.collided.add(other.id());
         }
     },
 
     init(b){
-        if(typeof(b) === "undefined") return;
+        if(!b) return;
         this.super$init(b);
 
         var target = Damage.linecast(b, b.x, b.y, b.rotation(), this.length);
@@ -64,7 +64,7 @@ const laser = extend(BulletType, {
             Drawf.laser(b.team, Core.atlas.find("laser"), Core.atlas.find("laser-end"), b.x, b.y, Tmp.v1.x, Tmp.v1.y, this.width * b.fout());
             Draw.reset();
 
-            Drawf.light(b.team, b.x, b.y, b.x + Tmp.v1.x, b.y + Tmp.v1.y, 15 * b.fout() + 5, this.getColor(b), 0.6);
+            Drawf.light(Team.derelict, b.x, b.y, b.x + Tmp.v1.x, b.y + Tmp.v1.y, 15 * b.fout() + 5, this.getColor(b), 0.6);
         }
     }
 });

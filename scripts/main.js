@@ -146,6 +146,7 @@ const script = [
                 childs: [
                     "orb",
                     "shockwire",
+					"current",
                     "plasma"
                 ]
             },

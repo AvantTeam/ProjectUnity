@@ -1,4 +1,4 @@
-const caelifera = global.unity.copterbase.extend(UnitEntity, "caelifera", {
+const caelifera = this.global.unity.copterbase.extend(UnitEntity, "caelifera", {
 	rotor: [{
 		x: 0,
 		y: 6,

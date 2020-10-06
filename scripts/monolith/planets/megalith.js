@@ -148,9 +148,7 @@ const megalithGen = extend(PlanetGenerator, {
 		this.cells(1);
 		this.distort(10, 6);
 		
-		if(spawn != null){
-			this.inverseFloodFill(this.tiles.getn(spawn.x, spawn.y));
-		};
+		this.inverseFloodFill(this.tiles.getn(spawn.x, spawn.y));
 		
 		var ores = Seq.with(Blocks.oreCopper, Blocks.oreLead);
 		
@@ -206,14 +204,12 @@ const megalithGen = extend(PlanetGenerator, {
 		this.median(2);
 		
 		this.tech();
-		
-		if(spawn != null){
-			Schematics.placeLaunchLoadout(spawn.x, spawn.y);
-		};
+
+		Schematics.placeLaunchLoadout(spawn.x, spawn.y);
 		
 		var difficulty = this.sector.baseCoverage;
 		
-		if(this.sector.hasEnemyBase() && spawn != null){
+		if(this.sector.hasEnemyBase()){
 			this.basegen.generate(tiles, enemies.map(r => this.tiles.getn(r.x, r.y)), this.tiles.get(spawn.x, spawn.y), Vars.state.rules.waveTeam, this.sector, difficulty);
 			
 			Vars.state.rules.attackMode = true;

@@ -7,10 +7,23 @@ const chargeTriangles = new Effect(96, e => {
 	}}));
 });
 
-const chargeBeginTriangles = new Effect(190, e => {
+const chargeBeginTriangles = new Effect(250, e => {
 	Draw.color(Pal.surge);
 	
 	Drawf.tri(e.x, e.y, e.fin() * 16, e.fin() * 20, e.rotation);
+});
+
+const shootTriangle = new Effect(36, e => {
+	Draw.color(Pal.surge, Color.white, e.fin());
+	
+	Angles.randLenVectors(e.id, 8, e.fin() * 20 + 1, e.rotation, 40, new Floatc2({get(x, y){
+		Drawf.tri(e.x + x, e.y + y, e.fout() * 14, e.fout() * 15, e.rotation);
+		Drawf.tri(e.x + x, e.y + y, e.fout() * 8, e.fout() * 9, e.rotation);
+	}}));
+	
+	Angles.randLenVectors(e.id, 4, e.fin() * 20 + 1, e.rotation, 40, new Floatc2({get(x, y){
+		Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fslope() * 18 + 3);
+	}}));
 });
 
 const unecessaryCircle = new Effect(30, e => {
@@ -70,7 +83,7 @@ const plasmaFrag = extend(BulletType, {
 });
 plasmaFrag.speed = 4.5;
 plasmaFrag.drag = 0.05;
-plasmaFrag.damage = 20;
+plasmaFrag.damage = 90;
 plasmaFrag.collides = false;
 plasmaFrag.colors = [Pal.surge, Color.valueOf("f2e87b"), Color.valueOf("d89e6b"), Color.white];
 plasmaFrag.hitColor = plasmaFrag.colors[1];
@@ -80,8 +93,6 @@ plasmaFrag.despawnEffect = fragDisappear;
 
 const plasma = extend(BulletType, {
 	init(b){
-		//this.super$init(b);
-
     	if(typeof(b) === "undefined") return;
     
     	b.data = new Trail(10);
@@ -119,16 +130,20 @@ const plasma = extend(BulletType, {
 });
 plasma.lifetime = 190;
 plasma.speed = 4;
-plasma.damage = 280;
+plasma.damage = 380;
 plasma.colors = [Pal.surge, Color.valueOf("f2e87b"), Color.valueOf("d89e6b"), Color.white];
 plasma.hitColor = plasma.colors[1];
 plasma.fragBullet = plasmaFrag;
-//must be a constant value gdeft
 plasma.fragBullets = 8;
 
-const plasmaTurret = extendContent(ChargeTurret, "plasma", {});
-plasmaTurret.shootType = plasma;
-plasmaTurret.chargeMaxDelay = 190;
+const plasmaTurret = extendContent(ChargeTurret, "plasma", {
+	shouldTurn(){
+		return true;
+	}
+});
+plasmaTurret.shootType = plasma
+plasmaTurret.shootSound = Sounds.shotgun;
+plasmaTurret.shootEffect = shootTriangle;
 plasmaTurret.chargeBeginEffect = chargeBeginTriangles;
 plasmaTurret.chargeEffect = chargeTriangles;
 plasmaTurret.consumes.add(new ConsumeLiquidFilter(liquid => liquid.temperature <= 0.5 && liquid.flammability <= 0.1, 0.52)).boost();

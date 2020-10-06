@@ -76,4 +76,5 @@ const shockwire = extendContent(LaserTurret, "shockwire", {
 	}
 });
 shockwire.shootType = shockBeam;
+shockwire.shootSound = Sounds.thruster;
 shockwire.consumes.add(new ConsumeLiquidFilter(liquid => liquid.temperature <= 0.5 && liquid.flammability <= 0.1, 0.4)).update(false);

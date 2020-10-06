@@ -1,0 +1,18 @@
+{
+	"size": 3,
+	"health": 60,
+	"range": 160,
+	"reloadTime": 280,
+	"shootCone": 0.1,
+	"inaccuracy": 0,
+	"chargeTime": 160,
+	"chargeEffects": 4,
+	"chargeMaxDelay": 35,
+	"powerUse": 1,
+	"targetAir": true,
+	"requirements": [
+		{"item": "copper", "amount": 1}
+	],
+	"category": "turret",
+	"research": "fuse"
+}
