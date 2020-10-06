@@ -1,9 +1,9 @@
 const Integer = java.lang.Integer;
 
 const loaderBlock = extendContent(Block, "loader-block", {
-	load(){
+	/*load(){
 		this.region = Core.atlas.white();
-	},
+	},*/
 
 	init(){
 		Core.app.post(run(() => {

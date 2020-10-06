@@ -138,7 +138,7 @@ const jetstreamLaser = extend(ContinuousLaserBulletType, {
 			/*fLib.chanceMultiple(c, run(() => {
 				Lightning.create(b.team, Color.valueOf("f53036"), 3 + damageC, b.x, b.y, b.rotation(), Mathf.round(baseLen / 8));
 			}));*/
-			for(var i = 0; i < 4; i++){
+			for(var i = 0; i < 3; i++){
 				var lenRangedB = baseLen + Mathf.range(16);
 				if(Mathf.chanceDelta(c) && lenRangedB >= 8){
 					Lightning.create(b.team, Color.valueOf("f53036"), 3 + (damageC / 2), b.x, b.y, b.rotation(), Mathf.round(lenRangedB / 8));
@@ -161,8 +161,8 @@ const jetstreamLaser = extend(ContinuousLaserBulletType, {
 	},
 	
 	chargedDamage(b, val){
-		if(b.time < 60){
-			return val * (60 - b.time);
+		if(b.time < 50){
+			return val * (50 - b.time);
 		};
 		return 0;
 	},
