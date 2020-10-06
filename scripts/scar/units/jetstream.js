@@ -2,6 +2,37 @@ const sEffect = this.global.unity.status;
 
 const offsetA = 0.15;
 
+const tV = new Vec2();
+const tV2 = new Vec2();
+
+const falseLightning = new Effect(10, 500, e => {
+	var owner = e.data[0];
+	var length = e.data[1];
+	var lenInt = Mathf.round(length / 8);
+	
+	Lines.stroke(3 * e.fout());
+	Draw.color(e.color, Color.white, e.fin());
+	
+	for(var i = 0; i < lenInt; i++){
+		var offsetXA = (i == 0) ? 0 : Mathf.randomSeed(e.id + (i * 6413), -4.5, 4.5);
+		var offsetYA = (length / lenInt) * i;
+		
+		var f = i + 1;
+		
+		var offsetXB = (f == lenInt) ? 0 : Mathf.randomSeed(e.id + (f * 6413), -4.5, 4.5);
+		var offsetYB = (length / lenInt) * f;
+		
+		tV.trns(owner.rotation(), offsetYA, offsetXA);
+		tV.add(owner.x, owner.y);
+		
+		tV2.trns(owner.rotation(), offsetYB, offsetXB);
+		tV2.add(owner.x, owner.y);
+		
+		Lines.line(tV.x, tV.y, tV2.x, tV2.y, false);
+		Fill.circle(tV.x, tV.y, Lines.getStroke() / 2);
+	};
+});
+
 const coloredHitSmall = new Effect(14, e => {
 	Draw.color(Color.white, e.color, e.fin());
 	
@@ -102,6 +133,9 @@ const jetstreamLaser = extend(ContinuousLaserBulletType, {
 		if(Mathf.chanceDelta(0.1 + Mathf.clamp(angDst / 25)) && Mathf.round(lenRanged / 8) >= 1){
 			Lightning.create(b.team, Color.valueOf("f53036"), 6 + (angDst * 1.7), b.x, b.y, b.rotation(), Mathf.round(lenRanged / 8));
 		};
+		if(Mathf.chanceDelta(0.1)){
+			falseLightning.at(b.x, b.y, b.rotation(), Color.valueOf("f53036"), [b, baseLen]);
+		};
 		
 		b.data[2] = b.rotation();
 		//b.data[3].add(angDst);
@@ -179,6 +213,7 @@ jetstreamLaserWeap.shootCone = 30;
 
 const jetstream = extendContent(UnitType, "jetstream", {});
 jetstream.constructor = () => extend(UnitEntity, {});
+jetstream.description = "The Only Thing I Know for Real";
 jetstream.weapons.add(jetstreamLaserWeap);
 jetstream.weapons.add(jetstreamMissileWeap);
 jetstream.health = 670;
