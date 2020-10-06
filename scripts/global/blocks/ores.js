@@ -39,8 +39,8 @@ const umbriumOre = extendContent(OreBlock, "umbrium", {
 		createIconsC(packer, this);
 	}
 });
-umbriumOre.oreScale = 23.77;
-umbriumOre.oreThreshold = 0.813;
+umbriumOre.oreScale = 24.77;
+umbriumOre.oreThreshold = 0.893;
 umbriumOre.oreDefault = true;
 
 const luminumOre = extendContent(OreBlock, "luminum", {
@@ -53,8 +53,8 @@ const luminumOre = extendContent(OreBlock, "luminum", {
 		createIconsC(packer, this);
 	}
 });
-luminumOre.oreScale = 23.77;
-luminumOre.oreThreshold = 0.810;
+luminumOre.oreScale = 24.77;
+luminumOre.oreThreshold = 0.890;
 luminumOre.oreDefault = true;
 
 const monoliteOre = extendContent(OreBlock, "monolite", {
@@ -68,7 +68,7 @@ const monoliteOre = extendContent(OreBlock, "monolite", {
 	}
 });
 monoliteOre.oreScale = 23.77;
-monoliteOre.oreThreshold = 0.807;
+monoliteOre.oreThreshold = 0.887;
 monoliteOre.oreDefault = true;
 
 const imberiumOre = extendContent(OreBlock, "imberium", {
@@ -82,5 +82,5 @@ const imberiumOre = extendContent(OreBlock, "imberium", {
 	}
 });
 imberiumOre.oreScale = 23.77;
-imberiumOre.oreThreshold = 0.807;
+imberiumOre.oreThreshold = 0.887;
 imberiumOre.oreDefault = true;

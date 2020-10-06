@@ -1,3 +1,5 @@
+const sEffect = this.global.unity.status;
+
 //TODO move effect to an effect library.
 const coloredHitSmall = new Effect(14, e => {
 	Draw.color(Color.white, e.color, e.fin());
@@ -22,7 +24,7 @@ whirlWindMissile.shrinkY = 0;
 whirlWindMissile.backColor = Color.valueOf("f53036");
 whirlWindMissile.frontColor = Color.valueOf("ff786e");
 whirlWindMissile.trailColor = Color.valueOf("f53036");
-whirlWindMissile.splashDamage = 20;
+whirlWindMissile.splashDamage = 15;
 whirlWindMissile.splashDamageRadius = 20;
 whirlWindMissile.weaveMag = 3;
 whirlWindMissile.weaveScale = 4;
@@ -80,12 +82,13 @@ whirlWindLaser.largeHit = false;
 whirlWindLaser.damage = 21;
 whirlWindLaser.lifetime = 10 * 60;
 whirlWindLaser.length = 160;
-whirlWindLaser.width = 3;
+whirlWindLaser.width = 5;
 whirlWindLaser.incendChance = 0;
 whirlWindLaser.hitEffect = coloredHitSmall;
 whirlWindLaser.lightColor = Color.valueOf("f5303690");
 whirlWindLaser.hitColor = Color.valueOf("f5303690");
 whirlWindLaser.colors = [Color.valueOf("f5303690"), Color.valueOf("ff786e"), Color.white];
+whirlWindLaser.strokes = [1.5, 1, 0.3];
 
 const whirlWindMissileWeap = new Weapon();
 whirlWindMissileWeap.rotate = true;
@@ -102,7 +105,9 @@ whirlWindLaserWeap.x = 0;
 whirlWindLaserWeap.y = 4;
 whirlWindLaserWeap.minShootVelocity = 5;
 whirlWindLaserWeap.continuous = true;
-whirlWindLaserWeap.reload = (5 * 60) + whirlWindLaser.lifetime;
+whirlWindLaserWeap.reload = (2 * 60) + whirlWindLaser.lifetime;
+whirlWindLaserWeap.shootStatus = sEffect.reloadFatigue;
+whirlWindLaserWeap.shootStatusDuration = whirlWindLaser.lifetime;
 whirlWindLaserWeap.bullet = whirlWindLaser;
 whirlWindLaserWeap.shootCone = 20;
 
