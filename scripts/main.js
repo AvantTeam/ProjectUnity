@@ -50,7 +50,8 @@ const script = [
             "chainlaser",
             "exp",
             "multi-lib",
-			"status"
+			"status",
+			"funclib"
         ]
     },
 

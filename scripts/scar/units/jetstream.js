@@ -1,4 +1,5 @@
 const sEffect = this.global.unity.status;
+const fLib = this.global.unity.funclib;
 
 const offsetA = 0.15;
 
@@ -115,8 +116,9 @@ const jetstreamLaser = extend(ContinuousLaserBulletType, {
 		if(b.owner != null){
 			//var valA = Math.max(b.owner.vel.len() * 19, b.fdata * 0.95);
 			//lengthC = Mathf.clamp(valA, 0, this.length);
-			b.data[0] = Mathf.clamp(b.data[0] + (b.owner.vel.len() / 2), 0, this.length) + (angDst * 7);
+			b.data[0] = Mathf.clamp(b.data[0] + (b.owner.vel.len() / 2) + angDst, 0, this.length) + (angDst * 7);
 		};
+		var damageC = this.chargedDamage(b, angDst);
 		//this.super$update(b);
 		var realLength = Damage.findLaserLength(b, b.data[0]);
 		var fout = Mathf.clamp(b.time > b.lifetime - this.fadeTime ? 1 - (b.time - (this.lifetime - this.fadeTime)) / this.fadeTime : 1);
@@ -128,12 +130,26 @@ const jetstreamLaser = extend(ContinuousLaserBulletType, {
 		
 		if(b.timer.get(1, 5)){
 			Damage.collideLine(b, b.team, Fx.none, b.x, b.y, b.rotation(), b.data[0], this.largeHit);
+			if(angDst > 0.0001) fLib.collideLineDamageOnly(b.team, (angDst + damageC) * 2, b.x, b.y, b.rotation(), b.data[0], this);
 		};
 		
-		if(Mathf.chanceDelta(0.1 + Mathf.clamp(angDst / 25)) && Mathf.round(lenRanged / 8) >= 1){
-			Lightning.create(b.team, Color.valueOf("f53036"), 6 + (angDst * 1.7), b.x, b.y, b.rotation(), Mathf.round(lenRanged / 8));
+		if(b.time < 40){
+			var c = ((40 - b.time) * (angDst / 20)) / 40;
+			/*fLib.chanceMultiple(c, run(() => {
+				Lightning.create(b.team, Color.valueOf("f53036"), 3 + damageC, b.x, b.y, b.rotation(), Mathf.round(baseLen / 8));
+			}));*/
+			for(var i = 0; i < 4; i++){
+				var lenRangedB = baseLen + Mathf.range(16);
+				if(Mathf.chanceDelta(c) && lenRangedB >= 8){
+					Lightning.create(b.team, Color.valueOf("f53036"), 3 + (damageC / 2), b.x, b.y, b.rotation(), Mathf.round(lenRangedB / 8));
+				}
+			};
 		};
-		if(Mathf.chanceDelta(0.1)){
+		
+		if(Mathf.chanceDelta((0.1 + Mathf.clamp(angDst / 25)) * b.fout()) && Mathf.round(lenRanged / 8) >= 1){
+			Lightning.create(b.team, Color.valueOf("f53036"), 6 + (angDst * 1.7) + (damageC * 2), b.x, b.y, b.rotation(), Mathf.round(lenRanged / 8));
+		};
+		if(Mathf.chanceDelta(0.12 * b.fout())){
 			falseLightning.at(b.x, b.y, b.rotation(), Color.valueOf("f53036"), [b, baseLen]);
 		};
 		
@@ -142,6 +158,13 @@ const jetstreamLaser = extend(ContinuousLaserBulletType, {
 		
 		Tmp.v2.trns(b.rotation(), baseLen / 2);
 		b.data[1].updateC(b.x + Tmp.v2.x, b.y + Tmp.v2.y, b.rotation() + 90);
+	},
+	
+	chargedDamage(b, val){
+		if(b.time < 60){
+			return val * (60 - b.time);
+		};
+		return 0;
 	},
 	
 	draw(b){
@@ -203,7 +226,7 @@ const jetstreamLaserWeap = new Weapon();
 jetstreamLaserWeap.mirror = false;
 jetstreamLaserWeap.x = 0;
 jetstreamLaserWeap.y = 7;
-jetstreamLaserWeap.minShootVelocity = 5;
+//jetstreamLaserWeap.minShootVelocity = 5;
 jetstreamLaserWeap.continuous = true;
 jetstreamLaserWeap.reload = (2.5 * 60) + jetstreamLaser.lifetime;
 jetstreamLaserWeap.shootStatus = sEffect.reloadFatigue;
