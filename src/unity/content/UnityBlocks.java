@@ -3,15 +3,10 @@ package unity.content;
 import arc.util.*;
 import arc.util.Log.*;
 import arc.util.io.*;
-import arc.graphics.Color;
-import arc.graphics.g2d.*;
-import arc.math.geom.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.defense.turrets.*;
-import mindustry.entities.Damage;
-import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ctype.*;
@@ -32,8 +27,10 @@ public class UnityBlocks implements ContentList{
 
 		//crafting
 		multiTest1, multiTest2,
-		//turret
-		laser;
+		//koruh-turret
+		laserTurret, inferno;
+	//fuck
+	public static final ExpBlockModule laserExp = new ExpBlockModule(10), infernoExp = new ExpBlockModule(10);
 
 	@Override
 	public void load(){
@@ -128,14 +125,13 @@ public class UnityBlocks implements ContentList{
 					30);
 			}
 		};
-		//turret
-		laser = new PowerTurret("laser-turret"){
-			public final ExpBlockModule expModule = new ExpBlockModule(this, 10);
+		//koruh-turret
+		laserTurret = new PowerTurret("laser-turret"){
 
 			@Override
 			public void setBars(){
 				super.setBars();
-				expModule.customSetBars();
+				laserExp.customSetBars();
 			}
 
 			@Override
@@ -147,21 +143,21 @@ public class UnityBlocks implements ContentList{
 						@Override
 						public void add(){
 							super.add();
-							exp = expModule.forBars.get(id);
+							exp = laserExp.forBars.get(id);
 						}
 
 						@Override
 						public void remove(){
 							super.remove();
 							exp = null;
-							if (expModule.forBars.containsKey(id)) expModule.forBars.remove(id);
+							if (laserExp.forBars.containsKey(id)) laserExp.forBars.remove(id);
 						}
 
 						@Override
 						public void updateTile(){
 							if (exp == null) return;
 							exp.setExpStats();
-							if (expModule.hasCustomUpdate) exp.customUpdate();
+							if (laserExp.hasCustomUpdate) exp.customUpdate();
 							else super.updateTile();
 						}
 
@@ -179,7 +175,7 @@ public class UnityBlocks implements ContentList{
 							exp.customRead(read, revision);
 						}
 					};
-					expModule.new ExpBuildModule(ret);
+					laserExp.new ExpBuildModule(ret);
 					return ret;
 				};
 			}
@@ -195,71 +191,76 @@ public class UnityBlocks implements ContentList{
 				inaccuracy = 0f;
 				powerUse = 7f;
 				targetAir = false;
-				shootType = new BulletType(0.01f, 30f){
-					float length = 150f;
-					float width = 0.7f;
-					Color levelColor;
-					TextureRegion laserRegion, laserEndRegion;
+				shootType = UnityBullets.laser;
+				laserExp.addBlock(this);
+				laserExp.addExpField("linear", "reloadTime", 35, -2);
+				laserExp.addExpField("bool", "targetAir", 0, 5);
+			}
+		};
+		inferno = new ItemTurret("inferno"){
+			@Override
+			public void setBars(){
+				super.setBars();
+				infernoExp.customSetBars();
+			}
 
-					@Override
-					public void load(){
-						laserRegion = atlas.find("laser");
-						laserEndRegion = atlas.find("laser-end");
-					}
+			@Override
+			protected void initBuilding(){
+				buildType = () -> {
+					Building ret = new ItemTurret.ItemTurretBuild(){
+						private ExpBlockModule.ExpBuildModule exp;
 
-					@Override
-					public void init(Bullet b){
-						if (b == null) return;
-						Healthc target = Damage.linecast(b, b.x, b.y, b.rotation(), length);
-						b.data = target;
-						ExpBlockModule.ExpBuildModule exp = expModule.forBars.get(b.owner.id());
-						int lvl = expModule.getLevel(exp.totalExp());
-						b.damage(damage + lvl * 10f);
-						levelColor = Tmp.c1.set(Color.white).lerp(Pal.lancerLaser, lvl / 10f);
-						if (target instanceof Hitboxc){
-							Hitboxc hit = (Hitboxc) target;
-							hit.collision(b, hit.x(), hit.y());
-							b.collision(hit, hit.x(), hit.y());
-							exp.incExp(2);
-						}else if (target instanceof Building){
-							Building tile = (Building) target;
-							if (tile.collide(b)){
-								tile.collision(b);
-								hit(b, tile.x, tile.y);
-								exp.incExp(2);
-							}
-						}else b.data = new Vec2().trns(b.rotation(), length).add(b.x, b.y);
-					}
-
-					@Override
-					public float range(){ return length; }
-
-					@Override
-					public void draw(Bullet b){
-						if (b.data instanceof Position){
-							Tmp.v1.set((Position) b.data);
-							Draw.color(levelColor);
-							Drawf.laser(b.team, laserRegion, laserEndRegion, b.x, b.y, Tmp.v1.x, Tmp.v1.y,
-								width * b.fout());
-							Draw.reset();
-							Drawf.light(Team.derelict, b.x, b.y, b.x + Tmp.v1.x, b.y + Tmp.v1.y, 15f * b.fout() + 5f,
-								levelColor, 0.6f);
+						@Override
+						public void add(){
+							super.add();
+							exp = infernoExp.forBars.get(id);
 						}
-					}
 
-					{
-						lifetime = 18f;
-						despawnEffect = Fx.none;
-						pierce = true;
-						hitSize = 0f;
-						status = StatusEffects.shocked;
-						statusDuration = 3 * 60f;
-						hittable = false;
-						hitEffect = Fx.hitLiquid;
-					}
+						@Override
+						public void remove(){
+							super.remove();
+							exp = null;
+							if (infernoExp.forBars.containsKey(id)) infernoExp.forBars.remove(id);
+						}
+
+						@Override
+						public void updateTile(){
+							if (exp == null) return;
+							exp.setExpStats();
+							if (infernoExp.hasCustomUpdate) exp.customUpdate();
+							else super.updateTile();
+						}
+
+						@Override
+						public void write(Writes write){
+							super.write(write);
+							write.i(exp.totalExp());
+							exp.customWrite(write);
+						}
+
+						@Override
+						public void read(Reads read, byte revision){
+							super.read(read, revision);
+							exp.setExp(read.i());
+							exp.customRead(read, revision);
+						}
+					};
+					infernoExp.new ExpBuildModule(ret);
+					return ret;
 				};
-				expModule.addExpField("linear", "reloadTime", 35, -2);
-				expModule.addExpField("bool", "targetAir", 0, 5);
+			}
+
+			{
+				requirements(Category.turret,
+					with(Items.copper, 150, Items.lead, 165, Items.graphite, 120, Items.silicon, 130));
+				ammo(Items.coal, UnityBullets.coalBlaze, Items.pyratite, UnityBullets.pyraBlaze);
+				size = 3;
+				health = 1500;
+				range = 80f;
+				reloadTime = 10f;
+				shootCone = 5f;
+				infernoExp.addBlock(this);
+				infernoExp.addExpField("exp", "useless", 0, 2);
 			}
 		};
 	}

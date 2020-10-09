@@ -5,6 +5,7 @@ import arc.graphics.*;
 import arc.util.*;
 import arc.util.Log.*;
 import mindustry.mod.*;
+import mindustry.mod.Mods.*;
 import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.ctype.*;
@@ -13,18 +14,26 @@ import mindustry.world.*;
 import mindustry.gen.*;
 import unity.content.*;
 
+import static arc.Core.*;
 import static mindustry.Vars.*;
 
 public class Main extends Mod{
 	private final ContentList[] unityContent = {
 		new UnityItems(),
+		new UnityBullets(),
+		new UnityUnitTypes(),
 		new UnityBlocks(),
-		new UnityUnitTypes()
 	};
 
 	@Override
 	public void init(){
 		enableConsole = true;
+		if(!headless) {
+			LoadedMod mod=mods.locateMod("unity");
+			String change="mod."+mod.meta.name+".";
+			mod.meta.displayName=bundle.get(change+"name");
+			mod.meta.description=bundle.get(change+"description");
+		}
 		// Log.log(LogLevel.info,"[@]: @",,);
 	}
 

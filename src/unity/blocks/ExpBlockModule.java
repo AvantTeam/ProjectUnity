@@ -25,7 +25,7 @@ public class ExpBlockModule{
 	protected boolean hasLevelEffect = true;
 	protected Effect levelUpFx = Fx.upgradeCore;
 	protected Sound levelUpSound = Sounds.message;
-	protected final Block block;
+	protected Block block;
 	public final IntMap<ExpBuildModule> forBars = new IntMap();
 	public final boolean hasCustomUpdate;
 	{
@@ -34,18 +34,17 @@ public class ExpBlockModule{
 		}
 	}
 
-	public ExpBlockModule(Block block, int maxLevel, boolean hasCustomUpdate){
-		this.block = block;
+	public ExpBlockModule(int maxLevel, boolean hasCustomUpdate){
 		this.maxLevel = maxLevel;
 		this.hasCustomUpdate = hasCustomUpdate;
 		maxExp = getRequiredExp(maxLevel);
 	}
 
-	public ExpBlockModule(Block block, boolean hasCustomUpdate){ this(block, 20, hasCustomUpdate); }
+	public ExpBlockModule(boolean hasCustomUpdate){ this(20, hasCustomUpdate); }
 
-	public ExpBlockModule(Block block, int maxLevel){ this(block, maxLevel, false); }
+	public ExpBlockModule(int maxLevel){ this(maxLevel, false); }
 
-	public ExpBlockModule(Block block){ this(block, 20); }
+	public void addBlock(Block block){ this.block = block; }
 
 	public int getLevel(int exp){ return Math.min(Mathf.floorPositive(Mathf.sqrt(exp * 0.1f)), maxLevel); }
 
@@ -80,13 +79,11 @@ public class ExpBlockModule{
 	}
 
 	protected class ExpField{
-		//private final ExpType expType;
 		private final String field;
 		private final int start;
 		private final int intensity;
 
-		protected ExpField(/*String expType,*/ String field, int start, int intensity){
-			//this.expType = ExpType.valueOf(expType);
+		protected ExpField(String field, int start, int intensity){
 			this.field = field;
 			this.start = start;
 			this.intensity = intensity;
