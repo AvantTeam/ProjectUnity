@@ -135,6 +135,12 @@ public class UnityBlocks implements ContentList{
 			}
 
 			@Override
+			public void setStats(){
+				super.setStats();
+				laserExp.customSetStats();
+			}
+
+			@Override
 			protected void initBuilding(){
 				buildType = () -> {
 					Building ret = new PowerTurret.PowerTurretBuild(){
@@ -185,15 +191,13 @@ public class UnityBlocks implements ContentList{
 				size = 2;
 				health = 800;
 				range = 140f;
-				reloadTime = 30f;
 				coolantMultiplier = 2f;
 				shootCone = 1f;
 				inaccuracy = 0f;
 				powerUse = 7f;
-				targetAir = false;
 				shootType = UnityBullets.laser;
 				laserExp.addBlock(this);
-				laserExp.addExpField("linear", "reloadTime", 35, -2);
+				laserExp.addExpField("root", "range", 35, 2);
 				laserExp.addExpField("bool", "targetAir", 0, 5);
 			}
 		};
@@ -202,6 +206,12 @@ public class UnityBlocks implements ContentList{
 			public void setBars(){
 				super.setBars();
 				infernoExp.customSetBars();
+			}
+
+			@Override
+			public void setStats(){
+				super.setStats();
+				infernoExp.customSetStats();
 			}
 
 			@Override
