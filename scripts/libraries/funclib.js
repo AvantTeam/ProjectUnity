@@ -8,6 +8,28 @@ const rect = new Rect();
 const hitrect = new Rect();
 
 module.exports = {
+	/*
+	targets anything thats not in the array.
+	picks a random target if all potential targets is in the array.
+	*/
+	targetUnique(team, x, y, radius, targetSeq){
+		var result = null;
+		var cdist = (radius * radius) + 1;
+		
+		Units.nearbyEnemies(team, x - radius, y - radius, radius * 2, radius * 2, e => {
+			if(!e.within(x, y, radius)) return;
+			
+			var dst = e.dst2(x, y);
+			
+			if(Mathf.dst2(x, y, e.x, e.y) < cdist && !targetSeq.contains(e)){
+				result = e;
+				cdist = dst;
+			};
+		});
+		if(result == null) result = targetSeq.random();
+		
+		return result;
+	},
 	collideLineDamageOnly(team, damage, x, y, angle, length, bulletType){
 		collidedBlocks.clear();
 		tV.trns(angle, length);

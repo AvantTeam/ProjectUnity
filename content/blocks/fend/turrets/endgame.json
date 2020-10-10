@@ -1,0 +1,30 @@
+{
+	"size": 16,
+	"range": 820,
+	"reloadTime": 320,
+	"coolantMultiplier": 0.6,
+	"itemCapacity": 140,
+	"shootCone": 360,
+	"rotateSpeed": 0.97,
+	"consumes": {
+		"items": {
+			"items": [
+				{ "item": "terminum", "amount": 2 }
+			]
+		}
+	},
+	"expanded": true,
+	"requirements": [
+		{ "item": "phase-fabric", "amount": 6200 },
+		{ "item": "surge-alloy", "amount": 5600 },
+		{ "item": "dark-alloy", "amount": 2300 },
+		{ "item": "light-alloy", "amount": 2300 },
+		{ "item": "advance-alloy", "amount": 2300 },
+		{ "item": "plague-alloy", "amount": 2300 },
+		{ "item": "spark-alloy", "amount": 2300 },
+		{ "item": "monolith-alloy", "amount": 2300 },
+		{ "item": "terminum", "amount": 1200 },
+		{ "item": "termina-alloy", "amount": 800 }
+	],
+	"category": "turret"
+}

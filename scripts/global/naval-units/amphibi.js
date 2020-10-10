@@ -39,7 +39,7 @@ const amphibi = extendContent(UnitType, "amphibi-naval", {
 
 amphibi.constructor = () => {
 	//var time = transformTime;
-	var unit = extend(CommanderUnitWaterMove, {
+	var unit = extend(UnitWaterMove, {
 		setTransTimeC(a){
 			this._timeTrnsC = a;
 		},

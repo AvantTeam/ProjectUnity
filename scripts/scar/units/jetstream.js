@@ -133,8 +133,8 @@ const jetstreamLaser = extend(ContinuousLaserBulletType, {
 			if(angDst > 0.0001) fLib.collideLineDamageOnly(b.team, (angDst + damageC) * 2, b.x, b.y, b.rotation(), b.data[0], this);
 		};
 		
-		if(b.time < 40){
-			var c = ((40 - b.time) * (angDst / 20)) / 40;
+		if(b.time < 25){
+			var c = ((25 - b.time) * (angDst / 25)) / 25;
 			/*fLib.chanceMultiple(c, run(() => {
 				Lightning.create(b.team, Color.valueOf("f53036"), 3 + damageC, b.x, b.y, b.rotation(), Mathf.round(baseLen / 8));
 			}));*/
@@ -161,8 +161,8 @@ const jetstreamLaser = extend(ContinuousLaserBulletType, {
 	},
 	
 	chargedDamage(b, val){
-		if(b.time < 50){
-			return val * (50 - b.time);
+		if(b.time < 40){
+			return val * (40 - b.time);
 		};
 		return 0;
 	},
@@ -232,7 +232,7 @@ jetstreamLaserWeap.reload = (2.5 * 60) + jetstreamLaser.lifetime;
 jetstreamLaserWeap.shootStatus = sEffect.reloadFatigue;
 jetstreamLaserWeap.shootStatusDuration = jetstreamLaser.lifetime;
 jetstreamLaserWeap.bullet = jetstreamLaser;
-jetstreamLaserWeap.shootCone = 30;
+jetstreamLaserWeap.shootCone = 15;
 
 const jetstream = extendContent(UnitType, "jetstream", {});
 jetstream.constructor = () => extend(UnitEntity, {});

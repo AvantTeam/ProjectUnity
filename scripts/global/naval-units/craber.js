@@ -98,7 +98,7 @@ const craber = extendContent(UnitType, "craber-naval", {
 
 craber.constructor = () => {
     //var time = transformTime;
-    var unit = extend(CommanderUnitWaterMove, {
+    var unit = extend(UnitWaterMove, {
         setTransTimeC(a){
             this._timeTrnsC = a;
         },

@@ -110,10 +110,10 @@ missiles2.inaccuracy = 5;
 
 
 storm.constructor = () => {
-	const unit = extend(CommanderUnitWaterMove, {
-		update(unit) {
+	const unit = extend(UnitWaterMove, {
+		/*update(unit) {
 			this.super$update();
-		}
+		}*/
 	});
 	return unit;
 }
