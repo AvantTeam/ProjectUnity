@@ -15,6 +15,7 @@ import mindustry.graphics.*;
 import mindustry.game.Team;
 import unity.blocks.*;
 import unity.blocks.Recipe.*;
+import unity.blocks.experience.*;
 
 import static arc.Core.*;
 import static mindustry.type.ItemStack.*;
@@ -29,8 +30,6 @@ public class UnityBlocks implements ContentList{
 		multiTest1, multiTest2,
 		//koruh-turret
 		laserTurret, inferno;
-	//fuck
-	public static final ExpBlockModule laserExp = new ExpBlockModule(10), infernoExp = new ExpBlockModule(10);
 
 	@Override
 	public void load(){
@@ -126,66 +125,7 @@ public class UnityBlocks implements ContentList{
 			}
 		};
 		//koruh-turret
-		laserTurret = new PowerTurret("laser-turret"){
-
-			@Override
-			public void setBars(){
-				super.setBars();
-				laserExp.customSetBars();
-			}
-
-			@Override
-			public void setStats(){
-				super.setStats();
-				laserExp.customSetStats();
-			}
-
-			@Override
-			protected void initBuilding(){
-				buildType = () -> {
-					Building ret = new PowerTurret.PowerTurretBuild(){
-						private ExpBlockModule.ExpBuildModule exp;
-
-						@Override
-						public void add(){
-							super.add();
-							exp = laserExp.forBars.get(id);
-						}
-
-						@Override
-						public void remove(){
-							super.remove();
-							exp = null;
-							if (laserExp.forBars.containsKey(id)) laserExp.forBars.remove(id);
-						}
-
-						@Override
-						public void updateTile(){
-							if (exp == null) return;
-							exp.setExpStats();
-							if (laserExp.hasCustomUpdate) exp.customUpdate();
-							else super.updateTile();
-						}
-
-						@Override
-						public void write(Writes write){
-							super.write(write);
-							write.i(exp.totalExp());
-							exp.customWrite(write);
-						}
-
-						@Override
-						public void read(Reads read, byte revision){
-							super.read(read, revision);
-							exp.setExp(read.i());
-							exp.customRead(read, revision);
-						}
-					};
-					laserExp.new ExpBuildModule(ret);
-					return ret;
-				};
-			}
-
+		laserTurret = new ExpPowerTurret("laser-turret", 10){
 			{
 				requirements(Category.turret, with(Items.copper, 160, Items.lead, 110, Items.silicon, 90));
 				size = 2;
@@ -196,70 +136,11 @@ public class UnityBlocks implements ContentList{
 				inaccuracy = 0f;
 				powerUse = 7f;
 				shootType = UnityBullets.laser;
-				laserExp.addBlock(this);
-				laserExp.addExpField("root", "range", 35, 2);
-				laserExp.addExpField("bool", "targetAir", 0, 5);
+				addExpField("linear", "reloadTime", 35, -2);
+				addExpField("bool", "targetAir", 0, 5);
 			}
 		};
-		inferno = new ItemTurret("inferno"){
-			@Override
-			public void setBars(){
-				super.setBars();
-				infernoExp.customSetBars();
-			}
-
-			@Override
-			public void setStats(){
-				super.setStats();
-				infernoExp.customSetStats();
-			}
-
-			@Override
-			protected void initBuilding(){
-				buildType = () -> {
-					Building ret = new ItemTurret.ItemTurretBuild(){
-						private ExpBlockModule.ExpBuildModule exp;
-
-						@Override
-						public void add(){
-							super.add();
-							exp = infernoExp.forBars.get(id);
-						}
-
-						@Override
-						public void remove(){
-							super.remove();
-							exp = null;
-							if (infernoExp.forBars.containsKey(id)) infernoExp.forBars.remove(id);
-						}
-
-						@Override
-						public void updateTile(){
-							if (exp == null) return;
-							exp.setExpStats();
-							if (infernoExp.hasCustomUpdate) exp.customUpdate();
-							else super.updateTile();
-						}
-
-						@Override
-						public void write(Writes write){
-							super.write(write);
-							write.i(exp.totalExp());
-							exp.customWrite(write);
-						}
-
-						@Override
-						public void read(Reads read, byte revision){
-							super.read(read, revision);
-							exp.setExp(read.i());
-							exp.customRead(read, revision);
-						}
-					};
-					infernoExp.new ExpBuildModule(ret);
-					return ret;
-				};
-			}
-
+		inferno = new ExpItemTurret("inferno", 10){
 			{
 				requirements(Category.turret,
 					with(Items.copper, 150, Items.lead, 165, Items.graphite, 120, Items.silicon, 130));
@@ -269,8 +150,7 @@ public class UnityBlocks implements ContentList{
 				range = 80f;
 				reloadTime = 10f;
 				shootCone = 5f;
-				infernoExp.addBlock(this);
-				infernoExp.addExpField("exp", "useless", 0, 2);
+				addExpField("exp", "useless", 0, 2);
 			}
 		};
 	}

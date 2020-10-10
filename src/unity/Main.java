@@ -20,6 +20,7 @@ import static mindustry.Vars.*;
 public class Main extends Mod{
 	private final ContentList[] unityContent = {
 		new UnityItems(),
+		new UnityStatusEffects(),
 		new UnityBullets(),
 		new UnityUnitTypes(),
 		new UnityBlocks(),

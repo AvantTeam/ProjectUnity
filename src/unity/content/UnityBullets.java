@@ -12,7 +12,7 @@ import mindustry.entities.bullet.*;
 import mindustry.graphics.*;
 import mindustry.ctype.ContentList;
 import mindustry.game.Team;
-import unity.blocks.ExpBlockModule;
+import unity.blocks.experience.*;
 
 import static arc.Core.*;
 
@@ -24,7 +24,6 @@ public class UnityBullets implements ContentList{
 		laser = new BulletType(0.01f, 30f){
 			float length = 150f;
 			float width = 0.7f;
-			Color levelColor;
 			TextureRegion laserRegion, laserEndRegion;
 
 			@Override
@@ -38,10 +37,10 @@ public class UnityBullets implements ContentList{
 				if (b == null) return;
 				Healthc target = Damage.linecast(b, b.x, b.y, b.rotation(), length);
 				b.data = target;
-				ExpBlockModule.ExpBuildModule exp = UnityBlocks.laserExp.forBars.get(b.owner.id());
-				int lvl = UnityBlocks.laserExp.getLevel(exp.totalExp());
+				ExpPowerTurret.ExpPowerTurretBuild exp = b.owner.<ExpPowerTurret.ExpPowerTurretBuild>self();
+				int lvl = ((ExpPowerTurret) exp.block).getLevel(exp.totalExp());
 				b.damage(damage + lvl * 10f);
-				levelColor = Tmp.c1.set(Color.white).lerp(Pal.lancerLaser, lvl / 10f);
+				b.fdata = lvl / 10f;
 				if (target instanceof Hitboxc){
 					Hitboxc hit = (Hitboxc) target;
 					hit.collision(b, hit.x(), hit.y());
@@ -64,6 +63,7 @@ public class UnityBullets implements ContentList{
 			public void draw(Bullet b){
 				if (b.data instanceof Position){
 					Tmp.v1.set((Position) b.data);
+					Color levelColor = Tmp.c1.set(Color.white).lerp(Pal.lancerLaser, b.fdata);
 					Draw.color(levelColor);
 					Drawf.laser(b.team, laserRegion, laserEndRegion, b.x, b.y, Tmp.v1.x, Tmp.v1.y, width * b.fout());
 					Draw.reset();
@@ -87,11 +87,8 @@ public class UnityBullets implements ContentList{
 			@Override
 			public void hit(Bullet b, float x, float y){
 				super.hit(b, x, y);
-				((ExpBlockModule.ExpBuildModule) b.data).incExp(Mathf.random(1));
+				b.owner.<ExpItemTurret.ExpItemTurretBuild>self().incExp(Mathf.random(1));
 			}
-
-			@Override
-			public void init(Bullet b){ b.data = UnityBlocks.infernoExp.forBars.get(b.owner.id()); }
 
 			{
 				ammoMultiplier = 3;
@@ -111,11 +108,8 @@ public class UnityBullets implements ContentList{
 			@Override
 			public void hit(Bullet b, float x, float y){
 				super.hit(b, x, y);
-				((ExpBlockModule.ExpBuildModule) b.data).incExp(Mathf.random(1));
+				b.owner.<ExpItemTurret.ExpItemTurretBuild>self().incExp(Mathf.random(1));
 			}
-
-			@Override
-			public void init(Bullet b){ b.data = UnityBlocks.infernoExp.forBars.get(b.owner.id()); }
 
 			{
 				ammoMultiplier = 3;

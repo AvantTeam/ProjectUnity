@@ -1,4 +1,4 @@
-package unity.blocks;
+//package unity.blocks.experience;
 
 import java.util.EnumMap;
 import arc.func.*;
@@ -20,6 +20,7 @@ import mindustry.ui.Bar;
 import static arc.Core.*;
 import static mindustry.Vars.*;
 
+//|legacy|this way is flexible but code becomes fucking messy. Otherwise, class way is neat but I have to create so many twigs. 
 public class ExpBlockModule{
 	protected final int maxLevel, maxExp;
 	protected Color level0Color = Pal.accent, levelMaxColor = Color.valueOf("fff4cc"),
