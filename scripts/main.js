@@ -51,7 +51,8 @@ const script = [
             "exp",
             "multi-lib",
 			"status",
-			"funclib"
+			"funclib",
+			"unitloader"
         ]
     },
 
