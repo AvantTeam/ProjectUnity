@@ -38,7 +38,7 @@ public class UnityBullets implements ContentList{
 				Healthc target = Damage.linecast(b, b.x, b.y, b.rotation(), length);
 				b.data = target;
 				ExpPowerTurret.ExpPowerTurretBuild exp = b.owner.<ExpPowerTurret.ExpPowerTurretBuild>self();
-				int lvl = ((ExpPowerTurret) exp.block).getLevel(exp.totalExp());
+				int lvl = exp.getLevel();
 				b.damage(damage + lvl * 10f);
 				b.fdata = lvl / 10f;
 				if (target instanceof Hitboxc){
