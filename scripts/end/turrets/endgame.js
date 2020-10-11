@@ -4,7 +4,8 @@ const tempVec = new Vec2();
 
 const tempSeq = new Seq(256);
 
-const ringProgresses = [0.01, 0.03, 0.02, 0.04];
+const ringProgresses = [0.01, 0.03, 0.02];
+const ringDirection = [1, -1, 1];
 
 const fakeBullet = new BasicBulletType();
 fakeBullet.damage = Number.MAX_VALUE;
@@ -95,11 +96,11 @@ endgame.buildType = () => {
 				this.super$updateTile();
 			};
 			if(this.target != null){
-				for(var i = 0; i < 4; i++){
-					this._ringProgress[i] = Mathf.lerpDelta(this._ringProgress[i], 360, ringProgresses[i]);
+				for(var i = 0; i < 3; i++){
+					this._ringProgress[i] = Mathf.lerpDelta(this._ringProgress[i], 360 * ringDirection[i], ringProgresses[i]);
 				};
 			}else{
-				for(var i = 0; i < 4; i++){
+				for(var i = 0; i < 3; i++){
 					this._ringProgress[i] = Mathf.lerpDelta(this._ringProgress[i], 0, ringProgresses[i]);
 				};
 			};

@@ -158,12 +158,12 @@ const loaderBlock = extendContent(Block, "loader-block", {
 				expReconstructor.upgrades.each(i => {
 					newUpgrades.add(i);
 				});;
-				newUpgrades.add(
+				/*newUpgrades.add(
 					[
 						UnitTypes.bryde,
 						Vars.content.getByName(ContentType.unit, "unity-rexed")
 					]
-				);
+				);*/
 				newUpgrades.add(
 					[
 						Vars.content.getByName(ContentType.unit, "unity-anthophila"),
@@ -186,12 +186,12 @@ const loaderBlock = extendContent(Block, "loader-block", {
 				tetraReconstructor.upgrades.each(i => {
 					newUpgrades.add(i);
 				});;
-				newUpgrades.add(
+				/*newUpgrades.add(
 					[
 						Vars.content.getByName(ContentType.unit, "unity-rexed"),
 						Vars.content.getByName(ContentType.unit, "unity-storm")
 					]
-				);
+				);*/
 				newUpgrades.add(
 					[
 						Vars.content.getByName(ContentType.unit, "unity-vespula"),
