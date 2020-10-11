@@ -6,7 +6,6 @@ import mindustry.type.UnitType;
 import unity.content.UnityUnitTypes;
 
 public class CopterUnit extends UnitEntity{
-	private int classID;
 	public CopterUnitType copterType;
 
 	@Override

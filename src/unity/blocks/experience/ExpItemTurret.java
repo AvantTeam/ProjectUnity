@@ -1,6 +1,5 @@
 package unity.blocks.experience;
 
-import java.lang.reflect.*;
 import java.util.EnumMap;
 import arc.util.io.*;
 import arc.audio.Sound;
@@ -14,12 +13,13 @@ import unity.meta.ExpType;
 
 public class ExpItemTurret extends ItemTurret implements ExpBlockBase{
 	protected final int maxLevel;
-	protected final EnumMap<ExpType, ObjectSet<ExpField>> expFields = new EnumMap(ExpType.class);
+	protected final EnumMap<ExpType, ObjectSet<ExpField>> expFields = new EnumMap<ExpType, ObjectSet<ExpField>>(
+		ExpType.class);
 	protected Effect levelUpFx = Fx.upgradeCore;
 	protected Sound levelUpSound = Sounds.message;
 	public final boolean hasCustomUpdate;
 	{
-		for (ExpType type : ExpType.values()) expFields.put(type, new ObjectSet(4));
+		for (ExpType type : ExpType.values()) expFields.put(type, new ObjectSet<ExpField>(4));
 	}
 
 	public ExpItemTurret(String name, int maxLevel, boolean hasCustomUpdate){
@@ -58,20 +58,20 @@ public class ExpItemTurret extends ItemTurret implements ExpBlockBase{
 		@Override
 		public void updateTile(){
 			setExpStats();
-			if (hasCustomUpdate) customUpdate();
+			if (hasCustomUpdate) expUpdate();
 			else super.updateTile();
 		}
 
 		@Override
 		public void write(Writes write){
 			super.write(write);
-			customWrite(write);
+			expWrite(write);
 		}
 
 		@Override
 		public void read(Reads read, byte revision){
 			super.read(read, revision);
-			customRead(read, revision);
+			expRead(read, revision);
 		}
 
 		@Override

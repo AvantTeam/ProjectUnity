@@ -2,8 +2,6 @@ package unity.content;
 
 import arc.func.*;
 import arc.math.Mathf;
-import arc.util.*;
-import arc.util.Log.*;
 import arc.graphics.Color;
 import mindustry.ctype.*;
 import mindustry.type.*;
@@ -199,7 +197,7 @@ public class UnityUnitTypes implements ContentList{
 					}
 				});
 				fallRotateSpeed = 0.8f;
-				for (int i = 0, index = 0; i < 2; i++){
+				for (int i = 0; i < 2; i++){
 					for (int j = 0; j < 2; j++){
 						addRotor(Mathf.signs[i] * 22.5f, 21.25f, 1f, 3, 19 * Mathf.signs[i] * Mathf.signs[j], 0);
 						addRotor(Mathf.signs[i] * 17.25f, 1f, 0.8f, 2, 23 * Mathf.signs[i] * Mathf.signs[j], 0);
@@ -261,7 +259,7 @@ public class UnityUnitTypes implements ContentList{
 						bullet = Bullets.standardIncendiaryBig;
 					}
 				});
-				for (int i = 0, index = 0; i < 2; i++, index++) addRotor(0f, 6.5f, 1f, 3, 29 * Mathf.signs[i], 0);
+				for (int i = 00; i < 2; i++) addRotor(0f, 6.5f, 1f, 3, 29 * Mathf.signs[i], 0);
 
 			}
 		};

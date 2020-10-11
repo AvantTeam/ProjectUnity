@@ -1,6 +1,5 @@
 package unity.units;
 
-import arc.func.*;
 import arc.struct.Seq;
 import arc.graphics.g2d.*;
 import mindustry.type.*;
@@ -12,7 +11,7 @@ public class WormUnitType extends UnitType{
 	public TextureRegion segmentRegion, tailRegion, segmentCellRegion;
 	private int idType;
 	protected float segmentOffset;
-	protected final Seq<Weapon> segWeapSeq = new Seq();
+	protected final Seq<Weapon> segWeapSeq = new Seq<Weapon>();
 	public final int segmentLength;
 
 	public WormUnitType(String name, int segmentLength){
@@ -38,7 +37,7 @@ public class WormUnitType extends UnitType{
 	}
 
 	public void sortWeapons(Seq<Weapon> weaponSeq){
-		Seq<Weapon> mapped = new Seq();
+		Seq<Weapon> mapped = new Seq<Weapon>();
 		for (int i = 0, len = weaponSeq.size; i < len; i++){
 			Weapon w = weaponSeq.get(i);
 			mapped.add(w);

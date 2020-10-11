@@ -1,7 +1,6 @@
 package unity.blocks.experience;
 
 import java.util.EnumMap;
-import arc.func.*;
 import arc.struct.ObjectSet;
 import arc.math.Mathf;
 import arc.util.io.*;
@@ -77,16 +76,16 @@ public interface ExpBuildBase{
 
 	}
 
-	default void customUpdate(){
+	default void expUpdate(){
 
 	}
 
-	default void customWrite(Writes write){
+	default void expWrite(Writes write){
 		write.i(totalExp());
 		write.i(getLevel());
 	}
 
-	default void customRead(Reads read, byte revision){
+	default void expRead(Reads read, byte revision){
 		setExp(read.i());
 		setLevel(read.i());
 	}

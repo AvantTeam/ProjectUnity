@@ -1,9 +1,7 @@
 package unity.blocks;
 
 import java.util.Arrays;
-import arc.func.*;
 import arc.util.*;
-import arc.util.Log.*;
 import arc.util.io.*;
 import arc.struct.*;
 import arc.scene.*;
@@ -15,8 +13,6 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.graphics.g2d.TextureRegion;
 import mindustry.graphics.Pal;
-import mindustry.content.*;
-import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.ctype.ContentType;
 import mindustry.type.*;
@@ -31,14 +27,13 @@ import unity.blocks.Recipe.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
-import static mindustry.type.ItemStack.*;
 
 public class MultiCrafter extends GenericCrafter{
 	public final Recipe[] recs;
 	private ButtonStyle infoStyle = null;
-	public final ObjectSet<Item> inputItemSet = new ObjectSet(), outputItemSet = new ObjectSet();;
-	public final ObjectSet<Liquid> inputLiquidSet = new ObjectSet(), outputLiquidSet = new ObjectSet(),
-		liquidSet = new ObjectSet();
+	public final ObjectSet<Item> inputItemSet = new ObjectSet<Item>(), outputItemSet = new ObjectSet<Item>();;
+	public final ObjectSet<Liquid> inputLiquidSet = new ObjectSet<Liquid>(), outputLiquidSet = new ObjectSet<Liquid>(),
+		liquidSet = new ObjectSet<Liquid>();
 	public final boolean dumpToggle;
 	private boolean powerBarI = false, powerBarO = false, hasOutputItem = false;
 	private final CustomBlockInventoryFragment invFrag = new CustomBlockInventoryFragment();
@@ -219,8 +214,8 @@ public class MultiCrafter extends GenericCrafter{
 		protected float[] progressArr = new float[recs.length];
 		protected boolean cond = false, condValid = false;
 		public float productionEfficiency = 0f;
-		public final OrderedSet<Item> toOutputItemSet = new OrderedSet();
-		public final OrderedSet<Liquid> toOutputLiquidSet = new OrderedSet();
+		public final OrderedSet<Item> toOutputItemSet = new OrderedSet<Item>();
+		public final OrderedSet<Liquid> toOutputLiquidSet = new OrderedSet<Liquid>();
 
 		public int getToggle(){ return toggle; }
 
@@ -407,7 +402,6 @@ public class MultiCrafter extends GenericCrafter{
 				itemHas = 0;
 				items.each((item, amount) -> itemHas++);
 			}
-			int recLen = recs.length;
 			customUpdate();
 			if (toggle >= 0){
 				customCons();
@@ -460,7 +454,7 @@ public class MultiCrafter extends GenericCrafter{
 				control.input.frag.config.hideConfig();
 				return;
 			}
-			ButtonGroup group = new ButtonGroup();
+			ButtonGroup<ImageButton> group = new ButtonGroup<ImageButton>();
 			group.setMinCheckCount(0);
 			group.setMaxCheckCount(1);
 			int recLen = recs.length;

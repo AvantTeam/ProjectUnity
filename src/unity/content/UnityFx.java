@@ -5,11 +5,8 @@ import arc.graphics.g2d.Fill;
 import mindustry.entities.Effect;
 import mindustry.graphics.Pal;
 
-import static arc.graphics.g2d.Draw.rect;
 import static arc.graphics.g2d.Draw.*;
-import static arc.graphics.g2d.Lines.*;
 import static arc.math.Angles.*;
-import static mindustry.Vars.*;
 
 public class UnityFx{
 	public static final Effect shootSmallBlaze = new Effect(22, e -> {

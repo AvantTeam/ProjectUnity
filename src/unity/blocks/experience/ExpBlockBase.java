@@ -2,10 +2,8 @@ package unity.blocks.experience;
 
 import java.lang.reflect.Field;
 import java.util.EnumMap;
-import arc.func.*;
 import arc.struct.*;
 import arc.util.Tmp;
-import arc.math.Mathf;
 import arc.graphics.Color;
 import mindustry.ui.Bar;
 import mindustry.graphics.Pal;

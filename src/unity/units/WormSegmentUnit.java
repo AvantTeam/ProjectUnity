@@ -1,14 +1,12 @@
 package unity.units;
 
 import java.util.Arrays;
-import arc.func.*;
 import arc.math.*;
 import arc.util.*;
 import arc.struct.Seq;
 import arc.graphics.g2d.*;
 import mindustry.gen.*;
 import mindustry.type.*;
-import mindustry.graphics.Pal;
 import mindustry.entities.units.*;
 import mindustry.entities.bullet.BulletType;
 import mindustry.entities.Effect;
@@ -131,7 +129,7 @@ public class WormSegmentUnit extends UnitEntity{
 	public void setupWeapons(UnitType def){
 		if (!(def instanceof WormUnitType)) super.setupWeapons(def);
 		else{
-			Seq<WeaponMount> tmpSeq = new Seq();
+			Seq<WeaponMount> tmpSeq = new Seq<WeaponMount>();
 			Seq<Weapon> originSeq = ((WormUnitType) def).segWeapSeq;
 			for (int i = 0; i < originSeq.size; i++) tmpSeq.add(new WeaponMount(originSeq.get(i)));
 			mounts = tmpSeq.toArray(WeaponMount.class);

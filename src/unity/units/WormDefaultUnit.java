@@ -1,7 +1,6 @@
 package unity.units;
 
 import arc.util.*;
-import arc.util.io.*;
 import arc.math.*;
 import arc.math.geom.Vec2;
 import arc.graphics.g2d.Draw;
