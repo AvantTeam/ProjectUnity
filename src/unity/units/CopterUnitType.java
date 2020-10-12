@@ -36,15 +36,15 @@ public class CopterUnitType extends UnitType{
 			temp.bladeOutlineRegion = atlas.find(name + "-rotor-blade-outline");
 			temp.topOutlineRegion = atlas.find(name + "-rotor-top-outline");
 		}
-		customLoad();
+		copterLoad();
 	}
 
-	protected void customLoad(){}
+	protected void copterLoad(){}
 
 	@Override
 	public void draw(Unit unit){
 		super.draw(unit);
-		customDraw(unit);
+		copterDraw(unit);
 		Draw.mixcol(Color.white, unit.hitTime);
 		for (int i = 0; i < rotors.length; i++){
 			Rotor r = rotors[i];
@@ -67,7 +67,7 @@ public class CopterUnitType extends UnitType{
 		Draw.mixcol();
 	}
 
-	protected void customDraw(Unit unit){}
+	protected void copterDraw(Unit unit){}
 
 	class Rotor{
 		public TextureRegion bladeRegion, topRegion, bladeOutlineRegion, topOutlineRegion;

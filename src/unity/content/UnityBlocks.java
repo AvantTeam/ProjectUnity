@@ -1,6 +1,7 @@
 package unity.content;
 
 import mindustry.world.*;
+import mindustry.world.meta.BuildVisibility;
 import mindustry.world.blocks.environment.*;
 import mindustry.type.*;
 import mindustry.ctype.*;
@@ -8,6 +9,7 @@ import mindustry.content.*;
 import unity.blocks.*;
 import unity.blocks.Recipe.*;
 import unity.blocks.experience.*;
+import unity.blocks.light.*;
 
 import static mindustry.type.ItemStack.*;
 
@@ -17,8 +19,8 @@ public class UnityBlocks implements ContentList{
 	//faction ores
 	/*oreXenium, */ oreUmbrium, oreLuminum, oreMonolite, oreImberium,
 
-		//crafting
-		multiTest1, multiTest2,
+		//global-block
+		multiTest1, multiTest2, lightLamp, oilLamp, lightLaser, lightLampInfi,
 		//koruh-turret
 		laserTurret, inferno;
 
@@ -56,7 +58,57 @@ public class UnityBlocks implements ContentList{
 				oreDefault = true;
 			}
 		};
-		//crafting
+		//global-block
+		lightLamp = new LightSource("light-lamp"){
+			{
+				size = 1;
+				health = 40;
+				consumes.power(1f);
+				requirements(Category.logic, with(Items.lead, 5, Items.metaglass, 10));
+				drawer = new DrawLightSource();
+				lightLength = 30;
+			}
+		};
+		oilLamp = new LightSource("oil-lamp", true){
+			{
+				size = 3;
+				health = 240;
+				consumes.power(1.8f);
+				consumes.liquid(Liquids.oil, 0.1f);
+				requirements(Category.logic, with(Items.lead, 20, Items.metaglass, 20, Items.titanium, 15));
+				drawer = new DrawLightSource();
+				lightLength = 150;
+				lightStrength = 750;
+			}
+		};
+		lightLaser = new LightSource("light-laser"){
+			{
+				size = 1;
+				health = 60;
+				consumes.power(1.5f);
+				requirements(Category.logic, BuildVisibility.sandboxOnly,
+					with(Items.metaglass, 10, Items.silicon, 5, Items.titanium, 5));
+				alwaysUnlocked = true;
+				drawer = new DrawLightSource();
+				lightLength = 30;
+				lightInterval = 0;
+			}
+		};
+		lightLampInfi = new LightSource("light-lamp-infi"){
+			{
+				size = 1;
+				health = 40;
+				hasPower = false;
+				consumesPower = false;
+				requirements(Category.logic, BuildVisibility.sandboxOnly, with());
+				alwaysUnlocked = true;
+				drawer = new DrawLightSource();
+				lightLength = 150;
+				lightStrength = 600000;
+				scaleStatus = false;
+				maxLightLength = 7500;
+			}
+		};
 		multiTest1 = new MultiCrafter("multi-test-1", 10, true){
 			{
 				requirements(Category.crafting, with(Items.copper, 10));

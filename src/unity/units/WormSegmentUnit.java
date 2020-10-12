@@ -129,7 +129,7 @@ public class WormSegmentUnit extends UnitEntity{
 	public void setupWeapons(UnitType def){
 		if (!(def instanceof WormUnitType)) super.setupWeapons(def);
 		else{
-			Seq<WeaponMount> tmpSeq = new Seq<WeaponMount>();
+			Seq<WeaponMount> tmpSeq = new Seq<>();
 			Seq<Weapon> originSeq = ((WormUnitType) def).segWeapSeq;
 			for (int i = 0; i < originSeq.size; i++) tmpSeq.add(new WeaponMount(originSeq.get(i)));
 			mounts = tmpSeq.toArray(WeaponMount.class);
@@ -152,7 +152,7 @@ public class WormSegmentUnit extends UnitEntity{
 		}
 	}
 
-	public void updateCustom(){
+	public void wormSegmentUpdate(){
 		if (trueParentUnit != null){
 			health = trueParentUnit.health;
 			maxHealth = trueParentUnit.maxHealth;

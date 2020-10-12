@@ -92,7 +92,7 @@ public class WormDefaultUnit extends UnitEntity{
 			segV.scl(Mathf.clamp(1f - drag * Time.delta));
 			segU.set(seg.x, seg.y);
 			segU.rotation = angleD;
-			segU.updateCustom();
+			segU.wormSegmentUpdate();
 		}
 	}
 

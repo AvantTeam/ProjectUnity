@@ -31,12 +31,12 @@ import static mindustry.Vars.*;
 public class MultiCrafter extends GenericCrafter{
 	public final Recipe[] recs;
 	private ButtonStyle infoStyle = null;
-	public final ObjectSet<Item> inputItemSet = new ObjectSet<Item>(), outputItemSet = new ObjectSet<Item>();;
-	public final ObjectSet<Liquid> inputLiquidSet = new ObjectSet<Liquid>(), outputLiquidSet = new ObjectSet<Liquid>(),
-		liquidSet = new ObjectSet<Liquid>();
+	public final ObjectSet<Item> inputItemSet = new ObjectSet<>(), outputItemSet = new ObjectSet<>();;
+	public final ObjectSet<Liquid> inputLiquidSet = new ObjectSet<>(), outputLiquidSet = new ObjectSet<>(),
+		liquidSet = new ObjectSet<>();
 	public final boolean dumpToggle;
 	private boolean powerBarI = false, powerBarO = false, hasOutputItem = false;
-	private final CustomBlockInventoryFragment invFrag = new CustomBlockInventoryFragment();
+	private final MultiCrafterBlockInventoryFragment invFrag = new MultiCrafterBlockInventoryFragment();
 	private int index = 0;
 
 	public MultiCrafter(String name, Recipe[] recs, boolean dumpToggle){
@@ -114,7 +114,7 @@ public class MultiCrafter extends GenericCrafter{
 			}
 		}
 		hasPower = powerBarI || powerBarO;
-		if (powerBarI) consumes.add(new CustomConsumePower());
+		if (powerBarI) consumes.add(new MultiCrafterConsumePower());
 		consumesPower = powerBarI;
 		outputsPower = powerBarO;
 		super.init();
@@ -172,7 +172,7 @@ public class MultiCrafter extends GenericCrafter{
 					row.add("[lightgray]" + BlockStat.productionTime.localized() + ":[]").padRight(4f);
 					(new NumberValue(rec.craftTime / 60f, StatUnit.seconds)).display(row);
 				}).left().row();
-				customDisplay(part, ii);
+				multiCrafterDisplay(part, ii);
 			}).color(Pal.accent).left().growX();
 			table.add().size(18f).row();
 		}
@@ -207,15 +207,15 @@ public class MultiCrafter extends GenericCrafter{
 	@Override
 	public boolean outputsItems(){ return hasOutputItem; }
 
-	public void customDisplay(Table part, int i){}
+	public void multiCrafterDisplay(Table part, int i){}
 
 	public class MultiCrafterBuild extends GenericCrafterBuild{
 		protected int toggle = 0, dumpItemEntry = 0, itemHas = 0;
 		protected float[] progressArr = new float[recs.length];
 		protected boolean cond = false, condValid = false;
 		public float productionEfficiency = 0f;
-		public final OrderedSet<Item> toOutputItemSet = new OrderedSet<Item>();
-		public final OrderedSet<Liquid> toOutputLiquidSet = new OrderedSet<Liquid>();
+		public final OrderedSet<Item> toOutputItemSet = new OrderedSet<>();
+		public final OrderedSet<Liquid> toOutputLiquidSet = new OrderedSet<>();
 
 		public int getToggle(){ return toggle; }
 
@@ -362,7 +362,7 @@ public class MultiCrafter extends GenericCrafter{
 			return true;
 		}
 
-		protected void customCons(){
+		protected void multiCrafterCons(){
 			if (toggle < 0) return;
 			if (checkCond()){
 				if (progressArr[toggle] != 0){
@@ -377,7 +377,7 @@ public class MultiCrafter extends GenericCrafter{
 			}else warmup = Mathf.lerp(warmup, 0, 0.02f);
 		}
 
-		protected void customProd(){
+		protected void multiCrafterProd(){
 			if (toggle < 0) return;
 			ItemStack[] inputItems = recs[toggle].input.items;
 			LiquidStack[] inputLiquids = recs[toggle].input.liquids;
@@ -402,10 +402,10 @@ public class MultiCrafter extends GenericCrafter{
 				itemHas = 0;
 				items.each((item, amount) -> itemHas++);
 			}
-			customUpdate();
+			multiCrafterUpdate();
 			if (toggle >= 0){
-				customCons();
-				if (progress >= 1) customProd();
+				multiCrafterCons();
+				if (progress >= 1) multiCrafterProd();
 			}
 			if (dumpToggle && toggle < 0) return;
 			Seq<Item> que = toOutputItemSet.orderedItems();
@@ -427,7 +427,7 @@ public class MultiCrafter extends GenericCrafter{
 			}
 		}
 
-		public void customUpdate(){}
+		public void multiCrafterUpdate(){}
 
 		@Override
 		public boolean shouldConsume(){ return condValid && productionValid(); }
@@ -533,9 +533,9 @@ public class MultiCrafter extends GenericCrafter{
 
 		@Override
 		public void created(){
-			cons = new CustomConsumeModule(self());
-			items = new CustomItemModule();
-			liquids = new customLiquidModule();
+			cons = new MultiCrafterConsumeModule(self());
+			items = new MultiCrafterItemModule();
+			liquids = new MultiCrafterLiquidModule();
 		}
 
 		@Override
@@ -567,7 +567,7 @@ public class MultiCrafter extends GenericCrafter{
 			for (short i = 0; i < lenL; i++) toOutputLiquidSet.add(content.getByID(ContentType.liquid, read.s()));
 		}
 
-		class CustomItemModule extends ItemModule{
+		class MultiCrafterItemModule extends ItemModule{
 			@Override
 			public Item take(){
 				for (int i = 0; i < items.length; i++){
@@ -625,7 +625,7 @@ public class MultiCrafter extends GenericCrafter{
 			}
 		}
 
-		class customLiquidModule extends LiquidModule{
+		class MultiCrafterLiquidModule extends LiquidModule{
 			@Override
 			public void reset(Liquid liquid, float amount){
 				super.reset(liquid, amount);
@@ -651,8 +651,8 @@ public class MultiCrafter extends GenericCrafter{
 			}
 		}
 
-		class CustomConsumeModule extends ConsumeModule{
-			public CustomConsumeModule(Building entity){ super(entity); }
+		class MultiCrafterConsumeModule extends ConsumeModule{
+			public MultiCrafterConsumeModule(Building entity){ super(entity); }
 
 			@Override
 			public BlockStatus status(){
@@ -663,7 +663,7 @@ public class MultiCrafter extends GenericCrafter{
 		}
 	}
 
-	class CustomConsumePower extends ConsumePower{
+	class MultiCrafterConsumePower extends ConsumePower{
 		public float requestedPower(MultiCrafterBuild entity){
 			if (entity.tile().build == null) return 0;
 			int i = entity.getToggle();
@@ -674,7 +674,7 @@ public class MultiCrafter extends GenericCrafter{
 		}
 	}
 
-	class CustomBlockInventoryFragment extends BlockInventoryFragment{
+	class MultiCrafterBlockInventoryFragment extends BlockInventoryFragment{
 		private boolean built = false;
 		private boolean visible = false;
 

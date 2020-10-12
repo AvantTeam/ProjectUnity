@@ -11,7 +11,7 @@ public class WormUnitType extends UnitType{
 	public TextureRegion segmentRegion, tailRegion, segmentCellRegion;
 	private int idType;
 	protected float segmentOffset;
-	protected final Seq<Weapon> segWeapSeq = new Seq<Weapon>();
+	protected final Seq<Weapon> segWeapSeq = new Seq<>();
 	public final int segmentLength;
 
 	public WormUnitType(String name, int segmentLength){
@@ -37,7 +37,7 @@ public class WormUnitType extends UnitType{
 	}
 
 	public void sortWeapons(Seq<Weapon> weaponSeq){
-		Seq<Weapon> mapped = new Seq<Weapon>();
+		Seq<Weapon> mapped = new Seq<>();
 		for (int i = 0, len = weaponSeq.size; i < len; i++){
 			Weapon w = weaponSeq.get(i);
 			mapped.add(w);

@@ -13,12 +13,12 @@ import unity.meta.ExpType;
 
 public class ExpPowerTurret extends PowerTurret implements ExpBlockBase{
 	protected final int maxLevel;
-	protected final EnumMap<ExpType, ObjectSet<ExpField>> expFields = new EnumMap<ExpType, ObjectSet<ExpField>>(ExpType.class);
+	protected final EnumMap<ExpType, ObjectSet<ExpField>> expFields = new EnumMap<>(ExpType.class);
 	protected Effect levelUpFx = Fx.upgradeCore;
 	protected Sound levelUpSound = Sounds.message;
 	public final boolean hasCustomUpdate;
 	{
-		for (ExpType type : ExpType.values()) expFields.put(type, new ObjectSet<ExpField>(4));
+		for (ExpType type : ExpType.values()) expFields.put(type, new ObjectSet<>(4));
 	}
 
 	public ExpPowerTurret(String name, int maxLevel, boolean hasCustomUpdate){

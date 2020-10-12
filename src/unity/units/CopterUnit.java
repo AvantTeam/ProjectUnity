@@ -12,10 +12,10 @@ public class CopterUnit extends UnitEntity{
 	public void update(){
 		super.update();
 		if (dead) rotation += copterType.fallRotateSpeed * Mathf.signs[id % 2];
-		customUpdate();
+		copterUpdate();
 	}
 
-	public void customUpdate(){}
+	public void copterUpdate(){}
 
 	@Override
 	public void type(UnitType type){
