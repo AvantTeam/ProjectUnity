@@ -14,6 +14,7 @@ import mindustry.game.EventType.Trigger;
 import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.world.Tile;
+import mindustry.world.meta.*;
 import mindustry.world.blocks.production.GenericCrafter;
 
 import static arc.Core.*;
@@ -54,6 +55,13 @@ public class LightSource extends GenericCrafter{
 		bars.add("light",
 			(LightSourceBuild build) -> new Bar(() -> bundle.format("lightlib.light", build.getStrength()),
 				() -> lightColor, () -> build.getStrength() / lightStrength));
+	}
+
+	@Override
+	public void setStats(){
+		super.setStats();
+		stats.add(BlockStat.output, "@ @", bundle.format("lightlib.light", lightStrength),
+			StatUnit.perSecond.localized());
 	}
 
 	@Override
