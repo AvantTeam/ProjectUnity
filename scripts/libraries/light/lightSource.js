@@ -55,6 +55,10 @@ module.exports = {
                         return build.lightPower() / this.lightStrength;
                     }));
                 }));
+            },
+            setStats(){
+                this.super$setStats();
+                this.stats.add(BlockStat.output, "@ @", Core.bundle.format("lightlib.light", this.lightStrength), StatUnit.perSecond.localized());
             }
             //end
         });
