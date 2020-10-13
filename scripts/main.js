@@ -233,6 +233,13 @@ const script = [
             },
 			
 			{
+				name: "turrets",
+				childs: [
+					"endgame"
+				]
+			},
+			
+			{
 				name: "units",
 				childs: [
 					"devourer"

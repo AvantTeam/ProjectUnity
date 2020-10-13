@@ -1,11 +1,12 @@
 {
 	"size": 14,
 	"range": 820,
-	"reloadTime": 320,
+	"reloadTime": 430,
 	"coolantMultiplier": 0.6,
-	"itemCapacity": 140,
+	"itemCapacity": 10,
 	"shootCone": 360,
 	"rotateSpeed": 0.97,
+	"hasItems": true,
 	"consumes": {
 		"items": {
 			"items": [
