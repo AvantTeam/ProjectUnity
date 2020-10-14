@@ -13,6 +13,18 @@ const offsetSin = (offset, scl) => {
 	return Mathf.absin(Time.time() + (offset * Mathf.radDeg), scl, 0.5) + 0.5;
 };
 
+const vaporize = new Effect(126, 512, e => {
+	Draw.mixcol(Color.red, 1);
+	Draw.color(1, 1, 1, e.fout());
+	Draw.blend(Blending.additive);
+	
+	fLib.simpleUnitDrawer(e.data, false);
+	
+	Draw.blend();
+	Draw.color();
+	Draw.mixcol();
+});
+
 const endgameLaser = new Effect(76, 820 * 2, e => {
 	//const colors = ["f5303680", "f53036", "ffffff"];
 	const colors = [Color.valueOf("f53036"), Color.valueOf("ff786e"), Color.white];
@@ -113,8 +125,10 @@ endgame.buildType = () => {
 				//var tileTarget = Units.findEnemyTile(this.team, this.x, this.y, endgame.range, build => !build.dead);
 				var dstC = endgame.range + 999;
 				fLib.trueEachBlock(this.x, this.y, endgame.range / 2, build => {
-					if(build.team != this.team && !build.dead && Mathf.dst(this.x, this.y, build.x, build.y) < dstC){
-						dstC = Mathf.dst(this.x, this.y, build.x, build.y);
+					var dstD = Mathf.dst(this.x, this.y, build.x, build.y);
+					if(build.team != this.team && !build.dead && (dstD <= dstC || Mathf.equal(dstD, dstC, 4))){
+						//dstC = Mathf.dst(this.x, this.y, build.x, build.y);
+						dstC = dstD;
 						if(tempSeq.size >= 16){
 							tempSeq.remove(0);
 						};
@@ -212,6 +226,7 @@ endgame.buildType = () => {
 			Units.nearbyEnemies(this.team, this.x - rnge, this.y - rnge, rnge * 2, rnge * 2, e => {
 				if(Mathf.within(this.x, this.y, e.x, e.y, rnge) && !e.dead){
 					endgameLaser.at(this.x, this.y, 0, [new Vec2(this.x + (this._eyesOffset.x * 2), this.y + (this._eyesOffset.x * 2)), new Vec2(e.x, e.y), 1]);
+					vaporize.at(e.x, e.y, 0, e);
 					e.kill();
 				};
 			});
@@ -248,7 +263,7 @@ endgame.buildType = () => {
 			};
 			var e = this._targetsB[index];
 			if(e != null){
-				e.damage(100);
+				e.damage(250);
 				this._eyesVecArray[index].set(tempVec);
 				this._eyesVecArray[index].add(this.x, this.y);
 				endgameLaser.at(this.x, this.y, 0, [this._eyesVecArray[index], new Vec2(e.x, e.y), 0.625]);
