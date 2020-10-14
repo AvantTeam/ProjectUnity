@@ -239,9 +239,8 @@ public class MultiCrafter extends GenericCrafter{
 		}
 
 		@Override
-		public boolean acceptLiquid(Building source, Liquid liquid, float amount){
+		public boolean acceptLiquid(Building source, Liquid liquid){
 			if (!(block instanceof MultiCrafter)) return false;
-			if (liquids.get(liquid) + amount > block.liquidCapacity) return false;
 			return inputLiquidSet.contains(liquid);
 		}
 

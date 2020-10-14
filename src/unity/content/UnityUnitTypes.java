@@ -47,7 +47,7 @@ public class UnityUnitTypes implements ContentList{
 				health = 450;
 				engineSize = 0f;
 				flying = true;
-				hitsize = 15f;
+				hitSize = 15f;
 				range = 165f;
 				weapons.add(new Weapon(name + "-gun"){
 					{
@@ -87,7 +87,7 @@ public class UnityUnitTypes implements ContentList{
 				health = 75;
 				engineSize = 0f;
 				flying = true;
-				hitsize = 12f;
+				hitSize = 12f;
 				range = 140f;
 				weapons.add(new Weapon(name + "-gun"){
 					{
@@ -135,7 +135,7 @@ public class UnityUnitTypes implements ContentList{
 				health = 9500;
 				engineSize = 0f;
 				flying = true;
-				hitsize = 45f;
+				hitSize = 45f;
 				range = 300f;
 				lowAltitude = true;
 				weapons.add(new Weapon(name + "-gun"){
@@ -215,7 +215,7 @@ public class UnityUnitTypes implements ContentList{
 				health = 150;
 				engineSize = 0f;
 				flying = true;
-				hitsize = 13f;
+				hitSize = 13f;
 				range = 165f;
 				weapons.add(new Weapon(name + "-gun"){
 					{
@@ -273,7 +273,7 @@ public class UnityUnitTypes implements ContentList{
 				health = 4000;
 				engineSize = 0f;
 				flying = true;
-				hitsize = 30f;
+				hitSize = 30f;
 				range = 165f;
 				lowAltitude = true;
 				weapons.add(new Weapon(name + "-gun-big"){
@@ -316,18 +316,15 @@ public class UnityUnitTypes implements ContentList{
 				}
 			}
 		};
-		UnitPlan[] oldPlans = ((UnitFactory) Blocks.airFactory).plans;
-		UnitPlan[] newPlans = new UnitPlan[oldPlans.length + 1];
-		newPlans[oldPlans.length] = new UnitPlan(caelifera, 60f * 25, with(Items.silicon, 15, Items.titanium, 25));
-		System.arraycopy(oldPlans, 0, newPlans, 0, oldPlans.length);
-		((UnitFactory) Blocks.airFactory).plans = newPlans;
+		((UnitFactory) Blocks.airFactory).plans
+			.add(new UnitPlan(caelifera, 60f * 25, with(Items.silicon, 15, Items.titanium, 25)));
 		//worms
 		EntityMapping.nameMap.put("arcnelidia", WormDefaultUnit::new);
 		arcnelidia = new WormUnitType("arcnelidia"){
 			{
 				setTypeID(3);
 				segmentOffset = 23f;
-				hitsize = 17f;
+				hitSize = 17f;
 				health = 800;
 				speed = 4f;
 				accel = 0.035f;
@@ -377,28 +374,9 @@ public class UnityUnitTypes implements ContentList{
 		}};*/
 
 		//upgraders
-		UnitType[][] oldUpgradesAdditive = ((Reconstructor) Blocks.additiveReconstructor).upgrades;
-		UnitType[][] newUpgradesAdditive = new UnitType[oldUpgradesAdditive.length + 1][2];
-		newUpgradesAdditive[oldUpgradesAdditive.length] = new UnitType[]{caelifera, schistocerca};
-		System.arraycopy(oldUpgradesAdditive, 0, newUpgradesAdditive, 0, oldUpgradesAdditive.length);
-		((Reconstructor) Blocks.additiveReconstructor).upgrades = newUpgradesAdditive;
-
-		UnitType[][] oldUpgradesMultiplicative = ((Reconstructor) Blocks.multiplicativeReconstructor).upgrades;
-		UnitType[][] newUpgradesMultiplicative = new UnitType[oldUpgradesMultiplicative.length + 1][2];
-		newUpgradesMultiplicative[oldUpgradesMultiplicative.length] = new UnitType[]{schistocerca, anthophila};
-		System.arraycopy(oldUpgradesMultiplicative, 0, newUpgradesMultiplicative, 0, oldUpgradesMultiplicative.length);
-		((Reconstructor) Blocks.multiplicativeReconstructor).upgrades = newUpgradesMultiplicative;
-
-		UnitType[][] oldUpgradesExponential = ((Reconstructor) Blocks.exponentialReconstructor).upgrades;
-		UnitType[][] newUpgradesExponential = new UnitType[oldUpgradesExponential.length + 1][2];
-		newUpgradesExponential[oldUpgradesExponential.length] = new UnitType[]{anthophila, vespula};
-		System.arraycopy(oldUpgradesExponential, 0, newUpgradesExponential, 0, oldUpgradesExponential.length);
-		((Reconstructor) Blocks.exponentialReconstructor).upgrades = newUpgradesExponential;
-
-		UnitType[][] oldUpgradesTetrative = ((Reconstructor) Blocks.tetrativeReconstructor).upgrades;
-		UnitType[][] newUpgradesTetrative = new UnitType[oldUpgradesTetrative.length + 1][2];
-		newUpgradesTetrative[oldUpgradesTetrative.length] = new UnitType[]{vespula, lepidoptera};
-		System.arraycopy(oldUpgradesTetrative, 0, newUpgradesTetrative, 0, oldUpgradesTetrative.length);
-		((Reconstructor) Blocks.tetrativeReconstructor).upgrades = newUpgradesTetrative;
+		((Reconstructor) Blocks.additiveReconstructor).upgrades.add(new UnitType[]{caelifera, schistocerca});
+		((Reconstructor) Blocks.multiplicativeReconstructor).upgrades.add(new UnitType[]{schistocerca, anthophila});
+		((Reconstructor) Blocks.exponentialReconstructor).upgrades.add(new UnitType[]{anthophila, vespula});
+		((Reconstructor) Blocks.tetrativeReconstructor).upgrades.add(new UnitType[]{vespula, lepidoptera});
 	}
 }

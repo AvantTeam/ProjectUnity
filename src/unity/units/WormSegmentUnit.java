@@ -6,6 +6,7 @@ import arc.util.*;
 import arc.struct.Seq;
 import arc.graphics.g2d.*;
 import mindustry.gen.*;
+import mindustry.graphics.Pal;
 import mindustry.type.*;
 import mindustry.entities.units.*;
 import mindustry.entities.bullet.BulletType;
@@ -57,7 +58,7 @@ public class WormSegmentUnit extends UnitEntity{
 		maxHealth = type.health;
 		drag = type.drag;
 		armor = type.armor;
-		hitSize = type.hitsize;
+		hitSize = type.hitSize;
 		hovering = type.hovering;
 		if (controller == null) controller(type.createController());
 		if (mounts().length != type.weapons.size) setupWeapons(type);
@@ -142,7 +143,7 @@ public class WormSegmentUnit extends UnitEntity{
 	@Override
 	public void update(){
 		if (parentUnit == null || parentUnit.dead){
-			//deactivated=true; seems not exist in v106
+			//deactivated=true; seems not exist in v108
 			dead = true;
 			remove();
 		}
@@ -280,7 +281,7 @@ public class WormSegmentUnit extends UnitEntity{
 
 	public void drawShadow(){
 		TextureRegion region = segmentType == 0 ? wormType.segmentRegion() : wormType.tailRegion();
-		//Draw.color(Pal.shadow); seems not exist in v106
+		Draw.color(Pal.shadow); //seems not exist in v106
 		float e = Math.max(elevation, type.visualElevation);
 		Draw.rect(region, x + (UnitType.shadowTX * e), y + UnitType.shadowTY * e, rotation - 90f);
 		Draw.color();
