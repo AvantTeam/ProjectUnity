@@ -225,16 +225,18 @@ public class LightSource extends GenericCrafter{
 				if (furthest == tile || furthest == null) return false;
 				loops++;
 				if (!furthest.solid() || furthest.block() == block) return false;
-				if (furthest.bc() == null) return true;
-				/*if (furthest.bc().block instanceof LightReflector){
+				Building build = furthest.bc();
+				if (build == null) return true;
+				/*if (tempBuild.block instanceof LightReflector){
 					//TODO
-				}else if (furthest.bc().block instanceof LightDivisor){
+				}else if (tempBuild.block instanceof LightDivisor){
 				
-				}else if (furthest.bc().block instanceof LightRepeater){
-				
-				}else if (furthest.bc().block instanceof LightConsumer){
-				
-				}*/
+				}else */if (build instanceof LightRepeaterBuildBase){
+					//gradle is the fuckkist thing I had ever seen
+					next = ((LightRepeaterBuildBase) build).calcLight(ld, loops);
+				}/*else if (furthest.bc().block instanceof LightConsumer){
+					
+					}*/
 				return true;
 			});
 			if (!hit) return;
@@ -268,21 +270,6 @@ public class LightSource extends GenericCrafter{
 			table.button(Icon.rightOpen, Styles.clearTransi, 34f, () -> {
 				configure(1);
 			}).size(40f);
-		}
-
-		protected class LightData{
-			protected int angle = 0, length = lightLength;
-			protected float strength = 100f;
-			Color color = lightColor;
-
-			public LightData(){}
-
-			public LightData(int angle, float strength, int length, Color color){
-				this.angle = angle;
-				this.strength = strength;
-				this.length = length;
-				this.color = color;
-			}
 		}
 	}
 }
