@@ -26,52 +26,6 @@ public class UnityBullets implements ContentList{
 			float width = 0.7f;
 			TextureRegion laserRegion, laserEndRegion;
 
-			@Override
-			public void load(){
-				laserRegion = atlas.find("laser");
-				laserEndRegion = atlas.find("laser-end");
-			}
-
-			@Override
-			public void init(Bullet b){
-				if (b == null) return;
-				Healthc target = Damage.linecast(b, b.x, b.y, b.rotation(), length);
-				b.data = target;
-				ExpPowerTurret.ExpPowerTurretBuild exp = b.owner.<ExpPowerTurret.ExpPowerTurretBuild>self();
-				int lvl = exp.getLevel();
-				b.damage(damage + lvl * 10f);
-				b.fdata = lvl / 10f;
-				if (target instanceof Hitboxc){
-					Hitboxc hit = (Hitboxc) target;
-					hit.collision(b, hit.x(), hit.y());
-					b.collision(hit, hit.x(), hit.y());
-					exp.incExp(2);
-				}else if (target instanceof Building){
-					Building tile = (Building) target;
-					if (tile.collide(b)){
-						tile.collision(b);
-						hit(b, tile.x, tile.y);
-						exp.incExp(2);
-					}
-				}else b.data = new Vec2().trns(b.rotation(), length).add(b.x, b.y);
-			}
-
-			@Override
-			public float range(){ return length; }
-
-			@Override
-			public void draw(Bullet b){
-				if (b.data instanceof Position){
-					Tmp.v1.set((Position) b.data);
-					Color levelColor = Tmp.c1.set(Color.white).lerp(Pal.lancerLaser, b.fdata);
-					Draw.color(levelColor);
-					Drawf.laser(b.team, laserRegion, laserEndRegion, b.x, b.y, Tmp.v1.x, Tmp.v1.y, width * b.fout());
-					Draw.reset();
-					Drawf.light(Team.derelict, b.x, b.y, b.x + Tmp.v1.x, b.y + Tmp.v1.y, 15f * b.fout() + 5f,
-						levelColor, 0.6f);
-				}
-			}
-
 			{
 				lifetime = 18f;
 				despawnEffect = Fx.none;
@@ -82,14 +36,57 @@ public class UnityBullets implements ContentList{
 				hittable = false;
 				hitEffect = Fx.hitLiquid;
 			}
-		};
-		coalBlaze = new BulletType(3.35f, 32f){
+			
 			@Override
-			public void hit(Bullet b, float x, float y){
-				super.hit(b, x, y);
-				b.owner.<ExpItemTurret.ExpItemTurretBuild>self().incExp(Mathf.random(1));
+			public void load(){
+				laserRegion = atlas.find("laser");
+				laserEndRegion = atlas.find("laser-end");
 			}
 
+			@Override
+			public void init(Bullet b){
+				if(b == null) return;
+				Healthc target = Damage.linecast(b, b.x, b.y, b.rotation(), length);
+				b.data = target;
+				
+				ExpPowerTurret.ExpPowerTurretBuild exp = b.owner.<ExpPowerTurret.ExpPowerTurretBuild>self();
+				int lvl = exp.getLevel();
+				b.damage(damage + lvl * 10f);
+				b.fdata = lvl / 10f;
+				if(target instanceof Hitboxc){
+					Hitboxc hit = (Hitboxc) target;
+					hit.collision(b, hit.x(), hit.y());
+					b.collision(hit, hit.x(), hit.y());
+					exp.incExp(2);
+				}else if(target instanceof Building){
+					Building tile = (Building) target;
+					if(tile.collide(b)){
+						tile.collision(b);
+						hit(b, tile.x, tile.y);
+						exp.incExp(2);
+					}
+				}else b.data = new Vec2().trns(b.rotation(), length).add(b.x, b.y);
+			}
+
+			@Override
+			public float range(){
+				return length;
+			}
+
+			@Override
+			public void draw(Bullet b){
+				if(b.data instanceof Position){
+					Tmp.v1.set((Position) b.data);
+					Color levelColor = Tmp.c1.set(Color.white).lerp(Pal.lancerLaser, b.fdata);
+					Draw.color(levelColor);
+					Drawf.laser(b.team, laserRegion, laserEndRegion, b.x, b.y, Tmp.v1.x, Tmp.v1.y, width * b.fout());
+					Draw.reset();
+					Drawf.light(Team.derelict, b.x, b.y, b.x + Tmp.v1.x, b.y + Tmp.v1.y, 15f * b.fout() + 5f, levelColor, 0.6f);
+				}
+			}
+		};
+		
+		coalBlaze = new BulletType(3.35f, 32f){
 			{
 				ammoMultiplier = 3;
 				hitSize = 7f;
@@ -103,14 +100,15 @@ public class UnityBullets implements ContentList{
 				keepVelocity = true;
 				hittable = true;
 			}
-		};
-		pyraBlaze = new BulletType(3.35f, 46f){
+			
 			@Override
 			public void hit(Bullet b, float x, float y){
 				super.hit(b, x, y);
 				b.owner.<ExpItemTurret.ExpItemTurretBuild>self().incExp(Mathf.random(1));
 			}
-
+		};
+		
+		pyraBlaze = new BulletType(3.35f, 46f){
 			{
 				ammoMultiplier = 3;
 				hitSize = 7f;
@@ -123,6 +121,12 @@ public class UnityBullets implements ContentList{
 				status = StatusEffects.burning;
 				keepVelocity = false;
 				hittable = false;
+			}			
+			
+			@Override
+			public void hit(Bullet b, float x, float y){
+				super.hit(b, x, y);
+				b.owner.<ExpItemTurret.ExpItemTurretBuild>self().incExp(Mathf.random(1));
 			}
 		};
 	}
