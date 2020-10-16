@@ -7,7 +7,10 @@ public class LightData{
 	protected float strength = 100f;
 	Color color = Color.white;
 
-	public LightData(){}
+	public LightData(int length, Color color){
+		this.length = length;
+		this.color = color;
+	}
 
 	public LightData(int angle, float strength, int length, Color color){
 		this.angle = angle;

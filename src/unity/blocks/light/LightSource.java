@@ -86,7 +86,7 @@ public class LightSource extends GenericCrafter{
 		protected int angle = 0, loops;
 		protected final ArrayList<Tile> ls = new ArrayList<>();
 		protected final ArrayList<LightData> lsData = new ArrayList<>();
-		protected LightData lightData = new LightData(), next, next2;
+		protected LightData lightData = new LightData(lightLength, lightColor), next, next2;
 		{
 			Events.run(Trigger.draw, () -> {
 				if (this != null) drawLightLasers();
@@ -179,7 +179,7 @@ public class LightSource extends GenericCrafter{
 				if (settings.getBool("bloom")) Draw.z(a > 0.99f ? Layer.effect - 1 : Layer.bullet - 2);
 				if (i == len - 1 || ls.get(i + 1) == null){
 					if (tempData.length < 1) continue;
-					Lines.line(tempX, tempTile.worldy(), tempX + (tempLength - 1) * tilesize * Geometry.d8(tempAngle).x,
+					Lines.line(tempX, tempY, tempX + (tempLength - 1) * tilesize * Geometry.d8(tempAngle).x,
 						tempY + (tempLength - 1) * tilesize * Geometry.d8(tempAngle).y);
 					final float shift = (tempAngle % 2 == 0) ? w / 2f : w / 2.8285f;
 					Drawf.tri(tempX + ((tempLength - 1) * tilesize + shift) * Geometry.d8(tempAngle).x,
@@ -210,6 +210,7 @@ public class LightSource extends GenericCrafter{
 			//TODO
 			ls.add(tile);
 			lsData.add(lightData);
+			pointMarch(tile, lightData, length, maxLength, 0);
 			setInit(true);
 		}
 
@@ -232,7 +233,6 @@ public class LightSource extends GenericCrafter{
 				}else if (tempBuild.block instanceof LightDivisor){
 				
 				}else */if (build instanceof LightRepeaterBuildBase){
-					//gradle is the fuckkist thing I had ever seen
 					next = ((LightRepeaterBuildBase) build).calcLight(ld, loops);
 				}/*else if (furthest.bc().block instanceof LightConsumer){
 					

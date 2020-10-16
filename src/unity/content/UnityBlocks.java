@@ -20,7 +20,7 @@ public class UnityBlocks implements ContentList{
 	/*oreXenium, */oreUmbrium, oreLuminum, oreMonolite, oreImberium,
 
 	//global
-	multiTest1, multiTest2, 
+	multiTest1, multiTest2, lightItemFilter, metaglassWall, metaglassWallLarge,
 	
 	//light
 	lightLamp, oilLamp, lightLaser, lightLampInfi,
@@ -167,7 +167,24 @@ public class UnityBlocks implements ContentList{
 			scaleStatus = false;
 			maxLightLength = 7500;
 		}};
-	
+		
+		lightItemFilter = new LightRouter("light-item-filter"){{
+			size = 1;
+			health = 60;
+			requirements(Category.logic, with(Items.graphite, 5, Items.metaglass, 20, Items.silicon, 10));
+		}};
+		
+		metaglassWall = new LightWall("metaglass-wall"){{
+			size = 1;
+			health = 350;
+			requirements(Category.defense, with(Items.lead, 6, Items.metaglass, 6));
+		}};
+		
+		metaglassWallLarge = new LightWall("metaglass-wall-large") {{
+			size = 2;
+			health = 1400;
+			requirements(Category.defense, with(Items.lead, 24, Items.metaglass, 24));
+		}};
 		//endregion
 		//turrets
 		

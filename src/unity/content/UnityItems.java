@@ -8,7 +8,7 @@ public class UnityItems implements ContentList{
 	public static Item
 	
 	//faction items
-	advanceAlloy, lightAlloy, darkAlloy, monolithAlloy, plagueAlloy, sparkAlloy, terminum,
+	advanceAlloy, lightAlloy, darkAlloy, monolithAlloy, plagueAlloy, sparkAlloy, terminum, terminaAlloy, terminationFragment,
 	xenium, luminum, umbrium, monolite, contagium, imberium;
 	
 	@Override
@@ -48,6 +48,16 @@ public class UnityItems implements ContentList{
 		terminum = new Item("terminum", Color.valueOf("f53036")){{
 			cost = 3.2f;
 			radioactivity = 1.32f;
+		}};
+		
+		terminaAlloy = new Item("termina-alloy", Color.valueOf("9e6d74")){{
+			cost = 4.2f;
+			radioactivity = 1.74f;
+		}};
+		
+		terminationFragment = new Item("termination-fragment", Color.valueOf("f9504f")){{
+			cost = 1.2f;
+			radioactivity = 3.64f;
 		}};
 		
 		xenium = new Item("xenium", Color.valueOf("9dddff")){{
