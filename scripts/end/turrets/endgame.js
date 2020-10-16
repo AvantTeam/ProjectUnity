@@ -13,6 +13,16 @@ const offsetSin = (offset, scl) => {
 	return Mathf.absin(Time.time() + (offset * Mathf.radDeg), scl, 0.5) + 0.5;
 };
 
+const vaporizeTile = new Effect(126, 512, e => {
+	Draw.mixcol(Color.red, 1);
+	Draw.blend(Blending.additive);
+	
+	Fill.square(e.x, e.y, e.fout() * (e.rotation * (Vars.tilesize / 2)));
+	
+	Draw.blend();
+	Draw.mixcol();
+});
+
 const vaporize = new Effect(126, 512, e => {
 	Draw.mixcol(Color.red, 1);
 	Draw.color(1, 1, 1, e.fout());
@@ -123,16 +133,25 @@ endgame.buildType = () => {
 			if(this.timer.get(endgame.eyeTime, 30) && this.target != null){
 				tempSeq.clear();
 				//var tileTarget = Units.findEnemyTile(this.team, this.x, this.y, endgame.range, build => !build.dead);
+				var lowest = endgame.range + 999;
 				var dstC = endgame.range + 999;
 				fLib.trueEachBlock(this.x, this.y, endgame.range / 2, build => {
 					var dstD = Mathf.dst(this.x, this.y, build.x, build.y);
-					if(build.team != this.team && !build.dead && (dstD <= dstC || Mathf.equal(dstD, dstC, 4))){
+					if(build.team != this.team && !build.dead){
 						//dstC = Mathf.dst(this.x, this.y, build.x, build.y);
-						dstC = dstD;
-						if(tempSeq.size >= 16){
-							tempSeq.remove(0);
+						if(dstD < dstC){
+							lowest = Math.min(lowest, dstD);
+							dstC = dstD;
+							if(tempSeq.size >= 16){
+								tempSeq.remove(0);
+							};
+							tempSeq.add(build);
+						}else if(Mathf.equal(lowest, dstD, 32)){
+							if(tempSeq.size >= 16){
+								tempSeq.remove(0);
+							};
+							tempSeq.add(build);
 						};
-						tempSeq.add(build);
 					};
 				});
 				for(var i = 0; i < 16; i++){
@@ -235,6 +254,7 @@ endgame.buildType = () => {
 			var shouldLaser = 0;
 			fLib.trueEachBlock(this.x, this.y, endgame.range, build => {
 				if(build.team != this.team && build != this && !build.dead && build.block != null){
+					if(build.block.size >= 3) vaporizeTile.at(build.x, build.y, build.block.size);
 					if(shouldLaser % 5 == 0 || build.block.size >= 5) endgameLaser.at(this.x, this.y, 0, [new Vec2(this.x + (this._eyesOffset.x * 2), this.y + (this._eyesOffset.x * 2)), new Vec2(build.x, build.y), 1]);
 					build.kill();
 					shouldLaser++;

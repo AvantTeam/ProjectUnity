@@ -2,5 +2,13 @@
 	"color": "8c3d3b",
 	"radioactivity": 0.2,
 	"hardness": 3,
-	"cost": 1.42
+	"cost": 1.42,
+	"research": {
+		"parent": "surge-alloy",
+		"requirements": [
+			{ "item": "surge-alloy", "amount": 7000 },
+			{ "item": "silicon", "amount": 8500 },
+			{ "item": "graphite", "amount": 6000 }
+		]
+	}
 }

@@ -127,6 +127,8 @@ const script = [
             {
                 name: "turrets",
                 childs: [
+					"apparition",
+					
                     "fallout",
                     "catastrophe",
 					"calamity"

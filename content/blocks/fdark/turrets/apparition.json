@@ -1,0 +1,24 @@
+{
+	"size": 5,
+	"health": 3975,
+	"range": 235,
+	"reloadTime": 6,
+	"coolantMultiplier": 0.5,
+	"inaccuracy": 3,
+	"spread": 12,
+	"shots": 2,
+	"alternate": true,
+	"recoilAmount": 3,
+	"rotateSpeed": 4.5,
+	"hasLiquids": true,
+	"requirements": [
+		{ "item": "copper", "amount": 350 },
+		{ "item": "graphite", "amount": 380 },
+		{ "item": "silicon", "amount": 360 },
+		{ "item": "plastanium", "amount": 200 },
+		{ "item": "thorium", "amount": 220 },
+		{ "item": "umbrium", "amount": 370 },
+		{ "item": "surge-alloy", "amount": 290 }
+	],
+	"category": "turret"
+}

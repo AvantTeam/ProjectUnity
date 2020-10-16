@@ -6,7 +6,9 @@
 		"power": 5,
 		"items": {
 			"items": [
-				{"item": "thorium", "amount": 1000},
+				{"item": "silicon", "amount": 1200},
+				{"item": "metaglass", "amount": 800},
+				{"item": "thorium", "amount": 700},
 				{"item": "surge-alloy", "amount": 400},
 				{"item": "plastanium", "amount": 600},
 				{"item": "phase-fabric", "amount": 350}
@@ -14,7 +16,7 @@
 		},
 		"liquid": {
 			"liquid": "cryofluid",
-			"amount": 5
+			"amount": 7
 		}
 	},
 	"requirements": [
