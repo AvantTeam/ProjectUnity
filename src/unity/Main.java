@@ -20,23 +20,24 @@ public class Main extends Mod{
 		new UnityBullets(),
 		new UnityUnitTypes(),
 		new UnityBlocks(),
+		new UnityPlanets()
 	};
 
 	@Override
 	public void init(){
 		enableConsole = true;
-		if(!headless) {
-			LoadedMod mod=mods.locateMod("unity");
-			String change="mod."+mod.meta.name+".";
-			mod.meta.displayName=bundle.get(change+"name");
-			mod.meta.description=bundle.get(change+"description");
+		if(!headless){
+			LoadedMod mod = mods.locateMod("unity");
+			String change= "mod." + mod.meta.name + ".";
+			mod.meta.displayName = bundle.get(change + "name");
+			mod.meta.description = bundle.get(change + "description");
 		}
 		// Log.log(LogLevel.info,"[@]: @",,);
 	}
 
 	@Override
 	public void loadContent(){
-		for (ContentList list : unityContent){
+		for(ContentList list : unityContent){
 			list.load();
 		}
 		addResearch("graphite-press", UnityBlocks.multiTest1, with());
@@ -44,12 +45,12 @@ public class Main extends Mod{
 	}
 
 	private void addResearch(String parentName, Block target,ItemStack[] customRequirements){
-		//TODO find more neat way to add block in techTree | candidates:json,loop
+		//TODO find more neat way to add block in techTree | candidates: json, loop
 		Block parent = content.getByName(ContentType.block, parentName);
-		TechNode node = new TechNode(null, target,
-			customRequirements.length == 0 ? target.researchRequirements() : customRequirements);
+		TechNode node = new TechNode(null, target, customRequirements.length == 0 ? target.researchRequirements() : customRequirements);
 		TechNode parnode = TechTree.all.find(t -> t.content == parent);
-		if (!parnode.children.contains(node)) parnode.children.add(node);
+	
+		if(!parnode.children.contains(node)) parnode.children.add(node);
 		node.parent = parnode;
 	}
 }

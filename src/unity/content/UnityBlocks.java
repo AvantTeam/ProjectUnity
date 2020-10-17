@@ -17,7 +17,7 @@ public class UnityBlocks implements ContentList{
 	public static Block
 
 	//ores
-	/*oreXenium, */oreUmbrium, oreLuminum, oreMonolite, oreImberium,
+	/*oreXenium,*/ oreUmbrium, oreLuminum, oreMonolite, oreImberium,
 
 	//global
 	multiTest1, multiTest2, lightItemFilter, metaglassWall, metaglassWallLarge,
@@ -203,6 +203,7 @@ public class UnityBlocks implements ContentList{
 			health = 1400;
 			requirements(Category.defense, with(Items.lead, 24, Items.metaglass, 24));
 		}};
+		
 		//endregion
 		//turrets
 		
