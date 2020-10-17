@@ -265,7 +265,7 @@ electrodeGen.basegen = new BaseGenerator();
 const electrode = new JavaAdapter(Planet, {}, "electrode", Planets.sun, 3, 1);
 electrode.generator = electrodeGen;
 electrode.meshLoader = () => new HexMesh(electrode, 6);
-electrode.atmosphereColor = Pal.surge;
+electrode.atmosphereColor = Color.valueOf("ada41c");
 electrode.startSector = 30;
 
 module.exports = electrode;
