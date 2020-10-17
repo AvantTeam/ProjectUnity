@@ -56,7 +56,7 @@ amphibi.constructor = () => {
 					if(this.isPlayer()){
 						//groundUnit.controller(this.controller);
 						groundUnit.controller = this.controller;
-						if(groundUnit.controller.unit() != groundUnit.base()) groundUnit.controller.unit(groundUnit.base());
+						if(groundUnit.controller.unit() != groundUnit./*base*/self) groundUnit.controller.unit(groundUnit./*base*/self);
 					};
 					this.remove();
 				}else{
@@ -97,7 +97,7 @@ amphibiGround.constructor = () => {
 					if(this.isPlayer()){
 						//navalUnit.controller(this.controller);
 						navalUnit.controller = this.controller;
-						if(navalUnit.controller.unit() != navalUnit.base()) navalUnit.controller.unit(navalUnit.base());
+						if(navalUnit.controller.unit() != navalUnit./*base*/self) navalUnit.controller.unit(navalUnit./*base*/self);
 					};
 					this.remove();
 				}else{

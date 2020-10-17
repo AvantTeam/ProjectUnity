@@ -8,7 +8,7 @@ const laser = extend(BulletType, {
     },
 
     collision(other, x, y){
-        this.hit(this.base(), x, y);
+        this.hit(this.self, x, y);
         if(other instanceof Healthc){
             var h = other;
             h.damage(this.getDamage(this));
@@ -115,7 +115,7 @@ craber.constructor = () => {
                     if(this.isPlayer()){
                         //groundUnit.controller(this.controller);
                         groundUnit.controller = this.controller;
-                        if(groundUnit.controller.unit() != groundUnit.base()) groundUnit.controller.unit(groundUnit.base());
+                        if(groundUnit.controller.unit() != groundUnit.self) groundUnit.controller.unit(groundUnit.self);
                     };
                     this.remove();
                 }else{
@@ -156,7 +156,7 @@ craberGround.constructor = () => {
                     if(this.isPlayer()){
                         //navalUnit.controller(this.controller);
                         navalUnit.controller = this.controller;
-                        if(navalUnit.controller.unit() != navalUnit.base()) navalUnit.controller.unit(navalUnit.base());
+                        if(navalUnit.controller.unit() != navalUnit.self) navalUnit.controller.unit(navalUnit.self);
                     };
                     this.remove();
                 }else{
