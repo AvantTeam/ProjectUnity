@@ -16,6 +16,7 @@ import mindustry.ui.*;
 import mindustry.world.Tile;
 import mindustry.world.meta.*;
 import mindustry.world.blocks.production.GenericCrafter;
+import unity.blocks.light.LightReflector.LightReflectorBuild;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
@@ -225,14 +226,15 @@ public class LightSource extends GenericCrafter{
 				furthest = world.tile(x, y);
 				if (furthest == tile || furthest == null) return false;
 				loops++;
-				if (!furthest.solid() || furthest.block() == block) return false;
+				if (!furthest.solid() || (furthest.block() == block && tile == this.tile)) return false;
 				Building build = furthest.bc();
 				if (build == null) return true;
-				/*if (tempBuild.block instanceof LightReflector){
-					//TODO
-				}else if (tempBuild.block instanceof LightDivisor){
-				
-				}else */if (build instanceof LightRepeaterBuildBase){
+				if (build instanceof LightReflectorBuild){
+					int tr = ((LightReflectorBuild) build).calcReflection(ld.angle);
+					if (tr >= 0) next = new LightData(tr, ld.strength, ld.length - loops, ld.color);
+				}/*else if (tempBuild.block instanceof LightDivisor){
+					
+					}*/else if (build instanceof LightRepeaterBuildBase){
 					next = ((LightRepeaterBuildBase) build).calcLight(ld, loops);
 				}/*else if (furthest.bc().block instanceof LightConsumer){
 					

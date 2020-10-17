@@ -23,7 +23,7 @@ public class UnityBlocks implements ContentList{
 	multiTest1, multiTest2, lightItemFilter, metaglassWall, metaglassWallLarge,
 	
 	//light
-	lightLamp, oilLamp, lightLaser, lightLampInfi,
+	lightLamp, oilLamp, lightLaser, lightLampInfi, lightReflector, lightReflector1,
 	
 	//turrets
 	laserTurret, inferno;
@@ -124,8 +124,6 @@ public class UnityBlocks implements ContentList{
 		//region light
 		
 		lightLamp = new LightSource("light-lamp"){{
-			size = 1;
-			health = 40;
 			consumes.power(1f);
 			requirements(Category.logic, with(Items.lead, 5, Items.metaglass, 10));
 			drawer = new DrawLightSource();
@@ -144,7 +142,6 @@ public class UnityBlocks implements ContentList{
 		}};
 		
 		lightLaser = new LightSource("light-laser"){{
-			size = 1;
 			health = 60;
 			consumes.power(1.5f);
 			requirements(Category.logic, BuildVisibility.sandboxOnly, with(Items.metaglass, 10, Items.silicon, 5, Items.titanium, 5));
@@ -155,8 +152,6 @@ public class UnityBlocks implements ContentList{
 		}};
 		
 		lightLampInfi = new LightSource("light-lamp-infi"){{
-			size = 1;
-			health = 40;
 			hasPower = false;
 			consumesPower = false;
 			requirements(Category.logic, BuildVisibility.sandboxOnly, with());
@@ -169,13 +164,19 @@ public class UnityBlocks implements ContentList{
 		}};
 		
 		lightItemFilter = new LightRouter("light-item-filter"){{
-			size = 1;
 			health = 60;
 			requirements(Category.logic, with(Items.graphite, 5, Items.metaglass, 20, Items.silicon, 10));
 		}};
 		
+		lightReflector = new LightReflector("light-reflector"){{
+			requirements(Category.logic, with(Items.metaglass, 10));
+		}};
+		
+		lightReflector1 = new LightReflector("light-reflector-1", false){{
+			requirements(Category.logic, with(Items.metaglass, 10));
+		}};
+		
 		metaglassWall = new LightWall("metaglass-wall"){{
-			size = 1;
 			health = 350;
 			requirements(Category.defense, with(Items.lead, 6, Items.metaglass, 6));
 		}};
