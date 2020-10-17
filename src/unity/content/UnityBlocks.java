@@ -23,7 +23,7 @@ public class UnityBlocks implements ContentList{
 	multiTest1, multiTest2, lightItemFilter, metaglassWall, metaglassWallLarge,
 	
 	//light
-	lightLamp, oilLamp, lightLaser, lightLampInfi, lightReflector, lightReflector1,
+	lightLamp, oilLamp, lightLaser, lightLampInfi, lightReflector, lightReflector1, lightOmnimirror, lightDivisor, lightDivisor1,
 	
 	//turrets
 	laserTurret, inferno;
@@ -168,12 +168,29 @@ public class UnityBlocks implements ContentList{
 			requirements(Category.logic, with(Items.graphite, 5, Items.metaglass, 20, Items.silicon, 10));
 		}};
 		
+		lightOmnimirror = new LightOmniReflector("light-omnimirror"){{
+			health = 80;
+			requirements(Category.logic, with(Items.metaglass, 10, Items.silicon, 5));
+		}};
+		
 		lightReflector = new LightReflector("light-reflector"){{
 			requirements(Category.logic, with(Items.metaglass, 10));
 		}};
 		
-		lightReflector1 = new LightReflector("light-reflector-1", false){{
+		lightReflector1 = new LightReflector("light-reflector-1"){{
+			diagonal = false;
 			requirements(Category.logic, with(Items.metaglass, 10));
+		}};
+		
+		lightDivisor = new LightDivisor("light-divisor"){{
+			health = 80;
+			requirements(Category.logic, with(Items.metaglass, 10, Items.titanium, 2));
+		}};
+		
+		lightDivisor1 = new LightDivisor("light-divisor-1"){{
+			diagonal = false;
+			health = 80;
+			requirements(Category.logic, with(Items.metaglass, 10, Items.titanium, 2));
 		}};
 		
 		metaglassWall = new LightWall("metaglass-wall"){{

@@ -87,7 +87,7 @@ public class LightSource extends GenericCrafter{
 		protected int angle = 0, loops;
 		protected final ArrayList<Tile> ls = new ArrayList<>();
 		protected final ArrayList<LightData> lsData = new ArrayList<>();
-		protected LightData lightData = new LightData(lightLength, lightColor), next, next2;
+		protected LightData lightData = new LightData(lightLength, lightColor);
 		{
 			Events.run(Trigger.draw, () -> {
 				if (this != null) drawLightLasers();
@@ -218,8 +218,8 @@ public class LightSource extends GenericCrafter{
 		protected void pointMarch(Tile tile, LightData ld, int length, int maxLength, int num){
 			if (length <= 0 || maxLength <= 0 || ld.strength * getStrength() < 1f) return;
 			final Point2 dir = Geometry.d8(ld.angle);
-			next = null;
-			next2 = null;
+			LightData next = new LightData();
+			LightData next2 = new LightData();
 			furthest = null;
 			loops = 0;
 			boolean hit = world.raycast(tile.x, tile.y, tile.x + length * dir.x, tile.y + length * dir.y, (x, y) -> {
@@ -229,40 +229,45 @@ public class LightSource extends GenericCrafter{
 				if (!furthest.solid() || (furthest.block() == block && tile == this.tile)) return false;
 				Building build = furthest.bc();
 				if (build == null) return true;
-				if (build instanceof LightReflectorBuild){
+				if (build.block instanceof LightDivisor){
 					int tr = ((LightReflectorBuild) build).calcReflection(ld.angle);
-					if (tr >= 0) next = new LightData(tr, ld.strength, ld.length - loops, ld.color);
-				}/*else if (tempBuild.block instanceof LightDivisor){
-					
-					}*/else if (build instanceof LightRepeaterBuildBase){
-					next = ((LightRepeaterBuildBase) build).calcLight(ld, loops);
+					if (tr >= 0){
+						next.set(ld.angle, ld.strength / 2f, ld.length - loops, ld.color);
+						next2.set(tr, ld.strength / 2f, ld.length - loops, ld.color);
+					}
+				}else if (build instanceof LightReflectorBuild){
+					int tr = ((LightReflectorBuild) build).calcReflection(ld.angle);
+					if (tr >= 0) next.set(tr, ld.strength, ld.length - loops, ld.color);
+				}else if (build instanceof LightRepeaterBuildBase){
+					next.set(((LightRepeaterBuildBase) build).calcLight(ld, loops));
 				}/*else if (furthest.bc().block instanceof LightConsumer){
 					
 					}*/
 				return true;
 			});
 			if (!hit) return;
-			if (next == null || num > maxReflections){
+			if (!next.initialized || num > maxReflections){
 				ls.add(furthest);
 				lsData.add(null);
-			}else if (next2 == null){
+			}else if (!next2.initialized){
 				ls.add(furthest);
 				lsData.add(next);
 				pointMarch(furthest, next, ld.length - loops, maxLength - loops, ++num);
 			}else{
 				ls.add(furthest);
 				lsData.add(next);
+				Tile forSafety = furthest;
 				pointMarch(furthest, next, ld.length - loops, maxLength - loops, ++num);
 				ls.add(null);
 				lsData.add(null);
-				ls.add(furthest);
+				ls.add(forSafety);
 				lsData.add(next2);
-				pointMarch(furthest, next, ld.length - loops, maxLength - loops, ++num);
+				pointMarch(forSafety, next2, ld.length - loops, maxLength - loops, ++num);
 			}
 		}
 
 		@Override
-		public Object config(){ return angle; }
+		public Integer config(){ return angle; }
 
 		@Override
 		public void buildConfiguration(Table table){

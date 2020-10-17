@@ -10,21 +10,19 @@ import static arc.Core.*;
 import static mindustry.Vars.*;
 
 public class LightReflector extends Block{
-	protected final boolean diagonal;
+	protected boolean diagonal = true;
 	protected final TextureRegion[] angleRegions = new TextureRegion[2];
-	public static final String spriteName = "unity-light-reflector";
+	//blame sk
+	private static final String spriteName = "unity-light-reflector";
 	public static final int[][] ref = {{6, 5, 4, -1, 2, 1, 0, -1}, {2, -1, 0, 7, 6, -1, 4, 3},
 		{-1, 7, 6, 5, -1, 3, 2, 1}, {4, 3, -1, 1, 0, 7, -1, 5}};
 
-	public LightReflector(String name, boolean diagonal){
+	public LightReflector(String name){
 		super(name);
-		this.diagonal = diagonal;
 		update = true;
 		solid = true;
 		rotate = true;
 	}
-
-	public LightReflector(String name){ this(name, true); }
 
 	@Override
 	public void drawRequestRegion(BuildPlan req, Eachable<BuildPlan> list){

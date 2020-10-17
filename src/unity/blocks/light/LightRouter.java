@@ -30,7 +30,7 @@ public class LightRouter extends Router{
 		public LightData calcLight(LightData ld, int i){
 			Color tempColor = ld.color.cpy().mul(getItemColor());
 			int val = Mathf.floorPositive(tempColor.value() * ld.strength);
-			if (val == 0) return null;
+			if (val <= 0) return null;
 			return new LightData(ld.angle, val, ld.length - i, tempColor);
 		}
 

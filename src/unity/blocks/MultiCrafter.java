@@ -538,7 +538,7 @@ public class MultiCrafter extends GenericCrafter{
 		}
 
 		@Override
-		public Object config(){ return toggle; }
+		public Integer config(){ return toggle; }
 
 		@Override
 		public void write(Writes write){
