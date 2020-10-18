@@ -1,7 +1,7 @@
 name: "unity"
 displayName: "Project Unity"
 author: "A lot of People"
-description: "Founder: Eye of Darkness\n[cyan]Java: younggam\n GlennFolker\n"
+description: "Founder: Eye of Darkness\n[cyan]Java: younggam\n GlennFolker\n Gdeft\n"
 version: 0.1
 minGameVersion: 106
 main: "unity.Main"

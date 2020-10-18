@@ -34,7 +34,7 @@ public class UnityPlanets implements ContentList{
 		
 		inert = new Planet("inert", electrode, 0, 0.5f){{
 			atmosphereColor = Color.white.cpy();
-			accessible = false;
+			//accessible = false;
 			meshLoader = () -> new ColorMesh(
 				this, 3, 4, 0.3, 1.7, 1.2, 1, 0.9f,
 				Color.valueOf("121211"),
