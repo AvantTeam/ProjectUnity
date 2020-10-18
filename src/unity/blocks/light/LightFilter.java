@@ -12,6 +12,7 @@ import mindustry.world.*;
 import mindustry.graphics.Layer;
 import mindustry.ui.Styles;
 import mindustry.entities.units.BuildPlan;
+import unity.blocks.light.LightInfluencer.LightInfluencerBuild;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
@@ -57,7 +58,7 @@ public class LightFilter extends Block{
 	}
 
 	@Override
-	public int minimapColor(Tile tile){ return colors[((LightFilterBuild) tile.bc()).color].rgba(); }
+	public int minimapColor(Tile tile){ return colors[tile.<LightFilterBuild>bc().color].rgba(); }
 
 	@Override
 	public void load(){
@@ -67,14 +68,20 @@ public class LightFilter extends Block{
 	}
 
 	public class LightFilterBuild extends Building implements LightRepeaterBuildBase{
-		protected int color = 0;
+		protected int color;
+		protected LightInfluencerBuild cont;
 
-		//TODO
 		protected void setFilterColor(int c){ color = c; }
 
 		protected Color getTrueColor(boolean inverted){
-			//TODO
-			return Color.white;
+			Color ret = inverted ? ncolors[color] : colors[color];
+			if (cont == null) return ret;
+			else{
+				if (!cont.isValid()){
+					cont = null;
+					return ret;
+				}else return cont.lastSumColor();
+			}
 		}
 
 		@Override

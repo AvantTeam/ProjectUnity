@@ -23,7 +23,7 @@ public class UnityBlocks implements ContentList{
 	multiTest1, multiTest2, lightItemFilter, metaglassWall, metaglassWallLarge,
 	
 	//light
-	lightLamp, oilLamp, lightLaser, lightLampInfi, lightReflector, lightReflector1, lightOmnimirror, lightDivisor, lightDivisor1,
+	lightLamp, oilLamp, lightLaser, lightLampInfi, lightReflector, lightReflector1, lightOmnimirror, lightDivisor, lightDivisor1, lightFilter, lightInvertedFilter, lightPanel, lightInfluencer,
 	
 	//turrets
 	laserTurret, inferno;
@@ -191,6 +191,32 @@ public class UnityBlocks implements ContentList{
 			diagonal = false;
 			health = 80;
 			requirements(Category.logic, with(Items.metaglass, 10, Items.titanium, 2));
+		}};
+		
+		lightFilter = new LightFilter("light-filter"){{
+			health = 60;
+			requirements(Category.logic, with(Items.graphite, 10, Items.metaglass, 10));
+		}};
+		
+		lightInvertedFilter = new LightFilter("light-inverted-filter",true){{
+			health = 60;
+			requirements(Category.logic, with(Items.graphite, 10, Items.metaglass, 10));
+		}};
+		
+		lightPanel = new LightGenerator("light-panel"){{
+			health = 100;
+			lightStrength = 80f;
+			scaleStatus = true;
+			powerProduction = 1f;
+			requirements(Category.logic, with(Items.copper, 15, Items.graphite, 10, Items.silicon, 15));
+		}};
+		
+		lightInfluencer=new LightInfluencer("light-influencer"){{
+			health = 60;
+			lightStrength = 1f;
+			scaleStatus = true;
+			powerProduction = 1f;
+			requirements(Category.logic, with(Items.lead, 15, Items.metaglass, 10, Items.silicon, 5));
 		}};
 		
 		metaglassWall = new LightWall("metaglass-wall"){{

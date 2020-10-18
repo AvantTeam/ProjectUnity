@@ -16,6 +16,7 @@ import mindustry.ui.*;
 import mindustry.world.Tile;
 import mindustry.world.meta.*;
 import mindustry.world.blocks.production.GenericCrafter;
+import unity.blocks.light.LightGenerator.LightGeneratorBuild;
 import unity.blocks.light.LightReflector.LightReflectorBuild;
 
 import static arc.Core.*;
@@ -87,6 +88,7 @@ public class LightSource extends GenericCrafter{
 		protected int angle = 0, loops;
 		protected final ArrayList<Tile> ls = new ArrayList<>();
 		protected final ArrayList<LightData> lsData = new ArrayList<>();
+		protected final ArrayList<LightGeneratorBuild> lCons = new ArrayList<>();
 		protected LightData lightData = new LightData(lightLength, lightColor);
 		{
 			Events.run(Trigger.draw, () -> {
@@ -198,9 +200,7 @@ public class LightSource extends GenericCrafter{
 			Draw.color();
 		}
 
-		protected void clearCons(){
-			//TODO
-		}
+		protected void clearCons(){ lCons.forEach(b -> b.removeSource(this)); }
 
 		protected void lightMarchStart(int length, int maxLength){
 			lightData.angle = getAngle();
@@ -208,7 +208,7 @@ public class LightSource extends GenericCrafter{
 			clearCons();
 			ls.clear();
 			lsData.clear();
-			//TODO
+			lCons.clear();
 			ls.add(tile);
 			lsData.add(lightData);
 			pointMarch(tile, lightData, length, maxLength, 0);
@@ -239,10 +239,11 @@ public class LightSource extends GenericCrafter{
 					int tr = ((LightReflectorBuild) build).calcReflection(ld.angle);
 					if (tr >= 0) next.set(tr, ld.strength, ld.length - loops, ld.color);
 				}else if (build instanceof LightRepeaterBuildBase){
-					next.set(((LightRepeaterBuildBase) build).calcLight(ld, loops));
-				}/*else if (furthest.bc().block instanceof LightConsumer){
-					
-					}*/
+					LightData tempData = ((LightRepeaterBuildBase) build).calcLight(ld, loops);
+					if (tempData == null) return true;
+					next.set(tempData);
+				}else if (build.block instanceof LightGenerator)
+					lCons.add(((LightGeneratorBuild) build).addSource(this, ld));
 				return true;
 			});
 			if (!hit) return;
