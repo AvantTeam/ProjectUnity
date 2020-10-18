@@ -32,6 +32,10 @@ module.exports = {
                     }));
                 }));
             },
+            setStats() {
+                this.super$setStats();
+                this.stats.add(BlockStat.output, Core.bundle.format("bar.efficiency", 6000 / this.lightStrength));
+            },
             consumesLight() {
                 return true;
             }
