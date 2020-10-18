@@ -1,0 +1,20 @@
+{
+	"size": 3,
+	"health": 900,
+	"range": 260,
+	"reloadTime": 400,
+	"coolantMultiplier": 2,
+	"shootCone": 60,
+	"inaccuracy": 0,
+	"powerUse": 6.4,
+	"targetAir": false,
+	"requirements": [
+		{"item": "copper", "amount":300},
+		{"item": "lead", "amount": 100},
+		{"item": "titanium", "amount": 160},
+		{"item": "silicon", "amount": 240},
+		{"item": "imberium", "amount": 90},
+	],
+	"category": "turret",
+	"research": "ripple"
+}

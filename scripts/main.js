@@ -153,7 +153,8 @@ const script = [
                     "orb",
                     "shockwire",
 					"current",
-                    "plasma"
+                    "plasma",
+                    "shielder"
                 ]
             },
 
