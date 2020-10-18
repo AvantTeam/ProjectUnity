@@ -327,10 +327,12 @@ public class UnityUnitTypes implements ContentList{
 			}});
 		}};
 
-		/*EntityMapping.nameMap.put("devourer", WormDefaultUnit::new);
+		/*
+		EntityMapping.nameMap.put("devourer", WormDefaultUnit::new);
 		devourer=new WormUnitType("devourer", 45) {{
 			
-		}};*/
+		}};
+		*/
 
 		//reconstructors
 		((Reconstructor) Blocks.additiveReconstructor).upgrades.add(new UnitType[]{caelifera, schistocerca});
