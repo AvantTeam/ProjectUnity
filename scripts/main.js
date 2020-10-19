@@ -45,6 +45,7 @@ const script = [
             },
 
             "wormlib",
+			"unitlib",
             "copterbase",
             "loader",
             "chainlaser",
@@ -128,6 +129,7 @@ const script = [
                 name: "turrets",
                 childs: [
 					"apparition",
+					"ghost",
 					
                     "fallout",
                     "catastrophe",

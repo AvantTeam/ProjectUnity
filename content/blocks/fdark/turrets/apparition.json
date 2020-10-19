@@ -4,6 +4,7 @@
 	"range": 235,
 	"reloadTime": 6,
 	"coolantMultiplier": 0.5,
+	"restitution": 0.09,
 	"inaccuracy": 3,
 	"spread": 12,
 	"shots": 2,
