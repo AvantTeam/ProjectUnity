@@ -2,7 +2,7 @@
 	"size": 3,
 	"health": 900,
 	"range": 260,
-	"reloadTime": 400,
+	"reloadTime": 4000,
 	"coolantMultiplier": 2,
 	"shootCone": 60,
 	"inaccuracy": 0,
