@@ -20,11 +20,25 @@ const shieldBreakFx = new Effect(5, e => {
 	Draw.color();
 });
 
+function targetShield(t, b, radius){
+	var shield = false;
+
+	Groups.bullet.intersect(t.x-radius, t.y-radius, radius*2, radius*2, e => {
+		if(e != null && e.team == b.team && e.data != null && e.data[2] != null && e.data[2] == "shield"){
+			shield = true;
+		}
+	});
+
+	shield = !shield;
+
+	return t.damaged() && shield;
+}
+
 const shieldBullet = extend(BasicBulletType, {
 	update(b){
 		if(b.data == null){
 			/** The first number is the shield health, DO NOT TOUCH THE SECOND VALUE */
-			b.data = [800, 0];
+			b.data = [3000, 0, "shield"];
 		}
 
 		var radius = (((3-b.vel.len())*10)+1)*0.8;
@@ -33,12 +47,12 @@ const shieldBullet = extend(BasicBulletType, {
 			if(e != null && e.team != b.team){
 				if(e.owner instanceof Building){
 					if(e.owner.block.name != "unity-shielder"){
-						b.data[0] -= (e.damage/3);
+						b.data[0] -= e.damage;
 						b.data[1] = 1;
 						e.remove();
 					}
 				} else {
-					b.data[0] -= (e.damage/3);
+					b.data[0] -= e.damage;
 					b.data[1] = 1;
 					e.remove();
 				}
@@ -78,9 +92,9 @@ const shieldBullet = extend(BasicBulletType, {
 	}
 });
 shieldBullet.damage = 0;
-shieldBullet.speed = 3;
+shieldBullet.speed = 8;
 shieldBullet.lifetime = 20000;
-shieldBullet.drag = 0.012;
+shieldBullet.drag = 0.03;
 shieldBullet.shootEffect = Fx.none;
 shieldBullet.despawnEffect = Fx.none;
 shieldBullet.collides = false;
@@ -108,10 +122,14 @@ shielder.buildType = () => {
 			var spdScl = Mathf.clamp(Mathf.dst(this.x + shielder.tr.x, this.y + shielder.tr.y, this.targetPos.x, this.targetPos.y) / shielder.range, 0, 1);
 		
 			type.create(this, this.team, this.x + shielder.tr.x, this.y + shielder.tr.y, angle, spdScl, 1);
-		}/*,
+		},
 
 		findTarget(){
-			this.target = Units.bestTarget(this.team, this.x, this.y, shielder.range, e => !e.dead() && (e.isGrounded()) && e.damage, b -> true, unitSort);
-		}*/
+			this.target = Units.findAllyTile(this.team, this.x, this.y, shielder.range, e => targetShield(e, this, 10) && e != this);
+		},
+
+		validateTarget(){
+			return this.target != null;
+		}
 	})
 }
