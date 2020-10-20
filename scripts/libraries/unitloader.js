@@ -138,21 +138,6 @@ const unitLoader = new ContentList(){
 				Vars.content.getByName(ContentType.unit, "unity-lepidoptera")
 			]
 		]);
-		//5
-		reconAdd(Vars.content.getByName(ContentType.block, "unity-recursive-reconstructor"), [
-			[
-				Vars.content.getByName(ContentType.unit, "unity-gummy"),
-				UnitTypes.toxopid
-			],
-			[
-				UnitTypes.toxopid,
-				Vars.content.getByName(ContentType.unit, "unity-project-spiboss")
-			],
-			[
-				Vars.content.getByName(ContentType.unit, "unity-project-spiboss"),
-				Vars.content.getByName(ContentType.unit, "unity-arcaetana")
-			]
-		]);
 	}
 };
 

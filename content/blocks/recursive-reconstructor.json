@@ -2,6 +2,7 @@
 	"size": 11,
 	"hasLiquids": true,
 	"liquidCapacity": 360,
+	"configurable": true,
 	"consumes": {
 		"power": 5,
 		"items": {
