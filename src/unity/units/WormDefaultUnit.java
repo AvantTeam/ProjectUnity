@@ -26,8 +26,8 @@ public class WormDefaultUnit extends UnitEntity{
 	}
 
 	@Override
-	public void setStats(UnitType type){
-		super.setStats(type);
+	public void setType(UnitType type){
+		super.setType(type);
 		if(type instanceof WormUnitType) wormType = (WormUnitType) type;
 		else throw new ClassCastException("you set this unit's type in a sneaky way");
 	}

@@ -57,7 +57,7 @@ public class WormSegmentUnit extends UnitEntity{
 	}
 
 	@Override
-	public void setStats(UnitType type){
+	public void setType(UnitType type){
 		this.type = type;
 		maxHealth = type.health;
 		drag = type.drag;

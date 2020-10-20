@@ -14,7 +14,7 @@ repositories{
 
 ext{
     //the build number that this mod is made for
-    mindustryVersion = 'v108'
+    mindustryVersion = 'v109'
     //version of SDK you will be using
     sdkVersion = '30'
     sdkRoot = System.getenv("ANDROID_HOME")
@@ -36,7 +36,7 @@ allprojects{
 
 dependencies{
     compileOnly "com.github.Anuken.Arc:arc-core:$mindustryVersion"
-    compileOnly "com.github.Anuken:Mindustry:fb0179da95"//core:$mindustryVersion"
+    compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"//core:$mindustryVersion"
 }
 
 task jarAndroid{

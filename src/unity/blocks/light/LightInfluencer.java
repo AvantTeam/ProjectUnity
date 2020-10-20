@@ -52,7 +52,7 @@ public class LightInfluencer extends LightGenerator{
 		public void onProximityUpdate(){
 			super.onProximityUpdate();
 			for(int i = 0; i < 4; i++){
-				Building build = tile.getNearbyEntity(i);
+				Building build = tile.nearbyBuild(i);
 				if(build != null && build instanceof LightFilterBuild){
 					((LightFilterBuild) build).cont = this;
 					c[i] = true;
