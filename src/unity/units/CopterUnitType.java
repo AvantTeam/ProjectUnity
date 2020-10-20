@@ -54,7 +54,7 @@ public class CopterUnitType extends UnitType{
 			float offX = Angles.trnsx(unit.rotation - 90, r.x, r.y);
 			float offY = Angles.trnsy(unit.rotation - 90, r.x, r.y);
 			float w = region.width * r.scale * Draw.scl;
-			float h = region.height * r.scale * Draw.scl
+			float h = region.height * r.scale * Draw.scl;
 			
 			for(int j = 0; j < r.bladeCount; j++){
 				float angle = (unit.id * 24f + Time.time() * r.speed + (360f / (float) r.bladeCount) * j + r.rotOffset) % 360;

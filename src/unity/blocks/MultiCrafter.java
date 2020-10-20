@@ -273,7 +273,7 @@ public class MultiCrafter extends GenericCrafter{
 		public void displayConsumption(Table table){
 			int recLen = recs.length;
 			if(recLen <= 0) return;
-			int z = 0, y = 0, x = 0
+			int z = 0, y = 0, x = 0;
 			
 			table.left();
 			for(int i = 0; i < recLen; i++){

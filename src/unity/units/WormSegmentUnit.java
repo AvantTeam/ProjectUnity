@@ -39,7 +39,7 @@ public class WormSegmentUnit extends UnitEntity{
 		if(trueParentUnit == null) return true;
 		WormSegmentUnit[] segs = trueParentUnit.segmentUnits;
 		for(int i = 0, len = getSegmentLength(); i < len; i++){
-			if(segs[i] == other) return false
+			if(segs[i] == other) return false;
 		}
 		return true;
 	}
@@ -169,7 +169,7 @@ public class WormSegmentUnit extends UnitEntity{
 	}
 
 	public void wormSegmentUpdate(){
-		if trueParentUnit != null){
+		if(trueParentUnit != null){
 			health = trueParentUnit.health;
 			maxHealth = trueParentUnit.maxHealth;
 			hitTime = trueParentUnit.hitTime;

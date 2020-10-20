@@ -12,7 +12,7 @@ import static mindustry.Vars.*;
 public class LightReflector extends Block{
 	protected boolean diagonal = true;
 	protected final TextureRegion[] angleRegions = new TextureRegion[2];
-	//blame sk
+	/** change this */
 	private static final String spriteName = "unity-light-reflector";
 	public static final int[][] ref = {{6, 5, 4, -1, 2, 1, 0, -1}, {2, -1, 0, 7, 6, -1, 4, 3},
 		{-1, 7, 6, 5, -1, 3, 2, 1}, {4, 3, -1, 1, 0, 7, -1, 5}};

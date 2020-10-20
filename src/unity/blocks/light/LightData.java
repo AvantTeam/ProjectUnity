@@ -22,7 +22,9 @@ public class LightData{
 		this.strength = strength;
 	}
 
-	public LightData(LightData ld){ this(ld.angle, ld.strength, ld.length, ld.color); }
+	public LightData(LightData ld){
+		this(ld.angle, ld.strength, ld.length, ld.color);
+	}
 
 	public LightData set(int angle, float strength, int length, Color color){
 		this.angle = angle;

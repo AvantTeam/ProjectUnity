@@ -18,7 +18,9 @@ public class LightGenerator extends SolarGenerator{
 	protected boolean lightOptional;
 	protected TextureRegion lightRegion;
 
-	public LightGenerator(String name){ super(name); }
+	public LightGenerator(String name){
+		super(name);
+	}
 
 	@Override
 	public void load(){
@@ -29,9 +31,9 @@ public class LightGenerator extends SolarGenerator{
 	@Override
 	public void setBars(){
 		super.setBars();
-		bars.add("light",
-			(LightGeneratorBuild build) -> new Bar(() -> bundle.format("lightlib.light", build.lightPower()),
-				() -> build.lightSumColor(), () -> build.lastLightStatus()));
+		bars.add("light", (LightGeneratorBuild build) -> new Bar(() -> bundle.format("lightlib.light", build.lightPower()),
+			() -> build.lightSumColor(), () -> build.lastLightStatus())
+		);
 	}
 
 	@Override
@@ -59,11 +61,13 @@ public class LightGenerator extends SolarGenerator{
 		}
 
 		@Override
-		public void updateTile(){ productionEfficiency = enabled ? lightStatus() : 0f; }
+		public void updateTile(){
+			productionEfficiency = enabled ? lightStatus() : 0f;
+		}
 
 		protected void removeSource(LightSourceBuild src){
 			int index = srcs.indexOf(src);
-			if (index >= 0){
+			if(index >= 0){
 				srcs.remove(index);
 				srcDatas.remove(index);
 			}
@@ -71,7 +75,7 @@ public class LightGenerator extends SolarGenerator{
 
 		protected LightGeneratorBuild addSource(LightSourceBuild src, LightData srcData){
 			int index = srcs.indexOf(src);
-			if (index >= 0){
+			if(index >= 0){
 				LightData tempData = srcDatas.get(index);
 				tempData.strength += srcData.strength;
 				tempData.color = tempData.color.cpy().add(srcData.color.cpy().mul(srcData.strength / 100f));
@@ -83,8 +87,8 @@ public class LightGenerator extends SolarGenerator{
 		}
 
 		protected void validateSource(){
-			for (int i = 0, len = srcs.size(); i < len; i++){
-				if (!srcs.get(i).isValid()){
+			for(int i = 0, len = srcs.size(); i < len; i++){
+				if(!srcs.get(i).isValid()){
 					srcs.remove(i);
 					srcDatas.remove(i);
 					i--;
@@ -95,38 +99,43 @@ public class LightGenerator extends SolarGenerator{
 		protected float lightPower(){
 			lastLightPower = 0f;
 			validateSource();
-			for (int i = 0; i < srcs.size(); i++)
-				lastLightPower += srcs.get(i).getStrength() * srcDatas.get(i).strength / 100f;
+			for(int i = 0; i < srcs.size(); i++) lastLightPower += srcs.get(i).getStrength() * srcDatas.get(i).strength / 100f;
 			return lastLightPower;
 		}
 
-		protected float lastPower(){ return lastLightPower; }
+		protected float lastPower(){
+			return lastLightPower;
+		}
 
 		protected float lightStatus(){
 			float ret = lightPower() / lightStrength;
-			if (!scaleStatus) ret = Math.min(ret, 1f);
+			if(!scaleStatus) ret = Math.min(ret, 1f);
 			return ret;
 		}
 
 		protected float lastLightStatus(){
 			float ret = lastLightPower / lightStrength;
-			if (!scaleStatus) ret = Math.min(ret, 1f);
+			if(!scaleStatus) ret = Math.min(ret, 1f);
 			return ret;
 		}
 
 		protected Color lightSumColor(){
 			lastColor = Color.black.cpy();
 			validateSource();
-			for (int i = 0, len = srcDatas.size(); i < len; i++){
+			for(int i = 0, len = srcDatas.size(); i < len; i++){
 				lastColor.add(srcDatas.get(i).color.cpy().mul(srcDatas.get(i).strength / 100f));
-				if (lastColor.equals(Color.white)) break;
+				if(lastColor.equals(Color.white)) break;
 			}
-			if (!lastColor.equals(Color.black)) lastColor = lastColor.shiftValue(1f - lastColor.value());
+			if(!lastColor.equals(Color.black)) lastColor = lastColor.shiftValue(1f - lastColor.value());
 			return lastColor;
 		}
 
-		protected Color lastSumColor(){ return lastColor; }
+		protected Color lastSumColor(){
+			return lastColor;
+		}
 
-		public boolean consValid(){ return cons.valid() && (lightOptional || lastLightPower >= lightStrength); }
+		public boolean consValid(){
+			return cons.valid() && (lightOptional || lastLightPower >= lightStrength);
+		}
 	}
 }

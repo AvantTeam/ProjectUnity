@@ -14,8 +14,7 @@ import static mindustry.Vars.*;
 
 public class LightOmniReflector extends LightReflector{
 	protected TextureRegion baseRegion, topRegion;
-	public static final int[][] refomni = {ref[2], {1, 0, 7, 6, 5, 4, 3, 2}, ref[1], {3, 2, 1, 0, 7, 6, 5, 4}, ref[3],
-		{5, 4, 3, 2, 1, 0, 7, 6}, ref[0], {7, 6, 5, 4, 3, 2, 1, 0}};
+	public static final int[][] refomni = {ref[2], {1, 0, 7, 6, 5, 4, 3, 2}, ref[1], {3, 2, 1, 0, 7, 6, 5, 4}, ref[3], {5, 4, 3, 2, 1, 0, 7, 6}, ref[0], {7, 6, 5, 4, 3, 2, 1, 0}};
 
 	public LightOmniReflector(String name){
 		super(name);
@@ -31,14 +30,13 @@ public class LightOmniReflector extends LightReflector{
 	public void drawRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
 		final float scl = tilesize * req.animScale;
 		Draw.rect(baseRegion, req.drawx(), req.drawy(), scl, scl);
-		if (req.config != null) drawRequestConfig(req, list);
+		if(req.config != null) drawRequestConfig(req, list);
 	}
 
 	@Override
 	public void drawRequestConfig(BuildPlan req, Eachable<BuildPlan> list){
 		final float scl = tilesize * req.animScale;
-		Draw.rect(topRegion, req.drawx(), req.drawy(), scl, scl,
-			req.config == null ? 0 : (int) req.config * 22.5f + req.rotation * 90f);
+		Draw.rect(topRegion, req.drawx(), req.drawy(), scl, scl, req.config == null ? 0 : (int) req.config * 22.5f + req.rotation * 90f);
 	}
 
 	@Override
@@ -57,7 +55,9 @@ public class LightOmniReflector extends LightReflector{
 		}
 
 		@Override
-		public int calcReflection(int dir){ return refomni[(rotation * 4 + rotconf + 8) % 8][dir]; }
+		public int calcReflection(int dir){
+			return refomni[(rotation * 4 + rotconf + 8) % 8][dir];
+		}
 
 		@Override
 		public void draw(){
@@ -68,7 +68,9 @@ public class LightOmniReflector extends LightReflector{
 		}
 
 		@Override
-		public Integer config(){ return rotconf; }
+		public Integer config(){
+			return rotconf;
+		}
 
 		@Override
 		public void buildConfiguration(Table table){
