@@ -19,7 +19,9 @@ public class WormUnitType extends UnitType{
 		this.segmentLength = segmentLength;
 	}
 
-	public WormUnitType(String name){ this(name, 9); }
+	public WormUnitType(String name){
+		this(name, 9);
+	}
 
 	@Override
 	public void load(){
@@ -38,10 +40,10 @@ public class WormUnitType extends UnitType{
 
 	public void sortWeapons(Seq<Weapon> weaponSeq){
 		Seq<Weapon> mapped = new Seq<>();
-		for (int i = 0, len = weaponSeq.size; i < len; i++){
+		for(int i = 0, len = weaponSeq.size; i < len; i++){
 			Weapon w = weaponSeq.get(i);
 			mapped.add(w);
-			if (w.mirror){
+			if(w.mirror){
 				Weapon copy = w.copy();
 				copy.x *= -1;
 				copy.shootX *= -1;
@@ -56,23 +58,34 @@ public class WormUnitType extends UnitType{
 		weaponSeq.set(mapped);
 	}
 
-	public TextureRegion segmentRegion(){ return segmentRegion; }
+	public TextureRegion segmentRegion(){
+		return segmentRegion;
+	}
 
-	public TextureRegion tailRegion(){ return tailRegion; }
+	public TextureRegion tailRegion(){
+		return tailRegion;
+	}
 
-	public TextureRegion getSegmentCell(){ return segmentCellRegion; }
+	public TextureRegion getSegmentCell(){
+		return segmentCellRegion;
+	}
 
-	public void setTypeID(int id){ idType = id; }
+	public void setTypeID(int id){
+		idType = id;
+	}
 
-	public int getTypeID(){ return idType; }
+	public int getTypeID(){
+		return idType;
+	}
 
 	@Override
 	public void drawBody(Unit unit){
 		super.drawBody(unit);
 		float originZ = Draw.z();
-		if (!(unit instanceof WormDefaultUnit)) return;
+		
+		if(!(unit instanceof WormDefaultUnit)) return;
 		WormDefaultUnit wormUnit = (WormDefaultUnit) unit;
-		for (int i = 0; i < segmentLength; i++){
+		for(int i = 0; i < segmentLength; i++){
 			Draw.z(originZ - (i + 1) / 500f);
 			wormUnit.segmentUnits[i].drawBody();
 			drawWeapons(wormUnit.segmentUnits[i]);
@@ -83,14 +96,14 @@ public class WormUnitType extends UnitType{
 	@Override
 	public void drawShadow(Unit unit){
 		super.drawShadow(unit);
-		if (!(unit instanceof WormDefaultUnit)) return;
+		if(!(unit instanceof WormDefaultUnit)) return;
 		WormDefaultUnit wormUnit = (WormDefaultUnit) unit;
-		for (int i = 0; i < segmentLength; i++) wormUnit.segmentUnits[i].drawShadow();
+		for(int i = 0; i < segmentLength; i++) wormUnit.segmentUnits[i].drawShadow();
 	}
 
 	@Override
 	public void drawOcclusion(Unit unit){
 		super.drawOcclusion(unit);
-		if (unit instanceof WormDefaultUnit) ((WormDefaultUnit) unit).drawOcclusion();
+		if(unit instanceof WormDefaultUnit) ((WormDefaultUnit) unit).drawOcclusion();
 	}
 }

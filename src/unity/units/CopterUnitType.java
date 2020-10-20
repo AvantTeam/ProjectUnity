@@ -29,7 +29,7 @@ public class CopterUnitType extends UnitType{
 	@Override
 	public void load(){
 		super.load();
-		for (int i = 0; i < rotors.length; i++){
+		for(int i = 0; i < rotors.length; i++){
 			Rotor temp = rotors[i];
 			temp.bladeRegion = atlas.find(name + "-rotor-blade");
 			temp.topRegion = atlas.find(name + "-rotor-top");
@@ -39,23 +39,25 @@ public class CopterUnitType extends UnitType{
 		copterLoad();
 	}
 
-	protected void copterLoad(){}
+	protected void copterLoad(){
+		
+	}
 
 	@Override
 	public void draw(Unit unit){
 		super.draw(unit);
 		copterDraw(unit);
 		Draw.mixcol(Color.white, unit.hitTime);
-		for (int i = 0; i < rotors.length; i++){
+		for(int i = 0; i < rotors.length; i++){
 			Rotor r = rotors[i];
 			TextureRegion region = r.bladeRegion;
 			float offX = Angles.trnsx(unit.rotation - 90, r.x, r.y);
 			float offY = Angles.trnsy(unit.rotation - 90, r.x, r.y);
 			float w = region.width * r.scale * Draw.scl;
-			float h = region.height * r.scale * Draw.scl;
-			for (int j = 0; j < r.bladeCount; j++){
-				float angle = (unit.id * 24f + Time.time() * r.speed + (360f / (float) r.bladeCount) * j + r.rotOffset)
-					% 360;
+			float h = region.height * r.scale * Draw.scl
+			
+			for(int j = 0; j < r.bladeCount; j++){
+				float angle = (unit.id * 24f + Time.time() * r.speed + (360f / (float) r.bladeCount) * j + r.rotOffset) % 360;
 				Draw.alpha(state.isPaused() ? 1f : Time.time() % 2);
 				Draw.rect(r.bladeOutlineRegion, unit.x + offX, unit.y + offY, w, h, angle);
 				Draw.rect(region, unit.x + offX, unit.y + offY, w, h, angle);
@@ -67,7 +69,9 @@ public class CopterUnitType extends UnitType{
 		Draw.mixcol();
 	}
 
-	protected void copterDraw(Unit unit){}
+	protected void copterDraw(Unit unit){
+		
+	}
 
 	class Rotor{
 		public TextureRegion bladeRegion, topRegion, bladeOutlineRegion, topOutlineRegion;
@@ -85,6 +89,7 @@ public class CopterUnitType extends UnitType{
 	}
 
 	public class CopterAI extends FlyingAI{
+
 		@Override
 		protected void attack(float attackLength){
 			moveTo(target, unit.range() * 0.8f);

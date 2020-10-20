@@ -8,7 +8,8 @@ public class UnityStatusEffects implements ContentList{
 
 	@Override
 	public void load(){
-		reloadFatigueL = new StatusEffect("reload-fatigue");
-		reloadFatigueL.reloadMultiplier = 0.75f;
+		reloadFatigueL = new StatusEffect("reload-fatigue"){{
+			reloadMultiplier = 0.75f;
+		}};
 	}
 }

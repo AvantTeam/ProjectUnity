@@ -18,7 +18,7 @@ public class ExpPowerTurret extends PowerTurret implements ExpBlockBase{
 	protected Sound levelUpSound = Sounds.message;
 	public final boolean hasCustomUpdate;
 	{
-		for (ExpType type : ExpType.values()) expFields.put(type, new ObjectSet<>(4));
+		for(ExpType type : ExpType.values()) expFields.put(type, new ObjectSet<>(4));
 	}
 
 	public ExpPowerTurret(String name, int maxLevel, boolean hasCustomUpdate){
@@ -27,14 +27,22 @@ public class ExpPowerTurret extends PowerTurret implements ExpBlockBase{
 		this.hasCustomUpdate = hasCustomUpdate;
 	}
 
-	public ExpPowerTurret(String name, boolean hasCustomUpdate){ this(name, 20, hasCustomUpdate); }
+	public ExpPowerTurret(String name, boolean hasCustomUpdate){
+		this(name, 20, hasCustomUpdate);
+	}
 
-	public ExpPowerTurret(String name, int maxLevel){ this(name, maxLevel, false); }
+	public ExpPowerTurret(String name, int maxLevel){
+		this(name, maxLevel, false);
+	}
 
-	public ExpPowerTurret(String name){ this(name, 20, false); }
+	public ExpPowerTurret(String name){
+		this(name, 20, false);
+	}
 
 	@Override
-	public int getMaxLevel(){ return maxLevel; }
+	public int getMaxLevel(){
+		return maxLevel;
+	}
 
 	@Override
 	public void setBars(){
@@ -49,7 +57,9 @@ public class ExpPowerTurret extends PowerTurret implements ExpBlockBase{
 	}
 
 	@Override
-	public EnumMap<ExpType, ObjectSet<ExpField>> getExpFields(){ return expFields; }
+	public EnumMap<ExpType, ObjectSet<ExpField>> getExpFields(){
+		return expFields;
+	}
 
 	public class ExpPowerTurretBuild extends PowerTurretBuild implements ExpBuildBase{
 		private int exp = 0, level = 0;
@@ -57,7 +67,7 @@ public class ExpPowerTurret extends PowerTurret implements ExpBlockBase{
 		@Override
 		public void updateTile(){
 			setExpStats();
-			if (hasCustomUpdate) expUpdate();
+			if(hasCustomUpdate) expUpdate();
 			else super.updateTile();
 		}
 
@@ -74,10 +84,14 @@ public class ExpPowerTurret extends PowerTurret implements ExpBlockBase{
 		}
 
 		@Override
-		public Block getBlock(){ return block; }
+		public Block getBlock(){
+			return block;
+		}
 
 		@Override
-		public EnumMap<ExpType, ObjectSet<ExpField>> getBlockExpFields(){ return expFields; }
+		public EnumMap<ExpType, ObjectSet<ExpField>> getBlockExpFields(){
+			return expFields;
+		}
 
 		@Override
 		public void levelUpEffect(){
@@ -86,18 +100,28 @@ public class ExpPowerTurret extends PowerTurret implements ExpBlockBase{
 		}
 
 		@Override
-		public int totalExp(){ return exp; }
+		public int totalExp(){
+			return exp;
+		}
 
 		@Override
-		public void setExp(int a){ exp = a; }
+		public void setExp(int a){
+			exp = a;
+		}
 
 		@Override
-		public int getBlockMaxLevel(){ return maxLevel; }
+		public int getBlockMaxLevel(){
+			return maxLevel;
+		}
 
 		@Override
-		public int getLevel(){ return level; }
+		public int getLevel(){
+			return level;
+		}
 
 		@Override
-		public void setLevel(int a){ level = a; }
+		public void setLevel(int a){
+			level = a;
+		}
 	}
 }

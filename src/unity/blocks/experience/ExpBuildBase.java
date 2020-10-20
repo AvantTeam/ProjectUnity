@@ -15,7 +15,6 @@ public interface ExpBuildBase{
 	default void setExpStats(){
 		int lvl = getLevel();
 		getBlockExpFields().get(ExpType.linear).each(f -> {
-			//fuck
 			try{
 				f.field.set(getBlock(), Math.max(f.start + f.intensity * lvl, 0));
 			}catch (Exception e){
@@ -51,8 +50,8 @@ public interface ExpBuildBase{
 
 	default void incExp(int a){
 		int current = totalExp() + a, lvl = getLevel(), max = getRequiredExp(lvl);
-		if (lvl == getBlockMaxLevel()) return;
-		if (current >= max){
+		if(lvl == getBlockMaxLevel()) return;
+		if(current >= max){
 			setExp(current - max);
 			setLevel(lvl + 1);
 			levelUpEffect();
@@ -65,7 +64,9 @@ public interface ExpBuildBase{
 
 	void setLevel(int a);
 
-	default int getRequiredExp(int lvl){ return (2 * lvl + 1) * 10; }
+	default int getRequiredExp(int lvl){
+		return (2 * lvl + 1) * 10;
+	}
 
 	default float getLvlf(){
 		if (getLevel() == getBlockMaxLevel()) return 1f;
