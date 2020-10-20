@@ -28,9 +28,6 @@
 		{"item": "plastanium", "amount": 3600}
 	],
 	"constructTime": 20000,
-	"upgrades": [	
-		["gummy", "project-spiboss"]	
-	],
 	"category": "units",
 	"research": "tetrative-reconstructor"
 }

@@ -17,6 +17,19 @@ const reconAdd = (recon, planArray) => {
 		var f = new Seq(e);
 		recon.upgrades.add(f.toArray(UnitArrayClass));
 	});*/
+
+	for(var i = 0; i < planArray.length; i++){
+		var f = new Seq(planArray[i]);
+		//tSeq1.clear();
+		//tSeq1.add(planArray[0], planArray[1]);
+		recon.upgrades.add(f.toArray(UnitType));
+	};
+};
+
+//maybe later, my child
+const reconChange = (recon, planArray) => {
+	recon.upgrades.clear();
+
 	for(var i = 0; i < planArray.length; i++){
 		var f = new Seq(planArray[i]);
 		//tSeq1.clear();
@@ -123,6 +136,21 @@ const unitLoader = new ContentList(){
 			[
 				Vars.content.getByName(ContentType.unit, "unity-vespula"),
 				Vars.content.getByName(ContentType.unit, "unity-lepidoptera")
+			]
+		]);
+		//5
+		reconAdd(Vars.content.getByName(ContentType.block, "unity-recursive-reconstructor"), [
+			[
+				Vars.content.getByName(ContentType.unit, "unity-gummy"),
+				UnitTypes.toxopid
+			],
+			[
+				UnitTypes.toxopid,
+				Vars.content.getByName(ContentType.unit, "unity-project-spiboss")
+			],
+			[
+				Vars.content.getByName(ContentType.unit, "unity-project-spiboss"),
+				Vars.content.getByName(ContentType.unit, "unity-arcaetana")
 			]
 		]);
 	}
