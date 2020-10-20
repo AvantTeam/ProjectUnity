@@ -60,7 +60,7 @@ jar{
     }
 
     from(rootDir){
-        include "mod.hjson"
+        include "mod.hjson", "icon.png"
     }
 
     from("assets/"){

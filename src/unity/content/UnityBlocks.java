@@ -1,8 +1,13 @@
 package unity.content;
 
+import arc.math.Mathf;
+import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.meta.BuildVisibility;
+import mindustry.world.draw.DrawBlock;
 import mindustry.world.blocks.environment.*;
+import mindustry.world.blocks.production.*;
+import mindustry.world.blocks.defense.turrets.*;
 import mindustry.type.*;
 import mindustry.ctype.*;
 import mindustry.content.*;
@@ -11,6 +16,7 @@ import unity.blocks.Recipe.*;
 import unity.blocks.experience.*;
 import unity.blocks.light.*;
 
+import static arc.Core.*;
 import static mindustry.type.ItemStack.*;
 
 public class UnityBlocks implements ContentList{
@@ -20,12 +26,13 @@ public class UnityBlocks implements ContentList{
 	/*oreXenium,*/ oreUmbrium, oreLuminum, oreMonolite, oreImberium,
 
 	//global
-	multiTest1, multiTest2, lightItemFilter, metaglassWall, metaglassWallLarge,
+	multiTest1, multiTest2, lightItemFilter, metaglassWall, metaglassWallLarge, lightLamp, oilLamp, lightLaser, lightLampInfi, lightReflector, 
+	lightReflector1, lightOmnimirror, lightDivisor, lightDivisor1, lightFilter, lightInvertedFilter, lightPanel, lightInfluencer,
 	
-	//light
-	lightLamp, oilLamp, lightLaser, lightLampInfi, lightReflector, lightReflector1, lightOmnimirror, lightDivisor, lightDivisor1, lightFilter, lightInvertedFilter, lightPanel, lightInfluencer,
+	//dark
+	darkAlloyForge, apparition,
 	
-	//turrets
+	//koruh
 	laserTurret, inferno;
 
 	@Override
@@ -119,9 +126,6 @@ public class UnityBlocks implements ContentList{
 				new OutputContents(with(Items.silicon, 1), 10), 30
 			);
 		}};
-		
-		//endregion
-		//region light
 		
 		lightLamp = new LightSource("light-lamp"){{
 			consumes.power(1f);
@@ -229,9 +233,54 @@ public class UnityBlocks implements ContentList{
 			health = 1400;
 			requirements(Category.defense, with(Items.lead, 24, Items.metaglass, 24));
 		}};
+		//endregion
+		//region dark
+		
+		darkAlloyForge = new GenericSmelter("dark-alloy-forge"){{
+			requirements(Category.crafting, with(Items.copper, 30, Items.lead, 25));
+			outputItem = new ItemStack(UnityItems.darkAlloy, 3);
+			craftTime = 140f;
+			size = 4;
+			idleSound = Sounds.respawning;
+			idleSoundVolume = 0.6f;
+			drawer = new DrawBlock(){
+				@Override
+				public void draw(GenericCrafterBuild entity){
+					super.draw(entity);
+					if(entity.consValid() && Mathf.chanceDelta(0.76f)) UnityFx.craftingEffect.at(entity.getX(), entity.getY());
+				}
+			};
+			consumes.items(with(Items.lead, 4, Items.silicon, 3, Items.phasefabric, 1, UnityItems.umbrium, 2));
+			consumes.power(3.2f);
+		}};
+		
+		apparition=new ItemTurret("apparition") {
+			@Override
+			public void load(){
+				super.load();
+				baseRegion = atlas.find("unity-block-" + size);
+			}
+
+			{
+				requirements(Category.turret, with(Items.copper, 350, Items.graphite, 380, Items.silicon, 360, Items.plastanium, 200, Items.thorium, 220, UnityItems.umbrium, 370, Items.surgealloy, 290));
+				size = 5;
+				health = 3975;
+				range = 235f;
+				reloadTime = 6f;
+				coolantMultiplier = 0.5f;
+				restitution = 0.09f;
+				inaccuracy = 3f;
+				spread = 12f;
+				shots = 2;
+				alternate = true;
+				recoilAmount = 3f;
+				rotateSpeed = 4.5f;
+				ammo(Items.graphite, UnityBullets.standardDenseLarge, Items.silicon, UnityBullets.standardHomingLarge, Items.pyratite, UnityBullets.standardIncendiaryLarge, Items.thorium, UnityBullets.standardThoriumLarge);
+			}
+		};
 		
 		//endregion
-		//turrets
+		//koruh
 		
 		laserTurret = new ExpPowerTurret("laser-turret", 10){{
 			requirements(Category.turret, with(Items.copper, 160, Items.lead, 110, Items.silicon, 90));
@@ -257,5 +306,7 @@ public class UnityBlocks implements ContentList{
 			shootCone = 5f;
 			addExpField("exp", "useless", 0, 2);
 		}};
+		
+		//endregion
 	}
 }

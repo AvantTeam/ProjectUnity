@@ -10,6 +10,7 @@ import mindustry.gen.*;
 import mindustry.entities.Damage;
 import mindustry.entities.bullet.*;
 import mindustry.graphics.*;
+import mindustry.io.JsonIO;
 import mindustry.ctype.ContentList;
 import mindustry.game.Team;
 import unity.blocks.experience.*;
@@ -17,7 +18,7 @@ import unity.blocks.experience.*;
 import static arc.Core.*;
 
 public class UnityBullets implements ContentList{
-	public static BulletType laser, coalBlaze, pyraBlaze;
+	public static BulletType laser, coalBlaze, pyraBlaze, standardDenseLarge, standardHomingLarge, standardIncendiaryLarge, standardThoriumLarge;
 
 	@Override
 	public void load(){
@@ -36,7 +37,7 @@ public class UnityBullets implements ContentList{
 				hittable = false;
 				hitEffect = Fx.hitLiquid;
 			}
-			
+
 			@Override
 			public void load(){
 				laserRegion = atlas.find("laser");
@@ -48,7 +49,7 @@ public class UnityBullets implements ContentList{
 				if(b == null) return;
 				Healthc target = Damage.linecast(b, b.x, b.y, b.rotation(), length);
 				b.data = target;
-				
+
 				ExpPowerTurret.ExpPowerTurretBuild exp = b.owner.<ExpPowerTurret.ExpPowerTurretBuild>self();
 				int lvl = exp.getLevel();
 				b.damage(damage + lvl * 10f);
@@ -85,7 +86,7 @@ public class UnityBullets implements ContentList{
 				}
 			}
 		};
-		
+
 		coalBlaze = new BulletType(3.35f, 32f){
 			{
 				ammoMultiplier = 3;
@@ -100,14 +101,14 @@ public class UnityBullets implements ContentList{
 				keepVelocity = true;
 				hittable = true;
 			}
-			
+
 			@Override
 			public void hit(Bullet b, float x, float y){
 				super.hit(b, x, y);
 				b.owner.<ExpItemTurret.ExpItemTurretBuild>self().incExp(Mathf.random(1));
 			}
 		};
-		
+
 		pyraBlaze = new BulletType(3.35f, 46f){
 			{
 				ammoMultiplier = 3;
@@ -121,13 +122,43 @@ public class UnityBullets implements ContentList{
 				status = StatusEffects.burning;
 				keepVelocity = false;
 				hittable = false;
-			}			
-			
+			}
+
 			@Override
 			public void hit(Bullet b, float x, float y){
 				super.hit(b, x, y);
 				b.owner.<ExpItemTurret.ExpItemTurretBuild>self().incExp(Mathf.random(1));
 			}
 		};
+
+		standardDenseLarge = new BasicBulletType();
+		JsonIO.json().copyFields(Bullets.standardDenseBig, standardDenseLarge);
+		standardDenseLarge.damage *= 1.2f;
+		standardDenseLarge.speed *= 1.1f;
+		((BasicBulletType) standardDenseLarge).width *= 1.12f;
+		((BasicBulletType) standardDenseLarge).height *= 1.12f;
+
+		standardHomingLarge = new BasicBulletType();
+		JsonIO.json().copyFields(Bullets.standardDenseBig, standardHomingLarge);
+		standardHomingLarge.damage *= 1.1f;
+		standardHomingLarge.reloadMultiplier = 1.3f;
+		standardHomingLarge.homingPower = 0.09f;
+		standardHomingLarge.speed *= 1.1f;
+		((BasicBulletType) standardHomingLarge).width *= 1.09f;
+		((BasicBulletType) standardHomingLarge).height *= 1.09f;
+
+		standardIncendiaryLarge = new BasicBulletType();
+		JsonIO.json().copyFields(Bullets.standardIncendiaryBig, standardIncendiaryLarge);
+		standardIncendiaryLarge.damage *= 1.2f;
+		standardIncendiaryLarge.speed *= 1.1f;
+		((BasicBulletType) standardIncendiaryLarge).width *= 1.12f;
+		((BasicBulletType) standardIncendiaryLarge).height *= 1.12f;
+
+		standardThoriumLarge = new BasicBulletType();
+		JsonIO.json().copyFields(Bullets.standardThoriumBig, standardThoriumLarge);
+		standardThoriumLarge.damage *= 1.2f;
+		standardThoriumLarge.speed *= 1.1f;
+		((BasicBulletType) standardThoriumLarge).width *= 1.12f;
+		((BasicBulletType) standardThoriumLarge).height *= 1.12f;
 	}
 }
