@@ -23,6 +23,7 @@ const shieldBreakFx = new Effect(5, e => {
 const shieldBullet = extend(BasicBulletType, {
 	update(b){
 		if(b.data == null){
+			/** The first number is the shield health, DO NOT TOUCH THE SECOND VALUE */
 			b.data = [800, 0];
 		}
 
@@ -99,3 +100,18 @@ shielder.chargeEffect = new Effect(38, e => {
 shielder.chargeBeginEffect = Fx.none;
 shielder.consumes.add(new ConsumeLiquidFilter(liquid => liquid.temperature <= 0.5 && liquid.flammability <= 0.1, 0.4)).update(false);
 
+shielder.buildType = () => {
+	return extendContent(ChargeTurret.ChargeTurretBuild, shielder, {
+
+		/** Make the bullet Stay in its target, not following the path */
+		bullet(type, angle){
+			var spdScl = Mathf.clamp(Mathf.dst(this.x + shielder.tr.x, this.y + shielder.tr.y, this.targetPos.x, this.targetPos.y) / shielder.range, 0, 1);
+		
+			type.create(this, this.team, this.x + shielder.tr.x, this.y + shielder.tr.y, angle, spdScl, 1);
+		}/*,
+
+		findTarget(){
+			this.target = Units.bestTarget(this.team, this.x, this.y, shielder.range, e => !e.dead() && (e.isGrounded()) && e.damage, b -> true, unitSort);
+		}*/
+	})
+}
