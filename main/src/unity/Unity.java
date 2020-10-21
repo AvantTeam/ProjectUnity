@@ -2,10 +2,12 @@ package unity;
 
 import arc.*;
 import arc.func.*;
+import arc.graphics.Color;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.gen.Tex;
 import mindustry.mod.*;
 import mindustry.mod.Mods.*;
 import mindustry.ui.dialogs.*;
@@ -34,69 +36,67 @@ public class Unity extends Mod{
 
             Time.runTask(10f, () -> {
                 BaseDialog dialog = new BaseDialog(stringf.get("welcome-title"));
-
+                
                 dialog.addCloseButton();
                 dialog.cont.add("Project Unity").fillX().wrap().get().setAlignment(Align.center);
                 dialog.cont.row();
+                dialog.cont.image().color(Pal.accent).fillX().height(3f).pad(3f);
+                dialog.cont.row();
                 dialog.cont.add(stringf.get("welcome-text"));
                 dialog.cont.row();
-
-                dialog.cont.add(stringf.get("credits")).fillX().wrap().get().setAlignment(Align.center);
+                dialog.cont.add(" ");
                 dialog.cont.row();
 
-                for(ContributionType type : ContributionType.all){
-                    if(type == ContributionType.translator) continue;
 
-                    Seq<String> list = ContributorList.getBy(type);
-                    if(list.size > 0){
-                        dialog.cont.image().color(Pal.accent).fillX().height(3f).pad(3f);
-                        dialog.cont.row();
-                        dialog.cont.add(stringf.get(type.name()));
-                        dialog.cont.row();
 
-                        dialog.cont.pane(new Table(){{
-                            int i = 0;
-                            left();
+                dialog.cont.table(Tex.button, t -> {
+                    t.add(stringf.get("credits")).fillX().wrap().get().setAlignment(Align.center);
+                    t.row();
+                    t.pane(p -> {
+                        p.center();
+
+                        Seq<String> translatorsList = new Seq<String>();
+                        for(ContributionType type : ContributionType.all){
+                            if(type == ContributionType.translator) continue;
+
+                            Seq<String> list = ContributorList.getBy(type);
+                            if(list.size <= 0) continue;
 
                             for(String c : list){
-                                add(c + "[]").left().pad(3f).padLeft(6f).padRight(6f);
-
-                                if(i++ % 3 == 0){
-                                    row();
-                                }
+                                p.add(c + "[]").pad(3f).padLeft(6f).padRight(6f);
+                                p.row();
                             }
-                        }});
-                    }
-                }
+                        }
 
-                Seq<String> list = ContributorList.getBy(ContributionType.translator);
-                if(list.size > 0){
-                    for(Language lang : Language.all){
-                        Seq<String> trnsList = ContributorList.getBy(lang);
-                        if(trnsList.size < 1) continue;
+                        p.row();
+                        /** Spacing */
+                        p.add(" ");
+                        p.row();
+                        p.add(stringf.get("translators"));
+                        p.row();
+                        p.image().color(Pal.accent).fillX().height(3f).pad(3f);
+                        p.row();
 
-                        dialog.cont.image().color(Pal.accent).fillX().height(3f).pad(3f);
-                        dialog.cont.row();
-                        dialog.cont.add(stringf.get("translator"));
-                        dialog.cont.row();
 
-                        dialog.cont.pane(new Table(){{
-                            int i = 0;
-                            left();
+                        Seq<String> list = ContributorList.getBy(ContributionType.translator);
+                        for(Language lang : Language.all){
+                            Seq<String> trnsList = ContributorList.getBy(lang);
+                            if(trnsList.size < 1) continue;
 
-                            add(stringf.get("language-" + lang.name())).pad(3f).padLeft(6f).padRight(6f);
+                            p.add(stringf.get("language-" + lang.name()) + ":").pad(3f).padLeft(6f).padRight(6f);
+                            p.row();
+                            p.image().color(Color.sky).fillX().height(3f).pad(3f);
+                            p.row();
                             for(String c : trnsList){
-                                add(c + "[]");
-
-                                if(i++ % 3 == 0){
-                                    row();
-                                }
+                                p.add(c + "[]");
+                                p.row();
                             }
-
-                            row();
-                        }});
-                    }
-                }
+                            /** Spacing */
+                            p.add(" ");
+                            p.row();
+                        }
+                    }).pad(10f).grow();
+                }).width(250f).height(300f);
 
                 dialog.show();
             });
