@@ -1,95 +1,113 @@
 package unity.units;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.struct.*;
 import arc.util.Time;
 import mindustry.type.*;
 import mindustry.gen.*;
+import mindustry.io.*;
 import mindustry.ai.types.FlyingAI;
 
-import static arc.Core.*;
 import static mindustry.Vars.*;
 
 public class CopterUnitType extends UnitType{
-	protected final Rotor[] rotors;
+	public Seq<Rotor> rotors = new Seq<>();
 	protected float fallRotateSpeed = 2.5f;
-	private int index = 0;
 
-	public CopterUnitType(String name, int rotorSize){
+	public CopterUnitType(String name){
 		super(name);
-		rotors = new Rotor[rotorSize];
 		defaultController = () -> new CopterAI();
-	}
-
-	public void addRotor(float x, float y, float scale, int bladeCount, int speed, int rotOffset){
-		rotors[index++] = new Rotor(x, y, scale, bladeCount, speed, rotOffset);
 	}
 
 	@Override
 	public void load(){
 		super.load();
-		for(int i = 0; i < rotors.length; i++){
-			Rotor temp = rotors[i];
-			temp.bladeRegion = atlas.find(name + "-rotor-blade");
-			temp.topRegion = atlas.find(name + "-rotor-top");
-			temp.bladeOutlineRegion = atlas.find(name + "-rotor-blade-outline");
-			temp.topOutlineRegion = atlas.find(name + "-rotor-top-outline");
-		}
-		copterLoad();
+		rotors.each(Rotor::load);
 	}
 
-	protected void copterLoad(){
-		
+	@Override
+	public void init(){
+		super.init();
+
+		Seq<Rotor> mapped = new Seq<>();
+
+		rotors.each(rotor -> {
+			mapped.add(rotor);
+
+			if(rotor.mirror){
+				Rotor copy = rotor.copy();
+				copy.x *= -1f;
+				copy.speed *= -1f;
+				copy.rotOffset += 180f; //might change later
+
+				mapped.add(copy);
+			}
+		});
+
+		rotors = mapped;
 	}
 
 	@Override
 	public void draw(Unit unit){
 		super.draw(unit);
-		copterDraw(unit);
+
 		Draw.mixcol(Color.white, unit.hitTime);
-		for(int i = 0; i < rotors.length; i++){
-			Rotor r = rotors[i];
-			TextureRegion region = r.bladeRegion;
-			float offX = Angles.trnsx(unit.rotation - 90, r.x, r.y);
-			float offY = Angles.trnsy(unit.rotation - 90, r.x, r.y);
-			float w = region.width * r.scale * Draw.scl;
-			float h = region.height * r.scale * Draw.scl;
-			
-			for(int j = 0; j < r.bladeCount; j++){
-				float angle = (unit.id * 24f + Time.time() * r.speed + (360f / (float) r.bladeCount) * j + r.rotOffset) % 360;
+
+		rotors.each(rotor -> {
+			TextureRegion region = rotor.bladeRegion;
+
+			float offX = Angles.trnsx(unit.rotation - 90, rotor.x, rotor.y);
+			float offY = Angles.trnsy(unit.rotation - 90, rotor.x, rotor.y);
+
+			float w = region.width * rotor.scale * Draw.scl;
+			float h = region.height * rotor.scale * Draw.scl;
+
+			for(int j = 0; j < rotor.bladeCount; j++){
+				float angle = (unit.id * 24f + Time.time() * rotor.speed + (360f / (float) rotor.bladeCount) * j + rotor.rotOffset) % 360;
 				Draw.alpha(state.isPaused() ? 1f : Time.time() % 2);
-				Draw.rect(r.bladeOutlineRegion, unit.x + offX, unit.y + offY, w, h, angle);
+
 				Draw.rect(region, unit.x + offX, unit.y + offY, w, h, angle);
 			}
+
 			Draw.alpha(1f);
-			Draw.rect(r.topOutlineRegion, unit.x + offX, unit.y + offY, w, h, unit.rotation - 90f);
-			Draw.rect(r.topRegion, unit.x + offX, unit.y + offY, unit.rotation - 90f);
-		}
+			Draw.rect(rotor.topRegion, unit.x + offX, unit.y + offY, unit.rotation - 90f);
+		});
+
 		Draw.mixcol();
 	}
 
-	protected void copterDraw(Unit unit){
-		
-	}
+	public class Rotor{
+		public TextureRegion bladeRegion;
+		public TextureRegion topRegion;
 
-	class Rotor{
-		public TextureRegion bladeRegion, topRegion, bladeOutlineRegion, topOutlineRegion;
-		public float x = 0f, y = 0f, scale = 1f;
-		public int rotOffset = 0, speed = 29, bladeCount = 4;
+		public boolean mirror = false;
 
-		public Rotor(float x, float y, float scale, int bladeCount, int speed, int rotOffset){
-			this.x = x;
-			this.y = y;
-			this.scale = scale;
-			this.bladeCount = bladeCount;
-			this.speed = speed;
-			this.rotOffset = rotOffset;
+		public float x = 0f;
+		public float y = 0f;
+		public float scale = 1f;
+
+		public float rotOffset = 0f;
+		public float speed = 29f;
+
+		public int bladeCount = 4;
+
+		public void load(){
+			bladeRegion = Core.atlas.find(name + "-rotor-blade");
+			topRegion = Core.atlas.find(name + "-rotor-top");
+		}
+
+		public Rotor copy(){
+			Rotor out = new Rotor();
+			JsonIO.json().copyFields(this, out);
+
+			return out;
 		}
 	}
 
 	public class CopterAI extends FlyingAI{
-
 		@Override
 		protected void attack(float attackLength){
 			moveTo(target, unit.range() * 0.8f);

@@ -11,6 +11,8 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+import unity.units.*;
+import unity.units.CopterUnitType.*;
 
 import static mindustry.Vars.*;
 
@@ -60,6 +62,14 @@ public class IconGenerator implements Generator{
                     outliner.get(type.legBaseRegion);
                     outliner.get(type.baseJointRegion);
                     outliner.get(type.legRegion);
+                }
+
+                if(unit instanceof CopterUnit){
+                    CopterUnitType t = (CopterUnitType)type;
+                    Rotor rotor = t.rotors.first();
+
+                    outliner.get(rotor.bladeRegion);
+                    outliner.get(rotor.topRegion);
                 }
 
                 String fname = parseName.get(type.region);

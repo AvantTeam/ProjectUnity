@@ -24,11 +24,10 @@ public class Unity extends Mod{
 		enableConsole = true;
 		if(!headless){
 			LoadedMod mod = mods.locateMod("unity");
-			String change= "mod." + mod.meta.name + ".";
+			String change = "mod." + mod.meta.name + ".";
 			mod.meta.displayName = bundle.get(change + "name");
 			mod.meta.description = bundle.get(change + "description");
 		}
-		// Log.log(LogLevel.info,"[@]: @",,);
 	}
 
 	@Override
@@ -36,6 +35,5 @@ public class Unity extends Mod{
 		for(ContentList list : unityContent){
 			list.load();
 		}
-		//Log.log(LogLevel.info, "[@]: @", UnityBlocks.multiTest1.name, String.valueOf(UnityBlocks.multiTest1.getRecipe().output.items.length));
 	}
 }

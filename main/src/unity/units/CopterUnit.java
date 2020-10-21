@@ -5,15 +5,14 @@ import mindustry.gen.*;
 import unity.content.UnityUnitTypes;
 
 public class CopterUnit extends UnitEntity{
-
 	@Override
 	public void update(){
 		super.update();
-		if(dead) rotation += ((CopterUnitType) type).fallRotateSpeed * Mathf.signs[id % 2];
-		copterUpdate();
-	}
 
-	public void copterUpdate(){}
+		if(dead){
+			rotation += ((CopterUnitType)type).fallRotateSpeed * Mathf.signs[id() % 2];
+		}
+	}
 
 	@Override
 	public int classId(){
