@@ -1,13 +1,16 @@
 .vscode/
 .gradle/
 bin/
+settings/
 
 main/bin/
 main/build/
 main/assets-raw/sprites-gen/
+main/settings/
 
 tools/bin/
 tools/build/
+tools/settings/
 
 *.project
 *.classpath
