@@ -36,9 +36,7 @@ public class SpriteProcessor{
 
         try{
             mod.loadContent();
-        }catch(StackOverflowError e){
-            Log.err(e);
-        }
+        }catch(StackOverflowError e){}
 
         content.setCurrentMod(null);
 
