@@ -1,0 +1,39 @@
+sourceSets.main.java.srcDirs = [ "src/" ]
+
+repositories{
+    mavenCentral()
+    maven{ url 'https://www.jitpack.io' }
+}
+
+ext{
+    imageProcessorMain = "unity.tools.SpriteProcessor"
+
+    spritesGenFolder = "../main/assets-raw/sprites-gen/"
+    spritesAssetsFolder = "../main/assets/sprites/"
+}
+
+task processSprites(dependsOn: classes){
+    doLast{
+        delete{
+            delete "$spritesGenFolder"
+            delete "$spritesAssetsFolder"
+        }
+
+        file("$spritesGenFolder").mkdirs()
+
+        javaexec{
+            main = imageProcessorMain
+            classpath = sourceSets.main.runtimeClasspath
+            jvmArgs("-Djava.awt.headless=true")
+            standardInput = System.in
+            workingDir = "../main/assets-raw/"
+        }
+
+        copy{
+            from "$spritesGenFolder"
+            into "$spritesAssetsFolder"
+        }
+
+        file("$spritesAssetsFolder").mkdirs()
+    }
+}
