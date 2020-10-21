@@ -22,7 +22,8 @@ public final class ContributorList{
             "younggam",
             "[cyan]GlennFolker",
             "evl",
-            "Xusk"
+            "Xusk",
+            "[#77dd77]ThePythonGuy"
         );
         contributors.get(ContributionType.contributor.ordinal()).addAll(
             //noone here yet

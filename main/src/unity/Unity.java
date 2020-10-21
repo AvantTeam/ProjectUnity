@@ -2,12 +2,12 @@ package unity;
 
 import arc.*;
 import arc.func.*;
-import arc.graphics.Color;
+import arc.graphics.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
-import mindustry.gen.Tex;
+import mindustry.gen.*;
 import mindustry.mod.*;
 import mindustry.mod.Mods.*;
 import mindustry.ui.dialogs.*;
@@ -36,7 +36,7 @@ public class Unity extends Mod{
 
             Time.runTask(10f, () -> {
                 BaseDialog dialog = new BaseDialog(stringf.get("welcome-title"));
-                
+
                 dialog.addCloseButton();
                 dialog.cont.add("Project Unity").fillX().wrap().get().setAlignment(Align.center);
                 dialog.cont.row();
@@ -50,22 +50,27 @@ public class Unity extends Mod{
 
 
                 dialog.cont.table(Tex.button, t -> {
-                    t.add(stringf.get("credits")).fillX().wrap().get().setAlignment(Align.center);
-                    t.row();
                     t.pane(p -> {
                         p.center();
 
-                        Seq<String> translatorsList = new Seq<String>();
                         for(ContributionType type : ContributionType.all){
                             if(type == ContributionType.translator) continue;
 
                             Seq<String> list = ContributorList.getBy(type);
                             if(list.size <= 0) continue;
 
+                            p.add(stringf.get(type.name()));
+                            p.row();
+                            p.image().color(Pal.accent).fillX().height(3f).pad(3f);
+                            p.row();
+
                             for(String c : list){
                                 p.add(c + "[]").pad(3f).padLeft(6f).padRight(6f);
                                 p.row();
                             }
+                            /** Spacing */
+                            p.add(" ");
+                            p.row();
                         }
 
                         p.row();
