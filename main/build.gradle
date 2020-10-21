@@ -40,7 +40,6 @@ jar{
 
     from(project.assetsDir){
         include "**"
-        include "authors"
     }
 }
 

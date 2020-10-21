@@ -5,5 +5,5 @@
     "description": "Founder: Eye of Darkness\n[cyan]Java: younggam\n GlennFolker\n Gdeft\n",
     "version": 0.1,
     "minGameVersion": 106,
-    "main": "unity.Main"
+    "main": "unity.Unity"
 }
