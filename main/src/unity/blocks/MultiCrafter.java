@@ -49,7 +49,6 @@ public class MultiCrafter extends GenericCrafter{
 		hasPower = false;
 		saveConfig = true;
 		config(Integer.class, (MultiCrafterBuild tile, Integer value) -> {
-
 			if(tile.getToggle() >= 0) tile.getProgressArr()[tile.getToggle()] = tile.progress;
 			if(value == -1){
 				tile.setCondValid(false);
@@ -291,18 +290,15 @@ public class MultiCrafter extends GenericCrafter{
 					}
 					z += liquidStacks.length;
 					if(z == 0){
-						table.image(Icon.cancel).size(8 * 4);
+						table.image(Icon.cancel).size(8f * 4f);
 						x += 1;
 					}
 					if(i < recLen - 1){
 						InputContents next = recs[i + 1].input;
 						y += next.items.length + next.liquids.length;
 						x += z;
-						if(x + y <= 8 && y != 0){
-							table.image(Icon.pause).size(8 * 4);
-							x += 1;
-						}else if(x + y <= 7 && y == 0){
-							table.image(Icon.pause).size(8 * 4);
+						if((x + y <= 8 && y != 0) || (x + y <= 7 && y == 0)){
+							table.image(Icon.pause).size(8f * 4f);
 							x += 1;
 						}else{
 							table.row();
