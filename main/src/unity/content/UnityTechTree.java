@@ -7,7 +7,7 @@ import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.game.Objectives.Objective;
 
-import static mindustry.type.ItemStack.with;
+import static mindustry.type.ItemStack.*;
 import static unity.content.UnityBlocks.*;
 
 public class UnityTechTree implements ContentList{

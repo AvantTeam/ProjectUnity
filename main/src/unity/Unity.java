@@ -3,7 +3,6 @@ package unity;
 import arc.*;
 import arc.func.*;
 import arc.graphics.*;
-import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
@@ -54,10 +53,8 @@ public class Unity extends Mod{
                         p.center();
 
                         for(ContributionType type : ContributionType.all){
-                            if(type == ContributionType.translator) continue;
-
                             Seq<String> list = ContributorList.getBy(type);
-                            if(list.size <= 0) continue;
+                            if(type == ContributionType.translator || list.size <= 0) continue;
 
                             p.add(stringf.get(type.name()));
                             p.row();
@@ -82,23 +79,24 @@ public class Unity extends Mod{
                         p.image().color(Pal.accent).fillX().height(3f).pad(3f);
                         p.row();
 
-
                         Seq<String> list = ContributorList.getBy(ContributionType.translator);
-                        for(Language lang : Language.all){
-                            Seq<String> trnsList = ContributorList.getBy(lang);
-                            if(trnsList.size < 1) continue;
+                        if(list.size > 0){
+                            for(Language lang : Language.all){
+                                Seq<String> trnsList = ContributorList.getBy(lang);
+                                if(trnsList.size < 1) continue;
 
-                            p.add(stringf.get("language-" + lang.name()) + ":").pad(3f).padLeft(6f).padRight(6f);
-                            p.row();
-                            p.image().color(Color.sky).fillX().height(3f).pad(3f);
-                            p.row();
-                            for(String c : trnsList){
-                                p.add(c + "[]");
+                                p.add(stringf.get("language-" + lang.name()) + ":").pad(3f).padLeft(6f).padRight(6f);
+                                p.row();
+                                p.image().color(Color.sky).fillX().height(3f).pad(3f);
+                                p.row();
+                                for(String c : trnsList){
+                                    p.add(c + "[]");
+                                    p.row();
+                                }
+                                /** Spacing */
+                                p.add(" ");
                                 p.row();
                             }
-                            /** Spacing */
-                            p.add(" ");
-                            p.row();
                         }
                     }).pad(10f).grow();
                 }).width(250f).height(300f);

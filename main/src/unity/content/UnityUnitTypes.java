@@ -16,7 +16,7 @@ import unity.units.*;
 import static mindustry.type.ItemStack.*;
 
 public class UnityUnitTypes implements ContentList{
-    private static Prov<? extends Unit>[] constructors = new Prov[]{
+    private static Prov<?>[] constructors = new Prov[]{
         CopterUnit::new,
         WormSegmentUnit::new,
         WormDefaultUnit::new

@@ -1,7 +1,6 @@
 package unity.content;
 
 import arc.graphics.*;
-import arc.struct.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.graphics.*;
