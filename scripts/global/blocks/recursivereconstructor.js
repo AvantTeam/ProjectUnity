@@ -16,10 +16,16 @@ const recrect = extendContent(Reconstructor, "recursive-reconstructor", {
 
 recrect.buildType = () => {
 	return extendContent(Reconstructor.ReconstructorBuild, recrect, {
-		buildConfiguration(table){
+		update(){
+			this.super$update();
+
 			if(this.tier == null){
 				this.tier = 6;
 			}
+		},
+
+		buildConfiguration(table){
+			
 
 			table.button("T6", Styles.togglet, () => {
 				this.tier = 6;
@@ -56,6 +62,16 @@ recrect.buildType = () => {
 			}
 
 			return u == null ? null : u[1];
+		},
+
+		write(write){
+			this.super$write(write);
+			write.s((this.tier == null ? 6 : this.tier));
+		},
+
+		read(read, revision){
+			this.super$read(read, revision);
+			this.tier = ((read.s() == null || read.s() == -1) ? 6 : read.i());
 		}
 
 	})
