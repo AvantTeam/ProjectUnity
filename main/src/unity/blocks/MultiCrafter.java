@@ -130,9 +130,15 @@ public class MultiCrafter extends GenericCrafter{
 	}
 
 	@Override
-	public void displayInfo(Table table){
-		super.displayInfo(table);
+	public void setStats(){
+		super.setStats();
+
+        if(powerBarI) stats.remove(Stat.powerUse);
+		stats.remove(Stat.productionTime);
+
+        Table table = new Table();
 		int recLen = recs.length;
+
 		for(int i = 0; i < recLen; i++){
 			Recipe rec = recs[i];
 			ItemStack[] inputItems = rec.input.items;
@@ -141,10 +147,10 @@ public class MultiCrafter extends GenericCrafter{
 			LiquidStack[] outputLiquids = rec.output.liquids;
 			float inputPower = rec.input.power;
 			float outputPower = rec.output.power;
-			// what the fuck that I need this
 			int ii = i;
+
 			table.table(infoStyle.up, part -> {
-				part.add("[accent]" + BlockStat.input.localized()).expandX().left().row();
+				part.add("[accent]" + Stat.input.localized()).expandX().left().row();
 				part.table(row -> {
 					for(int l = 0, len = inputItems.length; l < len; l++)
 						row.add(new ItemDisplay(inputItems[l].item, inputItems[l].amount, true)).padRight(5f);
@@ -155,11 +161,11 @@ public class MultiCrafter extends GenericCrafter{
 				}).left().row();
 				if(inputPower > 0f){
 					part.table(row -> {
-						row.add("[lightgray]" + BlockStat.powerUse.localized() + ":[]").padRight(4f);
+						row.add("[lightgray]" + Stat.powerUse.localized() + ":[]").padRight(4f);
 						(new NumberValue(inputPower * 60f, StatUnit.powerSecond)).display(row);
 					}).left().row();
 				}
-				part.add("[accent]" + BlockStat.output.localized()).left().row();
+				part.add("[accent]" + Stat.output.localized()).left().row();
 				part.table(row -> {
 					for(int jj = 0, len = outputItems.length; jj < len; jj++)
 						row.add(new ItemDisplay(outputItems[jj].item, outputItems[jj].amount, true)).padRight(5f);
@@ -170,25 +176,18 @@ public class MultiCrafter extends GenericCrafter{
 				}).left().row();
 				if(outputPower > 0f){
 					part.table(row -> {
-						row.add("[lightgray]" + BlockStat.basePowerGeneration.localized() + ":[]").padRight(4f);
+						row.add("[lightgray]" + Stat.basePowerGeneration.localized() + ":[]").padRight(4f);
 						(new NumberValue(outputPower * 60f, StatUnit.powerSecond)).display(row);
 					}).left().row();
 				}
 				part.table(row -> {
-					row.add("[lightgray]" + BlockStat.productionTime.localized() + ":[]").padRight(4f);
+					row.add("[lightgray]" + Stat.productionTime.localized() + ":[]").padRight(4f);
 					(new NumberValue(rec.craftTime / 60f, StatUnit.seconds)).display(row);
 				}).left().row();
 				multiCrafterDisplay(part, ii);
 			}).color(Pal.accent).left().growX();
 			table.add().size(18f).row();
 		}
-	}
-
-	@Override
-	public void setStats(){
-		super.setStats();
-		if(powerBarI) stats.remove(BlockStat.powerUse);
-		stats.remove(BlockStat.productionTime);
 	}
 
 	@Override
@@ -677,8 +676,7 @@ public class MultiCrafter extends GenericCrafter{
 				super(entity);
 			}
 
-			@Override
-			public BlockStatus status(){
+			public BlockStatus BlockStatus(){
 				if(productionValid()) return BlockStatus.active;
 				if(getCondValid()) return BlockStatus.noOutput;
 				return BlockStatus.noInput;

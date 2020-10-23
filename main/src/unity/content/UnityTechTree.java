@@ -40,7 +40,7 @@ public class UnityTechTree implements ContentList{
 		attachNode(Blocks.copperWall, metaglassWall, () -> {
 			unityNode(metaglassWallLarge);
 		});
-		attachNode(Items.surgealloy, UnityItems.umbrium, with(Items.surgealloy, 7000, Items.silicon, 8500, Items.graphite, 6000), () -> {
+		attachNode(Items.surgeAlloy, UnityItems.umbrium, with(Items.surgeAlloy, 7000, Items.silicon, 8500, Items.graphite, 6000), () -> {
 
 		});
 	}

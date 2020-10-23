@@ -66,7 +66,7 @@ public class LightSource extends GenericCrafter{
 	@Override
 	public void setStats(){
 		super.setStats();
-		stats.add(BlockStat.output, "@ @", bundle.format("lightlib.light", lightStrength), StatUnit.perSecond.localized());
+		stats.add(Stat.output, "@ @", bundle.format("lightlib.light", lightStrength), StatUnit.perSecond.localized());
 	}
 
 	@Override

@@ -88,7 +88,7 @@ public class UnityBlocks implements ContentList{
 			);
 			addRecipe(
 				new InputContents(with(Items.coal, 1, Items.sand, 1), new LiquidStack[]{new LiquidStack(Liquids.water, 5)}, 1),
-				new OutputContents(with(Items.thorium, 1, Items.surgealloy, 1), new LiquidStack[]{new LiquidStack(Liquids.slag, 5)}), 60
+				new OutputContents(with(Items.thorium, 1, Items.surgeAlloy, 1), new LiquidStack[]{new LiquidStack(Liquids.slag, 5)}), 60
 			);
 			addRecipe(
 				new InputContents(with(Items.pyratite, 1, Items.blastCompound, 1), new LiquidStack[]{new LiquidStack(Liquids.water, 5)}, 1),
@@ -104,7 +104,7 @@ public class UnityBlocks implements ContentList{
 			);
 			addRecipe(
 				new InputContents(with(Items.coal, 1, Items.sand, 1), new LiquidStack[]{new LiquidStack(Liquids.water, 5)}, 1),
-				new OutputContents(with(Items.thorium, 1, Items.surgealloy, 1), new LiquidStack[]{new LiquidStack(Liquids.slag, 5), new LiquidStack(Liquids.oil, 5)}), 60
+				new OutputContents(with(Items.thorium, 1, Items.surgeAlloy, 1), new LiquidStack[]{new LiquidStack(Liquids.slag, 5), new LiquidStack(Liquids.oil, 5)}), 60
 			);
 		}};
 		
@@ -117,7 +117,7 @@ public class UnityBlocks implements ContentList{
 			);
 			addRecipe(
 				new InputContents(with(Items.coal, 1, Items.sand, 1)),
-				new OutputContents(with(Items.thorium, 1, Items.surgealloy, 2), 10), 60f);
+				new OutputContents(with(Items.thorium, 1, Items.surgeAlloy, 2), 10), 60f);
 			addRecipe(
 				new InputContents(with(Items.pyratite, 1, Items.blastCompound, 1)),
 				new OutputContents(with(Items.scrap, 1, Items.plastanium, 2, Items.sporePod, 2)), 72f);
@@ -250,7 +250,7 @@ public class UnityBlocks implements ContentList{
 					if(entity.consValid() && Mathf.chanceDelta(0.76f)) UnityFx.craftingEffect.at(entity.getX(), entity.getY());
 				}
 			};
-			consumes.items(with(Items.lead, 4, Items.silicon, 3, Items.phasefabric, 1, UnityItems.umbrium, 2));
+			consumes.items(with(Items.lead, 4, Items.silicon, 3, Items.phaseFabric, 1, UnityItems.umbrium, 2));
 			consumes.power(3.2f);
 		}};
 		
@@ -262,7 +262,7 @@ public class UnityBlocks implements ContentList{
 			}
 
 			{
-				requirements(Category.turret, with(Items.copper, 350, Items.graphite, 380, Items.silicon, 360, Items.plastanium, 200, Items.thorium, 220, UnityItems.umbrium, 370, Items.surgealloy, 290));
+				requirements(Category.turret, with(Items.copper, 350, Items.graphite, 380, Items.silicon, 360, Items.plastanium, 200, Items.thorium, 220, UnityItems.umbrium, 370, Items.surgeAlloy, 290));
 				size = 5;
 				health = 3975;
 				range = 235f;

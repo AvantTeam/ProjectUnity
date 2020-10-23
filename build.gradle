@@ -3,6 +3,7 @@ buildscript{
         props = new Properties().with{ p -> p.load(file('gradle.properties').newReader()); return p }
 
         mindustryVersion = props["mindustryVersion"]
+        mindustryHash = props["mindustryHash"]
     }
 
     repositories{
@@ -12,13 +13,15 @@ buildscript{
 
     dependencies{
         classpath "com.github.Anuken.Arc:arc-core:$mindustryVersion"
-        classpath "com.github.Anuken.Mindustry:core:$mindustryVersion"
+        //classpath "com.github.Anuken.Mindustry:core:$mindustryVersion"
+        classpath "com.github.Anuken:Mindustry:$mindustryHash"
     }
 }
 
 allprojects{
     ext{
         mindustryVersion = props["mindustryVersion"]
+        mindustryHash = props["mindustryHash"]
         modName = props["modName"]
 
         sdkVersion = '30'
@@ -51,7 +54,8 @@ project(":main"){
 
     dependencies{
         compileOnly "com.github.Anuken.Arc:arc-core:$mindustryVersion"
-        compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
+        //compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
+        compileOnly "com.github.Anuken:Mindustry:$mindustryHash"
     }
 }
 
@@ -62,6 +66,7 @@ project(":tools"){
         implementation project(":main")
 
         implementation "com.github.Anuken.Arc:arc-core:$mindustryVersion"
-        implementation "com.github.Anuken.Mindustry:core:$mindustryVersion"
+        //implementation "com.github.Anuken.Mindustry:core:$mindustryVersion"
+        implementation "com.github.Anuken:Mindustry:$mindustryHash"
     }
 }

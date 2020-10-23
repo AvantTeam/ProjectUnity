@@ -3,10 +3,12 @@ package unity;
 import arc.*;
 import arc.func.*;
 import arc.graphics.*;
+import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.mod.*;
 import mindustry.mod.Mods.*;
 import mindustry.ui.dialogs.*;
@@ -17,6 +19,8 @@ import unity.ContributorList.*;
 import unity.content.*;
 
 public class Unity extends Mod{
+    public final String githubURL = "https://github.com/EyeOfDarkness/ProjectUnity";
+    
     private final ContentList[] unityContent = {
         new UnityItems(),
         new UnityStatusEffects(),
@@ -34,73 +38,39 @@ public class Unity extends Mod{
             Func<String, String> stringf = value -> Core.bundle.get("mod." + value);
 
             Time.runTask(10f, () -> {
-                BaseDialog dialog = new BaseDialog(stringf.get("welcome-title"));
+                //TODO make it also on the about dialog rather than annoyingly pop up everytime it loads
+                BaseDialog dialog = new BaseDialog("@credits");
+                Table cont = dialog.cont;
 
-                dialog.addCloseButton();
-                dialog.cont.add("Project Unity").fillX().wrap().get().setAlignment(Align.center);
-                dialog.cont.row();
-                dialog.cont.image().color(Pal.accent).fillX().height(3f).pad(3f);
-                dialog.cont.row();
-                dialog.cont.add(stringf.get("welcome-text"));
-                dialog.cont.row();
-                dialog.cont.add(" ");
-                dialog.cont.row();
+                cont.table(t -> {
+                    t.add("@mod.credits.text").fillX().pad(3f).wrap().get().setAlignment(Align.center);
+                    t.row();
+                    
+                    t.add("@mod.credits.bottom-text").fillX().pad(3f).wrap().get().setAlignment(Align.center);
+                    t.row();
+                }).pad(3f);
+                
+                cont.row();
+                
+                cont.table(b -> {
+                    for(ContributionType type : ContributionType.all){
+                        Seq<String> list = ContributorList.getBy(type);
+                        if(list.size <= 0) continue;
 
-
-
-                dialog.cont.table(Tex.button, t -> {
-                    t.pane(p -> {
-                        p.center();
-
-                        for(ContributionType type : ContributionType.all){
-                            Seq<String> list = ContributorList.getBy(type);
-                            if(type == ContributionType.translator || list.size <= 0) continue;
-
-                            p.add(stringf.get(type.name()));
-                            p.row();
-                            p.image().color(Pal.accent).fillX().height(3f).pad(3f);
-                            p.row();
-
-                            for(String c : list){
-                                p.add(c + "[]").pad(3f).padLeft(6f).padRight(6f);
-                                p.row();
-                            }
-                            /** Spacing */
-                            p.add(" ");
-                            p.row();
-                        }
-
-                        p.row();
-                        /** Spacing */
-                        p.add(" ");
-                        p.row();
-                        p.add(stringf.get("translators"));
-                        p.row();
-                        p.image().color(Pal.accent).fillX().height(3f).pad(3f);
-                        p.row();
-
-                        Seq<String> list = ContributorList.getBy(ContributionType.translator);
-                        if(list.size > 0){
-                            for(Language lang : Language.all){
-                                Seq<String> trnsList = ContributorList.getBy(lang);
-                                if(trnsList.size < 1) continue;
-
-                                p.add(stringf.get("language-" + lang.name()) + ":").pad(3f).padLeft(6f).padRight(6f);
-                                p.row();
-                                p.image().color(Color.sky).fillX().height(3f).pad(3f);
-                                p.row();
-                                for(String c : trnsList){
-                                    p.add(c + "[]");
+                        b.table(t -> {
+                            t.add(stringf.get(type.name())).pad(3f).center();
+                            t.row();
+                            t.pane(p -> {
+                                for(String c : list){
+                                    p.add("[lightgray]" + c).left().pad(3f).padLeft(6f).padRight(6f);
                                     p.row();
                                 }
-                                /** Spacing */
-                                p.add(" ");
-                                p.row();
-                            }
-                        }
-                    }).pad(10f).grow();
-                }).width(250f).height(300f);
+                            });
+                        }).pad(6f).top();
+                    }
+                }).fillX();
 
+                dialog.addCloseButton();
                 dialog.show();
             });
         });

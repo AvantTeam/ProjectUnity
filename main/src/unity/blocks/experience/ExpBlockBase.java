@@ -14,10 +14,10 @@ import unity.meta.ExpType;
 import static arc.Core.*;
 
 public interface ExpBlockBase{
-	/** Turret status */
-	public static final ObjectMap<String, BlockStat> forStats = ObjectMap.of("range",
-		BlockStat.shootRange, "inaccuracy", BlockStat.inaccuracy, "reloadTime", BlockStat.reload, "targetAir",
-		BlockStat.targetsAir, "targetGround", BlockStat.targetsGround);
+	/** Turret BlockStatus */
+	public static final ObjectMap<String, Stat> forStats = ObjectMap.of("range",
+		Stat.shootRange, "inaccuracy", Stat.inaccuracy, "reloadTime", Stat.reload, "targetAir",
+		Stat.targetsAir, "targetGround", Stat.targetsGround);
 		Color defaultLevel0Color = Pal.accent, defaultLevelMaxColor = Color.valueOf("fff4cc"),
 		defaultExp0Color = Color.valueOf("84ff00"), defaultExpMaxColor = Color.valueOf("90ff00");
 
@@ -36,30 +36,30 @@ public interface ExpBlockBase{
 		);
 	}
 
-	default void expSetStats(BlockStats stats){
+	default void expSetStats(Stats stats){
 		getExpFields().get(ExpType.linear).each(f -> {
-			BlockStat temp = forStats.get(f.name);
+			Stat temp = forStats.get(f.name);
 			if(temp != null){
 				if(isNumerator(temp)) stats.add(temp, bundle.get("explib.linear.numer"), f.intensity > 0 ? "+" : "", 100f * f.intensity / (float) f.start);
 				else stats.add(temp, bundle.get("explib.linear.denomin"), f.start, f.intensity > 0 ? "+" : "", f.start, f.intensity);
 			}
 		});
 		getExpFields().get(ExpType.exp).each(f -> {
-			BlockStat temp = forStats.get(f.name);
+			Stat temp = forStats.get(f.name);
 			if(temp != null){
 				if(isNumerator(temp)) stats.add(temp, bundle.get("explib.expo.numer"), f.intensity, f.start);
 				else stats.add(temp, bundle.get("explib.expo.denomin"), f.start, f.start, f.intensity);
 			}
 		});
 		getExpFields().get(ExpType.root).each(f -> {
-			BlockStat temp = forStats.get(f.name);
+			Stat temp = forStats.get(f.name);
 			if(temp != null){
 				if(isNumerator(temp)) stats.add(temp, bundle.get("explib.root.numer"), f.intensity, f.start);
 				else stats.add(temp, bundle.get("explib.root.denomin"), f.start, f.start, f.intensity);
 			}
 		});
 		getExpFields().get(ExpType.bool).each(f -> {
-			BlockStat temp = forStats.get(f.name);
+			Stat temp = forStats.get(f.name);
 			if(temp != null) stats.add(temp, bundle.get("explib.bool"), f.intensity, f.start <= 0);
 		});
 	}
@@ -76,7 +76,7 @@ public interface ExpBlockBase{
 		}
 	}
 
-	default boolean isNumerator(BlockStat stat){
-		return stat == BlockStat.inaccuracy || stat == BlockStat.shootRange;
+	default boolean isNumerator(Stat stat){
+		return stat == Stat.inaccuracy || stat == Stat.shootRange;
 	}
 }

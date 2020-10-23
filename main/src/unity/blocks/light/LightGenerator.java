@@ -5,7 +5,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import mindustry.graphics.Layer;
 import mindustry.ui.Bar;
-import mindustry.world.meta.BlockStat;
+import mindustry.world.meta.Stat;
 import mindustry.world.blocks.power.SolarGenerator;
 import unity.blocks.light.LightSource.LightSourceBuild;
 
@@ -39,7 +39,7 @@ public class LightGenerator extends SolarGenerator{
 	@Override
 	public void setStats(){
 		super.setStats();
-		stats.add(BlockStat.output, bundle.format("bar.efficiency", 6000f / lightStrength));
+		stats.add(Stat.output, bundle.format("bar.efficiency", 6000f / lightStrength));
 	}
 
 	public class LightGeneratorBuild extends SolarGeneratorBuild{
