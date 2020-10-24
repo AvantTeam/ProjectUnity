@@ -1,8 +1,10 @@
 package unity.content;
 
-import arc.math.Mathf;
+import arc.graphics.Color;
+import arc.math.*;
 import mindustry.gen.*;
 import mindustry.world.*;
+import mindustry.world.consumers.*;
 import mindustry.world.meta.BuildVisibility;
 import mindustry.world.draw.DrawBlock;
 import mindustry.world.blocks.environment.*;
@@ -30,11 +32,11 @@ public class UnityBlocks implements ContentList{
 	lightReflector1, lightOmnimirror, lightDivisor, lightDivisor1, lightFilter, lightInvertedFilter, lightPanel, lightInfluencer,
 	
 	//dark
-	darkAlloyForge, apparition,
+    darkAlloyForge, apparition, catastrophe, calamity,
 	
 	//koruh
 	laserTurret, inferno;
-
+	
 	@Override
 	public void load(){
 		//region global ores
@@ -279,6 +281,68 @@ public class UnityBlocks implements ContentList{
 			}
 		};
 		
+        catastrophe = new LaserTurret("catastrophe"){
+            @Override
+            public void load(){
+                super.load();
+                baseRegion = atlas.find("unity-block-" + size);
+            }
+
+            {
+                size = 8;
+                health = 9750;
+                range = 300f;
+                reloadTime = 190f;
+                coolantMultiplier = 0.6f;
+                shootCone = 40f;
+                shootDuration = 320f;
+                powerUse = 39f;
+                shootShake = 4f;
+                firingMoveFract = 0.16f;
+                shootEffect = Fx.shootBigSmoke2;
+                recoilAmount = 7f;
+                cooldown = 0.012f;
+                heatColor = Color.white;
+                rotateSpeed = 1.9f;
+                activeSoundVolume = 2.4f;
+                expanded = true;
+                requirements(Category.turret, with(Items.copper, 1250, Items.lead, 1320, Items.graphite, 1100, Items.titanium, 1340, Items.surgeAlloy, 1240, Items.silicon, 1350, Items.thorium, 770, UnityItems.darkAlloy, 370));
+                shootType = UnityBullets.catastropheLaser;
+                consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.4f && liquid.flammability < 0.1f, 1.3f)).update(false);
+            }
+        };
+		
+        calamity = new BigLaserTurret("calamity"){
+            @Override
+            public void load(){
+                super.load();
+                baseRegion = atlas.find("unity-block-" + size);
+            }
+
+            {
+                size = 12;
+                health = 22000;
+                range = 420f;
+                reloadTime = 320f;
+                coolantMultiplier = 0.6f;
+                shootCone = 23f;
+                shootDuration = 360f;
+                powerUse = 87f;
+                shootShake = 4f;
+                firingMoveFract = 0.09f;
+                shootEffect = Fx.shootBigSmoke2;
+                recoilAmount = 7f;
+                cooldown = 0.009f;
+                heatColor = Color.white;
+                rotateSpeed = 0.97f;
+                activeSoundVolume = 3f;
+                expanded = true;
+                requirements(Category.turret, with(Items.copper, 2800, Items.lead, 2970, Items.graphite, 2475, Items.titanium, 3100, Items.surgeAlloy, 2790, Items.silicon, 3025, Items.thorium, 1750, UnityItems.darkAlloy, 1250));
+                shootType = UnityBullets.calamityLaser;
+                consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.3f && liquid.flammability < 0.1f, 2.1f)).update(false);
+            }
+        };
+
 		//endregion
 		//koruh
 		
