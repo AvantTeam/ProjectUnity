@@ -46,6 +46,7 @@ const script = [
 
             "wormlib",
 			"unitlib",
+            "hoverbase",
             "copterbase",
             "loader",
             "chainlaser",
@@ -117,7 +118,8 @@ const script = [
 				name: "units",
 				childs: [
 					"whirlwind",
-					"jetstream"
+					"jetstream",
+                    "hovos"
 				]
 			}
 		]
