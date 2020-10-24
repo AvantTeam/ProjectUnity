@@ -1,0 +1,15 @@
+requirements: [
+    copper/100,
+    lead/75,
+    silicon/50,
+    titanium/100
+]
+liquidCapacity: 0
+itemCapacity: 0
+consumes: {
+    power: 1
+}
+phaseRadiusBoost: 0
+phaseShieldBoost: 0
+
+category: defense

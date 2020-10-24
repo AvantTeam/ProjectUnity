@@ -121,14 +121,14 @@ module.exports = {
                 }));
             },
             isNumerator(stat) {
-                return stat == BlockStat.inaccuracy || stat == BlockStat.shootRange;
+                return stat == Stat.inaccuracy || stat == Stat.shootRange;
             },
             setStats() {
-                this.forStats.put("range", BlockStat.shootRange);
-                this.forStats.put("inaccuracy", BlockStat.inaccuracy);
-                this.forStats.put("reloadTime", BlockStat.reload);
-                this.forStats.put("targetAir", BlockStat.targetsAir);
-                this.forStats.put("targetGround", BlockStat.targetsGround);
+                this.forStats.put("range", Stat.shootRange);
+                this.forStats.put("inaccuracy", Stat.inaccuracy);
+                this.forStats.put("reloadTime", Stat.reload);
+                this.forStats.put("targetAir", Stat.targetsAir);
+                this.forStats.put("targetGround", Stat.targetsGround);
                 this.super$setStats();
                 for(var i = 0; i < this.linearInc.length; i++) {
                     var temp = this.forStats.get(this.linearInc[i]);

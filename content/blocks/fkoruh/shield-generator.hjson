@@ -1,0 +1,15 @@
+requirements: [
+    copper/75,
+    lead/75,
+    silicon/100,
+    titanium/50
+]
+health: 200
+itemCapacity: 0
+consumes: {
+    power: 2
+}
+phaseRadiusBoost: 0
+phaseShieldBoost: 0
+
+category: effect

@@ -109,7 +109,7 @@ const script = [
             "maps"
         ]
     },
-	
+
 	{
 		name: "scar",
 		childs: [
@@ -131,7 +131,7 @@ const script = [
                 childs: [
 					"apparition",
 					"ghost",
-					
+
                     "fallout",
                     "catastrophe",
 					"calamity"
@@ -186,6 +186,14 @@ const script = [
                     "laser",
                     "inferno"
                 ]
+            },
+
+            {
+                name: "blocks",
+                childs: [
+                    "shieldGenerator",
+                    "shieldedWall"
+                ]
             }
         ]
     },
@@ -237,14 +245,14 @@ const script = [
                     "terminalcrucible"
                 ]
             },
-			
+
 			{
 				name: "turrets",
 				childs: [
 					"endgame"
 				]
 			},
-			
+
 			{
 				name: "units",
 				childs: [
