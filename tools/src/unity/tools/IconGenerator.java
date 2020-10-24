@@ -11,8 +11,8 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
-import unity.units.*;
-import unity.units.CopterUnitType.*;
+import unity.entities.units.*;
+import unity.entities.units.CopterUnitType.*;
 
 import static mindustry.Vars.*;
 

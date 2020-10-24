@@ -1,4 +1,4 @@
-package unity.units;
+package unity.entities.units;
 
 import java.util.Arrays;
 import arc.math.*;

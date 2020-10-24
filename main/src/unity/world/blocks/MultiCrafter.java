@@ -1,4 +1,4 @@
-package unity.blocks;
+package unity.world.blocks;
 
 import java.util.Arrays;
 import arc.util.*;
@@ -21,9 +21,9 @@ import mindustry.world.meta.values.*;
 import mindustry.world.blocks.production.GenericCrafter;
 import mindustry.world.consumers.ConsumePower;
 import mindustry.world.modules.*;
+import unity.world.blocks.Recipe.*;
 import mindustry.ui.*;
 import mindustry.ui.fragments.BlockInventoryFragment;
-import unity.blocks.Recipe.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;

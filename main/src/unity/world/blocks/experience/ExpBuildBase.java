@@ -1,11 +1,11 @@
-package unity.blocks.experience;
+package unity.world.blocks.experience;
 
 import java.util.EnumMap;
 import arc.struct.ObjectSet;
 import arc.math.Mathf;
 import arc.util.io.*;
 import mindustry.world.Block;
-import unity.meta.ExpType;
+import unity.world.meta.ExpType;
 
 public interface ExpBuildBase{
 	Block getBlock();

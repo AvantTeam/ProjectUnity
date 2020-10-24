@@ -1,4 +1,4 @@
-package unity.blocks.light;
+package unity.world.blocks.light;
 
 public interface LightRepeaterBuildBase{
 	default LightData calcLight(LightData ld, int i){

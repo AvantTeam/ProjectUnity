@@ -1,4 +1,4 @@
-package unity.blocks.light;
+package unity.world.blocks.light;
 
 import java.util.ArrayList;
 import arc.graphics.*;
@@ -6,8 +6,8 @@ import arc.graphics.g2d.*;
 import mindustry.graphics.Layer;
 import mindustry.ui.Bar;
 import mindustry.world.meta.Stat;
+import unity.world.blocks.light.LightSource.LightSourceBuild;
 import mindustry.world.blocks.power.SolarGenerator;
-import unity.blocks.light.LightSource.LightSourceBuild;
 
 import static arc.Core.*;
 

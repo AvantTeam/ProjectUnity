@@ -1,4 +1,4 @@
-package unity.units;
+package unity.entities.units;
 
 import arc.struct.Seq;
 import arc.graphics.g2d.*;

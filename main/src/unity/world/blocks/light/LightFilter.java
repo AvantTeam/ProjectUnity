@@ -1,4 +1,4 @@
-package unity.blocks.light;
+package unity.world.blocks.light;
 
 import arc.math.Mathf;
 import arc.util.Eachable;
@@ -9,10 +9,10 @@ import arc.scene.ui.ImageButton;
 import arc.scene.ui.layout.Table;
 import mindustry.gen.*;
 import mindustry.world.*;
+import unity.world.blocks.light.LightInfluencer.LightInfluencerBuild;
 import mindustry.graphics.Layer;
 import mindustry.ui.Styles;
 import mindustry.entities.units.BuildPlan;
-import unity.blocks.light.LightInfluencer.LightInfluencerBuild;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;

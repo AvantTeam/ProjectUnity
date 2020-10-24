@@ -11,7 +11,7 @@ import mindustry.graphics.*;
 import mindustry.content.*;
 import mindustry.world.blocks.units.*;
 import mindustry.world.blocks.units.UnitFactory.*;
-import unity.units.*;
+import unity.entities.units.*;
 
 import static mindustry.type.ItemStack.*;
 

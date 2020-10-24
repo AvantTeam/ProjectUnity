@@ -1,4 +1,4 @@
-package unity.blocks.experience;
+package unity.world.blocks.experience;
 
 import java.util.EnumMap;
 import arc.util.io.*;
@@ -8,10 +8,10 @@ import mindustry.gen.*;
 import mindustry.content.Fx;
 import mindustry.entities.Effect;
 import mindustry.world.Block;
-import mindustry.world.blocks.defense.turrets.PowerTurret;
-import unity.meta.ExpType;
+import mindustry.world.blocks.defense.turrets.ItemTurret;
+import unity.world.meta.ExpType;
 
-public class ExpPowerTurret extends PowerTurret implements ExpBlockBase{
+public class ExpItemTurret extends ItemTurret implements ExpBlockBase{
 	protected final int maxLevel;
 	protected final EnumMap<ExpType, ObjectSet<ExpField>> expFields = new EnumMap<>(ExpType.class);
 	protected Effect levelUpFx = Fx.upgradeCore;
@@ -21,21 +21,21 @@ public class ExpPowerTurret extends PowerTurret implements ExpBlockBase{
 		for(ExpType type : ExpType.values()) expFields.put(type, new ObjectSet<>(4));
 	}
 
-	public ExpPowerTurret(String name, int maxLevel, boolean hasCustomUpdate){
+	public ExpItemTurret(String name, int maxLevel, boolean hasCustomUpdate){
 		super(name);
 		this.maxLevel = maxLevel;
 		this.hasCustomUpdate = hasCustomUpdate;
 	}
 
-	public ExpPowerTurret(String name, boolean hasCustomUpdate){
+	public ExpItemTurret(String name, boolean hasCustomUpdate){
 		this(name, 20, hasCustomUpdate);
 	}
 
-	public ExpPowerTurret(String name, int maxLevel){
+	public ExpItemTurret(String name, int maxLevel){
 		this(name, maxLevel, false);
 	}
 
-	public ExpPowerTurret(String name){
+	public ExpItemTurret(String name){
 		this(name, 20, false);
 	}
 
@@ -61,7 +61,7 @@ public class ExpPowerTurret extends PowerTurret implements ExpBlockBase{
 		return expFields;
 	}
 
-	public class ExpPowerTurretBuild extends PowerTurretBuild implements ExpBuildBase{
+	public class ExpItemTurretBuild extends ItemTurretBuild implements ExpBuildBase{
 		private int exp = 0, level = 0;
 
 		@Override
