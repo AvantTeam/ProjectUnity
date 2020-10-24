@@ -185,8 +185,7 @@ module.exports = {
         expblock.hasCustomUpdate = (typeof objb["customUpdate"] === "function");
         expblock.hasCustomRW = (typeof objb["customRead"] === "function");
         expblock.hasCache = (expblock.caches.length > 0);
-        var objc = clone(objb);
-        objc = Object.assign(objc, {
+        objb = Object.assign(objb, {
             totalExp() {
                 return this._exp;
             },
@@ -247,7 +246,7 @@ module.exports = {
         });
         //Extend Building
         expblock.buildType = ent => {
-            ent = extendContent(build, expblock, objc);
+            ent = extendContent(build, expblock, clone(objb));
             ent._exp = 0;
             ent._changedVal = true;
             return ent;
