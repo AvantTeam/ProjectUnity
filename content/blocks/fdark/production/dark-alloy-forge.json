@@ -9,8 +9,9 @@
 		"power": 3.2,
 		"items": {
 			"items": [
-				{"item": "lead", "amount": 4},
+				{"item": "lead", "amount": 2},
 				{"item": "silicon", "amount": 3},
+				{"item": "blast-compound", "amount": 1},
 				{"item": "phase-fabric", "amount": 1},
 				{"item": "umbrium", "amount": 2}
 			]

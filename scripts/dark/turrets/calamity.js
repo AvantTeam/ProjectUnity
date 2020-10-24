@@ -25,7 +25,8 @@ const calamityLaser = extendContent(ContinuousLaserBulletType, 580, {
 	},
 	
 	draw(b){
-		var baseLen = this.length * b.fout();
+		var realLength = Damage.findLaserLength(b, this.length);
+		var baseLen = realLength * b.fout();
 
 		//Lines.lineAngle(b.x, b.y, b.rotation(), baseLen);
 		for(var s = 0; s < this.colors.length; s++){

@@ -1,0 +1,24 @@
+{
+	"size": 12,
+	"health": 22000,
+	"range": 370,
+	"reloadTime": 12,
+	"coolantMultiplier": 0.5,
+	"restitution": 0.08,
+	"inaccuracy": 3,
+	"shots": 2,
+	"alternate": true,
+	"recoilAmount": 5.5,
+	"rotateSpeed": 3.5,
+	"hasLiquids": true,
+	"requirements": [
+		{ "item": "copper", "amount": 2800 },
+		{ "item": "graphite", "amount": 2980 },
+		{ "item": "silicon", "amount": 2300 },
+		{ "item": "titanium", "amount": 1900 },
+		{ "item": "phase-fabric", "amount": 1760 },
+		{ "item": "thorium", "amount": 1780 },
+		{ "item": "dark-alloy", "amount": 1280 }
+	],
+	"category": "turret"
+}

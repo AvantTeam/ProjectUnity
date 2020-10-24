@@ -13,6 +13,10 @@ const offsetSin = (offset, scl) => {
 	return Mathf.absin(Time.time() + (offset * Mathf.radDeg), scl, 0.5) + 0.5;
 };
 
+const offsetSinB = (offset, scl) => {
+	return Mathf.absin(Time.time() + (offset * Mathf.radDeg), scl, 0.25);
+};
+
 const vaporizeTile = new Effect(126, 512, e => {
 	Draw.mixcol(Color.red, 1);
 	Draw.blend(Blending.additive);
@@ -47,7 +51,7 @@ const endgameLaser = new Effect(76, 820 * 2, e => {
 	for(var i = 0; i < 3; i++){
 		Draw.z(originZ + (i / 1000));
 		if(i != 2){
-			Draw.color(tempColor.set(colors[i]).mul(1, offsetSin(0, 5), offsetSin(90, 5), 1));
+			Draw.color(tempColor.set(colors[i]).mul(1, 1 + offsetSinB(0, 5), 1 + offsetSinB(90, 5), 1));
 		}else{
 			Draw.color(Color.white);
 		};

@@ -185,7 +185,7 @@ module.exports = {
         expblock.hasCustomUpdate = (typeof objb["customUpdate"] === "function");
         expblock.hasCustomRW = (typeof objb["customRead"] === "function");
         expblock.hasCache = (expblock.caches.length > 0);
-        objc = clone(objb);
+		var objc = clone(objb);
         objc = Object.assign(objc, {
             totalExp() {
                 return this._exp;

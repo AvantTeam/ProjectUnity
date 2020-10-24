@@ -131,6 +131,7 @@ const script = [
                 childs: [
 					"apparition",
 					"ghost",
+					"banshee",
 
                     "fallout",
                     "catastrophe",
