@@ -15,9 +15,9 @@ import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.world.Tile;
 import mindustry.world.meta.*;
+import mindustry.world.blocks.production.GenericCrafter;
 import unity.world.blocks.light.LightGenerator.LightGeneratorBuild;
 import unity.world.blocks.light.LightReflector.LightReflectorBuild;
-import mindustry.world.blocks.production.GenericCrafter;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;

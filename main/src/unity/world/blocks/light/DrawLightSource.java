@@ -6,8 +6,8 @@ import mindustry.world.blocks.production.GenericCrafter.*;
 import mindustry.graphics.Layer;
 import mindustry.type.Liquid;
 import mindustry.world.draw.DrawBlock;
-import unity.world.blocks.light.LightSource.*;
 import mindustry.world.consumers.*;
+import unity.world.blocks.light.LightSource.*;
 
 import static arc.Core.*;
 
