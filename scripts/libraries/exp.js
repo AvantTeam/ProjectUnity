@@ -44,9 +44,13 @@ module.exports = {
             boolInc: [],
             boolIncStart: [],
             boolIncMul: [],
+            listInc: [],
+            listIncStart: [],
+            listIncMul: [],
             hasLevelFunction: false,
             hasCustomUpdate: false,
             forStats: new ObjectMap(),
+            caches: []
             //end
         }, obj, {
             //start
@@ -86,6 +90,9 @@ module.exports = {
                 } else if(this.boolInc.length > 0) {
                     this.boolEXP(tile, lvl);
                 };
+                if(this.listInc.length > 0) {
+                    this.listEXP(tile, lvl);
+                };
             },
             linearEXP(tile, lvl) {
                 for(var i = 0; i < this.linearInc.length; i++) {
@@ -105,6 +112,11 @@ module.exports = {
             boolEXP(tile, lvl) {
                 for(var i = 0; i < this.boolInc.length; i++) {
                     this[this.boolInc[i]] = (this.boolIncStart[i]) ? (lvl < this.boolIncMul[i]) : (lvl >= this.boolIncMul[i]);
+                };
+            },
+            listEXP(tile, lvl) {
+                for(var i = 0; i < this.listInc.length; i++) {
+                    this[this.listInc[i]] = this.listIncMul[i][Math.min(lvl, this.listIncMul[i].length - 1)];
                 };
             },
             setBars() {
@@ -165,13 +177,16 @@ module.exports = {
             var tobj = expblock.expFields[i];
             if(tobj.type == undefined) tobj.type = "linear";
             expblock[tobj.type + "Inc"].push(tobj.field);
-            expblock[tobj.type + "IncStart"].push((tobj.start == undefined) ? 0 : tobj.start);
+            expblock[tobj.type + "IncStart"].push((tobj.start == undefined) ? ((expblock[tobj.field] == undefined || expblock[tobj.field] == null) ? 0 : expblock[tobj.field]) : tobj.start);
             expblock[tobj.type + "IncMul"].push((tobj.intensity == undefined) ? 1 : tobj.intensity);
+            if(tobj.cacheValue) expblock.caches.push(tobj.field);
         };
         expblock.hasLevelFunction = (typeof objb["levelUp"] === "function");
         expblock.hasCustomUpdate = (typeof objb["customUpdate"] === "function");
         expblock.hasCustomRW = (typeof objb["customRead"] === "function");
-        objb = Object.assign(objb, {
+        expblock.hasCache = (expblock.caches.length > 0);
+        objc = clone(objb);
+        objc = Object.assign(objc, {
             totalExp() {
                 return this._exp;
             },
@@ -191,6 +206,7 @@ module.exports = {
                 if(this._exp >= expblock.maxExp) return;
                 this._exp += a;
                 if(this._exp > expblock.maxExp) this._exp = expblock.maxExp;
+                this._changedVal = true;
                 if(!expblock.hasLevelEffect) return;
                 if(expblock.getLevel(this._exp - a) != expblock.getLevel(this._exp)) {
                     expblock.levelUpFx.at(this.x, this.y, expblock.size);
@@ -198,8 +214,19 @@ module.exports = {
                     if(expblock.hasLevelFunction) this.levelUp(expblock.getLevel(this._exp));
                 };
             },
+
+            updateCaches(){
+                for(var i=0; i<expblock.caches.length; i++){
+                    this["_cache_" + expblock.caches[i]] = expblock[expblock.caches[i]];
+                }
+            },
+            getCache(fieldName){
+                return this["_cache_" + fieldName];
+            },
+
             updateTile() {
                 expblock.setEXPStats(this);
+                if(this._changedVal && expblock.hasCache) this.updateCaches();
                 if(expblock.hasCustomUpdate) this.customUpdate();
                 else this.super$updateTile();
             },
@@ -207,6 +234,10 @@ module.exports = {
                 this.super$read(stream, version);
                 this._exp = stream.i();
                 if(expblock.hasCustomRW) this.customRead(stream, version);
+                if(expblock.hasCache){
+                    expblock.setEXPStats(this);
+                    this.updateCaches();
+                }
             },
             write(stream) {
                 this.super$write(stream);
@@ -216,8 +247,9 @@ module.exports = {
         });
         //Extend Building
         expblock.buildType = ent => {
-            ent = extendContent(build, expblock, clone(objb));
+            ent = extendContent(build, expblock, objc);
             ent._exp = 0;
+            ent._changedVal = true;
             return ent;
         };
         return expblock;
