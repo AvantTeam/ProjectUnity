@@ -615,8 +615,8 @@ function MultiCrafterBlock() {
     };
     this.setStats = function() {
         this.super$setStats();
-        if(this.powerBarI) this.stats.remove(BlockStat.powerUse);
-        this.stats.remove(BlockStat.productionTime);
+        if(this.powerBarI) this.stats.remove(Stat.powerUse);
+        this.stats.remove(Stat.productionTime);
     };
     this.setBars = function() {
         this.super$setBars();
