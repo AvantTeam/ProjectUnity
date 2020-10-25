@@ -5,7 +5,7 @@ const pow6In = new Interp.PowIn(6);
 const calamityLaser = extendContent(ContinuousLaserBulletType, 580, {
 	update(b){
 		this.super$update(b);
-		var realLength = Damage.findLaserLength(b, realLength);
+		var realLength = Damage.findLaserLength(b, this.length);
 		if(Mathf.chanceDelta(0.5)){
 			Lightning.create(b.team, Color.valueOf("ff9c5a"), 34, b.x, b.y, b.rotation(), Mathf.round((this.length / 8) + Mathf.random(2, 7)));
 		};
