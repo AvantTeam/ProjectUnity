@@ -5,15 +5,10 @@ import arc.util.io.*;
 import arc.audio.Sound;
 import arc.struct.ObjectSet;
 import mindustry.gen.*;
-import mindustry.ui.Bar;
 import mindustry.content.Fx;
 import mindustry.entities.Effect;
-import mindustry.world.Block;
 import mindustry.world.blocks.defense.turrets.PowerTurret;
-import mindustry.world.meta.BlockBars;
 import unity.world.meta.ExpType;
-
-import static arc.Core.bundle;
 
 public class ExpPowerTurret extends PowerTurret implements ExpBlockBase{
     protected final int maxLevel;
@@ -51,13 +46,8 @@ public class ExpPowerTurret extends PowerTurret implements ExpBlockBase{
     @Override
     public void setBars(){
         super.setBars();
-        expSetBars(bars);
-    }
-
-    @Override
-    public void expSetBars(BlockBars bars){
-        bars.add("level", (ExpPowerTurretBuild build) -> new Bar(() -> bundle.get("explib.level") + " " + build.getLevel(), () -> getLerpColor(defaultLevel0Color, defaultLevelMaxColor, build.getLevel() / (float) getMaxLevel()), () -> build.getLevel() / (float) getMaxLevel()));
-        bars.add("exp", (ExpPowerTurretBuild build) -> new Bar(() -> build.getLevel() < getMaxLevel() ? bundle.get("explib.exp") : bundle.get("explib.max"), () -> getLerpColor(defaultExp0Color, defaultExpMaxColor, build.getLvlf()), () -> build.getLvlf()));
+        bars.add("level", (ExpPowerTurretBuild build) -> levelBar(build));
+        bars.add("exp", (ExpPowerTurretBuild build) -> expBar(build));
     }
 
     @Override
@@ -72,7 +62,8 @@ public class ExpPowerTurret extends PowerTurret implements ExpBlockBase{
     }
 
     public class ExpPowerTurretBuild extends PowerTurretBuild implements ExpBuildBase{
-        private int exp = 0, level = 0;
+        private float exp = 0f;
+        private int level = 0;
 
         @Override
         public void updateTile(){
@@ -94,13 +85,8 @@ public class ExpPowerTurret extends PowerTurret implements ExpBlockBase{
         }
 
         @Override
-        public Block getBlock(){
-            return block;
-        }
-
-        @Override
-        public EnumMap<ExpType, ObjectSet<ExpField>> getBlockExpFields(){
-            return expFields;
+        public ExpPowerTurret getExpBlock(){
+            return (ExpPowerTurret) block;
         }
 
         @Override
@@ -110,12 +96,12 @@ public class ExpPowerTurret extends PowerTurret implements ExpBlockBase{
         }
 
         @Override
-        public int totalExp(){
+        public float totalExp(){
             return exp;
         }
 
         @Override
-        public void setExp(int a){
+        public void setExp(float a){
             exp = a;
         }
 

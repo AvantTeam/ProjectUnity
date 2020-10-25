@@ -5,14 +5,10 @@ import arc.util.io.*;
 import arc.audio.Sound;
 import arc.struct.ObjectSet;
 import mindustry.gen.*;
-import mindustry.ui.Bar;
 import mindustry.content.Fx;
 import mindustry.entities.Effect;
-import mindustry.world.Block;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
 import unity.world.meta.ExpType;
-
-import static arc.Core.bundle;
 
 public class ExpItemTurret extends ItemTurret implements ExpBlockBase{
     protected final int maxLevel;
@@ -50,13 +46,8 @@ public class ExpItemTurret extends ItemTurret implements ExpBlockBase{
     @Override
     public void setBars(){
         super.setBars();
-        expSetBars(bars);
-    }
-
-    @Override
-    public void expSetBars(mindustry.world.meta.BlockBars bars){
-        bars.add("level", (ExpItemTurretBuild build) -> new Bar(() -> bundle.get("explib.level") + " " + build.getLevel(), () -> getLerpColor(defaultLevel0Color, defaultLevelMaxColor, build.getLevel() / (float) getMaxLevel()), () -> build.getLevel() / (float) getMaxLevel()));
-        bars.add("exp", (ExpItemTurretBuild build) -> new Bar(() -> build.getLevel() < getMaxLevel() ? bundle.get("explib.exp") : bundle.get("explib.max"), () -> getLerpColor(defaultExp0Color, defaultExpMaxColor, build.getLvlf()), () -> build.getLvlf()));
+        bars.add("level", (ExpItemTurretBuild build) -> levelBar(build));
+        bars.add("exp", (ExpItemTurretBuild build) -> expBar(build));
     }
 
     @Override
@@ -71,7 +62,8 @@ public class ExpItemTurret extends ItemTurret implements ExpBlockBase{
     }
 
     public class ExpItemTurretBuild extends ItemTurretBuild implements ExpBuildBase{
-        private int exp = 0, level = 0;
+        private float exp = 0f;
+        private int level = 0;
 
         @Override
         public void updateTile(){
@@ -93,13 +85,8 @@ public class ExpItemTurret extends ItemTurret implements ExpBlockBase{
         }
 
         @Override
-        public Block getBlock(){
-            return block;
-        }
-
-        @Override
-        public EnumMap<ExpType, ObjectSet<ExpField>> getBlockExpFields(){
-            return expFields;
+        public ExpItemTurret getExpBlock(){
+            return (ExpItemTurret) block;
         }
 
         @Override
@@ -109,12 +96,12 @@ public class ExpItemTurret extends ItemTurret implements ExpBlockBase{
         }
 
         @Override
-        public int totalExp(){
+        public float totalExp(){
             return exp;
         }
 
         @Override
-        public void setExp(int a){
+        public void setExp(float a){
             exp = a;
         }
 

@@ -252,7 +252,7 @@ public class UnityBlocks implements ContentList{
 					if(entity.consValid() && Mathf.chanceDelta(0.76f)) UnityFx.craftingEffect.at(entity.getX(), entity.getY());
 				}
 			};
-			consumes.items(with(Items.lead, 4, Items.silicon, 3, Items.phaseFabric, 1, UnityItems.umbrium, 2));
+			consumes.items(with(Items.lead, 2, Items.silicon, 3, Items.blastCompound, 1, Items.phaseFabric, 1, UnityItems.umbrium, 2));
 			consumes.power(3.2f);
 		}};
 		
