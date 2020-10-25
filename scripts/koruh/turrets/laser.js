@@ -96,6 +96,13 @@ const laserTurret = lib.extend(PowerTurret, PowerTurret.PowerTurretBuild, "laser
             start: false,
             intensity: 5
         }
+    ],
+    //testing purposes: it will get removed when it is time. Please don't touch it for now.
+    upgrades: [
+        {
+            block: Blocks.lancer,
+            min: 1
+        }
     ]
 }, {});
 laserTurret.shootType = laser;

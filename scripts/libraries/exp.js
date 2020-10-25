@@ -15,8 +15,50 @@ const clone = obj => {
     };
     return copy;
 }
+
+function arrayEqual(a, b){
+  if (a === b) return true;
+  if (a == null || b == null) return false;
+  if (a.length !== b.length) return false;
+
+  for (var i = 0; i < a.length; ++i) {
+    if (a[i] !== b[i]) return false;
+  }
+  return true;
+}
+
+function drawSpark(x, y, w, h, r){
+    Drawf.tri(x, y, w, h, r);
+    Drawf.tri(x, y, w, h, r+180);
+    Drawf.tri(x, y, w, h, r+90);
+    Drawf.tri(x, y, w, h, r+270);
+}
+
+const sparkleFx = new Effect(15, e => {
+    Draw.color(Color.white, e.color, e.fin());
+    var i=1;
+    Angles.randLenVectors(e.id, e.id % 3 + 1, e.rotation * 4 + 4, (x,y) => {
+      drawSpark(e.x + x, e.y + y, e.fout() * 4, 0.5 + e.fout() * 2.2, e.id * i);
+      i++;
+    });
+});
+
+const upgradeBlockFx = new Effect(90, e => {
+    Draw.color(Color.white, Color.green, e.fin());
+    Lines.stroke(e.fout()*6*e.rotation);
+    Lines.square(e.x, e.y, e.fin()*4*e.rotation+2*e.rotation, 0);
+
+    var i = 1;
+    Angles.randLenVectors(e.id, e.id % 3 + 7, e.rotation * 4 + 4 + 8*e.finpow(), (x,y) => {
+      drawSpark(e.x + x, e.y + y, e.fout() * 5, e.fout() * 3.5, e.id * i);
+      i++;
+    });
+});
+
 module.exports = {
-    extend(type, build, name, obj, objb) {
+    upgradeFx: upgradeBlockFx,
+    sparkleFx: sparkleFx,
+    extend(type, build, name, obj, objb){
         if(obj == undefined) obj = {};
         if(objb == undefined) objb = {};
         obj = Object.assign({
@@ -27,10 +69,18 @@ module.exports = {
             exp0Color: Color.valueOf("84ff00"),
             expMaxColor: Color.valueOf("90ff00"),
             expFields: [],
+            //type, field, start, intensity
             hasLevelEffect: true,
             levelUpFx: Fx.upgradeCore,
             levelUpSound: Sounds.message,
-            //type, field, start, intensity
+            upgrades: [],
+            //block, min, max
+            upgradeColor: Color.green,
+            upgradeFx: upgradeBlockFx,
+            upgradeSparkleFx: sparkleFx,
+            upgradeSound: Sounds.place,
+            sparkleChance: 0.08,
+
             //below are legacy arrays
             linearInc: [],
             linearIncStart: [],
@@ -50,7 +100,13 @@ module.exports = {
             hasLevelFunction: false,
             hasCustomUpdate: false,
             forStats: new ObjectMap(),
-            caches: []
+            caches: [],
+            enableUpgrade: false,
+            condConfig: false,
+            upBlock: [],
+            upMinLevel: [],
+            upMaxLevel: [],
+            upAuto: []
             //end
         }, obj, {
             //start
@@ -185,6 +241,30 @@ module.exports = {
         expblock.hasCustomUpdate = (typeof objb["customUpdate"] === "function");
         expblock.hasCustomRW = (typeof objb["customRead"] === "function");
         expblock.hasCache = (expblock.caches.length > 0);
+
+        expblock.enableUpgrade = (expblock.upgrades.length > 0);
+        /*for(var i = 0; i < expblock.upgrades.length; i++) {
+            var tobj = expblock.upgrades[i];
+            expblock.upBlock.push((tobj.block == undefined) ? Blocks.router : tobj.block);
+            expblock.upMinLevel.push((tobj.min == undefined) ? expblock.maxLevel : tobj.min);
+            expblock.upMaxLevel.push((tobj.max == undefined) ? expblock.maxLevel + 1 : tobj.max);
+            expblock.upAuto.push((tobj.autoUpgrade == undefined) ? false : tobj.autoUpgrade);
+        };*/
+        expblock.upPerLevel = [];
+        for(var i=0; i<expblock.maxLevel; i++){
+            expblock.upPerLevel.push([]);
+            for(var j=0; j<expblock.upgrades.length; j++){
+                if(expblock.upgrades[j].min == undefined) expblock.upgrades[j].min = expblock.maxLevel;
+                if(expblock.upgrades[j].min <= i && (expblock.upgrades[j].max == undefined || expblock.upgrades[j].max >= i)) expblock.upPerLevel[i].push(expblock.upgrades[j]);
+            }
+        }
+
+        if(expblock.enableUpgrade){
+            expblock.condConfig = expblock.configurable;
+            expblock.configurable = true;
+            //expblock.hasLevelEffect = true;
+        }
+
         objb = Object.assign(objb, {
             totalExp() {
                 return this._exp;
@@ -207,10 +287,14 @@ module.exports = {
                 if(this._exp > expblock.maxExp) this._exp = expblock.maxExp;
                 this._changedVal = true;
                 if(!expblock.hasLevelEffect) return;
-                if(expblock.getLevel(this._exp - a) != expblock.getLevel(this._exp)) {
+                var clvl = expblock.getLevel(this._exp);
+                if(expblock.getLevel(this._exp - a) != clvl) {
+                    if(expblock.enableUpgrade){
+                        if(!arrayEqual(this.currentUpgrades(clvl), this.currentUpgrades(clvl - 1))) this._checked = false;
+                    }
                     expblock.levelUpFx.at(this.x, this.y, expblock.size);
                     expblock.levelUpSound.at(this.x, this.y);
-                    if(expblock.hasLevelFunction) this.levelUp(expblock.getLevel(this._exp));
+                    if(expblock.hasLevelFunction) this.levelUp(clvl);
                 };
             },
 
@@ -226,6 +310,7 @@ module.exports = {
             updateTile() {
                 expblock.setEXPStats(this);
                 if(this._changedVal && expblock.hasCache) this.updateCaches();
+                if(expblock.enableUpgrade && !this._checked && Mathf.chance(expblock.sparkleChance)) this.sparkle();
                 if(expblock.hasCustomUpdate) this.customUpdate();
                 else this.super$updateTile();
             },
@@ -242,13 +327,100 @@ module.exports = {
                 this.super$write(stream);
                 stream.i(this._exp);
                 if(expblock.hasCustomRW) this.customWrite(stream);
+            },
+
+            currentUpgrades(lvl){
+                return expblock.upPerLevel[lvl];
+            },
+            sparkle(){
+                expblock.upgradeSparkleFx.at(this.x, this.y, expblock.size, expblock.upgradeColor);
+            },
+            upgradeBlock(block, expected){
+                if(expected != this.totalLevel()){
+                    //invalid
+                    Vars.control.input.frag.config.hideConfig();
+                    return;
+                }
+                var tile = this.tile;
+                if(block.size > expblock.size) tile = this.getBestTile(block.size);
+                if(tile == null) return;
+                Vars.control.input.frag.config.hideConfig();
+                //TODO: sync
+                expblock.upgradeFx.at(this.x, this.y, block.size, expblock.upgradeColor);
+                expblock.upgradeSound.at(this.x, this.y);
+                tile.setBlock(block, this.team, this.rotation);
+            },
+            getBestTile(size){
+                //TODO:
+                return this.tile;
+            },
+
+            makeUpgradeButton(t, iblock, lvl){
+                t.button(Icon.upgrade, Styles.cleari, () => {
+                    this.upgradeBlock(iblock, lvl);
+                }).size(40);
+            },
+            upgradeTable(table, lvl){
+                var arr = this.currentUpgrades(lvl);
+                if(arr.length == 0) return;
+                for(var i=0; i<arr.length; i++){
+                    var block = arr[i].block;
+                    table.table(cons(t => {
+                        t.background(Tex.button);
+                        t.image(block.icon(Cicon.medium)).size(38).padRight(2);
+                        t.table(cons(info => {
+                            info.left();
+                            info.add("[green]"+block.localizedName+"[]\n"+Core.bundle.get("explib.level.short")+" ["+((arr[i].min == lvl)?"green":"accent")+"]"+lvl+"[]/"+arr[i].min);
+                        })).width(80);
+                        t.button(Icon.infoCircle, Styles.cleari, () => {
+                            Vars.ui.content.show(block);
+                        }).size(40);
+                        if(arr[i].min == lvl) Styles.cleari.imageUpColor = expblock.upgradeColor;
+                        this.makeUpgradeButton(t, arr[i].block, lvl);
+                        if(arr[i].min == lvl) Styles.cleari.imageUpColor = Color.white;
+                    })).width(220).height(50);
+
+                    if(i < arr.length - 1) table.row();
+                }
+            },
+            buildConfiguration(table){
+                if(!expblock.enableUpgrade){
+                    this.super$buildConfiguration(table);
+                    return;
+                }
+                var lvl = this.totalLevel();
+                this._checked = true;
+                if(!expblock.condConfig) this.upgradeTable(table, lvl);
+                else{
+                    if(this.currentUpgrades(lvl).length == 0){
+                        this.super$buildConfiguration(table);
+                        return;
+                    }
+                    table.table(cons(table2 => {
+                        this.upgradeTable(table2, lvl);
+                    }));
+                    table.row();
+                    table.image().pad(2).width(130).height(4).color(expblock.upgradeColor);
+                    table.row();
+                    table.table(cons(table3 => {
+                        this.super$buildConfiguration(table3);
+                    }));
+                }
+            },
+            configTapped(){
+                if(!this.super$configTapped()) return false;
+                if(!expblock.enableUpgrade) return true;
+                if(expblock.condConfig) return true;
+                if(expblock.upPerLevel[this.totalLevel()].length > 0) return true;
+                return false;
             }
         });
         //Extend Building
         expblock.buildType = ent => {
             ent = extendContent(build, expblock, clone(objb));
             ent._exp = 0;
-            ent._changedVal = true;
+            ent._changedVal = false;
+            ent._checked = true;
             return ent;
         };
         return expblock;
