@@ -342,17 +342,46 @@ module.exports = {
                     return;
                 }
                 var tile = this.tile;
-                if(block.size > expblock.size) tile = this.getBestTile(block.size);
+                if(block.size > expblock.size) tile = this.getBestTile(tile, block.size, expblock.size);
                 if(tile == null) return;
                 Vars.control.input.frag.config.hideConfig();
                 //TODO: sync
-                expblock.upgradeFx.at(this.x, this.y, block.size, expblock.upgradeColor);
-                expblock.upgradeSound.at(this.x, this.y);
+
+                if(!Vars.headless) expblock.upgradeSound.at(this.x, this.y);
                 tile.setBlock(block, this.team, this.rotation);
+                if(!Vars.headless) expblock.upgradeFx.at(tile.drawx(), tile.drawy(), block.size, expblock.upgradeColor);
             },
-            getBestTile(size){
+            getBestTile(tile, size, current){
                 //TODO:
-                return this.tile;
+                var bound = size - current + 1;
+                var offset = Mathf.floorPositive(bound / 2);
+                if(bound % 2 == 0 && current % 2 == 0) offset--;
+                offset *= -1;
+                var minScore = bound * bound * 2;
+                var ctile = null;
+                for(var i=offset; i<offset + bound; i++){
+                    for(var j=offset; j<offset + bound; j++){
+                        if(Math.max(Math.abs(i), Math.abs(j)) < minScore && this.notSolid(size, tile, i, j)){
+                            minScore = Math.max(Math.abs(i), Math.abs(j));
+                            ctile = tile.nearby(i, j);
+                        }
+                    }
+                }
+                return ctile;
+            },
+            notSolid(size, tile, dx, dy){
+                var ttile = tile.nearby(dx, dy);
+                var off = Mathf.floorPositive((size - 1) / 2) * -1;
+                for(var i= off; i<size + off; i++){
+                    for(var j= off; j<size + off; j++){
+                        var check = ttile.nearby(i, j);
+                        if(check.solid()){
+                            if(check.build != null && check.build.tile == tile) continue;
+                            else return false;
+                        }
+                    }
+                }
+                return true;
             },
 
             makeUpgradeButton(t, iblock, lvl){
