@@ -5,25 +5,25 @@ const pow6In = new Interp.PowIn(6);
 const calamityLaser = extendContent(ContinuousLaserBulletType, 580, {
 	update(b){
 		this.super$update(b);
-		
+		var realLength = Damage.findLaserLength(b, this.length);
 		if(Mathf.chanceDelta(0.5)){
 			Lightning.create(b.team, Color.valueOf("ff9c5a"), 34, b.x, b.y, b.rotation(), Mathf.round((this.length / 8) + Mathf.random(2, 7)));
 		};
-		
+
 		for(var i = 0; i < 3; i++){
 			if(Mathf.chanceDelta(0.8)){
 				var lLength = Mathf.random(5, 12);
-				Tmp.v2.trns(b.rotation(), Mathf.random(0, this.length - (lLength * 8)));
+				Tmp.v2.trns(b.rotation(), Mathf.random(0, Math.max(realLength - lLength * 8, 4)));
 				Lightning.create(b.team, Color.valueOf("ff9c5a"), 32, b.x + Tmp.v2.x, b.y + Tmp.v2.y, b.rotation(), Mathf.round(lLength));
 			};
 		};
-		
+
 		if(Mathf.chance(0.6)){
-			Tmp.v2.trns(b.rotation(), Mathf.random(2.9, this.length));
+			Tmp.v2.trns(b.rotation(), Mathf.random(2.9, realLength));
 			Damage.createIncend(b.x + Tmp.v2.x, b.y + Tmp.v2.y, 9, 2);
 		}
 	},
-	
+
 	draw(b){
 		var realLength = Damage.findLaserLength(b, this.length);
 		var baseLen = realLength * b.fout();
@@ -51,7 +51,7 @@ calamityLaser.strokes = [2 * 1.7, 1.5 * 1.7, 1 * 1.7, 0.3 * 1.7];
 const calamity = extendContent(LaserTurret, "calamity", {
 	load(){
 		this.super$load();
-		
+
 		this.baseRegion = Core.atlas.find("unity-block-" + this.size);
 	}
 });
@@ -65,7 +65,7 @@ calamity.heatDrawer = tile => {
 	var a = Interp.pow2Out.apply(tile.heat);
 	tmpCol.set(r, g, b, a);
 	Draw.color(tmpCol);
-	
+
 	Draw.blend(Blending.additive);
 	Draw.rect(calamity.heatRegion, tile.x + calamity.tr2.x, tile.y + calamity.tr2.y, tile.rotation - 90);
 	Draw.blend();

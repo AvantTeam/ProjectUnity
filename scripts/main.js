@@ -119,8 +119,7 @@ const script = [
 				name: "units",
 				childs: [
 					"whirlwind",
-					"jetstream",
-                    "hovos"
+					"jetstream"
 				]
 			}
 		]
