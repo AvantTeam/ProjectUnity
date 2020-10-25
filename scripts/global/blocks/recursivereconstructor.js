@@ -65,14 +65,14 @@ recrect.buildType = () => {
 		},
 
 		write(write){
-			this.super$write(write);
-			write.s((this.tier == null ? 6 : this.tier));
-		},
+            this.super$write(write);
+            write.f(this.tier);
+        },
 
-		read(read, revision){
-			this.super$read(read, revision);
-			this.tier = ((read.s() == null || read.s() == -1) ? 6 : read.i());
-		}
+        read(read, revision){
+            this.super$read(read, revision);
+            this.tier = read.f();
+        }
 
 	})
 }
