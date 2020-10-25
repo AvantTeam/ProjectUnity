@@ -71,7 +71,8 @@ const script = [
 
                     "walls",
                     "ores",
-                    "multi-test-younggam"
+                    "multi-test-younggam",
+                    "infusor"
                 ]
             },
 
