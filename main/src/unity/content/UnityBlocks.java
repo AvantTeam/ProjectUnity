@@ -32,7 +32,7 @@ public class UnityBlocks implements ContentList{
 	lightReflector1, lightOmnimirror, lightDivisor, lightDivisor1, lightFilter, lightInvertedFilter, lightPanel, lightInfluencer,
 	
 	//dark
-    darkAlloyForge, apparition, catastrophe, calamity,
+    darkAlloyForge, apparition, fallout, catastrophe, calamity,
 	
 	//koruh
 	laserTurret, inferno;
@@ -281,7 +281,38 @@ public class UnityBlocks implements ContentList{
 			}
 		};
 		
-        catastrophe = new LaserTurret("catastrophe"){
+        fallout = new LaserTurret("fallout"){
+            @Override
+            public void load(){
+                super.load();
+                baseRegion = atlas.find("unity-block-" + size);
+            }
+
+            {
+                size = 5;
+                health = 3975;
+                range = 215f;
+                reloadTime = 110f;
+                coolantMultiplier = 0.8f;
+                shootCone = 40f;
+                shootDuration = 230f;
+                powerUse = 19f;
+                shootShake = 3f;
+                firingMoveFract = 0.2f;
+                shootEffect = Fx.shootBigSmoke2;
+                recoilAmount = 4f;
+                shootSound = Sounds.laserbig;
+                heatColor = Color.valueOf("e04300");
+                rotateSpeed = 3.5f;
+                activeSound = Sounds.beam;
+                activeSoundVolume = 2.2f;
+                requirements(Category.turret, with(Items.copper, 450, Items.lead, 350, Items.graphite, 390, Items.silicon, 360, Items.titanium, 250, UnityItems.umbrium, 370, Items.surgeAlloy, 360));
+                shootType = UnityBullets.falloutLaser;
+                consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.58f)).update(false);
+            }
+        };
+		
+        catastrophe = new BigLaserTurret("catastrophe"){
             @Override
             public void load(){
                 super.load();

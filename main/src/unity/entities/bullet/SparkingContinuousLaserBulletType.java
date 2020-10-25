@@ -3,6 +3,7 @@ package unity.entities.bullet;
 import arc.graphics.Color;
 import arc.math.Mathf;
 import arc.util.Tmp;
+import mindustry.gen.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.ContinuousLaserBulletType;
 
@@ -21,18 +22,19 @@ public class SparkingContinuousLaserBulletType extends ContinuousLaserBulletType
     }
 
     @Override
-    public void update(mindustry.gen.Bullet b){
+    public void update(Bullet b){
         super.update(b);
+        float realLength = Damage.findLaserLength(b, length);
         if(Mathf.chanceDelta(fromBlockChance)) Lightning.create(b.team, lightningColor, fromBlockDamage, b.x, b.y, b.rotation(), Mathf.round(length / (float) 8) + fromBlockLen + Mathf.random(fromBlockLenRand));
         for(int i = 0; i < fromLaserAmount; i++){
             if(Mathf.chanceDelta(fromLaserChance)){
                 int lLength = fromLaserLen + Mathf.random(fromLaserLenRand);
-                Tmp.v1.trns(b.rotation(), Mathf.random(0, length - lLength * 8f));
+                Tmp.v1.trns(b.rotation(), Mathf.random(0, Math.max(realLength - lLength * 8f, 4f)));
                 Lightning.create(b.team, lightColor, fromLaserDamage, b.x + Tmp.v1.x, b.y + Tmp.v1.y, b.rotation(), lLength);
             }
         }
         if(Mathf.chance(incendChance)){
-            Tmp.v1.trns(b.rotation(), Mathf.random(incendStart, length));
+            Tmp.v1.trns(b.rotation(), Mathf.random(incendStart, realLength));
             Damage.createIncend(b.x + Tmp.v1.x, b.y + Tmp.v2.y, incendSpread, incendAmount);
         }
     }

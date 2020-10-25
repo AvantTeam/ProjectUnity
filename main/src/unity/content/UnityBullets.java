@@ -13,7 +13,7 @@ import unity.entities.bullet.*;
 import unity.world.blocks.experience.*;
 
 public class UnityBullets implements ContentList{
-    public static BulletType laser, coalBlaze, pyraBlaze, catastropheLaser, calamityLaser,
+    public static BulletType laser, coalBlaze, pyraBlaze, falloutLaser, catastropheLaser, calamityLaser,
     //only enhanced
     standardDenseLarge, standardHomingLarge, standardIncendiaryLarge, standardThoriumLarge;
 
@@ -93,6 +93,18 @@ public class UnityBullets implements ContentList{
             public void hit(Bullet b, float x, float y){
                 super.hit(b, x, y);
                 b.owner.<ExpItemTurret.ExpItemTurretBuild>self().incExp(0.5f);
+            }
+        };
+
+        falloutLaser = new SparkingContinuousLaserBulletType(95f){
+            {
+                length = 230f;
+                fromBlockChance = 0.12f;
+                fromBlockDamage=23f;
+                fromLaserAmount = 0;
+                incendChance = 0f;
+                fromBlockLen=2;
+                fromBlockLenRand=5;
             }
         };
 
