@@ -24,7 +24,7 @@ function targetShield(t, b, radius){
 	var shield = false;
 
 	Groups.bullet.intersect(t.x - radius, t.y - radius, radius * 2, radius * 2, e => {
-		if(e != null && e.team == b.team && e.data instanceof Array && e.data[2] == "shield"){
+		if(e != null && e.team == b.team && Array.isArray(e.data) && e.data.length == 3 && e.data[2] == "shield"){
 			shield = true;
 		}
 	});
