@@ -32,7 +32,7 @@ public class UnityBlocks implements ContentList{
 	lightReflector1, lightOmnimirror, lightDivisor, lightDivisor1, lightFilter, lightInvertedFilter, lightPanel, lightInfluencer,
 	
 	//dark
-    darkAlloyForge, apparition, fallout, catastrophe, calamity,
+    darkAlloyForge, apparition, ghost, banshee, fallout, catastrophe, calamity,
 	
 	//koruh
 	laserTurret, inferno;
@@ -281,6 +281,60 @@ public class UnityBlocks implements ContentList{
 			}
 		};
 		
+        ghost = new BarrelsItemTurret("ghost"){
+            @Override
+            public void load(){
+                super.load();
+                baseRegion = atlas.find("unity-block-" + size);
+            }
+
+            {
+                size = 8;
+                health = 9750;
+                range = 290f;
+                reloadTime = 9f;
+                coolantMultiplier = 0.5f;
+                restitution = 0.08f;
+                inaccuracy = 3f;
+                shots = 2;
+                alternate = true;
+                recoilAmount = 5.5f;
+                rotateSpeed = 3.5f;
+                spread = 21f;
+                addBarrel(8f, 18.75f, 6f);
+                ammo(Items.graphite, UnityBullets.standardDenseHeavy, Items.silicon, UnityBullets.standardHomingHeavy, Items.pyratite, UnityBullets.standardIncendiaryHeavy, Items.thorium, UnityBullets.standardThoriumHeavy);
+                requirements(Category.turret, with(Items.copper, 1150, Items.graphite, 1420, Items.silicon, 960, Items.plastanium, 800, Items.thorium, 1230, UnityItems.darkAlloy, 380));
+            }
+        };
+
+        banshee = new unity.world.blocks.BarrelsItemTurret("banshee"){
+            @Override
+            public void load(){
+                super.load();
+                baseRegion = atlas.find("unity-block-" + size);
+            }
+
+            {
+                size = 12;
+                health = 22000;
+                range = 370f;
+                reloadTime = 12f;
+                coolantMultiplier = 0.5f;
+                restitution = 0.08f;
+                inaccuracy = 3f;
+                shots = 2;
+                alternate = true;
+                recoilAmount = 5.5f;
+                rotateSpeed = 3.5f;
+                spread = 37f;
+                focus = true;
+                addBarrel(23.5f, 36.5f, 9f);
+                addBarrel(8.5f, 24.5f, 6f);
+                ammo(Items.graphite, UnityBullets.standardDenseMassive, Items.silicon, UnityBullets.standardHomingMassive, Items.pyratite, UnityBullets.standardIncendiaryMassive, Items.thorium, UnityBullets.standardThoriumMassive);
+                requirements(Category.turret, with(Items.copper, 2800, Items.graphite, 2980, Items.silicon, 2300, Items.titanium, 1900, Items.phaseFabric, 1760, Items.thorium, 1780, UnityItems.darkAlloy, 1280));
+            }
+        };
+
         fallout = new LaserTurret("fallout"){
             @Override
             public void load(){
