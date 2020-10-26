@@ -1,55 +1,4 @@
-const chargeTriangles = new Effect(96, e => {
-	Draw.color(Pal.surge);
-	
-	Angles.randLenVectors(e.id, 5, (1 - e.finpow()) * 24, e.rotation, 360, new Floatc2({get(x, y){
-		Drawf.tri(e.x + x, e.y + y, e.fout() * 10, e.fout() * 11, e.rotation);
-		Drawf.tri(e.x + x, e.y + y, e.fout() * 8, e.fout() * 9, e.rotation);
-	}}));
-});
-
-const chargeBeginTriangles = new Effect(250, e => {
-	Draw.color(Pal.surge);
-	
-	Drawf.tri(e.x, e.y, e.fin() * 16, e.fin() * 20, e.rotation);
-});
-
-const shootTriangle = new Effect(36, e => {
-	Draw.color(Pal.surge, Color.white, e.fin());
-	
-	Angles.randLenVectors(e.id, 8, e.fin() * 20 + 1, e.rotation, 40, new Floatc2({get(x, y){
-		Drawf.tri(e.x + x, e.y + y, e.fout() * 14, e.fout() * 15, e.rotation);
-		Drawf.tri(e.x + x, e.y + y, e.fout() * 8, e.fout() * 9, e.rotation);
-	}}));
-	
-	Angles.randLenVectors(e.id, 4, e.fin() * 20 + 1, e.rotation, 40, new Floatc2({get(x, y){
-		Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fslope() * 18 + 3);
-	}}));
-});
-
-const unecessaryCircle = new Effect(30, e => {
-	Draw.color(Pal.surge);
-	
-	Lines.stroke(e.fout() * 2.8);
-	Lines.circle(e.x, e.y, e.fout() * 50);
-});
-
-const fragAppear = new Effect(12, e => {
-	Draw.z(Layer.bullet - 0.01);
-	
-	Draw.color(Color.white);
-	Drawf.tri(e.x, e.y, e.fin() * 12, e.fin() * 13, e.rotation);
-	
-	Draw.z();
-});
-
-const fragDisappear = new Effect(12, e => {
-	Draw.z(Layer.bullet - 0.01);
-	
-	Draw.color(Pal.surge, Color.white, e.fin());
-	Drawf.tri(e.x, e.y, e.fout() * 10, e.fout() * 11, e.rotation);
-	
-	Draw.z();
-});
+const effects = this.global.unity.effects;
 
 const plasmaFrag = extend(BulletType, {
 	init(b){
@@ -87,9 +36,9 @@ plasmaFrag.damage = 90;
 plasmaFrag.collides = false;
 plasmaFrag.colors = [Pal.surge, Color.valueOf("f2e87b"), Color.valueOf("d89e6b"), Color.white];
 plasmaFrag.hitColor = plasmaFrag.colors[1];
-plasmaFrag.shootEffect = fragAppear;
-plasmaFrag.hitEffect = fragDisappear;
-plasmaFrag.despawnEffect = fragDisappear;
+plasmaFrag.shootEffect = effects.imberPlasmaFragAppear;
+plasmaFrag.hitEffect = effects.imberPlasmaFragDisappear;
+plasmaFrag.despawnEffect = effects.imberPlasmaFragDisappear;
 
 const plasma = extend(BulletType, {
 	init(b){
@@ -118,7 +67,7 @@ const plasma = extend(BulletType, {
 	hit(b, x, y){
 		this.super$hit(b, b.x, b.y);
 
-		unecessaryCircle.at(b.x, b.y, b.rotation(), this.hitColor);
+		effects.imberTriangleHit.at(b.x, b.y, b.rotation(), this.hitColor);
 		
 		/*for(var i = 0; i < 10; i++){
 			var sr = 8 //scatter range
@@ -143,7 +92,7 @@ const plasmaTurret = extendContent(ChargeTurret, "plasma", {
 });
 plasmaTurret.shootType = plasma
 plasmaTurret.shootSound = Sounds.shotgun;
-plasmaTurret.shootEffect = shootTriangle;
-plasmaTurret.chargeBeginEffect = chargeBeginTriangles;
-plasmaTurret.chargeEffect = chargeTriangles;
+plasmaTurret.shootEffect = effects.imberShootTriangle;
+plasmaTurret.chargeBeginEffect = effects.imberChargeBeginTriangles;
+plasmaTurret.chargeEffect = effects.imberChargeTriangles;
 plasmaTurret.consumes.add(new ConsumeLiquidFilter(liquid => liquid.temperature <= 0.5 && liquid.flammability <= 0.1, 0.52)).boost();
