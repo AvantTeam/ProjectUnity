@@ -1,5 +1,6 @@
 const sEffect = this.global.unity.status;
 const fLib = this.global.unity.funclib;
+const effects = this.global.unity.effects;
 
 const offsetA = 0.15;
 
@@ -32,22 +33,6 @@ const falseLightning = new Effect(10, 500, e => {
 		Lines.line(tV.x, tV.y, tV2.x, tV2.y, false);
 		Fill.circle(tV.x, tV.y, Lines.getStroke() / 2);
 	};
-});
-
-const coloredHitSmall = new Effect(14, e => {
-	Draw.color(Color.white, e.color, e.fin());
-	
-	e.scaled(7, s => {
-		Lines.stroke(0.5 + s.fout());
-		Lines.circle(e.x, e.y, s.fin() * 5);
-	});
-	
-	Lines.stroke(0.5 + e.fout());
-	
-	Angles.randLenVectors(e.id, 5, e.fin() * 15, (x, y) => {
-		var ang = Mathf.angle(x, y);
-		Lines.lineAngle(e.x + x, e.y + y, ang, (e.fout() * 3) + 1);
-	});
 });
 
 //TODO move this to an effect library
@@ -205,7 +190,7 @@ jetstreamLaser.lifetime = 15 * 60;
 jetstreamLaser.length = 150;
 jetstreamLaser.width = 5;
 jetstreamLaser.incendChance = 0;
-jetstreamLaser.hitEffect = coloredHitSmall;
+jetstreamLaser.hitEffect = effects.coloredHitSmall;
 jetstreamLaser.lightColor = Color.valueOf("f5303690");
 jetstreamLaser.hitColor = Color.valueOf("f5303690");
 jetstreamLaser.colors = [Color.valueOf("f5303690"), Color.valueOf("ff786e"), Color.white];

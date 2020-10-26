@@ -43,10 +43,17 @@ const script = [
                     "lightConsumer", "lightCombiner", "lightRouter"
                 ]
             },
+			
+			{
+				name: "units",
+				childs: [
+					"ai"
+				]
+			},
 
+			"effects",
             "wormlib",
 			"unitlib",
-            "hoverbase",
             "copterbase",
             "loader",
             "chainlaser",
@@ -118,6 +125,8 @@ const script = [
 			{
 				name: "units",
 				childs: [
+					"hovos",
+				
 					"whirlwind",
 					"jetstream"
 				]
