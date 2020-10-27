@@ -142,7 +142,7 @@ const laserTurret = lib.extend(PowerTurret, PowerTurret.PowerTurretBuild, "laser
             min: 1
         },
         {
-            block: Vars.content.getByName(ContentType.block, "unity-charge-laser-turret"),
+            block: "unity-charge-laser-turret",
             min: 10
         }
     ]
