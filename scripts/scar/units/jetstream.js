@@ -221,7 +221,7 @@ jetstreamLaserWeap.shootCone = 15;
 
 const jetstream = extendContent(UnitType, "jetstream", {});
 jetstream.constructor = () => extend(UnitEntity, {});
-jetstream.description = "The Only Thing I Know for Real";
+jetstream.description = "There will be Bloodshed";
 jetstream.weapons.add(jetstreamLaserWeap);
 jetstream.weapons.add(jetstreamMissileWeap);
 jetstream.health = 670;

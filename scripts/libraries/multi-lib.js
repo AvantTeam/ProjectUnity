@@ -628,7 +628,7 @@ function MultiCrafterBlock(){
             if(outputPower > 0) this.stats.add(Stat.basePowerGeneration, new NumberValue(this.recs[i].output.power * 60, StatUnit.powerSecond));
             this.stats.add(Stat.productionTime, new NumberValue(rec.craftTime / 60, StatUnit.seconds));
             /*table.table(this.infoStyle.up, part => {
-                part.add("[accent]" + BlockStat.input.localized()).expandX().left().row();
+                part.add("[accent]" + Stat.input.localized()).expandX().left().row();
                 part.table(cons(row => {
                     for(var l = 0, len = inputItems.length; l < len; l++) row.add(new ItemDisplay(inputItems[l].item, inputItems[l].amount, true)).padRight(5);
                 })).left().row();
@@ -637,11 +637,11 @@ function MultiCrafterBlock(){
                 })).left().row();
                 if(inputPower > 0) {
                     part.table(cons(row => {
-                        row.add("[lightgray]" + BlockStat.powerUse.localized() + ":[]").padRight(4);
+                        row.add("[lightgray]" + Stat.powerUse.localized() + ":[]").padRight(4);
                         (new NumberValue(this.recs[i].input.power * 60, StatUnit.powerSecond)).display(row);
                     })).left().row();
                 }
-                part.add("[accent]" + BlockStat.output.localized()).left().row();
+                part.add("[accent]" + Stat.output.localized()).left().row();
                 part.table(cons(row => {
                     for(var jj = 0, len = outputItems.length; jj < len; jj++) row.add(new ItemDisplay(outputItems[jj].item, outputItems[jj].amount, true)).padRight(5);
                 })).left().row();
@@ -650,12 +650,12 @@ function MultiCrafterBlock(){
                 })).left().row();
                 if(outputPower > 0) {
                     part.table(cons(row => {
-                        row.add("[lightgray]" + BlockStat.basePowerGeneration.localized() + ":[]").padRight(4);
+                        row.add("[lightgray]" + Stat.basePowerGeneration.localized() + ":[]").padRight(4);
                         (new NumberValue(this.recs[i].output.power * 60, StatUnit.powerSecond)).display(row);
                     })).left().row();
                 }
                 part.table(cons(row => {
-                    row.add("[lightgray]" + BlockStat.productionTime.localized() + ":[]").padRight(4);
+                    row.add("[lightgray]" + Stat.productionTime.localized() + ":[]").padRight(4);
                     (new NumberValue(rec.craftTime / 60, StatUnit.seconds)).display(row);
                 })).left().row();
                 if(typeof this["customDisplay"] === "function") this.customDisplay(part, i);

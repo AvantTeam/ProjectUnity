@@ -71,8 +71,8 @@ const shockwire = extendContent(LaserTurret, "shockwire", {
 	setStats(){
 		this.super$setStats();
 
-		this.stats.remove(BlockStat.damage);
-		this.stats.add(BlockStat.damage, this.shootType.damage, StatUnit.none);
+		this.stats.remove(Stat.damage);
+		this.stats.add(Stat.damage, this.shootType.damage, StatUnit.none);
 	}
 });
 shockwire.shootType = shockBeam;
