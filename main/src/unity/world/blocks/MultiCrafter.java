@@ -136,58 +136,59 @@ public class MultiCrafter extends GenericCrafter{
         if(powerBarI) stats.remove(Stat.powerUse);
 		stats.remove(Stat.productionTime);
 
-        Table table = new Table();
-		int recLen = recs.length;
+        stats.add(Stat.input, table -> {
+            table.row();
+            int recLen = recs.length;
+            for(int i = 0; i < recLen; i++){
+                Recipe rec = recs[i];
+                ItemStack[] inputItems = rec.input.items;
+                ItemStack[] outputItems = rec.output.items;
+                LiquidStack[] inputLiquids = rec.input.liquids;
+                LiquidStack[] outputLiquids = rec.output.liquids;
+                float inputPower = rec.input.power;
+                float outputPower = rec.output.power;
+                int ii = i;
 
-		for(int i = 0; i < recLen; i++){
-			Recipe rec = recs[i];
-			ItemStack[] inputItems = rec.input.items;
-			ItemStack[] outputItems = rec.output.items;
-			LiquidStack[] inputLiquids = rec.input.liquids;
-			LiquidStack[] outputLiquids = rec.output.liquids;
-			float inputPower = rec.input.power;
-			float outputPower = rec.output.power;
-			int ii = i;
-
-			table.table(infoStyle.up, part -> {
-				part.add("[accent]" + Stat.input.localized()).expandX().left().row();
-				part.table(row -> {
-					for(int l = 0, len = inputItems.length; l < len; l++)
-						row.add(new ItemDisplay(inputItems[l].item, inputItems[l].amount, true)).padRight(5f);
-				}).left().row();
-				part.table(row -> {
-					for(int l = 0, len = inputLiquids.length; l < len; l++)
-						row.add(new LiquidDisplay(inputLiquids[l].liquid, inputLiquids[l].amount, false));
-				}).left().row();
-				if(inputPower > 0f){
-					part.table(row -> {
-						row.add("[lightgray]" + Stat.powerUse.localized() + ":[]").padRight(4f);
-						(new NumberValue(inputPower * 60f, StatUnit.powerSecond)).display(row);
-					}).left().row();
-				}
-				part.add("[accent]" + Stat.output.localized()).left().row();
-				part.table(row -> {
-					for(int jj = 0, len = outputItems.length; jj < len; jj++)
-						row.add(new ItemDisplay(outputItems[jj].item, outputItems[jj].amount, true)).padRight(5f);
-				}).left().row();
-				part.table(row -> {
-					for(int jj = 0, len = outputLiquids.length; jj < len; jj++)
-						row.add(new LiquidDisplay(outputLiquids[jj].liquid, outputLiquids[jj].amount, false));
-				}).left().row();
-				if(outputPower > 0f){
-					part.table(row -> {
-						row.add("[lightgray]" + Stat.basePowerGeneration.localized() + ":[]").padRight(4f);
-						(new NumberValue(outputPower * 60f, StatUnit.powerSecond)).display(row);
-					}).left().row();
-				}
-				part.table(row -> {
-					row.add("[lightgray]" + Stat.productionTime.localized() + ":[]").padRight(4f);
-					(new NumberValue(rec.craftTime / 60f, StatUnit.seconds)).display(row);
-				}).left().row();
-				multiCrafterDisplay(part, ii);
-			}).color(Pal.accent).left().growX();
-			table.add().size(18f).row();
-		}
+                table.table(infoStyle.up, part -> {
+                    part.add("[accent]" + Stat.input.localized()).expandX().left().row();
+                    part.table(row -> {
+                        for(int l = 0, len = inputItems.length; l < len; l++)
+                            row.add(new ItemDisplay(inputItems[l].item, inputItems[l].amount, true)).padRight(5f);
+                    }).left().row();
+                    part.table(row -> {
+                        for(int l = 0, len = inputLiquids.length; l < len; l++)
+                            row.add(new LiquidDisplay(inputLiquids[l].liquid, inputLiquids[l].amount, false));
+                    }).left().row();
+                    if(inputPower > 0f){
+                        part.table(row -> {
+                            row.add("[lightgray]" + Stat.powerUse.localized() + ":[]").padRight(4f);
+                            (new NumberValue(inputPower * 60f, StatUnit.powerSecond)).display(row);
+                        }).left().row();
+                    }
+                    part.add("[accent]" + Stat.output.localized()).left().row();
+                    part.table(row -> {
+                        for(int jj = 0, len = outputItems.length; jj < len; jj++)
+                            row.add(new ItemDisplay(outputItems[jj].item, outputItems[jj].amount, true)).padRight(5f);
+                    }).left().row();
+                    part.table(row -> {
+                        for(int jj = 0, len = outputLiquids.length; jj < len; jj++)
+                            row.add(new LiquidDisplay(outputLiquids[jj].liquid, outputLiquids[jj].amount, false));
+                    }).left().row();
+                    if(outputPower > 0f){
+                        part.table(row -> {
+                            row.add("[lightgray]" + Stat.basePowerGeneration.localized() + ":[]").padRight(4f);
+                            (new NumberValue(outputPower * 60f, StatUnit.powerSecond)).display(row);
+                        }).left().row();
+                    }
+                    part.table(row -> {
+                        row.add("[lightgray]" + Stat.productionTime.localized() + ":[]").padRight(4f);
+                        (new NumberValue(rec.craftTime / 60f, StatUnit.seconds)).display(row);
+                    }).left().row();
+                    multiCrafterDisplay(part, ii);
+                }).color(Pal.accent).left().growX();
+                table.add().size(18f).row();
+            }
+        });
 	}
 
 	@Override
