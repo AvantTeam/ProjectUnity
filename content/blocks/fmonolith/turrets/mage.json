@@ -9,7 +9,7 @@
 	"shootSound": "spark",
 	"powerUse": 2.5,
 	"recoilAmount": 2.5,
-	"targetAir": false,
+	"targetAir": true,
 	"shootType": {
 		"type": "LightningBulletType",
 		"lightningLength": 20,

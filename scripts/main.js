@@ -235,7 +235,8 @@ const script = [
             {
                 name: "turrets",
                 childs: [
-                    "mage", "oracle"
+                    "mage", "oracle",
+                    "spectrum"
                 ]
             },
 
