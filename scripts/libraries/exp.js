@@ -371,9 +371,10 @@ module.exports = {
                     return;
                 }*/
                 var tile = this.tile;
+                var powarr = (this.power == null) ? [] : this.power.links.toArray();
                 if(block.size > expblock.size) tile = this.getBestTile(tile, block.size, expblock.size);
                 if(tile == null) return;
-                var powarr = (tile.build.power == null) ? [] : tile.build.power.links.toArray();
+
                 //print(powarr.join(", "));
                 //Vars.control.input.frag.config.hideConfig();
 
