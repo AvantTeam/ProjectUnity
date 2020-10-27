@@ -190,6 +190,7 @@ const trueDevourer = extendContent(UnitType, "devourer-of-eldrich-gods", {
 			w.load();
 		});
 	},
+	
 	init(){
 		this.super$init();
 		
@@ -199,35 +200,45 @@ const trueDevourer = extendContent(UnitType, "devourer-of-eldrich-gods", {
 			if(s instanceof StatusEffect) this.immunities.add(s);
 		});
 	},
+	
 	setTypeID(id){
 		this.idType = id;
 	},
+	
 	getSegmentWeapon(){
 		return this.segWeapSeq;
 	},
+	
 	getTypeID(){
 		return this.idType;
 	},
+	
 	segmentOffsetF(){
 		return this.segmentOffset;
 	},
+	
 	getSegmentCellR(){
 		return this.segmentCellRegion;
 	},
+	
 	segmentRegionF(){
 		return this.segmentRegion;
 	},
+	
 	tailRegionF(){
 		return this.tailRegion;
 	},
+	
 	drawBody(unit){
 		this.super$drawBody(unit);
 		wormLib.drawSegments(unit);
 	},
+	
 	drawShadow(unit){
 		this.super$drawShadow(unit);
 		wormLib.drawShadowSegments(unit);
 	},
+	
 	drawOcclusion(unit){
 		this.super$drawOcclusion(unit);
 		wormLib.drawOcclusionSegments(unit);
