@@ -372,12 +372,22 @@ module.exports = {
                 var tile = this.tile;
                 if(block.size > expblock.size) tile = this.getBestTile(tile, block.size, expblock.size);
                 if(tile == null) return;
+                var powarr = (tile.build.power == null || !tile.block.hasPower) ? [] : tile.build.power.links.toArray();
                 //Vars.control.input.frag.config.hideConfig();
                 //TODO: sync
 
                 if(!Vars.headless) expblock.upgradeSound.at(this.x, this.y);
                 tile.setBlock(block, this.team, this.rotation);
                 if(!Vars.headless) expblock.upgradeFx.at(tile.drawx(), tile.drawy(), block.size, expblock.upgradeColor);
+                //retain node connections because why not
+                Core.app.post(() => {
+                    if(tile.build != null && tile.build.power != null && tile.block.hasPower && powArr.length > 0){
+                        for(var i=0; i<powarr.length; i++){
+                            var powtile = Vars.world.tile(powarr[i]);
+                            if(powtile.block instanceof PowerNode) powtile.build.configure(new Integer(powtile.pos()));
+                        }
+                    }
+                });
             },
             getBestTile(tile, size, current){
                 //TODO:
@@ -469,7 +479,19 @@ module.exports = {
                         this.super$buildConfiguration(table3);
                     }));
                 }
-            },
+            },/*
+            getCursor(){
+                if(!expblock.enableUpgrade) return this.super$getCursor();
+                else if(expblock.condConfig) return this.super$getCursor();
+                else{
+                    if(this._lastexp == this.totalExp() && (this._cachedCursor != null)) return this._cachedCursor;
+                    else{
+                        this._lastexp = this.totalExp();
+                        this._cachedCursor = (expblock.upPerLevel[this.totalLevel()].length > 0) ? SystemCursor.hand : SystemCursor.arrow;
+                        return this._cachedCursor;
+                    }
+                }
+            },*/
             configTapped(){
                 if(!this.super$configTapped()) return false;
                 if(!expblock.enableUpgrade) return true;
@@ -484,6 +506,8 @@ module.exports = {
             ent._exp = 0;
             ent._changedVal = false;
             ent._checked = true;
+            ent._lastexp = -1;
+            ent._cachedCursor = null;
             return ent;
         };
         return expblock;
