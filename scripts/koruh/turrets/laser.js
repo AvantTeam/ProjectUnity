@@ -101,7 +101,7 @@ const laserTurret = lib.extend(PowerTurret, PowerTurret.PowerTurretBuild, "laser
     upgrades: [
         {
             block: Blocks.lancer,
-            min: 1
+            min: 0
         },
         {
             block: Blocks.fuse,

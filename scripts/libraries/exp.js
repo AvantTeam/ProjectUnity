@@ -258,6 +258,7 @@ module.exports = {
         };*/
         for(var i=0; i<expblock.upgrades.length; i++){
             expblock.upgrades[i].id = i;
+            if(expblock.upgrades[i].iconContent === undefined) expblock.upgrades[i].iconContent = expblock.upgrades[i].block;
         }
         expblock.upPerLevel = [];
         for(var i=0; i<expblock.maxLevel; i++){
@@ -372,19 +373,31 @@ module.exports = {
                 var tile = this.tile;
                 if(block.size > expblock.size) tile = this.getBestTile(tile, block.size, expblock.size);
                 if(tile == null) return;
-                var powarr = (tile.build.power == null || !tile.block.hasPower) ? [] : tile.build.power.links.toArray();
+                var powarr = (tile.build.power == null) ? [] : tile.build.power.links.toArray();
+                //print(powarr.join(", "));
                 //Vars.control.input.frag.config.hideConfig();
-                //TODO: sync
 
                 if(!Vars.headless) expblock.upgradeSound.at(this.x, this.y);
                 tile.setBlock(block, this.team, this.rotation);
                 if(!Vars.headless) expblock.upgradeFx.at(tile.drawx(), tile.drawy(), block.size, expblock.upgradeColor);
+
                 //retain node connections because why not
+                if(Vars.net.client()) return;
                 Core.app.post(() => {
-                    if(tile.build != null && tile.build.power != null && tile.block.hasPower && powArr.length > 0){
+                    //print("h1");
+                    //print(powarr.join(", "));
+                    if(tile.build != null && tile.build.isValid() && tile.build.power != null && powarr.length > 0){
+                        //print("h2");
                         for(var i=0; i<powarr.length; i++){
-                            var powtile = Vars.world.tile(powarr[i]);
-                            if(powtile.block instanceof PowerNode) powtile.build.configure(new Integer(powtile.pos()));
+                            try{
+                                var powtile = Vars.world.tile(powarr[i]);
+                                //print(powtile + " | " + powtile.block() + " | Nowtile: " + tile);
+                                if(powtile.block() instanceof PowerNode) powtile.build.configure(new Integer(tile.pos()));
+                            }
+                            catch(unexpectedError){
+                                //just in case
+                                print(unexpectedError);
+                            }
                         }
                     }
                 });
@@ -439,7 +452,7 @@ module.exports = {
                 var arr = this.currentUpgrades(lvl);
                 if(arr.length == 0) return;
                 for(var i=0; i<arr.length; i++){
-                    var block = arr[i].block;
+                    var block = arr[i].iconContent;
                     table.table(cons(t => {
                         t.background(Tex.button);
                         t.image(block.icon(Cicon.medium)).size(38).padRight(2);
