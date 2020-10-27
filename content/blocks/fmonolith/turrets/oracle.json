@@ -13,7 +13,7 @@
 	"shootShake": 3,
 	"powerUse": 3,
 	"recoilAmount": 2.5,
-	"targetAir": false,
+	"targetAir": true,
 	"shootType": {
 		"type": "LightningBulletType",
 		"damage": 32,
