@@ -43,7 +43,7 @@ const script = [
                     "lightConsumer", "lightCombiner", "lightRouter"
                 ]
             },
-			
+
 			{
 				name: "units",
 				childs: [
@@ -126,7 +126,7 @@ const script = [
 				name: "units",
 				childs: [
 					"hovos",
-				
+
 					"whirlwind",
 					"jetstream"
 				]
@@ -195,6 +195,7 @@ const script = [
             {
                 name: "turrets",
                 childs: [
+                    "laserCharge",
                     "laser",
                     "inferno"
                 ]
