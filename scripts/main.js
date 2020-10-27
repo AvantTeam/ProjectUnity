@@ -243,7 +243,7 @@ const script = [
             {
                 name: "units",
                 childs: [
-                    "stele", "pedestal"
+                    "stele", "pedestal", "pilaster"
                 ]
             }
         ]
