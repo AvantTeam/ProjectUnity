@@ -62,9 +62,9 @@ const shieldGenerator = lib.extend(ForceProjector, ForceProjector.ForceBuild, "s
                 this.paramEntity.hit = 1;
                 this.paramEntity.buildup += trait.damage * this.paramEntity.warmup;
                 if(cons.valid(this)){
-                    this.incExp(scale / 10);
+                    this.incExp(scale / 20);
                 } else {
-                    this.incExp(0.15);
+                    this.incExp(0.1);
                 }
             }
         };
@@ -121,6 +121,9 @@ const shieldGenerator = lib.extend(ForceProjector, ForceProjector.ForceBuild, "s
             }
         }
         Draw.reset();
+    },
+    levelUp(int){
+        shieldGenerator.consumes.power(2 + this.totalLevel());
     }
 });
 

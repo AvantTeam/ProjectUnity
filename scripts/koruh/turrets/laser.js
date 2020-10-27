@@ -140,6 +140,10 @@ const laserTurret = lib.extend(PowerTurret, PowerTurret.PowerTurretBuild, "laser
             iconContent: UnitTypes.poly,
             block: Blocks.blockForge,
             min: 1
+        },
+        {
+            block: "unity-charge-laser-turret",
+            min: 10
         }
     ]
 }, {});
