@@ -258,10 +258,13 @@ module.exports = {
         };*/
         for(var i=0; i<expblock.upgrades.length; i++){
             expblock.upgrades[i].id = i;
+            if((typeof(expblock.upgrades[i].block)) == "string"){
+                expblock.upgrades[i].block = Vars.content.getByName(ContentType.block, expblock.upgrades[i].block);
+            }
             if(expblock.upgrades[i].iconContent === undefined) expblock.upgrades[i].iconContent = expblock.upgrades[i].block;
         }
         expblock.upPerLevel = [];
-        for(var i=0; i<expblock.maxLevel; i++){
+        for(var i=0; i<=expblock.maxLevel; i++){
             expblock.upPerLevel.push([]);
             for(var j=0; j<expblock.upgrades.length; j++){
                 if(expblock.upgrades[j].min == undefined) expblock.upgrades[j].min = expblock.maxLevel;
