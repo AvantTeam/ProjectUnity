@@ -34,11 +34,11 @@ const trailEffect = new Effect(30, e => {
 
 const spectrum = extendContent(PowerTurret, "spectrum", {
     getPrismOffset(){
-        return 32;
+        return 36;
     },
 
     getWidth(){
-        return 9;
+        return 7;
     },
 
     getTimer(){
@@ -74,14 +74,14 @@ spectrum.buildType = () => {
             Fill.circle(Tmp.v3.x, Tmp.v3.y, 1.2 * this.pow + Mathf.absin(5, 1) * this.pow);
 
             Lines.stroke(0.4 * this.pow + Mathf.absin(5, 0.2) * this.pow);
-            Lines.line(Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y);
+            Lines.line(Tmp.v2.x, Tmp.v2.y, Tmp.v3.x, Tmp.v3.y);
 
             for(let i = 0; i < Mathf.signs.length; i++){
                 let sign = Mathf.signs[i];
                 for(let j = 0; j < 2; j++){
                     let offset = 60 - 30 * j * sign;
 
-                    Drawf.tri(Tmp.v1.x, Tmp.v1.y,
+                    Drawf.tri(Tmp.v2.x, Tmp.v2.y,
                         1.2 * this.pow + Mathf.absin(2, 1.2) * this.pow,
                         8.5 * this.pow + Mathf.absin(2, 7) * this.pow,
                         this.rotation - 90 + offset
@@ -93,13 +93,13 @@ spectrum.buildType = () => {
             let w = spectrum.getWidth();
             let shade = 3;
 
-            vecs.get(0).set(Tmp.v31.set(w, -w, w).rotate(axisY, this.rot));
-            vecs.get(1).set(Tmp.v31.set(w, -w, -w).rotate(axisY, this.rot));
-            vecs.get(2).set(Tmp.v31.set(-w, -w, w).rotate(axisY, this.rot));
-            vecs.get(3).set(Tmp.v31.set(-w, -w, -w).rotate(axisY, this.rot));
-            vecs.get(4).set(Tmp.v31.set(0, w, 0).rotate(axisY, this.rot));
+            vecs.get(0).set(Tmp.v31.set(w, -w, w).rotate(axisY, this.rot)).add(this);
+            vecs.get(1).set(Tmp.v31.set(w, -w, -w).rotate(axisY, this.rot)).add(this);
+            vecs.get(2).set(Tmp.v31.set(-w, -w, w).rotate(axisY, this.rot)).add(this);
+            vecs.get(3).set(Tmp.v31.set(-w, -w, -w).rotate(axisY, this.rot)).add(this);
+            vecs.get(4).set(Tmp.v31.set(0, w, 0).rotate(axisY, this.rot)).add(this);
             
-            let index = Math.round(0);
+            let index = 0;
             vecs.each(vec => {
                 vec.rotate(axisX, this.rotation - 90);
 
@@ -131,29 +131,26 @@ spectrum.buildType = () => {
                 );
             };
 
-            sides.each(side => {
-                let region = Core.atlas.white();
-                let color = Color.whiteFloatBits;
-                let mcolor = Color.clearFloatBits;
-                let u = region.u;
-                let v = region.v;
-
-                let vertices = [];
-                for(let i = 0; i < 24; i++) vertices[i] = null;
-
-                for(let i = 0; i < side.items.length; i++){
-                    let point = vecs.get(side.items[i]);
-
-                    vertices[Math.round(0)] = point.x;
-                    vertices[Math.round(1)] = point.y;
-                    vertices[Math.round(2)] = color;
-                    vertices[Math.round(3)] = u;
-                    vertices[Math.round(4)] = v;
-                    vertices[Math.round(5)] = mcolor;
-                };
-
-                Draw.vert(region.texture, vertices, 0, vertices.length);
-            });
+            Draw.color(Tmp.c1.set(this.color).mul(
+                this.colors.get(0), this.colors.get(0), this.colors.get(0), this.alphas.get(0)
+            ));
+            Fill.tri(vecs.get(1).x, vecs.get(1).y, vecs.get(0).x, vecs.get(0).y, vecs.get(4).x, vecs.get(4).y);
+            Draw.color(Tmp.c1.set(this.color).mul(
+                this.colors.get(1), this.colors.get(1), this.colors.get(1), this.alphas.get(1)
+            ));
+            Fill.tri(vecs.get(1).x, vecs.get(1).y, vecs.get(3).x, vecs.get(3).y, vecs.get(4).x, vecs.get(4).y);
+            Draw.color(Tmp.c1.set(this.color).mul(
+                this.colors.get(2), this.colors.get(2), this.colors.get(2), this.alphas.get(2)
+            ));
+            Fill.tri(vecs.get(2).x, vecs.get(2).y, vecs.get(0).x, vecs.get(0).y, vecs.get(4).x, vecs.get(4).y);
+            Draw.color(Tmp.c1.set(this.color).mul(
+                this.colors.get(3), this.colors.get(3), this.colors.get(3), this.alphas.get(3)
+            ));
+            Fill.tri(vecs.get(2).x, vecs.get(2).y, vecs.get(3).x, vecs.get(3).y, vecs.get(4).x, vecs.get(4).y);
+            Draw.color(Tmp.c1.set(this.color).mul(
+                this.colors.get(4), this.colors.get(4), this.colors.get(4), this.alphas.get(4)
+            ));
+            Fill.quad(vecs.get(0).x, vecs.get(0).y, vecs.get(1).x, vecs.get(1).y, vecs.get(2).x, vecs.get(2).y, vecs.get(3).x, vecs.get(3).y);
 
             Draw.z(z);
             Draw.reset();
