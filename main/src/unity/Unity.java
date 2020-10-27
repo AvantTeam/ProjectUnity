@@ -2,19 +2,15 @@ package unity;
 
 import arc.*;
 import arc.func.*;
-import arc.graphics.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
-import mindustry.gen.*;
-import mindustry.graphics.*;
 import mindustry.mod.*;
 import mindustry.mod.Mods.*;
 import mindustry.ui.dialogs.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
-import mindustry.graphics.*;
 import unity.ContributorList.*;
 import unity.content.*;
 
