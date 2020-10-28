@@ -3,6 +3,7 @@ package unity.content;
 import arc.graphics.Color;
 import arc.math.*;
 import mindustry.gen.*;
+import mindustry.graphics.Pal;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.BuildVisibility;
@@ -20,6 +21,7 @@ import unity.world.blocks.light.*;
 
 import static arc.Core.*;
 import static mindustry.type.ItemStack.*;
+import static unity.content.UnityFx.*;
 
 public class UnityBlocks implements ContentList{
 	public static Block
@@ -33,6 +35,9 @@ public class UnityBlocks implements ContentList{
 	
 	//dark
     darkAlloyForge, apparition, ghost, banshee, fallout, catastrophe, calamity,
+
+	//imber
+	orb, shockwire, current, plasma, shielder,
 	
 	//koruh
 	laserTurret, inferno;
@@ -427,6 +432,33 @@ public class UnityBlocks implements ContentList{
                 consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.3f && liquid.flammability < 0.1f, 2.1f)).update(false);
             }
         };
+
+		//endregion
+		//imber
+
+		orb = new ChargeTurret("orb"){{
+			requirements(Category.turret, with(Items.copper, 55, Items.lead, 30, Items.graphite, 25, Items.silicon, 35, UnityItems.imberium, 20));
+			size = 2;
+			health = 1320;
+			range = 145;
+			reloadTime = 130;
+			coolantMultiplier = 2;
+			shootCone = 0.1f;
+			shots = 1;
+			inaccuracy = 12;
+			chargeTime = 65;
+			chargeEffects = 5;
+			chargeMaxDelay = 25;
+			powerUse = 10.4f;
+			targetAir = false;
+			shootType = UnityBullets.orb;
+			shootSound = Sounds.laser;
+			heatColor = Pal.turretHeat;
+			shootEffect = orbShoot;
+			smokeEffect = Fx.none;
+			chargeEffect = orbCharge;
+			chargeBeginEffect = orbChargeBegin;
+		}};
 
 		//endregion
 		//koruh

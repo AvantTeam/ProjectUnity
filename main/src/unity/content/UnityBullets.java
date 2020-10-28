@@ -4,6 +4,7 @@ import arc.util.Tmp;
 import arc.graphics.Color;
 import arc.math.geom.Vec2;
 import mindustry.content.*;
+import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.entities.bullet.*;
 import mindustry.graphics.*;
@@ -12,8 +13,16 @@ import mindustry.ctype.ContentList;
 import unity.entities.bullet.*;
 import unity.world.blocks.experience.*;
 
+import arc.graphics.g2d.*;
+
+import static arc.math.Mathf.*;
+import static mindustry.Vars.tilesize;
+import static mindustry.graphics.Drawf.*;
+import static mindustry.graphics.Pal.*;
+import static unity.content.UnityFx.*;
+
 public class UnityBullets implements ContentList{
-    public static BulletType laser, coalBlaze, pyraBlaze, falloutLaser, catastropheLaser, calamityLaser;
+    public static BulletType laser, coalBlaze, pyraBlaze, falloutLaser, catastropheLaser, calamityLaser, orb;
     //only enhanced
     public static BasicBulletType standardDenseLarge, standardHomingLarge, standardIncendiaryLarge, standardThoriumLarge, standardDenseHeavy, standardHomingHeavy, standardIncendiaryHeavy, standardThoriumHeavy, standardDenseMassive, standardHomingMassive,
     standardIncendiaryMassive, standardThoriumMassive;
@@ -125,6 +134,43 @@ public class UnityBullets implements ContentList{
                 incendSpread = 9f;
                 incendAmount = 2;
                 width = 9f;
+            }
+        };
+
+        orb = new BulletType(){
+            @Override
+            public void draw(Bullet b){
+                light(b.x, b.y, 16, surge, 0.6f);
+
+                Draw.color(surge);
+                Lines.circle(b.x, b.y, 4);
+
+                Draw.color();
+                Fill.circle(b.x, b.y, 2.5f);
+            }
+
+            @Override
+            public void update(Bullet b){
+                super.update(b);
+                if(b.timer.get(1, 7)){
+                    Units.nearbyEnemies(b.team, b.x - 5 * tilesize, b.y - 5 * tilesize, 5 * tilesize * 2, 5 * tilesize * 2, unit -> {
+                            Lightning.create(b.team, Pal.surge, random(17, 33), b.x, b.y, b.angleTo(unit), random(7, 13));
+			        });
+                }
+            }
+
+            @Override
+            public void drawLight(Bullet b){}
+
+            {
+                lifetime = 240;
+                speed = 1.24f;
+                damage = 23;
+                pierce = true;
+                hittable = false;
+                hitEffect = orbHit;
+                trailEffect = orbTrail;
+                trailChance = 0.4f;
             }
         };
 
