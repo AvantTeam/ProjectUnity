@@ -128,7 +128,8 @@ const script = [
 					"hovos",
                     
 					"whirlwind",
-					"jetstream"
+					"jetstream",
+					"vortex"
 				]
 			}
 		]
