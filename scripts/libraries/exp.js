@@ -56,6 +56,7 @@ const upgradeBlockFx = new Effect(90, e => {
 });
 
 const Integer = java.lang.Integer;
+if((typeof SystemCursor) == "undefined") const SystemCursor = Packages.arc.Graphics.Cursor.SystemCursor;
 //const String = java.lang.String;
 
 module.exports = {
@@ -505,7 +506,7 @@ module.exports = {
                         this.super$buildConfiguration(table3);
                     }));
                 }
-            },/*
+            },
             getCursor(){
                 if(!expblock.enableUpgrade) return this.super$getCursor();
                 else if(expblock.condConfig) return this.super$getCursor();
@@ -517,7 +518,7 @@ module.exports = {
                         return this._cachedCursor;
                     }
                 }
-            },*/
+            },
             configTapped(){
                 if(!this.super$configTapped()) return false;
                 if(!expblock.enableUpgrade) return true;

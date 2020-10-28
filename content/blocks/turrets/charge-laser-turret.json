@@ -6,6 +6,7 @@
 	"shootCone": 1,
 	"inaccuracy": 0,
 	"powerUse": 7,
+  "targetAir": true,
 	"requirements": [
 		{"item": "copper", "amount": 160},
 		{"item": "lead", "amount": 110},

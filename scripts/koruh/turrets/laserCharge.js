@@ -28,7 +28,7 @@ const chargeLaser = extend(BulletType, {
     },
 
     getColor(b){
-        return Tmp.c1.set(Color.white).lerp(Pal.lancerLaser, b.owner.totalLevel() / 10);
+        return Tmp.c1.set(Pal.lancerLaser).lerp(Pal.sapBullet, b.owner.totalLevel() / 15);
     },
 
     collision(other, x, y){
@@ -156,27 +156,25 @@ const chargeLaserTurret = lib.extend(ChargeTurret, ChargeTurret.ChargeTurretBuil
             field: "reloadTime",
             start: 60,
             intensity: -2
-        },
-        {
-            type: "bool",
-            field: "targetAir",
-            start: false,
-            intensity: 5
         }
     ]
 }, {
+    getShootColor(lvl){
+        return Tmp.c1.set(Pal.lancerLaser).lerp(Pal.sapBullet, lvl / 15);
+    },
     shoot(ammo){
         this.useAmmo();
+        var lvl = this.totalLevel();
 
         chargeLaserTurret.tr.trns(this.rotation, chargeLaserTurret.size * Vars.tilesize / 2);
-        chargeLaserTurret.chargeBeginEffect.at(this.x + chargeLaserTurret.tr.x, this.y + chargeLaserTurret.tr.y, this.rotation, Tmp.c1.set(Color.white).lerp(Pal.lancerLaser, this.totalLevel() / 10));
+        chargeLaserTurret.chargeBeginEffect.at(this.x + chargeLaserTurret.tr.x, this.y + chargeLaserTurret.tr.y, this.rotation, this.getShootColor(lvl));
         chargeLaserTurret.chargeSound.at(this.x + chargeLaserTurret.tr.x, this.y + chargeLaserTurret.tr.y, 1);
 
         for(var i = 0; i < chargeLaserTurret.chargeEffects; i++){
             Time.run(Mathf.random(chargeLaserTurret.chargeMaxDelay), () => {
                 if(!this.isValid()) return;
                 chargeLaserTurret.tr.trns(this.rotation, chargeLaserTurret.size * Vars.tilesize / 2);
-                chargeLaserTurret.chargeEffect.at(this.x + chargeLaserTurret.tr.x, this.y + chargeLaserTurret.tr.y, this.rotation, Tmp.c1.set(Color.white).lerp(Pal.lancerLaser, this.totalLevel() / 10));
+                chargeLaserTurret.chargeEffect.at(this.x + chargeLaserTurret.tr.x, this.y + chargeLaserTurret.tr.y, this.rotation, this.getShootColor(lvl));
             });
         }
 
@@ -195,7 +193,7 @@ const chargeLaserTurret = lib.extend(ChargeTurret, ChargeTurret.ChargeTurretBuil
     effects(){
         var fshootEffect = chargeLaserTurret.shootEffect == Fx.none ? this.peekAmmo().shootEffect : chargeLaserTurret.shootEffect;
         var fsmokeEffect = chargeLaserTurret.smokeEffect == Fx.none ? this.peekAmmo().smokeEffect : chargeLaserTurret.smokeEffect;
-        fshootEffect.at(this.x + chargeLaserTurret.tr.x, this.y + chargeLaserTurret.tr.y, this.rotation, Tmp.c1.set(Color.white).lerp(Pal.lancerLaser, this.totalLevel() / 10));
+        fshootEffect.at(this.x + chargeLaserTurret.tr.x, this.y + chargeLaserTurret.tr.y, this.rotation, this.getShootColor(this.totalLevel()));
         fsmokeEffect.at(this.x + chargeLaserTurret.tr.x, this.y + chargeLaserTurret.tr.y, this.rotation);
         chargeLaserTurret.shootSound.at(this.x + chargeLaserTurret.tr.x, this.y + chargeLaserTurret.tr.y, Mathf.random(0.9, 1.1));
 

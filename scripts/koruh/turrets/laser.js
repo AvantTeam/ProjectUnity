@@ -97,50 +97,7 @@ const laserTurret = lib.extend(PowerTurret, PowerTurret.PowerTurretBuild, "laser
             intensity: 5
         }
     ],
-    //testing purposes: it will get removed when it is time. Please don't touch it for now.
     upgrades: [
-        {
-            block: Blocks.arc,
-            min: 0
-        },
-        {
-            block: Blocks.lancer,
-            min: 0
-        },
-        {
-            block: Blocks.fuse,
-            min: 0
-        },
-        {
-            block: Blocks.meltdown,
-            min: 0
-        },
-        {
-            block: Blocks.router,
-            min: 10
-        },
-        {
-            iconContent: Items.copper,
-            block: Blocks.coreShard,
-            min: 1,
-            max: 1
-        },
-        {
-            iconContent: Items.lead,
-            block: Blocks.coreFoundation,
-            min: 2,
-            max: 2
-        },
-        {
-            iconContent: Items.titanium,
-            block: Blocks.coreNucleus,
-            min: 3
-        },
-        {
-            iconContent: UnitTypes.poly,
-            block: Blocks.blockForge,
-            min: 1
-        },
         {
             block: "unity-charge-laser-turret",
             min: 10
