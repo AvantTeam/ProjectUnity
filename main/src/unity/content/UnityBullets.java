@@ -80,7 +80,7 @@ public class UnityBullets implements ContentList{
             @Override
             public void hit(Bullet b, float x, float y){
                 super.hit(b, x, y);
-                b.owner.<ExpItemTurret.ExpItemTurretBuild>self().incExp(0.5f);
+                ((ExpItemTurret.ExpItemTurretBuild) b.owner).incExp(0.5f);
             }
         };
 
@@ -102,7 +102,7 @@ public class UnityBullets implements ContentList{
             @Override
             public void hit(Bullet b, float x, float y){
                 super.hit(b, x, y);
-                b.owner.<ExpItemTurret.ExpItemTurretBuild>self().incExp(0.5f);
+                ((ExpItemTurret.ExpItemTurretBuild) b.owner).incExp(0.5f);
             }
         };
 
@@ -154,8 +154,8 @@ public class UnityBullets implements ContentList{
                 super.update(b);
                 if(b.timer.get(1, 7)){
                     Units.nearbyEnemies(b.team, b.x - 5 * tilesize, b.y - 5 * tilesize, 5 * tilesize * 2, 5 * tilesize * 2, unit -> {
-                            Lightning.create(b.team, Pal.surge, random(17, 33), b.x, b.y, b.angleTo(unit), random(7, 13));
-			        });
+                        Lightning.create(b.team, Pal.surge, random(17, 33), b.x, b.y, b.angleTo(unit), random(7, 13));
+                    });
                 }
             }
 

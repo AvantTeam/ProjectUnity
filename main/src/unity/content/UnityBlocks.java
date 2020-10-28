@@ -243,22 +243,18 @@ public class UnityBlocks implements ContentList{
 		//endregion
 		//region dark
 		
-		darkAlloyForge = new GenericSmelter("dark-alloy-forge"){{
+		darkAlloyForge = new StemGenericSmelter("dark-alloy-forge"){{
 			requirements(Category.crafting, with(Items.copper, 30, Items.lead, 25));
 			outputItem = new ItemStack(UnityItems.darkAlloy, 3);
 			craftTime = 140f;
 			size = 4;
 			idleSound = Sounds.respawning;
 			idleSoundVolume = 0.6f;
-			drawer = new DrawBlock(){
-				@Override
-				public void draw(GenericCrafterBuild entity){
-					super.draw(entity);
-					if(entity.consValid() && Mathf.chanceDelta(0.76f)) UnityFx.craftingEffect.at(entity.getX(), entity.getY());
-				}
-			};
 			consumes.items(with(Items.lead, 2, Items.silicon, 3, Items.blastCompound, 1, Items.phaseFabric, 1, UnityItems.umbrium, 2));
 			consumes.power(3.2f);
+            afterUpdate = e -> {
+                if(e.consValid() && Mathf.chanceDelta(0.76f)) UnityFx.craftingEffect.at(e.getX(), e.getY(), Mathf.random(360f));
+            };
 		}};
 		
 		apparition=new ItemTurret("apparition") {
