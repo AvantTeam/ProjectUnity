@@ -121,8 +121,14 @@ const chargeLaser = extend(BulletType, {
 
 const chargeLaserFrag = new JavaAdapter(LaserBoltBulletType, {
     draw(b){
+        if(b.data == null) b.data = (b.owner == null) ? Pal.lancerLaser : chargeLaserFrag.backColor.set(Pal.lancerLaser).lerp(Pal.sapBullet, b.owner.totalLevel() / 15).cpy();
+        Draw.color(b.data);
+        Lines.stroke(2);
+        Lines.lineAngleCenter(b.x, b.y, b.rotation(), 7);
+        Lines.stroke(1.3);
+        Draw.color(chargeLaserFrag.frontColor);
+        Lines.lineAngleCenter(b.x, b.y, b.rotation(), 4);
         Draw.reset();
-        this.super$draw(b);
     }
 }, 2, 10);
 chargeLaserFrag.lifetime = 20;
