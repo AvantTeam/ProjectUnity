@@ -40,7 +40,7 @@ const distanceGroundAIL = prov(() => {
 			};
 			
 			if(this.command() == UnitCommand.rally){
-				var targetR = targetFlag(this.unit.x, this.unit.y, BlockFlag.rally, false);
+				var targetR = this.targetFlag(this.unit.x, this.unit.y, BlockFlag.rally, false);
 
 				if(targetR != null && !this.unit.within(targetR, 70)){
 					this.pathfind(Pathfinder.fieldRally);
