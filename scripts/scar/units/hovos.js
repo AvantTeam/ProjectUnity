@@ -27,7 +27,7 @@ hovos.speed = 0.8;
 hovos.weapons.add(hovosRailgun);
 hovos.health = 340;
 hovos.hitSize = 17;
-hovos.range = 210;
+hovos.range = 350;
 hovos.allowLegStep = true;
 hovos.legMoveSpace = 0.7;
 hovos.legTrns = 0.4;

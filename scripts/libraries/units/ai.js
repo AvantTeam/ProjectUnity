@@ -9,7 +9,7 @@ const distanceGroundAIL = prov(() => {
 		updateMovement(){
 			var core = this.unit.closestEnemyCore();
 			
-			if(core != null && unit.within(core, this.unit.range() / 1.1 + core.block.size * Vars.tilesize / 2)){
+			if(core != null && this.unit.within(core, this.unit.range() / 1.1 + core.block.size * Vars.tilesize / 2)){
 				this.target = core;
 				for(var i = 0; i < this.targets.length; i++){
 					this.targets[i] = core;
