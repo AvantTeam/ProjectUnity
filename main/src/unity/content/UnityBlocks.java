@@ -14,6 +14,8 @@ import mindustry.world.blocks.defense.turrets.*;
 import mindustry.type.*;
 import mindustry.ctype.*;
 import mindustry.content.*;
+import mindustry.world.meta.*;
+import mindustry.world.meta.*;
 import unity.world.blocks.*;
 import unity.world.blocks.Recipe.*;
 import unity.world.blocks.experience.*;
@@ -261,7 +263,7 @@ public class UnityBlocks implements ContentList{
 			consumes.power(3.2f);
 		}};
 		
-		apparition=new ItemTurret("apparition") {
+		apparition = new ItemTurret("apparition") {
 			@Override
 			public void load(){
 				super.load();
@@ -459,6 +461,33 @@ public class UnityBlocks implements ContentList{
 			chargeEffect = orbCharge;
 			chargeBeginEffect = orbChargeBegin;
 		}};
+
+		shockwire = new LaserTurret("shockwire"){
+			@Override
+			public void setStats(){
+				super.setStats();
+
+				stats.remove(Stat.damage);
+				stats.add(Stat.damage, shootType.damage, StatUnit.none);
+			}
+			{
+				requirements(Category.turret, with(Items.copper, 150, Items.lead, 145, Items.titanium, 160, Items.silicon, 130, UnityItems.imberium, 70));
+				size = 2;
+				health = 1400;
+				range = 125;
+				reloadTime = 140;
+				coolantMultiplier = 2;
+				shootCone = 1;
+				firingMoveFract = 0.15f;
+				shootDuration = 200;
+				inaccuracy = 0;
+				powerUse = 8.6f;
+				targetAir = false;
+				shootType = UnityBullets.shockBeam;
+				shootSound = Sounds.thruster;
+				consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability <= 0.1f, 0.4f)).update(false);
+			}
+		};
 
 		//endregion
 		//koruh

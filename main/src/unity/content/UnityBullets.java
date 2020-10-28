@@ -1,8 +1,12 @@
 package unity.content;
 
+import arc.Core;
+import arc.math.Mathf;
+import arc.math.geom.Position;
 import arc.util.Tmp;
 import arc.graphics.Color;
 import arc.math.geom.Vec2;
+import mindustry.Vars;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
@@ -10,6 +14,7 @@ import mindustry.entities.bullet.*;
 import mindustry.graphics.*;
 import mindustry.io.JsonIO;
 import mindustry.ctype.ContentList;
+import mindustry.world.blocks.defense.turrets.LaserTurret;
 import unity.entities.bullet.*;
 import unity.world.blocks.experience.*;
 
@@ -19,13 +24,15 @@ import static arc.math.Mathf.*;
 import static mindustry.Vars.tilesize;
 import static mindustry.graphics.Drawf.*;
 import static mindustry.graphics.Pal.*;
+import static rhino.ScriptRuntime.typeof;
 import static unity.content.UnityFx.*;
 
 public class UnityBullets implements ContentList{
-    public static BulletType laser, coalBlaze, pyraBlaze, falloutLaser, catastropheLaser, calamityLaser, orb;
+    public static BulletType laser, coalBlaze, pyraBlaze, falloutLaser, catastropheLaser, calamityLaser, orb, shockBeam;
     //only enhanced
     public static BasicBulletType standardDenseLarge, standardHomingLarge, standardIncendiaryLarge, standardThoriumLarge, standardDenseHeavy, standardHomingHeavy, standardIncendiaryHeavy, standardThoriumHeavy, standardDenseMassive, standardHomingMassive,
     standardIncendiaryMassive, standardThoriumMassive;
+
 
     @Override
     public void load(){
@@ -143,7 +150,7 @@ public class UnityBullets implements ContentList{
                 light(b.x, b.y, 16, surge, 0.6f);
 
                 Draw.color(surge);
-                Lines.circle(b.x, b.y, 4);
+                Fill.circle(b.x, b.y, 4);
 
                 Draw.color();
                 Fill.circle(b.x, b.y, 2.5f);
@@ -171,6 +178,72 @@ public class UnityBullets implements ContentList{
                 hitEffect = orbHit;
                 trailEffect = orbTrail;
                 trailChance = 0.4f;
+            }
+        };
+
+        shockBeam = new ContinuousLaserBulletType(35){
+            @Override
+            public void init(Bullet b){
+                super.init(b);
+
+                Healthc target = Damage.linecast(b, b.x, b.y, b.rotation(), length);
+                b.data = target;
+
+                if(target != null && !(target instanceof Building)){
+                    Healthc hit = target;
+
+                    ((Hitboxc) hit).collision((Hitboxc) hit, hit.x(), hit.y());
+                    b.collision((Hitboxc) hit, hit.x(), hit.y());
+                } else {
+                    b.data = new Vec2().trns(b.rotation(), this.length).add(b.x, b.y);
+                }
+            }
+
+            @Override
+            public void update(Bullet b){
+                if(b.timer.get(1, 5)){
+                    if(((LaserTurret.LaserTurretBuild) b.owner).target == null) return;
+                    Lightning.create(b.team, surge, Mathf.random(this.damage / 1.8f, this.damage / 1.2f), b.x, b.y, b.angleTo(((LaserTurret.LaserTurretBuild) b.owner).target), Mathf.floorPositive(b.dst(((LaserTurret.LaserTurretBuild) b.owner).target) / Vars.tilesize + 3));
+                    if(((LaserTurret.LaserTurretBuild) b.owner).target instanceof Healthc){
+                        ((Healthc) ((LaserTurret.LaserTurretBuild) b.owner).target).damage(this.damage);
+                    }
+                }
+            }
+
+            @Override
+            public void draw(Bullet b){
+                Posc target = ((LaserTurret.LaserTurretBuild) b.owner).target;
+                if(target != null){
+                    Draw.color(surge);
+                    Drawf.laser(b.team, Core.atlas.find("laser"), Core.atlas.find("laser-end"), b.x, b.y, target.x(), target.y(), width * b.fout());
+                    Draw.reset();
+
+                    Drawf.light(b.team, b.x, b.y, b.x + target.x(), b.y + target.y(), 15 * b.fout(), this.lightColor, 0.6f);
+                } else if (b.data instanceof Position){
+                    Object data = b.data;
+                    Tmp.v1.set((Position) data);
+
+                    Draw.color(surge);
+                    Drawf.laser(b.team, Core.atlas.find("laser"), Core.atlas.find("laser-end"), b.x, b.y, Tmp.v1.x, Tmp.v1.y, this.width * b.fout());
+                    Draw.reset();
+
+                    Drawf.light(b.team, b.x, b.y, b.x + Tmp.v1.x, b.y + Tmp.v1.y, 15 * b.fout(), surge, 0.6f);
+                }
+            }
+
+            {
+                speed = 0.0001f;
+                shootEffect = Fx.none;
+                despawnEffect = Fx.none;
+                pierce = true;
+                hitSize = 0;
+                status = StatusEffects.shocked;
+                statusDuration = 3 * 60;
+                width = 0.42f;
+                length = 120;
+                hittable = false;
+                hitEffect = Fx.hitLiquid;
+
             }
         };
 
