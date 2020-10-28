@@ -139,7 +139,7 @@ module.exports = {
                     this.linearEXP(lvl);
                 };
                 if(this.expInc.length == 1) {
-                    this[this.expInc[0]] = Math.max(this.expIncStart[0] + Mathf.pow(this.expIncMul[0], lvl), 0);
+                    this[this.expInc[0]] = Math.max(this.expIncStart[0] * Mathf.pow(this.expIncMul[0], lvl), 0);
                 } else if(this.expInc.length > 0) {
                     this.expEXP(lvl);
                 };
@@ -164,7 +164,7 @@ module.exports = {
             },
             expEXP(lvl) {
                 for(var i = 0; i < this.expInc.length; i++) {
-                    this[this.expInc[i]] = Math.max(this.expIncStart[i] + Mathf.pow(this.expIncMul[i], lvl), 0);
+                    this[this.expInc[i]] = Math.max(this.expIncStart[i] * Mathf.pow(this.expIncMul[i], lvl), 0);
                 };
             },
             rootEXP(lvl) {
@@ -473,12 +473,12 @@ module.exports = {
                         t.table(cons(info => {
                             info.left();
                             info.add("[green]"+block.localizedName+"[]\n"+Core.bundle.get("explib.level.short")+" ["+((arr[i].min == lvl)?"green":"accent")+"]"+lvl+"[]/"+arr[i].min);
-                        })).width(80);
+                        })).fillX().growX();
                         this.makeInfoButton(t, block);
                         if(arr[i].min == lvl) Styles.cleari.imageUpColor = expblock.upgradeColor;
                         this.makeUpgradeButton(t, arr[i].id, lvl);
                         if(arr[i].min == lvl) Styles.cleari.imageUpColor = Color.white;
-                    })).width(220).height(50);
+                    })).height(50).growX();
 
                     if(i < arr.length - 1) table.row();
                 }
