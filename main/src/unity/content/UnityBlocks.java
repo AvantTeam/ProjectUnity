@@ -260,12 +260,6 @@ public class UnityBlocks implements ContentList{
 		}};
 		
 		apparition = new ItemTurret("apparition") {
-			@Override
-			public void load(){
-				super.load();
-				baseRegion = atlas.find("unity-block-" + size);
-			}
-
 			{
 				requirements(Category.turret, with(Items.copper, 350, Items.graphite, 380, Items.silicon, 360, Items.plastanium, 200, Items.thorium, 220, UnityItems.umbrium, 370, Items.surgeAlloy, 290));
 				size = 5;
@@ -282,15 +276,15 @@ public class UnityBlocks implements ContentList{
 				rotateSpeed = 4.5f;
 				ammo(Items.graphite, UnityBullets.standardDenseLarge, Items.silicon, UnityBullets.standardHomingLarge, Items.pyratite, UnityBullets.standardIncendiaryLarge, Items.thorium, UnityBullets.standardThoriumLarge);
 			}
+            
+			@Override
+			public void load(){
+				super.load();
+				baseRegion = atlas.find("unity-block-" + size);
+			}
 		};
 		
         ghost = new BarrelsItemTurret("ghost"){
-            @Override
-            public void load(){
-                super.load();
-                baseRegion = atlas.find("unity-block-" + size);
-            }
-
             {
                 size = 8;
                 health = 9750;
@@ -308,15 +302,15 @@ public class UnityBlocks implements ContentList{
                 ammo(Items.graphite, UnityBullets.standardDenseHeavy, Items.silicon, UnityBullets.standardHomingHeavy, Items.pyratite, UnityBullets.standardIncendiaryHeavy, Items.thorium, UnityBullets.standardThoriumHeavy);
                 requirements(Category.turret, with(Items.copper, 1150, Items.graphite, 1420, Items.silicon, 960, Items.plastanium, 800, Items.thorium, 1230, UnityItems.darkAlloy, 380));
             }
-        };
-
-        banshee = new unity.world.blocks.BarrelsItemTurret("banshee"){
+            
             @Override
             public void load(){
                 super.load();
                 baseRegion = atlas.find("unity-block-" + size);
             }
+        };
 
+        banshee = new unity.world.blocks.BarrelsItemTurret("banshee"){
             {
                 size = 12;
                 health = 22000;
@@ -336,15 +330,15 @@ public class UnityBlocks implements ContentList{
                 ammo(Items.graphite, UnityBullets.standardDenseMassive, Items.silicon, UnityBullets.standardHomingMassive, Items.pyratite, UnityBullets.standardIncendiaryMassive, Items.thorium, UnityBullets.standardThoriumMassive);
                 requirements(Category.turret, with(Items.copper, 2800, Items.graphite, 2980, Items.silicon, 2300, Items.titanium, 1900, Items.phaseFabric, 1760, Items.thorium, 1780, UnityItems.darkAlloy, 1280));
             }
-        };
-
-        fallout = new LaserTurret("fallout"){
+            
             @Override
             public void load(){
                 super.load();
                 baseRegion = atlas.find("unity-block-" + size);
             }
+        };
 
+        fallout = new LaserTurret("fallout"){
             {
                 size = 5;
                 health = 3975;
@@ -367,15 +361,15 @@ public class UnityBlocks implements ContentList{
                 shootType = UnityBullets.falloutLaser;
                 consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.58f)).update(false);
             }
-        };
-		
-        catastrophe = new BigLaserTurret("catastrophe"){
+            
             @Override
             public void load(){
                 super.load();
                 baseRegion = atlas.find("unity-block-" + size);
             }
-
+        };
+		
+        catastrophe = new BigLaserTurret("catastrophe"){
             {
                 size = 8;
                 health = 9750;
@@ -398,15 +392,15 @@ public class UnityBlocks implements ContentList{
                 shootType = UnityBullets.catastropheLaser;
                 consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.4f && liquid.flammability < 0.1f, 1.3f)).update(false);
             }
-        };
-		
-        calamity = new BigLaserTurret("calamity"){
+            
             @Override
             public void load(){
                 super.load();
                 baseRegion = atlas.find("unity-block-" + size);
             }
-
+        };
+		
+        calamity = new BigLaserTurret("calamity"){
             {
                 size = 12;
                 health = 22000;
@@ -429,24 +423,30 @@ public class UnityBlocks implements ContentList{
                 shootType = UnityBullets.calamityLaser;
                 consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.3f && liquid.flammability < 0.1f, 2.1f)).update(false);
             }
+            
+            @Override
+            public void load(){
+                super.load();
+                baseRegion = atlas.find("unity-block-" + size);
+            }
         };
 
 		//endregion
-		//imber
+		//region imber
 
 		orb = new ChargeTurret("orb"){{
 			requirements(Category.turret, with(Items.copper, 55, Items.lead, 30, Items.graphite, 25, Items.silicon, 35, UnityItems.imberium, 20));
 			size = 2;
 			health = 1320;
-			range = 145;
-			reloadTime = 130;
-			coolantMultiplier = 2;
+			range = 145f;
+			reloadTime = 130f;
+			coolantMultiplier = 2f;
 			shootCone = 0.1f;
 			shots = 1;
-			inaccuracy = 12;
-			chargeTime = 65;
+			inaccuracy = 12f;
+			chargeTime = 65f;
 			chargeEffects = 5;
-			chargeMaxDelay = 25;
+			chargeMaxDelay = 25f;
 			powerUse = 10.4f;
 			targetAir = false;
 			shootType = UnityBullets.orb;
@@ -459,6 +459,24 @@ public class UnityBlocks implements ContentList{
 		}};
 
 		shockwire = new LaserTurret("shockwire"){
+            {
+				requirements(Category.turret, with(Items.copper, 150, Items.lead, 145, Items.titanium, 160, Items.silicon, 130, UnityItems.imberium, 70));
+				size = 2;
+				health = 1400;
+				range = 125f;
+				reloadTime = 140f;
+				coolantMultiplier = 2f;
+				shootCone = 1f;
+				firingMoveFract = 0.15f;
+				shootDuration = 200f;
+				inaccuracy = 0f;
+				powerUse = 8.6f;
+				targetAir = false;
+				shootType = UnityBullets.shockBeam;
+				shootSound = Sounds.thruster;
+				consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability <= 0.1f, 0.4f)).update(false);
+			}
+            
 			@Override
 			public void setStats(){
 				super.setStats();
@@ -466,27 +484,30 @@ public class UnityBlocks implements ContentList{
 				stats.remove(Stat.damage);
 				stats.add(Stat.damage, shootType.damage, StatUnit.none);
 			}
-			{
-				requirements(Category.turret, with(Items.copper, 150, Items.lead, 145, Items.titanium, 160, Items.silicon, 130, UnityItems.imberium, 70));
-				size = 2;
-				health = 1400;
-				range = 125;
-				reloadTime = 140;
-				coolantMultiplier = 2;
-				shootCone = 1;
-				firingMoveFract = 0.15f;
-				shootDuration = 200;
-				inaccuracy = 0;
-				powerUse = 8.6f;
-				targetAir = false;
-				shootType = UnityBullets.shockBeam;
-				shootSound = Sounds.thruster;
-				consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability <= 0.1f, 0.4f)).update(false);
-			}
 		};
+        
+        current = new ChargeTurret("current"){{
+            requirements(Category.turret, with(Items.copper, 280, Items.lead, 295, Items.silicon, 260, UnityItems.sparkAlloy, 65));
+            size = 3;
+            health = 2400;
+            range = 220f;
+            reloadTime = 480f;
+            coolantMultiplier = 2;
+            shootCone = 0.01f;
+            inaccuracy = 0f;
+            chargeTime = 240f;
+            chargeEffects = 4;
+            chargeMaxDelay = 260;
+            powerUse = 13.8f;
+            shootType = UnityBullets.currentStroke;
+            shootSound = Sounds.laserbig;
+            chargeEffect = UnityFx.currentCharge;
+            chargeBeginEffect = UnityFx.currentChargeBegin;
+            consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability <= 0.1f, 0.52f)).boost();
+        }};
 
 		//endregion
-		//koruh
+		//region koruh
 		
 		laserTurret = new ExpPowerTurret("laser-turret", 10){{
 			requirements(Category.turret, with(Items.copper, 160, Items.lead, 110, Items.silicon, 90));

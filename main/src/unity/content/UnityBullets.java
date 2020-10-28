@@ -28,7 +28,7 @@ import static rhino.ScriptRuntime.typeof;
 import static unity.content.UnityFx.*;
 
 public class UnityBullets implements ContentList{
-    public static BulletType laser, coalBlaze, pyraBlaze, falloutLaser, catastropheLaser, calamityLaser, orb, shockBeam;
+    public static BulletType laser, coalBlaze, pyraBlaze, falloutLaser, catastropheLaser, calamityLaser, orb, shockBeam, currentStroke;
     //only enhanced
     public static BasicBulletType standardDenseLarge, standardHomingLarge, standardIncendiaryLarge, standardThoriumLarge, standardDenseHeavy, standardHomingHeavy, standardIncendiaryHeavy, standardThoriumHeavy, standardDenseMassive, standardHomingMassive,
     standardIncendiaryMassive, standardThoriumMassive;
@@ -167,7 +167,9 @@ public class UnityBullets implements ContentList{
             }
 
             @Override
-            public void drawLight(Bullet b){}
+            public void drawLight(Bullet b){
+                
+            }
 
             {
                 lifetime = 240;
@@ -194,7 +196,7 @@ public class UnityBullets implements ContentList{
 
                     ((Hitboxc) hit).collision((Hitboxc) hit, hit.x(), hit.y());
                     b.collision((Hitboxc) hit, hit.x(), hit.y());
-                } else {
+                }else{
                     b.data = new Vec2().trns(b.rotation(), this.length).add(b.x, b.y);
                 }
             }
@@ -219,7 +221,7 @@ public class UnityBullets implements ContentList{
                     Draw.reset();
 
                     Drawf.light(b.team, b.x, b.y, b.x + target.x(), b.y + target.y(), 15 * b.fout(), this.lightColor, 0.6f);
-                } else if (b.data instanceof Position){
+                }else if(b.data instanceof Position){
                     Object data = b.data;
                     Tmp.v1.set((Position) data);
 
@@ -246,6 +248,25 @@ public class UnityBullets implements ContentList{
 
             }
         };
+        
+        currentStroke = new LaserBulletType(450){{
+            length = 430;
+            damage = 450;
+            width = 20;
+            lifetime = 65;
+            lightningSpacing = 35;
+            lightningLength = 5;
+            lightningDelay = 1.1f;
+            lightningLengthRand = 15;
+            lightningDamage = 50;
+            lightningAngleRand = 40;
+            largeHit = true;
+            lightColor = lightningColor = Pal.surge;
+            sideAngle = 15;
+            sideWidth = 0;
+            sideLength = 0;
+            colors = new Color[]{Pal.surge.cpy(), Pal.surge, Color.white};
+        }};
 
         //only enhanced
 

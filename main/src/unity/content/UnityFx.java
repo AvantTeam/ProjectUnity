@@ -73,14 +73,14 @@ public class UnityFx{
 
 	orbShootSmoke = new Effect(26, e -> {
 		color(Pal.surge);
-		randLenVectors(e.id, 7, 80, e.rotation, 0, (x, y) -> {
+		randLenVectors(e.id, 7, 80f, e.rotation, 0, (x, y) -> {
 			Fill.circle(e.x + x, e.y + y, e.fout() * 4);
 		});
 	}),
 
 	orbCharge = new Effect(38, e -> {
 		color(surge);
-		randLenVectors(e.id, 2, 1 + 20 * e.fout(), e.rotation, 120, (x, y) -> {
+		randLenVectors(e.id, 2, 1f + 20f * e.fout(), e.rotation, 120, (x, y) -> {
 			lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fslope() * 3 + 1);
 		});
 	}),
@@ -91,5 +91,24 @@ public class UnityFx{
 
 		color();
 		Fill.circle(e.x, e.y, e.fin() * 2);
-	});
+	}),
+    
+    currentCharge = new Effect(32, e -> {
+        color(Pal.surge, Color.white, e.fin());
+        randLenVectors(e.id, 8, 420f + random(24f, 28f) * e.fout(), e.rotation, 4, (x, y) -> {
+            stroke(0.3f + e.fout() * 2f);
+            lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fout() * 14f + 0.5f);
+        });
+        
+        stroke(e.fin() * 1.5f);
+        circle(e.x, e.y, e.fout() * 60f);
+    }),
+    
+    currentChargeBegin = new Effect(260, e -> {
+        color(Pal.surge);
+        Fill.circle(e.x, e.y, e.fin() * 7f);
+        
+        color();
+        Fill.circle(e.x, e.y, e.fin() * 3f);
+    });
 }
