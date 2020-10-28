@@ -1,6 +1,5 @@
 package unity.content;
 
-import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -37,7 +36,7 @@ public class UnityFx{
 		float value = randomSeed(e.id);
 		Tmp.v1.trns(value * 360f + ((value + 4f) * e.fin() * 80f), (randomSeed(e.id * 126) + 1f) * 34f * (1f - e.finpow()));
 		color(Color.valueOf("ff9c5a"));
-		Lines.square(e.x + Tmp.v1.x, e.y + Tmp.v1.y, e.fslope() * 3, 45);
+		Fill.square(e.x + Tmp.v1.x, e.y + Tmp.v1.y, e.fslope() * 3, 45);
 		color();
 	}),
 
