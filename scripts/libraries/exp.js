@@ -136,48 +136,48 @@ module.exports = {
                 if(this.linearInc.length == 1) {
                     this[this.linearInc[0]] = Math.max(this.linearIncStart[0] + this.linearIncMul[0] * lvl, 0);
                 } else if(this.linearInc.length > 0) {
-                    this.linearEXP(tile, lvl);
+                    this.linearEXP(lvl);
                 };
                 if(this.expInc.length == 1) {
                     this[this.expInc[0]] = Math.max(this.expIncStart[0] + Mathf.pow(this.expIncMul[0], lvl), 0);
                 } else if(this.expInc.length > 0) {
-                    this.expEXP(tile, lvl);
+                    this.expEXP(lvl);
                 };
                 if(this.rootInc.length == 1) {
                     this[this.rootInc[0]] = Math.max(this.rootIncStart[0] + Mathf.sqrt(this.rootIncMul[0] * lvl), 0);
                 } else if(this.rootInc.length > 0) {
-                    this.rootEXP(tile, lvl);
+                    this.rootEXP(lvl);
                 };
                 if(this.boolInc.length == 1) {
                     this[this.boolInc[0]] = (this.boolIncStart[0]) ? (lvl < this.boolIncMul[0]) : (lvl >= this.boolIncMul[0]);
                 } else if(this.boolInc.length > 0) {
-                    this.boolEXP(tile, lvl);
+                    this.boolEXP(lvl);
                 };
                 if(this.listInc.length > 0) {
-                    this.listEXP(tile, lvl);
+                    this.listEXP(lvl);
                 };
             },
-            linearEXP(tile, lvl) {
+            linearEXP(lvl) {
                 for(var i = 0; i < this.linearInc.length; i++) {
                     this[this.linearInc[i]] = Math.max(this.linearIncStart[i] + this.linearIncMul[i] * lvl, 0);
                 };
             },
-            expEXP(tile, lvl) {
+            expEXP(lvl) {
                 for(var i = 0; i < this.expInc.length; i++) {
                     this[this.expInc[i]] = Math.max(this.expIncStart[i] + Mathf.pow(this.expIncMul[i], lvl), 0);
                 };
             },
-            rootEXP(tile, lvl) {
+            rootEXP(lvl) {
                 for(var i = 0; i < this.rootInc.length; i++) {
                     this[this.rootInc[i]] = Math.max(this.rootIncStart[i] + Mathf.sqrt(this.rootIncMul[i] * lvl), 0);
                 };
             },
-            boolEXP(tile, lvl) {
+            boolEXP(lvl) {
                 for(var i = 0; i < this.boolInc.length; i++) {
                     this[this.boolInc[i]] = (this.boolIncStart[i]) ? (lvl < this.boolIncMul[i]) : (lvl >= this.boolIncMul[i]);
                 };
             },
-            listEXP(tile, lvl) {
+            listEXP(lvl) {
                 for(var i = 0; i < this.listInc.length; i++) {
                     this[this.listInc[i]] = this.listIncMul[i][Math.min(lvl, this.listIncMul[i].length - 1)];
                 };
