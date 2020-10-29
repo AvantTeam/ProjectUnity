@@ -262,6 +262,7 @@ module.exports = {
             if((expblock.upgrades[i].iconContent === undefined) && (typeof(expblock.upgrades[i].block)) != "string") expblock.upgrades[i].iconContent = expblock.upgrades[i].block;
         }
         Events.on(EventType.ClientLoadEvent, () => {
+            print("HIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII");
             for(var i=0; i<expblock.upgrades.length; i++){
                 if((typeof(expblock.upgrades[i].block)) == "string"){
                     expblock.upgrades[i].block = Vars.content.getByName(ContentType.block, expblock.upgrades[i].block);
@@ -374,10 +375,11 @@ module.exports = {
             upgradeID(id){
                 var lvl = this.totalLevel();
                 //print("UpgradeID: "+id);
+                print("ID: "+id);
                 if((lvl >= expblock.upgrades[id].min) && (expblock.upgrades[id].max === undefined || lvl <= expblock.upgrades[id].max)) this.upgradeBlock(expblock.upgrades[id].block);
             },
             upgradeBlock(block){
-                //print("UpgradeBlock: "+block);
+                print("UpgradeBlock: "+block);
                 /*if(expected != this.totalLevel()){
                     //invalid
                     Vars.control.input.frag.config.hideConfig();
