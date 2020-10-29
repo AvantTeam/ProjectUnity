@@ -1,4 +1,4 @@
-package unity.content;
+package unity.world.blocks;
 
 import arc.math.*;
 import mindustry.entities.Units;
@@ -7,14 +7,14 @@ import mindustry.gen.Building;
 import mindustry.gen.Groups;
 import mindustry.world.blocks.defense.turrets.*;
 
-public class ShieldTurret extends ChargeTurret {
+public class ShieldTurret extends ChargeTurret{
 
     public ShieldTurret(String name){
         super(name);
         // nothing for now
     }
 
-    public class ShieldTurretBuild extends ChargeTurretBuild {
+    public class ShieldTurretBuild extends ChargeTurretBuild{
         public boolean shield;
 
         @Override
@@ -36,7 +36,7 @@ public class ShieldTurret extends ChargeTurret {
 
         public boolean targetShield(Building t, ShieldTurretBuild b, float radius){
 
-            Groups.bullet.intersect(t.x-radius, t.y-radius, radius*2, radius*2, e -> {
+            Groups.bullet.intersect(t.x - radius, t.y - radius, radius * 2, radius * 2, e -> {
                 if(e != null && e.team == b.team && e.data != null && ((Object[]) e.data)[2] != null && ((Object[]) e.data)[2] == "shield"){
                     shield = true;
                 }

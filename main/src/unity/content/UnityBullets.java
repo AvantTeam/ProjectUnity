@@ -27,7 +27,7 @@ import static mindustry.graphics.Pal.*;
 import static unity.content.UnityFx.*;
 
 public class UnityBullets implements ContentList{
-    public static BulletType laser, coalBlaze, pyraBlaze, falloutLaser, catastropheLaser, calamityLaser, orb, shockBeam, currentStroke, plasmaTriangle, plasmaFragTriangle, shielderBullet;
+    public static BulletType laser, coalBlaze, pyraBlaze, falloutLaser, catastropheLaser, calamityLaser, orb, shockBeam, currentStroke, shielderBullet, plasmaFragTriangle, plasmaTriangle;
     
     //only enhanced
     public static BasicBulletType standardDenseLarge, standardHomingLarge, standardIncendiaryLarge, standardThoriumLarge, standardDenseHeavy, standardHomingHeavy, standardIncendiaryHeavy, standardThoriumHeavy, standardDenseMassive, standardHomingMassive,
@@ -265,6 +265,19 @@ public class UnityBullets implements ContentList{
             colors = new Color[]{Pal.surge.cpy(), Pal.surge, Color.white};
         }};
         
+        shielderBullet = new ShieldBulletType(8){{
+            drag = 0.03f;
+            shootEffect = Fx.none;
+            despawnEffect = Fx.none;
+            collides = false;
+            hitSize = 0;
+            hittable = false;
+            hitEffect = Fx.hitLiquid;
+            breakSound = Sounds.wave;
+            maxRadius = 10f;
+            shieldHealth = 3000f;
+        }};
+        
         plasmaFragTriangle = new TriangleBulletType(4.5f, 90f){{
             lifetime = 160f;
             lifetimeRand = 40f;
@@ -289,19 +302,6 @@ public class UnityBullets implements ContentList{
             despawnEffect = Fx.none;
             fragBullet = plasmaFragTriangle;
             fragBullets = 8;
-        }};
-
-        shielderBullet = new ShieldBulletType(8){{
-            drag = 0.03f;
-            shootEffect = Fx.none;
-            despawnEffect = Fx.none;
-            collides = false;
-            hitSize = 0;
-            hittable = false;
-            hitEffect = Fx.hitLiquid;
-            breakSound = Sounds.wave;
-            maxRadius = 10f;
-            shieldHealth = 3000f;
         }};
 
         //only enhanced
