@@ -37,45 +37,51 @@ const arcnelidiaType = extendContent(UnitType, "arcnelidia", {
 			w.load();
 		});
 	},
+	
 	init(){
 		this.super$init();
 		
 		wormLib.sortWeapons(this.segWeapSeq);
 	},
+	
 	setTypeID(id){
 		this.idType = id;
 	},
+	
 	getSegmentWeapon(){
 		return this.segWeapSeq;
 	},
 	getTypeID(){
 		return this.idType;
 	},
+	
 	segmentOffsetF(){
 		return this.segmentOffset;
 	},
+	
 	segmentRegionF(){
 		return this.segmentRegion;
 	},
 	tailRegionF(){
 		return this.tailRegion;
 	},
+	
 	drawBody(unit){
 		this.super$drawBody(unit);
 		wormLib.drawSegments(unit);
 	},
+	
 	drawShadow(unit){
 		this.super$drawShadow(unit);
 		wormLib.drawShadowSegments(unit);
 	},
+	
 	drawOcclusion(unit){
 		this.super$drawOcclusion(unit);
 		wormLib.drawOcclusionSegments(unit);
 	}
 });
-/*arcnelidiaType.constructor = () => {
-	return extend(UnitEntity, {});
-};*/
+
 arcnelidiaType.segWeapSeq = new Seq();
 arcnelidiaType.segWeapSeq.add(aWLightningB);
 //wormLib.sortWeapons(arcnelidiaType.segWeapSeq);
@@ -94,6 +100,4 @@ arcnelidiaType.armor = 5;
 arcnelidiaType.flying = true;
 arcnelidiaType.visualElevation = 0.8;
 arcnelidiaType.range = 210;
-//print(arcnelidiaType.constructor);
 wormLib.setUniversal(arcnelidiaType, UnitEntity, false, {});
-//print(arcnelidiaType.constructor);

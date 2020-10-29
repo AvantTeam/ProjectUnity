@@ -1,30 +1,11 @@
+const effects = this.global.unity.effects;
 const shieldBreak = loadSound("shield-break");
-
-const shieldBreakFx = new Effect(5, e => {
-	Draw.z(Layer.shields);
-	Draw.color(e.color);
-	var radius = e.data * e.fout();
-
-	if(Core.settings.getBool("animatedshields")){
-		Fill.poly(e.x, e.y, 6, radius);
-	} else {
-		Lines.stroke(1.5);
-		Draw.alpha(0.09);
-		Fill.poly(e.x, e.y, 6, radius);
-		Draw.alpha(1);
-		Lines.poly(e.x, e.y, 6, radius);
-		Draw.reset();
-	}
-	Draw.z(Layer.block);
-
-	Draw.color();
-});
 
 function targetShield(t, b, radius){
 	var shield = false;
 
-	Groups.bullet.intersect(t.x-radius, t.y-radius, radius*2, radius*2, e => {
-		if(e != null && e.team == b.team && e.data != null && e.data[2] != null && e.data[2] == "shield"){
+	Groups.bullet.intersect(t.x - radius, t.y - radius, radius * 2, radius * 2, e => {
+		if(e != null && e.team == b.team && Array.isArray(e.data) && e.data.length == 3 && e.data[2] == "shield"){
 			shield = true;
 		}
 	});
@@ -37,13 +18,13 @@ function targetShield(t, b, radius){
 const shieldBullet = extend(BasicBulletType, {
 	update(b){
 		if(b.data == null){
-			/** The first number is the shield health, DO NOT TOUCH THE SECOND VALUE */
+			/** The first number is the shield health, DO NOT TOUCH THE SECOND VALUE! */
 			b.data = [3000, 0, "shield"];
 		}
 
-		var radius = (((3-b.vel.len())*10)+1)*0.8;
+		var radius = (((3 - b.vel.len()) * 10) + 1) * 0.8;
 
-		Groups.bullet.intersect(b.x-radius, b.y-radius, radius*2, radius*2, e => {
+		Groups.bullet.intersect(b.x - radius, b.y - radius, radius * 2, radius * 2, e => {
 			if(e != null && e.team != b.team){
 				if(e.owner instanceof Building){
 					if(e.owner.block.name != "unity-shielder"){
@@ -51,7 +32,7 @@ const shieldBullet = extend(BasicBulletType, {
 						b.data[1] = 1;
 						e.remove();
 					}
-				} else {
+				}else{
 					b.data[0] -= e.damage;
 					b.data[1] = 1;
 					e.remove();
@@ -62,7 +43,7 @@ const shieldBullet = extend(BasicBulletType, {
 
 		if(b.data[0] <= 0){
 			shieldBreak.at(b.x, b.y, Mathf.random(0.8, 1));
-			shieldBreakFx.at(b.x, b.y, 0, b.team.color, radius);
+			effects.shieldBreakFx.at(b.x, b.y, 0, b.team.color, radius);
 			b.remove();
 		}
 
@@ -74,11 +55,11 @@ const shieldBullet = extend(BasicBulletType, {
 	draw(b){
 		Draw.z(Layer.shields);
 		Draw.color(b.team.color, Color.white, b.data != null ? Mathf.clamp(b.data[1]) : 0);
-		var radius = ((3-b.vel.len())*10)+1;
+		var radius = ((3 - b.vel.len()) * 10) + 1;
 
 		if(Core.settings.getBool("animatedshields")){
 			Fill.poly(b.x, b.y, 6, radius);
-		} else {
+		}else{
 			Lines.stroke(1.5);
 			Draw.alpha(0.09 + Mathf.clamp(0.08 * b.data[1]));
 			Fill.poly(b.x, b.y, 6, radius);
@@ -117,7 +98,7 @@ shielder.consumes.add(new ConsumeLiquidFilter(liquid => liquid.temperature <= 0.
 shielder.buildType = () => {
 	return extendContent(ChargeTurret.ChargeTurretBuild, shielder, {
 
-		/** Make the bullet Stay in its target, not following the path */
+		/** Make the bullet stay in its target, not following the path */
 		bullet(type, angle){
 			var spdScl = Mathf.clamp(Mathf.dst(this.x + shielder.tr.x, this.y + shielder.tr.y, this.targetPos.x, this.targetPos.y) / shielder.range, 0, 1);
 		

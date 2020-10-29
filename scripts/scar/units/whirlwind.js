@@ -1,21 +1,5 @@
 const sEffect = this.global.unity.status;
-
-//TODO move effect to an effect library.
-const coloredHitSmall = new Effect(14, e => {
-	Draw.color(Color.white, e.color, e.fin());
-	
-	e.scaled(7, s => {
-		Lines.stroke(0.5 + s.fout());
-		Lines.circle(e.x, e.y, s.fin() * 5);
-	});
-	
-	Lines.stroke(0.5 + e.fout());
-	
-	Angles.randLenVectors(e.id, 5, e.fin() * 15, (x, y) => {
-		var ang = Mathf.angle(x, y);
-		Lines.lineAngle(e.x + x, e.y + y, ang, (e.fout() * 3) + 1);
-	});
-});
+const effects = this.global.unity.effects;
 
 const whirlWindMissile = extend(MissileBulletType, {});
 whirlWindMissile.speed = 5;
@@ -84,7 +68,7 @@ whirlWindLaser.lifetime = 10 * 60;
 whirlWindLaser.length = 160;
 whirlWindLaser.width = 5;
 whirlWindLaser.incendChance = 0;
-whirlWindLaser.hitEffect = coloredHitSmall;
+whirlWindLaser.hitEffect = effects.coloredHitSmall;
 whirlWindLaser.lightColor = Color.valueOf("f5303690");
 whirlWindLaser.hitColor = Color.valueOf("f5303690");
 whirlWindLaser.colors = [Color.valueOf("f5303690"), Color.valueOf("ff786e"), Color.white];

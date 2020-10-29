@@ -443,6 +443,7 @@ const defaultUnit = prov(s => {
 		getSegmentLength(){
 			return typeof(this.type.segmentLength) == "function" ? this.type.segmentLength() : 9;
 		},
+		
 		setEffects(){
 			this._segmentUnits = [];
 			this._segments = [];
@@ -454,6 +455,7 @@ const defaultUnit = prov(s => {
 				this._segmentVelocities[i] = new Vec2();
 			}
 		},
+		
 		update(){
 			this._lastVelocityD.set(this._lastVelocityC);
 			this._lastVelocityC.set(this.vel);
@@ -461,6 +463,7 @@ const defaultUnit = prov(s => {
 			this.updateSegmentVLocal(this._lastVelocityC);
 			this.updateSegmentsLocal();
 		},
+		
 		updateSegmentVLocal(vec){
 			for(var j = 0; j < this.getSegmentLength(); j++){
 				var seg = this.getSegmentPositions();
@@ -490,6 +493,7 @@ const defaultUnit = prov(s => {
 				this.getSegmentVelocities()[p].scl(Time.delta);
 			}
 		},
+		
 		updateSegmentsLocal(){
 			var segmentOffset = (typeof(this.type.segmentOffsetF) == "function") ? this.type.segmentOffsetF() : this.type.hitSize * 2;
 			tempVec1.trns(Angles.angle(this.getSegmentPositions()[0].x, this.getSegmentPositions()[0].y, this.x, this.y) + 180, segmentOffset);
@@ -537,6 +541,7 @@ const defaultUnit = prov(s => {
 		classId(){
 			return mainID;
 		},
+		
 		clipSize(){
 			var segmentOffset = (typeof(this.type.segmentOffsetF) == "function") ? this.type.segmentOffsetF() : this.type.hitSize * 2;
 			return this.getSegmentLength() * segmentOffset * 2;
@@ -575,6 +580,7 @@ const defaultUnit = prov(s => {
 				parent = this.getSegments()[i];
 			}
 		},
+		
 		getSegments(){
 			return this._segmentUnits;
 		},
@@ -638,6 +644,7 @@ module.exports = {
 						this._segmentVelocities[i] = new Vec2();
 					}
 				},
+				
 				update(){
 					this._lastVelocityD.set(this._lastVelocityC);
 					this._lastVelocityC.set(this.vel);
@@ -683,6 +690,7 @@ module.exports = {
 						this.getSegmentVelocities()[p].scl(Time.delta);
 					}
 				},
+				
 				updateSegmentsLocal(){
 					var segmentOffset = (typeof(this.type.segmentOffsetF) == "function") ? this.type.segmentOffsetF() : this.type.hitSize * 2;
 					tempVec1.trns(Angles.angle(this.getSegmentPositions()[0].x, this.getSegmentPositions()[0].y, this.x, this.y) + 180, segmentOffset);
@@ -709,6 +717,7 @@ module.exports = {
 						segU[v].updateCustom();
 					}
 				},
+				
 				write(writes){
 					this.super$write(writes);
 	
@@ -717,6 +726,7 @@ module.exports = {
 						writes.f(this.getSegmentPositions()[i].y);
 					}
 				},
+				
 				read(reads){
 					this.super$read(reads);
 	

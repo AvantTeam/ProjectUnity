@@ -44,9 +44,16 @@ const script = [
                 ]
             },
 
+			{
+				name: "units",
+				childs: [
+					"ai"
+				]
+			},
+
+			"effects",
             "wormlib",
 			"unitlib",
-            "hoverbase",
             "copterbase",
             "loader",
             "chainlaser",
@@ -74,7 +81,8 @@ const script = [
 					"wind-turbine",
                     "walls",
                     "ores",
-                    "multi-test-younggam"
+                    "multi-test-younggam",
+                    "infusor"
                 ]
             },
 
@@ -120,9 +128,11 @@ const script = [
 			{
 				name: "units",
 				childs: [
+					"hovos",
+
 					"whirlwind",
 					"jetstream",
-                    "hovos"
+					"vortex"
 				]
 			}
 		]
@@ -190,6 +200,8 @@ const script = [
                 name: "turrets",
                 childs: [
                     "laser",
+                    "lasercharge",
+                    "laserfrost",
                     "inferno"
                 ]
             },
@@ -229,14 +241,15 @@ const script = [
             {
                 name: "turrets",
                 childs: [
-                    "mage", "oracle"
+                    "mage", "oracle",
+                    "spectrum"
                 ]
             },
 
             {
                 name: "units",
                 childs: [
-                    "electron", "neutron"
+                    "stele", "pedestal", "pilaster"
                 ]
             }
         ]

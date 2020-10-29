@@ -1,22 +1,4 @@
-const currentCharge = new Effect(32, e => {
-	Draw.color(Pal.surge, Color.white, e.fin());
-
-	Angles.randLenVectors(e.id, 8, 420 + Mathf.random(24, 28) * e.fout(), e.rotation, 4, new Floatc2({get(x, y){
-		Lines.stroke(0.3 + e.fout() * 2);
-		Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fout() * 14 + 0.5);
-	}}));
-	
-	Lines.stroke(e.fin() * 1.5);
-	Lines.circle(e.x, e.y, e.fout() * 60);
-});
-
-const currentChargeBegin = new Effect(260, e => {
-	Draw.color(Pal.surge);
-	Fill.circle(e.x, e.y, e.fin() * 7);
-
-	Draw.color();
-	Fill.circle(e.x, e.y, e.fin() * 3);
-});
+const effects = this.global.unity.effects;
 
 const current = extend(LaserBulletType, {});
 current.length = 430;
@@ -68,6 +50,6 @@ const currentTurret = extendContent(ChargeTurret, "current", {
 });
 currentTurret.shootType = current;
 currentTurret.shootSound = Sounds.laserbig;
-currentTurret.chargeEffect = currentCharge;
-currentTurret.chargeBeginEffect = currentChargeBegin;
+currentTurret.chargeEffect = effects.imberCurrentCharge;
+currentTurret.chargeBeginEffect = effects.imberCurrentChargeBegin;
 currentTurret.consumes.add(new ConsumeLiquidFilter(liquid => liquid.temperature <= 0.5 && liquid.flammability <= 0.1, 0.52)).boost();

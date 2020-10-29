@@ -24,7 +24,7 @@ function MultiCrafterBuild() {
         var current = this._toggle;
         if((this.block.doDumpToggle() ? current > -1 && this.block.getRecipes()[current].output.items.some(a => a.item == item) : this.block.getOutputItemSet().contains(item)) && !this.items.has(item)) this.toOutputItemSet.add(item);
         this.items.add(item, amount);
-    }
+    };
     this.displayConsumption = function(table) {
         if(typeof this.block["getRecipes"] !== "function") return;
         const recs = this.block.getRecipes();
@@ -43,35 +43,32 @@ function MultiCrafterBuild() {
                 (function(that, stack) {
                     table.add(new ReqImage(new ItemImage(stack.item.icon(Cicon.medium), stack.amount), () => that.items != null && that.items.has(stack.item, stack.amount))).size(8 * 4);
                 })(this, items[j]);
-            }
+            };
             z += len;
             //액체
             for(var l = 0, len = liquids.length; l < len; l++) {
                 (function(that, stack) {
                     table.add(new ReqImage(new ItemImage(stack.liquid.icon(Cicon.medium), stack.amount), () => that.liquids != null && that.liquids.get(stack.liquid) > stack.amount)).size(8 * 4);
                 })(this, liquids[l]);
-            }
+            };
             z += len;
             //아이템 유뮤 바에서 레시피 구분및 자동 줄바꿈을 위해 정리된 input item 필요.
             if(z == 0) {
                 table.image(Icon.cancel).size(8 * 4);
                 x += 1;
-            }
+            };
             if(i < recLen - 1) {
                 var next = recs[i + 1].input;
                 y += next.items.length + next.liquids.length;
                 x += z;
-                if(x + y <= 7 && y != 0) {
-                    table.image(Icon.pause).size(8 * 4);
-                    x += 1;
-                } else if(x + y <= 6 && y == 0) {
+                if(x + y <= 8 && y != 0 || x + y <= 7 && y == 0) {
                     table.image(Icon.pause).size(8 * 4);
                     x += 1;
                 } else {
                     table.row();
                     x = 0;
-                }
-            }
+                };
+            };
             y = 0;
             z = 0;
         }
@@ -87,7 +84,7 @@ function MultiCrafterBuild() {
             } else {
                 this._powerStat = 1;
                 return oPower;
-            }
+            };
         }
         this._powerStat = 0;
         return 0;
@@ -106,7 +103,7 @@ function MultiCrafterBuild() {
         //liquids
         for(var j = 0, len = liquids.length; j < len; j++) {
             if(this.liquids.get(liquids[j].liquid) < liquids[j].amount) return true;
-        }
+        };
         return false;
     };
     this.checkoutput = function(i) {
@@ -116,11 +113,11 @@ function MultiCrafterBuild() {
         var liquids = recs[i].output.liquids;
         for(var j = 0, len = items.length; j < len; j++) {
             if(this.items.get(items[j].item) + items[j].amount > this.getMaximumAccepted(items[j].item)) return true;
-        }
+        };
         //liquids
         for(var j = 0, len = liquids.length; j < len; j++) {
             if(this.liquids.get(liquids[j].liquid) + liquids[j].amount > this.block.liquidCapacity) return true;
-        }
+        };
         return false;
     };
     this.checkCond = function(i) {
@@ -128,9 +125,7 @@ function MultiCrafterBuild() {
             this._condValid = false;
             this._cond = false;
             return false;
-        }
-        //check power
-        else if(this.checkinput(i)) {
+        } else if(this.checkinput(i)) { //check power
             this._condValid = false;
             this._cond = false;
             return false;
@@ -138,7 +133,7 @@ function MultiCrafterBuild() {
             this._condValid = true;
             this._cond = false;
             return false;
-        }
+        };
         this._condValid = true;
         this._cond = true;
         return true;
@@ -150,7 +145,7 @@ function MultiCrafterBuild() {
             if(this.progressArr[i] != 0 && this.progressArr[i] != null) {
                 this.progress = this.progressArr[i];
                 this.progressArr[i] = 0;
-            }
+            };
             this.progress += this.getProgressIncreaseA(i, recs[i].craftTime);
             this.totalProgress += this.delta();
             this.warmup = Mathf.lerpDelta(this.warmup, 1, 0.02);
@@ -176,15 +171,15 @@ function MultiCrafterBuild() {
                 if(!this.put(oItem)) {
                     if(!eItems.has(oItem)) this.toOutputItemSet.add(oItem);
                     eItems.add(oItem, 1);
-                }
-            }
-        }
+                };
+            };
+        };
         //produce liquids
         for(var j = 0, len = outputLiquids.length; j < len; j++) {
             var oLiquid = outputLiquids[j].liquid;
             if(eLiquids.get(oLiquid) <= 0.001) this.toOutputLiquidset.add(oLiquid);
             this.handleLiquid(this, oLiquid, outputLiquids[j].amount);
-        }
+        };
         this.block.craftEffect.at(this.x, this.y);
         this.progress = 0;
     };
@@ -193,7 +188,7 @@ function MultiCrafterBuild() {
         if(this.timer.get(1, 60)) {
             this.itemHas = 0;
             this.items.each(item => this.itemHas++);
-        }
+        };
         const recs = this.block.getRecipes();
         var recLen = recs.length;
         var current = this._toggle;
@@ -203,7 +198,7 @@ function MultiCrafterBuild() {
         if(current >= 0) {
             this.customCons(current);
             if(this.progress >= 1) this.customProd(current);
-        }
+        };
         var eItems = this.items;
         var eLiquids = this.liquids;
         //dump
@@ -219,10 +214,10 @@ function MultiCrafterBuild() {
                     eItems.remove(candidate, 1);
                     if(!eItems.has(candidate)) this.toOutputItemSet.remove(candidate);
                     break;
-                }
-            }
+                };
+            };
             if(i != len) this.dumpItemEntry = (i + itemEntry) % len;
-        }
+        };
         var que = this.toOutputLiquidset.orderedItems(),
             len = que.size;
         if(len > 0) {
@@ -231,8 +226,8 @@ function MultiCrafterBuild() {
                 this.dumpLiquid(liquid);
                 if(eLiquids.get(liquid) <= 0.001) this.toOutputLiquidset.remove(liquid);
                 break;
-            }
-        }
+            };
+        };
     };
     this.shouldConsume = function() {
         return this._condValid && this.productionValid();
@@ -255,7 +250,7 @@ function MultiCrafterBuild() {
             invFrag.hide();
             Vars.control.input.frag.config.hideConfig();
             return;
-        }
+        };
         var group = new ButtonGroup();
         group.setMinCheckCount(0);
         group.setMaxCheckCount(1);
@@ -271,7 +266,7 @@ function MultiCrafterBuild() {
                 button.getStyle().imageUp = new TextureRegionDrawable(output.items.length > 0 ? output.items[0].item.icon(Cicon.small) : output.liquids.length > 0 ? output.liquids[0].liquid.icon(Cicon.small) : output.power > 0 ? Icon.power : Icon.cancel);
                 button.update(() => button.setChecked(that._toggle == i));
             })(i, this);
-        }
+        };
         table.row();
         //other images
         var lengths = [];
@@ -285,12 +280,12 @@ function MultiCrafterBuild() {
             if(outputLiquidLen > 0) {
                 if(outputItemLen > 0) lengths[l][1] = outputLiquidLen;
                 else lengths[l][1] = outputLiquidLen - 1;
-            }
+            };
             if(output.power > 0) lengths[l][2] = 1;
-        }
+        };
         for(var i = 0; i < recLen; i++) {
             max = max < lengths[i][0] + lengths[i][1] + lengths[i][2] ? lengths[i][0] + lengths[i][1] + lengths[i][2] : max;
-        }
+        };
         for(var i = 0; i < max; i++) {
             for(var j = 0; j < recLen; j++) {
                 if(exit[j]) continue;
@@ -310,10 +305,10 @@ function MultiCrafterBuild() {
                     lengths[j][2]--;
                 } else {
                     table.image(Tex.clear);
-                }
-            }
+                };
+            };
             table.row();
-        }
+        };
     };
     this.configured = function(player, value) {
         if(isNaN(value)) {
@@ -321,13 +316,13 @@ function MultiCrafterBuild() {
             this._cond = false;
             this._condValid = false;
             return;
-        }
+        };
         var current = this._toggle;
         if(current >= 0) this.progressArr[current] = this.progress;
         if(value == -1) {
             this._condValid = false;
             this._cond = false;
-        }
+        };
         if(this.block.doDumpToggle()) {
             this.toOutputItemSet.clear();
             this.toOutputLiquidset.clear();
@@ -337,13 +332,13 @@ function MultiCrafterBuild() {
                 for(var i = 0, len = oItems.length; i < len; i++) {
                     var item = oItems[i].item;
                     if(this.items.has(item)) this.toOutputItemSet.add(item);
-                }
+                };
                 for(var i = 0, len = oLiquids.length; i < len; i++) {
                     var liquid = oLiquids[i].liquid;
                     if(this.liquids.get(liquid) > 0.001) this.toOutputLiquidset.add(liquid);
-                }
-            }
-        }
+                };
+            };
+        };
         this.progress = 0;
         this._toggle = value;
     };
@@ -416,7 +411,7 @@ function MultiCrafterBuild() {
 function MultiCrafterBlock() {
     this.tempRecs = [];
     this.recs = [];
-    this.infoStyle = null
+    this.infoStyle = null;
     this.getRecipes = function() {
         return this.recs;
     };
@@ -510,8 +505,8 @@ function MultiCrafterBlock() {
                         this._inputItemSet.add(item);
                         if(isNaN(words[1])) throw "Invalid amount: " + words[1] + " at " + j + "th input item in " + i + "th recipe";
                         realInput.items[j] = new ItemStack(item, words[1] * 1);
-                    }
-                }
+                    };
+                };
                 if(tmpInput.liquids != null) {
                     for(var j = 0, len = tmpInput.liquids.length; j < len; j++) {
                         if(typeof tmpInput.liquids[j] != "string") throw "It is not string at " + j + "th input liquid in " + i + "th recipe";
@@ -523,9 +518,9 @@ function MultiCrafterBlock() {
                         this._liquidSet.add(liquid);
                         if(isNaN(words[1])) throw "Invalid amount: " + words[1] + " at " + j + "th input liquid in " + i + "th recipe";
                         realInput.liquids[j] = new LiquidStack(liquid, words[1] * 1);
-                    }
-                }
-            }
+                    };
+                };
+            };
             if(isOutputExist) {
                 if(tmpOutput.items != null) {
                     for(var j = 0, len = tmpOutput.items.length; j < len; j++) {
@@ -537,9 +532,9 @@ function MultiCrafterBlock() {
                         this.outputItemSet.add(item);
                         if(isNaN(words[1])) throw "Invalid amount: " + words[1] + " at " + j + "th output item in " + i + "th recipe";
                         realOutput.items[j] = new ItemStack(item, words[1] * 1);
-                    }
+                    };
                     if(j != 0) this.hasOutputItem = true;
-                }
+                };
                 if(tmpOutput.liquids != null) {
                     for(var j = 0, len = tmpOutput.liquids.length; j < len; j++) {
                         if(typeof tmpOutput.liquids[j] != "string") throw "It is not string at " + j + "th output liquid in " + i + "th recipe";
@@ -551,14 +546,14 @@ function MultiCrafterBlock() {
                         this._liquidSet.add(liquid);
                         if(isNaN(words[1])) throw "Invalid amount: " + words[1] + " at " + j + "th output liquid in " + i + "th recipe";
                         realOutput.liquids[j] = new LiquidStack(liquid, words[1] * 1);
-                    }
-                }
-            }
-        }
+                    };
+                };
+            };
+        };
         if(!this.powerBarI) {
             this.consumes.remove(ConsumeType.power);
             this.hasPower = false;
-        }
+        };
         this.consumesPower = this.powerBarI;
         this.outputsPower = this.powerBarO;
         this.super$init();
@@ -566,57 +561,60 @@ function MultiCrafterBlock() {
         this.timers += 2;
         if(!Vars.headless) this.infoStyle = Core.scene.getStyle(Button.ButtonStyle);
     };
-    this.displayInfo = function(table) {
-        this.super$displayInfo(table);
-        var recLen = this.recs.length;
-        for(var i = 0; i < recLen; i++) {
-            var rec = this.recs[i];
-            var outputItems = rec.output.items,
-                inputItems = rec.input.items;
-            var outputLiquids = rec.output.liquids,
-                inputLiquids = rec.input.liquids;
-            var inputPower = rec.input.power,
-                outputPower = rec.output.power
-            table.table(this.infoStyle.up, part => {
-                part.add("[accent]" + BlockStat.input.localized()).expandX().left().row();
-                part.table(cons(row => {
-                    for(var l = 0, len = inputItems.length; l < len; l++) row.add(new ItemDisplay(inputItems[l].item, inputItems[l].amount, true)).padRight(5);
-                })).left().row();
-                part.table(cons(row => {
-                    for(var l = 0, len = inputLiquids.length; l < len; l++) row.add(new LiquidDisplay(inputLiquids[l].liquid, inputLiquids[l].amount, false));
-                })).left().row();
-                if(inputPower > 0) {
-                    part.table(cons(row => {
-                        row.add("[lightgray]" + BlockStat.powerUse.localized() + ":[]").padRight(4);
-                        (new NumberValue(this.recs[i].input.power * 60, StatUnit.powerSecond)).display(row);
-                    })).left().row();
-                }
-                part.add("[accent]" + BlockStat.output.localized()).left().row();
-                part.table(cons(row => {
-                    for(var jj = 0, len = outputItems.length; jj < len; jj++) row.add(new ItemDisplay(outputItems[jj].item, outputItems[jj].amount, true)).padRight(5);
-                })).left().row();
-                part.table(cons(row => {
-                    for(var jj = 0, len = outputLiquids.length; jj < len; jj++) row.add(new LiquidDisplay(outputLiquids[jj].liquid, outputLiquids[jj].amount, false));
-                })).left().row();
-                if(outputPower > 0) {
-                    part.table(cons(row => {
-                        row.add("[lightgray]" + BlockStat.basePowerGeneration.localized() + ":[]").padRight(4);
-                        (new NumberValue(this.recs[i].output.power * 60, StatUnit.powerSecond)).display(row);
-                    })).left().row();
-                }
-                part.table(cons(row => {
-                    row.add("[lightgray]" + BlockStat.productionTime.localized() + ":[]").padRight(4);
-                    (new NumberValue(rec.craftTime / 60, StatUnit.seconds)).display(row);
-                })).left().row();
-                if(typeof this["customDisplay"] === "function") this.customDisplay(part, i);
-            }).color(Pal.accent).left().growX();
-            table.add().size(18).row();
-        }
-    };
     this.setStats = function() {
         this.super$setStats();
-        if(this.powerBarI) this.stats.remove(BlockStat.powerUse);
-        this.stats.remove(BlockStat.productionTime);
+        if(this.powerBarI) this.stats.remove(Stat.powerUse);
+        this.stats.remove(Stat.productionTime);
+        var customValue = method => new StatValue() {
+            display: method
+        }
+        this.stats.add(Stat.input, customValue(table => {
+            table.row();
+            var recLen = this.recs.length;
+            for(var i = 0; i < recLen; i++) {
+                var rec = this.recs[i];
+                var outputItems = rec.output.items,
+                    inputItems = rec.input.items;
+                var outputLiquids = rec.output.liquids,
+                    inputLiquids = rec.input.liquids;
+                var inputPower = rec.input.power,
+                    outputPower = rec.output.power;
+                table.table(this.infoStyle.up, part => {
+                    part.add("[accent]" + Stat.input.localized()).expandX().left().row();
+                    part.table(cons(row => {
+                        for(var l = 0, len = inputItems.length; l < len; l++) row.add(new ItemDisplay(inputItems[l].item, inputItems[l].amount, true)).padRight(5);
+                    })).left().row();
+                    part.table(cons(row => {
+                        for(var l = 0, len = inputLiquids.length; l < len; l++) row.add(new LiquidDisplay(inputLiquids[l].liquid, inputLiquids[l].amount, false));
+                    })).left().row();
+                    if(inputPower > 0) {
+                        part.table(cons(row => {
+                            row.add("[lightgray]" + Stat.powerUse.localized() + ":[]").padRight(4);
+                            (new NumberValue(this.recs[i].input.power * 60, StatUnit.powerSecond)).display(row);
+                        })).left().row();
+                    }
+                    part.add("[accent]" + Stat.output.localized()).left().row();
+                    part.table(cons(row => {
+                        for(var jj = 0, len = outputItems.length; jj < len; jj++) row.add(new ItemDisplay(outputItems[jj].item, outputItems[jj].amount, true)).padRight(5);
+                    })).left().row();
+                    part.table(cons(row => {
+                        for(var jj = 0, len = outputLiquids.length; jj < len; jj++) row.add(new LiquidDisplay(outputLiquids[jj].liquid, outputLiquids[jj].amount, false));
+                    })).left().row();
+                    if(outputPower > 0) {
+                        part.table(cons(row => {
+                            row.add("[lightgray]" + Stat.basePowerGeneration.localized() + ":[]").padRight(4);
+                            (new NumberValue(this.recs[i].output.power * 60, StatUnit.powerSecond)).display(row);
+                        })).left().row();
+                    }
+                    part.table(cons(row => {
+                        row.add("[lightgray]" + Stat.productionTime.localized() + ":[]").padRight(4);
+                        (new NumberValue(rec.craftTime / 60, StatUnit.seconds)).display(row);
+                    })).left().row();
+                    if(typeof this["customDisplay"] === "function") this.customDisplay(part, i);
+                }).color(Pal.accent).left().growX();
+                table.add().size(18).row();
+            };
+        }));
     };
     this.setBars = function() {
         this.super$setBars();
@@ -632,7 +630,7 @@ function MultiCrafterBlock() {
                 this.bars.add("liquid" + i, entity => new Bar(() => k.localizedName, () => k.barColor == null ? k.color : k.barColor, () => entity.liquids.get(k) / this.liquidCapacity));
                 i++;
             });
-        }
+        };
     };
     this.outputsItems = function() {
         return this.hasOutputItem;

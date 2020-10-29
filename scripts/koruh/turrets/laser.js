@@ -1,4 +1,5 @@
 const lib = this.global.unity.exp;
+const powerLaser = Color.valueOf("F9DBB1");
 
 const laser = extend(BulletType, {
     getDamage(b){
@@ -6,7 +7,7 @@ const laser = extend(BulletType, {
     },
 
     getColor(b){
-        return Tmp.c1.set(Color.white).lerp(Pal.lancerLaser, b.owner.totalLevel() / 10);
+        return Tmp.c1.set(powerLaser).lerp(Pal.lancerLaser, b.owner.totalLevel() / 10);
     },
 
     collision(other, x, y){
@@ -61,10 +62,22 @@ const laser = extend(BulletType, {
             Tmp.v1.set(data);
 
             Draw.color(this.getColor(b));
-            Drawf.laser(b.team, Core.atlas.find("laser"), Core.atlas.find("laser-end"), b.x, b.y, Tmp.v1.x, Tmp.v1.y, this.width * b.fout());
+            Draw.alpha(0.4);
+            //this looks horrible without bloom
+            //Drawf.laser(b.team, Core.atlas.find("laser"), Core.atlas.find("laser-end"), b.x, b.y, Tmp.v1.x, Tmp.v1.y, this.width * b.fout());
+            Lines.stroke(b.fout()*2.9);
+            Lines.line(b.x, b.y, Tmp.v1.x, Tmp.v1.y);
+
+            Draw.alpha(1);
+            Lines.stroke(b.fout()*1.8);
+            Lines.line(b.x, b.y, Tmp.v1.x, Tmp.v1.y);
+
+            Draw.color(Color.white);
+            Lines.stroke(b.fout());
+            Lines.line(b.x, b.y, Tmp.v1.x, Tmp.v1.y);
             Draw.reset();
 
-            Drawf.light(Team.derelict, b.x, b.y, b.x + Tmp.v1.x, b.y + Tmp.v1.y, 15 * b.fout() + 5, this.getColor(b), 0.6);
+            Drawf.light(Team.derelict, b.x, b.y, Tmp.v1.x, Tmp.v1.y, 15 * b.fout() + 5, Color.white, 0.6);
         }
     }
 });
@@ -80,6 +93,7 @@ laser.width = 0.7;
 laser.length = 150;
 laser.hittable = false;
 laser.hitEffect = Fx.hitLiquid;
+laser.shootEffect = Fx.hitLiquid;
 
 const laserTurret = lib.extend(PowerTurret, PowerTurret.PowerTurretBuild, "laser-turret", {
     maxLevel: 10,
@@ -95,6 +109,16 @@ const laserTurret = lib.extend(PowerTurret, PowerTurret.PowerTurretBuild, "laser
             field: "targetAir",
             start: false,
             intensity: 5
+        }
+    ],
+    upgrades: [
+        {
+            block: "unity-charge-laser-turret",
+            min: 10
+        },
+        {
+            block: "unity-frost-laser-turret",
+            min: 10
         }
     ]
 }, {});

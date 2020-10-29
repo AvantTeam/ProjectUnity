@@ -1,0 +1,16 @@
+{
+    "size": 4,
+    "health": 3200,
+    "range": 200,
+    "reloadTime": 30,
+    "shootType": {
+        "type": "BasicBulletType",
+        "speed": 10,
+        "lifetime": 10
+    },
+    "requirements": [
+        {"item": "copper", "amount": 1}
+    ],
+    "category": "turret",
+    "research": "oracle"
+}

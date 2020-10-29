@@ -1,0 +1,22 @@
+{
+	"size": 2,
+	"health": 800,
+	"range": 160,
+	"reloadTime": 40,
+  "consumes":{
+    "power": 1
+  },
+	"shootCone": 1,
+	"inaccuracy": 0,
+	"targetAir": true,
+	"requirements": [
+		{"item": "copper", "amount": 160},
+		{"item": "lead", "amount": 110},
+		{"item": "silicon", "amount": 90}
+	],
+	"category": "turret",
+  "hasLiquids": true,
+  "liquidCapacity": 15,
+  "consumesLiquid": true,
+  "hasPower": true
+}
