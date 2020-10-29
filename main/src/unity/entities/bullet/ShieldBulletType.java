@@ -59,7 +59,7 @@ public class ShieldBulletType extends BasicBulletType{
         if(b.data == null){
             Object[] data = new Object[3];
             data[0] = shieldHealth;
-            data[1] = 0;
+            data[1] = 0f;
             data[2] = "shield";
             b.data = data;
         }
@@ -92,7 +92,7 @@ public class ShieldBulletType extends BasicBulletType{
         }
 
         if((float) ((Object[]) b.data)[0] > 0){
-            float hit = (float) ((Object[]) b.data)[1] - 1 - 0.2f * Time.delta;
+            float hit = ((float) ((Object[]) b.data)[1]) - 1f - 0.2f * ((float) Time.delta);
             ((Object[]) b.data)[1] = hit;
         }
     }
