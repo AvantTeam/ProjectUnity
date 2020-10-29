@@ -87,15 +87,15 @@ const chargeLaser = extend(BulletType, {
             //Drawf.laser(b.team, Core.atlas.find("laser"), Core.atlas.find("laser-end"), b.x, b.y, Tmp.v1.x, Tmp.v1.y, this.width * b.fout());
             Draw.color(this.getColor(b));
             Draw.alpha(0.4);
-            Lines.stroke(b.fout()*3.5);
+            Lines.stroke(b.fout()*4);
             Lines.line(b.x, b.y, Tmp.v1.x, Tmp.v1.y);
 
             Draw.alpha(1);
-            Lines.stroke(b.fout()*2.3);
+            Lines.stroke(b.fout()*2.6);
             Lines.line(b.x, b.y, Tmp.v1.x, Tmp.v1.y);
 
             Draw.color(Color.white);
-            Lines.stroke(b.fout()*1.2);
+            Lines.stroke(b.fout()*1.5);
             Lines.line(b.x, b.y, Tmp.v1.x, Tmp.v1.y);
             Draw.reset();
 
