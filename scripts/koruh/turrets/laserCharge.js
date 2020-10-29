@@ -2,26 +2,27 @@ const lib = this.global.unity.exp;
 
 const laserCharge = new Effect(38, e => {
     Draw.color(e.color);
-    Angles.randLenVectors(e.id, Mathf.random(2, 4), 1 + 20 * e.fout(), e.rotation, 120, (x, y) => {
+    Angles.randLenVectors(e.id, e.id % 3 + 2, 1 + 20 * e.fout(), e.rotation, 120, (x, y) => {
         Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fslope() * 3 + 1);
     });
 });
 
 const laserChargeBegin = new Effect(60, e => {
     Draw.color(e.color);
-    Fill.circle(e.x, e.y, e.fin() * 3);
+    Fill.square(e.x, e.y, e.fin() * 3, 45);
 
     Draw.color();
-    Fill.circle(e.x, e.y, e.fin() * 2);
+    Fill.square(e.x, e.y, e.fin() * 2, 45);
 });
 
 const laserChargeShoot = new Effect(21, e => {
-    Draw.color(e.color);
+    Draw.color(e.color, Color.white, e.fout());
 
-    for(var i of Mathf.signs){
-        Drawf.tri(e.x, e.y, 4 * e.fout(), 29, e.rotation + 90 * i);
+    for(var i=0; i<4; i++){
+        Drawf.tri(e.x, e.y, 4 * e.fout(), 29, e.rotation + 90 * i + e.finpow() * 112);
     }
 });
+
 const chargeLaser = extend(BulletType, {
     getDamage(b){
         return this.damage + (b.owner.totalLevel() * 12);
@@ -82,11 +83,23 @@ const chargeLaser = extend(BulletType, {
             var data = b.data;
             Tmp.v1.set(data);
 
+            //Draw.color(this.getColor(b));
+            //Drawf.laser(b.team, Core.atlas.find("laser"), Core.atlas.find("laser-end"), b.x, b.y, Tmp.v1.x, Tmp.v1.y, this.width * b.fout());
             Draw.color(this.getColor(b));
-            Drawf.laser(b.team, Core.atlas.find("laser"), Core.atlas.find("laser-end"), b.x, b.y, Tmp.v1.x, Tmp.v1.y, this.width * b.fout());
+            Draw.alpha(0.4);
+            Lines.stroke(b.fout()*3.5);
+            Lines.line(b.x, b.y, Tmp.v1.x, Tmp.v1.y);
+
+            Draw.alpha(1);
+            Lines.stroke(b.fout()*2.3);
+            Lines.line(b.x, b.y, Tmp.v1.x, Tmp.v1.y);
+
+            Draw.color(Color.white);
+            Lines.stroke(b.fout()*1.2);
+            Lines.line(b.x, b.y, Tmp.v1.x, Tmp.v1.y);
             Draw.reset();
 
-            Drawf.light(Team.derelict, b.x, b.y, b.x + Tmp.v1.x, b.y + Tmp.v1.y, 15 * b.fout() + 5, this.getColor(b), 0.6);
+            Drawf.light(Team.derelict, b.x, b.y, b.x + Tmp.v1.x, b.y + Tmp.v1.y, 15 * b.fout() + 5, Color.white, 0.6);
         }
     },
 
@@ -152,6 +165,7 @@ chargeLaser.length = 150;
 chargeLaser.hittable = false;
 chargeLaser.hitEffect = Fx.hitLiquid;
 chargeLaser.fragBullet = chargeLaserFrag;
+chargeLaser.shootEffect = Fx.hitLiquid;
 
 
 const chargeLaserTurret = lib.extend(ChargeTurret, ChargeTurret.ChargeTurretBuild, "charge-laser-turret", {
