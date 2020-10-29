@@ -126,7 +126,7 @@ const script = [
 				name: "units",
 				childs: [
 					"hovos",
-                    
+
 					"whirlwind",
 					"jetstream",
 					"vortex"
@@ -196,8 +196,9 @@ const script = [
             {
                 name: "turrets",
                 childs: [
-                    "laserCharge",
                     "laser",
+                    "lasercharge",
+                    "laserfrost",
                     "inferno"
                 ]
             },

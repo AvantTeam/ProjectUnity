@@ -1,13 +1,12 @@
 const lib = this.global.unity.exp;
-const powerLaser = Color.valueOf("F9DBB1");
 
 const laser = extend(BulletType, {
     getDamage(b){
-        return this.damage + (b.owner.totalLevel() * 10);
+        return this.damage + (b.owner.totalLevel() * 3);
     },
 
     getColor(b){
-        return Tmp.c1.set(powerLaser).lerp(Pal.lancerLaser, b.owner.totalLevel() / 10);
+        return Tmp.c1.set(Liquids.cryofluid.color).lerp(Color.cyan, b.owner.totalLevel() / 15);
     },
 
     collision(other, x, y){
@@ -65,15 +64,15 @@ const laser = extend(BulletType, {
             Draw.alpha(0.4);
             //this looks horrible without bloom
             //Drawf.laser(b.team, Core.atlas.find("laser"), Core.atlas.find("laser-end"), b.x, b.y, Tmp.v1.x, Tmp.v1.y, this.width * b.fout());
-            Lines.stroke(b.fout()*2.9);
+            Lines.stroke(b.fout()*4);
             Lines.line(b.x, b.y, Tmp.v1.x, Tmp.v1.y);
 
             Draw.alpha(1);
-            Lines.stroke(b.fout()*1.8);
+            Lines.stroke(b.fout()*2.5);
             Lines.line(b.x, b.y, Tmp.v1.x, Tmp.v1.y);
 
             Draw.color(Color.white);
-            Lines.stroke(b.fout());
+            Lines.stroke(b.fout()*1.6);
             Lines.line(b.x, b.y, Tmp.v1.x, Tmp.v1.y);
             Draw.reset();
 
@@ -81,45 +80,32 @@ const laser = extend(BulletType, {
         }
     }
 });
-laser.damage = 30;
+laser.damage = 65;
 laser.lifetime = 18;
 laser.speed = 0.0001;
 laser.despawnEffect = Fx.none;
 laser.pierce = true;
 laser.hitSize = 0;
-laser.status = StatusEffects.shocked;
+laser.status = StatusEffects.freezing;
 laser.statusDuration = 3 * 60;
 laser.width = 0.7;
-laser.length = 150;
+laser.length = 170;
 laser.hittable = false;
 laser.hitEffect = Fx.hitLiquid;
 laser.shootEffect = Fx.hitLiquid;
 
-const laserTurret = lib.extend(PowerTurret, PowerTurret.PowerTurretBuild, "laser-turret", {
-    maxLevel: 10,
+const laserTurret = lib.extend(LiquidTurret, LiquidTurret.LiquidTurretBuild, "frost-laser-turret", {
+    maxLevel: 15,
     expFields: [
-        {
-            type: "linear",
-            field: "reloadTime",
-            start: 35,
-            intensity: -2
-        },
-        {
-            type: "bool",
-            field: "targetAir",
-            start: false,
-            intensity: 5
-        }
     ],
-    upgrades: [
-        {
-            block: "unity-charge-laser-turret",
-            min: 10
-        },
-        {
-            block: "unity-frost-laser-turret",
-            min: 10
-        }
-    ]
-}, {});
-laserTurret.shootType = laser;
+    init(){
+        this.super$init();
+        //this.consumes.powerCond(10, build => build.isActive());
+    }
+}, {
+    acceptLiquid(source, liquid){
+        return laserTurret.ammoTypes.get(liquid) != null;
+    }
+});
+//laserTurret.shootType = laser;
+laserTurret.ammo(Liquids.cryofluid, laser);

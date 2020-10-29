@@ -2,6 +2,7 @@
 	"size": 2,
 	"health": 800,
 	"range": 140,
+  "reloadTime": 60,
 	"coolantMultiplier": 2,
 	"shootCone": 1,
 	"inaccuracy": 0,
@@ -12,6 +13,5 @@
 		{"item": "lead", "amount": 110},
 		{"item": "silicon", "amount": 90}
 	],
-	"category": "turret",
-	"research": "lancer"
+	"category": "turret"
 }
