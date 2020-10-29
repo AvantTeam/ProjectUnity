@@ -24,11 +24,10 @@ import static arc.math.Mathf.*;
 import static mindustry.Vars.tilesize;
 import static mindustry.graphics.Drawf.*;
 import static mindustry.graphics.Pal.*;
-import static rhino.ScriptRuntime.typeof;
 import static unity.content.UnityFx.*;
 
 public class UnityBullets implements ContentList{
-    public static BulletType laser, coalBlaze, pyraBlaze, falloutLaser, catastropheLaser, calamityLaser, orb, shockBeam, currentStroke, plasmaTriangle, plasmaFragTriangle;
+    public static BulletType laser, coalBlaze, pyraBlaze, falloutLaser, catastropheLaser, calamityLaser, orb, shockBeam, currentStroke, plasmaTriangle, plasmaFragTriangle, shielderBullet;
     
     //only enhanced
     public static BasicBulletType standardDenseLarge, standardHomingLarge, standardIncendiaryLarge, standardThoriumLarge, standardDenseHeavy, standardHomingHeavy, standardIncendiaryHeavy, standardThoriumHeavy, standardDenseMassive, standardHomingMassive,
@@ -290,6 +289,19 @@ public class UnityBullets implements ContentList{
             despawnEffect = Fx.none;
             fragBullet = plasmaFragTriangle;
             fragBullets = 8;
+        }};
+
+        shielderBullet = new ShieldBulletType(8){{
+            drag = 0.03f;
+            shootEffect = Fx.none;
+            despawnEffect = Fx.none;
+            collides = false;
+            hitSize = 0;
+            hittable = false;
+            hitEffect = Fx.hitLiquid;
+            breakSound = Sounds.wave;
+            maxRadius = 10f;
+            shieldHealth = 3000f;
         }};
 
         //only enhanced

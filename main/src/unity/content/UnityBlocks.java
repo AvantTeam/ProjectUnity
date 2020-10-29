@@ -1,7 +1,10 @@
 package unity.content;
 
 import arc.graphics.Color;
+import arc.graphics.g2d.Draw;
+import arc.graphics.g2d.Lines;
 import arc.math.*;
+import mindustry.entities.Effect;
 import mindustry.gen.*;
 import mindustry.graphics.Pal;
 import mindustry.world.*;
@@ -435,7 +438,14 @@ public class UnityBlocks implements ContentList{
 		//region imber
 
 		orb = new ChargeTurret("orb"){{
-			requirements(Category.turret, with(Items.copper, 55, Items.lead, 30, Items.graphite, 25, Items.silicon, 35, UnityItems.imberium, 20));
+			requirements(Category.turret,
+					with(Items.copper, 55,
+							Items.lead, 30,
+							Items.graphite, 25,
+							Items.silicon, 35,
+							UnityItems.imberium, 20
+					)
+			);
 			size = 2;
 			health = 1320;
 			range = 145f;
@@ -460,7 +470,14 @@ public class UnityBlocks implements ContentList{
 
 		shockwire = new LaserTurret("shockwire"){
             {
-				requirements(Category.turret, with(Items.copper, 150, Items.lead, 145, Items.titanium, 160, Items.silicon, 130, UnityItems.imberium, 70));
+				requirements(Category.turret,
+						with(Items.copper, 150,
+								Items.lead, 145,
+								Items.titanium, 160,
+								Items.silicon, 130,
+								UnityItems.imberium, 70
+						)
+				);
 				size = 2;
 				health = 1400;
 				range = 125f;
@@ -487,7 +504,13 @@ public class UnityBlocks implements ContentList{
 		};
         
         current = new ChargeTurret("current"){{
-            requirements(Category.turret, with(Items.copper, 280, Items.lead, 295, Items.silicon, 260, UnityItems.sparkAlloy, 65));
+            requirements(Category.turret,
+					with(Items.copper, 280,
+							Items.lead, 295,
+							Items.silicon, 260,
+							UnityItems.sparkAlloy, 65
+					)
+			);
             size = 3;
             health = 2400;
             range = 220f;
@@ -507,7 +530,15 @@ public class UnityBlocks implements ContentList{
         }};
         
         plasma = new ChargeTurret("plasma"){{
-            requirements(Category.turret, with(Items.copper, 580, Items.lead, 520, Items.graphite, 410, Items.silicon, 390, Items.surgeAlloy, 180, UnityItems.sparkAlloy, 110));
+            requirements(Category.turret,
+					with(Items.copper, 580,
+							Items.lead, 520,
+							Items.graphite, 410,
+							Items.silicon, 390,
+							Items.surgeAlloy, 180,
+							UnityItems.sparkAlloy, 110
+					)
+			);
             size = 4;
             health = 2800;
             range = 200f;
@@ -527,6 +558,38 @@ public class UnityBlocks implements ContentList{
             chargeBeginEffect = UnityFx.plasmaChargeBegin;
             consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability <= 0.1f, 0.52f)).boost();
         }};
+
+        shielder = new ShieldTurret("shielder"){
+			{
+				requirements(Category.turret,
+						with(Items.copper, 300,
+								Items.lead, 100,
+								Items.titanium, 160,
+								Items.silicon, 240,
+								UnityItems.sparkAlloy, 90
+						)
+				);
+				size = 3;
+				health = 900;
+				range = 260;
+				reloadTime = 800;
+				coolantMultiplier = 2;
+				shootCone = 60;
+				inaccuracy = 0;
+				powerUse = 6.4f;
+				targetAir = false;
+				shootType = UnityBullets.shielderBullet;
+				shootSound = /*test*/Sounds.pew;
+				chargeEffect = new Effect(38, e -> {
+					Draw.color(Pal.accent);
+					Angles.randLenVectors(e.id, 2, 1 + 20 * e.fout(), e.rotation, 120, (x, y) -> {
+						Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fslope() * 3 + 1);
+					});
+				});
+				chargeBeginEffect = Fx.none;
+				consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability <= 0.1f, 0.4f)).update(false);
+			}
+		};
 
 		//endregion
 		//region koruh
