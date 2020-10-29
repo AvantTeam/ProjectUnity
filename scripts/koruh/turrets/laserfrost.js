@@ -109,3 +109,4 @@ const laserTurret = lib.extend(LiquidTurret, LiquidTurret.LiquidTurretBuild, "fr
 });
 //laserTurret.shootType = laser;
 laserTurret.ammo(Liquids.cryofluid, laser);
+laserTurret.buildVisibility = BuildVisibility.sandboxOnly;
