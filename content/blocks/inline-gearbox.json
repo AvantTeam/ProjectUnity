@@ -1,0 +1,9 @@
+{
+	"size": 2,
+	"requirements": [
+		{"item": "titanium", "amount": 20},
+		{"item": "lead", "amount": 30},
+		{"item": "copper", "amount": 30},
+	],
+	"category": "power",
+}

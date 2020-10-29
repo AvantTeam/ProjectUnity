@@ -54,6 +54,7 @@ const script = [
             "multi-lib",
 			"status",
 			"funclib",
+			"rotpowerlib",
 			"unitloader"/*,
             "shieldbulletlib"*/
         ]
@@ -68,7 +69,9 @@ const script = [
                     "recursivereconstructor",
 
                     "light-lamp", "light-reflector", "light-extra",
-
+					"drive-shaft",
+					"inline-gearbox",
+					"wind-turbine",
                     "walls",
                     "ores",
                     "multi-test-younggam"
