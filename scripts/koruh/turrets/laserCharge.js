@@ -102,6 +102,7 @@ const chargeLaser = extend(BulletType, {
             Drawf.light(Team.derelict, b.x, b.y, b.x + Tmp.v1.x, b.y + Tmp.v1.y, 15 * b.fout() + 5, Color.white, 0.6);
         }
     },
+    //h
 
     hit(b){
         this.hitEffect.at(b.x, b.y, b.rotation(), this.hitColor);
