@@ -2,7 +2,7 @@ const lib = this.global.unity.exp;
 
 const laserCharge = new Effect(38, e => {
     Draw.color(e.color);
-    Angles.randLenVectors(e.id, e.id % 3 + 2, 1 + 20 * e.fout(), e.rotation, 120, (x, y) => {
+    Angles.randLenVectors(e.id, e.id % 3 + 1, 1 + 20 * e.fout(), e.rotation, 120, (x, y) => {
         Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fslope() * 3 + 1);
     });
 });
@@ -228,7 +228,7 @@ const chargeLaserTurret = lib.extend(ChargeTurret, ChargeTurret.ChargeTurretBuil
 chargeLaserTurret.range = 155;
 chargeLaserTurret.chargeTime = 50;
 chargeLaserTurret.chargeMaxDelay = 30;
-chargeLaserTurret.chargeEffects = 7;
+chargeLaserTurret.chargeEffects = 4;
 chargeLaserTurret.recoilAmount = 2;
 chargeLaserTurret.cooldown = 0.03;
 chargeLaserTurret.powerUse = 6;
