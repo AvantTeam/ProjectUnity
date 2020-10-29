@@ -505,6 +505,28 @@ public class UnityBlocks implements ContentList{
             chargeBeginEffect = UnityFx.currentChargeBegin;
             consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability <= 0.1f, 0.52f)).boost();
         }};
+        
+        plasma = new ChargeTurret("plasma"){{
+            requirements(Category.turret, with(Items.copper, 580, Items.lead, 520, Items.graphite, 410, Items.silicon, 390, Items.surgeAlloy, 180, UnityItems.sparkAlloy, 110));
+            size = 4;
+            health = 2800;
+            range = 200f;
+            reloadTime = 460f;
+            coolantMultiplier = 2;
+            liquidCapacity = 20f;
+            shootCone = 1f;
+            inaccuracy = 0f;
+            chargeTime = 240f;
+            chargeEffects = 15;
+            chargeMaxDelay = 240f;
+            powerUse = 15.2f;
+            shootType = UnityBullets.plasmaTriangle;
+            shootSound = Sounds.shotgun;
+            shootEffect = UnityFx.plasmaShoot;
+            chargeEffect = UnityFx.plasmaCharge;
+            chargeBeginEffect = UnityFx.plasmaChargeBegin;
+            consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability <= 0.1f, 0.52f)).boost();
+        }};
 
 		//endregion
 		//region koruh

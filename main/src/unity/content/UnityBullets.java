@@ -28,7 +28,8 @@ import static rhino.ScriptRuntime.typeof;
 import static unity.content.UnityFx.*;
 
 public class UnityBullets implements ContentList{
-    public static BulletType laser, coalBlaze, pyraBlaze, falloutLaser, catastropheLaser, calamityLaser, orb, shockBeam, currentStroke;
+    public static BulletType laser, coalBlaze, pyraBlaze, falloutLaser, catastropheLaser, calamityLaser, orb, shockBeam, currentStroke, plasmaTriangle, plasmaFragTriangle;
+    
     //only enhanced
     public static BasicBulletType standardDenseLarge, standardHomingLarge, standardIncendiaryLarge, standardThoriumLarge, standardDenseHeavy, standardHomingHeavy, standardIncendiaryHeavy, standardThoriumHeavy, standardDenseMassive, standardHomingMassive,
     standardIncendiaryMassive, standardThoriumMassive;
@@ -145,6 +146,17 @@ public class UnityBullets implements ContentList{
         };
 
         orb = new BulletType(){
+            {
+                lifetime = 240;
+                speed = 1.24f;
+                damage = 23;
+                pierce = true;
+                hittable = false;
+                hitEffect = orbHit;
+                trailEffect = orbTrail;
+                trailChance = 0.4f;
+            }
+            
             @Override
             public void draw(Bullet b){
                 light(b.x, b.y, 16, surge, 0.6f);
@@ -167,23 +179,25 @@ public class UnityBullets implements ContentList{
             }
 
             @Override
-            public void drawLight(Bullet b){
-                
-            }
-
-            {
-                lifetime = 240;
-                speed = 1.24f;
-                damage = 23;
-                pierce = true;
-                hittable = false;
-                hitEffect = orbHit;
-                trailEffect = orbTrail;
-                trailChance = 0.4f;
-            }
+            public void drawLight(Bullet b){}
         };
 
         shockBeam = new ContinuousLaserBulletType(35){
+            {
+                speed = 0.0001f;
+                shootEffect = Fx.none;
+                despawnEffect = Fx.none;
+                pierce = true;
+                hitSize = 0;
+                status = StatusEffects.shocked;
+                statusDuration = 3 * 60;
+                width = 0.42f;
+                length = 120;
+                hittable = false;
+                hitEffect = Fx.hitLiquid;
+
+            }
+            
             @Override
             public void init(Bullet b){
                 super.init(b);
@@ -232,40 +246,50 @@ public class UnityBullets implements ContentList{
                     Drawf.light(b.team, b.x, b.y, b.x + Tmp.v1.x, b.y + Tmp.v1.y, 15 * b.fout(), surge, 0.6f);
                 }
             }
-
-            {
-                speed = 0.0001f;
-                shootEffect = Fx.none;
-                despawnEffect = Fx.none;
-                pierce = true;
-                hitSize = 0;
-                status = StatusEffects.shocked;
-                statusDuration = 3 * 60;
-                width = 0.42f;
-                length = 120;
-                hittable = false;
-                hitEffect = Fx.hitLiquid;
-
-            }
         };
         
         currentStroke = new LaserBulletType(450){{
-            length = 430;
-            damage = 450;
-            width = 20;
-            lifetime = 65;
-            lightningSpacing = 35;
+            lifetime = 65f;
+            width = 20f;
+            length = 430f;
+            lightningSpacing = 35f;
             lightningLength = 5;
             lightningDelay = 1.1f;
             lightningLengthRand = 15;
-            lightningDamage = 50;
-            lightningAngleRand = 40;
+            lightningDamage = 50f;
+            lightningAngleRand = 40f;
             largeHit = true;
             lightColor = lightningColor = Pal.surge;
-            sideAngle = 15;
-            sideWidth = 0;
-            sideLength = 0;
+            sideAngle = 15f;
+            sideWidth = 0f;
+            sideLength = 0f;
             colors = new Color[]{Pal.surge.cpy(), Pal.surge, Color.white};
+        }};
+        
+        plasmaFragTriangle = new TriangleBulletType(4.5f, 90f){{
+            lifetime = 160f;
+            lifetimeRand = 40f;
+            width = 10f;
+            length = 11f;
+            trailWidth = 4f;
+            trailLength = 8;
+            drag = 0.05f;
+            collides = false;
+            summonsLightning = true;
+            shootEffect = UnityFx.plasmaFragAppear;
+            hitEffect = despawnEffect = UnityFx.plasmaFragDisappear;
+        }};
+        
+        plasmaTriangle = new TriangleBulletType(4f, 380f){{
+            lifetime = 180f;
+            width = 16f;
+            length = 20f;
+            trailWidth = 6.5f;
+            trailLength = 10;
+            hitEffect = UnityFx.plasmaTriangleHit;
+            despawnEffect = Fx.none;
+            fragBullet = plasmaFragTriangle;
+            fragBullets = 8;
         }};
 
         //only enhanced
