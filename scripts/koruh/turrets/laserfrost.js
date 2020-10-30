@@ -145,8 +145,6 @@ laser.length = 170;
 laser.hittable = false;
 laser.hitEffect = Fx.hitLiquid;
 laser.shootEffect = shootFlake;
-laser.activeSound = Sounds.none;
-laser.shootSound = Sounds.splash;
 
 const laserTurret = lib.extend(LiquidTurret, LiquidTurret.LiquidTurretBuild, "frost-laser-turret", {
     maxLevel: 30,
@@ -164,3 +162,5 @@ const laserTurret = lib.extend(LiquidTurret, LiquidTurret.LiquidTurretBuild, "fr
 //laserTurret.shootType = laser;
 laserTurret.ammo(Liquids.cryofluid, laser);
 laserTurret.buildVisibility = BuildVisibility.sandboxOnly;
+laserTurret.activeSound = Sounds.none;
+laserTurret.shootSound = Sounds.splash;
