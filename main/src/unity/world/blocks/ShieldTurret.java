@@ -6,6 +6,7 @@ import mindustry.entities.bullet.*;
 import mindustry.gen.Building;
 import mindustry.gen.Groups;
 import mindustry.world.blocks.defense.turrets.*;
+import unity.entities.bullet.ShieldBulletType;
 
 public class ShieldTurret extends ChargeTurret{
 
@@ -37,7 +38,7 @@ public class ShieldTurret extends ChargeTurret{
         public boolean targetShield(Building t, ShieldTurretBuild b, float radius){
 
             Groups.bullet.intersect(t.x - radius, t.y - radius, radius * 2, radius * 2, e -> {
-                if(e != null && e.team == b.team && e.data != null && ((Object[]) e.data)[2] != null && ((Object[]) e.data)[2] == "shield"){
+                if(e != null && e.team == b.team && e.type instanceof ShieldBulletType){
                     shield = true;
                 }
 	        });

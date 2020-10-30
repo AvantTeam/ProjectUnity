@@ -57,50 +57,51 @@ public class ShieldBulletType extends BasicBulletType{
     @Override
     public void update(Bullet b){
         if(b.data == null){
-            Object[] data = new Object[3];
+            float[] data = new float[2];
             data[0] = shieldHealth;
             data[1] = 0f;
-            data[2] = "shield";
             b.data = data;
         }
 
         float radius = (((speed-b.vel.len())*maxRadius)+1)*0.8f;
-
+        float[] temp = (float[]) b.data;
         Groups.bullet.intersect(b.x-radius, b.y-radius, radius*2, radius*2, e -> {
             if(e != null && e.team != b.team){
                 if(e.owner instanceof Building){
                     if(((ChargeTurret.ChargeTurretBuild) e.owner).block.name != "unity-shielder"){
-                        float health = (float) ((Object[]) b.data)[0] - e.damage;
-                        ((Object[]) b.data)[0] = health;
-                        ((Object[]) b.data)[1] = 1;
+                        float health = temp[0] - e.damage;
+                        temp[0] = health;
+                        temp[1] = 1;
                         e.remove();
                     }
                 } else {
-                    float health = (float) ((Object[]) b.data)[0] - e.damage;
-                    ((Object[]) b.data)[0] = health;
-                    ((Object[]) b.data)[1] = 1;
+                    float health = temp[0] - e.damage;
+                    temp[0] = health;
+                    temp[1] = 1;
                     e.remove();
                 }
 
             }
 		});
 
-        if((float) ((Object[]) b.data)[0] <= 0){
+        if(temp[0] <= 0){
             breakSound.at(b.x, b.y, Mathf.random(0.8f, 1));
             breakFx.at(b.x, b.y, 0, b.team.color, radius);
             b.remove();
         }
 
-        if((float) ((Object[]) b.data)[0] > 0){
-            float hit = ((float) ((Object[]) b.data)[1]) - 1f - 0.2f * ((float) Time.delta);
-            ((Object[]) b.data)[1] = hit;
+        if(temp[0] > 0){
+            float hit = temp[1] - 1f - 0.2f * ((float) Time.delta);
+            temp[1] = hit;
         }
     }
 
     @Override
     public void draw(Bullet b){
         Draw.z(Layer.shields);
-        Draw.color(b.team.color, Color.white, b.data != null ? Mathf.clamp((float) ((Object[]) b.data)[1]) : 0);
+        if(b.data == null) return;
+        float[] temp = (float[]) b.data;
+        Draw.color(b.team.color, Color.white, Mathf.clamp(temp[1]));
 
         float radius = ((speed-b.vel.len())*maxRadius)+1;
 
@@ -108,7 +109,7 @@ public class ShieldBulletType extends BasicBulletType{
             Fill.poly(b.x, b.y, 6, radius);
         } else {
             Lines.stroke(1.5f);
-            Draw.alpha(0.09f + Mathf.clamp(0.08f * ((float) ((Object[]) b.data)[1])));
+            Draw.alpha(0.09f + Mathf.clamp(0.08f * temp[1]));
             Fill.poly(b.x, b.y, 6, radius);
             Draw.alpha(1);
             Lines.poly(b.x, b.y, 6, radius);
