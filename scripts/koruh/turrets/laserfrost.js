@@ -31,7 +31,7 @@ const shootFlake = new Effect(21, e => {
     Draw.color(e.color, Color.white, e.fout());
 
     for(var i=0; i<6; i++){
-        Drawf.tri(e.x, e.y, 2.5 * e.fout(), 29, e.rotation + 60 * i);
+        Drawf.tri(e.x, e.y, 3 * e.fout(), 12, e.rotation + 60 * i);
     }
 });
 
