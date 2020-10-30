@@ -136,7 +136,7 @@ public class Funcs{
             Vec2 vec = Geometry.raycastRect(x, y, x2, y2, hitRect.grow(expand * 2));
 
             if(vec != null) unit.damage(damage);
-		});
+        });
     }
     
     public static void chanceMultiple(float chance, Runnable run){
