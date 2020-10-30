@@ -1,12 +1,48 @@
 const lib = this.global.unity.exp;
+const freezeSound = loadSound("laser-freeze");
+
+const disabled = new StatusEffect("disabled");
+disabled.reloadMultiplier = 0.000001;
+disabled.speedMultiplier = 0.001;
+
+function snowflake(x, y, rot, size){
+  Lines.lineAngleCenter(x, y, 0 + rot, size);
+  Lines.lineAngleCenter(x, y, 60 + rot, size);
+  Lines.lineAngleCenter(x, y, 120 + rot, size);
+}
+
+const freezeEffect = new Effect(30, e => {
+  Draw.color(Color.white, e.color, e.fin());
+  Lines.stroke(e.fout() * 2);
+  Lines.poly(e.x, e.y, 6, 4 + e.rotation * 1.5 * e.finpow(), Mathf.randomSeed(e.id)*360);
+  Draw.color();
+  var i = 0;
+  Angles.randLenVectors(e.id, 5, e.rotation * 1.6 * e.fin() + 16, e.fin() * 33, 360, (x, y) => {
+    snowflake(e.x + x, e.y + y, e.finpow() * 60, Mathf.randomSeed(e.id + i) * 2 + 2);
+    i++;
+  });
+  Angles.randLenVectors(e.id + 1, 3, e.rotation * 2.1 * e.fin() + 7, e.fin() * -19, 360, (x, y) => {
+    snowflake(e.x + x, e.y + y, e.finpow() * 60, Mathf.randomSeed(e.id + i) * 2 + 2);
+    i++;
+  });
+});
 
 const laser = extend(BulletType, {
     getDamage(b){
-        return this.damage + (b.owner.totalLevel() * 3);
+        return this.damage + (b.owner.totalLevel() * 4);
     },
 
     getColor(b){
         return Tmp.c1.set(Liquids.cryofluid.color).lerp(Color.cyan, b.owner.totalLevel() / 15);
+    },
+
+    freezepos(b, x, y){
+        var lvl =  b.owner.totalLevel();
+        freezeEffect.at(x, y, lvl / 2 + 10, Tmp.c1.set(Liquids.cryofluid.color).lerp(Color.cyan, lvl / 15));
+        freezeSound.at(x, y, 1, 0.6);
+
+        Damage.status(b.team, x, y, 10 + lvl / 2, this.status, 60 + lvl * 60, true, true);
+        Damage.status(b.team, x, y, 10 + lvl / 2, disabled, 10 * lvl, true, true);
     },
 
     collision(other, x, y){
@@ -17,7 +53,9 @@ const laser = extend(BulletType, {
         }else if(other instanceof Unit) {
             var unit = other;
             unit.impulse(Tmp.v3.set(unit).sub(this.x, this.y).nor().scl(this.knockback * 80.0));
-            unit.apply(this.status, this.statusDuration);
+            var lvl =  b.owner.totalLevel();
+            unit.apply(this.status, this.statusDuration + lvl * 60);
+            unit.apply(disabled, 20 + 10 * lvl);
         }if(!this.pierce){
 			this.remove();
         }else{
@@ -37,16 +75,20 @@ const laser = extend(BulletType, {
 
             hit.collision(b, hit.x, hit.y);
             b.collision(hit, hit.x, hit.y);
+            this.freezepos(b, hit.x, hit.y);
             b.owner.incExp(2);
-        }else if(target instanceof Building){
+        }
+        else if(target instanceof Building){
             var tile = target;
 
             if(tile.collide(b)){
                 tile.collision(b);
                 this.hit(b, tile.x, tile.y);
+                this.freezepos(b, tile.x, tile.y);
                 b.owner.incExp(2);
             }
-        }else{
+        }
+        else{
             b.data = new Vec2().trns(b.rotation(), this.length).add(b.x, b.y);
         }
     },
@@ -61,6 +103,8 @@ const laser = extend(BulletType, {
             Tmp.v1.set(data);
 
             Draw.color(this.getColor(b));
+            Lines.stroke(b.fout() * 1.5);
+            Lines.circle(Tmp.v1.x, Tmp.v1.y, b.finpow() * 8);
             Draw.alpha(0.4);
             //this looks horrible without bloom
             //Drawf.laser(b.team, Core.atlas.find("laser"), Core.atlas.find("laser-end"), b.x, b.y, Tmp.v1.x, Tmp.v1.y, this.width * b.fout());
@@ -80,7 +124,7 @@ const laser = extend(BulletType, {
         }
     }
 });
-laser.damage = 65;
+laser.damage = 130;
 laser.lifetime = 18;
 laser.speed = 0.0001;
 laser.despawnEffect = Fx.none;
@@ -93,6 +137,8 @@ laser.length = 170;
 laser.hittable = false;
 laser.hitEffect = Fx.hitLiquid;
 laser.shootEffect = Fx.hitLiquid;
+laser.activeSound = Sounds.none;
+laser.shootSound = Sounds.splash;
 
 const laserTurret = lib.extend(LiquidTurret, LiquidTurret.LiquidTurretBuild, "frost-laser-turret", {
     maxLevel: 15,
