@@ -58,12 +58,18 @@ pyraBlaze.hittable = false;
 
 const inferno = lib.extend(ItemTurret, ItemTurret.ItemTurretBuild, "inferno", {
     maxLevel: 10,
-    expFields: [{
-        type: "exp",
-        field: "useless",
-        start: 0,
-        intensity: 2
-    }]
+    expFields: [
+      {
+        type: "list",
+        field: "shots",
+        intensity: [1, 1, 2, 2, 2, 3, 3, 4, 4, 5, 5]
+      },
+      {
+        type: "list",
+        field: "spread",
+        intensity: [0, 0, 5, 10, 15, 7, 14, 8, 10, 6, 9]
+      },
+    ]
 }, {});
 
-inferno.ammo(Items.coal, coalBlaze, Items.pyratite, pyraBlaze);
+inferno.ammo(Items.scrap, Bullets.slagShot, Items.coal, coalBlaze, Items.pyratite, pyraBlaze);
