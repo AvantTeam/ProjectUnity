@@ -27,6 +27,14 @@ const freezeEffect = new Effect(30, e => {
   });
 });
 
+const shootFlake = new Effect(21, e => {
+    Draw.color(e.color, Color.white, e.fout());
+
+    for(var i=0; i<6; i++){
+        Drawf.tri(e.x, e.y, 2.5 * e.fout(), 29, e.rotation + 60 * i);
+    }
+});
+
 const laser = extend(BulletType, {
     getDamage(b){
         return this.damage + (b.owner.totalLevel() * 4);
@@ -136,7 +144,7 @@ laser.width = 0.7;
 laser.length = 170;
 laser.hittable = false;
 laser.hitEffect = Fx.hitLiquid;
-laser.shootEffect = Fx.hitLiquid;
+laser.shootEffect = shootFlake;
 laser.activeSound = Sounds.none;
 laser.shootSound = Sounds.splash;
 
