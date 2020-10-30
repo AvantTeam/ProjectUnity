@@ -114,11 +114,11 @@ const laserTurret = lib.extend(PowerTurret, PowerTurret.PowerTurretBuild, "laser
     upgrades: [
         {
             block: "unity-charge-laser-turret",
-            min: 0
+            min: 10
         },
         {
             block: "unity-frost-laser-turret",
-            min: 1
+            min: 10
         }
     ]
 }, {});

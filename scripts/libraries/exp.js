@@ -281,7 +281,7 @@ module.exports = {
             }
         });
 
-        //pack upgrades into 2D array - trades time complexity for space complexity. Not necessary in the java port.
+        //pack upgrades into 2D array - trades time complexity for space complexity. Not necessary in the java port. *But you have to revamp the entire code anyways*
         expblock.upPerLevel = [];
         for(var i=0; i<=expblock.maxLevel; i++){
             expblock.upPerLevel.push([]);
