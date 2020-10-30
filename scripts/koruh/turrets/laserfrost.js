@@ -38,8 +38,8 @@ const laser = extend(BulletType, {
 
     freezepos(b, x, y){
         var lvl =  b.owner.totalLevel();
-        freezeEffect.at(x, y, lvl / 2 + 10, Tmp.c1.set(Liquids.cryofluid.color).lerp(Color.cyan, lvl / 15));
-        freezeSound.at(x, y, 1, 0.6);
+        if(!Vars.headless) freezeEffect.at(x, y, lvl / 2 + 10, Tmp.c1.set(Liquids.cryofluid.color).lerp(Color.cyan, lvl / 15));
+        if(!Vars.headless) freezeSound.at(x, y, 1, 0.6);
 
         Damage.status(b.team, x, y, 10 + lvl / 2, this.status, 60 + lvl * 60, true, true);
         Damage.status(b.team, x, y, 10 + lvl / 2, disabled, 10 * lvl, true, true);
