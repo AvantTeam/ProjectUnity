@@ -5,7 +5,9 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
+import mindustry.entities.*;
 import mindustry.entities.units.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 
@@ -16,6 +18,8 @@ public class Funcs{
 	private static final IntSet collidedBlocks = new IntSet();
 	private static final Rect rect = new Rect();
 	private static final Rect hitRect = new Rect();
+    private static Unit result;
+    private static float cdist;
 
     /** Same thing like the drawer from UnitType without applyColor and outlines. */
 	public static void simpleUnitDrawer(Unit unit, boolean drawLegs){
@@ -34,17 +38,17 @@ public class Funcs{
             
 	        float rotation = unit.rotation - 90f;
 	        float weaponRotation = rotation + (weapon.rotate ? mount.rotation : 0f);
-			float recoil = -(mount.reload / weapon.reload * weapon.recoil);
+            float recoil = -(mount.reload / weapon.reload * weapon.recoil);
             
-			float wx = unit.x + Angles.trnsx(rotation, weapon.x, weapon.y) + Angles.trnsx(weaponRotation, 0f, recoil);
-			float wy = unit.y + Angles.trnsy(rotation, weapon.x, weapon.y) + Angles.trnsy(weaponRotation, 0f, recoil);
+            float wx = unit.x + Angles.trnsx(rotation, weapon.x, weapon.y) + Angles.trnsx(weaponRotation, 0f, recoil);
+            float wy = unit.y + Angles.trnsy(rotation, weapon.x, weapon.y) + Angles.trnsy(weaponRotation, 0f, recoil);
             
             Draw.rect(weapon.region, wx, wy, weapon.region.width * Draw.scl * -Mathf.sign(weapon.flipSprite), weapon.region.height * Draw.scl, weaponRotation);
 	    }
 	}
     
     /** Iterates over all blocks in a radius. */
-    public static void Building trueEachBlock(int wx, int wy, float range, Cons<Building> cons){
+    public static void trueEachBlock(int wx, int wy, float range, Cons<Building> cons){
         collidedBlocks.clear();
         
         int tx = world.toTile(wx);
@@ -76,7 +80,7 @@ public class Funcs{
         Units.nearbyEnemies(team, x - radius, y - radius, radius * 2, radius * 2, unit -> {
             if(!unit.within(x, y, radius)) return;
             
-            dst = unit.dst(x, y);
+            float dst = unit.dst(x, y);
             
             if(Mathf.dst2(x, y, unit.x, unit.y) < cdist && !targetSeq.contains(unit)){
                 result = unit;
