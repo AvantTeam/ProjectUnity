@@ -3,7 +3,7 @@ const lib = this.global.unity.exp;
 const shootSmallBlaze = new Effect(32, e => {
     Draw.color(Pal.lightFlame, Pal.darkFlame, Color.gray, e.fin());
 
-    Angles.randLenVectors(e.id, 16, e.finpow() * 60, e.rotation, 18, new Floatc2({get: function(x, y){
+    Angles.randLenVectors(e.id, 16, e.finpow() * 60, e.rotation, 8, new Floatc2({get: function(x, y){
         Fill.circle(e.x + x, e.y + y, 0.85 + e.fout() * 3.5);
     }}));
 });
@@ -11,7 +11,7 @@ const shootSmallBlaze = new Effect(32, e => {
 const shootPyraBlaze = new Effect(32, e => {
     Draw.color(Pal.lightPyraFlame, Pal.darkPyraFlame, Color.gray, e.fin());
 
-    Angles.randLenVectors(e.id, 16, e.finpow() * 60, e.rotation, 18, new Floatc2({get: function(x, y){
+    Angles.randLenVectors(e.id, 16, e.finpow() * 60, e.rotation, 8, new Floatc2({get: function(x, y){
         Fill.circle(e.x + x, e.y + y, 0.85 + e.fout() * 3.5);
     }}));
 });
@@ -19,7 +19,7 @@ const shootPyraBlaze = new Effect(32, e => {
 const coalBlaze = extend(BulletType, {
     hit(b, x, y){
         this.super$hit(b, b.x, b.y);
-        b.owner.incExp(0.5);
+        b.owner.incExp(1.1);
     }
 });
 coalBlaze.ammoMultiplier = 3;
@@ -39,7 +39,7 @@ coalBlaze.hittable = false;
 const pyraBlaze = extend(BulletType, {
     hit(b, x, y){
         this.super$hit(b, b.x, b.y);
-        b.owner.incExp(0.5);
+        b.owner.incExp(1.75);
     }
 });
 pyraBlaze.ammoMultiplier = 3;

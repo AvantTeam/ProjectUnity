@@ -37,20 +37,20 @@ const shootFlake = new Effect(21, e => {
 
 const laser = extend(BulletType, {
     getDamage(b){
-        return this.damage + (b.owner.totalLevel() * 4);
+        return this.damage + (b.owner.totalLevel() * 2.5);
     },
 
     getColor(b){
-        return Tmp.c1.set(Liquids.cryofluid.color).lerp(Color.cyan, b.owner.totalLevel() / 15);
+        return Tmp.c1.set(Liquids.cryofluid.color).lerp(Color.cyan, b.owner.totalLevel() / 30);
     },
 
     freezepos(b, x, y){
         var lvl =  b.owner.totalLevel();
-        if(!Vars.headless) freezeEffect.at(x, y, lvl / 2 + 10, Tmp.c1.set(Liquids.cryofluid.color).lerp(Color.cyan, lvl / 15));
+        if(!Vars.headless) freezeEffect.at(x, y, lvl / 2 + 10, Tmp.c1.set(Liquids.cryofluid.color).lerp(Color.cyan, lvl / 30));
         if(!Vars.headless) freezeSound.at(x, y, 1, 0.6);
 
-        Damage.status(b.team, x, y, 10 + lvl / 2, this.status, 60 + lvl * 60, true, true);
-        Damage.status(b.team, x, y, 10 + lvl / 2, disabled, 10 * lvl, true, true);
+        Damage.status(b.team, x, y, 10 + lvl / 2, this.status, 60 + lvl * 6, true, true);
+        Damage.status(b.team, x, y, 10 + lvl / 2, disabled, 2 * lvl, true, true);
     },
 
     collision(other, x, y){
@@ -62,8 +62,8 @@ const laser = extend(BulletType, {
             var unit = other;
             unit.impulse(Tmp.v3.set(unit).sub(this.x, this.y).nor().scl(this.knockback * 80.0));
             var lvl =  b.owner.totalLevel();
-            unit.apply(this.status, this.statusDuration + lvl * 60);
-            unit.apply(disabled, 20 + 10 * lvl);
+            unit.apply(this.status, this.statusDuration + lvl * 6);
+            unit.apply(disabled, 20 + 2 * lvl);
         }if(!this.pierce){
 			this.remove();
         }else{
@@ -84,7 +84,7 @@ const laser = extend(BulletType, {
             hit.collision(b, hit.x, hit.y);
             b.collision(hit, hit.x, hit.y);
             this.freezepos(b, hit.x, hit.y);
-            b.owner.incExp(2);
+            b.owner.incExp(1.5);
         }
         else if(target instanceof Building){
             var tile = target;
@@ -149,7 +149,7 @@ laser.activeSound = Sounds.none;
 laser.shootSound = Sounds.splash;
 
 const laserTurret = lib.extend(LiquidTurret, LiquidTurret.LiquidTurretBuild, "frost-laser-turret", {
-    maxLevel: 15,
+    maxLevel: 30,
     expFields: [
     ],
     init(){
