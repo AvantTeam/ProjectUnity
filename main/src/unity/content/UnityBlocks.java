@@ -1,9 +1,11 @@
 package unity.content;
 
-import arc.graphics.Color;
+import arc.graphics.*;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Lines;
+import arc.graphics.g2d.TextureRegion;
 import arc.math.*;
+import arc.util.Time;
 import mindustry.entities.Effect;
 import mindustry.gen.*;
 import mindustry.graphics.Pal;
@@ -37,6 +39,9 @@ public class UnityBlocks implements ContentList{
 	
 	//dark
     darkAlloyForge, apparition, ghost, banshee, fallout, catastrophe, calamity,
+    
+    //end
+    terminalCrucible,
 
 	//imber
 	orb, shockwire, current, plasma, shielder,
@@ -432,6 +437,45 @@ public class UnityBlocks implements ContentList{
         };
 
 		//endregion
+        //region end
+
+        terminalCrucible = new StemGenericSmelter("terminal-crucible"){
+            TextureRegion circuitRegion;
+
+            @Override
+            public void load(){
+                super.load();
+                circuitRegion = atlas.find(name + "-lights");
+            }
+
+            {
+                requirements(Category.crafting, with(Items.lead, 810, Items.graphite, 720, Items.silicon, 520, Items.phaseFabric, 430, Items.surgeAlloy, 320, UnityItems.plagueAlloy, 120, UnityItems.darkAlloy, 120, UnityItems.lightAlloy, 120, UnityItems.advanceAlloy, 120, UnityItems.monolithAlloy, 120, UnityItems.sparkAlloy, 120));
+                flameColor = Color.valueOf("f53036");
+                preserveDraw = false;
+                afterDrawer = e -> {
+                    drawer.draw(e);
+                    if(e.warmup > 0f){
+                        Draw.blend(Blending.additive);
+                        Draw.color(1f, Mathf.absin(Time.time(), 5f, 0.5f) + 0.5f, Mathf.absin(Time.time() + 90f * Mathf.radDeg, 5f, 0.5f) + 0.5f, e.warmup);
+                        Draw.rect(circuitRegion, e.x, e.y);
+                        float b = (Mathf.absin(Time.time(), 8f, 0.25f) + 0.7f) * e.warmup;
+                        Draw.color(1f, b, b, b);
+                        Draw.rect(topRegion, e.x, e.y);
+                        Draw.blend();
+                        Draw.color();
+                    }
+                };
+                outputItem = new ItemStack(UnityItems.terminum, 1);
+                size = 6;
+                craftTime = 310f;
+                idleSound = Sounds.respawning;
+                idleSoundVolume = 0.6f;
+                consumes.power(45.2f);
+                consumes.items(with(UnityItems.plagueAlloy, 3, UnityItems.darkAlloy, 3, UnityItems.lightAlloy, 3, UnityItems.advanceAlloy, 3, UnityItems.monolithAlloy, 3, UnityItems.sparkAlloy, 3));
+            }
+        };
+
+        //endregion
 		//region imber
 
 		orb = new ChargeTurret("orb"){{
