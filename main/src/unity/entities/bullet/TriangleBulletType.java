@@ -11,7 +11,7 @@ import mindustry.graphics.*;
 import static mindustry.Vars.*;
 
 public class TriangleBulletType extends BulletType{
-    /** Gets a random number between 0 to lifetimeRand and add it with lifetiime */
+    /** Gets a random number between 0 to lifetimeRand and add it with lifetime */
     public float lifetimeRand = 0f;
     /** Whether or not it can summon lightning to closest enemy */
     public boolean summonsLightning = false;
