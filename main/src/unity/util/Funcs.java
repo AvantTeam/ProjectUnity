@@ -14,10 +14,10 @@ import mindustry.type.*;
 import static mindustry.Vars.*;
 
 public class Funcs{
-	private static final Vec2 tV = new Vec2();
-	private static final IntSet collidedBlocks = new IntSet();
-	private static final Rect rect = new Rect();
-	private static final Rect hitRect = new Rect();
+    private static final Vec2 tV = new Vec2();
+    private static final IntSet collidedBlocks = new IntSet();
+    private static final Rect rect = new Rect();
+    private static final Rect hitRect = new Rect();
     private static Unit result;
     private static float cdist;
 
@@ -90,5 +90,66 @@ public class Funcs{
         
         if(result == null) result = targetSeq.random();
         return result;
+    }
+    
+    /** The other version of Damage.collideLine */
+    public static void collideLineDamageOnly(Team team, float damage, int x, int y, float angle, float length, Bullet hitter){
+        collidedBlocks.clear();
+        tV.trns(angle, length);
+        
+        if(hitter.type.collidesGround){
+            world.raycastEachWorld(x, y, x + tV.x, y + tV.y, (cx, cy) -> {
+                Building tile = world.build(cx, cy);
+                
+                if(tile != null && !collidedBlocks.contains(tile.pos()) && tile.team != team){
+                    tile.damage(damage);
+                    collidedBlocks.add(tile.pos());
+                }
+                
+                return false;
+            });
+        }
+        
+        rect.setPosition(x, y).setSize(tV.x, tV.y);
+        float x2 = tV.x + x, y2 = tV.y + y;
+        
+        if(rect.width < 0){
+            rect.x += rect.width;
+            rect.width *= -1;
+        }
+        if(rect.height < 0){
+            rect.y += rect.height;
+            rect.height *= -1;
+        }
+        
+        float expand = 3f;
+        
+        rect.y -= expand;
+        rect.x -= expand;
+        rect.width += expand * 2;
+        rect.height += expand * 2;
+        
+        Units.nearbyEnemies(team, rect, unit -> {
+            if(!unit.checkTarget(hitter.type.collidesAir, hitter.type.collidesGround)) return;
+            unit.hitbox(hitRect);
+
+            Vec2 vec = Geometry.raycastRect(x, y, x2, y2, hitRect.grow(expand * 2));
+
+            if(vec != null) unit.damage(damage);
+		});
+    }
+    
+    public static void chanceMultiple(float chance, Runnable run){
+        int intC = Mathf.ceil(chance);
+        float tmp = chance;
+        
+        for(int i = 0; i < intC; i++){
+            if(tmp >= 1){
+                run.run();
+                tmp -= 1;
+            }else if(tmp > 0){
+                if(Mathf.chance(tmp)) run.run();
+            }
+        }
     }
 }
