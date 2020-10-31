@@ -28,6 +28,9 @@ public class UnityUnitTypes implements ContentList{
     //flying units
     caelifera, schistocerca, anthophila, vespula, lepidoptera,
 
+    //monolith
+    pedestal, pilaster, stele,
+
     //worm units
     arcnelidia, devourer;
 
@@ -318,6 +321,50 @@ public class UnityUnitTypes implements ContentList{
 
         ((UnitFactory)Blocks.airFactory).plans.add(new UnitPlan(caelifera, 60f * 25, with(Items.silicon, 15, Items.titanium, 25)));
         
+        //endregion
+        //region monolith
+
+        EntityMapping.nameMap.put("pedestal",MechUnit::create);
+        pedestal = new UnitType("pedestal"){{
+                speed = 0.42f;
+                hitSize = 11f;
+                health = 600;
+                armor = 3.5f;
+                rotateSpeed = 2.6f;
+                singleTarget = true;
+                weapons.add(new Weapon(name + "-gun"){{
+                    x = 10.75f;
+                    y = 2.25f;
+                    reload = 60f;
+                    recoil = 3.2f;
+                    ejectEffect = Fx.lightningShoot;
+                    shootSound = Sounds.shootBig;
+                    bullet = new BasicBulletType(3f, 12f, "shell"){{
+                        width = 20f;
+                        height = 20f;
+                        lifetime = 60f;
+                        frontColor = Pal.lancerLaser;
+                        backColor = Pal.lancerLaser.cpy().mul(0.6f);
+                    }};
+                }}, new Weapon(){{
+                    x = 10.75f;
+                    y = 2.25f;
+                    reload = 60f;
+                    ejectEffect = Fx.none;
+                    shootSound = Sounds.none;
+                    shots = 3;
+                    bullet = new LightningBulletType(){
+                        public void init(Bullet b){
+                            super.init(b);
+                            Sounds.spark.at(b.x, b.y, Mathf.random(0.6f, 0.8f));
+                        };
+                        {
+                            damage = 10f;
+                        }
+                    };
+                }});
+        }};
+
         //endregion
         //region worm units
         

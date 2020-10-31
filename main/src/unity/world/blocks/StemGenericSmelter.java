@@ -12,6 +12,8 @@ public class StemGenericSmelter extends GenericSmelter{
     }
 
     public class StemSmelterBuild extends SmelterBuild{
+        public Object data;
+
         @Override
         public void draw(){
             foreDrawer.get(this);

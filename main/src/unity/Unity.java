@@ -24,6 +24,7 @@ public class Unity extends Mod{
         new UnityUnitTypes(),
         new UnityBlocks(),
         new UnityPlanets(),
+        new UnitySectorPresets(),
         new UnityTechTree(),
     };
 

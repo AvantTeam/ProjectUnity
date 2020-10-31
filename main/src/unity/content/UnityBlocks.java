@@ -1,23 +1,21 @@
 package unity.content;
 
 import arc.graphics.*;
-import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.Lines;
-import arc.graphics.g2d.TextureRegion;
+import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.Time;
-import mindustry.entities.Effect;
+import mindustry.entities.*;
+import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.Pal;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
-import mindustry.world.meta.BuildVisibility;
+import mindustry.world.meta.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.defense.turrets.*;
 import mindustry.type.*;
 import mindustry.ctype.*;
 import mindustry.content.*;
-import mindustry.world.meta.*;
 import unity.world.blocks.*;
 import unity.world.blocks.Recipe.*;
 import unity.world.blocks.experience.*;
@@ -47,7 +45,10 @@ public class UnityBlocks implements ContentList{
 	orb, shockwire, current, plasma, shielder,
 	
 	//koruh
-	laserTurret, inferno;
+	laserTurret, inferno,
+	
+	//monolith
+    monolithAlloyFactory, mage, oracle, spectrum;
 	
 	@Override
 	public void load(){
@@ -550,7 +551,7 @@ public class UnityBlocks implements ContentList{
             consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability <= 0.1f, 0.52f)).boost();
         }};
         
-        plasma = new ChargeTurret("plasma"){{
+        plasma = new BurstChargeTurret("plasma"){{
             requirements(Category.turret, with(Items.copper, 580, Items.lead, 520, Items.graphite, 410, Items.silicon, 390, Items.surgeAlloy, 180, UnityItems.sparkAlloy, 110));
             size = 4;
             health = 2800;
@@ -569,6 +570,9 @@ public class UnityBlocks implements ContentList{
             shootEffect = UnityFx.plasmaShoot;
             chargeEffect = UnityFx.plasmaCharge;
             chargeBeginEffect = UnityFx.plasmaChargeBegin;
+            shots = 1;
+            subShots = 0;
+            alwaysTurn = false;
             consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability <= 0.1f, 0.52f)).boost();
         }};
 
@@ -623,6 +627,86 @@ public class UnityBlocks implements ContentList{
 			addExpField("exp", "useless", 0, 2);
 		}};
 		
+		//endregion
+		//region monolith
+
+        monolithAlloyFactory = new StemGenericSmelter("monolith-alloy-forge"){
+            int effectTimer = timers++;
+            Effect effect = UnityFx.effect;
+            {
+                requirements(Category.crafting, with(Items.metaglass, 160, UnityItems.monolite, 240, Items.silicon, 400, Items.plastanium, 120, Items.thorium, 90, Items.surgeAlloy, 120));
+                afterUpdate = e -> {
+                    if(e.data == null) e.data = 0f;
+                    if(e.consValid()) e.data = Mathf.lerpDelta((float) e.data, e.efficiency(), 0.02f);
+                    else e.data = Mathf.lerpDelta((float) e.data, 0f, 0.02f);
+                    float temp = (float) e.data;
+                    if(!Mathf.zero(temp)){
+                        if(e.timer.get(effectTimer, 45f)) effect.at(e.x, e.y, e.rotation, temp);
+                        if(Mathf.chanceDelta(temp * 0.5f)) Lightning.create(e.team, Pal.lancerLaser, 1f, e.x, e.y, Mathf.randomSeed((int) Time.time() + e.id, 360f), (int) (temp * 4f) + Mathf.random(3));
+                    }
+                };
+                outputItem = new ItemStack(UnityItems.monolithAlloy, 3);
+                size = 4;
+                flameColor = Pal.lancerLaser;
+                idleSound = Sounds.machine;
+                idleSoundVolume = 0.6f;
+                consumes.power(3.6f);
+                consumes.items(with(Items.silicon, 3, Items.graphite, 2, UnityItems.monolite, 2));
+                consumes.liquid(Liquids.cryofluid, 0.1f);
+            }
+        };
+
+        mage = new PowerTurret("mage"){{
+            requirements(Category.turret, with(Items.lead, 75, Items.silicon, 50, UnityItems.monolite, 25));
+            size = 2;
+            health = 600;
+            range = 120f;
+            reloadTime = 48;
+            shootCone = 15f;
+            shots = 3;
+            burstSpacing = 2f;
+            shootSound = Sounds.spark;
+            powerUse = 2.5f;
+            recoilAmount = 2.5f;
+            shootType = new LightningBulletType(){{
+                lightningLength = 20;
+                damage = 32f;
+            }};
+        }};
+
+        oracle = new BurstChargeTurret("oracle"){{
+            requirements(Category.turret, with(Items.silicon, 175, Items.titanium, 150, UnityItems.monolithAlloy, 75));
+            size = 3;
+            health = 1440;
+            range = 180f;
+            reloadTime = 72f;
+            chargeTime = 30f;
+            chargeMaxDelay = 4f;
+            chargeEffects = 12;
+            shootCone = 5f;
+            shots = 8;
+            burstSpacing = 2f;
+            shootSound = Sounds.spark;
+            shootShake = 3f;
+            powerUse = 3f;
+            recoilAmount = 2.5f;
+            shootType = new LightningBulletType(){{
+                damage = 32f;
+                shootEffect = Fx.lightningShoot;
+            }};
+            chargeEffect = UnityFx.oracleChage;
+            chargeBeginEffect = UnityFx.oracleChargeBegin;
+            subShots = 3;
+            subBurstSpacing = 1f;
+            subShootEffect = Fx.hitLancer;
+            subShootSound = Sounds.laser;
+            subShootType = new LaserBulletType(64f){{
+                length = 180;
+                sideAngle = 45f;
+                inaccuracy = 8f;
+            }};
+        }};
+
 		//endregion
 	}
 }
