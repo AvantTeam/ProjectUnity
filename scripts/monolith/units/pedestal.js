@@ -27,7 +27,7 @@ pedestalWeap.x = 10.75;
 pedestalWeap.y = 2.25;
 pedestalWeap.reload = 60;
 pedestalWeap.recoil = 3.2;
-pedestalWeap.shootEffect = Fx.lightningShoot;
+pedestalWeap.ejectEffect = Fx.lightningShoot;
 pedestalWeap.shootSound = Sounds.shootBig;
 pedestalWeap.bullet = pedestalBullet;
 
