@@ -5,13 +5,13 @@ import mindustry.world.blocks.production.GenericSmelter;
 
 public class StemGenericSmelter extends GenericSmelter{
     protected boolean preserveDraw = true, preserveUpdate = true;
-    protected Cons<FlexibleSmelterBuild> foreDrawer = e -> {}, afterDrawer = e -> {}, foreUpdate = e -> {}, afterUpdate = e -> {};
+    protected Cons<StemSmelterBuild> foreDrawer = e -> {}, afterDrawer = e -> {}, foreUpdate = e -> {}, afterUpdate = e -> {};
 
     public StemGenericSmelter(String name){
         super(name);
     }
 
-    public class FlexibleSmelterBuild extends SmelterBuild{
+    public class StemSmelterBuild extends SmelterBuild{
         @Override
         public void draw(){
             foreDrawer.get(this);
