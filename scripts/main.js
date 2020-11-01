@@ -52,6 +52,7 @@ const script = [
 			},
 
 			"effects",
+			"wavefront",
             "wormlib",
 			"unitlib",
             "copterbase",
