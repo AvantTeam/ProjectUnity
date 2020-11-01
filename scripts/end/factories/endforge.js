@@ -48,14 +48,14 @@ endForge.buildType = () => {
 			for(var i = 0; i < 4; i++){
 				var ang = i * 90;
 				for(var s = 0; s < 2; s++){
-					var ofst = (360 / 16) * ((i * 2) + s);
+					var ofst = (360 / 8) * ((i * 2) + s);
 					var reg = endForge.smallLightRegion;
 					var sgn = Mathf.signs[s];
 					var colA = (Mathf.absin(Time.time() + (ofst * Mathf.radDeg), 8, 0.25) + 0.75) * this.warmup;
 					var colB = (Mathf.absin(Time.time() + ((90 + ofst) * Mathf.radDeg), 8, 0.25) + 0.75) * this.warmup;
 					
 					Draw.color(1, colA, colB, this.warmup);
-					Draw.rect(reg, this.x, this.y, reg.width * sgn * Draw.scl, reg.height * Draw.scl, ang);
+					Draw.rect(reg, this.x, this.y, reg.width * sgn * Draw.scl, reg.height * Draw.scl, -ang);
 				};
 			};
 			
