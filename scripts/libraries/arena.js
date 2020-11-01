@@ -43,6 +43,9 @@ function cutscene(){
   Time.run(cuttime, () => {
     print("unpause!");
     cutnow = false;
+    Core.app.post(() => {
+      Vars.control.input.panning = false;
+    });
   });
 }
 
