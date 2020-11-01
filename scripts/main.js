@@ -259,7 +259,8 @@ const script = [
             {
                 name: "factories",
                 childs: [
-                    "terminalcrucible"
+                    "terminalcrucible",
+					"endforge"
                 ]
             },
 
