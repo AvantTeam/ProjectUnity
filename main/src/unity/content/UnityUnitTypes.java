@@ -3,6 +3,7 @@ package unity.content;
 import arc.func.*;
 import arc.math.Mathf;
 import arc.graphics.Color;
+import arc.graphics.g2d.*;
 import mindustry.ctype.*;
 import mindustry.type.*;
 import mindustry.gen.*;
@@ -337,32 +338,112 @@ public class UnityUnitTypes implements ContentList{
                     y = 2.25f;
                     reload = 60f;
                     recoil = 3.2f;
-                    ejectEffect = Fx.lightningShoot;
                     shootSound = Sounds.shootBig;
-                    bullet = new BasicBulletType(3f, 12f, "shell"){{
-                        width = 20f;
-                        height = 20f;
-                        lifetime = 60f;
-                        frontColor = Pal.lancerLaser;
-                        backColor = Pal.lancerLaser.cpy().mul(0.6f);
-                    }};
-                }}, new Weapon(){{
-                    x = 10.75f;
-                    y = 2.25f;
-                    reload = 60f;
-                    ejectEffect = Fx.none;
-                    shootSound = Sounds.none;
-                    shots = 3;
-                    bullet = new LightningBulletType(){
+                    BulletType subBullet = new LightningBulletType();
+                    subBullet.damage = 10f;
+                    bullet = new BasicBulletType(3f, 12f, "shell"){
+                        @Override
                         public void init(Bullet b){
-                            super.init(b);
-                            Sounds.spark.at(b.x, b.y, Mathf.random(0.6f, 0.8f));
+                            for(int i = 0; i < 3; i++){
+                                subBullet.create(b, b.x, b.y, b.vel.angle());
+                                Sounds.spark.at(b.x, b.y, Mathf.random(0.6f, 0.8f));
+                            }
                         };
+
                         {
-                            damage = 10f;
+                            width = 20f;
+                            height = 20f;
+                            lifetime = 60f;
+                            frontColor = Pal.lancerLaser;
+                            backColor = Pal.lancerLaser.cpy().mul(0.6f);
+                            shootEffect = Fx.lightningShoot;
                         }
                     };
                 }});
+        }};
+
+        EntityMapping.nameMap.put("pilaster", MechUnit::create);
+        pilaster = new UnitType("pilaster"){{
+            speed = 0.3f;
+            hitSize = 26.5f;
+            health = 1000;
+            armor = 4f;
+            rotateSpeed = 2.2f;
+            mechFrontSway = 0.55f;
+            weapons.add(new Weapon("unity-monolith-medium-weapon-mount"){{
+                rotate = true;
+                x = 4f;
+                y = 7.5f;
+                shootY = 6f;
+                recoil = 2.5f;
+                reload = 25f;
+                shots = 3;
+                spacing = 3f;
+                shootSound = Sounds.spark;
+                bullet = new LightningBulletType();
+                bullet.damage = 15f;
+                bullet.lightningLength = 15;
+            }}, new Weapon("unity-monolith-large-weapon-mount"){{
+                rotate = true;
+                rotateSpeed = 10f;
+                x = 13f;
+                y = 2f;
+                shootY = 10.5f;
+                recoil = 3f;
+                reload = 40f;
+                shootSound = Sounds.laser;
+                bullet = new LaserBulletType(100f);
+            }});
+        }};
+
+        EntityMapping.nameMap.put("stele", MechUnit::create);
+        stele = new UnitType("stele"){{
+            speed = 0.5f;
+            hitSize = 8f;
+            health = 200;
+            weapons.add(new Weapon(name + "-shotgun"){{
+                reload = 60f;
+                recoil = 2.5f;
+                x = 5.25f;
+                y = -0.25f;
+                shots = 12;
+                spacing = 0.5f;
+                inaccuracy = 0.5f;
+                velocityRnd = 0.2f;
+                shotDelay = 0f;
+                shootSound = Sounds.shootBig;
+                bullet = new BasicBulletType(3.5f, 3f){
+                    @Override
+                    public void init(Bullet b){
+                        b.data = new Trail(6);
+                    }
+
+                    @Override
+                    public void draw(Bullet b){
+                        ((Trail) b.data).draw(frontColor, width);
+                        Draw.color(frontColor);
+                        Fill.circle(b.x, b.y, width);
+                        Draw.color();
+                    }
+
+                    @Override
+                    public void update(Bullet b){
+                        super.update(b);
+                        ((Trail) b.data).update(b.x, b.y);
+                    }
+
+                    {
+                        frontColor = Pal.lancerLaser;
+                        backColor = Pal.lancerLaser.cpy().mul(0.7f);
+                        width = height = 2f;
+                        weaveScale = 3f;
+                        weaveMag = 5f;
+                        homingPower = 1f;
+                        lifetime = 60f;
+                        shootEffect = Fx.hitLancer;
+                    }
+                };
+            }});
         }};
 
         //endregion
