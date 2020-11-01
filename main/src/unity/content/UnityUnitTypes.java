@@ -2,7 +2,6 @@ package unity.content;
 
 import arc.func.*;
 import arc.math.Mathf;
-import arc.graphics.Color;
 import arc.graphics.g2d.*;
 import mindustry.ctype.*;
 import mindustry.type.*;
@@ -12,7 +11,9 @@ import mindustry.graphics.*;
 import mindustry.content.*;
 import mindustry.world.blocks.units.*;
 import mindustry.world.blocks.units.UnitFactory.*;
+import unity.ai.DistanceGroundAI;
 import unity.entities.units.*;
+import unity.graphics.UnityPal;
 
 import static mindustry.type.ItemStack.*;
 
@@ -31,6 +32,9 @@ public class UnityUnitTypes implements ContentList{
 
     //monolith
     pedestal, pilaster, stele,
+
+    //scar
+    hovos, jetstream,
 
     //worm units
     arcnelidia, devourer;
@@ -273,15 +277,15 @@ public class UnityUnitTypes implements ContentList{
                 bullet = new MissileBulletType(6f, 1f){{
                     width = 8f;
                     height = 14f;
-                    trailColor = Color.valueOf("e58956");
+                    trailColor = UnityPal.monolithDarker;
                     weaveScale = 2f;
                     weaveMag = -2f;
                     lifetime = 50f;
                     drag = -0.01f;
                     splashDamage = 48f;
                     splashDamageRadius = 12f;
-                    frontColor = Color.valueOf("ffd2ae");
-                    backColor = Color.valueOf("e58956");
+                    frontColor = UnityPal.monolithLighter;
+                    backColor = UnityPal.monolithDarker;
                 }};
             }}, new Weapon(name + "-gun-big"){{
                 rotate = true;
@@ -295,7 +299,7 @@ public class UnityUnitTypes implements ContentList{
                 shotDelay = 0f;
                 reload = 45f;
                 bullet = new ShrapnelBulletType(){{
-                    toColor = Color.valueOf("ffd2ae");
+                    toColor = UnityPal.monolithLighter;
                     damage = 150f;
                     keepVelocity = false;
                     length = 150f;
@@ -447,8 +451,72 @@ public class UnityUnitTypes implements ContentList{
         }};
 
         //endregion
+        //region scar
+
+        EntityMapping.nameMap.put("hovos",LegsUnit::create);
+        hovos = new UnitType("hovos"){{
+            defaultController = DistanceGroundAI::new;
+            speed = 0.8f;
+            health = 340;
+            hitSize = 17f;
+            range = 350f;
+            allowLegStep = true;
+            legMoveSpace = 0.7f;
+            legTrns = 0.4f;
+            legLength = 30f;
+            legExtension = -4.3f;
+            weapons.add(new Weapon("unity-small-scar-railgun"){{
+                reload = 60f * 2;
+                x = 0f;
+                y = -2f;
+                shootY = 9f;
+                mirror = false;
+                rotate = true;
+                shake = 2.3f;
+                rotateSpeed = 2f;
+                bullet = new RailBulletType(){{
+                    damage = 500f;
+                    speed = 59f;
+                    lifetime = 8f;
+                    shootEffect = UnityFx.scarRailShoot;
+                    pierceEffect = UnityFx.scarRailHit;
+                    updateEffect = UnityFx.scarRailTrail;
+                    hitEffect = Fx.massiveExplosion;
+                    pierceDamageFactor = 0.3f;
+                }};
+            }});
+        }};
+
+        /*EntityMapping.nameMap.put("jetstream", UnitEntity::create);
+        jetstream = new UnitType("jetstream"){{
+            description="There will be Bloodshed";
+            health=670;
+            rotateSpeed=12.5f;
+            faceTarget=true;
+            flying=true;
+            speed=9.2f;
+            drag=0.019f;
+            accel=0.028f;
+            hitSize=11f;
+            engineOffset=11f;
+            weapons.add(new Weapon() {
+                {
+                    mirror=false;
+                    x=0f;
+                    y=7f;
+                    continuous=true;
+                    //bullet=new 
+                    reload=60f*2.5f+bullet.lifetime;
+                    shootStatus=UnityStatusEffects.reloadFatigue;
+                    shootStatusDuration=bullet.lifetime;
+                    shootCone=15f;
+                }
+            });
+        }};*/
+
+        //endregion
         //region worm units
-        
+
         EntityMapping.nameMap.put("arcnelidia", WormDefaultUnit::new);
         arcnelidia = new WormUnitType("arcnelidia"){{
             setTypeID(3);

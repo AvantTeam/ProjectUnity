@@ -16,6 +16,7 @@ import mindustry.world.blocks.defense.turrets.*;
 import mindustry.type.*;
 import mindustry.ctype.*;
 import mindustry.content.*;
+import unity.graphics.UnityPal;
 import unity.world.blocks.*;
 import unity.world.blocks.Recipe.*;
 import unity.world.blocks.experience.*;
@@ -451,7 +452,7 @@ public class UnityBlocks implements ContentList{
 
             {
                 requirements(Category.crafting, with(Items.lead, 810, Items.graphite, 720, Items.silicon, 520, Items.phaseFabric, 430, Items.surgeAlloy, 320, UnityItems.plagueAlloy, 120, UnityItems.darkAlloy, 120, UnityItems.lightAlloy, 120, UnityItems.advanceAlloy, 120, UnityItems.monolithAlloy, 120, UnityItems.sparkAlloy, 120));
-                flameColor = Color.valueOf("f53036");
+                flameColor = UnityPal.scarColor;
                 preserveDraw = false;
                 afterDrawer = e -> {
                     drawer.draw(e);
@@ -589,7 +590,7 @@ public class UnityBlocks implements ContentList{
             targetAir = false;
             shootType = UnityBullets.shielderBullet;
             shootSound = /*test*/Sounds.pew;
-            chargeEffect = new Effect(38, e -> {
+            chargeEffect = new Effect(38f, e -> {
 				Draw.color(Pal.accent);
 				Angles.randLenVectors(e.id, 2, 1 + 20 * e.fout(), e.rotation, 120, (x, y) -> {
 					Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fslope() * 3 + 1);
