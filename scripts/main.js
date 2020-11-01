@@ -62,6 +62,7 @@ const script = [
             "multi-lib",
 			"status",
 			"funclib",
+      "arena",
 			"unitloader"/*,
             "shieldbulletlib"*/
         ]
