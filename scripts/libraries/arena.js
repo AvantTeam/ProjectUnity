@@ -1,5 +1,5 @@
 var mapname = "nullspacecore";
-var boss = UnitTypes.zenith;
+var boss = UnitTypes.antumbra;
 var bossnow = null;
 var playing = false;
 var cutnow = false;
@@ -16,11 +16,15 @@ print("h");
 
 function addHpBar(){
   Vars.ui.hudGroup.fill(cons(cont => {
-    var hpb = cont.add(new Bar("Boss HP", bosscolor, () => ((Time.time() - cutstart < cuttime) ? (Time.time() - cutstart) / cuttime: bossnow.healthf()))).width(Core.graphics.getWidth()*0.6).height(50).top().pad(40).get();
+    var hpb = cont.add(new Bar(boss.localizedName, bosscolor, () => ((Time.time() - cutstart < cuttime) ? (Time.time() - cutstart) / cuttime: bossnow.healthf()))).width(Core.graphics.getWidth()*0.6).height(50).top().pad(40).get();
     hpb.blink(Color.white);
     cont.top();
     cont.update(() => {
       if(!playing || bossnow == null) cont.remove();
+    });
+
+    Time.run(cuttime, () => {
+      hpb.reset(1);
     });
   }));
 }
