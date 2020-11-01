@@ -2,10 +2,12 @@ package unity.content;
 
 import arc.func.*;
 import arc.math.Mathf;
+import arc.graphics.Color;
 import arc.graphics.g2d.*;
 import mindustry.ctype.*;
 import mindustry.type.*;
 import mindustry.gen.*;
+import mindustry.entities.Lightning;
 import mindustry.entities.bullet.*;
 import mindustry.graphics.*;
 import mindustry.content.*;
@@ -27,8 +29,11 @@ public class UnityUnitTypes implements ContentList{
     private static final int[] classIDs = new int[constructors.length];
 
     public static UnitType
-    //flying units
+    //flying-units
     caelifera, schistocerca, anthophila, vespula, lepidoptera,
+
+    //ground-units
+    arcaetana, projectSpiboss,
 
     //monolith
     pedestal, pilaster, stele,
@@ -43,9 +48,13 @@ public class UnityUnitTypes implements ContentList{
         return classIDs[index];
     }
 
+    private static void setEntity(String name, Prov c){
+        EntityMapping.nameMap.put(name, c);
+    }
+
     @Override
     public void load(){
-        //region air units
+        //region flying-units
 
         for(int i = 0, j = 0, len = EntityMapping.idMap.length; i < len; i++){
             if(EntityMapping.idMap[i] == null){
@@ -56,7 +65,7 @@ public class UnityUnitTypes implements ContentList{
             }
         }
 
-        EntityMapping.nameMap.put("caelifera", CopterUnit::new);
+        setEntity("caelifera", CopterUnit::new);
         caelifera = new CopterUnitType("caelifera"){{
             speed = 5f;
             drag = 0.08f;
@@ -99,7 +108,7 @@ public class UnityUnitTypes implements ContentList{
             }});
         }};
 
-        EntityMapping.nameMap.put("schistocerca", CopterUnit::new);
+        setEntity("schistocerca", CopterUnit::new);
         schistocerca = new CopterUnitType("schistocerca"){{
             speed = 4.5f;
             drag = 0.07f;
@@ -152,7 +161,7 @@ public class UnityUnitTypes implements ContentList{
             }
         }};
 
-        EntityMapping.nameMap.put("anthophila", CopterUnit::new);
+        setEntity("anthophila", CopterUnit::new);
         anthophila = new CopterUnitType("anthophila"){{
             speed = 4f;
             drag = 0.07f;
@@ -196,7 +205,7 @@ public class UnityUnitTypes implements ContentList{
             }});
         }};
 
-        EntityMapping.nameMap.put("vespula", CopterUnit::new);
+        setEntity("vespula", CopterUnit::new);
         vespula = new CopterUnitType("vespula"){{
             speed = 3.5f;
             drag = 0.07f;
@@ -245,7 +254,7 @@ public class UnityUnitTypes implements ContentList{
 			}
         }};
 
-        EntityMapping.nameMap.put("lepidoptera", CopterUnit::new);
+        setEntity("lepidoptera", CopterUnit::new);
         lepidoptera = new CopterUnitType("lepidoptera"){{
             speed = 3f;
             drag = 0.07f;
@@ -327,9 +336,151 @@ public class UnityUnitTypes implements ContentList{
         ((UnitFactory)Blocks.airFactory).plans.add(new UnitPlan(caelifera, 60f * 25, with(Items.silicon, 15, Items.titanium, 25)));
         
         //endregion
+        //region ground-units
+
+        setEntity("arcaetana", BuilderLegsUnit::create);
+        arcaetana = new UnitType("arcaetana"){{
+            speed = 0.4f;
+            drag = 0.12f;
+            hitSize = 29f;
+            hovering = true;
+            allowLegStep = true;
+            health = 31000;
+            armor = 16f;
+            rotateSpeed = 1.3f;
+            legCount = 12;
+            legGroupSize = 4;
+            legMoveSpace = 0.4f;
+            legPairOffset = 0.4f;
+            legLength = 121f;
+            legExtension = -13.5f;
+            kinematicScl = 0.8f;
+            legBaseOffset = 9f;
+            legSpeed = 0.092f;
+            visualElevation = 1f;
+            groundLayer = 79f;
+            rippleScale = 3.4f;
+            legSplashDamage = 130f;
+            legSplashRange = 60f;
+            targetAir = false;
+            commandLimit = 5;
+            weapons.add(new Weapon(name + "-cannon"){{
+                x = 32.5f;
+                y = -1.75f;
+                shootX = -7.5f;
+                shootY = 30.25f;
+                inaccuracy = 7.3f;
+                velocityRnd = 0.1f;
+                shots = 4;
+                shotDelay = 7f;
+                shootSound = Sounds.artillery;
+                rotate = false;
+                reload = 130f;
+                shake = 6f;
+                recoil = 5f;
+                bullet = new ArtilleryBulletType(3.5f, 45f){
+                    @Override
+                    public void update(Bullet b){
+                        super.update(b);
+                        if(Mathf.chanceDelta(0.3f)) Lightning.create(b, UnityPal.arcaetanaLightning, 43f, b.x, b.y, Mathf.range(56f) + b.rotation(), 8);
+                    }
+
+                    {
+                        lifetime = 85f;
+                        collides = true;
+                        collidesTiles = true;
+                        splashDamageRadius = 90f;
+                        splashDamage = 50f;
+                        width = height = 27f;
+                        ammoMultiplier = 3f;
+                        knockback = 0.9f;
+                        hitShake = 7f;
+                        status = StatusEffects.sapped;
+                        statusDuration = 60f * 10f;
+                        smokeEffect = Fx.shootBigSmoke2;
+                        backColor = Pal.sapBulletBack;
+                        frontColor = lightningColor = Pal.sapBullet;
+                        lightning = 6;
+                        lightningLength = 23;
+                        fragLifeMin = 0.3f;
+                        fragBullets = 13;
+                        fragBullet = new ArtilleryBulletType(2.5f, 23f){{
+                            lifetime = 82f;
+                            splashDamageRadius = 40f;
+                            splashDamage = 20f;
+                            width = height = 20f;
+                            hitShake = 4f;
+                            status = StatusEffects.sapped;
+                            statusDuration = 60f * 10f;
+                            smokeEffect = Fx.shootBigSmoke2;
+                            backColor = Pal.sapBulletBack;
+                            frontColor = lightningColor = Pal.sapBullet;
+                            lightning = 3;
+                            lightningLength = 6;
+                        }};
+                    }
+                };
+            }}, new Weapon("unity-gummy-main-sapper"){{
+                x = 10.25f;
+                y = -23.25f;
+                shootY = 8f;
+                shootSound = Sounds.laser;
+                reload = 30f;
+                rotate = true;
+                bullet = new LaserBulletType(98f){
+                    @Override
+                    public void hit(Bullet b, float x, float y){
+                        super.hit(b, x, y);
+                        if(Mathf.chance(0.3f)) Lightning.create(b, UnityPal.arcaetanaLightning, 12f, x, y, Mathf.range(30f) + b.rotation(), 7);
+                    }
+
+                    {
+                        colors = new Color[]{Color.valueOf("a96bfa80"), UnityPal.arcaetanaLightning, Color.white};
+                        length = 195f;
+                        ammoMultiplier = 6f;
+                        width = 19f;
+                        drawSize = length * 2f + 20f;
+                    }
+                };
+            }});
+            weapons.add(weapons.get(1).copy(), new Weapon(name + "-main-laser"){{
+                x = 18.75f;
+                y = -11f;
+                shootY = 19f;
+                rotateSpeed = 1f;
+                shootSound = Sounds.laser;
+                reload = 60f;
+                recoil = 4f;
+                rotate = true;
+                occlusion = 15f;
+                shake = 4f;
+                bullet = new LaserBulletType(325f){
+                    @Override
+                    public void hit(Bullet b, float x, float y){
+                        super.hit(b, x, y);
+                        if(Mathf.chance(0.4f)) Lightning.create(b, UnityPal.arcaetanaLightning, 34f, x, y, Mathf.range(30f) + b.rotation(), 12);
+                    }
+
+                    {
+                        colors = new Color[]{Color.valueOf("a96bfa80"), UnityPal.arcaetanaLightning, Color.white};
+                        length = 290f;
+                        ammoMultiplier = 4f;
+                        width = 43f;
+                        sideLength = 45f;
+                        drawSize = length * 2f + 20f;
+                    }
+                };
+            }});
+            Weapon temp = weapons.get(2);
+            temp.x = -17f;
+            temp.y = -18.5f;
+            temp.flipSprite = true;
+        }};
+
+        //endregion
         //region monolith
 
-        EntityMapping.nameMap.put("pedestal",MechUnit::create);
+        setEntity("pedestal",MechUnit::create);
         pedestal = new UnitType("pedestal"){{
                 speed = 0.42f;
                 hitSize = 11f;
@@ -366,7 +517,7 @@ public class UnityUnitTypes implements ContentList{
                 }});
         }};
 
-        EntityMapping.nameMap.put("pilaster", MechUnit::create);
+        setEntity("pilaster", MechUnit::create);
         pilaster = new UnitType("pilaster"){{
             speed = 0.3f;
             hitSize = 26.5f;
@@ -400,7 +551,7 @@ public class UnityUnitTypes implements ContentList{
             }});
         }};
 
-        EntityMapping.nameMap.put("stele", MechUnit::create);
+        setEntity("stele", MechUnit::create);
         stele = new UnitType("stele"){{
             speed = 0.5f;
             hitSize = 8f;
@@ -453,7 +604,7 @@ public class UnityUnitTypes implements ContentList{
         //endregion
         //region scar
 
-        EntityMapping.nameMap.put("hovos",LegsUnit::create);
+        setEntity("hovos",LegsUnit::create);
         hovos = new UnitType("hovos"){{
             defaultController = DistanceGroundAI::new;
             speed = 0.8f;
@@ -487,7 +638,7 @@ public class UnityUnitTypes implements ContentList{
             }});
         }};
 
-        /*EntityMapping.nameMap.put("jetstream", UnitEntity::create);
+        /*setEntity("jetstream", UnitEntity::create);
         jetstream = new UnitType("jetstream"){{
             description="There will be Bloodshed";
             health=670;
@@ -517,7 +668,7 @@ public class UnityUnitTypes implements ContentList{
         //endregion
         //region worm units
 
-        EntityMapping.nameMap.put("arcnelidia", WormDefaultUnit::new);
+        setEntity("arcnelidia", WormDefaultUnit::new);
         arcnelidia = new WormUnitType("arcnelidia"){{
             setTypeID(3);
             segmentOffset = 23f;
@@ -560,7 +711,7 @@ public class UnityUnitTypes implements ContentList{
         }};
 
         /*
-        EntityMapping.nameMap.put("devourer", WormDefaultUnit::new);
+        setEntity("devourer", WormDefaultUnit::new);
         devourer=new WormUnitType("devourer", 45) {{
             
         }};
