@@ -102,12 +102,13 @@ endgame.reloadTime = 300;
 endgame.eyeTime = endgame.timers++;
 endgame.bulletTime = endgame.timers++;
 endgame.buildType = () => {
-	var endgameEntity = extendContent(Turret.TurretBuild, endgame, {
+	var endgameEntity = extendContent(PowerTurret.PowerTurretBuild, endgame, {
 		damage(amount){
 			var trueAmount = Mathf.clamp(amount, 0, 360);
 			this.super$damage(trueAmount);
 		},
 		setEff(){
+			this._threatLevel = 1;
 			this._ringProgress = [0, 0, 0];
 			this._targetsB = [];
 			this._eyeReloads = [0, 0];
@@ -134,7 +135,8 @@ endgame.buildType = () => {
 					this._targetsB[i] = null;
 				};
 			};
-			if(this.timer.get(endgame.eyeTime, 30) && this.target != null){
+			this.updateTreats();
+			if(this.timer.get(endgame.eyeTime, 30) && this.target != null && !this.isControlled()){
 				tempSeq.clear();
 				//var tileTarget = Units.findEnemyTile(this.team, this.x, this.y, endgame.range, build => !build.dead);
 				var lowest = endgame.range + 999;
@@ -212,10 +214,19 @@ endgame.buildType = () => {
 			Draw.blend();
 			Draw.z(originZ);
 		},
+		updateTreats(){
+			this._threatLevel = 1;
+			var rnge = endgame.range / 1.5;
+			Units.nearbyEnemies(this.team, this.x - rnge, this.y - rnge, rnge * 2, rnge * 2, e => {
+				if(Mathf.within(this.x, this.y, e.x, e.y, rnge) && !e.dead){
+					this._threatLevel += (e.maxHealth / 120);
+				}
+			});
+		},
 		updateEyes(){
 			this.updateEyeOffset();
 			this._eyesOffset.lerp(this._eyesTargetOffset, Mathf.clamp(0.08 * Time.delta));
-			if(this.target != null){
+			if(this.target != null || (this.isControlled() && this.unit.isShooting)){
 				this._eyeReloads[0] += this.delta();
 				this._eyeReloads[1] += this.delta();
 			};
@@ -226,12 +237,20 @@ endgame.buildType = () => {
 			
 			if(this._eyeReloads[0] >= 15){
 				this._eyeReloads[0] = 0;
-				if(this._targetsB[this._eyeSequenceA] != null) this.eyeShoot(this._eyeSequenceA);
+				if(!this.isControlled()){
+					if(this._targetsB[this._eyeSequenceA] != null) this.eyeShoot(this._eyeSequenceA);
+				}else{
+					if(this.unit.isShooting) this.playerEyeShoot(this._eyeSequenceA);
+				};
 				this._eyeSequenceA = (this._eyeSequenceA + 1) % 8;
 			};
 			if(this._eyeReloads[1] >= 5){
 				this._eyeReloads[1] = 0;
-				if(this._targetsB[this._eyeSequenceB + 8] != null) this.eyeShoot(this._eyeSequenceB + 8);
+				if(!this.isControlled()){
+					if(this._targetsB[this._eyeSequenceB + 8] != null) this.eyeShoot(this._eyeSequenceB + 8);
+				}else{
+					if(this.unit.isShooting) this.playerEyeShoot(this._eyeSequenceA + 8);
+				};
 				this._eyeSequenceB = (this._eyeSequenceB + 1) % 8;
 			};
 		},
@@ -277,6 +296,24 @@ endgame.buildType = () => {
 				this._eyesVecArray[i].add(this.x, this.y);
 			};
 		},
+		playerEyeShoot(index){
+			var rnge = 15;
+			var ux = this.unit.aimX();
+			var uy = this.unit.aimY();
+			fLib.trueEachBlock(this.unit.aimX(), this.unit.aimY(), 15, build => {
+				if(!build.dead && build.team != this.team){
+					build.damage(380);
+					endgameLaser.at(this.x, this.y, 0, [new Vec2(ux, uy), new Vec2(build.x, build.y), 0.525]);
+				};
+			});
+			Units.nearbyEnemies(this.team, ux - rnge, uy - rnge, rnge * 2, rnge * 2, e => {
+				if(Mathf.within(ux, uy, e.x, e.y, rnge + e.hitSize) && !e.dead){
+					e.damage(380 * this._threatLevel);
+					endgameLaser.at(this.x, this.y, 0, [new Vec2(ux, uy), new Vec2(e.x, e.y), 0.525]);
+				};
+			});
+			endgameLaser.at(this.x, this.y, 0, [this._eyesVecArray[index], new Vec2(ux, uy), 0.625]);
+		},
 		eyeShoot(index){
 			//var angOffset = 0;
 			var angleC = (360 / 8) * (index % 8);
@@ -287,11 +324,11 @@ endgame.buildType = () => {
 			};
 			var e = this._targetsB[index];
 			if(e != null){
-				e.damage(250);
+				e.damage(250 * this._threatLevel);
 				this._eyesVecArray[index].set(tempVec);
 				this._eyesVecArray[index].add(this.x, this.y);
 				endgameLaser.at(this.x, this.y, 0, [this._eyesVecArray[index], new Vec2(e.x, e.y), 0.625]);
-			}
+			};
 		},
 		updateAntiBullets(){
 			bulletSeq.clear();
@@ -355,29 +392,38 @@ endgame.buildType = () => {
 		updateTile(){
 			this.updateEyes();
 			if(this.power.status >= 0.0001){
-				//this._eyesAlpha = Mathf.lerpDelta(this._eyesAlpha, 1, 0.06);
-				this._lightsAlpha = Mathf.lerpDelta(this._lightsAlpha, 1, 0.07);
+				this._eyesAlpha = Mathf.lerpDelta(this._eyesAlpha, 1, 0.06);
+				//this._lightsAlpha = Mathf.lerpDelta(this._lightsAlpha, 1, 0.07);
 			}else{
-				//this._eyesAlpha = Mathf.lerpDelta(this._eyesAlpha, 0, 0.06);
-				this._lightsAlpha = Mathf.lerpDelta(this._lightsAlpha, 0, 0.07);
+				this._eyesAlpha = Mathf.lerpDelta(this._eyesAlpha, 0, 0.06);
+				//this._lightsAlpha = Mathf.lerpDelta(this._lightsAlpha, 0, 0.07);
 			};
 			if(this.consValid()){
 				this.updateAntiBullets();
 				this.super$updateTile();
 			};
-			if(this.target != null){
+			if(this.isControlled()){
+				var con = this.unit.controller;
+				this._eyesTargetOffset.trns(Angles.angle(this.x, this.y, con.mouseX, con.mouseY), Mathf.dst(this.x, this.y, con.mouseX, con.mouseY) / (endgame.range / 3));
+			};
+			if(this.target != null || (this.isControlled() && this.unit.isShooting)){
 				this._eyeResetTime = 0;
-				this._eyesTargetOffset.trns(Angles.angle(this.x, this.y, this.target.x, this.target.y), Mathf.dst(this.x, this.y, this.target.x, this.target.y) / (endgame.range / 3));
+				if(!this.isControlled()){
+					this._eyesTargetOffset.trns(Angles.angle(this.x, this.y, this.targetPos.x, this.targetPos.y), Mathf.dst(this.x, this.y, this.targetPos.x, this.targetPos.y) / (endgame.range / 3));
+					//tempVec.set(this.targetPos.x, this.targetPos.y).sub(this.x, this.y).div(new Vec2(endgame.range / 3, endgame.range / 3));
+					//this._eyesOffset.set(tempVec);
+				};
 				this._eyesTargetOffset.limit(2);
-				//this._lightsAlpha = Mathf.lerpDelta(this._lightsAlpha, 1, 0.07);
-				this._eyesAlpha = Mathf.lerpDelta(this._eyesAlpha, 1, 0.06);
+				this._lightsAlpha = Mathf.lerpDelta(this._lightsAlpha, 1, 0.07);
+				//this._eyesAlpha = Mathf.lerpDelta(this._eyesAlpha, 1, 0.06);
 				for(var i = 0; i < 3; i++){
 					this._ringProgress[i] = Mathf.lerpDelta(this._ringProgress[i], 360 * ringDirection[i], ringProgresses[i]);
 				};
 			}else{
 				//this._lightsAlpha = Mathf.lerpDelta(this._lightsAlpha, 0, 0.07);
 				if(this._eyeResetTime >= 60){
-					this._eyesAlpha = Mathf.lerpDelta(this._eyesAlpha, 0, 0.06);
+					this._lightsAlpha = Mathf.lerpDelta(this._lightsAlpha, 0, 0.07);
+					//this._eyesAlpha = Mathf.lerpDelta(this._eyesAlpha, 0, 0.06);
 					for(var i = 0; i < 3; i++){
 						this._ringProgress[i] = Mathf.lerpDelta(this._ringProgress[i], 0, ringProgresses[i]);
 					};
