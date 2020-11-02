@@ -14,7 +14,7 @@
 			"x": 1.5,
 			"y": 11,
 			"shootSound": "pew",
-			"ejectEffect": "shellEjectSmall",
+			"ejectEffect": "casing1",
 			"reload": 8,
 			"bullet": {
 				"type": "BasicBulletType",
@@ -29,7 +29,7 @@
 			"x": 4,
 			"y": 8.75,
 			"shootSound": "shootSnap",
-			"ejectEffect": "shellEjectSmall",
+			"ejectEffect": "casing1",
 			"reload": 12,
 			"bullet": {
 				"type": "BasicBulletType",
@@ -46,7 +46,7 @@
 			"x": 6.75,
 			"y": 5.75,
 			"shootSound": "shootBig",
-			"ejectEffect": "shellEjectMedium",
+			"ejectEffect": "casing2",
 			"reload": 30,
 			"bullet": "standardIncendiaryBig"
 		}

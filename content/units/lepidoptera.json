@@ -15,7 +15,7 @@
 			"x": 14,
 			"y": 27,
 			"shootSound": "shootBig",
-			"ejectEffect": "shellEjectBig",
+			"ejectEffect": "casing4",
 			"reload": 10,
 			"bullet": "standardThoriumBig"
 		},
@@ -24,7 +24,7 @@
 			"x": 17,
 			"y": 14,
 			"shootSound": "shootSnap",
-			"ejectEffect": "shellEjectMedium",
+			"ejectEffect": "casing2",
 			"shots": 2,
 			"spacing": 2,
 			"reload": 20,
