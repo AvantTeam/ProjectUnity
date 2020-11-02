@@ -15,7 +15,7 @@
 			"x": 5.25,
 			"y": 6.5,
 			"shootSound": "pew",
-			"ejectEffect": "shellEjectSmall",
+			"ejectEffect": "casing1",
 			"bullet": {
 				"type": "BasicBulletType",
 				"speed": 5,
@@ -30,7 +30,7 @@
 			"x": 4.5,
 			"y": 0.5,
 			"shootSound": "shootSnap",
-			"ejectEffect": "shellEjectMedium",
+			"ejectEffect": "casing2",
 			"bullet": {
 				"type": "MissileBulletType",
 				"speed": 3,
