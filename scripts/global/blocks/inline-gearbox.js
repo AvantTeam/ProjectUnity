@@ -1,12 +1,10 @@
 const rotL = require("libraries/rotpowerlib");
 
-const inlinegearbox = rotL.powerUser(Block, Building, "inline-gearbox", {
-	//fuck?
+const inlinegearbox = rotL.torqueExtend(Block, Building, "inline-gearbox",rotL.baseTypes.torqueConnector, {
 	
 	load(){
 		this.super$load();
-		this.topsprite = [];
-		this.topsprite = [Core.atlas.find(this.name + "-top1"),Core.atlas.find(this.name + "-top2")];
+		this.topsprite = Core.atlas.find(this.name + "-top");
 		this.overlaysprite = Core.atlas.find(this.name + "-overlay");
 		this.moving = Core.atlas.find(this.name + "-moving");
 		this.base = Core.atlas.find(this.name + "-base");
@@ -20,7 +18,7 @@ const inlinegearbox = rotL.powerUser(Block, Building, "inline-gearbox", {
 	updatePre()
 	{
 		this.setInertia(20);
-		this.setFriction(0.03);
+		this.setFriction(0.02);
 	},
 	
 	draw() {
@@ -31,8 +29,8 @@ const inlinegearbox = rotL.powerUser(Block, Building, "inline-gearbox", {
 		let offset = rotL.dirs[(this.rotation+1)%4];
 		let ox = offset.x*4;
 		let oy = offset.y*4;
-		rotL.drawRotRect(inlinegearbox.moving, this.x+ox, this.y+oy, 16, 14/4, fixedrot, this.getRotation(), this.getRotation()+90);
-		rotL.drawRotRect(inlinegearbox.moving, this.x-ox, this.y-oy, 16, 14/4, fixedrot, this.getRotation()+90, this.getRotation()+180);
+		rotL.drawRotRect(inlinegearbox.moving, this.x+ox, this.y+oy, 16, 14/4, 8, fixedrot, this.getRotation(), this.getRotation()+90);
+		rotL.drawRotRect(inlinegearbox.moving, this.x-ox, this.y-oy, 16, 14/4, 8, fixedrot, this.getRotation()+90, this.getRotation()+180);
 		//gears
 		Draw.rect(inlinegearbox.gear, this.x+2, this.y+2, this.getRotation());
 		Draw.rect(inlinegearbox.gear, this.x-2, this.y+2, -this.getRotation());
@@ -41,7 +39,7 @@ const inlinegearbox = rotL.powerUser(Block, Building, "inline-gearbox", {
 		
 		//
 		Draw.rect(inlinegearbox.overlaysprite, this.x, this.y, fixedrot);
-		Draw.rect(inlinegearbox.topsprite[this.rotation%2], this.x, this.y, 0);
+		Draw.rect(inlinegearbox.topsprite, this.x, this.y, fixedrot);
         this.drawTeamTop();
 
 	}

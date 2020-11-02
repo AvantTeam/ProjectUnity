@@ -1,5 +1,7 @@
 {
+
 	"size": 1,
+	"health": 150,
 	"requirements": [
 		{"item": "copper", "amount": 10},
 		{"item": "lead", "amount": 10},

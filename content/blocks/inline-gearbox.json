@@ -1,5 +1,6 @@
 {
 	"size": 2,
+	"health": 700,
 	"requirements": [
 		{"item": "titanium", "amount": 20},
 		{"item": "lead", "amount": 30},

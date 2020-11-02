@@ -1,0 +1,10 @@
+{
+	"size": 3,
+	"health": 1000,
+	"requirements": [
+		{"item": "lead", "amount": 100},
+		{"item": "copper", "amount": 50},
+	],
+	"category": "production",
+	
+}
