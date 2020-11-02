@@ -38,7 +38,7 @@ const laser = extend(BulletType, {
 
             hit.collision(b, hit.x, hit.y);
             b.collision(hit, hit.x, hit.y);
-            b.owner.incExp(2);
+            b.owner.incExp(1.5);
         }else if(target instanceof Building){
             var tile = target;
 

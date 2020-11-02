@@ -25,11 +25,11 @@ const laserChargeShoot = new Effect(21, e => {
 
 const chargeLaser = extend(BulletType, {
     getDamage(b){
-        return this.damage + (b.owner.totalLevel() * 12);
+        return this.damage + (b.owner.totalLevel() * 7);
     },
 
     getColor(b){
-        return Tmp.c1.set(Pal.lancerLaser).lerp(Pal.sapBullet, b.owner.totalLevel() / 15);
+        return Tmp.c1.set(Pal.lancerLaser).lerp(Pal.sapBullet, b.owner.totalLevel() / 30);
     },
 
     collision(other, x, y){
@@ -135,7 +135,7 @@ const chargeLaser = extend(BulletType, {
 
 const chargeLaserFrag = new JavaAdapter(LaserBoltBulletType, {
     draw(b){
-        if(b.data == null) b.data = (b.owner == null) ? Pal.lancerLaser : chargeLaserFrag.backColor.set(Pal.lancerLaser).lerp(Pal.sapBullet, b.owner.totalLevel() / 15).cpy();
+        if(b.data == null) b.data = (b.owner == null) ? Pal.lancerLaser : chargeLaserFrag.backColor.set(Pal.lancerLaser).lerp(Pal.sapBullet, b.owner.totalLevel() / 30).cpy();
         Draw.color(b.data);
         Lines.stroke(2);
         Lines.lineAngleCenter(b.x, b.y, b.rotation(), 7);
@@ -170,18 +170,18 @@ chargeLaser.shootEffect = Fx.hitLiquid;
 
 
 const chargeLaserTurret = lib.extend(ChargeTurret, ChargeTurret.ChargeTurretBuild, "charge-laser-turret", {
-    maxLevel: 15,
+    maxLevel: 30,
     expFields: [
         {
             type: "linear",
             field: "reloadTime",
             start: 60,
-            intensity: -2
+            intensity: -1
         }
     ]
 }, {
     getShootColor(lvl){
-        return Tmp.c1.set(Pal.lancerLaser).lerp(Pal.sapBullet, lvl / 15);
+        return Tmp.c1.set(Pal.lancerLaser).lerp(Pal.sapBullet, lvl / 30);
     },
     shoot(ammo){
         this.useAmmo();

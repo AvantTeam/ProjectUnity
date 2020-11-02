@@ -3,7 +3,7 @@ const lib = this.global.unity.exp;
 const shootSmallBlaze = new Effect(32, e => {
     Draw.color(Pal.lightFlame, Pal.darkFlame, Color.gray, e.fin());
 
-    Angles.randLenVectors(e.id, 16, e.finpow() * 60, e.rotation, 18, new Floatc2({get: function(x, y){
+    Angles.randLenVectors(e.id, 16, e.finpow() * 60, e.rotation, 8, new Floatc2({get: function(x, y){
         Fill.circle(e.x + x, e.y + y, 0.85 + e.fout() * 3.5);
     }}));
 });
@@ -11,7 +11,7 @@ const shootSmallBlaze = new Effect(32, e => {
 const shootPyraBlaze = new Effect(32, e => {
     Draw.color(Pal.lightPyraFlame, Pal.darkPyraFlame, Color.gray, e.fin());
 
-    Angles.randLenVectors(e.id, 16, e.finpow() * 60, e.rotation, 18, new Floatc2({get: function(x, y){
+    Angles.randLenVectors(e.id, 16, e.finpow() * 60, e.rotation, 8, new Floatc2({get: function(x, y){
         Fill.circle(e.x + x, e.y + y, 0.85 + e.fout() * 3.5);
     }}));
 });
@@ -19,7 +19,7 @@ const shootPyraBlaze = new Effect(32, e => {
 const coalBlaze = extend(BulletType, {
     hit(b, x, y){
         this.super$hit(b, b.x, b.y);
-        b.owner.incExp(0.5);
+        b.owner.incExp(1.1);
     }
 });
 coalBlaze.ammoMultiplier = 3;
@@ -39,7 +39,7 @@ coalBlaze.hittable = false;
 const pyraBlaze = extend(BulletType, {
     hit(b, x, y){
         this.super$hit(b, b.x, b.y);
-        b.owner.incExp(0.5);
+        b.owner.incExp(1.75);
     }
 });
 pyraBlaze.ammoMultiplier = 3;
@@ -58,12 +58,18 @@ pyraBlaze.hittable = false;
 
 const inferno = lib.extend(ItemTurret, ItemTurret.ItemTurretBuild, "inferno", {
     maxLevel: 10,
-    expFields: [{
-        type: "exp",
-        field: "useless",
-        start: 0,
-        intensity: 2
-    }]
+    expFields: [
+      {
+        type: "list",
+        field: "shots",
+        intensity: [1, 1, 2, 2, 2, 3, 3, 4, 4, 5, 5]
+      },
+      {
+        type: "list",
+        field: "spread",
+        intensity: [0, 0, 5, 10, 15, 7, 14, 8, 10, 6, 9]
+      },
+    ]
 }, {});
 
-inferno.ammo(Items.coal, coalBlaze, Items.pyratite, pyraBlaze);
+inferno.ammo(Items.scrap, Bullets.slagShot, Items.coal, coalBlaze, Items.pyratite, pyraBlaze);

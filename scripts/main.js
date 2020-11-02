@@ -52,6 +52,7 @@ const script = [
 			},
 
 			"effects",
+			"wavefront",
             "wormlib",
 			"unitlib",
             "copterbase",
@@ -61,6 +62,7 @@ const script = [
             "multi-lib",
 			"status",
 			"funclib",
+			"arena",
 			"rotpowerlib",
 			"unitloader"/*,
             "shieldbulletlib"*/
@@ -263,7 +265,8 @@ const script = [
             {
                 name: "factories",
                 childs: [
-                    "terminalcrucible"
+                    "terminalcrucible",
+					"endforge"
                 ]
             },
 

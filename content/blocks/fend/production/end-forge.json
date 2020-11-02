@@ -1,0 +1,32 @@
+{
+	"outputItem": {"item": "termina-alloy", "amount": 2},
+	"size": 8,
+	"hasLiquids": false,
+	"hasPower": true,
+	"hasItems": true,
+	"craftTime": 410,
+	"consumes": {
+		"power": 86.7,
+		"items": {
+			"items": [
+				{"item": "terminum", "amount": 3},
+				{"item": "dark-alloy", "amount": 5},
+				{"item": "light-alloy", "amount": 5},
+			]
+		}
+	},
+	"requirements": [
+		{"item": "silicon", "amount": 2300},
+		{"item": "phase-fabric", "amount": 650},
+		{"item": "surge-alloy", "amount": 1350},
+		{"item": "plague-alloy", "amount": 510},
+		{"item": "dark-alloy", "amount": 510},
+		{"item": "light-alloy", "amount": 510},
+		{"item": "advance-alloy", "amount": 510},
+		{"item": "monolith-alloy", "amount": 510},
+		{"item": "spark-alloy", "amount": 510},
+		{"item": "termination-fragment", "amount": 230}
+	],
+	"category": "crafting",
+	"idleSoundVolume": 0.6
+}
