@@ -316,5 +316,4 @@ Awaiting custom music player
 
 Events.on(ClientLoadEvent, e => {
 	Vars.control.music.darkMusic.add(music);
-})*
-/
+})*/
