@@ -2,7 +2,7 @@
 	"size": 2,
 	"health": 800,
 	"range": 160,
-	"reloadTime": 40,
+	"reloadTime": 80,
   "consumes":{
     "power": 1
   },
@@ -18,5 +18,6 @@
   "hasLiquids": true,
   "liquidCapacity": 15,
   "consumesLiquid": true,
-  "hasPower": true
+  "hasPower": true,
+  "extinguish": false
 }

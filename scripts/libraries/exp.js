@@ -261,6 +261,7 @@ module.exports = {
             expblock.upgrades[i].id = i;
             if((expblock.upgrades[i].iconContent === undefined) && (typeof(expblock.upgrades[i].block)) != "string") expblock.upgrades[i].iconContent = expblock.upgrades[i].block;
         }
+
         Events.on(EventType.ClientLoadEvent, () => {
             for(var i=0; i<expblock.upgrades.length; i++){
                 if((typeof(expblock.upgrades[i].block)) == "string"){
@@ -270,9 +271,17 @@ module.exports = {
                 if((typeof(expblock.upgrades[i].iconContent)) == "string") expblock.upgrades[i].iconContent = Vars.content.getByName((expblock.upgrades[i].iconContentType == undefined)? ContentType.item : expblock.upgrades[i].iconContentType, expblock.upgrades[i].iconContent);
             }
         });
+        Events.on(EventType.ServerLoadEvent, () => {
+            for(var i=0; i<expblock.upgrades.length; i++){
+                if((typeof(expblock.upgrades[i].block)) == "string"){
+                    expblock.upgrades[i].block = Vars.content.getByName(ContentType.block, expblock.upgrades[i].block);
+                    if(expblock.upgrades[i].iconContent === undefined) expblock.upgrades[i].iconContent = expblock.upgrades[i].block;
+                }
+                if((typeof(expblock.upgrades[i].iconContent)) == "string") expblock.upgrades[i].iconContent = Vars.content.getByName((expblock.upgrades[i].iconContentType == undefined)? ContentType.item : expblock.upgrades[i].iconContentType, expblock.upgrades[i].iconContent);
+            }
+        });
 
-
-        //pack upgrades into 2D array - trades time complexity for space complexity. Not necessary in the java port.
+        //pack upgrades into 2D array - trades time complexity for space complexity. Not necessary in the java port. *But you have to revamp the entire code anyways*
         expblock.upPerLevel = [];
         for(var i=0; i<=expblock.maxLevel; i++){
             expblock.upPerLevel.push([]);
@@ -374,10 +383,11 @@ module.exports = {
             upgradeID(id){
                 var lvl = this.totalLevel();
                 //print("UpgradeID: "+id);
+                print("ID: "+id);
                 if((lvl >= expblock.upgrades[id].min) && (expblock.upgrades[id].max === undefined || lvl <= expblock.upgrades[id].max)) this.upgradeBlock(expblock.upgrades[id].block);
             },
             upgradeBlock(block){
-                //print("UpgradeBlock: "+block);
+                print("UpgradeBlock: "+block);
                 /*if(expected != this.totalLevel()){
                     //invalid
                     Vars.control.input.frag.config.hideConfig();

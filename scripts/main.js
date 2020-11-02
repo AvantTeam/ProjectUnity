@@ -52,6 +52,7 @@ const script = [
 			},
 
 			"effects",
+			"wavefront",
             "wormlib",
 			"unitlib",
             "copterbase",
@@ -61,6 +62,8 @@ const script = [
             "multi-lib",
 			"status",
 			"funclib",
+			"arena",
+			"rotpowerlib",
 			"unitloader"/*,
             "shieldbulletlib"*/
         ]
@@ -75,7 +78,11 @@ const script = [
                     "recursivereconstructor",
 
                     "light-lamp", "light-reflector", "light-extra",
-
+					"drive-shaft",
+					"inline-gearbox",
+					"wind-turbine",
+					"auger-drill",
+					"simple-transmission",
                     "walls",
                     "ores",
                     "multi-test-younggam",
@@ -258,7 +265,8 @@ const script = [
             {
                 name: "factories",
                 childs: [
-                    "terminalcrucible"
+                    "terminalcrucible",
+					"endforge"
                 ]
             },
 
@@ -299,4 +307,14 @@ if(!Vars.headless){
         mod.meta.displayName = Core.bundle.get(change + "name");
         mod.meta.description = Core.bundle.get(change + "description");
     });
+	
+	
 };
+const music = loadMusic("youngcha");
+/*
+Awaiting custom music player
+
+Events.on(ClientLoadEvent, e => {
+	Vars.control.music.darkMusic.add(music);
+})*
+/
