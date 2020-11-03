@@ -208,16 +208,20 @@ const _RotPowerPropsCommon = {
 	},
 	onRemoved() {
 		this.deleteSelfFromNetwork();
-		this.getNeighbourset().each(cons(neighbourindex=>{
-			neighbourindex.build.removeNeighbour(this);
-		}));
+		if(this.getNeighbourArray()){
+			this.eachNeighbour(neighbourindex=>{
+				neighbourindex.build.removeNeighbour(this);
+			});
+		}
 		this.super$onRemoved();
 	},
 	onDestroyed(){
 		this.deleteSelfFromNetwork();
-		this.getNeighbourset().each(cons(neighbourindex=>{
-			neighbourindex.build.removeNeighbour(this);
-		}));
+		if(this.getNeighbourArray()){
+			this.eachNeighbour(neighbourindex=>{
+				neighbourindex.build.removeNeighbour(this);
+			});
+		}
 		this.super$onDestroyed();
 	},
 	deleteSelfFromNetwork(){
@@ -272,6 +276,7 @@ const _RotPowerPropsCommon = {
 	_graphset:null,
 	_dead:false,
 	_acceptPorts:[],
+	_neighbourArray:null,
 	_network:null,
 	_rotation:0,
 	_force:0,
@@ -287,37 +292,56 @@ const _RotPowerPropsCommon = {
 	getDead(){
 		return this._dead;
 	},
-	getNeighbourset(){
-		return this._neighbourset;
+	getNeighbourArray(){
+		return this._neighbourArray;
 	},
 	samepos(b){
 		return b.tileX()==this.tileX() && b.tileY()==this.tileY();
 	},
 	getNeighbour(building){
-		if(!this._neighbourset){return;}
+		if(!this._neighbourArray){return;}
 		let found = null;
-		this.getNeighbourset().each(cons(neigh=>{
+		this.eachNeighbour(neigh=>{
 			if(neigh.build.samepos(building)){
 				found = neigh;
 			}
-		}));
+		});
+		return found;	
+	},
+	eachNeighbour(func){
+		let prev=null;
+		for(let i =0;i<this._neighbourArray.length;i++){
+			if(prev==this._neighbourArray[i] || !this._neighbourArray[i]){continue;}
+			func(this._neighbourArray[i]);
+			prev=this._neighbourArray[i];
+		}
+	},
+	countNeighbours(){
+		if(!this._neighbourArray){return 0;}
+		let found = 0;
+		this.eachNeighbour(neigh=>{
+			found++;
+		});
 		return found;	
 	},
 	removeNeighbour(building){
-		let f = this.getNeighbour(building);
-		if(f){
-			this.getNeighbourset().remove(f);
+		for(let i =0;i<this._neighbourArray.length;i++){
+			if(this._neighbourArray[i]&&this._neighbourArray[i].build.samepos(building)){
+				this._neighbourArray[i]=null;
+			}
 		}
 	},
 	addNeighbour(n){
-		if(!this._neighbourset){
-			this._neighbourset= ObjectSet.with(n);
-		}else{
-			this._neighbourset.add(n);
+		if(!this._neighbourArray){
+			let temp = [];
+			temp[n.portindex] = n;
+			this.setNeighbourArray(temp);
+			return;
 		}
+		this._neighbourArray[n.portindex] = n;
 	},
-	setNeighbourset(nset){
-		this._neighbourset=nset;
+	setNeighbourArray(nset){
+		this._neighbourArray=nset;
 	},
 	getAcceptPorts(){
 		return this._acceptPorts;
@@ -534,7 +558,9 @@ const _TorqueTransmissionProps = Object.assign(Object.create(_RotPowerPropsCommo
 			}
 			if(this.networkSaveState){
 				for(let i = 0;i<this._networkList.length;i++){
-					this._networkList[i].lastVelocity=this._networkSpeeds[i];
+					if(this._networkSpeeds[i]){
+						this._networkList[i].lastVelocity=Math.max(this._networkList[i].lastVelocity,this._networkSpeeds[i]);
+					}
 				}
 			}
 			this.networkSaveState=0;
@@ -590,14 +616,23 @@ const _TorqueTransmissionProps = Object.assign(Object.create(_RotPowerPropsCommo
 		
 	},
 	readSpeedCache(stream,revision){
+		
 		let netam =  stream.i();
+		print("loading multiconnector with "+netam+" connections");
 		for(let i = 0;i<netam;i++){
 			this._networkSpeeds[i]=stream.f();
+			print("net "+i+"'s speeds");
+			if(this._networkSpeeds[i]===undefined){
+				this._networkSpeeds[i]=0;
+			}
 		}
 	},
 	writeSpeedCache(stream){
 		stream.i(this._networkList.length);
 		for(let i = 0;i<this._networkList.length;i++){
+			if(this._networkSpeeds[i]===undefined){
+				this._networkSpeeds[i]=0;
+			}
 			stream.f(this._networkSpeeds[i]);
 		}
 	},
@@ -806,32 +841,33 @@ const _EnergyGraph = {
 	},
 	remove(building){
 		if(!this.connected.contains(building)){return;}
-		if(!building.getNeighbourset()){return;}
-		//print("-------------begining remove");
-		if(building.getNeighbourset().size==1){
+		let c = building.countNeighbours();
+		if(c===0){print("removed, no neighbours lol");return;}
+		print("-------------begining remove");
+		if(c===1){
 			//todo: find out why this isnt triggering.
 			print("only one neighbour, removing without rebuilding network.");
 			this.connected.remove(building);
-			building.getNeighbourset().each(cons(neighbourindex=>{
+			building.eachNeighbour(neighbourindex=>{
 				neighbourindex.build.removeNeighbour(building);
-			}));
+			});
 			return;
 		}
 		this.connected.clear();
 		let networksadded = null;
 		let newnets=0;
-		
+		print(building.getNeighbourArray());
 		//need to erase all the graph references of the adjacent blocks first, but not with null since each tile is garanteed* to have a graph
 		//having multi-connector blocks makes this hard to brain
-		building.getNeighbourset().each(cons(neighbour=>{
+		building.eachNeighbour(neighbour=>{
 			let copynet = building.getNetworkOfPort(neighbour.portindex);
 			if(copynet==this){
 				let selfref = neighbour.build.getNeighbour(building);
 				neighbour.build.setNetworkOfPort(selfref.portindex,copynet.copyGraph(neighbour.build) );
 			}
-		}));
+		});
 		
-		building.getNeighbourset().each(cons(neighbourindex=>{
+		building.eachNeighbour(neighbourindex=>{
 			let neighbour = neighbourindex.build;
 			if(building.getNetworkOfPort(neighbourindex.portindex)==this){
 				let selfref = neighbour.getNeighbour(building);
@@ -845,7 +881,7 @@ const _EnergyGraph = {
 					neinet.rebuildGraphIndex(neighbour,selfref.portindex);
 				}
 			}
-		}));
+		});
 		building.replaceNetwork(this,null);
 	},
 	

@@ -82,6 +82,7 @@ const script = [
 					"inline-gearbox",
 					"wind-turbine",
 					"auger-drill",
+					"hand-crank",
 					"simple-transmission",
                     "walls",
                     "ores",
