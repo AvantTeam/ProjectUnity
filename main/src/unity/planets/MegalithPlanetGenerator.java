@@ -332,7 +332,7 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
 
         state.rules.waves = true;
 
-        state.rules.spawns = DefaultWaves.generate(difficulty);
+        state.rules.spawns = Waves.generate(difficulty);
     }
 
     @Override

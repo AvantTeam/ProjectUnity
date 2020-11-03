@@ -82,7 +82,7 @@ public class UnityUnitTypes implements ContentList{
                 x = 5.25f;
                 y = 6.5f;
                 shootSound = Sounds.pew;
-                ejectEffect = Fx.shellEjectSmall;
+                ejectEffect = Fx.casing1;
                 bullet = new BasicBulletType(5f, 7f){{
                     lifetime = 30f;
                     shrinkY = 0.2f;
@@ -92,7 +92,7 @@ public class UnityUnitTypes implements ContentList{
                 x = 4.5f;
                 y = 0.5f;
                 shootSound = Sounds.shootSnap;
-                ejectEffect = Fx.shellEjectMedium;
+                ejectEffect = Fx.casing2;
                 bullet = new MissileBulletType(3f, 1f){{
                     speed = 3f;
                     lifetime = 50f;
@@ -124,7 +124,7 @@ public class UnityUnitTypes implements ContentList{
                 x = 1.5f;
                 y = 11f;
                 shootSound = Sounds.pew;
-                ejectEffect = Fx.shellEjectSmall;
+                ejectEffect = Fx.casing1;
                 reload = 8f;
                 bullet = new BasicBulletType(4f, 5f){{
                     lifetime = 36;
@@ -134,7 +134,7 @@ public class UnityUnitTypes implements ContentList{
                 x = 4f;
                 y = 8.75f;
                 shootSound = Sounds.shootSnap;
-                ejectEffect = Fx.shellEjectSmall;
+                ejectEffect = Fx.casing1;
                 reload = 12f;
                 bullet = new BasicBulletType(4f, 8f){{
                     width = 7f;
@@ -146,7 +146,7 @@ public class UnityUnitTypes implements ContentList{
                 x = 6.75f;
                 y = 5.75f;
                 shootSound = Sounds.shootBig;
-                ejectEffect = Fx.shellEjectMedium;
+                ejectEffect = Fx.casing2;
                 reload = 30f;
                 bullet = Bullets.standardIncendiaryBig;
             }});
@@ -272,14 +272,14 @@ public class UnityUnitTypes implements ContentList{
                 x = 14f;
                 y = 27f;
                 shootSound = Sounds.shootBig;
-                ejectEffect = Fx.shellEjectBig;
+                ejectEffect = Fx.casing3Double;
                 reload = 10f;
                 bullet = Bullets.standardThoriumBig;
             }}, new Weapon(name + "-launcher"){{
                 x = 17f;
                 y = 14f;
                 shootSound = Sounds.shootSnap;
-                ejectEffect = Fx.shellEjectMedium;
+                ejectEffect = Fx.casing2;
                 shots = 2;
                 spacing = 2f;
                 reload = 20f;
@@ -475,6 +475,33 @@ public class UnityUnitTypes implements ContentList{
             temp.x = -17f;
             temp.y = -18.5f;
             temp.flipSprite = true;
+        }};
+
+        setEntity("project-spiboss ", BuilderLegsUnit::create);
+        projectSpiboss = new UnitType("project-spiboss"){{
+            groundLayer=Layer.legUnit+3f;
+            drag=0.1f;
+            speed=0.4f;
+            hitSize=34f;
+            health=20000;
+            legCount=10;
+            legMoveSpace=0.7f;
+            legPairOffset=0.7f;
+            legGroupSize=3;
+            legLength=55f;
+            legExtension=-12f;
+            legBaseOffset=22f;
+            landShake=2.4f;
+            legLengthScl=1f;
+            kinematicScl=0.7f;
+            rippleScale=2f;
+            legSpeed=0.2f;
+            legSplashDamage=80f;
+            legSplashRange=40f;
+            hovering=true;
+            armor=13f;
+            allowLegStep=true;
+            visualElevation=0.7f;
         }};
 
         //endregion
