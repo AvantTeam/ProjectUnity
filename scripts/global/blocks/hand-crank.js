@@ -7,7 +7,7 @@ const handCrank = rotL.torqueExtend(Block, Building, "hand-crank", rotL.baseType
 		this.handle = Core.atlas.find(this.name + "-handle");
 		this.shaft = [Core.atlas.find(this.name + "-base1"),Core.atlas.find(this.name + "-base2")];
 		this.base = Core.atlas.find(this.name + "-bottom");
-		this.setAccept([1,0,1,0]);
+		this.setAccept([1,0,0,0]);
 	},
 },{
 	_cooldown:0,
@@ -25,7 +25,7 @@ const handCrank = rotL.torqueExtend(Block, Building, "hand-crank", rotL.baseType
 		buttoncell.get().getStyle().imageUp = Icon.redo;
 	},
 	configured(player, value) {
-		this._force=20;
+		this._force=40;
 		this._cooldown=0;
 		
 	},
@@ -40,7 +40,7 @@ const handCrank = rotL.torqueExtend(Block, Building, "hand-crank", rotL.baseType
 	},
 
 	draw() {
-		let variant = this.rotation>1?1:0;
+		let variant = this.rotation%2;
 		Draw.rect(handCrank.base, this.x, this.y, 0);
 		Draw.rect(handCrank.shaft[variant], this.x, this.y, this.rotdeg());
 				//speeeeeeen

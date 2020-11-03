@@ -618,10 +618,10 @@ const _TorqueTransmissionProps = Object.assign(Object.create(_RotPowerPropsCommo
 	readSpeedCache(stream,revision){
 		
 		let netam =  stream.i();
-		print("loading multiconnector with "+netam+" connections");
+		//print("loading multiconnector with "+netam+" connections");
 		for(let i = 0;i<netam;i++){
 			this._networkSpeeds[i]=stream.f();
-			print("net "+i+"'s speeds");
+			//print("net "+i+"'s speeds");
 			if(this._networkSpeeds[i]===undefined){
 				this._networkSpeeds[i]=0;
 			}
@@ -843,10 +843,10 @@ const _EnergyGraph = {
 		if(!this.connected.contains(building)){return;}
 		let c = building.countNeighbours();
 		if(c===0){print("removed, no neighbours lol");return;}
-		print("-------------begining remove");
+		//print("-------------begining remove");
 		if(c===1){
 			//todo: find out why this isnt triggering.
-			print("only one neighbour, removing without rebuilding network.");
+			//print("only one neighbour, removing without rebuilding network.");
 			this.connected.remove(building);
 			building.eachNeighbour(neighbourindex=>{
 				neighbourindex.build.removeNeighbour(building);
@@ -893,83 +893,126 @@ const _EnergyGraph = {
 		//print("----Starting new rebuild");
 		this.rebuildGraphWithSet(building,ObjectSet.with(building),index);
 	},
-	rebuildGraphWithSet(building,searched,index){
-		if(!building.block.getAccept()){
-			print("oh no, accept ports not found");
-			return;
+	rebuildGraphWithSet(root,searched,rootindex){
+		
+		//guess ill die
+		//thank god this was already tail recursed.
+		let tree ={
+			complete:false,
+			parent: null,
+			children:[],
+			build:root,
+			parentConnectPort:rootindex,
 		}
-		let acceptports = building.getAcceptPorts();
-		if(index!=-1){
-			acceptports = building.getConnectedNeighours(index);
-		}
-		let prevbuilding = null;
-		searched.add(building);
-		//print("rebuilding from:"+building.block.localizedName+" at port"+ index);
-		//print("ports to scan:"+acceptports);
-		for(let port =0;port<acceptports.length;port++){
-			let portindex = acceptports[port].index;
-			if(!building.getNetworkOfPort(portindex)){
-				continue;
-			}
-			let portinfo = building.getConnectSidePos(acceptports[port].index);
-			let portpos = portinfo.toPos;
+		let current = tree;
+		
+		//debug
+		let total = 0;
+		//
+		
+		mainloop:
+		while(current!=null){
 			
-			if(!building.tile){return;}
-			let tile = building.tile.nearby(portpos.x,portpos.y);
-			// guess the world doesnt exist or something
-			if(!tile){return;}
-			if(tile.block().getIsNetworkConnector!=undefined ){
-				//conbuild -> connected building
-				let conbuild = tile.bc();
-				if(conbuild==prevbuilding||conbuild.getDead()){
+			total++;
+			
+			let building = current.build;
+			let index = current.parentConnectPort;
+			
+			if(!building.block.getAccept()){
+				print("oh no, accept ports not found");
+				return;
+			}
+			let acceptports = building.getAcceptPorts();
+			if(index!=-1){
+				acceptports = building.getConnectedNeighours(index);
+			}
+			let prevbuilding = null;
+			searched.add(building);
+			//print("rebuilding from:"+building.block.localizedName+" at port"+ index);
+			//print("ports to scan:"+acceptports);
+			
+			for(let port =0;port<acceptports.length;port++){
+				let portindex = acceptports[port].index;
+				if(!building.getNetworkOfPort(portindex)){
 					continue;
-				}	
-				let thisgraph = building.getNetworkOfPort(portindex);
+				}
+				let portinfo = building.getConnectSidePos(acceptports[port].index);
+				let portpos = portinfo.toPos;
 				
-				let fpos = portinfo.fromPos;
-				fpos.x+=building.tile.x;
-				fpos.y+=building.tile.y;
-				let connectIndex = conbuild.canConnect(fpos);
-				if(connectIndex==-1){
-					continue;
-				}
-				//print("found suitable connecting building: current block is connected at port "+connectIndex+" of other building");
-				building.addNeighbour({build:conbuild, portindex:portindex});
-				conbuild.addNeighbour({build:building, portindex:connectIndex});
-				//buildings without a network instance are assumed to be dead
-				let connet = conbuild.getNetworkOfPort(connectIndex);
-				if(!thisgraph.connected.contains(conbuild) && connet){
-					if(!building.hasNetwork(connet)){
-						if(connet.connected.contains(conbuild)){
-							
-							thisgraph.mergeGraph(connet);
-							thisgraph = building.getNetworkOfPort(portindex);
-							//print("external net:"+connet.connectedToString());
-							//print("network merged:"+thisgraph.connectedToString());
-							
-						}else{
-							//print("network doesnt not contain target building, assuming hollowed network, directly adding...");
-							//print("network polled:"+connet.connectedToString());
-							thisgraph.addBuilding(conbuild,connectIndex);
-						}
-						//placing it outside will result in the entire graph be re-searched for any nodes that havent beeen assimilated into the graph yet.
-						//may be problematic and cause lag^ but is a good way to rebuild the <entire> graph from any one point.
-						//placing it inside will only search available nodes that are not blocked by already assimilated nodes.
-						if(tile.block().getIsNetworkConnector()&&!searched.contains(conbuild)){
-							thisgraph.rebuildGraphWithSet(conbuild,searched,connectIndex);
-						}
-					}else{
-						//print("Graphs are the same(id:"+connet.id+"), skipping..");
+				if(!building.tile){return;}
+				let tile = building.tile.nearby(portpos.x,portpos.y);
+				// guess the world doesnt exist or something
+				if(!tile){return;}
+				if(tile.block().getIsNetworkConnector!=undefined ){
+					//conbuild -> connected building
+					let conbuild = tile.bc();
+					if(conbuild==prevbuilding||conbuild.getDead()){
+						continue;
 					}	
-				}else{
-					//print("Graph already contains building, skipping..");
+					let thisgraph = building.getNetworkOfPort(portindex);
+					
+					let fpos = portinfo.fromPos;
+					fpos.x+=building.tile.x;
+					fpos.y+=building.tile.y;
+					let connectIndex = conbuild.canConnect(fpos);
+					if(connectIndex==-1){
+						continue;
+					}
+					//print("found suitable connecting building: current block is connected at port "+connectIndex+" of other building");
+					building.addNeighbour({build:conbuild, portindex:portindex});
+					conbuild.addNeighbour({build:building, portindex:connectIndex});
+					//buildings without a network instance are assumed to be dead
+					let connet = conbuild.getNetworkOfPort(connectIndex);
+					if(!thisgraph.connected.contains(conbuild) && connet){
+						if(!building.hasNetwork(connet)){
+							if(connet.connected.contains(conbuild)){
+								
+								thisgraph.mergeGraph(connet);
+								thisgraph = building.getNetworkOfPort(portindex);
+								//print("external net:"+connet.connectedToString());
+								//print("network merged:"+thisgraph.connectedToString());
+								
+							}else{
+								//print("network doesnt not contain target building, assuming hollowed network, directly adding...");
+								//print("network polled:"+connet.connectedToString());
+								thisgraph.addBuilding(conbuild,connectIndex);
+							}
+							//placing it outside will result in the entire graph be re-searched for any nodes that havent beeen assimilated into the graph yet.
+							//may be problematic and cause lag^ but is a good way to rebuild the <entire> graph from any one point.
+							//placing it inside will only search available nodes that are not blocked by already assimilated nodes.
+							if(tile.block().getIsNetworkConnector()&&!searched.contains(conbuild)){
+								current.children.push({
+									complete:false,
+									parent: current,
+									children:[],
+									build:conbuild,
+									parentConnectPort:connectIndex,
+								});
+								//thisgraph.rebuildGraphWithSet(conbuild,searched,connectIndex);
+							}
+						}else{
+							//print("Graphs are the same(id:"+connet.id+"), skipping..");
+						}	
+					}else{
+						//print("Graph already contains building, skipping..");
+					}
+					prevbuilding =conbuild;
 				}
-				prevbuilding =conbuild;
 			}
-			
+			if(current.children.length>0){
+				for(let i =0;i<current.children.length;i++){
+					if(!current.children[i].complete){
+						current = current.children[i];
+						continue mainloop;
+					}
+				}
+			}
+			current.complete=true;
+			current = current.parent;
 			
 		}
 		
+		//print("total traversals:"+total);
 	},
 	//debug
 	connectedToString(){
