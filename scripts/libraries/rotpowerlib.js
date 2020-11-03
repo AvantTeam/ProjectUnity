@@ -208,16 +208,20 @@ const _RotPowerPropsCommon = {
 	},
 	onRemoved() {
 		this.deleteSelfFromNetwork();
-		this.getNeighbourset().each(cons(neighbourindex=>{
-			neighbourindex.build.removeNeighbour(this);
-		}));
+		if(this.getNeighbourset()){
+			this.getNeighbourset().each(cons(neighbourindex=>{
+				neighbourindex.build.removeNeighbour(this);
+			}));
+		}
 		this.super$onRemoved();
 	},
 	onDestroyed(){
 		this.deleteSelfFromNetwork();
-		this.getNeighbourset().each(cons(neighbourindex=>{
-			neighbourindex.build.removeNeighbour(this);
-		}));
+		if(this.getNeighbourset()){
+			this.getNeighbourset().each(cons(neighbourindex=>{
+				neighbourindex.build.removeNeighbour(this);
+			}));
+		}
 		this.super$onDestroyed();
 	},
 	deleteSelfFromNetwork(){
