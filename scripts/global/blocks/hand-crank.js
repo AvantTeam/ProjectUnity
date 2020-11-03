@@ -20,7 +20,6 @@ const handCrank = rotL.torqueExtend(Block, Building, "hand-crank", rotL.baseType
 		let buttoncell = table.button(Tex.whiteui, Styles.clearTransi, 50, run(() => {this.configure(0);}));
 		buttoncell.size(50).disabled(boolf(b =>
 		{ 
-			print(this.getCooldown());
 			return this.getCooldown()<20 ;
 			}  ));
 		buttoncell.get().getStyle().imageUp = Icon.redo;
