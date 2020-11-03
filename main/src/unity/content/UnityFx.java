@@ -219,5 +219,14 @@ public class UnityFx{
 
     falseLightning = new Effect(10f, 500f, e -> {
 
+    }),
+
+    forgeAbsorbEffect = new Effect(124f, e -> {
+        float angle = e.rotation;
+        float slope = (0.5f - Math.abs(e.finpow() - 0.5f)) * 2f;
+        Tmp.v1.trns(angle, (1 - e.finpow()) * 110f);
+        color(UnityPal.endColor);
+        stroke(1.5f);
+        lineAngleCenter(e.x + Tmp.v1.x, e.y + Tmp.v1.y, angle, slope * 8f);
     });
 }

@@ -382,7 +382,7 @@ public class UnityUnitTypes implements ContentList{
                     @Override
                     public void update(Bullet b){
                         super.update(b);
-                        if(Mathf.chanceDelta(0.3f)) Lightning.create(b, UnityPal.arcaetanaLightning, 43f, b.x, b.y, Mathf.range(56f) + b.rotation(), 8);
+                        if(Mathf.chanceDelta(0.3f)) Lightning.create(b, UnityPal.purpleLightning, 43f, b.x, b.y, Mathf.range(56f) + b.rotation(), 8);
                     }
 
                     {
@@ -431,11 +431,11 @@ public class UnityUnitTypes implements ContentList{
                     @Override
                     public void hit(Bullet b, float x, float y){
                         super.hit(b, x, y);
-                        if(Mathf.chance(0.3f)) Lightning.create(b, UnityPal.arcaetanaLightning, 12f, x, y, Mathf.range(30f) + b.rotation(), 7);
+                        if(Mathf.chance(0.3f)) Lightning.create(b, UnityPal.purpleLightning, 12f, x, y, Mathf.range(30f) + b.rotation(), 7);
                     }
 
                     {
-                        colors = new Color[]{Color.valueOf("a96bfa80"), UnityPal.arcaetanaLightning, Color.white};
+                        colors = new Color[]{Color.valueOf("a96bfa80"), UnityPal.purpleLightning, Color.white};
                         length = 195f;
                         ammoMultiplier = 6f;
                         width = 19f;
@@ -458,11 +458,11 @@ public class UnityUnitTypes implements ContentList{
                     @Override
                     public void hit(Bullet b, float x, float y){
                         super.hit(b, x, y);
-                        if(Mathf.chance(0.4f)) Lightning.create(b, UnityPal.arcaetanaLightning, 34f, x, y, Mathf.range(30f) + b.rotation(), 12);
+                        if(Mathf.chance(0.4f)) Lightning.create(b, UnityPal.purpleLightning, 34f, x, y, Mathf.range(30f) + b.rotation(), 12);
                     }
 
                     {
-                        colors = new Color[]{Color.valueOf("a96bfa80"), UnityPal.arcaetanaLightning, Color.white};
+                        colors = new Color[]{Color.valueOf("a96bfa80"), UnityPal.purpleLightning, Color.white};
                         length = 290f;
                         ammoMultiplier = 4f;
                         width = 43f;
@@ -477,31 +477,103 @@ public class UnityUnitTypes implements ContentList{
             temp.flipSprite = true;
         }};
 
-        setEntity("project-spiboss ", BuilderLegsUnit::create);
+        setEntity("project-spiboss", BuilderLegsUnit::create);
         projectSpiboss = new UnitType("project-spiboss"){{
-            groundLayer=Layer.legUnit+3f;
-            drag=0.1f;
-            speed=0.4f;
-            hitSize=34f;
-            health=20000;
-            legCount=10;
-            legMoveSpace=0.7f;
-            legPairOffset=0.7f;
-            legGroupSize=3;
-            legLength=55f;
-            legExtension=-12f;
-            legBaseOffset=22f;
-            landShake=2.4f;
-            legLengthScl=1f;
-            kinematicScl=0.7f;
-            rippleScale=2f;
-            legSpeed=0.2f;
-            legSplashDamage=80f;
-            legSplashRange=40f;
-            hovering=true;
-            armor=13f;
-            allowLegStep=true;
-            visualElevation=0.7f;
+            groundLayer = Layer.legUnit + 3f;
+            drag = 0.1f;
+            speed = 0.4f;
+            hitSize = 34f;
+            health = 20000;
+            legCount = 10;
+            legMoveSpace = 0.7f;
+            legPairOffset = 0.7f;
+            legGroupSize = 3;
+            legLength = 55f;
+            legExtension = -12f;
+            legBaseOffset = 22f;
+            landShake = 2.4f;
+            legLengthScl = 1f;
+            kinematicScl = 0.7f;
+            rippleScale = 2f;
+            legSpeed = 0.2f;
+            legSplashDamage = 80f;
+            legSplashRange = 40f;
+            hovering = true;
+            armor = 13f;
+            allowLegStep = true;
+            visualElevation = 0.7f;
+            weapons.add(new Weapon("large-purple-mount"){{
+                reload = 50f;
+                x = 13f;
+                y = -17f;
+                rotate = true;
+                shake = 1f;
+                rotateSpeed = 1f;
+                shots = 5;
+                shotDelay = 6f;
+                shootSound = Sounds.artillery;
+                bullet = new ArtilleryBulletType(2.5f, 1f){{
+                    hitEffect = Fx.sapExplosion;
+                    knockback = 0.8f;
+                    speed = 2.5f;
+                    lifetime = 70f;
+                    width = height = 19f;
+                    ammoMultiplier = 4f;
+                    splashDamageRadius = 95f;
+                    splashDamage = 55f;
+                    backColor = Pal.sapBulletBack;
+                    frontColor = lightningColor = Pal.sapBullet;
+                    lightning = 3;
+                    lightningLength = 10;
+                    smokeEffect = Fx.shootBigSmoke2;
+                    shake = 5f;
+                    status = StatusEffects.sapped;
+                    statusDuration = 60f * 10f;
+                }};
+            }}, new Weapon("mount-purple-weapon"){{
+                reload = 20f;
+                x = 25f;
+                y = 10f;
+                rotate = true;
+                shake = 1f;
+                rotateSpeed = 5f;
+                shootSound = Sounds.flame;
+                alternate = false;
+                bullet = new SapBulletType(){{
+                    sapStrength = 0.8f;
+                    length = 90f;
+                    damage = 25f;
+                    shootEffect = Fx.shootSmall;
+                    hitColor = color = UnityPal.purpleLightning;
+                    width = 0.7f;
+                    lifetime = 35f;
+                    knockback = -1.5f;
+                }};
+            }});
+            Weapon weap3 = weapons.get(1).copy();
+            weap3.x = 20f;
+            weap3.y = 13f;
+            weapons.insert(2, weap3);
+            Weapon weap4 = weapons.get(2).copy();
+            weap4.name = "spiroct-weapon";
+            weap4.reload = 23f;
+            weap4.x = 15f;
+            weap4.y = 18f;
+            weap4.rotateSpeed = 3f;
+            weap4.bullet = new SapBulletType(){{
+                sapStrength = 0.9f;
+                length = 90f;
+                damage = 30f;
+                shootEffect = Fx.shootSmall;
+                hitColor = color = UnityPal.purpleLightning;
+                width = 0.75f;
+                lifetime = 35f;
+                knockback = -1.5f;
+            }};
+            Weapon weap5 = weap4.copy();
+            weap5.x = 25f;
+            weap5.y = 5f;
+            weapons.add(weap4, weap5);
         }};
 
         //endregion

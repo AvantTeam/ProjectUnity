@@ -76,7 +76,7 @@ public class UnityBullets implements ContentList{
                 lifetime = 24f;
                 pierce = true;
                 statusDuration = 60 * 4f;
-                shootEffect = UnityFx.shootSmallBlaze;
+                shootEffect = shootSmallBlaze;
                 hitEffect = Fx.hitFlameSmall;
                 despawnEffect = Fx.none;
                 status = StatusEffects.burning;
@@ -98,7 +98,7 @@ public class UnityBullets implements ContentList{
                 lifetime = 24f;
                 pierce = true;
                 statusDuration = 60 * 4f;
-                shootEffect = UnityFx.shootPyraBlaze;
+                shootEffect = shootPyraBlaze;
                 hitEffect = Fx.hitFlameSmall;
                 despawnEffect = Fx.none;
                 status = StatusEffects.burning;
@@ -288,8 +288,8 @@ public class UnityBullets implements ContentList{
             drag = 0.05f;
             collides = false;
             summonsLightning = true;
-            shootEffect = UnityFx.plasmaFragAppear;
-            hitEffect = despawnEffect = UnityFx.plasmaFragDisappear;
+            shootEffect = plasmaFragAppear;
+            hitEffect = despawnEffect = plasmaFragDisappear;
         }};
         
         plasmaTriangle = new TriangleBulletType(4f, 380f){{
@@ -298,7 +298,7 @@ public class UnityBullets implements ContentList{
             length = 20f;
             trailWidth = 6.5f;
             trailLength = 10;
-            hitEffect = UnityFx.plasmaTriangleHit;
+            hitEffect = plasmaTriangleHit;
             despawnEffect = Fx.none;
             fragBullet = plasmaFragTriangle;
             fragBullets = 8;
