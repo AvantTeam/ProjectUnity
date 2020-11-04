@@ -79,6 +79,7 @@ const script = [
 
                     "light-lamp", "light-reflector", "light-extra",
 					"drive-shaft",
+					"shaft-router",
 					"inline-gearbox",
 					"wind-turbine",
 					"water-turbine",

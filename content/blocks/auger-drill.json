@@ -3,7 +3,7 @@
 	"health": 1000,
 	"requirements": [
 		{"item": "lead", "amount": 100},
-		{"item": "copper", "amount": 50},
+		{"item": "copper", "amount": 75},
 	],
 	"category": "production",
 	

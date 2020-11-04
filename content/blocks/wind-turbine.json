@@ -2,9 +2,9 @@
 	"size": 3,
 	"health": 1200,
 	"requirements": [
-		{"item": "titanium", "amount": 50},
-		{"item": "lead", "amount": 150},
-		{"item": "copper", "amount": 150},
+		{"item": "titanium", "amount": 20},
+		{"item": "lead", "amount": 80},
+		{"item": "copper", "amount": 70},
 	],
 	"category": "power",
 }
