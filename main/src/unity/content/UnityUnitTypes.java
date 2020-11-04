@@ -23,7 +23,9 @@ public class UnityUnitTypes implements ContentList{
     private static Prov<?>[] constructors = new Prov[]{
         CopterUnit::new,
         WormSegmentUnit::new,
-        WormDefaultUnit::new
+        WormDefaultUnit::new,
+        TransUnitWaterMove::new,
+        TransLegsUnit::new
     };
 
     private static final int[] classIDs = new int[constructors.length];
@@ -34,6 +36,9 @@ public class UnityUnitTypes implements ContentList{
 
     //ground-units
     arcaetana, projectSpiboss,
+
+    //naval-units
+    amphibiNaval, amphibi, craverNaval, craver,
 
     //monolith
     pedestal, pilaster, stele,
@@ -54,8 +59,6 @@ public class UnityUnitTypes implements ContentList{
 
     @Override
     public void load(){
-        //region flying-units
-
         for(int i = 0, j = 0, len = EntityMapping.idMap.length; i < len; i++){
             if(EntityMapping.idMap[i] == null){
                 classIDs[j] = i;
@@ -64,6 +67,7 @@ public class UnityUnitTypes implements ContentList{
                 if(j >= constructors.length) break;
             }
         }
+        //region flying-units
 
         setEntity("caelifera", CopterUnit::new);
         caelifera = new CopterUnitType("caelifera"){{
@@ -577,43 +581,118 @@ public class UnityUnitTypes implements ContentList{
         }};
 
         //endregion
+        //region naval-units
+
+        setEntity("amphibi-naval", TransUnitWaterMove::new);
+        amphibiNaval = new TransUnitType("amphibi-naval"){{
+            toTrans = amphibi;
+            speed = 1.3f;
+            health = 365;
+            engineSize = 5f;
+            engineOffset = 12f;
+            accel = 0.3f;
+            baseRotateSpeed = 0.2f;
+            rotateSpeed = 1.6f;
+            hitSize = 12f;
+            armor = 2f;
+            immunities.add(StatusEffects.wet);
+            trailX = 3f;
+            trailY = -5f;
+            trailLength = 13;
+            trailScl = 1.75f;
+            rotateShooting = true;
+            transformTime = 10f;
+            weapons.add(new Weapon("artillery"){{
+                reload = 35f;
+                x = 5.5f;
+                y = -4f;
+                shots = 2;
+                shotDelay = 2f;
+                inaccuracy = 5f;
+                rotate = true;
+                shake = 3f;
+                rotateSpeed = 4f;
+                bullet = new ArtilleryBulletType(2.1f, 1f){{
+                    hitEffect = Fx.blastExplosion;
+                    knockback = 0.8f;
+                    speed = 2.1f;
+                    lifetime = 80f;
+                    width = height = 11f;
+                    ammoMultiplier = 4f;
+                    splashDamageRadius = 35f;
+                    splashDamage = 25f;
+                    backColor = UnityPal.navalReddish;
+                    frontColor = lightningColor = UnityPal.navalYellowish;
+                    smokeEffect = Fx.shootBigSmoke2;
+                    shake = 4.5f;
+                    statusDuration = 60 * 10f;
+                }};
+            }});
+        }};
+
+        setEntity("amphibi", TransLegsUnit::new);
+        amphibi = new TransUnitType("amphibi"){{
+            toTrans = amphibiNaval;
+            speed = 0.3f;
+            health = 365;
+            armor = 1f;
+            hitSize = 12f;
+            hovering = true;
+            allowLegStep = true;
+            visualElevation = 0.5f;
+            legCount = 6;
+            legLength = 16f;
+            legMoveSpace = 0.7f;
+            legSpeed = 0.06f;
+            legPairOffset = 0.9f;
+            legGroupSize = 4;
+            legBaseOffset = 0f;
+            legExtension = -3f;
+            kinematicScl = 0.6f;
+            groundLayer = 65f;
+            rippleScale = 1f;
+            transformTime = 30f;
+            weapons.add(amphibiNaval.weapons.get(0));
+        }};
+
+        //endregion
         //region monolith
 
         setEntity("pedestal",MechUnit::create);
         pedestal = new UnitType("pedestal"){{
-                speed = 0.42f;
-                hitSize = 11f;
-                health = 600;
-                armor = 3.5f;
-                rotateSpeed = 2.6f;
-                singleTarget = true;
-                weapons.add(new Weapon(name + "-gun"){{
-                    x = 10.75f;
-                    y = 2.25f;
-                    reload = 60f;
-                    recoil = 3.2f;
-                    shootSound = Sounds.shootBig;
-                    BulletType subBullet = new LightningBulletType();
-                    subBullet.damage = 10f;
-                    bullet = new BasicBulletType(3f, 12f, "shell"){
-                        @Override
-                        public void init(Bullet b){
-                            for(int i = 0; i < 3; i++){
-                                subBullet.create(b, b.x, b.y, b.vel.angle());
-                                Sounds.spark.at(b.x, b.y, Mathf.random(0.6f, 0.8f));
-                            }
-                        };
-
-                        {
-                            width = 20f;
-                            height = 20f;
-                            lifetime = 60f;
-                            frontColor = Pal.lancerLaser;
-                            backColor = Pal.lancerLaser.cpy().mul(0.6f);
-                            shootEffect = Fx.lightningShoot;
+            speed = 0.42f;
+            hitSize = 11f;
+            health = 600;
+            armor = 3.5f;
+            rotateSpeed = 2.6f;
+            singleTarget = true;
+            weapons.add(new Weapon(name + "-gun"){{
+                x = 10.75f;
+                y = 2.25f;
+                reload = 60f;
+                recoil = 3.2f;
+                shootSound = Sounds.shootBig;
+                BulletType subBullet = new LightningBulletType();
+                subBullet.damage = 10f;
+                bullet = new BasicBulletType(3f, 12f, "shell"){
+                    @Override
+                    public void init(Bullet b){
+                        for(int i = 0; i < 3; i++){
+                            subBullet.create(b, b.x, b.y, b.vel.angle());
+                            Sounds.spark.at(b.x, b.y, Mathf.random(0.6f, 0.8f));
                         }
                     };
-                }});
+
+                    {
+                        width = 20f;
+                        height = 20f;
+                        lifetime = 60f;
+                        frontColor = Pal.lancerLaser;
+                        backColor = Pal.lancerLaser.cpy().mul(0.6f);
+                        shootEffect = Fx.lightningShoot;
+                    }
+                };
+            }});
         }};
 
         setEntity("pilaster", MechUnit::create);

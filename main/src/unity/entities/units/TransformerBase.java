@@ -1,0 +1,28 @@
+package unity.entities.units;
+
+import arc.util.Time;
+import mindustry.gen.*;
+import mindustry.world.blocks.environment.ShallowLiquid;
+
+public interface TransformerBase extends Unitc{
+    void setTimeTrans(float time);
+
+    float getTimeTrans();
+
+    default void transUpdate(){
+        TransUnitType temp = (TransUnitType) type();
+        float current = getTimeTrans();
+        if((floorOn().isLiquid && !(floorOn() instanceof ShallowLiquid)) ^ (self() instanceof WaterMovec)){
+            if(current < 0f || current > temp.transformTime){
+                Unit groundUnit = temp.toTrans.spawn(team(), x(), y());
+                groundUnit.rotation = rotation();
+                groundUnit.add();
+                groundUnit.vel.set(vel());
+                if(isPlayer()){
+                    groundUnit.controller(controller());
+                }
+                remove();
+            }else setTimeTrans(current - Time.delta);
+        }
+    }
+}
