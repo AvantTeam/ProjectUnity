@@ -78,11 +78,16 @@ const _RotPowerCommon = {
 	_accept:[],
 	_multi_graph_connector:false,
 	_network_connector: true,
+	_use_original_update: true,
 	_torqueFunc:_Torque_Speed_Funcs.linear,
 	//objects that generate torque have a max speed, its torque is dependant on how close the system shaft speed is to it, gear transmission is needed to achieve higher speeds.
 	getForce(current_speed,target_speed,max_torque,init_torque,force_coeff){
 		return this._torqueFunc(current_speed,target_speed,max_torque,init_torque,force_coeff);
 	},
+	// whether it calls the super's updateTile
+	getUseOgUpdate(){return this._use_original_update;},
+	setUseOgUpdate(newaccept){this._use_original_update=newaccept;},
+	
 	// the connection points it permits attachment to
 	getAccept(){return this._accept;},
 	setAccept(newaccept){this._accept=newaccept;},
@@ -233,7 +238,9 @@ const _RotPowerPropsCommon = {
 	},
 	prev_tile_rotation:0,
 	updateTile(){
-		this.super$updateTile();
+		if(this.block.getUseOgUpdate()){
+			this.super$updateTile();
+		}
 		if(this.prev_tile_rotation!=this.rotation){
 			this.recalcPorts();
 		}
@@ -613,7 +620,6 @@ const _TorqueTransmissionProps = Object.assign(Object.create(_RotPowerPropsCommo
 		for(let i = 0;i<this._networkList.length;i++){
 			this._networkList[i].remove(this);
 		}
-		
 	},
 	readSpeedCache(stream,revision){
 		
@@ -683,12 +689,11 @@ const _TorqueGeneratorProps = Object.assign(Object.create(_RotPowerPropsCommon),
 	displayBars(barsTable){
 		this.super$displayBars(barsTable);
 		let block = this.block;
-		barsTable.add(new Bar("stat.unity.torque", Pal.darkishGray, 
-			floatp(() => {
-				return this.getForce()/ block.getMaxTorque();
-			})
 		
-		)).growX();
+		barsTable.add(new Bar(
+			prov(()=>Core.bundle.get("stat.unity.torque")+": "+Strings.fixed(this.getForce(), 1)+"/"+Strings.fixed(block.getMaxTorque(), 1)),
+			prov(()=>Pal.darkishGray), 
+			floatp(() => this.getForce()/ block.getMaxTorque()))).growX();
 		barsTable.row();
 	},
 });
@@ -714,6 +719,8 @@ const _TorqueConsumer = Object.assign(Object.create(_RotPowerCommon),{
 	
 	getWorkingFriction(){return this._working_friction},
 	setWorkingFriction(new_val){this._working_friction=new_val},
+	
+	
 	
 });
 
@@ -1194,6 +1201,7 @@ module.exports={
 	},
 	
 	//_TorqueConsumer
+	getConnectSidePos: getConnectSidePos,
 	drawRotRect: _drawRotRect,
 	drawRotQuad:_drawRotQuad,
 	drawQuad: _drawQuad,

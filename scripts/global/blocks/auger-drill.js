@@ -20,6 +20,11 @@ const augerDrill = rotL.torqueExtendContent(Drill, Drill.DrillBuild, "auger-dril
 			0,0,0]);//bottom
 	},
 	
+	rotatedOutput( x,  y){
+        return false;
+    }
+	
+	
 },{
 	
 	updatePre()
@@ -56,7 +61,8 @@ const augerDrill = rotL.torqueExtendContent(Drill, Drill.DrillBuild, "auger-dril
 augerDrill.rotate = true;
 augerDrill.update = true;
 augerDrill.solid = true;
-
+augerDrill.hasItems = true;
+augerDrill.outputsItem = true;
 augerDrill.tier= 3;
 augerDrill.drawMineItem=true;
 augerDrill.drillTime=500;
