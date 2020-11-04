@@ -78,13 +78,6 @@ const script = [
                     "recursivereconstructor",
 
                     "light-lamp", "light-reflector", "light-extra",
-					"drive-shaft",
-					"inline-gearbox",
-					"wind-turbine",
-					"water-turbine",
-					"auger-drill",
-					"hand-crank",
-					"simple-transmission",
                     "walls",
                     "ores",
                     "multi-test-younggam",
@@ -285,6 +278,36 @@ const script = [
 					"devourer"
 				]
 			}
+        ]
+    },
+    {
+        name: "youngcha",
+        childs: [
+            {
+                name: "distribution",
+                childs: [
+                    "driveshaft",
+                    "inlinegearbox",
+                    "shaftrouter",
+                    "simpletransmission"
+                ]
+            },
+
+            {
+                name: "generation",
+                childs: [
+                    "handcrank",
+                    "windturbine",
+                    "waterturbine"
+                ]
+            },
+
+            {
+                name: "producers",
+                childs: [
+                    "augerdrill"
+                ]
+            }
         ]
     }
 ];

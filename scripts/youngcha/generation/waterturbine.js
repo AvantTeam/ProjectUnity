@@ -35,8 +35,10 @@ const waterTurbine = rotL.torqueExtendContent(ArmoredConduit, ArmoredConduit.Arm
 	},
 	rotatedOutput( x,  y){
         return false;
+    },
+	icons(){
+        return [Core.atlas.find(this.name)];
     }
-	
 	
 },{
 	_flowRate:0,
@@ -92,16 +94,13 @@ const waterTurbine = rotL.torqueExtendContent(ArmoredConduit, ArmoredConduit.Arm
 	
 });
 
-/*driveShaft.buildType= ()=>{
-	
-	
-}*/
+
 waterTurbine.rotate = true;
 waterTurbine.update = true;
 waterTurbine.solid = true;
 waterTurbine.hasLiquids = true;
 waterTurbine.outputsLiquid = true;
-waterTurbine.liquidCapacity = 300;
+waterTurbine.liquidCapacity = 250;
 waterTurbine.noUpdateDisabled = false;
 waterTurbine.setUseOgUpdate(false);
 waterTurbine.liquidPressure = 0.3;

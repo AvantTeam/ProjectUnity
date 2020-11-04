@@ -40,7 +40,7 @@ const handCrank = rotL.torqueExtend(Block, Building, "hand-crank", rotL.baseType
 	},
 
 	draw() {
-		let variant = this.rotation%2;
+		let variant = (this.rotation==2||this.rotation==1) ? 1:0;
 		Draw.rect(handCrank.base, this.x, this.y, 0);
 		Draw.rect(handCrank.shaft[variant], this.x, this.y, this.rotdeg());
 				//speeeeeeen

@@ -390,7 +390,7 @@ const _RotPowerPropsCommon = {
 	},
 	accumRotation(n_rotation){
 		this._rotation+=n_rotation;
-		this._rotation=this._rotation%360;
+		this._rotation=this._rotation%(360*24);
 	},
 	getFriction(){
 		return this._friction;
@@ -672,6 +672,13 @@ const _TorqueGenerator = Object.assign({
 
 const _TorqueGeneratorProps = Object.assign(Object.create(_RotPowerPropsCommon),{
 	_motor_force_mult:1.0,
+	_smoothedForce:null,
+	getSmoothedForce(){
+		if(!this._smoothedForce){
+			return 0;
+		}
+		return this._smoothedForce.mean();
+	},
 	updateExtension(){
 		let block = this.block;
 		this.setForce(_RotPowerCommon.getForce(
@@ -681,6 +688,10 @@ const _TorqueGeneratorProps = Object.assign(Object.create(_RotPowerPropsCommon),
 				block.getStartTorque(),
 				block.getTorqueCoeff()
 			)*this.edelta()*this._motor_force_mult);
+		if(!this._smoothedForce){
+			this._smoothedForce = new WindowedMean(40);
+		}
+		this._smoothedForce.add(this.getForce());
 	},
 	
 	getMotorForceMult(){return this._motor_force_mult},
@@ -691,9 +702,9 @@ const _TorqueGeneratorProps = Object.assign(Object.create(_RotPowerPropsCommon),
 		let block = this.block;
 		
 		barsTable.add(new Bar(
-			prov(()=>Core.bundle.get("stat.unity.torque")+": "+Strings.fixed(this.getForce(), 1)+"/"+Strings.fixed(block.getMaxTorque(), 1)),
+			prov(()=>Core.bundle.get("stat.unity.torque")+": "+Strings.fixed(this.getSmoothedForce(), 1)+"/"+Strings.fixed(block.getMaxTorque(), 1)),
 			prov(()=>Pal.darkishGray), 
-			floatp(() => this.getForce()/ block.getMaxTorque()))).growX();
+			floatp(() => this.getSmoothedForce()/ block.getMaxTorque()))).growX();
 		barsTable.row();
 	},
 });
@@ -863,7 +874,7 @@ const _EnergyGraph = {
 		this.connected.clear();
 		let networksadded = null;
 		let newnets=0;
-		print(building.getNeighbourArray());
+		//print(building.getNeighbourArray());
 		//need to erase all the graph references of the adjacent blocks first, but not with null since each tile is garanteed* to have a graph
 		//having multi-connector blocks makes this hard to brain
 		building.eachNeighbour(neighbour=>{
@@ -1067,6 +1078,7 @@ function _drawQuadA(r, verts){
 
 //same as below, but used for sloped surfaces (e.g. bevel gears)
 function _drawRotQuad(region, x, y, w, h1,h2,  rot, ang1, ang2){
+	if(!Core.settings.getBool("effects")){return;}
 	let amod1 = Mathf.mod(ang1,360);
 	let amod2 = Mathf.mod(ang2,360);
 	if(amod1>=180 && amod2>=180){return;}
@@ -1112,6 +1124,7 @@ function _drawRotQuad(region, x, y, w, h1,h2,  rot, ang1, ang2){
 //rot is used for the rotation of the block itself
 //ang1 ,ang2 is the two angles the sprite is distorted across, only draws if its visible, aka one of the angles is between 0 and 180
 function _drawRotRect(region, x, y, w, h,th,  rot, ang1, ang2){
+	if(!Core.settings.getBool("effects")){return;}
 	if(!region){
 		print("oh no there is no texture");
 		return;
