@@ -267,7 +267,7 @@ endgame.buildType = () => {
 			var rnge = endgame.range;
 			Units.nearbyEnemies(this.team, this.x - rnge, this.y - rnge, rnge * 2, rnge * 2, e => {
 				if(Mathf.within(this.x, this.y, e.x, e.y, rnge) && !e.dead){
-					endgameLaser.at(this.x, this.y, 0, [new Vec2(this.x + (this._eyesOffset.x * 2), this.y + (this._eyesOffset.x * 2)), new Vec2(e.x, e.y), 1]);
+					endgameLaser.at(this.x, this.y, 0, [new Vec2(this.x + (this._eyesOffset.x * 2), this.y + (this._eyesOffset.y * 2)), new Vec2(e.x, e.y), 1]);
 					vaporize.at(e.x, e.y, 0, e);
 					e.kill();
 				};
@@ -278,7 +278,7 @@ endgame.buildType = () => {
 			fLib.trueEachBlock(this.x, this.y, endgame.range, build => {
 				if(build.team != this.team && build != this && !build.dead && build.block != null){
 					if(build.block.size >= 3) vaporizeTile.at(build.x, build.y, build.block.size);
-					if(shouldLaser % 5 == 0 || build.block.size >= 5) endgameLaser.at(this.x, this.y, 0, [new Vec2(this.x + (this._eyesOffset.x * 2), this.y + (this._eyesOffset.x * 2)), new Vec2(build.x, build.y), 1]);
+					if(shouldLaser % 5 == 0 || build.block.size >= 5) endgameLaser.at(this.x, this.y, 0, [new Vec2(this.x + (this._eyesOffset.x * 2), this.y + (this._eyesOffset.y * 2)), new Vec2(build.x, build.y), 1]);
 					build.kill();
 					shouldLaser++;
 				};
