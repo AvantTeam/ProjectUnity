@@ -378,7 +378,7 @@ endgame.buildType = () => {
 						if(damageV + damageB > 1000 || b.type.splashDamageRadius > 120 || damageFull > 12000){
 							//b.remove();
 							bulletSeq.add(b);
-							endgameLaser.at(this.x, this.y, 0, [new Vec2(this.x + (this._eyesOffset.x * 2), this.y + (this._eyesOffset.x * 2)), new Vec2(b.x, b.y), 0.625]);
+							endgameLaser.at(this.x, this.y, 0, [new Vec2(this.x + (this._eyesOffset.x * 2), this.y + (this._eyesOffset.y * 2)), new Vec2(b.x, b.y), 0.625]);
 						}
 					};
 				});
