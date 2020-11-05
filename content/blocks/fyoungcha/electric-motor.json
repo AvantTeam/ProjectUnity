@@ -3,9 +3,10 @@
 	"health": 1300,
 	"hasPower": true,
 	"requirements": [
-		{"item": "silicon", "amount": 120},
+		{"item": "silicon", "amount": 100},
 		{"item": "lead", "amount": 80},
-		{"item": "copper", "amount": 120},
+		{"item": "copper", "amount": 150},
+		{"item": "titanium", "amount": 150},
 	],
 	"category": "power",
 }

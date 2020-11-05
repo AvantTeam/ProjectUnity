@@ -1,5 +1,6 @@
 const rotL = require("libraries/rotpowerlib");
-//thanks to steelblue8 for feedback and adjustments to the base sprite.
+
+
 const electricMotor = rotL.torqueExtend(Block, Building, "electric-motor", rotL.baseTypes.torqueGenerator,{
 	
 	load(){
@@ -23,8 +24,8 @@ const electricMotor = rotL.torqueExtend(Block, Building, "electric-motor", rotL.
 						0,0,0,
 						0,1,0,
 						0,0,0]);
-		this.setMaxSpeed(20);
-		this.setMaxTorque(60);
+		this.setMaxSpeed(10);
+		this.setMaxTorque(20);
 	},
 	
 },{
@@ -33,14 +34,14 @@ const electricMotor = rotL.torqueExtend(Block, Building, "electric-motor", rotL.
 	{
 		this.setInertia(10);
 		this.setFriction(0.3);
-		let mul = ((this.power.graph == null ? 0 : (this.power.graph.powerBalance <= 30) ? this.power.graph.powerBalance : 30));
+		let mul = (this.power.graph == null ? 0 :(this.power.graph.powerBalance/4.5) );
 		if(mul < 0){
 			mul = 0;
 		}
-		if(mul > 30){
-			mul = 30;
+		if(mul > 1){
+			mul = 1;
 		}
-		this.setForce(mul*2);
+		this.setMotorForceMult(mul);
 	},
 	
 	draw() {
@@ -71,6 +72,6 @@ const electricMotor = rotL.torqueExtend(Block, Building, "electric-motor", rotL.
 electricMotor.rotate = true;
 electricMotor.update = true;
 electricMotor.solid = true;
-electricMotor.consumes.power(0.8);
+electricMotor.consumes.power(4.5);
 
 ///Vars.content.getByName(ContentType.block, "unity-drive-shaft").overlaysprite = Core.atlas.find("unity-drive-shaft-overlay");
