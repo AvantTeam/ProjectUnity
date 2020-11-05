@@ -419,7 +419,7 @@ endgame.buildType = () => {
 					//this._eyesOffset.set(tempVec);
 				};
 				this._eyesTargetOffset.limit(2);
-				this._lightsAlpha = Mathf.lerpDelta(this._lightsAlpha, 1, 0.07);
+				this._lightsAlpha = Mathf.lerpDelta(this._lightsAlpha, 1 * this.power.status, 0.07 * this.power.status);
 				//this._eyesAlpha = Mathf.lerpDelta(this._eyesAlpha, 1, 0.06);
 				for(var i = 0; i < 3; i++){
 					this._ringProgress[i] = Mathf.lerpDelta(this._ringProgress[i], 360 * ringDirection[i], ringProgresses[i]);
