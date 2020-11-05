@@ -225,7 +225,7 @@ endgame.buildType = () => {
 		},
 		updateEyes(){
 			this.updateEyeOffset();
-			this._eyesOffset.lerp(this._eyesTargetOffset, Mathf.clamp(0.08 * Time.delta));
+			this._eyesOffset.lerp(this._eyesTargetOffset, Mathf.clamp(0.12 * Time.delta));
 			if(this.target != null || (this.isControlled() && this.unit.isShooting)){
 				this._eyeReloads[0] += this.delta();
 				this._eyeReloads[1] += this.delta();
@@ -309,6 +309,7 @@ endgame.buildType = () => {
 			Units.nearbyEnemies(this.team, ux - rnge, uy - rnge, rnge * 2, rnge * 2, e => {
 				if(Mathf.within(ux, uy, e.x, e.y, rnge + e.hitSize) && !e.dead){
 					e.damage(380 * this._threatLevel);
+					if(e.dead) vaporize.at(e.x, e.y, 0, e);
 					endgameLaser.at(this.x, this.y, 0, [new Vec2(ux, uy), new Vec2(e.x, e.y), 0.525]);
 				};
 			});
@@ -325,6 +326,7 @@ endgame.buildType = () => {
 			var e = this._targetsB[index];
 			if(e != null){
 				e.damage(250 * this._threatLevel);
+				if(e.dead) vaporize.at(e.x, e.y, 0, e);
 				this._eyesVecArray[index].set(tempVec);
 				this._eyesVecArray[index].add(this.x, this.y);
 				endgameLaser.at(this.x, this.y, 0, [this._eyesVecArray[index], new Vec2(e.x, e.y), 0.625]);
