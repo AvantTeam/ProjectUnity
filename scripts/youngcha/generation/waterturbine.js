@@ -26,6 +26,10 @@ const waterTurbine = rotL.torqueExtendContent(ArmoredConduit, ArmoredConduit.Arm
 		this.setMaxTorque(15);
 		this._timerFlow = this.timers++;
 	},
+	drawRequestRegion( req,  list){
+		Draw.alpha(0.5);
+        Draw.rect(Core.atlas.find(this.name), req.drawx(), req.drawy(), req.rotation * 90);
+	},
 	_timerFlow:0,
 	getTimerFlow(){
 		return this._timerFlow;

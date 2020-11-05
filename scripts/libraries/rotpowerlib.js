@@ -244,6 +244,7 @@ const _RotPowerPropsCommon = {
 		if(this.block.getUseOgUpdate()){
 			this.super$updateTile();
 		}
+		if(this._dead){return;}
 		if(this.prev_tile_rotation!=this.rotation){
 			if(this.prev_tile_rotation!=-1){
 				print("rotated to "+this.rotation);
@@ -267,7 +268,9 @@ const _RotPowerPropsCommon = {
 				this.needsNetworkUpdate=false;
 				this._network.rebuildGraph(this);
 				if(this.networkSaveState){
-					this._network.lastVelocity=this._speedcache;
+					if(this._speedcache){
+						this._network.lastVelocity=this._speedcache;
+					}
 					this.networkSaveState=0;
 				}
 			}
@@ -577,6 +580,11 @@ const _TorqueMulticonnectorProps = Object.assign(Object.create(_RotPowerPropsCom
 		
 		//rotation for vfx
 		for(let i = 0;i<this._networkList.length;i++){
+			if(!this._networkList[i]){
+				print("somehow network is not defined but update was called.");
+				print("network list:"+this._networkList);
+				continue;
+			}
 			this._networkList[i].update();
 			if(this._networkRots[i]=== undefined ){
 				this._networkRots[i]=0;
@@ -651,6 +659,7 @@ const _TorqueTransmissionProps = Object.assign(Object.create(_TorqueMulticonnect
 	
 	updateExtension2(){
 		//transmission distribution 
+		if(this._networkList.length==0 || this.dead){return;}
 		let ratios = this.block.getRatio();
 		let totalmratio = 0;
 		let totalm = 0;
@@ -706,7 +715,7 @@ const _TorqueGeneratorProps = Object.assign(Object.create(_RotPowerPropsCommon),
 	},
 	updateExtension(){
 		let block = this.block;
-		this.setForce(_RotPowerCommon.getForce(
+		this.setForce(this.block.getForce(
 				this.getNetwork().lastVelocity,
 				block.getMaxSpeed(),
 				block.getMaxTorque(),
@@ -1179,7 +1188,29 @@ function _drawRotRect(region, x, y, w, h,th,  rot, ang1, ang2){
 	}
 	s1 = Mathf.map(s1,-1,1,y-h/2,y+h/2);
 	s2 = Mathf.map(s2,-1,1,y-h/2,y+h/2);
-	Draw.rect(nregion,x,(s1+s2)/2,w,(s2-s1),w/2,y-s1,rot);
+	Draw.rect(nregion,x,(s1+s2)*0.5,w,(s2-s1),w*0.5,y-s1,rot);
+	
+}
+
+//draws the distorted sprite used to make the sliding worm gear effect.
+//x and y are assumed to refer to the center of the area.
+//w,h is the size in world units of the texture to distort.
+//tw, th is the width, hieght of the texture in world units.
+//rot is used for the rotation of the block itself
+//step is the width of the repeating pattern, offset is the offset
+function _drawSlideRect(region, x, y, w, h,tw,th,  rot, step, offset){
+	if(!region){
+		print("oh no there is no texture");
+		return;
+	}
+	let nregion = new TextureRegion(region);
+	let scaley = h/th;
+	let scalex = w/tw;
+	let texw = nregion.u2-nregion.u;
+	let texu = nregion.u;
+	nregion.u += Mathf.map(offset%1.0,0,1.0, 0, texw*step/tw);
+	nregion.u2 = nregion.u+(scalex*texw);
+	Draw.rect(nregion,x,y,w,h,w*0.5,h*0.5,rot);
 	
 }
 
@@ -1246,6 +1277,7 @@ module.exports={
 	drawRotQuad:_drawRotQuad,
 	drawQuad: _drawQuad,
 	drawQuadA: _drawQuadA,
+	drawSlideRect:_drawSlideRect,
 	torqueFuncs: _Torque_Speed_Funcs,
 	baseTypes:_baseTypes
 }

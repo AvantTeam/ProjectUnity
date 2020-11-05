@@ -8,6 +8,7 @@ const inlinegearbox = rotL.torqueExtend(Block, Building, "simple-transmission",r
 		this.topsprite = [Core.atlas.find(this.name + "-top1"),Core.atlas.find(this.name + "-top2")];
 		this.overlaysprite = [Core.atlas.find(this.name + "-overlay1"),Core.atlas.find(this.name + "-overlay2")];
 		this.moving = [Core.atlas.find(this.name + "-moving1"),Core.atlas.find(this.name + "-moving2"),Core.atlas.find(this.name + "-moving3")];
+		this.movingtest = Core.atlas.find(this.name + "-moving");
 		this.base = Core.atlas.find(this.name + "-bottom");
 		this.mbase = Core.atlas.find(this.name + "-mbase");
 		this.setAccept([2,1,0,0,1,2,0,0]);
@@ -41,6 +42,10 @@ const inlinegearbox = rotL.torqueExtend(Block, Building, "simple-transmission",r
 		
 		//
 		Draw.rect(inlinegearbox.overlaysprite[variant], this.x, this.y, this.rotdeg());
+		
+		
+		//rotL.drawSlideRect(inlinegearbox.movingtest, this.x-ox, this.y-oy,26*0.25,9,54*0.25,9,  this.rotdeg(), 18*0.25, this.getNetworkRotation(0)/360.0)
+		
 		Draw.rect(inlinegearbox.topsprite[this.rotation%2], this.x, this.y, 0);
         this.drawTeamTop();
 
