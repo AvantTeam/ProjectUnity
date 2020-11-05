@@ -53,11 +53,12 @@ const _RotPowerCommon = {
 	drawPlace(x, y, rotation, valid){
 		for(let i =0;i<this._accept.length;i++){
 			if(this._accept[i]==0){continue;}
-			Lines.stroke(3.5, Pal.accent);
+			Lines.stroke(3.5, Color.white);
 			let outpos = getConnectSidePos(i,this.size,rotation);
 			let dx = (outpos.toPos.x+x) * Vars.tilesize;
 			let dy = (outpos.toPos.y+y) * Vars.tilesize;
-			Lines.line(dx,dy,dx-_dirs[outpos.dir].x,dy-_dirs[outpos.dir].y);
+			let dir = _dirs[outpos.dir];
+			Lines.line(dx-dir.x,dy-dir.y,dx-dir.x*2,dy-dir.y*2);
 		}
 		this.super$drawPlace(x, y, rotation, valid);
 		
@@ -189,7 +190,7 @@ const _RotPowerPropsCommon = {
 		let building = this.super$create(block,team);
 		this.initAllNets(building);
 		this.needsNetworkUpdate =  true;
-		
+		this.prev_tile_rotation =  -1;
 		
 		
 	},
@@ -205,7 +206,10 @@ const _RotPowerPropsCommon = {
 		for(let index = 0 ;index< this.block.size*4;index++){
 			if(this.block.getAccept()[index]!==0){
 				let pos = this.getConnectSidePos(index).toPos;
+				let fpos = this.getConnectSidePos(index).fromPos;
 				pos.index = index;
+				pos.fromx = fpos.x;
+				pos.fromy = fpos.y;
 				this._acceptPorts.push(pos);
 			}
 		}
@@ -213,21 +217,20 @@ const _RotPowerPropsCommon = {
 	},
 	onRemoved() {
 		this.deleteSelfFromNetwork();
-		if(this.getNeighbourArray()){
-			this.eachNeighbour(neighbourindex=>{
-				neighbourindex.build.removeNeighbour(this);
-			});
-		}
+		this.deleteFromNeighbours();
 		this.super$onRemoved();
 	},
 	onDestroyed(){
 		this.deleteSelfFromNetwork();
+		this.deleteFromNeighbours();
+		this.super$onDestroyed();
+	},
+	deleteFromNeighbours(){
 		if(this.getNeighbourArray()){
 			this.eachNeighbour(neighbourindex=>{
 				neighbourindex.build.removeNeighbour(this);
 			});
 		}
-		this.super$onDestroyed();
 	},
 	deleteSelfFromNetwork(){
 		this._dead=true;
@@ -236,13 +239,21 @@ const _RotPowerPropsCommon = {
 		}
 		
 	},
-	prev_tile_rotation:0,
+	prev_tile_rotation:-1,
 	updateTile(){
 		if(this.block.getUseOgUpdate()){
 			this.super$updateTile();
 		}
 		if(this.prev_tile_rotation!=this.rotation){
+			if(this.prev_tile_rotation!=-1){
+				print("rotated to "+this.rotation);
+				this.deleteSelfFromNetwork();
+				this.deleteFromNeighbours();
+				this._dead=false;
+				this.initAllNets(this);
+			}
 			this.recalcPorts();
+			this.needsNetworkUpdate=true;
 		}
 		this.updatePre();
 		this.updateNetworks();
@@ -430,18 +441,9 @@ const _RotPowerPropsCommon = {
 }
 
 
-const _TorqueTransmission = Object.assign({
-	
-	//transmission ratio
-	_ratio:[1,2],
-	getRatio(){return this._ratio},
-	setRatio(new_val){this._ratio=new_val},
-	
-	
-	
-},_RotPowerCommon);
 
-const _TorqueTransmissionProps = Object.assign(Object.create(_RotPowerPropsCommon),{
+
+const _TorqueMulticonnectorProps = Object.assign(Object.create(_RotPowerPropsCommon),{
 	_networkList:[],
 	_networkRots:[],
 	_networkSpeeds:[],
@@ -589,22 +591,8 @@ const _TorqueTransmissionProps = Object.assign(Object.create(_RotPowerPropsCommo
 		
 		if(this._networkList.length==0){return;}
 		
-		//transmission distribution 
-		let ratios = this.block.getRatio();
-		let totalmratio = 0;
-		let totalm = 0;
-		let allpositive = true;
-		for(let i = 0;i<ratios.length;i++){
-			totalmratio += this._networkList[i].lastInertia*ratios[i];
-			totalm+=this._networkList[i].lastInertia*this._networkList[i].lastVelocity;
-			allpositive = allpositive && this._networkList[i].lastInertia>0;
-		}
-		if(totalmratio!=0&&totalm!=0&&allpositive){
-			for(let i = 0;i<ratios.length;i++){
-				let cratio = (this._networkList[i].lastInertia*ratios[i])/totalmratio;
-				this._networkList[i].lastVelocity = totalm*cratio/this._networkList[i].lastInertia;
-			}
-		}
+		
+		this.updateExtension2();
 		//rotation for vfx
 		for(let i = 0;i<this._networkList.length;i++){
 			if(this._networkRots[i]=== undefined ){
@@ -614,6 +602,7 @@ const _TorqueTransmissionProps = Object.assign(Object.create(_RotPowerPropsCommo
 			this._networkRots[i]=Mathf.mod(this._networkRots[i],360);
 		}
 	},
+	updateExtension2(){},
 	deleteSelfFromNetwork(){
 		this._dead=true;
 		if(this._networkList.length==0){return;}
@@ -640,6 +629,42 @@ const _TorqueTransmissionProps = Object.assign(Object.create(_RotPowerPropsCommo
 				this._networkSpeeds[i]=0;
 			}
 			stream.f(this._networkSpeeds[i]);
+		}
+	},
+	
+});
+
+
+const _TorqueTransmission = Object.assign({
+	
+	//transmission ratio
+	_ratio:[1,2],
+	getRatio(){return this._ratio},
+	setRatio(new_val){this._ratio=new_val},
+	
+	
+	
+},_RotPowerCommon);
+
+
+const _TorqueTransmissionProps = Object.assign(Object.create(_TorqueMulticonnectorProps),{
+	
+	updateExtension2(){
+		//transmission distribution 
+		let ratios = this.block.getRatio();
+		let totalmratio = 0;
+		let totalm = 0;
+		let allpositive = true;
+		for(let i = 0;i<ratios.length;i++){
+			totalmratio += this._networkList[i].lastInertia*ratios[i];
+			totalm+=this._networkList[i].lastInertia*this._networkList[i].lastVelocity;
+			allpositive = allpositive && this._networkList[i].lastInertia>0;
+		}
+		if(totalmratio!=0&&totalm!=0&&allpositive){
+			for(let i = 0;i<ratios.length;i++){
+				let cratio = (this._networkList[i].lastInertia*ratios[i])/totalmratio;
+				this._networkList[i].lastVelocity = totalm*cratio/this._networkList[i].lastInertia;
+			}
 		}
 	},
 	
@@ -954,11 +979,9 @@ const _EnergyGraph = {
 				if(!building.getNetworkOfPort(portindex)){
 					continue;
 				}
-				let portinfo = building.getConnectSidePos(acceptports[port].index);
-				let portpos = portinfo.toPos;
-				
+				let portinfo = acceptports[port];
 				if(!building.tile){return;}
-				let tile = building.tile.nearby(portpos.x,portpos.y);
+				let tile = building.tile.nearby(portinfo.x,portinfo.y);
 				// guess the world doesnt exist or something
 				if(!tile){return;}
 				if(tile.block().getIsNetworkConnector!=undefined ){
@@ -969,7 +992,7 @@ const _EnergyGraph = {
 					}	
 					let thisgraph = building.getNetworkOfPort(portindex);
 					
-					let fpos = portinfo.fromPos;
+					let fpos = {x:portinfo.fromx,y:portinfo.fromy};
 					fpos.x+=building.tile.x;
 					fpos.y+=building.tile.y;
 					let connectIndex = conbuild.canConnect(fpos);
@@ -1177,6 +1200,10 @@ const _baseTypes={
 	torqueTransmission:{
 		block:_TorqueTransmission,
 		build:_TorqueTransmissionProps
+	},
+	torqueMultiConnect:{
+		block:_RotPowerCommon,
+		build:_TorqueMulticonnectorProps
 	}
 	
 	
