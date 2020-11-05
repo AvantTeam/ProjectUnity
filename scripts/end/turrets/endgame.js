@@ -107,6 +107,9 @@ endgame.buildType = () => {
 			var trueAmount = Mathf.clamp(amount, 0, 360);
 			this.super$damage(trueAmount);
 		},
+		deltaB(){
+			return this.delta() * this.power.status;
+		},
 		setEff(){
 			this._threatLevel = 1;
 			this._ringProgress = [0, 0, 0];
@@ -226,9 +229,9 @@ endgame.buildType = () => {
 		updateEyes(){
 			this.updateEyeOffset();
 			this._eyesOffset.lerp(this._eyesTargetOffset, Mathf.clamp(0.12 * Time.delta));
-			if(this.target != null || (this.isControlled() && this.unit.isShooting)){
-				this._eyeReloads[0] += this.delta();
-				this._eyeReloads[1] += this.delta();
+			if((this.target != null || (this.isControlled() && this.unit.isShooting)) && this.consValid() && this.power.status >= 0.0001){
+				this._eyeReloads[0] += this.deltaB();
+				this._eyeReloads[1] += this.deltaB();
 			};
 			
 			if(this.consValid() && this.power.status >= 0.0001){

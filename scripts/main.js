@@ -298,7 +298,8 @@ const script = [
                 childs: [
                     "handcrank",
                     "windturbine",
-                    "waterturbine"
+                    "waterturbine",
+                    "electricmotor"
                 ]
             },
 
