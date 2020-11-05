@@ -226,7 +226,7 @@ endgame.buildType = () => {
 		updateEyes(){
 			this.updateEyeOffset();
 			this._eyesOffset.lerp(this._eyesTargetOffset, Mathf.clamp(0.12 * Time.delta));
-			if(this.target != null || (this.isControlled() && this.unit.isShooting)){
+			if((this.target != null || (this.isControlled() && this.unit.isShooting)) && this.consValid() && this.power.status > 0.0001){
 				this._eyeReloads[0] += this.delta();
 				this._eyeReloads[1] += this.delta();
 			};
