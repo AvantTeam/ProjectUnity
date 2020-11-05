@@ -228,5 +228,21 @@ public class UnityFx{
         color(UnityPal.endColor);
         stroke(1.5f);
         lineAngleCenter(e.x + Tmp.v1.x, e.y + Tmp.v1.y, angle, slope * 8f);
+    }),
+
+    imberSparkCraftingEffect = new Effect(70f, e -> {
+        color(UnityPal.imberColor, Color.valueOf("ffc266"), e.finpow());
+        alpha(e.finpow());
+        randLenVectors(e.id, 3, (1f - e.finpow()) * 24f, e.rotation, 360f, (x, y) -> {
+            tri(e.x + x, e.y + y, e.fout() * 8f, e.fout() * 10f, e.rotation);
+            tri(e.x + x, e.y + y, e.fout() * 4f, e.fout() * 6f, e.rotation);
+        });
+        color();
+    }),
+
+    imberCircleSparkCraftingEffect = new Effect(30f, e -> {
+        color(Pal.surge);
+        stroke(e.fslope());
+        circle(e.x, e.y, e.fin() * 20f);
     });
 }

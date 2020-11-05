@@ -10,6 +10,7 @@ public class UnityPal{
     monolithDarker = valueOf("e58956"),
     purpleLightning = valueOf("bf92f9"),
     endColor = valueOf("ff786e"),
+    imberColor = valueOf("fff566"),
     navalReddish = valueOf("d4816b"),
     navalYellowish = valueOf("ffd37f");
 }

@@ -43,7 +43,7 @@ public class UnityBlocks implements ContentList{
     terminalCrucible, endForge,
 
 	//imber
-	orb, shockwire, current, plasma, shielder,
+    sparkAlloyFactory, orb, shockwire, current, plasma, shielder,
 	
 	//koruh
 	laserTurret, inferno,
@@ -509,6 +509,24 @@ public class UnityBlocks implements ContentList{
 
         //endregion
 		//region imber
+
+        sparkAlloyFactory = new StemGenericSmelter("spark-alloy-forge"){{
+            requirements(Category.crafting, with(Items.graphite, 340, UnityItems.imberium, 270, Items.silicon, 250, Items.thorium, 120, Items.surgeAlloy, 100));
+            outputItem = new ItemStack(UnityItems.sparkAlloy, 4);
+            size = 4;
+            craftTime = 160f;
+            idleSound = Sounds.machine;
+            idleSoundVolume = 0.6f;
+            craftEffect = imberCircleSparkCraftingEffect;
+            afterUpdate = e -> {
+                if(e.consValid()){
+                    if(Mathf.chanceDelta(0.3f)) imberSparkCraftingEffect.at(e.getX(), e.getY(), Mathf.random(360f));
+                    else if(Mathf.chanceDelta(0.02f)) Lightning.create(e.team, UnityPal.imberColor, 5f, e.x, e.y, Mathf.random(360f), 5);
+                }
+            };
+            consumes.power(2.6f);
+            consumes.items(with(Items.surgeAlloy, 3, Items.titanium, 4, Items.plastanium, 2, UnityItems.imberium, 2));
+        }};
 
 		orb = new ChargeTurret("orb"){{
 			requirements(Category.turret, with(Items.copper, 55, Items.lead, 30, Items.graphite, 25, Items.silicon, 35, UnityItems.imberium, 20));
