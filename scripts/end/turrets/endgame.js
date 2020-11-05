@@ -397,7 +397,7 @@ endgame.buildType = () => {
 		updateTile(){
 			this.updateEyes();
 			if(this.power.status >= 0.0001){
-				this._eyesAlpha = Mathf.lerpDelta(this._eyesAlpha, 1, 0.06);
+				this._eyesAlpha = Mathf.lerpDelta(this._eyesAlpha, 1 * this.power.status, 0.06 * this.power.status);
 				//this._lightsAlpha = Mathf.lerpDelta(this._lightsAlpha, 1, 0.07);
 			}else{
 				this._eyesAlpha = Mathf.lerpDelta(this._eyesAlpha, 0, 0.06);
