@@ -1,0 +1,11 @@
+{
+	"size": 3,
+	"health": 1300,
+	"hasPower": true,
+	"requirements": [
+		{"item": "silicon", "amount": 120},
+		{"item": "lead", "amount": 80},
+		{"item": "copper", "amount": 120},
+	],
+	"category": "power",
+}
