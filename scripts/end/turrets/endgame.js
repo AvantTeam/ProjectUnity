@@ -252,7 +252,7 @@ endgame.buildType = () => {
 				if(!this.isControlled()){
 					if(this._targetsB[this._eyeSequenceB + 8] != null) this.eyeShoot(this._eyeSequenceB + 8);
 				}else{
-					if(this.unit.isShooting) this.playerEyeShoot(this._eyeSequenceA + 8);
+					if(this.unit.isShooting) this.playerEyeShoot(this._eyeSequenceB + 8);
 				};
 				this._eyeSequenceB = (this._eyeSequenceB + 1) % 8;
 			};
