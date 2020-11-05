@@ -225,7 +225,7 @@ endgame.buildType = () => {
 		},
 		updateEyes(){
 			this.updateEyeOffset();
-			this._eyesOffset.lerp(this._eyesTargetOffset, Mathf.clamp(0.08 * Time.delta));
+			this._eyesOffset.lerp(this._eyesTargetOffset, Mathf.clamp(0.12 * Time.delta));
 			if(this.target != null || (this.isControlled() && this.unit.isShooting)){
 				this._eyeReloads[0] += this.delta();
 				this._eyeReloads[1] += this.delta();
@@ -267,7 +267,7 @@ endgame.buildType = () => {
 			var rnge = endgame.range;
 			Units.nearbyEnemies(this.team, this.x - rnge, this.y - rnge, rnge * 2, rnge * 2, e => {
 				if(Mathf.within(this.x, this.y, e.x, e.y, rnge) && !e.dead){
-					endgameLaser.at(this.x, this.y, 0, [new Vec2(this.x + (this._eyesOffset.x * 2), this.y + (this._eyesOffset.x * 2)), new Vec2(e.x, e.y), 1]);
+					endgameLaser.at(this.x, this.y, 0, [new Vec2(this.x + (this._eyesOffset.x * 2), this.y + (this._eyesOffset.y * 2)), new Vec2(e.x, e.y), 1]);
 					vaporize.at(e.x, e.y, 0, e);
 					e.kill();
 				};
@@ -278,7 +278,7 @@ endgame.buildType = () => {
 			fLib.trueEachBlock(this.x, this.y, endgame.range, build => {
 				if(build.team != this.team && build != this && !build.dead && build.block != null){
 					if(build.block.size >= 3) vaporizeTile.at(build.x, build.y, build.block.size);
-					if(shouldLaser % 5 == 0 || build.block.size >= 5) endgameLaser.at(this.x, this.y, 0, [new Vec2(this.x + (this._eyesOffset.x * 2), this.y + (this._eyesOffset.x * 2)), new Vec2(build.x, build.y), 1]);
+					if(shouldLaser % 5 == 0 || build.block.size >= 5) endgameLaser.at(this.x, this.y, 0, [new Vec2(this.x + (this._eyesOffset.x * 2), this.y + (this._eyesOffset.y * 2)), new Vec2(build.x, build.y), 1]);
 					build.kill();
 					shouldLaser++;
 				};
@@ -309,6 +309,7 @@ endgame.buildType = () => {
 			Units.nearbyEnemies(this.team, ux - rnge, uy - rnge, rnge * 2, rnge * 2, e => {
 				if(Mathf.within(ux, uy, e.x, e.y, rnge + e.hitSize) && !e.dead){
 					e.damage(380 * this._threatLevel);
+					if(e.dead) vaporize.at(e.x, e.y, 0, e);
 					endgameLaser.at(this.x, this.y, 0, [new Vec2(ux, uy), new Vec2(e.x, e.y), 0.525]);
 				};
 			});
@@ -325,6 +326,7 @@ endgame.buildType = () => {
 			var e = this._targetsB[index];
 			if(e != null){
 				e.damage(250 * this._threatLevel);
+				if(e.dead) vaporize.at(e.x, e.y, 0, e);
 				this._eyesVecArray[index].set(tempVec);
 				this._eyesVecArray[index].add(this.x, this.y);
 				endgameLaser.at(this.x, this.y, 0, [this._eyesVecArray[index], new Vec2(e.x, e.y), 0.625]);
@@ -378,7 +380,7 @@ endgame.buildType = () => {
 						if(damageV + damageB > 1000 || b.type.splashDamageRadius > 120 || damageFull > 12000){
 							//b.remove();
 							bulletSeq.add(b);
-							endgameLaser.at(this.x, this.y, 0, [new Vec2(this.x + (this._eyesOffset.x * 2), this.y + (this._eyesOffset.x * 2)), new Vec2(b.x, b.y), 0.625]);
+							endgameLaser.at(this.x, this.y, 0, [new Vec2(this.x + (this._eyesOffset.x * 2), this.y + (this._eyesOffset.y * 2)), new Vec2(b.x, b.y), 0.625]);
 						}
 					};
 				});
