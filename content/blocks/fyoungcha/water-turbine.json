@@ -3,6 +3,7 @@
 	"health": 1100,
 	"requirements": [
 		{"item": "metaglass", "amount": 50},
+		{"item": "nickel", "amount": 20},
 		{"item": "lead", "amount": 150},
 		{"item": "copper", "amount": 100},
 	],

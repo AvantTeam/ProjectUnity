@@ -28,7 +28,19 @@ const createIconsC = (packer, block) => {
 		};
 	}
 };
-
+const nickelOre = extendContent(OreBlock, "nickel", {
+	init(){
+		this.itemDrop = Vars.content.getByName(ContentType.item, "unity-nickel");
+		this.super$init();
+	},
+	
+	createIcons(packer){
+		createIconsC(packer, this);
+	}
+});
+nickelOre.oreScale = 24.77;
+nickelOre.oreThreshold = 0.913;
+nickelOre.oreDefault = true;
 const umbriumOre = extendContent(OreBlock, "umbrium", {
 	init(){
 		this.itemDrop = Vars.content.getByName(ContentType.item, "unity-umbrium");

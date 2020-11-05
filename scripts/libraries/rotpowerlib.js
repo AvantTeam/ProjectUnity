@@ -748,8 +748,8 @@ const _TorqueGeneratorProps = Object.assign(Object.create(_RotPowerPropsCommon),
 const _TorqueConsumer = Object.assign(Object.create(_RotPowerCommon),{
 	//speed at which diminshing returns kicks in
 	_nominal_speed: 10,
-	//a multiplier ontop the dimishing returns, higher the less diminshing the returns, anything above 2 will result in a temporary reversal of diminishing returns
-	_oversupply_falloff: 1.5,
+	//a multiplier ontop the dimishing returns, higher the less diminshing the returns, anything above 0.7 will result in a temporary reversal of diminishing returns
+	_oversupply_falloff: 0.7,
 	//idle friction
 	_idle_friction: 0.01,
 	//working friction
@@ -786,8 +786,8 @@ const _TorqueConsumerProps = Object.assign(Object.create(_RotPowerPropsCommon),{
 		let p = this.super$efficiency();
 		let ratio = vel/block.getNominalSpeed();
 		if(ratio>1){
-			ratio = Mathf.sqrt(ratio);
-			ratio = 1+((ratio-1)*block.getFalloff());
+			ratio = Mathf.log2(ratio);
+			ratio = 1+((ratio)*block.getFalloff());
 		}
 		p*=ratio;
 		return p;
@@ -835,7 +835,7 @@ const _EnergyGraph = {
 		this.updateStat();
 		
 		let netForce = this.lastGrossForceApplied - this.lastFrictionCoefficent*this.lastVelocity*this.lastVelocity;
-		netForce = Math.max(0,netForce);
+		
 		this.lastNetForceApplied = netForce;
 		//newton's second law
 		let acceleration = netForce/this.lastInertia;
@@ -843,7 +843,7 @@ const _EnergyGraph = {
 			acceleration=0;
 		}
 		this.lastVelocity = this.lastVelocity+acceleration*Time.delta;
-		
+		this.lastVelocity = Math.max(0,this.lastVelocity);
 	},
 	
 	updateStat(){
@@ -897,7 +897,7 @@ const _EnergyGraph = {
 	remove(building){
 		if(!this.connected.contains(building)){return;}
 		let c = building.countNeighbours();
-		if(c===0){print("removed, no neighbours lol");return;}
+		if(c===0){return;}
 		//print("-------------begining remove");
 		if(c===1){
 			//todo: find out why this isnt triggering.
