@@ -1,12 +1,13 @@
 package unity.entities.units;
 
+import arc.func.Prov;
 import mindustry.game.Team;
 import mindustry.gen.Unit;
 import mindustry.type.UnitType;
 
 public class TransUnitType extends UnitType{
     protected float transformTime;
-    protected UnitType toTrans;
+    protected Prov<UnitType> toTrans;
 
     public TransUnitType(String name){
         super(name);

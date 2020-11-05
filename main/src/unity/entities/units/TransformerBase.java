@@ -12,9 +12,9 @@ public interface TransformerBase extends Unitc{
     default void transUpdate(){
         TransUnitType temp = (TransUnitType) type();
         float current = getTimeTrans();
-        if((floorOn().isLiquid && !(floorOn() instanceof ShallowLiquid)) ^ (self() instanceof WaterMovec)){
+        if(floorOn().isLiquid && !(floorOn() instanceof ShallowLiquid) ^ self() instanceof WaterMovec){
             if(current < 0f || current > temp.transformTime){
-                Unit groundUnit = temp.toTrans.spawn(team(), x(), y());
+                Unit groundUnit = temp.toTrans.get().spawn(team(), x(), y());
                 groundUnit.rotation = rotation();
                 groundUnit.add();
                 groundUnit.vel.set(vel());
