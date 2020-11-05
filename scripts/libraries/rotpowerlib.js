@@ -29,7 +29,7 @@ const _Torque_Speed_Funcs = {
 	//basic motor/generator
 	linear(x,s,m,h,k){
 		x = Math.min(s,x);
-		return k*(s-x)*m/s;
+		return  Math.min(k*(s-x)*m/s,99999);
 	},
 	//used for combustion
 	quadratic(x,s,m,h,k){
@@ -252,6 +252,7 @@ const _RotPowerPropsCommon = {
 				this.deleteFromNeighbours();
 				this._dead=false;
 				this.initAllNets(this);
+				this._neighbourArray=[];
 			}
 			this.recalcPorts();
 			this.needsNetworkUpdate=true;
@@ -388,6 +389,7 @@ const _RotPowerPropsCommon = {
 		return this._force;
 	},
 	setForce(n_force){
+		
 		this._force=n_force;
 	},
 	getInertia(){
@@ -833,6 +835,7 @@ const _EnergyGraph = {
 		this.updateStat();
 		
 		let netForce = this.lastGrossForceApplied - this.lastFrictionCoefficent*this.lastVelocity*this.lastVelocity;
+		netForce = Math.max(0,netForce);
 		this.lastNetForceApplied = netForce;
 		//newton's second law
 		let acceleration = netForce/this.lastInertia;
@@ -915,6 +918,7 @@ const _EnergyGraph = {
 			let copynet = building.getNetworkOfPort(neighbour.portindex);
 			if(copynet==this){
 				let selfref = neighbour.build.getNeighbour(building);
+				if(!selfref){return;}
 				neighbour.build.setNetworkOfPort(selfref.portindex,copynet.copyGraph(neighbour.build) );
 			}
 		});
@@ -923,6 +927,7 @@ const _EnergyGraph = {
 			let neighbour = neighbourindex.build;
 			if(building.getNetworkOfPort(neighbourindex.portindex)==this){
 				let selfref = neighbour.getNeighbour(building);
+				if(!selfref){return;}
 				let neinet = neighbour.getNetworkOfPort(selfref.portindex);
 				if(!networksadded || !networksadded.contains(neinet)){
 					if(!networksadded){
