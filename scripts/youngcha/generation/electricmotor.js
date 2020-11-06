@@ -20,12 +20,8 @@ const electricMotor = rotL.torqueExtend(Block, Building, "electric-motor", rotL.
 			Core.atlas.find(this.name + "-coil2")
 		];
 		this.mbase = Core.atlas.find(this.name + "-mbase");
-		this.setAccept([0,1,0,
-						0,0,0,
-						0,1,0,
-						0,0,0]);
-		this.setMaxSpeed(10);
-		this.setMaxTorque(20);
+		
+		
 	},
 	
 },{
@@ -73,5 +69,11 @@ electricMotor.rotate = true;
 electricMotor.update = true;
 electricMotor.solid = true;
 electricMotor.consumes.power(4.5);
+electricMotor.setAccept([0,1,0,
+						0,0,0,
+						0,1,0,
+						0,0,0]);
+electricMotor.setMaxSpeed(10);
+electricMotor.setMaxTorque(20);
 
 ///Vars.content.getByName(ContentType.block, "unity-drive-shaft").overlaysprite = Core.atlas.find("unity-drive-shaft-overlay");

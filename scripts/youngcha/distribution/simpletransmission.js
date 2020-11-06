@@ -1,6 +1,6 @@
 const rotL = require("libraries/rotpowerlib");
 
-const inlinegearbox = rotL.torqueExtend(Block, Building, "simple-transmission",rotL.baseTypes.torqueTransmission, {
+const simpleTrans = rotL.torqueExtend(Block, Building, "simple-transmission",rotL.baseTypes.torqueTransmission, {
 	
 	load(){
 		this.super$load();
@@ -11,7 +11,7 @@ const inlinegearbox = rotL.torqueExtend(Block, Building, "simple-transmission",r
 		this.movingtest = Core.atlas.find(this.name + "-moving");
 		this.base = Core.atlas.find(this.name + "-bottom");
 		this.mbase = Core.atlas.find(this.name + "-mbase");
-		this.setAccept([2,1,0,0,1,2,0,0]);
+		
 	},
 	
 },{
@@ -25,28 +25,28 @@ const inlinegearbox = rotL.torqueExtend(Block, Building, "simple-transmission",r
 	draw() {
 		let fixedrot = ((this.rotdeg()+90)%180)-90;
 		let variant = ((this.rotation+1)%4>=2)?1:0;
-		Draw.rect(inlinegearbox.base, this.x, this.y, 0);
-		Draw.rect(inlinegearbox.mbase, this.x, this.y, this.rotdeg());
+		Draw.rect(simpleTrans.base, this.x, this.y, 0);
+		Draw.rect(simpleTrans.mbase, this.x, this.y, this.rotdeg());
 		//speeeeeeen
 		let offset = rotL.dirs[(this.rotation+1)%4];
 		let ox = offset.x*4;
 		let oy = offset.y*4;
-		rotL.drawRotRect(inlinegearbox.moving[0], this.x+ox, this.y+oy, 16, 18/4, 18/4, fixedrot, this.getNetworkRotation(0), this.getNetworkRotation(0)+180);
-		rotL.drawRotRect(inlinegearbox.moving[0], this.x+ox, this.y+oy, 16, 18/4, 18/4, fixedrot, this.getNetworkRotation(0)+180, this.getNetworkRotation(0)+360);
+		rotL.drawRotRect(simpleTrans.moving[0], this.x+ox, this.y+oy, 16, 18/4, 18/4, fixedrot, this.getNetworkRotation(0), this.getNetworkRotation(0)+180);
+		rotL.drawRotRect(simpleTrans.moving[0], this.x+ox, this.y+oy, 16, 18/4, 18/4, fixedrot, this.getNetworkRotation(0)+180, this.getNetworkRotation(0)+360);
 		
-		rotL.drawRotRect(inlinegearbox.moving[1], this.x+ox*-0.125, this.y+oy*-0.125, 16, 18/4, 18/4, fixedrot, 360-(this.getNetworkRotation(0)), 360-(this.getNetworkRotation(0)+180));
-		rotL.drawRotRect(inlinegearbox.moving[1], this.x+ox*-0.125, this.y+oy*-0.125, 16, 18/4, 18/4, fixedrot, 720-(this.getNetworkRotation(0)+180), 720-(this.getNetworkRotation(0)+360));
+		rotL.drawRotRect(simpleTrans.moving[1], this.x+ox*-0.125, this.y+oy*-0.125, 16, 18/4, 18/4, fixedrot, 360-(this.getNetworkRotation(0)), 360-(this.getNetworkRotation(0)+180));
+		rotL.drawRotRect(simpleTrans.moving[1], this.x+ox*-0.125, this.y+oy*-0.125, 16, 18/4, 18/4, fixedrot, 720-(this.getNetworkRotation(0)+180), 720-(this.getNetworkRotation(0)+360));
 		
-		rotL.drawRotRect(inlinegearbox.moving[2], this.x-ox, this.y-oy, 16, 10/4, 10/4, fixedrot, this.getNetworkRotation(1)+0, this.getNetworkRotation(1)+180);
-		rotL.drawRotRect(inlinegearbox.moving[2], this.x-ox, this.y-oy, 16, 10/4, 10/4, fixedrot, this.getNetworkRotation(1)+180, this.getNetworkRotation(1)+360);
+		rotL.drawRotRect(simpleTrans.moving[2], this.x-ox, this.y-oy, 16, 10/4, 10/4, fixedrot, this.getNetworkRotation(1)+0, this.getNetworkRotation(1)+180);
+		rotL.drawRotRect(simpleTrans.moving[2], this.x-ox, this.y-oy, 16, 10/4, 10/4, fixedrot, this.getNetworkRotation(1)+180, this.getNetworkRotation(1)+360);
 		
 		//
-		Draw.rect(inlinegearbox.overlaysprite[variant], this.x, this.y, this.rotdeg());
+		Draw.rect(simpleTrans.overlaysprite[variant], this.x, this.y, this.rotdeg());
 		
 		
-		//rotL.drawSlideRect(inlinegearbox.movingtest, this.x-ox, this.y-oy,26*0.25,9,54*0.25,9,  this.rotdeg(), 18*0.25, this.getNetworkRotation(0)/360.0)
+		//rotL.drawSlideRect(simpleTrans.movingtest, this.x-ox, this.y-oy,26*0.25,9,54*0.25,9,  this.rotdeg(), 18*0.25, this.getNetworkRotation(0)/360.0)
 		
-		Draw.rect(inlinegearbox.topsprite[this.rotation%2], this.x, this.y, 0);
+		Draw.rect(simpleTrans.topsprite[this.rotation%2], this.x, this.y, 0);
         this.drawTeamTop();
 
 	}
@@ -54,7 +54,8 @@ const inlinegearbox = rotL.torqueExtend(Block, Building, "simple-transmission",r
 	
 });
 
-inlinegearbox.rotate = true;
-inlinegearbox.update = true;
-inlinegearbox.solid = true;
+simpleTrans.rotate = true;
+simpleTrans.update = true;
+simpleTrans.solid = true;
+simpleTrans.setAccept([2,1,0,0,1,2,0,0]);
 

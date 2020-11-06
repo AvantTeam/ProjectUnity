@@ -19,12 +19,8 @@ const windTurbine = rotL.torqueExtend(Block, Building, "wind-turbine", rotL.base
 		this.mbase = Core.atlas.find(this.name + "-mbase");
 		this.rotor1 = Core.atlas.find(this.name + "-rotor1");
 		this.rotor2 = Core.atlas.find(this.name + "-rotor2");
-		this.setAccept([0,1,0,
-						0,0,0,
-						0,0,0,
-						0,0,0]);
-		this.setMaxSpeed(5);
-		this.setMaxTorque(5);
+		
+
 	},
 	
 },{
@@ -74,5 +70,10 @@ const windTurbine = rotL.torqueExtend(Block, Building, "wind-turbine", rotL.base
 windTurbine.rotate = true;
 windTurbine.update = true;
 windTurbine.solid = true;
-
+windTurbine.setAccept( [0,1,0,
+						0,0,0,
+						0,0,0,
+						0,0,0]);
+windTurbine.setMaxSpeed(5);
+windTurbine.setMaxTorque(5);
 ///Vars.content.getByName(ContentType.block, "unity-drive-shaft").overlaysprite = Core.atlas.find("unity-drive-shaft-overlay");

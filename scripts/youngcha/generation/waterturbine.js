@@ -18,13 +18,6 @@ const waterTurbine = rotL.torqueExtendContent(ArmoredConduit, ArmoredConduit.Arm
 			Core.atlas.find(this.name + "-liquid2")
 		];
 		this.rotor = Core.atlas.find(this.name + "-rotor");
-		this.setAccept([0,0,0,
-						0,1,0,
-						0,0,0,
-						0,1,0]);
-		this.setMaxSpeed(7);
-		this.setMaxTorque(15);
-		this._timerFlow = this.timers++;
 	},
 	drawRequestRegion( req,  list){
 		Draw.alpha(0.5);
@@ -108,6 +101,11 @@ waterTurbine.liquidCapacity = 250;
 waterTurbine.noUpdateDisabled = false;
 waterTurbine.setUseOgUpdate(false);
 waterTurbine.liquidPressure = 0.3;
-
-
+waterTurbine.setAccept([0,0,0,
+						0,1,0,
+						0,0,0,
+						0,1,0]);
+waterTurbine.setMaxSpeed(7);
+waterTurbine.setMaxTorque(15);
+waterTurbine.setTimerFlow(waterTurbine.timers++);
 ///Vars.content.getByName(ContentType.block, "unity-drive-shaft").overlaysprite = Core.atlas.find("unity-drive-shaft-overlay");

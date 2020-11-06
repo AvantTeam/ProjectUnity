@@ -10,7 +10,7 @@ const inlinegearbox = rotL.torqueExtend(Block, Building, "inline-gearbox",rotL.b
 		this.base = Core.atlas.find(this.name + "-base");
 		this.mbase = Core.atlas.find(this.name + "-mbase");
 		this.gear = Core.atlas.find(this.name + "-gear");
-		this.setAccept([1,1,0,0,1,1,0,0]);
+		
 	},
 	
 },{
@@ -54,6 +54,6 @@ const inlinegearbox = rotL.torqueExtend(Block, Building, "inline-gearbox",rotL.b
 inlinegearbox.rotate = true;
 inlinegearbox.update = true;
 inlinegearbox.solid = true;
-
+inlinegearbox.setAccept([1,1,0,0,1,1,0,0]);
 
 ///Vars.content.getByName(ContentType.block, "unity-drive-shaft").overlaysprite = Core.atlas.find("unity-drive-shaft-overlay");

@@ -13,11 +13,7 @@ const augerDrill = rotL.torqueExtendContent(Drill, Drill.DrillBuild, "auger-dril
 		this.overlaysprite = Core.atlas.find(this.name + "-overlay");
 		this.top = [Core.atlas.find(this.name + "-top1"),Core.atlas.find(this.name + "-top2")];
 		// facing right (rotation :0)
-		this.setAccept(
-			[0,1,0, //right side
-			0,0,0, //top 
-			0,1,0, //left
-			0,0,0]);//bottom
+		
 	},
 	
 	rotatedOutput( x,  y){
@@ -30,6 +26,7 @@ const augerDrill = rotL.torqueExtendContent(Drill, Drill.DrillBuild, "auger-dril
 	updatePre()
 	{
 		this.setInertia(45);
+		this.warmup = Math.min(1.0,this.warmup);
 	},
 	
 	draw() {
@@ -70,4 +67,9 @@ augerDrill.outputsItem = true;
 augerDrill.tier= 3;
 augerDrill.drawMineItem=true;
 augerDrill.drillTime=500;
-augerDrill.setNominalSpeed(8);
+augerDrill.setNominalSpeed(6);
+augerDrill.setAccept(
+			[0,1,0, //right side
+			0,0,0, //top 
+			0,1,0, //left
+			0,0,0]);//bottom
