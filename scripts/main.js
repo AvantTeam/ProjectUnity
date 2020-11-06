@@ -289,7 +289,8 @@ const script = [
                     "driveshaft",
                     "inlinegearbox",
                     "shaftrouter",
-                    "simpletransmission"
+                    "simpletransmission",
+                    "mechanicalconveyor"
                 ]
             },
 

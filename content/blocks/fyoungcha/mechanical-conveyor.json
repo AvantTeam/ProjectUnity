@@ -1,0 +1,10 @@
+{
+	"size": 1,
+	"health": 250,
+	"speed": 0.1,
+	"requirements": [
+		{"item": "copper", "amount": 3},
+		{"item": "nickel", "amount": 2},
+	],
+	"category": "distribution"
+}
