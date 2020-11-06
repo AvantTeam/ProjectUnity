@@ -411,7 +411,7 @@ endgame.buildType = () => {
 				var con = this.unit.controller;
 				this._eyesTargetOffset.trns(Angles.angle(this.x, this.y, con.mouseX, con.mouseY), Mathf.dst(this.x, this.y, con.mouseX, con.mouseY) / (endgame.range / 3));
 			};
-			if(this.target != null || (this.isControlled() && this.unit.isShooting)){
+			if((this.target != null || (this.isControlled() && this.unit.isShooting)) && this.power.status >= 0.0001){
 				this._eyeResetTime = 0;
 				if(!this.isControlled()){
 					this._eyesTargetOffset.trns(Angles.angle(this.x, this.y, this.targetPos.x, this.targetPos.y), Mathf.dst(this.x, this.y, this.targetPos.x, this.targetPos.y) / (endgame.range / 3));
