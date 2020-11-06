@@ -9,7 +9,7 @@ const driveShaft = rotL.torqueExtend(Block, Building, "drive-shaft", rotL.baseTy
 		this.overlaysprite = Core.atlas.find(this.name + "-overlay");
 		this.moving = Core.atlas.find(this.name + "-moving");
 		this.base = Core.atlas.find(this.name + "-base");
-		this.setAccept([1,0,1,0]);
+		
 	},
 },{
 
@@ -36,5 +36,5 @@ const driveShaft = rotL.torqueExtend(Block, Building, "drive-shaft", rotL.baseTy
 driveShaft.rotate = true;
 driveShaft.update = true;
 driveShaft.solid = false;
-
+driveShaft.setAccept([1,0,1,0]);
 ///Vars.content.getByName(ContentType.block, "unity-drive-shaft").overlaysprite = Core.atlas.find("unity-drive-shaft-overlay");

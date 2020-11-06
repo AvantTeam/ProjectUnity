@@ -7,7 +7,6 @@ const handCrank = rotL.torqueExtend(Block, Building, "hand-crank", rotL.baseType
 		this.handle = Core.atlas.find(this.name + "-handle");
 		this.shaft = [Core.atlas.find(this.name + "-base1"),Core.atlas.find(this.name + "-base2")];
 		this.base = Core.atlas.find(this.name + "-bottom");
-		this.setAccept([1,0,0,0]);
 	},
 },{
 	_cooldown:0,
@@ -55,5 +54,6 @@ handCrank.rotate = true;
 handCrank.update = true;
 handCrank.solid = false;
 handCrank.configurable = true;
+handCrank.setAccept([1,0,0,0]);
 
 ///Vars.content.getByName(ContentType.block, "unity-drive-shaft").overlaysprite = Core.atlas.find("unity-drive-shaft-overlay");

@@ -38,8 +38,8 @@ const nickelOre = extendContent(OreBlock, "nickel", {
 		createIconsC(packer, this);
 	}
 });
-nickelOre.oreScale = 31.77;
-nickelOre.oreThreshold = 0.923;
+nickelOre.oreScale = 24.00;
+nickelOre.oreThreshold = 0.920;
 nickelOre.oreDefault = true;
 const umbriumOre = extendContent(OreBlock, "umbrium", {
 	init(){

@@ -5,7 +5,7 @@ const shaftRouter = rotL.torqueExtend(Block, Building, "shaft-router", rotL.base
 	load(){
 		this.super$load();
 		this.base = Core.atlas.find(this.name);
-		this.setAccept([1,1,1,1]);
+		
 	},
 },{
 
@@ -26,5 +26,5 @@ const shaftRouter = rotL.torqueExtend(Block, Building, "shaft-router", rotL.base
 shaftRouter.rotate = false;
 shaftRouter.update = true;
 shaftRouter.solid = false;
-
+shaftRouter.setAccept([1,1,1,1]);
 ///Vars.content.getByName(ContentType.block, "unity-drive-shaft").overlaysprite = Core.atlas.find("unity-drive-shaft-overlay");

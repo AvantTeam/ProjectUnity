@@ -5,7 +5,6 @@ const handCrank = rotL.torqueExtend(Block, Building, "torque-infi", rotL.baseTyp
 	load(){
 		this.super$load();
 		this.handle = Core.atlas.find(this.name);
-		this.setAccept([1,1,1,1]);
 		this.setMaxTorque(9999);
 		this.setMaxSpeed(999999);
 	},
@@ -30,5 +29,5 @@ const handCrank = rotL.torqueExtend(Block, Building, "torque-infi", rotL.baseTyp
 handCrank.rotate = true;
 handCrank.update = true;
 handCrank.solid = false;
-
+handCrank.setAccept([1,1,1,1]);
 ///Vars.content.getByName(ContentType.block, "unity-drive-shaft").overlaysprite = Core.atlas.find("unity-drive-shaft-overlay");
