@@ -71,7 +71,7 @@ const _GraphCommonBuild = {
 		}
 		this.updatePost();
 		this.prev_tile_rotation = this.rotation;
-	}
+	},
 	updatePost() {},
     updatePre() {},
 	
@@ -98,13 +98,21 @@ const _GraphCommonBlock = {
 		this.graphBlocks[graph.name] = graph;
 	},
 	injectGraphConnectors(building){
-		
+		for(let graphname in this.graphBlocks) {
+			building.setGraphConnector(Object.create(graphBuildings[graphname]));
+		}
 	},
 	getGraphConnectorBuilding(name){
 		return graphBuildings[name];
 	},
 	setGraphConnectorBuilding(graph){
 		this.graphBuildings[graph.name] = graph;
+	},
+	getGraphConnectorBuilder(name){
+		return graphBuilders[name];
+	},
+	setGraphConnectorBuilder(graph){
+		this.graphBuilders[graph.name] = graph;
 	},
 	setStats() {
         this.super$setStats();
@@ -209,9 +217,8 @@ const _GraphPropsCommon = {
         return getConnectSidePos(index, this.getBlock().block.size, this.getBlock().rotation);
     },
     canConnect(pos) {
-		//recalc ports returning wrong values.
         for (let i = 0; i < this._acceptPorts.length; i++) {
-            if (this._acceptPorts[i].x + this.tile.x == pos.x && this._acceptPorts[i].y + this.tile.y == pos.y) {
+            if (this._acceptPorts[i].x + this.getBuild().tile.x == pos.x && this._acceptPorts[i].y + this.getBuild().tile.y == pos.y) {
 				//print("can connect o-o : rot"+this.rotation+": "+this._acceptPorts[i].x+","+this._acceptPorts[i].y);
                 return this._acceptPorts[i].index;
             }
@@ -224,14 +231,17 @@ const _GraphPropsCommon = {
         this.needsNetworkUpdate = true;
     },
 
-
+	getBlockData(){
+		return this.getBuild().block.getGraphConnectorBlock(this.name);
+	},
     recalcPorts() {
 		//print("reclac ports with rotation " + this.rotation);
         this.setAcceptPorts([]);
-        for (let index = 0; index < this.block.size * 4; index++) {
-            if (this.block.getAccept()[index] !== 0) {
-                let pos = this.getConnectSidePos(index).toPos;
-                let fpos = this.getConnectSidePos(index).fromPos;
+        for (let index = 0; index < this.getBuild().block.size * 4; index++) {
+            if (this.getBlockData().getAccept()[index] !== 0) {
+				let out = this.getConnectSidePos(index);
+                let pos = out.toPos;
+                let fpos = out.fromPos;
                 pos.index = index;
                 pos.fromx = fpos.x;
                 pos.fromy = fpos.y;
@@ -287,7 +297,7 @@ const _GraphPropsCommon = {
 		this.recalcPorts();
 		this.needsNetworkUpdate = true;
 		
-	}
+	},
     updateNetworks() {
         if (this._network) {
             if (this.needsNetworkUpdate) {
@@ -311,13 +321,20 @@ const _GraphPropsCommon = {
     _graphset: null,
     _dead: false,
     _acceptPorts: [],
+	
+	//stored shit 
 	_saveCache:[],
+	
+	//stuff like rotation.
 	_propsList: [],
+	
     _neighbourArray: null,
     _network: null,
 	_lastRecalc: 0,
     //this is used to store local speed.
     _speedcache: 0,
+	drawSelect() {
+    },
     initAllNets(buildingnew) {
         //_BlockGraph.new(building)
         this.recalcPorts();
@@ -460,7 +477,7 @@ const _TorqueMulticonnectorProps = Object.assign(Object.create(_GraphPropsCommon
         this.recalcPorts();
         let templist = [];
         this._networkList = [];
-        let portarray = this.block.getAccept();
+        let portarray = this.getBlockData().getAccept();
         let networksmade = 0;
         for (let i = 0; i < portarray.length; i++) {
             if (!templist[portarray[i] - 1] && portarray[i] != 0) {
@@ -506,14 +523,14 @@ const _TorqueMulticonnectorProps = Object.assign(Object.create(_GraphPropsCommon
         return true;
     },
     getNetworkOfPort(index) {
-        let l = this.block.getAccept()[index];
+        let l = this.getBlockData().getAccept()[index];
         if (l == 0) {
             return undefined;
         }
         return this._networkList[l - 1];
     },
     setNetworkOfPort(index, net) {
-        let l = this.block.getAccept()[index];
+        let l = this.getBlockData().getAccept()[index];
         if (l == 0) {
             return;
         }
@@ -521,30 +538,16 @@ const _TorqueMulticonnectorProps = Object.assign(Object.create(_GraphPropsCommon
     },
     getConnectedNeighours(index) {
         let portarray = this.getAcceptPorts();
-        let targetport = this.block.getAccept()[index];
+		let blk = this.getBlockData();
+        let targetport = blk.getAccept()[index];
         let output = [];
-
         for (let i = 0; i < portarray.length; i++) {
-            if (this.block.getAccept()[portarray[i].index] == targetport) {
+            if (blk.getAccept()[portarray[i].index] == targetport) {
                 output.push(portarray[i]);
             }
         }
         return output;
     },
-    drawSelect() {
-        this.super$drawSelect();
-        if (this._networkList.length == 0) {
-            return;
-        }
-        let pals = [Pal.accent, Pal.redSpark, Pal.plasticSmoke, Pal.lancerLaser];
-        for (let i = 0; i < this._networkList.length; i++) {
-            this._networkList[i].connected.each(cons(building => {
-                Drawf.selected(building.tileX(), building.tileY(), building.block, pals[i]);
-            }));
-
-        }
-    },
-
     updateNetworks() {
         if (this._networkList.length == 0) {
             return;
@@ -552,7 +555,7 @@ const _TorqueMulticonnectorProps = Object.assign(Object.create(_GraphPropsCommon
         if (this.needsNetworkUpdate) {
             this.needsNetworkUpdate = false;
             let covered = [];
-            let portarray = this.block.getAccept();
+            let portarray = this.getBlockData().getAccept();
             for (let i = 0; i < portarray.length; i++) {
                 if (portarray[i] == 0 || covered[portarray[i] - 1]) {
                     continue;
@@ -622,8 +625,8 @@ const _BlockGraph = {
     lastFrameUpdated: 0,
     id: 0,
     //'connected' is the graph's field of building set
-    new(building,diff) {
-        const graph = Object.create(_BlockGraph,diff);
+    new(building) {
+        const graph = Object.create(_BlockGraph,building.getBuild().block.graphBuilders[building.name]);
         graph.id = getnetID();
         graph.connected = ObjectSet.with(building);
         return graph;
@@ -758,7 +761,7 @@ const _BlockGraph = {
                 let buildConnector = current.build;
                 let index = current.parentConnectPort;
 
-                if (!buildConnector.block.getAccept()) {
+                if (!buildConnector.getBlockData().getAccept()) {
                     print("oh no, accept ports not found");
                     return;
                 }
@@ -872,80 +875,66 @@ const _BlockGraph = {
     connectedToString() {
         let s = "Network:" + this.id + ":";
         this.connected.each(cons(buildConnector => {
-            s += buildConnector.block.localizedName + ", "
+            s += buildConnector.getBuild().block.localizedName + ", "
         }));
         return s;
     }
 }
 
 
-const _baseTypes = {
-    torqueConnector: {
-        block: _GraphCommon,
-        build: _GraphPropsCommon
-    },
-    torqueGenerator: {
-        block: _TorqueGenerator,
-        build: _TorqueGeneratorProps
-    },
-    torqueConsumer: {
-        block: _TorqueConsumer,
-        build: _TorqueConsumerProps
-    },
-    torqueTransmission: {
-        block: _TorqueTransmission,
-        build: _TorqueTransmissionProps
-    },
-    torqueMultiConnect: {
-        block: _GraphCommon,
-        build: _TorqueMulticonnectorProps
-    }
+/*
+how i want a grpah system to be made:
 
+const testgraphblock = Object.assign(Object.create(_GraphCommon),{ ... })
+const testgraphbuild = Object.assign(Object.create(_GraphPropsCommon),{ ... })
+const testgraph = Object.assign(Object.create(_BlockGraph),{ ... })
 
+const testgraphtype = {
+	block:testgraphblock,
+	build:testgraphbuild,
+	graph:testgraphbuild,
 }
 
+let testblock = init();
+addGraph(testblock, testgraphtype)
+addGraph(testblock, testgraphtype2)
+finalise(Block, Building, "test-block", )
+
+
+
+*/
 module.exports = {
     energyGraph: _BlockGraph,
     powerProps: _GraphPropsCommon,
     powercommon: _GraphCommon,
     dirs: _dirs,
+	init(custBlock, custBuild){
+		return {
+			block:Object.create(_GraphCommonBlock,custBlock),
+			build:Object.create(_GraphCommonBuild,custBuild),
+		}
+	},
 	addGraph(bcustom, graphConnector) {
-		Object.assign(bcustom.block. )
+		bcustom.block.setGraphConnectorBlock(Object.create(graphConnector.block));
+		bcustom.block.setGraphConnectorBuilding(Object.create(graphConnector.build));
+		bcustom.block.setGraphConnectorBuilder(Object.create(graphConnector.graph));
 	},
-	finalise(Type, Entity, name, customGraphBlock) {
-		
-	},
-	/*
-    torqueExtend(Type, Entity, name, baseType, def, customEnt) {
-        const block = Object.create(baseType.block);
-        Object.assign(block, def);
-        const rotpowerBlock = extendContent(Type, name, block);
-        rotpowerBlock.buildType = () => {
-            let building = extend(Entity, Object.create(Object.assign(deepCopy(baseType.build), deepCopy(customEnt))));
+	finaliseExtend(Type, Entity, name, bcustom) {
+		const rotpowerBlock = extendContent(Type, name, bcustom.block);
+		rotpowerBlock.buildType = () => {
+            let building = extend(Entity, bcustom.build);
             building.block = rotpowerBlock;
             return building;
         };
-        return rotpowerBlock;
-    },
-    torqueExtendContent(Type, Entity, name, baseType, def, customEnt) {
-        const block = Object.create(baseType.block);
-        Object.assign(block, def);
-        const rotpowerBlock = extendContent(Type, name, block);
-        rotpowerBlock.buildType = () => {
-            let building = extendContent(Entity, rotpowerBlock, Object.create(Object.assign(deepCopy(baseType.build), deepCopy(customEnt))));
+		return rotpowerBlock;
+	},
+	finaliseExtendContent(Type, Entity, name, bcustom) {
+		const rotpowerBlock = extendContent(Type, name, bcustom.block);
+		rotpowerBlock.buildType = () => {
+            let building = extendContent(Entity,rotpowerBlock, bcustom.build);
             building.block = rotpowerBlock;
             return building;
         };
-        return rotpowerBlock;
-    },*/
-
-    //_TorqueConsumer
-    getConnectSidePos: getConnectSidePos,
-    drawRotRect: _drawRotRect,
-    drawRotQuad: _drawRotQuad,
-    drawQuad: _drawQuad,
-    drawQuadA: _drawQuadA,
-    drawSlideRect: _drawSlideRect,
-    torqueFuncs: _Torque_Speed_Funcs,
-    baseTypes: _baseTypes
+		return rotpowerBlock;
+	},
 }

@@ -64,6 +64,7 @@ const script = [
 			"funclib",
 			"arena",
 			"rotpowerlib",
+			"graphlib",
 			"unitloader"/*,
             "shieldbulletlib"*/
         ]
