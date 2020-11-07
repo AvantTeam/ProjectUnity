@@ -1,8 +1,7 @@
 //imports
-importPackage(Packages.arc.g2d);
 
 //credit to younggam setting example of how to build new overlay resrouce(heat) and deltanedas for example of block graph system via phase router.
-
+//rotpowerlib with the fat cut out.
 function deepCopy(obj) {
     var clone = {};
     for (var i in obj) {
@@ -34,72 +33,104 @@ function sqrd(x) {
     return x * x;
 }
 
-const _Torque_Speed_Funcs = {
-    //s- max rated speed
-    //m- max torque
-    //h- inital torque
 
-    //basic motor/generator
-    linear(x, s, m, h, k) {
-        x = Math.min(s, x);
-        return Math.min(k * (s - x) * m / s, 99999);
+const _GraphCommonBuild = {
+	graphs:{},
+	prev_tile_rotation: -1,
+	getGraphConnector(name){
+		return this.graphs[name];
+	},
+	setGraphConnector(graph){
+		this.graphs[graph.name] = graph;
+		this.graphs[graph.name].getBuild = function(){
+			return this;
+		}
+	},
+	create(block, team) {
+        let building = this.super$create(block, team);
+		for(let graphname in this.graphs) {
+		  let graphConn = this.graphs[graphname];
+		  graphConn.onCreate(building)
+		}
+        this.prev_tile_rotation = -1;
+		
+
     },
-    //used for combustion
-    quadratic(x, s, m, h, k) {
-        let s2 = s * s;
-        x = Math.min(s, x);
-        let h1 = Mathf.sqrt(m * s2 * s2 * (m - h)) + m * s2;
-        return h + ((h * s2 - 2 * h1) * x * x) / (s2 * s2) + 2 * ((h1 - h * s2) * x * x) / (s2 * s);
-    },
-    //advanced electric motor
-    induction(x, s, m, h, k) {
-        x = Math.min(s, x);
-        return m * Mathf.log(s + 1 - x) * Mathf.pow(e, -k * sqrd(x - s * 0.8)) + (s - x) * (m / s);
-    },
-
-};
-
-
-
-const _RotPowerCommon = {
-
-    drawPlace(x, y, rotation, valid) {
-        for (let i = 0; i < this._accept.length; i++) {
-            if (this._accept[i] == 0) {
-                continue;
-            }
-            Lines.stroke(3.5, Color.white);
-            let outpos = getConnectSidePos(i, this.size, rotation);
-            let dx = (outpos.toPos.x + x) * Vars.tilesize;
-            let dy = (outpos.toPos.y + y) * Vars.tilesize;
-            let dir = _dirs[outpos.dir];
-            Lines.line(dx - dir.x, dy - dir.y, dx - dir.x * 2, dy - dir.y * 2);
+	updateTile() {
+		if (this.block.getUseOgUpdate()) {
+            this.super$updateTile();
         }
-        this.super$drawPlace(x, y, rotation, valid);
-
+		this.updatePre();
+		if (this.prev_tile_rotation != this.rotation) {
+			for(let graphname in this.graphs) {
+				this.graphs[graphname].onRotationChanged(this.prev_tile_rotation,this.rotation);
+			}
+		}
+		for(let graphname in this.graphs) {
+			this.graphs[graphname].onUpdate();
+		}
+		this.updatePost();
+		this.prev_tile_rotation = this.rotation;
+	}
+	updatePost() {},
+    updatePre() {},
+	
+	samepos(b) {
+        return b.tileX() == this.tileX() && b.tileY() == this.tileY();
     },
+    onProximityUpdate() {
+        this.super$onProximityUpdate();
+        //removal soon tm
+		for(let graphname in this.graphs) {
+			this.graphs[graphname].proximityUpdateCustom();
+		}
+    },
+}
 
-    setStats() {
+const _GraphCommonBlock = {
+	graphBlocks:{},
+	graphBuilders:{},
+	graphBuildings:{},
+	getGraphConnectorBlock(name){
+		return graphBlocks[name];
+	},
+	setGraphConnectorBlock(graph){
+		this.graphBlocks[graph.name] = graph;
+	},
+	injectGraphConnectors(building){
+		
+	},
+	getGraphConnectorBuilding(name){
+		return graphBuildings[name];
+	},
+	setGraphConnectorBuilding(graph){
+		this.graphBuildings[graph.name] = graph;
+	},
+	setStats() {
         this.super$setStats();
         const sV = new StatValue({
             display(table) {
-                table.add("test [cyan]1[white]2[gray]3");
+				for(let graphstat in this.graphBlocks) {
+					this.graphBlocks[graphstat].setStats(table);
+				}
             }
         });
-        this.stats.add(Stat.powerDamage, sV);
-
+        this.stats.add(Stat.abilities, sV);
     },
-    otherStats() {},
+}
+
+
+
+const _GraphCommon = {
+
+    setStats(table) {
+		table.add("test [cyan]1[white]2[gray]3");
+	},
 
     _accept: [],
     _multi_graph_connector: false,
     _network_connector: true,
     _use_original_update: true,
-    _torqueFunc: _Torque_Speed_Funcs.linear,
-    //objects that generate torque have a max speed, its torque is dependant on how close the system shaft speed is to it, gear transmission is needed to achieve higher speeds.
-    getForce(current_speed, target_speed, max_torque, init_torque, force_coeff) {
-        return this._torqueFunc(current_speed, target_speed, max_torque, init_torque, force_coeff);
-    },
     // whether it calls the super's updateTile
     getUseOgUpdate() {
         return this._use_original_update;
@@ -172,10 +203,10 @@ function getConnectSidePos(index, size, rotation) {
 }
 
 
-const _RotPowerPropsCommon = {
+const _GraphPropsCommon = {
 
     getConnectSidePos(index) {
-        return getConnectSidePos(index, this.block.size, this.rotation);
+        return getConnectSidePos(index, this.getBlock().block.size, this.getBlock().rotation);
     },
     canConnect(pos) {
 		//recalc ports returning wrong values.
@@ -187,49 +218,12 @@ const _RotPowerPropsCommon = {
         }
         return -1;
     },
-    onProximityUpdate() {
-        this.super$onProximityUpdate();
-        //removal soon tm
-        this.proximityUpdateCustom();
-    },
-    display(table) {
-        this.super$display(table);
-        if (!this._network) {
-            return;
-        }
-        let ps = " " + StatUnit.perSecond.localized();
-        let net = this._network;
-        let speed = this._network.lastVelocity / 60.0;
-        table.row();
-        table.table(
-            cons(sub => {
-                sub.clearChildren();
-                sub.left();
-                sub.label(prov(() => {
-                    return Strings.fixed(net.lastVelocity / 6.0, 2) + "r" + ps;
-                })).color(Color.lightGray);
 
-                /*l.update(run(()=>{
-                	
-                });*/
-            })
-        ).left();
-    },
-
-    create(block, team) {
-        let building = this.super$create(block, team);
+    onCreate(building) {
         this.initAllNets(building);
         this.needsNetworkUpdate = true;
-        this.prev_tile_rotation = -1;
-
-
     },
 
-    rotation(newrot) {
-        this.super$rotation(newrot);
-        //print("rotated to " + newrot);
-        this.recalcPorts();
-    },
 
     recalcPorts() {
 		//print("reclac ports with rotation " + this.rotation);
@@ -244,7 +238,7 @@ const _RotPowerPropsCommon = {
                 this._acceptPorts.push(pos);
             }
         }
-		this._lastRecalc=this.rotation;
+		this._lastRecalc=this.getBuild().rotation;
 
     },
     onRemoved() {
@@ -271,81 +265,63 @@ const _RotPowerPropsCommon = {
         }
 
     },
-    prev_tile_rotation: -1,
-    updateTile() {
-        if (this.block.getUseOgUpdate()) {
-            this.super$updateTile();
-        }
+    
+    onUpdate() {
         if (this._dead) {
             return;
         }
-        if (this.prev_tile_rotation != this.rotation) {
-            if (this.prev_tile_rotation != -1) {
-                print("rotated to " + this.rotation);
-                this.deleteSelfFromNetwork();
-                this.deleteFromNeighbours();
-                this._dead = false;
-                this.initAllNets(this);
-                this._neighbourArray = [];
-            }
-            this.recalcPorts();
-            this.needsNetworkUpdate = true;
-        }
-        this.updatePre();
+       
         this.updateNetworks();
         this.updateExtension();
-        this.updatePost();
-        this.prev_tile_rotation = this.rotation;
+        
+       
     },
+	onRotationChanged(prevrot,newrot){
+		 if (prevrot != -1) {
+			this.deleteSelfFromNetwork();
+			this.deleteFromNeighbours();
+			this._dead = false;
+			this.initAllNets(this);
+			this._neighbourArray = [];
+		}
+		this.recalcPorts();
+		this.needsNetworkUpdate = true;
+		
+	}
     updateNetworks() {
         if (this._network) {
             if (this.needsNetworkUpdate) {
                 this.needsNetworkUpdate = false;
                 this._network.rebuildGraph(this);
                 if (this.networkSaveState) {
-                    if (this._speedcache) {
-                        this._network.lastVelocity = this._speedcache;
-                    }
+					this.applySaveState(this._network, this._saveCache[0]);
                     this.networkSaveState = 0;
                 }
             }
             this._network.update();
-            this.accumRotation(this._network.lastVelocity);
-            this.setSpeedCache(this._network.lastVelocity);
+            this.updateProps(this._network,0);
         }
     },
+	applySaveState(graph,cache) {},
     updateExtension() {},
-    updatePost() {},
-    updatePre() {},
+	updateProps(graph,index) {},
     proximityUpdateCustom() {},
-
-    drawSelect() {
-        this.super$drawSelect();
-        if (this._network) {
-            this._network.connected.each(cons(building => {
-                Drawf.selected(building.tileX(), building.tileY(), building.block, Pal.accent);
-            }));
-        }
-    },
-
 
     //variables for network
     _graphset: null,
     _dead: false,
     _acceptPorts: [],
+	_saveCache:[],
+	_propsList: [],
     _neighbourArray: null,
     _network: null,
-    _rotation: 0,
-    _force: 0,
-    _inertia: 10,
-    _friction: 0.1,
 	_lastRecalc: 0,
     //this is used to store local speed.
     _speedcache: 0,
     initAllNets(buildingnew) {
-        //_EnergyGraph.new(building)
+        //_BlockGraph.new(building)
         this.recalcPorts();
-        this.setNetwork(_EnergyGraph.new(buildingnew));
+        this.setNetwork(_BlockGraph.new(this));
     },
     getDead() {
         return this._dead;
@@ -356,16 +332,13 @@ const _RotPowerPropsCommon = {
 	getLastRecalc() {
         return this._lastRecalc;
     },
-    samepos(b) {
-        return b.tileX() == this.tileX() && b.tileY() == this.tileY();
-    },
     getNeighbour(building) {
         if (!this._neighbourArray) {
             return;
         }
         let found = null;
         this.eachNeighbour(neigh => {
-            if (neigh.build.samepos(building)) {
+            if (neigh.build.getBuild().samepos(building.getBuild())) {
                 found = neigh;
             }
         });
@@ -441,61 +414,18 @@ const _RotPowerPropsCommon = {
     setNetworkOfPort(index, net) {
         this._network = net;
     },
-    getForce() {
-        return this._force;
-    },
-    setForce(n_force) {
-
-        this._force = n_force;
-    },
-    getInertia() {
-        return this._inertia;
-    },
-    setInertia(n_inertia) {
-        this._inertia = n_inertia;
-    },
-    getRotation() {
-        return this._rotation;
-    },
-    setRotation(n_rotation) {
-        this._rotation = n_rotation;
-    },
-    accumRotation(n_rotation) {
-        this._rotation += n_rotation;
-        this._rotation = this._rotation % (360 * 24);
-    },
-    getFriction() {
-        return this._friction;
-    },
-    setFriction(n_friction) {
-        this._friction = n_friction;
-    },
-    getSpeedCache() {
-        return this._speedcache;
-    },
-    setSpeedCache(ns) {
-        this._speedcache = ns;
-    },
-    readSpeedCache(stream, revision) {
-        this._speedcache = stream.f();
-    },
-    writeSpeedCache(stream) {
-        stream.f(this._speedcache);
-    },
-
+	writeGlobal(stream) {},
+	readGlobal(stream, revision) {},
+	writeLocal(stream,graph) {},
+	readLocal(stream, revision) {}, //returns a cache object
     write(stream) {
-        this.super$write(stream);
-        stream.f(this._force);
-        stream.f(this._inertia);
-        stream.f(this._friction);
-        this.writeSpeedCache(stream);
+        this.writeGlobal(stream);
+        this.writeLocal(stream,this._network);
     },
     read(stream, revision) {
-        this.super$read(stream, revision);
-        this._force = stream.f();
-        this._inertia = stream.f();
-        this._friction = stream.f();
-        this.readSpeedCache(stream, revision);
+        this.readGlobal(stream, revision);
+        let cachearray = [this.readLocal(stream, revision)];
+		this._saveCache = cachearray;
         this.networkSaveState = 1;
     }
 
@@ -504,10 +434,8 @@ const _RotPowerPropsCommon = {
 
 
 
-const _TorqueMulticonnectorProps = Object.assign(Object.create(_RotPowerPropsCommon), {
+const _TorqueMulticonnectorProps = Object.assign(Object.create(_GraphPropsCommon), {
     _networkList: [],
-    _networkRots: [],
-    _networkSpeeds: [],
     getNetworks() {
         return this._networkList;
     },
@@ -528,7 +456,7 @@ const _TorqueMulticonnectorProps = Object.assign(Object.create(_RotPowerPropsCom
         return false;
     },
     initAllNets(buildingnew) {
-        //_EnergyGraph.new(building)
+        //_BlockGraph.new(building)
         this.recalcPorts();
         let templist = [];
         this._networkList = [];
@@ -536,7 +464,7 @@ const _TorqueMulticonnectorProps = Object.assign(Object.create(_RotPowerPropsCom
         let networksmade = 0;
         for (let i = 0; i < portarray.length; i++) {
             if (!templist[portarray[i] - 1] && portarray[i] != 0) {
-                templist.push(_EnergyGraph.new(buildingnew));
+                templist.push(_BlockGraph.new(this));
                 networksmade++;
             }
         }
@@ -591,7 +519,6 @@ const _TorqueMulticonnectorProps = Object.assign(Object.create(_RotPowerPropsCom
         }
         this._networkList[l - 1] = net;
     },
-
     getConnectedNeighours(index) {
         let portarray = this.getAcceptPorts();
         let targetport = this.block.getAccept()[index];
@@ -635,28 +562,18 @@ const _TorqueMulticonnectorProps = Object.assign(Object.create(_RotPowerPropsCom
             }
             if (this.networkSaveState) {
                 for (let i = 0; i < this._networkList.length; i++) {
-                    if (this._networkSpeeds[i]) {
-                        this._networkList[i].lastVelocity = Math.max(this._networkList[i].lastVelocity, this._networkSpeeds[i]);
-                    }
+					this.applySaveState(this._networkList[i], this._saveCache[i]);
                 }
             }
             this.networkSaveState = 0;
         }
 
-        //rotation for vfx
         for (let i = 0; i < this._networkList.length; i++) {
             if (!this._networkList[i]) {
-                print("somehow network is not defined but update was called.");
-                print("network list:" + this._networkList);
                 continue;
             }
             this._networkList[i].update();
-            if (this._networkRots[i] === undefined) {
-                this._networkRots[i] = 0;
-            }
-            this._networkSpeeds[i] = this._networkList[i].lastVelocity;
-            this._networkRots[i] += this._networkList[i].lastVelocity;
-            this._networkRots[i] = Mathf.mod(this._networkRots[i], 360);
+            this.updateProps(networkList[i],i);
         }
         this.needsNetworkUpdate = false;
     },
@@ -669,231 +586,28 @@ const _TorqueMulticonnectorProps = Object.assign(Object.create(_RotPowerPropsCom
             this._networkList[i].remove(this);
         }
     },
-    readSpeedCache(stream, revision) {
-
-        let netam = stream.i();
-        //print("loading multiconnector with "+netam+" connections");
-        for (let i = 0; i < netam; i++) {
-            this._networkSpeeds[i] = stream.f();
-            //print("net "+i+"'s speeds");
-            if (this._networkSpeeds[i] === undefined) {
-                this._networkSpeeds[i] = 0;
-            }
-        }
+	
+	
+	write(stream) {
+        this.writeGlobal(stream);
+		stream.i(this._networkList.length);
+		for (let i = 0; i < this._networkList.length; i++) {
+			this.writeLocal(stream,this._networkList[i]);
+		}
     },
-    writeSpeedCache(stream) {
-        stream.i(this._networkList.length);
-        for (let i = 0; i < this._networkList.length; i++) {
-            if (this._networkSpeeds[i] === undefined) {
-                this._networkSpeeds[i] = 0;
-            }
-            stream.f(this._networkSpeeds[i]);
-        }
-    },
-
-});
-
-
-const _TorqueTransmission = Object.assign({
-
-    //transmission ratio
-    _ratio: [1, 2],
-    getRatio() {
-        return this._ratio
-    },
-    setRatio(new_val) {
-        this._ratio = new_val
-    },
-
-
-
-}, _RotPowerCommon);
-
-
-const _TorqueTransmissionProps = Object.assign(Object.create(_TorqueMulticonnectorProps), {
-	getPortRatio(index) {
-        let l = this.block.getAccept()[index];
-        if (l == 0) {
-            return 0;
-        }
-        return this.block.getRatio()[l - 1];
-    },
-    getPortRatioNeighour(index) {
-        return this.getPortRatio(this.getAcceptPorts()[index].index);
-    },
-    updateExtension() {
-        //transmission distribution 
-        if (this._networkList.length == 0 || this.dead) {
-            return;	
-        }
-        let ratios = this.block.getRatio();
-        let totalmratio = 0;
-        let totalm = 0;
-        let allpositive = true;
-        for (let i = 0; i < ratios.length; i++) {
-            totalmratio += this._networkList[i].lastInertia * ratios[i];
-            totalm += this._networkList[i].lastInertia * this._networkList[i].lastVelocity;
-            allpositive = allpositive && this._networkList[i].lastInertia > 0;
-        }
-        if (totalmratio != 0 && totalm != 0 && allpositive) {
-            for (let i = 0; i < ratios.length; i++) {
-                let cratio = (this._networkList[i].lastInertia * ratios[i]) / totalmratio;
-                this._networkList[i].lastVelocity = totalm * cratio / this._networkList[i].lastInertia;
-            }
-        }
-    },
-
-});
-
-const _TorqueGenerator = Object.assign({
-
-    //motor max rated speed
-    _max_speed: 10,
-    //a parameter for motor strength for some motors
-    _torque_coeff: 1,
-    //motor max rated stength, edit this if you need to change motor strength 
-    _maxtorque: 5,
-    //motor strength at no rotation speed used for the combustion motors
-    _starttorque: 5,
-    getMaxSpeed() {
-        return this._max_speed
-    },
-    setMaxSpeed(new_val) {
-        this._max_speed = new_val
-    },
-    getTorqueCoeff() {
-        return this._torque_coeff
-    },
-    setTorqueCoeff(new_val) {
-        this._torque_coeff = new_val
-    },
-    getMaxTorque() {
-        return this._maxtorque
-    },
-    setMaxTorque(new_val) {
-        this._maxtorque = new_val
-    },
-    getStartTorque() {
-        return this._starttorque
-    },
-    setStartTorque(new_val) {
-        this._starttorque = new_val
-    },
-
-
-
-
-}, _RotPowerCommon);
-
-const _TorqueGeneratorProps = Object.assign(Object.create(_RotPowerPropsCommon), {
-    _motor_force_mult: 1.0,
-    _smoothedForce: null,
-    getSmoothedForce() {
-        if (!this._smoothedForce) {
-            return 0;
-        }
-        return this._smoothedForce.mean();
-    },
-    updateExtension() {
-        let block = this.block;
-        this.setForce(this.block.getForce(
-            this.getNetwork().lastVelocity,
-            block.getMaxSpeed(),
-            block.getMaxTorque(),
-            block.getStartTorque(),
-            block.getTorqueCoeff()
-        ) * this.edelta() * this._motor_force_mult);
-        if (!this._smoothedForce) {
-            this._smoothedForce = new WindowedMean(40);
-        }
-        this._smoothedForce.add(this.getForce());
-    },
-
-    getMotorForceMult() {
-        return this._motor_force_mult
-    },
-    setMotorForceMult(new_val) {
-        this._motor_force_mult = new_val
-    },
-
-    displayBars(barsTable) {
-        this.super$displayBars(barsTable);
-        let block = this.block;
-
-        barsTable.add(new Bar(
-            prov(() => Core.bundle.get("stat.unity.torque") + ": " + Strings.fixed(this.getSmoothedForce(), 1) + "/" + Strings.fixed(block.getMaxTorque(), 1)),
-            prov(() => Pal.darkishGray),
-            floatp(() => this.getSmoothedForce() / block.getMaxTorque()))).growX();
-        barsTable.row();
-    },
-});
-
-const _TorqueConsumer = Object.assign(Object.create(_RotPowerCommon), {
-    //speed at which diminshing returns kicks in
-    _nominal_speed: 10,
-    //a multiplier ontop the dimishing returns, higher the less diminshing the returns, anything above 0.7 will result in a temporary reversal of diminishing returns
-    _oversupply_falloff: 0.7,
-    //idle friction
-    _idle_friction: 0.01,
-    //working friction
-    _working_friction: 0.1,
-
-    getNominalSpeed() {
-        return this._nominal_speed
-    },
-    setNominalSpeed(new_val) {
-        this._nominal_speed = new_val
-    },
-
-    getFalloff() {
-        return this._oversupply_falloff
-    },
-    setFalloff(new_val) {
-        this._oversupply_falloff = new_val
-    },
-
-    getIdleFriction() {
-        return this._idle_friction
-    },
-    setIdleFriction(new_val) {
-        this._idle_friction = new_val
-    },
-
-    getWorkingFriction() {
-        return this._working_friction
-    },
-    setWorkingFriction(new_val) {
-        this._working_friction = new_val
-    },
-
-
-
-});
-
-const _TorqueConsumerProps = Object.assign(Object.create(_RotPowerPropsCommon), {
-    offCondition() {
-        return false;
-    },
-    updateExtension() {
-        if (!this.enabled || this.offCondition()) {
-            this.setFriction(this.block.getIdleFriction());
-        } else {
-            this.setFriction(this.block.getWorkingFriction());
-        }
-    },
-    efficiency() {
-        let block = this.block;
-        let vel = this.getNetwork().lastVelocity;
-        let p = this.super$efficiency();
-        let ratio = vel / block.getNominalSpeed();
-        if (ratio > 1) {
-            ratio = Mathf.log2(ratio);
-            ratio = 1 + ((ratio) * block.getFalloff());
-        }
-        p *= ratio;
-        return p;
+    read(stream, revision) {
+        this.readGlobal(stream, revision);
+		let netam = stream.i();
+        let cachearray = [];
+		for (let i = 0; i < netam; i++) {
+			cachearray.push(this.readLocal(stream, revision));
+		}
+		this._saveCache = cachearray;
+        this.networkSaveState = 1;
     }
+
 });
+
 
 
 
@@ -904,18 +618,12 @@ function getnetID() {
     return uniqueidincre;
 }
 
-const _EnergyGraph = {
-    lastInertia: 0,
-    lastGrossForceApplied: 0,
-    lastNetForceApplied: 0,
-    lastVelocity: 0,
-    lastFrictionCoefficent: 0,
+const _BlockGraph = {
     lastFrameUpdated: 0,
     id: 0,
-    relativeRatio: 1,
     //'connected' is the graph's field of building set
-    new(building) {
-        const graph = Object.create(_EnergyGraph);
+    new(building,diff) {
+        const graph = Object.create(_BlockGraph,diff);
         graph.id = getnetID();
         graph.connected = ObjectSet.with(building);
         return graph;
@@ -923,7 +631,7 @@ const _EnergyGraph = {
     },
 
     copyGraph(building) {
-        const copygraph = _EnergyGraph.new(building)
+        const copygraph = _BlockGraph.new(building)
         copygraph.lastVelocity = this.lastVelocity;
         return copygraph;
 
@@ -933,34 +641,10 @@ const _EnergyGraph = {
         if (Core.graphics.getFrameId() == this.lastFrameUpdated)
             return;
         this.lastFrameUpdated = Core.graphics.getFrameId();
-        this.updateStat();
-
-        let netForce = this.lastGrossForceApplied - this.lastFrictionCoefficent * this.lastVelocity * this.lastVelocity;
-
-        this.lastNetForceApplied = netForce;
-        //newton's second law
-        let acceleration = netForce / this.lastInertia;
-        if (this.lastInertia == 0) {
-            acceleration = 0;
-        }
-        this.lastVelocity = this.lastVelocity + acceleration * Time.delta;
-        this.lastVelocity = Math.max(0, this.lastVelocity);
+        this.updateGraph();
     },
 
-    updateStat() {
-        let forceapply = 0;
-        let friccoeff = 0;
-        let iner = 0;
-        this.connected.each(cons(building => {
-            forceapply += building.getForce();
-            friccoeff += building.getFriction();
-            iner += building.getInertia();
-        }));
-        this.lastFrictionCoefficent = friccoeff;
-        this.lastGrossForceApplied = forceapply;
-        this.lastInertia = iner;
-
-    },
+    updateGraph() {},
     addBuilding(building, connectIndex) {
         this.connected.add(building);
         building.setNetworkOfPort(connectIndex, this);
@@ -976,15 +660,9 @@ const _EnergyGraph = {
             return;
         }
         //avoiding unupdated graphs connecting.
-        this.updateStat();
-        graph.updateStat();
-        let momentumA = this.lastVelocity * this.lastInertia;
-        let momentumB = graph.lastVelocity * graph.lastInertia;
-        this.lastVelocity = (momentumA + momentumB) / (this.lastInertia + graph.lastInertia);
-
-
-        //print("merging:"+graph.connectedToString());
-        //print("into:"+this.connectedToString());
+        this.updateGraph();
+        graph.updateGraph();
+		this.mergeStats(graph);
         graph.connected.each(cons(building => {
             //some buildings may be connected to two seperate networks due to how gear transmission works.
             if (!this.connected.contains(building)) {
@@ -994,9 +672,8 @@ const _EnergyGraph = {
             }
 
         }));
-        //print("result:"+this.connectedToString());
-
     },
+	mergeStats(graph){},
     remove(building) {
         if (!this.connected.contains(building)) {
             return;
@@ -1005,10 +682,8 @@ const _EnergyGraph = {
         if (c === 0) {
             return;
         }
-        //print("-------------begining remove");
         if (c === 1) {
-            //todo: find out why this isnt triggering.
-            //print("only one neighbour, removing without rebuilding network.");
+			//if theres only one neighbour it means removing this wont disconnect two seperate parts of the graph, and therefore can be just removed directly.
             this.connected.remove(building);
             building.eachNeighbour(neighbourindex => {
                 neighbourindex.build.removeNeighbour(building);
@@ -1018,9 +693,8 @@ const _EnergyGraph = {
         this.connected.clear();
         let networksadded = null;
         let newnets = 0;
-        //print(building.getNeighbourArray());
-        //need to erase all the graph references of the adjacent blocks first, but not with null since each tile is garanteed* to have a graph
-        //having multi-connector blocks makes this hard to brain
+
+		//reset each neighbour to a contained network
         building.eachNeighbour(neighbour => {
             let copynet = building.getNetworkOfPort(neighbour.portindex);
             if (copynet == this) {
@@ -1054,11 +728,9 @@ const _EnergyGraph = {
     },
 
     rebuildGraph(building) {
-        //print("----Starting new rebuild");
         this.rebuildGraphWithSet(building, ObjectSet.with(building), -1);
     },
     rebuildGraphIndex(building, index) {
-        //print("----Starting new rebuild");
         this.rebuildGraphWithSet(building, ObjectSet.with(building), index);
     },
     rebuildGraphWithSet(root, searched, rootindex) {
@@ -1083,79 +755,79 @@ const _EnergyGraph = {
 
                 total++;
 
-                let building = current.build;
+                let buildConnector = current.build;
                 let index = current.parentConnectPort;
 
-                if (!building.block.getAccept()) {
+                if (!buildConnector.block.getAccept()) {
                     print("oh no, accept ports not found");
                     return;
                 }
-                let acceptports = building.getAcceptPorts();
+                let acceptports = buildConnector.getAcceptPorts();
                 if (index != -1) {
-                    acceptports = building.getConnectedNeighours(index);
+                    acceptports = buildConnector.getConnectedNeighours(index);
                 }
                 let prevbuilding = null;
-                searched.add(building);
-                //print("rebuilding from:"+building.block.localizedName+" at port"+ index+ ",building has rotation of: "+building.rotation);
+                searched.add(buildConnector);
+                //print("rebuilding from:"+buildConnector.block.localizedName+" at port"+ index+ ",buildConnector has rotation of: "+buildConnector.rotation);
                 //print("ports to scan:"+acceptports);
 
                 for (let port = 0; port < acceptports.length; port++) {
                     let portindex = acceptports[port].index;
-                    if (!building.getNetworkOfPort(portindex)) {
+                    if (!buildConnector.getNetworkOfPort(portindex)) {
                         continue;
                     }
                     let portinfo = acceptports[port];
-                    if (!building.tile) {
+                    if (!buildConnector.getBuild().tile) {
                         return;
                     }
-                    let tile = building.tile.nearby(portinfo.x, portinfo.y);
+                    let tile = buildConnector.getBuild().tile.nearby(portinfo.x, portinfo.y);
                     // guess the world doesnt exist or something
                     if (!tile) {
                         return;
                     }
                     if (tile.block().getIsNetworkConnector != undefined) {
-                        //conbuild -> connected building
-                        let conbuild = tile.bc();
+                        //conbuild -> connected buildConnector
+                        let conbuild = tile.bc().getGraphConnector(this.name);
                         if (conbuild == prevbuilding || conbuild.getDead()) {
                             continue;
                         }
-                        let thisgraph = building.getNetworkOfPort(portindex);
+                        let thisgraph = buildConnector.getNetworkOfPort(portindex);
 						// networks in multiplayer are intialised with rotation of 0 then updated later. this results in many problems.
-						if(conbuild.rotation!=conbuild.getLastRecalc()){
+						if(conbuild.getBuild().rotation!=conbuild.getLastRecalc()){
 							conbuild.recalcPorts();
 						}
                         let fpos = {
                             x: portinfo.fromx,
                             y: portinfo.fromy
                         };
-                        fpos.x += building.tile.x;
-                        fpos.y += building.tile.y;
+                        fpos.x += buildConnector.getBuild().tile.x;
+                        fpos.y += buildConnector.getBuild().tile.y;
                         let connectIndex = conbuild.canConnect(fpos);
                         if (connectIndex == -1) {
                             continue;
                         }
-                        //print("found suitable connecting building: current block is connected at port "+connectIndex+" of other building at coord "+fpos.x+","+fpos.y);
-                        building.addNeighbour({
+                        //print("found suitable connecting buildConnector: current block is connected at port "+connectIndex+" of other buildConnector at coord "+fpos.x+","+fpos.y);
+                        buildConnector.addNeighbour({
                             build: conbuild,
                             portindex: portindex
                         });
                         conbuild.addNeighbour({
-                            build: building,
+                            build: buildConnector,
                             portindex: connectIndex
                         });
                         //buildings without a network instance are assumed to be dead
                         let connet = conbuild.getNetworkOfPort(connectIndex);
                         if (!thisgraph.connected.contains(conbuild) && connet) {
-                            if (!building.hasNetwork(connet)) {
+                            if (!buildConnector.hasNetwork(connet)) {
                                 if (connet.connected.contains(conbuild)) {
 
                                     thisgraph.mergeGraph(connet);
-                                    thisgraph = building.getNetworkOfPort(portindex);
+                                    thisgraph = buildConnector.getNetworkOfPort(portindex);
                                     //print("external net:"+connet.connectedToString());
                                     //print("network merged:"+thisgraph.connectedToString());
 
                                 } else {
-                                    //print("network doesnt not contain target building, assuming hollowed network, directly adding...");
+                                    //print("network doesnt not contain target buildConnector, assuming hollowed network, directly adding...");
                                     //print("network polled:"+connet.connectedToString());
                                     thisgraph.addBuilding(conbuild, connectIndex);
                                 }
@@ -1176,7 +848,7 @@ const _EnergyGraph = {
                                 //print("Graphs are the same(id:"+connet.id+"), skipping..");
                             }
                         } else {
-                            //print("Graph already contains building, skipping..");
+                            //print("Graph already contains buildConnector, skipping..");
                         }
                         prevbuilding = conbuild;
                     }
@@ -1199,167 +871,18 @@ const _EnergyGraph = {
     //debug
     connectedToString() {
         let s = "Network:" + this.id + ":";
-        this.connected.each(cons(building => {
-            s += building.block.localizedName + ", "
+        this.connected.each(cons(buildConnector => {
+            s += buildConnector.block.localizedName + ", "
         }));
         return s;
     }
 }
 
 
-//draws a non-rectangular quad sprite by directly polling vertex data.
-//mindustry's vertex batcher loads float arrays in the following format:
-/*
-	0-x
-	1-y
-	2-color (packed)
-	3-u
-	4-v
-	... repeat for every vertex
-*/
-
-//r is texture region
-function _drawQuad(r, x, y, x2, y2, x3, y3, x4, y4) {
-    let color = Draw.getColor().toFloatBits();
-
-    Draw.vert([
-        x, y, color, r.u, r.v,
-        x2, y2, color, r.u2, r.v,
-        x3, y3, color, r.u2, r.v2,
-        x4, y4, color, r.u, r.v2
-    ]);
-}
-
-function _drawQuadA(r, verts) {
-    let color = Draw.getColor().toFloatBits();
-
-    Draw.vert([
-        verts[0], verts[1], color, r.u, r.v,
-        verts[2], verts[3], color, r.u2, r.v,
-        verts[4], verts[5], color, r.u2, r.v2,
-        verts[6], verts[7], color, r.u, r.v2
-    ]);
-}
-
-//same as below, but used for sloped surfaces (e.g. bevel gears)
-function _drawRotQuad(region, x, y, w, h1, h2, rot, ang1, ang2) {
-    if (!Core.settings.getBool("effects")) {
-        return;
-    }
-    let amod1 = Mathf.mod(ang1, 360);
-    let amod2 = Mathf.mod(ang2, 360);
-    if (amod1 >= 180 && amod2 >= 180) {
-        return;
-    }
-
-    let s1 = -Mathf.cos(ang1 * Mathf.degreesToRadians);
-    let s2 = -Mathf.cos(ang2 * Mathf.degreesToRadians);
-    if (amod1 > 180) {
-        s1 = -1;
-    } else if (amod2 > 180) {
-        s2 = 1;
-    }
-    vert = [
-        -w * 0.5, //x1
-        Mathf.map(s1, -1, 1, -h1 * 0.5, h1 * 0.5), //y1
-        -w * 0.5, //x2
-        Mathf.map(s2, -1, 1, -h1 * 0.5, h1 * 0.5), //y2
-        w * 0.5, //etc
-        Mathf.map(s2, -1, 1, -h2 * 0.5, h2 * 0.5),
-        w * 0.5,
-        Mathf.map(s1, -1, 1, -h2 * 0.5, h2 * 0.5),
-    ];
-
-    //Draw.rect gives us a convinient rotate paramter, we dont have such luxury here.
-    let s = Mathf.sin(rot * Mathf.degreesToRadians);
-    let c = Mathf.cos(rot * Mathf.degreesToRadians);
-    for (let i = 0; i < 8; i += 2) {
-        //(x+iy)*(c+is) = xc-sy + i(cy+sx)
-        //can be optimised to one temp variable but who cares.
-        let nx = vert[i] * c - vert[i + 1] * s;
-        let ny = vert[i + 1] * c + vert[i] * s;
-        vert[i] = nx;
-        vert[i + 1] = ny;
-    }
-    //pray for the best.
-    this._drawQuadA(region, vert);
-}
-
-
-//draws the distorted sprite used to make the rotating shaft effect.
-//x and y are assumed to refer to the center of the area.
-//w,h is the size in world units of the texture to distort.
-//th is the hieght of the texture in world units.
-//rot is used for the rotation of the block itself
-//ang1 ,ang2 is the two angles the sprite is distorted across, only draws if its visible, aka one of the angles is between 0 and 180
-function _drawRotRect(region, x, y, w, h, th, rot, ang1, ang2) {
-    if (!Core.settings.getBool("effects")) {
-        return;
-    }
-    if (!region) {
-        print("oh no there is no texture");
-        return;
-    }
-    let amod1 = Mathf.mod(ang1, 360);
-    let amod2 = Mathf.mod(ang2, 360);
-    if (amod1 >= 180 && amod2 >= 180) {
-        return;
-    }
-
-    let nregion = new TextureRegion(region);
-    let scale = h / th;
-
-    let uy1 = nregion.v;
-    let uy2 = nregion.v2;
-    let ucenter = (uy1 + uy2) / 2;
-    let usize = (uy2 - uy1);
-    uy1 = ucenter - (usize * scale * 0.5);
-    uy2 = ucenter + (usize * scale * 0.5);
-    nregion.v = uy1;
-    nregion.v2 = uy2;
-
-    let s1 = -Mathf.cos(ang1 * Mathf.degreesToRadians);
-    let s2 = -Mathf.cos(ang2 * Mathf.degreesToRadians);
-    if (amod1 > 180) {
-        nregion.v2 = Mathf.map(0, amod1 - 360, amod2, uy2, uy1);
-        s1 = -1;
-    } else if (amod2 > 180) {
-        nregion.v = Mathf.map(180, amod1, amod2, uy2, uy1);
-        s2 = 1;
-    }
-    s1 = Mathf.map(s1, -1, 1, y - h / 2, y + h / 2);
-    s2 = Mathf.map(s2, -1, 1, y - h / 2, y + h / 2);
-    Draw.rect(nregion, x, (s1 + s2) * 0.5, w, (s2 - s1), w * 0.5, y - s1, rot);
-
-}
-
-//draws the distorted sprite used to make the sliding worm gear effect.
-//x and y are assumed to refer to the center of the area.
-//w,h is the size in world units of the texture to distort.
-//tw, th is the width, hieght of the texture in world units.
-//rot is used for the rotation of the block itself
-//step is the width of the repeating pattern, offset is the offset
-function _drawSlideRect(region, x, y, w, h, tw, th, rot, step, offset) {
-    if (!region) {
-        print("oh no there is no texture");
-        return;
-    }
-    let nregion = new TextureRegion(region);
-    let scaley = h / th;
-    let scalex = w / tw;
-    let texw = nregion.u2 - nregion.u;
-    let texu = nregion.u;
-    nregion.u += Mathf.map(offset % 1.0, 0, 1.0, 0, texw * step / tw);
-    nregion.u2 = nregion.u + (scalex * texw);
-    Draw.rect(nregion, x, y, w, h, w * 0.5, h * 0.5, rot);
-
-}
-
-
 const _baseTypes = {
     torqueConnector: {
-        block: _RotPowerCommon,
-        build: _RotPowerPropsCommon
+        block: _GraphCommon,
+        build: _GraphPropsCommon
     },
     torqueGenerator: {
         block: _TorqueGenerator,
@@ -1374,7 +897,7 @@ const _baseTypes = {
         build: _TorqueTransmissionProps
     },
     torqueMultiConnect: {
-        block: _RotPowerCommon,
+        block: _GraphCommon,
         build: _TorqueMulticonnectorProps
     }
 
@@ -1382,11 +905,17 @@ const _baseTypes = {
 }
 
 module.exports = {
-    energyGraph: _EnergyGraph,
-    powerProps: _RotPowerPropsCommon,
-    powercommon: _RotPowerCommon,
+    energyGraph: _BlockGraph,
+    powerProps: _GraphPropsCommon,
+    powercommon: _GraphCommon,
     dirs: _dirs,
-
+	addGraph(bcustom, graphConnector) {
+		Object.assign(bcustom.block. )
+	},
+	finalise(Type, Entity, name, customGraphBlock) {
+		
+	},
+	/*
     torqueExtend(Type, Entity, name, baseType, def, customEnt) {
         const block = Object.create(baseType.block);
         Object.assign(block, def);
@@ -1408,7 +937,7 @@ module.exports = {
             return building;
         };
         return rotpowerBlock;
-    },
+    },*/
 
     //_TorqueConsumer
     getConnectSidePos: getConnectSidePos,
