@@ -80,8 +80,7 @@ const script = [
                     "light-lamp", "light-reflector", "light-extra",
                     "walls",
                     "ores",
-                    "multi-test-younggam",
-                    "infusor"
+                    "multi-test-younggam"
                 ]
             },
 
