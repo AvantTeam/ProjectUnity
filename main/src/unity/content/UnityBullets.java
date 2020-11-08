@@ -308,14 +308,14 @@ public class UnityBullets implements ContentList{
 
         standardDenseLarge = new BasicBulletType();
         JsonIO.copy(Bullets.standardDenseBig, standardDenseLarge);
-        standardDenseLarge.damage *= 1.2f;
+        standardDenseLarge.damage *= 1.4f;
         standardDenseLarge.speed *= 1.1f;
         standardDenseLarge.width *= 1.12f;
         standardDenseLarge.height *= 1.12f;
 
         standardHomingLarge = new BasicBulletType();
         JsonIO.copy(Bullets.standardDenseBig, standardHomingLarge);
-        standardHomingLarge.damage *= 1.1f;
+        standardHomingLarge.damage *= 1.23f;
         standardHomingLarge.reloadMultiplier = 1.3f;
         standardHomingLarge.homingPower = 0.09f;
         standardHomingLarge.speed *= 1.1f;
@@ -324,21 +324,21 @@ public class UnityBullets implements ContentList{
 
         standardIncendiaryLarge = new BasicBulletType();
         JsonIO.copy(Bullets.standardIncendiaryBig, standardIncendiaryLarge);
-        standardIncendiaryLarge.damage *= 1.2f;
+        standardIncendiaryLarge.damage *= 1.4f;
         standardIncendiaryLarge.speed *= 1.1f;
         standardIncendiaryLarge.width *= 1.12f;
         standardIncendiaryLarge.height *= 1.12f;
 
         standardThoriumLarge = new BasicBulletType();
         JsonIO.copy(Bullets.standardThoriumBig, standardThoriumLarge);
-        standardThoriumLarge.damage *= 1.2f;
+        standardThoriumLarge.damage *= 1.4f;
         standardThoriumLarge.speed *= 1.1f;
         standardThoriumLarge.width *= 1.12f;
         standardThoriumLarge.height *= 1.12f;
 
         standardDenseHeavy = new BasicBulletType();
         JsonIO.copy(Bullets.standardDenseBig, standardDenseHeavy);
-        standardDenseHeavy.damage *= 1.6f;
+        standardDenseHeavy.damage *= 1.7f;
         standardDenseHeavy.speed *= 1.3f;
         standardDenseHeavy.width *= 1.32f;
         standardDenseHeavy.height *= 1.32f;
@@ -354,21 +354,21 @@ public class UnityBullets implements ContentList{
 
         standardIncendiaryHeavy = new BasicBulletType();
         JsonIO.copy(Bullets.standardIncendiaryBig, standardIncendiaryHeavy);
-        standardIncendiaryHeavy.damage *= 1.6f;
+        standardIncendiaryHeavy.damage *= 1.7f;
         standardIncendiaryHeavy.speed *= 1.3f;
         standardIncendiaryHeavy.width *= 1.32f;
         standardIncendiaryHeavy.height *= 1.32f;
 
         standardThoriumHeavy = new BasicBulletType();
         JsonIO.copy(Bullets.standardThoriumBig, standardThoriumHeavy);
-        standardThoriumHeavy.damage *= 1.6f;
+        standardThoriumHeavy.damage *= 1.7f;
         standardThoriumHeavy.speed *= 1.3f;
         standardThoriumHeavy.width *= 1.32f;
         standardThoriumHeavy.height *= 1.32f;
 
         standardDenseMassive = new BasicBulletType();
         JsonIO.copy(Bullets.standardDenseBig, standardDenseMassive);
-        standardDenseMassive.damage *= 1.7f;
+        standardDenseMassive.damage *= 1.8f;
         standardDenseMassive.speed *= 1.3f;
         standardDenseMassive.width *= 1.34f;
         standardDenseMassive.height *= 1.34f;
@@ -376,7 +376,7 @@ public class UnityBullets implements ContentList{
 
         standardHomingMassive = new BasicBulletType();
         JsonIO.copy(Bullets.standardDenseBig, standardHomingMassive);
-        standardHomingMassive.damage *= 1.5f;
+        standardHomingMassive.damage *= 1.6f;
         standardHomingMassive.reloadMultiplier = 1.3f;
         standardHomingMassive.homingPower = 0.09f;
         standardHomingMassive.speed *= 1.3f;
@@ -386,19 +386,19 @@ public class UnityBullets implements ContentList{
 
         standardIncendiaryMassive = new BasicBulletType();
         JsonIO.copy(Bullets.standardIncendiaryBig, standardIncendiaryMassive);
-        standardIncendiaryMassive.damage *= 1.7;
-        standardIncendiaryMassive.speed *= 1.3;
-        standardIncendiaryMassive.width *= 1.34;
-        standardIncendiaryMassive.height *= 1.34;
-        standardIncendiaryMassive.lifetime *= 1.1;
+        standardIncendiaryMassive.damage *= 1.8f;
+        standardIncendiaryMassive.speed *= 1.3f;
+        standardIncendiaryMassive.width *= 1.34f;
+        standardIncendiaryMassive.height *= 1.34f;
+        standardIncendiaryMassive.lifetime *= 1.1f;
 
         standardThoriumMassive = new BasicBulletType();
         JsonIO.copy(Bullets.standardThoriumBig, standardThoriumMassive);
-        standardThoriumMassive.damage *= 1.7;
-        standardThoriumMassive.speed *= 1.3;
-        standardThoriumMassive.width *= 1.34;
-        standardThoriumMassive.height *= 1.34;
-        standardThoriumMassive.lifetime *= 1.1;
+        standardThoriumMassive.damage *= 1.8f;
+        standardThoriumMassive.speed *= 1.3f;
+        standardThoriumMassive.width *= 1.34f;
+        standardThoriumMassive.height *= 1.34f;
+        standardThoriumMassive.lifetime *= 1.1f;
 
         //endregion
     }

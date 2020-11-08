@@ -511,7 +511,7 @@ public class UnityBlocks implements ContentList{
 		//region imber
 
         sparkAlloyFactory = new StemGenericSmelter("spark-alloy-forge"){{
-            requirements(Category.crafting, with(Items.graphite, 340, UnityItems.imberium, 270, Items.silicon, 250, Items.thorium, 120, Items.surgeAlloy, 100));
+            requirements(Category.crafting, with(Items.lead, 160, Items.graphite, 340, UnityItems.imberium, 270, Items.silicon, 250, Items.thorium, 120, Items.surgeAlloy, 100));
             outputItem = new ItemStack(UnityItems.sparkAlloy, 4);
             size = 4;
             craftTime = 160f;
@@ -525,7 +525,7 @@ public class UnityBlocks implements ContentList{
                 }
             };
             consumes.power(2.6f);
-            consumes.items(with(Items.surgeAlloy, 3, Items.titanium, 4, Items.plastanium, 2, UnityItems.imberium, 2));
+            consumes.items(with(Items.surgeAlloy, 3, Items.titanium, 4, Items.silicon, 6, UnityItems.imberium, 3));
         }};
 
 		orb = new ChargeTurret("orb"){{
@@ -606,7 +606,7 @@ public class UnityBlocks implements ContentList{
             health = 2800;
             range = 200f;
             reloadTime = 460f;
-            coolantMultiplier = 2;
+            coolantMultiplier = 1.2f;
             liquidCapacity = 20f;
             shootCone = 1f;
             inaccuracy = 0f;
@@ -684,7 +684,7 @@ public class UnityBlocks implements ContentList{
 		//region monolith
 
         monolithAlloyFactory = new StemGenericSmelter("monolith-alloy-forge"){{
-            requirements(Category.crafting, with(Items.metaglass, 160, UnityItems.monolite, 240, Items.silicon, 400, Items.plastanium, 120, Items.thorium, 90, Items.surgeAlloy, 120));
+            requirements(Category.crafting, with(Items.lead, 380, UnityItems.monolite, 240, Items.silicon, 400, Items.titanium, 240, Items.thorium, 90, Items.surgeAlloy, 160));
             final int effectTimer = timers++;
             afterUpdate = e -> {
                 if(e.data == null) e.data = 0f;
