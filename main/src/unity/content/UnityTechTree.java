@@ -19,6 +19,7 @@ public class UnityTechTree implements ContentList{
         attachNode(Blocks.surgeSmelter, () -> {
             unityNode(darkAlloyForge);
             unityNode(monolithAlloyFactory);
+            unityNode(sparkAlloyFactory);
         });
         attachNode(Blocks.powerNode, () -> {
             unityNode(lightLamp, () -> {

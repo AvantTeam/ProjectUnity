@@ -46,7 +46,7 @@ public class UnityBlocks implements ContentList{
     sparkAlloyFactory, orb, shockwire, current, plasma, shielder,
 	
 	//koruh
-	laserTurret, inferno,
+	laserTurret, inferno, teleporter,
 	
 	//monolith
     monolithAlloyFactory, mage, oracle, spectrum;
@@ -675,7 +675,11 @@ public class UnityBlocks implements ContentList{
 			shootCone = 5f;
 			addExpField("exp", "useless", 0, 2);
 		}};
-		
+
+        teleporter = new Teleporter("teleporter"){{
+            requirements(Category.distribution, with(Items.lead,12,Items.silicon,10,Items.phaseFabric,10,Items.thorium,4));
+        }};
+
 		//endregion
 		//region monolith
 

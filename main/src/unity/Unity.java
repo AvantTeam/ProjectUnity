@@ -1,5 +1,6 @@
 package unity;
 
+import java.util.Arrays;
 import arc.*;
 import arc.func.*;
 import arc.scene.ui.layout.*;
@@ -97,5 +98,9 @@ public class Unity extends Mod{
                 Log.err("Error loading @ content(s): @", getClass().getSimpleName(), e.getMessage());
             }
         }
+    }
+
+    public static void print(Object... objects){
+        Vars.mods.getScripts().log("unity", Arrays.toString(objects));
     }
 }
