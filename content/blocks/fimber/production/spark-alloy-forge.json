@@ -11,12 +11,13 @@
 			"items": [
 				{"item": "surge-alloy", "amount": 3},
 				{"item": "titanium", "amount": 4},
-				{"item": "plastanium", "amount": 2},
-				{"item": "imberium", "amount": 2}
+				{"item": "silicon", "amount": 6},
+				{"item": "imberium", "amount": 3}
 			]
 		}
 	},
 	"requirements": [
+		{"item": "lead", "amount": 160},
 		{"item": "graphite", "amount": 340},
 		{"item": "imberium", "amount": 270},
 		{"item": "silicon", "amount": 250},

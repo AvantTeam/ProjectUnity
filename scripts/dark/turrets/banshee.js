@@ -2,7 +2,7 @@ const tempVec = new Vec2();
 
 const standardDenseMassive = new BasicBulletType();
 JsonIO.json().copyFields(Bullets.standardDenseBig, standardDenseMassive);
-standardDenseMassive.damage *= 1.7;
+standardDenseMassive.damage *= 1.8;
 standardDenseMassive.speed *= 1.3;
 standardDenseMassive.width *= 1.34;
 standardDenseMassive.height *= 1.34;
@@ -10,7 +10,7 @@ standardDenseMassive.lifetime *= 1.1;
 
 const standardHomingMassive = new BasicBulletType();
 JsonIO.json().copyFields(Bullets.standardDenseBig, standardHomingMassive);
-standardHomingMassive.damage *= 1.5;
+standardHomingMassive.damage *= 1.6;
 standardHomingMassive.reloadMultiplier = 1.3;
 standardHomingMassive.homingPower = 0.09;
 standardHomingMassive.speed *= 1.3;
@@ -20,7 +20,7 @@ standardDenseMassive.lifetime *= 1.1;
 
 const standardIncendiaryMassive = new BasicBulletType();
 JsonIO.json().copyFields(Bullets.standardIncendiaryBig, standardIncendiaryMassive);
-standardIncendiaryMassive.damage *= 1.7;
+standardIncendiaryMassive.damage *= 1.8;
 standardIncendiaryMassive.speed *= 1.3;
 standardIncendiaryMassive.width *= 1.34;
 standardIncendiaryMassive.height *= 1.34;
@@ -28,7 +28,7 @@ standardIncendiaryMassive.lifetime *= 1.1;
 
 const standardThoriumMassive = new BasicBulletType();
 JsonIO.json().copyFields(Bullets.standardThoriumBig, standardThoriumMassive);
-standardThoriumMassive.damage *= 1.7;
+standardThoriumMassive.damage *= 1.8;
 standardThoriumMassive.speed *= 1.3;
 standardThoriumMassive.width *= 1.34;
 standardThoriumMassive.height *= 1.34;

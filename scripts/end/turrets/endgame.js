@@ -123,6 +123,7 @@ endgame.buildType = () => {
 			this._eyesTargetOffset = new Vec2();
 			this._eyesVecArray = [];
 			this._eyesOffset = new Vec2();
+			this._eyesOffsetB = new Vec2();
 			for(var i = 0; i < 16; i++){
 				this._targetsB[i] = null;
 				this._eyesVecArray[i] = new Vec2();
@@ -228,7 +229,11 @@ endgame.buildType = () => {
 		},
 		updateEyes(){
 			this.updateEyeOffset();
-			this._eyesOffset.lerp(this._eyesTargetOffset, Mathf.clamp(0.12 * Time.delta));
+			this._eyesOffsetB.lerp(this._eyesTargetOffset, Mathf.clamp(0.12 * Time.delta));
+			//this._eyesOffset.lerp(this._eyesTargetOffset, Mathf.clamp(0.12 * Time.delta));
+			this._eyesOffset.set(this._eyesOffsetB);
+			this._eyesOffset.add(Mathf.range(this.reload / endgame.reloadTime) / 2, Mathf.range(this.reload / endgame.reloadTime) / 2);
+			this._eyesOffset.limit(2);
 			if((this.target != null || (this.isControlled() && this.unit.isShooting)) && this.consValid() && this.power.status >= 0.0001){
 				this._eyeReloads[0] += this.deltaB();
 				this._eyeReloads[1] += this.deltaB();
@@ -303,6 +308,7 @@ endgame.buildType = () => {
 			var rnge = 15;
 			var ux = this.unit.aimX();
 			var uy = this.unit.aimY();
+			if(!Mathf.within(this.x, this.y, ux, uy, endgame.range * 1.5)) return;
 			fLib.trueEachBlock(this.unit.aimX(), this.unit.aimY(), 15, build => {
 				if(!build.dead && build.team != this.team){
 					build.damage(380);
@@ -316,7 +322,11 @@ endgame.buildType = () => {
 					endgameLaser.at(this.x, this.y, 0, [new Vec2(ux, uy), new Vec2(e.x, e.y), 0.525]);
 				};
 			});
-			endgameLaser.at(this.x, this.y, 0, [this._eyesVecArray[index], new Vec2(ux, uy), 0.625]);
+			tempVec.set(this._eyesVecArray[index]);
+			tempVec.add(ux, uy);
+			tempVec.scl(0.5);
+			//endgameLaser.at(this.x, this.y, 0, [this._eyesVecArray[index], new Vec2(ux, uy), 0.625]);
+			endgameLaser.at(tempVec.x, tempVec.y, 0, [this._eyesVecArray[index], new Vec2(ux, uy), 0.625]);
 		},
 		eyeShoot(index){
 			//var angOffset = 0;

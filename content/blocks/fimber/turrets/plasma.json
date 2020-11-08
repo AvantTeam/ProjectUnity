@@ -3,7 +3,7 @@
 	"health": 2800,
 	"range": 200,
 	"reloadTime": 460,
-	"coolantMultiplier": 2,
+	"coolantMultiplier": 1.2,
 	"liquidCapacity": 20,
 	"shootCone": 1,
 	"chargeTime": 240,

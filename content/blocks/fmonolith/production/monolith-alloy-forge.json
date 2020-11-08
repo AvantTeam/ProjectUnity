@@ -14,6 +14,7 @@
 			"items": [
 				{"item": "silicon", "amount": 3},
 				{"item": "graphite", "amount": 2},
+				{"item": "titanium", "amount": 2},
 				{"item": "monolite", "amount": 2}
 			]
 		},
@@ -23,12 +24,12 @@
 		}
 	},
 	"requirements": [
-		{"item": "metaglass", "amount": 160},
+		{"item": "lead", "amount": 380},
 		{"item": "monolite", "amount": 240},
 		{"item": "silicon", "amount": 400},
-		{"item": "plastanium", "amount": 120},
+		{"item": "titanium", "amount": 240},
 		{"item": "thorium", "amount": 90},
-		{"item": "surge-alloy", "amount": 120}
+		{"item": "surge-alloy", "amount": 160}
 	],
 	"category": "crafting",
 	"research": "alloy-smelter",

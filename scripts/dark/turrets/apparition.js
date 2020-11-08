@@ -1,13 +1,13 @@
 const standardDenseLarge = new BasicBulletType();
 JsonIO.json().copyFields(Bullets.standardDenseBig, standardDenseLarge);
-standardDenseLarge.damage *= 1.2;
+standardDenseLarge.damage *= 1.4;
 standardDenseLarge.speed *= 1.1;
 standardDenseLarge.width *= 1.12;
 standardDenseLarge.height *= 1.12;
 
 const standardHomingLarge = new BasicBulletType();
 JsonIO.json().copyFields(Bullets.standardDenseBig, standardHomingLarge);
-standardHomingLarge.damage *= 1.1;
+standardHomingLarge.damage *= 1.23;
 standardHomingLarge.reloadMultiplier = 1.3;
 standardHomingLarge.homingPower = 0.09;
 standardHomingLarge.speed *= 1.1;
@@ -16,14 +16,14 @@ standardHomingLarge.height *= 1.09;
 
 const standardIncendiaryLarge = new BasicBulletType();
 JsonIO.json().copyFields(Bullets.standardIncendiaryBig, standardIncendiaryLarge);
-standardIncendiaryLarge.damage *= 1.2;
+standardIncendiaryLarge.damage *= 1.4;
 standardIncendiaryLarge.speed *= 1.1;
 standardIncendiaryLarge.width *= 1.12;
 standardIncendiaryLarge.height *= 1.12;
 
 const standardThoriumLarge = new BasicBulletType();
 JsonIO.json().copyFields(Bullets.standardThoriumBig, standardThoriumLarge);
-standardThoriumLarge.damage *= 1.2;
+standardThoriumLarge.damage *= 1.4;
 standardThoriumLarge.speed *= 1.1;
 standardThoriumLarge.width *= 1.12;
 standardThoriumLarge.height *= 1.12;
