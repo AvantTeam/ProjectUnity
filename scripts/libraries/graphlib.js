@@ -41,13 +41,18 @@ const _GraphCommonBuild = {
 		return this.graphs[name];
 	},
 	setGraphConnector(graph){
-		this.graphs[graph.name] = graph;
-		this.graphs[graph.name].getBuild = function(){
-			return this;
+		if(!this.graphs){
+			this.graphs= {};
 		}
+		this.graphs[graph.name] = graph;
+		this.graphs[graph.name].setBuild(this);
+	},
+	get(){
+		return this;
 	},
 	create(block, team) {
         let building = this.super$create(block, team);
+		block.injectGraphConnectors(this);
 		for(let graphname in this.graphs) {
 		  let graphConn = this.graphs[graphname];
 		  graphConn.onCreate(building)
@@ -91,27 +96,45 @@ const _GraphCommonBlock = {
 	graphBlocks:{},
 	graphBuilders:{},
 	graphBuildings:{},
+	_use_original_update: true,
+	_network_connector: true,
+    // whether it calls the super's updateTile
+    getUseOgUpdate() {
+        return this._use_original_update;
+    },
+    setUseOgUpdate(newaccept) {
+        this._use_original_update = newaccept;
+    },
 	getGraphConnectorBlock(name){
-		return graphBlocks[name];
+		return this.graphBlocks[name];
 	},
 	setGraphConnectorBlock(graph){
+		if(!this.graphBlocks){
+			this.graphBlocks= {};
+		}
 		this.graphBlocks[graph.name] = graph;
 	},
 	injectGraphConnectors(building){
 		for(let graphname in this.graphBlocks) {
-			building.setGraphConnector(Object.create(graphBuildings[graphname]));
+			building.setGraphConnector(Object.create(this.graphBuildings[graphname]));
 		}
 	},
 	getGraphConnectorBuilding(name){
-		return graphBuildings[name];
+		return this.graphBuildings[name];
 	},
 	setGraphConnectorBuilding(graph){
+		if(!this.graphBuildings){
+			this.graphBuildings= {};
+		}
 		this.graphBuildings[graph.name] = graph;
 	},
 	getGraphConnectorBuilder(name){
-		return graphBuilders[name];
+		return this.graphBuilders[name];
 	},
 	setGraphConnectorBuilder(graph){
+		if(!this.graphBuilders){
+			this.graphBuilders= {};
+		}
 		this.graphBuilders[graph.name] = graph;
 	},
 	setStats() {
@@ -125,6 +148,13 @@ const _GraphCommonBlock = {
         });
         this.stats.add(Stat.abilities, sV);
     },
+	 // if false the network will not 'bridge' across this block when rebuilding (but will still connect to it, like how a diode connects).
+	getIsNetworkConnector() {
+        return this._network_connector;
+    },
+    setIsNetworkConnector(newaccept) {
+        this._network_connector = newaccept;
+    },
 }
 
 
@@ -137,15 +167,8 @@ const _GraphCommon = {
 
     _accept: [],
     _multi_graph_connector: false,
-    _network_connector: true,
-    _use_original_update: true,
-    // whether it calls the super's updateTile
-    getUseOgUpdate() {
-        return this._use_original_update;
-    },
-    setUseOgUpdate(newaccept) {
-        this._use_original_update = newaccept;
-    },
+    
+    
 
     // the connection points it permits attachment to
     getAccept() {
@@ -155,13 +178,8 @@ const _GraphCommon = {
         this._accept = newaccept;
     },
 
-    // if false the network will not 'bridge' across this block when rebuilding (but will still connect to it, like how a diode connects).
-    getIsNetworkConnector() {
-        return this._network_connector;
-    },
-    setIsNetworkConnector(newaccept) {
-        this._network_connector = newaccept;
-    },
+   
+    
 
 };
 // gets a conneciton point on its index, runs anticlockwise around the block.
@@ -212,20 +230,26 @@ function getConnectSidePos(index, size, rotation) {
 
 
 const _GraphPropsCommon = {
-
+	parentbuilding:null,
     getConnectSidePos(index) {
-        return getConnectSidePos(index, this.getBlock().block.size, this.getBlock().rotation);
+        return getConnectSidePos(index, this.getBuild().block.size, this.getBuild().rotation);
     },
     canConnect(pos) {
         for (let i = 0; i < this._acceptPorts.length; i++) {
             if (this._acceptPorts[i].x + this.getBuild().tile.x == pos.x && this._acceptPorts[i].y + this.getBuild().tile.y == pos.y) {
-				//print("can connect o-o : rot"+this.rotation+": "+this._acceptPorts[i].x+","+this._acceptPorts[i].y);
                 return this._acceptPorts[i].index;
             }
         }
         return -1;
     },
-
+	getBuild() {
+        return this.parentbuilding;
+    },
+	setBuild(ohno) {
+		print("setting build:");
+		print(ohno);
+        this.parentbuilding=ohno;
+    },
     onCreate(building) {
         this.initAllNets(building);
         this.needsNetworkUpdate = true;
@@ -236,6 +260,8 @@ const _GraphPropsCommon = {
 	},
     recalcPorts() {
 		//print("reclac ports with rotation " + this.rotation);
+		print("recalc build:");
+		print(this.getBuild());
         this.setAcceptPorts([]);
         for (let index = 0; index < this.getBuild().block.size * 4; index++) {
             if (this.getBlockData().getAccept()[index] !== 0) {
@@ -287,6 +313,7 @@ const _GraphPropsCommon = {
        
     },
 	onRotationChanged(prevrot,newrot){
+		print("rotation changed to "+newrot+"...");
 		 if (prevrot != -1) {
 			this.deleteSelfFromNetwork();
 			this.deleteFromNeighbours();
@@ -626,7 +653,7 @@ const _BlockGraph = {
     id: 0,
     //'connected' is the graph's field of building set
     new(building) {
-        const graph = Object.create(_BlockGraph,building.getBuild().block.graphBuilders[building.name]);
+        const graph = Object.assign(Object.create(_BlockGraph),deepCopy(building.getBuild().block.getGraphConnectorBuilder(building.name)));
         graph.id = getnetID();
         graph.connected = ObjectSet.with(building);
         return graph;
@@ -771,7 +798,7 @@ const _BlockGraph = {
                 }
                 let prevbuilding = null;
                 searched.add(buildConnector);
-                //print("rebuilding from:"+buildConnector.block.localizedName+" at port"+ index+ ",buildConnector has rotation of: "+buildConnector.rotation);
+                print("rebuilding from:"+buildConnector.getBuild().block.localizedName+" at port"+ index+ ",buildConnector has rotation of: "+buildConnector.getBuild().rotation);
                 //print("ports to scan:"+acceptports);
 
                 for (let port = 0; port < acceptports.length; port++) {
@@ -781,22 +808,27 @@ const _BlockGraph = {
                     }
                     let portinfo = acceptports[port];
                     if (!buildConnector.getBuild().tile) {
+						print("this tile no exist?");
                         return;
                     }
                     let tile = buildConnector.getBuild().tile.nearby(portinfo.x, portinfo.y);
                     // guess the world doesnt exist or something
                     if (!tile) {
+						print("nearby tile no exist");
                         return;
                     }
                     if (tile.block().getIsNetworkConnector != undefined) {
+						print("we in c:"+root.name);
                         //conbuild -> connected buildConnector
-                        let conbuild = tile.bc().getGraphConnector(this.name);
+                        let conbuild = tile.bc().getGraphConnector(root.name);
                         if (conbuild == prevbuilding || conbuild.getDead()) {
+							print("conbuild is dead or duplicate or undefined:"+conbuild);
                             continue;
                         }
                         let thisgraph = buildConnector.getNetworkOfPort(portindex);
 						// networks in multiplayer are intialised with rotation of 0 then updated later. this results in many problems.
 						if(conbuild.getBuild().rotation!=conbuild.getLastRecalc()){
+							print("updating unupdated rot");
 							conbuild.recalcPorts();
 						}
                         let fpos = {
@@ -807,9 +839,10 @@ const _BlockGraph = {
                         fpos.y += buildConnector.getBuild().tile.y;
                         let connectIndex = conbuild.canConnect(fpos);
                         if (connectIndex == -1) {
+							print("no connection :<");
                             continue;
                         }
-                        //print("found suitable connecting buildConnector: current block is connected at port "+connectIndex+" of other buildConnector at coord "+fpos.x+","+fpos.y);
+                        print("found suitable connecting buildConnector: current block is connected at port "+connectIndex+" of other buildConnector at coord "+fpos.x+","+fpos.y);
                         buildConnector.addNeighbour({
                             build: conbuild,
                             portindex: portindex
@@ -854,7 +887,10 @@ const _BlockGraph = {
                             //print("Graph already contains buildConnector, skipping..");
                         }
                         prevbuilding = conbuild;
-                    }
+                    }else{
+						print("nearby tile no network");
+						
+					}
                 }
                 if (current.children.length > 0) {
                     for (let i = 0; i < current.children.length; i++) {
@@ -904,14 +940,14 @@ finalise(Block, Building, "test-block", )
 
 */
 module.exports = {
-    energyGraph: _BlockGraph,
-    powerProps: _GraphPropsCommon,
-    powercommon: _GraphCommon,
+    blockGraph: _BlockGraph,
+    graphProps: _GraphPropsCommon,
+    graphCommon: _GraphCommon,
     dirs: _dirs,
-	init(custBlock, custBuild){
+	init(){
 		return {
-			block:Object.create(_GraphCommonBlock,custBlock),
-			build:Object.create(_GraphCommonBuild,custBuild),
+			block:Object.create(_GraphCommonBlock),
+			build:Object.create(_GraphCommonBuild),
 		}
 	},
 	addGraph(bcustom, graphConnector) {
@@ -919,19 +955,24 @@ module.exports = {
 		bcustom.block.setGraphConnectorBuilding(Object.create(graphConnector.build));
 		bcustom.block.setGraphConnectorBuilder(Object.create(graphConnector.graph));
 	},
-	finaliseExtend(Type, Entity, name, bcustom) {
-		const rotpowerBlock = extendContent(Type, name, bcustom.block);
+	setGraphName(graphConnector,name) {
+		graphConnector.block.name = name;
+		graphConnector.build.name= name;
+		graphConnector.graph.name= name;
+	},
+	finaliseExtend(Type, Entity, name, bcustom,custBlock, custBuild) {
+		const rotpowerBlock = extendContent(Type, name, Object.assign(bcustom.block,custBlock));
 		rotpowerBlock.buildType = () => {
-            let building = extend(Entity, bcustom.build);
+            let building = extend(Entity, Object.assign(deepCopy(bcustom.build),deepCopy(custBuild)));
             building.block = rotpowerBlock;
             return building;
         };
 		return rotpowerBlock;
 	},
-	finaliseExtendContent(Type, Entity, name, bcustom) {
-		const rotpowerBlock = extendContent(Type, name, bcustom.block);
+	finaliseExtendContent(Type, Entity, name, bcustom,custBlock, custBuild) {
+		const rotpowerBlock = extendContent(Type, name, Object.assign(bcustom.block,custBlock));
 		rotpowerBlock.buildType = () => {
-            let building = extendContent(Entity,rotpowerBlock, bcustom.build);
+            let building = extendContent(Entity,rotpowerBlock, Object.assign(deepCopy(bcustom.build),deepCopy(custBuild)));
             building.block = rotpowerBlock;
             return building;
         };
