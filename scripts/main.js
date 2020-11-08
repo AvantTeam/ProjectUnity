@@ -208,7 +208,8 @@ const script = [
                 name: "blocks",
                 childs: [
                     "shieldGenerator",
-                    "shieldedWall"
+                    "shieldedWall",
+                    "teleporter"
                 ]
             }
         ]
@@ -334,8 +335,8 @@ if(!Vars.headless){
         mod.meta.displayName = Core.bundle.get(change + "name");
         mod.meta.description = Core.bundle.get(change + "description");
     });
-	
-	
+
+
 };
 const music = loadMusic("youngcha");
 /*
