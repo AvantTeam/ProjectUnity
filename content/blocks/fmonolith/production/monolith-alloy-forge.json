@@ -32,6 +32,6 @@
 	],
 	"category": "crafting",
 	"research": "alloy-smelter",
-	"idleSound": "machine",
-	"idleSoundVolume": 0.6
+	"ambientSound": "machine",
+	"ambientSoundVolume": 0.6
 }
