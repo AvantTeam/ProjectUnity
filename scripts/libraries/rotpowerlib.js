@@ -325,7 +325,6 @@ const _TorqueTransmissionProps = Object.assign(Object.create(_TorqueMulticonnect
         if (this._networkList.length == 0 || this.dead) {
             return;	
         }
-		print("called!");
         let ratios = this.getBlockData().getRatio();
         let totalmratio = 0;
         let totalm = 0;
