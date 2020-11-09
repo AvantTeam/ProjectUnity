@@ -18,9 +18,9 @@ const handCrank = rotL.torqueExtend(Block, Building, "hand-crank", rotL.baseType
 	buildConfiguration(table) {
 		let buttoncell = table.button(Tex.whiteui, Styles.clearTransi, 50, run(() => {this.configure(0);}));
 		buttoncell.size(50).disabled(boolf(b =>
-		{ 
-			return this.getCooldown()<20 ;
-			}  ));
+			{ 
+				return this.getCooldown()<30 ;
+			}));
 		buttoncell.get().getStyle().imageUp = Icon.redo;
 	},
 	configured(player, value) {
@@ -30,20 +30,22 @@ const handCrank = rotL.torqueExtend(Block, Building, "hand-crank", rotL.baseType
 	},
 	updatePre()
 	{
-		let ratio = (20-this.getNetwork().lastVelocity)/20.0;
-		this.setInertia(3);
-		this.setFriction(0.01);
-		this.setForce(ratio*this._force);
+		let tgraph = this.getGraphConnector("torque graph");
+		let ratio = (20-tgraph.getNetwork().lastVelocity)/20.0;
+		tgraph.setInertia(3);
+		tgraph.setFriction(0.01);
+		tgraph.setForce(ratio*this._force);
 		this._cooldown+=Time.delta;
-		this._force*=0.7;
+		this._force*=0.8;
 	},
 
 	draw() {
+		let tgraph = this.getGraphConnector("torque graph");
 		let variant = (this.rotation==2||this.rotation==1) ? 1:0;
 		Draw.rect(handCrank.base, this.x, this.y, 0);
 		Draw.rect(handCrank.shaft[variant], this.x, this.y, this.rotdeg());
 				//speeeeeeen
-		Draw.rect(handCrank.handle, this.x, this.y, this.getRotation());
+		Draw.rect(handCrank.handle, this.x, this.y, tgraph.getRotation());
         this.drawTeamTop();
 	}
 
@@ -54,6 +56,6 @@ handCrank.rotate = true;
 handCrank.update = true;
 handCrank.solid = false;
 handCrank.configurable = true;
-handCrank.setAccept([1,0,0,0]);
-
-///Vars.content.getByName(ContentType.block, "unity-drive-shaft").overlaysprite = Core.atlas.find("unity-drive-shaft-overlay");
+handCrank.getGraphConnectorBlock("torque graph").setAccept([1,0,0,0]);
+handCrank.getGraphConnectorBlock("torque graph").setBaseFriction(0.01);
+handCrank.getGraphConnectorBlock("torque graph").setBaseInertia(3);

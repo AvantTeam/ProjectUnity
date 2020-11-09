@@ -27,8 +27,8 @@ const windTurbine = rotL.torqueExtend(Block, Building, "wind-turbine", rotL.base
 	
 	updatePre()
 	{
-		this.setInertia(20);
-		this.setFriction(0.03);
+		this.getGraphConnector("torque graph").setInertia(20);
+		this.getGraphConnector("torque graph").setFriction(0.03);
 		let x = Time.time()*0.001;
 		let mul = 0.4*Math.max(0,
 				Mathf.sin(x) + 
@@ -37,13 +37,15 @@ const windTurbine = rotL.torqueExtend(Block, Building, "wind-turbine", rotL.base
 				0.1*Mathf.sin(23*x+10)+
 				0.55
 				)+ 0.15;
-		this.setMotorForceMult(mul);
+		this.getGraphConnector("torque graph").setMotorForceMult(mul);
 	},
 	
 	draw() {
+		let torquegraph = this.getGraphConnector("torque graph");
+		let shaftrotog = torquegraph.getRotation();
 		let fixedrot = ((this.rotdeg()+90)%180)-90;
 		let variant = ((this.rotation+1)%4>=2)?1:0;
-		let shaftRot = variant==1?360-this.getRotation():this.getRotation();
+		let shaftRot = variant==1?360-shaftrotog:shaftrotog;
 		Draw.rect(windTurbine.bottom, this.x, this.y, 0);
 		Draw.rect(windTurbine.base[this.rotation], this.x, this.y, 0);
 		Draw.rect(windTurbine.mbase, this.x, this.y, this.rotdeg());
@@ -51,9 +53,9 @@ const windTurbine = rotL.torqueExtend(Block, Building, "wind-turbine", rotL.base
 		rotL.drawRotRect(windTurbine.moving, this.x, this.y, 24, 14/4, 24, this.rotdeg(), shaftRot, shaftRot+180);
 		Draw.rect(windTurbine.overlaysprite[variant], this.x, this.y, this.rotdeg());
 		
-		Drawf.shadow(windTurbine.rotor2, this.x -(this.block.size / 2), this.y - (this.block.size / 2), this.getRotation());
-		Draw.rect(windTurbine.rotor2, this.x, this.y, this.getRotation());
-		Draw.rect(windTurbine.rotor1, this.x, this.y, this.getRotation()*2);
+		Drawf.shadow(windTurbine.rotor2, this.x -(this.block.size / 2), this.y - (this.block.size / 2), shaftrotog);
+		Draw.rect(windTurbine.rotor2, this.x, this.y, shaftrotog);
+		Draw.rect(windTurbine.rotor1, this.x, this.y, shaftrotog*2);
 		
 		Draw.rect(windTurbine.topsprite, this.x, this.y, 0);
         this.drawTeamTop();
@@ -63,17 +65,14 @@ const windTurbine = rotL.torqueExtend(Block, Building, "wind-turbine", rotL.base
 	
 });
 
-/*driveShaft.buildType= ()=>{
-	
-	
-}*/
 windTurbine.rotate = true;
 windTurbine.update = true;
 windTurbine.solid = true;
-windTurbine.setAccept( [0,1,0,
-						0,0,0,
-						0,0,0,
-						0,0,0]);
-windTurbine.setMaxSpeed(5);
-windTurbine.setMaxTorque(5);
-///Vars.content.getByName(ContentType.block, "unity-drive-shaft").overlaysprite = Core.atlas.find("unity-drive-shaft-overlay");
+windTurbine.getGraphConnectorBlock("torque graph").setAccept([0,1,0,
+															   0,0,0,
+															   0,0,0,
+															   0,0,0]);
+windTurbine.getGraphConnectorBlock("torque graph").setMaxSpeed(5);
+windTurbine.getGraphConnectorBlock("torque graph").setMaxTorque(5);
+windTurbine.getGraphConnectorBlock("torque graph").setBaseFriction(0.03);
+windTurbine.getGraphConnectorBlock("torque graph").setBaseInertia(20);

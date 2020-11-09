@@ -64,6 +64,7 @@ const script = [
 			"funclib",
 			"arena",
 			"rotpowerlib",
+			"graphlib",
 			"unitloader"/*,
             "shieldbulletlib"*/
         ]
@@ -298,6 +299,7 @@ const script = [
             {
                 name: "generation",
                 childs: [
+					"testblock",
 					"torqueinfi",
                     "handcrank",
                     "windturbine",
