@@ -11,8 +11,8 @@ const shaftRouter = rotL.torqueExtend(Block, Building, "shaft-router", rotL.base
 
 	updatePre()
 	{
-		this.setInertia(5);
-		this.setFriction(0.05);
+		this.getGraphConnector("torque graph").setInertia(5);
+		this.getGraphConnector("torque graph").setFriction(0.05);
 	},
 
 	draw() {
@@ -26,5 +26,6 @@ const shaftRouter = rotL.torqueExtend(Block, Building, "shaft-router", rotL.base
 shaftRouter.rotate = false;
 shaftRouter.update = true;
 shaftRouter.solid = false;
-shaftRouter.setAccept([1,1,1,1]);
-///Vars.content.getByName(ContentType.block, "unity-drive-shaft").overlaysprite = Core.atlas.find("unity-drive-shaft-overlay");
+shaftRouter.getGraphConnectorBlock("torque graph").setAccept([1,1,1,1]);
+shaftRouter.getGraphConnectorBlock("torque graph").setBaseFriction(0.05);
+shaftRouter.getGraphConnectorBlock("torque graph").setBaseInertia(5);

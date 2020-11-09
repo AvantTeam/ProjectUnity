@@ -1,33 +1,35 @@
 const rotL = require("libraries/rotpowerlib");
 
-const handCrank = rotL.torqueExtend(Block, Building, "torque-infi", rotL.baseTypes.torqueGenerator, {
+const torqueinfi = rotL.torqueExtend(Block, Building, "torque-infi", rotL.baseTypes.torqueGenerator, {
 
 	load(){
 		this.super$load();
-		this.handle = Core.atlas.find(this.name);
-		this.setMaxTorque(9999);
-		this.setMaxSpeed(999999);
+		this.base = Core.atlas.find(this.name);
+
 	},
 },{
 
 	updatePre()
 	{
 		
-		this.setInertia(1);
-		this.setFriction(0.001);
-		this.setMotorForceMult(1);
+		this.getGraphConnector("torque graph").setInertia(1);
+		this.getGraphConnector("torque graph").setFriction(0.001);
+		this.getGraphConnector("torque graph").setMotorForceMult(1);
 	},
 
 	draw() {
-		Draw.rect(handCrank.handle, this.x, this.y, 0);
+		Draw.rect(torqueinfi.base, this.x, this.y, 0);
         this.drawTeamTop();
 	}
 
 
 });
 
-handCrank.rotate = true;
-handCrank.update = true;
-handCrank.solid = false;
-handCrank.setAccept([1,1,1,1]);
-///Vars.content.getByName(ContentType.block, "unity-drive-shaft").overlaysprite = Core.atlas.find("unity-drive-shaft-overlay");
+torqueinfi.rotate = true;
+torqueinfi.update = true;
+torqueinfi.solid = false;
+torqueinfi.getGraphConnectorBlock("torque graph").setAccept([1,1,1,1]);
+torqueinfi.getGraphConnectorBlock("torque graph").setMaxTorque(9999);
+torqueinfi.getGraphConnectorBlock("torque graph").setMaxSpeed(999999);
+torqueinfi.getGraphConnectorBlock("torque graph").setBaseFriction(0.001);
+torqueinfi.getGraphConnectorBlock("torque graph").setBaseInertia(1);

@@ -18,11 +18,12 @@ const simpleTrans = rotL.torqueExtend(Block, Building, "simple-transmission",rot
 	
 	updatePre()
 	{
-		this.setInertia(25);
-		this.setFriction(0.05);
+		this.getGraphConnector("torque graph").setInertia(25);
+		this.getGraphConnector("torque graph").setFriction(0.05);
 	},
 	
 	draw() {
+		let torquegraph = this.getGraphConnector("torque graph");
 		let fixedrot = ((this.rotdeg()+90)%180)-90;
 		let variant = ((this.rotation+1)%4>=2)?1:0;
 		Draw.rect(simpleTrans.base, this.x, this.y, 0);
@@ -31,14 +32,14 @@ const simpleTrans = rotL.torqueExtend(Block, Building, "simple-transmission",rot
 		let offset = rotL.dirs[(this.rotation+1)%4];
 		let ox = offset.x*4;
 		let oy = offset.y*4;
-		rotL.drawRotRect(simpleTrans.moving[0], this.x+ox, this.y+oy, 16, 18/4, 18/4, fixedrot, this.getNetworkRotation(0), this.getNetworkRotation(0)+180);
-		rotL.drawRotRect(simpleTrans.moving[0], this.x+ox, this.y+oy, 16, 18/4, 18/4, fixedrot, this.getNetworkRotation(0)+180, this.getNetworkRotation(0)+360);
+		rotL.drawRotRect(simpleTrans.moving[0], this.x+ox, this.y+oy, 16, 18/4, 18/4, fixedrot, torquegraph.getRotationOf(0), torquegraph.getRotationOf(0)+180);
+		rotL.drawRotRect(simpleTrans.moving[0], this.x+ox, this.y+oy, 16, 18/4, 18/4, fixedrot, torquegraph.getRotationOf(0)+180, torquegraph.getRotationOf(0)+360);
 		
-		rotL.drawRotRect(simpleTrans.moving[1], this.x+ox*-0.125, this.y+oy*-0.125, 16, 18/4, 18/4, fixedrot, 360-(this.getNetworkRotation(0)), 360-(this.getNetworkRotation(0)+180));
-		rotL.drawRotRect(simpleTrans.moving[1], this.x+ox*-0.125, this.y+oy*-0.125, 16, 18/4, 18/4, fixedrot, 720-(this.getNetworkRotation(0)+180), 720-(this.getNetworkRotation(0)+360));
+		rotL.drawRotRect(simpleTrans.moving[1], this.x+ox*-0.125, this.y+oy*-0.125, 16, 18/4, 18/4, fixedrot, 360-(torquegraph.getRotationOf(0)), 360-(torquegraph.getRotationOf(0)+180));
+		rotL.drawRotRect(simpleTrans.moving[1], this.x+ox*-0.125, this.y+oy*-0.125, 16, 18/4, 18/4, fixedrot, 720-(torquegraph.getRotationOf(0)+180), 720-(torquegraph.getRotationOf(0)+360));
 		
-		rotL.drawRotRect(simpleTrans.moving[2], this.x-ox, this.y-oy, 16, 10/4, 10/4, fixedrot, this.getNetworkRotation(1)+0, this.getNetworkRotation(1)+180);
-		rotL.drawRotRect(simpleTrans.moving[2], this.x-ox, this.y-oy, 16, 10/4, 10/4, fixedrot, this.getNetworkRotation(1)+180, this.getNetworkRotation(1)+360);
+		rotL.drawRotRect(simpleTrans.moving[2], this.x-ox, this.y-oy, 16, 10/4, 10/4, fixedrot, torquegraph.getRotationOf(1)+0, torquegraph.getRotationOf(1)+180);
+		rotL.drawRotRect(simpleTrans.moving[2], this.x-ox, this.y-oy, 16, 10/4, 10/4, fixedrot, torquegraph.getRotationOf(1)+180, torquegraph.getRotationOf(1)+360);
 		
 		//
 		Draw.rect(simpleTrans.overlaysprite[variant], this.x, this.y, this.rotdeg());
@@ -57,5 +58,7 @@ const simpleTrans = rotL.torqueExtend(Block, Building, "simple-transmission",rot
 simpleTrans.rotate = true;
 simpleTrans.update = true;
 simpleTrans.solid = true;
-simpleTrans.setAccept([2,1,0,0,1,2,0,0]);
-
+simpleTrans.getGraphConnectorBlock("torque graph").setAccept([2,1,0,0,1,2,0,0]);
+simpleTrans.getGraphConnectorBlock("torque graph").setRatio([1,2.5]);
+simpleTrans.getGraphConnectorBlock("torque graph").setBaseFriction(0.05);
+simpleTrans.getGraphConnectorBlock("torque graph").setBaseInertia(25);

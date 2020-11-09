@@ -17,11 +17,14 @@ const inlinegearbox = rotL.torqueExtend(Block, Building, "inline-gearbox",rotL.b
 	
 	updatePre()
 	{
-		this.setInertia(20);
-		this.setFriction(0.02);
+		this.getGraphConnector("torque graph").setInertia(20);
+		this.getGraphConnector("torque graph").setFriction(0.02);
 	},
 	
 	draw() {
+		let torquegraph = this.getGraphConnector("torque graph");
+		let shaftrot = torquegraph.getRotation();
+		
 		let fixedrot = ((this.rotdeg()+90)%180)-90;
 		Draw.rect(inlinegearbox.base, this.x, this.y, 0);
 		Draw.rect(inlinegearbox.mbase, this.x, this.y, fixedrot);
@@ -29,31 +32,25 @@ const inlinegearbox = rotL.torqueExtend(Block, Building, "inline-gearbox",rotL.b
 		let offset = rotL.dirs[(this.rotation+1)%4];
 		let ox = offset.x*4;
 		let oy = offset.y*4;
-		rotL.drawRotRect(inlinegearbox.moving, this.x+ox, this.y+oy, 16, 14/4, 8, fixedrot, this.getRotation(), this.getRotation()+90);
-		rotL.drawRotRect(inlinegearbox.moving, this.x-ox, this.y-oy, 16, 14/4, 8, fixedrot, this.getRotation()+90, this.getRotation()+180);
+		rotL.drawRotRect(inlinegearbox.moving, this.x+ox, this.y+oy, 16, 14/4, 8, fixedrot, shaftrot, shaftrot+90);
+		rotL.drawRotRect(inlinegearbox.moving, this.x-ox, this.y-oy, 16, 14/4, 8, fixedrot, shaftrot+90, shaftrot+180);
 		//gears
-		Draw.rect(inlinegearbox.gear, this.x+2, this.y+2, this.getRotation());
-		Draw.rect(inlinegearbox.gear, this.x-2, this.y+2, -this.getRotation());
-		Draw.rect(inlinegearbox.gear, this.x+2, this.y-2, -this.getRotation());
-		Draw.rect(inlinegearbox.gear, this.x-2, this.y-2, this.getRotation());
-		
+		Draw.rect(inlinegearbox.gear, this.x+2, this.y+2, shaftrot);
+		Draw.rect(inlinegearbox.gear, this.x-2, this.y+2, -shaftrot);
+		Draw.rect(inlinegearbox.gear, this.x+2, this.y-2, -shaftrot);
+		Draw.rect(inlinegearbox.gear, this.x-2, this.y-2, shaftrot);
 		//
 		Draw.rect(inlinegearbox.overlaysprite, this.x, this.y, fixedrot);
 		Draw.rect(inlinegearbox.topsprite, this.x, this.y, fixedrot);
         this.drawTeamTop();
-
 	}
 	
 	
 });
 
-/*driveShaft.buildType= ()=>{
-	
-	
-}*/
 inlinegearbox.rotate = true;
 inlinegearbox.update = true;
 inlinegearbox.solid = true;
-inlinegearbox.setAccept([1,1,0,0,1,1,0,0]);
-
-///Vars.content.getByName(ContentType.block, "unity-drive-shaft").overlaysprite = Core.atlas.find("unity-drive-shaft-overlay");
+inlinegearbox.getGraphConnectorBlock("torque graph").setAccept([1,1,0,0,1,1,0,0]);
+inlinegearbox.getGraphConnectorBlock("torque graph").setBaseFriction(0.02);
+inlinegearbox.getGraphConnectorBlock("torque graph").setBaseInertia(20);

@@ -28,23 +28,18 @@ const electricMotor = rotL.torqueExtend(Block, Building, "electric-motor", rotL.
 	
 	updatePre()
 	{
-		this.setInertia(10);
-		this.setFriction(0.3);
-		let mul = (this.power.graph == null ? 0 :(this.power.graph.powerBalance/4.5) );
-		if(mul < 0){
-			mul = 0;
-		}
-		if(mul > 1){
-			mul = 1;
-		}
-		this.setMotorForceMult(mul);
+		this.getGraphConnector("torque graph").setInertia(25);
+		this.getGraphConnector("torque graph").setFriction(0.1);
+		this.getGraphConnector("torque graph").setMotorForceMult(this.power.graph.getSatisfaction());
 	},
 	
 	draw() {
+		let torquegraph = this.getGraphConnector("torque graph");
 		let fixedrot = ((this.rotdeg() + 90) % 180) - 90;
 		let variant = ((this.rotation + 1) % 4>=2) ? 1 : 0;
 		let rotVar = (this.rotation == 1 || this.rotation == 3) ? 1 : 0;
-		let shaftRot = variant==1?360-this.getRotation():this.getRotation();
+		let shaftrotog = torquegraph.getRotation();
+		let shaftRot = variant==1?360-shaftrotog:shaftrotog;
 		Draw.rect(electricMotor.bottom, this.x, this.y, 0);
 		Draw.rect(electricMotor.base[rotVar], this.x, this.y, 0);
 		Draw.rect(electricMotor.coil[rotVar], this.x, this.y, 0);
@@ -61,19 +56,15 @@ const electricMotor = rotL.torqueExtend(Block, Building, "electric-motor", rotL.
 	
 });
 
-/*driveShaft.buildType= ()=>{
-	
-	
-}*/
 electricMotor.rotate = true;
 electricMotor.update = true;
 electricMotor.solid = true;
 electricMotor.consumes.power(4.5);
-electricMotor.setAccept([0,1,0,
-						0,0,0,
-						0,1,0,
-						0,0,0]);
-electricMotor.setMaxSpeed(10);
-electricMotor.setMaxTorque(20);
-
-///Vars.content.getByName(ContentType.block, "unity-drive-shaft").overlaysprite = Core.atlas.find("unity-drive-shaft-overlay");
+electricMotor.getGraphConnectorBlock("torque graph").setAccept([0,1,0,
+																0,0,0,
+																0,1,0,
+																0,0,0]);
+electricMotor.getGraphConnectorBlock("torque graph").setMaxSpeed(10);
+electricMotor.getGraphConnectorBlock("torque graph").setMaxTorque(20);
+electricMotor.getGraphConnectorBlock("torque graph").setBaseFriction(0.1);
+electricMotor.getGraphConnectorBlock("torque graph").setBaseInertia(25);

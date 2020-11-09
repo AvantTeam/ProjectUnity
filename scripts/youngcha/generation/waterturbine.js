@@ -45,8 +45,8 @@ const waterTurbine = rotL.torqueExtendContent(ArmoredConduit, ArmoredConduit.Arm
 	updatePre()
 	{
 		let flow = this._flowRate*40;
-		this.setInertia(20);
-		this.setFriction(0.03);
+		this.getGraphConnector("torque graph").setInertia(20);
+		this.getGraphConnector("torque graph").setFriction(0.15);
 		
 		
 		this.smoothLiquid = Mathf.lerpDelta(this.smoothLiquid, this.liquids.currentAmount() / this.liquidCapacity, 0.05);
@@ -58,20 +58,21 @@ const waterTurbine = rotL.torqueExtendContent(ArmoredConduit, ArmoredConduit.Arm
 		if(mul>1.0){
 			mul=0.5*Mathf.log2(mul)+1;
 		}
-		this.setMotorForceMult(mul);
+		this.getGraphConnector("torque graph").setMotorForceMult(mul);
 	},
 	
 	draw() {
+		let tgraph = this.getGraphConnector("torque graph");
 		let fixedrot = ((this.rotdeg()+90)%180)-90;
 		let variant = ((this.rotation+1)%4>=2)?1:0;
-		let shaftRot = variant==1?360-this.getRotation():this.getRotation();
+		let shaftRot = variant==1?360-tgraph.getRotation():tgraph.getRotation();
 		Draw.rect(waterTurbine.base[this.rotation%2], this.x, this.y, 0);
 		if(this.liquids.total() > 0.001){
 			Drawf.liquid(waterTurbine.liquidSprite[this.rotation%2], this.x, this.y, this.liquids.total() / this.block.liquidCapacity, this.liquids.current().color);
 		}
 		
-		Drawf.shadow(waterTurbine.rotor, this.x -(this.block.size / 2), this.y - (this.block.size / 2), this.getRotation());
-		Draw.rect(waterTurbine.rotor, this.x, this.y, this.getRotation());
+		Drawf.shadow(waterTurbine.rotor, this.x -(this.block.size / 2), this.y - (this.block.size / 2), tgraph.getRotation());
+		Draw.rect(waterTurbine.rotor, this.x, this.y, tgraph.getRotation());
 		
 		Draw.rect(waterTurbine.topsprite[this.rotation], this.x, this.y, 0);
         this.drawTeamTop();
@@ -101,11 +102,12 @@ waterTurbine.liquidCapacity = 250;
 waterTurbine.noUpdateDisabled = false;
 waterTurbine.setUseOgUpdate(false);
 waterTurbine.liquidPressure = 0.3;
-waterTurbine.setAccept([0,0,0,
-						0,1,0,
-						0,0,0,
-						0,1,0]);
-waterTurbine.setMaxSpeed(7);
-waterTurbine.setMaxTorque(15);
+waterTurbine.getGraphConnectorBlock("torque graph").setAccept([0,0,0,
+															   0,1,0,
+															   0,0,0,
+															   0,1,0]);
+waterTurbine.getGraphConnectorBlock("torque graph").setMaxSpeed(7);
+waterTurbine.getGraphConnectorBlock("torque graph").setMaxTorque(15);
+waterTurbine.getGraphConnectorBlock("torque graph").setBaseFriction(0.15);
+waterTurbine.getGraphConnectorBlock("torque graph").setBaseInertia(20);
 waterTurbine.setTimerFlow(waterTurbine.timers++);
-///Vars.content.getByName(ContentType.block, "unity-drive-shaft").overlaysprite = Core.atlas.find("unity-drive-shaft-overlay");
