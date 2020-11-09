@@ -1,0 +1,9 @@
+requirements:[
+    lead/12
+    silicon/10
+    phase-fabric/10
+    thorium/4
+]
+category:distribution
+itemCapacity:10
+hasItems:true

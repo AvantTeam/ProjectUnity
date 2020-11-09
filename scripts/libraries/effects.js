@@ -1,4 +1,14 @@
+const tempVec = new Vec2();
+
 //Colored region
+
+const coloredSpark1L = new Effect(23, e => {
+	tempVec.trns(e.rotation, e.fin() * 32, Mathf.randomSeedRange(Mathf.round((e.id * 322.563) + Time.time()), 8) * e.fslope());
+	tempVec.add(e.x, e.y);
+	
+	Draw.color(e.color);
+	Fill.square(tempVec.x, tempVec.y, 3 * e.fout(), 45);
+});
 
 const coloredRailShootL = new Effect(24, e => {
 	e.scaled(10, b => {
@@ -56,12 +66,16 @@ const coloredHitSmallL = new Effect(14, e => {
 //Imber region
 
 const imberSparkCraftingEffect = new Effect(70, e => {
-	Draw.color(Color.valueOf("fff566"), Color.valueOf("ffc266"), e.finpow());
-	Draw.alpha(e.finpow());
-	Angles.randLenVectors(e.id, 3, (1 - e.finpow()) * 24, e.rotation, 360, new Floatc2({get(x, y){
-		Drawf.tri(e.x + x, e.y + y, e.fout() * 8, e.fout() * 10, e.rotation);
-		Drawf.tri(e.x + x, e.y + y, e.fout() * 4, e.fout() * 6, e.rotation);
-	}}));
+	//Draw.color(Color.valueOf("fff566"), Color.valueOf("ffc266"), e.finpow());
+	Draw.color(Pal.surge, Color.white, e.finpow());
+	//Draw.alpha(e.finpow());
+	/*Angles.randLenVectors(e.id, 3, (1 - e.finpow()) * 24, e.rotation, 360, new Floatc2({get(x, y){
+		//Drawf.tri(e.x + x, e.y + y, e.fout() * 8, e.fout() * 10, e.rotation);
+		//Drawf.tri(e.x + x, e.y + y, e.fout() * 4, e.fout() * 6, e.rotation);
+	}}));*/
+	Angles.randLenVectors(e.id, 3, (1 - e.finpow()) * 24, e.rotation, 360, (x, y) => {
+		Fill.poly(e.x + x, e.y + y, 3, e.fslope() * 8, e.rotation);
+	});
 	Draw.color();
 });
 
@@ -263,6 +277,7 @@ const scarRailHitL = new Effect(18, e => {
 //End region
 
 module.exports = {
+	coloredSpark1: coloredSpark1L,
     coloredRailShoot: coloredRailShootL,
 	coloredRailTrail: coloredRailTrailL,
 	coloredRailHit: coloredRailHitL,

@@ -16,7 +16,7 @@
 	"hasLiquids": true,
 	"heatColor": "ffffff",
 	"rotateSpeed": 0.97,
-	"activeSoundVolume": 3,
+	"loopSoundVolume": 3,
 	"expanded": true,
 	"requirements": [
 		{ "item": "copper", "amount": 2800 },

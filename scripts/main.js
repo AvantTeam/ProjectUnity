@@ -88,7 +88,8 @@ const script = [
             {
                 name: "flying-units",
                 childs: [
-                    "caelifera", "schistocerca", "anthophila", "vespula", "lepidoptera"
+                    "caelifera", "schistocerca", "anthophila", "vespula", "lepidoptera",
+					"angel"
                 ]
             },
 
@@ -209,7 +210,8 @@ const script = [
                 name: "blocks",
                 childs: [
                     "shieldGenerator",
-                    "shieldedWall"
+                    "shieldedWall",
+                    "teleporter"
                 ]
             }
         ]
@@ -336,8 +338,8 @@ if(!Vars.headless){
         mod.meta.displayName = Core.bundle.get(change + "name");
         mod.meta.description = Core.bundle.get(change + "description");
     });
-	
-	
+
+
 };
 const music = loadMusic("youngcha");
 /*

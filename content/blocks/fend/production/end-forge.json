@@ -28,5 +28,5 @@
 		{"item": "termination-fragment", "amount": 230}
 	],
 	"category": "crafting",
-	"idleSoundVolume": 0.6
+	"ambientSoundVolume": 0.6
 }

@@ -1,8 +1,8 @@
 module.exports = {
     extend(type, build, name, obj = {}, objb = {}){
         obj = Object.assign({
-            idleSound: Sounds.machine,
-            idleSoundVolume: 1,
+            ambientSound: Sounds.machine,
+            ambientSoundVolume: 1,
 
             chargeReloadTime: 120
         }, obj, {
@@ -22,8 +22,8 @@ module.exports = {
             chargeReload: obj.chargeReloadTime
         }, objb, {
             loop: {
-                sound: obj.idleSound,
-                baseVolume: obj.idleSoundVolume,
+                sound: obj.ambientSound,
+                baseVolume: obj.ambientSoundVolume,
                 id: -1,
 
                 update(x, y, vol, pitch){
