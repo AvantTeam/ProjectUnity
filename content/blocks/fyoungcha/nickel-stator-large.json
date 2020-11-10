@@ -1,0 +1,9 @@
+{
+	"size": 2,
+	"health": 1800,
+	"requirements": [
+		{"item": "nickel", "amount": 240},
+		{"item": "titanium", "amount": 320},
+	],
+	"category": "power",
+}

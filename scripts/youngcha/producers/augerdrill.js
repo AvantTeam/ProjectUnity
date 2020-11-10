@@ -68,7 +68,8 @@ augerDrill.outputsItem = true;
 augerDrill.tier= 3;
 augerDrill.drawMineItem=true;
 augerDrill.drillTime=500;
-
+augerDrill.getGraphConnectorBlock("torque graph").setIdleFriction(0.03);
+augerDrill.getGraphConnectorBlock("torque graph").setWorkingFriction(0.15);
 augerDrill.getGraphConnectorBlock("torque graph").setNominalSpeed(8);
 augerDrill.getGraphConnectorBlock("torque graph").setAccept([0,1,0, //right side
 															0,0,0, //top 

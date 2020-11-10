@@ -300,6 +300,7 @@ const _GraphPropsCommon = {
         this.initAllNets(building);
         this.needsNetworkUpdate = true;
 		this._lastRecalc=-1;
+		this.initStats();
     },
 	
 	getBlockData(){
@@ -389,6 +390,7 @@ const _GraphPropsCommon = {
 	updateProps(graph,index) {},
     proximityUpdateCustom() {},
 	display(table) {},
+	initStats() {},
 	displayBars(barsTable){},
     //variables for network
     _graphset: null,

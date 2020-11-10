@@ -299,7 +299,7 @@ const script = [
             {
                 name: "generation",
                 childs: [
-					"testblock",
+					"magnets",
 					"torqueinfi",
                     "handcrank",
                     "windturbine",
