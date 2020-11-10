@@ -1,0 +1,60 @@
+const effects = this.global.unity.effects;
+const ais = this.global.unity.ai;
+
+const ryzerMissile = extend(MissileBulletType, {});
+ryzerMissile.speed = 5;
+ryzerMissile.height = 12;
+ryzerMissile.width = 7;
+ryzerMissile.shrinkY = 0;
+ryzerMissile.backColor = Color.valueOf("f53036");
+ryzerMissile.frontColor = Color.valueOf("ff786e");
+ryzerMissile.trailColor = Color.valueOf("f53036");
+ryzerMissile.splashDamage = 25;
+ryzerMissile.splashDamageRadius = 20;
+ryzerMissile.weaveMag = 3;
+ryzerMissile.weaveScale = 4;
+
+const ryzerRailBullet = extend(RailBulletType, {});
+ryzerRailBullet.damage = 700;
+ryzerRailBullet.speed = 59;
+ryzerRailBullet.lifetime = 8;
+ryzerRailBullet.shootEffect = effects.scarRailShoot;
+ryzerRailBullet.pierceEffect = effects.scarRailHit;
+ryzerRailBullet.updateEffect = effects.scarRailTrail;
+ryzerRailBullet.hitEffect = Fx.massiveExplosion;
+ryzerRailBullet.pierceDamageFactor = 0.2;
+
+const ryzerMissileLauncher = new Weapon("unity-scar-missile-launcher");
+ryzerMissileLauncher.x = 6.25;
+ryzerMissileLauncher.reload = 50;
+ryzerMissileLauncher.shots = 5;
+ryzerMissileLauncher.shotDelay = 3;
+ryzerMissileLauncher.inaccuracy = 4;
+ryzerMissileLauncher.rotate = true;
+ryzerMissileLauncher.bullet = ryzerMissile;
+
+const ryzerMainRailgun = new Weapon("");
+ryzerMainRailgun.reload = 2.5 * 60;
+ryzerMainRailgun.x = 0;
+ryzerMainRailgun.y = 7.5;
+ryzerMainRailgun.shootY = 2;
+ryzerMainRailgun.mirror = false;
+ryzerMainRailgun.rotate = false;
+ryzerMainRailgun.shake = 2.3;
+ryzerMainRailgun.bullet = ryzerRailBullet;
+
+const ryzer = extendContent(UnitType, "ryzer", {});
+ryzer.speed = 0.7;
+ryzer.health = 640;
+ryzer.weapons.add(ryzerMainRailgun);
+ryzer.weapons.add(ryzerMissileLauncher);
+ryzer.hitSize = 9.5 * 1.7;
+ryzer.range = 350;
+ryzer.allowLegStep = true;
+ryzer.legMoveSpace = 0.73;
+ryzer.legCount = 6;
+ryzer.legTrns = 0.4;
+ryzer.legLength = 32;
+ryzer.legExtension = -4.3;
+ryzer.defaultController = ais.distanceGroundAI;
+ryzer.constructor = () => extend(LegsUnit, {});

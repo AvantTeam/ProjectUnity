@@ -129,7 +129,7 @@ const distanceGroundAIL = prov(() => {
 			};
 			
 			if(this._lockTarget && this.target != null && this.target.team != this.unit.team && this.command() != UnitCommand.rally){
-				if(this.unit.within(this.target, this.unit.range() / 1.72)) this.unit.moveAt(tempVec.trns(this.unit.angleTo(this.target) + 180, this.unit.type.speed));
+				if(this.unit.within(this.target, this.unit.range() / 1.72)) this.unit.moveAt(tempVec.trns(this.unit.angleTo(this.target) + 180, this.unit.realSpeed()));
 			};
 		}
 	});

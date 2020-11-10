@@ -26,7 +26,7 @@ const hovos = extendContent(UnitType, "hovos", {});
 hovos.speed = 0.8;
 hovos.weapons.add(hovosRailgun);
 hovos.health = 340;
-hovos.hitSize = 17;
+hovos.hitSize = 7.75 * 1.7;
 hovos.range = 350;
 hovos.allowLegStep = true;
 hovos.legMoveSpace = 0.7;
