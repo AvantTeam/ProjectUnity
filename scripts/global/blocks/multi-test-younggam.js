@@ -1,5 +1,5 @@
 const multiLib = require("libraries/multi-lib");
-const multiTest1 = multiLib.MultiCrafter(GenericCrafter, "multi-test-1", [{
+const multiTest1 = multiLib.MultiCrafter(GenericSmelter, GenericSmelter.SmelterBuild, "multi-test-1", [{
         //1  you can skip recipe properties
         input: {},
         output: {
@@ -108,7 +108,7 @@ const multiTest1 = multiLib.MultiCrafter(GenericCrafter, "multi-test-1", [{
         }
     });
 multiTest1.dumpToggle = true;
-const multiTest2 = multiLib.MultiCrafter(GenericCrafter, "multi-test-2", [{ //1  you can skip recipe properties
+const multiTest2 = multiLib.MultiCrafter(GenericCrafter, GenericCrafter.GenericCrafterBuild, "multi-test-2", [{ //1  you can skip recipe properties
     input: {
         items: ["sand/1", "lead/1"],
     },
