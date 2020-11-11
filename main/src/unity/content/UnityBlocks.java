@@ -83,9 +83,10 @@ public class UnityBlocks implements ContentList{
 		//endregion
 		//region global
 		
-		multiTest1 = new MultiCrafter("multi-test-1", 10, true){{
+		multiTest1 = new MultiCrafter("multi-test-1", 10){{
 			requirements(Category.crafting, with(Items.copper, 10));
 			size = 3;
+			dumpToggle = true;
 			addRecipe(new InputContents(), new OutputContents(5.25f), 12);
 			addRecipe(
 				new InputContents(with(Items.coal, 1, Items.sand, 1), new LiquidStack[]{new LiquidStack(Liquids.water, 5)}, 1),
