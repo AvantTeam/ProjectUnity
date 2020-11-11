@@ -169,7 +169,6 @@ const _RotPowerPropsCommon = Object.assign(Object.create(graphLib.graphProps),{
         }
         let ps = " " + StatUnit.perSecond.localized();
         let net = this._network;
-        let speed = this._network.lastVelocity / 60.0;
         table.row();
         table.table(
             cons(sub => {
@@ -354,6 +353,10 @@ const _TorqueGenerator = Object.assign(Object.create(_RotPowerCommon),{
     _maxtorque: 5,
     //motor strength at no rotation speed used for the combustion motors
     _starttorque: 5,
+
+	
+	
+	
     getMaxSpeed() {
         return this._max_speed
     },
@@ -383,7 +386,7 @@ const _TorqueGenerator = Object.assign(Object.create(_RotPowerCommon),{
 		table.row();
 		table.left();
         table.add("[lightgray]" + Core.bundle.get("stat.unity.maxspeed") + ":[] ").left();
-		table.add(this.getMaxSpeed()+"rps");
+		table.add((this.getMaxSpeed()*0.1)+"rps");
 		
 		table.row();
 		table.left();
@@ -397,6 +400,7 @@ const _TorqueGenerator = Object.assign(Object.create(_RotPowerCommon),{
 
 const _TorqueGeneratorProps = Object.assign(Object.create(_RotPowerPropsCommon), {
     _motor_force_mult: 1.0,
+	_max_motor_force_mult: 1.0,
     _smoothedForce: null,
     getSmoothedForce() {
         if (!this._smoothedForce) {
@@ -412,7 +416,7 @@ const _TorqueGeneratorProps = Object.assign(Object.create(_RotPowerPropsCommon),
             block.getMaxTorque(),
             block.getStartTorque(),
             block.getTorqueCoeff()
-        ) * this.getBuild().edelta() * this._motor_force_mult);
+        ) * this.getBuild().edelta() * this._motor_force_mult * this._max_motor_force_mult);
         if (!this._smoothedForce) {
             this._smoothedForce = new WindowedMean(40);
         }
@@ -425,12 +429,14 @@ const _TorqueGeneratorProps = Object.assign(Object.create(_RotPowerPropsCommon),
     setMotorForceMult(new_val) {
         this._motor_force_mult = new_val
     },
-
+	setMaxMotorForceMult(new_val) {
+        this._max_motor_force_mult = new_val
+    },
     displayBars(barsTable) {
         let block = this.getBlockData();
 
         barsTable.add(new Bar(
-            prov(() => Core.bundle.get("stat.unity.torque") + ": " + Strings.fixed(this.getSmoothedForce(), 1) + "/" + Strings.fixed(block.getMaxTorque(), 1)),
+            prov(() => Core.bundle.get("stat.unity.torque") + ": " + Strings.fixed(this.getSmoothedForce(), 1) + "/" + Strings.fixed(block.getMaxTorque()*this._max_motor_force_mult, 1)),
             prov(() => Pal.darkishGray),
             floatp(() => this.getSmoothedForce() / block.getMaxTorque()))).growX();
         barsTable.row();
@@ -478,7 +484,7 @@ const _TorqueConsumer = Object.assign(Object.create(_RotPowerCommon), {
 		table.row();
 		table.left();
         table.add("[lightgray]" + Core.bundle.get("stat.unity.nominalspeed") + ":[] ").left();
-		table.add(this.getNominalSpeed()+"rps");
+		table.add((this.getNominalSpeed()*0.1)+"rps");
 		
 		table.row();
 		table.left();

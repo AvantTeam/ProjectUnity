@@ -58,8 +58,6 @@ const _GraphCommonBuild = {
 		  graphConn.onCreate(building)
 		}
         this.prev_tile_rotation = -1;
-		
-
     },
 	efficiency() {
 		let e = this.super$efficiency();
@@ -123,7 +121,9 @@ const _GraphCommonBuild = {
 		for(let graphname in this.graphs) {
 			this.graphs[graphname].displayBars(barsTable);
 		}
+		this.displayBarsExt(barsTable);
 	},
+	displayBarsExt(barsTable){},
 	write(stream) {
         this.super$write(stream);
         for(let graphname in this.graphs) {
@@ -165,7 +165,7 @@ const _GraphCommonBlock = {
 	},
 	injectGraphConnectors(building){
 		for(let graphname in this.graphBlocks) {
-			const gt = deepCopy(this.graphBuildings[graphname]);
+			let gt = deepCopy(this.graphBuildings[graphname]);
 			building.setGraphConnector(gt);
 			gt.parentblock = this.graphBlocks[graphname];
 		}
@@ -876,7 +876,7 @@ const _BlockGraph = {
 						//print("we in c:"+root.name);
                         //conbuild -> connected buildConnector
                         let conbuild = tile.bc().getGraphConnector(root.name);
-                        if (conbuild == prevbuilding || conbuild.getDead()) {
+                        if (!conbuild || conbuild == prevbuilding || conbuild.getDead()) {
 							//print("conbuild is dead or duplicate or undefined:"+conbuild);
                             continue;
                         }
@@ -976,6 +976,7 @@ module.exports = {
 	graphMultiProps: _GraphMulticonnectorProps,
     graphCommon: _GraphCommon,
     dirs: _dirs,
+	dcopy: deepCopy,
 	init(){
 		return {
 			block:deepCopy(_GraphCommonBlock),
