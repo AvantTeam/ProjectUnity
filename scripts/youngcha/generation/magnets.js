@@ -201,7 +201,7 @@ const nickelElectromagnet = graphLib.finaliseExtend(Block, Building,"nickel-elec
 nickelElectromagnet.rotate = true;
 nickelElectromagnet.update = true;
 nickelElectromagnet.solid = true;
-nickelElectromagnet.consumes.power(4);
+nickelElectromagnet.consumes.power(1.6);
 nickelElectromagnet.getGraphConnectorBlock("flux graph").setAccept( [1,1,0,0,0,0,0,0]);
 nickelElectromagnet.getGraphConnectorBlock("flux graph").setFlux(25);
 
@@ -215,7 +215,7 @@ nickelElectromagnet.getGraphConnectorBlock("flux graph").setFlux(25);
 const rotorBlock = {
 	_baseTopSpeed: 20,
 	_baseTorque: 5,
-	_torqueEfficiency: 1.0, // how much extra flux get converted into extra torque                                                         usually around 5         a value of one will increase max torque by 1 for each unit of flux.
+	_torqueEfficiency: 1.0, // how much extra flux get converted into extra torque                                                         usually around 2        a value of one will increase max torque by 1 for each unit of flux.
 	_fluxEfficiency: 1.0, // how much added magnets will decrease top speed, higher is better.                                             usually around ~8        a value of one will decrease top speed by half for each flux unit.
 	_rotPowerEfficiency: 1.0, // how good it converts rotation to power, power produced caps at the value of PowerGenerator.powerProduction   usually around ~0.2     a value of one will produce the maximum power for 0.1r/s above top speed.
 	getTorqueEfficiency(){return this._torqueEfficiency;},
@@ -232,6 +232,9 @@ const rotorBlock = {
 const rotorBuild = {
 	displayBarsExt(barsTable){	
         let block = this.block;
+		let flux = this.getGraphConnector("flux graph").getNetwork().getFlux();
+		let tgraph = this.getGraphConnector("torque graph");
+		let mtorque = flux * this.block.getTorqueEfficiency()* this.block.getBaseTorque();
 		
         barsTable.add(new Bar(
             prov(() => Core.bundle.format("bar.poweroutput", Strings.fixed((this.getPowerProduction() - block.consumes.getPower().usage) * 60 * this.timeScale, 1))),
@@ -240,39 +243,46 @@ const rotorBuild = {
         barsTable.row();
 		
 		barsTable.add(new Bar(
+            prov(() => Core.bundle.get("stat.unity.torque") + ": " + Strings.fixed(tgraph.getForce(), 1) + "/" + Strings.fixed(mtorque, 1)),
+            prov(() => Pal.darkishGray),
+            floatp(() => tgraph.getForce() / mtorque))).growX();
+        barsTable.row();
+		
+		barsTable.add(new Bar(
             prov(() => Core.bundle.get("stat.unity.maxspeed")+":"+ Strings.fixed(this.getTopSpeed()/6.0,1)+"r/s" ),
             prov(() => Pal.darkishGray),
             floatp(() => this.getTopSpeed()/this.block.getBaseTopSpeed()  ))).growX();
         barsTable.row();
-    
+		
 	},
 	
 	getTopSpeed(){
+		if(!this.getGraphConnector("flux graph").getNetwork()){return 1;}
 		let flux = this.getGraphConnector("flux graph").getNetwork().getFlux();
 		return this.block.getBaseTopSpeed()/ (1.0+ flux/this.block.getFluxEfficiency());
 	},
 	
 	updatePre(){
+		let blkdata = this.block.getGraphConnectorBlock("torque graph");
+		let fric = blkdata.getBaseFriction();
 		let flux = this.getGraphConnector("flux graph").getNetwork().getFlux();
 		let topspeed =  this.block.getBaseTopSpeed()/ (1.0+ flux/this.block.getFluxEfficiency());
 		let breakeven  = this.block.consumes.getPower().usage/this.block.powerProduction;
 		
 		let tgraph = this.getGraphConnector("torque graph");
 		let rotvel = tgraph.getNetwork().lastVelocity;
-		//print(flux+","+topspeed+","+breakeven+","+tgraph+","+rotvel);
 		if(!rotvel){
 			rotvel=0;
 		}
 		if(rotvel>topspeed){
 			this.productionEfficiency = breakeven + (1.0-breakeven) * Mathf.clamp((rotvel - topspeed)*this.block.getRotPowerEfficiency());
-			this.getGraphConnector("torque graph").setFriction(0.2);
+			tgraph.setFriction(fric);
 		}else{
 			this.productionEfficiency = Mathf.pow((rotvel/topspeed)*breakeven,4);
-			this.getGraphConnector("torque graph").setFriction(0.05 + (rotvel/topspeed)*0.15);
+			tgraph.setFriction(fric*0.5 + ((rotvel/topspeed)*fric*0.5) );
 		}
-		let mul = Mathf.clamp(1.0-(rotvel/topspeed));
-		this.getGraphConnector("torque graph").setMaxMotorForceMult(flux * this.block.getTorqueEfficiency());
-		this.getGraphConnector("torque graph").setMotorForceMult(mul);
+		let mul = Mathf.clamp(1.0-(rotvel/topspeed),-1.0,1.0);
+		tgraph.setForce(mul*flux * this.block.getTorqueEfficiency()* this.block.getBaseTorque()* this.edelta());
 	},
 }
 
@@ -280,7 +290,7 @@ const rotorBuild = {
 
 let erblankobj = graphLib.init();
 graphLib.addGraph(erblankobj, magnetgraphtype); //flux graph
-graphLib.addGraph(erblankobj, rotL.baseTypes.torqueGenerator);  //rotlib graph
+graphLib.addGraph(erblankobj, rotL.baseTypes.torqueConnector);  //rotlib graph
 
 Object.assign(erblankobj.block, rotorBlock);
 Object.assign(erblankobj.build,rotorBuild);
@@ -320,10 +330,10 @@ electricRotor.consumes.power(5.0);
 electricRotor.getGraphConnectorBlock("flux graph").setAccept( [0,0,0, 1,1,1, 0,0,0, 1,1,1]);
 electricRotor.getGraphConnectorBlock("flux graph").setFluxproducer(false);
 electricRotor.getGraphConnectorBlock("torque graph").setAccept([0,1,0, 0,0,0, 0,1,0, 0,0,0]);
-electricRotor.getGraphConnectorBlock("torque graph").setBaseFriction(0.2);
+electricRotor.getGraphConnectorBlock("torque graph").setBaseFriction(0.1);
 electricRotor.setFluxEfficiency(10.0);
-electricRotor.setRotPowerEfficiency(0.2);
-electricRotor.setTorqueEfficiency(1.5);
+electricRotor.setRotPowerEfficiency(0.16);
+electricRotor.setTorqueEfficiency(1.2);
 electricRotor.setBaseTorque(5.0);
 electricRotor.setBaseTopSpeed(20.0);
-electricRotor.powerProduction = 17.5;
+electricRotor.powerProduction = 20.0;

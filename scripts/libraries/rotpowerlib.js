@@ -342,7 +342,7 @@ const _TorqueTransmissionProps = Object.assign(Object.create(_TorqueMulticonnect
     },
 
 });
-
+//very basic.
 const _TorqueGenerator = Object.assign(Object.create(_RotPowerCommon),{
 
     //motor max rated speed
@@ -353,8 +353,6 @@ const _TorqueGenerator = Object.assign(Object.create(_RotPowerCommon),{
     _maxtorque: 5,
     //motor strength at no rotation speed used for the combustion motors
     _starttorque: 5,
-
-	
 	
 	
     getMaxSpeed() {
@@ -438,7 +436,7 @@ const _TorqueGeneratorProps = Object.assign(Object.create(_RotPowerPropsCommon),
         barsTable.add(new Bar(
             prov(() => Core.bundle.get("stat.unity.torque") + ": " + Strings.fixed(this.getSmoothedForce(), 1) + "/" + Strings.fixed(block.getMaxTorque()*this._max_motor_force_mult, 1)),
             prov(() => Pal.darkishGray),
-            floatp(() => this.getSmoothedForce() / block.getMaxTorque()))).growX();
+            floatp(() => this.getSmoothedForce() / (block.getMaxTorque()*this._max_motor_force_mult) ))).growX();
         barsTable.row();
     },
 });
