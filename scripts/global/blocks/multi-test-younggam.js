@@ -140,4 +140,4 @@ const multiTest2 = multiLib.MultiCrafter(GenericCrafter, "multi-test-2", [{ //1 
         power: 10
     },
     craftTime: 30
-}], {}, function Extra() {});
+}], {}, {});

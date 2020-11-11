@@ -1,13 +1,15 @@
+const customValue = method => new StatValue() {
+    display: method
+}
+
 function MultiCrafterBuild() {
     this.acceptItem = function(source, item) {
         if(typeof this.block["getInputItemSet"] !== "function") return false;
         if(this.items.get(item) >= this.getMaximumAccepted(item)) return false;
-        var ret = this.block.getInputItemSet();
-        return ret.contains(item);
+        return this.block.getInputItemSet().contains(item);
     };
-    this.acceptLiquid = function(source, liquid, amount) {
+    this.acceptLiquid = function(source, liquid) {
         if(typeof this.block["getInputLiquidSet"] !== "function") return false;
-        if(this.liquids.get(liquid) + amount > this.block.liquidCapacity) return false;
         return this.block.getInputLiquidSet().contains(liquid);
     };
     this.removeStack = function(item, amount) {
@@ -189,6 +191,7 @@ function MultiCrafterBuild() {
             this.itemHas = 0;
             this.items.each(item => this.itemHas++);
         };
+        if(!Vars.headless && Vars.control.input.frag.config.getSelectedTile() != this) this.block.invFrag.hide();
         const recs = this.block.getRecipes();
         var recLen = recs.length;
         var current = this._toggle;
@@ -311,7 +314,7 @@ function MultiCrafterBuild() {
         };
     };
     this.configured = function(player, value) {
-        if(isNaN(value)) {
+        if(isNaN(value) || typeof value != "number") {
             this._toggle = -1;
             this._cond = false;
             this._condValid = false;
@@ -343,7 +346,6 @@ function MultiCrafterBuild() {
         this._toggle = value;
     };
     this.onConfigureTileTapped = function(other) {
-        if(this != other) this.block.getInvFrag().hide();
         return this.items.total() > 0 ? true : this != other;
     };
     this.created = function() {
@@ -550,24 +552,28 @@ function MultiCrafterBlock() {
                 };
             };
         };
-        if(!this.powerBarI) {
-            this.consumes.remove(ConsumeType.power);
-            this.hasPower = false;
-        };
+        this.hasPower = this.powerBarI || this.powerBarO;
+        if(this.powerBarI) this.consumes.add(extend(ConsumePower, {
+            requestedPower(entity) {
+                if(typeof entity["getToggle"] !== "function") return 0;
+                var i = entity.getToggle();
+                if(i < 0) return 0;
+                var input = entity.block.getRecipes()[i].input.power;
+                if(input > 0 && entity.getCond()) return input;
+                return 0;
+            }
+        }));
         this.consumesPower = this.powerBarI;
         this.outputsPower = this.powerBarO;
         this.super$init();
         if(!this._outputLiquidSet.isEmpty()) this.outputsLiquid = true;
-        this.timers += 2;
+        this.timers++;
         if(!Vars.headless) this.infoStyle = Core.scene.getStyle(Button.ButtonStyle);
     };
     this.setStats = function() {
         this.super$setStats();
         if(this.powerBarI) this.stats.remove(Stat.powerUse);
         this.stats.remove(Stat.productionTime);
-        var customValue = method => new StatValue() {
-            display: method
-        }
         this.stats.add(Stat.input, customValue(table => {
             table.row();
             var recLen = this.recs.length;
@@ -635,29 +641,29 @@ function MultiCrafterBlock() {
     this.outputsItems = function() {
         return this.hasOutputItem;
     };
-    this.saveConfig = true;
 };
+
+function cloneObject(obj) {
+    var clone = {};
+    for(var i in obj) {
+        print(i);
+        if(typeof obj[i] == "object" && obj[i] != null) clone[i] = cloneObject(obj[i]);
+        else clone[i] = obj[i];
+    }
+    return clone;
+}
 module.exports = {
     MultiCrafter(Type, name, recipes, def, ExtraEntityDef) {
         const block = new MultiCrafterBlock();
         Object.assign(block, def);
         const multi = extendContent(Type, name, block);
-        multi.buildType = () => extendContent(GenericCrafter.GenericCrafterBuild, multi, Object.assign(new MultiCrafterBuild(), new ExtraEntityDef()));
-        multi.consumes.add(extend(ConsumePower, {
-            requestedPower(entity) {
-                if(typeof entity["getToggle"] !== "function") return 0;
-                var i = entity.getToggle();
-                if(i < 0) return 0;
-                var input = entity.block.getRecipes()[i].input.power;
-                if(input > 0 && entity.getCond()) return input;
-                return 0;
-            }
-        }));
+        multi.buildType = () => extendContent(GenericCrafter.GenericCrafterBuild, multi, Object.assign(new MultiCrafterBuild(), typeof ExtraEntityDef == "function" ? new ExtraEntityDef() : cloneObject(ExtraEntityDef)));
         multi.configurable = true;
         multi.hasItems = true;
         multi.hasLiquids = true;
-        multi.hasPower = true;
+        multi.hasPower = false;
         multi.tmpRecs = recipes;
+        multi.saveConfig = true;
         return multi;
     }
 };
