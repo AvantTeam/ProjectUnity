@@ -322,7 +322,7 @@ electricRotor.getGraphConnectorBlock("flux graph").setFluxproducer(false);
 electricRotor.getGraphConnectorBlock("torque graph").setAccept([0,1,0, 0,0,0, 0,1,0, 0,0,0]);
 electricRotor.getGraphConnectorBlock("torque graph").setBaseFriction(0.2);
 electricRotor.setFluxEfficiency(10.0);
-electricRotor.setRotPowerEfficiency(0.1);
+electricRotor.setRotPowerEfficiency(0.2);
 electricRotor.setTorqueEfficiency(1.5);
 electricRotor.setBaseTorque(5.0);
 electricRotor.setBaseTopSpeed(20.0);

@@ -2,8 +2,8 @@
 	"size": 2,
 	"health": 1800,
 	"requirements": [
-		{"item": "nickel", "amount": 240},
-		{"item": "titanium", "amount": 320},
+		{"item": "nickel", "amount": 250},
+		{"item": "titanium", "amount": 150},
 	],
 	"category": "power",
 }

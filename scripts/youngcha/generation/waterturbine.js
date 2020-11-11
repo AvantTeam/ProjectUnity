@@ -63,9 +63,10 @@ const waterTurbine = rotL.torqueExtendContent(ArmoredConduit, ArmoredConduit.Arm
 	
 	draw() {
 		let tgraph = this.getGraphConnector("torque graph");
+		let shaftRot = variant==1?360-tgraph.getRotation():tgraph.getRotation();
 		let fixedrot = ((this.rotdeg()+90)%180)-90;
 		let variant = ((this.rotation+1)%4>=2)?1:0;
-		let shaftRot = variant==1?360-tgraph.getRotation():tgraph.getRotation();
+		
 		Draw.rect(waterTurbine.base[this.rotation%2], this.x, this.y, 0);
 		if(this.liquids.total() > 0.001){
 			Drawf.liquid(waterTurbine.liquidSprite[this.rotation%2], this.x, this.y, this.liquids.total() / this.block.liquidCapacity, this.liquids.current().color);
