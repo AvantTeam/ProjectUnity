@@ -653,11 +653,11 @@ function cloneObject(obj) {
     return clone;
 }
 module.exports = {
-    MultiCrafter(Type, name, recipes, def, ExtraEntityDef) {
+    MultiCrafter(Type, EntityType, name, recipes, def, ExtraEntityDef) {
         const block = new MultiCrafterBlock();
         Object.assign(block, def);
         const multi = extendContent(Type, name, block);
-        multi.buildType = () => extendContent(GenericCrafter.GenericCrafterBuild, multi, Object.assign(new MultiCrafterBuild(), typeof ExtraEntityDef == "function" ? new ExtraEntityDef() : cloneObject(ExtraEntityDef)));
+        multi.buildType = () => extendContent(EntityType, multi, Object.assign(new MultiCrafterBuild(), typeof ExtraEntityDef == "function" ? new ExtraEntityDef() : cloneObject(ExtraEntityDef)));
         multi.configurable = true;
         multi.hasItems = true;
         multi.hasLiquids = true;
