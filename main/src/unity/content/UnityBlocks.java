@@ -18,9 +18,10 @@ import mindustry.ctype.*;
 import mindustry.content.*;
 import unity.graphics.UnityPal;
 import unity.world.blocks.*;
-import unity.world.blocks.Recipe.*;
 import unity.world.blocks.experience.*;
 import unity.world.blocks.light.*;
+import multilib.*;
+import multilib.Recipe.*;
 
 import static arc.Core.*;
 import static mindustry.type.ItemStack.*;
