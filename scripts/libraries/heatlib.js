@@ -171,7 +171,6 @@ const _HeatPropsCommon = Object.assign(deepCopy(graphLib.graphProps),{
     },
 	
 	updateProps(graph,index) {
-		print("uh");
 		let temp = this.getTemp();
 		let cond = this.getBlockData().getBaseHeatConductivity();
 		this.setHeatBuffer(0);
@@ -182,7 +181,6 @@ const _HeatPropsCommon = Object.assign(deepCopy(graphLib.graphProps),{
 		this.accumHeatBuffer((293.15-temp)*this.getBlockData().getBaseHeatRadiativity()*Time.delta);
 	},
 	initStats(){
-		print("uh init");
 		this.setTemp(293.15);
 	},
 	
@@ -218,7 +216,7 @@ const _HeatPropsCommon = Object.assign(deepCopy(graphLib.graphProps),{
 	},
 	readGlobal(stream, revision) {
 		this._heat = stream.f();
-        this._heatbuffer = this._heat;
+        this._heatbuffer = 0;
 	},
 	readLocal(stream, revision) {
 	}
