@@ -257,7 +257,7 @@ const _RotPowerPropsCommon = Object.assign(deepCopy(graphLib.graphProps),{
 
 
 
-const _TorqueMulticonnectorProps = Object.assign(deepCopy(graphLib.graphMultiProps),_RotPowerPropsCommon, {
+const _TorqueMulticonnectorProps = Object.assign(Object.create(graphLib.graphMultiProps),_RotPowerPropsCommon, {
     _networkRots: [],
     
     getNetworkRotation(index) {
@@ -329,6 +329,7 @@ const _TorqueTransmissionProps = Object.assign(Object.create(_TorqueMulticonnect
         let totalm = 0;
         let allpositive = true;
         for (let i = 0; i < ratios.length; i++) {
+			if(!this._networkList[i]){return;}
             totalmratio += this._networkList[i].lastInertia * ratios[i];
             totalm += this._networkList[i].lastInertia * this._networkList[i].lastVelocity;
             allpositive = allpositive && this._networkList[i].lastInertia > 0;
