@@ -161,7 +161,7 @@ function getConnectSidePos(index, size, rotation) {
 }
 
 
-const _RotPowerPropsCommon = Object.assign(deepCopy(graphLib.graphProps),{
+const _RotPowerPropsCommon = Object.assign(Object.create(graphLib.graphProps),{
 
     display(table) {
         if (!this._network) {
