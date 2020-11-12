@@ -259,8 +259,8 @@ public class UnityBlocks implements ContentList{
 			outputItem = new ItemStack(UnityItems.darkAlloy, 3);
 			craftTime = 140f;
 			size = 4;
-			idleSound = Sounds.respawning;
-			idleSoundVolume = 0.6f;
+			ambientSound = Sounds.respawning;
+			ambientSoundVolume = 0.6f;
 			consumes.items(with(Items.lead, 2, Items.silicon, 3, Items.blastCompound, 1, Items.phaseFabric, 1, UnityItems.umbrium, 2));
 			consumes.power(3.2f);
             afterUpdate = e -> {
@@ -364,8 +364,8 @@ public class UnityBlocks implements ContentList{
                 shootSound = Sounds.laserbig;
                 heatColor = Color.valueOf("e04300");
                 rotateSpeed = 3.5f;
-                activeSound = Sounds.beam;
-                activeSoundVolume = 2.2f;
+                ambientSound = Sounds.beam;
+                ambientSoundVolume = 2.2f;
                 requirements(Category.turret, with(Items.copper, 450, Items.lead, 350, Items.graphite, 390, Items.silicon, 360, Items.titanium, 250, UnityItems.umbrium, 370, Items.surgeAlloy, 360));
                 shootType = UnityBullets.falloutLaser;
                 consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.58f)).update(false);
@@ -395,7 +395,7 @@ public class UnityBlocks implements ContentList{
                 cooldown = 0.012f;
                 heatColor = Color.white;
                 rotateSpeed = 1.9f;
-                activeSoundVolume = 2.4f;
+                ambientSoundVolume = 2.4f;
                 expanded = true;
                 requirements(Category.turret, with(Items.copper, 1250, Items.lead, 1320, Items.graphite, 1100, Items.titanium, 1340, Items.surgeAlloy, 1240, Items.silicon, 1350, Items.thorium, 770, UnityItems.darkAlloy, 370));
                 shootType = UnityBullets.catastropheLaser;
@@ -426,7 +426,7 @@ public class UnityBlocks implements ContentList{
                 cooldown = 0.009f;
                 heatColor = Color.white;
                 rotateSpeed = 0.97f;
-                activeSoundVolume = 3f;
+                ambientSoundVolume = 3f;
                 expanded = true;
                 requirements(Category.turret, with(Items.copper, 2800, Items.lead, 2970, Items.graphite, 2475, Items.titanium, 3100, Items.surgeAlloy, 2790, Items.silicon, 3025, Items.thorium, 1750, UnityItems.darkAlloy, 1250));
                 shootType = UnityBullets.calamityLaser;
@@ -464,8 +464,8 @@ public class UnityBlocks implements ContentList{
             outputItem = new ItemStack(UnityItems.terminum, 1);
             size = 6;
             craftTime = 310f;
-            idleSound = Sounds.respawning;
-            idleSoundVolume = 0.6f;
+            ambientSound = Sounds.respawning;
+            ambientSoundVolume = 0.6f;
             consumes.power(45.2f);
             consumes.items(with(UnityItems.plagueAlloy, 3, UnityItems.darkAlloy, 3, UnityItems.lightAlloy, 3, UnityItems.advanceAlloy, 3, UnityItems.monolithAlloy, 3, UnityItems.sparkAlloy, 3));
         }};
@@ -475,7 +475,7 @@ public class UnityBlocks implements ContentList{
             outputItem = new ItemStack(UnityItems.terminaAlloy, 2);
             size = 8;
             craftTime = 410f;
-            idleSoundVolume = 0.6f;
+            ambientSoundVolume = 0.6f;
             addSprites(name + "-lights", name + "-top-small");
             foreUpdate = e -> {
                 if(e.consValid() && Mathf.chanceDelta(0.7f * e.warmup)) forgeAbsorbEffect.at(e.x, e.y, Mathf.random(360f));
@@ -517,8 +517,8 @@ public class UnityBlocks implements ContentList{
             outputItem = new ItemStack(UnityItems.sparkAlloy, 4);
             size = 4;
             craftTime = 160f;
-            idleSound = Sounds.machine;
-            idleSoundVolume = 0.6f;
+            ambientSound = Sounds.machine;
+            ambientSoundVolume = 0.6f;
             craftEffect = imberCircleSparkCraftingEffect;
             afterUpdate = e -> {
                 if(e.consValid()){
@@ -701,8 +701,8 @@ public class UnityBlocks implements ContentList{
             outputItem = new ItemStack(UnityItems.monolithAlloy, 3);
             size = 4;
             flameColor = Pal.lancerLaser;
-            idleSound = Sounds.machine;
-            idleSoundVolume = 0.6f;
+            ambientSound = Sounds.machine;
+            ambientSoundVolume = 0.6f;
             consumes.power(3.6f);
             consumes.items(with(Items.silicon, 3, Items.graphite, 2, UnityItems.monolite, 2));
             consumes.liquid(Liquids.cryofluid, 0.1f);
