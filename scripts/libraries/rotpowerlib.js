@@ -61,7 +61,7 @@ const _Torque_Speed_Funcs = {
 
 
 
-const _RotPowerCommon = Object.assign(Object.create(graphLib.graphCommon),{
+const _RotPowerCommon = Object.assign(deepCopy(graphLib.graphCommon),{
 	baseFriction:0.1,
 	baseInertia:10,
 	
@@ -77,13 +77,13 @@ const _RotPowerCommon = Object.assign(Object.create(graphLib.graphCommon),{
     setBaseInertia(v) {
         this.baseInertia = v;
     },
-    drawPlace(x, y, rotation, valid) {
+    drawPlace(x, y, size, rotation, valid) {
         for (let i = 0; i < this._accept.length; i++) {
             if (this._accept[i] == 0) {
                 continue;
             }
             Lines.stroke(3.5, Color.white);
-            let outpos = getConnectSidePos(i, this.size, rotation);
+            let outpos = getConnectSidePos(i, size, rotation);
             let dx = (outpos.toPos.x + x) * Vars.tilesize;
             let dy = (outpos.toPos.y + y) * Vars.tilesize;
             let dir = _dirs[outpos.dir];
@@ -161,7 +161,7 @@ function getConnectSidePos(index, size, rotation) {
 }
 
 
-const _RotPowerPropsCommon = Object.assign(Object.create(graphLib.graphProps),{
+const _RotPowerPropsCommon = Object.assign(deepCopy(graphLib.graphProps),{
 
     display(table) {
         if (!this._network) {
@@ -257,7 +257,7 @@ const _RotPowerPropsCommon = Object.assign(Object.create(graphLib.graphProps),{
 
 
 
-const _TorqueMulticonnectorProps = Object.assign(Object.create(graphLib.graphMultiProps),_RotPowerPropsCommon, {
+const _TorqueMulticonnectorProps = Object.assign(deepCopy(graphLib.graphMultiProps),_RotPowerPropsCommon, {
     _networkRots: [],
     
     getNetworkRotation(index) {
@@ -420,6 +420,7 @@ const _TorqueGeneratorProps = Object.assign(Object.create(_RotPowerPropsCommon),
         }
         this._smoothedForce.add(this.getForce());
     },
+	
 
     getMotorForceMult() {
         return this._motor_force_mult

@@ -64,6 +64,7 @@ const script = [
 			"funclib",
 			"arena",
 			"rotpowerlib",
+			"heatlib",
 			"graphlib",
 			"unitloader"/*,
             "shieldbulletlib"*/
@@ -289,6 +290,7 @@ const script = [
             {
                 name: "distribution",
                 childs: [
+					"heatdistributor",
                     "driveshaft",
                     "inlinegearbox",
                     "shaftrouter",
@@ -300,6 +302,7 @@ const script = [
             {
                 name: "generation",
                 childs: [
+					"heatgenerators",
 					"magnets",
 					"torqueinfi",
                     "handcrank",

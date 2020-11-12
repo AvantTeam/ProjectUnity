@@ -1,5 +1,6 @@
 const graphLib = require("libraries/graphlib");
 const rotL = require("libraries/rotpowerlib");
+const heatlib = require("libraries/heatlib");
 
 
 //graph

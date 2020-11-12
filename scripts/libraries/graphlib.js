@@ -52,6 +52,7 @@ const _GraphCommonBuild = {
 	},
 	create(block, team) {
         let building = this.super$create(block, team);
+		
 		block.injectGraphConnectors(this);
 		for(let graphname in this.graphs) {
 		  let graphConn = this.graphs[graphname];
@@ -208,6 +209,13 @@ const _GraphCommonBlock = {
     setIsNetworkConnector(newaccept) {
         this._network_connector = newaccept;
     },
+	drawPlace(x, y, rotation, valid) {
+        for(let graphstat in this.graphBlocks) {
+			this.graphBlocks[graphstat].drawPlace(x, y, this.size, rotation, valid);
+		}
+        this.super$drawPlace(x, y, rotation, valid);
+
+    },
 }
 
 
@@ -226,6 +234,9 @@ const _GraphCommon = {
     setAccept(newaccept) {
         this._accept = newaccept;
     },
+	drawPlace(x, y,size, rotation, valid){
+		
+	}
 };
 // gets a conneciton point on its index, runs anticlockwise around the block.
 /*
@@ -352,11 +363,8 @@ const _GraphPropsCommon = {
         if (this._dead) {
             return;
         }
-       
         this.updateNetworks();
         this.updateExtension();
-        
-       
     },
 	onRotationChanged(prevrot,newrot){
 		//print("rotation changed to "+newrot+"...");
@@ -438,6 +446,7 @@ const _GraphPropsCommon = {
     },
     eachNeighbour(func) {
         let prev = null;
+		if(!this._neighbourArray){return;}
         for (let i = 0; i < this._neighbourArray.length; i++) {
             if (prev == this._neighbourArray[i] || !this._neighbourArray[i]) {
                 continue;
