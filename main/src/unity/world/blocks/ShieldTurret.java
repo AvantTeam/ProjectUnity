@@ -41,7 +41,7 @@ public class ShieldTurret extends ChargeTurret{
                 if(e != null && e.team == b.team && e.type instanceof ShieldBulletType){
                     shield = true;
                 }
-	        });
+            });
 
             shield = !shield;
 

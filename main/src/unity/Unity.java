@@ -17,7 +17,7 @@ import unity.content.*;
 
 public class Unity extends Mod{
     public final String githubURL = "https://github.com/EyeOfDarkness/ProjectUnity";
-    
+
     private final ContentList[] unityContent = {
         new UnityItems(),
         new UnityStatusEffects(),
@@ -43,13 +43,13 @@ public class Unity extends Mod{
                 cont.table(t -> {
                     t.add("@mod.credits.text").fillX().pad(3f).wrap().get().setAlignment(Align.center);
                     t.row();
-                    
+
                     t.add("@mod.credits.bottom-text").fillX().pad(3f).wrap().get().setAlignment(Align.center);
                     t.row();
                 }).pad(3f);
-                
+
                 cont.row();
-                
+
                 cont.table(b -> {
                     for(ContributionType type : ContributionType.all){
                         Seq<String> list = ContributorList.getBy(type);

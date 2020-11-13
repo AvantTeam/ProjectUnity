@@ -66,7 +66,7 @@ public interface ExpBlockBase{
             Field blockField = getClass().getField(field);
             getExpFields().get(ExpType.valueOf(expType)).add(new ExpField(field, blockField, start, intensity));
             blockField.set(this, ExpType.valueOf(expType) == ExpType.bool ? start > 0 : start);
-        }catch (Exception e){
+        }catch(Exception e){
             //Log.log(LogLevel.info, "[@]: @", "E", e.toString());
         }
     }

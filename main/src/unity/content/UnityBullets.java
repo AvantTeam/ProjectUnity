@@ -28,11 +28,10 @@ import static unity.content.UnityFx.*;
 
 public class UnityBullets implements ContentList{
     public static BulletType laser, coalBlaze, pyraBlaze, falloutLaser, catastropheLaser, calamityLaser, orb, shockBeam, currentStroke, shielderBullet, plasmaFragTriangle, plasmaTriangle;
-    
+
     //only enhanced
     public static BasicBulletType standardDenseLarge, standardHomingLarge, standardIncendiaryLarge, standardThoriumLarge, standardDenseHeavy, standardHomingHeavy, standardIncendiaryHeavy, standardThoriumHeavy, standardDenseMassive, standardHomingMassive,
     standardIncendiaryMassive, standardThoriumMassive;
-
 
     @Override
     public void load(){
@@ -155,7 +154,7 @@ public class UnityBullets implements ContentList{
                 trailEffect = orbTrail;
                 trailChance = 0.4f;
             }
-            
+
             @Override
             public void draw(Bullet b){
                 light(b.x, b.y, 16, surge, 0.6f);
@@ -196,7 +195,7 @@ public class UnityBullets implements ContentList{
                 hitEffect = Fx.hitLiquid;
 
             }
-            
+
             @Override
             public void init(Bullet b){
                 super.init(b);
@@ -246,63 +245,71 @@ public class UnityBullets implements ContentList{
                 }
             }
         };
-        
-        currentStroke = new LaserBulletType(450){{
-            lifetime = 65f;
-            width = 20f;
-            length = 430f;
-            lightningSpacing = 35f;
-            lightningLength = 5;
-            lightningDelay = 1.1f;
-            lightningLengthRand = 15;
-            lightningDamage = 50f;
-            lightningAngleRand = 40f;
-            largeHit = true;
-            lightColor = lightningColor = Pal.surge;
-            sideAngle = 15f;
-            sideWidth = 0f;
-            sideLength = 0f;
-            colors = new Color[]{Pal.surge.cpy(), Pal.surge, Color.white};
-        }};
-        
-        shielderBullet = new ShieldBulletType(8){{
-            drag = 0.03f;
-            shootEffect = Fx.none;
-            despawnEffect = Fx.none;
-            collides = false;
-            hitSize = 0;
-            hittable = false;
-            hitEffect = Fx.hitLiquid;
-            breakSound = Sounds.wave;
-            maxRadius = 10f;
-            shieldHealth = 3000f;
-        }};
-        
-        plasmaFragTriangle = new TriangleBulletType(4.5f, 90f){{
-            lifetime = 160f;
-            lifetimeRand = 40f;
-            width = 10f;
-            length = 11f;
-            trailWidth = 4f;
-            trailLength = 8;
-            drag = 0.05f;
-            collides = false;
-            summonsLightning = true;
-            shootEffect = plasmaFragAppear;
-            hitEffect = despawnEffect = plasmaFragDisappear;
-        }};
-        
-        plasmaTriangle = new TriangleBulletType(4f, 380f){{
-            lifetime = 180f;
-            width = 16f;
-            length = 20f;
-            trailWidth = 6.5f;
-            trailLength = 10;
-            hitEffect = plasmaTriangleHit;
-            despawnEffect = Fx.none;
-            fragBullet = plasmaFragTriangle;
-            fragBullets = 8;
-        }};
+
+        currentStroke = new LaserBulletType(450){
+            {
+                lifetime = 65f;
+                width = 20f;
+                length = 430f;
+                lightningSpacing = 35f;
+                lightningLength = 5;
+                lightningDelay = 1.1f;
+                lightningLengthRand = 15;
+                lightningDamage = 50f;
+                lightningAngleRand = 40f;
+                largeHit = true;
+                lightColor = lightningColor = Pal.surge;
+                sideAngle = 15f;
+                sideWidth = 0f;
+                sideLength = 0f;
+                colors = new Color[]{Pal.surge.cpy(), Pal.surge, Color.white};
+            }
+        };
+
+        shielderBullet = new ShieldBulletType(8){
+            {
+                drag = 0.03f;
+                shootEffect = Fx.none;
+                despawnEffect = Fx.none;
+                collides = false;
+                hitSize = 0;
+                hittable = false;
+                hitEffect = Fx.hitLiquid;
+                breakSound = Sounds.wave;
+                maxRadius = 10f;
+                shieldHealth = 3000f;
+            }
+        };
+
+        plasmaFragTriangle = new TriangleBulletType(4.5f, 90f){
+            {
+                lifetime = 160f;
+                lifetimeRand = 40f;
+                width = 10f;
+                length = 11f;
+                trailWidth = 4f;
+                trailLength = 8;
+                drag = 0.05f;
+                collides = false;
+                summonsLightning = true;
+                shootEffect = plasmaFragAppear;
+                hitEffect = despawnEffect = plasmaFragDisappear;
+            }
+        };
+
+        plasmaTriangle = new TriangleBulletType(4f, 380f){
+            {
+                lifetime = 180f;
+                width = 16f;
+                length = 20f;
+                trailWidth = 6.5f;
+                trailLength = 10;
+                hitEffect = plasmaTriangleHit;
+                despawnEffect = Fx.none;
+                fragBullet = plasmaFragTriangle;
+                fragBullets = 8;
+            }
+        };
 
         //only enhanced
 

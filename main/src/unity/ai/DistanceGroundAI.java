@@ -24,7 +24,7 @@ public class DistanceGroundAI extends GroundAI{
 
         float range = unit.range();
         Team team = unit.team;
-        UnitType type=unit.type;
+        UnitType type = unit.type;
 
         if(core != null && unit.within(core, range / 1.1f + core.block.size * tilesize / 2f)){
             target = core;

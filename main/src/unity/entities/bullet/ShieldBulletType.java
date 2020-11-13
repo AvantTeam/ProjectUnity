@@ -27,7 +27,7 @@ public class ShieldBulletType extends BasicBulletType{
 
         if(Core.settings.getBool("animatedshields")){
             Fill.poly(e.x, e.y, 6, radius);
-        } else {
+        }else{
             Lines.stroke(1.5f);
             Draw.alpha(0.09f);
             Fill.poly(e.x, e.y, 6, radius);
@@ -35,11 +35,10 @@ public class ShieldBulletType extends BasicBulletType{
             Lines.poly(e.x, e.y, 6, radius);
             Draw.reset();
         }
-	    Draw.z(Layer.block);
+        Draw.z(Layer.block);
 
-	    Draw.color();
+        Draw.color();
     });
-
 
     public ShieldBulletType(float speed){
         super(speed, 0);
@@ -63,9 +62,9 @@ public class ShieldBulletType extends BasicBulletType{
             b.data = data;
         }
 
-        float radius = (((speed-b.vel.len())*maxRadius)+1)*0.8f;
+        float radius = (((speed - b.vel.len()) * maxRadius) + 1) * 0.8f;
         float[] temp = (float[]) b.data;
-        Groups.bullet.intersect(b.x-radius, b.y-radius, radius*2, radius*2, e -> {
+        Groups.bullet.intersect(b.x - radius, b.y - radius, radius * 2, radius * 2, e -> {
             if(e != null && e.team != b.team){
                 if(e.owner instanceof Building){
                     if(((ChargeTurret.ChargeTurretBuild) e.owner).block.name != "unity-shielder"){
@@ -74,7 +73,7 @@ public class ShieldBulletType extends BasicBulletType{
                         temp[1] = 1;
                         e.remove();
                     }
-                } else {
+                }else{
                     float health = temp[0] - e.damage;
                     temp[0] = health;
                     temp[1] = 1;
@@ -82,7 +81,7 @@ public class ShieldBulletType extends BasicBulletType{
                 }
 
             }
-		});
+        });
 
         if(temp[0] <= 0){
             breakSound.at(b.x, b.y, Mathf.random(0.8f, 1));
@@ -103,11 +102,11 @@ public class ShieldBulletType extends BasicBulletType{
         float[] temp = (float[]) b.data;
         Draw.color(b.team.color, Color.white, Mathf.clamp(temp[1]));
 
-        float radius = ((speed-b.vel.len())*maxRadius)+1;
+        float radius = ((speed - b.vel.len()) * maxRadius) + 1;
 
         if(Core.settings.getBool("animatedshields")){
             Fill.poly(b.x, b.y, 6, radius);
-        } else {
+        }else{
             Lines.stroke(1.5f);
             Draw.alpha(0.09f + Mathf.clamp(0.08f * temp[1]));
             Fill.poly(b.x, b.y, 6, radius);

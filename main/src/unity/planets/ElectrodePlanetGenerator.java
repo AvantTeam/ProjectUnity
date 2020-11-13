@@ -44,7 +44,7 @@ public class ElectrodePlanetGenerator extends PlanetGenerator{
 
     float rawHeight(Vec3 position){
         position = Tmp.v33.set(position).scl(scl);
-        return (Mathf.pow((float)noise.octaveNoise3D(7, 0.5f, 1f / 3f, position.x, position.y, position.z), 2.3f) + waterOffset) / (1f + waterOffset);
+        return (Mathf.pow((float) noise.octaveNoise3D(7, 0.5f, 1f / 3f, position.x, position.y, position.z), 2.3f) + waterOffset) / (1f + waterOffset);
     }
 
     @Override
@@ -56,7 +56,7 @@ public class ElectrodePlanetGenerator extends PlanetGenerator{
     @Override
     public Color getColor(Vec3 position){
         Block block = getBlock(position);
-        
+
         if(block == null) return Color.white.cpy();
         return Tmp.c1.set(block.mapColor).a(1f - block.albedo);
     }
@@ -73,25 +73,25 @@ public class ElectrodePlanetGenerator extends PlanetGenerator{
 
     Block getBlock(Vec3 position){
         float height = rawHeight(position);
-        
+
         Tmp.v31.set(position);
         position = Tmp.v33.set(position).scl(scl);
-        
+
         float rad = scl;
         float temp = Mathf.clamp(Math.abs(position.y * 2f) / (rad));
-        float tnoise = (float)noise.octaveNoise3D(7, 0.56, 1f / 3f, position.x, position.y + 999f, position.z);
-        
+        float tnoise = (float) noise.octaveNoise3D(7, 0.56, 1f / 3f, position.x, position.y + 999f, position.z);
+
         temp = Mathf.lerp(temp, tnoise, 0.5f);
         height *= 1.2f;
         height = Mathf.clamp(height);
 
-        return arr[Mathf.clamp((int)(temp * arr.length), 0, arr[0].length - 1)][Mathf.clamp((int)(height * arr[0].length), 0, arr[0].length - 1)];
+        return arr[Mathf.clamp((int) (temp * arr.length), 0, arr[0].length - 1)][Mathf.clamp((int) (height * arr[0].length), 0, arr[0].length - 1)];
     }
 
     @Override
     protected float noise(float x, float y, double octaves, double falloff, double scl, double mag){
         Vec3 v = sector.rect.project(x, y).scl(5f);
-        return (float)noise.octaveNoise3D(octaves, falloff, 1f / scl, v.x, v.y, v.z) * (float)mag;
+        return (float) noise.octaveNoise3D(octaves, falloff, 1f / scl, v.x, v.y, v.z) * (float) mag;
     }
 
     @Override
@@ -132,7 +132,7 @@ public class ElectrodePlanetGenerator extends PlanetGenerator{
             float ry = (height / 2f + Tmp.v1.y);
             float maxrad = radius - Tmp.v1.len();
             float rrad = Math.min(rand.random(9f, maxrad / 2f), 30f);
-            roomseq.add(new Room((int)rx, (int)ry, (int)rrad));
+            roomseq.add(new Room((int) rx, (int) ry, (int) rrad));
         }
 
         //check positions on the map to place the player spawn. this needs to be in the corner of the map
@@ -140,13 +140,13 @@ public class ElectrodePlanetGenerator extends PlanetGenerator{
         Seq<Room> enemies = new Seq<>();
         int enemySpawns = rand.chance(0.3) ? 2 : 1;
         int offset = rand.nextInt(360);
-        float length = width/2.55f - rand.random(13, 23);
+        float length = width / 2.55f - rand.random(13, 23);
         int angleStep = 5;
         int waterCheckRad = 5;
-        for(int i = 0; i < 360; i+= angleStep){
+        for(int i = 0; i < 360; i += angleStep){
             int angle = offset + i;
-            int cx = (int)(width / 2 + Angles.trnsx(angle, length));
-            int cy = (int)(height / 2 + Angles.trnsy(angle, length));
+            int cx = (int) (width / 2 + Angles.trnsx(angle, length));
+            int cy = (int) (height / 2 + Angles.trnsy(angle, length));
 
             int waterTiles = 0;
 
@@ -155,19 +155,19 @@ public class ElectrodePlanetGenerator extends PlanetGenerator{
                 for(int ry = -waterCheckRad; ry <= waterCheckRad; ry++){
                     Tile tile = tiles.get(cx + rx, cy + ry);
                     if(tile == null || tile.floor().liquidDrop != null){
-                        waterTiles ++;
+                        waterTiles++;
                     }
                 }
             }
 
             if(waterTiles <= 4 || (i + angleStep >= 360)){
-				spawn = new Room(cx, cy, rand.random(8, 15));
+                spawn = new Room(cx, cy, rand.random(8, 15));
                 roomseq.add(spawn);
 
                 for(int j = 0; j < enemySpawns; j++){
                     float enemyOffset = rand.range(60f);
                     Tmp.v1.set(cx - width / 2f, cy - height / 2f).rotate(180f + enemyOffset).add(width / 2f, height / 2f);
-                    Room espawn = new Room((int)Tmp.v1.x, (int)Tmp.v1.y, rand.random(8, 15));
+                    Room espawn = new Room((int) Tmp.v1.x, (int) Tmp.v1.y, rand.random(8, 15));
                     roomseq.add(espawn);
                     enemies.add(espawn);
                 }
@@ -200,15 +200,15 @@ public class ElectrodePlanetGenerator extends PlanetGenerator{
         float scl = 1f;
         float addscl = 1.3f;
 
-        if(noise.octaveNoise3D(2, 0.5, scl, sector.tile.v.x, sector.tile.v.y, sector.tile.v.z)*nmag + poles > 0.25f * addscl){
+        if(noise.octaveNoise3D(2, 0.5, scl, sector.tile.v.x, sector.tile.v.y, sector.tile.v.z) * nmag + poles > 0.25f * addscl){
             ores.add(Blocks.oreCoal);
         }
 
-        if(noise.octaveNoise3D(2, 0.5, scl, sector.tile.v.x + 1, sector.tile.v.y, sector.tile.v.z)*nmag + poles > 0.5f * addscl){
+        if(noise.octaveNoise3D(2, 0.5, scl, sector.tile.v.x + 1, sector.tile.v.y, sector.tile.v.z) * nmag + poles > 0.5f * addscl){
             ores.add(Blocks.oreTitanium);
         }
 
-        if(noise.octaveNoise3D(2, 0.5, scl, sector.tile.v.x + 2, sector.tile.v.y, sector.tile.v.z)*nmag + poles > 0.7f * addscl){
+        if(noise.octaveNoise3D(2, 0.5, scl, sector.tile.v.x + 2, sector.tile.v.y, sector.tile.v.z) * nmag + poles > 0.7f * addscl){
             ores.add(Blocks.oreThorium);
         }
 
@@ -225,7 +225,7 @@ public class ElectrodePlanetGenerator extends PlanetGenerator{
                 Block entry = ores.get(i);
                 float freq = frequencies.get(i);
                 if(Math.abs(0.5f - noise(offsetX, offsetY + i * 999, 2, 0.7, (40 + i * 2))) > 0.22f + i * 0.01 &&
-                    Math.abs(0.5f - noise(offsetX, offsetY - i * 999, 1, 1, (30 + i * 4))) > 0.37f + freq){
+                Math.abs(0.5f - noise(offsetX, offsetY - i * 999, 1, 1, (30 + i * 4))) > 0.37f + freq){
                     ore = entry;
                     break;
                 }
@@ -233,7 +233,7 @@ public class ElectrodePlanetGenerator extends PlanetGenerator{
         });
 
         trimDark();
-        
+
         median(2);
 
         tech();
@@ -264,17 +264,17 @@ public class ElectrodePlanetGenerator extends PlanetGenerator{
             for(int i = 0; i < ints.size && placed < ruinCount; i++){
                 int val = ints.items[i];
                 int x = Point2.x(val), y = Point2.y(val);
-                
+
                 //do not overwrite player spawn
                 if(Mathf.within(x, y, spawn.x, spawn.y, 18f)){
                     continue;
                 }
-                
+
                 float range = difficulty + rand.random(diffRange);
-                
+
                 Tile tile = tiles.getn(x, y);
                 BasePart part = null;
-                
+
                 if(tile.overlay().itemDrop != null){
                     part = bases.forResource(tile.drop()).getFrac(range);
                 }else if(tile.floor().liquidDrop != null && rand.chance(0.05)){
@@ -282,14 +282,14 @@ public class ElectrodePlanetGenerator extends PlanetGenerator{
                 }else if(rand.chance(0.05)){ //ore-less parts are less likely to occur.
                     part = bases.parts.getFrac(range);
                 }
-                
+
                 //actually place the part
                 if(part != null && BaseGenerator.tryPlace(part, x, y, Team.derelict, (cx, cy) -> {
                     Tile other = tiles.getn(cx, cy);
                     other.setOverlay(Blocks.oreScrap);
                     for(int j = 1; j <= 2; j++){
                         for(Point2 p : Geometry.d8){
-                            Tile t = tiles.get(cx + p.x*j, cy + p.y*j);
+                            Tile t = tiles.get(cx + p.x * j, cy + p.y * j);
                             if(t != null && t.floor().hasSurface() && rand.chance(j == 1 ? 0.4 : 0.2)){
                                 t.setOverlay(Blocks.oreScrap);
                             }
@@ -302,7 +302,7 @@ public class ElectrodePlanetGenerator extends PlanetGenerator{
                     Geometry.circle(x, y, tiles.width, tiles.height, debrisRadius, (cx, cy) -> {
                         float dst = Mathf.dst(cx, cy, x, y);
                         float removeChance = Mathf.lerp(0.05f, 0.5f, dst / debrisRadius);
-                        
+
                         Tile other = tiles.getn(cx, cy);
                         if(other.build != null && other.isCenter()){
                             if(other.team() == Team.derelict && rand.chance(removeChance)){
@@ -315,7 +315,7 @@ public class ElectrodePlanetGenerator extends PlanetGenerator{
                 }
             }
         }
-        
+
         Schematics.placeLaunchLoadout(spawn.x, spawn.y);
 
         for(Room espawn : enemies){
@@ -327,7 +327,7 @@ public class ElectrodePlanetGenerator extends PlanetGenerator{
 
             state.rules.attackMode = true;
         }else{
-            state.rules.winWave = 15 * (int)Math.max(difficulty * 10, 1);
+            state.rules.winWave = 15 * (int) Math.max(difficulty * 10, 1);
         }
 
         state.rules.waves = true;

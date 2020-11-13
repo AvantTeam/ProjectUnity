@@ -16,35 +16,35 @@ public interface ExpBuildBase{
         expFields.get(ExpType.linear).each(f -> {
             try{
                 f.field.set(expBlock, Math.max(f.start + f.intensity[0] * lvl, 0));
-            }catch (Exception e){
+            }catch(Exception e){
                 //Log.log(LogLevel.info, "[@]: @", "E", e.toString());
             }
         });
         expFields.get(ExpType.exp).each(f -> {
             try{
                 f.field.set(expBlock, Math.max(f.start + Mathf.pow(f.intensity[0], lvl), 0));
-            }catch (Exception e){
+            }catch(Exception e){
                 //Log.log(LogLevel.info, "[@]: @", "E", e.toString());
             }
         });
         expFields.get(ExpType.root).each(f -> {
             try{
                 f.field.set(expBlock, Math.max(f.start + Mathf.sqrt(f.intensity[0] * lvl), 0));
-            }catch (Exception e){
+            }catch(Exception e){
                 //Log.log(LogLevel.info, "[@]: @", "E", e.toString());
             }
         });
         expFields.get(ExpType.bool).each(f -> {
             try{
                 f.field.set(expBlock, f.start > 0 ? lvl < f.intensity[0] : lvl >= f.intensity[0]);
-            }catch (Exception e){
+            }catch(Exception e){
                 //Log.log(LogLevel.info, "[@]: @", "E", e.toString());
             }
         });
         expFields.get(ExpType.list).each(f -> {
             try{
                 f.field.set(expBlock, f.intensity[Math.min(lvl, f.intensity.length - 1)]);
-            }catch (Exception e){
+            }catch(Exception e){
                 //Log.log(LogLevel.info, "[@]: @", "E", e.toString());
             }
         });
