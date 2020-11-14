@@ -1,7 +1,4 @@
 const ais = this.global.unity.ai;
-const tempVec = new Vec2();
-
-const consumeInterval = 5;
 
 const angel = extendContent(UnitType, "angel", {});
 angel.health = 90;
