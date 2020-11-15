@@ -163,5 +163,9 @@ module.exports = {
 				}
 			};
 		};
+	},
+	
+	customValue : method => new StatValue() {
+		display: method
 	}
 };
