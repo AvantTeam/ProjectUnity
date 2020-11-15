@@ -165,7 +165,9 @@ module.exports = {
 		};
 	},
 	
-	customValue : method => new StatValue() {
-		display: method
+	customValue(method){
+		return new StatValue(){
+			display: method
+		}
 	}
 };
