@@ -220,10 +220,11 @@ const _RotPowerPropsCommon = Object.assign(Object.create(graphLib.graphProps),{
         this._inertia = n_inertia;
     },
 	getRotation() {
-		if(!this._propsList){return 0;}
+		if(!this._propsList[0]){return 0;}// map editor 'edit in game' will not load graph save data.
         return this._propsList[0].rotation;
     },
     getRotationOf(index) {
+		if(!this._propsList[index]){return 0;} // map editor 'edit in game' will not load graph save data.
         return this._propsList[index].rotation;
     },
     getFriction() {

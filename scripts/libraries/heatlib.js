@@ -40,7 +40,7 @@ const _HeatCommon = Object.assign(Object.create(graphLib.graphCommon),{
 	_baseHeatCapacity:10.0, //heatenergy needed to raise temp by one deg.
 	_baseHeatConductivity:0.5, //measure of how well it transfers heat 
 	_baseHeatRadiativity:0.01, //amount of heat lost to entropy per update
-	_maxtemp:1273.15, //max temp before damage in kelvin.
+	_maxtemp:1573.15, //max temp before damage in kelvin.
 	getBaseHeatCapacity() {
         return this._baseHeatCapacity;
     },
@@ -80,7 +80,7 @@ const _HeatCommon = Object.assign(Object.create(graphLib.graphCommon),{
         table.add("Heat system").color(Pal.accent).fillX();
 		table.row();
 		table.left();
-        table.add("[lightgray]" + Core.bundle.get("stat.unity.heatCapcaity") + ":[] ").left();
+        table.add("[lightgray]" + Core.bundle.get("stat.unity.heatCapacity") + ":[] ").left();
 		table.add((this.getBaseHeatCapacity())+"K J/K");
 		table.row();
 		table.left();
@@ -253,11 +253,17 @@ function _drawHeat(reg,x,y,rot, temp){
 	let a = 0;
 	//Draper point is 798 K, but well do something 300K lower for aesthetic.
 	if(temp>273.15){
-		a = Mathf.clamp((temp-498)*0.001);
+		a = Math.max(0,(temp-498)*0.001);
 		if(a<0.01){
 			return;
 		}
-		Draw.color(heatcolor,a);
+		if(a>1){
+			let fcol = new Color(heatcolor);
+			fcol.mul(a);
+			Draw.color(fcol,a);
+		}else{
+			Draw.color(heatcolor,a);
+		}
 		
 	}else{
 		a =1.0-Mathf.clamp(temp/273.15);
@@ -272,6 +278,25 @@ function _drawHeat(reg,x,y,rot, temp){
 	Draw.color();
 }
 
+function _getRegion(region, tile,sheetw,sheeth) {
+    if (!region) {
+        print("oh no there is no texture");
+        return;
+    }
+    let nregion = new TextureRegion(region);
+    let tilew = (nregion.u2 - nregion.u)/sheetw;
+	let tileh = (nregion.v2 - nregion.v)/sheeth;
+	let tilex = (tile%sheetw)/sheetw;
+	let tiley = Math.floor(tile/sheetw)/sheeth;
+	
+	nregion.u = Mathf.map(tilex,0,1,nregion.u,nregion.u2)+tilew*0.02;
+	nregion.v = Mathf.map(tiley,0,1,nregion.v,nregion.v2)+tileh*0.02; 
+	nregion.u2 = nregion.u+tilew*0.96;
+	nregion.v2 = nregion.v+tileh*0.96;
+	nregion.width = 32;
+	nregion.height = 32;
+    return nregion;
+}
 
 const _baseTypesHeat = {
     heatConnector: {
@@ -289,6 +314,7 @@ for(let key in _baseTypesHeat){
 
 
 module.exports = {
+	getRegion: _getRegion,
 	drawHeat: _drawHeat,
     heatGraph: heatGraph,
     heatProps: _HeatPropsCommon,

@@ -26,7 +26,7 @@ const thermalHeater = graphLib.finaliseExtend(Block, Building,"thermal-heater",t
 		let eff = this.sum + this.block.getTerrainAttrib().env();
 		let hgraph = this.getGraphConnector("heat graph");
 		let temp = hgraph.getTemp();
-		hgraph.setHeat(hgraph.getHeat()+ Math.max(0,1973-temp)*0.04);
+		hgraph.setHeat(hgraph.getHeat()+ Math.max(0,1273-temp)*0.08);
 	},
 	draw() {
 		let temp = this.getGraphConnector("heat graph").getTemp();
@@ -43,4 +43,5 @@ thermalHeater.update = true;
 thermalHeater.rotate = true;
 thermalHeater.getGraphConnectorBlock("heat graph").setAccept( [1,1, 0,0, 0,0, 0,0]);
 thermalHeater.getGraphConnectorBlock("heat graph").getBaseHeatConductivity(0.6);
-thermalHeater.getGraphConnectorBlock("heat graph").getBaseHeatCapacity(20);
+thermalHeater.getGraphConnectorBlock("heat graph").getBaseHeatCapacity(40);
+thermalHeater.getGraphConnectorBlock("heat graph").setBaseHeatRadiativity(0.004);
