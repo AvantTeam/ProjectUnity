@@ -48,13 +48,7 @@ calamityLaser.length = 450;
 calamityLaser.strokes = [2 * 1.7, 1.5 * 1.7, 1 * 1.7, 0.3 * 1.7];
 
 //TODO: research from catastrophe.
-const calamity = extendContent(LaserTurret, "calamity", {
-	load(){
-		this.super$load();
-
-		this.baseRegion = Core.atlas.find("unity-block-" + this.size);
-	}
-});
+const calamity = new LaserTurret("calamity");
 calamity.shootType = calamityLaser;
 calamity.consumes.add(new ConsumeLiquidFilter(liquid => liquid.temperature <= 0.3 && liquid.flammability < 0.1, 2.1)).update(false);
 calamity.heatDrawer = tile => {
