@@ -1,4 +1,4 @@
-package unity.world.blocks.light;
+package unity.world.blocks.logic;
 
 import arc.util.Eachable;
 import arc.util.io.*;
@@ -7,6 +7,7 @@ import arc.scene.ui.layout.Table;
 import mindustry.gen.*;
 import mindustry.graphics.Layer;
 import mindustry.ui.Styles;
+import unity.world.blocks.logic.LightReflector.LightReflectorBuild;
 import mindustry.entities.units.BuildPlan;
 
 import static arc.Core.*;

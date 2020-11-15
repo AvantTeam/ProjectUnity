@@ -1,4 +1,4 @@
-package unity.world.blocks.light;
+package unity.world.draw;
 
 import arc.graphics.g2d.*;
 import mindustry.world.Block;
@@ -6,8 +6,9 @@ import mindustry.world.blocks.production.GenericCrafter.*;
 import mindustry.graphics.Layer;
 import mindustry.type.Liquid;
 import mindustry.world.draw.DrawBlock;
+import unity.world.blocks.logic.LightSource;
+import unity.world.blocks.logic.LightSource.*;
 import mindustry.world.consumers.*;
-import unity.world.blocks.light.LightSource.*;
 
 import static arc.Core.*;
 

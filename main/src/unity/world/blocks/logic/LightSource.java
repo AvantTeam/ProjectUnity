@@ -1,4 +1,4 @@
-package unity.world.blocks.light;
+package unity.world.blocks.logic;
 
 import java.util.ArrayList;
 import arc.Events;
@@ -16,14 +16,16 @@ import mindustry.ui.*;
 import mindustry.world.Tile;
 import mindustry.world.meta.*;
 import mindustry.world.blocks.production.GenericCrafter;
-import unity.world.blocks.light.LightGenerator.LightGeneratorBuild;
-import unity.world.blocks.light.LightReflector.LightReflectorBuild;
+import unity.world.blocks.LightData;
+import unity.world.blocks.LightRepeaterBuildBase;
+import unity.world.blocks.logic.LightGenerator.LightGeneratorBuild;
+import unity.world.blocks.logic.LightReflector.LightReflectorBuild;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
 
 public class LightSource extends GenericCrafter{
-    protected int lightStrength = 60, lightLength = 50, maxLightLength = 5000, maxReflections = 128, lightInterval = 20;
+    public int lightStrength = 60, lightLength = 50, maxLightLength = 5000, maxReflections = 128, lightInterval = 20;
     protected final int reflowTimer = timers++;
     protected Color lightColor = Color.white;
     protected boolean scaleStatus = true;
@@ -107,7 +109,7 @@ public class LightSource extends GenericCrafter{
             return lightInit;
         }
 
-        protected float getAngleDeg(){
+        public float getAngleDeg(){
             return rotate ? rotdeg() : angle * 45f;
         }
 
@@ -128,7 +130,7 @@ public class LightSource extends GenericCrafter{
             strength = a;
         }
 
-        protected float getStrength(){
+        public float getStrength(){
             if(!lightInit) return targetStrength();
             return strength;
         }
@@ -272,10 +274,10 @@ public class LightSource extends GenericCrafter{
             });
 
             if(!hit) return;
-            if(!next.initialized || num > maxReflections){
+            if(!next.isIntialized() || num > maxReflections){
                 ls.add(furthest);
                 lsData.add(null);
-            }else if(!next2.initialized){
+            }else if(!next2.isIntialized()){
                 ls.add(furthest);
                 lsData.add(next);
                 pointMarch(furthest, next, ld.length - loops, maxLength - loops, ++num);

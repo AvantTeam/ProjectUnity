@@ -1,6 +1,8 @@
 package unity.content;
 
 import arc.Core;
+import arc.func.Cons;
+import arc.func.Prov;
 import arc.math.Mathf;
 import arc.math.geom.Position;
 import arc.util.Tmp;
@@ -16,7 +18,7 @@ import mindustry.io.JsonIO;
 import mindustry.ctype.ContentList;
 import mindustry.world.blocks.defense.turrets.LaserTurret;
 import unity.entities.bullet.*;
-import unity.world.blocks.experience.*;
+import unity.world.blocks.defense.turrets.*;
 
 import arc.graphics.g2d.*;
 
@@ -32,6 +34,13 @@ public class UnityBullets implements ContentList{
     //only enhanced
     public static BasicBulletType standardDenseLarge, standardHomingLarge, standardIncendiaryLarge, standardThoriumLarge, standardDenseHeavy, standardHomingHeavy, standardIncendiaryHeavy, standardThoriumHeavy, standardDenseMassive, standardHomingMassive,
     standardIncendiaryMassive, standardThoriumMassive;
+
+    private <T extends BulletType> T copy(BulletType from, Prov<T> constructor, Cons<T> setter){
+        T target = constructor.get();
+        JsonIO.<T>copy((T) from, target);
+        setter.get(target);
+        return target;
+    }
 
     @Override
     public void load(){
@@ -313,99 +322,99 @@ public class UnityBullets implements ContentList{
 
         //only enhanced
 
-        standardDenseLarge = new BasicBulletType();
-        JsonIO.copy(Bullets.standardDenseBig, standardDenseLarge);
-        standardDenseLarge.damage *= 1.4f;
-        standardDenseLarge.speed *= 1.1f;
-        standardDenseLarge.width *= 1.12f;
-        standardDenseLarge.height *= 1.12f;
+        standardDenseLarge = copy(Bullets.standardDenseBig, BasicBulletType::new, (BasicBulletType t) -> {
+            t.damage *= 1.4f;
+            t.speed *= 1.1f;
+            t.width *= 1.12f;
+            t.height *= 1.12f;
+        });
 
-        standardHomingLarge = new BasicBulletType();
-        JsonIO.copy(Bullets.standardDenseBig, standardHomingLarge);
-        standardHomingLarge.damage *= 1.23f;
-        standardHomingLarge.reloadMultiplier = 1.3f;
-        standardHomingLarge.homingPower = 0.09f;
-        standardHomingLarge.speed *= 1.1f;
-        standardHomingLarge.width *= 1.09f;
-        standardHomingLarge.height *= 1.09f;
+        standardHomingLarge = copy(Bullets.standardDenseBig, BasicBulletType::new, (BasicBulletType t) -> {
+            t.damage *= 1.23f;
+            t.reloadMultiplier = 1.3f;
+            t.homingPower = 0.09f;
+            t.speed *= 1.1f;
+            t.width *= 1.09f;
+            t.height *= 1.09f;
+        });
 
-        standardIncendiaryLarge = new BasicBulletType();
-        JsonIO.copy(Bullets.standardIncendiaryBig, standardIncendiaryLarge);
-        standardIncendiaryLarge.damage *= 1.4f;
-        standardIncendiaryLarge.speed *= 1.1f;
-        standardIncendiaryLarge.width *= 1.12f;
-        standardIncendiaryLarge.height *= 1.12f;
+        standardIncendiaryLarge = copy(Bullets.standardIncendiaryBig, BasicBulletType::new, (BasicBulletType t) -> {
+            t.damage *= 1.4f;
+            t.speed *= 1.1f;
+            t.width *= 1.12f;
+            t.height *= 1.12f;
+        });
 
-        standardThoriumLarge = new BasicBulletType();
-        JsonIO.copy(Bullets.standardThoriumBig, standardThoriumLarge);
-        standardThoriumLarge.damage *= 1.4f;
-        standardThoriumLarge.speed *= 1.1f;
-        standardThoriumLarge.width *= 1.12f;
-        standardThoriumLarge.height *= 1.12f;
+        standardThoriumLarge = copy(Bullets.standardThoriumBig, BasicBulletType::new, (BasicBulletType t) -> {
+            t.damage *= 1.4f;
+            t.speed *= 1.1f;
+            t.width *= 1.12f;
+            t.height *= 1.12f;
+        });
 
-        standardDenseHeavy = new BasicBulletType();
-        JsonIO.copy(Bullets.standardDenseBig, standardDenseHeavy);
-        standardDenseHeavy.damage *= 1.7f;
-        standardDenseHeavy.speed *= 1.3f;
-        standardDenseHeavy.width *= 1.32f;
-        standardDenseHeavy.height *= 1.32f;
+        standardDenseHeavy = copy(Bullets.standardDenseBig, BasicBulletType::new, (BasicBulletType t) -> {
+            t.damage *= 1.7f;
+            t.speed *= 1.3f;
+            t.width *= 1.32f;
+            t.height *= 1.32f;
+        });
 
-        standardHomingHeavy = new BasicBulletType();
-        JsonIO.copy(Bullets.standardDenseBig, standardHomingHeavy);
-        standardHomingHeavy.damage *= 1.4f;
-        standardHomingHeavy.reloadMultiplier = 1.3f;
-        standardHomingHeavy.homingPower = 0.09f;
-        standardHomingHeavy.speed *= 1.3f;
-        standardHomingHeavy.width *= 1.19f;
-        standardHomingHeavy.height *= 1.19f;
+        standardHomingHeavy = copy(Bullets.standardDenseBig, BasicBulletType::new, (BasicBulletType t) -> {
+            t.damage *= 1.4f;
+            t.reloadMultiplier = 1.3f;
+            t.homingPower = 0.09f;
+            t.speed *= 1.3f;
+            t.width *= 1.19f;
+            t.height *= 1.19f;
+        });
 
-        standardIncendiaryHeavy = new BasicBulletType();
-        JsonIO.copy(Bullets.standardIncendiaryBig, standardIncendiaryHeavy);
-        standardIncendiaryHeavy.damage *= 1.7f;
-        standardIncendiaryHeavy.speed *= 1.3f;
-        standardIncendiaryHeavy.width *= 1.32f;
-        standardIncendiaryHeavy.height *= 1.32f;
+        standardIncendiaryHeavy = copy(Bullets.standardIncendiaryBig, BasicBulletType::new, (BasicBulletType t) -> {
+            t.damage *= 1.7f;
+            t.speed *= 1.3f;
+            t.width *= 1.32f;
+            t.height *= 1.32f;
+        });
 
-        standardThoriumHeavy = new BasicBulletType();
-        JsonIO.copy(Bullets.standardThoriumBig, standardThoriumHeavy);
-        standardThoriumHeavy.damage *= 1.7f;
-        standardThoriumHeavy.speed *= 1.3f;
-        standardThoriumHeavy.width *= 1.32f;
-        standardThoriumHeavy.height *= 1.32f;
+        standardThoriumHeavy = copy(Bullets.standardThoriumBig, BasicBulletType::new, (BasicBulletType t) -> {
+            t.damage *= 1.7f;
+            t.speed *= 1.3f;
+            t.width *= 1.32f;
+            t.height *= 1.32f;
+        });
 
-        standardDenseMassive = new BasicBulletType();
-        JsonIO.copy(Bullets.standardDenseBig, standardDenseMassive);
-        standardDenseMassive.damage *= 1.8f;
-        standardDenseMassive.speed *= 1.3f;
-        standardDenseMassive.width *= 1.34f;
-        standardDenseMassive.height *= 1.34f;
-        standardDenseMassive.lifetime *= 1.1f;
+        standardDenseMassive = copy(Bullets.standardDenseBig, BasicBulletType::new, (BasicBulletType t) -> {
+            t.damage *= 1.8f;
+            t.speed *= 1.3f;
+            t.width *= 1.34f;
+            t.height *= 1.34f;
+            t.lifetime *= 1.1f;
+        });
 
-        standardHomingMassive = new BasicBulletType();
-        JsonIO.copy(Bullets.standardDenseBig, standardHomingMassive);
-        standardHomingMassive.damage *= 1.6f;
-        standardHomingMassive.reloadMultiplier = 1.3f;
-        standardHomingMassive.homingPower = 0.09f;
-        standardHomingMassive.speed *= 1.3f;
-        standardHomingMassive.width *= 1.21f;
-        standardHomingMassive.height *= 1.21f;
-        standardDenseMassive.lifetime *= 1.1f;
+        standardHomingMassive = copy(Bullets.standardDenseBig, BasicBulletType::new, (BasicBulletType t) -> {
+            t.damage *= 1.6f;
+            t.reloadMultiplier = 1.3f;
+            t.homingPower = 0.09f;
+            t.speed *= 1.3f;
+            t.width *= 1.21f;
+            t.height *= 1.21f;
+            t.lifetime *= 1.1f;
+        });
 
-        standardIncendiaryMassive = new BasicBulletType();
-        JsonIO.copy(Bullets.standardIncendiaryBig, standardIncendiaryMassive);
-        standardIncendiaryMassive.damage *= 1.8f;
-        standardIncendiaryMassive.speed *= 1.3f;
-        standardIncendiaryMassive.width *= 1.34f;
-        standardIncendiaryMassive.height *= 1.34f;
-        standardIncendiaryMassive.lifetime *= 1.1f;
+        standardIncendiaryMassive = copy(Bullets.standardIncendiaryBig, BasicBulletType::new, (BasicBulletType t) -> {
+            t.damage *= 1.8f;
+            t.speed *= 1.3f;
+            t.width *= 1.34f;
+            t.height *= 1.34f;
+            t.lifetime *= 1.1f;
+        });
 
-        standardThoriumMassive = new BasicBulletType();
-        JsonIO.copy(Bullets.standardThoriumBig, standardThoriumMassive);
-        standardThoriumMassive.damage *= 1.8f;
-        standardThoriumMassive.speed *= 1.3f;
-        standardThoriumMassive.width *= 1.34f;
-        standardThoriumMassive.height *= 1.34f;
-        standardThoriumMassive.lifetime *= 1.1f;
+        standardThoriumMassive = copy(Bullets.standardThoriumBig, BasicBulletType::new, (BasicBulletType t) -> {
+            t.damage *= 1.8f;
+            t.speed *= 1.3f;
+            t.width *= 1.34f;
+            t.height *= 1.34f;
+            t.lifetime *= 1.1f;
+        });
 
         //endregion
     }

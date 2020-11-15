@@ -1,4 +1,4 @@
-package unity.world.blocks.light;
+package unity.world.blocks.logic;
 
 import static arc.Core.atlas;
 

@@ -41,14 +41,17 @@ public class UnityUnitTypes implements ContentList{
     //naval-units
     rexed, storm, amphibiNaval, amphibi, craberNaval, craber,
 
-    //monolith
-    pedestal, pilaster, stele,
-
     //scar
     hovos, jetstream,
 
-    //worm units
-    arcnelidia, devourer;
+    //imber
+    arcnelidia,
+
+    //monolith
+    pedestal, pilaster, stele,
+
+    //end
+    devourer;
 
     public static int getClassId(int index){
         return classIDs[index];
@@ -409,6 +412,117 @@ public class UnityUnitTypes implements ContentList{
         //endregion
         //region ground-units
 
+        setEntity("project-spiboss", BuilderLegsUnit::create);
+        projectSpiboss = new UnitType("project-spiboss"){
+            {
+                groundLayer = Layer.legUnit + 3f;
+                drag = 0.1f;
+                speed = 0.4f;
+                hitSize = 34f;
+                health = 20000;
+                legCount = 10;
+                legMoveSpace = 0.7f;
+                legPairOffset = 0.7f;
+                legGroupSize = 3;
+                legLength = 55f;
+                legExtension = -12f;
+                legBaseOffset = 22f;
+                landShake = 2.4f;
+                legLengthScl = 1f;
+                kinematicScl = 0.7f;
+                rippleScale = 2f;
+                legSpeed = 0.2f;
+                legSplashDamage = 80f;
+                legSplashRange = 40f;
+                hovering = true;
+                armor = 13f;
+                allowLegStep = true;
+                visualElevation = 0.7f;
+                weapons.add(new Weapon("large-purple-mount"){
+                    {
+                        reload = 50f;
+                        x = 13f;
+                        y = -17f;
+                        rotate = true;
+                        shake = 1f;
+                        rotateSpeed = 1f;
+                        shots = 5;
+                        shotDelay = 6f;
+                        shootSound = Sounds.artillery;
+                        bullet = new ArtilleryBulletType(2.5f, 1f){
+                            {
+                                hitEffect = Fx.sapExplosion;
+                                knockback = 0.8f;
+                                speed = 2.5f;
+                                lifetime = 70f;
+                                width = height = 19f;
+                                ammoMultiplier = 4f;
+                                splashDamageRadius = 95f;
+                                splashDamage = 55f;
+                                backColor = Pal.sapBulletBack;
+                                frontColor = lightningColor = Pal.sapBullet;
+                                lightning = 3;
+                                lightningLength = 10;
+                                smokeEffect = Fx.shootBigSmoke2;
+                                shake = 5f;
+                                status = StatusEffects.sapped;
+                                statusDuration = 60f * 10f;
+                            }
+                        };
+                    }
+                }, new Weapon("mount-purple-weapon"){
+                    {
+                        reload = 20f;
+                        x = 25f;
+                        y = 10f;
+                        rotate = true;
+                        shake = 1f;
+                        rotateSpeed = 5f;
+                        shootSound = Sounds.flame;
+                        alternate = false;
+                        bullet = new SapBulletType(){
+                            {
+                                sapStrength = 0.8f;
+                                length = 90f;
+                                damage = 25f;
+                                shootEffect = Fx.shootSmall;
+                                hitColor = color = UnityPal.purpleLightning;
+                                width = 0.7f;
+                                lifetime = 35f;
+                                knockback = -1.5f;
+                            }
+                        };
+                    }
+                });
+                Weapon weap3 = weapons.get(1).copy();
+                weap3.x = 20f;
+                weap3.y = 13f;
+                weapons.insert(2, weap3);
+                Weapon weap4 = weapons.get(2).copy();
+                weap4.name = "spiroct-weapon";
+                weap4.reload = 23f;
+                weap4.x = 15f;
+                weap4.y = 18f;
+                weap4.rotateSpeed = 3f;
+                weap4.bullet = new SapBulletType(){
+                    {
+                        sapStrength = 0.9f;
+                        length = 90f;
+                        damage = 30f;
+                        shootEffect = Fx.shootSmall;
+                        hitColor = color = UnityPal.purpleLightning;
+                        width = 0.75f;
+                        lifetime = 35f;
+                        knockback = -1.5f;
+                    }
+                };
+                Weapon weap5 = weap4.copy();
+                weap5.x = 25f;
+                weap5.y = 5f;
+                weapons.add(weap4, weap5);
+            }
+        };
+
         setEntity("arcaetana", BuilderLegsUnit::create);
         arcaetana = new UnitType("arcaetana"){
             {
@@ -555,117 +669,6 @@ public class UnityUnitTypes implements ContentList{
                 temp.x = -17f;
                 temp.y = -18.5f;
                 temp.flipSprite = true;
-            }
-        };
-
-        setEntity("project-spiboss", BuilderLegsUnit::create);
-        projectSpiboss = new UnitType("project-spiboss"){
-            {
-                groundLayer = Layer.legUnit + 3f;
-                drag = 0.1f;
-                speed = 0.4f;
-                hitSize = 34f;
-                health = 20000;
-                legCount = 10;
-                legMoveSpace = 0.7f;
-                legPairOffset = 0.7f;
-                legGroupSize = 3;
-                legLength = 55f;
-                legExtension = -12f;
-                legBaseOffset = 22f;
-                landShake = 2.4f;
-                legLengthScl = 1f;
-                kinematicScl = 0.7f;
-                rippleScale = 2f;
-                legSpeed = 0.2f;
-                legSplashDamage = 80f;
-                legSplashRange = 40f;
-                hovering = true;
-                armor = 13f;
-                allowLegStep = true;
-                visualElevation = 0.7f;
-                weapons.add(new Weapon("large-purple-mount"){
-                    {
-                        reload = 50f;
-                        x = 13f;
-                        y = -17f;
-                        rotate = true;
-                        shake = 1f;
-                        rotateSpeed = 1f;
-                        shots = 5;
-                        shotDelay = 6f;
-                        shootSound = Sounds.artillery;
-                        bullet = new ArtilleryBulletType(2.5f, 1f){
-                            {
-                                hitEffect = Fx.sapExplosion;
-                                knockback = 0.8f;
-                                speed = 2.5f;
-                                lifetime = 70f;
-                                width = height = 19f;
-                                ammoMultiplier = 4f;
-                                splashDamageRadius = 95f;
-                                splashDamage = 55f;
-                                backColor = Pal.sapBulletBack;
-                                frontColor = lightningColor = Pal.sapBullet;
-                                lightning = 3;
-                                lightningLength = 10;
-                                smokeEffect = Fx.shootBigSmoke2;
-                                shake = 5f;
-                                status = StatusEffects.sapped;
-                                statusDuration = 60f * 10f;
-                            }
-                        };
-                    }
-                }, new Weapon("mount-purple-weapon"){
-                    {
-                        reload = 20f;
-                        x = 25f;
-                        y = 10f;
-                        rotate = true;
-                        shake = 1f;
-                        rotateSpeed = 5f;
-                        shootSound = Sounds.flame;
-                        alternate = false;
-                        bullet = new SapBulletType(){
-                            {
-                                sapStrength = 0.8f;
-                                length = 90f;
-                                damage = 25f;
-                                shootEffect = Fx.shootSmall;
-                                hitColor = color = UnityPal.purpleLightning;
-                                width = 0.7f;
-                                lifetime = 35f;
-                                knockback = -1.5f;
-                            }
-                        };
-                    }
-                });
-                Weapon weap3 = weapons.get(1).copy();
-                weap3.x = 20f;
-                weap3.y = 13f;
-                weapons.insert(2, weap3);
-                Weapon weap4 = weapons.get(2).copy();
-                weap4.name = "spiroct-weapon";
-                weap4.reload = 23f;
-                weap4.x = 15f;
-                weap4.y = 18f;
-                weap4.rotateSpeed = 3f;
-                weap4.bullet = new SapBulletType(){
-                    {
-                        sapStrength = 0.9f;
-                        length = 90f;
-                        damage = 30f;
-                        shootEffect = Fx.shootSmall;
-                        hitColor = color = UnityPal.purpleLightning;
-                        width = 0.75f;
-                        lifetime = 35f;
-                        knockback = -1.5f;
-                    }
-                };
-                Weapon weap5 = weap4.copy();
-                weap5.x = 25f;
-                weap5.y = 5f;
-                weapons.add(weap4, weap5);
             }
         };
 
@@ -1009,6 +1012,128 @@ public class UnityUnitTypes implements ContentList{
         ((UnitFactory) Blocks.navalFactory).plans.add(new UnitPlan(amphibiNaval, 60f * 25f, with(Items.silicon, 15, Items.titanium, 25)));
 
         //endregion
+        //region scar
+
+        setEntity("hovos", LegsUnit::create);
+        hovos = new UnitType("hovos"){
+            {
+                defaultController = DistanceGroundAI::new;
+                speed = 0.8f;
+                health = 340;
+                hitSize = 17f;
+                range = 350f;
+                allowLegStep = true;
+                legMoveSpace = 0.7f;
+                legTrns = 0.4f;
+                legLength = 30f;
+                legExtension = -4.3f;
+                weapons.add(new Weapon("unity-small-scar-railgun"){
+                    {
+                        reload = 60f * 2;
+                        x = 0f;
+                        y = -2f;
+                        shootY = 9f;
+                        mirror = false;
+                        rotate = true;
+                        shake = 2.3f;
+                        rotateSpeed = 2f;
+                        bullet = new RailBulletType(){
+                            {
+                                damage = 500f;
+                                speed = 59f;
+                                lifetime = 8f;
+                                shootEffect = UnityFx.scarRailShoot;
+                                pierceEffect = UnityFx.scarRailHit;
+                                updateEffect = UnityFx.scarRailTrail;
+                                hitEffect = Fx.massiveExplosion;
+                                pierceDamageFactor = 0.3f;
+                            }
+                        };
+                    }
+                });
+            }
+        };
+
+        /*setEntity("jetstream", UnitEntity::create);
+        jetstream = new UnitType("jetstream"){{
+            description="There will be Bloodshed";
+            health=670;
+            rotateSpeed=12.5f;
+            faceTarget=true;
+            flying=true;
+            speed=9.2f;
+            drag=0.019f;
+            accel=0.028f;
+            hitSize=11f;
+            engineOffset=11f;
+            weapons.add(new Weapon() {
+                {
+                    mirror=false;
+                    x=0f;
+                    y=7f;
+                    continuous=true;
+                    //bullet=new 
+                    reload=60f*2.5f+bullet.lifetime;
+                    shootStatus=UnityStatusEffects.reloadFatigue;
+                    shootStatusDuration=bullet.lifetime;
+                    shootCone=15f;
+                }
+            });
+        }};*/
+
+        //endregion
+        //region imber
+
+        setEntity("arcnelidia", WormDefaultUnit::new);
+        arcnelidia = new WormUnitType("arcnelidia"){
+            {
+                setTypeID(3);
+                segmentOffset = 23f;
+                hitSize = 17f;
+                health = 800;
+                speed = 4f;
+                accel = 0.035f;
+                drag = 0.007f;
+                rotateSpeed = 3.2f;
+                engineSize = -1f;
+                faceTarget = false;
+                armor = 5f;
+                flying = true;
+                visualElevation = 0.8f;
+                range = 210f;
+                LightningBulletType archnelidiaBolt = new LightningBulletType(){
+                    {
+                        damage = 23f;
+                        lightningColor = Pal.surge;
+                        lightningLength = 24;
+                        lightningLengthRand = 3;
+                    }
+                };
+                weapons.add(new Weapon(){
+                    {
+                        reload = 90f;
+                        rotateSpeed = 50f;
+                        rotate = true;
+                        ignoreRotation = true;
+                        minShootVelocity = 2.1f;
+                        bullet = archnelidiaBolt;
+                    }
+                });
+                segWeapSeq.add(new Weapon(){
+                    {
+                        x = 0f;
+                        shots = 4;
+                        reload = 70f;
+                        rotateSpeed = 50f;
+                        mirror = false;
+                        ignoreRotation = true;
+                        bullet = archnelidiaBolt;
+                    }
+                });
+            }
+        };
+
+        //endregion
         //region monolith
 
         setEntity("pedestal", MechUnit::create);
@@ -1147,126 +1272,7 @@ public class UnityUnitTypes implements ContentList{
         };
 
         //endregion
-        //region scar
-
-        setEntity("hovos", LegsUnit::create);
-        hovos = new UnitType("hovos"){
-            {
-                defaultController = DistanceGroundAI::new;
-                speed = 0.8f;
-                health = 340;
-                hitSize = 17f;
-                range = 350f;
-                allowLegStep = true;
-                legMoveSpace = 0.7f;
-                legTrns = 0.4f;
-                legLength = 30f;
-                legExtension = -4.3f;
-                weapons.add(new Weapon("unity-small-scar-railgun"){
-                    {
-                        reload = 60f * 2;
-                        x = 0f;
-                        y = -2f;
-                        shootY = 9f;
-                        mirror = false;
-                        rotate = true;
-                        shake = 2.3f;
-                        rotateSpeed = 2f;
-                        bullet = new RailBulletType(){
-                            {
-                                damage = 500f;
-                                speed = 59f;
-                                lifetime = 8f;
-                                shootEffect = UnityFx.scarRailShoot;
-                                pierceEffect = UnityFx.scarRailHit;
-                                updateEffect = UnityFx.scarRailTrail;
-                                hitEffect = Fx.massiveExplosion;
-                                pierceDamageFactor = 0.3f;
-                            }
-                        };
-                    }
-                });
-            }
-        };
-
-        /*setEntity("jetstream", UnitEntity::create);
-        jetstream = new UnitType("jetstream"){{
-            description="There will be Bloodshed";
-            health=670;
-            rotateSpeed=12.5f;
-            faceTarget=true;
-            flying=true;
-            speed=9.2f;
-            drag=0.019f;
-            accel=0.028f;
-            hitSize=11f;
-            engineOffset=11f;
-            weapons.add(new Weapon() {
-                {
-                    mirror=false;
-                    x=0f;
-                    y=7f;
-                    continuous=true;
-                    //bullet=new 
-                    reload=60f*2.5f+bullet.lifetime;
-                    shootStatus=UnityStatusEffects.reloadFatigue;
-                    shootStatusDuration=bullet.lifetime;
-                    shootCone=15f;
-                }
-            });
-        }};*/
-
-        //endregion
-        //region worm units
-
-        setEntity("arcnelidia", WormDefaultUnit::new);
-        arcnelidia = new WormUnitType("arcnelidia"){
-            {
-                setTypeID(3);
-                segmentOffset = 23f;
-                hitSize = 17f;
-                health = 800;
-                speed = 4f;
-                accel = 0.035f;
-                drag = 0.007f;
-                rotateSpeed = 3.2f;
-                engineSize = -1f;
-                faceTarget = false;
-                armor = 5f;
-                flying = true;
-                visualElevation = 0.8f;
-                range = 210f;
-                LightningBulletType archnelidiaBolt = new LightningBulletType(){
-                    {
-                        damage = 23f;
-                        lightningColor = Pal.surge;
-                        lightningLength = 24;
-                        lightningLengthRand = 3;
-                    }
-                };
-                weapons.add(new Weapon(){
-                    {
-                        reload = 90f;
-                        rotateSpeed = 50f;
-                        rotate = true;
-                        ignoreRotation = true;
-                        minShootVelocity = 2.1f;
-                        bullet = archnelidiaBolt;
-                    }
-                });
-                segWeapSeq.add(new Weapon(){
-                    {
-                        x = 0f;
-                        shots = 4;
-                        reload = 70f;
-                        rotateSpeed = 50f;
-                        mirror = false;
-                        ignoreRotation = true;
-                        bullet = archnelidiaBolt;
-                    }
-                });
-            }
-        };
+        //region dark
 
         /*
         setEntity("devourer", WormDefaultUnit::new);
@@ -1274,6 +1280,8 @@ public class UnityUnitTypes implements ContentList{
             
         }};
         */
+
+        //endregion
 
         //reconstructors
         ((Reconstructor) Blocks.additiveReconstructor).upgrades.add(new UnitType[]{caelifera, schistocerca}, new UnitType[]{amphibiNaval, craberNaval});

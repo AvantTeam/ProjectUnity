@@ -1,12 +1,13 @@
-package unity.world.blocks.light;
+package unity.world.blocks;
 
 import arc.graphics.Color;
 
 public class LightData{
-    protected boolean initialized = false;
-    protected int angle = 0, length = 50;
-    protected float strength = 100f;
-    Color color = Color.white;
+    private boolean initialized = false;
+    public int angle = 0;
+    public int length = 50;
+    public float strength = 100f;
+    public Color color = Color.white;
 
     public LightData(){}
 
@@ -62,5 +63,9 @@ public class LightData{
     public LightData color(Color color){
         this.color = color;
         return this;
+    }
+
+    public boolean isIntialized(){
+        return initialized;
     }
 }

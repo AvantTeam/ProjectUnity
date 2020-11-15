@@ -1,4 +1,4 @@
-package unity.world.blocks.light;
+package unity.world.blocks.logic;
 
 import arc.util.Eachable;
 import arc.graphics.g2d.*;

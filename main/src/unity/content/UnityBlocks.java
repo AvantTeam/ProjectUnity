@@ -17,9 +17,12 @@ import mindustry.type.*;
 import mindustry.ctype.*;
 import mindustry.content.*;
 import unity.graphics.UnityPal;
-import unity.world.blocks.*;
-import unity.world.blocks.experience.*;
-import unity.world.blocks.light.*;
+import unity.world.blocks.defense.LightWall;
+import unity.world.blocks.defense.turrets.*;
+import unity.world.blocks.distribution.Teleporter;
+import unity.world.blocks.logic.*;
+import unity.world.blocks.production.StemGenericSmelter;
+import unity.world.draw.DrawLightSource;
 import multilib.*;
 import multilib.Recipe.*;
 
@@ -30,31 +33,193 @@ import static unity.content.UnityFx.*;
 public class UnityBlocks implements ContentList{
     public static Block
 
-    //ores
-    /*oreXenium,*/ oreUmbrium, oreLuminum, oreMonolite, oreImberium,
+//global
+    //blocks
+    lightLamp, oilLamp, lightLaser, lightLampInfi, lightReflector, lightReflector1, lightOmnimirror, lightFilter, lightInvertedFilter, lightDivisor, lightDivisor1, lightItemFilter, lightPanel, lightInfluencer,
+    metaglassWall, metaglassWallLarge,
+    oreUmbrium, oreLuminum, oreMonolite, oreImberium,
+    multiTest1, multiTest2,
 
-    //global
-    multiTest1, multiTest2, lightItemFilter, metaglassWall, metaglassWallLarge, lightLamp, oilLamp, lightLaser, lightLampInfi, lightReflector,
-    lightReflector1, lightOmnimirror, lightDivisor, lightDivisor1, lightFilter, lightInvertedFilter, lightPanel, lightInfluencer,
+//dark
+    //turrets
+    apparition, ghost, banshee, fallout, catastrophe, calamity,
+    //factories
+    darkAlloyForge,
 
-    //dark
-    darkAlloyForge, apparition, ghost, banshee, fallout, catastrophe, calamity,
+//imber
+    //turrets
+    orb, shockwire, current, plasma, shielder,
+    //factories
+    sparkAlloyFactory,
 
-    //end
-    terminalCrucible, endForge,
+//koruh
+    //turrets
+    laserTurret, inferno,
+    //blocks
+    teleporter,
+    
+//light
+    //turrets
 
-    //imber
-    sparkAlloyFactory, orb, shockwire, current, plasma, shielder,
+//monolith
+    //factories
+    monolithAlloyFactory,
+    //turrets
+    mage, oracle, spectrum,
 
-    //koruh
-    laserTurret, inferno, teleporter,
+//end
+    //factories
+    terminalCrucible, endForge;
+    //turrets
 
-    //monolith
-    monolithAlloyFactory, mage, oracle, spectrum;
+//youngcha
+    //distribution
+
+    //generation
+
+    //producers
 
     @Override
     public void load(){
-        //region global ores
+        //region global blocks
+        lightLamp = new LightSource("light-lamp"){
+            {
+                consumes.power(1f);
+                requirements(Category.logic, with(Items.lead, 5, Items.metaglass, 10));
+                drawer = new DrawLightSource();
+                lightLength = 30;
+            }
+        };
+
+        oilLamp = new LightSource("oil-lamp", true){
+            {
+                size = 3;
+                health = 240;
+                consumes.power(1.8f);
+                consumes.liquid(Liquids.oil, 0.1f);
+                requirements(Category.logic, with(Items.lead, 20, Items.metaglass, 20, Items.titanium, 15));
+                drawer = new DrawLightSource();
+                lightLength = 150;
+                lightStrength = 750;
+            }
+        };
+
+        lightLaser = new LightSource("light-laser"){
+            {
+                health = 60;
+                consumes.power(1.5f);
+                requirements(Category.logic, BuildVisibility.sandboxOnly, with(Items.metaglass, 10, Items.silicon, 5, Items.titanium, 5));
+                alwaysUnlocked = true;
+                drawer = new DrawLightSource();
+                lightLength = 30;
+                lightInterval = 0;
+            }
+        };
+
+        lightLampInfi = new LightSource("light-lamp-infi"){
+            {
+                hasPower = false;
+                consumesPower = false;
+                requirements(Category.logic, BuildVisibility.sandboxOnly, with());
+                alwaysUnlocked = true;
+                drawer = new DrawLightSource();
+                lightLength = 150;
+                lightStrength = 600000;
+                scaleStatus = false;
+                maxLightLength = 7500;
+            }
+        };
+
+        lightReflector = new LightReflector("light-reflector"){
+            {
+                requirements(Category.logic, with(Items.metaglass, 10));
+            }
+        };
+
+        lightReflector1 = new LightReflector("light-reflector-1"){
+            {
+                diagonal = false;
+                requirements(Category.logic, with(Items.metaglass, 10));
+            }
+        };
+
+        lightOmnimirror = new LightOmniReflector("light-omnimirror"){
+            {
+                health = 80;
+                requirements(Category.logic, with(Items.metaglass, 10, Items.silicon, 5));
+            }
+        };
+
+        lightFilter = new LightFilter("light-filter"){
+            {
+                health = 60;
+                requirements(Category.logic, with(Items.graphite, 10, Items.metaglass, 10));
+            }
+        };
+
+        lightInvertedFilter = new LightFilter("light-inverted-filter", true){
+            {
+                health = 60;
+                requirements(Category.logic, with(Items.graphite, 10, Items.metaglass, 10));
+            }
+        };
+
+        lightDivisor = new LightDivisor("light-divisor"){
+            {
+                health = 80;
+                requirements(Category.logic, with(Items.metaglass, 10, Items.titanium, 2));
+            }
+        };
+
+        lightDivisor1 = new LightDivisor("light-divisor-1"){
+            {
+                diagonal = false;
+                health = 80;
+                requirements(Category.logic, with(Items.metaglass, 10, Items.titanium, 2));
+            }
+        };
+
+        lightItemFilter = new LightRouter("light-item-filter"){
+            {
+                health = 60;
+                requirements(Category.logic, with(Items.graphite, 5, Items.metaglass, 20, Items.silicon, 10));
+            }
+        };
+
+        lightPanel = new LightGenerator("light-panel"){
+            {
+                health = 100;
+                lightStrength = 80f;
+                scaleStatus = true;
+                powerProduction = 1f;
+                requirements(Category.logic, with(Items.copper, 15, Items.graphite, 10, Items.silicon, 15));
+            }
+        };
+
+        lightInfluencer = new LightInfluencer("light-influencer"){
+            {
+                health = 60;
+                lightStrength = 1f;
+                scaleStatus = true;
+                powerProduction = 1f;
+                requirements(Category.logic, with(Items.lead, 15, Items.metaglass, 10, Items.silicon, 5));
+            }
+        };
+
+        metaglassWall = new LightWall("metaglass-wall"){
+            {
+                health = 350;
+                requirements(Category.defense, with(Items.lead, 6, Items.metaglass, 6));
+            }
+        };
+
+        metaglassWallLarge = new LightWall("metaglass-wall-large"){
+            {
+                size = 2;
+                health = 1400;
+                requirements(Category.defense, with(Items.lead, 24, Items.metaglass, 24));
+            }
+        };
 
         oreUmbrium = new OreBlock(UnityItems.umbrium){
             {
@@ -87,9 +252,6 @@ public class UnityBlocks implements ContentList{
                 oreDefault = true;
             }
         };
-
-        //endregion
-        //region global
 
         multiTest1 = new MultiCrafter("multi-test-1", 10){
             {
@@ -145,164 +307,8 @@ public class UnityBlocks implements ContentList{
                 new OutputContents(with(Items.silicon, 1), 10), 30);
             }
         };
-
-        lightLamp = new LightSource("light-lamp"){
-            {
-                consumes.power(1f);
-                requirements(Category.logic, with(Items.lead, 5, Items.metaglass, 10));
-                drawer = new DrawLightSource();
-                lightLength = 30;
-            }
-        };
-
-        oilLamp = new LightSource("oil-lamp", true){
-            {
-                size = 3;
-                health = 240;
-                consumes.power(1.8f);
-                consumes.liquid(Liquids.oil, 0.1f);
-                requirements(Category.logic, with(Items.lead, 20, Items.metaglass, 20, Items.titanium, 15));
-                drawer = new DrawLightSource();
-                lightLength = 150;
-                lightStrength = 750;
-            }
-        };
-
-        lightLaser = new LightSource("light-laser"){
-            {
-                health = 60;
-                consumes.power(1.5f);
-                requirements(Category.logic, BuildVisibility.sandboxOnly, with(Items.metaglass, 10, Items.silicon, 5, Items.titanium, 5));
-                alwaysUnlocked = true;
-                drawer = new DrawLightSource();
-                lightLength = 30;
-                lightInterval = 0;
-            }
-        };
-
-        lightLampInfi = new LightSource("light-lamp-infi"){
-            {
-                hasPower = false;
-                consumesPower = false;
-                requirements(Category.logic, BuildVisibility.sandboxOnly, with());
-                alwaysUnlocked = true;
-                drawer = new DrawLightSource();
-                lightLength = 150;
-                lightStrength = 600000;
-                scaleStatus = false;
-                maxLightLength = 7500;
-            }
-        };
-
-        lightItemFilter = new LightRouter("light-item-filter"){
-            {
-                health = 60;
-                requirements(Category.logic, with(Items.graphite, 5, Items.metaglass, 20, Items.silicon, 10));
-            }
-        };
-
-        lightOmnimirror = new LightOmniReflector("light-omnimirror"){
-            {
-                health = 80;
-                requirements(Category.logic, with(Items.metaglass, 10, Items.silicon, 5));
-            }
-        };
-
-        lightReflector = new LightReflector("light-reflector"){
-            {
-                requirements(Category.logic, with(Items.metaglass, 10));
-            }
-        };
-
-        lightReflector1 = new LightReflector("light-reflector-1"){
-            {
-                diagonal = false;
-                requirements(Category.logic, with(Items.metaglass, 10));
-            }
-        };
-
-        lightDivisor = new LightDivisor("light-divisor"){
-            {
-                health = 80;
-                requirements(Category.logic, with(Items.metaglass, 10, Items.titanium, 2));
-            }
-        };
-
-        lightDivisor1 = new LightDivisor("light-divisor-1"){
-            {
-                diagonal = false;
-                health = 80;
-                requirements(Category.logic, with(Items.metaglass, 10, Items.titanium, 2));
-            }
-        };
-
-        lightFilter = new LightFilter("light-filter"){
-            {
-                health = 60;
-                requirements(Category.logic, with(Items.graphite, 10, Items.metaglass, 10));
-            }
-        };
-
-        lightInvertedFilter = new LightFilter("light-inverted-filter", true){
-            {
-                health = 60;
-                requirements(Category.logic, with(Items.graphite, 10, Items.metaglass, 10));
-            }
-        };
-
-        lightPanel = new LightGenerator("light-panel"){
-            {
-                health = 100;
-                lightStrength = 80f;
-                scaleStatus = true;
-                powerProduction = 1f;
-                requirements(Category.logic, with(Items.copper, 15, Items.graphite, 10, Items.silicon, 15));
-            }
-        };
-
-        lightInfluencer = new LightInfluencer("light-influencer"){
-            {
-                health = 60;
-                lightStrength = 1f;
-                scaleStatus = true;
-                powerProduction = 1f;
-                requirements(Category.logic, with(Items.lead, 15, Items.metaglass, 10, Items.silicon, 5));
-            }
-        };
-
-        metaglassWall = new LightWall("metaglass-wall"){
-            {
-                health = 350;
-                requirements(Category.defense, with(Items.lead, 6, Items.metaglass, 6));
-            }
-        };
-
-        metaglassWallLarge = new LightWall("metaglass-wall-large"){
-            {
-                size = 2;
-                health = 1400;
-                requirements(Category.defense, with(Items.lead, 24, Items.metaglass, 24));
-            }
-        };
         //endregion
-        //region dark
-
-        darkAlloyForge = new StemGenericSmelter("dark-alloy-forge"){
-            {
-                requirements(Category.crafting, with(Items.copper, 30, Items.lead, 25));
-                outputItem = new ItemStack(UnityItems.darkAlloy, 3);
-                craftTime = 140f;
-                size = 4;
-                ambientSound = Sounds.respawning;
-                ambientSoundVolume = 0.6f;
-                consumes.items(with(Items.lead, 2, Items.silicon, 3, Items.blastCompound, 1, Items.phaseFabric, 1, UnityItems.umbrium, 2));
-                consumes.power(3.2f);
-                afterUpdate = e -> {
-                    if(e.consValid() && Mathf.chanceDelta(0.76f)) UnityFx.craftingEffect.at(e.getX(), e.getY(), Mathf.random(360f));
-                };
-            }
-        };
-
+        //region dark turrets
         apparition = new ItemTurret("apparition"){
             {
                 requirements(Category.turret, with(Items.copper, 350, Items.graphite, 380, Items.silicon, 360, Items.plastanium, 200, Items.thorium, 220, UnityItems.umbrium, 370, Items.surgeAlloy, 290));
@@ -354,7 +360,7 @@ public class UnityBlocks implements ContentList{
             }
         };
 
-        banshee = new unity.world.blocks.BarrelsItemTurret("banshee"){
+        banshee = new unity.world.blocks.defense.turrets.BarrelsItemTurret("banshee"){
             {
                 size = 12;
                 health = 22000;
@@ -474,103 +480,25 @@ public class UnityBlocks implements ContentList{
                 baseRegion = atlas.find("unity-block-" + size);
             }
         };
-
         //endregion
-        //region end
-
-        terminalCrucible = new StemGenericSmelter("terminal-crucible"){
+        //region dark factories
+        darkAlloyForge = new StemGenericSmelter("dark-alloy-forge"){
             {
-                requirements(Category.crafting, with(Items.lead, 810, Items.graphite, 720, Items.silicon, 520, Items.phaseFabric, 430, Items.surgeAlloy, 320, UnityItems.plagueAlloy, 120, UnityItems.darkAlloy, 120, UnityItems.lightAlloy, 120, UnityItems.advanceAlloy, 120, UnityItems.monolithAlloy, 120, UnityItems.sparkAlloy, 120));
-                flameColor = UnityPal.scarColor;
-                addSprites(name + "-lights");
-                preserveDraw = false;
-                afterDrawer = e -> {
-                    drawer.draw(e);
-                    if(e.warmup > 0f){
-                        Draw.blend(Blending.additive);
-                        Draw.color(1f, Mathf.absin(Time.time(), 5f, 0.5f) + 0.5f, Mathf.absin(Time.time() + 90f * Mathf.radDeg, 5f, 0.5f) + 0.5f, e.warmup);
-                        Draw.rect(dataRegions[0], e.x, e.y);
-                        float b = (Mathf.absin(Time.time(), 8f, 0.25f) + 0.7f) * e.warmup;
-                        Draw.color(1f, b, b, b);
-                        Draw.rect(topRegion, e.x, e.y);
-                        Draw.blend();
-                        Draw.color();
-                    }
-                };
-                outputItem = new ItemStack(UnityItems.terminum, 1);
-                size = 6;
-                craftTime = 310f;
+                requirements(Category.crafting, with(Items.copper, 30, Items.lead, 25));
+                outputItem = new ItemStack(UnityItems.darkAlloy, 3);
+                craftTime = 140f;
+                size = 4;
                 ambientSound = Sounds.respawning;
                 ambientSoundVolume = 0.6f;
-                consumes.power(45.2f);
-                consumes.items(with(UnityItems.plagueAlloy, 3, UnityItems.darkAlloy, 3, UnityItems.lightAlloy, 3, UnityItems.advanceAlloy, 3, UnityItems.monolithAlloy, 3, UnityItems.sparkAlloy, 3));
-            }
-        };
-
-        endForge = new StemGenericSmelter("end-forge"){
-            {
-                requirements(Category.crafting, with(Items.silicon, 2300, Items.phaseFabric, 650, Items.surgeAlloy, 1350, UnityItems.plagueAlloy, 510, UnityItems.darkAlloy, 510, UnityItems.lightAlloy, 510, UnityItems.advanceAlloy, 510, UnityItems.monolithAlloy, 510, UnityItems.sparkAlloy, 510, UnityItems.terminationFragment, 230));
-                outputItem = new ItemStack(UnityItems.terminaAlloy, 2);
-                size = 8;
-                craftTime = 410f;
-                ambientSoundVolume = 0.6f;
-                addSprites(name + "-lights", name + "-top-small");
-                foreUpdate = e -> {
-                    if(e.consValid() && Mathf.chanceDelta(0.7f * e.warmup)) forgeAbsorbEffect.at(e.x, e.y, Mathf.random(360f));
-                };
-                preserveDraw = false;
-                afterDrawer = e -> {
-                    drawer.draw(e);
-                    if(e.warmup <= 0.0001f) return;
-                    Draw.blend(Blending.additive);
-                    Draw.color(1f, Mathf.absin(Time.time(), 5f, 0.5f) + 0.5f, Mathf.absin(Time.time() + 90f * Mathf.radDeg, 5f, 0.5f) + 0.5f, e.warmup);
-                    Draw.rect(dataRegions[0], e.x, e.y);
-                    float b = (Mathf.absin(Time.time(), 8f, 0.25f) + 0.75f) * e.warmup;
-                    Draw.color(1f, b, b, b);
-                    Draw.rect(topRegion, e.x, e.y);
-                    for(int i = 0; i < 4; i++){
-                        float ang = i * 90f;
-                        for(int s = 0; s < 2; s++){
-                            float offset = 360f / 8f * (i * 2 + s);
-                            TextureRegion reg = dataRegions[1];
-                            int sign = Mathf.signs[s];
-                            float colA = (Mathf.absin(Time.time() + offset * Mathf.radDeg, 8f, 0.25f) + 0.75f) * e.warmup;
-                            float colB = (Mathf.absin(Time.time() + (90f + offset) * Mathf.radDeg, 8f, 0.25f) + 0.75f) * e.warmup;
-                            Draw.color(1, colA, colB, e.warmup);
-                            Draw.rect(reg, e.x, e.y, reg.width * sign * Draw.scl, reg.height * Draw.scl, -ang);
-                        }
-                    }
-                    Draw.blend();
-                    Draw.color();
-                };
-                consumes.power(86.7f);
-                consumes.items(with(UnityItems.terminum, 3, UnityItems.darkAlloy, 5, UnityItems.lightAlloy, 5));
-            }
-        };
-
-        //endregion
-        //region imber
-
-        sparkAlloyFactory = new StemGenericSmelter("spark-alloy-forge"){
-            {
-                requirements(Category.crafting, with(Items.lead, 160, Items.graphite, 340, UnityItems.imberium, 270, Items.silicon, 250, Items.thorium, 120, Items.surgeAlloy, 100));
-                outputItem = new ItemStack(UnityItems.sparkAlloy, 4);
-                size = 4;
-                craftTime = 160f;
-                ambientSound = Sounds.machine;
-                ambientSoundVolume = 0.6f;
-                craftEffect = imberCircleSparkCraftingEffect;
+                consumes.items(with(Items.lead, 2, Items.silicon, 3, Items.blastCompound, 1, Items.phaseFabric, 1, UnityItems.umbrium, 2));
+                consumes.power(3.2f);
                 afterUpdate = e -> {
-                    if(e.consValid()){
-                        if(Mathf.chanceDelta(0.3f)) imberSparkCraftingEffect.at(e.getX(), e.getY(), Mathf.random(360f));
-                        else if(Mathf.chanceDelta(0.02f)) Lightning.create(e.team, UnityPal.imberColor, 5f, e.x, e.y, Mathf.random(360f), 5);
-                    }
+                    if(e.consValid() && Mathf.chanceDelta(0.76f)) UnityFx.craftingEffect.at(e.getX(), e.getY(), Mathf.random(360f));
                 };
-                consumes.power(2.6f);
-                consumes.items(with(Items.surgeAlloy, 3, Items.titanium, 4, Items.silicon, 6, UnityItems.imberium, 3));
             }
         };
-
+        //endregion
+        //region imber turrets
         orb = new ChargeTurret("orb"){
             {
                 requirements(Category.turret, with(Items.copper, 55, Items.lead, 30, Items.graphite, 25, Items.silicon, 35, UnityItems.imberium, 20));
@@ -698,10 +626,29 @@ public class UnityBlocks implements ContentList{
                 consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability <= 0.1f, 0.4f)).update(false);
             }
         };
-
         //endregion
-        //region koruh
-
+        //region imber factories
+        sparkAlloyFactory = new StemGenericSmelter("spark-alloy-forge"){
+            {
+                requirements(Category.crafting, with(Items.lead, 160, Items.graphite, 340, UnityItems.imberium, 270, Items.silicon, 250, Items.thorium, 120, Items.surgeAlloy, 100));
+                outputItem = new ItemStack(UnityItems.sparkAlloy, 4);
+                size = 4;
+                craftTime = 160f;
+                ambientSound = Sounds.machine;
+                ambientSoundVolume = 0.6f;
+                craftEffect = imberCircleSparkCraftingEffect;
+                afterUpdate = e -> {
+                    if(e.consValid()){
+                        if(Mathf.chanceDelta(0.3f)) imberSparkCraftingEffect.at(e.getX(), e.getY(), Mathf.random(360f));
+                        else if(Mathf.chanceDelta(0.02f)) Lightning.create(e.team, UnityPal.imberColor, 5f, e.x, e.y, Mathf.random(360f), 5);
+                    }
+                };
+                consumes.power(2.6f);
+                consumes.items(with(Items.surgeAlloy, 3, Items.titanium, 4, Items.silicon, 6, UnityItems.imberium, 3));
+            }
+        };
+        //endregion
+        //region koruh turrets
         laserTurret = new ExpPowerTurret("laser-turret", 10){
             {
                 requirements(Category.turret, with(Items.copper, 160, Items.lead, 110, Items.silicon, 90));
@@ -731,15 +678,15 @@ public class UnityBlocks implements ContentList{
             }
         };
 
+        //endregion
+        //region koruh blocks
         teleporter = new Teleporter("teleporter"){
             {
                 requirements(Category.distribution, with(Items.lead, 12, Items.silicon, 10, Items.phaseFabric, 10, Items.thorium, 4));
             }
         };
-
         //endregion
-        //region monolith
-
+        //region monolith factories
         monolithAlloyFactory = new StemGenericSmelter("monolith-alloy-forge"){
             {
                 requirements(Category.crafting, with(Items.lead, 380, UnityItems.monolite, 240, Items.silicon, 400, Items.titanium, 240, Items.thorium, 90, Items.surgeAlloy, 160));
@@ -764,7 +711,8 @@ public class UnityBlocks implements ContentList{
                 consumes.liquid(Liquids.cryofluid, 0.1f);
             }
         };
-
+        //endregion
+        //region monolith turrets
         mage = new PowerTurret("mage"){
             {
                 requirements(Category.turret, with(Items.lead, 75, Items.silicon, 50, UnityItems.monolite, 25));
@@ -825,7 +773,77 @@ public class UnityBlocks implements ContentList{
                 };
             }
         };
+        //endregion
+        //region end factories
+        terminalCrucible = new StemGenericSmelter("terminal-crucible"){
+            {
+                requirements(Category.crafting, with(Items.lead, 810, Items.graphite, 720, Items.silicon, 520, Items.phaseFabric, 430, Items.surgeAlloy, 320, UnityItems.plagueAlloy, 120, UnityItems.darkAlloy, 120, UnityItems.lightAlloy, 120, UnityItems.advanceAlloy, 120, UnityItems.monolithAlloy, 120, UnityItems.sparkAlloy, 120));
+                flameColor = UnityPal.scarColor;
+                addSprites(name + "-lights");
+                preserveDraw = false;
+                afterDrawer = e -> {
+                    drawer.draw(e);
+                    if(e.warmup > 0f){
+                        Draw.blend(Blending.additive);
+                        Draw.color(1f, Mathf.absin(Time.time(), 5f, 0.5f) + 0.5f, Mathf.absin(Time.time() + 90f * Mathf.radDeg, 5f, 0.5f) + 0.5f, e.warmup);
+                        Draw.rect(dataRegions[0], e.x, e.y);
+                        float b = (Mathf.absin(Time.time(), 8f, 0.25f) + 0.7f) * e.warmup;
+                        Draw.color(1f, b, b, b);
+                        Draw.rect(topRegion, e.x, e.y);
+                        Draw.blend();
+                        Draw.color();
+                    }
+                };
+                outputItem = new ItemStack(UnityItems.terminum, 1);
+                size = 6;
+                craftTime = 310f;
+                ambientSound = Sounds.respawning;
+                ambientSoundVolume = 0.6f;
+                consumes.power(45.2f);
+                consumes.items(with(UnityItems.plagueAlloy, 3, UnityItems.darkAlloy, 3, UnityItems.lightAlloy, 3, UnityItems.advanceAlloy, 3, UnityItems.monolithAlloy, 3, UnityItems.sparkAlloy, 3));
+            }
+        };
 
+        endForge = new StemGenericSmelter("end-forge"){
+            {
+                requirements(Category.crafting, with(Items.silicon, 2300, Items.phaseFabric, 650, Items.surgeAlloy, 1350, UnityItems.plagueAlloy, 510, UnityItems.darkAlloy, 510, UnityItems.lightAlloy, 510, UnityItems.advanceAlloy, 510, UnityItems.monolithAlloy, 510, UnityItems.sparkAlloy, 510, UnityItems.terminationFragment, 230));
+                outputItem = new ItemStack(UnityItems.terminaAlloy, 2);
+                size = 8;
+                craftTime = 410f;
+                ambientSoundVolume = 0.6f;
+                addSprites(name + "-lights", name + "-top-small");
+                foreUpdate = e -> {
+                    if(e.consValid() && Mathf.chanceDelta(0.7f * e.warmup)) forgeAbsorbEffect.at(e.x, e.y, Mathf.random(360f));
+                };
+                preserveDraw = false;
+                afterDrawer = e -> {
+                    drawer.draw(e);
+                    if(e.warmup <= 0.0001f) return;
+                    Draw.blend(Blending.additive);
+                    Draw.color(1f, Mathf.absin(Time.time(), 5f, 0.5f) + 0.5f, Mathf.absin(Time.time() + 90f * Mathf.radDeg, 5f, 0.5f) + 0.5f, e.warmup);
+                    Draw.rect(dataRegions[0], e.x, e.y);
+                    float b = (Mathf.absin(Time.time(), 8f, 0.25f) + 0.75f) * e.warmup;
+                    Draw.color(1f, b, b, b);
+                    Draw.rect(topRegion, e.x, e.y);
+                    for(int i = 0; i < 4; i++){
+                        float ang = i * 90f;
+                        for(int s = 0; s < 2; s++){
+                            float offset = 360f / 8f * (i * 2 + s);
+                            TextureRegion reg = dataRegions[1];
+                            int sign = Mathf.signs[s];
+                            float colA = (Mathf.absin(Time.time() + offset * Mathf.radDeg, 8f, 0.25f) + 0.75f) * e.warmup;
+                            float colB = (Mathf.absin(Time.time() + (90f + offset) * Mathf.radDeg, 8f, 0.25f) + 0.75f) * e.warmup;
+                            Draw.color(1, colA, colB, e.warmup);
+                            Draw.rect(reg, e.x, e.y, reg.width * sign * Draw.scl, reg.height * Draw.scl, -ang);
+                        }
+                    }
+                    Draw.blend();
+                    Draw.color();
+                };
+                consumes.power(86.7f);
+                consumes.items(with(UnityItems.terminum, 3, UnityItems.darkAlloy, 5, UnityItems.lightAlloy, 5));
+            }
+        };
         //endregion
     }
 }

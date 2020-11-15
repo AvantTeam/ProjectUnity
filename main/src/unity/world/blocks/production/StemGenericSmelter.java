@@ -1,4 +1,4 @@
-package unity.world.blocks;
+package unity.world.blocks.production;
 
 import arc.func.Cons;
 import arc.graphics.g2d.TextureRegion;

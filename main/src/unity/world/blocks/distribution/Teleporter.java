@@ -1,4 +1,4 @@
-package unity.world.blocks;
+package unity.world.blocks.distribution;
 
 import arc.Events;
 import arc.graphics.Color;

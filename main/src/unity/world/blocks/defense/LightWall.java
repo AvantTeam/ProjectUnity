@@ -1,6 +1,7 @@
-package unity.world.blocks.light;
+package unity.world.blocks.defense;
 
 import mindustry.world.blocks.defense.Wall;
+import unity.world.blocks.LightRepeaterBuildBase;
 
 public class LightWall extends Wall{
     public LightWall(String name){

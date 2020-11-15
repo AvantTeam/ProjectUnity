@@ -1,4 +1,4 @@
-package unity.world.blocks;
+package unity.world.blocks.defense.turrets;
 
 import arc.graphics.Blending;
 import arc.graphics.g2d.Draw;

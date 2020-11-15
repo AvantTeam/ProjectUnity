@@ -1,11 +1,11 @@
-package unity.world.blocks.light;
+package unity.world.blocks.logic;
 
 import arc.graphics.Blending;
 import arc.graphics.g2d.*;
 import arc.math.geom.Geometry;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import unity.world.blocks.light.LightFilter.LightFilterBuild;
+import unity.world.blocks.logic.LightFilter.LightFilterBuild;
 
 import static arc.Core.*;
 
