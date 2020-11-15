@@ -22,6 +22,7 @@ import unity.world.blocks.defense.turrets.*;
 import unity.world.blocks.distribution.Teleporter;
 import unity.world.blocks.logic.*;
 import unity.world.blocks.production.StemGenericSmelter;
+import unity.world.blocks.units.SelectableReconstructor;
 import unity.world.draw.DrawLightSource;
 import multilib.*;
 import multilib.Recipe.*;
@@ -35,6 +36,7 @@ public class UnityBlocks implements ContentList{
 
 //global
     //blocks
+    recursiveReconstructor,
     lightLamp, oilLamp, lightLaser, lightLampInfi, lightReflector, lightReflector1, lightOmnimirror, lightFilter, lightInvertedFilter, lightDivisor, lightDivisor1, lightItemFilter, lightPanel, lightInfluencer,
     metaglassWall, metaglassWallLarge,
     oreUmbrium, oreLuminum, oreMonolite, oreImberium,
@@ -57,7 +59,7 @@ public class UnityBlocks implements ContentList{
     laserTurret, inferno,
     //blocks
     teleporter,
-    
+
 //light
     //turrets
 
@@ -82,6 +84,22 @@ public class UnityBlocks implements ContentList{
     @Override
     public void load(){
         //region global blocks
+        recursiveReconstructor = new SelectableReconstructor("recursive-reconstructor"){
+            {
+                requirements(Category.units, with(Items.graphite, 1600, Items.silicon, 2000, Items.metaglass, 900, Items.thorium, 600, Items.lead, 1200, Items.plastanium, 3600));
+                size = 11;
+                liquidCapacity = 360f;
+                configurable = true;
+                constructTime = 20000f;
+                minTier = 6;
+                upgrades.add(new UnitType[]{UnitTypes.toxopid, UnityUnitTypes.projectSpiboss});
+                otherUpgrades.add(new UnitType[]{UnityUnitTypes.projectSpiboss, UnityUnitTypes.arcaetana});
+                consumes.power(5f);
+                consumes.items(with(Items.silicon, 1200, Items.metaglass, 800, Items.thorium, 700, Items.surgeAlloy, 400, Items.plastanium, 600, Items.phaseFabric, 350));
+                consumes.liquid(Liquids.cryofluid, 7f);
+            }
+        };
+
         lightLamp = new LightSource("light-lamp"){
             {
                 consumes.power(1f);

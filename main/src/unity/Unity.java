@@ -82,7 +82,7 @@ public class Unity extends Mod{
             LoadedMod mod = Vars.mods.locateMod("unity");
             Func<String, String> stringf = value -> Core.bundle.get("mod." + value);
 
-            mod.meta.displayName = stringf.get(mod.meta.name + ".displayName");
+            mod.meta.displayName = stringf.get(mod.meta.name + ".name");
             mod.meta.description = stringf.get(mod.meta.name + ".description");
         }
     }
