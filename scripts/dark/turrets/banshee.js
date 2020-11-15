@@ -34,7 +34,13 @@ standardThoriumMassive.width *= 1.34;
 standardThoriumMassive.height *= 1.34;
 standardThoriumMassive.lifetime *= 1.1;
 
-const banshee = extendContent(ItemTurret, "banshee", {});
+const banshee = extendContent(ItemTurret, "banshee", {
+	load(){
+		this.super$load();
+		
+		this.baseRegion = Core.atlas.find("unity-block-" + this.size);
+	}
+});
 banshee.spread = 37;
 banshee.shots = 2;
 banshee.spreadA = 18.5;

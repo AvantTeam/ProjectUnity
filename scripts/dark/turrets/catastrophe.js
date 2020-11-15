@@ -26,7 +26,13 @@ catastropheLaser.length = 340;
 catastropheLaser.strokes = [2 * 1.4, 1.5 * 1.4, 1 * 1.4, 0.3 * 1.4];
 
 //TODO: research from dark alloy item.
-const catastrophe = new LaserTurret("catastrophe");
+const catastrophe = extendContent(LaserTurret, "catastrophe", {
+	load(){
+		this.super$load();
+
+		this.baseRegion = Core.atlas.find("unity-block-" + this.size);
+	}
+});
 catastrophe.shootType = catastropheLaser;
 catastrophe.consumes.add(new ConsumeLiquidFilter(liquid => liquid.temperature <= 0.4 && liquid.flammability < 0.1, 1.3)).update(false);
 catastrophe.heatDrawer = tile => {

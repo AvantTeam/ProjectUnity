@@ -28,7 +28,13 @@ standardThoriumLarge.speed *= 1.1;
 standardThoriumLarge.width *= 1.12;
 standardThoriumLarge.height *= 1.12;
 
-const apparition = extendContent(ItemTurret, "apparition", {});
+const apparition = extendContent(ItemTurret, "apparition", {
+	load(){
+		this.super$load();
+		
+		this.baseRegion = Core.atlas.find("unity-block-" + this.size);
+	}
+});
 apparition.ammo(
 	Items.graphite, standardDenseLarge,
 	Items.silicon, standardHomingLarge,

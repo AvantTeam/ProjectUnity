@@ -32,7 +32,13 @@ standardThoriumHeavy.width *= 1.32;
 standardThoriumHeavy.height *= 1.32;
 //standardThoriumHeavy.lifetime *= 1.1;
 
-const ghost = extendContent(ItemTurret, "ghost", {});
+const ghost = extendContent(ItemTurret, "ghost", {
+	load(){
+		this.super$load();
+		
+		this.baseRegion = Core.atlas.find("unity-block-" + this.size);
+	}
+});
 ghost.spread = 21;
 ghost.spreadB = 4;
 ghost.secondReloadTime = 6;

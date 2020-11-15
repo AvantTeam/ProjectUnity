@@ -10,6 +10,12 @@ const falloutLaser = extendContent(ContinuousLaserBulletType, 95, {
 falloutLaser.length = 230;
 
 //TODO: research from umbrium item.
-const fallout = new LaserTurret("fallout");
+const fallout = extendContent(LaserTurret, "fallout", {
+	load(){
+		this.super$load();
+		
+		this.baseRegion = Core.atlas.find("unity-block-" + this.size);
+	}
+});
 fallout.shootType = falloutLaser;
 fallout.consumes.add(new ConsumeLiquidFilter(liquid => liquid.temperature <= 0.5 && liquid.flammability < 0.1, 0.58)).update(false);
