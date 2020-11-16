@@ -17,6 +17,39 @@ const offsetSinB = (offset, scl) => {
 	return Mathf.absin(Time.time() + (offset * Mathf.radDeg), scl, 0.25);
 };
 
+const endGameShoot = new Effect(45, 820 * 2, e => {
+	var curve = Mathf.curve(e.fin(), 0, 0.2) * 820;
+	var curveB = Mathf.curve(e.fin(), 0, 0.7);
+	
+	Draw.color(Color.red, Color.valueOf("ff000000"), curveB);
+	Draw.blend(Blending.additive);
+	
+	Fill.poly(e.x, e.y, Lines.circleVertices(curve), curve);
+	
+	Draw.blend();
+});
+endGameShoot.layer = 110.99;
+
+const darkShockWave = new Effect(56, 820 * 2, e => {
+	const sides = 148;
+	var poly = [];
+	
+	Draw.color(Color.black);
+	Lines.stroke(e.fout() * 1.5 + 0.5);
+	
+	for(var i = 0; i < sides; i++){
+		tempVec.trns(360 / sides * i, e.finpow() * 790 + (Mathf.clamp(Mathf.randomSeed(Mathf.round(Time.time() * 270 + (e.id * 1241) + Mathf.round(i / 3)), -390, 390), -340, 0) * e.fin())).add(e.x, e.y);
+		
+		for(var b = 0; b < 2; b++){
+			poly[(i * 2 + b)] = b == 0 ? tempVec.x : tempVec.y;
+		};
+		if(Mathf.randomSeed(Mathf.round(Time.time() * 270 + (e.id * 2311) + i + 1), 0, 20) / 20 >= 0.9){
+			Lines.line(e.x, e.y, tempVec.x, tempVec.y);
+		};
+	};
+	Lines.polyline(poly, sides * 2, true);
+});
+
 const vaporizeTile = new Effect(126, 512, e => {
 	Draw.mixcol(Color.red, 1);
 	Draw.blend(Blending.additive);
@@ -26,6 +59,7 @@ const vaporizeTile = new Effect(126, 512, e => {
 	Draw.blend();
 	Draw.mixcol();
 });
+vaporizeTile.layer = 111;
 
 const vaporize = new Effect(126, 512, e => {
 	Draw.mixcol(Color.red, 1);
@@ -38,6 +72,7 @@ const vaporize = new Effect(126, 512, e => {
 	Draw.color();
 	Draw.mixcol();
 });
+vaporize.layer = 111;
 
 const endgameLaser = new Effect(76, 820 * 2, e => {
 	//const colors = ["f5303680", "f53036", "ffffff"];
@@ -97,7 +132,7 @@ endgame.health = 68000;
 endgame.shootType = fakeBullet;
 endgame.outlineIcon = false;
 endgame.powerUse = 320;
-endgame.shootShake = 1.2;
+endgame.shootShake = 2.2;
 endgame.reloadTime = 300;
 endgame.eyeTime = endgame.timers++;
 endgame.bulletTime = endgame.timers++;
@@ -407,7 +442,8 @@ endgame.buildType = () => {
 		updateTile(){
 			this.updateEyes();
 			if(this.power.status >= 0.0001){
-				this._eyesAlpha = Mathf.lerpDelta(this._eyesAlpha, 1 * this.power.status, 0.06 * this.power.status);
+				var value = this._eyesAlpha > this.power.status ? 1 : this.power.status;
+				this._eyesAlpha = Mathf.lerpDelta(this._eyesAlpha, this.power.status, 0.06 * value);
 				//this._lightsAlpha = Mathf.lerpDelta(this._lightsAlpha, 1, 0.07);
 			}else{
 				this._eyesAlpha = Mathf.lerpDelta(this._eyesAlpha, 0, 0.06);
@@ -429,18 +465,16 @@ endgame.buildType = () => {
 					//this._eyesOffset.set(tempVec);
 				};
 				this._eyesTargetOffset.limit(2);
-				this._lightsAlpha = Mathf.lerpDelta(this._lightsAlpha, 1 * this.power.status, 0.07 * this.power.status);
-				//this._eyesAlpha = Mathf.lerpDelta(this._eyesAlpha, 1, 0.06);
+				this._lightsAlpha = Mathf.lerpDelta(this._lightsAlpha, this.power.status, 0.07 * this.power.status);
 				for(var i = 0; i < 3; i++){
-					this._ringProgress[i] = Mathf.lerpDelta(this._ringProgress[i], 360 * ringDirection[i], ringProgresses[i]);
+					this._ringProgress[i] = Mathf.lerpDelta(this._ringProgress[i], 360 * ringDirection[i], ringProgresses[i] * this.power.status);
 				};
 			}else{
 				//this._lightsAlpha = Mathf.lerpDelta(this._lightsAlpha, 0, 0.07);
 				if(this._eyeResetTime >= 60){
 					this._lightsAlpha = Mathf.lerpDelta(this._lightsAlpha, 0, 0.07);
-					//this._eyesAlpha = Mathf.lerpDelta(this._eyesAlpha, 0, 0.06);
 					for(var i = 0; i < 3; i++){
-						this._ringProgress[i] = Mathf.lerpDelta(this._ringProgress[i], 0, ringProgresses[i]);
+						this._ringProgress[i] = Mathf.lerpDelta(this._ringProgress[i], 0, ringProgresses[i] * this.power.status);
 					};
 				}else{
 					this._eyeResetTime += Time.delta;
@@ -451,6 +485,8 @@ endgame.buildType = () => {
 			this.consume();
 			this.killTilesC();
 			this.killUnitsC();
+			darkShockWave.at(this.x, this.y);
+			endGameShoot.at(this.x, this.y);
 			//if(this.target != null && this.target instanceof Healthc) this.target.kill();
 			//this.super$shoot(type);
 		}

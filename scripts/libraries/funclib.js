@@ -163,5 +163,11 @@ module.exports = {
 				}
 			};
 		};
+	},
+	
+	customValue(method){
+		return new StatValue(){
+			display: method
+		}
 	}
 };

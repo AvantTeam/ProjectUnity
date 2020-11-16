@@ -1,7 +1,4 @@
-const customValue = method => new StatValue() {
-    display: method
-}
-
+const fLib = this.global.unity.funclib;
 function MultiCrafterBuild() {
     this.acceptItem = function(source, item) {
         if(typeof this.block["getInputItemSet"] !== "function") return false;
@@ -574,7 +571,7 @@ function MultiCrafterBlock() {
         this.super$setStats();
         if(this.powerBarI) this.stats.remove(Stat.powerUse);
         this.stats.remove(Stat.productionTime);
-        this.stats.add(Stat.input, customValue(table => {
+        this.stats.add(Stat.input, fLib.customValue(table => {
             table.row();
             var recLen = this.recs.length;
             for(var i = 0; i < recLen; i++) {
