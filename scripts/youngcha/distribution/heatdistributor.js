@@ -38,6 +38,6 @@ const heatPipe = graphLib.finaliseExtend(Block, Building,"heat-pipe",hpblankobj,
 });
 heatPipe.update = true;
 heatPipe.getGraphConnectorBlock("heat graph").setAccept( [1,1,1,1]);
-heatPipe.getGraphConnectorBlock("heat graph").getBaseHeatConductivity(0.7);
-heatPipe.getGraphConnectorBlock("heat graph").getBaseHeatCapacity(5);
+heatPipe.getGraphConnectorBlock("heat graph").setBaseHeatConductivity(0.7);
+heatPipe.getGraphConnectorBlock("heat graph").setBaseHeatCapacity(5);
 heatPipe.getGraphConnectorBlock("heat graph").setBaseHeatRadiativity(0.008);

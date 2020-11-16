@@ -122,7 +122,9 @@ const _GraphCommonBuild = {
 		for(let graphname in this.graphs) {
 			this.graphs[graphname].display(table);
 		}
+		this.displayExt(table);
 	},
+	displayExt(table){},
 	displayBars(barsTable){
 		this.super$displayBars(barsTable);
 		for(let graphname in this.graphs) {
@@ -136,13 +138,17 @@ const _GraphCommonBuild = {
         for(let graphname in this.graphs) {
 			this.graphs[graphname].write(stream);
 		}
+		this.writeExt(stream);
     },
     read(stream, revision) {
         this.super$read(stream, revision);
         for(let graphname in this.graphs) {
 			this.graphs[graphname].read(stream, revision);
 		}
-    }
+		this.readExt(stream, revision);
+    },
+	writeExt(stream) {},
+	readExt(stream, revision) {}
 }
 
 const _GraphCommonBlock = {
@@ -522,6 +528,10 @@ const _GraphPropsCommon = {
     hasNetwork(net) {
         return this._network.id == net.id;
     },
+	getPortOfNetwork(net) {
+		if(!net||!this._network){return -1;}
+        return this._network.id==net.id?0:-1;
+    },
     getNetworkOfPort(index) {
         return this._network;
     },
@@ -562,12 +572,16 @@ const _GraphMulticonnectorProps = Object.assign(Object.create(_GraphPropsCommon)
         }
     },
     hasNetwork(net) {
-        for (let i = 0; i < this._networkList.length; i++) {
-            if (this._networkList[i].id == net.id) {
-                return true;
-            }
-        }
-        return false;
+        return this.getPortOfNetwork(net)!==-1;
+    },
+	getPortOfNetwork(net) {
+		if(!net){return -1;}
+		for (let i = 0; i < this._networkList.length; i++) {
+            if (this._networkList[i]&& this._networkList[i].id == net.id) {
+				return i;
+			}
+		}
+		return -1;
     },
     initAllNets(buildingnew) {
         //_BlockGraph.new(building)
@@ -752,11 +766,11 @@ const _BlockGraph = {
     addBuilding(building, connectIndex) {
         this.connected.add(building);
 		this.updateOnGraphChanged();
-		this.addMergeStats(building);
         building.setNetworkOfPort(connectIndex, this);
+		this.addMergeStats(building);
 		
     },
-	addMergeStats(building){}, // used for graph systems in which blocks 'techinically' have their own values, but are as a whole managed by a graph. 
+	addMergeStats(building){}, // can be called before the block offically adds the graph, esp during init.
     mergeGraph(graph) {
         ////print(graph);
         if (!graph) {
@@ -847,9 +861,6 @@ const _BlockGraph = {
         this.rebuildGraphWithSet(building, ObjectSet.with(building), index);
     },
     rebuildGraphWithSet(root, searched, rootindex) {
-
-        //guess ill die
-        //thank god this was already tail recursed.
         let tree = {
             complete: false,
             parent: null,
@@ -858,11 +869,7 @@ const _BlockGraph = {
             parentConnectPort: rootindex,
         }
         let current = tree;
-
-        //debug
         let total = 0;
-        //
-		////print("starting rebuild....");
         mainloop:
             while (current) {
 
@@ -959,17 +966,10 @@ const _BlockGraph = {
                                     });
                                     //thisgraph.rebuildGraphWithSet(conbuild,searched,connectIndex);
                                 }
-                            } else {
-                                ////print("Graphs are the same(id:"+connet.id+"), skipping..");
                             }
-                        } else {
-                            ////print("Graph already contains buildConnector, skipping..");
                         }
                         prevbuilding = conbuild;
-                    }else{
-						//print("nearby tile no network");
-						
-					}
+                    }
                 }
                 if (current.children.length > 0) {
                     for (let i = 0; i < current.children.length; i++) {

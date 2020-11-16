@@ -296,6 +296,7 @@ const script = [
                     "inlinegearbox",
                     "shaftrouter",
                     "simpletransmission",
+					"cruciblepump",
                     "mechanicalconveyor"
                 ]
             },
@@ -347,7 +348,7 @@ if(!Vars.headless){
 
 
 };
-const music = loadMusic("youngcha");
+//const music = loadMusic("youngcha");
 /*
 Awaiting custom music player
 

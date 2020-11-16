@@ -120,6 +120,9 @@ const cruicibleMelts = [
 	{name:"graphite", additive:true, additiveID:"carbon", additiveWeight: 1.0},    
 	{name:"unity-nickel", meltpoint:1100, meltspeed:0.15},  // irl: 1728K
 	{name:"unity-cupronickel", meltpoint:900, meltspeed:0.05},  // irl: 1300K
+	{name:"metaglass", meltpoint:1000, meltspeed:0.01},  // irl: 1300K
+	{name:"silicon", meltpoint:900, meltspeed:0.02},  // irl: 1600K
+	{name:"surge-alloy", meltpoint:1500, meltspeed:0.02},  // irl: 1600K
 	////APPEND NEW MELTS TO THE END TO AVOID AFFECTING SAVES
 ];
 for(let inde = 0 ;inde<cruicibleMelts.length;inde++){
@@ -135,16 +138,43 @@ function getMeltByName(name){
 function getMelt(item){
 	return getMeltByName(item.name);
 }
-
+function getMeltItem(id){
+	let hh = cruicibleMelts[id];
+	if(!hh.item && !hh.notItem){hh.item=Vars.content.getByName(ContentType.item,hh.name);}
+	return hh.item;
+}
 
 
 const cruicibleRecipes = [
 	{name:"unity-cupronickel", 
 		inputs:[
 			{material:"unity-nickel", amount:0.8},
-			{material:"copper", amount:1.2, needsliquid: true}
+			{material:"copper",       amount:2.0, needsliquid: true}
 		],
 		alloyspeed: 0.6
+	},
+	{name:"silicon", 
+		inputs:[
+			{material:"sand",   amount:1.5, needsliquid: true},
+			{material:"carbon", amount:0.25}
+		],
+		alloyspeed: 0.2
+	},
+	{name:"metaglass", 
+		inputs:[
+			{material:"sand", amount:0.66, needsliquid: true},
+			{material:"lead", amount:0.66, needsliquid: true}
+		],
+		alloyspeed: 0.5
+	},
+	{name:"surge-alloy", 
+		inputs:[
+			{material:"silicon",  amount:1,   needsliquid: true},
+			{material:"lead",     amount:2,   needsliquid: true},
+			{material:"copper",   amount:1,   needsliquid: true},
+			{material:"titanium", amount:1.5, needsliquid: true},
+		],
+		alloyspeed: 0.15
 	},
 ]
 
@@ -165,9 +195,8 @@ function sqrd(x) {
 const _CruicibleCommon = Object.assign(Object.create(graphLib.graphCommon),{
 	_baseLiquidCapacity:6.0, //capacity of cruicible
 	_meltSpeed:0.8, 
-	_autoInsert:true, //whether blocks that insert items into the cruicible graph should insert into this block.
-	_liquidFlow:true, //whether this block allows liquids to flow
-	
+	_doesCrafting:true, //whether this block does alloying
+	_capacityTiling:true, //whether the block's capacity is affect by tiling
 
 	getBaseLiquidCapacity() {
         return this._baseLiquidCapacity;
@@ -180,6 +209,18 @@ const _CruicibleCommon = Object.assign(Object.create(graphLib.graphCommon),{
     },
     setMeltSpeed(v) {
         this._meltSpeed = v;
+    },
+	setDoesCrafting(v) {
+        this._doesCrafting = v;
+    },
+	getDoesCrafting(v) {
+        return this._doesCrafting;
+    },
+	setCapacityTiling(v) {
+        this._capacityTiling = v;
+    },
+	getCapacityTiling(v) {
+        return this._capacityTiling;
     },
 
     setStats(table) {
@@ -378,17 +419,69 @@ const _CruiciblePropsCommon = Object.assign(deepCopy(graphLib.graphProps),{
 		this.contains =tmp;
 		this.melter=true;
 		this.containedAmCache=0;
+		let tmp2 = [];
+		this._propsList=tmp2;
 	},
-
+	applySaveState(graph,cache) {
+		if(graph.contains.length==cache.length){return;}
+		let tmp = [];
+		graph.contains = tmp;
+		let cc = graph.contains;
+		for(let i =0;i<cache.length;i++){
+			cc.push(cache[i]);
+			cc[i].item = getMeltItem(cc[i].id);
+		}
+	},
 	writeGlobal(stream) {
 	},
 	writeLocal(stream,graph) {
+		let cc = graph.contains;
+		if(!cc || !cc.length){
+			stream.i(0);
+			return;
+		}
+		stream.i(cc.length);
+		for(let i =0;i<cc.length;i++){
+			stream.i(cc[i].id);
+			stream.f(cc[i].meltedRatio);
+			stream.f(cc[i].volume);
+		}
 	},
 	readGlobal(stream, revision) {
 	},
 	readLocal(stream, revision) {
-	}
+		let len = stream.i();
+		let save = [];
+		for(let i =0;i<len;i++){
+			let id = stream.i();
+			let mratio = stream.f();
+			let vol = stream.f();
+			save.push({
+				id:id,
+				volume:vol,
+				meltedRatio:mratio,
+			});
+		}
+		return save;
+	},
+	displayBars(barsTable) {
+        let net = this.getNetwork();
+		net.getLiquidCapacity();
+		net.getVolumeContained();
 
+        barsTable.add(new Bar(
+            prov(() => Core.bundle.get("stat.unity.liquidTotal") + ": " + Strings.fixed(net.getVolumeContained(), 1) + "/" + Strings.fixed(net.getLiquidCapacity(), 1)),
+            prov(() => Pal.darkishGray),
+            floatp(() => net.getVolumeContained() / net.getLiquidCapacity() ))).growX();
+        barsTable.row();
+    },
+
+});
+
+
+const _CrucibleMulticonnectorProps = Object.assign(Object.create(_CruiciblePropsCommon),deepCopy(graphLib.graphMultiProps), {
+	
+	
 });
 
 
@@ -405,6 +498,7 @@ const crucibleGraph = { //this just uh manages the graphics lmAO
 	contains: [],
 	containedAmCache:0,
 	containChanged:true,
+	crafts:true,
 	totalCapacity:0,
 	
 	
@@ -427,7 +521,6 @@ const crucibleGraph = { //this just uh manages the graphics lmAO
 	addItem(item){
 		let meltprod = getMelt(item);
 		if(!meltprod){return false;}
-		/*todo addtiive melts.*/
 		if(!meltprod.additive){
 			if(!meltprod.item){meltprod.item=item;}
 			return this.addMeltItem(meltprod,1,false);
@@ -436,14 +529,29 @@ const crucibleGraph = { //this just uh manages the graphics lmAO
 		}
 		
 	},
+	getMelt(meltprod){
+		for(let i = 0;i<this.contains.length;i++){
+			if(this.contains[i].id === meltprod.id){
+				return this.contains[i];
+			}
+		}
+		return null;
+	},
+	getMeltFromID(id){
+		for(let i = 0;i<this.contains.length;i++){
+			if(this.contains[i].id === id){
+				return this.contains[i];
+			}
+		}
+		return null;
+	},
 	addMeltItem(meltprod, am,liquid){
 		if(!am){return;}
 		if(!this.contains || !this.contains.push){ 
 			let tmp =[];
 			this.contains = tmp;
 		}
-		if(!meltprod.item && !meltprod.notItem){meltprod.item=Vars.content.getByName(ContentType.items,meltprod.name);}
-		/*todo addtiive melts.*/
+		if(!meltprod.item && !meltprod.notItem){meltprod.item=Vars.content.getByName(ContentType.item,meltprod.name);}
 		let avalslot = null;
 		let totalcontained = 0;
 		for(let i = 0;i<this.contains.length;i++){
@@ -475,22 +583,34 @@ const crucibleGraph = { //this just uh manages the graphics lmAO
 	canContainMore(amount){
 		return this.getVolumeContained()+amount <=this.getLiquidCapacity();
 	},
+	getRemainingSpace(amount){
+		return Math.max(0,this.getLiquidCapacity()-this.getVolumeContained());
+	},
 	addSolidToSlot(slot, am){
+		if(am==0){return;}
 		let melted = slot.meltedRatio*slot.volume;
 		slot.volume = slot.volume+am;
 		slot.meltedRatio = melted/slot.volume;
+		if(slot.volume==0 || isNaN(slot.meltedRatio)){
+			slot.meltedRatio = 0;
+		}
 		this.containChanged=true;
 	},
 	addLiquidToSlot(slot, am){
-		let melted = slot.meltedRatio*slot.volume+am;
+		if(am==0){return;}
+		let melted = (slot.meltedRatio*slot.volume)+am;
 		slot.volume = slot.volume+am;
 		slot.meltedRatio = melted/slot.volume;
+		if(slot.volume==0 || isNaN(slot.meltedRatio)){
+			slot.meltedRatio = 0;
+		}
 		this.containChanged=true;
 	},
 	
 	addMergeStats(building){
-		let cc = building.contains;
+		let port = building.getPortOfNetwork(this);
 		this.totalCapacity +=building.liquidcap;
+		let cc = building._propsList[port] ;
 		if(!cc || cc.length==0){return;}
 		
 		for(let i = 0;i<cc.length;i++){
@@ -507,6 +627,8 @@ const crucibleGraph = { //this just uh manages the graphics lmAO
 	updateOnGraphChanged() {
 		this.totalCapacity = 0;
 		let capacumm=0;
+		
+		let hasCrafter = false;
 		this.connected.each(cons(building => {
 			let bitmask = 0;
 			if(!building.getBuild().tile){
@@ -533,8 +655,10 @@ const crucibleGraph = { //this just uh manages the graphics lmAO
 			building.tilingIndex = bitmask;
 			building.liquidcap = capacitymul[directneighbour]*building.getBlockData().getBaseLiquidCapacity();
 			capacumm+=building.liquidcap;
+			hasCrafter = hasCrafter||building.getBlockData().getDoesCrafting();
         }));
 		this.totalCapacity = capacumm;
+		this.crafts=hasCrafter;
 		if(this.getVolumeContained()>this.totalCapacity){
 			let decratio = this.totalCapacity/this.getVolumeContained();
 			for(let i = 0;i<this.contains.length;i++){
@@ -543,20 +667,24 @@ const crucibleGraph = { //this just uh manages the graphics lmAO
 			this.containChanged=true;
 		}
 	},
-	getAverageMeltSpeed(ml,tmpdep,cooldep){
+	getAverageTempDecay(meltpoint,meltspeed,tmpdep,cooldep){
 		let speed = 0;
 		let count = 0;
 		this.connected.each(cons(building => {
+			if(!building.getBlockData().getDoesCrafting()){return;}
 			let temp = building.getBuild().getGraphConnector("heat graph").getTemp();
-			if(temp>ml.meltpoint){
-				speed+=(1+(temp/ml.meltpoint)*tmpdep)*ml.meltspeed;
+			if(temp>meltpoint){
+				speed+=(1+(temp/meltpoint)*tmpdep)*meltspeed;
 			}else{
-				speed-=((1.0-(temp/ml.meltpoint))*cooldep)*ml.meltspeed;
+				speed-=((1.0-(temp/meltpoint))*cooldep)*meltspeed;
 			}
 			count++;
 		}));
 		if(count==0){return 0;}
 		return speed/=count;
+	},
+	getAverageMeltSpeed(ml,tmpdep,cooldep){
+		return this.getAverageTempDecay(ml.meltpoint,ml.meltspeed,tmpdep,cooldep);
 	},
 	getAverageMeltSpeedIndex(index,tmpdep,cooldep){
 		return this.getAverageMeltSpeed(cruicibleMelts[index],tmpdep,cooldep)
@@ -565,6 +693,10 @@ const crucibleGraph = { //this just uh manages the graphics lmAO
 
 	updateGraph() {
 		if(!this.contains){ return;}
+		if(!this.crafts){
+			this.removeEmptyMelts();
+			return;
+		}
 		//melting 
 		for(let i = 0;i<this.contains.length;i++){
 			let meltmul = Time.delta/this.contains[i].volume;
@@ -572,6 +704,14 @@ const crucibleGraph = { //this just uh manages the graphics lmAO
 			if(ml){
 				this.contains[i].meltedRatio += meltmul*this.getAverageMeltSpeed(ml,0.002,0.5)*0.2;
 				this.contains[i].meltedRatio = Mathf.clamp(this.contains[i].meltedRatio);
+				
+				if(ml.evaporationTemp){
+					let evap = this.getAverageTempDecay(ml.evaporationTemp,ml.evaporation,0.0,1.0);
+					if(evap>0){
+						this.contains[i].volume-=evap;
+						this.containChanged=true;
+					}
+				}
 			}
 		}
 		//alloying
@@ -598,7 +738,8 @@ const crucibleGraph = { //this just uh manages the graphics lmAO
 				}
 			}
 			if(valid && maxcraftable>0){
-				let craftam = Math.max(maxcraftable,cruicibleRecipes[z].alloyspeed*Time.delta*0.01);
+				let craftam = Math.min(maxcraftable,cruicibleRecipes[z].alloyspeed*Time.delta*0.1);
+				if(craftam<=0){continue;}
 				for(let r =0;r<cruicibleRecipes[z].inputs.length;r++){
 					let alyinput = cruicibleRecipes[z].inputs[r];
 					if(alyinput.needsliquid){
@@ -612,6 +753,10 @@ const crucibleGraph = { //this just uh manages the graphics lmAO
 			}
 		}
 		//removing empty if any
+		this.removeEmptyMelts();
+	},
+	
+	removeEmptyMelts(){
 		for(let i = 0;i<this.contains.length;i++){
 			if(this.contains[i].volume<=0){
 				this.contains.splice(i, 1);
@@ -619,11 +764,13 @@ const crucibleGraph = { //this just uh manages the graphics lmAO
 			}
 		}
 	},
+	
 	killGraph(){
 		let cc = this.contains;
+		let graph = this;
 		this.connected.each(cons(building => {
 			let nc = [];
-			let ratio = building.liquidcap/this.totalCapacity;
+			let ratio = building.liquidcap/graph.totalCapacity;
 			for(let i = 0;i<cc.length;i++){
 				nc.push({
 					id:cc[i].id,
@@ -632,7 +779,7 @@ const crucibleGraph = { //this just uh manages the graphics lmAO
 					item:cc[i].item
 				});
 			}
-			building.contains = nc;
+			building._propsList[building.getPortOfNetwork(graph)] = nc;
 		}));
 		this.connected.clear();
 	},
@@ -653,6 +800,11 @@ const _baseTypes = {
     crucibleConnector: {
         block: _CruicibleCommon,
         build: _CruiciblePropsCommon,
+		graph: crucibleGraph,
+    },
+	crucibleMultiConnector: {
+        block: _CruicibleCommon,
+        build: _CrucibleMulticonnectorProps,
 		graph: crucibleGraph,
     },
 }
@@ -694,10 +846,10 @@ function _getRegion(region, tile) {
 	let tilex = (tile%12)/12.0;
 	let tiley = Math.floor(tile/12)/4.0;
 	
-	nregion.u = Mathf.map(tilex,0,1,nregion.u,nregion.u2);
-	nregion.v = Mathf.map(tiley,0,1,nregion.v,nregion.v2); //y is flipped h 
-	nregion.u2 = nregion.u+tilew;
-	nregion.v2 = nregion.v+tileh;
+	nregion.u = Mathf.map(tilex,0,1,nregion.u,nregion.u2)+tilew*0.02;
+	nregion.v = Mathf.map(tiley,0,1,nregion.v,nregion.v2)+tileh*0.02; //y is flipped h 
+	nregion.u2 = nregion.u+tilew*0.96;
+	nregion.v2 = nregion.v+tileh*0.96;
 	nregion.width = 32;
 	nregion.height = 32;
     return nregion;
@@ -722,5 +874,6 @@ module.exports = {
     heatCommon: _CruicibleCommon,
     dirs: _dirs,
     getConnectSidePos: getConnectSidePos,
-    baseTypes: _baseTypes
+    baseTypes: _baseTypes,
+	meltTypes: cruicibleMelts
 }

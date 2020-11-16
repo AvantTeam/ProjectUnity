@@ -259,6 +259,7 @@ function _drawHeat(reg,x,y,rot, temp){
 		}
 		if(a>1){
 			let fcol = new Color(heatcolor);
+			fcol.add(0,0,0.01*a);
 			fcol.mul(a);
 			Draw.color(fcol,a);
 		}else{

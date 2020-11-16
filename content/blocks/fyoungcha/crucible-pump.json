@@ -1,0 +1,10 @@
+{
+	"size": 2,
+	"health": 500,
+	"requirements": [
+		{"item": "cupronickel", "amount": 50},
+		{"item": "nickel", "amount": 50},
+		{"item": "metaglass", "amount": 50},
+	],
+	"category": "crafting",
+}
