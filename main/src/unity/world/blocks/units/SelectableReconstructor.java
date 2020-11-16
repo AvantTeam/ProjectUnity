@@ -10,12 +10,21 @@ import mindustry.ui.Styles;
 import mindustry.world.blocks.units.Reconstructor;
 import mindustry.world.meta.Stat;
 
+import static arc.Core.atlas;
+
 public class SelectableReconstructor extends Reconstructor{
     public Seq<UnitType[]> otherUpgrades = new Seq<>();
     protected int minTier;
 
     public SelectableReconstructor(String name){
         super(name);
+    }
+
+    @Override
+    public void load(){
+        super.load();
+        outRegion = atlas.find("unity-factory-out-" + size);
+        inRegion = atlas.find("unity-factory-in-" + size);
     }
 
     @Override

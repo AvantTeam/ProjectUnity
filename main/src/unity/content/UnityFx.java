@@ -3,6 +3,7 @@ package unity.content;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.Position;
 import arc.util.*;
 import mindustry.entities.*;
 import mindustry.graphics.*;
@@ -244,5 +245,19 @@ public class UnityFx{
         color(Pal.surge);
         stroke(e.fslope());
         circle(e.x, e.y, e.fin() * 20f);
+    }),
+
+    healLaser = new Effect(60f, e -> {
+        if(e.data == null || !(e.data instanceof Position[])) return;
+        float[] reduction = new float[]{0f, 1.5f};
+        Position[] temp = (Position[]) e.data;
+        Position a = temp[0], b = temp[1];
+        for(int i = 0; i < 2; i++){
+            color(i == 0 ? Pal.heal : Color.white);
+            stroke((3f - reduction[i]) * e.fout());
+            line(a.getX(), a.getY(), b.getX(), b.getY());
+            Fill.circle(a.getX(), a.getY(), (2.5f - reduction[i]) * e.fout());
+            Fill.circle(b.getX(), b.getY(), (2.5f - reduction[i]) * e.fout());
+        }
     });
 }

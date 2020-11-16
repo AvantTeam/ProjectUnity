@@ -14,7 +14,7 @@ import mindustry.graphics.*;
 import mindustry.content.*;
 import mindustry.world.blocks.units.*;
 import mindustry.world.blocks.units.UnitFactory.*;
-import unity.ai.DistanceGroundAI;
+import unity.ai.*;
 import unity.entities.units.*;
 import unity.graphics.UnityPal;
 
@@ -33,7 +33,7 @@ public class UnityUnitTypes implements ContentList{
 
     public static UnitType
     //flying-units
-    caelifera, schistocerca, anthophila, vespula, lepidoptera,
+    caelifera, schistocerca, anthophila, vespula, lepidoptera, angel, malakhim,
 
     //ground-units
     arcaetana, projectSpiboss,
@@ -408,6 +408,51 @@ public class UnityUnitTypes implements ContentList{
         };
 
         ((UnitFactory) Blocks.airFactory).plans.add(new UnitPlan(caelifera, 60f * 25, with(Items.silicon, 15, Items.titanium, 25)));
+
+        setEntity("angel", UnitEntity::create);
+        angel = new UnitType("angel"){
+            {
+                defaultController = UnitHealerAI::new;
+                buildSpeed = 10f;
+                health = 90;
+                engineOffset = 5.7f;
+                flying = true;
+                speed = 4.3f;
+                accel = 0.08f;
+                drag = 0.01f;
+                range = 40f;
+                commandLimit = 0;
+                ammoType = AmmoTypes.power;
+                hitSize = 9f;
+            }
+        };
+
+        setEntity("malakhim", UnitEntity::create);
+        malakhim = new UnitType("malakhim"){
+            {
+                defaultController = UnitHealerAI::new;
+                buildSpeed = 15f;
+                health = 170;
+                engineOffset = 11.7f;
+                flying = true;
+                speed = 3.9f;
+                accel = 0.08f;
+                drag = 0.01f;
+                range = 50f;
+                commandLimit = 2;
+                ammoType = AmmoTypes.power;
+                hitSize = 10.5f * 1.7f;
+                weapons.add(new Weapon("heal-weapon-mount"){
+                    {
+                        rotate = true;
+                        x = 11f;
+                        y = -7f;
+                        reload = 10f;
+                        bullet = Bullets.healBullet;
+                    }
+                });
+            }
+        };
 
         //endregion
         //region ground-units
