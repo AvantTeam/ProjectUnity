@@ -35,7 +35,7 @@ const darkShockWave = new Effect(56, 820 * 2, e => {
 	var poly = [];
 	
 	Draw.color(Color.black);
-	Lines.stroke(e.fout() + 1);
+	Lines.stroke(e.fout() * 1.5 + 0.5);
 	
 	for(var i = 0; i < sides; i++){
 		tempVec.trns(360 / sides * i, e.finpow() * 790 + (Mathf.clamp(Mathf.randomSeed(Mathf.round(Time.time() * 270 + (e.id * 1241) + Mathf.round(i / 3)), -390, 390), -340, 0) * e.fin())).add(e.x, e.y);
@@ -43,7 +43,7 @@ const darkShockWave = new Effect(56, 820 * 2, e => {
 		for(var b = 0; b < 2; b++){
 			poly[(i * 2 + b)] = b == 0 ? tempVec.x : tempVec.y;
 		};
-		if(Mathf.randomSeed(Mathf.round(Time.time() * 270 + (e.id * 2311) + i + 1), 0, 20) / 20 >= 0.8){
+		if(Mathf.randomSeed(Mathf.round(Time.time() * 270 + (e.id * 2311) + i + 1), 0, 20) / 20 >= 0.9){
 			Lines.line(e.x, e.y, tempVec.x, tempVec.y);
 		};
 	};
