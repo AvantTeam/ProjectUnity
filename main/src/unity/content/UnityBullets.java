@@ -149,6 +149,8 @@ public class UnityBullets implements ContentList{
                 incendSpread = 9f;
                 incendAmount = 2;
                 width = 9f;
+                lightStroke = 70f;
+                spaceMag = 70f;
             }
         };
 

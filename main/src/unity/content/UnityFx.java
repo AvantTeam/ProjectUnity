@@ -219,7 +219,25 @@ public class UnityFx{
     }),
 
     falseLightning = new Effect(10f, 500f, e -> {
-
+        if(e.data == null || !(e.data instanceof Float)) return;
+        float length = (float) e.data;
+        int lenInt = Mathf.round(length / 8f);
+        stroke(3f * e.fout());
+        color(e.color, Color.white, e.fin());
+        //unity.Unity.print(lenInt,"  ",length);
+        for(int i = 0; i < lenInt; i++){
+            float offsetXA = i == 0 ? 0 : Mathf.randomSeed(e.id + i * 6413, -4.5f, 4.5f);
+            float offsetYA = length / lenInt * i;
+            int j = i + 1;
+            float offsetXB = j == lenInt ? 0 : Mathf.randomSeed(e.id + j * 6413, -4.5f, 4.5f);
+            float offsetYB = length / lenInt * j;
+            Tmp.v1.trns(e.rotation, offsetYA, offsetXA);
+            Tmp.v1.add(e.x, e.y);
+            Tmp.v2.trns(e.rotation, offsetYB, offsetXB);
+            Tmp.v2.add(e.x, e.y);
+            line(Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y, false);
+            Fill.circle(Tmp.v1.x, Tmp.v1.y, getStroke() / 2f);
+        }
     }),
 
     forgeAbsorbEffect = new Effect(124f, e -> {
@@ -259,5 +277,21 @@ public class UnityFx{
             Fill.circle(a.getX(), a.getY(), (2.5f - reduction[i]) * e.fout());
             Fill.circle(b.getX(), b.getY(), (2.5f - reduction[i]) * e.fout());
         }
+    }),
+
+    coloredHitSmall = new Effect(14f, e -> {
+        color(Color.white, e.color, e.fin());
+        e.scaled(7f, s -> {
+            stroke(0.5f + s.fout());
+            circle(e.x, e.y, s.fin() * 5f);
+        });
+        stroke(0.5f + e.fout());
+        randLenVectors(e.id, 5, e.fin() * 15f, (x, y) -> {
+            lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fout() * 3f + 1f);
+        });
+    }),
+
+    cutEffect = new Effect(3f * 60f, e -> {
+        
     });
 }

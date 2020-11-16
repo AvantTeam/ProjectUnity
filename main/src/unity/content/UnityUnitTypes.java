@@ -15,6 +15,8 @@ import mindustry.content.*;
 import mindustry.world.blocks.units.*;
 import mindustry.world.blocks.units.UnitFactory.*;
 import unity.ai.*;
+import unity.entities.bullet.AContinuousLaserBulletType;
+import unity.entities.bullet.BContinuousLaserBulletType;
 import unity.entities.units.*;
 import unity.graphics.UnityPal;
 
@@ -42,7 +44,7 @@ public class UnityUnitTypes implements ContentList{
     rexed, storm, amphibiNaval, amphibi, craberNaval, craber,
 
     //scar
-    hovos, jetstream,
+    hovos, ryzer, whirlwind, jetstream, vortex,
 
     //imber
     arcnelidia,
@@ -1065,7 +1067,7 @@ public class UnityUnitTypes implements ContentList{
                 defaultController = DistanceGroundAI::new;
                 speed = 0.8f;
                 health = 340;
-                hitSize = 17f;
+                hitSize = 7.75f * 1.7f;
                 range = 350f;
                 allowLegStep = true;
                 legMoveSpace = 0.7f;
@@ -1099,32 +1101,193 @@ public class UnityUnitTypes implements ContentList{
             }
         };
 
-        /*setEntity("jetstream", UnitEntity::create);
-        jetstream = new UnitType("jetstream"){{
-            description="There will be Bloodshed";
-            health=670;
-            rotateSpeed=12.5f;
-            faceTarget=true;
-            flying=true;
-            speed=9.2f;
-            drag=0.019f;
-            accel=0.028f;
-            hitSize=11f;
-            engineOffset=11f;
-            weapons.add(new Weapon() {
-                {
-                    mirror=false;
-                    x=0f;
-                    y=7f;
-                    continuous=true;
-                    //bullet=new 
-                    reload=60f*2.5f+bullet.lifetime;
-                    shootStatus=UnityStatusEffects.reloadFatigue;
-                    shootStatusDuration=bullet.lifetime;
-                    shootCone=15f;
-                }
-            });
-        }};*/
+        setEntity("ryzer", LegsUnit::create);
+        ryzer = new UnitType("ryzer"){
+            {
+                defaultController = DistanceGroundAI::new;
+                speed = 0.7f;
+                health = 640;
+                hitSize = 9.5f * 1.7f;
+                range = 350f;
+                allowLegStep = true;
+                legMoveSpace = 0.73f;
+                legCount = 6;
+                legTrns = 0.4f;
+                legLength = 32f;
+                legExtension = -4.3f;
+                weapons.add(new Weapon(){
+                    {
+                        reload = 2.5f * 60f;
+                        x = 0f;
+                        y = 7.5f;
+                        shootY = 2f;
+                        mirror = false;
+                        shake = 2.3f;
+                        bullet = new RailBulletType(){
+                            {
+                                damage = 700f;
+                                speed = 59f;
+                                lifetime = 8f;
+                                shootEffect = UnityFx.scarRailShoot;
+                                pierceEffect = UnityFx.scarRailHit;
+                                updateEffect = UnityFx.scarRailTrail;
+                                hitEffect = Fx.massiveExplosion;
+                                pierceDamageFactor = 0.2f;
+                            }
+                        };
+                    }
+                }, new Weapon("unity-scar-missile-launcher"){
+                    {
+                        reload = 50f;
+                        x = 6.25f;
+                        shots = 5;
+                        shotDelay = 3f;
+                        inaccuracy = 4f;
+                        rotate = true;
+                        bullet = new MissileBulletType(5f, 1f){
+                            {
+                                speed = 5f;
+                                width = 7f;
+                                height = 12f;
+                                shrinkY = 0f;
+                                backColor = trailColor = UnityPal.scarColor;
+                                frontColor = UnityPal.endColor;
+                                splashDamage = 25f;
+                                splashDamageRadius = 20f;
+                                weaveMag = 3f;
+                                weaveScale = 4f;
+                            }
+                        };
+                    }
+                });
+            }
+        };
+
+        setEntity("whirlwind", UnitEntity::create);
+        whirlwind = new UnitType("whirlwind"){
+            {
+                health = 280;
+                rotateSpeed = 4.5f;
+                faceTarget = false;
+                flying = true;
+                speed = 8f;
+                drag = 0.019f;
+                accel = 0.028f;
+                hitSize = 8f;
+                engineOffset = 8f;
+                weapons.add(new Weapon(){
+                    {
+                        mirror = false;
+                        x = 0f;
+                        y = 4f;
+                        minShootVelocity = 5f;
+                        continuous = true;
+                        shootStatus = UnityStatusEffects.reloadFatigue;
+                        shootCone = 20f;
+                        bullet = new AContinuousLaserBulletType(21f){
+                            {
+                                largeHit = false;
+                                lifetime = 10 * 60f;
+                                length = 160f;
+                                width = 5f;
+                                incendChance = 0f;
+                                hitEffect = UnityFx.coloredHitSmall;
+                                lightColor = hitColor = UnityPal.scarColorAlpha;
+                                colors = new Color[]{UnityPal.scarColorAlpha, UnityPal.endColor, Color.white};
+                                strokes = new float[]{1.5f, 1f, 0.3f};
+                            }
+                        };
+                        shootStatusDuration = bullet.lifetime;
+                        reload = 2 * 60f + bullet.lifetime;
+                    }
+                }, new Weapon(){
+                    {
+                        rotate = true;
+                        x = 4.2f;
+                        reload = 50f;
+                        inaccuracy = 1.1f;
+                        shots = 5;
+                        shotDelay = 3f;
+                        bullet = new MissileBulletType(5f, 1f){
+                            {
+                                height = 10f;
+                                shrinkY = 0f;
+                                backColor = trailColor = UnityPal.scarColor;
+                                frontColor = UnityPal.endColor;
+                                splashDamage = 25f;
+                                splashDamageRadius = 20f;
+                                weaveMag = 3f;
+                                weaveScale = 4f;
+                            }
+                        };
+                    }
+                });
+            }
+        };
+
+        setEntity("jetstream", UnitEntity::create);
+        jetstream = new UnitType("jetstream"){
+            {
+                description = "There will be Bloodshed";
+                health = 670;
+                rotateSpeed = 12.5f;
+                flying = true;
+                speed = 9.2f;
+                drag = 0.019f;
+                accel = 0.028f;
+                hitSize = 11f;
+                engineOffset = 11f;
+                weapons.add(new Weapon(){
+                    {
+                        mirror = false;
+                        x = 0f;
+                        y = 7f;
+                        continuous = true;
+                        shootStatus = UnityStatusEffects.reloadFatigue;
+                        shootCone = 15f;
+                        bullet = new BContinuousLaserBulletType(35f){
+                            {
+                                largeHit = false;
+                                lifetime = 15f * 60f;
+                                length = 150f;
+                                width = 5f;
+                                incendChance = 0f;
+                                hitEffect = UnityFx.coloredHitSmall;
+                                lightColor = hitColor = UnityPal.scarColorAlpha;
+                                colors = new Color[]{UnityPal.scarColorAlpha, UnityPal.endColor, Color.white};
+                                strokes = new float[]{1.5f, 1f, 0.3f};
+                                lenscales = new float[]{0.85f, 0.97f, 1f, 1.02f};
+                            }
+                        };
+                        reload = 60f * 2.5f + bullet.lifetime;
+                        shootStatusDuration = bullet.lifetime;
+                    }
+                }, new Weapon("unity-small-scar-weapon"){
+                    {
+                        rotate = true;
+                        x = 7.25f;
+                        y = -3.5f;
+                        reload = 50f;
+                        inaccuracy = 1.1f;
+                        shots = 6;
+                        shotDelay = 4f;
+                        bullet = new MissileBulletType(5f, 1f){
+                            {
+                                width = 7f;
+                                height = 12f;
+                                shrinkY = 0f;
+                                backColor = trailColor = UnityPal.scarColor;
+                                frontColor = UnityPal.endColor;
+                                splashDamage = 40f;
+                                splashDamageRadius = 20f;
+                                weaveMag = 3f;
+                                weaveScale = 4f;
+                            }
+                        };
+                    }
+                });
+            }
+        };
 
         //endregion
         //region imber

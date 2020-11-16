@@ -88,7 +88,7 @@ public class Funcs{
     }
 
     /** The other version of Damage.collideLine */
-    public static void collideLineDamageOnly(Team team, float damage, int x, int y, float angle, float length, Bullet hitter){
+    public static void collideLineDamageOnly(Team team, float damage, float x, float y, float angle, float length, Bullet hitter){
         collidedBlocks.clear();
         tV.trns(angle, length);
 
