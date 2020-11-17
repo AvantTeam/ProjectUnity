@@ -7,7 +7,6 @@ graphLib.addGraph(crublankobj, heatlib.baseTypesHeat.heatConnector);
 graphLib.addGraph(crublankobj, crucibleLib.baseTypes.crucibleConnector);
 
 
-let viewPos=null;
 
 const randomPos=[
 	{x:0,y:0},
@@ -20,6 +19,7 @@ const randomPos=[
 
 
 const crucible = graphLib.finaliseExtend(Block, Building, "crucible", crublankobj, {
+	viewPos:null,
     load() {
         this.super$load();
         this.liquidsprite = Core.atlas.find(this.name + "-liquid");
@@ -30,19 +30,29 @@ const crucible = graphLib.finaliseExtend(Block, Building, "crucible", crublankob
 		this.solidItemStrip = Core.atlas.find(this.name + "-solidstrip");
 		this.heatSprite = Core.atlas.find(this.name + "-heat");
     },
+	getViewingGraph(){
+		return this.viewPos;
+	},
+	setViewingGraph(s){
+		this.viewPos=s;
+	}
 }, {
 	
 	
 	
 	
 	buildConfiguration(table) {
-		let buttoncell = table.button(Tex.whiteui, Styles.clearTransi, 50, run(() => {this.configure(viewPos);}));
-		buttoncell.size(50);
-		buttoncell.get().getStyle().imageUp = Icon.eye;
+		if(!Vars.headless){
+			let buttoncell = table.button(Tex.whiteui, Styles.clearTransi, 50, run(() => {this.configure(0);}));
+			buttoncell.size(50);
+			buttoncell.get().getStyle().imageUp = Icon.eye;
+		}
 	},
 	configured(player, value) {
-		let thisg = this.getGraphConnector("crucible graph").getNetwork();
-		viewPos=(value==thisg?null:thisg);
+		if(!Vars.headless){
+			let thisg = this.getGraphConnector("crucible graph").getNetwork();
+			this.block.setViewingGraph(this.block.getViewingGraph()==thisg?null:thisg);
+		}
 	},
 	drawConfigure() {},
     updatePost() {},
@@ -50,7 +60,7 @@ const crucible = graphLib.finaliseExtend(Block, Building, "crucible", crublankob
        
         let dex = this.getGraphConnector("crucible graph");
 		let tileindex = crucibleLib.tileIndexMap[dex.getTileIndex()];
-		if(viewPos==dex.getNetwork()){
+		if(this.block.getViewingGraph()==dex.getNetwork()){
 			 let temp = this.getGraphConnector("heat graph").getTemp();
 			Draw.rect(crucible.floorSprite, this.x, this.y, 8, 8, 0);
 			this.drawContents(this.getGraphConnector("crucible graph"),crucible.liquidsprite,tileindex,crucible.solidItem,crucible.solidItemStrip);
