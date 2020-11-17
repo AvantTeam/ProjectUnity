@@ -8,11 +8,17 @@ let hpblankobj = graphLib.init();
 graphLib.addGraph(hpblankobj, heatlib.baseTypesHeat.heatConnector);
 
 const heatPipe = graphLib.finaliseExtend(Block, Building,"heat-pipe",hpblankobj,{
+	_timerid:0,
 	load(){
 		this.super$load();
 		this.heatsprite = Core.atlas.find(this.name+"-heat");
 		this.bottom = Core.atlas.find(this.name+"-tiles");
+		this._timerid = this.timers++;
 	},
+	getTimerId(){
+		return this._timerid;
+	}
+	
 },{
 	basespriteindex: 0,
 	onNeighboursChanged(){
@@ -24,14 +30,24 @@ const heatPipe = graphLib.finaliseExtend(Block, Building,"heat-pipe",hpblankobj,
 		});
 		this.basespriteindex=culm;
 	},
+	unitOn(unit){
+		if(this.timer.get(this.block.getTimerId(), 20)){
+			let temp = this.getGraphConnector("heat graph").getTemp();
+			let intensity = Mathf.clamp(Mathf.map(temp,400,1000,0,1));
+			unit.apply(StatusEffects.burning, intensity*10+5);
+			unit.damage(intensity*2);
+		}	
+	},
 	updatePost(){
 	},
 	draw() {
 		let temp = this.getGraphConnector("heat graph").getTemp();
 		Draw.rect(heatlib.getRegion(heatPipe.bottom,this.basespriteindex,8,2), this.x, this.y, 0);
-		Draw.color(heatlib.getTempColor(temp).add(basecolor));
-		Draw.rect(heatlib.getRegion(heatPipe.heatsprite,this.basespriteindex,8,2),this.x, this.y,0);
-		Draw.color();
+		if(temp<273||temp>498){
+			Draw.color(heatlib.getTempColor(temp).add(basecolor));
+			Draw.rect(heatlib.getRegion(heatPipe.heatsprite,this.basespriteindex,8,2),this.x, this.y,0);
+			Draw.color();
+		}
         this.drawTeamTop();
 	}
 });

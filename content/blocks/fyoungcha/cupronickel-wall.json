@@ -1,0 +1,9 @@
+{
+	"size": 1,
+	"health": 500,
+	"requirements": [
+		{"item": "cupronickel", "amount": 8},
+		{"item": "nickel", "amount": 5},
+	],
+	"category": "defense",
+}
