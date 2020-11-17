@@ -805,7 +805,44 @@ const _BlockGraph = {
 	killGraph(){
 		this.connected.clear();
 	},
-	isArticulationPoint(build){
+	isArticulationPoint(building){
+		//upgrade to binary search priority queue later.
+		let neighs = [];
+		building.eachNeighbour(neighbour => {
+			if (building.getNetworkOfPort(neighbour.portindex) == this){
+				neighs.push(neighbour.build);
+			}
+		});
+		let neighbourindex = 1;
+		let target = neighs[neighbourindex];
+		let front=Orderedqueue.new({b:neighs[0],d:0}, function(x){
+			return x.d+ Math.abs(x.b.getBuild().x - target.getBuild().x)+Math.abs(x.b.getBuild().y - target.getBuild().y);
+		});
+		let index = 0;
+		
+		let visited = ObjectSet.with(building);
+		while(!front.isEmpty()){
+			let current = front.pop();
+			if(current.b ==target){
+				neighbourindex++;
+				if(neighbourindex==neighs.length){
+					return false;
+				}
+				target = neighs[neighbourindex];
+				front.setFunc(function(x){
+					return x.d+ Math.abs(x.b.getBuild().x - target.getBuild().x)+Math.abs(x.b.getBuild().y - target.getBuild().y);
+				});
+			}
+			visited.add(current.b);
+			current.b.eachNeighbour(neighbour => {
+				if(visited.contains(neighbour.build)){return;}
+				if (current.b.getNetworkOfPort(neighbour.portindex) == this){
+					front.add({b:neighbour.build,d:current.d+4});
+				}
+			});
+			
+		}
+		
 		return true;
 	},
     remove(building) {
@@ -1004,6 +1041,67 @@ const _BlockGraph = {
         return s;
     }
 }
+
+//currently naive form and not optimsed;
+const Orderedqueue = {
+	list:[],
+	hueristic: function(x){return 1;},
+	new(startval,func){
+		let newqueue = Object.create(Orderedqueue);
+		newqueue.setFunc(func);
+		let f= [startval];
+		newqueue.list=f;
+		return newqueue;
+	},
+	
+	add(val){
+		this.list.push(val);
+	},
+	isEmpty(){
+		return this.list.length==0;
+	},
+	peek(){
+		let leastval = this.hueristic(this.list[0]);
+		let cind = 0;
+		for(let t=0;t<this.list.length;t++){
+			let h =this.hueristic(this.list[t]);
+			if(h<leastval){
+				leastval = h;
+				cind=t;
+			}
+		}
+		return this.list[cind];
+	},
+	pop(){
+		let leastval = this.hueristic(this.list[0]);
+		let cind = 0;
+		for(let t=0;t<this.list.length;t++){
+			let h =this.hueristic(this.list[t]);
+			if(h<leastval){
+				leastval = h;
+				cind=t;
+			}
+		}
+		let tmp= this.list[cind];
+		this.list.splice(cind,1);
+		return tmp;
+	},
+	remove(val){
+		for(let t=0;t<this.list.length;t++){
+			if(this.list[t]==val){
+				this.list.splice(t,1);
+				return;
+			}
+		}
+	},
+	
+	setFunc(newfunc){
+		this.hueristic = newfunc;
+	}
+	
+	
+}
+
 
 module.exports = {
     blockGraph: _BlockGraph,
