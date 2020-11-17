@@ -26,7 +26,7 @@ const thermalHeater = graphLib.finaliseExtend(Block, Building,"thermal-heater",t
 		let eff = this.sum + this.block.getTerrainAttrib().env();
 		let hgraph = this.getGraphConnector("heat graph");
 		let temp = hgraph.getTemp();
-		hgraph.setHeat(hgraph.getHeat()+ Math.max(0,1973-temp)*0.04);
+		hgraph.setHeat(hgraph.getHeat()+ Math.max(0,1273-temp)*0.08);
 	},
 	draw() {
 		let temp = this.getGraphConnector("heat graph").getTemp();
@@ -39,8 +39,40 @@ const thermalHeater = graphLib.finaliseExtend(Block, Building,"thermal-heater",t
 		this.sum = this.block.sumAttribute( this.block.getTerrainAttrib(), this.tile.x, this.tile.y);
 	}
 });
+
 thermalHeater.update = true;
 thermalHeater.rotate = true;
 thermalHeater.getGraphConnectorBlock("heat graph").setAccept( [1,1, 0,0, 0,0, 0,0]);
-thermalHeater.getGraphConnectorBlock("heat graph").getBaseHeatConductivity(0.6);
-thermalHeater.getGraphConnectorBlock("heat graph").getBaseHeatCapacity(20);
+thermalHeater.getGraphConnectorBlock("heat graph").setBaseHeatConductivity(0.6);
+thermalHeater.getGraphConnectorBlock("heat graph").setBaseHeatCapacity(40);
+thermalHeater.getGraphConnectorBlock("heat graph").setBaseHeatRadiativity(0.004);
+
+
+
+let ihblankobj = graphLib.init();
+graphLib.addGraph(ihblankobj, heatlib.baseTypesHeat.heatConnector);
+const infiHeater = graphLib.finaliseExtend(Block, Building,"infi-heater",ihblankobj,{
+	load(){
+		this.super$load();
+		this.heatsprite = Core.atlas.find(this.name+"-heat");
+		this.bottom = Core.atlas.find(this.name)+"-base";
+	},
+},{
+	updatePost(){
+		let hgraph = this.getGraphConnector("heat graph");
+		let temp = hgraph.getTemp();
+		hgraph.setHeat(hgraph.getHeat()+ Math.max(0,9999-temp)*0.5);
+	},
+	draw() {
+		let temp = this.getGraphConnector("heat graph").getTemp();
+		Draw.rect(infiHeater.bottom, this.x, this.y, 0);
+		heatlib.drawHeat(infiHeater.heatsprite,this.x, this.y,this.rotdeg(), temp);
+        this.drawTeamTop();
+	},
+});
+infiHeater.update = true;
+infiHeater.rotate = false;
+infiHeater.getGraphConnectorBlock("heat graph").setAccept( [1,1, 1,1]);
+infiHeater.getGraphConnectorBlock("heat graph").setBaseHeatConductivity(1.0);
+infiHeater.getGraphConnectorBlock("heat graph").setBaseHeatCapacity(1000);
+infiHeater.getGraphConnectorBlock("heat graph").setBaseHeatRadiativity(0.0);

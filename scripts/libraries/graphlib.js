@@ -50,6 +50,9 @@ const _GraphCommonBuild = {
 	get(){
 		return this;
 	},
+	getConnectSidePos(index) {
+        return getConnectSidePos(index, this.block.size, this.rotation);
+    },
 	create(block, team) {
         let building = this.super$create(block, team);
 		
@@ -87,10 +90,14 @@ const _GraphCommonBuild = {
             this.super$updateTile();
         }
 		this.updatePre();
+		if(!this.block.rotate){
+			this.rotation=0;
+		}
 		if (this.prev_tile_rotation != this.rotation) {
 			for(let graphname in this.graphs) {
 				this.graphs[graphname].onRotationChanged(this.prev_tile_rotation,this.rotation);
 			}
+			this.onRotationChanged();
 		}
 		for(let graphname in this.graphs) {
 			this.graphs[graphname].onUpdate();
@@ -100,7 +107,9 @@ const _GraphCommonBuild = {
 	},
 	updatePost() {},
     updatePre() {},
-	
+	onGraphUpdate() {},
+	onRotationChanged() {},
+	onNeighboursChanged() {},
 	samepos(b) {
         return b.tileX() == this.tileX() && b.tileY() == this.tileY();
     },
@@ -110,13 +119,17 @@ const _GraphCommonBuild = {
 		for(let graphname in this.graphs) {
 			this.graphs[graphname].proximityUpdateCustom();
 		}
+		this.proxUpdate();
     },
+	proxUpdate() {},
 	display(table) {
 		this.super$display(table);
 		for(let graphname in this.graphs) {
 			this.graphs[graphname].display(table);
 		}
+		this.displayExt(table);
 	},
+	displayExt(table){},
 	displayBars(barsTable){
 		this.super$displayBars(barsTable);
 		for(let graphname in this.graphs) {
@@ -130,13 +143,17 @@ const _GraphCommonBuild = {
         for(let graphname in this.graphs) {
 			this.graphs[graphname].write(stream);
 		}
+		this.writeExt(stream);
     },
     read(stream, revision) {
         this.super$read(stream, revision);
         for(let graphname in this.graphs) {
 			this.graphs[graphname].read(stream, revision);
 		}
-    }
+		this.readExt(stream, revision);
+    },
+	writeExt(stream) {},
+	readExt(stream, revision) {}
 }
 
 const _GraphCommonBlock = {
@@ -368,7 +385,7 @@ const _GraphPropsCommon = {
     },
 	onRotationChanged(prevrot,newrot){
 		//print("rotation changed to "+newrot+"...");
-		 if (prevrot != -1) {
+		if (prevrot != -1) {
 			this.deleteSelfFromNetwork();
 			this.deleteFromNeighbours();
 			this._dead = false;
@@ -388,6 +405,7 @@ const _GraphPropsCommon = {
 					this.applySaveState(this._network, this._saveCache[0]);
                     this.networkSaveState = 0;
                 }
+				this.getBuild().onGraphUpdate();
             }
             this._network.update();
             this.updateProps(this._network,0);
@@ -474,6 +492,7 @@ const _GraphPropsCommon = {
                 this._neighbourArray[i] = null;
             }
         }
+		this.getBuild().onNeighboursChanged();
     },
     addNeighbour(n) {
         if (!this._neighbourArray) {
@@ -483,9 +502,11 @@ const _GraphPropsCommon = {
             return;
         }
         this._neighbourArray[n.portindex] = n;
+		this.getBuild().onNeighboursChanged();
     },
     setNeighbourArray(nset) {
         this._neighbourArray = nset;
+		this.getBuild().onNeighboursChanged();
     },
     getAcceptPorts() {
         return this._acceptPorts;
@@ -511,6 +532,10 @@ const _GraphPropsCommon = {
     },
     hasNetwork(net) {
         return this._network.id == net.id;
+    },
+	getPortOfNetwork(net) {
+		if(!net||!this._network){return -1;}
+        return this._network.id==net.id?0:-1;
     },
     getNetworkOfPort(index) {
         return this._network;
@@ -552,12 +577,16 @@ const _GraphMulticonnectorProps = Object.assign(Object.create(_GraphPropsCommon)
         }
     },
     hasNetwork(net) {
-        for (let i = 0; i < this._networkList.length; i++) {
-            if (this._networkList[i].id == net.id) {
-                return true;
-            }
-        }
-        return false;
+        return this.getPortOfNetwork(net)!==-1;
+    },
+	getPortOfNetwork(net) {
+		if(!net){return -1;}
+		for (let i = 0; i < this._networkList.length; i++) {
+            if (this._networkList[i]&& this._networkList[i].id == net.id) {
+				return i;
+			}
+		}
+		return -1;
     },
     initAllNets(buildingnew) {
         //_BlockGraph.new(building)
@@ -667,6 +696,9 @@ const _GraphMulticonnectorProps = Object.assign(Object.create(_GraphPropsCommon)
             return;
         }
         for (let i = 0; i < this._networkList.length; i++) {
+			if (!this._networkList[i]) {
+                continue;
+            }
             this._networkList[i].remove(this);
         }
     },
@@ -711,6 +743,7 @@ const _BlockGraph = {
         graph.id = getnetID();
         graph.connected = ObjectSet.with(building);
 		graph.updateOnGraphChanged();
+		graph.addMergeStats(building);	
         return graph;
 
     },
@@ -733,12 +766,16 @@ const _BlockGraph = {
     },
 	updateOnGraphChanged() {},
     updateGraph() {},
-	updateDirect() {},
+	updateDirect() {}, // updating directly derived, non-time dependant values from graph connectors/buildings.
+	canConnect(b1,b2) {return true;},
     addBuilding(building, connectIndex) {
         this.connected.add(building);
-        building.setNetworkOfPort(connectIndex, this);
 		this.updateOnGraphChanged();
+        building.setNetworkOfPort(connectIndex, this);
+		this.addMergeStats(building);
+		
     },
+	addMergeStats(building){}, // can be called before the block offically adds the graph, esp during init.
     mergeGraph(graph) {
         ////print(graph);
         if (!graph) {
@@ -760,12 +797,17 @@ const _BlockGraph = {
                     this.connected.add(building);
                 }
             }
-
         }));
 		
 		this.updateOnGraphChanged();
     },
 	mergeStats(graph){},
+	killGraph(){
+		this.connected.clear();
+	},
+	isArticulationPoint(build){
+		return true;
+	},
     remove(building) {
         if (!this.connected.contains(building)) {
             return;
@@ -774,7 +816,7 @@ const _BlockGraph = {
         if (c === 0) {
             return;
         }
-        if (c === 1) {
+        if (c === 1 || !this.isArticulationPoint(building)) {
 			//if theres only one neighbour it means removing this wont disconnect two seperate parts of the graph, and therefore can be just removed directly.
             this.connected.remove(building);
             building.eachNeighbour(neighbourindex => {
@@ -783,7 +825,7 @@ const _BlockGraph = {
 			this.updateOnGraphChanged();
             return;
         }
-        this.connected.clear();
+		this.killGraph();
         let networksadded = null;
         let newnets = 0;
 
@@ -826,10 +868,8 @@ const _BlockGraph = {
     rebuildGraphIndex(building, index) {
         this.rebuildGraphWithSet(building, ObjectSet.with(building), index);
     },
+	//very slow, change it to not relook for neighbours every time.
     rebuildGraphWithSet(root, searched, rootindex) {
-
-        //guess ill die
-        //thank god this was already tail recursed.
         let tree = {
             complete: false,
             parent: null,
@@ -838,11 +878,7 @@ const _BlockGraph = {
             parentConnectPort: rootindex,
         }
         let current = tree;
-
-        //debug
         let total = 0;
-        //
-		////print("starting rebuild....");
         mainloop:
             while (current) {
 
@@ -882,17 +918,15 @@ const _BlockGraph = {
                         return;
                     }
                     if (tile.block().getIsNetworkConnector != undefined) {
-						//print("we in c:"+root.name);
                         //conbuild -> connected buildConnector
                         let conbuild = tile.bc().getGraphConnector(root.name);
-                        if (!conbuild || conbuild == prevbuilding || conbuild.getDead()) {
-							//print("conbuild is dead or duplicate or undefined:"+conbuild);
+                        if (!conbuild || conbuild == prevbuilding || conbuild.getDead() || !this.canConnect(current,conbuild)) {
+							//conbuild is dead or duplicate or undefined or not allowed to connect
                             continue;
                         }
                         let thisgraph = buildConnector.getNetworkOfPort(portindex);
 						// networks in multiplayer are intialised with rotation of 0 then updated later. this results in many problems.
 						if(conbuild.getBuild().rotation!=conbuild.getLastRecalc()){
-							//print("updating unupdated rot");
 							conbuild.recalcPorts();
 						}
                         let fpos = {
@@ -903,7 +937,6 @@ const _BlockGraph = {
                         fpos.y += buildConnector.getBuild().tile.y;
                         let connectIndex = conbuild.canConnect(fpos);
                         if (connectIndex == -1) {
-							//print("no connection :<");
                             continue;
                         }
                         //print("found suitable connecting buildConnector: current block is connected at port "+connectIndex+" of other buildConnector at coord "+fpos.x+","+fpos.y);
@@ -942,17 +975,10 @@ const _BlockGraph = {
                                     });
                                     //thisgraph.rebuildGraphWithSet(conbuild,searched,connectIndex);
                                 }
-                            } else {
-                                ////print("Graphs are the same(id:"+connet.id+"), skipping..");
                             }
-                        } else {
-                            ////print("Graph already contains buildConnector, skipping..");
                         }
                         prevbuilding = conbuild;
-                    }else{
-						//print("nearby tile no network");
-						
-					}
+                    }
                 }
                 if (current.children.length > 0) {
                     for (let i = 0; i < current.children.length; i++) {

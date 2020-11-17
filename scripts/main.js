@@ -65,6 +65,7 @@ const script = [
 			"arena",
 			"rotpowerlib",
 			"heatlib",
+			"cruciblelib",
 			"graphlib",
 			"unitloader"/*,
             "shieldbulletlib"*/
@@ -295,6 +296,7 @@ const script = [
                     "inlinegearbox",
                     "shaftrouter",
                     "simpletransmission",
+					"cruciblepump",
                     "mechanicalconveyor"
                 ]
             },
@@ -315,7 +317,8 @@ const script = [
             {
                 name: "producers",
                 childs: [
-                    "augerdrill"
+                    "augerdrill",
+					"crucible"
                 ]
             }
         ]

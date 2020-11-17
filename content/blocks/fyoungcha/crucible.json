@@ -1,0 +1,9 @@
+{
+	"size": 1,
+	"health": 400,
+	"requirements": [
+		{"item": "nickel", "amount": 20},
+		{"item": "titanium", "amount": 30},
+	],
+	"category": "crafting",
+}
