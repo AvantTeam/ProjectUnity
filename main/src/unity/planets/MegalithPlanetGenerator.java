@@ -238,7 +238,7 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
 
         tech();
 
-        float difficulty = sector.baseCoverage;
+        float difficulty = sector.threat;
         ints.clear();
         ints.ensureCapacity(width * height / 4);
 
