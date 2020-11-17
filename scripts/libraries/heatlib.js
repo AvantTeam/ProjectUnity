@@ -89,7 +89,7 @@ const _HeatCommon = Object.assign(Object.create(graphLib.graphCommon),{
 		table.row();
 		table.left();
         table.add("[lightgray]" + Core.bundle.get("stat.unity.heatRadiativity") + ":[] ").left();
-		table.add(this.getBaseHeatRadiativity()+"W/K");
+		table.add((this.getBaseHeatRadiativity()*1000)+"W/K");
 		this.setStatsExt(table);
     },
 	setStatsExt(table) {},
@@ -175,10 +175,11 @@ const _HeatPropsCommon = Object.assign(deepCopy(graphLib.graphProps),{
 		let cond = this.getBlockData().getBaseHeatConductivity();
 		this.setHeatBuffer(0);
 		let that = this;
+		let clampedDelta = Mathf.clamp(Time.delta,0,1.0/cond); //stop breaking physics x3
 		this.eachNeighbour(function(neighbour){
-			that.accumHeatBuffer((neighbour.build.getTemp()-temp)*cond*Time.delta);
+			that.accumHeatBuffer((neighbour.build.getTemp()-temp)*cond*clampedDelta);
 		});
-		this.accumHeatBuffer((293.15-temp)*this.getBlockData().getBaseHeatRadiativity()*Time.delta);
+		this.accumHeatBuffer((293.15-temp)*this.getBlockData().getBaseHeatRadiativity()*clampedDelta);
 	},
 	initStats(){
 		this.setTemp(293.15);
@@ -279,6 +280,30 @@ function _drawHeat(reg,x,y,rot, temp){
 	Draw.color();
 }
 
+function _tempColor(temp){
+	let a = 0;
+	if(temp>273.15){
+		a = Math.max(0,(temp-498)*0.001);
+		if(a<0.01){
+			return new Color(Color.clear);
+		}
+		let fcol = new Color(heatcolor.r,heatcolor.g,heatcolor.b,a);
+		if(a>1){
+			fcol.add(0,0,0.01*a);
+			fcol.mul(a);
+		}
+		
+		return fcol;
+		
+	}else{
+		a =1.0-Mathf.clamp(temp/273.15);
+		if(a<0.01){
+			return new Color(Color.clear);
+		}
+		return new Color(coldcolor.r,coldcolor.g,coldcolor.b,a);
+	}
+}
+
 function _getRegion(region, tile,sheetw,sheeth) {
     if (!region) {
         print("oh no there is no texture");
@@ -317,6 +342,7 @@ for(let key in _baseTypesHeat){
 module.exports = {
 	getRegion: _getRegion,
 	drawHeat: _drawHeat,
+	getTempColor: _tempColor,
     heatGraph: heatGraph,
     heatProps: _HeatPropsCommon,
     heatCommon: _HeatCommon,

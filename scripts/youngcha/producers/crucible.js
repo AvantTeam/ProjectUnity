@@ -9,10 +9,10 @@ graphLib.addGraph(crublankobj, crucibleLib.baseTypes.crucibleConnector);
 
 const randomPos=[
 	{x:0,y:0},
-	{x:-2,y:2},
-	{x:-2,y:-2},
-	{x:2,y:-2},
-	{x:-2,y:-2},
+	{x:-1.6,y:1.6},
+	{x:-1.6,y:-1.6},
+	{x:1.6,y:-1.6},
+	{x:-1.6,y:-1.6},
 	{x:0,y:0},
 		];
 
@@ -102,6 +102,7 @@ const crucible = graphLib.finaliseExtend(Block, Building, "crucible", crublankob
 });
 crucible.update = true;
 crucible.rotate = true;
+crucible.solid = true;
 crucible.getGraphConnectorBlock("crucible graph").setAccept([1, 1, 1, 1]);
 crucible.getGraphConnectorBlock("heat graph").setAccept([1, 1, 1, 1]);
 crucible.getGraphConnectorBlock("heat graph").getBaseHeatConductivity(0.2);

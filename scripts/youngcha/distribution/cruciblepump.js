@@ -129,6 +129,7 @@ const cruciblePump = graphLib.finaliseExtend(Block, Building,"crucible-pump",cpb
 });
 cruciblePump.rotate = true;
 cruciblePump.update = true;
+cruciblePump.solid = true;
 cruciblePump.configurable = true;
 cruciblePump.consumes.power(1.0);
 cruciblePump.getGraphConnectorBlock("crucible graph").setAccept([1,1,0,0,2,2,0,0]);

@@ -800,6 +800,9 @@ const _BlockGraph = {
 	killGraph(){
 		this.connected.clear();
 	},
+	isArticulationPoint(build){
+		return true;
+	},
     remove(building) {
         if (!this.connected.contains(building)) {
             return;
@@ -808,7 +811,7 @@ const _BlockGraph = {
         if (c === 0) {
             return;
         }
-        if (c === 1) {
+        if (c === 1 || !this.isArticulationPoint(building)) {
 			//if theres only one neighbour it means removing this wont disconnect two seperate parts of the graph, and therefore can be just removed directly.
             this.connected.remove(building);
             building.eachNeighbour(neighbourindex => {
@@ -860,6 +863,7 @@ const _BlockGraph = {
     rebuildGraphIndex(building, index) {
         this.rebuildGraphWithSet(building, ObjectSet.with(building), index);
     },
+	//very slow, change it to not relook for neighbours every time.
     rebuildGraphWithSet(root, searched, rootindex) {
         let tree = {
             complete: false,
