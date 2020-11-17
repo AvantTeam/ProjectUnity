@@ -50,6 +50,9 @@ const _GraphCommonBuild = {
 	get(){
 		return this;
 	},
+	getConnectSidePos(index) {
+        return getConnectSidePos(index, this.block.size, this.rotation);
+    },
 	create(block, team) {
         let building = this.super$create(block, team);
 		
@@ -94,6 +97,7 @@ const _GraphCommonBuild = {
 			for(let graphname in this.graphs) {
 				this.graphs[graphname].onRotationChanged(this.prev_tile_rotation,this.rotation);
 			}
+			this.onRotationChanged();
 		}
 		for(let graphname in this.graphs) {
 			this.graphs[graphname].onUpdate();
@@ -104,6 +108,7 @@ const _GraphCommonBuild = {
 	updatePost() {},
     updatePre() {},
 	onGraphUpdate() {},
+	onRotationChanged() {},
 	onNeighboursChanged() {},
 	samepos(b) {
         return b.tileX() == this.tileX() && b.tileY() == this.tileY();

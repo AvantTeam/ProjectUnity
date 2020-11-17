@@ -120,9 +120,9 @@ const cruicibleMelts = [
 	{name:"graphite", additive:true, additiveID:"carbon", additiveWeight: 1.0},    
 	{name:"unity-nickel", meltpoint:1100, meltspeed:0.15},  // irl: 1728K
 	{name:"unity-cupronickel", meltpoint:900, meltspeed:0.05},  // irl: 1300K
-	{name:"metaglass", meltpoint:1000, meltspeed:0.01},  // irl: 1300K
-	{name:"silicon", meltpoint:900, meltspeed:0.02},  // irl: 1600K
-	{name:"surge-alloy", meltpoint:1500, meltspeed:0.02},  // irl: 1600K
+	{name:"metaglass", meltpoint:1000, meltspeed:0.05},  // irl: 1300K
+	{name:"silicon", meltpoint:900, meltspeed:0.2},  // irl: 1600K
+	{name:"surge-alloy", meltpoint:1500, meltspeed:0.02},  
 	////APPEND NEW MELTS TO THE END TO AVOID AFFECTING SAVES
 ];
 for(let inde = 0 ;inde<cruicibleMelts.length;inde++){
@@ -834,6 +834,7 @@ const tileMap = [//not sure how to format this.
 	3,15,15,3,3,15,15,2,2,9,14,2,2,9,14,0,
 	0,42,42,0,0,12,12,1,1,45,18,1,1,19,13
 ]
+const inv12 = 0.0833333333;
 
 function _getRegion(region, tile) {
     if (!region) {
@@ -856,10 +857,6 @@ function _getRegion(region, tile) {
 }
 
 function _drawTile(region, x, y, w, h, rot, tile) {
-    if (!region) {
-        print("oh no there is no texture");
-        return;
-    }
     Draw.rect(_getRegion(region, tile) , x, y, w, h, w * 0.5, h * 0.5, rot);
 }
 
