@@ -51,6 +51,7 @@ const script = [
 				]
 			},
 
+			"sounds",
 			"effects",
 			"wavefront",
             "wormlib",

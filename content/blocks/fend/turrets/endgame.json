@@ -7,6 +7,9 @@
 	"shootCone": 360,
 	"rotateSpeed": 0.97,
 	"hasItems": true,
+	"shootSound": "end/endgame-shoot",
+	"loopSound": "end/endgame-active",
+	"loopSoundVolume": 0.12,
 	"consumes": {
 		"items": {
 			"items": [

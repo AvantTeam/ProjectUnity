@@ -1,4 +1,5 @@
 const fLib = this.global.unity.funclib;
+const soundLib = this.global.unity.sounds;
 
 const tempVec = new Vec2();
 const tempColor = new Color();
@@ -304,8 +305,11 @@ endgame.buildType = () => {
 		peekAmmo(){
             return endgame.shootType;
         },
+		shouldActiveSound(){
+			return this.power.status >= 0.0001;
+		},
 		effects(){
-			
+			endgame.shootSound.at(this.x, this.y, Mathf.random(0.9, 1.1));
 		},
 		killUnitsC(){
 			var rnge = endgame.range;
@@ -363,6 +367,7 @@ endgame.buildType = () => {
 			tempVec.scl(0.5);
 			//endgameLaser.at(this.x, this.y, 0, [this._eyesVecArray[index], new Vec2(ux, uy), 0.625]);
 			endgameLaser.at(tempVec.x, tempVec.y, 0, [this._eyesVecArray[index], new Vec2(ux, uy), 0.625]);
+			soundLib.endgameSmallShoot.at(this.x, this.y, Mathf.random(0.9, 1.1));
 		},
 		eyeShoot(index){
 			//var angOffset = 0;
@@ -379,6 +384,7 @@ endgame.buildType = () => {
 				this._eyesVecArray[index].set(tempVec);
 				this._eyesVecArray[index].add(this.x, this.y);
 				endgameLaser.at(this.x, this.y, 0, [this._eyesVecArray[index], new Vec2(e.x, e.y), 0.625]);
+				soundLib.endgameSmallShoot.at(this.x, this.y, Mathf.random(0.9, 1.1));
 			};
 		},
 		updateAntiBullets(){
@@ -486,6 +492,8 @@ endgame.buildType = () => {
 			this.consume();
 			this.killTilesC();
 			this.killUnitsC();
+			endgame.shootSound.at(this.x, this.y, Mathf.random(0.9, 1.1));
+			//this.effects();
 			darkShockWave.at(this.x, this.y);
 			endGameShoot.at(this.x, this.y);
 			//if(this.target != null && this.target instanceof Healthc) this.target.kill();
