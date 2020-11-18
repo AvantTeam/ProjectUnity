@@ -82,6 +82,7 @@ const endgameLaser = new Effect(76, 820 * 2, e => {
 	var b = e.data[1];
 	var width = e.data[2];
 	//Draw.blend(Blending.additive);
+	tempVec.set(a).lerp(b, Mathf.curve(e.fin(), 0, 0.09));
 	var originZ = Draw.z();
 	for(var i = 0; i < 3; i++){
 		Draw.z(originZ + (i / 1000));
@@ -94,10 +95,10 @@ const endgameLaser = new Effect(76, 820 * 2, e => {
 		
 		Fill.circle(a.x, a.y, strokes[i] * 4 * width * e.fout());
 		
-		Fill.circle(b.x, b.y, strokes[i] * 4 * width * e.fout());
+		Fill.circle(tempVec.x, tempVec.y, strokes[i] * 4 * width * e.fout());
 		
 		Lines.stroke(strokes[i] * 4 * width * e.fout());
-		Lines.line(a.x, a.y, b.x, b.y, false);
+		Lines.line(a.x, a.y, tempVec.x, tempVec.y, false);
 	};
 	Draw.z(originZ);
 	//Draw.blend();
