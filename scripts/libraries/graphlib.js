@@ -809,7 +809,7 @@ const _BlockGraph = {
 		//upgrade to binary search priority queue later.
 		let neighs = [];
 		building.eachNeighbour(neighbour => {
-			if (building.getNetworkOfPort(neighbour.portindex) == this){
+			if (building.getNetworkOfPort(neighbour.portindex) == this && neighbour.build){
 				neighs.push(neighbour.build);
 			}
 		});
@@ -823,6 +823,7 @@ const _BlockGraph = {
 		let visited = ObjectSet.with(building);
 		while(!front.isEmpty()){
 			let current = front.pop();
+			if(!current.b){continue;}
 			if(current.b ==target){
 				neighbourindex++;
 				if(neighbourindex==neighs.length){
@@ -830,6 +831,7 @@ const _BlockGraph = {
 				}
 				target = neighs[neighbourindex];
 				front.setFunc(function(x){
+					if(!x){return 99999999;}
 					return x.d+ Math.abs(x.b.getBuild().x - target.getBuild().x)+Math.abs(x.b.getBuild().y - target.getBuild().y);
 				});
 			}

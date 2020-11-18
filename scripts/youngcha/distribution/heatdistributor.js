@@ -34,8 +34,8 @@ const heatPipe = graphLib.finaliseExtend(Block, Building,"heat-pipe",hpblankobj,
 		if(this.timer.get(this.block.getTimerId(), 20)){
 			let temp = this.getGraphConnector("heat graph").getTemp();
 			let intensity = Mathf.clamp(Mathf.map(temp,400,1000,0,1));
-			unit.apply(StatusEffects.burning, intensity*10+5);
-			unit.damage(intensity*2);
+			unit.apply(StatusEffects.burning, intensity*20+5);
+			unit.damage(intensity*10);
 		}	
 	},
 	updatePost(){

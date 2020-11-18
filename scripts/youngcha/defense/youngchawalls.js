@@ -20,7 +20,7 @@ const cupronickelWall = graphLib.finaliseExtend(Block, Building,"cupronickel-wal
 		if(this.timer.get(this.block.getTimerId(), 60)){
 			let temp = this.getGraphConnector("heat graph").getTemp();
 			let intensity = Mathf.clamp(Mathf.map(temp,400,1000,0,1));
-			Damage.status(this.team, this.x, this.y, intensity*20.0+4, StatusEffects.burning, 3+intensity*20, false, true);
+			Damage.status(this.team, this.x, this.y, intensity*20.0+4, StatusEffects.burning, 3+intensity*40, false, true);
 		}
 	},
 	draw() {
@@ -56,8 +56,8 @@ const cupronickelWallLarge = graphLib.finaliseExtend(Block, Building,"cupronicke
 		if(this.timer.get(this.block.getTimerId(), 120)){
 			let temp = this.getGraphConnector("heat graph").getTemp();
 			let intensity = Mathf.clamp(Mathf.map(temp,400,1000,0,1));
-			Damage.status(this.team, this.x, this.y, intensity*40.0+8, StatusEffects.burning, 5+intensity*60, false, true);
-			Damage.damage(this.team, this.x, this.y, intensity*10.0+8, intensity*20, false, true);
+			Damage.status(this.team, this.x, this.y, intensity*40.0+8, StatusEffects.burning, 5+intensity*120, false, true);
+			Damage.damage(this.team, this.x, this.y, intensity*10.0+8, intensity*40, false, true);
 		}
 	},
 	draw() {

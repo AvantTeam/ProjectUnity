@@ -67,6 +67,7 @@ const script = [
 			"heatlib",
 			"cruciblelib",
 			"graphlib",
+			"turretmodui",
 			"unitloader"/*,
             "shieldbulletlib"*/
         ]
@@ -326,6 +327,12 @@ const script = [
                 name: "defense",
                 childs: [
                     "youngchawalls",
+                ]
+            },
+			{
+                name: "turrets",
+                childs: [
+                    "chopper",
                 ]
             }
         ]

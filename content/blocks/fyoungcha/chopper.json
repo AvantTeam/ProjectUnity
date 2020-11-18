@@ -1,0 +1,10 @@
+{
+	"size": 1,
+	"health": 650,
+	"requirements": [
+		{"item": "nickel", "amount": 50},
+		{"item": "titanium", "amount": 50},
+		{"item": "lead", "amount": 30},
+	],
+	"category": "turret",
+}
