@@ -1,5 +1,7 @@
+const sEffect = this.global.unity.status;
 const fLib = this.global.unity.funclib;
 const soundLib = this.global.unity.sounds;
+const exefLib = this.global.unity.extraeffects;
 
 const tempVec = new Vec2();
 const tempColor = new Color();
@@ -261,7 +263,12 @@ endgame.buildType = () => {
 			Units.nearbyEnemies(this.team, this.x - rnge, this.y - rnge, rnge * 2, rnge * 2, e => {
 				if(Mathf.within(this.x, this.y, e.x, e.y, rnge) && !e.dead){
 					this._threatLevel += (e.maxHealth / 120);
-				}
+				};
+				if(e.vel.len() >= 13){
+					e.vel.setLength(0);
+					e.apply(sEffect.endgameDisable);
+					//sEffect
+				};
 			});
 		},
 		updateEyes(){
@@ -351,13 +358,13 @@ endgame.buildType = () => {
 			if(!Mathf.within(this.x, this.y, ux, uy, endgame.range * 1.5)) return;
 			fLib.trueEachBlock(this.unit.aimX(), this.unit.aimY(), 15, build => {
 				if(!build.dead && build.team != this.team){
-					build.damage(380);
+					build.damage(490);
 					endgameLaser.at(this.x, this.y, 0, [new Vec2(ux, uy), new Vec2(build.x, build.y), 0.525]);
 				};
 			});
 			Units.nearbyEnemies(this.team, ux - rnge, uy - rnge, rnge * 2, rnge * 2, e => {
 				if(Mathf.within(ux, uy, e.x, e.y, rnge + e.hitSize) && !e.dead){
-					e.damage(380 * this._threatLevel);
+					e.damage(490 * this._threatLevel);
 					if(e.dead) vaporize.at(e.x, e.y, 0, e);
 					endgameLaser.at(this.x, this.y, 0, [new Vec2(ux, uy), new Vec2(e.x, e.y), 0.525]);
 				};
@@ -379,7 +386,7 @@ endgame.buildType = () => {
 			};
 			var e = this._targetsB[index];
 			if(e != null){
-				e.damage(250 * this._threatLevel);
+				e.damage(350 * this._threatLevel);
 				if(e.dead) vaporize.at(e.x, e.y, 0, e);
 				this._eyesVecArray[index].set(tempVec);
 				this._eyesVecArray[index].add(this.x, this.y);
@@ -439,6 +446,8 @@ endgame.buildType = () => {
 						}
 					};
 				});
+				//if(!bulletSeq.isEmpty()) endgame.shootSound.at(this.x, this.y, Mathf.random(0.9, 1.1));
+				if(!bulletSeq.isEmpty()) soundLib.endgameSmallShoot.at(this.x, this.y, Mathf.random(0.9, 1.1));
 				bulletSeq.each(b => b.remove());
 				bulletSeq.clear();
 			};
@@ -476,6 +485,10 @@ endgame.buildType = () => {
 				for(var i = 0; i < 3; i++){
 					this._ringProgress[i] = Mathf.lerpDelta(this._ringProgress[i], 360 * ringDirection[i], ringProgresses[i] * this.power.status);
 				};
+				var chance = (((this.reload / endgame.reloadTime) * 0.5) + 0.5) * this.power.status;
+				var randomAngle = Mathf.random(360);
+				tempVec.trns(randomAngle, 18.5);
+				if(Mathf.chanceDelta(0.15 * chance)) exefLib.createLightning(this.x + tempVec.x, this.y + tempVec.y, randomAngle, 175, Color.red, Color.black, this.team, 980, 520);
 			}else{
 				//this._lightsAlpha = Mathf.lerpDelta(this._lightsAlpha, 0, 0.07);
 				if(this._eyeResetTime >= 60){

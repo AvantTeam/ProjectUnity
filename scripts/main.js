@@ -53,6 +53,7 @@ const script = [
 
 			"sounds",
 			"effects",
+			"extraeffects",
 			"wavefront",
             "wormlib",
 			"unitlib",
