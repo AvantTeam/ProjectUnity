@@ -320,6 +320,13 @@ const script = [
                     "augerdrill",
 					"crucible"
                 ]
+            },
+			
+            {
+                name: "defense",
+                childs: [
+                    "youngchawalls",
+                ]
             }
         ]
     }
