@@ -15,8 +15,7 @@ import mindustry.content.*;
 import mindustry.world.blocks.units.*;
 import mindustry.world.blocks.units.UnitFactory.*;
 import unity.ai.*;
-import unity.entities.bullet.AContinuousLaserBulletType;
-import unity.entities.bullet.BContinuousLaserBulletType;
+import unity.entities.bullet.SaberContinuousLaserBulletType;
 import unity.entities.units.*;
 import unity.graphics.UnityPal;
 
@@ -1184,8 +1183,9 @@ public class UnityUnitTypes implements ContentList{
                         continuous = true;
                         shootStatus = UnityStatusEffects.reloadFatigue;
                         shootCone = 20f;
-                        bullet = new AContinuousLaserBulletType(21f){
+                        bullet = new SaberContinuousLaserBulletType(21f){
                             {
+                                lightStroke = 40f;
                                 largeHit = false;
                                 lifetime = 10 * 60f;
                                 length = 160f;
@@ -1245,8 +1245,10 @@ public class UnityUnitTypes implements ContentList{
                         continuous = true;
                         shootStatus = UnityStatusEffects.reloadFatigue;
                         shootCone = 15f;
-                        bullet = new BContinuousLaserBulletType(35f){
+                        bullet = new SaberContinuousLaserBulletType(35f){
                             {
+                                swipe = true;
+                                lightStroke = 40f;
                                 largeHit = false;
                                 lifetime = 15f * 60f;
                                 length = 150f;
@@ -1284,6 +1286,42 @@ public class UnityUnitTypes implements ContentList{
                                 weaveScale = 4f;
                             }
                         };
+                    }
+                });
+            }
+        };
+
+        setEntity("vortex", UnitEntity::create);
+        vortex = new UnitType("vortex"){
+            {
+                health = 1200;
+                rotateSpeed = 12.5f;
+                flying = true;
+                speed = 9.1f;
+                drag = 0.019f;
+                accel = 0.028f;
+                hitSize = 11f;
+                engineOffset = 14f;
+                weapons.add(new Weapon(){
+                    {
+                        mirror = false;
+                        x = 0f;
+                        continuous = true;
+                        bullet = new SaberContinuousLaserBulletType(60f){
+                            {
+                                swipe = true;
+                                largeHit = false;
+                                lifetime = 5f * 60f;
+                                length = 190f;
+                                width = 5f;
+                                incendChance = 0f;
+                                hitEffect = UnityFx.coloredHitSmall;
+                                lightColor = hitColor = UnityPal.scarColorAlpha;
+                                colors = new Color[]{UnityPal.scarColorAlpha, UnityPal.endColor, Color.white};
+                                strokes = new float[]{1.5f, 1f, 0.3f};
+                            }
+                        };
+                        reload = 1.2f * 60f + bullet.lifetime;
                     }
                 });
             }

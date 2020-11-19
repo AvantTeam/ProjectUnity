@@ -39,7 +39,7 @@ public class UnityBlocks implements ContentList{
     recursiveReconstructor,
     lightLamp, oilLamp, lightLaser, lightLampInfi, lightReflector, lightReflector1, lightOmnimirror, lightFilter, lightInvertedFilter, lightDivisor, lightDivisor1, lightItemFilter, lightPanel, lightInfluencer,
     metaglassWall, metaglassWallLarge,
-    oreUmbrium, oreLuminum, oreMonolite, oreImberium,
+    oreNickel, oreUmbrium, oreLuminum, oreMonolite, oreImberium,
     multiTest1, multiTest2,
 
 //dark
@@ -236,6 +236,14 @@ public class UnityBlocks implements ContentList{
                 size = 2;
                 health = 1400;
                 requirements(Category.defense, with(Items.lead, 24, Items.metaglass, 24));
+            }
+        };
+
+        oreNickel = new OreBlock(UnityItems.nickel){
+            {
+                oreScale = 24.77f;
+                oreThreshold = 0.913f;
+                oreDefault = true;
             }
         };
 
@@ -795,7 +803,7 @@ public class UnityBlocks implements ContentList{
         //region end factories
         terminalCrucible = new StemGenericSmelter("terminal-crucible"){
             {
-                requirements(Category.crafting, with(Items.lead, 810, Items.graphite, 720, Items.silicon, 520, Items.phaseFabric, 430, Items.surgeAlloy, 320, UnityItems.plagueAlloy, 120, UnityItems.darkAlloy, 120, UnityItems.lightAlloy, 120, UnityItems.advanceAlloy, 120, UnityItems.monolithAlloy, 120, UnityItems.sparkAlloy, 120));
+                requirements(Category.crafting, with(Items.lead, 810, Items.graphite, 720, Items.silicon, 520, Items.phaseFabric, 430, Items.surgeAlloy, 320, UnityItems.plagueAlloy, 120, UnityItems.darkAlloy, 120, UnityItems.lightAlloy, 120, UnityItems.advanceAlloy, 120, UnityItems.monolithAlloy, 120, UnityItems.sparkAlloy, 120, UnityItems.superAlloy, 120));
                 flameColor = UnityPal.scarColor;
                 addSprites(name + "-lights");
                 preserveDraw = false;
@@ -818,13 +826,13 @@ public class UnityBlocks implements ContentList{
                 ambientSound = Sounds.respawning;
                 ambientSoundVolume = 0.6f;
                 consumes.power(45.2f);
-                consumes.items(with(UnityItems.plagueAlloy, 3, UnityItems.darkAlloy, 3, UnityItems.lightAlloy, 3, UnityItems.advanceAlloy, 3, UnityItems.monolithAlloy, 3, UnityItems.sparkAlloy, 3));
+                consumes.items(with(UnityItems.plagueAlloy, 3, UnityItems.darkAlloy, 3, UnityItems.lightAlloy, 3, UnityItems.advanceAlloy, 3, UnityItems.monolithAlloy, 3, UnityItems.sparkAlloy, 3, UnityItems.superAlloy, 3));
             }
         };
 
         endForge = new StemGenericSmelter("end-forge"){
             {
-                requirements(Category.crafting, with(Items.silicon, 2300, Items.phaseFabric, 650, Items.surgeAlloy, 1350, UnityItems.plagueAlloy, 510, UnityItems.darkAlloy, 510, UnityItems.lightAlloy, 510, UnityItems.advanceAlloy, 510, UnityItems.monolithAlloy, 510, UnityItems.sparkAlloy, 510, UnityItems.terminationFragment, 230));
+                requirements(Category.crafting, with(Items.silicon, 2300, Items.phaseFabric, 650, Items.surgeAlloy, 1350, UnityItems.plagueAlloy, 510, UnityItems.darkAlloy, 510, UnityItems.lightAlloy, 510, UnityItems.advanceAlloy, 510, UnityItems.monolithAlloy, 510, UnityItems.sparkAlloy, 510, UnityItems.superAlloy, 510, UnityItems.terminationFragment, 230));
                 outputItem = new ItemStack(UnityItems.terminaAlloy, 2);
                 size = 8;
                 craftTime = 410f;
