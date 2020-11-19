@@ -122,7 +122,7 @@ arcaetanaMainLaser.shake = 4;
 arcaetanaMainLaser.bullet = arcaetanaDeathLaser;
 
 const arcaetana = extendContent(UnitType, "arcaetana", {});
-arcaetana.constructor = () => extend(BuilderLegsUnit, {});
+arcaetana.constructor = () => extend(LegsUnit, {});
 arcaetana.weapons.add(arcaetanaArtilleryCannon);
 arcaetana.weapons.add(arcaetanaSmallLaser);
 arcaetana.weapons.add(arcaetanaSmallLaserB);

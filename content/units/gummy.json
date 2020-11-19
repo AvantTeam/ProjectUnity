@@ -1,5 +1,5 @@
 {	
-	"type": "BuilderLegsUnit",	
+	"type": "LegsUnit",	
 	"speed": 0.4,	
 	"health": 13000,	
 	"armor": 6.5,	

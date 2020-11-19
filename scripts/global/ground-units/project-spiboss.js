@@ -100,7 +100,7 @@ const prspiboss = extendContent(UnitType, "project-spiboss", {
 });
 
 prspiboss.constructor = () => {
-	const unit = extend(BuilderLegsUnit, {});
+	const unit = extend(LegsUnit, {});
 	return unit;
 }
 
