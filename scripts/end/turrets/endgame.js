@@ -148,6 +148,7 @@ endgame.bulletTime = endgame.timers++;
 endgame.buildType = () => {
 	var endgameEntity = extendContent(PowerTurret.PowerTurretBuild, endgame, {
 		damage(amount){
+			if(this.verify()) return;
 			var trueAmount = Mathf.clamp(amount / this._resist, 0, 360);
 			this.super$damage(trueAmount);
 			//this._inv = false;
@@ -163,6 +164,7 @@ endgame.buildType = () => {
 			this._resistTime = 10;
 			this._threatLevel = 1;
 			this._ringProgress = [0, 0, 0];
+			this._lastHealth = 0;
 			this._targetsB = [];
 			this._eyeReloads = [0, 0];
 			this._eyeResetTime = 0;
@@ -364,10 +366,10 @@ endgame.buildType = () => {
 		},
 		playerEyeShoot(index){
 			var rnge = 15;
-			var ux = this.unit.aimX();
-			var uy = this.unit.aimY();
+			var ux = this.unit.aimX;
+			var uy = this.unit.aimY;
 			if(!Mathf.within(this.x, this.y, ux, uy, endgame.range * 1.5)) return;
-			fLib.trueEachBlock(this.unit.aimX(), this.unit.aimY(), 15, build => {
+			fLib.trueEachBlock(this.unit.aimX, this.unit.aimY, 15, build => {
 				if(!build.dead && build.team != this.team){
 					build.damage(490);
 					endgameLaser.at(this.x, this.y, 0, [new Vec2(ux, uy), new Vec2(build.x, build.y), 0.525]);
@@ -463,10 +465,15 @@ endgame.buildType = () => {
 				bulletSeq.clear();
 			};
 		},
+		verify(){
+			return this.health < this._lastHealth - 860;
+		},
 		/*updateShooting(){
 			this.super$updateShooting();
 		},*/
 		updateTile(){
+			if(this.verify()) this.health = this._lastHealth;
+			this._lastHealth = this.health;
 			if(this._resistTime >= 10){
 				//this._resist = 1;
 				this._resist = Math.max(1, this._resist - Time.delta);
@@ -517,6 +524,11 @@ endgame.buildType = () => {
 				}else{
 					this._eyeResetTime += Time.delta;
 				};
+			};
+		},
+		kill(){
+			if(this.health < 10){
+				Call.tileDestroyed(this);
 			};
 		},
 		collision(other){

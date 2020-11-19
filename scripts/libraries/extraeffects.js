@@ -13,7 +13,8 @@ const collidedPlast = (a, b, team) => {
 	//(x, y) => (furthest = world.tile(x, y)) != null && furthest.team() != b.team && furthest.block().absorbLasers);
 	var found = Vars.world.raycast(World.toTile(a.x), World.toTile(a.y), World.toTile(b.x), World.toTile(b.y), (x, y) => {
 		furthest = Vars.world.tile(x, y);
-		return furthest != null && furthest.team != team && furthest.block().absorbLasers;
+		//if(furthest != null) print(": " + furthest.team + " : " + team);
+		return furthest != null && furthest.team() != team && furthest.block().absorbLasers;
 	});
 	//if(found && furthest != null) node.score = node.range + 1;
 	//return found && furthest != null ? Math.max(6, a.dst(furthest.worldx(), furthest.worldy())) : b.dst(a);
@@ -70,6 +71,7 @@ function LightningNode(x, y, xa, ya){
 				tempVec.add(this.toPos);
 				
 				//collidedPlast(this, this.toPos, tempVec, this.team);
+				//print(this.team);
 				var collided = collidedPlast(this.toPos, tempVec, this.team);
 				if(collided) this.score = this.range + 1;
 				//print(collided);
