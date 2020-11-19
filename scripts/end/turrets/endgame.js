@@ -142,18 +142,25 @@ endgame.outlineIcon = false;
 endgame.powerUse = 320;
 endgame.shootShake = 2.2;
 endgame.reloadTime = 300;
+endgame.absorbLasers = true;
 endgame.eyeTime = endgame.timers++;
 endgame.bulletTime = endgame.timers++;
 endgame.buildType = () => {
 	var endgameEntity = extendContent(PowerTurret.PowerTurretBuild, endgame, {
 		damage(amount){
-			var trueAmount = Mathf.clamp(amount, 0, 360);
+			var trueAmount = Mathf.clamp(amount / this._resist, 0, 360);
 			this.super$damage(trueAmount);
+			//this._inv = false;
+			this._resist += 0.25 + Math.max((amount - 560) / 80, 0);
+			this._resistTime = 0;
 		},
 		deltaB(){
 			return this.delta() * this.power.status;
 		},
 		setEff(){
+			//this._inv = true;
+			this._resist = 1;
+			this._resistTime = 10;
 			this._threatLevel = 1;
 			this._ringProgress = [0, 0, 0];
 			this._targetsB = [];
@@ -460,6 +467,12 @@ endgame.buildType = () => {
 			this.super$updateShooting();
 		},*/
 		updateTile(){
+			if(this._resistTime >= 10){
+				//this._resist = 1;
+				this._resist = Math.max(1, this._resist - Time.delta);
+			}else{
+				this._resistTime += Time.delta;
+			};
 			this.updateEyes();
 			if(this.power.status >= 0.0001){
 				var value = this._eyesAlpha > this.power.status ? 1 : this.power.status;
@@ -505,6 +518,16 @@ endgame.buildType = () => {
 					this._eyeResetTime += Time.delta;
 				};
 			};
+		},
+		collision(other){
+			//const tempRange = 10;
+			var amount = other.owner != null && !this.within(other.owner, endgame.range) ? 0 : other.damage * other.type.tileDamageMultiplier;
+			this.damage(amount);
+			if(other.owner != null && !this.within(other.owner, endgame.range)){
+				other.owner.damage(0.33 * other.owner.maxHealth);
+				other.remove();
+			};
+			return true;
 		},
 		shoot(type){
 			this.consume();
