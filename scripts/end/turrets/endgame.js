@@ -485,10 +485,10 @@ endgame.buildType = () => {
 				for(var i = 0; i < 3; i++){
 					this._ringProgress[i] = Mathf.lerpDelta(this._ringProgress[i], 360 * ringDirection[i], ringProgresses[i] * this.power.status);
 				};
-				var chance = (((this.reload / endgame.reloadTime) * 0.5) + 0.5) * this.power.status;
+				var chance = (((this.reload / endgame.reloadTime) * 0.75) + 0.25) * this.power.status;
 				var randomAngle = Mathf.random(360);
 				tempVec.trns(randomAngle, 18.5);
-				if(Mathf.chanceDelta(0.15 * chance)) exefLib.createLightning(this.x + tempVec.x, this.y + tempVec.y, randomAngle, 175, Color.red, Color.black, this.team, 980, 520);
+				if(Mathf.chanceDelta(0.33 * chance)) exefLib.createLightning(this.x + tempVec.x, this.y + tempVec.y, randomAngle, 175, Color.red, Color.black, this.team, 980 * this.power.status, 520, this.targetPos);
 			}else{
 				//this._lightsAlpha = Mathf.lerpDelta(this._lightsAlpha, 0, 0.07);
 				if(this._eyeResetTime >= 60){

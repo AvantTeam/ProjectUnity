@@ -14,7 +14,8 @@
 				{"item": "light-alloy", "amount": 3},
 				{"item": "advance-alloy", "amount": 3},
 				{"item": "monolith-alloy", "amount": 3},
-				{"item": "spark-alloy", "amount": 3}
+				{"item": "spark-alloy", "amount": 3},
+				{"item": "spark-alloy", "amount": 3},
 			]
 		}
 	},
@@ -29,7 +30,8 @@
 		{"item": "light-alloy", "amount": 120},
 		{"item": "advance-alloy", "amount": 120},
 		{"item": "monolith-alloy", "amount": 120},
-		{"item": "spark-alloy", "amount": 120}
+		{"item": "spark-alloy", "amount": 120},
+		{ "item": "super-alloy", "amount": 120},
 	],
 	"category": "crafting",
 	"ambientSound": "respawning",

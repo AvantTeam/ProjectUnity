@@ -32,9 +32,9 @@ function LightningNode(x, y, xa, ya){
 	//this.effectC = 16;
 	this.effectC = 0;
 	this.score = 0;
-	this.range = 300;
+	//this.range = 300;
 	this.altTime = 0;
-	this.setC = (origin, team, damage, colorF, colorT, score, range) => {
+	this.setC = (origin, team, damage, colorF, colorT, score) => {
 		this.damage = damage;
 		//this.rotation = rotation;
 		this.colorFrom = colorF;
@@ -44,12 +44,12 @@ function LightningNode(x, y, xa, ya){
 		this.origin = origin;
 		this.origin.addNode(this);
 		//this.timerC = time;
-		this.range = range;
+		//this.range = range;
 		this.init();
 	};
 	this.draw = () => {
 		Draw.color(this.colorFrom, this.colorTo, this.effectC / 16);
-		Lines.stroke(Mathf.clamp(this.origin.fout() * 20) * 2);
+		Lines.stroke(Mathf.clamp(this.origin.fout() * 15) * 2);
 		tempVec2.set(this.fromPos);
 		tempVec2.lerp(this.toPos, this.altTime / timeProgress);
 		Lines.line(this.fromPos.x, this.fromPos.y, tempVec2.x, tempVec2.y);
@@ -72,8 +72,10 @@ function LightningNode(x, y, xa, ya){
 				if(collided) this.score = this.range + 1;
 				//print(collided);
 				
-				if(this.score < this.range){
-					tempVec.trns(this.rotation + rand, 17);
+				if(this.score < this.origin.getRange()){
+					var inf = this.origin.getInfluence();
+					var rotationC = inf != null ? Mathf.slerp(this.rotation + rand, Angles.angle(this.toPos.x, this.toPos.y, inf.x, inf.y) + (rand / 1.25), 0.07) : this.rotation + rand;
+					tempVec.trns(rotationC, 17);
 					var nScore = tempVec.len();
 					nScore += this.score;
 					tempVec.add(this.toPos);
@@ -102,11 +104,18 @@ const customLightningA = prov(() => {
 			this._team = Team.derelict;
 			this._damage = 12;
 			this._range = 120;
+			this._influence = null;
 		},
 		clipSize(){
 			return (this._range * 2) + 12;
 		},
-		setCCC(x, y, rotation, lifetime, colorF, colorT, team, damage, range){
+		getInfluence(){
+			return this._influence;
+		},
+		getRange(){
+			return this._range;
+		},
+		setCCC(x, y, rotation, lifetime, colorF, colorT, team, damage, range, influence){
 			this.x = x;
 			this.y = y;
 			this.rotation = rotation;
@@ -116,6 +125,7 @@ const customLightningA = prov(() => {
 			this._range = range;
 			this._colorF = colorF;
 			this._colorT = colorT;
+			this._influence = influence;
 		},
 		addNode(node){
 			this._nodes.add(node);
@@ -137,7 +147,7 @@ const customLightningA = prov(() => {
 			tempVec.trns(this.rotation, 17);
 			tempVec.add(this.x, this.y);
 			var l = new LightningNode(this.x, this.y, tempVec.x, tempVec.y);
-			l.setC(this, this._team, this._damage, this._colorF, this._colorT, 0, this._range);
+			l.setC(this, this._team, this._damage, this._colorF, this._colorT, 0);
 		},
 		remove(){
 			if (!this.added) return; 
@@ -152,9 +162,9 @@ const customLightningA = prov(() => {
 });
 
 module.exports = {
-	createLightning(x, y, rotation, lifetime, colorF, colorT, team, damage, range){
+	createLightning(x, y, rotation, lifetime, colorF, colorT, team, damage, range, influence){
 		var l = customLightningA.get();
-		l.setCCC(x, y, rotation, lifetime, colorF, colorT, team, damage, range);
+		l.setCCC(x, y, rotation, lifetime, colorF, colorT, team, damage, range, influence);
 		l.add();
 	}
 };
