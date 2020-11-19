@@ -25,7 +25,7 @@
 		{"item": "advance-alloy", "amount": 510},
 		{"item": "monolith-alloy", "amount": 510},
 		{"item": "spark-alloy", "amount": 510},
-		{ "item": "super-alloy", "amount": 510},
+		{"item": "super-alloy", "amount": 510},
 		{"item": "termination-fragment", "amount": 230}
 	],
 	"category": "crafting",

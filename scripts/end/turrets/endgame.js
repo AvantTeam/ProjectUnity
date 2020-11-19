@@ -12,6 +12,10 @@ const bulletSeq = new Seq(1023);
 const ringProgresses = [0.013, 0.035, 0.024];
 const ringDirection = [1, -1, 1];
 
+const getDamage = (type) => {
+	return type.damage + type.splashDamage + (Math.max(type.lightningDamage, 0) * lightning * lightningLength);
+};
+
 const offsetSin = (offset, scl) => {
 	return Mathf.absin(Time.time() + (offset * Mathf.radDeg), scl, 0.5) + 0.5;
 };
@@ -262,7 +266,7 @@ endgame.buildType = () => {
 			var rnge = endgame.range / 1.5;
 			Units.nearbyEnemies(this.team, this.x - rnge, this.y - rnge, rnge * 2, rnge * 2, e => {
 				if(Mathf.within(this.x, this.y, e.x, e.y, rnge) && !e.dead){
-					this._threatLevel += (e.maxHealth / 120);
+					this._threatLevel += (e.maxHealth / 340);
 				};
 				if(e.vel.len() >= 13){
 					e.vel.setLength(0);
@@ -400,7 +404,7 @@ endgame.buildType = () => {
 				var damageFull = 0;
 				Groups.bullet.intersect(this.x - endgame.range, this.y - endgame.range, endgame.range * 2, endgame.range * 2, b => {
 					if(Mathf.within(this.x, this.y, b.x, b.y, endgame.range) && b.team != this.team){
-						damageFull += b.type.damage + b.type.splashDamage;
+						damageFull += getDamage(b.type);
 						var currentBullet = b.type;
 						var totalFragBullets = 1;
 						
@@ -411,7 +415,7 @@ endgame.buildType = () => {
 							
 							totalFragBullets *= currentBullet.fragBullets;
 							
-							damageFull += (frag.damage + frag.splashDamage) * totalFragBullets;
+							damageFull += getDamage(frag) * totalFragBullets;
 							
 							currentBullet = currentBullet.fragBullet;
 						};
@@ -421,7 +425,7 @@ endgame.buildType = () => {
 					if(Mathf.within(this.x, this.y, b.x, b.y, endgame.range) && b.team != this.team){
 						var damageB = 0;
 						var currentBullet = b.type;
-						var damageV = b.type.damage + b.type.splashDamage;
+						var damageV = getDamage(b.type);
 						var totalFragBullets = 1;
 						
 						for(var f = 0; f < 16; f++){
@@ -431,7 +435,7 @@ endgame.buildType = () => {
 							
 							totalFragBullets *= currentBullet.fragBullets;
 							
-							damageB += (frag.damage + frag.splashDamage) * totalFragBullets;
+							damageB += getDamage(frag) * totalFragBullets;
 							
 							currentBullet = currentBullet.fragBullet;
 						};
@@ -439,7 +443,7 @@ endgame.buildType = () => {
 						/*if((b.getShieldDamage() + damageB > 1000 || b.getBulletType().splashDamageRadius > 120 || damageFull > 12000) && b != null){
 							b.remove();
 						}*/
-						if(damageV + damageB > 1000 || b.type.splashDamageRadius > 120 || damageFull > 12000){
+						if(damageV + damageB > 1500 || b.type.splashDamageRadius > 120 || damageFull > 12000 || (b.owner != null && !this.within(b.owner, endgame.range))){
 							//b.remove();
 							bulletSeq.add(b);
 							endgameLaser.at(this.x, this.y, 0, [new Vec2(this.x + (this._eyesOffset.x * 2), this.y + (this._eyesOffset.y * 2)), new Vec2(b.x, b.y), 0.625]);
@@ -485,10 +489,11 @@ endgame.buildType = () => {
 				for(var i = 0; i < 3; i++){
 					this._ringProgress[i] = Mathf.lerpDelta(this._ringProgress[i], 360 * ringDirection[i], ringProgresses[i] * this.power.status);
 				};
-				var chance = (((this.reload / endgame.reloadTime) * 0.75) + 0.25) * this.power.status;
+				const offsetF = 0.90;
+				var chance = (((this.reload / endgame.reloadTime) * offsetF) + (1 - offsetF)) * this.power.status;
 				var randomAngle = Mathf.random(360);
 				tempVec.trns(randomAngle, 18.5);
-				if(Mathf.chanceDelta(0.33 * chance)) exefLib.createLightning(this.x + tempVec.x, this.y + tempVec.y, randomAngle, 175, Color.red, Color.black, this.team, 980 * this.power.status, 520, this.targetPos);
+				if(Mathf.chanceDelta(0.75 * chance)) exefLib.createLightning(this.x + tempVec.x, this.y + tempVec.y, randomAngle, 80, Color.red, Color.black, this.team, 980 * this.power.status * this._threatLevel, 520, this.targetPos);
 			}else{
 				//this._lightsAlpha = Mathf.lerpDelta(this._lightsAlpha, 0, 0.07);
 				if(this._eyeResetTime >= 60){

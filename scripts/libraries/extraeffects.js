@@ -1,6 +1,8 @@
 const tempVec = new Vec2();
 const tempVec2 = new Vec2();
-const timeProgress = 2;
+const timeProgress = 1.2;
+const lightningLength = 23;
+const effectLength = 32;
 
 const collidedPlast = (a, b, team) => {
 	//Tmp.v1.trns(b.rotation(), length);
@@ -48,23 +50,23 @@ function LightningNode(x, y, xa, ya){
 		this.init();
 	};
 	this.draw = () => {
-		Draw.color(this.colorFrom, this.colorTo, this.effectC / 16);
-		Lines.stroke(Mathf.clamp(this.origin.fout() * 15) * 2);
+		Draw.color(this.colorFrom, this.colorTo, this.effectC / effectLength);
+		Lines.stroke(Mathf.clamp(this.origin.fout() * 5) * 2);
 		tempVec2.set(this.fromPos);
 		tempVec2.lerp(this.toPos, this.altTime / timeProgress);
 		Lines.line(this.fromPos.x, this.fromPos.y, tempVec2.x, tempVec2.y);
 		//Draw.reset();
 	};
 	this.update = () => {
-		if(this.effectC < 16){
+		if(this.effectC < effectLength){
 			this.effectC += Time.delta;
-			this.effectC = Mathf.clamp(this.effectC, 0, 16);
+			this.effectC = Mathf.clamp(this.effectC, 0, effectLength);
 		};
 		if(this.timerC >= timeProgress){
-			var chance = Mathf.chance(0.03) ? 2 : 1;
+			var chance = Mathf.chance(0.035) ? 2 : 1;
 			for(var i = 0; i < chance; i++){
 				var rand = chance == 2 ? Mathf.range(50) : Mathf.range(15);
-				tempVec.trns(this.rotation + rand, 17);
+				tempVec.trns(this.rotation + rand, lightningLength);
 				tempVec.add(this.toPos);
 				
 				//collidedPlast(this, this.toPos, tempVec, this.team);
@@ -74,8 +76,8 @@ function LightningNode(x, y, xa, ya){
 				
 				if(this.score < this.origin.getRange()){
 					var inf = this.origin.getInfluence();
-					var rotationC = inf != null ? Mathf.slerp(this.rotation + rand, Angles.angle(this.toPos.x, this.toPos.y, inf.x, inf.y) + (rand / 1.25), 0.07) : this.rotation + rand;
-					tempVec.trns(rotationC, 17);
+					var rotationC = inf != null ? Mathf.slerp(this.rotation + rand, Angles.angle(this.toPos.x, this.toPos.y, inf.x, inf.y) + (rand / 1.12), 0.12 * (Mathf.clamp((600 - Mathf.dst(this.toPos.x, this.toPos.y, inf.x, inf.y)) / 600))) : this.rotation + rand;
+					tempVec.trns(rotationC, lightningLength);
 					var nScore = tempVec.len();
 					nScore += this.score;
 					tempVec.add(this.toPos);
@@ -91,7 +93,7 @@ function LightningNode(x, y, xa, ya){
 		};
 	};
 	this.init = () => {
-		Damage.damage(this.team, this.toPos.x, this.toPos.y, 24, this.damage);
+		Damage.damage(this.team, this.toPos.x, this.toPos.y, lightningLength * 1.5, this.damage);
 	};
 };
 
@@ -144,7 +146,7 @@ const customLightningA = prov(() => {
 		add(){
 			if(this.added == true) return; 
 			this.super$add();
-			tempVec.trns(this.rotation, 17);
+			tempVec.trns(this.rotation, lightningLength);
 			tempVec.add(this.x, this.y);
 			var l = new LightningNode(this.x, this.y, tempVec.x, tempVec.y);
 			l.setC(this, this._team, this._damage, this._colorF, this._colorT, 0);
