@@ -123,7 +123,7 @@ public class SpriteProcessor{
     }
 
     static BufferedImage buffer(TextureRegion reg){
-        return spriteCache.get(((AtlasRegion)reg).name.replaceFirst("mechanical-warfare-", ""));
+        return spriteCache.get(((AtlasRegion)reg).name.replaceFirst("unity-", ""));
     }
 
     static boolean has(String name){
@@ -131,7 +131,7 @@ public class SpriteProcessor{
     }
 
     static boolean has(TextureRegion region){
-        return has(((AtlasRegion)region).name.replaceFirst("mechanical-warfare-", ""));
+        return has(((AtlasRegion)region).name.replaceFirst("unity-", ""));
     }
 
     static Sprite get(String name){
@@ -141,7 +141,7 @@ public class SpriteProcessor{
     static Sprite get(TextureRegion region){
         GenRegion.validate(region);
 
-        return new Sprite(spriteCache.get(((AtlasRegion)region).name.replaceFirst("mechanical-warfare-", "")));
+        return new Sprite(spriteCache.get(((AtlasRegion)region).name.replaceFirst("unity-", "")));
     }
 
     static void err(String message, Object... args){
