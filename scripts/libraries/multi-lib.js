@@ -119,7 +119,7 @@ function MultiCrafterBuild() {
         return false;
     };
     this.checkCond = function(i) {
-        if(this.power.status <= 0 && this.block.getRecipes()[i].input.power > 0) {
+        if(this.block.getRecipes()[i].input.power > 0 && this.power.status <= 0) {
             this._condValid = false;
             this._cond = false;
             return false;
@@ -619,7 +619,7 @@ function MultiCrafterBlock() {
         //initialize
         this.bars.remove("liquid");
         this.bars.remove("items");
-        if(!this.powerBarI) this.bars.remove("power");
+        if(!this.powerBarI && this.hasPower) this.bars.remove("power");
         if(this.powerBarO) this.bars.add("poweroutput", entity => new Bar(() => Core.bundle.format("bar.poweroutput", entity.getPowerProduction() * 60 * entity.timeScale), () => Pal.powerBar, () => typeof entity["getPowerStat"] === "function" ? entity.getPowerStat() : 0));
         //display every Liquids that can contain
         var i = 0;
