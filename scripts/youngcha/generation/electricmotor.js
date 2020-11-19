@@ -65,6 +65,6 @@ electricMotor.getGraphConnectorBlock("torque graph").setAccept([0,1,0,
 																0,1,0,
 																0,0,0]);
 electricMotor.getGraphConnectorBlock("torque graph").setMaxSpeed(10);
-electricMotor.getGraphConnectorBlock("torque graph").setMaxTorque(20);
+electricMotor.getGraphConnectorBlock("torque graph").setMaxTorque(16);
 electricMotor.getGraphConnectorBlock("torque graph").setBaseFriction(0.1);
 electricMotor.getGraphConnectorBlock("torque graph").setBaseInertia(25);
