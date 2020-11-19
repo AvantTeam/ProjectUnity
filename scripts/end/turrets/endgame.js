@@ -13,7 +13,7 @@ const ringProgresses = [0.013, 0.035, 0.024];
 const ringDirection = [1, -1, 1];
 
 const getDamage = (type) => {
-	return type.damage + type.splashDamage + (Math.max(type.lightningDamage, 0) * lightning * lightningLength);
+	return type.damage + type.splashDamage + (Math.max(type.lightningDamage, 0) * type.lightning * type.lightningLength);
 };
 
 const offsetSin = (offset, scl) => {
