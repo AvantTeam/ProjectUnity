@@ -524,7 +524,7 @@ endgame.buildType = () => {
 			var amount = other.owner != null && !this.within(other.owner, endgame.range) ? 0 : other.damage * other.type.tileDamageMultiplier;
 			this.damage(amount);
 			if(other.owner != null && !this.within(other.owner, endgame.range)){
-				other.owner.damage(0.33 * other.owner.maxHealth);
+				other.owner.damage(0.5 * other.owner.maxHealth * Math.max(this._resist / 10, 1));
 				other.remove();
 			};
 			return true;
