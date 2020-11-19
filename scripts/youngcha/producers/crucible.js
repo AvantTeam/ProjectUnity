@@ -175,6 +175,7 @@ const castingMold = graphLib.finaliseExtend(Block, Building, "casting-mold", cmb
 }, {
 	pourProgress:0,
 	castProgress:0,
+	castSpeed:0,
 	castingMelt:null,
 	outputBuildings:null,
 	writeExt(stream) {
@@ -203,6 +204,9 @@ const castingMold = graphLib.finaliseExtend(Block, Building, "casting-mold", cmb
 				if(that.castingMelt){
 					sub.image(that.castingMelt.item.icon(Cicon.medium));
 					sub.label(prov(() => {
+						if(that.pourProgress==1 && that.castSpeed==0){
+							return "Too hot to cast!";
+						}
 						return Strings.fixed((that.pourProgress+that.castProgress) *50.0, 2) + "%";
 					})).color(Color.lightGray);
 				}else{
@@ -267,7 +271,8 @@ const castingMold = graphLib.finaliseExtend(Block, Building, "casting-mold", cmb
 			}
 			if(this.castProgress<1.0){
 				let temp = this.getGraphConnector("heat graph").getTemp();
-				this.castProgress += Math.max(0,((1.0-(temp/this.castingMelt.meltpoint))*0.5)*this.castingMelt.meltspeed);
+				this.castSpeed=  Math.max(0,(1.0-((temp-75)/this.castingMelt.meltpoint))*this.castingMelt.meltspeed*1.5);
+				this.castProgress += this.castSpeed;
 				if(this.castProgress>1){
 					this.castProgress=1;
 				}

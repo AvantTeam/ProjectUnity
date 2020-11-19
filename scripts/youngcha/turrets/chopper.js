@@ -1,6 +1,79 @@
 const rotL = require("libraries/rotpowerlib");
 const modturretlib = require("libraries/turretmodui");
 
+
+
+const partinfo = 
+[
+	{
+		name:"Pivot",
+		desc:"",
+		tx:4,
+		ty:0,
+		tw:1,
+		th:1,
+		cannotPlace:true,
+		prePlace:{
+			x:0,
+			y:0,
+		},
+		isRoot:true,
+		cost:[
+		]
+	},
+	{
+		name:"Blade",
+		desc:"Slices and knocks back enemies",
+		tx:0,
+		ty:0,
+		tw:1,
+		th:1,
+		cost:[
+			{
+				name:"unity-nickel",
+				amount: 3
+			},
+			{
+				name:"titanium",
+				amount: 5
+			}
+		]
+	},
+	{
+		name:"Serrated blade",
+		desc:"A heavy reinforced blade.",
+		tx:2,
+		ty:0,
+		tw:2,
+		th:1,
+		cost:[
+			{
+				name:"unity-nickel",
+				amount: 8
+			},
+			{
+				name:"lead",
+				amount: 5
+			}
+		]
+	},
+	{
+		name:"Rod",
+		desc:"Supporting structure, does not collide",
+		tx:1,
+		ty:0,
+		tw:1,
+		th:1,
+		cost:[
+			{
+				name:"titanium",
+				amount: 3
+			}
+		]
+	},
+	
+];
+
 const chopperTurret = rotL.torqueExtend(Block, Building, "chopper", rotL.baseTypes.torqueConnector, {
 
 	load(){
@@ -12,42 +85,9 @@ const chopperTurret = rotL.torqueExtend(Block, Building, "chopper", rotL.baseTyp
 },{
 	buildConfiguration(table) {
 		let buttoncell = table.button(Tex.whiteui, Styles.clearTransi, 50, run(() => {
-			let dialog = new BaseDialog("@editmessage");
+			let dialog = new BaseDialog("Edit Blueprint");
             dialog.setFillParent(false);
-			modturretlib.applyUI(dialog.cont,chopperTurret.partsAtlas,2,1,[
-				{
-					name:"Blade",
-					desc:"Slices and knocks back enemies",
-					tx:0,
-					ty:0,
-					tw:1,
-					th:1,
-					cost:[
-						{
-							name:"unity-nickel",
-							amount: 5
-						},
-						{
-							name:"titanium",
-							amount: 5
-						}
-					]
-				},
-				{
-					name:"Rod",
-					desc:"Supporting structure, does not collide",
-					tx:1,
-					ty:0,
-					tw:1,
-					th:1,
-					cost:[
-						{
-							name:"titanium",
-							amount: 3
-						}
-					]
-				},
-			]);
+			modturretlib.applyUI(dialog.cont,chopperTurret.partsAtlas,5,1,partinfo,5,4);
 			dialog.buttons.button("@ok", () => {
 				this.configure(0);
 				dialog.hide();

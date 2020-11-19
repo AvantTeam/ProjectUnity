@@ -279,7 +279,7 @@ const rotorBuild = {
 			this.productionEfficiency = breakeven + (1.0-breakeven) * Mathf.clamp((rotvel - topspeed)*this.block.getRotPowerEfficiency());
 			tgraph.setFriction(fric);
 		}else{
-			this.productionEfficiency = Mathf.pow((rotvel/topspeed)*breakeven,4);
+			this.productionEfficiency = Mathf.pow((rotvel/topspeed)*breakeven,3);
 			tgraph.setFriction(fric*0.5 + ((rotvel/topspeed)*fric*0.5) );
 		}
 		let mul = Mathf.clamp(1.0-(rotvel/topspeed),-1.0,1.0);
@@ -331,10 +331,10 @@ electricRotor.consumes.power(8.0);
 electricRotor.getGraphConnectorBlock("flux graph").setAccept( [0,0,0, 1,1,1, 0,0,0, 1,1,1]);
 electricRotor.getGraphConnectorBlock("flux graph").setFluxproducer(false);
 electricRotor.getGraphConnectorBlock("torque graph").setAccept([0,1,0, 0,0,0, 0,1,0, 0,0,0]);
-electricRotor.getGraphConnectorBlock("torque graph").setBaseFriction(0.1);
+electricRotor.getGraphConnectorBlock("torque graph").setBaseFriction(0.05);
 electricRotor.setFluxEfficiency(10.0);
-electricRotor.setRotPowerEfficiency(0.2);
-electricRotor.setTorqueEfficiency(0.5);
+electricRotor.setRotPowerEfficiency(0.25);
+electricRotor.setTorqueEfficiency(0.8);
 electricRotor.setBaseTorque(5.0);
-electricRotor.setBaseTopSpeed(20.0);
+electricRotor.setBaseTopSpeed(15.0);
 electricRotor.powerProduction = 24.0;

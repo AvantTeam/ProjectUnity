@@ -73,7 +73,7 @@ const cruciblePump = graphLib.finaliseExtend(Block, Building,"crucible-pump",cpb
         ).left();
 	},
 	updatePost(){
-		let rate = 0.04;
+		let rate = 0.08;
 		let dex = this.getGraphConnector("crucible graph");
 		this.flowRate/=2.0;
 		if(this.filterItem){
