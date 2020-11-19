@@ -266,7 +266,7 @@ endgame.buildType = () => {
 			var rnge = endgame.range / 1.5;
 			Units.nearbyEnemies(this.team, this.x - rnge, this.y - rnge, rnge * 2, rnge * 2, e => {
 				if(Mathf.within(this.x, this.y, e.x, e.y, rnge) && !e.dead){
-					this._threatLevel += (e.maxHealth / 340);
+					this._threatLevel += (e.maxHealth / 440);
 				};
 				if(e.vel.len() >= 13){
 					e.vel.setLength(0);
@@ -493,7 +493,7 @@ endgame.buildType = () => {
 				var chance = (((this.reload / endgame.reloadTime) * offsetF) + (1 - offsetF)) * this.power.status;
 				var randomAngle = Mathf.random(360);
 				tempVec.trns(randomAngle, 18.5);
-				if(Mathf.chanceDelta(0.75 * chance)) exefLib.createLightning(this.x + tempVec.x, this.y + tempVec.y, randomAngle, 80, Color.red, Color.black, this.team, 980 * this.power.status * this._threatLevel, 520, this.targetPos);
+				if(Mathf.chanceDelta(0.75 * chance)) exefLib.createLightning(this.x + tempVec.x, this.y + tempVec.y, randomAngle, 80, Color.red, Color.black, this.team, 520 * this.power.status, 520, this.targetPos);
 			}else{
 				//this._lightsAlpha = Mathf.lerpDelta(this._lightsAlpha, 0, 0.07);
 				if(this._eyeResetTime >= 60){

@@ -65,7 +65,7 @@ function LightningNode(x, y, xa, ya){
 		if(this.timerC >= timeProgress){
 			var chance = Mathf.chance(0.035) ? 2 : 1;
 			for(var i = 0; i < chance; i++){
-				var rand = chance == 2 ? Mathf.range(50) : Mathf.range(15);
+				var rand = chance == 2 ? Mathf.range(60) : Mathf.range(20);
 				tempVec.trns(this.rotation + rand, lightningLength);
 				tempVec.add(this.toPos);
 				
@@ -76,7 +76,7 @@ function LightningNode(x, y, xa, ya){
 				
 				if(this.score < this.origin.getRange()){
 					var inf = this.origin.getInfluence();
-					var rotationC = inf != null ? Mathf.slerp(this.rotation + rand, Angles.angle(this.toPos.x, this.toPos.y, inf.x, inf.y) + (rand / 1.12), 0.12 * (Mathf.clamp((600 - Mathf.dst(this.toPos.x, this.toPos.y, inf.x, inf.y)) / 600))) : this.rotation + rand;
+					var rotationC = inf != null ? Mathf.slerp(this.rotation + rand, Angles.angle(this.toPos.x, this.toPos.y, inf.x, inf.y) + (rand / 1.12), 0.09 * (Mathf.clamp((600 - Mathf.dst(this.toPos.x, this.toPos.y, inf.x, inf.y)) / 600))) : this.rotation + rand;
 					tempVec.trns(rotationC, lightningLength);
 					var nScore = tempVec.len();
 					nScore += this.score;
@@ -156,6 +156,10 @@ const customLightningA = prov(() => {
 			Groups.all.remove(this);
 			Groups.draw.remove(this);
 			this.added = false;
+			this._nodes.each(n => {
+				n.toPos = null;
+				n.fromPos = null;
+			});
 			this._nodes.clear();
 		}
 	});
