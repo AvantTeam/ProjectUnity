@@ -816,7 +816,7 @@ const _BlockGraph = {
 		let neighbourindex = 1;
 		let target = neighs[neighbourindex];
 		let front=Orderedqueue.new({b:neighs[0],d:0}, function(x){
-			if(!x.b){return 99999999;}
+			if(!x.b||!target){print("target:"+target+","+x.b); return 99999999;}
 			return x.d+ Math.abs(x.b.getBuild().x - target.getBuild().x)+Math.abs(x.b.getBuild().y - target.getBuild().y);
 		});
 		let index = 0;
@@ -831,6 +831,13 @@ const _BlockGraph = {
 					return false;
 				}
 				target = neighs[neighbourindex];
+				while(!target){
+					neighbourindex++;
+					if(neighbourindex==neighs.length){
+						return false;
+					}
+					target = neighs[neighbourindex];
+				}
 				front.setFunc(function(x){
 					if(!x.b){return 99999999;}
 					return x.d+ Math.abs(x.b.getBuild().x - target.getBuild().x)+Math.abs(x.b.getBuild().y - target.getBuild().y);

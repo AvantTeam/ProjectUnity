@@ -697,12 +697,13 @@ const crucibleGraph = { //this just uh manages the graphics lmAO
 			this.removeEmptyMelts();
 			return;
 		}
+		let capacitymul = Math.sqrt(this.getLiquidCapacity()/15.0);
 		//melting 
 		for(let i = 0;i<this.contains.length;i++){
 			let meltmul = Time.delta/this.contains[i].volume;
 			let ml = cruicibleMelts[this.contains[i].id];
 			if(ml){
-				this.contains[i].meltedRatio += meltmul*this.getAverageMeltSpeed(ml,0.002,0.5)*0.2;
+				this.contains[i].meltedRatio += meltmul*this.getAverageMeltSpeed(ml,0.002,0.5)*0.2*capacitymul;
 				this.contains[i].meltedRatio = Mathf.clamp(this.contains[i].meltedRatio);
 				
 				if(ml.evaporationTemp){
@@ -738,7 +739,7 @@ const crucibleGraph = { //this just uh manages the graphics lmAO
 				}
 			}
 			if(valid && maxcraftable>0){
-				let craftam = Math.min(maxcraftable,cruicibleRecipes[z].alloyspeed*Time.delta*0.1);
+				let craftam = Math.min(maxcraftable,cruicibleRecipes[z].alloyspeed*Time.delta*0.1*capacitymul);
 				if(craftam<=0){continue;}
 				for(let r =0;r<cruicibleRecipes[z].inputs.length;r++){
 					let alyinput = cruicibleRecipes[z].inputs[r];
