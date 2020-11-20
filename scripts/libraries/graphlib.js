@@ -820,6 +820,7 @@ const _BlockGraph = {
 			return x.d+ Math.abs(x.b.getBuild().x - target.getBuild().x)+Math.abs(x.b.getBuild().y - target.getBuild().y);
 		});
 		let index = 0;
+		let giveup = this.connected.size;
 		
 		let visited = ObjectSet.with(building);
 		while(!front.isEmpty()){
@@ -850,7 +851,11 @@ const _BlockGraph = {
 					front.add({b:neighbour.build,d:current.d+4});
 				}
 			});
-			
+			giveup--;
+			if(giveup<0){
+				print(front.list);
+				return true;
+			}
 		}
 		
 		return true;
