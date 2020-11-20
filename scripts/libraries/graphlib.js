@@ -832,7 +832,7 @@ const _BlockGraph = {
 					return false;
 				}
 				target = neighs[neighbourindex];
-				while(!target){
+				while(!target || visited.contains(target)){
 					neighbourindex++;
 					if(neighbourindex==neighs.length){
 						return false;
