@@ -50,7 +50,7 @@ const darkShockWave = new Effect(56, 820 * 2, e => {
 		for(var b = 0; b < 2; b++){
 			poly[(i * 2 + b)] = b == 0 ? tempVec.x : tempVec.y;
 		};
-		if(Mathf.randomSeed(Mathf.round(Time.time() * 270 + (e.id * 2311) + i + 1), 0, 20) / 20 >= 0.9){
+		if(Mathf.randomSeed(Mathf.round(Time.time() * 270 + (e.id * 2311) + ((1 + i) * 342)), 0, 20) / 20 >= 0.9){
 			Lines.line(e.x, e.y, tempVec.x, tempVec.y);
 		};
 	};
@@ -334,13 +334,17 @@ endgame.buildType = () => {
 		},
 		killUnitsC(){
 			var rnge = endgame.range;
+			bulletSeq.clear();
 			Units.nearbyEnemies(this.team, this.x - rnge, this.y - rnge, rnge * 2, rnge * 2, e => {
 				if(Mathf.within(this.x, this.y, e.x, e.y, rnge) && !e.dead){
 					endgameLaser.at(this.x, this.y, 0, [new Vec2(this.x + (this._eyesOffset.x * 2), this.y + (this._eyesOffset.y * 2)), new Vec2(e.x, e.y), 1]);
 					vaporize.at(e.x, e.y, 0, e);
 					e.kill();
+					if(e.isFlying()) bulletSeq.add(e);
 				};
 			});
+			bulletSeq.each(e => e.destroy());
+			bulletSeq.clear();
 		},
 		killTilesC(){
 			var shouldLaser = 0;
