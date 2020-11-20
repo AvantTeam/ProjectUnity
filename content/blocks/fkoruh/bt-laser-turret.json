@@ -1,0 +1,17 @@
+{
+	"size": 4,
+	"health": 2800,
+	"range": 500,
+  "reloadTime": 500,
+	"coolantMultiplier": 1.5,
+	"shootCone": 1,
+	"inaccuracy": 0,
+	"powerUse": 17,
+  "targetAir": true,
+	"requirements": [
+		{"item": "copper", "amount": 160},
+		{"item": "lead", "amount": 110},
+		{"item": "silicon", "amount": 90}
+	],
+	"category": "turret"
+}

@@ -43,14 +43,14 @@ const script = [
                     "lightConsumer", "lightCombiner", "lightRouter"
                 ]
             },
-            
+
             {
               name: "units",
               childs: [
                 "ai"
               ]
             },
-            
+
             "sounds",
             "effects",
             "extraeffects",
@@ -74,7 +74,7 @@ const script = [
             "shieldbulletlib"*/
         ]
     },
-    
+
     {
         name: "global",
         childs: [
@@ -173,7 +173,7 @@ const script = [
             }
         ]
     },
-    
+
     {
         name: "imber",
         childs: [
@@ -213,6 +213,7 @@ const script = [
                     "laser",
                     "lasercharge",
                     "laserfrost",
+                    "laserbt",
                     "inferno"
                 ]
             },
@@ -332,7 +333,7 @@ const script = [
                     "crucible"
                 ]
             },
-			
+
             {
                 name: "defense",
                 childs: [

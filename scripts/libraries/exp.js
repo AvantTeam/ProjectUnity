@@ -68,6 +68,7 @@ module.exports = {
         obj = Object.assign({
             //start
             maxLevel: 20,
+            fakeMaxLevel: 59999,
             level0Color: Pal.accent,
             levelMaxColor: Color.valueOf("fff4cc"),
             exp0Color: Color.valueOf("84ff00"),
@@ -185,8 +186,8 @@ module.exports = {
             setBars() {
                 this.super$setBars();
                 this.bars.add("level", func(build => {
-                    return new Bar(prov(() => Core.bundle.get("explib.level") + " " + this.getLevel(build.totalExp())), prov(() => Tmp.c1.set(this.level0Color).lerp(this.levelMaxColor, this.getLevel(build.totalExp()) / this.maxLevel)), floatp(() => {
-                        return this.getLevel(build.totalExp()) / this.maxLevel;
+                    return new Bar(prov(() => Core.bundle.get("explib.level") + " " + this.getLevel(build.totalExp())), prov(() => Tmp.c1.set(this.level0Color).lerp(this.levelMaxColor, Mathf.clamp(this.getLevel(build.totalExp()) / this.fakeMaxLevel))), floatp(() => {
+                        return Mathf.clamp(this.getLevel(build.totalExp()) / this.fakeMaxLevel);
                     }));
                 }));
                 this.bars.add("exp", func(build => {
@@ -250,6 +251,8 @@ module.exports = {
         expblock.hasCache = (expblock.caches.length > 0);
 
         expblock.enableUpgrade = (expblock.upgrades.length > 0);
+
+        expblock.fakeMaxLevel = Math.min(expblock.fakeMaxLevel, expblock.maxLevel);
         /*for(var i = 0; i < expblock.upgrades.length; i++) {
             var tobj = expblock.upgrades[i];
             expblock.upBlock.push((tobj.block == undefined) ? Blocks.router : tobj.block);
