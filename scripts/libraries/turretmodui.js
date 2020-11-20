@@ -1,13 +1,58 @@
 
 //imports
 importPackage(Packages.arc.graphics.gl);
-
+importPackage(Packages.arc.input);
 const graphLib = require("libraries/graphlib");
 //credit to younggam setting example of how to build new overlay resrouce(heat) and deltanedas for example of block graph system via phase router.
 print("youndcha test2")
 //ui test, if sucessful will be moved to seperate js file
 importPackage(Packages.arc.util.pooling);
 importPackage(Packages.arc.scene);
+
+
+const _dirs = [
+	{
+        x: 1,
+        y: 0
+    },
+    {
+        x: 0,
+        y: 1
+    },
+    {
+        x: -1,
+        y: 0
+    },
+    {
+        x: 0,
+        y: -1
+    }
+
+];
+
+function getConnectSidePos(index, sizew,sizeh) {
+	if(sizew==1&&sizeh==1){
+		return {x:0 ,y:0, dir:{x:_dirs[index].x,y:_dirs[index].y}}
+	}
+    let cind = index-sizeh;
+	let lstsub = sizeh;
+	let gx = sizew-1;
+	let gy = 0;
+	let side = 0;
+	let forwarddir = _dirs[3];
+	while(cind>=0){
+		side++;
+		gx+=forwarddir.x*(lstsub-1);
+		gy+=forwarddir.y*(lstsub-1);
+		forwarddir = _dirs[3-side];
+		lstsub = side%2==1?sizew:sizeh;
+		cind-=lstsub;
+	}
+	gx+=forwarddir.x*(cind+lstsub);
+	gy+=forwarddir.y*(cind+lstsub);
+	let pdir = _dirs[(side)%4];
+	return {x:gx ,y:gy, dir:{x:pdir.x,y:pdir.y}};
+}
 
 function _getRegionRect(region, x, y, rw, rh, w, h) {
 	if (!region) {
@@ -106,7 +151,12 @@ function getStackedBarChart(pheight, datafunction, partsImage) {
 
 const blueprintCol = Color.valueOf("354654");
 const bgCol = Color.valueOf("323232");
-const costaccumrate = 0.5;
+const costaccumrate = 0.2;
+
+const colorPorts = [];
+for(let i =0;i<100;i++){
+	colorPorts.push(Color.HSVtoRGB(360.0 * Mathf.random(), 100 * Mathf.random(0.3, 1), 100 * Mathf.random(0.9,1), 1.0));
+}
 
 const modularConstructorUI = {
 	_prefHeight: 100,
@@ -114,7 +164,9 @@ const modularConstructorUI = {
 	_partsSelect: null,
 	_costAccum: 1.0,
 	_onTileAction: null,
-	_PartList: [], //just store in list instead of grid h.
+	_PartList: [], 
+	_RootList: [],
+	//just store in list instead of grid h.
 	//ok i actualy need a grid now fk.
 	_Grid:[],
 	_gridW: 1,
@@ -125,11 +177,8 @@ const modularConstructorUI = {
 	//Ui
 	_isClickedRN: false,
 	_hover:null,
+	_dragButtn:null,
 
-	fireClick() {
-		this.super$fireClick();
-		print("hello");
-	},
 	draw() {
 		let amx = this.x + this.width * 0.5;
 		let amy = this.y + this.height * 0.5;
@@ -145,7 +194,14 @@ const modularConstructorUI = {
 		Draw.color();
 		for (let i = 0; i < this._PartList.length; i++) {
 			let p = this._PartList[i];
+			if(!p.valid){
+				Draw.color(p.flash%10<5? Color.pink: Color.white);
+				p.flash++;
+			}else{
+				Draw.color();
+			}
 			Draw.rect(p.part.texRegion, p.x*32 + gamx + (p.part.tw*16), p.y*32 + gamy + (p.part.th*16), p.part.tw*32, p.part.th*32);
+			this.drawOpenConnectionPorts(p.part,p.x,p.y,gamx,gamy);
 		}
 		Draw.color(Color.black);
 		Fill.rect(this.x + 20, this.y + 20, 40, 40);
@@ -156,11 +212,45 @@ const modularConstructorUI = {
 				let ps = this._partsSelect;
 				Draw.color(this.canPlace(ps,this._hover.x,this._hover.y)?Color.white:Color.red,0.3);
 				Draw.rect(ps.texRegion, this._hover.x*32 + gamx + (ps.tw*16), this._hover.y*32 + gamy + (ps.th*16), ps.tw*32, ps.th*32);
+				this.drawOpenConnectionPorts(ps,this._hover.x,this._hover.y,gamx,gamy);
 			}
 		}
 		
 
 	},
+	
+	drawOpenConnectionPorts(ps,x,y,offx,offy){
+		for(let o =0;o<ps.connInList.length;o++){
+			let conout = ps.connInList[o];
+			let opcx = x+conout.x+conout.dir.x;
+			let opcy = y+conout.y+conout.dir.y;
+			if(!this.getPartAt(opcx, opcy)){
+				let brcx = (opcx-conout.dir.x*0.5 + 0.5)*32 + offx;
+				let brcy = (opcy-conout.dir.y*0.5 + 0.5)*32 + offy;
+				Draw.color(Color.black);
+				Fill.square(brcx, brcy, 6, 45);
+				Draw.color(colorPorts[ps.connInList[o].id-1]);
+				Fill.square(brcx, brcy, 2, 45);
+				Draw.color();
+			}
+		}
+		for(let o =0;o<ps.connOutList.length;o++){
+			let conout = ps.connOutList[o];
+			let opcx = x+conout.x+conout.dir.x;
+			let opcy = y+conout.y+conout.dir.y;
+			if(!this.getPartAt(opcx, opcy)){
+				let brcx = (opcx-conout.dir.x*0.5 + 0.5)*32 + offx;
+				let brcy = (opcy-conout.dir.y*0.5 + 0.5)*32 + offy;
+				Draw.color(Color.black);
+				Fill.square(brcx, brcy, 6, 45);
+				Draw.color(colorPorts[ps.connOutList[o].id-1]);
+				Lines.stroke(2.0);
+				Lines.poly(brcx, brcy,4, 3, 0);
+				Draw.color();
+			}
+		}
+	},
+	
 	getPrefHeight() {
 		return this._prefHeight;
 	},
@@ -180,6 +270,9 @@ const modularConstructorUI = {
 		return !(x < 0 || x + w > this._gridW || y < 0 || y + h > this._gridH);
 	},
 	canPlace(partType, x, y) {
+		return this.canPlaceConn(partType, x, y,true);
+	},
+	canPlaceConn(partType, x, y, chkConnection) {
 		if (!this.inBounds(partType,x,y)) {
 			return false;
 		}
@@ -190,34 +283,164 @@ const modularConstructorUI = {
 				}
 			}
 		}
-		
 		//conection
-		
+		if(chkConnection){
+			let hasConnection = partType.connInList.length==0;
+			let cin = partType.connInList;
+			for (let i = 0; i < cin.length; i++) {
+				let frompart = this.getPartAt(x+cin[i].x+cin[i].dir.x,y+cin[i].y+cin[i].dir.y);
+				if(frompart){
+					hasConnection= hasConnection|| this.partCanConnectOut(frompart,cin[i].x+x,cin[i].y+y,cin[i].id);
+				}
+			}
+			if(!hasConnection){ // check childs
+				let cout = partType.connOutList;
+				for (let i = 0; i < cout.length; i++) {
+					let frompart = this.getPartAt(x+cout[i].x+cout[i].dir.x,y+cout[i].y+cout[i].dir.y);
+					if(frompart){
+						hasConnection= hasConnection|| this.partCanConnectIn(frompart,cout[i].x+x,cout[i].y+y,cout[i].id);
+					}
+				}
+			}
+			return hasConnection;
+		}
+		return true;
+	},
+	floodFrom(part){
+		let visited =ObjectSet.with(part);
+		let toVisit = [];
+		let index = 0;
+		for (let i = 0; i < part.parents.length; i++) {
+			toVisit.push(part.parents[i]);
+		}
+		for (let i = 0; i < part.children.length; i++) {
+			toVisit.push(part.children[i]);
+		}
+		while(index<toVisit.length){
+			let cpart = toVisit[index];
+			visited.add(cpart);
+			for (let i = 0; i < cpart.parents.length; i++) {
+			if(!visited.contains(cpart.parents[i])){
+					toVisit.push(cpart.parents[i]);
+				}
+			}
+			for (let i = 0; i < cpart.children.length; i++) {
+				if(!visited.contains(cpart.children[i])){
+					toVisit.push(cpart.children[i]);
+				}
+			}
+			index++;
+		}
+		return visited;
+	},
+	rebuildFromRoots(){
+		for (let i = 0; i < this._PartList.length; i++) {
+			this._PartList[i].valid = false;
+		}
+		for (let i = 0; i < this._RootList.length; i++) {
+			let k = this.floodFrom(this._RootList[i]);
+			k.each(cons(part => {
+				part.valid = true;
+			}));
+		}
+	},
+	removeTile(part) {
+		if(!part||part.part.isRoot){return false;}
+		let prt = part.part;
+		//the children must perish.
+		for (let i = 0; i < part.parents.length; i++) {
+			for (let j = 0; j < part.parents[i].children.length; j++) {
+				if(part.parents[i].children[j] == part){
+					part.parents[i].children.splice(j,1);
+					break;
+				}
+			}
+		}	
+		for(let px =0;px<prt.tw;px++){
+			for(let py =0;py<prt.th;py++){
+				this.setGrid(null,part.x+px,part.y+py);
+			}
+		}
+		for (let i = 0; i < this._PartList.length; i++) {
+			if(this._PartList[i]==part){
+				this._PartList.splice(i,1);
+				break;
+			}
+		}
+		this.rebuildFromRoots();
+		this._costAccum -= costaccumrate*prt.tw*prt.th;
 		return true;
 	},
 	placeTile(partType, x, y) {
 		if (!this.canPlace(partType,x,y)) {
 			return false;
 		}
+		this.placeTileDirect(partType, x, y);
+		return true;
+	},
+	placeTileNoConn(partType, x, y) {
+		if (!this.canPlaceConn(partType,x,y,false)) {
+			return false;
+		}
+		this.placeTileDirect(partType, x, y);
+		return true;
+	},
+	placeTileDirect(partType, x, y) {
+		
 		let partPlaceobj = {
 			x: x,
 			y: y,
-			part: partType
+			valid:false,
+			flash:0,
+			part: partType,
+			parents: [],
+			children: [],
 		};
+		let cin = partType.connInList;
+		for (let i = 0; i < cin.length; i++) {
+			let frompart = this.getPartAt(x+cin[i].x+cin[i].dir.x,y+cin[i].y+cin[i].dir.y);
+			if(frompart){
+				if(this.partCanConnectOut(frompart,cin[i].x+x,cin[i].y+y,cin[i].id)){
+					partPlaceobj.parents.push(frompart);
+					frompart.children.push(partPlaceobj);
+				}
+			}
+		}
+		let cout = partType.connOutList;
+		for (let i = 0; i < cout.length; i++) {
+			let frompart = this.getPartAt(x+cout[i].x+cout[i].dir.x,y+cout[i].y+cout[i].dir.y);
+			if(frompart){
+				if(this.partCanConnectIn(frompart,cout[i].x+x,cout[i].y+y,cout[i].id)){
+					partPlaceobj.children.push(frompart);
+					frompart.parents.push(partPlaceobj);
+				}
+			}
+		}
+		
+		
 		for(let px =0;px<partType.tw;px++){
 			for(let py =0;py<partType.th;py++){
 				this.setGrid(partPlaceobj,x+px,y+py);
 			}
 		}
-		
+		if(partType.isRoot){
+			this._RootList.push(partPlaceobj);
+		}
 		this._PartList.push(partPlaceobj);
-		this._costAccum += costaccumrate;
+		this.rebuildFromRoots();
+		this._costAccum += costaccumrate*partType.tw*partType.th;
 		return true;
 	},
 	onIsClicked(event, x, y, point, butt) {
 		this._isClickedRN = true;
 		let gpos = this.uiToGridPos(x, y);
-		let success = this.placeTile(this._partsSelect, gpos.x, gpos.y);
+		let success = false;
+		if(butt==KeyCode.mouseRight){
+			success = this.removeTile(this.getPartAt(gpos.x, gpos.y));
+		}else{
+			success = this.placeTile(this._partsSelect, gpos.x, gpos.y);
+		}
+		this._dragButtn=butt;
 		if (this._onTileAction&&success) {
 			this._onTileAction.run();
 		}
@@ -228,7 +451,12 @@ const modularConstructorUI = {
 	onIsDragged(event, x, y, point, butt) {
 		if (this._isClickedRN) {
 			let gpos = this.uiToGridPos(x, y);
-			let success = this.placeTile(this._partsSelect, gpos.x, gpos.y);
+			let success = false;
+			if(butt==KeyCode.mouseRight){
+				success = this.removeTile(this.getPartAt(gpos.x, gpos.y));
+			}else{
+				success = this.placeTile(this._partsSelect, gpos.x, gpos.y);
+			}
 			if (this._onTileAction&&success) {
 				this._onTileAction.run();
 			}
@@ -261,7 +489,7 @@ const modularConstructorUI = {
 				that.onIsReleased(event, x, y, pointer, button);
 			},
 			touchDragged(event, x, y, pointer) {
-				that.onIsDragged(event, x, y, pointer, null);
+				that.onIsDragged(event, x, y, pointer, that._dragButtn);
 			}
 		}));
 	},
@@ -284,6 +512,27 @@ const modularConstructorUI = {
 		}
 		return this._Grid[x][y]?this._Grid[x][y]:null;
 	},
+	partCanConnect(part,x, y, portid) {
+		let cout = part.part.connOutList;
+		for (let i = 0; i < cout.length; i++) {
+			if(cout[i].id==portid && x == part.x+cout[i].x+cout[i].dir.x && y == part.y+cout[i].y+cout[i].dir.y){return true;}
+		}
+		return false;
+	},
+	partCanConnectOut(part,x, y, portid) {
+		let cout = part.part.connOutList;
+		for (let i = 0; i < cout.length; i++) {
+			if(cout[i].id==portid && x == part.x+cout[i].x+cout[i].dir.x && y == part.y+cout[i].y+cout[i].dir.y){return true;}
+		}
+		return false;
+	},
+	partCanConnectIn(part,x, y, portid) {
+		let cout = part.part.connInList;
+		for (let i = 0; i < cout.length; i++) {
+			if(cout[i].id==portid && x == part.x+cout[i].x+cout[i].dir.x && y == part.y+cout[i].y+cout[i].dir.y){return true;}
+		}
+		return false;
+	},
 	uiToGridPos(x, y) {
 		let gw = this._gridW * 32;
 		let gh = this._gridH * 32;
@@ -301,7 +550,29 @@ const modularConstructorUI = {
 		this._gridW = w;
 		this._gridH = h;
 	},
-
+	getPackedSave(){
+		let packer = IntPacker.new();
+		for(let px =0;px<this._gridW;px++){
+			for(let py =0;py<this._gridH;py++){
+				let p = this.getPartAt(px,py);
+				if(p){
+					packer.add(p.part.id+1);
+				}else{
+					packer.add(0);
+				}
+			}
+		}
+		return packer.end();
+	},
+	loadSave(array, partlist){
+		if(!array){return;}
+		for(let i = 0 ;i< array.length;i++){
+			if(array[i]==0){continue;}
+			let px = Math.floor(i/this._gridH);
+			let py = i%this._gridH;
+			this.placeTileNoConn(partlist[array[i]-1],px,py);
+		}
+	},
 	getCostAccum() {
 		return this._costAccum;
 	},
@@ -311,7 +582,10 @@ const modularConstructorUI = {
 	setPartSelect(s) {
 		print("PART SELECT:" + s.name);
 		this._partsSelect = s;
-	}
+	},
+	setPreconfig(s) {
+		//this._partsSprite = s;
+	},
 }
 
 function getModularConstructorUI(pheight, partssprite,partsConfig,preconfig, maxw, maxh) {
@@ -320,14 +594,17 @@ function getModularConstructorUI(pheight, partssprite,partsConfig,preconfig, max
 	pp.setPrefHeight(pheight);
 	pp.setPartsSprite(partssprite);
 	pp.setGridSize(maxw, maxh);
-	for (let i = 0; i < partsConfig.length; i++) {
-		let pinfo = partsConfig[i];
-		if(pinfo.prePlace){
-			pp.placeTile(pinfo, pinfo.prePlace.x, pinfo.prePlace.y);
-		}
+	if(!preconfig || !preconfig.length){
+		for (let i = 0; i < partsConfig.length; i++) {
+			let pinfo = partsConfig[i];
+			if(pinfo.prePlace){
+				pp.placeTile(pinfo, pinfo.prePlace.x, pinfo.prePlace.y);
+			}
+		}	
+	}else{
+		pp.loadSave(preconfig,partsConfig);
 	}
 	return pp;
-
 }
 
 function addConsButton(table, consFunc, style, runnable) {
@@ -387,6 +664,37 @@ partsConfig format:
 ]
  */
 function applyModularConstructorUI(table, partssprite, spritew, spriteh, partsConfig, maxw, maxh, preconfig) {
+	//preinit 
+	for (let i = 0; i < partsConfig.length; i++) {
+		partsConfig[i].id = i;
+		let pinfo = partsConfig[i];
+		if(!pinfo.connInList){
+			let tmp = [];
+			for (let i = 0; i < pinfo.connectIn.length; i++) {
+				if(pinfo.connectIn[i]!=0){
+					let t2 = getConnectSidePos(i,pinfo.tw,pinfo.th);
+					t2.id = pinfo.connectIn[i];
+					tmp.push(t2);
+				}
+			}
+			pinfo.connInList = tmp;
+		}
+		if(!pinfo.connOutList){
+			let tmp = [];
+			for (let i = 0; i < pinfo.connectOut.length; i++) {
+				if(pinfo.connectOut[i]!=0){
+					let t2 = getConnectSidePos(i,pinfo.tw,pinfo.th);
+					t2.id = pinfo.connectOut[i];
+					tmp.push(t2);
+				}
+			}
+			pinfo.connOutList = tmp;
+		}
+	}
+	
+	
+	
+	
 	let modelement = getModularConstructorUI(400, partssprite,partsConfig,preconfig, maxw, maxh);
 	let itemcache = {};
 
@@ -395,7 +703,6 @@ function applyModularConstructorUI(table, partssprite, spritew, spriteh, partsCo
 			scrolltbl.clearChildren();
 			scrolltbl.top().left();
 			for (let i = 0; i < partsConfig.length; i++) {
-				partsConfig[i].id = i;
 				let pinfo = partsConfig[i];
 				if(pinfo.cannotPlace){
 					pinfo.texRegion = _getRegionRect(partssprite, pinfo.tx, pinfo.ty, pinfo.tw, pinfo.th, spritew, spriteh);
@@ -482,8 +789,207 @@ function applyModularConstructorUI(table, partssprite, spritew, spriteh, partsCo
 	rebuildParts.run();
 	rebuildTotals.run();
 	
+	return modelement;
+}
+const _ModularBlock = {
+	gridW: 1,
+	gridH: 1,
+	getGridWidth(){return this.gridW;},
+	setGridWidth(s){this.gridW=Math.min(16,s);},
+	getGridHeight(){return this.gridH;},
+	setGridHeight(s){this.gridH=Math.min(16,s);},
+	
+	setConfigs(){
+		this.config(java.lang.String, (a,b) => a.setBlueprintFromString(b));
+        this.configClear((tile) => tile.setBlueprint(null));
+	},
 	
 }
+
+const _ModularBuild ={
+	_blueprint: null,
+	_blueprintRemainingCost: null,
+	_buffer: null,
+	setBlueprintFromString(s){
+		this._blueprint=unpackIntsFromString(s);
+	},
+	setBlueprint(s){
+		this._blueprint=s;
+	},
+	getBlueprint(s){
+		return this._blueprint;
+	},
+	getBufferRegion(){
+		if(!this._buffer){return null;}
+		return Draw.wrap(this._buffer.getTexture());
+	},
+	getPartsConfig(){
+		
+	},
+	getPartsAtlas(){
+		
+	},
+	drawPartBuffer(part,x,y,grid){
+		Draw.rect(part.texRegion,(x+part.tw*0.5)*32,(y+part.th*0.5)*32,part.tw*32,part.th*32);
+	},
+	buildConfiguration(table) {
+		let buttoncell = table.button(Tex.whiteui, Styles.clearTransi, 50, run(() => {
+			let dialog = new BaseDialog("Edit Blueprint");
+            dialog.setFillParent(false);
+			var patlas = this.getPartsAtlas();
+			let mtd = applyModularConstructorUI(dialog.cont,patlas,Math.round(patlas.width/32),Math.round(patlas.height/32),this.getPartsConfig(),this.block.getGridWidth(),this.block.getGridHeight(),this._blueprint);
+			dialog.buttons.button("@ok", () => {
+				this.configure(mtd.getPackedSave());
+				dialog.hide();
+			}).size(130.0, 60.0);
+			dialog.update(() => {
+				if(!this.tile.bc()||!this.tile.bc().getBlueprint){
+					dialog.hide();
+				}
+			});
+			dialog.show();
+		
+		
+		
+		}));
+		buttoncell.size(50);
+		buttoncell.get().getStyle().imageUp = Icon.pencil;
+	},
+	configured(player, value) {
+		if(!Array.isArray(value)){
+			this.setBlueprintFromString(value);
+		}else{
+			this._blueprint= unpackInts(value);
+		}
+		print(this._blueprint);
+		let totalcst = [];
+		for(var p = 0;p<this._blueprint.length;p++){
+			if(this._blueprint[p]!=0){
+				
+			}
+		}
+		this._blueprintRemainingCost = totalcst;
+		Draw.draw(Draw.z(), () => {
+			Tmp.m1.set(Draw.proj());
+			if(!this._buffer){
+				this._buffer = new FrameBuffer(this.block.getGridWidth()*32, this.block.getGridHeight()*32);
+			}
+			Draw.proj(0, 0, this.block.getGridWidth()*32, this.block.getGridHeight()*32);
+			this._buffer.begin(Color.clear);
+			Draw.color(Color.white);
+			for(var p = 0;p<this._blueprint.length;p++){
+				if(this._blueprint[p]==0){continue;}
+				let px = Math.floor(p/this.block.getGridHeight());
+				let py = (p%this.block.getGridHeight());
+				this.drawPartBuffer(this.getPartsConfig()[this._blueprint[p]-1],px,py,null);
+			}
+			this._buffer.end();
+			Draw.proj(Tmp.m1);
+			Draw.reset();
+		});
+		
+	},
+	config(){
+		if(!this._blueprint){return new String("")}
+		var tmp = _packArray(this._blueprint);
+		return tmp.toStringPack();
+	},
+}
+
+
+
+
+const IntPacker={
+	packed:[],
+	raw:[],
+	prev:-1,
+	count:0,
+	highi:false,
+	packindex:-1,
+	new(){
+		return deepCopy(Object.create(IntPacker));
+	},
+	add(bytef){
+		if(bytef!=this.prev){
+			if(this.prev!=-1){
+				if(!this.highi){
+					this.packed.push(0);
+					this.packindex++;
+				}
+				this.raw.push(this.count);
+				this.raw.push(this.prev);
+				let comb = this.prev+this.count*256;
+				this.packed[this.packindex]+= comb<<(this.highi?16:0);
+				this.highi = !this.highi;
+			}
+			this.count=1;
+			this.prev = bytef;
+		}else{
+			this.count++;
+		}
+	},
+	end(){
+		if(this.prev!=-1){
+			if(!this.highi){
+				this.packed.push(0);
+				this.packindex++;
+			}
+			this.raw.push(this.count);
+			this.raw.push(this.prev);
+			let comb = this.prev+this.count*256;
+			this.packed[this.packindex]+= comb<<(this.highi?16:0);
+			this.highi = !this.highi;
+		}
+		return this.packed;
+	},
+	toStringPack(){
+		var str = "";
+		for(var i = 0;i<this.raw.length;i++){
+			str +=String.fromCharCode(this.raw[i]);
+		}
+		return new String(str);
+	}
+	
+	
+	
+}
+function _packArray(a){
+	var packer = IntPacker.new();
+	var i = 0;
+	for(;i<a.length;i++){
+		packer.add(a[i]);
+	}
+	packer.end();
+	return packer;
+	
+}
+
+function unpackInts(intpack){
+	let out = [];
+	for(let i =0;i<intpack.length*2;i++){
+		let cint = intpack[Math.floor(i/2)];
+		let value = (cint>>(i%2==0?0:16))&65535;
+		let val = value&255;
+		let am = (value>>8)&255;
+		for(let k =0;k<am;k++){
+			out.push(val);
+		}
+	}
+	return out;
+}
+function unpackIntsFromString(sintpack){
+	let out = [];
+	let str = ""+sintpack;
+	for(let i =0;i<str.length;i+=2){
+		let val = str.charCodeAt(i+1);
+		let am = str.charCodeAt(i);
+		for(let k =0;k<am;k++){
+			out.push(val);
+		}
+	}
+	return out;
+}
+
 
 function deepCopy(obj) {
 	var clone = {};
@@ -531,6 +1037,13 @@ function _drawTile(region, x, y, w, h, rot, tile) {
 }
 
 module.exports = {
+	ModularBlock:_ModularBlock,
+	ModularBuild:_ModularBuild,
+	dcopy2:deepCopy,
+	IntPack:IntPacker,
+	unpack:unpackInts,
+	unpackFromString:unpackIntsFromString,
+	packArray: _packArray,
 	drawTile: _drawTile,
 	getRegion: _getRegion,
 	getConstructorUi: getModularConstructorUI,
