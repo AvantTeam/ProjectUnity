@@ -104,14 +104,14 @@ const chargeLaser = extend(BulletType, {
 
             hit.collision(b, hit.x, hit.y);
             b.collision(hit, hit.x, hit.y);
-            b.owner.incExp(2);
+            b.owner.incExp(1);
         }else if(target instanceof Building){
             var tile = target;
 
             if(tile.collide(b)){
                 tile.collision(b);
                 this.hit(b, tile.x, tile.y);
-                b.owner.incExp(2);
+                b.owner.incExp(1);
             }
         }else{
             b.data = new Vec2().trns(b.rotation(), this.length).add(b.x, b.y);
@@ -134,12 +134,14 @@ const chargeLaser = extend(BulletType, {
             Lines.stroke(b.fout() * 2);
 
             Draw.color(bcolor);
-            var h = new Effect(lifetime * 9 / 4, b1 => {
+            /*var h = new Effect(lifetime * 9 / 4, b1 => {
                 Lines.stroke(b.fout() * 2);
                 Draw.color(bcolor);
                 Lines.circle(b1.x, b1.y, (4 + b.finpow() * 65) * sizemulti)
             });
-            h.at(Tmp.v1.x, Tmp.v1.y);
+            h.at(Tmp.v1.x, Tmp.v1.y);*/
+            //이 미친 짓을 다시 하면 님 남은 수명을 미분해버릴 테니 그리 아쇼;
+            Lines.circle(Tmp.v1.x, Tmp.v1.y, (4 + b.finpow() * 65) * sizemulti);
 
             for(var i = 0; i < 4; i++){
                 Drawf.tri(Tmp.v1.x, Tmp.v1.y, 6, 100 * b.fout() * sizemulti, i * 90);
@@ -174,23 +176,26 @@ const chargeLaser = extend(BulletType, {
 
         Effect.shake(this.hitShake, this.hitShake, b);
 
+        var target = Damage.linecast(b, b.x, b.y, b.rotation(), this.length);//제에ㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔ발 밖으로 뺄 수 있는건 밖으로.
+        b.data = target;
+
         for(var i = 0; i < this.fragBullets; i++){
             var len = Mathf.random(1, 7);
-            var a = b.rotation() + i * 45;
-            var target = Damage.linecast(b, b.x, b.y, b.rotation(), this.length);
+            var a = b.rotation() + i * 120;
 
-            b.data = target;
 
             if(target instanceof Hitboxc){
                 var hit = target;
                 this.fragBullet.create(b, hit.x + Angles.trnsx(a, len), hit.y + Angles.trnsy(a, len), a);
 
-            }else if(target instanceof Building){
+            }
+            else if(target instanceof Building){
                 var tile = target;
                 if(tile.collide(b)){
                     this.fragBullet.create(b, tile.x + Angles.trnsx(a, len), tile.y + Angles.trnsy(a, len), a);
                 }
-            } else {
+            }
+            else{
                 b.data = new Vec2().trns(b.rotation(), this.length).add(b.x, b.y);
                 var bdata = b.data;
                 Tmp.v1.set(bdata);
@@ -210,7 +215,7 @@ const steleBullet = extend(BasicBulletType, { //i hope he won't blame me.. lol
         b.data.draw(this.frontColor, this.width);
 
         Draw.color(this.frontColor);
-        Fill.square(b.x, b.y, this.width)
+        Fill.square(b.x, b.y, this.width, b.rotation() + 45);
         Draw.color();
     },
 
@@ -229,11 +234,11 @@ const steleBullet = extend(BasicBulletType, { //i hope he won't blame me.. lol
 steleBullet.frontColor = Pal.lancerLaser;
 steleBullet.backColor = Pal.lancerLaser.cpy().mul(0.7);
 steleBullet.width = steleBullet.height = 2;
-steleBullet.weaveScale = 2.5;
-steleBullet.weaveMag = 4;
-steleBullet.homingPower = 1;
+steleBullet.weaveScale = 0.6;
+steleBullet.weaveMag = 0.5;
+steleBullet.homingPower = 0.4;
 steleBullet.speed = 3.5;
-steleBullet.lifetime = 60;
+steleBullet.lifetime = 30;
 steleBullet.damage = 6;
 steleBullet.shootEffect = Fx.hitLancer;
 steleBullet.hitEffect = fragHit;
@@ -257,7 +262,8 @@ chargeLaser.width = 0.7;
 chargeLaser.length = 150;
 chargeLaser.hittable = false;
 chargeLaser.hitEffect = Fx.hitLiquid;
-chargeLaser.fragBullet = steleBullet
+chargeLaser.fragBullet = steleBullet;
+chargeLaser.fragBullets = 3;
 chargeLaser.shootEffect = Fx.hitLiquid;
 
 const laserSwarmerTurret = lib.extend(ChargeTurret, ChargeTurret.ChargeTurretBuild, "swarm-laser-turret", {
