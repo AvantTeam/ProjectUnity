@@ -213,6 +213,7 @@ const script = [
                     "laser",
                     "lasercharge",
                     "laserfrost",
+                    "laserswarmer",
                     "laserbt",
                     "inferno"
                 ]

@@ -182,6 +182,10 @@ const chargeLaserTurret = lib.extend(ChargeTurret, ChargeTurret.ChargeTurretBuil
     fakeMaxLevel: 15,
     upgrades: [
         {
+            block: "unity-swarm-laser-turret",
+            min: 15
+        },
+        {
             block: "unity-bt-laser-turret",
             min: 30
         }

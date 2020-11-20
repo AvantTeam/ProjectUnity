@@ -1,6 +1,6 @@
 {
 	"size": 2,
-	"health": 800,
+	"health": 1000,
 	"range": 160,
 	"reloadTime": 80,
   "consumes":{
