@@ -11,26 +11,26 @@ module.exports = {
 	//recoded drawer found in UnitType, but without the applyColor function. doesnt draw outlines, only used for certain effects.
 	simpleUnitDrawer(unit, drawLegs){
 		var type = unit.type;
-		
+
 		if(drawLegs){
 			//TODO draw legs
 			if(unit instanceof Mechc){
-				
+
 			};
 		};
-		
+
 		Draw.rect(type.region, unit.x, unit.y, unit.rotation - 90);
-		
+
 		for(var i = 0; i < unit.mounts.length; i++){
 			var mount = unit.mounts[i];
 			var weapon = mount.weapon;
-			
+
 			var rotation = unit.rotation - 90;
 			var weaponRotation = rotation + (weapon.rotate ? mount.rotation : 0);
 			var recoil = -((mount.reload) / weapon.reload * weapon.recoil);
 			var wx = unit.x + Angles.trnsx(rotation, weapon.x, weapon.y) + Angles.trnsx(weaponRotation, 0, recoil);
 			var wy = unit.y + Angles.trnsy(rotation, weapon.x, weapon.y) + Angles.trnsy(weaponRotation, 0, recoil);
-			
+
 			Draw.rect(weapon.region,
 			wx, wy,
 			weapon.region.width * Draw.scl * -Mathf.sign(weapon.flipSprite),
@@ -38,14 +38,15 @@ module.exports = {
 			weaponRotation);
 		};
 	},
+
 	trueEachBlock(wx, wy, range, conss){
 		collidedBlocks.clear();
 		var tx = Vars.world.toTile(wx);
 		var ty = Vars.world.toTile(wy);
-		
+
 		var tileRange = Mathf.floorPositive(range / Vars.tilesize + 1);
 		var isCons = (conss instanceof Cons);
-		
+
 		for(var x = -tileRange + tx; x <= tileRange + tx; x++){
 			yGroup:
 			for(var y = -tileRange + ty; y <= tileRange + ty; y++){
@@ -70,19 +71,19 @@ module.exports = {
 	targetUnique(team, x, y, radius, targetSeq){
 		var result = null;
 		var cdist = (radius * radius) + 1;
-		
+
 		Units.nearbyEnemies(team, x - radius, y - radius, radius * 2, radius * 2, e => {
 			if(!e.within(x, y, radius)) return;
-			
+
 			var dst = e.dst2(x, y);
-			
+
 			if(Mathf.dst2(x, y, e.x, e.y) < cdist && !targetSeq.contains(e)){
 				result = e;
 				cdist = dst;
 			};
 		});
 		if(result == null) result = targetSeq.random();
-		
+
 		return result;
 	},
 	collideLineDamageOnly(team, damage, x, y, angle, length, bulletType){
@@ -112,12 +113,12 @@ module.exports = {
 				return false;
 			});
 		};
-		
+
 		rect.setPosition(x, y).setSize(tV.x, tV.y);
-		
+
 		var x2 = tV.x + x;
 		var y2 = tV.y + y;
-		
+
 		if(rect.width < 0){
 			rect.x += rect.width;
 			rect.width *= -1;
@@ -126,14 +127,14 @@ module.exports = {
 			rect.y += rect.height;
 			rect.height *= -1;
 		};
-		
+
 		const expand = 3;
-		
+
 		rect.y -= expand;
 		rect.x -= expand;
 		rect.width += expand * 2;
 		rect.height += expand * 2;
-		
+
 		Units.nearbyEnemies(team, rect, e => {
 			if(!e.checkTarget(bulletType.collidesAir, bulletType.collidesGround)) return;
 
@@ -149,7 +150,7 @@ module.exports = {
 			};
 		});
 	},
-	
+
 	chanceMultiple(chance, runF){
 		var intC = Mathf.ceil(chance);
 		var tmp = chance;
@@ -164,10 +165,10 @@ module.exports = {
 			};
 		};
 	},
-	
+
 	customValue(method){
-		return new StatValue(){
+		return extend(StatValue, {
 			display: method
-		}
+		});
 	}
 };
