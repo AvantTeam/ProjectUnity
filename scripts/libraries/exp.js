@@ -469,7 +469,7 @@ module.exports = {
             },
             makeUpgradeButton(t, id, lvl){
                 //print("Made IDButton:" + id);
-                t.button(Icon.upgrade, Styles.cleari, () => {
+                t.button(Icon.up, Styles.cleari, () => {
                     Vars.control.input.frag.config.hideConfig();
                     if(!expblock.useStringSync) this.configure(new Integer(id + 1));
                     else this.configure((id + 1) + "");
@@ -495,6 +495,10 @@ module.exports = {
 
                     if(i < arr.length - 1) table.row();
                 }
+            },
+            shouldShowConfigure(player){
+                if(!expblock.enableUpgrade) return this.super$shouldShowConfigure();
+                return (this.currentUpgrades(this.totalLevel()).length > 0) && this.super$shouldShowConfigure();
             },
             buildConfiguration(table){
                 if(!expblock.enableUpgrade){
