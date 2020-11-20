@@ -178,6 +178,13 @@ const chargeLaserTurret = lib.extend(ChargeTurret, ChargeTurret.ChargeTurretBuil
             start: 60,
             intensity: -1
         }
+    ],
+    fakeMaxLevel: 15,
+    upgrades: [
+        {
+            block: "unity-bt-laser-turret",
+            min: 30
+        }
     ]
 }, {
     getShootColor(lvl){

@@ -150,6 +150,13 @@ const laserTurret = lib.extend(LiquidTurret, LiquidTurret.LiquidTurretBuild, "fr
     maxLevel: 30,
     expFields: [
     ],
+    fakeMaxLevel: 15,
+    upgrades: [
+        {
+            block: "unity-bt-laser-turret",
+            min: 30
+        }
+    ],
     init(){
         this.super$init();
         //this.consumes.powerCond(10, build => build.isActive());
