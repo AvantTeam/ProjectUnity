@@ -497,8 +497,8 @@ module.exports = {
                 }
             },
             shouldShowConfigure(player){
-                if(!expblock.enableUpgrade) return this.super$shouldShowConfigure();
-                return (this.currentUpgrades(this.totalLevel()).length > 0) && this.super$shouldShowConfigure();
+                if(!expblock.enableUpgrade) return this.super$shouldShowConfigure(player);
+                return (this.currentUpgrades(this.totalLevel()).length > 0) && this.super$shouldShowConfigure(player);
             },
             buildConfiguration(table){
                 if(!expblock.enableUpgrade){
