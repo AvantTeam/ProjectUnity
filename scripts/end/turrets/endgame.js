@@ -152,7 +152,8 @@ endgame.buildType = () => {
 			var trueAmount = Mathf.clamp(amount / this._resist, 0, 360);
 			this.super$damage(trueAmount);
 			//this._inv = false;
-			this._resist += 0.25 + Math.max((amount - 560) / 80, 0);
+			this._resist += 0.25 + Math.max((Mathf.clamp(amount, 0, 2147483648) - 560) / 80, 0);
+			if(Number.isNaN(this._resist)) this._resist = 9223372036854775806;
 			this._resistTime = 0;
 		},
 		deltaB(){
@@ -466,7 +467,7 @@ endgame.buildType = () => {
 			};
 		},
 		verify(){
-			return this.health < this._lastHealth - 860;
+			return (this.health < this._lastHealth - 860) || Number.isNaN(this.health);
 		},
 		/*updateShooting(){
 			this.super$updateShooting();
