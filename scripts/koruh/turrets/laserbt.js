@@ -10,28 +10,28 @@ const laserCharge = new Effect(38, e => {
 
 const laserChargeBegin = new Effect(100, 100, e => {
     Draw.color(e.color);
-    Lines.stroke(e.fin() * 2);
-    Lines.circle(e.x, e.y, 4 + e.fout() * 100);
+    Lines.stroke(e.fin() * 3);
+    Lines.circle(e.x, e.y, 4 + e.fout() * 120);
 
-    Fill.circle(e.x, e.y, e.fin() * 20);
+    Fill.circle(e.x, e.y, e.fin() * 23);
 
-    Angles.randLenVectors(e.id, 20, 40 * e.fout(), (x, y) => {
-        Fill.circle(e.x + x, e.y + y, e.fin() * 5);
+    Angles.randLenVectors(e.id, 20, 50 * e.fout(), (x, y) => {
+        Fill.circle(e.x + x, e.y + y, e.fin() * 6);
     });
 
     Draw.color();
 
-    Fill.circle(e.x, e.y, e.fin() * 10);
+    Fill.circle(e.x, e.y, e.fin() * 13);
 });
 
 const laserChargeShoot = new Effect(40, e => {
     Draw.color(e.color);
 
     Lines.stroke(e.fout() * 2.5);
-    Lines.circle(e.x, e.y, e.finpow() * 85);
+    Lines.circle(e.x, e.y, e.finpow() * 100);
 
-    Lines.stroke(e.fout() * 4);
-    Lines.circle(e.x, e.y, e.fin() * 85);
+    Lines.stroke(e.fout() * 5);
+    Lines.circle(e.x, e.y, e.fin() * 100);
 
     Draw.color(e.color, Color.white, e.fout());
 
@@ -60,15 +60,15 @@ const chargeLaser = extend(LaserBulletType, {
         }
     }
 });
-chargeLaser.length = 450;
-chargeLaser.damage = 780;
-chargeLaser.width = 75;
+chargeLaser.length = 500;
+chargeLaser.damage = 1280;
+chargeLaser.width = 80;
 chargeLaser.lifetime = 65;
 chargeLaser.lightningSpacing = 35;
 chargeLaser.lightningLength = 5;
 chargeLaser.lightningDelay = 1.1;
 chargeLaser.lightningLengthRand = 15;
-chargeLaser.lightningDamage = 50;
+chargeLaser.lightningDamage = 90;
 chargeLaser.lightningAngleRand = 40;
 chargeLaser.largeHit = true;
 chargeLaser.lightColor = chargeLaser.lightningColor = Pal.lancerLaser;
