@@ -43,38 +43,38 @@ const script = [
                     "lightConsumer", "lightCombiner", "lightRouter"
                 ]
             },
-
-			{
-				name: "units",
-				childs: [
-					"ai"
-				]
-			},
-
-			"sounds",
-			"effects",
-			"extraeffects",
-			"wavefront",
+            
+            {
+              name: "units",
+              childs: [
+                "ai"
+              ]
+            },
+            
+            "sounds",
+            "effects",
+            "extraeffects",
+            "wavefront",
             "wormlib",
-			"unitlib",
+            "unitlib",
             "copterbase",
             "loader",
             "chainlaser",
             "exp",
             "multi-lib",
-			"status",
-			"funclib",
-			"arena",
-			"rotpowerlib",
-			"heatlib",
-			"cruciblelib",
-			"graphlib",
-			"turretmodui",
-			"unitloader"/*,
+            "status",
+            "funclib",
+            "arena",
+            "rotpowerlib",
+            "heatlib",
+            "cruciblelib",
+            "graphlib",
+            "turretmodui",
+            "unitloader"/*,
             "shieldbulletlib"*/
         ]
     },
-
+    
     {
         name: "global",
         childs: [
@@ -93,8 +93,13 @@ const script = [
             {
                 name: "flying-units",
                 childs: [
-                    "caelifera", "schistocerca", "anthophila", "vespula", "lepidoptera",
-					"angel", "malakhim"
+                    "caelifera",
+                    "schistocerca",
+                    "anthophila",
+                    "vespula",
+                    "lepidoptera",
+                    "angel",
+                    "malakhim"
                 ]
             },
 
@@ -127,22 +132,22 @@ const script = [
         ]
     },
 
-	{
-		name: "scar",
-		childs: [
-			{
-				name: "units",
-				childs: [
-					"hovos",
-					"ryzer",
+    {
+        name: "scar",
+        childs: [
+            {
+                name: "units",
+                childs: [
+                    "hovos",
+                    "ryzer",
 
-					"whirlwind",
-					"jetstream",
-					"vortex"
-				]
-			}
-		]
-	},
+                    "whirlwind",
+                    "jetstream",
+                    "vortex"
+                ]
+            }
+        ]
+    },
 
     {
         name: "dark",
@@ -150,13 +155,13 @@ const script = [
             {
                 name: "turrets",
                 childs: [
-					"apparition",
-					"ghost",
-					"banshee",
+                    "apparition",
+                    "ghost",
+                    "banshee",
 
                     "fallout",
                     "catastrophe",
-					"calamity"
+                    "calamity"
                 ]
             },
 
@@ -168,7 +173,7 @@ const script = [
             }
         ]
     },
-
+    
     {
         name: "imber",
         childs: [
@@ -177,7 +182,7 @@ const script = [
                 childs: [
                     "orb",
                     "shockwire",
-					"current",
+                    "current",
                     "plasma",
                     "shielder"
                 ]
@@ -248,7 +253,8 @@ const script = [
             {
                 name: "turrets",
                 childs: [
-                    "mage", "oracle",
+                    "mage",
+                    "oracle",
                     "spectrum"
                 ]
             },
@@ -256,7 +262,9 @@ const script = [
             {
                 name: "units",
                 childs: [
-                    "stele", "pedestal", "pilaster"
+                    "stele",
+                    "pedestal",
+                    "pilaster"
                 ]
             }
         ]
@@ -269,23 +277,23 @@ const script = [
                 name: "factories",
                 childs: [
                     "terminalcrucible",
-					"endforge"
+                    "endforge"
                 ]
             },
 
-			{
-				name: "turrets",
-				childs: [
-					"endgame"
-				]
-			},
+            {
+                name: "turrets",
+                childs: [
+                    "endgame"
+                ]
+            },
 
-			{
-				name: "units",
-				childs: [
-					"devourer"
-				]
-			}
+            {
+                name: "units",
+                childs: [
+                    "devourer"
+                ]
+            }
         ]
     },
     {
@@ -294,12 +302,12 @@ const script = [
             {
                 name: "distribution",
                 childs: [
-					"heatdistributor",
+                    "heatdistributor",
                     "driveshaft",
                     "inlinegearbox",
                     "shaftrouter",
                     "simpletransmission",
-					"cruciblepump",
+                    "cruciblepump",
                     "mechanicalconveyor"
                 ]
             },
@@ -307,9 +315,9 @@ const script = [
             {
                 name: "generation",
                 childs: [
-					"heatgenerators",
-					"magnets",
-					"torqueinfi",
+                    "heatgenerators",
+                    "magnets",
+                    "torqueinfi",
                     "handcrank",
                     "windturbine",
                     "waterturbine",
@@ -321,7 +329,7 @@ const script = [
                 name: "producers",
                 childs: [
                     "augerdrill",
-					"crucible"
+                    "crucible"
                 ]
             },
 			
