@@ -45,19 +45,19 @@ const script = [
             },
 
             {
-              name: "units",
-              childs: [
-                "ai"
-              ]
+                name: "units",
+                childs: [
+                    "ai"
+                ]
             },
 
             {
-              name: "bullets",
-              childs: [
-                "tractorbeam",
-                "chainlaser",
-                "shieldbullet"
-              ]
+                name: "bullets",
+                childs: [
+                    "tractorbeam",
+                    "chainlaser",
+                    "shieldbullet"
+                ]
             },
 
             "sounds",
@@ -273,7 +273,8 @@ const script = [
                 childs: [
                     "stele",
                     "pedestal",
-                    "pilaster"
+                    "pilaster",
+                    "pylon"
                 ]
             }
         ]
