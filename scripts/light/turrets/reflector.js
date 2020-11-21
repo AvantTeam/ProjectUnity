@@ -57,6 +57,12 @@ lightOvoid.hittable = false;
 //TODO lightConsumer after formatting
 const reflector = extendContent(ChargeTurret, "reflector", {
 	//TODO epic stuff and effects (?)
+  setStats(){
+    this.super$setStats();
+    
+    this.stats.remove(Stat.booster);
+    this.stats.add(Stat.input, new BoosterListValue(shielder.reloadTime, shielder.consumes.get(ConsumeType.liquid).amount, shielder.coolantMultiplier, false, l => shielder.consumes.liquidfilters.get(l.id)));
+  }
 });
 reflector.shootType = lightOvoid;
 reflector.shootSound = Sounds.laser;

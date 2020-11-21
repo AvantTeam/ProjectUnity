@@ -17,7 +17,14 @@ function targetShield(t, b, radius){
 
 const shieldBullet = shildB.newShieldBullet(10, 3000, shieldBreak);
 
-const shielder = extendContent(ChargeTurret, "shielder", {});
+const shielder = extendContent(ChargeTurret, "shielder", {
+  setStats(){
+    this.super$setStats();
+    
+    this.stats.remove(Stat.booster);
+    this.stats.add(Stat.input, new BoosterListValue(shielder.reloadTime, shielder.consumes.get(ConsumeType.liquid).amount, shielder.coolantMultiplier, false, l => shielder.consumes.liquidfilters.get(l.id)));
+  }
+});
 shielder.shootType = shieldBullet;
 shielder.shootSound = loadSound("shielder-shoot");
 shielder.chargeEffect = new Effect(38, e => {
