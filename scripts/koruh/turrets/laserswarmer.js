@@ -60,7 +60,7 @@ const plasmaedEffect = new Effect(50, e => { //TOO MANY LIST DEFINED LOL
 
 const plasmaed = new JavaAdapter(StatusEffect, {}, "plasmaed");
 plasmaed.effectChange = 0.15;
-plasmaed.damage = 2;
+plasmaed.damage = 0.5;
 plasmaed.reloadMultiplier = 0.8;
 plasmaed.healthMultiplier = 0.9;
 plasmaed.damageMultiplier = 0.8;
@@ -72,7 +72,6 @@ const chargeLaser = extend(BulletType, {
     },
 
     getColor(b){
-
         return Tmp.c1.set(Pal.lancerLaser.cpy().lerp(Pal.sapBullet, 0.5)).lerp(Pal.sapBullet, b.owner.totalLevel() / 30);
     },
 
@@ -204,17 +203,19 @@ const chargeLaser = extend(BulletType, {
         }
     }
 });
-const steleBullet = extend(BasicBulletType, { //i hope he won't blame me.. lol
+const steleBullet = new JavaAdapter(BasicBulletType, {//i hope he won't blame me.. lol
     init(b){
         if(typeof(b) !== "undefined"){
             b.data = new Trail(6);
         };
     },
-
+    getColor(b){
+        return Tmp.c1.set(Pal.lancerLaser.cpy().lerp(Pal.sapBullet, 0.5)).lerp(Pal.sapBullet, b.owner.totalLevel() / 30);
+    },
     draw(b){
         b.data.draw(this.frontColor, this.width);
 
-        Draw.color(this.frontColor);
+        Draw.color(this.getColor(b));
         Fill.square(b.x, b.y, this.width, b.rotation() + 45);
         Draw.color();
     },
@@ -230,19 +231,16 @@ const steleBullet = extend(BasicBulletType, { //i hope he won't blame me.. lol
 
         b.data.clear();
     }
-});
+}, 3.5, 15);
 steleBullet.frontColor = Pal.lancerLaser;
 steleBullet.backColor = Pal.lancerLaser.cpy().mul(0.7);
 steleBullet.width = steleBullet.height = 2;
 steleBullet.weaveScale = 0.6;
 steleBullet.weaveMag = 0.5;
 steleBullet.homingPower = 0.4;
-steleBullet.speed = 3.5;
 steleBullet.lifetime = 30;
-steleBullet.damage = 6;
 steleBullet.shootEffect = Fx.hitLancer;
-steleBullet.hitEffect = fragHit;
-steleBullet.despawnEffect = fragHit;
+steleBullet.hitEffect = steleBullet.despawnEffect = fragHit;
 steleBullet.pierceCap = 10;
 steleBullet.pierceBuilding = true;
 steleBullet.splashDamageRadius = 4;
@@ -273,12 +271,18 @@ const laserSwarmerTurret = lib.extend(ChargeTurret, ChargeTurret.ChargeTurretBui
             type: "linear",
             field: "reloadTime",
             start: 90,
-            intensity: -1
+            intensity: -2
+        },
+        {
+            type: "linear",
+            field: "range",
+            start: 20 * 8,
+            intensity: 0.5 * 8
         }
     ]
 }, {
     getShootColor(lvl){
-        return Tmp.c1.set(Pal.lancerLaser).lerp(Pal.sapBullet, lvl / 30);
+        return Tmp.c1.set(Pal.lancerLaser.cpy().lerp(Pal.sapBullet, 0.5)).lerp(Pal.sapBullet, this.totalLevel() / 30);
     },
     shoot(ammo){
         this.useAmmo();
@@ -329,7 +333,6 @@ const laserSwarmerTurret = lib.extend(ChargeTurret, ChargeTurret.ChargeTurretBui
     }
 });
 
-laserSwarmerTurret.range = 155;
 laserSwarmerTurret.chargeTime = 50;
 laserSwarmerTurret.chargeMaxDelay = 30;
 laserSwarmerTurret.chargeEffects = 4;
@@ -349,5 +352,4 @@ laserSwarmerTurret.buildVisibility = BuildVisibility.sandboxOnly;
 laserSwarmerTurret.shots = 4;
 laserSwarmerTurret.burstSpacing = 5;
 laserSwarmerTurret.inaccuracy = 10;
-laserSwarmerTurret.range = 190;
 laserSwarmerTurret.xRand = 10;
