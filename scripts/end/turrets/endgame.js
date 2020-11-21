@@ -292,7 +292,7 @@ endgame.buildType = () => {
 			this._eyesOffset.set(this._eyesOffsetB);
 			this._eyesOffset.add(Mathf.range(this.reload / endgame.reloadTime) / 2, Mathf.range(this.reload / endgame.reloadTime) / 2);
 			this._eyesOffset.limit(2);
-			if((this.target != null || (this.isControlled() && this.unit.isShooting)) && this.consValid() && this.power.status >= 0.0001){
+			if(((this.target != null && !this.isControlled()) || (this.isControlled() && this.unit.isShooting)) && this.consValid() && this.power.status >= 0.0001){
 				this._eyeReloads[0] += this.deltaB();
 				this._eyeReloads[1] += this.deltaB();
 			};
@@ -502,7 +502,7 @@ endgame.buildType = () => {
 				var con = this.unit.controller;
 				this._eyesTargetOffset.trns(Angles.angle(this.x, this.y, con.mouseX, con.mouseY), Mathf.dst(this.x, this.y, con.mouseX, con.mouseY) / (endgame.range / 3));
 			};
-			if((this.target != null || (this.isControlled() && this.unit.isShooting)) && this.power.status >= 0.0001){
+			if(((this.target != null && !this.isControlled()) || (this.isControlled() && this.unit.isShooting)) && this.power.status >= 0.0001){
 				this._eyeResetTime = 0;
 				if(!this.isControlled()){
 					this._eyesTargetOffset.trns(Angles.angle(this.x, this.y, this.targetPos.x, this.targetPos.y), Mathf.dst(this.x, this.y, this.targetPos.x, this.targetPos.y) / (endgame.range / 3));
