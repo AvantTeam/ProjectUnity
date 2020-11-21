@@ -45,10 +45,19 @@ const script = [
             },
 
             {
-              name: "units",
-              childs: [
-                "ai"
-              ]
+                name: "units",
+                childs: [
+                    "ai"
+                ]
+            },
+
+            {
+                name: "bullets",
+                childs: [
+                    "tractorbeam",
+                    "chainlaser",
+                    "shieldbullet"
+                ]
             },
 
             "sounds",
@@ -59,7 +68,6 @@ const script = [
             "unitlib",
             "copterbase",
             "loader",
-            "chainlaser",
             "exp",
             "multi-lib",
             "status",
@@ -70,8 +78,7 @@ const script = [
             "cruciblelib",
             "graphlib",
             "turretmodui",
-            "unitloader"/*,
-            "shieldbulletlib"*/
+            "unitloader"
         ]
     },
 
@@ -213,6 +220,7 @@ const script = [
                     "laser",
                     "lasercharge",
                     "laserfrost",
+                    "laserswarmer",
                     "laserbt",
                     "inferno"
                 ]
@@ -265,7 +273,8 @@ const script = [
                 childs: [
                     "stele",
                     "pedestal",
-                    "pilaster"
+                    "pilaster",
+                    "pylon"
                 ]
             }
         ]
