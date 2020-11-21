@@ -217,6 +217,10 @@ const _RotPowerPropsCommon = Object.assign(Object.create(graphLib.graphProps),{
         return this._inertia;
     },
     setInertia(n_inertia) {
+		var diff = n_inertia-this._inertia;
+		if(diff!=0){
+			this.getNetwork().injectIntertia(diff);
+		}
         this._inertia = n_inertia;
     },
 	getRotation() {
@@ -268,7 +272,15 @@ const _TorqueMulticonnectorProps = Object.assign(Object.create(graphLib.graphMul
         }
         return this._networkRots[index];
     },
-    
+    setInertia(n_inertia) {
+		var diff = n_inertia-this._inertia;
+		if(diff!=0){
+			for (let i = 0; i < this._networkList.length; i++) {
+				this._networkList[i].injectIntertia(diff);
+			}
+		}
+        this._inertia = n_inertia;
+    },
     drawSelect() {
         if (this._networkList.length == 0) {
             return;
@@ -546,6 +558,7 @@ const rotGraph = {
         this.lastGrossForceApplied = forceapply;
         this.lastInertia = iner;
 	},
+	canConnect(b1,b2) {return b1.getBuild().team == b2.getBuild().team;},
 	updateGraph() {
 		let netForce = this.lastGrossForceApplied - this.lastFrictionCoefficent * this.lastVelocity * this.lastVelocity;
 
@@ -562,6 +575,12 @@ const rotGraph = {
 		let momentumA = this.lastVelocity * this.lastInertia;
         let momentumB = graph.lastVelocity * graph.lastInertia;
         this.lastVelocity = (momentumA + momentumB) / (this.lastInertia + graph.lastInertia);
+	},
+	injectIntertia(iner){
+        this.lastVelocity = ( this.lastVelocity * this.lastInertia ) / (this.lastInertia + iner);
+		if((this.lastInertia + iner)==0){
+			this.lastVelocity = 0;
+		}
 	},
 };
 
