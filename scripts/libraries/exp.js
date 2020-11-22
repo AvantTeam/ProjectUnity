@@ -16,6 +16,8 @@ const clone = obj => {
     return copy;
 }
 
+const orblib = this.global.unity.exporb;
+
 function arrayEqual(a, b){
   if (a === b) return true;
   if (a == null || b == null) return false;
@@ -88,6 +90,14 @@ module.exports = {
 
             //use this if this block's Integer config is reserved. Not recommended.
             useStringSync: false,
+
+            //the floating point precision of save/load. This will be multiplied on save and divided on load. Use only if you increment exp in floats.
+            rwPrecision: 1,
+            //orb region
+            //whether it accepts exp orbs
+            consumesExp: true,
+            orbMultiplier: 0.8,
+            orbRefund: 0.3,
 
             //below are legacy arrays
             linearInc: [],
@@ -232,6 +242,11 @@ module.exports = {
                     var temp = this.forStats.get(this.boolInc[i]);
                     if(temp) this.stats.add(temp, Core.bundle.get("explib.bool"), String(this.boolIncMul[i]), !this.boolIncStart[i]);
                 };
+            },
+            //orb region
+            hasExp(){
+              //this is bc in js only functions are public. when porting to java, make this a public attribute instead. In fact, make 2 attributes, hasExp(for all exp blocks) and consumesExp(for orbs). This is the smae for light-lib blocks, you'll se that they are treated as variables even though they are functions.
+              return this.consumesExp;
             }
             //end
         });
@@ -253,6 +268,7 @@ module.exports = {
         expblock.enableUpgrade = (expblock.upgrades.length > 0);
 
         expblock.fakeMaxLevel = Math.min(expblock.fakeMaxLevel, expblock.maxLevel);
+        expblock.sync = true;
         /*for(var i = 0; i < expblock.upgrades.length; i++) {
             var tobj = expblock.upgrades[i];
             expblock.upBlock.push((tobj.block == undefined) ? Blocks.router : tobj.block);
@@ -313,7 +329,12 @@ module.exports = {
             }
         }
 
-        objb = Object.assign(objb, {
+        objb = Object.assign({
+            onDestroyed(){
+                orblib.spreadExp(this.x, this.y, this.totalExp() * expblock.orbRefund, 3 * expblock.size);
+                this.super$onDestroyed();
+            }
+        }, objb, {
             totalExp() {
                 return this._exp;
             },
@@ -364,7 +385,7 @@ module.exports = {
             },
             read(stream, version) {
                 this.super$read(stream, version);
-                this._exp = stream.i();
+                this._exp = stream.i() / expblock.rwPrecision;
                 if(expblock.hasCustomRW) this.customRead(stream, version);
                 if(expblock.hasCache){
                     expblock.setEXPStats(this);
@@ -373,7 +394,7 @@ module.exports = {
             },
             write(stream) {
                 this.super$write(stream);
-                stream.i(this._exp);
+                stream.i(this._exp * expblock.rwPrecision);
                 if(expblock.hasCustomRW) this.customWrite(stream);
             },
 
@@ -542,6 +563,13 @@ module.exports = {
                 if(expblock.condConfig) return true;
                 if(expblock.upPerLevel[this.totalLevel()].length > 0) return true;
                 return false;
+            },
+            //orb region
+            consumesOrb(){
+                return expblock.consumesExp && this.totalExp() < expblock.maxExp;
+            },
+            getOrbMuitiplier(){
+                return expblock.orbMultiplier;
             }
         });
         //Extend Building

@@ -60,18 +60,6 @@ const _HeatCommon = Object.assign(Object.create(graphLib.graphCommon),{
         this._baseHeatRadiativity = v;
     },
     drawPlace(x, y, size ,rotation, valid) {
-        for (let i = 0; i < this._accept.length; i++) {
-            if (this._accept[i] == 0) {
-                continue;
-            }
-            Lines.stroke(3.5, Color.pink);
-            let outpos = getConnectSidePos(i, size, rotation);
-            let dx = (outpos.toPos.x + x) * Vars.tilesize;
-            let dy = (outpos.toPos.y + y) * Vars.tilesize;
-            let dir = _dirs[outpos.dir];
-            Lines.line(dx - dir.x, dy - dir.y, dx - dir.x * 2, dy - dir.y * 2);
-        }
-
     },
 
     setStats(table) {

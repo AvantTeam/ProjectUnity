@@ -53,10 +53,10 @@ const chargeLaser = extend(LaserBulletType, {
 
         var target = Damage.linecast(b, b.x, b.y, b.rotation(), this.length);
         if(target instanceof Hitboxc){
-            b.owner.incExp(0.05);
+            b.owner.incExp(0.15);
         }
         else if(target instanceof Building){
-            b.owner.incExp(0.1);
+            b.owner.incExp(0.3);
         }
     }
 });
@@ -77,6 +77,24 @@ chargeLaser.sideWidth = 0;
 chargeLaser.sideLength = 0;
 chargeLaser.colors = [Pal.sapBullet.cpy().lerp(Pal.lancerLaser, 0.5).mul(1, 1, 1, 0.4), Pal.lancerLaser, Color.white];
 
+const chargeLaser2 = extend(LaserBulletType, {});
+chargeLaser2.length = 650;
+chargeLaser2.damage = 2280;
+chargeLaser2.width = 90;
+chargeLaser2.lifetime = 70;
+chargeLaser2.lightningSpacing = 30;
+chargeLaser2.lightningLength = 5;
+chargeLaser2.lightningDelay = 1.1;
+chargeLaser2.lightningLengthRand = 15;
+chargeLaser2.lightningDamage = 120;
+chargeLaser2.lightningAngleRand = 40;
+chargeLaser2.largeHit = true;
+chargeLaser2.lightColor = chargeLaser2.lightningColor = expColor;
+chargeLaser2.sideAngle = 15;
+chargeLaser2.sideWidth = 0;
+chargeLaser2.sideLength = 0;
+chargeLaser2.colors = [expColor.cpy().mul(1, 1, 1, 0.4), expColor, Color.white];
+
 
 
 const chargeLaserTurret = lib.extend(ChargeTurret, ChargeTurret.ChargeTurretBuild, "bt-laser-turret", {
@@ -86,13 +104,14 @@ const chargeLaserTurret = lib.extend(ChargeTurret, ChargeTurret.ChargeTurretBuil
             type: "list",
             field: "heatColor",
             intensity: [Pal.lancerLaser, expColor]
-        },
-        {
-            type: "list",
-            field: "chargeTime",
-            intensity: [100, 150]
-        },
-    ]
+        }
+    ],
+    rwPrecision: 20,
+    orbMultiplier: 0.07,
+    load(){
+        this.super$load();
+        this.topRegion = Core.atlas.find(this.name + "-top");
+    }
 }, {
     getShootColor(lvl){
         return lvl > 0 ? expColor : Pal.lancerLaser;
@@ -121,7 +140,7 @@ const chargeLaserTurret = lib.extend(ChargeTurret, ChargeTurret.ChargeTurretBuil
             chargeLaserTurret.tr.trns(this.rotation, chargeLaserTurret.size * Vars.tilesize / 2);
             this.recoil = chargeLaserTurret.recoilAmount;
             this.heat = 1;
-            this.bullet(ammo, this.rotation);
+            this.bullet(lvl > 0 ? chargeLaser2 : chargeLaser, this.rotation);
             this.effects();
             this.shooting = false;
         });
@@ -140,6 +159,18 @@ const chargeLaserTurret = lib.extend(ChargeTurret, ChargeTurret.ChargeTurretBuil
         this.recoil = chargeLaserTurret.recoilAmount;
     }
 });
+
+chargeLaserTurret.drawer = tile => {
+    Draw.rect(chargeLaserTurret.region, tile.x + chargeLaserTurret.tr2.x, tile.y + chargeLaserTurret.tr2.y, tile.rotation - 90);
+    if(tile.totalExp() >= chargeLaserTurret.maxExp){
+        //Draw.blend(Blending.additive);
+        Draw.color(expColor);
+        Draw.alpha(Mathf.absin(Time.time(), 20, 0.6));
+        Draw.rect(chargeLaserTurret.topRegion, tile.x + chargeLaserTurret.tr2.x, tile.y + chargeLaserTurret.tr2.y, tile.rotation - 90);
+        Draw.color();
+        //Draw.blend();
+    }
+}
 
 chargeLaserTurret.chargeTime = 100;
 chargeLaserTurret.chargeMaxDelay = 100;

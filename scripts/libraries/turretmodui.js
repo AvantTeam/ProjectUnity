@@ -501,7 +501,7 @@ const modularConstructorUI = {
 				if(!cst[p[cstitem].name]){
 					cst[p[cstitem].name] = 0;
 				}
-				cst[p[cstitem].name] += Math.floor(p[cstitem].amount*(this._costAccum-0.5));
+				cst[p[cstitem].name] += Math.floor(p[cstitem].amount*(this._costAccum-costaccumrate));
 			}
 		}
 		return cst;
@@ -555,14 +555,15 @@ const modularConstructorUI = {
 		for(let px =0;px<this._gridW;px++){
 			for(let py =0;py<this._gridH;py++){
 				let p = this.getPartAt(px,py);
-				if(p){
+				if(p && p.x==px && p.y==py && p.valid){
 					packer.add(p.part.id+1);
 				}else{
 					packer.add(0);
 				}
 			}
 		}
-		return packer.end();
+		packer.end();
+		return packer.toStringPack();
 	},
 	loadSave(array, partlist){
 		if(!array){return;}
@@ -618,12 +619,17 @@ function addConsButton(table, consFunc, style, runnable) {
 function displayPartInfo(part) {
 	let dialog = new BaseDialog("Part:" + part.name);
 	dialog.setFillParent(false);
-	dialog.cont.add("[white]Name");
-	dialog.cont.add("[gray]" + part.name);
+	dialog.cont.add("[lightgray]Name:[white]" + part.name).left();
 	dialog.cont.row();
-	dialog.cont.add("[white]Description:");
-	dialog.cont.add("[gray]" + part.desc).maxWidth(500).get().setWrap(true);
+	dialog.cont.add("[lightgray]Description:").left();
 	dialog.cont.row();
+	dialog.cont.add("[white]" + part.desc).left().maxWidth(500).get().setWrap(true);
+	dialog.cont.row();
+	dialog.cont.add("[accent] Stats");
+	for(var stat in part.stats){
+		dialog.cont.row();
+		dialog.cont.add("[lightgray]"+Core.bundle.get(part.stats[stat].name)+": [white]" + part.stats[stat].value).left();
+	}
 
 	dialog.buttons.button("@ok", () => {
 		dialog.hide();
@@ -809,12 +815,30 @@ const _ModularBlock = {
 const _ModularBuild ={
 	_blueprint: null,
 	_blueprintRemainingCost: null,
+	_totalItemCountCost:0,
+	_totalItemCountPaid:0,
 	_buffer: null,
+	_currentStats: null,
+	getPaidRatio(){
+		if(!this._totalItemCountCost){return 0;}
+		return this._totalItemCountPaid/this._totalItemCountCost;
+	},
 	setBlueprintFromString(s){
-		this._blueprint=unpackIntsFromString(s);
+		return this.setBlueprint(unpackIntsFromString(s));
 	},
 	setBlueprint(s){
-		this._blueprint=s;
+		if(!s&&!this._blueprint){return false;}
+		if((!s&&this._blueprint) ||(s&&!this._blueprint) || s.length!=this._blueprint.length){
+			this._blueprint=s;
+			return true;
+		}
+		for(var p = 0;p<this._blueprint.length;p++){
+			if(this._blueprint[p]!=s[p]){
+				this._blueprint=s;
+				return true;
+			}
+		}
+		return false;
 	},
 	getBlueprint(s){
 		return this._blueprint;
@@ -823,10 +847,61 @@ const _ModularBuild ={
 		if(!this._buffer){return null;}
 		return Draw.wrap(this._buffer.getTexture());
 	},
+	
+	displayExt(table){
+		let that =this;
+		let ps = " " + StatUnit.perSecond.localized();
+		let csttable = new Table();
+		table.row();
+		
+		let costCons = cons(sub => {
+			sub.clearChildren();
+			sub.left();
+			if(that._blueprintRemainingCost){
+				let rc = that._blueprintRemainingCost;
+				for(let i in rc){
+					sub.image(rc[i].item.icon(Cicon.medium));
+					sub.add(rc[i].paid + "/" + rc[i].total);
+					sub.row();
+				}
+			}else{
+				sub.labelWrap("No blueprint").color(Color.lightGray);
+			}
+		});
+		
+		
+        table.add(csttable).left().update(()=>{
+			costCons.get(csttable);
+		});
+	},
+
+    acceptItem(source, item) {
+		var hasspace = this._blueprintRemainingCost && this._blueprintRemainingCost[item.name] && this._blueprintRemainingCost[item.name].paid<this._blueprintRemainingCost[item.name].total;
+        return this.super$acceptItem(source,item)||hasspace;
+    },
+
+    handleItem(source, item) {
+        this._totalItemCountPaid++;
+		this._blueprintRemainingCost[item.name].paid++;
+		if(this._totalItemCountPaid==this._totalItemCountCost){
+			this.applyStats(this._currentStats);
+		}
+    },
+	
+	
 	getPartsConfig(){
 		
 	},
 	getPartsAtlas(){
+		
+	},
+	resetStats(){
+		
+	},
+	applyStats(total){
+		
+	},
+	accumStats(total,part,x,y,grid){
 		
 	},
 	drawPartBuffer(part,x,y,grid){
@@ -856,44 +931,143 @@ const _ModularBuild ={
 		buttoncell.get().getStyle().imageUp = Icon.pencil;
 	},
 	configured(player, value) {
+		let changed = false;
 		if(!Array.isArray(value)){
-			this.setBlueprintFromString(value);
+			changed=this.setBlueprintFromString(value);
 		}else{
-			this._blueprint= unpackInts(value);
+			changed=this.setBlueprint(unpackInts(value));
 		}
-		print(this._blueprint);
-		let totalcst = [];
+		if(!changed){
+			print("Blueprint was not changed");
+			return;
+		}
+		this.resetStats();
+		let totalcst = {};
+		let cstmult = 1;
 		for(var p = 0;p<this._blueprint.length;p++){
 			if(this._blueprint[p]!=0){
-				
+				cstmult+=costaccumrate;
 			}
 		}
+		//getting the cost, and packing it back into a 2d array
+		cstmult-=costaccumrate;
+		this._totalItemCountCost=0;
+		this._totalItemCountPaid=0;
+		var gridprint=[];
+		var newStatVals = [];
+		for(var p = 0;p<this._blueprint.length;p++){
+			if(this._blueprint[p]!=0){
+				var partL = this.getPartsConfig()[this._blueprint[p]-1];
+				var prttmp = partL.cost;
+				var partarea = partL.tw * partL.th;
+				for (let cstitem = 0; cstitem < prttmp.length; cstitem++) {
+					if(!totalcst[prttmp[cstitem].name]){
+						totalcst[prttmp[cstitem].name] = {total:0,paid:0, item:Vars.content.getByName(ContentType.item, prttmp[cstitem].name)};
+					}
+					totalcst[prttmp[cstitem].name].total += Math.floor(prttmp[cstitem].amount*cstmult*partarea);
+					this._totalItemCountCost+= Math.floor(prttmp[cstitem].amount*cstmult*partarea);
+				}
+			}
+			if(!gridprint[Math.floor(p/this.block.getGridHeight())]){
+				gridprint[Math.floor(p/this.block.getGridHeight())] = [];
+			}
+			gridprint[Math.floor(p/this.block.getGridHeight())][p%this.block.getGridHeight()] = this._blueprint[p];
+		}
 		this._blueprintRemainingCost = totalcst;
-		Draw.draw(Draw.z(), () => {
-			Tmp.m1.set(Draw.proj());
-			if(!this._buffer){
-				this._buffer = new FrameBuffer(this.block.getGridWidth()*32, this.block.getGridHeight()*32);
-			}
-			Draw.proj(0, 0, this.block.getGridWidth()*32, this.block.getGridHeight()*32);
-			this._buffer.begin(Color.clear);
-			Draw.color(Color.white);
-			for(var p = 0;p<this._blueprint.length;p++){
-				if(this._blueprint[p]==0){continue;}
-				let px = Math.floor(p/this.block.getGridHeight());
-				let py = (p%this.block.getGridHeight());
-				this.drawPartBuffer(this.getPartsConfig()[this._blueprint[p]-1],px,py,null);
-			}
-			this._buffer.end();
-			Draw.proj(Tmp.m1);
-			Draw.reset();
-		});
+		
+		//detemining the stats of the blueprint,
+		for(p = 0;p<this._blueprint.length;p++){
+			if(this._blueprint[p]==0){continue;}
+			let px = Math.floor(p/this.block.getGridHeight());
+			let py = (p%this.block.getGridHeight());
+			this.accumStats(newStatVals, this.getPartsConfig()[this._blueprint[p]-1],px,py,gridprint);
+		}
+		this._currentStats = newStatVals;
+		
+		//drawing the sprite.
+		if(!Vars.headless){
+			Draw.draw(Draw.z(), () => {
+				Tmp.m1.set(Draw.proj());
+				if(!this._buffer){
+					
+					this._buffer = new FrameBuffer(this.block.getGridWidth()*32, this.block.getGridHeight()*32);
+				}
+				Draw.proj(0, 0, this.block.getGridWidth()*32, this.block.getGridHeight()*32);
+				this._buffer.begin(Color.clear);
+				Draw.color(Color.white);
+				for(var p = 0;p<this._blueprint.length;p++){
+					if(this._blueprint[p]==0){continue;}
+					let px = Math.floor(p/this.block.getGridHeight());
+					let py = (p%this.block.getGridHeight());
+					this.drawPartBuffer(this.getPartsConfig()[this._blueprint[p]-1],px,py,gridprint);
+				}
+				this._buffer.end();
+				Draw.proj(Tmp.m1);
+				Draw.reset();
+			});
+		}
 		
 	},
 	config(){
-		if(!this._blueprint){return new String("")}
+		if(!this._blueprint){return new java.lang.String("")}
 		var tmp = _packArray(this._blueprint);
 		return tmp.toStringPack();
 	},
+	writeExt(stream) {
+		if(!this._blueprint){
+			stream.i(0);
+			return;
+		}
+		var tmp = _packArray(this._blueprint);
+		stream.s(tmp.packed.length);
+		for(var i = 0;i<tmp.packed.length;i++){
+			stream.i(tmp.packed[i]);
+		}
+		if(this._blueprintRemainingCost){
+			
+			let rc = this._blueprintRemainingCost;
+			let am = 0;
+			for(let i in rc){
+				am++;
+			}
+			stream.s(am);
+			for(let i in rc){
+				stream.s(rc[i].item.id);
+				stream.s(rc[i].paid);
+			}
+		}else{
+			stream.s(0);
+		}
+		
+		
+	},
+	readExt(stream, revision) {
+		var packedsize = stream.s();
+		var pack = [];
+		for(var i = 0;i<packedsize;i++){
+			pack[i]=stream.i();
+		}
+		this.configured(null,pack);
+		var costSize = stream.s();
+		if(costSize){
+			let rc = this._blueprintRemainingCost;
+			for(var i = 0;i<costSize;i++){
+				var itmid = stream.s();
+				var pam = stream.s();
+				for(let cid in rc){
+					if(itmid==rc[cid].item.id){
+						rc[cid].paid = pam;
+						this._totalItemCountPaid+=pam;
+						break;
+					}
+				}	
+			}
+		}
+		if(this._totalItemCountPaid==this._totalItemCountCost){
+			this.applyStats(this._currentStats);
+		}
+		
+	}
 }
 
 
@@ -947,7 +1121,7 @@ const IntPacker={
 		for(var i = 0;i<this.raw.length;i++){
 			str +=String.fromCharCode(this.raw[i]);
 		}
-		return new String(str);
+		return new java.lang.String(str);
 	}
 	
 	
@@ -1031,6 +1205,25 @@ function _getRegion(region, tile, w, h) {
 	nregion.height = 32;
 	return nregion;
 }
+var tmpRegConstruct=null; //for some reason the runnable always holds the same reference of region.
+function _drawConstruct(region,progress,color,alpha,time,layer,func){
+	if(!tmpRegConstruct){
+		tmpRegConstruct = new TextureRegion(region);
+	}
+	tmpRegConstruct.set(region);
+	Draw.draw(layer, run(()=>{
+		Shaders.build.region = tmpRegConstruct;
+		Shaders.build.progress = progress;
+		Shaders.build.color.set(color);
+		Shaders.build.color.a = alpha;
+		Shaders.build.time = -time / 20.0;
+
+		Draw.shader(Shaders.build);
+		func(tmpRegConstruct);
+		Draw.shader();
+		Draw.reset();
+	}));
+}
 
 function _drawTile(region, x, y, w, h, rot, tile) {
 	Draw.rect(_getRegion(region, tile), x, y, w, h, w * 0.5, h * 0.5, rot);
@@ -1039,6 +1232,7 @@ function _drawTile(region, x, y, w, h, rot, tile) {
 module.exports = {
 	ModularBlock:_ModularBlock,
 	ModularBuild:_ModularBuild,
+	drawConstruct:_drawConstruct,
 	dcopy2:deepCopy,
 	IntPack:IntPacker,
 	unpack:unpackInts,

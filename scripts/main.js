@@ -65,6 +65,7 @@ const script = [
             "extraeffects",
             "wavefront",
             "loader",
+            "exporb",
             "wormlib",
             "unitlib",
             "copterbase",
@@ -231,7 +232,8 @@ const script = [
                 childs: [
                     "shieldGenerator",
                     "shieldedWall",
-                    "teleporter"
+                    "teleporter",
+                    "expfountain"
                 ]
             }
         ]

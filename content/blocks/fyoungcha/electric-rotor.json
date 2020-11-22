@@ -6,5 +6,6 @@
 		{"item": "copper", "amount": 300},
 		{"item": "titanium", "amount": 150},
 	],
+	"research": "unity-nickel-stator",
 	"category": "power",
 }

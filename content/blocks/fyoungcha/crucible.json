@@ -2,8 +2,8 @@
 	"size": 1,
 	"health": 400,
 	"requirements": [
-		{"item": "nickel", "amount": 20},
-		{"item": "titanium", "amount": 30},
+		{"item": "nickel", "amount": 10},
+		{"item": "titanium", "amount": 15},
 	],
 	"category": "crafting",
 }
