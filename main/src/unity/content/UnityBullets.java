@@ -35,9 +35,10 @@ public class UnityBullets implements ContentList{
     public static BasicBulletType standardDenseLarge, standardHomingLarge, standardIncendiaryLarge, standardThoriumLarge, standardDenseHeavy, standardHomingHeavy, standardIncendiaryHeavy, standardThoriumHeavy, standardDenseMassive, standardHomingMassive,
     standardIncendiaryMassive, standardThoriumMassive;
 
+    @SuppressWarnings("unchecked")
     private <T extends BulletType> T copy(BulletType from, Prov<T> constructor, Cons<T> setter){
         T target = constructor.get();
-        JsonIO.<T>copy((T) from, target);
+        JsonIO.<T>copy((T)from, target);
         setter.get(target);
         return target;
     }

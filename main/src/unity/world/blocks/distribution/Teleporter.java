@@ -19,6 +19,7 @@ import mindustry.world.Block;
 
 import static arc.Core.*;
 
+@SuppressWarnings("unchecked")
 public class Teleporter extends Block{
     protected static final Color[] selection = new Color[]{Color.royal, Color.orange, Color.scarlet, Color.forest, Color.purple, Color.gold, Color.pink, Color.black};
     protected static final ObjectSet<TeleporterBuild>[][] teleporters;

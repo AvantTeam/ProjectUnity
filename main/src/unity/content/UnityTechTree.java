@@ -11,6 +11,7 @@ import static mindustry.type.ItemStack.*;
 import static unity.content.UnityBlocks.*;
 import static unity.content.UnitySectorPresets.*;
 
+@SuppressWarnings("unused")
 public class UnityTechTree implements ContentList{
     private static TechNode context = null;
 

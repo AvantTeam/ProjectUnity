@@ -58,7 +58,7 @@ public class UnityUnitTypes implements ContentList{
         return classIDs[index];
     }
 
-    private static void setEntity(String name, Prov c){
+    private static void setEntity(String name, Prov<?> c){
         EntityMapping.nameMap.put(name, c);
     }
 

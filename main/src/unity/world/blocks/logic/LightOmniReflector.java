@@ -13,6 +13,7 @@ import mindustry.entities.units.BuildPlan;
 import static arc.Core.*;
 import static mindustry.Vars.*;
 
+@SuppressWarnings("unused")
 public class LightOmniReflector extends LightReflector{
     protected TextureRegion baseRegion, topRegion;
     public static final int[][] refomni = {ref[2], {1, 0, 7, 6, 5, 4, 3, 2}, ref[1], {3, 2, 1, 0, 7, 6, 5, 4}, ref[3], {5, 4, 3, 2, 1, 0, 7, 6}, ref[0], {7, 6, 5, 4, 3, 2, 1, 0}};

@@ -5,6 +5,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
+import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
@@ -13,7 +14,7 @@ import mindustry.type.*;
 
 import static mindustry.Vars.*;
 
-public class Funcs{
+public final class Funcs{
     private static final Vec2 tV = new Vec2();
     private static final IntSet collidedBlocks = new IntSet();
     private static final Rect rect = new Rect();
@@ -50,8 +51,8 @@ public class Funcs{
     public static void trueEachBlock(int wx, int wy, float range, Cons<Building> cons){
         collidedBlocks.clear();
 
-        int tx = world.toTile(wx);
-        int ty = world.toTile(wy);
+        int tx = World.toTile(wx);
+        int ty = World.toTile(wy);
         int tileRange = Mathf.floorPositive(range / tilesize + 1);
 
         for(int x = -tileRange + tx; x <= tileRange + tx; x++){

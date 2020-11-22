@@ -64,6 +64,10 @@ public class IconGenerator implements Generator{
                     outliner.get(type.legRegion);
                 }
 
+                if(unit instanceof Mechc){
+                    outliner.get(type.legRegion);
+                }
+
                 if(unit instanceof CopterUnit){
                     CopterUnitType t = (CopterUnitType)type;
                     Rotor rotor = t.rotors.first();
