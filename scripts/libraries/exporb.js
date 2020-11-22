@@ -23,7 +23,7 @@ const exporb = extend(BulletType, {
     },
     draw(b){
         if((b.fin() > 0.5) && Time.time() % 14 < 7) return;//blinking
-        Draw.color(expColor, Color.white, 0.3 + 0.3 * Mathf.sin(Time.time() * 0.03 + b.id * 2));
+        Draw.color(expColor, Color.white, 0.1 + 0.1 * Mathf.sin(Time.time() * 0.03 + b.id * 2));
         /*
         Fill.circle(b.x, b.y, 1.5);
         Lines.stroke(0.5);
