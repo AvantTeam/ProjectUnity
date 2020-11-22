@@ -146,8 +146,50 @@ crucible.getGraphConnectorBlock("heat graph").setBaseHeatRadiativity(0.006);
 
 
 
+let hcblankobj = graphLib.init();
+graphLib.addGraph(hcblankobj, heatlib.baseTypesHeat.heatConnector);
+graphLib.addGraph(hcblankobj, crucibleLib.baseTypes.crucibleConnector);
+const holdingcrucible = graphLib.finaliseExtend(Block, Building, "holding-crucible", hcblankobj, {
+    load() {
+        this.super$load();
+        this.liquidsprite = Core.atlas.find(this.name + "-liquid");
+        this.bottom = Core.atlas.find(this.name);
+		this.heatSprite = Core.atlas.find(this.name + "-heat");
+    },
+}, {
+	
+	
+    updatePost() {},
+    draw() {
+        let temp = this.getGraphConnector("heat graph").getTemp();
+        let dex = this.getGraphConnector("crucible graph");
+		Draw.rect(holdingcrucible.bottom, this.x, this.y, 0);
+		this.drawContents(this.getGraphConnector("crucible graph"),holdingcrucible.liquidsprite);
+		heatlib.drawHeat(holdingcrucible.heatSprite, this.x, this.y, 0, temp);
+        this.drawTeamTop();
+    },
+	drawContents(crucgraph,liquidsprite){
+		let cc = crucgraph.getContained();
+		if(!cc || cc.length==0){return;}
+		if(crucgraph.getVolumeContained()>0){
+			Draw.color(crucgraph.getNetwork().getLiquidColor());	
+			Draw.rect(liquidsprite, this.x, this.y, 0);
+		}
+		Draw.color();	
+	}
+	
 
+});
 
+holdingcrucible.update = true;
+holdingcrucible.solid = true;
+holdingcrucible.getGraphConnectorBlock("crucible graph").setAccept([0,1,1,0, 0,1,1,0, 0,1,1,0, 0,1,1,0]);
+holdingcrucible.getGraphConnectorBlock("crucible graph").setDoesCrafting(false);
+holdingcrucible.getGraphConnectorBlock("crucible graph").setBaseLiquidCapacity(50);
+holdingcrucible.getGraphConnectorBlock("heat graph").setAccept([1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1]);
+holdingcrucible.getGraphConnectorBlock("heat graph").getBaseHeatConductivity(0.05);
+holdingcrucible.getGraphConnectorBlock("heat graph").getBaseHeatCapacity(275); 
+holdingcrucible.getGraphConnectorBlock("heat graph").setBaseHeatRadiativity(0.01);
 
 
 

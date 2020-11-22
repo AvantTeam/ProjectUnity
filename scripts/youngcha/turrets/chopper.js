@@ -203,7 +203,7 @@ const chopperTurret = graphLib.finaliseExtend(Block, Building, "chopper", blanko
             r = Math.max(r, this.hitSegments[i].end * 8);
         }
         this.detectrect = new Rect();
-        this.detectrect.setPosition(this.x, this.y).setSize(r * 2, r * 2);
+        this.detectrect.setPosition(this.x-r, this.y-r).setSize(r * 2, r * 2);
         this.bladeRadius = r;
     },
     getHitDamage(rx, ry, rot) {
