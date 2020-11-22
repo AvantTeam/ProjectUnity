@@ -1,0 +1,15 @@
+{
+	"size": 1,
+	"health": 80,
+  "hasPower": true,
+  "consumesPower": true,
+  "consumes": {
+		"power": 0.25,
+	},
+  "requirements": [
+		{"item": "graphite", "amount": 25},
+		{"item": "silicon", "amount": 25}
+	],
+  "rotate": false,
+  "category": "effect"
+}

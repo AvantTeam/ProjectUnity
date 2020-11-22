@@ -64,11 +64,11 @@ const script = [
             "effects",
             "extraeffects",
             "wavefront",
+            "loader",
+            "exporb",
             "wormlib",
             "unitlib",
             "copterbase",
-            "loader",
-            "exporb",
             "exp",
             "multi-lib",
             "status",
@@ -233,6 +233,8 @@ const script = [
                     "shieldGenerator",
                     "shieldedWall",
                     "teleporter",
+                    "expunloader",
+                    "exptank",
                     "expfountain"
                 ]
             }

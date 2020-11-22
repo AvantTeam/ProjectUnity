@@ -42,8 +42,8 @@ const addPlan = (factory, plan) => {
 	unitPlans.clear();
 	var fac = factory;
 	
-	fac.consumes.remove(ConsumeType.item);
-	
+	//fac.consumes.remove(ConsumeType.item);
+
 	/*const caelifera = new UnitFactory.UnitPlan(
 		Vars.content.getByName(ContentType.unit, "unity-caelifera"),
 		60 * 25,
@@ -58,10 +58,10 @@ const addPlan = (factory, plan) => {
 	
 	fac.plans = unitPlans.copy();
 	//whats the point of this again?, its created in the constructor. theres two of this now.
-	fac.config(Integer, (build, i) => {
+	/*fac.config(Integer, (build, i) => {
 		build.currentPlan = (Math.floor(i) < 0 || Math.floor(i) >= fac.plans.size) ? -1 : Math.floor(i);
 		build.progress = 0;
-	});
+	});*/
 	
 	fac.plans.each(uPlan => {
 		var stack = uPlan.requirements;
@@ -71,9 +71,9 @@ const addPlan = (factory, plan) => {
 		}
 	});
 	//also this
-	fac.consumes.add(extendContent(ConsumeItemDynamic, func(e => {
+	/*fac.consumes.add(extendContent(ConsumeItemDynamic, func(e => {
 		return e.currentPlan != -1 ? (fac.plans.get(e.currentPlan)).requirements : ItemStack.empty;
-	}), {}));
+	}), {}));*/
 };
 
 const unitLoader = new ContentList(){
@@ -113,8 +113,8 @@ const unitLoader = new ContentList(){
 				Vars.content.getByName(ContentType.unit, "unity-craber-naval")
 			],
 			[
-				Vars.content.getByName(ContentType.unit, "unity-electron"),
-				Vars.content.getByName(ContentType.unit, "unity-neutron")
+				Vars.content.getByName(ContentType.unit, "unity-stele"),
+				Vars.content.getByName(ContentType.unit, "unity-pedestal")
 			]
 		]);
 		//2
@@ -122,6 +122,10 @@ const unitLoader = new ContentList(){
 			[
 				Vars.content.getByName(ContentType.unit, "unity-schistocerca"),
 				Vars.content.getByName(ContentType.unit, "unity-anthophila")
+			],
+            [
+				Vars.content.getByName(ContentType.unit, "unity-pedestal"),
+				Vars.content.getByName(ContentType.unit, "unity-pilaster")
 			]
 		]);
 		//3
@@ -129,6 +133,10 @@ const unitLoader = new ContentList(){
 			[
 				Vars.content.getByName(ContentType.unit, "unity-anthophila"),
 				Vars.content.getByName(ContentType.unit, "unity-vespula")
+			],
+            [
+				Vars.content.getByName(ContentType.unit, "unity-pilaster"),
+				Vars.content.getByName(ContentType.unit, "unity-pylon")
 			]
 		]);
 		//4
