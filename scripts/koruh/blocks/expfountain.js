@@ -4,10 +4,13 @@ const expfountain = extendContent(Block, "exp-fountain", {
     load(){
         this.super$load();
         this.topRegion = Core.atlas.find(this.name + "-top");
+    },
+    noOrbCollision(){
+        return true;
     }
 });
 expfountain.update = true;
-expfountain.solid = false;
+expfountain.solid = true;
 expfountain.timers = 1;
 expfountain.buildType = () => extend(Building, {
     draw(){

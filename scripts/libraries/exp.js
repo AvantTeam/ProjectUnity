@@ -351,9 +351,10 @@ module.exports = {
                 this._exp = a;
             },
             incExp(a) {
-                if(this._exp >= expblock.maxExp) return;
+                if(this._exp >= expblock.maxExp && a > 0) return;
                 this._exp += a;
                 if(this._exp > expblock.maxExp) this._exp = expblock.maxExp;
+                if(this._exp < 0) this._exp = 0;
                 this._changedVal = true;
                 if(!expblock.hasLevelEffect) return;
                 var clvl = expblock.getLevel(this._exp);

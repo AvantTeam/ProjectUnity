@@ -57,5 +57,9 @@ exptank.buildType = () => extend(Building, {
     write(stream) {
         this.super$write(stream);
         stream.i(this._exp);
+    },
+    onDestroyed(){
+        orblib.spreadExp(this.x, this.y, this.totalExp() * 0.8, 3 * exptank.size);
+        this.super$onDestroyed();
     }
 });

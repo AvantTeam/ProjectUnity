@@ -94,7 +94,7 @@ const infl = conslib.extend(SolarGenerator, SolarGenerator.SolarGeneratorBuild, 
     onProximityUpdate(){
         this.super$onProximityUpdate();
         for(var i=0; i<4; i++){
-            var build = this.tile.getNearbyEntity(i);
+            var build = this.nearby(i);
             if(build != null && (build.block.name == "unity-light-filter" || build.block.name == "unity-light-inverted-filter")){
                 build.setCont(this);
                 this["_c"+i] = true;

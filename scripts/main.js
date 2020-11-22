@@ -233,8 +233,9 @@ const script = [
                     "shieldGenerator",
                     "shieldedWall",
                     "teleporter",
-                    "expfountain",
-                    "exptank"
+                    "expunloader",
+                    "exptank",
+                    "expfountain"
                 ]
             }
         ]

@@ -45,6 +45,9 @@ const exporb = extend(BulletType, {
             expAbsorb.at(b.x, b.y);
             b.remove();
         }
+        else if(tile.block().noOrbCollision){
+            //h
+        }
         else if(tile.solid()){
             b.trns(-1.1 * b.vel.x, -1.1 * b.vel.y);
             b.vel.scl(0, 0);
@@ -78,6 +81,7 @@ exporb.hitEffect = Fx.none;
 exporb.shootEffect = Fx.none;
 
 module.exports = {
+    expAmount: expAmount,
     exporb: exporb,
     hporb: null,
     exp: this.exporb,
@@ -96,6 +100,15 @@ module.exports = {
             if(v == undefined) v = 4;
             v *= 1000;
             var n = Mathf.floorPositive(amount / expAmount);
+            for(var i=0; i<n; i++){
+                this.exporb.createNet(Team.derelict, x, y, Mathf.random() * 360, 0, v, 1);
+            }
+        }
+    },
+    outputExp(x, y, n, v){
+        if(!Vars.net.client()){
+            if(v == undefined) v = 4;
+            v *= 1000;
             for(var i=0; i<n; i++){
                 this.exporb.createNet(Team.derelict, x, y, Mathf.random() * 360, 0, v, 1);
             }
