@@ -89,7 +89,7 @@ chargeLaser2.lightningLengthRand = 15;
 chargeLaser2.lightningDamage = 120;
 chargeLaser2.lightningAngleRand = 40;
 chargeLaser2.largeHit = true;
-chargeLaser2.lightColor = chargeLaser.lightningColor = expColor;
+chargeLaser2.lightColor = chargeLaser2.lightningColor = expColor;
 chargeLaser2.sideAngle = 15;
 chargeLaser2.sideWidth = 0;
 chargeLaser2.sideLength = 0;
