@@ -1472,7 +1472,7 @@ public class UnityUnitTypes implements ContentList{
             }});
         }};
 
-        setEntity("pylon", MechUnit::create);
+        setEntity("pylon", LegsUnit::create);
         pylon = new UnitType("pylon"){{
             speed = 0.28f;
             hitSize = 36f;
