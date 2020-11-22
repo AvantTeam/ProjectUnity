@@ -20,13 +20,6 @@ const sporePyrolyser = graphLib.finaliseExtendContent(GenericCrafter, GenericCra
 		let temp = this.getGraphConnector("heat graph").getTemp();
         return Mathf.sqrt(Mathf.clamp((temp-370.0)/300.0)) / baseTime * this.edelta();
 	},
-	updatePost(){
-		if(this.timer.get(this.block.getTimerId(), 60)){
-			let temp = this.getGraphConnector("heat graph").getTemp();
-			let intensity = Mathf.clamp(Mathf.map(temp,400,1000,0,1));
-			Damage.status(this.team, this.x, this.y, intensity*20.0+4, StatusEffects.burning, 3+intensity*40, false, true);
-		}
-	},
 	draw() {
 		let temp = this.getGraphConnector("heat graph").getTemp();
 		Draw.rect(sporePyrolyser.bottom, this.x, this.y, 0);

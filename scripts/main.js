@@ -344,7 +344,8 @@ const script = [
                 childs: [
                     "augerdrill",
                     "crucible",
-					"sporepyro"
+					"sporepyro",
+					"sporefarm"
                 ]
             },
 

@@ -1,0 +1,15 @@
+{
+	"size": 1,
+	"health": 50,
+	"requirements": [
+		{"item": "lead", "amount": 5},
+	],
+	"hasShadow":false,
+	"hasItems": true,
+	"itemCapacity": 2,
+	"buildCostMultiplier": 0.01,
+	"research": "unity-solar-collector",
+	"category": "production",
+	"rebuildable": false,
+	"breakSound":"splash"
+}
