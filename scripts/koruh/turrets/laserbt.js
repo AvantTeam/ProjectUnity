@@ -77,6 +77,24 @@ chargeLaser.sideWidth = 0;
 chargeLaser.sideLength = 0;
 chargeLaser.colors = [Pal.sapBullet.cpy().lerp(Pal.lancerLaser, 0.5).mul(1, 1, 1, 0.4), Pal.lancerLaser, Color.white];
 
+const chargeLaser2 = extend(LaserBulletType, {});
+chargeLaser2.length = 650;
+chargeLaser2.damage = 2280;
+chargeLaser2.width = 90;
+chargeLaser2.lifetime = 70;
+chargeLaser2.lightningSpacing = 30;
+chargeLaser2.lightningLength = 5;
+chargeLaser2.lightningDelay = 1.1;
+chargeLaser2.lightningLengthRand = 15;
+chargeLaser2.lightningDamage = 120;
+chargeLaser2.lightningAngleRand = 40;
+chargeLaser2.largeHit = true;
+chargeLaser2.lightColor = chargeLaser.lightningColor = expColor;
+chargeLaser2.sideAngle = 15;
+chargeLaser2.sideWidth = 0;
+chargeLaser2.sideLength = 0;
+chargeLaser2.colors = [expColor.cpy().mul(1, 1, 1, 0.4), expColor, Color.white];
+
 
 
 const chargeLaserTurret = lib.extend(ChargeTurret, ChargeTurret.ChargeTurretBuild, "bt-laser-turret", {
@@ -86,12 +104,7 @@ const chargeLaserTurret = lib.extend(ChargeTurret, ChargeTurret.ChargeTurretBuil
             type: "list",
             field: "heatColor",
             intensity: [Pal.lancerLaser, expColor]
-        },
-        {
-            type: "list",
-            field: "chargeTime",
-            intensity: [100, 150]
-        },
+        }
     ],
     rwPrecision: 20
 }, {
@@ -122,7 +135,7 @@ const chargeLaserTurret = lib.extend(ChargeTurret, ChargeTurret.ChargeTurretBuil
             chargeLaserTurret.tr.trns(this.rotation, chargeLaserTurret.size * Vars.tilesize / 2);
             this.recoil = chargeLaserTurret.recoilAmount;
             this.heat = 1;
-            this.bullet(ammo, this.rotation);
+            this.bullet(lvl > 0 ? chargeLaser2 : chargeLaser, this.rotation);
             this.effects();
             this.shooting = false;
         });
