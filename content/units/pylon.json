@@ -1,7 +1,7 @@
 {
     "speed": 0.28,
     "hitSize": 36,
-    "health": 8500,
+    "health": 7200,
     "flying": false,
     "hovering": true,
     "armor": 7,
@@ -9,8 +9,9 @@
     "allowLegStep": true,
     "visualElevation": 0.2,
     "legCount": 4,
+    "legSpeed": 0.08,
     "legLength": 16,
-    "legMoveSpace": 1.6,
+    "legMoveSpace": 1.2,
     "legTrns": 0.5,
     "legBaseOffset": 11,
     "commandLimit": 8
