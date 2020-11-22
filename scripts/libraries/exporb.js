@@ -59,7 +59,7 @@ const exporb = extend(BulletType, {
     }
 });
 
-exporb.damage = 0;
+exporb.damage = 8;
 exporb.drag = 0.05;
 exporb.lifetime = 180; //idle lifetime
 exporb.speed = 0.0001;
