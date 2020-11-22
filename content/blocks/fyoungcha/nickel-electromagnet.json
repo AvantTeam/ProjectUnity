@@ -7,5 +7,6 @@
 		{"item": "copper", "amount": 100},
 		{"item": "cupronickel", "amount": 50},
 	],
+	"research": "unity-nickel-stator-large",
 	"category": "power",
 }

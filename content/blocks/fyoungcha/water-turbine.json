@@ -8,4 +8,5 @@
 		{"item": "copper", "amount": 100},
 	],
 	"category": "power",
+	"research": "unity-wind-turbine",
 }

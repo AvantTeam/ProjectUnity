@@ -658,7 +658,7 @@ const crucibleGraph = { //this just uh manages the graphics lmAO
 				bitmask += 1<<i;
 			}
 			building.tilingIndex = bitmask;
-			building.liquidcap = capacitymul[directneighbour]*building.getBlockData().getBaseLiquidCapacity();
+			building.liquidcap = (building.getBuild().block.size==1?capacitymul[directneighbour]:1.0)*building.getBlockData().getBaseLiquidCapacity();
 			capacumm+=building.liquidcap;
 			hasCrafter = hasCrafter||building.getBlockData().getDoesCrafting();
         }));

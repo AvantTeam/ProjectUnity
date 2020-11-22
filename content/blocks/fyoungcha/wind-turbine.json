@@ -7,4 +7,5 @@
 		{"item": "copper", "amount": 70},
 	],
 	"category": "power",
+	"research": "unity-auger-drill",
 }

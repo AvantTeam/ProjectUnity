@@ -197,6 +197,9 @@ const chopperTurret = graphLib.finaliseExtend(Block, Building, "chopper", blanko
         this.inertia = 5 + total.inertia;
         this.originalmaxhp = this.maxHealth;
         this.maxHealth = this.originalmaxhp + total.hpinc;
+		if(!total.segments) {
+			total.segments = [];
+		}
         this.hitSegments = total.segments;
         var r = 0;
         for(var i = 0; i < this.hitSegments.length; i++) {

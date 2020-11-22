@@ -7,4 +7,5 @@
 		{"item": "lead", "amount": 10},
 	],
 	"category": "power",
+	"research": "unity-nickel",
 }
