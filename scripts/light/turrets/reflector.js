@@ -61,7 +61,7 @@ const reflector = extendContent(ChargeTurret, "reflector", {
     this.super$setStats();
     
     this.stats.remove(Stat.booster);
-    this.stats.add(Stat.input, new BoosterListValue(shielder.reloadTime, shielder.consumes.get(ConsumeType.liquid).amount, shielder.coolantMultiplier, false, l => shielder.consumes.liquidfilters.get(l.id)));
+    this.stats.add(Stat.input, new BoosterListValue(reflector.reloadTime, reflector.consumes.get(ConsumeType.liquid).amount, reflector.coolantMultiplier, false, l => reflector.consumes.liquidfilters.get(l.id)));
   }
 });
 reflector.shootType = lightOvoid;
