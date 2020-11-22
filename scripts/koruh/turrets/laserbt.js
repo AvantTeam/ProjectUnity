@@ -106,7 +106,12 @@ const chargeLaserTurret = lib.extend(ChargeTurret, ChargeTurret.ChargeTurretBuil
             intensity: [Pal.lancerLaser, expColor]
         }
     ],
-    rwPrecision: 20
+    rwPrecision: 20,
+    orbMultiplier: 0.07,
+    load(){
+        this.super$load();
+        this.topRegion = Core.atlas.find(this.name + "-top");
+    }
 }, {
     getShootColor(lvl){
         return lvl > 0 ? expColor : Pal.lancerLaser;
@@ -154,6 +159,18 @@ const chargeLaserTurret = lib.extend(ChargeTurret, ChargeTurret.ChargeTurretBuil
         this.recoil = chargeLaserTurret.recoilAmount;
     }
 });
+
+chargeLaserTurret.drawer = tile => {
+    Draw.rect(chargeLaserTurret.region, tile.x + chargeLaserTurret.tr2.x, tile.y + chargeLaserTurret.tr2.y, tile.rotation - 90);
+    if(tile.totalExp() >= chargeLaserTurret.maxExp){
+        Draw.blend(Blending.additive);
+        Draw.color(expColor);
+        Draw.alpha(Mathf.absin(Time.time(), 20, 0.6));
+        Draw.rect(chargeLaserTurret.topRegion, tile.x + chargeLaserTurret.tr2.x, tile.y + chargeLaserTurret.tr2.y, tile.rotation - 90);
+        Draw.color();
+        Draw.blend();
+    }
+}
 
 chargeLaserTurret.chargeTime = 100;
 chargeLaserTurret.chargeMaxDelay = 100;

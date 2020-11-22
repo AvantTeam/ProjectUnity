@@ -566,7 +566,7 @@ module.exports = {
             },
             //orb region
             consumesOrb(){
-                return expblock.consumesExp && this.totalExp() < expblock.maxExp - 1;
+                return expblock.consumesExp && this.totalExp() < expblock.maxExp;
             },
             getOrbMuitiplier(){
                 return expblock.orbMultiplier;
