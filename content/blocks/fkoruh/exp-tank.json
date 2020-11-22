@@ -1,0 +1,13 @@
+{
+	"size": 2,
+	"health": 300,
+  "hasPower": false,
+  "consumesPower": false,
+  "requirements": [
+		{"item": "copper", "amount": 50},
+		{"item": "lead", "amount": 100},
+		{"item": "graphite", "amount": 120}
+	],
+  "rotate": false,
+  "category": "effect"
+}

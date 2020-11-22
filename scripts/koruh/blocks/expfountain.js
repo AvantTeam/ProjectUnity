@@ -21,6 +21,6 @@ expfountain.buildType = () => extend(Building, {
     },
     updateTile(){
         this.super$updateTile();
-        if(this.enabled && this.timer.get(0, 120)) orblib.spreadExp(this.x, this.y, 100, 6);
+        if(this.enabled && this.timer.get(0, 60)) orblib.spreadExp(this.x, this.y, 100, 6);
     }
 });

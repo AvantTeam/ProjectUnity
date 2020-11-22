@@ -47,7 +47,7 @@ const exporb = extend(BulletType, {
     },
     conveyor(b, block, build){
         if(build.clogHeat > 0.5 || !build.enabled) return;
-        var mspeed = block.speed;
+        var mspeed = block.speed / 3;
         b.vel.add(d4x[build.rotation] * mspeed * build.delta(), d4y[build.rotation] * mspeed * build.delta());
     }
 });
@@ -91,6 +91,15 @@ module.exports = {
             var n = Mathf.floorPositive(amount / expAmount);
             for(var i=0; i<n; i++){
                 this.exporb.createNet(Team.derelict, x, y, Mathf.random() * 360, 0, v, 1);
+            }
+        }
+    },
+    spewExp(x, y, n, r, v){
+        if(!Vars.net.client()){
+            if(v == undefined) v = 8;
+            v *= 1000;
+            for(var i=0; i<n; i++){
+                this.exporb.createNet(Team.derelict, x, y, r - 5 + 10 * Mathf.random(), 0, v, 1);
             }
         }
     }
