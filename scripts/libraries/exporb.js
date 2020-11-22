@@ -17,6 +17,9 @@ const expDespawn = new Effect(15, e => {
 });
 
 const exporb = extend(BulletType, {
+    isOrb(){
+        return true;
+    },
     init(b){
         if(!b) return;
         this.super$init(b);
