@@ -18,8 +18,8 @@ import javax.imageio.*;
 import static mindustry.Vars.*;
 
 public class SpriteProcessor{
-    private static ObjectMap<String, TextureRegion> regionCache = new ObjectMap<>();
-    private static ObjectMap<String, BufferedImage> spriteCache = new ObjectMap<>();
+    static ObjectMap<String, TextureRegion> regionCache = new ObjectMap<>();
+    static ObjectMap<String, BufferedImage> spriteCache = new ObjectMap<>();
 
     public static Unity mod = new Unity();
 
@@ -107,6 +107,8 @@ public class SpriteProcessor{
         Generators.generate();
 
         Fi.get("./sprites-gen").walk(path -> {
+            if(path.absolutePath().contains("ui/")) return;
+
             try{
                 BufferedImage image = ImageIO.read(path.file());
 

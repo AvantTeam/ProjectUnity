@@ -56,9 +56,9 @@ project(":main"){
     apply plugin: 'java'
 
     dependencies{
-        compileOnly "com.github.Anuken.Arc:arc-core:$mindustryVersion"
-        compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
-        //compileOnly "com.github.Anuken:Mindustry:$mindustryHash"
+        implementation "com.github.Anuken.Arc:arc-core:$mindustryVersion"
+        implementation "com.github.Anuken.Mindustry:core:$mindustryVersion"
+        //implementation "com.github.Anuken:Mindustry:$mindustryHash"
         implementation "com.github.younggam:multi-lib:$multilibVersion"
     }
 }

@@ -1,35 +1,33 @@
 package unity.content;
 
-import arc.Core;
-import arc.func.Cons;
-import arc.func.Prov;
-import arc.math.Mathf;
-import arc.math.geom.Position;
-import arc.util.Tmp;
-import arc.graphics.Color;
-import arc.math.geom.Vec2;
-import mindustry.Vars;
+import arc.*;
+import arc.func.*;
+import arc.math.*;
+import arc.math.geom.*;
+import arc.util.*;
+import arc.graphics.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.entities.bullet.*;
 import mindustry.graphics.*;
-import mindustry.io.JsonIO;
-import mindustry.ctype.ContentList;
-import mindustry.world.blocks.defense.turrets.LaserTurret;
+import mindustry.io.*;
+import mindustry.ctype.*;
+import mindustry.world.blocks.defense.turrets.*;
 import unity.entities.bullet.*;
 import unity.world.blocks.defense.turrets.*;
 
 import arc.graphics.g2d.*;
 
 import static arc.math.Mathf.*;
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 import static mindustry.graphics.Drawf.*;
 import static mindustry.graphics.Pal.*;
 import static unity.content.UnityFx.*;
 
 public class UnityBullets implements ContentList{
-    public static BulletType laser, coalBlaze, pyraBlaze, falloutLaser, catastropheLaser, calamityLaser, orb, shockBeam, currentStroke, shielderBullet, plasmaFragTriangle, plasmaTriangle;
+    public static BulletType laser, coalBlaze, pyraBlaze, falloutLaser, catastropheLaser, calamityLaser, orb, shockBeam, currentStroke, shielderBullet, plasmaFragTriangle, plasmaTriangle, pylonLightning, pylonLaser, pylonLaserSmall;
 
     //only enhanced
     public static BasicBulletType standardDenseLarge, standardHomingLarge, standardIncendiaryLarge, standardThoriumLarge, standardDenseHeavy, standardHomingHeavy, standardIncendiaryHeavy, standardThoriumHeavy, standardDenseMassive, standardHomingMassive,
@@ -122,38 +120,32 @@ public class UnityBullets implements ContentList{
             }
         };
 
-        falloutLaser = new SparkingContinuousLaserBulletType(95f){
-            {
-                length = 230f;
-                fromBlockChance = 0.12f;
-                fromBlockDamage = 23f;
-                fromLaserAmount = 0;
-                incendChance = 0f;
-                fromBlockLen = 2;
-                fromBlockLenRand = 5;
-            }
-        };
+        falloutLaser = new SparkingContinuousLaserBulletType(95f){{
+            length = 230f;
+            fromBlockChance = 0.12f;
+            fromBlockDamage = 23f;
+            fromLaserAmount = 0;
+            incendChance = 0f;
+            fromBlockLen = 2;
+            fromBlockLenRand = 5;
+        }};
 
-        catastropheLaser = new SparkingContinuousLaserBulletType(240f){
-            {
-                length = 340f;
-                strokes = new float[]{2 * 1.4f, 1.5f * 1.4f, 1 * 1.4f, 0.3f * 1.4f};
-                incendSpread = 7f;
-                incendAmount = 2;
-            }
-        };
+        catastropheLaser = new SparkingContinuousLaserBulletType(240f){{
+            length = 340f;
+            strokes = new float[]{2 * 1.4f, 1.5f * 1.4f, 1 * 1.4f, 0.3f * 1.4f};
+            incendSpread = 7f;
+            incendAmount = 2;
+        }};
 
-        calamityLaser = new SparkingContinuousLaserBulletType(580f){
-            {
-                length = 450f;
-                strokes = new float[]{2 * 1.7f, 1.5f * 1.7f, 1 * 1.7f, 0.3f * 1.7f};
-                incendSpread = 9f;
-                incendAmount = 2;
-                width = 9f;
-                lightStroke = 70f;
-                spaceMag = 70f;
-            }
-        };
+        calamityLaser = new SparkingContinuousLaserBulletType(580f){{
+            length = 450f;
+            strokes = new float[]{2 * 1.7f, 1.5f * 1.7f, 1 * 1.7f, 0.3f * 1.7f};
+            incendSpread = 9f;
+            incendAmount = 2;
+            width = 9f;
+            lightStroke = 70f;
+            spaceMag = 70f;
+        }};
 
         orb = new BulletType(){
             {
@@ -258,70 +250,97 @@ public class UnityBullets implements ContentList{
             }
         };
 
-        currentStroke = new LaserBulletType(450){
+        currentStroke = new LaserBulletType(450){{
+            lifetime = 65f;
+            width = 20f;
+            length = 430f;
+            lightningSpacing = 35f;
+            lightningLength = 5;
+            lightningDelay = 1.1f;
+            lightningLengthRand = 15;
+            lightningDamage = 50f;
+            lightningAngleRand = 40f;
+            largeHit = true;
+            lightColor = lightningColor = Pal.surge;
+            sideAngle = 15f;
+            sideWidth = 0f;
+            sideLength = 0f;
+            colors = new Color[]{Pal.surge.cpy(), Pal.surge, Color.white};
+        }};
+
+        shielderBullet = new ShieldBulletType(8){{
+            drag = 0.03f;
+            shootEffect = Fx.none;
+            despawnEffect = Fx.none;
+            collides = false;
+            hitSize = 0;
+            hittable = false;
+            hitEffect = Fx.hitLiquid;
+            breakSound = Sounds.wave;
+            maxRadius = 10f;
+            shieldHealth = 3000f;
+        }};
+
+        plasmaFragTriangle = new TriangleBulletType(4.5f, 90f){{
+            lifetime = 160f;
+            lifetimeRand = 40f;
+            width = 10f;
+            length = 11f;
+            trailWidth = 4f;
+            trailLength = 8;
+            drag = 0.05f;
+            collides = false;
+            summonsLightning = true;
+            shootEffect = plasmaFragAppear;
+            hitEffect = despawnEffect = plasmaFragDisappear;
+        }};
+
+        plasmaTriangle = new TriangleBulletType(4f, 380f){{
+            lifetime = 180f;
+            width = 16f;
+            length = 20f;
+            trailWidth = 6.5f;
+            trailLength = 10;
+            hitEffect = plasmaTriangleHit;
+            despawnEffect = Fx.none;
+            fragBullet = plasmaFragTriangle;
+            fragBullets = 8;
+        }};
+
+        pylonLightning = new LightningBulletType(){{
+            lightningLength = 32;
+            lightningLengthRand = 12;
+            damage = 28f;
+        }};
+
+        pylonLaser = new LaserBulletType(420f){
             {
-                lifetime = 65f;
-                width = 20f;
-                length = 430f;
-                lightningSpacing = 35f;
-                lightningLength = 5;
-                lightningDelay = 1.1f;
-                lightningLengthRand = 15;
-                lightningDamage = 50f;
-                lightningAngleRand = 40f;
+                length = 520f;
+                width = 60f;
+                lifetime = 72f;
                 largeHit = true;
-                lightColor = lightningColor = Pal.surge;
-                sideAngle = 15f;
-                sideWidth = 0f;
-                sideLength = 0f;
-                colors = new Color[]{Pal.surge.cpy(), Pal.surge, Color.white};
+                sideLength = sideWidth = 0f;
+                shootEffect = pylonLaserCharge;
+            }
+
+            @Override
+            public void init(Bullet b){
+                super.init(b);
+
+                for(int i = 0; i < 24; i++){
+                    Time.run(2f * i, () -> {
+                        pylonLightning.create(b, b.x, b.y, b.vel().angle());
+
+                        Sounds.spark.at(b.x, b.y, Mathf.random(0.6f, 0.9f));
+                    });
+                }
             }
         };
 
-        shielderBullet = new ShieldBulletType(8){
-            {
-                drag = 0.03f;
-                shootEffect = Fx.none;
-                despawnEffect = Fx.none;
-                collides = false;
-                hitSize = 0;
-                hittable = false;
-                hitEffect = Fx.hitLiquid;
-                breakSound = Sounds.wave;
-                maxRadius = 10f;
-                shieldHealth = 3000f;
-            }
-        };
-
-        plasmaFragTriangle = new TriangleBulletType(4.5f, 90f){
-            {
-                lifetime = 160f;
-                lifetimeRand = 40f;
-                width = 10f;
-                length = 11f;
-                trailWidth = 4f;
-                trailLength = 8;
-                drag = 0.05f;
-                collides = false;
-                summonsLightning = true;
-                shootEffect = plasmaFragAppear;
-                hitEffect = despawnEffect = plasmaFragDisappear;
-            }
-        };
-
-        plasmaTriangle = new TriangleBulletType(4f, 380f){
-            {
-                lifetime = 180f;
-                width = 16f;
-                length = 20f;
-                trailWidth = 6.5f;
-                trailLength = 10;
-                hitEffect = plasmaTriangleHit;
-                despawnEffect = Fx.none;
-                fragBullet = plasmaFragTriangle;
-                fragBullets = 8;
-            }
-        };
+        pylonLaserSmall = new LaserBulletType(48f){{
+            length = 180f;
+            width = 24f;
+        }};
 
         //only enhanced
 

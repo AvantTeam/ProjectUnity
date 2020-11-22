@@ -9,6 +9,7 @@ ext{
     imageProcessorMain = "unity.tools.SpriteProcessor"
 
     spritesGenFolder = "../main/assets-raw/sprites-gen/"
+    spritesGenUIFolder = "../main/assets-raw/sprites-gen/ui/"
     spritesAssetsFolder = "../main/assets/sprites/"
 }
 
@@ -20,6 +21,7 @@ task processSprites(dependsOn: classes){
         }
 
         file("$spritesGenFolder").mkdirs()
+        file("$spritesGenUIFolder").mkdirs()
 
         javaexec{
             main = imageProcessorMain
@@ -29,11 +31,11 @@ task processSprites(dependsOn: classes){
             workingDir = "../main/assets-raw/"
         }
 
+        file("$spritesAssetsFolder").mkdirs()
+
         copy{
             from "$spritesGenFolder"
             into "$spritesAssetsFolder"
         }
-
-        file("$spritesAssetsFolder").mkdirs()
     }
 }

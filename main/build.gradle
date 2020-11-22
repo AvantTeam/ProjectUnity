@@ -6,7 +6,6 @@ repositories{
 }
 
 ext{
-    mainClassName = "unity.Unity"
     assetsDir = new File("$projectDir/assets")
 
     doExec = { cmd ->

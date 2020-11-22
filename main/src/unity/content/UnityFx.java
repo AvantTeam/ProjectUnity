@@ -6,6 +6,7 @@ import arc.math.*;
 import arc.math.geom.Position;
 import arc.util.*;
 import mindustry.entities.*;
+import mindustry.entities.bullet.*;
 import mindustry.graphics.*;
 import unity.graphics.UnityPal;
 
@@ -14,6 +15,7 @@ import static arc.graphics.g2d.Lines.*;
 import static arc.math.Angles.*;
 import static arc.math.Mathf.*;
 import static mindustry.graphics.Drawf.*;
+import static unity.content.UnityBullets.*;
 
 public class UnityFx{
     public static final Effect
@@ -219,7 +221,8 @@ public class UnityFx{
     }),
 
     falseLightning = new Effect(10f, 500f, e -> {
-        if(e.data == null || !(e.data instanceof Float)) return;
+        if(!(e.data instanceof Float)) return;
+
         float length = (float) e.data;
         int lenInt = Mathf.round(length / 8f);
         stroke(3f * e.fout());
@@ -266,7 +269,8 @@ public class UnityFx{
     }),
 
     healLaser = new Effect(60f, e -> {
-        if(e.data == null || !(e.data instanceof Position[])) return;
+        if(!(e.data instanceof Position[])) return;
+
         float[] reduction = new float[]{0f, 1.5f};
         Position[] temp = (Position[]) e.data;
         Position a = temp[0], b = temp[1];
@@ -293,5 +297,23 @@ public class UnityFx{
 
     cutEffect = new Effect(3f * 60f, e -> {
         
+    }),
+
+    pylonLaserCharge = new Effect(80f, 150f, e -> {
+        LaserBulletType laser = (LaserBulletType)pylonLaser;
+        float cwidth = laser.width;
+
+        for(int i = 0; i < laser.colors.length; i++){
+            cwidth *= laser.lengthFalloff;
+
+            Color color = laser.colors[i];
+            Draw.color(color);
+            Fill.circle(e.x, e.y, cwidth * e.fin());
+
+            for(int j = 0; j < 2; j++){
+                Lines.stroke(e.fin() * 1.5f * i);
+                Lines.square(e.x, e.y, e.fout() * laser.width * i, Time.time() * 4f * Mathf.signs[j]);
+            }
+        }
     });
 }

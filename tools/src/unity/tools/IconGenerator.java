@@ -28,6 +28,20 @@ public class IconGenerator implements Generator{
                 type.load();
                 type.init();
 
+                //avoid nulls; sometimes happens for unknown reasons
+                if(SpriteProcessor.regionCache.containsKey((type.name + "-leg-base").replaceFirst("unity-", ""))){
+                    type.legBaseRegion = SpriteProcessor.regionCache.get((type.name + "-leg-base").replaceFirst("unity-", ""));
+                }
+                if(SpriteProcessor.regionCache.containsKey((type.name + "-foot").replaceFirst("unity-", ""))){
+                    type.footRegion = SpriteProcessor.regionCache.get((type.name + "-foot").replaceFirst("unity-", ""));
+                }
+                if(SpriteProcessor.regionCache.containsKey((type.name + "-joint").replaceFirst("unity-", ""))){
+                    type.jointRegion = SpriteProcessor.regionCache.get((type.name + "-joint").replaceFirst("unity-", ""));
+                }
+                if(SpriteProcessor.regionCache.containsKey((type.name + "-joint-base").replaceFirst("unity-", ""))){
+                    type.baseJointRegion = SpriteProcessor.regionCache.get((type.name + "-joint-base").replaceFirst("unity-", ""));
+                }
+
                 Color outc = Pal.darkerMetal;
                 Func<Sprite, Sprite> outline = i -> i.outline(3, outc);
                 Func<TextureRegion, String> parseName = reg -> ((AtlasRegion)reg).name.replaceFirst("unity-", "");
@@ -43,6 +57,8 @@ public class IconGenerator implements Generator{
                         }else{
                             Log.warn("@ not found", fname);
                         }
+                    }else{
+                        Log.warn("A region is null");
                     }
                 };
 
@@ -98,9 +114,10 @@ public class IconGenerator implements Generator{
 
                 for(Weapon weapon : type.weapons){
                     weapon.load();
+                    String wname = weapon.name.replaceFirst("unity-", "");
 
-                    if(!weapon.top){
-                        Sprite weapSprite = SpriteProcessor.get(weapon.name.replaceFirst("unity-", ""));
+                    if(!weapon.top && SpriteProcessor.has(wname)){
+                        Sprite weapSprite = SpriteProcessor.get(wname);
 
                         icon.draw(weapSprite,
                         (int)(weapon.x * 4f / Draw.scl + icon.width / 2f - weapSprite.width / 2f),
@@ -125,32 +142,35 @@ public class IconGenerator implements Generator{
 
                 for(Weapon weapon : type.weapons){
                     weapon.load();
+                    String wname = weapon.name.replaceFirst("unity-", "");
 
-                    Sprite weapSprite = SpriteProcessor.get(weapon.name.replaceFirst("unity-", ""));
+                    if(SpriteProcessor.has(wname)){
+                        Sprite weapSprite = SpriteProcessor.get(wname);
 
-                    icon.draw(weapSprite,
-                    (int)(weapon.x * 4f / Draw.scl + icon.width / 2f - weapSprite.width / 2f),
-                    (int)(-weapon.y * 4f / Draw.scl + icon.height / 2f - weapSprite.height / 2f),
-                    weapon.flipSprite, false
-                    );
-
-                    if(weapon.top){
-                        icon.draw(outline.get(weapSprite),
+                        icon.draw(weapSprite,
                         (int)(weapon.x * 4f / Draw.scl + icon.width / 2f - weapSprite.width / 2f),
                         (int)(-weapon.y * 4f / Draw.scl + icon.height / 2f - weapSprite.height / 2f),
                         weapon.flipSprite, false
                         );
+
+                        if(weapon.top){
+                            icon.draw(outline.get(weapSprite),
+                            (int)(weapon.x * 4f / Draw.scl + icon.width / 2f - weapSprite.width / 2f),
+                            (int)(-weapon.y * 4f / Draw.scl + icon.height / 2f - weapSprite.height / 2f),
+                            weapon.flipSprite, false
+                            );
+                        }
                     }
                 }
 
-                icon.save(fname + "-full");
+                icon.save("ui/" + fname + "-full");
 
                 for(Cicon i : Cicon.scaled){
                     Vec2 size = Scaling.fit.apply(icon.width, icon.height, i.size, i.size);
                     Sprite scaled = new Sprite((int)size.x, (int)size.y);
 
                     scaled.drawScaled(icon);
-                    scaled.save(fname + "-" + i.name());
+                    scaled.save("ui/" + fname + "-" + i.name());
                 }
             }catch(IllegalArgumentException e){
                 Log.err("Skipping unit @: @", type.name, e.getMessage());
