@@ -163,12 +163,12 @@ const chargeLaserTurret = lib.extend(ChargeTurret, ChargeTurret.ChargeTurretBuil
 chargeLaserTurret.drawer = tile => {
     Draw.rect(chargeLaserTurret.region, tile.x + chargeLaserTurret.tr2.x, tile.y + chargeLaserTurret.tr2.y, tile.rotation - 90);
     if(tile.totalExp() >= chargeLaserTurret.maxExp){
-        Draw.blend(Blending.additive);
+        //Draw.blend(Blending.additive);
         Draw.color(expColor);
         Draw.alpha(Mathf.absin(Time.time(), 20, 0.6));
         Draw.rect(chargeLaserTurret.topRegion, tile.x + chargeLaserTurret.tr2.x, tile.y + chargeLaserTurret.tr2.y, tile.rotation - 90);
         Draw.color();
-        Draw.blend();
+        //Draw.blend();
     }
 }
 
