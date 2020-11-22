@@ -500,9 +500,14 @@ const crucibleGraph = { //this just uh manages the graphics lmAO
 	containChanged:true,
 	crafts:true,
 	totalCapacity:0,
+	color:null,
 	
-	
-	
+	getLiquidColor(){
+		if(!this.color){
+			return Color.clear;
+		}
+		return this.color;
+	},
 	getLiquidCapacity(){
 		if(!this.totalCapacity){return 0;}
 		return this.totalCapacity;
@@ -653,7 +658,7 @@ const crucibleGraph = { //this just uh manages the graphics lmAO
 				bitmask += 1<<i;
 			}
 			building.tilingIndex = bitmask;
-			building.liquidcap = capacitymul[directneighbour]*building.getBlockData().getBaseLiquidCapacity();
+			building.liquidcap = (building.getBuild().block.size==1?capacitymul[directneighbour]:1.0)*building.getBlockData().getBaseLiquidCapacity();
 			capacumm+=building.liquidcap;
 			hasCrafter = hasCrafter||building.getBlockData().getDoesCrafting();
         }));
@@ -689,12 +694,31 @@ const crucibleGraph = { //this just uh manages the graphics lmAO
 	getAverageMeltSpeedIndex(index,tmpdep,cooldep){
 		return this.getAverageMeltSpeed(cruicibleMelts[index],tmpdep,cooldep)
 	},
-
+	updateColor(){
+		let col = {r:0,g:0,b:0};
+		let tliquid = 0;
+		for(let i = 0;i<this.contains.length;i++){
+			let itmcol = Color.valueOf("555555");
+			if(this.contains[i].meltedRatio>0){
+				let liquidvol = this.contains[i].meltedRatio*this.contains[i].volume;
+				tliquid +=liquidvol;
+				if(this.contains[i].item){
+					itmcol = this.contains[i].item.color;
+				}
+				col.r +=itmcol.r*liquidvol;
+				col.g +=itmcol.g*liquidvol;
+				col.b +=itmcol.b*liquidvol;
+			}
+		}
+		let invt = 1.0/tliquid;
+		this.color =new Color(col.r*invt, col.g*invt, col.b*invt, Mathf.clamp(2.0*tliquid/this.getLiquidCapacity()));
+	},
 
 	updateGraph() {
 		if(!this.contains){ return;}
 		if(!this.crafts){
 			this.removeEmptyMelts();
+			this.updateColor();
 			return;
 		}
 		let capacitymul = Math.sqrt(this.getLiquidCapacity()/15.0);
@@ -755,6 +779,8 @@ const crucibleGraph = { //this just uh manages the graphics lmAO
 		}
 		//removing empty if any
 		this.removeEmptyMelts();
+		//updating color
+		this.updateColor();
 	},
 	
 	removeEmptyMelts(){
