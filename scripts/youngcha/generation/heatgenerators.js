@@ -1,7 +1,7 @@
 const heatlib = require("libraries/heatlib");
 const graphLib = require("libraries/graphlib");
 
-
+const _dirs = [{x: 1,y: 0},{x: 0,y: 1},{x: -1,y: 0},{x: 0,y: -1}];
 
 
 let thblankobj = graphLib.init();
@@ -15,7 +15,7 @@ const thermalHeater = graphLib.finaliseExtend(Block, Building,"thermal-heater",t
 	},
 	attribute: Attribute.heat,
 	
-	getTerrainAttrib(){return this.attribute},
+	getTerrainAttrib(){return this.attribute;},
 	
 	canPlaceOn( tile,  team){
         return tile.getLinkedTilesAs(this, this.tempTiles).sumf(other => other.floor().attributes.get(this.attribute)) > 0.01;
@@ -76,3 +76,183 @@ infiHeater.getGraphConnectorBlock("heat graph").setAccept( [1,1, 1,1]);
 infiHeater.getGraphConnectorBlock("heat graph").setBaseHeatConductivity(1.0);
 infiHeater.getGraphConnectorBlock("heat graph").setBaseHeatCapacity(1000);
 infiHeater.getGraphConnectorBlock("heat graph").setBaseHeatRadiativity(0.0);
+
+
+////SOLAR ------------------------------------------
+
+let scblankobj = graphLib.init();
+graphLib.addGraph(scblankobj, heatlib.baseTypesHeat.heatConnector);
+const solarCollector = graphLib.finaliseExtend(Block, Building,"solar-collector",scblankobj,{
+	load(){
+		this.super$load();
+		this.heatsprite = Core.atlas.find(this.name+"-heat");
+		this.lightsprite = Core.atlas.find(this.name+"-light");
+		this.bottom = Core.atlas.find(this.name);
+	},
+},{
+	linkedReflect:[],
+	thermalPwr: 0,
+	
+	getThermalPowerCoeff(ref){
+		let dst = Mathf.dst(ref.x,ref.y,this.x,this.y);
+		let dir = _dirs[this.rotation];
+		return Mathf.clamp((dir.x*(ref.x-this.x)/dst + dir.y*(ref.y-this.y)/dst)*1.5);
+	},
+	recalcThermalPwr(){
+		this.thermalPwr=0;
+		if(!this.linkedReflect || !this.linkedReflect.length){return;}
+		for(var i =0 ;i<this.linkedReflect.length;i++){
+			this.thermalPwr+=this.getThermalPowerCoeff(this.linkedReflect[i]);
+		}
+	},
+	appendSolarReflector(ref){
+		if(!this.linkedReflect.length){
+			let g = [];
+			this.linkedReflect = g;
+		}
+		this.linkedReflect.push(ref);
+		this.recalcThermalPwr();
+	},
+	removeReflector(ref){
+		for(var i =0 ;i<this.linkedReflect.length;i++){
+			if(this.linkedReflect[i]==ref){
+				this.linkedReflect.splice(i,1);
+				this.recalcThermalPwr();
+				return;
+			}
+		}
+	},
+	onDelete(){
+		if(!this.linkedReflect){return;}
+		for(var i =0 ;i<this.linkedReflect.length;i++){
+			this.linkedReflect[i].setLink(-1);
+		}
+	},
+	updatePost(){
+		let hgraph = this.getGraphConnector("heat graph");
+		let temp = hgraph.getTemp();
+		hgraph.setHeat(hgraph.getHeat()+ Math.min(this.thermalPwr,Math.max(0,800-temp)*this.thermalPwr*0.03));
+	},
+	draw() {
+		let temp = this.getGraphConnector("heat graph").getTemp();
+		Draw.rect(solarCollector.bottom, this.x, this.y,this.rotdeg());
+		heatlib.drawHeat(solarCollector.heatsprite,this.x, this.y,this.rotdeg(), temp);
+		if(this.thermalPwr>0){
+			Draw.z(Layer.effect);
+			Draw.color(new Color(this.thermalPwr,this.thermalPwr,this.thermalPwr));
+			Draw.rect(solarCollector.lightsprite, this.x, this.y,this.rotdeg());
+			Draw.z();
+		}
+        this.drawTeamTop();
+	},
+	
+});
+solarCollector.update = true;
+solarCollector.solid = true;
+solarCollector.rotate = true;
+solarCollector.getGraphConnectorBlock("heat graph").setAccept( [0,0,0 ,0,0,0 ,0,1,0 ,0,0,0]);
+solarCollector.getGraphConnectorBlock("heat graph").setBaseHeatConductivity(1.0);
+solarCollector.getGraphConnectorBlock("heat graph").setBaseHeatCapacity(60);
+solarCollector.getGraphConnectorBlock("heat graph").setBaseHeatRadiativity(0.02);
+
+
+
+const solarReflector = extendContent(Block, "solar-reflector", {
+	load(){
+		this.super$load();
+		this.mirror = Core.atlas.find(this.name+"-mirror");
+		this.bottom = Core.atlas.find(this.name+"-base");
+		this.config(Point2, ( tile,  point) => tile.setLink(Point2.pack(point.x + tile.tileX(), point.y + tile.tileY())));
+        this.config(java.lang.Integer, ( tile,  point) => tile.setLink(point));
+	},
+});
+solarReflector.buildType = () => {
+	
+	let building = extend(Building, {
+		mirrorRot:0,
+		_link:-1,
+		getLink(s){
+			return this._link;
+		},
+		setLink(s){
+			if(s==this._link){return;}
+			if(this._link!=-1){
+				Vars.world.build(this._link).removeReflector(this);
+			}
+			if(s!=-1){
+				let bui  = Vars.world.build(s);
+				if(!bui || !bui.appendSolarReflector){
+					return;
+				}
+				Vars.world.build(s).appendSolarReflector(this);
+			}
+			this._link=s;
+		},
+		updateTile(){
+			this.mirrorRot+=0.4;
+			let link = Vars.world.build(this._link);
+            let hasLink = this.linkValid();
+
+            if(hasLink){
+                this.setLink(link.pos());
+				this.mirrorRot = Mathf.slerpDelta(this.mirrorRot, this.tile.angleTo(link.tile), 0.05);
+            }
+			
+		},
+		draw(){
+			Draw.rect(solarReflector.bottom, this.x, this.y);
+			Draw.rect(solarReflector.mirror, this.x, this.y,this.mirrorRot);
+		},
+		drawConfigure(){
+			let sin = Mathf.absin(Time.time(), 6, 1);
+			
+			if(this.linkValid()){
+                let target = Vars.world.build(this._link);
+                Drawf.circles(target.x, target.y, (target.block.size / 2 + 1) * Vars.tilesize + sin - 2, Pal.place);
+                Drawf.arrow(this.x, this.y, target.x, target.y, this.size * Vars.tilesize + sin, 4 + sin);
+            }
+
+            Drawf.dashCircle(this.x, this.y, 100, Pal.accent);
+		},
+		onConfigureTileTapped(other){
+			if(this == other){
+                this.configure(new java.lang.Integer(-1));
+				print("confgured this, returning -1");
+                return false;
+            }
+			if(this._link == other.pos()){
+                this.configure(new java.lang.Integer(-1));
+				print("confgured same, returning -1");
+                return false;
+            }else if(other.appendSolarReflector && other.dst(this.tile) <= 100 && other.team == this.team){
+				print("confgured a valid building :0, returning "+other.pos());
+                this.configure(new java.lang.Integer(other.pos()));
+                return false;
+            }
+			return true;
+			
+		},
+		config(){
+            return Point2.unpack(this._link).sub(this.tile.x, this.tile.y);
+        },
+		linkValid(){
+            if(this._link == -1) return false;
+            let link = Vars.world.build(this._link);
+            return link.appendSolarReflector && link.team == this.team && this.within(link, 100);
+        },
+		write(stream) {
+			this.super$write(stream);
+			stream.i(this._link);
+		},
+		read(stream, revision) {
+			this.super$read(stream,revision);
+			this.setLink(stream.i());
+		}
+	});
+	building.block = solarReflector;
+	return building;
+};
+solarReflector.solid = true;
+solarReflector.update = true;
+solarReflector.configurable = true;
+

@@ -7,4 +7,5 @@
 		{"item": "copper", "amount": 50},
 	],
 	"category": "power",
+	"research": "unity-shaft-router",
 }

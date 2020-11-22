@@ -341,7 +341,8 @@ const script = [
                 name: "producers",
                 childs: [
                     "augerdrill",
-                    "crucible"
+                    "crucible",
+					"sporepyro"
                 ]
             },
 

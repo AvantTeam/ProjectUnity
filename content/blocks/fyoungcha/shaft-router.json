@@ -7,4 +7,5 @@
 		{"item": "lead", "amount": 20},
 	],
 	"category": "power",
+	"research": "unity-drive-shaft",
 }

@@ -1,0 +1,10 @@
+{
+	"size": 2,
+	"health": 800,
+	"requirements": [
+		{"item": "nickel", "amount": 25},
+		{"item": "copper", "amount": 50},
+	],
+	"research": "unity-wind-turbine",
+	"category": "power",
+}

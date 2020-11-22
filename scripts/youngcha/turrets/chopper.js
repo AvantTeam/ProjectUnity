@@ -328,7 +328,6 @@ const chopperTurret = graphLib.finaliseExtend(Block, Building, "chopper", blanko
     draw() {
         let tgraph = this.getGraphConnector("torque graph");
         Draw.rect(chopperTurret.base[this.rotation], this.x, this.y, 0);
-        //speeeeeeen tgraph.getRotation()
         let blades = this.getBufferRegion();
         if(blades) {
             Draw.z(Layer.turret);
