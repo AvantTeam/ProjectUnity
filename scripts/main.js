@@ -68,6 +68,7 @@ const script = [
             "unitlib",
             "copterbase",
             "loader",
+            "exporb",
             "exp",
             "multi-lib",
             "status",
@@ -231,7 +232,8 @@ const script = [
                 childs: [
                     "shieldGenerator",
                     "shieldedWall",
-                    "teleporter"
+                    "teleporter",
+                    "expfountain"
                 ]
             }
         ]

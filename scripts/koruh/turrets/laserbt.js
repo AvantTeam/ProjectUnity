@@ -53,10 +53,10 @@ const chargeLaser = extend(LaserBulletType, {
 
         var target = Damage.linecast(b, b.x, b.y, b.rotation(), this.length);
         if(target instanceof Hitboxc){
-            b.owner.incExp(0.05);
+            b.owner.incExp(0.15);
         }
         else if(target instanceof Building){
-            b.owner.incExp(0.1);
+            b.owner.incExp(0.3);
         }
     }
 });
@@ -92,7 +92,8 @@ const chargeLaserTurret = lib.extend(ChargeTurret, ChargeTurret.ChargeTurretBuil
             field: "chargeTime",
             intensity: [100, 150]
         },
-    ]
+    ],
+    rwPrecision: 20
 }, {
     getShootColor(lvl){
         return lvl > 0 ? expColor : Pal.lancerLaser;
