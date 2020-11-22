@@ -13,8 +13,8 @@ expfountain.buildType = () => extend(Building, {
     draw(){
         this.super$draw();
         Draw.blend(Blending.additive);
-        Draw.color(Color.yellow);
-        Draw.alpha(Mathf.absin(Time.time(), 20, 0.6));
+        Draw.color(Color.white);
+        Draw.alpha(Mathf.absin(Time.time(), 20, 0.4));
         Draw.rect(expfountain.topRegion, this.x, this.y);
         Draw.blend();
         Draw.reset();
