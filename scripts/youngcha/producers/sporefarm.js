@@ -2,14 +2,14 @@
 
 //tile.floor().liquidDrop == Liquids.water
 
-
+const frames = 5;
 const sporeFarm = extendContent(Block, "spore-farm", {
 	_timerid:0,
 	_dumptimerid:0,
 	load(){
 		this.super$load();
-		this.plantSprite = [Core.atlas.find(this.name+"-spore1"),Core.atlas.find(this.name+"-spore2"),Core.atlas.find(this.name+"-spore3")];
-		this.bottom  = [Core.atlas.find(this.name+"-ground1"),Core.atlas.find(this.name+"-ground2"),Core.atlas.find(this.name+"-ground3")];
+		this.plantSprite = [Core.atlas.find(this.name+"-spore1"),Core.atlas.find(this.name+"-spore2"),Core.atlas.find(this.name+"-spore3"),Core.atlas.find(this.name+"-spore4"),Core.atlas.find(this.name+"-spore5")];
+		this.bottom  = [Core.atlas.find(this.name+"-ground1"),Core.atlas.find(this.name+"-ground2"),Core.atlas.find(this.name+"-ground3"),Core.atlas.find(this.name+"-ground4"),Core.atlas.find(this.name+"-ground5")];
 		this._timerid = this.timers++;
 		this._dumptimerid = this.timers++;
 	},
@@ -30,8 +30,8 @@ sporeFarm.buildType = () =>
 			return ctile && ctile.floor().liquidDrop == Liquids.water;
 		},
 		attemptGrow(){
-			let ctile = Vars.world.tile(Math.floor(this.tile.x+Mathf.range(2)),Math.floor(this.tile.y+Mathf.range(2)));
-			if(!ctile || ctile.bc()){return false;}
+			let ctile = Vars.world.tile(Math.floor(this.tile.x+Mathf.range(2)+0.5),Math.floor(this.tile.y+Mathf.range(2)+0.5));
+			if(!ctile || ctile.bc()||ctile.solid()){return false;}
 			Call.setTile(ctile, sporeFarm, this.team, 0);
 			return true;
 		},
@@ -41,9 +41,9 @@ sporeFarm.buildType = () =>
 				if(this.delay==-1){
 					this.delay =  (this.tile.x*89+this.tile.y*13)%21;
 				}else{		
-					this.growth+=this.randomChk()?(this.growth>1.8?0.1:0.3):-0.1;
-					if(this.growth>=3){
-						this.growth=2;
+					this.growth+=this.randomChk()?(this.growth>frames-2?0.1:0.45):-0.1;
+					if(this.growth>=frames){
+						this.growth=frames-1;
 						if(!this.attemptGrow() && this.items.total()<1){
 							this.offload(Items.sporePod);
 						}
