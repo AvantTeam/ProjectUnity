@@ -150,7 +150,6 @@ const _GraphCommonBuild = {
     },
     read(stream, revision) {
         this.super$read(stream, revision);
-		print("graph connector");
         for(let graphname in this.graphs) {
 			this.graphs[graphname].read(stream, revision);
 		}
@@ -556,7 +555,6 @@ const _GraphPropsCommon = {
         this.writeLocal(stream,this._network);
     },
     read(stream, revision) {
-		print("reading graph block connector");
         this.readGlobal(stream, revision);
         let cachearray = [this.readLocal(stream, revision)];
 		this._saveCache = cachearray;

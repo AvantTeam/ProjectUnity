@@ -255,7 +255,6 @@ const _RotPowerPropsCommon = Object.assign(Object.create(graphLib.graphProps),{
 	},
 	readLocal(stream, revision) {
 		let fk = stream.f();
-		print(fk);
 		return {speed:fk}
 	}
 

@@ -181,7 +181,7 @@ nickelStatorLarge.getGraphConnectorBlock("flux graph").setFlux(10);
 
 //----------------------------------------------------------------------------------------------------------------------------------
 
-//adding a block
+
 let nemblankobj = graphLib.init();
 graphLib.addGraph(nemblankobj, magnetgraphtype);
 Object.assign(nemblankobj.build,magbehaviour);
@@ -210,6 +210,33 @@ nickelElectromagnet.getGraphConnectorBlock("flux graph").setAccept( [1,1,0,0,0,0
 nickelElectromagnet.getGraphConnectorBlock("flux graph").setFlux(25);
 
 
+//----------------------------------------------------------------------------------------------------------------------------------
+
+//adding a block
+let nesblankobj = graphLib.init();
+graphLib.addGraph(nesblankobj, magnetgraphtype);
+Object.assign(nesblankobj.build,magbehaviour);
+const neodymiumStator = graphLib.finaliseExtend(Block, Building,"neodymium-stator",nesblankobj,{
+	
+	load(){
+		this.super$load();
+		this.basesprite = [Core.atlas.find(this.name),Core.atlas.find(this.name+2),Core.atlas.find(this.name+3),Core.atlas.find(this.name+4)];
+	},
+	
+},{
+	updatePre(){},
+	draw() {
+		Draw.rect(neodymiumStator.basesprite[this.rotation], this.x, this.y, 0);
+        this.drawTeamTop();
+	}
+	
+});
+
+neodymiumStator.rotate = true;
+neodymiumStator.update = true;
+neodymiumStator.solid = true;
+neodymiumStator.getGraphConnectorBlock("flux graph").setAccept( [1,0,0,0]);
+neodymiumStator.getGraphConnectorBlock("flux graph").setFlux(200);
 
 
 //----------------------------------------------------------------------------------------------------------------------------------

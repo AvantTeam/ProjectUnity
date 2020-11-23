@@ -1,0 +1,8 @@
+{
+	"size": 1,
+	"health": 400,
+	"requirements": [
+	],
+	"buildVisibility": "sandboxOnly",
+	"category": "power",
+}

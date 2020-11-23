@@ -78,6 +78,37 @@ infiHeater.getGraphConnectorBlock("heat graph").setBaseHeatCapacity(1000);
 infiHeater.getGraphConnectorBlock("heat graph").setBaseHeatRadiativity(0.0);
 
 
+
+
+
+
+let icblankobj = graphLib.init();
+graphLib.addGraph(icblankobj, heatlib.baseTypesHeat.heatConnector);
+const infiCooler = graphLib.finaliseExtend(Block, Building,"infi-cooler",icblankobj,{
+	load(){
+		this.super$load();
+	},
+},{
+	updatePost(){
+		let hgraph = this.getGraphConnector("heat graph");
+		let temp = hgraph.getTemp();
+		hgraph.setHeat(0);
+	},
+	draw() {
+		let temp = this.getGraphConnector("heat graph").getTemp();
+		Draw.rect(infiHeater.bottom, this.x, this.y, 0);
+		heatlib.drawHeat(infiHeater.heatsprite,this.x, this.y,this.rotdeg(), temp);
+        this.drawTeamTop();
+	},
+});
+infiCooler.update = true;
+infiCooler.rotate = false;
+infiCooler.getGraphConnectorBlock("heat graph").setAccept( [1,1, 1,1]);
+infiCooler.getGraphConnectorBlock("heat graph").setBaseHeatConductivity(1.0);
+infiCooler.getGraphConnectorBlock("heat graph").setBaseHeatCapacity(1000);
+infiCooler.getGraphConnectorBlock("heat graph").setBaseHeatRadiativity(0.0);
+
+
 ////SOLAR ------------------------------------------
 
 let scblankobj = graphLib.init();
