@@ -26,7 +26,7 @@ const thermalHeater = graphLib.finaliseExtend(Block, Building,"thermal-heater",t
 		let eff = this.sum + this.block.getTerrainAttrib().env();
 		let hgraph = this.getGraphConnector("heat graph");
 		let temp = hgraph.getTemp();
-		hgraph.setHeat(hgraph.getHeat()+ Math.max(0,1100-temp)*0.3);
+		hgraph.setHeat(hgraph.getHeat()+ Math.max(0,1100-temp)*0.35);
 	},
 	draw() {
 		let temp = this.getGraphConnector("heat graph").getTemp();

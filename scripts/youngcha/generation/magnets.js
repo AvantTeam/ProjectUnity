@@ -100,18 +100,21 @@ const magbehaviour = {
 	updatePost(){
 		let f = this.getGraphConnector("flux graph").getFlux();
 		 Groups.bullet.intersect(this.x - f*2, this.y - f*2, f * 4, f * 4, cons(bullet=>{
-			 if(bullet.type == null || !bullet.type.hittable){
+			 
+			 if(bullet.type == null ){
 				 return;
 			 }
-			 let dx = bullet.x-this.x;
-			 let dy = bullet.y-this.y;
-			 let ldis = dx*dx+dy*dy;
-			 if(ldis<f*f*4){
-				 ldis = Math.sqrt(ldis);
-				 let invmass = 1.0/Math.max(1.0,bullet.type.estimateDPS()/10.0);
-				 let forcemag = Time.delta*0.1*f/(8+ldis);
-				 bullet.vel.x += forcemag*graphLib.dirs[this.rotation].x*invmass;
-				 bullet.vel.y += forcemag*graphLib.dirs[this.rotation].y*invmass;
+			 if(bullet.type.hittable || bullet.type.isOrb){
+				 let dx = bullet.x-this.x;
+				 let dy = bullet.y-this.y;
+				 let ldis = dx*dx+dy*dy;
+				 if(ldis<f*f*4){
+					 ldis = Math.sqrt(ldis);
+					 let invmass = 1.0/Math.max(1.0,bullet.type.estimateDPS()/10.0);
+					 let forcemag = (bullet.type.isOrb?5.0:1.0)*Time.delta*0.1*f/(8+ldis);
+					 bullet.vel.x += forcemag*graphLib.dirs[this.rotation].x*invmass;
+					 bullet.vel.y += forcemag*graphLib.dirs[this.rotation].y*invmass;
+				 }
 			 }
 		 }));
 	}

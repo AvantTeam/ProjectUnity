@@ -292,16 +292,19 @@ const castingMold = graphLib.finaliseExtend(Block, Building, "casting-mold", cmb
 			this.pourProgress=0;
 			this.castProgress=0;
 			let cc = dex.getContained();
+			if(cc.length==0){return;}
+			let hpmelt = null;
+			let hpmelttype = null;
 			for(let i = 0;i<cc.length;i++){
-				if(cc[i].meltedRatio*cc[i].volume>1){
-					dex.getNetwork().addLiquidToSlot(cc[i],-1);
-					let melttype = crucibleLib.meltTypes[cc[i].id];
-					if(melttype.notItem){
-						continue;
-					}
-					this.castingMelt = melttype;
-					break;
+				let melttype = crucibleLib.meltTypes[cc[i].id];
+				if(cc[i].meltedRatio*cc[i].volume>1 && (hpmelt==null || melttype.priority>hpmelttype.priority) && !melttype.notItem){
+					hpmelt = cc[i];
+					hpmelttype = melttype;
 				}
+			}
+			if(hpmelt){
+				dex.getNetwork().addLiquidToSlot(hpmelt,-1);
+				this.castingMelt = hpmelttype;
 			}
 		}else{
 			if(this.pourProgress<1.0){

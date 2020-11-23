@@ -56,7 +56,7 @@ const _GraphCommonBuild = {
 	create(block, team) {
         let building = this.super$create(block, team);
 		
-		block.injectGraphConnectors(this);
+		
 		for(let graphname in this.graphs) {
 		  let graphConn = this.graphs[graphname];
 		  graphConn.onCreate(building)
@@ -150,6 +150,7 @@ const _GraphCommonBuild = {
     },
     read(stream, revision) {
         this.super$read(stream, revision);
+		print("graph connector");
         for(let graphname in this.graphs) {
 			this.graphs[graphname].read(stream, revision);
 		}
@@ -555,6 +556,7 @@ const _GraphPropsCommon = {
         this.writeLocal(stream,this._network);
     },
     read(stream, revision) {
+		print("reading graph block connector");
         this.readGlobal(stream, revision);
         let cachearray = [this.readLocal(stream, revision)];
 		this._saveCache = cachearray;
@@ -1149,6 +1151,7 @@ module.exports = {
 		rotpowerBlock.buildType = () => {
             let building = extend(Entity, Object.assign(deepCopy(bcustom.build),deepCopy(custBuild)));
             building.block = rotpowerBlock;
+			rotpowerBlock.injectGraphConnectors(building);
             return building;
         };
 		return rotpowerBlock;
@@ -1158,6 +1161,7 @@ module.exports = {
 		rotpowerBlock.buildType = () => {
             let building = extendContent(Entity,rotpowerBlock, Object.assign(deepCopy(bcustom.build),deepCopy(custBuild)));
             building.block = rotpowerBlock;
+			rotpowerBlock.injectGraphConnectors(building);
             return building;
         };
 		return rotpowerBlock;

@@ -246,7 +246,7 @@ const _RotPowerPropsCommon = Object.assign(Object.create(graphLib.graphProps),{
         stream.f(this._friction);
 	},
 	writeLocal(stream,graph) {
-		stream.f(graph.lastVelocity);
+		stream.f(graph.lastVelocity?graph.lastVelocity:0.0);
 	},
 	readGlobal(stream, revision) {
 		this._force = stream.f();
@@ -254,7 +254,9 @@ const _RotPowerPropsCommon = Object.assign(Object.create(graphLib.graphProps),{
         this._friction = stream.f();
 	},
 	readLocal(stream, revision) {
-		return {speed:stream.f()}
+		let fk = stream.f();
+		print(fk);
+		return {speed:fk}
 	}
 
 });
