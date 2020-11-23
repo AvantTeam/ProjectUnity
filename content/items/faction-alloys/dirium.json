@@ -1,0 +1,11 @@
+{
+	"cost": 0.3,
+	"flammability": 0,
+	"radioactivity": 0,
+	"explosiveness": 0,
+	"color": "96f7c3",
+  "research": {
+		"parent": "steel"
+	},
+  "hardness": 9
+}

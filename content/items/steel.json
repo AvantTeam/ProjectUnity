@@ -1,0 +1,10 @@
+{
+	"color": "e1e3ed",
+	"radioactivity": 0.0,
+	"flammability": 0.0,
+	"hardness": 4,
+	"cost": 2.5,
+	"research": {
+		"parent": "dense-alloy"
+	}
+}
