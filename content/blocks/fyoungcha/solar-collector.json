@@ -1,11 +1,11 @@
 {
-	"size": 1,
-	"health": 650,
+	"size": 3,
+	"health": 1500,
 	"requirements": [
-		{"item": "nickel", "amount": 50},
+		{"item": "nickel", "amount": 80},
 		{"item": "titanium", "amount": 50},
 		{"item": "lead", "amount": 30},
 	],
-	"category": "turret",
 	"research": "unity-wind-turbine",
+	"category": "power",
 }

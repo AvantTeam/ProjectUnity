@@ -72,10 +72,12 @@ const _GraphCommonBuild = {
 	},
 	onRemoved() {
         this.updateGraphRemovals();
+		this.onDelete();
         this.super$onRemoved();
     },
     onDestroyed() {
         this.updateGraphRemovals();
+		this.onDelete();
         this.super$onDestroyed();
     },
 	
@@ -105,6 +107,7 @@ const _GraphCommonBuild = {
 		this.updatePost();
 		this.prev_tile_rotation = this.rotation;
 	},
+	onDelete() {},
 	updatePost() {},
     updatePre() {},
 	onGraphUpdate() {},

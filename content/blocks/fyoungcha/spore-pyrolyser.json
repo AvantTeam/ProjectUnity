@@ -1,0 +1,27 @@
+{
+	"size": 3,
+	"health": 1100,
+	"requirements": [
+		{"item": "nickel", "amount": 25},
+		{"item": "titanium", "amount": 50},
+		{"item": "copper", "amount": 50},
+		{"item": "lead", "amount": 30},
+	],
+	"consumes": {
+		"items": {
+			"items": [
+				{"item": "spore-pod", "amount": 1},
+			]
+		}
+	},
+	"craftTime": 50,
+	"hasItems": true,
+	"outputItem": {
+		"item": "coal",
+		"amount": 3
+	},
+	"research": "unity-solar-collector",
+	"category": "crafting",
+	"ambientSound": "machine",
+	"ambientSoundVolume": 0.6
+}
