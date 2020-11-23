@@ -10,8 +10,6 @@ const sporeFarm = extendContent(Block, "spore-farm", {
 		this.super$load();
 		this.plantSprite = [Core.atlas.find(this.name+"-spore1"),Core.atlas.find(this.name+"-spore2"),Core.atlas.find(this.name+"-spore3"),Core.atlas.find(this.name+"-spore4"),Core.atlas.find(this.name+"-spore5")];
 		this.bottom  = [Core.atlas.find(this.name+"-ground1"),Core.atlas.find(this.name+"-ground2"),Core.atlas.find(this.name+"-ground3"),Core.atlas.find(this.name+"-ground4"),Core.atlas.find(this.name+"-ground5")];
-		this._timerid = this.timers++;
-		this._dumptimerid = this.timers++;
 	},
 	getTimerId(){
 		return this._timerid;
@@ -20,6 +18,10 @@ const sporeFarm = extendContent(Block, "spore-farm", {
 		return this._dumptimerid;
 	}
 });
+
+const gtimer = sporeFarm.timers++;
+const dtimer = sporeFarm.timers++;
+
 sporeFarm.buildType = () => 
 {
 	let building = extend(Building, {
@@ -37,7 +39,7 @@ sporeFarm.buildType = () =>
 		},
 		updateTile(){
 			
-			if(this.timer.get(this.block.getTimerId(), (60+this.delay)*5.0 )){
+			if(this.timer.get(gtimer, (60+this.delay)*5.0 )){
 				if(this.delay==-1){
 					this.delay =  (this.tile.x*89+this.tile.y*13)%21;
 				}else{		
@@ -54,7 +56,7 @@ sporeFarm.buildType = () =>
 					}
 				}
 			}
-			if(this.timer.get(this.block.getDTimerId(),15)){
+			if(this.timer.get(dtimer,15)){
 				this.dump(Items.sporePod);
 			}
 		},
