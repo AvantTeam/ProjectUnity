@@ -1,0 +1,10 @@
+{
+	"color": "6d88a3",
+	"radioactivity": 0.0,
+	"flammability": 0.0,
+	"hardness": 2,
+	"cost": 2,
+	"research": {
+		"parent": "stone"
+	}
+}
