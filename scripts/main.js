@@ -286,7 +286,7 @@ const script = [
                     "pylon",
                     "monument"
                 ]
-            }
+            },
 
             {
                 name: "planets",
