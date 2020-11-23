@@ -1,0 +1,7 @@
+{
+	"type": "SectorPreset",
+	"planet": "megalith",
+	"sector": 30,
+	"alwaysUnlocked": true,
+	"captureWave": 15
+}

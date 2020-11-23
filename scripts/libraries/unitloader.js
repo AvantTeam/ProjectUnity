@@ -42,26 +42,10 @@ const addPlan = (factory, plan) => {
 	unitPlans.clear();
 	var fac = factory;
 	
-	//fac.consumes.remove(ConsumeType.item);
-
-	/*const caelifera = new UnitFactory.UnitPlan(
-		Vars.content.getByName(ContentType.unit, "unity-caelifera"),
-		60 * 25,
-		ItemStack.with(
-			Items.silicon, 15,
-			Items.titanium, 25
-		)
-	);*/
-	
 	unitPlans.add(plan);
 	fac.plans.each(u => unitPlans.add(u));
 	
 	fac.plans = unitPlans.copy();
-	//whats the point of this again?, its created in the constructor. theres two of this now.
-	/*fac.config(Integer, (build, i) => {
-		build.currentPlan = (Math.floor(i) < 0 || Math.floor(i) >= fac.plans.size) ? -1 : Math.floor(i);
-		build.progress = 0;
-	});*/
 	
 	fac.plans.each(uPlan => {
 		var stack = uPlan.requirements;
@@ -70,13 +54,9 @@ const addPlan = (factory, plan) => {
 			fac.itemCapacity = Math.max(fac.itemCapacity, stack[j].amount * 2);
 		}
 	});
-	//also this
-	/*fac.consumes.add(extendContent(ConsumeItemDynamic, func(e => {
-		return e.currentPlan != -1 ? (fac.plans.get(e.currentPlan)).requirements : ItemStack.empty;
-	}), {}));*/
 };
 
-const unitLoader = new ContentList(){
+const unitLoader = extend(ContentList, {
 	load(){
 		//Factories
 		//Air
@@ -108,10 +88,12 @@ const unitLoader = new ContentList(){
 				Vars.content.getByName(ContentType.unit, "unity-caelifera"),
 				Vars.content.getByName(ContentType.unit, "unity-schistocerca")
 			],
+
 			[
 				Vars.content.getByName(ContentType.unit, "unity-amphibi-naval"),
 				Vars.content.getByName(ContentType.unit, "unity-craber-naval")
 			],
+
 			[
 				Vars.content.getByName(ContentType.unit, "unity-stele"),
 				Vars.content.getByName(ContentType.unit, "unity-pedestal")
@@ -123,6 +105,7 @@ const unitLoader = new ContentList(){
 				Vars.content.getByName(ContentType.unit, "unity-schistocerca"),
 				Vars.content.getByName(ContentType.unit, "unity-anthophila")
 			],
+
             [
 				Vars.content.getByName(ContentType.unit, "unity-pedestal"),
 				Vars.content.getByName(ContentType.unit, "unity-pilaster")
@@ -134,6 +117,7 @@ const unitLoader = new ContentList(){
 				Vars.content.getByName(ContentType.unit, "unity-anthophila"),
 				Vars.content.getByName(ContentType.unit, "unity-vespula")
 			],
+
             [
 				Vars.content.getByName(ContentType.unit, "unity-pilaster"),
 				Vars.content.getByName(ContentType.unit, "unity-pylon")
@@ -144,9 +128,14 @@ const unitLoader = new ContentList(){
 			[
 				Vars.content.getByName(ContentType.unit, "unity-vespula"),
 				Vars.content.getByName(ContentType.unit, "unity-lepidoptera")
+			],
+
+            [
+				Vars.content.getByName(ContentType.unit, "unity-pylon"),
+				Vars.content.getByName(ContentType.unit, "unity-monument")
 			]
 		]);
 	}
-};
+});
 
 loader.addInit(unitLoader);

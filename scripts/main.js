@@ -281,7 +281,15 @@ const script = [
                     "stele",
                     "pedestal",
                     "pilaster",
-                    "pylon"
+                    "pylon",
+                    "monument"
+                ]
+            }
+
+            {
+                name: "planets",
+                childs: [
+                    "megalith"
                 ]
             }
         ]
