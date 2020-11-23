@@ -78,11 +78,12 @@ function LightningNode(x, y, xa, ya){
 				
 				if(this.score < this.origin.getRange()){
 					var inf = this.origin.getInfluence();
-					var rotationC = inf != null ? Mathf.slerp(this.rotation + rand, Angles.angle(this.toPos.x, this.toPos.y, inf.x, inf.y) + (rand / 1.12), 0.09 * (Mathf.clamp((600 - Mathf.dst(this.toPos.x, this.toPos.y, inf.x, inf.y)) / 600))) : this.rotation + rand;
+					var rotationC = (inf != null && !this.origin.intersected()) ? Angles.moveToward(this.rotation + rand, Angles.angle(this.toPos.x, this.toPos.y, inf.x, inf.y) + (rand / 1.12), 17 * (Mathf.clamp((600 - Mathf.dst(this.toPos.x, this.toPos.y, inf.x, inf.y)) / 600))) : this.rotation + rand;
 					tempVec.trns(rotationC, lightningLength);
 					var nScore = tempVec.len();
 					nScore += this.score;
 					tempVec.add(this.toPos);
+					if(inf != null && inf.within(tempVec, 43) && Angles.within(this.toPos.angleTo(tempVec), tempVec.angleTo(inf), 90)) this.origin.setIntersected();
 					
 					var l = new LightningNode(this.toPos.x, this.toPos.y, tempVec.x, tempVec.y);
 					l.setC(this.origin, this.team, this.damage, this.colorFrom, this.colorTo, nScore, this.range, 0);
@@ -108,7 +109,14 @@ const customLightningA = prov(() => {
 			this._team = Team.derelict;
 			this._damage = 12;
 			this._range = 120;
+			this._hasIntersected = false;
 			this._influence = null;
+		},
+		setIntersected(){
+			this._hasIntersected = true;
+		},
+		intersected(){
+			return this._hasIntersected;
 		},
 		clipSize(){
 			return (this._range * 2) + 12;

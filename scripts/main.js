@@ -235,9 +235,12 @@ const script = [
                     "teleporter",
                     "expunloader",
                     "exptank",
+                    "expchest",
                     "expfountain"
                 ]
-            }
+            },
+
+            "lava"
         ]
     },
 

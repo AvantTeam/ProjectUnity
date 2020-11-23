@@ -1,0 +1,10 @@
+{
+	"color": "8a8a8a",
+	"radioactivity": 0.0,
+	"flammability": 0.0,
+	"hardness": 2,
+	"cost": 1,
+	"research": {
+		"parent": "graphite"
+	}
+}
