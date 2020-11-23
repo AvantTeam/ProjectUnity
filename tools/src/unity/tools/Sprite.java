@@ -209,15 +209,8 @@ public class Sprite{
         return out;
     }
 
-    Sprite floorAlpha(){
-        for(int x = 0; x < width; x++){
-            for(int y = 0; y < height; y++){
-                Color color = getColor(x, y);
-                if(color.a <= 0.15f) color.a(0f);
-
-                draw(x, y, color);
-            }
-        }
+    Sprite alphaBleed(int maxIterations){
+        sprite = SpriteProcessor.bleeder.processImage(sprite, maxIterations);
 
         return this;
     }

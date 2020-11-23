@@ -4,6 +4,7 @@ import arc.*;
 import arc.files.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g2d.TextureAtlas.*;
+import arc.packer.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.core.*;
@@ -20,6 +21,7 @@ import static mindustry.Vars.*;
 public class SpriteProcessor{
     static ObjectMap<String, TextureRegion> regionCache = new ObjectMap<>();
     static ObjectMap<String, BufferedImage> spriteCache = new ObjectMap<>();
+    static ColorBleedEffect bleeder = new ColorBleedEffect();
 
     public static Unity mod = new Unity();
 
@@ -113,7 +115,7 @@ public class SpriteProcessor{
                 BufferedImage image = ImageIO.read(path.file());
 
                 Sprite sprite = new Sprite(image);
-                sprite.floorAlpha().antialias();
+                sprite.antialias().alphaBleed(2);
 
                 sprite.save(path.nameWithoutExtension());
             }catch(IOException e){
@@ -129,7 +131,7 @@ public class SpriteProcessor{
     }
 
     static boolean has(String name){
-        return Core.atlas.has(name);
+        return Core.atlas.has(name.replaceFirst("unity-", ""));
     }
 
     static boolean has(TextureRegion region){
@@ -144,6 +146,10 @@ public class SpriteProcessor{
         GenRegion.validate(region);
 
         return new Sprite(spriteCache.get(((AtlasRegion)region).name.replaceFirst("unity-", "")));
+    }
+
+    static TextureRegion getRegion(String name){
+        return regionCache.get(name.replaceFirst("unity-", ""));
     }
 
     static void err(String message, Object... args){

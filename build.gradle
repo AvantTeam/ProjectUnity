@@ -70,6 +70,7 @@ project(":tools"){
         implementation project(":main")
 
         implementation "com.github.Anuken.Arc:arc-core:$mindustryVersion"
+        implementation "com.github.Anuken.Arc:packer:$mindustryVersion"
         implementation "com.github.Anuken.Mindustry:core:$mindustryVersion"
         //implementation "com.github.Anuken:Mindustry:$mindustryHash"
     }

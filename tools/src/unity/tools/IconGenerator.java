@@ -29,17 +29,17 @@ public class IconGenerator implements Generator{
                 type.init();
 
                 //avoid nulls; sometimes happens for unknown reasons
-                if(SpriteProcessor.regionCache.containsKey((type.name + "-leg-base").replaceFirst("unity-", ""))){
-                    type.legBaseRegion = SpriteProcessor.regionCache.get((type.name + "-leg-base").replaceFirst("unity-", ""));
+                if(SpriteProcessor.has(type.name + "-leg-base")){
+                    type.legBaseRegion = SpriteProcessor.getRegion(type.name + "-leg-base");
                 }
-                if(SpriteProcessor.regionCache.containsKey((type.name + "-foot").replaceFirst("unity-", ""))){
-                    type.footRegion = SpriteProcessor.regionCache.get((type.name + "-foot").replaceFirst("unity-", ""));
+                if(SpriteProcessor.has(type.name + "-foot")){
+                    type.footRegion = SpriteProcessor.getRegion(type.name + "-foot");
                 }
-                if(SpriteProcessor.regionCache.containsKey((type.name + "-joint").replaceFirst("unity-", ""))){
-                    type.jointRegion = SpriteProcessor.regionCache.get((type.name + "-joint").replaceFirst("unity-", ""));
+                if(SpriteProcessor.has(type.name + "-joint")){
+                    type.jointRegion = SpriteProcessor.getRegion(type.name + "-joint");
                 }
-                if(SpriteProcessor.regionCache.containsKey((type.name + "-joint-base").replaceFirst("unity-", ""))){
-                    type.baseJointRegion = SpriteProcessor.regionCache.get((type.name + "-joint-base").replaceFirst("unity-", ""));
+                if(SpriteProcessor.has(type.name + "-joint-base")){
+                    type.baseJointRegion = SpriteProcessor.getRegion(type.name + "-joint-base");
                 }
 
                 Color outc = Pal.darkerMetal;
@@ -54,7 +54,7 @@ public class IconGenerator implements Generator{
                             sprite.draw(outline.get(sprite));
 
                             sprite.save(fname);
-                        }else{
+                        }else if(!fname.contains("-joint")){ //joint is optional sprite
                             Log.warn("@ not found", fname);
                         }
                     }else{
