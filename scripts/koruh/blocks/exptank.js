@@ -22,6 +22,7 @@ const exptank = extendContent(Block, "exp-tank", {
     },
 });
 exptank.update = true;
+exptank.sync = true;
 exptank.solid = true;
 exptank.expCapacity = 600;
 exptank.buildType = () => extend(Building, {
