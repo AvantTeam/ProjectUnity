@@ -236,10 +236,12 @@ const script = [
                     "expunloader",
                     "exptank",
                     "expchest",
-                    "expfountain"
+                    "expfountain",
+                    "expvoid"
                 ]
             },
 
+            "crafters",
             "lava"
         ]
     },
@@ -281,7 +283,15 @@ const script = [
                     "stele",
                     "pedestal",
                     "pilaster",
-                    "pylon"
+                    "pylon",
+                    "monument"
+                ]
+            },
+
+            {
+                name: "planets",
+                childs: [
+                    "megalith"
                 ]
             }
         ]

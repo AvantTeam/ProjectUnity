@@ -3,6 +3,7 @@
     "hitSize": 11,
     "health": 600,
     "flying": false,
+    "canBoost": true,
     "armor": 3.5,
     "rotateSpeed": 2.6
 }

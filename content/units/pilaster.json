@@ -3,6 +3,7 @@
     "hitSize": 26.5,
     "health": 1000,
     "flying": false,
+    "canBoost": true,
     "armor": 4,
     "rotateSpeed": 2.2,
     "mechFrontSway": 0.55
