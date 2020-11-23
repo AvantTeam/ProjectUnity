@@ -21,6 +21,9 @@ buildscript{
 }
 
 allprojects{
+    apply plugin: 'java'
+    group = "com.github.avant"
+
     ext{
         mindustryVersion = props["mindustryVersion"]
         mindustryHash = props["mindustryHash"]
@@ -53,19 +56,16 @@ allprojects{
 }
 
 project(":main"){
-    apply plugin: 'java'
-
     dependencies{
-        implementation "com.github.Anuken.Arc:arc-core:$mindustryVersion"
-        implementation "com.github.Anuken.Mindustry:core:$mindustryVersion"
-        //implementation "com.github.Anuken:Mindustry:$mindustryHash"
+        compileOnly "com.github.Anuken.Arc:arc-core:$mindustryVersion"
+        compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
+        //compileOnly "com.github.Anuken:Mindustry:$mindustryHash"
+
         implementation "com.github.younggam:multi-lib:$multilibVersion"
     }
 }
 
 project(":tools"){
-    apply plugin: 'java'
-
     dependencies{
         implementation project(":main")
 
