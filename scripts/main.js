@@ -236,7 +236,8 @@ const script = [
                     "expunloader",
                     "exptank",
                     "expchest",
-                    "expfountain"
+                    "expfountain",
+                    "expvoid"
                 ]
             },
 
