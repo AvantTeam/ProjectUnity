@@ -171,20 +171,17 @@ solarReflector.buildType = () => {
 	let building = extend(Building, {
 		mirrorRot:0,
 		_link:-1,
+		_hasChanged:false,
 		getLink(s){
 			return this._link;
 		},
 		setLink(s){
 			if(s==this._link){return;}
-			if(this._link!=-1){
+			if(this._link!=-1 && Vars.world.build(this._link).removeReflector){
 				Vars.world.build(this._link).removeReflector(this);
 			}
 			if(s!=-1){
-				let bui  = Vars.world.build(s);
-				if(!bui || !bui.appendSolarReflector){
-					return;
-				}
-				Vars.world.build(s).appendSolarReflector(this);
+				this._hasChanged=true;
 			}
 			this._link=s;
 		},
@@ -196,6 +193,10 @@ solarReflector.buildType = () => {
             if(hasLink){
                 this.setLink(link.pos());
 				this.mirrorRot = Mathf.slerpDelta(this.mirrorRot, this.tile.angleTo(link.tile), 0.05);
+				if(this._hasChanged){
+					link.appendSolarReflector(this);
+					this._hasChanged = false;
+				}
             }
 			
 		},
@@ -238,6 +239,7 @@ solarReflector.buildType = () => {
 		linkValid(){
             if(this._link == -1) return false;
             let link = Vars.world.build(this._link);
+			if(!link){this._link=-1;  return false;}
             return link.appendSolarReflector && link.team == this.team && this.within(link, 100);
         },
 		write(stream) {

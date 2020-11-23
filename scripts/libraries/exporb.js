@@ -48,6 +48,10 @@ const exporb = extend(BulletType, {
         else if(tile.block().noOrbCollision){
             //h
         }
+        else if((tile.block() instanceof Incinerator) && tile.build.heat > 0.5){
+            expAbsorb.at(b.x, b.y);
+            b.remove();
+        }
         else if(tile.solid()){
             b.trns(-1.1 * b.vel.x, -1.1 * b.vel.y);
             b.vel.scl(0, 0);

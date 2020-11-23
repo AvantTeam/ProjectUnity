@@ -1,0 +1,20 @@
+{
+	"outputItem": {"item": "stone", "amount": 1},
+	"size": 1,
+	"hasLiquids": true,
+	"hasPower": false,
+	"hasItems": true,
+	"craftTime": 60,
+	"consumes": {
+    "liquid": {
+			"liquid": "lava",
+			"amount": 0.1
+		}
+	},
+	"requirements": [
+		{"item": "copper", "amount": 20},
+		{"item": "dense-alloy", "amount": 30}
+	],
+	"category": "crafting",
+	"research": "dense-alloy"
+}
