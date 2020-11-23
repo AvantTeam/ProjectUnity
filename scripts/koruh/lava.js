@@ -25,7 +25,7 @@ const lava = new Liquid("lava", lavaColor);
 lava.heatCapacity = 0;
 lava.viscosity = 0.7;
 lava.temperature = 1.5;
-lava.effect = StatusEffects.melting;
+lava.effect = helpitburns;
 lava.lightColor = lavaColor2.cpy().mul(1, 1, 1, 0.55);
 
 var tmpc = new Color(0, 0, 0, 1);//Tmp.c1 cannot be used in events.run
