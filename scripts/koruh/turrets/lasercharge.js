@@ -99,7 +99,7 @@ const chargeLaser = extend(BulletType, {
             Lines.line(b.x, b.y, Tmp.v1.x, Tmp.v1.y);
             Draw.reset();
 
-            Drawf.light(Team.derelict, b.x, b.y, b.x + Tmp.v1.x, b.y + Tmp.v1.y, 15 * b.fout() + 5, Color.white, 0.6);
+            Drawf.light(Team.derelict, b.x, b.y, Tmp.v1.x, Tmp.v1.y, 15 * b.fout() + 5, Color.white, 0.6);
         }
     },
     //h

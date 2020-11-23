@@ -61,5 +61,8 @@ exptank.buildType = () => extend(Building, {
     onDestroyed(){
         orblib.spreadExp(this.x, this.y, this.totalExp() * 0.8, 3 * exptank.size);
         this.super$onDestroyed();
+    },
+    drawLight(){
+        Drawf.light(this.team, this, 25 + 25 * this.expf(), expColor, 0.5 * this.expf());
     }
 });

@@ -9,7 +9,7 @@ const ahhimaliquidnow = new Effect(45, e => {
 
     Draw.color(lavaColor, lavaColor2, e.fout());
 
-    Angles.randLenVectors(e.id, 4, 1 + e.fin() * 4, (x, y) => {
+    Angles.randLenVectors(e.id + 1, 4, 1 + e.fin() * 4, (x, y) => {
         Fill.circle(e.x + x, e.y + y, 0.2 + e.fout() * 1.3);
     });
 });
