@@ -1,8 +1,11 @@
+const fLib = this.global.unity.funclib;
+
 const tempVec = new Vec2();
 const tempVec2 = new Vec2();
 const timeProgress = 1.2;
 const lightningLength = 23;
 const effectLength = 32;
+const tempCol = new Color();
 
 const collidedPlast = (a, b, team) => {
 	//Tmp.v1.trns(b.rotation(), length);
@@ -21,6 +24,17 @@ const collidedPlast = (a, b, team) => {
 	return found && furthest != null;
 	//return found && furthest != null ? Math.max(6, b.dst(furthest.worldx(), furthest.worldy())) : length;
 };
+
+const vaporation = new Effect(23, e => {
+	if(e.data == null) return;
+	tempVec2.set(e.data[0]);
+	tempVec2.lerp(e.data[1], e.fin());
+	
+	//Draw.z(Layer.flyingUnit + 0.012);
+	Draw.color(Pal.darkFlame, Pal.darkerGray, e.fin());
+	Fill.circle(tempVec2.x + e.data[2].x, tempVec2.y + e.data[2].y, e.fout() * 5);
+});
+vaporation.layer = Layer.flyingUnit + 0.012;
 
 function LightningNode(x, y, xa, ya){
 	this.damage = 0;
@@ -100,6 +114,61 @@ function LightningNode(x, y, xa, ya){
 	};
 };
 
+const vapourize = prov(() => {
+	var b = extend(EffectState, {
+		setCC(){
+			//this._altLifetime = 30;
+			//this._host = null;
+			this.lifetime = 40;
+			this._influence = null;
+		},
+		setCCC(x, y, parent, influence){
+			this.x = x;
+			this.y = y;
+			this.parent = parent;
+			this._influence = influence;
+		},
+		add(){
+			if(this.added == true) return; 
+			//this.super$add();
+			Groups.all.add(this);
+			Groups.draw.add(this);
+			this.added = true;
+		},
+		update(){
+			//this._nodes.each(e => e.update());
+			if(Mathf.chanceDelta(0.2 * (1 - this.fin()) * (this.parent.type.hitSize / 10))){
+				tempVec.trns(Angles.angle(this.x, this.y, this._influence.x, this._influence.y) + 180, 65 + Mathf.range(0.3));
+				tempVec.add(this.parent);
+				tempVec2.trns(Mathf.random(360), Mathf.random(this.parent.type.hitSize / 1.25));
+				vaporation.at(this.parent.x, this.parent.y, 0, [this.parent, tempVec.cpy(), tempVec2.cpy()]);
+			};
+			this.super$update();
+		},
+		clipSize(){
+			return this.parent.hitSize * 2;
+		},
+		draw(){
+			var oz = Draw.z();
+			var slope = (0.5 - Math.abs(this.fin() - 0.5)) * 2;
+			Draw.z(Layer.flyingUnit + 0.01);
+			tempCol.set(Color.black);
+			tempCol.a = slope * 0.25;
+			Draw.color(tempCol);
+			fLib.simpleUnitDrawer(this.parent, false);
+			Draw.z(oz);
+		},
+		remove(){
+			if (!this.added) return; 
+			Groups.all.remove(this);
+			Groups.draw.remove(this);
+			this.added = false;
+		}
+	});
+	b.setCC();
+	return b;
+});
+
 const customLightningA = prov(() => {
 	var a = extend(EffectState, {
 		setCC(){
@@ -178,6 +247,12 @@ const customLightningA = prov(() => {
 });
 
 module.exports = {
+	createEvaporation(x, y, host, influence){
+		if(host == null || influence == null) return;
+		var l = vapourize.get();
+		l.setCCC(x, y, host, influence);
+		l.add();
+	},
 	createLightning(x, y, rotation, lifetime, colorF, colorT, team, damage, range, influence){
 		var l = customLightningA.get();
 		l.setCCC(x, y, rotation, lifetime, colorF, colorT, team, damage, range, influence);

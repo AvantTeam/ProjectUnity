@@ -61,6 +61,7 @@ const script = [
             },
 
             "sounds",
+			"funclib",
             "effects",
             "extraeffects",
             "wavefront",
@@ -71,8 +72,7 @@ const script = [
             "copterbase",
             "exp",
             "multi-lib",
-            "status",
-            "funclib",
+			"status",
             "arena",
             "rotpowerlib",
             "heatlib",
@@ -169,7 +169,8 @@ const script = [
 
                     "fallout",
                     "catastrophe",
-                    "calamity"
+                    "calamity",
+					"extinction"
                 ]
             },
 

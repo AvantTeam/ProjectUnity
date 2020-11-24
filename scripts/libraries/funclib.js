@@ -38,6 +38,48 @@ module.exports = {
 			weaponRotation);
 		};
 	},
+	
+	//consTile: (Tile, Build, Distance %, Angle Distance %)
+	//consUnit: (Unit, Distance %, Angle Distance %)
+	castCone(wx, wy, range, angle, cone, consTile, consUnit){
+		collidedBlocks.clear();
+		var tx = Vars.world.toTile(wx);
+		var ty = Vars.world.toTile(wy);
+
+		var tileRange = Mathf.floorPositive(range / Vars.tilesize + 1);
+		
+		if(consTile != null){
+			for(var x = -tileRange + tx; x <= tileRange + tx; x++){
+				yGroup:
+				for(var y = -tileRange + ty; y <= tileRange + ty; y++){
+					//Angles.angle(wx, wy, x * Vars.tilesize, y * Vars.tilesize)
+					if(!Mathf.within(x * Vars.tilesize, y * Vars.tilesize, wx, wy, range) || !Angles.within(Angles.angle(wx, wy, x * Vars.tilesize, y * Vars.tilesize), angle, cone)) continue yGroup;
+					var other = Vars.world.tile(x, y);
+					if(other == null) continue yGroup;
+					if(!collidedBlocks.contains(other.pos())){
+						/*if(isCons){
+							conss.get(other);
+						}else{
+							conss(other);
+						};*/
+						var dst = 1 - (Mathf.dst(x * Vars.tilesize, y * Vars.tilesize, wx, wy) / range);
+						var anDst = 1 - (Angles.angleDist(Angles.angle(wx, wy, x * Vars.tilesize, y * Vars.tilesize), angle) / cone);
+						consTile(other, other.build != null ? other.build : null, dst, anDst);
+						collidedBlocks.add(other.pos());
+					};
+				};
+			};
+		};
+		if(consUnit != null){
+			Groups.unit.intersect(wx - range, wy - range, range * 2, range * 2, e => {
+				if(!Mathf.within(e.x, e.y, wx, wy, range) || !Angles.within(Angles.angle(wx, wy, e.x, e.y), angle, cone)) return;
+				
+				var dst = 1 - (Mathf.dst(e.x, e.y, wx, wy) / range);
+				var anDst = 1 - (Angles.angleDist(Angles.angle(wx, wy, e.x, e.y), angle) / cone);
+				consUnit(e, dst, anDst);
+			});
+		};
+	},
 
 	trueEachBlock(wx, wy, range, conss){
 		collidedBlocks.clear();
