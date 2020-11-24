@@ -9,6 +9,7 @@
     "allowLegStep": true,
     "visualElevation": 0.2,
     "legCount": 4,
+    "legExtension": 8,
     "legSpeed": 0.08,
     "legLength": 16,
     "legMoveSpace": 1.2,
