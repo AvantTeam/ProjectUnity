@@ -18,7 +18,7 @@ const shieldedWall = lib.extend(ForceProjector, ForceProjector.ForceBuild, "shie
             type: "exp",
             field: "health",
             start: 300,
-            intensity: 1.5
+            intensity: 1.1
         }
     ],
     drawPlace(x, y, rotation, valid){
@@ -125,5 +125,6 @@ const shieldedWall = lib.extend(ForceProjector, ForceProjector.ForceBuild, "shie
     }
 });
 
+shieldedWall.health = 300;
 shieldedWall.radius = 10;
 shieldedWall.consumes.add(new ConsumeLiquidFilter(liquid => liquid.temperature <= 1 && liquid.flammability > 1000, 0.5)).boost().update(false);//???

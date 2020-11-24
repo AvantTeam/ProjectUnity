@@ -9,9 +9,9 @@
 	"powerUse": 7,
 	"targetAir": false,
 	"requirements": [
-		{"item": "copper", "amount": 160},
-		{"item": "lead", "amount": 110},
-		{"item": "silicon", "amount": 90}
+		{"item": "copper", "amount": 190},
+		{"item": "silicon", "amount": 110},
+		{"item": "dense-alloy", "amount": 35}
 	],
 	"category": "turret",
 	"research": "lancer"
