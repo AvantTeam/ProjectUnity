@@ -283,7 +283,7 @@ solarReflector.buildType = () => {
 		},
 		setLink(s){
 			if(s==this._link){return;}
-			if(this._link!=-1 && Vars.world.build(this._link).removeReflector){
+			if(this._link!=-1 && Vars.world.build(this._link) && Vars.world.build(this._link).removeReflector){
 				Vars.world.build(this._link).removeReflector(this);
 			}
 			if(s!=-1){
@@ -345,7 +345,7 @@ solarReflector.buildType = () => {
 		linkValid(){
             if(this._link == -1) return false;
             let link = Vars.world.build(this._link);
-			if(!link){this._link=-1;  return false;}
+			if(!link){return false;}
             return link.appendSolarReflector && link.team == this.team && this.within(link, 100);
         },
 		write(stream) {
