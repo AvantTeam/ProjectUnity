@@ -21,6 +21,9 @@ const shielder = extendContent(ChargeTurret, "shielder", {
   setStats(){
     this.super$setStats();
     
+    this.stats.remove(Stat.targetsAir);
+    this.stats.remove(Stat.targetsGround);
+    this.stats.remove(Stat.damage);
     this.stats.remove(Stat.booster);
     this.stats.add(Stat.input, new BoosterListValue(shielder.reloadTime, shielder.consumes.get(ConsumeType.liquid).amount, shielder.coolantMultiplier, false, l => shielder.consumes.liquidfilters.get(l.id)));
   }
@@ -55,6 +58,10 @@ shielder.buildType = () => {
 
 		validateTarget(){
 			return this.target != null;
-		}
+		},
+    
+    canControl(){
+      return false;
+    }
 	})
 }

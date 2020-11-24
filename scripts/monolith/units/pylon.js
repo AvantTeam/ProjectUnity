@@ -14,21 +14,50 @@ pylonLaserSmallWeapon.reload = 60;
 pylonLaserSmallWeapon.recoil = 4;
 pylonLaserSmallWeapon.bullet = pylonLaserSmall;
 
-const pylonLaserCharge = new Effect(80, 150, e => {
-    let cwidth = pylonLaser.width;
+const pylonLaserCharge = new Effect(200, 180, e => {
+    e.scaled(100, c => {
+        let cwidth = pylonLaser.width;
 
-    for(let i = 0; i < pylonLaser.colors.length; i++){
-        cwidth *= pylonLaser.lengthFalloff;
+        for(let i = 0; i < pylonLaser.colors.length; i++){
+            cwidth *= pylonLaser.lengthFalloff;
 
-        let color = pylonLaser.colors[i];
-        Draw.color(color);
-        Fill.circle(e.x, e.y, cwidth * e.fin());
+            Draw.color(pylonLaser.colors[i]);
+            Fill.circle(e.x, e.y, cwidth * c.fin());
 
-        for(let j = 0; j < 2; j++){
-            Lines.stroke(e.fin() * 1.5 * i);
-            Lines.square(e.x, e.y, e.fout() * pylonLaser.width * i, Time.time() * 4 * Mathf.signs[j]);
-        }
-    }
+            for(let j = 0; j < 2; j++){
+                Lines.stroke(c.fin() * 1.5 * i);
+                Lines.square(e.x, e.y, c.fout() * pylonLaser.width * i, Time.time() * 4 * Mathf.signs[j]);
+            };
+        };
+    });
+
+    shoot: {
+        if(e.fin() < 0.5) break shoot;
+
+        let fin = Mathf.curve(e.fin(), 0.5, 1);
+        let finpow = Interp.pow3Out.apply(fin);
+        let fout = 1 - fin;
+
+        for(let i = 0; i < pylonLaser.colors.length; i++){
+            Draw.color(pylonLaser.colors[i]);
+
+            for(let j = 0; j < 2; j++){
+                Lines.stroke(fout * 1.5 * i);
+
+                let rot = Mathf.signs[j] * (Time.time() + (fin * 720));
+                Lines.square(e.x, e.y, finpow * pylonLaser.width * 2 * i, rot);
+            };
+        };
+
+        Angles.randLenVectors(e.id, 48, finpow * 180, (x, y) => {
+            Draw.color(Color.white, Pal.lancerLaser, Color.cyan, fin);
+
+            Fill.circle(e.x + x, e.y + y, fout * 5);
+        });
+
+        Draw.color(Pal.lancerLaser, fout * 0.4);
+        Fill.circle(e.x, e.y, finpow * 180);
+    };
 });
 
 const pylonLightning = extend(LightningBulletType, {});
@@ -73,7 +102,7 @@ pylonLaserWeapon.cooldownTime = 280;
 pylonLaserWeapon.bullet = pylonLaser;
 pylonLaserWeapon.shootStatusDuration = 60 * 1.8;
 pylonLaserWeapon.shootStatus = StatusEffects.unmoving;
-pylonLaserWeapon.firstShotDelay = pylonLaserCharge.lifetime;
+pylonLaserWeapon.firstShotDelay = pylonLaserCharge.lifetime / 2;
 
 const pylon = extendContent(UnitType, "pylon", {});
 pylon.ammoType = AmmoTypes.powerHigh;
