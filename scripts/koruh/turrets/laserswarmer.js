@@ -75,6 +75,10 @@ const chargeLaser = extend(BulletType, {
         return Tmp.c1.set(Pal.lancerLaser.cpy().lerp(Pal.sapBullet, 0.5)).lerp(Pal.sapBullet, b.owner.totalLevel() / 30);
     },
 
+    getRealLength(b){
+        return 140 + (b.owner.totalLevel() * 2);
+    },
+
     collision(other, x, y){
         this.hit(this.base(), x, y);
         if(other instanceof Healthc){
@@ -95,7 +99,7 @@ const chargeLaser = extend(BulletType, {
         if(!b) return;
         this.super$init(b);
 
-        var target = Damage.linecast(b, b.x, b.y, b.rotation(), this.length);
+        var target = Damage.linecast(b, b.x, b.y, b.rotation(), this.getRealLength(b));
         b.data = target;
 
         if(target instanceof Hitboxc){
@@ -104,7 +108,8 @@ const chargeLaser = extend(BulletType, {
             hit.collision(b, hit.x, hit.y);
             b.collision(hit, hit.x, hit.y);
             b.owner.incExp(1);
-        }else if(target instanceof Building){
+        }
+        else if(target instanceof Building){
             var tile = target;
 
             if(tile.collide(b)){
@@ -112,8 +117,16 @@ const chargeLaser = extend(BulletType, {
                 this.hit(b, tile.x, tile.y);
                 b.owner.incExp(1);
             }
-        }else{
-            b.data = new Vec2().trns(b.rotation(), this.length).add(b.x, b.y);
+        }
+        else{
+            b.data = new Vec2().trns(b.rotation(), this.getRealLength(b)).add(b.x, b.y);
+        }
+        this.makeFrag(b.data.x, b.data.y, b);
+    },
+
+    makeFrag(x, y, b){
+        for(var i=0; i<this.fragBullets; i++){
+            this.fragBullet.create(b, x, y, b.rotation() + i * 120);
         }
     },
 
@@ -173,9 +186,9 @@ const chargeLaser = extend(BulletType, {
         this.hitEffect.at(b.x, b.y, b.rotation(), this.hitColor);
         this.hitSound.at(b);
 
-        Effect.shake(this.hitShake, this.hitShake, b);
+        Effect.shake(this.hitShake, this.hitShake, b);/*
 
-        var target = Damage.linecast(b, b.x, b.y, b.rotation(), this.length);//제에ㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔ발 밖으로 뺄 수 있는건 밖으로.
+        var target = Damage.linecast(b, b.x, b.y, b.rotation(), this.getRealLength(b));//제에ㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔ발 밖으로 뺄 수 있는건 밖으로.
         b.data = target;
 
         for(var i = 0; i < this.fragBullets; i++){
@@ -195,12 +208,12 @@ const chargeLaser = extend(BulletType, {
                 }
             }
             else{
-                b.data = new Vec2().trns(b.rotation(), this.length).add(b.x, b.y);
+                b.data = new Vec2().trns(b.rotation(), this.getRealLength(b)).add(b.x, b.y);
                 var bdata = b.data;
                 Tmp.v1.set(bdata);
                 this.fragBullet.create(b, Tmp.v1.x + Angles.trnsx(a, len), Tmp.v1.y + Angles.trnsy(a, len), a);
             }
-        }
+        }*/
     }
 });
 const steleBullet = new JavaAdapter(BasicBulletType, {//i hope he won't blame me.. lol
@@ -277,10 +290,18 @@ const laserSwarmerTurret = lib.extend(ChargeTurret, ChargeTurret.ChargeTurretBui
             type: "linear",
             field: "range",
             start: 20 * 8,
-            intensity: 0.5 * 8
+            intensity: 0.25 * 8
         }
-    ]
+    ],
+    drawPlace(x, y, rotation, valid){
+        Drawf.dashCircle(x * Vars.tilesize + this.offset, y * Vars.tilesize + this.offset, 20 * 8, Pal.placing);
+    }
 }, {
+    drawSelect(){
+        Drawf.dashCircle(this.x, this.y, 20 * 8, this.team.color);
+        var lvl = this.totalLevel();
+        if(lvl > 0) Drawf.dashCircle(this.x, this.y, 160 + 2 * lvl, laserSwarmerTurret.exp0Color);
+    },
     getShootColor(lvl){
         return Tmp.c1.set(Pal.lancerLaser.cpy().lerp(Pal.sapBullet, 0.5)).lerp(Pal.sapBullet, this.totalLevel() / 30);
     },
