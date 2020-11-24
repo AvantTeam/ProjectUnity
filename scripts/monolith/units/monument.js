@@ -45,6 +45,9 @@ railgun.shootSound = global.sounds.railgunbig;
 railgun.bullet = railgunBullet;
 
 const monument = extendContent(UnitType, "monument", {});
+monument.ammoType = AmmoTypes.powerHigh;
+monument.groundLayer = Layer.legUnit;
+monument.weapons.add(railgun);
 monument.constructor = () => {
     return extend(LegsUnit, {});
 };
