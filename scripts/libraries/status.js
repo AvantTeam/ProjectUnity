@@ -20,8 +20,8 @@ const radiationL = extendContent(StatusEffect, "radiation", {
 	update(unit, time){
 		this.super$update(unit, time);
 		
-		if(Mathf.chanceDelta(0.001)){
-			unit.damage(unit.maxHealth / 0.125);
+		if(Mathf.chanceDelta(0.008 * Mathf.clamp(time / 120))){
+			unit.damage(unit.maxHealth * 0.125);
 		};
 		for(var i = 0; i < unit.mounts.length; i++){
 			var strength = Mathf.clamp(time / 120);

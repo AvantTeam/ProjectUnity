@@ -2,6 +2,8 @@ const fLib = this.global.unity.funclib;
 
 const tempVec = new Vec2();
 const tempVec2 = new Vec2();
+const vapourizeQueue = new Seq(512);
+//const vapourizeQueueB = new IntSeq(512);
 const timeProgress = 1.2;
 const lightningLength = 23;
 const effectLength = 32;
@@ -35,6 +37,26 @@ const vaporation = new Effect(23, e => {
 	Fill.circle(tempVec2.x + e.data[2].x, tempVec2.y + e.data[2].y, e.fout() * 5);
 });
 vaporation.layer = Layer.flyingUnit + 0.012;
+
+function BuildQueue(build){
+	this.build = build;
+	this.time = 14.99;
+};
+
+Events.run(EventType.Trigger.update, () => {
+	vapourizeQueue.each(buildq => {
+		//print(buildq.build.dead);
+		if(!buildq.build.isValid()){
+			var size = buildq.build.block.size;
+			Puddles.deposit(buildq.build.tile, Liquids.slag, ((size * size) * 2) + 6);
+			//print(buildq.build.dead);
+			//vapourizeQueueB.add(buildq.build.id);
+		};
+		buildq.time -= Time.delta;
+	});
+	vapourizeQueue.removeAll(buildq => buildq.build.dead || buildq.time <= 0);
+	//vapourizeQueueB.clear();
+});
 
 function LightningNode(x, y, xa, ya){
 	this.damage = 0;
@@ -247,6 +269,9 @@ const customLightningA = prov(() => {
 });
 
 module.exports = {
+	addMoltenBlock(build){
+		if(!vapourizeQueue.contains(build)) vapourizeQueue.add(new BuildQueue(build));
+	},
 	createEvaporation(x, y, host, influence){
 		if(host == null || influence == null) return;
 		var l = vapourize.get();

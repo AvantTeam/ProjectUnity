@@ -50,9 +50,16 @@ const extinctionLaser = extendContent(ContinuousLaserBulletType, 770, {
 				//Damage.createIncend()
 				if(Mathf.chance(angD * 0.2 * Mathf.clamp(dst * 1.7))) Fires.create(tile);
 				if(build != null){
-					if(b.team != build.team) build.damage(angD * 258.3 * Mathf.clamp(dst * 1.7));
+					if(b.team != build.team){
+						build.damage(angD * 23.3 * Mathf.clamp(dst * 1.7));
+						exefLib.addMoltenBlock(build);
+					};
+					//var size = build.block.size;
+					//Puddles.deposit(tile, Liquids.slag, ((size * size) * 2) + 6);
+					//tempSeq.add(build);
 				};
 			}, null);
+			//tempSeq.each(build => build.remove());
 		};
 		fLib.castCone(b.x, b.y, this.length * 0.8, b.rotation(), 70, null, (e, dst, angD) => {
 			if(!e.dead){
