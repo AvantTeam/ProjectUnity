@@ -18,25 +18,33 @@ laserGun2.reload = 60;
 const railgunBullet = extend(PointBulletType, {});
 railgunBullet.damage = 1000;
 railgunBullet.tileDamageMultiplier = 0.7;
-railgunBullet.speed = 500;
+railgunBullet.speed = railgunBullet.maxRange = 500;
+railgunBullet.lifetime = 1;
 railgunBullet.hitShake = 6;
 railgunBullet.trailSpacing = 35;
 railgunBullet.frontColor = Color.white;
 railgunBullet.backColor = Pal.lancerLaser;
 railgunBullet.shootEffect = new Effect(48, e => {
-    for(let i = 0; i < 2; i++){
-        Draw.color(i < 1 ? railgunBullet.backColor : railgunBullet.frontColor);
-        Draw.blend(Blending.additive);
-        Draw.alpha(e.fout() * 0.8);
+    Draw.color(Color.white, Pal.lancerLaser, Color.cyan, e.fin());
 
-        Fill.circle(e.x, e.y, e.finpow() * 30 * (i + 1));
-        
-        Draw.blend();
-    }
+    Angles.randLenVectors(e.id, 12, e.finpow() * 64, e.rotation, 16, (x, y) => {
+        Fill.circle(e.x + x, e.y + y, 1 + e.fout() * 5);
+    });
 });
-railgunBullet.hitEffect = Fx.hitLancer;
+railgunBullet.despawnEffect = new Effect(32, e => {
+    e.scaled(15, i => {
+        Draw.color(Pal.lancerLaser);
+
+        Lines.stroke(i.fout() * 5);
+        Lines.circle(e.x, e.y, 4 + i.finpow() * 26);
+    });
+
+    Angles.randLenVectors(e.id, 25, 5 + e.fin() * 80, e.rotation, 60, (x, y) => {
+        Fill.circle(e.x + x, e.y + y, e.fout() * 3);
+    });
+});
 railgunBullet.smokeEffect = Fx.blastExplosion;
-railgunBullet.trailEffect = new Effect(48, e => {
+railgunBullet.trailEffect = new Effect(32, e => {
     let len = railgunBullet.trailSpacing - 12;
     let rot = e.rotation;
     Tmp.v1.trns(rot, len);
@@ -45,13 +53,13 @@ railgunBullet.trailEffect = new Effect(48, e => {
         Draw.color(i < 1 ? railgunBullet.backColor : railgunBullet.frontColor);
         let scl = i < 1 ? 1 : 0.5;
 
-        Lines.stroke(e.fout() * 15 * scl);
+        Lines.stroke(e.fout() * 10 * scl);
         Lines.lineAngle(e.x, e.y, rot, len, false);
         Drawf.tri(e.x + Tmp.v1.x, e.y + Tmp.v1.y, Lines.getStroke() * 1.22, 12 * scl, rot);
         Drawf.tri(e.x, e.y, Lines.getStroke() * 1.22, 12 * scl, rot + 180);
     }
 });
-railgunBullet.despawnEffect = Fx.cloudsmoke;
+railgunBullet.shootEffect = Fx.blastExplosion;
 
 const railgun = extendContent(Weapon, "unity-monolith-railgun-big", {});
 railgun.x = 0;
@@ -65,7 +73,7 @@ railgun.cooldownTime = 210;
 railgun.recoil = 8;
 railgun.shake = 8;
 railgun.occlusion = 30;
-railgun.shootSound = global.unity.sounds.railgunbig;
+railgun.shootSound = Sounds.railgun;
 railgun.bullet = railgunBullet;
 
 const monument = extendContent(UnitType, "monument", {});
