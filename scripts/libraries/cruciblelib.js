@@ -78,28 +78,6 @@ function getStackedBarChart(pheight, datafunction){
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 function deepCopy(obj) {
     var clone = {};
     for (var i in obj) {
@@ -111,18 +89,18 @@ function deepCopy(obj) {
 
 //dunno how to load this from a json
 const cruicibleMelts = [
-	{name:"copper", meltpoint:750, meltspeed:0.1, evaporation: 0.02, evaporationTemp: 2100}, // irl: 1475K, halved cus its a low tier resource.
-	{name:"lead", meltpoint:570, meltspeed:0.2, evaporation: 0.02, evaporationTemp: 1900},  //dont let it get too hot! c:
-	{name:"titanium", meltpoint:1600, meltspeed:0.05},  // irl: 1940K
-	{name:"sand", meltpoint:1000, meltspeed:0.1},  // irl: 1900K
-	{name:"carbon", meltpoint:4000, meltspeed:0.01, evaporation: 0.01, evaporationTemp: 600, notItem:true},  // practically cant be melted, but burns instead (to avoid clogging the thing)
-	{name:"coal", additive:true, additiveID:"carbon", additiveWeight: 0.5},  
-	{name:"graphite", additive:true, additiveID:"carbon", additiveWeight: 1.0},    
-	{name:"unity-nickel", meltpoint:1100, meltspeed:0.15},  // irl: 1728K
-	{name:"unity-cupronickel", meltpoint:900, meltspeed:0.05},  // irl: 1300K
-	{name:"metaglass", meltpoint:1000, meltspeed:0.05},  // irl: 1300K
-	{name:"silicon", meltpoint:900, meltspeed:0.2},  // irl: 1600K
-	{name:"surge-alloy", meltpoint:1500, meltspeed:0.02},  
+	{name:"copper", meltpoint:750, meltspeed:0.1, evaporation: 0.02, evaporationTemp: 2100, priority: 1}, // irl: 1475K, halved cus its a low tier resource.
+	{name:"lead", meltpoint:570, meltspeed:0.2, evaporation: 0.02, evaporationTemp: 1900, priority: 1},  //dont let it get too hot! c:
+	{name:"titanium", meltpoint:1600, meltspeed:0.05, priority: 1},  // irl: 1940K
+	{name:"sand", meltpoint:1000, meltspeed:0.1, priority: 1},  // irl: 1900K
+	{name:"carbon", meltpoint:4000, meltspeed:0.01, evaporation: 0.01, evaporationTemp: 600, notItem:true, priority: 0},  // practically cant be melted, but burns instead (to avoid clogging the thing)
+	{name:"coal", additive:true, additiveID:"carbon", additiveWeight: 0.5, priority: 0},  
+	{name:"graphite", additive:true, additiveID:"carbon", additiveWeight: 1.0, priority: 0},    
+	{name:"unity-nickel", meltpoint:1100, meltspeed:0.15, priority: 1},  // irl: 1728K
+	{name:"unity-cupronickel", meltpoint:900, meltspeed:0.05, priority: 2},  // irl: 1300K
+	{name:"metaglass", meltpoint:1000, meltspeed:0.05, priority: 2},  // irl: 1300K
+	{name:"silicon", meltpoint:900, meltspeed:0.2, priority: 2},  // irl: 1600K
+	{name:"surge-alloy", meltpoint:1500, meltspeed:0.02, priority: 3},  
 	////APPEND NEW MELTS TO THE END TO AVOID AFFECTING SAVES
 ];
 for(let inde = 0 ;inde<cruicibleMelts.length;inde++){
@@ -158,7 +136,7 @@ const cruicibleRecipes = [
 			{material:"sand",   amount:1.5, needsliquid: true},
 			{material:"carbon", amount:0.25}
 		],
-		alloyspeed: 0.2
+		alloyspeed: 0.25
 	},
 	{name:"metaglass", 
 		inputs:[
@@ -174,7 +152,7 @@ const cruicibleRecipes = [
 			{material:"copper",   amount:1,   needsliquid: true},
 			{material:"titanium", amount:1.5, needsliquid: true},
 		],
-		alloyspeed: 0.15
+		alloyspeed: 0.25
 	},
 ]
 

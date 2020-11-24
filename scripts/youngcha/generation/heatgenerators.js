@@ -14,9 +14,9 @@ const thermalHeater = graphLib.finaliseExtend(Block, Building,"thermal-heater",t
 		this.bottom = [Core.atlas.find(this.name)+1,Core.atlas.find(this.name)+2,Core.atlas.find(this.name)+3,Core.atlas.find(this.name)+4];
 	},
 	attribute: Attribute.heat,
-	
+
 	getTerrainAttrib(){return this.attribute;},
-	
+
 	canPlaceOn( tile,  team){
         return tile.getLinkedTilesAs(this, this.tempTiles).sumf(other => other.floor().attributes.get(this.attribute)) > 0.01;
     }
@@ -26,7 +26,7 @@ const thermalHeater = graphLib.finaliseExtend(Block, Building,"thermal-heater",t
 		let eff = this.sum + this.block.getTerrainAttrib().env();
 		let hgraph = this.getGraphConnector("heat graph");
 		let temp = hgraph.getTemp();
-		hgraph.setHeat(hgraph.getHeat()+ Math.max(0,1100-temp)*0.3);
+		hgraph.setHeat(hgraph.getHeat()+ Math.max(0,1100-temp)*0.35);
 	},
 	draw() {
 		let temp = this.getGraphConnector("heat graph").getTemp();
@@ -55,7 +55,7 @@ const infiHeater = graphLib.finaliseExtend(Block, Building,"infi-heater",ihblank
 	load(){
 		this.super$load();
 		this.heatsprite = Core.atlas.find(this.name+"-heat");
-		this.bottom = Core.atlas.find(this.name)+"-base";
+		this.bottom = Core.atlas.find(this.name+"-base");
 	},
 },{
 	updatePost(){
@@ -78,6 +78,39 @@ infiHeater.getGraphConnectorBlock("heat graph").setBaseHeatCapacity(1000);
 infiHeater.getGraphConnectorBlock("heat graph").setBaseHeatRadiativity(0.0);
 
 
+
+
+
+
+let icblankobj = graphLib.init();
+graphLib.addGraph(icblankobj, heatlib.baseTypesHeat.heatConnector);
+const infiCooler = graphLib.finaliseExtend(Block, Building,"infi-cooler",icblankobj,{
+	load(){
+		this.super$load();
+    this.heatsprite = Core.atlas.find(this.name+"-heat");
+		this.bottom = Core.atlas.find(this.name+"-base");
+	},
+},{
+	updatePost(){
+		let hgraph = this.getGraphConnector("heat graph");
+		let temp = hgraph.getTemp();
+		hgraph.setHeat(0);
+	},
+	draw() {
+		let temp = this.getGraphConnector("heat graph").getTemp();
+		Draw.rect(infiCooler.bottom, this.x, this.y, 0);
+		heatlib.drawHeat(infiCooler.heatsprite,this.x, this.y,this.rotdeg(), temp);
+        this.drawTeamTop();
+	},
+});
+infiCooler.update = true;
+infiCooler.rotate = false;
+infiCooler.getGraphConnectorBlock("heat graph").setAccept( [1,1, 1,1]);
+infiCooler.getGraphConnectorBlock("heat graph").setBaseHeatConductivity(1.0);
+infiCooler.getGraphConnectorBlock("heat graph").setBaseHeatCapacity(1000);
+infiCooler.getGraphConnectorBlock("heat graph").setBaseHeatRadiativity(0.0);
+
+
 ////SOLAR ------------------------------------------
 
 let scblankobj = graphLib.init();
@@ -92,7 +125,7 @@ const solarCollector = graphLib.finaliseExtend(Block, Building,"solar-collector"
 },{
 	linkedReflect:[],
 	thermalPwr: 0,
-	
+
 	getThermalPowerCoeff(ref){
 		let dst = Mathf.dst(ref.x,ref.y,this.x,this.y);
 		let dir = _dirs[this.rotation];
@@ -145,7 +178,7 @@ const solarCollector = graphLib.finaliseExtend(Block, Building,"solar-collector"
 		}
         this.drawTeamTop();
 	},
-	
+
 });
 solarCollector.update = true;
 solarCollector.solid = true;
@@ -167,7 +200,7 @@ const solarReflector = extendContent(Block, "solar-reflector", {
 	},
 });
 solarReflector.buildType = () => {
-	
+
 	let building = extend(Building, {
 		mirrorRot:0,
 		_link:-1,
@@ -198,7 +231,7 @@ solarReflector.buildType = () => {
 					this._hasChanged = false;
 				}
             }
-			
+
 		},
 		draw(){
 			Draw.rect(solarReflector.bottom, this.x, this.y);
@@ -206,7 +239,7 @@ solarReflector.buildType = () => {
 		},
 		drawConfigure(){
 			let sin = Mathf.absin(Time.time(), 6, 1);
-			
+
 			if(this.linkValid()){
                 let target = Vars.world.build(this._link);
                 Drawf.circles(target.x, target.y, (target.block.size / 2 + 1) * Vars.tilesize + sin - 2, Pal.place);
@@ -231,7 +264,7 @@ solarReflector.buildType = () => {
                 return false;
             }
 			return true;
-			
+
 		},
 		config(){
             return Point2.unpack(this._link).sub(this.tile.x, this.tile.y);
@@ -257,4 +290,3 @@ solarReflector.buildType = () => {
 solarReflector.solid = true;
 solarReflector.update = true;
 solarReflector.configurable = true;
-

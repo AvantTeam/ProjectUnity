@@ -56,7 +56,7 @@ const _GraphCommonBuild = {
 	create(block, team) {
         let building = this.super$create(block, team);
 		
-		block.injectGraphConnectors(this);
+		
 		for(let graphname in this.graphs) {
 		  let graphConn = this.graphs[graphname];
 		  graphConn.onCreate(building)
@@ -1149,6 +1149,7 @@ module.exports = {
 		rotpowerBlock.buildType = () => {
             let building = extend(Entity, Object.assign(deepCopy(bcustom.build),deepCopy(custBuild)));
             building.block = rotpowerBlock;
+			rotpowerBlock.injectGraphConnectors(building);
             return building;
         };
 		return rotpowerBlock;
@@ -1158,6 +1159,7 @@ module.exports = {
 		rotpowerBlock.buildType = () => {
             let building = extendContent(Entity,rotpowerBlock, Object.assign(deepCopy(bcustom.build),deepCopy(custBuild)));
             building.block = rotpowerBlock;
+			rotpowerBlock.injectGraphConnectors(building);
             return building;
         };
 		return rotpowerBlock;

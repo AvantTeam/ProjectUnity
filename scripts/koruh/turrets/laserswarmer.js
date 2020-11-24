@@ -9,10 +9,10 @@ const laserCharge = new Effect(38, e => {
 
 const laserChargeBegin = new Effect(60, e => {
     Draw.color(e.color);
-    Fill.square(e.x, e.y, e.fin() * 3, 45);
+    Fill.circle(e.x, e.y, e.fin() * 5);
 
     Draw.color();
-    Fill.square(e.x, e.y, e.fin() * 2, 45);
+    Fill.circle(e.x, e.y, e.fin() * 3.5);
 });
 
 const laserChargeShoot = new Effect(21, e => {
@@ -164,7 +164,7 @@ const chargeLaser = extend(BulletType, {
             Lines.line(b.x, b.y, Tmp.v1.x, Tmp.v1.y);
             Draw.reset();
 
-            Drawf.light(Team.derelict, b.x, b.y, b.x + Tmp.v1.x, b.y + Tmp.v1.y, 15 * b.fout() + 5, Color.white, 0.6);
+            Drawf.light(Team.derelict, b.x, b.y, Tmp.v1.x, Tmp.v1.y, 15 * b.fout() + 5, Color.white, 0.6);
         }
     },
     //h
@@ -288,14 +288,14 @@ const laserSwarmerTurret = lib.extend(ChargeTurret, ChargeTurret.ChargeTurretBui
         this.useAmmo();
         var lvl = this.totalLevel();
 
-        laserSwarmerTurret.tr.trns(this.rotation, laserSwarmerTurret.size * Vars.tilesize / 2);
+        laserSwarmerTurret.tr.trns(this.rotation, laserSwarmerTurret.size * Vars.tilesize / 2.7);
         laserSwarmerTurret.chargeBeginEffect.at(this.x + laserSwarmerTurret.tr.x, this.y + laserSwarmerTurret.tr.y, this.rotation, this.getShootColor(lvl));
         laserSwarmerTurret.chargeSound.at(this.x + laserSwarmerTurret.tr.x, this.y + laserSwarmerTurret.tr.y, 1);
 
         for(var i = 0; i < laserSwarmerTurret.chargeEffects; i++){
             Time.run(Mathf.random(laserSwarmerTurret.chargeMaxDelay), () => {
                 if(!this.isValid()) return;
-                laserSwarmerTurret.tr.trns(this.rotation, laserSwarmerTurret.size * Vars.tilesize / 2);
+                laserSwarmerTurret.tr.trns(this.rotation, laserSwarmerTurret.size * Vars.tilesize / 2.7);
                 laserSwarmerTurret.chargeEffect.at(this.x + laserSwarmerTurret.tr.x, this.y + laserSwarmerTurret.tr.y, this.rotation, this.getShootColor(lvl));
             });
         }
@@ -308,7 +308,7 @@ const laserSwarmerTurret = lib.extend(ChargeTurret, ChargeTurret.ChargeTurretBui
 
                     this.recoil = laserSwarmerTurret.recoilAmount;
 
-                    laserSwarmerTurret.tr.trns(this.rotation, laserSwarmerTurret.size * Vars.tilesize / 2, Mathf.range(laserSwarmerTurret.xRand));
+                    laserSwarmerTurret.tr.trns(this.rotation, laserSwarmerTurret.size * Vars.tilesize / 2.7, Mathf.range(laserSwarmerTurret.xRand));
 
                     this.heat = 1;
                     this.bullet(ammo, this.rotation + Mathf.range(laserSwarmerTurret.inaccuracy));
@@ -352,4 +352,4 @@ laserSwarmerTurret.buildVisibility = BuildVisibility.sandboxOnly;
 laserSwarmerTurret.shots = 4;
 laserSwarmerTurret.burstSpacing = 5;
 laserSwarmerTurret.inaccuracy = 10;
-laserSwarmerTurret.xRand = 10;
+laserSwarmerTurret.xRand = 6;

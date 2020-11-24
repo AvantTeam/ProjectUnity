@@ -4,7 +4,7 @@
 	"requirements": [
 		{"item": "cupronickel", "amount": 50},
 		{"item": "nickel", "amount": 50},
-		{"item": "metaglass", "amount": 50},
+		{"item": "metaglass", "amount": 15},
 	],
 	"category": "crafting",
 }

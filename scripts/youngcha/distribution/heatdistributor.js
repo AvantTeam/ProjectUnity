@@ -17,8 +17,12 @@ const heatPipe = graphLib.finaliseExtend(Block, Building,"heat-pipe",hpblankobj,
 	},
 	getTimerId(){
 		return this._timerid;
-	}
-	
+	},
+    drawRequestRegion(req, list) {
+        const scl = Vars.tilesize * req.animScale;
+        Draw.rect(this.region, req.drawx(), req.drawy(), scl, scl, req.rotation * 90);
+    },
+
 },{
 	basespriteindex: 0,
 	onNeighboursChanged(){
@@ -36,7 +40,7 @@ const heatPipe = graphLib.finaliseExtend(Block, Building,"heat-pipe",hpblankobj,
 			let intensity = Mathf.clamp(Mathf.map(temp,400,1000,0,1));
 			unit.apply(StatusEffects.burning, intensity*20+5);
 			unit.damage(intensity*10);
-		}	
+		}
 	},
 	updatePost(){
 	},

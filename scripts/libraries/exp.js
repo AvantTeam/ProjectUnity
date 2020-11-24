@@ -361,7 +361,7 @@ module.exports = {
                 if(expblock.getLevel(this._exp - a) != clvl) {
                     if(expblock.enableUpgrade){
                         if(!arrayEqual(this.currentUpgrades(clvl), this.currentUpgrades(a > 0 ? clvl - 1 : clvl + 1)) && this.currentUpgrades(clvl).length > 0) this._checked = false;
-                        Vars.control.input.frag.config.hideConfig();
+                        if(!Vars.headless) Vars.control.input.frag.config.hideConfig();
                     }
                     expblock.levelUpFx.at(this.x, this.y, expblock.size);
                     expblock.levelUpSound.at(this.x, this.y);
