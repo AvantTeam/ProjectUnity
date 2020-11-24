@@ -26,7 +26,7 @@ const thermalHeater = graphLib.finaliseExtend(Block, Building,"thermal-heater",t
 		let eff = this.sum + this.block.getTerrainAttrib().env();
 		let hgraph = this.getGraphConnector("heat graph");
 		let temp = hgraph.getTemp();
-		hgraph.setHeat(hgraph.getHeat()+ Math.max(0,1100-temp)*0.35);
+		hgraph.setHeat(hgraph.getHeat()+ Math.max(0,1100-temp)*0.11*eff);
 	},
 	draw() {
 		let temp = this.getGraphConnector("heat graph").getTemp();
@@ -47,6 +47,79 @@ thermalHeater.getGraphConnectorBlock("heat graph").setBaseHeatConductivity(0.6);
 thermalHeater.getGraphConnectorBlock("heat graph").setBaseHeatCapacity(40);
 thermalHeater.getGraphConnectorBlock("heat graph").setBaseHeatRadiativity(0.004);
 
+
+
+
+
+let chblankobj = graphLib.init();
+graphLib.addGraph(chblankobj, heatlib.baseTypesHeat.heatConnector);
+
+const combustionHeater = graphLib.finaliseExtend(Block, Building,"combustion-heater",chblankobj,{
+	load(){
+		this.super$load();
+		this.heatsprite = Core.atlas.find(this.name+"-heat");
+		this.bottom = [Core.atlas.find(this.name)+"-base1",Core.atlas.find(this.name)+"-base2",Core.atlas.find(this.name)+"-base3",Core.atlas.find(this.name)+"-base4"];
+	},
+	init(){
+		this.consumes.add(new ConsumeItemFilter(item => { return item.flammability>= 0.1})).update(false).optional(true, false);
+		this.super$init();
+	}
+},{
+	generateTime:0,
+	productionEfficiency:0,
+	productionValid(){
+		return this.generateTime > 0;
+	},
+	updatePost(){
+		let delt   = this.delta();
+		if(!this.consValid()){
+			this.productionEfficiency = 0.0;
+			return;
+		}
+		
+		if(this.generateTime <= 0 && this.items.total() > 0){
+			Fx.generatespark.at(this.x + Mathf.range(3.0), this.y + Mathf.range(3.0));
+			let item = this.items.take();
+			this.productionEfficiency = (item.flammability);
+			this.generateTime=1.0;
+		}
+		
+		if(this.generateTime > 0){
+            this.generateTime -= Math.min(1.0 / 100.0 * delt, this.generateTime);
+		}else{
+			this.productionEfficiency = 0.0;
+		}
+		let hgraph = this.getGraphConnector("heat graph");
+		let temp = hgraph.getTemp();
+		hgraph.setHeat(hgraph.getHeat()+ Math.max(0,1200-temp)*0.45*this.productionEfficiency);
+	},
+	draw() {
+		let temp = this.getGraphConnector("heat graph").getTemp();
+		Draw.rect(combustionHeater.bottom[this.rotation], this.x, this.y, 0);
+		heatlib.drawHeat(combustionHeater.heatsprite,this.x, this.y,this.rotdeg(), temp);
+        this.drawTeamTop();
+	},
+	writeExt(stream) {
+		stream.f(this.productionEfficiency);
+	},
+	readExt(stream, revision) {
+		this.productionEfficiency=stream.f();
+	}
+});
+
+combustionHeater.update = true;
+combustionHeater.rotate = true;
+combustionHeater.hasItems = true;
+combustionHeater.itemCapacity = 5;
+combustionHeater.getGraphConnectorBlock("heat graph").setAccept( [1,1, 0,0, 0,0, 0,0]);
+combustionHeater.getGraphConnectorBlock("heat graph").setBaseHeatConductivity(0.6);
+combustionHeater.getGraphConnectorBlock("heat graph").setBaseHeatCapacity(40);
+combustionHeater.getGraphConnectorBlock("heat graph").setBaseHeatRadiativity(0.004);
+
+
+
+
+//INF sources -----------------------------------------------------------------------------------------------------
 
 
 let ihblankobj = graphLib.init();
@@ -109,7 +182,7 @@ infiCooler.getGraphConnectorBlock("heat graph").setBaseHeatCapacity(1000);
 infiCooler.getGraphConnectorBlock("heat graph").setBaseHeatRadiativity(0.0);
 
 
-////SOLAR ------------------------------------------
+////SOLAR --------------------------------------------------------------------------------------------
 
 let scblankobj = graphLib.init();
 graphLib.addGraph(scblankobj, heatlib.baseTypesHeat.heatConnector);

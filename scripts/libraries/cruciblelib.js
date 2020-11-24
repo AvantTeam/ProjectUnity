@@ -839,7 +839,7 @@ const tileMap = [//not sure how to format this.
 	3,15,15,3,3,15,15,2,2,9,14,2,2,9,14,0,
 	0,42,42,0,0,12,12,1,1,45,18,1,1,19,13
 ]
-const inv12 = 0.0833333333;
+
 
 function _getRegion(region, tile) {
     if (!region) {
