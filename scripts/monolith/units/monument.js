@@ -1,3 +1,20 @@
+const laserGun = extendContent(Weapon, "unity-monolith-large2-weapon-mount", {});
+laserGun.x = 14;
+laserGun.y = 12;
+laserGun.shootY = 14;
+laserGun.rotate = true;
+laserGun.rotateSpeed = 3.5;
+laserGun.reload = 48;
+laserGun.recoil = 5;
+laserGun.shake = 5;
+laserGun.shootSound = Sounds.laser;
+laserGun.bullet = Bullets.lancerLaser;
+
+const laserGun2 = laserGun.copy();
+laserGun2.x = 20;
+laserGun2.y = 3;
+laserGun2.reload = 60;
+
 const railgunBullet = extend(PointBulletType, {});
 railgunBullet.damage = 1000;
 railgunBullet.tileDamageMultiplier = 0.7;
@@ -47,7 +64,7 @@ railgun.bullet = railgunBullet;
 const monument = extendContent(UnitType, "monument", {});
 monument.ammoType = AmmoTypes.powerHigh;
 monument.groundLayer = Layer.legUnit;
-monument.weapons.add(railgun);
+monument.weapons.add(railgun, laserGun, laserGun2);
 monument.constructor = () => {
     return extend(LegsUnit, {});
 };
