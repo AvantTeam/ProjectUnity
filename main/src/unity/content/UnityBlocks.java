@@ -27,7 +27,7 @@ import unity.world.draw.DrawLightSource;
 import multilib.*;
 import multilib.Recipe.*;
 
-import static arc.Core.*;
+import static arc.Core.atlas;
 import static mindustry.type.ItemStack.*;
 import static unity.content.UnityFx.*;
 
@@ -44,7 +44,7 @@ public class UnityBlocks implements ContentList{
 
 //dark
     //turrets
-    apparition, ghost, banshee, fallout, catastrophe, calamity,
+    apparition, ghost, banshee, fallout, catastrophe, calamity, extinction,
     //factories
     darkAlloyForge,
 
@@ -336,6 +336,12 @@ public class UnityBlocks implements ContentList{
         //endregion
         //region dark turrets
         apparition = new ItemTurret("apparition"){
+            @Override
+            public void load(){
+                super.load();
+                baseRegion = atlas.find("unity-block-" + size);
+            }
+
             {
                 requirements(Category.turret, with(Items.copper, 350, Items.graphite, 380, Items.silicon, 360, Items.plastanium, 200, Items.thorium, 220, UnityItems.umbrium, 370, Items.surgeAlloy, 290));
                 size = 5;
@@ -351,12 +357,6 @@ public class UnityBlocks implements ContentList{
                 recoilAmount = 3f;
                 rotateSpeed = 4.5f;
                 ammo(Items.graphite, UnityBullets.standardDenseLarge, Items.silicon, UnityBullets.standardHomingLarge, Items.pyratite, UnityBullets.standardIncendiaryLarge, Items.thorium, UnityBullets.standardThoriumLarge);
-            }
-
-            @Override
-            public void load(){
-                super.load();
-                baseRegion = atlas.find("unity-block-" + size);
             }
         };
 
@@ -377,12 +377,6 @@ public class UnityBlocks implements ContentList{
                 addBarrel(8f, 18.75f, 6f);
                 ammo(Items.graphite, UnityBullets.standardDenseHeavy, Items.silicon, UnityBullets.standardHomingHeavy, Items.pyratite, UnityBullets.standardIncendiaryHeavy, Items.thorium, UnityBullets.standardThoriumHeavy);
                 requirements(Category.turret, with(Items.copper, 1150, Items.graphite, 1420, Items.silicon, 960, Items.plastanium, 800, Items.thorium, 1230, UnityItems.darkAlloy, 380));
-            }
-
-            @Override
-            public void load(){
-                super.load();
-                baseRegion = atlas.find("unity-block-" + size);
             }
         };
 
@@ -406,15 +400,15 @@ public class UnityBlocks implements ContentList{
                 ammo(Items.graphite, UnityBullets.standardDenseMassive, Items.silicon, UnityBullets.standardHomingMassive, Items.pyratite, UnityBullets.standardIncendiaryMassive, Items.thorium, UnityBullets.standardThoriumMassive);
                 requirements(Category.turret, with(Items.copper, 2800, Items.graphite, 2980, Items.silicon, 2300, Items.titanium, 1900, Items.phaseFabric, 1760, Items.thorium, 1780, UnityItems.darkAlloy, 1280));
             }
+        };
 
+        fallout = new LaserTurret("fallout"){
             @Override
             public void load(){
                 super.load();
                 baseRegion = atlas.find("unity-block-" + size);
             }
-        };
 
-        fallout = new LaserTurret("fallout"){
             {
                 size = 5;
                 health = 3975;
@@ -436,12 +430,6 @@ public class UnityBlocks implements ContentList{
                 requirements(Category.turret, with(Items.copper, 450, Items.lead, 350, Items.graphite, 390, Items.silicon, 360, Items.titanium, 250, UnityItems.umbrium, 370, Items.surgeAlloy, 360));
                 shootType = UnityBullets.falloutLaser;
                 consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.58f)).update(false);
-            }
-
-            @Override
-            public void load(){
-                super.load();
-                baseRegion = atlas.find("unity-block-" + size);
             }
         };
 
@@ -468,12 +456,6 @@ public class UnityBlocks implements ContentList{
                 shootType = UnityBullets.catastropheLaser;
                 consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.4f && liquid.flammability < 0.1f, 1.3f)).update(false);
             }
-
-            @Override
-            public void load(){
-                super.load();
-                baseRegion = atlas.find("unity-block-" + size);
-            }
         };
 
         calamity = new BigLaserTurret("calamity"){
@@ -499,11 +481,30 @@ public class UnityBlocks implements ContentList{
                 shootType = UnityBullets.calamityLaser;
                 consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.3f && liquid.flammability < 0.1f, 2.1f)).update(false);
             }
+        };
 
-            @Override
-            public void load(){
-                super.load();
-                baseRegion = atlas.find("unity-block-" + size);
+        extinction = new BigLaserTurret("extinction"){
+            {
+                requirements(Category.turret, with(Items.copper, 3800, Items.lead, 4100, Items.graphite, 3200, Items.titanium, 4200, Items.surgeAlloy, 3800, Items.silicon, 4300, Items.thorium, 2400, UnityItems.darkAlloy, 1700, UnityItems.terminum, 900, UnityItems.terminaAlloy, 500));
+                size = 14;
+                health = 29500;
+                range = 520f;
+                reloadTime = 320f;
+                coolantMultiplier = 0.4f;
+                shootCone = 12f;
+                shootDuration = 360f;
+                powerUse = 125f;
+                shootShake = 4f;
+                firingMoveFract = 0.09f;
+                shootEffect = Fx.shootBigSmoke2;
+                recoilAmount = 7f;
+                cooldown = 0.003f;
+                heatColor = Color.white;
+                rotateSpeed = 0.9f;
+                loopSoundVolume = 3f;
+                expanded = true;
+                shootType = UnityBullets.extinctionLaser;
+                consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.27f && liquid.flammability < 0.1f, 2.5f)).update(false);
             }
         };
         //endregion
@@ -719,12 +720,13 @@ public class UnityBlocks implements ContentList{
                 final int effectTimer = timers++;
                 afterUpdate = e -> {
                     if(e.data == null) e.data = 0f;
-                    if(e.consValid()) e.data = Mathf.lerpDelta((float) e.data, e.efficiency(), 0.02f);
-                    else e.data = Mathf.lerpDelta((float) e.data, 0f, 0.02f);
-                    float temp = (float) e.data;
+                    if(e.consValid()) e.data = Mathf.lerpDelta((float)e.data, e.efficiency(), 0.02f);
+                    else e.data = Mathf.lerpDelta((float)e.data, 0f, 0.02f);
+                    float temp = (float)e.data;
                     if(!Mathf.zero(temp)){
                         if(e.timer.get(effectTimer, 45f)) effect.at(e.x, e.y, e.rotation, temp);
-                        if(Mathf.chanceDelta(temp * 0.5f)) Lightning.create(e.team, Pal.lancerLaser, 1f, e.x, e.y, Mathf.randomSeed((int) Time.time() + e.id, 360f), (int) (temp * 4f) + Mathf.random(3));
+                        //TODO not exactly same with js ver?.
+                        if(Mathf.chanceDelta(temp * 0.5f)) Lightning.create(e.team, Pal.lancerLaser, 1f, e.x, e.y, Mathf.randomSeed((int)Time.time() + e.id, 360f), (int)(temp * 4f) + Mathf.random(3));
                     }
                 };
                 outputItem = new ItemStack(UnityItems.monolithAlloy, 3);

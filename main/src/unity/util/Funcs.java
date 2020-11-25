@@ -11,6 +11,7 @@ import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.type.*;
+import mindustry.world.Tile;
 
 import static mindustry.Vars.*;
 
@@ -47,6 +48,49 @@ public final class Funcs{
         }
     }
 
+    public static void castCone(float wx, float wy, float range, float angle, float cone, Cons4<Tile, Building, Float, Float> consTile, Cons3<Unit, Float, Float> consUnit){
+        collidedBlocks.clear();
+        int tx = World.toTile(wx);
+        int ty = World.toTile(wy);
+        int tileRange = Mathf.floorPositive(range / tilesize + 1);
+        float rangeSquare = range * range;
+        if(consTile != null){
+            for(int x = -tileRange + tx, lenX = tileRange + tx; x <= lenX; x++){
+                for(int y = -tileRange + ty, lenY = tileRange + ty; y <= lenY; y++){
+                    float temp = Angles.angle(wx, wy, x * tilesize, y * tilesize);
+                    float tempDst = Mathf.dst(x * tilesize, y * tilesize, wx, wy);
+                    if(tempDst >= rangeSquare || !Angles.within(temp, angle, cone)) continue;
+                    Tile other = world.tile(x, y);
+                    if(other == null) continue;
+                    if(!collidedBlocks.contains(other.pos())){
+                        float dst = 1f - tempDst / range;
+                        float anDst = 1f - Angles.angleDist(temp, angle) / cone;
+                        consTile.get(other, other.build, dst, anDst);
+                        collidedBlocks.add(other.pos());
+                    }
+                }
+            }
+        }
+        if(consUnit != null){
+            Groups.unit.intersect(wx - range, wy - range, range * 2f, range * 2f, e -> {
+                float temp = Angles.angle(wx, wy, e.x, e.y);
+                float tempDst = Mathf.dst(e.x, e.y, wx, wy);
+                if(tempDst >= rangeSquare || !Angles.within(temp, angle, cone)) return;
+                float dst = 1f - tempDst / range;
+                float anDst = 1f - Angles.angleDist(temp, angle) / cone;
+                consUnit.get(e, dst, anDst);
+            });
+        }
+    }
+
+    public static void castCone(float wx, float wy, float range, float angle, float cone, Cons4<Tile, Building, Float, Float> consTile){
+        castCone(wx, wy, range, angle, cone, consTile, null);
+    }
+
+    public static void castCone(float wx, float wy, float range, float angle, float cone, Cons3<Unit, Float, Float> consUnit){
+        castCone(wx, wy, range, angle, cone, null, consUnit);
+    }
+
     /** Iterates over all blocks in a radius. */
     public static void trueEachBlock(int wx, int wy, float range, Cons<Building> cons){
         collidedBlocks.clear();
@@ -55,8 +99,8 @@ public final class Funcs{
         int ty = World.toTile(wy);
         int tileRange = Mathf.floorPositive(range / tilesize + 1);
 
-        for(int x = -tileRange + tx; x <= tileRange + tx; x++){
-            for(int y = -tileRange + ty; y <= tileRange + ty; y++){
+        for(int x = -tileRange + tx, lenX = tileRange + tx; x <= lenX; x++){
+            for(int y = -tileRange + ty, lenY = tileRange + ty; y <= lenY; y++){
                 if(!Mathf.within(x * tilesize, y * tilesize, wx, wy, range)) continue;
                 Building other = world.build(x, y);
 
@@ -74,11 +118,12 @@ public final class Funcs{
      */
     public static Unit targetUnique(Team team, int x, int y, float radius, Seq<Unit> targetSeq){
         result = null;
-        cdist = (radius * radius) + 1;
+        float radiusSquare = radius * radius;
+        cdist = radiusSquare + 1;
 
         Units.nearbyEnemies(team, x - radius, y - radius, radius * 2, radius * 2, unit -> {
             float dst = unit.dst(x, y);
-            if(!targetSeq.contains(unit) && dst < cdist && dst < radius * radius){
+            if(!targetSeq.contains(unit) && dst < cdist && dst < radiusSquare){
                 result = unit;
                 cdist = dst;
             }

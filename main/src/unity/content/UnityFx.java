@@ -7,7 +7,9 @@ import arc.math.geom.*;
 import arc.util.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
+import mindustry.gen.Unit;
 import mindustry.graphics.*;
+import unity.entities.UnitVecData;
 import unity.graphics.*;
 
 //fixing rect as Draw.rect not Lines.rect. currently no use
@@ -39,7 +41,7 @@ public class UnityFx{
 
         Tmp.v1.trns(value * 360f + ((value + 4f) * e.fin() * 80f), (Mathf.randomSeed(e.id * 126) + 1f) * 34f * (1f - e.finpow()));
 
-        color(Color.valueOf("ff9c5a"));
+        color(UnityPal.laserOrange);
         Fill.square(e.x + Tmp.v1.x, e.y + Tmp.v1.y, e.fslope() * 3f, 45f);
         color();
     }),
@@ -349,5 +351,26 @@ public class UnityFx{
             Fill.circle(e.x, e.y, finpow * 180f);
         }
         ;
-    });
+    }),
+
+    evaporateDeath = new Effect(64f, 800f, e -> {
+        if(!(e.data instanceof UnitVecData)) return;
+        UnitVecData temp = (UnitVecData)e.data;
+        Unit unit = temp.unit;
+        float curve = Interp.exp5In.apply(e.fin());
+        Tmp.c1.set(Color.black);
+        Tmp.c1.a = e.fout();
+        color(Tmp.c1);
+        rect(unit.type.region, unit.x + temp.vec.x * curve, unit.y + temp.vec.y * curve, unit.rotation - 90f);
+    }),
+
+    vaporation = new Effect(23f, e -> {
+        if(!(e.data instanceof Position[])) return;
+        Position[] temp = (Position[])e.data;
+        Tmp.v1.set(temp[0]);
+        Tmp.v1.lerp(temp[1], e.fin());
+        color(Pal.darkFlame, Pal.darkerGray, e.fin());
+        Fill.circle(Tmp.v1.x + temp[2].getX(), Tmp.v1.y + temp[2].getY(), e.fout() * 5f);
+    }).layer(Layer.flyingUnit + 0.012f);
+
 }

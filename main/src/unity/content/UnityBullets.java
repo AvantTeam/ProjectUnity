@@ -27,7 +27,8 @@ import static mindustry.graphics.Pal.*;
 import static unity.content.UnityFx.*;
 
 public class UnityBullets implements ContentList{
-    public static BulletType laser, coalBlaze, pyraBlaze, falloutLaser, catastropheLaser, calamityLaser, orb, shockBeam, currentStroke, shielderBullet, plasmaFragTriangle, plasmaTriangle, pylonLightning, pylonLaser, pylonLaserSmall;
+    public static BulletType laser, coalBlaze, pyraBlaze, falloutLaser, catastropheLaser, calamityLaser, extinctionLaser, orb, shockBeam, currentStroke,
+    shielderBullet, plasmaFragTriangle, plasmaTriangle, pylonLightning, pylonLaser, pylonLaserSmall;
 
     //only enhanced
     public static BasicBulletType standardDenseLarge, standardHomingLarge, standardIncendiaryLarge, standardThoriumLarge, standardDenseHeavy, standardHomingHeavy, standardIncendiaryHeavy, standardThoriumHeavy, standardDenseMassive, standardHomingMassive,
@@ -145,11 +146,39 @@ public class UnityBullets implements ContentList{
             {
                 length = 450f;
                 strokes = new float[]{2 * 1.7f, 1.5f * 1.7f, 1 * 1.7f, 0.3f * 1.7f};
-                incendSpread = 9f;
-                incendAmount = 2;
-                width = 9f;
                 lightStroke = 70f;
                 spaceMag = 70f;
+                fromBlockChance = 0.5f;
+                fromBlockDamage = 34f;
+                fromLaserChance = 0.8f;
+                fromLaserDamage = 32f;
+                fromLaserAmount = 3;
+                fromLaserLen = 5;
+                fromLaserLenRand = 7;
+                incendChance = 0.6f;
+                incendSpread = 9f;
+                incendAmount = 2;
+            }
+        };
+
+        extinctionLaser = new SparkingContinuousLaserBulletType(770f){
+            {
+                length = 560f;
+                strokes = new float[]{2f * 1.9f, 1.5f * 1.9f, 1f * 1.9f, 0.3f * 1.9f};
+                lightStroke = 90f;
+                spaceMag = 70f;
+                fromBlockChance = 0.7f;
+                fromBlockDamage = 76f;
+                fromBlockAmount = 2;
+                fromLaserChance = 0.8f;
+                fromLaserDamage = 46f;
+                fromLaserAmount = 4;
+                fromLaserLen = 5;
+                fromLaserLenRand = 7;
+                incendChance = 0.7f;
+                incendSpread = 9f;
+                incendAmount = 2;
+                extinction = true;
             }
         };
 
