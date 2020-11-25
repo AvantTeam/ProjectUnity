@@ -1,20 +1,18 @@
 {
-	"outputItem": {"item": "steel", "amount": 1},
+	"outputItem": {"item": "dense-alloy", "amount": 1},
 	"size": 1,
-  "health": 140,
+  "health": 70,
 	"hasLiquids": false,
 	"hasPower": false,
 	"hasItems": true,
-	"craftTime": 300,
+	"craftTime": 46.2,
   "itemCapacity": 10,
   "consumes": {
-		"power": 2.0,
 		"items": {
 			"items": [
-        {"item": "coal", "amount": 2},
-        {"item": "graphite", "amount": 2},
-				{"item": "dense-alloy", "amount": 3}
-
+        {"item": "copper", "amount": 1},
+				{"item": "lead", "amount": 2}
+        {"item": "coal", "amount": 1},
 			]
 		}
 	},

@@ -1,3 +1,35 @@
+const clib = this.global.unity.expcrafter;
+
+const denseColor = Color.valueOf("ffbeb8");
+const denseFx = new Effect(10, e => {
+      Draw.color(denseColor, Color.gray, e.fin());
+      Lines.stroke(1);
+      Lines.spikes(e.x, e.y, e.finpow() * 4.5, 1, 6);
+});
+
+const densesmelter = clib.extend(GenericSmelter, GenericSmelter.SmelterBuild, "dense-smelter", {
+    expUse: 2,
+    expCapacity: 24,
+    ignoreExp: true
+}, {
+    draw(){
+        Draw.rect(densesmelter.region, this.x, this.y);
+        if(this.warmup > 0){
+            Draw.blend(Blending.additive);
+            Draw.color(Color.orange, this.warmup * Mathf.absin(Time.time(), 8, 0.6));
+            Draw.rect(solidifier.topRegion, this.x, this.y);
+            Draw.color();
+            Draw.blend();
+        }
+    },
+    lackingExp(amount){
+        this.damage(amount * 3.5);
+    }
+});
+
+densesmelter.craftEffect = denseFx;
+
+
 const solidifier = extendContent(GenericSmelter, "solidifier", {
     setBars(){
         this.super$setBars();
@@ -63,9 +95,6 @@ solidifier.buildType = () => extendContent(GenericSmelter.SmelterBuild, solidifi
     }
 });
 
-
-const clib = this.global.unity.expcrafter;
-
 const craftFx = new Effect(10, e => {
       Draw.color(Pal.accent, Color.gray, e.fin());
       Lines.stroke(1);
@@ -118,7 +147,7 @@ liquifyFx.layer = Layer.blockUnder;
 
 const lavasmelter = clib.extend(GenericSmelter, GenericSmelter.SmelterBuild, "lava-smelter", {
     expUse: 4,
-    expCapacity: 30,
+    expCapacity: 32,
     ignoreExp: true,
 
     init(){
@@ -182,7 +211,6 @@ const diriumcrucible = clib.extend(GenericCrafter, GenericCrafter.GenericCrafter
 
     load(){
         this.super$load();
-        this.baseRegion = Core.atlas.find(this.name + "-base");
         this.expRegion = Core.atlas.find(this.name + "-top");
         this.topRegion = solidifier.topRegion;
     }
@@ -191,7 +219,7 @@ const diriumcrucible = clib.extend(GenericCrafter, GenericCrafter.GenericCrafter
         Drawf.light(this.team, this, 25 + 25 * this.expf(), expColor, 0.8 * this.expf());
     },
     draw(){
-        Draw.rect(diriumcrucible.baseRegion, this.x, this.y);
+        this.super$draw();
         if(this.warmup > 0){
             Draw.blend(Blending.additive);
             Draw.color(Pal.accent, this.warmup * Mathf.absin(Time.time(), 8, 1));

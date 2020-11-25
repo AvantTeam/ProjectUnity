@@ -1,6 +1,7 @@
 {
 	"outputItem": {"item": "dirium", "amount": 1},
 	"size": 1,
+  "health": 320,
 	"hasLiquids": false,
 	"hasPower": false,
 	"hasItems": true,
