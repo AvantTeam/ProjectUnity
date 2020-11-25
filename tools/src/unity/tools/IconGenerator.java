@@ -163,7 +163,7 @@ public class IconGenerator implements Generator{
                     }
                 }
 
-                icon.save("ui/" + fname + "-full");
+                icon.save(fname + "-full");
 
                 for(Cicon i : Cicon.scaled){
                     Vec2 size = Scaling.fit.apply(icon.width, icon.height, i.size, i.size);
