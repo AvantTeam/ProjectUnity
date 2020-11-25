@@ -887,8 +887,9 @@ const _ModularBuild ={
 			this.applyStats(this._currentStats);
 		}
     },
-	
-	
+	getPartsCatagories(){
+		
+	},
 	getPartsConfig(){
 		
 	},

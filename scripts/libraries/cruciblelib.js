@@ -476,7 +476,10 @@ const _CruiciblePropsCommon = Object.assign(deepCopy(graphLib.graphProps),{
 		let that = this;
 		return getIconBar(96, prov(()=>{
 			let cc = that.getContained();
-			let temp = that.getNetwork().getAverageTemp();
+			let temp = 0;
+			if(that.getNetwork()){
+				temp = that.getNetwork().getAverageTemp();
+			}
 			let tempcol = heatlib.getTempColor(temp);
 			tempcol.mul(tempcol.a);
 			tempcol.add(Color.gray);
@@ -606,6 +609,7 @@ const _CruiciblePropsCommon = Object.assign(deepCopy(graphLib.graphProps),{
 	},
 	displayBars(barsTable) {
         let net = this.getNetwork();
+		if(!net){return;}
 		net.getLiquidCapacity();
 		net.getVolumeContained();
 
