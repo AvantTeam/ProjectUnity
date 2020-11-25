@@ -24,6 +24,7 @@ pedestalBullet.frontColor = Pal.lancerLaser;
 pedestalBullet.backColor = Pal.lancerLaser.cpy().mul(0.6);
 
 const pedestalWeap = extendContent(Weapon, "unity-pedestal-gun", {});
+pedestalWeap.top = false;
 pedestalWeap.x = 10.75;
 pedestalWeap.y = 2.25;
 pedestalWeap.reload = 60;
