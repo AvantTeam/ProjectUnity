@@ -1,0 +1,30 @@
+{
+	"outputItem": {"item": "steel", "amount": 5},
+	"size": 1,
+  "health": 190,
+	"hasLiquids": true,
+	"hasPower": false,
+	"hasItems": true,
+	"craftTime": 70,
+  "itemCapacity": 21,
+  "consumes": {
+		"power": 2.4,
+		"items": {
+			"items": [
+				{"item": "graphite", "amount": 7},
+        {"item": "dense-alloy", "amount": 7}
+			]
+		},
+    "liquid": {
+			"liquid": "lava",
+			"amount": 0.4
+		}
+	},
+	"requirements": [
+    {"item": "silicon", "amount": 70},
+		{"item": "dense-alloy", "amount": 60},
+    {"item": "steel", "amount": 40}
+	],
+	"category": "crafting",
+	"research": "steel"
+}

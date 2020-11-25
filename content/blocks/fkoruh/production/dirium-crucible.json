@@ -1,0 +1,28 @@
+{
+	"outputItem": {"item": "dirium", "amount": 1},
+	"size": 1,
+  "health": 320,
+	"hasLiquids": false,
+	"hasPower": false,
+	"hasItems": true,
+	"craftTime": 210,
+  "itemCapacity": 40,
+  "consumes": {
+		"power": 62.8,
+		"items": {
+			"items": [
+				{"item": "steel", "amount": 9},
+				{"item": "titanium", "amount": 6},
+				{"item": "pyratite", "amount": 3},
+        {"item": "surge-alloy", "amount": 6}
+			]
+		}
+	},
+	"requirements": [
+		{"item": "dense-alloy", "amount": 150},
+    {"item": "plastanium", "amount": 150},
+    {"item": "steel", "amount": 100}
+	],
+	"category": "crafting",
+	"research": "lava-smelter"
+}

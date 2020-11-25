@@ -1,6 +1,7 @@
 {
 	"outputItem": {"item": "stone", "amount": 1},
 	"size": 1,
+  "health": 150,
 	"hasLiquids": true,
 	"hasPower": false,
 	"hasItems": true,
