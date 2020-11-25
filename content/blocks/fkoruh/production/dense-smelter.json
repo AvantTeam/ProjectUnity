@@ -1,0 +1,26 @@
+{
+	"outputItem": {"item": "dense-alloy", "amount": 1},
+	"size": 1,
+  "health": 70,
+	"hasLiquids": false,
+	"hasPower": false,
+	"hasItems": true,
+	"craftTime": 46.2,
+  "itemCapacity": 10,
+  "consumes": {
+		"items": {
+			"items": [
+        {"item": "copper", "amount": 1},
+				{"item": "lead", "amount": 2}
+        {"item": "coal", "amount": 1},
+			]
+		}
+	},
+	"requirements": [
+    {"item": "lead", "amount": 45},
+    {"item": "silicon", "amount": 20},
+		{"item": "dense-alloy", "amount": 30}
+	],
+	"category": "crafting",
+	"research": "dense-alloy"
+}

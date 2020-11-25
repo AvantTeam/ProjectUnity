@@ -91,7 +91,7 @@ module.exports = {
                 this.super$consume();
                 var remove = Math.min(expblock.expUse, this._exp)
                 this.incExp(-1 * remove);
-                if(remove < expblock.expUse - 0.9) this.lackingExp(expblock.expUse - remove);
+                if(remove < expblock.expUse - 0.2) this.lackingExp(expblock.expUse - remove);
             },
             consValid(){
                 return this.super$consValid() && (expblock.ignoreExp || this._exp >= expblock.expUse);

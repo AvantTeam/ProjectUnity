@@ -16,6 +16,7 @@
 	"hasLiquids": true,
 	"heatColor": "ffffff",
 	"rotateSpeed": 0.91,
+	"shootSound": "dark/extinction-shoot",
 	"loopSoundVolume": 3,
 	"expanded": true,
 	"requirements": [

@@ -1,3 +1,35 @@
+const clib = this.global.unity.expcrafter;
+
+const denseColor = Color.valueOf("ffbeb8");
+const denseFx = new Effect(10, e => {
+      Draw.color(denseColor, Color.gray, e.fin());
+      Lines.stroke(1);
+      Lines.spikes(e.x, e.y, e.finpow() * 4.5, 1, 6);
+});
+
+const densesmelter = clib.extend(GenericSmelter, GenericSmelter.SmelterBuild, "dense-smelter", {
+    expUse: 2,
+    expCapacity: 24,
+    ignoreExp: true
+}, {
+    draw(){
+        Draw.rect(densesmelter.region, this.x, this.y);
+        if(this.warmup > 0){
+            Draw.blend(Blending.additive);
+            Draw.color(Color.orange, this.warmup * Mathf.absin(Time.time(), 8, 0.6));
+            Draw.rect(solidifier.topRegion, this.x, this.y);
+            Draw.color();
+            Draw.blend();
+        }
+    },
+    lackingExp(amount){
+        this.damage(amount * 3.5);
+    }
+});
+
+densesmelter.craftEffect = denseFx;
+
+
 const solidifier = extendContent(GenericSmelter, "solidifier", {
     setBars(){
         this.super$setBars();
@@ -63,14 +95,28 @@ solidifier.buildType = () => extendContent(GenericSmelter.SmelterBuild, solidifi
     }
 });
 
-
-const clib = this.global.unity.expcrafter;
-
 const craftFx = new Effect(10, e => {
       Draw.color(Pal.accent, Color.gray, e.fin());
       Lines.stroke(1);
       Lines.spikes(e.x, e.y, e.fin() * 4, 1.5, 6);
 });
+
+const steelsmelter = extendContent(GenericSmelter, "steel-smelter", {});
+
+steelsmelter.craftEffect = craftFx;
+
+steelsmelter.buildType = () => extendContent(GenericSmelter.SmelterBuild, steelsmelter, {
+    draw(){
+        Draw.rect(steelsmelter.region, this.x, this.y);
+        if(this.warmup > 0){
+            Draw.color(1, 1, 1, this.warmup * Mathf.absin(Time.time(), 8, 0.6));
+            Draw.rect(solidifier.topRegion, this.x, this.y);
+            Draw.color();
+        }
+    }
+});
+
+
 const lavaColor = Color.valueOf("ff2a00");
 const lavaColor2 = Color.valueOf("ffcc00");
 const meltFx = new Effect(60, e => {
@@ -85,17 +131,23 @@ const meltFx = new Effect(60, e => {
         Fill.circle(e.x + x, e.y + y, 0.2 + e.fout() * 1.6);
     });
 });
-const liquifyColor = Color.valueOf("ff3f00");
+const smokePersistFx = new Effect(60, e => {
+    Draw.color(Color.gray, Color.clear, e.fin());
+    Angles.randLenVectors(e.id, 1, 4 + e.fin() * 4, (x, y) => {
+        Fill.circle(e.x + x, e.y + y, 0.2 + e.fin() * 4);
+    });
+});
+const liquifyColor = Color.valueOf("ff9f11");
 const liquifyFx = new Effect(300, e => {
       Draw.color(Color.white, liquifyColor, Math.min(1, e.fin() * 3));
       Draw.alpha(e.fout());
-      Draw.rect(lavasmelter.region, e.x, e.y, 8 + 2.5*e.finpow(), 8 + 2.5*e.finpow());
+      Draw.rect(lavasmelter.region, e.x, e.y, 8 + Math.min(2, 4*e.fin()), 8 + Math.min(2, 4*e.fin()));
 });
 liquifyFx.layer = Layer.blockUnder;
 
 const lavasmelter = clib.extend(GenericSmelter, GenericSmelter.SmelterBuild, "lava-smelter", {
     expUse: 4,
-    expCapacity: 30,
+    expCapacity: 32,
     ignoreExp: true,
 
     init(){
@@ -116,16 +168,26 @@ const lavasmelter = clib.extend(GenericSmelter, GenericSmelter.SmelterBuild, "la
         else if(!Vars.net.client()) this.configureAny(null);
     },
     configured(unit, value){
-        print("ow");
+        //print("ow");
         if(unit == null) this.melt();
     },
     melt(){
         Puddles.deposit(this.tile, lavasmelter.lava, this.liquids.get(lavasmelter.lava) * 10);
-        meltFx.at(this.x, this.y);
-        liquifyFx.at(this.x, this.y);
-        Sounds.steam.at(this.x, this.y);
+        if(!Vars.headless){
+            meltFx.at(this.x, this.y);
+            liquifyFx.at(this.x, this.y);
+            Sounds.splash.at(this.x, this.y, Mathf.random() * 0.2 + 0.3);
+            this.keepsmoke(this.x, this.y);
+        }
         this.tile.remove();
         this.remove();
+    },
+    keepsmoke(x, y){
+        for(var i=0; i<10; i++){
+            Time.run(Mathf.random() * 250 + 30, () => {
+                smokePersistFx.at(x, y);
+            });
+        }
     }
 });
 
@@ -144,8 +206,8 @@ const diriumFx = new Effect(10, e => {
 });
 
 const diriumcrucible = clib.extend(GenericCrafter, GenericCrafter.GenericCrafterBuild, "dirium-crucible", {
-    expUse: 15,
-    expCapacity: 100,
+    expUse: 30,
+    expCapacity: 120,
 
     load(){
         this.super$load();
@@ -154,14 +216,14 @@ const diriumcrucible = clib.extend(GenericCrafter, GenericCrafter.GenericCrafter
     }
 }, {
     drawLight(){
-        Drawf.light(this.team, this, 25 + 25 * this.expf(), expColor, 0.5 * this.expf());
+        Drawf.light(this.team, this, 25 + 25 * this.expf(), expColor, 0.8 * this.expf());
     },
     draw(){
-        this.super$draw();//
+        this.super$draw();
         if(this.warmup > 0){
-            Draw.color(1, 1, 1, this.warmup * Mathf.absin(Time.time(), 8, 0.6));
-            Draw.rect(solidifier.topRegion, this.x, this.y);
             Draw.blend(Blending.additive);
+            Draw.color(Pal.accent, this.warmup * Mathf.absin(Time.time(), 8, 1));
+            Draw.rect(solidifier.topRegion, this.x, this.y);
             Draw.color(diriumcrucible.exp0Color, this.warmup * Mathf.absin(Time.time(), 25, 0.3));
             Draw.rect(diriumcrucible.expRegion, this.x, this.y);
             Draw.blend();
