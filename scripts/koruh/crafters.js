@@ -85,11 +85,17 @@ const meltFx = new Effect(60, e => {
         Fill.circle(e.x + x, e.y + y, 0.2 + e.fout() * 1.6);
     });
 });
-const liquifyColor = Color.valueOf("ff3f00");
+const smokePersistFx = new Effect(60, e => {
+    Draw.color(Color.gray, Color.clear, e.fin());
+    Angles.randLenVectors(e.id, 1, 4 + e.fin() * 4, (x, y) => {
+        Fill.circle(e.x + x, e.y + y, 0.2 + e.fin() * 4);
+    });
+});
+const liquifyColor = Color.valueOf("ff9f11");
 const liquifyFx = new Effect(300, e => {
       Draw.color(Color.white, liquifyColor, Math.min(1, e.fin() * 3));
       Draw.alpha(e.fout());
-      Draw.rect(lavasmelter.region, e.x, e.y, 8 + 2.5*e.finpow(), 8 + 2.5*e.finpow());
+      Draw.rect(lavasmelter.region, e.x, e.y, 8 + Math.min(2, 4*e.fin()), 8 + Math.min(2, 4*e.fin()));
 });
 liquifyFx.layer = Layer.blockUnder;
 
@@ -116,16 +122,26 @@ const lavasmelter = clib.extend(GenericSmelter, GenericSmelter.SmelterBuild, "la
         else if(!Vars.net.client()) this.configureAny(null);
     },
     configured(unit, value){
-        print("ow");
+        //print("ow");
         if(unit == null) this.melt();
     },
     melt(){
         Puddles.deposit(this.tile, lavasmelter.lava, this.liquids.get(lavasmelter.lava) * 10);
-        meltFx.at(this.x, this.y);
-        liquifyFx.at(this.x, this.y);
-        Sounds.steam.at(this.x, this.y);
+        if(!Vars.headless){
+            meltFx.at(this.x, this.y);
+            liquifyFx.at(this.x, this.y);
+            Sounds.splash.at(this.x, this.y, Mathf.random() * 0.2 + 0.3);
+            this.keepsmoke(this.x, this.y);
+        }
         this.tile.remove();
         this.remove();
+    },
+    keepsmoke(x, y){
+        for(var i=0; i<10; i++){
+            Time.run(Mathf.random() * 250 + 30, () => {
+                smokePersistFx.at(x, y);
+            });
+        }
     }
 });
 
