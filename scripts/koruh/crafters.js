@@ -131,6 +131,8 @@ const lavasmelter = clib.extend(GenericSmelter, GenericSmelter.SmelterBuild, "la
     }
 });
 
+lavasmelter.saveConfig = false;
+
 lavasmelter.liquidCapacity = 20;
 lavasmelter.flameColor = lavaColor;
 lavasmelter.updateEffect = Fx.fuelburn;
