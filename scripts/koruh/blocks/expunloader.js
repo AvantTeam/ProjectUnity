@@ -10,6 +10,10 @@ const expunloader = extendContent(Block, "exp-unloader", {
             this.sideRegion.push(Core.atlas.find(this.name + "-" + i));
         }
     },
+    setStats(){
+        this.super$setStats();
+        this.stats.add(Stat.output, "@ [lightgray]@[]", Core.bundle.format("explib.expAmount", expunloader.unloadAmount * 10 * (60 / expunloader.unloadTime)), StatUnit.perSecond.localized());
+    },
     noOrbCollision(){
         return true;
     }
@@ -17,6 +21,8 @@ const expunloader = extendContent(Block, "exp-unloader", {
 expunloader.update = true;
 expunloader.solid = true;
 expunloader.timers = 1;
+expunloader.unloadAmount = 2;
+expunloader.unloadTime = 60;
 expunloader.buildType = () => extend(Building, {
     _join: [false, false, false, false],
     draw(){

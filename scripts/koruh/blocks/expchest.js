@@ -12,6 +12,10 @@ const exptank = extendContent(Block, "exp-chest", {
     hasExp(){
         return true;
     },
+    setStats(){
+        this.super$setStats();
+        this.stats.add(Stat.itemCapacity, "@", Core.bundle.format("explib.expAmount", this.expCapacity));
+    },
     setBars() {
         this.super$setBars();
         this.bars.add("exp", func(build => {

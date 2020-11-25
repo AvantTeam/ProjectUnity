@@ -71,6 +71,7 @@ const script = [
             "unitlib",
             "copterbase",
             "exp",
+            "expcrafter",
             "multi-lib",
 			"status",
             "arena",

@@ -12,6 +12,10 @@ const exptank = extendContent(Block, "exp-tank", {
     hasExp(){
         return true;
     },
+    setStats(){
+        this.super$setStats();
+        this.stats.add(Stat.itemCapacity, "@", Core.bundle.format("explib.expAmount", this.expCapacity));
+    },
     setBars() {
         this.super$setBars();
         this.bars.add("exp", func(build => {
@@ -19,7 +23,7 @@ const exptank = extendContent(Block, "exp-tank", {
                 return build.expf();
             }));
         }));
-    },
+    }
 });
 exptank.update = true;
 exptank.sync = true;
