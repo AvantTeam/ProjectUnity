@@ -1,17 +1,17 @@
 {
 	"outputItem": {"item": "steel", "amount": 5},
 	"size": 1,
-	"hasLiquids": false,
+	"hasLiquids": true,
 	"hasPower": false,
 	"hasItems": true,
 	"craftTime": 70,
-  "itemCapacity": 16,
+  "itemCapacity": 21,
   "consumes": {
 		"power": 2.4,
 		"items": {
 			"items": [
-				{"item": "dense-alloy", "amount": 4},
-				{"item": "graphite", "amount": 4}
+				{"item": "graphite", "amount": 7},
+        {"item": "dense-alloy", "amount": 7}
 			]
 		},
     "liquid": {

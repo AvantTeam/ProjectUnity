@@ -23,5 +23,5 @@
     {"item": "steel", "amount": 100}
 	],
 	"category": "crafting",
-	"research": "steel"
+	"research": "lava-smelter"
 }

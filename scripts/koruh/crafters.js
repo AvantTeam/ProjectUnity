@@ -71,6 +71,23 @@ const craftFx = new Effect(10, e => {
       Lines.stroke(1);
       Lines.spikes(e.x, e.y, e.fin() * 4, 1.5, 6);
 });
+
+const steelsmelter = extendContent(GenericSmelter, "steel-smelter", {});
+
+steelsmelter.craftEffect = craftFx;
+
+steelsmelter.buildType = () => extendContent(GenericSmelter.SmelterBuild, steelsmelter, {
+    draw(){
+        Draw.rect(steelsmelter.region, this.x, this.y);
+        if(this.warmup > 0){
+            Draw.color(1, 1, 1, this.warmup * Mathf.absin(Time.time(), 8, 0.6));
+            Draw.rect(solidifier.topRegion, this.x, this.y);
+            Draw.color();
+        }
+    }
+});
+
+
 const lavaColor = Color.valueOf("ff2a00");
 const lavaColor2 = Color.valueOf("ffcc00");
 const meltFx = new Effect(60, e => {
@@ -160,8 +177,8 @@ const diriumFx = new Effect(10, e => {
 });
 
 const diriumcrucible = clib.extend(GenericCrafter, GenericCrafter.GenericCrafterBuild, "dirium-crucible", {
-    expUse: 15,
-    expCapacity: 100,
+    expUse: 30,
+    expCapacity: 120,
 
     load(){
         this.super$load();
@@ -170,7 +187,7 @@ const diriumcrucible = clib.extend(GenericCrafter, GenericCrafter.GenericCrafter
     }
 }, {
     drawLight(){
-        Drawf.light(this.team, this, 25 + 25 * this.expf(), expColor, 0.5 * this.expf());
+        Drawf.light(this.team, this, 25 + 25 * this.expf(), expColor, 0.8 * this.expf());
     },
     draw(){
         this.super$draw();//
