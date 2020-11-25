@@ -4,6 +4,7 @@ buildscript{
 
         mindustryVersion = props["mindustryVersion"]
         mindustryHash = props["mindustryHash"]
+        arcHash = props["arcHash"]
         multilibVersion = props["multilibVersion"]
     }
 
@@ -13,7 +14,8 @@ buildscript{
     }
 
     dependencies{
-        classpath "com.github.Anuken.Arc:arc-core:$mindustryVersion"
+        //classpath "com.github.Anuken.Arc:arc-core:$mindustryVersion"
+        classpath "com.github.Anuken.Arc:arc-core:$arcHash"
         classpath "com.github.Anuken.Mindustry:core:$mindustryVersion"
         //classpath "com.github.Anuken:Mindustry:$mindustryHash"
         classpath "com.github.younggam:multi-lib:$multilibVersion"
@@ -27,6 +29,7 @@ allprojects{
     ext{
         mindustryVersion = props["mindustryVersion"]
         mindustryHash = props["mindustryHash"]
+        arcHash = props["arcHash"]
         multilibVersion = props["multilibVersion"]
         modName = props["modName"]
 
@@ -57,7 +60,8 @@ allprojects{
 
 project(":main"){
     dependencies{
-        compileOnly "com.github.Anuken.Arc:arc-core:$mindustryVersion"
+        //compileOnly "com.github.Anuken.Arc:arc-core:$mindustryVersion"
+        compileOnly "com.github.Anuken.Arc:arc-core:$arcHash"
         compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
         //compileOnly "com.github.Anuken:Mindustry:$mindustryHash"
 
@@ -69,8 +73,10 @@ project(":tools"){
     dependencies{
         implementation project(":main")
 
-        implementation "com.github.Anuken.Arc:arc-core:$mindustryVersion"
-        implementation "com.github.Anuken.Arc:packer:$mindustryVersion"
+        //implementation "com.github.Anuken.Arc:arc-core:$mindustryVersion"
+        implementation "com.github.Anuken.Arc:arc-core:$arcHash"
+        //implementation "com.github.Anuken.Arc:packer:$mindustryVersion"
+        implementation "com.github.Anuken.Arc:packer:$arcHash"
         implementation "com.github.Anuken.Mindustry:core:$mindustryVersion"
         //implementation "com.github.Anuken:Mindustry:$mindustryHash"
     }
