@@ -103,7 +103,6 @@ const lavasmelter = clib.extend(GenericSmelter, GenericSmelter.SmelterBuild, "la
         this.lava = this.consumes.get(ConsumeType.liquid).liquid;
     }
 }, {
-    _suicide: false,//exp is not guaranteed to sync, so i need to use kill()
     draw(){
         Draw.rect(lavasmelter.region, this.x, this.y);
         if(this.warmup > 0){
@@ -113,21 +112,20 @@ const lavasmelter = clib.extend(GenericSmelter, GenericSmelter.SmelterBuild, "la
         }
     },
     lackingExp(amount){
-        //just fricking melt
-        this._suicide = true;
-        this.kill();
+        if(!Vars.net.active()) this.melt();
+        else if(!Vars.net.client()) this.configureAny(null);
     },
-    killed(){
-        if(!this._suicide) this.super$killed();
-        else{
-            this._suicide = false;
-            Puddles.deposit(this.tile, lavasmelter.lava, this.liquids.get(lavasmelter.lava) * 10);
-            meltFx.at(this.x, this.y);
-            liquifyFx.at(this.x, this.y);
-            Sounds.steam.at(this.x, this.y);
-            this.tile.remove();
-            this.remove();
-        }
+    configured(unit, value){
+        print("ow");
+        if(unit == null) this.melt();
+    },
+    melt(){
+        Puddles.deposit(this.tile, lavasmelter.lava, this.liquids.get(lavasmelter.lava) * 10);
+        meltFx.at(this.x, this.y);
+        liquifyFx.at(this.x, this.y);
+        Sounds.steam.at(this.x, this.y);
+        this.tile.remove();
+        this.remove();
     }
 });
 
