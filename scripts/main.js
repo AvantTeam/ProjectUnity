@@ -70,6 +70,7 @@ const script = [
             },
 
             "sounds",
+            "musics",
             "funclib",
             "effects",
             "extraeffects",
@@ -301,6 +302,13 @@ const script = [
                 name: "planets",
                 childs: [
                     "megalith"
+                ]
+            },
+
+            {
+                name: "sectors",
+                childs: [
+                    "accretion"
                 ]
             }
         ]
