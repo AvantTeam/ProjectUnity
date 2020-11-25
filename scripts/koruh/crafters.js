@@ -182,6 +182,7 @@ const diriumcrucible = clib.extend(GenericCrafter, GenericCrafter.GenericCrafter
 
     load(){
         this.super$load();
+        this.baseRegion = Core.atlas.find(this.name + "-base");
         this.expRegion = Core.atlas.find(this.name + "-top");
         this.topRegion = solidifier.topRegion;
     }
@@ -190,11 +191,11 @@ const diriumcrucible = clib.extend(GenericCrafter, GenericCrafter.GenericCrafter
         Drawf.light(this.team, this, 25 + 25 * this.expf(), expColor, 0.8 * this.expf());
     },
     draw(){
-        this.super$draw();//
+        Draw.rect(diriumcrucible.baseRegion, this.x, this.y);
         if(this.warmup > 0){
-            Draw.color(1, 1, 1, this.warmup * Mathf.absin(Time.time(), 8, 0.6));
-            Draw.rect(solidifier.topRegion, this.x, this.y);
             Draw.blend(Blending.additive);
+            Draw.color(Pal.accent, this.warmup * Mathf.absin(Time.time(), 8, 1));
+            Draw.rect(solidifier.topRegion, this.x, this.y);
             Draw.color(diriumcrucible.exp0Color, this.warmup * Mathf.absin(Time.time(), 25, 0.3));
             Draw.rect(diriumcrucible.expRegion, this.x, this.y);
             Draw.blend();
