@@ -3,6 +3,7 @@
 importPackage(Packages.arc.graphics.gl);
 
 const graphLib = require("libraries/graphlib");
+const heatlib = require("libraries/heatlib");
 //credit to younggam setting example of how to build new overlay resrouce(heat) and deltanedas for example of block graph system via phase router.
 print("youndcha test2")
 //ui test, if sucessful will be moved to seperate js file
@@ -78,6 +79,110 @@ function getStackedBarChart(pheight, datafunction){
 
 
 
+const IconBar ={
+	_prefHeight:60,
+	_barStats: prov(()=>
+		{
+			return {
+				value: 2,
+				defaultmax: 3,
+				defaultmin: 0,
+				color:Color.red,
+				steps:[
+					{value:1.6, icon: null},
+					{value:1, icon: null}
+				]
+			};
+		}
+	),
+	draw(){
+		let font = Fonts.outline;
+        let lay = Pools.obtain(GlyphLayout,prov(()=>{return new GlyphLayout();}));
+		let xstart = 20;
+		let data = this._barStats.get();
+		let maxVal = Math.max(data.defaultmax,data.value);
+		let minVal = Math.min(data.defaultmin,data.value);
+		for(let i=0;i<data.steps.length;i++){
+			maxVal = Math.max(maxVal,data.steps[i].value);
+			minVal = Math.min(minVal,data.steps[i].value);
+		}
+		
+		let dpos = Mathf.map(data.value,minVal,maxVal,xstart,this.width-xstart);
+		let ah = this.height;
+		Lines.stroke(3);
+		Draw.color(Color.gray);
+		Lines.rect(this.x+xstart, this.y+ah*0.5-8,this.width-xstart,16);  //thermometer outline
+		
+		Draw.color(data.color);
+		Fill.rect(this.x + xstart, this.y+ah*0.5,26,26,45);  //thermometer head
+		Fill.rect(this.x + xstart+dpos*0.5, this.y+ah*0.5,dpos,16);  //thermometer fill
+		
+		let stepsize = Mathf.pow(10,Math.floor(Mathf.log(10.0,2*(maxVal-minVal))));
+		if(maxVal-minVal <= stepsize){
+			stepsize = stepsize*0.5; //5x
+		}
+		if(maxVal-minVal <= stepsize){
+			stepsize = stepsize*0.4; //2x
+		}
+		if(maxVal-minVal <= stepsize){
+			stepsize = stepsize*0.5; //1x
+		}
+		
+		Draw.color(Color.white);
+		
+		for(let i=0;i<data.steps.length;i++){  //icon indicators
+			let dpos = Mathf.map(data.steps[i].value,minVal,maxVal,this.x+xstart,this.x+this.width);
+			Lines.line(dpos,this.y+ah*0.5,dpos,this.y+ah*0.5 + 12 );
+			Draw.rect(data.steps[i].icon,dpos,this.y+ah*0.75);
+		}
+		Draw.color(Color.lightGray);
+		let stsrt = (Math.floor(minVal/stepsize)+1)*stepsize;
+		for(let i=stsrt;i<maxVal;i+=stepsize){  //step indicators
+			let dpos = Mathf.map(i,minVal,maxVal,this.x+xstart,this.x+this.width);
+			Lines.line(dpos,this.y+ah*0.5,dpos,this.y+ah*0.5 - 12 );
+			
+			let text = Strings.fixed(i,0)+"'C";
+			if(i>=1000){
+				text = Strings.fixed(i/1000,1)+"K'C";
+			}
+			lay.setText(font, text);
+			font.setColor(Color.white);
+			font.draw(text, dpos - lay.width / 2.0, this.y + (ah*0.25) + lay.height / 2.0 + 1);
+		}
+
+        Pools.free(lay);
+		
+		
+	},
+	setSize(x,y){
+		this.super$setSize(x,y);
+	},
+	getPrefHeight() {
+        return this._prefHeight;
+    },
+	getPrefWidth() {
+        return 180.0;
+    },
+	setPrefHeight(s) {
+        this._prefHeight=s;
+    },
+	setBarStatsProv(s) {
+        this._barStats=s;
+    }
+	
+};
+
+function getIconBar(pheight, datafunction){
+	let pp=  extend(Element,Object.create(IconBar));
+	pp.setPrefHeight(pheight);
+	pp.setBarStatsProv(datafunction);
+	return pp;
+	
+}
+
+
+
+
 function deepCopy(obj) {
     var clone = {};
     for (var i in obj) {
@@ -91,16 +196,18 @@ function deepCopy(obj) {
 const cruicibleMelts = [
 	{name:"copper", meltpoint:750, meltspeed:0.1, evaporation: 0.02, evaporationTemp: 2100, priority: 1}, // irl: 1475K, halved cus its a low tier resource.
 	{name:"lead", meltpoint:570, meltspeed:0.2, evaporation: 0.02, evaporationTemp: 1900, priority: 1},  //dont let it get too hot! c:
-	{name:"titanium", meltpoint:1600, meltspeed:0.05, priority: 1},  // irl: 1940K
-	{name:"sand", meltpoint:1000, meltspeed:0.1, priority: 1},  // irl: 1900K
+	{name:"titanium", meltpoint:1600, meltspeed:0.07, priority: 1},  // irl: 1940K
+	{name:"sand", meltpoint:1000, meltspeed:0.25, priority: 1},  // irl: 1900K
 	{name:"carbon", meltpoint:4000, meltspeed:0.01, evaporation: 0.01, evaporationTemp: 600, notItem:true, priority: 0},  // practically cant be melted, but burns instead (to avoid clogging the thing)
 	{name:"coal", additive:true, additiveID:"carbon", additiveWeight: 0.5, priority: 0},  
 	{name:"graphite", additive:true, additiveID:"carbon", additiveWeight: 1.0, priority: 0},    
 	{name:"unity-nickel", meltpoint:1100, meltspeed:0.15, priority: 1},  // irl: 1728K
-	{name:"unity-cupronickel", meltpoint:900, meltspeed:0.05, priority: 2},  // irl: 1300K
-	{name:"metaglass", meltpoint:1000, meltspeed:0.05, priority: 2},  // irl: 1300K
+	{name:"unity-cupronickel", meltpoint:850, meltspeed:0.05, priority: 2},  // irl: 1300K
+	{name:"metaglass", meltpoint:950, meltspeed:0.05, priority: 2},  // irl: 1300K
 	{name:"silicon", meltpoint:900, meltspeed:0.2, priority: 2},  // irl: 1600K
-	{name:"surge-alloy", meltpoint:1500, meltspeed:0.02, priority: 3},  
+	{name:"surge-alloy", meltpoint:1500, meltspeed:0.05, priority: 3},  
+	{name:"thorium", meltpoint:1650, meltspeed:0.03, priority: 1},  // irl: 1950K
+	{name:"unity-super-alloy", meltpoint:1800, meltspeed:0.02, priority: 4},  
 	////APPEND NEW MELTS TO THE END TO AVOID AFFECTING SAVES
 ];
 for(let inde = 0 ;inde<cruicibleMelts.length;inde++){
@@ -153,6 +260,15 @@ const cruicibleRecipes = [
 			{material:"titanium", amount:1.5, needsliquid: true},
 		],
 		alloyspeed: 0.25
+	},
+	{name:"unity-super-alloy", 
+		inputs:[
+			{material:"unity-cupronickel",  amount:1,   needsliquid: true},
+			{material:"silicon",     amount:1,   needsliquid: true},
+			{material:"thorium",   amount:1,   needsliquid: true},
+			{material:"titanium", amount:1, needsliquid: true},
+		],
+		alloyspeed: 0.20
 	},
 ]
 
@@ -355,6 +471,46 @@ const _CruiciblePropsCommon = Object.assign(deepCopy(graphLib.graphProps),{
 		}));
 	},
 	
+	getIconBar(){
+		
+		let that = this;
+		return getIconBar(96, prov(()=>{
+			let cc = that.getContained();
+			let temp = that.getNetwork().getAverageTemp();
+			let tempcol = heatlib.getTempColor(temp);
+			tempcol.mul(tempcol.a);
+			tempcol.add(Color.gray);
+			tempcol.a = 1.0;
+			let data = {
+				value: (temp-273),
+				defaultmax: 500,
+				defaultmin: 0,
+				color: tempcol,
+				steps:[],
+			};
+			if(temp<270){
+				data.defaultmin = Math.max(-273.15,5*(temp-273));
+				data.defaultmax = Math.max(20,500+ 5*(temp-273));
+			}
+			if(!cc ||!cc.length){
+			}else{
+				for(let i = 0;i<cc.length;i++){
+					let ccl = cc[i];
+					let ml = cruicibleMelts[cc[i].id];
+					let itm = Vars.content.getByName(ContentType.item,ml.name);
+					if(itm){
+						data.steps.push(
+							{value:ml.meltpoint-273, icon: itm.icon(Cicon.xlarge)}
+						);
+					}
+				}
+			}
+			return data;
+			
+		}));
+	},
+	
+	
     display(table) {
         if (!this._network) {
             return;
@@ -365,6 +521,12 @@ const _CruiciblePropsCommon = Object.assign(deepCopy(graphLib.graphProps),{
             cons(sub => {
                 sub.clearChildren();
 				sub.left();
+				sub.label(prov(() => {
+                    return "Crucible temperature:";
+                })).color(Color.lightGray).growX();
+				sub.row();
+				sub.add(this.getIconBar()).padTop(3).growX();
+				sub.row();
 				sub.label(prov(() => {
                     return "Crucible contents:";
                 })).color(Color.lightGray).growX();
@@ -650,6 +812,18 @@ const crucibleGraph = { //this just uh manages the graphics lmAO
 			this.containChanged=true;
 		}
 	},
+	getAverageTemp(){
+		let speed = 0;
+		let count = 0;
+		this.connected.each(cons(building => {
+			if(!building.getBlockData().getDoesCrafting()){return;}
+			let temp = building.getBuild().getGraphConnector("heat graph").getTemp();
+			speed+=temp;
+			count++;
+		}));
+		if(count==0){return 0;}
+		return speed/=count;
+	},
 	getAverageTempDecay(meltpoint,meltspeed,tmpdep,cooldep){
 		let speed = 0;
 		let count = 0;
@@ -705,7 +879,7 @@ const crucibleGraph = { //this just uh manages the graphics lmAO
 			let meltmul = Time.delta/this.contains[i].volume;
 			let ml = cruicibleMelts[this.contains[i].id];
 			if(ml){
-				this.contains[i].meltedRatio += meltmul*this.getAverageMeltSpeed(ml,0.002,0.5)*0.2*capacitymul;
+				this.contains[i].meltedRatio += meltmul*this.getAverageMeltSpeed(ml,0.002,0.5)*0.4*capacitymul;
 				this.contains[i].meltedRatio = Mathf.clamp(this.contains[i].meltedRatio);
 				
 				if(ml.evaporationTemp){
@@ -741,7 +915,7 @@ const crucibleGraph = { //this just uh manages the graphics lmAO
 				}
 			}
 			if(valid && maxcraftable>0){
-				let craftam = Math.min(maxcraftable,cruicibleRecipes[z].alloyspeed*Time.delta*0.1*capacitymul);
+				let craftam = Math.min(maxcraftable,cruicibleRecipes[z].alloyspeed*Time.delta*0.2*capacitymul);
 				if(craftam<=0){continue;}
 				for(let r =0;r<cruicibleRecipes[z].inputs.length;r++){
 					let alyinput = cruicibleRecipes[z].inputs[r];

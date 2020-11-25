@@ -59,12 +59,21 @@ const script = [
                     "shieldbullet"
                 ]
             },
+            
+            {
+                name: "loaders",
+                childs: [
+                    "loader",
+                    "unitloader",
+                    "musicloader"
+                ]
+            },
 
             "sounds",
+            "funclib",
             "effects",
             "extraeffects",
             "wavefront",
-            "loader",
             "exporb",
             "wormlib",
             "unitlib",
@@ -72,14 +81,12 @@ const script = [
             "exp",
             "multi-lib",
             "status",
-            "funclib",
             "arena",
             "rotpowerlib",
             "heatlib",
             "cruciblelib",
             "graphlib",
-            "turretmodui",
-            "unitloader"
+            "turretmodui"
         ]
     },
 
@@ -169,7 +176,8 @@ const script = [
 
                     "fallout",
                     "catastrophe",
-                    "calamity"
+                    "calamity",
+					"extinction"
                 ]
             },
 
@@ -402,10 +410,3 @@ if(!Vars.headless){
 
 
 };
-//const music = loadMusic("youngcha");
-/*
-Awaiting custom music player
-
-Events.on(ClientLoadEvent, e => {
-	Vars.control.music.darkMusic.add(music);
-})*/

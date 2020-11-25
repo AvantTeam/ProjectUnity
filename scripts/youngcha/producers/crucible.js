@@ -214,6 +214,9 @@ const castingMold = graphLib.finaliseExtend(Block, Building, "casting-mold", cmb
         this.bottom = [Core.atlas.find(this.name + "-base1"),Core.atlas.find(this.name + "-base2"),Core.atlas.find(this.name + "-base3"),Core.atlas.find(this.name + "-base4")];
 		this.top = [Core.atlas.find(this.name + "-top1"),Core.atlas.find(this.name + "-top2"),Core.atlas.find(this.name + "-top3"),Core.atlas.find(this.name + "-top4")];
     },
+	rotatedOutput( x,  y){
+        return false;
+    }
 }, {
 	pourProgress:0,
 	castProgress:0,
@@ -259,10 +262,13 @@ const castingMold = graphLib.finaliseExtend(Block, Building, "casting-mold", cmb
 	},
 	updateOutput(){
 		let newouts = [];
-		for(let i =0;i<=1;i++){
+		for(let i =0;i<8;i++){
 			let pos = this.getConnectSidePos(i);
 			let b = this.nearby(pos.toPos.x,pos.toPos.y);
 			if(b){
+				if(b.getGraphConnector && b.getGraphConnector("crucible graph")){
+					continue;
+				}
 				newouts.push(b);
 			}
 		}

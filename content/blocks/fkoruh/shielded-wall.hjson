@@ -1,8 +1,7 @@
 requirements: [
-    copper/100,
-    lead/75,
-    silicon/50,
-    titanium/100
+    lead/6,
+    silicon/6,
+    dense-alloy/6
 ]
 liquidCapacity: 0
 itemCapacity: 0

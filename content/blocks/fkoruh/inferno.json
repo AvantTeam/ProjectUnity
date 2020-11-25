@@ -7,8 +7,7 @@
 	"requirements": [
 		{"item": "copper", "amount": 150},
 		{"item": "lead", "amount": 165},
-		{"item": "graphite", "amount": 120},
-		{"item": "silicon", "amount": 130}
+		{"item": "graphite", "amount": 60}
 	],
 	"category": "turret",
 	"research": "scorch"
