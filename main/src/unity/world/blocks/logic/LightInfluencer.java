@@ -54,7 +54,7 @@ public class LightInfluencer extends LightGenerator{
             for(int i = 0; i < 4; i++){
                 Building build = tile.nearbyBuild(i);
                 if(build != null && build instanceof LightFilterBuild){
-                    ((LightFilterBuild) build).cont = this;
+                    ((LightFilterBuild)build).cont = this;
                     c[i] = true;
                 }else c[i] = false;
             }

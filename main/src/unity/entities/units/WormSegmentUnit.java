@@ -30,7 +30,7 @@ public class WormSegmentUnit extends UnitEntity{
     @Override
     public void type(UnitType type){
         super.type(type);
-        if(type instanceof WormUnitType) wormType = (WormUnitType) type;
+        if(type instanceof WormUnitType) wormType = (WormUnitType)type;
         else throw new ClassCastException("you set this unit's type a in sneaky way");
     }
 
@@ -67,7 +67,7 @@ public class WormSegmentUnit extends UnitEntity{
 
         if(controller == null) controller(type.createController());
         if(mounts().length != type.weapons.size) setupWeapons(type);
-        if(type instanceof WormUnitType) wormType = (WormUnitType) type;
+        if(type instanceof WormUnitType) wormType = (WormUnitType)type;
         else throw new ClassCastException("you set this unit's type in sneaky way");
     }
 
@@ -113,7 +113,7 @@ public class WormSegmentUnit extends UnitEntity{
     @Override
     public Player getPlayer(){
         if(trueParentUnit == null) return null;
-        return isPlayer() ? (Player) trueParentUnit.controller : null;
+        return isPlayer() ? (Player)trueParentUnit.controller : null;
     }
 
     @Override
@@ -144,7 +144,7 @@ public class WormSegmentUnit extends UnitEntity{
         if(!(def instanceof WormUnitType)) super.setupWeapons(def);
         else{
             Seq<WeaponMount> tmpSeq = new Seq<>();
-            Seq<Weapon> originSeq = ((WormUnitType) def).segWeapSeq;
+            Seq<Weapon> originSeq = ((WormUnitType)def).segWeapSeq;
             for(int i = 0; i < originSeq.size; i++) tmpSeq.add(new WeaponMount(originSeq.get(i)));
             mounts = tmpSeq.toArray(WeaponMount.class);
         }

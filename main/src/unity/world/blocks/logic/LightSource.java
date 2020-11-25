@@ -82,7 +82,7 @@ public class LightSource extends GenericCrafter{
     @Override
     public void drawRequestConfig(BuildPlan req, Eachable<BuildPlan> list){
         final float scl = tilesize * req.animScale * size;
-        Draw.rect(topRegion, req.drawx(), req.drawy(), scl, scl, req.config == null ? 0 : ((int) req.config) * 45f);
+        Draw.rect(topRegion, req.drawx(), req.drawy(), scl, scl, req.config == null ? 0 : ((int)req.config) * 45f);
     }
 
     public class LightSourceBuild extends GenericCrafterBuild{
@@ -256,20 +256,20 @@ public class LightSource extends GenericCrafter{
                 Building build = furthest.bc();
                 if(build == null) return true;
                 if(build.block instanceof LightDivisor){
-                    int tr = ((LightReflectorBuild) build).calcReflection(ld.angle);
+                    int tr = ((LightReflectorBuild)build).calcReflection(ld.angle);
                     if(tr >= 0){
                         next.set(ld.angle, ld.strength / 2f, ld.length - loops, ld.color);
                         next2.set(tr, ld.strength / 2f, ld.length - loops, ld.color);
                     }
                 }else if(build instanceof LightReflectorBuild){
-                    int tr = ((LightReflectorBuild) build).calcReflection(ld.angle);
+                    int tr = ((LightReflectorBuild)build).calcReflection(ld.angle);
                     if(tr >= 0) next.set(tr, ld.strength, ld.length - loops, ld.color);
                 }else if(build instanceof LightRepeaterBuildBase){
-                    LightData tempData = ((LightRepeaterBuildBase) build).calcLight(ld, loops);
+                    LightData tempData = ((LightRepeaterBuildBase)build).calcLight(ld, loops);
                     if(tempData == null) return true;
                     next.set(tempData);
                 }else if(build.block instanceof LightGenerator)
-                    lCons.add(((LightGeneratorBuild) build).addSource(this, ld));
+                    lCons.add(((LightGeneratorBuild)build).addSource(this, ld));
                 return true;
             });
 

@@ -24,7 +24,7 @@ public interface ExpBlockBase{
     }
 
     default Bar levelBar(ExpBuildBase build){
-        return new Bar(() -> bundle.get("explib.level") + " " + build.getLevel(), () -> getLerpColor(defaultLevel0Color, defaultLevelMaxColor, build.getLevel() / (float) getMaxLevel()), () -> build.getLevel() / (float) getMaxLevel());
+        return new Bar(() -> bundle.get("explib.level") + " " + build.getLevel(), () -> getLerpColor(defaultLevel0Color, defaultLevelMaxColor, build.getLevel() / (float)getMaxLevel()), () -> build.getLevel() / (float)getMaxLevel());
     }
 
     default Bar expBar(ExpBuildBase build){

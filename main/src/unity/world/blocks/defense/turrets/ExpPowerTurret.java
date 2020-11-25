@@ -89,7 +89,7 @@ public class ExpPowerTurret extends PowerTurret implements ExpBlockBase{
 
         @Override
         public ExpPowerTurret getExpBlock(){
-            return (ExpPowerTurret) block;
+            return (ExpPowerTurret)block;
         }
 
         @Override

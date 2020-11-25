@@ -89,7 +89,7 @@ public class ExpItemTurret extends ItemTurret implements ExpBlockBase{
 
         @Override
         public ExpItemTurret getExpBlock(){
-            return (ExpItemTurret) block;
+            return (ExpItemTurret)block;
         }
 
         @Override

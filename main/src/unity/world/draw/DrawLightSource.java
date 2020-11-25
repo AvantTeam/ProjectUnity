@@ -19,7 +19,7 @@ public class DrawLightSource extends DrawBlock{
     @Override
     public void draw(GenericCrafterBuild entity){
         Draw.z(Layer.block);
-        LightSource lightb = (LightSource) entity.block;
+        LightSource lightb = (LightSource)entity.block;
         Draw.rect(lightb.baseRegion, entity.x, entity.y);
 
         if(drawLiquid && entity.liquids.total() > 0.01f){
@@ -28,19 +28,19 @@ public class DrawLightSource extends DrawBlock{
             Draw.rect(lightb.liquidRegion, entity.x, entity.y);
             Draw.color();
         }
-        if(((LightSourceBuild) entity).getStrength() > lightb.lightStrength / 2f){
+        if(((LightSourceBuild)entity).getStrength() > lightb.lightStrength / 2f){
             Draw.z(Layer.effect - 2f);
             Draw.rect(lightb.lightRegion, entity.x, entity.y);
         }
 
         Draw.z(Layer.effect + 2f);
-        Draw.rect(lightb.topRegion, entity.x, entity.y, lightb.angleConfig ? ((LightSourceBuild) entity).getAngleDeg() : entity.rotation * 90f);
+        Draw.rect(lightb.topRegion, entity.x, entity.y, lightb.angleConfig ? ((LightSourceBuild)entity).getAngleDeg() : entity.rotation * 90f);
         Draw.reset();
     }
 
     @Override
     public void load(Block block){
-        LightSource lightb = (LightSource) block;
+        LightSource lightb = (LightSource)block;
         drawLiquid = block.consumes.has(ConsumeType.liquid);
 
         lightb.baseRegion = atlas.find(block.name + "-base");

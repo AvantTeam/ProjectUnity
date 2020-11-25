@@ -77,7 +77,7 @@ public interface ExpBuildBase{
 
     default float getLvlf(){
         if(getLevel() == getBlockMaxLevel()) return 1f;
-        return totalExp() / (float) getRequiredExp(getLevel());
+        return totalExp() / (float)getRequiredExp(getLevel());
     }
 
     default void levelUpEffect(){
@@ -89,7 +89,7 @@ public interface ExpBuildBase{
     }
 
     default void expWrite(Writes write){
-        write.i((int) totalExp());
+        write.i((int)totalExp());
         write.i(getLevel());
     }
 

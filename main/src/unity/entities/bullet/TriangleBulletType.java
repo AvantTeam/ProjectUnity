@@ -46,7 +46,7 @@ public class TriangleBulletType extends BulletType{
 
     @Override
     public void draw(Bullet b){
-        ((Trail) b.data).draw(lightningColor, trailWidth);
+        ((Trail)b.data).draw(lightningColor, trailWidth);
 
         Draw.color(lightningColor);
         Drawf.tri(b.x, b.y, width, length, b.rotation());
@@ -58,9 +58,9 @@ public class TriangleBulletType extends BulletType{
 
         Teamc target = Units.closestTarget(b.team, b.x, b.y, summonRadius * tilesize);
 
-        ((Trail) b.data).update(b.x, b.y);
+        ((Trail)b.data).update(b.x, b.y);
         if(summonsLightning && target != null && b.timer.get(1, summonDelay)){
-            Lightning.create(b.team, lightningColor, damage, b.x, b.y, b.angleTo(target), (int) (b.dst(target) / tilesize + 2));
+            Lightning.create(b.team, lightningColor, damage, b.x, b.y, b.angleTo(target), (int)(b.dst(target) / tilesize + 2));
         }
     }
 }

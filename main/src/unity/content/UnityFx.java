@@ -10,11 +10,11 @@ import mindustry.entities.bullet.*;
 import mindustry.graphics.*;
 import unity.graphics.*;
 
+//fixing rect as Draw.rect not Lines.rect. currently no use
+import static arc.graphics.g2d.Draw.rect;
 import static arc.graphics.g2d.Draw.*;
 import static arc.graphics.g2d.Lines.*;
 import static arc.math.Angles.*;
-import static arc.math.Mathf.*;
-import static mindustry.graphics.Drawf.*;
 import static unity.content.UnityBullets.*;
 
 public class UnityFx{
@@ -35,9 +35,9 @@ public class UnityFx{
     }),
 
     craftingEffect = new Effect(67f, 35f, e -> {
-        float value = randomSeed(e.id);
+        float value = Mathf.randomSeed(e.id);
 
-        Tmp.v1.trns(value * 360f + ((value + 4f) * e.fin() * 80f), (randomSeed(e.id * 126) + 1f) * 34f * (1f - e.finpow()));
+        Tmp.v1.trns(value * 360f + ((value + 4f) * e.fin() * 80f), (Mathf.randomSeed(e.id * 126) + 1f) * 34f * (1f - e.finpow()));
 
         color(Color.valueOf("ff9c5a"));
         Fill.square(e.x + Tmp.v1.x, e.y + Tmp.v1.y, e.fslope() * 3f, 45f);
@@ -57,17 +57,17 @@ public class UnityFx{
         color(Pal.surge);
         for(int i = 0; i < 2; i++){
             int l = Mathf.signs[i];
-            tri(e.x, e.y, 4f * e.fout(), 29f, e.rotation + 67 * l);
+            Drawf.tri(e.x, e.y, 4f * e.fout(), 29f, e.rotation + 67 * l);
         }
     }),
 
     orbTrail = new Effect(43f, e -> {
         float originalZ = z();
 
-        Tmp.v1.trns(randomSeed(e.id) * 360f, randomSeed(e.id * 341) * 12f * e.fin());
+        Tmp.v1.trns(Mathf.randomSeed(e.id) * 360f, Mathf.randomSeed(e.id * 341) * 12f * e.fin());
 
         z(Layer.bullet - 0.01f);
-        light(e.x + Tmp.v1.x, e.y + Tmp.v1.y, 4.7f * e.fout() + 3f, Pal.surge, 0.6f);
+        Drawf.light(e.x + Tmp.v1.x, e.y + Tmp.v1.y, 4.7f * e.fout() + 3f, Pal.surge, 0.6f);
 
         color(Pal.surge);
         Fill.circle(e.x + Tmp.v1.x, e.y + Tmp.v1.y, e.fout() * 2.7f);
@@ -99,7 +99,7 @@ public class UnityFx{
 
     currentCharge = new Effect(32f, e -> {
         color(Pal.surge, Color.white, e.fin());
-        randLenVectors(e.id, 8, 420f + random(24f, 28f) * e.fout(), e.rotation, 4f, (x, y) -> {
+        randLenVectors(e.id, 8, 420f + Mathf.random(24f, 28f) * e.fout(), e.rotation, 4f, (x, y) -> {
             stroke(0.3f + e.fout() * 2f);
             lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fout() * 14f + 0.5f);
         });
@@ -119,22 +119,22 @@ public class UnityFx{
     plasmaCharge = new Effect(96f, e -> {
         color(Pal.surge);
         randLenVectors(e.id, 5, (1f - e.finpow()) * 24f, e.rotation, 360f, (x, y) -> {
-            tri(e.x + x, e.y + y, e.fout() * 10f, e.fout() * 11f, e.rotation);
-            tri(e.x + x, e.y + y, e.fout() * 8f, e.fout() * 9f, e.rotation);
+            Drawf.tri(e.x + x, e.y + y, e.fout() * 10f, e.fout() * 11f, e.rotation);
+            Drawf.tri(e.x + x, e.y + y, e.fout() * 8f, e.fout() * 9f, e.rotation);
         });
     }),
 
     plasmaChargeBegin = new Effect(250f, e -> {
         color(Pal.surge);
-        tri(e.x, e.y, e.fin() * 16f, e.fout() * 20f, e.rotation);
+        Drawf.tri(e.x, e.y, e.fin() * 16f, e.fout() * 20f, e.rotation);
     }),
 
     plasmaShoot = new Effect(36f, e -> {
         color(Pal.surge, Color.white, e.fin());
 
         randLenVectors(e.id, 8, e.fin() * 20f + 1f, e.rotation, 40f, (x, y) -> {
-            tri(e.x + x, e.y + y, e.fout() * 14f, e.fout() * 15f, e.rotation);
-            tri(e.x + x, e.y + y, e.fout() * 8f, e.fout() * 9f, e.rotation);
+            Drawf.tri(e.x + x, e.y + y, e.fout() * 14f, e.fout() * 15f, e.rotation);
+            Drawf.tri(e.x + x, e.y + y, e.fout() * 8f, e.fout() * 9f, e.rotation);
         });
 
         randLenVectors(e.id, 4, e.fin() * 20f + 1f, e.rotation, 40f, (x, y) -> {
@@ -146,14 +146,14 @@ public class UnityFx{
         color(Pal.surge);
 
         stroke(e.fout() * 2.8f);
-        Lines.circle(e.x, e.y, e.fin() * 60);
+        circle(e.x, e.y, e.fin() * 60);
     }),
 
     plasmaFragAppear = new Effect(12f, e -> {
         z(Layer.bullet - 0.01f);
 
         color(Color.white);
-        tri(e.x, e.y, e.fin() * 12f, e.fin() * 13f, e.rotation);
+        Drawf.tri(e.x, e.y, e.fin() * 12f, e.fin() * 13f, e.rotation);
 
         z();
     }),
@@ -162,7 +162,7 @@ public class UnityFx{
         z(Layer.bullet - 0.01f);
 
         color(Pal.surge, Color.white, e.fin());
-        tri(e.x, e.y, e.fout() * 10f, e.fout() * 11f, e.rotation);
+        Drawf.tri(e.x, e.y, e.fout() * 10f, e.fout() * 11f, e.rotation);
 
         z();
     }),
@@ -180,7 +180,7 @@ public class UnityFx{
 
     effect = new Effect(60f, e -> {
         color(Pal.lancerLaser);
-        float temp = (float) e.data;
+        float temp = (float)e.data;
         stroke(e.fout() * 3f * temp);
         circle(e.x, e.y, e.finpow() * 24f * temp);
     }),
@@ -194,9 +194,9 @@ public class UnityFx{
         for(int i = 0; i < 2; i++){
             int sign = Mathf.signs[i];
             color(UnityPal.scarColor);
-            tri(e.x, e.y, 13 * e.fout(), 85f, e.rotation + 90f * sign);
+            Drawf.tri(e.x, e.y, 13 * e.fout(), 85f, e.rotation + 90f * sign);
             color(Color.white);
-            tri(e.x, e.y, Math.max(13 * e.fout() - 4f, 0f), 81f, e.rotation + 90f * sign);
+            Drawf.tri(e.x, e.y, Math.max(13 * e.fout() - 4f, 0f), 81f, e.rotation + 90f * sign);
         }
     }),
 
@@ -204,9 +204,9 @@ public class UnityFx{
         for(int i = 0; i < 2; i++){
             int sign = Mathf.signs[i];
             color(UnityPal.scarColor);
-            tri(e.x, e.y, 10f * e.fout(), 24f, e.rotation + 90f + 90f * sign);
+            Drawf.tri(e.x, e.y, 10f * e.fout(), 24f, e.rotation + 90f + 90f * sign);
             color(Color.white);
-            tri(e.x, e.y, Math.max(10f * e.fout() - 4f, 0f), 20f, e.rotation + 90f + 90f * sign);
+            Drawf.tri(e.x, e.y, Math.max(10f * e.fout() - 4f, 0f), 20f, e.rotation + 90f + 90f * sign);
         }
     }),
 
@@ -214,16 +214,16 @@ public class UnityFx{
         for(int i = 0; i < 2; i++){
             int sign = Mathf.signs[i];
             color(UnityPal.scarColor);
-            tri(e.x, e.y, 10f * e.fout(), 60f, e.rotation + 90f + 90f * sign);
+            Drawf.tri(e.x, e.y, 10f * e.fout(), 60f, e.rotation + 90f + 90f * sign);
             color(Color.white);
-            tri(e.x, e.y, Math.max(10 * e.fout() - 4f, 0f), 56f, e.rotation + 90f + 90f * sign);
+            Drawf.tri(e.x, e.y, Math.max(10 * e.fout() - 4f, 0f), 56f, e.rotation + 90f + 90f * sign);
         }
     }),
 
     falseLightning = new Effect(10f, 500f, e -> {
         if(!(e.data instanceof Float)) return;
 
-        float length = (float) e.data;
+        float length = (float)e.data;
         int lenInt = Mathf.round(length / 8f);
         stroke(3f * e.fout());
         color(e.color, Color.white, e.fin());
@@ -256,8 +256,8 @@ public class UnityFx{
         color(UnityPal.imberColor, Color.valueOf("ffc266"), e.finpow());
         alpha(e.finpow());
         randLenVectors(e.id, 3, (1f - e.finpow()) * 24f, e.rotation, 360f, (x, y) -> {
-            tri(e.x + x, e.y + y, e.fout() * 8f, e.fout() * 10f, e.rotation);
-            tri(e.x + x, e.y + y, e.fout() * 4f, e.fout() * 6f, e.rotation);
+            Drawf.tri(e.x + x, e.y + y, e.fout() * 8f, e.fout() * 10f, e.rotation);
+            Drawf.tri(e.x + x, e.y + y, e.fout() * 4f, e.fout() * 6f, e.rotation);
         });
         color();
     }),
@@ -272,7 +272,7 @@ public class UnityFx{
         if(!(e.data instanceof Position[])) return;
 
         float[] reduction = new float[]{0f, 1.5f};
-        Position[] temp = (Position[]) e.data;
+        Position[] temp = (Position[])e.data;
         Position a = temp[0], b = temp[1];
         for(int i = 0; i < 2; i++){
             color(i == 0 ? Pal.heal : Color.white);
@@ -296,7 +296,7 @@ public class UnityFx{
     }),
 
     cutEffect = new Effect(3f * 60f, e -> {
-        
+
     }),
 
     pylonLaserCharge = new Effect(200f, 180f, e -> {
@@ -311,10 +311,12 @@ public class UnityFx{
                 Fill.circle(e.x, e.y, cwidth * c.fin());
 
                 for(int j = 0; j < 2; j++){
-                    Lines.stroke(c.fin() * 1.5f * i);
-                    Lines.square(e.x, e.y, c.fout() * laser.width * i, Time.time() * 4f * Mathf.signs[j]);
-                };
-            };
+                    stroke(c.fin() * 1.5f * i);
+                    square(e.x, e.y, c.fout() * laser.width * i, Time.time() * 4f * Mathf.signs[j]);
+                }
+                ;
+            }
+            ;
         });
 
         shoot: {
@@ -328,14 +330,16 @@ public class UnityFx{
                 color(laser.colors[i]);
 
                 for(int j = 0; j < 2; j++){
-                    Lines.stroke(fout * 1.5f * i);
+                    stroke(fout * 1.5f * i);
 
                     float rot = Mathf.signs[j] * (Time.time() + (fin * 720f));
-                    Lines.square(e.x, e.y, finpow * laser.width * 2f * i, rot);
-                };
-            };
+                    square(e.x, e.y, finpow * laser.width * 2f * i, rot);
+                }
+                ;
+            }
+            ;
 
-            Angles.randLenVectors(e.id, 48, finpow * 180f, (x, y) -> {
+            randLenVectors(e.id, 48, finpow * 180f, (x, y) -> {
                 color(Color.white, Pal.lancerLaser, Color.cyan, fin);
 
                 Fill.circle(e.x + x, e.y + y, fout * 5f);
@@ -343,6 +347,7 @@ public class UnityFx{
 
             color(Pal.lancerLaser, fout * 0.4f);
             Fill.circle(e.x, e.y, finpow * 180f);
-        };
+        }
+        ;
     });
 }

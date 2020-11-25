@@ -23,7 +23,7 @@ public class ShieldBulletType extends BasicBulletType{
     public Effect breakFx = new Effect(5, e -> {
         Draw.z(Layer.shields);
         Draw.color(e.color);
-        float radius = ((int) e.data) * e.fout();
+        float radius = ((int)e.data) * e.fout();
 
         if(Core.settings.getBool("animatedshields")){
             Fill.poly(e.x, e.y, 6, radius);
@@ -63,11 +63,11 @@ public class ShieldBulletType extends BasicBulletType{
         }
 
         float radius = (((speed - b.vel.len()) * maxRadius) + 1) * 0.8f;
-        float[] temp = (float[]) b.data;
+        float[] temp = (float[])b.data;
         Groups.bullet.intersect(b.x - radius, b.y - radius, radius * 2, radius * 2, e -> {
             if(e != null && e.team != b.team){
                 if(e.owner instanceof Building){
-                    if(((ChargeTurret.ChargeTurretBuild) e.owner).block.name != "unity-shielder"){
+                    if(((ChargeTurret.ChargeTurretBuild)e.owner).block.name != "unity-shielder"){
                         float health = temp[0] - e.damage;
                         temp[0] = health;
                         temp[1] = 1;
@@ -90,7 +90,7 @@ public class ShieldBulletType extends BasicBulletType{
         }
 
         if(temp[0] > 0){
-            float hit = temp[1] - 1f - 0.2f * ((float) Time.delta);
+            float hit = temp[1] - 1f - 0.2f * ((float)Time.delta);
             temp[1] = hit;
         }
     }
@@ -99,7 +99,7 @@ public class ShieldBulletType extends BasicBulletType{
     public void draw(Bullet b){
         Draw.z(Layer.shields);
         if(b.data == null) return;
-        float[] temp = (float[]) b.data;
+        float[] temp = (float[])b.data;
         Draw.color(b.team.color, Color.white, Mathf.clamp(temp[1]));
 
         float radius = ((speed - b.vel.len()) * maxRadius) + 1;

@@ -12,13 +12,13 @@ public class UnitHealerAI extends FlyingAI{
 
     @Override
     protected boolean invalid(Teamc target){
-        return target == null || target.team() != unit.team || (target instanceof Healthc && !(((Healthc) target).damaged() && ((Healthc) target).isValid()));
+        return target == null || target.team() != unit.team || (target instanceof Healthc && !(((Healthc)target).damaged() && ((Healthc)target).isValid()));
     }
 
     @Override
     public void updateMovement(){
         if(target != null && target instanceof Unit){
-            Unit temp = (Unit) target;
+            Unit temp = (Unit)target;
             vec.trns(unit.angleTo(temp) + 180f, unit.type.range + temp.hitSize);
             vec.add(target).sub(unit).scl(0.01f).limit(1f).scl(unit.realSpeed());
             unit.moveAt(vec);
@@ -29,7 +29,7 @@ public class UnitHealerAI extends FlyingAI{
     @Override
     protected void updateWeapons(){
         if(target != null && (unit.ammo > 0.0001f || !state.rules.unitAmmo) && target instanceof Unit){
-            Unit temp = (Unit) target;
+            Unit temp = (Unit)target;
             if(timer.get(3, 5f) && unit.within(target, unit.type.range + temp.hitSize)){
                 if(state.rules.unitAmmo) unit.ammo--;
                 UnityFx.healLaser.at(unit.x, unit.y, 0f, new Position[]{unit, temp});

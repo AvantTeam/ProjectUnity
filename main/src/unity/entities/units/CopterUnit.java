@@ -10,7 +10,7 @@ public class CopterUnit extends UnitEntity{
         super.update();
 
         if(dead){
-            rotation += ((CopterUnitType) type).fallRotateSpeed * Mathf.signs[id() % 2];
+            rotation += ((CopterUnitType)type).fallRotateSpeed * Mathf.signs[id() % 2];
         }
     }
 

@@ -81,7 +81,7 @@ public class Teleporter extends Block{
     @Override
     public void drawRequestConfigCenter(BuildPlan req, Object content, String region){
         if(!(content instanceof Integer)) return;
-        int temp = (int) content;
+        int temp = (int)content;
         Draw.color(selection[temp]);
         Draw.rect(blankRegion, req.drawx(), req.drawy());
     }

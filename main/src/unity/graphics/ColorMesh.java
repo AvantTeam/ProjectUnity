@@ -23,7 +23,7 @@ public class ColorMesh extends HexMesh{
             @Override
             public Color getColor(Vec3 position){
                 double height = Math.pow(sim.octaveNoise3D(octaves, persistence, scl, position.x, position.y, position.z), pow) * mag;
-                return Tmp.c1.set(colors[Mathf.clamp((int) (height * colors.length), 0, colors.length - 1)]).mul(colorScale);
+                return Tmp.c1.set(colors[Mathf.clamp((int)(height * colors.length), 0, colors.length - 1)]).mul(colorScale);
             }
         }, divisions, Shaders.planet);
     }

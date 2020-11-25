@@ -25,7 +25,7 @@ public class SparkingContinuousLaserBulletType extends ContinuousLaserBulletType
     public void update(Bullet b){
         super.update(b);
         float realLength = Damage.findLaserLength(b, length);
-        if(Mathf.chanceDelta(fromBlockChance)) Lightning.create(b.team, lightningColor, fromBlockDamage, b.x, b.y, b.rotation(), Mathf.round(length / (float) 8) + fromBlockLen + Mathf.random(fromBlockLenRand));
+        if(Mathf.chanceDelta(fromBlockChance)) Lightning.create(b.team, lightningColor, fromBlockDamage, b.x, b.y, b.rotation(), Mathf.round(length / (float)8) + fromBlockLen + Mathf.random(fromBlockLenRand));
         for(int i = 0; i < fromLaserAmount; i++){
             if(Mathf.chanceDelta(fromLaserChance)){
                 int lLength = fromLaserLen + Mathf.random(fromLaserLenRand);

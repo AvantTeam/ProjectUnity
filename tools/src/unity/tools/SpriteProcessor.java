@@ -32,9 +32,11 @@ public class SpriteProcessor{
         content.createBaseContent();
 
         //setup dummy loaded mod to load unity contents properly
-        content.setCurrentMod(new LoadedMod(null, null, mod, new ModMeta(){{
-            name = "unity";
-        }}));
+        content.setCurrentMod(new LoadedMod(null, null, mod, new ModMeta(){
+            {
+                name = "unity";
+            }
+        }));
 
         try{
             mod.loadContent();
@@ -55,12 +57,14 @@ public class SpriteProcessor{
                 BufferedImage sprite = ImageIO.read(path.file());
                 if(sprite == null) throw new IOException("sprite " + path.absolutePath() + " is corrupted or invalid!");
 
-                GenRegion region = new GenRegion(fname, path){{
-                    width = sprite.getWidth();
-                    height = sprite.getHeight();
-                    u2 = v2 = 1f;
-                    u = v = 0f;
-                }};
+                GenRegion region = new GenRegion(fname, path){
+                    {
+                        width = sprite.getWidth();
+                        height = sprite.getHeight();
+                        u2 = v2 = 1f;
+                        u = v = 0f;
+                    }
+                };
 
                 regionCache.put(fname, region);
                 spriteCache.put(fname, sprite);

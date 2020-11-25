@@ -38,7 +38,7 @@ public class LightOmniReflector extends LightReflector{
     @Override
     public void drawRequestConfig(BuildPlan req, Eachable<BuildPlan> list){
         final float scl = tilesize * req.animScale;
-        Draw.rect(topRegion, req.drawx(), req.drawy(), scl, scl, req.config == null ? 0 : (int) req.config * 22.5f + req.rotation * 90f);
+        Draw.rect(topRegion, req.drawx(), req.drawy(), scl, scl, req.config == null ? 0 : (int)req.config * 22.5f + req.rotation * 90f);
     }
 
     @Override

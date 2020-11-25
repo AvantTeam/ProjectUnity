@@ -16,7 +16,7 @@ public class TransUnitType extends UnitType{
     @Override
     public Unit create(Team team){
         Unit ret = super.create(team);
-        ((TransformerBase) ret).setTimeTrans(transformTime);
+        ((TransformerBase)ret).setTimeTrans(transformTime);
         return ret;
     }
 }
