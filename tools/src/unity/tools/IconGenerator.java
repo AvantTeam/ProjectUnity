@@ -28,20 +28,6 @@ public class IconGenerator implements Generator{
                 type.load();
                 type.init();
 
-                //avoid nulls; sometimes happens for unknown reasons
-                if(SpriteProcessor.has(type.name + "-leg-base")){
-                    type.legBaseRegion = SpriteProcessor.getRegion(type.name + "-leg-base");
-                }
-                if(SpriteProcessor.has(type.name + "-foot")){
-                    type.footRegion = SpriteProcessor.getRegion(type.name + "-foot");
-                }
-                if(SpriteProcessor.has(type.name + "-joint")){
-                    type.jointRegion = SpriteProcessor.getRegion(type.name + "-joint");
-                }
-                if(SpriteProcessor.has(type.name + "-joint-base")){
-                    type.baseJointRegion = SpriteProcessor.getRegion(type.name + "-joint-base");
-                }
-
                 Color outc = Pal.darkerMetal;
                 Func<Sprite, Sprite> outline = i -> i.outline(3, outc);
                 Func<TextureRegion, String> parseName = reg -> ((AtlasRegion)reg).name.replaceFirst("unity-", "");

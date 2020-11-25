@@ -72,37 +72,43 @@ public class SpriteProcessor{
         Core.atlas = new TextureAtlas(){
             @Override
             public AtlasRegion find(String name){
-                if(!regionCache.containsKey(name)){
-                    GenRegion region = new GenRegion(name, null);
+                String fname = name.replaceFirst("unity-", "");
+
+                if(!regionCache.containsKey(fname)){
+                    GenRegion region = new GenRegion(fname, null);
                     region.invalid = true;
 
                     return region;
                 }
 
-                return (AtlasRegion)regionCache.get(name);
+                return (AtlasRegion)regionCache.get(fname);
             }
 
             @Override
             public AtlasRegion find(String name, TextureRegion def){
-                if(!regionCache.containsKey(name)){
+                String fname = name.replaceFirst("unity-", "");
+
+                if(!regionCache.containsKey(fname)){
                     return (AtlasRegion)def;
                 }
 
-                return (AtlasRegion)regionCache.get(name);
+                return (AtlasRegion)regionCache.get(fname);
             }
 
             @Override
             public AtlasRegion find(String name, String def){
-                if(!regionCache.containsKey(name)){
-                    return (AtlasRegion)regionCache.get(def);
+                String fname = name.replaceFirst("unity-", "");
+
+                if(!regionCache.containsKey(fname)){
+                    return (AtlasRegion)regionCache.get(def.replaceFirst("unity-", ""));
                 }
 
-                return (AtlasRegion)regionCache.get(name);
+                return (AtlasRegion)regionCache.get(fname);
             }
 
             @Override
             public boolean has(String name){
-                return regionCache.containsKey(name);
+                return regionCache.containsKey(name.replaceFirst("unity-", ""));
             }
         };
 
