@@ -1357,6 +1357,7 @@ public class UnityUnitTypes implements ContentList{
             health = 200;
             canBoost = true;
             weapons.add(new Weapon(name + "-shotgun"){{
+                top = false;
                 reload = 60f;
                 recoil = 2.5f;
                 x = 5.25f;
@@ -1411,6 +1412,7 @@ public class UnityUnitTypes implements ContentList{
             singleTarget = true;
             canBoost = true;
             weapons.add(new Weapon(name + "-gun"){{
+                top = false;
                 x = 10.75f;
                 y = 2.25f;
                 reload = 60f;
