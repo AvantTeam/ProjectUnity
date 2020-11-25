@@ -37,6 +37,7 @@ steleBullet.damage = 3;
 steleBullet.shootEffect = Fx.hitLancer;
 
 const steleWeap = extendContent(Weapon, "unity-stele-shotgun", {});
+steleWeap.top = false;
 steleWeap.reload = 60;
 steleWeap.recoil = 2.5;
 steleWeap.x = 5.25;
