@@ -1,0 +1,11 @@
+{
+	"size": 1,
+	"health": 120,
+	"requirements": [
+		{"item": "nickel", "amount": 30},
+		{"item": "copper", "amount": 50},
+		{"item": "titanium", "amount": 10},
+	],
+	"research": "unity-nickel-stator",
+	"category": "power",
+}
