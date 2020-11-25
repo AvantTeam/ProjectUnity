@@ -17,7 +17,7 @@
 	"heatColor": "ffffff",
 	"rotateSpeed": 0.91,
 	"shootSound": "dark/extinction-shoot",
-	"loopSoundVolume": 3,
+	"loopSoundVolume": 2,
 	"expanded": true,
 	"requirements": [
 		{ "item": "copper", "amount": 3800 },

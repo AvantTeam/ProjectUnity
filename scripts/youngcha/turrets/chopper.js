@@ -162,7 +162,7 @@ const chopperTurret = graphLib.finaliseExtend(Block, Building, "chopper", blanko
         partinfo[1].sprite = Core.atlas.find(this.name + "-blade1");
         partinfo[1].sprite2 = Core.atlas.find(this.name + "-blade2");
         partinfo[2].sprite = Core.atlas.find(this.name + "-sblade");
-		this.category = [Core.atlas.find(this.name + "-category1"),Core.atlas.find(this.name + "-category1")];
+		this.categoryC = [Core.atlas.find(this.name + "-category1"),Core.atlas.find(this.name + "-category1")];
         this.setConfigs();
 
     },
@@ -189,8 +189,8 @@ const chopperTurret = graphLib.finaliseExtend(Block, Building, "chopper", blanko
     },
 	getPartsCatagories() {
         return {
-			blade:this.block.category[0],
-			saw:this.block.category[1];
+			blade:this.block.categoryC[0],
+			saw:this.block.categoryC[1]
 		};
     },
     resetStats() {
