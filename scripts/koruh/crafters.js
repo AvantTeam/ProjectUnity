@@ -65,6 +65,68 @@ solidifier.buildType = () => extendContent(GenericSmelter.SmelterBuild, solidifi
 
 
 const clib = this.global.unity.expcrafter;
+
+const craftFx = new Effect(10, e => {
+      Draw.color(Pal.accent, Color.gray, e.fin());
+      Lines.stroke(1);
+      Lines.spikes(e.x, e.y, e.fin() * 4, 1.5, 6);
+});
+const lavaColor = Color.valueOf("ff2a00");
+const lavaColor2 = Color.valueOf("ffcc00");
+const meltFx = new Effect(60, e => {
+    Draw.color(Color.gray, Color.clear, e.fin());
+    Angles.randLenVectors(e.id, 15, 4.5 + e.fin() * 16, (x, y) => {
+        Fill.circle(e.x + x, e.y + y, 0.2 + e.fin() * 5);
+    });
+
+    Draw.color(lavaColor, lavaColor2, e.fout());
+
+    Angles.randLenVectors(e.id + 1, 8, 3 + e.fin() * 7, (x, y) => {
+        Fill.circle(e.x + x, e.y + y, 0.2 + e.fout() * 1.6);
+    });
+});
+const liquifyColor = Color.valueOf("ff3f00");
+const liquifyFx = new Effect(300, e => {
+      Draw.color(Color.white, liquifyColor, Math.min(1, e.fin() * 3));
+      Draw.alpha(e.fout());
+      Draw.rect(lavasmelter.region, e.x, e.y, 8 + 2.5*e.finpow(), 8 + 2.5*e.finpow());
+});
+liquifyFx.layer = Layer.blockUnder;
+
+const lavasmelter = clib.extend(GenericSmelter, GenericSmelter.SmelterBuild, "lava-smelter", {
+    expUse: 4,
+    expCapacity: 30,
+    ignoreExp: true,
+
+    init(){
+        this.super$init();
+        this.lava = this.consumes.get(ConsumeType.liquid).liquid;
+    }
+}, {
+    draw(){
+        Draw.rect(lavasmelter.region, this.x, this.y);
+        if(this.warmup > 0){
+            Draw.color(lavasmelter.lava.color, this.liquids.get(lavasmelter.lava) / lavasmelter.liquidCapacity);
+            Draw.rect(solidifier.topRegion, this.x, this.y);
+            Draw.color();
+        }
+    },
+    lackingExp(amount){
+        //just fricking melt
+        Puddles.deposit(this.tile, lavasmelter.lava, this.liquids.get(lavasmelter.lava) * 10);
+        meltFx.at(this.x, this.y);
+        liquifyFx.at(this.x, this.y);
+        Sounds.steam.at(this.x, this.y);
+        this.tile.remove();
+        this.remove();
+    }
+});
+
+lavasmelter.liquidCapacity = 20;
+lavasmelter.flameColor = lavaColor;
+lavasmelter.updateEffect = Fx.fuelburn;
+lavasmelter.craftEffect = craftFx;
+
 const diriumColor = Color.valueOf("96f7c3");
 const diriumFx = new Effect(10, e => {
       Draw.color(Color.white, diriumColor, e.fin());
