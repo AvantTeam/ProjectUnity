@@ -1,23 +1,23 @@
 package unity.content;
 
 import arc.func.*;
-import arc.math.Mathf;
-import arc.graphics.Color;
+import arc.math.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import mindustry.ctype.*;
 import mindustry.type.*;
 import mindustry.gen.*;
-import mindustry.entities.Lightning;
-import mindustry.entities.abilities.ForceFieldAbility;
+import mindustry.entities.*;
+import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.graphics.*;
 import mindustry.content.*;
 import mindustry.world.blocks.units.*;
 import mindustry.world.blocks.units.UnitFactory.*;
 import unity.ai.*;
-import unity.entities.bullet.SaberContinuousLaserBulletType;
+import unity.entities.bullet.*;
 import unity.entities.units.*;
-import unity.graphics.UnityPal;
+import unity.graphics.*;
 
 import static mindustry.type.ItemStack.*;
 
@@ -1355,6 +1355,7 @@ public class UnityUnitTypes implements ContentList{
             speed = 0.5f;
             hitSize = 8f;
             health = 200;
+            canBoost = true;
             weapons.add(new Weapon(name + "-shotgun"){{
                 reload = 60f;
                 recoil = 2.5f;
@@ -1408,6 +1409,7 @@ public class UnityUnitTypes implements ContentList{
             armor = 3.5f;
             rotateSpeed = 2.6f;
             singleTarget = true;
+            canBoost = true;
             weapons.add(new Weapon(name + "-gun"){{
                 x = 10.75f;
                 y = 2.25f;
@@ -1445,6 +1447,7 @@ public class UnityUnitTypes implements ContentList{
             armor = 4f;
             rotateSpeed = 2.2f;
             mechFrontSway = 0.55f;
+            canBoost = true;
             weapons.add(new Weapon("unity-monolith-medium-weapon-mount"){{
                 rotate = true;
                 x = 4f;
@@ -1486,10 +1489,11 @@ public class UnityUnitTypes implements ContentList{
             allowLegStep = true;
             visualElevation = 0.2f;
             legCount = 4;
+            legExtension = 8f;
             legSpeed = 0.08f;
             legLength = 16f;
             legMoveSpace = 1.2f;
-            legTrns = 1.5f;
+            legTrns = 0.5f;
             legBaseOffset = 11f;
             groundLayer = Layer.legUnit;
 
@@ -1498,19 +1502,19 @@ public class UnityUnitTypes implements ContentList{
             weapons.add(new Weapon("unity-pylon-laser"){{
                 shootSound = Sounds.laserblast;
                 chargeSound = Sounds.lasercharge;
-                soundPitchMin = 1;
+                soundPitchMin = 1f;
                 top = false;
                 mirror = false;
-                shake = 15;
-                shootY = 11;
-                x = y = 0;
-                reload = 420;
-                recoil = 0;
-                cooldownTime = 280;
+                shake = 15f;
+                shootY = 11f;
+                x = y = 0f;
+                reload = 420f;
+                recoil = 0f;
+                cooldownTime = 280f;
 
                 shootStatusDuration = 60f * 1.8f;
                 shootStatus = StatusEffects.unmoving;
-                firstShotDelay = UnityFx.pylonLaserCharge.lifetime;
+                firstShotDelay = UnityFx.pylonLaserCharge.lifetime / 2f;
 
                 bullet = UnityBullets.pylonLaser;
             }}, new Weapon("unity-monolith-large2-weapon-mount"){{

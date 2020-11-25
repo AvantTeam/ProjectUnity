@@ -3,12 +3,12 @@ package unity.content;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.math.geom.Position;
+import arc.math.geom.*;
 import arc.util.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.graphics.*;
-import unity.graphics.UnityPal;
+import unity.graphics.*;
 
 import static arc.graphics.g2d.Draw.*;
 import static arc.graphics.g2d.Lines.*;
@@ -299,21 +299,50 @@ public class UnityFx{
         
     }),
 
-    pylonLaserCharge = new Effect(80f, 150f, e -> {
+    pylonLaserCharge = new Effect(200f, 180f, e -> {
         LaserBulletType laser = (LaserBulletType)pylonLaser;
-        float cwidth = laser.width;
+        e.scaled(100f, c -> {
+            float cwidth = laser.width;
 
-        for(int i = 0; i < laser.colors.length; i++){
-            cwidth *= laser.lengthFalloff;
+            for(int i = 0; i < laser.colors.length; i++){
+                cwidth *= laser.lengthFalloff;
 
-            Color color = laser.colors[i];
-            Draw.color(color);
-            Fill.circle(e.x, e.y, cwidth * e.fin());
+                color(laser.colors[i]);
+                Fill.circle(e.x, e.y, cwidth * c.fin());
 
-            for(int j = 0; j < 2; j++){
-                Lines.stroke(e.fin() * 1.5f * i);
-                Lines.square(e.x, e.y, e.fout() * laser.width * i, Time.time() * 4f * Mathf.signs[j]);
-            }
-        }
+                for(int j = 0; j < 2; j++){
+                    Lines.stroke(c.fin() * 1.5f * i);
+                    Lines.square(e.x, e.y, c.fout() * laser.width * i, Time.time() * 4f * Mathf.signs[j]);
+                };
+            };
+        });
+
+        shoot: {
+            if(e.fin() < 0.5f) break shoot;
+
+            float fin = Mathf.curve(e.fin(), 0.5f, 1f);
+            float finpow = Interp.pow3Out.apply(fin);
+            float fout = 1 - fin;
+
+            for(int i = 0; i < laser.colors.length; i++){
+                color(laser.colors[i]);
+
+                for(int j = 0; j < 2; j++){
+                    Lines.stroke(fout * 1.5f * i);
+
+                    float rot = Mathf.signs[j] * (Time.time() + (fin * 720f));
+                    Lines.square(e.x, e.y, finpow * laser.width * 2f * i, rot);
+                };
+            };
+
+            Angles.randLenVectors(e.id, 48, finpow * 180f, (x, y) -> {
+                color(Color.white, Pal.lancerLaser, Color.cyan, fin);
+
+                Fill.circle(e.x + x, e.y + y, fout * 5f);
+            });
+
+            color(Pal.lancerLaser, fout * 0.4f);
+            Fill.circle(e.x, e.y, finpow * 180f);
+        };
     });
 }
