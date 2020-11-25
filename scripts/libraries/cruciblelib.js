@@ -240,7 +240,7 @@ const cruicibleRecipes = [
 	},
 	{name:"silicon", 
 		inputs:[
-			{material:"sand",   amount:1.5, needsliquid: true},
+			{material:"sand",   amount:1.25, needsliquid: true},
 			{material:"carbon", amount:0.25}
 		],
 		alloyspeed: 0.25

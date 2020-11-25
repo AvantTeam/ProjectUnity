@@ -2,10 +2,11 @@
 	"size": 3,
 	"health": 1000,
 	"requirements": [
-		{"item": "nickel", "amount": 300},
-		{"item": "copper", "amount": 300},
+		{"item": "nickel", "amount": 200},
+		{"item": "copper", "amount": 200},
 		{"item": "titanium", "amount": 150},
+		{"item": "graphite", "amount": 100},
 	],
-	"research": "unity-nickel-stator",
+	"research": "unity-electric-rotor-small",
 	"category": "power",
 }

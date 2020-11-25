@@ -305,15 +305,13 @@ const rotorBuild = {
 		if(!rotvel){
 			rotvel=0;
 		}
-		if(rotvel>topspeed){
-			this.productionEfficiency = breakeven + (1.0-breakeven) * Mathf.clamp((rotvel - topspeed)*this.block.getRotPowerEfficiency());
-			tgraph.setFriction(fric);
-		}else{
-			this.productionEfficiency = Mathf.pow((rotvel/topspeed)*breakeven,3);
-			tgraph.setFriction(fric*0.5 + ((rotvel/topspeed)*fric*0.5) );
-		}
-		let mul = Mathf.clamp(1.0-(rotvel/topspeed),-1.0,1.0);
-		tgraph.setForce(mul*flux * this.block.getTorqueEfficiency()* this.block.getBaseTorque()* this.edelta());
+		tgraph.setFriction(fric);
+		let rotNeg = Mathf.clamp((rotvel/topspeed),0, 2.0/breakeven);
+		//ok uh the back-torque should be proportional to the electrcity gained with a constant.
+		this.productionEfficiency = Mathf.clamp(rotNeg*breakeven,0,2);
+		let netTorque = this.block.getBaseTorque()*(this.efficiency() - rotNeg);
+		this.productionEfficiency*=this.block.getRotPowerEfficiency();
+		tgraph.setForce(flux*netTorque* this.delta());
 	},
 }
 
@@ -357,14 +355,79 @@ electricRotor.rotate = true;
 electricRotor.update = true;
 electricRotor.solid = true;
 electricRotor.outputsPower = electricRotor.consumesPower = true;
-electricRotor.consumes.power(8.0);
+electricRotor.consumes.power(16.0);
 electricRotor.getGraphConnectorBlock("flux graph").setAccept( [0,0,0, 1,1,1, 0,0,0, 1,1,1]);
 electricRotor.getGraphConnectorBlock("flux graph").setFluxproducer(false);
 electricRotor.getGraphConnectorBlock("torque graph").setAccept([0,1,0, 0,0,0, 0,1,0, 0,0,0]);
 electricRotor.getGraphConnectorBlock("torque graph").setBaseFriction(0.05);
 electricRotor.setFluxEfficiency(10.0);
-electricRotor.setRotPowerEfficiency(0.25);
+electricRotor.setRotPowerEfficiency(0.8);
 electricRotor.setTorqueEfficiency(0.8);
 electricRotor.setBaseTorque(5.0);
 electricRotor.setBaseTopSpeed(15.0);
-electricRotor.powerProduction = 24.0;
+electricRotor.powerProduction = 32.0;
+
+
+
+
+
+
+
+
+
+let ersblankobj = graphLib.init();
+graphLib.addGraph(ersblankobj, magnetgraphtype); //flux graph
+graphLib.addGraph(ersblankobj, rotL.baseTypes.torqueConnector);  //rotlib graph
+
+Object.assign(ersblankobj.block, rotorBlock);
+Object.assign(ersblankobj.build,rotorBuild);
+const electricRotorSmall = graphLib.finaliseExtendContent(PowerGenerator, PowerGenerator.GeneratorBuild,"electric-rotor-small",ersblankobj,{
+	load(){
+		this.super$load();
+		this.top = Core.atlas.find(this.name+"-top");
+		this.overlaysprite = Core.atlas.find(this.name+"-over");
+		this.rotor = Core.atlas.find(this.name+"-spin");
+	},
+	
+},{
+	updatePost(){
+		this.getGraphConnector("torque graph").setInertia(20);
+	},
+	draw() {
+		let fixedrot = ((this.rotdeg()+90)%180)-90;
+		let tgraph = this.getGraphConnector("torque graph");
+		let variant = ((this.rotation+1)%4>=2)?1:0;
+		let shaftRot = variant==1?360-tgraph.getRotation():tgraph.getRotation();
+		rotL.drawRotRect(electricRotorSmall.rotor, this.x, this.y, 8, 3.5, 8, this.rotdeg(), shaftRot, shaftRot+180);
+		rotL.drawRotRect(electricRotorSmall.rotor, this.x, this.y, 8, 3.5, 8, this.rotdeg(), shaftRot+180, shaftRot+360);
+		Draw.rect(electricRotorSmall.overlaysprite, this.x, this.y, fixedrot);
+		Draw.rect(electricRotorSmall.top, this.x, this.y, fixedrot);
+        this.drawTeamTop();
+	}
+});
+
+electricRotorSmall.rotate = true;
+electricRotorSmall.update = true;
+electricRotorSmall.solid = true;
+electricRotorSmall.outputsPower = electricRotorSmall.consumesPower = true;
+electricRotorSmall.consumes.power(1.0);
+electricRotorSmall.getGraphConnectorBlock("flux graph").setAccept( [0,1,0,1]);
+electricRotorSmall.getGraphConnectorBlock("flux graph").setFluxproducer(false);
+electricRotorSmall.getGraphConnectorBlock("torque graph").setAccept([1,0,1,0]);
+electricRotorSmall.getGraphConnectorBlock("torque graph").setBaseFriction(0.08);
+electricRotorSmall.setFluxEfficiency(10.0);
+electricRotorSmall.setRotPowerEfficiency(0.8);
+electricRotorSmall.setTorqueEfficiency(0.7);
+electricRotorSmall.setBaseTorque(1.0);
+electricRotorSmall.setBaseTopSpeed(3.0);
+electricRotorSmall.powerProduction = 2.0;
+
+
+
+
+
+
+
+
+
+
