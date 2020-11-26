@@ -127,7 +127,7 @@ teleunit.buildType = prov(() => extend(Building, {
         player.unit().set(dest.x, dest.y);
         player.unit().snapInterpolation();
         if(Vars.player != null && player == Vars.player) Core.camera.position.set(player);
-        if(!Vars.headless) this.effects(dest, player.unit().hitSize * 1.3);
+        if(!Vars.headless) this.effects(dest, player.unit().hitSize * 1.7);
     },
     effects(dest, hitSize){
         Sounds.plasmadrop.at(this.x, this.y, Mathf.random() * 0.2 + 1);
