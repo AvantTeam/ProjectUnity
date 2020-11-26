@@ -1,4 +1,5 @@
 const diriumColor = Color.valueOf("96f7c3");
+const diriumColor2 = Color.valueOf("ccffe4");
 
 const tpOut = new Effect(30, e => {
     Draw.color(diriumColor);
@@ -11,11 +12,25 @@ const tpOut = new Effect(30, e => {
     });
 });
 
-const tpIn = new Effect(15, e => {
-    Draw.color(diriumColor);
-    Lines.stroke(3*e.fin());
-    Lines.square(e.x, e.y, e.fout() *  e.rotation * 0.8, 45);
+const tpIn = new Effect(50, e => {
+    if(!(e.data instanceof UnitType)) return;
+    var region = e.data.icon(Cicon.full);
+    Draw.color();
+    Draw.mixcol(diriumColor, 1);
+    Draw.rect(region, e.x, e.y, region.width * Draw.scl * e.fout(), region.height * Draw.scl * e.fout(), e.rotation);
+    Draw.mixcol();
 });
+
+const tpFlash = new Effect(30, e => {
+    if(!(e.data instanceof Unit) || e.data.dead) return;
+    var region = e.data.type.icon(Cicon.full);
+    Draw.mixcol(diriumColor2, 1);
+    Draw.alpha(e.fout());
+    Draw.rect(region, e.data.x, e.data.y, e.data.rotation - 90);
+    Draw.mixcol();
+    Draw.color();
+});
+tpFlash.layer = Layer.flyingUnit + 1;
 
 const teleunit = extendContent(Block, "teleunit", {
     load() {
@@ -30,7 +45,7 @@ const teleunit = extendContent(Block, "teleunit", {
     }
 });
 teleunit.update = true;
-teleunit.solid = true;
+teleunit.solid = false;
 //teleunit.consumesTap = true;
 teleunit.ambientSound = Sounds.techloop;
 teleunit.ambientSoundVolume = 0.02;
@@ -124,12 +139,14 @@ teleunit.buildType = prov(() => extend(Building, {
         index++;
         if(index >= barr.length) index = 0;
         var dest = barr[index];
+        if(!Vars.headless) tpIn.at(player.unit().x, player.unit().y, player.unit().rotation - 90, Color.white, player.unit().type);
         player.unit().set(dest.x, dest.y);
         player.unit().snapInterpolation();
+        player.unit().set(dest.x, dest.y);//for good measure
         if(Vars.player != null && player == Vars.player) Core.camera.position.set(player);
-        if(!Vars.headless) this.effects(dest, player.unit().hitSize * 1.7, player == Vars.player);
+        if(!Vars.headless) this.effects(dest, player.unit().hitSize * 1.7, player == Vars.player, player.unit());
     },
-    effects(dest, hitSize, isPlayer){
+    effects(dest, hitSize, isPlayer, unit){
         //TODO: EoD-style total unit effect
         if(isPlayer){
             Sounds.plasmadrop.at(dest.x, dest.y, Mathf.random() * 0.2 + 1);
@@ -140,6 +157,6 @@ teleunit.buildType = prov(() => extend(Building, {
             Sounds.lasercharge2.at(dest.x, dest.y, Mathf.random() * 0.2 + 0.7);
         }
         tpOut.at(dest.x, dest.y, hitSize);
-        tpIn.at(this.x, this.y, hitSize);
+        tpFlash.at(dest.x, dest.y, 0, Color.white, unit);
     }
 }));
