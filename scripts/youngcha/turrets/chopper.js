@@ -5,7 +5,7 @@ const graphLib = require("libraries/graphlib");
 const partinfo = [{
         name: "Pivot",
         desc: "",
-        category: "Blade",
+        category: "blade",
         tx: 4,
         ty: 0,
         tw: 1,
@@ -38,7 +38,7 @@ const partinfo = [{
     {
         name: "Blade",
         desc: "Slices and knocks back enemies",
-        category: "Blade",
+        category: "blade",
         tx: 0,
         ty: 0,
         tw: 1,
@@ -77,7 +77,7 @@ const partinfo = [{
     {
         name: "Serrated blade",
         desc: "A heavy reinforced blade.",
-        category: "Blade",
+        category: "blade",
         tx: 2,
         ty: 0,
         tw: 2,
@@ -115,7 +115,7 @@ const partinfo = [{
     {
         name: "Rod",
         desc: "Supporting structure, does not collide",
-        category: "Blade",
+        category: "blade",
         tx: 1,
         ty: 0,
         tw: 1,
@@ -162,6 +162,7 @@ const chopperTurret = graphLib.finaliseExtend(Block, Building, "chopper", blanko
         partinfo[1].sprite = Core.atlas.find(this.name + "-blade1");
         partinfo[1].sprite2 = Core.atlas.find(this.name + "-blade2");
         partinfo[2].sprite = Core.atlas.find(this.name + "-sblade");
+		this.categorySprite = [Core.atlas.find(this.name + "-category1"),Core.atlas.find(this.name + "-category2")];
         this.setConfigs();
 
     },
@@ -185,6 +186,12 @@ const chopperTurret = graphLib.finaliseExtend(Block, Building, "chopper", blanko
     },
     getPartsAtlas() {
         return chopperTurret.partsAtlas;
+    },
+	getPartsCatagories() {
+        return {
+			blade:chopperTurret.categorySprite[0],
+			saw:chopperTurret.categorySprite[1]
+		};
     },
     resetStats() {
         this.inertia = 5;

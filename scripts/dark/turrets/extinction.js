@@ -1,5 +1,6 @@
 const fLib = this.global.unity.funclib;
 const sEffect = this.global.unity.status;
+const soundLib = this.global.unity.sounds;
 const exefLib = this.global.unity.extraeffects;
 const tempVec = new Vec2();
 const tempSeq = new Seq();
@@ -139,6 +140,7 @@ const extinction = extendContent(LaserTurret, "extinction", {
 		this.baseRegion = Core.atlas.find("unity-block-" + this.size);
 	}
 });
+extinction.loopSound = soundLib.beamIntenseHighpitchTone;
 extinction.shootType = extinctionLaser;
 extinction.consumes.add(new ConsumeLiquidFilter(liquid => liquid.temperature <= 0.27 && liquid.flammability < 0.1, 2.9)).update(false);
 extinction.heatDrawer = tile => {
