@@ -99,7 +99,7 @@ teleunit.buildType = prov(() => extend(Building, {
         return barr;
     },
     inRange(player){
-        return this.enabled && !player.isDead() && Math.abs(player.x - this.x) <= 1.8 * Vars.tilesize && Math.abs(player.y - this.y) <= 1.7 * Vars.tilesize;
+        return this.enabled && player.unit() != null && !player.unit().dead && Math.abs(player.unit().x - this.x) <= 1.8 * Vars.tilesize && Math.abs(player.unit().y - this.y) <= 1.7 * Vars.tilesize;
     },
     shouldShowConfigure(player){
         return this.consValid() && this.inRange(Vars.player);
