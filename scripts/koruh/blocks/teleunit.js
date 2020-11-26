@@ -130,6 +130,7 @@ teleunit.buildType = prov(() => extend(Building, {
         if(!Vars.headless) this.effects(dest, player.unit().hitSize * 1.7);
     },
     effects(dest, hitSize){
+        //TODO: EoD-style total unit effect
         Sounds.plasmadrop.at(this.x, this.y, Mathf.random() * 0.2 + 1);
         Sounds.plasmadrop.at(dest.x, dest.y, Mathf.random() * 0.2 + 0.7);
         tpOut.at(dest.x, dest.y, hitSize);
