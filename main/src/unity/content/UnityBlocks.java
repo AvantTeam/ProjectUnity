@@ -3,6 +3,7 @@ package unity.content;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.struct.Seq;
 import arc.util.Time;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
@@ -12,6 +13,7 @@ import mindustry.world.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 import mindustry.world.blocks.environment.*;
+import mindustry.world.blocks.units.UnitFactory;
 import mindustry.world.blocks.defense.turrets.*;
 import mindustry.type.*;
 import mindustry.ctype.*;
@@ -37,6 +39,7 @@ public class UnityBlocks implements ContentList{
 
 //global
     //blocks
+    electroTile,
     recursiveReconstructor,
     lightLamp, oilLamp, lightLaser, lightLampInfi, lightReflector, lightReflector1, lightOmnimirror, lightFilter, lightInvertedFilter, lightDivisor, lightDivisor1, lightItemFilter, lightPanel, lightInfluencer,
     metaglassWall, metaglassWallLarge,
@@ -69,6 +72,8 @@ public class UnityBlocks implements ContentList{
     monolithAlloyForge,
     //turrets
     mage, oracle, spectrum,
+    //units
+    monolithGroundFactory,
 
 //end
     //factories
@@ -85,6 +90,7 @@ public class UnityBlocks implements ContentList{
     @Override
     public void load(){
         //region global blocks
+        electroTile = new Floor("electro-tile");
         recursiveReconstructor = new SelectableReconstructor("recursive-reconstructor"){
             {
                 requirements(Category.units, with(Items.graphite, 1600, Items.silicon, 2000, Items.metaglass, 900, Items.thorium, 600, Items.lead, 1200, Items.plastanium, 3600));
@@ -804,6 +810,16 @@ public class UnityBlocks implements ContentList{
                 };
             }
         };
+        //endregion
+        //region monolith units
+        /*monolithGroundFactory = new UnitFactory("monolith-ground-factory"){
+            {
+                requirements(Category.units, with());
+                size = 3;
+                plans = Seq.with(new UnitPlan(UnityUnitTypes.stele, 900f, with(Items.silicon, 10, UnityItems.monolite, 15)));
+                consumes.power(1.2f);
+            }
+        };*/
         //endregion
         //region end factories
         terminalCrucible = new StemGenericSmelter("terminal-crucible"){

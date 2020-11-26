@@ -20,6 +20,7 @@ import static arc.math.Angles.*;
 import static unity.content.UnityBullets.*;
 
 public class UnityFx{
+    private static int integer;
     public static final Effect
 
     shootSmallBlaze = new Effect(22f, e -> {
@@ -371,6 +372,38 @@ public class UnityFx{
         Tmp.v1.lerp(temp[1], e.fin());
         color(Pal.darkFlame, Pal.darkerGray, e.fin());
         Fill.circle(Tmp.v1.x + temp[2].getX(), Tmp.v1.y + temp[2].getY(), e.fout() * 5f);
-    }).layer(Layer.flyingUnit + 0.012f);
+    }).layer(Layer.flyingUnit + 0.012f),
 
+    sparkleFx = new Effect(15f, e -> {
+        color(Color.white, e.color, e.fin());
+        integer = 1;
+        randLenVectors(e.id, e.id % 3 + 1, e.rotation * 4f + 4f, (x, y) -> {
+            UnityDrawf.spark(e.x + x, e.y + y, e.fout() * 4f, 0.5f + e.fout() * 2.2f, e.id * integer);
+            integer++;
+        });
+    }),
+
+    upgradeBlockFx = new Effect(90f, e -> {
+        color(Color.white, Color.green, e.fin());
+        stroke(e.fout() * 6f * e.rotation);
+        square(e.x, e.y, (e.fin() * 4f + 2f) * e.rotation, 0f);
+        integer = 1;
+        randLenVectors(e.id, e.id % 3 + 7, e.rotation * 4f + 4f + 8f * e.finpow(), (x, y) -> {
+            UnityDrawf.spark(e.x + x, e.y + y, e.fout() * 5f, e.fout() * 3.5f, e.id * integer);
+            integer++;
+        });
+    }),
+
+    expAbsorb = new Effect(15f, e -> {
+        stroke(e.fout() * 1.5f);
+        color(UnityPal.expColor);
+        circle(e.x, e.y, e.fin() * 2.5f + 1f);
+    }),
+
+    expDespawn = new Effect(15f, e -> {
+        color(UnityPal.expColor);
+        randLenVectors(e.id, 7, 2f + 5 * e.fin(), (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, e.fout());
+        });
+    });
 }

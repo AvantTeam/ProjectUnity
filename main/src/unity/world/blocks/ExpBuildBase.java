@@ -4,9 +4,10 @@ import java.util.EnumMap;
 import arc.struct.ObjectSet;
 import arc.math.Mathf;
 import arc.util.io.*;
+import mindustry.gen.Buildingc;
 import unity.world.meta.ExpType;
 
-public interface ExpBuildBase{
+public interface ExpBuildBase extends Buildingc{
     ExpBlockBase getExpBlock();
 
     default void setExpStats(){

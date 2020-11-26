@@ -28,7 +28,7 @@ import static unity.content.UnityFx.*;
 
 public class UnityBullets implements ContentList{
     public static BulletType laser, coalBlaze, pyraBlaze, falloutLaser, catastropheLaser, calamityLaser, extinctionLaser, orb, shockBeam, currentStroke,
-    shielderBullet, plasmaFragTriangle, plasmaTriangle, pylonLightning, pylonLaser, pylonLaserSmall;
+    shielderBullet, plasmaFragTriangle, plasmaTriangle, pylonLightning, pylonLaser, pylonLaserSmall, exporb;
 
     //only enhanced
     public static BasicBulletType standardDenseLarge, standardHomingLarge, standardIncendiaryLarge, standardThoriumLarge, standardDenseHeavy, standardHomingHeavy, standardIncendiaryHeavy, standardThoriumHeavy, standardDenseMassive, standardHomingMassive,
@@ -388,6 +388,8 @@ public class UnityBullets implements ContentList{
                 width = 24f;
             }
         };
+
+        exporb = new ExpOrb();
 
         //only enhanced
 

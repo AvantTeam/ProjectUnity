@@ -9,8 +9,7 @@ import mindustry.game.EventType.SectorLaunchEvent;
 import static mindustry.Vars.*;
 
 public class UnityMusics{
-    private static Music monolithDark;
-    private static Seq<Music> ambientMusic, darkMusic, bossMusic;
+    private static Seq<Music> ambientMusic, darkMusic, bossMusic, monolithDarkMusics;
 
     private static Music loadMusic(String name){
         return mods.getScripts().loadMusic(name);
@@ -20,11 +19,17 @@ public class UnityMusics{
         ambientMusic = control.sound.ambientMusic;
         darkMusic = control.sound.darkMusic;
         bossMusic = control.sound.bossMusic;
-        monolithDark = loadMusic("monolith-dark");
+        monolithDarkMusics = Seq.with(loadMusic("monolith-dark"));
         Events.on(SectorLaunchEvent.class, e -> {
             if(e.sector.planet == content.getByName(ContentType.planet, "unity-megalith")){
-                if(darkMusic.contains(monolithDark)) darkMusic.add(monolithDark);
-            }else if(darkMusic.contains(monolithDark)) darkMusic.remove(monolithDark);
+                monolithDarkMusics.each(music -> {
+                    if(darkMusic.contains(music)) darkMusic.add(music);
+                });
+            }else{
+                monolithDarkMusics.each(music -> {
+                    if(darkMusic.contains(music)) darkMusic.remove(music);
+                });
+            }
         });
     }
 }
