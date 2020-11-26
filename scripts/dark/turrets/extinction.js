@@ -5,6 +5,7 @@ const exefLib = this.global.unity.extraeffects;
 const tempVec = new Vec2();
 const tempSeq = new Seq();
 const tempColor = new Color();
+const pow6In = new Interp.PowIn(6);
 
 const evaporateDeath = new Effect(64, 800, e => {
 	var oz = Draw.z();
@@ -149,8 +150,8 @@ extinction.heatDrawer = tile => {
 	var g = Interp.pow3In.apply(tile.heat) + ((1 - Interp.pow3In.apply(tile.heat)) * 0.12);
 	var b = pow6In.apply(tile.heat);
 	var a = Interp.pow2Out.apply(tile.heat);
-	tmpCol.set(r, g, b, a);
-	Draw.color(tmpCol);
+	tempColor.set(r, g, b, a);
+	Draw.color(tempColor);
 
 	Draw.blend(Blending.additive);
 	Draw.rect(extinction.heatRegion, tile.x + extinction.tr2.x, tile.y + extinction.tr2.y, tile.rotation - 90);
