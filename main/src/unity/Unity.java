@@ -12,14 +12,18 @@ import mindustry.mod.Mods.*;
 import mindustry.ui.dialogs.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
-import unity.ContributorList.*;
 import unity.content.*;
+import unity.mod.ContributorList;
+import unity.mod.UnityMusics;
+import unity.mod.UnitySounds;
+import unity.mod.ContributorList.*;
 
 public class Unity extends Mod{
     public final String githubURL = "https://github.com/EyeOfDarkness/ProjectUnity";
 
     private final ContentList[] unityContent = {
         new UnityItems(),
+        new OverWriter(),
         new UnityStatusEffects(),
         new UnityBullets(),
         new UnityUnitTypes(),
@@ -89,6 +93,8 @@ public class Unity extends Mod{
 
     @Override
     public void loadContent(){
+        UnityMusics.load();
+        UnitySounds.load();
         for(ContentList list : unityContent){
             try{
                 list.load();

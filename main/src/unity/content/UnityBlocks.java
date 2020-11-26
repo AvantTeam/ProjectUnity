@@ -17,6 +17,7 @@ import mindustry.type.*;
 import mindustry.ctype.*;
 import mindustry.content.*;
 import unity.graphics.UnityPal;
+import unity.mod.UnitySounds;
 import unity.world.blocks.defense.LightWall;
 import unity.world.blocks.defense.turrets.*;
 import unity.world.blocks.distribution.Teleporter;
@@ -52,7 +53,7 @@ public class UnityBlocks implements ContentList{
     //turrets
     orb, shockwire, current, plasma, shielder,
     //factories
-    sparkAlloyFactory,
+    sparkAlloyForge,
 
 //koruh
     //turrets
@@ -65,7 +66,7 @@ public class UnityBlocks implements ContentList{
 
 //monolith
     //factories
-    monolithAlloyFactory,
+    monolithAlloyForge,
     //turrets
     mage, oracle, spectrum,
 
@@ -425,8 +426,8 @@ public class UnityBlocks implements ContentList{
                 shootSound = Sounds.laserbig;
                 heatColor = Color.valueOf("e04300");
                 rotateSpeed = 3.5f;
-                ambientSound = Sounds.beam;
-                ambientSoundVolume = 2.2f;
+                loopSound = Sounds.beam;
+                loopSoundVolume = 2.2f;
                 requirements(Category.turret, with(Items.copper, 450, Items.lead, 350, Items.graphite, 390, Items.silicon, 360, Items.titanium, 250, UnityItems.umbrium, 370, Items.surgeAlloy, 360));
                 shootType = UnityBullets.falloutLaser;
                 consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.58f)).update(false);
@@ -450,7 +451,7 @@ public class UnityBlocks implements ContentList{
                 cooldown = 0.012f;
                 heatColor = Color.white;
                 rotateSpeed = 1.9f;
-                ambientSoundVolume = 2.4f;
+                loopSoundVolume = 2.4f;
                 expanded = true;
                 requirements(Category.turret, with(Items.copper, 1250, Items.lead, 1320, Items.graphite, 1100, Items.titanium, 1340, Items.surgeAlloy, 1240, Items.silicon, 1350, Items.thorium, 770, UnityItems.darkAlloy, 370));
                 shootType = UnityBullets.catastropheLaser;
@@ -475,7 +476,7 @@ public class UnityBlocks implements ContentList{
                 cooldown = 0.009f;
                 heatColor = Color.white;
                 rotateSpeed = 0.97f;
-                ambientSoundVolume = 3f;
+                loopSoundVolume = 3f;
                 expanded = true;
                 requirements(Category.turret, with(Items.copper, 2800, Items.lead, 2970, Items.graphite, 2475, Items.titanium, 3100, Items.surgeAlloy, 2790, Items.silicon, 3025, Items.thorium, 1750, UnityItems.darkAlloy, 1250));
                 shootType = UnityBullets.calamityLaser;
@@ -489,7 +490,7 @@ public class UnityBlocks implements ContentList{
                 size = 14;
                 health = 29500;
                 range = 520f;
-                reloadTime = 320f;
+                reloadTime = 380f;
                 coolantMultiplier = 0.4f;
                 shootCone = 12f;
                 shootDuration = 360f;
@@ -500,8 +501,10 @@ public class UnityBlocks implements ContentList{
                 recoilAmount = 7f;
                 cooldown = 0.003f;
                 heatColor = Color.white;
-                rotateSpeed = 0.9f;
-                loopSoundVolume = 3f;
+                rotateSpeed = 0.82f;
+                shootSound = UnitySounds.extinctionShoot;
+                loopSound = UnitySounds.beamIntenseHighpitchTone;
+                loopSoundVolume = 2f;
                 expanded = true;
                 shootType = UnityBullets.extinctionLaser;
                 consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.27f && liquid.flammability < 0.1f, 2.5f)).update(false);
@@ -655,7 +658,7 @@ public class UnityBlocks implements ContentList{
         };
         //endregion
         //region imber factories
-        sparkAlloyFactory = new StemGenericSmelter("spark-alloy-forge"){
+        sparkAlloyForge = new StemGenericSmelter("spark-alloy-forge"){
             {
                 requirements(Category.crafting, with(Items.lead, 160, Items.graphite, 340, UnityItems.imberium, 270, Items.silicon, 250, Items.thorium, 120, Items.surgeAlloy, 100));
                 outputItem = new ItemStack(UnityItems.sparkAlloy, 4);
@@ -714,7 +717,7 @@ public class UnityBlocks implements ContentList{
         };
         //endregion
         //region monolith factories
-        monolithAlloyFactory = new StemGenericSmelter("monolith-alloy-forge"){
+        monolithAlloyForge = new StemGenericSmelter("monolith-alloy-forge"){
             {
                 requirements(Category.crafting, with(Items.lead, 380, UnityItems.monolite, 240, Items.silicon, 400, Items.titanium, 240, Items.thorium, 90, Items.surgeAlloy, 160));
                 final int effectTimer = timers++;
