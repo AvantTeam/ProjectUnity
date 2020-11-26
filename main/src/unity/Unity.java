@@ -93,8 +93,10 @@ public class Unity extends Mod{
 
     @Override
     public void loadContent(){
-        UnityMusics.load();
-        UnitySounds.load();
+        try{
+            UnityMusics.load();
+            UnitySounds.load();
+        }catch(Exception e){}
         for(ContentList list : unityContent){
             try{
                 list.load();
