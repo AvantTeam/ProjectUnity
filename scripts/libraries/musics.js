@@ -2,19 +2,24 @@ const ambientMusic = Vars.control.sound.ambientMusic;
 const darkMusic = Vars.control.sound.darkMusic;
 const bossMusic = Vars.control.sound.bossMusic;
 
-const monolithDark = loadMusic("monolith-dark");
+//TODO make this an ObjectMap instead
+const monolithDarkMusics = Seq.with(loadMusic("monolith-dark1"));
 Events.on(SectorLaunchEvent, e => {
-    if(
-        e.sector.planet == Vars.content.getByName("unity-megalith")
-    ){
-        if(darkMusic.contains(monolithDark)){
-            darkMusic.add(monolithDark);
-        };
-    }else if(darkMusic.contains(monolithDark)){
-        darkMusic.remove(monolithDark);
-    };
+    if(e.sector.planet == Vars.content.getByName("unity-megalith")){
+        monolithDarkMusics.each(music => {
+            if(!darkMusic.contains(music)){
+                darkMusic.add(music);
+            };
+        });
+    }else{
+        monolithDarkMusics.each(music => {
+            if(darkMusic.contains(music)){
+                darkMusic.remove(music);
+            };
+        });
+    }
 });
 
 module.exports = {
-    monolithDark: monolithDark
+    monolithDark1: monolithDarkMusics.get(0)
 };
