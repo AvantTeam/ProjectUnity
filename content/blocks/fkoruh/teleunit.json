@@ -7,3 +7,7 @@ requirements:[
 ]
 category:units
 hasItems:false
+consumes: {
+  power: 3
+}
+size: 3

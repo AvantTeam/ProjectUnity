@@ -59,7 +59,7 @@ const script = [
                     "shieldbullet"
                 ]
             },
-            
+
             {
                 name: "loaders",
                 childs: [
@@ -244,6 +244,7 @@ const script = [
                     "shieldGenerator",
                     "shieldedWall",
                     "teleporter",
+                    "teleunit",
                     "expunloader",
                     "exptank",
                     "expchest",

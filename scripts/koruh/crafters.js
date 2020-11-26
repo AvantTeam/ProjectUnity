@@ -173,6 +173,11 @@ const lavasmelter = clib.extend(GenericSmelter, GenericSmelter.SmelterBuild, "la
     },
     melt(){
         Puddles.deposit(this.tile, lavasmelter.lava, this.liquids.get(lavasmelter.lava) * 10);
+        for(var i=0; i<4; i++){
+            var tg = this.tile.nearby(i);
+            if(tg == null || !tg.solid()) continue;
+            Fires.create(this.tile.nearby(i));
+        }
         if(!Vars.headless){
             meltFx.at(this.x, this.y);
             liquifyFx.at(this.x, this.y);
@@ -233,3 +238,5 @@ const diriumcrucible = clib.extend(GenericCrafter, GenericCrafter.GenericCrafter
 });
 
 diriumcrucible.craftEffect = diriumFx;
+diriumcrucible.ambientSound = Sounds.techloop;
+diriumcrucible.ambientSoundVolume = 0.02;
