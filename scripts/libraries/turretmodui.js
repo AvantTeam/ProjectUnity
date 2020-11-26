@@ -669,7 +669,7 @@ partsConfig format:
 	...
 ]
  */
-function applyModularConstructorUI(table, partssprite, spritew, spriteh, partsConfig, maxw, maxh, preconfig) {
+function applyModularConstructorUI(table, partssprite, spritew, spriteh, partsConfig, maxw, maxh, preconfig,categories) {
 	//preinit 
 	for (let i = 0; i < partsConfig.length; i++) {
 		partsConfig[i].id = i;
@@ -696,10 +696,11 @@ function applyModularConstructorUI(table, partssprite, spritew, spriteh, partsCo
 			}
 			pinfo.connOutList = tmp;
 		}
+		pinfo.texRegion = _getRegionRect(partssprite, pinfo.tx, pinfo.ty, pinfo.tw, pinfo.th, spritew, spriteh);
 	}
 	
 	
-	
+	let currentCat = "";
 	
 	let modelement = getModularConstructorUI(400, partssprite,partsConfig,preconfig, maxw, maxh);
 	let itemcache = {};
@@ -711,21 +712,22 @@ function applyModularConstructorUI(table, partssprite, spritew, spriteh, partsCo
 			for (let i = 0; i < partsConfig.length; i++) {
 				let pinfo = partsConfig[i];
 				if(pinfo.cannotPlace){
-					pinfo.texRegion = _getRegionRect(partssprite, pinfo.tx, pinfo.ty, pinfo.tw, pinfo.th, spritew, spriteh);
+					continue;
+				}
+				if(pinfo.category!=currentCat){
 					continue;
 				}
 				scrolltbl.row();
 				addConsButton(scrolltbl, cons((butt) => {
 						butt.top().left();
 						butt.margin(12);
-
 						butt.defaults().left().top();
 						butt.add(pinfo.name).size(170, 45); //name
+						
 						butt.row();
+						
 						butt.table(cons((toptbl) => {
-							let texreg = _getRegionRect(partssprite, pinfo.tx, pinfo.ty, pinfo.tw, pinfo.th, spritew, spriteh);
-							pinfo.texRegion = texreg;
-							toptbl.add(new BorderImage(texreg, 2)).size(40 - 4).padTop(-4).padLeft(-4).padRight(4);
+							toptbl.add(new BorderImage(pinfo.texRegion, 2)).size(40 - 4).padTop(-4).padLeft(-4).padRight(4);
 							
 							toptbl.button(Tex.whiteui, Styles.clearTransi, 50, run(() => {
 									displayPartInfo(pinfo)
@@ -733,7 +735,6 @@ function applyModularConstructorUI(table, partssprite, spritew, spriteh, partsCo
 							
 						})).marginLeft(4);
 
-						//butt.image(_getRegionRect(partssprite,pinfo.tx,pinfo.ty,pinfo.tw,pinfo.th,spritew,spriteh));  //part sprite
 						butt.row();
 
 						butt.add("[accent]Cost").padBottom(4);
@@ -746,7 +747,10 @@ function applyModularConstructorUI(table, partssprite, spritew, spriteh, partsCo
 								}
 								bottbl.image(itemcache[cst.name].icon(Cicon.small)).left();
 								bottbl.add("[gray]" + Math.floor(cst.amount * costinc)).padLeft(2).left().padRight(4);
-								bottbl.row();
+								
+								if(cstitem%2==1){
+									bottbl.row();
+								}
 							}
 						}));
 
@@ -762,6 +766,29 @@ function applyModularConstructorUI(table, partssprite, spritew, spriteh, partsCo
 	let rebuildParts = run(() => partSelectCons.get(parts));
 	let pane = new ScrollPane(parts, Styles.defaultPane);
 	
+	let prevChecked = null;
+	let catTable = new Table();
+	catTable.margin(12);
+	catTable.top().left();
+	for(let i in categories){
+		let catbutt = new ImageButton(categories[i], Styles.clearToggleTransi);
+		const ft = i;
+		catbutt.clicked(() => {
+			currentCat = ft;
+			rebuildParts.run();
+			catbutt.setChecked(true);
+			if(prevChecked){
+				prevChecked.setChecked(false);
+			}
+			prevChecked = catbutt;
+		});
+		catTable.add(catbutt);
+	}
+	rebuildParts.run();
+	let leftside = new Table();
+	leftside.add(catTable).align(Align.left);
+	leftside.row();
+	leftside.add(pane).minWidth(200).maxHeight(400).align(Align.top).get().setScrollingDisabled(true, false);
 	
 	let costCons = cons((csttbl) => {
 		csttbl.clearChildren();
@@ -785,14 +812,14 @@ function applyModularConstructorUI(table, partssprite, spritew, spriteh, partsCo
 	let totals = new Table();
 	let rebuildTotals = run(() => costCons.get(totals));
 	
-	table.add(pane).minWidth(150).maxHeight(400).align(Align.top).get().setScrollingDisabled(true, false);
+	table.add(leftside).minWidth(150).align(Align.top);
 	table.add(modelement).size(750, 400);
 	table.add(totals).minWidth(100).maxHeight(400).align(Align.top);
 	modelement.setOnTileAction(run(() => {
 			rebuildParts.run();
 			rebuildTotals.run();
 		}));
-	rebuildParts.run();
+	
 	rebuildTotals.run();
 	
 	return modelement;
@@ -887,8 +914,9 @@ const _ModularBuild ={
 			this.applyStats(this._currentStats);
 		}
     },
-	
-	
+	getPartsCatagories(){
+		
+	},
 	getPartsConfig(){
 		
 	},
@@ -912,7 +940,12 @@ const _ModularBuild ={
 			let dialog = new BaseDialog("Edit Blueprint");
             dialog.setFillParent(false);
 			var patlas = this.getPartsAtlas();
-			let mtd = applyModularConstructorUI(dialog.cont,patlas,Math.round(patlas.width/32),Math.round(patlas.height/32),this.getPartsConfig(),this.block.getGridWidth(),this.block.getGridHeight(),this._blueprint);
+			let mtd = applyModularConstructorUI(dialog.cont,patlas,Math.round(patlas.width/32),Math.round(patlas.height/32),
+												this.getPartsConfig(),
+												this.block.getGridWidth(),
+												this.block.getGridHeight(),
+												this._blueprint,
+												this.getPartsCatagories());
 			dialog.buttons.button("@ok", () => {
 				this.configure(mtd.getPackedSave());
 				dialog.hide();
