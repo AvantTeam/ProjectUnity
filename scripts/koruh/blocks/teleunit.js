@@ -127,12 +127,18 @@ teleunit.buildType = prov(() => extend(Building, {
         player.unit().set(dest.x, dest.y);
         player.unit().snapInterpolation();
         if(Vars.player != null && player == Vars.player) Core.camera.position.set(player);
-        if(!Vars.headless) this.effects(dest, player.unit().hitSize * 1.7);
+        if(!Vars.headless) this.effects(dest, player.unit().hitSize * 1.7, player == Vars.player);
     },
-    effects(dest, hitSize){
+    effects(dest, hitSize, isPlayer){
         //TODO: EoD-style total unit effect
-        Sounds.plasmadrop.at(this.x, this.y, Mathf.random() * 0.2 + 1);
-        Sounds.plasmadrop.at(dest.x, dest.y, Mathf.random() * 0.2 + 0.7);
+        if(isPlayer){
+            Sounds.plasmadrop.at(dest.x, dest.y, Mathf.random() * 0.2 + 1);
+            Sounds.lasercharge2.at(this.x, this.y, Mathf.random() * 0.2 + 0.7);
+        }
+        else{
+            Sounds.plasmadrop.at(this.x, this.y, Mathf.random() * 0.2 + 1);
+            Sounds.lasercharge2.at(dest.x, dest.y, Mathf.random() * 0.2 + 0.7);
+        }
         tpOut.at(dest.x, dest.y, hitSize);
         tpIn.at(this.x, this.y, hitSize);
     }
