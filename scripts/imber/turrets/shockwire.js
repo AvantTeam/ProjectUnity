@@ -67,7 +67,7 @@ shockBeam.color = Pal.surge.cpy();
 shockBeam.hittable = false;
 shockBeam.hitEffect = Fx.hitLiquid;
 
-const shockwire = extendContent(LaserTurret, "shockwire", {
+const shockwire = extendContent(PowerTurret, "shockwire", {
 	setStats(){
 		this.super$setStats();
 
