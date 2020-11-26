@@ -58,7 +58,7 @@ teleunit.buildType = prov(() => extend(Building, {
         Draw.reset();
     },
     drawSelect(){
-        Draw.color(this.consValid() && this.enabled ? Pal.accent : Pal.darkMetal);
+        Draw.color(this.consValid() && this.enabled ? (this.inRange(Vars.player) ? diriumColor : Pal.accent) : Pal.darkMetal);
         var length = Vars.tilesize * teleunit.size / 2 + 3 + Mathf.absin(Time.time(), 5, 2);
 
         Draw.rect(teleunit.arrowRegion, this.x + length, this.y, (0 + 2) * 90);
@@ -99,7 +99,7 @@ teleunit.buildType = prov(() => extend(Building, {
         return barr;
     },
     inRange(player){
-        return this.enabled && player.unit() != null && !player.unit().dead && Math.abs(player.unit().x - this.x) <= 1.8 * Vars.tilesize && Math.abs(player.unit().y - this.y) <= 1.7 * Vars.tilesize;
+        return this.enabled && player.unit() != null && !player.unit().dead && Math.abs(player.unit().x - this.x) <= 2.5 * Vars.tilesize && Math.abs(player.unit().y - this.y) <= 2.5 * Vars.tilesize;
     },
     shouldShowConfigure(player){
         return this.consValid() && this.inRange(Vars.player);
@@ -111,7 +111,7 @@ teleunit.buildType = prov(() => extend(Building, {
         return false;
     },
     configured(unit, value){
-        if(unit != null && unit.isPlayer()) this.tpPlayer(unit.getPlayer());
+        if(unit != null && unit.isPlayer() && !(unit instanceof BlockUnitc)) this.tpPlayer(unit.getPlayer());
     },
     tpPlayer(player){
         var barr = this.getDestList();
