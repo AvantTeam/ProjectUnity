@@ -274,20 +274,10 @@ const customLightningA = prov(() => {
 
 module.exports = {
 	addMoltenBlock(build){
-        var contains = false;
-        var tmp = null;
-        
-        vapourizeQueue.each(buildq => {
-            contains = buildq.build == build;
-            if(contains){
-                tmp = buildq;
-                return;
-            }
-        });
-        
-        if(!contains){
+        var tmp = vapourizeQueue.find(bq => bq.build == build);
+        if(tmp == null){
             vapourizeQueue.add(new BuildQueue(build));
-        }else if(tmp != null){
+        }else{
             tmp.time = 14.99;
         };
 	},
