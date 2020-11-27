@@ -2,7 +2,7 @@ requirements:[
     lead/22
     silicon/10
     phase-fabric/32
-    dirium/16
+    dirium/32
 ]
 category:distribution
 itemCapacity:10

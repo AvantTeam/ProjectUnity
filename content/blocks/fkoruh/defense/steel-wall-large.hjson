@@ -1,0 +1,8 @@
+health: 1760
+requirements: [
+    steel/24
+]
+
+category: defense
+size: 2
+buildVisibility: shown

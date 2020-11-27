@@ -1,0 +1,23 @@
+{
+	"size": 2,
+	"health": 1000,
+	"range": 160,
+	"reloadTime": 80,
+  "consumes":{
+    "power": 1
+  },
+	"shootCone": 1,
+	"inaccuracy": 0,
+	"targetAir": true,
+	"requirements": [
+    {"item": "copper", "amount": 190},
+		{"item": "silicon", "amount": 110},
+		{"item": "dense-alloy", "amount": 35}
+	],
+	"category": "turret",
+  "hasLiquids": true,
+  "liquidCapacity": 15,
+  "consumesLiquid": true,
+  "hasPower": true,
+  "extinguish": false
+}

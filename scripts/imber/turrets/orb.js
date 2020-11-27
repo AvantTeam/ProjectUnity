@@ -35,7 +35,7 @@ orb.trailEffect = effects.imberOrbTrail;
 orb.trailChance = 0.4;
 orb.scanRadius = 5 * Vars.tilesize;
 
-const orbTurret = extendContent(ChargeTurret, "orb", {});
+const orbTurret = extendContent(PowerTurret, "orb", {});
 orbTurret.shootType = orb;
 orbTurret.shootSound = Sounds.laser;
 orbTurret.heatColor = Pal.turretHeat;

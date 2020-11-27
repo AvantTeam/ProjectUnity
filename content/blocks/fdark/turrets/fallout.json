@@ -16,7 +16,7 @@
 	"heatColor": "e04300",
 	"rotateSpeed": 3.5,
 	"loopSound": "beam",
-	"loopSoundVolume": 2.2,
+	"loopSoundVolume": 2.1,
 	"hasLiquids": true,
 	"requirements": [
 		{ "item": "copper", "amount": 450 },

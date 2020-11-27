@@ -20,12 +20,13 @@ const chargeBegin = new Effect(40, e => {
 	Fill.circle(e.x, e.y, e.fin() * 6);
 });
 
-const oracle = extendContent(ChargeTurret, "oracle", {});
+const oracle = extendContent(PowerTurret, "oracle", {});
 oracle.chargeEffect = charge;
+oracle.chargeTime = 40;
 oracle.chargeBeginEffect = chargeBegin;
 
 oracle.buildType = () => {
-	var oracleEntity = extendContent(ChargeTurret.ChargeTurretBuild, oracle, {
+	var oracleEntity = extendContent(PowerTurret.PowerTurretBuild, oracle, {
 		setVecA(){
 			this._vectorTemp = new Vec2();
 		},

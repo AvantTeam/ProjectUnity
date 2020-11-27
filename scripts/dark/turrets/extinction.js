@@ -5,6 +5,7 @@ const exefLib = this.global.unity.extraeffects;
 const tempVec = new Vec2();
 const tempSeq = new Seq();
 const tempColor = new Color();
+const pow6In = new Interp.PowIn(6);
 
 const evaporateDeath = new Effect(64, 800, e => {
 	var oz = Draw.z();
@@ -27,15 +28,15 @@ const extinctionLaser = extendContent(ContinuousLaserBulletType, 770, {
 		this.super$update(b);
 		var realLength = Damage.findLaserLength(b, this.length);
 		
-		for(var i = 0; i < 2; i++){
-			if(Mathf.chanceDelta(0.7)){
+		for(var i = 0; i < 4; i++){
+			if(Mathf.chanceDelta(0.5)){
 				Lightning.create(b.team, Color.valueOf("ff9c5a"), 76, b.x, b.y, b.rotation(), Mathf.round((this.length / 8) + Mathf.random(2, 7)));
 			};
 		};
 
 		for(var i = 0; i < 4; i++){
 			if(Mathf.chanceDelta(0.8)){
-				var lLength = Mathf.random(5, 12);
+				var lLength = Mathf.random(10, 17);
 				Tmp.v2.trns(b.rotation(), Mathf.random(0, Math.max(realLength - lLength * 8, 4)));
 				Lightning.create(b.team, Color.valueOf("ff9c5a"), 46, b.x + Tmp.v2.x, b.y + Tmp.v2.y, b.rotation(), Mathf.round(lLength));
 			};
@@ -131,7 +132,7 @@ const extinctionLaser = extendContent(ContinuousLaserBulletType, 770, {
 	}
 });
 extinctionLaser.length = 560;
-extinctionLaser.strokes = [2 * 1.9, 1.5 * 1.9, 1 * 1.9, 0.3 * 1.9];
+extinctionLaser.strokes = [2 * 2.2, 1.5 * 2.2, 1 * 2.2, 0.3 * 2.2];
 
 const extinction = extendContent(LaserTurret, "extinction", {
 	load(){
@@ -149,8 +150,8 @@ extinction.heatDrawer = tile => {
 	var g = Interp.pow3In.apply(tile.heat) + ((1 - Interp.pow3In.apply(tile.heat)) * 0.12);
 	var b = pow6In.apply(tile.heat);
 	var a = Interp.pow2Out.apply(tile.heat);
-	tmpCol.set(r, g, b, a);
-	Draw.color(tmpCol);
+	tempColor.set(r, g, b, a);
+	Draw.color(tempColor);
 
 	Draw.blend(Blending.additive);
 	Draw.rect(extinction.heatRegion, tile.x + extinction.tr2.x, tile.y + extinction.tr2.y, tile.rotation - 90);
