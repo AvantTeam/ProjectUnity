@@ -1,11 +1,18 @@
 const ais = this.global.unity.ai;
 
+const malakhimBullet = new LaserBoltBulletType(5.2, 10);
+malakhimBullet.lifetime = 35;
+malakhimBullet.healPercent = 5.5;
+malakhimBullet.collidesTeam = true;
+malakhimBullet.backColor = Pal.heal;
+malakhimBullet.frontColor = Color.white;
+
 const malakhimWeapon = new Weapon("heal-weapon-mount");
 malakhimWeapon.rotate = true;
 malakhimWeapon.x = 11;
 malakhimWeapon.y = -7;
 malakhimWeapon.reload = 10;
-malakhimWeapon.bullet = Bullets.healBullet;
+malakhimWeapon.bullet = malakhimBullet;
 
 const malakhim = extendContent(UnitType, "malakhim", {
 	healStrength(){
