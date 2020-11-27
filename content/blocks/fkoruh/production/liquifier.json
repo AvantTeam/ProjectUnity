@@ -1,0 +1,25 @@
+{
+	"outputLiquid": {"liquid": "lava", "amount": 0.1},
+	"size": 1,
+  "health": 100,
+	"hasLiquids": true,
+	"hasPower": true,
+	"hasItems": true,
+	"craftTime": 30,
+	"consumes": {
+    "items": {
+			"items": [
+        {"item": "stone", "amount": 6},
+				{"item": "pyratite", "amount": 2}
+			]
+		},
+    "power": 3.7
+	},
+	"requirements": [
+    {"item": "titanium", "amount": 30},
+    {"item": "silicon", "amount": 15},
+    {"item": "steel", "amount": 10}
+	],
+	"category": "crafting",
+	"research": "steel"
+}

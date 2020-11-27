@@ -116,6 +116,33 @@ steelsmelter.buildType = () => extendContent(GenericSmelter.SmelterBuild, steels
     }
 });
 
+const liquifier = extendContent(GenericCrafter, "liquifier", {
+    load(){
+        this.super$load();
+        this.topRegion = Core.atlas.find(this.name + "-top");
+    }
+});
+
+liquifier.updateEffect = Fx.fuelburn;
+
+liquifier.buildType = () => extendContent(GenericCrafter.GenericCrafterBuild, liquifier, {
+    draw(){
+        Draw.rect(liquifier.region, this.x, this.y);
+        if(this.warmup > 0){
+            Draw.color(lavasmelter.lava.color, this.liquids.get(lavasmelter.lava) / liquifier.liquidCapacity);
+            Draw.rect(liquifier.topRegion, this.x, this.y);
+            Draw.color();
+        }
+    },
+    consume(){
+        this.super$consume();
+        if(!Vars.net.client() && Mathf.chance(0.2)) this.configureAny(null);
+    },
+    configured(unit, value){
+        if(unit == null) Fires.create(this.tile);
+    }
+});
+
 
 const lavaColor = Color.valueOf("ff2a00");
 const lavaColor2 = Color.valueOf("ffcc00");
