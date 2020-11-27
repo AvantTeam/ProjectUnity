@@ -4,8 +4,8 @@ requirements: [
     silicon/250,
     dense-alloy/120,
     titanium/100,
-    steel/30,
-    dirium/10
+    steel/60,
+    dirium/30
 ]
 consumes: {
     power: 10
