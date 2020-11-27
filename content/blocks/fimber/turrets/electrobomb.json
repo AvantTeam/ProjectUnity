@@ -1,0 +1,20 @@
+{
+	"size": 5,
+	"health": 1320,
+	"range": 400,
+	"minRange": 60,
+	"reloadTime": 320,
+	"coolantMultiplier": 2,
+	"shootCone": 20,
+	"shots": 1,
+	"inaccuracy": 0,
+	"targetAir": false,
+	"requirements": [
+		{"item": "titanium", "amount": 360},
+		{"item": "thorium", "amount": 630},
+		{"item": "silicon", "amount": 240},
+		{"item": "spark-alloy", "amount": 420},
+	],
+	"category": "turret",
+	"research": "plasma"
+}
