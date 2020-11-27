@@ -85,7 +85,7 @@ const shieldGenerator = lib.extend(ForceProjector, ForceProjector.ForceBuild, "s
         }
 
         if(this.buildup > 0){
-            Draw.alpha(this.buildup / this.breakage * 0.6);//lower alpha color
+            Draw.alpha(this.buildup / this.breakage * 0.6 * Mathf.absin(Time.time(), 8, 1));//lower alpha color
             Draw.blend(Blending.additive);
             Draw.rect(this.topRegion, this.x, this.y);
             Draw.blend();

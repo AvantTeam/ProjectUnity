@@ -23,12 +23,12 @@ const deflectGenerator = lib.extend(ForceProjector, ForceProjector.ForceBuild, "
         }
     ],
     drawPlace(x, y, rotation, valid){
-        var fin = (Time.globalTime() % 90) / 90;
+        var fin = (Time.time() % 90) / 90;
         Draw.color(this.exp0Color);
         Lines.stroke(1.5 * (1 - fin));
         Lines.circle(x * Vars.tilesize + this.offset, y * Vars.tilesize + this.offset, this.radius + fin * 1.5 * this.maxLevel);
 
-        Draw.color(Pal.lancerLaser, colorOfDirium, 1 - fin);
+        Draw.color(Pal.lancerLaser, colorOfDirium, fin);
         Lines.stroke(1.5);
         Lines.circle(x * Vars.tilesize + this.offset, y * Vars.tilesize + this.offset, this.radius);
         Draw.color();
@@ -116,19 +116,18 @@ const deflectGenerator = lib.extend(ForceProjector, ForceProjector.ForceBuild, "
     },
     draw(){
         this.super$draw();
-
-        Draw.mixcol(colorOfDirium, this.levelf() * Mathf.absin(Time.time(), 8, 1));
-        Draw.rect(deflectGenerator.topRegion, this.x, this.y);
-
         if(this.drawer != null){
             this.drawer.set(this.x, this.y);
         }
 
         if(this.buildup > 0){
-            Draw.alpha(this.buildup / this.breakage * 0.6);
+            Draw.color();
+            Draw.mixcol(colorOfDirium, this.levelf() * Mathf.absin(Time.time(), 29, 1));
+            Draw.alpha(this.buildup / this.breakage * 0.6 * Mathf.absin(Time.time(), 8, 1));
             Draw.blend(Blending.additive);
             Draw.rect(deflectGenerator.topRegion, this.x, this.y);
             Draw.blend();
+            Draw.mixcol();
             Draw.reset();
         }
     },
@@ -141,7 +140,7 @@ const deflectGenerator = lib.extend(ForceProjector, ForceProjector.ForceBuild, "
 
             Draw.z(Layer.shields);
 
-            Draw.color(colorOfDirium, Color.white.cpy(), Mathf.clamp(this.hit));
+            Draw.color(Tmp.c1.set(Pal.lancerLaser).lerp(colorOfDirium, this.levelf()), Color.white.cpy(), Mathf.clamp(this.hit));
             if(radius > 4){
                 if(Core.settings.getBool("animatedshields")){
                     Fill.poly(this.x, this.y, 40, radius);
