@@ -16,6 +16,10 @@ const shieldGenerator = lib.extend(ForceProjector, ForceProjector.ForceBuild, "s
         }
     ],
     drawPlace(x, y, rotation, valid){
+        var fin = (Time.globalTime() % 90) / 90;
+        Draw.color(this.exp0Color);
+        Lines.stroke(1.5 * (1 - fin));
+        Lines.circle(x * Vars.tilesize + this.offset, y * Vars.tilesize + this.offset, this.radius + fin * 1.5 * this.maxLevel);
         Draw.color(Pal.lancerLaser);
         Lines.stroke(1.5);
         Lines.circle(x * Vars.tilesize + this.offset, y * Vars.tilesize + this.offset, this.radius);
