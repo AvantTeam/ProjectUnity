@@ -1,6 +1,4 @@
-type: Wall
-
-health: 160
+health: 200
 requirements: [
     stone/6
 ]

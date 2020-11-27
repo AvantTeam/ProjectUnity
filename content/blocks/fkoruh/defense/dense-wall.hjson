@@ -1,6 +1,6 @@
-health: 640
+health: 360
 requirements: [
-    steel/6
+    dense-alloy/6
 ]
 
 category: defense

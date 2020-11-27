@@ -3,7 +3,7 @@ requirements:[
     titanium/80
     silicon/90
     phase-fabric/64
-    dirium/32
+    dirium/48
 ]
 category:units
 hasItems:false

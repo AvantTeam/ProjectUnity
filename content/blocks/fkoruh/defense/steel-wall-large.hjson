@@ -1,8 +1,8 @@
-type: Wall
-
-health: 1280
+health: 2560
 requirements: [
     steel/24
 ]
 
 category: defense
+size: 2
+buildVisibility: shown

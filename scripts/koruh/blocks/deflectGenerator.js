@@ -23,10 +23,19 @@ const deflectGenerator = lib.extend(ForceProjector, ForceProjector.ForceBuild, "
         }
     ],
     drawPlace(x, y, rotation, valid){
-        Draw.color(colorOfDirium);
+        var fin = (Time.time() % 90) / 90;
+        Draw.color(this.exp0Color);
+        Lines.stroke(1.5 * (1 - fin));
+        Lines.circle(x * Vars.tilesize + this.offset, y * Vars.tilesize + this.offset, this.radius + fin * 2 * this.maxLevel);
+
+        Draw.color(Pal.lancerLaser, colorOfDirium, fin);
         Lines.stroke(1.5);
         Lines.circle(x * Vars.tilesize + this.offset, y * Vars.tilesize + this.offset, this.radius);
         Draw.color();
+    },
+    load(){
+        this.super$load();
+        this.regionAlt = Core.atlas.find(this.name + "-1");
     }
 }, {
     deflectChance: 0.2,
@@ -112,18 +121,21 @@ const deflectGenerator = lib.extend(ForceProjector, ForceProjector.ForceBuild, "
     draw(){
         this.super$draw();
 
-        Draw.mixcol(colorOfDirium, this.levelf() * Mathf.absin(Time.time(), 8, 1));
-        Draw.rect(deflectGenerator.topRegion, this.x, this.y);
+        Draw.alpha(this.levelf());
+        Draw.rect(deflectGenerator.regionAlt, this.x, this.y);
 
         if(this.drawer != null){
             this.drawer.set(this.x, this.y);
         }
 
         if(this.buildup > 0){
+            Draw.color();
+            Draw.mixcol(colorOfDirium, this.levelf());
             Draw.alpha(this.buildup / this.breakage * 0.6);
             Draw.blend(Blending.additive);
             Draw.rect(deflectGenerator.topRegion, this.x, this.y);
             Draw.blend();
+            Draw.mixcol();
             Draw.reset();
         }
     },
@@ -136,7 +148,7 @@ const deflectGenerator = lib.extend(ForceProjector, ForceProjector.ForceBuild, "
 
             Draw.z(Layer.shields);
 
-            Draw.color(colorOfDirium, Color.white.cpy(), Mathf.clamp(this.hit));
+            Draw.color(Tmp.c1.set(Pal.lancerLaser).lerp(colorOfDirium, this.levelf()), Color.white, Mathf.clamp(this.hit));
             if(radius > 4){
                 if(Core.settings.getBool("animatedshields")){
                     Fill.poly(this.x, this.y, 40, radius);
@@ -152,16 +164,25 @@ const deflectGenerator = lib.extend(ForceProjector, ForceProjector.ForceBuild, "
         Draw.reset();
     },
     levelUp(int){
-        deflectGenerator.consumes.power(2 + this.totalLevel());
+        //deflectGenerator.consumes.power(2 + this.totalLevel());이거 안됨 다른 방법을 찾아봐요
         this.buildup = 0;
         this.broken = false;
-        this.buildingRadius += 2;
-        if(this.deflectChange <= 1){ //...to 8lv
-            this.deflectChance += 0.1;
-        }else{//9 ~ 30, total +21 damage
-            this.deflectDamage += 1;
+        this.buildingRadius = 60 + int * 2;
+        if(this.deflectChance <= 1){ //...to 8lv
+            this.deflectChance = 0.2 + int * 0.1;
+        }else{//9 ~ 30, total +30 damage
+            this.deflectDamage = int;
         }
-    }
+    },
+    customRead(read, revision){
+        this.buildingRadius = 60 + this.totalLevel() * 2;
+        if(this.totalLevel() <= 8){
+            this.deflectChance = 0.2 + this.totalLevel() * 0.1;
+        }else{
+            this.deflectDamage = this.totalLevel();
+        }
+    },
+    customWrite(write){}
 });
 deflectGenerator.radius = 60;
 deflectGenerator.buildVisibility = BuildVisibility.shown;

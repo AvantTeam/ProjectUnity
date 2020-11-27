@@ -16,7 +16,9 @@
 	"hasLiquids": true,
 	"heatColor": "ffffff",
 	"rotateSpeed": 1.9,
-	"loopSoundVolume": 2.4,
+    "shootSound": "laserbig",
+    "loopSound": "beam",
+	"loopSoundVolume": 2.2,
 	"expanded": true,
 	"requirements": [
 		{ "item": "copper", "amount": 1250 },
