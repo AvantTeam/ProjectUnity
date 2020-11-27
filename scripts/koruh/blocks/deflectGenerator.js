@@ -166,7 +166,7 @@ const deflectGenerator = lib.extend(ForceProjector, ForceProjector.ForceBuild, "
             this.deflectDamage = int;
         }
     },
-    custonRead(read, revision){
+    customRead(read, revision){
         this.super$read(read, revision);
         this.buildingRadius = 60 + this.totalLevel() * 2;
         if(this.totalLevel() <= 8){
@@ -174,7 +174,8 @@ const deflectGenerator = lib.extend(ForceProjector, ForceProjector.ForceBuild, "
         }else{
             this.deflectDamage = this.totalLevel();
         }
-    }
+    },
+    customWrite(write){}
 });
 deflectGenerator.radius = 60;
 deflectGenerator.buildVisibility = BuildVisibility.shown;
