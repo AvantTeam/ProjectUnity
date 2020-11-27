@@ -169,7 +169,7 @@ chargeLaser.fragBullet = chargeLaserFrag;
 chargeLaser.shootEffect = Fx.hitLiquid;
 
 
-const chargeLaserTurret = lib.extend(ChargeTurret, ChargeTurret.ChargeTurretBuild, "charge-laser-turret", {
+const chargeLaserTurret = lib.extend(PowerTurret, PowerTurret.PowerTurretBuild, "charge-laser-turret", {
     maxLevel: 30,
     expFields: [
         {
@@ -210,7 +210,7 @@ const chargeLaserTurret = lib.extend(ChargeTurret, ChargeTurret.ChargeTurretBuil
             });
         }
 
-        this.shooting = true;
+        this.charging = true;
 
         Time.run(chargeLaserTurret.chargeTime, () => {
             if(!this.isValid()) return;
@@ -219,7 +219,7 @@ const chargeLaserTurret = lib.extend(ChargeTurret, ChargeTurret.ChargeTurretBuil
             this.heat = 1;
             this.bullet(ammo, this.rotation + Mathf.range(chargeLaserTurret.inaccuracy));
             this.effects();
-            this.shooting = false;
+            this.charging = false;
         });
     },
     effects(){
