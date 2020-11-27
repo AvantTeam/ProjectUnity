@@ -20,5 +20,5 @@
 		{"item": "imberium", "amount": 20},
 	],
 	"category": "turret",
-	"research": "cyclone"
+	"research": "unity-imberium"
 }

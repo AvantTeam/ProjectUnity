@@ -17,5 +17,5 @@
 		{"item": "spark-alloy", "amount": 65}
 	],
 	"category": "turret",
-	"research": "shockwire"
+	"research": "unity-spark-alloy"
 }

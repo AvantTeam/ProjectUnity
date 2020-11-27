@@ -2,5 +2,8 @@
 	"color": "f6ff7d",
 	"radioactivity": 0.6,
 	"hardness": 3,
-	"cost": 1.4
+	"cost": 1.4,
+	"research": {
+		"parent": "surge-alloy"
+	}
 }

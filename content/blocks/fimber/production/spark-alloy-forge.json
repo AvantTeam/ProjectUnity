@@ -25,7 +25,7 @@
 		{"item": "surge-alloy", "amount": 100}
 	],
 	"category": "crafting",
-	"research": "alloy-smelter",
+	"research": "imberium",
 	"ambientSound": "machine",
 	"ambientSoundVolume": 0.6
 }
