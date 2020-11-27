@@ -1,5 +1,7 @@
 const effects = this.global.unity.effects;
 
+const plasmaFrag = Vars.content.getByName(ContentType.block, "unity-plasma").shootType.fragBullet;
+
 const surgeBomb = new Effect(40, 100, e => {
 	Draw.color(Pal.surge);
 	Lines.stroke(e.fout() * 2);
@@ -20,14 +22,17 @@ const surgeBomb = new Effect(40, 100, e => {
 
 const bullet = extend(BasicBulletType, {
 	despawned(b){
+		this.super$despawned(b);
+		this.hit(b);
+
 		for(var i = 0; i < 10; i++){
 			Lightning.create(b, Pal.surge, b.splashDamage / 5, b.x, b.y, Mathf.random(0, 360), 20);
 		}
 	}
 });
 
-bullet.sprite = "large-bomb";
-bullet.width = bullet.height = 120/4;
+bullet.sprite = Core.atlas.find("large-bomb");
+bullet.width = bullet.height = 30;
 bullet.maxRange = 30;
 bullet.ignoreRotation = true;
 bullet.backColor = Pal.surge;
@@ -44,15 +49,34 @@ bullet.hitEffect = Fx.massiveExplosion;
 bullet.keepVelocity = false;
 bullet.spin = 2;
 bullet.shrinkX = bullet.shrinkY = 0.7;
-bullet.speed = 4;
-bullet.drag = 0.02;
+bullet.speed = 7;
 bullet.collides = false;
-bullet.splashDamage = 280;
+bullet.splashDamage = 620;
 bullet.splashDamageRadius = 120;
+bullet.fragBullet = plasmaFrag;
+bullet.fragBullets = 8;
+bullet.fragLifeMin = 0.8;
+bullet.fragLifeMax = 1.1;
+bullet.scaleVelocity = true;
+//used for display only
+bullet.damage = 620;
 
-const electrobombTurret = extendContent(ItemTurret, "electrobomb", {});
-electrobombTurret.ammo(Vars.content.getByName(ContentType.item, "unity-imberium"), electrobomb);
-electrobomb.consumes.powerCond(9, electrobomb.buildType.isActive());
+const electrobombTurret = extendContent(ItemTurret, "electrobomb", {
+	load(){
+		this.super$load();
+		this.baseRegion = Core.atlas.find("unity-block-5")
+	},
+
+	init(){
+		this.super$init();
+
+		this.ammo(
+			Vars.content.getByName(ContentType.item, "unity-spark-alloy"), bullet
+		);
+	}
+});
+
+electrobombTurret.consumes.powerCond(10, boolf(b => b.isActive()))
 electrobombTurret.shootSound = Sounds.laser;
 electrobombTurret.shootEffect = Fx.none;
 electrobombTurret.smokeEffect = Fx.none;
