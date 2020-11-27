@@ -1,8 +1,30 @@
+const Class = java.lang.Class;
+
+const lightnings = new IntMap();
+const getLightnings = id => {
+    return lightnings.get(id, prov(() => {
+        const seq = new Seq(true, lightningSpawnAbility.lightningCount, Class.forName("arc.math.geom.Vec2"));
+        seq.setSize(lightningSpawnAbility.lightningCount);
+        
+        return seq;
+    }));
+};
+
 const lightningSpawnAbility = extend(Ability, {
     update(unit){
+        //update position
+        for(let i = 0; i < this.lightningCount; i++){
+            if(getLightnings(unit.id).get(i) == null){
+                getLightnings(unit.id).set(i, new Vec2());
+            }
+
+            let lightning = getLightnings(unit.id).get(i);
+            lightning.trns((360 * i / this.lightningCount) + (Time.time() * this.rotateSpeed * Mathf.signs[unit.id % 2]), this.lightningOffset * this.phase).add(unit);
+        }
+
         if(this.timer <= 0){
             for(let i = 0; i < this.lightningCount; i++){
-                let lightning = this.lightnings[i];
+                let lightning = getLightnings(unit.id).get(i);
 
                 if(this.phase > 0){
                     let u = Units.closestTarget(unit.team, lightning.x, lightning.y, this.lightningRange);
@@ -23,23 +45,13 @@ const lightningSpawnAbility = extend(Ability, {
             this.timer = Math.max(this.timer - Time.delta, 0);
         };
 
-        //update position
-        for(let i = 0; i < this.lightningCount; i++){
-            if(typeof(this.lightnings[i]) === "undefined"){
-                this.lightnings[i] = new Vec2();
-            }
-
-            let lightning = this.lightnings[i];
-            lightning.trns((360 * i / this.lightningCount) + (Time.time() * this.rotateSpeed * Mathf.signs[unit.id % 2]), this.lightningOffset * this.phase).add(unit);
-        }
-
         this.phase = Mathf.lerpDelta(this.phase, unit.ammof(), this.phaseSpeed);
         this.phase = this.phase < 0.01 ? 0 : this.phase;
     },
 
     draw(unit){
         for(let i = 0; i < this.lightningCount; i++){
-            let lightning = this.lightnings[i];
+            let lightning = getLightnings(unit.id).get(i);
             let region = Core.atlas.find("circle-shadow");
             let r = this.phase * region.width * Draw.scl + this.lightningRadius + (Mathf.sin(Time.time(), 6, 4) * this.phase);
 
@@ -58,7 +70,6 @@ const lightningSpawnAbility = extend(Ability, {
         return Core.bundle.get("ability." + "lightning-spawn-ability");
     }
 });
-lightningSpawnAbility.lightnings = [];
 lightningSpawnAbility.timerTarget = 48;
 lightningSpawnAbility.timer = lightningSpawnAbility.timerTarget;
 lightningSpawnAbility.lightningCount = 8;
