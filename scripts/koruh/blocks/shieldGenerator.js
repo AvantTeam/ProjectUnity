@@ -118,12 +118,12 @@ const shieldGenerator = lib.extend(ForceProjector, ForceProjector.ForceBuild, "s
     },
     levelUp(int){
         shieldGenerator.consumes.power(2 + int);
-        this.buildingRadius = 40 + 1.5 * int;
+        this.buildingRadius = shieldGenerator.radius + 1.5 * int;
     },
-    custonRead(read, revision){
-        this.super$read(read, revision);
+    customRead(read, revision){
         this.buildingRadius = 40 + this.totalLevel() * 1.5;
-    }
+    },
+    customWrite(write){}
 });
 
 shieldGenerator.radius = 40;
