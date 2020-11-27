@@ -1,4 +1,5 @@
 const lib = this.global.unity.exp;
+
 const shieldBreakCircle = new Effect(40, e => {
     Draw.color(Pal.lancerLaser);
     Lines.stroke(3 * e.fout());
@@ -26,24 +27,23 @@ const shieldGenerator = lib.extend(ForceProjector, ForceProjector.ForceBuild, "s
         Draw.color();
     }
 }, {
-    buildingRadius: this.buildingRadius,
+    buildingRadius: 40,
     created(){
         this.super$created();
         this.buildingRadius = shieldGenerator.radius;
     },
     customUpdate(){
-
         this.radscl = Mathf.lerpDelta(this.radscl, this.broken ? 0 : this.warmup, 0.05);
         this.warmup = Mathf.lerpDelta(this.warmup, this.efficiency(), 0.1);
 
         var scale = !this.broken ? shieldGenerator.cooldownNormal : shieldGenerator.cooldownBrokenBase;
         var cons = shieldGenerator.consumes.get(ConsumeType.liquid);
+
         if(this.buildup > 0){
             if(cons.valid(this)){
                 cons.update(this);
                 scale *= (shieldGenerator.cooldownLiquid * (1 + (this.liquids.current().temperature - 0.4) * 0.9));
             }
-
             this.buildup -= this.delta() * scale;
         }
 
@@ -67,11 +67,7 @@ const shieldGenerator = lib.extend(ForceProjector, ForceProjector.ForceBuild, "s
                 Fx.absorb.at(trait);
                 this.paramEntity.hit = 1;
                 this.paramEntity.buildup += trait.damage * this.paramEntity.warmup;
-                if(cons.valid(this)){
-                    this.incExp(scale / 20);
-                } else {
-                    this.incExp(0.1);
-                }
+                this.incExp(cons.valid(this) ? scale / 20 : 0.1);
             }
         };
         var realRadius = this.realRadius();
@@ -121,8 +117,12 @@ const shieldGenerator = lib.extend(ForceProjector, ForceProjector.ForceBuild, "s
         Draw.reset();
     },
     levelUp(int){
-        shieldGenerator.consumes.power(2 + this.totalLevel());
-        this.buildingRadius += 1.5;
+        shieldGenerator.consumes.power(2 + int);
+        this.buildingRadius = 40 + 1.5 * int;
+    },
+    custonRead(read, revision){
+        this.super$read(read, revision);
+        this.buildingRadius = 40 + this.totalLevel() * 1.5;
     }
 });
 

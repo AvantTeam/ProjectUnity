@@ -23,7 +23,12 @@ const deflectGenerator = lib.extend(ForceProjector, ForceProjector.ForceBuild, "
         }
     ],
     drawPlace(x, y, rotation, valid){
-        Draw.color(colorOfDirium);
+        var fin = (Time.globalTime() % 90) / 90;
+        Draw.color(this.exp0Color);
+        Lines.stroke(1.5 * (1 - fin));
+        Lines.circle(x * Vars.tilesize + this.offset, y * Vars.tilesize + this.offset, this.radius + fin * 1.5 * this.maxLevel);
+
+        Draw.color(Pal.lancerLaser, colorOfDirium, 1 - fin);
         Lines.stroke(1.5);
         Lines.circle(x * Vars.tilesize + this.offset, y * Vars.tilesize + this.offset, this.radius);
         Draw.color();
@@ -155,11 +160,20 @@ const deflectGenerator = lib.extend(ForceProjector, ForceProjector.ForceBuild, "
         deflectGenerator.consumes.power(2 + this.totalLevel());
         this.buildup = 0;
         this.broken = false;
-        this.buildingRadius += 2;
-        if(this.deflectChange <= 1){ //...to 8lv
-            this.deflectChance += 0.1;
-        }else{//9 ~ 30, total +21 damage
-            this.deflectDamage += 1;
+        this.buildingRadius = 60 + int * 2;
+        if(this.deflectChance <= 1){ //...to 8lv
+            this.deflectChance = 0.2 + int * 0.1;
+        }else{//9 ~ 30, total +30 damage
+            this.deflectDamage = int;
+        }
+    },
+    custonRead(read, revision){
+        this.super$read(read, revision);
+        this.buildingRadius = 60 + this.totalLevel() * 2;
+        if(this.totalLevel() <= 8){
+            this.deflectChance = 0.2 + this.totalLevel() * 0.1;
+        }else{
+            this.deflectDamage = this.totalLevel();
         }
     }
 });
