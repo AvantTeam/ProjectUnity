@@ -143,6 +143,9 @@ const partinfo = [{
     },
 
 ];
+
+modturretlib.preCalcConnection(partinfo);
+
 let blankobj = graphLib.init();
 graphLib.addGraph(blankobj, rotL.baseTypes.torqueConnector);
 Object.assign(blankobj.build, modturretlib.dcopy2(modturretlib.ModularBuild));
@@ -204,6 +207,7 @@ const chopperTurret = graphLib.finaliseExtend(Block, Building, "chopper", blanko
         this.inertia = 5 + total.inertia;
         this.originalmaxhp = this.maxHealth;
         this.maxHealth = this.originalmaxhp + total.hpinc;
+		this.heal(total.hpinc* this.health/this.originalmaxhp);
 		if(!total.segments) {
 			total.segments = [];
 		}

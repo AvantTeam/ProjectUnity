@@ -390,6 +390,7 @@ const script = [
                 name: "turrets",
                 childs: [
                     "chopper",
+					"modularTurret",
                 ]
             }
         ]

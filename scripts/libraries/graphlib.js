@@ -51,7 +51,7 @@ const _GraphCommonBuild = {
 		return this;
 	},
 	getConnectSidePos(index) {
-        return getConnectSidePos(index, this.block.size, this.rotation);
+        return getConnectSidePos(index, this.block.size, Math.round(this.rotdeg()/90));
     },
 	create(block, team) {
         let building = this.super$create(block, team);
@@ -312,7 +312,7 @@ const _GraphPropsCommon = {
 	parentbuilding:null,
 	parentblock:null,
     getConnectSidePos(index) {
-        return getConnectSidePos(index, this.getBuild().block.size, this.getBuild().rotation);
+        return getConnectSidePos(index, this.getBuild().block.size,  Math.round(this.getBuild().rotdeg()/90));
     },
     canConnect(pos) {
         for (let i = 0; i < this._acceptPorts.length; i++) {
