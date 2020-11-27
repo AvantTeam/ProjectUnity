@@ -1,0 +1,23 @@
+{
+    "speed": 0.22,
+    "rotateSpeed": 1.2,
+    "health": 30000,
+    "armor": 13,
+
+    "visualElevation": 0.5,
+    "allowLegStep": true,
+    "hovering": true,
+
+    "legCount": 6,
+    "legLength": 30,
+    "legExtension": 12,
+    "legSpeed": 0.1,
+    "legTrns": 0.5,
+    "legBaseOffset": 25,
+    "legMoveSpace": 1.2,
+    "legPairOffset": 3,
+    "legSplashDamage": 84,
+    "legSplashRange": 48,
+
+    "hitSize": 64
+}

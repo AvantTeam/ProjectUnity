@@ -296,7 +296,8 @@ const script = [
                     "pedestal",
                     "pilaster",
                     "pylon",
-                    "monument"
+                    "monument",
+                    "colossus"
                 ]
             },
 
