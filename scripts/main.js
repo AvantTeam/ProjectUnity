@@ -202,7 +202,8 @@ const script = [
                     "shockwire",
                     "current",
                     "plasma",
-                    "shielder"
+                    "shielder",
+                    "electrobomb"
                 ]
             },
 
