@@ -9,11 +9,11 @@
     "hovering": true,
 
     "legCount": 6,
-    "legLength": 30,
+    "legLength": 48,
     "legExtension": 12,
     "legSpeed": 0.1,
     "legTrns": 0.5,
-    "legBaseOffset": 25,
+    "legBaseOffset": 15,
     "legMoveSpace": 1.2,
     "legPairOffset": 3,
     "legSplashDamage": 84,
