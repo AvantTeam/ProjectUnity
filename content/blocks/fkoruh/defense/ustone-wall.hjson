@@ -1,0 +1,8 @@
+type: Wall
+
+health: 160
+requirements: [
+    stone/6
+]
+
+category: defense
