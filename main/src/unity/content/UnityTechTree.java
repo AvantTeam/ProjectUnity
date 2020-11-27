@@ -44,17 +44,17 @@ public class UnityTechTree implements ContentList{
                 node(oilLamp);
             });
         });
-        attachNode(Blocks.scorch, () -> {
+        /*attachNode(Blocks.scorch, () -> {
             node(inferno);
-        });
+        });TODO*/
         attachNode(Blocks.arc, () -> {
             node(mage, () -> {
                 node(oracle);
             });
         });
-        attachNode(Blocks.lancer, () -> {
+        /*attachNode(Blocks.lancer, () -> {
             node(laserTurret);
-        });
+        });TODO*/
         attachNode(Blocks.ripple, () -> {
             node(shielder);
         });

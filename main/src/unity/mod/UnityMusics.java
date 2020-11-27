@@ -19,7 +19,7 @@ public class UnityMusics{
         ambientMusic = control.sound.ambientMusic;
         darkMusic = control.sound.darkMusic;
         bossMusic = control.sound.bossMusic;
-        monolithDarkMusics = Seq.with(loadMusic("monolith-dark"));
+        monolithDarkMusics = Seq.with(loadMusic("monolith-dark1"));
         Events.on(SectorLaunchEvent.class, e -> {
             if(e.sector.planet == content.getByName(ContentType.planet, "unity-megalith")){
                 monolithDarkMusics.each(music -> {

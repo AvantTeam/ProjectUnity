@@ -7,8 +7,9 @@ import arc.util.Time;
 import mindustry.content.Fx;
 import mindustry.entities.bullet.BulletType;
 import mindustry.game.Team;
-import mindustry.gen.Bullet;
+import mindustry.gen.*;
 import mindustry.graphics.Drawf;
+import mindustry.world.Block;
 import mindustry.world.Tile;
 import mindustry.world.blocks.distribution.Conveyor;
 import mindustry.world.blocks.distribution.Conveyor.ConveyorBuild;
@@ -17,6 +18,7 @@ import mindustry.world.blocks.production.Incinerator.IncineratorBuild;
 import unity.content.UnityFx;
 import unity.graphics.UnityPal;
 import unity.world.blocks.ExpBuildBase;
+import unity.world.blocks.storage.ExpOrbHandlerBase;
 
 import static mindustry.Vars.*;
 import static unity.content.UnityBullets.exporb;
@@ -42,7 +44,7 @@ public class ExpOrb extends BulletType{
     @Override
     public void draw(Bullet b){
         if(b.fin() > 0.5f && Time.time() % 14 < 7f) return;
-        Draw.color(UnityPal.endColor, Color.white, 0.1f + 0.1f * Mathf.sin(Time.time() * 0.03f + b.id * 2f));
+        Draw.color(UnityPal.expColor, Color.white, 0.1f + 0.1f * Mathf.sin(Time.time() * 0.03f + b.id * 2f));
         Fill.circle(b.x, b.y, 1.5f);
         Lines.stroke(0.5f);
         for(int i = 0; i < 4; i++) Drawf.tri(b.x, b.y, 4f, 4 + 1.5f * Mathf.sin(Time.time() * 0.12f + b.id * 3f), i * 90f + Mathf.sin(Time.time() * 0.04f + b.id * 5f) * 28f);
@@ -52,22 +54,22 @@ public class ExpOrb extends BulletType{
     public void update(Bullet b){
         if(b.moving()) b.time = 0f;
         Tile tile = world.tileWorld(b.x, b.y);
-        //TODO update below condition
-        if(tile.build instanceof ExpBuildBase){
-            ((ExpBuildBase)tile.build).incExp(expAmount);
+        Block block = tile.block();
+        Building build = tile.build;
+        if(build instanceof ExpBuildBase){
+            ExpBuildBase temp = (ExpBuildBase)tile.build;
+            temp.incExp(expAmount * temp.getOrbMultiplier());
             UnityFx.expAbsorb.at(b.x, b.y);
             b.remove();
-        }
-        /*TODO update this
-        else if(false){
-        
-        }*/else if(tile.block() instanceof Incinerator && ((IncineratorBuild)tile.build).heat > 0.5f){
+        }else if(block instanceof ExpOrbHandlerBase){
+
+        }else if(block instanceof Incinerator && ((IncineratorBuild)build).heat > 0.5f){
             UnityFx.expAbsorb.at(b.x, b.y);
             b.remove();
         }else if(tile.solid()){
             b.trns(-1.1f * b.vel.x, -1.1f * b.vel.y);
             b.vel.scl(0f);
-        }else if(tile.block() instanceof Conveyor) conveyor(b, (Conveyor)tile.block(), (ConveyorBuild)tile.build);
+        }else if(block instanceof Conveyor) conveyor(b, (Conveyor)block, (ConveyorBuild)build);
     }
 
     protected void conveyor(Bullet b, Conveyor block, ConveyorBuild build){

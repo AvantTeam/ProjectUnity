@@ -449,7 +449,15 @@ public class UnityUnitTypes implements ContentList{
                         x = 11f;
                         y = -7f;
                         reload = 10f;
-                        bullet = Bullets.healBullet;
+                        bullet = new LaserBoltBulletType(5.2f, 10f){
+                            {
+                                lifetime = 35f;
+                                healPercent = 5.5f;
+                                collidesTeam = true;
+                                backColor = Pal.heal;
+                                frontColor = Color.white;
+                            }
+                        };
                     }
                 });
             }

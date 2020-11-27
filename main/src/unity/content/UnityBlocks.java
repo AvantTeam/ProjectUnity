@@ -25,6 +25,8 @@ import unity.world.blocks.defense.turrets.*;
 import unity.world.blocks.distribution.Teleporter;
 import unity.world.blocks.logic.*;
 import unity.world.blocks.production.StemGenericSmelter;
+import unity.world.blocks.storage.ExpFountain;
+import unity.world.blocks.storage.ExpUnloader;
 import unity.world.blocks.units.SelectableReconstructor;
 import unity.world.draw.DrawLightSource;
 import multilib.*;
@@ -62,7 +64,7 @@ public class UnityBlocks implements ContentList{
     //turrets
     laserTurret, inferno,
     //blocks
-    teleporter,
+    teleporter, expUnloader, expFountain,
 
 //light
     //turrets
@@ -433,7 +435,7 @@ public class UnityBlocks implements ContentList{
                 heatColor = Color.valueOf("e04300");
                 rotateSpeed = 3.5f;
                 loopSound = Sounds.beam;
-                loopSoundVolume = 2.2f;
+                loopSoundVolume = 2.1f;
                 requirements(Category.turret, with(Items.copper, 450, Items.lead, 350, Items.graphite, 390, Items.silicon, 360, Items.titanium, 250, UnityItems.umbrium, 370, Items.surgeAlloy, 360));
                 shootType = UnityBullets.falloutLaser;
                 consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.58f)).update(false);
@@ -457,7 +459,9 @@ public class UnityBlocks implements ContentList{
                 cooldown = 0.012f;
                 heatColor = Color.white;
                 rotateSpeed = 1.9f;
-                loopSoundVolume = 2.4f;
+                shootSound = Sounds.laserbig;
+                loopSound = Sounds.beam;
+                loopSoundVolume = 2.2f;
                 expanded = true;
                 requirements(Category.turret, with(Items.copper, 1250, Items.lead, 1320, Items.graphite, 1100, Items.titanium, 1340, Items.surgeAlloy, 1240, Items.silicon, 1350, Items.thorium, 770, UnityItems.darkAlloy, 370));
                 shootType = UnityBullets.catastropheLaser;
@@ -482,7 +486,9 @@ public class UnityBlocks implements ContentList{
                 cooldown = 0.009f;
                 heatColor = Color.white;
                 rotateSpeed = 0.97f;
-                loopSoundVolume = 3f;
+                shootSound = Sounds.laserbig;
+                loopSound = Sounds.beam;
+                loopSoundVolume = 2.6f;
                 expanded = true;
                 requirements(Category.turret, with(Items.copper, 2800, Items.lead, 2970, Items.graphite, 2475, Items.titanium, 3100, Items.surgeAlloy, 2790, Items.silicon, 3025, Items.thorium, 1750, UnityItems.darkAlloy, 1250));
                 shootType = UnityBullets.calamityLaser;
@@ -685,7 +691,7 @@ public class UnityBlocks implements ContentList{
         };
         //endregion
         //region koruh turrets
-        laserTurret = new ExpPowerTurret("laser-turret", 10){
+        /*laserTurret = new ExpPowerTurret("laser-turret", 10){
             {
                 requirements(Category.turret, with(Items.copper, 160, Items.lead, 110, Items.silicon, 90));
                 size = 2;
@@ -700,7 +706,7 @@ public class UnityBlocks implements ContentList{
                 addExpField("bool", "targetAir", 0, 5);
             }
         };
-
+        
         inferno = new ExpItemTurret("inferno", 10){
             {
                 requirements(Category.turret, with(Items.copper, 150, Items.lead, 165, Items.graphite, 120, Items.silicon, 130));
@@ -712,13 +718,28 @@ public class UnityBlocks implements ContentList{
                 shootCone = 5f;
                 addExpField("exp", "useless", 0, 2);
             }
-        };
+        };TODO*/
 
         //endregion
         //region koruh blocks
         teleporter = new Teleporter("teleporter"){
             {
                 requirements(Category.distribution, with(Items.lead, 12, Items.silicon, 10, Items.phaseFabric, 10, Items.thorium, 4));
+            }
+        };
+
+        expUnloader = new ExpUnloader("exp-unloader"){
+            {
+                requirements(Category.effect, with(Items.graphite, 25, Items.silicon, 25, UnityItems.steel, 25));
+                health = 80;
+                consumes.power(0.25f);
+            }
+        };
+
+        expFountain = new ExpFountain("exp-fountain"){
+            {
+                requirements(Category.effect, BuildVisibility.sandboxOnly, with());
+                health = 200;
             }
         };
         //endregion

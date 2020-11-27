@@ -44,7 +44,7 @@ public class UnityBullets implements ContentList{
 
     @Override
     public void load(){
-        laser = new SapBulletType(){
+        /*laser = new SapBulletType(){
             {
                 length = 150f;
                 width = 0.7f;
@@ -119,7 +119,7 @@ public class UnityBullets implements ContentList{
                 super.hit(b, x, y);
                 ((ExpItemTurret.ExpItemTurretBuild)b.owner).incExp(0.5f);
             }
-        };
+        };TODO*/
 
         falloutLaser = new SparkingContinuousLaserBulletType(95f){
             {
@@ -164,16 +164,16 @@ public class UnityBullets implements ContentList{
         extinctionLaser = new SparkingContinuousLaserBulletType(770f){
             {
                 length = 560f;
-                strokes = new float[]{2f * 1.9f, 1.5f * 1.9f, 1f * 1.9f, 0.3f * 1.9f};
+                strokes = new float[]{2f * 2.2f, 1.5f * 2.2f, 1f * 2.2f, 0.3f * 2.2f};
                 lightStroke = 90f;
                 spaceMag = 70f;
-                fromBlockChance = 0.7f;
+                fromBlockChance = 0.5f;
                 fromBlockDamage = 76f;
-                fromBlockAmount = 2;
+                fromBlockAmount = 4;
                 fromLaserChance = 0.8f;
                 fromLaserDamage = 46f;
                 fromLaserAmount = 4;
-                fromLaserLen = 5;
+                fromLaserLen = 10;
                 fromLaserLenRand = 7;
                 incendChance = 0.7f;
                 incendSpread = 9f;

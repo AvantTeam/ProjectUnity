@@ -12,6 +12,9 @@ import unity.entities.effects.VapourizeEffectState;
 public class ExtraEffect{
     private static final Seq<BuildQueue> vapourizeQueue = new Seq<>(512);
     static{
+        Events.on(EventType.WorldLoadEvent.class, e -> {
+            vapourizeQueue.clear();
+        });
         Events.run(EventType.Trigger.update, () -> {
             vapourizeQueue.each(buildq -> {
                 Building temp = buildq.build;
@@ -26,7 +29,9 @@ public class ExtraEffect{
     }
 
     public static void addMoltenBlock(Building build){
-        if(!vapourizeQueue.contains(buildq -> buildq.build == build)) vapourizeQueue.add(new BuildQueue(build));
+        BuildQueue temp = vapourizeQueue.find(bq -> bq.build == build);
+        if(temp == null) vapourizeQueue.add(new BuildQueue(build));
+        else temp.time = 14.99f;
     }
 
     public static void createEvaporation(float x, float y, Unit host, Entityc influence){
