@@ -1,0 +1,18 @@
+health: 800
+size: 2
+requirements: [
+    silicon/250,
+    dense-alloy/120,
+    titanium/100,
+    steel/60,
+    dirium/16
+]
+consumes: {
+    power: 10
+}
+
+itemCapacity: 0
+phaseRadiusBoost: 0
+phaseShieldBoost: 0
+
+category: effect

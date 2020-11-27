@@ -277,7 +277,7 @@ chargeLaser.fragBullet = steleBullet;
 chargeLaser.fragBullets = 3;
 chargeLaser.shootEffect = Fx.hitLiquid;
 
-const laserSwarmerTurret = lib.extend(ChargeTurret, ChargeTurret.ChargeTurretBuild, "swarm-laser-turret", {
+const laserSwarmerTurret = lib.extend(PowerTurret, PowerTurret.PowerTurretBuild, "swarm-laser-turret", {
     maxLevel: 30,
     expFields: [
         {
@@ -321,7 +321,7 @@ const laserSwarmerTurret = lib.extend(ChargeTurret, ChargeTurret.ChargeTurretBui
             });
         }
 
-        this.shooting = true;
+        this.charging = true;
         for(var i = 0; i < laserSwarmerTurret.shots; i++){
             Time.run(laserSwarmerTurret.burstSpacing * i, () => {
                 Time.run(laserSwarmerTurret.chargeTime, () => {
@@ -334,7 +334,7 @@ const laserSwarmerTurret = lib.extend(ChargeTurret, ChargeTurret.ChargeTurretBui
                     this.heat = 1;
                     this.bullet(ammo, this.rotation + Mathf.range(laserSwarmerTurret.inaccuracy));
                     this.effects();
-                    this.shooting = false;
+                    this.charging = false;
                 });
             });
         }

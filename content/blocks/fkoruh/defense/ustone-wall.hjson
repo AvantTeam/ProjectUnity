@@ -1,0 +1,6 @@
+health: 200
+requirements: [
+    stone/6
+]
+
+category: defense

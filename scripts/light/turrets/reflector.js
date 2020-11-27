@@ -55,7 +55,7 @@ lightOvoid.despawnEffect = lightHit;
 lightOvoid.hittable = false;
 
 //TODO lightConsumer after formatting
-const reflector = extendContent(ChargeTurret, "reflector", {
+const reflector = extendContent(PowerTurret, "reflector", {
 	//TODO epic stuff and effects (?)
   setStats(){
     this.super$setStats();
@@ -67,5 +67,6 @@ const reflector = extendContent(ChargeTurret, "reflector", {
 reflector.shootType = lightOvoid;
 reflector.shootSound = Sounds.laser;
 reflector.chargeEffect = lightCharge;
+reflector.chargeTime = 120;
 reflector.chargeBeginEffect = lightChargeBegin;
 reflector.consumes.add(new ConsumeLiquidFilter(liquid => liquid.temperature <= 0.5 && liquid.flammability <= 0.1, 0.52)).update(false);

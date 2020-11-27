@@ -1,0 +1,6 @@
+health: 360
+requirements: [
+    dense-alloy/6
+]
+
+category: defense

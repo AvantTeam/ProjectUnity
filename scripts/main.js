@@ -81,6 +81,7 @@ const script = [
             "copterbase",
             "exp",
             "expcrafter",
+            "limitwall",
             "multi-lib",
             "status",
             "arena",
@@ -243,6 +244,7 @@ const script = [
                 name: "blocks",
                 childs: [
                     "shieldGenerator",
+                    "deflectGenerator",
                     "shieldedWall",
                     "teleporter",
                     "teleunit",
@@ -255,6 +257,7 @@ const script = [
             },
 
             "crafters",
+            "walls",
             "lava"
         ]
     },
@@ -297,7 +300,8 @@ const script = [
                     "pedestal",
                     "pilaster",
                     "pylon",
-                    "monument"
+                    "monument",
+                    "colossus"
                 ]
             },
 

@@ -80,18 +80,18 @@ const megalithGen = extend(PlanetGenerator, {
 		this.distort(10, 12);
 		
 		var constraint = 1.3;
-		var radius = width / 2 / Mathf.sqrt3;
+		var radius = this.width / 2 / Mathf.sqrt3;
 		var rooms = this.rand.random(2, 5);
 		var array = new Seq(Room);
 		
 		for(var i = 0; i < rooms; i++){
 			Tmp.v1.trns(this.rand.random(360), this.rand.random(radius / constraint));
 			
-			var rx = width / 2 + Tmp.v1.x;
-			var ry = height / 2 + Tmp.v1.y;
+			var rx = this.width / 2 + Tmp.v1.x;
+			var ry = this.height / 2 + Tmp.v1.y;
 			var maxrad = radius - Tmp.v1.len();
 			var rrad = Math.min(this.rand.random(9, maxrad / 2), 30);
-			
+            
 			array.add(new Room(Math.floor(rx), Math.floor(ry), Math.floor(rrad)));
 		};
 		
@@ -99,14 +99,14 @@ const megalithGen = extend(PlanetGenerator, {
 		var enemies = new Seq(Room);
 		var enemySpawns = this.rand.chance(0.3) ? 2 : 1;
 		var offset = this.rand.nextInt(360);
-		var length = width / 2.55 - this.rand.random(13, 23);
+		var length = this.width / 2.55 - this.rand.random(13, 23);
 		var angleStep = 5;
 		var waterCheckRad = 5;
 		
 		for(var i = 0; i < 360; i += angleStep){
 			var angle = offset + i;
-			var cx = Math.floor(width / 2 + Angles.trnsx(angle, length));
-			var cy = Math.floor(height / 2 + Angles.trnsy(angle, length));
+			var cx = Math.floor(this.width / 2 + Angles.trnsx(angle, length));
+			var cy = Math.floor(this.height / 2 + Angles.trnsy(angle, length));
 			
 			var waterTiles = 0;
 			
@@ -125,7 +125,7 @@ const megalithGen = extend(PlanetGenerator, {
 				
 				for(var j = 0; j < enemySpawns; j++){
 					var enemyOffset = this.rand.range(60);
-					Tmp.v1.set(cx - width / 2, cy - height / 2).rotate(180 + enemyOffset).add(width / 2, height / 2);
+					Tmp.v1.set(cx - this.width / 2, cy - this.height / 2).rotate(180 + enemyOffset).add(this.width / 2, this.height / 2);
 					var espawn = new Room(Tmp.v1.x, Tmp.v1.y, this.rand.random(8, 15));
 					array.add(espawn);
 					enemies.add(espawn);
@@ -200,9 +200,7 @@ const megalithGen = extend(PlanetGenerator, {
 		enemies.each(espawn => this.tiles.getn(espawn.x, espawn.y).setOverlay(Blocks.spawn));
 		
 		this.trimDark();
-		
 		this.median(2);
-		
 		this.tech();
 
 		Schematics.placeLaunchLoadout(spawn.x, spawn.y);

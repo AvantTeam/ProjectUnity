@@ -1,0 +1,14 @@
+{
+	"size": 3,
+	"health": 1500,
+	"range": 80,
+	"reloadTime": 10,
+	"shootCone": 5,
+	"requirements": [
+		{"item": "copper", "amount": 150},
+		{"item": "lead", "amount": 165},
+		{"item": "graphite", "amount": 60}
+	],
+	"category": "turret",
+	"research": "scorch"
+}

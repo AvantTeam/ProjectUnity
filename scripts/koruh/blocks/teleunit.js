@@ -1,6 +1,10 @@
 const diriumColor = Color.valueOf("96f7c3");
 const diriumColor2 = Color.valueOf("ccffe4");
 
+const tpCoolDown = new StatusEffect("tpcooldown"); //empty effect for tp cooldown
+tpCoolDown.color = diriumColor2;
+tpCoolDown.effect = Fx.none;
+
 const tpOut = new Effect(30, e => {
     Draw.color(diriumColor);
     Lines.stroke(3*e.fout());
@@ -50,6 +54,12 @@ teleunit.solid = false;
 teleunit.ambientSound = Sounds.techloop;
 teleunit.ambientSoundVolume = 0.02;
 teleunit.configurable = true;
+
+//WHEN PORTING TO JAVA, PLZ MAKE IT TELEPORT PAYLOADS
+//teleunit.outputsPayload = true;
+//teleunit.outputFacing = false;
+
+//const d4x = [1, 0, -1, 0], d4y = [0, 1, 0, -1];
 
 teleunit.buildType = prov(() => extend(Building, {
     _warmup: 0,
@@ -112,7 +122,41 @@ teleunit.buildType = prov(() => extend(Building, {
             return a.pos() - b.pos();
         });
         return barr;
+    },/*
+    getDestBlock(){
+        var barr = this.getDestList();
+        if(barr.length <= 0) return;
+        var index = barr.indexOf(this);
+        if(index < 0){
+            print("Error! Origin pad not in list!");
+        }
+        index++;
+        if(index >= barr.length) index = 0;
+        return barr[index];
     },
+    acceptPayload(source, payload){
+        if(source == null || !this.consValid() || !this.enabled) return false;
+        var way = (this.relativeTo(source.tile) + 2) % 4;
+        var dest = this.getDestBlock();
+        print("Dest: " + dest);
+        if(this == dest) return false;
+        var trns = teleunit.size / 2 + 1;
+        var next = dest.tile.nearby(d4x[way] * trns, d4y[way] * trns);
+        print("Next: " + next);
+        if(next == null || next.block() == teleunit) return false;
+        return next.build != null && next.build.team == dest.team && next.build.acceptPayload((next.block() instanceof PayloadConveyor) ? next.build : dest, payload);
+    },
+    handlePayload(source, payload){
+        if(source == null) return;
+        var way = (this.relativeTo(source.tile) + 2) % 4;
+        var dest = this.getDestBlock();
+        if(this == dest) return;
+        var trns = teleunit.size / 2 + 1;
+        var next = dest.tile.nearby(d4x[way] * trns, d4y[way] * trns);
+        if(next == null || next.block() == teleunit) return;
+        var fs = (next.block() instanceof PayloadConveyor) ? next.build : dest;
+        if(next.build != null && next.build.team == dest.team && next.build.acceptPayload(fs, payload)) next.build.handlePayload(fs, payload);
+    },*/
     inRange(player){
         return this.enabled && player.unit() != null && !player.unit().dead && Math.abs(player.unit().x - this.x) <= 2.5 * Vars.tilesize && Math.abs(player.unit().y - this.y) <= 2.5 * Vars.tilesize;
     },
@@ -129,9 +173,12 @@ teleunit.buildType = prov(() => extend(Building, {
         if(unit != null && unit.isPlayer() && !(unit instanceof BlockUnitc)) this.tpPlayer(unit.getPlayer());
     },
     tpPlayer(player){
+        this.tpUnit(player.unit(), player == Vars.player);
+        if(Vars.player != null && player == Vars.player) Core.camera.position.set(player);
+    },
+    tpUnit(unit, isPlayer){
         var barr = this.getDestList();
         if(barr.length <= 0) return;
-        //print(barr);
         var index = barr.indexOf(this);
         if(index < 0){
             print("Error! Origin pad not in list!");
@@ -139,12 +186,12 @@ teleunit.buildType = prov(() => extend(Building, {
         index++;
         if(index >= barr.length) index = 0;
         var dest = barr[index];
-        if(!Vars.headless) tpIn.at(player.unit().x, player.unit().y, player.unit().rotation - 90, Color.white, player.unit().type);
-        player.unit().set(dest.x, dest.y);
-        player.unit().snapInterpolation();
-        player.unit().set(dest.x, dest.y);//for good measure
-        if(Vars.player != null && player == Vars.player) Core.camera.position.set(player);
-        if(!Vars.headless) this.effects(dest, player.unit().hitSize * 1.7, player == Vars.player, player.unit());
+        if(!Vars.headless) tpIn.at(unit.x, unit.y, unit.rotation - 90, Color.white, unit.type);
+        unit.set(dest.x, dest.y);
+        unit.snapInterpolation();
+        unit.set(dest.x, dest.y);//for good measure
+
+        if(!Vars.headless) this.effects(dest, unit.hitSize * 1.7, isPlayer, unit);
     },
     effects(dest, hitSize, isPlayer, unit){
         //TODO: EoD-style total unit effect
@@ -158,5 +205,10 @@ teleunit.buildType = prov(() => extend(Building, {
         }
         tpOut.at(dest.x, dest.y, hitSize);
         tpFlash.at(dest.x, dest.y, 0, Color.white, unit);
+    },
+    unitOn(unit){
+        if(unit.hasEffect(tpCoolDown) || unit.isPlayer()) return;
+        this.tpUnit(unit, false);
+        unit.apply(tpCoolDown, 120);
     }
 }));

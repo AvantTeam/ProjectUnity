@@ -1,4 +1,5 @@
 const lib = this.global.unity.exp;
+
 const shieldBreakCircle = new Effect(40, e => {
     Draw.color(Pal.lancerLaser);
     Lines.stroke(3 * e.fout());
@@ -16,56 +17,57 @@ const shieldGenerator = lib.extend(ForceProjector, ForceProjector.ForceBuild, "s
         }
     ],
     drawPlace(x, y, rotation, valid){
+        var fin = (Time.time() % 90) / 90;
+        Draw.color(this.exp0Color);
+        Lines.stroke(1.5 * (1 - fin));
+        Lines.circle(x * Vars.tilesize + this.offset, y * Vars.tilesize + this.offset, this.radius + fin * 1.5 * this.maxLevel);
         Draw.color(Pal.lancerLaser);
         Lines.stroke(1.5);
         Lines.circle(x * Vars.tilesize + this.offset, y * Vars.tilesize + this.offset, this.radius);
         Draw.color();
     }
 }, {
+    buildingRadius: 40,
+    created(){
+        this.super$created();
+        this.buildingRadius = shieldGenerator.radius;
+    },
     customUpdate(){
-        //necessary for realRadius
         this.radscl = Mathf.lerpDelta(this.radscl, this.broken ? 0 : this.warmup, 0.05);
         this.warmup = Mathf.lerpDelta(this.warmup, this.efficiency(), 0.1);
 
-        //shield is self-healing by cooldown
         var scale = !this.broken ? shieldGenerator.cooldownNormal : shieldGenerator.cooldownBrokenBase;
         var cons = shieldGenerator.consumes.get(ConsumeType.liquid);
+
         if(this.buildup > 0){
             if(cons.valid(this)){
                 cons.update(this);
                 scale *= (shieldGenerator.cooldownLiquid * (1 + (this.liquids.current().temperature - 0.4) * 0.9));
             }
-
             this.buildup -= this.delta() * scale;
         }
-        //when shield is revived
+
         if(this.broken && this.buildup <= 0){
             this.broken = false;
         }
 
-        //when shield is destroyed
-        if(this.buildup >= shieldGenerator.breakage + shieldGenerator.phaseShieldBoost && !this.broken){
+        if(this.buildup >= shieldGenerator.breakagem && !this.broken){
             this.broken = true;
             this.buildup = shieldGenerator.breakage;
             shieldBreakCircle.at(this.x, this.y, this.realRadius(), Pal.lancerLaser);
         }
-        //when hit
+
         if(this.hit > 0){
             this.hit -= 1 / 5 * Time.delta;
         }
 
-        //bullet intersect
         const customConsumer = trait => {
             if(trait.team != this.paramEntity.team && trait.type.absorbable && Mathf.dst(this.paramEntity.x, this.paramEntity.y, trait.x, trait.y) <= this.realRadius()){
                 trait.absorb();
                 Fx.absorb.at(trait);
                 this.paramEntity.hit = 1;
                 this.paramEntity.buildup += trait.damage * this.paramEntity.warmup;
-                if(cons.valid(this)){
-                    this.incExp(scale / 20);
-                } else {
-                    this.incExp(0.1);
-                }
+                this.incExp(cons.valid(this) ? scale / 20 : 0.1);
             }
         };
         var realRadius = this.realRadius();
@@ -91,40 +93,37 @@ const shieldGenerator = lib.extend(ForceProjector, ForceProjector.ForceBuild, "s
         }
     },
     realRadius(){
-        return (shieldGenerator.radius + this.phaseHeat * shieldGenerator.phaseRadiusBoost) * this.radscl + Mathf.pow(1.35, this.totalLevel());
+        return this.buildingRadius * this.radscl;
     },
     drawShield(){
         if(!this.broken){
             var radius = this.realRadius();
 
             Draw.z(Layer.shields);
-
             Draw.color(Pal.lancerLaser, Color.white.cpy(), Mathf.clamp(this.hit));
 
-            if(Core.settings.getBool("animatedshields")){
-                if(radius <= 1){
-                    Draw.reset();
-                } else {
+            if(radius > 1){
+                if(Core.settings.getBool("animatedshields")){
                     Fill.poly(this.x, this.y, 40, radius);
-                }
-            } else {
-                if(radius <= 1){
-                    Draw.reset();
                 } else {
                     Lines.stroke(1.5);
                     Draw.alpha(0.09 + Mathf.clamp(0.08 * this.hit));
                     Fill.circle(this.x, this.y, radius);
                     Draw.alpha(1);
                     Lines.circle(this.x, this.y, radius);
-                    Draw.reset();
                 }
             }
         }
         Draw.reset();
     },
     levelUp(int){
-        shieldGenerator.consumes.power(2 + this.totalLevel());
-    }
+        shieldGenerator.consumes.power(2 + int);
+        this.buildingRadius = shieldGenerator.radius + 1.5 * int;
+    },
+    customRead(read, revision){
+        this.buildingRadius = 40 + this.totalLevel() * 1.5;
+    },
+    customWrite(write){}
 });
 
 shieldGenerator.radius = 40;

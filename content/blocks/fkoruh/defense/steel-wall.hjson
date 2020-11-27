@@ -1,0 +1,6 @@
+health: 640
+requirements: [
+    steel/6
+]
+
+category: defense
