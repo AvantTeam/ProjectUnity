@@ -9,9 +9,9 @@ const densewall = wlib.extend(Wall, Wall.WallBuild, "dense-wall", {
 }, {});
 
 const steelwall = wlib.extend(Wall, Wall.WallBuild, "steel-wall", {
-    maxDamage: 28
+    maxDamage: 24
 }, {});
 
 const steelwallLarge = wlib.extend(Wall, Wall.WallBuild, "steel-wall-large", {
-    maxDamage: 56
+    maxDamage: 48
 }, {});
