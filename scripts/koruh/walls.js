@@ -5,13 +5,13 @@ const stonewall = wlib.extend(Wall, Wall.WallBuild, "ustone-wall", {
 }, {});
 
 const densewall = wlib.extend(Wall, Wall.WallBuild, "dense-wall", {
-    maxDamage: 32
+    maxDamage: 36
 }, {});
 
 const steelwall = wlib.extend(Wall, Wall.WallBuild, "steel-wall", {
-    maxDamage: 22
+    maxDamage: 32
 }, {});
 
 const steelwallLarge = wlib.extend(Wall, Wall.WallBuild, "steel-wall-large", {
-    maxDamage: 44
+    maxDamage: 64
 }, {});
