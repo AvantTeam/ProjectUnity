@@ -1,6 +1,6 @@
-health: 160
+health: 320
 requirements: [
-    stone/6
+    dense-alloy/6
 ]
 
 category: defense

@@ -1,6 +1,4 @@
-type: Wall
-
-health: 320
+health: 440
 requirements: [
     steel/6
 ]

@@ -81,6 +81,7 @@ const script = [
             "copterbase",
             "exp",
             "expcrafter",
+            "limitwall",
             "multi-lib",
             "status",
             "arena",
@@ -255,6 +256,7 @@ const script = [
             },
 
             "crafters",
+            "walls",
             "lava"
         ]
     },
