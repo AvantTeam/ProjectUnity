@@ -28,15 +28,15 @@ const extinctionLaser = extendContent(ContinuousLaserBulletType, 770, {
 		this.super$update(b);
 		var realLength = Damage.findLaserLength(b, this.length);
 		
-		for(var i = 0; i < 2; i++){
-			if(Mathf.chanceDelta(0.7)){
+		for(var i = 0; i < 4; i++){
+			if(Mathf.chanceDelta(0.5)){
 				Lightning.create(b.team, Color.valueOf("ff9c5a"), 76, b.x, b.y, b.rotation(), Mathf.round((this.length / 8) + Mathf.random(2, 7)));
 			};
 		};
 
 		for(var i = 0; i < 4; i++){
 			if(Mathf.chanceDelta(0.8)){
-				var lLength = Mathf.random(5, 12);
+				var lLength = Mathf.random(10, 17);
 				Tmp.v2.trns(b.rotation(), Mathf.random(0, Math.max(realLength - lLength * 8, 4)));
 				Lightning.create(b.team, Color.valueOf("ff9c5a"), 46, b.x + Tmp.v2.x, b.y + Tmp.v2.y, b.rotation(), Mathf.round(lLength));
 			};

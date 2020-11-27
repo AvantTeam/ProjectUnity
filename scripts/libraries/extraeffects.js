@@ -43,6 +43,10 @@ function BuildQueue(build){
 	this.time = 14.99;
 };
 
+Events.on(EventType.WorldLoadEvent, e => {
+    vapourizeQueue.clear();
+});
+
 Events.run(EventType.Trigger.update, () => {
 	vapourizeQueue.each(buildq => {
 		//print(buildq.build.dead);
@@ -270,7 +274,22 @@ const customLightningA = prov(() => {
 
 module.exports = {
 	addMoltenBlock(build){
-		if(!vapourizeQueue.contains(build)) vapourizeQueue.add(new BuildQueue(build));
+        var contains = false;
+        var tmp = null;
+        
+        vapourizeQueue.each(buildq => {
+            contains = buildq.build == build;
+            if(contains){
+                tmp = buildq;
+                return;
+            }
+        });
+        
+        if(!contains){
+            vapourizeQueue.add(new BuildQueue(build));
+        }else if(tmp != null){
+            tmp.time = 14.99;
+        };
 	},
 	createEvaporation(x, y, host, influence){
 		if(host == null || influence == null) return;
