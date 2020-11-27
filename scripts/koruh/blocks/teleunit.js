@@ -55,6 +55,7 @@ teleunit.ambientSound = Sounds.techloop;
 teleunit.ambientSoundVolume = 0.02;
 teleunit.configurable = true;
 
+//WHEN PORTING TO JAVA, PLZ MAKE IT TELEPORT PAYLOADS
 //teleunit.outputsPayload = true;
 //teleunit.outputFacing = false;
 
