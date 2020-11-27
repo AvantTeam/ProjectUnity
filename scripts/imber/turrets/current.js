@@ -18,7 +18,7 @@ current.sideWidth = 0;
 current.sideLength = 0;
 current.colors = [Pal.surge.cpy(), Pal.surge, Color.white];
 
-const currentTurret = extendContent(ChargeTurret, "current", {
+const currentTurret = extendContent(PowerTurret, "current", {
 	shoot(ammo){
 		this.useAmmo();
 

@@ -96,7 +96,7 @@ plasma.fragBullets = 8;
 plasma.fragLifeMin = 0.8;
 plasma.fragLifeMax = 1.1;
 
-const plasmaTurret = extendContent(ChargeTurret, "plasma", {
+const plasmaTurret = extendContent(PowerTurret, "plasma", {
 	shouldTurn(){
 		return true;
 	}

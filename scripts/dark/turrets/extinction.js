@@ -132,7 +132,7 @@ const extinctionLaser = extendContent(ContinuousLaserBulletType, 770, {
 	}
 });
 extinctionLaser.length = 560;
-extinctionLaser.strokes = [2 * 1.9, 1.5 * 1.9, 1 * 1.9, 0.3 * 1.9];
+extinctionLaser.strokes = [2 * 2.2, 1.5 * 2.2, 1 * 2.2, 0.3 * 2.2];
 
 const extinction = extendContent(LaserTurret, "extinction", {
 	load(){

@@ -97,7 +97,7 @@ chargeLaser2.colors = [expColor.cpy().mul(1, 1, 1, 0.4), expColor, Color.white];
 
 
 
-const chargeLaserTurret = lib.extend(ChargeTurret, ChargeTurret.ChargeTurretBuild, "bt-laser-turret", {
+const chargeLaserTurret = lib.extend(PowerTurret, PowerTurret.PowerTurretBuild, "bt-laser-turret", {
     maxLevel: 1,
     expFields: [
         {
@@ -133,7 +133,7 @@ const chargeLaserTurret = lib.extend(ChargeTurret, ChargeTurret.ChargeTurretBuil
             });
         }*/
 
-        this.shooting = true;
+        this.charging = true;
 
         Time.run(chargeLaserTurret.chargeTime, () => {
             if(!this.isValid()) return;
@@ -142,7 +142,7 @@ const chargeLaserTurret = lib.extend(ChargeTurret, ChargeTurret.ChargeTurretBuil
             this.heat = 1;
             this.bullet(lvl > 0 ? chargeLaser2 : chargeLaser, this.rotation);
             this.effects();
-            this.shooting = false;
+            this.charging = false;
         });
     },
     effects(){

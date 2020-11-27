@@ -1,4 +1,9 @@
 const diriumColor = Color.valueOf("96f7c3");
+const diriumColor2 = Color.valueOf("ccffe4");
+
+const tpCoolDown = new StatusEffect("tpcooldown"); //empty effect for tp cooldown
+tpCoolDown.color = diriumColor2;
+tpCoolDown.effect = Fx.none;
 
 const tpOut = new Effect(30, e => {
     Draw.color(diriumColor);
@@ -11,11 +16,25 @@ const tpOut = new Effect(30, e => {
     });
 });
 
-const tpIn = new Effect(15, e => {
-    Draw.color(diriumColor);
-    Lines.stroke(3*e.fin());
-    Lines.square(e.x, e.y, e.fout() *  e.rotation * 0.8, 45);
+const tpIn = new Effect(50, e => {
+    if(!(e.data instanceof UnitType)) return;
+    var region = e.data.icon(Cicon.full);
+    Draw.color();
+    Draw.mixcol(diriumColor, 1);
+    Draw.rect(region, e.x, e.y, region.width * Draw.scl * e.fout(), region.height * Draw.scl * e.fout(), e.rotation);
+    Draw.mixcol();
 });
+
+const tpFlash = new Effect(30, e => {
+    if(!(e.data instanceof Unit) || e.data.dead) return;
+    var region = e.data.type.icon(Cicon.full);
+    Draw.mixcol(diriumColor2, 1);
+    Draw.alpha(e.fout());
+    Draw.rect(region, e.data.x, e.data.y, e.data.rotation - 90);
+    Draw.mixcol();
+    Draw.color();
+});
+tpFlash.layer = Layer.flyingUnit + 1;
 
 const teleunit = extendContent(Block, "teleunit", {
     load() {
@@ -30,7 +49,7 @@ const teleunit = extendContent(Block, "teleunit", {
     }
 });
 teleunit.update = true;
-teleunit.solid = true;
+teleunit.solid = false;
 //teleunit.consumesTap = true;
 teleunit.ambientSound = Sounds.techloop;
 teleunit.ambientSoundVolume = 0.02;
@@ -58,7 +77,7 @@ teleunit.buildType = prov(() => extend(Building, {
         Draw.reset();
     },
     drawSelect(){
-        Draw.color(this.consValid() && this.enabled ? Pal.accent : Pal.darkMetal);
+        Draw.color(this.consValid() && this.enabled ? (this.inRange(Vars.player) ? diriumColor : Pal.accent) : Pal.darkMetal);
         var length = Vars.tilesize * teleunit.size / 2 + 3 + Mathf.absin(Time.time(), 5, 2);
 
         Draw.rect(teleunit.arrowRegion, this.x + length, this.y, (0 + 2) * 90);
@@ -99,7 +118,7 @@ teleunit.buildType = prov(() => extend(Building, {
         return barr;
     },
     inRange(player){
-        return this.enabled && player.unit() != null && !player.unit().dead && Math.abs(player.unit().x - this.x) <= 1.8 * Vars.tilesize && Math.abs(player.unit().y - this.y) <= 1.7 * Vars.tilesize;
+        return this.enabled && player.unit() != null && !player.unit().dead && Math.abs(player.unit().x - this.x) <= 2.5 * Vars.tilesize && Math.abs(player.unit().y - this.y) <= 2.5 * Vars.tilesize;
     },
     shouldShowConfigure(player){
         return this.consValid() && this.inRange(Vars.player);
@@ -111,12 +130,15 @@ teleunit.buildType = prov(() => extend(Building, {
         return false;
     },
     configured(unit, value){
-        if(unit != null && unit.isPlayer()) this.tpPlayer(unit.getPlayer());
+        if(unit != null && unit.isPlayer() && !(unit instanceof BlockUnitc)) this.tpPlayer(unit.getPlayer());
     },
     tpPlayer(player){
+        this.tpUnit(player.unit(), player == Vars.player);
+        if(Vars.player != null && player == Vars.player) Core.camera.position.set(player);
+    },
+    tpUnit(unit, isPlayer){
         var barr = this.getDestList();
         if(barr.length <= 0) return;
-        //print(barr);
         var index = barr.indexOf(this);
         if(index < 0){
             print("Error! Origin pad not in list!");
@@ -124,16 +146,29 @@ teleunit.buildType = prov(() => extend(Building, {
         index++;
         if(index >= barr.length) index = 0;
         var dest = barr[index];
-        player.unit().set(dest.x, dest.y);
-        player.unit().snapInterpolation();
-        if(Vars.player != null && player == Vars.player) Core.camera.position.set(player);
-        if(!Vars.headless) this.effects(dest, player.unit().hitSize * 1.7);
+        if(!Vars.headless) tpIn.at(unit.x, unit.y, unit.rotation - 90, Color.white, unit.type);
+        unit.set(dest.x, dest.y);
+        unit.snapInterpolation();
+        unit.set(dest.x, dest.y);//for good measure
+
+        if(!Vars.headless) this.effects(dest, unit.hitSize * 1.7, isPlayer, unit);
     },
-    effects(dest, hitSize){
+    effects(dest, hitSize, isPlayer, unit){
         //TODO: EoD-style total unit effect
-        Sounds.plasmadrop.at(this.x, this.y, Mathf.random() * 0.2 + 1);
-        Sounds.plasmadrop.at(dest.x, dest.y, Mathf.random() * 0.2 + 0.7);
+        if(isPlayer){
+            Sounds.plasmadrop.at(dest.x, dest.y, Mathf.random() * 0.2 + 1);
+            Sounds.lasercharge2.at(this.x, this.y, Mathf.random() * 0.2 + 0.7);
+        }
+        else{
+            Sounds.plasmadrop.at(this.x, this.y, Mathf.random() * 0.2 + 1);
+            Sounds.lasercharge2.at(dest.x, dest.y, Mathf.random() * 0.2 + 0.7);
+        }
         tpOut.at(dest.x, dest.y, hitSize);
-        tpIn.at(this.x, this.y, hitSize);
+        tpFlash.at(dest.x, dest.y, 0, Color.white, unit);
+    },
+    unitOn(unit){
+        if(unit.hasEffect(tpCoolDown) || unit.isPlayer()) return;
+        this.tpUnit(unit, false);
+        unit.apply(tpCoolDown, 120);
     }
 }));

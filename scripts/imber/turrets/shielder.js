@@ -17,7 +17,7 @@ function targetShield(t, b, radius){
 
 const shieldBullet = shildB.newShieldBullet(10, 3000, shieldBreak);
 
-const shielder = extendContent(ChargeTurret, "shielder", {
+const shielder = extendContent(PowerTurret, "shielder", {
   setStats(){
     this.super$setStats();
     
