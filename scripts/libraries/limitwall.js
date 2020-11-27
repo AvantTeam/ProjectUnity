@@ -9,15 +9,15 @@
 //if damage taken is above the max damage, it will only take the max damage
 
 const maxDamageFx = new Effect(16, e => {
-    Color.color(Color.orange);
+    Draw.color(Color.orange);
     Lines.stroke(2.5 * e.fin());
     Lines.square(e.x, e.y, e.fout() * 1.5, 45);
 });
 
 const withstandFx = new Effect(16, e => {
-    Color.color(Color.orange);
-    Lines.stroke(1.2 * e.rotation * e.fin());
-    Lines.square(e.x, e.y, e.rotation * 4, 0);
+    Draw.color(Color.orange);
+    Lines.stroke(1.2 * e.rotation * e.fout());
+    Lines.square(e.x, e.y, e.rotation * 4);
 });
 
 
@@ -43,10 +43,11 @@ module.exports = {
             maxDamage: 30,
             maxDamageFx: maxDamageFx,
             withstandFx: withstandFx,
+            over9000: 90000000, //wave damage is 99999999
 
             setStats(){
                 this.super$setStats();
-                this.stats.add(Stat.abilities, "@", Core.bundle.format("stat.maxDamage", this.maxDamage));
+                this.stats.add(Stat.abilities, "@", Core.bundle.format("stat.unity.maxDamage", this.maxDamage));
             }
             //end
         }, obj);
@@ -56,8 +57,13 @@ module.exports = {
 
         objb = Object.assign({
             handleDamage(amount){
-                this.super$handleDamage(Math.min(amount, wallblock.maxDamage));
-                if(amount > wallblock.maxDamage) wallblock.withstandFx.at(this.x, this.y, wallblock.size);
+                if(amount > wallblock.maxDamage && amount < wallblock.over9000){
+                    wallblock.withstandFx.at(this.x, this.y, wallblock.size);
+                    return this.super$handleDamage(Math.min(amount, wallblock.maxDamage));
+                }
+                else{
+                    return this.super$handleDamage(amount);
+                }
             }
         }, objb);
         //Extend Building
