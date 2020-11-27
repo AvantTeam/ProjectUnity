@@ -1,6 +1,10 @@
 const diriumColor = Color.valueOf("96f7c3");
 const diriumColor2 = Color.valueOf("ccffe4");
 
+const tpCoolDown = new StatusEffect("tpcooldown"); //empty effect for tp cooldown
+tpCoolDown.color = diriumColor2;
+tpCoolDown.effect = Fx.none;
+
 const tpOut = new Effect(30, e => {
     Draw.color(diriumColor);
     Lines.stroke(3*e.fout());
@@ -129,9 +133,12 @@ teleunit.buildType = prov(() => extend(Building, {
         if(unit != null && unit.isPlayer() && !(unit instanceof BlockUnitc)) this.tpPlayer(unit.getPlayer());
     },
     tpPlayer(player){
+        this.tpUnit(player.unit(), player == Vars.player);
+        if(Vars.player != null && player == Vars.player) Core.camera.position.set(player);
+    },
+    tpUnit(unit, isPlayer){
         var barr = this.getDestList();
         if(barr.length <= 0) return;
-        //print(barr);
         var index = barr.indexOf(this);
         if(index < 0){
             print("Error! Origin pad not in list!");
@@ -139,12 +146,12 @@ teleunit.buildType = prov(() => extend(Building, {
         index++;
         if(index >= barr.length) index = 0;
         var dest = barr[index];
-        if(!Vars.headless) tpIn.at(player.unit().x, player.unit().y, player.unit().rotation - 90, Color.white, player.unit().type);
-        player.unit().set(dest.x, dest.y);
-        player.unit().snapInterpolation();
-        player.unit().set(dest.x, dest.y);//for good measure
-        if(Vars.player != null && player == Vars.player) Core.camera.position.set(player);
-        if(!Vars.headless) this.effects(dest, player.unit().hitSize * 1.7, player == Vars.player, player.unit());
+        if(!Vars.headless) tpIn.at(unit.x, unit.y, unit.rotation - 90, Color.white, unit.type);
+        unit.set(dest.x, dest.y);
+        unit.snapInterpolation();
+        unit.set(dest.x, dest.y);//for good measure
+
+        if(!Vars.headless) this.effects(dest, unit.hitSize * 1.7, isPlayer, unit);
     },
     effects(dest, hitSize, isPlayer, unit){
         //TODO: EoD-style total unit effect
@@ -158,5 +165,10 @@ teleunit.buildType = prov(() => extend(Building, {
         }
         tpOut.at(dest.x, dest.y, hitSize);
         tpFlash.at(dest.x, dest.y, 0, Color.white, unit);
+    },
+    unitOn(unit){
+        if(unit.hasEffect(tpCoolDown) || unit.isPlayer()) return;
+        this.tpUnit(unit, false);
+        unit.apply(tpCoolDown, 120);
     }
 }));
