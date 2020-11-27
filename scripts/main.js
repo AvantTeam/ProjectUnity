@@ -242,6 +242,7 @@ const script = [
                 name: "blocks",
                 childs: [
                     "shieldGenerator",
+                    "deflectGenerator",
                     "shieldedWall",
                     "teleporter",
                     "teleunit",

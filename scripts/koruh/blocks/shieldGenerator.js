@@ -15,6 +15,10 @@ const shieldGenerator = lib.extend(ForceProjector, ForceProjector.ForceBuild, "s
             intensity: 25
         }
     ],
+    setStats(){
+        this.super$setStats();
+        this.stats.remove(Stat.boostEffect);
+    },
     drawPlace(x, y, rotation, valid){
         Draw.color(Pal.lancerLaser);
         Lines.stroke(1.5);
@@ -22,6 +26,11 @@ const shieldGenerator = lib.extend(ForceProjector, ForceProjector.ForceBuild, "s
         Draw.color();
     }
 }, {
+    buildingRadius: this.buildingRadius,
+    created(){
+        this.super$created();
+        this.buildingRadius = shieldGenerator.radius;
+    },
     customUpdate(){
         //necessary for realRadius
         this.radscl = Mathf.lerpDelta(this.radscl, this.broken ? 0 : this.warmup, 0.05);
@@ -91,7 +100,7 @@ const shieldGenerator = lib.extend(ForceProjector, ForceProjector.ForceBuild, "s
         }
     },
     realRadius(){
-        return (shieldGenerator.radius + this.phaseHeat * shieldGenerator.phaseRadiusBoost) * this.radscl + Mathf.pow(1.35, this.totalLevel());
+        return (this.buildingRadius + this.phaseHeat * shieldGenerator.phaseRadiusBoost) * this.radscl;
     },
     drawShield(){
         if(!this.broken){
@@ -124,6 +133,7 @@ const shieldGenerator = lib.extend(ForceProjector, ForceProjector.ForceBuild, "s
     },
     levelUp(int){
         shieldGenerator.consumes.power(2 + this.totalLevel());
+        this.buildingRadius += 1.5;
     }
 });
 

@@ -1,0 +1,8 @@
+type: Wall
+
+health: 320
+requirements: [
+    steel/6
+]
+
+category: defense
