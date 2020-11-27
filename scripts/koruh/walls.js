@@ -1,11 +1,11 @@
 const wlib = this.global.unity.limitwall;
 
 const stonewall = wlib.extend(Wall, Wall.WallBuild, "ustone-wall", {
-    maxDamage: 32
+    maxDamage: 40
 }, {});
 
 const densewall = wlib.extend(Wall, Wall.WallBuild, "dense-wall", {
-    maxDamage: 30
+    maxDamage: 36
 }, {});
 
 const steelwall = wlib.extend(Wall, Wall.WallBuild, "steel-wall", {
