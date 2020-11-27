@@ -238,8 +238,8 @@ const diriumFx = new Effect(10, e => {
 });
 
 const diriumcrucible = clib.extend(GenericCrafter, GenericCrafter.GenericCrafterBuild, "dirium-crucible", {
-    expUse: 30,
-    expCapacity: 120,
+    expUse: 40,
+    expCapacity: 160,
 
     load(){
         this.super$load();

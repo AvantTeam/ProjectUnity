@@ -5,7 +5,7 @@ requirements: [
     dense-alloy/120,
     titanium/100,
     steel/60,
-    dirium/30
+    dirium/16
 ]
 consumes: {
     power: 10
