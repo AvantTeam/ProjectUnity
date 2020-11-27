@@ -149,7 +149,7 @@ const partinfo = [
 			},
 			baseSpeed:{
 				name: "stat.unity.bulletSpd",
-                value: 4,
+                value: 5,
 			},
 			ammoType:{
 				name: "stat.unity.ammoType",
@@ -173,7 +173,7 @@ const partinfo = [
 			},
 			lifetime:{
 				name: "stat.unity.lifetime",
-                value: 50,
+                value: 40,
 			},
 			
         },
@@ -214,7 +214,7 @@ const partinfo = [
 			},
 			baseSpeed:{
 				name: "stat.unity.bulletSpd",
-                value: 2,
+                value: 3,
 			},
 			ammoType:{
 				name: "stat.unity.ammoType",
@@ -446,6 +446,7 @@ const smallTurret = graphLib.finaliseExtendContent(Turret, Turret.TurretBuild, "
             this.aniprog = prog;
             this.anispeed = 0;
         }
+		this.updateAutoBuild();
 	},
 	draw() {
         Draw.rect(smallTurret.base, this.x, this.y, 0);

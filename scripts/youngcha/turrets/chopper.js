@@ -322,6 +322,7 @@ const chopperTurret = graphLib.finaliseExtend(Block, Building, "chopper", blanko
             this.anispeed = 0;
         }
         this.speedDmgMul = tgraph.getNetwork().lastVelocity;
+		this.updateAutoBuild();
     },
     updatePost() {
         var tgraph = this.getGraphConnector("torque graph");

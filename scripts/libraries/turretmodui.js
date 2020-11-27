@@ -639,7 +639,7 @@ function displayPartInfo(part) {
 	dialog.cont.row();
 	dialog.cont.add("[lightgray]Description:").left();
 	dialog.cont.row();
-	dialog.cont.add("[white]" + part.desc).left().maxWidth(500).get().setWrap(true);
+	dialog.cont.add("[white]" + part.desc).left().maxWidth(500).setWrap(true).get().setWrap(true);
 	dialog.cont.row();
 	dialog.cont.add("[accent] Stats");
 	for (var stat in part.stats) {
@@ -684,36 +684,18 @@ function _preCalcConnection(partsConfig){
 	}
 }
 
-function applyModularConstructorUI(table, partssprite, spritew, spriteh, partsConfig, maxw, maxh, preconfig, categories) {
-	//preinit
+function _assignPartSprties(partsConfig,partssprite){
 	for (let i = 0; i < partsConfig.length; i++) {
 		partsConfig[i].id = i;
 		let pinfo = partsConfig[i];
-		if (!pinfo.connInList) {
-			let tmp = [];
-			for (let i = 0; i < pinfo.connectIn.length; i++) {
-				if (pinfo.connectIn[i] != 0) {
-					let t2 = getConnectSidePos(i, pinfo.tw, pinfo.th);
-					t2.id = pinfo.connectIn[i];
-					tmp.push(t2);
-				}
-			}
-			pinfo.connInList = tmp;
-		}
-		if (!pinfo.connOutList) {
-			let tmp = [];
-			for (let i = 0; i < pinfo.connectOut.length; i++) {
-				if (pinfo.connectOut[i] != 0) {
-					let t2 = getConnectSidePos(i, pinfo.tw, pinfo.th);
-					t2.id = pinfo.connectOut[i];
-					tmp.push(t2);
-				}
-			}
-			pinfo.connOutList = tmp;
-		}
 		pinfo.texRegion = _getRegionRect(partssprite, pinfo.tx, pinfo.ty, pinfo.tw, pinfo.th, spritew, spriteh);
 	}
+}
 
+function applyModularConstructorUI(table, partssprite, spritew, spriteh, partsConfig, maxw, maxh, preconfig, categories) {
+	//preinit
+	_preCalcConnection(partsConfig);
+	_assignPartSprties(partsConfig,partssprite);
 	let currentCat = "";
 
 	let modelement = getModularConstructorUI(400, partssprite, partsConfig, preconfig, maxw, maxh);
@@ -838,9 +820,13 @@ function applyModularConstructorUI(table, partssprite, spritew, spriteh, partsCo
 
 	return modelement;
 }
+
 const _ModularBlock = {
 	gridW: 1,
 	gridH: 1,
+	_timerid:1,
+	_autoBuildDelay: 10,
+	
 	getGridWidth() {
 		return this.gridW;
 	},
@@ -858,6 +844,18 @@ const _ModularBlock = {
 		this.config(java.lang.String, (a, b) => a.setBlueprintFromString(b));
 		this.configClear((tile) => tile.setBlueprint(null));
 	},
+	getBuildTimerId(){
+		if(!this._timerid){
+			this._timerid = this.timers++;
+		}
+		return this._timerid;
+	},
+	setAutoBuildDelay(s){
+		this._autoBuildDelay=s;
+	},
+	getAutoBuildDelay(){
+		return this._autoBuildDelay;
+	}
 
 }
 
@@ -932,7 +930,31 @@ const _ModularBuild = {
 			costCons.get(csttable);
 		});
 	},
-
+	////team().core().items
+	updateAutoBuild(){
+		if (this._totalItemCountPaid >= this._totalItemCountCost) {return;}
+		let rc = this._blueprintRemainingCost;
+		if(this.team.rules().infiniteResources){
+			for (let i in rc) {
+				//rc[i].paid=rc[i].total; soon
+			}
+		}
+		if(this.timer.get(this.block.getBuildTimerId(),this.block.getAutoBuildDelay())){
+			let citems = this.team.core().items;
+			for (let i in rc) {
+				if(rc[i].paid<rc[i].total && citems.get(rc[i].item)>0){
+					citems.remove(rc[i].item, 1);
+					this._totalItemCountPaid++;
+					rc[i].paid++;
+					if (this._totalItemCountPaid == this._totalItemCountCost) {
+						this.applyStats(this._currentStats);
+					}
+					return;
+				}
+			}
+		}
+	},
+	
 	acceptItem(source, item) {
 		var hasspace = this._blueprintRemainingCost && this._blueprintRemainingCost[item.name] && this._blueprintRemainingCost[item.name].paid < this._blueprintRemainingCost[item.name].total;
 		return this.super$acceptItem(source, item) || hasspace || this.acceptItemExt(source, item);
@@ -949,6 +971,7 @@ const _ModularBuild = {
 			this.applyStats(this._currentStats);
 		}
 	},
+	
 	acceptItemExt(source, item) {
 		return false;
 	},
@@ -962,6 +985,8 @@ const _ModularBuild = {
 	drawPartBuffer(part, x, y, grid) {
 		Draw.rect(part.texRegion, (x + part.tw * 0.5) * 32, (y + part.th * 0.5) * 32, part.tw * 32, part.th * 32);
 	},
+	
+	
 	buildConfiguration(table) {
 		let buttoncell = table.button(Tex.whiteui, Styles.clearTransi, 50, run(() => {
 					let dialog = new BaseDialog("Edit Blueprint");
@@ -1328,9 +1353,7 @@ const _TurretModularBuild = Object.assign(deepCopy(_ModularBuild), {
 		},
 		//Consume ammo and return a type.
 		useAmmo() {
-			let btype = this.guns[this.currentBarrel].bullettype;
-			this.currentBarrel++;
-			this.currentBarrel = this.currentBarrel % this.guns.length;
+			
 			return btype;
 		},
 		//the ammo type that will be returned if useAmmo is called.
@@ -1427,6 +1450,10 @@ const _TurretModularBuild = Object.assign(deepCopy(_ModularBuild), {
 			if (this.reload >= this.reloadTime*this.guns[this.currentBarrel].reloadmult) {
 				let type = this.guns[this.currentBarrel];
 				this.shootType(type);
+				this.currentBarrel++;
+				this.currentBarrel = this.currentBarrel % this.guns.length;
+				print(this.currentBarrel);
+				
 
 				this.reload = 0;
 			} else {
