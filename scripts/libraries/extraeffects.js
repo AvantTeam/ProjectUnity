@@ -276,12 +276,13 @@ module.exports = {
 	addMoltenBlock(build){
         var contains = false;
         var tmp = null;
+        var s = true;
         
         vapourizeQueue.each(buildq => {
             contains = buildq.build == build;
-            if(contains){
+            if(contains && s){
                 tmp = buildq;
-                return;
+                s = false;
             }
         });
         
