@@ -69,7 +69,7 @@ public class ExpUnloader extends Block implements ExpOrbHandlerBase{
 
         protected void checkUnload(int dir){
             Building build = nearby(dir);
-            if(!build.isValid() || !(build instanceof ExpBuildBase)){
+            if(!(build instanceof ExpBuildBase) || !build.isValid()){
                 join[dir] = false;
                 return;
             }
@@ -77,7 +77,7 @@ public class ExpUnloader extends Block implements ExpOrbHandlerBase{
             for(int i = 0; i < 2; i++){
                 if(temp.totalExp() >= ExpOrb.expAmount){
                     temp.incExp(-1f * ExpOrb.expAmount);
-                    ExpOrb.spewExp(x, y, 1, dir * 90f + 180f, 8f);
+                    ExpOrb.spewExp(x, y, 1, dir * 90f + 180f);
                 }else break;
             }
         }

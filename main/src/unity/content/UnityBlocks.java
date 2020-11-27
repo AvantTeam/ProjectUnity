@@ -26,7 +26,9 @@ import unity.world.blocks.distribution.Teleporter;
 import unity.world.blocks.logic.*;
 import unity.world.blocks.production.StemGenericSmelter;
 import unity.world.blocks.storage.ExpFountain;
+import unity.world.blocks.storage.ExpStorageBlock;
 import unity.world.blocks.storage.ExpUnloader;
+import unity.world.blocks.storage.ExpVoid;
 import unity.world.blocks.units.SelectableReconstructor;
 import unity.world.draw.DrawLightSource;
 import multilib.*;
@@ -64,7 +66,7 @@ public class UnityBlocks implements ContentList{
     //turrets
     laserTurret, inferno,
     //blocks
-    teleporter, expUnloader, expFountain,
+    teleporter, expUnloader, expTank, expChest, expFountain, expVoid,
 
 //light
     //turrets
@@ -736,7 +738,33 @@ public class UnityBlocks implements ContentList{
             }
         };
 
+        expTank = new ExpStorageBlock("exp-tank"){
+            {
+                requirements(Category.effect, with(Items.copper, 100, Items.graphite, 100, UnityItems.denseAlloy, 30));
+                size = 2;
+                health = 300;
+            }
+        };
+
+        expChest = new ExpStorageBlock("exp-chest"){
+            {
+                requirements(Category.effect, with(Items.copper, 400, UnityItems.steel, 250, Items.phaseFabric, 120));
+                size = 4;
+                health = 1200;
+                expCapacity = 3200;
+                lightRadius = 50f;
+                lightOpacity = 0.6f;
+            }
+        };
+
         expFountain = new ExpFountain("exp-fountain"){
+            {
+                requirements(Category.effect, BuildVisibility.sandboxOnly, with());
+                health = 200;
+            }
+        };
+
+        expVoid = new ExpVoid("exp-void"){
             {
                 requirements(Category.effect, BuildVisibility.sandboxOnly, with());
                 health = 200;

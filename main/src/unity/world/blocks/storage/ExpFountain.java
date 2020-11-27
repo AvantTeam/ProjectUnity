@@ -39,7 +39,7 @@ public class ExpFountain extends Block implements ExpOrbHandlerBase{
 
         @Override
         public void updateTile(){
-            if(enabled && timer(0, 60f)) ExpOrb.spreadExp(x, y, 100f, 6);
+            if(enabled && timer(0, 60f)) ExpOrb.spreadExp(x, y, 100f, 6f);
         }
 
         @Override

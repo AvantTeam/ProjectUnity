@@ -8,6 +8,10 @@ public interface ExpBuildBase extends Buildingc{
 
     float totalExp();
 
+    default float expf(){
+        return totalExp() / getMaxExp();
+    }
+
     void setExp(float a);
 
     default void expWrite(Writes write){
@@ -20,7 +24,7 @@ public interface ExpBuildBase extends Buildingc{
 
     default void incExp(float a){
         setExp(Math.min(totalExp() + a, getMaxExp()));
-        if(totalExp() > 0f) setExp(0f);
+        if(totalExp() < 0f) setExp(0f);
     }
 
     default boolean consumesOrb(){

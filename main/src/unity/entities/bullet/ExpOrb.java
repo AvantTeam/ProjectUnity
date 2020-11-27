@@ -113,7 +113,7 @@ public class ExpOrb extends BulletType{
     }
 
     public static void spewExp(float x, float y, int n, float r, float v){
-        if(net.client()){
+        if(!net.client()){
             v *= 1000f;
             for(int i = 0; i < n; i++) exporb.createNet(Team.derelict, x, y, r - 5f + 10 * Mathf.random(), 0, v, 1f);
         }
