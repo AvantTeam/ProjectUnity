@@ -1,0 +1,10 @@
+requirements: [
+    stone/1
+    dense-alloy/1
+    steel/1
+]
+
+category: distribution
+health: 140
+speed: 0.08
+displayedSpeed: 11

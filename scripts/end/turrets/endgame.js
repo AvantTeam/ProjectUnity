@@ -198,8 +198,9 @@ endgame.buildType = () => {
 				//var tileTarget = Units.findEnemyTile(this.team, this.x, this.y, endgame.range, build => !build.dead);
 				var lowest = endgame.range + 999;
 				var dstC = endgame.range + 999;
-				fLib.trueEachBlock(this.x, this.y, endgame.range / 2, build => {
-					var dstD = Mathf.dst(this.x, this.y, build.x, build.y);
+                
+                Vars.indexer.eachBlock(null, this.x, this.y, endgame.range, build => build.team != this.team, build => {
+                    var dstD = Mathf.dst(this.x, this.y, build.x, build.y);
 					if(build.team != this.team && !build.dead){
 						//dstC = Mathf.dst(this.x, this.y, build.x, build.y);
 						if(dstD < dstC){
@@ -216,9 +217,9 @@ endgame.buildType = () => {
 							tempSeq.add(build);
 						};
 					};
-				});
+                });
 				for(var i = 0; i < 16; i++){
-					var tmpTarget = fLib.targetUnique(this.team, this.x, this.y, endgame.range / 2, new Seq(this._targetsB));
+					var tmpTarget = fLib.targetUnique(this.team, this.x, this.y, endgame.range, new Seq(this._targetsB));
 					if(tmpTarget == null && tempSeq.size > 0.0001){
 						//tmpTarget = Units.findEnemyTile(this.team, this.x, this.y, endgame.range, build => !build.dead);
 						//tmpTarget = tileTarget;

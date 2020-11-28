@@ -1,0 +1,10 @@
+requirements: [
+    steel/1
+    phase-fabric/1
+    dirium/1
+]
+
+category: distribution
+health: 150
+speed: 0.15
+displayedSpeed: 18.75
