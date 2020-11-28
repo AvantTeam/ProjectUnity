@@ -4,7 +4,7 @@ import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.TextureRegion;
 import arc.math.Mathf;
-import arc.util.Time;
+import arc.util.*;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import mindustry.gen.Building;
@@ -46,7 +46,7 @@ public class ExpStorageBlock extends Block{
     public void setBars(){
         super.setBars();
         bars.add("exp", (ExpStorageBuild build) -> {
-            return new Bar(() -> bundle.get("explib.exp"), () -> UnityPal.expColor.cpy().lerp(UnityPal.expMaxColor, build.expf()), () -> build.expf());
+            return new Bar(() -> bundle.get("explib.exp"), () -> Tmp.c1.set(UnityPal.expColor).lerp(UnityPal.expMaxColor, build.expf()), () -> build.expf());
         });
     }
 

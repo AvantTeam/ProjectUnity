@@ -405,5 +405,28 @@ public class UnityFx{
         randLenVectors(e.id, 7, 2f + 5 * e.fin(), (x, y) -> {
             Fill.circle(e.x + x, e.y + y, e.fout());
         });
+    }),
+
+    maxDamageFx = new Effect(16f, e -> {
+        color(Color.orange);
+        stroke(2.5f * e.fin());
+        square(e.x, e.y, e.rotation * 4f);
+    }),
+
+    withstandFx = new Effect(16f, e -> {
+        color(Color.orange);
+        stroke(1.2f * e.rotation * e.fout());
+        square(e.x, e.y, e.rotation * 4f);
+    }),
+
+    ahhimaLiquidNow = new Effect(45f, e -> {
+        color(Color.gray, Color.clear, e.fin());
+        randLenVectors(e.id, 3, 2.5f + e.fin() * 6f, (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, 0.2f + e.fin() * 3f);
+        });
+        color(UnityPal.lavaColor, UnityPal.lavaColor2, e.fout());
+        randLenVectors(e.id + 1, 4, 1 + e.fin() * 4f, (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, 0.2f + e.fout() * 1.3f);
+        });
     });
 }

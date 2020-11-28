@@ -13,9 +13,7 @@ import mindustry.ui.dialogs.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import unity.content.*;
-import unity.mod.ContributorList;
-import unity.mod.UnityMusics;
-import unity.mod.UnitySounds;
+import unity.mod.*;
 import unity.mod.ContributorList.*;
 
 public class Unity extends Mod{
@@ -25,6 +23,7 @@ public class Unity extends Mod{
         new UnityItems(),
         new OverWriter(),
         new UnityStatusEffects(),
+        new UnityLiquids(),
         new UnityBullets(),
         new UnityUnitTypes(),
         new UnityBlocks(),

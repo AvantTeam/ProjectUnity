@@ -21,6 +21,7 @@ import mindustry.content.*;
 import unity.graphics.UnityPal;
 import unity.mod.UnitySounds;
 import unity.world.blocks.defense.LightWall;
+import unity.world.blocks.defense.LimitWall;
 import unity.world.blocks.defense.turrets.*;
 import unity.world.blocks.distribution.Teleporter;
 import unity.world.blocks.logic.*;
@@ -67,6 +68,7 @@ public class UnityBlocks implements ContentList{
     laserTurret, inferno,
     //blocks
     teleporter, expUnloader, expTank, expChest, expFountain, expVoid,
+    stoneWall, denseWall, steelWall, steelWallLarge,
 
 //light
     //turrets
@@ -508,7 +510,7 @@ public class UnityBlocks implements ContentList{
                 coolantMultiplier = 0.4f;
                 shootCone = 12f;
                 shootDuration = 360f;
-                powerUse = 125f;
+                powerUse = 175f;
                 shootShake = 4f;
                 firingMoveFract = 0.09f;
                 shootEffect = Fx.shootBigSmoke2;
@@ -726,7 +728,7 @@ public class UnityBlocks implements ContentList{
         //region koruh blocks
         teleporter = new Teleporter("teleporter"){
             {
-                requirements(Category.distribution, with(Items.lead, 12, Items.silicon, 10, Items.phaseFabric, 10, Items.thorium, 4));
+                requirements(Category.distribution, with(Items.lead, 22, Items.silicon, 10, Items.phaseFabric, 32, UnityItems.dirium, 32));
             }
         };
 
@@ -768,6 +770,39 @@ public class UnityBlocks implements ContentList{
             {
                 requirements(Category.effect, BuildVisibility.sandboxOnly, with());
                 health = 200;
+            }
+        };
+
+        stoneWall = new LimitWall("ustone-wall"){
+            {
+                requirements(Category.defense, with(UnityItems.stone, 6));
+                maxDamage = 40f;
+                health = 200;
+            }
+        };
+
+        denseWall = new LimitWall("dense-wall"){
+            {
+                requirements(Category.defense, with(UnityItems.denseAlloy, 6));
+                maxDamage = 32f;
+                health = 360;
+            }
+        };
+
+        steelWall = new LimitWall("steel-wall"){
+            {
+                requirements(Category.defense, with(UnityItems.steel, 6));
+                maxDamage = 24f;
+                health = 620;
+            }
+        };
+
+        steelWallLarge = new LimitWall("steel-wall-large"){
+            {
+                requirements(Category.defense, with(UnityItems.steel, 24));
+                maxDamage = 48f;
+                health = 2480;
+                size = 2;
             }
         };
         //endregion

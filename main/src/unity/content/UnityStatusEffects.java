@@ -6,9 +6,10 @@ import mindustry.ctype.ContentList;
 import mindustry.entities.units.WeaponMount;
 import mindustry.gen.Unit;
 import mindustry.type.StatusEffect;
+import unity.graphics.UnityPal;
 
 public class UnityStatusEffects implements ContentList{
-    public static StatusEffect radiation, reloadFatigue;
+    public static StatusEffect radiation, reloadFatigue, molten;
 
     @Override
     public void load(){
@@ -34,6 +35,15 @@ public class UnityStatusEffects implements ContentList{
         reloadFatigue = new StatusEffect("reload-fatigue"){
             {
                 reloadMultiplier = 0.75f;
+            }
+        };
+        molten = new StatusEffect("molten"){
+            {
+                color = UnityPal.lavaColor;
+                speedMultiplier = 0.6f;
+                healthMultiplier = 0.5f;
+                damage = 1f;
+                effect = UnityFx.ahhimaLiquidNow;
             }
         };
     }
