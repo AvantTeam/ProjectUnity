@@ -6,4 +6,5 @@
 		{"item": "nickel", "amount": 30},
 	],
 	"category": "crafting",
+	"research": "unity-crucible",
 }

@@ -7,4 +7,6 @@
 		{"item": "titanium", "amount": 150},
 	],
 	"category": "power",
+	"research": "unity-solar-collector",
+
 }

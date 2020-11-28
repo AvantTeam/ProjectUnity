@@ -159,6 +159,10 @@ const partinfo = [
 				name: "stat.unity.payload",
                 value: 1,
 			},
+			magazine:{
+				name: "stat.unity.magazine",
+                value: 3,
+			},
 			shots:{
 				name: "stat.unity.shots",
                 value: 1,
@@ -173,7 +177,7 @@ const partinfo = [
 			},
 			lifetime:{
 				name: "stat.unity.lifetime",
-                value: 40,
+                value: 35,
 			},
 			
         },
@@ -226,6 +230,10 @@ const partinfo = [
 			},
 			payload:{
 				name: "stat.unity.payload",
+                value: 1,
+			},
+			magazine:{
+				name: "stat.unity.magazine",
                 value: 2,
 			},
 			shots:{
@@ -302,6 +310,10 @@ const partinfo = [
 			},
 			payload:{
 				name: "stat.unity.payload",
+                value: 1,
+			},
+			magazine:{
+				name: "stat.unity.magazine",
                 value: 2,
 			},
 			shots:{
@@ -318,7 +330,7 @@ const partinfo = [
 			},
 			lifetime:{
 				name: "stat.unity.lifetime",
-                value: 20,
+                value: 25,
 			},
 			mod: {
                 name: "stat.unity.mod",
@@ -369,11 +381,15 @@ const partinfo = [
 					if(!config.shots){
 						config.shots=1;
 					}
+					if(!config.ammoCostMul){
+						config.ammoCostMul=1;
+					}
 					if(!config.reloadmult){
 						config.reloadmult=1;
 					}
 					config.shots = config.shots+1;
 					config.reloadmult *= config.shots/(config.shots-1);
+					config.ammoCostMul*= config.shots/(config.shots-1);
 				})
             },
         }
@@ -411,6 +427,12 @@ const partinfo = [
 				cons: cons((config)=>{
 					config.incindiary = true;
 					config.status = StatusEffects.burning;
+					if(!config.ammoType){
+						config.ammoType={};
+					}
+					if(!config.ammoType["fire"]){
+						config.ammoType["fire"] = 1;
+					}
 				})
             },
         }
@@ -457,10 +479,17 @@ const partinfo = [
 						config.homingPower += 0.02;
 						config.homingRange += 15;
 					}
+					if(!config.ammoType){
+						config.ammoType={};
+					}
+					if(!froms.ammoType["homing"]){
+						froms.ammoType["homing"] = 1;
+					}else{
+						froms.ammoType["homing"] += 1;
+					}
 				})
             },
         }
-
     },
 	
 	{
@@ -642,6 +671,7 @@ smallTurret.update = true;
 smallTurret.solid = true;
 smallTurret.configurable = true;
 smallTurret.acceptsItems = true;
+smallTurret.hasItems = true;
 smallTurret.setGridWidth(3);
 smallTurret.setGridHeight(3);
 smallTurret.getGraphConnectorBlock("torque graph").setAccept([1,1, 0,0, 0,0, 0,0]);

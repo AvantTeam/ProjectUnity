@@ -20,7 +20,7 @@
 		"item": "coal",
 		"amount": 3
 	},
-	"research": "unity-solar-collector",
+	"research": "unity-spore-farm",
 	"category": "crafting",
 	"ambientSound": "machine",
 	"ambientSoundVolume": 0.6
