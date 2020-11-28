@@ -639,7 +639,7 @@ function displayPartInfo(part) {
 	dialog.cont.row();
 	dialog.cont.add("[lightgray]Description:").left();
 	dialog.cont.row();
-	dialog.cont.add("[white]" + part.desc).left().maxWidth(500).setWrap(true).get().setWrap(true);
+	dialog.cont.add("[white]" + part.desc).wrap().fillX().left().width(500).maxWidth(500).get().setWrap(true);
 	dialog.cont.row();
 	dialog.cont.add("[accent] Stats");
 	for (var stat in part.stats) {
@@ -684,7 +684,7 @@ function _preCalcConnection(partsConfig){
 	}
 }
 
-function _assignPartSprties(partsConfig,partssprite){
+function _assignPartSprties(partsConfig,partssprite, spritew, spriteh){
 	for (let i = 0; i < partsConfig.length; i++) {
 		partsConfig[i].id = i;
 		let pinfo = partsConfig[i];
@@ -695,7 +695,7 @@ function _assignPartSprties(partsConfig,partssprite){
 function applyModularConstructorUI(table, partssprite, spritew, spriteh, partsConfig, maxw, maxh, preconfig, categories) {
 	//preinit
 	_preCalcConnection(partsConfig);
-	_assignPartSprties(partsConfig,partssprite);
+	_assignPartSprties(partsConfig,partssprite,spritew,spriteh);
 	let currentCat = "";
 
 	let modelement = getModularConstructorUI(400, partssprite, partsConfig, preconfig, maxw, maxh);
@@ -1288,9 +1288,14 @@ const BulletTypesMap = {
 		}
 		//todo
 	}),
-	shell: {
+	shell: Object.assign(Object.create(normalBulletType),{
+		loadExt(){
+			this.width=10;
+			this.height=14;
+			this.hitEffect= Fx.flakExplosion;
+		}
 		//todo
-	},
+	}),
 	cluster: {
 		//todo
 	},
@@ -1326,6 +1331,17 @@ function getBulletTypeFromConfig(config) {
 
 }
 
+
+function mergeStats(tos, froms){
+	if(froms.shots){
+		froms.shots*=tos.shots;
+	}
+	if(froms.reloadmult){
+		froms.reloadmult*=tos.reloadmult;
+	}
+	return Object.assign(tos, froms);
+}
+
 const _TurretModularBuild = Object.assign(deepCopy(_ModularBuild), {
 		/*
 		[{
@@ -1343,6 +1359,8 @@ const _TurretModularBuild = Object.assign(deepCopy(_ModularBuild), {
 		originalmaxhp: 0,
 		currentBarrel: 0,
 		validTurret: false,
+		//gun stats
+		turretRange:80,
 
 		acceptItemExt(source, item) {
 			return false;
@@ -1363,6 +1381,7 @@ const _TurretModularBuild = Object.assign(deepCopy(_ModularBuild), {
 		applyStats(total) {
 			this.originalmaxhp = this.maxHealth;
 			this.maxHealth = this.originalmaxhp + total.hpinc;
+			this.turretRange=80 + total.rangeinc;
 			this.heal(total.hpinc* this.health/this.originalmaxhp);
 			if (!total.guns) {
 				this.validTurret = false;
@@ -1373,7 +1392,7 @@ const _TurretModularBuild = Object.assign(deepCopy(_ModularBuild), {
 				if (!total.guns[i]) {
 					continue;
 				}
-				lt.push(Object.assign(total.guns[i], total.globalStats));
+				lt.push(mergeStats(total.guns[i], total.globalStats));
 				lt[i].bullettype = getBulletTypeFromConfig(lt[i]);
 
 			}
@@ -1391,6 +1410,12 @@ const _TurretModularBuild = Object.assign(deepCopy(_ModularBuild), {
 				total.globalStats = {};
 			}
 			total.hpinc += part.stats["hp"].value;
+			if( part.stats["rangeinc"]){
+				if(!total.rangeinc){
+					total.rangeinc=0;
+				}
+				total.rangeinc +=  part.stats["rangeinc"].value;
+			}
 			if (part.category == "base") {
 				print("encountered base part");
 				total.reload = part.stats.reload.value;
@@ -1441,7 +1466,7 @@ const _TurretModularBuild = Object.assign(deepCopy(_ModularBuild), {
 				this.maxHealth = this.originalmaxhp;
 			}
 			this.validTurret = false;
-			
+			this.turretRange=80;
 		},
 		updateShooting() {
 			if (!this.valid) {
@@ -1452,8 +1477,6 @@ const _TurretModularBuild = Object.assign(deepCopy(_ModularBuild), {
 				this.shootType(type);
 				this.currentBarrel++;
 				this.currentBarrel = this.currentBarrel % this.guns.length;
-				print(this.currentBarrel);
-				
 
 				this.reload = 0;
 			} else {
@@ -1466,7 +1489,19 @@ const _TurretModularBuild = Object.assign(deepCopy(_ModularBuild), {
 			for(let i = 0; i < configtype.shots; i++){
 				this.bullet(configtype.bullettype, this.rotation + Mathf.range(configtype.spread));
 			}
-		}
+		},
+		findTarget(){
+			let targetAir = true;
+			let targetGround = true;
+            if(targetAir && !targetGround){
+                this.target = Units.bestEnemy(this.team, this.x, this.y, this.turretRange, e => !e.dead && !e.isGrounded(), this.block.unitSort);
+            }else{
+                this.target = Units.bestTarget(this.team, this.x, this.y,  this.turretRange, e => !e.dead && (e.isGrounded() || targetAir) && (!e.isGrounded() || targetGround), b => true, this.block.unitSort);
+            }
+        },
+		drawSelect(){
+            Drawf.dashCircle(this.x, this.y, this.turretRange, this.team.color);
+        }
 
 	});
 

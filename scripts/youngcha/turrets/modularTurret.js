@@ -149,7 +149,7 @@ const partinfo = [
 			},
 			baseSpeed:{
 				name: "stat.unity.bulletSpd",
-                value: 5,
+                value: 4,
 			},
 			ammoType:{
 				name: "stat.unity.ammoType",
@@ -194,7 +194,11 @@ const partinfo = [
         cost: [
 			{
                 name: "unity-nickel",
-                amount: 4
+                amount: 5
+            },
+			{
+                name: "graphite",
+                amount: 5
             },
 		],
         connectOut: [0,3,0,0],
@@ -255,10 +259,129 @@ const partinfo = [
     },
 	
 	
-	
+	{
+        name: "Cannon breach",
+        desc: "Accepts and fires large shells",
+        category: "breach",
+        tx: 2,
+        ty: 1,
+        tw: 1,
+        th: 1,
+        cost: [
+			{
+                name: "titanium",
+                amount: 8
+            },
+			{
+                name: "lead",
+                amount: 4
+            },
+		],
+        connectOut: [0,3,0,0],
+        connectIn: [0,0,0,2],
+        stats: {
+            hp: {
+                name: "stat.unity.hpinc",
+                value: 10,
+            },
+			bulletType: {
+                name: "stat.unity.bulletType",
+                value: "shell",
+            },
+			baseDmg:{
+				name: "stat.unity.bulletDmg",
+                value: 85,
+			},
+			baseSpeed:{
+				name: "stat.unity.bulletSpd",
+                value: 10,
+			},
+			ammoType:{
+				name: "stat.unity.ammoType",
+                value: "heavy",
+			},
+			payload:{
+				name: "stat.unity.payload",
+                value: 2,
+			},
+			shots:{
+				name: "stat.unity.shots",
+                value: 1,
+			},
+			reloadMultiplier:{
+				name: "stat.unity.reloadMult",
+                value: 6.5,
+			},
+			spread:{
+				name: "stat.unity.spread",
+                value: 7,
+			},
+			lifetime:{
+				name: "stat.unity.lifetime",
+                value: 20,
+			},
+			mod: {
+                name: "stat.unity.mod",
+                value: "Piercing",
+				cons: cons((config)=>{
+					config.pierce = 2;
+				})
+            },
+			
+        },
+		
+
+    },
 	
 	{
-        name: "Incinidary Modifier",
+        name: "Ammo Packet",
+        desc: "Makes the gun shoot more bullet at once",
+        category: "ammo",
+        tx: 3,
+        ty: 1,
+        tw: 1,
+        th: 1,
+        cost: [
+            {
+                name: "metaglass",
+                amount: 8
+            },
+			{
+                name: "graphite",
+                amount: 8
+            },
+			{
+                name: "titanium",
+                amount: 8
+            },
+		],
+        connectOut: [0,0,0,0],
+        connectIn: [5,0,5,0],
+        stats: {
+            hp: {
+                name: "stat.unity.hpinc",
+                value: 15,
+            },
+			mod: {
+                name: "stat.unity.mod",
+                value: "+1 ammo size",
+				cons: cons((config)=>{
+					if(!config.shots){
+						config.shots=1;
+					}
+					if(!config.reloadmult){
+						config.reloadmult=1;
+					}
+					config.shots = config.shots+1;
+					config.reloadmult *= config.shots/(config.shots-1);
+				})
+            },
+        }
+
+    },
+	
+	{
+        name: "Incendiary Modifier",
         desc: "Makes the gun's bullets spark fires.",
         category: "ammo",
         tx: 4,
@@ -284,7 +407,7 @@ const partinfo = [
             },
 			mod: {
                 name: "stat.unity.mod",
-                value: "Incinidary",
+                value: "Incendiary",
 				cons: cons((config)=>{
 					config.incindiary = true;
 					config.status = StatusEffects.burning;
@@ -375,7 +498,7 @@ const partinfo = [
         th: 1,
         cost: [
             {
-                name: "titanium",
+                name: "unity-cupronickel",
                 amount: 10
             },
 		],
@@ -389,6 +512,43 @@ const partinfo = [
 			radiate: {
                 name: "stat.unity.heatRadiativity",
                 value: 0.03,
+            },
+        }
+
+    },
+	
+	{
+        name: "Rangefinder",
+        desc: "Increases the range of the turret",
+        category: "misc",
+        tx: 4,
+        ty: 3,
+        tw: 1,
+        th: 1,
+        cost: [
+            {
+                name: "graphite",
+                amount: 15
+            },
+			{
+                name: "metaglass",
+                amount: 10
+            },
+			{
+                name: "copper",
+                amount: 5
+            },
+		],
+        connectOut: [6,6,6,6],
+        connectIn: [6,6,6,6],
+        stats: {
+            hp: {
+                name: "stat.unity.hpinc",
+                value: 5,
+            },
+			rangeinc: {
+                name: "stat.unity.range",
+                value: 50,
             },
         }
 
