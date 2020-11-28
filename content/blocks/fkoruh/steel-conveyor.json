@@ -1,0 +1,9 @@
+requirements: [
+    stone/1
+    steel/2
+]
+
+category: distribution
+health: 80
+speed: 0.1
+displaySpeed: 12.5

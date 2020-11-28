@@ -1,0 +1,11 @@
+requirements: [
+    stone/4
+    dense-alloy/3
+    steel/2
+    dirium/1
+]
+
+category: distribution
+health: 150
+speed: 0.15
+displaySpeed: 18.75
