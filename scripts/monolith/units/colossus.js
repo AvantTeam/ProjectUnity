@@ -1,11 +1,37 @@
+const timers = new IntMap();
+const getTimer = id => {
+    if(!timers.containsKey(id)){
+        timers.put(id, 48);
+    };
+
+    return timers.get(id);
+};
+
+const setTimer = (id, val) => {
+    timers.put(id, val);
+};
+
+const phases = new IntMap();
+const getPhase = id => {
+    if(!phases.containsKey(id)){
+        phases.put(id, 0);
+    };
+
+    return phases.get(id);
+};
+
+const setPhase = (id, val) => {
+    phases.put(id, val);
+};
+
 const lightningSpawnAbility = extend(Ability, {
     update(unit){
-        if(this.timer <= 0){
-            if(this.phase > 0){
+        if(getTimer(unit.id) <= 0){
+            if(getPhase(unit.id) > 0){
                 for(let i = 0; i < this.lightningCount; i++){
                     Tmp.v1.trns(
                         (Time.time() * this.rotateSpeed + (360 * i / this.lightningCount) + Mathf.randomSeed(unit.id)) * Mathf.signs[unit.id % 2],
-                        this.lightningOffset * this.phase
+                        this.lightningOffset * getPhase(unit.id)
                     ).add(unit);
 
                     let u = Units.closestTarget(unit.team, Tmp.v1.x, Tmp.v1.y, this.lightningRange);
@@ -21,24 +47,28 @@ const lightningSpawnAbility = extend(Ability, {
                 };
             };
 
-            this.timer = this.timerTarget;
+            setTimer(unit.id, this.timerTarget);
         }else{
-            this.timer = Math.max(this.timer - Time.delta, 0);
+            setTimer(unit.id, Math.max(getTimer(unit.id) - Time.delta, 0));
         };
 
-        this.phase = Mathf.lerpDelta(this.phase, unit.ammof(), this.phaseSpeed);
-        this.phase = this.phase < 0.01 ? 0 : this.phase;
+        setPhase(unit.id, Mathf.lerpDelta(getPhase(unit.id), unit.ammof(), this.phaseSpeed));
+        setPhase(unit.id, getPhase(unit.id) < 0.01 ? 0 : getPhase(unit.id));
     },
 
     draw(unit){
+        let z = Draw.z();
+
+        Draw.z(unit.type.groundLayer + Mathf.clamp(unit.type.hitSize / 4000, 0, 0.01) - 0.015);
+
         for(let i = 0; i < this.lightningCount; i++){
             Tmp.v1.trns(
                 (Time.time() * this.rotateSpeed + (360 * i / this.lightningCount) + Mathf.randomSeed(unit.id)) * Mathf.signs[unit.id % 2],
-                this.lightningOffset * this.phase
+                this.lightningOffset * getPhase(unit.id)
             ).add(unit);
 
             let region = Core.atlas.find("circle-shadow");
-            let r = this.phase * region.width * Draw.scl + this.lightningRadius + (Mathf.sin(Time.time(), 6, 4) * this.phase);
+            let r = getPhase(unit.id) * region.width * Draw.scl + this.lightningRadius + (Mathf.sin(Time.time(), 6, 4) * getPhase(unit.id));
 
             Draw.color(this.backColor);
             Draw.rect(region, Tmp.v1.x, Tmp.v1.y, r, r);
@@ -49,6 +79,8 @@ const lightningSpawnAbility = extend(Ability, {
             Draw.color(Color.white);
             Draw.rect(region, Tmp.v1.x, Tmp.v1.y, r / 3, r / 3);
         };
+        
+        Draw.z(z);
     },
 
     localized(){
@@ -56,7 +88,6 @@ const lightningSpawnAbility = extend(Ability, {
     }
 });
 lightningSpawnAbility.timerTarget = 48;
-lightningSpawnAbility.timer = lightningSpawnAbility.timerTarget;
 lightningSpawnAbility.lightningCount = 8;
 lightningSpawnAbility.lightningRange = 120;
 lightningSpawnAbility.lightningOffset = 56;
@@ -65,7 +96,6 @@ lightningSpawnAbility.lightningDamage = 100;
 lightningSpawnAbility.lightningSound = Sounds.spark;
 lightningSpawnAbility.lightningRadius = 18;
 lightningSpawnAbility.rotateSpeed = 2;
-lightningSpawnAbility.phase = 0;
 lightningSpawnAbility.phaseSpeed = 0.05;
 lightningSpawnAbility.backColor = Pal.lancerLaser.cpy();
     lightningSpawnAbility.backColor.a = 0.5;
@@ -73,6 +103,8 @@ lightningSpawnAbility.frontColor = Color.white.cpy();
     lightningSpawnAbility.frontColor.a = 0.8;
 
 const colossus = extend(UnitType, "colossus", {});
+colossus.ammoType = AmmoTypes.powerHigh;
+colossus.groundLayer = Layer.legUnit;
 colossus.abilities.add(lightningSpawnAbility);
 colossus.constructor = () => {
     return extend(LegsUnit, {});
