@@ -203,7 +203,8 @@ const script = [
                     "shockwire",
                     "current",
                     "plasma",
-                    "shielder"
+                    "shielder",
+                    "electrobomb"
                 ]
             },
 
@@ -395,6 +396,7 @@ const script = [
                 name: "turrets",
                 childs: [
                     "chopper",
+					"modularTurret",
                 ]
             }
         ]

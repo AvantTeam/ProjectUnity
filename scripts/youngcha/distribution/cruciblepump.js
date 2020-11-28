@@ -105,7 +105,7 @@ const cruciblePump = graphLib.finaliseExtend(Block, Building,"crucible-pump",cpb
 			}
 		}
 		this.flowAnimation+=this.flowRate*0.4;
-	},
+	},	
 	draw() {
 		let temp = this.getGraphConnector("heat graph").getTemp();
 		Draw.rect(cruciblePump.bottom, this.x, this.y, 0);

@@ -3,5 +3,9 @@
 	"flammability": 0,
 	"radioactivity": 0.01,
 	"explosiveness": 0.1,
-	"color": "f4ff61"
+	"color": "f4ff61",
+	"research": {
+		"parent": "spark-alloy-forge"
+	}
+
 }
