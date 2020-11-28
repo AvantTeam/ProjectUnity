@@ -4,6 +4,9 @@
 	"hardness": 3,
 	"cost": 1.4,
 	"research": {
-		"parent": "surge-alloy"
+		"parent": "surge-alloy",
+		"customRequirements": [
+			{"item": "surge-alloy", "amount": 40}
+		]
 	}
 }
