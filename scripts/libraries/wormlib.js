@@ -382,6 +382,14 @@ const segmentUnit = prov(() => {
 			
 			if(typeof(this.type.getSegmentCellR) == "function" && this._segmentType == 0) this.drawCellC();
 
+			var outline = (this.type.segmentRegionOutline == null ||this.type.tailRegionOutline == null) ? null : this._segmentType == 0 ? this.type.segmentRegionOutline() : this.type.tailRegionOutline();
+
+			if(outline != null){
+				Draw.z(Draw.z() - (this.type.outlineSpace == null ? 0.01 : this.type.outlineSpace));
+
+				Draw.rect(outline, this, this.rotation - 90);
+			}
+
 			Draw.reset();
 		},
 		
