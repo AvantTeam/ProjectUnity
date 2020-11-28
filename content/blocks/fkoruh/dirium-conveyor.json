@@ -1,7 +1,6 @@
 requirements: [
-    stone/4
-    dense-alloy/3
-    steel/2
+    steel/1
+    phase-fabric/1
     dirium/1
 ]
 

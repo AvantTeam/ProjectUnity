@@ -259,8 +259,7 @@ const script = [
             "crafters",
             "walls",
             "lava",
-            "diriumconveyor",
-            "steelconveyor"
+            "conveyors"
         ]
     },
 
