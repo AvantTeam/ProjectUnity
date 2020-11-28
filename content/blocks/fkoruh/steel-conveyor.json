@@ -6,4 +6,4 @@ requirements: [
 category: distribution
 health: 80
 speed: 0.1
-displaySpeed: 12.5
+displayedSpeed: 12.5
