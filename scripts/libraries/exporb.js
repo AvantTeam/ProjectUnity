@@ -45,6 +45,9 @@ const exporb = extend(BulletType, {
             expAbsorb.at(b.x, b.y);
             b.remove();
         }
+        else if(tile.block().expConveyor){
+            this.expConveyor(b, tile.block(), tile.build);
+        }
         else if(tile.block().noOrbCollision){
             //h
         }
@@ -62,6 +65,12 @@ const exporb = extend(BulletType, {
     conveyor(b, block, build){
         if(build.clogHeat > 0.5 || !build.enabled) return;
         var mspeed = block.speed / 3;
+        b.vel.add(d4x[build.rotation] * mspeed * build.delta(), d4y[build.rotation] * mspeed * build.delta());
+    },
+    expConveyor(b, block, build){
+        if(build.clogHeat > 0.5 || !build.enabled) return;
+        var mspeed = block.speed * 2;
+        b.vel.scl(0.7, 0.7);//more resistance
         b.vel.add(d4x[build.rotation] * mspeed * build.delta(), d4y[build.rotation] * mspeed * build.delta());
     }
 });
