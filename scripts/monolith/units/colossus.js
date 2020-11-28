@@ -1,44 +1,25 @@
-const Class = java.lang.Class;
-
-const lightnings = new IntMap();
-const getLightnings = id => {
-    return lightnings.get(id, prov(() => {
-        const seq = new Seq(true, lightningSpawnAbility.lightningCount, Class.forName("arc.math.geom.Vec2"));
-        seq.setSize(lightningSpawnAbility.lightningCount);
-        
-        return seq;
-    }));
-};
-
 const lightningSpawnAbility = extend(Ability, {
     update(unit){
-        //update position
-        for(let i = 0; i < this.lightningCount; i++){
-            if(getLightnings(unit.id).get(i) == null){
-                getLightnings(unit.id).set(i, new Vec2());
-            }
-
-            let lightning = getLightnings(unit.id).get(i);
-            lightning.trns((360 * i / this.lightningCount) + (Time.time() * this.rotateSpeed * Mathf.signs[unit.id % 2]), this.lightningOffset * this.phase).add(unit);
-        }
-
         if(this.timer <= 0){
-            for(let i = 0; i < this.lightningCount; i++){
-                let lightning = getLightnings(unit.id).get(i);
+            if(this.phase > 0){
+                for(let i = 0; i < this.lightningCount; i++){
+                    Tmp.v1.trns(
+                        (Time.time() * this.rotateSpeed + (360 * i / this.lightningCount) + Mathf.randomSeed(unit.id)) * Mathf.signs[unit.id % 2],
+                        this.lightningOffset * this.phase
+                    ).add(unit);
 
-                if(this.phase > 0){
-                    let u = Units.closestTarget(unit.team, lightning.x, lightning.y, this.lightningRange);
+                    let u = Units.closestTarget(unit.team, Tmp.v1.x, Tmp.v1.y, this.lightningRange);
 
                     if(u != null){
-                        Tmp.v2.set(u.x, u.y).sub(unit.x, unit.y);
+                        Tmp.v2.set(u).sub(unit);
                         let angle = Tmp.v2.angle();
                         let len = Math.min(Math.round(Tmp.v2.len() / 6), Math.round(this.lightningRange / 6));
 
-                        Lightning.create(unit.team, this.lightningColor, this.lightningDamage, lightning.x, lightning.y, angle, len);
-                        this.lightningSound.at(lightning.x, lightning.y, Mathf.random(0.8, 1.2));
+                        Lightning.create(unit.team, this.lightningColor, this.lightningDamage, Tmp.v1.x, Tmp.v1.y, angle, len);
+                        this.lightningSound.at(Tmp.v1.x, Tmp.v1.y, Mathf.random(0.8, 1.2));
                     }
-                }
-            }
+                };
+            };
 
             this.timer = this.timerTarget;
         }else{
@@ -51,19 +32,23 @@ const lightningSpawnAbility = extend(Ability, {
 
     draw(unit){
         for(let i = 0; i < this.lightningCount; i++){
-            let lightning = getLightnings(unit.id).get(i);
+            Tmp.v1.trns(
+                (Time.time() * this.rotateSpeed + (360 * i / this.lightningCount) + Mathf.randomSeed(unit.id)) * Mathf.signs[unit.id % 2],
+                this.lightningOffset * this.phase
+            ).add(unit);
+
             let region = Core.atlas.find("circle-shadow");
             let r = this.phase * region.width * Draw.scl + this.lightningRadius + (Mathf.sin(Time.time(), 6, 4) * this.phase);
 
             Draw.color(this.backColor);
-            Draw.rect(region, lightning.x, lightning.y, r, r);
+            Draw.rect(region, Tmp.v1.x, Tmp.v1.y, r, r);
 
             Draw.color(this.frontColor);
-            Draw.rect(region, lightning.x, lightning.y, r / 2, r / 2);
-            
+            Draw.rect(region, Tmp.v1.x, Tmp.v1.y, r / 2, r / 2);
+
             Draw.color(Color.white);
-            Draw.rect(region, lightning.x, lightning.y, r / 3, r / 3);
-        }
+            Draw.rect(region, Tmp.v1.x, Tmp.v1.y, r / 3, r / 3);
+        };
     },
 
     localized(){
@@ -73,7 +58,7 @@ const lightningSpawnAbility = extend(Ability, {
 lightningSpawnAbility.timerTarget = 48;
 lightningSpawnAbility.timer = lightningSpawnAbility.timerTarget;
 lightningSpawnAbility.lightningCount = 8;
-lightningSpawnAbility.lightningRange = 80;
+lightningSpawnAbility.lightningRange = 120;
 lightningSpawnAbility.lightningOffset = 56;
 lightningSpawnAbility.lightningColor = Pal.lancerLaser;
 lightningSpawnAbility.lightningDamage = 100;
@@ -87,7 +72,7 @@ lightningSpawnAbility.backColor = Pal.lancerLaser.cpy();
 lightningSpawnAbility.frontColor = Color.white.cpy();
     lightningSpawnAbility.frontColor.a = 0.8;
 
-const colossus = extendContent(UnitType, "colossus", {});
+const colossus = extend(UnitType, "colossus", {});
 colossus.abilities.add(lightningSpawnAbility);
 colossus.constructor = () => {
     return extend(LegsUnit, {});
