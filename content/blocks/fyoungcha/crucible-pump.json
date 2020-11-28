@@ -7,4 +7,5 @@
 		{"item": "metaglass", "amount": 15},
 	],
 	"category": "crafting",
+	"research": "unity-casting-mold",
 }
