@@ -8,4 +8,4 @@ requirements: [
 category: distribution
 health: 150
 speed: 0.15
-displayedSpeed: 18.75
+displaySpeed: 18.75
