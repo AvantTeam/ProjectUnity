@@ -543,7 +543,7 @@ public class UnityBlocks implements ContentList{
         };
         //endregion
         //region imber turrets
-        orb = new ChargeTurret("orb"){
+        orb = new PowerTurret("orb"){
             {
                 requirements(Category.turret, with(Items.copper, 55, Items.lead, 30, Items.graphite, 25, Items.silicon, 35, UnityItems.imberium, 20));
                 size = 2;
@@ -597,7 +597,7 @@ public class UnityBlocks implements ContentList{
             }
         };
 
-        current = new ChargeTurret("current"){
+        current = new PowerTurret("current"){
             {
                 requirements(Category.turret, with(Items.copper, 280, Items.lead, 295, Items.silicon, 260, UnityItems.sparkAlloy, 65));
                 size = 3;
@@ -619,7 +619,7 @@ public class UnityBlocks implements ContentList{
             }
         };
 
-        plasma = new BurstChargeTurret("plasma"){
+        plasma = new BurstPowerTurret("plasma"){
             {
                 requirements(Category.turret, with(Items.copper, 580, Items.lead, 520, Items.graphite, 410, Items.silicon, 390, Items.surgeAlloy, 180, UnityItems.sparkAlloy, 110));
                 size = 4;
@@ -821,7 +821,7 @@ public class UnityBlocks implements ContentList{
             }
         };
 
-        oracle = new BurstChargeTurret("oracle"){
+        oracle = new BurstPowerTurret("oracle"){
             {
                 requirements(Category.turret, with(Items.silicon, 175, Items.titanium, 150, UnityItems.monolithAlloy, 75));
                 size = 3;
