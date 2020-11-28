@@ -39,10 +39,10 @@ const lightningSpawnAbility = extend(Ability, {
                     if(u != null){
                         Tmp.v2.set(u).sub(unit);
                         let angle = Tmp.v2.angle();
-                        let len = Math.min(Math.round(Tmp.v2.len() / 6), Math.round(this.lightningRange / 6));
 
-                        Lightning.create(unit.team, this.lightningColor, this.lightningDamage, Tmp.v1.x, Tmp.v1.y, angle, len);
+                        Lightning.create(unit.team, this.lightningColor, this.lightningDamage, Tmp.v1.x, Tmp.v1.y, angle, this.lightningRange / 6);
                         this.lightningSound.at(Tmp.v1.x, Tmp.v1.y, Mathf.random(0.8, 1.2));
+                        this.shootEffect.at(Tmp.v1.x, Tmp.v1.y, angle);
                     }
                 };
             };
@@ -101,6 +101,20 @@ lightningSpawnAbility.backColor = Pal.lancerLaser.cpy();
     lightningSpawnAbility.backColor.a = 0.5;
 lightningSpawnAbility.frontColor = Color.white.cpy();
     lightningSpawnAbility.frontColor.a = 0.8;
+lightningSpawnAbility.shootEffect = new Effect(18, e => {
+    e.scaled(12, i => {
+        Angles.randLenVectors(e.id, 8, 4 + i.fin() * 18, (x, y) => {
+            Draw.color(Color.white, Pal.lancerLaser, e.fin());
+
+            Fill.square(e.x + x, e.y + y, 1 + i.fout() * 3, 45);
+        });
+    });
+
+    Draw.color(Color.white, Pal.lancerLaser, e.fin());
+    Draw.alpha(e.fout());
+
+    Fill.circle(e.x, e.y, e.finpow() * 8);
+});
 
 const colossus = extend(UnitType, "colossus", {});
 colossus.ammoType = AmmoTypes.powerHigh;
