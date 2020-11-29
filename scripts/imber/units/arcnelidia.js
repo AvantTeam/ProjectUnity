@@ -1,30 +1,32 @@
 const wormLib = this.global.unity.wormlib;
 
-const aLightningBullet = extend(LightningBulletType, {});
-aLightningBullet.damage = 23;
-aLightningBullet.lightningColor = Pal.surge;
-aLightningBullet.lightningLength = 24;
-aLightningBullet.lightningLengthRand = 3;
-
-const aWLightningB = new Weapon();
-//aWLightningB.x = 0;
-aWLightningB.reload = 90;
-aWLightningB.rotateSpeed = 50;
-aWLightningB.mirror = true;
-aWLightningB.rotate = true;
-aWLightningB.ignoreRotation = true;
-aWLightningB.minShootVelocity = 2.1;
-aWLightningB.bullet = aLightningBullet;
+const aLaserBullet = extend(LaserBulletType, {});
+aLaserBullet.damage = 200;
+aLaserBullet.colors = [Pal.surge.cpy().mul(1, 1, 1, 0.4), Pal.surge, Color.white];
+aLaserBullet.hitEffect = Fx.hitLancer;
+aLaserBullet.despawnEffect = Fx.none;
+aLaserBullet.hitSize = 4;
+aLaserBullet.lifetime = 16;
+aLaserBullet.drawSize = 400;
+aLaserBullet.collidesAir = false;
+aLaserBullet.length = 190;
 
 const aWLightning = new Weapon();
-aWLightning.x = 0;
-aWLightning.shots = 4;
-aWLightning.reload = 70;
+aWLightning.x = 3;
+aWLightning.reload = 10;
 aWLightning.rotateSpeed = 50;
-aWLightning.mirror = false;
-aWLightning.ignoreRotation = true;
-//aWLightning.minShootVelocity = 0.12;
-aWLightning.bullet = aLightningBullet;
+aWLightning.shootSound = Sounds.laser;
+aWLightning.mirror = true;
+aWLightning.rotate = true;
+aWLightning.minShootVelocity = 2.1;
+aWLightning.bullet = aLaserBullet;
+
+const aWLightningB = new Weapon();
+aWLightningB.x = aWLightning.y = 0;
+aWLightningB.reload = 60;
+aWLightningB.rotateSpeed = 50;
+aWLightningB.minShootVelocity = 0.01;
+aWLightningB.bullet = UnitTypes.horizon.weapons.first().bullet;
 
 const arcnelidiaType = extendContent(UnitType, "arcnelidia", {
 	load(){
@@ -32,6 +34,9 @@ const arcnelidiaType = extendContent(UnitType, "arcnelidia", {
 		
 		this.segmentRegion = Core.atlas.find(this.name + "-segment");
 		this.tailRegion = Core.atlas.find(this.name + "-tail");
+
+		this.segmentOutline = Core.atlas.find(this.name + "-segment-outline");
+		this.tailOutline = Core.atlas.find(this.name + "-tail-outline");
 		
 		this.segWeapSeq.each(w => {
 			w.load();
@@ -62,10 +67,19 @@ const arcnelidiaType = extendContent(UnitType, "arcnelidia", {
 	segmentRegionF(){
 		return this.segmentRegion;
 	},
+
 	tailRegionF(){
 		return this.tailRegion;
 	},
 	
+	segmentRegionOutline(){
+		return this.segmentOutline;
+	},
+
+	tailRegionOutline(){
+		return this.tailOutline;
+	},
+
 	drawBody(unit){
 		this.super$drawBody(unit);
 		wormLib.drawSegments(unit);

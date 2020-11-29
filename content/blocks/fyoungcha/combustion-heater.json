@@ -8,4 +8,5 @@
 		{"item": "titanium", "amount": 80},
 	],
 	"category": "power",
+	"research": "unity-crucible",
 }

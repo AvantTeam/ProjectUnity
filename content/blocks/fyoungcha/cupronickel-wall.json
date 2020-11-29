@@ -6,4 +6,5 @@
 		{"item": "nickel", "amount": 5},
 	],
 	"category": "defense",
+	"research": "unity-casting-mold",
 }

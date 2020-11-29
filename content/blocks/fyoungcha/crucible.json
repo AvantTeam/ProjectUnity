@@ -6,4 +6,5 @@
 		{"item": "titanium", "amount": 15},
 	],
 	"category": "crafting",
+	"research": "unity-thermal-heater",
 }

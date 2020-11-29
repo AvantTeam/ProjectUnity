@@ -936,8 +936,11 @@ const _ModularBuild = {
 		let rc = this._blueprintRemainingCost;
 		if(this.team.rules().infiniteResources){
 			for (let i in rc) {
-				//rc[i].paid=rc[i].total; soon
+				rc[i].paid=rc[i].total; 
 			}
+			this._totalItemCountPaid =this._totalItemCountCost;
+			this.applyStats(this._currentStats);
+			return;
 		}
 		if(this.timer.get(this.block.getBuildTimerId(),this.block.getAutoBuildDelay())){
 			let citems = this.team.core().items;
@@ -1012,6 +1015,9 @@ const _ModularBuild = {
 				}));
 		buttoncell.size(50);
 		buttoncell.get().getStyle().imageUp = Icon.pencil;
+		if(this.block.hasItems){
+			Vars.control.input.frag.inv.showFor(this);
+		}
 	},
 	configured(player, value) {
 		let changed = false;
@@ -1106,6 +1112,7 @@ const _ModularBuild = {
 		var tmp = _packArray(this._blueprint);
 		return tmp.toStringPack();
 	},
+	
 	writeExt(stream) {
 		if (!this._blueprint) {
 			stream.i(0);
@@ -1161,6 +1168,41 @@ const _ModularBuild = {
 
 	}
 }
+
+const ammotype = {
+	normal:{
+		"copper":{am:1},"graphite":{am:2},"unity-nickel":{am:1},"unity-cupronickel":{am:5}
+	},
+	fire:{
+		"coal":{am:1},"pyratite":{am:3},"blast-compound":{am:1},"plastanium":{am:1}
+	},
+	explosive:{
+		"coal":{am:0.5},"blast-compound":{am:6},"thorium":{am:1}
+	},
+	frag:{
+		"metaglass":{am:1},"plastanium":{am:4}
+	},
+	heavy:{
+		"lead":{am:1},"titanium":{am:1.5},"thorium":{am:3},"unity-super-alloy":{am:15}
+	},
+	shock:{
+		"surge-alloy":{am:1}
+	},
+	homing:{
+		"silicon":{am:1},"phase-fabric":{am:8}
+	},
+	exotic:{
+		"phase-fabric":{am:1},"unity-super-alloy":{am:10}
+	},
+}
+const ammotypeIcons = {}
+function getAmmoIcon(type){
+	 if(!ammotypeIcons[type]){
+		 ammotypeIcons[type]= Core.atlas.find("unity-icon-ammo-"+type);
+	 }
+	 return  ammotypeIcons[type];
+}
+
 
 const normalBulletType = { // BasicBulletType with all the fat cut out.
 		hasInit:false,
@@ -1339,40 +1381,142 @@ function mergeStats(tos, froms){
 	if(froms.reloadmult){
 		froms.reloadmult*=tos.reloadmult;
 	}
+	if(froms.shots){
+		froms.shots*=tos.shots;
+	}
+	if(froms.ammoType){
+		for(let type in tos.ammoType){
+			if(!froms.ammoType[type]){
+				froms.ammoType[type] = tos.ammoType[type];
+			}else{
+				froms.ammoType[type] += tos.ammoType[type];
+			}
+		}
+	}
+	if(froms.ammoCostMul){
+		if(!froms.ammoType){
+			froms.ammoType={};
+			for(let type in tos.ammoType){
+				froms.ammoType[type] = tos.ammoType[type];
+			}
+		}
+		for(let type in froms.ammoType){
+			froms.ammoType[type]*=froms.ammoCostMul;
+		}
+	}
 	return Object.assign(tos, froms);
 }
 
+const _TurretModularBlock = Object.assign(deepCopy(_ModularBlock),{
+	setStatsExt() {
+		const sV = new StatValue({
+            display(table) {
+				for(let ammo in ammotype ) {
+					table.row();
+					table.image(getAmmoIcon(ammo)).size(3 * 8).padRight(4).right().top();
+					table.add(ammo).padRight(10).left().top();
+					table.table(cons((itbl)=>{
+						itbl.left().defaults().padRight(3).left();
+						for(let item in ammotype[ammo] ) {
+							itbl.image(Vars.content.getByName(ContentType.item, item).icon(Cicon.medium));
+							itbl.add("[lightgray]Multiplier: [white]"+ ammotype[ammo][item].am);
+							itbl.row();
+						}
+					})).fillY().top().left().get().background(Tex.underline);
+					
+					
+				}
+            }
+        });
+		this.stats.add(Stat.ammo,sV);
+	},
+});
+
+
 const _TurretModularBuild = Object.assign(deepCopy(_ModularBuild), {
-		/*
-		[{
-		offsetx,
-		offsety,
-		ammocost:[
-		]
-		bullettypes,
-		chainfire,
-		spread,
-		}
-		]
-		 */
 		guns: null,
 		originalmaxhp: 0,
 		currentBarrel: 0,
 		validTurret: false,
 		//gun stats
 		turretRange:80,
+		itemcap:10,
 
 		acceptItemExt(source, item) {
+			if(!this.validTurret){
+				return false;
+			}
+			for (let i = 0; i < this.guns.length; i++) {
+				let ammoreq = this.guns[i].ammoType;
+				for(let ammot in ammoreq){
+					let allowed = ammotype[ammot];
+					let valid = false;
+					for(let alloweditem in allowed){
+						if(alloweditem==item.name){
+							return this.items.get(item)<this.itemcap;
+						}
+					}
+				}
+			}
 			return false;
 		},
-		handleItemExt(source, item) {},
+		handleItemExt(source, item) {
+			this.super$handleItem(source, item);
+		},
 		hasAmmo() {
-			return this.validTurret;
+			if(!this.validTurret){
+				return false;
+			}
+			if(this.guns[this.currentBarrel].magazine<=0){
+				this.attemptRefillMag(this.guns[this.currentBarrel]);
+			}
+			return this.guns[this.currentBarrel].magazine>0;
+		},
+		attemptRefillMag(gun){
+			let ammoreq = gun.ammoType;
+			let consume = [];
+			for(let ammot in ammoreq){
+				let allowed = ammotype[ammot];
+				let valid = false;
+				for(let alloweditem in allowed){
+					let item = Vars.content.getByName(ContentType.item, alloweditem);
+					let itemsneeded = Math.ceil(ammoreq[ammot]/ammotype[ammot][alloweditem].am);
+					if(this.items.has(item, itemsneeded)){
+						//add the ammmo
+						consume.push({item:item, am:itemsneeded});
+						valid = true;
+						break;
+					}
+				}
+				if(!valid){
+					return;
+				}
+			}
+			gun.magazine+=gun.magazineSize;
+			for(let i =0;i<consume.length;i++){
+				this.items.remove(consume[i].item,consume[i].am);
+			}
+		},
+		haveAmmoType(type, am){
+			let allowed = ammotype[type];
+			for(let alloweditem in allowed){
+				let item = Vars.content.getByName(ContentType.item, alloweditem);
+				let itemsneeded = Math.ceil(am/ammotype[type][alloweditem].am);
+				if(this.items.has(item, itemsneeded)){
+					return true;
+				}
+			}
+			return false;
 		},
 		//Consume ammo and return a type.
 		useAmmo() {
-			
-			return btype;
+			if(this.guns[this.currentBarrel].magazine==0){
+				this.attemptRefillMag(this.guns[this.currentBarrel]);
+			}
+			if(this.guns[this.currentBarrel].magazine>0){
+				this.guns[this.currentBarrel].magazine--;
+			}
+			return this.guns[this.currentBarrel].bullettype;
 		},
 		//the ammo type that will be returned if useAmmo is called.
 		peekAmmo() {
@@ -1381,8 +1525,9 @@ const _TurretModularBuild = Object.assign(deepCopy(_ModularBuild), {
 		applyStats(total) {
 			this.originalmaxhp = this.maxHealth;
 			this.maxHealth = this.originalmaxhp + total.hpinc;
-			this.turretRange=80 + total.rangeinc;
+			this.turretRange=80 + (total.rangeinc?total.rangeinc:0);
 			this.heal(total.hpinc* this.health/this.originalmaxhp);
+			this.itemcap=10;
 			if (!total.guns) {
 				this.validTurret = false;
 				return;
@@ -1394,14 +1539,36 @@ const _TurretModularBuild = Object.assign(deepCopy(_ModularBuild), {
 				}
 				lt.push(mergeStats(total.guns[i], total.globalStats));
 				lt[i].bullettype = getBulletTypeFromConfig(lt[i]);
+				lt[i].magazine =0;
 
 			}
 			this.guns = lt;
 			this.validTurret = true;
 			this.reloadTime = total.reload;
 		},
-
-		
+		displayBarsExt(barsTable){
+			if(this.validTurret){
+				let that =this;
+				for (let i = 0; i < that.guns.length; i++) {
+					const index = i;
+					barsTable.row();
+					barsTable.add(new Bar(
+						prov(() =>  "Breach "+index+" Ammo: " + that.guns[index].magazine + "/" + that.guns[index].magazineSize),
+						prov(() => Pal.ammo),
+						floatp(() =>  1.0*that.guns[index].magazine/that.guns[index].magazineSize ))).growX();
+					barsTable.row();
+					barsTable.table(cons((tbl)=>{
+						tbl.left();
+						let ammoreq = that.guns[i].ammoType;
+						for(let ammot in ammoreq){
+							tbl.add((that.haveAmmoType(ammot,ammoreq[ammot])?"[white]":"[red]")+ammoreq[ammot]);
+							tbl.image(getAmmoIcon(ammot)).pad(3).marginRight(15).scaling(Scaling.fillY).size(32);
+						}
+					}));
+				}
+				
+			}
+		},
 		accumStats(total, part, x, y, grid) {
 			if (!total.hpinc) {
 				total.hpinc = 0;
@@ -1431,15 +1598,18 @@ const _TurretModularBuild = Object.assign(deepCopy(_ModularBuild), {
 							if (!total.guns) {
 								total.guns = [];
 							}
-							//find barrels and ammo mods.
+							let ammoType = {};
+							ammoType[guninfo.stats.ammoType.value]=guninfo.stats.payload.value;
 							let basestats = {
 								damage: guninfo.stats.baseDmg.value,
 								speed: guninfo.stats.baseSpeed.value,
 								lifetime: guninfo.stats.lifetime.value,
 								type: guninfo.stats.bulletType.value,
+								ammoType: ammoType,
 								shots: guninfo.stats.shots.value,
 								spread: guninfo.stats.spread.value,
 								reloadmult: guninfo.stats.reloadMultiplier.value,
+								magazineSize: guninfo.stats.magazine.value,
 							};
 							if(guninfo.stats.mod){
 								guninfo.stats.mod.cons.get(basestats);
@@ -1447,7 +1617,7 @@ const _TurretModularBuild = Object.assign(deepCopy(_ModularBuild), {
 							total.guns.push(basestats);
 							break;
 						case "ammo":
-							guninfo.stats.mod.cons.get(total.globalStats)
+							guninfo.stats.mod.cons.get(total.globalStats);
 							break;
 						}
 
@@ -1467,6 +1637,7 @@ const _TurretModularBuild = Object.assign(deepCopy(_ModularBuild), {
 			}
 			this.validTurret = false;
 			this.turretRange=80;
+			this.itemcap=10;
 		},
 		updateShooting() {
 			if (!this.valid) {
@@ -1489,6 +1660,7 @@ const _TurretModularBuild = Object.assign(deepCopy(_ModularBuild), {
 			for(let i = 0; i < configtype.shots; i++){
 				this.bullet(configtype.bullettype, this.rotation + Mathf.range(configtype.spread));
 			}
+			this.useAmmo();
 		},
 		findTarget(){
 			let targetAir = true;
@@ -1497,7 +1669,10 @@ const _TurretModularBuild = Object.assign(deepCopy(_ModularBuild), {
                 this.target = Units.bestEnemy(this.team, this.x, this.y, this.turretRange, e => !e.dead && !e.isGrounded(), this.block.unitSort);
             }else{
                 this.target = Units.bestTarget(this.team, this.x, this.y,  this.turretRange, e => !e.dead && (e.isGrounded() || targetAir) && (!e.isGrounded() || targetGround), b => true, this.block.unitSort);
-            }
+				//print(this.target);
+				//print("r:"+this.turretRange+",t:"+this.team+",s:"+this.block.unitSort);
+			}
+			
         },
 		drawSelect(){
             Drawf.dashCircle(this.x, this.y, this.turretRange, this.team.color);
@@ -1659,6 +1834,7 @@ function _drawTile(region, x, y, w, h, rot, tile) {
 
 module.exports = {
 	preCalcConnection:_preCalcConnection,
+	TurretModularBlock:_TurretModularBlock,
 	ModularBlock: _ModularBlock,
 	ModularBuild: _ModularBuild,
 	TurretModularBuild: _TurretModularBuild,

@@ -7,4 +7,5 @@
 		{"item": "nickel", "amount": 15},
 	],
 	"category": "power",
+	"research": "unity-heat-pipe",
 }

@@ -7,4 +7,5 @@
 		{"item": "copper", "amount": 30},
 	],
 	"category": "turret",
+	"research": "unity-chopper",
 }
