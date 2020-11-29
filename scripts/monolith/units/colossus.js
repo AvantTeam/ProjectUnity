@@ -117,14 +117,16 @@ lightningSpawnAbility.shootEffect = new Effect(18, e => {
 });
 
 const colossusLaser = extend(LaserBulletType, 280, {});
+colossusLaser.lifetime = 32;
 colossusLaser.width = 45;
 colossusLaser.length = 280;
-colossusLaser.lightningSpacing = 15;
+colossusLaser.lightningSpacing = 35;
 colossusLaser.lightningLength = 4;
 colossusLaser.lightningDelay = 1.5;
 colossusLaser.lightningLengthRand = 6;
 colossusLaser.lightningDamage = 48;
 colossusLaser.lightningAngleRand = 30;
+colossusLaser.lightningColor = Pal.lancerLaser;
 
 const colossusWeapon = extend(Weapon, "unity-colossus-weapon", {});
 colossusWeapon.top = false;
@@ -133,9 +135,9 @@ colossusWeapon.y = 7.75;
 colossusWeapon.shootY = 20;
 colossusWeapon.reload = 60;
 colossusWeapon.spacing = 1;
-colossusWeapon.inaccuracy = 30;
+colossusWeapon.inaccuracy = 6;
 colossusWeapon.shots = 5;
-colossusWeapon.shotDelay = 2;
+colossusWeapon.shotDelay = 3;
 colossusWeapon.recoil = 8;
 colossusWeapon.shootSound = Sounds.laser;
 colossusWeapon.bullet = colossusLaser;
