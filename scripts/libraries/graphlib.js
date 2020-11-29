@@ -224,7 +224,11 @@ const _GraphCommonBlock = {
             }
         });
         this.stats.add(Stat.abilities, sV);
+		this.setStatsExt();
     },
+	setStatsExt() {
+		
+	},
 	 // if false the network will not 'bridge' across this block when rebuilding (but will still connect to it, like how a diode connects).
 	getIsNetworkConnector() {
         return this._network_connector;

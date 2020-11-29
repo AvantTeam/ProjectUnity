@@ -310,11 +310,11 @@ const partinfo = [
 			},
 			payload:{
 				name: "stat.unity.payload",
-                value: 1,
+                value: 2,
 			},
 			magazine:{
 				name: "stat.unity.magazine",
-                value: 2,
+                value: 1,
 			},
 			shots:{
 				name: "stat.unity.shots",
@@ -482,10 +482,10 @@ const partinfo = [
 					if(!config.ammoType){
 						config.ammoType={};
 					}
-					if(!froms.ammoType["homing"]){
-						froms.ammoType["homing"] = 1;
+					if(!config.ammoType["homing"]){
+						config.ammoType["homing"] = 1;
 					}else{
-						froms.ammoType["homing"] += 1;
+						config.ammoType["homing"] += 1;
 					}
 				})
             },
@@ -592,7 +592,7 @@ let blankobj = graphLib.init();
 graphLib.addGraph(blankobj, rotL.baseTypes.torqueConnector);
 graphLib.addGraph(blankobj, heatlib.baseTypesHeat.heatConnector);
 Object.assign(blankobj.build, modturretlib.dcopy2(modturretlib.TurretModularBuild));
-Object.assign(blankobj.block, modturretlib.dcopy2(modturretlib.ModularBlock));
+Object.assign(blankobj.block, modturretlib.dcopy2(modturretlib.TurretModularBlock));
 
 
 const smallTurret = graphLib.finaliseExtendContent(Turret, Turret.TurretBuild, "small-turret-base", blankobj, {

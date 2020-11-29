@@ -1171,30 +1171,33 @@ const _ModularBuild = {
 
 const ammotype = {
 	normal:{
-		"copper":{am:1},"graphite":{am:2},"unity-nickel":{am:1}
+		"copper":{am:1},"graphite":{am:2},"unity-nickel":{am:1},"unity-cupronickel":{am:5}
 	},
 	fire:{
 		"coal":{am:1},"pyratite":{am:3},"blast-compound":{am:1},"plastanium":{am:1}
 	},
 	explosive:{
-		"coal":{am:0.5},"blast-compound":{am:4},"thorium":{am:1}
+		"coal":{am:0.5},"blast-compound":{am:6},"thorium":{am:1}
 	},
 	frag:{
-		"metaglass":{am:1},"plastanium":{am:3}
+		"metaglass":{am:1},"plastanium":{am:4}
 	},
 	heavy:{
-		"lead":{am:1},"titanium":{am:1.5},"unity-nickel":{am:1.5},"unity-super-alloy":{am:4}
+		"lead":{am:1},"titanium":{am:1.5},"thorium":{am:3},"unity-super-alloy":{am:15}
 	},
 	shock:{
 		"surge-alloy":{am:1}
 	},
 	homing:{
-		"silicon":{am:2}
+		"silicon":{am:1},"phase-fabric":{am:8}
+	},
+	exotic:{
+		"phase-fabric":{am:1},"unity-super-alloy":{am:10}
 	},
 }
 const ammotypeIcons = {}
 function getAmmoIcon(type){
-	 if(ammotypeIcons[type]){
+	 if(!ammotypeIcons[type]){
 		 ammotypeIcons[type]= Core.atlas.find("unity-icon-ammo-"+type);
 	 }
 	 return  ammotypeIcons[type];
@@ -1392,6 +1395,7 @@ function mergeStats(tos, froms){
 	}
 	if(froms.ammoCostMul){
 		if(!froms.ammoType){
+			froms.ammoType={};
 			for(let type in tos.ammoType){
 				froms.ammoType[type] = tos.ammoType[type];
 			}
@@ -1403,19 +1407,33 @@ function mergeStats(tos, froms){
 	return Object.assign(tos, froms);
 }
 
+const _TurretModularBlock = Object.assign(deepCopy(_ModularBlock),{
+	setStatsExt() {
+		const sV = new StatValue({
+            display(table) {
+				for(let ammo in ammotype ) {
+					table.row();
+					table.image(getAmmoIcon(ammo)).size(3 * 8).padRight(4).right().top();
+					table.add(ammo).padRight(10).left().top();
+					table.table(cons((itbl)=>{
+						itbl.left().defaults().padRight(3).left();
+						for(let item in ammotype[ammo] ) {
+							itbl.image(Vars.content.getByName(ContentType.item, item).icon(Cicon.medium));
+							itbl.add("[lightgray]Multiplier: [white]"+ ammotype[ammo][item].am);
+							itbl.row();
+						}
+					})).fillY().top().left().get().background(Tex.underline);
+					
+					
+				}
+            }
+        });
+		this.stats.add(Stat.ammo,sV);
+	},
+});
+
+
 const _TurretModularBuild = Object.assign(deepCopy(_ModularBuild), {
-		/*
-		[{
-		offsetx,
-		offsety,
-		ammocost:[
-		]
-		bullettypes,
-		chainfire,
-		spread,
-		}
-		]
-		 */
 		guns: null,
 		originalmaxhp: 0,
 		currentBarrel: 0,
@@ -1479,6 +1497,17 @@ const _TurretModularBuild = Object.assign(deepCopy(_ModularBuild), {
 				this.items.remove(consume[i].item,consume[i].am);
 			}
 		},
+		haveAmmoType(type, am){
+			let allowed = ammotype[type];
+			for(let alloweditem in allowed){
+				let item = Vars.content.getByName(ContentType.item, alloweditem);
+				let itemsneeded = Math.ceil(am/ammotype[type][alloweditem].am);
+				if(this.items.has(item, itemsneeded)){
+					return true;
+				}
+			}
+			return false;
+		},
 		//Consume ammo and return a type.
 		useAmmo() {
 			if(this.guns[this.currentBarrel].magazine==0){
@@ -1517,19 +1546,27 @@ const _TurretModularBuild = Object.assign(deepCopy(_ModularBuild), {
 			this.validTurret = true;
 			this.reloadTime = total.reload;
 		},
-
-		displayBarsExt(barstable){
+		displayBarsExt(barsTable){
 			if(this.validTurret){
-				barstable.row();
 				let that =this;
-				let debuglabel = new Label(prov(()=>{
-					let text = "";
-					for (let i = 0; i < that.guns.length; i++) {
-						text+="[white]([gray]"+that.guns[i].magazine+"/[white]"+that.guns[i].magazineSize+")-"
-					}
-					return text;
-				}));
-				barstable.add(debuglabel);
+				for (let i = 0; i < that.guns.length; i++) {
+					const index = i;
+					barsTable.row();
+					barsTable.add(new Bar(
+						prov(() =>  "Breach "+index+" Ammo: " + that.guns[index].magazine + "/" + that.guns[index].magazineSize),
+						prov(() => Pal.ammo),
+						floatp(() =>  1.0*that.guns[index].magazine/that.guns[index].magazineSize ))).growX();
+					barsTable.row();
+					barsTable.table(cons((tbl)=>{
+						tbl.left();
+						let ammoreq = that.guns[i].ammoType;
+						for(let ammot in ammoreq){
+							tbl.add((that.haveAmmoType(ammot,ammoreq[ammot])?"[white]":"[red]")+ammoreq[ammot]);
+							tbl.image(getAmmoIcon(ammot)).pad(3).marginRight(15).scaling(Scaling.fillY).size(32);
+						}
+					}));
+				}
+				
 			}
 		},
 		accumStats(total, part, x, y, grid) {
@@ -1797,6 +1834,7 @@ function _drawTile(region, x, y, w, h, rot, tile) {
 
 module.exports = {
 	preCalcConnection:_preCalcConnection,
+	TurretModularBlock:_TurretModularBlock,
 	ModularBlock: _ModularBlock,
 	ModularBuild: _ModularBuild,
 	TurretModularBuild: _TurretModularBuild,

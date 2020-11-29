@@ -6,7 +6,7 @@ const shieldBreakCircle = new Effect(40, e => {
     Lines.circle(e.x, e.y, e.rotation + e.fin());
 });
 const deflect = new Effect(12, e => {
-    Draw.color(Pal.heal);
+    Draw.color(Pal.lancerLaser);
 
     Lines.stroke(2 * e.fout());
     Lines.square(e.x, e.y, 8 * e.fout(), 45);
@@ -78,18 +78,19 @@ const deflectGenerator = lib.extend(ForceProjector, ForceProjector.ForceBuild, "
         const customConsumer = trait => {
             if(trait.team != this.paramEntity.team && trait.type.absorbable && Mathf.dst(this.paramEntity.x, this.paramEntity.y, trait.x, trait.y) <= this.realRadius()){
                 var h = 0;
-                if(Mathf.chance(this.deflectChance)){
+                if(Mathf.chance(this.deflectChance) && trait.time>2){
                     h = 2;
                     trait.trns(-trait.vel.x, -trait.vel.y);
-
-                    var penX = Math.abs(this.paramEntity.x - trait.x);
-                    var penY = Math.abs(this.paramEntity.y - trait.y);
-
-                    if(penX > penY){
-                        trait.vel.x *= -1;
-                    }else{
-                        trait.vel.y *= -1;
-                    }
+					var dx = trait.x-this.paramEntity.x;
+					var dy = trait.y-this.paramEntity.y;
+					var dst = Mathf.sqrt(dx*dx+dy*dy);
+					dx/=dst;
+					dy/=dst;
+					var vdn = dx*trait.vel.x + dy*trait.vel.y;
+					if(vdn<0){ // dont deflect bullets already on their way out of the shield
+						trait.vel.x  = trait.vel.x-2*vdn*dx;
+						trait.vel.y  = trait.vel.y-2*vdn*dy;
+					}
                     trait.owner = this.paramEntity;
                     trait.team = this.paramEntity.team;
                     trait.time += 1;
