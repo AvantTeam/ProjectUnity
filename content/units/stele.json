@@ -3,5 +3,6 @@
     "hitSize": 8,
     "health": 200,
     "flying": false,
-    "canBoost": true
+    "canBoost": true,
+    "boostMultiplier": 2.5
 }

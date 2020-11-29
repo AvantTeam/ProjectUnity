@@ -4,6 +4,9 @@
     "health": 600,
     "flying": false,
     "canBoost": true,
+    "boostMultiplier": 2.5,
+    "engineSize": 3.5,
+    "engineOffset": 6,
     "armor": 3.5,
     "rotateSpeed": 2.6
 }

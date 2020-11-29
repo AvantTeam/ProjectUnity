@@ -1,14 +1,14 @@
-//Unit Loader made by EoD, an improved version than the one in @loader.js
+// Unit Loader made by EoD
 const Integer = java.lang.Integer;
 const loader = this.global.unity.loader;
 
 const tSeq1 = new Seq(UnitType);
-//const UnitArrayClass = tSeq1.toArray(UnitType).getClass();
-//const tSeq2 = new Seq(tSeq1.toArray(UnitType).getClass());
-//const convertSeq = new Seq();
+// const UnitArrayClass = tSeq1.toArray(UnitType).getClass();
+// const tSeq2 = new Seq(tSeq1.toArray(UnitType).getClass());
+ const convertSeq = new Seq();
 const unitPlans = new Seq(UnitFactory.UnitPlan);
-//print(tSeq1.toArray(UnitType).getClass());
-//var fac = null;
+// print(tSeq1.toArray(UnitType).getClass());
+// var fac = null;
 
 //Seq in a seq
 const reconAdd = (recon, planArray) => {
@@ -81,8 +81,9 @@ const unitLoader = extend(ContentList, {
         );
         addPlan(Blocks.navalFactory, amphibi);
         //End
+
         //Reconstructors
-        //1
+        // 1 -> 2
         reconAdd(Blocks.additiveReconstructor, [
             [
                 Vars.content.getByName(ContentType.unit, "unity-caelifera"),
@@ -99,7 +100,8 @@ const unitLoader = extend(ContentList, {
                 Vars.content.getByName(ContentType.unit, "unity-pedestal")
             ]
         ]);
-        //2
+
+        // 2 -> 3
         reconAdd(Blocks.multiplicativeReconstructor, [
             [
                 Vars.content.getByName(ContentType.unit, "unity-schistocerca"),
@@ -111,7 +113,8 @@ const unitLoader = extend(ContentList, {
                 Vars.content.getByName(ContentType.unit, "unity-pilaster")
             ]
         ]);
-        //3
+
+        // 3 -> 4
         reconAdd(Blocks.exponentialReconstructor, [
             [
                 Vars.content.getByName(ContentType.unit, "unity-anthophila"),
@@ -123,7 +126,8 @@ const unitLoader = extend(ContentList, {
                 Vars.content.getByName(ContentType.unit, "unity-pylon")
             ]
         ]);
-        //4
+
+        // 4 -> 5
         reconAdd(Blocks.tetrativeReconstructor, [
             [
                 Vars.content.getByName(ContentType.unit, "unity-vespula"),
@@ -135,6 +139,27 @@ const unitLoader = extend(ContentList, {
                 Vars.content.getByName(ContentType.unit, "unity-monument")
             ]
         ]);
+
+        // 5 -> 6
+        global.unity.recursivereconstructor.addT6Upgrade(
+            [
+                UnitTypes.toxopid,
+                Vars.content.getByName(ContentType.unit, "unity-project-spiboss")
+            ]
+        ).addT6Upgrade(
+            [
+                Vars.content.getByName(ContentType.unit, "unity-monument"),
+                Vars.content.getByName(ContentType.unit, "unity-colossus")
+            ]
+        );
+
+        // 6 -> 7
+        global.unity.recursivereconstructor.addT7Upgrade(
+            [
+                Vars.content.getByName(ContentType.unit, "unity-project-spiboss"),
+                Vars.content.getByName(ContentType.unit, "unity-arcaetana")
+            ]
+        );
     }
 });
 
