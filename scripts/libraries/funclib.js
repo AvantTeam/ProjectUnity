@@ -57,11 +57,6 @@ module.exports = {
 					var other = Vars.world.tile(x, y);
 					if(other == null) continue yGroup;
 					if(!collidedBlocks.contains(other.pos())){
-						/*if(isCons){
-							conss.get(other);
-						}else{
-							conss(other);
-						};*/
 						var dst = 1 - (Mathf.dst(x * Vars.tilesize, y * Vars.tilesize, wx, wy) / range);
 						var anDst = 1 - (Angles.angleDist(Angles.angle(wx, wy, x * Vars.tilesize, y * Vars.tilesize), angle) / cone);
 						consTile(other, other.build != null ? other.build : null, dst, anDst);

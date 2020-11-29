@@ -321,33 +321,7 @@ const script = [
             }
         ]
     },
-
-    {
-        name: "end",
-        childs: [
-            {
-                name: "factories",
-                childs: [
-                    "terminalcrucible",
-                    "endforge"
-                ]
-            },
-
-            {
-                name: "turrets",
-                childs: [
-                    "endgame"
-                ]
-            },
-
-            {
-                name: "units",
-                childs: [
-                    "devourer"
-                ]
-            }
-        ]
-    },
+    
     {
         name: "youngcha",
         childs: [
@@ -398,6 +372,33 @@ const script = [
                 childs: [
                     "chopper",
 					"modularTurret",
+                ]
+            }
+        ]
+    },
+    
+    {
+        name: "end",
+        childs: [
+            {
+                name: "factories",
+                childs: [
+                    "terminalcrucible",
+                    "endforge"
+                ]
+            },
+
+            {
+                name: "turrets",
+                childs: [
+                    "endgame"
+                ]
+            },
+
+            {
+                name: "units",
+                childs: [
+                    "devourer"
                 ]
             }
         ]
