@@ -5,7 +5,7 @@ const bossMusic = Vars.control.sound.bossMusic;
 //TODO make this an ObjectMap instead
 const monolithDarkMusics = Seq.with(loadMusic("monolith-dark1"));
 Events.on(SectorLaunchEvent, e => {
-    if(e.sector.planet == Vars.content.getByName("unity-megalith")){
+    if(e.sector.planet == Vars.content.getByName(ContentType.planet,"unity-megalith")){
         monolithDarkMusics.each(music => {
             if(!darkMusic.contains(music)){
                 darkMusic.add(music);
