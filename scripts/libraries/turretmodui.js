@@ -844,10 +844,10 @@ const _ModularBlock = {
 		this.config(java.lang.String, (a, b) => a.setBlueprintFromString(b));
 		this.configClear((tile) => tile.setBlueprint(null));
 	},
+	initBuildTimerId(){
+		this._timerid = this.timers++;
+	},
 	getBuildTimerId(){
-		if(!this._timerid){
-			this._timerid = this.timers++;
-		}
 		return this._timerid;
 	},
 	setAutoBuildDelay(s){

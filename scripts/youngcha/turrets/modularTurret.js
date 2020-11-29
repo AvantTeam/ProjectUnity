@@ -674,6 +674,7 @@ smallTurret.acceptsItems = true;
 smallTurret.hasItems = true;
 smallTurret.setGridWidth(3);
 smallTurret.setGridHeight(3);
+smallTurret.initBuildTimerId();
 smallTurret.getGraphConnectorBlock("torque graph").setAccept([1,1, 0,0, 0,0, 0,0]);
 smallTurret.getGraphConnectorBlock("torque graph").setBaseFriction(0.03);
 smallTurret.getGraphConnectorBlock("torque graph").setBaseInertia(5);

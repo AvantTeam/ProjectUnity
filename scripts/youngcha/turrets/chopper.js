@@ -369,6 +369,7 @@ chopperTurret.configurable = true;
 chopperTurret.acceptsItems = true;
 chopperTurret.setGridWidth(7);
 chopperTurret.setGridHeight(1);
+chopperTurret.initBuildTimerId();
 chopperTurret.getGraphConnectorBlock("torque graph").setAccept([1, 0, 0, 0]);
 chopperTurret.getGraphConnectorBlock("torque graph").setBaseFriction(0.03);
 chopperTurret.getGraphConnectorBlock("torque graph").setBaseInertia(5);
