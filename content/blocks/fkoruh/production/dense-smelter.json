@@ -17,10 +17,10 @@
 		}
 	},
 	"requirements": [
-    {"item": "lead", "amount": 45},
-    {"item": "silicon", "amount": 20},
-		{"item": "dense-alloy", "amount": 30}
+    {"item": "stone", "amount": 35},
+    {"item": "copper", "amount": 30},
+    {"item": "lead", "amount": 20}
 	],
 	"category": "crafting",
-	"research": "dense-alloy"
+	"research": "inferno"
 }
