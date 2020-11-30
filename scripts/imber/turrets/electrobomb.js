@@ -31,7 +31,7 @@ const bullet = extend(BasicBulletType, {
 	}
 });
 
-bullet.sprite = "large-bomb"; //dummy! dummy! dummy!
+bullet.sprite = "unity-large-bomb"; //dummy! dummy! dummy!
 bullet.width = bullet.height = 30;
 bullet.maxRange = 30;
 bullet.ignoreRotation = true;
