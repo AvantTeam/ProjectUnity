@@ -6,5 +6,5 @@ requirements: [
 
 category: distribution
 health: 140
-speed: 0.08
-displayedSpeed: 11
+speed: 0.1
+displayedSpeed: 12.5

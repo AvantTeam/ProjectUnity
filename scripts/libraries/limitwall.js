@@ -20,6 +20,13 @@ const withstandFx = new Effect(16, e => {
     Lines.square(e.x, e.y, e.rotation * 4);
 });
 
+const diriumColor = Color.valueOf("96f7c3");
+
+const blinkFx = new Effect(30, e => {
+    Draw.color(Color.white, diriumColor, e.fin());
+    Lines.stroke(3 * e.rotation * e.fout());
+    Lines.square(e.x, e.y, e.rotation * 4 * e.finpow());
+});
 
 const clone = obj => {
     if(obj === null || typeof(obj) !== 'object') return obj;
@@ -35,19 +42,27 @@ const clone = obj => {
 module.exports = {
     maxDamageFx: maxDamageFx,
     withstandFx: withstandFx,
+    blinkFx: blinkFx,
     extend(type, build, name, obj, objb){
         if(obj == undefined) obj = {};
         if(objb == undefined) objb = {};
         obj = Object.assign({
             //start
+            //negative to disable max damage
             maxDamage: 30,
             maxDamageFx: maxDamageFx,
             withstandFx: withstandFx,
             over9000: 90000000, //wave damage is 99999999
 
+            //negative to disable wall blinking
+            blinkFrame: -1,
+            blinkFx: blinkFx,
+
             setStats(){
                 this.super$setStats();
-                this.stats.add(Stat.abilities, "@", Core.bundle.format("stat.unity.maxDamage", this.maxDamage));
+                if(this.maxDamage > 0 && this.blinkFrame > 0) this.stats.add(Stat.abilities, "@\n@", Core.bundle.format("stat.unity.maxDamage", this.maxDamage), Core.bundle.format("stat.unity.blinkFrame", this.blinkFrame));
+                else if(this.maxDamage > 0) this.stats.add(Stat.abilities, "@", Core.bundle.format("stat.unity.maxDamage", this.maxDamage));
+                else if(this.blinkFrame > 0) this.stats.add(Stat.abilities, "@", Core.bundle.format("stat.unity.blinkFrame", this.blinkFrame));
             }
             //end
         }, obj);
@@ -57,7 +72,16 @@ module.exports = {
 
         objb = Object.assign({
             handleDamage(amount){
-                if(amount > wallblock.maxDamage && amount < wallblock.over9000){
+                if(wallblock.blinkFrame > 0){
+                    if(Time.time() - this._blink >= wallblock.blinkFrame){
+                        this._blink = Time.time();
+                        wallblock.blinkFx.at(this.x, this.y, wallblock.size);
+                    }
+                    else{
+                        return 0;
+                    }
+                }
+                if(wallblock.maxDamage > 0 && amount > wallblock.maxDamage && amount < wallblock.over9000){
                     wallblock.withstandFx.at(this.x, this.y, wallblock.size);
                     return this.super$handleDamage(Math.min(amount, wallblock.maxDamage));
                 }
@@ -69,6 +93,7 @@ module.exports = {
         //Extend Building
         wallblock.buildType = ent => {
             ent = extendContent(build, wallblock, clone(objb));
+            if(wallblock.blinkFrame > 0) ent._blink = 0;
             return ent;
         };
         return wallblock;

@@ -1,6 +1,6 @@
-health: 560
+health: 1024
 requirements: [
-    dense-alloy/6
+    dirium/6
 ]
 
 category: defense

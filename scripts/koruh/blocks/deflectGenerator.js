@@ -18,7 +18,7 @@ const deflectGenerator = lib.extend(ForceProjector, ForceProjector.ForceBuild, "
         {
             type: "linear",
             field: "breakage",
-            start: 775,
+            start: 820,
             intensity: 35
         }
     ],

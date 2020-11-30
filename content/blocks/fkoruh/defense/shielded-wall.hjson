@@ -4,7 +4,7 @@ requirements: [
     dense-alloy/6
 ]
 consumes: {
-    power: 1
+    power: 0.5
 }
 
 phaseRadiusBoost: 0

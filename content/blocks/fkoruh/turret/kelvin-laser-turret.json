@@ -12,7 +12,7 @@
 	"requirements": [
     {"item": "copper", "amount": 190},
 		{"item": "silicon", "amount": 110},
-		{"item": "dense-alloy", "amount": 35}
+		{"item": "titanium", "amount": 15}
 	],
 	"category": "turret",
   "hasLiquids": true,

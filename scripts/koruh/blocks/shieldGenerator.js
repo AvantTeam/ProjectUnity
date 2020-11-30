@@ -12,7 +12,7 @@ const shieldGenerator = lib.extend(ForceProjector, ForceProjector.ForceBuild, "s
         {
             type: "linear",
             field: "breakage",
-            start: 400,
+            start: 500,
             intensity: 25
         }
     ],
