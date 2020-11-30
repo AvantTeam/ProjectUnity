@@ -13,3 +13,4 @@ phaseRadiusBoost: 0
 phaseShieldBoost: 0
 
 category: effect
+research: "shielded-wall"

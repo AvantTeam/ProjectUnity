@@ -8,3 +8,4 @@ category: distribution
 health: 140
 speed: 0.1
 displayedSpeed: 12.5
+research: "exp-unloader"

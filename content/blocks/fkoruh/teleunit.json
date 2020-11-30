@@ -11,3 +11,4 @@ consumes: {
   power: 3
 }
 size: 3
+research: "teleporter"

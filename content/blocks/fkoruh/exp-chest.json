@@ -9,5 +9,6 @@
 		{"item": "phase-fabric", "amount": 120}
 	],
   "rotate": false,
-  "category": "effect"
+  "category": "effect",
+  "research": "exp-tank"
 }
