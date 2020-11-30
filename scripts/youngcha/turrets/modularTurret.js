@@ -123,6 +123,10 @@ const partinfo = [
                 name: "stat.unity.usesTorque",
                 value: true,
             },
+			shaftSpd: {
+                name: "stat.unity.shaftSpd",
+                value: 4,
+            },
         }
 
     },
@@ -601,6 +605,13 @@ const partinfo = [
 ];
 
 modturretlib.preCalcConnection(partinfo);
+
+modturretlib.TurretBaseUpdater.attachBaseUpdater(partinfo,"Gun base",{});
+modturretlib.TurretBaseUpdater.attachBaseUpdater(partinfo,"Rotary Gun base",{
+	reloadMultiplier(){
+		return Mathf.clamp(this.build.getGraphConnector("torque graph").getNetwork().lastVelocity/ this.basepart.stats.shaftSpd.value);
+	},
+});
 
 let blankobj = graphLib.init();
 graphLib.addGraph(blankobj, rotL.baseTypes.torqueConnector);

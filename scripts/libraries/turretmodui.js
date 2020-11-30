@@ -1452,30 +1452,116 @@ const _TurretModularBlock = Object.assign(deepCopy(_ModularBlock),{
 	},
 });
 
+function getPart(config,name){
+	for(let i = 0;i<config.length;i++){
+		if(config[i].name==name){
+			return config[i];
+		}
+	}
+	return null;
+}
 
-const _TurretBaseUpdater = {
+function printObj(obj, depth){
+	if(!depth){
+		depth=0;
+	}
+	for (var i in obj) {
+		if (Array.isArray(obj[i])) {
+			print(" ".repeat(depth)+"[");
+			printObj(obj[i],depth+1);
+			print(" ".repeat(depth)+"]");
+		} else if (typeof(obj[i]) == "object" && obj[i] != null)
+			printObj(obj[i],depth+1);
+		else
+			print(" ".repeat(depth)+i+":"+obj[i]);
+	}
+}
+
+
+const _TurretBaseUpdater = { //basically a turret.
 	currentBarrel: 0,
 	guns: null,
 	build: null,
 	basepart:null,
+	reloadTime: 0,
+	reload: 0,
+	
+	attachBaseUpdater(partinfo, name, ext){
+		for(let i = 0;i<partinfo.length;i++){
+			if(partinfo[i].name==name){
+				partinfo[i].baseUpdater = Object.assign(Object.create(_TurretBaseUpdater),deepCopy(ext));
+				partinfo[i].baseUpdater.basepart = name;
+				return;
+			}
+		}
+	},
+	reloadMultiplier(){
+		return 1;
+	},
 	updateShooting() {
-		if (this.build.reload >= this.build.reloadTime*this.guns[this.currentBarrel].reloadmult && this.canShoot()) {
+		if (this.reload >= this.reloadTime*this.guns[this.currentBarrel].reloadmult && this.hasAmmo() && this.canShoot()) {
 			let type = this.guns[this.currentBarrel];
 			this.build.shootType(type);
+			this.useAmmo();
+			this.onShoot();
 			this.currentBarrel++;
 			this.currentBarrel = this.currentBarrel % this.guns.length;
-
-			this.build.reload = 0;
+			this.reload = 0;
 		} else {
-			this.build.reload += this.build.delta() * this.build.baseReloadSpeed();
+			this.reload += this.build.delta() * this.build.baseReloadSpeed()*this.reloadMultiplier();
 		}
 	},
 	canShoot(){
 		return true;
 	},
 	onShoot(){},
-	processConfig(total,basex,basey,grid){
-		let part = this.basepart;
+	
+	applyStats(total,global) {
+		print("applying stats to base...");
+		if (!total.guns || total.guns.length==0) {
+			print("shit no guns");
+			printObj(total);
+			return;
+		}
+		let lt = [];
+		for (let i = 0; i < total.guns.length; i++) {
+			if (!total.guns[i]) {
+				continue;
+			}
+			lt.push(mergeStats(total.guns[i], global));
+			lt[i].bullettype = getBulletTypeFromConfig(lt[i]);
+			lt[i].magazine =0;
+
+		}
+		this.guns = lt;
+		this.reloadTime = total.reload;
+	},
+	//Consume ammo and return a type.
+	useAmmo() {
+		if(this.guns[this.currentBarrel].magazine==0){
+			this.build.attemptRefillMag(this.guns[this.currentBarrel]);
+		}
+		if(this.guns[this.currentBarrel].magazine>0){
+			this.guns[this.currentBarrel].magazine--;
+		}
+		return this.guns[this.currentBarrel].bullettype;
+	},
+	//the ammo type that will be returned if useAmmo is called.
+	peekAmmo() {
+		return this.guns[this.currentBarrel].bullettype;
+	},
+	
+	processConfig(supertotal,basex,basey,grid){
+		let part = getPart(this.build.getPartsConfig(),this.basepart);
+		if(!supertotal.bases){
+			supertotal.bases = [];
+		}
+		let baseEntry = {
+			base:this,
+			baseAccum:{}
+		};
+		
+		let total = baseEntry.baseAccum;
 		total.reload = part.stats.reload.value;
 		for (let i = 0; i < part.connOutList.length; i++) {
 			let attach = part.connOutList[i];
@@ -1485,31 +1571,36 @@ const _TurretBaseUpdater = {
 
 				let guninfo = this.build.getPartsConfig()[grid[atx][aty] - 1];
 				switch (guninfo.category) {
-				case "breach":
-					if (!total.guns) {
-						total.guns = [];
-					}
-					let ammoType = {};
-					ammoType[guninfo.stats.ammoType.value]=guninfo.stats.payload.value;
-					let basestats = {
-						damage: guninfo.stats.baseDmg.value,
-						speed: guninfo.stats.baseSpeed.value,
-						lifetime: guninfo.stats.lifetime.value,
-						type: guninfo.stats.bulletType.value,
-						ammoType: ammoType,
-						shots: guninfo.stats.shots.value,
-						spread: guninfo.stats.spread.value,
-						reloadmult: guninfo.stats.reloadMultiplier.value,
-						magazineSize: guninfo.stats.magazine.value,
-					};
-					if(guninfo.stats.mod){
-						guninfo.stats.mod.cons.get(basestats);
-					}
-					total.guns.push(basestats);
-					break;
-				case "ammo":
-					guninfo.stats.mod.cons.get(total.globalStats);
-					break;
+					case "breach":
+						if (!total.guns) {
+							total.guns = [];
+						}
+						let ammoType = {};
+						ammoType[guninfo.stats.ammoType.value]=guninfo.stats.payload.value;
+						let basestats = {
+							damage: guninfo.stats.baseDmg.value,
+							speed: guninfo.stats.baseSpeed.value,
+							lifetime: guninfo.stats.lifetime.value,
+							type: guninfo.stats.bulletType.value,
+							ammoType: ammoType,
+							shots: guninfo.stats.shots.value,
+							spread: guninfo.stats.spread.value,
+							reloadmult: guninfo.stats.reloadMultiplier.value,
+							magazineSize: guninfo.stats.magazine.value,
+						};
+						if(guninfo.stats.mod){
+							guninfo.stats.mod.cons.get(basestats);
+						}
+						total.guns.push(basestats);
+						break;
+					case "ammo":
+						guninfo.stats.mod.cons.get(total.globalStats);
+						break;
+					
+					case "barrel":
+						guninfo.stats.mod.cons.get(total.globalStats);
+						
+						break;
 				}
 
 				if (guninfo.category != "breach") {
@@ -1518,13 +1609,68 @@ const _TurretBaseUpdater = {
 				print("encountered breach");
 			}
 		}
+		baseEntry.baseAccum = total;
+		supertotal.bases.push(baseEntry);
 					
 	},
+	hasAmmo() {
+		if(!this.guns || this.guns.length==0){
+			print("shit no guns");
+			return false;
+		}
+		if(this.guns[this.currentBarrel].magazine<=0){
+			this.build.attemptRefillMag(this.guns[this.currentBarrel]);
+		}
+		return this.guns[this.currentBarrel].magazine>0;
+	},
+	acceptItem(item) {
+		if(!this.guns || this.guns.length==0){
+			return false;
+		}
+		for (let i = 0; i < this.guns.length; i++) {
+			let ammoreq = this.guns[i].ammoType;
+			for(let ammot in ammoreq){
+				let allowed = ammotype[ammot];
+				let valid = false;
+				for(let alloweditem in allowed){
+					if(alloweditem==item.name){
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	},
+	displayAmmoStats(barsTable){
+		if(!this.guns || this.guns.length==0){
+			return;
+		}
+		let that =this;
+		for (let i = 0; i < that.guns.length; i++) {
+			const index = i;
+			barsTable.row();
+			barsTable.add(new Bar(
+				prov(() =>  "Breach "+index+" Ammo: " + that.guns[index].magazine + "/" + that.guns[index].magazineSize),
+				prov(() => Pal.ammo),
+				floatp(() =>  1.0*that.guns[index].magazine/that.guns[index].magazineSize ))).growX();
+			barsTable.row();
+			barsTable.table(cons((tbl)=>{
+				tbl.left();
+				let ammoreq = that.guns[i].ammoType;
+				for(let ammot in ammoreq){
+					tbl.add((that.build.haveAmmoType(ammot,ammoreq[ammot])?"[white]":"[red]")+ammoreq[ammot]);
+					tbl.image(getAmmoIcon(ammot)).pad(3).marginRight(15).scaling(Scaling.fillY).size(32);
+				}
+			}));
+		}
+	},
+	
 	
 }
 
 const _TurretModularBuild = Object.assign(deepCopy(_ModularBuild), {
 		guns: null,
+		bases: [],
 		originalmaxhp: 0,
 		currentBarrel: 0,
 		validTurret: false,
@@ -1536,16 +1682,9 @@ const _TurretModularBuild = Object.assign(deepCopy(_ModularBuild), {
 			if(!this.validTurret){
 				return false;
 			}
-			for (let i = 0; i < this.guns.length; i++) {
-				let ammoreq = this.guns[i].ammoType;
-				for(let ammot in ammoreq){
-					let allowed = ammotype[ammot];
-					let valid = false;
-					for(let alloweditem in allowed){
-						if(alloweditem==item.name){
-							return this.items.get(item)<this.itemcap;
-						}
-					}
+			for (let i = 0; i < this.bases.length; i++) {
+				if(this.bases[i].acceptItem && this.items.get(item)<this.itemcap){
+					return true;
 				}
 			}
 			return false;
@@ -1557,10 +1696,12 @@ const _TurretModularBuild = Object.assign(deepCopy(_ModularBuild), {
 			if(!this.validTurret){
 				return false;
 			}
-			if(this.guns[this.currentBarrel].magazine<=0){
-				this.attemptRefillMag(this.guns[this.currentBarrel]);
+			for (let i = 0; i < this.bases.length; i++) {
+				if(this.bases[i].hasAmmo()){
+					return true;
+				}
 			}
-			return this.guns[this.currentBarrel].magazine>0;
+			return false;
 		},
 		attemptRefillMag(gun){
 			let ammoreq = gun.ammoType;
@@ -1598,19 +1739,21 @@ const _TurretModularBuild = Object.assign(deepCopy(_ModularBuild), {
 			}
 			return false;
 		},
-		//Consume ammo and return a type.
+		//not used anymore.
 		useAmmo() {
-			if(this.guns[this.currentBarrel].magazine==0){
+			/*if(this.guns[this.currentBarrel].magazine==0){
 				this.attemptRefillMag(this.guns[this.currentBarrel]);
 			}
 			if(this.guns[this.currentBarrel].magazine>0){
 				this.guns[this.currentBarrel].magazine--;
 			}
-			return this.guns[this.currentBarrel].bullettype;
+			return this.guns[this.currentBarrel].bullettype;*/
+			return Bullets.standardCopper;
 		},
-		//the ammo type that will be returned if useAmmo is called.
+		//not used anymore.
 		peekAmmo() {
-			return this.guns[this.currentBarrel].bullettype;
+			//return this.guns[this.currentBarrel].bullettype;
+			return Bullets.standardCopper;
 		},
 		applyStats(total) {
 			this.originalmaxhp = this.maxHealth;
@@ -1618,45 +1761,28 @@ const _TurretModularBuild = Object.assign(deepCopy(_ModularBuild), {
 			this.turretRange=80 + (total.rangeinc?total.rangeinc:0);
 			this.heal(total.hpinc* this.health/this.originalmaxhp);
 			this.itemcap=10;
-			if (!total.guns || total.guns.length==0) {
+			if (!total.bases || total.bases.length==0) {
+				print("shit no bases");
 				this.validTurret = false;
 				return;
 			}
 			let lt = [];
-			for (let i = 0; i < total.guns.length; i++) {
-				if (!total.guns[i]) {
+			for (let i = 0; i < total.bases.length; i++) {
+				if (!total.bases[i]) {
 					continue;
 				}
-				lt.push(mergeStats(total.guns[i], total.globalStats));
-				lt[i].bullettype = getBulletTypeFromConfig(lt[i]);
-				lt[i].magazine =0;
+				total.bases[i].base.applyStats(total.bases[i].baseAccum,total.globalStats);
+				lt.push(total.bases[i].base);
 
 			}
-			this.guns = lt;
+			this.bases = lt;
 			this.validTurret = true;
-			this.reloadTime = total.reload;
 		},
 		displayBarsExt(barsTable){
 			if(this.validTurret){
-				let that =this;
-				for (let i = 0; i < that.guns.length; i++) {
-					const index = i;
-					barsTable.row();
-					barsTable.add(new Bar(
-						prov(() =>  "Breach "+index+" Ammo: " + that.guns[index].magazine + "/" + that.guns[index].magazineSize),
-						prov(() => Pal.ammo),
-						floatp(() =>  1.0*that.guns[index].magazine/that.guns[index].magazineSize ))).growX();
-					barsTable.row();
-					barsTable.table(cons((tbl)=>{
-						tbl.left();
-						let ammoreq = that.guns[i].ammoType;
-						for(let ammot in ammoreq){
-							tbl.add((that.haveAmmoType(ammot,ammoreq[ammot])?"[white]":"[red]")+ammoreq[ammot]);
-							tbl.image(getAmmoIcon(ammot)).pad(3).marginRight(15).scaling(Scaling.fillY).size(32);
-						}
-					}));
+				for (let i = 0; i < this.bases.length; i++) {
+					this.bases[i].displayAmmoStats(barsTable);
 				}
-				
 			}
 		},
 		accumStats(total, part, x, y, grid) {
@@ -1674,51 +1800,13 @@ const _TurretModularBuild = Object.assign(deepCopy(_ModularBuild), {
 				total.rangeinc +=  part.stats["rangeinc"].value;
 			}
 			if (part.category == "base") {
-				print("encountered base part");
-				total.reload = part.stats.reload.value;
-				for (let i = 0; i < part.connOutList.length; i++) {
-					let attach = part.connOutList[i];
-					let atx = attach.x + x + attach.dir.x;
-					let aty = attach.y + y + attach.dir.y;
-					if (grid[atx] && grid[atx][aty]) {
-
-						let guninfo = this.getPartsConfig()[grid[atx][aty] - 1];
-						switch (guninfo.category) {
-						case "breach":
-							if (!total.guns) {
-								total.guns = [];
-							}
-							let ammoType = {};
-							ammoType[guninfo.stats.ammoType.value]=guninfo.stats.payload.value;
-							let basestats = {
-								damage: guninfo.stats.baseDmg.value,
-								speed: guninfo.stats.baseSpeed.value,
-								lifetime: guninfo.stats.lifetime.value,
-								type: guninfo.stats.bulletType.value,
-								ammoType: ammoType,
-								shots: guninfo.stats.shots.value,
-								spread: guninfo.stats.spread.value,
-								reloadmult: guninfo.stats.reloadMultiplier.value,
-								magazineSize: guninfo.stats.magazine.value,
-							};
-							if(guninfo.stats.mod){
-								guninfo.stats.mod.cons.get(basestats);
-							}
-							total.guns.push(basestats);
-							break;
-						case "ammo":
-							guninfo.stats.mod.cons.get(total.globalStats);
-							break;
-						}
-
-						if (guninfo.category != "breach") {
-							continue;
-						}
-						print("encountered breach");
-
-					}
+				if(!total.bases){
+					total.bases=[];
 				}
-				//find the rest of the gunz
+				let baseinst = deepCopy(part.baseUpdater);
+				baseinst.build = this;
+				baseinst.processConfig(total,x,y,grid);
+				
 			}
 		},
 		resetStats() {
@@ -1730,15 +1818,13 @@ const _TurretModularBuild = Object.assign(deepCopy(_ModularBuild), {
 			this.itemcap=10;
 		},
 		drawPartBuffer(part, x, y, grid) {
-			let ox= this.block.getSpriteGridPadding();
-			let oy= this.block.getSpriteGridPadding();
-			let scl = this.block.getSpriteGridSize();
-			let dx = ox+(x+part.tw*0.5)*scl;	
-			let dy = oy+(y+part.th*0.5)*scl*0.8;
 			if(!(part.category=="none"||part.category=="base")){
-				if(part.baseSprite){
-					Draw.rect(part.baseSprite, dx, dy, part.baseSprite.width,part.baseSprite.height);
-				}else{
+				if(!part.baseSprite){
+					let ox= this.block.getSpriteGridPadding();
+					let oy= this.block.getSpriteGridPadding();
+					let scl = this.block.getSpriteGridSize();
+					let dx = ox+(x+part.tw*0.5)*scl;	
+					let dy = oy+(y+part.th*0.5)*scl*0.8;
 					Draw.rect(part.texRegion, dx, dy, scl,scl);
 				}
 			}
@@ -1755,6 +1841,9 @@ const _TurretModularBuild = Object.assign(deepCopy(_ModularBuild), {
 				for(var gy = 0;gy<grid[gx].length;gy++){
 					if(grid[gx][gy]){
 						let p = this.getPartsConfig()[grid[gx][gy]-1];
+						if(!(p.category=="ammo"||p.category=="misc")){
+							continue;
+						}
 						let x = ox+(gx+p.tw*0.5)*scl;	
 						let y = oy+(gy+p.th*0.5)*scl*0.8;
 						if(p.sloped){
@@ -1774,9 +1863,7 @@ const _TurretModularBuild = Object.assign(deepCopy(_ModularBuild), {
 						let p = this.getPartsConfig()[grid[gx][gy]-1];
 						let x = ox+(gx+p.tw*0.5)*scl;	
 						let y = oy+(gy+p.th*0.5)*scl*0.8;
-						print(p.name);
-						print(p.baseSprite);
-						if(p.baseSprite){
+						if(p.baseSprite && (p.category=="ammo"||p.category=="misc")){
 							Draw.rect(p.baseSprite, x, y,p.baseSprite.width,p.baseSprite.height);
 						}
 					}
@@ -1786,18 +1873,11 @@ const _TurretModularBuild = Object.assign(deepCopy(_ModularBuild), {
 		},
 		
 		updateShooting() {
-			if (!this.valid) {
+			if (!this.validTurret) {
 				return;
 			}
-			if (this.reload >= this.reloadTime*this.guns[this.currentBarrel].reloadmult) {
-				let type = this.guns[this.currentBarrel];
-				this.shootType(type);
-				this.currentBarrel++;
-				this.currentBarrel = this.currentBarrel % this.guns.length;
-
-				this.reload = 0;
-			} else {
-				this.reload += this.delta() * this.baseReloadSpeed();
+			for (let i = 0; i < this.bases.length; i++) {
+				this.bases[i].updateShooting();
 			}
 		},
 		shootType(configtype){
@@ -1806,7 +1886,7 @@ const _TurretModularBuild = Object.assign(deepCopy(_ModularBuild), {
 			for(let i = 0; i < configtype.shots; i++){
 				this.bullet(configtype.bullettype, this.rotation + Mathf.range(configtype.spread));
 			}
-			this.useAmmo();
+
 		},
 		findTarget(){
 			let targetAir = true;
@@ -1815,8 +1895,6 @@ const _TurretModularBuild = Object.assign(deepCopy(_ModularBuild), {
                 this.target = Units.bestEnemy(this.team, this.x, this.y, this.turretRange, e => !e.dead && !e.isGrounded(), this.block.unitSort);
             }else{
                 this.target = Units.bestTarget(this.team, this.x, this.y,  this.turretRange, e => !e.dead && (e.isGrounded() || targetAir) && (!e.isGrounded() || targetGround), b => true, this.block.unitSort);
-				//print(this.target);
-				//print("r:"+this.turretRange+",t:"+this.team+",s:"+this.block.unitSort);
 			}
 			
         },
@@ -1980,6 +2058,7 @@ function _drawTile(region, x, y, w, h, rot, tile) {
 
 module.exports = {
 	preCalcConnection:_preCalcConnection,
+	TurretBaseUpdater:_TurretBaseUpdater,
 	TurretModularBlock:_TurretModularBlock,
 	ModularBlock: _ModularBlock,
 	ModularBuild: _ModularBuild,
