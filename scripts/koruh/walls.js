@@ -18,7 +18,7 @@ const steelwallLarge = wlib.extend(Wall, Wall.WallBuild, "steel-wall-large", {
 
 const diriumwall = wlib.extend(Wall, Wall.WallBuild, "dirium-wall", {
     maxDamage: 64,
-    blinkFrame: 60
+    blinkFrame: 30
 }, {});
 
 const diriumwallLarge = wlib.extend(Wall, Wall.WallBuild, "dirium-wall-large", {
