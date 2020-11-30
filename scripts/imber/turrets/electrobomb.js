@@ -1,6 +1,7 @@
 const effects = this.global.unity.effects;
 
-const plasmaFrag = Vars.content.getByName(ContentType.block, "unity-plasma").shootType.fragBullet;
+//YOU DUMMY
+//const plasmaFrag = Vars.content.getByName(ContentType.block, "unity-plasma").shootType.fragBullet;
 
 const surgeBomb = new Effect(40, 100, e => {
 	Draw.color(Pal.surge);
@@ -30,7 +31,7 @@ const bullet = extend(BasicBulletType, {
 	}
 });
 
-bullet.sprite = Core.atlas.find("large-bomb");
+bullet.sprite = "large-bomb"; //dummy! dummy! dummy!
 bullet.width = bullet.height = 30;
 bullet.maxRange = 30;
 bullet.ignoreRotation = true;
@@ -52,7 +53,7 @@ bullet.speed = 7;
 bullet.collides = false;
 bullet.splashDamage = 680;
 bullet.splashDamageRadius = 120;
-bullet.fragBullet = plasmaFrag;
+
 bullet.fragBullets = 8;
 bullet.fragLifeMin = 0.8;
 bullet.fragLifeMax = 1.1;
@@ -70,6 +71,9 @@ const electrobombTurret = extendContent(ItemTurret, "electrobomb", {
 		this.ammo(
 			Vars.content.getByName(ContentType.item, "unity-spark-alloy"), bullet
 		);
+
+    const plasmaFrag = Vars.content.getByName(ContentType.block, "unity-plasma").shootType.fragBullet;
+    bullet.fragBullet = plasmaFrag;
 	}
 });
 
