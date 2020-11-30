@@ -227,6 +227,10 @@ const script = [
     {
         name: "koruh",
         childs: [
+            "crafters",
+            "walls",
+            "lava",
+            "conveyors",
             {
                 name: "turrets",
                 childs: [
@@ -254,12 +258,7 @@ const script = [
                     "expfountain",
                     "expvoid"
                 ]
-            },
-
-            "crafters",
-            "walls",
-            "lava",
-            "conveyors"
+            }
         ]
     },
 
@@ -321,7 +320,7 @@ const script = [
             }
         ]
     },
-    
+
     {
         name: "youngcha",
         childs: [
@@ -376,7 +375,7 @@ const script = [
             }
         ]
     },
-    
+
     {
         name: "end",
         childs: [
