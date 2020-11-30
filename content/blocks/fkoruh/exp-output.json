@@ -1,0 +1,14 @@
+{
+	"size": 1,
+	"health": 60,
+  "hasPower": false,
+  "consumesPower": false,
+  "requirements": [
+		{"item": "stone", "amount": 25},
+		{"item": "copper", "amount": 25},
+  	{"item": "graphite", "amount": 10}
+	],
+  "rotate": false,
+  "category": "effect",
+  "research": "inferno"
+}

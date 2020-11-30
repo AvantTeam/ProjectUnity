@@ -12,5 +12,6 @@
   	{"item": "steel", "amount": 25}
 	],
   "rotate": false,
-  "category": "effect"
+  "category": "effect",
+  "research": "exp-tank"
 }

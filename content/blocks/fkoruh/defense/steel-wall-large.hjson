@@ -6,3 +6,4 @@ requirements: [
 category: defense
 size: 2
 buildVisibility: shown
+research: "steel-wall"

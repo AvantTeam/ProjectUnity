@@ -252,6 +252,7 @@ const script = [
                     "shieldedWall",
                     "teleporter",
                     "teleunit",
+                    "expoutput",
                     "expunloader",
                     "exptank",
                     "expchest",

@@ -13,3 +13,4 @@ liquidCapacity: 0
 itemCapacity: 0
 
 category: defense
+research: "dense-wall"
