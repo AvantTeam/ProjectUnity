@@ -46,7 +46,7 @@ oracle.buildType = () => {
 					oracle.chargeEffect.at(this.x + tr.x, this.y + tr.y, this.rotation);
 				});
 			};
-			this.shooting = true;
+			this.charging = true;
 
 			Time.run(oracle.chargeTime, () => {
 				if(!this.isValid()) return;
@@ -72,7 +72,7 @@ oracle.buildType = () => {
 
 				this.effects();
 
-				this.shooting = false;
+				this.charging = false;
 			});
 		},
 		bullet(type, angle){
