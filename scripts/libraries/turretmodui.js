@@ -1297,9 +1297,6 @@ const BulletTypesMap = {
 			return this.super$collides(bullet,tile) && this.getZ(bullet)<0.2;
 		},
 		update(b){
-			if(!this.hasInit){
-				this.load(); // uh yeh, since this is created dynamically unfortunatly.
-			}
 			this.super$update(b);
 			
 			if(b.fin()<0.15&&b.timer.get(0, (3 + b.fslope() * 2) * 1.0)){
