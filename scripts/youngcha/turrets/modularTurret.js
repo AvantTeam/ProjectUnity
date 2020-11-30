@@ -4,6 +4,16 @@ const modturretlib = require("libraries/turretmodui");
 const graphLib = require("libraries/graphlib");
 const heatlib = require("libraries/heatlib");
 
+
+function getPart(name){
+	for(let i = 0;i<partinfo.length;i++){
+		if(partinfo[i].name==name){
+			return partinfo[i];
+		}
+	}
+	return null;
+}
+
 const partinfo = [
 	{
         name: "Pivot",
@@ -281,8 +291,12 @@ const partinfo = [
                 amount: 8
             },
 			{
-                name: "lead",
-                amount: 4
+                name: "graphite",
+                amount: 12
+            },
+			{
+                name: "unity-nickel",
+                amount: 8
             },
 		],
         connectOut: [0,3,0,0],
@@ -602,13 +616,25 @@ const smallTurret = graphLib.finaliseExtendContent(Turret, Turret.TurretBuild, "
         this.partsAtlas = Core.atlas.find(this.name + "-parts");
 		this.categorySprite = [Core.atlas.find(this.name + "-category1"),Core.atlas.find(this.name + "-category2"),Core.atlas.find(this.name + "-category3"),Core.atlas.find(this.name + "-category4"),Core.atlas.find(this.name + "-category5")];
         this.setConfigs();
-
+		this.baseSprite = Core.atlas.find(this.name + "-root");
+		this.baseOutline = Core.atlas.find(this.name + "-root-outline");
+		
+		getPart("Gun base").shadowSprite =Core.atlas.find(this.name + "-gbase-outline");
+		getPart("Gun base").baseSprite = Core.atlas.find(this.name + "-gbase");
+		getPart("Cannon breach").shadowSprite =Core.atlas.find(this.name + "-cbreach-outline");
+		getPart("Cannon breach").baseSprite = Core.atlas.find(this.name + "-cbreach");
     },
 	
 }, {
 	aniprog: 0,
     anitime: 0,
     anispeed: 0,
+	getBaseSprite(){
+		return smallTurret.baseSprite;
+	},
+	getBaseOutline(){
+		return smallTurret.baseOutline;
+	},
 	getPartsConfig() {
         return partinfo;
     },
@@ -675,6 +701,8 @@ smallTurret.hasItems = true;
 smallTurret.setGridWidth(3);
 smallTurret.setGridHeight(3);
 smallTurret.initBuildTimerId();
+smallTurret.setSpriteGridSize(20);
+smallTurret.setSpriteGridPadding(3);
 smallTurret.getGraphConnectorBlock("torque graph").setAccept([1,1, 0,0, 0,0, 0,0]);
 smallTurret.getGraphConnectorBlock("torque graph").setBaseFriction(0.03);
 smallTurret.getGraphConnectorBlock("torque graph").setBaseInertia(5);

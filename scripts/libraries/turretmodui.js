@@ -826,7 +826,20 @@ const _ModularBlock = {
 	gridH: 1,
 	_timerid:1,
 	_autoBuildDelay: 10,
-	
+	_spriteGridSize:32,
+	_spriteGridPadding:0,
+	getSpriteGridSize(){
+		return this._spriteGridSize;
+	},
+	setSpriteGridSize(s){
+		this._spriteGridSize=s;
+	},
+	getSpriteGridPadding(){
+		return this._spriteGridPadding;
+	},
+	setSpriteGridPadding(s){
+		this._spriteGridPadding=s;
+	},
 	getGridWidth() {
 		return this.gridW;
 	},
@@ -865,6 +878,7 @@ const _ModularBuild = {
 	_totalItemCountCost: 0,
 	_totalItemCountPaid: 0,
 	_buffer: null,
+	_backbuffer: null,
 	_currentStats: null,
 	getPaidRatio() {
 		if (!this._totalItemCountCost) {
@@ -943,6 +957,7 @@ const _ModularBuild = {
 			return;
 		}
 		if(this.timer.get(this.block.getBuildTimerId(),this.block.getAutoBuildDelay())){
+			if(!this.team.core()){return;}
 			let citems = this.team.core().items;
 			for (let i in rc) {
 				if(rc[i].paid<rc[i].total && citems.get(rc[i].item)>0){
@@ -988,8 +1003,12 @@ const _ModularBuild = {
 	drawPartBuffer(part, x, y, grid) {
 		Draw.rect(part.texRegion, (x + part.tw * 0.5) * 32, (y + part.th * 0.5) * 32, part.tw * 32, part.th * 32);
 	},
-	
-	
+	preDrawBuffer(grid) {
+	},
+	postDrawBuffer(grid) {
+	},
+	backBuffer(grid) {
+	},
 	buildConfiguration(table) {
 		let buttoncell = table.button(Tex.whiteui, Styles.clearTransi, 50, run(() => {
 					let dialog = new BaseDialog("Edit Blueprint");
@@ -1082,14 +1101,17 @@ const _ModularBuild = {
 		//drawing the sprite.
 		if (!Vars.headless) {
 			Draw.draw(Draw.z(), () => {
+				this.backBuffer(gridprint);
+				let tx = this.block.getSpriteGridPadding()*2 + this.block.getGridWidth()*this.block.getSpriteGridSize();
+				let ty = this.block.getSpriteGridPadding()*2 + this.block.getGridHeight()*this.block.getSpriteGridSize();
 				Tmp.m1.set(Draw.proj());
 				if (!this._buffer) {
-
-					this._buffer = new FrameBuffer(this.block.getGridWidth() * 32, this.block.getGridHeight() * 32);
+					this._buffer = new FrameBuffer(tx,ty);
 				}
-				Draw.proj(0, 0, this.block.getGridWidth() * 32, this.block.getGridHeight() * 32);
+				Draw.proj(0, 0, tx,ty);
 				this._buffer.begin(Color.clear);
 				Draw.color(Color.white);
+				this.preDrawBuffer(gridprint);
 				for (var p = 0; p < this._blueprint.length; p++) {
 					if (this._blueprint[p] == 0) {
 						continue;
@@ -1098,6 +1120,7 @@ const _ModularBuild = {
 					let py = (p % this.block.getGridHeight());
 					this.drawPartBuffer(this.getPartsConfig()[this._blueprint[p] - 1], px, py, gridprint);
 				}
+				this.postDrawBuffer(gridprint);
 				this._buffer.end();
 				Draw.proj(Tmp.m1);
 				Draw.reset();
@@ -1171,7 +1194,7 @@ const _ModularBuild = {
 
 const ammotype = {
 	normal:{
-		"copper":{am:1},"graphite":{am:2},"unity-nickel":{am:1},"unity-cupronickel":{am:5}
+		"copper":{am:1},"graphite":{am:6},"unity-nickel":{am:2},"unity-cupronickel":{am:10}
 	},
 	fire:{
 		"coal":{am:1},"pyratite":{am:3},"blast-compound":{am:1},"plastanium":{am:1}
@@ -1433,6 +1456,76 @@ const _TurretModularBlock = Object.assign(deepCopy(_ModularBlock),{
 });
 
 
+const _TurretBaseUpdater = {
+	currentBarrel: 0,
+	guns: null,
+	build: null,
+	basepart:null,
+	updateShooting() {
+		if (this.build.reload >= this.build.reloadTime*this.guns[this.currentBarrel].reloadmult && this.canShoot()) {
+			let type = this.guns[this.currentBarrel];
+			this.build.shootType(type);
+			this.currentBarrel++;
+			this.currentBarrel = this.currentBarrel % this.guns.length;
+
+			this.build.reload = 0;
+		} else {
+			this.build.reload += this.build.delta() * this.build.baseReloadSpeed();
+		}
+	},
+	canShoot(){
+		return true;
+	},
+	onShoot(){},
+	processConfig(total,basex,basey,grid){
+		let part = this.basepart;
+		total.reload = part.stats.reload.value;
+		for (let i = 0; i < part.connOutList.length; i++) {
+			let attach = part.connOutList[i];
+			let atx = attach.x + basex + attach.dir.x;
+			let aty = attach.y + basey + attach.dir.y;
+			if (grid[atx] && grid[atx][aty]) {
+
+				let guninfo = this.build.getPartsConfig()[grid[atx][aty] - 1];
+				switch (guninfo.category) {
+				case "breach":
+					if (!total.guns) {
+						total.guns = [];
+					}
+					let ammoType = {};
+					ammoType[guninfo.stats.ammoType.value]=guninfo.stats.payload.value;
+					let basestats = {
+						damage: guninfo.stats.baseDmg.value,
+						speed: guninfo.stats.baseSpeed.value,
+						lifetime: guninfo.stats.lifetime.value,
+						type: guninfo.stats.bulletType.value,
+						ammoType: ammoType,
+						shots: guninfo.stats.shots.value,
+						spread: guninfo.stats.spread.value,
+						reloadmult: guninfo.stats.reloadMultiplier.value,
+						magazineSize: guninfo.stats.magazine.value,
+					};
+					if(guninfo.stats.mod){
+						guninfo.stats.mod.cons.get(basestats);
+					}
+					total.guns.push(basestats);
+					break;
+				case "ammo":
+					guninfo.stats.mod.cons.get(total.globalStats);
+					break;
+				}
+
+				if (guninfo.category != "breach") {
+					continue;
+				}
+				print("encountered breach");
+			}
+		}
+					
+	},
+	
+}
+
 const _TurretModularBuild = Object.assign(deepCopy(_ModularBuild), {
 		guns: null,
 		originalmaxhp: 0,
@@ -1528,7 +1621,7 @@ const _TurretModularBuild = Object.assign(deepCopy(_ModularBuild), {
 			this.turretRange=80 + (total.rangeinc?total.rangeinc:0);
 			this.heal(total.hpinc* this.health/this.originalmaxhp);
 			this.itemcap=10;
-			if (!total.guns) {
+			if (!total.guns || total.guns.length==0) {
 				this.validTurret = false;
 				return;
 			}
@@ -1639,6 +1732,62 @@ const _TurretModularBuild = Object.assign(deepCopy(_ModularBuild), {
 			this.turretRange=80;
 			this.itemcap=10;
 		},
+		drawPartBuffer(part, x, y, grid) {
+			let ox= this.block.getSpriteGridPadding();
+			let oy= this.block.getSpriteGridPadding();
+			let scl = this.block.getSpriteGridSize();
+			let dx = ox+(x+part.tw*0.5)*scl;	
+			let dy = oy+(y+part.th*0.5)*scl*0.8;
+			if(!(part.category=="none"||part.category=="base")){
+				if(part.baseSprite){
+					Draw.rect(part.baseSprite, dx, dy, part.baseSprite.width,part.baseSprite.height);
+				}else{
+					Draw.rect(part.texRegion, dx, dy, scl,scl);
+				}
+			}
+		},
+		getBaseSprite(){},
+		getBaseOutline(){},
+		preDrawBuffer(grid) {
+			let ox= this.block.getSpriteGridPadding();
+			let oy= this.block.getSpriteGridPadding();
+			let scl = this.block.getSpriteGridSize();
+			Draw.rect(this.getBaseOutline(), ox+grid.length*scl*0.5, oy+grid[0].length*scl*0.5,this.getBaseOutline().width,this.getBaseOutline().height);
+			
+			for(var gx = 0;gx<grid.length;gx++){
+				for(var gy = 0;gy<grid[gx].length;gy++){
+					if(grid[gx][gy]){
+						let p = this.getPartsConfig()[grid[gx][gy]-1];
+						let x = ox+(gx+p.tw*0.5)*scl;	
+						let y = oy+(gy+p.th*0.5)*scl*0.8;
+						if(p.sloped){
+							
+						}else{
+							if(p.shadowSprite){
+								Draw.rect(p.shadowSprite, x, y,p.shadowSprite.width,p.shadowSprite.height);
+							}
+						}
+					}					
+				}
+			}
+			Draw.rect(this.getBaseSprite(), ox+grid.length*scl*0.5, oy+grid[0].length*scl*0.5,this.getBaseSprite().width,this.getBaseSprite().height);
+			for(var gx = 0;gx<grid.length;gx++){
+				for(var gy = 0;gy<grid[gx].length;gy++){
+					if(grid[gx][gy]){
+						let p = this.getPartsConfig()[grid[gx][gy]-1];
+						let x = ox+(gx+p.tw*0.5)*scl;	
+						let y = oy+(gy+p.th*0.5)*scl*0.8;
+						print(p.name);
+						print(p.baseSprite);
+						if(p.baseSprite){
+							Draw.rect(p.baseSprite, x, y,p.baseSprite.width,p.baseSprite.height);
+						}
+					}
+				}
+			}
+			
+		},
+		
 		updateShooting() {
 			if (!this.valid) {
 				return;
