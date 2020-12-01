@@ -25,15 +25,15 @@ const exporb = extend(BulletType, {
         this.super$init(b);
     },
     draw(b){
-        if((b.fin() > 0.5) && Time.time() % 14 < 7) return;//blinking
-        Draw.color(expColor, Color.white, 0.1 + 0.1 * Mathf.sin(Time.time() * 0.03 + b.id * 2));
+        if((b.fin() > 0.5) && Time.time % 14 < 7) return;//blinking
+        Draw.color(expColor, Color.white, 0.1 + 0.1 * Mathf.sin(Time.time * 0.03 + b.id * 2));
         /*
         Fill.circle(b.x, b.y, 1.5);
         Lines.stroke(0.5);
-        Lines.circle(b.x, b.y, 2.2 + 0.6 * Mathf.sin(Time.time() * 0.1 + b.id * 5));*/
+        Lines.circle(b.x, b.y, 2.2 + 0.6 * Mathf.sin(Time.time * 0.1 + b.id * 5));*/
         Fill.circle(b.x, b.y, 1.5);
         Lines.stroke(0.5);
-        for(var i=0;i<4;i++) Drawf.tri(b.x, b.y, 4, 4+1.5*Mathf.sin(Time.time()*0.12 + b.id * 3), i*90+Mathf.sin(Time.time()*0.04 + b.id * 5)*28);
+        for(var i=0;i<4;i++) Drawf.tri(b.x, b.y, 4, 4+1.5*Mathf.sin(Time.time*0.12 + b.id * 3), i*90+Mathf.sin(Time.time*0.04 + b.id * 5)*28);
     },
     update(b){
         if(b.moving()) b.time = 0;//if this is idle it dies

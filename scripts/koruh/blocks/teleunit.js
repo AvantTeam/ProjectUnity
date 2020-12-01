@@ -69,22 +69,22 @@ teleunit.buildType = prov(() => extend(Building, {
     draw() {
         this.super$draw();
         Draw.color(Color.white);
-        Draw.alpha(0.45 + Mathf.absin(Time.time(), 7, 0.26));
+        Draw.alpha(0.45 + Mathf.absin(Time.time, 7, 0.26));
         Draw.rect(teleunit.topRegion, this.x, this.y);
         if(this._warmup >= 0.001){
           Draw.z(Layer.bullet);
-          Draw.color(diriumColor, this.team.color, Mathf.absin(Time.time(), 19, 1));
-          Lines.stroke((Mathf.absin(Time.time(), 62, 0.5) + 0.5) * this._warmup);
+          Draw.color(diriumColor, this.team.color, Mathf.absin(Time.time, 19, 1));
+          Lines.stroke((Mathf.absin(Time.time, 62, 0.5) + 0.5) * this._warmup);
           Lines.square(this.x, this.y, 10.5, 45);
-          Lines.stroke((Mathf.absin(Time.time(), 62, 1) + 1) * this._warmup);
-          Lines.square(this.x, this.y, 8.5, Time.time() / 2);
-          Lines.square(this.x, this.y, 8.5, -1 * Time.time() / 2);
+          Lines.stroke((Mathf.absin(Time.time, 62, 1) + 1) * this._warmup);
+          Lines.square(this.x, this.y, 8.5, Time.time / 2);
+          Lines.square(this.x, this.y, 8.5, -1 * Time.time / 2);
         }
         Draw.reset();
     },
     drawSelect(){
         Draw.color(this.consValid() && this.enabled ? (this.inRange(Vars.player) ? diriumColor : Pal.accent) : Pal.darkMetal);
-        var length = Vars.tilesize * teleunit.size / 2 + 3 + Mathf.absin(Time.time(), 5, 2);
+        var length = Vars.tilesize * teleunit.size / 2 + 3 + Mathf.absin(Time.time, 5, 2);
 
         Draw.rect(teleunit.arrowRegion, this.x + length, this.y, (0 + 2) * 90);
         Draw.rect(teleunit.arrowRegion, this.x, this.y + length, (1 + 2) * 90);

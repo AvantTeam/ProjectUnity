@@ -16,7 +16,7 @@ print("h");
 
 function addHpBar(){
   Vars.ui.hudGroup.fill(cons(cont => {
-    var hpb = cont.add(new Bar(boss.localizedName, bosscolor, () => ((Time.time() - cutstart < cuttime) ? (Time.time() - cutstart) / cuttime: bossnow.healthf()))).width(Core.graphics.getWidth()*0.6).height(50).top().pad(40).get();
+    var hpb = cont.add(new Bar(boss.localizedName, bosscolor, () => ((Time.time - cutstart < cuttime) ? (Time.time - cutstart) / cuttime: bossnow.healthf()))).width(Core.graphics.getWidth()*0.6).height(50).top().pad(40).get();
     hpb.blink(Color.white);
     cont.top();
     cont.update(() => {
@@ -37,7 +37,7 @@ function gameover(win){
 }
 
 function cutscene(){
-  cutstart = Time.time();
+  cutstart = Time.time;
   bossnow.apply(disabled, cuttime);
   Groups.player.each(p => {
     if(p.unit() != null) p.unit().apply(disabled, cuttime);

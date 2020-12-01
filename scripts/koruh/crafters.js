@@ -16,7 +16,7 @@ const densesmelter = clib.extend(GenericSmelter, GenericSmelter.SmelterBuild, "d
         Draw.rect(densesmelter.region, this.x, this.y);
         if(this.warmup > 0){
             Draw.blend(Blending.additive);
-            Draw.color(Color.orange, this.warmup * Mathf.absin(Time.time(), 8, 0.6));
+            Draw.color(Color.orange, this.warmup * Mathf.absin(Time.time, 8, 0.6));
             Draw.rect(solidifier.topRegion, this.x, this.y);
             Draw.color();
             Draw.blend();
@@ -109,7 +109,7 @@ steelsmelter.buildType = () => extendContent(GenericSmelter.SmelterBuild, steels
     draw(){
         Draw.rect(steelsmelter.region, this.x, this.y);
         if(this.warmup > 0){
-            Draw.color(1, 1, 1, this.warmup * Mathf.absin(Time.time(), 8, 0.6));
+            Draw.color(1, 1, 1, this.warmup * Mathf.absin(Time.time, 8, 0.6));
             Draw.rect(solidifier.topRegion, this.x, this.y);
             Draw.color();
         }
@@ -254,9 +254,9 @@ const diriumcrucible = clib.extend(GenericCrafter, GenericCrafter.GenericCrafter
         this.super$draw();
         if(this.warmup > 0){
             Draw.blend(Blending.additive);
-            Draw.color(Pal.accent, this.warmup * Mathf.absin(Time.time(), 8, 1));
+            Draw.color(Pal.accent, this.warmup * Mathf.absin(Time.time, 8, 1));
             Draw.rect(solidifier.topRegion, this.x, this.y);
-            Draw.color(diriumcrucible.exp0Color, this.warmup * Mathf.absin(Time.time(), 25, 0.3));
+            Draw.color(diriumcrucible.exp0Color, this.warmup * Mathf.absin(Time.time, 25, 0.3));
             Draw.rect(diriumcrucible.expRegion, this.x, this.y);
             Draw.blend();
         }

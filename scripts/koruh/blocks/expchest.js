@@ -42,7 +42,7 @@ exptank.buildType = () => extend(Building, {
     },
     draw(){
         Draw.rect(exptank.baseRegion, this.x, this.y);
-        Draw.color(expColor, Color.white, Mathf.absin(Time.time(), 20, 0.6));
+        Draw.color(expColor, Color.white, Mathf.absin(Time.time, 20, 0.6));
         Draw.alpha(this._exp / exptank.expCapacity);
         Draw.rect(exptank.expRegion, this.x, this.y);
         Draw.color();

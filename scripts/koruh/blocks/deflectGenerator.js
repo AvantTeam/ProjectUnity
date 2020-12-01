@@ -6,7 +6,7 @@ const shieldBreakCircle = new Effect(40, e => {
     Lines.circle(e.x, e.y, e.rotation + e.fin());
 });
 const deflect = new Effect(12, e => {
-    Draw.color(Pal.lancerLaser);
+    Draw.color(colorOfDirium);
 
     Lines.stroke(2 * e.fout());
     Lines.square(e.x, e.y, 8 * e.fout(), 45);
@@ -23,7 +23,7 @@ const deflectGenerator = lib.extend(ForceProjector, ForceProjector.ForceBuild, "
         }
     ],
     drawPlace(x, y, rotation, valid){
-        var fin = (Time.time() % 90) / 90;
+        var fin = (Time.time % 90) / 90;
         Draw.color(this.exp0Color);
         Lines.stroke(1.5 * (1 - fin));
         Lines.circle(x * Vars.tilesize + this.offset, y * Vars.tilesize + this.offset, this.radius + fin * 2 * this.maxLevel);
@@ -68,7 +68,7 @@ const deflectGenerator = lib.extend(ForceProjector, ForceProjector.ForceBuild, "
         if(this.buildup >= deflectGenerator.breakage && !this.broken){
             this.broken = true;
             this.buildup = deflectGenerator.breakage;
-            shieldBreakCircle.at(this.x, this.y, this.realRadius(), Pal.lancerLaser);
+            shieldBreakCircle.at(this.x, this.y, this.realRadius(), Pal.lancerLaser.cpy().lerp(colorOfDirium, this.levelf()));
         }
 
         if(this.hit > 0){

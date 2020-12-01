@@ -31,7 +31,10 @@ lava.lightColor = lavaColor2.cpy().mul(1, 1, 1, 0.55);
 var tmpc = new Color(0, 0, 0, 1);//Tmp.c1 cannot be used in events.run
 var tmpc2 = new Color(0, 0, 0, 1);
 
-Events.run(Trigger.update, () => {
-    lava.color = tmpc.set(lavaColor).lerp(lavaColor2, Mathf.absin(Time.globalTime(), 25, 1));
-    lava.lightColor = tmpc2.set(lava.color).mul(1, 1, 1, 0.55);
-});
+if(!Vars.headless){
+    //pointless in headless afaik
+    Events.run(Trigger.update, () => {
+        lava.color = tmpc.set(lavaColor).lerp(lavaColor2, Mathf.absin(Time.globalTime, 25, 1));
+        lava.lightColor = tmpc2.set(lava.color).mul(1, 1, 1, 0.55);
+    });
+}

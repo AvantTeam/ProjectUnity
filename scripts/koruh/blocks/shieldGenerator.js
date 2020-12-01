@@ -17,7 +17,7 @@ const shieldGenerator = lib.extend(ForceProjector, ForceProjector.ForceBuild, "s
         }
     ],
     drawPlace(x, y, rotation, valid){
-        var fin = (Time.time() % 90) / 90;
+        var fin = (Time.time % 90) / 90;
         Draw.color(this.exp0Color);
         Lines.stroke(1.5 * (1 - fin));
         Lines.circle(x * Vars.tilesize + this.offset, y * Vars.tilesize + this.offset, this.radius + fin * 1.5 * this.maxLevel);
@@ -51,7 +51,7 @@ const shieldGenerator = lib.extend(ForceProjector, ForceProjector.ForceBuild, "s
             this.broken = false;
         }
 
-        if(this.buildup >= shieldGenerator.breakagem && !this.broken){
+        if(this.buildup >= shieldGenerator.breakage && !this.broken){
             this.broken = true;
             this.buildup = shieldGenerator.breakage;
             shieldBreakCircle.at(this.x, this.y, this.realRadius(), Pal.lancerLaser);

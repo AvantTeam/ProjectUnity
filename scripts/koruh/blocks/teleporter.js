@@ -52,7 +52,7 @@ teleporter.buildType = prov(() => extend(Building, {
             Draw.rect(teleporter.blankRegion, this.x, this.y);
         }
         Draw.color(Color.white);
-        Draw.alpha(0.45 + Mathf.absin(Time.time(), 7, 0.26));
+        Draw.alpha(0.45 + Mathf.absin(Time.time, 7, 0.26));
         Draw.rect(teleporter.topRegion, this.x, this.y);
         Draw.reset();
     },

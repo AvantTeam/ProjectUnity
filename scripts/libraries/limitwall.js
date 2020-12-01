@@ -73,8 +73,8 @@ module.exports = {
         objb = Object.assign({
             handleDamage(amount){
                 if(wallblock.blinkFrame > 0){
-                    if(Time.time() - this._blink >= wallblock.blinkFrame){
-                        this._blink = Time.time();
+                    if(Time.time - this._blink >= wallblock.blinkFrame){
+                        this._blink = Time.time;
                         wallblock.blinkFx.at(this.x, this.y, wallblock.size);
                     }
                     else{

@@ -33,7 +33,7 @@ expunloader.buildType = () => extend(Building, {
         if(!this.consValid()) return;
         Draw.blend(Blending.additive);
         Draw.color(Color.white);
-        Draw.alpha(Mathf.absin(Time.time(), 20, 0.4));
+        Draw.alpha(Mathf.absin(Time.time, 20, 0.4));
         Draw.rect(expunloader.topRegion, this.x, this.y);
         for(var i=0; i<4; i++){
             if(this._join[i]) Draw.rect(expunloader.topRegion2, this.x, this.y, i*90);

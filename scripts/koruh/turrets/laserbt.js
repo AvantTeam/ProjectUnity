@@ -165,7 +165,7 @@ chargeLaserTurret.drawer = tile => {
     if(tile.totalExp() >= chargeLaserTurret.maxExp){
         //Draw.blend(Blending.additive);
         Draw.color(expColor);
-        Draw.alpha(Mathf.absin(Time.time(), 20, 0.6));
+        Draw.alpha(Mathf.absin(Time.time, 20, 0.6));
         Draw.rect(chargeLaserTurret.topRegion, tile.x + chargeLaserTurret.tr2.x, tile.y + chargeLaserTurret.tr2.y, tile.rotation - 90);
         Draw.color();
         //Draw.blend();
