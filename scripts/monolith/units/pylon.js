@@ -26,7 +26,7 @@ const pylonLaserCharge = new Effect(200, 180, e => {
 
             for(let j = 0; j < 2; j++){
                 Lines.stroke(c.fin() * 1.5 * i);
-                Lines.square(e.x, e.y, c.fout() * pylonLaser.width * i, Time.time() * 4 * Mathf.signs[j]);
+                Lines.square(e.x, e.y, c.fout() * pylonLaser.width * i, Time.time * 4 * Mathf.signs[j]);
             };
         };
     });
@@ -44,7 +44,7 @@ const pylonLaserCharge = new Effect(200, 180, e => {
             for(let j = 0; j < 2; j++){
                 Lines.stroke(fout * 1.5 * i);
 
-                let rot = Mathf.signs[j] * (Time.time() + (fin * 720));
+                let rot = Mathf.signs[j] * (Time.time + (fin * 720));
                 Lines.square(e.x, e.y, finpow * pylonLaser.width * 2 * i, rot);
             };
         };

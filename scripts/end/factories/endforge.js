@@ -37,7 +37,7 @@ endForge.buildType = () => {
 			
 			if(this.warmup <= 0.0001) return;
 			Draw.blend(Blending.additive);
-			Draw.color(1, Mathf.absin(Time.time(), 5, 0.5) + 0.5, Mathf.absin(Time.time() + (90 * Mathf.radDeg), 5, 0.5) + 0.5, this.warmup);
+			Draw.color(1, Mathf.absin(Time.time(), 5, 0.5) + 0.5, Mathf.absin(Time.time + (90 * Mathf.radDeg), 5, 0.5) + 0.5, this.warmup);
 			Draw.rect(endForge.circuitRegion, this.x, this.y);
 			
 			var b = (Mathf.absin(Time.time(), 8, 0.25) + 0.75) * this.warmup;
@@ -51,8 +51,8 @@ endForge.buildType = () => {
 					var ofst = (360 / 8) * ((i * 2) + s);
 					var reg = endForge.smallLightRegion;
 					var sgn = Mathf.signs[s];
-					var colA = (Mathf.absin(Time.time() + (ofst * Mathf.radDeg), 8, 0.25) + 0.75) * this.warmup;
-					var colB = (Mathf.absin(Time.time() + ((90 + ofst) * Mathf.radDeg), 8, 0.25) + 0.75) * this.warmup;
+					var colA = (Mathf.absin(Time.time + (ofst * Mathf.radDeg), 8, 0.25) + 0.75) * this.warmup;
+					var colB = (Mathf.absin(Time.time + ((90 + ofst) * Mathf.radDeg), 8, 0.25) + 0.75) * this.warmup;
 					
 					Draw.color(1, colA, colB, this.warmup);
 					Draw.rect(reg, this.x, this.y, reg.width * sgn * Draw.scl, reg.height * Draw.scl, -ang);

@@ -30,7 +30,7 @@ const lightningSpawnAbility = extend(Ability, {
             if(getPhase(unit.id) > 0){
                 for(let i = 0; i < this.lightningCount; i++){
                     Tmp.v1.trns(
-                        (Time.time() * this.rotateSpeed + (360 * i / this.lightningCount) + Mathf.randomSeed(unit.id)) * Mathf.signs[unit.id % 2],
+                        (Time.time * this.rotateSpeed + (360 * i / this.lightningCount) + Mathf.randomSeed(unit.id)) * Mathf.signs[unit.id % 2],
                         this.lightningOffset * getPhase(unit.id)
                     ).add(unit);
 
@@ -63,7 +63,7 @@ const lightningSpawnAbility = extend(Ability, {
 
         for(let i = 0; i < this.lightningCount; i++){
             Tmp.v1.trns(
-                (Time.time() * this.rotateSpeed + (360 * i / this.lightningCount) + Mathf.randomSeed(unit.id)) * Mathf.signs[unit.id % 2],
+                (Time.time * this.rotateSpeed + (360 * i / this.lightningCount) + Mathf.randomSeed(unit.id)) * Mathf.signs[unit.id % 2],
                 this.lightningOffset * getPhase(unit.id)
             ).add(unit);
 

@@ -17,11 +17,11 @@ const getDamage = (type) => {
 };
 
 const offsetSin = (offset, scl) => {
-	return Mathf.absin(Time.time() + (offset * Mathf.radDeg), scl, 0.5) + 0.5;
+	return Mathf.absin(Time.time + (offset * Mathf.radDeg), scl, 0.5) + 0.5;
 };
 
 const offsetSinB = (offset, scl) => {
-	return Mathf.absin(Time.time() + (offset * Mathf.radDeg), scl, 0.25);
+	return Mathf.absin(Time.time + (offset * Mathf.radDeg), scl, 0.25);
 };
 
 const endGameShoot = new Effect(45, 820 * 2, e => {
@@ -45,12 +45,12 @@ const darkShockWave = new Effect(56, 820 * 2, e => {
 	Lines.stroke(e.fout() * 1.5 + 0.5);
 	
 	for(var i = 0; i < sides; i++){
-		tempVec.trns(360 / sides * i, e.finpow() * 790 + (Mathf.clamp(Mathf.randomSeed(Mathf.round(Time.time() * 270 + (e.id * 1241) + Mathf.round(i / 3)), -390, 390), -340, 0) * e.fin())).add(e.x, e.y);
+		tempVec.trns(360 / sides * i, e.finpow() * 790 + (Mathf.clamp(Mathf.randomSeed(Mathf.round(Time.time * 270 + (e.id * 1241) + Mathf.round(i / 3)), -390, 390), -340, 0) * e.fin())).add(e.x, e.y);
 		
 		for(var b = 0; b < 2; b++){
 			poly[(i * 2 + b)] = b == 0 ? tempVec.x : tempVec.y;
 		};
-		if(Mathf.randomSeed(Mathf.round(Time.time() * 270 + (e.id * 2311) + ((1 + i) * 342)), 0, 20) / 20 >= 0.9){
+		if(Mathf.randomSeed(Mathf.round(Time.time * 270 + (e.id * 2311) + ((1 + i) * 342)), 0, 20) / 20 >= 0.9){
 			Lines.line(e.x, e.y, tempVec.x, tempVec.y);
 		};
 	};

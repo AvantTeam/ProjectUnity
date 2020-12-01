@@ -63,9 +63,9 @@ module.exports = {
                     var h = region.height * r.scale * Draw.scl;
 
                     for(var j = 0; j < r.bladeCount; j++){
-                        var angle = ((unit.id * 24) + (Time.time() * r.speed) + ((360 / r.bladeCount) * j) + r.rotOffset) % 360;
+                        var angle = ((unit.id * 24) + (Time.time * r.speed) + ((360 / r.bladeCount) * j) + r.rotOffset) % 360;
 
-                        Draw.alpha(Vars.state.isPaused() ? 1 : Time.time() % 2);
+                        Draw.alpha(Vars.state.isPaused() ? 1 : Time.time % 2);
 
                         Draw.rect(outline, unit.x + offx, unit.y + offy, w, h, angle);
                         Draw.rect(region, unit.x + offx, unit.y + offy, w, h, angle);

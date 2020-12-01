@@ -97,7 +97,7 @@ const multiTest1 = multiLib.MultiCrafter(GenericSmelter, GenericSmelter.SmelterB
     }], {}, //for entity, they need constructor for extra properties
     function Extra() {
         this._obj = {
-            a: Time.time()
+            a: Time.time
         };
         this.getObj = function() {
             return this._obj;
