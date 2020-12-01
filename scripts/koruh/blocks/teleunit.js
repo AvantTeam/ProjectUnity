@@ -63,8 +63,10 @@ teleunit.configurable = true;
 
 teleunit.buildType = prov(() => extend(Building, {
     _warmup: 0,
+    _warmup2: 0,
     updateTile(){
         this._warmup = Mathf.lerpDelta(this._warmup, this.consValid() ? 1 : 0, 0.05);
+        this._warmup2 = Mathf.lerpDelta(this._warmup2, this.consValid() && this.enabled ? 1 : 0, 0.05);
     },
     draw() {
         this.super$draw();
@@ -72,13 +74,15 @@ teleunit.buildType = prov(() => extend(Building, {
         Draw.alpha(0.45 + Mathf.absin(Time.time, 7, 0.26));
         Draw.rect(teleunit.topRegion, this.x, this.y);
         if(this._warmup >= 0.001){
-          Draw.z(Layer.bullet);
-          Draw.color(diriumColor, this.team.color, Mathf.absin(Time.time, 19, 1));
-          Lines.stroke((Mathf.absin(Time.time, 62, 0.5) + 0.5) * this._warmup);
-          Lines.square(this.x, this.y, 10.5, 45);
-          Lines.stroke((Mathf.absin(Time.time, 62, 1) + 1) * this._warmup);
-          Lines.square(this.x, this.y, 8.5, Time.time / 2);
-          Lines.square(this.x, this.y, 8.5, -1 * Time.time / 2);
+            Draw.z(Layer.bullet);
+            Draw.color(diriumColor, this.team.color, Mathf.absin(Time.time, 19, 1));
+            Lines.stroke((Mathf.absin(Time.time, 62, 0.5) + 0.5) * this._warmup);
+            Lines.square(this.x, this.y, 10.5, 45);
+            if(this._warmup2 >= 0.001){
+                Lines.stroke((Mathf.absin(Time.time, 62, 1) + 1) * this._warmup2);
+                Lines.square(this.x, this.y, 8.5, Time.time / 2);
+                Lines.square(this.x, this.y, 8.5, -1 * Time.time / 2);
+            }
         }
         Draw.reset();
     },
@@ -115,7 +119,7 @@ teleunit.buildType = prov(() => extend(Building, {
         for(var i=0; i<arr.length;i++){
             var tid = arr[i].split("#")[1];
             //print("tid: "+tid);
-            if(teleunit.buildId[tid] == undefined || teleunit.buildId[tid] == null || !teleunit.buildId[tid] || !teleunit.buildId[tid].enabled) continue;
+            if(teleunit.buildId[tid] == undefined || teleunit.buildId[tid] == null || !teleunit.buildId[tid] || (!teleunit.buildId[tid].enabled && teleunit.buildId[tid] != this)) continue;
             barr.push(teleunit.buildId[tid]);
         }
         barr.sort(function(a, b) {
@@ -177,5 +181,9 @@ teleunit.buildType = prov(() => extend(Building, {
         if(unit.hasEffect(tpCoolDown) || unit.isPlayer()) return;
         this.tpUnit(unit, false);
         unit.apply(tpCoolDown, 120);
+    },
+    consValid(){
+        //suppress considering enabled
+        return this.power.status > 0.98;
     }
 }));
