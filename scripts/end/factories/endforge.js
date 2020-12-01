@@ -37,10 +37,10 @@ endForge.buildType = () => {
 			
 			if(this.warmup <= 0.0001) return;
 			Draw.blend(Blending.additive);
-			Draw.color(1, Mathf.absin(Time.time(), 5, 0.5) + 0.5, Mathf.absin(Time.time + (90 * Mathf.radDeg), 5, 0.5) + 0.5, this.warmup);
+			Draw.color(1, Mathf.absin(Time.time, 5, 0.5) + 0.5, Mathf.absin(Time.time + (90 * Mathf.radDeg), 5, 0.5) + 0.5, this.warmup);
 			Draw.rect(endForge.circuitRegion, this.x, this.y);
 			
-			var b = (Mathf.absin(Time.time(), 8, 0.25) + 0.75) * this.warmup;
+			var b = (Mathf.absin(Time.time, 8, 0.25) + 0.75) * this.warmup;
 
 			Draw.color(1, b, b, b);
 			Draw.rect(endForge.topRegion, this.x, this.y);

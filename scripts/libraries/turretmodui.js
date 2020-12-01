@@ -1332,7 +1332,7 @@ const BulletTypesMap = {
 				this.load(); // uh yeh, since this is created dynamically unfortunatly.
 			}
 			let scl = this.getZ(b)+1;
-			let offset = Time.time()*3.0;
+			let offset = Time.time*3.0;
 			var height = this.height*scl;
 			var width = this.width*scl;
 			let flash = Mathf.pow(2,5*b.fin()-1)%1.0>0.5;

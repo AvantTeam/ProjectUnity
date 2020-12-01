@@ -68,7 +68,7 @@ const lightningSpawnAbility = extend(Ability, {
             ).add(unit);
 
             let region = Core.atlas.find("circle-shadow");
-            let r = getPhase(unit.id) * region.width * Draw.scl + this.lightningRadius + (Mathf.sin(Time.time(), 6, 4) * getPhase(unit.id));
+            let r = getPhase(unit.id) * region.width * Draw.scl + this.lightningRadius + (Mathf.sin(Time.time, 6, 4) * getPhase(unit.id));
 
             Draw.color(this.backColor);
             Draw.rect(region, Tmp.v1.x, Tmp.v1.y, r, r);

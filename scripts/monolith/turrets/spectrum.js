@@ -54,7 +54,7 @@ spectrum.buildType = () => {
 
             this.pow = Mathf.lerpDelta(this.pow, this.efficiency(), spectrum.cooldown);
             this.rot += 2 * this.pow;
-            this.size = (1 + Mathf.sin(Time.time(), 15, 0.08 * this.pow)) * this.pow;
+            this.size = (1 + Mathf.sin(Time.time, 15, 0.08 * this.pow)) * this.pow;
             this.color.shiftHue(this.rot).mul(0.5 + this.pow * 0.5);
         },
 

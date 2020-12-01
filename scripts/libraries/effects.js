@@ -3,7 +3,7 @@ const tempVec = new Vec2();
 //Colored region
 
 const coloredSpark1L = new Effect(23, e => {
-	tempVec.trns(e.rotation, e.fin() * 32, Mathf.randomSeedRange(Mathf.round((e.id * 322.563) + Time.time()), 8) * e.fslope());
+	tempVec.trns(e.rotation, e.fin() * 32, Mathf.randomSeedRange(Mathf.round((e.id * 322.563) + Time.time), 8) * e.fslope());
 	tempVec.add(e.x, e.y);
 	
 	Draw.color(e.color);

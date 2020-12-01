@@ -311,7 +311,7 @@ solarReflector.buildType = () => {
 			Draw.rect(solarReflector.mirror, this.x, this.y,this.mirrorRot);
 		},
 		drawConfigure(){
-			let sin = Mathf.absin(Time.time(), 6, 1);
+			let sin = Mathf.absin(Time.time, 6, 1);
 
 			if(this.linkValid()){
                 let target = Vars.world.build(this._link);

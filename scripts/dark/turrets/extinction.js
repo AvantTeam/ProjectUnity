@@ -117,10 +117,10 @@ const extinctionLaser = extendContent(ContinuousLaserBulletType, 770, {
 
 		//Lines.lineAngle(b.x, b.y, b.rotation(), baseLen);
 		for(var s = 0; s < this.colors.length; s++){
-			Draw.color(Tmp.c1.set(this.colors[s]).mul(1 + Mathf.absin(Time.time(), 1, 0.1)));
+			Draw.color(Tmp.c1.set(this.colors[s]).mul(1 + Mathf.absin(Time.time, 1, 0.1)));
 			for(var i = 0; i < this.tscales.length; i++){
 				Tmp.v1.trns(b.rotation() + 180, ((this.lenscales[i] * 2) - 2) * 35);
-				Lines.stroke((9 + Mathf.absin(Time.time(), 0.8, 1.5)) * b.fout() * this.strokes[s] * this.tscales[i]);
+				Lines.stroke((9 + Mathf.absin(Time.time, 0.8, 1.5)) * b.fout() * this.strokes[s] * this.tscales[i]);
 				Lines.lineAngle(b.x + Tmp.v1.x, b.y + Tmp.v1.y, b.rotation(), baseLen * this.lenscales[i], false);
 			};
 		};

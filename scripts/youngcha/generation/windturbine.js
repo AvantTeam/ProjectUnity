@@ -29,7 +29,7 @@ const windTurbine = rotL.torqueExtend(Block, Building, "wind-turbine", rotL.base
 	{
 		this.getGraphConnector("torque graph").setInertia(20);
 		this.getGraphConnector("torque graph").setFriction(0.03);
-		let x = Time.time()*0.001;
+		let x = Time.time*0.001;
 		let mul = 0.4*Math.max(0,
 				Mathf.sin(x) + 
 				0.5*Mathf.sin(2*x+50)+ 

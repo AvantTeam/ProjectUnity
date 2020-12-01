@@ -6,7 +6,7 @@ laser.inaccuracy = 8;
 const charge = new Effect(30, e => {
 	Draw.color(Pal.lancerLaser);
 
-	var angle = Mathf.randomSeed(e.id, 360) + Time.time();
+	var angle = Mathf.randomSeed(e.id, 360) + Time.time;
 	var dist = (1 - e.finpow()) * 20;
 
 	Tmp.v1.trns(angle, dist);
