@@ -172,7 +172,7 @@ public class UnityFx{
 
     oracleChage = new Effect(30f, e -> {
         color(Pal.lancerLaser);
-        Tmp.v1.trns(Mathf.randomSeed(e.id, 360f) + Time.time(), (1 - e.finpow()) * 20f);
+        Tmp.v1.trns(Mathf.randomSeed(e.id, 360f) + Time.time, (1 - e.finpow()) * 20f);
         Fill.square(e.x + Tmp.v1.x, e.y + Tmp.v1.y, e.fin() * 4.5f, 45f);
     }),
 
@@ -315,7 +315,7 @@ public class UnityFx{
 
                 for(int j = 0; j < 2; j++){
                     stroke(c.fin() * 1.5f * i);
-                    square(e.x, e.y, c.fout() * laser.width * i, Time.time() * 4f * Mathf.signs[j]);
+                    square(e.x, e.y, c.fout() * laser.width * i, Time.time * 4f * Mathf.signs[j]);
                 }
                 ;
             }
@@ -335,7 +335,7 @@ public class UnityFx{
                 for(int j = 0; j < 2; j++){
                     stroke(fout * 1.5f * i);
 
-                    float rot = Mathf.signs[j] * (Time.time() + (fin * 720f));
+                    float rot = Mathf.signs[j] * (Time.time + (fin * 720f));
                     square(e.x, e.y, finpow * laser.width * 2f * i, rot);
                 }
                 ;

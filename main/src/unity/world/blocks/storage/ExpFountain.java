@@ -31,7 +31,7 @@ public class ExpFountain extends Block implements ExpOrbHandlerBase{
             super.draw();
             Draw.blend(Blending.additive);
             Draw.color(Color.white);
-            Draw.alpha(Mathf.absin(Time.time(), 20f, 0.4f));
+            Draw.alpha(Mathf.absin(Time.time, 20f, 0.4f));
             Draw.rect(topRegion, x, y);
             Draw.blend();
             Draw.reset();

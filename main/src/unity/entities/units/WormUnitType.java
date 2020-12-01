@@ -8,7 +8,7 @@ import mindustry.gen.*;
 import static arc.Core.*;
 
 public class WormUnitType extends UnitType{
-    public TextureRegion segmentRegion, tailRegion, segmentCellRegion;
+    public TextureRegion segmentRegion, tailRegion, segmentCellRegion, segmentOutline, tailOutline;
     private int idType;
     protected float segmentOffset;
     protected final Seq<Weapon> segWeapSeq = new Seq<>();
@@ -29,6 +29,8 @@ public class WormUnitType extends UnitType{
         segmentRegion = atlas.find(name + "-segment");
         segmentCellRegion = atlas.find(name + "-segment-cell");
         tailRegion = atlas.find(name + "-tail");
+        segmentOutline = atlas.find(name + "-segment-outline");
+        tailOutline = atlas.find(name + "-tail-outline");
         segWeapSeq.each(w -> w.load());
     }
 

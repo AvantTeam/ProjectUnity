@@ -71,7 +71,7 @@ public class ExpStorageBlock extends Block{
         @Override
         public void draw(){
             Draw.rect(baseRegion, x, y);
-            Draw.color(UnityPal.expColor, Color.white, Mathf.absin(Time.time(), 20f, 0.6f));
+            Draw.color(UnityPal.expColor, Color.white, Mathf.absin(Time.time, 20f, 0.6f));
             Draw.alpha(expf());
             Draw.rect(expRegion, x, y);
             Draw.color();

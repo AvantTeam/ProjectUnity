@@ -1369,37 +1369,31 @@ public class UnityUnitTypes implements ContentList{
                 flying = true;
                 visualElevation = 0.8f;
                 range = 210f;
-
-                LightningBulletType archnelidiaBolt = new LightningBulletType(){
-                    {
-                        damage = 23f;
-                        lightningColor = Pal.surge;
-                        lightningLength = 24;
-                        lightningLengthRand = 3;
-                    }
-                };
-
                 weapons.add(new Weapon(){
                     {
-                        reload = 90f;
+                        x = 0f;
+                        reload = 10f;
                         rotateSpeed = 50f;
-                        rotate = true;
-                        ignoreRotation = true;
+                        shootSound = Sounds.laser;
+                        mirror = rotate = true;
                         minShootVelocity = 2.1f;
-
-                        bullet = archnelidiaBolt;
+                        bullet = new LaserBulletType(200f){
+                            {
+                                colors = new Color[]{Pal.surge.cpy().mul(1f, 1f, 1f, 0.4f), Pal.surge, Color.white};
+                                drawSize = 400f;
+                                collidesAir = false;
+                                length = 190f;
+                            }
+                        };
                     }
                 });
                 segWeapSeq.add(new Weapon(){
                     {
                         x = 0f;
-                        shots = 4;
-                        reload = 70f;
+                        reload = 60f;
                         rotateSpeed = 50f;
-                        mirror = false;
-                        ignoreRotation = true;
-
-                        bullet = archnelidiaBolt;
+                        minShootVelocity = 0.01f;
+                        bullet = UnitTypes.horizon.weapons.first().bullet;
                     }
                 });
             }

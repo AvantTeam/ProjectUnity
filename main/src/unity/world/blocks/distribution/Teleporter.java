@@ -113,7 +113,7 @@ public class Teleporter extends Block{
                 Draw.rect(blankRegion, x, y);
             }
             Draw.color(Color.white);
-            Draw.alpha(0.45f + Mathf.absin(Time.time(), 7f, 0.26f));
+            Draw.alpha(0.45f + Mathf.absin(Time.time, 7f, 0.26f));
             Draw.rect(topRegion, x, y);
             Draw.reset();
         }

@@ -23,6 +23,7 @@ import unity.mod.UnitySounds;
 import unity.world.blocks.defense.LightWall;
 import unity.world.blocks.defense.LimitWall;
 import unity.world.blocks.defense.turrets.*;
+import unity.world.blocks.distribution.ExpConveyor;
 import unity.world.blocks.distribution.Teleporter;
 import unity.world.blocks.logic.*;
 import unity.world.blocks.production.StemGenericSmelter;
@@ -64,11 +65,12 @@ public class UnityBlocks implements ContentList{
     sparkAlloyForge,
 
 //koruh
+    stoneWall, denseWall, steelWall, steelWallLarge,
+    steelConveyor, diriumConveyor,
     //turrets
     laserTurret, inferno,
     //blocks
     teleporter, expUnloader, expTank, expChest, expFountain, expVoid,
-    stoneWall, denseWall, steelWall, steelWallLarge,
 
 //light
     //turrets
@@ -694,6 +696,60 @@ public class UnityBlocks implements ContentList{
             }
         };
         //endregion
+        //region koruh
+        stoneWall = new LimitWall("ustone-wall"){
+            {
+                requirements(Category.defense, with(UnityItems.stone, 6));
+                maxDamage = 40f;
+                health = 200;
+            }
+        };
+
+        denseWall = new LimitWall("dense-wall"){
+            {
+                requirements(Category.defense, with(UnityItems.denseAlloy, 6));
+                maxDamage = 32f;
+                health = 360;
+            }
+        };
+
+        steelWall = new LimitWall("steel-wall"){
+            {
+                requirements(Category.defense, with(UnityItems.steel, 6));
+                maxDamage = 24f;
+                health = 620;
+            }
+        };
+
+        steelWallLarge = new LimitWall("steel-wall-large"){
+            {
+                requirements(Category.defense, with(UnityItems.steel, 24));
+                maxDamage = 48f;
+                health = 2480;
+                size = 2;
+            }
+        };
+
+        steelConveyor = new ExpConveyor("steel-conveyor"){
+            {
+                requirements(Category.distribution, with(UnityItems.stone, 1, UnityItems.denseAlloy, 1, UnityItems.steel, 1));
+                health = 140;
+                speed = 0.1f;
+                displayedSpeed = 12.5f;
+                drawMultiplier = 1.9f;
+            }
+        };
+
+        diriumConveyor = new ExpConveyor("dirium-conveyor"){
+            {
+                requirements(Category.distribution, with(UnityItems.steel, 1, Items.phaseFabric, 1, UnityItems.dirium, 1));
+                health = 150;
+                speed = 0.16f;
+                displayedSpeed = 20f;
+                drawMultiplier = 1.3f;
+            }
+        };
+        //endregion
         //region koruh turrets
         /*laserTurret = new ExpPowerTurret("laser-turret", 10){
             {
@@ -723,7 +779,6 @@ public class UnityBlocks implements ContentList{
                 addExpField("exp", "useless", 0, 2);
             }
         };TODO*/
-
         //endregion
         //region koruh blocks
         teleporter = new Teleporter("teleporter"){
@@ -772,39 +827,6 @@ public class UnityBlocks implements ContentList{
                 health = 200;
             }
         };
-
-        stoneWall = new LimitWall("ustone-wall"){
-            {
-                requirements(Category.defense, with(UnityItems.stone, 6));
-                maxDamage = 40f;
-                health = 200;
-            }
-        };
-
-        denseWall = new LimitWall("dense-wall"){
-            {
-                requirements(Category.defense, with(UnityItems.denseAlloy, 6));
-                maxDamage = 32f;
-                health = 360;
-            }
-        };
-
-        steelWall = new LimitWall("steel-wall"){
-            {
-                requirements(Category.defense, with(UnityItems.steel, 6));
-                maxDamage = 24f;
-                health = 620;
-            }
-        };
-
-        steelWallLarge = new LimitWall("steel-wall-large"){
-            {
-                requirements(Category.defense, with(UnityItems.steel, 24));
-                maxDamage = 48f;
-                health = 2480;
-                size = 2;
-            }
-        };
         //endregion
         //region monolith factories
         monolithAlloyForge = new StemGenericSmelter("monolith-alloy-forge"){
@@ -819,7 +841,7 @@ public class UnityBlocks implements ContentList{
                     if(!Mathf.zero(temp)){
                         if(e.timer.get(effectTimer, 45f)) effect.at(e.x, e.y, e.rotation, temp);
                         //TODO not exactly same with js ver?.
-                        if(Mathf.chanceDelta(temp * 0.5f)) Lightning.create(e.team, Pal.lancerLaser, 1f, e.x, e.y, Mathf.randomSeed((int)Time.time() + e.id, 360f), (int)(temp * 4f) + Mathf.random(3));
+                        if(Mathf.chanceDelta(temp * 0.5f)) Lightning.create(e.team, Pal.lancerLaser, 1f, e.x, e.y, Mathf.randomSeed((int)Time.time + e.id, 360f), (int)(temp * 4f) + Mathf.random(3));
                     }
                 };
                 outputItem = new ItemStack(UnityItems.monolithAlloy, 3);
@@ -916,9 +938,9 @@ public class UnityBlocks implements ContentList{
                     drawer.draw(e);
                     if(e.warmup > 0f){
                         Draw.blend(Blending.additive);
-                        Draw.color(1f, Mathf.absin(Time.time(), 5f, 0.5f) + 0.5f, Mathf.absin(Time.time() + 90f * Mathf.radDeg, 5f, 0.5f) + 0.5f, e.warmup);
+                        Draw.color(1f, Mathf.absin(Time.time, 5f, 0.5f) + 0.5f, Mathf.absin(Time.time + 90f * Mathf.radDeg, 5f, 0.5f) + 0.5f, e.warmup);
                         Draw.rect(dataRegions[0], e.x, e.y);
-                        float b = (Mathf.absin(Time.time(), 8f, 0.25f) + 0.7f) * e.warmup;
+                        float b = (Mathf.absin(Time.time, 8f, 0.25f) + 0.7f) * e.warmup;
                         Draw.color(1f, b, b, b);
                         Draw.rect(topRegion, e.x, e.y);
                         Draw.blend();
@@ -951,9 +973,9 @@ public class UnityBlocks implements ContentList{
                     drawer.draw(e);
                     if(e.warmup <= 0.0001f) return;
                     Draw.blend(Blending.additive);
-                    Draw.color(1f, Mathf.absin(Time.time(), 5f, 0.5f) + 0.5f, Mathf.absin(Time.time() + 90f * Mathf.radDeg, 5f, 0.5f) + 0.5f, e.warmup);
+                    Draw.color(1f, Mathf.absin(Time.time, 5f, 0.5f) + 0.5f, Mathf.absin(Time.time + 90f * Mathf.radDeg, 5f, 0.5f) + 0.5f, e.warmup);
                     Draw.rect(dataRegions[0], e.x, e.y);
-                    float b = (Mathf.absin(Time.time(), 8f, 0.25f) + 0.75f) * e.warmup;
+                    float b = (Mathf.absin(Time.time, 8f, 0.25f) + 0.75f) * e.warmup;
                     Draw.color(1f, b, b, b);
                     Draw.rect(topRegion, e.x, e.y);
                     for(int i = 0; i < 4; i++){
@@ -962,8 +984,8 @@ public class UnityBlocks implements ContentList{
                             float offset = 360f / 8f * (i * 2 + s);
                             TextureRegion reg = dataRegions[1];
                             int sign = Mathf.signs[s];
-                            float colA = (Mathf.absin(Time.time() + offset * Mathf.radDeg, 8f, 0.25f) + 0.75f) * e.warmup;
-                            float colB = (Mathf.absin(Time.time() + (90f + offset) * Mathf.radDeg, 8f, 0.25f) + 0.75f) * e.warmup;
+                            float colA = (Mathf.absin(Time.time + offset * Mathf.radDeg, 8f, 0.25f) + 0.75f) * e.warmup;
+                            float colB = (Mathf.absin(Time.time + (90f + offset) * Mathf.radDeg, 8f, 0.25f) + 0.75f) * e.warmup;
                             Draw.color(1, colA, colB, e.warmup);
                             Draw.rect(reg, e.x, e.y, reg.width * sign * Draw.scl, reg.height * Draw.scl, -ang);
                         }

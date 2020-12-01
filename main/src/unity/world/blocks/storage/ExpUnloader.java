@@ -49,7 +49,7 @@ public class ExpUnloader extends Block implements ExpOrbHandlerBase{
             if(!consValid()) return;
             Draw.blend(Blending.additive);
             Draw.color(Color.white);
-            Draw.alpha(Mathf.absin(Time.time(), 20f, 0.4f));
+            Draw.alpha(Mathf.absin(Time.time, 20f, 0.4f));
             Draw.rect(topRegion, x, y);
             for(int i = 0; i < 4; i++){
                 if(join[i]) Draw.rect(topRegion2, x, y, i * 90f);

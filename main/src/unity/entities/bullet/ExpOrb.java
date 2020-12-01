@@ -18,6 +18,7 @@ import mindustry.world.blocks.production.Incinerator.IncineratorBuild;
 import unity.content.UnityFx;
 import unity.graphics.UnityPal;
 import unity.world.blocks.ExpBuildBase;
+import unity.world.blocks.distribution.ExpConveyor;
 import unity.world.blocks.storage.ExpOrbHandlerBase;
 
 import static mindustry.Vars.*;
@@ -43,11 +44,11 @@ public class ExpOrb extends BulletType{
 
     @Override
     public void draw(Bullet b){
-        if(b.fin() > 0.5f && Time.time() % 14 < 7f) return;
-        Draw.color(UnityPal.expColor, Color.white, 0.1f + 0.1f * Mathf.sin(Time.time() * 0.03f + b.id * 2f));
+        if(b.fin() > 0.5f && Time.time % 14 < 7f) return;
+        Draw.color(UnityPal.expColor, Color.white, 0.1f + 0.1f * Mathf.sin(Time.time * 0.03f + b.id * 2f));
         Fill.circle(b.x, b.y, 1.5f);
         Lines.stroke(0.5f);
-        for(int i = 0; i < 4; i++) Drawf.tri(b.x, b.y, 4f, 4 + 1.5f * Mathf.sin(Time.time() * 0.12f + b.id * 3f), i * 90f + Mathf.sin(Time.time() * 0.04f + b.id * 5f) * 28f);
+        for(int i = 0; i < 4; i++) Drawf.tri(b.x, b.y, 4f, 4 + 1.5f * Mathf.sin(Time.time * 0.12f + b.id * 3f), i * 90f + Mathf.sin(Time.time * 0.04f + b.id * 5f) * 28f);
     }
 
     @Override
@@ -61,6 +62,8 @@ public class ExpOrb extends BulletType{
             temp.incExp(expAmount * temp.getOrbMultiplier());
             UnityFx.expAbsorb.at(b.x, b.y);
             b.remove();
+        }else if(block instanceof ExpConveyor){
+            expConveyor(b, (Conveyor)block, (ConveyorBuild)build);
         }else if(block instanceof ExpOrbHandlerBase){
 
         }else if(block instanceof Incinerator && ((IncineratorBuild)build).heat > 0.5f){
@@ -76,6 +79,12 @@ public class ExpOrb extends BulletType{
         if(build.clogHeat > 0.5f || !build.enabled) return;
         float mspeed = build.delta() * block.speed / 3f;
         b.vel.add(d4x[build.rotation] * mspeed, d4y[build.rotation] * mspeed);
+    }
+
+    protected void expConveyor(Bullet b, Conveyor block, ConveyorBuild build){
+        if(build.clogHeat > 0.5f || !build.enabled) return;
+        float mspeed = build.delta() * block.speed * 2f;
+        b.vel.scl(0.7f).add(d4x[build.rotation] * mspeed, d4y[build.rotation] * mspeed);
     }
 
     public static void createExp(float x, float y, float amount, float r){

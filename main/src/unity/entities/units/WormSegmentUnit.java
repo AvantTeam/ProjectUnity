@@ -158,12 +158,11 @@ public class WormSegmentUnit extends UnitEntity{
     @Override
     public void update(){
         if(parentUnit == null || parentUnit.dead){
-            //deactivated = true; seems to not exist in v108
             dead = true;
             remove();
         }
         if(trueParentUnit != null && isBugged){
-            if(Arrays.stream(trueParentUnit.segmentUnits).anyMatch(s -> s == this)) remove();
+            if(Arrays.stream(trueParentUnit.segmentUnits).noneMatch(s -> s == this)) remove();
             else isBugged = false;
         }
     }
@@ -176,10 +175,10 @@ public class WormSegmentUnit extends UnitEntity{
             ammo = trueParentUnit.ammo;
         }
         if(team != trueParentUnit.team) team = trueParentUnit.team;
-        if(!net.client() && !dead /*&& deactivated*/ && controller != null) controller.updateUnit();
+        if(!net.client() && !dead && controller != null) controller.updateUnit();
         if(controller == null || !controller.isValidController()) resetController();
-        updateStatus();
         updateWeapon();
+        updateStatus();
     }
 
     protected void updateStatus(){
@@ -284,6 +283,11 @@ public class WormSegmentUnit extends UnitEntity{
         Draw.rect(region, this, rotation - 90);
         TextureRegion segCellReg = wormType.getSegmentCell();
         if(segCellReg != atlas.find("error") && segmentType == 0) drawCell(segCellReg);
+        TextureRegion outline = wormType.segmentOutline == null || wormType.tailOutline == null ? null : segmentType == 0 ? wormType.segmentOutline : wormType.tailOutline;
+        if(outline != null){
+            Draw.z(Draw.z() - UnitType.outlineSpace);
+            Draw.rect(outline, this, rotation - 90f);
+        }
         Draw.reset();
     }
 
