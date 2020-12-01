@@ -3,9 +3,9 @@
 	"health": 1000,
 	"range": 160,
 	"reloadTime": 80,
-  "consumes":{
-    "power": 1
-  },
+    "consumes":{
+        "power": 1
+    },
 	"shootCone": 1,
 	"inaccuracy": 0,
 	"targetAir": true,
@@ -15,9 +15,8 @@
 		{"item": "titanium", "amount": 15}
 	],
 	"category": "turret",
-  "hasLiquids": true,
-  "liquidCapacity": 15,
-  "consumesLiquid": true,
-  "hasPower": true,
-  "extinguish": false
+    "hasLiquids": true,
+    "liquidCapacity": 15,
+    "hasPower": true,
+    "extinguish": false
 }
