@@ -190,7 +190,9 @@ const script = [
                 childs: [
                     "darkalloyfactory"
                 ]
-            }
+            },
+            
+            "darkwalls"
         ]
     },
 
