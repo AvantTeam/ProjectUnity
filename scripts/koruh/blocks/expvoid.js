@@ -1,6 +1,9 @@
 const expvoid = extendContent(Block, "exp-void", {
     hasExp(){
         return true;
+    },
+    expCapacityf(){
+        return 99999999;//heh
     }
 });
 expvoid.update = true;

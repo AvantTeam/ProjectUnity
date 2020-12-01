@@ -50,6 +50,9 @@ module.exports = {
             },
             hasExp(){
                 return true;
+            },
+            expCapacityf(){
+                return this.expCapacity;
             }
             //end
         }, obj);

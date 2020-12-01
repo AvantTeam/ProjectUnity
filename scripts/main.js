@@ -69,6 +69,7 @@ const script = [
                 ]
             },
 
+            "expsense",
             "sounds",
             "musics",
             "funclib",

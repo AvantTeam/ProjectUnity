@@ -24,6 +24,9 @@ const exptank = extendContent(Block, "exp-chest", {
             }));
         }));
     },
+    expCapacityf(){
+        return this.expCapacity;
+    }
 });
 exptank.update = true;
 exptank.solid = true;

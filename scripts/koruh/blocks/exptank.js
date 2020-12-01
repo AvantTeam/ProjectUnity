@@ -23,6 +23,9 @@ const exptank = extendContent(Block, "exp-tank", {
                 return build.expf();
             }));
         }));
+    },
+    expCapacityf(){
+        return this.expCapacity;
     }
 });
 exptank.update = true;

@@ -247,6 +247,12 @@ module.exports = {
             hasExp(){
               //this is bc in js only functions are public. when porting to java, make this a public attribute instead. In fact, make 2 attributes, hasExp(for all exp blocks) and consumesExp(for orbs). This is the smae for light-lib blocks, you'll se that they are treated as variables even though they are functions.
               return this.consumesExp;
+            },
+            expCapacityf(){
+                return this.maxExp;
+            },
+            maxLevelf(){
+                return this.maxLevel;
             }
             //end
         });
