@@ -70,7 +70,6 @@ const script = [
 
             "expsense",
             "sounds",
-            "musics",
             "funclib",
             "effects",
             "extraeffects",
