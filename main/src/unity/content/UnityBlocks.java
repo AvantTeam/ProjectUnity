@@ -14,6 +14,7 @@ import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.units.UnitFactory;
+import mindustry.world.blocks.defense.Wall;
 import mindustry.world.blocks.defense.turrets.*;
 import mindustry.type.*;
 import mindustry.ctype.*;
@@ -42,63 +43,60 @@ import static unity.content.UnityFx.*;
 
 public class UnityBlocks implements ContentList{
     public static Block
-
-//global
-    //blocks
-    electroTile,
+    //order is load order
+    //global
     recursiveReconstructor,
+
     lightLamp, oilLamp, lightLaser, lightLampInfi, lightReflector, lightReflector1, lightOmnimirror, lightFilter, lightInvertedFilter, lightDivisor, lightDivisor1, lightItemFilter, lightPanel, lightInfluencer,
+
     metaglassWall, metaglassWallLarge,
+
     oreNickel, oreUmbrium, oreLuminum, oreMonolite, oreImberium,
+
     multiTest1, multiTest2,
 
-//dark
-    //turrets
+    //dark
     apparition, ghost, banshee, fallout, catastrophe, calamity, extinction,
-    //factories
+
     darkAlloyForge,
 
-//imber
-    //turrets
+    darkWall, darkWallLarge,
+
+    //imber
     orb, shockwire, current, plasma, shielder,
-    //factories
+
     sparkAlloyForge,
 
-//koruh
-    stoneWall, denseWall, steelWall, steelWallLarge,
+    electroTile,
+
+    //koruh
+    stoneWall, denseWall, steelWall, steelWallLarge, diriumWall, diriumWallLarge,
+
     steelConveyor, diriumConveyor,
-    //turrets
+
     laserTurret, inferno,
-    //blocks
+
     teleporter, expUnloader, expTank, expChest, expFountain, expVoid,
 
-//light
-    //turrets
+    //light
 
-//monolith
-    //factories
+    //monolith
     monolithAlloyForge,
-    //turrets
+
     mage, oracle, spectrum,
-    //units
+
     monolithGroundFactory,
 
-//end
-    //factories
+    //youngcha
+    concreteBlank, concreteFill, concreteNumber, concreteStripe, concrete, stoneFullTiles, stoneFull, stoneHalf, stoneTiles,
+
+    //end
     terminalCrucible, endForge;
-    //turrets
-
-//youngcha
-    //distribution
-
-    //generation
-
-    //producers
 
     @Override
     public void load(){
-        //region global blocks
-        electroTile = new Floor("electro-tile");
+        //region global
+
         recursiveReconstructor = new SelectableReconstructor("recursive-reconstructor"){
             {
                 requirements(Category.units, with(Items.graphite, 1600, Items.silicon, 2000, Items.metaglass, 900, Items.thorium, 600, Items.lead, 1200, Items.plastanium, 3600));
@@ -348,8 +346,10 @@ public class UnityBlocks implements ContentList{
                 new OutputContents(with(Items.silicon, 1), 10), 30);
             }
         };
+
         //endregion
-        //region dark turrets
+        //region dark
+
         apparition = new ItemTurret("apparition"){
             @Override
             public void load(){
@@ -528,8 +528,7 @@ public class UnityBlocks implements ContentList{
                 consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.27f && liquid.flammability < 0.1f, 2.5f)).update(false);
             }
         };
-        //endregion
-        //region dark factories
+
         darkAlloyForge = new StemGenericSmelter("dark-alloy-forge"){
             {
                 requirements(Category.crafting, with(Items.copper, 30, Items.lead, 25));
@@ -541,12 +540,29 @@ public class UnityBlocks implements ContentList{
                 consumes.items(with(Items.lead, 2, Items.silicon, 3, Items.blastCompound, 1, Items.phaseFabric, 1, UnityItems.umbrium, 2));
                 consumes.power(3.2f);
                 afterUpdate = e -> {
-                    if(e.consValid() && Mathf.chanceDelta(0.76f)) UnityFx.craftingEffect.at(e.getX(), e.getY(), Mathf.random(360f));
+                    if(e.consValid() && Mathf.chanceDelta(0.76f)) craftingEffect.at(e.getX(), e.getY(), Mathf.random(360f));
                 };
             }
         };
+
+        darkWall = new Wall("dark-wall"){
+            {
+                requirements(Category.defense, with(UnityItems.umbrium, 6));
+                health = 120 * 4;
+            }
+        };
+
+        darkWallLarge = new Wall("dark-wall-large"){
+            {
+                requirements(Category.defense, with(UnityItems.umbrium, 24));
+                health = 120 * 4 * 4;
+                size = 2;
+            }
+        };
+
         //endregion
-        //region imber turrets
+        //region imber
+
         orb = new PowerTurret("orb"){
             {
                 requirements(Category.turret, with(Items.copper, 55, Items.lead, 30, Items.graphite, 25, Items.silicon, 35, UnityItems.imberium, 20));
@@ -582,8 +598,8 @@ public class UnityBlocks implements ContentList{
                 reloadTime = 140f;
                 coolantMultiplier = 2f;
                 shootCone = 1f;
-                firingMoveFract = 0.15f;
-                shootDuration = 200f;
+                /*firingMoveFract = 0.15f;
+                shootDuration = 200f;TODO*/
                 inaccuracy = 0f;
                 powerUse = 8.6f;
                 targetAir = false;
@@ -623,13 +639,14 @@ public class UnityBlocks implements ContentList{
             }
         };
 
-        plasma = new BurstPowerTurret("plasma"){
+        plasma = new PowerTurret("plasma"){
             {
                 requirements(Category.turret, with(Items.copper, 580, Items.lead, 520, Items.graphite, 410, Items.silicon, 390, Items.surgeAlloy, 180, UnityItems.sparkAlloy, 110));
                 size = 4;
                 health = 2800;
                 range = 200f;
                 reloadTime = 460f;
+                recoilAmount = 4f;
                 coolantMultiplier = 1.2f;
                 liquidCapacity = 20f;
                 shootCone = 1f;
@@ -644,8 +661,6 @@ public class UnityBlocks implements ContentList{
                 chargeEffect = plasmaCharge;
                 chargeBeginEffect = plasmaChargeBegin;
                 shots = 1;
-                subShots = 0;
-                alwaysTurn = false;
                 consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability <= 0.1f, 0.52f)).boost();
             }
         };
@@ -674,8 +689,7 @@ public class UnityBlocks implements ContentList{
                 consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability <= 0.1f, 0.4f)).update(false);
             }
         };
-        //endregion
-        //region imber factories
+
         sparkAlloyForge = new StemGenericSmelter("spark-alloy-forge"){
             {
                 requirements(Category.crafting, with(Items.lead, 160, Items.graphite, 340, UnityItems.imberium, 270, Items.silicon, 250, Items.thorium, 120, Items.surgeAlloy, 100));
@@ -695,6 +709,8 @@ public class UnityBlocks implements ContentList{
                 consumes.items(with(Items.surgeAlloy, 3, Items.titanium, 4, Items.silicon, 6, UnityItems.imberium, 3));
             }
         };
+
+        electroTile = new Floor("electro-tile");
         //endregion
         //region koruh
         stoneWall = new LimitWall("ustone-wall"){
@@ -709,7 +725,7 @@ public class UnityBlocks implements ContentList{
             {
                 requirements(Category.defense, with(UnityItems.denseAlloy, 6));
                 maxDamage = 32f;
-                health = 360;
+                health = 560;
             }
         };
 
@@ -717,7 +733,7 @@ public class UnityBlocks implements ContentList{
             {
                 requirements(Category.defense, with(UnityItems.steel, 6));
                 maxDamage = 24f;
-                health = 620;
+                health = 810;
             }
         };
 
@@ -725,7 +741,26 @@ public class UnityBlocks implements ContentList{
             {
                 requirements(Category.defense, with(UnityItems.steel, 24));
                 maxDamage = 48f;
-                health = 2480;
+                health = 3240;
+                size = 2;
+            }
+        };
+
+        diriumWall = new LimitWall("dirium-wall"){
+            {
+                requirements(Category.defense, with(UnityItems.dirium, 6));
+                maxDamage = 75f;
+                blinkFrame = 20f;
+                health = 1024;
+            }
+        };
+
+        diriumWallLarge = new LimitWall("dirium-wall-large"){
+            {
+                requirements(Category.defense, with(UnityItems.dirium, 24));
+                maxDamage = 150f;
+                blinkFrame = 20f;
+                health = 4096;
                 size = 2;
             }
         };
@@ -749,8 +784,7 @@ public class UnityBlocks implements ContentList{
                 drawMultiplier = 1.3f;
             }
         };
-        //endregion
-        //region koruh turrets
+
         /*laserTurret = new ExpPowerTurret("laser-turret", 10){
             {
                 requirements(Category.turret, with(Items.copper, 160, Items.lead, 110, Items.silicon, 90));
@@ -779,8 +813,7 @@ public class UnityBlocks implements ContentList{
                 addExpField("exp", "useless", 0, 2);
             }
         };TODO*/
-        //endregion
-        //region koruh blocks
+
         teleporter = new Teleporter("teleporter"){
             {
                 requirements(Category.distribution, with(Items.lead, 22, Items.silicon, 10, Items.phaseFabric, 32, UnityItems.dirium, 32));
@@ -827,8 +860,10 @@ public class UnityBlocks implements ContentList{
                 health = 200;
             }
         };
+
         //endregion
-        //region monolith factories
+        //region monolith
+
         monolithAlloyForge = new StemGenericSmelter("monolith-alloy-forge"){
             {
                 requirements(Category.crafting, with(Items.lead, 380, UnityItems.monolite, 240, Items.silicon, 400, Items.titanium, 240, Items.thorium, 90, Items.surgeAlloy, 160));
@@ -854,8 +889,7 @@ public class UnityBlocks implements ContentList{
                 consumes.liquid(Liquids.cryofluid, 0.1f);
             }
         };
-        //endregion
-        //region monolith turrets
+
         mage = new PowerTurret("mage"){
             {
                 requirements(Category.turret, with(Items.lead, 75, Items.silicon, 50, UnityItems.monolite, 25));
@@ -916,8 +950,7 @@ public class UnityBlocks implements ContentList{
                 };
             }
         };
-        //endregion
-        //region monolith units
+
         /*monolithGroundFactory = new UnitFactory("monolith-ground-factory"){
             {
                 requirements(Category.units, with());
@@ -926,8 +959,39 @@ public class UnityBlocks implements ContentList{
                 consumes.power(1.2f);
             }
         };*/
+
         //endregion
-        //region end factories
+        //region youngcha
+
+        concreteBlank = new Floor("concrete-blank");
+
+        concreteFill = new Floor("concrete-fill"){
+            {
+                variants = 0;
+            }
+        };
+
+        concreteNumber = new Floor("concrete-number"){
+            {
+                variants = 10;
+            }
+        };
+
+        concreteStripe = new Floor("concrete-stripe");
+
+        concrete = new Floor("concrete");
+
+        stoneFullTiles = new Floor("stone-full-tiles");
+
+        stoneFull = new Floor("stone-full");
+
+        stoneHalf = new Floor("stone-half");
+
+        stoneTiles = new Floor("stone-tiles");
+
+        //endregion
+        //region end
+
         terminalCrucible = new StemGenericSmelter("terminal-crucible"){
             {
                 requirements(Category.crafting, with(Items.lead, 810, Items.graphite, 720, Items.silicon, 520, Items.phaseFabric, 430, Items.surgeAlloy, 320, UnityItems.plagueAlloy, 120, UnityItems.darkAlloy, 120, UnityItems.lightAlloy, 120, UnityItems.advanceAlloy, 120, UnityItems.monolithAlloy, 120, UnityItems.sparkAlloy, 120, UnityItems.superAlloy, 120));
@@ -997,6 +1061,7 @@ public class UnityBlocks implements ContentList{
                 consumes.items(with(UnityItems.terminum, 3, UnityItems.darkAlloy, 5, UnityItems.lightAlloy, 5));
             }
         };
+
         //endregion
     }
 }

@@ -14,11 +14,11 @@ import mindustry.world.Block;
 import mindustry.world.meta.Stat;
 import unity.entities.bullet.ExpOrb;
 import unity.graphics.UnityPal;
-import unity.world.blocks.ExpBuildBase;
+import unity.world.blocks.*;
 
 import static arc.Core.*;
 
-public class ExpStorageBlock extends Block{
+public class ExpStorageBlock extends Block implements ExpBlockBase{
     protected int expCapacity = 600;
     protected float lightRadius = 25f, lightOpacity = 0.6f;
     protected TextureRegion topRegion, baseRegion, expRegion;
@@ -48,6 +48,11 @@ public class ExpStorageBlock extends Block{
         bars.add("exp", (ExpStorageBuild build) -> {
             return new Bar(() -> bundle.get("explib.exp"), () -> Tmp.c1.set(UnityPal.expColor).lerp(UnityPal.expMaxColor, build.expf()), () -> build.expf());
         });
+    }
+
+    @Override
+    public int expCapaciry(){
+        return expCapacity;
     }
 
     public class ExpStorageBuild extends Building implements ExpBuildBase{

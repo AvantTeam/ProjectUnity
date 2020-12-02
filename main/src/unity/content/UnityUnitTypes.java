@@ -1409,6 +1409,7 @@ public class UnityUnitTypes implements ContentList{
                 hitSize = 8f;
                 health = 200;
                 canBoost = true;
+                boostMultiplier = 2.5f;
                 weapons.add(new Weapon(name + "-shotgun"){
                     {
                         top = false;
@@ -1417,7 +1418,7 @@ public class UnityUnitTypes implements ContentList{
                         x = 5.25f;
                         y = -0.25f;
                         shots = 12;
-                        spacing = 0.5f;
+                        spacing = 0.3f;
                         inaccuracy = 0.5f;
                         velocityRnd = 0.2f;
                         shotDelay = 0f;
@@ -1468,6 +1469,9 @@ public class UnityUnitTypes implements ContentList{
                 rotateSpeed = 2.6f;
                 singleTarget = true;
                 canBoost = true;
+                boostMultiplier = 2.5f;
+                engineSize = 3.5f;
+                engineOffset = 6f;
                 weapons.add(new Weapon(name + "-gun"){
                     {
                         top = false;
@@ -1511,6 +1515,9 @@ public class UnityUnitTypes implements ContentList{
                 rotateSpeed = 2.2f;
                 mechFrontSway = 0.55f;
                 canBoost = true;
+                boostMultiplier = 2.5f;
+                engineSize = 5f;
+                engineOffset = 10f;
                 weapons.add(new Weapon("unity-monolith-medium-weapon-mount"){
                     {
                         rotate = true;

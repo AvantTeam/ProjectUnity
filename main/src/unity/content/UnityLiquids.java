@@ -26,10 +26,11 @@ public class UnityLiquids implements ContentList{
         };
 
         //endregion
-
-        Events.run(Trigger.update, () -> {
-            lava.color = temp.set(UnityPal.lavaColor).lerp(UnityPal.lavaColor2, Mathf.absin(Time.globalTime, 25f, 1f));
-            lava.lightColor = temp2.set(temp).mul(1, 1, 1, 0.55f);
-        });
+        if(!mindustry.Vars.headless){
+            Events.run(Trigger.update, () -> {
+                lava.color = temp.set(UnityPal.lavaColor).lerp(UnityPal.lavaColor2, Mathf.absin(Time.globalTime, 25f, 1f));
+                lava.lightColor = temp2.set(temp).mul(1, 1, 1, 0.55f);
+            });
+        }
     }
 }

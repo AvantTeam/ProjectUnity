@@ -428,5 +428,11 @@ public class UnityFx{
         randLenVectors(e.id + 1, 4, 1 + e.fin() * 4f, (x, y) -> {
             Fill.circle(e.x + x, e.y + y, 0.2f + e.fout() * 1.3f);
         });
+    }),
+
+    blinkFx = new Effect(30f, e -> {
+        color(Color.white, UnityPal.diriumColor, e.fin());
+        stroke(3f * e.rotation * e.fout());
+        square(e.x, e.y, e.rotation * 4f * e.finpow());
     });
 }

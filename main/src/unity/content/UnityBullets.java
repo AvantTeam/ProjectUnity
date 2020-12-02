@@ -219,17 +219,17 @@ public class UnityBullets implements ContentList{
             public void drawLight(Bullet b){}
         };
 
-        shockBeam = new ContinuousLaserBulletType(35){
+        shockBeam = new ContinuousLaserBulletType(35f){
             {
                 speed = 0.0001f;
                 shootEffect = Fx.none;
                 despawnEffect = Fx.none;
                 pierce = true;
-                hitSize = 0;
+                hitSize = 0f;
                 status = StatusEffects.shocked;
-                statusDuration = 3 * 60;
-                width = 0.42f;
-                length = 120;
+                statusDuration = 3f * 60f;
+                width = 0.62f;
+                length = 120f;
                 hittable = false;
                 hitEffect = Fx.hitLiquid;
 

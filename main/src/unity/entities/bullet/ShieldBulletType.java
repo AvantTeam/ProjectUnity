@@ -36,8 +36,6 @@ public class ShieldBulletType extends BasicBulletType{
             Draw.reset();
         }
         Draw.z(Layer.block);
-
-        Draw.color();
     });
 
     public ShieldBulletType(float speed){

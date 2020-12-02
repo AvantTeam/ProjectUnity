@@ -12,7 +12,6 @@ import mindustry.world.blocks.defense.turrets.PowerTurret;
 import static mindustry.Vars.*;
 
 public class BurstPowerTurret extends PowerTurret{
-    protected boolean alwaysTurn;
     protected BulletType subShootType;
     protected int subShots = 1;
     protected float subBurstSpacing;
@@ -59,11 +58,6 @@ public class BurstPowerTurret extends PowerTurret{
                     charging = false;
                 });
             }else super.shoot(type);
-        }
-
-        @Override
-        public boolean shouldTurn(){
-            return alwaysTurn || !charging;
         }
 
         protected void subEffects(){
