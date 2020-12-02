@@ -55,7 +55,7 @@ const megalithGen = extend(PlanetGenerator, {
     },
     
     generate(){
-        
+        throw new Error("this is called you eye sore");
     },
     
     postGenerate(tiles){
