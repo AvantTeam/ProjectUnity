@@ -17,11 +17,11 @@ const steelwallLarge = wlib.extend(Wall, Wall.WallBuild, "steel-wall-large", {
 }, {});
 
 const diriumwall = wlib.extend(Wall, Wall.WallBuild, "dirium-wall", {
-    maxDamage: 64,
-    blinkFrame: 30
+    maxDamage: 75,
+    blinkFrame: 20
 }, {});
 
 const diriumwallLarge = wlib.extend(Wall, Wall.WallBuild, "dirium-wall-large", {
-    maxDamage: 128,
-    blinkFrame: 30
+    maxDamage: 150,
+    blinkFrame: 20
 }, {});
