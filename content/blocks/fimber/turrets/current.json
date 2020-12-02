@@ -1,21 +1,21 @@
 {
-	"size": 3,
-	"health": 2400,
-	"range": 220,
-	"reloadTime": 480,
-	"coolantMultiplier": 2,
-	"shootCone": 0.01,
-	"inaccuracy": 0,
-	"chargeTime": 260,
-	"chargeEffects": 14,
-	"chargeMaxDelay": 260,
-	"powerUse": 13.8,
-	"requirements": [
-		{"item": "copper", "amount": 280},
-		{"item": "lead", "amount": 295},
-		{"item": "silicon", "amount": 260},
-		{"item": "spark-alloy", "amount": 65}
-	],
-	"category": "turret",
-	"research": "unity-spark-alloy"
+    "size": 3,
+    "health": 2400,
+    "range": 220,
+    "reloadTime": 480,
+    "coolantMultiplier": 2,
+    "shootCone": 0.01,
+    "inaccuracy": 0,
+    "chargeTime": 260,
+    "chargeEffects": 14,
+    "chargeMaxDelay": 260,
+    "powerUse": 13.8,
+    "requirements": [
+        {"item": "copper", "amount": 280},
+        {"item": "lead", "amount": 295},
+        {"item": "silicon", "amount": 260},
+        {"item": "spark-alloy", "amount": 65}
+    ],
+    "category": "turret",
+    "research": "unity-spark-alloy"
 }

@@ -1,20 +1,20 @@
 {
-	"size": 2,
-	"health": 1400,
-	"range": 125,
-	"reloadTime": 140,
-	"coolantMultiplier": 2,
-	"shootCone": 1,
-	"inaccuracy": 0,
-	"powerUse": 8.6,
-	"targetAir": false,
-	"requirements": [
-		{"item": "copper", "amount": 150},
-		{"item": "lead", "amount": 145},
-		{"item": "titanium", "amount": 160},
-		{"item": "silicon", "amount": 130},
-		{"item": "imberium", "amount": 70},
-	],
-	"category": "turret",
-	"research": "orb"
+    "size": 2,
+    "health": 1400,
+    "range": 125,
+    "reloadTime": 140,
+    "coolantMultiplier": 2,
+    "shootCone": 1,
+    "inaccuracy": 0,
+    "powerUse": 8.6,
+    "targetAir": false,
+    "requirements": [
+        {"item": "copper", "amount": 150},
+        {"item": "lead", "amount": 145},
+        {"item": "titanium", "amount": 160},
+        {"item": "silicon", "amount": 130},
+        {"item": "imberium", "amount": 70},
+    ],
+    "category": "turret",
+    "research": "orb"
 }

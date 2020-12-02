@@ -97,9 +97,9 @@ const _GraphCommonBuild = {
 		if(!this.block.rotate){
 			this.rotation=0;
 		}
-		if (this.prev_tile_rotation != this.rotation) {
+		if (this.prev_tile_rotation != Math.floor(this.rotdeg()/90)) {
 			for(let graphname in this.graphs) {
-				this.graphs[graphname].onRotationChanged(this.prev_tile_rotation,this.rotation);
+				this.graphs[graphname].onRotationChanged(this.prev_tile_rotation,Math.floor(this.rotdeg()/90));
 			}
 			this.onRotationChanged();
 		}
@@ -107,7 +107,10 @@ const _GraphCommonBuild = {
 			this.graphs[graphname].onUpdate();
 		}
 		this.updatePost();
-		this.prev_tile_rotation = this.rotation;
+		this.prev_tile_rotation =  Math.floor(this.rotdeg()/90);
+	},
+	getTileRotation(){
+		return Math.floor(this.rotdeg()/90);
 	},
 	onDelete() {},
 	onDeletePost() {},
@@ -346,7 +349,7 @@ const _GraphPropsCommon = {
 	},
     recalcPorts() {
 		////print("reclac ports with rotation " + this.rotation);
-		if(this._lastRecalc==this.getBuild().rotation){
+		if(this._lastRecalc==this.getBuild().getTileRotation()){
 			return;
 		}
 		//print("recalc build:");
@@ -364,7 +367,7 @@ const _GraphPropsCommon = {
                 this._acceptPorts.push(pos);
             }
         }
-		this._lastRecalc=this.getBuild().rotation;
+		this._lastRecalc=this.getBuild().getTileRotation();
 
     },
     onRemoved() {

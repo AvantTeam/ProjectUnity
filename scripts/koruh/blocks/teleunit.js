@@ -63,8 +63,10 @@ teleunit.configurable = true;
 
 teleunit.buildType = prov(() => extend(Building, {
     _warmup: 0,
+    _warmup2: 0,
     updateTile(){
-        this._warmup = Mathf.lerpDelta(this._warmup, this.consValid() && this.enabled ? 1 : 0, 0.05);
+        this._warmup = Mathf.lerpDelta(this._warmup, this.consValid() ? 1 : 0, 0.05);
+        this._warmup2 = Mathf.lerpDelta(this._warmup2, this.consValid() && this.enabled ? 1 : 0, 0.05);
     },
     draw() {
         this.super$draw();
@@ -72,18 +74,20 @@ teleunit.buildType = prov(() => extend(Building, {
         Draw.alpha(0.45 + Mathf.absin(Time.time, 7, 0.26));
         Draw.rect(teleunit.topRegion, this.x, this.y);
         if(this._warmup >= 0.001){
-          Draw.z(Layer.bullet);
-          Draw.color(diriumColor, this.team.color, Mathf.absin(Time.time, 19, 1));
-          Lines.stroke((Mathf.absin(Time.time, 62, 0.5) + 0.5) * this._warmup);
-          Lines.square(this.x, this.y, 10.5, 45);
-          Lines.stroke((Mathf.absin(Time.time, 62, 1) + 1) * this._warmup);
-          Lines.square(this.x, this.y, 8.5, Time.time / 2);
-          Lines.square(this.x, this.y, 8.5, -1 * Time.time / 2);
+            Draw.z(Layer.bullet);
+            Draw.color(diriumColor, this.team.color, Mathf.absin(Time.time, 19, 1));
+            Lines.stroke((Mathf.absin(Time.time, 62, 0.5) + 0.5) * this._warmup);
+            Lines.square(this.x, this.y, 10.5, 45);
+            if(this._warmup2 >= 0.001){
+                Lines.stroke((Mathf.absin(Time.time, 62, 1) + 1) * this._warmup2);
+                Lines.square(this.x, this.y, 8.5, Time.time / 2);
+                Lines.square(this.x, this.y, 8.5, -1 * Time.time / 2);
+            }
         }
         Draw.reset();
     },
     drawSelect(){
-        Draw.color(this.consValid() && this.enabled ? (this.inRange(Vars.player) ? diriumColor : Pal.accent) : Pal.darkMetal);
+        Draw.color(this.consValid() ? (this.inRange(Vars.player) ? diriumColor : Pal.accent) : Pal.darkMetal);
         var length = Vars.tilesize * teleunit.size / 2 + 3 + Mathf.absin(Time.time, 5, 2);
 
         Draw.rect(teleunit.arrowRegion, this.x + length, this.y, (0 + 2) * 90);
@@ -115,50 +119,16 @@ teleunit.buildType = prov(() => extend(Building, {
         for(var i=0; i<arr.length;i++){
             var tid = arr[i].split("#")[1];
             //print("tid: "+tid);
-            if(teleunit.buildId[tid] == undefined || teleunit.buildId[tid] == null || !teleunit.buildId[tid]) continue;
+            if(teleunit.buildId[tid] == undefined || teleunit.buildId[tid] == null || !teleunit.buildId[tid] || (!teleunit.buildId[tid].enabled && teleunit.buildId[tid] != this)) continue;
             barr.push(teleunit.buildId[tid]);
         }
         barr.sort(function(a, b) {
             return a.pos() - b.pos();
         });
         return barr;
-    },/*
-    getDestBlock(){
-        var barr = this.getDestList();
-        if(barr.length <= 0) return;
-        var index = barr.indexOf(this);
-        if(index < 0){
-            print("Error! Origin pad not in list!");
-        }
-        index++;
-        if(index >= barr.length) index = 0;
-        return barr[index];
     },
-    acceptPayload(source, payload){
-        if(source == null || !this.consValid() || !this.enabled) return false;
-        var way = (this.relativeTo(source.tile) + 2) % 4;
-        var dest = this.getDestBlock();
-        print("Dest: " + dest);
-        if(this == dest) return false;
-        var trns = teleunit.size / 2 + 1;
-        var next = dest.tile.nearby(d4x[way] * trns, d4y[way] * trns);
-        print("Next: " + next);
-        if(next == null || next.block() == teleunit) return false;
-        return next.build != null && next.build.team == dest.team && next.build.acceptPayload((next.block() instanceof PayloadConveyor) ? next.build : dest, payload);
-    },
-    handlePayload(source, payload){
-        if(source == null) return;
-        var way = (this.relativeTo(source.tile) + 2) % 4;
-        var dest = this.getDestBlock();
-        if(this == dest) return;
-        var trns = teleunit.size / 2 + 1;
-        var next = dest.tile.nearby(d4x[way] * trns, d4y[way] * trns);
-        if(next == null || next.block() == teleunit) return;
-        var fs = (next.block() instanceof PayloadConveyor) ? next.build : dest;
-        if(next.build != null && next.build.team == dest.team && next.build.acceptPayload(fs, payload)) next.build.handlePayload(fs, payload);
-    },*/
     inRange(player){
-        return this.enabled && player.unit() != null && !player.unit().dead && Math.abs(player.unit().x - this.x) <= 2.5 * Vars.tilesize && Math.abs(player.unit().y - this.y) <= 2.5 * Vars.tilesize;
+        return player.unit() != null && !player.unit().dead && Math.abs(player.unit().x - this.x) <= 2.5 * Vars.tilesize && Math.abs(player.unit().y - this.y) <= 2.5 * Vars.tilesize;
     },
     shouldShowConfigure(player){
         return this.consValid() && this.inRange(Vars.player);
@@ -207,8 +177,13 @@ teleunit.buildType = prov(() => extend(Building, {
         tpFlash.at(dest.x, dest.y, 0, Color.white, unit);
     },
     unitOn(unit){
+        if(!this.consValid()) return;
         if(unit.hasEffect(tpCoolDown) || unit.isPlayer()) return;
         this.tpUnit(unit, false);
         unit.apply(tpCoolDown, 120);
+    },
+    consValid(){
+        //suppress considering enabled
+        return this.power.status > 0.98;
     }
 }));
