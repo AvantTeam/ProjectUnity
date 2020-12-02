@@ -1,0 +1,7 @@
+{
+	"size": 1,
+	"requirements": [
+		{ "item": "umbrium", "amount": 6 }
+	],
+	"category": "defense"
+}
