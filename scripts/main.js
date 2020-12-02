@@ -55,7 +55,6 @@ const script = [
                 name: "bullets",
                 childs: [
                     "tractorbeam",
-                    "chainlaser",
                     "shieldbullet"
                 ]
             },

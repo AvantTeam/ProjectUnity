@@ -147,7 +147,7 @@ const imberCurrentCharge = new Effect(32, e => {
 
 const imberCurrentChargeBegin = new Effect(260, e => {
     Draw.color(Pal.surge);
-    Fill.circle(e.x, e.y, e.fin() * 7);
+    Fill.circle(e.x, e.y, e.fin() * 6);
 
     Draw.color();
     Fill.circle(e.x, e.y, e.fin() * 3);

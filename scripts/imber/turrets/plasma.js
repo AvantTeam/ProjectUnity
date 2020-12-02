@@ -84,11 +84,7 @@ plasma.fragBullets = 8;
 plasma.fragLifeMin = 0.8;
 plasma.fragLifeMax = 1.1;
 
-const plasmaTurret = extendContent(PowerTurret, "plasma", {
-    shouldTurn(){
-        return true;
-    }
-});
+const plasmaTurret = extendContent(PowerTurret, "plasma", {});
 plasmaTurret.shootType = plasma;
 plasmaTurret.shootSound = Sounds.shotgun;
 plasmaTurret.shootEffect = effects.imberShootTriangle;
