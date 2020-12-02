@@ -912,7 +912,11 @@ const _ModularBuild = {
 		if (!this._buffer) {
 			return null;
 		}
-		return Draw.wrap(this._buffer.getTexture());
+		var tex = Draw.wrap(this._buffer.getTexture());
+		var tmp1 = tex.u;
+		tex.v = tex.v2;
+		tex.v2=tmp1;
+		return tex;
 	},
 
 	displayExt(table) {
@@ -1299,9 +1303,7 @@ const BulletTypesMap = {
 		update(b){
 			this.super$update(b);
 			
-			if(b.fin()<0.15&&b.timer.get(0, (3 + b.fslope() * 2) * 1.0)){
-				this.trailEffect.at(b.x, b.y, b.fslope() * 4.0*Mathf.clamp(b.fout()), this.backColor);
-			}
+			
 			
 			if(this.justBounced(b)){
 				b.vel.x *= 0.8;
@@ -1331,6 +1333,11 @@ const BulletTypesMap = {
 			if(!this.hasInit){
 				this.load(); // uh yeh, since this is created dynamically unfortunatly.
 			}
+			
+			if(b.fin()<0.15&&b.timer.get(0, (3 + b.fslope() * 2) * 1.0)){
+				this.trailEffect.at(b.x, b.y, b.fslope() * 4.0*Mathf.clamp(b.fout()), this.backColor);
+			}
+			
 			let scl = this.getZ(b)+1;
 			let offset = Time.time*3.0;
 			var height = this.height*scl;
@@ -1355,6 +1362,7 @@ const BulletTypesMap = {
 			this.width=10;
 			this.height=14;
 			this.hitEffect= Fx.flakExplosion;
+			this.shootEffect = Fx.shootBig;
 		}
 		//todo
 	}),
@@ -1485,6 +1493,8 @@ const _TurretBaseUpdater = { //basically a turret.
 	basepart:null,
 	reloadTime: 0,
 	reload: 0,
+	offsetx: 0,
+	offsety: 0,
 	
 	attachBaseUpdater(partinfo, name, ext){
 		for(let i = 0;i<partinfo.length;i++){
@@ -1501,7 +1511,7 @@ const _TurretBaseUpdater = { //basically a turret.
 	updateShooting() {
 		if (this.reload >= this.reloadTime*this.guns[this.currentBarrel].reloadmult && this.hasAmmo() && this.canShoot()) {
 			let type = this.guns[this.currentBarrel];
-			this.build.shootType(type);
+			this.build.shootType(type,this.offsetx,this.offsety);
 			this.useAmmo();
 			this.onShoot();
 			this.currentBarrel++;
@@ -1520,7 +1530,7 @@ const _TurretBaseUpdater = { //basically a turret.
 		print("applying stats to base...");
 		if (!total.guns || total.guns.length==0) {
 			print("shit no guns");
-			printObj(total);
+			//printObj(total);
 			return;
 		}
 		let lt = [];
@@ -1528,13 +1538,14 @@ const _TurretBaseUpdater = { //basically a turret.
 			if (!total.guns[i]) {
 				continue;
 			}
-			lt.push(mergeStats(total.guns[i], global));
+			lt.push(mergeStats(total.guns[i], total.globalStats));
 			lt[i].bullettype = getBulletTypeFromConfig(lt[i]);
 			lt[i].magazine =0;
 
 		}
 		this.guns = lt;
 		this.reloadTime = total.reload;
+		
 	},
 	//Consume ammo and return a type.
 	useAmmo() {
@@ -1553,6 +1564,8 @@ const _TurretBaseUpdater = { //basically a turret.
 	
 	processConfig(supertotal,basex,basey,grid){
 		let part = getPart(this.build.getPartsConfig(),this.basepart);
+		this.offsetx = ((grid.length*0.5)-(basex+0.5*part.tw))   * this.build.block.getSpriteGridSize()*0.25;
+		this.offsety = ((grid[0].length*0.5)-(basey+0.5*part.th))* this.build.block.getSpriteGridSize()*0.25;
 		if(!supertotal.bases){
 			supertotal.bases = [];
 		}
@@ -1562,6 +1575,9 @@ const _TurretBaseUpdater = { //basically a turret.
 		};
 		
 		let total = baseEntry.baseAccum;
+		if(!total.globalStats){
+			total.globalStats={};
+		}
 		total.reload = part.stats.reload.value;
 		for (let i = 0; i < part.connOutList.length; i++) {
 			let attach = part.connOutList[i];
@@ -1591,6 +1607,9 @@ const _TurretBaseUpdater = { //basically a turret.
 						if(guninfo.stats.mod){
 							guninfo.stats.mod.cons.get(basestats);
 						}
+						basestats.partList = [];
+						basestats.partList.push(guninfo);
+						
 						total.guns.push(basestats);
 						break;
 					case "ammo":
@@ -1664,6 +1683,9 @@ const _TurretBaseUpdater = { //basically a turret.
 			}));
 		}
 	},
+	draw(x,y){
+		
+	}
 	
 	
 }
@@ -1741,18 +1763,10 @@ const _TurretModularBuild = Object.assign(deepCopy(_ModularBuild), {
 		},
 		//not used anymore.
 		useAmmo() {
-			/*if(this.guns[this.currentBarrel].magazine==0){
-				this.attemptRefillMag(this.guns[this.currentBarrel]);
-			}
-			if(this.guns[this.currentBarrel].magazine>0){
-				this.guns[this.currentBarrel].magazine--;
-			}
-			return this.guns[this.currentBarrel].bullettype;*/
 			return Bullets.standardCopper;
 		},
 		//not used anymore.
 		peekAmmo() {
-			//return this.guns[this.currentBarrel].bullettype;
 			return Bullets.standardCopper;
 		},
 		applyStats(total) {
@@ -1773,10 +1787,12 @@ const _TurretModularBuild = Object.assign(deepCopy(_ModularBuild), {
 				}
 				total.bases[i].base.applyStats(total.bases[i].baseAccum,total.globalStats);
 				lt.push(total.bases[i].base);
+				total.bases[i].base.hasAmmo();
 
 			}
 			this.bases = lt;
 			this.validTurret = true;
+			this.items.clear();
 		},
 		displayBarsExt(barsTable){
 			if(this.validTurret){
@@ -1880,12 +1896,15 @@ const _TurretModularBuild = Object.assign(deepCopy(_ModularBuild), {
 				this.bases[i].updateShooting();
 			}
 		},
-		shootType(configtype){
-			this.block.tr.trns(this.rotation, this.block.size * Vars.tilesize / 2.0, Mathf.range(this.block.xRand));
+		shootType(configtype,x,y){
+			this.block.tr.trns(this.rotation, this.block.size * Vars.tilesize / 2.0 + y, Mathf.range(this.block.xRand) + x);
 
 			for(let i = 0; i < configtype.shots; i++){
 				this.bullet(configtype.bullettype, this.rotation + Mathf.range(configtype.spread));
 			}
+			
+			configtype.bullettype.shootEffect.at(this.x + this.block.tr.x, this.y + this.block.tr.y, this.rotation);
+            configtype.bullettype.smokeEffect.at(this.x + this.block.tr.x, this.y + this.block.tr.y, this.rotation);
 
 		},
 		findTarget(){
@@ -1900,7 +1919,41 @@ const _TurretModularBuild = Object.assign(deepCopy(_ModularBuild), {
         },
 		drawSelect(){
             Drawf.dashCircle(this.x, this.y, this.turretRange, this.team.color);
-        }
+        },
+		drawExt(){},
+		draw(){
+			this.drawExt();
+			let turretSprite = this.getBufferRegion();
+			if(turretSprite) {
+				Draw.z(Layer.turret);
+				if(this.getPaidRatio() < 1) {
+					let ou = turretSprite.u;
+					let ou2 = turretSprite.u2;
+					let ov = turretSprite.v;
+					let ov2 = turretSprite.v2;
+					turretSprite.setU2(Mathf.map(this.aniprog, 0, 1, ou + 0.5*(ou2-ou), ou2));
+					turretSprite.setU(Mathf.map(this.aniprog, 0, 1, ou+ 0.5*(ou2-ou), ou));
+					turretSprite.setV2(Mathf.map(this.aniprog, 0, 1, ov+ 0.5*(ov2-ou), ov2));
+					turretSprite.setV(Mathf.map(this.aniprog, 0, 1, ov+ 0.5*(ov2-ou), ov));
+				}
+				var that = this;
+				if(this.getPaidRatio() < 1) {
+					_drawConstruct(turretSprite, this.aniprog, Pal.accent, 1.0, this.anitime * 0.5, Layer.turret, function(tex) {
+						Draw.rect(tex, that.x, that.y, that.rotation+90);
+					});
+				}
+				else {
+					Draw.rect(turretSprite, that.x, that.y, this.rotation-90);
+					
+					for (let i = 0; i < this.bases.length; i++) {
+						this.block.tr2.trns(this.rotation+90, this.bases[i].offsetx, this.bases[i].offsety);
+						this.bases[i].draw(that.x+this.block.tr2.x, that.y+this.block.tr2.y);
+					}
+					//painful
+				}
+			}
+		}
+		
 
 	});
 

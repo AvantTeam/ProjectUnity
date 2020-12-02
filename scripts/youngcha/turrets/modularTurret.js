@@ -125,8 +125,9 @@ const partinfo = [
             },
 			shaftSpd: {
                 name: "stat.unity.shaftSpd",
-                value: 4,
+                value: 40,
             },
+			
         }
 
     },
@@ -364,7 +365,7 @@ const partinfo = [
     },
 	
 	{
-        name: "Ammo Packet",
+        name: "Ammo Packer",
         desc: "Makes the gun shoot more bullet at once",
         category: "ammo",
         tx: 3,
@@ -529,7 +530,7 @@ const partinfo = [
         stats: {
             hp: {
                 name: "stat.unity.hpinc",
-                value: 100,
+                value: 200,
             },
         }
 
@@ -606,11 +607,68 @@ const partinfo = [
 
 modturretlib.preCalcConnection(partinfo);
 
-modturretlib.TurretBaseUpdater.attachBaseUpdater(partinfo,"Gun base",{});
+modturretlib.TurretBaseUpdater.attachBaseUpdater(partinfo,"Gun base",{
+	onShoot(){
+		this.guns[this.currentBarrel].recoilTime = Time.time;
+	},
+	draw(x,y){
+		let trg = new Vec2(0,0);
+		trg.trns(this.build.rotation,1.0);
+		Draw.z(Layer.turret-0.01);
+		Draw.rect(getPart(this.basepart).shadowSprite,x+trg.x,y+trg.y,this.build.rotation-90);
+		let barrel = this.guns[this.currentBarrel].partList;
+		for(let i = 0;i<barrel.length;i++){
+			if(!this.guns[this.currentBarrel].recoilTime){
+				this.guns[this.currentBarrel].recoilTime=0;
+			}
+			let offset = ((i+1)*4-(2.0/(1+Time.time-this.guns[this.currentBarrel].recoilTime)));
+			Draw.z(Layer.turret-0.01);
+			Draw.rect(barrel[i].shadowSprite, x + offset*trg.x, y + offset*trg.y,this.build.rotation-90);
+			Draw.z(Layer.turret);
+			Draw.rect(barrel[i].baseSprite, x + offset*trg.x, y + offset*trg.y,this.build.rotation-90);
+		}
+		Draw.z(Layer.turret+0.01);
+		Draw.rect(getPart(this.basepart).baseSprite,x+trg.x,y+trg.y,this.build.rotation-90);
+	}
+});
 modturretlib.TurretBaseUpdater.attachBaseUpdater(partinfo,"Rotary Gun base",{
 	reloadMultiplier(){
-		return Mathf.clamp(this.build.getGraphConnector("torque graph").getNetwork().lastVelocity/ this.basepart.stats.shaftSpd.value);
+		return Mathf.clamp(this.build.getGraphConnector("torque graph").getNetwork().lastVelocity/ getPart(this.basepart).stats.shaftSpd.value);
 	},
+	onShoot(){
+		this.guns[this.currentBarrel].recoilTime = Time.time;
+	},
+	draw(x,y){
+		let trg = new Vec2(0,0);
+		trg.trns(this.build.rotation,1.0);
+		let trg2 = new Vec2(0,0);
+		trg2.trns(this.build.rotation+90,1.0);
+		Draw.z(Layer.turret-0.01);
+		Draw.rect(getPart(this.basepart).shadowSprite,x+trg.x,y+trg.y,this.build.rotation-90);
+		let gunrot = this.build.getGraphConnector("torque graph").getRotation();
+		for(var cbarrel = 0;cbarrel<this.guns.length;cbarrel++){
+			var barrel = this.guns[cbarrel].partList;
+			var rx = Mathf.sinDeg(gunrot + 360.0*cbarrel/this.guns.length)*1.5;
+			var rz = Mathf.cosDeg(gunrot + 360.0*cbarrel/this.guns.length)*0.01;
+			for(var i = 0;i<barrel.length;i++){
+				if(!this.guns[cbarrel].recoilTime){
+					this.guns[cbarrel].recoilTime=0;
+				}
+				var offset = ((i+1)*4-(2.0/(1+Time.time-this.guns[cbarrel].recoilTime)));
+				var dx = x + offset*trg.x + rx*trg2.x;
+				var dy = y + offset*trg.y + rx*trg2.y;
+				Draw.z(Layer.turret-0.01);
+				Draw.rect(barrel[i].shadowSprite, dx, dy, this.build.rotation-90);
+				Draw.z(Layer.turret+0.01+rz);
+				Draw.rect(barrel[i].baseSprite, dx, dy, this.build.rotation-90);
+			}
+		}
+		
+		
+		
+		Draw.z(Layer.turret+0.03);
+		Draw.rect(getPart(this.basepart).baseSprite,x+trg.x,y+trg.y,this.build.rotation-90);
+	}
 });
 
 let blankobj = graphLib.init();
@@ -632,8 +690,26 @@ const smallTurret = graphLib.finaliseExtendContent(Turret, Turret.TurretBuild, "
 		
 		getPart("Gun base").shadowSprite =Core.atlas.find(this.name + "-gbase-outline");
 		getPart("Gun base").baseSprite = Core.atlas.find(this.name + "-gbase");
+		getPart("Rotary Gun base").shadowSprite =Core.atlas.find(this.name + "-rgbase-outline");
+		getPart("Rotary Gun base").baseSprite = Core.atlas.find(this.name + "-rgbase");
 		getPart("Cannon breach").shadowSprite =Core.atlas.find(this.name + "-cbreach-outline");
 		getPart("Cannon breach").baseSprite = Core.atlas.find(this.name + "-cbreach");
+		getPart("Gun breach").shadowSprite =Core.atlas.find(this.name + "-gbreach-outline");
+		getPart("Gun breach").baseSprite = Core.atlas.find(this.name + "-gbreach");
+		getPart("Grenade breach").shadowSprite =Core.atlas.find(this.name + "-grbreach-outline");
+		getPart("Grenade breach").baseSprite = Core.atlas.find(this.name + "-grbreach");
+		getPart("Incendiary Modifier").shadowSprite =Core.atlas.find(this.name + "-firemod-outline");
+		getPart("Incendiary Modifier").baseSprite = Core.atlas.find(this.name + "-firemod");
+		getPart("Homing Modifier").shadowSprite =Core.atlas.find(this.name + "-homingmod-outline");
+		getPart("Homing Modifier").baseSprite = Core.atlas.find(this.name + "-homingmod");
+		getPart("Ammo Packer").shadowSprite =Core.atlas.find(this.name + "-apacker-outline");
+		getPart("Ammo Packer").baseSprite = Core.atlas.find(this.name + "-apacker");
+		getPart("Rangefinder").shadowSprite =Core.atlas.find(this.name + "-rfinder-outline");
+		getPart("Rangefinder").baseSprite = Core.atlas.find(this.name + "-rfinder");
+		getPart("Radiator").shadowSprite =Core.atlas.find(this.name + "-rad-outline");
+		getPart("Radiator").baseSprite = Core.atlas.find(this.name + "-rad");
+		getPart("Armour Plate").shadowSprite =Core.atlas.find(this.name + "-aplate-outline");
+		getPart("Armour Plate").baseSprite = Core.atlas.find(this.name + "-aplate");
     },
 	
 }, {
@@ -674,31 +750,9 @@ const smallTurret = graphLib.finaliseExtendContent(Turret, Turret.TurretBuild, "
         }
 		this.updateAutoBuild();
 	},
-	draw() {
+	drawExt() {
         Draw.rect(smallTurret.base, this.x, this.y, 0);
-		let turretSprite = this.getBufferRegion();
-        if(turretSprite) {
-            Draw.z(Layer.turret);
-            if(this.getPaidRatio() < 1) {
-				let ou = turretSprite.u;
-				let ou2 = turretSprite.u2;
-				let ov = turretSprite.v;
-				let ov2 = turretSprite.v2;
-                turretSprite.setU2(Mathf.map(this.aniprog, 0, 1, ou + 0.5*(ou2-ou), ou2));
-				turretSprite.setU(Mathf.map(this.aniprog, 0, 1, ou+ 0.5*(ou2-ou), ou));
-				turretSprite.setV2(Mathf.map(this.aniprog, 0, 1, ov+ 0.5*(ov2-ou), ov2));
-				turretSprite.setV(Mathf.map(this.aniprog, 0, 1, ov+ 0.5*(ov2-ou), ov));
-            }
-            var that = this;
-            if(this.getPaidRatio() < 1) {
-                modturretlib.drawConstruct(turretSprite, this.aniprog, Pal.accent, 1.0, this.anitime * 0.5, Layer.turret, function(tex) {
-                    Draw.rect(tex, that.x, that.y, that.rotation+90);
-                });
-            }
-            else {
-                Draw.rect(turretSprite, that.x, that.y, this.rotation+90);
-            }
-        }
+		
         this.drawTeamTop();
 	}
 });
@@ -712,7 +766,7 @@ smallTurret.hasItems = true;
 smallTurret.setGridWidth(3);
 smallTurret.setGridHeight(3);
 smallTurret.initBuildTimerId();
-smallTurret.setSpriteGridSize(20);
+smallTurret.setSpriteGridSize(18);
 smallTurret.setSpriteGridPadding(3);
 smallTurret.getGraphConnectorBlock("torque graph").setAccept([1,1, 0,0, 0,0, 0,0]);
 smallTurret.getGraphConnectorBlock("torque graph").setBaseFriction(0.03);

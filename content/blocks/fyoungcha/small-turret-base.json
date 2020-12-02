@@ -1,6 +1,6 @@
 {
 	"size": 2,
-	"health": 1600,
+	"health": 1200,
 	"requirements": [
 		{"item": "graphite", "amount": 20},
 		{"item": "nickel", "amount": 30},
