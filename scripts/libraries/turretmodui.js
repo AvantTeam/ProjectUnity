@@ -1412,6 +1412,9 @@ function mergeStats(tos, froms){
 	if(froms.shots){
 		froms.shots*=tos.shots;
 	}
+	if(froms.heatMult){
+		froms.heat=tos.heat*froms.heatMult;
+	}
 	if(froms.ammoType){
 		for(let type in tos.ammoType){
 			if(!froms.ammoType[type]){
@@ -1508,15 +1511,30 @@ const _TurretBaseUpdater = { //basically a turret.
 	reloadMultiplier(){
 		return 1;
 	},
+	getBasePart(){
+		return getPart(this.build.getPartsConfig(),this.basepart);
+	},
 	updateShooting() {
-		if (this.reload >= this.reloadTime*this.guns[this.currentBarrel].reloadmult && this.hasAmmo() && this.canShoot()) {
-			let type = this.guns[this.currentBarrel];
-			this.build.shootType(type,this.offsetx,this.offsety);
-			this.useAmmo();
-			this.onShoot();
-			this.currentBarrel++;
-			this.currentBarrel = this.currentBarrel % this.guns.length;
-			this.reload = 0;
+		
+		if (this.reload >= this.reloadTime*this.guns[this.currentBarrel].reloadmult && this.hasAmmo() && this.canShoot() ) {
+			let hgraph = this.build.getGraphConnector("heat graph");
+			let temp = hgraph.getTemp();
+			if(temp<500){
+				let type = this.guns[this.currentBarrel];
+				this.build.shootType(type,this.offsetx,this.offsety);
+				this.useAmmo();
+				
+				
+				hgraph.setHeat(hgraph.getHeat()+this.guns[this.currentBarrel].heat* this.getBasePart().stats.heatAccumMult.value );
+				this.onShoot();
+				this.currentBarrel++;
+				this.currentBarrel = this.currentBarrel % this.guns.length;
+				this.reload = 0;
+			}else{
+				if( Mathf.chance(0.06+0.3*Mathf.clamp((temp-500)*0.01)) ){
+					this.build.block.coolEffect.at(this.build.x + Mathf.range(this.build.block.size * Vars.tilesize / 2), this.build.y + Mathf.range(this.build.block.size * Vars.tilesize / 2));
+				}
+			}
 		} else {
 			this.reload += this.build.delta() * this.build.baseReloadSpeed()*this.reloadMultiplier();
 		}
@@ -1527,10 +1545,7 @@ const _TurretBaseUpdater = { //basically a turret.
 	onShoot(){},
 	
 	applyStats(total,global) {
-		print("applying stats to base...");
 		if (!total.guns || total.guns.length==0) {
-			print("shit no guns");
-			//printObj(total);
 			return;
 		}
 		let lt = [];
@@ -1603,10 +1618,12 @@ const _TurretBaseUpdater = { //basically a turret.
 							spread: guninfo.stats.spread.value,
 							reloadmult: guninfo.stats.reloadMultiplier.value,
 							magazineSize: guninfo.stats.magazine.value,
+							heat:guninfo.stats.heat.value,
 						};
 						if(guninfo.stats.mod){
 							guninfo.stats.mod.cons.get(basestats);
 						}
+						//search for barrels.
 						basestats.partList = [];
 						basestats.partList.push(guninfo);
 						
@@ -1615,17 +1632,11 @@ const _TurretBaseUpdater = { //basically a turret.
 					case "ammo":
 						guninfo.stats.mod.cons.get(total.globalStats);
 						break;
-					
-					case "barrel":
-						guninfo.stats.mod.cons.get(total.globalStats);
-						
-						break;
 				}
 
 				if (guninfo.category != "breach") {
 					continue;
 				}
-				print("encountered breach");
 			}
 		}
 		baseEntry.baseAccum = total;
@@ -1634,7 +1645,6 @@ const _TurretBaseUpdater = { //basically a turret.
 	},
 	hasAmmo() {
 		if(!this.guns || this.guns.length==0){
-			print("shit no guns");
 			return false;
 		}
 		if(this.guns[this.currentBarrel].magazine<=0){
