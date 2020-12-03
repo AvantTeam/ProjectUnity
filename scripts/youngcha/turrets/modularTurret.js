@@ -18,11 +18,15 @@ const smallTurret = graphLib.finaliseExtendContent(Turret, Turret.TurretBuild, "
         this.super$load();
         this.base = [Core.atlas.find(this.name+"1"),Core.atlas.find(this.name+"2"),Core.atlas.find(this.name+"3"),Core.atlas.find(this.name+"4")];
         this.partsAtlas = partslib.partIcons();
-        this.setConfigs();
 		this.baseSprite = Core.atlas.find(this.name + "-root");
 		this.baseOutline = Core.atlas.find(this.name + "-root-outline");
-		this.partsConfig = partslib.getPartList(["small"], 1,0, partslib.small, (part)=>{return true;});
+		
     },
+	init(){
+		this.super$init();
+		this.setConfigs();
+		this.partsConfig = partslib.getPartList(["small"], 1,0, partslib.small, (part)=>{return true;});
+	}
 	
 }, {
 	getBaseSprite(){return smallTurret.baseSprite;},
@@ -77,11 +81,14 @@ const medTurret = graphLib.finaliseExtendContent(Turret, Turret.TurretBuild, "me
         this.super$load();
         this.base = [Core.atlas.find(this.name+"1"),Core.atlas.find(this.name+"2"),Core.atlas.find(this.name+"3"),Core.atlas.find(this.name+"4")];
         this.partsAtlas = partslib.partIcons();
-        this.setConfigs();
 		this.baseSprite = Core.atlas.find(this.name + "-root");
 		this.baseOutline = Core.atlas.find(this.name + "-root-outline");
-		this.partsConfig = partslib.getPartList(["small","medium"], 2,0, partslib.medium, (part)=>{return true;});
     },
+	init(){
+		this.super$init();
+		this.setConfigs();
+		this.partsConfig = partslib.getPartList(["small","medium"], 2,0, partslib.medium, (part)=>{return true;});
+	}
 	
 }, {
 	getBaseSprite(){return medTurret.baseSprite;},
