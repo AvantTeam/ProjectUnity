@@ -19,8 +19,8 @@ jobs:
     - name: Build mod jar
       run: |
         chmod +x gradlew
+        ./gradlew main:jar
         ./gradlew tools:processSprites
-        ./gradlew main:deploy
     - name: Upload built jar file
       uses: actions/upload-artifact@v2
       with:
