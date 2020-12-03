@@ -84,11 +84,12 @@ const script = [
             "multi-lib",
             "status",
             "arena",
+			"graphlib",
             "rotpowerlib",
             "heatlib",
             "cruciblelib",
-            "graphlib",
-            "turretmodui"
+            "turretmodui",
+			"modularparts",
         ]
     },
 
