@@ -17,7 +17,7 @@ public class UnitySectorPresets implements ContentList{
         accretion = new SectorPreset("accretion", megalith, 30){
             {
                 alwaysUnlocked = true;
-                captureWave = 25;
+                captureWave = 15;
             }
         };
     }

@@ -5,7 +5,7 @@ import mindustry.type.ItemStack;
 import mindustry.ctype.*;
 import mindustry.content.*;
 import mindustry.content.TechTree.*;
-import mindustry.game.Objectives.Objective;
+import mindustry.game.Objectives.*;
 
 import static mindustry.type.ItemStack.*;
 import static unity.content.UnityBlocks.*;
@@ -17,67 +17,77 @@ public class UnityTechTree implements ContentList{
 
     @Override
     public void load(){
+        //region blocks
         attachNode(Blocks.surgeSmelter, () -> {
-            unityNode(darkAlloyForge);
-            unityNode(monolithAlloyFactory);
-            unityNode(sparkAlloyFactory);
+            node(darkAlloyForge);
+            node(monolithAlloyForge);
+            node(sparkAlloyForge);
         });
         attachNode(Blocks.powerNode, () -> {
-            unityNode(lightLamp, () -> {
-                unityNode(lightFilter, () -> {
-                    unityNode(lightInvertedFilter, () -> {
-                        unityNode(lightItemFilter);
+            node(lightLamp, () -> {
+                node(lightFilter, () -> {
+                    node(lightInvertedFilter, () -> {
+                        node(lightItemFilter);
                     });
                 });
-                unityNode(lightPanel);
-                unityNode(lightReflector, () -> {
-                    unityNode(lightDivisor, () -> {
-                        unityNode(lightDivisor1, () -> {
-                            unityNode(lightInfluencer);
+                node(lightPanel);
+                node(lightReflector, () -> {
+                    node(lightDivisor, () -> {
+                        node(lightDivisor1, () -> {
+                            node(lightInfluencer);
                         });
                     });
-                    unityNode(lightReflector1, () -> {
-                        unityNode(lightOmnimirror);
+                    node(lightReflector1, () -> {
+                        node(lightOmnimirror);
                     });
                 });
-                unityNode(oilLamp);
+                node(oilLamp);
             });
         });
-        attachNode(Blocks.scorch, () -> {
-            unityNode(inferno);
-        });
+        /*attachNode(Blocks.scorch, () -> {
+            node(inferno);
+        });TODO*/
         attachNode(Blocks.arc, () -> {
-            unityNode(mage, () -> {
-                unityNode(oracle);
+            node(mage, () -> {
+                node(oracle);
             });
         });
-        attachNode(Blocks.lancer, () -> {
-            unityNode(laserTurret);
-        });
+        /*attachNode(Blocks.lancer, () -> {
+            node(laserTurret);
+        });TODO*/
         attachNode(Blocks.ripple, () -> {
-            unityNode(shielder);
+            node(shielder);
         });
         attachNode(Blocks.cyclone, () -> {
-            unityNode(orb);
+            node(orb);
         });
         attachNode(Blocks.meltdown, () -> {
-            unityNode(shockwire, () -> {
-                unityNode(current, () -> {
-                    unityNode(plasma);
+            node(shockwire, () -> {
+                node(current, () -> {
+                    node(plasma);
                 });
             });
         });
         attachNode(Blocks.copperWall, () -> {
-            unityNode(metaglassWall, () -> {
-                unityNode(metaglassWall);
+            node(metaglassWall, () -> {
+                node(metaglassWall);
             });
         });
-        attachNode(Items.surgeAlloy, () -> {
-            unityNode(UnityItems.umbrium, with(Items.surgeAlloy, 7000, Items.silicon, 8500, Items.graphite, 6000), () -> {});
+        //endregion
+        //region items
+        attachNode(Items.lead, () -> {
+            nodeProduce(UnityItems.nickel, () -> {});
         });
-        attachNode(Blocks.coreShard, () -> {
-            unityNode(accretion, () -> {});
+        attachNode(Items.graphite, ()->{
+            nodeProduce(UnityItems.stone, ()->{
+                nodeProduce(UnityItems.denseAlloy, ()->{
+                    nodeProduce(UnityItems.steel, ()->{
+                        nodeProduce(UnityItems.dirium, ()->{});
+                    });
+                });
+            });
         });
+        //endregion
     }
 
     private static void attachNode(UnlockableContent parent, Runnable children){
@@ -86,7 +96,7 @@ public class UnityTechTree implements ContentList{
         children.run();
     }
 
-    private static void unityNode(UnlockableContent content, ItemStack[] requirements, Seq<Objective> objectives, Runnable children){
+    private static void node(UnlockableContent content, ItemStack[] requirements, Seq<Objective> objectives, Runnable children){
         TechNode node = new TechNode(context, content, requirements);
         if(objectives != null) node.objectives = objectives;
         TechNode prev = context;
@@ -95,19 +105,27 @@ public class UnityTechTree implements ContentList{
         context = prev;
     }
 
-    private static void unityNode(UnlockableContent content, ItemStack[] requirements, Runnable children){
-        unityNode(content, requirements, null, children);
+    private static void node(UnlockableContent content, ItemStack[] requirements, Runnable children){
+        node(content, requirements, null, children);
     }
 
-    private static void unityNode(UnlockableContent content, Seq<Objective> objectives, Runnable children){
-        unityNode(content, content.researchRequirements(), objectives, children);
+    private static void node(UnlockableContent content, Seq<Objective> objectives, Runnable children){
+        node(content, content.researchRequirements(), objectives, children);
     }
 
-    private static void unityNode(UnlockableContent content, Runnable children){
-        unityNode(content, content.researchRequirements(), children);
+    private static void node(UnlockableContent content, Runnable children){
+        node(content, content.researchRequirements(), children);
     }
 
-    private static void unityNode(UnlockableContent block){
-        unityNode(block, () -> {});
+    private static void node(UnlockableContent block){
+        node(block, () -> {});
+    }
+
+    private static void nodeProduce(UnlockableContent content, Seq<Objective> objectives, Runnable children){
+        node(content, content.researchRequirements(), objectives.and(new Produce(content)), children);
+    }
+
+    private static void nodeProduce(UnlockableContent content, Runnable children){
+        nodeProduce(content, new Seq<>(), children);
     }
 }

@@ -8,7 +8,7 @@ import mindustry.gen.*;
 import static arc.Core.*;
 
 public class WormUnitType extends UnitType{
-    public TextureRegion segmentRegion, tailRegion, segmentCellRegion;
+    public TextureRegion segmentRegion, tailRegion, segmentCellRegion, segmentOutline, tailOutline;
     private int idType;
     protected float segmentOffset;
     protected final Seq<Weapon> segWeapSeq = new Seq<>();
@@ -29,6 +29,8 @@ public class WormUnitType extends UnitType{
         segmentRegion = atlas.find(name + "-segment");
         segmentCellRegion = atlas.find(name + "-segment-cell");
         tailRegion = atlas.find(name + "-tail");
+        segmentOutline = atlas.find(name + "-segment-outline");
+        tailOutline = atlas.find(name + "-tail-outline");
         segWeapSeq.each(w -> w.load());
     }
 
@@ -84,7 +86,7 @@ public class WormUnitType extends UnitType{
         float originZ = Draw.z();
 
         if(!(unit instanceof WormDefaultUnit)) return;
-        WormDefaultUnit wormUnit = (WormDefaultUnit) unit;
+        WormDefaultUnit wormUnit = (WormDefaultUnit)unit;
         for(int i = 0; i < segmentLength; i++){
             Draw.z(originZ - (i + 1) / 500f);
             wormUnit.segmentUnits[i].drawBody();
@@ -97,13 +99,13 @@ public class WormUnitType extends UnitType{
     public void drawShadow(Unit unit){
         super.drawShadow(unit);
         if(!(unit instanceof WormDefaultUnit)) return;
-        WormDefaultUnit wormUnit = (WormDefaultUnit) unit;
+        WormDefaultUnit wormUnit = (WormDefaultUnit)unit;
         for(int i = 0; i < segmentLength; i++) wormUnit.segmentUnits[i].drawShadow();
     }
 
     @Override
     public void drawOcclusion(Unit unit){
         super.drawOcclusion(unit);
-        if(unit instanceof WormDefaultUnit) ((WormDefaultUnit) unit).drawOcclusion();
+        if(unit instanceof WormDefaultUnit) ((WormDefaultUnit)unit).drawOcclusion();
     }
 }

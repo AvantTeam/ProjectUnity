@@ -123,14 +123,14 @@ public class Sprite{
         for(int x = 0; x < sprite.getWidth(); x++){
             for(int y = 0; y < sprite.getHeight(); y++){
                 int A = getRGB(x - 1, y + 1),
-                    B = getRGB(x, y + 1),
-                    C = getRGB(x + 1, y + 1),
-                    D = getRGB(x - 1, y),
-                    E = getRGB(x, y),
-                    F = getRGB(x + 1, y),
-                    G = getRGB(x - 1, y - 1),
-                    H = getRGB(x, y - 1),
-                    I = getRGB(x + 1, y - 1);
+                B = getRGB(x, y + 1),
+                C = getRGB(x + 1, y + 1),
+                D = getRGB(x - 1, y),
+                E = getRGB(x, y),
+                F = getRGB(x + 1, y),
+                G = getRGB(x - 1, y - 1),
+                H = getRGB(x, y - 1),
+                I = getRGB(x + 1, y - 1);
 
                 Arrays.fill(p, E);
 
@@ -188,8 +188,7 @@ public class Sprite{
                 if(getColor(x, y).a < 1f){
                     boolean found = false;
 
-                    outer:
-                    for(int rx = -radius; rx <= radius; rx++){
+                    outer: for(int rx = -radius; rx <= radius; rx++){
                         for(int ry = -radius; ry <= radius; ry++){
                             if(Mathf.dst(rx, ry) <= radius && getColor(rx + x, ry + y).a > 0.01f){
                                 found = true;

@@ -66,8 +66,8 @@ public class CopterUnitType extends UnitType{
             float h = region.height * rotor.scale * Draw.scl;
 
             for(int j = 0; j < rotor.bladeCount; j++){
-                float angle = (unit.id * 24f + Time.time() * rotor.speed + (360f / (float) rotor.bladeCount) * j + rotor.rotOffset) % 360;
-                Draw.alpha(state.isPaused() ? 1f : Time.time() % 2);
+                float angle = (unit.id * 24f + Time.time * rotor.speed + (360f / (float)rotor.bladeCount) * j + rotor.rotOffset) % 360;
+                Draw.alpha(state.isPaused() ? 1f : Time.time % 2);
 
                 Draw.rect(region, unit.x + offX, unit.y + offY, w, h, angle);
             }

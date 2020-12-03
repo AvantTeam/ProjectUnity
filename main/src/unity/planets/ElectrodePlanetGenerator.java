@@ -44,7 +44,7 @@ public class ElectrodePlanetGenerator extends PlanetGenerator{
 
     float rawHeight(Vec3 position){
         position = Tmp.v33.set(position).scl(scl);
-        return (Mathf.pow((float) noise.octaveNoise3D(7, 0.5f, 1f / 3f, position.x, position.y, position.z), 2.3f) + waterOffset) / (1f + waterOffset);
+        return (Mathf.pow((float)noise.octaveNoise3D(7, 0.5f, 1f / 3f, position.x, position.y, position.z), 2.3f) + waterOffset) / (1f + waterOffset);
     }
 
     @Override
@@ -79,19 +79,19 @@ public class ElectrodePlanetGenerator extends PlanetGenerator{
 
         float rad = scl;
         float temp = Mathf.clamp(Math.abs(position.y * 2f) / (rad));
-        float tnoise = (float) noise.octaveNoise3D(7, 0.56, 1f / 3f, position.x, position.y + 999f, position.z);
+        float tnoise = (float)noise.octaveNoise3D(7, 0.56, 1f / 3f, position.x, position.y + 999f, position.z);
 
         temp = Mathf.lerp(temp, tnoise, 0.5f);
         height *= 1.2f;
         height = Mathf.clamp(height);
 
-        return arr[Mathf.clamp((int) (temp * arr.length), 0, arr[0].length - 1)][Mathf.clamp((int) (height * arr[0].length), 0, arr[0].length - 1)];
+        return arr[Mathf.clamp((int)(temp * arr.length), 0, arr[0].length - 1)][Mathf.clamp((int)(height * arr[0].length), 0, arr[0].length - 1)];
     }
 
     @Override
     protected float noise(float x, float y, double octaves, double falloff, double scl, double mag){
         Vec3 v = sector.rect.project(x, y).scl(5f);
-        return (float) noise.octaveNoise3D(octaves, falloff, 1f / scl, v.x, v.y, v.z) * (float) mag;
+        return (float)noise.octaveNoise3D(octaves, falloff, 1f / scl, v.x, v.y, v.z) * (float)mag;
     }
 
     @Override
@@ -132,7 +132,7 @@ public class ElectrodePlanetGenerator extends PlanetGenerator{
             float ry = (height / 2f + Tmp.v1.y);
             float maxrad = radius - Tmp.v1.len();
             float rrad = Math.min(rand.random(9f, maxrad / 2f), 30f);
-            roomseq.add(new Room((int) rx, (int) ry, (int) rrad));
+            roomseq.add(new Room((int)rx, (int)ry, (int)rrad));
         }
 
         //check positions on the map to place the player spawn. this needs to be in the corner of the map
@@ -145,8 +145,8 @@ public class ElectrodePlanetGenerator extends PlanetGenerator{
         int waterCheckRad = 5;
         for(int i = 0; i < 360; i += angleStep){
             int angle = offset + i;
-            int cx = (int) (width / 2 + Angles.trnsx(angle, length));
-            int cy = (int) (height / 2 + Angles.trnsy(angle, length));
+            int cx = (int)(width / 2 + Angles.trnsx(angle, length));
+            int cy = (int)(height / 2 + Angles.trnsy(angle, length));
 
             int waterTiles = 0;
 
@@ -167,7 +167,7 @@ public class ElectrodePlanetGenerator extends PlanetGenerator{
                 for(int j = 0; j < enemySpawns; j++){
                     float enemyOffset = rand.range(60f);
                     Tmp.v1.set(cx - width / 2f, cy - height / 2f).rotate(180f + enemyOffset).add(width / 2f, height / 2f);
-                    Room espawn = new Room((int) Tmp.v1.x, (int) Tmp.v1.y, rand.random(8, 15));
+                    Room espawn = new Room((int)Tmp.v1.x, (int)Tmp.v1.y, rand.random(8, 15));
                     roomseq.add(espawn);
                     enemies.add(espawn);
                 }
@@ -327,7 +327,7 @@ public class ElectrodePlanetGenerator extends PlanetGenerator{
 
             state.rules.attackMode = true;
         }else{
-            state.rules.winWave = 15 * (int) Math.max(difficulty * 10, 1);
+            state.rules.winWave = 15 * (int)Math.max(difficulty * 10, 1);
         }
 
         state.rules.waves = true;

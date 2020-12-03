@@ -136,15 +136,13 @@ public class IconGenerator implements Generator{
                         icon.draw(weapSprite,
                         (int)(weapon.x * 4f / Draw.scl + icon.width / 2f - weapSprite.width / 2f),
                         (int)(-weapon.y * 4f / Draw.scl + icon.height / 2f - weapSprite.height / 2f),
-                        weapon.flipSprite, false
-                        );
+                        weapon.flipSprite, false);
 
                         if(weapon.top){
                             icon.draw(outline.get(weapSprite),
                             (int)(weapon.x * 4f / Draw.scl + icon.width / 2f - weapSprite.width / 2f),
                             (int)(-weapon.y * 4f / Draw.scl + icon.height / 2f - weapSprite.height / 2f),
-                            weapon.flipSprite, false
-                            );
+                            weapon.flipSprite, false);
                         }
                     }
                 }

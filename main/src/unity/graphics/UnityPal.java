@@ -13,5 +13,11 @@ public class UnityPal{
     endColor = valueOf("ff786e"),
     imberColor = valueOf("fff566"),
     navalReddish = valueOf("d4816b"),
-    navalYellowish = valueOf("ffd37f");
+    navalYellowish = valueOf("ffd37f"),
+    laserOrange = valueOf("ff9c5a"),
+    expColor = valueOf("84ff00"),
+    expMaxColor = valueOf("90ff00"),
+    lavaColor = valueOf("ff2a00"),
+    lavaColor2 = valueOf("ffcc00"),
+    diriumColor = valueOf("96f7c3");
 }

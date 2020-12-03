@@ -21,14 +21,14 @@ public class WormDefaultUnit extends UnitEntity{
     @Override
     public void type(UnitType type){
         super.type(type);
-        if(type instanceof WormUnitType) wormType = (WormUnitType) type;
+        if(type instanceof WormUnitType) wormType = (WormUnitType)type;
         else throw new ClassCastException("you set this unit's type in a sneaky way");
     }
 
     @Override
     public void setType(UnitType type){
         super.setType(type);
-        if(type instanceof WormUnitType) wormType = (WormUnitType) type;
+        if(type instanceof WormUnitType) wormType = (WormUnitType)type;
         else throw new ClassCastException("you set this unit's type in a sneaky way");
     }
 
@@ -52,7 +52,8 @@ public class WormDefaultUnit extends UnitEntity{
     }
 
     protected void updateSegmentVLocal(Vec2 vec){
-        for(int i = 0, len = getSegmentLength(); i < len; i++){
+        int len = getSegmentLength();
+        for(int i = 0; i < len; i++){
             Vec2 seg = segments[i];
             Vec2 segV = segmentVelocities[i];
             segV.limit(type.speed);
@@ -65,33 +66,31 @@ public class WormDefaultUnit extends UnitEntity{
             Tmp.v1.scl(1f / 3f);
 
             float trueVel = Math.max(Math.max(velocity, segV.len()), Tmp.v1.len());
-
             Tmp.v1.trns(angleB, trueVel);
             segV.add(Tmp.v1);
             segV.setLength(trueVel);
             segmentUnits[i].vel.set(segV);
-            segV.scl(Time.delta);
         }
+        for(int i = 0; i < len; i++) segmentVelocities[i].scl(Time.delta);
     }
 
     protected void updateSegmentsLocal(){
         float segmentOffset = wormType.segmentOffset;
-        Tmp.v1.trns(Angles.angle(segments[0].x, segments[0].y, x, y) + 180, segmentOffset);
+        Tmp.v1.trns(Angles.angle(segments[0].x, segments[0].y, x, y) + 180f, segmentOffset);
         Tmp.v1.add(x, y);
         segments[0].set(Tmp.v1);
         int len = getSegmentLength();
-
+        for(int i = 1; i < len; i++){
+            Vec2 seg = segments[i];
+            float angle = Angles.angle(seg.x, seg.y, segments[i - 1].x, segments[i - 1].y);
+            Tmp.v1.trns(angle, segmentOffset);
+            seg.set(segments[i - 1]);
+            seg.sub(Tmp.v1);
+        }
         for(int i = 0; i < len; i++){
             Vec2 seg = segments[i];
             Vec2 segV = segmentVelocities[i];
             WormSegmentUnit segU = segmentUnits[i];
-
-            if(i >= 1){
-                float angle = Angles.angle(seg.x, seg.y, segments[i - 1].x, segments[i - 1].y);
-                Tmp.v1.trns(angle, segmentOffset);
-                seg.set(segments[i - 1]);
-                seg.sub(Tmp.v1);
-            }
             seg.add(segV);
             float angleD = i == 0 ? Angles.angle(seg.x, seg.y, x, y) : Angles.angle(seg.x, seg.y, segments[i - 1].x, segments[i - 1].y);
             segV.scl(Mathf.clamp(1f - drag * Time.delta));
@@ -128,11 +127,13 @@ public class WormDefaultUnit extends UnitEntity{
         Unit parent = this;
         for(int i = 0, len = getSegmentLength(); i < len; i++){
             int typeS = i == len - 1 ? 1 : 0;
+            segments[i].set(x, y);
             WormSegmentUnit temp = new WormSegmentUnit();
 
             temp.elevation = elevation;
             temp.setSegmentType(typeS);
             temp.type(type);
+            temp.controller = type.createController();
             temp.controller.unit(temp);
             temp.team = team;
             temp.setTrueParent(this);

@@ -30,7 +30,7 @@ public class WormSegmentUnit extends UnitEntity{
     @Override
     public void type(UnitType type){
         super.type(type);
-        if(type instanceof WormUnitType) wormType = (WormUnitType) type;
+        if(type instanceof WormUnitType) wormType = (WormUnitType)type;
         else throw new ClassCastException("you set this unit's type a in sneaky way");
     }
 
@@ -67,7 +67,7 @@ public class WormSegmentUnit extends UnitEntity{
 
         if(controller == null) controller(type.createController());
         if(mounts().length != type.weapons.size) setupWeapons(type);
-        if(type instanceof WormUnitType) wormType = (WormUnitType) type;
+        if(type instanceof WormUnitType) wormType = (WormUnitType)type;
         else throw new ClassCastException("you set this unit's type in sneaky way");
     }
 
@@ -113,7 +113,7 @@ public class WormSegmentUnit extends UnitEntity{
     @Override
     public Player getPlayer(){
         if(trueParentUnit == null) return null;
-        return isPlayer() ? (Player) trueParentUnit.controller : null;
+        return isPlayer() ? (Player)trueParentUnit.controller : null;
     }
 
     @Override
@@ -144,7 +144,7 @@ public class WormSegmentUnit extends UnitEntity{
         if(!(def instanceof WormUnitType)) super.setupWeapons(def);
         else{
             Seq<WeaponMount> tmpSeq = new Seq<>();
-            Seq<Weapon> originSeq = ((WormUnitType) def).segWeapSeq;
+            Seq<Weapon> originSeq = ((WormUnitType)def).segWeapSeq;
             for(int i = 0; i < originSeq.size; i++) tmpSeq.add(new WeaponMount(originSeq.get(i)));
             mounts = tmpSeq.toArray(WeaponMount.class);
         }
@@ -158,12 +158,11 @@ public class WormSegmentUnit extends UnitEntity{
     @Override
     public void update(){
         if(parentUnit == null || parentUnit.dead){
-            //deactivated = true; seems to not exist in v108
             dead = true;
             remove();
         }
         if(trueParentUnit != null && isBugged){
-            if(Arrays.stream(trueParentUnit.segmentUnits).anyMatch(s -> s == this)) remove();
+            if(Arrays.stream(trueParentUnit.segmentUnits).noneMatch(s -> s == this)) remove();
             else isBugged = false;
         }
     }
@@ -176,10 +175,10 @@ public class WormSegmentUnit extends UnitEntity{
             ammo = trueParentUnit.ammo;
         }
         if(team != trueParentUnit.team) team = trueParentUnit.team;
-        if(!net.client() && !dead /*&& deactivated*/ && controller != null) controller.updateUnit();
+        if(!net.client() && !dead && controller != null) controller.updateUnit();
         if(controller == null || !controller.isValidController()) resetController();
-        updateStatus();
         updateWeapon();
+        updateStatus();
     }
 
     protected void updateStatus(){
@@ -284,6 +283,11 @@ public class WormSegmentUnit extends UnitEntity{
         Draw.rect(region, this, rotation - 90);
         TextureRegion segCellReg = wormType.getSegmentCell();
         if(segCellReg != atlas.find("error") && segmentType == 0) drawCell(segCellReg);
+        TextureRegion outline = wormType.segmentOutline == null || wormType.tailOutline == null ? null : segmentType == 0 ? wormType.segmentOutline : wormType.tailOutline;
+        if(outline != null){
+            Draw.z(Draw.z() - UnitType.outlineSpace);
+            Draw.rect(outline, this, rotation - 90f);
+        }
         Draw.reset();
     }
 

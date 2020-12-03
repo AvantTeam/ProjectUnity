@@ -35,10 +35,10 @@ public class SelectableReconstructor extends Reconstructor{
         });
         super.setStats();
         stats.add(Stat.output, table -> {
+            float size = 8f * 3f;
             table.row();
             table.add("[accent]T" + (minTier + 1)).row();
-            for(UnitType[] upgrade : otherUpgrades){
-                float size = 8f * 3f;
+            otherUpgrades.each(upgrade->{
                 if(upgrade[0].unlockedNow() && upgrade[1].unlockedNow()){
                     table.image(upgrade[0].icon(Cicon.small)).size(size).padRight(4f).padLeft(10f).scaling(Scaling.fit).right();
                     table.add(upgrade[0].localizedName).left();
@@ -47,7 +47,7 @@ public class SelectableReconstructor extends Reconstructor{
                     table.add(upgrade[1].localizedName).left();
                     table.row();
                 }
-            }
+            });
         });
     }
 

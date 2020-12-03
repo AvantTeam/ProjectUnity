@@ -81,7 +81,7 @@ public class Teleporter extends Block{
     @Override
     public void drawRequestConfigCenter(BuildPlan req, Object content, String region){
         if(!(content instanceof Integer)) return;
-        int temp = (int) content;
+        int temp = (int)content;
         Draw.color(selection[temp]);
         Draw.rect(blankRegion, req.drawx(), req.drawy());
     }
@@ -113,7 +113,7 @@ public class Teleporter extends Block{
                 Draw.rect(blankRegion, x, y);
             }
             Draw.color(Color.white);
-            Draw.alpha(0.45f + Mathf.absin(Time.time(), 7f, 0.26f));
+            Draw.alpha(0.45f + Mathf.absin(Time.time, 7f, 0.26f));
             Draw.rect(topRegion, x, y);
             Draw.reset();
         }

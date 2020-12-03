@@ -8,14 +8,14 @@ import mindustry.gen.Groups;
 import mindustry.world.blocks.defense.turrets.*;
 import unity.entities.bullet.ShieldBulletType;
 
-public class ShieldTurret extends ChargeTurret{
+public class ShieldTurret extends PowerTurret{
 
     public ShieldTurret(String name){
         super(name);
         // nothing for now
     }
 
-    public class ShieldTurretBuild extends ChargeTurretBuild{
+    public class ShieldTurretBuild extends PowerTurretBuild{
         public boolean shield;
 
         @Override

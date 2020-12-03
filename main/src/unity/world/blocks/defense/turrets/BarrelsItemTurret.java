@@ -7,6 +7,7 @@ import arc.math.geom.Vec2;
 import mindustry.entities.bullet.BulletType;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
 
+import static arc.Core.atlas;
 import static mindustry.Vars.tilesize;
 
 public class BarrelsItemTurret extends ItemTurret{
@@ -20,6 +21,12 @@ public class BarrelsItemTurret extends ItemTurret{
 
     protected void addBarrel(float x, float y, float reloadTime){
         barrels.add(new Barrel(x, y, reloadTime));
+    }
+
+    @Override
+    public void load(){
+        super.load();
+        baseRegion = atlas.find("unity-block-" + size);
     }
 
     protected class Barrel{

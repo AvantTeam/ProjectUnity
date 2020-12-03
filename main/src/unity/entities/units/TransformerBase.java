@@ -10,7 +10,7 @@ public interface TransformerBase extends Unitc{
     float getTimeTrans();
 
     default void transUpdate(){
-        TransUnitType temp = (TransUnitType) type();
+        TransUnitType temp = (TransUnitType)type();
         float current = getTimeTrans();
         if(floorOn().isLiquid && !(floorOn() instanceof ShallowLiquid) ^ self() instanceof WaterMovec){
             if(current < 0f || current > temp.transformTime){

@@ -55,7 +55,7 @@ public class LightFilter extends Block{
     public void drawRequestConfig(BuildPlan req, Eachable<BuildPlan> list){
         if(req.config == null) return;
         final float scl = tilesize * req.animScale;
-        Draw.color(colors[(int) req.config], 0.7f);
+        Draw.color(colors[(int)req.config], 0.7f);
         Draw.rect(lightRegion, req.drawx(), req.drawy(), scl, scl);
         Draw.color();
     }

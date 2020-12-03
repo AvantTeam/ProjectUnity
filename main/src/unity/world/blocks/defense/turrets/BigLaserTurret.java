@@ -6,6 +6,8 @@ import arc.math.Interp;
 import arc.util.Tmp;
 import mindustry.world.blocks.defense.turrets.LaserTurret;
 
+import static arc.Core.atlas;
+
 public class BigLaserTurret extends LaserTurret{
     protected static Interp pow6In = new Interp.PowIn(6);
 
@@ -24,5 +26,11 @@ public class BigLaserTurret extends LaserTurret{
             Draw.color();
             Draw.blend();
         };
+    }
+
+    @Override
+    public void load(){
+        super.load();
+        baseRegion = atlas.find("unity-block-" + size);
     }
 }
