@@ -99,15 +99,9 @@ public final class Funcs{
         int ty = World.toTile(wy);
         int tileRange = Mathf.floorPositive(range / tilesize + 1);
 
-<<<<<<< HEAD
-        for(int x = -tileRange + tx; x <= tileRange + tx; x++){
-            for(int y = -tileRange + ty; y <= tileRange + ty; y++){
-                if(!Mathf.within((float)(x * tilesize), (float)(y * tilesize), wx, wy, range)) continue;
-=======
         for(int x = -tileRange + tx, lenX = tileRange + tx; x <= lenX; x++){
             for(int y = -tileRange + ty, lenY = tileRange + ty; y <= lenY; y++){
                 if(!Mathf.within(x * tilesize, y * tilesize, wx, wy, range)) continue;
->>>>>>> aec6704b146ba1e1b86e1b51394a952472196445
                 Building other = world.build(x, y);
 
                 if(other == null) continue;
