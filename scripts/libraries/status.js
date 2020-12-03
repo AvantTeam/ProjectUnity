@@ -16,6 +16,14 @@
 darkenHealth.damage = 2;
 darkenHealth.opposite(StatusEffects.freezing);*/
 
+const blueBurnFx = new Effect(35, e => {
+    Draw.color(Pal.lancerLaser, Color.valueOf("4f72e1"), e.fin());
+
+    Angles.randLenVectors(e.id, 3, 2 + e.fin() * 7, (x, y) => {
+        Fill.circle(e.x + x, e.y + y, 0.1 + e.fout() * 1.4);
+    });
+});
+
 const radiationL = extendContent(StatusEffect, "radiation", {
 	update(unit, time){
 		this.super$update(unit, time);
@@ -36,6 +44,19 @@ const radiationL = extendContent(StatusEffect, "radiation", {
 });
 radiationL.damage = 1.6;
 
+//const blueBurnL = new StatusEffect("blue-burn");
+const blueBurnL = extend(StatusEffect, "blue-burn", {});
+blueBurnL.damage = 0.14;
+blueBurnL.effect = blueBurnFx;
+blueBurnL.initblock = () => {
+    blueBurnL.opposite(StatusEffects.wet, StatusEffects.freezing);
+    blueBurnL.trans(StatusEffects.tarred, (unit, time, newTime, result) => {
+        unit.damagePierce(8);
+        blueBurnFx.at(unit.x() + Mathf.range(unit.bounds() / 2), unit.y() + Mathf.range(unit.bounds() / 2));
+        result.set(blueBurnL, Math.min(time + newTime, 400));
+    });
+};
+
 const reloadFatigueL = new StatusEffect("reload-fatigue");
 reloadFatigueL.reloadMultiplier = 0.75;
 
@@ -47,6 +68,7 @@ endgameDisableL.color = Color.valueOf("f53036");
 module.exports = {
 	//darkBurn: darkenHealth,
 	radiation: radiationL,
+    blueBurn: blueBurnL,
 	reloadFatigue: reloadFatigueL,
 	endgameDisable: endgameDisableL
 };

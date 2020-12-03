@@ -271,6 +271,36 @@ const scarRailHitL = new Effect(18, e => {
 });
 
 //end region
+//advance faction region
+
+const advanceA = Pal.lancerLaser;
+const advanceB = Color.valueOf("4f72e1");
+
+const hitAdvanceFlameL = new Effect(15, e => {
+	Draw.color(advanceA, advanceB, e.fin());
+	
+	Angles.randLenVectors(e.id, 2, e.finpow() * 17.0, e.rotation, 60.0, (x, y) => {
+        Fill.poly(e.x + x, e.y + y, 6, 3 + e.fout() * 3, e.rotation);
+    });
+});
+
+const advanceFlameTrailL = new Effect(27, e => {
+	Draw.color(advanceA, advanceB, e.fin());
+	
+	Fill.poly(e.x, e.y, 6, e.fout() * 4.1, e.rotation + e.fin() * 270);
+});
+
+const advanceFlameSmokeL = new Effect(13, e => {
+	Draw.color(Color.valueOf("4d668f77"), Color.valueOf("35455f00"), e.fin());
+	
+	//Fill.poly(e.x, e.y, 6, e.fout() * 7.1, e.rotation + e.fin() * 270);
+	
+	Angles.randLenVectors(e.id, 2, e.finpow() * 13.0, e.rotation, 60.0, (x, y) => {
+        Fill.poly(e.x + x, e.y + y, 6, e.fout() * 4.1, e.rotation + e.fin() * 270);
+    });
+});
+
+//end region
 
 module.exports = {
 	coloredSpark1: coloredSpark1L,
@@ -299,5 +329,9 @@ module.exports = {
 	
 	scarRailShoot: scarRailShootL,
 	scarRailTrail: scarRailTrailL,
-	scarRailHit: scarRailHitL
+	scarRailHit: scarRailHitL,
+    
+    hitAdvanceFlame: hitAdvanceFlameL,
+    advanceFlameTrail: advanceFlameTrailL,
+    advanceFlameSmoke: advanceFlameSmokeL
 };

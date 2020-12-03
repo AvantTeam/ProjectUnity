@@ -194,6 +194,18 @@ const script = [
             "darkwalls"
         ]
     },
+    
+    {
+        name: "advance",
+        childs: [
+            {
+                name: "turrets",
+                childs: [
+                    "celsius"
+                ]
+            }
+        ]
+    },
 
     {
         name: "imber",

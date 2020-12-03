@@ -1,0 +1,26 @@
+{
+	"health": 780,
+	"size": 1,
+	"reloadTime": 3,
+	"range": 47,
+	"shootCone": 50,
+	"heatColor": "CCFFFF",
+	"ammoUseEffect": "none",
+	"inaccuracy": 9.2,
+	"rotateSpeed": 7.5,
+	"shots": 2,
+	"spread": 6,
+	"recoil": 1,
+	"powerUse": 13.9,
+	"hasPower": true,
+	"targetAir": true,
+	"shootSound": "flame",
+	"cooldown": 0.01,
+	"requirements": [
+		{ "item": "silicon", "amount": 20 },
+		{ "item": "xenium", "amount": 15 },
+        { "item": "titanium", "amount": 30 },
+		{ "item": "advance-alloy", "amount": 25 }
+	],
+	"category": "turret"
+}
