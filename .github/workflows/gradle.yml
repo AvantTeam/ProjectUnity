@@ -18,6 +18,7 @@ jobs:
         java-version: 14
     - name: Build mod jar
       run: |
+        chmod +x gradlew
         ./gradlew tools:processSprites
         ./gradlew main:deploy
     - name: Upload built jar file
