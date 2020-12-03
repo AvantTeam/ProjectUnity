@@ -57,7 +57,7 @@ public final class Funcs{
 
         for(int x = -tileRange + tx; x <= tileRange + tx; x++){
             for(int y = -tileRange + ty; y <= tileRange + ty; y++){
-                if(!Mathf.within(x * tilesize, y * tilesize, wx, wy, range)) continue;
+                if(!Mathf.within((float)(x * tilesize), (float)(y * tilesize), wx, wy, range)) continue;
                 Building other = world.build(x, y);
 
                 if(other == null) continue;

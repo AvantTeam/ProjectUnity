@@ -54,3 +54,10 @@ task deploy(type: Jar){
         delete{ delete "$buildDir/libs/${modName}Android.jar" }
     }
 }
+
+dependencies{
+    compileOnly "com.github.Anuken.Arc:arc-core:$mindustryVersion"
+    compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
+
+    implementation "com.github.younggam:multi-lib:$multilibVersion"
+}
