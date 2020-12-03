@@ -201,7 +201,8 @@ const script = [
             {
                 name: "turrets",
                 childs: [
-                    "celsius"
+                    "celsius",
+                    "kelvin"
                 ]
             }
         ]
