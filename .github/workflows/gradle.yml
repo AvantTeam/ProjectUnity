@@ -19,10 +19,10 @@ jobs:
     - name: Build mod jar
       run: |
         chmod +x ./gradlew
-        ./gradlew tools:processSprites
-        ./gradlew jar
+        ./gradlew clean tools:processSprites
+        ./gradlew clean main:deploy
     - name: Upload built jar file
       uses: actions/upload-artifact@v2
       with:
         name: ${{ steps.get-repo-name.outputs.RESULT }}
-        path: main/build/libs/${{ steps.get-repo-name.outputs.RESULT }}Desktop.jar
+        path: main/build/libs/${{ steps.get-repo-name.outputs.RESULT }}.jar
