@@ -1,14 +1,15 @@
 package unity.mod;
 
-import arc.Events;
-import arc.audio.Music;
-import arc.func.Cons;
-import arc.struct.Seq;
-import mindustry.ctype.ContentType;
-import mindustry.game.EventType.SectorLaunchEvent;
+import arc.*;
+import arc.audio.*;
+import arc.func.*;
+import arc.struct.*;
+import mindustry.ctype.*;
+import mindustry.game.EventType.*;
 
 import static mindustry.Vars.*;
 
+@SuppressWarnings("unused")
 public class UnityMusics{
     private static Seq<Music> ambientMusic, darkMusic, bossMusic, monolithDarkMusics;
     private static Seq<Cons<SectorLaunchEvent>> listeners = new Seq<>();
@@ -18,7 +19,7 @@ public class UnityMusics{
     }
 
     private static void addMusic(Seq<Music> category, String planet, Music... musics){
-        if(planet == "global"){
+        if(planet.equals("global")){
             for(Music music : musics){
                 if(!category.contains(music)) category.add(music);
             }
@@ -37,13 +38,12 @@ public class UnityMusics{
         });
     }
 
-    public static void load(){
+    static{
         ambientMusic = control.sound.ambientMusic;
         darkMusic = control.sound.darkMusic;
         bossMusic = control.sound.bossMusic;
         addMusic(darkMusic, "megalith", loadMusic("monolith-dark1"), loadMusic("monolith-dark2"));
-        Events.on(SectorLaunchEvent.class, e -> {
-            listeners.each(cons -> cons.get(e));
-        });
+
+        Events.on(SectorLaunchEvent.class, e -> listeners.each(cons -> cons.get(e)));
     }
 }

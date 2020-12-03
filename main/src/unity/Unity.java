@@ -1,6 +1,5 @@
 package unity;
 
-import java.util.Arrays;
 import arc.*;
 import arc.func.*;
 import arc.scene.ui.layout.*;
@@ -17,7 +16,7 @@ import unity.mod.*;
 import unity.mod.ContributorList.*;
 
 public class Unity extends Mod{
-    public final String githubURL = "https://github.com/EyeOfDarkness/ProjectUnity";
+    public static final String githubURL = "https://github.com/EyeOfDarkness/ProjectUnity";
 
     private final ContentList[] unityContent = {
         new UnityItems(),
@@ -92,10 +91,6 @@ public class Unity extends Mod{
 
     @Override
     public void loadContent(){
-        try{
-            UnityMusics.load();
-            UnitySounds.load();
-        }catch(Exception e){}
         for(ContentList list : unityContent){
             try{
                 list.load();
@@ -105,9 +100,5 @@ public class Unity extends Mod{
                 Log.err("Error loading @ content(s): @", getClass().getSimpleName(), e.getMessage());
             }
         }
-    }
-
-    public static void print(Object... objects){
-        Vars.mods.getScripts().log("unity", Arrays.toString(objects));
     }
 }

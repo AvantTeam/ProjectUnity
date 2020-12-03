@@ -6,6 +6,7 @@ import mindustry.world.blocks.environment.Floor;
 
 import static mindustry.content.Blocks.*;
 
+@SuppressWarnings("unchecked")
 public class OverWriter implements ContentList{
     public <T extends UnlockableContent> void forceOverWrite(UnlockableContent target, Cons<T> setter){
         setter.get((T)target);

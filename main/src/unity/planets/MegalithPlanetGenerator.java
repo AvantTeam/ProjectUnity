@@ -3,21 +3,15 @@ package unity.planets;
 import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
-import arc.struct.*;
 import arc.util.*;
 import arc.util.noise.*;
-import mindustry.ai.*;
-import mindustry.ai.BaseRegistry.*;
 import mindustry.content.*;
-import mindustry.game.*;
 import mindustry.maps.generators.*;
 import mindustry.world.*;
 
 import static mindustry.content.Blocks.*;
-import static mindustry.Vars.*;
 
 public class MegalithPlanetGenerator extends PlanetGenerator{
-    Simplex noise = new Simplex();
     RidgedPerlin rid = new RidgedPerlin(1, 2);
     BaseGenerator basegen = new BaseGenerator();
     float scl = 6f;
