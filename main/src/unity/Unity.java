@@ -101,4 +101,9 @@ public class Unity extends Mod{
             }
         }
     }
+    //still don't want to import-unimport Log.java everytime i debug.
+    //unity.Unity.print(); for copypaste
+    public static void print(Object... args){
+        Log.info("[unity]: ", args);
+    }
 }
