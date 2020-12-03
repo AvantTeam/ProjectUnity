@@ -159,7 +159,6 @@ function getStackedBarChart(pheight, datafunction, partsImage) {
 
 const blueprintCol = Color.valueOf("354654");
 const bgCol = Color.valueOf("323232");
-const costaccumrate = 0.2;
 
 const colorPorts = [];
 for (let i = 0; i < 100; i++) {
@@ -172,6 +171,7 @@ const modularConstructorUI = {
 	_partsSelect: null,
 	_costAccum: 1.0,
 	_onTileAction: null,
+	_costaccumrate: 0.2,
 	_PartList: [],
 	_RootList: [],
 	//just store in list instead of grid h.
@@ -375,7 +375,7 @@ const modularConstructorUI = {
 			}
 		}
 		this.rebuildFromRoots();
-		this._costAccum -= costaccumrate * prt.tw * prt.th;
+		this._costAccum -= this._costaccumrate * prt.tw * prt.th;
 		return true;
 	},
 	placeTile(partType, x, y) {
@@ -434,7 +434,7 @@ const modularConstructorUI = {
 		}
 		this._PartList.push(partPlaceobj);
 		this.rebuildFromRoots();
-		this._costAccum += costaccumrate * partType.tw * partType.th;
+		this._costAccum += this._costaccumrate * partType.tw * partType.th;
 		return true;
 	},
 	onIsClicked(event, x, y, point, butt) {
@@ -507,7 +507,7 @@ const modularConstructorUI = {
 				if (!cst[p[cstitem].name]) {
 					cst[p[cstitem].name] = 0;
 				}
-				cst[p[cstitem].name] += Math.floor(p[cstitem].amount * (this._costAccum - costaccumrate));
+				cst[p[cstitem].name] += Math.floor(p[cstitem].amount * (this._costAccum - this._costaccumrate));
 			}
 		}
 		return cst;
@@ -593,6 +593,9 @@ const modularConstructorUI = {
 	getCostAccum() {
 		return this._costAccum;
 	},
+	setCostAccum(s) {
+		this._costAccum=s;
+	},
 	setPartsSprite(s) {
 		this._partsSprite = s;
 	},
@@ -600,17 +603,19 @@ const modularConstructorUI = {
 		print("PART SELECT:" + s.name);
 		this._partsSelect = s;
 	},
+	
 	setPreconfig(s) {
 		//this._partsSprite = s;
 	},
 }
 
-function getModularConstructorUI(pheight, partssprite, partsConfig, preconfig, maxw, maxh) {
+function getModularConstructorUI(pheight, partssprite, partsConfig, preconfig, maxw, maxh,cstacc) {
 	let pp = extend(Element, Object.create(deepCopy(modularConstructorUI)));
 	pp.init();
 	pp.setPrefHeight(pheight);
 	pp.setPartsSprite(partssprite);
 	pp.setGridSize(maxw, maxh);
+	pp.setCostAccum(cstacc);
 	if (!preconfig || !preconfig.length) {
 		for (let i = 0; i < partsConfig.length; i++) {
 			let pinfo = partsConfig[i];
@@ -692,13 +697,13 @@ function _assignPartSprties(partsConfig,partssprite, spritew, spriteh){
 	}
 }
 
-function applyModularConstructorUI(table, partssprite, spritew, spriteh, partsConfig, maxw, maxh, preconfig, categories) {
+function applyModularConstructorUI(table, partssprite, spritew, spriteh, partsConfig, maxw, maxh, preconfig, categories,cstaccum) {
 	//preinit
 	_preCalcConnection(partsConfig);
 	_assignPartSprties(partsConfig,partssprite,spritew,spriteh);
 	let currentCat = "";
 
-	let modelement = getModularConstructorUI(400, partssprite, partsConfig, preconfig, maxw, maxh);
+	let modelement = getModularConstructorUI(400, partssprite, partsConfig, preconfig, maxw, maxh,cstaccum);
 	let itemcache = {};
 
 	let partSelectCons = cons((scrolltbl) => {
@@ -828,6 +833,7 @@ const _ModularBlock = {
 	_autoBuildDelay: 10,
 	_spriteGridSize:32,
 	_spriteGridPadding:0,
+	_partCostAccum:0.2,
 	getSpriteGridSize(){
 		return this._spriteGridSize;
 	},
@@ -851,6 +857,13 @@ const _ModularBlock = {
 	},
 	setGridHeight(s) {
 		this.gridH = Math.min(16, s);
+	},
+	
+	getCostAccum() {
+		return this._partCostAccum;
+	},
+	setCostAccum(s) {
+		this._partCostAccum = s;
 	},
 
 	setConfigs() {
@@ -952,7 +965,7 @@ const _ModularBuild = {
 	updateAutoBuild(){
 		if (this._totalItemCountPaid >= this._totalItemCountCost) {return;}
 		let rc = this._blueprintRemainingCost;
-		if(this.team.rules().infiniteResources){
+		if(Vars.state.rules.infiniteResources || this.team.rules().infiniteResources || this.team.rules().cheat){
 			for (let i in rc) {
 				rc[i].paid=rc[i].total; 
 			}
@@ -1023,7 +1036,8 @@ const _ModularBuild = {
 							this.block.getGridWidth(),
 							this.block.getGridHeight(),
 							this._blueprint,
-							this.getPartsCatagories());
+							this.getPartsCatagories(),
+							this.block.getCostAccum());
 					dialog.buttons.button("@ok", () => {
 						this.configure(mtd.getPackedSave());
 						dialog.hide();
@@ -1056,6 +1070,7 @@ const _ModularBuild = {
 		this.resetStats();
 		let totalcst = {};
 		let cstmult = 1;
+		let costaccumrate = this.block.getCostAccum();
 		for (var p = 0; p < this._blueprint.length; p++) {
 			if (this._blueprint[p] != 0) {
 				var partL = this.getPartsConfig()[this._blueprint[p] - 1];
@@ -1397,6 +1412,9 @@ function getBulletTypeFromConfig(config) {
 	//frag bullets
 	bullet.fragBullet = config.fragBullet ? config.fragBullet.get() : null;
 	bullet.fragBullets = config.fragBullets ? config.fragBullets : 0;
+	bullet.lightningDamage = config.lightningDamage ? config.lightningDamage :-1;
+    bullet.lightning = config.lightning ? config.lightning :0;
+    bullet.lightningLength = config.lightningLength ? config.lightningLength :10;
 	return bullet;
 
 }
@@ -1439,6 +1457,20 @@ function mergeStats(tos, froms){
 }
 
 const _TurretModularBlock = Object.assign(deepCopy(_ModularBlock),{
+	yshift:0,
+	yscale:1,
+	setSpriteYshift(s){
+		this.yshift=s;
+	},
+	getSpriteYshift(){
+		return this.yshift;
+	},
+	setSpriteYscale(s){
+		this.yscale=s;
+	},
+	getSpriteYscale(){
+		return this.yscale;
+	},
 	setStatsExt() {
 		const sV = new StatValue({
             display(table) {
@@ -1461,6 +1493,7 @@ const _TurretModularBlock = Object.assign(deepCopy(_ModularBlock),{
         });
 		this.stats.add(Stat.ammo,sV);
 	},
+	
 });
 
 function getPart(config,name){
@@ -1850,7 +1883,7 @@ const _TurretModularBuild = Object.assign(deepCopy(_ModularBuild), {
 					let oy= this.block.getSpriteGridPadding();
 					let scl = this.block.getSpriteGridSize();
 					let dx = ox+(x+part.tw*0.5)*scl;	
-					let dy = oy+(y+part.th*0.5)*scl*0.8;
+					let dy = oy+(y+part.th*0.5+this.block.getSpriteYshift())*scl* this.block.getSpriteYscale();
 					Draw.rect(part.texRegion, dx, dy, scl,scl);
 				}
 			}
@@ -1871,7 +1904,7 @@ const _TurretModularBuild = Object.assign(deepCopy(_ModularBuild), {
 							continue;
 						}
 						let x = ox+(gx+p.tw*0.5)*scl;	
-						let y = oy+(gy+p.th*0.5)*scl*0.8;
+						let y = oy+(gy+p.th*0.5+this.block.getSpriteYshift())*scl* this.block.getSpriteYscale();
 						if(p.sloped){
 							
 						}else{
@@ -1888,7 +1921,7 @@ const _TurretModularBuild = Object.assign(deepCopy(_ModularBuild), {
 					if(grid[gx][gy]){
 						let p = this.getPartsConfig()[grid[gx][gy]-1];
 						let x = ox+(gx+p.tw*0.5)*scl;	
-						let y = oy+(gy+p.th*0.5)*scl*0.8;
+						let y = oy+(gy+p.th*0.5+this.block.getSpriteYshift())*scl* this.block.getSpriteYscale();
 						if(p.baseSprite && (p.category=="ammo"||p.category=="misc")){
 							Draw.rect(p.baseSprite, x, y,p.baseSprite.width,p.baseSprite.height);
 						}
@@ -1930,8 +1963,23 @@ const _TurretModularBuild = Object.assign(deepCopy(_ModularBuild), {
 		drawSelect(){
             Drawf.dashCircle(this.x, this.y, this.turretRange, this.team.color);
         },
+		aniprog: 0,
+		anitime: 0,
+		anispeed: 0,
 		drawExt(){},
 		draw(){
+			this.anitime += Time.delta;
+			var prog = this.getPaidRatio();
+			if(this.aniprog < prog) {
+				this.anispeed = (prog - this.aniprog) * 0.1;
+				this.aniprog += this.anispeed;
+			}
+			else {
+				this.aniprog = prog;
+				this.anispeed = 0;
+			}
+			
+			
 			this.drawExt();
 			let turretSprite = this.getBufferRegion();
 			if(turretSprite) {
@@ -1943,8 +1991,8 @@ const _TurretModularBuild = Object.assign(deepCopy(_ModularBuild), {
 					let ov2 = turretSprite.v2;
 					turretSprite.setU2(Mathf.map(this.aniprog, 0, 1, ou + 0.5*(ou2-ou), ou2));
 					turretSprite.setU(Mathf.map(this.aniprog, 0, 1, ou+ 0.5*(ou2-ou), ou));
-					turretSprite.setV2(Mathf.map(this.aniprog, 0, 1, ov+ 0.5*(ov2-ou), ov2));
-					turretSprite.setV(Mathf.map(this.aniprog, 0, 1, ov+ 0.5*(ov2-ou), ov));
+					turretSprite.setV2(Mathf.map(this.aniprog, 0, 1, ov+ 0.5*(ov2-ov), ov2));
+					turretSprite.setV(Mathf.map(this.aniprog, 0, 1, ov+ 0.5*(ov2-ov), ov));
 				}
 				var that = this;
 				if(this.getPaidRatio() < 1) {

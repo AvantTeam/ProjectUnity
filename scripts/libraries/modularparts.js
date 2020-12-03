@@ -165,7 +165,7 @@ const smallParts = [
 			},
 			heat: {
                 name: "stat.unity.heatPerShot",
-                value: 350,
+                value: 200,
             },
 			
         },
@@ -250,7 +250,7 @@ const smallParts = [
             },
 			heat: {
                 name: "stat.unity.heatPerShot",
-                value: 500,
+                value: 300,
             },
 			
         },
@@ -587,9 +587,171 @@ const smallParts = [
 	
 	
 ];
+const medParts = [
+	{
+        name: "Small adapter",
+        desc: "Allows small gun bases to connect to medium slots",
+        category: "misc",
+        tx: 0,
+        ty: 4,
+        tw: 3,
+        th: 1,
+        cost: [
+			{
+                name: "unity-nickel",
+                amount: 10
+            },
+			{
+                name: "graphite",
+                amount: 20
+            },
+            {
+                name: "titanium",
+                amount: 15
+            },
+		],
+        connectOut: [0, 1,0,1,  0, 0,0,0],
+        connectIn: [0, 0,0,0,  0, 0,10,0],
+        stats: {
+            hp: {
+                name: "stat.unity.hpinc",
+                value: 10,
+            },
+        }
+    },
+	{
+        name: "Large Gun base",
+        desc: "A large gun base, not finished.",
+        category: "base",
+        tx: 0,
+        ty: 2,
+        tw: 1, 
+        th: 1,
+        cost: [
+			{
+                name: "unity-nickel",
+                amount: 20
+            },
+            {
+                name: "titanium",
+                amount: 15
+            },
+			{
+                name: "unity-cupronickel",
+                amount: 15
+            },
+		],
+        connectOut: [5, 12, 5, 0],
+        connectIn: [0, 0, 0, 10],
+        stats: {
+            hp: {
+                name: "stat.unity.hpinc",
+                value: 10,
+            },
+			support: {
+                name: "stat.unity.supports",
+                value: "[accent]1x [white]large turret",
+            },
+			reload: {
+				name: "stat.unity.reload",
+				value: 20,
+			},
+			heatAccumMult: {
+                name: "stat.unity.heatAccumMult",
+                value: 1.0,
+            },
+        }
 
+    },
+	{
+        name: "Large Cannon breach",
+        desc: "Accepts and fires large shells",
+        category: "breach",
+        tx: 3,
+        ty: 4,
+        tw: 1,
+        th: 2,
+        cost: [
+			{
+                name: "titanium",
+                amount: 30
+            },
+			{
+                name: "graphite",
+                amount: 25
+            },
+			{
+                name: "unity-nickel",
+                amount: 15
+            },
+		],
+        connectOut: [0,0, 3, 0,0 ,0],
+        connectIn: [0,0, 0, 0,0, 12],
+        stats: {
+            hp: {
+                name: "stat.unity.hpinc",
+                value: 50,
+            },
+			bulletType: {
+                name: "stat.unity.bulletType",
+                value: "shell",
+            },
+			baseDmg:{
+				name: "stat.unity.bulletDmg",
+                value: 180,
+			},
+			baseSpeed:{
+				name: "stat.unity.bulletSpd",
+                value: 12,
+			},
+			ammoType:{
+				name: "stat.unity.ammoType",
+                value: "heavy",
+			},
+			payload:{
+				name: "stat.unity.payload",
+                value: 6,
+			},
+			magazine:{
+				name: "stat.unity.magazine",
+                value: 1,
+			},
+			shots:{
+				name: "stat.unity.shots",
+                value: 1,
+			},
+			reloadMultiplier:{
+				name: "stat.unity.reloadMult",
+                value: 4,
+			},
+			spread:{
+				name: "stat.unity.spread",
+                value: 6,
+			},
+			lifetime:{
+				name: "stat.unity.lifetime",
+                value: 30,
+			},
+			mod: {
+                name: "stat.unity.mod",
+                value: "Piercing",
+				cons: cons((config)=>{
+					config.pierce = 2;
+				})
+            },
+			heat: {
+                name: "stat.unity.heatPerShot",
+                value: 3000,
+            },
+			
+        },
+		
+
+    },
+]
 
 modturretlib.preCalcConnection(smallParts);
+modturretlib.preCalcConnection(medParts);
 
 const basicBase = {
 	onShoot(){
@@ -664,11 +826,12 @@ const rotaryBase = {
 
 modturretlib.TurretBaseUpdater.attachBaseUpdater(smallParts,"Gun base",basicBase);
 modturretlib.TurretBaseUpdater.attachBaseUpdater(smallParts,"Rotary Gun base",rotaryBase);
-
+modturretlib.TurretBaseUpdater.attachBaseUpdater(medParts,"Large Gun base",basicBase);
 
 
 const partTierCategory={
 	small: smallParts,
+	medium: medParts,
 }
 
 
@@ -768,8 +931,13 @@ function loadAllSprites(){
 	getPart(smallParts,"Radiator").baseSprite = Core.atlas.find("unity-part-rad");
 	getPart(smallParts,"Armour Plate").shadowSprite = Core.atlas.find("unity-part-aplate-outline");
 	getPart(smallParts,"Armour Plate").baseSprite = Core.atlas.find("unity-part-aplate");
-	print("sprite died");
-	print(getPart(smallParts,"Armour Plate").baseSprite);
+	
+	getPart(medParts,"Small adapter").baseSprite = Core.atlas.find("unity-part-small-adapter");
+	getPart(medParts,"Small adapter").shadowSprite = Core.atlas.find("unity-part-small-adapter-outline");
+	getPart(medParts,"Large Cannon breach").shadowSprite =Core.atlas.find("unity-part-clbreach-outline");
+	getPart(medParts,"Large Cannon breach").baseSprite = Core.atlas.find("unity-part-clbreach");
+	getPart(medParts,"Large Gun base").shadowSprite =Core.atlas.find("unity-part-gbase-outline");
+	getPart(medParts,"Large Gun base").baseSprite = Core.atlas.find("unity-part-gbase");
 }
 
 Events.on(EventType.ClientLoadEvent, cons(e => {
