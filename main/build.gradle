@@ -23,12 +23,12 @@ task jarAndroid{
         def dependencies = files.collect{ "--classpath $it.path" }.join(" ")
 
         //dex and desugar files - this requires d8 in your PATH
-        doExec("d8 $dependencies --min-api 14 --output ${modName}Android.jar ${modName}Desktop.jar")
+        doExec("d8 $dependencies --min-api 14 --output ${modName}Android.jar ${modName}.jar")
     }
 }
 
 jar{
-    archiveFileName = "${modName}Desktop.jar"
+    archiveFileName = "${modName}.jar"
 
     from {configurations.runtimeClasspath.collect{ it.isDirectory() ? it : zipTree(it) }}
 
@@ -47,10 +47,10 @@ task deploy(type: Jar){
     dependsOn jar
     archiveFileName = "${modName}.jar"
 
-    from{ [zipTree("$buildDir/libs/${modName}Desktop.jar"), zipTree("$buildDir/libs/${modName}Android.jar")] }
+    from{ [zipTree("$buildDir/libs/${modName}.jar"), zipTree("$buildDir/libs/${modName}Android.jar")] }
 
     doLast{
-        delete{ delete "$buildDir/libs/${modName}Desktop.jar" }
+        delete{ delete "$buildDir/libs/${modName}.jar" }
         delete{ delete "$buildDir/libs/${modName}Android.jar" }
     }
 }
