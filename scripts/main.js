@@ -90,6 +90,7 @@ const script = [
             "cruciblelib",
             "turretmodui",
 			"modularparts",
+      "sparkle"
         ]
     },
 
@@ -190,11 +191,11 @@ const script = [
                     "darkalloyfactory"
                 ]
             },
-            
+
             "darkwalls"
         ]
     },
-    
+
     {
         name: "advance",
         childs: [
