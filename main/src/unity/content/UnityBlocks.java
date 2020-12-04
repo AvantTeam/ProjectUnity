@@ -885,7 +885,7 @@ public class UnityBlocks implements ContentList{
                     Draw.blend(Blending.additive);
                     Draw.color(1f, Mathf.absin(Time.time, 5f, 0.5f) + 0.5f, Mathf.absin(Time.time + 90f * Mathf.radDeg, 5f, 0.5f) + 0.5f, e.warmup);
                     Draw.rect(dataRegions[0], e.x, e.y);
-                    float b = (Mathf.absin(Time.time, 8f, 0.25f) + 0.7f) * e.warmup;
+                    float b = (Mathf.absin(Time.time, 8f, 0.25f) + 0.75f) * e.warmup;
                     Draw.color(1f, b, b, b);
                     Draw.rect(topRegion, e.x, e.y);
                     Draw.blend();

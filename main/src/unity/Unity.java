@@ -19,16 +19,16 @@ public class Unity extends Mod{
     public static final String githubURL = "https://github.com/EyeOfDarkness/ProjectUnity";
     //don't know how to indent this
     private final ContentList[] unityContent = {
-    new UnityItems(),
-    new OverWriter(),
-    new UnityStatusEffects(),
-    new UnityLiquids(),
-    new UnityBullets(),
-    new UnityUnitTypes(),
-    new UnityBlocks(),
-    new UnityPlanets(),
-    new UnitySectorPresets(),
-    new UnityTechTree(),
+        new UnityItems(),
+        new OverWriter(),
+        new UnityStatusEffects(),
+        new UnityLiquids(),
+        new UnityBullets(),
+        new UnityUnitTypes(),
+        new UnityBlocks(),
+        new UnityPlanets(),
+        new UnitySectorPresets(),
+        new UnityTechTree()
     };
 
     public Unity(){

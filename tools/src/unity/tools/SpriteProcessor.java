@@ -40,8 +40,7 @@ public class SpriteProcessor{
 
         try{
             mod.loadContent();
-        }catch(StackOverflowError e){
-        }
+        }catch(StackOverflowError e){}
 
         content.setCurrentMod(null);
 

@@ -23,7 +23,7 @@ public class UnityFx{
     private static int integer;
     public static final Effect
 
-    shootSmallBlaze = new Effect(22f, e -> {
+        shootSmallBlaze = new Effect(22f, e -> {
         color(Pal.lightFlame, Pal.darkFlame, Pal.gray, e.fin());
         randLenVectors(e.id, 16, e.finpow() * 60f, e.rotation, 18f, (x, y) -> {
             Fill.circle(e.x + x, e.y + y, 0.85f + e.fout() * 3.5f);
@@ -352,7 +352,6 @@ public class UnityFx{
             color(Pal.lancerLaser, fout * 0.4f);
             Fill.circle(e.x, e.y, finpow * 180f);
         }
-        ;
     }),
 
     evaporateDeath = new Effect(64f, 800f, e -> {

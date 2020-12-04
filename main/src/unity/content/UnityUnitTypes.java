@@ -23,18 +23,18 @@ import static mindustry.type.ItemStack.*;
 
 public class UnityUnitTypes implements ContentList{
     private static final Prov<?>[] constructors = new Prov[]{
-    CopterUnit::new,
-    WormSegmentUnit::new,
-    WormDefaultUnit::new,
-    TransUnitWaterMove::new,
-    TransLegsUnit::new
+        CopterUnit::new,
+        WormSegmentUnit::new,
+        WormDefaultUnit::new,
+        TransUnitWaterMove::new,
+        TransLegsUnit::new
     };
 
     private static final int[] classIDs = new int[constructors.length];
 
     public static UnitType
-    //flying-units
-    caelifera, schistocerca, anthophila, vespula, lepidoptera, angel, malakhim,
+        //flying-units
+        caelifera, schistocerca, anthophila, vespula, lepidoptera, angel, malakhim,
 
     //ground-units
     arcaetana, projectSpiboss,
@@ -1427,29 +1427,29 @@ public class UnityUnitTypes implements ContentList{
         //reconstructors
 
         ((Reconstructor)Blocks.additiveReconstructor).upgrades.add(
-        //global
-        new UnitType[]{caelifera, schistocerca},
-        new UnitType[]{amphibiNaval, craberNaval},
+            //global
+            new UnitType[]{caelifera, schistocerca},
+            new UnitType[]{amphibiNaval, craberNaval},
 
-        //monolith
-        new UnitType[]{stele, pedestal});
+            //monolith
+            new UnitType[]{stele, pedestal});
 
         ((Reconstructor)Blocks.multiplicativeReconstructor).upgrades.add(
-        //global
-        new UnitType[]{schistocerca, anthophila},
+            //global
+            new UnitType[]{schistocerca, anthophila},
 
-        //monolith
-        new UnitType[]{pedestal, pilaster});
+            //monolith
+            new UnitType[]{pedestal, pilaster});
 
         ((Reconstructor)Blocks.exponentialReconstructor).upgrades.add(
-        //global
-        new UnitType[]{anthophila, vespula},
+            //global
+            new UnitType[]{anthophila, vespula},
 
-        //monolith
-        new UnitType[]{pilaster, pylon});
+            //monolith
+            new UnitType[]{pilaster, pylon});
 
         ((Reconstructor)Blocks.tetrativeReconstructor).upgrades.add(
-        //global
-        new UnitType[]{vespula, lepidoptera});
+            //global
+            new UnitType[]{vespula, lepidoptera});
     }
 }

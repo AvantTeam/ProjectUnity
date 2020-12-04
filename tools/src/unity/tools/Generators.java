@@ -2,7 +2,7 @@ package unity.tools;
 
 public class Generators{
     public static final Generator[] generators = {
-    new IconGenerator()
+        new IconGenerator()
     };
 
     public static void generate(){

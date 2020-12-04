@@ -24,20 +24,20 @@ public class ElectrodePlanetGenerator extends PlanetGenerator{
     float waterOffset = 0.07f;
 
     Block[][] arr = {
-    {metalFloor2, metalFloorDamaged, darkMetal, deepwater, metalFloorDamaged, deepwater, metalFloorDamaged, deepwater, deepwater, metalFloorDamaged, ice, ice, ice},
-    {metalFloor2, ice, deepwater, deepwater, metalFloorDamaged, darkMetal, deepwater, metalFloorDamaged, deepwater, darkMetal, metalFloorDamaged, ice, ice},
-    {water, metalFloor2, darksand, darkMetal, deepwater, deepwater, darkMetal, deepwater, deepwater, deepwater, metalFloorDamaged, metalFloorDamaged, ice},
-    {water, metalFloor2, metalFloor2, darkMetal, darksand, darksand, darkMetal, deepwater, darkMetal, deepwater, darkMetal, deepwater, metalFloorDamaged},
+        {metalFloor2, metalFloorDamaged, darkMetal, deepwater, metalFloorDamaged, deepwater, metalFloorDamaged, deepwater, deepwater, metalFloorDamaged, ice, ice, ice},
+        {metalFloor2, ice, deepwater, deepwater, metalFloorDamaged, darkMetal, deepwater, metalFloorDamaged, deepwater, darkMetal, metalFloorDamaged, ice, ice},
+        {water, metalFloor2, darksand, darkMetal, deepwater, deepwater, darkMetal, deepwater, deepwater, deepwater, metalFloorDamaged, metalFloorDamaged, ice},
+        {water, metalFloor2, metalFloor2, darkMetal, darksand, darksand, darkMetal, deepwater, darkMetal, deepwater, darkMetal, deepwater, metalFloorDamaged},
 
-    {deepwater, water, metalFloor2, darksand, darksand, darkMetal, darkMetal, darkMetal, darkMetal, basalt, deepwater, deepwater, metalFloorDamaged},
-    {deepwater, water, metalFloor2, darkMetal, darksand, darkMetal, darkMetal, darkMetal, basalt, basalt, darkMetal, deepwater, deepwater},
-    {deepwater, water, metalFloor2, darksand, darkMetal, darkMetal, basalt, darkMetal, darkMetal, basalt, darkMetal, basalt, deepwater},
-    {deepwater, water, metalFloor2, darksand, darksand, darkMetal, basalt, darkMetal, basalt, basalt, deepwater, deepwater, metalFloorDamaged},
+        {deepwater, water, metalFloor2, darksand, darksand, darkMetal, darkMetal, darkMetal, darkMetal, basalt, deepwater, deepwater, metalFloorDamaged},
+        {deepwater, water, metalFloor2, darkMetal, darksand, darkMetal, darkMetal, darkMetal, basalt, basalt, darkMetal, deepwater, deepwater},
+        {deepwater, water, metalFloor2, darksand, darkMetal, darkMetal, basalt, darkMetal, darkMetal, basalt, darkMetal, basalt, deepwater},
+        {deepwater, water, metalFloor2, darksand, darksand, darkMetal, basalt, darkMetal, basalt, basalt, deepwater, deepwater, metalFloorDamaged},
 
-    {water, metalFloor2, metalFloor2, darksand, darksand, darkMetal, darkMetal, deepwater, metalFloorDamaged, deepwater, deepwater, deepwater, metalFloorDamaged},
-    {water, metalFloor2, darksand, darkMetal, deepwater, deepwater, metalFloorDamaged, deepwater, deepwater, deepwater, metalFloorDamaged, darkMetal, ice},
-    {metalFloor2, ice, deepwater, deepwater, metalFloorDamaged, deepwater, darkMetal, metalFloorDamaged, deepwater, darkMetal, metalFloorDamaged, ice, ice},
-    {metalFloor2, metalFloorDamaged, deepwater, deepwater, darkMetal, deepwater, metalFloorDamaged, deepwater, deepwater, metalFloorDamaged, ice, ice, ice}
+        {water, metalFloor2, metalFloor2, darksand, darksand, darkMetal, darkMetal, deepwater, metalFloorDamaged, deepwater, deepwater, deepwater, metalFloorDamaged},
+        {water, metalFloor2, darksand, darkMetal, deepwater, deepwater, metalFloorDamaged, deepwater, deepwater, deepwater, metalFloorDamaged, darkMetal, ice},
+        {metalFloor2, ice, deepwater, deepwater, metalFloorDamaged, deepwater, darkMetal, metalFloorDamaged, deepwater, darkMetal, metalFloorDamaged, ice, ice},
+        {metalFloor2, metalFloorDamaged, deepwater, deepwater, darkMetal, deepwater, metalFloorDamaged, deepwater, deepwater, metalFloorDamaged, ice, ice, ice}
     };
 
     float waterf = 2f / arr[0].length;
@@ -225,7 +225,7 @@ public class ElectrodePlanetGenerator extends PlanetGenerator{
                 Block entry = ores.get(i);
                 float freq = frequencies.get(i);
                 if(Math.abs(0.5f - noise(offsetX, offsetY + i * 999, 2, 0.7, (40 + i * 2))) > 0.22f + i * 0.01 &&
-                Math.abs(0.5f - noise(offsetX, offsetY - i * 999, 1, 1, (30 + i * 4))) > 0.37f + freq){
+                    Math.abs(0.5f - noise(offsetX, offsetY - i * 999, 1, 1, (30 + i * 4))) > 0.37f + freq){
                     ore = entry;
                     break;
                 }

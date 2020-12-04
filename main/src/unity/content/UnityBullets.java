@@ -27,11 +27,11 @@ import static unity.content.UnityFx.*;
 
 public class UnityBullets implements ContentList{
     public static BulletType laser, coalBlaze, pyraBlaze, falloutLaser, catastropheLaser, calamityLaser, extinctionLaser, orb, shockBeam, currentStroke,
-    shielderBullet, plasmaFragTriangle, plasmaTriangle, pylonLightning, pylonLaser, pylonLaserSmall, exporb;
+        shielderBullet, plasmaFragTriangle, plasmaTriangle, pylonLightning, pylonLaser, pylonLaserSmall, exporb;
 
     //only enhanced
     public static BasicBulletType standardDenseLarge, standardHomingLarge, standardIncendiaryLarge, standardThoriumLarge, standardDenseHeavy, standardHomingHeavy, standardIncendiaryHeavy, standardThoriumHeavy, standardDenseMassive, standardHomingMassive,
-    standardIncendiaryMassive, standardThoriumMassive;
+        standardIncendiaryMassive, standardThoriumMassive;
 
     @SuppressWarnings("unchecked")
     private <T extends BulletType> T copy(BulletType from, Prov<T> constructor, Cons<T> setter){
@@ -207,8 +207,7 @@ public class UnityBullets implements ContentList{
             }
 
             @Override
-            public void drawLight(Bullet b){
-            }
+            public void drawLight(Bullet b){}
         };
 
         shockBeam = new ContinuousLaserBulletType(35f){
