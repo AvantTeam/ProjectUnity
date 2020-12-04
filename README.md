@@ -1,28 +1,27 @@
 # Project Unity
 
-[![Discord](https://img.shields.io/discord/782583108473978880.svg?color=7289da&label=AvantTeam&logo=discord&style=flat-square)](https://discord.gg/V6ygvgGVqE)
-![Made with Conflicts](https://img.shields.io/badge/Made%20with-conflicts%20<3-red?style=flat-square)
+[![Discord](https://img.shields.io/discord/782583108473978880.svg?color=7289da&label=AvantTeam&logo=discord&style=round-square)](https://discord.gg/V6ygvgGVqE)
+![Made by 19 Authors](https://img.shields.io/badge/Made%20by-19%20Authors-blue?style=round-square)
 
-The biggest Mindustry mod, created by 19 authors.
+The biggest [Mindustry](https://github.com/Anuken/Mindustry/) mod.
 
-[*Wiki*]()  
+_Relevant links_:
+<br>
 [*Miro Board*](https://miro.com/app/board/o9J_lejcuWo=/)  
 [*Trello Board*](https://trello.com/b/oNa7R7bq/project-unity)
 
 ## Building
 
-Install JDK 14 or higher (you can do `apt install openjdk-14-jdk-headless` on Linux). Set JAVA_HOME environment variable to where it is located. Clone this repository then change your current working directory to where the cloned repository folder is. If you are compiling for Android, click [here](#Android).
+Install JDK 15 or higher. Set `JAVA_HOME` environment variable to where it is located. Clone this repository then change your current working directory to where the cloned repository folder is. If you are compiling for Android, click [here](#Android).
 
 ### Windows
 
 - `gradlew main:jar` - Desktop
-- `gradlew main:deploy` - Desktop & Android
 - `gradlew tools:proc` - Generate Sprites
 
 ### Linux/MacOS
 
 - `./gradlew main:jar` - Desktop
-- `./gradlew main:deploy` - Desktop & Android
 - `./gradlew tools:proc` - Generate Sprites
 
 ### Android
@@ -33,4 +32,4 @@ Install JDK 14 or higher (you can do `apt install openjdk-14-jdk-headless` on Li
 
 ---
 
-Build output should be located in `main/build/libs/*.jar`.
+Build output should be located in `main/build/libs/`.
