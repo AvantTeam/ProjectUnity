@@ -18,20 +18,20 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
     float waterOffset = 0.07f;
 
     Block[][] arr = {
-        {water, darksandWater, snow, snow, snow, snow, snow, iceSnow, iceSnow, iceSnow, iceSnow, ice, ice, ice, ice},
-        {water, darksandWater, darksand, stone, snow, snow, snow, snow, iceSnow, iceSnow, iceSnow, iceSnow, ice, ice, ice},
-        {water, water, darksandWater, darksand, darksand, stone, stone, snow, snow, iceSnow, iceSnow, iceSnow, iceSnow, ice, ice},
-        {water, water, darksandWater, darksand, darksand, darksand, stone, stone, stone, iceSnow, iceSnow, iceSnow, iceSnow, ice, ice},
+    {water, darksandWater, snow, snow, snow, snow, snow, iceSnow, iceSnow, iceSnow, iceSnow, ice, ice, ice, ice},
+    {water, darksandWater, darksand, stone, snow, snow, snow, snow, iceSnow, iceSnow, iceSnow, iceSnow, ice, ice, ice},
+    {water, water, darksandWater, darksand, darksand, stone, stone, snow, snow, iceSnow, iceSnow, iceSnow, iceSnow, ice, ice},
+    {water, water, darksandWater, darksand, darksand, darksand, stone, stone, stone, iceSnow, iceSnow, iceSnow, iceSnow, ice, ice},
 
-        {deepwater, water, darksandWater, darksand, darksand, darksand, stone, stone, stone, basalt, snow, snow, iceSnow, iceSnow, ice},
-        {deepwater, water, darksandWater, darksand, darksand, darksand, stone, stone, stone, basalt, basalt, snow, snow, iceSnow, ice},
-        {deepwater, water, darksandWater, darksand, darksand, darksand, stone, stone, stone, basalt, basalt, snow, snow, iceSnow, ice},
-        {deepwater, water, darksandWater, darksand, darksand, darksand, stone, stone, stone, basalt, snow, snow, iceSnow, iceSnow, ice},
+    {deepwater, water, darksandWater, darksand, darksand, darksand, stone, stone, stone, basalt, snow, snow, iceSnow, iceSnow, ice},
+    {deepwater, water, darksandWater, darksand, darksand, darksand, stone, stone, stone, basalt, basalt, snow, snow, iceSnow, ice},
+    {deepwater, water, darksandWater, darksand, darksand, darksand, stone, stone, stone, basalt, basalt, snow, snow, iceSnow, ice},
+    {deepwater, water, darksandWater, darksand, darksand, darksand, stone, stone, stone, basalt, snow, snow, iceSnow, iceSnow, ice},
 
-        {water, water, darksandWater, darksand, darksand, darksand, stone, stone, stone, iceSnow, iceSnow, iceSnow, iceSnow, ice, ice},
-        {water, water, darksandWater, darksand, darksand, stone, stone, snow, snow, iceSnow, iceSnow, iceSnow, iceSnow, ice, ice},
-        {water, darksandWater, darksand, stone, snow, snow, snow, snow, iceSnow, iceSnow, iceSnow, iceSnow, ice, ice, ice},
-        {water, darksandWater, snow, snow, snow, snow, snow, iceSnow, iceSnow, iceSnow, iceSnow, ice, ice, ice, ice}
+    {water, water, darksandWater, darksand, darksand, darksand, stone, stone, stone, iceSnow, iceSnow, iceSnow, iceSnow, ice, ice},
+    {water, water, darksandWater, darksand, darksand, stone, stone, snow, snow, iceSnow, iceSnow, iceSnow, iceSnow, ice, ice},
+    {water, darksandWater, darksand, stone, snow, snow, snow, snow, iceSnow, iceSnow, iceSnow, iceSnow, ice, ice, ice},
+    {water, darksandWater, snow, snow, snow, snow, snow, iceSnow, iceSnow, iceSnow, iceSnow, ice, ice, ice, ice}
     };
 
     float waterf = 2f / arr[0].length;

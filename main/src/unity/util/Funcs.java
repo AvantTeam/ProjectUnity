@@ -113,8 +113,9 @@ public final class Funcs{
         }
     }
 
-    /** Targets any units that is not in the array.
-     *  @returns the unit, picks a random target if all potential targets is in the array.
+    /**
+     * Targets any units that is not in the array.
+     * @returns the unit, picks a random target if all potential targets is in the array.
      */
     public static Unit targetUnique(Team team, int x, int y, float radius, Seq<Unit> targetSeq){
         result = null;

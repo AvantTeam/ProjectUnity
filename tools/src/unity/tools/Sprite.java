@@ -188,7 +188,8 @@ public class Sprite{
                 if(getColor(x, y).a < 1f){
                     boolean found = false;
 
-                    outer: for(int rx = -radius; rx <= radius; rx++){
+                    outer:
+                    for(int rx = -radius; rx <= radius; rx++){
                         for(int ry = -radius; ry <= radius; ry++){
                             if(Mathf.dst(rx, ry) <= radius && getColor(rx + x, ry + y).a > 0.01f){
                                 found = true;

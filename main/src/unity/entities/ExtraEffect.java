@@ -11,6 +11,7 @@ import unity.entities.effects.VapourizeEffectState;
 
 public class ExtraEffect{
     private static final Seq<BuildQueue> vapourizeQueue = new Seq<>(512);
+
     static{
         Events.on(EventType.WorldLoadEvent.class, e -> {
             vapourizeQueue.clear();

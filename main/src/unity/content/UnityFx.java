@@ -322,7 +322,8 @@ public class UnityFx{
             ;
         });
 
-        shoot: {
+        shoot:
+        {
             if(e.fin() < 0.5f) break shoot;
 
             float fin = Mathf.curve(e.fin(), 0.5f, 1f);

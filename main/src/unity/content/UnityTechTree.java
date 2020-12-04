@@ -78,11 +78,11 @@ public class UnityTechTree implements ContentList{
         attachNode(Items.lead, () -> {
             nodeProduce(UnityItems.nickel, () -> {});
         });
-        attachNode(Items.graphite, ()->{
-            nodeProduce(UnityItems.stone, ()->{
-                nodeProduce(UnityItems.denseAlloy, ()->{
-                    nodeProduce(UnityItems.steel, ()->{
-                        nodeProduce(UnityItems.dirium, ()->{});
+        attachNode(Items.graphite, () -> {
+            nodeProduce(UnityItems.stone, () -> {
+                nodeProduce(UnityItems.denseAlloy, () -> {
+                    nodeProduce(UnityItems.steel, () -> {
+                        nodeProduce(UnityItems.dirium, () -> {});
                     });
                 });
             });

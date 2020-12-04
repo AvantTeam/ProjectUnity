@@ -1,6 +1,5 @@
 package unity.entities.units;
 
-import java.util.Arrays;
 import arc.math.*;
 import arc.util.*;
 import arc.struct.Seq;
@@ -162,7 +161,7 @@ public class WormSegmentUnit extends UnitEntity{
             remove();
         }
         if(trueParentUnit != null && isBugged){
-            if(Arrays.stream(trueParentUnit.segmentUnits).noneMatch(s -> s == this)) remove();
+            if(!Structs.contains(trueParentUnit.segmentUnits, s -> s == this)) remove();
             else isBugged = false;
         }
     }
@@ -239,7 +238,7 @@ public class WormSegmentUnit extends UnitEntity{
     }
 
     protected void shoot(WeaponMount mount, Weapon weapon, float x, float y, float aimX, float aimY, float rotation,
-    int side){
+                         int side){
         weapon.shootSound.at(x, y, Mathf.random(0.8f, 1.0f));
         BulletType ammo = weapon.bullet;
         float lifeScl = ammo.scaleVelocity ? Mathf.clamp(Mathf.dst(x, y, aimX, aimY) / ammo.range()) : 1.0f;

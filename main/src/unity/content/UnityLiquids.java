@@ -15,15 +15,13 @@ public class UnityLiquids implements ContentList{
 
     @Override
     public void load(){
-        lava = new Liquid("lava", UnityPal.lavaColor){
-            {
-                heatCapacity = 0f;
-                viscosity = 0.7f;
-                temperature = 1.5f;
-                effect = UnityStatusEffects.molten;
-                lightColor = UnityPal.lavaColor2.cpy().mul(1f, 1f, 1f, 0.55f);
-            }
-        };
+        lava = new Liquid("lava", UnityPal.lavaColor){{
+            heatCapacity = 0f;
+            viscosity = 0.7f;
+            temperature = 1.5f;
+            effect = UnityStatusEffects.molten;
+            lightColor = UnityPal.lavaColor2.cpy().mul(1f, 1f, 1f, 0.55f);
+        }};
 
         //endregion
         if(!mindustry.Vars.headless){

@@ -6,9 +6,9 @@ import static mindustry.Vars.mods;
 
 public class UnitySounds{
     public static Sound
-        endgameSmallShoot,
-        beamIntenseHighpitchTone,
-        extinctionShoot;
+    endgameSmallShoot,
+    beamIntenseHighpitchTone,
+    extinctionShoot;
 
     private static Sound loadSound(String name){
         return mods.getScripts().loadSound(name);

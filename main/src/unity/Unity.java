@@ -17,18 +17,18 @@ import unity.mod.ContributorList.*;
 
 public class Unity extends Mod{
     public static final String githubURL = "https://github.com/EyeOfDarkness/ProjectUnity";
-
+    //don't know how to indent this
     private final ContentList[] unityContent = {
-        new UnityItems(),
-        new OverWriter(),
-        new UnityStatusEffects(),
-        new UnityLiquids(),
-        new UnityBullets(),
-        new UnityUnitTypes(),
-        new UnityBlocks(),
-        new UnityPlanets(),
-        new UnitySectorPresets(),
-        new UnityTechTree(),
+    new UnityItems(),
+    new OverWriter(),
+    new UnityStatusEffects(),
+    new UnityLiquids(),
+    new UnityBullets(),
+    new UnityUnitTypes(),
+    new UnityBlocks(),
+    new UnityPlanets(),
+    new UnitySectorPresets(),
+    new UnityTechTree(),
     };
 
     public Unity(){
@@ -101,9 +101,10 @@ public class Unity extends Mod{
             }
         }
     }
+
     //still don't want to import-unimport Log.java everytime i debug.
     //unity.Unity.print(); for copypaste
     public static void print(Object... args){
-        Log.info("[unity]: ", args);
+        Log.infoList("unity :", args);
     }
 }

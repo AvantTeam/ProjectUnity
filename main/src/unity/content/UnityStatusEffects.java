@@ -32,19 +32,15 @@ public class UnityStatusEffects implements ContentList{
                 damage = 1.6f;
             }
         };
-        reloadFatigue = new StatusEffect("reload-fatigue"){
-            {
-                reloadMultiplier = 0.75f;
-            }
-        };
-        molten = new StatusEffect("molten"){
-            {
-                color = UnityPal.lavaColor;
-                speedMultiplier = 0.6f;
-                healthMultiplier = 0.5f;
-                damage = 1f;
-                effect = UnityFx.ahhimaLiquidNow;
-            }
-        };
+        reloadFatigue = new StatusEffect("reload-fatigue"){{
+            reloadMultiplier = 0.75f;
+        }};
+        molten = new StatusEffect("molten"){{
+            color = UnityPal.lavaColor;
+            speedMultiplier = 0.6f;
+            healthMultiplier = 0.5f;
+            damage = 1f;
+            effect = UnityFx.ahhimaLiquidNow;
+        }};
     }
 }
