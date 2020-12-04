@@ -72,7 +72,7 @@ public class ExpOrb extends BulletType{
         }else if(tile.solid()){
             b.trns(-1.1f * b.vel.x, -1.1f * b.vel.y);
             b.vel.scl(0f);
-        }else if(block instanceof Conveyor) conveyor(b, (Conveyor)block, (ConveyorBuild)build);
+        }else if(block instanceof Conveyor conv) conveyor(b, conv, (ConveyorBuild)build);
     }
 
     protected void conveyor(Bullet b, Conveyor block, ConveyorBuild build){

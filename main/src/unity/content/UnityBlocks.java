@@ -747,18 +747,18 @@ public class UnityBlocks implements ContentList{
         diriumWall = new LimitWall("dirium-wall"){
             {
                 requirements(Category.defense, with(UnityItems.dirium, 6));
-                maxDamage = 75f;
-                blinkFrame = 20f;
-                health = 1024;
+                maxDamage = 76f;
+                blinkFrame = 30f;
+                health = 760;
             }
         };
 
         diriumWallLarge = new LimitWall("dirium-wall-large"){
             {
                 requirements(Category.defense, with(UnityItems.dirium, 24));
-                maxDamage = 150f;
-                blinkFrame = 20f;
-                health = 4096;
+                maxDamage = 152f;
+                blinkFrame = 30f;
+                health = 3040;
                 size = 2;
             }
         };
