@@ -48,7 +48,7 @@ const extinctionLaser = extendContent(ContinuousLaserBulletType, 770, {
 		};
 		
 		if(b.timer.get(2, 15)){
-			fLib.castCone(b.x, b.y, this.length * 0.8, b.rotation(), 70, (tile, build, dst, angD) => {
+			fLib.castCone(b.x, b.y, this.length * 1.3, b.rotation(), 70, (tile, build, dst, angD) => {
 				//Damage.createIncend()
 				if(Mathf.chance(angD * 0.2 * Mathf.clamp(dst * 1.7))) Fires.create(tile);
 				if(build != null){
@@ -63,7 +63,7 @@ const extinctionLaser = extendContent(ContinuousLaserBulletType, 770, {
 			}, null);
 			//tempSeq.each(build => build.remove());
 		};
-		fLib.castCone(b.x, b.y, this.length * 0.8, b.rotation(), 70, null, (e, dst, angD) => {
+		fLib.castCone(b.x, b.y, this.length * 1.3, b.rotation(), 70, null, (e, dst, angD) => {
 			if(!e.dead){
 				var damageMulti = e.team != b.team ? 0.25 : 1;
 				e.damage(28 * angD * dst * damageMulti);

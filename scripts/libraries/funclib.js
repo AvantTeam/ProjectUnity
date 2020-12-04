@@ -5,6 +5,7 @@ const tV = new Vec2();
 const collidedBlocks = new IntSet(127);
 
 const rect = new Rect();
+const rectAlt = new Rect();
 const hitrect = new Rect();
 
 module.exports = {
@@ -43,17 +44,26 @@ module.exports = {
 	//consUnit: (Unit, Distance %, Angle Distance %)
 	castCone(wx, wy, range, angle, cone, consTile, consUnit){
 		collidedBlocks.clear();
-		var tx = Vars.world.toTile(wx);
-		var ty = Vars.world.toTile(wy);
-
-		var tileRange = Mathf.floorPositive(range / Vars.tilesize + 1);
-		
-		if(consTile != null){
-			for(var x = -tileRange + tx; x <= tileRange + tx; x++){
-				yGroup:
-				for(var y = -tileRange + ty; y <= tileRange + ty; y++){
-					//Angles.angle(wx, wy, x * Vars.tilesize, y * Vars.tilesize)
-					if(!Mathf.within(x * Vars.tilesize, y * Vars.tilesize, wx, wy, range) || !Angles.within(Angles.angle(wx, wy, x * Vars.tilesize, y * Vars.tilesize), angle, cone)) continue yGroup;
+        var expand = 3;
+        
+        if(consTile != null){
+            rect.setCentered(wx, wy, expand);
+            for(var i = 0; i < 3; i++){
+                var angleC = (((-3 + i * 3) / 3) * cone) + angle;
+                tV.trns(angleC, range).add(wx, wy);
+                
+                rectAlt.setCentered(tV.x, tV.y, expand);
+                rect.merge(rectAlt);
+            };
+            var tx = Mathf.round(rect.x / Vars.tilesize);
+            var ty = Mathf.round(rect.y / Vars.tilesize);
+            var tw = tx + Mathf.round(rect.width / Vars.tilesize);
+            var th = ty + Mathf.round(rect.height / Vars.tilesize);
+            
+            for(var x = tx; x <= tw; x++){
+                yGroup:
+                for(var y = ty; y <= th; y++){
+                    if(!Mathf.within(x * Vars.tilesize, y * Vars.tilesize, wx, wy, range) || !Angles.within(Angles.angle(wx, wy, x * Vars.tilesize, y * Vars.tilesize), angle, cone)) continue yGroup;
 					var other = Vars.world.tile(x, y);
 					if(other == null) continue yGroup;
 					if(!collidedBlocks.contains(other.pos())){
@@ -62,9 +72,9 @@ module.exports = {
 						consTile(other, other.build != null ? other.build : null, dst, anDst);
 						collidedBlocks.add(other.pos());
 					};
-				};
-			};
-		};
+                };
+            };
+        };
 		if(consUnit != null){
 			Groups.unit.intersect(wx - range, wy - range, range * 2, range * 2, e => {
 				if(!Mathf.within(e.x, e.y, wx, wy, range) || !Angles.within(Angles.angle(wx, wy, e.x, e.y), angle, cone)) return;
