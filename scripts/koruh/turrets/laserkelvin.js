@@ -153,6 +153,9 @@ const laserTurret = lib.extend(LiquidTurret, LiquidTurret.LiquidTurretBuild, "ke
     init(){
         this.super$init();
         //this.consumes.powerCond(10, build => build.isActive());
+    },
+    canBeBuilt(){
+        return false;
     }
 }, {
     acceptLiquid(source, liquid){

@@ -295,6 +295,9 @@ const laserSwarmerTurret = lib.extend(PowerTurret, PowerTurret.PowerTurretBuild,
     ],
     drawPlace(x, y, rotation, valid){
         Drawf.dashCircle(x * Vars.tilesize + this.offset, y * Vars.tilesize + this.offset, 20 * 8, Pal.placing);
+    },
+    canBeBuilt(){
+        return false;
     }
 }, {
     drawSelect(){

@@ -189,7 +189,10 @@ const chargeLaserTurret = lib.extend(PowerTurret, PowerTurret.PowerTurretBuild, 
             block: "unity-bt-laser-turret",
             min: 30
         }
-    ]
+    ],
+    canBeBuilt(){
+        return false;
+    }
 }, {
     getShootColor(lvl){
         return Tmp.c1.set(Pal.lancerLaser).lerp(Pal.sapBullet, lvl / 30);

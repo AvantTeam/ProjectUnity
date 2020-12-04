@@ -111,6 +111,9 @@ const chargeLaserTurret = lib.extend(PowerTurret, PowerTurret.PowerTurretBuild, 
     load(){
         this.super$load();
         this.topRegion = Core.atlas.find(this.name + "-top");
+    },
+    canBeBuilt(){
+        return false;
     }
 }, {
     getShootColor(lvl){
