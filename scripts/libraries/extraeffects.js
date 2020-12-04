@@ -179,7 +179,7 @@ const vapourize = prov(() => {
 			var slope = (0.5 - Math.abs(this.fin() - 0.5)) * 2;
 			Draw.z(Layer.flyingUnit + 0.01);
 			tempCol.set(Color.black);
-			tempCol.a = slope * 0.25;
+			tempCol.a = slope * Interp.pow3In.apply(1 - this.parent.healthf());
 			Draw.color(tempCol);
 			fLib.simpleUnitDrawer(this.parent, false);
 			Draw.z(oz);
