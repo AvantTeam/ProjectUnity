@@ -1548,28 +1548,28 @@ const _TurretBaseUpdater = { //basically a turret.
 		return getPart(this.build.getPartsConfig(),this.basepart);
 	},
 	updateShooting() {
-		
+		let hgraph = this.build.getGraphConnector("heat graph");
+		let temp = hgraph.getTemp();
 		if (this.reload >= this.reloadTime*this.guns[this.currentBarrel].reloadmult && this.hasAmmo() && this.canShoot() ) {
-			let hgraph = this.build.getGraphConnector("heat graph");
-			let temp = hgraph.getTemp();
-			if(temp<500){
-				let type = this.guns[this.currentBarrel];
-				this.build.shootType(type,this.offsetx,this.offsety);
-				this.useAmmo();
+			let type = this.guns[this.currentBarrel];
+			this.build.shootType(type,this.offsetx,this.offsety);
+			this.useAmmo();
+			
+			
+			hgraph.setHeat(hgraph.getHeat()+this.guns[this.currentBarrel].heat* this.getBasePart().stats.heatAccumMult.value );
+			this.onShoot();
+			this.currentBarrel++;
+			this.currentBarrel = this.currentBarrel % this.guns.length;
+			this.reload = 0;
+			
 				
-				
-				hgraph.setHeat(hgraph.getHeat()+this.guns[this.currentBarrel].heat* this.getBasePart().stats.heatAccumMult.value );
-				this.onShoot();
-				this.currentBarrel++;
-				this.currentBarrel = this.currentBarrel % this.guns.length;
-				this.reload = 0;
-			}else{
+			if(temp>500){
 				if( Mathf.chance(0.06+0.3*Mathf.clamp((temp-500)*0.01)) ){
 					this.build.block.coolEffect.at(this.build.x + Mathf.range(this.build.block.size * Vars.tilesize / 2), this.build.y + Mathf.range(this.build.block.size * Vars.tilesize / 2));
 				}
 			}
 		} else {
-			this.reload += this.build.delta() * this.build.baseReloadSpeed()*this.reloadMultiplier();
+			this.reload += this.build.delta() * this.build.baseReloadSpeed()*this.reloadMultiplier() * Mathf.clamp(1+(500-temp)*0.003);
 		}
 	},
 	canShoot(){

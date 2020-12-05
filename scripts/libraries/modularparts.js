@@ -79,7 +79,7 @@ const smallParts = [
             },
 			reload: {
 				name: "stat.unity.reload",
-				value: 2
+				value: 1.5
 			},
 			mass: {
                 name: "stat.unity.blademass",
@@ -294,7 +294,7 @@ const smallParts = [
             },
 			baseDmg:{
 				name: "stat.unity.bulletDmg",
-                value: 85,
+                value: 100,
 			},
 			baseSpeed:{
 				name: "stat.unity.bulletSpd",
@@ -337,7 +337,7 @@ const smallParts = [
             },
 			heat: {
                 name: "stat.unity.heatPerShot",
-                value: 1500,
+                value: 1000,
             },
 			
         },
@@ -698,7 +698,7 @@ const medParts = [
             },
 			baseDmg:{
 				name: "stat.unity.bulletDmg",
-                value: 180,
+                value: 200,
 			},
 			baseSpeed:{
 				name: "stat.unity.bulletSpd",
@@ -741,7 +741,7 @@ const medParts = [
             },
 			heat: {
                 name: "stat.unity.heatPerShot",
-                value: 3000,
+                value: 1500,
             },
 			
         },
