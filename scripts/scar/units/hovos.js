@@ -3,8 +3,10 @@ const ais = this.global.unity.ai;
 
 const hovosBullet = extend(RailBulletType, {});
 hovosBullet.damage = 500;
-hovosBullet.speed = 59;
-hovosBullet.lifetime = 8;
+//hovosBullet.speed = 59;
+//hovosBullet.lifetime = 8;
+hovosBullet.length = 59 * 6;
+hovosBullet.updateEffectSeg = 59;
 hovosBullet.shootEffect = effects.scarRailShoot;
 hovosBullet.pierceEffect = effects.scarRailHit;
 hovosBullet.updateEffect = effects.scarRailTrail;
