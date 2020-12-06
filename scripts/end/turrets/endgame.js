@@ -341,7 +341,7 @@ endgame.buildType = () => {
 					endgameLaser.at(this.x, this.y, 0, [new Vec2(this.x + (this._eyesOffset.x * 2), this.y + (this._eyesOffset.y * 2)), new Vec2(e.x, e.y), 1]);
 					vaporize.at(e.x, e.y, 0, e);
 					e.kill();
-					if(e.isFlying()) bulletSeq.add(e);
+					bulletSeq.add(e);
 				};
 			});
 			bulletSeq.each(e => {
