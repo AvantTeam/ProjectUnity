@@ -341,10 +341,14 @@ endgame.buildType = () => {
 					endgameLaser.at(this.x, this.y, 0, [new Vec2(this.x + (this._eyesOffset.x * 2), this.y + (this._eyesOffset.y * 2)), new Vec2(e.x, e.y), 1]);
 					vaporize.at(e.x, e.y, 0, e);
 					e.kill();
-					if(e.isFlying()) bulletSeq.add(e);
+					bulletSeq.add(e);
 				};
 			});
-			bulletSeq.each(e => e.destroy());
+			bulletSeq.each(e => {
+                Groups.unit.remove(e);
+                Groups.all.remove(e);
+                Groups.draw.remove(e);
+            });
 			bulletSeq.clear();
 		},
 		killTilesC(){
@@ -406,7 +410,12 @@ endgame.buildType = () => {
 			var e = this._targetsB[index];
 			if(e != null){
 				e.damage(350 * this._threatLevel);
-				if(e.dead) vaporize.at(e.x, e.y, 0, e);
+				if(e.dead){
+                    vaporize.at(e.x, e.y, 0, e);
+                    Groups.unit.remove(e);
+                    Groups.all.remove(e);
+                    Groups.draw.remove(e);
+                };
 				this._eyesVecArray[index].set(tempVec);
 				this._eyesVecArray[index].add(this.x, this.y);
 				endgameLaser.at(this.x, this.y, 0, [this._eyesVecArray[index], new Vec2(e.x, e.y), 0.625]);
@@ -533,7 +542,7 @@ endgame.buildType = () => {
 			};
 		},
 		kill(){
-			if(this.health < 10){
+			if(this._lastHealth < 10){
 				Call.tileDestroyed(this);
 			};
 		},
