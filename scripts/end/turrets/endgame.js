@@ -345,13 +345,9 @@ endgame.buildType = () => {
 				};
 			});
 			bulletSeq.each(e => {
-                try{
-                    e.destroy();
-                }catch(f){
-                    Groups.unit.remove(e);
-                    Groups.all.remove(e);
-                    Groups.draw.remove(e);
-                };
+                Groups.unit.remove(e);
+                Groups.all.remove(e);
+                Groups.draw.remove(e);
             });
 			bulletSeq.clear();
 		},
@@ -414,7 +410,12 @@ endgame.buildType = () => {
 			var e = this._targetsB[index];
 			if(e != null){
 				e.damage(350 * this._threatLevel);
-				if(e.dead) vaporize.at(e.x, e.y, 0, e);
+				if(e.dead){
+                    vaporize.at(e.x, e.y, 0, e);
+                    Groups.unit.remove(e);
+                    Groups.all.remove(e);
+                    Groups.draw.remove(e);
+                };
 				this._eyesVecArray[index].set(tempVec);
 				this._eyesVecArray[index].add(this.x, this.y);
 				endgameLaser.at(this.x, this.y, 0, [this._eyesVecArray[index], new Vec2(e.x, e.y), 0.625]);
