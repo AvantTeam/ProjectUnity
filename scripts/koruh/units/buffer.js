@@ -1,3 +1,5 @@
+const alib = this.global.unity.abilpassive;
+
 const lightningb = new JavaAdapter(BulletType, {
     range(){
       return 70;
@@ -30,13 +32,7 @@ bufferWep.bullet = lightningb;
 bufferWep.shootSound = Sounds.spark;
 
 const buffer = extendContent(UnitType, "buffer", {
-    landed(u){
-        Effect.shake(1, 1, u);
-        Fx.landShock.at(u);
-        for(var i = 0; i < 8; i++){
-            Time.run(Mathf.random(8), () => Lightning.create(u.team, Pal.lancerLaser, 17, u.x, u.y, Mathf.random(360), 14));
-        }
-    }
+  //landed() is a no-op wtf
 });
 buffer.mineTier = 1;
 buffer.speed = 0.75;
@@ -47,3 +43,18 @@ buffer.buildSpeed = 0.9;
 buffer.engineColor = Color.valueOf("d3ddff");
 buffer.weapons.add(bufferWep);
 buffer.constructor = () => extend(MechUnit, {});
+buffer.canBoost = true;
+buffer.boostMultiplier = 1.5;
+alib.add(buffer, {
+  used(u){
+    Effect.shake(1, 1, u);
+    Fx.landShock.at(u);
+    for(var i = 0; i < 8; i++){
+        Time.run(Mathf.random(8), () => Lightning.create(u.team, Pal.lancerLaser, 17, u.x, u.y, Mathf.random(360), 14));
+    }
+  },
+
+  able(u){
+    return !u.isFlying();
+  }
+})
