@@ -275,6 +275,14 @@ const script = [
                     "expfountain",
                     "expvoid"
                 ]
+            },
+
+            {
+                name: "units",
+                childs: [
+                    "buffer",
+                    "cache"
+                ]
             }
         ]
     },

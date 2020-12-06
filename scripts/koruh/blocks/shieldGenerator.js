@@ -5,6 +5,11 @@ const shieldBreakCircle = new Effect(40, e => {
     Lines.stroke(3 * e.fout());
     Lines.circle(e.x, e.y, e.rotation + e.fin());
 });
+const absorbed = new Effect(12, e => {
+    Draw.color(Pal.lancerLaser);
+    Lines.stroke(2 * e.fout());
+    Lines.circle(e.x, e.y, 5 * e.fout());
+});
 
 const shieldGenerator = lib.extend(ForceProjector, ForceProjector.ForceBuild, "shield-generator", {
     maxLevel: 15,
@@ -64,7 +69,7 @@ const shieldGenerator = lib.extend(ForceProjector, ForceProjector.ForceBuild, "s
         const customConsumer = trait => {
             if(trait.team != this.paramEntity.team && trait.type.absorbable && Mathf.dst(this.paramEntity.x, this.paramEntity.y, trait.x, trait.y) <= this.realRadius()){
                 trait.absorb();
-                Fx.absorb.at(trait);
+                absorbed.at(trait);
                 this.paramEntity.hit = 1;
                 this.paramEntity.buildup += trait.damage * this.paramEntity.warmup;
                 this.incExp(cons.valid(this) ? scale / 20 : 0.1);
