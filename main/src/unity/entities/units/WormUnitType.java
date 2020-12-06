@@ -85,8 +85,7 @@ public class WormUnitType extends UnitType{
         super.drawBody(unit);
         float originZ = Draw.z();
 
-        if(!(unit instanceof WormDefaultUnit)) return;
-        WormDefaultUnit wormUnit = (WormDefaultUnit)unit;
+        if(!(unit instanceof WormDefaultUnit wormUnit)) return;
         for(int i = 0; i < segmentLength; i++){
             Draw.z(originZ - (i + 1) / 500f);
             wormUnit.segmentUnits[i].drawBody();
@@ -98,14 +97,13 @@ public class WormUnitType extends UnitType{
     @Override
     public void drawShadow(Unit unit){
         super.drawShadow(unit);
-        if(!(unit instanceof WormDefaultUnit)) return;
-        WormDefaultUnit wormUnit = (WormDefaultUnit)unit;
+        if(!(unit instanceof WormDefaultUnit wormUnit)) return;
         for(int i = 0; i < segmentLength; i++) wormUnit.segmentUnits[i].drawShadow();
     }
 
     @Override
     public void drawOcclusion(Unit unit){
         super.drawOcclusion(unit);
-        if(unit instanceof WormDefaultUnit) ((WormDefaultUnit)unit).drawOcclusion();
+        if(unit instanceof WormDefaultUnit wormunit) wormunit.drawOcclusion();
     }
 }

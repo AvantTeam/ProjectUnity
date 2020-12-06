@@ -57,8 +57,7 @@ public class ExpOrb extends BulletType{
         Tile tile = world.tileWorld(b.x, b.y);
         Block block = tile.block();
         Building build = tile.build;
-        if(build instanceof ExpBuildBase){
-            ExpBuildBase temp = (ExpBuildBase)tile.build;
+        if(build instanceof ExpBuildBase temp){
             temp.incExp(expAmount * temp.getOrbMultiplier());
             UnityFx.expAbsorb.at(b.x, b.y);
             b.remove();
@@ -73,7 +72,6 @@ public class ExpOrb extends BulletType{
             b.trns(-1.1f * b.vel.x, -1.1f * b.vel.y);
             b.vel.scl(0f);
         }else if(block instanceof Conveyor conv) conveyor(b, conv, (ConveyorBuild)build);
-        //else if(block instanceof Conveyor) conveyor(b, (Conveyor)block, (ConveyorBuild)build);
     }
 
     protected void conveyor(Bullet b, Conveyor block, ConveyorBuild build){

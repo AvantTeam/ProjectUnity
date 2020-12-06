@@ -69,11 +69,10 @@ public class ExpUnloader extends Block implements ExpOrbHandlerBase{
 
         protected void checkUnload(int dir){
             Building build = nearby(dir);
-            if(!(build instanceof ExpBuildBase) || !build.isValid()){
+            if(!(build instanceof ExpBuildBase temp) || !build.isValid()){
                 join[dir] = false;
                 return;
             }
-            ExpBuildBase temp = (ExpBuildBase)build;
             for(int i = 0; i < 2; i++){
                 if(temp.totalExp() >= ExpOrb.expAmount){
                     temp.incExp(-1f * ExpOrb.expAmount);

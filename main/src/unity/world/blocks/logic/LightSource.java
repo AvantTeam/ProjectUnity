@@ -1,6 +1,7 @@
 package unity.world.blocks.logic;
 
 import java.util.ArrayList;
+
 import arc.Events;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -61,7 +62,7 @@ public class LightSource extends GenericCrafter{
     public void setBars(){
         super.setBars();
         bars.add("light", (LightSourceBuild build) -> new Bar(() -> bundle.format("lightlib.light", build.getStrength()),
-        () -> lightColor, () -> build.getStrength() / lightStrength));
+            () -> lightColor, () -> build.getStrength() / lightStrength));
     }
 
     @Override
@@ -261,11 +262,11 @@ public class LightSource extends GenericCrafter{
                         next.set(ld.angle, ld.strength / 2f, ld.length - loops, ld.color);
                         next2.set(tr, ld.strength / 2f, ld.length - loops, ld.color);
                     }
-                }else if(build instanceof LightReflectorBuild){
-                    int tr = ((LightReflectorBuild)build).calcReflection(ld.angle);
+                }else if(build instanceof LightReflectorBuild b){
+                    int tr = b.calcReflection(ld.angle);
                     if(tr >= 0) next.set(tr, ld.strength, ld.length - loops, ld.color);
-                }else if(build instanceof LightRepeaterBuildBase){
-                    LightData tempData = ((LightRepeaterBuildBase)build).calcLight(ld, loops);
+                }else if(build instanceof LightRepeaterBuildBase b){
+                    LightData tempData = b.calcLight(ld, loops);
                     if(tempData == null) return true;
                     next.set(tempData);
                 }else if(build.block instanceof LightGenerator)

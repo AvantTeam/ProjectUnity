@@ -233,11 +233,9 @@ public class UnityBullets implements ContentList{
                 Healthc target = Damage.linecast(b, b.x, b.y, b.rotation(), length);
                 b.data = target;
 
-                if(target != null && !(target instanceof Building)){
-                    Healthc hit = target;
-
-                    ((Hitboxc)hit).collision((Hitboxc)hit, hit.x(), hit.y());
-                    b.collision((Hitboxc)hit, hit.x(), hit.y());
+                if(target != null && !(target instanceof Building) && target instanceof Hitboxc hit){
+                    hit.collision(hit, hit.x(), hit.y());
+                    b.collision(hit, hit.x(), hit.y());
                 }else{
                     b.data = new Vec2().trns(b.rotation(), this.length).add(b.x, b.y);
                 }
@@ -246,11 +244,10 @@ public class UnityBullets implements ContentList{
             @Override
             public void update(Bullet b){
                 if(b.timer.get(1, 5)){
-                    if(((LaserTurret.LaserTurretBuild)b.owner).target == null) return;
-                    Lightning.create(b.team, surge, Mathf.random(this.damage / 1.8f, this.damage / 1.2f), b.x, b.y, b.angleTo(((LaserTurret.LaserTurretBuild)b.owner).target), Mathf.floorPositive(b.dst(((LaserTurret.LaserTurretBuild)b.owner).target) / Vars.tilesize + 3));
-                    if(((LaserTurret.LaserTurretBuild)b.owner).target instanceof Healthc){
-                        ((Healthc)((LaserTurret.LaserTurretBuild)b.owner).target).damage(this.damage);
-                    }
+                    Posc target = ((LaserTurret.LaserTurretBuild)b.owner).target;
+                    if(target == null) return;
+                    Lightning.create(b.team, surge, Mathf.random(this.damage / 1.8f, this.damage / 1.2f), b.x, b.y, b.angleTo(target), Mathf.floorPositive(b.dst(target) / Vars.tilesize + 3));
+                    if(target instanceof Healthc h) h.damage(this.damage);
                 }
             }
 
@@ -263,9 +260,8 @@ public class UnityBullets implements ContentList{
                     Draw.reset();
 
                     Drawf.light(b.team, b.x, b.y, b.x + target.x(), b.y + target.y(), 15 * b.fout(), this.lightColor, 0.6f);
-                }else if(b.data instanceof Position){
-                    Object data = b.data;
-                    Tmp.v1.set((Position)data);
+                }else if(b.data instanceof Position data){
+                    Tmp.v1.set(data);
 
                     Draw.color(surge);
                     Drawf.laser(b.team, Core.atlas.find("laser"), Core.atlas.find("laser-end"), b.x, b.y, Tmp.v1.x, Tmp.v1.y, this.width * b.fout());

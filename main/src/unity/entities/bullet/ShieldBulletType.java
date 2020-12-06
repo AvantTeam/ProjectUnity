@@ -64,8 +64,8 @@ public class ShieldBulletType extends BasicBulletType{
         float[] temp = (float[])b.data;
         Groups.bullet.intersect(b.x - radius, b.y - radius, radius * 2, radius * 2, e -> {
             if(e != null && e.team != b.team){
-                if(e.owner instanceof TurretBuild){
-                    if(((TurretBuild)e.owner).block.name != "unity-shielder"){
+                if(e.owner instanceof TurretBuild build){
+                    if(build.block.name != "unity-shielder"){
                         float health = temp[0] - e.damage;
                         temp[0] = health;
                         temp[1] = 1;

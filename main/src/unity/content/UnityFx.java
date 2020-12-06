@@ -224,9 +224,7 @@ public class UnityFx{
     }),
 
     falseLightning = new Effect(10f, 500f, e -> {
-        if(!(e.data instanceof Float)) return;
-
-        float length = (float)e.data;
+        if(!(e.data instanceof Float length)) return;
         int lenInt = Mathf.round(length / 8f);
         stroke(3f * e.fout());
         color(e.color, Color.white, e.fin());
@@ -272,10 +270,8 @@ public class UnityFx{
     }),
 
     healLaser = new Effect(60f, e -> {
-        if(!(e.data instanceof Position[])) return;
-
+        if(!(e.data instanceof Position[] temp)) return;
         float[] reduction = new float[]{0f, 1.5f};
-        Position[] temp = (Position[])e.data;
         Position a = temp[0], b = temp[1];
         for(int i = 0; i < 2; i++){
             color(i == 0 ? Pal.heal : Color.white);
@@ -355,8 +351,7 @@ public class UnityFx{
     }),
 
     evaporateDeath = new Effect(64f, 800f, e -> {
-        if(!(e.data instanceof UnitVecData)) return;
-        UnitVecData temp = (UnitVecData)e.data;
+        if(!(e.data instanceof UnitVecData temp)) return;
         Unit unit = temp.unit;
         float curve = Interp.exp5In.apply(e.fin());
         Tmp.c1.set(Color.black);
@@ -366,8 +361,7 @@ public class UnityFx{
     }),
 
     vaporation = new Effect(23f, e -> {
-        if(!(e.data instanceof Position[])) return;
-        Position[] temp = (Position[])e.data;
+        if(!(e.data instanceof Position[] temp)) return;
         Tmp.v1.set(temp[0]);
         Tmp.v1.lerp(temp[1], e.fin());
         color(Pal.darkFlame, Pal.darkerGray, e.fin());
