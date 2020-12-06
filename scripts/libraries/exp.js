@@ -392,11 +392,17 @@ module.exports = {
                 this._exp = a;
             },
             incExp(a) {
-                if(this._exp >= expblock.maxExp && a > 0) return;
+                if(this._exp >= expblock.maxExp && a > 0){
+                    if(this.getHub() != null && !this.getHub().isFull()){
+                        var per = this.getHub().getPercent();
+                        this.getHub().incExp(a * per * 0.75);
+                    }
+                    return;
+                }
                 if(a > 0 && this.getHub() != null && !this.getHub().isFull()){
                     var per = this.getHub().getPercent();
                     this.getHub().incExp(a * per);
-                    a = 1.1 - a * per;
+                    a = (1.1 - per) * a;
                 }
                 this._exp += a;
                 if(this._exp > expblock.maxExp) this._exp = expblock.maxExp;
