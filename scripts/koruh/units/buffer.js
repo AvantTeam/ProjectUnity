@@ -68,5 +68,5 @@ var classid = alib.add(buffer, MechUnit, [
         }
       }
     }
-  ], {});
+  ], {}, true);
 buffer.setTypeID(classid);

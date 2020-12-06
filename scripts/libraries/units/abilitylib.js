@@ -39,9 +39,86 @@ const addMapping = provider => {
   return EntityMapping.idMap.indexOf(provider);
 };
 
+//you need to add
+/*
+setTypeID(id){
+  this.idType = id;
+},
+getTypeID(){
+  return this.idType;
+}*/
+//to the UnitType, and also the following:
+/*
+var classid = alib.add(unittypehere, MechUnit, [abilitieshere], {unitentityextensionhere}, whethertoaddtoentitymapping);
+unittypehere.setTypeID(classid);
+*/
+
+
+
 module.exports = {
   waitFx: waitFx,
   ringFx: ringFx,
+
+  add(unittype, unitentity, abarr, objb, addToMap){
+    if(objb == undefined) objb = {};
+    for(var i=0; i<abarr.length; i++){
+      this["add" + abarr[i].type](unittype, abarr[i], i);
+    }
+
+    objb = Object.assign({
+      classId(){
+        return this.type.getTypeID();
+      }
+    }, objb, {
+      setCoolTimer(ids){
+        this._timers = [];
+        this._isUsed = [];
+        this._check = [];
+        for(var i=0; i<ids; i++){
+          this._timers.push(0);
+          this._isUsed.push(false);
+          this._check.push(true);
+        }
+      },
+      getCool(id){
+        return this._timers[id];
+      },
+      setCool(id, a){
+        this._timers[id] = a;
+      },
+      usedCool(id, a){
+        this._timers[id] = a;
+        this._isUsed[id] = true;
+      },
+      getUse(id){
+        if(this._isUsed[id]){
+          this._isUsed[id] = false;
+          return true;
+        }
+        return false;
+      },
+      useCheck(id, b){
+        if(b){
+          if(!this._check[id]){
+            this._check[id] = true;
+            return true;
+          }
+        }
+        else this._check[id] = false;
+        return false;
+      }
+    });
+
+    unittype.constructor = prov(unit => {
+      unit = extend(unitentity, clone(objb));
+      unit.setCoolTimer(abarr.length);
+      return unit;
+    });
+
+    return addToMap ? addMapping(unittype.constructor) : -1;
+  },
+
+  //do not use/rename the following functions!
 
   addpassive(unittype, obj, id){
     obj = Object.assign({
@@ -115,65 +192,6 @@ module.exports = {
     });
 
     unittype.abilities.add(new JavaAdapter(Ability, clone(obj)));
-  },
-
-  add(unittype, unitentity, abarr, objb){
-    if(objb == undefined) objb = {};
-    for(var i=0; i<abarr.length; i++){
-      this["add" + abarr[i].type](unittype, abarr[i], i);
-    }
-
-    objb = Object.assign({
-      classId(){
-        return this.type.getTypeID();
-      }
-    }, objb, {
-      setCoolTimer(ids){
-        this._timers = [];
-        this._isUsed = [];
-        this._check = [];
-        for(var i=0; i<ids; i++){
-          this._timers.push(0);
-          this._isUsed.push(false);
-          this._check.push(true);
-        }
-      },
-      getCool(id){
-        return this._timers[id];
-      },
-      setCool(id, a){
-        this._timers[id] = a;
-      },
-      usedCool(id, a){
-        this._timers[id] = a;
-        this._isUsed[id] = true;
-      },
-      getUse(id){
-        if(this._isUsed[id]){
-          this._isUsed[id] = false;
-          return true;
-        }
-        return false;
-      },
-      useCheck(id, b){
-        if(b){
-          if(!this._check[id]){
-            this._check[id] = true;
-            return true;
-          }
-        }
-        else this._check[id] = false;
-        return false;
-      }
-    });
-
-    unittype.constructor = prov(unit => {
-      unit = extend(unitentity, clone(objb));
-      unit.setCoolTimer(abarr.length);
-      return unit;
-    });
-
-    return addMapping(unittype.constructor);
   }
 }
 
