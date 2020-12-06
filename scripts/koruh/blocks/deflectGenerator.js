@@ -11,6 +11,11 @@ const deflect = new Effect(12, e => {
     Lines.stroke(2 * e.fout());
     Lines.square(e.x, e.y, 8 * e.fout(), 45);
 });
+const noDeflect = new Effect(12, e => {
+    Draw.color(Pal.lancerLaser);
+    Lines.stroke(2 * e.fout());
+    Lines.circle(e.x, e.y, 5 * e.fout());
+});
 
 const deflectGenerator = lib.extend(ForceProjector, ForceProjector.ForceBuild, "deflect-generator", {
     maxLevel: 30,
@@ -81,16 +86,19 @@ const deflectGenerator = lib.extend(ForceProjector, ForceProjector.ForceBuild, "
                 if(Mathf.chance(this.deflectChance) && trait.time>2){
                     h = 2;
                     trait.trns(-trait.vel.x, -trait.vel.y);
-					var dx = trait.x-this.paramEntity.x;
-					var dy = trait.y-this.paramEntity.y;
-					var dst = Mathf.sqrt(dx*dx+dy*dy);
-					dx/=dst;
-					dy/=dst;
-					var vdn = dx*trait.vel.x + dy*trait.vel.y;
-					if(vdn<0){ // dont deflect bullets already on their way out of the shield
-						trait.vel.x  = trait.vel.x-2*vdn*dx;
-						trait.vel.y  = trait.vel.y-2*vdn*dy;
-					}
+
+          					var dx = trait.x-this.paramEntity.x;
+          					var dy = trait.y-this.paramEntity.y;
+          					var dst = Mathf.sqrt(dx*dx+dy*dy);
+          					dx /= dst;
+          					dy /= dst;
+
+          					var vdn = dx * trait.vel.x + dy * trait.vel.y;
+          					if(vdn<0){ // dont deflect bullets already on their way out of the shield
+          						trait.vel.x = trait.vel.x - 2 * vdn * dx;
+          						trait.vel.y = trait.vel.y - 2 * vdn * dy;
+          					}
+
                     trait.owner = this.paramEntity;
                     trait.team = this.paramEntity.team;
                     trait.time += 1;
@@ -101,10 +109,12 @@ const deflectGenerator = lib.extend(ForceProjector, ForceProjector.ForceBuild, "
                     h = 1;
                     trait.absorb();
 
-                    Fx.absorb.at(trait);
+                    noDeflect.at(trait);
                 }
+
                 this.paramEntity.hit = 1;
                 this.paramEntity.buildup += trait.damage * this.paramEntity.warmup / h;
+
                 if(cons.valid(this)){
                     this.incExp((scale / 20) * h);
                 } else {

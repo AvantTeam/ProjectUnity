@@ -16,13 +16,15 @@ ryzerMissile.weaveScale = 4;
 
 const ryzerRailBullet = extend(RailBulletType, {});
 ryzerRailBullet.damage = 700;
-ryzerRailBullet.speed = 59;
-ryzerRailBullet.lifetime = 8;
+//ryzerRailBullet.speed = 59;
+//ryzerRailBullet.lifetime = 8;
+ryzerRailBullet.length = 59 * 7;
+ryzerRailBullet.updateEffectSeg = 59;
 ryzerRailBullet.shootEffect = effects.scarRailShoot;
 ryzerRailBullet.pierceEffect = effects.scarRailHit;
 ryzerRailBullet.updateEffect = effects.scarRailTrail;
 ryzerRailBullet.hitEffect = Fx.massiveExplosion;
-ryzerRailBullet.pierceDamageFactor = 0.2;
+ryzerRailBullet.pierceDamageFactor = 0.3;
 
 const ryzerMissileLauncher = new Weapon("unity-scar-missile-launcher");
 ryzerMissileLauncher.x = 6.25;
