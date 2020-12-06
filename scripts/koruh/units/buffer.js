@@ -1,4 +1,4 @@
-const alib = this.global.unity.abilpassive;
+const alib = this.global.unity.abilitylib;
 
 const lightningb = new JavaAdapter(BulletType, {
     range(){
@@ -33,6 +33,12 @@ bufferWep.shootSound = Sounds.spark;
 
 const buffer = extendContent(UnitType, "buffer", {
   //landed() is a no-op wtf
+  setTypeID(id){
+		this.idType = id;
+	},
+	getTypeID(){
+		return this.idType;
+	}
 });
 buffer.mineTier = 1;
 buffer.speed = 0.75;
@@ -42,19 +48,25 @@ buffer.health = 150;
 buffer.buildSpeed = 0.9;
 buffer.engineColor = Color.valueOf("d3ddff");
 buffer.weapons.add(bufferWep);
-buffer.constructor = () => extend(MechUnit, {});
+//buffer.constructor = () => extend(MechUnit, {});
 buffer.canBoost = true;
 buffer.boostMultiplier = 1.5;
-alib.add(buffer, {
-  used(u){
-    Effect.shake(1, 1, u);
-    Fx.landShock.at(u);
-    for(var i = 0; i < 8; i++){
-        Time.run(Mathf.random(8), () => Lightning.create(u.team, Pal.lancerLaser, 17, u.x, u.y, Mathf.random(360), 14));
-    }
-  },
+var classid = alib.add(buffer, MechUnit, [
+    {
+      type: "conditional",
+      name: "$ability.shockwave",
+      rechargeTime: 120,
 
-  able(u){
-    return !u.isFlying();
-  }
-})
+      able(u){
+        return !u.isFlying();
+      },
+      used(u){
+        Effect.shake(1, 1, u);
+        Fx.landShock.at(u);
+        for(var i = 0; i < 8; i++){
+            Time.run(Mathf.random(8), () => Lightning.create(u.team, Pal.lancerLaser, 17, u.x, u.y, Mathf.random(360), 14));
+        }
+      }
+    }
+  ], {});
+buffer.setTypeID(classid);

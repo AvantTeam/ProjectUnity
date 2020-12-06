@@ -47,7 +47,7 @@ const script = [
             {
                 name: "units",
                 childs: [
-                    "abilpassive",
+                    "abilitylib",
                     "ai"
                 ]
             },
