@@ -347,7 +347,7 @@ endgame.buildType = () => {
 			bulletSeq.each(e => {
                 e.added = false;
                 Groups.unit.remove(e);
-                Groups.all.remove(e);
+                if(!(e instanceof Player)) Groups.all.remove(e);
                 Groups.draw.remove(e);
             });
 			bulletSeq.clear();
