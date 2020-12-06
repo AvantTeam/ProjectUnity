@@ -193,7 +193,7 @@ const solarCollector = graphLib.finaliseExtend(Block, Building,"solar-collector"
 		this.super$load();
 		this.heatsprite = Core.atlas.find(this.name+"-heat");
 		this.lightsprite = Core.atlas.find(this.name+"-light");
-		this.bottom = Core.atlas.find(this.name);
+		this.bottom = [Core.atlas.find(this.name+"1"),Core.atlas.find(this.name+"2"),Core.atlas.find(this.name+"3"),Core.atlas.find(this.name+"4")];
 	},
 },{
 	linkedReflect:[],
@@ -241,7 +241,7 @@ const solarCollector = graphLib.finaliseExtend(Block, Building,"solar-collector"
 	},
 	draw() {
 		let temp = this.getGraphConnector("heat graph").getTemp();
-		Draw.rect(solarCollector.bottom, this.x, this.y,this.rotdeg());
+		Draw.rect(solarCollector.bottom[this.rotation], this.x, this.y,0);
 		heatlib.drawHeat(solarCollector.heatsprite,this.x, this.y,this.rotdeg(), temp);
 		if(this.thermalPwr>0){
 			Draw.z(Layer.effect);
@@ -308,6 +308,7 @@ solarReflector.buildType = () => {
 		},
 		draw(){
 			Draw.rect(solarReflector.bottom, this.x, this.y);
+			Drawf.shadow(solarReflector.mirror, this.x -(this.block.size / 2), this.y - (this.block.size / 2), this.mirrorRot);
 			Draw.rect(solarReflector.mirror, this.x, this.y,this.mirrorRot);
 		},
 		drawConfigure(){

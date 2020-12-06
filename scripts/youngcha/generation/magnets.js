@@ -131,7 +131,7 @@ const nickelStator = graphLib.finaliseExtend(Block, Building,"nickel-stator",nsb
 	
 	load(){
 		this.super$load();
-		this.basesprite = [Core.atlas.find(this.name),Core.atlas.find(this.name+2),Core.atlas.find(this.name+3),Core.atlas.find(this.name+4)];
+		this.basesprite = [Core.atlas.find(this.name+1),Core.atlas.find(this.name+2),Core.atlas.find(this.name+3),Core.atlas.find(this.name+4)];
 	},
 	
 },{
@@ -160,7 +160,7 @@ const nickelStatorLarge = graphLib.finaliseExtend(Block, Building,"nickel-stator
 	
 	load(){
 		this.super$load();
-		this.basesprite = [Core.atlas.find(this.name),Core.atlas.find(this.name+2),Core.atlas.find(this.name+3),Core.atlas.find(this.name+4)];
+		this.basesprite = [Core.atlas.find(this.name+1),Core.atlas.find(this.name+2),Core.atlas.find(this.name+3),Core.atlas.find(this.name+4)];
 	},
 	
 },{
@@ -189,7 +189,7 @@ const nickelElectromagnet = graphLib.finaliseExtend(Block, Building,"nickel-elec
 	
 	load(){
 		this.super$load();
-		this.basesprite = [Core.atlas.find(this.name),Core.atlas.find(this.name+2),Core.atlas.find(this.name+3),Core.atlas.find(this.name+4)];
+		this.basesprite = [Core.atlas.find(this.name+1),Core.atlas.find(this.name+2),Core.atlas.find(this.name+3),Core.atlas.find(this.name+4)];
 	},
 	
 },{
