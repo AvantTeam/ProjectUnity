@@ -99,6 +99,8 @@ module.exports = {
             orbMultiplier: 0.8,
             orbRefund: 0.3,
 
+            //the exact amout of exp that the former block used
+            innateExp: 0,
             //below are legacy arrays
             linearInc: [],
             linearIncStart: [],
@@ -124,7 +126,49 @@ module.exports = {
             upBlock: [],
             upMinLevel: [],
             upMaxLevel: [],
-            upAuto: []
+            upAuto: [],
+
+            //overridable functions
+            setStats(){
+                this.super$setStats();
+                this.stats.add(Stat.itemCapacity, "@", Core.bundle.format("explib.lvlAmount", this.fakeMaxLevel));
+                this.stats.add(Stat.itemCapacity, "@", Core.bundle.format("explib.expAmount", this.getRequiredEXP(this.fakeMaxLevel)));
+
+                const statTable = new StatValue({
+                    display(table){
+                        table.table(cons(t => {
+                            t.row();
+                            t.add("$explib.upgrades");
+                            t.row();
+                            for(var i=0; i<expblock.upgrades.length; i++){
+                                if(expblock.upgrades[i].min > expblock.fakeMaxLevel) continue;
+                                var size = 8 * 3;
+
+                                t.add("[green]" + Core.bundle.get("explib.level") + " " + expblock.upgrades[i].min + "[] ");
+
+                                t.image(expblock.upgrades[i].block.icon(Cicon.small)).size(size).padRight(4).scaling(Scaling.fit);
+                                t.add(expblock.upgrades[i].block.localizedName).left();
+                                t.row();
+                            }
+                        }));
+                    }
+                });
+                this.stats.add(Stat.abilities, statTable);
+                if(this.customStats) this.customStats();
+            },
+            setBars() {
+                this.super$setBars();
+                this.bars.add("level", func(build => {
+                    return new Bar(prov(() => Core.bundle.get("explib.level") + " " + this.getLevel(build.totalExp())), prov(() => Tmp.c1.set(this.level0Color).lerp(this.levelMaxColor, Mathf.clamp(this.getLevel(build.totalExp()) / this.fakeMaxLevel))), floatp(() => {
+                        return Mathf.clamp(this.getLevel(build.totalExp()) / this.fakeMaxLevel);
+                    }));
+                }));
+                this.bars.add("exp", func(build => {
+                    return new Bar(prov(() => (build.totalExp() < this.maxExp) ? Core.bundle.get("explib.exp") : Core.bundle.get("explib.max")), prov(() => Tmp.c1.set(this.exp0Color).lerp(this.expMaxColor, this.getLvlf(build.totalExp()))), floatp(() => {
+                        return this.getLvlf(build.totalExp());
+                    }));
+                }));
+            }
             //end
         }, obj, {
             //start
@@ -193,22 +237,11 @@ module.exports = {
                     this[this.listInc[i]] = this.listIncMul[i][Math.min(lvl, this.listIncMul[i].length - 1)];
                 };
             },
-            setBars() {
-                this.super$setBars();
-                this.bars.add("level", func(build => {
-                    return new Bar(prov(() => Core.bundle.get("explib.level") + " " + this.getLevel(build.totalExp())), prov(() => Tmp.c1.set(this.level0Color).lerp(this.levelMaxColor, Mathf.clamp(this.getLevel(build.totalExp()) / this.fakeMaxLevel))), floatp(() => {
-                        return Mathf.clamp(this.getLevel(build.totalExp()) / this.fakeMaxLevel);
-                    }));
-                }));
-                this.bars.add("exp", func(build => {
-                    return new Bar(prov(() => (build.totalExp() < this.maxExp) ? Core.bundle.get("explib.exp") : Core.bundle.get("explib.max")), prov(() => Tmp.c1.set(this.exp0Color).lerp(this.expMaxColor, this.getLvlf(build.totalExp()))), floatp(() => {
-                        return this.getLvlf(build.totalExp());
-                    }));
-                }));
-            },
+
             isNumerator(stat) {
                 return stat == Stat.inaccuracy || stat == Stat.shootRange;
             },
+            /*
             setStats() {
                 this.forStats.put("range", Stat.shootRange);
                 this.forStats.put("inaccuracy", Stat.inaccuracy);
@@ -242,7 +275,7 @@ module.exports = {
                     var temp = this.forStats.get(this.boolInc[i]);
                     if(temp) this.stats.add(temp, Core.bundle.get("explib.bool"), String(this.boolIncMul[i]), !this.boolIncStart[i]);
                 };
-            },
+            },*/
             //orb region
             hasExp(){
               //this is bc in js only functions are public. when porting to java, make this a public attribute instead. In fact, make 2 attributes, hasExp(for all exp blocks) and consumesExp(for orbs). This is the smae for light-lib blocks, you'll se that they are treated as variables even though they are functions.
@@ -294,6 +327,7 @@ module.exports = {
                     if(expblock.upgrades[i].iconContent === undefined) expblock.upgrades[i].iconContent = expblock.upgrades[i].block;
                 }
                 if((typeof(expblock.upgrades[i].iconContent)) == "string") expblock.upgrades[i].iconContent = Vars.content.getByName((expblock.upgrades[i].iconContentType == undefined)? ContentType.item : expblock.upgrades[i].iconContentType, expblock.upgrades[i].iconContent);
+                //if(expblock.upgrades[i].block.hasInnateExp) expblock.upgrades[i].block.setInnateExp(expblock.getRequiredEXP(expblock.upgrades[i].min)); //add to java port, rhino is meh
             }
         });
         Events.on(EventType.ServerLoadEvent, () => {
@@ -303,6 +337,7 @@ module.exports = {
                     if(expblock.upgrades[i].iconContent === undefined) expblock.upgrades[i].iconContent = expblock.upgrades[i].block;
                 }
                 if((typeof(expblock.upgrades[i].iconContent)) == "string") expblock.upgrades[i].iconContent = Vars.content.getByName((expblock.upgrades[i].iconContentType == undefined)? ContentType.item : expblock.upgrades[i].iconContentType, expblock.upgrades[i].iconContent);
+                //if(expblock.upgrades[i].block.hasInnateExp) expblock.upgrades[i].block.setInnateExp(expblock.getRequiredEXP(expblock.upgrades[i].min));
             }
         });
 
@@ -337,7 +372,7 @@ module.exports = {
 
         objb = Object.assign({
             onDestroyed(){
-                orblib.spreadExp(this.x, this.y, this.totalExp() * expblock.orbRefund, 3 * expblock.size);
+                orblib.spreadExp(this.x, this.y, this.totalExp() * expblock.orbRefund + expblock.innateExp, 3 * expblock.size);
                 this.super$onDestroyed();
             }
         }, objb, {
@@ -492,13 +527,13 @@ module.exports = {
             },
 
             makeInfoButton(t, block){
-                t.button(Icon.infoCircle, Styles.cleari, () => {
+                t.button(Icon.infoCircle, Styles.emptyi, () => {
                     Vars.ui.content.show(block);
                 }).size(40);
             },
             makeUpgradeButton(t, id, lvl){
                 //print("Made IDButton:" + id);
-                t.button(Icon.up, Styles.cleari, () => {
+                t.button(Icon.up, Styles.emptyi, () => {
                     Vars.control.input.frag.config.hideConfig();
                     if(!expblock.useStringSync) this.configure(new Integer(id + 1));
                     else this.configure((id + 1) + "");
@@ -517,9 +552,9 @@ module.exports = {
                             info.add("[green]"+block.localizedName+"[]\n"+Core.bundle.get("explib.level.short")+" ["+((arr[i].min == lvl)?"green":"accent")+"]"+lvl+"[]/"+arr[i].min);
                         })).fillX().growX();
                         this.makeInfoButton(t, block);
-                        if(arr[i].min == lvl) Styles.cleari.imageUpColor = expblock.upgradeColor;
+                        if(arr[i].min == lvl) Styles.emptyi.imageUpColor = expblock.upgradeColor;
                         this.makeUpgradeButton(t, arr[i].id, lvl);
-                        if(arr[i].min == lvl) Styles.cleari.imageUpColor = Color.white;
+                        if(arr[i].min == lvl) Styles.emptyi.imageUpColor = Color.white;
                     })).height(50).growX();
 
                     if(i < arr.length - 1) table.row();
