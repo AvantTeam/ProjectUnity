@@ -1,22 +1,23 @@
-const lightning = new JavaAdapter(BulletType, {
+const lightningb = new JavaAdapter(BulletType, {
     range(){
       return 70;
     },
     draw(b){},
     init(b){
+        if(b == null) return;
         Lightning.create(b.team, Pal.lancerLaser, this.damage, b.x, b.y, b.rotation(), 30);
     }
 }, 0.001, 12);
-//lightning.speed = 0.001;
-//lightning.damage = 12;
-lightning.lifetime = 1;
-lightning.shootEffect = Fx.hitLancer;
-lightning.smokeEffect = Fx.none;
-lightning.despawnEffect = Fx.none;
-lightning.hitEffect = Fx.hitLancer;
-lightning.keepVelocity = false;
+//lightningb.speed = 0.001;
+//lightningb.damage = 12;
+lightningb.lifetime = 1;
+lightningb.shootEffect = Fx.hitLancer;
+lightningb.smokeEffect = Fx.none;
+lightningb.despawnEffect = Fx.none;
+lightningb.hitEffect = Fx.hitLancer;
+lightningb.keepVelocity = false;
 
-const bufferWep = new Weapon("bufferShockgun");
+const bufferWep = new Weapon("buffer-shockgun");
 bufferWep.shake = 2;
 bufferWep.y = 1;
 bufferWep.reload = 55;
@@ -25,7 +26,7 @@ bufferWep.alternate = true;
 bufferWep.shots = 2;
 bufferWep.inaccuracy = 0;
 bufferWep.ejectEffect = Fx.none;
-bufferWep.bullet = lightning;
+bufferWep.bullet = lightningb;
 bufferWep.shootSound = Sounds.spark;
 
 const buffer = extendContent(UnitType, "buffer", {
@@ -37,7 +38,7 @@ const buffer = extendContent(UnitType, "buffer", {
         }
     }
 });
-buffer.mineTier = -1;
+buffer.mineTier = 1;
 buffer.speed = 0.75;
 buffer.boostMultiplier = 1.26;
 buffer.itemCapacity = 15;
