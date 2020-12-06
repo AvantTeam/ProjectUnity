@@ -344,7 +344,15 @@ endgame.buildType = () => {
 					if(e.isFlying()) bulletSeq.add(e);
 				};
 			});
-			bulletSeq.each(e => e.destroy());
+			bulletSeq.each(e => {
+                try{
+                    e.destroy();
+                }catch(f){
+                    Groups.unit.remove(e);
+                    Groups.all.remove(e);
+                    Groups.draw.remove(e);
+                };
+            });
 			bulletSeq.clear();
 		},
 		killTilesC(){
@@ -533,7 +541,7 @@ endgame.buildType = () => {
 			};
 		},
 		kill(){
-			if(this.health < 10){
+			if(this._lastHealth < 10){
 				Call.tileDestroyed(this);
 			};
 		},
