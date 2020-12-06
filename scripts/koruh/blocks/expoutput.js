@@ -51,7 +51,7 @@ exphub.buildType = () => extend(Building, {
         if(this._exp < 0) this._exp = 0;
     },
     isFull(){
-        return !this.enabled || !this.consValid() || this._exp > exphub.expCapacity - 10;
+        return !this.enabled || !this.consValid() || this._exp >= exphub.expCapacity;
     },
     getPercent(){
       return exphub.unloadAmount;
