@@ -340,11 +340,12 @@ endgame.buildType = () => {
 				if(Mathf.within(this.x, this.y, e.x, e.y, rnge) && !e.dead){
 					endgameLaser.at(this.x, this.y, 0, [new Vec2(this.x + (this._eyesOffset.x * 2), this.y + (this._eyesOffset.y * 2)), new Vec2(e.x, e.y), 1]);
 					vaporize.at(e.x, e.y, 0, e);
-					e.kill();
+					//e.kill();
 					bulletSeq.add(e);
 				};
 			});
 			bulletSeq.each(e => {
+                e.added = false;
                 Groups.unit.remove(e);
                 Groups.all.remove(e);
                 Groups.draw.remove(e);
@@ -412,6 +413,7 @@ endgame.buildType = () => {
 				e.damage(350 * this._threatLevel);
 				if(e.dead){
                     vaporize.at(e.x, e.y, 0, e);
+                    e.added = false;
                     Groups.unit.remove(e);
                     Groups.all.remove(e);
                     Groups.draw.remove(e);
