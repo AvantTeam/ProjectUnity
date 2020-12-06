@@ -1,8 +1,11 @@
 {
 	"size": 1,
 	"health": 60,
-  "hasPower": false,
-  "consumesPower": false,
+  "hasPower": true,
+  "consumesPower": true,
+  "consumes": {
+		"power": 0.06,
+	},
   "requirements": [
 		{"item": "stone", "amount": 25},
 		{"item": "copper", "amount": 25},

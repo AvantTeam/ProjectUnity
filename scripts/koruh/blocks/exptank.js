@@ -26,7 +26,10 @@ const exptank = extendContent(Block, "exp-tank", {
     },
     expCapacityf(){
         return this.expCapacity;
-    }
+    }/*,
+    isHubbable(){
+        return true;
+    }*/
 });
 exptank.update = true;
 exptank.sync = true;
@@ -72,5 +75,11 @@ exptank.buildType = () => extend(Building, {
     },
     drawLight(){
         Drawf.light(this.team, this, 25 + 25 * this.expf(), expColor, 0.5 * this.expf());
-    }
+    }/*,
+    setHub(hub){
+        //no.
+    },
+    getHub(){
+        return null;
+    }*/
 });

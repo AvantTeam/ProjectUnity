@@ -393,6 +393,11 @@ module.exports = {
             },
             incExp(a) {
                 if(this._exp >= expblock.maxExp && a > 0) return;
+                if(a > 0 && this.getHub() != null && !this.getHub().isFull()){
+                    var per = this.getHub().getPercent();
+                    this.getHub().incExp(a * per);
+                    a = 1.1 - a * per;
+                }
                 this._exp += a;
                 if(this._exp > expblock.maxExp) this._exp = expblock.maxExp;
                 if(this._exp < 0) this._exp = 0;
@@ -613,6 +618,20 @@ module.exports = {
             },
             getOrbMuitiplier(){
                 return expblock.orbMultiplier;
+            },
+            //hub region
+            isHubbable(){
+              return true;
+            },
+            setHub(hub){
+              this._exphub = hub;
+            },
+            getHub(){
+              if(this._exphub == null) return null;
+              if(!this._exphub.isValid()){
+                this._exphub = null;
+              }
+              return this._exphub;
             }
         });
         //Extend Building
@@ -623,6 +642,7 @@ module.exports = {
             ent._checked = true;
             ent._lastexp = -1;
             ent._cachedCursor = null;
+            ent._exphub = null;
             return ent;
         };
         return expblock;
