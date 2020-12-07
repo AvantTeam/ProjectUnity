@@ -14,7 +14,7 @@ ext{
 }
 
 task proc(dependsOn: classes){
-    dependsOn ":main:classes"
+    dependsOn ":main:jar"
 
     doLast{
         delete{
