@@ -1,0 +1,84 @@
+const effects = this.global.unity.effects;
+const ais = this.global.unity.ai;
+
+const zenaMissile = extend(MissileBulletType, {});
+zenaMissile.speed = 5;
+zenaMissile.height = 12;
+zenaMissile.width = 7;
+zenaMissile.shrinkY = 0;
+zenaMissile.backColor = Color.valueOf("f53036");
+zenaMissile.frontColor = Color.valueOf("ff786e");
+zenaMissile.trailColor = Color.valueOf("f53036");
+zenaMissile.splashDamage = 30;
+zenaMissile.splashDamageRadius = 20;
+zenaMissile.weaveMag = 3;
+zenaMissile.weaveScale = 4;
+
+const zenaRailBullet = extend(RailBulletType, {});
+zenaRailBullet.damage = 780;
+//zenaRailBullet.speed = 59;
+//zenaRailBullet.lifetime = 8;
+zenaRailBullet.length = 60 * 7;
+zenaRailBullet.updateEffectSeg = 60;
+zenaRailBullet.shootEffect = effects.scarRailShoot;
+zenaRailBullet.pierceEffect = effects.scarRailHit;
+zenaRailBullet.updateEffect = effects.scarRailTrail;
+zenaRailBullet.hitEffect = Fx.massiveExplosion;
+zenaRailBullet.pierceDamageFactor = 0.2;
+
+const zenaRailBulletWeak = extend(RailBulletType, {});
+zenaRailBulletWeak.damage = 230;
+//zenaRailBulletWeak.speed = 59;
+//zenaRailBulletWeak.lifetime = 8;
+zenaRailBulletWeak.length = 40 * 7;
+zenaRailBulletWeak.updateEffectSeg = 40;
+zenaRailBulletWeak.shootEffect = effects.scarRailShoot;
+zenaRailBulletWeak.pierceEffect = effects.scarRailHit;
+zenaRailBulletWeak.updateEffect = effects.scarRailTrail;
+zenaRailBulletWeak.hitEffect = Fx.massiveExplosion;
+zenaRailBulletWeak.pierceDamageFactor = 0.5;
+
+const zenaMainRailgun = new Weapon("");
+zenaMainRailgun.reload = 2.75 * 60;
+zenaMainRailgun.x = 0;
+zenaMainRailgun.y = 12;
+zenaMainRailgun.shootY = 0;
+zenaMainRailgun.mirror = false;
+zenaMainRailgun.rotate = false;
+zenaMainRailgun.shake = 2.3;
+zenaMainRailgun.bullet = zenaRailBullet;
+
+const zenaSecRailgun = new Weapon("");
+zenaSecRailgun.reload = 2.25 * 70;
+zenaSecRailgun.x = 10.25;
+zenaSecRailgun.y = 2;
+zenaSecRailgun.rotate = false;
+zenaSecRailgun.shake = 1.1;
+zenaSecRailgun.bullet = zenaRailBulletWeak;
+
+const zenaMissileLauncher = new Weapon("unity-scar-missile-launcher");
+zenaMissileLauncher.x = 12.25;
+zenaMissileLauncher.y = -5;
+zenaMissileLauncher.reload = 50;
+zenaMissileLauncher.shots = 5;
+zenaMissileLauncher.shotDelay = 3;
+zenaMissileLauncher.inaccuracy = 4;
+zenaMissileLauncher.rotate = true;
+zenaMissileLauncher.bullet = zenaMissile;
+
+const zena = extendContent(UnitType, "zena", {});
+zena.speed = 0.7;
+zena.health = 1220;
+zena.weapons.add(zenaMainRailgun);
+zena.weapons.add(zenaSecRailgun);
+zena.weapons.add(zenaMissileLauncher);
+zena.hitSize = 10.5 * 1.7;
+zena.range = 350;
+zena.allowLegStep = true;
+zena.legMoveSpace = 0.73;
+zena.legCount = 6;
+zena.legTrns = 0.4;
+zena.legLength = 40;
+zena.legExtension = -9.3;
+zena.defaultController = ais.distanceGroundAI;
+zena.constructor = () => extend(LegsUnit, {});

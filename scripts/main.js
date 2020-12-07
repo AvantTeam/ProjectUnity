@@ -160,6 +160,7 @@ const script = [
                 childs: [
                     "hovos",
                     "ryzer",
+                    "zena",
 
                     "whirlwind",
                     "jetstream",
