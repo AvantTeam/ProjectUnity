@@ -70,13 +70,31 @@ var thelib = {
     Events.on(EventType.ServerLoadEvent, () => {
       Vars.netServer.addPacketHandler("skilluse", (p, h) => {
         //following will be called on server
-        if(p.unit() != null && p.unit().useSkills) this.syncFromServer(p.unit());
+
+        if(p.unit() != null && p.unit().useSkills){
+          this.syncFromServer(p.unit());
+          Call.clientPacketReliable("skillusec", p.id);
+        }
+      });
+      Vars.netClient.addPacketHandler("skillusec", (h) => {
+        //following will run on all clients minus the server
+        var pl = Groups.player.getByID(h - 0);
+        if(pl != null && pl.unit() != null && pl.unit().useSkills) this.syncedClick(pl.unit());
       });
     });
     Events.on(EventType.ClientLoadEvent, () => {
       Vars.netServer.addPacketHandler("skilluse", (p, h) => {
         //following will be called on server
-        if(p.unit() != null && p.unit().useSkills) this.syncFromServer(p.unit());
+
+        if(p.unit() != null && p.unit().useSkills){
+          this.syncFromServer(p.unit());
+          Call.clientPacketReliable("skillusec", p.id);
+        }
+      });
+      Vars.netClient.addPacketHandler("skillusec", (h) => {
+        //following will run on all clients minus the server
+        var pl = Groups.player.getByID(h - 0);
+        if(pl != null && pl.unit() != null && pl.unit().useSkills) this.syncedClick(pl.unit());
       });
     });
 
@@ -122,13 +140,19 @@ var thelib = {
     //print("Notify");
     if(Vars.headless) return;
     if(!Vars.net.active()) this.syncedClick(Vars.player.unit());
-    else if(!Vars.net.client()) this.syncFromServer(Vars.player.unit());
+    else if(!Vars.net.client()) this.syncFromHost();
     else Call.serverPacketReliable("skilluse", "");
   },
 
   syncFromServer(u){
-    //runs on the server. TODO: make it run syncedclick on all clients
+    //runs on the server.
     this.syncedClick(u);
+  },
+
+  syncFromHost(u){
+    //runs on the host who is not a headless. TODO: make it run syncedclick on all clients
+    this.syncedClick(u);
+    Call.clientPacketReliable("skillusec", Vars.player.id);
   },
 
   syncedClick(u){
