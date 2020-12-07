@@ -6,8 +6,8 @@ laserZap.damage = 90;
 laserZap.sideAngle = 15;
 laserZap.sideWidth = 1.5;
 laserZap.sideLength = 60;
-laserZap.width = 25;
-laserZap.length = 180;
+laserZap.width = 16;
+laserZap.length = 215;
 laserZap.shootEffect = Fx.shockwave;
 laserZap.colors = [Pal.lancerLaser.cpy().mul(1, 1, 1, 0.7), Pal.lancerLaser, Color.white]
 /*
@@ -129,7 +129,7 @@ const dijkstra = extendContent(UnitType, "dijkstra", {
 dijkstra.mineTier = -1;
 dijkstra.speed = 7.5;
 dijkstra.drag = 0.01;
-dijkstra.health = 560;
+dijkstra.health = 640;
 dijkstra.flying = true;
 dijkstra.armor = 8;
 dijkstra.accel = 0.01;
@@ -184,6 +184,14 @@ var classid = alib.add(dijkstra, UnitEntity, [
         Damage.collideLine(b, u.team, slasheffect, u.x, u.y, dir, 16 * Vars.tilesize, true);
         u.apply(boostedskill, 30);
         var posnew = Tmp.v1.set(18 * Vars.tilesize, 0).setAngle(dir);
+        u.set(posnew.x + u.x, posnew.y + u.y);
+        if(u.isPlayer()){
+          u.getPlayer().snapInterpolation();
+          u.getPlayer().snapSync();
+        }
+        else{
+          u.snapInterpolation();
+        }
         /*if(!Vars.net.client()){
           u.set(posnew.x + u.x, posnew.y + u.y);
           u.snapInterpolation();
@@ -203,11 +211,12 @@ var classid = alib.add(dijkstra, UnitEntity, [
           Sounds.spark.at(posnew.x + u.x, posnew.y + u.y, 1.6);
           Fx.lancerLaserShootSmoke.at(posnew.x + u.x, posnew.y + u.y, (dir + 180) % 360);
         }
+        /*
         Time.run(15, () => {
           if(u != null && u.isValid() && !u.dead) u.vel.trns(dir, 3);
-        });
+        });*/
 
-        u.vel.trns(dir, 21);
+        u.vel.trns(dir, 4);
       }
     }
   ], {}, true);
