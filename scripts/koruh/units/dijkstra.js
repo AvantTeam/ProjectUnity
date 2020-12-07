@@ -204,7 +204,7 @@ var classid = alib.add(dijkstra, UnitEntity, [
           Fx.lancerLaserShootSmoke.at(posnew.x + u.x, posnew.y + u.y, (dir + 180) % 360);
         }
         Time.run(15, () => {
-          if((!Vars.net.active() || Vars.net.client()) && u != null && u.isValid() && !u.dead) u.vel.trns(dir, 3);
+          if(u != null && u.isValid() && !u.dead) u.vel.trns(dir, 3);
         });
 
         u.vel.trns(dir, 21);
