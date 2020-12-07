@@ -282,7 +282,8 @@ const script = [
                 name: "units",
                 childs: [
                     "buffer",
-                    "cache"
+                    "cache",
+                    "dijkstra"
                 ]
             }
         ]
