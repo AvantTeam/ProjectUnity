@@ -80,6 +80,10 @@ var classid = alib.add(dijkstra, UnitEntity, [
       type: "active",
       name: "$ability.blastcut",
       rechargeTime: 30,
+      aiUse: true,
+      aiShouldUse(u){
+        return Units.closestEnemy(u.team ,u.x ,u.y ,25 * Vars.tilesize, boolf(tu => true)) != null;
+      },
 
       used(u){
         var target = Units.closestEnemy(u.team ,u.x ,u.y ,25 * Vars.tilesize, boolf(tu => true));
@@ -91,16 +95,20 @@ var classid = alib.add(dijkstra, UnitEntity, [
         Damage.collideLine(b, u.team, slasheffect, u.x, u.y, dir, 7 * Vars.tilesize, false);
         u.apply(boostedskill, 1);
         var posnew = Tmp.v1.set(8 * Vars.tilesize, 0).setAngle(dir);
-        u.set(posnew.x + u.x, posnew.y + u.y);
-        u.snapInterpolation();
+        if(!Vars.net.client()){
+          u.set(posnew.x + u.x, posnew.y + u.y);
+          u.snapInterpolation();
+          if(u.isPlayer()) u.getPlayer().snapSync();
+        }
+
         //u.set(posnew.x + u.x, posnew.y + u.y);//for good measure
-        Core.app.post(() => {
-          if(!Vars.headless && u.getPlayer() == Vars.player)  Core.camera.position.set(Vars.player);
-        });
+        /*Core.app.post(() => {
+          if(!Vars.headless && u.getPlayer() == Vars.player) Core.camera.position.set(Vars.player);
+        });*/
 
         if(!Vars.headless){
-          Sounds.spark.at(u.x, u.y, 1.6);
-          Fx.lancerLaserShootSmoke.at(u.x, u.y, (dir + 180) % 360);
+          Sounds.spark.at(posnew.x + u.x, posnew.y + u.y, 1.6);
+          Fx.lancerLaserShootSmoke.at(posnew.x + u.x, posnew.y + u.y, (dir + 180) % 360);
         }
 
         u.vel.trns(dir, 4);
