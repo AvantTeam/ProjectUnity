@@ -93,10 +93,16 @@ var classid = alib.add(dijkstra, UnitEntity, [
         var posnew = Tmp.v1.set(8 * Vars.tilesize, 0).setAngle(dir);
         u.set(posnew.x + u.x, posnew.y + u.y);
         u.snapInterpolation();
-        u.set(posnew.x + u.x, posnew.y + u.y);//for good measure
-        if(!Vars.headless && u.getPlayer() == Vars.player)  Core.camera.position.set(Vars.player);
-        Sounds.spark.at(u.x, u.y, 1.6);
-        Fx.lancerLaserShootSmoke.at(u.x, u.y, (dir + 180) % 360);
+        //u.set(posnew.x + u.x, posnew.y + u.y);//for good measure
+        Core.app.post(() => {
+          if(!Vars.headless && u.getPlayer() == Vars.player)  Core.camera.position.set(Vars.player);
+        });
+
+        if(!Vars.headless){
+          Sounds.spark.at(u.x, u.y, 1.6);
+          Fx.lancerLaserShootSmoke.at(u.x, u.y, (dir + 180) % 360);
+        }
+
         u.vel.trns(dir, 4);
       }
     }
