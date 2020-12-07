@@ -217,7 +217,7 @@ var thelib = {
         //this should run on all clients (TODO)
         //print("UseSkills");
         this.abilities.each(ab => {
-          print(ab);
+          //print(ab);
           if(ab.isActiveSkill) ab.tryuse(this);
         });
       }
