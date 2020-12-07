@@ -55,7 +55,7 @@ const slasheffect = new Effect(90, e => {
 const boostedskill = new StatusEffect("boostedskill");
 boostedskill.color = Pal.lancerLaser;
 boostedskill.effect = Fx.none;
-boostedskill.speedMultiplier = 1.45;
+boostedskill.speedMultiplier = 2;
 const lightningsk = new JavaAdapter(BulletType, {
     range(){
       return 21 * Vars.tilesize;
@@ -82,36 +82,43 @@ var classid = alib.add(dijkstra, UnitEntity, [
       rechargeTime: 30,
       aiUse: true,
       aiShouldUse(u){
-        return Units.closestEnemy(u.team ,u.x ,u.y ,25 * Vars.tilesize, boolf(tu => true)) != null;
+        return Units.closestEnemy(u.team ,u.x ,u.y ,20 * Vars.tilesize, boolf(tu => true)) != null;
       },
 
       used(u){
-        var target = Units.closestEnemy(u.team ,u.x ,u.y ,25 * Vars.tilesize, boolf(tu => true));
+        var target = Units.closestEnemy(u.team ,u.x ,u.y, 35 * Vars.tilesize, boolf(tu => true));
         var dir = u.rotation;
         if(target) dir = Tmp.v1.set(target.x - u.x,target.y - u.y).angle();
         Fx.lightningShoot.at(u.x, u.y, dir);
 
         var b = lightningsk.create(u, u.team, u.x, u.y, dir, -1, 1, 1, null);
-        Damage.collideLine(b, u.team, slasheffect, u.x, u.y, dir, 7 * Vars.tilesize, false);
-        u.apply(boostedskill, 1);
-        var posnew = Tmp.v1.set(8 * Vars.tilesize, 0).setAngle(dir);
-        if(!Vars.net.client()){
+        Damage.collideLine(b, u.team, slasheffect, u.x, u.y, dir, 16 * Vars.tilesize, true);
+        u.apply(boostedskill, 30);
+        var posnew = Tmp.v1.set(18 * Vars.tilesize, 0).setAngle(dir);
+        /*if(!Vars.net.client()){
           u.set(posnew.x + u.x, posnew.y + u.y);
           u.snapInterpolation();
           if(u.isPlayer()) u.getPlayer().snapSync();
-        }
+        }*/
 
         //u.set(posnew.x + u.x, posnew.y + u.y);//for good measure
         /*Core.app.post(() => {
           if(!Vars.headless && u.getPlayer() == Vars.player) Core.camera.position.set(Vars.player);
         });*/
 
+        if(Vars.mobile && !Vars.headless && u.getPlayer() == Vars.player){
+          Core.camera.position.set(posnew.x + u.x, posnew.y + u.y);
+        }
+
         if(!Vars.headless){
           Sounds.spark.at(posnew.x + u.x, posnew.y + u.y, 1.6);
           Fx.lancerLaserShootSmoke.at(posnew.x + u.x, posnew.y + u.y, (dir + 180) % 360);
         }
+        Time.run(15, () => {
+          if(u != null && u.isValid() && !u.dead) u.vel.trns(dir, 3);
+        });
 
-        u.vel.trns(dir, 4);
+        u.vel.trns(dir, 21);
       }
     }
   ], {}, true);

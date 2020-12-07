@@ -124,7 +124,7 @@ var thelib = {
     var press = false;
     Events.run(Trigger.update, () => {
       if(!Vars.state.isMenu()){
-        if(Core.input.keyDown(Binding.boost)){
+        if(Core.input.keyDown(Binding.boost) && !(Core.scene.getKeyboardFocus() instanceof TextField)){
           if(!press){
             press = true;
             this.notifyClick();
