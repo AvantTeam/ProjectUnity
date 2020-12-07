@@ -76,11 +76,11 @@ var thelib = {
           Call.clientPacketReliable("skillusec", p.id);
         }
       });
-      Vars.netClient.addPacketHandler("skillusec", (h) => {
+      /*Vars.netClient.addPacketHandler("skillusec", (h) => {
         //following will run on all clients minus the server
         var pl = Groups.player.getByID(h - 0);
         if(pl != null && pl.unit() != null && pl.unit().useSkills) this.syncedClick(pl.unit());
-      });
+      });*/
     });
     Events.on(EventType.ClientLoadEvent, () => {
       Vars.netServer.addPacketHandler("skilluse", (p, h) => {
