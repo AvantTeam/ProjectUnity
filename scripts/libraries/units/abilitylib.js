@@ -67,10 +67,19 @@ var thelib = {
 
   setupActive(dothis){
     if(!dothis) return;
-    Vars.netServer.addPacketHandler("skilluse", (p, h) => {
-      //following will be called on server
-      if(p.unit() != null && p.unit().useSkills) this.syncFromServer(p.unit());
+    Events.on(EventType.ServerLoadEvent, () => {
+      Vars.netServer.addPacketHandler("skilluse", (p, h) => {
+        //following will be called on server
+        if(p.unit() != null && p.unit().useSkills) this.syncFromServer(p.unit());
+      });
     });
+    Events.on(EventType.ClientLoadEvent, () => {
+      Vars.netServer.addPacketHandler("skilluse", (p, h) => {
+        //following will be called on server
+        if(p.unit() != null && p.unit().useSkills) this.syncFromServer(p.unit());
+      });
+    });
+
     this.setupMobile(Vars.mobile);
     this.setupDesktop(!Vars.mobile);
   },
