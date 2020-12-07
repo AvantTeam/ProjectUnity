@@ -41,12 +41,12 @@ const reconChange = (recon, planArray) => {
 const addPlan = (factory, plan) => {
     unitPlans.clear();
     var fac = factory;
-    
+
     unitPlans.add(plan);
     fac.plans.each(u => unitPlans.add(u));
-    
+
     fac.plans = unitPlans.copy();
-    
+
     fac.plans.each(uPlan => {
         var stack = uPlan.requirements;
         for(var j = 0; j < stack.length; j++){
@@ -59,6 +59,19 @@ const addPlan = (factory, plan) => {
 const unitLoader = extend(ContentList, {
     load(){
         //Factories
+        //Not Air
+        const buffer = new UnitFactory.UnitPlan(
+            Vars.content.getByName(ContentType.unit, "unity-buffer"),
+            60 * 25,
+            ItemStack.with(
+                Vars.content.getByName(ContentType.item, "unity-stone"), 30,
+                Vars.content.getByName(ContentType.item, "unity-dense-alloy"), 20,
+                Items.titanium, 25
+            )
+        );
+        addPlan(Blocks.groundFactory, buffer);
+        //End
+
         //Air
         const caelifera = new UnitFactory.UnitPlan(
             Vars.content.getByName(ContentType.unit, "unity-caelifera"),
@@ -69,7 +82,7 @@ const unitLoader = extend(ContentList, {
             )
         );
         addPlan(Blocks.airFactory, caelifera);
-        
+
         //Naval
         const amphibi = new UnitFactory.UnitPlan(
             Vars.content.getByName(ContentType.unit, "unity-amphibi-naval"),
@@ -96,6 +109,11 @@ const unitLoader = extend(ContentList, {
             ],
 
             [
+                Vars.content.getByName(ContentType.unit, "unity-buffer"),
+                Vars.content.getByName(ContentType.unit, "unity-cache")
+            ],
+
+            [
                 Vars.content.getByName(ContentType.unit, "unity-stele"),
                 Vars.content.getByName(ContentType.unit, "unity-pedestal")
             ]
@@ -106,6 +124,11 @@ const unitLoader = extend(ContentList, {
             [
                 Vars.content.getByName(ContentType.unit, "unity-schistocerca"),
                 Vars.content.getByName(ContentType.unit, "unity-anthophila")
+            ],
+
+            [
+                Vars.content.getByName(ContentType.unit, "unity-cache"),
+                Vars.content.getByName(ContentType.unit, "unity-dijkstra")
             ],
 
             [
