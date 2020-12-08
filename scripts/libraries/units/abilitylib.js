@@ -19,8 +19,32 @@ const smallRingFx = new Effect(20, e => {
   if(!(e.data instanceof Unit)) return;
   if(!e.data.isValid() || e.data.dead) return;
   Draw.color(Color.white, e.color, e.fin());
+  Lines.stroke(e.fin());
+  Lines.circle(e.data.x, e.data.y, e.fin() * 5);
+});
+
+const squareFx = new Effect(25, e => {
+  if(!(e.data instanceof Unit)) return;
+  if(!e.data.isValid() || e.data.dead) return;
+  Draw.color(Color.white, e.color, e.fin());
+  Lines.stroke(e.fout() * 2.5);
+  Lines.square(e.data.x, e.data.y, e.fin() * 18, 45);
+});
+
+const slotFx3 = new Effect(70, e => {
+  if(!Array.isArray(e.data)) return;
+  if(e.data[1] == null || !e.data[1].isValid() || e.data[1].dead || !e.data[1].slotsLeft) return;
+  Draw.color(e.color);
+  Draw.alpha(e.fout(0.5));
   Lines.stroke(e.fout());
-  Lines.circle(e.data.x, e.data.y, e.finpow() * 5);
+  for(var i=0;i<3;i++){
+    if(i < e.data[1].slotsLeft(e.data[0]) && e.data[1].slotsLeft(e.data[0]) < e.rotation){
+      Fill.square(e.data[1].x + i * 5 - 5, e.data[1].y, 2, 45);
+    }
+    else{
+      Lines.square(e.data[1].x + i * 5 - 5, e.data[1].y, 2, 45);
+    }
+  }
 });
 
 //deepcopy no work
@@ -64,6 +88,9 @@ unittypehere.setTypeID(classid);
 var thelib = {
   waitFx: waitFx,
   ringFx: ringFx,
+  smallRingFx: smallRingFx,
+  squareFx: squareFx,
+  slotFx3: slotFx3,
 
   setupActive(dothis){
     if(!dothis) return;
@@ -180,7 +207,7 @@ var thelib = {
           this._timers.push(0);
           this._isUsed.push(false);
           this._check.push(true);
-          this._left.push(1);
+          this._left.push(0);
         }
       },
       getCool(id){
@@ -192,6 +219,14 @@ var thelib = {
       usedCool(id, a){
         this._timers[id] = a;
         this._isUsed[id] = true;
+      },
+      usedCoolSlot(id, a, smax){
+        if(this._left[id] > 1) this._left[id]--;
+        else{
+          this._timers[id] = a;
+          this._isUsed[id] = true;
+          this._left[id] = smax;
+        }
       },
       getUse(id){
         if(this._isUsed[id]){
@@ -328,6 +363,7 @@ var thelib = {
       singleRechargeFx: smallRingFx,
       //whether ai mindlessly spams the skill, or just not use it at all
       aiUse: false,
+      slotFx: slotFx3,
 
       localized(){
         return this.name;
@@ -349,6 +385,9 @@ var thelib = {
       },
       update(u){
         //if((u.isPlayer() && u.getPlayer() == Vars.player) && u.useCheck(id, Core.input.keyDown(Binding.boost))) this.tryuse(u);
+        if(this.slots > 1 && this.singleRecharge > 0){
+          //TODO
+        }
         if(!u.isPlayer() && this.aiUse && this.able(u) && this.aiShouldUse(u) && u.getCool(id) + this.rechargeTime < Time.time) this.tryuse(u);
         if(this.rechargeFx != Fx.none && u.getCool(id) + this.rechargeTime < Time.time && u.getUse(id) && (this.rechargeVisible || (u.isPlayer() && u.getPlayer() == Vars.player))) this.rechargeFx.at(u.x, u.y, 0, this.color, u);
       }
@@ -356,8 +395,15 @@ var thelib = {
       tryuse(u){
         if(u.getCool(id) + this.rechargeTime > Time.time) this.notyet(u, u.getCool(id) + this.rechargeTime);
         else{
-          u.usedCool(id, Time.time);
-          this.used(u);
+          if(this.slots > 1){
+            u.usedCoolSlot(id, Time.time, this.slots);
+            this.used(u);
+            if(this.slotFx != Fx.none && (this.chargingVisible || (u.isPlayer() && u.getPlayer() == Vars.player))) this.slotFx.at(u.x, u.y, this.slots, this.color, [id, u]);
+          }
+          else{
+            u.usedCool(id, Time.time);
+            this.used(u);
+          }
         }
       },
 

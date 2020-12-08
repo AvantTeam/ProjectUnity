@@ -133,6 +133,8 @@ dijkstra.health = 640;
 dijkstra.flying = true;
 dijkstra.armor = 8;
 dijkstra.accel = 0.01;
+dijkstra.lowAltitude = true;
+dijkstra.range = 220;
 dijkstra.weapons.add(laserWeap);
 dijkstra.weapons.add(plasmaWeap);
 
@@ -168,8 +170,12 @@ var classid = alib.add(dijkstra, UnitEntity, [
     {
       type: "active",
       name: "$ability.blastcut",
-      rechargeTime: 30,
+      rechargeTime: 105,
       aiUse: true,
+      slots: 3,
+      singleRecharge: 60,
+      rechargeFx: alib.squareFx,
+
       aiShouldUse(u){
         return Units.closestEnemy(u.team ,u.x ,u.y ,20 * Vars.tilesize, boolf(tu => true)) != null;
       },
