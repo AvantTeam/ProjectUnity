@@ -193,7 +193,7 @@ var classid = alib.add(dijkstra, UnitEntity, [
         u.set(posnew.x + u.x, posnew.y + u.y);
         if(u.isPlayer()){
           u.getPlayer().snapInterpolation();
-          u.getPlayer().snapSync();
+          if(Vars.headless) u.getPlayer().snapSync();
         }
         else{
           u.snapInterpolation();
@@ -215,7 +215,7 @@ var classid = alib.add(dijkstra, UnitEntity, [
 
         if(!Vars.headless){
           Sounds.spark.at(posnew.x + u.x, posnew.y + u.y, 1.6);
-          Fx.lancerLaserShootSmoke.at(posnew.x + u.x, posnew.y + u.y, (dir + 180) % 360);
+          Fx.lancerLaserShootSmoke.at(u.x, u.y, (dir + 180) % 360);
         }
         /*
         Time.run(15, () => {
