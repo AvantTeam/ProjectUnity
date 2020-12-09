@@ -91,6 +91,7 @@ var thelib = {
   smallRingFx: smallRingFx,
   squareFx: squareFx,
   slotFx3: slotFx3,
+  showActiveHint: true,
 
   setupActive(dothis){
     if(!dothis) return;
@@ -166,6 +167,8 @@ var thelib = {
   notifyClick(){
     //print("Notify");
     if(Vars.headless) return;
+    this.showActiveHint = false;
+
     if(!Vars.net.active()) this.syncedClick(Vars.player.unit());
     else if(!Vars.net.client()) this.syncFromHost();
     else Call.serverPacketReliable("skilluse", "");
@@ -249,7 +252,7 @@ var thelib = {
         return this._left[id];
       },
       useSkills(){
-        //this should run on all clients (TODO)
+        //this should run on all clients
         //print("UseSkills");
         this.abilities.each(ab => {
           //print(ab);
