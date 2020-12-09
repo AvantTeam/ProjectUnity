@@ -38,6 +38,7 @@ const script = [
     {
         name: "libraries",
         childs: [
+          "factions",
             {
                 name: "light",
                 childs: [
