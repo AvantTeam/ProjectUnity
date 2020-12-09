@@ -1,0 +1,12 @@
+sourceSets.main.java.srcDirs = [ "src/" ]
+
+repositories{
+    mavenCentral()
+    jcenter()
+    maven{ url 'https://www.jitpack.io' }
+}
+
+dependencies{
+    implementation "com.github.Anuken.Arc:arc-core:$mindustryVersion"
+    implementation "com.squareup:javapoet:$javapoetVersion"
+}

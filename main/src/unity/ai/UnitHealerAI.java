@@ -17,7 +17,7 @@ public class UnitHealerAI extends FlyingAI{
 
     @Override
     public void updateMovement(){
-        if(target != null && target instanceof Unit temp){
+        if(target instanceof Unit temp){
             vec.trns(unit.angleTo(temp) + 180f, unit.type.range + temp.hitSize);
             vec.add(target).sub(unit).scl(0.01f).limit(1f).scl(unit.realSpeed());
             unit.moveAt(vec);

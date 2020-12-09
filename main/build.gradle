@@ -1,4 +1,4 @@
-sourceSets.main.java.srcDirs = [ "src/" ]
+sourceSets.main.java.srcDirs = [ "src/", "${buildDir}/generated/sources/annotationProcessor/java/main/" ]
 
 repositories{
     mavenCentral()
@@ -30,7 +30,13 @@ task jarAndroid{
 jar{
     archiveFileName = "${modName}.jar"
 
-    from {configurations.runtimeClasspath.collect{ it.isDirectory() ? it : zipTree(it) }}
+    from{
+        configurations.runtimeClasspath.collect{
+            (!it.name.contains("core-$mindustryVersion") && !it.name.contains("arc-core-$mindustryVersion"))
+            ?   (it.isDirectory() ? it : zipTree(it))
+            :   null
+        }
+    }
 
     from(project.projectDir){
         include "mod.json"
@@ -61,4 +67,11 @@ dependencies{
 
     implementation "com.github.younggam:multi-lib:$multilibVersion"
     annotationProcessor "com.github.bsideup.jabel:jabel-javac-plugin:0.3.0"
+
+    implementation project(":annotations")
+    annotationProcessor project(":annotations")
+
+    compileJava.options.compilerArgs.addAll([
+        "-processor", "unity.annotations.FactionProcessor"
+    ])
 }

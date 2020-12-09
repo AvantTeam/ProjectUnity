@@ -39,6 +39,7 @@ public class UnityMusics{
     }
 
     //is this loaded well even if Core.assets are not loaded?
+    //answer: Core.assets = new AssetManager() is initialized before the game loads mods, probably
     static{
         ambientMusic = control.sound.ambientMusic;
         darkMusic = control.sound.darkMusic;

@@ -15,6 +15,8 @@ import mindustry.content.*;
 import mindustry.world.blocks.units.*;
 import mindustry.world.blocks.units.UnitFactory.*;
 import unity.ai.*;
+import unity.annotations.Annotations.*;
+import unity.annotations.util.*;
 import unity.entities.bullet.*;
 import unity.entities.units.*;
 import unity.graphics.*;
@@ -48,11 +50,10 @@ public class UnityUnitTypes implements ContentList{
     //imber
     arcnelidia,
 
-    //monolith
-    stele, pedestal, pilaster, pylon,
-
     //end
     devourer;
+
+    public static @FactionDef(type = Faction.monolith) UnitType stele, pedestal, pilaster, pylon;
 
     public static int getClassId(int index){
         return classIDs[index];

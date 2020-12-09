@@ -2,4 +2,4 @@ if(JavaVersion.current().ordinal() < JavaVersion.VERSION_14.ordinal()){
     throw new GradleException("!! You must use Java 14 or above to compile and run Project Unity !! Read the README. Your version: ${System.properties["java.version"]}")
 }
 
-include "main", "tools"
+include "main", "tools", "annotations"

@@ -20,7 +20,7 @@ jobs:
       run: |
         chmod +x gradlew
         ./gradlew tools:proc
-        ./gradlew main:jar
+        ./gradlew clean main:jar
     - name: Upload built jar file
       uses: actions/upload-artifact@v2
       with:
