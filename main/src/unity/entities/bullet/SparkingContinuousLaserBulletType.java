@@ -15,10 +15,11 @@ import mindustry.entities.bullet.ContinuousLaserBulletType;
 //lmao
 public class SparkingContinuousLaserBulletType extends ContinuousLaserBulletType{
     protected float fromBlockChance = 0.4f, fromBlockDamage = 23f,
-    fromLaserChance = 0.9f, fromLaserDamage = 23f,
-    incendStart = 2.9f;
+        fromLaserChance = 0.9f, fromLaserDamage = 23f,
+        incendStart = 2.9f,
+        coneRange = 1.1f;
     protected int fromLaserLen = 4, fromLaserLenRand = 5, fromLaserAmount = 1,
-    fromBlockLen = 2, fromBlockLenRand = 5, fromBlockAmount = 1;
+        fromBlockLen = 2, fromBlockLenRand = 5, fromBlockAmount = 1;
     protected boolean extinction;
     protected final Seq<Unit> tempSeq = new Seq<>();
 
@@ -52,7 +53,7 @@ public class SparkingContinuousLaserBulletType extends ContinuousLaserBulletType
 
         if(extinction){
             if(b.timer(2, 15f)){
-                Funcs.castCone(b.x, b.y, length * 0.8f, b.rotation(), 70, (tile, build, dst, angD) -> {
+                Funcs.castCone(b.x, b.y, length * coneRange, b.rotation(), 70, (tile, build, dst, angD) -> {
                     if(Mathf.chance(angD * 0.2f * Mathf.clamp(dst * 1.7f))) Fires.create(tile);
                     if(build != null && b.team != build.team){
                         build.damage(angD * 23.3f * Mathf.clamp(dst * 1.7f));
@@ -60,7 +61,7 @@ public class SparkingContinuousLaserBulletType extends ContinuousLaserBulletType
                     }
                 });
             }
-            Funcs.castCone(b.x, b.y, length * 0.8f, b.rotation(), 70f, (e, dst, angD) -> {
+            Funcs.castCone(b.x, b.y, length * coneRange, b.rotation(), 70f, (e, dst, angD) -> {
                 float clamped = Mathf.clamp(dst * 1.7f);
                 if(!e.dead){
                     float damageMulti = e.team != b.team ? 0.25f : 1f;

@@ -61,7 +61,7 @@ public class VapourizeEffectState extends EffectState{
         float slope = (0.4f - Math.abs(fin() - 0.5f)) * 2f;
         Draw.z(Layer.flyingUnit + 0.01f);
         Tmp.c1.set(Color.black);
-        Tmp.c1.a = slope * 0.25f;
+        Tmp.c1.a = slope * Interp.pow3In.apply(1 - unit.healthf());
         Draw.color(Tmp.c1);
         Funcs.simpleUnitDrawer(unit, false);
         Draw.z(oz);
