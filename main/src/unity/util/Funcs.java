@@ -18,8 +18,7 @@ import static mindustry.Vars.*;
 public final class Funcs{
     private static final Vec2 tV = new Vec2();
     private static final IntSet collidedBlocks = new IntSet();
-    private static final Rect rect = new Rect();
-    private static final Rect hitRect = new Rect();
+    private static final Rect rect = new Rect(), rectAlt = new Rect(), hitRect = new Rect();
     private static Unit result;
     private static float cdist;
 
@@ -50,13 +49,22 @@ public final class Funcs{
 
     public static void castCone(float wx, float wy, float range, float angle, float cone, Cons4<Tile, Building, Float, Float> consTile, Cons3<Unit, Float, Float> consUnit){
         collidedBlocks.clear();
-        int tx = World.toTile(wx);
-        int ty = World.toTile(wy);
-        int tileRange = Mathf.floorPositive(range / tilesize + 1);
+        float expand = 3;
         float rangeSquare = range * range;
         if(consTile != null){
-            for(int x = -tileRange + tx, lenX = tileRange + tx; x <= lenX; x++){
-                for(int y = -tileRange + ty, lenY = tileRange + ty; y <= lenY; y++){
+            rect.setCentered(wx, wy, expand);
+            for(int i = 0; i < 3; i++){
+                float angleC = (-1 + i) * cone + angle;
+                tV.trns(angleC, range).add(wx, wy);
+                rectAlt.setCentered(tV.x, tV.y, expand);
+                rect.merge(rectAlt);
+            }
+            int tx = Mathf.round(rect.x / tilesize);
+            int ty = Mathf.round(rect.y / tilesize);
+            int tw = tx + Mathf.round(rect.width / tilesize);
+            int th = ty + Mathf.round(rect.height / tilesize);
+            for(int x = tx; x <= tw; x++){
+                for(int y = ty; y <= th; y++){
                     float temp = Angles.angle(wx, wy, x * tilesize, y * tilesize);
                     float tempDst = Mathf.dst(x * tilesize, y * tilesize, wx, wy);
                     if(tempDst >= rangeSquare || !Angles.within(temp, angle, cone)) continue;

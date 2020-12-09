@@ -962,8 +962,10 @@ public class UnityUnitTypes implements ContentList{
 
                 bullet = new RailBulletType(){{
                     damage = 500f;
-                    speed = 59f;
-                    lifetime = 8f;
+                    //speed = 59f;
+                    //lifetime = 8f;
+                    length = 59f * 6f;
+                    updateEffectSeg = 59f;
                     shootEffect = UnityFx.scarRailShoot;
                     pierceEffect = UnityFx.scarRailHit;
                     updateEffect = UnityFx.scarRailTrail;
@@ -997,13 +999,15 @@ public class UnityUnitTypes implements ContentList{
 
                 bullet = new RailBulletType(){{
                     damage = 700f;
-                    speed = 59f;
-                    lifetime = 8f;
+                    //speed = 59f;
+                    //lifetime = 8f;
+                    length = 59f * 7f;
+                    updateEffectSeg = 59f;
                     shootEffect = UnityFx.scarRailShoot;
                     pierceEffect = UnityFx.scarRailHit;
                     updateEffect = UnityFx.scarRailTrail;
                     hitEffect = Fx.massiveExplosion;
-                    pierceDamageFactor = 0.2f;
+                    pierceDamageFactor = 0.3f;
                 }};
             }}, new Weapon("unity-scar-missile-launcher"){
                 {
