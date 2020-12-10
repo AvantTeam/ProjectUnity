@@ -48,28 +48,32 @@ public class FactionProcessor extends BaseProcessor{
                 MethodSpec.methodBuilder("map").addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                     .addJavadoc("Gets a {@link $T} with the given content as a key", cName(Faction.class))
                     .returns(tName(Faction.class))
-                    .addParameter(UnlockableContent.class, "name")
-                    .addStatement("return map.get(name)")
+                    .addParameter(cName(UnlockableContent.class), "content")
+                    .addStatement("return map.get(content)")
+                .build()
+            )
+            .addMethod(
+                MethodSpec.methodBuilder("put").addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                    .addJavadoc("Puts and handles this content with the given {@link $T}", cName(Faction.class))
+                    .returns(TypeName.VOID)
+                    .addParameter(cName(UnlockableContent.class), "content")
+                    .addParameter(cName(Faction.class), "faction")
+                    .addStatement("map.put(content, faction)")
+                    .addStatement("content.description += $S + $S + faction.name", "\n", "Faction: ")
                 .build()
             );
+
         MethodSpec.Builder initializer = MethodSpec.methodBuilder("init")
             .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
             .addJavadoc("Initializes all content whose fields are to be modified");
 
-        int i = 0;
         for(VariableElement e : factions){
-            i++;
-
-            Element up = e.getEnclosingElement();
+            TypeName up = TypeName.get(e.getEnclosingElement().asType());
             String c = e.getSimpleName().toString();
-            Faction fac = e.getAnnotation(FactionDef.class).type();
-            String cf = fac.name();
+            TypeName upf = cName(Faction.class);
+            String f = e.getAnnotation(FactionDef.class).type().name();
 
-            initializer.addStatement("map.put($T.$L, $T.$L)", tName(up), c, cName(Faction.class), cf);
-            initializer.addStatement("$T.$L.description += $S + $S + map.get($T.$L).name", tName(up), c, "\n", "Faction: ", tName(up), c);
-            if(i < factions.size){
-                initializer.addCode(lnew());
-            }
+            initializer.addStatement("put($T.$L, $T.$L)", up, c, upf, f);
         }
 
         facMeta.addMethod(initializer.build());

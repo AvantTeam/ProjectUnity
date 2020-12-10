@@ -2,9 +2,13 @@ package unity.annotations.util;
 
 import arc.*;
 import arc.graphics.*;
+import mindustry.graphics.*;
 
 public enum Faction{
-    monolith("monolith", Color.teal.cpy());
+    scar("scar", Pal.remove),
+    imber("imber", Pal.surge),
+    monolith("monolith", Color.teal),
+    end("end", Pal.removeBack);
 
     public final String name;
     public final Color color;

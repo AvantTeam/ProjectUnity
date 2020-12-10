@@ -35,26 +35,23 @@ public class UnityUnitTypes implements ContentList{
     private static final int[] classIDs = new int[constructors.length];
 
     public static UnitType
-        //kinda side-effects of multiline array indenting. how anuke did that?
-        //flying-units
-        caelifera, schistocerca, anthophila, vespula, lepidoptera, angel, malakhim,
+    //kinda side-effects of multiline array indenting. how anuke did that?
+    //flying-units
+    caelifera, schistocerca, anthophila, vespula, lepidoptera, angel, malakhim,
 
     //ground-units
     arcaetana, projectSpiboss,
 
     //naval-units
-    rexed, storm, amphibiNaval, amphibi, craberNaval, craber,
+    rexed, storm, amphibiNaval, amphibi, craberNaval, craber;
 
-    //scar
-    hovos, ryzer, whirlwind, jetstream, vortex,
+    public static @FactionDef(type = Faction.scar) UnitType hovos, ryzer, whirlwind, jetstream, vortex;
 
-    //imber
-    arcnelidia,
-
-    //end
-    devourer;
+    public static @FactionDef(type = Faction.imber) UnitType arcnelidia;
 
     public static @FactionDef(type = Faction.monolith) UnitType stele, pedestal, pilaster, pylon;
+
+    public static @FactionDef(type = Faction.end) UnitType devourer;
 
     public static int getClassId(int index){
         return classIDs[index];
