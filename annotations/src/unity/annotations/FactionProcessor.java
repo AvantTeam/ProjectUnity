@@ -66,7 +66,7 @@ public class FactionProcessor extends BaseProcessor{
             String cf = fac.name();
 
             initializer.addStatement("map.put($L.$L, $L.$L)", up, c, upf, cf);
-            initializer.addStatement("$L.$L.description += $S + map.get($L.$L).name", up, c, "\nFaction: ", up, c);
+            initializer.addStatement("$L.$L.description += $S + map.get($L.$L).name", up, c, "\n\nFaction: ", up, c);
         }
 
         facMeta.addMethod(initializer.build());
