@@ -23,24 +23,23 @@ public class SpriteProcessor{
     static ObjectMap<String, BufferedImage> spriteCache = new ObjectMap<>();
     static ColorBleedEffect bleeder = new ColorBleedEffect();
 
-    public static Unity mod = new Unity();
+    public static Unity mod;
 
     public static void main(String[] args) throws Exception{
         headless = true;
+        mod = new Unity();
 
         content = new ContentLoader();
         content.createBaseContent();
 
         //setup dummy loaded mod to load unity contents properly
-        content.setCurrentMod(new LoadedMod(null, null, mod, new ModMeta(){
-            {
-                name = "unity";
-            }
-        }));
+        content.setCurrentMod(new LoadedMod(null, null, mod, new ModMeta(){{
+            name = "unity";
+        }}));
 
         try{
             mod.loadContent();
-        }catch(StackOverflowError e){}
+        }catch(StackOverflowError ignored){}
 
         content.setCurrentMod(null);
 
