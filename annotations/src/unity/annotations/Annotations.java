@@ -10,4 +10,8 @@ public class Annotations{
     public @interface FactionDef{
         Faction type();
     }
+
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface TriggerProcess{
+    }
 }

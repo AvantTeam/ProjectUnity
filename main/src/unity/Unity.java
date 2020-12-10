@@ -11,6 +11,7 @@ import mindustry.mod.Mods.*;
 import mindustry.ui.dialogs.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
+import unity.annotations.Annotations.*;
 import unity.content.*;
 import unity.gen.*;
 import unity.mod.*;
@@ -18,6 +19,8 @@ import unity.mod.ContributorList.*;
 
 public class Unity extends Mod{
     public static final String githubURL = "https://github.com/EyeOfDarkness/ProjectUnity";
+    //just to trigger the processors
+    private static final @TriggerProcess Object tmp = null;
     //don't know how to indent this
     private final ContentList[] unityContent = {
         new UnityItems(),
@@ -34,6 +37,7 @@ public class Unity extends Mod{
 
     public Unity(){
         ContributorList.init();
+        UnitySounds.load();
 
         Events.on(ClientLoadEvent.class, e -> {
             Func<String, String> stringf = value -> Core.bundle.get("mod." + value);
