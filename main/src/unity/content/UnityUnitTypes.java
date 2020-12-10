@@ -34,24 +34,23 @@ public class UnityUnitTypes implements ContentList{
 
     private static final int[] classIDs = new int[constructors.length];
 
-    public static UnitType
-    //kinda side-effects of multiline array indenting. how anuke did that?
+    public static UnitType//@formatter:off
     //flying-units
     caelifera, schistocerca, anthophila, vespula, lepidoptera, angel, malakhim,
-
+    //@formatter:on | kinda alternative
     //ground-units
     arcaetana, projectSpiboss,
 
     //naval-units
     rexed, storm, amphibiNaval, amphibi, craberNaval, craber;
 
-    public static @FactionDef(type = Faction.scar) UnitType hovos, ryzer, whirlwind, jetstream, vortex;
+    public static /*@FactionDef(type = Faction.scar)*/ UnitType hovos, ryzer, whirlwind, jetstream, vortex;
 
-    public static @FactionDef(type = Faction.imber) UnitType arcnelidia;
+    public static /*@FactionDef(type = Faction.imber)*/ UnitType arcnelidia;
 
-    public static @FactionDef(type = Faction.monolith) UnitType stele, pedestal, pilaster, pylon;
+    public static /*@FactionDef(type = Faction.monolith)*/ UnitType stele, pedestal, pilaster, pylon;
 
-    public static @FactionDef(type = Faction.end) UnitType devourer;
+    public static /*@FactionDef(type = Faction.end)*/ UnitType devourer;
 
     public static int getClassId(int index){
         return classIDs[index];
@@ -1435,21 +1434,24 @@ public class UnityUnitTypes implements ContentList{
             new UnitType[]{amphibiNaval, craberNaval},
 
             //monolith
-            new UnitType[]{stele, pedestal});
+            new UnitType[]{stele, pedestal}
+        );
 
         ((Reconstructor)Blocks.multiplicativeReconstructor).upgrades.add(
             //global
             new UnitType[]{schistocerca, anthophila},
 
             //monolith
-            new UnitType[]{pedestal, pilaster});
+            new UnitType[]{pedestal, pilaster}
+        );
 
         ((Reconstructor)Blocks.exponentialReconstructor).upgrades.add(
             //global
             new UnitType[]{anthophila, vespula},
 
             //monolith
-            new UnitType[]{pilaster, pylon});
+            new UnitType[]{pilaster, pylon}
+        );
 
         ((Reconstructor)Blocks.tetrativeReconstructor).upgrades.add(
             //global
