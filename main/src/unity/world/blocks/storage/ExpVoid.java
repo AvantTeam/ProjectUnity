@@ -11,7 +11,7 @@ public class ExpVoid extends Block implements ExpBlockBase{
     }
 
     @Override
-    public int expCapaciry(){
+    public int expCapacity(){
         return 99999999;
     }
 

@@ -1,12 +1,10 @@
 package unity.world.blocks.storage;
 
 import arc.graphics.Color;
-import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.TextureRegion;
+import arc.graphics.g2d.*;
 import arc.math.Mathf;
 import arc.util.*;
-import arc.util.io.Reads;
-import arc.util.io.Writes;
+import arc.util.io.*;
 import mindustry.gen.Building;
 import mindustry.graphics.Drawf;
 import mindustry.ui.Bar;
@@ -45,13 +43,11 @@ public class ExpStorageBlock extends Block implements ExpBlockBase{
     @Override
     public void setBars(){
         super.setBars();
-        bars.add("exp", (ExpStorageBuild build) -> {
-            return new Bar(() -> bundle.get("explib.exp"), () -> Tmp.c1.set(UnityPal.expColor).lerp(UnityPal.expMaxColor, build.expf()), () -> build.expf());
-        });
+        bars.add("exp", (ExpStorageBuild build) -> new Bar(() -> bundle.get("explib.exp"), () -> Tmp.c1.set(UnityPal.expColor).lerp(UnityPal.expMaxColor, build.expf()), build::expf));
     }
 
     @Override
-    public int expCapaciry(){
+    public int expCapacity(){
         return expCapacity;
     }
 
