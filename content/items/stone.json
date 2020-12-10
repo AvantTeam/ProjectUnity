@@ -4,6 +4,8 @@
 	"flammability": 0.0,
 	"hardness": 3,
 	"cost": 1,
+	"lowPriority": true,
+	
 	"research": {
 		"parent": "graphite"
 	}
