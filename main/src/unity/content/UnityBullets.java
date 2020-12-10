@@ -36,7 +36,7 @@ public class UnityBullets implements ContentList{
     @SuppressWarnings("unchecked")
     private <T extends BulletType> T copy(BulletType from, Prov<T> constructor, Cons<T> setter){
         T target = constructor.get();
-        JsonIO.<T>copy((T)from, target);
+        JsonIO.copy((T)from, target);
         setter.get(target);
         return target;
     }
@@ -199,11 +199,7 @@ public class UnityBullets implements ContentList{
             @Override
             public void update(Bullet b){
                 super.update(b);
-                if(b.timer.get(1, 7)){
-                    Units.nearbyEnemies(b.team, b.x - 5 * tilesize, b.y - 5 * tilesize, 5 * tilesize * 2, 5 * tilesize * 2, unit -> {
-                        Lightning.create(b.team, Pal.surge, random(17, 33), b.x, b.y, b.angleTo(unit), random(7, 13));
-                    });
-                }
+                if(b.timer.get(1, 7)) Units.nearbyEnemies(b.team, b.x - 5 * tilesize, b.y - 5 * tilesize, 5 * tilesize * 2, 5 * tilesize * 2, unit -> Lightning.create(b.team, Pal.surge, random(17, 33), b.x, b.y, b.angleTo(unit), random(7, 13)));
             }
 
             @Override
@@ -233,7 +229,7 @@ public class UnityBullets implements ContentList{
                 Healthc target = Damage.linecast(b, b.x, b.y, b.rotation(), length);
                 b.data = target;
 
-                if(target != null && !(target instanceof Building) && target instanceof Hitboxc hit){
+                if(!(target instanceof Building) && target instanceof Hitboxc hit){
                     hit.collision(hit, hit.x(), hit.y());
                     b.collision(hit, hit.x(), hit.y());
                 }else{

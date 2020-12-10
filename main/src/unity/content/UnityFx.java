@@ -25,16 +25,12 @@ public class UnityFx{
 
         shootSmallBlaze = new Effect(22f, e -> {
         color(Pal.lightFlame, Pal.darkFlame, Pal.gray, e.fin());
-        randLenVectors(e.id, 16, e.finpow() * 60f, e.rotation, 18f, (x, y) -> {
-            Fill.circle(e.x + x, e.y + y, 0.85f + e.fout() * 3.5f);
-        });
+        randLenVectors(e.id, 16, e.finpow() * 60f, e.rotation, 18f, (x, y) -> Fill.circle(e.x + x, e.y + y, 0.85f + e.fout() * 3.5f));
     }),
 
     shootPyraBlaze = new Effect(32f, e -> {
         color(Pal.lightPyraFlame, Pal.darkPyraFlame, Pal.gray, e.fin());
-        randLenVectors(e.id, 16, e.finpow() * 60f, e.rotation, 18f, (x, y) -> {
-            Fill.circle(e.x + x, e.y + y, 0.85f + e.fout() * 3.5f);
-        });
+        randLenVectors(e.id, 16, e.finpow() * 60f, e.rotation, 18f, (x, y) -> Fill.circle(e.x + x, e.y + y, 0.85f + e.fout() * 3.5f));
     }),
 
     craftingEffect = new Effect(67f, 35f, e -> {
@@ -80,16 +76,12 @@ public class UnityFx{
 
     orbShootSmoke = new Effect(26f, e -> {
         color(Pal.surge);
-        randLenVectors(e.id, 7, 80f, e.rotation, 0f, (x, y) -> {
-            Fill.circle(e.x + x, e.y + y, e.fout() * 4f);
-        });
+        randLenVectors(e.id, 7, 80f, e.rotation, 0f, (x, y) -> Fill.circle(e.x + x, e.y + y, e.fout() * 4f));
     }),
 
     orbCharge = new Effect(38f, e -> {
         color(Pal.surge);
-        randLenVectors(e.id, 2, 1f + 20f * e.fout(), e.rotation, 120f, (x, y) -> {
-            lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fslope() * 3f + 1f);
-        });
+        randLenVectors(e.id, 2, 1f + 20f * e.fout(), e.rotation, 120f, (x, y) -> lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fslope() * 3f + 1f));
     }),
 
     orbChargeBegin = new Effect(71f, e -> {
@@ -140,9 +132,7 @@ public class UnityFx{
             Drawf.tri(e.x + x, e.y + y, e.fout() * 8f, e.fout() * 9f, e.rotation);
         });
 
-        randLenVectors(e.id, 4, e.fin() * 20f + 1f, e.rotation, 40f, (x, y) -> {
-            lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fslope() * 18f + 3f);
-        });
+        randLenVectors(e.id, 4, e.fin() * 20f + 1f, e.rotation, 40f, (x, y) -> lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fslope() * 18f + 3f));
     }),
 
     plasmaTriangleHit = new Effect(30f, e -> {
@@ -289,9 +279,7 @@ public class UnityFx{
             circle(e.x, e.y, s.fin() * 5f);
         });
         stroke(0.5f + e.fout());
-        randLenVectors(e.id, 5, e.fin() * 15f, (x, y) -> {
-            lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fout() * 3f + 1f);
-        });
+        randLenVectors(e.id, 5, e.fin() * 15f, (x, y) -> lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fout() * 3f + 1f));
     }),
 
     cutEffect = new Effect(3f * 60f, e -> {
@@ -313,9 +301,7 @@ public class UnityFx{
                     stroke(c.fin() * 1.5f * i);
                     square(e.x, e.y, c.fout() * laser.width * i, Time.time * 4f * Mathf.signs[j]);
                 }
-                ;
             }
-            ;
         });
 
         shoot:
@@ -335,9 +321,7 @@ public class UnityFx{
                     float rot = Mathf.signs[j] * (Time.time + (fin * 720f));
                     square(e.x, e.y, finpow * laser.width * 2f * i, rot);
                 }
-                ;
             }
-            ;
 
             randLenVectors(e.id, 48, finpow * 180f, (x, y) -> {
                 color(Color.white, Pal.lancerLaser, Color.cyan, fin);
@@ -396,9 +380,7 @@ public class UnityFx{
 
     expDespawn = new Effect(15f, e -> {
         color(UnityPal.expColor);
-        randLenVectors(e.id, 7, 2f + 5 * e.fin(), (x, y) -> {
-            Fill.circle(e.x + x, e.y + y, e.fout());
-        });
+        randLenVectors(e.id, 7, 2f + 5 * e.fin(), (x, y) -> Fill.circle(e.x + x, e.y + y, e.fout()));
     }),
 
     maxDamageFx = new Effect(16f, e -> {
@@ -415,13 +397,9 @@ public class UnityFx{
 
     ahhimaLiquidNow = new Effect(45f, e -> {
         color(Color.gray, Color.clear, e.fin());
-        randLenVectors(e.id, 3, 2.5f + e.fin() * 6f, (x, y) -> {
-            Fill.circle(e.x + x, e.y + y, 0.2f + e.fin() * 3f);
-        });
+        randLenVectors(e.id, 3, 2.5f + e.fin() * 6f, (x, y) -> Fill.circle(e.x + x, e.y + y, 0.2f + e.fin() * 3f));
         color(UnityPal.lavaColor, UnityPal.lavaColor2, e.fout());
-        randLenVectors(e.id + 1, 4, 1 + e.fin() * 4f, (x, y) -> {
-            Fill.circle(e.x + x, e.y + y, 0.2f + e.fout() * 1.3f);
-        });
+        randLenVectors(e.id + 1, 4, 1 + e.fin() * 4f, (x, y) -> Fill.circle(e.x + x, e.y + y, 0.2f + e.fout() * 1.3f));
     }),
 
     blinkFx = new Effect(30f, e -> {

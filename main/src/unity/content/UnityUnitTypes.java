@@ -35,6 +35,7 @@ public class UnityUnitTypes implements ContentList{
     private static final int[] classIDs = new int[constructors.length];
 
     public static UnitType
+        //kinda side-effects of multiline array indenting. how anuke did that?
         //flying-units
         caelifera, schistocerca, anthophila, vespula, lepidoptera, angel, malakhim,
 
