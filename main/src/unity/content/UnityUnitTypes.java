@@ -44,13 +44,13 @@ public class UnityUnitTypes implements ContentList{
     //naval-units
     rexed, storm, amphibiNaval, amphibi, craberNaval, craber;
 
-    public static /*@FactionDef(type = Faction.scar)*/ UnitType hovos, ryzer, whirlwind, jetstream, vortex;
+    public static @FactionDef(type = Faction.scar) UnitType hovos, ryzer, whirlwind, jetstream, vortex;
 
-    public static /*@FactionDef(type = Faction.imber)*/ UnitType arcnelidia;
+    public static @FactionDef(type = Faction.imber) UnitType arcnelidia;
 
-    public static /*@FactionDef(type = Faction.monolith)*/ UnitType stele, pedestal, pilaster, pylon;
+    public static @FactionDef(type = Faction.monolith) UnitType stele, pedestal, pilaster, pylon;
 
-    public static /*@FactionDef(type = Faction.end)*/ UnitType devourer;
+    public static @FactionDef(type = Faction.end) UnitType devourer;
 
     public static int getClassId(int index){
         return classIDs[index];

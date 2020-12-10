@@ -102,7 +102,7 @@ public class Unity extends Mod{
             Log.info("@: Loaded content list: @", getClass().getSimpleName(), list.getClass().getSimpleName());
         }
 
-        //FactionMeta.init();
+        FactionMeta.init();
     }
 
     //still don't want to import-unimport Log.java everytime i debug.
