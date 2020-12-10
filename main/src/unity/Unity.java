@@ -12,6 +12,7 @@ import mindustry.ui.dialogs.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import unity.content.*;
+import unity.gen.*;
 import unity.mod.*;
 import unity.mod.ContributorList.*;
 
@@ -92,18 +93,16 @@ public class Unity extends Mod{
     @Override
     public void loadContent(){
         for(ContentList list : unityContent){
-            try{
-                list.load();
+            list.load();
 
-                Log.info("@: Loaded content list: @", getClass().getSimpleName(), list.getClass().getSimpleName());
-            }catch(Exception e){
-                Log.err("Error loading @ content(s): @", getClass().getSimpleName(), e.getMessage());
-            }
+            Log.info("@: Loaded content list: @", getClass().getSimpleName(), list.getClass().getSimpleName());
         }
+
+        FactionMeta.init();
     }
 
     //still don't want to import-unimport Log.java everytime i debug.
-    //unity.Unity.print(); for copypaste
+    /** <code>unity.Unity.print();</code> for copypaste */
     public static void print(Object... args){
         Log.infoList("unity :", args);
     }
