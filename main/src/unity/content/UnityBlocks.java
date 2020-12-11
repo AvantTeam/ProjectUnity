@@ -17,6 +17,8 @@ import mindustry.world.blocks.defense.turrets.*;
 import mindustry.type.*;
 import mindustry.ctype.*;
 import mindustry.content.*;
+import unity.annotations.Annotations.*;
+import unity.annotations.util.*;
 import unity.gen.*;
 import unity.graphics.*;
 import unity.world.blocks.defense.*;
@@ -46,45 +48,46 @@ public class UnityBlocks implements ContentList{
 
     oreNickel, oreUmbrium, oreLuminum, oreMonolite, oreImberium,
 
-    multiTest1, multiTest2,
+    multiTest1, multiTest2;
 
-    //dark
-    apparition, ghost, banshee, fallout, catastrophe, calamity, extinction,
+    public static @FactionDef(type = Faction.dark)
+    Block apparition, ghost, banshee, fallout, catastrophe, calamity, extinction,
 
     darkAlloyForge,
 
-    darkWall, darkWallLarge,
+    darkWall, darkWallLarge;
 
-    //imber
-    orb, shockwire, current, plasma, shielder,
+    public static @FactionDef(type = Faction.imber)
+    Block orb, shockwire, current, plasma, shielder,
 
     sparkAlloyForge,
 
-    electroTile,
+    electroTile;
 
-    //koruh
-    stoneWall, denseWall, steelWall, steelWallLarge, diriumWall, diriumWallLarge,
+    public static @FactionDef(type = Faction.koruh)
+    Block stoneWall, denseWall, steelWall, steelWallLarge, diriumWall, diriumWallLarge,
 
     steelConveyor, diriumConveyor,
 
-    laserTurret, inferno,
+    //laserTurret, inferno,
 
-    teleporter, expUnloader, expTank, expChest, expFountain, expVoid,
+    teleporter, expOutput, expUnloader, expTank, expChest, expFountain, expVoid;
 
-    //light
+    //public static @FactionDef(type = Faction.light)
+    //Block
 
-    //monolith
-    monolithAlloyForge,
+    public static @FactionDef(type = Faction.monolith)
+    Block monolithAlloyForge,
 
-    mage, oracle, spectrum,
+    mage, oracle; //spectrum,
 
-    monolithGroundFactory,
+    //monolithGroundFactory;
 
-    //youngcha
-    concreteBlank, concreteFill, concreteNumber, concreteStripe, concrete, stoneFullTiles, stoneFull, stoneHalf, stoneTiles,
+    public static @FactionDef(type = Faction.youngcha)
+    Block concreteBlank, concreteFill, concreteNumber, concreteStripe, concrete, stoneFullTiles, stoneFull, stoneHalf, stoneTiles;
 
-    //end
-    terminalCrucible, endForge;
+    public static @FactionDef(type = Faction.end)
+    Block terminalCrucible, endForge;
 
     @Override
     public void load(){
@@ -728,9 +731,18 @@ public class UnityBlocks implements ContentList{
             requirements(Category.distribution, with(Items.lead, 22, Items.silicon, 10, Items.phaseFabric, 32, UnityItems.dirium, 32));
         }};
 
+        expOutput = new ExpOutput("exp-output"){{
+            requirements(Category.effect, with(UnityItems.stone, 25, Items.copper, 25, Items.graphite, 10));
+            health = 60;
+            unloadAmount = 0.4f;
+            unloadTime = 20f;
+            consumes.power(0.06f);
+        }};
+
         expUnloader = new ExpUnloader("exp-unloader"){{
             requirements(Category.effect, with(Items.graphite, 25, Items.silicon, 25, UnityItems.steel, 25));
             health = 80;
+            loadSides = true;
             consumes.power(0.25f);
         }};
 

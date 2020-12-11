@@ -7,14 +7,14 @@ import arc.graphics.Color;
 import arc.graphics.g2d.*;
 import arc.scene.ui.ImageButton;
 import arc.scene.ui.layout.Table;
+import mindustry.entities.units.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
+import mindustry.ui.*;
 import mindustry.world.*;
 import unity.world.blocks.LightData;
 import unity.world.blocks.LightRepeaterBuildBase;
 import unity.world.blocks.logic.LightInfluencer.LightInfluencerBuild;
-import mindustry.graphics.Layer;
-import mindustry.ui.Styles;
-import mindustry.entities.units.BuildPlan;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
@@ -62,7 +62,7 @@ public class LightFilter extends Block{
 
     @Override
     public int minimapColor(Tile tile){
-        return colors[tile.<LightFilterBuild>bc().color].rgba();
+        return colors[((LightFilterBuild)tile.build).color].rgba();
     }
 
     @Override

@@ -13,8 +13,6 @@ public class ExpSensorStatement extends LStatement{
     public String res = "result", type = "block1";
     public ExpContentList cont = ExpContentList.totalExp;
 
-    public ExpSensorStatement(){}
-
     @Override
     public void build(Table table){
         table.clearChildren();

@@ -13,7 +13,6 @@ import mindustry.world.Block;
 import mindustry.world.Tile;
 import mindustry.world.blocks.distribution.Conveyor;
 import mindustry.world.blocks.distribution.Conveyor.ConveyorBuild;
-import mindustry.world.blocks.production.Incinerator;
 import mindustry.world.blocks.production.Incinerator.IncineratorBuild;
 import unity.content.UnityFx;
 import unity.graphics.UnityPal;
@@ -26,7 +25,7 @@ import static unity.content.UnityBullets.exporb;
 
 public class ExpOrb extends BulletType{
     public static final float expAmount = 10f;
-    protected final int[] d4x = new int[]{1, 0, -1, 0}, d4y = new int[]{0, 1, 0, -1};
+    public static final int[] d4x = new int[]{1, 0, -1, 0}, d4y = new int[]{0, 1, 0, -1};
 
     public ExpOrb(){
         damage = 8f;
@@ -57,15 +56,15 @@ public class ExpOrb extends BulletType{
         Tile tile = world.tileWorld(b.x, b.y);
         Block block = tile.block();
         Building build = tile.build;
-        if(build instanceof ExpBuildBase temp){
+        if(block instanceof ExpOrbHandlerBase){
+
+        }else if(block instanceof ExpConveyor){
+            expConveyor(b, (Conveyor)block, (ConveyorBuild)build);
+        }else if(build instanceof ExpBuildBase temp && temp.consumesOrb()){
             temp.incExp(expAmount * temp.getOrbMultiplier());
             UnityFx.expAbsorb.at(b.x, b.y);
             b.remove();
-        }else if(block instanceof ExpConveyor){
-            expConveyor(b, (Conveyor)block, (ConveyorBuild)build);
-        }else if(block instanceof ExpOrbHandlerBase){
-
-        }else if(block instanceof Incinerator && ((IncineratorBuild)build).heat > 0.5f){
+        }else if(build instanceof IncineratorBuild incine && incine.heat > 0.5f){
             UnityFx.expAbsorb.at(b.x, b.y);
             b.remove();
         }else if(tile.solid()){
