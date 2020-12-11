@@ -16,6 +16,7 @@ public class ExpUnloader extends Block implements ExpOrbHandlerBase{
     protected float unloadAmount = 2f, unloadTime = 60f;
     protected TextureRegion topRegion, topRegion2;
     protected final TextureRegion[] sideRegions = new TextureRegion[4];
+    protected boolean loadSides;
 
     public ExpUnloader(String name){
         super(name);
@@ -27,14 +28,16 @@ public class ExpUnloader extends Block implements ExpOrbHandlerBase{
     public void load(){
         super.load();
         topRegion = atlas.find(name + "-top");
-        topRegion2 = atlas.find(name + "-top2");
-        for(int i = 0; i < 4; i++) sideRegions[i] = atlas.find(name + "-" + i);
+        if(loadSides){
+            topRegion2 = atlas.find(name + "-top2");
+            for(int i = 0; i < 4; i++) sideRegions[i] = atlas.find(name + "-" + i);
+        }
     }
 
     @Override
     public void setStats(){
         super.setStats();
-        stats.add(Stat.output, "@ [lightgray]@[]", bundle.format("explib.expAmount", unloadAmount * 10f * (60f / unloadTime)), StatUnit.perSecond.localized());
+        if(unloadAmount > 1f) stats.add(Stat.output, "@ [lightgray]@[]", bundle.format("explib.expAmount", unloadAmount * 10f * (60f / unloadTime)), StatUnit.perSecond.localized());
     }
 
     public class ExpUnloaderBuild extends Building{
@@ -43,6 +46,10 @@ public class ExpUnloader extends Block implements ExpOrbHandlerBase{
         @Override
         public void draw(){
             super.draw();
+            expUnloaderDraw();
+        }
+
+        protected void expUnloaderDraw(){
             for(int i = 0; i < 4; i++){
                 if(join[i]) Draw.rect(sideRegions[i], x, y);
             }
@@ -60,6 +67,10 @@ public class ExpUnloader extends Block implements ExpOrbHandlerBase{
 
         @Override
         public void updateTile(){
+            expUnloaderUpdate();
+        }
+
+        protected void expUnloaderUpdate(){
             if(enabled && consValid() && timer(0, 60f)){
                 for(int i = 0; i < 4; i++){
                     if(join[i]) checkUnload(i);
@@ -84,6 +95,10 @@ public class ExpUnloader extends Block implements ExpOrbHandlerBase{
         @Override
         public void onProximityUpdate(){
             super.onProximityUpdate();
+            expUnloaderOnProximity();
+        }
+
+        protected void expUnloaderOnProximity(){
             for(int i = 0; i < 4; i++){
                 Building build = nearby(i);
                 join[i] = build instanceof ExpBuildBase && build.isValid() && build.interactable(team);

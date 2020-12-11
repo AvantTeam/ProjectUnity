@@ -62,7 +62,8 @@ public class LightSource extends GenericCrafter{
     public void setBars(){
         super.setBars();
         bars.add("light", (LightSourceBuild build) -> new Bar(() -> bundle.format("lightlib.light", build.getStrength()),
-            () -> lightColor, () -> build.getStrength() / lightStrength));
+            () -> lightColor, () -> build.getStrength() / lightStrength
+        ));
     }
 
     @Override
@@ -254,7 +255,7 @@ public class LightSource extends GenericCrafter{
                 loops++;
 
                 if(!furthest.solid() || (furthest.block() == block && tile == this.tile)) return false;
-                Building build = furthest.bc();
+                Building build = furthest.build;
                 if(build == null) return true;
                 if(build.block instanceof LightDivisor){
                     int tr = ((LightReflectorBuild)build).calcReflection(ld.angle);

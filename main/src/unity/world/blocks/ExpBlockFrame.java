@@ -15,7 +15,7 @@ import mindustry.world.meta.Stat;
 import mindustry.world.meta.Stats;
 import unity.world.meta.ExpType;
 
-//I know this naming is ridiculous
+//I know this naming is ridiculous. this is not completed.
 public interface ExpBlockFrame extends ExpBlockBase{
     /** Turret BlockStatus */
     public static final ObjectMap<String, Stat> forStats = ObjectMap.of("range", Stat.shootRange, "inaccuracy", Stat.inaccuracy, "reloadTime", Stat.reload, "targetAir", Stat.targetsAir, "targetGround", Stat.targetsGround);

@@ -7,7 +7,6 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.gen.Building;
 import mindustry.graphics.Drawf;
-import mindustry.ui.Bar;
 import mindustry.world.Block;
 import mindustry.world.meta.Stat;
 import unity.entities.bullet.ExpOrb;
@@ -43,7 +42,7 @@ public class ExpStorageBlock extends Block implements ExpBlockBase{
     @Override
     public void setBars(){
         super.setBars();
-        bars.add("exp", (ExpStorageBuild build) -> new Bar(() -> bundle.get("explib.exp"), () -> Tmp.c1.set(UnityPal.expColor).lerp(UnityPal.expMaxColor, build.expf()), build::expf));
+        bars.add("exp", (ExpStorageBuild build) -> expBar(build));
     }
 
     @Override
