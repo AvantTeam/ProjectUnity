@@ -10,7 +10,7 @@ public final class ContributorList{
             contributors.put(type.ordinal(), new Seq<>());
         }
 
-        /** DO NOT INSERT COLORS! */
+        // DO NOT INSERT COLORS!
         contributors.get(ContributionType.collaborator.ordinal()).addAll(
         "sk7725",
         "younggam",
@@ -19,7 +19,7 @@ public final class ContributorList{
         "Xusk",
         "ThePythonGuy");
         contributors.get(ContributionType.contributor.ordinal()).addAll(
-        /** will always be empty.. */
+        // will always be empty...
         );
         contributors.get(ContributionType.translator.ordinal()).addAll(
         "sk7725 (Korean)",

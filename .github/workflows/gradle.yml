@@ -21,8 +21,3 @@ jobs:
         chmod +x gradlew
         ./gradlew tools:proc
         ./gradlew clean main:jar
-    - name: Upload built jar file
-      uses: actions/upload-artifact@v2
-      with:
-        name: ${{ env.REPOSITORY_NAME }}
-        path: main/build/libs/${{ env.REPOSITORY_NAME }}.jar
