@@ -57,7 +57,13 @@ public class FactionProcessor extends BaseProcessor{
             .addJavadoc("Unity's {@link $T} effects", cName(Sound.class))
             .addMethod(
                 MethodSpec.methodBuilder("loadSound").addModifiers(Modifier.PROTECTED, Modifier.STATIC)
-                    .addJavadoc("Loads a {@link $T}", cName(Sound.class))
+                    .addJavadoc(
+                        CodeBlock.builder()
+                            .add("Loads a {@link $T}" + lnew(), cName(Sound.class))
+                            .add("@param soundName The {@link $T} name" + lnew(), cName(Sound.class))
+                            .add("@return The {@link $T}", cName(Sound.class))
+                        .build()
+                    )
                     .returns(cName(Sound.class))
                     .addParameter(cName(String.class), "soundName")
                     .beginControlFlow("if(!$T.headless)", cName(Vars.class))
@@ -77,7 +83,13 @@ public class FactionProcessor extends BaseProcessor{
             )
             .addMethod(
                 MethodSpec.methodBuilder("disposeSound").addModifiers(Modifier.PROTECTED, Modifier.STATIC)
-                    .addJavadoc("Disposes a {@link $T}", cName(Sound.class))
+                    .addJavadoc(
+                        CodeBlock.builder()
+                            .add("Disposes a {@link $T}" + lnew(), cName(Sound.class))
+                            .add("@param soundName The {@link $T} name" + lnew(), cName(Sound.class))
+                            .add("@return {@code null}")
+                        .build()
+                    )
                     .returns(cName(Sound.class))
                     .addParameter(cName(String.class), "soundName")
                     .beginControlFlow("if(!$T.headless)", cName(Vars.class))
@@ -128,7 +140,13 @@ public class FactionProcessor extends BaseProcessor{
             .addJavadoc("Unity's {@link $T}s", cName(Music.class))
             .addMethod(
                 MethodSpec.methodBuilder("loadMusic").addModifiers(Modifier.PROTECTED, Modifier.STATIC)
-                    .addJavadoc("Loads a {@link $T}", cName(Music.class))
+                    .addJavadoc(
+                        CodeBlock.builder()
+                            .add("Loads a {@link $T}" + lnew(), cName(Music.class))
+                            .add("@param musicName The {@link $T} name" + lnew(), cName(Music.class))
+                            .add("@return The {@link $T}", cName(Music.class))
+                        .build()
+                    )
                     .returns(cName(Music.class))
                     .addParameter(cName(String.class), "musicName")
                     .beginControlFlow("if(!$T.headless)", cName(Vars.class))
@@ -148,7 +166,13 @@ public class FactionProcessor extends BaseProcessor{
             )
             .addMethod(
                 MethodSpec.methodBuilder("disposeMusic").addModifiers(Modifier.PROTECTED, Modifier.STATIC)
-                    .addJavadoc("Disposes a {@link $T}", cName(Music.class))
+                    .addJavadoc(
+                        CodeBlock.builder()
+                            .add("Disposes a {@link $T}" + lnew(), cName(Music.class))
+                            .add("@param musicName The {@link $T} name" + lnew(), cName(Music.class))
+                            .add("@return {@code null}")
+                        .build()
+                    )
                     .returns(cName(Music.class))
                     .addParameter(cName(String.class), "musicName")
                     .beginControlFlow("if(!$T.headless)", cName(Vars.class))
@@ -236,7 +260,13 @@ public class FactionProcessor extends BaseProcessor{
             )
             .addMethod(
                 MethodSpec.methodBuilder("map").addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                    .addJavadoc("Gets a {@link $T} with the given content as a key", cName(Faction.class))
+                    .addJavadoc(
+                        CodeBlock.builder()
+                            .add("Gets a {@link $T} with the given content as a key" + lnew(), cName(Faction.class))
+                            .add("@param content The content object" + lnew())
+                            .add("@return The {@link $T}", cName(Faction.class))
+                        .build()
+                    )
                     .returns(tName(Faction.class))
                     .addParameter(cName(Object.class), "content")
                     .addStatement("return map.get(content)")
@@ -244,7 +274,13 @@ public class FactionProcessor extends BaseProcessor{
             )
             .addMethod(
                 MethodSpec.methodBuilder("put").addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                    .addJavadoc("Puts and handles this content with the given {@link $T}", cName(Faction.class))
+                    .addJavadoc(
+                        CodeBlock.builder()
+                            .add("Puts and handles this content with the given {@link $T}" + lnew(), cName(Faction.class))
+                            .add("@param content The content object" + lnew())
+                            .add("@param faction The {@link $T}", cName(Faction.class))
+                        .build()
+                    )
                     .returns(TypeName.VOID)
                     .addParameter(cName(Object.class), "content")
                     .addParameter(cName(Faction.class), "faction")
@@ -256,7 +292,15 @@ public class FactionProcessor extends BaseProcessor{
             )
             .addMethod(
                 MethodSpec.methodBuilder("getByFaction").addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                    .addJavadoc("Returns specific {@link $T}s with the given {@link $T}", cName(Object.class), cName(Faction.class))
+                    .addJavadoc(
+                        CodeBlock.builder()
+                            .add("Returns specific {@link $T}s with the given {@link $T}" + lnew(), cName(Object.class), cName(Faction.class))
+                            .add("@param <$T> The generic type to filter" + lnew(), tvName("T"))
+                            .add("@param faction The {@link $T}" + lnew(), cName(Faction.class))
+                            .add("@param type The generic type class" + lnew())
+                            .add("@return {@link $T} filled with the filtered objects", cName(Seq.class))
+                        .build()
+                    )
                     .addTypeVariable(tvName("T"))
                     .returns(ParameterizedTypeName.get(cName(Seq.class), tvName("T")))
                     .addParameter(cName(Faction.class), "faction")
@@ -269,7 +313,14 @@ public class FactionProcessor extends BaseProcessor{
             )
             .addMethod(
                 MethodSpec.methodBuilder("getByCtype").addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                    .addJavadoc("Returns all {@link $T}s with the given {@link $T}", cName(Content.class), cName(ContentType.class))
+                    .addJavadoc(
+                        CodeBlock.builder()
+                            .add("Returns all {@link $T}s with the given {@link $T}" + lnew(), cName(Content.class), cName(ContentType.class))
+                            .add("@param <$T> The generic type to filter" + lnew(), tvName("T"))
+                            .add("@param ctype The {@link $T}" + lnew(), cName(ContentType.class))
+                            .add("@return {@link $T} filled with the filtered objects", cName(Seq.class))
+                        .build()
+                    )
                     .addTypeVariable(tvName("T", cName(Content.class)))
                     .returns(ParameterizedTypeName.get(cName(Seq.class), tvName("T")))
                     .addParameter(cName(ContentType.class), "ctype")
@@ -285,7 +336,13 @@ public class FactionProcessor extends BaseProcessor{
             )
             .addMethod(
                 MethodSpec.methodBuilder("getMusicCategory").addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                    .addJavadoc("Returns the category of a specific {@link $T}", cName(Music.class))
+                    .addJavadoc(
+                        CodeBlock.builder()
+                            .add("Gets the category of a specific {@link $T}" + lnew(), cName(Music.class))
+                            .add("@param mus The {@link $T}" + lnew(), cName(Music.class))
+                            .add("@return The category")
+                        .build()
+                    )
                     .returns(ParameterizedTypeName.get(cName(Seq.class), cName(Music.class)))
                     .addParameter(cName(Music.class), "mus")
                     .addStatement("$T category = music.get(mus)", cName(String.class))
