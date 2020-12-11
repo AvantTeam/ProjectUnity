@@ -29,4 +29,10 @@ public class Annotations{
          */
         String category() default "ambient";
     }
+
+    /** Indicates that this content implements exp mechanism */
+    @Target(ElementType.FIELD)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface ExpDef{
+    }
 }

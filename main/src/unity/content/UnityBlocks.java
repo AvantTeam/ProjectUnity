@@ -17,6 +17,7 @@ import mindustry.world.blocks.defense.turrets.*;
 import mindustry.type.*;
 import mindustry.ctype.*;
 import mindustry.content.*;
+import unity.annotations.Annotations.*;
 import unity.gen.*;
 import unity.graphics.*;
 import unity.world.blocks.defense.*;
@@ -86,8 +87,11 @@ public class UnityBlocks implements ContentList{
     //end
     terminalCrucible, endForge;
 
+    public static @ExpDef Block expTest;
+
     @Override
     public void load(){
+        expTest = new Block("no");
         //region global
 
         recursiveReconstructor = new SelectableReconstructor("recursive-reconstructor"){{

@@ -358,13 +358,13 @@ public class FactionProcessor extends BaseProcessor{
                 .build()
             );
 
-        MethodSpec.Builder initializer = MethodSpec.methodBuilder("init")
-            .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+        MethodSpec.Builder initializer = MethodSpec.methodBuilder("init").addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+            .returns(TypeName.VOID)
             .addJavadoc("Initializes all content whose fields are to be modified");
 
         Faction before = null;
         for(VariableElement e : factions){
-            TypeName up = TypeName.get(e.getEnclosingElement().asType());
+            TypeName up = tName(e.getEnclosingElement());
             String c = e.getSimpleName().toString();
             TypeName upf = cName(Faction.class);
             FactionDef def = e.getAnnotation(FactionDef.class);
