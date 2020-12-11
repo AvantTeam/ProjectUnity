@@ -1,0 +1,13 @@
+requirements:[
+    stone/120
+    copper/100
+    lead/60
+    silicon/25
+]
+category:units
+hasItems:false
+consumes: {
+  power: 0.7
+}
+size: 2
+research: "pad-nova"

@@ -1,0 +1,13 @@
+requirements:[
+    copper/125
+    lead/125
+    silicon/50
+    titanium/50
+]
+category:units
+hasItems:false
+consumes: {
+  power: 1
+}
+size: 2
+research: "pad-buffer"

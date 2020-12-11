@@ -2,7 +2,7 @@
 var faclist = global.unity.factionContent;
 
 module.exports = {
-    contCache = {},
+    contCache: {},
     getFaction(cont){
         if(this.contCache[cont.name]) return this.contCache[cont.name];
         else this.contCache[cont.name] = this.getFactionRaw(cont);

@@ -1,0 +1,14 @@
+requirements:[
+    stone/150
+    lead/160
+    silicon/100
+    titanium/60
+    plastanium/50
+]
+category:units
+hasItems:false
+consumes: {
+  power: 0.8
+}
+size: 2
+research: "pad-buffer"

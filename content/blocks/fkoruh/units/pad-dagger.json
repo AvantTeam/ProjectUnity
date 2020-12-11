@@ -1,0 +1,12 @@
+requirements:[
+    copper/75
+    lead/100
+    graphite/25
+]
+category:units
+hasItems:false
+consumes: {
+  power: 0.5
+}
+size: 2
+research: "inferno"

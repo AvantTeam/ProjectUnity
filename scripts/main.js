@@ -86,6 +86,7 @@ const script = [
             "exp",
             "expcrafter",
             "limitwall",
+            "mechpad",
             "multi-lib",
             "status",
             "arena",
@@ -252,6 +253,7 @@ const script = [
             "walls",
             "lava",
             "conveyors",
+            "pads",
             {
                 name: "turrets",
                 childs: [
