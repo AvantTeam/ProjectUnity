@@ -10,6 +10,8 @@ public enum Faction{
     monolith("monolith", Color.teal),
     end("end", Pal.removeBack);
 
+    public static final Faction[] all = values();
+
     public final String name;
     public final Color color;
 

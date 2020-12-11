@@ -6,26 +6,28 @@ import mindustry.ctype.*;
 import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
 import mindustry.type.*;
+import unity.annotations.Annotations.*;
+import unity.annotations.util.*;
 import unity.graphics.*;
 import unity.planets.*;
 
 public class UnityPlanets implements ContentList{
-    public static Planet
+    public static @FactionDef(type = Faction.imber) Planet electrode, inert;
 
-    megalith, electrode, inert;
+    public static @FactionDef(type = Faction.monolith) Planet megalith;
 
     @Override
     public void load(){
         megalith = new Planet("megalith", Planets.sun, 3, 1){{
             generator = new MegalithPlanetGenerator();
-            meshLoader = () -> new HexMesh(megalith, 6);
+            meshLoader = () -> new HexMesh(this, 6);
             atmosphereColor = Color.valueOf("0f3ad2");
             startSector = 30;
         }};
 
         electrode = new Planet("electrode", Planets.sun, 3, 1){{
             generator = new ElectrodePlanetGenerator();
-            meshLoader = () -> new HexMesh(electrode, 6);
+            meshLoader = () -> new HexMesh(this, 6);
             atmosphereColor = Pal.surge;
             startSector = 30;
         }};

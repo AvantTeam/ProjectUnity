@@ -81,6 +81,10 @@ public abstract class BaseProcessor extends AbstractProcessor{
         return ClassName.get(type);
     }
 
+    public TypeVariableName tvName(String name, TypeName... bounds){
+        return TypeVariableName.get(name, bounds);
+    }
+
     public String lnew(){
         return Character.toString('\n');
     }
