@@ -37,10 +37,8 @@ public class UnityUnitTypes implements ContentList{
     public static UnitType
     //flying-units
     caelifera, schistocerca, anthophila, vespula, lepidoptera, angel, malakhim,
-
     //ground-units
     arcaetana, projectSpiboss,
-
     //naval-units
     rexed, storm, amphibiNaval, amphibi, craberNaval, craber;
 
@@ -1434,21 +1432,24 @@ public class UnityUnitTypes implements ContentList{
             new UnitType[]{amphibiNaval, craberNaval},
 
             //monolith
-            new UnitType[]{stele, pedestal});
+            new UnitType[]{stele, pedestal}
+        );
 
         ((Reconstructor)Blocks.multiplicativeReconstructor).upgrades.add(
             //global
             new UnitType[]{schistocerca, anthophila},
 
             //monolith
-            new UnitType[]{pedestal, pilaster});
+            new UnitType[]{pedestal, pilaster}
+        );
 
         ((Reconstructor)Blocks.exponentialReconstructor).upgrades.add(
             //global
             new UnitType[]{anthophila, vespula},
 
             //monolith
-            new UnitType[]{pilaster, pylon});
+            new UnitType[]{pilaster, pylon}
+        );
 
         ((Reconstructor)Blocks.tetrativeReconstructor).upgrades.add(
             //global

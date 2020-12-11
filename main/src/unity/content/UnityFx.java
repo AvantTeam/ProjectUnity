@@ -22,8 +22,8 @@ import static unity.content.UnityBullets.*;
 public class UnityFx{
     private static int integer;
     public static final Effect
-
-        shootSmallBlaze = new Effect(22f, e -> {
+    //@formatter:off
+    shootSmallBlaze = new Effect(22f, e -> {    //@formatter:on
         color(Pal.lightFlame, Pal.darkFlame, Pal.gray, e.fin());
         randLenVectors(e.id, 16, e.finpow() * 60f, e.rotation, 18f, (x, y) -> Fill.circle(e.x + x, e.y + y, 0.85f + e.fout() * 3.5f));
     }),

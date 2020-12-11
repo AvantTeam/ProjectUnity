@@ -36,13 +36,14 @@ public class UnityPlanets implements ContentList{
             atmosphereColor = Color.white.cpy();
             accessible = false;
             meshLoader = () -> new ColorMesh(
-            this, 3, 4, 0.3, 1.7, 1.2, 1, 0.9f,
-            Color.valueOf("121211"),
-            Color.valueOf("141414"),
-            Color.valueOf("131313"),
-            Color.valueOf("181617"),
-            Color.valueOf("191415"),
-            Color.valueOf("101111"));
+                this, 3, 4, 0.3, 1.7, 1.2, 1, 0.9f,
+                Color.valueOf("121211"),
+                Color.valueOf("141414"),
+                Color.valueOf("131313"),
+                Color.valueOf("181617"),
+                Color.valueOf("191415"),
+                Color.valueOf("101111")
+            );
         }};
     }
 }

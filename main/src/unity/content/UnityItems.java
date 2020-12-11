@@ -5,11 +5,11 @@ import mindustry.ctype.*;
 import mindustry.type.*;
 
 public class UnityItems implements ContentList{
-    public static Item
+    public static Item//@formatter:off
     //faction-alloys
     advanceAlloy, cupronickel, darkAlloy, dirium, lightAlloy, monolithAlloy, plagueAlloy, sparkAlloy, superAlloy, terminaAlloy,
     terminationFragment, terminum,
-
+    //@formatter:on
     //faction items
     contagium, denseAlloy, imberium, luminum, monolite, nickel, steel, stone, umbrium, xenium;
 

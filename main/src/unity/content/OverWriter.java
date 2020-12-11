@@ -2,7 +2,10 @@ package unity.content;
 
 import arc.func.Cons;
 import mindustry.ctype.*;
+import mindustry.gen.*;
+import mindustry.logic.*;
 import mindustry.world.blocks.environment.Floor;
+import unity.logic.*;
 
 import static mindustry.content.Blocks.*;
 
@@ -14,6 +17,8 @@ public class OverWriter implements ContentList{
 
     @Override
     public void load(){
+        //region contents
+
         forceOverWrite(basalt, (Floor t) -> {
             t.itemDrop = UnityItems.stone;
             t.playerUnmineable = true;
@@ -33,5 +38,13 @@ public class OverWriter implements ContentList{
             t.itemDrop = UnityItems.stone;
             t.playerUnmineable = true;
         });
+
+        //endregion
+        //region statements
+
+        LAssembler.customParsers.put("expsensor", (args) -> new ExpSensorStatement());
+        LogicIO.allStatements.add(ExpSensorStatement::new);
+
+        //endregion
     }
 }
