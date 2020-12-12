@@ -87,7 +87,7 @@ public class UnityBlocks implements ContentList{
     Block concreteBlank, concreteFill, concreteNumber, concreteStripe, concrete, stoneFullTiles, stoneFull, stoneHalf, stoneTiles;
 
     public static @FactionDef(type = Faction.end)
-    Block terminalCrucible, endForge;
+    Block terminalCrucible, endForge, endGame;
 
     public static @ExpDef Block expTest;
 
@@ -957,6 +957,26 @@ public class UnityBlocks implements ContentList{
             };
             consumes.power(86.7f);
             consumes.items(with(UnityItems.terminum, 3, UnityItems.darkAlloy, 5, UnityItems.lightAlloy, 5));
+        }};
+
+        endGame = new EndGameTurret("endgame"){{
+            requirements(Category.turret, with(Items.phaseFabric, 9500, Items.surgeAlloy, 10500,
+            UnityItems.darkAlloy, 2300, UnityItems.lightAlloy, 2300, UnityItems.advanceAlloy, 2300,
+            UnityItems.plagueAlloy, 2300, UnityItems.sparkAlloy, 2300, UnityItems.monolithAlloy, 2300,
+            UnityItems.superAlloy, 2300, UnityItems.terminum, 1600, UnityItems.terminaAlloy, 800));
+
+            shootCone = 360f;
+            reloadTime = 430f;
+            range = 820f;
+            size = 14;
+            coolantMultiplier = 0.6f;
+            hasItems = true;
+            itemCapacity = 10;
+
+            shootType = new BulletType(){{
+                damage = Float.MAX_VALUE;
+            }};
+            consumes.item(UnityItems.terminum, 2);
         }};
 
         //endregion

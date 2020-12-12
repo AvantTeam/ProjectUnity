@@ -5,8 +5,10 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.core.*;
 import mindustry.entities.*;
+import mindustry.entities.bullet.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -19,7 +21,7 @@ public final class Funcs{
     private static final Vec2 tV = new Vec2();
     private static final IntSet collidedBlocks = new IntSet();
     private static final Rect rect = new Rect(), rectAlt = new Rect(), hitRect = new Rect();
-    private static Unit result;
+    private static Posc result;
     private static float cdist;
 
     /** Same thing like the drawer from UnitType without applyColor and outlines. */
@@ -99,6 +101,13 @@ public final class Funcs{
         castCone(wx, wy, range, angle, cone, null, consUnit);
     }
 
+    public static float offsetSin(float offset, float scl){
+        return Mathf.absin(Time.time + (offset * Mathf.radDeg), scl, 0.5f) + 0.5f;
+    }
+
+    public static float offsetSinB(float offset, float scl){
+        return Mathf.absin(Time.time + (offset * Mathf.radDeg), scl, 0.25f);
+    }
     /** Iterates over all blocks in a radius. */
     public static void trueEachBlock(int wx, int wy, float range, Cons<Building> cons){
         collidedBlocks.clear();
@@ -121,11 +130,15 @@ public final class Funcs{
         }
     }
 
+    public static float getBulletDamage(BulletType type){
+        return type.damage + type.splashDamage + (Math.max(type.lightningDamage / 2f, 0f) * type.lightning * type.lightningLength);
+    }
+
     /**
      * Targets any units that is not in the array.
      * @returns the unit, picks a random target if all potential targets is in the array.
      */
-    public static Unit targetUnique(Team team, int x, int y, float radius, Seq<Unit> targetSeq){
+    public static Posc targetUnique(Team team, float x, float y, float radius, Seq<Posc> targetSeq){
         result = null;
         float radiusSquare = radius * radius;
         cdist = radiusSquare + 1;
