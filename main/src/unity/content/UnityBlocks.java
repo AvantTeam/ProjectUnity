@@ -38,7 +38,7 @@ import static unity.content.UnityFx.*;
 
 public class UnityBlocks implements ContentList{
     public static Block//@formatter:off
-    //order is load order
+    //order is load order. double newLine means next js file or json contents directory. eh, not that important.
     //global
     recursiveReconstructor,
     //@formatter:on
@@ -89,7 +89,8 @@ public class UnityBlocks implements ContentList{
     public static @FactionDef(type = Faction.end)
     Block terminalCrucible, endForge, endGame;
 
-    public static @ExpDef Block expTest;
+    public static @ExpDef
+    Block expTest;
 
     @Override
     public void load(){
@@ -961,9 +962,10 @@ public class UnityBlocks implements ContentList{
 
         endGame = new EndGameTurret("endgame"){{
             requirements(Category.turret, with(Items.phaseFabric, 9500, Items.surgeAlloy, 10500,
-            UnityItems.darkAlloy, 2300, UnityItems.lightAlloy, 2300, UnityItems.advanceAlloy, 2300,
-            UnityItems.plagueAlloy, 2300, UnityItems.sparkAlloy, 2300, UnityItems.monolithAlloy, 2300,
-            UnityItems.superAlloy, 2300, UnityItems.terminum, 1600, UnityItems.terminaAlloy, 800));
+                UnityItems.darkAlloy, 2300, UnityItems.lightAlloy, 2300, UnityItems.advanceAlloy, 2300,
+                UnityItems.plagueAlloy, 2300, UnityItems.sparkAlloy, 2300, UnityItems.monolithAlloy, 2300,
+                UnityItems.superAlloy, 2300, UnityItems.terminum, 1600, UnityItems.terminaAlloy, 800
+            ));
 
             shootCone = 360f;
             reloadTime = 430f;
