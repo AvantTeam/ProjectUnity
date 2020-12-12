@@ -21,6 +21,7 @@ import static arc.Core.*;
 
 @SuppressWarnings("unchecked")
 public class Teleporter extends Block{
+    //this class was made assuming only one instance. if more, static should be removed or further improvement.
     protected static final Color[] selection = new Color[]{Color.royal, Color.orange, Color.scarlet, Color.forest, Color.purple, Color.gold, Color.pink, Color.black};
     protected static final ObjectSet<TeleporterBuild>[][] teleporters;
     protected float powerUse = 2.5f;
@@ -112,7 +113,7 @@ public class Teleporter extends Block{
                 Draw.rect(blankRegion, x, y);
             }
             Draw.color(Color.white);
-            Draw.alpha(0.45f + Mathf.absin(Time.time, 7f, 0.26f));
+            Draw.alpha(0.45f + Mathf.absin(7f, 0.26f));
             Draw.rect(topRegion, x, y);
             Draw.reset();
         }

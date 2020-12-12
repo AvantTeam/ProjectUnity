@@ -2,6 +2,7 @@ package unity.content;
 
 import arc.math.Mathf;
 import arc.util.Time;
+import mindustry.content.*;
 import mindustry.ctype.ContentList;
 import mindustry.entities.units.WeaponMount;
 import mindustry.gen.Unit;
@@ -9,7 +10,7 @@ import mindustry.type.StatusEffect;
 import unity.graphics.UnityPal;
 
 public class UnityStatusEffects implements ContentList{
-    public static StatusEffect radiation, reloadFatigue, molten;
+    public static StatusEffect radiation, reloadFatigue, molten, tpCoolDown;
 
     @Override
     public void load(){
@@ -32,15 +33,22 @@ public class UnityStatusEffects implements ContentList{
                 damage = 1.6f;
             }
         };
+
         reloadFatigue = new StatusEffect("reload-fatigue"){{
             reloadMultiplier = 0.75f;
         }};
+
         molten = new StatusEffect("molten"){{
             color = UnityPal.lavaColor;
             speedMultiplier = 0.6f;
             healthMultiplier = 0.5f;
             damage = 1f;
             effect = UnityFx.ahhimaLiquidNow;
+        }};
+
+        tpCoolDown = new StatusEffect("tpcooldonw"){{
+            color = UnityPal.diriumColor2;
+            effect = Fx.none;
         }};
     }
 }

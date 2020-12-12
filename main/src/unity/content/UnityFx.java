@@ -9,6 +9,8 @@ import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.Unit;
 import mindustry.graphics.*;
+import mindustry.type.*;
+import mindustry.ui.*;
 import unity.entities.UnitVecData;
 import unity.graphics.*;
 
@@ -22,7 +24,7 @@ import static unity.content.UnityBullets.*;
 public class UnityFx{
     private static int integer;
     public static final Effect
-    //@formatter:off
+        //@formatter:off
     shootSmallBlaze = new Effect(22f, e -> {    //@formatter:on
         color(Pal.lightFlame, Pal.darkFlame, Pal.gray, e.fin());
         randLenVectors(e.id, 16, e.finpow() * 60f, e.rotation, 18f, (x, y) -> Fill.circle(e.x + x, e.y + y, 0.85f + e.fout() * 3.5f));
@@ -406,5 +408,33 @@ public class UnityFx{
         color(Color.white, UnityPal.diriumColor, e.fin());
         stroke(3f * e.rotation * e.fout());
         square(e.x, e.y, e.rotation * 4f * e.finpow());
-    });
+    }),
+
+    tpOut = new Effect(30f, e -> {
+        color(UnityPal.diriumColor);
+        stroke(3f * e.fout());
+        square(e.x, e.y, e.finpow() * e.rotation, 45f);
+        stroke(5f * e.fout());
+        square(e.x, e.y, e.fin() * e.rotation, 45f);
+        randLenVectors(e.id, 10, e.fin() * (e.rotation + 10f), (x, y) -> Fill.square(e.x + x, e.y + y, e.fout() * 4f, 100f * Mathf.randomSeed(e.id + 1) * e.fin()));
+    }),
+
+    tpIn = new Effect(50f, e -> {
+        if(!(e.data instanceof UnitType type)) return;
+        TextureRegion region = type.icon(Cicon.full);
+        color();
+        mixcol(UnityPal.diriumColor, 1f);
+        rect(region, e.x, e.y, region.width * scl * e.fout(), region.height * scl * e.fout(), e.rotation);
+        mixcol();
+    }),
+
+    tpFlash = new Effect(30f, e -> {
+        if(!(e.data instanceof Unit unit) || !unit.isValid()) return;
+        TextureRegion region = unit.type.icon(Cicon.full);
+        mixcol(UnityPal.diriumColor2, 1f);
+        alpha(e.fout());
+        rect(region, unit.x, unit.y, unit.rotation - 90f);
+        mixcol();
+        color();
+    }).layer(Layer.flyingUnit + 1f);
 }

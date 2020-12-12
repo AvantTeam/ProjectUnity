@@ -71,7 +71,7 @@ public class UnityBlocks implements ContentList{
 
     //laserTurret, inferno,
 
-    teleporter, expOutput, expUnloader, expTank, expChest, expFountain, expVoid;
+    teleporter, teleunit, expOutput, expUnloader, expTank, expChest, expFountain, expVoid;
 
     //public static @FactionDef(type = Faction.light)
     //Block
@@ -735,6 +735,14 @@ public class UnityBlocks implements ContentList{
             requirements(Category.distribution, with(Items.lead, 22, Items.silicon, 10, Items.phaseFabric, 32, UnityItems.dirium, 32));
         }};
 
+        teleunit = new TeleUnit("teleunit"){{
+            requirements(Category.units, with(Items.lead, 180, Items.titanium, 80, Items.silicon, 90, Items.phaseFabric, 64, UnityItems.dirium, 48));
+            size = 3;
+            ambientSound = Sounds.techloop;
+            ambientSoundVolume = 0.02f;
+            consumes.power(3f);
+        }};
+
         expOutput = new ExpOutput("exp-output"){{
             requirements(Category.effect, with(UnityItems.stone, 25, Items.copper, 25, Items.graphite, 10));
             health = 60;
@@ -903,9 +911,9 @@ public class UnityBlocks implements ContentList{
                 drawer.draw(e);
                 if(e.warmup > 0f){
                     Draw.blend(Blending.additive);
-                    Draw.color(1f, Mathf.absin(Time.time, 5f, 0.5f) + 0.5f, Mathf.absin(Time.time + 90f * Mathf.radDeg, 5f, 0.5f) + 0.5f, e.warmup);
+                    Draw.color(1f, Mathf.absin(5f, 0.5f) + 0.5f, Mathf.absin(Time.time + 90f * Mathf.radDeg, 5f, 0.5f) + 0.5f, e.warmup);
                     Draw.rect(dataRegions[0], e.x, e.y);
-                    float b = (Mathf.absin(Time.time, 8f, 0.25f) + 0.75f) * e.warmup;
+                    float b = (Mathf.absin(8f, 0.25f) + 0.75f) * e.warmup;
                     Draw.color(1f, b, b, b);
                     Draw.rect(topRegion, e.x, e.y);
                     Draw.blend();
@@ -936,9 +944,9 @@ public class UnityBlocks implements ContentList{
                 drawer.draw(e);
                 if(e.warmup <= 0.0001f) return;
                 Draw.blend(Blending.additive);
-                Draw.color(1f, Mathf.absin(Time.time, 5f, 0.5f) + 0.5f, Mathf.absin(Time.time + 90f * Mathf.radDeg, 5f, 0.5f) + 0.5f, e.warmup);
+                Draw.color(1f, Mathf.absin(5f, 0.5f) + 0.5f, Mathf.absin(Time.time + 90f * Mathf.radDeg, 5f, 0.5f) + 0.5f, e.warmup);
                 Draw.rect(dataRegions[0], e.x, e.y);
-                float b = (Mathf.absin(Time.time, 8f, 0.25f) + 0.75f) * e.warmup;
+                float b = (Mathf.absin(8f, 0.25f) + 0.75f) * e.warmup;
                 Draw.color(1f, b, b, b);
                 Draw.rect(topRegion, e.x, e.y);
                 for(int i = 0; i < 4; i++){

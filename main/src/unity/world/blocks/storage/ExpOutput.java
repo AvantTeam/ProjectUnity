@@ -3,6 +3,7 @@ package unity.world.blocks.storage;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.gen.*;
@@ -102,15 +103,15 @@ public class ExpOutput extends ExpUnloader implements ExpBlockBase{
             if(!consValid()) return;
             Draw.blend(Blending.additive);
             Draw.color(Color.white);
-            Draw.alpha(Mathf.absin(Time.time, 20f, 0.4f));
+            Draw.alpha(Mathf.absin(20f, 0.4f));
             Draw.rect(topRegion, x, y);
             Draw.blend();
             if(warmup > 0.001f){
                 Draw.color(UnityPal.expColor);
                 Draw.z(Layer.effect);
-                Lines.stroke(warmup * Mathf.absin(Time.time, 20f, 1.2f));
+                Lines.stroke(warmup * Mathf.absin(20f, 1.2f));
                 for(int i = 0; i < 4; i++){
-                    if(join[i]) Lines.lineAngle(x + 4f * d4x[i], y, 4f * d4y[i], 90f * (i + 1), 8f);
+                    if(join[i]) Lines.lineAngle(x + 4f * Geometry.d4x[i], y, 4f * Geometry.d4y[i], 90f * (i + 1), 8f);
                 }
             }
             Draw.reset();

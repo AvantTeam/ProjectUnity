@@ -114,9 +114,16 @@ public class Unity extends Mod{
         handler = new MusicHandler();
     }
 
-    //still don't want to import-unimport Log.java everytime i debug.
     /** <code>unity.Unity.print();</code> for copypaste */
     public static void print(Object... args){
-        Log.infoList("unity :", args);
+        StringBuilder h = new StringBuilder();
+        if(args == null) h.append("null");
+        else{
+            for(var o : args){
+                h.append(o == null ? "null" : o.toString());
+                h.append(", ");
+            }
+        }
+        Log.infoTag("unity", h.toString());
     }
 }
