@@ -164,7 +164,7 @@ module.exports = {
                 Draw.draw(Layer.blockOver, () => {
                     try{
                         Drawf.construct(this.x, this.y, region, 0, progress, Vars.state.rules.unitBuildSpeedMultiplier, this._time);
-                        Lines.stroke(2 * this._heat, Pal.accentBack);
+                        Lines.stroke(this._heat, Pal.accentBack);
                         var pos = Mathf.sin(this._time, 6, 8);
                         Lines.lineAngleCenter(this.x + pos, this.y, 90, 16 - Math.abs(pos) * 2);
                         Draw.color();
@@ -174,7 +174,7 @@ module.exports = {
                     }
                 });
 
-                Lines.stroke(2 * this._heat);
+                Lines.stroke(1.5 * this._heat);
                 Draw.color(Pal.accentBack);
                 Lines.poly(this.x, this.y, 4, 8 * this._heat);
 
