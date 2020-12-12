@@ -116,7 +116,7 @@ module.exports = {
                     this._time += this.edelta() * (this.consValid() ? 1 : 0) * Vars.state.rules.unitBuildSpeedMultiplier;
                     if(this._time > padblock.craftTime) this.finishUnit();
                 }
-                this._heat = Mathf.lerpDelta(this._heat, this.inProgress() ? 1.1 : 0, 0.1);
+                this._heat = Mathf.lerpDelta(this._heat, this.inProgress() ? 1 : 0, 0.1);
             },
             getResultUnit(){
                 return this._revert ? UnitTypes.alpha : padblock.unit;
