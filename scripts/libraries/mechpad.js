@@ -67,6 +67,17 @@ module.exports = {
             inRange(player){
                 return player.unit() != null && !player.unit().dead && Math.abs(player.unit().x - this.x) <= 2.5 * Vars.tilesize && Math.abs(player.unit().y - this.y) <= 2.5 * Vars.tilesize;
             },
+            drawSelect(){
+                Draw.color(this.consValid() ? (this.inRange(Vars.player) ? Color.orange : Pal.accent) : Pal.darkMetal);
+                var length = Vars.tilesize * padblock.size / 2 + 3 + Mathf.absin(Time.time, 5, 2);
+
+                Draw.rect(padblock.arrowRegion, this.x + length, this.y, (0 + 2) * 90);
+                Draw.rect(padblock.arrowRegion, this.x, this.y + length, (1 + 2) * 90);
+                Draw.rect(padblock.arrowRegion, this.x + -1 * length, this.y, (2 + 2) * 90);
+                Draw.rect(padblock.arrowRegion, this.x, this.y + -1 * length, (3 + 2) * 90);
+
+                Draw.color();
+            },
             shouldShowConfigure(player){
                 return this.consValid() && this.inRange(Vars.player);
             },
@@ -75,7 +86,7 @@ module.exports = {
                 //stupid rhino
                 if(this.unit == null){
                     this.unit = UnitTypes.block.create(this.team);
-                    unit.tile(this);
+                    this.unit.tile(this);
                 }
                 return this.unit;
             },
@@ -121,10 +132,10 @@ module.exports = {
                 if(!Vars.net.client()){
                     var unit = this.getResultUnit().create(this.team);
                     unit.set(this);
-                    unit.rotation(90);
+                    unit.rotation = 90;
                     unit.impulse(0, 3);
-                    unit.controller(player);
-                    unit.spawnedByCore(true);
+                    unit.set(this.getResultUnit(), player);
+                    unit.spawnedByCore = true;
                     unit.add();
                 }
 
