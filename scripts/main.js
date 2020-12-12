@@ -110,7 +110,6 @@ const script = [
 
 
                     "ores",
-                    "multi-test-younggam"
                 ]
             },
 
