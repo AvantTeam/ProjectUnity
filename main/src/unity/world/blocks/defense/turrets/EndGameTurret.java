@@ -290,13 +290,13 @@ public class EndGameTurret extends PowerTurret {
 
         void updateEyesOffset(){
             for(int i = 0; i < 16; i++){
-                float angleC = (360f / 8f) * (i * 8f);
+                float angleC = ((360f / 8f) * (i % 8f));
                 if(i >= 8){
                     Tmp.v1.trns(angleC + 22.5f + ringProgress[1], 25.75f);
                 }else{
                     Tmp.v1.trns(angleC + ringProgress[0], 36.75f);
                 }
-                eyesVecArray[i].set(Tmp.v1).add(x, y);
+                eyesVecArray[i].set(Tmp.v1.x, Tmp.v1.y).add(x, y);
             }
         }
 
@@ -373,9 +373,7 @@ public class EndGameTurret extends PowerTurret {
                 }else{
                     if(unit.isShooting()) playerShoot(eyeSequenceA);
                 }
-                //eyeSequenceA = (eyeSequenceA + 1) % 8;
-                eyeSequenceA += 1;
-                eyeSequenceA %= 8;
+                eyeSequenceA = (eyeSequenceA + 1) % 8;
             }
             if(eyeReloads[1] >= 5f){
                 eyeReloads[1] = 0f;
@@ -384,9 +382,7 @@ public class EndGameTurret extends PowerTurret {
                 }else{
                     if(unit.isShooting()) playerShoot(eyeSequenceB + 8);
                 }
-                //eyeSequenceB = (eyeSequenceB + 1) % 8;
-                eyeSequenceB += 1;
-                eyeSequenceB %= 8;
+                eyeSequenceB = (eyeSequenceB + 1) % 8;
             }
         }
 
@@ -458,6 +454,7 @@ public class EndGameTurret extends PowerTurret {
             consume();
             killTiles();
             killUnits();
+            UnityFx.endGameShoot.at(x, y);
             UnitySounds.endgameShoot.at(x, y);
         }
 
@@ -476,7 +473,7 @@ public class EndGameTurret extends PowerTurret {
         @Override
         public void add(){
             if(isAdded()) return;
-            for (int i = 0; i < 16; i++){
+            for(int i = 0; i < 16; i++){
                 eyesVecArray[i] = new Vec2();
                 targets[i] = null;
             }
