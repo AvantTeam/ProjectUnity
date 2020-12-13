@@ -3,11 +3,12 @@ package unity.entities;
 import arc.Events;
 import arc.struct.Seq;
 import arc.util.Time;
+import arc.util.pooling.*;
 import mindustry.content.Liquids;
 import mindustry.entities.Puddles;
 import mindustry.game.EventType;
 import mindustry.gen.*;
-import unity.entities.effects.VapourizeEffectState;
+import unity.entities.effects.*;
 
 public class ExtraEffect{
     private static final Seq<BuildQueue> vapourizeQueue = new Seq<>(512);
@@ -27,6 +28,17 @@ public class ExtraEffect{
             });
             vapourizeQueue.removeAll(buildq -> buildq.build.dead || buildq.time <= 0f);
         });
+    }
+
+    public static SlowLightning createSlowLightning(float x, float y, float rotation, float lifetime){
+        SlowLightning l = Pools.obtain(SlowLightning.class, SlowLightning::new);
+        l.x = x;
+        l.y = y;
+        l.rotation = rotation;
+        l.lifetime = lifetime;
+        l.lightningLength = 43f;
+        //l.add();
+        return l;
     }
 
     public static void addMoltenBlock(Building build){

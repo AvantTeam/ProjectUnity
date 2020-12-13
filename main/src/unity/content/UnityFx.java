@@ -5,14 +5,17 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.Unit;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+import mindustry.world.blocks.defense.turrets.Turret.*;
 import unity.entities.UnitVecData;
 import unity.graphics.*;
+import unity.util.*;
 
 //fixing rect as Draw.rect not Lines.rect. currently no use
 import static arc.graphics.g2d.Draw.rect;
@@ -436,5 +439,71 @@ public class UnityFx{
         rect(region, unit.x, unit.y, unit.rotation - 90f);
         mixcol();
         color();
-    }).layer(Layer.flyingUnit + 1f);
+    }).layer(Layer.flyingUnit + 1f),
+
+    endGameShoot = new Effect(45f, 820f * 2f, e -> {
+        float curve = Mathf.curve(e.fin(), 0f, 0.2f) * 820f;
+        float curveB = Mathf.curve(e.fin(), 0f, 0.7f);
+
+        Draw.color(Color.red, Color.valueOf("ff000000"), curveB);
+        Draw.blend(Blending.additive);
+        Fill.poly(e.x, e.y, Lines.circleVertices(curve), curve);
+        Draw.blend();
+    }).layer(110.99f),
+
+    vapourizeTile = new Effect(126f, (float)(Vars.tilesize * 16), e -> {
+        Draw.color(Color.red);
+        Draw.blend(Blending.additive);
+
+        Fill.circle(e.x, e.y, e.fout() * e.rotation * (Vars.tilesize / 2f));
+
+        if(e.data instanceof TurretBuild turret){
+            Draw.mixcol(Color.red, 1f);
+            Draw.alpha(e.fout());
+            Draw.rect(turret.block.region, e.x, e.y, turret.rotation - 90f);
+        }
+
+        Draw.blend();
+        Draw.mixcol();
+        Draw.color();
+    }).layer(111f),
+
+    vapourizeUnit = new Effect(126f, 512f, e -> {
+        Draw.mixcol(Color.red, 1f);
+        Draw.color(1f, 1f, 1f, e.fout());
+        Draw.blend(Blending.additive);
+
+        Funcs.simpleUnitDrawer((Unit)e.data, false);
+
+        Draw.blend();
+        Draw.color();
+        Draw.mixcol();
+    }).layer(111f),
+
+    endgameLaser = new Effect(76f, 820f * 2f, e -> {
+        if(e.data == null) return;
+        Color[] colors = {Color.valueOf("f53036"), Color.valueOf("ff786e"), Color.white};
+        float[] strokes = {2f, 1.3f, 0.6f};
+        float oz = Draw.z();
+        Object[] data = (Object[])e.data;
+        Position a = (Position)data[0];
+        Position b = (Position)data[1];
+        float width = (float)data[2];
+        Tmp.v1.set(a).lerp(b, Mathf.curve(e.fin(), 0f, 0.09f));
+        for(int i = 0; i < 3; i++){
+            Draw.z(oz + (i / 1000f));
+            if(i >= 2){
+                Draw.color(Color.white);
+            }else{
+                Draw.color(Tmp.c1.set(colors[i]).mul(1f,1f + Funcs.offsetSinB(0f, 5f), 1f + Funcs.offsetSinB(90f, 5f), 1f));
+            }
+
+            Fill.circle(a.getX(), a.getY(), strokes[i] * 4f * width * e.fout());
+            Fill.circle(Tmp.v1.x, Tmp.v1.y, strokes[i] * 4f * width * e.fout());
+
+            Lines.stroke(strokes[i] * 4f * width * e.fout());
+            Lines.line(a.getX(), a.getY(), Tmp.v1.x, Tmp.v1.y);
+        }
+        Draw.z(oz);
+    });
 }

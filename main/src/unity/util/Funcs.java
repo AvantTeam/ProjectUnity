@@ -155,6 +155,45 @@ public final class Funcs{
         return result;
     }
 
+    public static void collideLineRaw(float x, float y, float x2, float y2, Boolf<Building> buildB, Boolf<Unit> unitB, Boolf<Building> buildC, Cons<Unit> unitC){
+        collidedBlocks.clear();
+        world.raycastEachWorld(x, y, x2, y2, (cx, cy) -> {
+            Building tile = world.build(cx, cy);
+            if(tile != null && buildB.get(tile) && !collidedBlocks.contains(tile.pos())){
+                boolean s = buildC.get(tile);
+                collidedBlocks.add(tile.pos());
+                if(s) return true;
+            }
+            return false;
+        });
+
+        rect.setPosition(x, y).setSize(x2 - x, y2 - y);
+
+        if(rect.width < 0){
+            rect.x += rect.width;
+            rect.width *= -1;
+        }
+        if(rect.height < 0){
+            rect.y += rect.height;
+            rect.height *= -1;
+        }
+
+        float expand = 2f;
+
+        rect.grow(expand * 2f);
+
+        Groups.unit.intersect(rect.x, rect.y, rect.width, rect.height, unit -> {
+            if(unitB.get(unit)){
+                unit.hitbox(hitRect);
+                hitRect.grow(expand * 2);
+
+                Vec2 vec = Geometry.raycastRect(x, y, x2, y2, hitRect);
+
+                if(vec != null) unitC.get(unit);
+            }
+        });
+    }
+
     /** The other version of Damage.collideLine */
     public static void collideLineDamageOnly(Team team, float damage, float x, float y, float angle, float length, Bullet hitter){
         collidedBlocks.clear();
