@@ -213,10 +213,8 @@ public class TeleUnit extends Block{
         public boolean acceptPayload(Building source, Payload payload){
             TeleUnitBuild dest = getDest();
             if(!consValid() || !dest.enabled) return false;
-            unity.Unity.print(dest);
             int ntrns = 1 + size / 2;
             Building nextBuild = dest.nearby(Geometry.d4x(source.rotation) * ntrns, Geometry.d4y(source.rotation) * ntrns);
-            unity.Unity.print(nextBuild);
             boolean result = nextBuild != null && (
                 //same size
                 (nextBuild.block.size == size && dest.tileX() + Geometry.d4(source.rotation).x * size == nextBuild.tileX() && dest.tileY() + Geometry.d4(source.rotation).y * size == nextBuild.tileY()) ||
@@ -227,7 +225,6 @@ public class TeleUnit extends Block{
                             Math.abs(nextBuild.y - dest.y) <= (nextBuild.block.size * tilesize - size * tilesize) / 2f : //check Y alignment
                             Math.abs(nextBuild.x - dest.x) <= (nextBuild.block.size * tilesize - size * tilesize) / 2f   //check X alignment
                         )));
-            unity.Unity.print(result);
             if(result && nextBuild.block.outputsPayload && !nextBuild.tile.solid() && (nextBuild.rotation + 2) % 4 != source.rotation){
                 result = nextBuild.acceptPayload(source, payload);
                 if(result) nextBuild.handlePayload(source, payload);
