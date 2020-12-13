@@ -47,7 +47,7 @@ module.exports = {
         padblock.solid = false;
         padblock.hasItems = false;
         padblock.ambientSound = Sounds.respawn;
-        padblock.ambientSoundVolume = 0.02;
+        padblock.ambientSoundVolume = 0.08;
         padblock.configurable = true;
         //TODO: set group to null
 
