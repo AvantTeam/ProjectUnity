@@ -284,10 +284,6 @@ public class UnityFx{
         randLenVectors(e.id, 5, e.fin() * 15f, (x, y) -> lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fout() * 3f + 1f));
     }),
 
-    cutEffect = new Effect(3f * 60f, e -> {
-
-    }),
-
     pylonLaserCharge = new Effect(200f, 180f, e -> {
         LaserBulletType laser = (LaserBulletType)pylonLaser;
         e.scaled(100f, c -> {
@@ -436,5 +432,11 @@ public class UnityFx{
         rect(region, unit.x, unit.y, unit.rotation - 90f);
         mixcol();
         color();
-    }).layer(Layer.flyingUnit + 1f);
+    }).layer(Layer.flyingUnit + 1f),
+
+    rockFx = new Effect(10f, e -> {
+        color(Color.orange, Color.gray, e.fin());
+        stroke(1f);
+        spikes(e.x, e.y, e.fin() * 4f, 1.5f, 6);
+    });
 }
