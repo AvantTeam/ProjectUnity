@@ -4,6 +4,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
@@ -33,7 +34,7 @@ import unity.world.draw.*;
 
 import static arc.Core.*;
 import static mindustry.type.ItemStack.*;
-import static unity.content.UnityFx.*;
+//deleted import static UnifyFx becuz name of effects are rly confusing.
 
 public class UnityBlocks implements ContentList{
     public static Block//@formatter:off
@@ -62,7 +63,7 @@ public class UnityBlocks implements ContentList{
     electroTile;
 
     public static @FactionDef(type = Faction.koruh)
-    Block solidifier,
+    Block solidifier, steelSmelter, liquifier,
 
     stoneWall, denseWall, steelWall, steelWallLarge, diriumWall, diriumWallLarge,
 
@@ -429,7 +430,7 @@ public class UnityBlocks implements ContentList{
             consumes.items(with(Items.lead, 2, Items.silicon, 3, Items.blastCompound, 1, Items.phaseFabric, 1, UnityItems.umbrium, 2));
             consumes.power(3.2f);
             afterUpdate = e -> {
-                if(e.consValid() && Mathf.chanceDelta(0.76f)) craftingEffect.at(e.getX(), e.getY(), Mathf.random(360f));
+                if(e.consValid() && Mathf.chanceDelta(0.76f)) UnityFx.craftingEffect.at(e.getX(), e.getY(), Mathf.random(360f));
             };
         }};
 
@@ -465,10 +466,10 @@ public class UnityBlocks implements ContentList{
             shootType = UnityBullets.orb;
             shootSound = Sounds.laser;
             heatColor = Pal.turretHeat;
-            shootEffect = orbShoot;
+            shootEffect = UnityFx.orbShoot;
             smokeEffect = Fx.none;
-            chargeEffect = orbCharge;
-            chargeBeginEffect = orbChargeBegin;
+            chargeEffect = UnityFx.orbCharge;
+            chargeBeginEffect = UnityFx.orbChargeBegin;
         }};
 
         shockwire = new LaserTurret("shockwire"){
@@ -514,8 +515,8 @@ public class UnityBlocks implements ContentList{
             powerUse = 13.8f;
             shootType = UnityBullets.currentStroke;
             shootSound = Sounds.laserbig;
-            chargeEffect = currentCharge;
-            chargeBeginEffect = currentChargeBegin;
+            chargeEffect = UnityFx.currentCharge;
+            chargeBeginEffect = UnityFx.currentChargeBegin;
             consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability <= 0.1f, 0.52f)).boost();
         }};
 
@@ -536,9 +537,9 @@ public class UnityBlocks implements ContentList{
             powerUse = 15.2f;
             shootType = UnityBullets.plasmaTriangle;
             shootSound = Sounds.shotgun;
-            shootEffect = plasmaShoot;
-            chargeEffect = plasmaCharge;
-            chargeBeginEffect = plasmaChargeBegin;
+            shootEffect = UnityFx.plasmaShoot;
+            chargeEffect = UnityFx.plasmaCharge;
+            chargeBeginEffect = UnityFx.plasmaChargeBegin;
             shots = 1;
             consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability <= 0.1f, 0.52f)).boost();
         }};
@@ -571,10 +572,10 @@ public class UnityBlocks implements ContentList{
             craftTime = 160f;
             ambientSound = Sounds.machine;
             ambientSoundVolume = 0.6f;
-            craftEffect = imberCircleSparkCraftingEffect;
+            craftEffect = UnityFx.imberCircleSparkCraftingEffect;
             afterUpdate = e -> {
                 if(e.consValid()){
-                    if(Mathf.chanceDelta(0.3f)) imberSparkCraftingEffect.at(e.getX(), e.getY(), Mathf.random(360f));
+                    if(Mathf.chanceDelta(0.3f)) UnityFx.imberSparkCraftingEffect.at(e.getX(), e.getY(), Mathf.random(360f));
                     else if(Mathf.chanceDelta(0.02f)) Lightning.create(e.team, UnityPal.imberColor, 5f, e.x, e.y, Mathf.random(360f), 5);
                 }
             };
@@ -593,20 +594,65 @@ public class UnityBlocks implements ContentList{
             hasItems = true;
             liquidCapacity = 12f;
             updateEffect = Fx.fuelburn;
-            craftEffect = rockFx;
+            craftEffect = UnityFx.rockFx;
             craftTime = 60f;
             flameColor = Color.valueOf("ffb096");
             outputItem = new ItemStack(UnityItems.stone, 1);
             preserveDraw = false;
             afterDrawer = e -> {
                 Draw.rect(region, e.x, e.y);
-                if(e.warmup > 0.001f){
+                if(e.warmup > 0f){
                     Draw.color(liquids[0].color, e.liquids.get(liquids[0]) / liquidCapacity);
                     Draw.rect(topRegion, e.x, e.y);
                     Draw.color();
                 }
             };
             consumes.add(new ConsumeLiquids(new LiquidStack[]{new LiquidStack(UnityLiquids.lava, 0.1f), new LiquidStack(Liquids.water, 0.1f)}));
+        }};
+
+        steelSmelter = new StemGenericSmelter("steel-smelter"){{
+            requirements(Category.crafting, with(Items.lead, 45, Items.silicon, 20, UnityItems.denseAlloy, 30));
+            health = 140;
+            itemCapacity = 10;
+            craftEffect = UnityFx.craftFx;
+            craftTime = 300f;
+            outputItem = new ItemStack(UnityItems.steel, 1);
+            preserveDraw = false;
+            afterDrawer = e -> {
+                Draw.rect(region, e.x, e.y);
+                if(e.warmup > 0f){
+                    Draw.color(1f, 1f, 1f, e.warmup * Mathf.absin(8f, 0.6f));
+                    Draw.rect(topRegion, e.x, e.y);
+                    Draw.color();
+                }
+            };
+            consumes.power(2f);
+            consumes.items(with(Items.coal, 2, Items.graphite, 2, UnityItems.denseAlloy, 3));
+        }};
+
+        liquifier = new StemGenericSmelter("liquifier"){{
+            requirements(Category.crafting, with(Items.titanium, 30, Items.silicon, 15, UnityItems.steel, 10));
+            health = 100;
+            hasLiquids = true;
+            updateEffect = Fx.fuelburn;
+            craftTime = 30f;
+            outputLiquid = new LiquidStack(UnityLiquids.lava, 0.1f);
+            configClear(b -> Fires.create(b.tile));
+            afterUpdate = e -> {//eh is it chanceDelta?
+                if(e.progress == 0f && e.warmup > 0.001f && !Vars.net.client() && Mathf.chance(0.2f)) e.configureAny(null);
+            };
+            preserveDraw = false;
+            afterDrawer = e -> {
+                Draw.rect(region, e.x, e.y);
+                if(e.warmup > 0f){
+                    Liquid liquid = outputLiquid.liquid;
+                    Draw.color(liquid.color, e.liquids.get(liquid) / liquidCapacity);
+                    Draw.rect(topRegion, e.x, e.y);
+                    Draw.color();
+                }
+            };
+            consumes.power(3.7f);
+            consumes.items(with(UnityItems.stone, 6, Items.pyratite, 2));
         }};
 
         stoneWall = new LimitWall("ustone-wall"){{
@@ -753,7 +799,7 @@ public class UnityBlocks implements ContentList{
                 else e.fdata = Mathf.lerpDelta(e.fdata, 0f, 0.02f);
                 float temp = e.fdata;
                 if(!Mathf.zero(temp)){
-                    if(e.timer.get(effectTimer, 45f)) effect.at(e.x, e.y, e.rotation, temp);
+                    if(e.timer.get(effectTimer, 45f)) UnityFx.effect.at(e.x, e.y, e.rotation, temp);
                     //TODO not exactly same with js ver?.
                     if(Mathf.chanceDelta(temp * 0.5f)) Lightning.create(e.team, Pal.lancerLaser, 1f, e.x, e.y, Mathf.randomSeed((int)Time.time + e.id, 360f), (int)(temp * 4f) + Mathf.random(3));
                 }
@@ -810,8 +856,8 @@ public class UnityBlocks implements ContentList{
                     shootEffect = Fx.lightningShoot;
                 }
             };
-            chargeEffect = oracleChage;
-            chargeBeginEffect = oracleChargeBegin;
+            chargeEffect = UnityFx.oracleChage;
+            chargeBeginEffect = UnityFx.oracleChargeBegin;
             subShots = 3;
             subBurstSpacing = 1f;
             subShootEffect = Fx.hitLancer;
@@ -895,7 +941,7 @@ public class UnityBlocks implements ContentList{
             ambientSoundVolume = 0.6f;
             addSprites("lights", "top-small");
             foreUpdate = e -> {
-                if(e.consValid() && Mathf.chanceDelta(0.7f * e.warmup)) forgeAbsorbEffect.at(e.x, e.y, Mathf.random(360f));
+                if(e.consValid() && Mathf.chanceDelta(0.7f * e.warmup)) UnityFx.forgeAbsorbEffect.at(e.x, e.y, Mathf.random(360f));
             };
             preserveDraw = false;
             afterDrawer = e -> {

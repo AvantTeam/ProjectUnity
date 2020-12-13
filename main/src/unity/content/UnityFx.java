@@ -438,5 +438,11 @@ public class UnityFx{
         color(Color.orange, Color.gray, e.fin());
         stroke(1f);
         spikes(e.x, e.y, e.fin() * 4f, 1.5f, 6);
+    }),
+
+    craftFx = new Effect(10f, e -> {
+        color(Pal.accent, Color.gray, e.fin());
+        stroke(1f);
+        spikes(e.x, e.y, e.fin() * 4f, 1.5f, 6);
     });
 }
