@@ -12,6 +12,9 @@ import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.world.blocks.defense.turrets.*;
+import unity.content.*;
+import unity.entities.*;
+import unity.entities.effects.*;
 import unity.gen.*;
 import unity.util.*;
 
@@ -25,49 +28,6 @@ public class EndGameTurret extends PowerTurret {
     private final static float[] ringProgresses = {0.013f, 0.035f, 0.024f};
     private final static int[] ringDirections = {1, -1, 1};
     private final static Seq<Entityc> entitySeq = new Seq<>(512);
-    //might move to the effect class
-    public final static Effect vapourizeTile = new Effect(126f, (float)(Vars.tilesize * 16), e -> {
-        Draw.color(Color.red);
-        Draw.blend(Blending.additive);
-
-        Fill.circle(e.x, e.y, e.fout() * e.rotation * (Vars.tilesize / 2f));
-
-        if(e.data instanceof TurretBuild turret){
-            Draw.mixcol(Color.red, 1f);
-            Draw.alpha(e.fout());
-            Draw.rect(turret.block.region, e.x, e.y, turret.rotation - 90f);
-        }
-
-        Draw.blend();
-        Draw.mixcol();
-        Draw.color();
-    });
-    public final static Effect endgameLaser = new Effect(76f, 820f * 2f, e -> {
-        if(e.data == null) return;
-        Color[] colors = {Color.valueOf("f53036"), Color.valueOf("ff786e"), Color.white};
-        float[] strokes = {2f, 1.3f, 0.6f};
-        float oz = Draw.z();
-        Object[] data = (Object[])e.data;
-        Position a = (Position)data[0];
-        Position b = (Position)data[1];
-        float width = (float)data[2];
-        Tmp.v1.set(a).lerp(b, Mathf.curve(e.fin(), 0f, 0.09f));
-        for(int i = 0; i < 3; i++){
-            Draw.z(oz + (i / 1000f));
-            if(i >= 2){
-                Draw.color(Color.white);
-            }else{
-                Draw.color(Tmp.c1.set(colors[i]).mul(1f,1f + Funcs.offsetSinB(0f, 5f), 1f + Funcs.offsetSinB(90f, 5f), 1f));
-            }
-
-            Fill.circle(a.getX(), a.getY(), strokes[i] * 4f * width * e.fout());
-            Fill.circle(Tmp.v1.x, Tmp.v1.y, strokes[i] * 4f * width * e.fout());
-
-            Lines.stroke(strokes[i] * 4f * width * e.fout());
-            Lines.line(a.getX(), a.getY(), Tmp.v1.x, Tmp.v1.y);
-        }
-        Draw.z(oz);
-    });
 
     protected int eyeTime = timers++;
     protected int bulletTime = timers++;
@@ -218,7 +178,8 @@ public class EndGameTurret extends PowerTurret {
             Units.nearbyEnemies(team, x - range, y - range, range * 2f, range * 2f, e -> {
                 if(Mathf.within(x, y, e.x, e.y, range) && !e.dead){
                     Object[] data = {new Vec2(x + eyeOffset.x, y + eyeOffset.y), e, 1f};
-                    endgameLaser.at(x, y, 0, data);
+                    UnityFx.vapourizeUnit.at(e.x, e.y, 0, e);
+                    UnityFx.endgameLaser.at(x, y, 0, data);
                     entitySeq.add(e);
                 }
             });
@@ -230,10 +191,10 @@ public class EndGameTurret extends PowerTurret {
             shouldLaser = 0;
             Vars.indexer.eachBlock(null, x, y, range, build -> build.team != team, building -> {
                 if(!building.dead && building != this){
-                    if(building.block.size >= 3) vapourizeTile.at(building.x, building.y, building.block.size, building);
+                    if(building.block.size >= 3) UnityFx.vapourizeTile.at(building.x, building.y, building.block.size, building);
                     if((shouldLaser % 5) == 0 || building.block.size >= 5){
                         Object[] data = {new Vec2(x + (eyeOffset.x * 2f), y + (eyeOffset.y * 2f)), building, 1f};
-                        endgameLaser.at(x, y, 0, data);
+                        UnityFx.endgameLaser.at(x, y, 0, data);
                     }
                     building.kill();
                     shouldLaser++;
@@ -254,13 +215,13 @@ public class EndGameTurret extends PowerTurret {
             Vars.indexer.eachBlock(null, ux, uy, rnge, b -> b.team() != team && !b.dead(), building -> {
                 building.damage(490f);
                 Object[] data = {new Vec2(ux, uy), building, 0.525f};
-                endgameLaser.at(x, y, 0, data);
+                UnityFx.endgameLaser.at(x, y, 0, data);
             });
             Tmp.v1.set(eyesVecArray[index]);
             Tmp.v1.add(ux, uy);
             Tmp.v1.scl(0.5f);
             Object[] dataB = {eyesVecArray[index], new Vec2(ux, uy), 0.625f};
-            endgameLaser.at(Tmp.v1.x, Tmp.v1.y, 0, dataB);
+            UnityFx.endgameLaser.at(Tmp.v1.x, Tmp.v1.y, 0, dataB);
             UnitySounds.endgameSmallShoot.at(x, y);
         }
 
@@ -269,11 +230,11 @@ public class EndGameTurret extends PowerTurret {
             if(e != null){
                 e.damage(350 * threatLevel);
                 if(e.dead()){
-                    //if(targets[index] instanceof Unit tmp)
+                    if(targets[index] instanceof Unit tmp) UnityFx.vapourizeUnit.at(tmp.x, tmp.y, tmp.rotation, tmp);
                     e.remove();
                 }
                 Object[] data = {eyesVecArray[index], e, 0.625f};
-                endgameLaser.at(x, y, 0, data);
+                UnityFx.endgameLaser.at(x, y, 0, data);
                 //sound
                 UnitySounds.endgameSmallShoot.at(x, y);
             }
@@ -329,13 +290,13 @@ public class EndGameTurret extends PowerTurret {
 
         void updateEyesOffset(){
             for(int i = 0; i < 16; i++){
-                float angleC = (360f / 8f) * (i * 8f);
+                float angleC = ((360f / 8f) * (i % 8f));
                 if(i >= 8){
                     Tmp.v1.trns(angleC + 22.5f + ringProgress[1], 25.75f);
                 }else{
                     Tmp.v1.trns(angleC + ringProgress[0], 36.75f);
                 }
-                eyesVecArray[i].set(Tmp.v1).add(x, y);
+                eyesVecArray[i].set(Tmp.v1.x, Tmp.v1.y).add(x, y);
             }
         }
 
@@ -375,7 +336,7 @@ public class EndGameTurret extends PowerTurret {
                         if(damageB > 1600f || b.type.splashDamageRadius > 120f || damageFull + damageB > 13000f || (b.owner != null && !within((Posc)b.owner, range))){
                             entitySeq.add(b);
                             Object[] data = {new Vec2(x + (eyeOffset.x * 2f), y + (eyeOffset.y * 2f)), new Vec2(b.x, b.y), 0.625f};
-                            endgameLaser.at(x, y, 0f, data);
+                            UnityFx.endgameLaser.at(x, y, 0f, data);
                         }
                     }
                 });
@@ -458,19 +419,29 @@ public class EndGameTurret extends PowerTurret {
                 float value = lightsAlpha > power.status ? 1f : power.status;
                 lightsAlpha = Mathf.lerpDelta(lightsAlpha, power.status, 0.07f * value);
                 for(int i = 0; i < 3; i++){
-                    ringProgress[i] = Mathf.lerpDelta(ringProgress[i], 360 * (float)ringDirections[i], ringProgresses[i] * power.status);
+                    ringProgress[i] = Mathf.lerpDelta(ringProgress[i], 360f * (float)ringDirections[i], ringProgresses[i] * power.status);
                 }
-                /*
+
                 float chance = (((reload / reloadTime) * 0.90f) + (1f - 0.90f)) * power.status;
                 float randomAngle = Mathf.random(360f);
                 Tmp.v1.trns(randomAngle, 18.5f);
-                if(Mathf.chanceDelta(0.75 * chance));
-                */
+                Tmp.v1.add(x, y);
+                if(Mathf.chanceDelta(0.75 * chance)){
+                    SlowLightning l = ExtraEffect.createSlowLightning(Tmp.v1.x, Tmp.v1.y, randomAngle, 80f);
+                    l.team = team;
+                    l.colorFrom = Color.red;
+                    l.colorTo = Color.black;
+                    l.damage = 520f * power.status;
+                    l.range = 730f;
+                    l.influence = targetPos;
+                    l.add();
+                }
+
             }else{
                 if(eyeResetTime >= 60f){
                     lightsAlpha = Mathf.lerpDelta(lightsAlpha, 0f, 0.07f);
                     for(int i = 0; i < 3; i++){
-                        ringProgress[i] = Mathf.lerpDelta(ringProgress[i], 0, ringProgresses[i] * power.status);
+                        ringProgress[i] = Mathf.lerpDelta(ringProgress[i], 0f, ringProgresses[i] * power.status);
                     }
                 }else{
                     eyeResetTime += Time.delta;
@@ -483,6 +454,7 @@ public class EndGameTurret extends PowerTurret {
             consume();
             killTiles();
             killUnits();
+            UnityFx.endGameShoot.at(x, y);
             UnitySounds.endgameShoot.at(x, y);
         }
 
@@ -501,7 +473,7 @@ public class EndGameTurret extends PowerTurret {
         @Override
         public void add(){
             if(isAdded()) return;
-            for (int i = 0; i < 16; i++){
+            for(int i = 0; i < 16; i++){
                 eyesVecArray[i] = new Vec2();
                 targets[i] = null;
             }

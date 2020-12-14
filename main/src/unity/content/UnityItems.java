@@ -15,7 +15,7 @@ public class UnityItems implements ContentList{
 
     @Override
     public void load(){
-        //region faction-alloys
+        //region faction-alloys     TODO separating these makes load order differ from js version. rearrange this?
 
         advanceAlloy = new Item("advance-alloy", Color.valueOf("748096")){{
             cost = 1.4f;

@@ -2,6 +2,7 @@ package unity.world.blocks.production;
 
 import arc.func.Cons;
 import arc.graphics.g2d.TextureRegion;
+import arc.struct.*;
 import mindustry.world.blocks.production.GenericSmelter;
 
 import static arc.Core.*;
@@ -9,7 +10,7 @@ import static arc.Core.*;
 public class StemGenericSmelter extends GenericSmelter{
     protected boolean preserveDraw = true, preserveUpdate = true;
     protected Cons<StemSmelterBuild> foreDrawer = e -> {}, afterDrawer = e -> {}, foreUpdate = e -> {}, afterUpdate = e -> {};
-    protected TextureRegion[] dataRegions;
+    protected final ObjectMap<String, TextureRegion> regions = new ObjectMap<>(3);
     protected String[] spriteNames = new String[]{};
 
     public StemGenericSmelter(String name){
@@ -19,9 +20,7 @@ public class StemGenericSmelter extends GenericSmelter{
     @Override
     public void load(){
         super.load();
-        int len = spriteNames.length;
-        dataRegions = new TextureRegion[len];
-        for(int i = 0; i < len; i++) dataRegions[i] = atlas.find(spriteNames[i]);
+        for(String s : spriteNames) regions.put(s, atlas.find(name + "-" + s));
     }
 
     protected void addSprites(String... names){
@@ -29,7 +28,7 @@ public class StemGenericSmelter extends GenericSmelter{
     }
 
     public class StemSmelterBuild extends SmelterBuild{
-        public Object data;
+        public float fdata;
 
         @Override
         public void draw(){

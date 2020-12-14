@@ -5,12 +5,17 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.Unit;
 import mindustry.graphics.*;
+import mindustry.type.*;
+import mindustry.ui.*;
+import mindustry.world.blocks.defense.turrets.Turret.*;
 import unity.entities.UnitVecData;
 import unity.graphics.*;
+import unity.util.*;
 
 //fixing rect as Draw.rect not Lines.rect. currently no use
 import static arc.graphics.g2d.Draw.rect;
@@ -22,7 +27,7 @@ import static unity.content.UnityBullets.*;
 public class UnityFx{
     private static int integer;
     public static final Effect
-    //@formatter:off
+        //@formatter:off
     shootSmallBlaze = new Effect(22f, e -> {    //@formatter:on
         color(Pal.lightFlame, Pal.darkFlame, Pal.gray, e.fin());
         randLenVectors(e.id, 16, e.finpow() * 60f, e.rotation, 18f, (x, y) -> Fill.circle(e.x + x, e.y + y, 0.85f + e.fout() * 3.5f));
@@ -282,10 +287,6 @@ public class UnityFx{
         randLenVectors(e.id, 5, e.fin() * 15f, (x, y) -> lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fout() * 3f + 1f));
     }),
 
-    cutEffect = new Effect(3f * 60f, e -> {
-
-    }),
-
     pylonLaserCharge = new Effect(200f, 180f, e -> {
         LaserBulletType laser = (LaserBulletType)pylonLaser;
         e.scaled(100f, c -> {
@@ -406,5 +407,111 @@ public class UnityFx{
         color(Color.white, UnityPal.diriumColor, e.fin());
         stroke(3f * e.rotation * e.fout());
         square(e.x, e.y, e.rotation * 4f * e.finpow());
+    }),
+
+    tpOut = new Effect(30f, e -> {
+        color(UnityPal.diriumColor);
+        stroke(3f * e.fout());
+        square(e.x, e.y, e.finpow() * e.rotation, 45f);
+        stroke(5f * e.fout());
+        square(e.x, e.y, e.fin() * e.rotation, 45f);
+        randLenVectors(e.id, 10, e.fin() * (e.rotation + 10f), (x, y) -> Fill.square(e.x + x, e.y + y, e.fout() * 4f, 100f * Mathf.randomSeed(e.id + 1) * e.fin()));
+    }),
+
+    tpIn = new Effect(50f, e -> {
+        if(!(e.data instanceof UnitType type)) return;
+        TextureRegion region = type.icon(Cicon.full);
+        color();
+        mixcol(UnityPal.diriumColor, 1f);
+        rect(region, e.x, e.y, region.width * scl * e.fout(), region.height * scl * e.fout(), e.rotation);
+        mixcol();
+    }),
+
+    tpFlash = new Effect(30f, e -> {
+        if(!(e.data instanceof Unit unit) || !unit.isValid()) return;
+        TextureRegion region = unit.type.icon(Cicon.full);
+        mixcol(UnityPal.diriumColor2, 1f);
+        alpha(e.fout());
+        rect(region, unit.x, unit.y, unit.rotation - 90f);
+        mixcol();
+        color();
+    }).layer(Layer.flyingUnit + 1f),
+
+    endGameShoot = new Effect(45f, 820f * 2f, e -> {
+        float curve = Mathf.curve(e.fin(), 0f, 0.2f) * 820f;
+        float curveB = Mathf.curve(e.fin(), 0f, 0.7f);
+
+        Draw.color(Color.red, Color.valueOf("ff000000"), curveB);
+        Draw.blend(Blending.additive);
+        Fill.poly(e.x, e.y, Lines.circleVertices(curve), curve);
+        Draw.blend();
+    }).layer(110.99f),
+
+    vapourizeTile = new Effect(126f, (float)(Vars.tilesize * 16), e -> {
+        Draw.color(Color.red);
+        Draw.blend(Blending.additive);
+
+        Fill.circle(e.x, e.y, e.fout() * e.rotation * (Vars.tilesize / 2f));
+
+        if(e.data instanceof TurretBuild turret){
+            Draw.mixcol(Color.red, 1f);
+            Draw.alpha(e.fout());
+            Draw.rect(turret.block.region, e.x, e.y, turret.rotation - 90f);
+        }
+
+        Draw.blend();
+        Draw.mixcol();
+        Draw.color();
+    }).layer(111f),
+
+    vapourizeUnit = new Effect(126f, 512f, e -> {
+        Draw.mixcol(Color.red, 1f);
+        Draw.color(1f, 1f, 1f, e.fout());
+        Draw.blend(Blending.additive);
+
+        Funcs.simpleUnitDrawer((Unit)e.data, false);
+
+        Draw.blend();
+        Draw.color();
+        Draw.mixcol();
+    }).layer(111f),
+
+    endgameLaser = new Effect(76f, 820f * 2f, e -> {
+        if(e.data == null) return;
+        Color[] colors = {Color.valueOf("f53036"), Color.valueOf("ff786e"), Color.white};
+        float[] strokes = {2f, 1.3f, 0.6f};
+        float oz = Draw.z();
+        Object[] data = (Object[])e.data;
+        Position a = (Position)data[0];
+        Position b = (Position)data[1];
+        float width = (float)data[2];
+        Tmp.v1.set(a).lerp(b, Mathf.curve(e.fin(), 0f, 0.09f));
+        for(int i = 0; i < 3; i++){
+            Draw.z(oz + (i / 1000f));
+            if(i >= 2){
+                Draw.color(Color.white);
+            }else{
+                Draw.color(Tmp.c1.set(colors[i]).mul(1f,1f + Funcs.offsetSinB(0f, 5f), 1f + Funcs.offsetSinB(90f, 5f), 1f));
+            }
+
+            Fill.circle(a.getX(), a.getY(), strokes[i] * 4f * width * e.fout());
+            Fill.circle(Tmp.v1.x, Tmp.v1.y, strokes[i] * 4f * width * e.fout());
+
+            Lines.stroke(strokes[i] * 4f * width * e.fout());
+            Lines.line(a.getX(), a.getY(), Tmp.v1.x, Tmp.v1.y);
+        }
+        Draw.z(oz);
+    }),
+    
+    rockFx = new Effect(10f, e -> {
+        color(Color.orange, Color.gray, e.fin());
+        stroke(1f);
+        spikes(e.x, e.y, e.fin() * 4f, 1.5f, 6);
+    }),
+
+    craftFx = new Effect(10f, e -> {
+        color(Pal.accent, Color.gray, e.fin());
+        stroke(1f);
+        spikes(e.x, e.y, e.fin() * 4f, 1.5f, 6);
     });
 }

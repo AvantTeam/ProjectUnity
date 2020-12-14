@@ -3,6 +3,7 @@ package unity.entities.bullet;
 import arc.graphics.Color;
 import arc.graphics.g2d.*;
 import arc.math.Mathf;
+import arc.math.geom.*;
 import arc.util.Time;
 import mindustry.content.Fx;
 import mindustry.entities.bullet.BulletType;
@@ -25,7 +26,6 @@ import static unity.content.UnityBullets.exporb;
 
 public class ExpOrb extends BulletType{
     public static final float expAmount = 10f;
-    public static final int[] d4x = new int[]{1, 0, -1, 0}, d4y = new int[]{0, 1, 0, -1};
 
     public ExpOrb(){
         damage = 8f;
@@ -76,13 +76,13 @@ public class ExpOrb extends BulletType{
     protected void conveyor(Bullet b, Conveyor block, ConveyorBuild build){
         if(build.clogHeat > 0.5f || !build.enabled) return;
         float mspeed = build.delta() * block.speed / 3f;
-        b.vel.add(d4x[build.rotation] * mspeed, d4y[build.rotation] * mspeed);
+        b.vel.add(Geometry.d4x[build.rotation] * mspeed, Geometry.d4y[build.rotation] * mspeed);
     }
 
     protected void expConveyor(Bullet b, Conveyor block, ConveyorBuild build){
         if(build.clogHeat > 0.5f || !build.enabled) return;
         float mspeed = build.delta() * block.speed * 2f;
-        b.vel.scl(0.7f).add(d4x[build.rotation] * mspeed, d4y[build.rotation] * mspeed);
+        b.vel.scl(0.7f).add(Geometry.d4x[build.rotation] * mspeed, Geometry.d4y[build.rotation] * mspeed);
     }
 
     public static void createExp(float x, float y, float amount, float r){
