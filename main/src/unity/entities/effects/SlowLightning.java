@@ -146,7 +146,7 @@ public class SlowLightning extends EffectState{
 
                     if(score < origin.range){
                         Vec2 inf = origin.influence;
-                        float rotationC = (inf != null && origin.hasIntersected) ? Angles.moveToward(rotation + rand, Angles.angle(toPos.x, toPos.y, inf.x, inf.y) + (rand / 1.12f), 17f * Mathf.clamp((600f - Mathf.dst(toPos.x, toPos.y, inf.x, inf.y)) / 600)) : rotation + rand;
+                        float rotationC = (inf != null && !origin.hasIntersected) ? Angles.moveToward(rotation + rand, Angles.angle(toPos.x, toPos.y, inf.x, inf.y) + (rand / 1.12f), 17f * Mathf.clamp((600f - Mathf.dst(toPos.x, toPos.y, inf.x, inf.y)) / 600f)) : rotation + rand;
                         Tmp.v2.trns(rotationC, origin.lightningLength);
                         float nScore = Tmp.v2.len() + score;
                         Tmp.v2.add(toPos);
