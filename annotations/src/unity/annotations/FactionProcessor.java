@@ -40,10 +40,9 @@ public class FactionProcessor extends BaseProcessor{
 
     @Override
     public void process(RoundEnvironment roundEnv) throws Exception{
-        Seq<? extends Element> elements = Seq.with(roundEnv.getElementsAnnotatedWith(FactionDef.class));
-        factions.addAll(elements.select(e -> e instanceof VariableElement).map(e -> (VariableElement)e));
+        factions.addAll((Set<VariableElement>)roundEnv.getElementsAnnotatedWith(FactionDef.class));
         if(faction == null){
-            faction = (TypeElement)elements.find(def -> def.getAnnotation(FactionDef.class).base());
+            faction = (TypeElement)Seq.with(roundEnv.getElementsAnnotatedWith(FactionBase.class)).first();
         }
 
         if(round == 1){
@@ -51,7 +50,6 @@ public class FactionProcessor extends BaseProcessor{
             processMusics();
         }else if(round == 2){
             musics.addAll((Set<VariableElement>)roundEnv.getElementsAnnotatedWith(MusicDef.class));
-
             processFactions();
         }
     }
@@ -402,7 +400,6 @@ public class FactionProcessor extends BaseProcessor{
         }
 
         facMeta.addMethod(initializer.build());
-
         write(facMeta.build());
     }
 }

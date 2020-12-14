@@ -5,7 +5,7 @@ import arc.graphics.*;
 import mindustry.graphics.*;
 import unity.annotations.Annotations.*;
 
-@FactionDef(base = true)
+@FactionBase
 public enum Faction{
     scar("scar", Pal.remove),
     dark("dark", Color.valueOf("fc6203")),

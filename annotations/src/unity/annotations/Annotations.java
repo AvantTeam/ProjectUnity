@@ -8,14 +8,11 @@ public class Annotations{
     // region definitions
 
     /** Indicates that this content belongs to a specific faction */
-    @Target({ElementType.FIELD, ElementType.TYPE})
+    @Target(ElementType.FIELD)
     @Retention(RetentionPolicy.SOURCE)
     public @interface FactionDef{
         /** @return The {@link Faction} */
         String type() default "invalid";
-
-        /** @return Wether this class is the base class for faction enum. Only one type may use this */
-        boolean base() default false;
     }
 
     /** Indicates that this music belongs to a specific faction in a specific category */
@@ -32,6 +29,12 @@ public class Annotations{
          * @return The music category.
          */
         String category() default "ambient";
+    }
+
+    /** Wether this class is the base class for faction enum. Only one type may use this */
+    @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface FactionBase{
     }
 
     // end region

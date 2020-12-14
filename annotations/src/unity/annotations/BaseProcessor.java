@@ -9,6 +9,7 @@ import java.util.*;
 import javax.annotation.processing.*;
 import javax.lang.model.*;
 import javax.lang.model.element.*;
+import javax.lang.model.type.*;
 import javax.lang.model.util.*;
 import javax.tools.*;
 
@@ -69,6 +70,10 @@ public abstract class BaseProcessor extends AbstractProcessor{
         .indent("    ")
             .skipJavaLangImports(true)
         .build().writeTo(filer);
+    }
+
+    public Element toEl(TypeMirror t){
+        return typeUtils.asElement(t);
     }
 
     public TypeName tName(Class<?> type){
