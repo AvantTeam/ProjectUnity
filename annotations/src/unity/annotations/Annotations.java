@@ -15,6 +15,25 @@ public class Annotations{
         String type() default "invalid";
     }
 
+    /** Indicates that this content has an exp mechanism */
+    @Target(ElementType.FIELD)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface ExpDef{
+        /** @return The exp type */
+        Class<?> type();
+    }
+
+    /** Indicates that this content's entity type inherits interfaces */
+    @Target(ElementType.FIELD)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface EntityDef{
+        /** @return The base class for the generated entity class */
+        Class<?> base();
+
+        /** @return The interfaces that will be inherited by the generated entity class */
+        Class<?>[] def();
+    }
+
     /** Indicates that this music belongs to a specific faction in a specific category */
     @Target(ElementType.FIELD)
     @Retention(RetentionPolicy.SOURCE)
@@ -40,22 +59,7 @@ public class Annotations{
     // end region
     // region utilities
 
-    /** Indicates that the following function is used to get a field that will be defined later */
-    @Target(ElementType.METHOD)
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface Getter{
-    }
-
-    /** Same as {@link Getter}, the following function will be identified as a setter */
-    @Target(ElementType.METHOD)
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface Setter{
-    }
-
-    /**
-     * Indicates that the following field returned by this getter is meant to be read-only
-     * @see Getter
-     */
+    /** Wether the field returned by this getter is meant to be read-only */
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.SOURCE)
     public @interface ReadOnly{
@@ -72,7 +76,7 @@ public class Annotations{
         String eval();
 
         /** @return Class arguments to be parsed into {@link #eval()} */
-        Class<?>[] args() default {};
+        String[] args() default {};
     }
 
     // end region

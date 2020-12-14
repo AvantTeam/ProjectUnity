@@ -1,10 +1,12 @@
 package unity.annotations;
 
 import arc.files.*;
+import arc.struct.*;
 import arc.util.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.regex.*;
 
 import javax.annotation.processing.*;
 import javax.lang.model.*;
@@ -76,6 +78,16 @@ public abstract class BaseProcessor extends AbstractProcessor{
         return typeUtils.asElement(t);
     }
 
+    public Seq<Element> elements(Runnable run){
+        try{
+            run.run();
+        }catch(MirroredTypesException ex){
+            return Seq.with(ex.getTypeMirrors()).map(this::toEl);
+        }
+
+        return Seq.with();
+    }
+
     public TypeName tName(Class<?> type){
         return ClassName.get(type).box();
     }
@@ -86,6 +98,20 @@ public abstract class BaseProcessor extends AbstractProcessor{
 
     public ClassName cName(Class<?> type){
         return ClassName.get(type);
+    }
+
+    public ClassName cName(String canonical){
+        Matcher matcher = Pattern.compile("\\.[A-Z]").matcher(canonical);
+        matcher.find();
+        int offset = matcher.start();
+
+        String pkgName = canonical.substring(0, offset);
+        Seq<String> simpleNames = Seq.with(canonical.substring(offset + 1).split("\\."));
+        simpleNames.reverse();
+        String simpleName = simpleNames.pop();
+        simpleNames.reverse();
+
+        return ClassName.get(pkgName, simpleName, simpleNames.toArray());
     }
 
     public TypeVariableName tvName(String name, TypeName... bounds){
