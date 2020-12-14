@@ -13,7 +13,6 @@ import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import unity.content.*;
 import unity.gen.*;
-import unity.gen.UnityMusics;
 import unity.mod.*;
 import unity.mod.ContributorList.*;
 
@@ -47,7 +46,6 @@ public class Unity extends Mod{
         Events.on(ClientLoadEvent.class, e -> {
             Core.app.post(() -> {
                 FactionMeta.init();
-                ExpMeta.init();
             });
             Func<String, String> stringf = value -> Core.bundle.get("mod." + value);
 

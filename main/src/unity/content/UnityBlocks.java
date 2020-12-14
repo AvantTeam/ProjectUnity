@@ -18,7 +18,6 @@ import mindustry.type.*;
 import mindustry.ctype.*;
 import mindustry.content.*;
 import unity.annotations.Annotations.*;
-import unity.annotations.util.*;
 import unity.gen.*;
 import unity.graphics.*;
 import unity.world.blocks.defense.*;
@@ -50,21 +49,21 @@ public class UnityBlocks implements ContentList{
 
     multiTest1, multiTest2;
 
-    public static @FactionDef(type = Faction.dark)
+    public static @FactionDef(type = "dark")
     Block apparition, ghost, banshee, fallout, catastrophe, calamity, extinction,
 
     darkAlloyForge,
 
     darkWall, darkWallLarge;
 
-    public static @FactionDef(type = Faction.imber)
+    public static @FactionDef(type = "imber")
     Block orb, shockwire, current, plasma, shielder,
 
     sparkAlloyForge,
 
     electroTile;
 
-    public static @FactionDef(type = Faction.koruh)
+    public static @FactionDef(type = "koruh")
     Block stoneWall, denseWall, steelWall, steelWallLarge, diriumWall, diriumWallLarge,
 
     steelConveyor, diriumConveyor,
@@ -73,28 +72,24 @@ public class UnityBlocks implements ContentList{
 
     teleporter, expOutput, expUnloader, expTank, expChest, expFountain, expVoid;
 
-    //public static @FactionDef(type = Faction.light)
+    //public static @FactionDef(type = "light")
     //Block
 
-    public static @FactionDef(type = Faction.monolith)
+    public static @FactionDef(type = "monolith")
     Block monolithAlloyForge,
 
     mage, oracle; //spectrum,
 
     //monolithGroundFactory;
 
-    public static @FactionDef(type = Faction.youngcha)
+    public static @FactionDef(type = "youngcha")
     Block concreteBlank, concreteFill, concreteNumber, concreteStripe, concrete, stoneFullTiles, stoneFull, stoneHalf, stoneTiles;
 
-    public static @FactionDef(type = Faction.end)
+    public static @FactionDef(type = "end")
     Block terminalCrucible, endForge, endGame;
-
-    public static @ExpDef
-    Block expTest;
 
     @Override
     public void load(){
-        expTest = new Block("no");
         //region global
 
         recursiveReconstructor = new SelectableReconstructor("recursive-reconstructor"){{

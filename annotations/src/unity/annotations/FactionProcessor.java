@@ -17,20 +17,21 @@ import javax.lang.model.element.*;
 import com.squareup.javapoet.*;
 
 import unity.annotations.Annotations.*;
-import unity.annotations.util.*;
 
 @SuppressWarnings({"unchecked"})
 @SupportedAnnotationTypes({
     "unity.annotations.Annotations.FactionDef",
-    "unity.annotations.Annotations.MusicDef"
+    "unity.annotations.Annotations.MusicDef",
+    "unity.annotations.Annotations.FactionBase"
 })
 public class FactionProcessor extends BaseProcessor{
     Seq<VariableElement> factions = new Seq<>();
     Seq<VariableElement> musics = new Seq<>();
+    TypeElement faction;
 
-    private final ObjectMap<String, Faction> map = ObjectMap.of(
-        "monolithDark1:dark", Faction.monolith,
-        "monolithDark2:dark", Faction.monolith
+    private final StringMap map = StringMap.of(
+        "monolithDark1:dark", "monolith",
+        "monolithDark2:dark", "monolith"
     );
 
     {
@@ -39,13 +40,16 @@ public class FactionProcessor extends BaseProcessor{
 
     @Override
     public void process(RoundEnvironment roundEnv) throws Exception{
-        if(round == 1){
-            factions.addAll((Set<VariableElement>)roundEnv.getElementsAnnotatedWith(FactionDef.class));
+        Seq<? extends Element> elements = Seq.with(roundEnv.getElementsAnnotatedWith(FactionDef.class));
+        factions.addAll(elements.select(e -> e instanceof VariableElement).map(e -> (VariableElement)e));
+        if(faction == null){
+            faction = (TypeElement)elements.find(def -> def.getAnnotation(FactionDef.class).base());
+        }
 
+        if(round == 1){
             processSounds();
             processMusics();
         }else if(round == 2){
-            factions.addAll((Set<VariableElement>)roundEnv.getElementsAnnotatedWith(FactionDef.class));
             musics.addAll((Set<VariableElement>)roundEnv.getElementsAnnotatedWith(MusicDef.class));
 
             processFactions();
@@ -204,7 +208,7 @@ public class FactionProcessor extends BaseProcessor{
                 if(n[0].equals(name)){
                     music.addAnnotation(
                         AnnotationSpec.builder(cName(MusicDef.class))
-                            .addMember("type", "$T.$L", Faction.class, map.get(name + ":" + n[1]).name())
+                            .addMember("facType", "$S", map.get(name + ":" + n[1]))
                             .addMember("category", "$S", n[1])
                         .build()
                     );
@@ -230,18 +234,18 @@ public class FactionProcessor extends BaseProcessor{
                     .addMember("value", "$S", "unchecked")
                 .build()
             )
-            .addJavadoc("Modifies content fields based on its {@link $T}", cName(Faction.class))
+            .addJavadoc("Modifies content fields based on its {@link $T}", tName(faction))
             .addField(
                 FieldSpec.builder(
                     ParameterizedTypeName.get(
                         cName(ObjectMap.class),
-                        tName(Object.class),
-                        tName(Faction.class)
+                        cName(Object.class),
+                        tName(faction)
                     ),
                     "map",
                     Modifier.PRIVATE, Modifier.STATIC
                 )
-                    .addJavadoc("Maps {@link $T} with {@link $T}", cName(Object.class), cName(Faction.class))
+                    .addJavadoc("Maps {@link $T} with {@link $T}", cName(Object.class), tName(faction))
                     .initializer("new $T<>()", cName(ObjectMap.class))
                 .build()
             )
@@ -262,12 +266,12 @@ public class FactionProcessor extends BaseProcessor{
                 MethodSpec.methodBuilder("map").addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                     .addJavadoc(
                         CodeBlock.builder()
-                            .add("Gets a {@link $T} with the given content as a key" + lnew(), cName(Faction.class))
+                            .add("Gets a {@link $T} with the given content as a key" + lnew(), tName(faction))
                             .add("@param content The content object" + lnew())
-                            .add("@return The {@link $T}", cName(Faction.class))
+                            .add("@return The {@link $T}", tName(faction))
                         .build()
                     )
-                    .returns(tName(Faction.class))
+                    .returns(tName(faction))
                     .addParameter(cName(Object.class), "content")
                     .addStatement("return map.get(content)")
                 .build()
@@ -276,14 +280,14 @@ public class FactionProcessor extends BaseProcessor{
                 MethodSpec.methodBuilder("put").addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                     .addJavadoc(
                         CodeBlock.builder()
-                            .add("Puts and handles this content with the given {@link $T}" + lnew(), cName(Faction.class))
+                            .add("Puts and handles this content with the given {@link $T}" + lnew(), tName(faction))
                             .add("@param content The content object" + lnew())
-                            .add("@param faction The {@link $T}", cName(Faction.class))
+                            .add("@param faction The {@link $T}", tName(faction))
                         .build()
                     )
                     .returns(TypeName.VOID)
                     .addParameter(cName(Object.class), "content")
-                    .addParameter(cName(Faction.class), "faction")
+                    .addParameter(tName(faction), "faction")
                     .addStatement("map.put(content, faction)")
                     .beginControlFlow("if(content instanceof $T unlockable)", cName(UnlockableContent.class))
                         .addStatement("unlockable.description += $S + $S + faction.name", "\n", "[gray]Faction:[] ")
@@ -294,16 +298,16 @@ public class FactionProcessor extends BaseProcessor{
                 MethodSpec.methodBuilder("getByFaction").addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                     .addJavadoc(
                         CodeBlock.builder()
-                            .add("Returns specific {@link $T}s with the given {@link $T}" + lnew(), cName(Object.class), cName(Faction.class))
+                            .add("Returns specific {@link $T}s with the given {@link $T}" + lnew(), cName(Object.class), tName(faction))
                             .add("@param <$T> The generic type to filter" + lnew(), tvName("T"))
-                            .add("@param faction The {@link $T}" + lnew(), cName(Faction.class))
+                            .add("@param faction The {@link $T}" + lnew(), tName(faction))
                             .add("@param type The generic type class" + lnew())
                             .add("@return {@link $T} filled with the filtered objects", cName(Seq.class))
                         .build()
                     )
                     .addTypeVariable(tvName("T"))
                     .returns(ParameterizedTypeName.get(cName(Seq.class), tvName("T")))
-                    .addParameter(cName(Faction.class), "faction")
+                    .addParameter(tName(faction), "faction")
                     .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(cName(Class.class), tvName("T")), "type").build())
                     .addStatement("$T<$T> contents = new $T<>()", cName(Seq.class), tvName("T"), cName(Seq.class))
                     .addStatement("map.keys().toSeq().select(o -> map.get(o).equals(faction) && type.isAssignableFrom(o.getClass())).each(o -> contents.add(($T)o))", tvName("T"))
@@ -362,28 +366,28 @@ public class FactionProcessor extends BaseProcessor{
             .returns(TypeName.VOID)
             .addJavadoc("Initializes all content whose fields are to be modified");
 
-        Faction before = null;
+        String before = null;
         for(VariableElement e : factions){
             TypeName up = tName(e.getEnclosingElement());
             String c = e.getSimpleName().toString();
-            TypeName upf = cName(Faction.class);
+            TypeName upf = tName(faction);
             FactionDef def = e.getAnnotation(FactionDef.class);
-            Faction fac = def.type();
+            String fac = def.type();
 
             if(before != null && !fac.equals(before)){
                 initializer.addCode(lnew());
             }
             before = fac;
 
-            initializer.addStatement("put($T.$L, $T.$L)", up, c, upf, fac.name());
+            initializer.addStatement("put($T.$L, $T.$L)", up, c, upf, fac);
         }
 
         Seq<String[]> names = map.keys().toSeq().map(n -> n.split(":"));
         for(VariableElement e : musics){
             TypeName up = TypeName.get(e.getEnclosingElement().asType());
             String c = e.getSimpleName().toString();
-            TypeName upf = cName(Faction.class);
-            String f = e.getAnnotation(MusicDef.class).type().name();
+            TypeName upf = tName(faction);
+            String f = e.getAnnotation(MusicDef.class).facType();
 
             initializer.addCode(lnew());
             initializer.addStatement("put($T.$L, $T.$L)", up, c, upf, f);

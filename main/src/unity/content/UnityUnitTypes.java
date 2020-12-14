@@ -16,7 +16,6 @@ import mindustry.world.blocks.units.*;
 import mindustry.world.blocks.units.UnitFactory.*;
 import unity.ai.*;
 import unity.annotations.Annotations.*;
-import unity.annotations.util.*;
 import unity.entities.bullet.*;
 import unity.entities.units.*;
 import unity.graphics.*;
@@ -42,13 +41,13 @@ public class UnityUnitTypes implements ContentList{
     //naval-units
     rexed, storm, amphibiNaval, amphibi, craberNaval, craber;
 
-    public static @FactionDef(type = Faction.scar)
+    public static @FactionDef(type = "scar")
     UnitType hovos, ryzer, whirlwind, jetstream, vortex;
 
-    public static @FactionDef(type = Faction.imber)
+    public static @FactionDef(type = "imber")
     UnitType arcnelidia;
 
-    public static @FactionDef(type = Faction.monolith)
+    public static @FactionDef(type = "monolith")
     UnitType stele, pedestal, pilaster, pylon;
 
     //public static @FactionDef(type = Faction.end) UnitType devourer;

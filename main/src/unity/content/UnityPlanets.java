@@ -7,14 +7,13 @@ import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
 import mindustry.type.*;
 import unity.annotations.Annotations.*;
-import unity.annotations.util.*;
 import unity.graphics.*;
 import unity.planets.*;
 
 public class UnityPlanets implements ContentList{
-    public static @FactionDef(type = Faction.imber) Planet electrode, inert;
+    public static @FactionDef(type = "imber") Planet electrode, inert;
 
-    public static @FactionDef(type = Faction.monolith) Planet megalith;
+    public static @FactionDef(type = "monolith") Planet megalith;
 
     @Override
     public void load(){

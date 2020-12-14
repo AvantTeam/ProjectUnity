@@ -19,6 +19,7 @@ public abstract class BaseProcessor extends AbstractProcessor{
     public static final String packageName = "unity.gen";
 
     public static Elements elementUtils;
+    public static Types typeUtils;
     public static Filer filer;
     public static Messager messager;
     public static Fi rootDir;
@@ -31,6 +32,7 @@ public abstract class BaseProcessor extends AbstractProcessor{
         super.init(processingEnv);
 
         elementUtils = processingEnv.getElementUtils();
+        typeUtils = processingEnv.getTypeUtils();
         filer = processingEnv.getFiler();
         messager = processingEnv.getMessager();
     }
