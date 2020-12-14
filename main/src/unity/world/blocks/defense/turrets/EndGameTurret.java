@@ -244,7 +244,7 @@ public class EndGameTurret extends PowerTurret {
             threatLevel = 1f;
             Units.nearbyEnemies(team, x - range, y - range, range * 2, range * 2, e -> {
                 if(within(e, range) && e.isAdded()){
-                    threatLevel += Math.max((e.maxHealth() - 100f) / 410f, 0f);
+                    threatLevel += Math.max(((e.maxHealth() + e.type.dpsEstimate) - 350f) / 710f, 0f);
                     if(e.realSpeed() >= 18f){
                         e.vel.setLength(0f);
                         //e.apply(UnityStatusEffects.endgameDisable);
@@ -427,12 +427,14 @@ public class EndGameTurret extends PowerTurret {
                 Tmp.v1.trns(randomAngle, 18.5f);
                 Tmp.v1.add(x, y);
                 if(Mathf.chanceDelta(0.75 * chance)){
-                    SlowLightning l = ExtraEffect.createSlowLightning(Tmp.v1.x, Tmp.v1.y, randomAngle, 80f);
+                    SlowLightning l = ExtraEffect.createSlowLightning(Tmp.v1.x, Tmp.v1.y, randomAngle, 110f);
                     l.team = team;
                     l.colorFrom = Color.red;
                     l.colorTo = Color.black;
-                    l.damage = 520f * power.status;
-                    l.range = 730f;
+                    l.splitChance = 0.045f;
+                    //l.damage = 520f * power.status;
+                    l.liveDamage = () -> 520f * power.status;
+                    l.range = 790f;
                     l.influence = targetPos;
                     l.add();
                 }

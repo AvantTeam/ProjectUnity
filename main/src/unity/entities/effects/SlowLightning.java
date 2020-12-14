@@ -20,6 +20,8 @@ public class SlowLightning extends EffectState{
     public Color colorTo = Color.white;
     public Team team = Team.derelict;
     public Vec2 influence;
+    public Floatp liveDamage;
+    public float splitChance = 0.035f;
     public float nodeTime = 32f;
     public float transTime = 1.9f;
     public float damage = 12f;
@@ -67,7 +69,9 @@ public class SlowLightning extends EffectState{
     public void reset(){
         super.reset();
         team = Team.derelict;
+        liveDamage = null;
         influence = null;
+        splitChance = 0.035f;
         nodeTime = 32f;
         transTime = 1.9f;
         damage = 12f;
@@ -138,7 +142,7 @@ public class SlowLightning extends EffectState{
                 visualTime = Mathf.clamp(visualTime, 0, origin.nodeTime);
             }
             if(timerC >= origin.transTime){
-                int chance = Mathf.chance(0.035) ? 2 : 1;
+                int chance = Mathf.chance(origin.splitChance) ? 2 : 1;
                 for(int i = 0; i < chance; i++){
                     float rand = chance == 2 ? Mathf.range(60f) : Mathf.range(20f);
                     //Tmp.v2.trns(rotation + rand, origin.lightningLength);
@@ -170,8 +174,9 @@ public class SlowLightning extends EffectState{
 
         public void init(){
             origin.nodes.add(this);
+            float tDamage = origin.liveDamage != null ? origin.liveDamage.get() : origin.damage;
             Boolf<Building> bf = building -> {
-                building.damage(origin.damage);
+                building.damage(tDamage);
                 if(building.block.absorbLasers){
                     Tmp.v1.trns(rotation, fromPos.dst(building));
                     Tmp.v1.add(fromPos);
@@ -180,7 +185,7 @@ public class SlowLightning extends EffectState{
                 }
                 return building.block.absorbLasers;
             };
-            Cons<Unit> uc = unit -> unit.damage(origin.damage);
+            Cons<Unit> uc = unit -> unit.damage(tDamage);
             Funcs.collideLineRaw(fromPos.x, fromPos.y, toPos.x, toPos.y, t -> t.team != origin.team, u -> u.team != origin.team, bf, uc);
         }
     }
