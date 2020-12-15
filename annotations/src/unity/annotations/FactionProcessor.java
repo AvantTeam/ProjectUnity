@@ -42,7 +42,12 @@ public class FactionProcessor extends BaseProcessor{
     public void process(RoundEnvironment roundEnv) throws Exception{
         factions.addAll((Set<VariableElement>)roundEnv.getElementsAnnotatedWith(FactionDef.class));
         if(faction == null){
-            faction = (TypeElement)Seq.with(roundEnv.getElementsAnnotatedWith(FactionBase.class)).first();
+            Seq<TypeElement> seq = Seq.with(roundEnv.getElementsAnnotatedWith(FactionBase.class)).map(e -> (TypeElement)e);
+            if(seq.size > 1){
+                throw new IllegalArgumentException("Always one type may be annotated by 'FactionBase', no more, no less");
+            }
+
+            faction = seq.first();
         }
 
         if(round == 1){

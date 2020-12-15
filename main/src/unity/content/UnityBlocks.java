@@ -22,6 +22,7 @@ import unity.annotations.Annotations.*;
 import unity.entities.comp.*;
 import unity.gen.*;
 import unity.graphics.*;
+import unity.type.exp.*;
 import unity.world.blocks.defense.*;
 import unity.world.blocks.defense.turrets.*;
 import unity.world.blocks.distribution.*;
@@ -34,7 +35,6 @@ import unity.world.draw.*;
 
 import static arc.Core.*;
 import static mindustry.type.ItemStack.*;
-//deleted import static UnifyFx becuz name of effects are rly confusing.
 
 public class UnityBlocks implements ContentList{
     public static Block//@formatter:off
@@ -89,7 +89,7 @@ public class UnityBlocks implements ContentList{
     public static @FactionDef(type = "end")
     Block terminalCrucible, endForge, endGame;
 
-    public static @EntityDef(base = Building.class, def = {ExpEntity.class})
+    public static @ExpDef(type = ExpBlock.class) @EntityDef(base = Building.class, def = {ExpBuildc.class})
     Block h;
 
     @Override
