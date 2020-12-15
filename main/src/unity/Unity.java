@@ -46,6 +46,7 @@ public class Unity extends Mod{
         Events.on(ClientLoadEvent.class, e -> {
             Core.app.post(() -> {
                 FactionMeta.init();
+                ExpMeta.init();
             });
             Func<String, String> stringf = value -> Core.bundle.get("mod." + value);
 

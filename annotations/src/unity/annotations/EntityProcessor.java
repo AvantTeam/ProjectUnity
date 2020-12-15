@@ -60,6 +60,9 @@ public class EntityProcessor extends BaseProcessor{
                     for(ExecutableElement getter : getters){
                         String n = getter.getSimpleName().toString();
 
+                        if(getter.getAnnotation(MustInherit.class) != null){
+                            resolvedGetters.add(n);
+                        }
                         if(resolvedGetters.contains(n)) continue;
 
                         FieldSpec.Builder field = FieldSpec.builder(

@@ -15,7 +15,7 @@ public class Annotations{
         String type();
     }
 
-    /** Indicates that this content has an exp mechanism */
+    /** Indicates that this content implements an exp mechanism */
     @Target(ElementType.FIELD)
     @Retention(RetentionPolicy.SOURCE)
     public @interface ExpDef{
@@ -56,6 +56,12 @@ public class Annotations{
     public @interface FactionBase{
     }
 
+    /** Wether this class is the base class for exp types. Only one type may use this */
+    @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface ExpBase{
+    }
+
     // end region
     // region utilities
 
@@ -65,9 +71,14 @@ public class Annotations{
     public @interface ReadOnly{
     }
 
+    /** Wether this getter must be implemented by the type's subtypes */
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface MustInherit{
+    }
+
     /**
      * Indicates that the following field returned by this getter is gonna be initialized
-     * @see Getter
      */
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.SOURCE)

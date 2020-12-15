@@ -28,7 +28,7 @@ public abstract class BaseProcessor extends AbstractProcessor{
     public static Fi rootDir;
 
     protected int round;
-    protected int rounds;
+    protected int rounds = 1;
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv){
@@ -116,6 +116,13 @@ public abstract class BaseProcessor extends AbstractProcessor{
 
     public TypeVariableName tvName(String name, TypeName... bounds){
         return TypeVariableName.get(name, bounds);
+    }
+
+    public ClassName withoutTV(TypeElement t){
+        String canonical = t.getQualifiedName().toString();
+        String stripped = canonical.replaceAll("\\<[A-Z]\\>", "");
+
+        return cName(stripped);
     }
 
     public String lnew(){
