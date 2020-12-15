@@ -7,11 +7,13 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.io.*;
 import mindustry.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.world.blocks.defense.turrets.*;
+import mindustry.world.consumers.*;
 import unity.content.*;
 import unity.entities.*;
 import unity.entities.effects.*;
@@ -60,11 +62,6 @@ public class EndGameTurret extends PowerTurret {
         outlineIcon = false;
         loopSound = UnitySounds.endgameActive;
         shootSound = UnitySounds.endgameShoot;
-        /*shootType = new BulletType(){
-            {
-                damage = Float.MAX_VALUE;
-            }
-        };*/
     }
 
     @Override
@@ -90,6 +87,7 @@ public class EndGameTurret extends PowerTurret {
     }
 
     public class EndGameTurretBuilding extends PowerTurretBuild{
+        protected float charge = 0f;
         protected float resist = 1f;
         protected float resistTime = 10f;
         protected float threatLevel = 1f;
@@ -118,15 +116,53 @@ public class EndGameTurret extends PowerTurret {
         @Override
         public void damage(float damage){
             if(verify()) return;
+            if(damage > 10000) charge += Mathf.clamp(damage - 10000f, 0f, 2000000f) / 150f;
+            if(charge > 15) charge = 15f;
             float trueAmount = Mathf.clamp(damage / resist, 0f, 410f);
             super.damage(trueAmount);
-            resist += 0.025 + Mathf.clamp(damage - 560f, 0f, 2147483647f) / 80f;
+            resist += 0.125f + (Mathf.clamp(damage - 520f, 0f, 2147483647f) / 70f);
             if(Float.isNaN(resist)) resist = Float.MAX_VALUE;
             resistTime = 0f;
         }
 
+        @Override
+        protected float baseReloadSpeed(){
+            return Mathf.clamp(efficiency() + charge, 0f, 1.2f);
+        }
+
+        float trueEfficiency(){
+            return Mathf.clamp(efficiency() + charge);
+        }
+
         float deltaB(){
-            return delta() * power.status;
+            return (delta() * baseReloadSpeed());
+        }
+
+        @Override
+        public boolean consValid(){
+            boolean valid = false;
+            if(block.consumes.hasPower()){
+                valid = block.consumes.getPower().valid(this);
+            }
+            valid |= charge > 0.001f;
+            if(block.consumes.has(ConsumeType.item)){
+                valid &= block.consumes.getItem().valid(this);
+            }
+            return valid;
+        }
+
+        @Override
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            charge = read.f();
+            resist = read.f();
+        }
+
+        @Override
+        public void write(Writes write){
+            super.write(write);
+            write.f(charge);
+            write.f(resist);
         }
 
         @Override
@@ -145,7 +181,7 @@ public class EndGameTurret extends PowerTurret {
             Draw.z(oz + 0.005f);
             Draw.color(1f, Funcs.offsetSin(0f, 5f), Funcs.offsetSin(90f, 5f), eyesAlpha);
             Draw.rect(bottomLightsRegion, x, y);
-            Draw.color(1, Funcs.offsetSin(0f, 5f), Funcs.offsetSin(90f, 5f), lightsAlpha * Funcs.offsetSin(0f, 12f));
+            Draw.color(1f, Funcs.offsetSin(0f, 5f), Funcs.offsetSin(90f, 5f), lightsAlpha * Funcs.offsetSin(0f, 12f));
             Draw.rect(baseLightsRegion, x, y);
             //Draw.z(oz + 0.015f);
 
@@ -170,7 +206,7 @@ public class EndGameTurret extends PowerTurret {
 
         @Override
         public boolean shouldActiveSound(){
-            return power.status >= 0.0001;
+            return trueEfficiency() >= 0.0001;
         }
 
         void killUnits(){
@@ -302,7 +338,7 @@ public class EndGameTurret extends PowerTurret {
 
         void updateAntiBullets(){
             entitySeq.clear();
-            if(power.status > 0.0001f && timer.get(bulletTime, 4f / Math.max(power.status, 0.001f))){
+            if(trueEfficiency() > 0.0001f && timer.get(bulletTime, 4f / Math.max(trueEfficiency(), 0.001f))){
                 damageFull = 0f;
                 Groups.bullet.intersect(x - range, y - range, range * 2f, range * 2f, b -> {
                     if(within(b, range) && b.team != team){
@@ -347,7 +383,7 @@ public class EndGameTurret extends PowerTurret {
         }
 
         boolean verify(){
-            return (health < lastHealth - 860) || Float.isNaN(health);
+            return (health < lastHealth - 860f) || Float.isNaN(health);
         }
 
         void updateEyes(){
@@ -357,12 +393,12 @@ public class EndGameTurret extends PowerTurret {
             eyeOffset.set(eyeOffsetB);
             eyeOffset.add(Mathf.range(reload / reloadTime) / 2, Mathf.range(reload / reloadTime) / 2);
             eyeOffset.limit(2);
-            if(((target != null && !isControlled()) || (isControlled() && unit.isShooting())) && consValid() && power.status >= 0.0001f){
+            if(((target != null && !isControlled()) || (isControlled() && unit.isShooting())) && consValid() && trueEfficiency() >= 0.0001f){
                 eyeReloads[0] += deltaB();
                 eyeReloads[1] += deltaB();
             }
 
-            if(consValid() && power.status > 0.0001){
+            if(consValid() && trueEfficiency() > 0.0001){
                 updateEyesTargeting();
             }
 
@@ -389,16 +425,17 @@ public class EndGameTurret extends PowerTurret {
         @Override
         public void updateTile(){
             lastHealth = health;
-            if(resistTime >= 10){
-                resist = Math.max(1, resist - Time.delta);
+            charge = Math.max(0f, charge - (Time.delta / 20f));
+            if(resistTime >= 15){
+                resist = Math.max(1f, resist - Time.delta);
             }else{
                 resistTime += Time.delta;
             }
             updateEyes();
             //super.updateTile();
-            if(power.status > 0.0001f){
-                float value = eyesAlpha > power.status ? 1f : power.status;
-                eyesAlpha = Mathf.lerpDelta(eyesAlpha, power.status, 0.06f * value);
+            if(trueEfficiency() > 0.0001f){
+                float value = eyesAlpha > trueEfficiency() ? 1f : trueEfficiency();
+                eyesAlpha = Mathf.lerpDelta(eyesAlpha, trueEfficiency(), 0.06f * value);
             }else{
                 eyesAlpha = Mathf.lerpDelta(eyesAlpha, 0f, 0.06f);
             }
@@ -410,19 +447,19 @@ public class EndGameTurret extends PowerTurret {
                 Player con = (Player)unit.controller();
                 eyeTargetOffset.trns(angleTo(con.mouseX, con.mouseY), dst(con.mouseX, con.mouseY) / (range / 3f));
                 //eyeTargetOffset.limit(2f);
-            }else if(target != null && power.status > 0.0001f){
+            }else if(target != null && trueEfficiency() > 0.0001f){
                 eyeTargetOffset.trns(angleTo(targetPos.x, targetPos.y), dst(targetPos.x, targetPos.y) / (range / 3f));
             }
             eyeTargetOffset.limit(2f);
-            if(((target != null && !isControlled()) || (isControlled() && unit.isShooting())) && power.status > 0.0001f){
+            if(((target != null && !isControlled()) || (isControlled() && unit.isShooting())) && trueEfficiency() > 0.0001f){
                 eyeResetTime = 0f;
-                float value = lightsAlpha > power.status ? 1f : power.status;
-                lightsAlpha = Mathf.lerpDelta(lightsAlpha, power.status, 0.07f * value);
+                float value = lightsAlpha > trueEfficiency() ? 1f : trueEfficiency();
+                lightsAlpha = Mathf.lerpDelta(lightsAlpha, trueEfficiency(), 0.07f * value);
                 for(int i = 0; i < 3; i++){
-                    ringProgress[i] = Mathf.lerpDelta(ringProgress[i], 360f * (float)ringDirections[i], ringProgresses[i] * power.status);
+                    ringProgress[i] = Mathf.lerpDelta(ringProgress[i], 360f * (float)ringDirections[i], ringProgresses[i] * trueEfficiency());
                 }
 
-                float chance = (((reload / reloadTime) * 0.90f) + (1f - 0.90f)) * power.status;
+                float chance = (((reload / reloadTime) * 0.90f) + (1f - 0.90f)) * trueEfficiency();
                 float randomAngle = Mathf.random(360f);
                 Tmp.v1.trns(randomAngle, 18.5f);
                 Tmp.v1.add(x, y);
@@ -433,7 +470,7 @@ public class EndGameTurret extends PowerTurret {
                     l.colorTo = Color.black;
                     l.splitChance = 0.045f;
                     //l.damage = 520f * power.status;
-                    l.liveDamage = () -> 520f * power.status;
+                    l.liveDamage = () -> 520f * trueEfficiency();
                     l.range = 790f;
                     l.influence = targetPos;
                     l.add();
@@ -443,7 +480,7 @@ public class EndGameTurret extends PowerTurret {
                 if(eyeResetTime >= 60f){
                     lightsAlpha = Mathf.lerpDelta(lightsAlpha, 0f, 0.07f);
                     for(int i = 0; i < 3; i++){
-                        ringProgress[i] = Mathf.lerpDelta(ringProgress[i], 0f, ringProgresses[i] * power.status);
+                        ringProgress[i] = Mathf.lerpDelta(ringProgress[i], 0f, ringProgresses[i] * trueEfficiency());
                     }
                 }else{
                     eyeResetTime += Time.delta;
@@ -469,7 +506,8 @@ public class EndGameTurret extends PowerTurret {
                 en.damage(0.5f * en.maxHealth() * Math.max(resist / 10f, 1f));
             }
 
-            return super.collision(other);
+            return true;
+            //return super.collision(other);
         }
 
         @Override
