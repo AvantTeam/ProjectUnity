@@ -75,7 +75,7 @@ public class Annotations{
         /** @return The code that is gonna be used to evaluate the initializer */
         String eval();
 
-        /** @return Class arguments to be parsed into {@link #eval()} */
+        /** @return Class arguments to be parsed into {@link #eval()}. */
         String[] args() default {};
     }
 
