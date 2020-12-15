@@ -12,7 +12,7 @@ public class Annotations{
     @Retention(RetentionPolicy.SOURCE)
     public @interface FactionDef{
         /** @return The {@link Faction} */
-        String type() default "invalid";
+        String type();
     }
 
     /** Indicates that this content has an exp mechanism */

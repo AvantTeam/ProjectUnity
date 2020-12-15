@@ -157,17 +157,23 @@ public final class Funcs{
 
     public static void collideLineRaw(float x, float y, float x2, float y2, Boolf<Building> buildB, Boolf<Unit> unitB, Boolf<Building> buildC, Cons<Unit> unitC){
         collidedBlocks.clear();
+        tV.set(x2, y2);
         world.raycastEachWorld(x, y, x2, y2, (cx, cy) -> {
             Building tile = world.build(cx, cy);
             if(tile != null && buildB.get(tile) && !collidedBlocks.contains(tile.pos())){
                 boolean s = buildC.get(tile);
                 collidedBlocks.add(tile.pos());
-                if(s) return true;
+                if(s){
+                    //Mathf.dst();
+                    tV.trns(Angles.angle(x, y, x2, y2), Mathf.dst(x, y, tile.x, tile.y));
+                    tV.add(x, y);
+                    return true;
+                }
             }
             return false;
         });
 
-        rect.setPosition(x, y).setSize(x2 - x, y2 - y);
+        rect.setPosition(x, y).setSize(tV.x - x, tV.y - y);
 
         if(rect.width < 0){
             rect.x += rect.width;
@@ -187,7 +193,7 @@ public final class Funcs{
                 unit.hitbox(hitRect);
                 hitRect.grow(expand * 2);
 
-                Vec2 vec = Geometry.raycastRect(x, y, x2, y2, hitRect);
+                Vec2 vec = Geometry.raycastRect(x, y, tV.x, tV.y, hitRect);
 
                 if(vec != null) unitC.get(unit);
             }
