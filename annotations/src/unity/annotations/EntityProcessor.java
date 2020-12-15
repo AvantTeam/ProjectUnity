@@ -35,6 +35,7 @@ public class EntityProcessor extends BaseProcessor{
                 EntityDef def = e.getAnnotation(EntityDef.class);
                 TypeElement base = (TypeElement)elements(def::base).first();
                 Seq<TypeElement> inters = elements(def::def).map(el -> (TypeElement)el);
+                ObjectSet<TypeElement> allInters = getInterfaces(base);
 
                 StringBuilder name = new StringBuilder();
                 for(TypeElement t : inters){
@@ -43,12 +44,18 @@ public class EntityProcessor extends BaseProcessor{
                 }
                 name.append(base.getSimpleName().toString());
 
-                TypeSpec.Builder entity = TypeSpec.classBuilder(name.toString()).addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-                    .superclass(tName(base))
-                    .addSuperinterfaces(inters.map(this::tName));
+                TypeSpec.Builder entity = TypeSpec.classBuilder(name.toString()).addModifiers(Modifier.PUBLIC, Modifier.FINAL);
+                entity.superclass(tName(base));
+                for(TypeElement t : inters){
+                    if(allInters.contains(t)) continue;
 
-                Seq<String> resolvedGetters = new Seq<>();
+                    entity.addSuperinterface(tName(t));
+                }
+
+                Seq<String> resolvedGetters = Seq.with("self", "as");
                 for(TypeElement type : inters){
+                    if(allInters.contains(type)) continue;
+
                     Seq<ExecutableElement> getters = getGetters(type);
                     for(ExecutableElement getter : getters){
                         String n = getter.getSimpleName().toString();
@@ -95,6 +102,17 @@ public class EntityProcessor extends BaseProcessor{
                 write(spec.builder.build());
             }
         }
+    }
+
+    protected ObjectSet<TypeElement> getInterfaces(TypeElement type){
+        ObjectSet<TypeElement> all = ObjectSet.with(Seq.with(type.getInterfaces()).map(this::toEl).map(e -> (TypeElement)e));
+        for(TypeMirror m : type.getInterfaces()){
+            if(!(m instanceof NoType)){
+                all.addAll(getInterfaces((TypeElement)toEl(m)));
+            }
+        }
+
+        return all;
     }
 
     protected Seq<ExecutableElement> getGetters(TypeElement type){
