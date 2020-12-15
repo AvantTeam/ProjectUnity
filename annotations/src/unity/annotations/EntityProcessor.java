@@ -56,7 +56,9 @@ public class EntityProcessor extends BaseProcessor{
                 for(TypeElement type : inters){
                     if(allInters.contains(type)) continue;
 
-                    Seq<ExecutableElement> getters = getGetters(type);
+                    Seq<ExecutableElement> getters = getGetters(type).select(getter ->
+                        !allInters.contains((TypeElement)getter.getEnclosingElement())
+                    );
                     for(ExecutableElement getter : getters){
                         String n = getter.getSimpleName().toString();
 
@@ -77,7 +79,7 @@ public class EntityProcessor extends BaseProcessor{
 
                         MethodSpec.Builder getImpl = MethodSpec.overriding(getter)
                             .addStatement("return this.$L", n);
-                        ExecutableElement setter = getSetter(type, getter);
+                        ExecutableElement setter = getSetter((TypeElement)getter.getEnclosingElement(), getter);
                         MethodSpec.Builder setImpl;
                         if(setter != null){
                             setImpl = MethodSpec.overriding(setter)
@@ -119,11 +121,16 @@ public class EntityProcessor extends BaseProcessor{
     }
 
     protected Seq<ExecutableElement> getGetters(TypeElement type){
-        return getMethods(type).select(m ->
+        Seq<ExecutableElement> getters = new Seq<>();
+        getInterfaces(type).each(t -> getMethods(t).each(m ->
             m.getReturnType().getKind() != VOID &&
             m.getParameters().isEmpty() &&
-            !m.getModifiers().contains(Modifier.DEFAULT)
-        );
+            !m.getModifiers().contains(Modifier.DEFAULT) &&
+            m.getAnnotation(MustInherit.class) == null
+        ,
+        getters::add));
+
+        return getters;
     }
 
     protected ExecutableElement getSetter(TypeElement type, ExecutableElement getter){

@@ -1,22 +1,19 @@
 package unity.entities.comp;
 
 import mindustry.gen.*;
+import mindustry.world.*;
 import unity.gen.*;
 import unity.type.*;
 import unity.type.exp.*;
 
-public interface ExpBuildc extends ExpEntityc, Buildingc{
+public interface ExpBuildc extends ExpEntityc<Block, ExpBlock>, Buildingc{
     @Override
-    default float maxExp(){
-        return exp().maxExp;
-    }
-
-    default ExpBlock exp(){
-        ExpType<?> exp = ExpMeta.map(block());
-        if(!(exp instanceof ExpBlock block)){
-            throw new IllegalStateException("No ExpBlock found for type: '" + block().localizedName + "'");
+    default ExpBlock expType(){
+        ExpType<?> type = ExpMeta.map(block());
+        if(!(type instanceof ExpBlock)){
+            throw new IllegalStateException("No 'ExpBlock' type found for '" + block().localizedName + "'");
         }
 
-        return block;
+        return (ExpBlock)type;
     }
 }
