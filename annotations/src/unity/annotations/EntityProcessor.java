@@ -38,7 +38,6 @@ public class EntityProcessor extends BaseProcessor{
         defs.addAll((Set<VariableElement>)roundEnv.getElementsAnnotatedWith(EntityDef.class));
 
         if(round == 1){
-            ObjectSet<String> resolved = new ObjectSet<>();
             for(VariableElement e : defs){
                 EntityDef def = e.getAnnotation(EntityDef.class);
                 TypeElement base = (TypeElement)elements(def::base).first();
@@ -52,7 +51,6 @@ public class EntityProcessor extends BaseProcessor{
                 }
                 name.append(base.getSimpleName().toString());
 
-                if(resolved.contains(name.toString())) continue;
                 TypeSpec.Builder entity = TypeSpec.classBuilder(name.toString()).addModifiers(Modifier.PUBLIC, Modifier.FINAL);
                 entity.superclass(tName(base));
                 for(TypeElement t : inters){
@@ -162,8 +160,6 @@ public class EntityProcessor extends BaseProcessor{
                 EntityDefinition definition = new EntityDefinition(name.toString(), base, entity);
                 specs.add(definition);
                 defMap.get(definition, Seq::new).add(e);
-
-                resolved.add(name.toString());
             }
         }else if(round == 2){
             TypeSpec.Builder mapper = TypeSpec.classBuilder("UnityEntityMapping").addModifiers(Modifier.PUBLIC)
