@@ -77,6 +77,12 @@ public class Annotations{
     public @interface MustInherit{
     }
 
+    /** Wether this method replaces the actual method in the base class */
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface Replace{
+    }
+
     /**
      * Indicates that the following field returned by this getter is gonna be initialized
      */

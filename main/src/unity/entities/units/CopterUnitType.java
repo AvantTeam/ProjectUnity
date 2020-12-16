@@ -15,7 +15,7 @@ import static mindustry.Vars.*;
 
 public class CopterUnitType extends UnitType{
     public Seq<Rotor> rotors = new Seq<>();
-    protected float fallRotateSpeed = 2.5f;
+    public float fallRotateSpeed = 2.5f;
 
     public CopterUnitType(String name){
         super(name);

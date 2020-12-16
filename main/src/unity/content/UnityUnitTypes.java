@@ -17,6 +17,7 @@ import mindustry.world.blocks.units.UnitFactory.*;
 import unity.ai.*;
 import unity.annotations.Annotations.*;
 import unity.entities.bullet.*;
+import unity.entities.comp.Copterc;
 import unity.entities.units.*;
 import unity.graphics.*;
 
@@ -24,7 +25,6 @@ import static mindustry.type.ItemStack.*;
 
 public class UnityUnitTypes implements ContentList{
     private static final Prov<?>[] constructors = new Prov[]{
-        CopterUnit::new,
         WormSegmentUnit::new,
         WormDefaultUnit::new,
         TransUnitWaterMove::new,
@@ -35,11 +35,14 @@ public class UnityUnitTypes implements ContentList{
 
     public static UnitType//@formatter:off
     //flying-units
-    caelifera, schistocerca, anthophila, vespula, lepidoptera, angel, malakhim,
+    angel, malakhim,
     //ground-units  @formatter:on
     arcaetana, projectSpiboss,
     //naval-units
     rexed, storm, amphibiNaval, amphibi, craberNaval, craber;
+
+    public static @EntityDef(base = UnitEntity.class, def = {Copterc.class})
+    UnitType caelifera, schistocerca, anthophila, vespula, lepidoptera;
 
     public static @FactionDef(type = "scar")
     UnitType hovos, ryzer, whirlwind, jetstream, vortex;
@@ -50,7 +53,7 @@ public class UnityUnitTypes implements ContentList{
     public static @FactionDef(type = "monolith")
     UnitType stele, pedestal, pilaster, pylon;
 
-    //public static @FactionDef(type = Faction.end) UnitType devourer;
+    //public static @FactionDef(type = "end") UnitType devourer;
 
     public static int getClassId(int index){
         return classIDs[index];
@@ -72,7 +75,6 @@ public class UnityUnitTypes implements ContentList{
         }
         //region flying-units
 
-        setEntity("caelifera", CopterUnit::new);
         caelifera = new CopterUnitType("caelifera"){{
             speed = 5f;
             drag = 0.08f;
@@ -115,7 +117,6 @@ public class UnityUnitTypes implements ContentList{
             }});
         }};
 
-        setEntity("schistocerca", CopterUnit::new);
         schistocerca = new CopterUnitType("schistocerca"){{
             speed = 4.5f;
             drag = 0.07f;
@@ -168,7 +169,6 @@ public class UnityUnitTypes implements ContentList{
             }
         }};
 
-        setEntity("anthophila", CopterUnit::new);
         anthophila = new CopterUnitType("anthophila"){{
             speed = 4f;
             drag = 0.07f;
@@ -212,7 +212,6 @@ public class UnityUnitTypes implements ContentList{
             }});
         }};
 
-        setEntity("vespula", CopterUnit::new);
         vespula = new CopterUnitType("vespula"){{
             speed = 3.5f;
             drag = 0.07f;
@@ -263,7 +262,6 @@ public class UnityUnitTypes implements ContentList{
             }
         }};
 
-        setEntity("lepidoptera", CopterUnit::new);
         lepidoptera = new CopterUnitType("lepidoptera"){{
             speed = 3f;
             drag = 0.07f;

@@ -17,7 +17,7 @@ import unity.mod.*;
 import unity.mod.ContributorList.*;
 
 public class Unity extends Mod{
-    public static final String githubURL = "https://github.com/EyeOfDarkness/ProjectUnity";
+    public static final String githubURL = "https://github.com/AvantTeam/ProjectUnity";
     public static MusicHandler handler;
 
     private final ContentList[] unityContent = {
@@ -44,10 +44,6 @@ public class Unity extends Mod{
         });
 
         Events.on(ClientLoadEvent.class, e -> {
-            Core.app.post(() -> {
-                FactionMeta.init();
-                ExpMeta.init();
-            });
             Func<String, String> stringf = value -> Core.bundle.get("mod." + value);
 
             Time.runTask(10f, () -> {
@@ -111,6 +107,9 @@ public class Unity extends Mod{
         }
 
         handler = new MusicHandler();
+        FactionMeta.init();
+        ExpMeta.init();
+        UnityEntityMapping.init();
     }
 
     /** <code>unity.Unity.print();</code> for copypaste */

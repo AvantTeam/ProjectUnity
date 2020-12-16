@@ -1,5 +1,6 @@
 package unity.entities.comp;
 
+import arc.util.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 import unity.gen.*;
@@ -15,5 +16,10 @@ public interface ExpBuildc extends ExpEntityc<Block, ExpBlock>, Buildingc{
         }
 
         return (ExpBlock)type;
+    }
+
+    @Override
+    default void updateTile(){
+        Log.info("Appended method");
     }
 }
