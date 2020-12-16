@@ -95,15 +95,15 @@ public class WormUnitType extends UnitType{
     }
 
     @Override
-    public void drawShadow(Unit unit){
+    public void drawSoftShadow(Unit unit){
         super.drawShadow(unit);
         if(!(unit instanceof WormDefaultUnit wormUnit)) return;
-        for(int i = 0; i < segmentLength; i++) wormUnit.segmentUnits[i].drawShadow();
+        for(int i = 0; i < segmentLength; i++) wormUnit.segmentUnits[i].drawSoftShadow();
     }
 
     @Override
-    public void drawOcclusion(Unit unit){
-        super.drawOcclusion(unit);
-        if(unit instanceof WormDefaultUnit wormunit) wormunit.drawOcclusion();
+    public void drawShadow(Unit unit){
+        super.drawShadow(unit);
+        if(unit instanceof WormDefaultUnit wormunit) wormunit.drawShadow();
     }
 }

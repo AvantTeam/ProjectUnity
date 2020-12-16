@@ -110,11 +110,11 @@ public class WormDefaultUnit extends UnitEntity{
         return getSegmentLength() * wormType.segmentOffset * 2f;
     }
 
-    protected void drawOcclusion(){
+    protected void drawShadow(){
         float originZ = Draw.z();
         for(int i = 0, len = getSegmentLength(); i < len; i++){
             Draw.z(originZ - (i + 1) / 500f);
-            type.drawOcclusion(segmentUnits[i]);
+            type.drawShadow(segmentUnits[i]);
         }
         Draw.z(originZ);
     }

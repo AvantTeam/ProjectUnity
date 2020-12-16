@@ -605,7 +605,7 @@ public class UnityUnitTypes implements ContentList{
                 reload = 60f;
                 recoil = 4f;
                 rotate = true;
-                occlusion = 15f;
+                shadow = 15f;
                 shake = 4f;
                 bullet = new LaserBulletType(325f){
                     @Override
@@ -720,7 +720,7 @@ public class UnityUnitTypes implements ContentList{
             rotateShooting = true;
             weapons.add(new Weapon(name + "-igniter"){{
                 shootSound = Sounds.laser;
-                occlusion = 20f;
+                shadow = 20f;
                 shootY = 10f;
                 reload = 170f;
                 x = 0f;

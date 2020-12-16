@@ -295,7 +295,7 @@ public class WormSegmentUnit extends UnitEntity{
         Draw.rect(cellRegion, x, y, rotation, -90f);
     }
 
-    public void drawShadow(){
+    public void drawSoftShadow(){
         TextureRegion region = segmentType == 0 ? wormType.segmentRegion() : wormType.tailRegion();
         Draw.color(Pal.shadow); //seems to not exist in v106
         float e = Math.max(elevation, type.visualElevation);
