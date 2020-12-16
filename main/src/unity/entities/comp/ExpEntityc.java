@@ -1,7 +1,6 @@
 package unity.entities.comp;
 
 import arc.math.*;
-import arc.struct.*;
 import mindustry.ctype.*;
 import unity.annotations.Annotations.*;
 import unity.type.*;
@@ -11,9 +10,6 @@ public interface ExpEntityc<T extends UnlockableContent, E extends ExpType<T>>{
     float exp();
 
     void exp(float exp);
-
-    @Initialize(eval = "new $T<>()", args = Seq.class)
-    Seq<String> testSeq();
 
     default float expf(){
         int level = level();
