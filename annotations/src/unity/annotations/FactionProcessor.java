@@ -75,7 +75,7 @@ public class FactionProcessor extends BaseProcessor{
                     .addParameter(cName(String.class), "soundName")
                     .beginControlFlow("if(!$T.headless)", cName(Vars.class))
                         .addStatement("$T name = $S + soundName", cName(String.class), "sounds/")
-                        .addStatement("$T path = $T.tree.get(name + $S).exists() ? name + $S : name + $S", cName(String.class), cName(Vars.class), ".ogg", ".ogg", ".mp3")
+                        .addStatement("$T path = name + $S", cName(String.class), ".ogg")
                         .addCode(lnew())
                         .addStatement("var sound = new $T()", cName(Sound.class))
                         .addCode(lnew())
@@ -101,7 +101,7 @@ public class FactionProcessor extends BaseProcessor{
                     .addParameter(cName(String.class), "soundName")
                     .beginControlFlow("if(!$T.headless)", cName(Vars.class))
                         .addStatement("$T name = $S + soundName", cName(String.class), "sounds/")
-                        .addStatement("$T path = $T.tree.get(name + $S).exists() ? name + $S : name + $S", cName(String.class), cName(Vars.class), ".ogg", ".ogg", ".mp3")
+                        .addStatement("$T path = name + $S", cName(String.class), ".ogg")
                         .addCode(lnew())
                         .beginControlFlow("if($T.assets.isLoaded(path, $T.class))", cName(Core.class), cName(Sound.class))
                             .addStatement("$T.assets.unload(path)", cName(Core.class))
@@ -119,20 +119,25 @@ public class FactionProcessor extends BaseProcessor{
             .addJavadoc("Disposes all {@link $T}s", cName(Sound.class))
             .returns(TypeName.VOID);
 
-        rootDir.child("main/assets/sounds").walk(path -> {
-            String name = path.nameWithoutExtension();
+        String dir = "main/assets/sounds/";
+        rootDir.child(dir).walk(path -> {
+            String p = path.absolutePath();
+            String name = p.substring(p.lastIndexOf(dir) + dir.length(), p.length());
+            String fname = path.nameWithoutExtension();
+            int ex = 4;
 
             soundSpec.addField(
                 FieldSpec.builder(
                     tName(Sound.class),
-                    name,
+                    fname,
                     Modifier.PUBLIC, Modifier.STATIC
                 )
                 .build()
             );
 
-            load.addStatement("$L = loadSound($S)", name, name);
-            dispose.addStatement("$L = disposeSound($S)", name, name);
+            String stripped = name.substring(0, name.length() - ex);
+            load.addStatement("$L = loadSound($S)", fname, stripped);
+            dispose.addStatement("$L = disposeSound($S)", fname, stripped);
         });
 
         soundSpec
@@ -158,7 +163,7 @@ public class FactionProcessor extends BaseProcessor{
                     .addParameter(cName(String.class), "musicName")
                     .beginControlFlow("if(!$T.headless)", cName(Vars.class))
                         .addStatement("$T name = $S + musicName", cName(String.class), "music/")
-                        .addStatement("$T path = $T.tree.get(name + $S).exists() ? name + $S : name + $S", cName(String.class), cName(Vars.class), ".ogg", ".ogg", ".mp3")
+                        .addStatement("$T path = name + $S", cName(String.class), ".mp3")
                         .addCode(lnew())
                         .addStatement("var music = new $T()", cName(Music.class))
                         .addCode(lnew())
@@ -184,7 +189,7 @@ public class FactionProcessor extends BaseProcessor{
                     .addParameter(cName(String.class), "musicName")
                     .beginControlFlow("if(!$T.headless)", cName(Vars.class))
                         .addStatement("$T name = $S + musicName", cName(String.class), "music/")
-                        .addStatement("$T path = $T.tree.get(name + $S).exists() ? name + $S : name + $S", cName(String.class), cName(Vars.class), ".ogg", ".ogg", ".mp3")
+                        .addStatement("$T path = name + $S", cName(String.class), ".mp3")
                         .addCode(lnew())
                         .beginControlFlow("if($T.assets.isLoaded(path, $T.class))", cName(Core.class), cName(Music.class))
                             .addStatement("$T.assets.unload(path)", cName(Core.class))
@@ -202,16 +207,20 @@ public class FactionProcessor extends BaseProcessor{
             .addJavadoc("Disposes all {@link $T}s", cName(Music.class))
             .returns(TypeName.VOID);
 
-        rootDir.child("main/assets/music").walk(path -> {
-            String name = path.nameWithoutExtension();
+        String dir = "main/assets/music/";
+        rootDir.child(dir).walk(path -> {
+            String p = path.absolutePath();
+            String name = p.substring(p.lastIndexOf(dir) + dir.length(), p.length());
+            String fname = path.nameWithoutExtension();
+            int ex = 4;
 
-            FieldSpec.Builder music = FieldSpec.builder(tName(Music.class), name, Modifier.PUBLIC, Modifier.STATIC);
+            FieldSpec.Builder music = FieldSpec.builder(tName(Music.class), fname, Modifier.PUBLIC, Modifier.STATIC);
             Seq<String[]> names = map.keys().toSeq().map(n -> n.split(":"));
             for(String[] n : names){
-                if(n[0].equals(name)){
+                if(n[0].equals(fname)){
                     music.addAnnotation(
                         AnnotationSpec.builder(cName(MusicDef.class))
-                            .addMember("facType", "$S", map.get(name + ":" + n[1]))
+                            .addMember("facType", "$S", map.get(fname + ":" + n[1]))
                             .addMember("category", "$S", n[1])
                         .build()
                     );
@@ -219,8 +228,10 @@ public class FactionProcessor extends BaseProcessor{
             }
 
             musicSpec.addField(music.build());
-            load.addStatement("$L = loadMusic($S)", name, name);
-            dispose.addStatement("$L = disposeMusic($S)", name, name);
+
+            String stripped = name.substring(0, name.length() - ex);
+            load.addStatement("$L = loadMusic($S)", fname, stripped);
+            dispose.addStatement("$L = disposeMusic($S)", fname, stripped);
         });
 
         musicSpec

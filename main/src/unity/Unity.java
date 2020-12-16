@@ -2,7 +2,6 @@ package unity;
 
 import arc.*;
 import arc.func.*;
-import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
@@ -49,7 +48,7 @@ public class Unity extends Mod{
             Time.runTask(10f, () -> {
                 //TODO make it also on the about dialog rather than annoyingly pop up everytime it loads
                 BaseDialog dialog = new BaseDialog("@credits");
-                Table cont = dialog.cont;
+                var cont = dialog.cont;
 
                 cont.table(t -> {
                     t.add("@mod.credits.text").fillX().pad(3f).wrap().get().setAlignment(Align.center);
@@ -88,6 +87,7 @@ public class Unity extends Mod{
     @Override
     public void init(){
         Vars.enableConsole = true;
+        handler = new MusicHandler();
 
         if(!Vars.headless){
             LoadedMod mod = Vars.mods.locateMod("unity");
@@ -106,13 +106,12 @@ public class Unity extends Mod{
             Log.info("@: Loaded content list: @", getClass().getSimpleName(), list.getClass().getSimpleName());
         }
 
-        handler = new MusicHandler();
         FactionMeta.init();
         ExpMeta.init();
         UnityEntityMapping.init();
     }
 
-    /** <code>unity.Unity.print();</code> for copypaste */
+    /** {@code unity.Unity.print();} for copypaste */
     public static void print(Object... args){
         StringBuilder h = new StringBuilder();
         if(args == null) h.append("null");
