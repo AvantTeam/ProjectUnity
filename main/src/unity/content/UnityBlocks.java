@@ -624,7 +624,7 @@ public class UnityBlocks implements ContentList{
             consumes.items(with(Items.coal, 2, Items.graphite, 2, UnityItems.denseAlloy, 3));
         }};
 
-        liquifier = new StemGenericSmelter("liquifier"){{
+        liquifier = new BurnerSmelter("liquifier"){{
             requirements(Category.crafting, with(Items.titanium, 30, Items.silicon, 15, UnityItems.steel, 10));
             health = 100;
             hasLiquids = true;
@@ -646,7 +646,6 @@ public class UnityBlocks implements ContentList{
                 }
             };
             consumes.power(3.7f);
-            consumes.items(with(UnityItems.stone, 6, Items.pyratite, 2));
         }};
 
         stoneWall = new LimitWall("ustone-wall"){{

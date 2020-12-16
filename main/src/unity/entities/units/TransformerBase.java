@@ -3,6 +3,7 @@ package unity.entities.units;
 import arc.util.Time;
 import mindustry.gen.*;
 import mindustry.world.blocks.environment.ShallowLiquid;
+import unity.type.*;
 
 public interface TransformerBase extends Unitc{
     void setTimeTrans(float time);
@@ -10,7 +11,7 @@ public interface TransformerBase extends Unitc{
     float getTimeTrans();
 
     default void transUpdate(){
-        TransUnitType temp = (TransUnitType)type();
+        UnityUnitType temp = (UnityUnitType)type();
         float current = getTimeTrans();
         if(floorOn().isLiquid && !(floorOn() instanceof ShallowLiquid) ^ self() instanceof WaterMovec){
             if(current < 0f || current > temp.transformTime){

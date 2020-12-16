@@ -7,10 +7,11 @@ import arc.graphics.g2d.Draw;
 import mindustry.gen.*;
 import mindustry.type.UnitType;
 import unity.content.UnityUnitTypes;
+import unity.type.*;
 
 public class WormDefaultUnit extends UnitEntity{
-    public WormUnitType wormType;
-    protected WormSegmentUnit[] segmentUnits;
+    public UnityUnitType wormType;
+    public WormSegmentUnit[] segmentUnits;
     protected Vec2[] segments, segmentVelocities;
     protected final Vec2 lastVelocityC = new Vec2(), lastVelocityD = new Vec2();
 
@@ -21,14 +22,14 @@ public class WormDefaultUnit extends UnitEntity{
     @Override
     public void type(UnitType type){
         super.type(type);
-        if(type instanceof WormUnitType w) wormType = w;
+        if(type instanceof UnityUnitType w) wormType = w;
         else throw new ClassCastException("you set this unit's type in a sneaky way");
     }
 
     @Override
     public void setType(UnitType type){
         super.setType(type);
-        if(type instanceof WormUnitType w) wormType = w;
+        if(type instanceof UnityUnitType w) wormType = w;
         else throw new ClassCastException("you set this unit's type in a sneaky way");
     }
 
@@ -110,7 +111,7 @@ public class WormDefaultUnit extends UnitEntity{
         return getSegmentLength() * wormType.segmentOffset * 2f;
     }
 
-    protected void drawShadow(){
+    public void drawShadow(){
         float originZ = Draw.z();
         for(int i = 0, len = getSegmentLength(); i < len; i++){
             Draw.z(originZ - (i + 1) / 500f);

@@ -20,6 +20,7 @@ import unity.entities.bullet.*;
 import unity.entities.comp.Copterc;
 import unity.entities.units.*;
 import unity.graphics.*;
+import unity.type.*;
 
 import static mindustry.type.ItemStack.*;
 
@@ -32,6 +33,9 @@ public class UnityUnitTypes implements ContentList{
     };
 
     private static final int[] classIDs = new int[constructors.length];
+    //moved to here to not confuse load order. if you want to move somewhere, change load order too.
+    public static @EntityDef(base = UnitEntity.class, def = {Copterc.class})
+    UnitType caelifera, schistocerca, anthophila, vespula, lepidoptera;
 
     public static UnitType//@formatter:off
     //flying-units
@@ -40,9 +44,6 @@ public class UnityUnitTypes implements ContentList{
     arcaetana, projectSpiboss,
     //naval-units
     rexed, storm, amphibiNaval, amphibi, craberNaval, craber;
-
-    public static @EntityDef(base = UnitEntity.class, def = {Copterc.class})
-    UnitType caelifera, schistocerca, anthophila, vespula, lepidoptera;
 
     public static @FactionDef(type = "scar")
     UnitType hovos, ryzer, whirlwind, jetstream, vortex;
@@ -75,7 +76,8 @@ public class UnityUnitTypes implements ContentList{
         }
         //region flying-units
 
-        caelifera = new CopterUnitType("caelifera"){{
+        caelifera = new UnityUnitType("caelifera"){{
+            defaultController = CopterAI::new;
             speed = 5f;
             drag = 0.08f;
             accel = 0.04f;
@@ -111,13 +113,14 @@ public class UnityUnitTypes implements ContentList{
                 }};
             }});
 
-            rotors.add(new Rotor(){{
+            rotors.add(new Rotor(name + "-rotor"){{
                 x = 0f;
                 y = 6f;
             }});
         }};
 
-        schistocerca = new CopterUnitType("schistocerca"){{
+        schistocerca = new UnityUnitType("schistocerca"){{
+            defaultController = CopterAI::new;
             speed = 4.5f;
             drag = 0.07f;
             accel = 0.03f;
@@ -160,7 +163,7 @@ public class UnityUnitTypes implements ContentList{
             }});
 
             for(int i : Mathf.signs){
-                rotors.add(new Rotor(){{
+                rotors.add(new Rotor(name + "-rotor"){{
                     x = 0f;
                     y = 6.5f;
                     bladeCount = 3;
@@ -169,7 +172,8 @@ public class UnityUnitTypes implements ContentList{
             }
         }};
 
-        anthophila = new CopterUnitType("anthophila"){{
+        anthophila = new UnityUnitType("anthophila"){{
+            defaultController = CopterAI::new;
             speed = 4f;
             drag = 0.07f;
             accel = 0.03f;
@@ -200,11 +204,11 @@ public class UnityUnitTypes implements ContentList{
                 }};
             }});
 
-            rotors.add(new Rotor(){{
+            rotors.add(new Rotor(name + "-rotor"){{
                 x = 0f;
                 y = -13f;
                 scale = 0.6f;
-            }}, new Rotor(){{
+            }}, new Rotor(name + "-rotor"){{
                 mirror = true;
                 x = 13f;
                 y = 3f;
@@ -212,7 +216,8 @@ public class UnityUnitTypes implements ContentList{
             }});
         }};
 
-        vespula = new CopterUnitType("vespula"){{
+        vespula = new UnityUnitType("vespula"){{
+            defaultController = CopterAI::new;
             speed = 3.5f;
             drag = 0.07f;
             accel = 0.03f;
@@ -252,7 +257,7 @@ public class UnityUnitTypes implements ContentList{
             }});
 
             for(int i : Mathf.signs){
-                rotors.add(new Rotor(){{
+                rotors.add(new Rotor(name + "-rotor"){{
                     mirror = true;
                     x = 15f;
                     y = 6.75f;
@@ -262,7 +267,8 @@ public class UnityUnitTypes implements ContentList{
             }
         }};
 
-        lepidoptera = new CopterUnitType("lepidoptera"){{
+        lepidoptera = new UnityUnitType("lepidoptera"){{
+            defaultController = CopterAI::new;
             speed = 3f;
             drag = 0.07f;
             accel = 0.03f;
@@ -323,13 +329,13 @@ public class UnityUnitTypes implements ContentList{
             }});
 
             for(int i : Mathf.signs){
-                rotors.add(new Rotor(){{
+                rotors.add(new Rotor(name + "-rotor"){{
                     mirror = true;
                     x = 22.5f;
                     y = 21.25f;
                     bladeCount = 3;
                     speed = 19f * i;
-                }}, new Rotor(){{
+                }}, new Rotor(name + "-rotor"){{
                     mirror = true;
                     x = 17.25f;
                     y = 1f;
@@ -792,7 +798,7 @@ public class UnityUnitTypes implements ContentList{
         }};
 
         setEntity("amphibi-naval", TransUnitWaterMove::new);
-        amphibiNaval = new TransUnitType("amphibi-naval"){{
+        amphibiNaval = new UnityUnitType("amphibi-naval"){{
             toTrans = () -> amphibi;
             speed = 1.3f;
             health = 365;
@@ -840,7 +846,7 @@ public class UnityUnitTypes implements ContentList{
         }};
 
         setEntity("amphibi", TransLegsUnit::new);
-        amphibi = new TransUnitType("amphibi"){{
+        amphibi = new UnityUnitType("amphibi"){{
             toTrans = () -> amphibiNaval;
             speed = 0.3f;
             health = 365;
@@ -865,7 +871,7 @@ public class UnityUnitTypes implements ContentList{
         }};
 
         setEntity("craber-naval", TransUnitWaterMove::new);
-        craberNaval = new TransUnitType("craber-naval"){{
+        craberNaval = new UnityUnitType("craber-naval"){{
             toTrans = () -> craber;
             speed = 1.2f;
             health = 730;
@@ -903,7 +909,7 @@ public class UnityUnitTypes implements ContentList{
         }};
 
         setEntity("craber", TransLegsUnit::new);
-        craber = new TransUnitType("craber"){{
+        craber = new UnityUnitType("craber"){{
             toTrans = () -> craberNaval;
             speed = 0.3f;
             health = 730;
@@ -1181,8 +1187,7 @@ public class UnityUnitTypes implements ContentList{
         //region imber
 
         setEntity("arcnelidia", WormDefaultUnit::new);
-        arcnelidia = new WormUnitType("arcnelidia"){{
-            setTypeID(3);
+        arcnelidia = new UnityUnitType("arcnelidia"){{
             segmentOffset = 23f;
             hitSize = 17f;
             health = 800;

@@ -11,9 +11,8 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
-import unity.entities.units.*;
-import unity.entities.units.CopterUnitType.*;
 import unity.gen.*;
+import unity.type.*;
 
 import static mindustry.Vars.*;
 
@@ -72,7 +71,7 @@ public class IconGenerator implements Generator{
                 }
 
                 if(unit instanceof CopterUnitEntity){
-                    CopterUnitType t = (CopterUnitType)type;
+                    UnityUnitType t = (UnityUnitType)type;
                     Rotor rotor = t.rotors.first();
 
                     outliner.get(rotor.bladeRegion);
@@ -107,14 +106,16 @@ public class IconGenerator implements Generator{
                         Sprite weapSprite = SpriteProcessor.get(wname);
 
                         icon.draw(weapSprite,
-                        (int)(weapon.x * 4f / Draw.scl + icon.width / 2f - weapSprite.width / 2f),
-                        (int)(-weapon.y * 4f / Draw.scl + icon.height / 2f - weapSprite.height / 2f),
-                        weapon.flipSprite, false);
+                            (int)(weapon.x * 4f / Draw.scl + icon.width / 2f - weapSprite.width / 2f),
+                            (int)(-weapon.y * 4f / Draw.scl + icon.height / 2f - weapSprite.height / 2f),
+                            weapon.flipSprite, false
+                        );
 
                         icon.draw(outline.get(weapSprite),
-                        (int)(weapon.x * 4f / Draw.scl + icon.width / 2f - weapSprite.width / 2f),
-                        (int)(-weapon.y * 4f / Draw.scl + icon.height / 2f - weapSprite.height / 2f),
-                        weapon.flipSprite, false);
+                            (int)(weapon.x * 4f / Draw.scl + icon.width / 2f - weapSprite.width / 2f),
+                            (int)(-weapon.y * 4f / Draw.scl + icon.height / 2f - weapSprite.height / 2f),
+                            weapon.flipSprite, false
+                        );
                     }
                 }
 
@@ -135,15 +136,17 @@ public class IconGenerator implements Generator{
                         Sprite weapSprite = SpriteProcessor.get(wname);
 
                         icon.draw(weapSprite,
-                        (int)(weapon.x * 4f / Draw.scl + icon.width / 2f - weapSprite.width / 2f),
-                        (int)(-weapon.y * 4f / Draw.scl + icon.height / 2f - weapSprite.height / 2f),
-                        weapon.flipSprite, false);
+                            (int)(weapon.x * 4f / Draw.scl + icon.width / 2f - weapSprite.width / 2f),
+                            (int)(-weapon.y * 4f / Draw.scl + icon.height / 2f - weapSprite.height / 2f),
+                            weapon.flipSprite, false
+                        );
 
                         if(weapon.top){
                             icon.draw(outline.get(weapSprite),
-                            (int)(weapon.x * 4f / Draw.scl + icon.width / 2f - weapSprite.width / 2f),
-                            (int)(-weapon.y * 4f / Draw.scl + icon.height / 2f - weapSprite.height / 2f),
-                            weapon.flipSprite, false);
+                                (int)(weapon.x * 4f / Draw.scl + icon.width / 2f - weapSprite.width / 2f),
+                                (int)(-weapon.y * 4f / Draw.scl + icon.height / 2f - weapSprite.height / 2f),
+                                weapon.flipSprite, false
+                            );
                         }
                     }
                 }

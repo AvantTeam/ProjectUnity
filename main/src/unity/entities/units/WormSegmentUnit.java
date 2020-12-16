@@ -11,12 +11,13 @@ import mindustry.entities.units.*;
 import mindustry.entities.bullet.BulletType;
 import mindustry.entities.Effect;
 import unity.content.UnityUnitTypes;
+import unity.type.*;
 
 import static arc.Core.atlas;
 import static mindustry.Vars.*;
 
 public class WormSegmentUnit extends UnitEntity{
-    public WormUnitType wormType;
+    public UnityUnitType wormType;
     protected WormDefaultUnit trueParentUnit;
     protected Unit parentUnit;
     protected boolean isBugged;
@@ -29,7 +30,7 @@ public class WormSegmentUnit extends UnitEntity{
     @Override
     public void type(UnitType type){
         super.type(type);
-        if(type instanceof WormUnitType) wormType = (WormUnitType)type;
+        if(type instanceof UnityUnitType w) wormType = w;
         else throw new ClassCastException("you set this unit's type a in sneaky way");
     }
 
@@ -66,7 +67,7 @@ public class WormSegmentUnit extends UnitEntity{
 
         if(controller == null) controller(type.createController());
         if(mounts().length != type.weapons.size) setupWeapons(type);
-        if(type instanceof WormUnitType) wormType = (WormUnitType)type;
+        if(type instanceof UnityUnitType w) wormType = w;
         else throw new ClassCastException("you set this unit's type in sneaky way");
     }
 
@@ -140,10 +141,10 @@ public class WormSegmentUnit extends UnitEntity{
 
     @Override
     public void setupWeapons(UnitType def){
-        if(!(def instanceof WormUnitType)) super.setupWeapons(def);
+        if(!(def instanceof UnityUnitType w)) super.setupWeapons(def);
         else{
             Seq<WeaponMount> tmpSeq = new Seq<>();
-            Seq<Weapon> originSeq = ((WormUnitType)def).segWeapSeq;
+            Seq<Weapon> originSeq = w.segWeapSeq;
             for(int i = 0; i < originSeq.size; i++) tmpSeq.add(new WeaponMount(originSeq.get(i)));
             mounts = tmpSeq.toArray(WeaponMount.class);
         }
@@ -212,7 +213,7 @@ public class WormSegmentUnit extends UnitEntity{
                 mount.heat = Math.max(mount.heat - Time.delta * reloadMultiplier / mount.weapon.cooldownTime, 0);
             }
             if(weapon.otherSide != -1 && weapon.alternate && mount.side == weapon.flipSprite
-            && mount.reload + Time.delta > weapon.reload / 2.0F && mount.reload <= weapon.reload / 2.0F){
+                && mount.reload + Time.delta > weapon.reload / 2.0F && mount.reload <= weapon.reload / 2.0F){
                 mounts[weapon.otherSide].side = !mounts[weapon.otherSide].side;
                 mount.side = !mount.side;
             }
@@ -278,10 +279,10 @@ public class WormSegmentUnit extends UnitEntity{
 
     public void drawBody(){
         type.applyColor(this);
-        TextureRegion region = segmentType == 0 ? wormType.segmentRegion() : wormType.tailRegion();
+        TextureRegion region = segmentType == 0 ? wormType.segmentRegion : wormType.tailRegion;
         Draw.rect(region, this, rotation - 90);
-        TextureRegion segCellReg = wormType.getSegmentCell();
-        if(segCellReg != atlas.find("error") && segmentType == 0) drawCell(segCellReg);
+        TextureRegion segCellReg = wormType.segmentCellRegion;
+        if(segmentType == 0 && segCellReg != atlas.find("error")) drawCell(segCellReg);
         TextureRegion outline = wormType.segmentOutline == null || wormType.tailOutline == null ? null : segmentType == 0 ? wormType.segmentOutline : wormType.tailOutline;
         if(outline != null){
             Draw.z(Draw.z() - UnitType.outlineSpace);
@@ -296,7 +297,7 @@ public class WormSegmentUnit extends UnitEntity{
     }
 
     public void drawSoftShadow(){
-        TextureRegion region = segmentType == 0 ? wormType.segmentRegion() : wormType.tailRegion();
+        TextureRegion region = segmentType == 0 ? wormType.segmentRegion : wormType.tailRegion;
         Draw.color(Pal.shadow); //seems to not exist in v106
         float e = Math.max(elevation, type.visualElevation);
         Draw.rect(region, x + (UnitType.shadowTX * e), y + UnitType.shadowTY * e, rotation - 90f);
