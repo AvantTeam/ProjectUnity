@@ -114,15 +114,20 @@ public abstract class BaseProcessor extends AbstractProcessor{
         return ClassName.get(pkgName, simpleName, simpleNames.toArray());
     }
 
+    public ClassName cName(Element e){
+        return cName(stripTV(e.asType().toString()));
+    }
+
     public TypeVariableName tvName(String name, TypeName... bounds){
         return TypeVariableName.get(name, bounds);
     }
 
-    public ClassName withoutTV(TypeElement t){
-        String canonical = t.getQualifiedName().toString();
-        String stripped = canonical.replaceAll("\\<[A-Z]\\>", "");
+    public String stripTV(String canonical){
+        return canonical.replaceAll("\\<[A-Z]+\\>", "");
+    }
 
-        return cName(stripped);
+    public ClassName withoutTV(TypeElement t){
+        return cName(stripTV(t.getQualifiedName().toString()));
     }
 
     public String lnew(){

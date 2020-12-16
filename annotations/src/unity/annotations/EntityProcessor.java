@@ -81,7 +81,7 @@ public class EntityProcessor extends BaseProcessor{
                         );
                         Initialize initializer = getter.getAnnotation(Initialize.class);
                         if(initializer != null){
-                            field.initializer(initializer.eval(), (Object[])Seq.with(initializer.args()).map(this::cName).toArray());
+                            field.initializer(initializer.eval(), elements(initializer::args).map(this::cName).toArray(Object.class));
                         }
 
                         MethodSpec.Builder getImpl = MethodSpec.overriding(getter)

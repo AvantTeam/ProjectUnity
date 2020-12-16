@@ -93,7 +93,7 @@ public class Annotations{
         String eval();
 
         /** @return Class arguments to be parsed into {@link #eval()}. */
-        String[] args() default {};
+        Class<?>[] args() default {};
     }
 
     // end region
