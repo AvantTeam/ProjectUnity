@@ -16,6 +16,7 @@ import mindustry.world.blocks.units.*;
 import mindustry.world.blocks.units.UnitFactory.*;
 import unity.ai.*;
 import unity.annotations.Annotations.*;
+import unity.entities.abilities.*;
 import unity.entities.bullet.*;
 import unity.entities.comp.Copterc;
 import unity.entities.units.*;
@@ -52,7 +53,7 @@ public class UnityUnitTypes implements ContentList{
     UnitType arcnelidia;
 
     public static @FactionDef(type = "monolith")
-    UnitType stele, pedestal, pilaster, pylon;
+    UnitType stele, pedestal, pilaster, pylon, monument, colossus;
 
     //public static @FactionDef(type = "end") UnitType devourer;
 
@@ -1418,6 +1419,108 @@ public class UnityUnitTypes implements ContentList{
             }});
         }};
 
+        setEntity("monument", LegsUnit::create);
+        monument = new UnitType("monument"){{
+            speed = 0.25f;
+            rotateSpeed = 1.4f;
+            health = 16000;
+            armor = 9f;
+            hitSize = 48f;
+            ammoType = AmmoTypes.powerHigh;
+            allowLegStep = hovering = true;
+            legCount = 6;
+            legLength = 30f;
+            legExtension = 8f;
+            legSpeed = 0.1f;
+            legTrns = 0.5f;
+            legBaseOffset = 15f;
+            legMoveSpace = 1.2f;
+            legPairOffset = 3f;
+            legSplashDamage = 64f;
+            legSplashRange = 48f;
+            visualElevation = 0.3f;
+            groundLayer = Layer.legUnit;
+            weapons.add(new Weapon("unity-monolith-railgun-big"){{
+                x = 0f;
+                y = 12f;
+                rotate = true;
+                rotateSpeed = 1.2f;
+                mirror = false;
+                shootY = 35f;
+                reload = 240f;
+                shootCone = 2f;
+                cooldownTime = 210f;
+                recoil = shake = 8f;
+                shadow = 30f;
+                shootSound = Sounds.railgun;
+                bullet = UnityBullets.monumentRailBullet;
+            }}, new Weapon("unity-monolith-large2-weapon-mount"){{
+                x = 14f;
+                y = 12f;
+                shootY = 14f;
+                rotate = true;
+                rotateSpeed = 3.5f;
+                reload = 48f;
+                recoil = shake = 5f;
+                shootSound = Sounds.laser;
+                bullet = new LaserBulletType(140f);
+            }});
+            Weapon laserGun2 = weapons.get(1).copy();
+            laserGun2.x = 20f;
+            laserGun2.y = 3f;
+            laserGun2.reload = 60f;
+            weapons.add(laserGun2);
+        }};
+
+        setEntity("colossus", LegsUnit::create);
+        colossus = new UnitType("colossus"){{
+            speed = 0.22f;
+            rotateSpeed = 1.2f;
+            health = 30000;
+            armor = 13f;
+            hitSize = 64f;
+            ammoType = AmmoTypes.powerHigh;
+            visualElevation = 0.5f;
+            allowLegStep = hovering = true;
+            legCount = 6;
+            legLength = 48f;
+            legExtension = 12f;
+            legSpeed = 0.1f;
+            legTrns = 0.5f;
+            legBaseOffset = 15f;
+            legMoveSpace = 0.82f;
+            legPairOffset = 3f;
+            legSplashDamage = 84f;
+            legSplashRange = 48f;
+            groundLayer = Layer.legUnit;
+            abilities.add(new LightningSpawnAbility());
+            weapons.add(new Weapon(name + "-weapon"){{
+                top = false;
+                x = 30f;
+                y = 7.75f;
+                shootY = 20f;
+                reload = 60f;
+                spacing = 1f;
+                inaccuracy = 6f;
+                shots = 5;
+                shotDelay = 3f;
+                recoil = 8f;
+                shootSound = Sounds.laser;
+                bullet = new LaserBulletType(280f){{
+                    lifetime = 32f;
+                    width = 45f;
+                    length = 280f;
+                    lightningSpacing = 35f;
+                    lightningLength = 4;
+                    lightningDelay = 1.5f;
+                    lightningLengthRand = 6;
+                    lightningDamage = 48f;
+                    lightningAngleRand = 30f;
+                    lightningColor = Pal.lancerLaser;
+                }};
+            }});
+        }};
+
         //endregion
         //region dark
 
@@ -1458,6 +1561,10 @@ public class UnityUnitTypes implements ContentList{
 
         ((Reconstructor)Blocks.tetrativeReconstructor).upgrades.add(
             //global
-            new UnitType[]{vespula, lepidoptera});
+            new UnitType[]{vespula, lepidoptera},
+
+            //monolith
+            new UnitType[]{pylon, monument}
+        );
     }
 }

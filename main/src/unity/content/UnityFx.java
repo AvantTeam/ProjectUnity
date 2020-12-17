@@ -491,7 +491,7 @@ public class UnityFx{
             if(i >= 2){
                 Draw.color(Color.white);
             }else{
-                Draw.color(Tmp.c1.set(colors[i]).mul(1f,1f + Funcs.offsetSinB(0f, 5f), 1f + Funcs.offsetSinB(90f, 5f), 1f));
+                Draw.color(Tmp.c1.set(colors[i]).mul(1f, 1f + Funcs.offsetSinB(0f, 5f), 1f + Funcs.offsetSinB(90f, 5f), 1f));
             }
 
             Fill.circle(a.getX(), a.getY(), strokes[i] * 4f * width * e.fout());
@@ -502,7 +502,7 @@ public class UnityFx{
         }
         Draw.z(oz);
     }),
-    
+
     rockFx = new Effect(10f, e -> {
         color(Color.orange, Color.gray, e.fin());
         stroke(1f);
@@ -513,5 +513,45 @@ public class UnityFx{
         color(Pal.accent, Color.gray, e.fin());
         stroke(1f);
         spikes(e.x, e.y, e.fin() * 4f, 1.5f, 6);
+    }),
+    //I have no idea with naming
+    monumentShoot = new Effect(48f, e -> {
+        color(Color.white, Pal.lancerLaser, Color.cyan, e.fin());
+        randLenVectors(e.id, 12, e.finpow() * 64f, e.rotation, 16f, (x, y) -> Fill.circle(e.x + x, e.y + y, 1f + e.fout() * 5f));
+    }),
+
+    monumentDespawn = new Effect(32f, e -> {
+        e.scaled(15f, i -> {
+            color(Pal.lancerLaser);
+            stroke(i.fout() * 5f);
+            circle(e.x, e.y, 4f + i.finpow() * 26f);
+        });
+        randLenVectors(e.id, 25, 5f + e.fin() * 80f, e.rotation, 60f, (x, y) -> Fill.circle(e.x + x, e.y + y, e.fout() * 3f));
+    }),
+
+    monumentTrail = new Effect(32f, e -> {
+        float len = ((PointBulletType)monumentRailBullet).trailSpacing - 12f;
+        float rot = e.rotation;
+        Tmp.v1.trns(rot, len);
+        for(int i = 0; i < 2; i++){
+            color(i < 1 ? Color.white : Pal.lancerLaser);
+            float scl = i < 1 ? 1f : 0.5f;
+            stroke(e.fout() * 10f * scl);
+            lineAngle(e.x, e.y, rot, len, false);
+            Drawf.tri(e.x + Tmp.v1.x, e.y + Tmp.v1.y, getStroke() * 1.22f, 12f * scl, rot);
+            Drawf.tri(e.x, e.y, getStroke() * 1.22f, 12 * scl, rot + 180f);
+        }
+    }),
+
+    lightningSpawnShoot = new Effect(18f, e -> {
+        e.scaled(12f, i -> {
+            randLenVectors(e.id, 8, 4f + i.fin() * 18f, (x, y) -> {
+                color(Color.white, Pal.lancerLaser, e.fin());
+                Fill.square(e.x + x, e.y + y, 1f + i.fout() * 3f, 45f);
+            });
+            color(Color.white, Pal.lancerLaser, e.fin());
+            alpha(e.fout());
+            Fill.circle(e.x, e.y, e.finpow() * 8f);
+        });
     });
 }

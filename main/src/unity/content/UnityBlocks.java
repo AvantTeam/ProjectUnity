@@ -98,7 +98,10 @@ public class UnityBlocks implements ContentList{
             configurable = true;
             constructTime = 20000f;
             minTier = 6;
-            upgrades.add(new UnitType[]{UnitTypes.toxopid, UnityUnitTypes.projectSpiboss});
+            upgrades.add(
+                new UnitType[]{UnitTypes.toxopid, UnityUnitTypes.projectSpiboss},
+                new UnitType[]{UnityUnitTypes.monument, UnityUnitTypes.colossus}
+            );
             otherUpgrades.add(new UnitType[]{UnityUnitTypes.projectSpiboss, UnityUnitTypes.arcaetana});
             consumes.power(5f);
             consumes.items(with(Items.silicon, 1200, Items.metaglass, 800, Items.thorium, 700, Items.surgeAlloy, 400, Items.plastanium, 600, Items.phaseFabric, 350));

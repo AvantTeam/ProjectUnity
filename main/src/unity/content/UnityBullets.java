@@ -27,7 +27,7 @@ import static unity.content.UnityFx.*;
 
 public class UnityBullets implements ContentList{
     public static BulletType laser, coalBlaze, pyraBlaze, falloutLaser, catastropheLaser, calamityLaser, extinctionLaser, orb, shockBeam, currentStroke,
-        shielderBullet, plasmaFragTriangle, plasmaTriangle, pylonLightning, pylonLaser, pylonLaserSmall, exporb;
+        shielderBullet, plasmaFragTriangle, plasmaTriangle, pylonLightning, pylonLaser, pylonLaserSmall, exporb, monumentRailBullet;
 
     //only enhanced
     public static BasicBulletType standardDenseLarge, standardHomingLarge, standardIncendiaryLarge, standardThoriumLarge, standardDenseHeavy, standardHomingHeavy, standardIncendiaryHeavy, standardThoriumHeavy, standardDenseMassive, standardHomingMassive,
@@ -361,6 +361,19 @@ public class UnityBullets implements ContentList{
         }};
 
         exporb = new ExpOrb();
+
+        monumentRailBullet = new PointBulletType(){{
+            damage = 1000;
+            tileDamageMultiplier = 0.7f;
+            speed = maxRange = 500f;
+            lifetime = 1f;
+            hitShake = 6f;
+            trailSpacing = 35f;
+            shootEffect = monumentShoot;
+            despawnEffect = monumentDespawn;
+            smokeEffect = shootEffect = Fx.blastExplosion;
+            trailEffect = monumentTrail;
+        }};
 
         //only enhanced
 

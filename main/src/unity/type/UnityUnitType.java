@@ -18,7 +18,7 @@ import static mindustry.Vars.state;
 note that as classes are integrated, inner classes are extracted.*/
 public class UnityUnitType extends UnitType{
     public TextureRegion segmentRegion, tailRegion, segmentCellRegion, segmentOutline, tailOutline;
-    public final Seq<Rotor> rotors = new Seq<>();
+    public final Seq<Rotor> rotors = new Seq<>(4);
     public final Seq<Weapon> segWeapSeq = new Seq<>();
     public float fallRotateSpeed = 2.5f, transformTime, segmentOffset;
     public int segmentLength = 9;
