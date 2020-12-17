@@ -90,7 +90,7 @@ const laserWeap = new Weapon("dijkstra-laser");
 
 laserWeap.rotate = true;
 laserWeap.rotateSpeed = 8;
-laserWeap.occlusion = 20;
+laserWeap.shadow = 20;
 laserWeap.x = 0;
 laserWeap.y = 0;
 laserWeap.reload = 150;

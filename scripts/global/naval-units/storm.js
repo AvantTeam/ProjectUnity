@@ -58,7 +58,7 @@ laser.colors = [Color.valueOf("d4816b"), Color.valueOf("ffd37f"), Color.white];
 var igniter = new Weapon("unity-storm-igniter");
 
 igniter.shootSound = Sounds.laser;
-igniter.occlusion = 20;
+igniter.shadow = 20;
 igniter.shootY = 10;
 igniter.reload = 170;
 igniter.x = 0;

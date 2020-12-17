@@ -117,7 +117,7 @@ arcaetanaMainLaser.shootSound = Sounds.laser;
 arcaetanaMainLaser.reload = 60;
 arcaetanaMainLaser.recoil = 4;
 arcaetanaMainLaser.rotate = true;
-arcaetanaMainLaser.occlusion = 15;
+arcaetanaMainLaser.shadow = 15;
 arcaetanaMainLaser.shake = 4;
 arcaetanaMainLaser.bullet = arcaetanaDeathLaser;
 
