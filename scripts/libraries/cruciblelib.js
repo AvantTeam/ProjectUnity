@@ -193,7 +193,7 @@ function deepCopy(obj) {
 }
 
 //dunno how to load this from a json
-const cruicibleMelts = [
+const crucibleMelts = [
 	{name:"copper", meltpoint:750, meltspeed:0.1, evaporation: 0.02, evaporationTemp: 2100, priority: 1}, // irl: 1475K, halved cus its a low tier resource.
 	{name:"lead", meltpoint:570, meltspeed:0.2, evaporation: 0.02, evaporationTemp: 1900, priority: 1},  //dont let it get too hot! c:
 	{name:"titanium", meltpoint:1600, meltspeed:0.07, priority: 1},  // irl: 1940K
@@ -210,13 +210,13 @@ const cruicibleMelts = [
 	{name:"unity-super-alloy", meltpoint:1800, meltspeed:0.02, priority: 4},  
 	////APPEND NEW MELTS TO THE END TO AVOID AFFECTING SAVES
 ];
-for(let inde = 0 ;inde<cruicibleMelts.length;inde++){
-	cruicibleMelts[inde].id = inde;
+for(let inde = 0 ;inde<crucibleMelts.length;inde++){
+	crucibleMelts[inde].id = inde;
 }
 function getMeltByName(name){
-	for(let inde = 0 ;inde<cruicibleMelts.length;inde++){
-		if(cruicibleMelts[inde].name == name){
-			return cruicibleMelts[inde];
+	for(let inde = 0 ;inde<crucibleMelts.length;inde++){
+		if(crucibleMelts[inde].name == name){
+			return crucibleMelts[inde];
 		}
 	}
 }
@@ -224,13 +224,13 @@ function getMelt(item){
 	return getMeltByName(item.name);
 }
 function getMeltItem(id){
-	let hh = cruicibleMelts[id];
+	let hh = crucibleMelts[id];
 	if(!hh.item && !hh.notItem){hh.item=Vars.content.getByName(ContentType.item,hh.name);}
 	return hh.item;
 }
 
 
-const cruicibleRecipes = [
+const crucibleRecipes = [
 	{name:"unity-cupronickel", 
 		inputs:[
 			{material:"unity-nickel", amount:0.8},
@@ -286,8 +286,8 @@ function sqrd(x) {
 
 
 
-const _CruicibleCommon = Object.assign(Object.create(graphLib.graphCommon),{
-	_baseLiquidCapacity:6.0, //capacity of cruicible
+const _CrucibleCommon = Object.assign(Object.create(graphLib.graphCommon),{
+	_baseLiquidCapacity:6.0, //capacity of crucible
 	_meltSpeed:0.8, 
 	_doesCrafting:true, //whether this block does alloying
 	_capacityTiling:true, //whether the block's capacity is affect by tiling
@@ -383,7 +383,7 @@ function getConnectSidePos(index, size, rotation) {
 }
 
 
-const _CruiciblePropsCommon = Object.assign(deepCopy(graphLib.graphProps),{
+const _CruciblePropsCommon = Object.assign(deepCopy(graphLib.graphProps),{
 	tilingIndex:0,
 	liquidcap:0,
 	melter:true,
@@ -453,7 +453,7 @@ const _CruiciblePropsCommon = Object.assign(deepCopy(graphLib.graphProps),{
 				let remain = 1.0-(cc.length*min);
 				for(let i = 0;i<cc.length;i++){
 					let ccl = cc[i];
-					let ml = cruicibleMelts[cc[i].id];
+					let ml = crucibleMelts[cc[i].id];
 					let itm = Vars.content.getByName(ContentType.item,ml.name);
 					if(itm){
 						data.push(
@@ -499,7 +499,7 @@ const _CruiciblePropsCommon = Object.assign(deepCopy(graphLib.graphProps),{
 			}else{
 				for(let i = 0;i<cc.length;i++){
 					let ccl = cc[i];
-					let ml = cruicibleMelts[cc[i].id];
+					let ml = crucibleMelts[cc[i].id];
 					let itm = Vars.content.getByName(ContentType.item,ml.name);
 					if(itm){
 						data.steps.push(
@@ -623,7 +623,7 @@ const _CruiciblePropsCommon = Object.assign(deepCopy(graphLib.graphProps),{
 });
 
 
-const _CrucibleMulticonnectorProps = Object.assign(Object.create(_CruiciblePropsCommon),deepCopy(graphLib.graphMultiProps), {
+const _CrucibleMulticonnectorProps = Object.assign(Object.create(_CruciblePropsCommon),deepCopy(graphLib.graphMultiProps), {
 	
 	
 });
@@ -763,8 +763,8 @@ const crucibleGraph = { //this just uh manages the graphics lmAO
 		if(!cc || cc.length==0){return;}
 		
 		for(let i = 0;i<cc.length;i++){
-			this.addMeltItem(cruicibleMelts[cc[i].id], cc[i].volume*(1.0-cc[i].meltedRatio), false);
-			this.addMeltItem(cruicibleMelts[cc[i].id], cc[i].volume*cc[i].meltedRatio, true);
+			this.addMeltItem(crucibleMelts[cc[i].id], cc[i].volume*(1.0-cc[i].meltedRatio), false);
+			this.addMeltItem(crucibleMelts[cc[i].id], cc[i].volume*cc[i].meltedRatio, true);
 		}
 		
 	},
@@ -848,7 +848,7 @@ const crucibleGraph = { //this just uh manages the graphics lmAO
 		return this.getAverageTempDecay(ml.meltpoint,ml.meltspeed,tmpdep,cooldep);
 	},
 	getAverageMeltSpeedIndex(index,tmpdep,cooldep){
-		return this.getAverageMeltSpeed(cruicibleMelts[index],tmpdep,cooldep)
+		return this.getAverageMeltSpeed(crucibleMelts[index],tmpdep,cooldep)
 	},
 	updateColor(){
 		let col = {r:0,g:0,b:0};
@@ -881,7 +881,7 @@ const crucibleGraph = { //this just uh manages the graphics lmAO
 		//melting 
 		for(let i = 0;i<this.contains.length;i++){
 			let meltmul = Time.delta/this.contains[i].volume;
-			let ml = cruicibleMelts[this.contains[i].id];
+			let ml = crucibleMelts[this.contains[i].id];
 			if(ml){
 				this.contains[i].meltedRatio += meltmul*this.getAverageMeltSpeed(ml,0.002,0.5)*0.4*capacitymul;
 				this.contains[i].meltedRatio = Mathf.clamp(this.contains[i].meltedRatio);
@@ -896,16 +896,16 @@ const crucibleGraph = { //this just uh manages the graphics lmAO
 			}
 		}
 		//alloying
-		for(let z=0;z<cruicibleRecipes.length;z++){
+		for(let z=0;z<crucibleRecipes.length;z++){
 			let valid = true;
 			let inputslots = [];
 			let maxcraftable = 9999999;
-			for(let r =0;r<cruicibleRecipes[z].inputs.length;r++){
+			for(let r =0;r<crucibleRecipes[z].inputs.length;r++){
 				let found =false;
 				for(let i = 0;i<this.contains.length;i++){
 					let ingre = this.contains[i];
-					let alyinput = cruicibleRecipes[z].inputs[r];
-					if(cruicibleMelts[ingre.id].name == alyinput.material  && //actually such a mess
+					let alyinput = crucibleRecipes[z].inputs[r];
+					if(crucibleMelts[ingre.id].name == alyinput.material  && //actually such a mess
 						(!alyinput.needsliquid ||ingre.meltedRatio>0)){
 						found=true;
 						inputslots[r]=i;
@@ -919,10 +919,10 @@ const crucibleGraph = { //this just uh manages the graphics lmAO
 				}
 			}
 			if(valid && maxcraftable>0){
-				let craftam = Math.min(maxcraftable,cruicibleRecipes[z].alloyspeed*Time.delta*0.2*capacitymul);
+				let craftam = Math.min(maxcraftable,crucibleRecipes[z].alloyspeed*Time.delta*0.2*capacitymul);
 				if(craftam<=0){continue;}
-				for(let r =0;r<cruicibleRecipes[z].inputs.length;r++){
-					let alyinput = cruicibleRecipes[z].inputs[r];
+				for(let r =0;r<crucibleRecipes[z].inputs.length;r++){
+					let alyinput = crucibleRecipes[z].inputs[r];
 					if(alyinput.needsliquid){
 						this.addLiquidToSlot(this.contains[inputslots[r]],-alyinput.amount*craftam);
 					}else{
@@ -930,7 +930,7 @@ const crucibleGraph = { //this just uh manages the graphics lmAO
 						this.containChanged=true;
 					}
 				}
-				this.addMeltItem(getMeltByName(cruicibleRecipes[z].name),craftam,true);
+				this.addMeltItem(getMeltByName(crucibleRecipes[z].name),craftam,true);
 			}
 		}
 		//removing empty if any
@@ -970,8 +970,8 @@ const crucibleGraph = { //this just uh manages the graphics lmAO
 		let cc = graph.contains;
 		this.totalCapacity +=graph.totalCapacity;
 		for(let i = 0;i<cc.length;i++){
-			this.addMeltItem(cruicibleMelts[cc[i].id], cc[i].volume*(1.0-cc[i].meltedRatio), false);
-			this.addMeltItem(cruicibleMelts[cc[i].id], cc[i].volume*cc[i].meltedRatio, true);
+			this.addMeltItem(crucibleMelts[cc[i].id], cc[i].volume*(1.0-cc[i].meltedRatio), false);
+			this.addMeltItem(crucibleMelts[cc[i].id], cc[i].volume*cc[i].meltedRatio, true);
 		}
 	},
 	
@@ -981,12 +981,12 @@ const crucibleGraph = { //this just uh manages the graphics lmAO
 
 const _baseTypes = {
     crucibleConnector: {
-        block: _CruicibleCommon,
-        build: _CruiciblePropsCommon,
+        block: _CrucibleCommon,
+        build: _CruciblePropsCommon,
 		graph: crucibleGraph,
     },
 	crucibleMultiConnector: {
-        block: _CruicibleCommon,
+        block: _CrucibleCommon,
         build: _CrucibleMulticonnectorProps,
 		graph: crucibleGraph,
     },
@@ -1050,10 +1050,10 @@ module.exports = {
 	getRegion:_getRegion,
 	tileIndexMap: tileMap,
     crucibleGraph: crucibleGraph,
-    heatProps: _CruiciblePropsCommon,
-    heatCommon: _CruicibleCommon,
+    heatProps: _CruciblePropsCommon,
+    heatCommon: _CrucibleCommon,
     dirs: _dirs,
     getConnectSidePos: getConnectSidePos,
     baseTypes: _baseTypes,
-	meltTypes: cruicibleMelts
+	meltTypes: crucibleMelts
 }
