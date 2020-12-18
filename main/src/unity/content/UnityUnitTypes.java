@@ -47,7 +47,7 @@ public class UnityUnitTypes implements ContentList{
     rexed, storm, amphibiNaval, amphibi, craberNaval, craber;
 
     public static @FactionDef(type = "scar")
-    UnitType hovos, ryzer, whirlwind, jetstream, vortex;
+    UnitType hovos, ryzer, sundown, whirlwind, jetstream, vortex;
 
     public static @FactionDef(type = "imber")
     UnitType arcnelidia;
@@ -1035,6 +1035,55 @@ public class UnityUnitTypes implements ContentList{
             });
         }};
 
+        setEntity("sundown", LegsUnit::create);
+        sundown = new UnityUnitType("sundown"){{
+            defaultController = DistanceGroundAI::new;
+            speed = 0.5f;
+            health = 8700f;
+            hitSize = 36f;
+            range = 260f;
+            allowLegStep = true;
+            legMoveSpace = 0.53f;
+            legCount = 4;
+            legTrns = 0.4f;
+            legLength = 44f;
+            legExtension = -9.3f;
+
+            weapons.add(new Weapon("unity-scar-large-launcher"){{
+                x = 13.5f;
+                y = -6.5f;
+                shootY = 5f;
+                shadow = 6f;
+                rotateSpeed = 5f;
+                rotate = true;
+                reload = 90f;
+                shake = 1f;
+                shots = 12;
+                inaccuracy = 26f;
+                velocityRnd = 0.2f;
+                xRand = 1.2f;
+                shootSound = Sounds.bigshot;
+
+                bullet = new MissileBulletType(6f, 7f){{
+                    lifetime = 70f;
+                    speed = 5f;
+                    width = 7f;
+                    height = 12f;
+                    shrinkY = 0f;
+                    backColor = trailColor = UnityPal.scarColor;
+                    frontColor = UnityPal.endColor;
+                    splashDamage = 46f;
+                    splashDamageRadius = 20f;
+                    weaveMag = 3f;
+                    weaveScale = 6f;
+                    pierceBuilding = true;
+                    pierceCap = 3;
+                }};
+            }});
+
+            abilities.add(new DirectionShieldAbility(4, 0.2f, 20f, 600f, 1.3f, 0.4f, hitSize / 1.42f));
+        }};
+
         setEntity("whirlwind", UnitEntity::create);
         whirlwind = new UnitType("whirlwind"){{
             health = 280;
@@ -1070,7 +1119,7 @@ public class UnityUnitTypes implements ContentList{
                 }};
 
                 shootStatusDuration = bullet.lifetime;
-                reload = 2 * 60f + bullet.lifetime;
+                reload = 2 * 60f;
             }}, new Weapon(){{
                 rotate = true;
                 x = 4.2f;
@@ -1127,7 +1176,7 @@ public class UnityUnitTypes implements ContentList{
                     lenscales = new float[]{0.85f, 0.97f, 1f, 1.02f};
                 }};
 
-                reload = 60f * 2.5f + bullet.lifetime;
+                reload = 60f * 3.2f;
                 shootStatusDuration = bullet.lifetime;
             }}, new Weapon("unity-small-scar-weapon"){{
                 rotate = true;
@@ -1169,6 +1218,7 @@ public class UnityUnitTypes implements ContentList{
 
                 bullet = new SaberContinuousLaserBulletType(60f){{
                     swipe = true;
+                    swipeDamageMultiplier = 1.2f;
                     largeHit = false;
                     lifetime = 5f * 60f;
                     length = 190f;
@@ -1180,7 +1230,7 @@ public class UnityUnitTypes implements ContentList{
                     strokes = new float[]{1.5f, 1f, 0.3f};
                 }};
 
-                reload = 1.2f * 60f + bullet.lifetime;
+                reload = 2f * 60f;
             }});
         }};
 

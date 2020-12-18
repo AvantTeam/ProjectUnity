@@ -9,6 +9,7 @@ import arc.util.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.type.*;
+import unity.entities.*;
 import unity.entities.units.*;
 
 import static arc.Core.atlas;
@@ -18,6 +19,7 @@ import static mindustry.Vars.state;
 note that as classes are integrated, inner classes are extracted.*/
 public class UnityUnitType extends UnitType{
     public TextureRegion segmentRegion, tailRegion, segmentCellRegion, segmentOutline, tailOutline;
+    public TextureRegion[] abilityRegions = new TextureRegion[AbilityTextures.values().length];
     public final Seq<Rotor> rotors = new Seq<>(4);
     public final Seq<Weapon> segWeapSeq = new Seq<>();
     public float fallRotateSpeed = 2.5f, transformTime, segmentOffset;
@@ -47,6 +49,11 @@ public class UnityUnitType extends UnitType{
         tailRegion = atlas.find(name + "-tail");
         segmentOutline = atlas.find(name + "-segment-outline");
         tailOutline = atlas.find(name + "-tail-outline");
+        //abilities
+        for(AbilityTextures type : AbilityTextures.values()){
+            abilityRegions[type.ordinal()] = atlas.find(name + "-" + type.name());
+        }
+
         segWeapSeq.each(Weapon::load);
     }
 
