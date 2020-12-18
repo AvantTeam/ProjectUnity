@@ -114,6 +114,7 @@ public class EntityProcessor extends BaseProcessor{
                 for(ExecutableElement appended : appending.keys().toSeq()){
                     Seq<ExecutableElement> appenders = appending.get(appended);
                     boolean replace = appenders.contains(app -> app.getAnnotation(Replace.class) != null);
+                    boolean returns = appended.getReturnType().getKind() != VOID;
 
                     StringBuilder params = new StringBuilder();
                     Seq<Object> args = Seq.with(appended.getSimpleName().toString());
@@ -129,32 +130,51 @@ public class EntityProcessor extends BaseProcessor{
 
                     MethodSpec.Builder method = MethodSpec.overriding(appended);
                     if(!replace){
-                        method
-                            .addStatement("super.$L(" + params.toString() + ")", args.toArray())
-                            .addCode(lnew());
+                        if(!returns){
+                            method
+                                .addStatement("super.$L(" + params.toString() + ")", args.toArray())
+                                .addCode(lnew());
 
-                        for(ExecutableElement appender : appenders){
-                            TypeElement up = (TypeElement)appender.getEnclosingElement();
-                            method.addStatement("$T.super.$L(" + params.toString() + ")", Seq.<Object>with(tName(up)).addAll(args).toArray());
+                            for(ExecutableElement appender : appenders){
+                                TypeElement up = (TypeElement)appender.getEnclosingElement();
+                                method.addStatement("$T.super.$L(" + params.toString() + ")", Seq.<Object>with(tName(up)).addAll(args).toArray());
+                            }
+                        }else if(appended.getReturnType().getKind() == BOOLEAN){
+                            StringBuilder builder = new StringBuilder()
+                                .append("return ");
+                            Seq<Object> builderArgs = new Seq<>();
+
+                            for(int i = 0; i < appenders.size; i++){
+                                ExecutableElement appender = appenders.get(i);
+
+                                TypeElement up = (TypeElement)appender.getEnclosingElement();
+                                builder.append("$T.super.$L(" + params.toString() + ")");
+                                builderArgs.addAll(Seq.<Object>with(tName(up)).addAll(args));
+
+                                if(i < appenders.size - 1){
+                                    builder.append(" && ");
+                                }else{
+                                    builder.append(";");
+                                }
+                            }
+
+                            method.addStatement(builder.toString(), builderArgs.toArray());
                         }
                     }else{
                         Seq<ExecutableElement> replacers = appenders.select(app -> app.getAnnotation(Replace.class) != null);
 
                         for(ExecutableElement replacer : replacers){
                             TypeElement up = (TypeElement)replacer.getEnclosingElement();
-                            method.addStatement("$T.super.$L(" + params.toString() + ")", Seq.<Object>with(tName(up)).addAll(args).toArray());
+                            Object[] mArgs = Seq.<Object>with(tName(up)).addAll(args).toArray();
+                            if(!returns){
+                                method.addStatement("$T.super.$L(" + params.toString() + ")", mArgs);
+                            }else{
+                                method.addStatement("return $T.super.$L(" + params.toString() + ")", mArgs);
+                            }
                         }
                     }
 
-                    entity
-                        .addMethod(method.build())
-                        .addMethod(
-                            MethodSpec.methodBuilder("toString").addModifiers(Modifier.PUBLIC)
-                                .addAnnotation(Override.class)
-                                .returns(String.class)
-                                .addStatement("return $S + id()", name.toString() + "#")
-                            .build()
-                        );
+                    entity.addMethod(method.build());
                 }
 
                 EntityDefinition definition = new EntityDefinition(name.toString(), base, entity);
@@ -230,6 +250,14 @@ public class EntityProcessor extends BaseProcessor{
                 }
 
                 first = false;
+
+                spec.builder.addMethod(
+                    MethodSpec.methodBuilder("toString").addModifiers(Modifier.PUBLIC)
+                        .addAnnotation(Override.class)
+                        .returns(String.class)
+                        .addStatement("return $S + id()", spec.name.toString() + "#")
+                    .build()
+                );
                 write(spec.builder.build());
             }
 
@@ -239,7 +267,10 @@ public class EntityProcessor extends BaseProcessor{
     }
 
     protected ObjectSet<TypeElement> getInterfaces(TypeElement type){
-        ObjectSet<TypeElement> all = ObjectSet.with(Seq.with(type.getInterfaces()).map(this::toEl).map(e -> (TypeElement)e));
+        Seq<TypeMirror> inters = (Seq<TypeMirror>)Seq.with(type.getInterfaces());
+        inters.add(type.asType());
+
+        ObjectSet<TypeElement> all = ObjectSet.with(inters.map(this::toEl).map(e -> (TypeElement)e));
         for(TypeMirror m : type.getInterfaces()){
             if(!(m instanceof NoType)){
                 all.addAll(getInterfaces((TypeElement)toEl(m)));

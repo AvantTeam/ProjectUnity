@@ -18,7 +18,7 @@ import unity.ai.*;
 import unity.annotations.Annotations.*;
 import unity.entities.abilities.*;
 import unity.entities.bullet.*;
-import unity.entities.comp.Copterc;
+import unity.entities.comp.*;
 import unity.entities.units.*;
 import unity.graphics.*;
 import unity.type.*;
@@ -35,7 +35,7 @@ public class UnityUnitTypes implements ContentList{
 
     private static final int[] classIDs = new int[constructors.length];
     //moved to here to not confuse load order. if you want to move somewhere, change load order too.
-    public static @EntityDef(base = UnitEntity.class, def = {Copterc.class})
+    public static @EntityDef(base = UnitEntity.class, def = Copterc.class)
     UnitType caelifera, schistocerca, anthophila, vespula, lepidoptera;
 
     public static UnitType//@formatter:off
@@ -57,6 +57,9 @@ public class UnityUnitTypes implements ContentList{
 
     //public static @FactionDef(type = "end") UnitType devourer;
 
+    public static @EntityDef(base = UnitEntity.class, def = Wormc.class)
+    UnitType googol;
+
     public static int getClassId(int index){
         return classIDs[index];
     }
@@ -76,6 +79,14 @@ public class UnityUnitTypes implements ContentList{
             }
         }
         //region flying-units
+
+        googol = new UnityUnitType("project-googol"){{
+            defaultController = WormAI::new;
+            splittable = true;
+            segmentLength = 23;
+            segmentOffset = 6f;
+            headDamage = 48f;
+        }};
 
         caelifera = new UnityUnitType("caelifera"){{
             defaultController = CopterAI::new;
