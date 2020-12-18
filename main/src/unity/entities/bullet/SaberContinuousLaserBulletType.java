@@ -15,6 +15,8 @@ import unity.util.Funcs;
 
 public class SaberContinuousLaserBulletType extends ContinuousLaserBulletType{
     protected boolean swipe;
+    protected float swipeTime = 40f;
+    protected float swipeDamageMultiplier = 1f;
 
     public SaberContinuousLaserBulletType(float damage){
         super(damage);
@@ -25,7 +27,7 @@ public class SaberContinuousLaserBulletType extends ContinuousLaserBulletType{
     }
 
     float chargedDamage(Bullet b, float val){
-        return b.time < 40f ? val * (40f - b.time) : 0f;
+        return b.time < swipeTime ? swipeDamageMultiplier * val * (swipeTime - b.time) : 0f;
     }
 
     @Override
@@ -59,7 +61,7 @@ public class SaberContinuousLaserBulletType extends ContinuousLaserBulletType{
             if(Mathf.chanceDelta((0.1f + Mathf.clamp(angDst / 25f)) * b.fout()) && Mathf.round(lenRanged / 8f) >= 1) Lightning.create(b, UnityPal.scarColor, 6f + angDst * 1.7f + damageC * 2f, b.x, b.y, b.rotation(), Mathf.round(lenRanged / 8f));
             if(Mathf.chanceDelta(0.12f * b.fout())) UnityFx.falseLightning.at(b.x, b.y, b.rotation(), UnityPal.scarColor, baseLen);
             temp.rot = b.rotation();
-            Tmp.v1.trns(b.rotation(), baseLen / 2f);
+            Tmp.v1.trns(b.rotation(), (baseLen * lenscales[lenscales.length - 1]) / 2f);
             temp.fT.update(b.x + Tmp.v1.x, b.y + Tmp.v1.y, b.rotation() + 90f);
         }else{
             temp.f = length;
@@ -75,7 +77,7 @@ public class SaberContinuousLaserBulletType extends ContinuousLaserBulletType{
         float realLength = Damage.findLaserLength(b, temp.f);
         float fout = Mathf.clamp(b.time > b.lifetime - fadeTime ? 1f - (b.time - (lifetime - fadeTime)) / fadeTime : 1f);
         float baseLen = realLength * fout;
-        temp.fT.draw(UnityPal.scarColor, baseLen * 0.5f);
+        temp.fT.draw(UnityPal.scarColor, baseLen * lenscales[lenscales.length - 1] * 0.5f);
         Lines.lineAngle(b.x, b.y, b.rotation(), baseLen);
         for(int s = 0; s < colors.length; s++){
             Draw.color(Tmp.c1.set(colors[s]).mul(1f + Mathf.absin(1f, 0.1f)));

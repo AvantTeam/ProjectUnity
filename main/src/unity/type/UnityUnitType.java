@@ -9,6 +9,7 @@ import arc.util.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.type.*;
+import unity.entities.*;
 import unity.entities.comp.*;
 import unity.entities.units.*;
 
@@ -22,6 +23,7 @@ public class UnityUnitType extends UnitType{
 
     // worms
     public TextureRegion segmentRegion, tailRegion, segmentCellRegion, segmentOutline, tailOutline;
+    public TextureRegion[] abilityRegions = new TextureRegion[AbilityTextures.values().length];
     public int segmentLength = 9;
     public float segmentOffset = 23f;
         // don't touch, please
@@ -63,6 +65,10 @@ public class UnityUnitType extends UnitType{
         tailRegion = atlas.find(name + "-tail");
         segmentOutline = atlas.find(name + "-segment-outline");
         tailOutline = atlas.find(name + "-tail-outline");
+        //abilities
+        for(AbilityTextures type : AbilityTextures.values()){
+            abilityRegions[type.ordinal()] = atlas.find(name + "-" + type.name());
+        }
 
         //please do not the touch
         bodyRegion = atlas.find(name + "-body");
