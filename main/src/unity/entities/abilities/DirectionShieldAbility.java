@@ -122,17 +122,17 @@ public class DirectionShieldAbility extends Ability{
         float z = Draw.z();
         if(!(unit.type instanceof UnityUnitType type)) return;
         TextureRegion region = type.abilityRegions[AbilityTextures.shield.ordinal()];
-        float size = (Math.max(region.width, region.height) * Draw.scl) * 1.2f;
+        float size = (Math.max(region.width, region.height) * Draw.scl) * 1.3f;
         for(int i = 0; i < shields; i++){
             Tmp.v3.trns(unit.rotation + shieldAngles[i], distanceRadius);
             Tmp.v3.add(unit);
             Draw.z(z - 0.01f);
             float offset = available[i] ? 2f : 1.5f;
-            Draw.color(Color.white, Color.black, (1f - (healths[i] / maxHealth)) / offset);
+            Draw.color(Color.white, Color.black, (1f - (Mathf.clamp(healths[i] / maxHealth))) / offset);
             Draw.rect(region, Tmp.v3.x, Tmp.v3.y, shieldAngles[i] + unit.rotation);
             Draw.z(Math.min(Layer.darkness, z - 1f));
             Draw.color(Pal.shadow);
-            Draw.rect(type.softShadowRegion, unit, size, size);
+            Draw.rect(type.softShadowRegion, Tmp.v3.x, Tmp.v3.y, size, size);
         }
         Draw.z(z);
         Draw.color();

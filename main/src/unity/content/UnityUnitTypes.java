@@ -1076,7 +1076,7 @@ public class UnityUnitTypes implements ContentList{
                 x = 13.5f;
                 y = -6.5f;
                 shootY = 5f;
-                shadow = 6f;
+                shadow = 8f;
                 rotateSpeed = 5f;
                 rotate = true;
                 reload = 90f;
@@ -1095,16 +1095,36 @@ public class UnityUnitTypes implements ContentList{
                     shrinkY = 0f;
                     backColor = trailColor = UnityPal.scarColor;
                     frontColor = UnityPal.endColor;
-                    splashDamage = 46f;
+                    splashDamage = 36f;
                     splashDamageRadius = 20f;
                     weaveMag = 3f;
                     weaveScale = 6f;
                     pierceBuilding = true;
                     pierceCap = 3;
                 }};
+            }},
+            new Weapon("unity-scar-railgun"){{
+                x = 7f;
+                y = -9.25f;
+                shootY = 10.75f;
+                rotateSpeed = 2f;
+                rotate = true;
+                shadow = 12f;
+                reload = 60f * 3f;
+
+                bullet = new RailBulletType(){{
+                    damage = 800f;
+                    length = 59f * 7f;
+                    updateEffectSeg = 59f;
+                    shootEffect = UnityFx.scarRailShoot;
+                    pierceEffect = UnityFx.scarRailHit;
+                    updateEffect = UnityFx.scarRailTrail;
+                    hitEffect = Fx.massiveExplosion;
+                    pierceDamageFactor = 0.2f;
+                }};
             }});
 
-            abilities.add(new DirectionShieldAbility(4, 0.2f, 20f, 600f, 1.3f, 0.4f, hitSize / 1.42f));
+            abilities.add(new DirectionShieldAbility(4, 0.2f, 20f, 900f, 2.3f, 1.4f, hitSize / 1.42f));
         }};
 
         whirlwind = new UnityUnitType("whirlwind"){{
@@ -1596,7 +1616,7 @@ public class UnityUnitTypes implements ContentList{
         */
 
         //endregion
-        //reconstructors
+        //reconstructors    TODO should this be moved to OverWriter.java?
 
         ((Reconstructor)Blocks.additiveReconstructor).upgrades.add(
             //global
