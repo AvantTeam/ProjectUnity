@@ -55,9 +55,6 @@ public class UnityUnitTypes implements ContentList{
     public static @FactionDef(type = "monolith")
     UnitType stele, pedestal, pilaster, pylon, monument, colossus;
 
-    public static @EntityDef(base = UnitEntity.class, def = Wormc.class)
-    UnitType googol;
-
     //public static @FactionDef(type = "end") UnitType devourer;
 
     public static int getClassId(int index){
