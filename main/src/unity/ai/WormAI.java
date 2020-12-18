@@ -1,5 +1,6 @@
 package unity.ai;
 
+import arc.math.*;
 import arc.math.geom.*;
 import mindustry.ai.types.*;
 import mindustry.entities.units.*;
@@ -34,9 +35,7 @@ public class WormAI extends FlyingAI{
     protected void attack(float circleLength){
         if(worm().isHead()){
             super.attack(circleLength);
-            if(!unit.vel.isZero(0.1f)){
-                unit.rotation(unit.vel.angle());
-            }
+            updateRotation();
         }
     }
 
@@ -44,9 +43,7 @@ public class WormAI extends FlyingAI{
     protected void moveTo(Position target, float circleLength){
         if(worm().isHead()){
             super.moveTo(target, circleLength);
-            if(!unit.vel.isZero(0.1f)){
-                unit.rotation(unit.vel.angle());
-            }
+            updateRotation();
         }
     }
 
@@ -54,9 +51,13 @@ public class WormAI extends FlyingAI{
     protected void moveTo(Position target, float circleLength, float smooth){
         if(worm().isHead()){
             super.moveTo(target, circleLength, smooth);
-            if(!unit.vel.isZero(0.1f)){
-                unit.rotation(unit.vel.angle());
-            }
+            updateRotation();
+        }
+    }
+
+    protected void updateRotation(){
+        if(unit.vel.isZero(0.001f)){
+            unit.rotation(Mathf.slerpDelta(unit.rotation(), unit.vel.angle(), unit.type.rotateSpeed));
         }
     }
 

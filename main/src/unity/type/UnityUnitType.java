@@ -8,6 +8,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.type.*;
 import unity.entities.*;
 import unity.entities.comp.*;
@@ -134,7 +135,23 @@ public class UnityUnitType extends UnitType{
 
     @Override
     public void drawShadow(Unit unit){
-        super.drawShadow(unit);
+        if(unit instanceof Wormc){
+            var worm = (Unit & Wormc)unit;
+
+            Draw.color(Pal.shadow);
+            float e = Math.max(unit.elevation, visualElevation);
+
+            if(worm.isHead()){
+                Draw.rect(region, worm.x + shadowTX * e, worm.y + shadowTY * e, worm.rotation - 90);
+            }else if(worm.isTail()){
+                Draw.rect(tailRegion, worm.x + shadowTX * e, worm.y + shadowTY * e, worm.rotation - 90);
+            }else{
+                Draw.rect(bodyRegion, worm.x + shadowTX * e, worm.y + shadowTY * e, worm.rotation - 90);
+            }
+        }else{
+            super.drawShadow(unit);
+        }
+
         //worm
         if(unit instanceof WormDefaultUnit wormunit) wormunit.drawShadow();
     }
@@ -151,13 +168,12 @@ public class UnityUnitType extends UnitType{
     public void drawBody(Unit unit){
         float z = Draw.z();
 
-        // my worm lololol
         if(unit instanceof Wormc){
             var worm = (Unit & Wormc)unit;
 
             applyColor(unit);
 
-            Draw.z(1f + z + worm.layer());
+            Draw.z(1.01f + z + worm.layer());
             if(worm.isHead()){
                 Draw.rect(region, worm.x, worm.y, worm.rotation - 90);
             }else if(worm.isTail()){
@@ -184,6 +200,17 @@ public class UnityUnitType extends UnitType{
     }
 
     @Override
+    public void drawEngine(Unit unit){
+        if(unit instanceof Wormc worm){
+            if(worm.isHead() && worm.child() == null){
+                super.drawEngine(unit);
+            }
+        }else{
+            super.drawEngine(unit);
+        }
+    }
+
+    @Override
     public void drawOutline(Unit unit){
         Draw.reset();
 
@@ -198,7 +225,7 @@ public class UnityUnitType extends UnitType{
                 Draw.rect(bodyOutlineRegion, worm.x, worm.y, worm.rotation - 90);
             }
         }else{
-            super.drawBody(unit);
+            super.drawOutline(unit);
         }
     }
 
@@ -206,22 +233,23 @@ public class UnityUnitType extends UnitType{
         Draw.mixcol(Color.white, unit.hitTime);
 
         rotors.each(rotor -> {
-            TextureRegion region = rotor.bladeRegion;
-
             float offX = Angles.trnsx(unit.rotation - 90, rotor.x, rotor.y);
             float offY = Angles.trnsy(unit.rotation - 90, rotor.x, rotor.y);
 
-            float w = region.width * rotor.scale * Draw.scl;
-            float h = region.height * rotor.scale * Draw.scl;
+            float w = rotor.bladeRegion.width * rotor.scale * Draw.scl;
+            float h = rotor.bladeRegion.height * rotor.scale * Draw.scl;
 
-            for(int j = 0; j < rotor.bladeCount; j++){
-                float angle = (unit.id * 24f + Time.time * rotor.speed + (360f / (float)rotor.bladeCount) * j + rotor.rotOffset) % 360;
-                Draw.alpha(state.isPaused() ? 1f : Time.time % 2);
+            for(int i = 0; i < 2; i++){
+                for(int j = 0; j < rotor.bladeCount; j++){
+                    float angle = (unit.id * 24f + Time.time * rotor.speed + (360f / (float)rotor.bladeCount) * j + rotor.rotOffset) % 360;
+                    Draw.alpha(state.isPaused() ? 1f : Time.time % 2);
 
-                Draw.rect(region, unit.x + offX, unit.y + offY, w, h, angle);
+                    Draw.rect(i == 0 ? rotor.bladeOutlineRegion : rotor.bladeRegion, unit.x + offX, unit.y + offY, w, h, angle);
+                }
             }
 
             Draw.alpha(1f);
+            Draw.rect(rotor.topOutlineRegion, unit.x + offX, unit.y + offY, unit.rotation - 90f);
             Draw.rect(rotor.topRegion, unit.x + offX, unit.y + offY, unit.rotation - 90f);
         });
 

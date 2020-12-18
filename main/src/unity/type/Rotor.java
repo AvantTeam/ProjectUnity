@@ -6,11 +6,11 @@ import mindustry.io.*;
 
 //same as Weapon directory.
 public class Rotor{
-    public TextureRegion bladeRegion;
-    public TextureRegion topRegion;
+    public final String name;
+
+    public TextureRegion bladeRegion, bladeOutlineRegion, topRegion, topOutlineRegion;
 
     public boolean mirror = false;
-
     public float x = 0f;
     public float y = 0f;
     public float scale = 1f;
@@ -19,7 +19,6 @@ public class Rotor{
     public float speed = 29f;
 
     public int bladeCount = 4;
-    public String name;
 
     //is this not neat?
     public Rotor(String name){
@@ -28,7 +27,10 @@ public class Rotor{
 
     public void load(){
         bladeRegion = Core.atlas.find(name + "-blade");
+        bladeOutlineRegion = Core.atlas.find(name + "-blade-outline");
+
         topRegion = Core.atlas.find(name + "-top");
+        topOutlineRegion = Core.atlas.find(name + "-top-outline");
     }
 
     public Rotor copy(){

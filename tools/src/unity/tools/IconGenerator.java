@@ -19,9 +19,10 @@ import static mindustry.Vars.*;
 public class IconGenerator implements Generator{
     @Override
     public void generate(){
-        content.units().each(type -> {
-            if(type.minfo.mod == null) return;
+        content.units().each(t -> {
+            if(t.minfo.mod == null || !(t instanceof UnityUnitType)) return;
 
+            UnityUnitType type = (UnityUnitType)t;
             ObjectSet<String> outlined = new ObjectSet<>();
 
             try{
@@ -31,9 +32,9 @@ public class IconGenerator implements Generator{
                 Color outc = Pal.darkerMetal;
                 Func<Sprite, Sprite> outline = i -> i.outline(3, outc);
                 Func<TextureRegion, String> parseName = reg -> ((AtlasRegion)reg).name.replaceFirst("unity-", "");
-                Cons<TextureRegion> outliner = t -> {
-                    if(t != null){
-                        String fname = parseName.get(t);
+                Cons<TextureRegion> outliner = tr -> {
+                    if(tr != null){
+                        String fname = parseName.get(tr);
 
                         if(SpriteProcessor.has(fname)){
                             Sprite sprite = SpriteProcessor.get(fname);
@@ -47,12 +48,26 @@ public class IconGenerator implements Generator{
                         Log.warn("A region is null");
                     }
                 };
+                Cons2<String, TextureRegion> outlSeparate = (suff, tr) -> {
+                    if(tr != null){
+                        String fname = parseName.get(tr);
+
+                        if(SpriteProcessor.has(fname)){
+                            Sprite outl = outline.get(SpriteProcessor.get(fname));
+                            outl.save(fname + "-" + suff);
+                        }else{
+                            Log.warn("@ not found", fname);
+                        }
+                    }else{
+                        Log.warn("A region is null");
+                    }
+                };
 
                 for(Weapon weapon : type.weapons){
                     String fname = weapon.name.replaceFirst("unity-", "");
 
                     if(outlined.add(fname) && SpriteProcessor.has(fname)){
-                        outline.get(SpriteProcessor.get(fname)).save(fname + "-outline");
+                        outlSeparate.get("outline", weapon.region);
                     }
                 }
 
@@ -71,23 +86,18 @@ public class IconGenerator implements Generator{
                 }
 
                 if(unit instanceof Copterc){
-                    UnityUnitType t = (UnityUnitType)type;
-                    Rotor rotor = t.rotors.first();
+                    for(Rotor rotor : type.rotors){
+                        outlSeparate.get("outline", rotor.bladeRegion);
+                        outlSeparate.get("outline", rotor.topRegion);
+                    }
+                }
 
-                    outliner.get(rotor.bladeRegion);
-                    outliner.get(rotor.topRegion);
+                if(unit instanceof Wormc){
+                    outlSeparate.get("outline", type.bodyRegion);
+                    outlSeparate.get("outline", type.tailRegion);
                 }
 
                 String fname = parseName.get(type.region);
-
-                if(unit instanceof Wormc){
-                    Sprite body = outline.get(SpriteProcessor.get(fname + "-body"));
-                    Sprite tail = outline.get(SpriteProcessor.get(fname + "-tail"));
-
-                    body.save(fname + "-outline");
-                    tail.save(fname + "-outline");
-                }
-
                 Sprite outl = outline.get(SpriteProcessor.get(fname));
                 outl.save(fname + "-outline");
 

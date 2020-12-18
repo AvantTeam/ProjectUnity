@@ -1,6 +1,7 @@
 package unity.entities.comp;
 
 import arc.*;
+import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
@@ -151,12 +152,17 @@ public interface Wormc extends Unitc{
 
     default void updateMovement(){
         if(!isHead()){
-            Tmp.v1.trns(parent().vel().angle(), -segmentLength()).add(parent());
-            Tmp.v2.set(Tmp.v1).sub(this);
-            vel().add(Tmp.v2.limit(speed()));
+            Tmp.v1.trns(parent().vel().angle(), -segmentOffset()).add(parent());
+            Tmp.v2.trns(parent().vel().angle(), -segmentOffset())
+                .add(Tmp.v1)
+                .sub(this)
+                .setLength(Mathf.lerp(vel().len(), speed(), type().accel));
 
-            if(!vel().isZero(0.1f)){
-                rotation(vel().angle());
+            if(!Mathf.zero(Mathf.dst(Tmp.v2.x, Tmp.v2.y, Tmp.v1.x, Tmp.v1.y), 0.5f)){
+                vel().add(Tmp.v2).limit(speed());
+            }
+            if(!vel().isZero(0.001f)){
+                rotation(Mathf.slerpDelta(rotation(), vel().angle(), 0.2f));
             }
         }
     }

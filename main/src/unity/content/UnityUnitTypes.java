@@ -100,8 +100,9 @@ public class UnityUnitTypes implements ContentList{
 
         googol = new UnityUnitType("project-googol"){{
             defaultController = WormAI::new;
+            flying = true;
             splittable = true;
-            segmentLength = 23;
+            segmentLength = 15;
             segmentOffset = 6f;
             headDamage = 48f;
         }};
@@ -378,7 +379,7 @@ public class UnityUnitTypes implements ContentList{
 
         ((UnitFactory)Blocks.airFactory).plans.add(new UnitPlan(caelifera, 60f * 25, with(Items.silicon, 15, Items.titanium, 25)));
 
-        angel = new UnitType("angel"){{
+        angel = new UnityUnitType("angel"){{
             defaultController = UnitHealerAI::new;
             buildSpeed = 10f;
             health = 90;
@@ -393,7 +394,7 @@ public class UnityUnitTypes implements ContentList{
             hitSize = 9f;
         }};
 
-        malakhim = new UnitType("malakhim"){{
+        malakhim = new UnityUnitType("malakhim"){{
             defaultController = UnitHealerAI::new;
             buildSpeed = 15f;
             health = 170;
@@ -424,7 +425,7 @@ public class UnityUnitTypes implements ContentList{
         //endregion
         //region ground-units
 
-        projectSpiboss = new UnitType("project-spiboss"){{
+        projectSpiboss = new UnityUnitType("project-spiboss"){{
             groundLayer = Layer.legUnit + 3f;
             drag = 0.1f;
             speed = 0.4f;
@@ -522,7 +523,7 @@ public class UnityUnitTypes implements ContentList{
             weapons.add(weap4, weap5);
         }};
 
-        arcaetana = new UnitType("arcaetana"){{
+        arcaetana = new UnityUnitType("arcaetana"){{
             speed = 0.4f;
             drag = 0.12f;
             hitSize = 29f;
@@ -666,7 +667,7 @@ public class UnityUnitTypes implements ContentList{
         //region naval-units
 
         setEntity("rexed", UnitWaterMove::create);
-        rexed = new UnitType("rexed"){{
+        rexed = new UnityUnitType("rexed"){{
             speed = 0.6f;
             health = 1370;
             engineSize = 5f;
@@ -734,7 +735,7 @@ public class UnityUnitTypes implements ContentList{
         }};
 
         setEntity("storm", UnitWaterMove::create);
-        storm = new UnitType("storm"){{
+        storm = new UnityUnitType("storm"){{
             speed = 0.5f;
             health = 3450;
             engineSize = 5f;
@@ -964,7 +965,7 @@ public class UnityUnitTypes implements ContentList{
         //endregion
         //region scar
 
-        hovos = new UnitType("hovos"){{
+        hovos = new UnityUnitType("hovos"){{
             defaultController = DistanceGroundAI::new;
             speed = 0.8f;
             health = 340;
@@ -1001,7 +1002,7 @@ public class UnityUnitTypes implements ContentList{
             }});
         }};
 
-        ryzer = new UnitType("ryzer"){{
+        ryzer = new UnityUnitType("ryzer"){{
             defaultController = DistanceGroundAI::new;
             speed = 0.7f;
             health = 640;
@@ -1106,7 +1107,7 @@ public class UnityUnitTypes implements ContentList{
             abilities.add(new DirectionShieldAbility(4, 0.2f, 20f, 600f, 1.3f, 0.4f, hitSize / 1.42f));
         }};
 
-        whirlwind = new UnitType("whirlwind"){{
+        whirlwind = new UnityUnitType("whirlwind"){{
             health = 280;
             rotateSpeed = 4.5f;
             faceTarget = false;
@@ -1162,7 +1163,7 @@ public class UnityUnitTypes implements ContentList{
             }});
         }};
 
-        jetstream = new UnitType("jetstream"){{
+        jetstream = new UnityUnitType("jetstream"){{
             //description = "There will be Bloodshed"; use bundle, eye
             health = 670;
             rotateSpeed = 12.5f;
@@ -1221,7 +1222,7 @@ public class UnityUnitTypes implements ContentList{
             }});
         }};
 
-        vortex = new UnitType("vortex"){{
+        vortex = new UnityUnitType("vortex"){{
             health = 1200;
             rotateSpeed = 12.5f;
             flying = true;
@@ -1297,7 +1298,7 @@ public class UnityUnitTypes implements ContentList{
         //endregion
         //region monolith
 
-        stele = new UnitType("stele"){{
+        stele = new UnityUnitType("stele"){{
             speed = 0.5f;
             hitSize = 8f;
             health = 200;
@@ -1349,7 +1350,7 @@ public class UnityUnitTypes implements ContentList{
             }});
         }};
 
-        pedestal = new UnitType("pedestal"){{
+        pedestal = new UnityUnitType("pedestal"){{
             speed = 0.42f;
             hitSize = 11f;
             health = 600;
@@ -1390,7 +1391,7 @@ public class UnityUnitTypes implements ContentList{
             }});
         }};
 
-        pilaster = new UnitType("pilaster"){{
+        pilaster = new UnityUnitType("pilaster"){{
             speed = 0.3f;
             hitSize = 26.5f;
             health = 1000;
@@ -1428,7 +1429,7 @@ public class UnityUnitTypes implements ContentList{
             }});
         }};
 
-        pylon = new UnitType("pylon"){{
+        pylon = new UnityUnitType("pylon"){{
             speed = 0.28f;
             hitSize = 36f;
             health = 7200f;
@@ -1484,7 +1485,7 @@ public class UnityUnitTypes implements ContentList{
             }});
         }};
 
-        monument = new UnitType("monument"){{
+        monument = new UnityUnitType("monument"){{
             speed = 0.25f;
             rotateSpeed = 1.4f;
             health = 16000;
@@ -1536,7 +1537,7 @@ public class UnityUnitTypes implements ContentList{
             weapons.add(laserGun2);
         }};
 
-        colossus = new UnitType("colossus"){{
+        colossus = new UnityUnitType("colossus"){{
             speed = 0.22f;
             rotateSpeed = 1.2f;
             health = 30000;
