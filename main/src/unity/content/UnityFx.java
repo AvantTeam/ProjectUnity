@@ -553,5 +553,14 @@ public class UnityFx{
             alpha(e.fout());
             Fill.circle(e.x, e.y, e.finpow() * 8f);
         });
+    }),
+
+    flareEffect = new Effect(18f, e -> {
+        color(Pal.lightFlame, Pal.darkFlame, e.fin());
+        Lines.stroke(e.fout());
+
+        randLenVectors(e.id, 4, 5f * e.fin(), e.rotation, 15f, (x, y) -> {
+            Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 6f * e.fin());
+        });
     });
 }

@@ -5,7 +5,7 @@ import mindustry.ctype.*;
 import unity.annotations.Annotations.*;
 import unity.type.*;
 
-public interface ExpEntityc<T extends UnlockableContent, E extends ExpType<T>>{
+public abstract interface ExpEntityc<T extends UnlockableContent, E extends ExpType<T>>{
     @Initialize(eval = "0f")
     float exp();
 

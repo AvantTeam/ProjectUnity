@@ -146,15 +146,7 @@ public class EntityProcessor extends BaseProcessor{
                         }
                     }
 
-                    entity
-                        .addMethod(method.build())
-                        .addMethod(
-                            MethodSpec.methodBuilder("toString").addModifiers(Modifier.PUBLIC)
-                                .addAnnotation(Override.class)
-                                .returns(String.class)
-                                .addStatement("return $S + id()", name.toString() + "#")
-                            .build()
-                        );
+                    entity.addMethod(method.build());
                 }
 
                 EntityDefinition definition = new EntityDefinition(name.toString(), base, entity);
@@ -230,6 +222,14 @@ public class EntityProcessor extends BaseProcessor{
                 }
 
                 first = false;
+
+                spec.builder.addMethod(
+                    MethodSpec.methodBuilder("toString").addModifiers(Modifier.PUBLIC)
+                        .addAnnotation(Override.class)
+                        .returns(String.class)
+                        .addStatement("return $S + id()", spec.name.toString() + "#")
+                    .build()
+                );
                 write(spec.builder.build());
             }
 
@@ -239,7 +239,10 @@ public class EntityProcessor extends BaseProcessor{
     }
 
     protected ObjectSet<TypeElement> getInterfaces(TypeElement type){
-        ObjectSet<TypeElement> all = ObjectSet.with(Seq.with(type.getInterfaces()).map(this::toEl).map(e -> (TypeElement)e));
+        Seq<TypeMirror> inters = (Seq<TypeMirror>)Seq.with(type.getInterfaces());
+        inters.add(type.asType());
+
+        ObjectSet<TypeElement> all = ObjectSet.with(inters.map(this::toEl).map(e -> (TypeElement)e));
         for(TypeMirror m : type.getInterfaces()){
             if(!(m instanceof NoType)){
                 all.addAll(getInterfaces((TypeElement)toEl(m)));

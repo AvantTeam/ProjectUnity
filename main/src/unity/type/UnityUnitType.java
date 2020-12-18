@@ -9,20 +9,34 @@ import arc.util.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.type.*;
+import unity.entities.comp.*;
 import unity.entities.units.*;
 
-import static arc.Core.atlas;
-import static mindustry.Vars.state;
+import static arc.Core.*;
+import static mindustry.Vars.*;
 
 /*unit.entities.units might be gradually deleted.
 note that as classes are integrated, inner classes are extracted.*/
 public class UnityUnitType extends UnitType{
-    public TextureRegion segmentRegion, tailRegion, segmentCellRegion, segmentOutline, tailOutline;
-    public final Seq<Rotor> rotors = new Seq<>(4);
     public final Seq<Weapon> segWeapSeq = new Seq<>();
-    public float fallRotateSpeed = 2.5f, transformTime, segmentOffset;
+
+    // worms
+    public TextureRegion segmentRegion, tailRegion, segmentCellRegion, segmentOutline, tailOutline;
     public int segmentLength = 9;
+    public float segmentOffset = 23f;
+        // don't touch, please
+    public TextureRegion bodyRegion, bodyOutlineRegion, tailOutlineRegion;
+    public boolean splittable = false;
+    public float headDamage = 0f;
+    public float headTimer = 5f;
+
+    // transforms
     public Prov<UnitType> toTrans;
+    public float transformTime;
+
+    // copters
+    public final Seq<Rotor> rotors = new Seq<>(4);
+    public float fallRotateSpeed = 2.5f;
 
     public UnityUnitType(String name){
         super(name);
@@ -39,14 +53,22 @@ public class UnityUnitType extends UnitType{
     @Override
     public void load(){
         super.load();
+
         //copter
         rotors.each(Rotor::load);
         //worm
+
         segmentRegion = atlas.find(name + "-segment");
         segmentCellRegion = atlas.find(name + "-segment-cell");
         tailRegion = atlas.find(name + "-tail");
         segmentOutline = atlas.find(name + "-segment-outline");
         tailOutline = atlas.find(name + "-tail-outline");
+
+        //please do not the touch
+        bodyRegion = atlas.find(name + "-body");
+        bodyOutlineRegion = atlas.find(name + "-body-outline");
+        tailOutlineRegion = atlas.find(name + "-tail-outline");
+
         segWeapSeq.each(Weapon::load);
     }
 
@@ -97,8 +119,11 @@ public class UnityUnitType extends UnitType{
     @Override
     public void draw(Unit unit){
         super.draw(unit);
-        //copter
-        if(!rotors.isEmpty()) drawRotors(unit);
+
+        // copter
+        if(unit instanceof Copterc){
+            drawRotors(unit);
+        }
     }
 
     @Override
@@ -118,17 +143,54 @@ public class UnityUnitType extends UnitType{
 
     @Override
     public void drawBody(Unit unit){
-        super.drawBody(unit);
-        //worm
-        float originZ = Draw.z();
+        float z = Draw.z();
 
-        if(!(unit instanceof WormDefaultUnit wormUnit)) return;
-        for(int i = 0; i < segmentLength; i++){
-            Draw.z(originZ - (i + 1) / 500f);
-            wormUnit.segmentUnits[i].drawBody();
-            drawWeapons(wormUnit.segmentUnits[i]);
+        // my worm lololol
+        if(unit instanceof Wormc){
+            var worm = (Unit & Wormc)unit;
+
+            applyColor(unit);
+            if(worm.isHead()){
+                Draw.rect(region, worm.x, worm.y, worm.rotation - 90);
+            }else if(worm.isTail()){
+                Draw.rect(tailRegion, worm.x, worm.y, worm.rotation - 90);
+            }else{
+                Draw.rect(bodyRegion, worm.x, worm.y, worm.rotation - 90);
+            }
+
+            Draw.reset();
+        }else{
+            super.drawBody(unit);
         }
-        Draw.z(originZ);
+
+        //worm
+        if(unit instanceof WormDefaultUnit wormUnit){
+            for(int i = 0; i < segmentLength; i++){
+                Draw.z(z - (i + 1f) / 500f);
+                wormUnit.segmentUnits[i].drawBody();
+                drawWeapons(wormUnit.segmentUnits[i]);
+            }
+            Draw.z(z);
+        }
+    }
+
+    @Override
+    public void drawOutline(Unit unit){
+        Draw.reset();
+
+        if(unit instanceof Wormc){
+            var worm = (Unit & Wormc)unit;
+
+            if(worm.isHead()){
+                Draw.rect(outlineRegion, worm.x, worm.y, worm.rotation - 90);
+            }else if(worm.isTail()){
+                Draw.rect(tailOutlineRegion, worm.x, worm.y, worm.rotation - 90);
+            }else{
+                Draw.rect(bodyOutlineRegion, worm.x, worm.y, worm.rotation - 90);
+            }
+        }else{
+            super.drawBody(unit);
+        }
     }
 
     public void drawRotors(Unit unit){
