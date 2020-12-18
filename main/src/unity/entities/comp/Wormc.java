@@ -1,6 +1,7 @@
 package unity.entities.comp;
 
 import arc.*;
+import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
@@ -42,10 +43,14 @@ public interface Wormc extends Unitc{
 
     void initialized(boolean initialized);
 
-    @Initialize(eval = "false")
+    @Initialize(eval = "true")
     boolean savedAsHead();
 
     void savedAsHead(boolean savedAsHead);
+
+    float layer();
+
+    void layer(float layer);
 
     @ReadOnly
     @Initialize(eval = "new $T(1)", args = Interval.class)
@@ -66,8 +71,12 @@ public interface Wormc extends Unitc{
             int seg = healths().isEmpty() ? segmentLength() : healths().size;
             for(int i = 0; i < seg; i++){
                 Wormc child = (Wormc)type().create(team());
+                child.layer(0f - (seg / (i + 1f) * 0.1f));
                 child.rotation(rotation());
+                child.set(x(), y());
+
                 child.initialized(true);
+                child.savedAsHead(false);
                 child.add();
 
                 childs().set(i, child.id());
@@ -95,7 +104,7 @@ public interface Wormc extends Unitc{
 
     @Override
     default void update(){
-        float dmg = ((UnityUnitType)type()).headDamage;
+        float dmg = headDamage();
         if(dmg > 0f && headTimer().get(((UnityUnitType)type()).headTimer)){
             float size = hitSize() * 1.4f;
             float mul = isHead() ? 1f : 0.1f;
@@ -140,8 +149,28 @@ public interface Wormc extends Unitc{
         }
     }
 
+    default void updateMovement(){
+        if(!isHead()){
+            Tmp.v1.trns(parent().vel().angle(), -segmentLength()).add(parent());
+            Tmp.v2.set(Tmp.v1).sub(this);
+            vel().add(Tmp.v2.limit(speed()));
+
+            if(!vel().isZero(0.1f)){
+                rotation(vel().angle());
+            }
+        }
+    }
+
     default int segmentLength(){
         return ((UnityUnitType)type()).segmentLength;
+    }
+
+    default float headDamage(){
+        return ((UnityUnitType)type()).headDamage;
+    }
+
+    default float segmentOffset(){
+        return ((UnityUnitType)type()).segmentOffset;
     }
 
     default Wormc parent(){
@@ -166,11 +195,6 @@ public interface Wormc extends Unitc{
         if(isHead()) return this;
 
         Wormc worm = (Wormc)Groups.unit.getByID(headId());
-        if(worm == null || worm.dead()){
-            findHead();
-            worm = (Wormc)Groups.unit.getByID(headId());
-        }
-
         return worm;
     }
 
@@ -207,13 +231,28 @@ public interface Wormc extends Unitc{
     }
 
     @Override
+    @Replace
+    default int cap(){
+        return (Units.getCap(team()) - team().data().unitCount) * segmentLength();
+    }
+
+    @Override
+    default boolean collides(Hitboxc hitbox){
+        return hitbox instanceof Wormc worm
+        ?   !(worm.head() == head())
+        :   true;
+    }
+
+    @Override
     default void write(Writes write){
         write.bool(isHead());
 
-        write.i(childs().size);
-        for(int id : childs().items){
-            Wormc worm = (Wormc)Groups.unit.getByID(id);
-            write.f(worm.health());
+        if(isHead()){
+            write.i(childs().size);
+            for(int id : childs().items){
+                Wormc worm = (Wormc)Groups.unit.getByID(id);
+                write.f(worm.health());
+            }
         }
     }
 
@@ -221,12 +260,14 @@ public interface Wormc extends Unitc{
     default void read(Reads read){
         savedAsHead(read.bool());
 
-        healths(new FloatSeq(){{
-            setSize(read.i());
+        if(savedAsHead()){
+            healths(new FloatSeq(){{
+                setSize(read.i());
 
-            for(int i = 0; i < size; i++){
-                set(i, read.f());
-            }
-        }});
+                for(int i = 0; i < size; i++){
+                    set(i, read.f());
+                }
+            }});
+        }
     }
 }

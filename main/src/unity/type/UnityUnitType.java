@@ -150,6 +150,8 @@ public class UnityUnitType extends UnitType{
             var worm = (Unit & Wormc)unit;
 
             applyColor(unit);
+
+            Draw.z(1f + z + worm.layer());
             if(worm.isHead()){
                 Draw.rect(region, worm.x, worm.y, worm.rotation - 90);
             }else if(worm.isTail()){
@@ -170,8 +172,9 @@ public class UnityUnitType extends UnitType{
                 wormUnit.segmentUnits[i].drawBody();
                 drawWeapons(wormUnit.segmentUnits[i]);
             }
-            Draw.z(z);
         }
+
+        Draw.z(z);
     }
 
     @Override

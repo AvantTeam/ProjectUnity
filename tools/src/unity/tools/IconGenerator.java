@@ -11,7 +11,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
-import unity.gen.*;
+import unity.entities.comp.*;
 import unity.type.*;
 
 import static mindustry.Vars.*;
@@ -70,7 +70,7 @@ public class IconGenerator implements Generator{
                     outliner.get(type.legRegion);
                 }
 
-                if(unit instanceof CopterUnitEntity){
+                if(unit instanceof Copterc){
                     UnityUnitType t = (UnityUnitType)type;
                     Rotor rotor = t.rotors.first();
 
@@ -79,6 +79,14 @@ public class IconGenerator implements Generator{
                 }
 
                 String fname = parseName.get(type.region);
+
+                if(unit instanceof Wormc){
+                    Sprite body = outline.get(SpriteProcessor.get(fname + "-body"));
+                    Sprite tail = outline.get(SpriteProcessor.get(fname + "-tail"));
+
+                    body.save(fname + "-outline");
+                    tail.save(fname + "-outline");
+                }
 
                 Sprite outl = outline.get(SpriteProcessor.get(fname));
                 outl.save(fname + "-outline");

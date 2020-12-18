@@ -57,6 +57,9 @@ public class UnityUnitTypes implements ContentList{
 
     //public static @FactionDef(type = "end") UnitType devourer;
 
+    public static @EntityDef(base = UnitEntity.class, def = Wormc.class)
+    UnitType googol;
+
     public static int getClassId(int index){
         return classIDs[index];
     }
@@ -76,6 +79,14 @@ public class UnityUnitTypes implements ContentList{
             }
         }
         //region flying-units
+
+        googol = new UnityUnitType("project-googol"){{
+            defaultController = WormAI::new;
+            splittable = true;
+            segmentLength = 23;
+            segmentOffset = 6f;
+            headDamage = 48f;
+        }};
 
         caelifera = new UnityUnitType("caelifera"){{
             defaultController = CopterAI::new;
