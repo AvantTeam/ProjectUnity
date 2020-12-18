@@ -228,18 +228,18 @@ public class EntityProcessor extends BaseProcessor{
             }
 
             boolean first = true;
+            for(VariableElement e : pointers){
+                TypeElement up = (TypeElement)e.getEnclosingElement();
+                String c = e.getSimpleName().toString();
+                TypeElement type = (TypeElement)elements(e.getAnnotation(EntityPoint.class)::type).first();
+
+                init.addStatement("put($T.$L, $T::create)", tName(up), c, tName(type));
+                first = false;
+            }
+
             for(EntityDefinition spec : specs){
                 TypeElement base = spec.base;
                 ClassName specName = ClassName.get(packageName, spec.name);
-
-                for(VariableElement e : pointers){
-                    TypeElement up = (TypeElement)e.getEnclosingElement();
-                    String c = e.getSimpleName().toString();
-                    TypeElement type = (TypeElement)elements(e.getAnnotation(EntityPoint.class)::type).first();
-
-                    init.addStatement("put($T.$L, $T::new)", tName(up), c, tName(type));
-                    first = false;
-                }
 
                 if(!typeUtils.isSubtype(base.asType(), elementUtils.getTypeElement("mindustry.gen.Buildingc").asType())){
                     classId++;
