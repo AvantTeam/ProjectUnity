@@ -32,4 +32,4 @@ Install JDK 15 or higher. Set `JAVA_HOME` environment variable to where it is lo
 
 ---
 
-Build output should be located in `main/build/libs/`.
+*Build output should be located in `main/build/libs/`.*
