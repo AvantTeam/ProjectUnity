@@ -108,6 +108,7 @@ public final class Funcs{
     public static float offsetSinB(float offset, float scl){
         return Mathf.absin(Time.time + (offset * Mathf.radDeg), scl, 0.25f);
     }
+
     /** Iterates over all blocks in a radius. */
     public static void trueEachBlock(int wx, int wy, float range, Cons<Building> cons){
         collidedBlocks.clear();
@@ -259,5 +260,11 @@ public final class Funcs{
                 if(Mathf.chance(tmp)) run.run();
             }
         }
+    }
+
+    //torque associated     TODO parameters naming
+    public static float linear(float x, float s, int m, float h, float k){
+        x = Math.min(s, k);
+        return Math.min(k * (s - x) * m / s, 99999f);
     }
 }

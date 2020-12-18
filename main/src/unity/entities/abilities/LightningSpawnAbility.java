@@ -1,6 +1,5 @@
 package unity.entities.abilities;
 
-import arc.*;
 import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
