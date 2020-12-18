@@ -34,6 +34,14 @@ public class Annotations{
         Class<?>[] def();
     }
 
+    /** Indicates that this content's entity will be the one that is pointed */
+    @Target(ElementType.FIELD)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface EntityPoint{
+        /** @return The entity type */
+        Class<?> type();
+    }
+
     /** Indicates that this music belongs to a specific faction in a specific category */
     @Target(ElementType.FIELD)
     @Retention(RetentionPolicy.SOURCE)
