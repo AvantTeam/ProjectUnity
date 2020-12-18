@@ -22,10 +22,12 @@ import static javax.lang.model.type.TypeKind.*;
 
 @SuppressWarnings("unchecked")
 @SupportedAnnotationTypes({
-    "unity.annotations.Annotations.EntityDef"
+    "unity.annotations.Annotations.EntityDef",
+    "unity.annotations.Annotations.EntityPoint"
 })
 public class EntityProcessor extends BaseProcessor{
     Seq<VariableElement> defs = new Seq<>();
+    Seq<VariableElement> pointers = new Seq<>();
     ObjectSet<EntityDefinition> specs = new ObjectSet<>();
     ObjectMap<EntityDefinition, Seq<VariableElement>> defMap = new ObjectMap<>();
 
@@ -36,6 +38,7 @@ public class EntityProcessor extends BaseProcessor{
     @Override
     public void process(RoundEnvironment roundEnv) throws Exception{
         defs.addAll((Set<VariableElement>)roundEnv.getElementsAnnotatedWith(EntityDef.class));
+        pointers.addAll((Set<VariableElement>)roundEnv.getElementsAnnotatedWith(EntityPoint.class));
 
         if(round == 1){
             for(VariableElement e : defs){
@@ -225,6 +228,15 @@ public class EntityProcessor extends BaseProcessor{
             }
 
             boolean first = true;
+            for(VariableElement e : pointers){
+                TypeElement up = (TypeElement)e.getEnclosingElement();
+                String c = e.getSimpleName().toString();
+                TypeElement type = (TypeElement)elements(e.getAnnotation(EntityPoint.class)::type).first();
+
+                init.addStatement("put($T.$L, $T::create)", tName(up), c, tName(type));
+                first = false;
+            }
+
             for(EntityDefinition spec : specs){
                 TypeElement base = spec.base;
                 ClassName specName = ClassName.get(packageName, spec.name);
@@ -248,8 +260,6 @@ public class EntityProcessor extends BaseProcessor{
 
                     init.addStatement("put($T.$L, $T::new)", tName(up), c, specName);
                 }
-
-                first = false;
 
                 spec.builder.addMethod(
                     MethodSpec.methodBuilder("toString").addModifiers(Modifier.PUBLIC)

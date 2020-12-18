@@ -34,29 +34,47 @@ public class UnityUnitTypes implements ContentList{
     };
 
     private static final int[] classIDs = new int[constructors.length];
-    //moved to here to not confuse load order. if you want to move somewhere, change load order too.
+
+    /** Global {@linkplain Copterc copter} units */
     public static @EntityDef(base = UnitEntity.class, def = Copterc.class)
     UnitType caelifera, schistocerca, anthophila, vespula, lepidoptera;
 
-    public static UnitType//@formatter:off
-    //flying-units
-    angel, malakhim,
-    //ground-units  @formatter:on
-    arcaetana, projectSpiboss,
+    /** Global {@linkplain UnitEntity flying} units */
+    public static @EntityPoint(type = UnitEntity.class)
+    UnitType angel, malakhim;
+
+    /** Global {@linkplain LegsUnit legs} units */
+    public static @EntityPoint(type = LegsUnit.class)
+    UnitType arcaetana, projectSpiboss;
+
+    /** Global naval units */
+    public static UnitType
     //naval-units
     rexed, storm, amphibiNaval, amphibi, craberNaval, craber;
 
-    public static @FactionDef(type = "scar")
-    UnitType hovos, ryzer, sundown, whirlwind, jetstream, vortex;
+    /** Scar {@linkplain LegsUnit legs} units */
+    public static @FactionDef(type = "scar") @EntityPoint(type = LegsUnit.class)
+    UnitType hovos, ryzer, sundown;
 
+    /** Scar {@linkplain UnitEntity flying} units */
+    public static @FactionDef(type = "scar") @EntityPoint(type = UnitEntity.class)
+    UnitType whirlwind, jetstream, vortex;
+
+    /** Imber 'whatever this is' units */
     public static @FactionDef(type = "imber")
     UnitType arcnelidia;
 
-    public static @FactionDef(type = "monolith")
-    UnitType stele, pedestal, pilaster, pylon, monument, colossus;
+    /** Monolith {@linkplain MechUnit mech} units */
+    public static @FactionDef(type = "monolith") @EntityPoint(type = MechUnit.class)
+    UnitType stele, pedestal, pilaster;
+
+    /** Monolith {@linkplain LegsUnit legs} units */
+    public static @FactionDef(type = "monolith") @EntityPoint(type = LegsUnit.class)
+    UnitType pylon, monument, colossus;
 
     //public static @FactionDef(type = "end") UnitType devourer;
 
+    /** Don't even bother */
     public static @EntityDef(base = UnitEntity.class, def = Wormc.class)
     UnitType googol;
 
@@ -360,7 +378,6 @@ public class UnityUnitTypes implements ContentList{
 
         ((UnitFactory)Blocks.airFactory).plans.add(new UnitPlan(caelifera, 60f * 25, with(Items.silicon, 15, Items.titanium, 25)));
 
-        setEntity("angel", UnitEntity::create);
         angel = new UnitType("angel"){{
             defaultController = UnitHealerAI::new;
             buildSpeed = 10f;
@@ -376,7 +393,6 @@ public class UnityUnitTypes implements ContentList{
             hitSize = 9f;
         }};
 
-        setEntity("malakhim", UnitEntity::create);
         malakhim = new UnitType("malakhim"){{
             defaultController = UnitHealerAI::new;
             buildSpeed = 15f;
@@ -408,7 +424,6 @@ public class UnityUnitTypes implements ContentList{
         //endregion
         //region ground-units
 
-        setEntity("project-spiboss", LegsUnit::create);
         projectSpiboss = new UnitType("project-spiboss"){{
             groundLayer = Layer.legUnit + 3f;
             drag = 0.1f;
@@ -507,7 +522,6 @@ public class UnityUnitTypes implements ContentList{
             weapons.add(weap4, weap5);
         }};
 
-        setEntity("arcaetana", LegsUnit::create);
         arcaetana = new UnitType("arcaetana"){{
             speed = 0.4f;
             drag = 0.12f;
@@ -950,7 +964,6 @@ public class UnityUnitTypes implements ContentList{
         //endregion
         //region scar
 
-        setEntity("hovos", LegsUnit::create);
         hovos = new UnitType("hovos"){{
             defaultController = DistanceGroundAI::new;
             speed = 0.8f;
@@ -988,7 +1001,6 @@ public class UnityUnitTypes implements ContentList{
             }});
         }};
 
-        setEntity("ryzer", LegsUnit::create);
         ryzer = new UnitType("ryzer"){{
             defaultController = DistanceGroundAI::new;
             speed = 0.7f;
@@ -1046,7 +1058,6 @@ public class UnityUnitTypes implements ContentList{
             });
         }};
 
-        setEntity("sundown", LegsUnit::create);
         sundown = new UnityUnitType("sundown"){{
             defaultController = DistanceGroundAI::new;
             speed = 0.5f;
@@ -1095,7 +1106,6 @@ public class UnityUnitTypes implements ContentList{
             abilities.add(new DirectionShieldAbility(4, 0.2f, 20f, 600f, 1.3f, 0.4f, hitSize / 1.42f));
         }};
 
-        setEntity("whirlwind", UnitEntity::create);
         whirlwind = new UnitType("whirlwind"){{
             health = 280;
             rotateSpeed = 4.5f;
@@ -1152,7 +1162,6 @@ public class UnityUnitTypes implements ContentList{
             }});
         }};
 
-        setEntity("jetstream", UnitEntity::create);
         jetstream = new UnitType("jetstream"){{
             //description = "There will be Bloodshed"; use bundle, eye
             health = 670;
@@ -1212,7 +1221,6 @@ public class UnityUnitTypes implements ContentList{
             }});
         }};
 
-        setEntity("vortex", UnitEntity::create);
         vortex = new UnitType("vortex"){{
             health = 1200;
             rotateSpeed = 12.5f;
@@ -1289,7 +1297,6 @@ public class UnityUnitTypes implements ContentList{
         //endregion
         //region monolith
 
-        setEntity("stele", MechUnit::create);
         stele = new UnitType("stele"){{
             speed = 0.5f;
             hitSize = 8f;
@@ -1342,7 +1349,6 @@ public class UnityUnitTypes implements ContentList{
             }});
         }};
 
-        setEntity("pedestal", MechUnit::create);
         pedestal = new UnitType("pedestal"){{
             speed = 0.42f;
             hitSize = 11f;
@@ -1384,7 +1390,6 @@ public class UnityUnitTypes implements ContentList{
             }});
         }};
 
-        setEntity("pilaster", MechUnit::create);
         pilaster = new UnitType("pilaster"){{
             speed = 0.3f;
             hitSize = 26.5f;
@@ -1423,7 +1428,6 @@ public class UnityUnitTypes implements ContentList{
             }});
         }};
 
-        setEntity("pylon", LegsUnit::create);
         pylon = new UnitType("pylon"){{
             speed = 0.28f;
             hitSize = 36f;
@@ -1480,7 +1484,6 @@ public class UnityUnitTypes implements ContentList{
             }});
         }};
 
-        setEntity("monument", LegsUnit::create);
         monument = new UnitType("monument"){{
             speed = 0.25f;
             rotateSpeed = 1.4f;
@@ -1533,7 +1536,6 @@ public class UnityUnitTypes implements ContentList{
             weapons.add(laserGun2);
         }};
 
-        setEntity("colossus", LegsUnit::create);
         colossus = new UnitType("colossus"){{
             speed = 0.22f;
             rotateSpeed = 1.2f;
