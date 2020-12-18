@@ -1104,7 +1104,7 @@ public class UnityUnitTypes implements ContentList{
             }},
             new Weapon("unity-scar-railgun"){{
                 x = 7f;
-                y = -7.25f;
+                y = -9.25f;
                 shootY = 10.75f;
                 rotateSpeed = 2f;
                 rotate = true;
