@@ -103,7 +103,7 @@ public class UnityUnitTypes implements ContentList{
             flying = true;
             splittable = true;
             segmentLength = 15;
-            segmentOffset = 6f;
+            segmentOffset = 4.5f;
             headDamage = 48f;
         }};
 

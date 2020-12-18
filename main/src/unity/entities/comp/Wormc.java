@@ -158,7 +158,7 @@ public interface Wormc extends Unitc{
                 .sub(this)
                 .setLength(Mathf.lerp(vel().len(), speed(), type().accel));
 
-            if(!Mathf.zero(Mathf.dst(Tmp.v2.x, Tmp.v2.y, Tmp.v1.x, Tmp.v1.y), 0.5f)){
+            if(dst(parent()) >= segmentOffset() * 2f){
                 vel().add(Tmp.v2).limit(speed());
             }
             if(!vel().isZero(0.001f)){
