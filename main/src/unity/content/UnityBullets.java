@@ -18,6 +18,7 @@ import mindustry.world.blocks.defense.turrets.*;
 import unity.entities.bullet.*;
 
 import arc.graphics.g2d.*;
+import unity.graphics.*;
 
 import static arc.math.Mathf.*;
 import static mindustry.Vars.*;
@@ -27,7 +28,7 @@ import static unity.content.UnityFx.*;
 
 public class UnityBullets implements ContentList{
     public static BulletType laser, coalBlaze, pyraBlaze, falloutLaser, catastropheLaser, calamityLaser, extinctionLaser, orb, shockBeam, currentStroke,
-        shielderBullet, plasmaFragTriangle, plasmaTriangle, pylonLightning, pylonLaser, pylonLaserSmall, exporb, monumentRailBullet;
+        shielderBullet, plasmaFragTriangle, plasmaTriangle, pylonLightning, pylonLaser, pylonLaserSmall, exporb, monumentRailBullet, scarShrapnel;
 
     //only enhanced
     public static BasicBulletType standardDenseLarge, standardHomingLarge, standardIncendiaryLarge, standardThoriumLarge, standardDenseHeavy, standardHomingHeavy, standardIncendiaryHeavy, standardThoriumHeavy, standardDenseMassive, standardHomingMassive,
@@ -373,6 +374,13 @@ public class UnityBullets implements ContentList{
             despawnEffect = monumentDespawn;
             smokeEffect = shootEffect = Fx.blastExplosion;
             trailEffect = monumentTrail;
+        }};
+
+        scarShrapnel = new ShrapnelBulletType(){{
+            fromColor = UnityPal.endColor;
+            toColor = UnityPal.scarColor;
+            damage = 1f;
+            length = 110f;
         }};
 
         //only enhanced

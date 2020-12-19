@@ -10,6 +10,7 @@ import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import unity.content.*;
 import unity.entities.*;
 import unity.type.*;
 import unity.util.*;
@@ -26,6 +27,9 @@ public class DirectionShieldAbility extends Ability{
     public float shieldSize;
     public float shieldSpeed;
     public Interval timer = new Interval();
+
+    public float explosiveReflectDamageMultiplier = 0.7f;
+    public float explosiveDamageThreshold = 90f;
 
     public DirectionShieldAbility(int shields, float speed, float size, float health, float regen, float disableRegen, float distance){
         shieldSpeed = speed;
@@ -48,7 +52,10 @@ public class DirectionShieldAbility extends Ability{
 
     @Override
     public Ability copy(){
-        return new DirectionShieldAbility(shields, shieldSpeed, shieldSize, maxHealth, shieldRegen, disableRegen, distanceRadius);
+        DirectionShieldAbility instance = new DirectionShieldAbility(shields, shieldSpeed, shieldSize, maxHealth, shieldRegen, disableRegen, distanceRadius);
+        instance.explosiveReflectDamageMultiplier = explosiveReflectDamageMultiplier;
+        instance.explosiveDamageThreshold = explosiveDamageThreshold;
+        return instance;
     }
 
     protected void updateShields(Unit unit){
@@ -77,9 +84,19 @@ public class DirectionShieldAbility extends Ability{
                         if(!available[n.id]) return;
                         Vec2 vec = Geometry.raycastRect(n.nodeA.x, n.nodeA.y, n.nodeB.x, n.nodeB.y, Tmp.r2);
                         if(vec != null){
-                            healths[n.id] -= Funcs.getBulletDamage(b.type) * (b.damage() / (b.type.damage * b.damageMultiplier()));
+                            float d = Funcs.getBulletDamage(b.type) * (b.damage() / (b.type.damage * b.damageMultiplier()));
+                            healths[n.id] -= d;
                             b.damage(b.damage() / 1.5f);
                             float angC = unit.angleTo(b) + Mathf.range(15f);
+                            if(explosiveReflectDamageMultiplier > 0f && d >= explosiveDamageThreshold){
+                                for(int i = 0; i < 3; i++){
+                                    float off = (i * 20f - (3 - 1) * 20f / 2f);
+                                    Tmp.v4.set(n.nodeA);
+                                    Tmp.v4.add(n.nodeB);
+                                    Tmp.v4.scl(0.5f);
+                                    UnityBullets.scarShrapnel.create(unit, unit.team, Tmp.v4.x, Tmp.v4.y, angC + off, d * explosiveReflectDamageMultiplier, 1f, 1f, null);
+                                }
+                            }
                             b.team(unit.team());
                             b.rotation(angC);
                             if(healths[n.id] < 0) available[n.id] = false;
