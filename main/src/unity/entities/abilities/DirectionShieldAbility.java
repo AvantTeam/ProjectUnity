@@ -6,6 +6,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.content.*;
 import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
@@ -109,6 +110,11 @@ public class DirectionShieldAbility extends Ability{
             if(available[i]){
                 healths[i] = Math.min(healths[i] + (shieldRegen * Time.delta), maxHealth);
             }else{
+                if(Mathf.chanceDelta(0.21 * (1f - Mathf.clamp(healths[i] / maxHealth)))){
+                    Tmp.v1.trns(unit.rotation + shieldAngles[i], distanceRadius);
+                    Tmp.v1.add(unit);
+                    Fx.smoke.at(Tmp.v1.x + Mathf.range(shieldSize / 4f), Tmp.v1.y + Mathf.range(shieldSize / 4f));
+                }
                 healths[i] = Math.min(healths[i] + (disableRegen * Time.delta), maxHealth);
                 if(healths[i] >= maxHealth) available[i] = true;
             }
@@ -143,13 +149,22 @@ public class DirectionShieldAbility extends Ability{
         for(int i = 0; i < shields; i++){
             Tmp.v3.trns(unit.rotation + shieldAngles[i], distanceRadius);
             Tmp.v3.add(unit);
-            Draw.z(z - 0.01f);
+            Draw.z(z - 0.0098f);
             float offset = available[i] ? 2f : 1.5f;
             Draw.color(Color.white, Color.black, (1f - (Mathf.clamp(healths[i] / maxHealth))) / offset);
             Draw.rect(region, Tmp.v3.x, Tmp.v3.y, shieldAngles[i] + unit.rotation);
             Draw.z(Math.min(Layer.darkness, z - 1f));
             Draw.color(Pal.shadow);
             Draw.rect(type.softShadowRegion, Tmp.v3.x, Tmp.v3.y, size, size);
+            Draw.z(z - 0.0099f);
+            float engScl = shieldSize / 4f;
+            float liveScl = (engScl - (engScl / 4f)) + Mathf.absin(Time.time, 2f, engScl / 4f);
+            Tmp.v3.trns(unit.rotation + shieldAngles[i], distanceRadius - (engScl / 1.7f));
+            Tmp.v3.add(unit);
+            Draw.color(unit.team.color);
+            Fill.circle(Tmp.v3.x, Tmp.v3.y, liveScl);
+            Draw.color(Color.white);
+            Fill.circle(Tmp.v3.x, Tmp.v3.y, liveScl / 2f);
         }
         Draw.z(z);
         Draw.color();
