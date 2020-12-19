@@ -17,6 +17,8 @@ import unity.type.*;
 import unity.util.*;
 
 public class DirectionShieldAbility extends Ability{
+    protected final float shieldWidth = 7f;
+
     public int shields;
     public float[] shieldAngles;
     public float[] healths;
@@ -63,9 +65,9 @@ public class DirectionShieldAbility extends Ability{
         Tmp.r1.setCentered(unit.x, unit.y, shieldSize);
         Seq<ShieldNode> nodes = new Seq<>();
         for(int i = 0; i < shields; i++){
-            Tmp.v1.trns(unit.rotation + shieldAngles[i], distanceRadius);
+            Tmp.v1.trns(unit.rotation + shieldAngles[i], distanceRadius - (shieldWidth / 2f));
             Tmp.v1.add(unit);
-            Tmp.v2.trns(unit.rotation + shieldAngles[i] + 90, shieldSize / 2f);
+            Tmp.v2.trns(unit.rotation + shieldAngles[i] + 90, (shieldSize / 2f) - (shieldWidth / 2f));
 
             ShieldNode ts = new ShieldNode();
             ts.id = i;
@@ -80,7 +82,7 @@ public class DirectionShieldAbility extends Ability{
             Groups.bullet.intersect(Tmp.r1.x, Tmp.r1.y, Tmp.r1.width, Tmp.r1.height, b -> {
                 if(b.team != unit.team && !(b.type instanceof ContinuousLaserBulletType || b.type instanceof LaserBulletType) && !b.type.scaleVelocity){
                     b.hitbox(Tmp.r2);
-                    Tmp.r2.grow(5f);
+                    Tmp.r2.grow(shieldWidth);
                     nodes.each(n -> {
                         if(!available[n.id]) return;
                         Vec2 vec = Geometry.raycastRect(n.nodeA.x, n.nodeA.y, n.nodeB.x, n.nodeB.y, Tmp.r2);
