@@ -87,7 +87,7 @@ dependencies{
     implementation "com.github.younggam:multi-lib:$multilibVersion"
     annotationProcessor "com.github.bsideup.jabel:jabel-javac-plugin:0.3.0"
 
-    compileOnly project(":annotations")
+    implementation project(":annotations")
     annotationProcessor project(":annotations")
 
     compileJava.options.compilerArgs.addAll([

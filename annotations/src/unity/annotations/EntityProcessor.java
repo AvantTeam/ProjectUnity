@@ -156,8 +156,6 @@ public class EntityProcessor extends BaseProcessor{
 
                                 if(i < appenders.size - 1){
                                     builder.append(" && ");
-                                }else{
-                                    builder.append(";");
                                 }
                             }
 
@@ -172,6 +170,9 @@ public class EntityProcessor extends BaseProcessor{
                             if(!returns){
                                 method.addStatement("$T.super.$L(" + params.toString() + ")", mArgs);
                             }else{
+                                if(replacers.size > 1){
+                                    throw new IllegalArgumentException("There is more than 1 method replacer for method with non-void return type: '" + appended.getSimpleName().toString() + "'");
+                                }
                                 method.addStatement("return $T.super.$L(" + params.toString() + ")", mArgs);
                             }
                         }
@@ -277,17 +278,21 @@ public class EntityProcessor extends BaseProcessor{
     }
 
     protected ObjectSet<TypeElement> getInterfaces(TypeElement type){
+        if(type == null) return new ObjectSet<>();
+
         Seq<TypeMirror> inters = (Seq<TypeMirror>)Seq.with(type.getInterfaces());
         inters.add(type.asType());
+        inters.add(type.getSuperclass());
 
         ObjectSet<TypeElement> all = ObjectSet.with(inters.map(this::toEl).map(e -> (TypeElement)e));
+        all.addAll(getInterfaces((TypeElement)toEl(type.getSuperclass())));
         for(TypeMirror m : type.getInterfaces()){
             if(!(m instanceof NoType)){
                 all.addAll(getInterfaces((TypeElement)toEl(m)));
             }
         }
 
-        return all;
+        return all.select(e -> !(e instanceof NoType));
     }
 
     protected ObjectMap<ExecutableElement, Seq<ExecutableElement>> getAppendedMethods(TypeElement base, TypeElement comp){
@@ -298,12 +303,22 @@ public class EntityProcessor extends BaseProcessor{
         );
 
         for(ExecutableElement e : toAppend){
-            ExecutableElement append = baseMethods.find(m ->
-                m.getReturnType().equals(e.getReturnType()) &&
-                m.getSimpleName().toString().equals(e.getSimpleName().toString()) &&
-                m.getTypeParameters().equals(e.getTypeParameters()) &&
-                m.getParameters().equals(e.getParameters())
-            );
+            ExecutableElement append = baseMethods.find(m -> {
+                boolean equal = m.getParameters().size() == e.getParameters().size();
+                for(int i = 0; i < m.getParameters().size(); i++){
+                    try{
+                        VariableElement up = m.getParameters().get(i);
+                        VariableElement c = e.getParameters().get(i);
+
+                        equal = typeUtils.isSameType(up.asType(), c.asType());
+                        if(!equal) break;
+                    }catch(IndexOutOfBoundsException ex){
+                        return false;
+                    }
+                }
+
+                return m.getSimpleName().toString().equals(e.getSimpleName().toString()) && equal;
+            });
 
             if(append != null){
                 appending.get(append, Seq::new).add(e);
@@ -340,10 +355,10 @@ public class EntityProcessor extends BaseProcessor{
     }
 
     protected Seq<ExecutableElement> getMethodsRec(TypeElement type){
-        Seq<ExecutableElement> methods = new Seq<>();
+        Seq<ExecutableElement> methods = getMethods(type);
         getInterfaces(type).each(t -> 
             getMethods(t).each(m ->
-                !methods.contains(mm -> elementUtils.overrides(mm, m, (TypeElement)mm.getEnclosingElement()))
+                !methods.contains(mm -> elementUtils.overrides(mm, m, type))
             ,
             methods::add)
         );

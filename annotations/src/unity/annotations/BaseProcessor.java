@@ -58,7 +58,7 @@ public abstract class BaseProcessor extends AbstractProcessor{
         try{
             process(roundEnv);
         }catch(Exception e){
-            e.printStackTrace();
+            Log.err(e);
             throw new RuntimeException(e);
         }
 

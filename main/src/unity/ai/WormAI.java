@@ -57,7 +57,7 @@ public class WormAI extends FlyingAI{
 
     protected void updateRotation(){
         if(unit.vel.isZero(0.001f)){
-            unit.rotation(Mathf.slerpDelta(unit.rotation(), unit.vel.angle(), unit.type.rotateSpeed));
+            unit.rotation(Mathf.slerpDelta(unit.rotation(), unit.vel.angle(), unit.type.rotateSpeed / 60f));
         }
     }
 

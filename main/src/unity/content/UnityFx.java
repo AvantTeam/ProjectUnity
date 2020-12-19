@@ -559,8 +559,8 @@ public class UnityFx{
         color(Pal.lightFlame, Pal.darkFlame, e.fin());
         Lines.stroke(e.fout());
 
-        randLenVectors(e.id, 4, 5f * e.fin(), e.rotation, 15f, (x, y) -> {
-            Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 6f * e.fin());
+        randLenVectors(e.id, 6, 8f * e.finpow(), e.rotation, 18f, (x, y) -> {
+            Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 12f * e.fin());
         });
     });
 }

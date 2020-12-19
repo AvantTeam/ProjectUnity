@@ -105,6 +105,7 @@ public class UnityUnitTypes implements ContentList{
             segmentLength = 15;
             segmentOffset = 4.5f;
             headDamage = 48f;
+            speed = 3f;
         }};
 
         caelifera = new UnityUnitType("caelifera"){{
