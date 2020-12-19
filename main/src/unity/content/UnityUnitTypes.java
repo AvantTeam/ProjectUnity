@@ -1063,11 +1063,12 @@ public class UnityUnitTypes implements ContentList{
         sundown = new UnityUnitType("sundown"){{
             defaultController = DistanceGroundAI::new;
             speed = 0.5f;
-            health = 8700f;
+            health = 9400f;
             hitSize = 36f;
-            range = 260f;
+            range = 340f;
             allowLegStep = true;
             legMoveSpace = 0.53f;
+            rotateSpeed = 2.5f;
             legCount = 4;
             legTrns = 0.4f;
             legLength = 44f;
@@ -1080,15 +1081,15 @@ public class UnityUnitTypes implements ContentList{
                 shadow = 8f;
                 rotateSpeed = 5f;
                 rotate = true;
-                reload = 90f;
+                reload = 80f;
                 shake = 1f;
                 shots = 12;
-                inaccuracy = 26f;
+                inaccuracy = 19f;
                 velocityRnd = 0.2f;
                 xRand = 1.2f;
                 shootSound = Sounds.bigshot;
 
-                bullet = new MissileBulletType(6f, 7f){{
+                bullet = new MissileBulletType(6f, 12f){{
                     lifetime = 70f;
                     speed = 5f;
                     width = 7f;
@@ -1111,7 +1112,7 @@ public class UnityUnitTypes implements ContentList{
                 rotateSpeed = 2f;
                 rotate = true;
                 shadow = 12f;
-                reload = 60f * 3f;
+                reload = 60f * 2.7f;
 
                 bullet = new RailBulletType(){{
                     damage = 800f;
@@ -1125,7 +1126,7 @@ public class UnityUnitTypes implements ContentList{
                 }};
             }});
 
-            abilities.add(new DirectionShieldAbility(4, 0.2f, 20f, 900f, 2.3f, 1.4f, hitSize / 1.42f));
+            abilities.add(new DirectionShieldAbility(4, 0.1f, 20f, 1600f, 2.3f, 1.3f, 29.2f));
         }};
 
         whirlwind = new UnityUnitType("whirlwind"){{
