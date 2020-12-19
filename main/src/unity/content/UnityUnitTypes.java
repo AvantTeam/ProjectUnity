@@ -1126,7 +1126,7 @@ public class UnityUnitTypes implements ContentList{
                 }};
             }});
 
-            abilities.add(new DirectionShieldAbility(4, 0.1f, 20f, 1600f, 2.3f, 1.3f, 29.2f));
+            abilities.add(new DirectionShieldAbility(4, 0.1f, 20f, 1600f, 2.3f, 1.3f, 32.2f));
         }};
 
         whirlwind = new UnityUnitType("whirlwind"){{

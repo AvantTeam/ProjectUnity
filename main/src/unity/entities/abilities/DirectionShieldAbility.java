@@ -65,9 +65,9 @@ public class DirectionShieldAbility extends Ability{
         Tmp.r1.setCentered(unit.x, unit.y, shieldSize);
         Seq<ShieldNode> nodes = new Seq<>();
         for(int i = 0; i < shields; i++){
-            Tmp.v1.trns(unit.rotation + shieldAngles[i], distanceRadius - (shieldWidth / 2f));
+            Tmp.v1.trns(shieldAngles[i], distanceRadius - (shieldWidth / 2f));
             Tmp.v1.add(unit);
-            Tmp.v2.trns(unit.rotation + shieldAngles[i] + 90, (shieldSize / 2f) - (shieldWidth / 2f));
+            Tmp.v2.trns(shieldAngles[i] + 90, (shieldSize / 2f) - (shieldWidth / 2f));
 
             ShieldNode ts = new ShieldNode();
             ts.id = i;
@@ -113,7 +113,7 @@ public class DirectionShieldAbility extends Ability{
                 healths[i] = Math.min(healths[i] + (shieldRegen * Time.delta), maxHealth);
             }else{
                 if(Mathf.chanceDelta(0.21 * (1f - Mathf.clamp(healths[i] / maxHealth)))){
-                    Tmp.v1.trns(unit.rotation + shieldAngles[i], distanceRadius);
+                    Tmp.v1.trns(shieldAngles[i], distanceRadius);
                     Tmp.v1.add(unit);
                     Fx.smoke.at(Tmp.v1.x + Mathf.range(shieldSize / 4f), Tmp.v1.y + Mathf.range(shieldSize / 4f));
                 }
@@ -128,14 +128,14 @@ public class DirectionShieldAbility extends Ability{
         if(unit.isShooting()){
             float size = ((shieldSize * 6f) / Mathf.sqrt(distanceRadius / 3f));
             for(int i = 0; i < shields; i++){
-                float ang = Mathf.mod((i * size - (shields - 1) * size / 2f), 360f);
+                float ang = Mathf.mod((i * size - (shields - 1) * size / 2f) + unit.rotation, 360f);
                 //float ang = (-shields + (i * shields)) * (size / shields);
                 shieldAngles[i] = Mathf.slerpDelta(shieldAngles[i], ang, shieldSpeed);
             }
         }else{
             float offset = (360f / shields) / 2f;
             for(int i = 0; i < shields; i++){
-                float ang = Mathf.mod((i * 360f / shields) + offset, 360f);
+                float ang = Mathf.mod(((i * 360f / shields) + offset) + unit.rotation + 180f, 360f);
                 shieldAngles[i] = Mathf.slerpDelta(shieldAngles[i], ang, shieldSpeed);
             }
         }
@@ -149,19 +149,19 @@ public class DirectionShieldAbility extends Ability{
         TextureRegion region = type.abilityRegions[AbilityTextures.shield.ordinal()];
         float size = (Math.max(region.width, region.height) * Draw.scl) * 1.3f;
         for(int i = 0; i < shields; i++){
-            Tmp.v3.trns(unit.rotation + shieldAngles[i], distanceRadius);
+            Tmp.v3.trns(shieldAngles[i], distanceRadius);
             Tmp.v3.add(unit);
             Draw.z(z - 0.0098f);
             float offset = available[i] ? 2f : 1.5f;
             Draw.color(Color.white, Color.black, (1f - (Mathf.clamp(healths[i] / maxHealth))) / offset);
-            Draw.rect(region, Tmp.v3.x, Tmp.v3.y, shieldAngles[i] + unit.rotation);
+            Draw.rect(region, Tmp.v3.x, Tmp.v3.y, shieldAngles[i]);
             Draw.z(Math.min(Layer.darkness, z - 1f));
             Draw.color(Pal.shadow);
             Draw.rect(type.softShadowRegion, Tmp.v3.x, Tmp.v3.y, size, size);
             Draw.z(z - 0.0099f);
             float engScl = shieldSize / 4f;
             float liveScl = (engScl - (engScl / 4f)) + Mathf.absin(Time.time, 2f, engScl / 4f);
-            Tmp.v3.trns(unit.rotation + shieldAngles[i], distanceRadius - (engScl / 1.7f));
+            Tmp.v3.trns(shieldAngles[i], distanceRadius - (engScl / 1.5f));
             Tmp.v3.add(unit);
             Draw.color(unit.team.color);
             Fill.circle(Tmp.v3.x, Tmp.v3.y, liveScl);
