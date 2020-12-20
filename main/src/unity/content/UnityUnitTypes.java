@@ -49,8 +49,8 @@ public class UnityUnitTypes implements ContentList{
 
     /** Global naval units */
     public static UnitType
-    //naval-units
-    rexed, storm, amphibiNaval, amphibi, craberNaval, craber;
+        //naval-units
+        rexed, storm, amphibiNaval, amphibi, craberNaval, craber;
 
     /** Scar {@linkplain LegsUnit legs} units */
     public static @FactionDef(type = "scar") @EntityPoint(type = LegsUnit.class)
@@ -1072,64 +1072,66 @@ public class UnityUnitTypes implements ContentList{
             legTrns = 0.4f;
             legLength = 40f;
             legExtension = -9.3f;
-            weapons.add(new Weapon(){{
-                x = 0f;
-                y = 12f;
-                shootY = 0f;
-                mirror = false;
-                rotate = false;
-                shake = 2.3f;
-                reload = 2.75f * 60f;
+            weapons.add(
+                new Weapon(){{
+                    x = 0f;
+                    y = 12f;
+                    shootY = 0f;
+                    mirror = false;
+                    rotate = false;
+                    shake = 2.3f;
+                    reload = 2.75f * 60f;
 
-                bullet = new RailBulletType(){{
-                    damage = 780f;
-                    length = 60f * 7f;
-                    updateEffectSeg = 60f;
-                    shootEffect = UnityFx.scarRailShoot;
-                    pierceEffect = UnityFx.scarRailHit;
-                    updateEffect = UnityFx.scarRailTrail;
-                    hitEffect = Fx.massiveExplosion;
-                    pierceDamageFactor = 0.2f;
-                }};
-            }},
-            new Weapon(){{
-                x = 10.25f;
-                y = 2f;
-                rotate = false;
-                shake = 1.1f;
-                reload = 2.25f * 70f;
+                    bullet = new RailBulletType(){{
+                        damage = 780f;
+                        length = 60f * 7f;
+                        updateEffectSeg = 60f;
+                        shootEffect = UnityFx.scarRailShoot;
+                        pierceEffect = UnityFx.scarRailHit;
+                        updateEffect = UnityFx.scarRailTrail;
+                        hitEffect = Fx.massiveExplosion;
+                        pierceDamageFactor = 0.2f;
+                    }};
+                }},
+                new Weapon(){{
+                    x = 10.25f;
+                    y = 2f;
+                    rotate = false;
+                    shake = 1.1f;
+                    reload = 2.25f * 70f;
 
-                bullet = new RailBulletType(){{
-                    damage = 230f;
-                    length = 40f * 7f;
-                    updateEffectSeg = 40f;
-                    shootEffect = UnityFx.scarRailShoot;
-                    pierceEffect = UnityFx.scarRailHit;
-                    updateEffect = UnityFx.scarRailTrail;
-                    hitEffect = Fx.massiveExplosion;
-                    pierceDamageFactor = 0.5f;
-                }};
-            }},
-            new Weapon("unity-scar-missile-launcher"){{
-                x = 12.25f;
-                y = -5f;
-                rotate = true;
-                shots = 5;
-                shotDelay = 3f;
-                inaccuracy = 4f;
-                reload = 50f;
-                bullet = new MissileBulletType(5f, 0f){{
-                    width = 7f;
-                    height = 12f;
-                    shrinkY = 0f;
-                    backColor = trailColor = UnityPal.scarColor;
-                    frontColor = UnityPal.endColor;
-                    splashDamage = 30f;
-                    splashDamageRadius = 20f;
-                    weaveMag = 3f;
-                    weaveScale = 4f;
-                }};
-            }});
+                    bullet = new RailBulletType(){{
+                        damage = 230f;
+                        length = 40f * 7f;
+                        updateEffectSeg = 40f;
+                        shootEffect = UnityFx.scarRailShoot;
+                        pierceEffect = UnityFx.scarRailHit;
+                        updateEffect = UnityFx.scarRailTrail;
+                        hitEffect = Fx.massiveExplosion;
+                        pierceDamageFactor = 0.5f;
+                    }};
+                }},
+                new Weapon("unity-scar-missile-launcher"){{
+                    x = 12.25f;
+                    y = -5f;
+                    rotate = true;
+                    shots = 5;
+                    shotDelay = 3f;
+                    inaccuracy = 4f;
+                    reload = 50f;
+                    bullet = new MissileBulletType(5f, 0f){{
+                        width = 7f;
+                        height = 12f;
+                        shrinkY = 0f;
+                        backColor = trailColor = UnityPal.scarColor;
+                        frontColor = UnityPal.endColor;
+                        splashDamage = 30f;
+                        splashDamageRadius = 20f;
+                        weaveMag = 3f;
+                        weaveScale = 4f;
+                    }};
+                }}
+            );
         }};
 
         sundown = new UnityUnitType("sundown"){{
@@ -1146,58 +1148,60 @@ public class UnityUnitTypes implements ContentList{
             legLength = 44f;
             legExtension = -9.3f;
 
-            weapons.add(new Weapon("unity-scar-large-launcher"){{
-                x = 13.5f;
-                y = -6.5f;
-                shootY = 5f;
-                shadow = 8f;
-                rotateSpeed = 5f;
-                rotate = true;
-                reload = 80f;
-                shake = 1f;
-                shots = 12;
-                inaccuracy = 19f;
-                velocityRnd = 0.2f;
-                xRand = 1.2f;
-                shootSound = Sounds.missile;
+            weapons.add(
+                new Weapon("unity-scar-large-launcher"){{
+                    x = 13.5f;
+                    y = -6.5f;
+                    shootY = 5f;
+                    shadow = 8f;
+                    rotateSpeed = 5f;
+                    rotate = true;
+                    reload = 80f;
+                    shake = 1f;
+                    shots = 12;
+                    inaccuracy = 19f;
+                    velocityRnd = 0.2f;
+                    xRand = 1.2f;
+                    shootSound = Sounds.missile;
 
-                bullet = new MissileBulletType(6f, 12f){{
-                    lifetime = 70f;
-                    speed = 5f;
-                    width = 7f;
-                    height = 12f;
-                    shrinkY = 0f;
-                    backColor = trailColor = UnityPal.scarColor;
-                    frontColor = UnityPal.endColor;
-                    splashDamage = 36f;
-                    splashDamageRadius = 20f;
-                    weaveMag = 3f;
-                    weaveScale = 6f;
-                    pierceBuilding = true;
-                    pierceCap = 3;
-                }};
-            }},
-            new Weapon("unity-scar-railgun"){{
-                x = 7f;
-                y = -9.25f;
-                shootY = 10.75f;
-                rotateSpeed = 2f;
-                rotate = true;
-                shadow = 12f;
-                reload = 60f * 2.7f;
-                shootSound = Sounds.artillery;
+                    bullet = new MissileBulletType(6f, 12f){{
+                        lifetime = 70f;
+                        speed = 5f;
+                        width = 7f;
+                        height = 12f;
+                        shrinkY = 0f;
+                        backColor = trailColor = UnityPal.scarColor;
+                        frontColor = UnityPal.endColor;
+                        splashDamage = 36f;
+                        splashDamageRadius = 20f;
+                        weaveMag = 3f;
+                        weaveScale = 6f;
+                        pierceBuilding = true;
+                        pierceCap = 3;
+                    }};
+                }},
+                new Weapon("unity-scar-railgun"){{
+                    x = 7f;
+                    y = -9.25f;
+                    shootY = 10.75f;
+                    rotateSpeed = 2f;
+                    rotate = true;
+                    shadow = 12f;
+                    reload = 60f * 2.7f;
+                    shootSound = Sounds.artillery;
 
-                bullet = new RailBulletType(){{
-                    damage = 880f;
-                    length = 61f * 7f;
-                    updateEffectSeg = 61f;
-                    shootEffect = UnityFx.scarRailShoot;
-                    pierceEffect = UnityFx.scarRailHit;
-                    updateEffect = UnityFx.scarRailTrail;
-                    hitEffect = Fx.massiveExplosion;
-                    pierceDamageFactor = 0.2f;
-                }};
-            }});
+                    bullet = new RailBulletType(){{
+                        damage = 880f;
+                        length = 61f * 7f;
+                        updateEffectSeg = 61f;
+                        shootEffect = UnityFx.scarRailShoot;
+                        pierceEffect = UnityFx.scarRailHit;
+                        updateEffect = UnityFx.scarRailTrail;
+                        hitEffect = Fx.massiveExplosion;
+                        pierceDamageFactor = 0.2f;
+                    }};
+                }}
+            );
 
             abilities.add(new DirectionShieldAbility(4, 0.1f, 20f, 1600f, 2.3f, 1.3f, 32.2f));
         }};

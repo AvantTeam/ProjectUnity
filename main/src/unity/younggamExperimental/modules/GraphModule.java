@@ -8,22 +8,24 @@ import arc.util.io.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 import unity.younggamExperimental.*;
+import unity.younggamExperimental.graph.*;
 import unity.younggamExperimental.graphs.*;
 
-//building 에 들어갈 모듈. powerModule와 비슷한 역할?
+//GraphPropsCommon building 에 들어갈 모듈. powerModule와 비슷한 역할?
 public class GraphModule{
+    public final Seq<GraphData> acceptPorts = new Seq<>(8);
     public final int portIndex;
 
     public Building parentBuilding;
+    public Graph parentBlock;
+    public int d;
 
-    final Seq<GraphData> acceptPorts = new Seq<>(8);
     final ObjectSet<GraphModule> neighbours = new ObjectSet<>(4);//neighbourArray
 
     protected GraphBase network;
 
-    Block parentBlock;
     int lastRecalc;
-    boolean dead, needsNetworkUpdate/*TODO =true*/, networkSaveState;
+    boolean dead, needsNetworkUpdate = true, networkSaveState;
 
     GraphModule(Building parentBuilding, int portIndex){
         this.parentBuilding = parentBuilding;
@@ -35,12 +37,13 @@ public class GraphModule{
     }
 
     int canConnect(Point2 pos){
-        return acceptPorts.indexOf(d -> pos.equals(d.toPos.x + parentBuilding.tileX(), d.toPos.y + parentBuilding.tileY()));
+        GraphData temp = acceptPorts.find(d -> pos.equals(d.toPos.x + parentBuilding.tileX(), d.toPos.y + parentBuilding.tileY()));
+        if(temp != null) return temp.index;
+        return -1;
     }
 
     void onCreate(Building build){
         initAllNets();
-        needsNetworkUpdate = true;
         lastRecalc = -1;
         initStats();
     }
@@ -48,7 +51,9 @@ public class GraphModule{
     void recalcPorts(){
         if(lastRecalc == parentBuilding.rotation) return;
         acceptPorts.clear();
-        for(int i = 0, len = parentBuilding.block.size * 4; i < len; i++) acceptPorts.add(getConnectSidePos(i));
+        for(int i = 0, len = parentBlock.accept.length; i < len; i++){
+            if(parentBlock.accept[i] != 0) acceptPorts.add(getConnectSidePos(i));
+        }
         lastRecalc = parentBuilding.rotation;
     }
 
@@ -137,7 +142,7 @@ public class GraphModule{
         return neighbours.size;
     }
 
-    void removeNeighbour(GraphModule build){
+    public void removeNeighbour(GraphModule build){
         neighbours.remove(build);
         //TODO
     }
@@ -145,6 +150,10 @@ public class GraphModule{
     void addNeighbour(GraphModule n){
         neighbours.add(n);
         //TODO
+    }
+
+    public Seq<GraphData> getConnectedNeighbours(int index){
+        return acceptPorts;
     }
 
     GraphBase getNetwork(){
@@ -182,5 +191,15 @@ public class GraphModule{
         readGlobal(reads, revision);
         //TODO
         networkSaveState = true;
+    }
+
+    //내가 추가한거
+    public int hueristic(Position target){
+        return d + Math.abs(Math.round(parentBuilding.x - target.getX())) + Math.abs(Math.round(parentBuilding.y - target.getY()));
+    }
+
+    public GraphModule d(int a){
+        d = a;
+        return this;
     }
 }

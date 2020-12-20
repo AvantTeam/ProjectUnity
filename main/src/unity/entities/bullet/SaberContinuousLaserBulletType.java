@@ -38,7 +38,7 @@ public class SaberContinuousLaserBulletType extends ContinuousLaserBulletType{
             float angDst = Angles.angleDist(b.rotation(), temp.rot) / Time.delta;
             temp.mean.add(angDst);
             angDst = temp.mean.rawMean();
-            if(b.owner instanceof Velc) temp.f = Mathf.clamp(temp.f + ((Velc)b.owner).vel().len() / 2f + angDst, 0f, length + angDst * 7f);
+            if(b.owner instanceof Velc v) temp.f = Mathf.clamp(temp.f + v.vel().len() / 2f + angDst, 0f, length + angDst * 7f);
 
             float damageC = chargedDamage(b, angDst);
             float realLength = Damage.findLaserLength(b, temp.f);
@@ -65,15 +65,14 @@ public class SaberContinuousLaserBulletType extends ContinuousLaserBulletType{
             temp.fT.update(b.x + Tmp.v1.x, b.y + Tmp.v1.y, b.rotation() + 90f);
         }else{
             temp.f = length;
-            if(b.owner instanceof Velc) temp.f = Mathf.clamp(((Velc)b.owner).vel().len() * 19f, 0f, length);
+            if(b.owner instanceof Velc v) temp.f = Mathf.clamp(v.vel().len() * 19f, 0f, length);
             if(b.timer(1, 5f)) Damage.collideLine(b, b.team, Fx.none, b.x, b.y, b.rotation(), temp.f, largeHit);
         }
     }
 
     @Override
     public void draw(Bullet b){
-        if(!(b.data instanceof SaberData)) return;
-        SaberData temp = (SaberData)b.data;
+        if(!(b.data instanceof SaberData temp)) return;
         float realLength = Damage.findLaserLength(b, temp.f);
         float fout = Mathf.clamp(b.time > b.lifetime - fadeTime ? 1f - (b.time - (lifetime - fadeTime)) / fadeTime : 1f);
         float baseLen = realLength * fout;
