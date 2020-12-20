@@ -1060,7 +1060,7 @@ public class UnityUnitTypes implements ContentList{
             });
         }};
 
-        zena = new UnitType("zena"){{
+        zena = new UnityUnitType("zena"){{
             defaultController = DistanceGroundAI::new;
             speed = 0.7f;
             health = 1220f;
