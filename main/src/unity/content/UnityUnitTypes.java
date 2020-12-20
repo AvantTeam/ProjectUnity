@@ -54,7 +54,7 @@ public class UnityUnitTypes implements ContentList{
 
     /** Scar {@linkplain LegsUnit legs} units */
     public static @FactionDef(type = "scar") @EntityPoint(type = LegsUnit.class)
-    UnitType hovos, ryzer, sundown;
+    UnitType hovos, ryzer, zena, sundown;
 
     /** Scar {@linkplain UnitEntity flying} units */
     public static @FactionDef(type = "scar") @EntityPoint(type = UnitEntity.class)
@@ -1060,12 +1060,84 @@ public class UnityUnitTypes implements ContentList{
             });
         }};
 
+        zena = new UnitType("zena"){{
+            defaultController = DistanceGroundAI::new;
+            speed = 0.7f;
+            health = 1220f;
+            hitSize = 17.85f;
+            range = 350f;
+            allowLegStep = true;
+            legMoveSpace = 0.73f;
+            legCount = 6;
+            legTrns = 0.4f;
+            legLength = 40f;
+            legExtension = -9.3f;
+            weapons.add(new Weapon(){{
+                x = 0f;
+                y = 12f;
+                shootY = 0f;
+                mirror = false;
+                rotate = false;
+                shake = 2.3f;
+                reload = 2.75f * 60f;
+
+                bullet = new RailBulletType(){{
+                    damage = 780f;
+                    length = 60f * 7f;
+                    updateEffectSeg = 60f;
+                    shootEffect = UnityFx.scarRailShoot;
+                    pierceEffect = UnityFx.scarRailHit;
+                    updateEffect = UnityFx.scarRailTrail;
+                    hitEffect = Fx.massiveExplosion;
+                    pierceDamageFactor = 0.2f;
+                }};
+            }},
+            new Weapon(){{
+                x = 10.25f;
+                y = 2f;
+                rotate = false;
+                shake = 1.1f;
+                reload = 2.25f * 70f;
+
+                bullet = new RailBulletType(){{
+                    damage = 230f;
+                    length = 40f * 7f;
+                    updateEffectSeg = 40f;
+                    shootEffect = UnityFx.scarRailShoot;
+                    pierceEffect = UnityFx.scarRailHit;
+                    updateEffect = UnityFx.scarRailTrail;
+                    hitEffect = Fx.massiveExplosion;
+                    pierceDamageFactor = 0.5f;
+                }};
+            }},
+            new Weapon("unity-scar-missile-launcher"){{
+                x = 12.25f;
+                y = -5f;
+                rotate = true;
+                shots = 5;
+                shotDelay = 3f;
+                inaccuracy = 4f;
+                reload = 50f;
+                bullet = new MissileBulletType(5f, 0f){{
+                    width = 7f;
+                    height = 12f;
+                    shrinkY = 0f;
+                    backColor = trailColor = UnityPal.scarColor;
+                    frontColor = UnityPal.endColor;
+                    splashDamage = 30f;
+                    splashDamageRadius = 20f;
+                    weaveMag = 3f;
+                    weaveScale = 4f;
+                }};
+            }});
+        }};
+
         sundown = new UnityUnitType("sundown"){{
             defaultController = DistanceGroundAI::new;
-            speed = 0.5f;
+            speed = 0.6f;
             health = 9400f;
             hitSize = 36f;
-            range = 340f;
+            range = 360f;
             allowLegStep = true;
             legMoveSpace = 0.53f;
             rotateSpeed = 2.5f;
@@ -1116,9 +1188,9 @@ public class UnityUnitTypes implements ContentList{
                 shootSound = Sounds.artillery;
 
                 bullet = new RailBulletType(){{
-                    damage = 800f;
-                    length = 59f * 7f;
-                    updateEffectSeg = 59f;
+                    damage = 880f;
+                    length = 61f * 7f;
+                    updateEffectSeg = 61f;
                     shootEffect = UnityFx.scarRailShoot;
                     pierceEffect = UnityFx.scarRailHit;
                     updateEffect = UnityFx.scarRailTrail;
