@@ -19,11 +19,12 @@ lightningb.despawnEffect = Fx.none;
 lightningb.hitEffect = Fx.hitLancer;
 lightningb.keepVelocity = false;
 
-const bufferWep = new Weapon("buffer-shockgun");
+const bufferWep = new Weapon("unity-buffer-shockgun");
 bufferWep.shake = 2;
-bufferWep.y = 1;
+bufferWep.y = bufferWep.shootY = -1;
+bufferWep.x = bufferWep.shootX = -1;
 bufferWep.reload = 55;
-bufferWep.shotDelay = 3;
+bufferWep.shotDelay = 2;
 bufferWep.alternate = true;
 bufferWep.shots = 2;
 bufferWep.inaccuracy = 0;
@@ -64,7 +65,11 @@ var classid = alib.add(buffer, MechUnit, [
         Effect.shake(1, 1, u);
         Fx.landShock.at(u);
         for(var i = 0; i < 8; i++){
-            Time.run(Mathf.random(8), () => Lightning.create(u.team, Pal.lancerLaser, 17, u.x, u.y, Mathf.random(360), 14));
+            Time.run(Mathf.random(8), () => {
+              Lightning.create(u.team, Pal.lancerLaser, 17, u.x, u.y, Mathf.random(360), 14);
+              Effect.shake(i * 0.25, i * 0.25, u);
+              Sounds.spark.at(u.x, u.y, 1.25, 0.75);
+            });
         }
       }
     }

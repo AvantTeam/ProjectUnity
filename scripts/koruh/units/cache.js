@@ -26,7 +26,12 @@ missilesWep.velocityRnd = 0.2;
 missilesWep.spacing = 1;
 missilesWep.bullet = missileJavelin;
 missilesWep.shootSound = Sounds.missile;
+missilesWep.flipSprite = true;
+
 const cache = extendContent(UnitType, "cache", {
+    mass(){
+        return 2 * (this.hitSize * this.hitSize * Mathf.pi);
+    },
     load(){
         this.super$load();
         this.shield = Core.atlas.find(this.name + "-shield");
@@ -52,10 +57,18 @@ cache.maxV = 6;
 
 cache.mineTier = -1;
 cache.speed = 7;
-cache.drag = 0.01;
+cache.drag = 0.001;
 cache.health = 560;
 cache.flying = true;
 cache.armor = 6;
 cache.accel = 0.02;
 cache.weapons.add(missilesWep);
-cache.abilities.add(new MoveLightningAbility(10 * Vars.state.rules.unitDamageMultiplier, 14, 0.15, cache.minV, cache.maxV, Pal.lancerLaser))
+
+const cacheAbil = extend(MoveLightningAbility, 10 * Vars.state.rules.unitDamageMultiplier, 14, 0.15, cache.minV, cache.maxV, Pal.lancerLaser, {
+    update(unit){
+        var scl = Mathf.clamp((unit.vel.len() - this.minSpeed) / (this.maxSpeed - this.minSpeed));
+        this.super$update(unit);
+        Effect.shake(Mathf.random(scl * 1.5), Mathf.random(scl * 1.5), unit);
+    }
+});
+cache.abilities.add(cacheAbil);
