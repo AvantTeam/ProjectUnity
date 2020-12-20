@@ -18,10 +18,12 @@ import unity.util.*;
 
 public class DirectionShieldAbility extends Ability{
     protected final float shieldWidth = 7f;
+    protected final float blinkTime = 5f;
 
     public int shields;
     public float[] shieldAngles;
     public float[] healths;
+    public float[] hitTimes;
     public boolean[] available;
     public float maxHealth;
     public float disableRegen;
@@ -42,12 +44,14 @@ public class DirectionShieldAbility extends Ability{
         distanceRadius = distance;
         shieldAngles = new float[shields];
         healths = new float[shields];
+        hitTimes = new float[shields];
         available = new boolean[shields];
         this.disableRegen = disableRegen;
         this.shields = shields;
 
         for(int i = 0; i < shields; i++){
             shieldAngles[i] = 0f;
+            hitTimes[i] = 0f;
             healths[i] = health;
             available[i] = true;
         }
@@ -100,6 +104,7 @@ public class DirectionShieldAbility extends Ability{
                                     UnityBullets.scarShrapnel.create(unit, unit.team, Tmp.v4.x, Tmp.v4.y, angC + off, d * explosiveReflectDamageMultiplier, 1f, 1f, null);
                                 }
                             }
+                            hitTimes[n.id] = blinkTime;
                             b.team(unit.team());
                             b.rotation(angC);
                             if(healths[n.id] < 0) available[n.id] = false;
@@ -131,12 +136,14 @@ public class DirectionShieldAbility extends Ability{
                 float ang = Mathf.mod((i * size - (shields - 1) * size / 2f) + unit.rotation, 360f);
                 //float ang = (-shields + (i * shields)) * (size / shields);
                 shieldAngles[i] = Mathf.slerpDelta(shieldAngles[i], ang, shieldSpeed);
+                hitTimes[i] = Math.max(hitTimes[i] - Time.delta, 0f);
             }
         }else{
             float offset = (360f / shields) / 2f;
             for(int i = 0; i < shields; i++){
                 float ang = Mathf.mod(((i * 360f / shields) + offset) + unit.rotation + 180f, 360f);
                 shieldAngles[i] = Mathf.slerpDelta(shieldAngles[i], ang, shieldSpeed);
+                hitTimes[i] = Math.max(hitTimes[i] - Time.delta, 0f);
             }
         }
         updateShields(unit);
@@ -153,9 +160,11 @@ public class DirectionShieldAbility extends Ability{
             Tmp.v3.add(unit);
             Draw.z(z - 0.0098f);
             float offset = available[i] ? 2f : 1.5f;
+            Draw.mixcol(Color.white, hitTimes[i] / blinkTime);
             Draw.color(Color.white, Color.black, (1f - (Mathf.clamp(healths[i] / maxHealth))) / offset);
             Draw.rect(region, Tmp.v3.x, Tmp.v3.y, shieldAngles[i]);
             Draw.z(Math.min(Layer.darkness, z - 1f));
+            Draw.mixcol();
             Draw.color(Pal.shadow);
             Draw.rect(type.softShadowRegion, Tmp.v3.x, Tmp.v3.y, size, size);
             Draw.z(z - 0.0099f);
@@ -169,7 +178,7 @@ public class DirectionShieldAbility extends Ability{
             Fill.circle(Tmp.v3.x, Tmp.v3.y, liveScl / 2f);
         }
         Draw.z(z);
-        Draw.color();
+        Draw.reset();
     }
 
     public static class ShieldNode{

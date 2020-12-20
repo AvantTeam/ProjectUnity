@@ -1087,7 +1087,7 @@ public class UnityUnitTypes implements ContentList{
                 inaccuracy = 19f;
                 velocityRnd = 0.2f;
                 xRand = 1.2f;
-                shootSound = Sounds.bigshot;
+                shootSound = Sounds.missile;
 
                 bullet = new MissileBulletType(6f, 12f){{
                     lifetime = 70f;
@@ -1113,6 +1113,7 @@ public class UnityUnitTypes implements ContentList{
                 rotate = true;
                 shadow = 12f;
                 reload = 60f * 2.7f;
+                shootSound = Sounds.artillery;
 
                 bullet = new RailBulletType(){{
                     damage = 800f;
