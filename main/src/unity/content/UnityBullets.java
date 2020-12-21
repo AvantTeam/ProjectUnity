@@ -28,7 +28,7 @@ import static unity.content.UnityFx.*;
 
 public class UnityBullets implements ContentList{
     public static BulletType laser, coalBlaze, pyraBlaze, falloutLaser, catastropheLaser, calamityLaser, extinctionLaser, orb, shockBeam, currentStroke,
-        shielderBullet, plasmaFragTriangle, plasmaTriangle, pylonLightning, pylonLaser, pylonLaserSmall, exporb, monumentRailBullet, scarShrapnel;
+        shielderBullet, plasmaFragTriangle, plasmaTriangle, pylonLightning, pylonLaser, pylonLaserSmall, exporb, monumentRailBullet, scarShrapnel, scarMissile;
 
     //only enhanced
     public static BasicBulletType standardDenseLarge, standardHomingLarge, standardIncendiaryLarge, standardThoriumLarge, standardDenseHeavy, standardHomingHeavy, standardIncendiaryHeavy, standardThoriumHeavy, standardDenseMassive, standardHomingMassive,
@@ -381,6 +381,22 @@ public class UnityBullets implements ContentList{
             toColor = UnityPal.scarColor;
             damage = 1f;
             length = 110f;
+        }};
+
+        scarMissile = new MissileBulletType(6f, 12f){{
+            lifetime = 70f;
+            speed = 5f;
+            width = 7f;
+            height = 12f;
+            shrinkY = 0f;
+            backColor = trailColor = UnityPal.scarColor;
+            frontColor = UnityPal.endColor;
+            splashDamage = 36f;
+            splashDamageRadius = 20f;
+            weaveMag = 3f;
+            weaveScale = 6f;
+            pierceBuilding = true;
+            pierceCap = 3;
         }};
 
         //only enhanced
