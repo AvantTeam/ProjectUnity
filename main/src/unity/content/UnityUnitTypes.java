@@ -4,6 +4,8 @@ import arc.func.*;
 import arc.math.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.math.geom.*;
+import arc.util.*;
 import mindustry.ctype.*;
 import mindustry.type.*;
 import mindustry.gen.*;
@@ -54,7 +56,7 @@ public class UnityUnitTypes implements ContentList{
 
     /** Scar {@linkplain LegsUnit legs} units */
     public static @FactionDef(type = "scar") @EntityPoint(type = LegsUnit.class)
-    UnitType hovos, ryzer, zena, sundown;
+    UnitType hovos, ryzer, zena, sundown, rex;
 
     /** Scar {@linkplain UnitEntity flying} units */
     public static @FactionDef(type = "scar") @EntityPoint(type = UnitEntity.class)
@@ -1068,7 +1070,7 @@ public class UnityUnitTypes implements ContentList{
         zena = new UnityUnitType("zena"){{
             defaultController = DistanceGroundAI::new;
             speed = 0.7f;
-            health = 1220f;
+            health = 1220;
             hitSize = 17.85f;
             range = 350f;
             allowLegStep = true;
@@ -1142,16 +1144,22 @@ public class UnityUnitTypes implements ContentList{
         sundown = new UnityUnitType("sundown"){{
             defaultController = DistanceGroundAI::new;
             speed = 0.6f;
-            health = 9400f;
+            health = 9400;
             hitSize = 36f;
             range = 360f;
             allowLegStep = true;
             legMoveSpace = 0.53f;
             rotateSpeed = 2.5f;
+            armor = 4f;
             legCount = 4;
             legTrns = 0.4f;
             legLength = 44f;
             legExtension = -9.3f;
+            legSplashDamage = 20f;
+            legSplashRange = 30f;
+
+            groundLayer = Layer.legUnit;
+            visualElevation = 0.65f;
 
             weapons.add(
                 new Weapon("unity-scar-large-launcher"){{
@@ -1169,21 +1177,7 @@ public class UnityUnitTypes implements ContentList{
                     xRand = 1.2f;
                     shootSound = Sounds.missile;
 
-                    bullet = new MissileBulletType(6f, 12f){{
-                        lifetime = 70f;
-                        speed = 5f;
-                        width = 7f;
-                        height = 12f;
-                        shrinkY = 0f;
-                        backColor = trailColor = UnityPal.scarColor;
-                        frontColor = UnityPal.endColor;
-                        splashDamage = 36f;
-                        splashDamageRadius = 20f;
-                        weaveMag = 3f;
-                        weaveScale = 6f;
-                        pierceBuilding = true;
-                        pierceCap = 3;
-                    }};
+                    bullet = UnityBullets.scarMissile;
                 }},
                 new Weapon("unity-scar-railgun"){{
                     x = 7f;
@@ -1209,6 +1203,124 @@ public class UnityUnitTypes implements ContentList{
             );
 
             abilities.add(new DirectionShieldAbility(4, 0.1f, 20f, 1600f, 2.3f, 1.3f, 32.2f));
+        }};
+
+        rex = new UnityUnitType("rex"){{
+            defaultController = DistanceGroundAI::new;
+            speed = 0.55f;
+            health = 23000;
+            hitSize = 47.5f;
+            range = 390f;
+            allowLegStep = true;
+            rotateSpeed = 2f;
+            armor = 12f;
+
+            hovering = true;
+            groundLayer = Layer.legUnit + 0.01f;
+            visualElevation = 0.95f;
+
+            legCount = 4;
+            legTrns = 1f;
+            legLength = 56f;
+            legExtension = -9.5f;
+            legSplashDamage = 90f;
+            legSplashRange = 65f;
+            legSpeed = 0.08f;
+            legMoveSpace = 0.57f;
+            legPairOffset = 0.8f;
+
+            weapons.add(new Weapon("unity-rex-railgun"){{
+                x = 33.25f;
+                y = -12.25f;
+                shootY = 23.25f;
+                rotate = false;
+                top = false;
+                reload = 60f * 4.5f;
+                recoil = 4f;
+                shootSound = Sounds.artillery;
+
+                bullet = new RailBulletType(){
+                    {
+                        damage = 3300f;
+                        tileDamageMultiplier = 0.5f;
+                        length = 61f * 8f;
+                        updateEffectSeg = 61f;
+                        shootEffect = UnityFx.scarRailShoot;
+                        pierceEffect = UnityFx.scarRailHit;
+                        updateEffect = UnityFx.scarRailTrail;
+                        hitEffect = Fx.massiveExplosion;
+                        pierceDamageFactor = 0.35f;
+                    }
+                    @Override
+                    public void init(Bullet b){
+                        //super.init(b);
+                        b.fdata = length;
+                        Damage.collideLine(b, b.team, b.type.hitEffect, b.x, b.y, b.rotation(), length, true);
+                        float resultLen = b.fdata;
+
+                        Vec2 nor = Tmp.v1.set(b.vel).nor();
+                        for(float i = 0; i <= resultLen; i += updateEffectSeg){
+                            updateEffect.at(b.x + nor.x * i, b.y + nor.y * i, b.rotation());
+                        }
+                    }
+                };
+            }},
+            new Weapon("unity-scar-large-launcher"){{
+                x = 12.25f;
+                y = 13f;
+                shootY = 5f;
+                xRand = 2.2f;
+                shadow = 8f;
+                rotateSpeed = 5f;
+                rotate = true;
+                reload = 4f;
+                inaccuracy = 5f;
+
+                bullet = new BasicBulletType(6f, 12f){{
+                    lifetime = 35f;
+                    width = 7f;
+                    height = 12f;
+                    pierce = true;
+                    pierceBuilding = true;
+                    pierceCap = 2;
+                }};
+            }},
+            new Weapon("unity-scar-large-launcher"){{
+                x = 15.75f;
+                y = -17.5f;
+                shootY = 5f;
+                shadow = 8f;
+                rotateSpeed = 5f;
+                rotate = true;
+                reload = 85f;
+                shake = 1f;
+                shots = 9;
+                inaccuracy = 19f;
+                velocityRnd = 0.2f;
+                xRand = 1.2f;
+                shootSound = Sounds.missile;
+
+                bullet = UnityBullets.scarMissile;
+            }},
+            new Weapon("unity-scar-large-launcher"){{
+                x = 9.25f;
+                y = -13.75f;
+                shootY = 5f;
+                shadow = 8f;
+                rotateSpeed = 5f;
+                rotate = true;
+                reload = 90f;
+                shake = 1f;
+                shots = 9;
+                inaccuracy = 19f;
+                velocityRnd = 0.2f;
+                xRand = 1.2f;
+                shootSound = Sounds.missile;
+
+                bullet = UnityBullets.scarMissile;
+            }});
+
+            abilities.add(new DirectionShieldAbility(3, 0.06f, 45f, 3100f, 3.3f, 0.9f, 49f));
         }};
 
         whirlwind = new UnityUnitType("whirlwind"){{

@@ -131,7 +131,7 @@ public class DirectionShieldAbility extends Ability{
     @Override
     public void update(Unit unit){
         if(unit.isShooting()){
-            float size = ((shieldSize * 6f) / Mathf.sqrt(distanceRadius / 3f));
+            float size = ((shieldSize * 6f) / Mathf.sqrt(distanceRadius / 1.75f));
             for(int i = 0; i < shields; i++){
                 float ang = Mathf.mod((i * size - (shields - 1) * size / 2f) + unit.rotation, 360f);
                 //float ang = (-shields + (i * shields)) * (size / shields);
@@ -170,7 +170,7 @@ public class DirectionShieldAbility extends Ability{
             Draw.z(z - 0.0099f);
             float engScl = shieldSize / 4f;
             float liveScl = (engScl - (engScl / 4f)) + Mathf.absin(Time.time, 2f, engScl / 4f);
-            Tmp.v3.trns(shieldAngles[i], distanceRadius - (engScl / 1.5f));
+            Tmp.v3.trns(shieldAngles[i], distanceRadius - engScl);
             Tmp.v3.add(unit);
             Draw.color(unit.team.color);
             Fill.circle(Tmp.v3.x, Tmp.v3.y, liveScl);
