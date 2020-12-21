@@ -71,7 +71,7 @@ public class DirectionShieldAbility extends Ability{
         for(int i = 0; i < shields; i++){
             Tmp.v1.trns(shieldAngles[i], distanceRadius - (shieldWidth / 2f));
             Tmp.v1.add(unit);
-            Tmp.v2.trns(shieldAngles[i] + 90, (shieldSize / 2f) - (shieldWidth / 2f));
+            Tmp.v2.trns(shieldAngles[i] + 90f, (shieldSize / 2f) - (shieldWidth / 2f));
 
             ShieldNode ts = new ShieldNode();
             ts.id = i;
@@ -90,6 +90,7 @@ public class DirectionShieldAbility extends Ability{
                     nodes.each(n -> {
                         if(!available[n.id]) return;
                         Vec2 vec = Geometry.raycastRect(n.nodeA.x, n.nodeA.y, n.nodeB.x, n.nodeB.y, Tmp.r2);
+                        
                         if(vec != null){
                             float d = Funcs.getBulletDamage(b.type) * (b.damage() / (b.type.damage * b.damageMultiplier()));
                             healths[n.id] -= d;
@@ -131,9 +132,9 @@ public class DirectionShieldAbility extends Ability{
     @Override
     public void update(Unit unit){
         if(unit.isShooting()){
-            float size = ((shieldSize * 6f) / Mathf.sqrt(distanceRadius / 1.75f));
+            float size = ((shieldSize * Mathf.PI2) / Mathf.sqrt(distanceRadius / 1.5f));
             for(int i = 0; i < shields; i++){
-                float ang = Mathf.mod((i * size - (shields - 1) * size / 2f) + unit.rotation, 360f);
+                float ang = Mathf.mod((i * size - (shields - 1f) * size / 2f) + unit.rotation, 360f);
                 //float ang = (-shields + (i * shields)) * (size / shields);
                 shieldAngles[i] = Mathf.slerpDelta(shieldAngles[i], ang, shieldSpeed);
                 hitTimes[i] = Math.max(hitTimes[i] - Time.delta, 0f);
@@ -190,7 +191,7 @@ public class DirectionShieldAbility extends Ability{
         }
 
         public Vec2 getNodes(int sign){
-            return sign <= -1 ? nodeA : nodeB;
+            return sign <= 0 ? nodeA : nodeB;
         }
     }
 }
