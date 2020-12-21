@@ -201,9 +201,14 @@ public class UnityUnitType extends UnitType{
 
     @Override
     public void drawEngine(Unit unit){
+        float z = Draw.z();
+
         if(unit instanceof Wormc worm){
             if(worm.isHead() && worm.child() == null){
+                Draw.z(1.01f + z + worm.layer());
+
                 super.drawEngine(unit);
+                Draw.z(z);
             }
         }else{
             super.drawEngine(unit);
@@ -211,12 +216,38 @@ public class UnityUnitType extends UnitType{
     }
 
     @Override
+    public void drawWeapons(Unit unit){
+        float z = Draw.z();
+
+        if(unit instanceof Wormc worm){
+            Draw.z(1.01f + z + worm.layer());
+        }
+
+        super.drawWeapons(unit);
+        Draw.z(z);
+    }
+
+    @Override
+    public void drawCell(Unit unit){
+        float z = Draw.z();
+
+        if(unit instanceof Wormc worm){
+            Draw.z(1.01f + z + worm.layer());
+        }
+
+        super.drawCell(unit);
+        Draw.z(z);
+    }
+
+    @Override
     public void drawOutline(Unit unit){
+        float z = Draw.z();
         Draw.reset();
 
         if(unit instanceof Wormc){
             var worm = (Unit & Wormc)unit;
 
+            Draw.z(1.01f + z + worm.layer());
             if(worm.isHead()){
                 Draw.rect(outlineRegion, worm.x, worm.y, worm.rotation - 90);
             }else if(worm.isTail()){
@@ -227,6 +258,8 @@ public class UnityUnitType extends UnitType{
         }else{
             super.drawOutline(unit);
         }
+
+        Draw.z(z);
     }
 
     public void drawRotors(Unit unit){

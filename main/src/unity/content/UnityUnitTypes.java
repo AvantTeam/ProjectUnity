@@ -101,11 +101,16 @@ public class UnityUnitTypes implements ContentList{
         googol = new UnityUnitType("project-googol"){{
             defaultController = WormAI::new;
             flying = true;
+            speed = 3f;
+
+            rotateShooting = false;
+
             splittable = true;
             segmentLength = 15;
-            segmentOffset = 4.5f;
+            segmentOffset = 3.5f;
             headDamage = 48f;
-            speed = 3f;
+
+            weapons.add(UnitTypes.beta.weapons.first());
         }};
 
         caelifera = new UnityUnitType("caelifera"){{

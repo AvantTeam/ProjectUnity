@@ -67,17 +67,18 @@ public interface Wormc extends Unitc{
 
     @Override
     default void add(){
-        Core.app.post(this::setupSegments);
+        setupSegments();
     }
 
     default void setupSegments(){
         if(savedAsHead()){
             headId(id());
-            childs(new IntSeq(){{
-                setSize(segmentLength());
-            }});
 
-            int seg = healths().isEmpty() ? segmentLength() : healths().size;
+            IntSeq childs = new IntSeq();
+            childs.setSize(healths().isEmpty() ? segmentLength() : healths().size);
+            childs(childs);
+
+            int seg = childs().size;
             for(int i = 0; i < seg; i++){
                 Wormc child = (Wormc)type().create(team());
                 child.layer(0f - (seg / (i + 1f) * 0.1f));
@@ -131,53 +132,44 @@ public interface Wormc extends Unitc{
     }
 
     @Override
-    @Replace
-    default void damage(float amount){
-        if(splittable()){
-            damageUnfiltered(amount);
-        }else{
-            if(isHead()){
-                IntSeq childs = childs();
-                for(int i = childs.size; i >= 0; i--){
-                    Wormc worm = (Wormc)Groups.unit.getByID(childs.get(i));
-                    if(worm != null){
-                        worm.damageUnfiltered(amount / (childs.size + 1));
-                    }
-                }
-                damageUnfiltered(amount / (childs.size + 1));
-            }else{
-                Wormc head = head();
-                if(head != null) head.damage(amount);
+    default void killed(){
+        if(isTail()) return;
+
+        Wormc child = child();
+        IntSeq childs = new IntSeq();
+
+        boolean past = false;
+        for(int id : head().childs().items){
+            Wormc worm = (Wormc)Groups.unit.getByID(id);
+            if(past && worm != null && !worm.dead()){
+                childs.add(worm.id());
+            }else if(worm == this){
+                past = true;
             }
         }
-    }
 
-    default void damageUnfiltered(float amount){
-        health(health() - amount);
-        hitTime(1f);
+        child.childs(childs);
+        for(int id : child.childs().items){
+            Wormc worm = (Wormc)Groups.unit.getByID(id);
+            if(worm == null || worm.dead()) continue;
 
-        if(health() <= 0f && !dead()){
-            kill();
+            worm.findHead();
         }
     }
 
     default void updateMovement(){
         if(!isHead()){
-            Tmp.v1.trns(parent().vel().angle(), -segmentOffset())
-                .add(parent());
-            Tmp.v2.set(Tmp.v1)
-                .sub(this);
-            Tmp.v3.set(Tmp.v2)
-                .setLength(Math.min(speed(), Mathf.lerp(vel().len(), Tmp.v2.len(), type().accel)));
+            if(!parent().vel().isZero(0.1f)){
+                Tmp.v1.trns(parent().vel().angle(), -segmentOffset()).add(parent());
+                Tmp.v2.set(Tmp.v1).sub(this)
+                    .setLength(Math.min(type().speed, Mathf.lerpDelta(vel().len(), Tmp.v2.len(), type().accel)));
 
-            if(Tmp.v2.len() > segmentOffset() * 8f){
-                vel().add(Tmp.v3).limit(Tmp.v2.len());
-            }else{
-                vel().setZero();
+                if(dst(Tmp.v1) > segmentOffset() * 4f){
+                    vel().add(Tmp.v2).limit(type().speed).scl(Time.delta);
+                }
             }
-            if(vel().isZero(0.1f)){
-                rotation(Mathf.slerpDelta(rotation(), angleTo(Tmp.v1), type().rotateSpeed / 60f));
-            }
+
+            rotation(Mathf.slerpDelta(rotation(), angleTo(parent()), type().rotateSpeed / 60f));
         }
     }
 
@@ -260,8 +252,77 @@ public interface Wormc extends Unitc{
 
     @Override
     @Replace
-    default int cap(){
-        return (Units.getCap(team()) - team().data().unitCount) * segmentLength();
+    default void damage(float amount){
+        if(splittable()){
+            damageUnfiltered(amount);
+        }else{
+            if(isHead()){
+                IntSeq childs = childs();
+                for(int i = childs.size; i >= 0; i--){
+                    Wormc worm = (Wormc)Groups.unit.getByID(childs.get(i));
+                    if(worm == null || worm.dead()) continue;
+
+                    worm.damageUnfiltered(amount / (childs.size + 1));
+
+                }
+                damageUnfiltered(amount / (childs.size + 1));
+            }else{
+                Wormc head = head();
+                if(head != null) head.damage(amount);
+            }
+        }
+    }
+
+    default void damageUnfiltered(float amount){
+        health(health() - amount);
+        hitTime(1f);
+
+        if(health() <= 0f && !dead()){
+            kill();
+        }
+    }
+
+    @Override
+    @Replace
+    default void aim(float x, float y){
+        if(isHead()){
+            aimUnfiltered(x, y);
+            for(int id : childs().items){
+                Wormc worm = (Wormc)Groups.unit.getByID(id);
+                if(worm == null || worm.dead()) continue;
+
+                worm.aimUnfiltered(x, y);
+            }
+        }else{
+            head().aim(x, y);
+        }
+    }
+
+    default void aimUnfiltered(float x, float y){
+        Tmp.v1.set(x, y).sub(this);
+        if(Tmp.v1.len() < type().aimDst){
+            Tmp.v1.setLength(type().aimDst);
+        }
+
+        Tmp.v1.add(this);
+        for(WeaponMount mount : mounts()){
+            mount.aimX = Tmp.v1.x;
+            mount.aimY = Tmp.v1.y;
+        }
+
+        aimX(Tmp.v1.x);
+        aimY(Tmp.v1.y);
+    }
+
+    @Override
+    @Replace
+    default float mass(){
+        if(isHead()){
+            float mass = hitSize() * hitSize() * Mathf.pi;
+            return mass * (childs().size + 1);
+        }else{
+            return head().mass();
+        }
     }
 
     @Override
@@ -272,6 +333,8 @@ public interface Wormc extends Unitc{
                 health(maxHealth());
                 for(int id : childs().items){
                     Unit worm = Groups.unit.getByID(id);
+                    if(worm == null || worm.dead()) continue;
+
                     worm.health(maxHealth());
                 }
             }else{
@@ -292,6 +355,8 @@ public interface Wormc extends Unitc{
                 health(health() + value);
                 for(int id : childs().items){
                     Unit worm = Groups.unit.getByID(id);
+                    if(worm == null || worm.dead()) continue;
+
                     worm.health(worm.health() + value);
                 }
             }else{
@@ -309,8 +374,10 @@ public interface Wormc extends Unitc{
             if(isHead()){
                 this.<Unit>self().health = health;
                 for(int id : childs().items){
-                    Unit unit = Groups.unit.getByID(id);
-                    unit.health = health;
+                    Unit worm = Groups.unit.getByID(id);
+                    if(worm == null || worm.dead()) continue;
+
+                    worm.health = health;
                 }
             }else{
                 head().health(health);
@@ -375,7 +442,7 @@ public interface Wormc extends Unitc{
 
     @Override
     default void write(Writes write){
-        write.b(isHead() ? 1 : 0);
+        write.bool(isHead());
 
         if(isHead()){
             write.i(childs().size);
@@ -388,16 +455,18 @@ public interface Wormc extends Unitc{
 
     @Override
     default void read(Reads read){
-        savedAsHead(read.b() == 1 ? true : false);
+        savedAsHead(read.bool());
 
         if(savedAsHead()){
-            healths(new FloatSeq(){{
-                setSize(read.i());
+            int size = read.i();
+            FloatSeq healths = new FloatSeq();
 
-                for(int i = 0; i < size; i++){
-                    set(i, read.f());
-                }
-            }});
+            healths.setSize(size);
+            for(int i = 0; i < size; i++){
+                healths.set(i, read.f());
+            }
+
+            healths(healths);
         }else{
             remove();
         }

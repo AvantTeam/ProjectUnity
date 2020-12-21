@@ -306,12 +306,12 @@ public class EntityProcessor extends BaseProcessor{
             ExecutableElement append = baseMethods.find(m -> {
                 boolean equal = m.getParameters().size() == e.getParameters().size();
                 for(int i = 0; i < m.getParameters().size(); i++){
+                    if(!equal) break;
                     try{
                         VariableElement up = m.getParameters().get(i);
                         VariableElement c = e.getParameters().get(i);
 
                         equal = typeUtils.isSameType(up.asType(), c.asType());
-                        if(!equal) break;
                     }catch(IndexOutOfBoundsException ex){
                         return false;
                     }
