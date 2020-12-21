@@ -13,9 +13,7 @@ ext{
     spritesAssetsFolder = "../main/assets/sprites/"
 }
 
-task proc(dependsOn: classes){
-    dependsOn ":main:jar"
-
+task proc(dependsOn: [classes, configurations.runtimeClasspath]){
     doLast{
         delete{
             delete "$spritesGenFolder"

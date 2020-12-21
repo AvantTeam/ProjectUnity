@@ -8,7 +8,7 @@ import mindustry.io.*;
 public class Rotor{
     public final String name;
 
-    public TextureRegion bladeRegion, bladeOutlineRegion, topRegion, topOutlineRegion;
+    public TextureRegion bladeRegion, bladeOutlineRegion, topRegion;
 
     public boolean mirror = false;
     public float x = 0f;
@@ -20,7 +20,6 @@ public class Rotor{
 
     public int bladeCount = 4;
 
-    //is this not neat?
     public Rotor(String name){
         this.name = name;
     }
@@ -28,9 +27,7 @@ public class Rotor{
     public void load(){
         bladeRegion = Core.atlas.find(name + "-blade");
         bladeOutlineRegion = Core.atlas.find(name + "-blade-outline");
-
         topRegion = Core.atlas.find(name + "-top");
-        topOutlineRegion = Core.atlas.find(name + "-top-outline");
     }
 
     public Rotor copy(){

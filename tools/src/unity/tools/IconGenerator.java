@@ -87,14 +87,27 @@ public class IconGenerator implements Generator{
 
                 if(unit instanceof Copterc){
                     for(Rotor rotor : type.rotors){
-                        outlSeparate.get("outline", rotor.bladeRegion);
-                        outlSeparate.get("outline", rotor.topRegion);
+                        String fname = type.name.replaceFirst("unity-", "") + "-rotor";
+
+                        if(outlined.add(fname + "-blade")){
+                            outlSeparate.get("outline", rotor.bladeRegion);
+                        }
+                        if(outlined.add(fname + "-top")){
+                            outliner.get(rotor.topRegion);
+                        }
                     }
                 }
 
                 if(unit instanceof Wormc){
                     outlSeparate.get("outline", type.bodyRegion);
                     outlSeparate.get("outline", type.tailRegion);
+                }
+
+                for(TextureRegion reg : type.abilityRegions){
+                    String fname = parseName.get(reg);
+                    if(outlined.add(fname) && SpriteProcessor.has(fname)){
+                        outliner.get(reg);
+                    }
                 }
 
                 String fname = parseName.get(type.region);

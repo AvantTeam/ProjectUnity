@@ -264,8 +264,7 @@ public class UnityUnitType extends UnitType{
 
     public void drawRotors(Unit unit){
         Draw.mixcol(Color.white, unit.hitTime);
-
-        rotors.each(rotor -> {
+        for(Rotor rotor : rotors){
             float offX = Angles.trnsx(unit.rotation - 90, rotor.x, rotor.y);
             float offY = Angles.trnsy(unit.rotation - 90, rotor.x, rotor.y);
 
@@ -282,9 +281,8 @@ public class UnityUnitType extends UnitType{
             }
 
             Draw.alpha(1f);
-            Draw.rect(rotor.topOutlineRegion, unit.x + offX, unit.y + offY, unit.rotation - 90f);
             Draw.rect(rotor.topRegion, unit.x + offX, unit.y + offY, unit.rotation - 90f);
-        });
+        }
 
         Draw.mixcol();
     }

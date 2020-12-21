@@ -14,9 +14,7 @@ ext{
     }
 }
 
-task jarAndroid{
-    dependsOn "jar"
-
+task jarAndroid(dependsOn: jar){
     doLast{
         def files = (configurations.compileClasspath.asList() + configurations.runtimeClasspath.asList() + [new File("$sdkRoot/platforms/android-$sdkVersion/android.jar")])
         def dependencies = files.collect{ "--classpath $it.path" }.join(" ")
@@ -67,9 +65,7 @@ jar{
     }
 }
 
-task deploy(type: Jar){
-    dependsOn jarAndroid
-    dependsOn jar
+task deploy(type: Jar, dependsOn: [jarAndroid, jar]){
     archiveFileName = "${modName}.jar"
 
     from{ [zipTree("$buildDir/libs/${modName}.jar"), zipTree("$buildDir/libs/${modName}Android.jar")] }
