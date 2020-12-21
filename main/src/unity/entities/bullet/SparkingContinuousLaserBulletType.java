@@ -48,7 +48,7 @@ public class SparkingContinuousLaserBulletType extends ContinuousLaserBulletType
         }
         if(Mathf.chance(incendChance)){
             Tmp.v1.trns(b.rotation(), Mathf.random(incendStart, realLength));
-            Damage.createIncend(b.x + Tmp.v1.x, b.y + Tmp.v2.y, incendSpread, incendAmount);
+            Damage.createIncend(b.x + Tmp.v1.x, b.y + Tmp.v1.y, incendSpread, incendAmount);
         }
 
         if(extinction){
