@@ -14,6 +14,8 @@ import unity.annotations.Annotations.*;
 import unity.content.*;
 import unity.type.*;
 
+import java.lang.reflect.*;
+
 /**
 <code>
 const p = Vars.player;
@@ -107,6 +109,8 @@ public interface Wormc extends Unitc{
                     ((Wormc)Groups.unit.getByID(childs().get(i - 1))).setChild(childs().get(i));
                 }
             }
+
+            for(int id : childs().items) Log.info(id);
         }else if(!initialized()){
             remove();
         }
@@ -141,7 +145,7 @@ public interface Wormc extends Unitc{
         boolean past = false;
         for(int id : head().childs().items){
             Wormc worm = (Wormc)Groups.unit.getByID(id);
-            if(past && worm != null && !worm.dead()){
+            if(past && worm != null){
                 childs.add(worm.id());
             }else if(worm == this){
                 past = true;
@@ -149,11 +153,13 @@ public interface Wormc extends Unitc{
         }
 
         child.childs(childs);
-        for(int id : child.childs().items){
-            Wormc worm = (Wormc)Groups.unit.getByID(id);
-            if(worm == null || worm.dead()) continue;
-
-            worm.findHead();
+        for(int i = 0; i < child.childs().size; i++){
+            Wormc worm = (Wormc)Groups.unit.getByID(childs().get(i));
+            if(i == 0){
+                child.setChild(worm.id());
+            }else{
+                worm.setChild(childs().get(i - 1));
+            }
         }
     }
 
@@ -171,6 +177,11 @@ public interface Wormc extends Unitc{
 
             rotation(Mathf.slerpDelta(rotation(), angleTo(parent()), type().rotateSpeed / 60f));
         }
+    }
+
+    @Override
+    default boolean hasWeapons(){
+        return mounts().length > 0 || headDamage() > 0f;
     }
 
     default int segmentLength(){
@@ -211,7 +222,7 @@ public interface Wormc extends Unitc{
         if(isHead()) return this;
 
         Wormc worm = (Wormc)Groups.unit.getByID(headId());
-        if(worm == null || worm.dead()){
+        if(worm == null){
             findHead();
             worm = (Wormc)Groups.unit.getByID(headId());
         }
@@ -228,8 +239,8 @@ public interface Wormc extends Unitc{
     }
 
     default void setParent(Wormc unit){
-        if(unit == null || unit.dead() || (unit.child() != null && unit.child() != this)){
-            parentId(unit.id());
+        if(unit == null){
+            parentId(-1);
             return;
         }
 
@@ -238,7 +249,7 @@ public interface Wormc extends Unitc{
 
     default void setChild(int id){
         Unit worm = Groups.unit.getByID(id);
-        if(worm == null || worm.dead()){
+        if(worm == null){
             childId(-1);
             return;
         }
@@ -260,7 +271,7 @@ public interface Wormc extends Unitc{
                 IntSeq childs = childs();
                 for(int i = childs.size; i >= 0; i--){
                     Wormc worm = (Wormc)Groups.unit.getByID(childs.get(i));
-                    if(worm == null || worm.dead()) continue;
+                    if(worm == null) continue;
 
                     worm.damageUnfiltered(amount / (childs.size + 1));
 
@@ -289,7 +300,7 @@ public interface Wormc extends Unitc{
             aimUnfiltered(x, y);
             for(int id : childs().items){
                 Wormc worm = (Wormc)Groups.unit.getByID(id);
-                if(worm == null || worm.dead()) continue;
+                if(worm == null) continue;
 
                 worm.aimUnfiltered(x, y);
             }
@@ -333,8 +344,8 @@ public interface Wormc extends Unitc{
                 health(maxHealth());
                 for(int id : childs().items){
                     Unit worm = Groups.unit.getByID(id);
-                    if(worm == null || worm.dead()) continue;
-
+                    if(worm == null) continue;
+    
                     worm.health(maxHealth());
                 }
             }else{
@@ -355,8 +366,8 @@ public interface Wormc extends Unitc{
                 health(health() + value);
                 for(int id : childs().items){
                     Unit worm = Groups.unit.getByID(id);
-                    if(worm == null || worm.dead()) continue;
-
+                    if(worm == null) continue;
+    
                     worm.health(worm.health() + value);
                 }
             }else{
@@ -375,8 +386,8 @@ public interface Wormc extends Unitc{
                 this.<Unit>self().health = health;
                 for(int id : childs().items){
                     Unit worm = Groups.unit.getByID(id);
-                    if(worm == null || worm.dead()) continue;
-
+                    if(worm == null) continue;
+    
                     worm.health = health;
                 }
             }else{
@@ -392,6 +403,39 @@ public interface Wormc extends Unitc{
         return hitbox instanceof Wormc worm
         ?   !(worm.head() == head())
         :   true;
+    }
+
+    @Override
+    @Replace
+    default void controlWeapons(boolean rotate, boolean shoot){
+        if(isHead()){
+            controlWeaponsUnfiltered(rotate, shoot);
+            for(int id : childs().items){
+                Wormc worm = (Wormc)Groups.unit.getByID(id);
+                if(worm == null) continue;
+
+                worm.controlWeaponsUnfiltered(rotate, shoot);
+            }
+        }else{
+            head().controlWeapons(rotate, shoot);
+        }
+    }
+
+    default void controlWeaponsUnfiltered(boolean rotate, boolean shoot){
+        for(WeaponMount mount : mounts()){
+            mount.rotate = rotate;
+            mount.shoot = shoot;
+        }
+
+        try{
+            Field isRotate = UnitEntity.class.getDeclaredField("isRotate");
+            isRotate.setAccessible(true);
+            isRotate.setBoolean((UnitEntity)this, rotate);
+
+            isShooting(shoot);
+        }catch(Exception e){
+            throw new IllegalStateException(e);
+        }
     }
 
     @Override

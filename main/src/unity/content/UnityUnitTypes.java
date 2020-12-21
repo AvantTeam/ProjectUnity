@@ -110,7 +110,10 @@ public class UnityUnitTypes implements ContentList{
             segmentOffset = 3.5f;
             headDamage = 48f;
 
-            weapons.add(UnitTypes.beta.weapons.first());
+            Weapon weapon = UnitTypes.beta.weapons.first().copy();
+            weapon.top = true;
+
+            weapons.add(weapon);
         }};
 
         caelifera = new UnityUnitType("caelifera"){{

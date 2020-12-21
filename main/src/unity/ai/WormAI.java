@@ -1,10 +1,14 @@
 package unity.ai;
 
+import arc.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.util.*;
 import mindustry.ai.types.*;
+import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
+import mindustry.type.*;
 import mindustry.world.meta.*;
 import unity.entities.comp.*;
 
@@ -15,7 +19,7 @@ public class WormAI extends FlyingAI{
     @Override
     public void updateMovement(){
         if(worm().isHead()){
-            if(target != null && (unit.hasWeapons() || worm().headDamage() > 0f) && command() == UnitCommand.attack){
+            if(target != null && worm().hasWeapons() && command() == UnitCommand.attack){
                 attack(120f);
             }
 
@@ -55,9 +59,41 @@ public class WormAI extends FlyingAI{
         }
     }
 
+    @Override
+    protected void updateWeapons(){
+        if(worm().isPlayer()){
+            worm().isShooting = worm().head().isShooting();
+
+            for(WeaponMount mount : worm().mounts){
+                Weapon weapon = mount.weapon;
+
+                Vec2 to = Predict.intercept(worm(), Core.input.mouseWorld(), weapon.bullet.speed);
+                mount.aimX = to.x;
+                mount.aimY = to.y;
+
+                mount.shoot = worm().head().isShooting();
+                mount.rotate = true;
+
+                worm().aimX = mount.aimX;
+                worm().aimY = mount.aimY;
+            }
+        }else{
+            super.updateWeapons();
+        }
+    }
+
     protected void updateRotation(){
         if(unit.vel.isZero(0.001f)){
             unit.rotation(Mathf.slerpDelta(unit.rotation(), unit.vel.angle(), unit.type.rotateSpeed / 60f));
+
+            Wormc child = worm().child();
+            if(child != null){
+                Tmp.v1.trns(unit.rotation(), -worm().segmentOffset()).add(worm());
+                Tmp.v2.trns(child.rotation(), child.segmentOffset()).add(child);
+                Tmp.v3.set(Tmp.v2).sub(Tmp.v1);
+
+                unit.moveAt(Tmp.v3);
+            }
         }
     }
 
