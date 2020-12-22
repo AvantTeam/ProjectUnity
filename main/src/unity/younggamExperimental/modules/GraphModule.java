@@ -6,38 +6,40 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.io.*;
 import mindustry.gen.*;
-import mindustry.world.*;
 import unity.younggamExperimental.*;
 import unity.younggamExperimental.graph.*;
 import unity.younggamExperimental.graphs.*;
 
+import java.util.*;
+
 //GraphPropsCommon building 에 들어갈 모듈. powerModule와 비슷한 역할?
-public class GraphModule{
+public abstract class GraphModule{
     public final Seq<GraphData> acceptPorts = new Seq<>(8);
     public final int portIndex;
 
-    public Building parentBuilding;
+    public GraphModules parent;
     public Graph parentBlock;
     public int d;
 
     final ObjectSet<GraphModule> neighbours = new ObjectSet<>(4);//neighbourArray
 
-    protected GraphBase network;
+    protected BaseGraph network;
 
     int lastRecalc;
     boolean dead, needsNetworkUpdate = true, networkSaveState;
+    Seq saveCache;
 
-    GraphModule(Building parentBuilding, int portIndex){
-        this.parentBuilding = parentBuilding;
+    GraphModule(GraphModules parent, int portIndex){
+        this.parent = parent;
         this.portIndex = portIndex;
     }
 
     GraphData getConnectSidePos(int index){
-        return GraphData.getConnectSidePos(index, parentBuilding.block.size, parentBuilding.rotation);
+        return parent.getConnectSidePos(index);
     }
 
     int canConnect(Point2 pos){
-        GraphData temp = acceptPorts.find(d -> pos.equals(d.toPos.x + parentBuilding.tileX(), d.toPos.y + parentBuilding.tileY()));
+        GraphData temp = acceptPorts.find(d -> pos.equals(d.toPos.x + parent.build.tileX(), d.toPos.y + parent.build.tileY()));
         if(temp != null) return temp.index;
         return -1;
     }
@@ -49,12 +51,12 @@ public class GraphModule{
     }
 
     void recalcPorts(){
-        if(lastRecalc == parentBuilding.rotation) return;
+        if(lastRecalc == parent.build.rotation) return;
         acceptPorts.clear();
         for(int i = 0, len = parentBlock.accept.length; i < len; i++){
             if(parentBlock.accept[i] != 0) acceptPorts.add(getConnectSidePos(i));
         }
-        lastRecalc = parentBuilding.rotation;
+        lastRecalc = parent.build.rotation;
     }
 
     void onRemoved(){
@@ -95,35 +97,38 @@ public class GraphModule{
                 needsNetworkUpdate = false;
                 network.rebuildGraph(this);
                 if(networkSaveState){
-                    applySaveState(network);
+                    applySaveState(network, saveCache.get(0));
                     networkSaveState = false;
                 }
-                //TODO
+                //parent.onGraphUpdate(); TODO
             }
             network.update();
             updateProps(network, 0);
         }
     }
 
-    void applySaveState(GraphBase graph/*TODO*/){}
+    abstract void applySaveState(BaseGraph graph, Object cache);
 
-    void updateExtension(){}
+    abstract void updateExtension();
 
-    void updateProps(GraphBase graph, int index){}
+    abstract void updateProps(BaseGraph graph, int index);
 
-    void proximityUpdateCustom(){}
+    abstract void proximityUpdateCustom();
 
-    void display(Table table){}
+    abstract void display(Table table);
 
-    void initStats(){}
+    abstract void initStats();
 
-    void displayBars(/*TODO*/){}
+    abstract void displayBars(Table table);
 
-    void drawSelect(){}
+    abstract void drawSelect();
+
+    //abstract 해결용 임의로 넣은것
+    abstract BaseGraph newNetwork();
 
     void initAllNets(){
         recalcPorts();
-        network = new GraphBase(this);
+        network = newNetwork();
     }
 
     public GraphModule getNeighbour(GraphModule build){
@@ -144,43 +149,43 @@ public class GraphModule{
 
     public void removeNeighbour(GraphModule build){
         neighbours.remove(build);
-        //TODO
+        //parent.build.onNeighboursChanged();TODO
     }
 
     void addNeighbour(GraphModule n){
         neighbours.add(n);
-        //TODO
+        //parent.build.onNeighboursChanged();TODO
     }
 
     public Seq<GraphData> getConnectedNeighbours(int index){
         return acceptPorts;
     }
 
-    GraphBase getNetwork(){
+    BaseGraph getNetwork(){
         return network;
     }
 
-    public boolean replaceNetwork(GraphBase old, GraphBase set){
+    public boolean replaceNetwork(BaseGraph old, BaseGraph set){
         network = set;
         return true;
     }
 
     //TODO 굳이? 싶은 함수들 여기
-    public GraphBase getNetworkOfPort(int index){
+    public BaseGraph getNetworkOfPort(int index){
         return network;
     }
 
-    public void setNetworkOfPort(int index, GraphBase net){
+    public void setNetworkOfPort(int index, BaseGraph net){
         network = net;
     }
 
-    void writeGlobal(Writes writes){}
+    abstract void writeGlobal(Writes writes);
 
-    void readGlobal(Reads reads, byte revision){}
+    abstract void readGlobal(Reads reads, byte revision);
 
-    void writeLocal(Writes writes, GraphBase graph){}
+    abstract void writeLocal(Writes writes, BaseGraph graph);
 
-    void readLocal(Writes writes, byte revision){}
+    abstract <T> T[] readLocal(Reads writes, byte revision);
 
     void write(Writes writes){
         writeGlobal(writes);
@@ -189,17 +194,19 @@ public class GraphModule{
 
     void read(Reads reads, byte revision){
         readGlobal(reads, revision);
-        //TODO
+        saveCache = Seq.with(readLocal(reads, revision));
         networkSaveState = true;
     }
 
     //내가 추가한거
     public int hueristic(Position target){
-        return d + Math.abs(Math.round(parentBuilding.x - target.getX())) + Math.abs(Math.round(parentBuilding.y - target.getY()));
+        return d + Math.abs(Math.round(parent.build.x - target.getX())) + Math.abs(Math.round(parent.build.y - target.getY()));
     }
 
     public GraphModule d(int a){
         d = a;
         return this;
     }
+
+    public abstract GraphType type();
 }
