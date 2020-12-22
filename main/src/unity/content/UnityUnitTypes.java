@@ -112,10 +112,22 @@ public class UnityUnitTypes implements ContentList{
             segmentOffset = 13f;
             headDamage = 48f;
 
-            Weapon weapon = UnitTypes.beta.weapons.first().copy();
-            weapon.top = true;
+            weapons.add(new Weapon("small-mount-weapon"){{
+                reload = 20f;
+                mirror = false;
+                y = 1f;
+                rotate = true;
+                ejectEffect = Fx.none;
+                shootSound = Sounds.lasershoot;
 
-            weapons.add(weapon);
+                bullet = new LaserBoltBulletType(12f, 20f){{
+                    width = 7f;
+                    height = 24f;
+                    lifetime = 60f;
+                    shootEffect = Fx.shootSmall;
+                    smokeEffect = Fx.shootSmallSmoke;
+                }};
+            }});
         }};
 
         caelifera = new UnityUnitType("caelifera"){{
