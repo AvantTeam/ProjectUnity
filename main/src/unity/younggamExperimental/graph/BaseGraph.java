@@ -9,10 +9,10 @@ import unity.younggamExperimental.modules.*;
 import java.util.*;
 
 //BlockGraph 그래프 그자체 TODO abstract로 만들기?, build들 이름 바꾸기?
-public class GraphBase{
+public abstract class BaseGraph{
+    public final ObjectSet<GraphModule> connected = new ObjectSet<>();
+    public final int id;
     private static int lastId;
-    final ObjectSet<GraphModule> connected = new ObjectSet<>();
-    final int id;
     long lastFrameUpdated;
     GraphModule target;
 
@@ -20,20 +20,23 @@ public class GraphBase{
         id = lastId++;
     }
 
-    public GraphBase(GraphModule build){
+    public BaseGraph(GraphModule build){
         //TODO  init 으로 분리하기?
         connected.add(build);
         updateOnGraphChanged();
         addMergeStats(build);
     }
 
-    GraphBase copyGraph(GraphModule build){
-        GraphBase copygraph = new GraphBase(build);
+    //abstract 문제해결용 임의로 추가..
+    abstract BaseGraph create(GraphModule build);
+
+    BaseGraph copyGraph(GraphModule build){
+        BaseGraph copygraph = create(build);
         copygraph.copyGraphStatsFrom(this);
         return copygraph;
     }
 
-    void copyGraphStatsFrom(GraphBase graph){}
+    abstract void copyGraphStatsFrom(BaseGraph graph);
 
     public void update(){
         long frameId = Core.graphics.getFrameId();
@@ -43,11 +46,11 @@ public class GraphBase{
         updateGraph();
     }
 
-    void updateOnGraphChanged(){}
+    abstract void updateOnGraphChanged();
 
-    void updateGraph(){}
+    abstract void updateGraph();
 
-    void updateDirect(){}
+    abstract void updateDirect();
 
     boolean canConnect(GraphModule b1, GraphModule b2){
         return true;
@@ -60,9 +63,9 @@ public class GraphBase{
         addMergeStats(build);
     }
 
-    void addMergeStats(GraphModule build){}
+    abstract void addMergeStats(GraphModule build);
 
-    void mergeGraph(GraphBase graph){
+    void mergeGraph(BaseGraph graph){
         if(graph == null) return;
         if(graph.connected.size > connected.size){
             graph.mergeGraph(this);
@@ -78,7 +81,7 @@ public class GraphBase{
         updateOnGraphChanged();
     }
 
-    void mergeStats(GraphBase graph){}
+    abstract void mergeStats(BaseGraph graph);
 
     void killGraph(){
         connected.clear();
@@ -94,7 +97,7 @@ public class GraphBase{
         PQueue<GraphModule> front = new PQueue<>();
         front.comparator = (a, b) -> {
             if(target == null) return 99999999;
-            return a.hueristic(target.parentBuilding) - b.hueristic(target.parentBuilding);
+            return a.hueristic(target.parent.build) - b.hueristic(target.parent.build);
         };
         front.add(neighs.get(0));
         int giveUp = connected.size;
@@ -110,7 +113,7 @@ public class GraphBase{
                     if(neighbourIndex == neighs.size) return false;
                     target = neighs.get(neighbourIndex);
                 }
-                front.comparator = Comparator.comparingInt(a -> a.hueristic(target.parentBuilding));
+                front.comparator = Comparator.comparingInt(a -> a.hueristic(target.parent.build));
             }
             visited.add(current);
             current.eachNeighbour(n -> {
@@ -133,9 +136,9 @@ public class GraphBase{
             return;
         }
         killGraph();
-        ObjectSet<GraphBase> networksAdded = new ObjectSet<>(c);
+        ObjectSet<BaseGraph> networksAdded = new ObjectSet<>(c);
         build.eachNeighbour(n -> {
-            GraphBase copyNet = build.getNetworkOfPort(n.portIndex);
+            BaseGraph copyNet = build.getNetworkOfPort(n.portIndex);
             if(copyNet == this){
                 GraphModule selfref = n.getNeighbour(build);
                 if(selfref == null) return;
@@ -146,7 +149,7 @@ public class GraphBase{
             if(build.getNetworkOfPort(n.portIndex) == this){
                 GraphModule selfref = n.getNeighbour(build);
                 if(selfref == null) return;
-                GraphBase neiNet = n.getNetworkOfPort(selfref.portIndex);
+                BaseGraph neiNet = n.getNetworkOfPort(selfref.portIndex);
                 if(!networksAdded.contains(neiNet)){
                     networksAdded.add(neiNet);
                     neiNet.rebuildGraphIndex(n, selfref.portIndex);
@@ -160,7 +163,7 @@ public class GraphBase{
         rebuildGrpahWithSet(build, ObjectSet.with(build), -1);
     }
 
-    void rebuildGraphIndex(GraphModule build, int index){
+    public void rebuildGraphIndex(GraphModule build, int index){
         rebuildGrpahWithSet(build, ObjectSet.with(build), index);
     }
 
@@ -186,8 +189,8 @@ public class GraphBase{
                 GraphData portInfo = acceptPorts.get(port);
                 int portIndex = portInfo.index;
                 if(buildConnector.getNetworkOfPort(portIndex) == null) continue;
-                if(buildConnector.parentBuilding.tile == null) return;
-                Tile tile = buildConnector.parentBuilding.tile.nearby(portInfo.toPos);
+                if(buildConnector.parent.build.tile == null) return;
+                Tile tile = buildConnector.parent.build.tile.nearby(portInfo.toPos);
                 if(tile == null) return;
 
                 //TODO
@@ -207,11 +210,13 @@ public class GraphBase{
 
     String connectedToString(){
         StringBuilder s = new StringBuilder("Network:" + id + ":");
-        connected.each(build -> s.append(build.parentBuilding.block.localizedName).append(", "));
+        connected.each(build -> s.append(build.parent.build.block.localizedName).append(", "));
         return s.toString();
     }
 
     //내가 추가한것
+    public abstract GraphType type();
+
     class GraphTree{
         boolean complete;
         GraphTree parent;

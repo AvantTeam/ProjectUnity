@@ -1,7 +1,10 @@
 package unity.younggamExperimental.graphs;
 
+import arc.scene.ui.layout.*;
+import unity.younggamExperimental.*;
+
 //GraphCommon 그래프계의 타입 느낌? Consume?
-public class Graph{
+public abstract class Graph{
     public boolean isMultiConnector;
     public int[] accept;
 
@@ -9,5 +12,11 @@ public class Graph{
         accept = newAccept;
     }
 
-    void drawPlace(int x, int y, int size, int rotation, boolean valid){}
+    public abstract void setStats(Table table);
+
+    public abstract void setStatsExt(Table table);
+
+    abstract void drawPlace(int x, int y, int size, int rotation, boolean valid);
+
+    public abstract GraphType type();
 }

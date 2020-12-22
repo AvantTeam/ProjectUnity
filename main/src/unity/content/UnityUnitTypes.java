@@ -50,10 +50,9 @@ public class UnityUnitTypes implements ContentList{
     UnitType arcaetana, projectSpiboss;
 
     /** Global naval units */
-    public static UnitType
-        //naval-units
-        rexed, storm, amphibiNaval, amphibi, craberNaval, craber;
-
+    public static UnitType//@formatter:off
+    rexed, storm, amphibiNaval, amphibi, craberNaval, craber;
+    //formatter:on
     /** Scar {@linkplain LegsUnit legs} units */
     public static @FactionDef(type = "scar") @EntityPoint(type = LegsUnit.class)
     UnitType hovos, ryzer, zena, sundown, rex;
