@@ -61,7 +61,7 @@ public class WormAI extends FlyingAI{
 
     @Override
     protected void updateWeapons(){
-        if(worm().isPlayer()){
+        if(!worm().isHead()){
             worm().isShooting = worm().head().isShooting();
 
             for(WeaponMount mount : worm().mounts){
@@ -83,16 +83,16 @@ public class WormAI extends FlyingAI{
     }
 
     protected void updateRotation(){
-        if(unit.vel.isZero(0.001f)){
-            unit.rotation(Mathf.slerpDelta(unit.rotation(), unit.vel.angle(), unit.type.rotateSpeed / 60f));
+        if(!unit.vel.isZero(0.001f)){
+            unit.rotation(Mathf.slerpDelta(unit.rotation(), unit.prefRotation(), unit.type.rotateSpeed / 60f));
 
             Wormc child = worm().child();
             if(child != null){
-                Tmp.v1.trns(unit.rotation(), -worm().segmentOffset()).add(worm());
-                Tmp.v2.trns(child.rotation(), child.segmentOffset()).add(child);
+                Tmp.v1.trns(unit.rotation(), -worm().segmentOffset() / 2f).add(worm());
+                Tmp.v2.trns(child.rotation(), child.segmentOffset() / 2f).add(child);
                 Tmp.v3.set(Tmp.v2).sub(Tmp.v1);
 
-                unit.moveAt(Tmp.v3);
+                unit.vel.add(Tmp.v3);
             }
         }
     }

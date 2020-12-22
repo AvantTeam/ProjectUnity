@@ -109,7 +109,7 @@ public class UnityUnitTypes implements ContentList{
 
             splittable = true;
             segmentLength = 15;
-            segmentOffset = 3.5f;
+            segmentOffset = 13f;
             headDamage = 48f;
 
             Weapon weapon = UnitTypes.beta.weapons.first().copy();

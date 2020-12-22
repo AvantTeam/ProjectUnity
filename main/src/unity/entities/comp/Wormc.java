@@ -165,17 +165,12 @@ public interface Wormc extends Unitc{
 
     default void updateMovement(){
         if(!isHead()){
-            if(!parent().vel().isZero(0.1f)){
-                Tmp.v1.trns(parent().vel().angle(), -segmentOffset()).add(parent());
-                Tmp.v2.set(Tmp.v1).sub(this)
-                    .setLength(Math.min(type().speed, Mathf.lerpDelta(vel().len(), Tmp.v2.len(), type().accel)));
+            Tmp.v1.trns(parent().vel().angle(), -segmentOffset()).add(parent());
+            Tmp.v3.trns(parent().vel().angle(), -segmentOffset() / 2f).add(parent());
+            Tmp.v2.set(Tmp.v1).sub(this);
 
-                if(dst(Tmp.v1) > segmentOffset() * 4f){
-                    vel().add(Tmp.v2).limit(type().speed).scl(Time.delta);
-                }
-            }
-
-            rotation(Mathf.slerpDelta(rotation(), angleTo(parent()), type().rotateSpeed / 60f));
+            vel().set(Tmp.v2).scl(Time.delta);
+            rotation(Mathf.slerpDelta(rotation(), angleTo(Tmp.v3), type().rotateSpeed / 60f));
         }
     }
 
@@ -401,7 +396,7 @@ public interface Wormc extends Unitc{
     @Override
     default boolean collides(Hitboxc hitbox){
         return hitbox instanceof Wormc worm
-        ?   !(worm.head() == head())
+        ?   worm.head() != head()
         :   true;
     }
 
