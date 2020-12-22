@@ -26,7 +26,7 @@ public class ExpBlock extends ExpType<Block>{
 
             type.config(Integer.class, (build, value) -> {
                 int i = value.intValue();
-                if(i > 0 && build instanceof ExpEntity exp){
+                if(i > 0 && build instanceof ExpBuildc exp){
                     exp.upgrade(i);
                 }
             });
