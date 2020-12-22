@@ -75,10 +75,6 @@ public class UnityUnitTypes implements ContentList{
 
     //public static @FactionDef(type = "end") UnitType devourer;
 
-    /** Don't even bother */
-    public static @EntityDef(base = UnitEntity.class, def = Wormc.class)
-    UnitType googol;
-
     public static int getClassId(int index){
         return classIDs[index];
     }
@@ -98,24 +94,6 @@ public class UnityUnitTypes implements ContentList{
             }
         }
         //region flying-units
-
-        googol = new UnityUnitType("project-googol"){{
-            defaultController = WormAI::new;
-            flying = true;
-            speed = 3f;
-
-            rotateShooting = false;
-
-            splittable = true;
-            segmentLength = 15;
-            segmentOffset = 3.5f;
-            headDamage = 48f;
-
-            Weapon weapon = UnitTypes.beta.weapons.first().copy();
-            weapon.top = true;
-
-            weapons.add(weapon);
-        }};
 
         caelifera = new UnityUnitType("caelifera"){{
             defaultController = CopterAI::new;

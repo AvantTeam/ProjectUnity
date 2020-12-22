@@ -61,21 +61,39 @@ public class WormAI extends FlyingAI{
 
     @Override
     protected void updateWeapons(){
-        if(worm().isPlayer()){
-            worm().isShooting = worm().head().isShooting();
+        if(!worm().isHead()){
+            unit.isShooting = worm().head().isShooting();
 
             for(WeaponMount mount : worm().mounts){
                 Weapon weapon = mount.weapon;
 
-                Vec2 to = Predict.intercept(worm(), Core.input.mouseWorld(), weapon.bullet.speed);
+                Vec2 t = unit.isPlayer()
+                ?   Tmp.v6.set(Core.input.mouseWorld()).sub(unit)
+                :   Tmp.v6.set(worm().head().aimX(), worm().head().aimY());
+
+                float v = 0f;
+                if(!unit.isPlayer()){
+                    Teamc target = Units.closestTarget(unit.team, t.x, t.y, Float.MAX_VALUE,
+                    u ->
+                        !u.dead() &&
+                        (u.isFlying() && unit.type.targetAir) ||
+                        (u.isGrounded() && unit.type.targetGround),
+                    tile -> !tile.dead() && unit.type.targetGround);
+
+                    if(target instanceof Hitboxc h){
+                        v += h.deltaLen();
+                    }
+                }
+
+                Vec2 to = Predict.intercept(unit.x, unit.y, worm().head().deltaLen(), t.x, t.y, v, weapon.bullet.speed);
                 mount.aimX = to.x;
                 mount.aimY = to.y;
 
                 mount.shoot = worm().head().isShooting();
-                mount.rotate = true;
+                mount.rotate = weapon.rotate;
 
-                worm().aimX = mount.aimX;
-                worm().aimY = mount.aimY;
+                unit.aimX = mount.aimX;
+                unit.aimY = mount.aimY;
             }
         }else{
             super.updateWeapons();
@@ -83,17 +101,8 @@ public class WormAI extends FlyingAI{
     }
 
     protected void updateRotation(){
-        if(unit.vel.isZero(0.001f)){
-            unit.rotation(Mathf.slerpDelta(unit.rotation(), unit.vel.angle(), unit.type.rotateSpeed / 60f));
-
-            Wormc child = worm().child();
-            if(child != null){
-                Tmp.v1.trns(unit.rotation(), -worm().segmentOffset()).add(worm());
-                Tmp.v2.trns(child.rotation(), child.segmentOffset()).add(child);
-                Tmp.v3.set(Tmp.v2).sub(Tmp.v1);
-
-                unit.moveAt(Tmp.v3);
-            }
+        if(!unit.vel.isZero(0.001f)){
+            unit.rotation(Mathf.slerpDelta(unit.rotation(), unit.prefRotation(), unit.type.rotateSpeed / 60f));
         }
     }
 
