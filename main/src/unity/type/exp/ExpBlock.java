@@ -10,6 +10,13 @@ import unity.entities.comp.*;
 import unity.type.*;
 
 public class ExpBlock extends ExpType<Block>{
+    public boolean hasExp = false;
+    public float orbRefund = 0.3f;
+
+    public boolean hub = false;
+    public boolean conveyor = false;
+    public boolean noOrbCollision = true;
+
     public ExpBlock(Block type){
         super(type);
     }

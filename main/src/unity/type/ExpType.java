@@ -1,10 +1,14 @@
 package unity.type;
 
 import arc.*;
+import arc.audio.*;
 import arc.graphics.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.content.*;
 import mindustry.ctype.*;
+import mindustry.entities.*;
+import mindustry.gen.Sounds;
 import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.world.meta.*;
@@ -24,6 +28,9 @@ public abstract class ExpType<T extends UnlockableContent>{
 
     public OrderedSet<ExpUpgrade> upgrades = new OrderedSet<>();
     public boolean enableUpgrade;
+    public boolean hasUpgradeEffect = true;
+    public Effect upgradeEffect = Fx.none;
+    public Sound upgradeSound = Sounds.none;
 
     protected ExpType(T type){
         this.type = type;
