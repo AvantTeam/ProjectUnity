@@ -15,8 +15,8 @@ public abstract interface ExpEntityc<T extends UnlockableContent, E extends ExpT
         int level = level();
         if(level >= maxLevel()) return 1f;
 
-        float last = requiredExp(level);
-        float next = requiredExp(level + 1);
+        float last = expType().requiredExp(level);
+        float next = expType().requiredExp(level + 1);
 
         return (exp() - last) / (next - last);
     }
@@ -33,10 +33,9 @@ public abstract interface ExpEntityc<T extends UnlockableContent, E extends ExpT
         return expType().maxLevel;
     }
 
-    default float requiredExp(int level){
-        return level * level * 10f;
-    }
-
     @MustInherit
     E expType();
+
+    @MustInherit
+    void upgrade(int i);
 }
