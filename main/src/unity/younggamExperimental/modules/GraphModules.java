@@ -3,71 +3,80 @@ package unity.younggamExperimental.modules;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.io.*;
-import mindustry.gen.*;
 import unity.younggamExperimental.*;
+import unity.younggamExperimental.blocks.GraphBlockBase.*;
 
 //GraphCommonBuild. ㅁㄴ이라ㅓㅣ
 public class GraphModules{
-    public Building build;
-    final ObjectSet<GraphModule> graphs = new ObjectSet<>(4);
+    public final GraphBuildBase build;
+    final IntMap<GraphModule> graphs = new IntMap<>(4);
     int prevTileRotation = -1;
 
+    public GraphModules(GraphBuildBase build){
+        this.build = build;
+    }
+
     //TODO 굳이 싶은것들?
-    void setGraphConnector(GraphModule graph){
+    public void setGraphConnector(int i, GraphModule graph){
         graph.parent = this;
-        graphs.add(graph);
+        graphs.put(i, graph);
+    }
+
+    public GraphModule getGraphConnector(GraphType type){
+        return graphs.get(type.ordinal());
     }
 
     GraphData getConnectSidePos(int index){
-        return GraphData.getConnectSidePos(index, build.block.size, build.rotation);
+        return GraphData.getConnectSidePos(index, build.block().size, build.rotation());
     }
 
-    void created(){//create
-        for(var graphConn : graphs) graphConn.onCreate(build);
+    public void created(){//create
+        for(var graphConn : graphs.values()) graphConn.onCreate(build);
         prevTileRotation = -1;
     }
 
-    float efficiency(){
-        float e = 0f;
-        for(var graph : graphs) e *= graph.efficiency();
+    public float efficiency(){
+        float e = 1f;
+        for(var graph : graphs.values()) e *= graph.efficiency();
         return Math.max(0f, e);
     }
 
-    void onRemoved(){
-        updateGraphRemovals();
-    }
-
     //onDestroyed. 중복 호출?
-    void updateGraphRemovals(){
-        graphs.each(GraphModule::onRemoved);
+    public void updateGraphRemovals(){
+        for(var graph : graphs.values()) graph.onRemoved();
     }
 
-    void updateTile(){
-        if(!build.block.rotate) build.rotation = 0;
-        if(prevTileRotation != build.rotation){
-            for(var graph : graphs) graph.onRotationChanged(prevTileRotation, build.rotation);
+    public void updateTile(){
+        if(!build.block().rotate) build.rotation(0);
+        if(prevTileRotation != build.rotation()){
+            for(var graph : graphs.values()) graph.onRotationChanged(prevTileRotation, build.rotation());
+            build.onRotationChanged();
         }
-        for(var graph : graphs) graph.onUpdate();
-        prevTileRotation = build.rotation;
+        for(var graph : graphs.values()) graph.onUpdate();
     }
 
-    void onProximityChanged(){
-        graphs.each(GraphModule::proximityUpdateCustom);
+    public void onProximityUpdate(){
+        for(var graph : graphs.values()) graph.proximityUpdateCustom();
     }
 
-    void display(Table table){
-        for(var graph : graphs) graph.display(table);
+    public void display(Table table){
+        for(var graph : graphs.values()) graph.display(table);
     }
 
-    void displayBars(Table table){
-        for(var graph : graphs) graph.displayBars(table);
+    public void displayBars(Table table){
+        for(var graph : graphs.values()) graph.displayBars(table);
     }
 
-    void write(Writes writes){
-        for(var graph : graphs) graph.write(writes);
+    public void write(Writes write){
+        for(var graph : graphs.values()) graph.write(write);
     }
 
-    void read(Reads reads, byte revision){
-        for(var graph : graphs) graph.read(reads, revision);
+    public void read(Reads read, byte revision){
+        for(var graph : graphs.values()) graph.read(read, revision);
+    }
+
+    //
+    public void prevTileRotation(int r){
+        prevTileRotation = r;
     }
 }

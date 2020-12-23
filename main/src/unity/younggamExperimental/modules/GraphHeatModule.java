@@ -6,46 +6,37 @@ import arc.math.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import unity.younggamExperimental.*;
 import unity.younggamExperimental.graph.*;
 import unity.younggamExperimental.graphs.*;
 
-public class HeatModule extends GraphModule{
-    float heat, heatBuffer;
-
-    HeatModule(GraphModules parent, int portIndex){
-        super(parent, portIndex);
-    }
+public class GraphHeatModule extends GraphModule<GraphHeat, GraphHeatModule, HeatGraph>{
+    public float heat, heatBuffer;
 
     @Override
-    void applySaveState(BaseGraph graph, Object cache){
-
-    }
+    void applySaveState(HeatGraph graph){}
 
     @Override
-    void updateExtension(){
-
-    }
+    void updateExtension(){}
 
     @Override
-    void updateProps(BaseGraph graph, int index){
+    void updateProps(HeatGraph graph, int index){
         float temp = getTemp();
-        float cond = ((GraphHeat)super.parentBlock).baseHeatConductivity;
+        float cond = type.baseHeatConductivity;
         heatBuffer = 0f;
         float clampedDelta = Mathf.clamp(Time.delta, 0, 1f / cond);
-        neighbours.each(n -> heatBuffer += (((HeatModule)n).getTemp() - temp) * cond * clampedDelta);
-        heatBuffer += (293.15f - temp) * ((GraphHeat)parentBlock).baseHeatRadiativity * clampedDelta;
+        neighbours.each(n -> heatBuffer += (n.getTemp() - temp) * cond * clampedDelta);
+        heatBuffer += (293.15f - temp) * type.baseHeatRadiativity * clampedDelta;
     }
 
     @Override
-    void proximityUpdateCustom(){
-
-    }
+    void proximityUpdateCustom(){}
 
     @Override
     void display(Table table){
-        if(network == null) return;
+        if(networks.get(0) == null) return;
         String ps = Core.bundle.get("stat.unity.temperatureUnit");
         table.row();
         table.table(sub -> {
@@ -57,41 +48,38 @@ public class HeatModule extends GraphModule{
 
     @Override
     void initStats(){
-
+        setTemp(293.15f);
     }
 
     @Override
-    void displayBars(Table table){
-
-    }
+    void displayBars(Table table){}
 
     @Override
     void drawSelect(){
-        if(network != null) network.connected.each(build -> Drawf.selected(build.parent.build, Pal.accent));
+        if(networks.get(0) != null) networks.get(0).connected.each(module -> Drawf.selected(module.parent.build.<Building>self(), Pal.accent));
     }
 
     @Override
-    BaseGraph newNetwork(){
-        return null;//TODO
+    HeatGraph newNetwork(){
+        return new HeatGraph(this);
     }
 
     @Override
-    void writeGlobal(Writes writes){
-
+    void writeGlobal(Writes write){
+        write.f(heat);
     }
 
     @Override
     void readGlobal(Reads reads, byte revision){
-
+        heat = reads.f();
+        heatBuffer = 0f;
     }
 
     @Override
-    void writeLocal(Writes writes, BaseGraph graph){
-
-    }
+    void writeLocal(Writes write, HeatGraph graph){}
 
     @Override
-    <T> T[] readLocal(Reads writes, byte revision){
+    <T> T[] readLocal(Reads read, byte revision){
         return null;
     }
 
@@ -100,11 +88,13 @@ public class HeatModule extends GraphModule{
         return GraphType.heat;
     }
 
-    float getTemp(){
-        return heat / ((GraphHeat)parentBlock).baseHeatCapacity;
+    @Override
+    public float getTemp(){
+        return heat / type.baseHeatCapacity;
     }
 
+    @Override
     void setTemp(float t){
-        heat = t * ((GraphHeat)parentBlock).baseHeatCapacity;
+        heat = t * type.baseHeatCapacity;
     }
 }

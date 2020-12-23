@@ -32,6 +32,9 @@ import unity.world.blocks.storage.*;
 import unity.world.blocks.units.*;
 import unity.world.consumers.*;
 import unity.world.draw.*;
+import unity.younggamExperimental.blocks.*;
+import unity.younggamExperimental.graphs.*;
+import unity.younggamExperimental.modules.*;
 
 import static arc.Core.*;
 import static mindustry.type.ItemStack.*;
@@ -84,7 +87,9 @@ public class UnityBlocks implements ContentList{
     //monolithGroundFactory;
 
     public static @FactionDef(type = "youngcha")
-    Block concreteBlank, concreteFill, concreteNumber, concreteStripe, concrete, stoneFullTiles, stoneFull, stoneHalf, stoneTiles;
+    Block concreteBlank, concreteFill, concreteNumber, concreteStripe, concrete, stoneFullTiles, stoneFull, stoneHalf, stoneTiles,
+
+    sporePyro;
 
     public static @FactionDef(type = "end")
     Block terminalCrucible, endForge, endGame;
@@ -907,6 +912,20 @@ public class UnityBlocks implements ContentList{
         stoneHalf = new Floor("stone-half");
 
         stoneTiles = new Floor("stone-tiles");
+
+        sporePyro = new SporePyrolyser("spore-pyrolyser"){{
+            requirements(Category.crafting, with(UnityItems.nickel, 25, Items.titanium, 50, Items.copper, 50, Items.lead, 30));
+            size = 3;
+            health = 1100;
+            craftTime = 50f;
+            outputItem = new ItemStack(Items.coal, 3);
+            ambientSound = Sounds.machine;
+            ambientSoundVolume = 0.6f;
+            consumes.item(Items.sporePod, 1);
+            addGraph(new GraphHeat(60f, 0.4f, 0.008f)
+                .setAccept(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1), GraphHeatModule::new
+            );
+        }};
 
         //endregion
         //region end

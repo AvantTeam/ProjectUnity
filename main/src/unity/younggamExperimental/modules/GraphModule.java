@@ -5,70 +5,66 @@ import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.io.*;
-import mindustry.gen.*;
 import unity.younggamExperimental.*;
+import unity.younggamExperimental.blocks.GraphBlockBase.*;
 import unity.younggamExperimental.graph.*;
 import unity.younggamExperimental.graphs.*;
 
 //GraphPropsCommon building 에 들어갈 모듈. powerModule와 비슷한 역할?
-public abstract class GraphModule{
+//I had stroke
+public abstract class GraphModule<T extends Graph, M extends GraphModule<T, M, G>, G extends BaseGraph<T, M, G>>{
     public final Seq<GraphData> acceptPorts = new Seq<>(8);
-    public final int portIndex;
 
     public GraphModules parent;
-    public Graph parentBlock;
-    public int d;
+    public T type;//parentBlock
+    public int d, portIndex;
 
-    final ObjectSet<GraphModule> neighbours = new ObjectSet<>(4);//neighbourArray
+    final ObjectSet<M> neighbours = new ObjectSet<>(4);//neighbourArray
 
-    protected BaseGraph network;
+    protected final IntMap<G> networks = new IntMap<>(4);
 
     int lastRecalc;
     boolean dead, needsNetworkUpdate = true, networkSaveState;
-    Seq saveCache;
-
-    GraphModule(GraphModules parent, int portIndex){
-        this.parent = parent;
-        this.portIndex = portIndex;
-    }
+    Seq saveCache = new Seq(4);
 
     GraphData getConnectSidePos(int index){
         return parent.getConnectSidePos(index);
     }
 
-    int canConnect(Point2 pos){
+    public int canConnect(Point2 pos){
         GraphData temp = acceptPorts.find(d -> pos.equals(d.toPos.x + parent.build.tileX(), d.toPos.y + parent.build.tileY()));
         if(temp != null) return temp.index;
         return -1;
     }
 
-    void onCreate(Building build){
+    void onCreate(GraphBuildBase build){
         initAllNets();
+        needsNetworkUpdate = true;
         lastRecalc = -1;
         initStats();
     }
 
-    void recalcPorts(){
-        if(lastRecalc == parent.build.rotation) return;
+    public void recalcPorts(){
+        if(lastRecalc == parent.build.rotation()) return;
         acceptPorts.clear();
-        for(int i = 0, len = parentBlock.accept.length; i < len; i++){
-            if(parentBlock.accept[i] != 0) acceptPorts.add(getConnectSidePos(i));
+        for(int i = 0, len = type.accept.length; i < len; i++){
+            if(type.accept[i] != 0) acceptPorts.add(getConnectSidePos(i));
         }
-        lastRecalc = parent.build.rotation;
+        lastRecalc = parent.build.rotation();
     }
 
-    void onRemoved(){
+    public void onRemoved(){
         deleteSelfFromNetwork();
         deleteFromNeighbours();
     }
 
     void deleteFromNeighbours(){
-        neighbours.each(n -> n.removeNeighbour(this));
+        neighbours.each(n -> n.removeNeighbour((M)this));
     }
 
     void deleteSelfFromNetwork(){
         dead = true;
-        if(network != null) network.remove(this);
+        if(networks.get(0) != null) networks.get(0).remove((M)this);
     }
 
     void onUpdate(){
@@ -90,26 +86,26 @@ public abstract class GraphModule{
     }
 
     void updateNetworks(){
-        if(network != null){
+        if(networks.get(0) != null){
             if(needsNetworkUpdate){
                 needsNetworkUpdate = false;
-                network.rebuildGraph(this);
+                networks.get(0).rebuildGraph((M)this);
                 if(networkSaveState){
-                    applySaveState(network, saveCache.get(0));
+                    applySaveState(networks.get(0));
                     networkSaveState = false;
                 }
-                //parent.onGraphUpdate(); TODO
+                parent.build.onGraphUpdate();
             }
-            network.update();
-            updateProps(network, 0);
+            networks.get(0).update();
+            updateProps(networks.get(0), 0);
         }
     }
 
-    abstract void applySaveState(BaseGraph graph, Object cache);
+    abstract void applySaveState(G graph);
 
     abstract void updateExtension();
 
-    abstract void updateProps(BaseGraph graph, int index);
+    abstract void updateProps(G graph, int index);
 
     abstract void proximityUpdateCustom();
 
@@ -122,18 +118,26 @@ public abstract class GraphModule{
     abstract void drawSelect();
 
     //abstract 해결용 임의로 넣은것
-    abstract BaseGraph newNetwork();
+    abstract G newNetwork();
 
     void initAllNets(){
         recalcPorts();
-        network = newNetwork();
+        networks.put(0, newNetwork());
     }
 
-    public GraphModule getNeighbour(GraphModule build){
+    public boolean dead(){
+        return dead;
+    }
+
+    public float lastRecalc(){
+        return lastRecalc;
+    }
+
+    public M getNeighbour(M build){
         return neighbours.get(build);
     }
 
-    public void eachNeighbour(Cons<GraphModule> func){
+    public void eachNeighbour(Cons<M> func){
         neighbours.each(func);
     }
 
@@ -145,66 +149,86 @@ public abstract class GraphModule{
         return neighbours.size;
     }
 
-    public void removeNeighbour(GraphModule build){
+    public void removeNeighbour(M build){
         neighbours.remove(build);
-        //parent.build.onNeighboursChanged();TODO
+        parent.build.onNeighboursChanged();
     }
 
-    void addNeighbour(GraphModule n){
+    public void addNeighbour(M n){
         neighbours.add(n);
-        //parent.build.onNeighboursChanged();TODO
+        parent.build.onNeighboursChanged();
     }
 
     public Seq<GraphData> getConnectedNeighbours(int index){
         return acceptPorts;
     }
 
-    BaseGraph getNetwork(){
-        return network;
+    G getNetwork(){
+        return networks.get(0);
     }
 
-    public boolean replaceNetwork(BaseGraph old, BaseGraph set){
-        network = set;
+    public boolean hasNetwork(G net){
+        return networks.get(0).id == net.id;
+    }
+
+    int getPortOfNetwork(G net){
+        return networks.get(0).id == net.id ? 0 : -1;
+    }
+
+    public boolean replaceNetwork(G old, G set){
+        networks.put(0, set);
         return true;
     }
 
     //TODO 굳이? 싶은 함수들 여기
-    public BaseGraph getNetworkOfPort(int index){
-        return network;
+    public G getNetworkOfPort(int index){
+        return networks.get(0);
     }
 
-    public void setNetworkOfPort(int index, BaseGraph net){
-        network = net;
+    public void setNetworkOfPort(int index, G net){
+        networks.put(0, net);
     }
 
-    abstract void writeGlobal(Writes writes);
+    abstract void writeGlobal(Writes write);
 
-    abstract void readGlobal(Reads reads, byte revision);
+    abstract void readGlobal(Reads read, byte revision);
 
-    abstract void writeLocal(Writes writes, BaseGraph graph);
+    abstract void writeLocal(Writes write, G graph);
 
-    abstract <T> T[] readLocal(Reads writes, byte revision);
+    abstract <R> R[] readLocal(Reads read, byte revision);
 
-    void write(Writes writes){
-        writeGlobal(writes);
-        writeLocal(writes, network);
+    void write(Writes write){
+        writeGlobal(write);
+        writeLocal(write, networks.get(0));
     }
 
-    void read(Reads reads, byte revision){
-        readGlobal(reads, revision);
-        saveCache = Seq.with(readLocal(reads, revision));
+    void read(Reads read, byte revision){
+        readGlobal(read, revision);
+        saveCache.clear();
+        saveCache.add(readLocal(read, revision));
         networkSaveState = true;
     }
 
     //내가 추가한거
-    public int hueristic(Position target){
-        return d + Math.abs(Math.round(parent.build.x - target.getX())) + Math.abs(Math.round(parent.build.y - target.getY()));
-    }
-
-    public GraphModule d(int a){
-        d = a;
-        return this;
-    }
-
     public abstract GraphType type();
+
+    public int hueristic(Position target){
+        return d + Math.abs(Math.round(parent.build.x() - target.getX())) + Math.abs(Math.round(parent.build.y() - target.getY()));
+    }
+
+    public M d(int a){
+        d = a;
+        return (M)this;
+    }
+
+    public M portIndex(int a){
+        portIndex = a;
+        return (M)this;
+    }
+
+    public float getTemp(){
+        return 0f;
+    }
+
+    void setTemp(float t){}
 }

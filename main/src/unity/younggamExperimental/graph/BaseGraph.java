@@ -1,42 +1,47 @@
 package unity.younggamExperimental.graph;
 
 import arc.*;
+import arc.math.geom.*;
 import arc.struct.*;
 import mindustry.world.*;
 import unity.younggamExperimental.*;
+import unity.younggamExperimental.blocks.*;
+import unity.younggamExperimental.blocks.GraphBlockBase.*;
+import unity.younggamExperimental.graphs.*;
 import unity.younggamExperimental.modules.*;
 
-import java.util.*;
+import java.util.Comparator;
 
-//BlockGraph 그래프 그자체 TODO abstract로 만들기?, build들 이름 바꾸기?
-public abstract class BaseGraph{
-    public final ObjectSet<GraphModule> connected = new ObjectSet<>();
+//BlockGraph 그래프 그자체
+//I had stroke.
+public abstract class BaseGraph<T extends Graph, M extends GraphModule<T, M, G>, G extends BaseGraph<T, M, G>>{
+    public final ObjectSet<M> connected = new ObjectSet<>();
     public final int id;
     private static int lastId;
     long lastFrameUpdated;
-    GraphModule target;
+    M target;
 
     {
         id = lastId++;
     }
 
-    public BaseGraph(GraphModule build){
+    public BaseGraph(M module/*building*/){
         //TODO  init 으로 분리하기?
-        connected.add(build);
+        connected.add(module);
         updateOnGraphChanged();
-        addMergeStats(build);
+        addMergeStats(module);
     }
 
     //abstract 문제해결용 임의로 추가..
-    abstract BaseGraph create(GraphModule build);
+    abstract G create(M module/*building*/);
 
-    BaseGraph copyGraph(GraphModule build){
-        BaseGraph copygraph = create(build);
-        copygraph.copyGraphStatsFrom(this);
+    G copyGraph(M module/*building*/){
+        G copygraph = create(module);
+        copygraph.copyGraphStatsFrom((G)this);
         return copygraph;
     }
 
-    abstract void copyGraphStatsFrom(BaseGraph graph);
+    abstract void copyGraphStatsFrom(G graph);
 
     public void update(){
         long frameId = Core.graphics.getFrameId();
@@ -52,58 +57,58 @@ public abstract class BaseGraph{
 
     abstract void updateDirect();
 
-    boolean canConnect(GraphModule b1, GraphModule b2){
+    boolean canConnect(M b1, M b2){
         return true;
     }
 
-    void addBuilding(GraphModule build, int connectIndex){
-        connected.add(build);
+    void addBuilding(M module/*building*/, int connectIndex){
+        connected.add(module);
         updateOnGraphChanged();
-        build.setNetworkOfPort(connectIndex, this);
-        addMergeStats(build);
+        module.setNetworkOfPort(connectIndex, (G)this);
+        addMergeStats(module);
     }
 
-    abstract void addMergeStats(GraphModule build);
+    abstract void addMergeStats(M module/*building*/);
 
-    void mergeGraph(BaseGraph graph){
+    void mergeGraph(G graph){
         if(graph == null) return;
         if(graph.connected.size > connected.size){
-            graph.mergeGraph(this);
+            graph.mergeGraph((G)this);
             return;
         }
         updateDirect();
         graph.updateDirect();
         mergeStats(graph);
-        graph.connected.each(build -> {
-            if(!connected.contains(build) && build.replaceNetwork(graph, this))
-                connected.add(build);
+        graph.connected.each(module -> {
+            if(!connected.contains(module) && module.replaceNetwork(graph, (G)this))
+                connected.add(module);
         });
         updateOnGraphChanged();
     }
 
-    abstract void mergeStats(BaseGraph graph);
+    abstract void mergeStats(G graph);
 
     void killGraph(){
         connected.clear();
     }
 
-    boolean isAtriculationPoint(GraphModule build){
-        Seq<GraphModule> neighs = new Seq<>(4);
-        build.eachNeighbour(n -> {
-            if(build.getNetworkOfPort(n.portIndex) == this) neighs.add(n);
+    boolean isAtriculationPoint(M module/*building*/){
+        Seq<M> neighs = new Seq<>(4);
+        module.eachNeighbour(n -> {
+            if(module.getNetworkOfPort(n.portIndex) == this) neighs.add(n);
         });
         int neighbourIndex = 1;
         target = neighs.get(neighbourIndex);
-        PQueue<GraphModule> front = new PQueue<>();
+        PQueue<M> front = new PQueue<>();
         front.comparator = (a, b) -> {
             if(target == null) return 99999999;
             return a.hueristic(target.parent.build) - b.hueristic(target.parent.build);
         };
         front.add(neighs.get(0));
         int giveUp = connected.size;
-        ObjectSet<GraphModule> visited = ObjectSet.with(build);
+        ObjectSet<M> visited = ObjectSet.with(module);
         while(!front.empty()){
-            GraphModule current = front.poll();
+            M current = front.poll();
             if(current == target){
                 neighbourIndex++;
                 if(neighbourIndex == neighs.size) return false;
@@ -125,49 +130,49 @@ public abstract class BaseGraph{
         return true;
     }
 
-    public void remove(GraphModule build){
-        if(!connected.contains(build)) return;
-        int c = build.countNeighbours();
+    public void remove(M module/*building*/){
+        if(!connected.contains(module)) return;
+        int c = module.countNeighbours();
         if(c == 0) return;
-        if(c == 1 || !isAtriculationPoint(build)){
-            connected.remove(build);
-            build.eachNeighbour(n -> n.removeNeighbour(build));
+        if(c == 1 || !isAtriculationPoint(module)){
+            connected.remove(module);
+            module.eachNeighbour(n -> n.removeNeighbour(module));
             updateOnGraphChanged();
             return;
         }
         killGraph();
-        ObjectSet<BaseGraph> networksAdded = new ObjectSet<>(c);
-        build.eachNeighbour(n -> {
-            BaseGraph copyNet = build.getNetworkOfPort(n.portIndex);
+        ObjectSet<G> networksAdded = new ObjectSet<>(c);
+        module.eachNeighbour(n -> {
+            G copyNet = module.getNetworkOfPort(n.portIndex);
             if(copyNet == this){
-                GraphModule selfref = n.getNeighbour(build);
+                M selfref = n.getNeighbour(module);
                 if(selfref == null) return;
                 n.setNetworkOfPort(selfref.portIndex, copyNet.copyGraph(n));
             }
         });
-        build.eachNeighbour(n -> {
-            if(build.getNetworkOfPort(n.portIndex) == this){
-                GraphModule selfref = n.getNeighbour(build);
+        module.eachNeighbour(n -> {
+            if(module.getNetworkOfPort(n.portIndex) == this){
+                M selfref = n.getNeighbour(module);
                 if(selfref == null) return;
-                BaseGraph neiNet = n.getNetworkOfPort(selfref.portIndex);
+                G neiNet = n.getNetworkOfPort(selfref.portIndex);
                 if(!networksAdded.contains(neiNet)){
                     networksAdded.add(neiNet);
                     neiNet.rebuildGraphIndex(n, selfref.portIndex);
                 }
             }
         });
-        build.replaceNetwork(this, null);
+        module.replaceNetwork((G)this, null);
     }
 
-    public void rebuildGraph(GraphModule build){
-        rebuildGrpahWithSet(build, ObjectSet.with(build), -1);
+    public void rebuildGraph(M module/*building*/){
+        rebuildGrpahWithSet(module, ObjectSet.with(module), -1);
     }
 
-    public void rebuildGraphIndex(GraphModule build, int index){
-        rebuildGrpahWithSet(build, ObjectSet.with(build), index);
+    public void rebuildGraphIndex(M module/*building*/, int index){
+        rebuildGrpahWithSet(module, ObjectSet.with(module), index);
     }
 
-    void rebuildGrpahWithSet(GraphModule root, ObjectSet<GraphModule> searched, int rootIndex){
+    void rebuildGrpahWithSet(M root, ObjectSet<M> searched, int rootIndex){
         GraphTree tree = new GraphTree(root, rootIndex);
         GraphTree current = tree;
         int total = 0;
@@ -175,58 +180,89 @@ public abstract class BaseGraph{
         while(current != null){
             total++;
 
-            GraphModule buildConnector = current.build;
+            M buildConnector = current.module;
+            GraphBuildBase build = buildConnector.parent.build;
             int index = current.parentConnectPort;
 
-            if(buildConnector.parentBlock.accept == null) return;
+            if(buildConnector.type.accept == null) return;
 
             Seq<GraphData> acceptPorts = buildConnector.acceptPorts;
             if(index != -1) acceptPorts = buildConnector.getConnectedNeighbours(index);
-            GraphModule prevBuild = null;
+            M prevModule = null;//prevBuilding
             searched.add(buildConnector);
 
             for(int port = 0, len = acceptPorts.size; port < len; port++){
                 GraphData portInfo = acceptPorts.get(port);
                 int portIndex = portInfo.index;
                 if(buildConnector.getNetworkOfPort(portIndex) == null) continue;
-                if(buildConnector.parent.build.tile == null) return;
-                Tile tile = buildConnector.parent.build.tile.nearby(portInfo.toPos);
+                if(build.tile() == null) return;
+                Tile tile = build.tile().nearby(portInfo.toPos);
                 if(tile == null) return;
 
-                //TODO
+                if(tile.block() instanceof GraphBlockBase block){
+                    M conModule = (M)((GraphBuildBase)tile.build).getGraphConnector(root.type());//conbuild
+                    if(conModule == null || conModule == prevModule || conModule.dead() || !canConnect(current.module, conModule)) continue;
+                    G thisGraph = buildConnector.getNetworkOfPort(portIndex);
+                    if(conModule.parent.build.rotation() != conModule.lastRecalc()) conModule.recalcPorts();
+                    Point2 fPos = portInfo.fromPos;
+                    fPos.x += build.tileX();
+                    fPos.y += build.tileY();
+                    int connectIndex = conModule.canConnect(fPos);
+                    if(connectIndex == -1) continue;
+                    buildConnector.addNeighbour(conModule.portIndex(portIndex));
+                    conModule.addNeighbour(buildConnector.portIndex(portIndex));
 
-                Seq<GraphTree> children = current.children;
-                for(int i = 0, childLen = children.size; i < childLen; i++){
-                    if(!children.get(i).complete){
-                        current = children.get(i);
-                        continue mainLoop;
+                    G conNet = conModule.getNetworkOfPort(connectIndex);
+                    if(!thisGraph.connected.contains(conModule) && conNet != null){
+                        if(!buildConnector.hasNetwork(conNet)){
+                            if(conNet.connected.contains(conModule)){
+                                thisGraph.mergeGraph(conNet);
+                                thisGraph = buildConnector.getNetworkOfPort(portIndex);
+                            }else{
+                                thisGraph.addBuilding(conModule, connectIndex);
+                            }
+                            if(!searched.contains(conModule)){//isNetworkConnector omitted.
+                                current.children.add(new GraphTree(current, conModule, connectIndex));
+                            }
+                        }
                     }
+                    prevModule = conModule;
                 }
-                current.complete = true;
-                current = current.parent;
             }
+            Seq<GraphTree> children = current.children;
+            for(int i = 0, childLen = children.size; i < childLen; i++){
+                if(!children.get(i).complete){
+                    current = children.get(i);
+                    continue mainLoop;
+                }
+            }
+            current.complete = true;
+            current = current.parent;
         }
     }
 
     String connectedToString(){
         StringBuilder s = new StringBuilder("Network:" + id + ":");
-        connected.each(build -> s.append(build.parent.build.block.localizedName).append(", "));
+        connected.each(build -> s.append(build.parent.build.block().localizedName).append(", "));
         return s.toString();
     }
 
     //내가 추가한것
-    public abstract GraphType type();
-
     class GraphTree{
         boolean complete;
         GraphTree parent;
         final Seq<GraphTree> children = new Seq<>(4);
-        GraphModule build;
+        M module;//building
         int parentConnectPort;
 
-        GraphTree(GraphModule root, int rootIndex){
-            build = root;
+        GraphTree(GraphTree parent, M root, int rootIndex){
+            this.parent = parent;
+            module = root;
             parentConnectPort = rootIndex;
+        }
+
+        GraphTree(M root, int rootIndex){
+            this(null, root, rootIndex);
         }
     }
 }

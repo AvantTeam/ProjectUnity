@@ -8,8 +8,9 @@ public abstract class Graph{
     public boolean isMultiConnector;
     public int[] accept;
 
-    public void setAccept(int... newAccept){
+    public Graph setAccept(int... newAccept){
         accept = newAccept;
+        return this;
     }
 
     public abstract void setStats(Table table);
