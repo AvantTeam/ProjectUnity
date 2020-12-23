@@ -12,10 +12,10 @@ jobs:
       run: | 
         echo "${ANDROID_HOME}/build-tools/30.0.1" >> $GITHUB_PATH
         echo "REPOSITORY_NAME=$(echo "$GITHUB_REPOSITORY" | awk -F / '{print $2}')" >> $GITHUB_ENV
-    - name: Set up JDK 14
+    - name: Set up JDK 15
       uses: actions/setup-java@v1
       with:
-        java-version: 14
+        java-version: 15
     - name: Build mod jar
       run: |
         chmod +x gradlew
