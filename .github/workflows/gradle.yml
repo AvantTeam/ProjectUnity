@@ -14,10 +14,12 @@ jobs:
       with:
         java-version: 15
 
-    - name: Set up Android SDK Build Tools
+    - name: Set up Android SDK tuild tools
       uses: android-actions/setup-android@v2.0.1
       env:
         ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"
+
+    - name: Download Android SDK build tools
       run: |
         sdkmanager "build-tools;30.0.1"
         echo "${ANDROID_HOME}/build-tools/30.0.1" >> $GITHUB_PATH
