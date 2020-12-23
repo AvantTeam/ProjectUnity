@@ -20,13 +20,15 @@ public abstract class ExpType<T extends UnlockableContent>{
 
     public int maxLevel = 20;
     public float maxExp = requiredExp(maxLevel);
+    public float orbRefund = 0.3f;
 
     public Color minLevelColor = Pal.accent;
     public Color maxLevelColor = Color.valueOf("fff4cc");
     public Color minExpColor = Color.valueOf("84ff00");
     public Color maxExpColor = Color.valueOf("90ff00");
+    public Color upgradeColor = Color.green;
 
-    public OrderedSet<ExpUpgrade> upgrades = new OrderedSet<>();
+    public Seq<ExpUpgrade> upgrades = new Seq<>();
     public boolean enableUpgrade;
     public boolean hasUpgradeEffect = true;
     public Effect upgradeEffect = Fx.none;
@@ -73,6 +75,7 @@ public abstract class ExpType<T extends UnlockableContent>{
     public class ExpUpgrade{
         public final T type;
         public int min = 1;
+        public int max = maxLevel;
 
         public ExpUpgrade(T type){
             this.type = type;

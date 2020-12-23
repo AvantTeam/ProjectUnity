@@ -19,8 +19,10 @@ import mindustry.type.*;
 import mindustry.ctype.*;
 import mindustry.content.*;
 import unity.annotations.Annotations.*;
+import unity.entities.comp.*;
 import unity.gen.*;
 import unity.graphics.*;
+import unity.type.exp.*;
 import unity.world.blocks.defense.*;
 import unity.world.blocks.defense.turrets.*;
 import unity.world.blocks.distribution.*;
@@ -87,8 +89,15 @@ public class UnityBlocks implements ContentList{
     public static @FactionDef(type = "end")
     Block terminalCrucible, endForge, endGame;
 
+    public static
+    @ExpDef(type = ExpBlock.class)
+    @EntityDef(base = Building.class, def = ExpBuildc.class)
+    @FactionDef(type = "koruh")
+    Block expTest;
+
     @Override
     public void load(){
+        expTest = new Block("hhh");
         //region global
 
         recursiveReconstructor = new SelectableReconstructor("recursive-reconstructor"){{

@@ -1,13 +1,13 @@
 package unity.entities.comp;
 
 import arc.math.*;
-import mindustry.*;
 import mindustry.ctype.*;
 import mindustry.gen.*;
 import unity.annotations.Annotations.*;
+import unity.entities.*;
 import unity.type.*;
 
-public abstract interface ExpEntityc<T extends UnlockableContent, E extends ExpType<T>> extends Posc{
+public abstract interface ExpEntityc<T extends UnlockableContent, E extends ExpType<T>> extends Healthc{
     @Initialize(eval = "0f")
     float exp();
 
@@ -43,27 +43,21 @@ public abstract interface ExpEntityc<T extends UnlockableContent, E extends ExpT
         if(exp() > expType().maxExp) exp(expType().maxExp);
         if(exp() < 0f) exp(0f);
 
-        if(!expType().hasUpgradeEffect) return;
-        if(after > before){
-            if(expType().enableUpgrade){
-                if(!Vars.headless && this == Vars.control.input.frag.config.getSelectedTile()){
-                    Vars.control.input.frag.config.hideConfig();
-                }
-            }
+        if(after > before) upgradeDefault();
+    }
 
-            if(this instanceof Buildingc build){
-                expType().upgradeEffect.at(this, build.block().size);
-            }else if(this instanceof Unitc unit){
-                expType().upgradeEffect.at(this, unit.rotation());
-            }
-
-            expType().upgradeSound.at(this);
-        }
+    default void upgradeDefault(){
+        expType().upgradeSound.at(this);
     }
 
     @MustInherit
     E expType();
 
     @MustInherit
-    void upgrade(int i);
+    float spreadAmount();
+
+    @Override
+    default void killed(){
+        ExpOrbs.spreadExp(x(), y(), exp() * expType().orbRefund, spreadAmount());
+    }
 }

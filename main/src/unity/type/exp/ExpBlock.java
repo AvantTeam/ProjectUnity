@@ -11,11 +11,13 @@ import unity.type.*;
 
 public class ExpBlock extends ExpType<Block>{
     public boolean hasExp = false;
-    public float orbRefund = 0.3f;
 
     public boolean hub = false;
     public boolean conveyor = false;
     public boolean noOrbCollision = true;
+
+    /** Wether the upgrade configuration is conditional */
+    public boolean condConfig;
 
     public ExpBlock(Block type){
         super(type);
@@ -27,8 +29,9 @@ public class ExpBlock extends ExpType<Block>{
         setBars();
 
         type.sync = true;
+
         if(enableUpgrade){
-            type.configurable = true;
+            type.configurable = condConfig = true;
             type.saveConfig = false;
 
             type.config(Integer.class, (build, value) -> {

@@ -24,6 +24,50 @@ public final class Funcs{
     private static Posc result;
     private static float cdist;
 
+    public static <T extends Buildingc> Tile getBestTile(T build, int before, int after){
+        Tile tile = build.tile();
+        int bound = before - after + 1;
+        int offset = Mathf.floorPositive(bound / 2);
+
+        if(bound % 2 == 0 && after % 2 == 0) offset--;
+        offset *= -1;
+
+        int minScore = bound * bound * 2;
+        Tile ctile = null;
+
+        for(int i = offset; i < offset + bound; i++){
+            for(int j = offset; j < offset + bound; j++){
+                if(Math.max(Math.abs(i), Math.abs(j)) < minScore && notSolid(tile, before, i, j)){
+                    minScore = Math.max(Math.abs(i), Math.abs(j));
+                    ctile = tile.nearby(i, j);
+                }
+            }
+        }
+
+        return ctile;
+    }
+
+    public static boolean notSolid(Tile tile, int size, int x, int y){
+        Tile ttile = tile.nearby(x, y);
+        int off = Mathf.floorPositive((size - 1) / 2) * -1;
+
+        for(int i = off; i < size + off; i++){
+            for(int j = off; j < size + off; j++){
+                Tile check = ttile.nearby(i, j);
+
+                if(check.solid()){
+                    if(check.build != null && check.build.tile == tile){
+                        continue;
+                    }else{
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
     /** Same thing like the drawer from UnitType without applyColor and outlines. */
     public static void simpleUnitDrawer(Unit unit, boolean drawLegs){
         UnitType type = unit.type;
