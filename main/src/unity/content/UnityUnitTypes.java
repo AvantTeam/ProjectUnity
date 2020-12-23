@@ -1182,7 +1182,10 @@ public class UnityUnitTypes implements ContentList{
                 }}
             );
 
-            abilities.add(new DirectionShieldAbility(4, 0.1f, 20f, 1600f, 2.3f, 1.3f, 32.2f));
+            DirectionShieldAbility shield = new DirectionShieldAbility(4, 0.1f, 20f, 1600f, 2.3f, 1.3f, 32.2f);
+            shield.healthBarColor = UnityPal.endColor;
+
+            abilities.add(shield);
         }};
 
         rex = new UnityUnitType("rex"){{
@@ -1300,7 +1303,10 @@ public class UnityUnitTypes implements ContentList{
                 bullet = UnityBullets.scarMissile;
             }});
 
-            abilities.add(new DirectionShieldAbility(3, 0.06f, 45f, 3100f, 3.3f, 0.9f, 49f));
+            DirectionShieldAbility shield = new DirectionShieldAbility(3, 0.06f, 45f, 3100f, 3.3f, 0.9f, 49f);
+            shield.healthBarColor = UnityPal.endColor;
+
+            abilities.add(shield);
         }};
 
         whirlwind = new UnityUnitType("whirlwind"){{

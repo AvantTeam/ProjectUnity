@@ -35,6 +35,8 @@ public class DirectionShieldAbility extends Ability{
 
     public float explosiveReflectDamageMultiplier = 0.7f;
     public float explosiveDamageThreshold = 90f;
+    public float healthBarOffset = 4f;
+    public Color healthBarColor = Color.white;
 
     public DirectionShieldAbility(int shields, float speed, float size, float health, float regen, float disableRegen, float distance){
         shieldSpeed = speed;
@@ -62,6 +64,8 @@ public class DirectionShieldAbility extends Ability{
         DirectionShieldAbility instance = new DirectionShieldAbility(shields, shieldSpeed, shieldSize, maxHealth, shieldRegen, disableRegen, distanceRadius);
         instance.explosiveReflectDamageMultiplier = explosiveReflectDamageMultiplier;
         instance.explosiveDamageThreshold = explosiveDamageThreshold;
+        instance.healthBarOffset = healthBarOffset;
+        instance.healthBarColor = healthBarColor;
         return instance;
     }
 
@@ -86,16 +90,17 @@ public class DirectionShieldAbility extends Ability{
             Groups.bullet.intersect(Tmp.r1.x, Tmp.r1.y, Tmp.r1.width, Tmp.r1.height, b -> {
                 if(b.team != unit.team && !(b.type instanceof ContinuousLaserBulletType || b.type instanceof LaserBulletType) && !b.type.scaleVelocity){
                     b.hitbox(Tmp.r2);
+                    Tmp.r3.set(Tmp.r2).grow(shieldWidth).move(b.vel.x / 2f, b.vel.y / 2f);
                     Tmp.r2.grow(shieldWidth);
                     nodes.each(n -> {
                         if(!available[n.id]) return;
-                        Vec2 vec = Geometry.raycastRect(n.nodeA.x, n.nodeA.y, n.nodeB.x, n.nodeB.y, Tmp.r2);
                         
-                        if(vec != null){
+                        if(Geometry.raycastRect(n.nodeA.x, n.nodeA.y, n.nodeB.x, n.nodeB.y, Tmp.r2) != null || Geometry.raycastRect(n.nodeA.x, n.nodeA.y, n.nodeB.x, n.nodeB.y, Tmp.r3) != null){
                             float d = Funcs.getBulletDamage(b.type) * (b.damage() / (b.type.damage * b.damageMultiplier()));
                             healths[n.id] -= d;
                             b.damage(b.damage() / 1.5f);
-                            float angC = unit.angleTo(b) + Mathf.range(15f);
+                            float angC = (((shieldAngles[n.id] + 90f) * 2f) - b.rotation()) + Mathf.range(15f);
+                            
                             if(explosiveReflectDamageMultiplier > 0f && d >= explosiveDamageThreshold){
                                 for(int i = 0; i < 3; i++){
                                     float off = (i * 20f - (3 - 1) * 20f / 2f);
@@ -124,7 +129,10 @@ public class DirectionShieldAbility extends Ability{
                     Fx.smoke.at(Tmp.v1.x + Mathf.range(shieldSize / 4f), Tmp.v1.y + Mathf.range(shieldSize / 4f));
                 }
                 healths[i] = Math.min(healths[i] + (disableRegen * Time.delta), maxHealth);
-                if(healths[i] >= maxHealth) available[i] = true;
+                if(healths[i] >= maxHealth){
+                    available[i] = true;
+                    hitTimes[i] = blinkTime;
+                }
             }
         }
     }
@@ -153,9 +161,11 @@ public class DirectionShieldAbility extends Ability{
     @Override
     public void draw(Unit unit){
         float z = Draw.z();
-        if(!(unit.type instanceof UnityUnitType type)) return;
+        if(!(unit.type instanceof UnityUnitType)) return;
+        UnityUnitType type = (UnityUnitType)unit.type;
         TextureRegion region = type.abilityRegions[AbilityTextures.shield.ordinal()];
         float size = (Math.max(region.width, region.height) * Draw.scl) * 1.3f;
+        Lines.stroke(1.5f);
         for(int i = 0; i < shields; i++){
             Tmp.v3.trns(shieldAngles[i], distanceRadius);
             Tmp.v3.add(unit);
@@ -164,10 +174,19 @@ public class DirectionShieldAbility extends Ability{
             Draw.mixcol(Color.white, hitTimes[i] / blinkTime);
             Draw.color(Color.white, Color.black, (1f - (Mathf.clamp(healths[i] / maxHealth))) / offset);
             Draw.rect(region, Tmp.v3.x, Tmp.v3.y, shieldAngles[i]);
+
+            if(available[i]){
+                Tmp.v3.trns(shieldAngles[i], distanceRadius + healthBarOffset);
+                Tmp.v3.add(unit);
+                Draw.color(healthBarColor);
+                Lines.lineAngleCenter(Tmp.v3.x, Tmp.v3.y, shieldAngles[i] + 90f, Mathf.clamp(healths[i] / maxHealth) * shieldSize);
+            }
+
             Draw.z(Math.min(Layer.darkness, z - 1f));
             Draw.mixcol();
             Draw.color(Pal.shadow);
             Draw.rect(type.softShadowRegion, Tmp.v3.x, Tmp.v3.y, size, size);
+
             Draw.z(z - 0.0099f);
             float engScl = shieldSize / 4f;
             float liveScl = (engScl - (engScl / 4f)) + Mathf.absin(Time.time, 2f, engScl / 4f);
