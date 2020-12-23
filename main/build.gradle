@@ -1,14 +1,16 @@
-sourceSets.main.java.srcDirs = [ "src/", "${buildDir}/generated/sources/annotationProcessor/java/main/" ]
+sourceSets.main.java.srcDirs = ["src/", "$buildDir/generated/sources/annotationProcessor/java/main/"]
+sourceSets.main.resources.srcDirs = ["assets/"]
 
 repositories{
     mavenCentral()
-    maven{ url 'https://www.jitpack.io' }
+    maven{url "https://www.jitpack.io"}
 }
 
 ext{
-    assetsDir = new File("$projectDir/assets")
+    sdkRoot = System.getenv("ANDROID_HOME")
+    sdkVersion = "30.0.1"
 
-    doExec = { cmd ->
+    doExec = {cmd ->
         def proc = cmd.execute(null, new File("$buildDir/libs"))
         proc.waitForProcessOutput(System.out, System.err)
     }
@@ -17,62 +19,30 @@ ext{
 task jarAndroid(dependsOn: jar){
     doLast{
         def files = (configurations.compileClasspath.asList() + configurations.runtimeClasspath.asList() + [new File("$sdkRoot/platforms/android-$sdkVersion/android.jar")])
-        def dependencies = files.collect{ "--classpath $it.path" }.join(" ")
+        def dependencies = files.collect{"--classpath $it.path"}.join(" ")
 
-        doExec("d8 $dependencies --min-api 14 --output ${modName}Android.jar ${modName}.jar")
+        doExec("dx $dependencies --min-api 14 --output ${modName}Android.jar ${modName}Desktop.jar")
     }
 }
 
 jar{
-    archiveFileName = "${modName}.jar"
-
-    def blacklist = [
-        "core-$mindustryVersion",
-        "arc-core-$mindustryVersion",
-        "javapoet-",
-        "lz4-java-",
-        "freetype-",
-        "g3d-",
-        "fx-",
-        "arcnet-",
-        "rhino-"
-    ]
-    def contains = { name ->
-        for(String dep : blacklist){
-            if(name.contains(dep)){
-                return true;
-            }
-        }
-
-        return false;
-    }
+    archiveFileName = "${modName}Desktop.jar"
 
     from{
-        configurations.runtimeClasspath.collect{
-            !contains(it.name)
-            ?   (it.isDirectory() ? it : zipTree(it))
-            :   null
-        }
-    }
-
-    from(project.projectDir){
-        include "mod.json"
-        include "icon.png"
-    }
-
-    from(project.assetsDir){
-        include "**"
+        configurations.runtimeClasspath.collect{it.isDirectory() ? it : zipTree(it)}
     }
 }
 
 task deploy(type: Jar, dependsOn: [jarAndroid, jar]){
     archiveFileName = "${modName}.jar"
 
-    from{ [zipTree("$buildDir/libs/${modName}.jar"), zipTree("$buildDir/libs/${modName}Android.jar")] }
+    from{[zipTree("$buildDir/libs/${modName}Desktop.jar"), zipTree("$buildDir/libs/${modName}Android.jar")]}
 
     doLast{
-        delete{ delete "$buildDir/libs/${modName}.jar" }
-        delete{ delete "$buildDir/libs/${modName}Android.jar" }
+        delete{
+            delete "$buildDir/libs/${modName}Desktop.jar"
+            delete "$buildDir/libs/${modName}Android.jar"
+        }
     }
 }
 
