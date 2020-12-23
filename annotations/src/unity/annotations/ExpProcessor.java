@@ -52,6 +52,7 @@ public class ExpProcessor extends BaseProcessor{
                     Modifier.PRIVATE, Modifier.STATIC
                 )
                 .addJavadoc("The map")
+                .initializer("new $T<>()", cName(ObjectMap.class))
                 .build()
             )
             .addMethod(
