@@ -19,13 +19,13 @@ jobs:
       env:
         ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"
 
-    - name: Download Android SDK build tools
-      run: |
-        sdkmanager "build-tools;30.0.1"
-        echo "${ANDROID_HOME}/build-tools/30.0.1" >> $GITHUB_PATH
+    #- name: Download Android SDK build tools
+    #  run: |
+    #    sdkmanager "build-tools;30.0.1"
+    #    echo "${ANDROID_HOME}/build-tools/30.0.1" >> $GITHUB_PATH
 
     - name: Build mod jar
       run: |
         chmod +x gradlew
         ./gradlew tools:proc
-        ./gradlew main:deploy
+        ./gradlew main:jar
