@@ -3,7 +3,6 @@ package unity.entities.comp;
 import arc.*;
 import arc.Graphics.*;
 import arc.Graphics.Cursor.*;
-import arc.math.*;
 import arc.util.io.*;
 import mindustry.gen.*;
 import mindustry.world.*;
@@ -11,7 +10,6 @@ import mindustry.world.blocks.power.*;
 import unity.annotations.Annotations.*;
 import unity.gen.*;
 import unity.type.*;
-import unity.type.ExpType.*;
 import unity.type.exp.*;
 import unity.util.*;
 

@@ -1,7 +1,6 @@
 package unity.type.exp;
 
 import arc.*;
-import arc.graphics.*;
 import arc.math.*;
 import arc.util.*;
 import mindustry.ui.*;

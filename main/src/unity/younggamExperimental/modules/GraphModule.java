@@ -10,8 +10,6 @@ import unity.younggamExperimental.*;
 import unity.younggamExperimental.graph.*;
 import unity.younggamExperimental.graphs.*;
 
-import java.util.*;
-
 //GraphPropsCommon building 에 들어갈 모듈. powerModule와 비슷한 역할?
 public abstract class GraphModule{
     public final Seq<GraphData> acceptPorts = new Seq<>(8);

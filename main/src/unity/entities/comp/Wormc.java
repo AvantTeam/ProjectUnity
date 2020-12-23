@@ -1,8 +1,6 @@
 package unity.entities.comp;
 
-import arc.*;
 import arc.func.*;
-import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;

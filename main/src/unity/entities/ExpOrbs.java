@@ -15,8 +15,6 @@ import mindustry.world.blocks.distribution.Conveyor.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.blocks.production.Incinerator.*;
 import unity.entities.comp.*;
-import unity.gen.*;
-import unity.type.*;
 import unity.type.exp.*;
 
 import static mindustry.Vars.*;

@@ -4,7 +4,6 @@ import arc.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.scene.ui.layout.*;
-import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.graphics.*;
@@ -14,7 +13,6 @@ import unity.younggamExperimental.graphs.*;
 
 public class HeatModule extends GraphModule{
     float heat, heatBuffer;
-
 
     HeatModule(GraphModules parent, int portIndex){
         super(parent, portIndex);
