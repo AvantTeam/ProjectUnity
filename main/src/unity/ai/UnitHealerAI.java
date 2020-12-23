@@ -12,7 +12,11 @@ public class UnitHealerAI extends FlyingAI{
 
     @Override
     protected boolean invalid(Teamc target){
-        return target == null || target.team() != unit.team || (target instanceof Healthc t && !(t.damaged() && t.isValid()));
+        boolean damaged = target instanceof Healthc t
+        ?   !t.damaged() && !t.isValid()
+        :   true;
+
+        return target == null || target.team() != unit.team || damaged;
     }
 
     @Override
@@ -31,7 +35,7 @@ public class UnitHealerAI extends FlyingAI{
             if(timer.get(3, 5f) && unit.within(target, unit.type.range + temp.hitSize)){
                 if(state.rules.unitAmmo) unit.ammo--;
                 UnityFx.healLaser.at(unit.x, unit.y, 0f, new Position[]{unit, temp});
-                //i don't wanna create class only for adding one field.
+
                 temp.heal(unit.type.buildSpeed);
             }
         }
@@ -42,6 +46,7 @@ public class UnitHealerAI extends FlyingAI{
         if(retarget()){
             score = 0f;
             target = null;
+
             Groups.unit.each(x -> x.team == unit.team, e -> {
                 float scoreB = (1 - e.healthf()) * 200f + (1000000f - unit.dst(e)) / 500f;
                 if(scoreB > score && e.damaged() && e != unit && e.isValid()){
@@ -50,6 +55,7 @@ public class UnitHealerAI extends FlyingAI{
                 }
             });
         }
+
         updateWeapons();
     }
 }
