@@ -104,10 +104,8 @@ public class DirectionShieldAbility extends Ability{
                             if(explosiveReflectDamageMultiplier > 0f && d >= explosiveDamageThreshold){
                                 for(int i = 0; i < 3; i++){
                                     float off = (i * 20f - (3 - 1) * 20f / 2f);
-                                    Tmp.v4.set(n.nodeA);
-                                    Tmp.v4.add(n.nodeB);
-                                    Tmp.v4.scl(0.5f);
-                                    UnityBullets.scarShrapnel.create(unit, unit.team, Tmp.v4.x, Tmp.v4.y, angC + off, d * explosiveReflectDamageMultiplier, 1f, 1f, null);
+
+                                    UnityBullets.scarShrapnel.create(unit, unit.team, b.x, b.y, angC + off, d * explosiveReflectDamageMultiplier, 1f, 1f, null);
                                 }
                             }
                             hitTimes[n.id] = blinkTime;
@@ -123,10 +121,12 @@ public class DirectionShieldAbility extends Ability{
             if(available[i]){
                 healths[i] = Math.min(healths[i] + (shieldRegen * Time.delta), maxHealth);
             }else{
-                if(Mathf.chanceDelta(0.21 * (1f - Mathf.clamp(healths[i] / maxHealth)))){
+                if(Mathf.chanceDelta(0.32 * (1f - Mathf.clamp(healths[i] / maxHealth)))){
                     Tmp.v1.trns(shieldAngles[i], distanceRadius);
                     Tmp.v1.add(unit);
-                    Fx.smoke.at(Tmp.v1.x + Mathf.range(shieldSize / 4f), Tmp.v1.y + Mathf.range(shieldSize / 4f));
+                    Tmp.v2.trns(shieldAngles[i] + 90, Mathf.range(shieldSize / 2f), Mathf.range(2f));
+                    Tmp.v1.add(Tmp.v2);
+                    Fx.smoke.at(Tmp.v1.x, Tmp.v1.y);
                 }
                 healths[i] = Math.min(healths[i] + (disableRegen * Time.delta), maxHealth);
                 if(healths[i] >= maxHealth){

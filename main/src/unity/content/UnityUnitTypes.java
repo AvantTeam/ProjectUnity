@@ -1213,7 +1213,7 @@ public class UnityUnitTypes implements ContentList{
             legPairOffset = 0.8f;
 
             weapons.add(new Weapon("unity-rex-railgun"){{
-                x = 33.25f;
+                x = 31.25f;
                 y = -12.25f;
                 shootY = 23.25f;
                 rotate = false;
