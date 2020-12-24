@@ -3,8 +3,6 @@ buildscript{
         props = new Properties().with{ p -> p.load(file("gradle.properties").newReader()); return p }
 
         mindustryVersion = props["mindustryVersion"]
-        mindustryHash = props["mindustryHash"]
-        arcHash = props["arcHash"]
         javapoetVersion = props["javapoetVersion"]
         multilibVersion = props["multilibVersion"]
     }
@@ -16,7 +14,6 @@ buildscript{
 
     dependencies{
         classpath "com.github.Anuken.Arc:arc-core:$mindustryVersion"
-        //classpath "com.github.Anuken.Arc:arc-core:$arcHash"
         classpath "com.github.Anuken.Mindustry:core:$mindustryVersion"
         classpath "com.squareup:javapoet:$javapoetVersion"
         classpath "com.github.younggam:multi-lib:$multilibVersion"
@@ -34,8 +31,6 @@ allprojects{
 
     ext{
         mindustryVersion = props["mindustryVersion"]
-        mindustryHash = props["mindustryHash"]
-        arcHash = props["arcHash"]
         javapoetVersion = props["javapoetVersion"]
         multilibVersion = props["multilibVersion"]
         modName = props["modName"]
