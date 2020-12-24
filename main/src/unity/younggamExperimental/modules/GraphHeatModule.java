@@ -12,6 +12,7 @@ import unity.younggamExperimental.*;
 import unity.younggamExperimental.graph.*;
 import unity.younggamExperimental.graphs.*;
 
+//not considered to be multi
 public class GraphHeatModule extends GraphModule<GraphHeat, GraphHeatModule, HeatGraph>{
     public float heat, heatBuffer;
 
@@ -24,11 +25,11 @@ public class GraphHeatModule extends GraphModule<GraphHeat, GraphHeatModule, Hea
     @Override
     void updateProps(HeatGraph graph, int index){
         float temp = getTemp();
-        float cond = type.baseHeatConductivity;
+        float cond = this.graph.baseHeatConductivity;
         heatBuffer = 0f;
         float clampedDelta = Mathf.clamp(Time.delta, 0, 1f / cond);
         neighbours.each(n -> heatBuffer += (n.getTemp() - temp) * cond * clampedDelta);
-        heatBuffer += (293.15f - temp) * type.baseHeatRadiativity * clampedDelta;
+        heatBuffer += (293.15f - temp) * this.graph.baseHeatRadiativity * clampedDelta;
     }
 
     @Override
@@ -90,11 +91,16 @@ public class GraphHeatModule extends GraphModule<GraphHeat, GraphHeatModule, Hea
 
     @Override
     public float getTemp(){
-        return heat / type.baseHeatCapacity;
+        return heat / graph.baseHeatCapacity;
     }
 
     @Override
     void setTemp(float t){
-        heat = t * type.baseHeatCapacity;
+        heat = t * graph.baseHeatCapacity;
+    }
+
+    @Override
+    boolean canBeMulti(){
+        return false;
     }
 }

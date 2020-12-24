@@ -184,7 +184,7 @@ public abstract class BaseGraph<T extends Graph, M extends GraphModule<T, M, G>,
             GraphBuildBase build = buildConnector.parent.build;
             int index = current.parentConnectPort;
 
-            if(buildConnector.type.accept == null) return;
+            if(buildConnector.graph.accept == null) return;
 
             Seq<GraphData> acceptPorts = buildConnector.acceptPorts;
             if(index != -1) acceptPorts = buildConnector.getConnectedNeighbours(index);

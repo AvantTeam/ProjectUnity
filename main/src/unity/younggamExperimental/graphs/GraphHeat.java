@@ -3,6 +3,7 @@ package unity.younggamExperimental.graphs;
 import arc.scene.ui.layout.*;
 import mindustry.graphics.*;
 import unity.younggamExperimental.*;
+import unity.younggamExperimental.modules.*;
 
 import static arc.Core.bundle;
 
@@ -45,5 +46,10 @@ public class GraphHeat extends Graph{
     @Override
     public GraphType type(){
         return GraphType.heat;
+    }
+
+    @Override
+    public GraphHeatModule module(){
+        return new GraphHeatModule().graph(this);
     }
 }

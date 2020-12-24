@@ -16,7 +16,7 @@ public abstract class GraphModule<T extends Graph, M extends GraphModule<T, M, G
     public final Seq<GraphData> acceptPorts = new Seq<>(8);
 
     public GraphModules parent;
-    public T type;//parentBlock
+    public T graph;//parentBlock
     public int d, portIndex;
 
     final ObjectSet<M> neighbours = new ObjectSet<>(4);//neighbourArray
@@ -24,7 +24,7 @@ public abstract class GraphModule<T extends Graph, M extends GraphModule<T, M, G
     protected final IntMap<G> networks = new IntMap<>(4);
 
     int lastRecalc;
-    boolean dead, needsNetworkUpdate = true, networkSaveState;
+    boolean dead, needsNetworkUpdate = true, networkSaveState, multi;//
     Seq saveCache = new Seq(4);
 
     GraphData getConnectSidePos(int index){
@@ -47,8 +47,8 @@ public abstract class GraphModule<T extends Graph, M extends GraphModule<T, M, G
     public void recalcPorts(){
         if(lastRecalc == parent.build.rotation()) return;
         acceptPorts.clear();
-        for(int i = 0, len = type.accept.length; i < len; i++){
-            if(type.accept[i] != 0) acceptPorts.add(getConnectSidePos(i));
+        for(int i = 0, len = graph.accept.length; i < len; i++){
+            if(graph.accept[i] != 0) acceptPorts.add(getConnectSidePos(i));
         }
         lastRecalc = parent.build.rotation();
     }
@@ -64,7 +64,14 @@ public abstract class GraphModule<T extends Graph, M extends GraphModule<T, M, G
 
     void deleteSelfFromNetwork(){
         dead = true;
-        if(networks.get(0) != null) networks.get(0).remove((M)this);
+        if(multi) deleteSelfFromNetworkMulti();
+        else if(networks.get(0) != null) networks.get(0).remove((M)this);
+    }
+
+    //multi
+    void deleteSelfFromNetworkMulti(){
+        if(networks.isEmpty()) return;
+        for(var i : networks.values()) i.remove((M)this);
     }
 
     void onUpdate(){
@@ -86,6 +93,10 @@ public abstract class GraphModule<T extends Graph, M extends GraphModule<T, M, G
     }
 
     void updateNetworks(){
+        if(multi){
+            updateNetworksMulti();
+            return;
+        }
         if(networks.get(0) != null){
             if(needsNetworkUpdate){
                 needsNetworkUpdate = false;
@@ -99,6 +110,31 @@ public abstract class GraphModule<T extends Graph, M extends GraphModule<T, M, G
             networks.get(0).update();
             updateProps(networks.get(0), 0);
         }
+    }
+
+    //multi
+    void updateNetworksMulti(){
+        if(networks.isEmpty()) return;
+        if(needsNetworkUpdate){
+            boolean[] covered = new boolean[4];
+            int[] portArray = graph.accept;
+            for(int i = 0, len = portArray.length; i < len; i++){
+                int j = portArray[i] - 1;
+                if(portArray[i] == 0 || covered[j]) continue;
+                getNetworkOfPort(j).rebuildGraphIndex((M)this, i);
+                covered[j] = true;
+            }
+            if(networkSaveState){
+                for(var i : networks) applySaveState(i.value);
+            }
+            networkSaveState = false;
+        }
+        for(var i : networks){
+            if(i.value == null) continue;
+            i.value.update();
+            updateProps(i.value, i.key);
+        }
+        needsNetworkUpdate = false;
     }
 
     abstract void applySaveState(G graph);
@@ -122,7 +158,17 @@ public abstract class GraphModule<T extends Graph, M extends GraphModule<T, M, G
 
     void initAllNets(){
         recalcPorts();
-        networks.put(0, newNetwork());
+        if(multi) initAllNetsMulti();
+        else networks.put(0, newNetwork());
+    }
+
+    //multi
+    void initAllNetsMulti(){
+        int[] portArray = graph.accept;
+        networks.clear();
+        for(int i = 0, len = portArray.length; i < len; i++){
+            if(portArray[i] != 0 && !networks.containsKey(portArray[i] - 1)) networks.put(portArray[i] - 1, newNetwork());
+        }
     }
 
     public boolean dead(){
@@ -160,7 +206,19 @@ public abstract class GraphModule<T extends Graph, M extends GraphModule<T, M, G
     }
 
     public Seq<GraphData> getConnectedNeighbours(int index){
+        if(multi) return getConnectedNeighboursMulti(index);
         return acceptPorts;
+    }
+
+    //multi
+    Seq<GraphData> getConnectedNeighboursMulti(int index){
+        int[] portArray = graph.accept;
+        int targetPort = portArray[index];
+        Seq<GraphData> output = new Seq<>();
+        for(var i : acceptPorts){
+            if(portArray[i.index] == targetPort) output.add(i);
+        }
+        return output;
     }
 
     G getNetwork(){
@@ -168,25 +226,63 @@ public abstract class GraphModule<T extends Graph, M extends GraphModule<T, M, G
     }
 
     public boolean hasNetwork(G net){
+        if(multi) return hasNetworkMulti(net);
         return networks.get(0).id == net.id;
     }
 
+    //multi
+    boolean hasNetworkMulti(G net){
+        return getPortOfNetworkMulti(net) != -1;
+    }
+
     int getPortOfNetwork(G net){
+        if(multi) return getPortOfNetworkMulti(net);
         return networks.get(0).id == net.id ? 0 : -1;
     }
 
+    //multi
+    int getPortOfNetworkMulti(G net){
+        if(net == null) return -1;
+        return networks.findKey(net, true, -1);
+    }
+
     public boolean replaceNetwork(G old, G set){
+        if(multi) return replaceNetworkMulti(old, set);
         networks.put(0, set);
+        return true;
+    }
+
+    //multi
+    boolean replaceNetworkMulti(G old, G set){
+        int index = networks.findKey(old, true, -1);
+        if(index == -1) return false;
+        networks.put(index, set);
         return true;
     }
 
     //TODO 굳이? 싶은 함수들 여기
     public G getNetworkOfPort(int index){
+        if(multi) getNetworkOfPortMulti(index);
         return networks.get(0);
     }
 
+    //multi
+    G getNetworkOfPortMulti(int index){
+        int l = graph.accept[index];
+        if(l == 0) return null;
+        return networks.get(l - 1);
+    }
+
     public void setNetworkOfPort(int index, G net){
-        networks.put(0, net);
+        if(multi) setNetworkOfPortMulti(index, net);
+        else networks.put(0, net);
+    }
+
+    //multi
+    void setNetworkOfPortMulti(int index, G net){
+        int l = graph.accept[index];
+        if(l == 0) return;
+        networks.put(l - 1, net);
     }
 
     abstract void writeGlobal(Writes write);
@@ -199,14 +295,41 @@ public abstract class GraphModule<T extends Graph, M extends GraphModule<T, M, G
 
     void write(Writes write){
         writeGlobal(write);
-        writeLocal(write, networks.get(0));
+        if(multi) writeMulti(write);
+        else writeLocal(write, networks.get(0));
+    }
+
+    //multi
+    void writeMulti(Writes write){
+        write.b(networks.size);
+        for(var i : networks.values()) writeLocal(write, i);
     }
 
     void read(Reads read, byte revision){
         readGlobal(read, revision);
         saveCache.clear();
-        saveCache.add(readLocal(read, revision));
+        if(multi) readMulti(read, revision);
+        else{
+            saveCache.add(readLocal(read, revision));
+            networkSaveState = true;
+        }
+    }
+
+    //multi
+    void readMulti(Reads read, byte revision){
+        int netAm = read.b();
+        for(int i = 0; i < netAm; i++) saveCache.add(readLocal(read, revision));
         networkSaveState = true;
+    }
+
+    G getNetworkFromSet(int index){
+        return networks.get(index);
+    }
+
+    boolean setNetworkFromSet(int index, G net){
+        if(networks.containsKey(index) && networks.get(index).id == net.id) return false;
+        networks.put(index, net);
+        return true;
     }
 
     //내가 추가한거
@@ -231,4 +354,12 @@ public abstract class GraphModule<T extends Graph, M extends GraphModule<T, M, G
     }
 
     void setTemp(float t){}
+
+    public M graph(T graph){
+        this.graph = graph;
+        if(canBeMulti() && graph.isMultiConnector) multi = true;
+        return (M)this;
+    }
+
+    abstract boolean canBeMulti();
 }

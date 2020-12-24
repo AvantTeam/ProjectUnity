@@ -89,7 +89,9 @@ public class UnityBlocks implements ContentList{
     public static @FactionDef(type = "youngcha")
     Block concreteBlank, concreteFill, concreteNumber, concreteStripe, concrete, stoneFullTiles, stoneFull, stoneHalf, stoneTiles,
 
-    sporePyro;
+    sporePyro,
+
+    cupronickelWall, cupronickelWallLarge;
 
     public static @FactionDef(type = "end")
     Block terminalCrucible, endForge, endGame;
@@ -922,9 +924,25 @@ public class UnityBlocks implements ContentList{
             ambientSound = Sounds.machine;
             ambientSoundVolume = 0.6f;
             consumes.item(Items.sporePod, 1);
-            addGraph(new GraphHeat(60f, 0.4f, 0.008f)
-                .setAccept(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1), GraphHeatModule::new
-            );
+            addGraph(new GraphHeat(60f, 0.4f, 0.008f).setAccept(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1));
+        }};
+
+        cupronickelWall = new HeatWall("cupronickel-wall"){{
+            requirements(Category.defense, with(UnityItems.cupronickel, 8, UnityItems.nickel, 5));
+            health = 500;
+            addGraph(new GraphHeat(50f, 0.5f, 0.03f).setAccept(1, 1, 1, 1));
+        }};
+        cupronickelWallLarge = new HeatWall("cupronickel-wall-large"){{
+            requirements(Category.defense, with(UnityItems.cupronickel, 36, UnityItems.nickel, 20));
+            size = 2;
+            health = 2000;
+            minStatusRadius = 8f;
+            statusRadiusMul = 40f;
+            minStatusDuration = 5f;
+            statusDurationMul = 120f;
+            statusTime = 120f;
+            maxDamage = 40f;
+            addGraph(new GraphHeat(200f, 0.5f, 0.09f).setAccept(1, 1, 1, 1, 1, 1, 1, 1));
         }};
 
         //endregion
