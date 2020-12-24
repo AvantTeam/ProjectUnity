@@ -5,6 +5,7 @@ buildscript{
         mindustryVersion = props["mindustryVersion"]
         javapoetVersion = props["javapoetVersion"]
         multilibVersion = props["multilibVersion"]
+        jabelVersion = props["jabelVersion"]
     }
 
     repositories{
@@ -17,6 +18,7 @@ buildscript{
         classpath "com.github.Anuken.Mindustry:core:$mindustryVersion"
         classpath "com.squareup:javapoet:$javapoetVersion"
         classpath "com.github.younggam:multi-lib:$multilibVersion"
+        classpath "com.github.Anuken:jabel:$jabelVersion"
     }
 }
 
@@ -33,6 +35,8 @@ allprojects{
         mindustryVersion = props["mindustryVersion"]
         javapoetVersion = props["javapoetVersion"]
         multilibVersion = props["multilibVersion"]
+        jabelVersion = props["jabelVersion"]
+
         modName = props["modName"]
 
         sdkVersion = "30"

@@ -51,7 +51,7 @@ dependencies{
     compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
 
     implementation "com.github.younggam:multi-lib:$multilibVersion"
-    annotationProcessor "com.github.bsideup.jabel:jabel-javac-plugin:0.3.0"
+    annotationProcessor "com.github.Anuken:jabel:$jabelVersion"
 
     compileOnly project(":annotations")
     annotationProcessor project(":annotations")
