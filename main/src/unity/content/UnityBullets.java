@@ -365,7 +365,7 @@ public class UnityBullets implements ContentList{
 
         monumentRailBullet = new PointBulletType(){{
             damage = 1000;
-            tileDamageMultiplier = 0.7f;
+            buildingDamageMultiplier = 0.7f;
             speed = maxRange = 500f;
             lifetime = 1f;
             hitShake = 6f;

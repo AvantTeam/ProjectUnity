@@ -20,7 +20,7 @@ import unity.entities.effects.*;
 import unity.gen.*;
 import unity.util.*;
 
-public class EndGameTurret extends PowerTurret {
+public class EndGameTurret extends PowerTurret{
     private static int shouldLaser = 0;
     private static float lowest;
     private static float dstC;
@@ -499,7 +499,7 @@ public class EndGameTurret extends PowerTurret {
 
         @Override
         public boolean collision(Bullet other){
-            float amount = other.owner != null && !within((Posc)other.owner, range) ? 0f : other.damage() * other.type.tileDamageMultiplier;
+            float amount = other.owner != null && !within((Posc)other.owner, range) ? 0f : other.damage() * other.type.buildingDamageMultiplier;
             damage(amount);
             if(other.owner != null && !within((Posc)other.owner, range)){
                 Healthc en = (Healthc)other.owner;

@@ -1225,7 +1225,7 @@ public class UnityUnitTypes implements ContentList{
                 bullet = new RailBulletType(){
                     {
                         damage = 3300f;
-                        tileDamageMultiplier = 0.5f;
+                        buildingDamageMultiplier = 0.5f;
                         length = 61f * 8f;
                         updateEffectSeg = 61f;
                         shootEffect = UnityFx.scarRailShoot;
