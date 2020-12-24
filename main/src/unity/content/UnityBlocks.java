@@ -34,7 +34,6 @@ import unity.world.consumers.*;
 import unity.world.draw.*;
 import unity.younggamExperimental.blocks.*;
 import unity.younggamExperimental.graphs.*;
-import unity.younggamExperimental.modules.*;
 
 import static arc.Core.*;
 import static mindustry.type.ItemStack.*;
@@ -89,7 +88,9 @@ public class UnityBlocks implements ContentList{
     public static @FactionDef(type = "youngcha")
     Block concreteBlank, concreteFill, concreteNumber, concreteStripe, concrete, stoneFullTiles, stoneFull, stoneHalf, stoneTiles,
 
-    sporePyro,
+    infiHeater,
+
+    sporePyrolyser,
 
     cupronickelWall, cupronickelWallLarge;
 
@@ -915,7 +916,13 @@ public class UnityBlocks implements ContentList{
 
         stoneTiles = new Floor("stone-tiles");
 
-        sporePyro = new SporePyrolyser("spore-pyrolyser"){{
+        infiHeater = new HeatSource("infi-heater"){{
+            requirements(Category.power, BuildVisibility.sandboxOnly, with());
+            health = 200;
+            addGraph(new GraphHeat(1000f, 1f, 0f).setAccept(1, 1, 1, 1));
+        }};
+
+        sporePyrolyser = new SporePyrolyser("spore-pyrolyser"){{
             requirements(Category.crafting, with(UnityItems.nickel, 25, Items.titanium, 50, Items.copper, 50, Items.lead, 30));
             size = 3;
             health = 1100;
@@ -932,6 +939,7 @@ public class UnityBlocks implements ContentList{
             health = 500;
             addGraph(new GraphHeat(50f, 0.5f, 0.03f).setAccept(1, 1, 1, 1));
         }};
+
         cupronickelWallLarge = new HeatWall("cupronickel-wall-large"){{
             requirements(Category.defense, with(UnityItems.cupronickel, 36, UnityItems.nickel, 20));
             size = 2;

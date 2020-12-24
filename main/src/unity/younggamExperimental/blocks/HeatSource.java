@@ -1,11 +1,8 @@
 package unity.younggamExperimental.blocks;
 
 import arc.graphics.g2d.*;
-import arc.math.*;
 import arc.scene.ui.layout.*;
 import arc.util.io.*;
-import mindustry.content.*;
-import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 import unity.graphics.*;
@@ -14,18 +11,13 @@ import unity.younggamExperimental.modules.*;
 
 import static arc.Core.atlas;
 
-//youngchaWalls
-public class HeatWall extends Block implements GraphBlockBase{
-    protected float minStatusRadius = 4f, statusRadiusMul = 20f,
-        minStatusDuration = 3f, statusDurationMul = 40f,
-        statusTime = 60f, maxDamage;
+public class HeatSource extends Block implements GraphBlockBase{
     final Graphs graphs = new Graphs();
-    TextureRegion heatRegion;//heatSprite
-    int timerId;
+    TextureRegion heatRegion, baseRegion;//heatSprite,bottom
 
-    public HeatWall(String name){
+    public HeatSource(String name){
         super(name);
-        update = solid = true;
+        update = true;
     }
 
     @Override
@@ -51,10 +43,10 @@ public class HeatWall extends Block implements GraphBlockBase{
     public void load(){
         super.load();
         heatRegion = atlas.find(name + "-heat");
-        timerId = timers++;
+        baseRegion = atlas.find(name + "-base");
     }
 
-    public class HeatWallBuild extends Building implements GraphBuildBase{
+    public class HeatSourceBuild extends Building implements GraphBuildBase{
         GraphModules gms;
 
         @Override
@@ -129,19 +121,15 @@ public class HeatWall extends Block implements GraphBlockBase{
         //not common probably separated?
         @Override
         public void updatePost(){
-            if(timer(timerId, statusTime)){
-                float temp = heat().getTemp();
-                float intensity = Mathf.clamp(Mathf.map(temp, 400f, 1000f, 0f, 1f));
-                Damage.status(team, x, y, intensity * statusRadiusMul + minStatusRadius, StatusEffects.burning, minStatusDuration + intensity * statusDurationMul, false, true);
-                if(maxDamage > 0f) Damage.damage(team, x, y, intensity * 10f + 8f, intensity * maxDamage, false, true);
-            }
+            GraphHeatModule hgraph = heat();
+            hgraph.heat = hgraph.heat + Math.max(0, 9999f - hgraph.getTemp()) * 0.5f;
         }
 
         @Override
         public void draw(){
             float temp = heat().getTemp();
-            Draw.rect(region, x, y, 0f);
-            UnityDrawf.drawHeat(heatRegion, x, y, 0f, temp);
+            Draw.rect(baseRegion, x, y, 0f);
+            UnityDrawf.drawHeat(heatRegion, x, y, rotdeg(), temp);
             super.drawTeamTop();
         }
     }
