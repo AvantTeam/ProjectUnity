@@ -162,7 +162,7 @@ const filter = extendContent(Block, "light-filter", {
         Draw.color();
     },*/
     minimapColor(tile){
-        return colors[tile.bc().getFilterColor()].rgba();
+        return colors[tile.build.getFilterColor()].rgba();
     },
 
     load(){
@@ -293,7 +293,7 @@ const filterInv = extendContent(Block, "light-inverted-filter", {
         Draw.color();
     },*/
     minimapColor(tile){
-        return ncolors[tile.bc().getFilterColor()].rgba();
+        return ncolors[tile.build.getFilterColor()].rgba();
     },
 
     load(){

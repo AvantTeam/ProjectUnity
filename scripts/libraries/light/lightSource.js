@@ -229,27 +229,27 @@ module.exports = {
                     if(furthest == tile || furthest == null) return false;
                     i++;
                     if(!furthest.solid() || (furthest.block() == lightblock && tile == source.tile)) return false;
-                    if(furthest.bc() == null) return true;
-                    if(furthest.bc().block.lightReflector) {
+                    if(furthest.build == null) return true;
+                    if(furthest.build.block.lightReflector) {
                         //print("Light reflector!");
-                        var tr = furthest.bc().calcReflection(ld[0]);
+                        var tr = furthest.build.calcReflection(ld[0]);
                         if(tr >= 0) next = [tr, ld[1], ld[2] - i, ld[3]];
                     }
-                    else if(furthest.bc().block.lightDivisor) {
-                        var tr = furthest.bc().calcReflection(ld[0]);
+                    else if(furthest.build.block.lightDivisor) {
+                        var tr = furthest.build.calcReflection(ld[0]);
                         if(tr >= 0) {
                             next = [ld[0], ld[1] / 2, ld[2] - i, ld[3]];
                             next2 = [tr, ld[1] / 2, ld[2] - i, ld[3]];
                         }
                     }
-                    else if(furthest.bc().block.lightRepeater) {
-                        var tl = furthest.bc().calcLight(ld, i);
+                    else if(furthest.build.block.lightRepeater) {
+                        var tl = furthest.build.calcLight(ld, i);
                         if(tl == null) return true;
                         next = [tl[0], tl[1], tl[2], tl[3]];
                     }
-                    else if(furthest.bc().block.consumesLight) {
-                        furthest.bc().addSource([source, ld]);
-                        this._lCons.push(furthest.bc());
+                    else if(furthest.build.block.consumesLight) {
+                        furthest.build.addSource([source, ld]);
+                        this._lCons.push(furthest.build));
                     }
                     return true;
                 });

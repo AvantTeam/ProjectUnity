@@ -792,7 +792,7 @@ const crucibleGraph = { //this just uh manages the graphics lmAO
 				if(!tile || (tile.block().getIsNetworkConnector === undefined) ){
 					continue;
 				}
-				let conbuild = tile.bc().getGraphConnector(this.name);
+				let conbuild = tile.build.getGraphConnector(this.name);
 				if (!conbuild || conbuild.getDead() || !this.canConnect(building,conbuild)) {
 					continue;
 				}

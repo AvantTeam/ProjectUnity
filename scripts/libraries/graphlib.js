@@ -984,7 +984,7 @@ const _BlockGraph = {
                     }
                     if (tile.block().getIsNetworkConnector != undefined) {
                         //conbuild -> connected buildConnector
-                        let conbuild = tile.bc().getGraphConnector(root.name);
+                        let conbuild = tile.build.getGraphConnector(root.name);
                         if (!conbuild || conbuild == prevbuilding || conbuild.getDead() || !this.canConnect(current.build,conbuild)) {
 							//conbuild is dead or duplicate or undefined or not allowed to connect
                             continue;

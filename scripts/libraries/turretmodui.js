@@ -1043,7 +1043,7 @@ const _ModularBuild = {
 						dialog.hide();
 					}).size(130.0, 60.0);
 					dialog.update(() => {
-						if (!this.tile.bc() || !this.tile.bc().getBlueprint) {
+						if (!this.tile.build || !this.tile.build.getBlueprint) {
 							dialog.hide();
 						}
 					});
@@ -1333,8 +1333,8 @@ const BulletTypesMap = {
 			if(tile.solid()){
 				b.trns(-b.vel.x, -b.vel.y);
 				
-				let penX = Math.abs(tile.bc().x - b.x);
-				let penY = Math.abs(tile.bc().y - b.y);
+				let penX = Math.abs(tile.build.x - b.x);
+				let penY = Math.abs(tile.build.y - b.y);
 
                 if(penX > penY){
                     b.vel.x *= -0.5;

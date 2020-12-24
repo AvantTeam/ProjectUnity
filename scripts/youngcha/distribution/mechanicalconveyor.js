@@ -31,14 +31,14 @@ mechConv.buildType = () => {
 			var right = (this.right() != null) ? this.right().tile : this.tile;
 			var tile = this.tile;
 
-			var backCon = (back.relativeTo(tile) - back.bc().rotation) == 0;
-			var rightCon = (right.relativeTo(tile) - right.bc().rotation) == 0;
-			var leftCon = (left.relativeTo(tile) - left.bc().rotation) == 0;
+			var backCon = (back.relativeTo(tile) - back.build.rotation) == 0;
+			var rightCon = (right.relativeTo(tile) - right.build.rotation) == 0;
+			var leftCon = (left.relativeTo(tile) - left.build.rotation) == 0;
 			var baCon = "pork";
 
-			var backThis = back.bc().block == this.block;
-			var rightThis = right.bc().block == this.block;
-			var leftThis = left.bc().block == this.block;
+			var backThis = back.build.block == this.block;
+			var rightThis = right.build.block == this.block;
+			var leftThis = left.build.block == this.block;
 			var takeThis = "its dangerous to go alone";
 			
 			var looking = (backCon && backThis) || (leftCon && leftThis) || (rightCon && rightThis);

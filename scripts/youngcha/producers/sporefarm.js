@@ -47,7 +47,7 @@ sporeFarm.buildType = () =>
 			let bitmask = 0;
 			for(let i =0;i<tilechkdirs.length;i++){
 				let tile = this.tile.nearby(tilechkdirs[i].x, tilechkdirs[i].y);
-				if(!tile || !tile.bc() || !tile.bc().updateTilings){
+				if(!tile || !tile.build || !tile.build.updateTilings){
 					continue;
 				}
 				bitmask += 1<<i;
@@ -57,10 +57,10 @@ sporeFarm.buildType = () =>
 		updateNeighbours(){
 			for(let i =0;i<tilechkdirs.length;i++){
 				let tile = this.tile.nearby(tilechkdirs[i].x, tilechkdirs[i].y);
-				if(!tile || !tile.bc() || !tile.bc().triggerTileUpdate){
+				if(!tile || !tile.build || !tile.build.triggerTileUpdate){
 					continue;
 				}
-				tile.bc().triggerTileUpdate();
+				tile.build.triggerTileUpdate();
 			}
 		},
 		onProximityRemoved() {
