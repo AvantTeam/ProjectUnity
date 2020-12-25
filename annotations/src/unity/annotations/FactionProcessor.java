@@ -6,6 +6,7 @@ import arc.assets.loaders.SoundLoader.*;
 import arc.assets.loaders.MusicLoader.*;
 import arc.audio.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.*;
 import mindustry.ctype.*;
 
@@ -30,8 +31,9 @@ public class FactionProcessor extends BaseProcessor{
     TypeElement faction;
 
     private final StringMap map = StringMap.of(
-        "monolithDark1:dark", "monolith",
-        "monolithDark2:dark", "monolith"
+        "the-former-glory:dark", "monolith",
+        "reflection-of-time:dark", "monolith",
+        "solemn-winds:ambient", "monolith"
     );
 
     {
@@ -129,15 +131,15 @@ public class FactionProcessor extends BaseProcessor{
             soundSpec.addField(
                 FieldSpec.builder(
                     tName(Sound.class),
-                    fname,
+                    Strings.kebabToCamel(fname),
                     Modifier.PUBLIC, Modifier.STATIC
                 )
                 .build()
             );
 
             String stripped = name.substring(0, name.length() - ex);
-            load.addStatement("$L = loadSound($S)", fname, stripped);
-            dispose.addStatement("$L = disposeSound($S)", fname, stripped);
+            load.addStatement("$L = loadSound($S)", Strings.kebabToCamel(fname), stripped);
+            dispose.addStatement("$L = disposeSound($S)", Strings.kebabToCamel(fname), stripped);
         });
 
         soundSpec
@@ -214,7 +216,7 @@ public class FactionProcessor extends BaseProcessor{
             String fname = path.nameWithoutExtension();
             int ex = 4;
 
-            FieldSpec.Builder music = FieldSpec.builder(tName(Music.class), fname, Modifier.PUBLIC, Modifier.STATIC);
+            FieldSpec.Builder music = FieldSpec.builder(tName(Music.class), Strings.kebabToCamel(fname), Modifier.PUBLIC, Modifier.STATIC);
             Seq<String[]> names = map.keys().toSeq().map(n -> n.split(":"));
             for(String[] n : names){
                 if(n[0].equals(fname)){
@@ -230,8 +232,8 @@ public class FactionProcessor extends BaseProcessor{
             musicSpec.addField(music.build());
 
             String stripped = name.substring(0, name.length() - ex);
-            load.addStatement("$L = loadMusic($S)", fname, stripped);
-            dispose.addStatement("$L = disposeMusic($S)", fname, stripped);
+            load.addStatement("$L = loadMusic($S)", Strings.kebabToCamel(fname), stripped);
+            dispose.addStatement("$L = disposeMusic($S)", Strings.kebabToCamel(fname), stripped);
         });
 
         musicSpec
