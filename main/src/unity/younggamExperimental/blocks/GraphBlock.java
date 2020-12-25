@@ -1,31 +1,30 @@
 package unity.younggamExperimental.blocks;
 
 import arc.graphics.g2d.*;
-import arc.math.*;
 import arc.scene.ui.layout.*;
 import arc.util.io.*;
-import mindustry.content.*;
-import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.world.*;
-import unity.graphics.*;
+import unity.younggamExperimental.*;
 import unity.younggamExperimental.graphs.*;
 import unity.younggamExperimental.modules.*;
 
 import static arc.Core.atlas;
 
-//youngchaWalls
-public class HeatWall extends Block implements GraphBlockBase{
-    protected float minStatusRadius = 4f, statusRadiusMul = 20f,
-        minStatusDuration = 3f, statusDurationMul = 40f,
-        statusTime = 60f, maxDamage;
-    final Graphs graphs = new Graphs();
-    TextureRegion heatRegion;//heatSprite
-    int timerId;
+//block that uses graph
+public class GraphBlock extends Block implements GraphBlockBase{
+    protected final Graphs graphs = new Graphs();
+    protected TextureRegion heatRegion;//heatSprite
 
-    public HeatWall(String name){
+    public GraphBlock(String name){
         super(name);
-        update = solid = true;
+        update = true;
+    }
+
+    @Override
+    public void load(){
+        super.load();
+        if(graphs.hasGraph(GraphType.heat)) heatRegion = atlas.find(name + "-heat");
     }
 
     @Override
@@ -46,15 +45,7 @@ public class HeatWall extends Block implements GraphBlockBase{
         return graphs;
     }
 
-    //not common probably separated?
-    @Override
-    public void load(){
-        super.load();
-        heatRegion = atlas.find(name + "-heat");
-        timerId = timers++;
-    }
-
-    public class HeatWallBuild extends Building implements GraphBuildBase{
+    public class GraphBuild extends Building implements GraphBuildBase{
         GraphModules gms;
 
         @Override
@@ -108,12 +99,6 @@ public class HeatWall extends Block implements GraphBlockBase{
         }
 
         @Override
-        public void drawSelect(){
-            super.drawSelect();
-            gms.drawSelect();
-        }
-
-        @Override
         public void write(Writes write){
             super.write(write);
             gms.write(write);
@@ -132,21 +117,10 @@ public class HeatWall extends Block implements GraphBlockBase{
             return gms;
         }
 
-        //not common probably separated?
         @Override
-        public void updatePost(){
-            if(timer(timerId, statusTime)){
-                float intensity = Mathf.clamp(Mathf.map(heat().getTemp(), 400f, 1000f, 0f, 1f));
-                Damage.status(team, x, y, intensity * statusRadiusMul + minStatusRadius, StatusEffects.burning, minStatusDuration + intensity * statusDurationMul, false, true);
-                if(maxDamage > 0f) Damage.damage(team, x, y, intensity * 10f + 8f, intensity * maxDamage, false, true);
-            }
-        }
-
-        @Override
-        public void draw(){
-            Draw.rect(region, x, y);
-            UnityDrawf.drawHeat(heatRegion, x, y, 0f, heat().getTemp());
-            drawTeamTop();
+        public void drawSelect(){
+            super.drawSelect();
+            gms.drawSelect();
         }
     }
 }

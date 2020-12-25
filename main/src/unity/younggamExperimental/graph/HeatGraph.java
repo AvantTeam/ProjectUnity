@@ -3,8 +3,8 @@ package unity.younggamExperimental.graph;
 import unity.younggamExperimental.graphs.*;
 import unity.younggamExperimental.modules.*;
 
-//TODO HeatModule 등 내부 클래스로 옮기기?
-public class HeatGraph extends BaseGraph<GraphHeat, GraphHeatModule, HeatGraph>{
+//heatGraph
+public class HeatGraph extends BaseGraph<GraphHeatModule, HeatGraph>{
     float lastHeatFlow;
 
     public HeatGraph(GraphHeatModule module/*building*/){

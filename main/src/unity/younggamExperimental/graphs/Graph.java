@@ -15,7 +15,7 @@ public abstract class Graph{
     }
 
     public Graph multi(){
-        isMultiConnector = true;
+        isMultiConnector = canBeMulti();
         return this;
     }
 
@@ -25,7 +25,10 @@ public abstract class Graph{
 
     abstract void drawPlace(int x, int y, int size, int rotation, boolean valid);
 
+    //내가추가
     public abstract GraphType type();
 
     public abstract GraphModule module();
+
+    abstract boolean canBeMulti();
 }

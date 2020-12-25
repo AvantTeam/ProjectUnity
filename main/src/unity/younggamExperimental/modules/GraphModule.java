@@ -12,7 +12,7 @@ import unity.younggamExperimental.graphs.*;
 
 //GraphPropsCommon building 에 들어갈 모듈. powerModule와 비슷한 역할?
 //I had stroke
-public abstract class GraphModule<T extends Graph, M extends GraphModule<T, M, G>, G extends BaseGraph<T, M, G>>{
+public abstract class GraphModule<T extends Graph, M extends GraphModule<T, M, G>, G extends BaseGraph<M, G>>{
     public final Seq<GraphData> acceptPorts = new Seq<>(8);
 
     public GraphModules parent;
@@ -102,7 +102,7 @@ public abstract class GraphModule<T extends Graph, M extends GraphModule<T, M, G
                 needsNetworkUpdate = false;
                 networks.get(0).rebuildGraph((M)this);
                 if(networkSaveState){
-                    applySaveState(networks.get(0));
+                    applySaveState(networks.get(0), 0);
                     networkSaveState = false;
                 }
                 parent.build.onGraphUpdate();
@@ -125,7 +125,7 @@ public abstract class GraphModule<T extends Graph, M extends GraphModule<T, M, G
                 covered[j] = true;
             }
             if(networkSaveState){
-                for(var i : networks) applySaveState(i.value);
+                for(var i : networks) applySaveState(i.value, i.key);
             }
             networkSaveState = false;
         }
@@ -137,7 +137,7 @@ public abstract class GraphModule<T extends Graph, M extends GraphModule<T, M, G
         needsNetworkUpdate = false;
     }
 
-    abstract void applySaveState(G graph);
+    abstract void applySaveState(G graph, int index);
 
     abstract void updateExtension();
 
@@ -291,7 +291,7 @@ public abstract class GraphModule<T extends Graph, M extends GraphModule<T, M, G
 
     abstract void writeLocal(Writes write, G graph);
 
-    abstract <R> R[] readLocal(Reads read, byte revision);
+    abstract Object[] readLocal(Reads read, byte revision);
 
     void write(Writes write){
         writeGlobal(write);
@@ -357,9 +357,7 @@ public abstract class GraphModule<T extends Graph, M extends GraphModule<T, M, G
 
     public M graph(T graph){
         this.graph = graph;
-        if(canBeMulti() && graph.isMultiConnector) multi = true;
+        if(graph.isMultiConnector) multi = true;
         return (M)this;
     }
-
-    abstract boolean canBeMulti();
 }

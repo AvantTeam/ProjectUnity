@@ -99,6 +99,12 @@ public class SporePyrolyser extends GenericCrafter implements GraphBlockBase{
         }
 
         @Override
+        public void drawSelect(){
+            super.drawSelect();
+            gms.drawSelect();
+        }
+
+        @Override
         public void write(Writes write){
             super.write(write);
             gms.write(write);
@@ -120,15 +126,13 @@ public class SporePyrolyser extends GenericCrafter implements GraphBlockBase{
         //not common probably separated?
         @Override
         public float getProgressIncrease(float baseTime){
-            float temp = heat().getTemp();
-            return Mathf.sqrt(Mathf.clamp((temp - 370f) / 300f)) / baseTime * edelta();
+            return Mathf.sqrt(Mathf.clamp((heat().getTemp() - 370f) / 300f)) / baseTime * edelta();
         }
 
         @Override
         public void draw(){
-            float temp = heat().getTemp();
-            Draw.rect(region, x, y, 0f);
-            UnityDrawf.drawHeat(heatRegion, x, y, 0f, temp * 1.5f);
+            Draw.rect(region, x, y);
+            UnityDrawf.drawHeat(heatRegion, x, y, 0f, heat().getTemp() * 1.5f);
             drawTeamTop();
         }
     }

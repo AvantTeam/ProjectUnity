@@ -88,7 +88,7 @@ public class UnityBlocks implements ContentList{
     public static @FactionDef(type = "youngcha")
     Block concreteBlank, concreteFill, concreteNumber, concreteStripe, concrete, stoneFullTiles, stoneFull, stoneHalf, stoneTiles,
 
-    infiHeater,
+    thermalHeater, combustionHeater, infiHeater, infiCooler,
 
     sporePyrolyser,
 
@@ -916,9 +916,35 @@ public class UnityBlocks implements ContentList{
 
         stoneTiles = new Floor("stone-tiles");
 
+        thermalHeater = new ThermalHeater("thermal-heater"){{
+            requirements(Category.power, with(Items.copper, 150, UnityItems.nickel, 100, Items.titanium, 150));
+            size = 2;
+            health = 500;
+            maxTemp = 1100f;
+            mulCoeff = 0.11f;
+            addGraph(new GraphHeat(40f, 0.6f, 0.004f).setAccept(1, 1, 0, 0, 0, 0, 0, 0));
+        }};
+
+        combustionHeater = new CombustionHeater("combustion-heater"){{
+            requirements(Category.power, with(Items.copper, 100, UnityItems.nickel, 70, Items.graphite, 40, Items.titanium, 80));
+            size = 2;
+            health = 550;
+            itemCapacity = 5;
+            maxTemp = 1200f;
+            mulCoeff = 0.45f;
+            addGraph(new GraphHeat(40f, 0.6f, 0.004f).setAccept(1, 1, 0, 0, 0, 0, 0, 0));
+        }};
+
         infiHeater = new HeatSource("infi-heater"){{
             requirements(Category.power, BuildVisibility.sandboxOnly, with());
             health = 200;
+            addGraph(new GraphHeat(1000f, 1f, 0f).setAccept(1, 1, 1, 1));
+        }};
+
+        infiCooler = new HeatSource("infi-cooler"){{
+            requirements(Category.power, BuildVisibility.sandboxOnly, with());
+            health = 200;
+            isVoid = true;
             addGraph(new GraphHeat(1000f, 1f, 0f).setAccept(1, 1, 1, 1));
         }};
 

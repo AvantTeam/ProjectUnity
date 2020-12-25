@@ -10,10 +10,10 @@ import static arc.Core.bundle;
 public class GraphHeat extends Graph{
     public final float baseHeatCapacity, baseHeatConductivity, baseHeatRadiativity;
 
-    public GraphHeat(float baseHeatCapacity, float baseHeatConductivity, float baseHeatRadiativity){
-        this.baseHeatCapacity = baseHeatCapacity;
-        this.baseHeatConductivity = baseHeatConductivity;
-        this.baseHeatRadiativity = baseHeatRadiativity;
+    public GraphHeat(float capacity, float conductivity, float radiativity){
+        baseHeatCapacity = capacity;
+        baseHeatConductivity = conductivity;
+        baseHeatRadiativity = radiativity;
     }
 
     public GraphHeat(){
@@ -51,5 +51,10 @@ public class GraphHeat extends Graph{
     @Override
     public GraphHeatModule module(){
         return new GraphHeatModule().graph(this);
+    }
+
+    @Override
+    boolean canBeMulti(){
+        return false;
     }
 }
