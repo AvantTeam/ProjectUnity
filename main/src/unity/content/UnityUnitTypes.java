@@ -55,7 +55,7 @@ public class UnityUnitTypes implements ContentList{
     //formatter:on
     /** Scar {@linkplain LegsUnit legs} units */
     public static @FactionDef(type = "scar") @EntityPoint(type = LegsUnit.class)
-    UnitType hovos, ryzer, zena, sundown, rex;
+    UnitType hovos, ryzer, zena, sundown, rex, excelsus;
 
     /** Scar {@linkplain UnitEntity flying} units */
     public static @FactionDef(type = "scar") @EntityPoint(type = UnitEntity.class)
@@ -1307,6 +1307,51 @@ public class UnityUnitTypes implements ContentList{
             shield.healthBarColor = UnityPal.endColor;
 
             abilities.add(shield);
+        }};
+
+        excelsus = new UnityUnitType("excelsus"){{
+            defaultController = DistanceGroundAI::new;
+            speed = 0.6f;
+            health = 38000;
+            hitSize = 66.5f;
+            range = 370f;
+            allowLegStep = true;
+            rotateSpeed = 1.4f;
+            armor = 18f;
+            customBackLegs = true;
+
+            hovering = true;
+            groundLayer = Layer.legUnit + 0.03f;
+            visualElevation = 1.1f;
+
+            legCount = 6;
+            legTrns = 1f;
+            legLength = 62f;
+            legExtension = -9.5f;
+            legSplashDamage = 120f;
+            legSplashRange = 85f;
+            legSpeed = 0.06f;
+            legMoveSpace = 0.57f;
+            legPairOffset = 0.8f;
+            kinematicScl = 0.7f;
+
+            weapons.add(new Weapon("unity-scar-large-launcher"){{
+                x = 8.25f;
+                y = -18.5f;
+                shootY = 5f;
+                shadow = 8f;
+                rotateSpeed = 5f;
+                rotate = true;
+                reload = 80f;
+                shake = 1f;
+                shots = 12;
+                inaccuracy = 19f;
+                velocityRnd = 0.2f;
+                xRand = 1.2f;
+                shootSound = Sounds.missile;
+
+                bullet = UnityBullets.scarMissile;
+            }});
         }};
 
         whirlwind = new UnityUnitType("whirlwind"){{

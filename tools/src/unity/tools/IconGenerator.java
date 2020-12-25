@@ -79,6 +79,10 @@ public class IconGenerator implements Generator{
                     outliner.get(type.legBaseRegion);
                     outliner.get(type.baseJointRegion);
                     outliner.get(type.legRegion);
+
+                    outliner.get(type.legBackRegion);
+                    outliner.get(type.legBaseBackRegion);
+                    outliner.get(type.footBackRegion);
                 }
 
                 if(unit instanceof Mechc){

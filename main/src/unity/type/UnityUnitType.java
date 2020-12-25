@@ -4,8 +4,10 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.entities.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -22,9 +24,9 @@ note that as classes are integrated, inner classes are extracted.*/
 public class UnityUnitType extends UnitType{
     public final Seq<Weapon> segWeapSeq = new Seq<>();
 
-    // worms
-    public TextureRegion segmentRegion, tailRegion, segmentCellRegion, segmentOutline, tailOutline;
+    public TextureRegion segmentRegion, tailRegion, segmentCellRegion, segmentOutline, tailOutline, legBackRegion, legBaseBackRegion, footBackRegion;
     public TextureRegion[] abilityRegions = new TextureRegion[AbilityTextures.values().length];
+    // worms
     public int segmentLength = 9;
     public float segmentOffset = 23f;
         // don't touch, please
@@ -40,6 +42,11 @@ public class UnityUnitType extends UnitType{
     // copters
     public final Seq<Rotor> rotors = new Seq<>(4);
     public float fallRotateSpeed = 2.5f;
+
+    // legs extra
+    protected static Vec2 legOffsetB = new Vec2();
+
+    public boolean customBackLegs = false;
 
     public UnityUnitType(String name){
         super(name);
@@ -66,6 +73,9 @@ public class UnityUnitType extends UnitType{
         tailRegion = atlas.find(name + "-tail");
         segmentOutline = atlas.find(name + "-segment-outline");
         tailOutline = atlas.find(name + "-tail-outline");
+        legBackRegion = atlas.find(name + "-leg-back");
+        legBaseBackRegion = atlas.find(name + "-leg-base-back");
+        footBackRegion = atlas.find(name + "-foot-back");
         //abilities
         for(AbilityTextures type : AbilityTextures.values()){
             abilityRegions[type.ordinal()] = atlas.find(name + "-" + type.name());
@@ -130,6 +140,72 @@ public class UnityUnitType extends UnitType{
         // copter
         if(unit instanceof Copterc){
             drawRotors(unit);
+        }
+    }
+
+    @Override
+    public <T extends Unit & Legsc> void drawLegs(T unit){
+        if(!customBackLegs){
+            super.drawLegs(unit);
+        }else{
+            applyColor(unit);
+
+            Leg[] legs = unit.legs();
+
+            float ssize = footRegion.width * Draw.scl * 1.5f;
+            float rotation = unit.baseRotation();
+
+            for(Leg leg : legs){
+                Drawf.shadow(leg.base.x, leg.base.y, ssize);
+            }
+
+            //legs are drawn front first
+            for(int j = legs.length - 1; j >= 0; j--){
+                int i = (j % 2 == 0 ? j/2 : legs.length - 1 - j/2);
+                Leg leg = legs[i];
+                float angle = unit.legAngle(rotation, i);
+                boolean flip = i >= legs.length/2f;
+                boolean back = j < legs.length - 2;
+                int flips = Mathf.sign(flip);
+
+                TextureRegion fr = back ? footRegion : footBackRegion;
+                TextureRegion lr = back ? legRegion : legBackRegion;
+                TextureRegion lbr = back ? legBaseRegion : legBaseBackRegion;
+
+                Vec2 position = legOffsetB.trns(angle, legBaseOffset).add(unit);
+
+                Tmp.v1.set(leg.base).sub(leg.joint).inv().setLength(legExtension);
+
+                if(leg.moving && visualElevation > 0){
+                    float scl = visualElevation;
+                    float elev = Mathf.slope(1f - leg.stage) * scl;
+                    Draw.color(Pal.shadow);
+                    Draw.rect(fr, leg.base.x + shadowTX * elev, leg.base.y + shadowTY * elev, position.angleTo(leg.base));
+                    Draw.color();
+                }
+
+                Draw.rect(fr, leg.base.x, leg.base.y, position.angleTo(leg.base));
+
+                Lines.stroke(lr.height * Draw.scl * flips);
+                Lines.line(lr, position.x, position.y, leg.joint.x, leg.joint.y, false);
+
+                Lines.stroke(lbr.height * Draw.scl * flips);
+                Lines.line(lbr, leg.joint.x + Tmp.v1.x, leg.joint.y + Tmp.v1.y, leg.base.x, leg.base.y, false);
+
+                if(jointRegion.found()){
+                    Draw.rect(jointRegion, leg.joint.x, leg.joint.y);
+                }
+
+                if(baseJointRegion.found()){
+                    Draw.rect(baseJointRegion, position.x, position.y, rotation);
+                }
+            }
+
+            if(baseRegion.found()){
+                Draw.rect(baseRegion, unit.x, unit.y, rotation - 90);
+            }
+
+            Draw.reset();
         }
     }
 
