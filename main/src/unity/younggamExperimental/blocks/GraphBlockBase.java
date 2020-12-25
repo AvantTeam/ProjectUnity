@@ -1,12 +1,10 @@
 package unity.younggamExperimental.blocks;
 
-import arc.func.*;
 import arc.scene.ui.layout.*;
 import arc.util.io.*;
 import mindustry.gen.*;
 import mindustry.world.meta.*;
 import unity.younggamExperimental.*;
-import unity.younggamExperimental.graph.*;
 import unity.younggamExperimental.graphs.*;
 import unity.younggamExperimental.modules.*;
 
@@ -31,6 +29,7 @@ public interface GraphBlockBase{
             return gms().getGraphConnector(type);
         }
 
+        //TODO how to prevent type casting?
         default GraphHeatModule heat(){
             return (GraphHeatModule)gms().getGraphConnector(GraphType.heat);
         }

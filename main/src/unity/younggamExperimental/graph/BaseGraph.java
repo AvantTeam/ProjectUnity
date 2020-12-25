@@ -14,7 +14,7 @@ import java.util.Comparator;
 
 //BlockGraph 그래프 그자체
 //I had stroke.
-public abstract class BaseGraph<T extends Graph, M extends GraphModule<T, M, G>, G extends BaseGraph<T, M, G>>{
+public abstract class BaseGraph<M extends GraphModule<? extends Graph, M, G>, G extends BaseGraph<M, G>>{
     public final ObjectSet<M> connected = new ObjectSet<>();
     public final int id;
     private static int lastId;

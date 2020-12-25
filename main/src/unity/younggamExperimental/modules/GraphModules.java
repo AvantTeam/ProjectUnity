@@ -79,4 +79,9 @@ public class GraphModules{
     public void prevTileRotation(int r){
         prevTileRotation = r;
     }
+
+    //xelo must have forgotten this
+    public void drawSelect(){
+        for(var graph : graphs.values()) graph.drawSelect();
+    }
 }

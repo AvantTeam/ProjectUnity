@@ -17,7 +17,7 @@ public class GraphHeatModule extends GraphModule<GraphHeat, GraphHeatModule, Hea
     public float heat, heatBuffer;
 
     @Override
-    void applySaveState(HeatGraph graph){}
+    void applySaveState(HeatGraph graph, int index){}
 
     @Override
     void updateExtension(){}
@@ -80,7 +80,7 @@ public class GraphHeatModule extends GraphModule<GraphHeat, GraphHeatModule, Hea
     void writeLocal(Writes write, HeatGraph graph){}
 
     @Override
-    <T> T[] readLocal(Reads read, byte revision){
+    Object[] readLocal(Reads read, byte revision){
         return null;
     }
 
@@ -89,6 +89,7 @@ public class GraphHeatModule extends GraphModule<GraphHeat, GraphHeatModule, Hea
         return GraphType.heat;
     }
 
+    //heat
     @Override
     public float getTemp(){
         return heat / graph.baseHeatCapacity;
@@ -97,10 +98,5 @@ public class GraphHeatModule extends GraphModule<GraphHeat, GraphHeatModule, Hea
     @Override
     void setTemp(float t){
         heat = t * graph.baseHeatCapacity;
-    }
-
-    @Override
-    boolean canBeMulti(){
-        return false;
     }
 }

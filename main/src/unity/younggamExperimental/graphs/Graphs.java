@@ -1,6 +1,5 @@
 package unity.younggamExperimental.graphs;
 
-import arc.func.*;
 import arc.struct.*;
 import mindustry.world.meta.*;
 import unity.younggamExperimental.*;
@@ -9,7 +8,7 @@ import unity.younggamExperimental.modules.*;
 //GraphCommonBlock 블럭에 쓰일것 consumers 역할?
 public class Graphs{
     private final Graph[] graphBlocks = new Graph[GraphType.values().length];
-    private final Seq<GraphType> results = new Seq<>(4);//null 연산 매번 안하려고
+    private final ObjectSet<GraphType> results = new ObjectSet<>(4);//null 연산 매번 안하려고
     boolean useOriginalUpdate = true;
     //isNetworkConnector - omitted since this is never set to false
 
@@ -18,6 +17,10 @@ public class Graphs{
     Graph getGraphConnectorBlock(GraphType type){
         if(graphBlocks[type.ordinal()] == null) throw new IllegalArgumentException();
         return graphBlocks[type.ordinal()];
+    }
+
+    public boolean hasGraph(GraphType type){
+        return results.contains(type);
     }
 
     //set block,build,builders 종합

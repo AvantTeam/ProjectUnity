@@ -306,9 +306,9 @@ public final class Funcs{
         }
     }
 
-    //torque associated     TODO parameters naming
-    public static float linear(float x, float s, int m, float h, float k){
-        x = Math.min(s, k);
-        return Math.min(k * (s - x) * m / s, 99999f);
+    //torque associated
+    public static float linear(float current,float target, float maxTorque, float coefficient){
+        current = Math.min(target, current);
+        return Math.min(coefficient * (target - current) * maxTorque / target, 99999f);
     }
 }
