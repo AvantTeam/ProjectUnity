@@ -20,13 +20,16 @@ jobs:
         ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
 
     - name: Download Android SDK build tools
-      run: sdkmanager "build-tools;30.0.1"
-
-    - name: Add Android SDK build tools to PATH
-      run: echo "${ANDROID_HOME}/build-tools/30.0.1" >> $GITHUB_PATH
-
-    - name: Build mod jar
       run: |
+        export JAVA_OPTS='-XX:+IgnoreUnrecognizedVMOptions --add-modules java.xml.bind'
+        sdkmanager "build-tools;30.0.1"
+
+    - name: Set up PATH and grant permissions
+      run: |
+        echo "${ANDROID_HOME}/build-tools/30.0.1" >> $GITHUB_PATH
         chmod +x gradlew
+
+    - name: Build mod jar files
+      run: 
         ./gradlew tools:proc
         ./gradlew main:deploy
