@@ -4,20 +4,28 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.ui.layout.*;
 import arc.util.io.*;
-import mindustry.world.blocks.production.*;
+import mindustry.content.*;
+import mindustry.entities.*;
+import mindustry.gen.*;
+import mindustry.world.*;
 import unity.graphics.*;
 import unity.younggamExperimental.graphs.*;
 import unity.younggamExperimental.modules.*;
 
 import static arc.Core.atlas;
 
-//시도용 I hope GenericCrafters that uses graph can be integrated
-public class SporePyrolyser extends GenericCrafter implements GraphBlockBase{
+//youngchaWalls
+public class HeatWall extends Block implements GraphBlockBase{
+    protected float minStatusRadius = 4f, statusRadiusMul = 20f,
+        minStatusDuration = 3f, statusDurationMul = 40f,
+        statusTime = 60f, maxDamage;
     final Graphs graphs = new Graphs();
     TextureRegion heatRegion;//heatSprite
+    int timerId;
 
-    public SporePyrolyser(String name){
+    public HeatWall(String name){
         super(name);
+        update = solid = true;
     }
 
     @Override
@@ -43,9 +51,10 @@ public class SporePyrolyser extends GenericCrafter implements GraphBlockBase{
     public void load(){
         super.load();
         heatRegion = atlas.find(name + "-heat");
+        timerId = timers++;
     }
 
-    public class SporPyrolyserBuild extends GenericCrafterBuild implements GraphBuildBase{
+    public class HeatWallBuild extends Building implements GraphBuildBase{
         GraphModules gms;
 
         @Override
@@ -119,17 +128,21 @@ public class SporePyrolyser extends GenericCrafter implements GraphBlockBase{
 
         //not common probably separated?
         @Override
-        public float getProgressIncrease(float baseTime){
-            float temp = heat().getTemp();
-            return Mathf.sqrt(Mathf.clamp((temp - 370f) / 300f)) / baseTime * edelta();
+        public void updatePost(){
+            if(timer(timerId, statusTime)){
+                float temp = heat().getTemp();
+                float intensity = Mathf.clamp(Mathf.map(temp, 400f, 1000f, 0f, 1f));
+                Damage.status(team, x, y, intensity * statusRadiusMul + minStatusRadius, StatusEffects.burning, minStatusDuration + intensity * statusDurationMul, false, true);
+                if(maxDamage > 0f) Damage.damage(team, x, y, intensity * 10f + 8f, intensity * maxDamage, false, true);
+            }
         }
 
         @Override
         public void draw(){
             float temp = heat().getTemp();
             Draw.rect(region, x, y, 0f);
-            UnityDrawf.drawHeat(heatRegion, x, y, 0f, temp * 1.5f);
-            drawTeamTop();
+            UnityDrawf.drawHeat(heatRegion, x, y, 0f, temp);
+            super.drawTeamTop();
         }
     }
 }

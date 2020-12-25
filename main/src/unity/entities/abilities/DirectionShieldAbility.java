@@ -188,7 +188,7 @@ public class DirectionShieldAbility extends Ability{
             Draw.rect(type.softShadowRegion, Tmp.v3.x, Tmp.v3.y, size, size);
 
             Draw.z(z - 0.0099f);
-            float engScl = shieldSize / 4f;
+            float engScl = shieldSize / 6f;
             float liveScl = (engScl - (engScl / 4f)) + Mathf.absin(Time.time, 2f, engScl / 4f);
             Tmp.v3.trns(shieldAngles[i], distanceRadius - engScl);
             Tmp.v3.add(unit);

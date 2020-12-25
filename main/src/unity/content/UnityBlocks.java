@@ -34,7 +34,6 @@ import unity.world.consumers.*;
 import unity.world.draw.*;
 import unity.younggamExperimental.blocks.*;
 import unity.younggamExperimental.graphs.*;
-import unity.younggamExperimental.modules.*;
 
 import static arc.Core.*;
 import static mindustry.type.ItemStack.*;
@@ -89,7 +88,11 @@ public class UnityBlocks implements ContentList{
     public static @FactionDef(type = "youngcha")
     Block concreteBlank, concreteFill, concreteNumber, concreteStripe, concrete, stoneFullTiles, stoneFull, stoneHalf, stoneTiles,
 
-    sporePyro;
+    infiHeater,
+
+    sporePyrolyser,
+
+    cupronickelWall, cupronickelWallLarge;
 
     public static @FactionDef(type = "end")
     Block terminalCrucible, endForge, endGame;
@@ -913,7 +916,13 @@ public class UnityBlocks implements ContentList{
 
         stoneTiles = new Floor("stone-tiles");
 
-        sporePyro = new SporePyrolyser("spore-pyrolyser"){{
+        infiHeater = new HeatSource("infi-heater"){{
+            requirements(Category.power, BuildVisibility.sandboxOnly, with());
+            health = 200;
+            addGraph(new GraphHeat(1000f, 1f, 0f).setAccept(1, 1, 1, 1));
+        }};
+
+        sporePyrolyser = new SporePyrolyser("spore-pyrolyser"){{
             requirements(Category.crafting, with(UnityItems.nickel, 25, Items.titanium, 50, Items.copper, 50, Items.lead, 30));
             size = 3;
             health = 1100;
@@ -922,9 +931,26 @@ public class UnityBlocks implements ContentList{
             ambientSound = Sounds.machine;
             ambientSoundVolume = 0.6f;
             consumes.item(Items.sporePod, 1);
-            addGraph(new GraphHeat(60f, 0.4f, 0.008f)
-                .setAccept(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1), GraphHeatModule::new
-            );
+            addGraph(new GraphHeat(60f, 0.4f, 0.008f).setAccept(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1));
+        }};
+
+        cupronickelWall = new HeatWall("cupronickel-wall"){{
+            requirements(Category.defense, with(UnityItems.cupronickel, 8, UnityItems.nickel, 5));
+            health = 500;
+            addGraph(new GraphHeat(50f, 0.5f, 0.03f).setAccept(1, 1, 1, 1));
+        }};
+
+        cupronickelWallLarge = new HeatWall("cupronickel-wall-large"){{
+            requirements(Category.defense, with(UnityItems.cupronickel, 36, UnityItems.nickel, 20));
+            size = 2;
+            health = 2000;
+            minStatusRadius = 8f;
+            statusRadiusMul = 40f;
+            minStatusDuration = 5f;
+            statusDurationMul = 120f;
+            statusTime = 120f;
+            maxDamage = 40f;
+            addGraph(new GraphHeat(200f, 0.5f, 0.09f).setAccept(1, 1, 1, 1, 1, 1, 1, 1));
         }};
 
         //endregion

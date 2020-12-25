@@ -18,8 +18,8 @@ public interface GraphBlockBase{
         graphs().disableOgUpdate();
     }
 
-    default void addGraph(Graph graph, Prov<GraphModule> build){
-        graphs().setGraphConnectorTypes(graph, build);
+    default void addGraph(Graph graph){
+        graphs().setGraphConnectorTypes(graph);
     }
 
     default void setStatsExt(Stats stats){}

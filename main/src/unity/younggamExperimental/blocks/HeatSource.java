@@ -1,23 +1,23 @@
 package unity.younggamExperimental.blocks;
 
 import arc.graphics.g2d.*;
-import arc.math.*;
 import arc.scene.ui.layout.*;
 import arc.util.io.*;
-import mindustry.world.blocks.production.*;
+import mindustry.gen.*;
+import mindustry.world.*;
 import unity.graphics.*;
 import unity.younggamExperimental.graphs.*;
 import unity.younggamExperimental.modules.*;
 
 import static arc.Core.atlas;
 
-//시도용 I hope GenericCrafters that uses graph can be integrated
-public class SporePyrolyser extends GenericCrafter implements GraphBlockBase{
+public class HeatSource extends Block implements GraphBlockBase{
     final Graphs graphs = new Graphs();
-    TextureRegion heatRegion;//heatSprite
+    TextureRegion heatRegion, baseRegion;//heatSprite,bottom
 
-    public SporePyrolyser(String name){
+    public HeatSource(String name){
         super(name);
+        update = true;
     }
 
     @Override
@@ -43,9 +43,10 @@ public class SporePyrolyser extends GenericCrafter implements GraphBlockBase{
     public void load(){
         super.load();
         heatRegion = atlas.find(name + "-heat");
+        baseRegion = atlas.find(name + "-base");
     }
 
-    public class SporPyrolyserBuild extends GenericCrafterBuild implements GraphBuildBase{
+    public class HeatSourceBuild extends Building implements GraphBuildBase{
         GraphModules gms;
 
         @Override
@@ -119,17 +120,17 @@ public class SporePyrolyser extends GenericCrafter implements GraphBlockBase{
 
         //not common probably separated?
         @Override
-        public float getProgressIncrease(float baseTime){
-            float temp = heat().getTemp();
-            return Mathf.sqrt(Mathf.clamp((temp - 370f) / 300f)) / baseTime * edelta();
+        public void updatePost(){
+            GraphHeatModule hgraph = heat();
+            hgraph.heat = hgraph.heat + Math.max(0, 9999f - hgraph.getTemp()) * 0.5f;
         }
 
         @Override
         public void draw(){
             float temp = heat().getTemp();
-            Draw.rect(region, x, y, 0f);
-            UnityDrawf.drawHeat(heatRegion, x, y, 0f, temp * 1.5f);
-            drawTeamTop();
+            Draw.rect(baseRegion, x, y, 0f);
+            UnityDrawf.drawHeat(heatRegion, x, y, rotdeg(), temp);
+            super.drawTeamTop();
         }
     }
 }
