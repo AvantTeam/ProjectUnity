@@ -53,8 +53,10 @@ public class IconGenerator implements Generator{
                         String fname = parseName.get(tr);
 
                         if(SpriteProcessor.has(fname)){
-                            Sprite outl = outline.get(SpriteProcessor.get(fname));
-                            outl.save(fname + "-" + suff);
+                            Sprite sprite = SpriteProcessor.get(fname);
+                            sprite.draw(outline.get(sprite));
+
+                            sprite.save(fname + "-" + suff);
                         }else{
                             Log.warn("@ not found", fname);
                         }
@@ -110,10 +112,10 @@ public class IconGenerator implements Generator{
                     }
                 }
 
+                outlSeparate.get("outline", type.region);
+
                 String fname = parseName.get(type.region);
                 Sprite outl = outline.get(SpriteProcessor.get(fname));
-                outl.save(fname + "-outline");
-
                 Sprite region = SpriteProcessor.get(fname);
 
                 Sprite icon = Sprite.createEmpty(region.width, region.height);
