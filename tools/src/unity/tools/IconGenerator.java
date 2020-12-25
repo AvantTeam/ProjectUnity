@@ -32,6 +32,8 @@ public class IconGenerator implements Generator{
                 Color outc = Pal.darkerMetal;
                 Func<Sprite, Sprite> outline = i -> i.outline(3, outc);
                 Func<TextureRegion, String> parseName = reg -> ((AtlasRegion)reg).name.replaceFirst("unity-", "");
+                Seq<String> optional = Seq.with("-joint", "-leg-back", "-leg-base-back", "-foot-back");
+
                 Cons<TextureRegion> outliner = tr -> {
                     if(tr != null){
                         String fname = parseName.get(tr);
@@ -41,7 +43,7 @@ public class IconGenerator implements Generator{
                             sprite.draw(outline.get(sprite));
 
                             sprite.save(fname);
-                        }else if(!fname.contains("-joint")){ //joint is optional sprite
+                        }else if(!optional.contains(fname::contains)){
                             Log.warn("@ not found", fname);
                         }
                     }else{
