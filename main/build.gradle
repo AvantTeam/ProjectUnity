@@ -16,12 +16,13 @@ ext{
     }
 }
 
-task jarAndroid(dependsOn: jar){
+task dex{
     doLast{
-        def files = (configurations.compileClasspath.asList() + configurations.runtimeClasspath.asList() + [new File("$sdkRoot/platforms/android-$sdkVersion/android.jar")])
-        def dependencies = files.collect{"--classpath $it.path"}.join(" ")
-
-        doExec("dx $dependencies --min-api 14 --output ${modName}Android.jar ${modName}Desktop.jar")
+        if(System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')){
+            doExec("cmd /c dx --dex --keep-classes --min-sdk-version=30 --output=${modName}Android.jar ${modName}Desktop.jar")
+        }else{
+            doExec("dx --dex --keep-classes --min-sdk-version=30 --output=${modName}Android.jar ${modName}Desktop.jar")
+        }
     }
 }
 
@@ -33,18 +34,7 @@ jar{
     }
 }
 
-task deploy(type: Jar, dependsOn: [jarAndroid, jar]){
-    archiveFileName = "${modName}.jar"
-
-    from{[zipTree("$buildDir/libs/${modName}Desktop.jar"), zipTree("$buildDir/libs/${modName}Android.jar")]}
-
-    doLast{
-        delete{
-            delete "$buildDir/libs/${modName}Desktop.jar"
-            delete "$buildDir/libs/${modName}Android.jar"
-        }
-    }
-}
+task deploy(dependsOn: [jar, dex])
 
 dependencies{
     compileOnly "com.github.Anuken.Arc:arc-core:$mindustryVersion"
