@@ -5,6 +5,7 @@ import arc.math.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.ctype.*;
 import mindustry.type.*;
@@ -1335,6 +1336,8 @@ public class UnityUnitTypes implements ContentList{
             legPairOffset = 0.8f;
             kinematicScl = 0.7f;
 
+            immunities = ObjectSet.with(StatusEffects.burning);
+
             weapons.add(new Weapon("unity-scar-large-launcher"){{
                 x = 8.25f;
                 y = -18.5f;
@@ -1351,7 +1354,78 @@ public class UnityUnitTypes implements ContentList{
                 shootSound = Sounds.missile;
 
                 bullet = UnityBullets.scarMissile;
+            }},
+            new Weapon("unity-scar-large-launcher"){{
+                x = 13.75f;
+                y = -24.5f;
+                shootY = 5f;
+                shadow = 8f;
+                rotateSpeed = 5f;
+                rotate = true;
+                reload = 75f;
+                shake = 1f;
+                shots = 12;
+                inaccuracy = 19f;
+                velocityRnd = 0.2f;
+                xRand = 1.2f;
+                shootSound = Sounds.missile;
+
+                bullet = UnityBullets.scarMissile;
+            }},
+            new Weapon("unity-scar-small-laser-weapon"){{
+                x = 18.25f;
+                y = 11.75f;
+                shootY = 4f;
+                rotateSpeed = 5f;
+                rotate = true;
+                reload = 3f * 60f;
+                shake = 1.2f;
+                continuous = true;
+                alternate = false;
+                shootSound = Sounds.none;
+
+                bullet = new ContinuousLaserBulletType(40f){{
+                    length = 180f;
+                    lifetime = 10f * 60f;
+                    shake = 1.2f;
+                    incendChance = 0f;
+                    largeHit = false;
+                    colors = new Color[]{UnityPal.scarColorAlpha, UnityPal.endColor, Color.white};
+                    width = 4f;
+                    hitColor = UnityPal.scarColor;
+                    lightColor = UnityPal.scarColorAlpha;
+                    hitEffect = UnityFx.scarHitSmall;
+                }};
+            }},
+            new Weapon("unity-excelsus-laser-weapon"){{
+                x = 29.75f;
+                y = -20.5f;
+                shootY = 7f;
+                shadow = 19f;
+                rotateSpeed = 1.5f;
+                rotate = true;
+                reload = 7f * 60f;
+                shake = 2f;
+                continuous = true;
+                alternate = false;
+                shootSound = Sounds.none;
+
+                bullet = new ContinuousLaserBulletType(210f){{
+                    length = 360f;
+                    lifetime = 3f * 60f;
+                    shake = 3f;
+                    colors = new Color[]{UnityPal.scarColorAlpha, UnityPal.endColor, Color.white};
+                    width = 8f;
+                    hitColor = UnityPal.scarColor;
+                    lightColor = UnityPal.scarColorAlpha;
+                    hitEffect = UnityFx.scarHitSmall;
+                }};
             }});
+            
+            DirectionShieldAbility shield = new DirectionShieldAbility(6, 0.04f, 29f, 3400f, 4.2f, 0.9f, 54f);
+            shield.healthBarColor = UnityPal.endColor;
+
+            abilities.add(shield);
         }};
 
         whirlwind = new UnityUnitType("whirlwind"){{
