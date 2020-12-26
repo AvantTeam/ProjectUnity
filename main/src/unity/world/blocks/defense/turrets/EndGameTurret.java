@@ -242,11 +242,19 @@ public class EndGameTurret extends PowerTurret{
             entitySeq.clear();
         }
 
-        //TODO remove unit from physics by setting its 'added' to false
+        void attemptRemoveAdd(Unit unit){
+            try{
+                unit.getClass().getField("added").setBoolean(unit, false);
+            }catch(Exception e){
+                throw new RuntimeException(e);
+            }
+        }
+
         void annihilate(Entityc entity){
             Groups.all.remove(entity);
             if(entity instanceof Unit){
                 Unit tmp = (Unit)entity;
+                attemptRemoveAdd(tmp);
                 UnityFx.vapourizeUnit.at(tmp.x, tmp.y, tmp.rotation, tmp);
                 tmp.team.data().updateCount(tmp.type, -1);
                 tmp.clearCommand();
