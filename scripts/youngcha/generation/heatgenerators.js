@@ -230,8 +230,8 @@ const solarCollector = graphLib.finaliseExtend(Block, Building,"solar-collector"
 	},
 	onDelete(){
 		if(!this.linkedReflect){return;}
-		for(var i =0 ;i<this.linkedReflect.length;i++){
-			this.linkedReflect[i].setLink(-1);
+		while(this.linkedReflect.length > 0){
+			this.linkedReflect[0].setLink(-1);
 		}
 	},
 	updatePost(){
@@ -317,7 +317,7 @@ solarReflector.buildType = () => {
 			if(this.linkValid()){
                 let target = Vars.world.build(this._link);
                 Drawf.circles(target.x, target.y, (target.block.size / 2 + 1) * Vars.tilesize + sin - 2, Pal.place);
-                Drawf.arrow(this.x, this.y, target.x, target.y, this.size * Vars.tilesize + sin, 4 + sin);
+                Drawf.arrow(this.x, this.y, target.x, target.y, this.block.size * Vars.tilesize + sin, 4 + sin);
             }
 
             Drawf.dashCircle(this.x, this.y, 100, Pal.accent);
@@ -356,7 +356,11 @@ solarReflector.buildType = () => {
 		read(stream, revision) {
 			this.super$read(stream,revision);
 			this.setLink(stream.i());
-		}
+		},
+        onRemoved(){
+            var build = Vars.world.build(this._link);
+            if(build!=null && build.removeReflector) build.removeReflector(this);
+        }
 	});
 	building.block = solarReflector;
 	return building;
