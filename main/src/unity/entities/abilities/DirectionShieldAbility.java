@@ -88,7 +88,7 @@ public class DirectionShieldAbility extends Ability{
         }
         if(timer.get(1.5f)){
             Groups.bullet.intersect(Tmp.r1.x, Tmp.r1.y, Tmp.r1.width, Tmp.r1.height, b -> {
-                if(b.team != unit.team && !(b.type instanceof ContinuousLaserBulletType || b.type instanceof LaserBulletType) && !b.type.scaleVelocity){
+                if(b.team != unit.team && !(b.type instanceof ContinuousLaserBulletType || b.type instanceof LaserBulletType) && !b.type.scaleVelocity && b.vel().len() > 0.1f){
                     b.hitbox(Tmp.r2);
                     Tmp.r3.set(Tmp.r2).grow(shieldWidth).move(b.vel.x / 2f, b.vel.y / 2f);
                     Tmp.r2.grow(shieldWidth);
@@ -167,9 +167,9 @@ public class DirectionShieldAbility extends Ability{
         float size = (Math.max(region.width, region.height) * Draw.scl) * 1.3f;
         Lines.stroke(1.5f);
         for(int i = 0; i < shields; i++){
+            Draw.z(z - 0.0098f);
             Tmp.v3.trns(shieldAngles[i], distanceRadius);
             Tmp.v3.add(unit);
-            Draw.z(z - 0.0098f);
             float offset = available[i] ? 2f : 1.5f;
             Draw.mixcol(Color.white, hitTimes[i] / blinkTime);
             Draw.color(Color.white, Color.black, (1f - (Mathf.clamp(healths[i] / maxHealth))) / offset);
@@ -196,8 +196,9 @@ public class DirectionShieldAbility extends Ability{
             Fill.circle(Tmp.v3.x, Tmp.v3.y, liveScl);
             Draw.color(Color.white);
             Fill.circle(Tmp.v3.x, Tmp.v3.y, liveScl / 2f);
+            Draw.z(z);
         }
-        Draw.z(z);
+        //Draw.z(z);
         Draw.reset();
     }
 
