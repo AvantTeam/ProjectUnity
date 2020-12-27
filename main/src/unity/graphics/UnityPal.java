@@ -21,5 +21,7 @@ public class UnityPal{
         lavaColor2 = valueOf("ffcc00"),
         diriumColor = valueOf("96f7c3"),
         diriumColor2 = valueOf("ccffe4"),
-        coldColor = valueOf("6bc7ff");
+        coldColor = valueOf("6bc7ff"),
+        youngchaOrangish = valueOf("ea7a55"),
+        youngchaGray = valueOf("555555");
 }

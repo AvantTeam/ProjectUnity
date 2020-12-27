@@ -6,6 +6,8 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.struct.ObjectMap.*;
 import arc.util.io.*;
+import mindustry.gen.*;
+import mindustry.graphics.*;
 import unity.younggamExperimental.*;
 import unity.younggamExperimental.blocks.GraphBlockBase.*;
 import unity.younggamExperimental.graph.*;
@@ -153,7 +155,10 @@ public abstract class GraphModule<T extends Graph, M extends GraphModule<T, M, G
 
     abstract void displayBars(Table table);
 
-    abstract void drawSelect();
+    void drawSelect(){
+        var net = networks.get(0);
+        if(net != null) net.connected.each(module -> Drawf.selected(module.parent.build.<Building>self(), Pal.accent));
+    }
 
     //abstract 해결용 임의로 넣은것
     abstract G newNetwork();
@@ -246,7 +251,7 @@ public abstract class GraphModule<T extends Graph, M extends GraphModule<T, M, G
         return getPortOfNetworkMulti(net) != -1;
     }
 
-    int getPortOfNetwork(G net){
+    public int getPortOfNetwork(G net){
         if(multi) return getPortOfNetworkMulti(net);
         return networks.get(0).id == net.id ? 0 : -1;
     }

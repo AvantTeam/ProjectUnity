@@ -56,11 +56,6 @@ public class GraphHeatModule extends GraphModule<GraphHeat, GraphHeatModule, Hea
     void displayBars(Table table){}
 
     @Override
-    void drawSelect(){
-        if(networks.get(0) != null) networks.get(0).connected.each(module -> Drawf.selected(module.parent.build.<Building>self(), Pal.accent));
-    }
-
-    @Override
     HeatGraph newNetwork(){
         return new HeatGraph(this);
     }

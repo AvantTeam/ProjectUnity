@@ -48,8 +48,8 @@ public class GraphCrucible extends Graph{
     }
 
     @Override
-    public GraphModule module(){
-        return null;
+    public GraphCrucibleModule module(){
+        return new GraphCrucibleModule().graph(this);
     }
 
     @Override

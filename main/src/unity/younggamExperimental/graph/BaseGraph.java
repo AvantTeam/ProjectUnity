@@ -202,8 +202,8 @@ public abstract class BaseGraph<M extends GraphModule<? extends Graph, M, G>, G 
                 Tile tile = build.tile().nearby(portInfo.toPos);
                 if(tile == null) return;
 
-                if(tile.block() instanceof GraphBlockBase block){
-                    M conModule = (M)((GraphBuildBase)tile.build).getGraphConnector(root.type());//conbuild
+                if(tile.build instanceof GraphBuildBase other){
+                    M conModule = (M)other.getGraphConnector(root.type());//conbuild
                     if(conModule == null || conModule == prevModule || conModule.dead() || !canConnect(current.module, conModule)) continue;
                     G thisGraph = buildConnector.getNetworkOfPort(portIndex);
                     if(conModule.parent.build.rotation() != conModule.lastRecalc()) conModule.recalcPorts();
