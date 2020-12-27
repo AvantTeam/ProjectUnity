@@ -35,9 +35,8 @@ public class GraphTorqueGenerate extends GraphTorque{
     }
 
     @Override
-    public GraphTorqueModule module(){
-        //TODO
-        return null;
+    public GraphTorqueGenerateModule module(){
+        return new GraphTorqueGenerateModule().graph(this);
     }
 
     @Override

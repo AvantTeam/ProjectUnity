@@ -29,4 +29,11 @@ public class GraphTorqueGenerateModule extends GraphTorqueModule<GraphTorqueGene
             () -> smoothedForce.mean() / graph.maxTorque / maxMotorForceMult
         )).growX().row();
     }
+
+    @Override
+    public GraphTorqueGenerateModule graph(GraphTorqueGenerate graph){
+        this.graph = graph;
+        if(graph.isMultiConnector) multi = true;
+        return this;
+    }
 }

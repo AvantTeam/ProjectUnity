@@ -117,15 +117,15 @@ public class GraphTorqueModule<T extends GraphTorque> extends GraphModule<T, Gra
         return rots.get(index);
     }
 
-    public float getForce(){
+    public float force(){
         return force;
     }
 
-    public float getFriction(){
+    public float friction(){
         return friction;
     }
 
-    public float getInertia(){
+    public float inertia(){
         return inertia;
     }
 }

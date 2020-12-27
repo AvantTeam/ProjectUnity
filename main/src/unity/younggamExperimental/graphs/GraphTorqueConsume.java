@@ -39,9 +39,8 @@ public class GraphTorqueConsume extends GraphTorque{
     }
 
     @Override
-    public GraphTorqueModule module(){
-        //TODO
-        return null;
+    public GraphTorqueConsumeModule module(){
+        return new GraphTorqueConsumeModule().graph(this);
     }
 
     @Override

@@ -5,6 +5,7 @@ import arc.scene.ui.layout.*;
 import arc.util.io.*;
 import mindustry.gen.*;
 import mindustry.world.*;
+import unity.graphics.*;
 import unity.younggamExperimental.*;
 import unity.younggamExperimental.graphs.*;
 import unity.younggamExperimental.modules.*;
@@ -121,6 +122,16 @@ public class GraphBlock extends Block implements GraphBlockBase{
         public void drawSelect(){
             super.drawSelect();
             gms.drawSelect();
+        }
+        //laziness
+
+        @Override
+        public void draw(){
+            if(graphs.hasGraph(GraphType.heat)){
+                Draw.rect(region, x, y);
+                UnityDrawf.drawHeat(heatRegion, x, y, 0, heat().getTemp());
+                drawTeamTop();
+            }
         }
     }
 }

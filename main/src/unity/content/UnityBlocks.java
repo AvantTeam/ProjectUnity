@@ -88,7 +88,9 @@ public class UnityBlocks implements ContentList{
     public static @FactionDef(type = "youngcha")
     Block concreteBlank, concreteFill, concreteNumber, concreteStripe, concrete, stoneFullTiles, stoneFull, stoneHalf, stoneTiles,
 
-    thermalHeater, combustionHeater, infiHeater, infiCooler,
+    heatPipe, smallRadiator,
+
+    thermalHeater, combustionHeater, infiHeater, infiCooler, solarCollector, solarReflector,
 
     sporePyrolyser,
 
@@ -916,6 +918,19 @@ public class UnityBlocks implements ContentList{
 
         stoneTiles = new Floor("stone-tiles");
 
+        heatPipe = new HeatPipe("heat-pipe"){{
+            requirements(Category.power, with(Items.copper, 15, UnityItems.cupronickel, 10, UnityItems.nickel, 5));
+            health = 140;
+            addGraph(new GraphHeat(5f, 0.7f, 0.008f).setAccept(1, 1, 1, 1));
+        }};
+
+        smallRadiator = new GraphBlock("small-radiator"){{
+            requirements(Category.power, with(Items.copper, 30, UnityItems.cupronickel, 20, UnityItems.nickel, 15));
+            health = 200;
+            solid = true;
+            addGraph(new GraphHeat(10f, 0.7f, 0.05f).setAccept(1, 1, 1, 1));
+        }};
+
         thermalHeater = new ThermalHeater("thermal-heater"){{
             requirements(Category.power, with(Items.copper, 150, UnityItems.nickel, 100, Items.titanium, 150));
             size = 2;
@@ -946,6 +961,21 @@ public class UnityBlocks implements ContentList{
             health = 200;
             isVoid = true;
             addGraph(new GraphHeat(1000f, 1f, 0f).setAccept(1, 1, 1, 1));
+        }};
+
+        solarCollector = new SolarCollector("solar-collector"){{
+            requirements(Category.power, with(UnityItems.nickel, 80, Items.titanium, 50, Items.lead, 30));
+            size = 3;
+            health = 1500;
+            maxTemp = 800f;
+            mulCoeff = 0.03f;
+            addGraph(new GraphHeat(60f, 1f, 0.02f).setAccept(0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0));
+        }};
+
+        solarReflector = new SolarReflector("solar-reflector"){{
+            requirements(Category.power, with(UnityItems.nickel, 25, Items.copper, 50));
+            size = 2;
+            health = 800;
         }};
 
         sporePyrolyser = new SporePyrolyser("spore-pyrolyser"){{

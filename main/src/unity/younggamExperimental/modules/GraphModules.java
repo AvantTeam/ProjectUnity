@@ -9,21 +9,21 @@ import unity.younggamExperimental.blocks.GraphBlockBase.*;
 //GraphCommonBuild. ㅁㄴ이라ㅓㅣ
 public class GraphModules{
     public final GraphBuildBase build;
-    final IntMap<GraphModule> graphs = new IntMap<>(4);
+    //TODO unMap?
+    final IntMap<GraphModule> modules = new IntMap<>(4);
     int prevTileRotation = -1;
 
     public GraphModules(GraphBuildBase build){
         this.build = build;
     }
 
-    //TODO 굳이 싶은것들?
     public void setGraphConnector(int i, GraphModule graph){
         graph.parent = this;
-        graphs.put(i, graph);
+        modules.put(i, graph);
     }
 
     public GraphModule getGraphConnector(GraphType type){
-        return graphs.get(type.ordinal());
+        return modules.get(type.ordinal());
     }
 
     GraphData getConnectSidePos(int index){
@@ -31,48 +31,48 @@ public class GraphModules{
     }
 
     public void created(){//create
-        for(var graphConn : graphs.values()) graphConn.onCreate(build);
+        for(var graphConn : modules.values()) graphConn.onCreate(build);
         prevTileRotation = -1;
     }
 
     public float efficiency(){
         float e = 1f;
-        for(var graph : graphs.values()) e *= graph.efficiency();
+        for(var graph : modules.values()) e *= graph.efficiency();
         return Math.max(0f, e);
     }
 
     //onDestroyed. 중복 호출?
     public void updateGraphRemovals(){
-        for(var graph : graphs.values()) graph.onRemoved();
+        for(var graph : modules.values()) graph.onRemoved();
     }
 
     public void updateTile(){
         if(!build.block().rotate) build.rotation(0);
         if(prevTileRotation != build.rotation()){
-            for(var graph : graphs.values()) graph.onRotationChanged(prevTileRotation, build.rotation());
+            for(var graph : modules.values()) graph.onRotationChanged(prevTileRotation, build.rotation());
             build.onRotationChanged();
         }
-        for(var graph : graphs.values()) graph.onUpdate();
+        for(var graph : modules.values()) graph.onUpdate();
     }
 
     public void onProximityUpdate(){
-        for(var graph : graphs.values()) graph.proximityUpdateCustom();
+        for(var graph : modules.values()) graph.proximityUpdateCustom();
     }
 
     public void display(Table table){
-        for(var graph : graphs.values()) graph.display(table);
+        for(var graph : modules.values()) graph.display(table);
     }
 
     public void displayBars(Table table){
-        for(var graph : graphs.values()) graph.displayBars(table);
+        for(var graph : modules.values()) graph.displayBars(table);
     }
 
     public void write(Writes write){
-        for(var graph : graphs.values()) graph.write(write);
+        for(var graph : modules.values()) graph.write(write);
     }
 
     public void read(Reads read, byte revision){
-        for(var graph : graphs.values()) graph.read(read, revision);
+        for(var graph : modules.values()) graph.read(read, revision);
     }
 
     //
@@ -82,6 +82,6 @@ public class GraphModules{
 
     //xelo must have forgotten this
     public void drawSelect(){
-        for(var graph : graphs.values()) graph.drawSelect();
+        for(var graph : modules.values()) graph.drawSelect();
     }
 }

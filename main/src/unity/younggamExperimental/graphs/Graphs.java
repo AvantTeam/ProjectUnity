@@ -12,8 +12,6 @@ public class Graphs{
     boolean useOriginalUpdate = true;
     //isNetworkConnector - omitted since this is never set to false
 
-    //TODO 굳이? 싶은함수들 위에 그리고 <T extends asdf>?
-
     Graph getGraphConnectorBlock(GraphType type){
         if(graphBlocks[type.ordinal()] == null) throw new IllegalArgumentException();
         return graphBlocks[type.ordinal()];
@@ -33,8 +31,7 @@ public class Graphs{
     public void injectGraphConnector(GraphModules gms){
         for(GraphType type : results){
             int i = type.ordinal();
-            GraphModule gt = graphBlocks[i].module();
-            gms.setGraphConnector(i, gt);
+            gms.setGraphConnector(i, graphBlocks[i].module());
         }
     }
 

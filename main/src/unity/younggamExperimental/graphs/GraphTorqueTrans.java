@@ -28,7 +28,7 @@ public class GraphTorqueTrans extends GraphTorque{
     }
 
     @Override
-    public GraphTorqueModule module(){
+    public GraphTorqueTransModule module(){
         return new GraphTorqueTransModule().graph(this);
     }
 }

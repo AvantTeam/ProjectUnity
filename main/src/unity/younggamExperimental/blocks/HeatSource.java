@@ -7,12 +7,10 @@ import static arc.Core.atlas;
 
 public class HeatSource extends HeatGenerator{
     protected boolean isVoid;
-
     TextureRegion baseRegion;//bottom
 
     public HeatSource(String name){
         super(name);
-        rotate = false;
     }
 
     @Override

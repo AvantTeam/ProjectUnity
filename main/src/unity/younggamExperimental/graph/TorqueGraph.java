@@ -45,9 +45,9 @@ public class TorqueGraph<T extends GraphTorque> extends BaseGraph<GraphTorqueMod
         float fricCoeff = 0f;
         float iner = 0f;
         for(var module : connected){//building, GraphTorqueModule
-            forceApply += module.getForce();
-            fricCoeff += module.getFriction();
-            iner += module.getInertia();
+            forceApply += module.force();
+            fricCoeff += module.friction();
+            iner += module.inertia();
         }
         lastFrictionCoefficient = fricCoeff;
         lastGrossForceApplied = forceApply;

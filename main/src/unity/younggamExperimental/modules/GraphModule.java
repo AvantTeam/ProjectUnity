@@ -4,6 +4,7 @@ import arc.func.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
+import arc.struct.ObjectMap.*;
 import arc.util.io.*;
 import unity.younggamExperimental.*;
 import unity.younggamExperimental.blocks.GraphBlockBase.*;
@@ -13,13 +14,13 @@ import unity.younggamExperimental.graphs.*;
 //GraphPropsCommon building 에 들어갈 모듈. powerModule와 비슷한 역할?
 //I had stroke
 public abstract class GraphModule<T extends Graph, M extends GraphModule<T, M, G>, G extends BaseGraph<M, G>>{
-    public final Seq<GraphData> acceptPorts = new Seq<>(8);
+    public final Seq<GraphData> acceptPorts = new Seq<>(4);
 
     public GraphModules parent;
     public T graph;//parentBlock
-    public int d, portIndex;
+    public int d;
 
-    final ObjectSet<M> neighbours = new ObjectSet<>(4);//neighbourArray
+    final OrderedMap<M, Integer> neighbours = new OrderedMap<>(4);//neighbourArray
 
     protected final IntMap<G> networks = new IntMap<>(4);
 
@@ -38,6 +39,7 @@ public abstract class GraphModule<T extends Graph, M extends GraphModule<T, M, G
     }
 
     void onCreate(GraphBuildBase build){
+        if(build.block().size > 1) neighbours.ensureCapacity((build.block().size - 1) * 4);
         initAllNets();
         needsNetworkUpdate = true;
         lastRecalc = -1;
@@ -59,7 +61,7 @@ public abstract class GraphModule<T extends Graph, M extends GraphModule<T, M, G
     }
 
     void deleteFromNeighbours(){
-        neighbours.each(n -> n.removeNeighbour((M)this));
+        for(var n : neighbours.keys()) n.removeNeighbour((M)this);
     }
 
     void deleteSelfFromNetwork(){
@@ -86,7 +88,7 @@ public abstract class GraphModule<T extends Graph, M extends GraphModule<T, M, G
             deleteFromNeighbours();
             dead = false;
             initAllNets();
-            neighbours.clear(4);
+            neighbours.clear();
         }
         recalcPorts();
         needsNetworkUpdate = true;
@@ -179,12 +181,20 @@ public abstract class GraphModule<T extends Graph, M extends GraphModule<T, M, G
         return lastRecalc;
     }
 
-    public M getNeighbour(M build){
-        return neighbours.get(build);
+    public M getNeighbour(M module/*building*/){
+        return neighbours.containsKey(module) ? module : null;
     }
 
-    public void eachNeighbour(Cons<M> func){
-        neighbours.each(func);
+    public void eachNeighbour(Cons<Entry<M, Integer>> func){
+        for(var n : neighbours) func.get(n);
+    }
+
+    public void eachNeighbourKey(Cons<M> func){
+        for(var n : neighbours.keys()) func.get(n);
+    }
+
+    public void eachNeighbourValue(Cons<Integer> func){
+        for(var n : neighbours.values()) func.get(n);
     }
 
     float efficiency(){
@@ -195,14 +205,15 @@ public abstract class GraphModule<T extends Graph, M extends GraphModule<T, M, G
         return neighbours.size;
     }
 
-    public void removeNeighbour(M build){
-        neighbours.remove(build);
-        parent.build.onNeighboursChanged();
+    public void removeNeighbour(M module/*building*/){
+        if(module != null && neighbours.remove(module) != null) parent.build.onNeighboursChanged();
     }
 
-    public void addNeighbour(M n){
-        neighbours.add(n);
-        parent.build.onNeighboursChanged();
+    public void addNeighbour(M n, int portIndex){
+        if(n != null){
+            Integer v = neighbours.put(n, portIndex);
+            if(v == null || v == portIndex) parent.build.onNeighboursChanged();
+        }
     }
 
     public Seq<GraphData> getConnectedNeighbours(int index){
@@ -260,7 +271,6 @@ public abstract class GraphModule<T extends Graph, M extends GraphModule<T, M, G
         return true;
     }
 
-    //TODO 굳이? 싶은 함수들 여기
     public G getNetworkOfPort(int index){
         if(multi) getNetworkOfPortMulti(index);
         return networks.get(0);
@@ -344,9 +354,8 @@ public abstract class GraphModule<T extends Graph, M extends GraphModule<T, M, G
         return (M)this;
     }
 
-    public M portIndex(int a){
-        portIndex = a;
-        return (M)this;
+    public int portIndex(M module){
+        return neighbours.get(module, -1);
     }
 
     public float getTemp(){

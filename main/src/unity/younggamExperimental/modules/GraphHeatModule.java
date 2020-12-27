@@ -28,7 +28,7 @@ public class GraphHeatModule extends GraphModule<GraphHeat, GraphHeatModule, Hea
         float cond = this.graph.baseHeatConductivity;
         heatBuffer = 0f;
         float clampedDelta = Mathf.clamp(Time.delta, 0, 1f / cond);
-        neighbours.each(n -> heatBuffer += (n.getTemp() - temp) * cond * clampedDelta);
+        for(var n : neighbours.keys()) heatBuffer += (n.getTemp() - temp) * cond * clampedDelta;
         heatBuffer += (293.15f - temp) * this.graph.baseHeatRadiativity * clampedDelta;
     }
 

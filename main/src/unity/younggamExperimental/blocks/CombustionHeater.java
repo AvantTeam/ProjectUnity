@@ -15,6 +15,7 @@ public class CombustionHeater extends HeatGenerator{
 
     public CombustionHeater(String name){
         super(name);
+        rotate = true;
     }
 
     @Override

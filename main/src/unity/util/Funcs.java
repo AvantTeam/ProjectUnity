@@ -1,6 +1,7 @@
 package unity.util;
 
 import arc.func.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -12,6 +13,7 @@ import mindustry.entities.bullet.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.Tile;
 
@@ -306,9 +308,47 @@ public final class Funcs{
         }
     }
 
-    //torque associated
-    public static float linear(float current,float target, float maxTorque, float coefficient){
+    //graph associated below
+    public static float linear(float current, float target, float maxTorque, float coefficient){
         current = Math.min(target, current);
         return Math.min(coefficient * (target - current) * maxTorque / target, 99999f);
+    }
+
+    public static TextureRegion[] getRegions(TextureRegion region, int sheetW, int sheetH){
+        int size = sheetW * sheetH;
+        TextureRegion[] ret = new TextureRegion[size];
+        float tileW = (region.u2 - region.u) / sheetW;
+        float tileH = (region.v2 - region.v) / sheetH;
+        for(int i = 0; i < size; i++){
+            float tileX = ((float)(i % sheetW)) / sheetW;
+            float tileY = ((float)(i / sheetW)) / sheetH;
+            TextureRegion nRegion = new TextureRegion(region);
+
+            nRegion.u = Mathf.map(tileX, 0f, 1f, nRegion.u, nRegion.u2) + tileW * 0.02f;
+            nRegion.v = Mathf.map(tileY, 0f, 1f, nRegion.v, nRegion.v2) + tileH * 0.02f;
+            nRegion.u2 = nRegion.u + tileW * 0.96f;
+            nRegion.v2 = nRegion.v + tileH * 0.96f;
+            nRegion.width = nRegion.height = 32;
+            ret[i] = nRegion;
+        }
+        return ret;
+    }
+
+    public static Color tempColor(float temp){
+        float a;
+        if(temp > 273.15f){
+            a = Math.max(0f, (temp - 498f) * 0.001f);
+            if(a < 0.01f) return Color.clear.cpy();
+            Color fcol = Pal.turretHeat.cpy().a(a);
+            if(a > 1f){
+                fcol.a += 0.01f * a;
+                fcol.mul(a);
+            }
+            return fcol;
+        }else{
+            a = 1f - Mathf.clamp(temp / 273.15f);
+            if(a < 0.01f) return Color.clear.cpy();
+            return Pal.turretHeat.cpy().a(a);
+        }
     }
 }

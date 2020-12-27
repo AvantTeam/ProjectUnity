@@ -15,7 +15,7 @@ import java.util.Comparator;
 //BlockGraph 그래프 그자체
 //I had stroke.
 public abstract class BaseGraph<M extends GraphModule<? extends Graph, M, G>, G extends BaseGraph<M, G>>{
-    public final ObjectSet<M> connected = new ObjectSet<>();
+    public final OrderedSet<M> connected = new OrderedSet<>(4);
     public final int id;
     private static int lastId;
     long lastFrameUpdated;
@@ -26,13 +26,13 @@ public abstract class BaseGraph<M extends GraphModule<? extends Graph, M, G>, G 
     }
 
     public BaseGraph(M module/*building*/){
-        //TODO  init 으로 분리하기?
+        int size = module.parent.build.block().size;
+        if(size > 1) connected.ensureCapacity((size - 1) * 4);
         connected.add(module);
         updateOnGraphChanged();
         addMergeStats(module);
     }
 
-    //abstract 문제해결용 임의로 추가..
     abstract G create(M module/*building*/);
 
     G copyGraph(M module/*building*/){
@@ -79,10 +79,10 @@ public abstract class BaseGraph<M extends GraphModule<? extends Graph, M, G>, G 
         updateDirect();
         graph.updateDirect();
         mergeStats(graph);
-        graph.connected.each(module -> {
+        for(var module : graph.connected){
             if(!connected.contains(module) && module.replaceNetwork(graph, (G)this))
                 connected.add(module);
-        });
+        }
         updateOnGraphChanged();
     }
 
@@ -95,7 +95,7 @@ public abstract class BaseGraph<M extends GraphModule<? extends Graph, M, G>, G 
     boolean isAtriculationPoint(M module/*building*/){
         Seq<M> neighs = new Seq<>(4);
         module.eachNeighbour(n -> {
-            if(module.getNetworkOfPort(n.portIndex) == this) neighs.add(n);
+            if(module.getNetworkOfPort(n.value) == this) neighs.add(n.key);
         });
         int neighbourIndex = 1;
         target = neighs.get(neighbourIndex);
@@ -104,7 +104,7 @@ public abstract class BaseGraph<M extends GraphModule<? extends Graph, M, G>, G 
             if(target == null) return 99999999;
             return a.hueristic(target.parent.build) - b.hueristic(target.parent.build);
         };
-        front.add(neighs.get(0));
+        front.add(neighs.get(0).d(0));
         int giveUp = connected.size;
         ObjectSet<M> visited = ObjectSet.with(module);
         while(!front.empty()){
@@ -122,8 +122,8 @@ public abstract class BaseGraph<M extends GraphModule<? extends Graph, M, G>, G 
             }
             visited.add(current);
             current.eachNeighbour(n -> {
-                if(visited.contains(n)) return;
-                if(current.getNetworkOfPort(n.portIndex) == this) front.add(n.d(current.d + 4));
+                if(visited.contains(n.key)) return;
+                if(current.getNetworkOfPort(n.value) == this) front.add(n.key.d(current.d + 4));
             });
             if(--giveUp < 0) return true;
         }
@@ -136,28 +136,30 @@ public abstract class BaseGraph<M extends GraphModule<? extends Graph, M, G>, G 
         if(c == 0) return;
         if(c == 1 || !isAtriculationPoint(module)){
             connected.remove(module);
-            module.eachNeighbour(n -> n.removeNeighbour(module));
+            module.eachNeighbourKey(n -> n.removeNeighbour(module));
             updateOnGraphChanged();
             return;
         }
         killGraph();
         ObjectSet<G> networksAdded = new ObjectSet<>(c);
         module.eachNeighbour(n -> {
-            G copyNet = module.getNetworkOfPort(n.portIndex);
+            G copyNet = module.getNetworkOfPort(n.value);
+            M temp = n.key;
             if(copyNet == this){
-                M selfref = n.getNeighbour(module);
+                M selfref = temp.getNeighbour(module);
                 if(selfref == null) return;
-                n.setNetworkOfPort(selfref.portIndex, copyNet.copyGraph(n));
+                temp.setNetworkOfPort(temp.portIndex(selfref), copyNet.copyGraph(temp));
             }
         });
         module.eachNeighbour(n -> {
-            if(module.getNetworkOfPort(n.portIndex) == this){
-                M selfref = n.getNeighbour(module);
+            if(module.getNetworkOfPort(n.value) == this){
+                M temp = n.key;
+                M selfref = temp.getNeighbour(module);
                 if(selfref == null) return;
-                G neiNet = n.getNetworkOfPort(selfref.portIndex);
+                G neiNet = temp.getNetworkOfPort(temp.portIndex(selfref));
                 if(!networksAdded.contains(neiNet)){
                     networksAdded.add(neiNet);
-                    neiNet.rebuildGraphIndex(n, selfref.portIndex);
+                    neiNet.rebuildGraphIndex(temp, temp.portIndex(selfref));
                 }
             }
         });
@@ -194,6 +196,7 @@ public abstract class BaseGraph<M extends GraphModule<? extends Graph, M, G>, G 
             for(int port = 0, len = acceptPorts.size; port < len; port++){
                 GraphData portInfo = acceptPorts.get(port);
                 int portIndex = portInfo.index;
+                //unity.Unity.print(portIndex);
                 if(buildConnector.getNetworkOfPort(portIndex) == null) continue;
                 if(build.tile() == null) return;
                 Tile tile = build.tile().nearby(portInfo.toPos);
@@ -204,13 +207,13 @@ public abstract class BaseGraph<M extends GraphModule<? extends Graph, M, G>, G 
                     if(conModule == null || conModule == prevModule || conModule.dead() || !canConnect(current.module, conModule)) continue;
                     G thisGraph = buildConnector.getNetworkOfPort(portIndex);
                     if(conModule.parent.build.rotation() != conModule.lastRecalc()) conModule.recalcPorts();
-                    Point2 fPos = portInfo.fromPos;
+                    Point2 fPos = portInfo.fromPos.cpy();
                     fPos.x += build.tileX();
                     fPos.y += build.tileY();
                     int connectIndex = conModule.canConnect(fPos);
                     if(connectIndex == -1) continue;
-                    buildConnector.addNeighbour(conModule.portIndex(portIndex));
-                    conModule.addNeighbour(buildConnector.portIndex(portIndex));
+                    buildConnector.addNeighbour(conModule, portIndex);
+                    conModule.addNeighbour(buildConnector, connectIndex);
 
                     G conNet = conModule.getNetworkOfPort(connectIndex);
                     if(!thisGraph.connected.contains(conModule) && conNet != null){
@@ -243,7 +246,7 @@ public abstract class BaseGraph<M extends GraphModule<? extends Graph, M, G>, G 
 
     String connectedToString(){
         StringBuilder s = new StringBuilder("Network:" + id + ":");
-        connected.each(build -> s.append(build.parent.build.block().localizedName).append(", "));
+        for(var build : connected) s.append(build.parent.build.block().localizedName).append(", ");
         return s.toString();
     }
 

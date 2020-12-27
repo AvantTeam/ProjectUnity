@@ -27,4 +27,11 @@ public class GraphTorqueTransModule extends GraphTorqueModule<GraphTorqueTrans>{
             }
         }
     }
+
+    @Override
+    public GraphTorqueTransModule graph(GraphTorqueTrans graph){
+        this.graph = graph;
+        if(graph.isMultiConnector) multi = true;
+        return this;
+    }
 }

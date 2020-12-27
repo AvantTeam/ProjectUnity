@@ -19,4 +19,11 @@ public class GraphTorqueConsumeModule extends GraphTorqueModule<GraphTorqueConsu
         }
         return ratio;
     }
+
+    @Override
+    public GraphTorqueConsumeModule graph(GraphTorqueConsume graph){
+        this.graph = graph;
+        if(graph.isMultiConnector) multi = true;
+        return this;
+    }
 }

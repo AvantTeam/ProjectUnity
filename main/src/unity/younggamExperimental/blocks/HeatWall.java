@@ -21,7 +21,6 @@ public class HeatWall extends Block implements GraphBlockBase{
         statusTime = 60f, maxDamage;
     final Graphs graphs = new Graphs();
     TextureRegion heatRegion;//heatSprite
-    int timerId;
 
     public HeatWall(String name){
         super(name);
@@ -51,7 +50,6 @@ public class HeatWall extends Block implements GraphBlockBase{
     public void load(){
         super.load();
         heatRegion = atlas.find(name + "-heat");
-        timerId = timers++;
     }
 
     public class HeatWallBuild extends Building implements GraphBuildBase{
@@ -135,7 +133,7 @@ public class HeatWall extends Block implements GraphBlockBase{
         //not common probably separated?
         @Override
         public void updatePost(){
-            if(timer(timerId, statusTime)){
+            if(timer(dumpTime, statusTime)){
                 float intensity = Mathf.clamp(Mathf.map(heat().getTemp(), 400f, 1000f, 0f, 1f));
                 Damage.status(team, x, y, intensity * statusRadiusMul + minStatusRadius, StatusEffects.burning, minStatusDuration + intensity * statusDurationMul, false, true);
                 if(maxDamage > 0f) Damage.damage(team, x, y, intensity * 10f + 8f, intensity * maxDamage, false, true);
