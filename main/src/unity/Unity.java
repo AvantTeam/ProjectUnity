@@ -43,48 +43,50 @@ public class Unity extends Mod{
             UnityMusics.dispose();
         });
 
-        Core.settings.getBoolOnce("unity-install", () -> {
-            Events.on(ClientLoadEvent.class, e -> {
-                Func<String, String> stringf = value -> Core.bundle.get("mod." + value);
+        if(Core.settings != null){
+            Core.settings.getBoolOnce("unity-install", () -> {
+                Events.on(ClientLoadEvent.class, e -> {
+                    Func<String, String> stringf = value -> Core.bundle.get("mod." + value);
 
-                Time.runTask(10f, () -> {
-                    //TODO make it also on the about dialog
-                    BaseDialog dialog = new BaseDialog("@credits");
-                    var cont = dialog.cont;
+                    Time.runTask(10f, () -> {
+                        //TODO make it also on the about dialog
+                        BaseDialog dialog = new BaseDialog("@credits");
+                        var cont = dialog.cont;
 
-                    cont.table(t -> {
-                        t.add("@mod.credits.text").fillX().pad(3f).wrap().get().setAlignment(Align.center);
-                        t.row();
+                        cont.table(t -> {
+                            t.add("@mod.credits.text").fillX().pad(3f).wrap().get().setAlignment(Align.center);
+                            t.row();
 
-                        t.add("@mod.credits.bottom-text").fillX().pad(3f).wrap().get().setAlignment(Align.center);
-                        t.row();
-                    }).pad(3f);
+                            t.add("@mod.credits.bottom-text").fillX().pad(3f).wrap().get().setAlignment(Align.center);
+                            t.row();
+                        }).pad(3f);
 
-                    cont.row();
+                        cont.row();
 
-                    cont.pane(b -> {
-                        for(ContributionType type : ContributionType.all){
-                            Seq<String> list = ContributorList.getBy(type);
-                            if(list.size <= 0) continue;
+                        cont.pane(b -> {
+                            for(ContributionType type : ContributionType.all){
+                                Seq<String> list = ContributorList.getBy(type);
+                                if(list.size <= 0) continue;
 
-                            b.table(t -> {
-                                t.add(stringf.get(type.name())).pad(3f).center();
-                                t.row();
-                                t.pane(p -> {
-                                    for(String c : list){
-                                        p.add("[lightgray]" + c).left().pad(3f).padLeft(6f).padRight(6f);
-                                        p.row();
-                                    }
-                                });
-                            }).pad(6f).top();
-                        }
-                    }).fillX();
+                                b.table(t -> {
+                                    t.add(stringf.get(type.name())).pad(3f).center();
+                                    t.row();
+                                    t.pane(p -> {
+                                        for(String c : list){
+                                            p.add("[lightgray]" + c).left().pad(3f).padLeft(6f).padRight(6f);
+                                            p.row();
+                                        }
+                                    });
+                                }).pad(6f).top();
+                            }
+                        }).fillX();
 
-                    dialog.addCloseButton();
-                    dialog.show();
+                        dialog.addCloseButton();
+                        dialog.show();
+                    });
                 });
             });
-        });
+        }
     }
 
     @Override
