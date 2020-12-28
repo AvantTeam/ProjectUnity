@@ -11,19 +11,27 @@ public final class ContributorList{
         }
 
         // DO NOT INSERT COLORS!
+        
         contributors.get(ContributionType.collaborator.ordinal()).addAll(
-        "sk7725",
-        "younggam",
-        "GlennFolker",
+        "Eldoofus",
         "Gdeft",
+        "GlennFolker",
+        "Goobrr",
+        "sk7725",
+        "ThePythonGuy",
+        "ThirstyBoi",
+        "Txar",
+        "Xelo",
         "Xusk",
-        "ThePythonGuy");
+        "younggam"
+        );
         contributors.get(ContributionType.contributor.ordinal()).addAll(
         // will always be empty...
         );
         contributors.get(ContributionType.translator.ordinal()).addAll(
         "sk7725 (Korean)",
-        "Xusk (Russian)");
+        "Xusk (Russian)"
+        );
     }
 
     public static Seq<String> getBy(ContributionType type){
