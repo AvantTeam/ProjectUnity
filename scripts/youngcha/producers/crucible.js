@@ -138,8 +138,8 @@ crucible.update = true;
 crucible.solid = true;
 crucible.getGraphConnectorBlock("crucible graph").setAccept([1, 1, 1, 1]);
 crucible.getGraphConnectorBlock("heat graph").setAccept([1, 1, 1, 1]);
-crucible.getGraphConnectorBlock("heat graph").getBaseHeatConductivity(0.2);
-crucible.getGraphConnectorBlock("heat graph").getBaseHeatCapacity(75); //maybe make it dynamic later...
+crucible.getGraphConnectorBlock("heat graph").setBaseHeatConductivity(0.2);
+crucible.getGraphConnectorBlock("heat graph").setBaseHeatCapacity(75); //maybe make it dynamic later...
 crucible.getGraphConnectorBlock("heat graph").setBaseHeatRadiativity(0.006);
 
 
@@ -187,8 +187,8 @@ holdingcrucible.getGraphConnectorBlock("crucible graph").setAccept([0,1,1,0, 0,1
 holdingcrucible.getGraphConnectorBlock("crucible graph").setDoesCrafting(false);
 holdingcrucible.getGraphConnectorBlock("crucible graph").setBaseLiquidCapacity(50);
 holdingcrucible.getGraphConnectorBlock("heat graph").setAccept([1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1]);
-holdingcrucible.getGraphConnectorBlock("heat graph").getBaseHeatConductivity(0.05);
-holdingcrucible.getGraphConnectorBlock("heat graph").getBaseHeatCapacity(275); 
+holdingcrucible.getGraphConnectorBlock("heat graph").setBaseHeatConductivity(0.05);
+holdingcrucible.getGraphConnectorBlock("heat graph").setBaseHeatCapacity(275); 
 holdingcrucible.getGraphConnectorBlock("heat graph").setBaseHeatRadiativity(0.01);
 
 
@@ -360,6 +360,6 @@ castingMold.getGraphConnectorBlock("crucible graph").setAccept([0,0,0,0,1,1,0,0]
 castingMold.getGraphConnectorBlock("crucible graph").setDoesCrafting(false);
 castingMold.getGraphConnectorBlock("crucible graph").setBaseLiquidCapacity(2);
 castingMold.getGraphConnectorBlock("heat graph").setAccept([1,1,1,1,1,1,1,1]);
-castingMold.getGraphConnectorBlock("heat graph").getBaseHeatConductivity(0.2);
-castingMold.getGraphConnectorBlock("heat graph").getBaseHeatCapacity(55); 
+castingMold.getGraphConnectorBlock("heat graph").setBaseHeatConductivity(0.2);
+castingMold.getGraphConnectorBlock("heat graph").setBaseHeatCapacity(55); 
 castingMold.getGraphConnectorBlock("heat graph").setBaseHeatRadiativity(0.01);
