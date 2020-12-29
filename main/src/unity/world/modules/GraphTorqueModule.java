@@ -15,8 +15,9 @@ import unity.world.graphs.*;
 //_RotPowerPropsCommon
 public class GraphTorqueModule<T extends GraphTorque> extends GraphModule<T, GraphTorqueModule<T>, TorqueGraph<T>>{
     static final Color[] pals = new Color[]{Pal.accent, Pal.redSpark, Pal.plasticSmoke, Pal.lancerLaser};
-    final FloatSeq rots = new FloatSeq(4);//propsList
-    float force, inertia = 10f, friction = 0.1f;
+    public float force, inertia;
+    final IntFloatMap rots = new IntFloatMap(4);//propsList
+    float friction;
 
     @Override
     void applySaveState(TorqueGraph<T> graph, int index){
@@ -28,10 +29,10 @@ public class GraphTorqueModule<T extends GraphTorque> extends GraphModule<T, Gra
 
     @Override
     void updateProps(TorqueGraph<T> graph, int index){
-        float rot = rots.get(index);
+        float rot = rots.get(index, 0f);
         rot += graph.lastVelocity;
         rot %= (360f * 24f);
-        rots.set(index, rot);
+        rots.put(index, rot);
     }
 
     @Override
@@ -51,7 +52,10 @@ public class GraphTorqueModule<T extends GraphTorque> extends GraphModule<T, Gra
     }
 
     @Override
-    void initStats(){}
+    void initStats(){
+        friction = graph.baseFriction;
+        setInertia(graph.baseInertia);
+    }
 
     @Override
     void displayBars(Table table){}
@@ -89,8 +93,7 @@ public class GraphTorqueModule<T extends GraphTorque> extends GraphModule<T, Gra
 
     @Override
     Float[] readLocal(Reads read, byte revision){
-        float fk = read.f();
-        return new Float[]{fk};
+        return new Float[]{read.f()};
     }
 
     @Override
@@ -106,7 +109,7 @@ public class GraphTorqueModule<T extends GraphTorque> extends GraphModule<T, Gra
     }
 
     //torque
-    void setInertia(float iner){
+    public void setInertia(float iner){
         float diff = iner - inertia;
         if(diff != 0f){
             if(multi){
@@ -116,23 +119,17 @@ public class GraphTorqueModule<T extends GraphTorque> extends GraphModule<T, Gra
         inertia = iner;
     }
 
-    float getRotation(){
-        return rots.get(0);
+    public float getRotation(){
+        return rots.get(0, 0f);
     }
 
-    float getRotationOf(int index){
-        return rots.get(index);
-    }
-
-    public float force(){
-        return force;
+    public float getRotationOf(int index){
+        return rots.get(index, 0f);
     }
 
     public float friction(){
         return friction;
     }
 
-    public float inertia(){
-        return inertia;
-    }
+    public void setMotorForceMult(float a){}
 }

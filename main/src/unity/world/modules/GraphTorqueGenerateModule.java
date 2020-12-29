@@ -36,4 +36,9 @@ public class GraphTorqueGenerateModule extends GraphTorqueModule<GraphTorqueGene
         if(graph.isMultiConnector) multi = true;
         return this;
     }
+
+    @Override
+    public void setMotorForceMult(float a){
+        motorForceMult = a;
+    }
 }

@@ -92,9 +92,19 @@ public class UnityBlocks implements ContentList{
 
     heatPipe, smallRadiator,
 
+    driveShaft,
+
+    inlineGearbox,
+
+    shaftRouter,
+
+    simpleTransmission,
+
     cruciblePump,
 
     thermalHeater, combustionHeater, infiHeater, infiCooler, solarCollector, solarReflector,
+
+    torqueInfi,
 
     crucible, holdingCrucible, castingMold,
 
@@ -937,6 +947,33 @@ public class UnityBlocks implements ContentList{
             addGraph(new GraphHeat(10f, 0.7f, 0.05f).setAccept(1, 1, 1, 1));
         }};
 
+        driveShaft = new DriveShaft("drive-shaft"){{
+            requirements(Category.power, with(Items.copper, 10, Items.lead, 10));
+            health = 150;
+            addGraph(new GraphTorque(0.01f, 3f).setAccept(1, 0, 1, 0));
+        }};
+
+        inlineGearbox = new InlineGearbox("inline-gearbox"){{
+            requirements(Category.power, with(Items.titanium, 20, Items.lead, 30, Items.copper, 30));
+            size = 2;
+            health = 700;
+            addGraph(new GraphTorque(0.02f, 20f).setAccept(1, 1, 0, 0, 1, 1, 0, 0));
+        }};
+
+        shaftRouter = new GraphBlock("shaft-router"){{
+            requirements(Category.power, with(Items.copper, 20, Items.lead, 20));
+            health = 100;
+            preserveDraw = true;
+            addGraph(new GraphTorque(0.05f, 5f).setAccept(1, 1, 1, 1));
+        }};
+
+        simpleTransmission = new SimpleTransmission("simple-transmission"){{
+            requirements(Category.power, with(Items.titanium, 50, Items.lead, 50, Items.copper, 50));
+            size = 2;
+            health = 500;
+            addGraph(new GraphTorqueTrans(0.05f, 25f).setRatio(1f, 2.5f).setAccept(2, 1, 0, 0, 1, 2, 0, 0));
+        }};
+
         cruciblePump = new CruciblePump("crucible-pump"){{
             requirements(Category.crafting, with(UnityItems.cupronickel, 50, UnityItems.nickel, 50, Items.metaglass, 15));
             size = 2;
@@ -991,6 +1028,13 @@ public class UnityBlocks implements ContentList{
             requirements(Category.power, with(UnityItems.nickel, 25, Items.copper, 50));
             size = 2;
             health = 800;
+        }};
+
+        torqueInfi = new TorqueGenerator("torque-infi"){{
+            requirements(Category.power, BuildVisibility.sandboxOnly, with());
+            health = 200;
+            preserveDraw = true;
+            addGraph(new GraphTorqueGenerate(0.001f, 1f, 999999f, 9999f).setAccept(1, 1, 1, 1));
         }};
 
         crucible = new Crucible("crucible"){{

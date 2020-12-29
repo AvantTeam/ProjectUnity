@@ -16,6 +16,7 @@ import static arc.Core.atlas;
 public class GraphBlock extends Block implements GraphBlockBase{
     protected final Graphs graphs = new Graphs();
     protected TextureRegion heatRegion, liquidRegion;//heatSprite,liquidSprite
+    protected boolean preserveDraw;
 
     public GraphBlock(String name){
         super(name);
@@ -128,7 +129,8 @@ public class GraphBlock extends Block implements GraphBlockBase{
 
         @Override
         public void draw(){
-            if(graphs.hasGraph(GraphType.heat)){
+            if(preserveDraw) super.draw();
+            else if(graphs.hasGraph(GraphType.heat)){
                 Draw.rect(region, x, y);
                 UnityDrawf.drawHeat(heatRegion, x, y, 0, heat().getTemp());
                 drawTeamTop();

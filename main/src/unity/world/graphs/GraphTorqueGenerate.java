@@ -16,6 +16,10 @@ public class GraphTorqueGenerate extends GraphTorque{
         this.startTorque = startTorque;
     }
 
+    public GraphTorqueGenerate(float friction, float inertia, float maxSpeed, float maxTorque){
+        this(friction, inertia, maxSpeed, 1f, maxTorque, 5f);
+    }
+
     public GraphTorqueGenerate(){
         super();
         this.maxSpeed = 10f;

@@ -11,6 +11,7 @@ public class GraphTorqueTrans extends GraphTorque{
 
     public GraphTorqueTrans(float friction, float inertia){
         super(friction, inertia);
+        multi();
     }
 
     public GraphTorqueTrans setRatio(float ratio1, float ratio2){
