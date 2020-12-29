@@ -11,26 +11,25 @@ public final class ContributorList{
         }
 
         // DO NOT INSERT COLORS!
-        
         contributors.get(ContributionType.collaborator.ordinal()).addAll(
-        "Eldoofus",
-        "Gdeft",
-        "GlennFolker",
-        "Goobrr",
-        "sk7725",
-        "ThePythonGuy",
-        "ThirstyBoi",
-        "Txar",
-        "Xelo",
-        "Xusk",
-        "younggam"
+            "Eldoofus",
+            "Gdeft",
+            "GlennFolker",
+            "Goobrr",
+            "sk7725",
+            "ThePythonGuy3",
+            "ThirstyBoi",
+            "Txar",
+            "Xelo",
+            "Xusk",
+            "younggam"
         );
         contributors.get(ContributionType.contributor.ordinal()).addAll(
-        // will always be empty...
+            // will always be empty...
         );
         contributors.get(ContributionType.translator.ordinal()).addAll(
-        "sk7725 (Korean)",
-        "Xusk (Russian)"
+            "sk7725 (Korean)",
+            "Xusk (Russian)"
         );
     }
 
