@@ -6,6 +6,8 @@ import arc.math.*;
 import mindustry.graphics.*;
 
 public class UnityDrawf{
+    private static TextureRegion nRegion = new TextureRegion();
+
     public static void spark(float x, float y, float w, float h, float r){
         Drawf.tri(x, y, w, h, r);
         //is this order imporant?
@@ -33,5 +35,15 @@ public class UnityDrawf{
         Draw.rect(reg, x, y, rot);
         Draw.blend();
         Draw.color();
+    }
+
+    public static void drawSlideRect(TextureRegion region, float x, float y, float w, float h, float tw, float th, float rot, int step, float offset){
+        if(region == null) return;
+        nRegion.set(region);
+        float scaleX = w / tw;
+        float texW = nRegion.u2 - nRegion.u;
+        nRegion.u += Mathf.map(offset % 1, 0f, 1f, 0f, texW * step / tw);
+        nRegion.u2 = nRegion.u + scaleX * texW;
+        Draw.rect(nRegion, x, y, w, h, w * 0.5f, h * 0.5f, rot);
     }
 }

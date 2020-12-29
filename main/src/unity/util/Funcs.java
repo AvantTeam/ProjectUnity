@@ -16,6 +16,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.Tile;
+import unity.graphics.*;
 
 import static mindustry.Vars.*;
 
@@ -341,14 +342,14 @@ public final class Funcs{
             if(a < 0.01f) return Color.clear.cpy();
             Color fcol = Pal.turretHeat.cpy().a(a);
             if(a > 1f){
-                fcol.a += 0.01f * a;
+                fcol.b += 0.01f * a;
                 fcol.mul(a);
             }
             return fcol;
         }else{
             a = 1f - Mathf.clamp(temp / 273.15f);
             if(a < 0.01f) return Color.clear.cpy();
-            return Pal.turretHeat.cpy().a(a);
+            return UnityPal.coldColor.cpy().a(a);
         }
     }
 }

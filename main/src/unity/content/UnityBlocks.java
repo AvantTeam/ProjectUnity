@@ -23,17 +23,19 @@ import unity.entities.comp.*;
 import unity.gen.*;
 import unity.graphics.*;
 import unity.type.exp.*;
+import unity.world.blocks.*;
 import unity.world.blocks.defense.*;
 import unity.world.blocks.defense.turrets.*;
 import unity.world.blocks.distribution.*;
 import unity.world.blocks.logic.*;
+import unity.world.blocks.power.*;
 import unity.world.blocks.production.*;
+import unity.world.blocks.sandbox.*;
 import unity.world.blocks.storage.*;
 import unity.world.blocks.units.*;
 import unity.world.consumers.*;
 import unity.world.draw.*;
-import unity.younggamExperimental.blocks.*;
-import unity.younggamExperimental.graphs.*;
+import unity.world.graphs.*;
 
 import static arc.Core.*;
 import static mindustry.type.ItemStack.*;
@@ -90,7 +92,11 @@ public class UnityBlocks implements ContentList{
 
     heatPipe, smallRadiator,
 
+    cruciblePump,
+
     thermalHeater, combustionHeater, infiHeater, infiCooler, solarCollector, solarReflector,
+
+    crucible, holdingCrucible, castingMold,
 
     sporePyrolyser,
 
@@ -931,6 +937,15 @@ public class UnityBlocks implements ContentList{
             addGraph(new GraphHeat(10f, 0.7f, 0.05f).setAccept(1, 1, 1, 1));
         }};
 
+        cruciblePump = new CruciblePump("crucible-pump"){{
+            requirements(Category.crafting, with(UnityItems.cupronickel, 50, UnityItems.nickel, 50, Items.metaglass, 15));
+            size = 2;
+            health = 500;
+            consumes.power(1f);
+            addGraph(new GraphCrucible(10f, false).setAccept(1, 1, 0, 0, 2, 2, 0, 0).multi());
+            addGraph(new GraphHeat(50f, 0.1f, 0.003f).setAccept(1, 1, 1, 1, 1, 1, 1, 1));
+        }};
+
         thermalHeater = new ThermalHeater("thermal-heater"){{
             requirements(Category.power, with(Items.copper, 150, UnityItems.nickel, 100, Items.titanium, 150));
             size = 2;
@@ -976,6 +991,29 @@ public class UnityBlocks implements ContentList{
             requirements(Category.power, with(UnityItems.nickel, 25, Items.copper, 50));
             size = 2;
             health = 800;
+        }};
+
+        crucible = new Crucible("crucible"){{
+            requirements(Category.crafting, with(UnityItems.nickel, 10, Items.titanium, 15));
+            health = 400;
+            addGraph(new GraphCrucible().setAccept(1, 1, 1, 1));
+            addGraph(new GraphHeat(75f, 0.2f, 0.006f).setAccept(1, 1, 1, 1));
+        }};
+
+        holdingCrucible = new HoldingCrucible("holding-crucible"){{
+            requirements(Category.crafting, with(UnityItems.nickel, 50, UnityItems.cupronickel, 150, Items.metaglass, 150, Items.titanium, 30));
+            size = 4;
+            health = 2400;
+            addGraph(new GraphCrucible(50f, false).setAccept(0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0));
+            addGraph(new GraphHeat(275f, 0.05f, 0.01f).setAccept(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1));
+        }};
+
+        castingMold = new CastingMold("casting-mold"){{
+            requirements(Category.crafting, with(Items.titanium, 70, UnityItems.nickel, 30));
+            size = 2;
+            health = 700;
+            addGraph(new GraphCrucible(2f, false).setAccept(0, 0, 0, 0, 1, 1, 0, 0));
+            addGraph(new GraphHeat(55f, 0.2f, 0.0f).setAccept(1, 1, 1, 1, 1, 1, 1, 1));
         }};
 
         sporePyrolyser = new SporePyrolyser("spore-pyrolyser"){{

@@ -12,7 +12,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.world.*;
-import unity.world.blocks.LightData;
+import unity.world.meta.LightData;
 import unity.world.blocks.LightRepeaterBuildBase;
 import unity.world.blocks.logic.LightInfluencer.LightInfluencerBuild;
 
