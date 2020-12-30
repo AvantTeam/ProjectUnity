@@ -26,7 +26,11 @@ public class CruciblePump extends GraphBlock{
         super(name);
         rotate = solid = configurable = true;
         config(Item.class, (CruciblePumpBuild build, Item item) -> build.filterItem = item);
-        config(Byte.class, (CruciblePumpBuild build, Byte value) -> build.pumpMode = value);
+        config(Integer.class, (CruciblePumpBuild build, Integer value) -> {
+            unity.Unity.print(value, value & 3, value >>> 2);
+            build.pumpMode = value & 3;
+            if(value > 2) build.filterItem = content.item(value >>> 2);
+        });
         configClear((CruciblePumpBuild build) -> build.filterItem = null);
     }
 
@@ -40,14 +44,14 @@ public class CruciblePump extends GraphBlock{
     public class CruciblePumpBuild extends GraphBuild{
         Item filterItem;
         float flowRate, flowAnimation;
-        byte pumpMode;
+        int pumpMode;
 
         @Override
         public void buildConfiguration(Table table){
             table.labelWrap("Fill until:").growX().pad(5f).center().row();
             table.table(bTable -> {
                 bTable.button("Full", Styles.clearPartialt, () -> configure(0)).left().size(50f).disabled(b -> pumpMode == 0);
-                bTable.button("50%", Styles.clearPartialt, () -> configure(1)).left().size(50f).disabled(b -> pumpMode == 2);
+                bTable.button("50%", Styles.clearPartialt, () -> configure(1)).left().size(50f).disabled(b -> pumpMode == 1);
                 bTable.button("25%", Styles.clearPartialt, () -> configure(2)).left().size(50f).disabled(b -> pumpMode == 2);
             }).row();
             table.labelWrap("Pump:").growX().pad(5f).center().row();
@@ -117,6 +121,11 @@ public class CruciblePump extends GraphBlock{
         public void readExt(Reads read, byte revision){
             filterItem = content.item(read.s());
             pumpMode = read.b();
+        }
+
+        @Override
+        public Integer config(){
+            return pumpMode + (filterItem != null ? (filterItem.id + 1) << 2 : 0);
         }
     }
 }

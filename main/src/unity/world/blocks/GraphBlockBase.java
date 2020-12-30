@@ -33,7 +33,7 @@ public interface GraphBlockBase{
             return gms().heat();
         }
 
-        default GraphTorqueModule torque(){
+        default GraphTorqueModule<? extends GraphTorque> torque(){
             return gms().torque();
         }
 

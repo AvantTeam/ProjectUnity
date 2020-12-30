@@ -2,6 +2,7 @@ package unity.world.modules;
 
 import arc.scene.ui.layout.*;
 import arc.util.io.*;
+import unity.world.graphs.*;
 import unity.world.meta.*;
 import unity.world.blocks.GraphBlockBase.*;
 
@@ -10,7 +11,7 @@ public class GraphModules{
     public final GraphBuildBase build;
     //unMapped becuz of typeCastings DON'T MODIFY
     private GraphHeatModule heat;
-    private GraphTorqueModule torque;
+    private GraphTorqueModule<? extends GraphTorque> torque;
     private GraphCrucibleModule crucible;
     private boolean hasHeat, hasTorque, hasCrucible;
     int prevTileRotation = -1;
@@ -46,7 +47,7 @@ public class GraphModules{
         return heat;
     }
 
-    public GraphTorqueModule torque(){
+    public GraphTorqueModule<? extends GraphTorque> torque(){
         return torque;
     }
 

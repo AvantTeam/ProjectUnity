@@ -102,9 +102,17 @@ public class UnityBlocks implements ContentList{
 
     cruciblePump,
 
+    mechanicalConveyor,
+
     thermalHeater, combustionHeater, infiHeater, infiCooler, solarCollector, solarReflector,
 
     torqueInfi,
+
+    handCrank,
+
+    windTurbin,
+
+    electricMotor,
 
     crucible, holdingCrucible, castingMold,
 
@@ -983,6 +991,12 @@ public class UnityBlocks implements ContentList{
             addGraph(new GraphHeat(50f, 0.1f, 0.003f).setAccept(1, 1, 1, 1, 1, 1, 1, 1));
         }};
 
+        mechanicalConveyor = new ShadowedConveyor("mechanical-conveyor"){{
+            requirements(Category.distribution, with(Items.copper, 3, UnityItems.nickel, 2));
+            health = 250;
+            speed = 0.1f;
+        }};
+
         thermalHeater = new ThermalHeater("thermal-heater"){{
             requirements(Category.power, with(Items.copper, 150, UnityItems.nickel, 100, Items.titanium, 150));
             size = 2;
@@ -1035,6 +1049,27 @@ public class UnityBlocks implements ContentList{
             health = 200;
             preserveDraw = true;
             addGraph(new GraphTorqueGenerate(0.001f, 1f, 999999f, 9999f).setAccept(1, 1, 1, 1));
+        }};
+
+        handCrank = new HandCrank("hand-crank"){{
+            requirements(Category.power, with(UnityItems.nickel, 5, Items.lead, 20));
+            health = 120;
+            addGraph(new GraphTorque(0.01f, 3f).setAccept(1, 0, 0, 0));
+        }};
+
+        windTurbin = new WindTurbin("wind-turbine"){{
+            requirements(Category.power, with(Items.titanium, 20, Items.lead, 80, Items.copper, 70));
+            size = 3;
+            health = 1200;
+            addGraph(new GraphTorqueGenerate(0.03f, 20f, 5f, 5f).setAccept(0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
+        }};
+
+        electricMotor = new ElectricMotor("electric-motor"){{
+            requirements(Category.power, with(Items.silicon, 100, Items.lead, 80, Items.copper, 150, Items.titanium, 150));
+            size = 3;
+            health = 1300;
+            consumes.power(4.5f);
+            addGraph(new GraphTorqueGenerate(0.1f, 25f, 10f, 16f).setAccept(0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0));
         }};
 
         crucible = new Crucible("crucible"){{

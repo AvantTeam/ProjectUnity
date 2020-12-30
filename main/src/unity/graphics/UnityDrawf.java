@@ -55,14 +55,12 @@ public class UnityDrawf{
         if(amod1 >= 180f && amod2 >= 180f) return;
 
         nRegion.set(region);
-        float scale = h / th;
-
         float uy1 = nRegion.v;
         float uy2 = nRegion.v2;
         float uCenter = (uy1 + uy2) / 2f;
-        float uSize = uy2 - uy1;
-        uy1 = uCenter - (uSize * scale * 0.5f);
-        uy2 = uCenter + (uSize * scale * 0.5f);
+        float uSize = (uy2 - uy1) * h / th * 0.5f;
+        uy1 = uCenter - uSize;
+        uy2 = uCenter + uSize;
         nRegion.v = uy1;
         nRegion.v2 = uy2;
 
@@ -76,7 +74,7 @@ public class UnityDrawf{
             s2 = 1f;
         }
         s1 = Mathf.map(s1, -1f, 1f, y - h / 2f, y + h / 2f);
-        s2 = Mathf.map(s2, -1f, 1f, y + h / 2f, y + h / 2f);
+        s2 = Mathf.map(s2, -1f, 1f, y - h / 2f, y + h / 2f);
         Draw.rect(nRegion, x, (s1 + s2) * 0.5f, w, s2 - s1, w * 0.5f, y - s1, rot);
     }
 }
