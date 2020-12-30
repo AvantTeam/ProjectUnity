@@ -249,7 +249,7 @@ module.exports = {
                     }
                     else if(furthest.build.block.consumesLight) {
                         furthest.build.addSource([source, ld]);
-                        this._lCons.push(furthest.build));
+                        this._lCons.push(furthest.build);
                     }
                     return true;
                 });
