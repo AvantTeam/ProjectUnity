@@ -9,8 +9,8 @@ public class TorqueGraph<T extends GraphTorque> extends BaseGraph<GraphTorqueMod
     public float lastInertia, lastGrossForceApplied, lastNetForceApplied, lastVelocity, lastFrictionCoefficient;
 
     @Override
-    public TorqueGraph<T> create(GraphTorqueModule<T> module){
-        return new TorqueGraph();
+    public TorqueGraph<T> create(){
+        return new TorqueGraph<>();
     }
 
     @Override

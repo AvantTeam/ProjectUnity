@@ -22,7 +22,6 @@ public class GraphHeat extends Graph{
 
     @Override
     public void setStats(Table table){
-        //TODO 정리하기?
         table.row().left();
         table.add("Heat system").color(Pal.accent).fillX().row();
         table.left();

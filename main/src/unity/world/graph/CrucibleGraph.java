@@ -22,7 +22,7 @@ public class CrucibleGraph extends BaseGraph<GraphCrucibleModule, CrucibleGraph>
     boolean containChanged = true, crafts = true;
 
     @Override
-    public CrucibleGraph create(GraphCrucibleModule module){
+    public CrucibleGraph create(){
         return new CrucibleGraph();
     }
 

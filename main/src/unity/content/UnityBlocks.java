@@ -90,7 +90,7 @@ public class UnityBlocks implements ContentList{
     public static @FactionDef(type = "youngcha")
     Block concreteBlank, concreteFill, concreteNumber, concreteStripe, concrete, stoneFullTiles, stoneFull, stoneHalf, stoneTiles,
 
-    heatPipe, smallRadiator,
+    heatPipe, smallRadiator,//heatdistributor
 
     driveShaft,
 
@@ -104,21 +104,25 @@ public class UnityBlocks implements ContentList{
 
     mechanicalConveyor,
 
-    thermalHeater, combustionHeater, infiHeater, infiCooler, solarCollector, solarReflector,
+    thermalHeater, combustionHeater, infiHeater, infiCooler, solarCollector, solarReflector,//heatgenerators
+
+    nickelStator, nickelStatorLarge, nickelElectromagnet, neodymiumStator, electricRotor, electricRotorSmall,//magnets
 
     torqueInfi,
 
     handCrank,
 
-    windTurbin,
+    windTurbine,
+
+    waterTurbine,
 
     electricMotor,
 
-    crucible, holdingCrucible, castingMold,
+    crucible, holdingCrucible, castingMold,//crucible
 
     sporePyrolyser,
 
-    cupronickelWall, cupronickelWallLarge;
+    cupronickelWall, cupronickelWallLarge;//youngchaWalls
 
     public static @FactionDef(type = "end")
     Block terminalCrucible, endForge, endGame;
@@ -1044,6 +1048,63 @@ public class UnityBlocks implements ContentList{
             health = 800;
         }};
 
+        nickelStator = new Magnet("nickel-stator"){{
+            requirements(Category.power, with(UnityItems.nickel, 30, Items.titanium, 20));
+            health = 450;
+            addGraph(new GraphFlux(2f).setAccept(1, 0, 0, 0));
+        }};
+
+        nickelStatorLarge = new Magnet("nickel-stator-large"){{
+            requirements(Category.power, with(UnityItems.nickel, 250, Items.titanium, 150));
+            size = 2;
+            health = 1800;
+            addGraph(new GraphFlux(10f).setAccept(1, 1, 0, 0, 0, 0, 0, 0));
+        }};
+
+        nickelElectromagnet = new Magnet("nickel-electromagnet"){{
+            requirements(Category.power, with(UnityItems.nickel, 250, Items.titanium, 200, Items.copper, 100, UnityItems.cupronickel, 50));
+            size = 2;
+            health = 1000;
+            consumes.power(1.6f);
+            addGraph(new GraphFlux(25f).setAccept(1, 1, 0, 0, 0, 0, 0, 0));
+        }};
+
+        neodymiumStator = new Magnet("neodymium-stator"){{
+            requirements(Category.power, BuildVisibility.sandboxOnly, with());
+            health = 400;
+            addGraph(new GraphFlux(200f).setAccept(1, 0, 0, 0));
+        }};
+
+        electricRotor = new RotorBlock("electric-rotor"){{
+            requirements(Category.power, with(UnityItems.nickel, 200, Items.copper, 200, Items.titanium, 150, Items.graphite, 100));
+            size = 3;
+            health = 1000;
+            powerProduction = 32f;
+            big = true;
+            fluxEfficiency = 10f;
+            rotPowerEfficiency = 0.8f;
+            torqueEfficiency = 0.8f;
+            baseTorque = 5f;
+            baseTopSpeed = 15f;
+            consumes.power(16f);
+            addGraph(new GraphFlux(false).setAccept(0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1));
+            addGraph(new GraphTorque(0.05f, 150f).setAccept(0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0));
+        }};
+
+        electricRotorSmall = new RotorBlock("electric-rotor-small"){{
+            requirements(Category.power, with(UnityItems.nickel, 30, Items.copper, 50, Items.titanium, 10));
+            health = 120;
+            powerProduction = 2f;
+            fluxEfficiency = 10f;
+            rotPowerEfficiency = 0.8f;
+            torqueEfficiency = 0.7f;
+            baseTorque = 1f;
+            baseTopSpeed = 3f;
+            consumes.power(1f);
+            addGraph(new GraphFlux(false).setAccept(0, 1, 0, 1));
+            addGraph(new GraphTorque(0.08f, 20f).setAccept(1, 0, 1, 0));
+        }};
+
         torqueInfi = new TorqueGenerator("torque-infi"){{
             requirements(Category.power, BuildVisibility.sandboxOnly, with());
             health = 200;
@@ -1057,11 +1118,21 @@ public class UnityBlocks implements ContentList{
             addGraph(new GraphTorque(0.01f, 3f).setAccept(1, 0, 0, 0));
         }};
 
-        windTurbin = new WindTurbin("wind-turbine"){{
+        windTurbine = new WindTurbin("wind-turbine"){{
             requirements(Category.power, with(Items.titanium, 20, Items.lead, 80, Items.copper, 70));
             size = 3;
             health = 1200;
             addGraph(new GraphTorqueGenerate(0.03f, 20f, 5f, 5f).setAccept(0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
+        }};
+
+        waterTurbine = new WaterTurbin("water-turbine"){{
+            requirements(Category.power, with(Items.metaglass, 50, UnityItems.nickel, 20, Items.lead, 150, Items.copper, 100));
+            size = 3;
+            health = 1100;
+            liquidCapacity = 250f;
+            liquidPressure = 0.3f;
+            disableOgUpdate();
+            addGraph(new GraphTorqueGenerate(0.15f, 20f, 7f, 15f).setAccept(0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0));
         }};
 
         electricMotor = new ElectricMotor("electric-motor"){{

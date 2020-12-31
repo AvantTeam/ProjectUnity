@@ -130,7 +130,7 @@ public class GraphCrucibleModule extends GraphModule<GraphCrucible, GraphCrucibl
 
     @Override
     void display(Table table){
-        if(networks.get(0) == null) return;
+        if(multi || networks.get(0) == null) return;
         table.row();
         table.table(sub -> {
             sub.clearChildren();

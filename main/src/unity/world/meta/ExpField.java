@@ -1,6 +1,6 @@
 package unity.world.meta;
 
-import java.lang.reflect.*;;
+import java.lang.reflect.*;
 
 public class ExpField{
     public final String name;

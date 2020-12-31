@@ -12,9 +12,9 @@ public class Graphs{
     boolean useOriginalUpdate = true;
     //isNetworkConnector - omitted since this is never set to false
 
-    Graph getGraphConnectorBlock(GraphType type){
+    public <T extends Graph> T getGraphConnectorBlock(GraphType type){
         if(graphBlocks[type.ordinal()] == null) throw new IllegalArgumentException();
-        return graphBlocks[type.ordinal()];
+        return (T)graphBlocks[type.ordinal()];
     }
 
     public boolean hasGraph(GraphType type){

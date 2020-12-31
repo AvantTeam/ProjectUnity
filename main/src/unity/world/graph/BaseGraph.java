@@ -32,10 +32,10 @@ public abstract class BaseGraph<M extends GraphModule<? extends Graph, M, G>, G 
         addMergeStats(module);
     }
 
-    public abstract G create(M module/*building*/);
+    public abstract G create(/*building*/);
 
     G copyGraph(M module/*building*/){
-        G copygraph = create(module);
+        G copygraph = create();
         copygraph.init(module);
         copygraph.copyGraphStatsFrom((G)this);
         return copygraph;

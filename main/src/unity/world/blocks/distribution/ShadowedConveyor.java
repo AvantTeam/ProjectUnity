@@ -27,7 +27,7 @@ public class ShadowedConveyor extends Conveyor{
             super.draw();
             Draw.z(Layer.block);
             if(nextc == null || block != nextc.block) Draw.rect(shadowRegion, x, y, rotdeg());
-            if(!looking) Draw.rect(shadowRegion, x, y, rotdeg() + 190f);
+            if(!looking) Draw.rect(shadowRegion, x, y, rotdeg() + 180f);
         }
 
         @Override

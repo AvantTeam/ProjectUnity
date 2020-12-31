@@ -41,6 +41,10 @@ public interface GraphBlockBase{
             return gms().crucible();
         }
 
+        default GraphFluxModule flux(){
+            return gms().flux();
+        }
+
         default void onGraphUpdate(){}
 
         default void onNeighboursChanged(){}

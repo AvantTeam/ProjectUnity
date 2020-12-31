@@ -7,7 +7,7 @@ public class HeatGraph extends BaseGraph<GraphHeatModule, HeatGraph>{
     float lastHeatFlow;
 
     @Override
-    public HeatGraph create(GraphHeatModule module/*building*/){
+    public HeatGraph create(/*building*/){
         return new HeatGraph();
     }
 

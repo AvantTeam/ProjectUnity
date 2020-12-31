@@ -49,7 +49,7 @@ public class ExpSensorStatement extends LStatement{
 
     @Override
     public void write(StringBuilder builder){
-        builder.append("expsensor " + res);
+        builder.append("expsensor ").append(res);
         builder.append(" ");
         builder.append(cont.name());
         builder.append(" ");
