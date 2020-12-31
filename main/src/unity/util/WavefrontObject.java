@@ -37,7 +37,7 @@ public class WavefrontObject{
     public Color lightColor = Color.white;
     public Color shadeColor = Color.black;
     public float size = 1f;
-    public float shadingSmoothness = 3.3f;
+    public float shadingSmoothness = 2.8f;
     public float drawLayer = Layer.blockBuilding;
     protected int indexerA;
     protected float indexerZ;

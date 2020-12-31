@@ -1219,7 +1219,7 @@ public class UnityBlocks implements ContentList{
                 pierce = true;
                 auraDamage = 8000f;
                 damageRadius = 120f;
-                laserColor = Pal.lancerLaser;
+                laserColor = UnityPal.advance;
             }};
         }};
 
