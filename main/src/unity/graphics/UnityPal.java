@@ -9,6 +9,8 @@ public class UnityPal{
         scarColorAlpha = valueOf("f5303690"),
         monolithLighter = valueOf("ffd2ae"),
         monolithDarker = valueOf("e58956"),
+        advance = valueOf("a3e3ff"),
+        advanceDark = valueOf("59a7ff"),
         purpleLightning = valueOf("bf92f9"),
         endColor = valueOf("ff786e"),
         imberColor = valueOf("fff566"),

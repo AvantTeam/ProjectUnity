@@ -27,6 +27,7 @@ public class Unity extends Mod{
         new UnityLiquids(),
         new UnityBullets(),
         new UnityUnitTypes(),
+        new UnityObjs(),
         new UnityBlocks(),
         new UnityPlanets(),
         new UnitySectorPresets(),
