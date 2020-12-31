@@ -461,7 +461,7 @@ public class UnityFx{
         Draw.color(Color.red);
         Draw.blend(Blending.additive);
 
-        Fill.circle(e.x, e.y, e.fout() * e.rotation * (Vars.tilesize / 2f));
+        Fill.square(e.x, e.y, e.fout() * e.rotation * (Vars.tilesize / 2f));
 
         if(e.data instanceof TurretBuild turret){
             Draw.mixcol(Color.red, 1f);
@@ -511,6 +511,12 @@ public class UnityFx{
             Lines.line(a.getX(), a.getY(), Tmp.v1.x, Tmp.v1.y);
         }
         Draw.z(oz);
+    }),
+
+    pointBlastLaserEffect = new Effect(23f, 600f, e -> {
+        Draw.color(e.color);
+        Fill.circle(e.x, e.y, e.rotation * e.fout());
+        Drawf.light(e.x, e.y, e.rotation * e.fout() * 3f, e.color, 0.66f);
     }),
 
     rockFx = new Effect(10f, e -> {

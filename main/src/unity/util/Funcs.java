@@ -22,6 +22,7 @@ import static mindustry.Vars.*;
 
 public final class Funcs{
     private static final Vec2 tV = new Vec2();
+    private static final Seq<Unit> tmpUnitSeq = new Seq<>();
     private static final IntSet collidedBlocks = new IntSet();
     private static final Rect rect = new Rect(), rectAlt = new Rect(), hitRect = new Rect();
     private static Posc result;
@@ -204,48 +205,79 @@ public final class Funcs{
     }
 
     public static void collideLineRaw(float x, float y, float x2, float y2, Boolf<Building> buildB, Boolf<Unit> unitB, Boolf<Building> buildC, Cons<Unit> unitC){
+        collideLineRaw(x, y, x2, y2, buildB, unitB, buildC, unitC, null, null);
+    }
+
+    public static void collideLineRaw(float x, float y, float x2, float y2, Boolf<Building> buildB, Boolf<Unit> unitB, Boolf<Building> buildC, Cons<Unit> unitC, Floatf<Unit> sort, Effect effect){
         collidedBlocks.clear();
         tV.set(x2, y2);
-        world.raycastEachWorld(x, y, x2, y2, (cx, cy) -> {
-            Building tile = world.build(cx, cy);
-            if(tile != null && buildB.get(tile) && !collidedBlocks.contains(tile.pos())){
-                boolean s = buildC.get(tile);
-                collidedBlocks.add(tile.pos());
-                if(s){
-                    //Mathf.dst();
-                    tV.trns(Angles.angle(x, y, x2, y2), Mathf.dst(x, y, tile.x, tile.y));
-                    tV.add(x, y);
-                    return true;
+        if(buildC != null){
+            world.raycastEachWorld(x, y, x2, y2, (cx, cy) -> {
+                Building tile = world.build(cx, cy);
+                if(tile != null && (buildB == null || buildB.get(tile)) && !collidedBlocks.contains(tile.pos())){
+                    boolean s = buildC.get(tile);
+                    collidedBlocks.add(tile.pos());
+                    if(effect != null) effect.at(cx, cy);
+                    if(s){
+                        //Mathf.dst();
+                        tV.trns(Angles.angle(x, y, x2, y2), Mathf.dst(x, y, tile.x, tile.y));
+                        tV.add(x, y);
+                        return true;
+                    }
                 }
-            }
-            return false;
-        });
-
-        rect.setPosition(x, y).setSize(tV.x - x, tV.y - y);
-
-        if(rect.width < 0){
-            rect.x += rect.width;
-            rect.width *= -1;
-        }
-        if(rect.height < 0){
-            rect.y += rect.height;
-            rect.height *= -1;
+                return false;
+            });
         }
 
-        float expand = 2f;
+        if(unitB != null && unitC != null){
+            rect.setPosition(x, y).setSize(tV.x - x, tV.y - y);
 
-        rect.grow(expand * 2f);
-
-        Groups.unit.intersect(rect.x, rect.y, rect.width, rect.height, unit -> {
-            if(unitB.get(unit)){
-                unit.hitbox(hitRect);
-                hitRect.grow(expand * 2);
-
-                Vec2 vec = Geometry.raycastRect(x, y, tV.x, tV.y, hitRect);
-
-                if(vec != null) unitC.get(unit);
+            if(rect.width < 0){
+                rect.x += rect.width;
+                rect.width *= -1;
             }
-        });
+            if(rect.height < 0){
+                rect.y += rect.height;
+                rect.height *= -1;
+            }
+
+            float expand = 2f;
+
+            rect.grow(expand * 2f);
+
+            if(sort == null){
+                Groups.unit.intersect(rect.x, rect.y, rect.width, rect.height, unit -> {
+                    if(unitB.get(unit)){
+                        unit.hitbox(hitRect);
+                        hitRect.grow(expand * 2);
+
+                        Vec2 vec = Geometry.raycastRect(x, y, tV.x, tV.y, hitRect);
+
+                        if(vec != null){
+                            if(effect != null) effect.at(vec.x, vec.y);
+                            unitC.get(unit);
+                        }
+                    }
+                });
+            }else{
+                tmpUnitSeq.clear();
+                Groups.unit.intersect(rect.x, rect.y, rect.width, rect.height, unit -> {
+                    if(unitB.get(unit)){
+                        unit.hitbox(hitRect);
+                        hitRect.grow(expand * 2);
+
+                        Vec2 vec = Geometry.raycastRect(x, y, tV.x, tV.y, hitRect);
+
+                        if(vec != null){
+                            if(effect != null) effect.at(vec.x, vec.y);
+                            tmpUnitSeq.add(unit);
+                        }
+                    }
+                });
+                tmpUnitSeq.sort(sort).each(unitC);
+                tmpUnitSeq.clear();
+            }
+        }
     }
 
     /** The other version of Damage.collideLine */

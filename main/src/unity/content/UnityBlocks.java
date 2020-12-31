@@ -19,6 +19,7 @@ import mindustry.type.*;
 import mindustry.ctype.*;
 import mindustry.content.*;
 import unity.annotations.Annotations.*;
+import unity.entities.bullet.*;
 import unity.entities.comp.*;
 import unity.gen.*;
 import unity.graphics.*;
@@ -123,6 +124,9 @@ public class UnityBlocks implements ContentList{
     sporePyrolyser,
 
     cupronickelWall, cupronickelWallLarge;//youngchaWalls
+
+    public static @FactionDef(type = "advance")
+    Block cube;
 
     public static @FactionDef(type = "end")
     Block terminalCrucible, endForge, endGame;
@@ -1195,6 +1199,28 @@ public class UnityBlocks implements ContentList{
             statusTime = 120f;
             maxDamage = 40f;
             addGraph(new GraphHeat(200f, 0.5f, 0.09f).setAccept(1, 1, 1, 1, 1, 1, 1, 1));
+        }};
+
+        //endregion
+        //region advance
+
+        cube = new ObjPowerTurret("the-cube"){{
+            requirements(Category.turret, with(Items.copper, 3300, Items.lead, 2900, Items.graphite, 4400, Items.silicon, 3800, Items.titanium, 4600, UnityItems.xenium, 2300, Items.phaseFabric, 670, UnityItems.advanceAlloy, 1070));
+            health = 22500;
+            object = UnityObjs.cube;
+            size = 10;
+            range = 320f;
+            reloadTime = 240f;
+            powerUse = 260f;
+            coolantMultiplier = 1.1f;
+            shootType = new PointBlastLaserBulletType(580f){{
+                length = 320f;
+                lifetime = 17f;
+                pierce = true;
+                auraDamage = 8000f;
+                damageRadius = 120f;
+                laserColor = Pal.lancerLaser;
+            }};
         }};
 
         //endregion
