@@ -77,16 +77,29 @@ public class WavefrontObject{
                         if(!faceTmp.verts[tmpIndexer].neighbors.contains(vTmp)) faceTmp.verts[tmpIndexer].neighbors.add(vTmp);
                     }
                     //faceTmp.shadingValue += (Math.abs(tvert.source.x) + Math.abs(tvert.source.y) + Math.abs(tvert.source.z)) / 3f;
-                    faceTmp.shadingValue += tvert.source.len();
+                    //faceTmp.shadingValue += tvert.source.len();
                     faceTmp.size += 6;
                     tmpIndexer++;
                 }
-                faceTmp.shadingValue /= tmpIndexer - 1;
+                tmpIndexer = 0;
+                for(Vertex vt : faceTmp.verts){
+                    vt.neighbors.each(vs -> {
+                        for(Vertex vc : faceTmp.verts){
+                            if(vs == vc) return true;
+                        }
+                        return false;
+                    }, vs -> {
+                        faceTmp.shadingValue += vt.source.dst(vs.source);
+                        tmpIndexer++;
+                    });
+                    //tmpIndexer++;
+                }
+                faceTmp.shadingValue /= tmpIndexer;
                 faces.add(faceTmp);
             }
         }
 
-        Unity.print(toString());
+        //Unity.print(toString());
         loaded = true;
     }
 
