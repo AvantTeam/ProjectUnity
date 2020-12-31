@@ -8,6 +8,7 @@ import mindustry.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.world.*;
+import mindustry.world.blocks.environment.*;
 import unity.graphics.*;
 import unity.util.*;
 
@@ -15,6 +16,7 @@ import static arc.Core.atlas;
 
 public class SporeFarm extends Block{
     static final int frames = 5;
+    TextureRegion cageFloor;
     final TextureRegion[] sporeRegions = new TextureRegion[frames], groundRegions = new TextureRegion[frames];//plantSprite,bottom
     TextureRegion[] fenceRegions;//fence
     int gTimer;
@@ -31,6 +33,7 @@ public class SporeFarm extends Block{
         for(int i = 0; i < 5; i++) sporeRegions[i] = atlas.find(name + "-spore" + (i + 1));
         for(int i = 0; i < 5; i++) groundRegions[i] = atlas.find(name + "-ground" + (i + 1));
         fenceRegions = Funcs.getRegions(atlas.find(name + "-fence"), 12, 4);
+        cageFloor = atlas.find(name + "-floor");
     }
 
     public class SporeFarmBuild extends Building{
@@ -96,6 +99,16 @@ public class SporeFarm extends Block{
         public void draw(){
             float rrot = (tileX() * 89f + tileY() * 13f) % 4f;
             float rrot2 = (tileX() * 69f + tileY() * 42f) % 4f;
+            if(growth < frames - 0.5f){
+                Tile t = Vars.world.tileWorld(x, y);
+                if(t != null && t.floor() != Blocks.air){
+                    Floor f = t.floor();
+                    Mathf.rand.setSeed(t.pos());
+                    Draw.rect(f.variantRegions()[Mathf.randomSeed(t.pos(), 0, Math.max(0, variantRegions().length - 1))], x, y);
+                }
+                Draw.rect(cageFloor, x, y);
+            }
+
             if(growth != 0f){
                 Draw.rect(groundRegions[Mathf.floor(growth)], x, y, rrot * 90f);
                 Draw.rect(sporeRegions[Mathf.floor(growth)], x, y, rrot2 * 90f);

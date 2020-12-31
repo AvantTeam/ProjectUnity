@@ -1198,7 +1198,7 @@ public class UnityBlocks implements ContentList{
         sporeFarm = new SporeFarm("spore-farm"){{
             requirements(Category.production, with(Items.lead, 5));
             health = 50;
-            hasShadow = rebuildable = false;
+            rebuildable = false;
             hasItems = true;
             itemCapacity = 2;
             buildCostMultiplier = 0.01f;
