@@ -118,9 +118,13 @@ public class UnityBlocks implements ContentList{
 
     electricMotor,
 
+    augerDrill,
+
     crucible, holdingCrucible, castingMold,//crucible
 
     sporePyrolyser,
+
+    sporeFarm,
 
     cupronickelWall, cupronickelWallLarge;//youngchaWalls
 
@@ -1143,6 +1147,15 @@ public class UnityBlocks implements ContentList{
             addGraph(new GraphTorqueGenerate(0.1f, 25f, 10f, 16f).setAccept(0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0));
         }};
 
+        augerDrill = new AugerDrill("auger-drill"){{
+            requirements(Category.production, with(Items.lead, 100, Items.copper, 75));
+            size = 3;
+            health = 1000;
+            tier = 3;
+            drillTime = 400f;
+            addGraph(new GraphTorqueConsume(45f, 8f, 0.03f, 0.15f).setAccept(0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0));
+        }};
+
         crucible = new Crucible("crucible"){{
             requirements(Category.crafting, with(UnityItems.nickel, 10, Items.titanium, 15));
             health = 400;
@@ -1176,6 +1189,16 @@ public class UnityBlocks implements ContentList{
             ambientSoundVolume = 0.6f;
             consumes.item(Items.sporePod, 1);
             addGraph(new GraphHeat(60f, 0.4f, 0.008f).setAccept(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1));
+        }};
+
+        sporeFarm = new SporeFarm("spore-farm"){{
+            requirements(Category.production, with(Items.lead, 5));
+            health = 50;
+            hasShadow = rebuildable = false;
+            hasItems = true;
+            itemCapacity = 2;
+            buildCostMultiplier = 0.01f;
+            breakSound = Sounds.splash;
         }};
 
         cupronickelWall = new HeatWall("cupronickel-wall"){{

@@ -1,0 +1,162 @@
+package unity.world.blocks.production;
+
+import arc.graphics.g2d.*;
+import arc.math.geom.*;
+import arc.scene.ui.layout.*;
+import arc.util.io.*;
+import mindustry.world.blocks.production.*;
+import unity.graphics.*;
+import unity.world.blocks.*;
+import unity.world.graphs.*;
+import unity.world.modules.*;
+
+import static arc.Core.atlas;
+
+public class AugerDrill extends Drill implements GraphBlockBase{
+    protected final Graphs graphs = new Graphs();
+    final TextureRegion[] bottomRegions = new TextureRegion[2], topRegions = new TextureRegion[2];//bottom,top
+    TextureRegion rotorRegion, rotorRotateRegion, mbaseRegion, gearRegion, rotateRegion, overlayRegion;//rotor,rotortexture,mbase,gear,moving,overlaysprite
+
+    public AugerDrill(String name){
+        super(name);
+        rotate = true;
+    }
+
+    @Override
+    public void load(){
+        super.load();
+        for(int i = 0; i < 2; i++) bottomRegions[i] = atlas.find(name + "-bottom" + (i + 1));
+        rotorRegion = atlas.find(name + "-rotor");
+        rotorRotateRegion = atlas.find(name + "-rotor-rotate");
+        mbaseRegion = atlas.find(name + "-mbase");
+        gearRegion = atlas.find(name + "-gear");
+        rotorRegion = atlas.find(name + "-rotate");
+        overlayRegion = atlas.find(name + "-overlay");
+        for(int i = 0; i < 2; i++) topRegions[i] = atlas.find(name + "-top" + (i + 1));
+    }
+
+    @Override
+    public void setStats(){
+        super.setStats();
+        graphs.setStats(stats);
+        setStatsExt(stats);
+    }
+
+    @Override
+    public void drawPlace(int x, int y, int rotation, boolean valid){
+        graphs.drawPlace(x, y, size, rotation, valid);
+        super.drawPlace(x, y, rotation, valid);
+    }
+
+    @Override
+    public Graphs graphs(){
+        return graphs;
+    }
+
+    public class ArguerDrillBuild extends DrillBuild implements GraphBuildBase{
+        protected GraphModules gms;
+
+        @Override
+        public void created(){
+            gms = new GraphModules(this);
+            graphs.injectGraphConnector(gms);
+            gms.created();
+        }
+
+        @Override
+        public float efficiency(){
+            return super.efficiency() * gms.efficiency();
+        }
+
+        @Override
+        public void onRemoved(){
+            gms.updateGraphRemovals();
+            onDelete();
+            super.onRemoved();
+            onDeletePost();
+        }
+
+        @Override
+        public void updateTile(){
+            if(graphs.useOriginalUpdate()) super.updateTile();
+            updatePre();
+            gms.updateTile();
+            updatePost();
+            gms.prevTileRotation(rotation);
+        }
+
+        @Override
+        public void onProximityUpdate(){
+            super.onProximityUpdate();
+            gms.onProximityUpdate();
+            proxUpdate();
+        }
+
+        @Override
+        public void display(Table table){
+            super.display(table);
+            gms.display(table);
+            displayExt(table);
+        }
+
+        @Override
+        public void displayBars(Table table){
+            super.displayBars(table);
+            gms.displayBars(table);
+            displayBarsExt(table);
+        }
+
+        @Override
+        public void write(Writes write){
+            super.write(write);
+            gms.write(write);
+            writeExt(write);
+        }
+
+        @Override
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            gms.read(read, revision);
+            readExt(read, revision);
+        }
+
+        @Override
+        public GraphModules gms(){
+            return gms;
+        }
+
+        @Override
+        public void drawSelect(){
+            super.drawSelect();
+            gms.drawSelect();
+        }
+
+        //
+        @Override
+        public void updatePre(){
+            warmup = Math.min(1f, warmup);
+        }
+
+        @Override
+        public void draw(){
+            float rot = torque().getRotation();
+            float fixedRot = (rotdeg() + 90f) % 180f - 90f;
+            int variant = rotation % 2;
+            float shaftRot = rot * 2f;
+            var offset = Geometry.d4(rotation + 1);
+            Draw.rect(bottomRegions[variant], x, y);
+            Draw.rect(rotorRegion, x, y, 360f - rot * 0.25f);
+            UnityDrawf.drawRotRect(rotorRotateRegion, x, y, 24f, 3.5f, 3.5f, 450f - rot * 0.25f, shaftRot, shaftRot + 180f);
+            UnityDrawf.drawRotRect(rotorRotateRegion, x, y, 24f, 3.5f, 3.5f, 450f - rot * 0.25f, shaftRot + 180f, shaftRot + 360f);
+
+            Draw.rect(mbaseRegion, x, y, fixedRot);
+            UnityDrawf.drawRotRect(rotateRegion, x, y, 24f, 3.5f, 3.5f, fixedRot, rot, rot + 180f);
+            UnityDrawf.drawRotRect(rotateRegion, x, y, 24f, 3.5f, 3.5f, fixedRot, rot + 180f, rot + 360f);
+            Draw.rect(overlayRegion, x, y, fixedRot);
+            Draw.rect(gearRegion, x + offset.x * 4f, y + offset.y * 4f, 360f - rot);
+            Draw.rect(gearRegion, x - offset.x * 4f, y - offset.y * 4f, rot);
+            Draw.rect(topRegions[variant], x, y);
+            drawTeamTop();
+        }
+    }
+}

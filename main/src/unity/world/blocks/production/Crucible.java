@@ -26,24 +26,6 @@ public class Crucible extends GraphBlock{
         new FixedPosition(-1.6f, -1.6f),
         new FixedPosition(0f, 0f)
     };
-    private static final byte[] tileMap = {
-        39, 39, 27, 27, 39, 39, 27, 27, 38, 38, 17, 26, 38, 38, 17, 26, 36,
-        36, 16, 16, 36, 36, 24, 24, 37, 37, 41, 21, 37, 37, 43, 25, 39,
-        39, 27, 27, 39, 39, 27, 27, 38, 38, 17, 26, 38, 38, 17, 26, 36,
-        36, 16, 16, 36, 36, 24, 24, 37, 37, 41, 21, 37, 37, 43, 25, 3,
-        3, 15, 15, 3, 3, 15, 15, 5, 5, 29, 31, 5, 5, 29, 31, 4,
-        4, 40, 40, 4, 4, 20, 20, 28, 28, 10, 11, 28, 28, 23, 32, 3,
-        3, 15, 15, 3, 3, 15, 15, 2, 2, 9, 14, 2, 2, 9, 14, 4,
-        4, 40, 40, 4, 4, 20, 20, 30, 30, 47, 44, 30, 30, 22, 6, 39,
-        39, 27, 27, 39, 39, 27, 27, 38, 38, 17, 26, 38, 38, 17, 26, 36,
-        36, 16, 16, 36, 36, 24, 24, 37, 37, 41, 21, 37, 37, 43, 25, 39,
-        39, 27, 27, 39, 39, 27, 27, 38, 38, 17, 26, 38, 38, 17, 26, 36,
-        36, 16, 16, 36, 36, 24, 24, 37, 37, 41, 21, 37, 37, 43, 25, 3,
-        3, 15, 15, 3, 3, 15, 15, 5, 5, 29, 31, 5, 5, 29, 31, 0,
-        0, 42, 42, 0, 0, 12, 12, 8, 8, 35, 34, 8, 8, 33, 7, 3,
-        3, 15, 15, 3, 3, 15, 15, 2, 2, 9, 14, 2, 2, 9, 14, 0,
-        0, 42, 42, 0, 0, 12, 12, 1, 1, 45, 18, 1, 1, 19, 13
-    };//xelo..
     TextureRegion[] liquidRegions, baseRegions, roofRegions, solidItemStrips, heatRegions;//liquidSprite,bottom,roof,solidItemStrip
     CrucibleGraph viewPos;
     TextureRegion floorRegion, solidItem;//floorSprite
@@ -85,7 +67,7 @@ public class Crucible extends GraphBlock{
         @Override
         public void draw(){
             var dex = crucible();
-            byte tileIndex = tileMap[dex.tilingIndex];
+            byte tileIndex = UnityDrawf.tileMap[dex.tilingIndex];
             if(viewPos == dex.getNetwork()){
                 Draw.rect(floorRegion, x, y, 8f, 8f);
                 drawContents(dex, tileIndex);

@@ -15,7 +15,7 @@ public class GraphTorqueConsumeModule extends GraphTorqueModule<GraphTorqueConsu
         float ratio = networks.get(0).lastVelocity / graph.nominalSpeed;
         if(ratio > 1f){
             ratio = Mathf.log2(ratio);
-            ratio = 1 + ratio * graph.oversupplyFalloff;
+            ratio = 1f + ratio * graph.oversupplyFalloff;
         }
         return ratio;
     }

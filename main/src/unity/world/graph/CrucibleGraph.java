@@ -15,7 +15,6 @@ import unity.world.modules.*;
 
 public class CrucibleGraph extends BaseGraph<GraphCrucibleModule, CrucibleGraph>{
     static final float[] capacityMul = new float[]{0f, 0.1f, 0.2f, 0.5f, 1f};
-    static final int[] convert = new int[]{4, 2, 1, 0, 3, 5, 6, 7};//Geometry.d8 -> tilechkdrs
     public final Color color = Color.clear.cpy();
     final Seq<CrucibleData> contains = new Seq<>();
     float totalVolume, totalCapacity, containedAmCache;
@@ -106,7 +105,7 @@ public class CrucibleGraph extends BaseGraph<GraphCrucibleModule, CrucibleGraph>
                 GraphCrucibleModule conModule = build.crucible();//conBuild
                 if(conModule == null || conModule.dead() || !canConnect(module, conModule)) continue;
                 if(i % 2 == 0) directNeighbour++;
-                bitmask += 1 << convert[i];
+                bitmask += 1 << i;
             }
             module.tilingIndex = bitmask;
             module.liquidCap = (module.parent.build.block().size == 1 ? capacityMul[directNeighbour] : 1f) * module.graph.baseLiquidCapcity;

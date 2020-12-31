@@ -9,12 +9,16 @@ import static arc.Core.bundle;
 public class GraphTorqueConsume extends GraphTorque{
     public final float nominalSpeed, oversupplyFalloff, idleFriction, workingFriction;
 
-    public GraphTorqueConsume(float friction, float inertia, float nominalS, float falloff, float idleF, float workingF){
-        super(friction, inertia);
+    public GraphTorqueConsume(float inertia, float nominalS, float falloff, float idleF, float workingF){
+        super(idleF, inertia);
         nominalSpeed = nominalS;
         oversupplyFalloff = falloff;
         idleFriction = idleF;
         workingFriction = workingF;
+    }
+
+    public GraphTorqueConsume(float inertia, float nominalS, float idleF, float workingF){
+        this(inertia, nominalS, 0.7f, idleF, workingF);
     }
 
     public GraphTorqueConsume(){
