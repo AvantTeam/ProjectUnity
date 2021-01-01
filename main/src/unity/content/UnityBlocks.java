@@ -3,6 +3,7 @@ package unity.content;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.entities.*;
@@ -37,6 +38,8 @@ import unity.world.blocks.units.*;
 import unity.world.consumers.*;
 import unity.world.draw.*;
 import unity.world.graphs.*;
+import younggamExperimental.*;
+import younggamExperimental.blocks.*;
 
 import static arc.Core.*;
 import static mindustry.type.ItemStack.*;
@@ -127,7 +130,9 @@ public class UnityBlocks implements ContentList{
 
     sporeFarm,
 
-    cupronickelWall, cupronickelWallLarge;//youngchaWalls
+    cupronickelWall, cupronickelWallLarge,//youngchaWalls
+
+    chopper;
 
     public static @FactionDef(type = "advance")
     Block cube;
@@ -1222,6 +1227,30 @@ public class UnityBlocks implements ContentList{
             statusTime = 120f;
             maxDamage = 40f;
             addGraph(new GraphHeat(200f, 0.5f, 0.09f).setAccept(1, 1, 1, 1, 1, 1, 1, 1));
+        }};
+
+        chopper = new Chopper("chopper"){{
+            requirements(Category.turret, with(UnityItems.nickel, 50, Items.titanium, 50, Items.lead, 30));
+            health = 650;
+            setGridW(7);
+            setGridH(1);
+            addPart(
+                "Pivot", "", PartType.blade, 4, 0, 1, 1, true, true,
+                new Point2(0, 0), new ItemStack[0], new byte[]{1, 0, 0, 0}, new byte[]{0, 0, 0, 0}
+            );
+            addPart(
+                "Blade", "Slices and knocks back enemies", PartType.blade, 0, 0, 1, 1,
+                with(UnityItems.nickel, 3, Items.titanium, 5), new byte[]{1, 0, 0, 0}, new byte[]{0, 0, 1, 0}
+            );
+            addPart(
+                "Serrated blade", "A heavy reinforced blade.", PartType.blade, 2, 0, 2, 1,
+                with(UnityItems.nickel, 8, Items.lead, 5), new byte[]{1, 0, 0, 0, 0, 0}, new byte[]{0, 0, 0, 1, 0, 0}
+            );
+            addPart(
+                "Rod", "Supporting structure, does not collide", PartType.blade, 1, 0, 1, 1,
+                with(Items.titanium, 3), new byte[]{1, 0, 0, 0}, new byte[]{0, 0, 1, 0}
+            );
+            addGraph(new GraphTorque(0.03f, 5f).setAccept(1, 0, 0, 0));
         }};
 
         //endregion

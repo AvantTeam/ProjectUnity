@@ -19,7 +19,7 @@ public class GraphData{
     public static GraphData getConnectSidePos(int index, int size, int rotation){
         int side = index / size;
         side = (side + rotation) % 4;
-        Point2 normal = d4((side + 3) % 4);
+        //Point2 normal = d4((side + 3) % 4);unused
         Point2 tangent = d4((side + 1) % 4);
         int originX = 0, originY = 0;
         if(size > 1){

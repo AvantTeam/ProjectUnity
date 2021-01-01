@@ -24,6 +24,7 @@ public class UnityPal{
         diriumColor = valueOf("96f7c3"),
         diriumColor2 = valueOf("ccffe4"),
         coldColor = valueOf("6bc7ff"),
-        youngchaOrangish = valueOf("ea7a55"),
-        youngchaGray = valueOf("555555");
+        bgCol = valueOf("323232"),
+        youngchaGray = valueOf("555555"),
+        blueprintCol = valueOf("354654");
 }
