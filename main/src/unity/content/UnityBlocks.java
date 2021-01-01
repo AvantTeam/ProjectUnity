@@ -1259,7 +1259,7 @@ public class UnityBlocks implements ContentList{
         }};
 
         kelvin = new PowerTurret("kelvin"){{
-            requirements(Category.turret, with(Items.silicon, 20, UnityItems.xenium, 15, Items.titanium, 30, UnityItems.advanceAlloy, 25));
+            requirements(Category.turret, with(Items.silicon, 80, UnityItems.xenium, 35, Items.titanium, 90, UnityItems.advanceAlloy, 50));
             health = 2680;
             size = 2;
             reloadTime = 3f;
