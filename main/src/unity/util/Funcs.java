@@ -347,22 +347,6 @@ public final class Funcs{
         return Math.min(coefficient * (target - current) * maxTorque / target, 99999f);
     }
 
-    public static TextureRegion getRegionRect(TextureRegion region, float x, float y, int rw, int rh, int w, int h){
-        TextureRegion nRegion = new TextureRegion(region);
-        float tileW = (nRegion.u2 - nRegion.u) / w;
-        float tileH = (region.v2 - region.v) / h;
-        float tileX = x / w;
-        float tileY = y / h;
-
-        nRegion.u = Mathf.map(tileX, 0f, 1f, nRegion.u, nRegion.u2) + tileW * 0.02f;
-        nRegion.v = Mathf.map(tileY, 0f, 1f, nRegion.v, nRegion.v2) + tileH * 0.02f;
-        nRegion.u2 = nRegion.u + tileW * (rw - 0.02f);
-        nRegion.v2 = nRegion.v + tileH * (rh - 0.02f);
-        nRegion.width = 32 * rw;
-        nRegion.height = 32 * rh;
-        return nRegion;
-    }
-
     public static TextureRegion[] getRegions(TextureRegion region, int sheetW, int sheetH){
         int size = sheetW * sheetH;
         TextureRegion[] ret = new TextureRegion[size];
@@ -399,26 +383,5 @@ public final class Funcs{
             if(a < 0.01f) return Color.clear.cpy();
             return UnityPal.coldColor.cpy().a(a);
         }
-    }
-
-    public static IntSeq unpackInts(IntSeq intpack){
-        IntSeq out = new IntSeq();
-        for(int i = 0, len = intpack.size * 2; i < len; i++){
-            int cint = intpack.get(i / 2);
-            int value = (cint >>> (i % 2 == 0 ? 0 : 16)) & 65536;
-            int am = (value >> 8) & 255;
-            for(int k = 0; k < am; k++) out.add(value & 255);
-        }
-        return out;
-    }
-
-    public static IntSeq unpackIntsFromString(String sintpack){
-        IntSeq out = new IntSeq();
-        for(int i = 0, len = sintpack.length(); i < len; i += 2){
-            int val = sintpack.codePointAt(i + 1);
-            int am = sintpack.codePointAt(i);
-            for(int k = 0; k < am; k++) out.add(val);
-        }
-        return out;
     }
 }
