@@ -10,7 +10,7 @@ import mindustry.type.StatusEffect;
 import unity.graphics.UnityPal;
 
 public class UnityStatusEffects implements ContentList{
-    public static StatusEffect radiation, reloadFatigue, molten, tpCoolDown;
+    public static StatusEffect radiation, reloadFatigue, blueBurn, molten, tpCoolDown;
 
     @Override
     public void load(){
@@ -33,6 +33,19 @@ public class UnityStatusEffects implements ContentList{
                 damage = 1.6f;
             }
         };
+
+        blueBurn = new StatusEffect("blue-burn"){{
+            damage = 0.14f;
+            effect = UnityFx.blueBurnEffect;
+            init(() -> {
+                opposite(StatusEffects.wet, StatusEffects.freezing);
+                trans(StatusEffects.tarred, (unit, time, newTime, result) -> {
+                    unit.damagePierce(8f);
+                    effect.at(unit.x() + Mathf.range(unit.bounds() / 2), unit.y() + Mathf.range(unit.bounds() / 2));
+                    result.set(this, Math.min(time + newTime, 400f));
+                });
+            });
+        }};
 
         reloadFatigue = new StatusEffect("reload-fatigue"){{
             reloadMultiplier = 0.75f;

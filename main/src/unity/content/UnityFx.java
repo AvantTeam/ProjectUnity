@@ -447,6 +447,36 @@ public class UnityFx{
         color();
     }).layer(Layer.flyingUnit + 1f),
 
+    hitAdvanceFlame = new Effect(15f, e -> {
+        Draw.color(UnityPal.advance, UnityPal.advanceDark, e.fin());
+
+        Angles.randLenVectors(e.id, 2, e.finpow() * 17f, e.rotation, 60f, (x, y) -> {
+            Fill.poly(e.x + x, e.y + y, 6, 3f + e.fout() * 3f, e.rotation);
+        });
+    }),
+
+    advanceFlameTrail = new Effect(27f, e -> {
+        Draw.color(UnityPal.advance, UnityPal.advanceDark, e.fin());
+        float rot = Mathf.randomSeed(e.id, -1, 1) * 270f;
+
+        Fill.poly(e.x, e.y, 6, e.fout() * 4.1f, e.rotation + e.fin() * rot);
+    }),
+
+    advanceFlameSmoke = new Effect(13f, e -> {
+        Draw.color(Color.valueOf("4d668f77"), Color.valueOf("35455f00"), e.fin());
+        float rot = Mathf.randomSeed(e.id, -1, 1) * 270f;
+
+        Angles.randLenVectors(e.id, 2, e.finpow() * 13f, e.rotation, 60f, (x, y) -> Fill.poly(e.x + x, e.y + y, 6, e.fout() * 4.1f, e.rotation + e.fin() * rot));
+    }),
+
+    blueBurnEffect = new Effect(35f, e -> {
+        Draw.color(UnityPal.advance, UnityPal.advanceDark, e.fin());
+
+        Angles.randLenVectors(e.id, 3, 2 + e.fin() * 7, (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, 0.1f + e.fout() * 1.4f);
+        });
+    }),
+
     endGameShoot = new Effect(45f, 820f * 2f, e -> {
         float curve = Mathf.curve(e.fin(), 0f, 0.2f) * 820f;
         float curveB = Mathf.curve(e.fin(), 0f, 0.7f);

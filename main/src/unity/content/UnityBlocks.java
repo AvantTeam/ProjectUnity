@@ -135,7 +135,7 @@ public class UnityBlocks implements ContentList{
     chopper;
 
     public static @FactionDef(type = "advance")
-    Block cube;
+    Block celsius, kelvin, cube;
 
     public static @FactionDef(type = "end")
     Block terminalCrucible, endForge, endGame;
@@ -1255,6 +1255,68 @@ public class UnityBlocks implements ContentList{
 
         //endregion
         //region advance
+
+        celsius = new PowerTurret("celsius"){{
+            requirements(Category.turret, with(Items.silicon, 20, UnityItems.xenium, 15, Items.titanium, 30, UnityItems.advanceAlloy, 25));
+            health = 780;
+            size = 1;
+            reloadTime = 3f;
+            range = 47f;
+            shootCone = 50f;
+            heatColor = Color.valueOf("ccffff");
+            inaccuracy = 9.2f;
+            rotateSpeed = 7.5f;
+            shots = 2;
+            spread = 6f;
+            recoilAmount = 1f;
+            powerUse = 15.4f;
+            targetAir = true;
+            shootSound = Sounds.flame;
+            cooldown = 0.01f;
+
+            shootType = new AdvanceFlameBullet(4.7f, 36f){{
+                lifetime = 18f;
+                drag = 0.034f;
+                statusDuration = 770f;
+                status = UnityStatusEffects.blueBurn;
+
+                hitEffect = UnityFx.hitAdvanceFlame;
+                flameTrail = UnityFx.advanceFlameTrail;
+                smokeTrail = UnityFx.advanceFlameSmoke;
+                lightColor = UnityPal.advance;
+            }};
+        }};
+
+        kelvin = new PowerTurret("kelvin"){{
+            requirements(Category.turret, with(Items.silicon, 20, UnityItems.xenium, 15, Items.titanium, 30, UnityItems.advanceAlloy, 25));
+            health = 2680;
+            size = 2;
+            reloadTime = 3f;
+            range = 100f;
+            shootCone = 50f;
+            heatColor = Color.valueOf("ccffff");
+            inaccuracy = 9.2f;
+            rotateSpeed = 6.5f;
+            shots = 2;
+            spread = 6f;
+            recoilAmount = 1f;
+            powerUse = 12.9f;
+            targetAir = true;
+            shootSound = Sounds.flame;
+            cooldown = 0.01f;
+
+            shootType = new AdvanceFlameBullet(4.7f, 16f){{
+                lifetime = 32f;
+                drag = 0.016f;
+                statusDuration = 770f;
+                status = UnityStatusEffects.blueBurn;
+
+                hitEffect = UnityFx.hitAdvanceFlame;
+                flameTrail = UnityFx.advanceFlameTrail;
+                smokeTrail = UnityFx.advanceFlameSmoke;
+                lightColor = UnityPal.advance;
+            }};
+        }};
 
         cube = new ObjPowerTurret("the-cube"){{
             requirements(Category.turret, with(Items.copper, 3300, Items.lead, 2900, Items.graphite, 4400, Items.silicon, 3800, Items.titanium, 4600, UnityItems.xenium, 2300, Items.phaseFabric, 670, UnityItems.advanceAlloy, 1070));
