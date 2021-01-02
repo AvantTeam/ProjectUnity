@@ -405,7 +405,7 @@ public final class Funcs{
         IntSeq out = new IntSeq();
         for(int i = 0, len = intpack.size * 2; i < len; i++){
             int cint = intpack.get(i / 2);
-            int value = (cint >>> (i % 2 == 0 ? 0 : 16)) & 65536;
+            int value = (cint >>> (i % 2 == 0 ? 0 : 16)) & 65535;
             int am = (value >> 8) & 255;
             for(int k = 0; k < am; k++) out.add(value & 255);
         }

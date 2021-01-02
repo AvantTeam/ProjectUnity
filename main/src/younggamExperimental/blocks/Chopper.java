@@ -3,25 +3,34 @@ package younggamExperimental.blocks;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
+import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
+import mindustry.entities.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.meta.*;
+import unity.graphics.*;
 import unity.util.*;
 import unity.world.blocks.*;
 import younggamExperimental.*;
+import younggamExperimental.Segment;
 
 import static arc.Core.atlas;
 
+//this is bad class. It has no potential to have many instances.
 public class Chopper extends GraphBlock{
-    static final PartInfo[] partInfo = new PartInfo[5];
+    static final IntSet collidedBlocks = new IntSet();
+    static final PartInfo[] partInfo = new PartInfo[4];
+    static final float knockbackMult = 10f;
+    static final int mask = 65535;
     final PartType[] categories = new PartType[]{PartType.blade, PartType.saw};//categorySprite
     final TextureRegion[] baseRegions = new TextureRegion[4];//base
     TextureRegion topRegion, partsRegion;//topsprite,partsAtlas
@@ -53,6 +62,7 @@ public class Chopper extends GraphBlock{
 
     @Override
     public void load(){
+        super.load();
         topRegion = atlas.find(name + "-top");
         for(int i = 0; i < 4; i++) baseRegions[i] = atlas.find(name + "-base" + (i + 1));
         partsRegion = atlas.find(name + "-parts");
@@ -67,33 +77,33 @@ public class Chopper extends GraphBlock{
         ty = spriteGridPadding * 2 + gridH * spriteGridSize;
     }
 
-    protected void addPart(String name, String desc, PartType category, int tx, int ty, int tw, int th, boolean cannotPlace, boolean isRoot, Point2 prePlace, ItemStack[] cost, byte[] connectOut, byte[] connectIn){
+    protected void addPart(String name, String desc, PartType category, int tx, int ty, int tw, int th, boolean cannotPlace, boolean isRoot, Point2 prePlace, ItemStack[] cost, byte[] connectOut, byte[] connectIn, PartStat... stats){
         //TODO
-        partInfo[index++] = new PartInfo(name, desc, category, tx, ty, tw, th, cannotPlace, isRoot, prePlace, cost, connectOut, connectIn);
+        partInfo[index++] = new PartInfo(name, desc, category, tx, ty, tw, th, cannotPlace, isRoot, prePlace, cost, connectOut, connectIn, stats);
     }
 
-    protected void addPart(String name, String desc, PartType category, int tx, int ty, int tw, int th, ItemStack[] cost, byte[] connectOut, byte[] connectIn){
-        addPart(name, desc, category, tx, ty, tw, th, false, false, null, cost, connectOut, connectIn);
+    protected void addPart(String name, String desc, PartType category, int tx, int ty, int tw, int th, ItemStack[] cost, byte[] connectOut, byte[] connectIn, PartStat... stats){
+        addPart(name, desc, category, tx, ty, tw, th, false, false, null, cost, connectOut, connectIn, stats);
     }
 
     public class ChopperBuild extends GraphBuild{
         final OrderedMap<Item, Integer> blueprintRemainingCost = new OrderedMap<>(12);
         final IntSeq bluePrint = new IntSeq();
-        final Seq<StatContainer.Segment> hitSegments = new Seq<>();
+        final Seq<Segment> hitSegments = new Seq<>();
         final FrameBuffer buffer = new FrameBuffer(tx, ty);
         final StatContainer currentStats = new StatContainer();
         final Rect detectRect = new Rect();
-        float totalItemCountCost, totalItemCountPaid,
-            originalMaxHp;
-        int aniProg, aniTime, aniSpeed,
+        float originalMaxHp,
             speedDmgMul,
-            knockbackTorque, inertia,
+            aniProg, aniSpeed, aniTime;
+        int totalItemCountCost, totalItemCountPaid,
+            knockbackTorque, inertia = 5,
             bladeRadius;
         boolean changed;
 
         float getPaidRatio(){
-            if(totalItemCountCost == 0f) return 0f;
-            return totalItemCountPaid / totalItemCountCost;
+            if(totalItemCountCost == 0) return 0f;
+            return ((float)totalItemCountPaid) / totalItemCountCost;
         }
 
         boolean setBluePrintFromString(String s){
@@ -128,7 +138,7 @@ public class Chopper extends GraphBlock{
                 else{//idk
                     for(var i : blueprintRemainingCost){
                         sub.image(i.key.icon(Cicon.medium));
-                        sub.add((i.value >>> 16) + "/" + (i.value & 65536));
+                        sub.add((i.value >>> 16) + "/" + (i.value & mask));
                         sub.row();
                     }
                 }
@@ -139,7 +149,7 @@ public class Chopper extends GraphBlock{
             if(totalItemCountPaid >= totalItemCountCost) return;
             if(Vars.state.rules.infiniteResources || team.rules().infiniteResources || team.rules().cheat){
                 for(var i : blueprintRemainingCost){
-                    int temp = i.value & 65536;
+                    int temp = i.value & mask;
                     i.value <<= 16;
                     i.value += temp;
                 }
@@ -147,15 +157,15 @@ public class Chopper extends GraphBlock{
                 applyStats();
                 return;
             }
-            if(timer(dumpTime, autoBuildDelay)){
+            if(timer(timerDump, autoBuildDelay)){
                 var core = team.core();
-                if(team.core() == null) return;
-                var cItems = team.core().items;
+                if(core == null) return;
+                var cItems = core.items;
                 for(var i : blueprintRemainingCost){
-                    if(i.value >>> 16 < (i.value & 65536) && cItems.get(i.key) > 0){
+                    if((i.value >>> 16) < (i.value & mask) && cItems.get(i.key) > 0){
                         cItems.remove(i.key, 1);
                         totalItemCountPaid++;
-                        i.value += 1 << 16;
+                        blueprintRemainingCost.put(i.key, i.value + (1 << 16));
                         if(totalItemCountPaid == totalItemCountCost) applyStats();
                         return;
                     }
@@ -166,7 +176,7 @@ public class Chopper extends GraphBlock{
         @Override
         public boolean acceptItem(Building source, Item item){
             int value = blueprintRemainingCost.get(item, 0);
-            boolean hasSpace = value >>> 16 < (value & 65536);
+            boolean hasSpace = value >>> 16 < (value & mask);
             return super.acceptItem(source, item) || hasSpace;//acceptItemExt
         }
 
@@ -182,15 +192,15 @@ public class Chopper extends GraphBlock{
         //TODO 굳이?
         void resetStats(){
             inertia = 5;
-            //TODO
+            hitSegments.clear();
             if(originalMaxHp > 0f) maxHealth = originalMaxHp;
         }
 
         void applyStats(){
-            inertia = 5 + currentStats.inertia();
+            inertia = 5 + currentStats.inertia;
             originalMaxHp = maxHealth;
-            maxHealth = originalMaxHp + currentStats.hpinc();
-            heal(currentStats.hpinc() * health / originalMaxHp);
+            maxHealth = originalMaxHp + currentStats.hpinc;
+            heal(currentStats.hpinc * health / originalMaxHp);
             hitSegments.set(currentStats.segments);
             int r = 0;
             for(int i = 0, len = hitSegments.size; i < len; i++) r = Math.max(r, hitSegments.get(i).end * 8);
@@ -198,13 +208,74 @@ public class Chopper extends GraphBlock{
             bladeRadius = r;
         }
 
+        float getHitDamage(float rx, float ry, float rot){
+            float dist = Mathf.dst(rx, ry);
+            float drx = Mathf.cosDeg(rot);
+            float dry = Mathf.sinDeg(rot);
+            if(rx * drx / dist + ry * dry / dist < Mathf.cosDeg(Mathf.clamp(speedDmgMul * 10f, 0f, 180f))) return 0f;
+            for(var seg : hitSegments){
+                if(seg.start * 8 + 4 < dist && seg.end * 8 + 4 > dist) return seg.damage * Mathf.clamp(dist * 0.1f);
+            }
+            return 0f;
+        }
+
+        void onIntCollider(int cx, int cy, float rot){
+            var build = Vars.world.build(cx, cy);
+            boolean collide = build != null && collidedBlocks.add(tile.pos());
+            if(collide && build.team != team){
+                float k = getHitDamage((cx - tileX()) * Vars.tilesize, (cy - tileY()) * Vars.tilesize, rot);
+                build.damage(k);
+                knockbackTorque += k * knockbackMult;
+            }
+        }
+
+        void damageChk(float rot){
+            float drx = Mathf.cosDeg(rot);
+            float dry = Mathf.sinDeg(rot);
+            collidedBlocks.clear();
+            Vars.world.raycastEachWorld(x, y, x + drx * bladeRadius, y + dry * bladeRadius, (cx, cy) -> {
+                onIntCollider(cx, cy, rot);
+                return false;
+            });
+            Units.nearbyEnemies(team, detectRect, unit -> {
+                if(!unit.checkTarget(false, true)) return;
+                float k = getHitDamage(unit.x - x, unit.y - y, rot);
+                if(k > 0f){
+                    unit.damage(k);
+                    unit.impulse(-dry * k * 10f, drx * k * 10f);
+                    knockbackTorque += k * knockbackMult;
+                }
+            });
+        }
+
         void accumStats(PartInfo part, int x, int y, int[][] grid){
-            //TODO
+            var iner = part.stats.get(PartStatType.mass);
+            if(iner != null) currentStats.inertia += iner.asInt() * x;
+            var hp = part.stats.get(PartStatType.hp);
+            if(hp != null) currentStats.hpinc += hp.asInt();
+
+            var collides = part.stats.get(PartStatType.collides);
+            if(collides != null && collides.asBool()){
+                var damage = part.stats.get(PartStatType.damage);
+                int dmg = damage != null ? damage.asInt() : 0;
+                if(currentStats.segments.isEmpty()) currentStats.segments.add(new Segment(x, x + part.tw, dmg));
+                else{
+                    boolean appended = false;
+                    for(var i : currentStats.segments){
+                        if(i.damage == dmg && i.end == x){
+                            i.end += part.tw;
+                            appended = true;
+                            break;
+                        }
+                    }
+                    if(!appended) currentStats.segments.add(new Segment(x, x + part.tw, dmg));
+                }
+            }
         }
 
         void drawPartBuffer(PartInfo part, int x, int y, int[][] grid){
             Draw.rect(part.sprite, (x + part.tw * 0.5f) * 32f, (y + part.th * 0.5f) * 32f, part.tw * 32f, part.th * 32f);
-            if(part.sprite2 != null && grid[x + 1][y] == 0) Draw.rect(part.sprite2, (x + part.tw * 0.5f + 1f) * 32f, (y + part.th * 0.5f) * 32f, part.tw * 32f, part.th * 32f);
+            if(part.sprite2 != null && x + 1 < grid.length && grid[x + 1][y] == 0) Draw.rect(part.sprite2, (x + part.tw * 0.5f + 1f) * 32f, (y + part.th * 0.5f) * 32f, part.tw * 32f, part.th * 32f);
         }
 
         @Override
@@ -233,7 +304,8 @@ public class Chopper extends GraphBlock{
             super.configured(builder, value);
             if(!changed) return;
             resetStats();
-            int cstMult = 1, len = bluePrint.size;
+            float cstMult = 1f;
+            int len = bluePrint.size;
             for(int p = 0; p < len; p++){
                 int temp = bluePrint.get(p);
                 if(temp != 0){
@@ -252,7 +324,7 @@ public class Chopper extends GraphBlock{
                     var prtTmp = partL.cost;
                     for(var cstItem : prtTmp){
                         int cur = blueprintRemainingCost.get(cstItem.item, 0);
-                        int increment = cstItem.amount * cstMult;
+                        int increment = Mathf.floor(cstItem.amount * cstMult);
                         blueprintRemainingCost.put(cstItem.item, cur + increment);
                         totalItemCountCost += increment;
                     }
@@ -262,7 +334,7 @@ public class Chopper extends GraphBlock{
             currentStats.clear();
             for(int p = 0; p < len; p++){
                 int temp = bluePrint.get(p);
-                if(p == 0) continue;
+                if(temp == 0) continue;
                 accumStats(partInfo[temp - 1], p / gridH, p % gridH, gridPrint);
             }
             if(!Vars.headless){
@@ -275,6 +347,7 @@ public class Chopper extends GraphBlock{
                     //preDrawBuffer(gridPrint)
                     for(int p = 0; p < len; p++){
                         int temp = bluePrint.get(p);
+                        if(temp == 0) continue;
                         drawPartBuffer(partInfo[temp - 1], p / gridH, p % gridH, gridPrint);
                     }
                     //postDrawBuffer(gridPrint)
@@ -331,6 +404,46 @@ public class Chopper extends GraphBlock{
                 }
             }
             if(totalItemCountPaid == totalItemCountCost) applyStats();
+        }
+
+        @Override
+        public void updatePre(){
+            var tGraph = torque();
+            tGraph.setInertia(inertia);
+            tGraph.force = -knockbackTorque;
+            knockbackTorque = 0;
+            aniTime += Time.delta;
+            float prog = getPaidRatio();
+            if(aniProg < prog){
+                aniSpeed = (prog - aniProg) * 0.1f;
+                aniProg += aniSpeed;
+            }else{
+                aniProg = prog;
+                aniSpeed = 0f;
+            }
+            speedDmgMul = tGraph.getNetwork().lastVelocity;
+            updateAutoBuild();
+        }
+
+        @Override
+        public void updatePost(){
+            if(getPaidRatio() >= 1f && speedDmgMul > 0.8f) damageChk(torque().getRotation());
+        }
+
+        @Override
+        public void draw(){
+            float rot = torque().getRotation();
+            Draw.rect(baseRegions[rotation], x, y);
+            var blades = getBufferRegion();
+            if(blades != null){
+                Draw.z(Layer.turret);
+                if(getPaidRatio() < 1f){
+                    blades.setU2(Mathf.map(aniProg, 0f, 1f, blades.u, blades.u2));
+                    UnityDrawf.drawConstruct(blades, aniProg, Pal.accent, 1f, aniTime * 0.5f, Layer.turret, tex -> Draw.rect(tex, x + tex.width * 0.125f, y, tex.width * 0.25f, tex.height * 0.25f, 0f, tex.height * 0.25f * 0.5f, rot));
+                }else Draw.rect(blades, x + blades.width * 0.125f, y, blades.width * 0.25f, blades.height * 0.25f, 0f, blades.height * 0.25f * 0.5f, rot);
+                Draw.rect(topRegion, x, y);
+            }
+            drawTeamTop();
         }
     }
 }

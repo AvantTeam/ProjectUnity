@@ -1,5 +1,6 @@
 package younggamExperimental;
 
+import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.math.geom.*;
 import arc.struct.*;
@@ -14,12 +15,12 @@ public class PartInfo{
     public final Point2 prePlace;
     public final ItemStack[] cost;
     public final byte[] connectOut, connectIn;
-    //public final Part TODO
+    public final OrderedMap<PartStatType, PartStat> stats = new OrderedMap<>(12);
     public TextureRegion sprite, sprite2, texRegion;
     final Seq<ConnectData> connInList = new Seq<>(), connOutList = new Seq<>();
     int id;
 
-    public PartInfo(String name, String desc, PartType category, int tx, int ty, int tw, int th, boolean cannotPlace, boolean isRoot, Point2 prePlace, ItemStack[] cost, byte[] connectOut, byte[] connectIn){
+    public PartInfo(String name, String desc, PartType category, int tx, int ty, int tw, int th, boolean cannotPlace, boolean isRoot, Point2 prePlace, ItemStack[] cost, byte[] connectOut, byte[] connectIn, PartStat... stats){
         this.name = name;
         this.desc = desc;
         this.category = category;
@@ -33,6 +34,7 @@ public class PartInfo{
         this.cost = cost;
         this.connectOut = connectOut;
         this.connectIn = connectIn;
+        for(var i : stats) this.stats.put(i.category, i);
     }
 
     public static void preCalcConnection(PartInfo[] partsConfig){

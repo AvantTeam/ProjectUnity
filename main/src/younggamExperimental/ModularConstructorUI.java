@@ -1,5 +1,6 @@
 package younggamExperimental;
 
+import arc.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -25,7 +26,7 @@ public class ModularConstructorUI extends Element{
     static PartType currentCat;
     Point2 hover;
     final Seq<PartPlaceObj> partList = new Seq<>(), rootList = new Seq<>();
-    PartPlaceObj[][] grid;
+    final GridMap<PartPlaceObj> grid = new GridMap<>();
     Runnable onTileAction;
     TextureRegion partsSprite;
     PartInfo partsSelect;
@@ -47,7 +48,7 @@ public class ModularConstructorUI extends Element{
         pp.gridW = maxW;
         pp.gridH = maxH;
         pp.costAccum = cstacc;
-        if(!preConfig.isEmpty()){
+        if(preConfig.isEmpty()){
             for(var pinfo : partsConfig){
                 if(pinfo.prePlace != null) pp.placeTile(pinfo, pinfo.prePlace.x, pinfo.prePlace.y);
             }
@@ -151,7 +152,10 @@ public class ModularConstructorUI extends Element{
         cont.add("[white]" + part.desc).wrap().fillX().left().width(500f).maxWidth(500f).get().setWrap(true);
         cont.row();
         cont.add("[accent] Stats");
-        //TODO
+        for(var stat : part.stats){
+            cont.row();
+            cont.add("[lightgray]" + Core.bundle.get(stat.key.name) + ": [white]" + stat.value.value.toString()).left();
+        }
         dialog.buttons.button("@ok", dialog::hide).size(130f, 60f);
         dialog.update(() -> {});
         dialog.show();
@@ -227,7 +231,7 @@ public class ModularConstructorUI extends Element{
     }
 
     boolean inBounds(PartInfo partType, int x, int y){
-        return inBoundsRect(x, y, partType.tw, partType.th);
+        return partType != null && inBoundsRect(x, y, partType.tw, partType.th);
     }
 
     boolean inBoundsRect(int x, int y, int w, int h){
@@ -264,6 +268,7 @@ public class ModularConstructorUI extends Element{
 
     OrderedSet<PartPlaceObj> floodFrom(PartPlaceObj part){
         OrderedSet<PartPlaceObj> visited = new OrderedSet<>(12);
+        visited.add(part);
         Seq<PartPlaceObj> toVisit = new Seq<>();
         for(var i : part.parents) toVisit.add(i);
         for(var i : part.children) toVisit.add(i);
@@ -294,14 +299,14 @@ public class ModularConstructorUI extends Element{
     boolean removeTile(PartPlaceObj part){
         if(part == null) return false;
         var prt = part.part;
-        if(part.part.isRoot) return false;
+        if(prt.isRoot) return false;
         for(var i : part.parents){
             i.children.remove(part);
         }
         int lenX = prt.tw;
         int lenY = prt.th;
         for(int px = 0; px < lenX; px++){
-            for(int py = 0; py < lenY; py++) grid[part.x + px][part.y + py] = null;
+            for(int py = 0; py < lenY; py++) grid.remove(part.x + px, part.y + py);
         }
         partList.remove(part);
         rebuildFromRoots();
@@ -322,7 +327,7 @@ public class ModularConstructorUI extends Element{
     }
 
     boolean placeTileDirect(PartInfo partType, int x, int y){
-        PartPlaceObj partPlaceObj = new PartPlaceObj(x, y, false, partType);
+        PartPlaceObj partPlaceObj = new PartPlaceObj(x, y, partType);
         for(var i : partType.connInList){
             var fromPart = getPartAt(x + i.x + i.dir.x, y + i.y + i.dir.y);
             if(fromPart != null && partCanConnectOut(fromPart, i.x + x, i.y + y, i.id)){
@@ -338,10 +343,9 @@ public class ModularConstructorUI extends Element{
             }
         }
         int xLen = partType.tw;
-        int yLen = partType.ty;
-        grid = new PartPlaceObj[xLen][yLen];
+        int yLen = partType.th;
         for(int px = 0; px < xLen; px++){
-            for(int py = 0; py < yLen; py++) grid[x + px][y + py] = partPlaceObj;
+            for(int py = 0; py < yLen; py++) grid.put(x + px, y + py, partPlaceObj);
         }
         if(partType.isRoot) rootList.add(partPlaceObj);
         partList.add(partPlaceObj);
@@ -417,8 +421,8 @@ public class ModularConstructorUI extends Element{
     }
 
     PartPlaceObj getPartAt(int x, int y){
-        if(!inBoundsRect(x, y, 1, 1) || x >= grid.length) return null;
-        return y >= grid[x].length ? grid[x][y] : null;
+        if(!inBoundsRect(x, y, 1, 1)) return null;
+        return grid.get(x, y);
     }
 
     boolean partCanConnectOut(PartPlaceObj part, int x, int y, byte portId){
@@ -439,7 +443,7 @@ public class ModularConstructorUI extends Element{
         int gw = gridW * 32;
         int gh = gridH * 32;
         float gamx = (width - gw) * 0.5f;
-        float gamy = (width - gh) * 0.5f;
+        float gamy = (height - gh) * 0.5f;
         return new Point2(Mathf.floor((x - gamx) / 32f), Mathf.floor((y - gamy) / 32f));
     }
 
@@ -473,10 +477,9 @@ public class ModularConstructorUI extends Element{
         boolean valid;
         final OrderedSet<PartPlaceObj> parents = new OrderedSet<>(12), children = new OrderedSet<>(12);
 
-        PartPlaceObj(int x, int y, boolean valid, PartInfo part){
+        PartPlaceObj(int x, int y, PartInfo part){
             this.x = x;
             this.y = y;
-            this.valid = valid;
             this.part = part;
         }
     }

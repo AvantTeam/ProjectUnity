@@ -1,6 +1,7 @@
 package unity.graphics;
 
 import arc.*;
+import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -94,5 +95,20 @@ public class UnityDrawf{
         s1 = Mathf.map(s1, -1f, 1f, y - h / 2f, y + h / 2f);
         s2 = Mathf.map(s2, -1f, 1f, y - h / 2f, y + h / 2f);
         Draw.rect(nRegion, x, (s1 + s2) * 0.5f, w, s2 - s1, w * 0.5f, y - s1, rot);
+    }
+
+    public static void drawConstruct(TextureRegion region, float progress, Color color, float alpha, float time, float layer, Cons<TextureRegion> func){
+        nRegion.set(region);
+        Draw.draw(layer, () -> {
+            Shaders.build.region = nRegion;
+            Shaders.build.progress = progress;
+            Shaders.build.color.set(color);
+            Shaders.build.color.a = alpha;
+            Shaders.build.time = -time / 20f;
+            Draw.shader(Shaders.build);
+            func.get(nRegion);
+            Draw.shader();
+            Draw.reset();
+        });
     }
 }

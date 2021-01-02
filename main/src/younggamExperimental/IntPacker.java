@@ -43,7 +43,7 @@ public class IntPacker{
 
     public String toStringPack(){
         var str = new StringBuilder("");
-        for(int i = 0, len = raw.size; i < len; i++) str.append(raw.get(i));
+        for(int i = 0, len = raw.size; i < len; i++) str.append((char)raw.get(i));
         return str.toString();
     }
 
