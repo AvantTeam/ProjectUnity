@@ -37,6 +37,10 @@ public class PartInfo{
         for(var i : stats) this.stats.put(i.category, i);
     }
 
+    public PartInfo(String name, String desc, PartType category, int tx, int ty, int tw, int th, ItemStack[] cost, byte[] connectOut, byte[] connectIn, PartStat... stats){
+        this(name, desc, category, tx, ty, tw, th, false, false, null, cost, connectOut, connectIn, stats);
+    }
+
     public static void preCalcConnection(PartInfo[] partsConfig){
         for(int i = 0, len = partsConfig.length; i < len; i++){
             int id = i;

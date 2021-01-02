@@ -4,11 +4,11 @@ import arc.struct.*;
 
 public class StatContainer{
     public final Seq<Segment> segments = new Seq<>();
-    public int inertia, hpinc;
+    public int inertia, hpinc, rangeInc;
 
     public void clear(){
         segments.clear();
-        inertia = hpinc = 0;
+        inertia = hpinc = rangeInc = 0;
     }
 
 }

@@ -132,7 +132,9 @@ public class UnityBlocks implements ContentList{
 
     cupronickelWall, cupronickelWallLarge,//youngchaWalls
 
-    chopper;
+    chopper,
+
+    smallTurret, medTurret;
 
     public static @FactionDef(type = "advance")
     Block cube;
@@ -1255,6 +1257,35 @@ public class UnityBlocks implements ContentList{
                 new PartStat(PartStatType.mass, 1), new PartStat(PartStatType.collides, false), new PartStat(PartStatType.hp, 40)
             );
             addGraph(new GraphTorque(0.03f, 5f).setAccept(1, 0, 0, 0));
+        }};
+
+        smallTurret = new ModularTurret("small-turret-base"){{
+            requirements(Category.turret, with(Items.graphite, 20, UnityItems.nickel, 30, Items.copper, 30));
+            size = 2;
+            health = 1200;
+            setGridW(3);
+            setGridH(3);
+            spriteGridSize = 18;
+            spriteGridPadding = 3;
+            yScale = 0.8f;
+            addGraph(new GraphTorque(0.03f, 50f).setAccept(1, 1, 0, 0, 0, 0, 0, 0, 0, 0));
+            addGraph(new GraphHeat(50f, 0.1f, 0.01f).setAccept(1, 1, 1, 1, 1, 1, 1, 1));
+        }};
+
+        medTurret = new ModularTurret("med-turret-base"){{
+            requirements(Category.turret, with(Items.graphite, 25, UnityItems.nickel, 30, Items.titanium, 50, Items.silicon, 40));
+            size = 3;
+            health = 1200;
+            acceptsItems = true;
+            setGridW(5);
+            setGridH(5);
+            spriteGridSize = 16;
+            spriteGridPadding = 4;
+            yShift = 0.8f;
+            yScale = 0.8f;
+            partCostAccum = 0.12f;
+            addGraph(new GraphTorque(0.05f, 150f).setAccept(0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
+            addGraph(new GraphHeat(120f, 0.05f, 0.02f).setAccept(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1));
         }};
 
         //endregion
