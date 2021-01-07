@@ -38,7 +38,7 @@ const script = [
     {
         name: "libraries",
         childs: [
-          "factions",
+            "factions",
             {
                 name: "light",
                 childs: [
@@ -96,7 +96,7 @@ const script = [
             "cruciblelib",
             "turretmodui",
 			"modularparts",
-      "sparkle"
+            "sparkle"
         ]
     },
 
@@ -393,6 +393,7 @@ const script = [
                 name: "producers",
                 childs: [
                     "augerdrill",
+                    "augerextractor",
                     "crucible",
 					"sporepyro",
 					"sporefarm"
