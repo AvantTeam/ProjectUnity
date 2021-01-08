@@ -140,7 +140,6 @@ public class AugerDrill extends Drill implements GraphBlockBase{
             gms.drawSelect();
         }
 
-        //
         @Override
         public void updatePre(){
             warmup = Math.min(1f, warmup);

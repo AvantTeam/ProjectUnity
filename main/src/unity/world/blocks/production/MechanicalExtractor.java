@@ -137,7 +137,6 @@ public class MechanicalExtractor extends SolidPump implements GraphBlockBase{
             gms.drawSelect();
         }
 
-        //
         @Override
         public void updatePre(){
             warmup = Math.min(1f, warmup);
