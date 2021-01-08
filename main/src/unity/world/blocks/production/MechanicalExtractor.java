@@ -30,8 +30,8 @@ public class MechanicalExtractor extends SolidPump implements GraphBlockBase{
         rotorRotateRegion = atlas.find(name + "-rotor-rotate");
         mbaseRegion = atlas.find(name + "-mbase");
         gearRegion = atlas.find(name + "-gear");
-        rotorRegion = atlas.find(name + "-rotate");
         overlayRegion = atlas.find(name + "-overlay");
+        rotateRegion = atlas.find(name + "-moving");
         for(int i = 0; i < 2; i++) topRegions[i] = atlas.find(name + "-top" + (i + 1));
     }
 
@@ -40,6 +40,11 @@ public class MechanicalExtractor extends SolidPump implements GraphBlockBase{
         super.setStats();
         graphs.setStats(stats);
         setStatsExt(stats);
+    }
+    
+    @Override
+    public TextureRegion[] icons(){
+        return new TextureRegion[]{atlas.find(name)};
     }
 
     @Override
@@ -145,16 +150,21 @@ public class MechanicalExtractor extends SolidPump implements GraphBlockBase{
             float shaftRot = rot * 2f;
             var offset = Geometry.d4(rotation + 1);
             Draw.rect(bottomRegions[variant], x, y);
+            
+            //Bottom rotor
             Draw.rect(rotorRegion, x, y, 360f - rot * 0.25f);
             UnityDrawf.drawRotRect(rotorRotateRegion, x, y, 24f, 3.5f, 3.5f, 450f - rot * 0.25f, shaftRot, shaftRot + 180f);
             UnityDrawf.drawRotRect(rotorRotateRegion, x, y, 24f, 3.5f, 3.5f, 450f - rot * 0.25f, shaftRot + 180f, shaftRot + 360f);
 
+            //Shaft
             Draw.rect(mbaseRegion, x, y, fixedRot);
-            UnityDrawf.drawRotRect(rotateRegion, x, y, 24f, 3.5f, 3.5f, fixedRot, rot, rot + 180f);
-            UnityDrawf.drawRotRect(rotateRegion, x, y, 24f, 3.5f, 3.5f, fixedRot, rot + 180f, rot + 360f);
+            UnityDrawf.drawRotRect(rotateRegion, x, y, 24f, 3.5f, 6f, fixedRot, rot, rot + 180f);
             Draw.rect(overlayRegion, x, y, fixedRot);
+            
+            //Gears
             Draw.rect(gearRegion, x + offset.x * 4f, y + offset.y * 4f, 360f - rot);
             Draw.rect(gearRegion, x - offset.x * 4f, y - offset.y * 4f, rot);
+            
             Draw.rect(topRegions[variant], x, y);
             drawTeamTop();
         }
