@@ -122,7 +122,7 @@ public class UnityBlocks implements ContentList{
 
     electricMotor,
 
-    augerDrill,
+    augerDrill, mechanicalExtractor,
 
     crucible, holdingCrucible, castingMold,//crucible
 
@@ -1164,6 +1164,15 @@ public class UnityBlocks implements ContentList{
             health = 1000;
             tier = 3;
             drillTime = 400f;
+            addGraph(new GraphTorqueConsume(45f, 8f, 0.03f, 0.15f).setAccept(0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0));
+        }};
+
+        mechanicalExtractor = new MechanicalExtractor("mechanical-extractor"){{
+            requirements(Category.production, with(Items.lead, 100, Items.copper, 75));
+            hasPower = false;
+            size = 3;
+            health = 1000;
+            pumpAmount = 0.35f;
             addGraph(new GraphTorqueConsume(45f, 8f, 0.03f, 0.15f).setAccept(0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0));
         }};
 

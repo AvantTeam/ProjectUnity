@@ -12,16 +12,14 @@ import unity.world.modules.*;
 
 import static arc.Core.atlas;
 
-public class AugerDrill extends Drill implements GraphBlockBase{
+public class MechanicalExtractor extends SolidPump implements GraphBlockBase{
     protected final Graphs graphs = new Graphs();
     final TextureRegion[] bottomRegions = new TextureRegion[2], topRegions = new TextureRegion[2];//bottom,top
     TextureRegion rotorRegion, rotorRotateRegion, mbaseRegion, gearRegion, rotateRegion, overlayRegion;//rotor,rotortexture,mbase,gear,moving,overlaysprite
 
-    public AugerDrill(String name){
+    public MechanicalExtractor(String name){
         super(name);
         rotate = true;
-        hasLiquids = false;
-        liquidBoostIntensity = 1f;
     }
 
     @Override
@@ -55,7 +53,7 @@ public class AugerDrill extends Drill implements GraphBlockBase{
         return graphs;
     }
 
-    public class ArguerDrillBuild extends DrillBuild implements GraphBuildBase{
+    public class MechanicalExtractorBuild extends SolidPumpBuild implements GraphBuildBase{
         protected GraphModules gms;
 
         @Override
