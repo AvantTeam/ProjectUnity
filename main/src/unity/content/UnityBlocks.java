@@ -1124,6 +1124,7 @@ public class UnityBlocks implements ContentList{
             requirements(Category.power, BuildVisibility.sandboxOnly, with());
             health = 200;
             preserveDraw = true;
+            rotate = false;
             addGraph(new GraphTorqueGenerate(0.001f, 1f, 999999f, 9999f).setAccept(1, 1, 1, 1));
         }};
 
