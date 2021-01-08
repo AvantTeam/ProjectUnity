@@ -15,7 +15,7 @@ import static arc.Core.atlas;
 public class MechanicalExtractor extends SolidPump implements GraphBlockBase{
     protected final Graphs graphs = new Graphs();
     final TextureRegion[] bottomRegions = new TextureRegion[2], topRegions = new TextureRegion[2];//bottom,top
-    TextureRegion rotorRegion, rotorRotateRegion, mbaseRegion, gearRegion, rotateRegion, overlayRegion;//rotor,rotortexture,mbase,gear,moving,overlaysprite
+    TextureRegion rotorRegion, rotorRotateRegion, mbaseRegion, wormDrive, gearRegion, rotateRegion, overlayRegion;//rotor,rotortexture,mbase,rotate,gear,moving,overlaysprite
 
     public MechanicalExtractor(String name){
         super(name);
@@ -32,6 +32,7 @@ public class MechanicalExtractor extends SolidPump implements GraphBlockBase{
         gearRegion = atlas.find(name + "-gear");
         overlayRegion = atlas.find(name + "-overlay");
         rotateRegion = atlas.find(name + "-moving");
+        wormDrive = atlas.find(name + "-rotate");
         for(int i = 0; i < 2; i++) topRegions[i] = atlas.find(name + "-top" + (i + 1));
     }
 
@@ -158,7 +159,9 @@ public class MechanicalExtractor extends SolidPump implements GraphBlockBase{
 
             //Shaft
             Draw.rect(mbaseRegion, x, y, fixedRot);
-            UnityDrawf.drawRotRect(rotateRegion, x, y, 24f, 3.5f, 6f, fixedRot, rot, rot + 180f);
+            UnityDrawf.drawRotRect(wormDrive, x, y, 24f, 3.5f, 3.5f, fixedRot, rot, rot + 180f);
+            UnityDrawf.drawRotRect(wormDrive, x, y, 24f, 3.5f, 3.5f, fixedRot, rot + 180f, rot + 360f);
+            UnityDrawf.drawRotRect(rotateRegion, x, y, 24f, 3.5f, 3.5f, fixedRot, rot, rot + 180f);
             Draw.rect(overlayRegion, x, y, fixedRot);
             
             //Gears

@@ -15,7 +15,7 @@ import static arc.Core.atlas;
 public class AugerDrill extends Drill implements GraphBlockBase{
     protected final Graphs graphs = new Graphs();
     final TextureRegion[] bottomRegions = new TextureRegion[2], topRegions = new TextureRegion[2];//bottom,top
-    TextureRegion rotorRegion, rotorRotateRegion, mbaseRegion, gearRegion, rotateRegion, overlayRegion;//rotor,rotortexture,mbase,gear,moving,overlaysprite
+    TextureRegion oreRegion, rotorRegion, rotorRotateRegion, mbaseRegion, wormDrive, gearRegion, rotateRegion, overlayRegion;//ore,rotor,rotortexture,mbase,rotate,gear,moving,overlaysprite
 
     public AugerDrill(String name){
         super(name);
@@ -28,12 +28,14 @@ public class AugerDrill extends Drill implements GraphBlockBase{
     public void load(){
         super.load();
         for(int i = 0; i < 2; i++) bottomRegions[i] = atlas.find(name + "-bottom" + (i + 1));
+        oreRegion = atlas.find(name + "-ore");
         rotorRegion = atlas.find(name + "-rotor");
         rotorRotateRegion = atlas.find(name + "-rotor-rotate");
         mbaseRegion = atlas.find(name + "-mbase");
         gearRegion = atlas.find(name + "-gear");
         overlayRegion = atlas.find(name + "-overlay");
         rotateRegion = atlas.find(name + "-moving");
+        wormDrive = atlas.find(name + "-rotate");
         for(int i = 0; i < 2; i++) topRegions[i] = atlas.find(name + "-top" + (i + 1));
     }
 
@@ -153,6 +155,13 @@ public class AugerDrill extends Drill implements GraphBlockBase{
             var offset = Geometry.d4(rotation + 1);
             Draw.rect(bottomRegions[variant], x, y);
             
+            //Target Region
+            if(dominantItem != null && drawMineItem){
+                Draw.color(dominantItem.color);
+                Draw.rect(oreRegion, x, y);
+                Draw.color();
+            }
+            
             //Bottom rotor
             Draw.rect(rotorRegion, x, y, 360f - rot * 0.25f);
             UnityDrawf.drawRotRect(rotorRotateRegion, x, y, 24f, 3.5f, 3.5f, 450f - rot * 0.25f, shaftRot, shaftRot + 180f);
@@ -160,7 +169,9 @@ public class AugerDrill extends Drill implements GraphBlockBase{
 
             //Shaft
             Draw.rect(mbaseRegion, x, y, fixedRot);
-            UnityDrawf.drawRotRect(rotateRegion, x, y, 24f, 3.5f, 6f, fixedRot, rot, rot + 180f);
+            UnityDrawf.drawRotRect(wormDrive, x, y, 24f, 3.5f, 3.5f, fixedRot, rot, rot + 180f);
+            UnityDrawf.drawRotRect(wormDrive, x, y, 24f, 3.5f, 3.5f, fixedRot, rot + 180f, rot + 360f);
+            UnityDrawf.drawRotRect(rotateRegion, x, y, 24f, 3.5f, 3.5f, fixedRot, rot, rot + 180f);
             Draw.rect(overlayRegion, x, y, fixedRot);
             
             //Gears
