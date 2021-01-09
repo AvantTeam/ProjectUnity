@@ -22,7 +22,8 @@ public final class ContributorList{
             "Txar",
             "Xelo",
             "Xusk",
-            "younggam"
+            "younggam",
+            "MEEP of Faith"
         );
         contributors.get(ContributionType.contributor.ordinal()).addAll(
             // will always be empty...
