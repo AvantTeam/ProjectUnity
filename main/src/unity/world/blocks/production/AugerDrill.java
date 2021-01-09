@@ -150,6 +150,7 @@ public class AugerDrill extends Drill implements GraphBlockBase{
             float rot = torque().getRotation();
             float fixedRot = (rotdeg() + 90f) % 180f - 90f;
             int variant = rotation % 2;
+            float deg = rotation == 0 || rotation == 3 ? rot : -rot;
             float shaftRot = rot * 2f;
             var offset = Geometry.d4(rotation + 1);
             Draw.rect(bottomRegions[variant], x, y);
@@ -174,8 +175,8 @@ public class AugerDrill extends Drill implements GraphBlockBase{
             Draw.rect(overlayRegion, x, y, fixedRot);
             
             //Gears
-            Draw.rect(gearRegion, x + offset.x * 4f, y + offset.y * 4f, 360f - rot);
-            Draw.rect(gearRegion, x - offset.x * 4f, y - offset.y * 4f, rot);
+            Draw.rect(gearRegion, x + offset.x * 4f, y + offset.y * 4f, -deg/2);
+            Draw.rect(gearRegion, x - offset.x * 4f, y - offset.y * 4f, deg/2);
             
             Draw.rect(topRegions[variant], x, y);
             drawTeamTop();

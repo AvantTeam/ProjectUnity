@@ -4,6 +4,9 @@ import arc.graphics.g2d.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.util.io.*;
+import arc.util.*;
+import arc.math.*;
+import mindustry.graphics.*;
 import mindustry.world.blocks.production.*;
 import unity.graphics.*;
 import unity.world.blocks.*;
@@ -15,7 +18,7 @@ import static arc.Core.atlas;
 public class MechanicalExtractor extends SolidPump implements GraphBlockBase{
     protected final Graphs graphs = new Graphs();
     final TextureRegion[] bottomRegions = new TextureRegion[2], topRegions = new TextureRegion[2];//bottom,top
-    TextureRegion rotorRegion, rotorRotateRegion, mbaseRegion, wormDrive, gearRegion, rotateRegion, overlayRegion;//rotor,rotortexture,mbase,rotate,gear,moving,overlaysprite
+    TextureRegion rotorRegion, mbaseRegion, wormDrive, gearRegion, rotateRegion, overlayRegion;//rotor,mbase,rotate,gear,moving,overlaysprite
 
     public MechanicalExtractor(String name){
         super(name);
@@ -27,7 +30,6 @@ public class MechanicalExtractor extends SolidPump implements GraphBlockBase{
         super.load();
         for(int i = 0; i < 2; i++) bottomRegions[i] = atlas.find(name + "-bottom" + (i + 1));
         rotorRegion = atlas.find(name + "-rotor");
-        rotorRotateRegion = atlas.find(name + "-rotor-rotate");
         mbaseRegion = atlas.find(name + "-mbase");
         gearRegion = atlas.find(name + "-gear");
         overlayRegion = atlas.find(name + "-overlay");
@@ -147,14 +149,19 @@ public class MechanicalExtractor extends SolidPump implements GraphBlockBase{
             float rot = torque().getRotation();
             float fixedRot = (rotdeg() + 90f) % 180f - 90f;
             int variant = rotation % 2;
+            float deg = rotation == 0 || rotation == 3 ? rot : -rot;
+            float rev = rotation == 0 || rotation == 3 ? 24 : -24;
             float shaftRot = rot * 2f;
             var offset = Geometry.d4(rotation + 1);
             Draw.rect(bottomRegions[variant], x, y);
             
-            //Bottom rotor
-            Draw.rect(rotorRegion, x, y, 360f - rot * 0.25f);
-            UnityDrawf.drawRotRect(rotorRotateRegion, x, y, 24f, 3.5f, 3.5f, 450f - rot * 0.25f, shaftRot, shaftRot + 180f);
-            UnityDrawf.drawRotRect(rotorRotateRegion, x, y, 24f, 3.5f, 3.5f, 450f - rot * 0.25f, shaftRot + 180f, shaftRot + 360f);
+            //Liquid
+            Drawf.liquid(liquidRegion, x, y, liquids.total() / liquidCapacity, liquids.current().color);
+            
+            //Bottom rotors
+            Draw.rect(rotorRegion, x + offset.x * 4f, y + offset.y * 4f, rev, 24,-deg/2);
+            Draw.rect(rotorRegion, x - offset.x * 4f, y - offset.y * 4f, -rev, 24, deg/2 + 90);
+            
 
             //Shaft
             Draw.rect(mbaseRegion, x, y, fixedRot);
@@ -164,8 +171,8 @@ public class MechanicalExtractor extends SolidPump implements GraphBlockBase{
             Draw.rect(overlayRegion, x, y, fixedRot);
             
             //Gears
-            Draw.rect(gearRegion, x + offset.x * 4f, y + offset.y * 4f, 360f - rot);
-            Draw.rect(gearRegion, x - offset.x * 4f, y - offset.y * 4f, rot);
+            Draw.rect(gearRegion, x + offset.x * 4f, y + offset.y * 4f, -deg/2);
+            Draw.rect(gearRegion, x - offset.x * 4f, y - offset.y * 4f, deg/2);
             
             Draw.rect(topRegions[variant], x, y);
             drawTeamTop();
