@@ -17,7 +17,7 @@ public class CloudBulletType extends BasicBulletType{
     /** Trail spawn randomness */
     public float trailRand = 0.6f;
     /** Smoke spawn randomness */
-    public float smokeRand = 0.6f;
+    public float smokeRand = 1.7f;
 
     public CloudBulletType(float speed, float damage){
         super(speed, damage);
