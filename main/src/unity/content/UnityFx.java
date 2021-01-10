@@ -164,6 +164,24 @@ public class UnityFx{
 
         z();
     }),
+    
+    surgeBomb = new Effect(40f, 100f, e -> {
+        color(Pal.surge);
+        Lines.stroke(e.fout() * 2);
+        Lines.circle(e.x, e.y, 4 + e.finpow() * 65);
+
+        color(Pal.surge);
+
+        for(var i = 0; i < 4; i++){
+            Drawf.tri(e.x, e.y, 6, 100 * e.fout(), i*90);
+        }
+
+        color();
+
+        for(var i = 0; i < 4; i++){
+            Drawf.tri(e.x, e.y, 3, 35 * e.fout(), i*90);
+        }
+    }),
 
     oracleChage = new Effect(30f, e -> {
         color(Pal.lancerLaser);

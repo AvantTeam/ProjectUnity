@@ -64,7 +64,7 @@ public class UnityBlocks implements ContentList{
     darkWall, darkWallLarge;
 
     public static @FactionDef(type = "imber")
-    Block orb, shockwire, current, plasma, shielder,
+    Block orb, shockwire, current, plasma, electrobomb, shielder,
 
     sparkAlloyForge,
 
@@ -602,6 +602,32 @@ public class UnityBlocks implements ContentList{
             shots = 1;
             consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability <= 0.1f, 0.52f)).boost();
         }};
+
+        electrobomb = new ItemTurret("electrobomb"){
+            @Override
+            public void load(){
+                super.load();
+                baseRegion = atlas.find("unity-block-" + size);
+            }
+            
+            {
+                requirements(Category.turret, with(Items.titanium, 360, Items.thorium, 630, Items.silicon, 240, UnityItems.sparkAlloy, 420));
+                size = 5;
+                range = 400f;
+                minRange = 60f;
+                reloadTime = 320f;
+                coolantMultiplier = 2f;
+                shootCone = 20f;
+                shots = 1;
+                inaccuracy = 0f;
+                targetAir = false;
+                ammo(UnityItems.sparkAlloy, UnityBullets.surgeBomb);
+                shootSound = Sounds.laser;
+                shootEffect = Fx.none;
+                smokeEffect = Fx.none;
+                consumes.powerCond(10f, TurretBuild::isActive);
+            }
+        };
 
         shielder = new ShieldTurret("shielder"){{
             requirements(Category.turret, with(Items.copper, 300, Items.lead, 100, Items.titanium, 160, Items.silicon, 240, UnityItems.sparkAlloy, 90));
