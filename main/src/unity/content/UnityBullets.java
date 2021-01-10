@@ -25,10 +25,11 @@ import static mindustry.Vars.*;
 import static mindustry.graphics.Drawf.*;
 import static mindustry.graphics.Pal.*;
 import static unity.content.UnityFx.*;
+import static unity.content.UnityStatusEffects.*;
 
 public class UnityBullets implements ContentList{
     public static BulletType laser, coalBlaze, pyraBlaze, falloutLaser, catastropheLaser, calamityLaser, extinctionLaser, orb, shockBeam, currentStroke,
-        shielderBullet, plasmaFragTriangle, plasmaTriangle, surgeBomb, pylonLightning, pylonLaser, pylonLaserSmall, exporb, monumentRailBullet, scarShrapnel, scarMissile;
+        shielderBullet, plasmaFragTriangle, plasmaTriangle, surgeBomb, pylonLightning, pylonLaser, pylonLaserSmall, exporb, monumentRailBullet, scarShrapnel, scarMissile, celsiusCloud, kelvinCloud;
 
     //only enhanced
     public static BasicBulletType standardDenseLarge, standardHomingLarge, standardIncendiaryLarge, standardThoriumLarge, standardDenseHeavy, standardHomingHeavy, standardIncendiaryHeavy, standardThoriumHeavy, standardDenseMassive, standardHomingMassive,
@@ -427,6 +428,38 @@ public class UnityBullets implements ContentList{
             weaveScale = 6f;
             pierceBuilding = true;
             pierceCap = 3;
+        }};
+        
+        celsiusCloud = new CloudBulletType(4.7f, 32f){{
+            drag = 0.034f;
+            lifetime = 18f;
+            hitSize = 4f;
+            shootEffect = Fx.none;
+            smokeEffect = Fx.none;
+            hitEffect = UnityFx.hitAdvanceFlame;
+            despawnEffect = Fx.none;
+            collides = true;
+            collidesTiles = true;
+            collidesAir = true;
+            pierce = true;
+            statusDuration = 770f;
+            status = UnityStatusEffects.blueBurn;
+        }};
+        
+        kelvinCloud = new CloudBulletType(4.7f, 16f){{
+            drag = 0.016f;
+            lifetime = 32f;
+            hitSize = 4f;
+            shootEffect = Fx.none;
+            smokeEffect = Fx.none;
+            hitEffect = UnityFx.hitAdvanceFlame;
+            despawnEffect = Fx.none;
+            collides = true;
+            collidesTiles = true;
+            collidesAir = true;
+            pierce = true;
+            statusDuration = 770f;
+            status = UnityStatusEffects.blueBurn;
         }};
 
         //only enhanced
