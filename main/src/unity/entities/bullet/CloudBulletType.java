@@ -33,7 +33,7 @@ public class CloudBulletType extends BasicBulletType{
         
         if(b.timer.get(0, 1)){
             UnityFx.advanceFlameTrail.at(b.x + Mathf.range(trailRand), b.y + Mathf.range(trailRand), b.rotation());
-		};
+		}
 		
 		if(Mathf.chanceDelta(0.7f)){
             UnityFx.advanceFlameSmoke.at(b.x + Mathf.range(smokeRand), b.y + Mathf.range(smokeRand), b.rotation());

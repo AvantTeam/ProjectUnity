@@ -20,6 +20,7 @@ public class WaterTurbin extends ArmoredConduit implements GraphBlockBase{
     final TextureRegion[] topRegions = new TextureRegion[4], bottomRegions = new TextureRegion[2], liquidRegions = new TextureRegion[2];//topsprite,base,liquidsprite
     TextureRegion rotorRegion;//rotor
     protected final Graphs graphs = new Graphs();
+    public float requiredLiquid = 0.001f;
 
     public WaterTurbin(String name){
         super(name);
@@ -151,7 +152,11 @@ public class WaterTurbin extends ArmoredConduit implements GraphBlockBase{
             smoothLiquid = Mathf.lerpDelta(smoothLiquid, liquids.currentAmount() / liquidCapacity, 0.05f);
             if(liquids.total() > 0.001f && timer(timerFlow, 1f)) flowRate = moveLiquidForward(leaks, liquids.current());
             float mul = flow / 100f;
-            if(mul > 1f) mul = 0.5f * Mathf.log2(mul) + 1f;
+            if(mul > 1f && liquids.total() > requiredLiquid){
+                mul = 0.5f * Mathf.log2(mul) + 1f;
+            }else{
+                mul = 0;
+            }
             torque().setMotorForceMult(mul);
         }
 

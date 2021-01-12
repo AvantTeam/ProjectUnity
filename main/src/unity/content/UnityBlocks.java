@@ -1173,6 +1173,7 @@ public class UnityBlocks implements ContentList{
             health = 1100;
             liquidCapacity = 250f;
             liquidPressure = 0.3f;
+            requiredLiquid = 3;
             disableOgUpdate();
             addGraph(new GraphTorqueGenerate(0.15f, 20f, 7f, 15f).setAccept(0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0));
         }};
@@ -1199,7 +1200,8 @@ public class UnityBlocks implements ContentList{
             hasPower = false;
             size = 3;
             health = 1000;
-            pumpAmount = 0.35f;
+            pumpAmount = 0.4f;
+            
             addGraph(new GraphTorqueConsume(45f, 8f, 0.03f, 0.15f).setAccept(0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0));
         }};
 
