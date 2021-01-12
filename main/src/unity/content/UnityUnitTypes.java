@@ -20,6 +20,7 @@ import mindustry.world.blocks.units.UnitFactory.*;
 import unity.ai.*;
 import unity.annotations.Annotations.*;
 import unity.entities.abilities.*;
+import unity.entities.abilities.TouhouWeaponsAbility.*;
 import unity.entities.bullet.*;
 import unity.entities.comp.*;
 import unity.entities.units.*;
@@ -73,6 +74,8 @@ public class UnityUnitTypes implements ContentList{
     /** Monolith {@linkplain LegsUnit legs} units */
     public static @FactionDef(type = "monolith") @EntityPoint(type = LegsUnit.class)
     UnitType pylon, monument, colossus;
+
+    public static UnitType sakuya;
 
     //public static @FactionDef(type = "end") UnitType devourer;
 
@@ -1904,6 +1907,98 @@ public class UnityUnitTypes implements ContentList{
                     lightningColor = Pal.lancerLaser;
                 }};
             }});
+        }};
+
+        //endregion
+        //region misc
+
+        setEntity("sakuya", UnitEntity::create);
+        sakuya = new UnityUnitType("sakuya"){{
+            health = 2000f;
+            flying = true;
+            hovering = true;
+            drag = 0.2f;
+            speed = 5f;
+            rotateSpeed = 4f;
+            accel = 0.6f;
+            ammoType = AmmoTypes.powerHigh;
+
+            //fake weapon for turning
+            weapons.add(new Weapon(){{
+                bullet = new BulletType(6f, 0f){{
+                    instantDisappear = true;
+                    collides = false;
+                    collidesAir = false;
+                    collidesTiles = false;
+                    collidesGround = false;
+                }};
+            }});
+
+            float scl = 2f;
+            float spreadB = 45f;
+
+            //bullets are temporary
+            TouhouWeapon main = new TouhouWeapon(){{
+                focusedPosition.set(4f * scl, 4f * scl);
+                unfocusedPosition.set(4f * scl, 4f * scl);
+                mirror = true;
+                shouldDraw = false;
+                bullet = Bullets.standardDenseBig;
+                reload = 5f;
+                unfReload = 5f;
+            }};
+
+            TouhouWeapon secondary = new TouhouWeapon(){{
+                mirror = false;
+                unfocusedPosition.set(0f, -8f * scl);
+                focusedPosition.set(0f, 8f * scl);
+                unfocusedShots = 2;
+                unfocusedSpacing = spreadB * 2f;
+                reload = 10f;
+                unfReload = 10f;
+                bullet = Bullets.standardIncendiaryBig;
+            }};
+
+            TouhouWeaponState[] states = {
+                new TouhouWeaponState(main, secondary),
+                new TouhouWeaponState(main, new TouhouWeapon(secondary){{
+                    mirror = true;
+                    unfocusedPosition.set(8f * scl, -4f * scl);
+                    focusedPosition.set(8f * scl, 4f * scl);
+                    offsetAngle = 7f;
+                    unfocusedSpacing = spreadB;
+                    unfocusedOffset = -(spreadB / 2f);
+                }}),
+                new TouhouWeaponState(main, new TouhouWeapon(secondary){{
+                    unfocusedPosition.set(0f, -8f * scl);
+                    focusedPosition.set(0f, 6f * scl);
+                }}, new TouhouWeapon(secondary){{
+                    mirror = true;
+                    unfocusedPosition.set(8f * scl, 0f);
+                    focusedPosition.set(8f * scl, 9f * scl);
+                    offsetAngle = 7f;
+                    unfocusedSpacing = spreadB;
+                    unfocusedOffset = -(spreadB / 2f);
+                }}),
+                new TouhouWeaponState(main, new TouhouWeapon(secondary){{
+                    mirror = true;
+                    unfocusedPosition.set(8f * scl, -4f * scl);
+                    focusedPosition.set(7f * scl, 6f * scl);
+                    offsetAngle = 7f;
+                    unfocusedSpacing = spreadB;
+                    unfocusedOffset = -(spreadB / 2f);
+                }},
+                new TouhouWeapon(secondary){{
+                    mirror = true;
+                    unfocusedPosition.set(16f * scl, -7f * scl);
+                    focusedPosition.set(14f * scl, 9f * scl);
+                    offsetAngle = 7f;
+                    unfocusedSpacing = spreadB;
+                    unfocusedOffset = -(spreadB / 2f);
+                }})
+            };
+
+            abilities.add(new TouhouWeaponsAbility(states));
         }};
 
         //endregion
