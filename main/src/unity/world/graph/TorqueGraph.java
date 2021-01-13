@@ -28,7 +28,7 @@ public class TorqueGraph<T extends GraphTorque> extends BaseGraph<GraphTorqueMod
 
     @Override
     void updateGraph(){
-        float netForce = lastGrossForceApplied - lastFrictionCoefficient * lastVelocity * lastVelocity;
+        float netForce = lastGrossForceApplied - lastFrictionCoefficient;
         lastNetForceApplied = netForce;
         float acceleration = lastInertia == 0f ? 0f : netForce / lastInertia;
         lastVelocity += acceleration * Time.delta;
