@@ -596,32 +596,7 @@ public class UnityUnitTypes implements ContentList{
                         }};
                     }
                 };
-            }}, new Weapon("unity-gummy-main-sapper"){
-                {
-                    x = 10.25f;
-                    y = -23.25f;
-                    shootY = 8f;
-                    shootSound = Sounds.laser;
-                    reload = 30f;
-                    rotate = true;
-                    bullet = new LaserBulletType(98f){
-                        @Override
-                        public void hit(Bullet b, float x, float y){
-                            super.hit(b, x, y);
-                            if(Mathf.chance(0.3f)) Lightning.create(b, UnityPal.purpleLightning, 12f, x, y, Mathf.range(30f) + b.rotation(), 7);
-                        }
-
-                        {
-                            colors = new Color[]{Color.valueOf("a96bfa80"), UnityPal.purpleLightning, Color.white};
-                            length = 195f;
-                            ammoMultiplier = 6f;
-                            width = 19f;
-                            drawSize = length * 2f + 20f;
-                        }
-                    };
-                }
-            });
-            weapons.add(weapons.get(1).copy(), new Weapon(name + "-main-laser"){{
+            }}, new Weapon(name + "-main-laser"){{
                 x = 18.75f;
                 y = -11f;
                 shootY = 19f;
@@ -648,11 +623,37 @@ public class UnityUnitTypes implements ContentList{
                         drawSize = length * 2f + 20f;
                     }
                 };
-            }});
-            Weapon temp = weapons.get(2);
-            temp.x = -17f;
-            temp.y = -18.5f;
-            temp.flipSprite = true;
+            }}, new Weapon("unity-gummy-main-sapper"){
+                {
+                    x = -17f;
+                    y = -18.5f;
+                    shootY = 8f;
+                    shootSound = Sounds.laser;
+                    reload = 30f;
+                    rotate = true;
+                    flipSprite = true;
+                    bullet = new LaserBulletType(98f){
+                        @Override
+                        public void hit(Bullet b, float x, float y){
+                            super.hit(b, x, y);
+                            if(Mathf.chance(0.3f)) Lightning.create(b, UnityPal.purpleLightning, 12f, x, y, Mathf.range(30f) + b.rotation(), 7);
+                        }
+
+                        {
+                            colors = new Color[]{Color.valueOf("a96bfa80"), UnityPal.purpleLightning, Color.white};
+                            length = 195f;
+                            ammoMultiplier = 6f;
+                            width = 19f;
+                            drawSize = length * 2f + 20f;
+                        }
+                    };
+                }
+            });
+            weapons.add(weapons.get(2).copy());
+            Weapon temp = weapons.get(3);
+            temp.x = 10.25f;
+            temp.y = -23.25f;
+            temp.flipSprite = false;
         }};
 
         //endregion
@@ -676,7 +677,29 @@ public class UnityUnitTypes implements ContentList{
             trailScl = 1.75f;
             rotateShooting = true;
             abilities.add(new ForceFieldAbility(65f, 0.1f, 300f, 450f));
-            weapons.add(new Weapon(name + "-main"){{
+            weapons.add(new Weapon("missiles-mount"){{
+                reload = 35f;
+                x = 3.5f;
+                y = 5f;
+                shots = 3;
+                shotDelay = 3f;
+                inaccuracy = 5f;
+                rotate = true;
+                shake = 3f;
+                rotateSpeed = 4f;
+                bullet = new MissileBulletType(3f, 3f){{
+                    lifetime = 49f;
+                    splashDamageRadius = 35f;
+                    splashDamage = 20f;
+                    weaveScale = 8f;
+                    weaveMag = 1f;
+                    despawnEffect = Fx.blastExplosion;
+                    width = height = 9f;
+                    backColor = Pal.bulletYellowBack;
+                    frontColor = Pal.bulletYellow;
+                    trailColor = Color.gray;
+                }};
+            }}, new Weapon(name + "-main"){{
                 reload = 120f;
                 shootY = 7f;
                 x = 0f;
@@ -701,28 +724,6 @@ public class UnityUnitTypes implements ContentList{
                     shake = 4.5f;
                     statusDuration = 60f * 10f;
                 }};
-            }}, new Weapon("missiles-mount"){{
-                reload = 35f;
-                x = 3.5f;
-                y = 5f;
-                shots = 3;
-                shotDelay = 3f;
-                inaccuracy = 5f;
-                rotate = true;
-                shake = 3f;
-                rotateSpeed = 4f;
-                bullet = new MissileBulletType(3f, 3f){{
-                    lifetime = 49f;
-                    splashDamageRadius = 35f;
-                    splashDamage = 20f;
-                    weaveScale = 8f;
-                    weaveMag = 1f;
-                    despawnEffect = Fx.blastExplosion;
-                    width = height = 9f;
-                    backColor = Pal.bulletYellowBack;
-                    frontColor = Pal.bulletYellow;
-                    trailColor = Color.gray;
-                }};
             }});
         }};
 
@@ -743,27 +744,35 @@ public class UnityUnitTypes implements ContentList{
             trailLength = 45;
             trailScl = 2f;
             rotateShooting = true;
-            weapons.add(new Weapon(name + "-igniter"){{
-                shootSound = Sounds.laser;
-                shadow = 20f;
-                shootY = 10f;
-                reload = 170f;
-                x = 0f;
-                y = -2f;
+            Weapon missile1 = new Weapon("missiles-mount"){{
+                reload = 45f;
+                x = 15f;
+                y = 12f;
                 rotate = true;
-                shake = 5f;
-                rotateSpeed = 1f;
-                mirror = false;
-                bullet = new LaserBulletType(155f){{
-                    sideAngle = 25f;
-                    sideWidth = 2f;
-                    sideLength = 25f;
-                    width = 25f;
-                    length = 220f;
-                    shootEffect = Fx.shockwave;
-                    colors = new Color[]{UnityPal.navalReddish, UnityPal.navalYellowish, Color.white};
+                shake = 2f;
+                rotateSpeed = 4f;
+                shots = 4;
+                shotDelay = 3f;
+                inaccuracy = 5f;
+                bullet = new MissileBulletType(3.5f, 5f){{
+                    lifetime = 49f;
+                    splashDamageRadius = 45f;
+                    splashDamage = 30f;
+                    weaveScale = 8f;
+                    weaveMag = 1f;
+                    despawnEffect = Fx.blastExplosion;
+                    width = height = 10f;
+                    backColor = Pal.bulletYellowBack;
+                    frontColor = Pal.bulletYellow;
+                    trailColor = Color.gray;
                 }};
-            }}, new Weapon(name + "-main"){{
+            }};
+            Weapon missile2 = missile1.copy();
+            missile2.reload = 35f;
+            missile2.x = 12f;
+            missile2.y = -8;
+            weapons.add(missile1, missile2,
+            new Weapon(name + "-main"){{
                 reload = 120f;
                 shootY = 7f;
                 x = 17f;
@@ -786,34 +795,27 @@ public class UnityUnitTypes implements ContentList{
                     shake = 4.5f;
                     statusDuration = 60f * 10f;
                 }};
-            }}, new Weapon("missiles-mount"){{
-                reload = 45f;
-                x = 15f;
-                y = 12f;
+            }}, new Weapon(name + "-igniter"){{
+                shootSound = Sounds.laser;
+                shadow = 20f;
+                shootY = 10f;
+                reload = 170f;
+                x = 0f;
+                y = -2f;
                 rotate = true;
-                shake = 2f;
-                rotateSpeed = 4f;
-                shots = 4;
-                shotDelay = 3f;
-                inaccuracy = 5f;
-                bullet = new MissileBulletType(3.5f, 5f){{
-                    lifetime = 49f;
-                    splashDamageRadius = 45f;
-                    splashDamage = 30f;
-                    weaveScale = 8f;
-                    weaveMag = 1f;
-                    despawnEffect = Fx.blastExplosion;
-                    width = height = 10f;
-                    backColor = Pal.bulletYellowBack;
-                    frontColor = Pal.bulletYellow;
-                    trailColor = Color.gray;
+                shake = 5f;
+                rotateSpeed = 1f;
+                mirror = false;
+                bullet = new LaserBulletType(155f){{
+                    sideAngle = 25f;
+                    sideWidth = 2f;
+                    sideLength = 25f;
+                    width = 25f;
+                    length = 220f;
+                    shootEffect = Fx.shockwave;
+                    colors = new Color[]{UnityPal.navalReddish, UnityPal.navalYellowish, Color.white};
                 }};
             }});
-            Weapon temp = weapons.get(2).copy();
-            temp.reload = 35f;
-            temp.x = 12f;
-            temp.y = -8;
-            weapons.add(temp);
         }};
 
         setEntity("amphibi-naval", TransUnitWaterMove::new);
