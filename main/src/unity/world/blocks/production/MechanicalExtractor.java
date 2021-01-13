@@ -76,7 +76,7 @@ public class MechanicalExtractor extends SolidPump implements GraphBlockBase{
 
         @Override
         public float efficiency(){
-            return super.efficiency() * gms.efficiency();
+            return super.efficiency() * gms.efficiency() * gms.efficiency();
         }
 
         @Override

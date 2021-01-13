@@ -151,6 +151,7 @@ public class WaterTurbin extends ArmoredConduit implements GraphBlockBase{
             smoothLiquid = Mathf.lerpDelta(smoothLiquid, liquids.currentAmount() / liquidCapacity, 0.05f);
             if(liquids.total() > 0.001f && timer(timerFlow, 1f)) flowRate = moveLiquidForward(leaks, liquids.current());
             float mul = flow / 100f;
+            if(mul < 0.4f) mul = 0f;
             if(mul > 1f) mul = 0.5f * Mathf.log2(mul) + 1f;
             torque().setMotorForceMult(mul);
         }
