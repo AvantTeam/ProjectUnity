@@ -20,7 +20,7 @@ import mindustry.world.blocks.units.UnitFactory.*;
 import unity.ai.*;
 import unity.annotations.Annotations.*;
 import unity.entities.abilities.*;
-import unity.entities.abilities.TouhouWeaponsAbility.*;
+import unity.entities.abilities.FloatingWeaponsAbility.*;
 import unity.entities.bullet.*;
 import unity.entities.comp.*;
 import unity.entities.units.*;
@@ -1926,6 +1926,9 @@ public class UnityUnitTypes implements ContentList{
             //fake weapon for turning
             weapons.add(new Weapon(){{
                 bullet = new BulletType(6f, 0f){{
+                    despawnEffect = Fx.none;
+                    hitEffect = Fx.none;
+                    shootEffect = Fx.none;
                     instantDisappear = true;
                     collides = false;
                     collidesAir = false;
@@ -1938,17 +1941,17 @@ public class UnityUnitTypes implements ContentList{
             float spreadB = 45f;
 
             //bullets are temporary
-            TouhouWeapon main = new TouhouWeapon(){{
+            FloatingWeapon main = new FloatingWeapon(){{
                 focusedPosition.set(4f * scl, 4f * scl);
                 unfocusedPosition.set(4f * scl, 4f * scl);
                 mirror = true;
                 shouldDraw = false;
-                bullet = Bullets.standardDenseBig;
+                bullet = UnityBullets.knifeMain;
                 reload = 5f;
                 unfReload = 5f;
             }};
 
-            TouhouWeapon secondary = new TouhouWeapon(){{
+            FloatingWeapon secondary = new FloatingWeapon(){{
                 mirror = false;
                 unfocusedPosition.set(0f, -8f * scl);
                 focusedPosition.set(0f, 8f * scl);
@@ -1956,12 +1959,13 @@ public class UnityUnitTypes implements ContentList{
                 unfocusedSpacing = spreadB * 2f;
                 reload = 10f;
                 unfReload = 10f;
-                bullet = Bullets.standardIncendiaryBig;
+                bullet = UnityBullets.knifeFocused;
+                unfBullet = UnityBullets.knifeUnfocused;
             }};
 
-            TouhouWeaponState[] states = {
-                new TouhouWeaponState(main, secondary),
-                new TouhouWeaponState(main, new TouhouWeapon(secondary){{
+            FloatingWeaponState[] states = {
+                new FloatingWeaponState(main, secondary),
+                new FloatingWeaponState(main, new FloatingWeapon(secondary){{
                     mirror = true;
                     unfocusedPosition.set(8f * scl, -4f * scl);
                     focusedPosition.set(8f * scl, 4f * scl);
@@ -1969,10 +1973,10 @@ public class UnityUnitTypes implements ContentList{
                     unfocusedSpacing = spreadB;
                     unfocusedOffset = -(spreadB / 2f);
                 }}),
-                new TouhouWeaponState(main, new TouhouWeapon(secondary){{
+                new FloatingWeaponState(main, new FloatingWeapon(secondary){{
                     unfocusedPosition.set(0f, -8f * scl);
                     focusedPosition.set(0f, 6f * scl);
-                }}, new TouhouWeapon(secondary){{
+                }}, new FloatingWeapon(secondary){{
                     mirror = true;
                     unfocusedPosition.set(8f * scl, 0f);
                     focusedPosition.set(8f * scl, 9f * scl);
@@ -1980,7 +1984,7 @@ public class UnityUnitTypes implements ContentList{
                     unfocusedSpacing = spreadB;
                     unfocusedOffset = -(spreadB / 2f);
                 }}),
-                new TouhouWeaponState(main, new TouhouWeapon(secondary){{
+                new FloatingWeaponState(main, new FloatingWeapon(secondary){{
                     mirror = true;
                     unfocusedPosition.set(8f * scl, -4f * scl);
                     focusedPosition.set(7f * scl, 6f * scl);
@@ -1988,7 +1992,7 @@ public class UnityUnitTypes implements ContentList{
                     unfocusedSpacing = spreadB;
                     unfocusedOffset = -(spreadB / 2f);
                 }},
-                new TouhouWeapon(secondary){{
+                new FloatingWeapon(secondary){{
                     mirror = true;
                     unfocusedPosition.set(16f * scl, -7f * scl);
                     focusedPosition.set(14f * scl, 9f * scl);
@@ -1998,7 +2002,7 @@ public class UnityUnitTypes implements ContentList{
                 }})
             };
 
-            abilities.add(new TouhouWeaponsAbility(states));
+            abilities.add(new FloatingWeaponsAbility(states), new TimeFreezeAbility());
         }};
 
         //endregion

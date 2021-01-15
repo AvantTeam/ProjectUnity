@@ -10,7 +10,7 @@ import mindustry.type.StatusEffect;
 import unity.graphics.UnityPal;
 
 public class UnityStatusEffects implements ContentList{
-    public static StatusEffect radiation, reloadFatigue, blueBurn, molten, tpCoolDown;
+    public static StatusEffect radiation, reloadFatigue, blueBurn, molten, tpCoolDown, slow;
 
     @Override
     public void load(){
@@ -62,6 +62,10 @@ public class UnityStatusEffects implements ContentList{
         tpCoolDown = new StatusEffect("tpcooldonw"){{
             color = UnityPal.diriumColor2;
             effect = Fx.none;
+        }};
+
+        slow = new StatusEffect("slow"){{
+            speedMultiplier = 0.4f;
         }};
     }
 }

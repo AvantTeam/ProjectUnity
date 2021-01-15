@@ -10,24 +10,25 @@ import mindustry.*;
 import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
+import unity.content.*;
 import unity.entities.*;
 import unity.type.*;
 
 import java.util.*;
 
-public class TouhouWeaponsAbility extends Ability{
-    public TouhouWeaponState[] stateType;
+public class FloatingWeaponsAbility extends Ability{
+    public FloatingWeaponState[] stateType;
     public float powerLimit = 700f;
     protected float focusLerp = 0f;
     protected float power = 0f;
     protected int changed = 0;
     protected float[] reloads;
 
-    public TouhouWeaponsAbility(TouhouWeaponState... states){
-        stateType = new TouhouWeaponState[states.length];
+    public FloatingWeaponsAbility(FloatingWeaponState... states){
+        stateType = new FloatingWeaponState[states.length];
         System.arraycopy(states, 0, stateType, 0, states.length);
         int tmpSizeB = 0;
-        for(TouhouWeaponState a : stateType){
+        for(FloatingWeaponState a : stateType){
             int tmpSize = a.types.length;
             tmpSizeB = Math.max(tmpSizeB, tmpSize);
         }
@@ -37,7 +38,7 @@ public class TouhouWeaponsAbility extends Ability{
 
     @Override
     public Ability copy(){
-        TouhouWeaponsAbility tmp = (TouhouWeaponsAbility)super.copy();
+        FloatingWeaponsAbility tmp = (FloatingWeaponsAbility)super.copy();
         tmp.reloads = Arrays.copyOf(reloads, reloads.length);
         return tmp;
     }
@@ -55,6 +56,7 @@ public class TouhouWeaponsAbility extends Ability{
         //TODO sync
         if(!Vars.headless && (Core.input.keyDown(KeyCode.shiftLeft) && unit.controller() == Vars.player)){
             focusLerp = Mathf.lerpDelta(focusLerp, 1f, 0.3f);
+            unit.apply(UnityStatusEffects.slow, 1f);
         }else{
             focusLerp = Mathf.lerpDelta(focusLerp, 0f, 0.3f);
         }
@@ -70,18 +72,18 @@ public class TouhouWeaponsAbility extends Ability{
         power = Math.min(powerLimit, power + amount);
     }
 
-    public static class TouhouWeaponState{
-        TouhouWeapon[] types;
+    public static class FloatingWeaponState{
+        FloatingWeapon[] types;
 
-        public TouhouWeaponState(TouhouWeapon... types){
-            this.types = new TouhouWeapon[types.length];
+        public FloatingWeaponState(FloatingWeapon... types){
+            this.types = new FloatingWeapon[types.length];
             System.arraycopy(types, 0, this.types, 0, types.length);
         }
 
-        public void draw(Unit unit, TouhouWeaponsAbility source){
+        public void draw(Unit unit, FloatingWeaponsAbility source){
             if(!(unit.type instanceof UnityUnitType)) return;
             TextureRegion region = ((UnityUnitType)unit.type).abilityRegions[AbilityTextures.shooter.ordinal()];
-            for(TouhouWeapon t : types){
+            for(FloatingWeapon t : types){
                 if(!t.shouldDraw) continue;
                 if(t.mirror){
                     for(int i : Mathf.signs){
@@ -95,10 +97,10 @@ public class TouhouWeaponsAbility extends Ability{
             }
         }
 
-        public void update(Unit unit, TouhouWeaponsAbility source){
+        public void update(Unit unit, FloatingWeaponsAbility source){
             int index = 0;
             boolean focused = source.focusLerp >= 0.5f;
-            for(TouhouWeapon t : types){
+            for(FloatingWeapon t : types){
                 source.reloads[index] += Time.delta * unit.reloadMultiplier();
                 float freload = focused ? t.reload : t.unfReload;
                 if(source.reloads[index] >= freload){
@@ -139,7 +141,7 @@ public class TouhouWeaponsAbility extends Ability{
         }
     }
 
-    public static class TouhouWeapon{
+    public static class FloatingWeapon{
         public int shots = 1;
         public int unfocusedShots = 1;
         public float spacing = 0f;
@@ -157,11 +159,11 @@ public class TouhouWeaponsAbility extends Ability{
         public boolean mirror = false;
         public boolean shouldDraw = true;
 
-        public TouhouWeapon(){
+        public FloatingWeapon(){
 
         }
 
-        public TouhouWeapon(TouhouWeapon other){
+        public FloatingWeapon(FloatingWeapon other){
             shots = other.shots;
             unfocusedShots = other.unfocusedShots;
             spacing = other.spacing;
