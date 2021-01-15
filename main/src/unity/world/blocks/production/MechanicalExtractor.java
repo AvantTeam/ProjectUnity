@@ -17,7 +17,7 @@ import static arc.Core.atlas;
 
 public class MechanicalExtractor extends SolidPump implements GraphBlockBase{
     protected final Graphs graphs = new Graphs();
-    final TextureRegion[] bottomRegions = new TextureRegion[2], topRegions = new TextureRegion[2];//bottom,top
+    final TextureRegion[] bottomRegions = new TextureRegion[2], topRegions = new TextureRegion[2], liquidRegions = new TextureRegion[2];//bottom,top
     TextureRegion rotorRegion, mbaseRegion, wormDrive, gearRegion, rotateRegion, overlayRegion;//rotor,mbase,rotate,gear,moving,overlaysprite
 
     public MechanicalExtractor(String name){
@@ -28,14 +28,17 @@ public class MechanicalExtractor extends SolidPump implements GraphBlockBase{
     @Override
     public void load(){
         super.load();
-        for(int i = 0; i < 2; i++) bottomRegions[i] = atlas.find(name + "-bottom" + (i + 1));
         rotorRegion = atlas.find(name + "-rotor");
         mbaseRegion = atlas.find(name + "-mbase");
         gearRegion = atlas.find(name + "-gear");
         overlayRegion = atlas.find(name + "-overlay");
         rotateRegion = atlas.find(name + "-moving");
         wormDrive = atlas.find(name + "-rotate");
-        for(int i = 0; i < 2; i++) topRegions[i] = atlas.find(name + "-top" + (i + 1));
+        for(int i = 0; i < 2; i++){
+            bottomRegions[i] = atlas.find(name + "-bottom" + (i + 1));
+            topRegions[i] = atlas.find(name + "-top" + (i + 1));
+            liquidRegions[i] = atlas.find(name + "-liquid" + (i + 1));
+        }
     }
 
     @Override
@@ -73,7 +76,7 @@ public class MechanicalExtractor extends SolidPump implements GraphBlockBase{
 
         @Override
         public float efficiency(){
-            return super.efficiency() * gms.efficiency();
+            return super.efficiency() * gms.efficiency() * gms.efficiency();
         }
 
         @Override
@@ -156,7 +159,7 @@ public class MechanicalExtractor extends SolidPump implements GraphBlockBase{
             Draw.rect(bottomRegions[variant], x, y);
             
             //Liquid
-            Drawf.liquid(liquidRegion, x, y, liquids.total() / liquidCapacity, liquids.current().color);
+            Drawf.liquid(liquidRegions[variant], x, y, liquids.total() / liquidCapacity, liquids.current().color);
             
             //Bottom rotors
             Draw.rect(rotorRegion, x + offset.x * 4f, y + offset.y * 4f, rev, 24,-deg/2);

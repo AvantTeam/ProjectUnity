@@ -1174,7 +1174,7 @@ public class UnityBlocks implements ContentList{
             liquidCapacity = 250f;
             liquidPressure = 0.3f;
             disableOgUpdate();
-            addGraph(new GraphTorqueGenerate(0.15f, 20f, 7f, 15f).setAccept(0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0));
+            addGraph(new GraphTorqueGenerate(0.3f, 20f, 7f, 15f).setAccept(0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0));
         }};
 
         electricMotor = new ElectricMotor("electric-motor"){{
@@ -1199,8 +1199,9 @@ public class UnityBlocks implements ContentList{
             hasPower = false;
             size = 3;
             health = 1000;
-            pumpAmount = 0.35f;
-            addGraph(new GraphTorqueConsume(45f, 8f, 0.03f, 0.15f).setAccept(0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0));
+            pumpAmount = 0.4f;
+            
+            addGraph(new GraphTorqueConsume(45f, 8f, 0.06f, 0.3f).setAccept(0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0));
         }};
 
         crucible = new Crucible("crucible"){{

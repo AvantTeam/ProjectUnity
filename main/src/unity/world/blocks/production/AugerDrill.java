@@ -14,8 +14,8 @@ import static arc.Core.atlas;
 
 public class AugerDrill extends Drill implements GraphBlockBase{
     protected final Graphs graphs = new Graphs();
-    final TextureRegion[] bottomRegions = new TextureRegion[2], topRegions = new TextureRegion[2];//bottom,top
-    TextureRegion oreRegion, rotorRegion, rotorRotateRegion, mbaseRegion, wormDrive, gearRegion, rotateRegion, overlayRegion;//ore,rotor,rotortexture,mbase,rotate,gear,moving,overlaysprite
+    final TextureRegion[] bottomRegions = new TextureRegion[2], topRegions = new TextureRegion[2], oreRegions = new TextureRegion[2];//bottom,top,ore
+    TextureRegion rotorRegion, rotorRotateRegion, mbaseRegion, wormDrive, gearRegion, rotateRegion, overlayRegion;//rotor,rotortexture,mbase,rotate,gear,moving,overlaysprite
 
     public AugerDrill(String name){
         super(name);
@@ -27,8 +27,6 @@ public class AugerDrill extends Drill implements GraphBlockBase{
     @Override
     public void load(){
         super.load();
-        for(int i = 0; i < 2; i++) bottomRegions[i] = atlas.find(name + "-bottom" + (i + 1));
-        oreRegion = atlas.find(name + "-ore");
         rotorRegion = atlas.find(name + "-rotor");
         rotorRotateRegion = atlas.find(name + "-rotor-rotate");
         mbaseRegion = atlas.find(name + "-mbase");
@@ -36,7 +34,11 @@ public class AugerDrill extends Drill implements GraphBlockBase{
         overlayRegion = atlas.find(name + "-overlay");
         rotateRegion = atlas.find(name + "-moving");
         wormDrive = atlas.find(name + "-rotate");
-        for(int i = 0; i < 2; i++) topRegions[i] = atlas.find(name + "-top" + (i + 1));
+        for(int i = 0; i < 2; i++){
+            bottomRegions[i] = atlas.find(name + "-bottom" + (i + 1));
+            topRegions[i] = atlas.find(name + "-top" + (i + 1));
+            oreRegions[i] = atlas.find(name + "-ore" + (i + 1));
+        }
     }
 
     @Override
@@ -158,7 +160,7 @@ public class AugerDrill extends Drill implements GraphBlockBase{
             //Target Region
             if(dominantItem != null && drawMineItem){
                 Draw.color(dominantItem.color);
-                Draw.rect(oreRegion, x, y);
+                Draw.rect(oreRegions[variant], x, y);
                 Draw.color();
             }
             
