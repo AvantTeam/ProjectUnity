@@ -78,6 +78,8 @@ public class UnityBlocks implements ContentList{
     steelConveyor, diriumConveyor,
 
     //laserTurret, inferno,
+    
+    daggerPad,
 
     teleporter, teleunit, expOutput, expUnloader, expTank, expChest, expFountain, expVoid;
 
@@ -793,6 +795,12 @@ public class UnityBlocks implements ContentList{
             speed = 0.16f;
             displayedSpeed = 20f;
             drawMultiplier = 1.3f;
+        }};
+        
+        daggerPad = new MechPad("dagger-pad"){{
+            requirements(Category.units, with(Items.copper, 75, Items.lead, 100, Items.graphite, 100));
+            size = 2;
+            consumes.power(0.5f);
         }};
 
         /*laserTurret = new ExpPowerTurret("laser-turret", 10){{
