@@ -167,8 +167,8 @@ public class UnityFx{
     
     surgeBomb = new Effect(40f, 100f, e -> {
         color(Pal.surge);
-        Lines.stroke(e.fout() * 2);
-        Lines.circle(e.x, e.y, 4 + e.finpow() * 65);
+        stroke(e.fout() * 2);
+        circle(e.x, e.y, 4 + e.finpow() * 65);
 
         color(Pal.surge);
 
@@ -286,12 +286,6 @@ public class UnityFx{
         color();
     }),
 
-    imberCircleSparkCraftingEffect = new Effect(30f, e -> {
-        color(Pal.surge);
-        stroke(e.fslope());
-        circle(e.x, e.y, e.fin() * 20f);
-    }),
-
     healLaser = new Effect(60f, e -> {
         if(!(e.data instanceof Position[] temp)) return;
         float[] reduction = new float[]{0f, 1.5f};
@@ -399,6 +393,51 @@ public class UnityFx{
             UnityDrawf.spark(e.x + x, e.y + y, e.fout() * 5f, e.fout() * 3.5f, e.id * integer);
             integer++;
         });
+    }),
+
+    imberCircleSparkCraftingEffect = new Effect(30f, e -> {
+        color(Pal.surge);
+        stroke(e.fslope());
+        circle(e.x, e.y, e.fin() * 20f);
+    }),
+    
+    waitFx = new Effect(30f, e -> {
+        // if(!isArray(e.data)) return; (I don't know how to translate this)
+        Object[] data = (Object[])e.data;
+        float whenReady = (float)data[0];
+        Unit u = (Unit)data[1];
+        if(u == null || !u.isValid() || u.dead) return;
+        z(Layer.effect - 0.00001f);
+        color(e.color);
+        stroke(e.fout() * 1.5f);
+        polySeg(60, 0, (int)(60 * (1 - (e.rotation - Time.time) / whenReady)), u.x, u.y, 8f, 0f);
+    }),
+
+    ringFx = new Effect(25f, e -> {
+        if(!(e.data instanceof Unit)) return;
+        Unit u = (Unit)e.data;
+        if(!u.isValid() || u.dead) return;
+        color(Color.white, e.color, e.fin());
+        stroke(e.fout() * 1.5f);
+        circle(u.x, u.y, 8f);
+    }),
+
+    smallRingFx = new Effect(20f, e -> {
+        if(!(e.data instanceof Unit)) return;
+        Unit u = (Unit)e.data;
+        if(!u.isValid() || u.dead) return;
+        color(Color.white, e.color, e.fin());
+        stroke(e.fin());
+        circle(u.x, u.y, e.fin() * 5f);
+    }),
+
+    squareFx = new Effect(25f, e -> {
+        if(!(e.data instanceof Unit)) return;
+        Unit u = (Unit)e.data;
+        if(!u.isValid() || u.dead) return;
+        color(Color.white, e.color, e.fin());
+        stroke(e.fout() * 2.5f);
+        square(u.x, u.y, e.fin() * 18f, 45f);
     }),
 
     expAbsorb = new Effect(15f, e -> {

@@ -79,7 +79,7 @@ public class UnityBlocks implements ContentList{
 
     //laserTurret, inferno,
     
-    daggerPad,
+    daggerPad, novaPad, bufferPad, cachePad,
 
     teleporter, teleunit, expOutput, expUnloader, expTank, expChest, expFountain, expVoid;
 
@@ -801,6 +801,30 @@ public class UnityBlocks implements ContentList{
             requirements(Category.units, with(Items.copper, 75, Items.lead, 100, Items.graphite, 100));
             size = 2;
             consumes.power(0.5f);
+        }};
+        
+        novaPad = new MechPad("nova-pad"){{
+            requirements(Category.units, with(Items.copper, 125, Items.lead, 125, Items.silicon, 50, Items.titanium, 50));
+            size = 2;
+            craftTime = 120f;
+            consumes.power(1f);
+            unitType = UnitTypes.nova;
+        }};
+        
+        bufferPad = new MechPad("buffer-pad"){{
+            requirements(Category.units, with(UnityItems.stone, 120, Items.copper, 100, Items.lead, 60, Items.silicon, 25));
+            size = 2;
+            craftTime = 300f;
+            consumes.power(0.7f);
+            unitType = UnityUnitTypes.buffer;
+        }};
+        
+        cachePad = new MechPad("cache-pad"){{
+            requirements(Category.units, with(UnityItems.stone, 150, Items.lead, 160, Items.silicon, 100, Items.titanium, 60, Items.plastanium, 50));
+            size = 2;
+            craftTime = 300f;
+            consumes.power(0.8f);
+            unitType = UnityUnitTypes.cache;
         }};
 
         /*laserTurret = new ExpPowerTurret("laser-turret", 10){{

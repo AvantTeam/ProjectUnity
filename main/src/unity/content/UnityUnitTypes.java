@@ -66,6 +66,14 @@ public class UnityUnitTypes implements ContentList{
     /** Imber 'whatever this is' units */
     public static @FactionDef(type = "imber")
     UnitType arcnelidia;
+    
+    /** Koruh {@linkplain MechUnit mech} units */
+    public static @FactionDef(type = "koruh") @EntityPoint(type = MechUnit.class)
+    UnitType buffer;
+    
+    /** Koruh {@linkplain UnitEntity flying} units */
+    public static @FactionDef(type = "koruh") @EntityPoint(type = UnitEntity.class)
+    UnitType cache;
 
     /** Monolith {@linkplain MechUnit mech} units */
     public static @FactionDef(type = "monolith") @EntityPoint(type = MechUnit.class)
@@ -1621,6 +1629,86 @@ public class UnityUnitTypes implements ContentList{
             }});
         }};
 
+        //endregion
+        //region koruh
+        
+        buffer = new UnityUnitType("buffer"){{
+            mineTier = 1;
+            speed = 0.75f;
+            boostMultiplier = 1.26f;
+            itemCapacity = 15;
+            health = 150;
+            buildSpeed = 0.9f;
+            //engineColor = Color.valueOf("d3ddff");
+            canBoost = true;
+            boostMultiplier = 1.5f;
+            weapons.add(new Weapon("unity-buffer-shotgun"){{
+                top = false;
+                shake = 2f;
+                x = y = -1f;
+                shootY = 1f;
+                shootX = -0.125f;
+                shootY = 3.5f;
+                reload = 55f;
+                shotDelay = 3f;
+                alternate = true;
+                shots = 2;
+                inaccuracy = 0f;
+                ejectEffect = Fx.none;
+                shootSound = Sounds.spark;
+                bullet = new LightningBulletType(){{
+                    damage = 12;
+                    shootEffect = Fx.hitLancer;
+                    smokeEffect = Fx.none;
+                    despawnEffect = Fx.none;
+                    hitEffect = Fx.hitLancer;
+                    keepVelocity = false;
+                }};
+            }});
+            abilities.add(new LightningBurstAbility(120f, 8, 8, 17f, 14, Pal.lancerLaser));
+        }};
+        
+        cache = new UnityUnitType("cache"){{
+            mineTier = -1;
+            speed = 7f;
+            drag = 0.001f;
+            health = 560;
+            flying = true;
+            armor = 6f;
+            accel = 0.02f;
+            weapons.add(new Weapon(){{
+                top = false;
+                shootY = 1.5f;
+                reload = 70f;
+                shots = 4;
+                inaccuracy = 2f;
+                alternate = true;
+                ejectEffect = Fx.none;
+                velocityRnd = 0.2f;
+                spacing = 1f;
+                shootSound = Sounds.missile;
+                bullet = new MissileBulletType(5f, 21f){{
+                    width = 8f;
+                    height = 8f;
+                    shrinkY = 0f;
+                    drag = -0.003f;
+                    keepVelocity = false;
+                    splashDamageRadius = 20f;
+                    splashDamage = 1f;
+                    lifetime = 60;
+                    trailColor = Color.valueOf("b6c6fd");
+                    hitEffect = Fx.blastExplosion;
+                    despawnEffect = Fx.blastExplosion;
+                    backColor = Pal.bulletYellowBack;
+                    frontColor = Pal.bulletYellow;
+                    weaveScale = 8f;
+                    weaveMag = 2f;
+                }};
+            }});
+            String shieldSprite = "unity-cache-shield";
+            abilities.add(new ShieldMoveLightningAbility(10f, 14, 0.15f, 4f, 3.6f, 6f, Pal.lancerLaser, shieldSprite));
+        }};
+        
         //endregion
         //region monolith
 
