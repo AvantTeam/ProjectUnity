@@ -526,6 +526,11 @@ public class UnityFx{
         Angles.randLenVectors(e.id, 2, e.finpow() * 13f, e.rotation, 60f, (x, y) -> Fill.poly(e.x + x, e.y + y, 6, e.fout() * 4.1f, e.rotation + e.fin() * rot));
     }),
 
+    teamConvertedEffect = new Effect(18, e -> {
+        Draw.color(UnityPal.advance, Color.white, e.fin());
+        Fill.square(e.x, e.y, 0.1f + e.fout() * 2.8f, 45f);
+    }),
+
     blueBurnEffect = new Effect(35f, e -> {
         Draw.color(UnityPal.advance, UnityPal.advanceDark, e.fin());
 

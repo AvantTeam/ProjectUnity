@@ -25,12 +25,10 @@ import static mindustry.Vars.*;
 import static mindustry.graphics.Drawf.*;
 import static mindustry.graphics.Pal.*;
 import static unity.content.UnityFx.*;
-import static unity.content.UnityStatusEffects.*;
 
 public class UnityBullets implements ContentList{
     public static BulletType laser, coalBlaze, pyraBlaze, falloutLaser, catastropheLaser, calamityLaser, extinctionLaser, orb, shockBeam, currentStroke,
-        shielderBullet, plasmaFragTriangle, plasmaTriangle, surgeBomb, pylonLightning, pylonLaser, pylonLaserSmall, exporb, monumentRailBullet, scarShrapnel, scarMissile, celsiusCloud, kelvinCloud,
-        knifeMain, knifeUnfocused, knifeFocused;
+        shielderBullet, plasmaFragTriangle, plasmaTriangle, surgeBomb, pylonLightning, pylonLaser, pylonLaserSmall, exporb, monumentRailBullet, scarShrapnel, scarMissile, celsiusCloud, kelvinCloud;
 
     //only enhanced
     public static BasicBulletType standardDenseLarge, standardHomingLarge, standardIncendiaryLarge, standardThoriumLarge, standardDenseHeavy, standardHomingHeavy, standardIncendiaryHeavy, standardThoriumHeavy, standardDenseMassive, standardHomingMassive,
@@ -461,30 +459,6 @@ public class UnityBullets implements ContentList{
             pierce = true;
             statusDuration = 770f;
             status = UnityStatusEffects.blueBurn;
-        }};
-
-        knifeMain = new BasicBulletType(8f, 80f, "unity-knife"){{
-            lifetime = 45f;
-            width = 21f;
-            height = 21f;
-            backColor = missileYellow;
-            frontColor = Color.white;
-        }};
-
-        knifeFocused = new BasicBulletType(8f, 70f, "unity-knife"){{
-            lifetime = 45f;
-            width = 21f;
-            height = 21f;
-            backColor = heal;
-            frontColor = Color.white;
-        }};
-
-        knifeUnfocused = new BasicBulletType(8f, 35f, "unity-knife"){{
-            lifetime = 45f;
-            width = 21f;
-            height = 21f;
-            backColor = lancerLaser;
-            frontColor = Color.white;
         }};
 
         //only enhanced

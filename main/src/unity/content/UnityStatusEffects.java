@@ -69,6 +69,7 @@ public class UnityStatusEffects implements ContentList{
             healthMultiplier = 0.35f;
             damageMultiplier = 0.4f;
             permanent = true;
+            effect = UnityFx.teamConvertedEffect;
             color = Color.valueOf("a3e3ff");
         }};
     }

@@ -1407,7 +1407,7 @@ public class UnityBlocks implements ContentList{
                 requirements(Category.turret, with(Items.lead, 640, Items.graphite, 740, Items.titanium, 560, Items.surgeAlloy, 650, Items.silicon, 720, Items.thorium, 400, UnityItems.xenium, 340, UnityItems.advanceAlloy, 640));
                 health = 7900;
                 size = 7;
-                reloadTime = 170f;
+                reloadTime = 230f;
                 range = 290f;
                 coolantMultiplier = 1.4f;
                 shootCone = 40f;
