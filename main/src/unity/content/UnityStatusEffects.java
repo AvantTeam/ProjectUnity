@@ -1,5 +1,6 @@
 package unity.content;
 
+import arc.graphics.*;
 import arc.math.Mathf;
 import arc.util.Time;
 import mindustry.content.*;
@@ -10,7 +11,7 @@ import mindustry.type.StatusEffect;
 import unity.graphics.UnityPal;
 
 public class UnityStatusEffects implements ContentList{
-    public static StatusEffect radiation, reloadFatigue, blueBurn, molten, tpCoolDown, slow;
+    public static StatusEffect radiation, reloadFatigue, blueBurn, molten, tpCoolDown, teamConverted;
 
     @Override
     public void load(){
@@ -64,8 +65,11 @@ public class UnityStatusEffects implements ContentList{
             effect = Fx.none;
         }};
 
-        slow = new StatusEffect("slow"){{
-            speedMultiplier = 0.4f;
+        teamConverted = new StatusEffect("team-converted"){{
+            healthMultiplier = 0.35f;
+            damageMultiplier = 0.4f;
+            permanent = true;
+            color = Color.valueOf("a3e3ff");
         }};
     }
 }

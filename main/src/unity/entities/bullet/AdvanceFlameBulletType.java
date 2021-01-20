@@ -9,7 +9,7 @@ import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import unity.graphics.*;
 
-public class AdvanceFlameBullet extends BulletType{
+public class AdvanceFlameBulletType extends BulletType{
     public float orbSize = 3f;
     public Color fromColor = UnityPal.advance;
     public Color toColor = UnityPal.advanceDark;
@@ -19,7 +19,7 @@ public class AdvanceFlameBullet extends BulletType{
     public float flameRange = 0.6f;
     public float smokeRange = 1.7f;
 
-    public AdvanceFlameBullet(float speed, float damage){
+    public AdvanceFlameBulletType(float speed, float damage){
         this.speed = speed;
         this.damage = damage;
         drag = 0.016f;

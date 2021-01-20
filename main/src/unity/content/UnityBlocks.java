@@ -139,7 +139,7 @@ public class UnityBlocks implements ContentList{
     smallTurret, medTurret;
 
     public static @FactionDef(type = "advance")
-    Block celsius, kelvin, cube;
+    Block celsius, kelvin, xenoCorruptor, cube;
 
     public static @FactionDef(type = "end")
     Block terminalCrucible, endForge, endGame;
@@ -1403,6 +1403,43 @@ public class UnityBlocks implements ContentList{
             shootType = UnityBullets.kelvinCloud;
         }};
 
+        xenoCorruptor = new LaserTurret("xeno-corruptor"){{
+                requirements(Category.turret, with(Items.lead, 640, Items.graphite, 740, Items.titanium, 560, Items.surgeAlloy, 650, Items.silicon, 720, Items.thorium, 400, UnityItems.xenium, 340, UnityItems.advanceAlloy, 640));
+                health = 7900;
+                size = 7;
+                reloadTime = 170f;
+                range = 290f;
+                coolantMultiplier = 1.4f;
+                shootCone = 40f;
+                shootDuration = 310f;
+                firingMoveFract = 0.16f;
+                powerUse = 45f;
+                shootShake = 3f;
+                recoilAmount = 8f;
+                shootType = new ChangeTeamLaserBulletType(60f){{
+                    length = 300f;
+                    lifetime = 18f;
+                    shootEffect = Fx.none;
+                    smokeEffect = Fx.none;
+                    hitEffect = Fx.hitLancer;
+                    incendChance = -1f;
+                    lightColor = Color.valueOf("59a7ff");
+                    conversionStatusEffect = UnityStatusEffects.teamConverted;
+                    convertBlocks = false;
+
+                    colors = new Color[]{Color.valueOf("59a7ff55"), Color.valueOf("59a7ffaa"), Color.valueOf("a3e3ff"), Color.white};
+                }};
+
+                consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.4f && liquid.flammability < 0.1f, 2.1f)).update(false);
+            }
+
+            @Override
+            public void load(){
+                super.load();
+                baseRegion = atlas.find("unity-block-" + size);
+            }
+        };
+
         cube = new ObjPowerTurret("the-cube"){{
             requirements(Category.turret, with(Items.copper, 3300, Items.lead, 2900, Items.graphite, 4400, Items.silicon, 3800, Items.titanium, 4600, UnityItems.xenium, 2300, Items.phaseFabric, 670, UnityItems.advanceAlloy, 1070));
             health = 22500;
@@ -1507,7 +1544,8 @@ public class UnityBlocks implements ContentList{
             itemCapacity = 10;
 
             shootType = new BulletType(){{
-                damage = Float.MAX_VALUE;
+                //damage = Float.MAX_VALUE;
+                damage = (float)Double.MAX_VALUE;
             }};
             consumes.item(UnityItems.terminum, 2);
         }};
