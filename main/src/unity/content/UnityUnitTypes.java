@@ -1703,7 +1703,7 @@ public class UnityUnitTypes implements ContentList{
                 }};
             }});
             String shieldSprite = "unity-cache-shield";
-            abilities.add(new ShieldMoveLightningAbility(10f, 14, 0.15f, 4f, 3.6f, 6f, Pal.lancerLaser, shieldSprite));
+            abilities.add(new MoveLightningAbility(10f, 14, 0.15f, 4f, 3.6f, 6f, Pal.lancerLaser, shieldSprite));
         }};
         
         //endregion
