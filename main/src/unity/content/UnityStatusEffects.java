@@ -1,5 +1,6 @@
 package unity.content;
 
+import arc.graphics.*;
 import arc.math.Mathf;
 import arc.util.Time;
 import mindustry.content.*;
@@ -10,7 +11,7 @@ import mindustry.type.StatusEffect;
 import unity.graphics.UnityPal;
 
 public class UnityStatusEffects implements ContentList{
-    public static StatusEffect radiation, reloadFatigue, molten, tpCoolDown;
+    public static StatusEffect radiation, reloadFatigue, blueBurn, molten, tpCoolDown, teamConverted;
 
     @Override
     public void load(){
@@ -34,6 +35,19 @@ public class UnityStatusEffects implements ContentList{
             }
         };
 
+        blueBurn = new StatusEffect("blue-burn"){{
+            damage = 0.14f;
+            effect = UnityFx.blueBurnEffect;
+            init(() -> {
+                opposite(StatusEffects.wet, StatusEffects.freezing);
+                trans(StatusEffects.tarred, (unit, time, newTime, result) -> {
+                    unit.damagePierce(8f);
+                    effect.at(unit.x() + Mathf.range(unit.bounds() / 2), unit.y() + Mathf.range(unit.bounds() / 2));
+                    result.set(this, Math.min(time + newTime, 400f));
+                });
+            });
+        }};
+
         reloadFatigue = new StatusEffect("reload-fatigue"){{
             reloadMultiplier = 0.75f;
         }};
@@ -49,6 +63,14 @@ public class UnityStatusEffects implements ContentList{
         tpCoolDown = new StatusEffect("tpcooldonw"){{
             color = UnityPal.diriumColor2;
             effect = Fx.none;
+        }};
+
+        teamConverted = new StatusEffect("team-converted"){{
+            healthMultiplier = 0.35f;
+            damageMultiplier = 0.4f;
+            permanent = true;
+            effect = UnityFx.teamConvertedEffect;
+            color = Color.valueOf("a3e3ff");
         }};
     }
 }

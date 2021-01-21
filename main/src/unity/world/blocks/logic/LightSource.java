@@ -17,7 +17,7 @@ import mindustry.ui.*;
 import mindustry.world.Tile;
 import mindustry.world.meta.*;
 import mindustry.world.blocks.production.GenericCrafter;
-import unity.world.blocks.LightData;
+import unity.world.meta.LightData;
 import unity.world.blocks.LightRepeaterBuildBase;
 import unity.world.blocks.logic.LightGenerator.LightGeneratorBuild;
 import unity.world.blocks.logic.LightReflector.LightReflectorBuild;

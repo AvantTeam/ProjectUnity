@@ -164,6 +164,24 @@ public class UnityFx{
 
         z();
     }),
+    
+    surgeBomb = new Effect(40f, 100f, e -> {
+        color(Pal.surge);
+        stroke(e.fout() * 2);
+        circle(e.x, e.y, 4 + e.finpow() * 65);
+
+        color(Pal.surge);
+
+        for(var i = 0; i < 4; i++){
+            Drawf.tri(e.x, e.y, 6, 100 * e.fout(), i*90);
+        }
+
+        color();
+
+        for(var i = 0; i < 4; i++){
+            Drawf.tri(e.x, e.y, 3, 35 * e.fout(), i*90);
+        }
+    }),
 
     oracleChage = new Effect(30f, e -> {
         color(Pal.lancerLaser);
@@ -266,12 +284,6 @@ public class UnityFx{
             Drawf.tri(e.x + x, e.y + y, e.fout() * 4f, e.fout() * 6f, e.rotation);
         });
         color();
-    }),
-
-    imberCircleSparkCraftingEffect = new Effect(30f, e -> {
-        color(Pal.surge);
-        stroke(e.fslope());
-        circle(e.x, e.y, e.fin() * 20f);
     }),
 
     healLaser = new Effect(60f, e -> {
@@ -383,6 +395,51 @@ public class UnityFx{
         });
     }),
 
+    imberCircleSparkCraftingEffect = new Effect(30f, e -> {
+        color(Pal.surge);
+        stroke(e.fslope());
+        circle(e.x, e.y, e.fin() * 20f);
+    }),
+    
+    waitFx = new Effect(30f, e -> {
+        // if(!isArray(e.data)) return; (I don't know how to translate this)
+        Object[] data = (Object[])e.data;
+        float whenReady = (float)data[0];
+        Unit u = (Unit)data[1];
+        if(u == null || !u.isValid() || u.dead) return;
+        z(Layer.effect - 0.00001f);
+        color(e.color);
+        stroke(e.fout() * 1.5f);
+        polySeg(60, 0, (int)(60 * (1 - (e.rotation - Time.time) / whenReady)), u.x, u.y, 8f, 0f);
+    }),
+
+    ringFx = new Effect(25f, e -> {
+        if(!(e.data instanceof Unit)) return;
+        Unit u = (Unit)e.data;
+        if(!u.isValid() || u.dead) return;
+        color(Color.white, e.color, e.fin());
+        stroke(e.fout() * 1.5f);
+        circle(u.x, u.y, 8f);
+    }),
+
+    smallRingFx = new Effect(20f, e -> {
+        if(!(e.data instanceof Unit)) return;
+        Unit u = (Unit)e.data;
+        if(!u.isValid() || u.dead) return;
+        color(Color.white, e.color, e.fin());
+        stroke(e.fin());
+        circle(u.x, u.y, e.fin() * 5f);
+    }),
+
+    squareFx = new Effect(25f, e -> {
+        if(!(e.data instanceof Unit)) return;
+        Unit u = (Unit)e.data;
+        if(!u.isValid() || u.dead) return;
+        color(Color.white, e.color, e.fin());
+        stroke(e.fout() * 2.5f);
+        square(u.x, u.y, e.fin() * 18f, 45f);
+    }),
+
     expAbsorb = new Effect(15f, e -> {
         stroke(e.fout() * 1.5f);
         color(UnityPal.expColor);
@@ -447,6 +504,41 @@ public class UnityFx{
         color();
     }).layer(Layer.flyingUnit + 1f),
 
+    hitAdvanceFlame = new Effect(15f, e -> {
+        Draw.color(UnityPal.advance, UnityPal.advanceDark, e.fin());
+
+        Angles.randLenVectors(e.id, 2, e.finpow() * 17f, e.rotation, 60f, (x, y) -> {
+            Fill.poly(e.x + x, e.y + y, 6, 3f + e.fout() * 3f, e.rotation);
+        });
+    }),
+
+    advanceFlameTrail = new Effect(27f, e -> {
+        Draw.color(UnityPal.advance, UnityPal.advanceDark, e.fin());
+        float rot = Mathf.randomSeed(e.id, -1, 1) * 270f;
+
+        Fill.poly(e.x, e.y, 6, e.fout() * 4.1f, e.rotation + e.fin() * rot);
+    }),
+
+    advanceFlameSmoke = new Effect(13f, e -> {
+        Draw.color(Color.valueOf("4d668f77"), Color.valueOf("35455f00"), e.fin());
+        float rot = Mathf.randomSeed(e.id, -1, 1) * 270f;
+
+        Angles.randLenVectors(e.id, 2, e.finpow() * 13f, e.rotation, 60f, (x, y) -> Fill.poly(e.x + x, e.y + y, 6, e.fout() * 4.1f, e.rotation + e.fin() * rot));
+    }),
+
+    teamConvertedEffect = new Effect(18, e -> {
+        Draw.color(UnityPal.advance, Color.white, e.fin());
+        Fill.square(e.x, e.y, 0.1f + e.fout() * 2.8f, 45f);
+    }),
+
+    blueBurnEffect = new Effect(35f, e -> {
+        Draw.color(UnityPal.advance, UnityPal.advanceDark, e.fin());
+
+        Angles.randLenVectors(e.id, 3, 2 + e.fin() * 7, (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, 0.1f + e.fout() * 1.4f);
+        });
+    }),
+
     endGameShoot = new Effect(45f, 820f * 2f, e -> {
         float curve = Mathf.curve(e.fin(), 0f, 0.2f) * 820f;
         float curveB = Mathf.curve(e.fin(), 0f, 0.7f);
@@ -461,7 +553,7 @@ public class UnityFx{
         Draw.color(Color.red);
         Draw.blend(Blending.additive);
 
-        Fill.circle(e.x, e.y, e.fout() * e.rotation * (Vars.tilesize / 2f));
+        Fill.square(e.x, e.y, e.fout() * e.rotation * (Vars.tilesize / 2f));
 
         if(e.data instanceof TurretBuild turret){
             Draw.mixcol(Color.red, 1f);
@@ -511,6 +603,12 @@ public class UnityFx{
             Lines.line(a.getX(), a.getY(), Tmp.v1.x, Tmp.v1.y);
         }
         Draw.z(oz);
+    }),
+
+    pointBlastLaserEffect = new Effect(23f, 600f, e -> {
+        Draw.color(e.color);
+        Fill.circle(e.x, e.y, e.rotation * e.fout());
+        Drawf.light(e.x, e.y, e.rotation * e.fout() * 3f, e.color, 0.66f);
     }),
 
     rockFx = new Effect(10f, e -> {

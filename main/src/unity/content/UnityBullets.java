@@ -28,7 +28,7 @@ import static unity.content.UnityFx.*;
 
 public class UnityBullets implements ContentList{
     public static BulletType laser, coalBlaze, pyraBlaze, falloutLaser, catastropheLaser, calamityLaser, extinctionLaser, orb, shockBeam, currentStroke,
-        shielderBullet, plasmaFragTriangle, plasmaTriangle, pylonLightning, pylonLaser, pylonLaserSmall, exporb, monumentRailBullet, scarShrapnel, scarMissile;
+        shielderBullet, plasmaFragTriangle, plasmaTriangle, surgeBomb, pylonLightning, pylonLaser, pylonLaserSmall, exporb, monumentRailBullet, scarShrapnel, scarMissile, celsiusCloud, kelvinCloud;
 
     //only enhanced
     public static BasicBulletType standardDenseLarge, standardHomingLarge, standardIncendiaryLarge, standardThoriumLarge, standardDenseHeavy, standardHomingHeavy, standardIncendiaryHeavy, standardThoriumHeavy, standardDenseMassive, standardHomingMassive,
@@ -326,6 +326,36 @@ public class UnityBullets implements ContentList{
             fragBullets = 8;
         }};
 
+        surgeBomb = new SurgeBulletType(7f, 100f){{
+            width = height = 30f;
+            maxRange = 30f;
+            backColor = Pal.surge;
+            frontColor = Color.white;
+            mixColorTo = Color.white;
+            hitSound = Sounds.plasmaboom;
+            despawnShake = 4f;
+            collidesAir = false;
+            lifetime = 70f;
+            despawnEffect = UnityFx.surgeBomb;
+            hitEffect = Fx.massiveExplosion;
+            keepVelocity = false;
+            spin = 2f;
+            shrinkX = shrinkY = 0.7f;
+            collides = false;
+            splashDamage = 680f;
+            splashDamageRadius = 120f;
+
+            fragBullets = 8;
+            fragLifeMin = 0.8f;
+            fragLifeMax = 1.1f;
+            scaleVelocity = true;
+            fragBullet = plasmaFragTriangle;
+            
+            shocks = 10;
+            shockDamage = 680f / 5f;
+            shockLength = 20;
+        }};
+
         pylonLightning = new LightningBulletType(){{
             lightningLength = 32;
             lightningLengthRand = 12;
@@ -397,6 +427,38 @@ public class UnityBullets implements ContentList{
             weaveScale = 6f;
             pierceBuilding = true;
             pierceCap = 3;
+        }};
+        
+        celsiusCloud = new CloudBulletType(4.7f, 32f){{
+            drag = 0.034f;
+            lifetime = 18f;
+            hitSize = 4f;
+            shootEffect = Fx.none;
+            smokeEffect = Fx.none;
+            hitEffect = UnityFx.hitAdvanceFlame;
+            despawnEffect = Fx.none;
+            collides = true;
+            collidesTiles = true;
+            collidesAir = true;
+            pierce = true;
+            statusDuration = 770f;
+            status = UnityStatusEffects.blueBurn;
+        }};
+        
+        kelvinCloud = new CloudBulletType(4.7f, 16f){{
+            drag = 0.016f;
+            lifetime = 32f;
+            hitSize = 4f;
+            shootEffect = Fx.none;
+            smokeEffect = Fx.none;
+            hitEffect = UnityFx.hitAdvanceFlame;
+            despawnEffect = Fx.none;
+            collides = true;
+            collidesTiles = true;
+            collidesAir = true;
+            pierce = true;
+            statusDuration = 770f;
+            status = UnityStatusEffects.blueBurn;
         }};
 
         //only enhanced

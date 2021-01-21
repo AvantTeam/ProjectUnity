@@ -11,6 +11,7 @@ import arc.util.io.*;
 import mindustry.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
+import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.consumers.*;
@@ -219,11 +220,7 @@ public class EndGameTurret extends PowerTurret{
                     entitySeq.add(e);
                 }
             });
-            entitySeq.each(e -> {
-                if(e instanceof Unit u) Groups.unit.remove(u);
-                Groups.draw.remove((Drawc)e);
-                Groups.all.remove(e);
-            });
+            entitySeq.each(this::annihilate);
             entitySeq.clear();
         }
 
@@ -241,14 +238,49 @@ public class EndGameTurret extends PowerTurret{
                     shouldLaser++;
                 }
             });
-            entitySeq.each(e -> {
-                if(e instanceof Building b){
-                    b.tile.remove();
-                    Groups.build.remove(b);
-                }
-                Groups.all.remove(e);
-            });
+            entitySeq.each(this::annihilate);
             entitySeq.clear();
+        }
+
+        void attemptRemoveAdd(Unit unit){
+            try{
+                unit.getClass().getField("added").setBoolean(unit, false);
+            }catch(Exception e){
+                throw new RuntimeException(e);
+            }
+        }
+
+        void annihilate(Entityc entity){
+            Groups.all.remove(entity);
+            if(entity instanceof Unit){
+                Unit tmp = (Unit)entity;
+                attemptRemoveAdd(tmp);
+                UnityFx.vapourizeUnit.at(tmp.x, tmp.y, tmp.rotation, tmp);
+                tmp.team.data().updateCount(tmp.type, -1);
+                tmp.clearCommand();
+                tmp.controller().removed(tmp);
+                Groups.unit.remove(tmp);
+                Groups.draw.remove((Drawc)entity);
+                if(Vars.net.client()){
+                    Vars.netClient.addRemovedEntity(tmp.id);
+                }
+                for(WeaponMount mount : tmp.mounts){
+                    if(mount.bullet != null){
+                        mount.bullet.time = mount.bullet.lifetime - 10f;
+                        mount.bullet = null;
+                    }
+                    if(mount.sound != null){
+                        mount.sound.stop();
+                    }
+                }
+            }
+            if(entity instanceof Building build){
+                Groups.build.remove(build);
+                build.tile.remove();
+                if(build.sound != null) build.sound.stop();
+                build.added = false;
+            }
+            if(entity instanceof Syncc s) Groups.sync.remove(s);
         }
 
         @Override
@@ -269,7 +301,10 @@ public class EndGameTurret extends PowerTurret{
             Units.nearbyEnemies(team, ux - rnge, uy - range, range * 2f, range * 2f, e -> {
                 if(e.within(ux, uy, rnge + e.hitSize) && !e.dead){
                     e.damage(490f * threatLevel);
-                    if(e.dead) UnityFx.vapourizeUnit.at(e.x, e.y, 0, e);
+                    if(e.dead){
+                        UnityFx.vapourizeUnit.at(e.x, e.y, 0, e);
+                        annihilate(e);
+                    }
                     UnityFx.endgameLaser.at(x, y, 0, new Object[]{new Vec2(ux, uy), e, 0.525f});
                 }
             });
@@ -286,15 +321,7 @@ public class EndGameTurret extends PowerTurret{
             if(e != null){
                 e.damage(350 * threatLevel);
                 if(e.dead()){
-                    if(targets[index] instanceof Unit tmp){
-                        UnityFx.vapourizeUnit.at(tmp.x, tmp.y, tmp.rotation, tmp);
-                        Groups.unit.remove(tmp);
-                    }else if(targets[index] instanceof Building build){
-                        Groups.build.remove(build);
-                    }
-                    //e.remove();
-                    Groups.draw.remove((Drawc)targets[index]);
-                    Groups.all.remove(e);
+                    annihilate(targets[index]);
                 }
                 Object[] data = {eyesVecArray[index], e, 0.625f};
                 UnityFx.endgameLaser.at(x, y, 0, data);

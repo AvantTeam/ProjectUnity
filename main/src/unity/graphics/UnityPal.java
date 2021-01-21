@@ -9,6 +9,8 @@ public class UnityPal{
         scarColorAlpha = valueOf("f5303690"),
         monolithLighter = valueOf("ffd2ae"),
         monolithDarker = valueOf("e58956"),
+        advance = valueOf("a3e3ff"),
+        advanceDark = valueOf("59a7ff"),
         purpleLightning = valueOf("bf92f9"),
         endColor = valueOf("ff786e"),
         imberColor = valueOf("fff566"),
@@ -21,5 +23,8 @@ public class UnityPal{
         lavaColor2 = valueOf("ffcc00"),
         diriumColor = valueOf("96f7c3"),
         diriumColor2 = valueOf("ccffe4"),
-        coldColor = valueOf("6bc7ff");
+        coldColor = valueOf("6bc7ff"),
+        bgCol = valueOf("323232"),
+        youngchaGray = valueOf("555555"),
+        blueprintCol = valueOf("354654");
 }

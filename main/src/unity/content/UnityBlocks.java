@@ -3,6 +3,7 @@ package unity.content;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.entities.*;
@@ -19,21 +20,26 @@ import mindustry.type.*;
 import mindustry.ctype.*;
 import mindustry.content.*;
 import unity.annotations.Annotations.*;
+import unity.entities.bullet.*;
 import unity.entities.comp.*;
 import unity.gen.*;
 import unity.graphics.*;
 import unity.type.exp.*;
+import unity.world.blocks.*;
 import unity.world.blocks.defense.*;
 import unity.world.blocks.defense.turrets.*;
 import unity.world.blocks.distribution.*;
 import unity.world.blocks.logic.*;
+import unity.world.blocks.power.*;
 import unity.world.blocks.production.*;
+import unity.world.blocks.sandbox.*;
 import unity.world.blocks.storage.*;
 import unity.world.blocks.units.*;
 import unity.world.consumers.*;
 import unity.world.draw.*;
-import unity.younggamExperimental.blocks.*;
-import unity.younggamExperimental.graphs.*;
+import unity.world.graphs.*;
+import younggamExperimental.*;
+import younggamExperimental.blocks.*;
 
 import static arc.Core.*;
 import static mindustry.type.ItemStack.*;
@@ -58,7 +64,7 @@ public class UnityBlocks implements ContentList{
     darkWall, darkWallLarge;
 
     public static @FactionDef(type = "imber")
-    Block orb, shockwire, current, plasma, shielder,
+    Block orb, shockwire, current, plasma, electrobomb, shielder,
 
     sparkAlloyForge,
 
@@ -72,6 +78,8 @@ public class UnityBlocks implements ContentList{
     steelConveyor, diriumConveyor,
 
     //laserTurret, inferno,
+    
+    daggerPad, novaPad, bufferPad, cachePad,
 
     teleporter, teleunit, expOutput, expUnloader, expTank, expChest, expFountain, expVoid;
 
@@ -88,11 +96,50 @@ public class UnityBlocks implements ContentList{
     public static @FactionDef(type = "youngcha")
     Block concreteBlank, concreteFill, concreteNumber, concreteStripe, concrete, stoneFullTiles, stoneFull, stoneHalf, stoneTiles,
 
-    thermalHeater, combustionHeater, infiHeater, infiCooler,
+    heatPipe, smallRadiator,//heatdistributor
+
+    driveShaft,
+
+    inlineGearbox,
+
+    shaftRouter,
+
+    simpleTransmission,
+
+    cruciblePump,
+
+    mechanicalConveyor,
+
+    thermalHeater, combustionHeater, infiHeater, infiCooler, solarCollector, solarReflector,//heatgenerators
+
+    nickelStator, nickelStatorLarge, nickelElectromagnet, neodymiumStator, electricRotor, electricRotorSmall,//magnets
+
+    torqueInfi,
+
+    handCrank,
+
+    windTurbine,
+
+    waterTurbine,
+
+    electricMotor,
+
+    augerDrill, mechanicalExtractor,
+
+    crucible, holdingCrucible, castingMold,//crucible
 
     sporePyrolyser,
 
-    cupronickelWall, cupronickelWallLarge;
+    sporeFarm,
+
+    cupronickelWall, cupronickelWallLarge,//youngchaWalls
+
+    chopper,
+
+    smallTurret, medTurret;
+
+    public static @FactionDef(type = "advance")
+    Block celsius, kelvin, xenoCorruptor, cube;
 
     public static @FactionDef(type = "end")
     Block terminalCrucible, endForge, endGame;
@@ -558,6 +605,32 @@ public class UnityBlocks implements ContentList{
             consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability <= 0.1f, 0.52f)).boost();
         }};
 
+        electrobomb = new ItemTurret("electrobomb"){
+            @Override
+            public void load(){
+                super.load();
+                baseRegion = atlas.find("unity-block-" + size);
+            }
+            
+            {
+                requirements(Category.turret, with(Items.titanium, 360, Items.thorium, 630, Items.silicon, 240, UnityItems.sparkAlloy, 420));
+                size = 5;
+                range = 400f;
+                minRange = 60f;
+                reloadTime = 320f;
+                coolantMultiplier = 2f;
+                shootCone = 20f;
+                shots = 1;
+                inaccuracy = 0f;
+                targetAir = false;
+                ammo(UnityItems.sparkAlloy, UnityBullets.surgeBomb);
+                shootSound = Sounds.laser;
+                shootEffect = Fx.none;
+                smokeEffect = Fx.none;
+                consumes.powerCond(10f, TurretBuild::isActive);
+            }
+        };
+
         shielder = new ShieldTurret("shielder"){{
             requirements(Category.turret, with(Items.copper, 300, Items.lead, 100, Items.titanium, 160, Items.silicon, 240, UnityItems.sparkAlloy, 90));
             size = 3;
@@ -722,6 +795,36 @@ public class UnityBlocks implements ContentList{
             speed = 0.16f;
             displayedSpeed = 20f;
             drawMultiplier = 1.3f;
+        }};
+        
+        daggerPad = new MechPad("dagger-pad"){{
+            requirements(Category.units, with(Items.copper, 75, Items.lead, 100, Items.graphite, 100));
+            size = 2;
+            consumes.power(0.5f);
+        }};
+        
+        novaPad = new MechPad("nova-pad"){{
+            requirements(Category.units, with(Items.copper, 125, Items.lead, 125, Items.silicon, 50, Items.titanium, 50));
+            size = 2;
+            craftTime = 120f;
+            consumes.power(1f);
+            unitType = UnitTypes.nova;
+        }};
+        
+        bufferPad = new MechPad("buffer-pad"){{
+            requirements(Category.units, with(UnityItems.stone, 120, Items.copper, 100, Items.lead, 60, Items.silicon, 25));
+            size = 2;
+            craftTime = 300f;
+            consumes.power(0.7f);
+            unitType = UnityUnitTypes.buffer;
+        }};
+        
+        cachePad = new MechPad("cache-pad"){{
+            requirements(Category.units, with(UnityItems.stone, 150, Items.lead, 160, Items.silicon, 100, Items.titanium, 60, Items.plastanium, 50));
+            size = 2;
+            craftTime = 300f;
+            consumes.power(0.8f);
+            unitType = UnityUnitTypes.cache;
         }};
 
         /*laserTurret = new ExpPowerTurret("laser-turret", 10){{
@@ -916,6 +1019,61 @@ public class UnityBlocks implements ContentList{
 
         stoneTiles = new Floor("stone-tiles");
 
+        heatPipe = new HeatPipe("heat-pipe"){{
+            requirements(Category.power, with(Items.copper, 15, UnityItems.cupronickel, 10, UnityItems.nickel, 5));
+            health = 140;
+            addGraph(new GraphHeat(5f, 0.7f, 0.008f).setAccept(1, 1, 1, 1));
+        }};
+
+        smallRadiator = new GraphBlock("small-radiator"){{
+            requirements(Category.power, with(Items.copper, 30, UnityItems.cupronickel, 20, UnityItems.nickel, 15));
+            health = 200;
+            solid = true;
+            addGraph(new GraphHeat(10f, 0.7f, 0.05f).setAccept(1, 1, 1, 1));
+        }};
+
+        driveShaft = new DriveShaft("drive-shaft"){{
+            requirements(Category.power, with(Items.copper, 10, Items.lead, 10));
+            health = 150;
+            addGraph(new GraphTorque(0.01f, 3f).setAccept(1, 0, 1, 0));
+        }};
+
+        inlineGearbox = new InlineGearbox("inline-gearbox"){{
+            requirements(Category.power, with(Items.titanium, 20, Items.lead, 30, Items.copper, 30));
+            size = 2;
+            health = 700;
+            addGraph(new GraphTorque(0.02f, 20f).setAccept(1, 1, 0, 0, 1, 1, 0, 0));
+        }};
+
+        shaftRouter = new GraphBlock("shaft-router"){{
+            requirements(Category.power, with(Items.copper, 20, Items.lead, 20));
+            health = 100;
+            preserveDraw = true;
+            addGraph(new GraphTorque(0.05f, 5f).setAccept(1, 1, 1, 1));
+        }};
+
+        simpleTransmission = new SimpleTransmission("simple-transmission"){{
+            requirements(Category.power, with(Items.titanium, 50, Items.lead, 50, Items.copper, 50));
+            size = 2;
+            health = 500;
+            addGraph(new GraphTorqueTrans(0.05f, 25f).setRatio(1f, 2.5f).setAccept(2, 1, 0, 0, 1, 2, 0, 0));
+        }};
+
+        cruciblePump = new CruciblePump("crucible-pump"){{
+            requirements(Category.crafting, with(UnityItems.cupronickel, 50, UnityItems.nickel, 50, Items.metaglass, 15));
+            size = 2;
+            health = 500;
+            consumes.power(1f);
+            addGraph(new GraphCrucible(10f, false).setAccept(1, 1, 0, 0, 2, 2, 0, 0).multi());
+            addGraph(new GraphHeat(50f, 0.1f, 0.003f).setAccept(1, 1, 1, 1, 1, 1, 1, 1));
+        }};
+
+        mechanicalConveyor = new ShadowedConveyor("mechanical-conveyor"){{
+            requirements(Category.distribution, with(Items.copper, 3, UnityItems.nickel, 2));
+            health = 250;
+            speed = 0.1f;
+        }};
+
         thermalHeater = new ThermalHeater("thermal-heater"){{
             requirements(Category.power, with(Items.copper, 150, UnityItems.nickel, 100, Items.titanium, 150));
             size = 2;
@@ -948,6 +1106,159 @@ public class UnityBlocks implements ContentList{
             addGraph(new GraphHeat(1000f, 1f, 0f).setAccept(1, 1, 1, 1));
         }};
 
+        solarCollector = new SolarCollector("solar-collector"){{
+            requirements(Category.power, with(UnityItems.nickel, 80, Items.titanium, 50, Items.lead, 30));
+            size = 3;
+            health = 1500;
+            maxTemp = 800f;
+            mulCoeff = 0.03f;
+            addGraph(new GraphHeat(60f, 1f, 0.02f).setAccept(0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0));
+        }};
+
+        solarReflector = new SolarReflector("solar-reflector"){{
+            requirements(Category.power, with(UnityItems.nickel, 25, Items.copper, 50));
+            size = 2;
+            health = 800;
+        }};
+
+        nickelStator = new Magnet("nickel-stator"){{
+            requirements(Category.power, with(UnityItems.nickel, 30, Items.titanium, 20));
+            health = 450;
+            addGraph(new GraphFlux(2f).setAccept(1, 0, 0, 0));
+        }};
+
+        nickelStatorLarge = new Magnet("nickel-stator-large"){{
+            requirements(Category.power, with(UnityItems.nickel, 250, Items.titanium, 150));
+            size = 2;
+            health = 1800;
+            addGraph(new GraphFlux(10f).setAccept(1, 1, 0, 0, 0, 0, 0, 0));
+        }};
+
+        nickelElectromagnet = new Magnet("nickel-electromagnet"){{
+            requirements(Category.power, with(UnityItems.nickel, 250, Items.titanium, 200, Items.copper, 100, UnityItems.cupronickel, 50));
+            size = 2;
+            health = 1000;
+            consumes.power(1.6f);
+            addGraph(new GraphFlux(25f).setAccept(1, 1, 0, 0, 0, 0, 0, 0));
+        }};
+
+        neodymiumStator = new Magnet("neodymium-stator"){{
+            requirements(Category.power, BuildVisibility.sandboxOnly, with());
+            health = 400;
+            addGraph(new GraphFlux(200f).setAccept(1, 0, 0, 0));
+        }};
+
+        electricRotor = new RotorBlock("electric-rotor"){{
+            requirements(Category.power, with(UnityItems.nickel, 200, Items.copper, 200, Items.titanium, 150, Items.graphite, 100));
+            size = 3;
+            health = 1000;
+            powerProduction = 32f;
+            big = true;
+            fluxEfficiency = 10f;
+            rotPowerEfficiency = 0.8f;
+            torqueEfficiency = 0.8f;
+            baseTorque = 5f;
+            baseTopSpeed = 15f;
+            consumes.power(16f);
+            addGraph(new GraphFlux(false).setAccept(0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1));
+            addGraph(new GraphTorque(0.05f, 150f).setAccept(0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0));
+        }};
+
+        electricRotorSmall = new RotorBlock("electric-rotor-small"){{
+            requirements(Category.power, with(UnityItems.nickel, 30, Items.copper, 50, Items.titanium, 10));
+            health = 120;
+            powerProduction = 2f;
+            fluxEfficiency = 10f;
+            rotPowerEfficiency = 0.8f;
+            torqueEfficiency = 0.7f;
+            baseTorque = 1f;
+            baseTopSpeed = 3f;
+            consumes.power(1f);
+            addGraph(new GraphFlux(false).setAccept(0, 1, 0, 1));
+            addGraph(new GraphTorque(0.08f, 20f).setAccept(1, 0, 1, 0));
+        }};
+
+        torqueInfi = new TorqueGenerator("torque-infi"){{
+            requirements(Category.power, BuildVisibility.sandboxOnly, with());
+            health = 200;
+            preserveDraw = true;
+            rotate = false;
+            addGraph(new GraphTorqueGenerate(0.001f, 1f, 999999f, 9999f).setAccept(1, 1, 1, 1));
+        }};
+
+        handCrank = new HandCrank("hand-crank"){{
+            requirements(Category.power, with(UnityItems.nickel, 5, Items.lead, 20));
+            health = 120;
+            addGraph(new GraphTorque(0.01f, 3f).setAccept(1, 0, 0, 0));
+        }};
+
+        windTurbine = new WindTurbin("wind-turbine"){{
+            requirements(Category.power, with(Items.titanium, 20, Items.lead, 80, Items.copper, 70));
+            size = 3;
+            health = 1200;
+            addGraph(new GraphTorqueGenerate(0.03f, 20f, 5f, 5f).setAccept(0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
+        }};
+
+        waterTurbine = new WaterTurbin("water-turbine"){{
+            requirements(Category.power, with(Items.metaglass, 50, UnityItems.nickel, 20, Items.lead, 150, Items.copper, 100));
+            size = 3;
+            health = 1100;
+            liquidCapacity = 250f;
+            liquidPressure = 0.3f;
+            disableOgUpdate();
+            addGraph(new GraphTorqueGenerate(0.3f, 20f, 7f, 15f).setAccept(0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0));
+        }};
+
+        electricMotor = new ElectricMotor("electric-motor"){{
+            requirements(Category.power, with(Items.silicon, 100, Items.lead, 80, Items.copper, 150, Items.titanium, 150));
+            size = 3;
+            health = 1300;
+            consumes.power(4.5f);
+            addGraph(new GraphTorqueGenerate(0.1f, 25f, 10f, 16f).setAccept(0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0));
+        }};
+
+        augerDrill = new AugerDrill("auger-drill"){{
+            requirements(Category.production, with(Items.lead, 100, Items.copper, 75));
+            size = 3;
+            health = 1000;
+            tier = 3;
+            drillTime = 400f;
+            addGraph(new GraphTorqueConsume(45f, 8f, 0.03f, 0.15f).setAccept(0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0));
+        }};
+
+        mechanicalExtractor = new MechanicalExtractor("mechanical-extractor"){{
+            requirements(Category.production, with(Items.lead, 100, Items.copper, 75));
+            hasPower = false;
+            size = 3;
+            health = 1000;
+            pumpAmount = 0.4f;
+            
+            addGraph(new GraphTorqueConsume(45f, 8f, 0.06f, 0.3f).setAccept(0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0));
+        }};
+
+        crucible = new Crucible("crucible"){{
+            requirements(Category.crafting, with(UnityItems.nickel, 10, Items.titanium, 15));
+            health = 400;
+            addGraph(new GraphCrucible().setAccept(1, 1, 1, 1));
+            addGraph(new GraphHeat(75f, 0.2f, 0.006f).setAccept(1, 1, 1, 1));
+        }};
+
+        holdingCrucible = new HoldingCrucible("holding-crucible"){{
+            requirements(Category.crafting, with(UnityItems.nickel, 50, UnityItems.cupronickel, 150, Items.metaglass, 150, Items.titanium, 30));
+            size = 4;
+            health = 2400;
+            addGraph(new GraphCrucible(50f, false).setAccept(0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0));
+            addGraph(new GraphHeat(275f, 0.05f, 0.01f).setAccept(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1));
+        }};
+
+        castingMold = new CastingMold("casting-mold"){{
+            requirements(Category.crafting, with(Items.titanium, 70, UnityItems.nickel, 30));
+            size = 2;
+            health = 700;
+            addGraph(new GraphCrucible(2f, false).setAccept(0, 0, 0, 0, 1, 1, 0, 0));
+            addGraph(new GraphHeat(55f, 0.2f, 0.0f).setAccept(1, 1, 1, 1, 1, 1, 1, 1));
+        }};
+
         sporePyrolyser = new SporePyrolyser("spore-pyrolyser"){{
             requirements(Category.crafting, with(UnityItems.nickel, 25, Items.titanium, 50, Items.copper, 50, Items.lead, 30));
             size = 3;
@@ -958,6 +1269,16 @@ public class UnityBlocks implements ContentList{
             ambientSoundVolume = 0.6f;
             consumes.item(Items.sporePod, 1);
             addGraph(new GraphHeat(60f, 0.4f, 0.008f).setAccept(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1));
+        }};
+
+        sporeFarm = new SporeFarm("spore-farm"){{
+            requirements(Category.production, with(Items.lead, 5));
+            health = 50;
+            rebuildable = false;
+            hasItems = true;
+            itemCapacity = 2;
+            buildCostMultiplier = 0.01f;
+            breakSound = Sounds.splash;
         }};
 
         cupronickelWall = new HeatWall("cupronickel-wall"){{
@@ -977,6 +1298,165 @@ public class UnityBlocks implements ContentList{
             statusTime = 120f;
             maxDamage = 40f;
             addGraph(new GraphHeat(200f, 0.5f, 0.09f).setAccept(1, 1, 1, 1, 1, 1, 1, 1));
+        }};
+
+        chopper = new Chopper("chopper"){{
+            requirements(Category.turret, with(UnityItems.nickel, 50, Items.titanium, 50, Items.lead, 30));
+            health = 650;
+            setGridW(7);
+            setGridH(1);
+            addPart(
+                "Pivot", "", PartType.blade, 4, 0, 1, 1, true, true,
+                new Point2(0, 0), new ItemStack[0], new byte[]{1, 0, 0, 0}, new byte[]{0, 0, 0, 0},
+                new PartStat(PartStatType.mass, 1), new PartStat(PartStatType.collides, false), new PartStat(PartStatType.hp, 10)
+            );
+            addPart(
+                "Blade", "Slices and knocks back enemies", PartType.blade, 0, 0, 1, 1,
+                with(UnityItems.nickel, 3, Items.titanium, 5), new byte[]{1, 0, 0, 0}, new byte[]{0, 0, 1, 0},
+                new PartStat(PartStatType.mass, 2), new PartStat(PartStatType.collides, true), new PartStat(PartStatType.hp, 80), new PartStat(PartStatType.damage, 5)
+            );
+            addPart(
+                "Serrated blade", "A heavy reinforced blade.", PartType.blade, 2, 0, 2, 1,
+                with(UnityItems.nickel, 8, Items.lead, 5), new byte[]{1, 0, 0, 0, 0, 0}, new byte[]{0, 0, 0, 1, 0, 0},
+                new PartStat(PartStatType.mass, 6), new PartStat(PartStatType.collides, true), new PartStat(PartStatType.hp, 120), new PartStat(PartStatType.damage, 12)
+            );
+            addPart(
+                "Rod", "Supporting structure, does not collide", PartType.blade, 1, 0, 1, 1,
+                with(Items.titanium, 3), new byte[]{1, 0, 0, 0}, new byte[]{0, 0, 1, 0},
+                new PartStat(PartStatType.mass, 1), new PartStat(PartStatType.collides, false), new PartStat(PartStatType.hp, 40)
+            );
+            addGraph(new GraphTorque(0.03f, 5f).setAccept(1, 0, 0, 0));
+        }};
+
+        smallTurret = new ModularTurret("small-turret-base"){{
+            requirements(Category.turret, with(Items.graphite, 20, UnityItems.nickel, 30, Items.copper, 30));
+            size = 2;
+            health = 1200;
+            setGridW(3);
+            setGridH(3);
+            spriteGridSize = 18;
+            spriteGridPadding = 3;
+            yScale = 0.8f;
+            addGraph(new GraphTorque(0.03f, 50f).setAccept(1, 1, 0, 0, 0, 0, 0, 0, 0, 0));
+            addGraph(new GraphHeat(50f, 0.1f, 0.01f).setAccept(1, 1, 1, 1, 1, 1, 1, 1));
+        }};
+
+        medTurret = new ModularTurret("med-turret-base"){{
+            requirements(Category.turret, with(Items.graphite, 25, UnityItems.nickel, 30, Items.titanium, 50, Items.silicon, 40));
+            size = 3;
+            health = 1200;
+            acceptsItems = true;
+            setGridW(5);
+            setGridH(5);
+            spriteGridSize = 16;
+            spriteGridPadding = 4;
+            yShift = 0.8f;
+            yScale = 0.8f;
+            partCostAccum = 0.12f;
+            addGraph(new GraphTorque(0.05f, 150f).setAccept(0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
+            addGraph(new GraphHeat(120f, 0.05f, 0.02f).setAccept(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1));
+        }};
+
+        //endregion
+        //region advance
+
+        celsius = new PowerTurret("celsius"){{
+            requirements(Category.turret, with(Items.silicon, 20, UnityItems.xenium, 15, Items.titanium, 30, UnityItems.advanceAlloy, 25));
+            health = 780;
+            size = 1;
+            reloadTime = 3f;
+            range = 47f;
+            shootCone = 50f;
+            heatColor = Color.valueOf("ccffff");
+            ammoUseEffect = Fx.none;
+            inaccuracy = 9.2f;
+            rotateSpeed = 7.5f;
+            shots = 2;
+            recoilAmount = 1f;
+            powerUse = 13.9f;
+            hasPower = true;
+            targetAir = true;
+            shootSound = Sounds.flame;
+            cooldown = 0.01f;
+            shootType = UnityBullets.celsiusCloud;
+        }};
+
+        kelvin = new PowerTurret("kelvin"){{
+            requirements(Category.turret, with(Items.silicon, 80, UnityItems.xenium, 35, Items.titanium, 90, UnityItems.advanceAlloy, 50));
+            health = 2680;
+            size = 2;
+            reloadTime = 3f;
+            range = 100f;
+            shootCone = 50f;
+            heatColor = Color.valueOf("ccffff");
+            ammoUseEffect = Fx.none;
+            inaccuracy = 9.2f;
+            rotateSpeed = 6.5f;
+            shots = 2;
+            spread = 6f;
+            recoilAmount = 1f;
+            powerUse = 13.9f;
+            hasPower = true;
+            targetAir = true;
+            shootSound = Sounds.flame;
+            cooldown = 0.01f;
+            shootType = UnityBullets.kelvinCloud;
+        }};
+
+        xenoCorruptor = new LaserTurret("xeno-corruptor"){{
+                requirements(Category.turret, with(Items.lead, 640, Items.graphite, 740, Items.titanium, 560, Items.surgeAlloy, 650, Items.silicon, 720, Items.thorium, 400, UnityItems.xenium, 340, UnityItems.advanceAlloy, 640));
+                health = 7900;
+                size = 7;
+                reloadTime = 230f;
+                range = 290f;
+                coolantMultiplier = 1.4f;
+                shootCone = 40f;
+                shootDuration = 310f;
+                firingMoveFract = 0.16f;
+                powerUse = 45f;
+                shootShake = 3f;
+                recoilAmount = 8f;
+                shootType = new ChangeTeamLaserBulletType(60f){{
+                    length = 300f;
+                    lifetime = 18f;
+                    shootEffect = Fx.none;
+                    smokeEffect = Fx.none;
+                    hitEffect = Fx.hitLancer;
+                    incendChance = -1f;
+                    lightColor = Color.valueOf("59a7ff");
+                    conversionStatusEffect = UnityStatusEffects.teamConverted;
+                    convertBlocks = false;
+
+                    colors = new Color[]{Color.valueOf("59a7ff55"), Color.valueOf("59a7ffaa"), Color.valueOf("a3e3ff"), Color.white};
+                }};
+
+                consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.4f && liquid.flammability < 0.1f, 2.1f)).update(false);
+            }
+
+            @Override
+            public void load(){
+                super.load();
+                baseRegion = atlas.find("unity-block-" + size);
+            }
+        };
+
+        cube = new ObjPowerTurret("the-cube"){{
+            requirements(Category.turret, with(Items.copper, 3300, Items.lead, 2900, Items.graphite, 4400, Items.silicon, 3800, Items.titanium, 4600, UnityItems.xenium, 2300, Items.phaseFabric, 670, UnityItems.advanceAlloy, 1070));
+            health = 22500;
+            object = UnityObjs.cube;
+            size = 10;
+            range = 320f;
+            reloadTime = 240f;
+            powerUse = 260f;
+            coolantMultiplier = 1.1f;
+            shootType = new PointBlastLaserBulletType(580f){{
+                length = 320f;
+                lifetime = 17f;
+                pierce = true;
+                auraDamage = 8000f;
+                damageRadius = 120f;
+                laserColor = UnityPal.advance;
+            }};
         }};
 
         //endregion
@@ -1064,7 +1544,8 @@ public class UnityBlocks implements ContentList{
             itemCapacity = 10;
 
             shootType = new BulletType(){{
-                damage = Float.MAX_VALUE;
+                //damage = Float.MAX_VALUE;
+                damage = (float)Double.MAX_VALUE;
             }};
             consumes.item(UnityItems.terminum, 2);
         }};

@@ -143,7 +143,7 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
             float rad = Math.min(rand.random(6f, (roomPos - Tmp.v1.len()) / 2f), 24f);
 
             rooms.add(new Room((int)tx, (int)ty, (int)rad));
-        };
+        }
 
         Room spawn = null;
         Seq<Room> enemies = new Seq<>();

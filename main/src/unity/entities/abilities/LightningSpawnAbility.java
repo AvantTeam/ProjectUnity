@@ -37,7 +37,7 @@ public class LightningSpawnAbility extends Ability{
                     Tmp.v1.trns(
                         (Time.time + rotateSpeed + 360f * i / (float)lightningCount + Mathf.randomSeed(unit.id)) * Mathf.signs[unit.id % 2],
                         lightningOffset * phase
-                    ).add(unit);;
+                    ).add(unit);
                     Teamc u = Units.closestTarget(unit.team, Tmp.v1.x, Tmp.v1.y, lightningRange);
                     if(u != null){
                         float angle = Tmp.v2.set(u).sub(unit).angle();
