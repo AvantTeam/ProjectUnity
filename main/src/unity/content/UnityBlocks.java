@@ -164,6 +164,7 @@ public class UnityBlocks implements ContentList{
             minTier = 6;
             upgrades.add(
                 new UnitType[]{UnitTypes.toxopid, UnityUnitTypes.projectSpiboss},
+                new UnitType[]{UnitTypes.corvus, UnityUnitTypes.ursa},
                 new UnitType[]{UnityUnitTypes.monument, UnityUnitTypes.colossus}
             );
             otherUpgrades.add(new UnitType[]{UnityUnitTypes.projectSpiboss, UnityUnitTypes.arcaetana});

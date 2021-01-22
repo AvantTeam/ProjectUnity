@@ -45,6 +45,10 @@ public class UnityUnitTypes implements ContentList{
     /** Global {@linkplain UnitEntity flying} units */
     public static @EntityPoint(type = UnitEntity.class)
     UnitType angel, malakhim;
+    
+    /** Global {@linkplain MechUnit mech} units. */
+    public static @EntityPoint(type = MechUnit.class)
+    UnitType ursa;
 
     /** Global {@linkplain LegsUnit legs} units */
     public static @EntityPoint(type = LegsUnit.class)
@@ -421,6 +425,62 @@ public class UnityUnitTypes implements ContentList{
 
         //endregion
         //region ground-units
+        
+        ursa = new UnityUnitType("ursa"){{
+            speed = 0.3f;
+            health = 20000;
+            mechFrontSway = 1.9f;
+            mechSideSway = 0.6f;
+            hitSize = 26;
+            weapons.add(new Weapon(name + "-laser"){{
+                alternate = false;
+                reload = 20f;
+                ejectEffect = Fx.none;
+                shootCone = 10f;
+                shootSound = Sounds.laserblast;
+                // chargeSound = Sounds.lasercharge;
+                soundPitchMin = 1f;
+                top = false;
+                shake = 14f;
+                shootX = 1.5f;
+                shootY = 8f;
+                x = 20.75f;
+                y = 0f;
+                x = 21;
+                shots = 2;
+                spacing = 8f;
+                shotDelay = 0f;
+                shootStatus = StatusEffects.unmoving;
+                shootStatusDuration = 45f;
+                // firstShotDelay = Fx.greenLaserCharge.lifetime;
+                bullet = new LaserBulletType(){{
+                    length = 460f;
+                    damage = 170f;
+                    width = 75f;
+
+                    lifetime = 65f;
+
+                    lightningSpacing = 35f;
+                    lightningLength = 5;
+                    lightningDelay = 1.1f;
+                    lightningLengthRand = 15;
+                    lightningDamage = 20;
+                    lightningAngleRand = 40f;
+                    largeHit = true;
+                    lightColor = lightningColor = Pal.heal;
+
+                    // shootEffect = Fx.greenLaserCharge;
+
+                    healPercent = 10f;
+                    collidesTeam = true;
+
+                    sideAngle = 20f;
+                    sideWidth = 1f;
+                    sideLength = 140f;
+                    colors = new Color[]{Pal.heal.cpy().a(0.4f), Pal.heal, Color.white};
+                }};
+            }});
+        }};
 
         projectSpiboss = new UnityUnitType("project-spiboss"){{
             groundLayer = Layer.legUnit + 3f;
