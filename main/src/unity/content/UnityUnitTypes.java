@@ -433,8 +433,8 @@ public class UnityUnitTypes implements ContentList{
             mechSideSway = 0.6f;
             hitSize = 26;
             weapons.add(new Weapon(name + "-laser"){{
-                alternate = false;
-                reload = 20f;
+                alternate = true;
+                reload = 40f;
                 ejectEffect = Fx.none;
                 shootCone = 10f;
                 shootSound = Sounds.laserblast;
@@ -443,19 +443,20 @@ public class UnityUnitTypes implements ContentList{
                 top = false;
                 shake = 14f;
                 shootX = 1.5f;
-                shootY = 8f;
+                shootY = 16f;
+                recoil = 5f;
                 x = 20.75f;
                 y = 0f;
                 x = 21;
-                shots = 2;
-                spacing = 8f;
-                shotDelay = 0f;
+                shots = 3;
+                spacing = 12f;
+                shotDelay = 10f;
                 shootStatus = StatusEffects.unmoving;
                 shootStatusDuration = 45f;
                 // firstShotDelay = Fx.greenLaserCharge.lifetime;
                 bullet = new LaserBulletType(){{
                     length = 460f;
-                    damage = 170f;
+                    damage = 210f;
                     width = 75f;
 
                     lifetime = 65f;
@@ -464,7 +465,7 @@ public class UnityUnitTypes implements ContentList{
                     lightningLength = 5;
                     lightningDelay = 1.1f;
                     lightningLengthRand = 15;
-                    lightningDamage = 20;
+                    lightningDamage = 35;
                     lightningAngleRand = 40f;
                     largeHit = true;
                     lightColor = lightningColor = Pal.heal;
