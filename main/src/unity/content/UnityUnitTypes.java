@@ -8,7 +8,6 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.ctype.*;
-import mindustry.entities.abilities.ShieldMoveLightningAbility;
 import mindustry.type.*;
 import mindustry.gen.*;
 import mindustry.entities.*;
