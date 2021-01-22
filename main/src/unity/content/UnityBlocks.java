@@ -1379,7 +1379,7 @@ public class UnityBlocks implements ContentList{
             targetAir = true;
             shootSound = Sounds.flame;
             cooldown = 0.01f;
-            shootType = UnityBullets.celsiusCloud;
+            shootType = UnityBullets.celsiusSmoke;
         }};
 
         kelvin = new PowerTurret("kelvin"){{
@@ -1401,7 +1401,7 @@ public class UnityBlocks implements ContentList{
             targetAir = true;
             shootSound = Sounds.flame;
             cooldown = 0.01f;
-            shootType = UnityBullets.kelvinCloud;
+            shootType = UnityBullets.kelvinSmoke;
         }};
 
         xenoCorruptor = new LaserTurret("xeno-corruptor"){{

@@ -3,13 +3,12 @@ package unity.entities.bullet;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import unity.content.*;
 
-public class CloudBulletType extends BasicBulletType{
+public class SmokeBulletType extends BasicBulletType{
     /** Starting size */
     public float baseSize = 3f;
     /** Amount it grows by the end of its lifetime */
@@ -19,11 +18,11 @@ public class CloudBulletType extends BasicBulletType{
     /** Smoke spawn randomness */
     public float smokeRand = 1.7f;
 
-    public CloudBulletType(float speed, float damage){
+    public SmokeBulletType(float speed, float damage){
         super(speed, damage);
     }
     
-    public CloudBulletType(){
+    public SmokeBulletType(){
         this(1, 1);
     }
     

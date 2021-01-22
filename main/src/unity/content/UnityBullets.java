@@ -28,7 +28,8 @@ import static unity.content.UnityFx.*;
 
 public class UnityBullets implements ContentList{
     public static BulletType laser, coalBlaze, pyraBlaze, falloutLaser, catastropheLaser, calamityLaser, extinctionLaser, orb, shockBeam, currentStroke,
-        shielderBullet, plasmaFragTriangle, plasmaTriangle, surgeBomb, pylonLightning, pylonLaser, pylonLaserSmall, exporb, monumentRailBullet, scarShrapnel, scarMissile, celsiusCloud, kelvinCloud;
+        shielderBullet, plasmaFragTriangle, plasmaTriangle, surgeBomb, pylonLightning, pylonLaser, pylonLaserSmall, exporb, monumentRailBullet, scarShrapnel, scarMissile, celsiusSmoke, kelvinSmoke,
+        kamiBullet1;
 
     //only enhanced
     public static BasicBulletType standardDenseLarge, standardHomingLarge, standardIncendiaryLarge, standardThoriumLarge, standardDenseHeavy, standardHomingHeavy, standardIncendiaryHeavy, standardThoriumHeavy, standardDenseMassive, standardHomingMassive,
@@ -429,7 +430,7 @@ public class UnityBullets implements ContentList{
             pierceCap = 3;
         }};
         
-        celsiusCloud = new CloudBulletType(4.7f, 32f){{
+        celsiusSmoke = new SmokeBulletType(4.7f, 32f){{
             drag = 0.034f;
             lifetime = 18f;
             hitSize = 4f;
@@ -445,7 +446,7 @@ public class UnityBullets implements ContentList{
             status = UnityStatusEffects.blueBurn;
         }};
         
-        kelvinCloud = new CloudBulletType(4.7f, 16f){{
+        kelvinSmoke = new SmokeBulletType(4.7f, 16f){{
             drag = 0.016f;
             lifetime = 32f;
             hitSize = 4f;
@@ -459,6 +460,13 @@ public class UnityBullets implements ContentList{
             pierce = true;
             statusDuration = 770f;
             status = UnityStatusEffects.blueBurn;
+        }};
+
+        kamiBullet1 = new CircleBulletType(4f, 7f){{
+            lifetime = 240f;
+            hitSize = 6f;
+            despawnEffect = Fx.none;
+            color = b -> Tmp.c1.set(Color.red).shiftHue(b.time * 3f);
         }};
 
         //only enhanced

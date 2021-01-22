@@ -8,6 +8,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.ctype.*;
+import mindustry.entities.abilities.ShieldMoveLightningAbility;
 import mindustry.type.*;
 import mindustry.gen.*;
 import mindustry.entities.*;
@@ -85,6 +86,8 @@ public class UnityUnitTypes implements ContentList{
     /** Monolith {@linkplain LegsUnit legs} units */
     public static @FactionDef(type = "monolith") @EntityPoint(type = LegsUnit.class)
     UnitType pylon, monument, colossus;
+
+    public static UnitType kami;
 
     //public static @FactionDef(type = "end") UnitType devourer;
 
@@ -2055,6 +2058,14 @@ public class UnityUnitTypes implements ContentList{
                     lightningColor = Pal.lancerLaser;
                 }};
             }});
+        }};
+
+        setEntity("kami-mkii", UnitEntity::create);
+        kami = new RainbowUnitType("kami-mkii"){{
+            health = 120000f;
+            speed = 15f;
+            flying = true;
+            defaultController = KamiAI::new;
         }};
 
         //endregion
