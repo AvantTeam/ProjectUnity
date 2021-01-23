@@ -55,26 +55,26 @@ public class KamiAI implements UnitController{
             }
             if(kamiAI.reloads[0] >= 2f){
                 for(int i = 0; i < 3; i++){
-                    float angle = (i * (360f / 3)) + (kamiAI.reloads[2] * kamiAI.reloads[3] * 7f);
+                    float angle = (i * (360f / 3)) + (kamiAI.reloads[2] * kamiAI.reloads[3] * 5f);
                     for(int j = 0; j < 3; j++){
                         Bullet bullet = UnityBullets.kamiBullet1.create(kamiAI.unit, kamiAI.unit.x, kamiAI.unit.y, angle + Mathf.range(1f));
                         bullet.vel.scl(Mathf.random(0.8f, 1.2f) * 0.7f);
                         bullet.lifetime *= 1 / 0.7f;
                     }
                 }
-                kamiAI.reloads[2] += Time.delta;
-                if(kamiAI.reloads[2] >= 170f){
+                if(kamiAI.reloads[2] >= 60f * 4.5f){
                     kamiAI.reloads[1] = 0;
-                    kamiAI.reloads[0] = -70f;
+                    kamiAI.reloads[0] = -80f;
                     kamiAI.reloads[3] *= -1f;
                     kamiAI.reloads[2] = 0f;
                 }else{
                     kamiAI.reloads[0] = 0f;
                 }
             }
+            kamiAI.reloads[2] += Time.delta;
             kamiAI.reloads[0] += Time.delta;
         }, kamiAI -> {
-            kamiAI.reloads[1] = -70f;
+            kamiAI.reloads[0] = -80f;
             kamiAI.reloads[3] = 1f;
         }, 15 * 60f)
     };
