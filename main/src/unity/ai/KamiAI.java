@@ -63,7 +63,7 @@ public class KamiAI implements UnitController{
                     }
                 }
                 kamiAI.reloads[2] += Time.delta;
-                if(kamiAI.reloads[2] >= 100f){
+                if(kamiAI.reloads[2] >= 170f){
                     kamiAI.reloads[1] = 0;
                     kamiAI.reloads[0] = -70f;
                     kamiAI.reloads[3] *= -1f;
