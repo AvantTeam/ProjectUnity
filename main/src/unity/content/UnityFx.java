@@ -47,6 +47,69 @@ public class UnityFx{
         Fill.square(e.x + Tmp.v1.x, e.y + Tmp.v1.y, e.fslope() * 3f, 45f);
         color();
     }),
+    
+    catastropheCharge = new Effect(90f, e -> {
+        float slope = Mathf.curve(e.fin(), 0f, 0.85f) - Mathf.curve(e.fin(), 0.85f, 1f);
+        float foutpow = Interp.pow3Out.apply(e.fout());
+        float rot = e.rotation + (180 + Mathf.randomSeed(e.id, 180f)) * e.finpow() + Mathf.randomSeed(e.id + 1, 90f);
+        
+        color(Color.valueOf("ff9c5a"));
+        stroke(e.fin() * 6f);
+        Lines.circle(e.x, e.y, foutpow * 28f);
+
+        Fill.circle(e.x, e.y, slope * 6f);
+        for(int i = 0; i < 6; i++){
+            Drawf.tri(e.x, e.y, 6f, 80f * slope, rot + i * 60);
+        }
+
+        color();
+        Fill.circle(e.x, e.y, slope * 3f);
+        for(int i = 0; i < 6; i++){
+            Drawf.tri(e.x, e.y, 3f, 30f * slope, rot + i * 60);
+        }
+    }), 
+    
+    calamityCharge = new Effect(110f, e -> {
+        float slope = Mathf.curve(e.fin(), 0f, 0.85f) - Mathf.curve(e.fin(), 0.85f, 1f);
+        float foutpow = Interp.pow3Out.apply(e.fout());
+        float rot = e.rotation + (270 + Mathf.randomSeed(e.id, 270f)) * e.finpow() + Mathf.randomSeed(e.id + 1, 90f);
+        
+        color(Color.valueOf("ff9c5a"));
+        stroke(e.fin() * 8f);
+        Lines.circle(e.x, e.y, foutpow * 45f);
+
+        Fill.circle(e.x, e.y, slope * 8f);
+        for(int i = 0; i < 9; i++){
+            Drawf.tri(e.x, e.y, 8f, 140f * slope, rot + i * 40);
+        }
+
+        color();
+        Fill.circle(e.x, e.y, slope * 4f);
+        for(int i = 0; i < 9; i++){
+            Drawf.tri(e.x, e.y, 4f, 50f * slope, rot + i * 40);
+        }
+    }), 
+    
+    extinctionCharge = new Effect(130f, e -> {
+        float slope = Mathf.curve(e.fin(), 0f, 0.85f) - Mathf.curve(e.fin(), 0.85f, 1f);
+        float foutpow = Interp.pow3Out.apply(e.fout());
+        float rot = e.rotation + (360 + Mathf.randomSeed(e.id, 360f)) * e.finpow() + Mathf.randomSeed(e.id + 1, 90f);
+        
+        color(Color.valueOf("ff9c5a"));
+        stroke(e.fin() * 10f);
+        Lines.circle(e.x, e.y, foutpow * 70f);
+
+        Fill.circle(e.x, e.y, slope * 10f);
+        for(int i = 0; i < 12; i++){
+            Drawf.tri(e.x, e.y, 10f, 200f * slope, rot + i * 30);
+        }
+
+        color();
+        Fill.circle(e.x, e.y, slope * 5f);
+        for(int i = 0; i < 12; i++){
+            Drawf.tri(e.x, e.y, 5f, 80f * slope, rot + i * 30);
+        }
+    }), 
 
     orbHit = new Effect(12f, e -> {
         color(Pal.surge);

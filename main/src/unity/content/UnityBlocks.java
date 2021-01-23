@@ -391,6 +391,7 @@ public class UnityBlocks implements ContentList{
                 coolantMultiplier = 0.8f;
                 shootCone = 40f;
                 shootDuration = 230f;
+                // shootLength = 5f;
                 powerUse = 19f;
                 shootShake = 3f;
                 firingMoveFract = 0.2f;
@@ -415,6 +416,7 @@ public class UnityBlocks implements ContentList{
             coolantMultiplier = 0.6f;
             shootCone = 40f;
             shootDuration = 320f;
+            // shootLength = 12f;
             powerUse = 39f;
             shootShake = 4f;
             firingMoveFract = 0.16f;
@@ -428,6 +430,8 @@ public class UnityBlocks implements ContentList{
             loopSoundVolume = 2.2f;
             expanded = true;
             requirements(Category.turret, with(Items.copper, 1250, Items.lead, 1320, Items.graphite, 1100, Items.titanium, 1340, Items.surgeAlloy, 1240, Items.silicon, 1350, Items.thorium, 770, UnityItems.darkAlloy, 370));
+            chargeBeginEffect = UnityFx.catastropheCharge;
+            chargeTime = UnityFx.catastropheCharge.lifetime;
             shootType = UnityBullets.catastropheLaser;
             consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.4f && liquid.flammability < 0.1f, 1.3f)).update(false);
         }};
@@ -440,6 +444,7 @@ public class UnityBlocks implements ContentList{
             coolantMultiplier = 0.6f;
             shootCone = 23f;
             shootDuration = 360f;
+            // shootLength = 14f;
             powerUse = 87f;
             shootShake = 4f;
             firingMoveFract = 0.09f;
@@ -453,6 +458,8 @@ public class UnityBlocks implements ContentList{
             loopSoundVolume = 2.6f;
             expanded = true;
             requirements(Category.turret, with(Items.copper, 2800, Items.lead, 2970, Items.graphite, 2475, Items.titanium, 3100, Items.surgeAlloy, 2790, Items.silicon, 3025, Items.thorium, 1750, UnityItems.darkAlloy, 1250));
+            chargeBeginEffect = UnityFx.calamityCharge;
+            chargeTime = UnityFx.calamityCharge.lifetime;
             shootType = UnityBullets.calamityLaser;
             consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.3f && liquid.flammability < 0.1f, 2.1f)).update(false);
         }};
@@ -466,6 +473,7 @@ public class UnityBlocks implements ContentList{
             coolantMultiplier = 0.4f;
             shootCone = 12f;
             shootDuration = 360f;
+            // shootLength = 10f;
             powerUse = 175f;
             shootShake = 4f;
             firingMoveFract = 0.09f;
@@ -478,6 +486,8 @@ public class UnityBlocks implements ContentList{
             loopSound = UnitySounds.beamIntenseHighpitchTone;
             loopSoundVolume = 2f;
             expanded = true;
+            chargeBeginEffect = UnityFx.extinctionCharge;
+            chargeTime = UnityFx.extinctionCharge.lifetime;
             shootType = UnityBullets.extinctionLaser;
             consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.27f && liquid.flammability < 0.1f, 2.5f)).update(false);
         }};
