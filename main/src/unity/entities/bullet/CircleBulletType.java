@@ -26,10 +26,13 @@ public class CircleBulletType extends BulletType{
 
     @Override
     public void draw(Bullet b){
+        float z = Draw.z();
+        Draw.z(b.hitSize > 50f ? z - 0.001f : z);
         Draw.color(color.get(b));
         Fill.circle(b.x, b.y, b.hitSize + 1.5f);
         Draw.color(Color.white);
         Fill.circle(b.x, b.y, b.hitSize);
+        Draw.z(z);
     }
 
     @Override
