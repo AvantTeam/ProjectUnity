@@ -191,13 +191,14 @@ public class KamiAI implements UnitController{
                         Cons<Bullet> data = b -> {
                             if((b.time - 40f) < 1.2f * 17){
                                 b.vel.setLength(Math.max((1f - Mathf.clamp((b.time - 40f) / (1.2f * 17))) * b.type.speed, 0.02f));
-                            }else if(b.time >= 1.75f * 60){
-                                b.vel.setLength(Math.max(Mathf.clamp((b.time - (1.75f * 60)) / 30f) * b.type.speed, 0.02f));
+                            }else if((b.time - b.fdata) >= 1.75f * 60){
+                                b.vel.setLength(Math.max(Mathf.clamp(((b.time - b.fdata) - (1.75f * 60)) / 30f) * b.type.speed, 0.02f));
                             }
                         };
                         Bullet b = UnityBullets.kamiBullet1.create(kamiAI.unit, kamiAI.unit.x, kamiAI.unit.y, angle);
                         b.time = (kamiAI.reloads[4] * 6.666f);
                         b.data = data;
+                        b.fdata = (kamiAI.reloads[4] * 6.666f);
                     }
                     kamiAI.reloads[4] += 1f;
                 }
@@ -221,6 +222,7 @@ public class KamiAI implements UnitController{
     protected Bullet[] tmpBullets = new Bullet[8];
     protected float time = 0f;
     protected float waitTime = 40f;
+    protected float moveTime = 0f;
     protected float autoShootTime = 0f;
     protected boolean changed = false;
     protected KamiShootType shooterType;
@@ -254,11 +256,17 @@ public class KamiAI implements UnitController{
 
     public void updateBulletHell(){
         if(target == null || unit == null) return;
+        if(!unit.within(target, 650f)) moveTime = 100f;
+        if(moveTime > 0.001f){
+            tmpVec.trns(relativeRotation, 0, 210).add(target).sub(unit).scl(1 / 20f);
+            unit.move(tmpVec.x, tmpVec.y);
+            moveTime -= Time.delta;
+        }
         if(!changed){
             tmpVec.trns(relativeRotation, 0, 210).add(target).sub(unit).scl(1 / 20f);
             unit.move(tmpVec.x, tmpVec.y);
             autoShootTime += Time.delta;
-            if(tmpVec.trns(relativeRotation, 0, 210).add(target).epsilonEquals(unit.x, unit.y, 12f) || autoShootTime >= 100f){
+            if(tmpVec.trns(relativeRotation, 0, 210).add(target).epsilonEquals(unit.x, unit.y, 12f) || autoShootTime >= 90f){
                 int rand = Mathf.random(0, iSeq.size - 1);
                 int t = iSeq.get(rand);
                 shooterType = types[t];
