@@ -668,6 +668,17 @@ public class UnityFx{
         Draw.z(oz);
     }),
 
+    kamiWarningLine = new Effect(120f, 670f * 2f, e -> {
+        if(e.data == null) return;
+        Position[] data = (Position[])e.data;
+        Position a = data[0];
+        Position b = data[1];
+
+        Draw.color(Tmp.c1.set(Color.red).shiftHue(e.time * 3f));
+        Lines.stroke(Mathf.clamp(e.fslope() * 2f) * 1.2f);
+        Lines.line(a.getX(), a.getY(), b.getX(), b.getY());
+    }),
+
     pointBlastLaserEffect = new Effect(23f, 600f, e -> {
         Draw.color(e.color);
         Fill.circle(e.x, e.y, e.rotation * e.fout());

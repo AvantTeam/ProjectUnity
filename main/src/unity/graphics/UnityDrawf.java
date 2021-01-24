@@ -111,4 +111,26 @@ public class UnityDrawf{
             Draw.reset();
         });
     }
+
+    //An alternate to Anuke's method, this one allows triangles
+    public static void drawPolygon(float[] vertices){
+        if(vertices.length < 6) return;
+        for(int i = 2; i < vertices.length; i += 6){
+            boolean isTriangle = vertices.length - i < 0;
+            if(!isTriangle){
+                Fill.quad(
+                vertices[0], vertices[1],
+                vertices[i], vertices[i + 1],
+                vertices[i + 2], vertices[i + 3],
+                vertices[i + 4], vertices[i + 5]
+                );
+            }else{
+                Fill.tri(
+                vertices[0], vertices[1],
+                vertices[i], vertices[i + 1],
+                vertices[i + 2], vertices[i + 3]
+                );
+            }
+        }
+    }
 }

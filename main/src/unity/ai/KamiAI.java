@@ -76,6 +76,64 @@ public class KamiAI implements UnitController{
         }, kamiAI -> {
             kamiAI.reloads[0] = -80f;
             kamiAI.reloads[3] = 1f;
+        }, 15 * 60f),
+        new KamiShootType(kamiAI -> {
+            if(kamiAI.reloads[0] >= 2.5f * 60f){
+                kamiAI.reloads[6] += Time.delta;
+                kamiAI.reloads[1] += Time.delta;
+                kamiAI.reloads[8] += Time.delta;
+                if(kamiAI.reloads[6] >= 6 && kamiAI.tmpBullets[0] != null){
+                    Cons<Bullet> data = b -> {
+                        if(b.time < 1f * 60){
+                            b.vel.setLength(Math.max((1f - (b.time / (1f * 60))) * b.type.speed, 0.01f));
+                        }else if(b.time >= 2.5f * 60){
+                            b.vel.setLength(Math.min(Math.max((b.time - (2.5f * 60)) / 80f, 0.01f), b.type.speed));
+                        }
+                    };
+                    for(int i = 0; i < 8; i++){
+                        float angle = (i * (360f / 8)) + (kamiAI.reloads[8] * kamiAI.reloads[7] * 4f);
+                        Bullet bullet = UnityBullets.kamiBullet1.create(kamiAI.unit, kamiAI.unit.x, kamiAI.unit.y, angle);
+                        bullet.hitSize = 8f;
+                        bullet.lifetime = 7f * 60f;
+                        bullet.data = data;
+
+                    }
+                    kamiAI.reloads[6] = 0f;
+                }
+                if(kamiAI.reloads[2] != 1){
+                    tmpVec.trns(kamiAI.reloads[3], 670f).add(kamiAI.unit);
+                    UnityFx.kamiWarningLine.at(kamiAI.unit.x, kamiAI.unit.y, 0f, new Position[]{new Vec2(kamiAI.unit.x, kamiAI.unit.y), new Vec2(tmpVec)});
+                    kamiAI.reloads[2] = 1;
+                }
+                if(kamiAI.reloads[1] >= 100){
+                    if(kamiAI.reloads[4] != 1){
+                        tmpVec.trns(kamiAI.reloads[3], 310f).add(kamiAI.unit);
+                        kamiAI.tmpBullets[0] = UnityBullets.kamiLaser.create(kamiAI.unit, tmpVec.x, tmpVec.y, kamiAI.reloads[4]);
+                        kamiAI.reloads[4] = 1f;
+                    }
+                    if(kamiAI.tmpBullets[0] != null){
+                        kamiAI.reloads[3] = Angles.moveToward(kamiAI.reloads[3], kamiAI.unit.angleTo(kamiAI.target), 0.2f * Time.delta);
+                        tmpVec.trns(kamiAI.reloads[3], 310f).add(kamiAI.unit);
+                        kamiAI.tmpBullets[0].rotation(kamiAI.reloads[3]);
+                        kamiAI.tmpBullets[0].set(tmpVec);
+                    }
+                    kamiAI.reloads[5] += Time.delta;
+                    if(kamiAI.reloads[5] >= 4.2f * 60f){
+                        kamiAI.tmpBullets[0] = null;
+                        for(int i = 0; i < 6; i++) kamiAI.reloads[i] = 0f;
+                        kamiAI.reloads[8] = 0f;
+                        kamiAI.reloads[7] *= -1f;
+                    }
+                }
+            }else if(kamiAI.target != null){
+                tmpVec.trns(kamiAI.relativeRotation, 0, 210).add(kamiAI.target).sub(kamiAI.unit).scl(1 / 20f);
+                kamiAI.reloads[3] = kamiAI.unit.angleTo(kamiAI.target);
+                kamiAI.unit.move(tmpVec.x, tmpVec.y);
+                kamiAI.reloads[0] += Time.delta;
+            }
+        }, kamiAI -> {
+            kamiAI.reloads[0] = 1.50f * 60f;
+            kamiAI.reloads[7] = 1f;
         }, 15 * 60f)
     };
 
@@ -84,6 +142,7 @@ public class KamiAI implements UnitController{
     protected Teamc target;
     protected IntSeq iSeq = new IntSeq();
     protected float[] reloads = new float[16];
+    protected Bullet[] tmpBullets = new Bullet[8];
     protected float time = 0f;
     protected float waitTime = 40f;
     protected float autoShootTime = 0f;
@@ -123,7 +182,7 @@ public class KamiAI implements UnitController{
             tmpVec.trns(relativeRotation, 0, 210).add(target).sub(unit).scl(1 / 20f);
             unit.move(tmpVec.x, tmpVec.y);
             autoShootTime += Time.delta;
-            if(tmpVec.trns(relativeRotation, 0, 210).add(target).epsilonEquals(unit.x, unit.y, 12f) || autoShootTime >= 120f){
+            if(tmpVec.trns(relativeRotation, 0, 210).add(target).epsilonEquals(unit.x, unit.y, 12f) || autoShootTime >= 100f){
                 int rand = Mathf.random(0, iSeq.size - 1);
                 int t = iSeq.get(rand);
                 shooterType = types[t];
@@ -143,6 +202,7 @@ public class KamiAI implements UnitController{
         changed = false;
         waitTime = 0f;
         Arrays.fill(reloads, 0f);
+        Arrays.fill(tmpBullets, null);
     }
 
     @Override
