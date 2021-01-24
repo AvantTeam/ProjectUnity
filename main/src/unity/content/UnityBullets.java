@@ -474,6 +474,7 @@ public class UnityBullets implements ContentList{
             lifetime = 4f * 60f;
             length = 760f;
             width = 140f;
+            fadeInTime = 60f;
             drawSize = (length + (width * 2f)) * 2f;
         }};
 

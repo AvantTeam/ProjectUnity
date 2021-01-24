@@ -84,14 +84,15 @@ public class KamiAI implements UnitController{
                 kamiAI.reloads[8] += Time.delta;
                 if(kamiAI.reloads[6] >= 6 && kamiAI.tmpBullets[0] != null){
                     Cons<Bullet> data = b -> {
-                        if(b.time < 1f * 60){
-                            b.vel.setLength(Math.max((1f - (b.time / (1f * 60))) * b.type.speed, 0.01f));
+                        if(b.time < 1f * 50){
+                            b.vel.setLength(Math.max((1f - (b.time / (1f * 50))) * b.type.speed, 0.02f));
                         }else if(b.time >= 2.5f * 60){
-                            b.vel.setLength(Math.min(Math.max((b.time - (2.5f * 60)) / 80f, 0.01f), b.type.speed));
+                            b.vel.setLength(Math.min(Math.max((b.time - (2.5f * 60)) / 80f, 0.02f), b.type.speed));
                         }
                     };
-                    for(int i = 0; i < 8; i++){
-                        float angle = (i * (360f / 8)) + (kamiAI.reloads[8] * kamiAI.reloads[7] * 4f);
+                    int diff = 7 + difficulty;
+                    for(int i = 0; i < diff; i++){
+                        float angle = (i * (360f / diff)) + (kamiAI.reloads[8] * kamiAI.reloads[7] * 4f);
                         Bullet bullet = UnityBullets.kamiBullet1.create(kamiAI.unit, kamiAI.unit.x, kamiAI.unit.y, angle);
                         bullet.hitSize = 8f;
                         bullet.lifetime = 7f * 60f;
@@ -134,7 +135,66 @@ public class KamiAI implements UnitController{
         }, kamiAI -> {
             kamiAI.reloads[0] = 1.50f * 60f;
             kamiAI.reloads[7] = 1f;
-        }, 15 * 60f)
+        }, 15 * 60f),
+        new KamiShootType(kamiAI -> {
+            if(kamiAI.reloads[1] >= 12f){
+                int diff = 7 + difficulty;
+                for(int i = 0; i < diff; i++){
+                    float angle = (i * (360f / diff)) + Mathf.sin(kamiAI.reloads[2], 120f, 30f) + kamiAI.relativeRotation;
+                    Cons<Bullet> data1 = b -> {
+                        if(b.time > 1.1f * 17f){
+                            float spacing = 20f;
+                            for(int j = 0; j < 5; j++){
+                                float angleB = (j * spacing - (5 - 1) * spacing / 2f);
+                                Cons<Bullet> data2 = a -> {
+                                    if(a.time >= 1.1f * 17){
+                                        a.vel.scl(0.9f);
+                                        a.rotation(a.rotation() + (angleB / 2f));
+                                        a.data = null;
+                                    }
+                                };
+                                Bullet c = UnityBullets.kamiBullet1.create((Teamc)b.owner, b.x, b.y, b.rotation() + angleB);
+                                c.vel.scl(0.7f);
+                                c.data = data2;
+                            }
+                            b.time = b.lifetime + 1f;
+                        }
+                    };
+                    Bullet b = UnityBullets.kamiBullet1.create(kamiAI.unit, kamiAI.unit.x, kamiAI.unit.y, angle);
+                    b.data = data1;
+                    b.vel.scl(0.8f);
+                }
+                kamiAI.reloads[1] = 0f;
+            }
+            if(kamiAI.reloads[0] >= 4f * 60){
+                kamiAI.reloads[2] += Time.delta;
+                if(kamiAI.reloads[3] >= 7f){
+                    kamiAI.reloads[3] = 0f;
+                    for(int i = 0; i < 24 + difficulty; i++){
+                        float angle = (i * (360f / (24 + difficulty))) + (kamiAI.reloads[4] * 5f * kamiAI.reloads[5]);
+                        Cons<Bullet> data = b -> {
+                            if((b.time - 40f) < 1.2f * 17){
+                                b.vel.setLength(Math.max((1f - Mathf.clamp((b.time - 40f) / (1.2f * 17))) * b.type.speed, 0.02f));
+                            }else if(b.time >= 1.75f * 60){
+                                b.vel.setLength(Math.max(Mathf.clamp((b.time - (1.75f * 60)) / 30f) * b.type.speed, 0.02f));
+                            }
+                        };
+                        Bullet b = UnityBullets.kamiBullet1.create(kamiAI.unit, kamiAI.unit.x, kamiAI.unit.y, angle);
+                        b.lifetime = b.type.lifetime - (kamiAI.reloads[4] * 6.666f);
+                        b.data = data;
+                    }
+                    kamiAI.reloads[4] += 1f;
+                }
+                if(kamiAI.reloads[4] >= 6){
+                    kamiAI.reloads[3] = -(4f * 60);
+                    kamiAI.reloads[4] = 0f;
+                    kamiAI.reloads[5] *= -1f;
+                }
+                kamiAI.reloads[3] += Time.delta;
+            }
+            kamiAI.reloads[0] += Time.delta;
+            kamiAI.reloads[1] += Time.delta;
+        }, kamiAI -> kamiAI.reloads[5] = 1f, 20 * 60f)
     };
 
     protected Interval timer = new Interval(1);
