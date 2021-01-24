@@ -82,6 +82,21 @@ public class KamiAI implements UnitController{
                 kamiAI.reloads[6] += Time.delta;
                 kamiAI.reloads[1] += Time.delta;
                 kamiAI.reloads[8] += Time.delta;
+                kamiAI.reloads[9] += Time.delta;
+                if(kamiAI.reloads[9] >= 20 && kamiAI.tmpBullets[0] != null){
+                    int diff = 4 + difficulty;
+                    for(int i = 0; i < diff; i++){
+                        float angle = (i * (360f / diff)) + (kamiAI.reloads[8] * kamiAI.reloads[7] * -2f);
+                        tmpVec.trns(angle, 30f).add(kamiAI.unit);
+                        for(int j = 0; j < 2; j++){
+                            Bullet bullet = UnityBullets.kamiBullet1.create(kamiAI.unit, tmpVec.x, tmpVec.y, angle);
+                            bullet.hitSize = 15f;
+                            bullet.vel.scl(j >= 1 ? 0.75f : 0.33f);
+                            bullet.lifetime *= 1f / (j >= 1 ? 0.75f : 0.33f);
+                        }
+                    }
+                    kamiAI.reloads[9] = 0f;
+                }
                 if(kamiAI.reloads[6] >= 6 && kamiAI.tmpBullets[0] != null){
                     Cons<Bullet> data = b -> {
                         if(b.time < 1f * 50){
@@ -123,6 +138,7 @@ public class KamiAI implements UnitController{
                         kamiAI.tmpBullets[0] = null;
                         for(int i = 0; i < 6; i++) kamiAI.reloads[i] = 0f;
                         kamiAI.reloads[8] = 0f;
+                        kamiAI.reloads[9] = 0f;
                         kamiAI.reloads[7] *= -1f;
                     }
                 }
@@ -180,7 +196,7 @@ public class KamiAI implements UnitController{
                             }
                         };
                         Bullet b = UnityBullets.kamiBullet1.create(kamiAI.unit, kamiAI.unit.x, kamiAI.unit.y, angle);
-                        b.lifetime = b.type.lifetime - (kamiAI.reloads[4] * 6.666f);
+                        b.time = (kamiAI.reloads[4] * 6.666f);
                         b.data = data;
                     }
                     kamiAI.reloads[4] += 1f;
