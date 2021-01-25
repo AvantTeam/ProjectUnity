@@ -248,7 +248,7 @@ public class KamiAI implements UnitController{
                 iSeq.add(i);
             }
         }
-        if(timer.get(1, 4f) && unit.deltaLen() >= 0.5f){
+        if(timer.get(1, 10f) && unit.deltaLen() >= 0.25f){
             UnityFx.rainbowTextureTrail.at(unit.x, unit.y, unit.rotation, ((RainbowUnitType)unit.type).trailRegion);
         }
         if(waitTime >= 40f){
@@ -260,6 +260,7 @@ public class KamiAI implements UnitController{
 
     public void updateBulletHell(){
         if(target == null || unit == null) return;
+        unit.lookAt(relativeRotation - 90f);
         if(!unit.within(target, 650f)) moveTime = 150f;
         if(moveTime > 0.001f){
             tmpVec.trns(relativeRotation, 0, 210).add(target).sub(unit).scl(1 / 20f);
@@ -329,6 +330,8 @@ public class KamiAI implements UnitController{
             ai.time += Time.delta;
             if(ai.time >= maxTime){
                 ai.time = 0f;
+                ai.relativeRotation += Mathf.range(180f);
+                if(ai.relativeRotation < 0f) ai.relativeRotation += 360f;
                 ai.changeType();
             }
         }
