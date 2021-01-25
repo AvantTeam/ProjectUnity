@@ -46,13 +46,9 @@ public class UnityUnitTypes implements ContentList{
     public static @EntityPoint(type = UnitEntity.class)
     UnitType angel, malakhim;
     
-    /** Global {@linkplain MechUnit mech} units. */
-    public static @EntityPoint(type = MechUnit.class)
-    UnitType ursa;
-
     /** Global {@linkplain LegsUnit legs} units */
     public static @EntityPoint(type = LegsUnit.class)
-    UnitType arcaetana, projectSpiboss;
+    UnitType ursa, arcaetana, projectSpiboss;
 
     /** Global naval units */
     public static UnitType//@formatter:off
@@ -433,7 +429,7 @@ public class UnityUnitTypes implements ContentList{
             health = 20000;
             mechFrontSway = 1.9f;
             mechSideSway = 0.6f;
-            hitSize = 26;
+            hitSize = 31f;
             weapons.add(new Weapon(name + "-laser"){{
                 alternate = true;
                 reload = 40f;
@@ -447,18 +443,16 @@ public class UnityUnitTypes implements ContentList{
                 shootX = 1.5f;
                 shootY = 16f;
                 recoil = 5f;
-                x = 20.75f;
+                x = 30.75f;
                 y = 0f;
                 x = 21;
-                shots = 3;
-                spacing = 12f;
-                shotDelay = 10f;
+                shots = 1;
                 shootStatus = StatusEffects.unmoving;
                 shootStatusDuration = 45f;
                 // firstShotDelay = Fx.greenLaserCharge.lifetime;
                 bullet = new LaserBulletType(){{
                     length = 460f;
-                    damage = 210f;
+                    damage = 270f;
                     width = 75f;
 
                     lifetime = 65f;
@@ -2063,6 +2057,7 @@ public class UnityUnitTypes implements ContentList{
         kami = new RainbowUnitType("kami-mkii"){{
             health = 120000f;
             speed = 15f;
+            hitSize = 36f;
             flying = true;
             defaultController = KamiAI::new;
         }};
