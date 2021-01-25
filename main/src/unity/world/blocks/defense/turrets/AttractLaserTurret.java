@@ -62,10 +62,6 @@ public class AttractLaserTurret extends LaserTurret{
 
             float prog = charge * 1.5f + 0.5f;
             sound.update(x, y, charge, prog);
-
-            if(isControlled()){
-                Log.info("Bullet: @, Life: @", bullet(), bulletLife());
-            }
         }
 
         @Override
@@ -87,7 +83,7 @@ public class AttractLaserTurret extends LaserTurret{
         protected void updateCooling(){
             if(!isShooting() || (bulletLife() > 0f && bullet() != null)){
                 charge = Mathf.lerpDelta(charge, 0f, chargeCooldown);
-            }else if(isControlled() && isShooting()){
+            }else{
                 float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;
 
                 Liquid liquid = liquids.current();

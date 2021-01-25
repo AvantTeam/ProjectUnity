@@ -29,7 +29,7 @@ import static unity.content.UnityFx.*;
 public class UnityBullets implements ContentList{
     public static BulletType laser, coalBlaze, pyraBlaze, falloutLaser, catastropheLaser, calamityLaser, extinctionLaser, orb, shockBeam, currentStroke,
         shielderBullet, plasmaFragTriangle, plasmaTriangle, surgeBomb, pylonLightning, pylonLaser, pylonLaserSmall, exporb, monumentRailBullet, scarShrapnel, scarMissile, celsiusSmoke, kelvinSmoke,
-        kamiBullet1, kamiLaser;
+        kamiBullet1, kamiLaser, supernovaLaser;
 
     //only enhanced
     public static BasicBulletType standardDenseLarge, standardHomingLarge, standardIncendiaryLarge, standardThoriumLarge, standardDenseHeavy, standardHomingHeavy, standardIncendiaryHeavy, standardThoriumHeavy, standardDenseMassive, standardHomingMassive,
@@ -477,6 +477,31 @@ public class UnityBullets implements ContentList{
             fadeInTime = 60f;
             drawSize = (length + (width * 2f)) * 2f;
         }};
+
+        supernovaLaser = new ContinuousLaserBulletType(160){
+            @Override
+            public void update(Bullet b){
+                super.update(b);
+
+                float start = Mathf.randomSeed((long)(b.id + Time.time), length);
+                Lightning.create(b.team, Pal.lancerLaser, 12f,
+                b.x + Angles.trnsx(b.rotation(), start),
+                b.y + Angles.trnsy(b.rotation(), start),
+                b.rotation() + Mathf.randomSeedRange((long)(b.id + Time.time + 1f), 15f), Mathf.randomSeed((long)(b.id + Time.time + 2f), 10, 19)
+                );
+            }
+
+            {
+                colors = new Color[]{
+                Color.valueOf("4be3ca55"),
+                Color.valueOf("91eedeaa"),
+                Pal.lancerLaser.cpy(),
+                Color.white
+                };
+
+                length = 280;
+            }
+        };
 
         //only enhanced
 

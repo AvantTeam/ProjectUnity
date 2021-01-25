@@ -1008,7 +1008,7 @@ public class UnityBlocks implements ContentList{
             powerUse = 24f;
 
             shootCone = 15f;
-            range = 210f;
+            range = 250f;
 
             chargeSound = Sounds.machine;
             chargeSoundVolume = 1f;
@@ -1018,7 +1018,7 @@ public class UnityBlocks implements ContentList{
 
             baseExplosiveness = 25f;
             shootDuration = 480f;
-            shootType = ((LaserTurret)Blocks.meltdown).shootType;
+            shootType = UnityBullets.supernovaLaser;
         }};
 
         /*monolithGroundFactory = new UnitFactory("monolith-ground-factory"){{
