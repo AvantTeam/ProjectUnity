@@ -89,7 +89,7 @@ public class UnityBlocks implements ContentList{
     public static @FactionDef(type = "monolith")
     Block monolithAlloyForge,
 
-    mage, oracle; //spectrum,
+    mage, oracle, supernova; //spectrum,
 
     //monolithGroundFactory;
 
@@ -986,6 +986,29 @@ public class UnityBlocks implements ContentList{
                     inaccuracy = 8f;
                 }
             };
+        }};
+
+        supernova = new AttractLaserTurret("supernova"){{
+            requirements(Category.turret, with(Items.copper, 1));
+            size = 7;
+            health = 8100;
+
+            rotateSpeed = 1f;
+            recoilAmount = 4f;
+            powerUse = 24f;
+
+            shootCone = 15f;
+            range = 210f;
+
+            chargeSound = Sounds.machine;
+            chargeSoundVolume = 1f;
+            shootSound = UnitySounds.supernovaShoot;
+            loopSound = UnitySounds.supernovaActive;
+            loopSoundVolume = 1f;
+
+            baseExplosiveness = 25f;
+            shootDuration = 480f;
+            shootType = ((LaserTurret)Blocks.meltdown).shootType;
         }};
 
         /*monolithGroundFactory = new UnitFactory("monolith-ground-factory"){{

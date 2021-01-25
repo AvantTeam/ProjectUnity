@@ -11,6 +11,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+import mindustry.world.blocks.defense.turrets.*;
 import unity.entities.comp.*;
 import unity.type.*;
 
@@ -190,18 +191,39 @@ public class IconGenerator implements Generator{
                     }
                 }
 
-                icon.save(fname + "-full");
-
-                for(Cicon i : Cicon.scaled){
-                    Vec2 size = Scaling.fit.apply(icon.width, icon.height, i.size, i.size);
-                    Sprite scaled = new Sprite((int)size.x, (int)size.y);
-
-                    scaled.drawScaled(icon);
-                    scaled.save("ui/" + fname + "-" + i.name());
-                }
-            }catch(IllegalArgumentException e){
+                genIcon(icon, fname);
+            }catch(Exception e){
                 Log.err("Skipping unit @: @", type.name, e.getMessage());
             }
         });
+
+        content.blocks().each(block -> {
+            if(block.minfo.mod == null) return;
+
+            try{
+                if(block instanceof Turret) {
+                    block.load();
+                    block.init();
+
+                    String fname = block.name.replaceFirst("unity-", "");
+
+                    Sprite reg = SpriteProcessor.get(fname);
+                    Sprite icon = Sprite.createEmpty(0, 0);
+                }
+            }catch(Exception e){
+                Log.err("Skipping block @: @", block.name, e.getMessage());
+            }
+        });
+    }
+
+    private void genIcon(Sprite sprite, String name) {
+        sprite.save(name + "-full");
+        for(Cicon i : Cicon.scaled){
+            Vec2 size = Scaling.fit.apply(sprite.width, sprite.height, i.size, i.size);
+            Sprite scaled = new Sprite((int)size.x, (int)size.y);
+
+            scaled.drawScaled(sprite);
+            scaled.save("ui/" + name + "-" + i.name());
+        }
     }
 }

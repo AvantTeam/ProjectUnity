@@ -11,15 +11,15 @@ import mindustry.*;
 import mindustry.graphics.*;
 import unity.*;
 
-/*
- Wavefront Object Converter and Renderer for Arc/libGDX
- Renders objects orthographically
- no culling, textures, normals yet.
- the faces MUST be a quad, because of "limitations."
- the faces should not intersect. (no crashes, its just that the renderer doesnt support it.)
-
- by EyeOfDarkness
-*/
+/**
+ * Wavefront Object Converter and Renderer for Arc/libGDX
+ * Renders objects orthographically
+ * no culling, textures, normals yet.
+ * the faces MUST be a quad, because of "limitations."
+ * the faces should not intersect. (no crashes, its just that the renderer doesnt support it.)
+ * 
+ * @author EyeOfDarkness
+ */
 public class WavefrontObject{
     protected static int tmpIndexer = 0;
     protected static final float zScale = 0.01f;
