@@ -672,7 +672,7 @@ public class UnityFx{
         if(!(e.data instanceof TextureRegion t)) return;
         Draw.blend(Blending.additive);
         Draw.color(Tmp.c1.set(Color.red).shiftHue(e.time * 3f).a(Mathf.clamp(e.fout() * 1.5f)));
-        Draw.rect(t, e.x, e.y, e.rotation);
+        Draw.rect(t, e.x, e.y, e.rotation - 90f);
         Draw.blend();
     }),
 
