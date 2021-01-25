@@ -14,7 +14,6 @@ import java.util.*;
 
 public class KamiAI implements UnitController{
     public static int difficulty = 1;
-    private static final boolean testing = false;
     private static final Vec2 tmpVec = new Vec2();
     private static final Vec2 tmpVec2 = new Vec2();
     private static final KamiShootType[] types = {
@@ -249,7 +248,7 @@ public class KamiAI implements UnitController{
                 iSeq.add(i);
             }
         }
-        if(timer.get(1, 2f) && unit.vel.len() > 0.25f){
+        if(timer.get(1, 4f) && unit.deltaLen() >= 0.5f){
             UnityFx.rainbowTextureTrail.at(unit.x, unit.y, unit.rotation, ((RainbowUnitType)unit.type).trailRegion);
         }
         if(waitTime >= 40f){
@@ -272,17 +271,12 @@ public class KamiAI implements UnitController{
             unit.move(tmpVec.x, tmpVec.y);
             autoShootTime += Time.delta;
             if(tmpVec.trns(relativeRotation, 0, 210).add(target).epsilonEquals(unit.x, unit.y, 12f) || autoShootTime >= 90f){
-                if(!testing){
-                    int rand = Mathf.random(0, iSeq.size - 1);
-                    int t = iSeq.get(rand);
-                    shooterType = types[t];
-                    iSeq.removeIndex(rand);
-                    //shooterType = types[Mathf.random(0, types.length - 1)];
-
-                    //shooterType.init(this);
-                }else{
-                    shooterType = types[3];
-                }
+                int rand = Mathf.random(0, iSeq.size - 1);
+                int t = iSeq.get(rand);
+                shooterType = types[t];
+                iSeq.removeIndex(rand);
+                //shooterType = types[Mathf.random(0, types.length - 1)];
+                
                 shooterType.init(this);
                 autoShootTime = 0f;
                 changed = true;
