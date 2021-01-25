@@ -187,16 +187,16 @@ public class KamiAI implements UnitController{
                 if(kamiAI.reloads[3] >= 7f){
                     kamiAI.reloads[3] = 0f;
                     for(int i = 0; i < 24 + difficulty; i++){
-                        float angle = (i * (360f / (24 + difficulty))) + (kamiAI.reloads[4] * 5f * kamiAI.reloads[5]);
+                        float angle = (i * (360f / (24 + difficulty))) + (kamiAI.reloads[4] * 9f * kamiAI.reloads[5]);
                         Cons<Bullet> data = b -> {
                             if((b.time - 40f) < 1.2f * 17){
                                 b.vel.setLength(Math.max((1f - Mathf.clamp((b.time - 40f) / (1.2f * 17))) * b.type.speed, 0.02f));
-                            }else if((b.time - b.fdata) >= 1.75f * 60){
+                            }else if((b.time - b.fdata) >= 2f * 60){
                                 b.vel.setLength(Math.max(Mathf.clamp(((b.time - b.fdata) - (1.75f * 60)) / 30f) * b.type.speed, 0.02f));
                             }
                         };
                         Bullet b = UnityBullets.kamiBullet1.create(kamiAI.unit, kamiAI.unit.x, kamiAI.unit.y, angle);
-                        b.time = (kamiAI.reloads[4] * 6.666f);
+                        b.time = (kamiAI.reloads[4] * 3.333f);
                         b.data = data;
                         b.fdata = (kamiAI.reloads[4] * 6.666f);
                     }
@@ -256,7 +256,7 @@ public class KamiAI implements UnitController{
 
     public void updateBulletHell(){
         if(target == null || unit == null) return;
-        if(!unit.within(target, 650f)) moveTime = 100f;
+        if(!unit.within(target, 650f)) moveTime = 150f;
         if(moveTime > 0.001f){
             tmpVec.trns(relativeRotation, 0, 210).add(target).sub(unit).scl(1 / 20f);
             unit.move(tmpVec.x, tmpVec.y);
