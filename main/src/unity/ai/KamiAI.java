@@ -8,11 +8,13 @@ import arc.util.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import unity.content.*;
+import unity.type.*;
 
 import java.util.*;
 
 public class KamiAI implements UnitController{
     public static int difficulty = 1;
+    private static final boolean testing = false;
     private static final Vec2 tmpVec = new Vec2();
     private static final Vec2 tmpVec2 = new Vec2();
     private static final KamiShootType[] types = {
@@ -123,13 +125,13 @@ public class KamiAI implements UnitController{
                 }
                 if(kamiAI.reloads[1] >= 100){
                     if(kamiAI.reloads[4] != 1){
-                        tmpVec.trns(kamiAI.reloads[3], 310f).add(kamiAI.unit);
+                        tmpVec.trns(kamiAI.reloads[3], 80f).add(kamiAI.unit);
                         kamiAI.tmpBullets[0] = UnityBullets.kamiLaser.create(kamiAI.unit, tmpVec.x, tmpVec.y, kamiAI.reloads[4]);
                         kamiAI.reloads[4] = 1f;
                     }
                     if(kamiAI.tmpBullets[0] != null){
                         kamiAI.reloads[3] = Angles.moveToward(kamiAI.reloads[3], kamiAI.unit.angleTo(kamiAI.target), 0.2f * Time.delta);
-                        tmpVec.trns(kamiAI.reloads[3], 310f).add(kamiAI.unit);
+                        tmpVec.trns(kamiAI.reloads[3], 80f).add(kamiAI.unit);
                         kamiAI.tmpBullets[0].rotation(kamiAI.reloads[3]);
                         kamiAI.tmpBullets[0].set(tmpVec);
                     }
@@ -214,7 +216,7 @@ public class KamiAI implements UnitController{
         }, kamiAI -> kamiAI.reloads[5] = 1f, 20 * 60f)
     };
 
-    protected Interval timer = new Interval(1);
+    protected Interval timer = new Interval(2);
     protected Unit unit;
     protected Teamc target;
     protected IntSeq iSeq = new IntSeq();
@@ -247,6 +249,9 @@ public class KamiAI implements UnitController{
                 iSeq.add(i);
             }
         }
+        if(timer.get(1, 2f) && unit.vel.len() > 0.25f){
+            UnityFx.rainbowTextureTrail.at(unit.x, unit.y, unit.rotation, ((RainbowUnitType)unit.type).trailRegion);
+        }
         if(waitTime >= 40f){
             updateBulletHell();
         }else{
@@ -267,12 +272,17 @@ public class KamiAI implements UnitController{
             unit.move(tmpVec.x, tmpVec.y);
             autoShootTime += Time.delta;
             if(tmpVec.trns(relativeRotation, 0, 210).add(target).epsilonEquals(unit.x, unit.y, 12f) || autoShootTime >= 90f){
-                int rand = Mathf.random(0, iSeq.size - 1);
-                int t = iSeq.get(rand);
-                shooterType = types[t];
-                iSeq.removeIndex(rand);
-                //shooterType = types[Mathf.random(0, types.length - 1)];
+                if(!testing){
+                    int rand = Mathf.random(0, iSeq.size - 1);
+                    int t = iSeq.get(rand);
+                    shooterType = types[t];
+                    iSeq.removeIndex(rand);
+                    //shooterType = types[Mathf.random(0, types.length - 1)];
 
+                    //shooterType.init(this);
+                }else{
+                    shooterType = types[3];
+                }
                 shooterType.init(this);
                 autoShootTime = 0f;
                 changed = true;

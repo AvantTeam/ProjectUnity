@@ -668,6 +668,12 @@ public class UnityFx{
         Draw.z(oz);
     }),
 
+    rainbowTextureTrail = new Effect(80f, e -> {
+        if(!(e.data instanceof TextureRegion t)) return;
+        Draw.color(Tmp.c1.set(Color.red).shiftHue(e.time * 3f).a(Mathf.clamp(e.fout() * 1.5f)));
+        Draw.rect(t, e.x, e.y, e.rotation);
+    }),
+
     kamiWarningLine = new Effect(120f, 670f * 2f, e -> {
         if(e.data == null) return;
         Position[] data = (Position[])e.data;

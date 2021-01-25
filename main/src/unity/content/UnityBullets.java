@@ -29,7 +29,7 @@ import static unity.content.UnityFx.*;
 public class UnityBullets implements ContentList{
     public static BulletType laser, coalBlaze, pyraBlaze, falloutLaser, catastropheLaser, calamityLaser, extinctionLaser, orb, shockBeam, currentStroke,
         shielderBullet, plasmaFragTriangle, plasmaTriangle, surgeBomb, pylonLightning, pylonLaser, pylonLaserSmall, exporb, monumentRailBullet, scarShrapnel, scarMissile, celsiusSmoke, kelvinSmoke,
-        kamiBullet1, kamiLaser, supernovaLaser;
+        kamiBullet1, kamiLaser, kamiSmallLaser, supernovaLaser;
 
     //only enhanced
     public static BasicBulletType standardDenseLarge, standardHomingLarge, standardIncendiaryLarge, standardThoriumLarge, standardDenseHeavy, standardHomingHeavy, standardIncendiaryHeavy, standardThoriumHeavy, standardDenseMassive, standardHomingMassive,
@@ -475,6 +475,15 @@ public class UnityBullets implements ContentList{
             length = 760f;
             width = 140f;
             fadeInTime = 60f;
+            drawSize = (length + (width * 2f)) * 2f;
+        }};
+
+        kamiSmallLaser = new KamiLaserBulletType(230f){{
+            lifetime = 2f * 60f;
+            length = 760f;
+            width = 20f;
+            fadeInTime = 15f;
+            curveScl = 3f;
             drawSize = (length + (width * 2f)) * 2f;
         }};
 
