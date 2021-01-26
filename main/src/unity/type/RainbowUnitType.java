@@ -12,6 +12,7 @@ public class RainbowUnitType extends UnityUnitType{
     public int segments = 5;
     public float offset = 15f;
     public TextureRegion[] rainbowRegions;
+    public TextureRegion trailRegion;
 
     public RainbowUnitType(String name){
         super(name);
@@ -21,6 +22,7 @@ public class RainbowUnitType extends UnityUnitType{
     public void load(){
         super.load();
 
+        trailRegion = Core.atlas.find(name + "-trail");
         rainbowRegions = new TextureRegion[segments];
         for(int i = 0; i < segments; i++){
             rainbowRegions[i] = Core.atlas.find(name + "-rainbow-" + (i + 1));
