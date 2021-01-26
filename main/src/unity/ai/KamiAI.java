@@ -330,7 +330,7 @@ public class KamiAI implements UnitController{
             ai.time += Time.delta;
             if(ai.time >= maxTime){
                 ai.time = 0f;
-                ai.relativeRotation += Mathf.range(180f);
+                ai.relativeRotation = Mathf.range(360f);
                 if(ai.relativeRotation < 0f) ai.relativeRotation += 360f;
                 ai.changeType();
             }
