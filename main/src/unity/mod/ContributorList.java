@@ -15,6 +15,7 @@ public final class ContributorList{
             "Eldoofus",
             "Gdeft",
             "GlennFolker",
+            "JerichoFletcher",
             "Goobrr",
             "sk7725",
             "ThePythonGuy3",
