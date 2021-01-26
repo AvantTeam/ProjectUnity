@@ -89,7 +89,18 @@ public class UnityBlocks implements ContentList{
     public static @FactionDef(type = "monolith")
     Block monolithAlloyForge,
 
-    mage, oracle, supernova; //spectrum,
+    mage, oracle;
+
+    public static
+    @FactionDef(type = "monolith")
+    @LoadRegs(value = {
+        "supernova-head",
+        "supernova-core",
+        "supernova-wing-left", "supernova-wing-right",
+        "supernova-wing-left-bottom", "supernova-wing-right-bottom",
+        "supernova-bottom"
+    }, outline = true)
+    Block supernova;
 
     //monolithGroundFactory;
 

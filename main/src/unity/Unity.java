@@ -5,7 +5,6 @@ import arc.func.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
-import mindustry.graphics.*;
 import mindustry.mod.*;
 import mindustry.mod.Mods.*;
 import mindustry.ui.dialogs.*;
@@ -38,6 +37,10 @@ public class Unity extends Mod{
         ContributorList.init();
         UnitySounds.load();
         UnityMusics.load();
+
+        Events.on(ContentInitEvent.class, e -> {
+            Regions.load();
+        });
 
         Events.on(DisposeEvent.class, e -> {
             UnitySounds.dispose();
