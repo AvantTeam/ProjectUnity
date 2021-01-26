@@ -51,7 +51,7 @@ public class LoadProcessor extends BaseProcessor{
             .addJavadoc("Loads the texture regions");
 
         for(String reg : genericRegs){
-            String name = Strings.kebabToCamel(reg);
+            String name = Strings.kebabToCamel(reg) + "Region";
             FieldSpec.Builder var = FieldSpec.builder(
                 cName(TextureRegion.class),
                 name,
@@ -59,7 +59,7 @@ public class LoadProcessor extends BaseProcessor{
             );
 
             spec.addField(var.build());
-            load.addStatement("$L = $T.atlas.find($S)", name, cName(Core.class), reg);
+            load.addStatement("$L = $T.atlas.find($S)", name, cName(Core.class), "unity-" + reg);
         }
 
         spec.addMethod(load.build());

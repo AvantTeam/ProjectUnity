@@ -1,5 +1,6 @@
 package unity.world.blocks.defense.turrets;
 
+import arc.*;
 import arc.audio.*;
 import arc.math.*;
 import arc.util.*;
@@ -28,8 +29,15 @@ public class AttractLaserTurret extends LaserTurret{
         super(name);
     }
 
-    public class ChargeLaserTurretBuild extends LaserTurretBuild{
+    @Override
+    public void load(){
+        super.load();
+        baseRegion = Core.atlas.find("unity-block-" + size);
+    }
+
+    public class AttractLaserTurretBuild extends LaserTurretBuild{
         public float charge;
+        public float phase;
 
         protected PitchedSoundLoop sound = new PitchedSoundLoop(chargeSound, chargeSoundVolume);
 
@@ -58,6 +66,12 @@ public class AttractLaserTurret extends LaserTurret{
                 attractUnits();
             }
 
+            if(isShooting() || (bulletLife() > 0f && bullet() != null)){
+                phase = Mathf.clamp(phase + chargeWarmup * efficiency(), 0f, 1f);
+            }else{
+                phase = Mathf.lerpDelta(phase, 0f, chargeCooldown);
+            }
+
             super.updateTile();
 
             float prog = charge * 1.5f + 0.5f;
@@ -70,7 +84,7 @@ public class AttractLaserTurret extends LaserTurret{
                 return;
             }
 
-            if(charge >= 1f && (consValid() || cheating())){
+            if(charge >= 1f && phase >= 1f && (consValid() || cheating())){
                 BulletType type = peekAmmo();
 
                 shoot(type);

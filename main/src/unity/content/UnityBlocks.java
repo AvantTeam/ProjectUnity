@@ -1009,28 +1009,91 @@ public class UnityBlocks implements ContentList{
             };
         }};
 
-        supernova = new AttractLaserTurret("supernova"){{
-            requirements(Category.turret, with(Items.copper, 1));
-            size = 7;
-            health = 8100;
+        supernova = new AttractLaserTurret("supernova"){
+            /** Temporary vector array to be used in the drawing method */
+            final Vec2[] phases = new Vec2[]{new Vec2(), new Vec2(), new Vec2(), new Vec2(), new Vec2(), new Vec2()};
 
-            rotateSpeed = 1f;
-            recoilAmount = 4f;
-            powerUse = 24f;
+            {
+                requirements(Category.turret, with(Items.copper, 1));
+                size = 7;
+                health = 8100;
 
-            shootCone = 15f;
-            range = 250f;
+                shootLength = size * Vars.tilesize / 2f - 8f;
+                rotateSpeed = 1f;
+                recoilAmount = 4f;
+                powerUse = 24f;
 
-            chargeSound = Sounds.machine;
-            chargeSoundVolume = 1f;
-            shootSound = UnitySounds.supernovaShoot;
-            loopSound = UnitySounds.supernovaActive;
-            loopSoundVolume = 1f;
+                shootCone = 15f;
+                range = 250f;
 
-            baseExplosiveness = 25f;
-            shootDuration = 480f;
-            shootType = UnityBullets.supernovaLaser;
-        }};
+                chargeSound = Sounds.machine;
+                chargeSoundVolume = 1f;
+                shootSound = UnitySounds.supernovaShoot;
+                loopSound = UnitySounds.supernovaActive;
+                loopSoundVolume = 1f;
+
+                baseExplosiveness = 25f;
+                shootDuration = 480f;
+                shootType = UnityBullets.supernovaLaser;
+
+                drawer = b -> {
+                    if(b instanceof AttractLaserTurretBuild tile){
+                        //core
+                        phases[0].trns(tile.rotation, -tile.recoil + Mathf.curve(tile.phase, 0f, 0.3f) * -2f);
+                        //left wing
+                        phases[1].trns(tile.rotation - 90,
+                            Mathf.curve(tile.phase, 0.2f, 0.5f) * -2f,
+
+                            -tile.recoil + Mathf.curve(tile.phase, 0.2f, 0.5f) * 2f +
+                            Mathf.curve(tile.phase, 0.5f, 0.8f) * 3f
+                        );
+                        //left bottom wing
+                        phases[2].trns(tile.rotation - 90,
+                            Mathf.curve(tile.phase, 0f, 0.3f) * -1.5f +
+                            Mathf.curve(tile.phase, 0.6f, 1f) * -2f,
+
+                            -tile.recoil + Mathf.curve(tile.phase, 0f, 0.3f) * 1.5f +
+                            Mathf.curve(tile.phase, 0.6f, 1f) * -1f
+                        );
+                        //bottom
+                        phases[3].trns(tile.rotation, -tile.recoil + Mathf.curve(tile.phase, 0f, 0.6f) * -4f);
+                        //right wing
+                        phases[4].trns(tile.rotation - 90,
+                            Mathf.curve(tile.phase, 0.2f, 0.5f) * 2f,
+
+                            -tile.recoil + Mathf.curve(tile.phase, 0.2f, 0.5f) * 2f +
+                            Mathf.curve(tile.phase, 0.5f, 0.8f) * 3f
+                        );
+                        //right bottom wing
+                        phases[5].trns(tile.rotation - 90,
+                            Mathf.curve(tile.phase, 0f, 0.3f) * 1.5f +
+                            Mathf.curve(tile.phase, 0.6f, 1f) * 2f,
+
+                            -tile.recoil + Mathf.curve(tile.phase, 0f, 0.3f) * 1.5f +
+                            Mathf.curve(tile.phase, 0.6f, 1f) * -1f
+                        );
+
+                        Draw.rect(Regions.supernovaWingLeftBottomOutlineRegion, tile.x + phases[2].x, tile.y + phases[2].y, tile.rotation - 90);
+                        Draw.rect(Regions.supernovaWingRightBottomOutlineRegion, tile.x + phases[5].x, tile.y + phases[5].y, tile.rotation - 90);
+                        Draw.rect(Regions.supernovaWingLeftOutlineRegion, tile.x + phases[1].x, tile.y + phases[1].y, tile.rotation - 90);
+                        Draw.rect(Regions.supernovaWingRightOutlineRegion, tile.x + phases[4].x, tile.y + phases[4].y, tile.rotation - 90);
+                        Draw.rect(Regions.supernovaBottomOutlineRegion, tile.x + phases[3].x, tile.y + phases[3].y, tile.rotation - 90);
+                        Draw.rect(Regions.supernovaHeadOutlineRegion, tile.x + tr2.x, tile.y + tr2.y, tile.rotation - 90);
+                        Draw.rect(Regions.supernovaCoreOutlineRegion, tile.x + phases[0].x, tile.y + phases[0].y, tile.rotation - 90);
+
+                        Draw.rect(Regions.supernovaWingLeftBottomRegion, tile.x + phases[2].x, tile.y + phases[2].y, tile.rotation - 90);
+                        Draw.rect(Regions.supernovaWingRightBottomRegion, tile.x + phases[5].x, tile.y + phases[5].y, tile.rotation - 90);
+                        Draw.rect(Regions.supernovaWingLeftRegion, tile.x + phases[1].x, tile.y + phases[1].y, tile.rotation - 90);
+                        Draw.rect(Regions.supernovaWingRightRegion, tile.x + phases[4].x, tile.y + phases[4].y, tile.rotation - 90);
+                        Draw.rect(Regions.supernovaBottomRegion, tile.x + phases[3].x, tile.y + phases[3].y, tile.rotation - 90);
+                        Draw.rect(Regions.supernovaHeadRegion, tile.x + tr2.x, tile.y + tr2.y, tile.rotation - 90);
+                        Draw.rect(Regions.supernovaCoreRegion, tile.x + phases[0].x, tile.y + phases[0].y, tile.rotation - 90);
+                    }else{
+                        throw new IllegalStateException("building isn't an instance of AttractLaserTurretBuild");
+                    }
+                };
+            }
+        };
 
         /*monolithGroundFactory = new UnitFactory("monolith-ground-factory"){{
             requirements(Category.units, with());
