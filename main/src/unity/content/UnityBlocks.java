@@ -1026,7 +1026,7 @@ public class UnityBlocks implements ContentList{
                 shootCone = 15f;
                 range = 250f;
 
-                chargeSound = Sounds.machine;
+                chargeSound = UnitySounds.supernovaCharge;
                 chargeSoundVolume = 1f;
                 shootSound = UnitySounds.supernovaShoot;
                 loopSound = UnitySounds.supernovaActive;
