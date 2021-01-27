@@ -22,25 +22,21 @@ public class LoadProcessor extends BaseProcessor{
     ObjectSet<String> genericRegs = new ObjectSet<>();
 
     {
-        rounds = 2;
+        rounds = 1;
     }
 
     @Override
     public void process(RoundEnvironment roundEnv) throws Exception{
-        if(round == 1){
-            for(Element e : roundEnv.getElementsAnnotatedWith(LoadRegs.class)){
-                LoadRegs regs = e.getAnnotation(LoadRegs.class);
+        for(Element e : roundEnv.getElementsAnnotatedWith(LoadRegs.class)){
+            LoadRegs regs = e.getAnnotation(LoadRegs.class);
 
-                genericRegs.addAll(regs.value());
-                if(regs.outline()){
-                    genericRegs.addAll(Seq.with(regs.value()).map(n -> n + "-outline"));
-                }
+            genericRegs.addAll(regs.value());
+            if(regs.outline()){
+                genericRegs.addAll(Seq.with(regs.value()).map(n -> n + "-outline"));
             }
-
-            processGenerics();
-        }else{
-
         }
+
+        processGenerics();
     }
 
     void processGenerics() throws IOException{

@@ -105,16 +105,6 @@ public class Annotations{
     }
 
     /**
-     * Loads a texture region and assigns it to its acquirers
-     */
-    @Target(ElementType.FIELD)
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface Load{
-        /** @return The region's name */
-        String value();
-    }
-
-    /**
      * Loads texture regions but does not assign them to their acquirers
      */
     @Retention(RetentionPolicy.SOURCE)
