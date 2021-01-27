@@ -12,6 +12,7 @@ import mindustry.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.units.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.consumers.*;
@@ -31,6 +32,10 @@ public class EndGameTurret extends PowerTurret{
     private final static float[] ringProgresses = {0.013f, 0.035f, 0.024f};
     private final static int[] ringDirections = {1, -1, 1};
     private final static Seq<Entityc> entitySeq = new Seq<>(512);
+
+    private final static Seq<DeadUnitEntry> locked = new Seq<>(128);
+    private static boolean firstInit = false;
+    private final static Seq<DeadUnitEntry> toRemove = new Seq<>(128);
 
     protected int eyeTime = timers++;
     protected int bulletTime = timers++;
@@ -108,6 +113,7 @@ public class EndGameTurret extends PowerTurret{
         protected Vec2[] eyesVecArray = new Vec2[16];
 
         protected Posc[] targets = new Posc[16];
+        private final Seq<DeadUnitEntry> tmpArray = new Seq<>();
 
         @Override
         protected void effects(){
@@ -254,6 +260,7 @@ public class EndGameTurret extends PowerTurret{
             Groups.all.remove(entity);
             if(entity instanceof Unit){
                 Unit tmp = (Unit)entity;
+                tmpArray.add(new DeadUnitEntry(tmp));
                 attemptRemoveAdd(tmp);
                 UnityFx.vapourizeUnit.at(tmp.x, tmp.y, tmp.rotation, tmp);
                 tmp.team.data().updateCount(tmp.type, -1);
@@ -486,6 +493,26 @@ public class EndGameTurret extends PowerTurret{
                 resistTime += Time.delta;
             }
             updateEyes();
+            boolean tmpB = true;
+            for(DeadUnitEntry d : tmpArray){
+                boolean isModified = d.isModified();
+                d.time += Time.delta;
+                if(d.time >= 120f){
+                    toRemove.add(d);
+                    if(isModified){
+                        locked.add(d);
+                        if(!firstInit && tmpB){
+                            Events.run(Trigger.update, new AnnihilateRunnable());
+                            tmpB = false;
+                        }
+                    }
+                }
+            }
+            firstInit = false;
+            for(DeadUnitEntry d : toRemove){
+                tmpArray.remove(d);
+            }
+            toRemove.clear();
             //super.updateTile();
             if(trueEfficiency() > 0.0001f){
                 float value = eyesAlpha > trueEfficiency() ? 1f : trueEfficiency();
@@ -572,6 +599,92 @@ public class EndGameTurret extends PowerTurret{
                 targets[i] = null;
             }
             super.add();
+        }
+    }
+
+    private static class AnnihilateRunnable implements Runnable{
+        boolean obsolete = false;
+        int layer = 0;
+        @Override
+        public void run(){
+            if(obsolete) return;
+            firstInit = true;
+            for(DeadUnitEntry d : locked){
+                for(int i = 0; i < Math.min(1 + layer, 3); i++){
+                    d.tryDestroy();
+                }
+                if(layer > 4){
+                    d.entity.x = Float.NaN;
+                    d.entity.y = Float.NaN;
+                    d.entity.abilities.clear();
+                }
+                if(d.isModified()){
+                    AnnihilateRunnable ar = new AnnihilateRunnable();
+                    ar.layer = layer + 1;
+                    Events.run(Trigger.update, ar);
+                    obsolete = true;
+                }
+                d.update();
+            }
+        }
+    }
+
+    private static class DeadUnitEntry{
+        Unit entity;
+        float lx;
+        float ly;
+        float lrot;
+        float time = 0f;
+
+        DeadUnitEntry(Unit unit){
+            entity = unit;
+            lx = unit.x;
+            ly = unit.y;
+            lrot = unit.rotation;
+        }
+
+        boolean isModified(){
+            return entity.x != lx || entity.y != ly || entity.rotation != lrot;
+        }
+
+        void update(){
+            lx = entity.x;
+            ly = entity.y;
+            lrot = entity.rotation;
+        }
+
+        void attemptRemoveAdd(Unit unit){
+            try{
+                unit.getClass().getField("added").setBoolean(unit, false);
+            }catch(Exception e){
+                throw new RuntimeException(e);
+            }
+        }
+
+        void tryDestroy(){
+            Groups.all.remove(entity);
+            Unit tmp = entity;
+            attemptRemoveAdd(tmp);
+            UnityFx.vapourizeUnit.at(tmp.x, tmp.y, tmp.rotation, tmp);
+            tmp.team.data().updateCount(tmp.type, -1);
+            tmp.clearCommand();
+            tmp.controller().removed(tmp);
+            Groups.unit.remove(tmp);
+            Groups.draw.remove(entity);
+            if(Vars.net.client()){
+                Vars.netClient.addRemovedEntity(tmp.id);
+            }
+            for(WeaponMount mount : tmp.mounts){
+                if(mount.bullet != null){
+                    mount.bullet.time = mount.bullet.lifetime - 10f;
+                    mount.bullet = null;
+                }
+                if(mount.sound != null){
+                    mount.sound.stop();
+                }
+            }
+
+            if(entity instanceof Syncc s) Groups.sync.remove(s);
         }
     }
 }
