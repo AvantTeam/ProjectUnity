@@ -803,6 +803,14 @@ public class UnityFx{
         }
     }),
 
+    supernovaStarDecay = new Effect(36f, e -> {
+        randLenVectors(e.id, 3, 48f * e.finpow(), (x, y) -> {
+            color(Pal.lancerLaser);
+            alpha(e.fout());
+            Fill.circle(e.x + x, e.y + y, 1f + 2.5f * e.fout());
+        });
+    }),
+
     supernovaChargeStar2 = new Effect(27f, e -> {
         if(e.data instanceof Float data){
             float r = data.floatValue();

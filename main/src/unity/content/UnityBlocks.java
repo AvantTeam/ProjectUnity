@@ -1025,6 +1025,7 @@ public class UnityBlocks implements ContentList{
             Effect chargeStarEffect;
             Effect chargeStar2Effect;
             Effect chargeBeginEffect;
+            Effect starDecayEffect;
             Effect heatWaveEffect;
 
             {
@@ -1057,6 +1058,7 @@ public class UnityBlocks implements ContentList{
                 chargeStarEffect = UnityFx.supernovaChargeStar;
                 chargeStar2Effect = UnityFx.supernovaChargeStar2;
                 chargeBeginEffect = UnityFx.supernovaChargeBegin;
+                starDecayEffect = UnityFx.supernovaStarDecay;
                 heatWaveEffect = UnityFx.supernovaStarHeatwave;
 
                 drawer = b -> {
@@ -1121,20 +1123,19 @@ public class UnityBlocks implements ContentList{
                 effectDrawer = tile -> {
                     boolean notShooting = tile.bulletLife() <= 0f || tile.bullet() == null;
                     float ch = notShooting ? tile.charge : 1f;
-                    float starX = starOffset + phases[0].x;
-                    float starY = starOffset + phases[0].y;
+                    Tmp.v1.trns(tile.rotation, -tile.recoil + starOffset + Mathf.curve(tile.phase, 0f, 0.3f) * -2f);
 
                     Draw.color(Pal.lancerLaser);
                     Fill.circle(
-                        tile.x + Angles.trnsx(tile.rotation, -tile.recoil + starX),
-                        tile.y + Angles.trnsy(tile.rotation, -tile.recoil + starY),
+                        tile.x + Tmp.v1.x,
+                        tile.y + Tmp.v1.y,
                         ch * starRadius
                     );
 
                     if(notShooting){
                         Fill.circle(
-                            tile.x + Angles.trnsx(tile.rotation, -tile.recoil + shootLength),
-                            tile.y + Angles.trnsy(tile.rotation, -tile.recoil + shootLength),
+                            tile.x + Tmp.v1.x,
+                            tile.y + Tmp.v1.y,
                             tile.charge * starRadius * 0.67f
                         );
                     }
@@ -1144,8 +1145,8 @@ public class UnityBlocks implements ContentList{
                         float d = 0.3f;
 
                         starEffect.at(
-                            tile.x + Angles.trnsx(tile.rotation, -tile.recoil + starX) + Angles.trnsx(a, d),
-                            tile.y + Angles.trnsy(tile.rotation, -tile.recoil + starY) + Angles.trnsy(a, d),
+                            tile.x + Tmp.v1.x + Angles.trnsx(a, d),
+                            tile.y + Tmp.v1.y + Angles.trnsy(a, d),
                             tile.rotation, Float.valueOf(ch * starRadius)
                         );
                         chargeEffect.at(
@@ -1157,8 +1158,8 @@ public class UnityBlocks implements ContentList{
                         if(notShooting){
                             if(tile.charge > 0.1f && tile.timer(timerChargeStar, 20f)){
                                 chargeStarEffect.at(
-                                    tile.x + Angles.trnsx(tile.rotation, -tile.recoil + starX),
-                                    tile.y + Angles.trnsy(tile.rotation, -tile.recoil + starY),
+                                    tile.x + Tmp.v1.x,
+                                    tile.y + Tmp.v1.y,
                                     tile.rotation, Float.valueOf(tile.charge)
                                 );
                             }
@@ -1171,17 +1172,25 @@ public class UnityBlocks implements ContentList{
                                 );
 
                                 chargeStar2Effect.at(
-                                    tile.x + Angles.trnsx(tile.rotation, -tile.recoil + starX),
-                                    tile.y + Angles.trnsy(tile.rotation, -tile.recoil + starY),
+                                    tile.x + Tmp.v1.x,
+                                    tile.y + Tmp.v1.y,
                                     tile.rotation, Float.valueOf(tile.charge)
                                 );
                             }
-                        }else if(tile.timer(timerChargeStar, 20f)){
-                            heatWaveEffect.at(
-                                tile.x + Angles.trnsx(tile.rotation, -tile.recoil + starX),
-                                tile.y + Angles.trnsy(tile.rotation, -tile.recoil + starY),
+                        }else{
+                            starDecayEffect.at(
+                                tile.x + Tmp.v1.x,
+                                tile.y + Tmp.v1.y,
                                 tile.rotation
                             );
+
+                            if(tile.timer(timerChargeStar, 20f)){
+                                heatWaveEffect.at(
+                                    tile.x + Tmp.v1.x,
+                                    tile.y + Tmp.v1.y,
+                                    tile.rotation
+                                );
+                            }
                         }
                     }
                 };
