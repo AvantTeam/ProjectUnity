@@ -752,5 +752,64 @@ public class UnityFx{
         randLenVectors(e.id, 6, 8f * e.finpow(), e.rotation, 18f, (x, y) -> {
             Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 12f * e.fin());
         });
+    }),
+
+    supernovaStar = new Effect(45f, e -> {
+        if(e.data instanceof Float data){
+            float a = Mathf.randomSeed(e.id, 360f);
+            float d = 0.5f + e.fout() * 0.5f;
+
+            float r = data.floatValue();
+
+            color(Pal.lancerLaser);
+            alpha(0.6f * e.fout());
+            Fill.circle(e.x + trnsx(a, d), e.y + trnsy(a, d), r);
+        }
+    }),
+
+    supernovaCharge = new Effect(20f, e -> {
+        if(e.data instanceof Float data){
+            float r = data.floatValue();
+
+            color(Pal.lancerLaser);
+            alpha(0.6f * e.fout());
+            Fill.circle(e.x, e.y, Mathf.lerp(0.2f, 1f, e.fout()) * r);
+        }
+    }),
+
+    supernovaChargeBegin = new Effect(27f, e -> {
+        if(e.data instanceof Float data){
+            float r = data.floatValue();
+            randLenVectors(e.id, (int)(2f * r), 1f + 27f * e.fout(), (x, y) -> {
+                color(Pal.lancerLaser);
+                lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), (1f + e.fslope() * 6f) * r);
+            });
+        }
+    }),
+
+    supernovaStarHeatwave = new Effect(40f, e -> {
+        color(Pal.lancerLaser);
+        alpha(e.fout() * 3f);
+        circle(e.x, e.y, 120 * e.fin());
+    }),
+
+    supernovaChargeStar = new Effect(30f, e -> {
+        if(e.data instanceof Float data){
+            float r = data.floatValue();
+
+            color(Pal.lancerLaser);
+            alpha(e.fin() * 2f * r);
+            circle(e.x, e.y, 150f * e.fout() * Mathf.lerp(0.1f, 1f, r));
+        }
+    }),
+
+    supernovaChargeStar2 = new Effect(27f, e -> {
+        if(e.data instanceof Float data){
+            float r = data.floatValue();
+            randLenVectors(e.id, (int)(3f * r), e.fout() * ((90f + r * 150f) * (0.3f + Mathf.randomSeed(e.id, 0.7f))), (x, y) -> {
+                color(Pal.lancerLaser);
+                Fill.circle(e.x + x, e.y + y, 2f * e.fin());
+            });
+        }
     });
 }

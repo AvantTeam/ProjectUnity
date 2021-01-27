@@ -4,6 +4,7 @@ import arc.*;
 import arc.audio.*;
 import arc.math.*;
 import arc.util.*;
+import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
@@ -135,7 +136,7 @@ public class AttractLaserTurret extends LaserTurret{
             });
         }
 
-        protected float bulletLife(){
+        public float bulletLife(){
             try{
 				return bulletLifef.getFloat(this);
 			}catch(Exception e){
@@ -143,7 +144,7 @@ public class AttractLaserTurret extends LaserTurret{
             }
         }
 
-        protected Bullet bullet(){
+        public Bullet bullet(){
             try{
                 return (Bullet)bulletf.get(this);
             }catch(Exception e){

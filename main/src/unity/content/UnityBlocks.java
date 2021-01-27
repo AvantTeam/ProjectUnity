@@ -1,5 +1,6 @@
 package unity.content;
 
+import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -42,6 +43,7 @@ import younggamExperimental.*;
 import younggamExperimental.blocks.*;
 
 import static arc.Core.*;
+import static mindustry.Vars.*;
 import static mindustry.type.ItemStack.*;
 
 public class UnityBlocks implements ContentList{
@@ -1013,18 +1015,32 @@ public class UnityBlocks implements ContentList{
             /** Temporary vector array to be used in the drawing method */
             final Vec2[] phases = new Vec2[]{new Vec2(), new Vec2(), new Vec2(), new Vec2(), new Vec2(), new Vec2()};
 
+            float starRadius;
+            float starOffset;
+            Cons<AttractLaserTurretBuild> effectDrawer;
+
+            final int timerChargeStar = timers++;
+            Effect starEffect;
+            Effect chargeEffect;
+            Effect chargeStarEffect;
+            Effect chargeStar2Effect;
+            Effect chargeBeginEffect;
+            Effect heatWaveEffect;
+
             {
                 requirements(Category.turret, with(Items.copper, 1));
                 size = 7;
                 health = 8100;
 
-                shootLength = size * Vars.tilesize / 2f - 8f;
+                shootLength = size * tilesize / 2f - 8f;
                 rotateSpeed = 1f;
                 recoilAmount = 4f;
                 powerUse = 24f;
 
                 shootCone = 15f;
                 range = 250f;
+                starRadius = 8f;
+                starOffset = -2.25f;
 
                 chargeSound = UnitySounds.supernovaCharge;
                 chargeSoundVolume = 1f;
@@ -1035,6 +1051,13 @@ public class UnityBlocks implements ContentList{
                 baseExplosiveness = 25f;
                 shootDuration = 480f;
                 shootType = UnityBullets.supernovaLaser;
+
+                starEffect = UnityFx.supernovaStar;
+                chargeEffect = UnityFx.supernovaCharge;
+                chargeStarEffect = UnityFx.supernovaChargeStar;
+                chargeStar2Effect = UnityFx.supernovaChargeStar2;
+                chargeBeginEffect = UnityFx.supernovaChargeBegin;
+                heatWaveEffect = UnityFx.supernovaStarHeatwave;
 
                 drawer = b -> {
                     if(b instanceof AttractLaserTurretBuild tile){
@@ -1088,8 +1111,73 @@ public class UnityBlocks implements ContentList{
                         Draw.rect(Regions.supernovaBottomRegion, tile.x + phases[3].x, tile.y + phases[3].y, tile.rotation - 90);
                         Draw.rect(Regions.supernovaHeadRegion, tile.x + tr2.x, tile.y + tr2.y, tile.rotation - 90);
                         Draw.rect(Regions.supernovaCoreRegion, tile.x + phases[0].x, tile.y + phases[0].y, tile.rotation - 90);
+
+                        effectDrawer.get(tile);
                     }else{
                         throw new IllegalStateException("building isn't an instance of AttractLaserTurretBuild");
+                    }
+                };
+
+                effectDrawer = tile -> {
+                    Draw.color(Pal.lancerLaser);
+                    Fill.circle(
+                        tile.x + Angles.trnsx(tile.rotation, -tile.recoil + starOffset),
+                        tile.y + Angles.trnsy(tile.rotation, -tile.recoil + starOffset),
+                        tile.charge * starRadius
+                    );
+
+                    if(tile.bulletLife() <= 0f || tile.bullet() == null){
+                        Fill.circle(
+                            tile.x + tr.x,
+                            tile.y + tr.y,
+                            tile.charge * starRadius * 0.67f
+                        );
+                    }
+
+                    if(!state.isPaused()){
+                        float a = Mathf.random(360f);
+                        float d = 0.3f;
+
+                        starEffect.at(
+                            tile.x + Angles.trnsx(tile.rotation, -tile.recoil + starOffset) + Angles.trnsx(a, d),
+                            tile.y + Angles.trnsy(tile.rotation, -tile.recoil + starOffset) + Angles.trnsy(a, d),
+                            tile.rotation, Float.valueOf(tile.charge * starRadius)
+                        );
+                        chargeEffect.at(
+                            tile.x + Angles.trnsx(tile.rotation, -tile.recoil + shootLength),
+                            tile.y + Angles.trnsy(tile.rotation, -tile.recoil + shootLength),
+                            tile.rotation, Float.valueOf(tile.charge * starRadius * 0.67f)
+                        );
+
+                        if(tile.bulletLife() <= 0f && tile.bullet() == null){
+                            if(tile.charge > 0.1f && tile.timer(timerChargeStar, 20f)){
+                                chargeStarEffect.at(
+                                    tile.x + Angles.trnsx(tile.rotation, -tile.recoil + starOffset),
+                                    tile.y + Angles.trnsy(tile.rotation, -tile.recoil + starOffset),
+                                    tile.rotation, Float.valueOf(tile.charge)
+                                );
+                            }
+
+                            if(Mathf.chanceDelta(tile.charge)){
+                                chargeBeginEffect.at(
+                                    tile.x + Angles.trnsx(tile.rotation, -tile.recoil + shootLength),
+                                    tile.y + Angles.trnsy(tile.rotation, -tile.recoil + shootLength),
+                                    tile.rotation, Float.valueOf(tile.charge)
+                                );
+
+                                chargeStar2Effect.at(
+                                    tile.x + Angles.trnsx(tile.rotation, -tile.recoil + starOffset),
+                                    tile.y + Angles.trnsy(tile.rotation, -tile.recoil + starOffset),
+                                    tile.rotation, Float.valueOf(tile.charge)
+                                );
+                            }
+                        }else if(tile.timer(timerChargeStar, 20f)){
+                            heatWaveEffect.at(
+                                tile.x + Angles.trnsx(tile.rotation, -tile.recoil + shootLength),
+                                tile.y + Angles.trnsy(tile.rotation, -tile.recoil + shootLength),
+                                tile.rotation
+                            );
+                        }
                     }
                 };
             }
