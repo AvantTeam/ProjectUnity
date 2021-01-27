@@ -1119,17 +1119,22 @@ public class UnityBlocks implements ContentList{
                 };
 
                 effectDrawer = tile -> {
+                    boolean notShooting = tile.bulletLife() <= 0f || tile.bullet() == null;
+                    float ch = notShooting ? tile.charge : 1f;
+                    float starX = starOffset + phases[0].x;
+                    float starY = starOffset + phases[0].y;
+
                     Draw.color(Pal.lancerLaser);
                     Fill.circle(
-                        tile.x + Angles.trnsx(tile.rotation, -tile.recoil + starOffset),
-                        tile.y + Angles.trnsy(tile.rotation, -tile.recoil + starOffset),
-                        tile.charge * starRadius
+                        tile.x + Angles.trnsx(tile.rotation, -tile.recoil + starX),
+                        tile.y + Angles.trnsy(tile.rotation, -tile.recoil + starY),
+                        ch * starRadius
                     );
 
-                    if(tile.bulletLife() <= 0f || tile.bullet() == null){
+                    if(notShooting){
                         Fill.circle(
-                            tile.x + tr.x,
-                            tile.y + tr.y,
+                            tile.x + Angles.trnsx(tile.rotation, -tile.recoil + shootLength),
+                            tile.y + Angles.trnsy(tile.rotation, -tile.recoil + shootLength),
                             tile.charge * starRadius * 0.67f
                         );
                     }
@@ -1139,9 +1144,9 @@ public class UnityBlocks implements ContentList{
                         float d = 0.3f;
 
                         starEffect.at(
-                            tile.x + Angles.trnsx(tile.rotation, -tile.recoil + starOffset) + Angles.trnsx(a, d),
-                            tile.y + Angles.trnsy(tile.rotation, -tile.recoil + starOffset) + Angles.trnsy(a, d),
-                            tile.rotation, Float.valueOf(tile.charge * starRadius)
+                            tile.x + Angles.trnsx(tile.rotation, -tile.recoil + starX) + Angles.trnsx(a, d),
+                            tile.y + Angles.trnsy(tile.rotation, -tile.recoil + starY) + Angles.trnsy(a, d),
+                            tile.rotation, Float.valueOf(ch * starRadius)
                         );
                         chargeEffect.at(
                             tile.x + Angles.trnsx(tile.rotation, -tile.recoil + shootLength),
@@ -1149,11 +1154,11 @@ public class UnityBlocks implements ContentList{
                             tile.rotation, Float.valueOf(tile.charge * starRadius * 0.67f)
                         );
 
-                        if(tile.bulletLife() <= 0f && tile.bullet() == null){
+                        if(notShooting){
                             if(tile.charge > 0.1f && tile.timer(timerChargeStar, 20f)){
                                 chargeStarEffect.at(
-                                    tile.x + Angles.trnsx(tile.rotation, -tile.recoil + starOffset),
-                                    tile.y + Angles.trnsy(tile.rotation, -tile.recoil + starOffset),
+                                    tile.x + Angles.trnsx(tile.rotation, -tile.recoil + starX),
+                                    tile.y + Angles.trnsy(tile.rotation, -tile.recoil + starY),
                                     tile.rotation, Float.valueOf(tile.charge)
                                 );
                             }
@@ -1166,15 +1171,15 @@ public class UnityBlocks implements ContentList{
                                 );
 
                                 chargeStar2Effect.at(
-                                    tile.x + Angles.trnsx(tile.rotation, -tile.recoil + starOffset),
-                                    tile.y + Angles.trnsy(tile.rotation, -tile.recoil + starOffset),
+                                    tile.x + Angles.trnsx(tile.rotation, -tile.recoil + starX),
+                                    tile.y + Angles.trnsy(tile.rotation, -tile.recoil + starY),
                                     tile.rotation, Float.valueOf(tile.charge)
                                 );
                             }
                         }else if(tile.timer(timerChargeStar, 20f)){
                             heatWaveEffect.at(
-                                tile.x + Angles.trnsx(tile.rotation, -tile.recoil + shootLength),
-                                tile.y + Angles.trnsy(tile.rotation, -tile.recoil + shootLength),
+                                tile.x + Angles.trnsx(tile.rotation, -tile.recoil + starX),
+                                tile.y + Angles.trnsy(tile.rotation, -tile.recoil + starY),
                                 tile.rotation
                             );
                         }
