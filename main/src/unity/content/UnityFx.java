@@ -48,8 +48,8 @@ public class UnityFx{
         color();
     }),
     
-    catastropheCharge = new Effect(90f, e -> {
-        float slope = Interp.pow5Out.apply(Mathf.curve(e.fin(), 0f, 0.70f)) - Mathf.curve(e.fin(), 0.85f, 1f);
+    catastropheCharge = new Effect(70f, e -> {
+        float slope = Interp.pow2Out.apply(Mathf.curve(e.fin(), 0f, 0.70f)) - Interp.pow5In.apply(Mathf.curve(e.fin(), 0.85f, 1f));
         float shrink = 1 - Mathf.curve(e.fin(), 0.85f, 1f);
         float foutpow = Interp.pow3Out.apply(e.fout());
         float rotpow = Interp.pow3Out.apply(e.fin());
@@ -74,8 +74,8 @@ public class UnityFx{
         }
     }), 
     
-    calamityCharge = new Effect(110f, e -> {
-        float slope = Interp.pow5Out.apply(Mathf.curve(e.fin(), 0f, 0.70f)) - Mathf.curve(e.fin(), 0.85f, 1f);
+    calamityCharge = new Effect(140f, e -> {
+        float slope = Interp.pow2Out.apply(Mathf.curve(e.fin(), 0f, 0.70f)) - Interp.pow5In.apply(Mathf.curve(e.fin(), 0.85f, 1f));
         float shrink = 1 - Mathf.curve(e.fin(), 0.85f, 1f);
         float foutpow = Interp.pow3Out.apply(e.fout());
         float rotpow = Interp.pow3Out.apply(e.fin());
@@ -100,8 +100,8 @@ public class UnityFx{
         }
     }), 
     
-    extinctionCharge = new Effect(130f, e -> {
-        float slope = Interp.pow5Out.apply(Mathf.curve(e.fin(), 0f, 0.70f)) - Mathf.curve(e.fin(), 0.85f, 1f);
+    extinctionCharge = new Effect(210f, e -> {
+        float slope = Interp.pow2Out.apply(Mathf.curve(e.fin(), 0f, 0.70f)) - Interp.pow5In.apply(Mathf.curve(e.fin(), 0.85f, 1f));
         float shrink = 1 - Mathf.curve(e.fin(), 0.85f, 1f);
         float foutpow = Interp.pow3Out.apply(e.fout());
         float rotpow = Interp.pow3Out.apply(e.fin());
