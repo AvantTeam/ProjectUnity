@@ -13,7 +13,6 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
-import unity.*;
 
 import static mindustry.Vars.*;
 
@@ -135,7 +134,6 @@ public class MechPad extends Block{
         }
         
         public void finishUnit(){
-            Unity.print("spawny");
             Player thisP = thisU.getPlayer();
             if(thisP == null) return;
             Fx.spawn.at(self());

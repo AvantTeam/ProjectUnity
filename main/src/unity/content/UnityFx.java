@@ -49,65 +49,80 @@ public class UnityFx{
     }),
     
     catastropheCharge = new Effect(90f, e -> {
-        float slope = Mathf.curve(e.fin(), 0f, 0.85f) - Mathf.curve(e.fin(), 0.85f, 1f);
+        float slope = Interp.pow5Out.apply(Mathf.curve(e.fin(), 0f, 0.70f)) - Mathf.curve(e.fin(), 0.85f, 1f);
+        float shrink = 1 - Mathf.curve(e.fin(), 0.85f, 1f);
         float foutpow = Interp.pow3Out.apply(e.fout());
-        float rot = e.rotation + (180 + Mathf.randomSeed(e.id, 180f)) * e.finpow() + Mathf.randomSeed(e.id + 1, 90f);
+        float rotpow = Interp.pow3Out.apply(e.fin());
+        int spikes = 7;
+        float spread = 50;
         
         color(Color.valueOf("ff9c5a"));
         stroke(e.fin() * 6f);
         Lines.circle(e.x, e.y, foutpow * 28f);
 
-        Fill.circle(e.x, e.y, slope * 6f);
-        for(int i = 0; i < 6; i++){
-            Drawf.tri(e.x, e.y, 6f, 80f * slope, rot + i * 60);
+        Fill.circle(e.x, e.y, slope * 6f * (1f + 3f * rotpow) / 2f);
+        for(int i = 0; i < spikes; i++){
+            float rot = Mathf.lerp((i - (int)(spikes / 2f)) * spread, 0, rotpow);
+            Drawf.tri(e.x, e.y, shrink * 6f * (1f + 3f * rotpow), 80f * slope, e.rotation + rot);
         }
 
         color();
-        Fill.circle(e.x, e.y, slope * 3f);
-        for(int i = 0; i < 6; i++){
-            Drawf.tri(e.x, e.y, 3f, 30f * slope, rot + i * 60);
+        Fill.circle(e.x, e.y, slope * 3f * (1f + 3f * rotpow) / 2f);
+        for(int i = 0; i < spikes; i++){
+            float rot = Mathf.lerp((i - (int)(spikes / 2f)) * spread, 0, rotpow);
+            Drawf.tri(e.x, e.y, shrink * 3f * (1f + 3f * rotpow), 30f * slope, e.rotation + rot);
         }
     }), 
     
     calamityCharge = new Effect(110f, e -> {
-        float slope = Mathf.curve(e.fin(), 0f, 0.85f) - Mathf.curve(e.fin(), 0.85f, 1f);
+        float slope = Interp.pow5Out.apply(Mathf.curve(e.fin(), 0f, 0.70f)) - Mathf.curve(e.fin(), 0.85f, 1f);
+        float shrink = 1 - Mathf.curve(e.fin(), 0.85f, 1f);
         float foutpow = Interp.pow3Out.apply(e.fout());
-        float rot = e.rotation + (270 + Mathf.randomSeed(e.id, 270f)) * e.finpow() + Mathf.randomSeed(e.id + 1, 90f);
+        float rotpow = Interp.pow3Out.apply(e.fin());
+        int spikes = 9;
+        float spread = 39f;
         
         color(Color.valueOf("ff9c5a"));
         stroke(e.fin() * 8f);
         Lines.circle(e.x, e.y, foutpow * 45f);
 
-        Fill.circle(e.x, e.y, slope * 8f);
-        for(int i = 0; i < 9; i++){
-            Drawf.tri(e.x, e.y, 8f, 140f * slope, rot + i * 40);
+        Fill.circle(e.x, e.y, slope * 8f * (1f + 3f * rotpow) / 2f);
+        for(int i = 0; i < spikes; i++){
+            float rot = Mathf.lerp((i - (int)(spikes / 2f)) * spread, 0, rotpow);
+            Drawf.tri(e.x, e.y, shrink * 8f * (1f + 3f * rotpow), 140f * slope, e.rotation + rot);
         }
 
         color();
-        Fill.circle(e.x, e.y, slope * 4f);
-        for(int i = 0; i < 9; i++){
-            Drawf.tri(e.x, e.y, 4f, 50f * slope, rot + i * 40);
+        Fill.circle(e.x, e.y, slope * 4f * (1f + 3f * rotpow) / 2f);
+        for(int i = 0; i < spikes; i++){
+            float rot = Mathf.lerp((i - (int)(spikes / 2f)) * spread, 0, rotpow);
+            Drawf.tri(e.x, e.y, shrink * 4f * (1f + 3f * rotpow), 50f * slope, e.rotation + rot);
         }
     }), 
     
     extinctionCharge = new Effect(130f, e -> {
-        float slope = Mathf.curve(e.fin(), 0f, 0.85f) - Mathf.curve(e.fin(), 0.85f, 1f);
+        float slope = Interp.pow5Out.apply(Mathf.curve(e.fin(), 0f, 0.70f)) - Mathf.curve(e.fin(), 0.85f, 1f);
+        float shrink = 1 - Mathf.curve(e.fin(), 0.85f, 1f);
         float foutpow = Interp.pow3Out.apply(e.fout());
-        float rot = e.rotation + (360 + Mathf.randomSeed(e.id, 360f)) * e.finpow() + Mathf.randomSeed(e.id + 1, 90f);
+        float rotpow = Interp.pow3Out.apply(e.fin());
+        int spikes = 13;
+        float spread = 27f;
         
         color(Color.valueOf("ff9c5a"));
         stroke(e.fin() * 10f);
         Lines.circle(e.x, e.y, foutpow * 70f);
 
-        Fill.circle(e.x, e.y, slope * 10f);
-        for(int i = 0; i < 12; i++){
-            Drawf.tri(e.x, e.y, 10f, 200f * slope, rot + i * 30);
+        Fill.circle(e.x, e.y, slope * 10f * (1f + 3f * rotpow) / 2f);
+        for(int i = 0; i < spikes; i++){
+            float rot = Mathf.lerp((i - (int)(spikes / 2f)) * spread, 0, rotpow);
+            Drawf.tri(e.x, e.y, shrink * 10f * (1f + 3f * rotpow), 200f * slope, e.rotation + rot);
         }
 
         color();
-        Fill.circle(e.x, e.y, slope * 5f);
-        for(int i = 0; i < 12; i++){
-            Drawf.tri(e.x, e.y, 5f, 80f * slope, rot + i * 30);
+        Fill.circle(e.x, e.y, slope * 5f * (1f + 3f * rotpow) / 2f);
+        for(int i = 0; i < spikes; i++){
+            float rot = Mathf.lerp((i - (int)(spikes / 2f)) * spread, 0, rotpow);
+            Drawf.tri(e.x, e.y, shrink * 5f * (1f + 3f * rotpow), 80f * slope, e.rotation + rot);
         }
     }), 
 
