@@ -73,7 +73,7 @@ public class UnityBullets implements ContentList{
 
             @Override
             public void draw(Bullet b){
-                color = Tmp.c1.set(Color.white).lerp(Pal.lancerLaser, b.fdata);
+                color = Tmp.c1.set(Color.white).lerp(lancerLaser, b.fdata);
                 super.draw(b);
             }
         };
@@ -201,7 +201,7 @@ public class UnityBullets implements ContentList{
             @Override
             public void update(Bullet b){
                 super.update(b);
-                if(b.timer.get(1, 7)) Units.nearbyEnemies(b.team, b.x - 5 * tilesize, b.y - 5 * tilesize, 5 * tilesize * 2, 5 * tilesize * 2, unit -> Lightning.create(b.team, Pal.surge, random(17, 33), b.x, b.y, b.angleTo(unit), random(7, 13)));
+                if(b.timer.get(1, 7)) Units.nearbyEnemies(b.team, b.x - 5 * tilesize, b.y - 5 * tilesize, 5 * tilesize * 2, 5 * tilesize * 2, unit -> Lightning.create(b.team, surge, random(17, 33), b.x, b.y, b.angleTo(unit), random(7, 13)));
             }
 
             @Override
@@ -281,11 +281,11 @@ public class UnityBullets implements ContentList{
             lightningDamage = 50f;
             lightningAngleRand = 40f;
             largeHit = true;
-            lightColor = lightningColor = Pal.surge;
+            lightColor = lightningColor = surge;
             sideAngle = 15f;
             sideWidth = 0f;
             sideLength = 0f;
-            colors = new Color[]{Pal.surge.cpy(), Pal.surge, Color.white};
+            colors = new Color[]{surge.cpy(), surge, Color.white};
         }};
 
         shielderBullet = new ShieldBulletType(8){{
@@ -330,7 +330,7 @@ public class UnityBullets implements ContentList{
         surgeBomb = new SurgeBulletType(7f, 100f){{
             width = height = 30f;
             maxRange = 30f;
-            backColor = Pal.surge;
+            backColor = surge;
             frontColor = Color.white;
             mixColorTo = Color.white;
             hitSound = Sounds.plasmaboom;
@@ -487,28 +487,55 @@ public class UnityBullets implements ContentList{
             drawSize = (length + (width * 2f)) * 2f;
         }};
 
-        supernovaLaser = new ContinuousLaserBulletType(160){
+        supernovaLaser = new ContinuousLaserBulletType(400f){
+            final Effect plasmaEffect = new Effect(36f, e -> {
+                Draw.color(Color.white, lancerLaser, e.fin());
+                Fill.circle(
+                    e.x + Angles.trnsx(e.rotation, e.fin() * 24f),
+                    e.y + Angles.trnsy(e.rotation, e.fin() * 24f),
+                    e.fout() * 5f
+                );
+            });
+
             @Override
             public void update(Bullet b){
                 super.update(b);
 
-                float start = Mathf.randomSeed((long)(b.id + Time.time), length);
-                Lightning.create(b.team, Pal.lancerLaser, 12f,
-                b.x + Angles.trnsx(b.rotation(), start),
-                b.y + Angles.trnsy(b.rotation(), start),
-                b.rotation() + Mathf.randomSeedRange((long)(b.id + Time.time + 1f), 15f), Mathf.randomSeed((long)(b.id + Time.time + 2f), 10, 19)
-                );
+                if(b.timer(2, 1f)){
+                    float start = Mathf.randomSeed((long)(b.id + Time.time), length);
+                    Lightning.create(b.team, lancerLaser, 12f,
+                        b.x + Angles.trnsx(b.rotation(), start),
+                        b.y + Angles.trnsy(b.rotation(), start),
+                        b.rotation() + Mathf.randomSeedRange((long)(b.id + Time.time + 1f), 15f), Mathf.randomSeed((long)(b.id + Time.time + 2f), 10, 19)
+                    );
+                }
+            }
+
+            @Override
+            public void draw(Bullet b){
+                super.draw(b);
+
+                if(!state.isPaused()){
+                    for(int i = 0; i < 2; i++){
+                        float f = Mathf.random(length * b.fout());
+                        plasmaEffect.at(
+                            b.x + Angles.trnsx(b.rotation(), f) + Mathf.range(6f),
+                            b.y + Angles.trnsy(b.rotation(), f) + Mathf.range(6f),
+                            b.rotation() + Mathf.range(85f)
+                        );
+                    }
+                }
             }
 
             {
                 colors = new Color[]{
-                Color.valueOf("4be3ca55"),
-                Color.valueOf("91eedeaa"),
-                Pal.lancerLaser.cpy(),
-                Color.white
+                    Color.valueOf("4be3ca55"),
+                    Color.valueOf("91eedeaa"),
+                    lancerLaser.cpy(),
+                    Color.white
                 };
 
-                length = 280;
+                length = 280f;
             }
         };
 
