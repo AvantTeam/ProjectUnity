@@ -11,6 +11,8 @@ import mindustry.*;
 import mindustry.graphics.*;
 import unity.*;
 
+import static mindustry.Vars.*;
+
 /**
  * Wavefront Object Converter and Renderer for Arc/libGDX
  * Renders objects orthographically
@@ -47,8 +49,8 @@ public class WavefrontObject{
     }
 
     public void load(){
-        if(loaded) return;
-        String[] sourceA = Vars.tree.get("objects/" + name + ".obj", true).readString().split("\n");
+        if(loaded || headless) return;
+        String[] sourceA = tree.get("objects/" + name + ".obj", true).readString().split("\n");
 
         for(String line : sourceA){
             if(line.contains("v ")){
