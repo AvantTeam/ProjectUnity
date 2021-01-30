@@ -61,15 +61,17 @@ public class AttractLaserTurret extends LaserTurret{
         public void updateTile(){
             if(!validateTarget() || !consValid()){
                 charge = Mathf.lerpDelta(charge, 0f, chargeCooldown);
+                charge = charge > 0.001f ? charge : 0f;
             }
             if(bulletLife() <= 0f && bullet() == null){
                 attractUnits();
             }
 
             if(isShooting() || (bulletLife() > 0f && bullet() != null)){
-                phase = Mathf.clamp(phase + chargeWarmup * efficiency(), 0f, 1f);
+                phase = Mathf.clamp(phase + chargeWarmup * efficiency() * Time.delta, 0f, 1f);
             }else{
                 phase = Mathf.lerpDelta(phase, 0f, chargeCooldown);
+                phase = phase > 0.001f ? phase : 0f;
             }
 
             super.updateTile();

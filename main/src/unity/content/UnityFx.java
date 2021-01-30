@@ -805,7 +805,8 @@ public class UnityFx{
     supernovaStarHeatwave = new Effect(40f, e -> {
         color(Pal.lancerLaser);
         alpha(e.fout() * 3f);
-        circle(e.x, e.y, 120 * e.fin());
+        circle(e.x, e.y, 120f * e.fin());
+        circle(e.x, e.y, 120f * e.finpow() * 0.75f);
     }),
 
     supernovaChargeStar = new Effect(30f, e -> {
@@ -814,14 +815,14 @@ public class UnityFx{
 
             color(Pal.lancerLaser);
             alpha(e.fin() * 2f * r);
-            circle(e.x, e.y, 150f * e.fout() * Mathf.lerp(0.1f, 1f, r));
+            circle(e.x, e.y, 150f * Interp.pow2Out.apply(e.fout()) * Mathf.lerp(0.1f, 1f, r));
         }
     }),
 
     supernovaStarDecay = new Effect(56f, e -> {
-        randLenVectors(e.id, 3, 40f * e.finpow(), (x, y) -> {
+        randLenVectors(e.id, 2, 36f * e.finpow(), (x, y) -> {
             color(Pal.lancerLaser);
-            Fill.circle(e.x + x, e.y + y, 2.5f * e.fout());
+            Fill.circle(e.x + x, e.y + y, 2.2f * e.fout());
         });
     }),
 

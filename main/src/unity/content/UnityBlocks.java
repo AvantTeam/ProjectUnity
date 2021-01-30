@@ -1130,9 +1130,9 @@ public class UnityBlocks implements ContentList{
                     if(tile.heat <= 0.00001f) return;
 
                     float r = Utils.pow6In.apply(tile.heat);
-                    float g = Interp.pow2In.apply(tile.heat) + ((1f - Interp.pow3In.apply(tile.heat)) * 0.12f);
+                    float g = Interp.pow3In.apply(tile.heat);
                     float b = Interp.pow2Out.apply(tile.heat);
-                    float a = Interp.pow2Out.apply(tile.heat);
+                    float a = Interp.pow2In.apply(tile.heat);
 
                     Draw.color(Tmp.c1.set(r, g, b, a));
                     Draw.blend(Blending.additive);
