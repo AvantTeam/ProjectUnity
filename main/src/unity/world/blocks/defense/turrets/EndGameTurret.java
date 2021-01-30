@@ -186,9 +186,9 @@ public class EndGameTurret extends PowerTurret{
 
             Draw.blend(Blending.additive);
             Draw.z(oz + 0.005f);
-            Draw.color(1f, Funcs.offsetSin(0f, 5f), Funcs.offsetSin(90f, 5f), eyesAlpha);
+            Draw.color(1f, Utils.offsetSin(0f, 5f), Utils.offsetSin(90f, 5f), eyesAlpha);
             Draw.rect(bottomLightsRegion, x, y);
-            Draw.color(1f, Funcs.offsetSin(0f, 5f), Funcs.offsetSin(90f, 5f), lightsAlpha * Funcs.offsetSin(0f, 12f));
+            Draw.color(1f, Utils.offsetSin(0f, 5f), Utils.offsetSin(90f, 5f), lightsAlpha * Utils.offsetSin(0f, 12f));
             Draw.rect(baseLightsRegion, x, y);
             //Draw.z(oz + 0.015f);
 
@@ -199,10 +199,10 @@ public class EndGameTurret extends PowerTurret{
             for(int i = 0; i < 3; i++){
                 int h = i + 1;
                 Draw.z(oz + 0.015f);
-                Draw.color(1f, Funcs.offsetSin(10f * h, 5f), Funcs.offsetSin(90f + (10f * h), 5f), eyesAlpha);
+                Draw.color(1f, Utils.offsetSin(10f * h, 5f), Utils.offsetSin(90f + (10f * h), 5f), eyesAlpha);
                 Draw.rect(regions[i], x + (eyeOffset.x * trnsScl[i]), y + (eyeOffset.y * trnsScl[i]), ringProgress[i]);
                 Draw.z(oz + 0.025f);
-                Draw.color(1f, Funcs.offsetSin(10f * h, 5f), Funcs.offsetSin(90f + (10f * h), 5f), lightsAlpha * Funcs.offsetSin(5 * h, 12f));
+                Draw.color(1f, Utils.offsetSin(10f * h, 5f), Utils.offsetSin(90f + (10f * h), 5f), lightsAlpha * Utils.offsetSin(5 * h, 12f));
                 Draw.rect(regionsB[i], x, y, ringProgress[i]);
             }
 
@@ -375,7 +375,7 @@ public class EndGameTurret extends PowerTurret{
                     }
                 });
                 for(int i = 0; i < 16; i++){
-                    Posc tmpTarget = Funcs.targetUnique(team, x, y, range, new Seq<>(targets));
+                    Posc tmpTarget = Utils.targetUnique(team, x, y, range, new Seq<>(targets));
                     if(tmpTarget == null && entitySeq.size >= 1){
                         tmpTarget = (Posc)entitySeq.random();
                     }
@@ -403,7 +403,7 @@ public class EndGameTurret extends PowerTurret{
                 damageFull = 0f;
                 Groups.bullet.intersect(x - range, y - range, range * 2f, range * 2f, b -> {
                     if(within(b, range) && b.team != team){
-                        damageFull += Funcs.getBulletDamage(b.type);
+                        damageFull += Utils.getBulletDamage(b.type);
                         BulletType current = b.type;
                         totalFrags = 1;
                         for(int i = 0; i < 16; i++){
@@ -411,7 +411,7 @@ public class EndGameTurret extends PowerTurret{
 
                             BulletType frag = current.fragBullet;
                             totalFrags *= current.fragBullets;
-                            damageFull += Funcs.getBulletDamage(frag) * totalFrags;
+                            damageFull += Utils.getBulletDamage(frag) * totalFrags;
 
                             current = frag;
                         }
@@ -419,14 +419,14 @@ public class EndGameTurret extends PowerTurret{
                 });
                 Groups.bullet.intersect(x - range, y - range, range * 2f, range * 2f, b -> {
                     if(within(b, range) && b.team != team){
-                        damageB = Funcs.getBulletDamage(b.type);
+                        damageB = Utils.getBulletDamage(b.type);
                         BulletType current = b.type;
                         totalFrags = 1;
                         for(int i = 0; i < 16; i++){
                             if(current.fragBullet == null) break;
                             BulletType frag = current.fragBullet;
                             totalFrags *= current.fragBullets;
-                            damageB += Funcs.getBulletDamage(frag) * totalFrags;
+                            damageB += Utils.getBulletDamage(frag) * totalFrags;
 
                             current = frag;
                         }

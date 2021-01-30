@@ -649,7 +649,7 @@ public class UnityFx{
         Draw.color(1f, 1f, 1f, e.fout());
         Draw.blend(Blending.additive);
 
-        Funcs.simpleUnitDrawer((Unit)e.data, false);
+        Utils.simpleUnitDrawer((Unit)e.data, false);
 
         Draw.blend();
         Draw.color();
@@ -671,7 +671,7 @@ public class UnityFx{
             if(i >= 2){
                 Draw.color(Color.white);
             }else{
-                Draw.color(Tmp.c1.set(colors[i]).mul(1f, 1f + Funcs.offsetSinB(0f, 5f), 1f + Funcs.offsetSinB(90f, 5f), 1f));
+                Draw.color(Tmp.c1.set(colors[i]).mul(1f, 1f + Utils.offsetSinB(0f, 5f), 1f + Utils.offsetSinB(90f, 5f), 1f));
             }
 
             Fill.circle(a.getX(), a.getY(), strokes[i] * 4f * width * e.fout());
@@ -818,11 +818,10 @@ public class UnityFx{
         }
     }),
 
-    supernovaStarDecay = new Effect(36f, e -> {
-        randLenVectors(e.id, 3, 48f * e.finpow(), (x, y) -> {
+    supernovaStarDecay = new Effect(56f, e -> {
+        randLenVectors(e.id, 3, 40f * e.finpow(), (x, y) -> {
             color(Pal.lancerLaser);
-            alpha(e.fout());
-            Fill.circle(e.x + x, e.y + y, 1f + 2.5f * e.fout());
+            Fill.circle(e.x + x, e.y + y, 2.5f * e.fout());
         });
     }),
 

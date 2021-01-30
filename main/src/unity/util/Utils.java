@@ -4,6 +4,7 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.Interp.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
@@ -15,12 +16,14 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
-import mindustry.world.Tile;
+import mindustry.world.*;
 import unity.graphics.*;
 
 import static mindustry.Vars.*;
 
-public final class Funcs{
+public final class Utils{
+    public static final PowIn pow6In = new PowIn(6);
+
     private static final Vec2 tV = new Vec2();
     private static final Seq<Unit> tmpUnitSeq = new Seq<>();
     private static final IntSet collidedBlocks = new IntSet();

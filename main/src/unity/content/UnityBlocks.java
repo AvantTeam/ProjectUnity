@@ -26,6 +26,7 @@ import unity.entities.comp.*;
 import unity.gen.*;
 import unity.graphics.*;
 import unity.type.exp.*;
+import unity.util.*;
 import unity.world.blocks.*;
 import unity.world.blocks.defense.*;
 import unity.world.blocks.defense.turrets.*;
@@ -1112,12 +1113,34 @@ public class UnityBlocks implements ContentList{
                         Draw.rect(Regions.supernovaWingRightRegion, tile.x + phases[4].x, tile.y + phases[4].y, tile.rotation - 90);
                         Draw.rect(Regions.supernovaBottomRegion, tile.x + phases[3].x, tile.y + phases[3].y, tile.rotation - 90);
                         Draw.rect(Regions.supernovaHeadRegion, tile.x + tr2.x, tile.y + tr2.y, tile.rotation - 90);
+
+                        float z = Draw.z();
+                        Draw.z(z + 0.001f);
+
                         Draw.rect(Regions.supernovaCoreRegion, tile.x + phases[0].x, tile.y + phases[0].y, tile.rotation - 90);
+                        Draw.z(z);
 
                         effectDrawer.get(tile);
                     }else{
                         throw new IllegalStateException("building isn't an instance of AttractLaserTurretBuild");
                     }
+                };
+
+                heatDrawer = tile -> {
+                    if(tile.heat <= 0.00001f) return;
+
+                    float r = Utils.pow6In.apply(tile.heat);
+                    float g = Interp.pow2In.apply(tile.heat) + ((1f - Interp.pow3In.apply(tile.heat)) * 0.12f);
+                    float b = Interp.pow2Out.apply(tile.heat);
+                    float a = Interp.pow2Out.apply(tile.heat);
+
+                    Draw.color(Tmp.c1.set(r, g, b, a));
+                    Draw.blend(Blending.additive);
+
+                    Draw.rect(heatRegion, tile.x + tr2.x, tile.y + tr2.y, tile.rotation - 90f);
+
+                    Draw.color();
+                    Draw.blend();
                 };
 
                 effectDrawer = tile -> {

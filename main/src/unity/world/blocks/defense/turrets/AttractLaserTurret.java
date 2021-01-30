@@ -88,7 +88,6 @@ public class AttractLaserTurret extends LaserTurret{
                 BulletType type = peekAmmo();
 
                 shoot(type);
-
                 charge = 0f;
             }
         }
@@ -102,9 +101,9 @@ public class AttractLaserTurret extends LaserTurret{
 
                 Liquid liquid = liquids.current();
 
-                float used = Math.min(Math.min(liquids.get(liquid), maxUsed * Time.delta), Math.max(0f, ((reloadTime - reload) / coolantMultiplier) / liquid.heatCapacity)) * baseReloadSpeed();
-                charge = Mathf.clamp(charge + chargeWarmup * (1f - used), 0f, 1f);
-                liquids.remove(liquid, used);
+                float used = Math.min(Math.min(liquids.get(liquid), maxUsed), Math.max(0f, ((reloadTime - reload) / coolantMultiplier) / liquid.heatCapacity)) * baseReloadSpeed();
+                charge = Mathf.clamp(charge + chargeWarmup * (1f - used) * Time.delta, 0f, 1f);
+                liquids.remove(liquid, used * Time.delta);
 
                 if(Mathf.chance(0.06f * used)){
                     coolEffect.at(x + Mathf.range(size * tilesize / 2f), y + Mathf.range(size * tilesize / 2f));

@@ -96,7 +96,7 @@ public class DirectionShieldAbility extends Ability{
                         if(!available[n.id]) return;
                         
                         if(Geometry.raycastRect(n.nodeA.x, n.nodeA.y, n.nodeB.x, n.nodeB.y, Tmp.r2) != null || Geometry.raycastRect(n.nodeA.x, n.nodeA.y, n.nodeB.x, n.nodeB.y, Tmp.r3) != null){
-                            float d = Funcs.getBulletDamage(b.type) * (b.damage() / (b.type.damage * b.damageMultiplier()));
+                            float d = Utils.getBulletDamage(b.type) * (b.damage() / (b.type.damage * b.damageMultiplier()));
                             healths[n.id] -= d;
                             b.damage(b.damage() / 1.5f);
                             float angC = (((shieldAngles[n.id] + 90f) * 2f) - b.rotation()) + Mathf.range(15f);

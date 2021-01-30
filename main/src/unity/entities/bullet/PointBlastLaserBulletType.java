@@ -59,7 +59,7 @@ public class PointBlastLaserBulletType extends BulletType{
         Tmp.v1.trns(b.rotation(), length);
         Tmp.v1.add(b);
         available = false;
-        Funcs.collideLineRaw(b.x, b.y, Tmp.v1.x, Tmp.v1.y, building -> building.team != b.team, unit -> unit.team != b.team, building -> {
+        Utils.collideLineRaw(b.x, b.y, Tmp.v1.x, Tmp.v1.y, building -> building.team != b.team, unit -> unit.team != b.team, building -> {
             building.damage(damage);
             available = true;
             b.fdata = b.dst(building);

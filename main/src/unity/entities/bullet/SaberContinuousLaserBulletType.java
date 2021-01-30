@@ -11,7 +11,7 @@ import mindustry.graphics.Drawf;
 import unity.content.UnityFx;
 import unity.entities.SaberData;
 import unity.graphics.UnityPal;
-import unity.util.Funcs;
+import unity.util.Utils;
 
 public class SaberContinuousLaserBulletType extends ContinuousLaserBulletType{
     protected boolean swipe;
@@ -47,7 +47,7 @@ public class SaberContinuousLaserBulletType extends ContinuousLaserBulletType{
 
             if(b.timer(1, 5f)){
                 Damage.collideLine(b, b.team, Fx.none, b.x, b.y, b.rotation(), temp.f, largeHit);
-                if(angDst > 0.0001f) Funcs.collideLineDamageOnly(b.team, (angDst + damageC) * 2f, b.x, b.y, b.rotation(), temp.f, b);
+                if(angDst > 0.0001f) Utils.collideLineDamageOnly(b.team, (angDst + damageC) * 2f, b.x, b.y, b.rotation(), temp.f, b);
             }
 
             if(b.time < 25f){

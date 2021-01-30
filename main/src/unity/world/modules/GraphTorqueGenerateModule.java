@@ -16,7 +16,7 @@ public class GraphTorqueGenerateModule extends GraphTorqueModule<GraphTorqueGene
 
     @Override
     void updateExtension(){
-        force = Funcs.linear(networks.get(0).lastVelocity, graph.maxSpeed, graph.maxTorque, graph.torqueCoeff)
+        force = Utils.linear(networks.get(0).lastVelocity, graph.maxSpeed, graph.maxTorque, graph.torqueCoeff)
             * parent.build.edelta() * motorForceMult * maxMotorForceMult;
         smoothedForce.add(force);
     }

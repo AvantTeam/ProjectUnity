@@ -25,8 +25,8 @@ public class HeatPipe extends GraphBlock{
     @Override
     public void load(){
         super.load();
-        heatRegions = Funcs.getRegions(heatRegion, 8, 2);
-        regions = Funcs.getRegions(atlas.find(name + "-tiles"), 8, 2);
+        heatRegions = Utils.getRegions(heatRegion, 8, 2);
+        regions = Utils.getRegions(atlas.find(name + "-tiles"), 8, 2);
     }
 
     @Override
@@ -64,7 +64,7 @@ public class HeatPipe extends GraphBlock{
             float temp = heat().getTemp();
             Draw.rect(regions[spriteIndex], x, y);
             if(temp < 273f || temp > 498f){
-                Draw.color(Funcs.tempColor(temp).add(baseColor));
+                Draw.color(Utils.tempColor(temp).add(baseColor));
                 Draw.rect(heatRegions[spriteIndex], x, y);
                 Draw.color();
             }

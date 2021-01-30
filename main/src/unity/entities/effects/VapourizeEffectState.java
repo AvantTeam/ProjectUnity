@@ -8,7 +8,7 @@ import arc.util.Tmp;
 import mindustry.gen.*;
 import mindustry.graphics.Layer;
 import unity.content.UnityFx;
-import unity.util.Funcs;
+import unity.util.Utils;
 
 //I doubt that is this way appropriate?
 public class VapourizeEffectState extends EffectState{
@@ -63,7 +63,7 @@ public class VapourizeEffectState extends EffectState{
         Tmp.c1.set(Color.black);
         Tmp.c1.a = slope * Interp.pow3In.apply(1 - unit.healthf());
         Draw.color(Tmp.c1);
-        Funcs.simpleUnitDrawer(unit, false);
+        Utils.simpleUnitDrawer(unit, false);
         Draw.z(oz);
     }
 

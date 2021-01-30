@@ -45,7 +45,7 @@ public class ModularTurret extends Turret implements GraphBlockBase{
         super(name);
         rotate = configurable = hasItems = true;
         config(String.class, (ModularTurretBuild build, String value) -> build.changed = build.setBluePrintFromString(value));
-        config(IntSeq.class, (ModularTurretBuild build, IntSeq value) -> build.changed = build.setBluePrint(Funcs.unpackInts(value)));
+        config(IntSeq.class, (ModularTurretBuild build, IntSeq value) -> build.changed = build.setBluePrint(Utils.unpackInts(value)));
         configClear((ModularTurretBuild build) -> build.setBluePrint(null));
     }
 
@@ -124,7 +124,7 @@ public class ModularTurret extends Turret implements GraphBlockBase{
         }
 
         boolean setBluePrintFromString(String s){
-            return setBluePrint(Funcs.unpackIntsFromString(s));
+            return setBluePrint(Utils.unpackIntsFromString(s));
         }
 
         boolean setBluePrint(IntSeq s){

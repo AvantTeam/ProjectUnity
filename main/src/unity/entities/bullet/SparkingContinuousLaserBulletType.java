@@ -7,7 +7,7 @@ import mindustry.gen.*;
 import unity.content.*;
 import unity.entities.*;
 import unity.graphics.UnityPal;
-import unity.util.Funcs;
+import unity.util.Utils;
 import mindustry.content.StatusEffects;
 import mindustry.entities.*;
 import mindustry.entities.bullet.ContinuousLaserBulletType;
@@ -53,7 +53,7 @@ public class SparkingContinuousLaserBulletType extends ContinuousLaserBulletType
 
         if(extinction){
             if(b.timer(2, 15f)){
-                Funcs.castCone(b.x, b.y, length * coneRange, b.rotation(), 70, (tile, build, dst, angD) -> {
+                Utils.castCone(b.x, b.y, length * coneRange, b.rotation(), 70, (tile, build, dst, angD) -> {
                     if(Mathf.chance(angD * 0.2f * Mathf.clamp(dst * 1.7f))) Fires.create(tile);
                     if(build != null && b.team != build.team){
                         build.damage(angD * 23.3f * Mathf.clamp(dst * 1.7f));
@@ -61,7 +61,7 @@ public class SparkingContinuousLaserBulletType extends ContinuousLaserBulletType
                     }
                 });
             }
-            Funcs.castCone(b.x, b.y, length * coneRange, b.rotation(), 70f, (e, dst, angD) -> {
+            Utils.castCone(b.x, b.y, length * coneRange, b.rotation(), 70f, (e, dst, angD) -> {
                 float clamped = Mathf.clamp(dst * 1.7f);
                 if(!e.dead){
                     float damageMulti = e.team != b.team ? 0.25f : 1f;
@@ -89,7 +89,7 @@ public class SparkingContinuousLaserBulletType extends ContinuousLaserBulletType
     @Override
     public void init(Bullet b){
         if(extinction){
-            Funcs.castCone(b.x, b.y, length * 1.3f, b.rotation(), 80f, (tile, build, dst, angD) -> {
+            Utils.castCone(b.x, b.y, length * 1.3f, b.rotation(), 80f, (tile, build, dst, angD) -> {
                 if(Mathf.chance(angD * 0.9f * Mathf.clamp(dst * 1.7f))) Fires.create(tile);
                 if(build != null && b.team != build.team) build.damage(angD * 258.3f * Mathf.clamp(dst * 1.7f));
             }, (e, dst, angD) -> {

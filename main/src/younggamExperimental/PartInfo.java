@@ -62,7 +62,7 @@ public class PartInfo{
         for(int i = 0, len = partsConfig.length; i < len; i++){
             var pinfo = partsConfig[i];
             pinfo.id = i;
-            pinfo.texRegion = Funcs.getRegionRect(partsSprite, pinfo.tx, pinfo.ty, pinfo.tw, pinfo.th, spriteW, spriteH);
+            pinfo.texRegion = Utils.getRegionRect(partsSprite, pinfo.tx, pinfo.ty, pinfo.tw, pinfo.th, spriteW, spriteH);
         }
     }
 }

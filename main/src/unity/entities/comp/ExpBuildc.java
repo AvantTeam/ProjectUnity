@@ -52,7 +52,7 @@ public interface ExpBuildc extends ExpEntityc<Block, ExpBlock>, Buildingc{
         int[] links = power() == null ? new int[0] : power().links.toArray();
 
         if(block.size > expType().type.size){
-            tile = Funcs.getBestTile(this, block.size, expType().type.size);
+            tile = Utils.getBestTile(this, block.size, expType().type.size);
             if(tile == null) return;
 
             tile.setBlock(block, team(), rotation());

@@ -186,7 +186,7 @@ public class SlowLightning extends EffectState{
                 return building.block.absorbLasers;
             };
             Cons<Unit> uc = unit -> unit.damage(tDamage);
-            Funcs.collideLineRaw(fromPos.x, fromPos.y, toPos.x, toPos.y, t -> t.team != origin.team, u -> u.team != origin.team, bf, uc);
+            Utils.collideLineRaw(fromPos.x, fromPos.y, toPos.x, toPos.y, t -> t.team != origin.team, u -> u.team != origin.team, bf, uc);
         }
     }
 }

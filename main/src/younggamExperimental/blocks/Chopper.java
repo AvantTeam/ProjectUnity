@@ -44,7 +44,7 @@ public class Chopper extends GraphBlock{
         super(name);
         rotate = solid = configurable = acceptsItems = true;
         config(String.class, (ChopperBuild build, String value) -> build.changed = build.setBluePrintFromString(value));
-        config(IntSeq.class, (ChopperBuild build, IntSeq value) -> build.changed = build.setBluePrint(Funcs.unpackInts(value)));
+        config(IntSeq.class, (ChopperBuild build, IntSeq value) -> build.changed = build.setBluePrint(Utils.unpackInts(value)));
         configClear((ChopperBuild build) -> build.setBluePrint(null));
     }
 
@@ -107,7 +107,7 @@ public class Chopper extends GraphBlock{
         }
 
         boolean setBluePrintFromString(String s){
-            return setBluePrint(Funcs.unpackIntsFromString(s));
+            return setBluePrint(Utils.unpackIntsFromString(s));
         }
 
         boolean setBluePrint(IntSeq s){

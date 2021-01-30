@@ -86,7 +86,7 @@ public class GraphCrucibleModule extends GraphModule<GraphCrucible, GraphCrucibl
             float temp = 0f;
             var net = networks.get(0);
             if(net != null) temp = net.getAverageTemp();
-            Color tempCol = Funcs.tempColor(temp);
+            Color tempCol = Utils.tempColor(temp);
             tempCol.mul(tempCol.a);
             tempCol.add(Color.gray);
             tempCol.a = 1f;
