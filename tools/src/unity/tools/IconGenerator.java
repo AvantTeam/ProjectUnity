@@ -11,7 +11,6 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
-import mindustry.world.blocks.defense.turrets.*;
 import unity.entities.comp.*;
 import unity.type.*;
 
@@ -201,15 +200,28 @@ public class IconGenerator implements Generator{
             if(block.minfo.mod == null) return;
 
             try{
-                if(block instanceof Turret) {
-                    block.load();
-                    block.init();
+                block.load();
+                block.init();
 
-                    String fname = block.name.replaceFirst("unity-", "");
+                TextureRegion[] genIcon = block.getGeneratedIcons();
 
-                    Sprite reg = SpriteProcessor.get(fname);
-                    Sprite icon = Sprite.createEmpty(0, 0);
+                Sprite icon = Sprite.createEmpty(block.size * 32, block.size * 32);
+                for(TextureRegion reg : genIcon){
+                    Func<TextureRegion, String> parseName = r -> ((AtlasRegion)r).name.replaceFirst("unity-", "");
+                    Sprite sprite = SpriteProcessor.get(parseName.get(reg));
+
+                    if(!block.outlineIcon){
+                        icon.draw(sprite);
+                    }else{
+                        if(reg == genIcon[genIcon.length - 1]){
+                            icon.draw(sprite.outline(4, block.outlineColor));
+                        }
+
+                        icon.draw(sprite);
+                    }
                 }
+
+                genIcon(icon, block.name.replaceFirst("unity-", ""));
             }catch(Exception e){
                 Log.err("Skipping block @: @", block.name, e.getMessage());
             }
