@@ -1038,6 +1038,7 @@ public class UnityBlocks implements ContentList{
                 rotateSpeed = 1f;
                 recoilAmount = 4f;
                 powerUse = 24f;
+                cooldown = 0.006f;
 
                 shootCone = 15f;
                 range = 250f;
