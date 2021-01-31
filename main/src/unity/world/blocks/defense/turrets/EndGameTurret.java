@@ -500,7 +500,7 @@ public class EndGameTurret extends PowerTurret{
                 if(d.time >= 120f){
                     toRemove.add(d);
                     if(isModified){
-                        locked.add(d);
+                        if(!locked.contains(d)) locked.add(d);
                         if(!firstInit && tmpB){
                             Events.run(Trigger.update, new AnnihilateRunnable());
                             tmpB = false;
