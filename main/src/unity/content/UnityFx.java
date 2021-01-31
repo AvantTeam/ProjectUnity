@@ -834,5 +834,17 @@ public class UnityFx{
                 Fill.circle(e.x + x, e.y + y, 2f * e.fin());
             });
         }
+    }),
+
+    reflectResumeDynamic = new Effect(22f, e -> {
+        color(Color.valueOf("FFF3D6"));
+        stroke(e.fout() * 2f);
+        Lines.circle(e.x, e.y, Interp.pow3In.apply(e.fout()) * e.rotation);
+    }),
+
+    reflectPulseDynamic = new Effect(22f, e -> {
+        color(Color.valueOf("FFF3D6"));
+        stroke(e.fout() * 2f);
+        Lines.circle(e.x, e.y, e.finpow() * e.rotation);
     });
 }
