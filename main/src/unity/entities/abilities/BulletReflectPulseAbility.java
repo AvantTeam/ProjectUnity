@@ -12,7 +12,7 @@ import unity.content.UnityFx;
 
 import static arc.Core.*;
 
-public class ReflectPulseAbility extends Ability{
+public class BulletReflectPulseAbility extends Ability{
     protected int maxReflect = 1;
     protected float reload = 100f, range = 60f, reflectTime = 60f, maxDamage = 100f;
     protected Effect healEffect = Fx.heal;
@@ -52,9 +52,9 @@ public class ReflectPulseAbility extends Ability{
         }
     }
 
-    ReflectPulseAbility(){}
+    BulletReflectPulseAbility(){}
 
-    public ReflectPulseAbility(int maxReflect, float reload, float range, float reflectTime, float maxDamage){
+    public BulletReflectPulseAbility(int maxReflect, float reload, float range, float reflectTime, float maxDamage){
         this.maxReflect = maxReflect;
         this.reload = reload;
         this.range = range;
