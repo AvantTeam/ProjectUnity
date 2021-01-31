@@ -33,7 +33,8 @@ public class UnityUnitTypes implements ContentList{
         WormSegmentUnit::new,
         WormDefaultUnit::new,
         TransUnitWaterMove::new,
-        TransLegsUnit::new
+        TransLegsUnit::new,
+        EndInvisibleUnit::new
     };
 
     private static final int[] classIDs = new int[constructors.length];
@@ -84,7 +85,7 @@ public class UnityUnitTypes implements ContentList{
 
     public static UnitType kami;
 
-    //public static @FactionDef(type = "end") UnitType devourer;
+    public static @FactionDef(type = "end") UnitType opticaecus; /*devourer;*/
 
     public static int getClassId(int index){
         return classIDs[index];
@@ -2064,6 +2065,56 @@ public class UnityUnitTypes implements ContentList{
 
         //endregion
         //region dark
+
+        setEntity("opticaecus", EndInvisibleUnit::new);
+        opticaecus = new InvisibleUnitType("opticaecus"){{
+            health = 180000f;
+            speed = 1.8f;
+            drag = 0.02f;
+            hitSize = 60.5f;
+            flying = true;
+            circleTarget = false;
+            engineOffset = 40f;
+            engineSize = 6f;
+
+            weapons.add(new Weapon(){{
+                mirror = false;
+                rotate = false;
+                x = 0f;
+                y = 11.25f;
+                shootY = 0f;
+                reload = 4f * 60f;
+
+                bullet = new LaserBulletType(1400f){{
+                    colors = new Color[]{UnityPal.scarColor, UnityPal.endColor, Color.white};
+                    hitColor = UnityPal.endColor;
+                    width = 30f;
+                    length = 390f;
+                    largeHit = true;
+                }};
+            }}, new Weapon("unity-doeg-launcher"){{
+                x = 24.75f;
+                mirror = true;
+                rotate = true;
+                reload = 1.2f * 60f;
+                inaccuracy = 20f;
+                shotDelay = 2f;
+                shots = 10;
+
+                bullet = new MissileBulletType(6f, 420f){{
+                    lifetime = 55f;
+                    frontColor = UnityPal.endColor;
+                    backColor = trailColor = UnityPal.scarColor;
+                    shrinkY = 0.1f;
+                    splashDamage = 320f;
+                    splashDamageRadius = 45f;
+                    weaveScale = 15f;
+                    weaveMag = 2f;
+                    width *= 1.6f;
+                    height *= 2.1f;
+                }};
+            }});
+        }};
 
         /*
         setEntity("devourer", WormDefaultUnit::new);
