@@ -266,7 +266,7 @@ public class UnityUnitType extends UnitType{
         //worm
         if(unit instanceof WormDefaultUnit wormUnit){
             for(int i = 0; i < segmentLength; i++){
-                Draw.z(z - (i + 1f) / 500f);
+                Draw.z(z - (i + 1f) / 1000f);
                 wormUnit.segmentUnits[i].drawBody();
                 drawWeapons(wormUnit.segmentUnits[i]);
             }

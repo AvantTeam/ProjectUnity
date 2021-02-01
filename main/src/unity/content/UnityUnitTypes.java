@@ -2213,7 +2213,7 @@ public class UnityUnitTypes implements ContentList{
                 ignoreRotation = true;
                 rotate = true;
                 x = 22f;
-                y = -17.75f;
+                y = -15.75f;
                 shootY = 12f;
                 shadow = 16f;
                 reload = 1.5f * 60;
@@ -2226,8 +2226,9 @@ public class UnityUnitTypes implements ContentList{
             }}, new Weapon("unity-doeg-small-laser"){{
                 mirror = true;
                 alternate = false;
+                rotate = true;
                 x = 22f;
-                y = -25f;
+                y = -26f;
                 reload = 2f * 60;
                 shadow = 14f;
                 shootSound = Sounds.laser;

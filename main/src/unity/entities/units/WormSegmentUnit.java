@@ -152,7 +152,7 @@ public class WormSegmentUnit extends UnitEntity{
 
     @Override
     public boolean serialize(){
-        return true;
+        return false;
     }
 
     @Override
@@ -279,6 +279,7 @@ public class WormSegmentUnit extends UnitEntity{
     }
 
     public void drawBody(){
+        float z = Draw.z();
         type.applyColor(this);
         TextureRegion region = segmentType == 0 ? wormType.segmentRegion : wormType.tailRegion;
         Draw.rect(region, this, rotation - 90);
@@ -288,13 +289,14 @@ public class WormSegmentUnit extends UnitEntity{
         if(outline != null){
             Draw.z(Draw.z() - UnitType.outlineSpace);
             Draw.rect(outline, this, rotation - 90f);
+            Draw.z(z);
         }
         Draw.reset();
     }
 
     public void drawCell(TextureRegion cellRegion){
         Draw.color(type.cellColor(this));
-        Draw.rect(cellRegion, x, y, rotation, -90f);
+        Draw.rect(cellRegion, x, y, rotation - 90f);
     }
 
     public void drawSoftShadow(){
