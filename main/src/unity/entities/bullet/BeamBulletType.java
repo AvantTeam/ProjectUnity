@@ -12,7 +12,6 @@ import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import unity.*;
 
 public class BeamBulletType extends BulletType{
     /** Colors. Should only be 2 colors. */
@@ -88,7 +87,7 @@ public class BeamBulletType extends BulletType{
 
             Drawf.light(b.team, b.x, b.y, Tmp.v1.x, Tmp.v1.y, lightWidth * b.fout(), color, 0.6f);
 
-            Unity.print("Pos based draw");
+            //Unity.print("Pos based draw");
         }else if(b.data instanceof Vec2 data){
             Tmp.v1.set(data);
 
@@ -98,7 +97,7 @@ public class BeamBulletType extends BulletType{
 
             Drawf.light(b.team, b.x, b.y, Tmp.v1.x, Tmp.v1.y, lightWidth * b.fout(), color, 0.6f);
             
-            Unity.print("Vec2 based draw");
+            //Unity.print("Vec2 based draw");
         }
     }
 }
