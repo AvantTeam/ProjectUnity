@@ -120,6 +120,10 @@ public class WormDefaultUnit extends UnitEntity{
         Draw.z(originZ);
     }
 
+    public WormSegmentUnit newSegment(){
+        return new WormSegmentUnit();
+    }
+
     @Override
     public void add(){
         if(added) return;
@@ -129,7 +133,7 @@ public class WormDefaultUnit extends UnitEntity{
         for(int i = 0, len = getSegmentLength(); i < len; i++){
             int typeS = i == len - 1 ? 1 : 0;
             segments[i].set(x, y);
-            WormSegmentUnit temp = new WormSegmentUnit();
+            WormSegmentUnit temp = newSegment();
 
             temp.elevation = elevation;
             temp.setSegmentType(typeS);

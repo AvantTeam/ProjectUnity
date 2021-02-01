@@ -51,7 +51,7 @@ public class WormSegmentUnit extends UnitEntity{
         Groups.all.add(this);
         Groups.unit.add(this);
         Groups.sync.add(this);
-        Groups.draw.add(this);
+        //Groups.draw.add(this);
         added = true;
         updateLastPosition();
     }
@@ -77,7 +77,7 @@ public class WormSegmentUnit extends UnitEntity{
         Groups.all.remove(this);
         Groups.unit.remove(this);
         Groups.sync.remove(this);
-        Groups.draw.remove(this);
+        //Groups.draw.remove(this);
         added = false;
         controller.removed(this);
         if(net.client()) netClient.addRemovedEntity(id);
@@ -173,6 +173,8 @@ public class WormSegmentUnit extends UnitEntity{
             maxHealth = trueParentUnit.maxHealth;
             hitTime = trueParentUnit.hitTime;
             ammo = trueParentUnit.ammo;
+        }else{
+            return;
         }
         if(team != trueParentUnit.team) team = trueParentUnit.team;
         if(!net.client() && !dead && controller != null) controller.updateUnit();
@@ -189,8 +191,7 @@ public class WormSegmentUnit extends UnitEntity{
 
     protected void updateWeapon(){
         boolean can = canShoot();
-        for(int i = 0; i < mounts.length; i++){
-            WeaponMount mount = mounts[i];
+        for(WeaponMount mount : mounts){
             if(mount == null) continue;
             Weapon weapon = mount.weapon;
             mount.reload = Math.max(mount.reload - Time.delta * reloadMultiplier, 0);
@@ -213,7 +214,7 @@ public class WormSegmentUnit extends UnitEntity{
                 mount.heat = Math.max(mount.heat - Time.delta * reloadMultiplier / mount.weapon.cooldownTime, 0);
             }
             if(weapon.otherSide != -1 && weapon.alternate && mount.side == weapon.flipSprite
-                && mount.reload + Time.delta > weapon.reload / 2.0F && mount.reload <= weapon.reload / 2.0F){
+            && mount.reload + Time.delta > weapon.reload / 2.0F && mount.reload <= weapon.reload / 2.0F){
                 mounts[weapon.otherSide].side = !mounts[weapon.otherSide].side;
                 mount.side = !mount.side;
             }

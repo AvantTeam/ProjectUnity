@@ -7,6 +7,7 @@ import arc.graphics.g2d.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.ctype.*;
 import mindustry.type.*;
 import mindustry.gen.*;
@@ -34,7 +35,8 @@ public class UnityUnitTypes implements ContentList{
         WormDefaultUnit::new,
         TransUnitWaterMove::new,
         TransLegsUnit::new,
-        EndInvisibleUnit::new
+        EndInvisibleUnit::new,
+        EndWormUnit::new
     };
 
     private static final int[] classIDs = new int[constructors.length];
@@ -85,7 +87,7 @@ public class UnityUnitTypes implements ContentList{
 
     public static UnitType kami;
 
-    public static @FactionDef(type = "end") UnitType opticaecus; /*devourer;*/
+    public static @FactionDef(type = "end") UnitType opticaecus, devourer;
 
     public static int getClassId(int index){
         return classIDs[index];
@@ -2068,11 +2070,12 @@ public class UnityUnitTypes implements ContentList{
 
         setEntity("opticaecus", EndInvisibleUnit::new);
         opticaecus = new InvisibleUnitType("opticaecus"){{
-            health = 180000f;
+            health = 60000f;
             speed = 1.8f;
             drag = 0.02f;
             hitSize = 60.5f;
             flying = true;
+            lowAltitude = true;
             circleTarget = false;
             engineOffset = 40f;
             engineSize = 6f;
@@ -2101,10 +2104,10 @@ public class UnityUnitTypes implements ContentList{
                 shotDelay = 2f;
                 shots = 10;
 
-                bullet = new MissileBulletType(6f, 420f){{
+                bullet = new MissileBulletType(6f, 220f){{
                     lifetime = 55f;
                     frontColor = UnityPal.endColor;
-                    backColor = trailColor = UnityPal.scarColor;
+                    backColor = trailColor = lightColor = UnityPal.scarColor;
                     shrinkY = 0.1f;
                     splashDamage = 320f;
                     splashDamageRadius = 45f;
@@ -2115,6 +2118,137 @@ public class UnityUnitTypes implements ContentList{
                 }};
             }});
         }};
+
+        setEntity("devourer-of-eldrich-gods", EndWormUnit::new);
+        devourer = new UnityUnitType("devourer-of-eldrich-gods"){{
+            health = 1250000f;
+            flying = true;
+            speed = 4f;
+            accel = 0.053f;
+            drag = 0.012f;
+            circleTarget = true;
+            hitSize = 41f * 1.55f;
+            segmentOffset = (41f * 1.55f) + 1f;
+            segmentLength = 45;
+            lowAltitude = true;
+            visualElevation = 2f;
+            rotateSpeed = 3.2f;
+            engineSize = -1f;
+            range = 450f;
+            armor = 16f;
+
+            BulletType t = new AntiCheatBasicBulletType(9.2f, 130f){{
+                hitSize = 8f;
+                shrinkY = 0f;
+                width = 19f;
+                height = 25f;
+                backColor = hitColor = lightColor = UnityPal.scarColor;
+                frontColor = UnityPal.endColor;
+            }};
+
+            weapons.add(new Weapon(){{
+                mirror = false;
+                ignoreRotation = true;
+                x = 0f;
+                y = 18f;
+                reload = 15f * 60f;
+                continuous = true;
+                shake = 4f;
+                bullet = new SparkingContinuousLaserBulletType(780f){{
+                    length = 340f;
+                    lifetime = 5f * 60f;
+                    incendChance = -1f;
+                    fromBlockAmount = 1;
+                    fromBlockChance = 0.4f;
+                    fromBlockDamage = 80f;
+                    colors = new Color[]{UnityPal.scarColorAlpha, UnityPal.scarColor, UnityPal.endColor, Color.white};
+                }};
+            }}, new Weapon("unity-doeg-destroyer"){{
+                mirror = true;
+                ignoreRotation = true;
+                rotate = true;
+                x = 22f;
+                y = -17.75f;
+                shootY = 12f;
+                shadow = 16f;
+                reload = 1.5f * 60;
+                inaccuracy = 1.4f;
+                shots = 6;
+                shotDelay = 4f;
+                shootSound = Sounds.shootBig;
+
+                bullet = t;
+            }});
+            segWeapSeq.add(new Weapon("unity-doeg-launcher"){{
+                mirror = true;
+                rotate = true;
+                x = 19f;
+                y = 0f;
+                shootY = 8f;
+                shadow = 16f;
+                reload = 1.2f * 60;
+                inaccuracy = 1.4f;
+                shots = 8;
+                shotDelay = 3f;
+                xRand = 12f;
+                shootSound = Sounds.missile;
+
+                bullet = new AntiCheatBasicBulletType(6f, 30f, "missile"){{
+                    width = 9f;
+                    height = 11f;
+                    shrinkY = 0f;
+                    hitSound = Sounds.explosion;
+                    trailChance = 0.2f;
+                    lifetime = 52f;
+                    homingPower = 0.08f;
+                    splashDamage = 90f;
+                    splashDamageRadius = 45f;
+                    weaveMag = 18f;
+                    weaveScale = 1.6f;
+                    backColor = trailColor = hitColor = lightColor = UnityPal.scarColor;
+                    frontColor = UnityPal.endColor;
+                }};
+            }}, new Weapon("unity-doeg-destroyer"){{
+                mirror = true;
+                ignoreRotation = true;
+                rotate = true;
+                x = 22f;
+                y = -17.75f;
+                shootY = 12f;
+                shadow = 16f;
+                reload = 1.5f * 60;
+                inaccuracy = 1.4f;
+                shots = 6;
+                shotDelay = 4f;
+                shootSound = Sounds.shootBig;
+
+                bullet = t;
+            }}, new Weapon("unity-doeg-small-laser"){{
+                mirror = true;
+                alternate = false;
+                x = 22f;
+                y = -25f;
+                reload = 2f * 60;
+                shadow = 14f;
+                shootSound = Sounds.laser;
+                continuous = true;
+
+                bullet = new ContinuousLaserBulletType(25f){{
+                    lifetime = 2f * 60;
+                    length = 190f;
+                    for(int i = 0; i < strokes.length; i++){
+                        strokes[i] *= 0.4f;
+                    }
+                    colors = new Color[]{UnityPal.scarColorAlpha, UnityPal.scarColor, UnityPal.endColor, Color.white};
+                }};
+            }});
+        }
+            @Override
+            public void init(){
+                super.init();
+                immunities.addAll(Vars.content.getBy(ContentType.status));
+            }
+        };
 
         /*
         setEntity("devourer", WormDefaultUnit::new);
