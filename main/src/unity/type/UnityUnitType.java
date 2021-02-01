@@ -228,8 +228,7 @@ public class UnityUnitType extends UnitType{
             super.drawShadow(unit);
         }
 
-        //worm
-        if(unit instanceof WormDefaultUnit wormunit) wormunit.drawShadow();
+        if(unit instanceof WormDefaultUnit wormUnit) wormUnit.drawShadow();
     }
 
     @Override
@@ -237,7 +236,9 @@ public class UnityUnitType extends UnitType{
         super.drawSoftShadow(unit);
         //worm
         if(!(unit instanceof WormDefaultUnit wormUnit)) return;
-        for(int i = 0; i < segmentLength; i++) wormUnit.segmentUnits[i].drawSoftShadow();
+        for(WormSegmentUnit s : wormUnit.segmentUnits){
+            wormUnit.type.drawSoftShadow(s);
+        }
     }
 
     @Override

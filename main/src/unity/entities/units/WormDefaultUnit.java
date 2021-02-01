@@ -114,8 +114,8 @@ public class WormDefaultUnit extends UnitEntity{
     public void drawShadow(){
         float originZ = Draw.z();
         for(int i = 0, len = getSegmentLength(); i < len; i++){
-            Draw.z(originZ - (i + 1) / 500f);
-            type.drawShadow(segmentUnits[i]);
+            Draw.z(originZ - (i + 1) / 10000f);
+            segmentUnits[i].drawShadow();
         }
         Draw.z(originZ);
     }

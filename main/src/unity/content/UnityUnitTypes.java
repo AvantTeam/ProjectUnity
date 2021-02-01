@@ -2127,6 +2127,7 @@ public class UnityUnitTypes implements ContentList{
             accel = 0.053f;
             drag = 0.012f;
             circleTarget = true;
+            rotateShooting = faceTarget = false;
             hitSize = 41f * 1.55f;
             segmentOffset = (41f * 1.55f) + 1f;
             segmentLength = 45;
@@ -2134,7 +2135,7 @@ public class UnityUnitTypes implements ContentList{
             visualElevation = 2f;
             rotateSpeed = 3.2f;
             engineSize = -1f;
-            range = 450f;
+            range = 480f;
             armor = 16f;
 
             BulletType t = new AntiCheatBasicBulletType(9.2f, 130f){{
@@ -2227,8 +2228,8 @@ public class UnityUnitTypes implements ContentList{
                 mirror = true;
                 alternate = false;
                 rotate = true;
-                x = 22f;
-                y = -26f;
+                x = 17.5f;
+                y = 16.5f;
                 reload = 2f * 60;
                 shadow = 14f;
                 shootSound = Sounds.laser;
@@ -2236,7 +2237,7 @@ public class UnityUnitTypes implements ContentList{
 
                 bullet = new ContinuousLaserBulletType(25f){{
                     lifetime = 2f * 60;
-                    length = 190f;
+                    length = 230f;
                     for(int i = 0; i < strokes.length; i++){
                         strokes[i] *= 0.4f;
                     }
