@@ -208,67 +208,16 @@ public class UnityBullets implements ContentList{
             public void drawLight(Bullet b){}
         };
 
-        shockBeam = new ContinuousLaserBulletType(35f){
-            {
-                speed = 0.0001f;
-                shootEffect = Fx.none;
-                despawnEffect = Fx.none;
-                pierce = true;
-                hitSize = 0f;
-                status = StatusEffects.shocked;
-                statusDuration = 3f * 60f;
-                width = 0.62f;
-                length = 120f;
-                hittable = false;
-                hitEffect = Fx.hitLiquid;
-
-            }
-
-            @Override
-            public void init(Bullet b){
-                super.init(b);
-
-                Healthc target = Damage.linecast(b, b.x, b.y, b.rotation(), length);
-                b.data = target;
-
-                if(!(target instanceof Building) && target instanceof Hitboxc hit){
-                    hit.collision(hit, hit.x(), hit.y());
-                    b.collision(hit, hit.x(), hit.y());
-                }else{
-                    b.data = new Vec2().trns(b.rotation(), this.length).add(b.x, b.y);
-                }
-            }
-
-            @Override
-            public void update(Bullet b){
-                if(b.timer.get(1, 5)){
-                    Posc target = ((LaserTurret.LaserTurretBuild)b.owner).target;
-                    if(target == null) return;
-                    Lightning.create(b.team, surge, Mathf.random(this.damage / 1.8f, this.damage / 1.2f), b.x, b.y, b.angleTo(target), Mathf.floorPositive(b.dst(target) / Vars.tilesize + 3));
-                    if(target instanceof Healthc h) h.damage(this.damage);
-                }
-            }
-
-            @Override
-            public void draw(Bullet b){
-                Posc target = ((LaserTurret.LaserTurretBuild)b.owner).target;
-                if(target != null){
-                    Draw.color(surge);
-                    Drawf.laser(b.team, Core.atlas.find("laser"), Core.atlas.find("laser-end"), b.x, b.y, target.x(), target.y(), width * b.fout());
-                    Draw.reset();
-
-                    Drawf.light(b.team, b.x, b.y, target.x(), target.y(), 15 * b.fout(), this.lightColor, 0.6f);
-                }else if(b.data instanceof Position data){
-                    Tmp.v1.set(data);
-
-                    Draw.color(surge);
-                    Drawf.laser(b.team, Core.atlas.find("laser"), Core.atlas.find("laser-end"), b.x, b.y, Tmp.v1.x, Tmp.v1.y, this.width * b.fout());
-                    Draw.reset();
-
-                    Drawf.light(b.team, b.x, b.y, Tmp.v1.x, Tmp.v1.y, 15 * b.fout(), surge, 0.6f);
-                }
-            }
-        };
+        shockBeam = new BeamBulletType(120f, 35f){{
+            status = StatusEffects.shocked;
+            statusDuration = 3f * 60f;
+            laserWidth = 0.62f;
+            hitEffect = Fx.hitLiquid;
+            fromLightning = true;
+            fromLightningMinDamage = damage/1.8f;
+            fromLightningMaxDamage = damage/1.2f;
+            color = Pal.surge;
+        }};
 
         currentStroke = new LaserBulletType(450){{
             lifetime = 65f;
