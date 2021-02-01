@@ -4,6 +4,7 @@ import arc.math.*;
 import arc.util.*;
 import arc.struct.Seq;
 import arc.graphics.g2d.*;
+import mindustry.audio.*;
 import mindustry.gen.*;
 import mindustry.graphics.Pal;
 import mindustry.type.*;
@@ -192,86 +193,96 @@ public class WormSegmentUnit extends UnitEntity{
     protected void updateWeapon(){
         boolean can = canShoot();
         for(WeaponMount mount : mounts){
-            if(mount == null) continue;
             Weapon weapon = mount.weapon;
             mount.reload = Math.max(mount.reload - Time.delta * reloadMultiplier, 0);
-            float weaponRotation = rotation - 90f + (weapon.rotate ? mount.rotation : 0f);
-
-            float offset = Angles.trnsx(rotation - 90, weapon.x, weapon.y) + Angles.trnsx(weaponRotation, weapon.shootX, weapon.shootY);
-            float shootX = x + offset;
-            float shootY = y + offset;
-            float shootAngle = weapon.rotate ? weaponRotation + 90f : Angles.angle(shootX, shootY, mount.aimX, mount.aimY) + rotation - angleTo(mount.aimX, mount.aimY);
-
+            float weaponRotation = this.rotation - 90 + (weapon.rotate ? mount.rotation : 0);
+            float mountX = this.x + Angles.trnsx(this.rotation - 90, weapon.x, weapon.y);
+            float mountY = this.y + Angles.trnsy(this.rotation - 90, weapon.x, weapon.y);
+            float shootX = mountX + Angles.trnsx(weaponRotation, weapon.shootX, weapon.shootY);
+            float shootY = mountY + Angles.trnsy(weaponRotation, weapon.shootX, weapon.shootY);
+            float shootAngle = weapon.rotate ? weaponRotation + 90 : Angles.angle(shootX, shootY, mount.aimX, mount.aimY) + (this.rotation - angleTo(mount.aimX, mount.aimY));
             if(weapon.continuous && mount.bullet != null){
-                if(!mount.bullet.isAdded() || mount.bullet.time >= mount.bullet.lifetime){
+                if(!mount.bullet.isAdded() || mount.bullet.time >= mount.bullet.lifetime || mount.bullet.type != weapon.bullet){
                     mount.bullet = null;
                 }else{
                     mount.bullet.rotation(weaponRotation + 90);
                     mount.bullet.set(shootX, shootY);
+                    mount.reload = weapon.reload;
                     vel.add(Tmp.v1.trns(rotation + 180.0F, mount.bullet.type.recoil));
+                    if(weapon.shootSound != Sounds.none && !headless){
+                        if(mount.sound == null) mount.sound = new SoundLoop(weapon.shootSound, 1.0F);
+                        mount.sound.update(x, y, true);
+                    }
                 }
             }else{
                 mount.heat = Math.max(mount.heat - Time.delta * reloadMultiplier / mount.weapon.cooldownTime, 0);
+                if(mount.sound != null){
+                    mount.sound.update(x, y, false);
+                }
             }
-            if(weapon.otherSide != -1 && weapon.alternate && mount.side == weapon.flipSprite
-            && mount.reload + Time.delta > weapon.reload / 2.0F && mount.reload <= weapon.reload / 2.0F){
+            if(weapon.otherSide != -1 && weapon.alternate && mount.side == weapon.flipSprite && mount.reload + Time.delta > weapon.reload / 2.0F && mount.reload <= weapon.reload / 2.0F){
                 mounts[weapon.otherSide].side = !mounts[weapon.otherSide].side;
                 mount.side = !mount.side;
             }
             if(weapon.rotate && (mount.rotate || mount.shoot) && can){
-                float axisX = x + Angles.trnsx(rotation - 90, weapon.x, weapon.y);
-                float axisY = y + Angles.trnsy(rotation - 90, weapon.x, weapon.y);
-
-                mount.targetRotation = Angles.angle(axisX, axisY, mount.aimX, mount.aimY) - rotation;
+                float axisX = this.x + Angles.trnsx(this.rotation - 90, weapon.x, weapon.y);
+                float axisY = this.y + Angles.trnsy(this.rotation - 90, weapon.x, weapon.y);
+                mount.targetRotation = Angles.angle(axisX, axisY, mount.aimX, mount.aimY) - this.rotation;
                 mount.rotation = Angles.moveToward(mount.rotation, mount.targetRotation, weapon.rotateSpeed * Time.delta);
             }else if(!weapon.rotate){
                 mount.rotation = 0;
                 mount.targetRotation = angleTo(mount.aimX, mount.aimY);
             }
-            if(mount.shoot && can && (ammo > 0 || !state.rules.unitAmmo || team().rules().infiniteAmmo) && (!weapon.alternate || mount.side == weapon.flipSprite) && (vel.len() >= mount.weapon.minShootVelocity || (net.active() && !isLocal())) && mount.reload <= 1.0E-4F && Angles.within(weapon.rotate ? mount.rotation : rotation, mount.targetRotation, mount.weapon.shootCone)){
-                shoot(mount, weapon, shootX, shootY, mount.aimX, mount.aimY, shootAngle, Mathf.sign(weapon.x));
+            if(mount.shoot && can && (ammo > 0 || !state.rules.unitAmmo || team().rules().infiniteAmmo) && (!weapon.alternate || mount.side == weapon.flipSprite) && (vel.len() >= mount.weapon.minShootVelocity || (net.active() && !isLocal())) && mount.reload <= 1.0E-4F && Angles.within(weapon.rotate ? mount.rotation : this.rotation, mount.targetRotation, mount.weapon.shootCone)){
+                shoot(mount, shootX, shootY, mount.aimX, mount.aimY, mountX, mountY, shootAngle, Mathf.sign(weapon.x));
                 mount.reload = weapon.reload;
                 ammo--;
-
-                if(trueParentUnit != null) trueParentUnit.ammo -= 1;
                 if(ammo < 0) ammo = 0;
             }
         }
     }
 
-    protected void shoot(WeaponMount mount, Weapon weapon, float x, float y, float aimX, float aimY, float rotation,
-                         int side){
-        weapon.shootSound.at(x, y, Mathf.random(0.8f, 1.0f));
+    protected void shoot(WeaponMount mount, float x, float y, float aimX, float aimY, float mountX,
+                       float mountY, float rotation, int side){
+        Weapon weapon = mount.weapon;
+        float baseX = this.x;
+        float baseY = this.y;
+        boolean delay = weapon.firstShotDelay + weapon.shotDelay > 0f;
+        (delay ? weapon.chargeSound : weapon.continuous ? Sounds.none : weapon.shootSound).at(x, y, Mathf.random(weapon.soundPitchMin, weapon.soundPitchMax));
         BulletType ammo = weapon.bullet;
-        float lifeScl = ammo.scaleVelocity ? Mathf.clamp(Mathf.dst(x, y, aimX, aimY) / ammo.range()) : 1.0f;
-        shootSequence = 0;
-
-        if(weapon.shotDelay + weapon.firstShotDelay > 0.01f){
-            Angles.shotgun(weapon.shots, weapon.spacing, rotation, f -> {
-                Time.run(shootSequence * weapon.shotDelay + weapon.firstShotDelay, () -> {
-                    if(!isAdded()) return;
-                    mount.bullet = bullet(weapon, x, y, f + Mathf.range(weapon.inaccuracy), lifeScl);
+        float lifeScl = ammo.scaleVelocity ? Mathf.clamp(Mathf.dst(x, y, aimX, aimY) / ammo.range()) : 1f;
+        sequenceNum = 0;
+        if (delay) {
+            Angles.shotgun(weapon.shots, weapon.spacing, rotation, (f)->{
+                Time.run(sequenceNum * weapon.shotDelay + weapon.firstShotDelay, ()->{
+                    if (!isAdded()) return;
+                    mount.bullet = bullet(weapon, x + this.x - baseX, y + this.y - baseY, f + Mathf.range(weapon.inaccuracy), lifeScl);
                 });
-                shootSequence++;
+                sequenceNum++;
             });
-        }else{
+        } else {
             Angles.shotgun(weapon.shots, weapon.spacing, rotation, f -> mount.bullet = bullet(weapon, x, y, f + Mathf.range(weapon.inaccuracy), lifeScl));
         }
-        if(weapon.firstShotDelay > 0) Time.run(weapon.firstShotDelay, () -> {
-            if(!isAdded()) return;
-            vel.add(Tmp.v1.trns(rotation + 180f, ammo.recoil));
-            Effect.shake(weapon.shake, weapon.shake, x, y);
-            mount.heat = 1.0f;
-        });
-        else{
-            vel.add(Tmp.v1.trns(rotation + 180f, ammo.recoil));
-            Effect.shake(weapon.shake, weapon.shake, x, y);
-            mount.heat = 1.0f;
-        }
         boolean parentize = ammo.keepVelocity;
-        weapon.ejectEffect.at(x, y, rotation + side);
+        if(delay){
+            Time.run(weapon.firstShotDelay, () -> {
+                if(!isAdded()) return;
+                vel.add(Tmp.v1.trns(rotation + 180f, ammo.recoil));
+                Effect.shake(weapon.shake, weapon.shake, x, y);
+                mount.heat = 1f;
+                if(!weapon.continuous){
+                    weapon.shootSound.at(x, y, Mathf.random(weapon.soundPitchMin, weapon.soundPitchMax));
+                }
+            });
+        }else{
+            vel.add(Tmp.v1.trns(rotation + 180f, ammo.recoil));
+            Effect.shake(weapon.shake, weapon.shake, x, y);
+            mount.heat = 1f;
+        }
+        weapon.ejectEffect.at(mountX, mountY, rotation * side);
         ammo.shootEffect.at(x, y, rotation, parentize ? this : null);
         ammo.smokeEffect.at(x, y, rotation, parentize ? this : null);
+        apply(weapon.shootStatus, weapon.shootStatusDuration);
     }
 
     protected Bullet bullet(Weapon weapon, float x, float y, float angle, float lifescl){
