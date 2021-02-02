@@ -804,6 +804,7 @@ public class UnityFx{
 
     supernovaStarHeatwave = new Effect(40f, e -> {
         color(Pal.lancerLaser);
+        stroke(e.fout());
         circle(e.x, e.y, 120f * e.fin());
         circle(e.x, e.y, 120f * e.finpow() * 0.6f);
     }),
