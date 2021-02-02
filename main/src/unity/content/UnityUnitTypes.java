@@ -2126,7 +2126,8 @@ public class UnityUnitTypes implements ContentList{
             speed = 4f;
             accel = 0.053f;
             drag = 0.012f;
-            circleTarget = true;
+            defaultController = AdvanceWormAI::new;
+            circleTarget = counterDrag = true;
             rotateShooting = faceTarget = false;
             hitSize = 41f * 1.55f;
             segmentOffset = (41f * 1.55f) + 1f;
@@ -2162,6 +2163,7 @@ public class UnityUnitTypes implements ContentList{
                     fromBlockAmount = 1;
                     fromBlockChance = 0.4f;
                     fromBlockDamage = 80f;
+                    lightColor = lightningColor = hitColor = UnityPal.scarColor;
                     colors = new Color[]{UnityPal.scarColorAlpha, UnityPal.scarColor, UnityPal.endColor, Color.white};
                 }};
             }}, new Weapon("unity-doeg-destroyer"){{
