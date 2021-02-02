@@ -4,7 +4,6 @@ import arc.*;
 import arc.func.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.*;
 import mindustry.mod.*;
 import mindustry.mod.Mods.*;
 import mindustry.ui.dialogs.*;
@@ -14,6 +13,8 @@ import unity.content.*;
 import unity.gen.*;
 import unity.mod.*;
 import unity.mod.ContributorList.*;
+
+import static mindustry.Vars.*;
 
 public class Unity extends Mod{
     public static final String githubURL = "https://github.com/AvantTeam/ProjectUnity";
@@ -39,7 +40,9 @@ public class Unity extends Mod{
         UnityMusics.load();
 
         Events.on(ContentInitEvent.class, e -> {
-            Regions.load();
+            if(!headless){
+                Regions.load();
+            }
         });
 
         Events.on(DisposeEvent.class, e -> {
@@ -95,11 +98,11 @@ public class Unity extends Mod{
 
     @Override
     public void init(){
-        Vars.enableConsole = true;
+        enableConsole = true;
         handler = new MusicHandler();
 
-        if(!Vars.headless){
-            LoadedMod mod = Vars.mods.locateMod("unity");
+        if(!headless){
+            LoadedMod mod = mods.locateMod("unity");
             Func<String, String> stringf = value -> Core.bundle.get("mod." + value);
 
             mod.meta.displayName = stringf.get(mod.meta.name + ".name");
