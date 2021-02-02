@@ -15,6 +15,7 @@ public class CircleBulletType extends BulletType{
 
     public CircleBulletType(float speed, float damage){
         super(speed, damage);
+        collidesTiles = false;
     }
 
     @Override
