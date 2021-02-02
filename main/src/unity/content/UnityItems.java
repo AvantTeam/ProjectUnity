@@ -126,6 +126,7 @@ public class UnityItems implements ContentList{
         stone = new Item("stone", Color.valueOf("8a8a8a")){{
             hardness = 3;
             cost = 1f;
+            lowPriority = true;
         }};
 
         umbrium = new Item("umbrium", Color.valueOf("8c3d3b")){{
