@@ -51,7 +51,7 @@ public class KamiLaserBulletType extends BulletType{
                 tVecB.trns(b.rotation(), length).add(b);
                 tVecD.trns(b.rotation(), width * curveScl).add(b);
                 tVecC.set(e);
-                if(b.collides(e)){
+                if(b.team != e.team){
                     Position a = e.dst(tVecB) < e.dst(tVecD) ? tVecB : tVecD;
                     float ba = e.dst(tVecB) < e.dst(tVecD) ? 0f : 180f;
                     //float angle = Angles.within(a.angleTo(e), b.rotation() + ba, 90f) ? 1f + (Mathf.clamp(1f - (Angles.angleDist(a.angleTo(e), b.rotation() + ba) / 90f)) * curveScl) : 1f;
