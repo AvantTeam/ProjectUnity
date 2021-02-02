@@ -6,8 +6,10 @@ import arc.math.geom.Vec2;
 import arc.graphics.g2d.Draw;
 import mindustry.gen.*;
 import mindustry.type.UnitType;
+import unity.ai.*;
 import unity.content.UnityUnitTypes;
 import unity.type.*;
+import unity.util.*;
 
 public class WormDefaultUnit extends UnitEntity{
     public UnityUnitType wormType;
@@ -70,6 +72,7 @@ public class WormDefaultUnit extends UnitEntity{
             Tmp.v1.trns(angleB, trueVel);
             segV.add(Tmp.v1);
             segV.setLength(trueVel);
+            if(wormType.counterDrag) segV.scl(1f + (drag * 1.5f));
             segmentUnits[i].vel.set(segV);
         }
         for(int i = 0; i < len; i++) segmentVelocities[i].scl(Time.delta);
@@ -171,6 +174,9 @@ public class WormDefaultUnit extends UnitEntity{
     }*/
 
     public void handleCollision(Hitboxc originUnit, Hitboxc other, float x, float y){
-
+        if(controller instanceof AdvanceWormAI f && other instanceof Bullet b){
+            float damage = Utils.getBulletDamage(b.type);
+            f.setTarget(b.x, b.y, damage);
+        }
     }
 }

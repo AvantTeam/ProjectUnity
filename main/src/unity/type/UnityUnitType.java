@@ -29,6 +29,8 @@ public class UnityUnitType extends UnitType{
     // worms
     public int segmentLength = 9;
     public float segmentOffset = 23f;
+    //hopefully make segment movement more consistant.
+    public boolean counterDrag = false;
         // don't touch, please
     public TextureRegion bodyRegion, bodyOutlineRegion, tailOutlineRegion;
     public boolean splittable = false;
