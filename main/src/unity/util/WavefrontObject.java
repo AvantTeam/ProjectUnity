@@ -7,9 +7,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.*;
 import mindustry.graphics.*;
-import unity.*;
 
 import static mindustry.Vars.*;
 

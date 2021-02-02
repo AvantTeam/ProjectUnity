@@ -9,7 +9,7 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import unity.entities.*;
 
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class CircleBulletType extends BulletType{
     public Func<Bullet, Color> color = (Bullet b) -> Color.red;
 

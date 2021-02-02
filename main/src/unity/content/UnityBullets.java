@@ -1,12 +1,9 @@
 package unity.content;
 
-import arc.*;
 import arc.func.*;
 import arc.math.*;
-import arc.math.geom.*;
 import arc.util.*;
 import arc.graphics.*;
-import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
@@ -14,7 +11,6 @@ import mindustry.entities.bullet.*;
 import mindustry.graphics.*;
 import mindustry.io.*;
 import mindustry.ctype.*;
-import mindustry.world.blocks.defense.turrets.*;
 import unity.entities.bullet.*;
 
 import arc.graphics.g2d.*;
