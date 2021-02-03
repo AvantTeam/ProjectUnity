@@ -15,7 +15,7 @@ public class MusicHandler implements ApplicationListener{
     private ObjectMap<String, MusicLoopData> loopDatas = new ObjectMap<>();
     private MusicLoopData currentData = null;
     private Music currentMusic = null;
-    private Boolp currentPredicate = state::isPlaying;
+    private Boolp currentPredicate;
 
     private boolean introPassed = false;
 
@@ -86,7 +86,7 @@ public class MusicHandler implements ApplicationListener{
 
     public void play(String name, Boolp predicate){
         currentData = loopDatas.get(name);
-        currentPredicate = predicate;
+        currentPredicate = predicate == null ? state::isPlaying : predicate;
     }
 
     public MusicLoopData getCurrentData(){
