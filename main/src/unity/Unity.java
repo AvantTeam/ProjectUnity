@@ -50,7 +50,10 @@ public class Unity extends Mod{
             UnityMusics.dispose();
         });
 
-        Core.app.addListener(musicHandler = new MusicHandler());
+        musicHandler = new MusicHandler();
+        if(Core.app != null){
+            Core.app.addListener(musicHandler);
+        }
 
         if(Core.settings != null){
             Core.settings.getBoolOnce("unity-install", () -> {
