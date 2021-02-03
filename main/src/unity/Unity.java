@@ -18,7 +18,7 @@ import static mindustry.Vars.*;
 
 public class Unity extends Mod{
     public static final String githubURL = "https://github.com/AvantTeam/ProjectUnity";
-    public static MusicHandler handler;
+    public static MusicHandler musicHandler;
 
     private final ContentList[] unityContent = {
         new UnityItems(),
@@ -49,6 +49,8 @@ public class Unity extends Mod{
             UnitySounds.dispose();
             UnityMusics.dispose();
         });
+
+        Core.app.addListener(musicHandler = new MusicHandler());
 
         if(Core.settings != null){
             Core.settings.getBoolOnce("unity-install", () -> {
@@ -99,7 +101,7 @@ public class Unity extends Mod{
     @Override
     public void init(){
         enableConsole = true;
-        handler = new MusicHandler();
+        musicHandler.setup();
 
         if(!headless){
             LoadedMod mod = mods.locateMod("unity");

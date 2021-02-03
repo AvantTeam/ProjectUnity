@@ -18,12 +18,14 @@ import mindustry.graphics.*;
 import mindustry.content.*;
 import mindustry.world.blocks.units.*;
 import mindustry.world.blocks.units.UnitFactory.*;
+import unity.*;
 import unity.ai.*;
 import unity.annotations.Annotations.*;
 import unity.entities.abilities.*;
 import unity.entities.bullet.*;
 import unity.entities.comp.*;
 import unity.entities.units.*;
+import unity.gen.UnityMusics;
 import unity.graphics.*;
 import unity.type.*;
 
@@ -2056,13 +2058,15 @@ public class UnityUnitTypes implements ContentList{
             }});
         }};
 
-        setEntity("kami-mkii", UnitEntity::create);
+        setEntity("kami-mkii", KamiUnit::create);
         kami = new RainbowUnitType("kami-mkii"){{
+            defaultController = KamiAI::new;
             health = 120000f;
             speed = 15f;
             hitSize = 36f;
             flying = true;
-            defaultController = KamiAI::new;
+
+            Unity.musicHandler.registerLoop("kami", UnityMusics.radiantDischargeIntro, UnityMusics.radiantDischargeLoop);
         }};
 
         //endregion
