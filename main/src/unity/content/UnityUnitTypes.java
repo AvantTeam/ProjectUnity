@@ -2058,7 +2058,7 @@ public class UnityUnitTypes implements ContentList{
             }});
         }};
 
-        setEntity("kami-mkii", KamiUnit::create);
+        setEntity("kami-mkii", KamiUnit::new);
         kami = new RainbowUnitType("kami-mkii"){{
             defaultController = KamiAI::new;
             health = 120000f;

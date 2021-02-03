@@ -2,16 +2,21 @@ package unity.mod;
 
 import arc.*;
 import arc.audio.*;
+import arc.func.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.game.EventType.*;
 import mindustry.type.*;
 import unity.gen.*;
 
+import static mindustry.Vars.*;
+
 public class MusicHandler implements ApplicationListener{
     private ObjectMap<String, MusicLoopData> loopDatas = new ObjectMap<>();
     private MusicLoopData currentData = null;
     private Music currentMusic = null;
+    private Boolp currentPredicate = state::isPlaying;
+
     private boolean introPassed = false;
 
     public void setup(){
@@ -40,7 +45,7 @@ public class MusicHandler implements ApplicationListener{
 
     @Override
     public void update(){
-        if(currentData != null){
+        if(currentData != null && currentPredicate.get()){
             if(currentData.intro.getVolume() < 1f){
                 currentData.intro.setVolume(1f);
             }
@@ -79,14 +84,9 @@ public class MusicHandler implements ApplicationListener{
         return currentMusic != null && currentMusic.isPlaying();
     }
 
-    public void play(String name){
+    public void play(String name, Boolp predicate){
         currentData = loopDatas.get(name);
-    }
-
-    public void stop(String name){
-        if(currentData == loopDatas.get(name)){
-            currentData = null;
-        }
+        currentPredicate = predicate;
     }
 
     public MusicLoopData getCurrentData(){
