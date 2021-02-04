@@ -10,7 +10,7 @@ public class KamiUnit extends UnitEntity{
     public void add(){
         if(!added){
             Unity.musicHandler.play("kami", () -> 
-                !dead &&
+                !dead && added &&
                 player.within(this, 1500f) &&
                 (state.isPlaying() || state.isPaused())
             );
