@@ -2142,6 +2142,7 @@ public class UnityUnitTypes implements ContentList{
             engineSize = -1f;
             range = 480f;
             armor = 16f;
+            omniMovement = false;
 
             BulletType t = new AntiCheatBasicBulletType(9.2f, 130f){{
                 hitSize = 8f;
