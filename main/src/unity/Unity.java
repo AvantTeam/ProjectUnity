@@ -13,12 +13,14 @@ import unity.content.*;
 import unity.gen.*;
 import unity.mod.*;
 import unity.mod.ContributorList.*;
+import unity.util.*;
 
 import static mindustry.Vars.*;
 
 public class Unity extends Mod{
     public static final String githubURL = "https://github.com/AvantTeam/ProjectUnity";
     public static MusicHandler musicHandler;
+    public static UnityAntiCheat antiCheat;
 
     private final ContentList[] unityContent = {
         new UnityItems(),
@@ -51,8 +53,11 @@ public class Unity extends Mod{
         });
 
         musicHandler = new MusicHandler();
+        antiCheat = new UnityAntiCheat();
         if(Core.app != null){
             Core.app.addListener(musicHandler);
+            //Core.app.addListener(antiCheat);
+            ((ApplicationCore)Core.app.getListeners().get(0)).add(antiCheat);
         }
 
         if(Core.settings != null){
@@ -105,6 +110,7 @@ public class Unity extends Mod{
     public void init(){
         enableConsole = true;
         musicHandler.setup();
+        antiCheat.setup();
 
         if(!headless){
             LoadedMod mod = mods.locateMod("unity");

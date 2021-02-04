@@ -16,6 +16,7 @@ import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.consumers.*;
+import unity.*;
 import unity.content.*;
 import unity.entities.*;
 import unity.entities.effects.*;
@@ -260,6 +261,7 @@ public class EndGameTurret extends PowerTurret{
             Groups.all.remove(entity);
             if(entity instanceof Unit){
                 Unit tmp = (Unit)entity;
+                Unity.antiCheat.removeUnit(tmp);
                 tmpArray.add(new DeadUnitEntry(tmp));
                 attemptRemoveAdd(tmp);
                 UnityFx.vapourizeUnit.at(tmp.x, tmp.y, tmp.rotation, tmp);
@@ -284,6 +286,7 @@ public class EndGameTurret extends PowerTurret{
             if(entity instanceof Building build){
                 Groups.build.remove(build);
                 build.tile.remove();
+                Unity.antiCheat.removeBuilding(build);
                 if(build.sound != null) build.sound.stop();
                 build.added = false;
             }
@@ -599,6 +602,16 @@ public class EndGameTurret extends PowerTurret{
                 targets[i] = null;
             }
             super.add();
+            Unity.antiCheat.addBuilding(this);
+        }
+
+        @Override
+        public void remove(){
+            if(!isAdded()) return;
+            if(lastHealth <= 0){
+                Unity.antiCheat.removeBuilding(this);
+            }
+            super.remove();
         }
     }
 
@@ -618,7 +631,7 @@ public class EndGameTurret extends PowerTurret{
                     d.entity.y = Float.NaN;
                     d.entity.abilities.clear();
                 }
-                if(d.isModified()){
+                if(d.isModified() && !obsolete){
                     AnnihilateRunnable ar = new AnnihilateRunnable();
                     ar.layer = layer + 1;
                     Events.run(Trigger.update, ar);

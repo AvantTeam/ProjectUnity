@@ -24,6 +24,6 @@ public class TransLegsUnit extends LegsUnit implements TransformerBase{
 
     @Override
     public int classId(){
-        return UnityUnitTypes.getClassId(4);
+        return UnityUnitTypes.getClassId(3);
     }
 }

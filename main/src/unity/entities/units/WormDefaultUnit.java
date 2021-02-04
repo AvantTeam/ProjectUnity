@@ -106,7 +106,7 @@ public class WormDefaultUnit extends UnitEntity{
 
     @Override
     public int classId(){
-        return UnityUnitTypes.getClassId(2);
+        return UnityUnitTypes.getClassId(1);
     }
 
     @Override

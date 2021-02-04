@@ -24,6 +24,6 @@ public class TransUnitWaterMove extends UnitWaterMove implements TransformerBase
 
     @Override
     public int classId(){
-        return UnityUnitTypes.getClassId(3);
+        return UnityUnitTypes.getClassId(2);
     }
 }
