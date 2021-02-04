@@ -23,7 +23,7 @@ public class ShieldBulletType extends BasicBulletType{
     public Effect breakFx = new Effect(5, e -> {
         Draw.z(Layer.shields);
         Draw.color(e.color);
-        float radius = ((int)e.data) * e.fout();
+        float radius = (float)e.data * e.fout();
 
         if(Core.settings.getBool("animatedshields")){
             Fill.poly(e.x, e.y, 6, radius);
