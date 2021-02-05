@@ -20,7 +20,7 @@ public class MusicHandler implements ApplicationListener{
 
     private boolean introPassed = false;
 
-    public MusicHandler(){
+    public void setup(){
         if(netClient != null){
             netClient.addPacketHandler("unity.bossmusic.play", this::play);
 
@@ -42,9 +42,7 @@ public class MusicHandler implements ApplicationListener{
         }else{
             Log.warn("netServer is null");
         }
-    }
 
-    public void setup(){
         Events.on(SectorLaunchEvent.class, e -> {
             Planet p = e.sector.planet;
 
@@ -131,7 +129,6 @@ public class MusicHandler implements ApplicationListener{
         currentPredicate = predicate == null ? () -> (state.isPlaying() || state.isPaused()) : predicate;
 
         if(net.server()){
-            Log.info("Music play on server");
             Call.serverPacketReliable("unity.bossmusic.play", name);
         }
     }
@@ -142,7 +139,6 @@ public class MusicHandler implements ApplicationListener{
         }
 
         if(net.server()){
-            Log.info("Music stop from server");
             Call.serverPacketReliable("unity.bossmusic.stop", name);
         }
     }
