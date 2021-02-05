@@ -204,7 +204,7 @@ public class UnityFx{
 
     plasmaChargeBegin = new Effect(250f, e -> {
         color(Pal.surge);
-        Drawf.tri(e.x, e.y, e.fin() * 16f, e.fout() * 20f, e.rotation);
+        Drawf.tri(e.x, e.y, e.fin() * 16f, e.fin() * 20f, e.rotation);
     }),
 
     plasmaShoot = new Effect(36f, e -> {
