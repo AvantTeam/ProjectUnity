@@ -119,7 +119,7 @@ public class WormSegmentUnit extends UnitEntity{
 
     @Override
     public int classId(){
-        return UnityUnitTypes.getClassId(1);
+        return UnityUnitTypes.getClassId(0);
     }
 
     @Override

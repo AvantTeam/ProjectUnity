@@ -4,6 +4,7 @@ import arc.math.*;
 import arc.util.*;
 import mindustry.gen.*;
 import mindustry.type.*;
+import unity.*;
 import unity.content.*;
 
 public class EndWormUnit extends WormDefaultUnit{
@@ -44,11 +45,20 @@ public class EndWormUnit extends WormDefaultUnit{
     }
 
     @Override
+    public void add(){
+        if(added) return;
+        Unity.antiCheat.addUnit(this);
+        super.add();
+    }
+
+    @Override
     public void remove(){
         if(lastHealth > 0f){
             immunity += 3500f;
             return;
         }
+        if(!added) return;
+        Unity.antiCheat.removeUnit(this);
         super.remove();
     }
 
@@ -78,5 +88,19 @@ public class EndWormUnit extends WormDefaultUnit{
     @Override
     public int classId(){
         return UnityUnitTypes.getClassId(5);
+    }
+
+    public static class EndWormSegmentUnit extends WormSegmentUnit{
+        @Override
+        public void remove(){
+            if(parentUnit == null || !parentUnit.isAdded()){
+                super.remove();
+            }
+        }
+
+        @Override
+        public int classId(){
+            return UnityUnitTypes.getClassId(6);
+        }
     }
 }

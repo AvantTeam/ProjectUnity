@@ -25,6 +25,7 @@ import unity.entities.abilities.*;
 import unity.entities.bullet.*;
 import unity.entities.comp.*;
 import unity.entities.units.*;
+import unity.entities.units.EndWormUnit.*;
 import unity.gen.UnityMusics;
 import unity.graphics.*;
 import unity.type.*;
@@ -38,7 +39,8 @@ public class UnityUnitTypes implements ContentList{
         TransUnitWaterMove::new,
         TransLegsUnit::new,
         EndInvisibleUnit::new,
-        EndWormUnit::new
+        EndWormUnit::new,
+        EndWormSegmentUnit::new
     };
 
     private static final int[] classIDs = new int[constructors.length];
