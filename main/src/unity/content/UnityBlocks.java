@@ -558,33 +558,21 @@ public class UnityBlocks implements ContentList{
             chargeBeginEffect = UnityFx.orbChargeBegin;
         }};
 
-        shockwire = new LaserTurret("shockwire"){
-            {
-                requirements(Category.turret, with(Items.copper, 150, Items.lead, 145, Items.titanium, 160, Items.silicon, 130, UnityItems.imberium, 70));
-                size = 2;
-                health = 1400;
-                range = 125f;
-                reloadTime = 140f;
-                coolantMultiplier = 2f;
-                shootCone = 1f;
-                /*firingMoveFract = 0.15f;
-                shootDuration = 200f;TODO*/
-                inaccuracy = 0f;
-                powerUse = 8.6f;
-                targetAir = false;
-                shootType = UnityBullets.shockBeam;
-                shootSound = Sounds.thruster;
-                consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability <= 0.1f, 0.4f)).update(false);
-            }
-
-            @Override
-            public void setStats(){
-                super.setStats();
-
-                stats.remove(Stat.damage);
-                stats.add(Stat.damage, shootType.damage, StatUnit.none);
-            }
-        };
+        shockwire = new LaserTurret("shockwire"){{
+            requirements(Category.turret, with(Items.copper, 150, Items.lead, 145, Items.titanium, 160, Items.silicon, 130, UnityItems.imberium, 70));
+            size = 2;
+            health = 1400;
+            range = 125f;
+            reloadTime = 140f;
+            coolantMultiplier = 2f;
+            shootCone = 1f;
+            inaccuracy = 0f;
+            powerUse = 8.6f;
+            targetAir = false;
+            shootType = UnityBullets.shockBeam;
+            shootSound = Sounds.thruster;
+            consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability <= 0.1f, 0.4f)).update(false);
+        }};
 
         current = new PowerTurret("current"){{
             requirements(Category.turret, with(Items.copper, 280, Items.lead, 295, Items.silicon, 260, UnityItems.sparkAlloy, 65));
@@ -630,13 +618,7 @@ public class UnityBlocks implements ContentList{
             consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability <= 0.1f, 0.52f)).boost();
         }};
 
-        electrobomb = new ItemTurret("electrobomb"){
-            @Override
-            public void load(){
-                super.load();
-                baseRegion = atlas.find("unity-block-" + size);
-            }
-            
+        electrobomb = new ItemTurret("electrobomb"){            
             {
                 requirements(Category.turret, with(Items.titanium, 360, Items.thorium, 630, Items.silicon, 240, UnityItems.sparkAlloy, 420));
                 size = 5;
@@ -653,6 +635,12 @@ public class UnityBlocks implements ContentList{
                 shootEffect = Fx.none;
                 smokeEffect = Fx.none;
                 consumes.powerCond(10f, TurretBuild::isActive);
+            }
+            
+            @Override
+            public void load(){
+                super.load();
+                baseRegion = atlas.find("unity-block-" + size);
             }
         };
 
