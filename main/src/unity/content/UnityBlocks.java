@@ -1016,18 +1016,18 @@ public class UnityBlocks implements ContentList{
             /** Temporary vector array to be used in the drawing method */
             final Vec2[] phases = new Vec2[]{new Vec2(), new Vec2(), new Vec2(), new Vec2(), new Vec2(), new Vec2()};
 
-            float starRadius;
-            float starOffset;
+            final float starRadius;
+            final float starOffset;
             Cons<AttractLaserTurretBuild> effectDrawer;
 
             final int timerChargeStar = timers++;
-            Effect starEffect;
-            Effect chargeEffect;
-            Effect chargeStarEffect;
-            Effect chargeStar2Effect;
-            Effect chargeBeginEffect;
-            Effect starDecayEffect;
-            Effect heatWaveEffect;
+            final Effect starEffect;
+            final Effect chargeEffect;
+            final Effect chargeStarEffect;
+            final Effect chargeStar2Effect;
+            final Effect chargeBeginEffect;
+            final Effect starDecayEffect;
+            final Effect heatWaveEffect;
 
             {
                 requirements(Category.turret, with(Items.copper, 1));
