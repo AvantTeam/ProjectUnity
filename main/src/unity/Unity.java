@@ -55,9 +55,14 @@ public class Unity extends Mod{
         musicHandler = new MusicHandler();
         antiCheat = new UnityAntiCheat();
         if(Core.app != null){
-            Core.app.addListener(musicHandler);
-            //Core.app.addListener(antiCheat);
-            ((ApplicationCore)Core.app.getListeners().get(0)).add(antiCheat);
+            ApplicationListener listener = Core.app.getListeners().first();
+            if(listener instanceof ApplicationCore core){
+                core.add(musicHandler);
+                core.add(antiCheat);
+            }else{
+                Core.app.addListener(musicHandler);
+                Core.app.addListener(antiCheat);
+            }
         }
 
         if(Core.settings != null){
