@@ -25,16 +25,22 @@ public class MusicHandler implements ApplicationListener{
             netClient.addPacketHandler("unity.bossmusic.play", this::play);
 
             netClient.addPacketHandler("unity.bossmusic.stop", this::stop);
+        }else{
+            Log.warn("netClient is null");
         }
 
         if(netServer != null){
             netServer.addPacketHandler("unity.bossmusic.play", (p, name) -> {
+                Log.info("Sending packet to client");
                 Call.clientPacketReliable("unity.bossmusic.play", name);
             });
 
             netServer.addPacketHandler("unity.bossmusic.stop", (p, name) -> {
+                Log.info("Sending packet to client");
                 Call.clientPacketReliable("unity.bossmusic.stop", name);
             });
+        }else{
+            Log.warn("netServer is null");
         }
     }
 
@@ -125,6 +131,7 @@ public class MusicHandler implements ApplicationListener{
         currentPredicate = predicate == null ? () -> (state.isPlaying() || state.isPaused()) : predicate;
 
         if(net.server()){
+            Log.info("Music play on server");
             Call.serverPacketReliable("unity.bossmusic.play", name);
         }
     }
@@ -135,6 +142,7 @@ public class MusicHandler implements ApplicationListener{
         }
 
         if(net.server()){
+            Log.info("Music stop from server");
             Call.serverPacketReliable("unity.bossmusic.stop", name);
         }
     }
