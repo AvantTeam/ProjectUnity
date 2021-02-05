@@ -43,6 +43,7 @@ public class UnityUnitType extends UnitType{
 
     // copters
     public final Seq<Rotor> rotors = new Seq<>(4);
+    public float rotorDeathSlowdown = 0.01f;
     public float fallRotateSpeed = 2.5f;
 
     // legs extra
@@ -352,8 +353,8 @@ public class UnityUnitType extends UnitType{
 
             for(int i = 0; i < 2; i++){
                 for(int j = 0; j < rotor.bladeCount; j++){
-                    float angle = (unit.id * 24f + Time.time * rotor.speed + (360f / (float)rotor.bladeCount) * j + rotor.rotOffset) % 360;
-                    Draw.alpha(state.isPaused() ? 1f : Time.time % 2);
+                    float angle = (unit.rotation + (unit.id * 24f + (((Copterc) unit).rotorRot().get(rotors.indexOf(rotor))) + (360f / (float) rotor.bladeCount) * j + rotor.rotOffset)) % 360;
+                    Draw.alpha(state.isPaused() || unit.dead() ? 1f : Time.time % 2);
 
                     Draw.rect(i == 0 ? rotor.bladeOutlineRegion : rotor.bladeRegion, unit.x + offX, unit.y + offY, w, h, angle);
                 }
