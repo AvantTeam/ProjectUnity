@@ -6,6 +6,7 @@ import arc.func.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.game.EventType.*;
+import mindustry.gen.*;
 import mindustry.type.*;
 import unity.gen.*;
 
@@ -18,6 +19,24 @@ public class MusicHandler implements ApplicationListener{
     private Boolp currentPredicate;
 
     private boolean introPassed = false;
+
+    public MusicHandler(){
+        if(netClient != null){
+            netClient.addPacketHandler("unity.bossmusic.play", this::play);
+
+            netClient.addPacketHandler("unity.bossmusic.stop", this::stop);
+        }
+
+        if(netServer != null){
+            netServer.addPacketHandler("unity.bossmusic.play", (p, name) -> {
+                Call.clientPacketReliable("unity.bossmusic.play", name);
+            });
+
+            netServer.addPacketHandler("unity.bossmusic.stop", (p, name) -> {
+                Call.clientPacketReliable("unity.bossmusic.stop", name);
+            });
+        }
+    }
 
     public void setup(){
         Events.on(SectorLaunchEvent.class, e -> {
@@ -45,7 +64,11 @@ public class MusicHandler implements ApplicationListener{
 
     @Override
     public void update(){
-        if(currentData != null && currentPredicate.get()){
+        if(currentData != null && !currentPredicate.get()){
+            stop(loopDatas.findKey(currentData, false));
+        }
+
+        if(currentData != null){
             if(currentData.intro.getVolume() < 1f){
                 currentData.intro.setVolume(1f);
             }
@@ -76,6 +99,15 @@ public class MusicHandler implements ApplicationListener{
         }
     }
 
+    @Override
+    public void dispose(){
+        loopDatas.clear();
+        currentData = null;
+
+        currentMusic.stop();
+        currentMusic = null;
+    }
+
     public void registerLoop(String name, Music intro, Music loop){
         loopDatas.put(name, new MusicLoopData(intro, loop));
     }
@@ -84,9 +116,27 @@ public class MusicHandler implements ApplicationListener{
         return currentMusic != null && currentMusic.isPlaying();
     }
 
+    public void play(String name){
+        play(name, null);
+    }
+
     public void play(String name, Boolp predicate){
         currentData = loopDatas.get(name);
-        currentPredicate = predicate == null ? state::isPlaying : predicate;
+        currentPredicate = predicate == null ? () -> (state.isPlaying() || state.isPaused()) : predicate;
+
+        if(net.server()){
+            Call.serverPacketReliable("unity.bossmusic.play", name);
+        }
+    }
+
+    public void stop(String name){
+        if(currentData == loopDatas.get(name)){
+            currentData = null;
+        }
+
+        if(net.server()){
+            Call.serverPacketReliable("unity.bossmusic.stop", name);
+        }
     }
 
     public MusicLoopData getCurrentData(){
