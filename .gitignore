@@ -16,3 +16,5 @@ tools/.settings/
 
 *.project
 *.classpath
+
+.kateproject

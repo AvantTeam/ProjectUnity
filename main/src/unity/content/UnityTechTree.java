@@ -1,15 +1,14 @@
 package unity.content;
 
-import arc.struct.Seq;
-import mindustry.type.ItemStack;
-import mindustry.ctype.*;
+import arc.struct.*;
 import mindustry.content.*;
 import mindustry.content.TechTree.*;
+import mindustry.ctype.*;
 import mindustry.game.Objectives.*;
+import mindustry.type.*;
+import unity.content.*;
 
-import static mindustry.type.ItemStack.*;
 import static unity.content.UnityBlocks.*;
-import static unity.content.UnitySectorPresets.*;
 
 @SuppressWarnings("unused")
 public class UnityTechTree implements ContentList{
@@ -18,11 +17,22 @@ public class UnityTechTree implements ContentList{
     @Override
     public void load(){
         //region blocks
+        
         attachNode(Blocks.surgeSmelter, () -> {
             node(darkAlloyForge);
             node(monolithAlloyForge);
-            node(sparkAlloyForge);
+            node(sparkAlloyForge, () -> {
+               node(orb, () -> {
+                    node(shielder);
+                    node(shockwire, () -> {
+                        node(current, () -> {
+                            node(plasma);
+                        });
+                    });
+                });
+            });
         });
+        
         attachNode(Blocks.powerNode, () -> {
             node(lightLamp, () -> {
                 node(lightFilter, () -> {
@@ -30,6 +40,7 @@ public class UnityTechTree implements ContentList{
                         node(lightItemFilter);
                     });
                 });
+                
                 node(lightPanel);
                 node(lightReflector, () -> {
                     node(lightDivisor, () -> {
@@ -37,57 +48,47 @@ public class UnityTechTree implements ContentList{
                             node(lightInfluencer);
                         });
                     });
+                    
                     node(lightReflector1, () -> {
                         node(lightOmnimirror);
                     });
                 });
+                
                 node(oilLamp);
-            });
+            });            
         });
-        /*attachNode(Blocks.scorch, () -> {
-            node(inferno);
-        });TODO*/
+        
         attachNode(Blocks.arc, () -> {
             node(mage, () -> {
                 node(oracle);
             });
         });
-        /*attachNode(Blocks.lancer, () -> {
-            node(laserTurret);
-        });TODO*/
-        attachNode(Blocks.ripple, () -> {
-            node(shielder);
-        });
-        attachNode(Blocks.cyclone, () -> {
-            node(orb);
-        });
-        attachNode(Blocks.meltdown, () -> {
-            node(shockwire, () -> {
-                node(current, () -> {
-                    node(plasma);
-                });
-            });
-        });
-        attachNode(Blocks.copperWall, () -> {
+        
+        attachNode(Blocks.titaniumWall, () -> {
             node(metaglassWall, () -> {
-                node(metaglassWall);
+                node(metaglassWallLarge);
             });
         });
-        //endregion
+        
+        //end region
         //region items
+        
         attachNode(Items.lead, () -> {
-            nodeProduce(UnityItems.nickel, () -> {});
+            nodeProduce(UnityItems.nickel);
         });
+        
         attachNode(Items.graphite, () -> {
             nodeProduce(UnityItems.stone, () -> {
                 nodeProduce(UnityItems.denseAlloy, () -> {
                     nodeProduce(UnityItems.steel, () -> {
-                        nodeProduce(UnityItems.dirium, () -> {});
+                        //nodeProduce(UnityItems.uranium);
+                        nodeProduce(UnityLiquids.lava, () -> {
+                            nodeProduce(UnityItems.dirium);
+                        });
                     });
                 });
             });
         });
-        //endregion
     }
 
     private static void attachNode(UnlockableContent parent, Runnable children){
@@ -99,6 +100,7 @@ public class UnityTechTree implements ContentList{
     private static void node(UnlockableContent content, ItemStack[] requirements, Seq<Objective> objectives, Runnable children){
         TechNode node = new TechNode(context, content, requirements);
         if(objectives != null) node.objectives = objectives;
+        
         TechNode prev = context;
         context = node;
         children.run();
@@ -127,5 +129,9 @@ public class UnityTechTree implements ContentList{
 
     private static void nodeProduce(UnlockableContent content, Runnable children){
         nodeProduce(content, new Seq<>(), children);
+    }
+    
+    private static void nodeProduce(UnlockableContent content){
+        nodeProduce(content, new Seq<>(), () -> {});
     }
 }
