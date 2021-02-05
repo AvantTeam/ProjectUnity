@@ -27,13 +27,15 @@ public class MusicHandler implements ApplicationListener{
             netClient.addPacketHandler("unity.bossmusic.stop", this::stop);
         }
 
-        netServer.addPacketHandler("unity.bossmusic.play", (p, name) -> {
-            Call.clientPacketReliable("unity.bossmusic.play", name);
-        });
+        if(netServer != null){
+            netServer.addPacketHandler("unity.bossmusic.play", (p, name) -> {
+                Call.clientPacketReliable("unity.bossmusic.play", name);
+            });
 
-        netServer.addPacketHandler("unity.bossmusic.stop", (p, name) -> {
-            Call.clientPacketReliable("unity.bossmusic.stop", name);
-        });
+            netServer.addPacketHandler("unity.bossmusic.stop", (p, name) -> {
+                Call.clientPacketReliable("unity.bossmusic.stop", name);
+            });
+        }
     }
 
     public void setup(){
@@ -95,6 +97,15 @@ public class MusicHandler implements ApplicationListener{
                 introPassed = false;
             }
         }
+    }
+
+    @Override
+    public void dispose(){
+        loopDatas.clear();
+        currentData = null;
+
+        currentMusic.stop();
+        currentMusic = null;
     }
 
     public void registerLoop(String name, Music intro, Music loop){
