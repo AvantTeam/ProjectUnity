@@ -66,7 +66,7 @@ public class ItemEjectPlateTurret extends ItemTurret{
             super.updateTile();
         }
 
-        protected void ejectEffetcs(){
+        protected void ejectEffects(){
             if(!isValid()) return;
 
             //alternate sides when using a double turret
