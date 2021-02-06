@@ -299,9 +299,12 @@ public class KamiAI implements UnitController{
         }
     }
 
-    protected static void createBullet(Teamc owner, BulletType type, float x, float y, float angle, float velocityScl, float lifetimeScl, float hitSize, Object data, float fdata, float time){
+    /** Returns the synced bullet. MAY be null! */
+    protected static Bullet createBullet(Teamc owner, BulletType type, float x, float y, float angle, float velocityScl, float lifetimeScl, float hitSize, Object data, float fdata, float time){
+        Bullet b = null;
+
         if(net.server() || !net.active()){
-            Bullet b = type.create(owner, owner.team(), x, y, angle);
+            b = type.create(owner, owner.team(), x, y, angle);
             b.hitSize = hitSize < 0f ? type.hitSize : hitSize;
             b.lifetime = type.lifetime * lifetimeScl;
             b.vel.scl(velocityScl);
@@ -332,6 +335,8 @@ public class KamiAI implements UnitController{
 
             net.send(packet, SendMode.udp);
         }
+
+        return b;
     }
 
     @Override
