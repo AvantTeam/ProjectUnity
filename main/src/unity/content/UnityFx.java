@@ -194,30 +194,6 @@ public class UnityFx{
         Fill.circle(e.x, e.y, e.fin() * 3f);
     }),
 
-    plasmaCharge = new Effect(96f, e -> {
-        color(Pal.surge);
-        randLenVectors(e.id, 5, (1f - e.finpow()) * 24f, e.rotation, 360f, (x, y) -> {
-            Drawf.tri(e.x + x, e.y + y, e.fout() * 10f, e.fout() * 11f, e.rotation);
-            Drawf.tri(e.x + x, e.y + y, e.fout() * 8f, e.fout() * 9f, e.rotation);
-        });
-    }),
-
-    plasmaChargeBegin = new Effect(250f, e -> {
-        color(Pal.surge);
-        Drawf.tri(e.x, e.y, e.fin() * 16f, e.fin() * 20f, e.rotation);
-    }),
-
-    plasmaShoot = new Effect(36f, e -> {
-        color(Pal.surge, Color.white, e.fin());
-
-        randLenVectors(e.id, 8, e.fin() * 20f + 1f, e.rotation, 40f, (x, y) -> {
-            Drawf.tri(e.x + x, e.y + y, e.fout() * 14f, e.fout() * 15f, e.rotation);
-            Drawf.tri(e.x + x, e.y + y, e.fout() * 8f, e.fout() * 9f, e.rotation);
-        });
-
-        randLenVectors(e.id, 4, e.fin() * 20f + 1f, e.rotation, 40f, (x, y) -> lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fslope() * 18f + 3f));
-    }),
-
     plasmaTriangleHit = new Effect(30f, e -> {
         color(Pal.surge);
 
@@ -243,7 +219,7 @@ public class UnityFx{
         z();
     }),
     
-    surgeBomb = new Effect(40f, 100f, e -> {
+    surgeSplash = new Effect(40f, 100f, e -> {
         color(Pal.surge);
         stroke(e.fout() * 2);
         circle(e.x, e.y, 4 + e.finpow() * 65);
