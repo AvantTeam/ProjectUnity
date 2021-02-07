@@ -7,6 +7,7 @@ import arc.util.*;
 import mindustry.entities.bullet.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import unity.ai.KamiAI.*;
 import unity.entities.*;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
@@ -27,13 +28,17 @@ public class CircleBulletType extends BulletType{
 
     @Override
     public void draw(Bullet b){
-        float z = Draw.z();
-        Draw.z(b.hitSize > 50f ? z - 0.001f : z);
-        Draw.color(color.get(b));
-        Fill.circle(b.x, b.y, b.hitSize + 1.5f);
-        Draw.color(Color.white);
-        Fill.circle(b.x, b.y, b.hitSize);
-        Draw.z(z);
+        if(!(b.data instanceof KamiBulletData && ((KamiBulletData)b.data).hasDrawer())){
+            float z = Draw.z();
+            Draw.z(b.hitSize > 50f ? z - 0.001f : z);
+            Draw.color(color.get(b));
+            Fill.circle(b.x, b.y, b.hitSize + 1.5f);
+            Draw.color(Color.white);
+            Fill.circle(b.x, b.y, b.hitSize);
+            Draw.z(z);
+        }else{
+            ((KamiBulletData)b.data).draw(b);
+        }
     }
 
     @Override

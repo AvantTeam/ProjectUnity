@@ -662,8 +662,26 @@ public class UnityFx{
     rainbowTextureTrail = new Effect(80f, e -> {
         if(!(e.data instanceof TextureRegion t)) return;
         Draw.blend(Blending.additive);
-        Draw.color(Tmp.c1.set(Color.red).shiftHue(e.time * 3f).a(Mathf.clamp(e.fout() * 1.5f)));
+        Draw.color(Tmp.c1.set(Color.red).shiftHue(e.time * 4f).a(Mathf.clamp(e.fout() * 1.5f)));
         Draw.rect(t, e.x, e.y, e.rotation - 90f);
+        Draw.blend();
+    }),
+
+    kamiEoLCharge = new Effect(60f, e -> {
+        if(!(e.data instanceof Unit u)) return;
+        Draw.blend(Blending.additive);
+        for(int i = 0; i < 2; i++){
+            float angle = i * 360f / 2f;
+            Draw.color(Tmp.c1.set(Color.red).shiftHue((e.time * 5f) + angle).a(Mathf.clamp(e.fout() * 1.5f)));
+            Tmp.v1.trns(angle + (e.fin() * 180f), 150f * e.fslope()).add(u);
+            Draw.rect(u.type.region, Tmp.v1.x, Tmp.v1.y, u.rotation - 90f);
+        }
+        for(int i = 0; i < 4; i++){
+            float angle = i * 360f / 4f;
+            Draw.color(Tmp.c1.set(Color.red).shiftHue((e.time * 5f) + angle).a(Mathf.clamp(e.fout() * 1.5f)));
+            Tmp.v1.trns(angle + (e.fin() * -270f), 100f * e.fslope()).add(u);
+            Draw.rect(u.type.region, Tmp.v1.x, Tmp.v1.y, u.rotation - 90f);
+        }
         Draw.blend();
     }),
 

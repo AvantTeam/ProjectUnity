@@ -407,6 +407,7 @@ public class UnityBullets implements ContentList{
             hitSize = 6f;
             despawnEffect = Fx.none;
             pierce = true;
+            keepVelocity = false;
             color = b -> Tmp.c1.set(Color.red).shiftHue(b.time * 3f);
         }};
 

@@ -64,8 +64,10 @@ public class KamiAI implements UnitController{
             }
             kamiAI.reloads[0] += Time.delta;
         }, 3f * 60f),
+        //Atomic Fire "Nuclear Fusion"
         new KamiShootType(kamiAI -> {
             if(kamiAI.reloads[1] < 2f){
+                float randRot = Mathf.random(360f);
                 for(int i = 0; i < 6; i++){
                     float angle = (i * (360f / 6));
                     //Bullet bullet = UnityBullets.kamiBullet1.create(kamiAI.unit, kamiAI.unit.x, kamiAI.unit.y, angle);
@@ -74,7 +76,7 @@ public class KamiAI implements UnitController{
                     //bullet.lifetime *= 1 / 0.3f;
                     createBullet(kamiAI.unit, UnityBullets.kamiBullet1,
                         kamiAI.unit.x, kamiAI.unit.y, angle,
-                        0.3f, 1f / 0.3f, 100f,
+                        0.3f + Mathf.range(0.1f), 1f / 0.3f, 100f,
                         null, 0f, 0f
                     );
                 }
@@ -109,6 +111,7 @@ public class KamiAI implements UnitController{
             kamiAI.reloads[0] = -80f;
             kamiAI.reloads[3] = 1f;
         }, 15 * 60f),
+        //Magicannon "Final Spark"/Love Sign "Master Spark" mix
         new KamiShootType(kamiAI -> {
             if(kamiAI.reloads[0] >= 2.5f * 60f){
                 kamiAI.reloads[6] += Time.delta;
@@ -134,12 +137,12 @@ public class KamiAI implements UnitController{
                     }
                     kamiAI.reloads[9] = 0f;
                 }
-                if(kamiAI.reloads[6] >= 6 && kamiAI.tmpBullets[0] != null){
+                if(kamiAI.reloads[6] >= 4 && kamiAI.tmpBullets[0] != null){
                     Cons<Bullet> data = b -> {
                         if(b.time < 1f * 50){
                             b.vel.setLength(Math.max((1f - (b.time / (1f * 50))) * b.type.speed, 0.02f));
                         }else if(b.time >= 2.5f * 60){
-                            b.vel.setLength(Math.min(Math.max((b.time - (2.5f * 60)) / 80f, 0.02f), b.type.speed));
+                            b.vel.setLength(Math.min(Math.max((b.time - (2.5f * 60)) / 80f, 0.02f), b.type.speed * 1.5f));
                         }
                     };
                     int diff = 7 + difficulty;
@@ -193,6 +196,7 @@ public class KamiAI implements UnitController{
             kamiAI.reloads[0] = 1.50f * 60f;
             kamiAI.reloads[7] = 1f;
         }, 15 * 60f),
+        //Dream Sign "Evil-Sealing Circle"
         new KamiShootType(kamiAI -> {
             if(kamiAI.reloads[1] >= 12f){
                 int diff = 7 + difficulty;
@@ -267,9 +271,54 @@ public class KamiAI implements UnitController{
             }
             kamiAI.reloads[0] += Time.delta;
             kamiAI.reloads[1] += Time.delta;
-        }, kamiAI -> kamiAI.reloads[5] = 1f, 20 * 60f)
+        }, kamiAI -> kamiAI.reloads[5] = 1f, 20 * 60f),
+        //EoL Dash/"St Nikou's Air Scroll" mix
+        new MultiStageShootType(kamiAI -> {
+            UnityFx.kamiEoLCharge.at(kamiAI.unit.x, kamiAI.unit.y, 0f, kamiAI.unit);
+            kamiAI.charging = true;
+        }, 5){{
+            stages = new KamiShootType[]{
+                new KamiShootType(kamiAI -> {}, kamiAI -> {
+                    kamiAI.targetPoint.trns(kamiAI.relativeRotation - 90f, 360f).add(kamiAI.unit);
+                    kamiAI.lastPoint.set(kamiAI.unit);
+                    UnityFx.kamiWarningLine.at(kamiAI.unit.x, kamiAI.unit.y, 0f, new Position[]{new Vec2(kamiAI.unit.x, kamiAI.unit.y), new Vec2(kamiAI.targetPoint)});
+                }, kamiAI -> kamiAI.stage <= 0 ? 80f : 5f).setStage(),
+                new KamiShootType(kamiAI -> {
+                    tmpVec.set(kamiAI.unit);
+                    tmpVec.approachDelta(kamiAI.targetPoint, 25f);
+                    kamiAI.unit.rotation(kamiAI.relativeRotation - 90f);
+                    kamiAI.unit.set(tmpVec);
+                    if(kamiAI.targetPoint.epsilonEquals(kamiAI.unit.x, kamiAI.unit.y, 16f)){
+                        int diff = 75 + ((difficulty - 1) * 2);
+                        for(int i = 0; i < diff; i++){
+                            float fin = ((float)i / diff);
+                            tmpVec2.set(kamiAI.lastPoint).lerp(kamiAI.targetPoint, fin);
+                            float angle = i * 15f;
+                            Bullet b = UnityBullets.kamiBullet1.create(kamiAI.unit, kamiAI.unit.team, tmpVec2.x, tmpVec2.y, angle, 0f);
+                            b.fdata = i / (diff / 20f);
+                            b.lifetime *= 2f;
+                            b.data = new KamiBulletData<>(angle, (bullet, kamiBulletData) -> {
+                                float time = (2f * 60f) + bullet.fdata;
+                                if(bullet.time >= time) bullet.vel.trns(kamiBulletData.initialRotation, Mathf.clamp((bullet.time - time) / 15f, 0f, bullet.type.speed));
+                            });
+                        }
+                        diff = 10 + (difficulty - 1);
+                        for(int i = 0; i < diff; i++){
+                            float angle = i * (360f / diff);
+                            Bullet b = UnityBullets.kamiBullet1.create(kamiAI.unit, kamiAI.unit.x, kamiAI.unit.y, angle);
+                            b.lifetime *= 2f;
+                            b.vel.scl(1.25f);
+                        }
+                        kamiAI.relativeRotation = Mathf.mod((((Mathf.round(kamiAI.relativeRotation / 60f) * 60f) + 90f) * 2f) - kamiAI.relativeRotation, 360f);
+                        kamiAI.altTime = 3f * 60f;
+                    }
+                }, 3f * 60f).setStage()
+            };
+        }}
     };
 
+    protected Vec2 targetPoint = new Vec2();
+    protected Vec2 lastPoint = new Vec2();
     protected Interval timer = new Interval(2);
     protected Unit unit;
     protected Teamc target;
@@ -281,8 +330,11 @@ public class KamiAI implements UnitController{
     protected float moveTime = 0f;
     protected float autoShootTime = 0f;
     protected boolean changed = false;
+    protected boolean charging = false;
     protected KamiShootType shooterType;
     protected float relativeRotation = 0f;
+    protected float altTime = 0f;
+    protected int stage = 0;
 
     private static Field out;
     private static Field write;
@@ -372,7 +424,7 @@ public class KamiAI implements UnitController{
         if(target == null || unit == null) return;
         unit.lookAt(relativeRotation - 90f);
         if(!unit.within(target, 650f)) moveTime = 150f;
-        if(moveTime > 0.001f){
+        if(moveTime > 0.001f && !charging){
             tmpVec.trns(relativeRotation, 0, 210).add(target).sub(unit).scl(1 / 20f);
             unit.move(tmpVec.x, tmpVec.y);
             moveTime -= Time.delta;
@@ -385,8 +437,8 @@ public class KamiAI implements UnitController{
                 int rand = Mathf.random(0, iSeq.size - 1);
                 int t = iSeq.get(rand);
                 shooterType = types[t];
+                //shooterType = types[types.length - 1];
                 iSeq.removeIndex(rand);
-                //shooterType = types[Mathf.random(0, types.length - 1)];
                 
                 shooterType.init(this);
                 autoShootTime = 0f;
@@ -397,9 +449,21 @@ public class KamiAI implements UnitController{
         }
     }
 
+    public void resetTypes(){
+        Arrays.fill(reloads, 0f);
+        Arrays.fill(tmpBullets, null);
+    }
+
     public void changeType(){
+        targetPoint.setZero();
+        lastPoint.setZero();
         changed = false;
+        charging = false;
+        stage = 0;
+        time = 0f;
+        altTime = 0f;
         waitTime = 0f;
+        relativeRotation = Mathf.random(360f);
         Arrays.fill(reloads, 0f);
         Arrays.fill(tmpBullets, null);
     }
@@ -430,15 +494,100 @@ public class KamiAI implements UnitController{
         }
     }
 
+    public static class KamiBulletData<T extends Bullet> implements Cons<T>{
+        float initialRotation = 0f;
+        Cons2<T, KamiBulletData<T>>[] stages;
+        Cons2<T, KamiBulletData<T>> drawer = null;
+        int currentStage = 0;
+
+        @SafeVarargs
+        KamiBulletData(Cons2<T, KamiBulletData<T>>... stages){
+            this.stages = stages;
+        }
+
+        @SafeVarargs
+        KamiBulletData(float rotation, Cons2<T, KamiBulletData<T>>... stages){
+            initialRotation = rotation;
+            this.stages = stages;
+        }
+
+        public boolean hasDrawer(){
+            return drawer != null;
+        }
+
+        public void draw(T bullet){
+            drawer.get(bullet, this);
+        }
+
+        @Override
+        public void get(T bullet){
+            stages[currentStage].get(bullet, this);
+        }
+
+        void nextStage(){
+            currentStage = Math.min(currentStage + 1, stages.length - 1);
+        }
+
+        void moveStage(int index){
+            currentStage = Mathf.clamp(index, 0, stages.length - 1);
+        }
+    }
+
+    private static class MultiStageShootType extends KamiShootType{
+        KamiShootType[] stages;
+        int loop;
+
+        MultiStageShootType(int loop){
+            super(null, 0f);
+            this.loop = loop;
+        }
+
+        MultiStageShootType(Cons<KamiAI> init, int loop){
+            super(null, init, 0f);
+            this.loop = loop;
+        }
+
+        @Override
+        protected void init(KamiAI ai){
+            super.init(ai);
+            stages[0].init(ai);
+        }
+
+        @Override
+        protected void update(KamiAI ai){
+            ai.time += Time.delta;
+            ai.altTime += Time.delta;
+            stages[ai.stage % stages.length].update(ai);
+            float f = stages[ai.stage % stages.length].liveMaxTime == null ? stages[ai.stage % stages.length].maxTime : stages[ai.stage % stages.length].liveMaxTime.get(ai);
+            if(ai.altTime >= f){
+                ai.stage++;
+                ai.altTime = 0;
+                ai.resetTypes();
+                if(!(loop > 0 && (ai.stage) / stages.length >= loop)) stages[ai.stage % stages.length].init(ai);
+            }
+            if((ai.time >= maxTime && loop <= 0) || (loop > 0 && (ai.stage) / stages.length >= loop)){
+                ai.changeType();
+            }
+        }
+    }
+
     private static class KamiShootType{
         Cons<KamiAI> type;
         Cons<KamiAI> init;
+        Floatf<KamiAI> liveMaxTime;
         float maxTime;
+        boolean stage = false;
 
         KamiShootType(Cons<KamiAI> type, float time){
             this.type = type;
             maxTime = time;
             init = null;
+        }
+
+        KamiShootType(Cons<KamiAI> type, Cons<KamiAI> init, Floatf<KamiAI> time){
+            this.type = type;
+            liveMaxTime = time;
+            this.init = init;
         }
 
         KamiShootType(Cons<KamiAI> type, Cons<KamiAI> init, float time){
@@ -447,17 +596,20 @@ public class KamiAI implements UnitController{
             this.init = init;
         }
 
+        KamiShootType setStage(){
+            stage = true;
+            return this;
+        }
+
         protected void init(KamiAI ai){
             if(init != null) init.get(ai);
         }
 
         protected void update(KamiAI ai){
             type.get(ai);
+            if(stage) return;
             ai.time += Time.delta;
-            if(ai.time >= maxTime){
-                ai.time = 0f;
-                ai.relativeRotation = Mathf.range(360f);
-                if(ai.relativeRotation < 0f) ai.relativeRotation += 360f;
+            if((ai.time >= maxTime && liveMaxTime == null) || (liveMaxTime != null && ai.time >= liveMaxTime.get(ai))){
                 ai.changeType();
             }
         }
