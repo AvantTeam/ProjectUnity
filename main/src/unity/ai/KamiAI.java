@@ -147,7 +147,7 @@ public class KamiAI implements UnitController{
                     };
                     int diff = 7 + difficulty;
                     for(int i = 0; i < diff; i++){
-                        float angle = (i * (360f / diff)) + (kamiAI.reloads[8] * kamiAI.reloads[7] * 4f);
+                        float angle = (i * (360f / diff)) + (kamiAI.reloads[8] * kamiAI.reloads[7] * 6f);
                         //Bullet bullet = UnityBullets.kamiBullet1.create(kamiAI.unit, kamiAI.unit.x, kamiAI.unit.y, angle);
                         //bullet.hitSize = 8f;
                         //bullet.lifetime = 7f * 60f;
