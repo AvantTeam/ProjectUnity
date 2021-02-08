@@ -4,6 +4,7 @@ import arc.func.*;
 import arc.math.*;
 import arc.util.*;
 import arc.graphics.*;
+import arc.graphics.g2d.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
@@ -11,16 +12,11 @@ import mindustry.entities.bullet.*;
 import mindustry.graphics.*;
 import mindustry.io.*;
 import mindustry.ctype.*;
+import unity.content.*;
 import unity.entities.bullet.*;
-
-import arc.graphics.g2d.*;
 import unity.graphics.*;
 
-import static arc.math.Mathf.*;
 import static mindustry.Vars.*;
-import static mindustry.graphics.Drawf.*;
-import static mindustry.graphics.Pal.*;
-import static unity.content.UnityFx.*;
 
 public class UnityBullets implements ContentList{
     public static BulletType laser, coalBlaze, pyraBlaze, falloutLaser, catastropheLaser, calamityLaser, extinctionLaser, orb, shockBeam, currentStroke,
@@ -41,7 +37,8 @@ public class UnityBullets implements ContentList{
 
     @Override
     public void load(){
-        /*laser = new SapBulletType(){
+        /* TODO koruh bullets
+        laser = new SapBulletType(){
             {
                 length = 150f;
                 width = 0.7f;
@@ -116,7 +113,7 @@ public class UnityBullets implements ContentList{
                 super.hit(b, x, y);
                 ((ExpItemTurret.ExpItemTurretBuild)b.owner).incExp(0.5f);
             }
-        };TODO*/
+        };*/
 
         falloutLaser = new SparkingContinuousLaserBulletType(95f){{
             length = 230f;
@@ -178,16 +175,16 @@ public class UnityBullets implements ContentList{
                 damage = 23;
                 pierce = true;
                 hittable = false;
-                hitEffect = orbHit;
-                trailEffect = orbTrail;
+                hitEffect = UnityFx.orbHit;
+                trailEffect = UnityFx.orbTrail;
                 trailChance = 0.4f;
             }
 
             @Override
             public void draw(Bullet b){
-                light(b.x, b.y, 16, surge, 0.6f);
+                Drawf.light(b.x, b.y, 16, Pal.surge, 0.6f);
 
-                Draw.color(surge);
+                Draw.color(Pal.surge);
                 Fill.circle(b.x, b.y, 4);
 
                 Draw.color();
@@ -197,7 +194,7 @@ public class UnityBullets implements ContentList{
             @Override
             public void update(Bullet b){
                 super.update(b);
-                if(b.timer.get(1, 7)) Units.nearbyEnemies(b.team, b.x - 5 * tilesize, b.y - 5 * tilesize, 5 * tilesize * 2, 5 * tilesize * 2, unit -> Lightning.create(b.team, surge, random(17, 33), b.x, b.y, b.angleTo(unit), random(7, 13)));
+                if(b.timer.get(1, 7)) Units.nearbyEnemies(b.team, b.x - 5 * tilesize, b.y - 5 * tilesize, 5 * tilesize * 2, 5 * tilesize * 2, unit -> Lightning.create(b.team, Pal.surge, Mathf.random(17, 33), b.x, b.y, b.angleTo(unit), Mathf.random(7, 13)));
             }
 
             @Override
@@ -207,11 +204,11 @@ public class UnityBullets implements ContentList{
         shockBeam = new BeamBulletType(120f, 35f){{
             status = StatusEffects.shocked;
             statusDuration = 3f * 60f;
-            laserWidth = 0.62f;
+            beamWidth = 0.62f;
             hitEffect = Fx.hitLiquid;
-            fromLightning = true;
-            fromLightningMinDamage = damage/1.8f;
-            fromLightningMaxDamage = damage/1.2f;
+            castsLightning = true;
+            minLightningDamage = damage / 1.8f;
+            maxLightningDamage = damage / 1.2f;
             color = Pal.surge;
         }};
 
@@ -226,11 +223,11 @@ public class UnityBullets implements ContentList{
             lightningDamage = 50f;
             lightningAngleRand = 40f;
             largeHit = true;
-            lightColor = lightningColor = surge;
+            lightColor = lightningColor = Pal.surge;
             sideAngle = 15f;
             sideWidth = 0f;
             sideLength = 0f;
-            colors = new Color[]{surge.cpy(), surge, Color.white};
+            colors = new Color[]{Pal.surge.cpy(), Pal.surge, Color.white};
         }};
 
         shielderBullet = new ShieldBulletType(8){{
@@ -246,27 +243,25 @@ public class UnityBullets implements ContentList{
             shieldHealth = 3000f;
         }};
 
-        plasmaFragTriangle = new TriangleBulletType(4.5f, 90f){{
+        plasmaFragTriangle = new TriangleBulletType(11, 10, 4.5f, 90f){{
             lifetime = 160f;
             lifetimeRand = 40f;
-            width = 10f;
-            length = 11f;
-            trailWidth = 4f;
+            trailWidth = 3f;
             trailLength = 8;
             drag = 0.05f;
             collides = false;
-            summonsLightning = true;
-            shootEffect = plasmaFragAppear;
-            hitEffect = despawnEffect = plasmaFragDisappear;
+            castsLightning = true;
+            shootEffect = UnityFx.plasmaFragAppear;
+            hitEffect = despawnEffect = UnityFx.plasmaFragDisappear;
         }};
 
-        plasmaTriangle = new TriangleBulletType(4f, 380f){{
+        plasmaTriangle = new TriangleBulletType(13, 10, 4f, 380f){{
             lifetime = 180f;
-            width = 16f;
-            length = 20f;
-            trailWidth = 6.5f;
-            trailLength = 10;
-            hitEffect = plasmaTriangleHit;
+            trailWidth = 3.5f;
+            trailLength = 14;
+            homingPower = 0.06f;
+            hitSound = Sounds.plasmaboom;
+            hitEffect = UnityFx.plasmaTriangleHit;
             despawnEffect = Fx.none;
             fragBullet = plasmaFragTriangle;
             fragBullets = 8;
@@ -275,14 +270,14 @@ public class UnityBullets implements ContentList{
         surgeBomb = new SurgeBulletType(7f, 100f){{
             width = height = 30f;
             maxRange = 30f;
-            backColor = surge;
+            backColor = Pal.surge;
             frontColor = Color.white;
             mixColorTo = Color.white;
             hitSound = Sounds.plasmaboom;
             despawnShake = 4f;
             collidesAir = false;
             lifetime = 70f;
-            despawnEffect = UnityFx.surgeBomb;
+            despawnEffect = UnityFx.surgeSplash;
             hitEffect = Fx.massiveExplosion;
             keepVelocity = false;
             spin = 2f;
@@ -315,7 +310,7 @@ public class UnityBullets implements ContentList{
                 lifetime = 72f;
                 largeHit = true;
                 sideLength = sideWidth = 0f;
-                shootEffect = pylonLaserCharge;
+                shootEffect = UnityFx.pylonLaserCharge;
             }
 
             @Override
@@ -346,10 +341,10 @@ public class UnityBullets implements ContentList{
             lifetime = 1f;
             hitShake = 6f;
             trailSpacing = 35f;
-            shootEffect = monumentShoot;
-            despawnEffect = monumentDespawn;
+            shootEffect = UnityFx.monumentShoot;
+            despawnEffect = UnityFx.monumentDespawn;
             smokeEffect = shootEffect = Fx.blastExplosion;
-            trailEffect = monumentTrail;
+            trailEffect = UnityFx.monumentTrail;
         }};
 
         scarShrapnel = new ShrapnelBulletType(){{
@@ -412,6 +407,7 @@ public class UnityBullets implements ContentList{
             hitSize = 6f;
             despawnEffect = Fx.none;
             pierce = true;
+            keepVelocity = false;
             color = b -> Tmp.c1.set(Color.red).shiftHue(b.time * 3f);
         }};
 
@@ -434,7 +430,7 @@ public class UnityBullets implements ContentList{
 
         supernovaLaser = new ContinuousLaserBulletType(400f){
             final Effect plasmaEffect = new Effect(36f, e -> {
-                Draw.color(Color.white, lancerLaser, e.fin());
+                Draw.color(Color.white, Pal.lancerLaser, e.fin());
                 Fill.circle(
                     e.x + Angles.trnsx(e.rotation, e.fin() * 24f),
                     e.y + Angles.trnsy(e.rotation, e.fin() * 24f),
@@ -448,7 +444,7 @@ public class UnityBullets implements ContentList{
 
                 if(b.timer(2, 1f)){
                     float start = Mathf.randomSeed((long)(b.id + Time.time), length);
-                    Lightning.create(b.team, lancerLaser, 12f,
+                    Lightning.create(b.team, Pal.lancerLaser, 12f,
                         b.x + Angles.trnsx(b.rotation(), start),
                         b.y + Angles.trnsy(b.rotation(), start),
                         b.rotation() + Mathf.randomSeedRange((long)(b.id + Time.time + 1f), 15f), Mathf.randomSeed((long)(b.id + Time.time + 2f), 10, 19)
@@ -476,7 +472,7 @@ public class UnityBullets implements ContentList{
                 colors = new Color[]{
                     Color.valueOf("4be3ca55"),
                     Color.valueOf("91eedeaa"),
-                    lancerLaser.cpy(),
+                    Pal.lancerLaser.cpy(),
                     Color.white
                 };
 

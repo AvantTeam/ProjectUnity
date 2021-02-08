@@ -110,7 +110,7 @@ public class UnityBlocks implements ContentList{
     public static @FactionDef(type = "youngcha")
     Block concreteBlank, concreteFill, concreteNumber, concreteStripe, concrete, stoneFullTiles, stoneFull, stoneHalf, stoneTiles,
 
-    heatPipe, smallRadiator,//heatdistributor
+    heatPipe, smallRadiator, //heatdistributor
 
     driveShaft,
 
@@ -124,9 +124,9 @@ public class UnityBlocks implements ContentList{
 
     mechanicalConveyor,
 
-    thermalHeater, combustionHeater, infiHeater, infiCooler, solarCollector, solarReflector,//heatgenerators
+    thermalHeater, combustionHeater, infiHeater, infiCooler, solarCollector, solarReflector, //heatgenerators
 
-    nickelStator, nickelStatorLarge, nickelElectromagnet, neodymiumStator, electricRotor, electricRotorSmall,//magnets
+    nickelStator, nickelStatorLarge, nickelElectromagnet, neodymiumStator, electricRotor, electricRotorSmall, //magnets
 
     torqueInfi,
 
@@ -140,13 +140,13 @@ public class UnityBlocks implements ContentList{
 
     augerDrill, mechanicalExtractor,
 
-    crucible, holdingCrucible, castingMold,//crucible
+    crucible, holdingCrucible, castingMold, //crucible
 
     sporePyrolyser,
 
     sporeFarm,
 
-    cupronickelWall, cupronickelWallLarge,//youngchaWalls
+    cupronickelWall, cupronickelWallLarge, //youngchaWalls
 
     chopper,
 
@@ -599,22 +599,15 @@ public class UnityBlocks implements ContentList{
             size = 4;
             health = 2800;
             range = 200f;
-            reloadTime = 460f;
+            reloadTime = 360f;
             recoilAmount = 4f;
             coolantMultiplier = 1.2f;
             liquidCapacity = 20f;
             shootCone = 1f;
             inaccuracy = 0f;
-            chargeTime = 240f;
-            chargeEffects = 15;
-            chargeMaxDelay = 240f;
             powerUse = 15.2f;
             shootType = UnityBullets.plasmaTriangle;
             shootSound = Sounds.shotgun;
-            shootEffect = UnityFx.plasmaShoot;
-            chargeEffect = UnityFx.plasmaCharge;
-            chargeBeginEffect = UnityFx.plasmaChargeBegin;
-            shots = 1;
             consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability <= 0.1f, 0.52f)).boost();
         }};
 

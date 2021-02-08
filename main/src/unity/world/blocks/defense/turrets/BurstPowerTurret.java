@@ -1,13 +1,13 @@
 package unity.world.blocks.defense.turrets;
 
-import arc.audio.Sound;
-import arc.math.Mathf;
-import arc.util.Time;
-import mindustry.content.Fx;
-import mindustry.entities.Effect;
-import mindustry.entities.bullet.BulletType;
-import mindustry.gen.Sounds;
-import mindustry.world.blocks.defense.turrets.PowerTurret;
+import arc.audio.*;
+import arc.math.*;
+import arc.util.*;
+import mindustry.content.*;
+import mindustry.entities.*;
+import mindustry.entities.bullet.*;
+import mindustry.gen.*;
+import mindustry.world.blocks.defense.turrets.*;
 
 import static mindustry.Vars.*;
 
@@ -28,8 +28,10 @@ public class BurstPowerTurret extends PowerTurret{
             if(chargeTime > 0f){
                 useAmmo();
                 tr.trns(rotation, size * tilesize / 2f);
+                
                 chargeBeginEffect.at(x + tr.x, y + tr.y, rotation);
                 chargeSound.at(x + tr.x, y + tr.y, 1f);
+                
                 for(int i = 0; i < chargeEffects; i++){
                     Time.run(Mathf.random(chargeMaxDelay), () -> {
                         if(!isValid()) return;
@@ -38,11 +40,13 @@ public class BurstPowerTurret extends PowerTurret{
                     });
                 }
                 charging = true;
+                
                 Time.run(chargeTime, () -> {
                     if(!isValid()) return;
                     tr.trns(rotation, size * tilesize / 2f);
                     recoil = recoilAmount;
                     heat = 1f;
+                    
                     for(int i = 0; i < shots; i++){
                         Time.run(burstSpacing * 2f, () -> {
                             bullet(type, rotation + Mathf.range(inaccuracy));
@@ -57,7 +61,9 @@ public class BurstPowerTurret extends PowerTurret{
                     effects();
                     charging = false;
                 });
-            }else super.shoot(type);
+            }else{
+                super.shoot(type);
+            }
         }
 
         protected void subEffects(){

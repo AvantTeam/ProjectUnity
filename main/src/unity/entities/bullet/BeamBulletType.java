@@ -14,13 +14,16 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 
 public class BeamBulletType extends BulletType{
-    /** Colors. Should only be 2 colors. */
     public Color color = Pal.heal;
-    public boolean fromLightning;
-    public float force, scaledForce, fromLightningMinDamage, fromLightningMaxDamage;
-    public float laserWidth = 0.6f;
+    public float beamWidth = 0.6f;
     public float lightWidth = 15f;
     public float length;
+
+    /** Whether or not for this beam to cast lightning. */
+    public boolean castsLightning;
+    /** The interval between lightning casts and collision in ticks. */
+    public float castInterval = 5f;
+    public float minLightningDamage, maxLightningDamage;
 
     public BeamBulletType(float length, float damage){
         super(0.01f, damage);
@@ -49,24 +52,28 @@ public class BeamBulletType extends BulletType{
         b.data = target;
         
         if(target instanceof Hitboxc hit){
-            if(b.timer.get(1, 5)){
+            if(b.timer.get(1, castInterval)){
                 hit.collision(b, target.x(), target.y());
                 b.collision(hit, target.x(), target.y());
-                if(fromLightning) Lightning.create(b.team, color, Mathf.random(fromLightningMinDamage, fromLightningMaxDamage), b.x, b.y, b.angleTo(target), Mathf.floorPositive(b.dst(target) / Vars.tilesize + 3));
+                if(castsLightning){
+                    Lightning.create(b.team, color, Mathf.random(minLightningDamage, maxLightningDamage), b.x, b.y, b.angleTo(target), Mathf.floorPositive(b.dst(target) / Vars.tilesize + 3));
+                }
             }
         }else if(target instanceof Building build){
-            if(b.timer.get(1, 5)){
+            if(b.timer.get(1, castInterval)){
                 if(build.collide(b)){
                     build.collision(b);
                     hit(b, target.x(), target.y());
                 }
-                if(fromLightning) Lightning.create(b.team, color, Mathf.random(fromLightningMinDamage, fromLightningMaxDamage), b.x, b.y, b.angleTo(target), Mathf.floorPositive(b.dst(target) / Vars.tilesize + 3));
+                if(castsLightning){
+                    Lightning.create(b.team, color, Mathf.random(minLightningDamage, maxLightningDamage), b.x, b.y, b.angleTo(target), Mathf.floorPositive(b.dst(target) / Vars.tilesize + 3));
+                }
             }
         }else{
             b.data = new Vec2().trns(b.rotation(), this.length).add(b.x, b.y);
-            if(b.timer.get(1, 5) && fromLightning){
+            if(b.timer.get(1, castInterval) && castsLightning){
                 Vec2 point = (Vec2) b.data;
-                Lightning.create(b.team, color, Mathf.random(fromLightningMinDamage, fromLightningMaxDamage), b.x, b.y, b.angleTo(point.x, point.y), Mathf.floorPositive(b.dst(point.x, point.y) / Vars.tilesize + 3));
+                Lightning.create(b.team, color, Mathf.random(minLightningDamage, maxLightningDamage), b.x, b.y, b.angleTo(point.x, point.y), Mathf.floorPositive(b.dst(point.x, point.y) / Vars.tilesize + 3));
             }
         }
     }
@@ -82,22 +89,18 @@ public class BeamBulletType extends BulletType{
             Tmp.v1.set(data);
 
             Draw.color(color);
-            Drawf.laser(b.team, Core.atlas.find("laser"), Core.atlas.find("laser-end"), b.x, b.y, Tmp.v1.x, Tmp.v1.y, laserWidth * b.fout());
+            Drawf.laser(b.team, Core.atlas.find("laser"), Core.atlas.find("laser-end"), b.x, b.y, Tmp.v1.x, Tmp.v1.y, beamWidth * b.fout());
             Draw.reset();
 
             Drawf.light(b.team, b.x, b.y, Tmp.v1.x, Tmp.v1.y, lightWidth * b.fout(), color, 0.6f);
-
-            //Unity.print("Pos based draw");
         }else if(b.data instanceof Vec2 data){
             Tmp.v1.set(data);
 
             Draw.color(color);
-            Drawf.laser(b.team, Core.atlas.find("laser"), Core.atlas.find("laser-end"), b.x, b.y, Tmp.v1.x, Tmp.v1.y, laserWidth * b.fout());
+            Drawf.laser(b.team, Core.atlas.find("laser"), Core.atlas.find("laser-end"), b.x, b.y, Tmp.v1.x, Tmp.v1.y, beamWidth * b.fout());
             Draw.reset();
 
             Drawf.light(b.team, b.x, b.y, Tmp.v1.x, Tmp.v1.y, lightWidth * b.fout(), color, 0.6f);
-            
-            //Unity.print("Vec2 based draw");
         }
     }
 }

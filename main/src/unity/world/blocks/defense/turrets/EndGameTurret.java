@@ -41,22 +41,15 @@ public class EndGameTurret extends PowerTurret{
     protected int eyeTime = timers++;
     protected int bulletTime = timers++;
 
-    public TextureRegion baseLightsRegion;
-    public TextureRegion bottomLightsRegion;
-    public TextureRegion eyeMainRegion;
+    public TextureRegion
+    
+    baseLightsRegion, bottomLightsRegion, eyeMainRegion,
 
-    public TextureRegion ringABottomRegion;
-    public TextureRegion ringAEyesRegion;
-    public TextureRegion ringARegion;
-    public TextureRegion ringALightsRegion;
+    ringABottomRegion, ringAEyesRegion, ringARegion, ringALightsRegion,
+    
+    ringBBottomRegion, ringBEyesRegion, ringBRegion, ringBLightsRegion,
 
-    public TextureRegion ringBBottomRegion;
-    public TextureRegion ringBEyesRegion;
-    public TextureRegion ringBRegion;
-    public TextureRegion ringBLightsRegion;
-
-    public TextureRegion ringCRegion;
-    public TextureRegion ringCLightsRegion;
+    ringCRegion, ringCLightsRegion;
 
     public EndGameTurret(String name){
         super(name);
@@ -126,8 +119,10 @@ public class EndGameTurret extends PowerTurret{
             if(verify()) return;
             if(damage > 10000) charge += Mathf.clamp(damage - 10000f, 0f, 2000000f) / 150f;
             if(charge > 15) charge = 15f;
+            
             float trueAmount = Mathf.clamp(damage / resist, 0f, 410f);
             super.damage(trueAmount);
+            
             resist += 0.125f + (Mathf.clamp(damage - 520f, 0f, 2147483647f) / 70f);
             if(Float.isNaN(resist)) resist = Float.MAX_VALUE;
             resistTime = 0f;
@@ -177,15 +172,18 @@ public class EndGameTurret extends PowerTurret{
         public void draw(){
             float oz = Draw.z();
             Draw.rect(baseRegion, x, y);
+            
             Draw.z(oz + 0.01f);
             Draw.rect(ringABottomRegion, x, y, ringProgress[0]);
             Draw.rect(ringBBottomRegion, x, y, ringProgress[1]);
+            
             Draw.z(oz + 0.02f);
             Draw.rect(ringARegion, x, y, ringProgress[0]);
             Draw.rect(ringBRegion, x, y, ringProgress[1]);
             Draw.rect(ringCRegion, x, y, ringProgress[2]);
 
             Draw.blend(Blending.additive);
+            
             Draw.z(oz + 0.005f);
             Draw.color(1f, Utils.offsetSin(0f, 5f), Utils.offsetSin(90f, 5f), eyesAlpha);
             Draw.rect(bottomLightsRegion, x, y);
@@ -202,6 +200,7 @@ public class EndGameTurret extends PowerTurret{
                 Draw.z(oz + 0.015f);
                 Draw.color(1f, Utils.offsetSin(10f * h, 5f), Utils.offsetSin(90f + (10f * h), 5f), eyesAlpha);
                 Draw.rect(regions[i], x + (eyeOffset.x * trnsScl[i]), y + (eyeOffset.y * trnsScl[i]), ringProgress[i]);
+                
                 Draw.z(oz + 0.025f);
                 Draw.color(1f, Utils.offsetSin(10f * h, 5f), Utils.offsetSin(90f + (10f * h), 5f), lightsAlpha * Utils.offsetSin(5 * h, 12f));
                 Draw.rect(regionsB[i], x, y, ringProgress[i]);
@@ -261,18 +260,23 @@ public class EndGameTurret extends PowerTurret{
             Groups.all.remove(entity);
             if(entity instanceof Unit){
                 Unit tmp = (Unit)entity;
+                
                 Unity.antiCheat.removeUnit(tmp);
                 tmpArray.add(new DeadUnitEntry(tmp));
                 attemptRemoveAdd(tmp);
+                
                 UnityFx.vapourizeUnit.at(tmp.x, tmp.y, tmp.rotation, tmp);
+                
                 tmp.team.data().updateCount(tmp.type, -1);
                 tmp.clearCommand();
                 tmp.controller().removed(tmp);
+                
                 Groups.unit.remove(tmp);
                 Groups.draw.remove((Drawc)entity);
                 if(Vars.net.client()){
                     Vars.netClient.addRemovedEntity(tmp.id);
                 }
+                
                 for(WeaponMount mount : tmp.mounts){
                     if(mount.bullet != null){
                         mount.bullet.time = mount.bullet.lifetime - 10f;
@@ -287,6 +291,7 @@ public class EndGameTurret extends PowerTurret{
                 Groups.build.remove(build);
                 build.tile.remove();
                 Unity.antiCheat.removeBuilding(build);
+                
                 if(build.sound != null) build.sound.stop();
                 build.added = false;
             }
@@ -302,12 +307,14 @@ public class EndGameTurret extends PowerTurret{
             final float rnge = 15f;
             float ux = unit.aimX();
             float uy = unit.aimY();
+            
             if(!Mathf.within(x, y, ux, uy, range * 1.5f)) return;
             Vars.indexer.eachBlock(null, ux, uy, rnge, b -> b.team() != team && !b.dead(), building -> {
                 building.damage(490f);
                 Object[] data = {new Vec2(ux, uy), building, 0.525f};
                 UnityFx.endgameLaser.at(x, y, 0, data);
             });
+            
             Units.nearbyEnemies(team, ux - rnge, uy - range, range * 2f, range * 2f, e -> {
                 if(e.within(ux, uy, rnge + e.hitSize) && !e.dead){
                     e.damage(490f * threatLevel);
@@ -318,9 +325,11 @@ public class EndGameTurret extends PowerTurret{
                     UnityFx.endgameLaser.at(x, y, 0, new Object[]{new Vec2(ux, uy), e, 0.525f});
                 }
             });
+            
             Tmp.v1.set(eyesVecArray[index]);
             Tmp.v1.add(ux, uy);
             Tmp.v1.scl(0.5f);
+            
             Object[] dataB = {eyesVecArray[index], new Vec2(ux, uy), 0.625f};
             UnityFx.endgameLaser.at(Tmp.v1.x, Tmp.v1.y, 0, dataB);
             UnitySounds.endgameSmallShoot.at(x, y);
@@ -334,8 +343,8 @@ public class EndGameTurret extends PowerTurret{
                     annihilate(targets[index]);
                 }
                 Object[] data = {eyesVecArray[index], e, 0.625f};
+                
                 UnityFx.endgameLaser.at(x, y, 0, data);
-                //sound
                 UnitySounds.endgameSmallShoot.at(x, y);
             }
         }
@@ -377,6 +386,7 @@ public class EndGameTurret extends PowerTurret{
                         entitySeq.add(build);
                     }
                 });
+                
                 for(int i = 0; i < 16; i++){
                     Posc tmpTarget = Utils.targetUnique(team, x, y, range, new Seq<>(targets));
                     if(tmpTarget == null && entitySeq.size >= 1){
@@ -409,6 +419,7 @@ public class EndGameTurret extends PowerTurret{
                         damageFull += Utils.getBulletDamage(b.type);
                         BulletType current = b.type;
                         totalFrags = 1;
+                        
                         for(int i = 0; i < 16; i++){
                             if(current.fragBullet == null) break;
 
@@ -490,6 +501,7 @@ public class EndGameTurret extends PowerTurret{
         public void updateTile(){
             lastHealth = health;
             charge = Math.max(0f, charge - (Time.delta / 20f));
+            
             if(resistTime >= 15){
                 resist = Math.max(1f, resist - Time.delta);
             }else{
@@ -497,6 +509,7 @@ public class EndGameTurret extends PowerTurret{
             }
             updateEyes();
             boolean tmpB = true;
+            
             for(DeadUnitEntry d : tmpArray){
                 boolean isModified = d.isModified();
                 d.time += Time.delta;
@@ -515,6 +528,7 @@ public class EndGameTurret extends PowerTurret{
             for(DeadUnitEntry d : toRemove){
                 tmpArray.remove(d);
             }
+            
             toRemove.clear();
             //super.updateTile();
             if(trueEfficiency() > 0.0001f){
@@ -523,10 +537,12 @@ public class EndGameTurret extends PowerTurret{
             }else{
                 eyesAlpha = Mathf.lerpDelta(eyesAlpha, 0f, 0.06f);
             }
+            
             if(consValid()){
                 updateAntiBullets();
                 super.updateTile();
             }
+            
             if(isControlled()){
                 Player con = (Player)unit.controller();
                 eyeTargetOffset.trns(angleTo(con.mouseX, con.mouseY), dst(con.mouseX, con.mouseY) / (range / 3f));
@@ -535,10 +551,12 @@ public class EndGameTurret extends PowerTurret{
                 eyeTargetOffset.trns(angleTo(targetPos.x, targetPos.y), dst(targetPos.x, targetPos.y) / (range / 3f));
             }
             eyeTargetOffset.limit(2f);
+            
             if(((target != null && !isControlled()) || (isControlled() && unit.isShooting())) && trueEfficiency() > 0.0001f){
                 eyeResetTime = 0f;
                 float value = lightsAlpha > trueEfficiency() ? 1f : trueEfficiency();
                 lightsAlpha = Mathf.lerpDelta(lightsAlpha, trueEfficiency(), 0.07f * value);
+                
                 for(int i = 0; i < 3; i++){
                     ringProgress[i] = Mathf.lerpDelta(ringProgress[i], 360f * (float)ringDirections[i], ringProgresses[i] * trueEfficiency());
                 }
@@ -547,6 +565,7 @@ public class EndGameTurret extends PowerTurret{
                 float randomAngle = Mathf.random(360f);
                 Tmp.v1.trns(randomAngle, 18.5f);
                 Tmp.v1.add(x, y);
+                
                 if(Mathf.chanceDelta(0.75 * chance)){
                     SlowLightning l = ExtraEffect.createSlowLightning(Tmp.v1.x, Tmp.v1.y, randomAngle, 110f);
                     l.team = team;
@@ -577,6 +596,7 @@ public class EndGameTurret extends PowerTurret{
             consume();
             killTiles();
             killUnits();
+            
             UnityFx.endGameShoot.at(x, y);
             UnitySounds.endgameShoot.at(x, y);
         }
@@ -601,6 +621,7 @@ public class EndGameTurret extends PowerTurret{
                 eyesVecArray[i] = new Vec2();
                 targets[i] = null;
             }
+            
             super.add();
             Unity.antiCheat.addBuilding(this);
         }
@@ -611,6 +632,7 @@ public class EndGameTurret extends PowerTurret{
             if(lastHealth <= 0){
                 Unity.antiCheat.removeBuilding(this);
             }
+            
             super.remove();
         }
     }
@@ -626,11 +648,13 @@ public class EndGameTurret extends PowerTurret{
                 for(int i = 0; i < Math.min(1 + layer, 3); i++){
                     d.tryDestroy();
                 }
+                
                 if(layer > 4){
                     d.entity.x = Float.NaN;
                     d.entity.y = Float.NaN;
                     d.entity.abilities.clear();
                 }
+                
                 if(d.isModified() && !obsolete){
                     AnnihilateRunnable ar = new AnnihilateRunnable();
                     ar.layer = layer + 1;
@@ -678,15 +702,19 @@ public class EndGameTurret extends PowerTurret{
             Groups.all.remove(entity);
             Unit tmp = entity;
             attemptRemoveAdd(tmp);
+            
             UnityFx.vapourizeUnit.at(tmp.x, tmp.y, tmp.rotation, tmp);
+            
             tmp.team.data().updateCount(tmp.type, -1);
             tmp.clearCommand();
             tmp.controller().removed(tmp);
+            
             Groups.unit.remove(tmp);
             Groups.draw.remove(entity);
             if(Vars.net.client()){
                 Vars.netClient.addRemovedEntity(tmp.id);
             }
+            
             for(WeaponMount mount : tmp.mounts){
                 if(mount.bullet != null){
                     mount.bullet.time = mount.bullet.lifetime - 10f;
