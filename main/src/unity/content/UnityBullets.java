@@ -38,43 +38,17 @@ public class UnityBullets implements ContentList{
 
     @Override
     public void load(){
-        laser = new SapBulletType(){
-            {
-                length = 150f;
-                width = 0.7f;
+        laser = new ExpLaserBulletType(150f, 30f, 30f){{
+                width = 1f;
                 damage = 30f;
-                lifetime = 18f;
                 despawnEffect = Fx.none;
-                pierce = true;
-                hitSize = 0f;
                 status = StatusEffects.shocked;
                 statusDuration = 3 * 60f;
-                hittable = false;
-                hitEffect = Fx.hitLiquid;
-                sapStrength = 0f;
-            }
-
-            @Override
-            public void init(Bullet b){
-                if(b.owner instanceof ExpBuildc exp){
-                    int lvl = exp.level();
-
-                    b.damage(damage + lvl * 10f);
-                    b.fdata = lvl / 10f;
-
-                    super.init(b);
-                    if(!(b.data instanceof Position)){
-                        exp.incExp(2f);
-                    }
-                }
-            }
-
-            @Override
-            public void draw(Bullet b){
-                color = Tmp.c1.set(Color.white).lerp(Pal.lancerLaser, b.fdata);
-                super.draw(b);
-            }
-        };
+                hitUnitExpGain = 2f;
+                hitBuildingExpGain = 2f;
+                fromColor = Color.white;
+                toColor = Pal.lancerLaser;
+        }};
 
         /* TODO koruh bullets
         coalBlaze = new BulletType(3.35f, 32f){
