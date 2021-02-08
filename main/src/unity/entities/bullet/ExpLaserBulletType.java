@@ -15,7 +15,7 @@ import unity.graphics.*;
 
 public class ExpLaserBulletType extends BulletType {
     /** Color of laser. Shifts to second color as the turret levels up. */
-    public Color fromColor = Color.white, toColor = Pal.lancerLaser;
+    public Color fromColor = Pal.lancerLaser, toColor = UnityPal.expLaser;
     /** Damage increase per owner level, if the owner can level up. */
     public float damageInc;
     /** Dimentions of laser */

@@ -46,8 +46,6 @@ public class UnityBullets implements ContentList{
                 statusDuration = 3 * 60f;
                 hitUnitExpGain = 2f;
                 hitBuildingExpGain = 2f;
-                fromColor = Color.white;
-                toColor = Pal.lancerLaser;
         }};
 
         /* TODO koruh bullets
