@@ -17,6 +17,12 @@ import static mindustry.Vars.*;
 
 public interface ExpBuildc extends ExpEntityc<Block, ExpBlock>, Buildingc{
     @Override
+    @MethodPriority(-1)
+    default void updateTile(){
+        
+    }
+
+    @Override
     default ExpBlock expType(){
         ExpType<?> type = ExpMeta.map(block());
         if(!(type instanceof ExpBlock block)){

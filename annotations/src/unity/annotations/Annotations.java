@@ -91,6 +91,12 @@ public class Annotations{
     public @interface Replace{
     }
 
+    /** Used for method appender sorting */
+    public @interface MethodPriority{
+        /** @return The priority */
+        int value();
+    }
+
     /**
      * Indicates that the following field returned by this getter is gonna be initialized
      */

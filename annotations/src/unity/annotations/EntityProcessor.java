@@ -134,13 +134,29 @@ public class EntityProcessor extends BaseProcessor{
                     MethodSpec.Builder method = MethodSpec.overriding(appended);
                     if(!replace){
                         if(!returns){
-                            method
-                                .addStatement("super.$L(" + params.toString() + ")", args.toArray())
-                                .addCode(lnew());
+                            appenders.sort(m -> {
+                                MethodPriority p = m.getAnnotation(MethodPriority.class);
+                                return p == null ? 0 : p.value();
+                            });
 
+                            boolean superCalled = false;
                             for(ExecutableElement appender : appenders){
+                                MethodPriority p = appender.getAnnotation(MethodPriority.class);
+                                if((p == null || p.value() >= 0) && !superCalled){
+                                    method
+                                        .addStatement("super.$L(" + params.toString() + ")", args.toArray())
+                                        .addCode(lnew());
+
+                                    superCalled = true;
+                                }
+
                                 TypeElement up = (TypeElement)appender.getEnclosingElement();
                                 method.addStatement("$T.super.$L(" + params.toString() + ")", Seq.<Object>with(tName(up)).addAll(args).toArray());
+                            }
+
+                            if(!superCalled){
+                                method.addStatement("super.$L(" + params.toString() + ")", args.toArray());
+                                superCalled = true;
                             }
                         }else if(appended.getReturnType().getKind() == BOOLEAN){
                             StringBuilder builder = new StringBuilder()

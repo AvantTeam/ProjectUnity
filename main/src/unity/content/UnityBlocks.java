@@ -86,6 +86,12 @@ public class UnityBlocks implements ContentList{
 
     teleporter, teleunit, expOutput, expUnloader, expTank, expChest, expFountain, expVoid;
 
+    public static
+    @ExpDef(type = ExpBlock.class)
+    @EntityDef(base = Building.class, def = ExpBuildc.class)
+    @FactionDef(type = "koruh")
+    Block laser, laserCharge, laserFrost;
+
     //public static @FactionDef(type = "light")
     //Block
 
@@ -158,15 +164,9 @@ public class UnityBlocks implements ContentList{
     public static @FactionDef(type = "end")
     Block terminalCrucible, endForge, endGame;
 
-    public static
-    @ExpDef(type = ExpBlock.class)
-    @EntityDef(base = Building.class, def = ExpBuildc.class)
-    @FactionDef(type = "koruh")
-    Block expTest;
-
     @Override
     public void load(){
-        expTest = new Block("hhh");
+        
         //region global
 
         recursiveReconstructor = new SelectableReconstructor("recursive-reconstructor"){{
@@ -909,6 +909,22 @@ public class UnityBlocks implements ContentList{
             requirements(Category.effect, BuildVisibility.sandboxOnly, with());
             health = 200;
         }};
+
+        laser = new PowerTurret("laser-turret"){
+            @Override
+            public void init(){
+                super.init();
+
+                ExpBlock block = ExpMeta.map(this);
+                block.maxLevel = 10;
+                block.addUpgrade(laserCharge, 10);
+                block.addUpgrade(laserFrost, 10);
+            }
+        };
+
+        laserCharge = new PowerTurret("charge-laser-turret");
+
+        laserFrost = new PowerTurret("frost-laser-turret");
 
         //endregion
         //region monolith

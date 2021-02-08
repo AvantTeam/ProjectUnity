@@ -14,10 +14,14 @@ import mindustry.ui.*;
 import mindustry.world.meta.*;
 import unity.annotations.Annotations.*;
 
+import java.lang.reflect.*;
+
 @ExpBase
+@SuppressWarnings("unchecked")
 public abstract class ExpType<T extends UnlockableContent>{
     public final T type;
 
+    public ObjectSet<ExpField> expFields = new ObjectSet<>();
     public int maxLevel = 20;
     public float maxExp = requiredExp(maxLevel);
     public float orbRefund = 0.3f;
@@ -72,6 +76,17 @@ public abstract class ExpType<T extends UnlockableContent>{
         return level * level * 10f;
     }
 
+    public void addUpgrade(T type, int minLevel){
+        addUpgrade(type, minLevel, maxLevel);
+    }
+
+    public void addUpgrade(T type, int minLevel, int maxLevel){
+        upgrades.add(new ExpUpgrade(type){{
+            min = minLevel;
+            max = maxLevel;
+        }});
+    }
+
     public class ExpUpgrade{
         public final T type;
         public int min = 1;
@@ -80,5 +95,31 @@ public abstract class ExpType<T extends UnlockableContent>{
         public ExpUpgrade(T type){
             this.type = type;
         }
+    }
+
+    public class ExpField{
+        public final ExpFieldType type;
+        public final Field field;
+        public int startInt;
+        public boolean startBool;
+        public int intensity;
+
+        public ExpField(ExpFieldType type, Field field){
+            this.type = type;
+            this.field = field;
+        }
+
+        public <V> V get(){
+            try{
+                return (V)field.get(ExpType.this.type);
+            }catch(Exception e){
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    public enum ExpFieldType{
+        linear,
+        bool;
     }
 }
