@@ -110,6 +110,9 @@ public class MusicHandler implements ApplicationListener{
 
         currentMusic.stop();
         currentMusic = null;
+
+        UnitySounds.dispose();
+        UnityMusics.dispose();
     }
 
     public void registerLoop(String name, Music intro, Music loop){

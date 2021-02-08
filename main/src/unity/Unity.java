@@ -39,21 +39,19 @@ public class Unity extends Mod{
     public Unity(){
         ContributorList.init();
 
-        Events.on(ContentInitEvent.class, e -> {
-            if(!headless){
+        if(!headless){
+            Events.on(ContentInitEvent.class, e -> {
                 Regions.load();
-            }
-        });
+            });
 
-        Events.on(FileTreeInitEvent.class, e -> {
+            Events.on(FileTreeInitEvent.class, e -> {
+                UnitySounds.load();
+                UnityMusics.load();
+            });
+        }else{
             UnitySounds.load();
             UnityMusics.load();
-        });
-
-        Events.on(DisposeEvent.class, e -> {
-            UnitySounds.dispose();
-            UnityMusics.dispose();
-        });
+        }
 
         musicHandler = new MusicHandler();
         antiCheat = new UnityAntiCheat();
