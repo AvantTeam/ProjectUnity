@@ -116,12 +116,12 @@ public class KamiAI implements UnitController{
             if(kamiAI.reloads[0] >= 2.5f * 60f){
                 kamiAI.reloads[6] += Time.delta;
                 kamiAI.reloads[1] += Time.delta;
-                kamiAI.reloads[8] += Time.delta;
                 kamiAI.reloads[9] += Time.delta;
                 if(kamiAI.reloads[9] >= 20 && kamiAI.tmpBullets[0] != null){
                     int diff = 4 + difficulty;
+                    kamiAI.reloads[8] -= 17f;
                     for(int i = 0; i < diff; i++){
-                        float angle = (i * (360f / diff)) + (kamiAI.reloads[8] * kamiAI.reloads[7] * -2f);
+                        float angle = (i * (360f / diff)) + (kamiAI.reloads[8] * kamiAI.reloads[7]);
                         tmpVec.trns(angle, 30f).add(kamiAI.unit);
                         for(int j = 0; j < 2; j++){
                             //Bullet bullet = UnityBullets.kamiBullet1.create(kamiAI.unit, tmpVec.x, tmpVec.y, angle);
@@ -146,8 +146,9 @@ public class KamiAI implements UnitController{
                         }
                     };
                     int diff = 7 + difficulty;
+                    kamiAI.reloads[10] += 6f;
                     for(int i = 0; i < diff; i++){
-                        float angle = (i * (360f / diff)) + (kamiAI.reloads[8] * kamiAI.reloads[7] * 6f);
+                        float angle = (i * (360f / diff)) + (kamiAI.reloads[10] * kamiAI.reloads[7]);
                         //Bullet bullet = UnityBullets.kamiBullet1.create(kamiAI.unit, kamiAI.unit.x, kamiAI.unit.y, angle);
                         //bullet.hitSize = 8f;
                         //bullet.lifetime = 7f * 60f;
@@ -183,6 +184,7 @@ public class KamiAI implements UnitController{
                         for(int i = 0; i < 6; i++) kamiAI.reloads[i] = 0f;
                         kamiAI.reloads[8] = 0f;
                         kamiAI.reloads[9] = 0f;
+                        kamiAI.reloads[10] = 0f;
                         kamiAI.reloads[7] *= -1f;
                     }
                 }
@@ -199,7 +201,7 @@ public class KamiAI implements UnitController{
         //Dream Sign "Evil-Sealing Circle"
         new KamiShootType(kamiAI -> {
             if(kamiAI.reloads[1] >= 12f){
-                int diff = 7 + difficulty;
+                int diff = 8;
                 for(int i = 0; i < diff; i++){
                     float angle = (i * (360f / diff)) + Mathf.sin(kamiAI.reloads[2], 120f, 30f) + kamiAI.relativeRotation;
                     Cons<Bullet> data1 = b -> {
@@ -289,7 +291,7 @@ public class KamiAI implements UnitController{
                     kamiAI.unit.rotation(kamiAI.relativeRotation - 90f);
                     kamiAI.unit.set(tmpVec);
                     if(kamiAI.targetPoint.epsilonEquals(kamiAI.unit.x, kamiAI.unit.y, 16f)){
-                        int diff = 75 + ((difficulty - 1) * 2);
+                        int diff = 65 + ((difficulty - 1) * 2);
                         for(int i = 0; i < diff; i++){
                             float fin = ((float)i / diff);
                             tmpVec2.set(kamiAI.lastPoint).lerp(kamiAI.targetPoint, fin);
@@ -307,7 +309,7 @@ public class KamiAI implements UnitController{
                             float angle = i * (360f / diff);
                             Bullet b = UnityBullets.kamiBullet1.create(kamiAI.unit, kamiAI.unit.x, kamiAI.unit.y, angle);
                             b.lifetime *= 2f;
-                            b.vel.scl(1.25f);
+                            b.vel.scl(1.1f);
                         }
                         kamiAI.relativeRotation = Mathf.mod((((Mathf.round(kamiAI.relativeRotation / 60f) * 60f) + 90f) * 2f) - kamiAI.relativeRotation, 360f);
                         kamiAI.altTime = 3f * 60f;
