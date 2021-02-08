@@ -124,7 +124,7 @@ public class SpriteProcessor{
                 BufferedImage image = ImageIO.read(path.file());
 
                 Sprite sprite = new Sprite(image);
-                sprite.antialias().alphaBleed(2);
+                sprite.alphaBleed(2).antialias();
 
                 sprite.save(path.nameWithoutExtension());
             }catch(IOException e){

@@ -57,6 +57,12 @@ public abstract interface ExpEntityc<T extends UnlockableContent, E extends ExpT
     float spreadAmount();
 
     @Override
+    @MethodPriority(-1)
+    default void update(){
+        expType().setExpStats(this);
+    }
+
+    @Override
     default void killed(){
         ExpOrbs.spreadExp(x(), y(), exp() * expType().orbRefund, spreadAmount());
     }

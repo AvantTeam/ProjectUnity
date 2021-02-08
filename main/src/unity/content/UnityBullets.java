@@ -2,6 +2,7 @@ package unity.content;
 
 import arc.func.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.util.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -12,8 +13,8 @@ import mindustry.entities.bullet.*;
 import mindustry.graphics.*;
 import mindustry.io.*;
 import mindustry.ctype.*;
-import unity.content.*;
 import unity.entities.bullet.*;
+import unity.entities.comp.*;
 import unity.graphics.*;
 
 import static mindustry.Vars.*;
@@ -37,7 +38,6 @@ public class UnityBullets implements ContentList{
 
     @Override
     public void load(){
-        /* TODO koruh bullets
         laser = new SapBulletType(){
             {
                 length = 150f;
@@ -56,21 +56,27 @@ public class UnityBullets implements ContentList{
 
             @Override
             public void init(Bullet b){
-                ExpPowerTurret.ExpPowerTurretBuild exp = (ExpPowerTurret.ExpPowerTurretBuild)b.owner;
-                int lvl = exp.getLevel();
-                b.damage(damage + lvl * 10f);
-                b.fdata = lvl / 10f;
-                super.init(b);
-                if(!(b.data instanceof Vec2)) exp.incExp(2f);
+                if(b.owner instanceof ExpBuildc exp){
+                    int lvl = exp.level();
+
+                    b.damage(damage + lvl * 10f);
+                    b.fdata = lvl / 10f;
+
+                    super.init(b);
+                    if(!(b.data instanceof Position)){
+                        exp.incExp(2f);
+                    }
+                }
             }
 
             @Override
             public void draw(Bullet b){
-                color = Tmp.c1.set(Color.white).lerp(lancerLaser, b.fdata);
+                color = Tmp.c1.set(Color.white).lerp(Pal.lancerLaser, b.fdata);
                 super.draw(b);
             }
         };
 
+        /* TODO koruh bullets
         coalBlaze = new BulletType(3.35f, 32f){
             {
                 ammoMultiplier = 3;

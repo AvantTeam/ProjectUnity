@@ -22,14 +22,15 @@ import mindustry.ctype.*;
 import mindustry.content.*;
 import unity.annotations.Annotations.*;
 import unity.entities.bullet.*;
-import unity.entities.comp.*;
 import unity.gen.*;
 import unity.graphics.*;
+import unity.type.ExpType.*;
 import unity.type.exp.*;
 import unity.util.*;
 import unity.world.blocks.*;
 import unity.world.blocks.defense.*;
 import unity.world.blocks.defense.turrets.*;
+import unity.world.blocks.defense.turrets.exp.ExpPowerTurret;
 import unity.world.blocks.distribution.*;
 import unity.world.blocks.logic.*;
 import unity.world.blocks.power.*;
@@ -88,7 +89,6 @@ public class UnityBlocks implements ContentList{
 
     public static
     @ExpDef(type = ExpBlock.class)
-    @EntityDef(base = Building.class, def = ExpBuildc.class)
     @FactionDef(type = "koruh")
     Block laser, laserCharge, laserFrost;
 
@@ -910,21 +910,42 @@ public class UnityBlocks implements ContentList{
             health = 200;
         }};
 
-        laser = new PowerTurret("laser-turret"){
+        laser = new ExpPowerTurret("laser-turret"){
             @Override
             public void init(){
                 super.init();
 
                 ExpBlock block = ExpMeta.map(this);
                 block.maxLevel = 10;
+
                 block.addUpgrade(laserCharge, 10);
                 block.addUpgrade(laserFrost, 10);
+
+                block.addField(ExpFieldType.linear, ReloadTurret.class, "reloadTime", reloadTime, -2f);
+                block.addField(ExpFieldType.bool, Turret.class, "targetAir", false, 5f);
+            }
+
+            {
+                requirements(Category.turret, with(Items.copper, 190, Items.silicon, 110, Items.titanium, 15));
+                size = 2;
+                health = 800;
+
+                reloadTime = 35f;
+                coolantMultiplier = 2f;
+                shootCone = 1f;
+                range = 140f;
+                inaccuracy = 0f;
+                targetAir = false;
+
+                powerUse = 7f;
+
+                shootType = UnityBullets.laser;
             }
         };
 
-        laserCharge = new PowerTurret("charge-laser-turret");
+        laserCharge = new ExpPowerTurret("charge-laser-turret");
 
-        laserFrost = new PowerTurret("frost-laser-turret");
+        laserFrost = new ExpPowerTurret("frost-laser-turret");
 
         //endregion
         //region monolith
