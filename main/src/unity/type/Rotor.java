@@ -32,7 +32,7 @@ public class Rotor{
 
     public Rotor copy(){
         Rotor out = new Rotor(name);
-        JsonIO.json().copyFields(this, out);
+        JsonIO.json.copyFields(this, out);
 
         return out;
     }

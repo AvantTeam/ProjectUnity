@@ -38,13 +38,16 @@ public class Unity extends Mod{
 
     public Unity(){
         ContributorList.init();
-        UnitySounds.load();
-        UnityMusics.load();
 
         Events.on(ContentInitEvent.class, e -> {
             if(!headless){
                 Regions.load();
             }
+        });
+
+        Events.on(FileTreeInitEvent.class, e -> {
+            UnitySounds.load();
+            UnityMusics.load();
         });
 
         Events.on(DisposeEvent.class, e -> {
