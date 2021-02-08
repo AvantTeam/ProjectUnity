@@ -58,7 +58,7 @@ public class ExpLaserBulletType extends BulletType {
         if(b.owner instanceof ExpBuildc exp){
             int lvl = exp.level();
 
-            return Tmp.c1.set(fromColor).lerp(toColor, lvl / 10);
+            return Tmp.c1.set(fromColor).lerp(toColor, lvl / 10f);
         }else{
             return fromColor;
         }
@@ -66,6 +66,8 @@ public class ExpLaserBulletType extends BulletType {
 
     public void init(Bullet b){
         super.init(b);
+
+        setDamage(b);
 
         Healthc target = Damage.linecast(b, b.x, b.y, b.rotation(), this.length);
         b.data = target;
@@ -75,18 +77,14 @@ public class ExpLaserBulletType extends BulletType {
 
             hit.collision(b, hit.x(), hit.y());
             b.collision(hit, hit.x(), hit.y());
-            if(b.owner instanceof ExpBuildc exp){
-                exp.incExp(hitUnitExpGain);
-            }
+            if(b.owner instanceof ExpBuildc exp) exp.incExp(hitUnitExpGain);
         }else if(target instanceof Building){
             Building tile = (Building) target;
 
             if(tile.collide(b)){
                 tile.collision(b);
                 this.hit(b, tile.x, tile.y);
-                if(b.owner instanceof ExpBuildc exp){
-                    exp.incExp(hitBuildingExpGain);
-                }
+                if(b.owner instanceof ExpBuildc exp) exp.incExp(hitBuildingExpGain);
             }
         }else{
             b.data = new Vec2().trns(b.rotation(), this.length).add(b.x, b.y);
@@ -101,9 +99,7 @@ public class ExpLaserBulletType extends BulletType {
         if(b.data instanceof Position point){
             Tmp.v1.set(point);
 
-            //TODO fix the exp color thing
-            //Draw.color(this.getColor(b));
-            Draw.color(fromColor);
+            Draw.color(getColor(b));
 
             Draw.alpha(0.4f);
             Lines.stroke(b.fout() * width * strokes[0]);
