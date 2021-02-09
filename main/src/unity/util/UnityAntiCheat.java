@@ -6,7 +6,6 @@ import arc.util.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.world.blocks.ConstructBlock.*;
-import unity.*;
 
 public class UnityAntiCheat implements ApplicationListener{
     private final Interval timer = new Interval();

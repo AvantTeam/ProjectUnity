@@ -29,7 +29,6 @@ public class Unity extends Mod{
         new UnityLiquids(),
         new UnityBullets(),
         new UnityUnitTypes(),
-        new UnityObjs(),
         new UnityBlocks(),
         new UnityPlanets(),
         new UnitySectorPresets(),
@@ -39,19 +38,28 @@ public class Unity extends Mod{
     public Unity(){
         ContributorList.init();
 
+        Core.assets.setLoader(WavefrontObject.class, new WavefrontObjectLoader(tree));
         if(!headless){
             Events.on(ContentInitEvent.class, e -> {
                 Regions.load();
             });
 
             Events.on(FileTreeInitEvent.class, e -> {
+                UnityObjs.load();
                 UnitySounds.load();
                 UnityMusics.load();
             });
         }else{
+            UnityObjs.load();
             UnitySounds.load();
             UnityMusics.load();
         }
+
+        Events.on(DisposeEvent.class, e -> {
+            UnityObjs.dispose();
+            UnitySounds.dispose();
+            UnityMusics.dispose();
+        });
 
         musicHandler = new MusicHandler();
         antiCheat = new UnityAntiCheat();

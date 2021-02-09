@@ -16,8 +16,6 @@ public class ObjPowerTurret extends PowerTurret{
     @Override
     public void load(){
         super.load();
-        object.load();
-
         baseRegion = region;
     }
 

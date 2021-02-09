@@ -2,7 +2,6 @@ package unity.annotations;
 
 import arc.*;
 import arc.assets.*;
-import arc.assets.loaders.SoundLoader.*;
 import arc.assets.loaders.MusicLoader.*;
 import arc.audio.*;
 import arc.struct.*;
@@ -48,100 +47,11 @@ public class FactionProcessor extends BaseProcessor{
         }
 
         if(round == 1){
-            processSounds();
             processMusics();
         }else if(round == 2){
             musics.addAll((Set<VariableElement>)roundEnv.getElementsAnnotatedWith(MusicDef.class));
             processFactions();
         }
-    }
-
-    protected void processSounds() throws Exception{
-        TypeSpec.Builder soundSpec = TypeSpec.classBuilder("UnitySounds").addModifiers(Modifier.PUBLIC)
-            .addJavadoc("Unity's {@link $T} effects", cName(Sound.class))
-            .addMethod(
-                MethodSpec.methodBuilder("loadSound").addModifiers(Modifier.PROTECTED, Modifier.STATIC)
-                    .addJavadoc(
-                        CodeBlock.builder()
-                            .add("Loads a {@link $T}" + lnew(), cName(Sound.class))
-                            .add("@param soundName The {@link $T} name" + lnew(), cName(Sound.class))
-                            .add("@return The {@link $T}", cName(Sound.class))
-                        .build()
-                    )
-                    .returns(cName(Sound.class))
-                    .addParameter(cName(String.class), "soundName")
-                    .beginControlFlow("if(!$T.headless)", cName(Vars.class))
-                        .addStatement("$T name = $S + soundName", cName(String.class), "sounds/")
-                        .addStatement("$T path = $T.tree.get(name + $S).exists() ? name + $S : name + $S", cName(String.class), cName(Vars.class), ".ogg", ".ogg", ".mp3")
-                        .addCode(lnew())
-                        .addStatement("var sound = new $T()", cName(Sound.class))
-                        .addCode(lnew())
-                        .addStatement("$T<?> desc = $T.assets.load(path, $T.class, new $T(sound))", cName(AssetDescriptor.class), cName(Core.class), cName(Sound.class), cName(SoundParameter.class))
-                        .addStatement("desc.errored = $T::printStackTrace", cName(Throwable.class))
-                        .addCode(lnew())
-                        .addStatement("return sound")
-                    .nextControlFlow("else")
-                        .addStatement("return new $T()", cName(Sound.class))
-                    .endControlFlow()
-                .build()
-            )
-            .addMethod(
-                MethodSpec.methodBuilder("disposeSound").addModifiers(Modifier.PROTECTED, Modifier.STATIC)
-                    .addJavadoc(
-                        CodeBlock.builder()
-                            .add("Disposes a {@link $T}" + lnew(), cName(Sound.class))
-                            .add("@param soundName The {@link $T} name" + lnew(), cName(Sound.class))
-                            .add("@return {@code null}")
-                        .build()
-                    )
-                    .returns(cName(Sound.class))
-                    .addParameter(cName(String.class), "soundName")
-                    .beginControlFlow("if(!$T.headless)", cName(Vars.class))
-                        .addStatement("$T name = $S + soundName", cName(String.class), "sounds/")
-                        .addStatement("$T path = name + $S", cName(String.class), ".ogg")
-                        .addCode(lnew())
-                        .beginControlFlow("if($T.assets.isLoaded(path, $T.class))", cName(Core.class), cName(Sound.class))
-                            .addStatement("$T.assets.unload(path)", cName(Core.class))
-                        .endControlFlow()
-                    .endControlFlow()
-                    .addCode(lnew())
-                    .addStatement("return null")
-                .build()
-            );
-        MethodSpec.Builder load = MethodSpec.methodBuilder("load").addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-            .addJavadoc("Loads all {@link $T}s", cName(Sound.class))
-            .returns(TypeName.VOID);
-
-        MethodSpec.Builder dispose = MethodSpec.methodBuilder("dispose").addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-            .addJavadoc("Disposes all {@link $T}s", cName(Sound.class))
-            .returns(TypeName.VOID);
-
-        String dir = "main/assets/sounds/";
-        rootDir.child(dir).walk(path -> {
-            String p = path.absolutePath();
-            String name = p.substring(p.lastIndexOf(dir) + dir.length(), p.length());
-            String fname = path.nameWithoutExtension();
-            int ex = 4;
-
-            soundSpec.addField(
-                FieldSpec.builder(
-                    tName(Sound.class),
-                    Strings.kebabToCamel(fname),
-                    Modifier.PUBLIC, Modifier.STATIC
-                )
-                .build()
-            );
-
-            String stripped = name.substring(0, name.length() - ex);
-            load.addStatement("$L = loadSound($S)", Strings.kebabToCamel(fname), stripped);
-            dispose.addStatement("$L = disposeSound($S)", Strings.kebabToCamel(fname), stripped);
-        });
-
-        soundSpec
-            .addMethod(load.build())
-            .addMethod(dispose.build());
-
-        write(soundSpec.build());
     }
 
     protected void processMusics() throws Exception{

@@ -1,6 +1,7 @@
 package unity.util;
 
 import arc.*;
+import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -9,19 +10,18 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.graphics.*;
 
-import static mindustry.Vars.*;
+import java.io.*;
 
 /**
  * Wavefront Object Converter and Renderer for Arc/libGDX
- * Renders objects orthographically
- * no culling, textures, normals yet.
- * the faces MUST be a quad, because of "limitations."
- * the faces should not intersect. (no crashes, its just that the renderer doesnt support it.)
+ * Renders objects orthographically.
+ * No culling, textures, nor normals yet.
+ * The faces MUST be a quad, because of "limitations."
+ * The faces should not intersect. (no crashes, its just that the renderer doesnt support it.)
  * 
  * @author EyeOfDarkness
  */
 public class WavefrontObject{
-    protected static int tmpIndexer = 0;
     protected static final float zScale = 0.01f;
     protected static final float defaultScl = 4f;
     protected static final float perspectiveDistance = 350f;
@@ -29,9 +29,6 @@ public class WavefrontObject{
     public Seq<Vec3> vertices = new Seq<>();
     public Seq<Face> faces = new Seq<>();
     protected Seq<Vertex> drawnVertices = new Seq<>();
-
-    public String name;
-    public boolean loaded = false;
 
     public ShadingType shadingType = ShadingType.zDistance;
     public Color lightColor = Color.white;
@@ -42,65 +39,74 @@ public class WavefrontObject{
     protected int indexerA;
     protected float indexerZ;
 
-    public WavefrontObject(String fileName){
-        name = fileName;
-    }
+    public void load(Fi file){
+        BufferedReader reader = file.reader(64);
+        while(true){
+            try{
+                String line = reader.readLine();
+                if(line == null) break;
 
-    public void load(){
-        if(loaded || headless) return;
-        String[] sourceA = tree.get("objects/" + name + ".obj", true).readString().split("\n");
-
-        for(String line : sourceA){
-            if(line.contains("v ")){
-                String[] vectorA = line.replace("v ", "").split(" ");
-                float[] tmpV = new float[3];
-
-                for(int i = 0; i < 3; i++){
-                    tmpV[i] = Strings.parseFloat(vectorA[i], 0f);
-                }
-
-                drawnVertices.add(new Vertex(tmpV[0], tmpV[1], tmpV[2]));
-                vertices.add(new Vec3(tmpV[0], tmpV[1], tmpV[2]));
-            }
-            if(line.contains("f ")){
-                String[] faceA = line.replace("f ", "").split(" ");
-                Face faceTmp = new Face();
-                faceTmp.verts = new Vertex[faceA.length];
-
-                tmpIndexer = 0;
-                for(String segment : faceA){
-                    String[] faceIndex = segment.split("/");
-                    Vertex tvert = drawnVertices.get(getFaceVal(faceIndex[0]));
-                    faceTmp.verts[tmpIndexer] = tvert;
-                    for(int sign : Mathf.signs){
-                        Vertex vTmp = drawnVertices.get(faceTypeIndex(faceA[Mathf.mod(sign + tmpIndexer, faceA.length)], 0));
-                        if(!faceTmp.verts[tmpIndexer].neighbors.contains(vTmp)) faceTmp.verts[tmpIndexer].neighbors.add(vTmp);
+                if(line.contains("v ")){
+                    String[] pos = line.replaceFirst("v ", "").split("\\s+");
+                    if(pos.length != 3){
+                        throw new IllegalStateException("'v' must define all 3 vector points");
                     }
-                    //faceTmp.shadingValue += (Math.abs(tvert.source.x) + Math.abs(tvert.source.y) + Math.abs(tvert.source.z)) / 3f;
-                    //faceTmp.shadingValue += tvert.source.len();
-                    faceTmp.size += 6;
-                    tmpIndexer++;
+
+                    float[] vec = new float[3];    
+                    for(int i = 0; i < 3; i++){
+                        vec[i] = Strings.parseFloat(pos[i], 0f);
+                    }
+
+                    drawnVertices.add(new Vertex(vec[0], vec[1], vec[2]));
+                    vertices.add(new Vec3(vec[0], vec[1], vec[2]));
                 }
-                tmpIndexer = 0;
-                for(Vertex vt : faceTmp.verts){
-                    vt.neighbors.each(vs -> {
-                        for(Vertex vc : faceTmp.verts){
-                            if(vs == vc) return true;
+
+                if(line.contains("f ")){
+                    String[] segments = line.replace("f ", "").split("\\s+");
+                    Face face = new Face();
+                    face.verts = new Vertex[segments.length];
+
+                    int[] i = {0};
+                    for(String segment : segments){
+                        String[] faceIndex = segment.split("/+");
+                        Vertex vert = drawnVertices.get(getFaceVal(faceIndex[0]));
+                        face.verts[i[0]] = vert;
+
+                        for(int sign : Mathf.signs){
+                            Vertex v = drawnVertices.get(faceTypeIndex(segments[Mathf.mod(sign + i[0], segments.length)], 0));
+
+                            if(!face.verts[i[0]].neighbors.contains(v)){
+                                face.verts[i[0]].neighbors.add(v);
+                            }
                         }
-                        return false;
-                    }, vs -> {
-                        faceTmp.shadingValue += vt.source.dst(vs.source);
-                        tmpIndexer++;
-                    });
-                    //tmpIndexer++;
+                        //faceTmp.shadingValue += (Math.abs(vert.source.x) + Math.abs(vert.source.y) + Math.abs(vert.source.z)) / 3f;
+                        //faceTmp.shadingValue += vert.source.len();
+                        face.size += 6;
+                        i[0]++;
+                    }
+
+                    i[0] = 0;
+                    for(Vertex vt : face.verts){
+                        vt.neighbors.each(vs -> {
+                            for(Vertex vc : face.verts){
+                                if(vs == vc) return true;
+                            }
+
+                            return false;
+                        }, vs -> {
+                            face.shadingValue += vt.source.dst(vs.source);
+                            i[0]++;
+                        });
+                        //i[0]++;
+                    }
+
+                    face.shadingValue /= i[0];
+                    faces.add(face);
                 }
-                faceTmp.shadingValue /= tmpIndexer;
-                faces.add(faceTmp);
+            }catch(Exception e){
+                throw new RuntimeException(e);
             }
         }
-
-        //Unity.print(toString());
-        loaded = true;
     }
 
     public void draw(float x, float y, float rX, float rY, float rZ){
