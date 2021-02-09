@@ -13,6 +13,7 @@ import unity.*;
 
 import java.awt.image.*;
 import java.io.*;
+import java.util.*;
 
 import javax.imageio.*;
 
@@ -27,6 +28,11 @@ public class SpriteProcessor{
 
     public static void main(String[] args) throws Exception{
         headless = true;
+        loadLogger();
+
+        Fi handle = Fi.get("../assets/bundles/bundle");
+        Core.bundle = I18NBundle.createBundle(handle, Locale.getDefault());
+
         mod = new Unity();
 
         content = new ContentLoader();
@@ -39,7 +45,7 @@ public class SpriteProcessor{
 
         try{
             mod.loadContent();
-        }catch(StackOverflowError ignored){}
+        }catch(Exception ignored){}
 
         content.setCurrentMod(null);
 

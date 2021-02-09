@@ -911,20 +911,6 @@ public class UnityBlocks implements ContentList{
         }};
 
         laser = new ExpPowerTurret("laser-turret"){
-            @Override
-            public void init(){
-                super.init();
-
-                ExpBlock block = ExpMeta.map(this);
-                block.maxLevel = 10;
-
-                block.addUpgrade(laserCharge, 10);
-                block.addUpgrade(laserFrost, 10);
-
-                block.addField(ExpFieldType.linear, ReloadTurret.class, "reloadTime", reloadTime, -2f);
-                block.addField(ExpFieldType.bool, Turret.class, "targetAir", false, 5f);
-            }
-
             {
                 requirements(Category.turret, with(Items.copper, 190, Items.silicon, 110, Items.titanium, 15));
                 size = 2;
@@ -940,6 +926,22 @@ public class UnityBlocks implements ContentList{
                 powerUse = 7f;
 
                 shootType = UnityBullets.laser;
+            }
+
+            @Override
+            public void init(){
+                super.init();
+
+                ExpBlock block = ExpMeta.map(this);
+                block.init();
+
+                block.maxLevel = 10;
+
+                block.addUpgrade(laserCharge, 10);
+                block.addUpgrade(laserFrost, 10);
+
+                block.addField(ExpFieldType.linear, ReloadTurret.class, "reloadTime", reloadTime, -2f);
+                block.addField(ExpFieldType.bool, Turret.class, "targetAir", false, 5f);
             }
         };
 

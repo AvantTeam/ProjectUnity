@@ -68,9 +68,9 @@ public abstract class ExpType<T extends UnlockableContent>{
                 Seq<ExpField> fields = expFields.get(type, Seq::new);
                 int amount = fields.size;
 
-                Field fInc = getClass().getDeclaredField(type.name() + "Inc");
-                Field fIncStart = getClass().getDeclaredField(type.name() + "IncStart");
-                Field fIncMul = getClass().getDeclaredField(type.name() + "IncMul");
+                Field fInc = ExpType.class.getDeclaredField(type.name() + "Inc");
+                Field fIncStart = ExpType.class.getDeclaredField(type.name() + "IncStart");
+                Field fIncMul = ExpType.class.getDeclaredField(type.name() + "IncMul");
 
                 fInc.set(this, new Field[amount]);
                 fIncStart.set(this, type == ExpFieldType.bool ? new boolean[amount] : new float[amount]);

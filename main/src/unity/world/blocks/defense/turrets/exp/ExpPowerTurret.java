@@ -46,5 +46,10 @@ public class ExpPowerTurret extends PowerTurret{
             super.read(read);
             ExpBuildc.super.read(read);
         }
+
+        @Override
+        public String toString(){
+            return getClass().getSimpleName() + "#" + id;
+        }
     }
 }

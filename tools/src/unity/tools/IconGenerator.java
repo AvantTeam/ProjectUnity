@@ -192,7 +192,11 @@ public class IconGenerator implements Generator{
 
                 genIcon(icon, fname);
             }catch(Exception e){
-                Log.err("Skipping unit @: @", type.name, e.getMessage());
+                if(e instanceof IllegalArgumentException i){
+                    Log.err("Skipping unit @: @", type.name, i.getMessage());
+                }else{
+                    Log.err(e);
+                }
             }
         });
 
@@ -223,7 +227,11 @@ public class IconGenerator implements Generator{
 
                 genIcon(icon, block.name.replaceFirst("unity-", ""));
             }catch(Exception e){
-                Log.err("Skipping block @: @", block.name, e.getMessage());
+                if(e instanceof IllegalArgumentException i){
+                    Log.err("Skipping block @: @", block.name, i.getMessage());
+                }else{
+                    Log.err(e);
+                }
             }
         });
     }
