@@ -7,6 +7,7 @@ import arc.assets.loaders.MusicLoader.*;
 import arc.audio.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.io.*;
 import mindustry.*;
 import mindustry.ctype.*;
 
@@ -29,12 +30,6 @@ public class FactionProcessor extends BaseProcessor{
     Seq<VariableElement> factions = new Seq<>();
     Seq<VariableElement> musics = new Seq<>();
     TypeElement faction;
-
-    private final StringMap map = StringMap.of(
-        "the-former-glory:dark", "monolith",
-        "reflection-of-time:dark", "monolith",
-        "solemn-winds:ambient", "monolith"
-    );
 
     {
         rounds = 2;
@@ -209,29 +204,30 @@ public class FactionProcessor extends BaseProcessor{
             .addJavadoc("Disposes all {@link $T}s", cName(Music.class))
             .returns(TypeName.VOID);
 
+        ObjectMap<String, String> musProp = new ObjectMap<>();
+        PropertiesUtils.load(musProp, rootDir.child("main/assets/music/music.properties").reader());
+
         String dir = "main/assets/music/";
         rootDir.child(dir).walk(path -> {
+            if(!path.name().endsWith(".mp3")) return;
+
             String p = path.absolutePath();
             String name = p.substring(p.lastIndexOf(dir) + dir.length(), p.length());
             String fname = path.nameWithoutExtension();
-            int ex = 4;
+            String stripped = name.substring(0, name.length() - 4);
 
             FieldSpec.Builder music = FieldSpec.builder(tName(Music.class), Strings.kebabToCamel(fname), Modifier.PUBLIC, Modifier.STATIC);
-            Seq<String[]> names = map.keys().toSeq().map(n -> n.split(":"));
-            for(String[] n : names){
-                if(n[0].equals(fname)){
-                    music.addAnnotation(
-                        AnnotationSpec.builder(cName(MusicDef.class))
-                            .addMember("facType", "$S", map.get(fname + ":" + n[1]))
-                            .addMember("category", "$S", n[1])
-                        .build()
-                    );
-                }
+            if(musProp.containsKey("music." + stripped + ".faction")){
+                music.addAnnotation(
+                    AnnotationSpec.builder(cName(MusicDef.class))
+                        .addMember("facType", "$S", musProp.get("music." + stripped + ".faction"))
+                        .addMember("category", "$S", musProp.get("music." + stripped + ".category", "ambient"))
+                    .build()
+                );
             }
 
             musicSpec.addField(music.build());
 
-            String stripped = name.substring(0, name.length() - ex);
             load.addStatement("$L = loadMusic($S)", Strings.kebabToCamel(fname), stripped);
             dispose.addStatement("$L = disposeMusic($S)", Strings.kebabToCamel(fname), stripped);
         });
@@ -398,23 +394,15 @@ public class FactionProcessor extends BaseProcessor{
             initializer.addStatement("put($T.$L, $T.$L)", up, c, upf, fac);
         }
 
-        Seq<String[]> names = map.keys().toSeq().map(n -> n.split(":"));
         for(VariableElement e : musics){
             TypeName up = TypeName.get(e.getEnclosingElement().asType());
             String c = e.getSimpleName().toString();
             TypeName upf = tName(faction);
-            String f = e.getAnnotation(MusicDef.class).facType();
+            MusicDef def = e.getAnnotation(MusicDef.class);
 
             initializer.addCode(lnew());
-            initializer.addStatement("put($T.$L, $T.$L)", up, c, upf, f);
-
-            category:
-            for(String[] n : names){
-                if(n[0].equals(c)){
-                    initializer.addStatement("music.put($T.$L, $S)", up, c, n[1]);
-                    break category;
-                }
-            }
+            initializer.addStatement("put($T.$L, $T.$L)", up, c, upf, def.facType());
+            initializer.addStatement("music.put($T.$L, $S)", up, c, def.category());
         }
 
         facMeta.addMethod(initializer.build());
