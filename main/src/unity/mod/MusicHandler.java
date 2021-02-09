@@ -93,7 +93,7 @@ public class MusicHandler implements ApplicationListener{
                 introPassed = true;
             }
         }else if(currentMusic != null){
-            currentMusic.setVolume(currentMusic.getVolume() - Time.delta / 120f);
+            currentMusic.setVolume((currentMusic.getVolume() - Time.delta / 120f) * (Core.settings.getInt("musicvol") / 100f));
             if(currentMusic.getVolume() < 0.01f){
                 currentMusic.stop();
                 currentMusic = null;
