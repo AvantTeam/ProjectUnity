@@ -38,7 +38,9 @@ public class Unity extends Mod{
     public Unity(){
         ContributorList.init();
 
-        Core.assets.setLoader(WavefrontObject.class, new WavefrontObjectLoader(tree));
+        if(Core.assets != null){
+            Core.assets.setLoader(WavefrontObject.class, new WavefrontObjectLoader(tree));
+        }
         if(!headless){
             Events.on(ContentInitEvent.class, e -> {
                 Regions.load();
