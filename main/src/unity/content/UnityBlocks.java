@@ -904,9 +904,7 @@ public class UnityBlocks implements ContentList{
 
                 reloadTime = 35f;
                 coolantMultiplier = 2f;
-                shootCone = 1f;
                 range = 140f;
-                inaccuracy = 0f;
                 targetAir = false;
                 shootSound = Sounds.pew_;
 
@@ -941,8 +939,6 @@ public class UnityBlocks implements ContentList{
 
                 reloadTime = 60f;
                 coolantMultiplier = 2f;
-                shootCone = 1f;
-                inaccuracy = 0f;
                 range = 140f;
                 chargeTime = 50f;
                 chargeMaxDelay = 30f;
@@ -985,7 +981,41 @@ public class UnityBlocks implements ContentList{
             }
         };
 
-        laserFrost = new ExpPowerTurret("frost-laser-turret");
+        laserFrost = new ExpLiquidTurret("frost-laser-turret"){
+            {
+                requirements(Category.turret, with(Items.copper, 190, Items.silicon, 110, Items.titanium, 15));
+                size = 2;
+                health = 1000;
+
+                range = 160f;
+                reloadTime = 80f;
+                targetAir = true;
+                hasLiquids = true;
+                liquidCapacity = 15f;
+                hasPower = true;
+                extinguish = false;
+                buildVisibility = BuildVisibility.sandboxOnly;
+
+                ammo(Liquids.cryofluid, UnityBullets.frostLaser);
+                consumes.powerCond(1f, TurretBuild::isActive);
+            }
+
+            @Override
+            public void init(){
+                super.init();
+
+                ExpBlock block = ExpMeta.map(this);
+                block.init();
+
+                block.maxLevel = 30;
+                block.maxExp = block.requiredExp(block.maxLevel);
+
+                //TODO port branch and breakthrough
+                //block.addUpgrade(laserBreakthrough, 30);
+
+                block.setupFields();
+            }
+        };
 
         //endregion
         //region monolith

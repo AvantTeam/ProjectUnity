@@ -11,10 +11,15 @@ import mindustry.type.StatusEffect;
 import unity.graphics.UnityPal;
 
 public class UnityStatusEffects implements ContentList{
-    public static StatusEffect radiation, reloadFatigue, blueBurn, molten, tpCoolDown, teamConverted;
+    public static StatusEffect disabled, radiation, reloadFatigue, blueBurn, molten, tpCoolDown, teamConverted;
 
     @Override
     public void load(){
+        disabled = new StatusEffect("diabled"){{
+            reloadMultiplier = 0f;
+            speedMultiplier = 0f;
+        }};
+
         radiation = new StatusEffect("radiation"){
             //TODO create new class?
             @Override

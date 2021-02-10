@@ -45,19 +45,31 @@ public class ExpLaserBulletType extends BulletType {
         this(120f, 1f);
     }
 
+    public int getLevel(Bullet b){
+        if(b.owner instanceof ExpBuildc exp){
+            return exp.level();
+        }else{
+            return 1;
+        }
+    }
+
+    public float getLevelf(Bullet b){
+        if(b.owner instanceof ExpBuildc exp){
+            return exp.levelf();
+        }else{
+            return 1f;
+        }
+    }
+
     public void setDamage(Bullet b){
         if(b.owner instanceof ExpBuildc exp){
-            int lvl = exp.level();
-
-            b.damage = b.damage + lvl * damageInc * b.damageMultiplier();
+            b.damage += getLevel(b) * damageInc * b.damageMultiplier();
         }
     }
 
     public Color getColor(Bullet b){
         if(b.owner instanceof ExpBuildc exp){
-            int lvl = exp.level();
-
-            return Tmp.c1.set(fromColor).lerp(toColor, lvl / 10f);
+            return Tmp.c1.set(fromColor).lerp(toColor, getLevelf(b));
         }else{
             return fromColor;
         }
@@ -65,9 +77,7 @@ public class ExpLaserBulletType extends BulletType {
 
     public float getLength(Bullet b){
         if(b.owner instanceof ExpBuildc exp){
-            int lvl = exp.level();
-
-            return length + lengthInc * lvl;
+            return length + lengthInc * getLevel(b);
         }else{
             return length;
         }
@@ -88,10 +98,10 @@ public class ExpLaserBulletType extends BulletType {
             if(b.owner instanceof ExpBuildc exp) exp.incExp(hitUnitExpGain);
         }else if(target instanceof Building tile && tile.collide(b)){
             tile.collision(b);
-            this.hit(b, tile.x, tile.y);
+            hit(b, tile.x, tile.y);
             if(b.owner instanceof ExpBuildc exp) exp.incExp(hitBuildingExpGain);
         }else{
-            b.data = new Vec2().trns(b.rotation(), this.length).add(b.x, b.y);
+            b.data = new Vec2().trns(b.rotation(), length).add(b.x, b.y);
         }
     }
 

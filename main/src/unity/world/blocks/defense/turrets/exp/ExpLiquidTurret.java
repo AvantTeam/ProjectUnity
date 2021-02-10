@@ -1,18 +1,27 @@
 package unity.world.blocks.defense.turrets.exp;
 
 import arc.util.io.*;
+import mindustry.gen.*;
+import mindustry.type.*;
 import mindustry.world.blocks.defense.turrets.*;
 import unity.entities.comp.*;
 
-public class ExpPowerTurret extends PowerTurret{
-    public ExpPowerTurret(String name){
+public class ExpLiquidTurret extends LiquidTurret{
+    public ExpLiquidTurret(String name){
         super(name);
         shootCone = 1;
         inaccuracy = 0;
+        loopSound = Sounds.none;
+        shootSound = Sounds.splash;
     }
 
-    public class ExpPowerTurretBuild extends PowerTurretBuild implements ExpBuildc{
+    public class ExpLiquidTurrettBuild extends LiquidTurretBuild implements ExpBuildc{
         public float exp = 0f;
+
+        @Override
+        public boolean acceptLiquid(Building source, Liquid liquid){
+            return ammoTypes.get(liquid) != null;
+        }
 
         @Override
         public float exp() {

@@ -6,6 +6,7 @@ import arc.math.geom.*;
 import arc.util.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
@@ -15,12 +16,13 @@ import mindustry.io.*;
 import mindustry.ctype.*;
 import unity.entities.bullet.*;
 import unity.entities.comp.*;
+import unity.gen.*;
 import unity.graphics.*;
 
 import static mindustry.Vars.*;
 
 public class UnityBullets implements ContentList{
-    public static BulletType laser, shardLaserFrag, shardLaser, coalBlaze, pyraBlaze, falloutLaser, catastropheLaser, calamityLaser, extinctionLaser, orb, shockBeam, currentStroke,
+    public static BulletType laser, shardLaserFrag, shardLaser, frostLaser, coalBlaze, pyraBlaze, falloutLaser, catastropheLaser, calamityLaser, extinctionLaser, orb, shockBeam, currentStroke,
         shielderBullet, plasmaFragTriangle, plasmaTriangle, surgeBomb, pylonLightning, pylonLaser, pylonLaserSmall, exporb, monumentRailBullet, scarShrapnel, scarMissile, celsiusSmoke, kelvinSmoke,
         kamiBullet1, kamiLaser, kamiSmallLaser, supernovaLaser;
 
@@ -107,6 +109,52 @@ public class UnityBullets implements ContentList{
                     }else{
                         b.data = new Vec2().trns(b.rotation(), length).add(b.x, b.y);
                     }
+                }
+            }
+        };
+
+        frostLaser = new ExpLaserBulletType(170f, 130f){
+            {
+                width = 0.7f;
+                damageInc = 2.5f;
+                despawnEffect = Fx.none;
+                status = StatusEffects.freezing;
+                statusDuration = 3 * 60f;
+                hitUnitExpGain = 1.5f;
+                hitBuildingExpGain = 2f;
+                shootEffect = UnityFx.shootFlake;
+            }
+
+            public void freezePos(Bullet b, float x, float y){
+                var lvl =  getLevel(b);
+                if(!Vars.headless) UnityFx.freezeEffect.at(x, y, lvl / 3.5f + 10f, getColor(b));
+                if(!Vars.headless) UnitySounds.laserFreeze.at(x, y, 1f, 0.6f);
+        
+                Damage.status(b.team, x, y, 10f + lvl / 3.5f, status, 60f + lvl * 6f, true, true);
+                Damage.status(b.team, x, y, 10f + lvl / 3.5f, UnityStatusEffects.disabled, 2f * lvl, true, true);
+            }
+
+            @Override
+            public void init(Bullet b){
+                super.init(b);
+
+                setDamage(b);
+
+                Healthc target = Damage.linecast(b, b.x, b.y, b.rotation(), getLength(b));
+                b.data = target;
+
+                if(target instanceof Hitboxc hit){
+                    hit.collision(b, hit.x(), hit.y());
+                    b.collision(hit, hit.x(), hit.y());
+                    freezePos(b, hit.x(), hit.y());
+                    if(b.owner instanceof ExpBuildc exp) exp.incExp(hitUnitExpGain);
+                }else if(target instanceof Building tile && tile.collide(b)){
+                    tile.collision(b);
+                    hit(b, tile.x, tile.y);
+                    freezePos(b, tile.x, tile.y);
+                    if(b.owner instanceof ExpBuildc exp) exp.incExp(hitBuildingExpGain);
+                }else{
+                    b.data = new Vec2().trns(b.rotation(), length).add(b.x, b.y);
                 }
             }
         };

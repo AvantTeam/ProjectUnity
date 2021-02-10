@@ -26,6 +26,7 @@ import static unity.content.UnityBullets.*;
 
 public class UnityFx{
     private static int integer;
+
     public static final Effect
         //@formatter:off
     laserCharge = new Effect(38f, e -> {
@@ -35,7 +36,7 @@ public class UnityFx{
         });
     }),
 
-    laserChargeBegin = new Effect(38f, e -> {
+    laserChargeBegin = new Effect(60f, e -> {
         color(e.color);
         Fill.square(e.x, e.y, e.fin() * 3f, 45f);
     
@@ -43,11 +44,39 @@ public class UnityFx{
         Fill.square(e.x, e.y, e.fin() * 2f, 45f);
     }),
 
-    laserChargeShoot = new Effect(38f, e -> {
+    laserChargeShoot = new Effect(21f, e -> {
         color(e.color, Color.white, e.fout());
 
         for(var i=0; i<4; i++){
             Drawf.tri(e.x, e.y, 4f * e.fout(), 29f, e.rotation + 90f * i + e.finpow() * 112f);
+        }
+    }),
+
+    freezeEffect = new Effect(30f, e -> {
+        color(Color.white, e.color, e.fin());
+        stroke(e.fout() * 2);
+        Lines.poly(e.x, e.y, 6, 4f + e.rotation * 1.5f * e.finpow(), Mathf.randomSeed(e.id) * 360f);
+        color();
+        integer = 0;
+        randLenVectors(e.id, 5, e.rotation * 1.6f * e.fin() + 16f, e.fin() * 33f, 360f, (x, y) -> {
+            lineAngleCenter(e.x + x, e.y + y, e.finpow() * 60f, Mathf.randomSeed(e.id + (long)integer) * 2 + 2);
+            lineAngleCenter(e.x + x, e.y + y, e.finpow() * 60f + 60f, Mathf.randomSeed(e.id + (long)integer) * 2 + 2);
+            lineAngleCenter(e.x + x, e.y + y, e.finpow() * 60f + 120f, Mathf.randomSeed(e.id + (long)integer) * 2 + 2);
+            integer++;
+        });
+        randLenVectors(e.id + 1, 3, e.rotation * 2.1f * e.fin() + 7f, e.fin() * -19f, 360f, (x, y) -> {
+            lineAngleCenter(e.x + x, e.y + y, e.finpow() * 60f, Mathf.randomSeed(e.id + (long)integer) * 2 + 2);
+            lineAngleCenter(e.x + x, e.y + y, e.finpow() * 60f + 60f, Mathf.randomSeed(e.id + (long)integer) * 2 + 2);
+            lineAngleCenter(e.x + x, e.y + y, e.finpow() * 60f + 120f, Mathf.randomSeed(e.id + (long)integer) * 2 + 2);
+            integer++;
+        });
+    }),
+
+    shootFlake = new Effect(21f, e -> {
+        color(e.color, Color.white, e.fout());
+
+        for(int i = 0; i < 6; i++){
+            Drawf.tri(e.x, e.y, 3f * e.fout(), 12f, e.rotation + 30f + 60f * i);
         }
     }),
     
