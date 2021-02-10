@@ -1771,6 +1771,7 @@ public class UnityBlocks implements ContentList{
             reloadTime = 240f;
             powerUse = 260f;
             coolantMultiplier = 1.1f;
+            shootSound = UnitySounds.cubeBlast;
             shootType = new PointBlastLaserBulletType(580f){{
                 length = 320f;
                 lifetime = 17f;
