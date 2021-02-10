@@ -6,6 +6,7 @@ import arc.util.io.*;
 import mindustry.graphics.*;
 import mindustry.world.blocks.defense.turrets.*;
 import unity.entities.comp.*;
+import unity.graphics.*;
 
 public class ExpPowerTurret extends PowerTurret{
     /** Color of shoot effects. Shifts to second color as the turret levels up. */
@@ -31,7 +32,7 @@ public class ExpPowerTurret extends PowerTurret{
         public void drawSelect(){
             Drawf.dashCircle(x, y, 20f * 8f, team.color);
             int lvl = level();
-            if(lvl > 0 && rangeInc > 0) Drawf.dashCircle(x, y, range + rangeInc * lvl, getShootColor(lvl));
+            if(lvl > 0 && rangeInc > 0) Drawf.dashCircle(x, y, range + rangeInc * lvl, UnityPal.expColor);
         }
 
         @Override

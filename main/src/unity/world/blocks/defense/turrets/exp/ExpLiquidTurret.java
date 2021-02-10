@@ -1,12 +1,21 @@
 package unity.world.blocks.defense.turrets.exp;
 
+import arc.graphics.*;
+import arc.util.*;
 import arc.util.io.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.blocks.defense.turrets.*;
 import unity.entities.comp.*;
+import unity.graphics.*;
 
 public class ExpLiquidTurret extends LiquidTurret{
+    /** Color of shoot effects. Shifts to second color as the turret levels up. */
+    public Color fromColor = Pal.lancerLaser, toColor = Pal.sapBullet;
+    /** Increase in range with each level. I don't know how to get the expFields from here, if possible. */
+    public float rangeInc = -1f;
+
     public ExpLiquidTurret(String name){
         super(name);
         configurable = true;
@@ -18,6 +27,17 @@ public class ExpLiquidTurret extends LiquidTurret{
 
     public class ExpLiquidTurrettBuild extends LiquidTurretBuild implements ExpBuildc{
         public float exp = 0f;
+
+        public Color getShootColor(float lvl){
+            return Tmp.c1.set(fromColor).lerp(toColor, lvl);
+        }
+
+        @Override
+        public void drawSelect(){
+            Drawf.dashCircle(x, y, 20f * 8f, team.color);
+            int lvl = level();
+            if(lvl > 0 && rangeInc > 0) Drawf.dashCircle(x, y, range + rangeInc * lvl, UnityPal.expColor);
+        }
 
         @Override
         public boolean acceptLiquid(Building source, Liquid liquid){
