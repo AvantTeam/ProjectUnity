@@ -15,8 +15,10 @@ public class UnityStyles implements Loadable{
         creditst = new TextButtonStyle(){{
             font = Fonts.def;
             fontColor = Color.white;
-            up = atlas.drawable("unity-credits-banner");
+
+            up = atlas.drawable("unity-credits-banner-up");
             down = atlas.drawable("unity-credits-banner-down");
+            over = atlas.drawable("unity-credits-banner-over");
         }};
     }
 }
