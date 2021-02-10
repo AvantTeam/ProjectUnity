@@ -22,7 +22,7 @@ import unity.graphics.*;
 import static mindustry.Vars.*;
 
 public class UnityBullets implements ContentList{
-    public static BulletType laser, shardLaserFrag, shardLaser, frostLaser, coalBlaze, pyraBlaze, falloutLaser, catastropheLaser, calamityLaser, extinctionLaser, orb, shockBeam, currentStroke,
+    public static BulletType laser, shardLaserFrag, shardLaser, frostLaser, branchLaserFrag, branchLaser, coalBlaze, pyraBlaze, falloutLaser, catastropheLaser, calamityLaser, extinctionLaser, orb, shockBeam, currentStroke,
         shielderBullet, plasmaFragTriangle, plasmaTriangle, surgeBomb, pylonLightning, pylonLaser, pylonLaserSmall, exporb, monumentRailBullet, scarShrapnel, scarMissile, celsiusSmoke, kelvinSmoke,
         kamiBullet1, kamiLaser, kamiSmallLaser, supernovaLaser;
 
@@ -43,7 +43,6 @@ public class UnityBullets implements ContentList{
         laser = new ExpLaserBulletType(150f, 30f){{
                 width = 0.7f;
                 damageInc = 7f;
-                despawnEffect = Fx.none;
                 status = StatusEffects.shocked;
                 statusDuration = 3 * 60f;
                 hitUnitExpGain = hitBuildingExpGain = 2f;
@@ -62,7 +61,7 @@ public class UnityBullets implements ContentList{
 
             @Override
             public void draw(Bullet b){
-                if(b.data == null) b.data = (b.owner == null) ? Pal.lancerLaser : backColor.set(Pal.lancerLaser).lerp(Pal.sapBullet, ((ExpBuildc)b.owner).level() / 30f).cpy();
+                if(b.data == null) b.data = (b.owner == null) ? Pal.lancerLaser : backColor.set(Pal.lancerLaser).lerp(Pal.sapBullet, ((ExpBuildc)b.owner).levelf()).cpy();
                 Draw.color((Color)b.data);
                 Lines.stroke(2f);
                 Lines.lineAngleCenter(b.x, b.y, b.rotation(), 7f);
@@ -75,9 +74,7 @@ public class UnityBullets implements ContentList{
 
         shardLaser = new ExpLaserBulletType(150f, 30f){
             {
-                width = 0.7f;
                 damageInc = 5f;
-                despawnEffect = Fx.none;
                 status = StatusEffects.shocked;
                 statusDuration = 3 * 60f;
                 hitUnitExpGain = hitBuildingExpGain = 2f;
@@ -115,9 +112,7 @@ public class UnityBullets implements ContentList{
 
         frostLaser = new ExpLaserBulletType(170f, 130f){
             {
-                width = 0.7f;
                 damageInc = 2.5f;
-                despawnEffect = Fx.none;
                 status = StatusEffects.freezing;
                 statusDuration = 3 * 60f;
                 hitUnitExpGain = 1.5f;
@@ -158,6 +153,94 @@ public class UnityBullets implements ContentList{
                 }else{
                     b.data = new Vec2().trns(b.rotation(), length).add(b.x, b.y);
                 }
+            }
+        };
+
+        branchLaserFrag = new BasicBulletType(3.5f, 15f){
+            {
+                frontColor = Pal.lancerLaser;
+                backColor = Pal.lancerLaser.cpy().mul(0.7f);
+                width = height = 2f;
+                weaveScale = 0.6f;
+                weaveMag = 0.5f;
+                homingPower = 0.4f;
+                lifetime = 30f;
+                shootEffect = Fx.hitLancer;
+                hitEffect = despawnEffect = UnityFx.branchFragHit;
+                pierceCap = 10;
+                pierceBuilding = true;
+                splashDamageRadius = 4f;
+                splashDamage = 4f;
+                status = UnityStatusEffects.plasmaed;
+                statusDuration = 180f;
+            }
+
+            @Override
+            public void init(Bullet b){
+                b.data = new Trail(6);
+            }
+
+            public Color getColor(Bullet b){
+                return Tmp.c1.set(Pal.lancerLaser.cpy().lerp(Pal.sapBullet, 0.5f)).lerp(Pal.sapBullet, ((ExpBuildc)b.owner).levelf());
+            }
+
+            @Override
+            public void draw(Bullet b){
+                ((Trail)b.data).draw(frontColor, width);
+        
+                Draw.color(getColor(b));
+                Fill.square(b.x, b.y, width, b.rotation() + 45);
+                Draw.color();
+            }
+        
+            @Override
+            public void update(Bullet b){
+                super.update(b);
+        
+                ((Trail)b.data).update(b.x, b.y);
+            }
+        
+            @Override
+            public void hit(Bullet b, float x, float y){
+                super.hit(b, b.x, b.y);
+        
+                ((Trail)b.data).clear();
+            }
+        };
+
+        branchLaser = new ExpLaserBulletType(140f, 20f){
+            {
+                damageInc = 6f;
+                lengthInc = 2f;
+                status = StatusEffects.shocked;
+                statusDuration = 3 * 60f;
+                hitUnitExpGain = hitBuildingExpGain = 1f;
+                fragBullet = shardLaserFrag;
+                fromColor = Pal.lancerLaser.cpy().lerp(Pal.sapBullet, 0.5f);
+                toColor = Pal.sapBullet;
+                fragBullets = 3;
+                fragBullet = branchLaserFrag;
+            }
+
+            public void makeFrag(Bullet b, float x, float y){
+                for(int i = 0; i < fragBullets; i++){
+                    fragBullet.create(b, x, y, b.rotation() + i * 120f);
+                }
+            }
+
+            @Override
+            public void init(Bullet b){
+                super.init(b);
+
+                if(b.data instanceof Position point) makeFrag(b, point.getX(), point.getY());
+            }
+
+            @Override
+            public void hit(Bullet b){
+                hitEffect.at(b.x, b.y, b.rotation(), hitColor);
+                hitSound.at(b);
+        
+                Effect.shake(hitShake, hitShake, b);
             }
         };
 

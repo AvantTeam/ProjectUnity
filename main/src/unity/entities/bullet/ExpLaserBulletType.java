@@ -17,7 +17,7 @@ public class ExpLaserBulletType extends BulletType {
     /** Color of laser. Shifts to second color as the turret levels up. */
     public Color fromColor = Pal.lancerLaser, toColor = UnityPal.expLaser;
     /** Dimentions of laser */
-    public float width = 1, length;
+    public float width = 0.7f, length;
     /** Damage increase per owner level, if the owner can level up. */
     public float damageInc;
     /** Length increase per owner level, if the owner can level up. */
@@ -35,7 +35,8 @@ public class ExpLaserBulletType extends BulletType {
         hitSize = 0f;
         hitEffect = Fx.hitLiquid;
         shootEffect = Fx.hitLiquid;
-        lifetime = 16f;
+        lifetime = 18f;
+        despawnEffect = Fx.none;
         keepVelocity = false;
         collides = false;
         pierce = true;

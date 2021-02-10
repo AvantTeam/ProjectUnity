@@ -10,46 +10,43 @@ import mindustry.entities.bullet.*;
 import mindustry.graphics.*;
 
 public class ExpPowerChargeTurret extends ExpPowerTurret{
-    /** Charge color lerp based on level */
-    public Color fromColor = Pal.lancerLaser, toColor = Pal.sapBullet;
-    
     public ExpPowerChargeTurret(String name){
         super(name);
     }
 
     public class ExpPowerChargeTurretBuild extends ExpPowerTurretBuild{
-        public Color getShootColor(float lvl){
-            return Tmp.c1.set(fromColor).lerp(toColor, lvl);
-        }
-
         @Override
         public void shoot(BulletType ammo){
             useAmmo();
             float lvl = levelf();
     
-            tr.trns(rotation, size * Vars.tilesize / 2);
+            tr.trns(rotation, shootLength);
             chargeBeginEffect.at(x + tr.x, y + tr.y, rotation, getShootColor(lvl));
-            chargeSound.at(x + tr.x, y + tr.y, 1);
+            chargeSound.at(x + tr.x, y + tr.y, 1f);
     
             for(int i = 0; i < chargeEffects; i++){
                 Time.run(Mathf.random(chargeMaxDelay), () -> {
                     if(!isValid()) return;
-                    tr.trns(rotation, size * Vars.tilesize / 2f);
+                    tr.trns(rotation, shootLength);
                     chargeEffect.at(x + tr.x, y + tr.y, rotation, getShootColor(lvl));
                 });
             }
     
             charging = true;
     
-            Time.run(chargeTime, () -> {
-                if(!isValid()) return;
-                tr.trns(rotation, size * Vars.tilesize / 2f);
-                recoil = recoilAmount;
-                heat = 1f;
-                bullet(ammo, rotation + Mathf.range(inaccuracy));
-                effects();
-                charging = false;
-            });
+            for(var i = 0; i < shots; i++){
+                Time.run(burstSpacing * i, () -> {
+                    Time.run(chargeTime, () -> {
+                        if(!isValid()) return;
+                        tr.trns(rotation, shootLength, Mathf.range(xRand));
+                        recoil = recoilAmount;
+                        heat = 1f;
+                        bullet(ammo, rotation + Mathf.range(inaccuracy));
+                        effects();
+                        charging = false;
+                    });
+                });
+            }
         }
 
         @Override

@@ -11,13 +11,22 @@ import mindustry.type.StatusEffect;
 import unity.graphics.UnityPal;
 
 public class UnityStatusEffects implements ContentList{
-    public static StatusEffect disabled, radiation, reloadFatigue, blueBurn, molten, tpCoolDown, teamConverted;
+    public static StatusEffect disabled, plasmaed, radiation, reloadFatigue, blueBurn, molten, tpCoolDown, teamConverted;
 
     @Override
     public void load(){
         disabled = new StatusEffect("diabled"){{
             reloadMultiplier = 0f;
             speedMultiplier = 0f;
+        }};
+
+        plasmaed = new StatusEffect("plasmaed"){{
+            effectChance = 0.15f;
+            damage = 0.5f;
+            reloadMultiplier = 0.8f;
+            healthMultiplier = 0.9f;
+            damageMultiplier = 0.8f;
+            effect = UnityFx.plasmaedEffect;
         }};
 
         radiation = new StatusEffect("radiation"){

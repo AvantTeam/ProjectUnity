@@ -6,6 +6,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.Unit;
@@ -74,6 +75,22 @@ public class UnityFx{
         for(int i = 0; i < 6; i++){
             Drawf.tri(e.x, e.y, 3f * e.fout(), 12f, e.rotation + 30f + 60f * i);
         }
+    }),
+
+    plasmaedEffect = new Effect(50f, e -> {
+        color(Liquids.cryofluid.color, Color.white.cpy().mul(0.25f, 0.25f, 1f, e.fout()), e.fout() / 6f + Mathf.randomSeedRange(e.id, 0.1f));
+
+        Fill.square(e.x, e.y, e.fslope() * 2f, 45f);
+    }),
+
+    branchFragHit = new Effect(8f, e -> {
+        color(Color.white, Pal.lancerLaser, e.fin());
+    
+        stroke(0.5f + e.fout());
+        Lines.circle(e.x, e.y, e.fin() * 5f);
+    
+        stroke(e.fout());
+        Lines.circle(e.x, e.y, e.fin() * 6f);
     }),
     
     shootSmallBlaze = new Effect(22f, e -> {    //@formatter:on
