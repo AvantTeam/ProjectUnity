@@ -47,8 +47,8 @@ public class ExpBlock extends ExpType<Block>{
             if(b instanceof ExpBuildc build){
                 return new Bar(
                     () -> Core.bundle.get("explib.level") + " " + build.level(),
-                    () -> Tmp.c1.set(minLevelColor).lerp(maxLevelColor, Mathf.clamp(build.level() / maxLevel)),
-                    () -> Mathf.clamp(build.level() / maxLevel)
+                    () -> Tmp.c1.set(minLevelColor).lerp(maxLevelColor, build.levelf()),
+                    () -> build.levelf()
                 );
             }else{
                 throw new IllegalStateException("Building type for '" + type.localizedName + "' is not an instance of 'ExpBuildc'!");
@@ -61,8 +61,8 @@ public class ExpBlock extends ExpType<Block>{
                     () -> build.exp() < maxExp
                     ?    Core.bundle.get("explib.exp")
                     :   Core.bundle.get("explib.max"),
-                    () -> Tmp.c1.set(minExpColor).lerp(maxExpColor, build.levelf()),
-                    () -> build.levelf()
+                    () -> Tmp.c1.set(minExpColor).lerp(maxExpColor, build.expf()),
+                    () -> build.expf()
                 );
             }else{
                 throw new IllegalStateException("Building type for '" + type.localizedName + "' is not an instance of 'ExpBuildc'!");
