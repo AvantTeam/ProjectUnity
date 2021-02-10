@@ -980,6 +980,7 @@ public class UnityBlocks implements ContentList{
                 //block.addUpgrade(laserBreakthrough, 30);
 
                 block.addField(ExpFieldType.linear, ReloadTurret.class, "reloadTime", reloadTime, -1f);
+                block.setupFields();
             }
         };
 
