@@ -38,9 +38,9 @@ public class UnityBullets implements ContentList{
 
     @Override
     public void load(){
-        laser = new ExpLaserBulletType(150f, 30f, 30f){{
+        laser = new ExpLaserBulletType(150f, 30f){{
                 width = 1f;
-                damage = 30f;
+                damageInc = 7f;
                 despawnEffect = Fx.none;
                 status = StatusEffects.shocked;
                 statusDuration = 3 * 60f;

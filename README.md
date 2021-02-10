@@ -1,7 +1,7 @@
 # Project Unity
 
-[![Discord](https://img.shields.io/discord/782583108473978880.svg?color=7289da&label=AvantTeam&logo=discord&style=round-square)](https://discord.gg/V6ygvgGVqE)
-[![Made by 19 Authors](https://img.shields.io/badge/Made%20by-19%20Authors-blue?style=round-square)](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
+[![Discord](https://img.shields.io/discord/782583108473978880.svg?color=7289da&label=AvantTeam&logo=discord&style=flat-square)](https://discord.gg/V6ygvgGVqE)
+[![Made by 19 Authors](https://img.shields.io/badge/Made%20by-19%20Authors-blue?style=flat-square)](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
 
 The biggest [Mindustry](https://github.com/Anuken/Mindustry/) mod.
 
