@@ -20,7 +20,7 @@ import unity.graphics.*;
 import static mindustry.Vars.*;
 
 public class UnityBullets implements ContentList{
-    public static BulletType laser, coalBlaze, pyraBlaze, falloutLaser, catastropheLaser, calamityLaser, extinctionLaser, orb, shockBeam, currentStroke,
+    public static BulletType laser, shardLaserFrag, shardLaser, coalBlaze, pyraBlaze, falloutLaser, catastropheLaser, calamityLaser, extinctionLaser, orb, shockBeam, currentStroke,
         shielderBullet, plasmaFragTriangle, plasmaTriangle, surgeBomb, pylonLightning, pylonLaser, pylonLaserSmall, exporb, monumentRailBullet, scarShrapnel, scarMissile, celsiusSmoke, kelvinSmoke,
         kamiBullet1, kamiLaser, kamiSmallLaser, supernovaLaser;
 
@@ -39,14 +39,77 @@ public class UnityBullets implements ContentList{
     @Override
     public void load(){
         laser = new ExpLaserBulletType(150f, 30f){{
-                width = 1f;
+                width = 0.7f;
                 damageInc = 7f;
                 despawnEffect = Fx.none;
                 status = StatusEffects.shocked;
                 statusDuration = 3 * 60f;
-                hitUnitExpGain = 2f;
-                hitBuildingExpGain = 2f;
+                hitUnitExpGain = hitBuildingExpGain = 2f;
         }};
+
+        shardLaserFrag = new LaserBoltBulletType(2f, 10f){
+            {
+                lifetime = 20f;
+                pierceCap = 10;
+                pierceBuilding = true;
+                backColor = Color.white.cpy().lerp(Pal.lancerLaser, 0.1f);
+                frontColor = Color.white;
+                hitEffect = Fx.hitLancer;
+                despawnEffect = Fx.hitLancer;
+            }
+
+            @Override
+            public void draw(Bullet b){
+                if(b.data == null) b.data = (b.owner == null) ? Pal.lancerLaser : backColor.set(Pal.lancerLaser).lerp(Pal.sapBullet, ((ExpBuildc)b.owner).level() / 30f).cpy();
+                Draw.color((Color)b.data);
+                Lines.stroke(2f);
+                Lines.lineAngleCenter(b.x, b.y, b.rotation(), 7f);
+                Lines.stroke(1.3f);
+                Draw.color(frontColor);
+                Lines.lineAngleCenter(b.x, b.y, b.rotation(), 4f);
+                Draw.reset();
+            }
+        };
+
+        shardLaser = new ExpLaserBulletType(150f, 30f){
+            {
+                width = 0.7f;
+                damageInc = 5f;
+                despawnEffect = Fx.none;
+                status = StatusEffects.shocked;
+                statusDuration = 3 * 60f;
+                hitUnitExpGain = hitBuildingExpGain = 2f;
+                fragBullet = shardLaserFrag;
+                toColor = Pal.sapBullet;
+            }
+
+            @Override
+            public void hit(Bullet b){
+                hitEffect.at(b.x, b.y, b.rotation(), hitColor);
+                hitSound.at(b.x, b.y, hitSoundPitch, hitSoundVolume);
+        
+                Effect.shake(hitShake, hitShake, b);
+        
+                for(var i = 0; i < fragBullets; i++){
+                    var len = Mathf.random(1f, 7f);
+                    var a = b.rotation() + i * 45f;
+                    var target = Damage.linecast(b, b.x, b.y, b.rotation(), length);
+        
+                    b.data = target;
+        
+                    if(target instanceof Hitboxc hit){
+                        fragBullet.create(b, hit.x() + Angles.trnsx(a, len), hit.y() + Angles.trnsy(a, len), a);
+        
+                    }else if(target instanceof Building tile){
+                        if(tile.collide(b)){
+                            fragBullet.create(b, tile.x() + Angles.trnsx(a, len), tile.y() + Angles.trnsy(a, len), a);
+                        }
+                    }else{
+                        b.data = new Vec2().trns(b.rotation(), length).add(b.x, b.y);
+                    }
+                }
+            }
+        };
 
         /* TODO koruh bullets
         coalBlaze = new BulletType(3.35f, 32f){

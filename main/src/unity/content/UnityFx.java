@@ -28,6 +28,29 @@ public class UnityFx{
     private static int integer;
     public static final Effect
         //@formatter:off
+    laserCharge = new Effect(38f, e -> {
+        color(e.color);
+        randLenVectors(e.id, e.id % 3 + 1, 1f + 20f * e.fout(), e.rotation, 120f, (x, y) -> {
+            lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fslope() * 3f + 1f);
+        });
+    }),
+
+    laserChargeBegin = new Effect(38f, e -> {
+        color(e.color);
+        Fill.square(e.x, e.y, e.fin() * 3f, 45f);
+    
+        color();
+        Fill.square(e.x, e.y, e.fin() * 2f, 45f);
+    }),
+
+    laserChargeShoot = new Effect(38f, e -> {
+        color(e.color, Color.white, e.fout());
+
+        for(var i=0; i<4; i++){
+            Drawf.tri(e.x, e.y, 4f * e.fout(), 29f, e.rotation + 90f * i + e.finpow() * 112f);
+        }
+    }),
+    
     shootSmallBlaze = new Effect(22f, e -> {    //@formatter:on
         color(Pal.lightFlame, Pal.darkFlame, Pal.gray, e.fin());
         randLenVectors(e.id, 16, e.finpow() * 60f, e.rotation, 18f, (x, y) -> Fill.circle(e.x + x, e.y + y, 0.85f + e.fout() * 3.5f));

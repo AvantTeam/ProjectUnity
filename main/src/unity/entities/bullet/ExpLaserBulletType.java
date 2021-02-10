@@ -30,6 +30,7 @@ public class ExpLaserBulletType extends BulletType {
     public ExpLaserBulletType(float length, float damage){
         super(0.01f, damage);
         this.length = length;
+        hitSize = 0f;
         hitEffect = Fx.hitLiquid;
         shootEffect = Fx.hitLiquid;
         lifetime = 16f;
