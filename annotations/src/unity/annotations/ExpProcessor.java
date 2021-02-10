@@ -86,7 +86,6 @@ public class ExpProcessor extends BaseProcessor{
                     .addParameter(cName(UnlockableContent.class), "content")
                     .addParameter(tvName("T"), "exp")
                     .addStatement("map.put(content, exp)")
-                    .addStatement("exp.init()")
                 .build()
             );
         MethodSpec.Builder init = MethodSpec.methodBuilder("init").addModifiers(Modifier.PUBLIC, Modifier.STATIC)
