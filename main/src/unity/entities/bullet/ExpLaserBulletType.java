@@ -52,7 +52,7 @@ public class ExpLaserBulletType extends BulletType {
         if(b.owner instanceof ExpBuildc exp){
             return exp.level();
         }else{
-            return 1;
+            return 0;
         }
     }
 
@@ -60,18 +60,18 @@ public class ExpLaserBulletType extends BulletType {
         if(b.owner instanceof ExpBuildc exp){
             return exp.levelf();
         }else{
-            return 1f;
+            return 0f;
         }
     }
 
     public void setDamage(Bullet b){
-        if(b.owner instanceof ExpBuildc exp){
+        if(b.owner instanceof ExpBuildc){
             b.damage += getLevel(b) * damageInc * b.damageMultiplier();
         }
     }
 
     public Color getColor(Bullet b){
-        if(b.owner instanceof ExpBuildc exp){
+        if(b.owner instanceof ExpBuildc){
             return Tmp.c1.set(fromColor).lerp(toColor, getLevelf(b));
         }else{
             return fromColor;
@@ -79,7 +79,7 @@ public class ExpLaserBulletType extends BulletType {
     }
 
     public float getLength(Bullet b){
-        if(b.owner instanceof ExpBuildc exp){
+        if(b.owner instanceof ExpBuildc){
             return length + lengthInc * getLevel(b);
         }else{
             return length;
@@ -104,7 +104,7 @@ public class ExpLaserBulletType extends BulletType {
             hit(b, tile.x, tile.y);
             if(b.owner instanceof ExpBuildc exp) exp.incExp(hitBuildingExpGain);
         }else{
-            b.data = new Vec2().trns(b.rotation(), length).add(b.x, b.y);
+            b.data = new Vec2().trns(b.rotation(), getLength(b)).add(b.x, b.y);
         }
     }
 

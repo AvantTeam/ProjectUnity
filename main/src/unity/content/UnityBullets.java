@@ -61,7 +61,6 @@ public class UnityBullets implements ContentList{
 
             @Override
             public void draw(Bullet b){
-                if(b.data == null) b.data = (b.owner == null) ? Pal.lancerLaser : backColor.set(Pal.lancerLaser).lerp(Pal.sapBullet, ((ExpBuildc)b.owner).levelf()).cpy();
                 Draw.color((Color)b.data);
                 Lines.stroke(2f);
                 Lines.lineAngleCenter(b.x, b.y, b.rotation(), 7f);
@@ -82,31 +81,21 @@ public class UnityBullets implements ContentList{
                 toColor = Pal.sapBullet;
             }
 
+            public void makeFrag(Bullet b, float x, float y){
+                for(int i = 0; i < fragBullets; i++){
+                    Object data = getColor(b);
+                    fragBullet.create(b.owner, b.team, x, y, b.rotation() + i * 45f, -1f, 1f, 1f, data);
+                }
+            }
+
             @Override
-            public void hit(Bullet b){
+            public void hit(Bullet b, float x, float y){
                 hitEffect.at(b.x, b.y, b.rotation(), hitColor);
                 hitSound.at(b.x, b.y, hitSoundPitch, hitSoundVolume);
         
                 Effect.shake(hitShake, hitShake, b);
         
-                for(var i = 0; i < fragBullets; i++){
-                    var len = Mathf.random(1f, 7f);
-                    var a = b.rotation() + i * 45f;
-                    var target = Damage.linecast(b, b.x, b.y, b.rotation(), length);
-        
-                    b.data = target;
-        
-                    if(target instanceof Hitboxc hit){
-                        fragBullet.create(b, hit.x() + Angles.trnsx(a, len), hit.y() + Angles.trnsy(a, len), a);
-        
-                    }else if(target instanceof Building tile){
-                        if(tile.collide(b)){
-                            fragBullet.create(b, tile.x() + Angles.trnsx(a, len), tile.y() + Angles.trnsy(a, len), a);
-                        }
-                    }else{
-                        b.data = new Vec2().trns(b.rotation(), length).add(b.x, b.y);
-                    }
-                }
+                if(b.data instanceof Position pos) makeFrag(b, pos.getX(), pos.getT());
             }
         };
 
@@ -175,20 +164,19 @@ public class UnityBullets implements ContentList{
                 statusDuration = 180f;
             }
 
+            public Color c;
+
             @Override
             public void init(Bullet b){
+                c = (Color)b.data;
                 b.data = new Trail(6);
-            }
-
-            public Color getColor(Bullet b){
-                return Tmp.c1.set(Pal.lancerLaser.cpy().lerp(Pal.sapBullet, 0.5f)).lerp(Pal.sapBullet, ((ExpBuildc)b.owner).levelf());
             }
 
             @Override
             public void draw(Bullet b){
                 ((Trail)b.data).draw(frontColor, width);
         
-                Draw.color(getColor(b));
+                Draw.color(c);
                 Fill.square(b.x, b.y, width, b.rotation() + 45);
                 Draw.color();
             }
@@ -196,14 +184,12 @@ public class UnityBullets implements ContentList{
             @Override
             public void update(Bullet b){
                 super.update(b);
-        
                 ((Trail)b.data).update(b.x, b.y);
             }
         
             @Override
             public void hit(Bullet b, float x, float y){
                 super.hit(b, b.x, b.y);
-        
                 ((Trail)b.data).clear();
             }
         };
@@ -224,7 +210,8 @@ public class UnityBullets implements ContentList{
 
             public void makeFrag(Bullet b, float x, float y){
                 for(int i = 0; i < fragBullets; i++){
-                    fragBullet.create(b, x, y, b.rotation() + i * 120f);
+                    Object data = getColor(b);
+                    fragBullet.create(b.owner, b.team, x, y, b.rotation() + i * 120f, -1f, 1f, 1f, data);
                 }
             }
 
