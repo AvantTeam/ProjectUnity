@@ -123,6 +123,8 @@ public class UnityBullets implements ContentList{
                 hitUnitExpGain = 1.5f;
                 hitBuildingExpGain = 2f;
                 shootEffect = UnityFx.shootFlake;
+                fromColor = Liquids.cryofluid.color;
+                toColor = Color.cyan;
             }
 
             public void freezePos(Bullet b, float x, float y){
