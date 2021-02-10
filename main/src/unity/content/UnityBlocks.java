@@ -958,7 +958,7 @@ public class UnityBlocks implements ContentList{
                 chargeBeginEffect = UnityFx.laserChargeBegin;
                 heatColor = Color.red;
                 shootSound = Sounds.laser;
-                
+
                 shootType = UnityBullets.shardLaser;
 
                 buildVisibility = BuildVisibility.sandboxOnly;
@@ -972,6 +972,7 @@ public class UnityBlocks implements ContentList{
                 block.init();
 
                 block.maxLevel = 30;
+                block.maxExp = block.requiredExp(block.maxLevel);
 
                 //TODO port branch and breakthrough
                 //block.addUpgrade(laserBranch, 15);
