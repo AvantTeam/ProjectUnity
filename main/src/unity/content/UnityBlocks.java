@@ -908,6 +908,7 @@ public class UnityBlocks implements ContentList{
                 range = 140f;
                 inaccuracy = 0f;
                 targetAir = false;
+                shootSound = Sounds.pew_;
 
                 powerUse = 7f;
 
