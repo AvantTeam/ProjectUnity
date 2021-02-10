@@ -10,11 +10,13 @@ import arc.util.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
-import mindustry.gen.Sounds;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
+import mindustry.world.*;
 import mindustry.world.meta.*;
 import unity.annotations.Annotations.*;
+import unity.content.*;
 import unity.entities.comp.*;
 
 import java.lang.reflect.*;
@@ -37,7 +39,9 @@ public abstract class ExpType<T extends UnlockableContent>{
     public Seq<ExpUpgrade> upgrades = new Seq<>();
     public boolean enableUpgrade;
     public boolean hasUpgradeEffect = true;
-    public Effect upgradeEffect = Fx.none;
+    public float sparkleChance = 0.08f;
+    public Effect sparkleEffect = UnityFx.sparkleFx;
+    public Effect upgradeEffect = UnityFx.upgradeBlockFx;
     public Sound upgradeSound = Sounds.none;
 
     public ObjectMap<ExpFieldType, Seq<ExpField>> expFields = new ObjectMap<>();
@@ -62,7 +66,6 @@ public abstract class ExpType<T extends UnlockableContent>{
     }
 
     public void init(){
-        setStats();
         enableUpgrade = upgrades.size > 0;
     }
 
@@ -100,29 +103,31 @@ public abstract class ExpType<T extends UnlockableContent>{
         }
     }
 
-    protected void setStats(){
+    public void setStats(){
         type.stats.add(Stat.itemCapacity, "@", Core.bundle.format("explib.lvlAmount", maxLevel));
         type.stats.add(Stat.itemCapacity, "@", Core.bundle.format("explib.expAmount", requiredExp(maxLevel)));
 
-        type.stats.add(Stat.abilities, table -> {
-            table.table(t -> {
-                t.row();
-                t.add("$explib.upgrades");
-                t.row();
-
-                for(ExpUpgrade upgrade : upgrades){
-                    if(upgrade.min > maxLevel) continue;
-
-                    float size = 8f * 3f;
-
-                    t.add("[green]" + Core.bundle.get("explib.level") + " " + upgrade.min + "[] ");
-
-                    t.image(upgrade.type.icon(Cicon.small)).size(size).padRight(4).scaling(Scaling.fit);
-                    t.add(upgrade.type.localizedName).left();
+        if(upgrades.size > 0){
+            type.stats.add(Stat.abilities, table -> {
+                table.table(t -> {
                     t.row();
-                }
+                    t.add("$explib.upgrades");
+                    t.row();
+
+                    for(ExpUpgrade upgrade : upgrades){
+                        if(upgrade.min > maxLevel) continue;
+
+                        float size = 8f * 3f;
+
+                        t.add("[green]" + Core.bundle.get("explib.level") + " " + upgrade.min + "[] ");
+
+                        t.image(upgrade.type.icon(Cicon.small)).size(size).padRight(4).scaling(Scaling.fit);
+                        t.add(upgrade.type.localizedName).left();
+                        t.row();
+                    }
+                });
             });
-        });
+        }
     }
 
     public float requiredExp(int level){

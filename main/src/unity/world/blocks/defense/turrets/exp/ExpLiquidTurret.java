@@ -9,6 +9,7 @@ import unity.entities.comp.*;
 public class ExpLiquidTurret extends LiquidTurret{
     public ExpLiquidTurret(String name){
         super(name);
+        configurable = true;
         shootCone = 1;
         inaccuracy = 0;
         loopSound = Sounds.none;
@@ -31,6 +32,11 @@ public class ExpLiquidTurret extends LiquidTurret{
         @Override
         public void exp(float exp) {
             this.exp = exp;
+        }
+
+        @Override
+        public boolean consumesOrb(){
+            return exp() < expType().maxExp;
         }
 
         @Override

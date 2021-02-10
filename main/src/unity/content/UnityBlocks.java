@@ -918,7 +918,9 @@ public class UnityBlocks implements ContentList{
                 super.init();
 
                 ExpBlock block = ExpMeta.map(this);
-                block.init();
+                block.hasExp = true;
+                block.condConfig = true;
+                block.enableUpgrade = true;
 
                 block.maxLevel = 10;
 
@@ -927,7 +929,10 @@ public class UnityBlocks implements ContentList{
 
                 block.addField(ExpFieldType.linear, ReloadTurret.class, "reloadTime", reloadTime, -2f);
                 block.addField(ExpFieldType.bool, Turret.class, "targetAir", false, 5f);
+
                 block.setupFields();
+                block.setStats();
+                block.init();
             }
         };
 
@@ -967,7 +972,9 @@ public class UnityBlocks implements ContentList{
                 super.init();
 
                 ExpBlock block = ExpMeta.map(this);
-                block.init();
+                block.hasExp = true;
+                block.condConfig = true;
+                block.enableUpgrade = true;
 
                 block.maxLevel = 30;
                 block.maxExp = block.requiredExp(block.maxLevel);
@@ -977,7 +984,10 @@ public class UnityBlocks implements ContentList{
                 //block.addUpgrade(laserBreakthrough, 30);
 
                 block.addField(ExpFieldType.linear, ReloadTurret.class, "reloadTime", reloadTime, -1f);
+
                 block.setupFields();
+                block.setStats();
+                block.init();
             }
         };
 
@@ -1005,7 +1015,9 @@ public class UnityBlocks implements ContentList{
                 super.init();
 
                 ExpBlock block = ExpMeta.map(this);
-                block.init();
+                block.hasExp = true;
+                block.condConfig = true;
+                block.enableUpgrade = true;
 
                 block.maxLevel = 30;
                 block.maxExp = block.requiredExp(block.maxLevel);
@@ -1014,6 +1026,8 @@ public class UnityBlocks implements ContentList{
                 //block.addUpgrade(laserBreakthrough, 30);
 
                 block.setupFields();
+                block.setStats();
+                block.init();
             }
         };
 

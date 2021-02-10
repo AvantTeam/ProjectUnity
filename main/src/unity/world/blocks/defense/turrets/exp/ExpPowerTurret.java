@@ -7,6 +7,7 @@ import unity.entities.comp.*;
 public class ExpPowerTurret extends PowerTurret{
     public ExpPowerTurret(String name){
         super(name);
+        configurable = true;
         shootCone = 1;
         inaccuracy = 0;
     }

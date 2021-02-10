@@ -59,15 +59,11 @@ public class UnityFx{
         color();
         integer = 0;
         randLenVectors(e.id, 5, e.rotation * 1.6f * e.fin() + 16f, e.fin() * 33f, 360f, (x, y) -> {
-            lineAngleCenter(e.x + x, e.y + y, e.finpow() * 60f, Mathf.randomSeed(e.id + (long)integer) * 2 + 2);
-            lineAngleCenter(e.x + x, e.y + y, e.finpow() * 60f + 60f, Mathf.randomSeed(e.id + (long)integer) * 2 + 2);
-            lineAngleCenter(e.x + x, e.y + y, e.finpow() * 60f + 120f, Mathf.randomSeed(e.id + (long)integer) * 2 + 2);
+            UnityDrawf.snowFlake(e.x + x, e.y + y, e.finpow() * 60f, Mathf.randomSeed(e.id + (long)integer) * 2 + 2);
             integer++;
         });
         randLenVectors(e.id + 1, 3, e.rotation * 2.1f * e.fin() + 7f, e.fin() * -19f, 360f, (x, y) -> {
-            lineAngleCenter(e.x + x, e.y + y, e.finpow() * 60f, Mathf.randomSeed(e.id + (long)integer) * 2 + 2);
-            lineAngleCenter(e.x + x, e.y + y, e.finpow() * 60f + 60f, Mathf.randomSeed(e.id + (long)integer) * 2 + 2);
-            lineAngleCenter(e.x + x, e.y + y, e.finpow() * 60f + 120f, Mathf.randomSeed(e.id + (long)integer) * 2 + 2);
+            UnityDrawf.snowFlake(e.x + x, e.y + y, e.finpow() * 60f, Mathf.randomSeed(e.id + (long)integer) * 2 + 2);
             integer++;
         });
     }),

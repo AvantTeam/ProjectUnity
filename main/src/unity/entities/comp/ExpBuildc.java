@@ -3,6 +3,7 @@ package unity.entities.comp;
 import arc.*;
 import arc.Graphics.*;
 import arc.Graphics.Cursor.*;
+import arc.math.*;
 import arc.util.io.*;
 import mindustry.gen.*;
 import mindustry.world.*;
@@ -53,29 +54,30 @@ public interface ExpBuildc extends ExpEntityc<Block, ExpBlock>, Buildingc{
 
         if(block.size > expType().type.size){
             tile = Utils.getBestTile(this, block.size, expType().type.size);
-            if(tile == null) return;
+        }
+        if(tile == null) return;
 
-            tile.setBlock(block, team(), rotation());
-            expType().upgradeSound.at(this);
-            expType().upgradeEffect.at(tile.drawx(), tile.drawy(), block.size, expType().upgradeColor);
+        tile.setBlock(block, team(), rotation());
+        expType().upgradeSound.at(this);
+        if(Mathf.chance(expType().sparkleChance)) expType().sparkleEffect.at(tile.drawx(), tile.drawy(), block.size, expType().upgradeColor);
+        expType().upgradeEffect.at(tile.drawx(), tile.drawy(), block.size, expType().upgradeColor);
 
-            if(!net.client()){
-                Building build = tile.build;
+        if(!net.client()){
+            Building build = tile.build;
 
-                Core.app.post(() -> {
-                    if(build != null && build.isValid() && build.power != null && links.length > 0){
-                        for(int link : links){
-                            try{
-                                Tile powtile = world.tile(link);
+            Core.app.post(() -> {
+                if(build != null && build.isValid() && build.power != null && links.length > 0){
+                    for(int link : links){
+                        try{
+                            Tile powtile = world.tile(link);
 
-                                if(powtile.block() instanceof PowerNode){
-                                    powtile.build.configure(Integer.valueOf(link));
-                                }
-                            }catch(Throwable ignored){}
-                        }
+                            if(powtile.block() instanceof PowerNode){
+                                powtile.build.configure(Integer.valueOf(link));
+                            }
+                        }catch(Throwable ignored){}
                     }
-                });
-            }
+                }
+            });
         }
     }
 

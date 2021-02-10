@@ -28,6 +28,12 @@ public class UnityDrawf{
         2, 1, 2, 1, 9, 45, 9, 19, 2, 1, 2, 1, 14, 18, 14, 13
     };//xelo..
 
+    public static void snowFlake(float x, float y, float r, float s){
+        Lines.lineAngleCenter(x, y, 0 + r, s);
+        Lines.lineAngleCenter(x, y, 60 + r, s);
+        Lines.lineAngleCenter(x, y, 120 + r, s);
+    }
+
     public static void spark(float x, float y, float w, float h, float r){
         Drawf.tri(x, y, w, h, r);
         //is this order imporant?
