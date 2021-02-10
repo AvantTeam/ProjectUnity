@@ -95,7 +95,7 @@ public class UnityBullets implements ContentList{
         
                 Effect.shake(hitShake, hitShake, b);
         
-                if(b.data instanceof Position pos) makeFrag(b, pos.getX(), pos.getT());
+                if(b.data instanceof Position pos) makeFrag(b, pos.getX(), pos.getY());
             }
         };
 
