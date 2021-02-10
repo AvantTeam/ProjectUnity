@@ -80,6 +80,7 @@ public class UnityBullets implements ContentList{
                 statusDuration = 3 * 60f;
                 hitUnitExpGain = hitBuildingExpGain = 2f;
                 fragBullet = shardLaserFrag;
+                toColor = Pal.sapBullet;
             }
 
             @Override
