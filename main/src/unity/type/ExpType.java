@@ -5,6 +5,7 @@ import arc.audio.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.struct.*;
+import arc.struct.ObjectMap.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
@@ -19,6 +20,7 @@ import unity.entities.comp.*;
 import java.lang.reflect.*;
 
 @ExpBase
+@SuppressWarnings({"unchecked", "rawtypes"})
 public abstract class ExpType<T extends UnlockableContent>{
     public final T type;
 
@@ -39,19 +41,19 @@ public abstract class ExpType<T extends UnlockableContent>{
     public Sound upgradeSound = Sounds.none;
 
     public ObjectMap<ExpFieldType, Seq<ExpField>> expFields = new ObjectMap<>();
-    public Field[] linearInc;
+    public Entry<Class, Field>[] linearInc;
     public float[] linearIncStart;
     public float[] linearIncMul;
 
-    public Field[] expInc;
+    public Entry<Class, Field>[] expInc;
     public float[] expIncStart;
     public float[] expIncMul;
 
-    public Field[] rootInc;
+    public Entry<Class, Field>[] rootInc;
     public float[] rootIncStart;
     public float[] rootIncMul;
 
-    public Field[] boolInc;
+    public Entry<Class, Field>[] boolInc;
     public boolean[] boolIncStart;
     public float[] boolIncMul;
 
@@ -61,8 +63,10 @@ public abstract class ExpType<T extends UnlockableContent>{
 
     public void init(){
         setStats();
-
         enableUpgrade = upgrades.size > 0;
+    }
+
+    public void setupFields(){
         for(ExpFieldType type : ExpFieldType.all){
             try{
                 Seq<ExpField> fields = expFields.get(type, Seq::new);
@@ -72,14 +76,17 @@ public abstract class ExpType<T extends UnlockableContent>{
                 Field fIncStart = ExpType.class.getDeclaredField(type.name() + "IncStart");
                 Field fIncMul = ExpType.class.getDeclaredField(type.name() + "IncMul");
 
-                fInc.set(this, new Field[amount]);
+                fInc.set(this, (Entry<Class, Field>[])new Entry[amount]);
                 fIncStart.set(this, type == ExpFieldType.bool ? new boolean[amount] : new float[amount]);
                 fIncMul.set(this, new float[amount]);
 
                 for(int i = 0; i < fields.size; i++){
                     ExpField field = fields.get(i);
 
-                    ((Field[])fInc.get(this))[i] = field.field;
+                    Entry<Class, Field> entry = (((Entry<Class, Field>[])fInc.get(this))[i] = new Entry<>());
+                    entry.key = field.classType;
+                    entry.value = field.field;
+
                     if(type == ExpFieldType.bool){
                         ((boolean[])fIncStart.get(this))[i] = field.startBool;
                     }else{
@@ -151,7 +158,7 @@ public abstract class ExpType<T extends UnlockableContent>{
 
     public <E extends T> void addField(ExpFieldType type, Class<E> enclosing, String field, float sFloat, boolean sBool, float ints){
         try{
-            expFields.get(type, Seq::new).add(new ExpField(type, enclosing.getDeclaredField(field)){{
+            expFields.get(type, Seq::new).add(new ExpField(type, enclosing, enclosing.getDeclaredField(field)){{
                 startFloat = sFloat;
                 startBool = sBool;
                 intensity = ints;
@@ -174,30 +181,26 @@ public abstract class ExpType<T extends UnlockableContent>{
     }
 
     public void linearExp(int level) throws Exception{
-        if(linearInc == null) return;
         for(int i = 0; i < linearInc.length; i++){
-            linearInc[i].set(type, Math.max(linearIncStart[i] + linearIncMul[i] * level, 0f));
+            linearInc[i].value.set(linearInc[i].key.cast(type), Math.max(linearIncStart[i] + linearIncMul[i] * level, 0f));
         }
     }
 
     public void expExp(int level) throws Exception{
-        if(expInc == null) return;
         for(int i = 0; i < expInc.length; i++){
-            expInc[i].set(type, Math.max(expIncStart[i] * Mathf.pow(this.expIncMul[i], level), 0f));
+            expInc[i].value.set(expInc[i].key.cast(type), Math.max(expIncStart[i] * Mathf.pow(this.expIncMul[i], level), 0f));
         }
     }
 
     public void rootExp(int level) throws Exception{
-        if(rootInc == null) return;
         for(int i = 0; i < rootInc.length; i++) {
-            rootInc[i].set(type, Math.max(rootIncStart[i] + Mathf.sqrt(rootIncMul[i] * level), 0f));
+            rootInc[i].value.set(rootInc[i].key.cast(type), Math.max(rootIncStart[i] + Mathf.sqrt(rootIncMul[i] * level), 0f));
         }
     }
 
     public void boolExp(int level) throws Exception{
-        if(boolInc == null) return;
         for(int i = 0; i < boolInc.length; i++) {
-            boolInc[i].set(type, (boolIncStart[i]) ? (level < boolIncMul[i]) : (level >= boolIncMul[i]));
+            boolInc[i].value.set(boolInc[i].key.cast(type), (boolIncStart[i]) ? (level < boolIncMul[i]) : (level >= boolIncMul[i]));
         }
     }
 
@@ -213,14 +216,16 @@ public abstract class ExpType<T extends UnlockableContent>{
 
     public class ExpField{
         public final ExpFieldType type;
+        public final Class classType;
         public final Field field;
 
         public float startFloat = 0f;
         public boolean startBool = false;
         public float intensity = 1f;
 
-        public ExpField(ExpFieldType type, Field field){
+        public ExpField(ExpFieldType type, Class classType, Field field){
             this.type = type;
+            this.classType = classType;
             this.field = field;
         }
     }

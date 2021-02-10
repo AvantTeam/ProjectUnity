@@ -933,8 +933,6 @@ public class UnityBlocks implements ContentList{
                 super.init();
 
                 ExpBlock block = ExpMeta.map(this);
-                block.init();
-
                 block.maxLevel = 10;
 
                 block.addUpgrade(laserCharge, 10);
@@ -942,6 +940,7 @@ public class UnityBlocks implements ContentList{
 
                 block.addField(ExpFieldType.linear, ReloadTurret.class, "reloadTime", reloadTime, -2f);
                 block.addField(ExpFieldType.bool, Turret.class, "targetAir", false, 5f);
+                block.setupFields();
             }
         };
 
