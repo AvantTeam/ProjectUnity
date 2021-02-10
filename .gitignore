@@ -18,5 +18,3 @@ tools/.settings/
 *.classpath
 
 .kateproject
-
-build.bat
