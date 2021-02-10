@@ -2,17 +2,21 @@ package unity;
 
 import arc.*;
 import arc.func.*;
+import arc.scene.*;
+import arc.scene.style.*;
+import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.mod.*;
 import mindustry.mod.Mods.*;
+import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import unity.content.*;
 import unity.gen.*;
 import unity.mod.*;
-import unity.mod.ContributorList.*;
+import unity.ui.dialogs.*;
 import unity.util.*;
 
 import static mindustry.Vars.*;
@@ -41,6 +45,7 @@ public class Unity extends Mod{
         if(Core.assets != null){
             Core.assets.setLoader(WavefrontObject.class, new WavefrontObjectLoader(tree));
         }
+        
         if(!headless){
             Events.on(ContentInitEvent.class, e -> {
                 Regions.load();
@@ -50,6 +55,11 @@ public class Unity extends Mod{
                 UnityObjs.load();
                 UnitySounds.load();
                 UnityMusics.load();
+            });
+            
+            Events.on(ClientLoadEvent.class, e -> {
+                new CreditsDialog().show(); //currently for testing.
+                addCredits();
             });
         }else{
             UnityObjs.load();
@@ -79,44 +89,7 @@ public class Unity extends Mod{
         if(Core.settings != null){
             Core.settings.getBoolOnce("unity-install", () -> {
                 Events.on(ClientLoadEvent.class, e -> {
-                    Func<String, String> stringf = value -> Core.bundle.get("mod." + value);
-
-                    Time.runTask(10f, () -> {
-                        //TODO make it also on the about dialog
-                        BaseDialog dialog = new BaseDialog("@credits");
-                        var cont = dialog.cont;
-
-                        cont.table(t -> {
-                            t.add("@mod.credits.text").fillX().pad(3f).wrap().get().setAlignment(Align.center);
-                            t.row();
-
-                            t.add("@mod.credits.bottom-text").fillX().pad(3f).wrap().get().setAlignment(Align.center);
-                            t.row();
-                        }).pad(3f);
-
-                        cont.row();
-
-                        cont.pane(b -> {
-                            for(ContributionType type : ContributionType.all){
-                                Seq<String> list = ContributorList.getBy(type);
-                                if(list.size <= 0) continue;
-
-                                b.table(t -> {
-                                    t.add(stringf.get(type.name())).pad(3f).center();
-                                    t.row();
-                                    t.pane(p -> {
-                                        for(String c : list){
-                                            p.add("[lightgray]" + c).left().pad(3f).padLeft(6f).padRight(6f);
-                                            p.row();
-                                        }
-                                    });
-                                }).pad(6f).top();
-                            }
-                        }).fillX();
-
-                        dialog.addCloseButton();
-                        dialog.show();
-                    });
+                    Time.runTask(5f, CreditsDialog::showList);
                 });
             });
         }
@@ -150,7 +123,25 @@ public class Unity extends Mod{
         UnityEntityMapping.init();
     }
 
-    /** {@code unity.Unity.print();} for copypaste */
+    private void addCredits(){ //TODO make it actually work
+        CreditsDialog credits = new CreditsDialog();
+        Cell menuc = ((Table)((Group)ui.menuGroup.getChildren().get(0)).getChildren().get(1)).getCells().get(1);
+        Table buttons = ((Table)menuc.get());
+        
+        buttons.row();
+        
+        if(mobile){
+            //TODO button for mobile
+        }else{
+            buttons.button(
+                "Project Unity",
+                new TextureRegionDrawable(Core.atlas.find("unity-icon-ammo-normal")),
+                Styles.clearToggleMenut,
+                credits::show
+            ).marginLeft(11f);
+        }
+    }
+
     public static void print(Object... args){
         StringBuilder h = new StringBuilder();
         if(args == null) h.append("null");

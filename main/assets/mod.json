@@ -1,9 +1,9 @@
 {
     "name": "unity",
     "displayName": "Project Unity",
-    "author": "A lot of People",
-    "description": "Founder: Eye of Darkness\n[cyan]Java: younggam\n GlennFolker\n JerichoFletcher\n Gdeft\n[pink] sk7725",
-    "version": "0.4",
-    "minGameVersion": 123,
+    "author": "The Avant Team",
+    "description": "A big-collaboration Mindustry mod created by many authors from the Mindustry modding community.",
+    "version": "0.1",
+    "minGameVersion": 124.1,
     "main": "unity.Unity"
 }
