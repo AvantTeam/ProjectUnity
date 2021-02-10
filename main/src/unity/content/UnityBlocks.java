@@ -920,6 +920,8 @@ public class UnityBlocks implements ContentList{
                 super.init();
 
                 ExpBlock block = ExpMeta.map(this);
+                block.init();
+
                 block.maxLevel = 10;
 
                 block.addUpgrade(laserCharge, 10);
