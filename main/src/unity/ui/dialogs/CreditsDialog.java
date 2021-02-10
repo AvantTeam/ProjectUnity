@@ -17,7 +17,7 @@ import unity.mod.ContributorList.*;
 
 public class CreditsDialog extends BaseDialog{
     static Func<String, String> stringf = value -> Core.bundle.get("mod." + value);
-    
+
     public CreditsDialog(){
         super("@credits");
 
@@ -28,7 +28,7 @@ public class CreditsDialog extends BaseDialog{
         shown(this::setup);
         onResize(this::setup);
     }
-    
+
     void setup(){
         cont.clear();
         buttons.clear();
@@ -42,7 +42,7 @@ public class CreditsDialog extends BaseDialog{
         for(LinkEntry link : ModLinks.getLinks()){
             Table table = new Table(Tex.underline);
             table.margin(0);
-            
+
             table.table(img -> {
                 img.image().height(h - 5).width(40f).color(link.color);
                 img.row();
@@ -73,7 +73,7 @@ public class CreditsDialog extends BaseDialog{
         shown(() -> Time.run(1f, () -> Core.scene.setScrollFocus(pane)));
 
         cont.add(pane).growX();
-        
+
         addCloseButton();
 
         buttons.button("@credits", CreditsDialog::showList).size(200f, 64f);
@@ -87,7 +87,7 @@ public class CreditsDialog extends BaseDialog{
 
     public static void showList(){
         BaseDialog dialog = new BaseDialog("@credits");
-        
+
         dialog.cont.table(t -> {
             t.add("@mod.credits.text").fillX().pad(3f).wrap().get().setAlignment(Align.center);
             t.row();
@@ -95,9 +95,9 @@ public class CreditsDialog extends BaseDialog{
             t.add("@mod.credits.bottom-text").fillX().pad(3f).wrap().get().setAlignment(Align.center);
             t.row();
         }).pad(3f);
-        
+
         dialog.cont.row();
-        
+
         dialog.cont.pane(b -> {
             for(ContributionType type : ContributionType.all){
                 Seq<String> list = ContributorList.getBy(type);
@@ -120,11 +120,11 @@ public class CreditsDialog extends BaseDialog{
         dialog.addCloseButton();
         dialog.show();
     }
-    
+
     static class ModLinks{
         private static LinkEntry[] links;
-        
-        private static void init(){
+
+        static{
             links = new LinkEntry[]{
                 new LinkEntry("avant-discord", "https://discord.gg/V6ygvgGVqE", Icon.discord, Color.valueOf("7289da")),
                 new LinkEntry("changelog", "https://github.com/AvantTeam/ProjectUnity/releases", Icon.list, Pal.accent.cpy()),
@@ -132,10 +132,8 @@ public class CreditsDialog extends BaseDialog{
                 new LinkEntry("bug", "https://github.com/AvantTeam/ProjectUnity/issues/new", Icon.wrench, Color.valueOf("ec7458"))
             };
         }
-        
+
         public static LinkEntry[] getLinks(){
-            if(links == null) init();
-            
             return links;
         }
     }

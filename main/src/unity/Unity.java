@@ -3,26 +3,21 @@ package unity;
 import arc.*;
 import arc.func.*;
 import arc.scene.*;
-import arc.scene.style.*;
-import arc.scene.ui.layout.*;
-import arc.struct.*;
 import arc.util.*;
 import mindustry.mod.*;
 import mindustry.mod.Mods.*;
-import mindustry.ui.*;
-import mindustry.ui.dialogs.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import unity.content.*;
 import unity.gen.*;
 import unity.mod.*;
+import unity.ui.*;
 import unity.ui.dialogs.*;
 import unity.util.*;
 
 import static mindustry.Vars.*;
 
 public class Unity extends Mod{
-    public static final String githubURL = "https://github.com/AvantTeam/ProjectUnity";
     public static MusicHandler musicHandler;
     public static UnityAntiCheat antiCheat;
 
@@ -44,8 +39,9 @@ public class Unity extends Mod{
 
         if(Core.assets != null){
             Core.assets.setLoader(WavefrontObject.class, new WavefrontObjectLoader(tree));
+            Core.assets.load(new UnityStyles());
         }
-        
+
         if(!headless){
             Events.on(ContentInitEvent.class, e -> {
                 Regions.load();
@@ -56,11 +52,8 @@ public class Unity extends Mod{
                 UnitySounds.load();
                 UnityMusics.load();
             });
-            
-            Events.on(ClientLoadEvent.class, e -> {
-                new CreditsDialog().show(); //currently for testing.
-                addCredits();
-            });
+
+            Events.on(ClientLoadEvent.class, e -> addCredits());
         }else{
             UnityObjs.load();
             UnitySounds.load();
@@ -123,22 +116,23 @@ public class Unity extends Mod{
         UnityEntityMapping.init();
     }
 
-    private void addCredits(){ //TODO make it actually work
-        CreditsDialog credits = new CreditsDialog();
-        Cell menuc = ((Table)((Group)ui.menuGroup.getChildren().get(0)).getChildren().get(1)).getCells().get(1);
-        Table buttons = ((Table)menuc.get());
-        
-        buttons.row();
-        
-        if(mobile){
-            //TODO button for mobile
-        }else{
-            buttons.button(
-                "Project Unity",
-                new TextureRegionDrawable(Core.atlas.find("unity-icon-ammo-normal")),
-                Styles.clearToggleMenut,
-                credits::show
-            ).marginLeft(11f);
+    protected void addCredits(){
+        try{
+            CreditsDialog credits = new CreditsDialog();
+            Group group = (Group)ui.menuGroup.getChildren().first();
+
+            if(mobile){
+                //TODO button for mobile
+            }else{
+                group.fill(c ->
+                    c.bottom().left()
+                        .button("", UnityStyles.creditst, credits::show)
+                        .size(84, 45)
+                        .name("unity credits")
+                );
+            }
+        }catch(Throwable t){
+            Log.err("Couldn't create Unity's credits button", t);
         }
     }
 
