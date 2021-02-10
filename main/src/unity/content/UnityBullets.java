@@ -14,6 +14,7 @@ import mindustry.entities.bullet.*;
 import mindustry.graphics.*;
 import mindustry.io.*;
 import mindustry.ctype.*;
+import unity.Unity;
 import unity.entities.bullet.*;
 import unity.entities.comp.*;
 import unity.gen.*;
@@ -60,8 +61,17 @@ public class UnityBullets implements ContentList{
             }
 
             @Override
+            public void init(Bullet b){
+                b.fdata = (float)b.data;
+            }
+
+            public Color getColor(Bullet b){
+                return Tmp.c1.set(Pal.lancerLaser.cpy().lerp(Pal.sapBullet, 0.5f)).lerp(Pal.sapBullet, b.fdata);
+            }
+
+            @Override
             public void draw(Bullet b){
-                Draw.color((Color)b.data);
+                Draw.color(getColor(b));
                 Lines.stroke(2f);
                 Lines.lineAngleCenter(b.x, b.y, b.rotation(), 7f);
                 Lines.stroke(1.3f);
@@ -81,21 +91,32 @@ public class UnityBullets implements ContentList{
                 toColor = Pal.sapBullet;
             }
 
-            public void makeFrag(Bullet b, float x, float y){
-                for(int i = 0; i < fragBullets; i++){
-                    Object data = getColor(b);
-                    fragBullet.create(b.owner, b.team, x, y, b.rotation() + i * 45f, -1f, 1f, 1f, data);
-                }
-            }
-
             @Override
             public void hit(Bullet b, float x, float y){
-                hitEffect.at(b.x, b.y, b.rotation(), hitColor);
-                hitSound.at(b.x, b.y, hitSoundPitch, hitSoundVolume);
+                hitEffect.at(x, y, b.rotation(), hitColor);
+                hitSound.at(x, y, hitSoundPitch, hitSoundVolume);
         
                 Effect.shake(hitShake, hitShake, b);
         
-                if(b.data instanceof Position pos) makeFrag(b, pos.getX(), pos.getT());
+                for(var i = 0; i < fragBullets; i++){
+                    var len = Mathf.random(1f, 7f);
+                    var a = b.rotation() + Mathf.randomSeed(b.id, 360f) + i * 360f/fragBullets;
+                    var target = Damage.linecast(b, x, y, b.rotation(), length);
+        
+                    Object data = getLevelf(b);
+                    b.data = target;
+        
+                    if(target instanceof Hitboxc hit){
+                        fragBullet.create(b.owner, b.team, hit.x() + Angles.trnsx(a, len), hit.y() + Angles.trnsy(a, len), a, -1f, 1f, 1f, data);
+        
+                    }else if(target instanceof Building tile){
+                        if(tile.collide(b)){
+                            fragBullet.create(b.owner, b.team, tile.x() + Angles.trnsx(a, len), tile.y() + Angles.trnsy(a, len), a, -1f, 1f, 1f, data);
+                        }
+                    }else{
+                        b.data = new Vec2().trns(b.rotation(), length).add(b.x, b.y);
+                    }
+                }
             }
         };
 
@@ -164,19 +185,21 @@ public class UnityBullets implements ContentList{
                 statusDuration = 180f;
             }
 
-            public Color c;
-
             @Override
             public void init(Bullet b){
-                c = (Color)b.data;
+                b.fdata = (float)b.data;
                 b.data = new Trail(6);
+            }
+
+            public Color getColor(Bullet b){
+                return Tmp.c1.set(Pal.lancerLaser.cpy().lerp(Pal.sapBullet, 0.5f)).lerp(Pal.sapBullet, b.fdata);
             }
 
             @Override
             public void draw(Bullet b){
-                ((Trail)b.data).draw(frontColor, width);
+                if(b.data instanceof Trail tr) tr.draw(frontColor, width);
         
-                Draw.color(c);
+                Draw.color(getColor(b));
                 Fill.square(b.x, b.y, width, b.rotation() + 45);
                 Draw.color();
             }
@@ -184,13 +207,13 @@ public class UnityBullets implements ContentList{
             @Override
             public void update(Bullet b){
                 super.update(b);
-                ((Trail)b.data).update(b.x, b.y);
+                if(b.data instanceof Trail tr) tr.update(b.x, b.y);
             }
         
             @Override
             public void hit(Bullet b, float x, float y){
-                super.hit(b, b.x, b.y);
-                ((Trail)b.data).clear();
+                super.hit(b, x, y);
+                if(b.data instanceof Trail tr) tr.clear();
             }
         };
 
@@ -208,10 +231,9 @@ public class UnityBullets implements ContentList{
                 fragBullet = branchLaserFrag;
             }
 
-            public void makeFrag(Bullet b, float x, float y){
+            public void makeFrag(Bullet b, float x, float y, Object color){
                 for(int i = 0; i < fragBullets; i++){
-                    Object data = getColor(b);
-                    fragBullet.create(b.owner, b.team, x, y, b.rotation() + i * 120f, -1f, 1f, 1f, data);
+                    fragBullet.create(b.owner, b.team, x, y, b.rotation() + Mathf.randomSeed(b.id, 360f) + i * 360f/fragBullets, -1f, 1f, 1f, color);
                 }
             }
 
@@ -219,12 +241,12 @@ public class UnityBullets implements ContentList{
             public void init(Bullet b){
                 super.init(b);
 
-                if(b.data instanceof Position point) makeFrag(b, point.getX(), point.getY());
+                if(b.data instanceof Position point) makeFrag(b, point.getX(), point.getY(), getLevelf(b));
             }
 
             @Override
-            public void hit(Bullet b){
-                hitEffect.at(b.x, b.y, b.rotation(), hitColor);
+            public void hit(Bullet b, float x, float y){
+                hitEffect.at(x, y, b.rotation(), hitColor);
                 hitSound.at(b);
         
                 Effect.shake(hitShake, hitShake, b);

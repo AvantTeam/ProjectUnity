@@ -65,25 +65,15 @@ public class ExpLaserBulletType extends BulletType {
     }
 
     public void setDamage(Bullet b){
-        if(b.owner instanceof ExpBuildc){
-            b.damage += getLevel(b) * damageInc * b.damageMultiplier();
-        }
+        b.damage += damageInc * getLevel(b) * b.damageMultiplier();
     }
 
     public Color getColor(Bullet b){
-        if(b.owner instanceof ExpBuildc){
-            return Tmp.c1.set(fromColor).lerp(toColor, getLevelf(b));
-        }else{
-            return fromColor;
-        }
+        return Tmp.c1.set(fromColor).lerp(toColor, getLevelf(b));
     }
 
     public float getLength(Bullet b){
-        if(b.owner instanceof ExpBuildc){
-            return length + lengthInc * getLevel(b);
-        }else{
-            return length;
-        }
+        return length + lengthInc * getLevel(b);
     }
 
     @Override

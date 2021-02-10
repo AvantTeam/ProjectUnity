@@ -1044,7 +1044,7 @@ public class UnityBlocks implements ContentList{
                 coolantMultiplier = 2.25f;
                 powerUse = 15f;
                 targetAir = true;
-                range = 20f * 8f;
+                range = 150f;
 
                 chargeTime = 50f;
                 chargeMaxDelay = 30f;
