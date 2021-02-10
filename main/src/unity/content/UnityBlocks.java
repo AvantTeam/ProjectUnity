@@ -30,7 +30,7 @@ import unity.util.*;
 import unity.world.blocks.*;
 import unity.world.blocks.defense.*;
 import unity.world.blocks.defense.turrets.*;
-import unity.world.blocks.defense.turrets.exp.ExpPowerTurret;
+import unity.world.blocks.defense.turrets.exp.*;
 import unity.world.blocks.distribution.*;
 import unity.world.blocks.logic.*;
 import unity.world.blocks.power.*;
@@ -833,21 +833,7 @@ public class UnityBlocks implements ContentList{
             unitType = UnityUnitTypes.cache;
         }};
 
-        /*laserTurret = new ExpPowerTurret("laser-turret", 10){{
-            requirements(Category.turret, with(Items.copper, 160, Items.lead, 110, Items.silicon, 90));
-            size = 2;
-            health = 800;
-            range = 140f;
-            coolantMultiplier = 2f;
-            shootCone = 1f;
-            inaccuracy = 0f;
-            powerUse = 7f;
-            shootType = UnityBullets.laser;
-            addExpField("linear", "reloadTime", 35, -2);
-            addExpField("bool", "targetAir", 0, 5);
-        }};
-
-        inferno = new ExpItemTurret("inferno", 10){{
+        /*inferno = new ExpItemTurret("inferno", 10){{
             requirements(Category.turret, with(Items.copper, 150, Items.lead, 165, Items.graphite, 120, Items.silicon, 130));
             ammo(Items.coal, UnityBullets.coalBlaze, Items.pyratite, UnityBullets.pyraBlaze);
             size = 3;
@@ -945,7 +931,55 @@ public class UnityBlocks implements ContentList{
             }
         };
 
-        laserCharge = new ExpPowerTurret("charge-laser-turret");
+        laserCharge = new ExpPowerChargeTurret("charge-laser-turret"){
+            {
+                requirements(Category.turret, with(Items.copper, 190, Items.silicon, 110, Items.titanium, 15));
+                size = 2;
+                health = 1400;
+
+                reloadTime = 60f;
+                coolantMultiplier = 2f;
+                shootCone = 1f;
+                inaccuracy = 0f;
+                range = 140f;
+                chargeTime = 50f;
+                chargeMaxDelay = 30f;
+                chargeEffects = 4;
+                recoilAmount = 2f;
+                cooldown = 0.03f;
+                targetAir = true;
+                shootShake = 2f;
+
+                powerUse = 7f;
+
+                shootEffect = UnityFx.laserChargeShoot;
+                smokeEffect = Fx.none;
+                chargeEffect = UnityFx.laserCharge;
+                chargeBeginEffect = UnityFx.laserChargeBegin;
+                heatColor = Color.red;
+                shootSound = Sounds.laser;
+                
+                shootType = UnityBullets.shardLaser;
+
+                buildVisibility = BuildVisibility.sandboxOnly;
+            }
+
+            @Override
+            public void init(){
+                super.init();
+
+                ExpBlock block = ExpMeta.map(this);
+                block.init();
+
+                block.maxLevel = 30;
+
+                //TODO port branch and breakthrough
+                //block.addUpgrade(laserBranch, 15);
+                //block.addUpgrade(laserBreakthrough, 30);
+
+                block.addField(ExpFieldType.linear, ReloadTurret.class, "reloadTime", reloadTime, -1f);
+            }
+        };
 
         laserFrost = new ExpPowerTurret("frost-laser-turret");
 
