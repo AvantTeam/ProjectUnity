@@ -986,7 +986,7 @@ public class UnityBlocks implements ContentList{
                 block.maxExp = block.requiredExp(block.maxLevel);
 
                 block.addUpgrade(laserBranch, 15);
-                block.addUpgrade(laserFractal, 15);
+                //block.addUpgrade(laserFractal, 15);
                 block.addUpgrade(laserBreakthrough, 30);
 
                 block.addField(ExpFieldType.linear, ReloadTurret.class, "reloadTime", reloadTime, -1f);
