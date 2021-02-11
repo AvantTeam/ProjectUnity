@@ -3,9 +3,13 @@ package unity.entities.comp;
 import arc.*;
 import arc.Graphics.*;
 import arc.Graphics.Cursor.*;
+import arc.graphics.*;
 import arc.math.*;
+import arc.scene.ui.layout.*;
+import arc.util.*;
 import arc.util.io.*;
 import mindustry.gen.*;
+import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.power.*;
 import unity.annotations.Annotations.*;
@@ -17,6 +21,11 @@ import unity.util.*;
 import static mindustry.Vars.*;
 
 public interface ExpBuildc extends ExpEntityc<Block, ExpBlock>, Buildingc{
+    @Initialize(eval = "false")
+    boolean checked();
+
+    void checked(boolean checked);
+
     @Override
     default ExpBlock expType(){
         ExpType<?> type = ExpMeta.map(block());
@@ -41,8 +50,32 @@ public interface ExpBuildc extends ExpEntityc<Block, ExpBlock>, Buildingc{
         ExpEntityc.super.killed();
     }
 
-    default void upgrade(int i){
-        var upgrade = expType().upgrades.get(i);
+    @Override
+    default void upgradeDefault(){
+        ExpEntityc.super.upgradeDefault();
+        expType().upgradeEffect.at(this, block().size);
+
+        if(expType().enableUpgrade){
+            if(
+                !Structs.eq(currentUpgrades(level() - 1), currentUpgrades(level())) &&
+                currentUpgrades(level()).length > 0
+            ){
+                checked(false);
+            }
+
+            if(!headless && control.input.frag.config.getSelectedTile() == this){
+                control.input.frag.config.hideConfig();
+            }
+        }
+    }
+
+    @Override
+    default void sparkle(){
+        expType().sparkleEffect.at(x(), y(), block().size, expType().upgradeColor);
+    }
+
+    default void upgrade(int index){
+        var upgrade = expType().upgrades.get(index);
         if(level() >= upgrade.min && level() <= upgrade.max){
             upgradeBlock(upgrade.type);
         }
@@ -82,9 +115,95 @@ public interface ExpBuildc extends ExpEntityc<Block, ExpBlock>, Buildingc{
     }
 
     @Override
+    default void buildConfiguration(Table table){
+        expBuildConfiguration(table);
+    }
+
+    default void expBuildConfiguration(Table table){
+        if(!expType().enableUpgrade){
+            return;
+        }
+
+        checked(true);
+
+        int level = level();
+        if(!expType().condConfig){
+            upgradeTable(table, level);
+        }else{
+            if(currentUpgrades(level).length == 0){
+                return;
+            }
+
+            table.table(t -> upgradeTable(t, level));
+            table.row();
+            table.image().pad(2f).width(130f).height(4f).color(expType().upgradeColor);
+            table.row();
+        }
+    }
+
+    default void upgradeTable(Table table, int level){
+        var upgrades = currentUpgrades(level);
+        if(upgrades.length == 0) return;
+
+        int[] i = {0};
+        for(; i[0] < upgrades.length; i[0]++){
+            Block block = upgrades[i[0]].type;
+            table.table(t -> {
+                t.background(Tex.button);
+                t.image(block.icon(Cicon.medium)).size(38).padRight(2);
+
+                t.table(info -> {
+                    info.left();
+                    info.add("[green]" + block.localizedName + "[]\n" + Core.bundle.get("explib.level.short") +
+                        " [" + ((upgrades[i[0]].min == level)
+                            ? "green" : "accent") +
+                        "]" +
+                    level + "[]/" + upgrades[i[0]].min);
+                }).fillX().growX();
+
+                infoButton(t, block);
+                if(upgrades[i[0]].min == level){
+                    Styles.emptyi.imageUpColor = expType().upgradeColor;
+                }
+
+                upgradeButton(t, upgrades[i[0]].index(), level);
+                if(upgrades[i[0]].min == level){
+                    Styles.emptyi.imageUpColor = Color.white;
+                }
+            }).height(50).growX();
+
+            if(i[0] < upgrades.length - 1) table.row();
+        }
+    }
+
+    default void infoButton(Table table, Block block){
+        table.button(Icon.infoCircle, Styles.emptyi, () -> {
+            ui.content.show(block);
+        }).size(40);
+    }
+
+    default void upgradeButton(Table table, int index, int level){
+        table.button(Icon.up, Styles.emptyi, () -> {
+            control.input.frag.config.hideConfig();
+            configure(Integer.valueOf(index));
+        }).size(40);
+    }
+
+    default ExpType<Block>.ExpUpgrade[] currentUpgrades(int level){
+        return expType().upgradesPerLevel[level];
+    }
+
+    @Override
     @MethodPriority(-1)
     default void update(){
         ExpEntityc.super.update();
+    }
+
+    @Override
+    default void updateTile(){
+        if(expType().enableUpgrade && !checked() && Mathf.chance(expType().sparkleChance)){
+            sparkle();
+        }
     }
 
     @Override

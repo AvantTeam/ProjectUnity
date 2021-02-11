@@ -1,6 +1,7 @@
 package unity.world.blocks.defense.turrets.exp;
 
 import arc.graphics.*;
+import arc.scene.ui.layout.Table;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.graphics.*;
@@ -12,6 +13,7 @@ public class ExpPowerTurret extends PowerTurret{
     /** Color of shoot effects. Shifts to second color as the turret levels up. */
     public Color fromColor = Pal.lancerLaser, toColor = Pal.sapBullet;
     /** Increase in range with each level. I don't know how to get the expFields from here, if possible. */
+    // ^ regarding that, you use ExpMeta#map(UnlockableContent), or you can just do block.addField(...) ~glen
     public float rangeInc = -1f;
 
     public ExpPowerTurret(String name){
@@ -23,6 +25,7 @@ public class ExpPowerTurret extends PowerTurret{
 
     public class ExpPowerTurretBuild extends PowerTurretBuild implements ExpBuildc{
         public float exp = 0f;
+        public boolean checked = false;
 
         public Color getShootColor(float lvl){
             return Tmp.c1.set(fromColor).lerp(toColor, lvl);
@@ -36,13 +39,23 @@ public class ExpPowerTurret extends PowerTurret{
         }
 
         @Override
-        public float exp() {
+        public float exp(){
             return exp;
         }
 
         @Override
-        public void exp(float exp) {
+        public void exp(float exp){
             this.exp = exp;
+        }
+
+        @Override
+        public boolean checked(){
+            return checked;
+        }
+
+        @Override
+        public void checked(boolean checked){
+            this.checked = checked;
         }
 
         @Override
@@ -55,6 +68,12 @@ public class ExpPowerTurret extends PowerTurret{
         public void update(){
             ExpBuildc.super.update();
             super.update();
+        }
+
+        @Override
+        public void buildConfiguration(Table table){
+            ExpBuildc.super.buildConfiguration(table);
+            super.buildConfiguration(table);
         }
 
         @Override

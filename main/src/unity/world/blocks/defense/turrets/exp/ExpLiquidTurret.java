@@ -1,6 +1,7 @@
 package unity.world.blocks.defense.turrets.exp;
 
 import arc.graphics.*;
+import arc.scene.ui.layout.Table;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.gen.*;
@@ -28,8 +29,9 @@ public class ExpLiquidTurret extends LiquidTurret{
         shootSound = Sounds.splash;
     }
 
-    public class ExpLiquidTurrettBuild extends LiquidTurretBuild implements ExpBuildc{
+    public class ExpLiquidTurretBuild extends LiquidTurretBuild implements ExpBuildc{
         public float exp = 0f;
+        public boolean checked = false;
 
         public Color getShootColor(float lvl){
             return Tmp.c1.set(fromColor).lerp(toColor, lvl);
@@ -48,13 +50,23 @@ public class ExpLiquidTurret extends LiquidTurret{
         }
 
         @Override
-        public float exp() {
+        public float exp(){
             return exp;
         }
 
         @Override
-        public void exp(float exp) {
+        public void exp(float exp){
             this.exp = exp;
+        }
+
+        @Override
+        public boolean checked(){
+            return checked;
+        }
+
+        @Override
+        public void checked(boolean checked){
+            this.checked = checked;
         }
 
         @Override
@@ -63,7 +75,7 @@ public class ExpLiquidTurret extends LiquidTurret{
         }
 
         @Override
-        public void killed() {
+        public void killed(){
             super.killed();
             ExpBuildc.super.killed();
         }
@@ -72,6 +84,12 @@ public class ExpLiquidTurret extends LiquidTurret{
         public void update(){
             ExpBuildc.super.update();
             super.update();
+        }
+
+        @Override
+        public void buildConfiguration(Table table){
+            ExpBuildc.super.buildConfiguration(table);
+            super.buildConfiguration(table);
         }
 
         @Override

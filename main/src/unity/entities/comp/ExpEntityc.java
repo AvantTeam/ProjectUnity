@@ -50,6 +50,10 @@ public abstract interface ExpEntityc<T extends UnlockableContent, E extends ExpT
         expType().upgradeSound.at(this);
     }
 
+    default void sparkle(){
+        
+    }
+
     @MustInherit
     E expType();
 
