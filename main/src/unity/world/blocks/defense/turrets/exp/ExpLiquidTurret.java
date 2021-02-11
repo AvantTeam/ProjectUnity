@@ -21,6 +21,9 @@ public class ExpLiquidTurret extends LiquidTurret{
         configurable = true;
         shootCone = 1;
         inaccuracy = 0;
+        hasPower = true;
+        hasLiquids = true;
+        extinguish = false;
         loopSound = Sounds.none;
         shootSound = Sounds.splash;
     }
@@ -34,7 +37,7 @@ public class ExpLiquidTurret extends LiquidTurret{
 
         @Override
         public void drawSelect(){
-            Drawf.dashCircle(x, y, 20f * 8f, team.color);
+            Drawf.dashCircle(x, y, range, team.color);
             int lvl = level();
             if(lvl > 0 && rangeInc > 0) Drawf.dashCircle(x, y, range + rangeInc * lvl, UnityPal.expColor);
         }

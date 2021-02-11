@@ -1000,10 +1000,7 @@ public class UnityBlocks implements ContentList{
                 range = 160f;
                 reloadTime = 80f;
                 targetAir = true;
-                hasLiquids = true;
                 liquidCapacity = 15f;
-                hasPower = true;
-                extinguish = false;
                 buildVisibility = BuildVisibility.sandboxOnly;
 
                 ammo(Liquids.cryofluid, UnityBullets.frostLaser);
@@ -1022,7 +1019,7 @@ public class UnityBlocks implements ContentList{
                 block.maxLevel = 30;
                 block.maxExp = block.requiredExp(block.maxLevel);
                 
-                block.addUpgrade(laserKelvin, 15);
+                //block.addUpgrade(laserKelvin, 15);
                 block.addUpgrade(laserBreakthrough, 30);
 
                 block.setupFields();
@@ -1091,7 +1088,40 @@ public class UnityBlocks implements ContentList{
             }
         };
 
-        laserKelvin = new ExpLiquidTurret("kelvin-laser-turret");
+        laserKelvin = new ExpLiquidTurret("kelvin-laser-turret"){
+            {
+                requirements(Category.turret, with(Items.copper, 190, Items.silicon, 110, Items.titanium, 15));
+                size = 3;
+                health = 2100;
+
+                range = 180f;
+                reloadTime = 120f;
+                targetAir = true;
+                liquidCapacity = 25f;
+
+                buildVisibility = BuildVisibility.sandboxOnly;
+
+                consumes.powerCond(2.5f, TurretBuild::isActive);
+                ammo(Liquids.cryofluid, UnityBullets.kelvinLaser);
+            }
+
+            @Override
+            public void init(){
+                super.init();
+
+                ExpBlock block = ExpMeta.map(this);
+                block.hasExp = true;
+                block.condConfig = true;
+                block.enableUpgrade = true;
+
+                block.maxLevel = 30;
+                block.maxExp = block.requiredExp(block.maxLevel);
+
+                block.setupFields();
+                block.setStats();
+                block.init();
+            }
+        };
 
         laserBreakthrough = new ExpPowerChargeTurret("bt-laser-turret");
 

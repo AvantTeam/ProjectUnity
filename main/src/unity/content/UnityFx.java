@@ -73,7 +73,7 @@ public class UnityFx{
         color(e.color, Color.white, e.fout());
 
         for(int i = 0; i < 6; i++){
-            Drawf.tri(e.x, e.y, 3f * e.fout(), 12f, e.rotation + 30f + 60f * i);
+            Drawf.tri(e.x, e.y, 3f * e.fout(), 12f, e.rotation + Mathf.randomSeed(e.id, 360f) + 60f * i);
         }
     }),
 
