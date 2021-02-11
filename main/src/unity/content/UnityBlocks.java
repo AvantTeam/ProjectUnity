@@ -912,7 +912,7 @@ public class UnityBlocks implements ContentList{
                 coolantMultiplier = 2f;
                 range = 140f;
                 targetAir = false;
-                shootSound = Sounds.pew; //refrain from breaking the audio backend.
+                shootSound = Sounds.laser;
 
                 powerUse = 7f;
 
@@ -1160,12 +1160,14 @@ public class UnityBlocks implements ContentList{
                 drawer = b -> {
                     if(b instanceof ExpPowerChargeTurretBuild tile){
                         Draw.rect(region, tile.x + tr2.x, tile.y + tr2.y, tile.rotation - 90f);
-                        //Draw.blend(Blending.additive);
-                        Draw.color(tile.getShootColor(tile.levelf()));
-                        Draw.alpha(Mathf.absin(Time.time, 20f, 0.6f));
-                        Draw.rect(Regions.btLaserTurretTopRegion, tile.x + tr2.x, tile.y + tr2.y, tile.rotation - 90f);
-                        Draw.color();
-                        //Draw.blend();
+                        if(tile.level() >= tile.maxLevel()){
+                            //Draw.blend(Blending.additive);
+                            Draw.color(tile.getShootColor(tile.levelf()));
+                            Draw.alpha(Mathf.absin(Time.time, 20f, 0.6f));
+                            Draw.rect(Regions.btLaserTurretTopRegion, tile.x + tr2.x, tile.y + tr2.y, tile.rotation - 90f);
+                            Draw.color();
+                            //Draw.blend();
+                        }
                     }else{
                         throw new IllegalStateException("building isn't an instance of ExpPowerChargeTurretBuild");
                     }
@@ -1181,7 +1183,7 @@ public class UnityBlocks implements ContentList{
                 block.condConfig = true;
                 block.enableUpgrade = true;
 
-                block.maxLevel = 30;
+                block.maxLevel = 1;
                 block.maxExp = block.requiredExp(block.maxLevel);
 
                 //block.rwPrecision = 20f;

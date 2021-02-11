@@ -295,16 +295,16 @@ public class UnityBullets implements ContentList{
 
         breakthroughLaser = new ExpLaserBlastBulletType(500f, 1200f){
             {
-                damageInc = 34;
-                lengthInc = 5;
+                damageInc = 1000f;
+                lengthInc = 150f;
                 largeHit = true;
                 width = 80f;
-                widthInc = 3.5f;
+                widthInc = 10f;
                 lifetime = 65f;
-                lightningSpacingInc = -5f/30f;
-                lightningDamageInc = 1f;
-                hitUnitExpGain = 0.2f;
-                hitBuildingExpGain = 0.3f;
+                lightningSpacingInc = -5f;
+                lightningDamageInc = 30f;
+                hitUnitExpGain = 0.005f;
+                hitBuildingExpGain = 0.008f;
                 sideLength = 0f;
                 sideWidth = 0f;
             }
