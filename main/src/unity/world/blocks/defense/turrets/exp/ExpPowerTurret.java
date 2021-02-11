@@ -30,7 +30,7 @@ public class ExpPowerTurret extends PowerTurret{
 
         @Override
         public void drawSelect(){
-            Drawf.dashCircle(x, y, 20f * 8f, team.color);
+            Drawf.dashCircle(x, y, range, team.color);
             int lvl = level();
             if(lvl > 0 && rangeInc > 0) Drawf.dashCircle(x, y, range + rangeInc * lvl, UnityPal.expColor);
         }

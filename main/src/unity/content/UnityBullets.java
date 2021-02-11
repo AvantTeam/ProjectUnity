@@ -229,6 +229,7 @@ public class UnityBullets implements ContentList{
                 toColor = Pal.sapBullet;
                 fragBullets = 3;
                 fragBullet = branchLaserFrag;
+                maxRange = 150f + 2f * 30f; //Account for range increase
             }
 
             public void makeFrag(Bullet b, float x, float y, Object color){

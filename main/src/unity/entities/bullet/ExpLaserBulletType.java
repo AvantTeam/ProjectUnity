@@ -100,7 +100,7 @@ public class ExpLaserBulletType extends BulletType {
 
     @Override
     public float range(){
-        return this.length;
+        return Math.max(length, maxRange);
     }
 
     @Override
