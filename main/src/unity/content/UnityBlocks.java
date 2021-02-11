@@ -90,7 +90,13 @@ public class UnityBlocks implements ContentList{
     public static
     @ExpDef(type = ExpBlock.class)
     @FactionDef(type = "koruh")
-    Block laser, laserCharge, laserFrost, laserBranch, laserFractal, laserKelvin, laserBreakthrough;
+    Block laser, laserCharge, laserFrost, laserBranch, laserFractal, laserKelvin; 
+    
+    public static
+    @ExpDef(type = ExpBlock.class)
+    @FactionDef(type = "koruh")
+    @LoadRegs(value = {"bt-laser-turret-top"})
+    Block laserBreakthrough;
 
     //public static @FactionDef(type = "light")
     //Block
@@ -1123,7 +1129,72 @@ public class UnityBlocks implements ContentList{
             }
         };
 
-        laserBreakthrough = new ExpPowerChargeTurret("bt-laser-turret");
+        laserBreakthrough = new ExpPowerChargeTurret("bt-laser-turret"){
+            {
+                requirements(Category.turret, with(Items.copper, 190, Items.silicon, 110, Items.titanium, 15));
+                size = 4;
+                health = 2800;
+
+                range = 500f;
+                coolantMultiplier = 1.5f;
+                targetAir = true;
+                reloadTime = 500f;
+                chargeTime = 100f;
+                chargeMaxDelay = 100f;
+                chargeEffects = 0;
+                recoilAmount = 5f;
+                cooldown = 0.03f;
+                powerUse = 17f;
+                shootShake = 4f;
+                shootEffect = UnityFx.laserBreakthroughShoot;
+                smokeEffect = Fx.none;
+                chargeEffect = Fx.none;
+                chargeBeginEffect = UnityFx.laserBreakthroughChargeBegin;
+                heatColor = Pal.lancerLaser;
+                toColor = UnityPal.expColor;
+                shootSound = Sounds.laserblast;
+                chargeSound = Sounds.lasercharge;
+                shootType = UnityBullets.breakthroughLaser;
+                buildVisibility = BuildVisibility.sandboxOnly;
+
+                drawer = b -> {
+                    if(b instanceof ExpPowerChargeTurretBuild tile){
+                        Draw.rect(region, tile.x + tr2.x, tile.y + tr2.y, tile.rotation - 90f);
+                        //Draw.blend(Blending.additive);
+                        Draw.color(tile.getShootColor(tile.levelf()));
+                        Draw.alpha(Mathf.absin(Time.time, 20f, 0.6f));
+                        Draw.rect(Regions.btLaserTurretTopRegion, tile.x + tr2.x, tile.y + tr2.y, tile.rotation - 90f);
+                        Draw.color();
+                        //Draw.blend();
+                    }else{
+                        throw new IllegalStateException("building isn't an instance of ExpPowerChargeTurretBuild");
+                    }
+                };
+            }
+
+            @Override
+            public void init(){
+                super.init();
+
+                ExpBlock block = ExpMeta.map(this);
+                block.hasExp = true;
+                block.condConfig = true;
+                block.enableUpgrade = true;
+
+                block.maxLevel = 30;
+                block.maxExp = block.requiredExp(block.maxLevel);
+
+                //block.rwPrecision = 20f;
+                //block.orbMultiplier = 0.07f;
+
+                //Color[] heatColors = {Pal.lancerLaser, UnityPal.expColor};
+                //block.addField(ExpFieldType.list, Turret.class, "heatColor", heatColor, heatColors);
+
+                block.setupFields();
+                block.setStats();
+                block.init();
+            }
+        };
 
         //endregion
         //region monolith

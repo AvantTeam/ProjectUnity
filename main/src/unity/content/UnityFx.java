@@ -92,6 +92,43 @@ public class UnityFx{
         stroke(e.fout());
         Lines.circle(e.x, e.y, e.fin() * 6f);
     }),
+
+    laserBreakthroughChargeBegin = new Effect(100f, 100f, e -> {
+        color(e.color);
+        stroke(e.fin() * 3f);
+        Lines.circle(e.x, e.y, 4f + e.fout() * 120f);
+    
+        Fill.circle(e.x, e.y, e.fin() * 23.5f);
+    
+        randLenVectors(e.id, 20, 50f * e.fout(), (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, e.fin() * 6f);
+        });
+    
+        color();
+    
+        Fill.circle(e.x, e.y, e.fin() * 13);
+    }),
+    
+    laserBreakthroughShoot = new Effect(40f, e -> {
+        color(e.color);
+    
+        stroke(e.fout() * 2.5f);
+        Lines.circle(e.x, e.y, e.finpow() * 100f);
+    
+        stroke(e.fout() * 5f);
+        Lines.circle(e.x, e.y, e.fin() * 100f);
+    
+        color(e.color, Color.white, e.fout());
+    
+        randLenVectors(e.id, 20, 80f * e.finpow(), (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, e.fout() * 5f);
+        });
+    
+    
+        for(int i = 0; i < 4; i++){
+            Drawf.tri(e.x, e.y, 9f * e.fout(), 170f, e.rotation + Mathf.randomSeed(e.id, 360f) + 90f * i + e.finpow() * (0.5f - Mathf.randomSeed(e.id)) * 150f);
+        }
+    }),
     
     shootSmallBlaze = new Effect(22f, e -> {    //@formatter:on
         color(Pal.lightFlame, Pal.darkFlame, Pal.gray, e.fin());

@@ -69,11 +69,16 @@ public class ExpLaserBulletType extends BulletType {
     }
 
     public Color getColor(Bullet b){
-        return Tmp.c1.set(fromColor).lerp(toColor, getLevelf(b));
+        return Tmp.c1.set(fromColor).lerp(toColor, getLevelf(b)).cpy();
     }
 
     public float getLength(Bullet b){
         return length + lengthInc * getLevel(b);
+    }
+
+    @Override
+    public float range(){
+        return Math.max(length, maxRange);
     }
 
     @Override
@@ -99,11 +104,6 @@ public class ExpLaserBulletType extends BulletType {
     }
 
     @Override
-    public float range(){
-        return Math.max(length, maxRange);
-    }
-
-    @Override
     public void draw(Bullet b){
         if(b.data instanceof Position point){
             Tmp.v1.set(point);
@@ -125,5 +125,11 @@ public class ExpLaserBulletType extends BulletType {
 
             Drawf.light(b.team, b.x, b.y, Tmp.v1.x, Tmp.v1.y, width * 10 * b.fout(), Color.white, 0.6f);
         }
+    }
+    
+
+    @Override
+    public void drawLight(Bullet b){
+        //no light drawn here
     }
 }

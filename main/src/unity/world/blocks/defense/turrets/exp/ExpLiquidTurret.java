@@ -32,7 +32,7 @@ public class ExpLiquidTurret extends LiquidTurret{
         public float exp = 0f;
 
         public Color getShootColor(float lvl){
-            return Tmp.c1.set(fromColor).lerp(toColor, lvl);
+            return Tmp.c1.set(fromColor).lerp(toColor, lvl).cpy();
         }
 
         @Override

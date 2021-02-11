@@ -23,7 +23,7 @@ import unity.graphics.*;
 import static mindustry.Vars.*;
 
 public class UnityBullets implements ContentList{
-    public static BulletType laser, shardLaserFrag, shardLaser, frostLaser, branchLaserFrag, branchLaser, kelvinLaser, coalBlaze, pyraBlaze, falloutLaser, catastropheLaser, calamityLaser, extinctionLaser, orb, shockBeam, currentStroke,
+    public static BulletType laser, shardLaserFrag, shardLaser, frostLaser, branchLaserFrag, branchLaser, kelvinLaser, breakthroughLaser, coalBlaze, pyraBlaze, falloutLaser, catastropheLaser, calamityLaser, extinctionLaser, orb, shockBeam, currentStroke,
         shielderBullet, plasmaFragTriangle, plasmaTriangle, surgeBomb, pylonLightning, pylonLaser, pylonLaserSmall, exporb, monumentRailBullet, scarShrapnel, scarMissile, celsiusSmoke, kelvinSmoke,
         kamiBullet1, kamiLaser, kamiSmallLaser, supernovaLaser;
 
@@ -61,17 +61,8 @@ public class UnityBullets implements ContentList{
             }
 
             @Override
-            public void init(Bullet b){
-                b.fdata = (float)b.data;
-            }
-
-            public Color getColor(Bullet b){
-                return Tmp.c1.set(Pal.lancerLaser.cpy().lerp(Pal.sapBullet, 0.5f)).lerp(Pal.sapBullet, b.fdata);
-            }
-
-            @Override
             public void draw(Bullet b){
-                Draw.color(getColor(b));
+                Draw.color((Color)b.data);
                 Lines.stroke(2f);
                 Lines.lineAngleCenter(b.x, b.y, b.rotation(), 7f);
                 Lines.stroke(1.3f);
@@ -103,7 +94,7 @@ public class UnityBullets implements ContentList{
                     var a = b.rotation() + Mathf.randomSeed(b.id, 360f) + i * 360f/fragBullets;
                     var target = Damage.linecast(b, x, y, b.rotation(), length);
         
-                    Object data = getLevelf(b);
+                    Object data = getColor(b);
                     b.data = target;
         
                     if(target instanceof Hitboxc hit){
@@ -193,7 +184,7 @@ public class UnityBullets implements ContentList{
             }
 
             public Color getColor(Bullet b){
-                return Tmp.c1.set(Pal.lancerLaser.cpy().lerp(Pal.sapBullet, 0.5f)).lerp(Pal.sapBullet, b.fdata);
+                return Tmp.c1.set(Pal.lancerLaser.cpy().lerp(Pal.sapBullet, 0.5f)).lerp(Pal.sapBullet, b.fdata).cpy();
             }
 
             @Override
@@ -300,6 +291,23 @@ public class UnityBullets implements ContentList{
                 }else{
                     b.data = new Vec2().trns(b.rotation(), length).add(b.x, b.y);
                 }
+            }
+        };
+
+        breakthroughLaser = new ExpLaserBlastBulletType(500f, 1200f){
+            {
+                damageInc = 34;
+                lengthInc = 5;
+                largeHit = true;
+                width = 80f;
+                widthInc = 3.5f;
+                lifetime = 65f;
+                lightningSpacingInc = -5f/30f;
+                lightningDamageInc = 1f;
+                hitUnitExpGain = 0.2f;
+                hitBuildingExpGain = 0.3f;
+                sideLength = 0f;
+                sideWidth = 0f;
             }
         };
 
@@ -641,7 +649,7 @@ public class UnityBullets implements ContentList{
             despawnEffect = Fx.none;
             pierce = true;
             keepVelocity = false;
-            color = b -> Tmp.c1.set(Color.red).shiftHue(b.time * 3f);
+            color = b -> Tmp.c1.set(Color.red).shiftHue(b.time * 3f).cpy();
         }};
 
         kamiLaser = new KamiLaserBulletType(230f){{
