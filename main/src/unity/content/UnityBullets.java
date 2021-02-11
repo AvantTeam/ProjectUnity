@@ -97,7 +97,7 @@ public class UnityBullets implements ContentList{
                 hitSound.at(x, y, hitSoundPitch, hitSoundVolume);
         
                 Effect.shake(hitShake, hitShake, b);
-        
+
                 for(var i = 0; i < fragBullets; i++){
                     var len = Mathf.random(1f, 7f);
                     var a = b.rotation() + Mathf.randomSeed(b.id, 360f) + i * 360f/fragBullets;
