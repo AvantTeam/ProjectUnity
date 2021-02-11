@@ -1,13 +1,10 @@
 package unity.world.blocks.defense.turrets.exp;
 
-import arc.graphics.*;
 import arc.math.*;
 import arc.util.*;
-import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
-import mindustry.graphics.*;
 
 public class ExpPowerChargeTurret extends ExpPowerTurret{
     public ExpPowerChargeTurret(String name){

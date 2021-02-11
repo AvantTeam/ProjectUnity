@@ -1,7 +1,6 @@
 package unity.type.exp;
 
 import arc.*;
-import arc.math.*;
 import arc.util.*;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -28,7 +27,6 @@ public class ExpBlock extends ExpType<Block>{
         setBars();
 
         type.sync = true;
-
         if(enableUpgrade){
             type.configurable = condConfig = true;
             type.saveConfig = false;

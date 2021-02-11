@@ -912,7 +912,7 @@ public class UnityBlocks implements ContentList{
                 coolantMultiplier = 2f;
                 range = 140f;
                 targetAir = false;
-                shootSound = Sounds.pew_;
+                shootSound = Sounds.pew; //refrain from breaking the audio backend.
 
                 powerUse = 7f;
 

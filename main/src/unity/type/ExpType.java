@@ -7,13 +7,11 @@ import arc.math.*;
 import arc.struct.*;
 import arc.struct.ObjectMap.*;
 import arc.util.*;
-import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
-import mindustry.world.*;
 import mindustry.world.meta.*;
 import unity.annotations.Annotations.*;
 import unity.content.*;
@@ -37,12 +35,14 @@ public abstract class ExpType<T extends UnlockableContent>{
     public Color upgradeColor = Color.green;
 
     public Seq<ExpUpgrade> upgrades = new Seq<>();
+    /** Maps {@link #upgrades} into 2D array. Do NOT modify */
+    public ExpUpgrade[][] upgradesPerLevel;
     public boolean enableUpgrade;
     public boolean hasUpgradeEffect = true;
     public float sparkleChance = 0.08f;
     public Effect sparkleEffect = UnityFx.sparkleFx;
     public Effect upgradeEffect = UnityFx.upgradeBlockFx;
-    public Sound upgradeSound = Sounds.none;
+    public Sound upgradeSound = Sounds.message;
 
     public ObjectMap<ExpFieldType, Seq<ExpField>> expFields = new ObjectMap<>();
     public Entry<Class, Field>[] linearInc;
@@ -67,6 +67,28 @@ public abstract class ExpType<T extends UnlockableContent>{
 
     public void init(){
         enableUpgrade = upgrades.size > 0;
+
+        for(int i = 0; i < upgrades.size; i++){
+            upgrades.get(i).index = i;
+        }
+
+        Seq<ExpUpgrade[]> upgradesPerLevel = new Seq<>(ExpUpgrade[].class);
+        for(int i = 0; i <= maxLevel; i++){
+            Seq<ExpUpgrade> level = new Seq<>(ExpUpgrade.class);
+            for(ExpUpgrade upgrade : upgrades){
+                if(upgrade.min < 0){
+                    upgrade.min = maxLevel;
+                }
+                if(
+                    upgrade.min <= i &&
+                    (upgrade.max < 0 || upgrade.max >= i)
+                ){
+                    level.add(upgrade);
+                }
+            }
+            upgradesPerLevel.add(level.toArray());
+        }
+        this.upgradesPerLevel = upgradesPerLevel.toArray();
     }
 
     public void setupFields(){
@@ -193,34 +215,41 @@ public abstract class ExpType<T extends UnlockableContent>{
 
     public void expExp(int level) throws Exception{
         for(int i = 0; i < expInc.length; i++){
-            expInc[i].value.set(expInc[i].key.cast(type), Math.max(expIncStart[i] * Mathf.pow(this.expIncMul[i], level), 0f));
+            expInc[i].value.set(expInc[i].key.cast(type), Math.max(expIncStart[i] * Mathf.pow(expIncMul[i], level), 0f));
         }
     }
 
     public void rootExp(int level) throws Exception{
-        for(int i = 0; i < rootInc.length; i++) {
+        for(int i = 0; i < rootInc.length; i++){
             rootInc[i].value.set(rootInc[i].key.cast(type), Math.max(rootIncStart[i] + Mathf.sqrt(rootIncMul[i] * level), 0f));
         }
     }
 
     public void boolExp(int level) throws Exception{
-        for(int i = 0; i < boolInc.length; i++) {
+        for(int i = 0; i < boolInc.length; i++){
             boolInc[i].value.set(boolInc[i].key.cast(type), (boolIncStart[i]) ? (level < boolIncMul[i]) : (level >= boolIncMul[i]));
         }
     }
 
     public class ExpUpgrade{
         public final T type;
+        private int index;
+
         public int min = 1;
         public int max = maxLevel;
 
         public ExpUpgrade(T type){
             this.type = type;
         }
+
+        public int index(){
+            return index;
+        }
     }
 
     public class ExpField{
         public final ExpFieldType type;
+        /** No generics because I need the EXACT type from the class, for casting and reflection */
         public final Class classType;
         public final Field field;
 
@@ -231,7 +260,9 @@ public abstract class ExpType<T extends UnlockableContent>{
         public ExpField(ExpFieldType type, Class classType, Field field){
             this.type = type;
             this.classType = classType;
+
             this.field = field;
+            this.field.setAccessible(true);
         }
     }
 

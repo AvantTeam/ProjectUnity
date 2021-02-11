@@ -14,7 +14,6 @@ import mindustry.entities.bullet.*;
 import mindustry.graphics.*;
 import mindustry.io.*;
 import mindustry.ctype.*;
-import unity.Unity;
 import unity.entities.bullet.*;
 import unity.entities.comp.*;
 import unity.gen.*;
