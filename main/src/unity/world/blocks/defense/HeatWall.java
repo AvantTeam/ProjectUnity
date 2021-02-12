@@ -134,7 +134,7 @@ public class HeatWall extends Block implements GraphBlockBase{
         //not common probably separated?
         @Override
         public void updatePost(){
-            if(timer(dumpTime, statusTime)){
+            if(timer(timerDump, statusTime)){
                 float intensity = Mathf.clamp(Mathf.map(heat().getTemp(), 400f, 1000f, 0f, 1f));
                 Damage.status(team, x, y, intensity * statusRadiusMul + minStatusRadius, StatusEffects.burning, minStatusDuration + intensity * statusDurationMul, false, true);
                 if(maxDamage > 0f) Damage.damage(team, x, y, intensity * 10f + 8f, intensity * maxDamage, false, true);
