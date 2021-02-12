@@ -60,5 +60,10 @@ public class ExpPowerChargeTurret extends ExpPowerTurret{
     
             recoil = recoilAmount;
         }
+
+        @Override
+        public String toString(){
+            return getClass().getSimpleName() + "#" + id;
+        }
     }
 }

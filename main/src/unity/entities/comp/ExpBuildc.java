@@ -95,23 +95,20 @@ public interface ExpBuildc extends ExpEntityc<Block, ExpBlock>, Buildingc{
         if(Mathf.chance(expType().sparkleChance)) expType().sparkleEffect.at(tile.drawx(), tile.drawy(), block.size, expType().upgradeColor);
         expType().upgradeEffect.at(tile.drawx(), tile.drawy(), block.size, expType().upgradeColor);
 
-        if(!net.client()){
-            Building build = tile.build;
+        Building build = tile.build;
+        Core.app.post(() -> {
+            if(build != null && build.isValid() && build.power != null && links.length > 0){
+                for(int link : links){
+                    try{
+                        Tile powtile = world.tile(link);
 
-            Core.app.post(() -> {
-                if(build != null && build.isValid() && build.power != null && links.length > 0){
-                    for(int link : links){
-                        try{
-                            Tile powtile = world.tile(link);
-
-                            if(powtile.block() instanceof PowerNode){
-                                powtile.build.configure(Integer.valueOf(link));
-                            }
-                        }catch(Throwable ignored){}
-                    }
+                        if(powtile.block() instanceof PowerNode){
+                            powtile.build.configure(Integer.valueOf(link));
+                        }
+                    }catch(Throwable ignored){}
                 }
-            });
-        }
+            }
+        });
     }
 
     @Override
@@ -183,9 +180,10 @@ public interface ExpBuildc extends ExpEntityc<Block, ExpBlock>, Buildingc{
     }
 
     default void upgradeButton(Table table, int index, int level){
+        Integer i = Integer.valueOf(index);
         table.button(Icon.up, Styles.emptyi, () -> {
             control.input.frag.config.hideConfig();
-            configure(Integer.valueOf(index));
+            configure(i);
         }).size(40);
     }
 
@@ -231,7 +229,7 @@ public interface ExpBuildc extends ExpEntityc<Block, ExpBlock>, Buildingc{
     }
 
     @Override
-    default void read(Reads read){
+    default void read(Reads read, byte revision){
         exp(read.f());
     }
 }

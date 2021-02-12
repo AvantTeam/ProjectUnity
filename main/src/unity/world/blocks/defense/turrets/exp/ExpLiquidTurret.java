@@ -99,9 +99,9 @@ public class ExpLiquidTurret extends LiquidTurret{
         }
 
         @Override
-        public void read(Reads read){
-            super.read(read);
-            ExpBuildc.super.read(read);
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            ExpBuildc.super.read(read, revision);
         }
 
         @Override
