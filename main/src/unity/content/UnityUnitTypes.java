@@ -91,7 +91,7 @@ public class UnityUnitTypes implements ContentList{
 
     public static UnitType kami;
 
-    public static @FactionDef(type = "end") UnitType opticaecus, devourer;
+    public static @FactionDef(type = "end") UnitType opticaecus, devourer, ravager;
 
     public static int getClassId(int index){
         return classIDs[index];
@@ -2253,6 +2253,40 @@ public class UnityUnitTypes implements ContentList{
                     colors = new Color[]{UnityPal.scarColorAlpha, UnityPal.scarColor, UnityPal.endColor, Color.white};
                 }};
             }});
+        }
+            @Override
+            public void init(){
+                super.init();
+                immunities.addAll(Vars.content.getBy(ContentType.status));
+            }
+        };
+
+        setEntity("ravager", LegsUnit::create);
+        ravager = new UnityUnitType("ravager"){{
+            health = 1650000f;
+            speed = 0.65f;
+            drag = 0.16f;
+            armor = 15f;
+            hitSize = 138f;
+            rotateSpeed = 1.2f;
+
+            allowLegStep = true;
+            hovering = true;
+            groundLayer = Layer.legUnit + 6f;
+            visualElevation = 3f;
+            legCount = 8;
+            legGroupSize = 4;
+            legPairOffset = 4f;
+            legMoveSpace = 0.6f;
+            legLength = 140f;
+            legExtension = -15f;
+            legBaseOffset = 50f;
+            legSpeed = 0.15f;
+            legTrns = 0.2f;
+            rippleScale = 7f;
+
+            legSplashRange = 150f;
+            legSplashDamage = 1600f;
         }
             @Override
             public void init(){
