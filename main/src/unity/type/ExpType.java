@@ -19,6 +19,8 @@ import unity.entities.comp.*;
 
 import java.lang.reflect.*;
 
+import static mindustry.Vars.*;
+
 @ExpBase
 @SuppressWarnings({"unchecked", "rawtypes"})
 public abstract class ExpType<T extends UnlockableContent>{
@@ -126,8 +128,8 @@ public abstract class ExpType<T extends UnlockableContent>{
     }
 
     public void setStats(){
-        type.stats.add(Stat.itemCapacity, "@", Core.bundle.format("explib.lvlAmount", maxLevel));
-        type.stats.add(Stat.itemCapacity, "@", Core.bundle.format("explib.expAmount", requiredExp(maxLevel)));
+        type.stats.add(Stat.itemCapacity, "@", format("explib.lvlAmount", maxLevel));
+        type.stats.add(Stat.itemCapacity, "@", format("explib.expAmount", requiredExp(maxLevel)));
 
         if(upgrades.size > 0){
             type.stats.add(Stat.abilities, table -> {
@@ -149,6 +151,14 @@ public abstract class ExpType<T extends UnlockableContent>{
                     }
                 });
             });
+        }
+    }
+
+    protected String format(String format, Object... args){
+        if(headless){
+            return format;
+        }else{
+            return Core.bundle.format(format, args);
         }
     }
 
