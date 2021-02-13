@@ -1,13 +1,13 @@
 package unity.entities.units;
 
 import mindustry.gen.*;
-import unity.*;
+import unity.net.*;
 
 public class KamiUnit extends UnitEntity{
     @Override
     public void add(){
         if(!added){
-            Unity.musicHandler.play("kami", () -> !dead && added);
+            UnityCall.bossMusic(this, "kami");
             super.add();
         }
     }

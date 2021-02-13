@@ -14,6 +14,7 @@ import mindustry.io.*;
 import mindustry.net.Net.*;
 import mindustry.net.Packets.*;
 import unity.content.*;
+import unity.net.*;
 import unity.type.*;
 
 import java.lang.reflect.*;
@@ -32,11 +33,11 @@ public class KamiAI implements UnitController{
                     float angle = (i * (360f / (6f + difficulty))) + kamiAI.reloads[1];
                     tmpVec2.trns(angle, 20f).add(kamiAI.unit);
                     //UnityBullets.kamiBullet1.create(kamiAI.unit, tmpVec2.x, tmpVec2.y, angle).vel.scl(0.8f);
-                    createBullet(
+                    UnityCall.createKamiBullet(
                         kamiAI.unit, UnityBullets.kamiBullet1,
                         tmpVec2.x, tmpVec2.y, angle,
                         0.8f, 1f, -1f,
-                        null, 0f, 0f
+                        -1, 0f, 0f
                     );
                 }
                 kamiAI.reloads[0] = 0f;
@@ -49,14 +50,15 @@ public class KamiAI implements UnitController{
                 for(int i = 0; i < 16; i++){
                     float angle = (i * (360f / 16));
                     tmpVec2.trns(angle, 20f).add(kamiAI.unit);
-                    for(int s : Mathf.signs){
-                        Cons<Bullet> data = b -> b.rotation(b.rotation() + (s * Time.delta));
+
+                    for(int j = 0; j < 2; j++){
+                        //Cons<Bullet> data = b -> b.rotation(b.rotation() + (s * Time.delta));
                         //UnityBullets.kamiBullet1.create(kamiAI.unit, tmpVec2.x, tmpVec2.y, angle).data(data);
-                        createBullet(
+                        UnityCall.createKamiBullet(
                             kamiAI.unit, UnityBullets.kamiBullet1,
                             tmpVec2.x, tmpVec2.y, angle,
                             1f, 1f, -1f,
-                            data, 0f, 0f
+                            j, 0f, 0f
                         );
                     }
                 }
@@ -74,10 +76,11 @@ public class KamiAI implements UnitController{
                     //bullet.hitSize = 100f;
                     //bullet.vel.scl(0.3f);
                     //bullet.lifetime *= 1 / 0.3f;
-                    createBullet(kamiAI.unit, UnityBullets.kamiBullet1,
+                    UnityCall.createKamiBullet(
+                        kamiAI.unit, UnityBullets.kamiBullet1,
                         kamiAI.unit.x, kamiAI.unit.y, angle,
                         0.3f + Mathf.range(0.1f), 1f / 0.3f, 100f,
-                        null, 0f, 0f
+                        -1, 0f, 0f
                     );
                 }
                 kamiAI.reloads[1] = 3f;
@@ -89,10 +92,11 @@ public class KamiAI implements UnitController{
                         //Bullet bullet = UnityBullets.kamiBullet1.create(kamiAI.unit, kamiAI.unit.x, kamiAI.unit.y, angle + Mathf.range(1f));
                         //bullet.vel.scl(Mathf.random(0.8f, 1.2f) * 0.7f);
                         //bullet.lifetime *= 1 / 0.7f;
-                        createBullet(kamiAI.unit, UnityBullets.kamiBullet1,
+                        UnityCall.createKamiBullet(
+                            kamiAI.unit, UnityBullets.kamiBullet1,
                             kamiAI.unit.x, kamiAI.unit.y, angle + Mathf.randomSeedRange(kamiAI.unit.id + (long)Time.time, 1f),
                             Mathf.randomSeed(kamiAI.unit.id + (long)(Time.time + 1f), 0.8f, 1.2f) * 0.7f, 1 / 0.7f, -1f,
-                            null, 0f, 0f
+                            -1, 0f, 0f
                         );
                     }
                 }
@@ -128,10 +132,11 @@ public class KamiAI implements UnitController{
                             //bullet.hitSize = 15f;
                             //bullet.vel.scl(j >= 1 ? 0.75f : 0.33f);
                             //bullet.lifetime *= 1f / (j >= 1 ? 0.75f : 0.33f);
-                            createBullet(kamiAI.unit, UnityBullets.kamiBullet1,
+                            UnityCall.createKamiBullet(
+                                kamiAI.unit, UnityBullets.kamiBullet1,
                                 tmpVec.x, tmpVec.y, angle,
                                 j >= 1 ? 0.75f : 0.33f, 1f / (j >= 1 ? 0.75f : 0.33f), 15f,
-                                null, 0f, 0f
+                                -1, 0f, 0f
                             );
                         }
                     }
@@ -153,10 +158,11 @@ public class KamiAI implements UnitController{
                         //bullet.hitSize = 8f;
                         //bullet.lifetime = 7f * 60f;
                         //bullet.data = data;
-                        createBullet(kamiAI.unit, UnityBullets.kamiBullet1,
+                        UnityCall.createKamiBullet(
+                            kamiAI.unit, UnityBullets.kamiBullet1,
                             kamiAI.unit.x, kamiAI.unit.y, angle,
                             1f, (7f * 60f) / UnityBullets.kamiBullet1.lifetime, 8f,
-                            data, 0f, 0f
+                            2, 0f, 0f
                         );
                     }
                     kamiAI.reloads[6] = 0f;
@@ -169,7 +175,13 @@ public class KamiAI implements UnitController{
                 if(kamiAI.reloads[1] >= 100){
                     if(kamiAI.reloads[4] != 1){
                         tmpVec.trns(kamiAI.reloads[3], 80f).add(kamiAI.unit);
-                        kamiAI.tmpBullets[0] = UnityBullets.kamiLaser.create(kamiAI.unit, tmpVec.x, tmpVec.y, kamiAI.reloads[4]);
+                        //kamiAI.tmpBullets[0] = UnityBullets.kamiLaser.create(kamiAI.unit, tmpVec.x, tmpVec.y, kamiAI.reloads[4]);
+                        UnityCall.createKamiBullet(
+                            kamiAI.unit, UnityBullets.kamiLaser,
+                            tmpVec.x, tmpVec.y, kamiAI.reloads[4],
+                            1f, 1f, -1f,
+                            10, 0f, 0f
+                        );
                         kamiAI.reloads[4] = 1f;
                     }
                     if(kamiAI.tmpBullets[0] != null){
@@ -219,10 +231,11 @@ public class KamiAI implements UnitController{
                                 //Bullet c = UnityBullets.kamiBullet1.create((Teamc)b.owner, b.x, b.y, b.rotation() + angleB);
                                 //c.vel.scl(0.7f);
                                 //c.data = data2;
-                                createBullet((Teamc)b.owner, UnityBullets.kamiBullet1,
+                                UnityCall.createKamiBullet(
+                                    (Teamc)b.owner, UnityBullets.kamiBullet1,
                                     b.x, b.y, b.rotation() + angleB,
                                     0.7f, 1f, -1f,
-                                    data2, 0f, 0f
+                                    j + 3, 0f, 0f
                                 );
                             }
                             b.time = b.lifetime + 1f;
@@ -231,10 +244,11 @@ public class KamiAI implements UnitController{
                     //Bullet b = UnityBullets.kamiBullet1.create(kamiAI.unit, kamiAI.unit.x, kamiAI.unit.y, angle);
                     //b.data = data1;
                     //b.vel.scl(0.8f);
-                    createBullet(kamiAI.unit, UnityBullets.kamiBullet1,
+                    UnityCall.createKamiBullet(
+                        kamiAI.unit, UnityBullets.kamiBullet1,
                         kamiAI.unit.x, kamiAI.unit.y, angle,
                         0.8f, 1f, -1f,
-                        data1, 0f, 0f
+                        8, 0f, 0f
                     );
                 }
                 kamiAI.reloads[1] = 0f;
@@ -256,10 +270,11 @@ public class KamiAI implements UnitController{
                         //b.time = (kamiAI.reloads[4] * 3.333f);
                         //b.data = data;
                         //b.fdata = (kamiAI.reloads[4] * 6.666f);
-                        createBullet(kamiAI.unit, UnityBullets.kamiBullet1,
+                        UnityCall.createKamiBullet(
+                            kamiAI.unit, UnityBullets.kamiBullet1,
                             kamiAI.unit.x, kamiAI.unit.y, angle,
                             1f, 1f, -1f,
-                            data, (kamiAI.reloads[4] * 3.333f), (kamiAI.reloads[4] * 6.666f)
+                            9, (kamiAI.reloads[4] * 3.333f), (kamiAI.reloads[4] * 6.666f)
                         );
                     }
                     kamiAI.reloads[4] += 1f;
@@ -296,20 +311,32 @@ public class KamiAI implements UnitController{
                             float fin = ((float)i / diff);
                             tmpVec2.set(kamiAI.lastPoint).lerp(kamiAI.targetPoint, fin);
                             float angle = i * 15f;
-                            Bullet b = UnityBullets.kamiBullet1.create(kamiAI.unit, kamiAI.unit.team, tmpVec2.x, tmpVec2.y, angle, 0f);
+                            /*Bullet b = UnityBullets.kamiBullet1.create(kamiAI.unit, kamiAI.unit.team, tmpVec2.x, tmpVec2.y, angle, 0f);
                             b.fdata = i / (diff / 20f);
                             b.lifetime *= 2f;
                             b.data = new KamiBulletData<>(angle, (bullet, kamiBulletData) -> {
                                 float time = (2f * 60f) + bullet.fdata;
                                 if(bullet.time >= time) bullet.vel.trns(kamiBulletData.initialRotation, Mathf.clamp((bullet.time - time) / 15f, 0f, bullet.type.speed));
-                            });
+                            });*/
+                            UnityCall.createKamiBullet(
+                                kamiAI.unit, UnityBullets.kamiBullet1,
+                                tmpVec2.x, tmpVec2.y, angle,
+                                0f, 2f, -1f,
+                                i + 11, i / diff / 20f, 0f
+                            );
                         }
                         diff = 10 + (difficulty - 1);
                         for(int i = 0; i < diff; i++){
                             float angle = i * (360f / diff);
-                            Bullet b = UnityBullets.kamiBullet1.create(kamiAI.unit, kamiAI.unit.x, kamiAI.unit.y, angle);
+                            /*Bullet b = UnityBullets.kamiBullet1.create(kamiAI.unit, kamiAI.unit.x, kamiAI.unit.y, angle);
                             b.lifetime *= 2f;
-                            b.vel.scl(1.1f);
+                            b.vel.scl(1.1f);*/
+                            UnityCall.createKamiBullet(
+                                kamiAI.unit, UnityBullets.kamiBullet1,
+                                kamiAI.unit.x, kamiAI.unit.y, angle,
+                                1.1f, 2f, -1f,
+                                -1, 0f, 0f
+                            );
                         }
                         kamiAI.relativeRotation = Mathf.mod((((Mathf.round(kamiAI.relativeRotation / 60f) * 60f) + 90f) * 2f) - kamiAI.relativeRotation, 360f);
                         kamiAI.altTime = 3f * 60f;
@@ -337,61 +364,6 @@ public class KamiAI implements UnitController{
     protected float relativeRotation = 0f;
     protected float altTime = 0f;
     protected int stage = 0;
-
-    private static Field out;
-    private static Field write;
-
-    static{
-        try{
-            out = Call.class.getDeclaredField("OUT");
-            out.setAccessible(true);
-
-            write = Call.class.getDeclaredField("WRITE");
-            write.setAccessible(true);
-        }catch(Exception e){
-            throw new RuntimeException(e);
-        }
-    }
-
-    /** Returns the synced bullet. MAY be null! */
-    protected static Bullet createBullet(Teamc owner, BulletType type, float x, float y, float angle, float velocityScl, float lifetimeScl, float hitSize, Object data, float fdata, float time){
-        Bullet b = null;
-
-        if(net.server() || !net.active()){
-            b = type.create(owner, owner.team(), x, y, angle);
-            b.hitSize = hitSize < 0f ? type.hitSize : hitSize;
-            b.lifetime = type.lifetime * lifetimeScl;
-            b.vel.scl(velocityScl);
-            b.data = data;
-            b.fdata = fdata;
-            b.time = time;
-        }
-
-        if(net.server()){
-            InvokePacket packet = Pools.obtain(InvokePacket.class, InvokePacket::new);
-            packet.priority = 0;
-            packet.type = 12;
-
-            ReusableByteOutStream out = out();
-            Writes write = write();
-
-            out.reset();
-            TypeIO.writeBulletType(write, type);
-            TypeIO.writeTeam(write, owner.team());
-            write.f(x);
-            write.f(y);
-            write.f(angle);
-            write.f(-1f);
-            write.f(velocityScl);
-            write.f(lifetimeScl);
-            packet.bytes = out.getBytes();
-            packet.length = out.size();
-
-            net.send(packet, SendMode.udp);
-        }
-
-        return b;
-    }
 
     @Override
     public void updateUnit(){
@@ -478,22 +450,6 @@ public class KamiAI implements UnitController{
     @Override
     public Unit unit(){
         return unit;
-    }
-
-    protected static ReusableByteOutStream out(){
-        try{
-            return (ReusableByteOutStream)out.get(null);
-        }catch(Exception e){
-            throw new RuntimeException(e);
-        }
-    }
-
-    protected static Writes write(){
-        try{
-            return (Writes)write.get(null);
-        }catch(Exception e){
-            throw new RuntimeException(e);
-        }
     }
 
     public static class KamiBulletData<T extends Bullet> implements Cons<T>{
@@ -614,6 +570,80 @@ public class KamiAI implements UnitController{
             if((ai.time >= maxTime && liveMaxTime == null) || (liveMaxTime != null && ai.time >= liveMaxTime.get(ai))){
                 ai.changeType();
             }
+        }
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public static class KamiBulletDatas{
+        private static Cons<Bullet>[] consDatas;
+        private static KamiBulletData[] bulletDatas;
+
+        static{
+            consDatas = new Cons[11];
+            consDatas[0] = b -> b.rotation(b.rotation() + (-1f * Time.delta));
+            consDatas[1] = b -> b.rotation(b.rotation() + (Time.delta));
+
+            consDatas[2] = b -> {
+                if(b.time < 1f * 50){
+                    b.vel.setLength(Math.max((1f - (b.time / (1f * 50))) * b.type.speed, 0.02f));
+                }else if(b.time >= 2.5f * 60){
+                    b.vel.setLength(Math.min(Math.max((b.time - (2.5f * 60)) / 80f, 0.02f), b.type.speed * 1.5f));
+                }
+            };
+
+            float spacing = 20f;
+            for(int i = 0; i < 5; i++){
+                float angle = (i * spacing - (5 - 1) * spacing / 2f);
+                consDatas[i + 3] = b -> {
+                    if(b.time >= 1.1f * 17){
+                        b.vel.scl(0.9f);
+                        b.rotation(b.rotation() + (angle / 2f));
+                        b.data = null;
+                    }
+                };
+            }
+
+            consDatas[8] = b -> {
+                if(b.time > 1.1f * 17f){
+                    float spacingB = 20f;
+                    for(int j = 0; j < 5; j++){
+                        float angleB = (j * spacingB - (5 - 1) * spacingB / 2f);
+                        UnityCall.createKamiBullet(
+                            (Teamc)b.owner, UnityBullets.kamiBullet1,
+                            b.x, b.y, b.rotation() + angleB,
+                            0.7f, 1f, -1f,
+                            j + 3, 0f, 0f
+                        );
+                    }
+                    b.time = b.lifetime + 1f;
+                }
+            };
+
+            consDatas[9] = b -> {
+                if((b.time - 40f) < 1.2f * 17){
+                    b.vel.setLength(Math.max((1f - Mathf.clamp((b.time - 40f) / (1.2f * 17))) * b.type.speed, 0.02f));
+                }else if((b.time - b.fdata) >= 2f * 60){
+                    b.vel.setLength(Math.max(Mathf.clamp(((b.time - b.fdata) - (1.75f * 60)) / 30f) * b.type.speed, 0.02f));
+                }
+            };
+
+            consDatas[10] = b -> ((KamiAI)((Unitc)b.owner).controller()).tmpBullets[0] = b;
+
+            int diff = 65 + ((difficulty - 1) * 2);
+            bulletDatas = new KamiBulletData[diff];
+
+            for(int i = 0; i < diff; i++){
+                float angle = i * 15f;
+                bulletDatas[i] = new KamiBulletData<>(angle, (bullet, kamiBulletData) -> {
+                    float time = (2f * 60f) + bullet.fdata;
+                    if(bullet.time >= time) bullet.vel.trns(kamiBulletData.initialRotation, Mathf.clamp((bullet.time - time) / 15f, 0f, bullet.type.speed));
+                });
+            }
+        }
+
+        public static Object get(int i){
+            if(i < 0) return null;
+            return i < consDatas.length ? consDatas[i] : bulletDatas[i - consDatas.length];
         }
     }
 }

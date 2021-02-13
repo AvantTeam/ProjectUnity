@@ -6,7 +6,6 @@ import arc.func.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.game.EventType.*;
-import mindustry.gen.*;
 import mindustry.type.*;
 import unity.gen.*;
 
@@ -21,7 +20,7 @@ public class MusicHandler implements ApplicationListener{
     private boolean introPassed = false;
 
     public void setup(){
-        if(netClient != null){
+        /*if(netClient != null){
             netClient.addPacketHandler("unity.bossmusic.play", this::play);
 
             netClient.addPacketHandler("unity.bossmusic.stop", this::stop);
@@ -41,7 +40,7 @@ public class MusicHandler implements ApplicationListener{
             });
         }else{
             Log.warn("netServer is null");
-        }
+        }*/
 
         Events.on(SectorLaunchEvent.class, e -> {
             Planet p = e.sector.planet;
@@ -133,9 +132,9 @@ public class MusicHandler implements ApplicationListener{
         currentData = loopDatas.get(name);
         currentPredicate = predicate == null ? () -> (state.isPlaying() || state.isPaused()) : predicate;
 
-        if(net.server()){
+        /*if(net.server()){
             Call.serverPacketReliable("unity.bossmusic.play", name);
-        }
+        }*/
     }
 
     public void stop(String name){
@@ -143,9 +142,9 @@ public class MusicHandler implements ApplicationListener{
             currentData = null;
         }
 
-        if(net.server()){
+        /*if(net.server()){
             Call.serverPacketReliable("unity.bossmusic.stop", name);
-        }
+        }*/
     }
 
     public MusicLoopData getCurrentData(){
