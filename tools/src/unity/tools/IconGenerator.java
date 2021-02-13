@@ -199,41 +199,6 @@ public class IconGenerator implements Generator{
                 }
             }
         });
-
-        content.blocks().each(block -> {
-            if(block.minfo.mod == null) return;
-
-            try{
-                block.load();
-                block.init();
-
-                TextureRegion[] genIcon = block.getGeneratedIcons();
-
-                Sprite icon = Sprite.createEmpty(block.size * 32, block.size * 32);
-                for(TextureRegion reg : genIcon){
-                    Func<TextureRegion, String> parseName = r -> ((AtlasRegion)r).name.replaceFirst("unity-", "");
-                    Sprite sprite = SpriteProcessor.get(parseName.get(reg));
-
-                    if(!block.outlineIcon){
-                        icon.draw(sprite);
-                    }else{
-                        if(reg == genIcon[genIcon.length - 1]){
-                            icon.draw(sprite.outline(4, block.outlineColor));
-                        }
-
-                        icon.draw(sprite);
-                    }
-                }
-
-                genIcon(icon, block.name.replaceFirst("unity-", ""));
-            }catch(Exception e){
-                if(e instanceof IllegalArgumentException i){
-                    Log.err("Skipping block @: @", block.name, i.getMessage());
-                }else{
-                    Log.err(e);
-                }
-            }
-        });
     }
 
     private void genIcon(Sprite sprite, String name) {
