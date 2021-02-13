@@ -96,33 +96,25 @@ public class Unity extends Mod{
         musicHandler.setup();
         antiCheat.setup();
 
-        if(netClient != null){
-            net.handleClient(UnityInvokePacket.class, packet -> {
-                UnityRemoteReadClient.readPacket(packet.reader(), packet.type);
-            });
-        }else{
-            Log.warn("'netClient' is null");
-        }
+        net.handleClient(UnityInvokePacket.class, packet -> {
+            UnityRemoteReadClient.readPacket(packet.reader(), packet.type);
+        });
 
-        if(netServer != null){
-            net.handleServer(UnityInvokePacket.class, (con, packet) -> {
-                if(con.player == null) return;
+        net.handleServer(UnityInvokePacket.class, (con, packet) -> {
+            if(con.player == null) return;
 
-                try{
-                    UnityRemoteReadServer.readPacket(packet.reader(), packet.type, con.player);
-                }catch(ValidateException e){
-                    Log.err("Validation failed for '@': @", e.player, e.getMessage());
-                }catch(RuntimeException e){
-                    if(e.getCause() instanceof ValidateException v){
-                        Log.err("Validation failed for '@': @", v.player, v.getMessage());
-                    }else{
-                        throw e;
-                    }
+            try{
+                UnityRemoteReadServer.readPacket(packet.reader(), packet.type, con.player);
+            }catch(ValidateException e){
+                Log.err("Validation failed for '@': @", e.player, e.getMessage());
+            }catch(RuntimeException e){
+                if(e.getCause() instanceof ValidateException v){
+                    Log.err("Validation failed for '@': @", v.player, v.getMessage());
+                }else{
+                    throw e;
                 }
-            });
-        }else{
-            Log.warn("'netServer' is null");
-        }
+            }
+        });
 
         if(!headless){
             LoadedMod mod = mods.locateMod("unity");

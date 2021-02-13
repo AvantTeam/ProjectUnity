@@ -1,5 +1,6 @@
 package unity.net;
 
+import arc.util.*;
 import arc.util.io.*;
 import mindustry.gen.*;
 import mindustry.io.*;
@@ -23,8 +24,8 @@ public class UnityRemoteReadClient{
                 b.data = KamiBulletDatas.get(read.i());
                 b.fdata = read.f();
                 b.time = read.f();
-            }catch(Exception e){
-                throw new RuntimeException("'createKamiBullet' failed", e);
+            }catch(Throwable t){
+                Log.err(t);
             }
         }else if(id == 1){
             try{
@@ -32,11 +33,11 @@ public class UnityRemoteReadClient{
                 String name = read.str();
 
                 Unity.musicHandler.play(name, () -> !boss.dead() && boss.isAdded());
-            }catch(Exception e){
-                throw new RuntimeException("'bossMusic' failed", e);
+            }catch(Throwable t){
+                Log.err(t);
             }
         }else{
-            throw new RuntimeException("Invalid client remote read method id: " + id);
+            Log.err("Invalid client remote read method id: " + id);
         }
     }
 }
