@@ -89,10 +89,6 @@ public class UnityUnitTypes implements ContentList{
     public static @FactionDef(type = "monolith") @EntityPoint(type = LegsUnit.class)
     UnitType pylon, monument, colossus;
 
-    /** Azurite. Don't ask. */
-    public static @FactionDef(type = "monolith") @EntityPoint(type = AzuriteUnit.class)
-    UnitType azurite;
-
     public static UnitType kami;
 
     public static @FactionDef(type = "end") UnitType opticaecus, devourer, ravager;
@@ -2063,49 +2059,6 @@ public class UnityUnitTypes implements ContentList{
                 }};
             }});
         }};
-
-        azurite = new UnityUnitType("azurite"){
-            {
-                defaultController = AzuriteAI::new;
-                health = 80000f;
-                hitSize = 32f;
-                engineSize = 4f;
-
-                speed = 15f;
-                drag = 0.2f;
-                accel = 0.2f;
-            }
-
-            @Override
-            public void drawEngine(Unit unit){
-                if(!unit.isFlying() || !(unit instanceof AzuriteUnit az)) return;
-
-                float scale = az.elevation;
-
-                for(int i = 0; i < 3; i++){
-                    az.trails[i].draw(Pal.lancerLaser, (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f) * scale) * trailScl);
-
-                    Tmp.v1.trns(az.rotation - 90, az.trailOffsets[i].getX(), az.trailOffsets[i].getY());
-                    Draw.color(Pal.lancerLaser);
-                    Fill.circle(
-                        unit.x + Tmp.v1.x,
-                        unit.y + Tmp.v1.y,
-                        (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f)) * scale
-                    );
-                }
-
-                float offset = engineOffset / 2f + engineOffset / 2f * scale;
-
-                Draw.color(Color.white);
-                Fill.circle(
-                    unit.x + Angles.trnsx(unit.rotation + 180, offset - 1f),
-                    unit.y + Angles.trnsy(unit.rotation + 180, offset - 1f),
-                    (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f)) / 2f  * scale
-                );
-
-                Draw.color();
-            }
-        };
 
         setEntity("kami-mkii", KamiUnit::new);
         kami = new RainbowUnitType("kami-mkii"){{
