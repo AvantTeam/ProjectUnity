@@ -67,6 +67,15 @@ public class MusicHandler implements ApplicationListener{
 
     @Override
     public void update(){
+        if(headless){
+            currentData = null;
+
+            currentMusic.stop();
+            currentMusic = null;
+
+            return;
+        }
+
         if(currentData != null && !currentPredicate.get()){
             stop(loopDatas.findKey(currentData, false));
         }
@@ -103,7 +112,7 @@ public class MusicHandler implements ApplicationListener{
 
         if(currentMusic != null){
             control.sound.stop();
-            currentMusic.setVolume(currentMusic.getVolume() * (Core.settings.getInt("musicvol") / 100f));
+            currentMusic.setVolume(currentMusic.getVolume() * (Core.settings.getInt("musicvol", 100) / 100f));
         }
     }
 
