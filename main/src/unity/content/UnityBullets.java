@@ -24,7 +24,7 @@ import static mindustry.Vars.*;
 public class UnityBullets implements ContentList{
     public static BulletType laser, shardLaserFrag, shardLaser, frostLaser, branchLaserFrag, branchLaser, kelvinLaser, breakthroughLaser, coalBlaze, pyraBlaze, falloutLaser, catastropheLaser, calamityLaser, extinctionLaser, orb, shockBeam, currentStroke,
         shielderBullet, plasmaFragTriangle, plasmaTriangle, surgeBomb, pylonLightning, pylonLaser, pylonLaserSmall, exporb, monumentRailBullet, scarShrapnel, scarMissile, celsiusSmoke, kelvinSmoke,
-        kamiBullet1, kamiLaser, kamiSmallLaser, supernovaLaser;
+        kamiBullet1, kamiLaser, kamiSmallLaser, supernovaLaser, ravagerLaser;
 
     //only enhanced
     public static BasicBulletType standardDenseLarge, standardHomingLarge, standardIncendiaryLarge, standardThoriumLarge, standardDenseHeavy, standardHomingHeavy, standardIncendiaryHeavy, standardThoriumHeavy, standardDenseMassive, standardHomingMassive,
@@ -391,7 +391,7 @@ public class UnityBullets implements ContentList{
 
         extinctionLaser = new SparkingContinuousLaserBulletType(770f){{
             length = 560f;
-            strokes = new float[]{2f * 2.2f, 1.5f * 2.2f, 1f * 2.2f, 0.3f * 2.2f};
+            strokes = new float[]{2f * 2.2f, 1.5f * 2.2f, 2.2f, 0.3f * 2.2f};
             lightStroke = 90f;
             spaceMag = 70f;
             fromBlockChance = 0.5f;
@@ -717,6 +717,44 @@ public class UnityBullets implements ContentList{
                 };
 
                 length = 280f;
+            }
+        };
+
+        ravagerLaser = new PointBlastLaserBulletType(1210f){
+            {
+                length = 460f;
+                width = 26.1f;
+                lifetime = 25f;
+                widthReduction = 6f;
+                auraWidthReduction = 4f;
+                damageRadius = 75f;
+                auraDamage = 9000f;
+
+                laserColors = new Color[]{UnityPal.scarColorAlpha, UnityPal.scarColor, UnityPal.endColor, Color.black};
+            }
+
+            @Override
+            public void handleBuilding(Bullet b, Building build, float initialHealth){
+                float damage = auraDamage / (Math.max(2500f - Math.max(initialHealth - 150000f, 0f), 0f) / 2500f);
+                if(damage >= Float.MAX_VALUE || Float.isInfinite(damage)){
+                    build.health = 0f;
+                    build.tile.remove();
+                    build.remove();
+                }else{
+                    build.damage(damage);
+                }
+            }
+
+            @Override
+            public void hitEntity(Bullet b, Hitboxc other, float initialHealth){
+                if(!(other instanceof Unit h)) return;
+                float damage = auraDamage / (Math.max(2500f - Math.max(initialHealth - 150000f, 0f), 0f) / 2500f);
+                if(damage >= Float.MAX_VALUE || Float.isInfinite(damage)){
+                    h.health = 0f;
+                    other.remove();
+                }else{
+                    h.damage(damage);
+                }
             }
         };
 

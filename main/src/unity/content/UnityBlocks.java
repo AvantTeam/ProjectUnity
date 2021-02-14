@@ -20,6 +20,7 @@ import mindustry.world.blocks.defense.turrets.*;
 import mindustry.type.*;
 import mindustry.ctype.*;
 import mindustry.content.*;
+import unity.*;
 import unity.annotations.Annotations.*;
 import unity.entities.bullet.*;
 import unity.gen.*;
@@ -1959,7 +1960,7 @@ public class UnityBlocks implements ContentList{
                 pierce = true;
                 auraDamage = 8000f;
                 damageRadius = 120f;
-                laserColor = UnityPal.advance;
+                laserColors = new Color[]{UnityPal.advance};
             }};
         }};
 
