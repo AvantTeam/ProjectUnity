@@ -317,6 +317,9 @@ public class UnityUnitType extends UnitType{
             float wx = unit.x + Angles.trnsx(rotation, weapon.x, weapon.y) + Angles.trnsx(weaponRotation, 0, recoil),
             wy = unit.y + Angles.trnsy(rotation, weapon.x, weapon.y) + Angles.trnsy(weaponRotation, 0, recoil);
 
+            float zC = Draw.z();
+            if(found) Draw.z(zC - 0.005f);
+
             if(weapon.shadow > 0){
                 Drawf.shadow(wx, wy, weapon.shadow);
             }
@@ -334,8 +337,6 @@ public class UnityUnitType extends UnitType{
                 Draw.z(zB);
             }
 
-            float zC = Draw.z();
-            if(found) Draw.z(zC - 0.005f);
             Draw.rect(weapon.region,
             wx, wy,
             weapon.region.width * Draw.scl * -Mathf.sign(weapon.flipSprite),

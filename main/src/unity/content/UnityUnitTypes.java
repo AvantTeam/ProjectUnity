@@ -2289,7 +2289,7 @@ public class UnityUnitTypes implements ContentList{
             legSplashDamage = 1600f;
 
             bottomWeapons.add("unity-ravager-nightmare");
-            weapons.add(new Weapon("unity-ravager-nightmare"){{
+            weapons.addAll(new Weapon("unity-ravager-nightmare"){{
                 x = 80.25f;
                 y = -7.75f;
                 shootY = 75f;
@@ -2298,6 +2298,52 @@ public class UnityUnitTypes implements ContentList{
                 alternate = true;
                 rotate = false;
                 bullet = UnityBullets.ravagerLaser;
+            }}, new Weapon("unity-ravager-artillery"){{
+                shootY = 11f;
+                shots = 5;
+                inaccuracy = 10f;
+                shadow = 13.25f * 2f;
+                y = -31.75f;
+                x = 44.25f;
+                rotate = true;
+                rotateSpeed = 2f;
+                velocityRnd = 0.2f;
+                reload = 2f * 50f;
+                bullet = UnityBullets.ravagerArtillery;
+            }}, new Weapon("unity-ravager-artillery"){{
+                shootY = 11f;
+                shots = 5;
+                inaccuracy = 10f;
+                shadow = 13.25f * 2f;
+                y = -4.25f;
+                x = 51.25f;
+                rotate = true;
+                rotateSpeed = 2f;
+                velocityRnd = 0.2f;
+                reload = 2.25f * 50f;
+                bullet = UnityBullets.ravagerArtillery;
+            }}, new Weapon("unity-ravager-small-turret"){{
+                shootY = 7f;
+                inaccuracy = 2f;
+                shadow = 9.25f * 2f;
+                y = 53.75f;
+                x = 34.5f;
+                rotate = true;
+                xRand = 2f;
+                reload = 7f;
+
+                bullet = UnityBullets.missileAntiCheat;
+            }}, new Weapon("unity-ravager-small-turret"){{
+                shootY = 7f;
+                inaccuracy = 2f;
+                shadow = 9.25f * 2f;
+                y = 24.25f;
+                x = 50.75f;
+                rotate = true;
+                xRand = 2f;
+                reload = 7f;
+
+                bullet = UnityBullets.missileAntiCheat;
             }});
         }
             @Override

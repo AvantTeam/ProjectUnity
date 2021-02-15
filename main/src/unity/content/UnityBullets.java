@@ -24,7 +24,7 @@ import static mindustry.Vars.*;
 public class UnityBullets implements ContentList{
     public static BulletType laser, shardLaserFrag, shardLaser, frostLaser, branchLaserFrag, branchLaser, kelvinLaser, breakthroughLaser, coalBlaze, pyraBlaze, falloutLaser, catastropheLaser, calamityLaser, extinctionLaser, orb, shockBeam, currentStroke,
         shielderBullet, plasmaFragTriangle, plasmaTriangle, surgeBomb, pylonLightning, pylonLaser, pylonLaserSmall, exporb, monumentRailBullet, scarShrapnel, scarMissile, celsiusSmoke, kelvinSmoke,
-        kamiBullet1, kamiLaser, kamiSmallLaser, supernovaLaser, ravagerLaser;
+        kamiBullet1, kamiLaser, kamiSmallLaser, supernovaLaser, ravagerLaser, ravagerArtillery, missileAntiCheat;
 
     //only enhanced
     public static BasicBulletType standardDenseLarge, standardHomingLarge, standardIncendiaryLarge, standardThoriumLarge, standardDenseHeavy, standardHomingHeavy, standardIncendiaryHeavy, standardThoriumHeavy, standardDenseMassive, standardHomingMassive,
@@ -757,6 +757,52 @@ public class UnityBullets implements ContentList{
                 }
             }
         };
+
+        ravagerArtillery = new ArtilleryBulletType(4f, 170f){{
+            lifetime = 110f;
+            splashDamage = 325f;
+            splashDamageRadius = 140f;
+            width = height = 21f;
+            backColor = lightColor = trailColor = UnityPal.scarColor;
+            frontColor = lightningColor = UnityPal.endColor;
+            lightning = 5;
+            lightningLength = 10;
+            lightningLengthRand = 5;
+
+            fragBullets = 7;
+            fragLifeMin = 0.9f;
+            fragBullet = new AntiCheatBasicBulletType(5.6f, 640f){{
+                lifetime = 30f;
+                pierce = pierceBuilding = true;
+                pierceCap = 5;
+                backColor = lightColor = UnityPal.scarColor;
+                frontColor = UnityPal.endColor;
+                width = height = 16f;
+                shrinkY = 0f;
+                tolerance = 12000f;
+                fade = 40f;
+            }};
+        }};
+
+        missileAntiCheat = new AntiCheatBasicBulletType(4f, 440f, "missile"){{
+            lifetime = 60f;
+            width = height = 14f;
+            shrinkY = 0f;
+            drag = -0.013f;
+            tolerance = 12000f;
+            fade = 45f;
+            splashDamageRadius = 45f;
+            splashDamage = 220f;
+            homingPower = 0.08f;
+            trailChance = 0.2f;
+            weaveScale = 6f;
+            weaveMag = 1f;
+            hitEffect = Fx.blastExplosion;
+            despawnEffect = Fx.blastExplosion;
+
+            backColor = lightColor = trailColor = UnityPal.scarColor;
+            frontColor = UnityPal.endColor;
+        }};
 
         //only enhanced
 
