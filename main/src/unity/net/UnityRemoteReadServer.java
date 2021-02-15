@@ -1,10 +1,30 @@
 package unity.net;
 
+import arc.func.*;
+import arc.struct.*;
 import arc.util.io.*;
 import mindustry.gen.*;
 
+import java.io.*;
+
 public class UnityRemoteReadServer{
-    public static void readPacket(Reads reader, byte id, Player player){
-        
+    private static final ReusableByteInStream out = new ReusableByteInStream();
+    private static final Reads read = new Reads(new DataInputStream(out));
+
+    private static final ObjectMap<String, Cons<Player>> map = new ObjectMap<>();
+
+    public static void registerHandlers(){}
+
+    public static void readPacket(byte[] bytes, String type, Player player){
+        out.setBytes(bytes);
+        if(!map.containsKey(type)){
+            throw new RuntimeException("Unknown packet type: '" + type + "'");
+        }else{
+            try{
+                map.get(type).get(player);
+            }catch(Exception e){
+                throw new RuntimeException(e);
+            }
+        }
     }
 }
