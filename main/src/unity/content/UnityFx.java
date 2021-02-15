@@ -15,6 +15,7 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.defense.turrets.Turret.*;
 import unity.entities.UnitVecData;
+import unity.entities.bullet.*;
 import unity.graphics.*;
 import unity.util.*;
 
@@ -799,9 +800,13 @@ public class UnityFx{
     }),
 
     pointBlastLaserEffect = new Effect(23f, 600f, e -> {
-        Draw.color(e.color);
-        Fill.circle(e.x, e.y, e.rotation * e.fout());
-        Drawf.light(e.x, e.y, e.rotation * e.fout() * 3f, e.color, 0.66f);
+        if(!(e.data instanceof PointBlastLaserBulletType btype)) return;
+
+        for(int i = 0; i < btype.laserColors.length; i++){
+            Draw.color(btype.laserColors[i]);
+            Fill.circle(e.x, e.y, (e.rotation - (btype.auraWidthReduction * i)) * e.fout());
+        }
+        Drawf.light(e.x, e.y, e.rotation * e.fout() * 3f, btype.laserColors[0], 0.66f);
     }),
 
     rockFx = new Effect(10f, e -> {

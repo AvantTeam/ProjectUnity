@@ -2276,8 +2276,8 @@ public class UnityUnitTypes implements ContentList{
             visualElevation = 3f;
             legCount = 8;
             legGroupSize = 4;
-            legPairOffset = 4f;
-            legMoveSpace = 0.6f;
+            legPairOffset = 2f;
+            legMoveSpace = 0.5f;
             legLength = 140f;
             legExtension = -15f;
             legBaseOffset = 50f;
@@ -2287,6 +2287,18 @@ public class UnityUnitTypes implements ContentList{
 
             legSplashRange = 150f;
             legSplashDamage = 1600f;
+
+            bottomWeapons.add("unity-ravager-nightmare");
+            weapons.add(new Weapon("unity-ravager-nightmare"){{
+                x = 80.25f;
+                y = -7.75f;
+                shootY = 75f;
+                reload = 7f * 60f;
+                recoil = 8f;
+                alternate = true;
+                rotate = false;
+                bullet = UnityBullets.ravagerLaser;
+            }});
         }
             @Override
             public void init(){

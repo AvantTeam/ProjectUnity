@@ -8,6 +8,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.entities.*;
+import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -26,6 +27,7 @@ public class UnityUnitType extends UnitType{
 
     public TextureRegion segmentRegion, tailRegion, segmentCellRegion, segmentOutline, tailOutline, legBackRegion, legBaseBackRegion, footBackRegion;
     public TextureRegion[] abilityRegions = new TextureRegion[AbilityTextures.values().length];
+    public Seq<String> bottomWeapons = new Seq<>();
     // worms
     public int segmentLength = 9;
     public float segmentOffset = 23f;
@@ -303,7 +305,58 @@ public class UnityUnitType extends UnitType{
             Draw.z(1.01f + z + worm.layer());
         }
 
-        super.drawWeapons(unit);
+        //super.drawWeapons(unit);
+        applyColor(unit);
+        for(WeaponMount mount : unit.mounts){
+            Weapon weapon = mount.weapon;
+            boolean found = bottomWeapons.contains(weapon.name);
+
+            float rotation = unit.rotation - 90;
+            float weaponRotation  = rotation + (weapon.rotate ? mount.rotation : 0);
+            float recoil = -((mount.reload) / weapon.reload * weapon.recoil);
+            float wx = unit.x + Angles.trnsx(rotation, weapon.x, weapon.y) + Angles.trnsx(weaponRotation, 0, recoil),
+            wy = unit.y + Angles.trnsy(rotation, weapon.x, weapon.y) + Angles.trnsy(weaponRotation, 0, recoil);
+
+            if(weapon.shadow > 0){
+                Drawf.shadow(wx, wy, weapon.shadow);
+            }
+
+            if(weapon.outlineRegion.found()){
+                float zB = Draw.z();
+                if(!weapon.top || found) Draw.z(zB - outlineSpace);
+
+                Draw.rect(weapon.outlineRegion,
+                wx, wy,
+                weapon.outlineRegion.width * Draw.scl * -Mathf.sign(weapon.flipSprite),
+                weapon.region.height * Draw.scl,
+                weaponRotation);
+
+                Draw.z(zB);
+            }
+
+            float zC = Draw.z();
+            if(found) Draw.z(zC - 0.005f);
+            Draw.rect(weapon.region,
+            wx, wy,
+            weapon.region.width * Draw.scl * -Mathf.sign(weapon.flipSprite),
+            weapon.region.height * Draw.scl,
+            weaponRotation);
+
+            if(weapon.heatRegion.found() && mount.heat > 0){
+                Draw.color(weapon.heatColor, mount.heat);
+                Draw.blend(Blending.additive);
+                Draw.rect(weapon.heatRegion,
+                wx, wy,
+                weapon.heatRegion.width * Draw.scl * -Mathf.sign(weapon.flipSprite),
+                weapon.heatRegion.height * Draw.scl,
+                weaponRotation);
+                Draw.blend();
+                Draw.color();
+            }
+            Draw.z(zC);
+        }
+
+        Draw.reset();
         Draw.z(z);
     }
 
