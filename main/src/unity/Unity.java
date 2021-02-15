@@ -3,6 +3,7 @@ package unity;
 import arc.*;
 import arc.func.*;
 import arc.scene.*;
+import arc.struct.Seq;
 import arc.util.*;
 import mindustry.mod.*;
 import mindustry.mod.Mods.*;
@@ -34,6 +35,8 @@ public class Unity extends Mod{
         new UnitySectorPresets(),
         new UnityTechTree()
     };
+
+    private static LoadedMod unity;
 
     public Unity(){
         ContributorList.init();
@@ -97,11 +100,14 @@ public class Unity extends Mod{
         UnityCall.init();
 
         if(!headless){
-            LoadedMod mod = mods.locateMod("unity");
+            unity = mods.locateMod("unity");
             Func<String, String> stringf = value -> Core.bundle.get("mod." + value);
 
-            mod.meta.displayName = stringf.get(mod.meta.name + ".name");
-            mod.meta.description = stringf.get(mod.meta.name + ".description");
+            unity.meta.displayName = stringf.get(unity.meta.name + ".name");
+            unity.meta.description = stringf.get(unity.meta.name + ".description");
+
+            Scripts scripts = mods.getScripts();
+            scripts.runConsole("const Unity = Vars.mods.locateMod(\"unity\").main");
         }
     }
 
@@ -139,14 +145,39 @@ public class Unity extends Mod{
     }
 
     public static void print(Object... args){
-        StringBuilder h = new StringBuilder();
-        if(args == null) h.append("null");
-        else{
-            for(var o : args){
-                h.append(o == null ? "null" : o.toString());
-                h.append(", ");
+        StringBuilder builder = new StringBuilder();
+        if(args == null){
+            builder.append("null");
+        }else{
+            for(int i = 0; i < args.length; i++){
+                builder.append(args[i]);
+                if(i < args.length - 1) builder.append(", ");
             }
         }
-        Log.infoTag("unity", h.toString());
+
+        Log.infoTag("unity", builder.toString());
+    }
+
+    public static Class<?> forName(String canonical){
+        try{
+            return Class.forName(canonical, true, ((Unity)unity.main).getClass().getClassLoader());
+        }catch(Exception e){
+            Log.err(e);
+            return null;
+        }
+    }
+
+    public static <T> T newInstance(Class<T> type, Object... parameters){
+        try{
+            Class<?>[] types = Seq.with(parameters).map(param -> {
+                Class<?> ptype = param.getClass();
+                return ptype.isAnonymousClass() ? ptype.getSuperclass() : ptype;
+            }).toArray();
+
+            return type.getDeclaredConstructor(types).newInstance(parameters);
+        }catch(Exception e){
+            Log.err(e);
+            return null;
+        }
     }
 }
