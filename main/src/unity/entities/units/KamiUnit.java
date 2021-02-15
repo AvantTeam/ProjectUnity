@@ -7,7 +7,7 @@ public class KamiUnit extends UnitEntity{
     @Override
     public void add(){
         if(!added){
-            //UnityCall.bossMusic(this, "kami"); later.
+            UnityCall.bossMusic(this, "kami");
             super.add();
         }
     }

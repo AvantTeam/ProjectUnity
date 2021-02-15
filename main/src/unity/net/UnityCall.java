@@ -11,7 +11,6 @@ import unity.ai.KamiAI.*;
 
 import java.io.*;
 import java.nio.charset.*;
-import java.util.*;
 import java.util.regex.*;
 
 import static mindustry.Vars.*;
@@ -44,11 +43,6 @@ public class UnityCall{
         }else{
             Log.warn("'netServer' is null");
         }
-
-        byte[] tmp = {0, -32, 127, 64};
-        Log.info(Arrays.toString(tmp));
-        Log.info(packBytes(tmp));
-        Log.info(Arrays.toString(unpackBytes(packBytes(tmp))));
     }
 
     protected static String packBytes(byte[] bytes){
