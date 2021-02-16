@@ -261,8 +261,8 @@ public class UnityBullets implements ContentList{
                 toColor = Color.cyan;
             }
 
-            public float dmgMult = 200f; //Multiply the liquid's heat capacity
-            public float dmgMultInc = 15f;
+            public float dmgMult = 150f; //Multiply the liquid's heat capacity
+            public float dmgMultInc = 10f;
 
             @Override
             public void setDamage(Bullet b){
@@ -274,12 +274,12 @@ public class UnityBullets implements ContentList{
 
             public void freezePos(Bullet b, float x, float y){
                 var lvl = getLevel(b);
-                float rad = 3.5f;
+                float rad = 4.5f;
                 if(!Vars.headless) UnityFx.freezeEffect.at(x, y, lvl / rad + 10f, getColor(b));
                 if(!Vars.headless) UnitySounds.laserFreeze.at(x, y, 1f, 0.6f);
         
-                Damage.status(b.team, x, y, 10f + lvl / rad, status, 60f + lvl * 6f, true, true);
-                Damage.status(b.team, x, y, 10f + lvl / rad, UnityStatusEffects.disabled, 2f * lvl, true, true);
+                Damage.status(b.team, x, y, 10f + lvl / rad, status, 60f + lvl * 8f, true, true);
+                Damage.status(b.team, x, y, 10f + lvl / rad, UnityStatusEffects.disabled, 3f * lvl, true, true);
             }
 
             @Override
