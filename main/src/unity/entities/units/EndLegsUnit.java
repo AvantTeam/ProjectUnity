@@ -12,7 +12,7 @@ public class EndLegsUnit extends LegsUnit implements AntiCheatBase{
     private float lastMaxHealth = 0f;
 
     private float invTime = 0f;
-    private float invTimeB = 0f;
+    private final float[] invTimeB = new float[5];
     private float immunity = 1f;
 
     @Override
@@ -32,7 +32,9 @@ public class EndLegsUnit extends LegsUnit implements AntiCheatBase{
         super.update();
 
         invTime += Time.delta;
-        invTimeB += Time.delta;
+        for(int i = 0; i < invTimeB.length; i++){
+            invTimeB[i] += Time.delta;
+        }
         immunity = Math.max(1f, immunity - (Time.delta / 4f));
     }
 
@@ -95,8 +97,14 @@ public class EndLegsUnit extends LegsUnit implements AntiCheatBase{
 
     @Override
     public void lastHealth(float v){
-        if(invTimeB < 30f) return;
-        invTimeB = 0;
         lastHealth = v;
+    }
+
+    @Override
+    public void overrideAntiCheatDamage(float v, int priority){
+        if(invTimeB[Mathf.clamp(priority, 0, invTimeB.length - 1)] < 30f) return;
+        invTimeB[Mathf.clamp(priority, 0, invTimeB.length - 1)] = 0f;
+        lastHealth(lastHealth() - v);
+        if(health() > lastHealth()) health(lastHealth());
     }
 }

@@ -9,7 +9,7 @@ import unity.content.*;
 
 public class EndWormUnit extends WormDefaultUnit implements AntiCheatBase{
     private float invTime = 0f;
-    private float invTimeB = 0f;
+    private final float[] invTimeB = new float[5];
     private float immunity = 1f;
     private float lastHealth = 0f;
     private float lastMaxHealth = 0f;
@@ -22,8 +22,6 @@ public class EndWormUnit extends WormDefaultUnit implements AntiCheatBase{
 
     @Override
     public void lastHealth(float v){
-        if(invTimeB < 30f) return;
-        invTimeB = 0f;
         lastHealth = v;
     }
 
@@ -36,7 +34,9 @@ public class EndWormUnit extends WormDefaultUnit implements AntiCheatBase{
         lastMaxHealth = health;
         super.update();
         invTime += Time.delta;
-        invTimeB += Time.delta;
+        for(int i = 0; i < invTimeB.length; i++){
+            invTimeB[i] += Time.delta;
+        }
         immunity = Math.max(1f, immunity - (Time.delta / 4f));
         rogueDamageResist = Math.max(1f, rogueDamageResist - (Time.delta / 2f));
     }
@@ -84,6 +84,14 @@ public class EndWormUnit extends WormDefaultUnit implements AntiCheatBase{
     }
 
     @Override
+    public void overrideAntiCheatDamage(float v, int priority){
+        if(invTimeB[Mathf.clamp(priority, 0, invTimeB.length - 1)] < 30f) return;
+        invTimeB[Mathf.clamp(priority, 0, invTimeB.length - 1)] = 0f;
+        lastHealth(lastHealth() - v);
+        if(health() > lastHealth()) health(lastHealth());
+    }
+
+    @Override
     public void damage(float amount){
         if(invTime < 30f) return;
         invTime = 0f;
@@ -93,6 +101,11 @@ public class EndWormUnit extends WormDefaultUnit implements AntiCheatBase{
         immunity += Math.pow(amount / max, 2) * 2f;
         lastHealth -= trueDamage;
         super.damage(trueDamage);
+    }
+
+    @Override
+    public WormSegmentUnit newSegment(){
+        return new EndWormSegmentUnit();
     }
 
     @Override

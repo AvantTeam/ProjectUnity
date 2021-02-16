@@ -762,6 +762,22 @@ public class UnityFx{
         Draw.z(oz);
     }),
 
+    devourerShootEffect = new Effect(41f, e -> {
+        Color[] colors = {UnityPal.scarColorAlpha, UnityPal.scarColor, UnityPal.endColor, Color.white};
+
+        for(int i = 0; i < colors.length; i++){
+            Draw.color(colors[i]);
+            float size = Math.max(0f, (e.fslope() * 35f) - (i * ((7f + (1f - e.fslope())) * 2f)));
+            Fill.circle(e.x, e.y, size);
+
+            int finalI = i;
+            Angles.randLenVectors(e.id, 13, 140f, (x, y) -> {
+                float s = 3.4f + (colors.length - finalI);
+                Fill.circle(e.x + (x * (1f - e.finpow())), e.y + (y * (1f - e.finpow())), e.fin() * 2f * s);
+            });
+        }
+    }),
+
     rainbowTextureTrail = new Effect(80f, e -> {
         if(!(e.data instanceof TextureRegion t)) return;
         Draw.blend(Blending.additive);

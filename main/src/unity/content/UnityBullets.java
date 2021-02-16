@@ -745,7 +745,7 @@ public class UnityBullets implements ContentList{
                 }else{
                     h.damage(damage);
                 }
-                if(other instanceof AntiCheatBase) ((AntiCheatBase)other).overrideAntiCheatDamage(auraDamage);
+                if(other instanceof AntiCheatBase) ((AntiCheatBase)other).overrideAntiCheatDamage(auraDamage, 1);
             }
         };
 
@@ -788,6 +788,7 @@ public class UnityBullets implements ContentList{
             trailChance = 0.2f;
             weaveScale = 6f;
             weaveMag = 1f;
+            priority = 2;
             hitEffect = Fx.blastExplosion;
             despawnEffect = Fx.blastExplosion;
 
