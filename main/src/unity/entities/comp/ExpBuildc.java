@@ -112,6 +112,14 @@ public interface ExpBuildc extends ExpEntityc<Block, ExpBlock>, Buildingc{
     }
 
     @Override
+    default boolean shouldShowConfigure(Player player){
+        if(expType().enableUpgrade){
+            return (currentUpgrades(level()).length > 0);
+        }
+        return false;
+    }
+
+    @Override
     default void buildConfiguration(Table table){
         expBuildConfiguration(table);
     }
@@ -208,10 +216,10 @@ public interface ExpBuildc extends ExpEntityc<Block, ExpBlock>, Buildingc{
     @Replace
     default Cursor getCursor(){
         Cursor cursor = block().configurable && team() == player.team() ? SystemCursor.hand : SystemCursor.arrow;
-        if(!expType().enableUpgrade || expType().condConfig){
+        if(!expType().enableUpgrade){
             return cursor;
         }else{
-            return expType().upgrades.isEmpty() ? SystemCursor.arrow : SystemCursor.hand;
+            return currentUpgrades(level()).length > 0 ? SystemCursor.hand : SystemCursor.arrow;
         }
     }
 

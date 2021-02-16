@@ -7,24 +7,22 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.type.*;
 import mindustry.world.blocks.defense.turrets.*;
 import unity.entities.comp.*;
 import unity.graphics.*;
 
-public class ExpPowerTurret extends PowerTurret{
+public class ExpItemTurret extends ItemTurret{
     /** Color of shoot effects. Shifts to second color as the turret levels up. */
     public Color fromColor = Pal.lancerLaser, toColor = Pal.sapBullet;
     /** Increase in range with each level. I don't know how to get the expFields from here, if possible. */
-    // ^ regarding that, you use ExpMeta#map(UnlockableContent), or you can just do block.addField(...) ~glen
     public float rangeInc = -1f;
 
-    public ExpPowerTurret(String name){
+    public ExpItemTurret(String name){
         super(name);
-        shootCone = 1;
-        inaccuracy = 0;
     }
 
-    public class ExpPowerTurretBuild extends PowerTurretBuild implements ExpBuildc{
+    public class ExpItemTurretBuild extends ItemTurretBuild implements ExpBuildc{
         public float exp = 0f;
         public boolean checked = false;
 
@@ -72,7 +70,12 @@ public class ExpPowerTurret extends PowerTurret{
         }
 
         @Override
-        public void killed() {
+        public boolean consumesOrb(){
+            return exp() < expType().maxExp;
+        }
+
+        @Override
+        public void killed(){
             super.killed();
             ExpBuildc.super.killed();
         }

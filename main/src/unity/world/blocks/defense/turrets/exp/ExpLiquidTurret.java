@@ -1,5 +1,6 @@
 package unity.world.blocks.defense.turrets.exp;
 
+import arc.Graphics.*;
 import arc.graphics.*;
 import arc.scene.ui.layout.Table;
 import arc.util.*;
@@ -19,7 +20,6 @@ public class ExpLiquidTurret extends LiquidTurret{
 
     public ExpLiquidTurret(String name){
         super(name);
-        configurable = true;
         shootCone = 1;
         inaccuracy = 0;
         hasPower = true;
@@ -47,6 +47,18 @@ public class ExpLiquidTurret extends LiquidTurret{
         @Override
         public boolean acceptLiquid(Building source, Liquid liquid){
             return ammoTypes.get(liquid) != null;
+        }
+
+        @Override
+        public boolean shouldShowConfigure(Player player){
+            return
+                super.shouldShowConfigure(player) &&
+                ExpBuildc.super.shouldShowConfigure(player);
+        }
+
+        @Override
+        public Cursor getCursor(){
+            return ExpBuildc.super.getCursor();
         }
 
         @Override
