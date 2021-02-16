@@ -1206,6 +1206,7 @@ public class UnityBlocks implements ContentList{
                 size = 3;
                 range = 80f;
                 reloadTime = 6f;
+                coolantMultiplier = 2f;
                 recoilAmount = 0f;
                 shootCone = 5f;
                 shootSound = Sounds.flame;

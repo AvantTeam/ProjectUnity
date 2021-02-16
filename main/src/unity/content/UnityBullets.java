@@ -324,7 +324,7 @@ public class UnityBullets implements ContentList{
                 status = StatusEffects.burning;
                 keepVelocity = true;
                 hittable = false;
-                expGain = 1.1f;
+                expGain = 0.5f;
             }
         };
 
@@ -341,7 +341,7 @@ public class UnityBullets implements ContentList{
                 status = StatusEffects.burning;
                 keepVelocity = false;
                 hittable = false;
-                expGain = 1.75f;
+                expGain = 0.6f;
             }
         };
 
