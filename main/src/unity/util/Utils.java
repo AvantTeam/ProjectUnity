@@ -75,6 +75,49 @@ public final class Utils{
         return true;
     }
 
+    public static boolean hasBuilding(float wx, float wy, float range, Boolf<Building> pred){
+        collidedBlocks.clear();
+
+        int tx = World.toTile(wx);
+        int ty = World.toTile(wy);
+
+        int tileRange = (int)(range / tilesize + 1);
+        boolean any = false;
+
+        loop:
+        for(int x = -tileRange + tx; x <= tileRange + tx; x++){
+            for(int y = -tileRange + ty; y <= tileRange + ty; y++){
+                if(!Mathf.within(x * tilesize, y * tilesize, wx, wy, range)) continue;
+
+                Building other = world.build(x, y);
+
+                if(other == null) continue;
+
+                if(pred.get(other) && collidedBlocks.add(other.pos())){
+                    any = true;
+                    break loop;
+                }
+            }
+        }
+
+        return any;
+    }
+
+    public static float angleDistSigned(float a, float b){
+        float d = Math.abs(a - b) % 360f;
+        int sign = (a - b >= 0f && a - b <= 180f) || (a - b <= -180f && a - b >= -360f) ? 1 : -1;
+        return (d > 180f ? 360f - d : d) * sign;
+    }
+
+    public static float clampedAngle(float angle, float relative, float limit){
+        float dst = angleDistSigned(angle, relative);
+        if(Math.abs(dst) > limit){
+            float val = dst > 0 ? dst - limit : dst + limit;
+            return (angle - val) % 360f;
+        }
+        return angle;
+    }
+
     /** Same thing like the drawer from UnitType without applyColor and outlines. */
     public static void simpleUnitDrawer(Unit unit, boolean drawLegs){
         UnitType type = unit.type;

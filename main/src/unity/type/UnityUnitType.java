@@ -31,6 +31,7 @@ public class UnityUnitType extends UnitType{
     // worms
     public int segmentLength = 9;
     public float segmentOffset = 23f;
+    public float angleLimit = 30f;
     //hopefully make segment movement more consistant.
     public boolean counterDrag = false;
         // don't touch, please

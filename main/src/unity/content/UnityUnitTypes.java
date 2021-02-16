@@ -40,7 +40,8 @@ public class UnityUnitTypes implements ContentList{
         TransLegsUnit::new,
         EndInvisibleUnit::new,
         EndWormUnit::new,
-        EndWormSegmentUnit::new
+        EndWormSegmentUnit::new,
+        EndLegsUnit::new
     };
 
     private static final int[] classIDs = new int[constructors.length];
@@ -2146,11 +2147,12 @@ public class UnityUnitTypes implements ContentList{
             armor = 16f;
             omniMovement = false;
 
-            BulletType t = new AntiCheatBasicBulletType(9.2f, 130f){{
+            BulletType t = new AntiCheatBasicBulletType(9.2f, 230f){{
                 hitSize = 8f;
                 shrinkY = 0f;
                 width = 19f;
                 height = 25f;
+                otherAntiCheatScl = 2.75f;
                 backColor = hitColor = lightColor = UnityPal.scarColor;
                 frontColor = UnityPal.endColor;
             }};
@@ -2172,7 +2174,14 @@ public class UnityUnitTypes implements ContentList{
                     fromBlockDamage = 80f;
                     lightColor = lightningColor = hitColor = UnityPal.scarColor;
                     colors = new Color[]{UnityPal.scarColorAlpha, UnityPal.scarColor, UnityPal.endColor, Color.white};
-                }};
+                }
+
+                    @Override
+                    public void hitEntity(Bullet b, Hitboxc other, float initialHealth){
+                        super.hitEntity(b, other, initialHealth);
+                        if(other instanceof AntiCheatBase) ((AntiCheatBase)other).overrideAntiCheatDamage(damage * 2f);
+                    }
+                };
             }}, new Weapon("unity-doeg-destroyer"){{
                 mirror = true;
                 ignoreRotation = true;
@@ -2251,7 +2260,14 @@ public class UnityUnitTypes implements ContentList{
                         strokes[i] *= 0.4f;
                     }
                     colors = new Color[]{UnityPal.scarColorAlpha, UnityPal.scarColor, UnityPal.endColor, Color.white};
-                }};
+                }
+
+                    @Override
+                    public void hitEntity(Bullet b, Hitboxc other, float initialHealth){
+                        super.hitEntity(b, other, initialHealth);
+                        if(other instanceof AntiCheatBase) ((AntiCheatBase)other).overrideAntiCheatDamage(damage * 2f);
+                    }
+                };
             }});
         }
             @Override
@@ -2261,14 +2277,14 @@ public class UnityUnitTypes implements ContentList{
             }
         };
 
-        setEntity("ravager", LegsUnit::create);
+        setEntity("ravager", EndLegsUnit::new);
         ravager = new UnityUnitType("ravager"){{
             health = 1650000f;
             speed = 0.65f;
             drag = 0.16f;
             armor = 15f;
             hitSize = 138f;
-            rotateSpeed = 1.2f;
+            rotateSpeed = 1.1f;
 
             allowLegStep = true;
             hovering = true;
@@ -2293,7 +2309,7 @@ public class UnityUnitTypes implements ContentList{
                 x = 80.25f;
                 y = -7.75f;
                 shootY = 75f;
-                reload = 7f * 60f;
+                reload = 6f * 60f;
                 recoil = 8f;
                 alternate = true;
                 rotate = false;

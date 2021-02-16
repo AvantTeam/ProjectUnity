@@ -16,6 +16,7 @@ import mindustry.io.*;
 import mindustry.ctype.*;
 import unity.entities.bullet.*;
 import unity.entities.comp.*;
+import unity.entities.units.*;
 import unity.gen.*;
 import unity.graphics.*;
 
@@ -727,7 +728,7 @@ public class UnityBullets implements ContentList{
                 lifetime = 25f;
                 widthReduction = 6f;
                 auraWidthReduction = 4f;
-                damageRadius = 75f;
+                damageRadius = 110f;
                 auraDamage = 9000f;
 
                 laserColors = new Color[]{UnityPal.scarColorAlpha, UnityPal.scarColor, UnityPal.endColor, Color.black};
@@ -748,13 +749,14 @@ public class UnityBullets implements ContentList{
             @Override
             public void hitEntity(Bullet b, Hitboxc other, float initialHealth){
                 if(!(other instanceof Unit h)) return;
-                float damage = auraDamage / (Math.max(2500f - Math.max(initialHealth - 150000f, 0f), 0f) / 2500f);
+                float damage = auraDamage / (Math.max(4500f - Math.max(initialHealth - 350000f, 0f), 0f) / 4500f);
                 if(damage >= Float.MAX_VALUE || Float.isInfinite(damage)){
                     h.health = 0f;
                     other.remove();
                 }else{
                     h.damage(damage);
                 }
+                if(other instanceof AntiCheatBase) ((AntiCheatBase)other).overrideAntiCheatDamage(auraDamage);
             }
         };
 
@@ -771,7 +773,7 @@ public class UnityBullets implements ContentList{
 
             fragBullets = 7;
             fragLifeMin = 0.9f;
-            fragBullet = new AntiCheatBasicBulletType(5.6f, 640f){{
+            fragBullet = new AntiCheatBasicBulletType(5.6f, 240f){{
                 lifetime = 30f;
                 pierce = pierceBuilding = true;
                 pierceCap = 5;
@@ -786,7 +788,7 @@ public class UnityBullets implements ContentList{
 
         missileAntiCheat = new AntiCheatBasicBulletType(4f, 440f, "missile"){{
             lifetime = 60f;
-            width = height = 14f;
+            width = height = 12f;
             shrinkY = 0f;
             drag = -0.013f;
             tolerance = 12000f;

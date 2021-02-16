@@ -72,7 +72,7 @@ public class WormDefaultUnit extends UnitEntity{
             Tmp.v1.trns(angleB, trueVel);
             segV.add(Tmp.v1);
             segV.setLength(trueVel);
-            if(wormType.counterDrag) segV.scl(1f + (drag * 1.5f));
+            if(wormType.counterDrag) segV.scl(1f + drag);
             segmentUnits[i].vel.set(segV);
         }
         for(int i = 0; i < len; i++) segmentVelocities[i].scl(Time.delta);
@@ -80,13 +80,14 @@ public class WormDefaultUnit extends UnitEntity{
 
     protected void updateSegmentsLocal(){
         float segmentOffset = wormType.segmentOffset;
-        Tmp.v1.trns(Angles.angle(segments[0].x, segments[0].y, x, y) + 180f, segmentOffset);
+        float angleC = Utils.clampedAngle(Angles.angle(segments[0].x, segments[0].y, x, y), rotation, wormType.angleLimit) + 180f;
+        Tmp.v1.trns(angleC, segmentOffset);
         Tmp.v1.add(x, y);
         segments[0].set(Tmp.v1);
         int len = getSegmentLength();
         for(int i = 1; i < len; i++){
             Vec2 seg = segments[i];
-            float angle = Angles.angle(seg.x, seg.y, segments[i - 1].x, segments[i - 1].y);
+            float angle = Utils.clampedAngle(Angles.angle(seg.x, seg.y, segments[i - 1].x, segments[i - 1].y), segmentUnits[i - 1].rotation, wormType.angleLimit);
             Tmp.v1.trns(angle, segmentOffset);
             seg.set(segments[i - 1]);
             seg.sub(Tmp.v1);

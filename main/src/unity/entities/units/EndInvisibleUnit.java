@@ -4,13 +4,29 @@ import arc.math.*;
 import arc.util.*;
 import mindustry.gen.*;
 import unity.content.*;
+import unity.util.*;
 
-public class EndInvisibleUnit extends UnitEntity{
+public class EndInvisibleUnit extends UnitEntity implements AntiCheatBase{
     protected boolean isInvisible = false;
     protected float disabledTime = 0f;
-    protected Interval scanInterval = new Interval();
+    protected Interval scanInterval = new Interval(2);
     public float invFrame = 0f;
     public float alphaLerp = 0f;
+
+    @Override
+    public float lastHealth(){
+        return 0;
+    }
+
+    @Override
+    public void lastHealth(float v){
+
+    }
+
+    @Override
+    public void overrideAntiCheatDamage(float v){
+        super.damage(v);
+    }
 
     @Override
     public void update(){
@@ -19,11 +35,21 @@ public class EndInvisibleUnit extends UnitEntity{
         invFrame += Time.delta;
         disabledTime = Math.max(disabledTime - Time.delta, 0f);
 
-        if(scanInterval.get(5f) && isInvisible){
+        if(scanInterval.get(10f) && isInvisible){
             hitbox(Tmp.r1);
             Groups.bullet.intersect(Tmp.r1.x, Tmp.r1.y, Tmp.r1.width, Tmp.r1.height, b -> {
-                if(b.team != team) invFrame = 1.2f * 60;
+                if(b.team != team) disabledTime = 1.2f * 60;
             });
+        }
+        if(scanInterval.get(1, 30f)){
+            float size = hitSize * 3f;
+            Tmp.r1.setCentered(x, y, size * 2f);
+            Groups.unit.intersect(Tmp.r1.x, Tmp.r1.y, Tmp.r1.width, Tmp.r1.height, u -> {
+                if(u.team != team && Mathf.within(x, y, u.x, u.y, hitSize * 3f)){
+                    disabledTime = 1.2f * 60;
+                }
+            });
+            if(Utils.hasBuilding(x, y, size, build -> build.team != team)) disabledTime = 1.2f * 60f;
         }
 
         if(!isShooting && health > maxHealth / 2f && disabledTime <= 0f){
