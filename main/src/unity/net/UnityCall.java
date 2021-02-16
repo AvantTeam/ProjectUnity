@@ -91,16 +91,20 @@ public class UnityCall{
         }
     }
 
-    public static void bossMusic(Healthc boss, String name){
+    public static void bossMusic(String name, boolean play){
         if(net.server() || !net.active()){
-            Unity.musicHandler.play(name, () -> !boss.dead() && boss.isAdded());
+            if(play){
+                Unity.musicHandler.play(name);
+            }else{
+                Unity.musicHandler.stop(name);
+            }
         }
 
         if(net.server()){
             out.reset();
 
-            TypeIO.writeEntity(write, boss);
             write.str(name);
+            write.bool(play);
 
             Call.clientPacketReliable("unity.call", "1:" + pack(out.getBytes()));
         }

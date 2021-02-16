@@ -33,10 +33,14 @@ public class UnityRemoteReadClient{
         });
 
         map.put(1, () -> {
-            Healthc boss = TypeIO.readEntity(read);
             String name = read.str();
+            boolean play = read.bool();
 
-            Unity.musicHandler.play(name, () -> !boss.dead() && boss.isAdded());
+            if(play){
+                Unity.musicHandler.play(name);
+            }else{
+                Unity.musicHandler.stop(name);
+            }
         });
     }
 
