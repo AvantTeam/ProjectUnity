@@ -97,6 +97,7 @@ public class Unity extends Mod{
         enableConsole = true;
         musicHandler.setup();
         antiCheat.setup();
+        UnityCall.init();
 
         if(!headless){
             unity = mods.locateMod("unity");
@@ -120,7 +121,6 @@ public class Unity extends Mod{
         FactionMeta.init();
         ExpMeta.init();
         UnityEntityMapping.init();
-        UnityCall.init();
     }
 
     protected void addCredits(){
