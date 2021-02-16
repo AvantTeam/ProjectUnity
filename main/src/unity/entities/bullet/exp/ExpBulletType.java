@@ -1,4 +1,4 @@
-package unity.entities.bullet;
+package unity.entities.bullet.exp;
 
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;

@@ -9,7 +9,7 @@ import mindustry.gen.Building;
 import mindustry.graphics.Drawf;
 import mindustry.world.Block;
 import mindustry.world.meta.Stat;
-import unity.entities.bullet.ExpOrb;
+import unity.entities.bullet.exp.ExpOrb;
 import unity.graphics.UnityPal;
 import unity.world.blocks.*;
 

@@ -1095,7 +1095,7 @@ public class UnityBlocks implements ContentList{
             }
         };
 
-        laserKelvin = new ExpLiquidTurret("kelvin-laser-turret"){
+        laserKelvin = new ExpKelvinTurret("kelvin-laser-turret"){
             {
                 requirements(Category.turret, with(Items.copper, 190, Items.silicon, 110, Items.titanium, 15));
                 size = 3;
@@ -1109,7 +1109,6 @@ public class UnityBlocks implements ContentList{
                 buildVisibility = BuildVisibility.sandboxOnly;
 
                 consumes.powerCond(2.5f, TurretBuild::isActive);
-                ammo(Liquids.cryofluid, UnityBullets.kelvinLaser);
             }
 
             @Override

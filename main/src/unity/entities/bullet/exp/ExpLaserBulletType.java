@@ -1,4 +1,4 @@
-package unity.entities.bullet;
+package unity.entities.bullet.exp;
 
 import arc.graphics.*;
 import arc.graphics.g2d.*;

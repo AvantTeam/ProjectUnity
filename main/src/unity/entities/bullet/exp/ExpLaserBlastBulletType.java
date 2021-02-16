@@ -1,4 +1,4 @@
-package unity.entities.bullet;
+package unity.entities.bullet.exp;
 
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -9,7 +9,6 @@ import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import unity.Unity;
 import unity.entities.comp.*;
 import unity.graphics.*;
 
