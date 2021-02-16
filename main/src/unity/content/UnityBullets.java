@@ -311,50 +311,39 @@ public class UnityBullets implements ContentList{
             }
         };
 
-        /* TODO koruh bullets
-        coalBlaze = new BulletType(3.35f, 32f){
+        coalBlaze = new ExpBulletType(3.35f, 32f){
             {
                 ammoMultiplier = 3;
                 hitSize = 7f;
                 lifetime = 24f;
                 pierce = true;
                 statusDuration = 60 * 4f;
-                shootEffect = shootSmallBlaze;
+                shootEffect = UnityFx.shootSmallBlaze;
                 hitEffect = Fx.hitFlameSmall;
                 despawnEffect = Fx.none;
                 status = StatusEffects.burning;
                 keepVelocity = true;
-                hittable = true;
-            }
-
-            @Override
-            public void hit(Bullet b, float x, float y){
-                super.hit(b, x, y);
-                ((ExpItemTurret.ExpItemTurretBuild)b.owner).incExp(0.5f);
+                hittable = false;
+                expGain = 1.1f;
             }
         };
 
-        pyraBlaze = new BulletType(3.35f, 46f){
+        pyraBlaze = new ExpBulletType(3.35f, 46f){
             {
                 ammoMultiplier = 3;
                 hitSize = 7f;
                 lifetime = 24f;
                 pierce = true;
                 statusDuration = 60 * 4f;
-                shootEffect = shootPyraBlaze;
+                shootEffect = UnityFx.shootPyraBlaze;
                 hitEffect = Fx.hitFlameSmall;
                 despawnEffect = Fx.none;
                 status = StatusEffects.burning;
                 keepVelocity = false;
                 hittable = false;
+                expGain = 1.75f;
             }
-
-            @Override
-            public void hit(Bullet b, float x, float y){
-                super.hit(b, x, y);
-                ((ExpItemTurret.ExpItemTurretBuild)b.owner).incExp(0.5f);
-            }
-        };*/
+        };
 
         falloutLaser = new SparkingContinuousLaserBulletType(95f){{
             length = 230f;

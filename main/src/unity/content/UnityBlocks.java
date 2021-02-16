@@ -91,7 +91,7 @@ public class UnityBlocks implements ContentList{
     public static
     @ExpDef(type = ExpBlock.class)
     @FactionDef(type = "koruh")
-    Block laser, laserCharge, laserFrost, laserBranch, laserFractal, laserKelvin; 
+    Block laser, laserCharge, laserFrost, laserBranch, laserFractal, laserKelvin, inferno; 
     
     public static
     @ExpDef(type = ExpBlock.class)
@@ -1187,11 +1187,48 @@ public class UnityBlocks implements ContentList{
                 block.maxLevel = 1;
                 block.maxExp = block.requiredExp(block.maxLevel);
 
+                //TODO GLENN GO THE FUCK TO WORK
                 //block.rwPrecision = 20f;
                 //block.orbMultiplier = 0.07f;
 
                 //Color[] heatColors = {Pal.lancerLaser, UnityPal.expColor};
                 //block.addField(ExpFieldType.list, Turret.class, "heatColor", heatColor, heatColors);
+
+                block.setupFields();
+                block.setStats();
+                block.init();
+            }
+        };
+
+        inferno = new ExpItemTurret("inferno"){
+            {
+                requirements(Category.turret, with(Items.copper, 150, Items.lead, 165, Items.graphite, 60));
+                size = 3;
+                range = 80f;
+                reloadTime = 6f;
+                recoilAmount = 0f;
+                shootCone = 5f;
+                shootSound = Sounds.flame;
+                ammo(Items.scrap, Bullets.slagShot, Items.coal, UnityBullets.coalBlaze, Items.pyratite, UnityBullets.pyraBlaze);
+            }
+
+            @Override
+            public void init(){
+                super.init();
+
+                ExpBlock block = ExpMeta.map(this);
+                block.hasExp = true;
+                block.condConfig = true;
+                block.enableUpgrade = true;
+
+                block.maxLevel = 10;
+                block.maxExp = block.requiredExp(block.maxLevel);
+
+                //TODO GLENN GO THE FUCK TO WORK
+                //float[] shotCounts = {1, 1, 2, 2, 2, 3, 3, 4, 4, 5, 5};
+                //block.addField(ExpFieldType.list, Turret.class, "shots", shots, shotCounts);
+                //float[] spreadCounts = {0, 0, 5, 10, 15, 7, 14, 8, 10, 6, 9};
+                //block.addField(ExpFieldType.list, Turret.class, "spread", spread, spreadCounts);
 
                 block.setupFields();
                 block.setStats();
