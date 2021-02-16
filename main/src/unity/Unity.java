@@ -97,7 +97,6 @@ public class Unity extends Mod{
         enableConsole = true;
         musicHandler.setup();
         antiCheat.setup();
-        UnityCall.init();
 
         if(!headless){
             unity = mods.locateMod("unity");
@@ -115,13 +114,13 @@ public class Unity extends Mod{
     public void loadContent(){
         for(ContentList list : unityContent){
             list.load();
-
-            Log.info("@: Loaded content list: @", getClass().getSimpleName(), list.getClass().getSimpleName());
+            Log.infoTag("unity", "Loaded content list: " + list.getClass().getSimpleName());
         }
 
         FactionMeta.init();
         ExpMeta.init();
         UnityEntityMapping.init();
+        UnityCall.init();
     }
 
     protected void addCredits(){

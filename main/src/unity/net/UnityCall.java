@@ -1,6 +1,5 @@
 package unity.net;
 
-import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.entities.bullet.*;
@@ -10,25 +9,20 @@ import unity.*;
 import unity.ai.KamiAI.*;
 
 import java.io.*;
-import java.nio.charset.*;
-import java.util.regex.*;
+import java.util.*;
 
 import static mindustry.Vars.*;
 
 public class UnityCall{
-    private static final ReusableByteOutStream out = new ReusableByteOutStream(8192);
+    private static final ReusableByteOutStream out = new ReusableByteOutStream();
     private static final Writes write = new Writes(new DataOutputStream(out));
-
-    private static final byte[] hexArray = "0123456789ABCDEF".getBytes(StandardCharsets.US_ASCII);
-    private static final Pattern hexPattern = Pattern.compile("..");
-    private static final ByteSeq hexSeq = new ByteSeq();
 
     public static void init(){
         if(netClient != null){
             UnityRemoteReadClient.registerHandlers();
             netClient.addPacketHandler("unity.call", handler -> {
-                String[] split = handler.split("::");
-                UnityRemoteReadClient.readPacket(unpackBytes(split[1]), split[0]);
+                String[] split = handler.split(":");
+                UnityRemoteReadClient.readPacket(unpack(split[1]), Byte.parseByte(split[0]));
             });
         }else{
             Log.warn("'netClient' is null");
@@ -37,33 +31,28 @@ public class UnityCall{
         if(netServer != null){
             UnityRemoteReadServer.registerHandlers();
             netServer.addPacketHandler("unity.call", (player, handler) -> {
-                String[] split = handler.split("::");
-                UnityRemoteReadServer.readPacket(unpackBytes(split[1]), split[0], player);
+                String[] split = handler.split(":");
+                UnityRemoteReadServer.readPacket(unpack(split[1]), Byte.parseByte(split[0]), player);
             });
         }else{
             Log.warn("'netServer' is null");
         }
     }
 
-    protected static String packBytes(byte[] bytes){
-        byte[] hexChars = new byte[bytes.length * 2];
-        for(int j = 0; j < bytes.length; j++){
-            int v = bytes[j] & 0xFF;
-            hexChars[j * 2] = hexArray[v >>> 4];
-            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
-        }
-
-        return new String(hexChars, StandardCharsets.UTF_8);
+    protected static String pack(byte[] bytes){
+        String arr = Arrays.toString(bytes).replace(" ", "");
+        return arr.substring(1, arr.length() - 1);
     }
 
-    protected static byte[] unpackBytes(String str){
-        Matcher matcher = hexPattern.matcher(str);
-        hexSeq.clear();
-        while(matcher.find()){
-            hexSeq.add((byte)Integer.parseInt(matcher.group(), 16));
+    protected static byte[] unpack(String str){
+        String[] split = str.split(",");
+
+        byte[] bytes = new byte[split.length];
+        for(int i = 0; i < split.length; i++){
+            bytes[i] = Byte.parseByte(split[i]);
         }
 
-        return hexSeq.toArray();
+        return bytes;
     }
 
     public static void createKamiBullet(
@@ -98,7 +87,7 @@ public class UnityCall{
             write.f(fdata);
             write.f(time);
 
-            Call.clientPacketReliable("unity.call", "createKamiBullet::" + packBytes(out.getBytes()));
+            Call.clientPacketReliable("unity.call", "0:" + pack(out.getBytes()));
         }
     }
 
@@ -113,7 +102,7 @@ public class UnityCall{
             TypeIO.writeEntity(write, boss);
             write.str(name);
 
-            Call.clientPacketReliable("unity.call", "bossMusic::" + packBytes(out.getBytes()));
+            Call.clientPacketReliable("unity.call", "1:" + pack(out.getBytes()));
         }
     }
 }

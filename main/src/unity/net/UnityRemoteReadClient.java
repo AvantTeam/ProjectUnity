@@ -13,10 +13,10 @@ public class UnityRemoteReadClient{
     private static final ReusableByteInStream out = new ReusableByteInStream();
     private static final Reads read = new Reads(new DataInputStream(out));
 
-    private static final ObjectMap<String, Runnable> map = new ObjectMap<>();
+    private static final IntMap<Runnable> map = new IntMap<>();
 
     public static void registerHandlers(){
-        map.put("createKamiBullet", () -> {
+        map.put(0, () -> {
             Bullet b = TypeIO.readBulletType(read).create(
                 TypeIO.readEntity(read),
                 TypeIO.readTeam(read),
@@ -32,7 +32,7 @@ public class UnityRemoteReadClient{
             b.time = read.f();
         });
 
-        map.put("bossMusic", () -> {
+        map.put(1, () -> {
             Healthc boss = TypeIO.readEntity(read);
             String name = read.str();
 
@@ -40,7 +40,7 @@ public class UnityRemoteReadClient{
         });
     }
 
-    public static void readPacket(byte[] bytes, String type){
+    public static void readPacket(byte[] bytes, byte type){
         out.setBytes(bytes);
         if(!map.containsKey(type)){
             throw new RuntimeException("Unknown packet type: '" + type + "'");

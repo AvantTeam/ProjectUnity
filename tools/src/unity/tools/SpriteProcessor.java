@@ -45,7 +45,9 @@ public class SpriteProcessor{
 
         try{
             mod.loadContent();
-        }catch(Exception ignored){}
+        }catch(Throwable t){
+            Log.err(t);
+        }
 
         content.setCurrentMod(null);
 

@@ -11,11 +11,11 @@ public class UnityRemoteReadServer{
     private static final ReusableByteInStream out = new ReusableByteInStream();
     private static final Reads read = new Reads(new DataInputStream(out));
 
-    private static final ObjectMap<String, Cons<Player>> map = new ObjectMap<>();
+    private static final IntMap<Cons<Player>> map = new IntMap<>();
 
     public static void registerHandlers(){}
 
-    public static void readPacket(byte[] bytes, String type, Player player){
+    public static void readPacket(byte[] bytes, byte type, Player player){
         out.setBytes(bytes);
         if(!map.containsKey(type)){
             throw new RuntimeException("Unknown packet type: '" + type + "'");
