@@ -90,7 +90,8 @@ public class UnityUnitTypes implements ContentList{
     public static @FactionDef(type = "monolith") @EntityPoint(type = LegsUnit.class)
     UnitType pylon, monument, colossus;
 
-    public static UnitType kami;
+    public static @FactionDef(type = "koruh") @EntityDef(base = KamiUnit.class, def = Bossc.class)
+    UnitType kami;
 
     public static @FactionDef(type = "end") UnitType opticaecus, devourer, ravager;
 
@@ -2061,7 +2062,6 @@ public class UnityUnitTypes implements ContentList{
             }});
         }};
 
-        setEntity("kami-mkii", KamiUnit::new);
         kami = new RainbowUnitType("kami-mkii"){{
             defaultController = KamiAI::new;
             health = 120000f;
@@ -2069,7 +2069,7 @@ public class UnityUnitTypes implements ContentList{
             hitSize = 36f;
             flying = true;
 
-            Unity.musicHandler.registerLoop("kami", UnityMusics.radiantDischargeIntro, UnityMusics.radiantDischargeLoop);
+            Unity.musicHandler.registerLoop(name, UnityMusics.radiantDischargeIntro, UnityMusics.radiantDischargeLoop);
         }};
 
         //endregion
