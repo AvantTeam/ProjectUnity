@@ -30,6 +30,8 @@ public class UnityRemoteReadClient{
             b.data = KamiBulletDatas.get(read.i());
             b.fdata = read.f();
             b.time = read.f();
+
+            Unity.print(b.owner, ((Unitc)b.owner).controller());
         });
 
         map.put(1, () -> {
