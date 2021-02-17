@@ -13,7 +13,11 @@ public class UnityRemoteReadServer{
 
     private static final IntMap<Cons<Player>> map = new IntMap<>();
 
-    public static void registerHandlers(){}
+    public static void registerHandlers(){
+        map.put(2, player -> {
+            UnityCall.tapAbility(player, read.i());
+        });
+    }
 
     public static void readPacket(byte[] bytes, byte type, Player player){
         out.setBytes(bytes);
