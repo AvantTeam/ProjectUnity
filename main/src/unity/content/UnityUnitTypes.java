@@ -80,7 +80,7 @@ public class UnityUnitTypes implements ContentList{
     
     /** Koruh {@linkplain UnitEntity flying} units */
     public static @FactionDef(type = "koruh") @EntityPoint(type = UnitEntity.class)
-    UnitType cache;
+    UnitType cache, dijkstra;
 
     /** Monolith {@linkplain MechUnit mech} units */
     public static @FactionDef(type = "monolith") @EntityPoint(type = MechUnit.class)
@@ -1771,7 +1771,47 @@ public class UnityUnitTypes implements ContentList{
             String shieldSprite = "unity-cache-shield";
             abilities.add(new MoveLightningAbility(10f, 14, 0.15f, 4f, 3.6f, 6f, Pal.lancerLaser, shieldSprite));
         }};
-        
+
+        dijkstra = new UnityUnitType("dijkstra"){{
+            mineTier = -1;
+            speed = 7.5f;
+            drag = 0.01f;
+            health = 640f;
+            flying = true;
+            armor = 8;
+            accel = 0.01f;
+            lowAltitude = true;
+            range = 220f;
+
+            weapons.add(new Weapon("dijkstra-laser"){{
+                rotate = true;
+                rotateSpeed = 8f;
+                shadow = 20f;
+                x = 0f;
+                y = 0f;
+                reload = 150f;
+                shots = 1;
+                alternate = false;
+                ejectEffect = Fx.none;
+                bullet = UnityBullets.laserZap;
+                shootSound = Sounds.laser;
+                mirror = false;
+            }}, new Weapon("dijkstra-plasmagun"){{
+                x = 0f;
+                y = 0f;
+                reload = 7f;
+                shots = 1;
+                alternate = true;
+                ejectEffect = Fx.none;
+                velocityRnd = 1.5f;
+                spacing = 15f;
+                inaccuracy = 20f;
+
+                bullet = UnityBullets.plasmaBullet;
+                shootSound = Sounds.spark;
+            }});
+        }};
+
         //endregion
         //region monolith
 

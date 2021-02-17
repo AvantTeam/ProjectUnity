@@ -27,7 +27,7 @@ import static mindustry.Vars.*;
 public class UnityBullets implements ContentList{
     public static BulletType laser, shardLaserFrag, shardLaser, frostLaser, branchLaserFrag, branchLaser, kelvinLaser, breakthroughLaser, coalBlaze, pyraBlaze, falloutLaser, catastropheLaser, calamityLaser, extinctionLaser, orb, shockBeam, currentStroke,
         shielderBullet, plasmaFragTriangle, plasmaTriangle, surgeBomb, pylonLightning, pylonLaser, pylonLaserSmall, exporb, monumentRailBullet, scarShrapnel, scarMissile, celsiusSmoke, kelvinSmoke,
-        kamiBullet1, kamiLaser, kamiSmallLaser, supernovaLaser, ravagerLaser, ravagerArtillery, missileAntiCheat;
+        kamiBullet1, kamiLaser, kamiSmallLaser, supernovaLaser, ravagerLaser, ravagerArtillery, missileAntiCheat, laserZap, plasmaBullet;
 
     //only enhanced
     public static BasicBulletType standardDenseLarge, standardHomingLarge, standardIncendiaryLarge, standardThoriumLarge, standardDenseHeavy, standardHomingHeavy, standardIncendiaryHeavy, standardThoriumHeavy, standardDenseMassive, standardHomingMassive,
@@ -802,6 +802,69 @@ public class UnityBullets implements ContentList{
             backColor = lightColor = trailColor = UnityPal.scarColor;
             frontColor = UnityPal.endColor;
         }};
+
+        laserZap = new LaserBulletType(90f){{
+            sideAngle = 15f;
+            sideWidth = 1.5f;
+            sideLength = 60f;
+            width = 16f;
+            length = 215f;
+            shootEffect = Fx.shockwave;
+            colors = new Color[]{Pal.lancerLaser.cpy().mul(1f, 1f, 1f, 0.7f), Pal.lancerLaser, Color.white};
+        }};
+
+        plasmaBullet = new BasicBulletType(3.5f, 15f){
+            {
+                frontColor = Pal.lancerLaser.cpy().lerp(Color.white, 0.5f);
+                backColor = Pal.lancerLaser.cpy().lerp(Pal.sapBullet, 0.5f).mul(0.7f);
+                width = height = 2f;
+                weaveScale = 0.6f;
+                weaveMag = 0.5f;
+                homingPower = 0.4f;
+                lifetime = 80f;
+                shootEffect = Fx.hitLancer;
+                hitEffect = despawnEffect = Fx.hitLancer;
+                pierceCap = 10;
+                pierceBuilding = true;
+                splashDamageRadius = 4f;
+                splashDamage = 4f;
+                status = UnityStatusEffects.plasmaed;
+                statusDuration = 180f;
+                inaccuracy = 25f;
+            }
+
+            @Override
+            public void init(Bullet b){
+                b.data = new FixedTrail(9);
+            }
+
+            @Override
+            public void draw(Bullet b){
+                if(b.data instanceof FixedTrail trail){
+                    trail.draw(frontColor, width);
+                }
+
+                Draw.color(frontColor);
+                Fill.square(b.x, b.y, width, b.rotation() + 45f);
+                Draw.color();
+            }
+
+            @Override
+            public void update(Bullet b){
+                super.update(b);
+                if(b.data instanceof FixedTrail trail){
+                    trail.update(b.x, b.y, b.rotation());
+                }
+            }
+
+            @Override
+            public void hit(Bullet b, float x, float y){
+                super.hit(b, x, y);
+                if(b.data instanceof FixedTrail trail){
+                    trail.clear();
+                }
+            }
+        };
 
         //only enhanced
 
