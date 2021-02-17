@@ -13,8 +13,10 @@ import mindustry.gen.*;
 import mindustry.entities.bullet.*;
 import mindustry.graphics.*;
 import mindustry.io.*;
+import mindustry.type.*;
 import mindustry.ctype.*;
 import unity.entities.bullet.*;
+import unity.entities.bullet.exp.*;
 import unity.entities.comp.*;
 import unity.entities.units.*;
 import unity.gen.*;
@@ -259,14 +261,25 @@ public class UnityBullets implements ContentList{
                 toColor = Color.cyan;
             }
 
+            public float dmgMult = 150f; //Multiply the liquid's heat capacity
+            public float dmgMultInc = 10f;
+
+            @Override
+            public void setDamage(Bullet b){
+                Liquid liquid = Liquids.cryofluid;
+                if(b.owner instanceof Building build && !build.cheating()) liquid = build.liquids.current();
+                float mul = dmgMult + dmgMultInc * getLevel(b);
+                b.damage = liquid.heatCapacity * mul * b.damageMultiplier();
+            }
+
             public void freezePos(Bullet b, float x, float y){
                 var lvl = getLevel(b);
-                float rad = 3.5f;
+                float rad = 4.5f;
                 if(!Vars.headless) UnityFx.freezeEffect.at(x, y, lvl / rad + 10f, getColor(b));
                 if(!Vars.headless) UnitySounds.laserFreeze.at(x, y, 1f, 0.6f);
         
-                Damage.status(b.team, x, y, 10f + lvl / rad, status, 60f + lvl * 6f, true, true);
-                Damage.status(b.team, x, y, 10f + lvl / rad, UnityStatusEffects.disabled, 2f * lvl, true, true);
+                Damage.status(b.team, x, y, 10f + lvl / rad, status, 60f + lvl * 8f, true, true);
+                Damage.status(b.team, x, y, 10f + lvl / rad, UnityStatusEffects.disabled, 3f * lvl, true, true);
             }
 
             @Override
@@ -294,56 +307,50 @@ public class UnityBullets implements ContentList{
             }
         };
 
-        breakthroughLaser = new ExpLaserBlastBulletType(500f, 1200f){
-            {
-                damageInc = 1000f;
-                lengthInc = 150f;
-                largeHit = true;
-                width = 80f;
-                widthInc = 10f;
-                lifetime = 65f;
-                lightningSpacingInc = -5f;
-                lightningDamageInc = 30f;
-                hitUnitExpGain = 0.005f;
-                hitBuildingExpGain = 0.008f;
-                sideLength = 0f;
-                sideWidth = 0f;
-            }
-        };
+        breakthroughLaser = new ExpLaserBlastBulletType(500f, 1200f){{
+            damageInc = 1000f;
+            lengthInc = 150f;
+            largeHit = true;
+            width = 80f;
+            widthInc = 10f;
+            lifetime = 65f;
+            lightningSpacingInc = -5f;
+            lightningDamageInc = 30f;
+            hitUnitExpGain = 0.005f;
+            hitBuildingExpGain = 0.008f;
+            sideLength = 0f;
+            sideWidth = 0f;
+        }};
 
-        coalBlaze = new ExpBulletType(3.35f, 32f){
-            {
-                ammoMultiplier = 3;
-                hitSize = 7f;
-                lifetime = 24f;
-                pierce = true;
-                statusDuration = 60 * 4f;
-                shootEffect = UnityFx.shootSmallBlaze;
-                hitEffect = Fx.hitFlameSmall;
-                despawnEffect = Fx.none;
-                status = StatusEffects.burning;
-                keepVelocity = true;
-                hittable = false;
-                expGain = 0.5f;
-            }
-        };
+        coalBlaze = new ExpBulletType(3.35f, 32f){{
+            ammoMultiplier = 3;
+            hitSize = 7f;
+            lifetime = 24f;
+            pierce = true;
+            statusDuration = 60 * 4f;
+            shootEffect = UnityFx.shootSmallBlaze;
+            hitEffect = Fx.hitFlameSmall;
+            despawnEffect = Fx.none;
+            status = StatusEffects.burning;
+            keepVelocity = true;
+            hittable = false;
+            expGain = 0.5f;
+        }};
 
-        pyraBlaze = new ExpBulletType(3.35f, 46f){
-            {
-                ammoMultiplier = 3;
-                hitSize = 7f;
-                lifetime = 24f;
-                pierce = true;
-                statusDuration = 60 * 4f;
-                shootEffect = UnityFx.shootPyraBlaze;
-                hitEffect = Fx.hitFlameSmall;
-                despawnEffect = Fx.none;
-                status = StatusEffects.burning;
-                keepVelocity = false;
-                hittable = false;
-                expGain = 0.6f;
-            }
-        };
+        pyraBlaze = new ExpBulletType(3.35f, 46f){{
+            ammoMultiplier = 3;
+            hitSize = 7f;
+            lifetime = 24f;
+            pierce = true;
+            statusDuration = 60 * 4f;
+            shootEffect = UnityFx.shootPyraBlaze;
+            hitEffect = Fx.hitFlameSmall;
+            despawnEffect = Fx.none;
+            status = StatusEffects.burning;
+            keepVelocity = false;
+            hittable = false;
+            expGain = 0.6f;
+        }};
 
         falloutLaser = new SparkingContinuousLaserBulletType(95f){{
             length = 230f;
@@ -745,7 +752,7 @@ public class UnityBullets implements ContentList{
                 }else{
                     h.damage(damage);
                 }
-                if(other instanceof AntiCheatBase) ((AntiCheatBase)other).overrideAntiCheatDamage(auraDamage);
+                if(other instanceof AntiCheatBase) ((AntiCheatBase)other).overrideAntiCheatDamage(auraDamage, 1);
             }
         };
 
@@ -788,6 +795,7 @@ public class UnityBullets implements ContentList{
             trailChance = 0.2f;
             weaveScale = 6f;
             weaveMag = 1f;
+            priority = 2;
             hitEffect = Fx.blastExplosion;
             despawnEffect = Fx.blastExplosion;
 
