@@ -1007,7 +1007,7 @@ public class UnityBlocks implements ContentList{
                 range = 160f;
                 reloadTime = 80f;
                 targetAir = true;
-                liquidCapacity = 15f;
+                liquidCapacity = 10f;
                 buildVisibility = BuildVisibility.sandboxOnly;
 
                 ammo(Liquids.cryofluid, UnityBullets.frostLaser);
@@ -1026,7 +1026,7 @@ public class UnityBlocks implements ContentList{
                 block.maxLevel = 30;
                 block.maxExp = block.requiredExp(block.maxLevel);
                 
-                //block.addUpgrade(laserKelvin, 15);
+                block.addUpgrade(laserKelvin, 15);
                 block.addUpgrade(laserBreakthrough, 30);
 
                 block.setupFields();
@@ -1104,11 +1104,12 @@ public class UnityBlocks implements ContentList{
                 range = 180f;
                 reloadTime = 120f;
                 targetAir = true;
-                liquidCapacity = 25f;
+                liquidCapacity = 15f;
 
                 buildVisibility = BuildVisibility.sandboxOnly;
 
                 consumes.powerCond(2.5f, TurretBuild::isActive);
+                ammo(Liquids.water, UnityBullets.kelvinWaterLaser, Liquids.slag, UnityBullets.kelvinSlagLaser, Liquids.oil, UnityBullets.kelvinOilLaser, Liquids.cryofluid, UnityBullets.kelvinCryofluidLaser);
             }
 
             @Override

@@ -13,25 +13,25 @@ public class ExpKelvinTurret extends ExpLiquidTurret{
     public class ExpKelvinTurretBuild extends ExpLiquidTurretBuild{
         @Override
         public boolean acceptLiquid(Building source, Liquid liquid){
-            return liquid.heatCapacity > 0f;
+            return (liquids.current() == liquid || liquids.currentAmount() < 0.2f); //Accept any liquid, liquid acceptance copied from liquid tanks.
         }
 
         @Override
         public BulletType useAmmo(){
-            BulletType b = UnityBullets.kelvinLaser;
+            BulletType b = peekAmmo();
             liquids.remove(liquids.current(), 1f / b.ammoMultiplier);
             return b;
         }
 
         @Override
         public BulletType peekAmmo(){
-            return UnityBullets.kelvinLaser;
+            BulletType b = ammoTypes.get(liquids.current());
+            return b == null ? UnityBullets.kelvinLiquidLaser : b;
         }
 
         @Override
         public boolean hasAmmo(){
-            BulletType b = UnityBullets.kelvinLaser;
-            return liquids.total() >= 1f / b.ammoMultiplier;
+            return liquids.total() >= 1f / peekAmmo().ammoMultiplier;
         }
     }
 }
