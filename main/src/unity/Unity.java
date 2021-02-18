@@ -21,6 +21,7 @@ import static mindustry.Vars.*;
 
 public class Unity extends Mod{
     public static MusicHandler musicHandler;
+    public static TapHandler tapHandler;
     public static UnityAntiCheat antiCheat;
 
     private final ContentList[] unityContent = {
@@ -71,7 +72,9 @@ public class Unity extends Mod{
         });
 
         musicHandler = new MusicHandler();
+        tapHandler = new TapHandler();
         antiCheat = new UnityAntiCheat();
+
         if(Core.app != null){
             ApplicationListener listener = Core.app.getListeners().first();
             if(listener instanceof ApplicationCore core){

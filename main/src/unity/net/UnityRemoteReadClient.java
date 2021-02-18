@@ -8,7 +8,6 @@ import mindustry.gen.*;
 import mindustry.io.*;
 import unity.*;
 import unity.ai.KamiAI.*;
-import unity.entities.abilities.*;
 
 public class UnityRemoteReadClient{
     private static final ReusableByteInStream out = new ReusableByteInStream();
@@ -48,9 +47,10 @@ public class UnityRemoteReadClient{
 
         map.put(2, () -> {
             Player player = TypeIO.readEntity(read);
-            int index = read.i();
+            float x = read.f();
+            float y = read.f();
 
-            ((TapAbility)player.unit().abilities.get(index)).tapped(player.unit());
+            Unity.tapHandler.tap(player, x, y);
         });
     }
 

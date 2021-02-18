@@ -1,17 +1,18 @@
 package unity.content;
 
 import arc.graphics.*;
-import arc.math.Mathf;
-import arc.util.Time;
+import arc.math.*;
+import arc.util.*;
 import mindustry.content.*;
-import mindustry.ctype.ContentList;
-import mindustry.entities.units.WeaponMount;
-import mindustry.gen.Unit;
-import mindustry.type.StatusEffect;
-import unity.graphics.UnityPal;
+import mindustry.ctype.*;
+import mindustry.entities.units.*;
+import mindustry.gen.*;
+import mindustry.graphics.*;
+import mindustry.type.*;
+import unity.graphics.*;
 
 public class UnityStatusEffects implements ContentList{
-    public static StatusEffect disabled, plasmaed, radiation, reloadFatigue, blueBurn, molten, tpCoolDown, teamConverted;
+    public static StatusEffect disabled, plasmaed, radiation, reloadFatigue, blueBurn, molten, tpCoolDown, teamConverted, boosted;
 
     @Override
     public void load(){
@@ -84,6 +85,12 @@ public class UnityStatusEffects implements ContentList{
             permanent = true;
             effect = UnityFx.teamConvertedEffect;
             color = Color.valueOf("a3e3ff");
+        }};
+
+        boosted = new StatusEffect("boosted"){{
+            color = Pal.lancerLaser;
+            effect = Fx.none;
+            speedMultiplier = 2f;
         }};
     }
 }

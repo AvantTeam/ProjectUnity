@@ -15,7 +15,7 @@ public class UnityRemoteReadServer{
 
     public static void registerHandlers(){
         map.put(2, player -> {
-            UnityCall.tapAbility(player, read.i());
+            UnityCall.tap(player, read.f(), read.f());
         });
     }
 

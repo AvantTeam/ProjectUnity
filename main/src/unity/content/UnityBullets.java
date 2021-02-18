@@ -26,9 +26,30 @@ import unity.graphics.*;
 import static mindustry.Vars.*;
 
 public class UnityBullets implements ContentList{
-    public static BulletType laser, shardLaserFrag, shardLaser, frostLaser, branchLaserFrag, branchLaser, kelvinWaterLaser, kelvinSlagLaser, kelvinOilLaser, kelvinCryofluidLaser, kelvinLiquidLaser, breakthroughLaser, coalBlaze, pyraBlaze, falloutLaser, catastropheLaser, calamityLaser, extinctionLaser, orb, shockBeam, currentStroke,
-        shielderBullet, plasmaFragTriangle, plasmaTriangle, surgeBomb, pylonLightning, pylonLaser, pylonLaserSmall, exporb, monumentRailBullet, scarShrapnel, scarMissile, celsiusSmoke, kelvinSmoke,
-        kamiBullet1, kamiLaser, kamiSmallLaser, supernovaLaser, ravagerLaser, ravagerArtillery, missileAntiCheat, laserZap, plasmaBullet;
+    public static BulletType
+        laser, shardLaserFrag, shardLaser, frostLaser, branchLaserFrag, branchLaser, kelvinWaterLaser,
+        kelvinSlagLaser, kelvinOilLaser, kelvinCryofluidLaser, kelvinLiquidLaser, celsiusSmoke, kelvinSmoke,
+        breakthroughLaser,
+
+        coalBlaze, pyraBlaze,
+
+        falloutLaser, catastropheLaser, calamityLaser, extinctionLaser,
+
+        orb, shockBeam, currentStroke, shielderBullet, plasmaFragTriangle, plasmaTriangle, surgeBomb,
+
+        pylonLightning, pylonLaser, pylonLaserSmall, monumentRailBullet,
+
+        exporb,
+
+        scarShrapnel, scarMissile,
+
+        kamiBullet1, kamiLaser, kamiSmallLaser,
+        
+        supernovaLaser,
+
+        ravagerLaser, ravagerArtillery, missileAntiCheat, laserZap, plasmaBullet,
+
+        teleportLightning;
 
     //only enhanced
     public static BasicBulletType standardDenseLarge, standardHomingLarge, standardIncendiaryLarge, standardThoriumLarge, standardDenseHeavy, standardHomingHeavy, standardIncendiaryHeavy, standardThoriumHeavy, standardDenseMassive, standardHomingMassive,
@@ -983,6 +1004,15 @@ public class UnityBullets implements ContentList{
                 }
             }
         };
+
+        teleportLightning = new LightningBulletType(){{
+            damage = 12f;
+            shootEffect = Fx.hitLancer;
+            smokeEffect = Fx.none;
+            despawnEffect = Fx.none;
+            hitEffect = Fx.hitLancer;
+            keepVelocity = false;
+        }};
 
         //only enhanced
 

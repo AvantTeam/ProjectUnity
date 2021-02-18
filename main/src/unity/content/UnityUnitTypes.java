@@ -1783,6 +1783,8 @@ public class UnityUnitTypes implements ContentList{
             lowAltitude = true;
             range = 220f;
 
+            abilities.add(new TeleportAbility());
+
             weapons.add(new Weapon("dijkstra-laser"){{
                 rotate = true;
                 rotateSpeed = 8f;

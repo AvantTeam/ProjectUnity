@@ -2,7 +2,6 @@ package unity.entities.bullet.exp;
 
 import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.content.*;

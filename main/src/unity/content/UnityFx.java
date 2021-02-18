@@ -963,5 +963,11 @@ public class UnityFx{
         color(Color.valueOf("FFF3D6"));
         stroke(e.fout() * 2f);
         Lines.circle(e.x, e.y, e.finpow() * e.rotation);
+    }),
+
+    slashEffect = new Effect(90f, e -> {
+        color(Pal.lancerLaser);
+        Drawf.tri(e.x, e.y, 4f * e.fout(), 45f, (e.id * 57f + 90f) % 360f);
+        Drawf.tri(e.x, e.y, 4f * e.fout(), 45f, (e.id * 57f - 90f) % 360f);
     });
 }

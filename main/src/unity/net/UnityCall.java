@@ -7,7 +7,6 @@ import mindustry.gen.*;
 import mindustry.io.*;
 import unity.*;
 import unity.ai.KamiAI.*;
-import unity.entities.abilities.*;
 
 import java.io.*;
 import java.util.*;
@@ -111,9 +110,8 @@ public class UnityCall{
         }
     }
 
-    public static void tapAbility(Player player, int index){
-        TapAbility ability = (TapAbility)player.unit().abilities.get(index);
-        ability.tapped(player.unit());
+    public static void tap(Player player, float x, float y){
+        Unity.tapHandler.tap(player, x, y);
 
         if(net.server() || net.client()){
             out.reset();
@@ -121,12 +119,13 @@ public class UnityCall{
             if(net.server()){
                 TypeIO.writeEntity(write, player);
             }
-            write.i(index);
+            write.f(x);
+            write.f(y);
 
             if(net.client()){
-                Call.serverPacketReliable("unity.call", "2:" + pack(out.getBytes()));
+                Call.serverPacketUnreliable("unity.call", "2:" + pack(out.getBytes()));
             }else if(net.server()){
-                Call.clientPacketReliable(player.con, "unity.call", "2:" + pack(out.getBytes()));
+                Call.clientPacketUnreliable(player.con, "unity.call", "2:" + pack(out.getBytes()));
             }
         }
     }
