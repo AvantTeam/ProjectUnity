@@ -1,5 +1,6 @@
 package unity.world.blocks;
 
+import arc.*;
 import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
 import arc.util.io.*;
@@ -7,32 +8,32 @@ import mindustry.gen.*;
 import mindustry.world.*;
 import unity.graphics.*;
 import unity.world.meta.*;
-import unity.world.graphs.*;
 import unity.world.modules.*;
+import unity.world.graphs.*;
 
-import static arc.Core.atlas;
-
-//block that uses graph
 public class GraphBlock extends Block implements GraphBlockBase{
     protected final Graphs graphs = new Graphs();
-    protected TextureRegion heatRegion, liquidRegion;//heatSprite,liquidSprite
     protected boolean preserveDraw;
+    protected TextureRegion heatRegion, liquidRegion;
 
     public GraphBlock(String name){
         super(name);
+        
         update = true;
     }
 
     @Override
     public void load(){
         super.load();
-        if(graphs.hasGraph(GraphType.crucible)) liquidRegion = atlas.find(name + "-liquid");
-        if(graphs.hasGraph(GraphType.heat)) heatRegion = atlas.find(name + "-heat");
+        
+        if(graphs.hasGraph(GraphType.crucible)) liquidRegion = Core.atlas.find(name + "-liquid");
+        if(graphs.hasGraph(GraphType.heat)) heatRegion = Core.atlas.find(name + "-heat");
     }
 
     @Override
     public void setStats(){
         super.setStats();
+        
         graphs.setStats(stats);
         setStatsExt(stats);
     }
@@ -40,6 +41,7 @@ public class GraphBlock extends Block implements GraphBlockBase{
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         graphs.drawPlace(x, y, size, rotation, valid);
+        
         super.drawPlace(x, y, rotation, valid);
     }
 
@@ -67,6 +69,7 @@ public class GraphBlock extends Block implements GraphBlockBase{
         public void onRemoved(){
             gms.updateGraphRemovals();
             onDelete();
+            
             super.onRemoved();
             onDeletePost();
         }
@@ -74,6 +77,7 @@ public class GraphBlock extends Block implements GraphBlockBase{
         @Override
         public void updateTile(){
             if(graphs.useOriginalUpdate()) super.updateTile();
+            
             updatePre();
             gms.updateTile();
             updatePost();
@@ -83,6 +87,7 @@ public class GraphBlock extends Block implements GraphBlockBase{
         @Override
         public void onProximityUpdate(){
             super.onProximityUpdate();
+            
             gms.onProximityUpdate();
             proxUpdate();
         }
@@ -90,6 +95,7 @@ public class GraphBlock extends Block implements GraphBlockBase{
         @Override
         public void display(Table table){
             super.display(table);
+            
             gms.display(table);
             displayExt(table);
         }
@@ -97,6 +103,7 @@ public class GraphBlock extends Block implements GraphBlockBase{
         @Override
         public void displayBars(Table table){
             super.displayBars(table);
+            
             gms.displayBars(table);
             displayBarsExt(table);
         }
@@ -104,6 +111,7 @@ public class GraphBlock extends Block implements GraphBlockBase{
         @Override
         public void write(Writes write){
             super.write(write);
+            
             gms.write(write);
             writeExt(write);
         }
@@ -111,6 +119,7 @@ public class GraphBlock extends Block implements GraphBlockBase{
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
+            
             gms.read(read, revision);
             readExt(read, revision);
         }
@@ -123,16 +132,18 @@ public class GraphBlock extends Block implements GraphBlockBase{
         @Override
         public void drawSelect(){
             super.drawSelect();
+            
             gms.drawSelect();
         }
-        //laziness
 
         @Override
         public void draw(){
-            if(preserveDraw) super.draw();
-            else if(graphs.hasGraph(GraphType.heat)){
+            if(preserveDraw){
+                super.draw();
+            }else if(graphs.hasGraph(GraphType.heat)){
                 Draw.rect(region, x, y);
                 UnityDrawf.drawHeat(heatRegion, x, y, 0, heat().getTemp());
+                
                 drawTeamTop();
             }
         }

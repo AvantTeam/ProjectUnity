@@ -5,7 +5,6 @@ import unity.world.modules.*;
 
 import static arc.Core.bundle;
 
-//_TorqueConsumer
 public class GraphTorqueConsume extends GraphTorque{
     public final float nominalSpeed, oversupplyFalloff, idleFriction, workingFriction;
 

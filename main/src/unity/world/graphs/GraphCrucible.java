@@ -10,7 +10,7 @@ import static arc.Core.bundle;
 
 public class GraphCrucible extends Graph{
     public final float baseLiquidCapcity, meltSpeed;
-    public final boolean doesCrafting; //capacityTiling; seems unsued
+    public final boolean doesCrafting;
 
     public GraphCrucible(float capcity, float speed, boolean crafting){
         baseLiquidCapcity = capcity;
@@ -30,13 +30,15 @@ public class GraphCrucible extends Graph{
     public void setStats(Table table){
         table.row().left();
         table.add("Crucible system").color(Pal.accent).fillX();
+        
         table.row().left();
         table.add("[lightgray]" + bundle.get("stat.unity.liquidCapacity") + ":[] ").left();
-        table.add(baseLiquidCapcity + " Units");
+        table.add(baseLiquidCapcity + " Units"); 
+        
         table.row().left();
         table.add("[lightgray]" + bundle.get("stat.unity.meltSpeed") + ":[] ").left();
-        table.add(Strings.fixed(meltSpeed * 100f, 0) + "%");
-        setStatsExt(table);
+            
+            setStatsExt(table);
     }
 
     @Override

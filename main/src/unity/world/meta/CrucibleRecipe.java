@@ -12,6 +12,7 @@ public class CrucibleRecipe{
         this.melt = melt;
         this.alloySpeed = alloySpeed;
         this.input = input;
+        
         all[total++] = this;
     }
 

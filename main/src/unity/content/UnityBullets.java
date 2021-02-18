@@ -14,6 +14,7 @@ import mindustry.entities.bullet.*;
 import mindustry.graphics.*;
 import mindustry.io.*;
 import mindustry.type.*;
+import mindustry.world.*;
 import mindustry.ctype.*;
 import unity.entities.bullet.*;
 import unity.entities.bullet.exp.*;
@@ -25,7 +26,7 @@ import unity.graphics.*;
 import static mindustry.Vars.*;
 
 public class UnityBullets implements ContentList{
-    public static BulletType laser, shardLaserFrag, shardLaser, frostLaser, branchLaserFrag, branchLaser, kelvinLaser, breakthroughLaser, coalBlaze, pyraBlaze, falloutLaser, catastropheLaser, calamityLaser, extinctionLaser, orb, shockBeam, currentStroke,
+    public static BulletType laser, shardLaserFrag, shardLaser, frostLaser, branchLaserFrag, branchLaser, kelvinWaterLaser, kelvinSlagLaser, kelvinOilLaser, kelvinCryofluidLaser, kelvinLiquidLaser, breakthroughLaser, coalBlaze, pyraBlaze, falloutLaser, catastropheLaser, calamityLaser, extinctionLaser, orb, shockBeam, currentStroke,
         shielderBullet, plasmaFragTriangle, plasmaTriangle, surgeBomb, pylonLightning, pylonLaser, pylonLaserSmall, exporb, monumentRailBullet, scarShrapnel, scarMissile, celsiusSmoke, kelvinSmoke,
         kamiBullet1, kamiLaser, kamiSmallLaser, supernovaLaser, ravagerLaser, ravagerArtillery, missileAntiCheat, laserZap, plasmaBullet;
 
@@ -44,7 +45,6 @@ public class UnityBullets implements ContentList{
     @Override
     public void load(){
         laser = new ExpLaserBulletType(150f, 30f){{
-                width = 0.7f;
                 damageInc = 7f;
                 status = StatusEffects.shocked;
                 statusDuration = 3 * 60f;
@@ -248,10 +248,128 @@ public class UnityBullets implements ContentList{
             }
         };
 
-        //TODO Implement SK's any liquid idea.
-        kelvinLaser = new ExpLaserBulletType(170f, 130f){
+        kelvinWaterLaser = new ExpLaserBulletType(170f, 130f){{
+            damageInc = 7f;
+            status = StatusEffects.wet;
+            statusDuration = 3 * 60f;
+            knockback = 10f;
+            hitUnitExpGain = 1.5f;
+            hitBuildingExpGain = 2f;
+            fromColor = Liquids.water.color;
+            toColor = Color.sky;
+        }};
+
+        kelvinSlagLaser = new ExpLaserBulletType(170f, 130f){
             {
-                damageInc = 2.5f;
+                damageInc = 7f;
+                status = StatusEffects.burning;
+                statusDuration = 3 * 60f;
+                hitUnitExpGain = 1.5f;
+                hitBuildingExpGain = 2f;
+                puddles = 10;
+                puddleRange = 4f;
+                puddleAmount = 15f;
+                puddleLiquid = Liquids.slag;
+                fromColor = Liquids.slag.color;
+                toColor = Color.orange;
+            }
+
+            public void makeLava(float x, float y, Float level){
+                for(int i = 0; i < puddles; i++){
+                    Tile tile = world.tileWorld(x + Mathf.range(puddleRange), y + Mathf.range(puddleRange));
+                    Puddles.deposit(tile, puddleLiquid, puddleAmount + level * 2);
+                }
+            }
+
+            @Override
+            public void init(Bullet b){
+                super.init(b);
+
+                if(b.data instanceof Position point) makeLava(point.getX(), point.getY(), getLevelf(b));
+            }
+        };
+
+        kelvinOilLaser = new ExpLaserBulletType(170f, 130f){
+            {
+
+                damageInc = 7f;
+                status = StatusEffects.burning;
+                statusDuration = 3 * 60f;
+                hitUnitExpGain = 1.5f;
+                hitBuildingExpGain = 2f;
+                puddles = 10;
+                puddleRange = 4f;
+                puddleAmount = 15f;
+                puddleLiquid = Liquids.oil;
+                fromColor = Liquids.oil.color;
+                toColor = Color.darkGray;
+            }
+
+            public void makeLava(float x, float y, Float level){
+                for(int i = 0; i < puddles; i++){
+                    Tile tile = world.tileWorld(x + Mathf.range(puddleRange), y + Mathf.range(puddleRange));
+                    Puddles.deposit(tile, puddleLiquid, puddleAmount + level * 2);
+                }
+            }
+
+            @Override
+            public void init(Bullet b){
+                super.init(b);
+
+                if(b.data instanceof Position point) makeLava(point.getX(), point.getY(), getLevelf(b));
+            }
+        };
+
+        kelvinCryofluidLaser = new ExpLaserBulletType(170f, 130f){
+            {
+                damageInc = 3f;
+                status = StatusEffects.freezing;
+                statusDuration = 3 * 60f;
+                hitUnitExpGain = 1.5f;
+                hitBuildingExpGain = 2f;
+                shootEffect = UnityFx.shootFlake;
+                fromColor = Liquids.cryofluid.color;
+                toColor = Color.cyan;
+            }
+
+            public void freezePos(Bullet b, float x, float y){
+                var lvl = getLevel(b);
+                float rad = 4.5f;
+                if(!Vars.headless) UnityFx.freezeEffect.at(x, y, lvl / rad + 10f, getColor(b));
+                if(!Vars.headless) UnitySounds.laserFreeze.at(x, y, 1f, 0.6f);
+        
+                Damage.status(b.team, x, y, 10f + lvl / rad, status, 60f + lvl * 7.5f, true, true);
+                Damage.status(b.team, x, y, 10f + lvl / rad, UnityStatusEffects.disabled, 4.5f * lvl, true, true);
+            }
+
+            @Override
+            public void init(Bullet b){
+                super.init(b);
+
+                setDamage(b);
+
+                Healthc target = Damage.linecast(b, b.x, b.y, b.rotation(), getLength(b));
+                b.data = target;
+
+                if(target instanceof Hitboxc hit){
+                    hit.collision(b, hit.x(), hit.y());
+                    b.collision(hit, hit.x(), hit.y());
+                    freezePos(b, hit.x(), hit.y());
+                    if(b.owner instanceof ExpBuildc exp) exp.incExp(hitUnitExpGain);
+                }else if(target instanceof Building tile && tile.collide(b)){
+                    tile.collision(b);
+                    hit(b, tile.x, tile.y);
+                    freezePos(b, tile.x, tile.y);
+                    if(b.owner instanceof ExpBuildc exp) exp.incExp(hitBuildingExpGain);
+                }else{
+                    b.data = new Vec2().trns(b.rotation(), length).add(b.x, b.y);
+                }
+            }
+        };
+
+        //TODO Implement SK's any liquid idea.
+        kelvinLiquidLaser = new ExpLaserBulletType(170f, 130f){
+            {
                 status = StatusEffects.freezing;
                 statusDuration = 3 * 60f;
                 hitUnitExpGain = 1.5f;

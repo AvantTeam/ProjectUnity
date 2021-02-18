@@ -9,11 +9,12 @@ import unity.world.blocks.GraphBlockBase.*;
 //GraphCommonBuild. ㅁㄴ이라ㅓㅣ
 public class GraphModules{
     public final GraphBuildBase build;
-    //unMapped becuz of typeCastings DON'T MODIFY
+    
     private GraphHeatModule heat;
     private GraphTorqueModule<? extends GraphTorque> torque;
     private GraphCrucibleModule crucible;
     private GraphFluxModule flux;
+    
     private boolean hasHeat, hasTorque, hasCrucible, hasFlux;
     int prevTileRotation = -1;
 
@@ -26,11 +27,13 @@ public class GraphModules{
         if(type == GraphType.torque) return torque;
         if(type == GraphType.crucible) return crucible;
         if(type == GraphType.flux) return flux;
+        
         return null;
     }
 
     public <T extends GraphModule> void setGraphConnector(T graph){
         graph.parent = this;
+        
         if(graph instanceof GraphHeatModule heat){
             this.heat = heat;
             hasHeat = heat != null;
@@ -69,7 +72,7 @@ public class GraphModules{
         return GraphData.getConnectSidePos(index, build.block().size, build.rotation());
     }
 
-    public void created(){//create
+    public void created(){
         if(hasHeat) heat.onCreate(build);
         if(hasTorque) torque.onCreate(build);
         if(hasCrucible) crucible.onCreate(build);
@@ -79,10 +82,12 @@ public class GraphModules{
 
     public float efficiency(){
         float e = 1f;
+        
         if(hasHeat) e *= heat.efficiency();
         if(hasTorque) e *= torque.efficiency();
         if(hasCrucible) e *= crucible.efficiency();
         if(hasFlux) e *= flux.efficiency();
+        
         return Math.max(0f, e);
     }
 
@@ -101,6 +106,7 @@ public class GraphModules{
             if(hasTorque) torque.onRotationChanged(prevTileRotation, build.rotation());
             if(hasCrucible) crucible.onRotationChanged(prevTileRotation, build.rotation());
             if(hasFlux) flux.onRotationChanged(prevTileRotation, build.rotation());
+            
             build.onRotationChanged();
         }
         if(hasHeat) heat.onUpdate();
@@ -144,12 +150,10 @@ public class GraphModules{
         if(hasFlux) flux.read(read, revision);
     }
 
-    //
     public void prevTileRotation(int r){
         prevTileRotation = r;
     }
 
-    //xelo must have forgotten this
     public void drawSelect(){
         if(hasHeat) heat.drawSelect();
         if(hasTorque) torque.drawSelect();

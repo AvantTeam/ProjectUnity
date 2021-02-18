@@ -33,6 +33,7 @@ public class GraphTorqueGenerate extends GraphTorque{
         table.row().left();
         table.add("[lightgray]" + bundle.get("stat.unity.maxspeed") + ":[] ").left();
         table.add(maxSpeed * 0.1f + "rps");
+        
         table.row().left();
         table.add("[lightgray]" + bundle.get("stat.unity.maxtorque") + ":[] ").left();
         table.add(maxTorque + "KNm");
