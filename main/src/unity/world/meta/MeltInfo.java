@@ -6,9 +6,11 @@ import mindustry.type.*;
 public class MeltInfo{
     public static final MeltInfo[] all = new MeltInfo[14];
     public static final ObjectMap<Item, MeltInfo> map = new ObjectMap<>(14);
+    
     public final Item item;
     public final MeltInfo additiveID;
     public final String name;
+    
     public final float meltPoint, meltSpeed, evaporation, evaporationTemp, additiveWeight;
     public final int priority;
     public final byte id;
@@ -20,6 +22,7 @@ public class MeltInfo{
         this.item = item;
         this.additiveID = additiveID;
         this.name = name;
+        
         this.meltPoint = meltPoint;
         this.meltSpeed = meltSpeed;
         this.evaporation = evaporation;
@@ -27,7 +30,9 @@ public class MeltInfo{
         this.additiveWeight = additiveWeight;
         this.priority = priority;
         this.additive = additive;
+        
         all[total] = this;
+        
         if(item != null) map.put(item, this);
         id = total++;
     }

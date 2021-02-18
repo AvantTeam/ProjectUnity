@@ -28,6 +28,7 @@ public class GraphFluxModule extends GraphModule<GraphFlux, GraphFluxModule, Flu
         var net = networks.get(0);
         if(net == null) return;
         String ps = " Wb";
+        
         table.row();
         table.table(sub -> {
             sub.clearChildren();

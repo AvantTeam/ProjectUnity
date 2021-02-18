@@ -11,7 +11,6 @@ import unity.world.modules.*;
 import static arc.Core.bundle;
 import static mindustry.Vars.tilesize;
 
-//_RotPowerCommon
 public class GraphTorque extends Graph{
     public final float baseFriction, baseInertia;
 

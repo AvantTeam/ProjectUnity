@@ -4,9 +4,8 @@ import arc.scene.ui.layout.*;
 import unity.world.meta.*;
 import unity.world.modules.*;
 
-//GraphCommon 그래프계의 타입 느낌? Consume?
 public abstract class Graph{
-    public boolean isMultiConnector;//multi_graph_connector.
+    public boolean isMultiConnector;
     public int[] accept;
 
     public Graph setAccept(int... newAccept){
@@ -25,7 +24,6 @@ public abstract class Graph{
 
     abstract void drawPlace(int x, int y, int size, int rotation, boolean valid);
 
-    //내가추가
     public abstract GraphType type();
 
     public abstract GraphModule module();
