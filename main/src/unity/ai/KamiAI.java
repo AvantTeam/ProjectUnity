@@ -14,6 +14,7 @@ import mindustry.io.*;
 import mindustry.net.Net.*;
 import mindustry.net.Packets.*;
 import unity.content.*;
+import unity.entities.units.KamiUnit;
 import unity.net.*;
 import unity.type.*;
 
@@ -87,7 +88,7 @@ public class KamiAI implements UnitController{
             }
             if(kamiAI.reloads[0] >= 2f){
                 for(int i = 0; i < 3; i++){
-                    float angle = (i * (360f / 3)) + (kamiAI.reloads[2] * kamiAI.reloads[3] * 5f);
+                    float angle = (i * (360f / 3)) + (kamiAI.reloads[2] * kamiAI.kami().laserRotation * 5f);
                     for(int j = 0; j < 3; j++){
                         //Bullet bullet = UnityBullets.kamiBullet1.create(kamiAI.unit, kamiAI.unit.x, kamiAI.unit.y, angle + Mathf.range(1f));
                         //bullet.vel.scl(Mathf.random(0.8f, 1.2f) * 0.7f);
@@ -103,7 +104,7 @@ public class KamiAI implements UnitController{
                 if(kamiAI.reloads[2] >= 60f * 4.5f){
                     kamiAI.reloads[1] = 0;
                     kamiAI.reloads[0] = -80f;
-                    kamiAI.reloads[3] *= -1f;
+                    kamiAI.kami().laserRotation *= -1f;
                     kamiAI.reloads[2] = 0f;
                 }else{
                     kamiAI.reloads[0] = 0f;
@@ -113,7 +114,7 @@ public class KamiAI implements UnitController{
             kamiAI.reloads[0] += Time.delta;
         }, kamiAI -> {
             kamiAI.reloads[0] = -80f;
-            kamiAI.reloads[3] = 1f;
+            kamiAI.kami().laserRotation = 1f;
         }, 15 * 60f),
         //Magicannon "Final Spark"/Love Sign "Master Spark" mix
         new KamiShootType(kamiAI -> {
@@ -121,7 +122,7 @@ public class KamiAI implements UnitController{
                 kamiAI.reloads[6] += Time.delta;
                 kamiAI.reloads[1] += Time.delta;
                 kamiAI.reloads[9] += Time.delta;
-                if(kamiAI.reloads[9] >= 20 && kamiAI.tmpBullets[0] != null){
+                if(kamiAI.reloads[9] >= 20 && kamiAI.kami().laser != null){
                     int diff = 4 + difficulty;
                     kamiAI.reloads[8] -= 17f;
                     for(int i = 0; i < diff; i++){
@@ -142,7 +143,7 @@ public class KamiAI implements UnitController{
                     }
                     kamiAI.reloads[9] = 0f;
                 }
-                if(kamiAI.reloads[6] >= 4 && kamiAI.tmpBullets[0] != null){
+                if(kamiAI.reloads[6] >= 4 && kamiAI.kami().laser != null){
                     Cons<Bullet> data = b -> {
                         if(b.time < 1f * 50){
                             b.vel.setLength(Math.max((1f - (b.time / (1f * 50))) * b.type.speed, 0.02f));
@@ -168,14 +169,14 @@ public class KamiAI implements UnitController{
                     kamiAI.reloads[6] = 0f;
                 }
                 if(kamiAI.reloads[2] != 1){
-                    tmpVec.trns(kamiAI.reloads[3], 670f).add(kamiAI.unit);
+                    tmpVec.trns(kamiAI.kami().laserRotation, 670f).add(kamiAI.unit);
                     UnityFx.kamiWarningLine.at(kamiAI.unit.x, kamiAI.unit.y, 0f, new Position[]{new Vec2(kamiAI.unit.x, kamiAI.unit.y), new Vec2(tmpVec)});
                     kamiAI.reloads[2] = 1;
                 }
                 if(kamiAI.reloads[1] >= 100){
                     if(kamiAI.reloads[4] != 1){
-                        tmpVec.trns(kamiAI.reloads[3], 80f).add(kamiAI.unit);
-                        //kamiAI.tmpBullets[0] = UnityBullets.kamiLaser.create(kamiAI.unit, tmpVec.x, tmpVec.y, kamiAI.reloads[4]);
+                        tmpVec.trns(kamiAI.kami().laserRotation, 80f).add(kamiAI.unit);
+                        //kamiAI.kami().laser = UnityBullets.kamiLaser.create(kamiAI.unit, tmpVec.x, tmpVec.y, kamiAI.reloads[4]);
                         UnityCall.createKamiBullet(
                             kamiAI.unit, UnityBullets.kamiLaser,
                             tmpVec.x, tmpVec.y, kamiAI.reloads[4],
@@ -184,15 +185,15 @@ public class KamiAI implements UnitController{
                         );
                         kamiAI.reloads[4] = 1f;
                     }
-                    if(kamiAI.tmpBullets[0] != null){
-                        kamiAI.reloads[3] = Angles.moveToward(kamiAI.reloads[3], kamiAI.unit.angleTo(kamiAI.target), 0.2f * Time.delta);
-                        tmpVec.trns(kamiAI.reloads[3], 80f).add(kamiAI.unit);
-                        kamiAI.tmpBullets[0].rotation(kamiAI.reloads[3]);
-                        kamiAI.tmpBullets[0].set(tmpVec);
+                    if(kamiAI.kami().laser != null){
+                        kamiAI.kami().laserRotation = Angles.moveToward(kamiAI.kami().laserRotation, kamiAI.unit.angleTo(kamiAI.target), 0.2f * Time.delta);
+                        tmpVec.trns(kamiAI.kami().laserRotation, 80f).add(kamiAI.unit);
+                        //kamiAI.kami().laser.rotation(kamiAI.kami().laserRotation);
+                        kamiAI.kami().laser.set(tmpVec);
                     }
                     kamiAI.reloads[5] += Time.delta;
                     if(kamiAI.reloads[5] >= 4.2f * 60f){
-                        kamiAI.tmpBullets[0] = null;
+                        kamiAI.kami().laser = null;
                         for(int i = 0; i < 6; i++) kamiAI.reloads[i] = 0f;
                         kamiAI.reloads[8] = 0f;
                         kamiAI.reloads[9] = 0f;
@@ -202,7 +203,7 @@ public class KamiAI implements UnitController{
                 }
             }else if(kamiAI.target != null){
                 tmpVec.trns(kamiAI.relativeRotation, 0, 210).add(kamiAI.target).sub(kamiAI.unit).scl(1 / 20f);
-                kamiAI.reloads[3] = kamiAI.unit.angleTo(kamiAI.target);
+                kamiAI.kami().laserRotation = kamiAI.unit.angleTo(kamiAI.target);
                 kamiAI.unit.move(tmpVec.x, tmpVec.y);
                 kamiAI.reloads[0] += Time.delta;
             }
@@ -452,6 +453,10 @@ public class KamiAI implements UnitController{
         return unit;
     }
 
+    protected KamiUnit kami(){
+        return unit.as();
+    }
+
     public static class KamiBulletData<T extends Bullet> implements Cons<T>{
         float initialRotation = 0f;
         Cons2<T, KamiBulletData<T>>[] stages;
@@ -627,7 +632,7 @@ public class KamiAI implements UnitController{
                 }
             };
 
-            consDatas[10] = b -> ((KamiAI)((Unitc)b.owner).controller()).tmpBullets[0] = b;
+            consDatas[10] = b -> b.owner.<KamiUnit>as().laser = b;
 
             int diff = 65 + ((difficulty - 1) * 2);
             bulletDatas = new KamiBulletData[diff];

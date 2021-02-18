@@ -1,43 +1,69 @@
 package unity.net;
 
-import arc.util.*;
+import java.io.*;
+
+import arc.struct.*;
 import arc.util.io.*;
 import mindustry.gen.*;
 import mindustry.io.*;
 import unity.*;
 import unity.ai.KamiAI.*;
+import unity.entities.abilities.*;
 
 public class UnityRemoteReadClient{
-    public static void readPacket(Reads read, byte id){
-        if(id == 0){
-            try{
-                Bullet b = TypeIO.readBulletType(read).create(
-                    TypeIO.readEntity(read),
-                    TypeIO.readTeam(read),
-                    read.f(), read.f(), read.f()
-                );
-                b.vel.scl(read.f());
-                b.lifetime = b.type.lifetime * read.f();
+    private static final ReusableByteInStream out = new ReusableByteInStream();
+    private static final Reads read = new Reads(new DataInputStream(out));
 
-                float h = read.f();
-                b.hitSize = h < 0f ? b.type.hitSize : h;
-                b.data = KamiBulletDatas.get(read.i());
-                b.fdata = read.f();
-                b.time = read.f();
-            }catch(Throwable t){
-                Log.err(t);
-            }
-        }else if(id == 1){
-            try{
-                Healthc boss = TypeIO.readEntity(read);
-                String name = read.str();
+    private static final IntMap<Runnable> map = new IntMap<>();
 
-                Unity.musicHandler.play(name, () -> !boss.dead() && boss.isAdded());
-            }catch(Throwable t){
-                Log.err(t);
+    public static void registerHandlers(){
+        map.put(0, () -> {
+            Bullet b = TypeIO.readBulletType(read).create(
+                TypeIO.readEntity(read),
+                TypeIO.readTeam(read),
+                read.f(), read.f(), read.f()
+            );
+            b.vel.scl(read.f());
+            b.lifetime = b.type.lifetime * read.f();
+
+            float h = read.f();
+            b.hitSize = h < 0f ? b.type.hitSize : h;
+            b.data = KamiBulletDatas.get(read.i());
+            b.fdata = read.f();
+            b.time = read.f();
+
+            Unity.print(b.owner, ((Unitc)b.owner).controller());
+        });
+
+        map.put(1, () -> {
+            String name = read.str();
+            boolean play = read.bool();
+
+            if(play){
+                Unity.musicHandler.play(name);
+            }else{
+                Unity.musicHandler.stop(name);
             }
+        });
+
+        map.put(2, () -> {
+            Player player = TypeIO.readEntity(read);
+            int index = read.i();
+
+            ((TapAbility)player.unit().abilities.get(index)).tapped(player.unit());
+        });
+    }
+
+    public static void readPacket(byte[] bytes, byte type){
+        out.setBytes(bytes);
+        if(!map.containsKey(type)){
+            throw new RuntimeException("Unknown packet type: '" + type + "'");
         }else{
-            Log.err("Invalid client remote read method id: " + id);
+            try{
+                map.get(type).run();
+            }catch(Exception e){
+                throw new RuntimeException(e);
+            }
         }
     }
 }

@@ -69,6 +69,7 @@ public class MusicHandler implements ApplicationListener{
     public void update(){
         if(headless){
             currentData = null;
+            if(currentMusic != null) currentMusic.stop();
             currentMusic = null;
 
             return;
@@ -119,7 +120,7 @@ public class MusicHandler implements ApplicationListener{
         loopDatas.clear();
         currentData = null;
 
-        currentMusic.stop();
+        if(currentMusic != null) currentMusic.stop();
         currentMusic = null;
     }
 

@@ -15,6 +15,7 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.defense.turrets.Turret.*;
 import unity.entities.UnitVecData;
+import unity.entities.bullet.*;
 import unity.graphics.*;
 import unity.util.*;
 
@@ -130,7 +131,7 @@ public class UnityFx{
         }
     }),
     
-    shootSmallBlaze = new Effect(22f, e -> {    //@formatter:on
+    shootSmallBlaze = new Effect(22f, e -> {
         color(Pal.lightFlame, Pal.darkFlame, Pal.gray, e.fin());
         randLenVectors(e.id, 16, e.finpow() * 60f, e.rotation, 18f, (x, y) -> Fill.circle(e.x + x, e.y + y, 0.85f + e.fout() * 3.5f));
     }),
@@ -761,6 +762,22 @@ public class UnityFx{
         Draw.z(oz);
     }),
 
+    devourerShootEffect = new Effect(41f, e -> {
+        Color[] colors = {UnityPal.scarColorAlpha, UnityPal.scarColor, UnityPal.endColor, Color.white};
+
+        for(int i = 0; i < colors.length; i++){
+            Draw.color(colors[i]);
+            float size = Math.max(0f, (e.fslope() * 35f) - (i * ((7f + (1f - e.fslope())) * 2f)));
+            Fill.circle(e.x, e.y, size);
+
+            int finalI = i;
+            Angles.randLenVectors(e.id, 13, 140f, (x, y) -> {
+                float s = 3.4f + (colors.length - finalI);
+                Fill.circle(e.x + (x * (1f - e.finpow())), e.y + (y * (1f - e.finpow())), e.fin() * 2f * s);
+            });
+        }
+    }),
+
     rainbowTextureTrail = new Effect(80f, e -> {
         if(!(e.data instanceof TextureRegion t)) return;
         Draw.blend(Blending.additive);
@@ -799,9 +816,13 @@ public class UnityFx{
     }),
 
     pointBlastLaserEffect = new Effect(23f, 600f, e -> {
-        Draw.color(e.color);
-        Fill.circle(e.x, e.y, e.rotation * e.fout());
-        Drawf.light(e.x, e.y, e.rotation * e.fout() * 3f, e.color, 0.66f);
+        if(!(e.data instanceof PointBlastLaserBulletType btype)) return;
+
+        for(int i = 0; i < btype.laserColors.length; i++){
+            Draw.color(btype.laserColors[i]);
+            Fill.circle(e.x, e.y, (e.rotation - (btype.auraWidthReduction * i)) * e.fout());
+        }
+        Drawf.light(e.x, e.y, e.rotation * e.fout() * 3f, btype.laserColors[0], 0.66f);
     }),
 
     rockFx = new Effect(10f, e -> {

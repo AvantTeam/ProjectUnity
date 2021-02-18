@@ -30,7 +30,10 @@ public class UnityStatusEffects implements ContentList{
         }};
 
         radiation = new StatusEffect("radiation"){
-            //TODO create new class?
+            {
+                damage = 1.6f;
+            }
+
             @Override
             public void update(Unit unit, float time){
                 super.update(unit, time);
@@ -42,10 +45,6 @@ public class UnityStatusEffects implements ContentList{
                     if(Mathf.chanceDelta(0.12f)) temp.reload = Math.min(temp.reload + Time.delta * 1.5f * strength, temp.weapon.reload);
                     temp.rotation += Mathf.range(12f * strength);
                 }
-            }
-
-            {
-                damage = 1.6f;
             }
         };
 

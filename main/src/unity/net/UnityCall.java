@@ -1,20 +1,60 @@
 package unity.net;
 
+import arc.util.*;
 import arc.util.io.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.io.*;
-import mindustry.net.Net.*;
 import unity.*;
 import unity.ai.KamiAI.*;
+import unity.entities.abilities.*;
 
 import java.io.*;
+import java.util.*;
 
 import static mindustry.Vars.*;
 
 public class UnityCall{
-    private static ReusableByteOutStream out = new ReusableByteOutStream(8192);
-    private static Writes write = new Writes(new DataOutputStream(out));
+    private static final ReusableByteOutStream out = new ReusableByteOutStream();
+    private static final Writes write = new Writes(new DataOutputStream(out));
+
+    public static void init(){
+        if(netClient != null){
+            UnityRemoteReadClient.registerHandlers();
+            netClient.addPacketHandler("unity.call", handler -> {
+                String[] split = handler.split(":");
+                UnityRemoteReadClient.readPacket(unpack(split[1]), Byte.parseByte(split[0]));
+            });
+        }else{
+            Log.warn("'netClient' is null");
+        }
+
+        if(netServer != null){
+            UnityRemoteReadServer.registerHandlers();
+            netServer.addPacketHandler("unity.call", (player, handler) -> {
+                String[] split = handler.split(":");
+                UnityRemoteReadServer.readPacket(unpack(split[1]), Byte.parseByte(split[0]), player);
+            });
+        }else{
+            Log.warn("'netServer' is null");
+        }
+    }
+
+    protected static String pack(byte[] bytes){
+        String arr = Arrays.toString(bytes).replace(" ", "");
+        return arr.substring(1, arr.length() - 1);
+    }
+
+    protected static byte[] unpack(String str){
+        String[] split = str.split(",");
+
+        byte[] bytes = new byte[split.length];
+        for(int i = 0; i < split.length; i++){
+            bytes[i] = Byte.parseByte(split[i]);
+        }
+
+        return bytes;
+    }
 
     public static void createKamiBullet(
         Teamc owner, BulletType type,
@@ -33,10 +73,6 @@ public class UnityCall{
         }
 
         if(net.server()){
-            UnityInvokePacket packet = UnityInvokePacket.create();
-            packet.priority = 0;
-            packet.type = 0;
-
             out.reset();
 
             TypeIO.writeBulletType(write, type);
@@ -52,32 +88,46 @@ public class UnityCall{
             write.f(fdata);
             write.f(time);
 
-            packet.bytes = out.getBytes();
-            packet.length = out.size();
-
-            net.send(packet, SendMode.udp);
+            Call.clientPacketUnreliable("unity.call", "0:" + pack(out.getBytes()));
         }
     }
 
-    public static void bossMusic(Healthc boss, String name){
+    public static void bossMusic(String name, boolean play){
         if(net.server() || !net.active()){
-            Unity.musicHandler.play(name, () -> !boss.dead() && boss.isAdded());
+            if(play){
+                Unity.musicHandler.play(name);
+            }else{
+                Unity.musicHandler.stop(name);
+            }
         }
 
         if(net.server()){
-            UnityInvokePacket packet = UnityInvokePacket.create();
-            packet.priority = 0;
-            packet.type = 1;
-
             out.reset();
 
-            TypeIO.writeEntity(write, boss);
             write.str(name);
+            write.bool(play);
 
-            packet.bytes = out.getBytes();
-            packet.length = out.size();
+            Call.clientPacketReliable("unity.call", "1:" + pack(out.getBytes()));
+        }
+    }
 
-            net.send(packet, SendMode.tcp);
+    public static void tapAbility(Player player, int index){
+        TapAbility ability = (TapAbility)player.unit().abilities.get(index);
+        ability.tapped(player.unit());
+
+        if(net.server() || net.client()){
+            out.reset();
+
+            if(net.server()){
+                TypeIO.writeEntity(write, player);
+            }
+            write.i(index);
+
+            if(net.client()){
+                Call.serverPacketReliable("unity.call", "2:" + pack(out.getBytes()));
+            }else if(net.server()){
+                Call.clientPacketReliable(player.con, "unity.call", "2:" + pack(out.getBytes()));
+            }
         }
     }
 }

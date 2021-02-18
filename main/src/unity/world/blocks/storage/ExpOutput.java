@@ -13,7 +13,7 @@ import unity.graphics.*;
 import unity.world.blocks.*;
 
 import static arc.Core.bundle;
-import static unity.entities.bullet.ExpOrb.*;
+import static unity.entities.bullet.exp.ExpOrb.*;
 
 public class ExpOutput extends ExpUnloader implements ExpBlockBase{
     protected int expCapacitiy = 100;

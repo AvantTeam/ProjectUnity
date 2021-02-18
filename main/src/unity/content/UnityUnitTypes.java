@@ -26,7 +26,7 @@ import unity.entities.bullet.*;
 import unity.entities.comp.*;
 import unity.entities.units.*;
 import unity.entities.units.EndWormUnit.*;
-import unity.gen.UnityMusics;
+import unity.gen.*;
 import unity.graphics.*;
 import unity.type.*;
 
@@ -40,7 +40,8 @@ public class UnityUnitTypes implements ContentList{
         TransLegsUnit::new,
         EndInvisibleUnit::new,
         EndWormUnit::new,
-        EndWormSegmentUnit::new
+        EndWormSegmentUnit::new,
+        EndLegsUnit::new
     };
 
     private static final int[] classIDs = new int[constructors.length];
@@ -79,7 +80,7 @@ public class UnityUnitTypes implements ContentList{
     
     /** Koruh {@linkplain UnitEntity flying} units */
     public static @FactionDef(type = "koruh") @EntityPoint(type = UnitEntity.class)
-    UnitType cache;
+    UnitType cache, dijkstra;
 
     /** Monolith {@linkplain MechUnit mech} units */
     public static @FactionDef(type = "monolith") @EntityPoint(type = MechUnit.class)
@@ -89,7 +90,8 @@ public class UnityUnitTypes implements ContentList{
     public static @FactionDef(type = "monolith") @EntityPoint(type = LegsUnit.class)
     UnitType pylon, monument, colossus;
 
-    public static UnitType kami;
+    public static @FactionDef(type = "koruh") @EntityDef(base = KamiUnit.class, def = Bossc.class)
+    UnitType kami;
 
     public static @FactionDef(type = "end") UnitType opticaecus, devourer, ravager;
 
@@ -1769,7 +1771,47 @@ public class UnityUnitTypes implements ContentList{
             String shieldSprite = "unity-cache-shield";
             abilities.add(new MoveLightningAbility(10f, 14, 0.15f, 4f, 3.6f, 6f, Pal.lancerLaser, shieldSprite));
         }};
-        
+
+        dijkstra = new UnityUnitType("dijkstra"){{
+            mineTier = -1;
+            speed = 7.5f;
+            drag = 0.01f;
+            health = 640f;
+            flying = true;
+            armor = 8;
+            accel = 0.01f;
+            lowAltitude = true;
+            range = 220f;
+
+            weapons.add(new Weapon("dijkstra-laser"){{
+                rotate = true;
+                rotateSpeed = 8f;
+                shadow = 20f;
+                x = 0f;
+                y = 0f;
+                reload = 150f;
+                shots = 1;
+                alternate = false;
+                ejectEffect = Fx.none;
+                bullet = UnityBullets.laserZap;
+                shootSound = Sounds.laser;
+                mirror = false;
+            }}, new Weapon("dijkstra-plasmagun"){{
+                x = 0f;
+                y = 0f;
+                reload = 7f;
+                shots = 1;
+                alternate = true;
+                ejectEffect = Fx.none;
+                velocityRnd = 1.5f;
+                spacing = 15f;
+                inaccuracy = 20f;
+
+                bullet = UnityBullets.plasmaBullet;
+                shootSound = Sounds.spark;
+            }});
+        }};
+
         //endregion
         //region monolith
 
@@ -2060,7 +2102,6 @@ public class UnityUnitTypes implements ContentList{
             }});
         }};
 
-        setEntity("kami-mkii", KamiUnit::new);
         kami = new RainbowUnitType("kami-mkii"){{
             defaultController = KamiAI::new;
             health = 120000f;
@@ -2068,7 +2109,7 @@ public class UnityUnitTypes implements ContentList{
             hitSize = 36f;
             flying = true;
 
-            Unity.musicHandler.registerLoop("kami", UnityMusics.radiantDischargeIntro, UnityMusics.radiantDischargeLoop);
+            Unity.musicHandler.registerLoop(name, UnityMusics.radiantDischargeIntro, UnityMusics.radiantDischargeLoop);
         }};
 
         //endregion
@@ -2146,11 +2187,13 @@ public class UnityUnitTypes implements ContentList{
             armor = 16f;
             omniMovement = false;
 
-            BulletType t = new AntiCheatBasicBulletType(9.2f, 130f){{
+            BulletType t = new AntiCheatBasicBulletType(9.2f, 430f){{
                 hitSize = 8f;
                 shrinkY = 0f;
                 width = 19f;
                 height = 25f;
+                otherAntiCheatScl = 4.75f;
+                priority = 1;
                 backColor = hitColor = lightColor = UnityPal.scarColor;
                 frontColor = UnityPal.endColor;
             }};
@@ -2163,16 +2206,28 @@ public class UnityUnitTypes implements ContentList{
                 reload = 15f * 60f;
                 continuous = true;
                 shake = 4f;
-                bullet = new SparkingContinuousLaserBulletType(780f){{
+                firstShotDelay = 41f;
+                chargeSound = UnitySounds.devourerMainLaser;
+                shootSound = UnitySounds.continuousLaserA;
+                bullet = new SparkingContinuousLaserBulletType(2400f){{
                     length = 340f;
                     lifetime = 5f * 60f;
                     incendChance = -1f;
                     fromBlockAmount = 1;
                     fromBlockChance = 0.4f;
                     fromBlockDamage = 80f;
+                    shootEffect = UnityFx.devourerShootEffect;
+                    keepVelocity = true;
                     lightColor = lightningColor = hitColor = UnityPal.scarColor;
                     colors = new Color[]{UnityPal.scarColorAlpha, UnityPal.scarColor, UnityPal.endColor, Color.white};
-                }};
+                }
+
+                    @Override
+                    public void hitEntity(Bullet b, Hitboxc other, float initialHealth){
+                        super.hitEntity(b, other, initialHealth);
+                        if(other instanceof AntiCheatBase) ((AntiCheatBase)other).overrideAntiCheatDamage(damage * 4f, 2);
+                    }
+                };
             }}, new Weapon("unity-doeg-destroyer"){{
                 mirror = true;
                 ignoreRotation = true;
@@ -2203,7 +2258,7 @@ public class UnityUnitTypes implements ContentList{
                 xRand = 12f;
                 shootSound = Sounds.missile;
 
-                bullet = new AntiCheatBasicBulletType(6f, 30f, "missile"){{
+                bullet = new AntiCheatBasicBulletType(6f, 120f, "missile"){{
                     width = 9f;
                     height = 11f;
                     shrinkY = 0f;
@@ -2241,17 +2296,24 @@ public class UnityUnitTypes implements ContentList{
                 y = 16.5f;
                 reload = 2f * 60;
                 shadow = 14f;
-                shootSound = Sounds.laser;
+                shootSound = Sounds.beam;
                 continuous = true;
 
-                bullet = new ContinuousLaserBulletType(25f){{
+                bullet = new ContinuousLaserBulletType(85f){{
                     lifetime = 2f * 60;
                     length = 230f;
                     for(int i = 0; i < strokes.length; i++){
                         strokes[i] *= 0.4f;
                     }
                     colors = new Color[]{UnityPal.scarColorAlpha, UnityPal.scarColor, UnityPal.endColor, Color.white};
-                }};
+                }
+
+                    @Override
+                    public void hitEntity(Bullet b, Hitboxc other, float initialHealth){
+                        super.hitEntity(b, other, initialHealth);
+                        if(other instanceof AntiCheatBase) ((AntiCheatBase)other).overrideAntiCheatDamage(damage * 6f, 3);
+                    }
+                };
             }});
         }
             @Override
@@ -2261,14 +2323,14 @@ public class UnityUnitTypes implements ContentList{
             }
         };
 
-        setEntity("ravager", LegsUnit::create);
+        setEntity("ravager", EndLegsUnit::new);
         ravager = new UnityUnitType("ravager"){{
             health = 1650000f;
             speed = 0.65f;
             drag = 0.16f;
             armor = 15f;
             hitSize = 138f;
-            rotateSpeed = 1.2f;
+            rotateSpeed = 1.1f;
 
             allowLegStep = true;
             hovering = true;
@@ -2276,8 +2338,8 @@ public class UnityUnitTypes implements ContentList{
             visualElevation = 3f;
             legCount = 8;
             legGroupSize = 4;
-            legPairOffset = 4f;
-            legMoveSpace = 0.6f;
+            legPairOffset = 2f;
+            legMoveSpace = 0.5f;
             legLength = 140f;
             legExtension = -15f;
             legBaseOffset = 50f;
@@ -2287,6 +2349,69 @@ public class UnityUnitTypes implements ContentList{
 
             legSplashRange = 150f;
             legSplashDamage = 1600f;
+
+            bottomWeapons.add("unity-ravager-nightmare");
+            weapons.addAll(new Weapon("unity-ravager-nightmare"){{
+                x = 80.25f;
+                y = -7.75f;
+                shootY = 75f;
+                reload = 6f * 60f;
+                recoil = 8f;
+                alternate = true;
+                rotate = false;
+                shootSound = UnitySounds.ravagerNightmareShoot;
+                bullet = UnityBullets.ravagerLaser;
+            }}, new Weapon("unity-ravager-artillery"){{
+                shootY = 11f;
+                shots = 5;
+                inaccuracy = 10f;
+                shadow = 13.25f * 2f;
+                y = -31.75f;
+                x = 44.25f;
+                rotate = true;
+                rotateSpeed = 2f;
+                velocityRnd = 0.2f;
+                reload = 2f * 50f;
+                shootSound = Sounds.artillery;
+                bullet = UnityBullets.ravagerArtillery;
+            }}, new Weapon("unity-ravager-artillery"){{
+                shootY = 11f;
+                shots = 5;
+                inaccuracy = 10f;
+                shadow = 13.25f * 2f;
+                y = -4.25f;
+                x = 51.25f;
+                rotate = true;
+                rotateSpeed = 2f;
+                velocityRnd = 0.2f;
+                reload = 2.25f * 50f;
+                shootSound = Sounds.artillery;
+                bullet = UnityBullets.ravagerArtillery;
+            }}, new Weapon("unity-ravager-small-turret"){{
+                shootY = 7f;
+                inaccuracy = 2f;
+                shadow = 9.25f * 2f;
+                y = 53.75f;
+                x = 34.5f;
+                rotate = true;
+                xRand = 2f;
+                reload = 7f;
+                shootSound = Sounds.missile;
+
+                bullet = UnityBullets.missileAntiCheat;
+            }}, new Weapon("unity-ravager-small-turret"){{
+                shootY = 7f;
+                inaccuracy = 2f;
+                shadow = 9.25f * 2f;
+                y = 24.25f;
+                x = 50.75f;
+                rotate = true;
+                xRand = 2f;
+                reload = 7f;
+                shootSound = Sounds.missile;
+
+                bullet = UnityBullets.missileAntiCheat;
+            }});
         }
             @Override
             public void init(){

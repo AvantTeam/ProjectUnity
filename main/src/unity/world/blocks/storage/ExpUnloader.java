@@ -6,7 +6,7 @@ import arc.math.Mathf;
 import mindustry.gen.Building;
 import mindustry.world.Block;
 import mindustry.world.meta.*;
-import unity.entities.bullet.ExpOrb;
+import unity.entities.bullet.exp.ExpOrb;
 import unity.world.blocks.ExpBuildBase;
 
 import static arc.Core.*;
