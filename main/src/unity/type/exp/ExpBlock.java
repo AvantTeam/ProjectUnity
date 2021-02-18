@@ -14,6 +14,8 @@ public class ExpBlock extends ExpType<Block>{
     public boolean conveyor = false;
     public boolean noOrbCollision = true;
 
+    public float orbMultiplier = 0.8f;
+
     /** Wether the upgrade configuration is conditional */
     public boolean condConfig;
 

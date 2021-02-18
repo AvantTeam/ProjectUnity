@@ -20,7 +20,6 @@ import mindustry.world.blocks.defense.turrets.*;
 import mindustry.type.*;
 import mindustry.ctype.*;
 import mindustry.content.*;
-import unity.*;
 import unity.annotations.Annotations.*;
 import unity.entities.bullet.*;
 import unity.gen.*;
@@ -938,8 +937,8 @@ public class UnityBlocks implements ContentList{
                 block.addField(ExpFieldType.bool, Turret.class, "targetAir", false, 5f);
 
                 block.setupFields();
-                block.setStats();
                 block.init();
+                block.setStats();
             }
         };
 
@@ -993,8 +992,8 @@ public class UnityBlocks implements ContentList{
                 block.addField(ExpFieldType.linear, ReloadTurret.class, "reloadTime", reloadTime, -1f);
 
                 block.setupFields();
-                block.setStats();
                 block.init();
+                block.setStats();
             }
         };
 
@@ -1030,8 +1029,8 @@ public class UnityBlocks implements ContentList{
                 block.addUpgrade(laserBreakthrough, 30);
 
                 block.setupFields();
-                block.setStats();
                 block.init();
+                block.setStats();
             }
         };
 
@@ -1090,8 +1089,8 @@ public class UnityBlocks implements ContentList{
                 block.addField(ExpFieldType.linear, BaseTurret.class, "range", range, 0.25f * 8f);
 
                 block.setupFields();
-                block.setStats();
                 block.init();
+                block.setStats();
             }
         };
 
@@ -1125,8 +1124,8 @@ public class UnityBlocks implements ContentList{
                 block.maxExp = block.requiredExp(block.maxLevel);
 
                 block.setupFields();
-                block.setStats();
                 block.init();
+                block.setStats();
             }
         };
 
@@ -1187,16 +1186,14 @@ public class UnityBlocks implements ContentList{
                 block.maxLevel = 1;
                 block.maxExp = block.requiredExp(block.maxLevel);
 
-                //TODO GLENN GO THE FUCK TO WORK
-                //block.rwPrecision = 20f;
-                //block.orbMultiplier = 0.07f;
+                block.ioPrecision = 20f;
+                block.orbMultiplier = 0.07f;
 
-                //Color[] heatColors = {Pal.lancerLaser, UnityPal.expColor};
-                //block.addField(ExpFieldType.list, Turret.class, "heatColor", heatColor, heatColors);
+                block.addField(ExpFieldType.list, Turret.class, "heatColor", Color.class, new Color[]{Pal.lancerLaser, UnityPal.expColor});
 
                 block.setupFields();
-                block.setStats();
                 block.init();
+                block.setStats();
             }
         };
 
@@ -1225,15 +1222,16 @@ public class UnityBlocks implements ContentList{
                 block.maxLevel = 10;
                 block.maxExp = block.requiredExp(block.maxLevel);
 
-                //TODO GLENN GO THE FUCK TO WORK
-                //float[] shotCounts = {1, 1, 2, 2, 2, 3, 3, 4, 4, 5, 5};
-                //block.addField(ExpFieldType.list, Turret.class, "shots", shots, shotCounts);
-                //float[] spreadCounts = {0, 0, 5, 10, 15, 7, 14, 8, 10, 6, 9};
-                //block.addField(ExpFieldType.list, Turret.class, "spread", spread, spreadCounts);
+                block.addField(ExpFieldType.list, Turret.class, "shots", Integer.class, new Integer[]{
+                    1, 1, 2, 2, 2, 3, 3, 4, 4, 5, 5
+                });
+                block.addField(ExpFieldType.list, Turret.class, "spread", Float.class, new Float[]{
+                    0f, 0f, 5f, 10f, 15f, 7f, 14f, 8f, 10f, 6f, 9f
+                });
 
                 block.setupFields();
-                block.setStats();
                 block.init();
+                block.setStats();
             }
         };
 

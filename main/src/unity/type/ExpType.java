@@ -46,6 +46,10 @@ public abstract class ExpType<T extends UnlockableContent>{
     public Effect upgradeEffect = UnityFx.upgradeBlockFx;
     public Sound upgradeSound = Sounds.message;
 
+    /** The floating point in which exp will be multiplied on save and divided on load.
+     * Use only if you increment exp in floats */
+    public float ioPrecision = 1f;
+
     public ObjectMap<ExpFieldType, Seq<ExpField>> expFields = new ObjectMap<>();
     public Entry<Class, Field>[] linearInc;
     public float[] linearIncStart;
@@ -62,6 +66,9 @@ public abstract class ExpType<T extends UnlockableContent>{
     public Entry<Class, Field>[] boolInc;
     public boolean[] boolIncStart;
     public float[] boolIncMul;
+
+    public Entry<Class, Field>[] listInc;
+    public Entry<Class, Object[]>[] listIncMul;
 
     protected ExpType(T type){
         this.type = type;
@@ -99,27 +106,47 @@ public abstract class ExpType<T extends UnlockableContent>{
                 Seq<ExpField> fields = expFields.get(type, Seq::new);
                 int amount = fields.size;
 
-                Field fInc = ExpType.class.getDeclaredField(type.name() + "Inc");
-                Field fIncStart = ExpType.class.getDeclaredField(type.name() + "IncStart");
-                Field fIncMul = ExpType.class.getDeclaredField(type.name() + "IncMul");
+                if(type != ExpFieldType.list){
+                    Field fInc = ExpType.class.getDeclaredField(type.name() + "Inc");
+                    Field fIncMul = ExpType.class.getDeclaredField(type.name() + "IncMul");
+                    Field fIncStart = ExpType.class.getDeclaredField(type.name() + "IncStart");
 
-                fInc.set(this, (Entry<Class, Field>[])new Entry[amount]);
-                fIncStart.set(this, type == ExpFieldType.bool ? new boolean[amount] : new float[amount]);
-                fIncMul.set(this, new float[amount]);
+                    fInc.set(this, (Entry<Class, Field>[])new Entry[amount]);
+                    fIncStart.set(this, type == ExpFieldType.bool ? new boolean[amount] : new float[amount]);
+                    fIncMul.set(this, new float[amount]);
 
-                for(int i = 0; i < fields.size; i++){
-                    ExpField field = fields.get(i);
+                    for(int i = 0; i < amount; i++){
+                        ExpField field = fields.get(i);
 
-                    Entry<Class, Field> entry = (((Entry<Class, Field>[])fInc.get(this))[i] = new Entry<>());
-                    entry.key = field.classType;
-                    entry.value = field.field;
+                        Entry<Class, Field> entry = (((Entry<Class, Field>[])fInc.get(this))[i] = new Entry<>());
+                        entry.key = field.classType;
+                        entry.value = field.field;
 
-                    if(type == ExpFieldType.bool){
-                        ((boolean[])fIncStart.get(this))[i] = field.startBool;
-                    }else{
-                        ((float[])fIncStart.get(this))[i] = field.startFloat;
+                        if(type == ExpFieldType.bool){
+                            ((boolean[])fIncStart.get(this))[i] = field.startBool;
+                        }else{
+                            ((float[])fIncStart.get(this))[i] = field.startFloat;
+                        }
+
+                        ((float[])fIncMul.get(this))[i] = field.intensity;
                     }
-                    ((float[])fIncMul.get(this))[i] = field.intensity;
+                }else{
+                    listInc = new Entry[amount];
+                    listIncMul = new Entry[amount];
+
+                    for(int i = 0; i < amount; i++){
+                        ExpField field = fields.get(i);
+
+                        listInc[i] = new Entry<>(){{
+                            key = field.classType;
+                            value = field.field;
+                        }};
+
+                        listIncMul[i] = new Entry<>(){{
+                            key = field.intensityType;
+                            value = field.intensityList;
+                        }};
+                    }
                 }
             }catch(Exception e){
                 throw new RuntimeException(e);
@@ -178,27 +205,32 @@ public abstract class ExpType<T extends UnlockableContent>{
     }
 
     public <E extends T> void addField(ExpFieldType type, Class<E> enclosing, String field, float startFloat){
-        addField(type, enclosing, field, startFloat, false, 1);
+        addField(type, enclosing, field, startFloat, false, 1f, null, null);
     }
 
     public <E extends T> void addField(ExpFieldType type, Class<E> enclosing, String field, float startFloat, float intensity){
-        addField(type, enclosing, field, startFloat, false, intensity);
+        addField(type, enclosing, field, startFloat, false, intensity, null, null);
     }
 
     public <E extends T> void addField(ExpFieldType type, Class<E> enclosing, String field, boolean startBool){
-        addField(type, enclosing, field, 0, startBool, 1);
+        addField(type, enclosing, field, 0f, startBool, 1f, null, null);
     }
 
     public <E extends T> void addField(ExpFieldType type, Class<E> enclosing, String field, boolean startBool, float intensity){
-        addField(type, enclosing, field, 0, startBool, intensity);
+        addField(type, enclosing, field, 0f, startBool, intensity, null, null);
     }
 
-    public <E extends T> void addField(ExpFieldType type, Class<E> enclosing, String field, float sFloat, boolean sBool, float ints){
+    public <E extends T, I> void addField(ExpFieldType type, Class<E> enclosing, String field, Class<I> intensityType, I[] intensity){
+        addField(type, enclosing, field, 0f, false, 0f, intensityType, intensity);
+    }
+
+    public <E extends T, I> void addField(ExpFieldType type, Class<E> enclosing, String field, float sFloat, boolean sBool, float ints, Class<I> intType, I[] intLists){
         try{
-            expFields.get(type, Seq::new).add(new ExpField(type, enclosing, enclosing.getDeclaredField(field)){{
+            expFields.get(type, Seq::new).add(new ExpField(type, enclosing, intType, enclosing.getDeclaredField(field)){{
                 startFloat = sFloat;
                 startBool = sBool;
                 intensity = ints;
+                intensityList = intLists;
             }});
         }catch(Exception e){
             throw new RuntimeException(e);
@@ -212,6 +244,7 @@ public abstract class ExpType<T extends UnlockableContent>{
             expExp(level);
             rootExp(level);
             boolExp(level);
+            listExp(level);
         }catch(Exception ex){
             throw new RuntimeException(ex);
         }
@@ -241,6 +274,12 @@ public abstract class ExpType<T extends UnlockableContent>{
         }
     }
 
+    public void listExp(int level) throws Exception{
+        for(int i = 0; i < listInc.length; i++){
+            listInc[i].value.set(listInc[i].key.cast(type), listIncMul[i].key.cast(listIncMul[i].value[level]));
+        }
+    }
+
     public class ExpUpgrade{
         public final T type;
         private int index;
@@ -267,9 +306,13 @@ public abstract class ExpType<T extends UnlockableContent>{
         public boolean startBool = false;
         public float intensity = 1f;
 
-        public ExpField(ExpFieldType type, Class classType, Field field){
+        public final Class intensityType;
+        public Object[] intensityList;
+
+        public ExpField(ExpFieldType type, Class classType, Class intensityType, Field field){
             this.type = type;
             this.classType = classType;
+            this.intensityType = intensityType;
 
             this.field = field;
             this.field.setAccessible(true);
@@ -280,7 +323,8 @@ public abstract class ExpType<T extends UnlockableContent>{
         linear,
         exp,
         root,
-        bool;
+        bool,
+        list;
 
         public static final ExpFieldType[] all = values();
     }

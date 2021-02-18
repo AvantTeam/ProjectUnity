@@ -233,11 +233,11 @@ public interface ExpBuildc extends ExpEntityc<Block, ExpBlock>, Buildingc{
 
     @Override
     default void write(Writes write){
-        write.f(exp());
+        write.i((int)(exp() * expType().ioPrecision));
     }
 
     @Override
     default void read(Reads read, byte revision){
-        exp(read.f());
+        exp(read.i() / expType().ioPrecision);
     }
 }
