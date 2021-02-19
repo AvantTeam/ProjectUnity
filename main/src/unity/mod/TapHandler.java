@@ -17,7 +17,9 @@ public class TapHandler{
     private boolean press = false;
 
     public TapHandler(){
-        if(!mobile){
+        if(headless) return;
+
+        if(mobile){
             Core.input.addProcessor(new GestureDetector(new GestureListener(){
                 @Override
                 public boolean tap(float x, float y, int count, KeyCode button){
