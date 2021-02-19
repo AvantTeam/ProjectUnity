@@ -393,7 +393,7 @@ public class KamiAI implements UnitController{
         }
         if(timer.get(1, 10f) && unit.deltaLen() >= 0.25f){
             //UnityFx.rainbowTextureTrail.at(unit.x, unit.y, unit.rotation, ((RainbowUnitType)unit.type).trailRegion);
-            UnityCall.effect(UnityFx.rainbowTextureTrail, unit.x, unit.y, unit.rotation, ((RainbowUnitType)unit.type).trailRegion);
+            UnityCall.effect(UnityFx.rainbowTextureTrail, unit.x, unit.y, unit.rotation, (RainbowUnitType)unit.type);
         }
         if(waitTime >= 40f){
             updateBulletHell();

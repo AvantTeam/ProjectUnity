@@ -1,6 +1,5 @@
 package unity.net;
 
-import arc.graphics.g2d.TextureAtlas.*;
 import arc.math.geom.*;
 import arc.util.*;
 import arc.util.io.*;
@@ -156,11 +155,8 @@ public class UnityCall{
                         write.f(p.getX());
                         write.f(p.getY());
                     }
-                }else if(data instanceof AtlasRegion reg){
-                    write.b(17);
-                    TypeIO.writeString(write, reg.name);
                 }else if(data instanceof Entityc e){
-                    write.b(18);
+                    write.b(17);
                     TypeIO.writeEntity(write, e);
                 }else{
                     throw new IllegalArgumentException("Unknown object type: " + data.getClass());

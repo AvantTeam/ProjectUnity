@@ -17,6 +17,7 @@ import mindustry.world.blocks.defense.turrets.Turret.*;
 import unity.entities.UnitVecData;
 import unity.entities.bullet.*;
 import unity.graphics.*;
+import unity.type.*;
 import unity.util.*;
 
 //fixing rect as Draw.rect not Lines.rect. currently no use
@@ -779,10 +780,10 @@ public class UnityFx{
     }),
 
     rainbowTextureTrail = new Effect(80f, e -> {
-        if(!(e.data instanceof TextureRegion t)) return;
+        if(!(e.data instanceof RainbowUnitType t)) return;
         Draw.blend(Blending.additive);
         Draw.color(Tmp.c1.set(Color.red).shiftHue(e.time * 4f).a(Mathf.clamp(e.fout() * 1.5f)));
-        Draw.rect(t, e.x, e.y, e.rotation - 90f);
+        Draw.rect(t.trailRegion, e.x, e.y, e.rotation - 90f);
         Draw.blend();
     }),
 

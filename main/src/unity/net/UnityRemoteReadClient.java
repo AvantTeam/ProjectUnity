@@ -1,6 +1,5 @@
 package unity.net;
 
-import arc.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.io.*;
@@ -73,10 +72,13 @@ public class UnityRemoteReadClient{
                         }
 
                         data = pos;
+                        break;
                     }
 
-                    case 17: data = Core.atlas.find(TypeIO.readString(read));
-                    case 18: data = TypeIO.<Unit>readEntity(read);
+                    case 17: {
+                        data = TypeIO.<Unit>readEntity(read);
+                        break;
+                    }
 
                     default: throw new IllegalArgumentException("Unknown object type: " + type);
                 }
