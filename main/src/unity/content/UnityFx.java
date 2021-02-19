@@ -675,6 +675,11 @@ public class UnityFx{
         color();
     }).layer(Layer.flyingUnit + 1f),
 
+    blueTriangleTrail = new Effect(50f, e -> {
+        Draw.color(Color.white, Pal.lancerLaser, e.fin());
+        Fill.poly(e.x, e.y, 3, 4f * e.fout(), -90f);
+    }),
+
     hitAdvanceFlame = new Effect(15f, e -> {
         Draw.color(UnityPal.advance, UnityPal.advanceDark, e.fin());
 

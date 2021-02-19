@@ -67,6 +67,12 @@ public class UnityBlocks implements ContentList{
 
     darkWall, darkWallLarge;
 
+    public static @FactionDef(type = "light")
+    Block photon, //graviton, gluon, higgsBoson, singularity,
+    electron; /*,
+    proton, zBoson,
+    neutron, wBoson;*/
+
     public static @FactionDef(type = "imber")
     Block orb, shockwire, current, plasma, electrobomb, shielder,
 
@@ -535,6 +541,54 @@ public class UnityBlocks implements ContentList{
             requirements(Category.defense, with(UnityItems.umbrium, 24));
             health = 120 * 4 * 4;
             size = 2;
+        }};
+
+        //endregion
+        //region light
+
+        photon = new LaserTurret("photon"){{
+            requirements(Category.turret, with(Items.lead, 50, Items.silicon, 35, UnityItems.luminum, 65, Items.titanium, 65));
+            size = 2;
+            health = 1280;
+            reloadTime = 100f;
+            shootCone = 30f;
+            range = 120f;
+            powerUse = 4.5f;
+            shootType = new ContinuousLaserBulletType(16f){{
+                incendChance = -1f;
+                length = 130f;
+                width = 4f;
+                colors = new Color[]{Pal.lancerLaser.cpy().a(3.75f), Pal.lancerLaser, Color.white};
+                strokes = new float[]{0.92f, 0.6f, 0.28f};
+                lightColor = hitColor = Pal.lancerLaser;
+            }};
+            consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.2f)).update(false);
+        }};
+
+        electron = new PowerTurret("electron"){{
+            requirements(Category.turret, with(Items.lead, 110, Items.silicon, 75, UnityItems.luminum, 165, Items.titanium, 135));
+            size = 3;
+            health = 2540;
+            reloadTime = 60f;
+            coolantMultiplier = 2f;
+            range = 170f;
+            powerUse = 6.6f;
+            shootType = new BasicBulletType(6f, 26f, "unity-electric-shell"){{
+                lifetime = 30f;
+                width = 12f;
+                height = 19f;
+                backColor = lightColor = hitColor = Pal.lancerLaser;
+                frontColor = Color.white;
+            }
+
+                @Override
+                public void update(Bullet b){
+                    super.update(b);
+                    if(b.timer(0, 1f + b.fslope() * 2f)){
+                        UnityFx.blueTriangleTrail.at(b.x, b.y);
+                    }
+                }
+            };
         }};
 
         //endregion
