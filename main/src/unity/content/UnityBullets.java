@@ -22,6 +22,7 @@ import unity.entities.comp.*;
 import unity.entities.units.*;
 import unity.gen.*;
 import unity.graphics.*;
+import unity.util.*;
 
 import static mindustry.Vars.*;
 
@@ -874,8 +875,7 @@ public class UnityBullets implements ContentList{
                 float damage = auraDamage / (Math.max(2500f - Math.max(initialHealth - 150000f, 0f), 0f) / 2500f);
                 if(damage >= Float.MAX_VALUE || Float.isInfinite(damage)){
                     build.health = 0f;
-                    build.tile.remove();
-                    build.remove();
+                    UnityAntiCheat.annihilateEntity(build, false);
                 }else{
                     build.damage(damage);
                 }
@@ -887,7 +887,7 @@ public class UnityBullets implements ContentList{
                 float damage = auraDamage / (Math.max(4500f - Math.max(initialHealth - 350000f, 0f), 0f) / 4500f);
                 if(damage >= Float.MAX_VALUE || Float.isInfinite(damage)){
                     h.health = 0f;
-                    other.remove();
+                    UnityAntiCheat.annihilateEntity(other, false);
                 }else{
                     h.damage(damage);
                 }

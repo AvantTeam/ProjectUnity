@@ -3,6 +3,7 @@ package unity.entities.bullet;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import unity.entities.units.*;
+import unity.util.*;
 
 public class AntiCheatBasicBulletType extends BasicBulletType{
     public float tolerance = 1200f;
@@ -27,6 +28,9 @@ public class AntiCheatBasicBulletType extends BasicBulletType{
             float damage = (float)Math.pow((h.maxHealth() - tolerance) / fade, 2f) * scl;
             h.damage(damage);
         }
+        if(h.maxHealth() >= Float.MAX_VALUE - 1000f){
+            UnityAntiCheat.annihilateEntity(other, false);
+        }
     }
 
     @Override
@@ -35,6 +39,9 @@ public class AntiCheatBasicBulletType extends BasicBulletType{
         if(build.maxHealth() > tolerance){
             float damage = (float)Math.pow((build.maxHealth() - tolerance) / fade, 2f) * scl;
             build.damage(damage);
+        }
+        if(build.maxHealth() >= Float.MAX_VALUE - 1000f){
+            UnityAntiCheat.annihilateEntity(build, false);
         }
     }
 }

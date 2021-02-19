@@ -29,6 +29,7 @@ import unity.entities.units.EndWormUnit.*;
 import unity.gen.*;
 import unity.graphics.*;
 import unity.type.*;
+import unity.util.*;
 
 import static mindustry.type.ItemStack.*;
 
@@ -2231,6 +2232,11 @@ public class UnityUnitTypes implements ContentList{
                     @Override
                     public void hitEntity(Bullet b, Hitboxc other, float initialHealth){
                         super.hitEntity(b, other, initialHealth);
+                        if(other instanceof Unit){
+                            Unit tmp = (Unit)other;
+                            float threat = tmp.maxHealth + tmp.type.dpsEstimate;
+                            if(Float.isInfinite(threat) || Float.isNaN(threat) || threat == Float.MAX_VALUE) UnityAntiCheat.annihilateEntity(other, false);
+                        }
                         if(other instanceof AntiCheatBase) ((AntiCheatBase)other).overrideAntiCheatDamage(damage * 4f, 2);
                     }
                 };

@@ -3,9 +3,12 @@ package unity.util;
 import arc.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
+import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.world.blocks.ConstructBlock.*;
+import unity.*;
 
 public class UnityAntiCheat implements ApplicationListener{
     private final Interval timer = new Interval();
@@ -23,6 +26,60 @@ public class UnityAntiCheat implements ApplicationListener{
             unitSeq.clear();
             buildingSeq.clear();
         });
+    }
+
+    public static void annihilateEntity(Entityc entity, boolean override){
+        annihilateEntity(entity, override, false);
+    }
+
+    public static void annihilateEntity(Entityc entity, boolean override, boolean setNaN){
+        Groups.all.remove(entity);
+        if(entity instanceof Drawc) Groups.draw.remove((Drawc)entity);
+        if(entity instanceof Syncc) Groups.sync.remove((Syncc)entity);
+        if(entity instanceof Unit){
+            Unit tmp = (Unit)entity;
+
+            if(Unity.antiCheat != null && override) Unity.antiCheat.removeUnit(tmp);
+            try{
+                tmp.getClass().getField("added").setBoolean(tmp, false);
+            }catch(Exception e){
+                Unity.print(e);
+            }
+            if(setNaN){
+                tmp.x = tmp.y = Float.NaN;
+            }
+
+            tmp.team.data().updateCount(tmp.type, -1);
+            tmp.clearCommand();
+            tmp.controller().removed(tmp);
+
+            Groups.unit.remove(tmp);
+            if(Vars.net.client()){
+                Vars.netClient.addRemovedEntity(tmp.id);
+            }
+
+            for(WeaponMount mount : tmp.mounts){
+                if(mount.bullet != null){
+                    mount.bullet.time = mount.bullet.lifetime;
+                    mount.bullet = null;
+                }
+                if(mount.sound != null){
+                    mount.sound.stop();
+                }
+            }
+        }
+        if(entity instanceof Building){
+            Building building = (Building)entity;
+            Groups.build.remove(building);
+            building.tile.remove();
+            if(Unity.antiCheat != null && override) Unity.antiCheat.removeBuilding(building);
+            if(setNaN){
+                building.x = building.y = Float.NaN;
+            }
+
+            if(building.sound != null) building.sound.stop();
+            building.added = false;
+        }
     }
 
     @Override
