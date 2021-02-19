@@ -1,7 +1,10 @@
 package unity.net;
 
+import arc.graphics.g2d.TextureAtlas.*;
+import arc.math.geom.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.io.*;
@@ -123,10 +126,45 @@ public class UnityCall{
             write.f(y);
 
             if(net.client()){
-                Call.serverPacketUnreliable("unity.call", "2:" + pack(out.getBytes()));
+                Call.serverPacketReliable("unity.call", "2:" + pack(out.getBytes()));
             }else if(net.server()){
-                Call.clientPacketUnreliable(player.con, "unity.call", "2:" + pack(out.getBytes()));
+                Call.clientPacketReliable(player.con, "unity.call", "2:" + pack(out.getBytes()));
             }
+        }
+    }
+
+    public static void effect(Effect effect, float x, float y, float rotation, Object data){
+        if(!net.active()){
+            effect.at(x, y, rotation, data);
+        }
+
+        if(net.server()){
+            out.reset();
+
+            TypeIO.writeEffect(write, effect);
+            write.f(x);
+            write.f(y);
+            write.f(rotation);
+
+            try{
+                TypeIO.writeObject(write, data);
+            }catch(IllegalArgumentException no){
+                if(data instanceof Position[] pos){
+                    write.b(new byte[]{16, 16});
+                    write.b(pos.length);
+                    for(Position p : pos){
+                        write.f(p.getX());
+                        write.f(p.getY());
+                    }
+                }else if(data instanceof AtlasRegion reg){
+                    write.b(new byte[]{17, 17});
+                    TypeIO.writeString(write, reg.name);
+                }else{
+                    throw new IllegalArgumentException("Unknown object type: " + data.getClass());
+                }
+            }
+
+            Call.clientPacketReliable("unity.call", "3:" + pack(out.getBytes()));
         }
     }
 }

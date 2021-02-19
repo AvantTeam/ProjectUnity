@@ -1,6 +1,7 @@
 package unity.ai;
 
 import arc.func.*;
+import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
@@ -170,7 +171,9 @@ public class KamiAI implements UnitController{
                 }
                 if(kamiAI.reloads[2] != 1){
                     tmpVec.trns(kamiAI.kami().laserRotation, 670f).add(kamiAI.unit);
-                    UnityFx.kamiWarningLine.at(kamiAI.unit.x, kamiAI.unit.y, 0f, new Position[]{new Vec2(kamiAI.unit.x, kamiAI.unit.y), new Vec2(tmpVec)});
+                    //UnityFx.kamiWarningLine.at(kamiAI.unit.x, kamiAI.unit.y, 0f, new Position[]{new Vec2(kamiAI.unit.x, kamiAI.unit.y), new Vec2(tmpVec)});
+                    UnityCall.effect(UnityFx.kamiWarningLine, kamiAI.unit.x, kamiAI.unit.y, 0f, new Position[]{new Vec2(kamiAI.unit.x, kamiAI.unit.y), new Vec2(tmpVec)});
+
                     kamiAI.reloads[2] = 1;
                 }
                 if(kamiAI.reloads[1] >= 100){
@@ -181,7 +184,7 @@ public class KamiAI implements UnitController{
                             kamiAI.unit, UnityBullets.kamiLaser,
                             tmpVec.x, tmpVec.y, kamiAI.reloads[4],
                             1f, 1f, -1f,
-                            10, 0f, 0f
+                            -1, 0f, 0f
                         );
                         kamiAI.reloads[4] = 1f;
                     }
@@ -191,9 +194,10 @@ public class KamiAI implements UnitController{
                         //kamiAI.kami().laser.rotation(kamiAI.kami().laserRotation);
                         kamiAI.kami().laser.set(tmpVec);
                     }
-                    kamiAI.reloads[5] += Time.delta;
-                    if(kamiAI.reloads[5] >= 4.2f * 60f){
-                        kamiAI.kami().laser = null;
+                    //kamiAI.reloads[5] += Time.delta;
+                    //if(kamiAI.reloads[5] >= 4.2f * 60f){
+                    if(kamiAI.kami().laser == null){
+                        //kamiAI.kami().laser = null;
                         for(int i = 0; i < 6; i++) kamiAI.reloads[i] = 0f;
                         kamiAI.reloads[8] = 0f;
                         kamiAI.reloads[9] = 0f;
@@ -292,14 +296,16 @@ public class KamiAI implements UnitController{
         }, kamiAI -> kamiAI.reloads[5] = 1f, 20 * 60f),
         //EoL Dash/"St Nikou's Air Scroll" mix
         new MultiStageShootType(kamiAI -> {
-            UnityFx.kamiEoLCharge.at(kamiAI.unit.x, kamiAI.unit.y, 0f, kamiAI.unit);
+            //UnityFx.kamiEoLCharge.at(kamiAI.unit.x, kamiAI.unit.y, 0f, kamiAI.unit);
+            UnityCall.effect(UnityFx.kamiEoLCharge, kamiAI.unit.x, kamiAI.unit.y, 0f, kamiAI.unit);
             kamiAI.charging = true;
         }, 5){{
             stages = new KamiShootType[]{
                 new KamiShootType(kamiAI -> {}, kamiAI -> {
                     kamiAI.targetPoint.trns(kamiAI.relativeRotation - 90f, 360f).add(kamiAI.unit);
                     kamiAI.lastPoint.set(kamiAI.unit);
-                    UnityFx.kamiWarningLine.at(kamiAI.unit.x, kamiAI.unit.y, 0f, new Position[]{new Vec2(kamiAI.unit.x, kamiAI.unit.y), new Vec2(kamiAI.targetPoint)});
+                    //UnityFx.kamiEoLCharge.at(kamiAI.unit.x, kamiAI.unit.y, 0f, new Position[]{new Vec2(kamiAI.unit.x, kamiAI.unit.y), new Vec2(kamiAI.targetPoint)});
+                    UnityCall.effect(UnityFx.kamiEoLCharge, kamiAI.unit.x, kamiAI.unit.y, 0f, new Position[]{new Vec2(kamiAI.unit.x, kamiAI.unit.y), new Vec2(kamiAI.targetPoint)});
                 }, kamiAI -> kamiAI.stage <= 0 ? 80f : 5f).setStage(),
                 new KamiShootType(kamiAI -> {
                     tmpVec.set(kamiAI.unit);
@@ -386,7 +392,8 @@ public class KamiAI implements UnitController{
             }
         }
         if(timer.get(1, 10f) && unit.deltaLen() >= 0.25f){
-            UnityFx.rainbowTextureTrail.at(unit.x, unit.y, unit.rotation, ((RainbowUnitType)unit.type).trailRegion);
+            //UnityFx.rainbowTextureTrail.at(unit.x, unit.y, unit.rotation, ((RainbowUnitType)unit.type).trailRegion);
+            UnityCall.effect(UnityFx.rainbowTextureTrail, unit.x, unit.y, unit.rotation, ((RainbowUnitType)unit.type).trailRegion);
         }
         if(waitTime >= 40f){
             updateBulletHell();
@@ -631,8 +638,6 @@ public class KamiAI implements UnitController{
                     b.vel.setLength(Math.max(Mathf.clamp(((b.time - b.fdata) - (1.75f * 60)) / 30f) * b.type.speed, 0.02f));
                 }
             };
-
-            consDatas[10] = b -> b.owner.<KamiUnit>as().laser = b;
 
             int diff = 65 + ((difficulty - 1) * 2);
             bulletDatas = new KamiBulletData[diff];

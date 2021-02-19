@@ -1,17 +1,20 @@
 package unity.net;
 
-import java.io.*;
-
+import arc.*;
+import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.io.*;
+import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.io.*;
 import unity.*;
 import unity.ai.KamiAI.*;
 
+import java.io.*;
+
 public class UnityRemoteReadClient{
-    private static final ReusableByteInStream out = new ReusableByteInStream();
-    private static final Reads read = new Reads(new DataInputStream(out));
+    private static final ReusableByteInStream in = new ReusableByteInStream();
+    private static final Reads read = new Reads(new DataInputStream(in));
 
     private static final IntMap<Runnable> map = new IntMap<>();
 
@@ -52,10 +55,42 @@ public class UnityRemoteReadClient{
 
             Unity.tapHandler.tap(player, x, y);
         });
+
+        map.put(3, () -> {
+            Effect effect = TypeIO.readEffect(read);
+            float x = read.f();
+            float y = read.f();
+            float rotation = read.f();
+            Object data;
+
+            try{
+                data = TypeIO.readObject(read);
+            }catch(IllegalArgumentException no){
+                byte type = read.b();
+                switch(type){
+                    case 16: {
+                        Position[] pos = new Position[read.b()];
+                        for(int i = 0; i < pos.length; i++){
+                            pos[i] = new Vec2(read.f(), read.f());
+                        }
+
+                        data = pos;
+                    }
+
+                    case 17: {
+                        data = Core.atlas.find(TypeIO.readString(read));
+                    }
+
+                    default: throw new IllegalArgumentException("Unknown object type: " + type);
+                }
+            }
+
+            effect.at(x, y, rotation, data);
+        });
     }
 
     public static void readPacket(byte[] bytes, byte type){
-        out.setBytes(bytes);
+        in.setBytes(bytes);
         if(!map.containsKey(type)){
             throw new RuntimeException("Unknown packet type: '" + type + "'");
         }else{

@@ -1,7 +1,6 @@
 package unity.entities.bullet;
 
 import arc.*;
-import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -11,8 +10,8 @@ import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
+import unity.entities.units.*;
 
-@SuppressWarnings({"unchecked", "rawtypes"})
 public class KamiLaserBulletType extends BulletType{
     private static final Vec2 tVec = new Vec2();
     private static final Vec2 tVecB = new Vec2();
@@ -40,10 +39,6 @@ public class KamiLaserBulletType extends BulletType{
 
     @Override
     public void update(Bullet b){
-        if(b.data instanceof Cons cons){
-            ((Cons<Bullet>)cons).get(b);
-        }
-
         if(b.timer(1, 5f)){
             float fout = Mathf.clamp(b.time > b.lifetime - fadeTime ? 1f - (b.time - (lifetime - fadeTime)) / fadeTime : 1f) * Mathf.clamp(b.time / fadeInTime) * width;
 
@@ -94,5 +89,21 @@ public class KamiLaserBulletType extends BulletType{
         Lines.stroke(width * 2f * fout);
         Lines.line(tVecD.x, tVecD.y, tVec.x, tVec.y, false);
         Draw.reset();
+    }
+
+    @Override
+    public void init(Bullet b){
+        super.init(b);
+        if(b.owner instanceof KamiUnit kami){
+            kami.laser = b;
+        }
+    }
+
+    @Override
+    public void despawned(Bullet b){
+        super.despawned(b);
+        if(b.owner instanceof KamiUnit kami && kami.laser == b){
+            kami.laser = null;
+        }
     }
 }

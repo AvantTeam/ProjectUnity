@@ -8,8 +8,8 @@ import mindustry.gen.*;
 import java.io.*;
 
 public class UnityRemoteReadServer{
-    private static final ReusableByteInStream out = new ReusableByteInStream();
-    private static final Reads read = new Reads(new DataInputStream(out));
+    private static final ReusableByteInStream in = new ReusableByteInStream();
+    private static final Reads read = new Reads(new DataInputStream(in));
 
     private static final IntMap<Cons<Player>> map = new IntMap<>();
 
@@ -20,7 +20,7 @@ public class UnityRemoteReadServer{
     }
 
     public static void readPacket(byte[] bytes, byte type, Player player){
-        out.setBytes(bytes);
+        in.setBytes(bytes);
         if(!map.containsKey(type)){
             throw new RuntimeException("Unknown packet type: '" + type + "'");
         }else{
