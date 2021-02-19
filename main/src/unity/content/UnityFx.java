@@ -15,6 +15,7 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.defense.turrets.Turret.*;
 import unity.entities.UnitVecData;
+import unity.entities.abilities.BaseAbility.*;
 import unity.entities.bullet.*;
 import unity.graphics.*;
 import unity.type.*;
@@ -569,6 +570,18 @@ public class UnityFx{
         color(e.color);
         stroke(e.fout() * 1.5f);
         polySeg(60, 0, (int)(60 * (1 - (e.rotation - Time.time) / whenReady)), u.x, u.y, 8f, 0f);
+    }),
+
+    //^ this but better
+    waitEffect = new Effect(30f, e -> {
+        if(e.data instanceof WaitEffectData data){
+            if(data.unit() == null || !data.unit().isValid() || data.unit().dead) return;
+
+            z(Layer.effect - 0.00001f);
+            color(e.color);
+            stroke(e.fout() * 1.5f);
+            polySeg(60, 0, (int)(60f * data.progress()), data.unit().x, data.unit().y, 8f, 0f);
+        }
     }),
 
     ringFx = new Effect(25f, e -> {

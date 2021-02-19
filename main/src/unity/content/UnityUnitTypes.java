@@ -1783,7 +1783,11 @@ public class UnityUnitTypes implements ContentList{
             lowAltitude = true;
             range = 220f;
 
-            abilities.add(new TeleportAbility());
+            abilities.add(new SlashAbility(unit -> 
+                Units.closestEnemy(unit.team, unit.x, unit.y, 20f * Vars.tilesize, u -> 
+                    Angles.angleDist(unit.rotation, unit.angleTo(u)) < 5f
+                ) != null
+            ));
 
             weapons.add(new Weapon("dijkstra-laser"){{
                 rotate = true;

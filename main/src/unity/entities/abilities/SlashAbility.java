@@ -1,5 +1,8 @@
 package unity.entities.abilities;
 
+import arc.*;
+import arc.audio.*;
+import arc.func.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.content.*;
@@ -11,15 +14,21 @@ import unity.content.*;
 
 import static mindustry.Vars.*;
 
-public class TeleportAbility extends TapAbility{
+public class SlashAbility extends BaseAbility{
     public Effect teleportEffect = Fx.lightningShoot;
+    public Effect postTeleportEffect = Fx.lancerLaserShootSmoke;
+    public Sound teleportSound = Sounds.spark;
     public StatusEffect boostedEffect = UnityStatusEffects.boosted;
 
     public BulletType slashBullet = UnityBullets.teleportLightning;
     public Effect slashEffect = UnityFx.slashEffect;
 
+    public SlashAbility(Boolf<Unit> use){
+        super(use, true, true);
+    }
+
     @Override
-    public void tapped(Unit unit, float x, float y){
+    public void use(Unit unit, float x, float y){
         Teamc target = Units.closestEnemy(unit.team, unit.x, unit.y, 35f * tilesize, u -> true);
         float dir = unit.rotation;
 
@@ -45,5 +54,16 @@ public class TeleportAbility extends TapAbility{
         }else{
             unit.snapInterpolation();
         }
+
+        if(mobile && !headless && unit.getPlayer() == player){
+            Core.camera.position.set(pos.x + unit.x, pos.y + unit.y);
+        }
+
+        if(!headless){
+            teleportSound.at(pos.x + unit.x, pos.y + unit.y, 1.6f);
+            postTeleportEffect.at(unit.x, unit.y, (dir + 180f) % 360f);
+        }
+
+        unit.vel.trns(dir, 4f);
     }
 }
