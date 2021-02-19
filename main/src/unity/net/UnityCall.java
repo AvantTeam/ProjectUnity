@@ -150,15 +150,18 @@ public class UnityCall{
                 TypeIO.writeObject(write, data);
             }catch(IllegalArgumentException no){
                 if(data instanceof Position[] pos){
-                    write.b(new byte[]{16, 16});
+                    write.b(16);
                     write.b(pos.length);
                     for(Position p : pos){
                         write.f(p.getX());
                         write.f(p.getY());
                     }
                 }else if(data instanceof AtlasRegion reg){
-                    write.b(new byte[]{17, 17});
+                    write.b(17);
                     TypeIO.writeString(write, reg.name);
+                }else if(data instanceof Entityc e){
+                    write.b(18);
+                    TypeIO.writeEntity(write, e);
                 }else{
                     throw new IllegalArgumentException("Unknown object type: " + data.getClass());
                 }

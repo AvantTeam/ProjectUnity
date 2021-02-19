@@ -304,8 +304,8 @@ public class KamiAI implements UnitController{
                 new KamiShootType(kamiAI -> {}, kamiAI -> {
                     kamiAI.targetPoint.trns(kamiAI.relativeRotation - 90f, 360f).add(kamiAI.unit);
                     kamiAI.lastPoint.set(kamiAI.unit);
-                    //UnityFx.kamiEoLCharge.at(kamiAI.unit.x, kamiAI.unit.y, 0f, new Position[]{new Vec2(kamiAI.unit.x, kamiAI.unit.y), new Vec2(kamiAI.targetPoint)});
-                    UnityCall.effect(UnityFx.kamiEoLCharge, kamiAI.unit.x, kamiAI.unit.y, 0f, new Position[]{new Vec2(kamiAI.unit.x, kamiAI.unit.y), new Vec2(kamiAI.targetPoint)});
+                    //UnityFx.kamiWarningLine.at(kamiAI.unit.x, kamiAI.unit.y, 0f, new Position[]{new Vec2(kamiAI.unit.x, kamiAI.unit.y), new Vec2(kamiAI.targetPoint)});
+                    UnityCall.effect(UnityFx.kamiWarningLine, kamiAI.unit.x, kamiAI.unit.y, 0f, new Position[]{new Vec2(kamiAI.unit.x, kamiAI.unit.y), new Vec2(kamiAI.targetPoint)});
                 }, kamiAI -> kamiAI.stage <= 0 ? 80f : 5f).setStage(),
                 new KamiShootType(kamiAI -> {
                     tmpVec.set(kamiAI.unit);

@@ -33,8 +33,6 @@ public class UnityRemoteReadClient{
             b.data = KamiBulletDatas.get(read.i());
             b.fdata = read.f();
             b.time = read.f();
-
-            Unity.print(b.owner, ((Unitc)b.owner).controller());
         });
 
         map.put(1, () -> {
@@ -66,7 +64,7 @@ public class UnityRemoteReadClient{
             try{
                 data = TypeIO.readObject(read);
             }catch(IllegalArgumentException no){
-                byte type = read.b();
+                byte type = Byte.parseByte(no.getMessage().split(":")[1].trim());
                 switch(type){
                     case 16: {
                         Position[] pos = new Position[read.b()];
@@ -77,9 +75,8 @@ public class UnityRemoteReadClient{
                         data = pos;
                     }
 
-                    case 17: {
-                        data = Core.atlas.find(TypeIO.readString(read));
-                    }
+                    case 17: data = Core.atlas.find(TypeIO.readString(read));
+                    case 18: data = TypeIO.<Unit>readEntity(read);
 
                     default: throw new IllegalArgumentException("Unknown object type: " + type);
                 }
