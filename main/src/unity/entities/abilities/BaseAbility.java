@@ -16,6 +16,9 @@ import static mindustry.Vars.*;
 
 public abstract class BaseAbility extends Ability implements TapListener{
     public boolean useSlots = true;
+    /** If true, ability will use {@link #rechargeTime} and calls {@link #use(Unit, float, float)}.
+     * Otherwise, it will call {@link #updatePassive(Unit)} like all other normal abilities.
+     */
     public boolean interactive = false;
     /**
      * Whether {@link #use(Unit)} will only activate when player taps the screen / presses
@@ -44,7 +47,8 @@ public abstract class BaseAbility extends Ability implements TapListener{
     public float delayProgress = 0f;
     public Effect delayEffect = UnityFx.smallRingFx;
 
-    public Boolf<Unit> able;
+    protected Boolf<Unit> able;
+    protected boolean waited;
 
     protected BaseAbility(Boolf<Unit> able, boolean interactive, boolean useTap){
         this.able = able;
@@ -81,14 +85,9 @@ public abstract class BaseAbility extends Ability implements TapListener{
             Unity.tapHandler.removeListener(this);
         }else{
             if(useSlots && delayProgress >= delayTime){
-                delayProgress = 0f;
-                slot++;
-
                 use(unit, x, y);
                 return;
             }else if(rechargeProgress >= rechargeTime){
-                rechargeProgress = 0f;
-
                 use(unit, x, y);
                 return;
             }
@@ -101,7 +100,15 @@ public abstract class BaseAbility extends Ability implements TapListener{
         use(unit, Float.NaN, Float.NaN);
     }
 
-    public void use(Unit unit, float x, float y){}
+    public void use(Unit unit, float x, float y){
+        if(useSlots){
+            delayProgress = 0f;
+            waited = false;
+            slot++;
+        }else{
+            rechargeProgress = 0f;
+        }
+    }
 
     public void hold(Unit unit){
         if(chargeVisible || (unit.isPlayer() && unit.getPlayer() == player)){
@@ -134,7 +141,8 @@ public abstract class BaseAbility extends Ability implements TapListener{
             }else{
                 delayProgress = Math.min(delayProgress + Time.delta, delayTime);
                 if(delayProgress >= delayTime){
-                    if(chargeVisible || (unit.isPlayer() && unit.getPlayer() == player)){
+                    if(!waited && (chargeVisible || (unit.isPlayer() && unit.getPlayer() == player))){
+                        waited = true;
                         delayEffect.at(unit.x, unit.y, 0f, color, unit);
                     }
 

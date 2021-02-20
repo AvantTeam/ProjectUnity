@@ -1832,7 +1832,7 @@ public class UnityUnitTypes implements ContentList{
             hitSize = 15f;
             rotateSpeed = 12f;
 
-            engineOffset = 5.2f;
+            engineOffset = 4.6f;
             engineSize = 2.5f;
 
             abilities.add(new TeleportAbility(unit -> {

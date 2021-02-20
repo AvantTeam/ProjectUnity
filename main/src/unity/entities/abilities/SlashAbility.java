@@ -31,6 +31,8 @@ public class SlashAbility extends BaseAbility{
 
     @Override
     public void use(Unit unit, float x, float y){
+        super.use(unit, x, y);
+
         Teamc target = Units.closestEnemy(unit.team, unit.x, unit.y, 35f * tilesize, u -> true);
         float dir = unit.rotation;
 

@@ -28,6 +28,8 @@ public class TeleportAbility extends BaseAbility{
 
     @Override
     public void use(Unit unit, float x, float y){
+        super.use(unit, x, y);
+
         Vec2 pos;
         if(!Float.isNaN(x) && !Float.isNaN(y)){
             pos = Tmp.v1.set(x, y).sub(unit).limit(teleportDistance);
