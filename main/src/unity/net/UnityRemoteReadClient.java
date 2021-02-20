@@ -11,6 +11,8 @@ import unity.ai.KamiAI.*;
 
 import java.io.*;
 
+import static mindustry.Vars.*;
+
 public class UnityRemoteReadClient{
     private static final ReusableByteInStream in = new ReusableByteInStream();
     private static final Reads read = new Reads(new DataInputStream(in));
@@ -46,11 +48,13 @@ public class UnityRemoteReadClient{
         });
 
         map.put(2, () -> {
-            Player player = TypeIO.readEntity(read);
+            Player p = TypeIO.readEntity(read);
             float x = read.f();
             float y = read.f();
 
-            Unity.tapHandler.tap(player, x, y);
+            if(p != player){
+                Unity.tapHandler.tap(p, x, y);
+            }
         });
 
         map.put(3, () -> {

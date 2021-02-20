@@ -15,6 +15,8 @@ import unity.content.*;
 import static mindustry.Vars.*;
 
 public class SlashAbility extends BaseAbility{
+    public float slashDistance = 18f * tilesize;
+
     public Effect teleportEffect = Fx.lightningShoot;
     public Effect postTeleportEffect = Fx.lancerLaserShootSmoke;
     public Sound teleportSound = Sounds.spark;
@@ -23,8 +25,8 @@ public class SlashAbility extends BaseAbility{
     public BulletType slashBullet = UnityBullets.teleportLightning;
     public Effect slashEffect = UnityFx.slashEffect;
 
-    public SlashAbility(Boolf<Unit> use){
-        super(use, true, true);
+    public SlashAbility(Boolf<Unit> able){
+        super(able, true, true);
     }
 
     @Override
@@ -43,7 +45,7 @@ public class SlashAbility extends BaseAbility{
 
         unit.apply(boostedEffect, 30f);
 
-        Vec2 pos = Tmp.v1.set(18f * tilesize, 0f).setAngle(dir);
+        Vec2 pos = Tmp.v1.set(slashDistance, 0f).setAngle(dir);
         unit.set(pos.x + unit.x, pos.y + unit.y);
 
         if(unit.isPlayer()){

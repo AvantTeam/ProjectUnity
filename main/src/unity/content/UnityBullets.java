@@ -48,7 +48,9 @@ public class UnityBullets implements ContentList{
         
         supernovaLaser,
 
-        ravagerLaser, ravagerArtillery, missileAntiCheat, laserZap, plasmaBullet,
+        ravagerLaser, ravagerArtillery, missileAntiCheat, laserZap,
+
+        plasmaBullet, phantasmalBullet,
 
         teleportLightning;
 
@@ -1004,6 +1006,23 @@ public class UnityBullets implements ContentList{
                 }
             }
         };
+
+        phantasmalBullet = new BasicBulletType(6f, 6f){{
+            width = 6f;
+            height = 12f;
+            shrinkY = 0.3f;
+            lifetime = 45f;
+
+            frontColor = Color.white;
+            backColor = Pal.lancerLaser;
+            shootEffect = Fx.shootSmall;
+            smokeEffect = Fx.shootSmallSmoke;
+            hitEffect = Fx.flakExplosion;
+
+            lightning = 3;
+            lightningColor = Pal.lancerLaser;
+            lightningLength = 6;
+        }};
 
         teleportLightning = new LightningBulletType(){{
             damage = 12f;

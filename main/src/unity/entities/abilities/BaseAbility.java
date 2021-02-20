@@ -133,12 +133,17 @@ public abstract class BaseAbility extends Ability implements TapListener{
                 }
             }else{
                 delayProgress = Math.min(delayProgress + Time.delta, delayTime);
-                if(delayProgress >= delayTime && able(unit)){
-                    delayProgress = 0f;
-                    slot++;
-                    delayEffect.at(unit.x, unit.y, 0f, color, unit);
+                if(delayProgress >= delayTime){
+                    if(chargeVisible || (unit.isPlayer() && unit.getPlayer() == player)){
+                        delayEffect.at(unit.x, unit.y, 0f, color, unit);
+                    }
 
-                    use(unit);
+                    if(able(unit)){
+                        delayProgress = 0f;
+                        slot++;
+
+                        use(unit);
+                    }
                 }
             }
         }else{
