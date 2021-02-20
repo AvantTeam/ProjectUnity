@@ -9,6 +9,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.graphics.*;
+import unity.*;
 
 import java.io.*;
 
@@ -27,10 +28,13 @@ public class WavefrontObject{
     protected static final float perspectiveDistance = 350f;
 
     public Seq<Vec3> vertices = new Seq<>();
+    public Seq<Vec3> normals = new Seq<>();
     public Seq<Face> faces = new Seq<>();
-    protected Seq<Vertex> drawnVertices = new Seq<>();
+    private final Seq<Vertex> drawnVertices = new Seq<>();
+    private final Seq<Vec3> drawnNormals = new Seq<>();
+    private boolean hasNormal = false;
 
-    public ShadingType shadingType = ShadingType.zDistance;
+    public ShadingType shadingType = ShadingType.normalAngle;
     public Color lightColor = Color.white;
     public Color shadeColor = Color.black;
     public float size = 1f;
@@ -61,16 +65,37 @@ public class WavefrontObject{
                     vertices.add(new Vec3(vec[0], vec[1], vec[2]));
                 }
 
+                if(line.contains("vn ")){
+                    if(!hasNormal) hasNormal = true;
+                    String[] pos = line.replaceFirst("vn ", "").split("\\s+");
+                    if(pos.length != 3){
+                        throw new IllegalStateException("'v' must define all 3 vector points");
+                    }
+
+                    float[] vec = new float[3];
+                    for(int i = 0; i < 3; i++){
+                        vec[i] = Strings.parseFloat(pos[i], 0f);
+                    }
+
+                    drawnNormals.add(new Vec3(vec[0], vec[1], vec[2]));
+                    normals.add(new Vec3(vec[0], vec[1], vec[2]));
+                }
+
                 if(line.contains("f ")){
                     String[] segments = line.replace("f ", "").split("\\s+");
                     Face face = new Face();
                     face.verts = new Vertex[segments.length];
+                    if(hasNormal) face.normal = new Vec3[segments.length];
 
                     int[] i = {0};
                     for(String segment : segments){
-                        String[] faceIndex = segment.split("/+");
+                        String[] faceIndex = segment.split("/");
+                        //Unity.print(faceIndex.length + "");
                         Vertex vert = drawnVertices.get(getFaceVal(faceIndex[0]));
                         face.verts[i[0]] = vert;
+                        if(hasNormal){
+                            face.normal[i[0]] = drawnNormals.get(getFaceVal(faceIndex[2]));
+                        }
 
                         for(int sign : Mathf.signs){
                             Vertex v = drawnVertices.get(faceTypeIndex(segments[Mathf.mod(sign + i[0], segments.length)], 0));
@@ -119,7 +144,11 @@ public class WavefrontObject{
             v.scl(depth);
             
             v.add(x, y, 0f);
+            if(i <= drawnNormals.size - 1){
+                drawnNormals.get(i).set(normals.get(i)).rotate(Vec3.X, rX).rotate(Vec3.Y, rY).rotate(Vec3.Z, rZ);
+            }
         }
+
         for(Face face : faces){
             indexerA = 0;
             indexerZ = 0f;
@@ -129,17 +158,35 @@ public class WavefrontObject{
             }
             indexerZ /= indexerA;
             Draw.z((indexerZ * zScale) + drawLayer);
-            if(shadingType == ShadingType.zMedian){
-                zMedianDraw(face);
-            }else if(shadingType == ShadingType.zDistance){
-                zDistanceDraw(face);
-            }else{
-                Draw.color(lightColor);
+
+            switch(shadingType){
+                case zMedian -> zMedianDraw(face);
+                case zDistance -> zDistanceDraw(face);
+                case normalAngle -> normalAngleDraw(face);
+                default -> Draw.color(lightColor);
             }
             drawFace(face);
         }
         Draw.reset();
         Draw.z(oz);
+    }
+
+    protected void normalAngleDraw(Face face){
+        if(!hasNormal){
+            Draw.color(lightColor);
+            return;
+        }
+        Vec3 tmp = Tmp.v31.setZero();
+        indexerA = 0;
+        for(Vec3 n : face.normal){
+            tmp.add(n);
+            indexerA++;
+        }
+        tmp.scl(1f / indexerA);
+
+        float angle = (Math.abs(tmp.angleRad(Vec3.Z)) / (45f * Mathf.degRad)) / shadingSmoothness;
+        Tmp.c1.set(lightColor).lerp(shadeColor, Mathf.clamp(angle));
+        Draw.color(Tmp.c1);
     }
 
     protected void zMedianDraw(Face face){
@@ -229,6 +276,7 @@ public class WavefrontObject{
     public enum ShadingType{
         zMedian,
         zDistance,
+        normalAngle,
         noShading
     }
 }
