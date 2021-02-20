@@ -584,6 +584,17 @@ public class UnityFx{
         }
     }),
 
+    waitEffect2 = new Effect(30f, e -> {
+        if(e.data instanceof WaitEffectData data){
+            if(data.unit() == null || !data.unit().isValid() || data.unit().dead) return;
+
+            z(Layer.effect - 0.00001f);
+            color(e.color);
+            stroke(e.fout() * 1.5f);
+            polySeg(90, 0, (int)(90f * data.progress()), data.unit().x, data.unit().y, 12f, 0f);
+        }
+    }),
+
     ringFx = new Effect(25f, e -> {
         if(!(e.data instanceof Unit)) return;
         Unit u = (Unit)e.data;
@@ -593,6 +604,16 @@ public class UnityFx{
         circle(u.x, u.y, 8f);
     }),
 
+    ringEffect2 = new Effect(25f, e -> {
+        if(e.data instanceof Unit unit){
+            if(!unit.isValid() || unit.dead) return;
+
+            color(Color.white, e.color, e.fin());
+            stroke(e.fout() * 1.5f);
+            circle(unit.x, unit.y, 12f);
+        }
+    }),
+
     smallRingFx = new Effect(20f, e -> {
         if(!(e.data instanceof Unit)) return;
         Unit u = (Unit)e.data;
@@ -600,6 +621,16 @@ public class UnityFx{
         color(Color.white, e.color, e.fin());
         stroke(e.fin());
         circle(u.x, u.y, e.fin() * 5f);
+    }),
+
+    smallRingEffect2 = new Effect(20f, e -> {
+        if(e.data instanceof Unit unit){
+            if(!unit.isValid() || unit.dead) return;
+
+            color(Color.white, e.color, e.fin());
+            stroke(e.fin());
+            circle(unit.x, unit.y, e.fin() * 7.5f);
+        }
     }),
 
     squareFx = new Effect(25f, e -> {
@@ -988,5 +1019,18 @@ public class UnityFx{
         color(Pal.lancerLaser);
         Drawf.tri(e.x, e.y, 4f * e.fout(), 45f, (e.id * 57f + 90f) % 360f);
         Drawf.tri(e.x, e.y, 4f * e.fout(), 45f, (e.id * 57f - 90f) % 360f);
+    }),
+
+    teleportPos = new Effect(48f, e -> {
+        if(e.data instanceof UnitType unit){
+            blend(Blending.additive);
+            alpha(e.fout());
+            TextureRegion region = unit.icon(Cicon.full);
+            float w = region.width * scl * e.fout();
+            float h = region.height * scl * e.fout();
+
+            rect(region, e.x, e.y, w, h, e.rotation - 90);
+            blend();
+        }
     });
 }

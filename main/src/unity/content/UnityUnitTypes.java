@@ -7,7 +7,6 @@ import arc.graphics.g2d.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.*;
 import mindustry.ctype.*;
 import mindustry.type.*;
 import mindustry.gen.*;
@@ -31,6 +30,7 @@ import unity.graphics.*;
 import unity.type.*;
 import unity.util.*;
 
+import static mindustry.Vars.*;
 import static mindustry.type.ItemStack.*;
 
 public class UnityUnitTypes implements ContentList{
@@ -81,7 +81,7 @@ public class UnityUnitTypes implements ContentList{
     
     /** Koruh {@linkplain UnitEntity flying} units */
     public static @FactionDef(type = "koruh") @EntityPoint(type = UnitEntity.class)
-    UnitType cache, dijkstra;
+    UnitType cache, dijkstra, phantasm; // <- sk plz rename this, it's kinda off
 
     /** Monolith {@linkplain MechUnit mech} units */
     public static @FactionDef(type = "monolith") @EntityPoint(type = MechUnit.class)
@@ -1784,13 +1784,14 @@ public class UnityUnitTypes implements ContentList{
             lowAltitude = true;
             range = 220f;
 
-            abilities.add(new SlashAbility(unit -> 
-                Units.closestEnemy(unit.team, unit.x, unit.y, 20f * Vars.tilesize, u -> 
+            abilities.add(new SlashAbility(unit ->
+                Units.closestEnemy(unit.team, unit.x, unit.y, 20f * tilesize, u ->
+                    u.within(unit, 15f * tilesize) &&
                     Angles.angleDist(unit.rotation, unit.angleTo(u)) < 5f
                 ) != null
             ));
 
-            weapons.add(new Weapon("dijkstra-laser"){{
+            weapons.add(new Weapon("unity-dijkstra-laser"){{
                 rotate = true;
                 rotateSpeed = 8f;
                 shadow = 20f;
@@ -1803,7 +1804,7 @@ public class UnityUnitTypes implements ContentList{
                 bullet = UnityBullets.laserZap;
                 shootSound = Sounds.laser;
                 mirror = false;
-            }}, new Weapon("dijkstra-plasmagun"){{
+            }}, new Weapon("unity-dijkstra-plasmagun"){{
                 x = 0f;
                 y = 0f;
                 reload = 7f;
@@ -1816,6 +1817,56 @@ public class UnityUnitTypes implements ContentList{
 
                 bullet = UnityBullets.plasmaBullet;
                 shootSound = Sounds.spark;
+            }});
+        }};
+
+        phantasm = new UnityUnitType("phantasm"){{
+            mineTier = -1;
+            speed = 5.6f;
+            drag = 0.08f;
+            accel = 0.08f;
+            range = 240f;
+
+            health = 720f;
+            flying = true;
+            hitSize = 15f;
+            rotateSpeed = 12f;
+
+            engineOffset = 5.2f;
+            engineSize = 2.5f;
+
+            abilities.add(new TeleportAbility(unit -> {
+                boolean[] should = {false};
+
+                float rad = 3f * tilesize + unit.hitSize() / 2f;
+                Groups.bullet.intersect(unit.x - rad, unit.y - rad, rad * 2f, rad * 2f, b -> {
+                    if(unit.team.isEnemy(b.team) && b.within(unit, rad) && b.collides(unit) && !should[0]){
+                        should[0] = true;
+                    }
+                });
+
+                return should[0];
+            }){{
+                slots = 5;
+
+                rechargeTime = 180f;
+                delayTime = 60f;
+
+                waitEffect = UnityFx.waitEffect2;
+                rechargeEffect = UnityFx.ringEffect2;
+                delayEffect = UnityFx.smallRingEffect2;
+            }});
+
+            weapons.add(new Weapon("unity-phantasmal-gun"){{
+                top = false;
+                x = 1.25f;
+                y = 3.25f;
+                reload = 10f;
+                inaccuracy = 2f;
+
+                ejectEffect = Fx.casing2;
+                shootSound = Sounds.shootBig;
+                bullet = UnityBullets.phantasmalBullet;
             }});
         }};
 
@@ -2331,7 +2382,7 @@ public class UnityUnitTypes implements ContentList{
             @Override
             public void init(){
                 super.init();
-                immunities.addAll(Vars.content.getBy(ContentType.status));
+                immunities.addAll(content.getBy(ContentType.status));
             }
         };
 
@@ -2428,7 +2479,7 @@ public class UnityUnitTypes implements ContentList{
             @Override
             public void init(){
                 super.init();
-                immunities.addAll(Vars.content.getBy(ContentType.status));
+                immunities.addAll(content.getBy(ContentType.status));
             }
         };
 
