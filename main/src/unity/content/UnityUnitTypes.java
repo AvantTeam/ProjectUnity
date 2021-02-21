@@ -1835,18 +1835,18 @@ public class UnityUnitTypes implements ContentList{
             engineOffset = 4.6f;
             engineSize = 2.5f;
 
-            abilities.add(new TeleportAbility(unit -> {
-                boolean[] should = {false};
+            abilities.add(new TeleportAbility<Bullet>(unit -> {
+                Bullet[] should = {null};
 
                 float rad = 3f * tilesize + unit.hitSize() / 2f;
                 Groups.bullet.intersect(unit.x - rad, unit.y - rad, rad * 2f, rad * 2f, b -> {
-                    if(unit.team.isEnemy(b.team) && b.within(unit, rad) && b.collides(unit) && !should[0]){
-                        should[0] = true;
+                    if(unit.team.isEnemy(b.team) && b.within(unit, rad) && b.collides(unit) && should[0] == null){
+                        should[0] = b;
                     }
                 });
 
                 return should[0];
-            }){{
+            }, 15f * tilesize){{
                 slots = 5;
 
                 rechargeTime = 180f;
@@ -1861,7 +1861,7 @@ public class UnityUnitTypes implements ContentList{
                 top = false;
                 x = 1.25f;
                 y = 3.25f;
-                reload = 10f;
+                reload = 9f;
                 inaccuracy = 2f;
 
                 ejectEffect = Fx.casing2;

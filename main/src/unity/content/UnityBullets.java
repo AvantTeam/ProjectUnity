@@ -1007,7 +1007,7 @@ public class UnityBullets implements ContentList{
             }
         };
 
-        phantasmalBullet = new BasicBulletType(6f, 6f){{
+        phantasmalBullet = new BasicBulletType(6f, 32f){{
             width = 6f;
             height = 12f;
             shrinkY = 0.3f;
