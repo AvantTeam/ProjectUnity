@@ -39,7 +39,7 @@ public class SpriteProcessor{
         content.createBaseContent();
 
         //setup dummy loaded mod to load unity contents properly
-        content.setCurrentMod(new LoadedMod(null, null, mod, new ModMeta(){{
+        content.setCurrentMod(new LoadedMod(null, null, mod, getClass().getClassLoader(), new ModMeta(){{
             name = "unity";
         }}));
 
