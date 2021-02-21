@@ -1,4 +1,4 @@
-package unity.net;
+package unity.sync;
 
 import arc.math.geom.*;
 import arc.struct.*;

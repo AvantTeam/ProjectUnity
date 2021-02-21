@@ -12,7 +12,7 @@ import mindustry.game.EventType.*;
 import unity.content.*;
 import unity.gen.*;
 import unity.mod.*;
-import unity.net.*;
+import unity.sync.*;
 import unity.ui.*;
 import unity.ui.dialogs.*;
 import unity.util.*;

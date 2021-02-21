@@ -16,7 +16,7 @@ import mindustry.net.Net.*;
 import mindustry.net.Packets.*;
 import unity.content.*;
 import unity.entities.units.KamiUnit;
-import unity.net.*;
+import unity.sync.*;
 import unity.type.*;
 
 import java.lang.reflect.*;

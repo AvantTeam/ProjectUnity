@@ -1,4 +1,4 @@
-package unity.net;
+package unity.sync;
 
 import arc.func.*;
 import arc.struct.*;

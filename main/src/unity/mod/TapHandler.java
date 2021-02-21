@@ -8,7 +8,7 @@ import arc.struct.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.input.*;
-import unity.net.*;
+import unity.sync.*;
 
 import static mindustry.Vars.*;
 

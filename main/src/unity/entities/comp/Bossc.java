@@ -3,7 +3,7 @@ package unity.entities.comp;
 import mindustry.content.*;
 import mindustry.gen.*;
 import unity.annotations.Annotations.*;
-import unity.net.*;
+import unity.sync.*;
 
 public interface Bossc extends Unitc{
     @Override
