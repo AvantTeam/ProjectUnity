@@ -16,13 +16,15 @@ import unity.world.modules.*;
 
 import static arc.Core.atlas;
 
-public class WaterTurbin extends ArmoredConduit implements GraphBlockBase{
-    final TextureRegion[] topRegions = new TextureRegion[4], bottomRegions = new TextureRegion[2], liquidRegions = new TextureRegion[2];//topsprite,base,liquidsprite
-    TextureRegion rotorRegion;//rotor
+public class WaterTurbine extends ArmoredConduit implements GraphBlockBase{
     protected final Graphs graphs = new Graphs();
 
-    public WaterTurbin(String name){
+    public final TextureRegion[] topRegions = new TextureRegion[4], bottomRegions = new TextureRegion[2], liquidRegions = new TextureRegion[2];
+    public TextureRegion rotorRegion;
+
+    public WaterTurbine(String name){
         super(name);
+        
         solid = true;
         noUpdateDisabled = false;
     }
@@ -30,15 +32,20 @@ public class WaterTurbin extends ArmoredConduit implements GraphBlockBase{
     @Override
     public void load(){
         super.load();
-        for(int i = 0; i < 4; i++) topRegions[i] = atlas.find(name + "-top" + (i + 1));
-        for(int i = 0; i < 2; i++) bottomRegions[i] = atlas.find(name + "-bottom" + (i + 1));
-        for(int i = 0; i < 2; i++) liquidRegions[i] = atlas.find(name + "-liquid" + (i + 1));
+        
         rotorRegion = atlas.find(name + "-rotor");
+        
+        for(int i = 0; i < 4; i++) topRegions[i] = atlas.find(name + "-top" + (i + 1));
+        for(int i = 0; i < 2; i++){
+            bottomRegions[i] = atlas.find(name + "-bottom" + (i + 1));
+            liquidRegions[i] = atlas.find(name + "-liquid" + (i + 1));
+        }
     }
 
     @Override
     public void setStats(){
         super.setStats();
+        
         graphs.setStats(stats);
         setStatsExt(stats);
     }
@@ -46,6 +53,7 @@ public class WaterTurbin extends ArmoredConduit implements GraphBlockBase{
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         graphs.drawPlace(x, y, size, rotation, valid);
+        
         super.drawPlace(x, y, rotation, valid);
     }
 
@@ -65,7 +73,7 @@ public class WaterTurbin extends ArmoredConduit implements GraphBlockBase{
         return new TextureRegion[]{region};
     }
 
-    public class WaterTurbinBuild extends ArmoredConduitBuild implements GraphBuildBase{
+    public class WaterTurbineBuild extends ArmoredConduitBuild implements GraphBuildBase{
         protected GraphModules gms;
         float flowRate;
 
@@ -85,6 +93,7 @@ public class WaterTurbin extends ArmoredConduit implements GraphBlockBase{
         public void onRemoved(){
             gms.updateGraphRemovals();
             onDelete();
+            
             super.onRemoved();
             onDeletePost();
         }
@@ -92,8 +101,10 @@ public class WaterTurbin extends ArmoredConduit implements GraphBlockBase{
         @Override
         public void updateTile(){
             if(graphs.useOriginalUpdate()) super.updateTile();
+            
             updatePre();
             gms.updateTile();
+            
             updatePost();
             gms.prevTileRotation(rotation);
         }
@@ -101,6 +112,7 @@ public class WaterTurbin extends ArmoredConduit implements GraphBlockBase{
         @Override
         public void onProximityUpdate(){
             super.onProximityUpdate();
+            
             gms.onProximityUpdate();
             proxUpdate();
         }
@@ -108,6 +120,7 @@ public class WaterTurbin extends ArmoredConduit implements GraphBlockBase{
         @Override
         public void display(Table table){
             super.display(table);
+            
             gms.display(table);
             displayExt(table);
         }
@@ -115,6 +128,7 @@ public class WaterTurbin extends ArmoredConduit implements GraphBlockBase{
         @Override
         public void displayBars(Table table){
             super.displayBars(table);
+            
             gms.displayBars(table);
             displayBarsExt(table);
         }
@@ -122,6 +136,7 @@ public class WaterTurbin extends ArmoredConduit implements GraphBlockBase{
         @Override
         public void write(Writes write){
             super.write(write);
+            
             gms.write(write);
             writeExt(write);
         }
@@ -129,6 +144,7 @@ public class WaterTurbin extends ArmoredConduit implements GraphBlockBase{
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
+            
             gms.read(read, revision);
             readExt(read, revision);
         }
@@ -141,6 +157,7 @@ public class WaterTurbin extends ArmoredConduit implements GraphBlockBase{
         @Override
         public void drawSelect(){
             super.drawSelect();
+            
             gms.drawSelect();
         }
 

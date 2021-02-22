@@ -12,10 +12,9 @@ import unity.world.modules.*;
 
 import static arc.Core.atlas;
 
-//시도용 I hope GenericCrafters that uses graph can be integrated
 public class SporePyrolyser extends GenericCrafter implements GraphBlockBase{
     final Graphs graphs = new Graphs();
-    TextureRegion heatRegion;//heatSprite
+    TextureRegion heatRegion;
 
     public SporePyrolyser(String name){
         super(name);
@@ -24,6 +23,7 @@ public class SporePyrolyser extends GenericCrafter implements GraphBlockBase{
     @Override
     public void setStats(){
         super.setStats();
+        
         graphs.setStats(stats);
         setStatsExt(stats);
     }
@@ -31,6 +31,7 @@ public class SporePyrolyser extends GenericCrafter implements GraphBlockBase{
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         graphs.drawPlace(x, y, size, rotation, valid);
+        
         super.drawPlace(x, y, rotation, valid);
     }
 
@@ -39,10 +40,10 @@ public class SporePyrolyser extends GenericCrafter implements GraphBlockBase{
         return graphs;
     }
 
-    //not common probably separated?
     @Override
     public void load(){
         super.load();
+        
         heatRegion = atlas.find(name + "-heat");
     }
 
@@ -65,6 +66,7 @@ public class SporePyrolyser extends GenericCrafter implements GraphBlockBase{
         public void onRemoved(){
             gms.updateGraphRemovals();
             onDelete();
+            
             super.onRemoved();
             onDeletePost();
         }
@@ -72,8 +74,10 @@ public class SporePyrolyser extends GenericCrafter implements GraphBlockBase{
         @Override
         public void updateTile(){
             if(graphs.useOriginalUpdate()) super.updateTile();
+            
             updatePre();
             gms.updateTile();
+            
             updatePost();
             gms.prevTileRotation(rotation);
         }
@@ -81,6 +85,7 @@ public class SporePyrolyser extends GenericCrafter implements GraphBlockBase{
         @Override
         public void onProximityUpdate(){
             super.onProximityUpdate();
+            
             gms.onProximityUpdate();
             proxUpdate();
         }
@@ -88,6 +93,7 @@ public class SporePyrolyser extends GenericCrafter implements GraphBlockBase{
         @Override
         public void display(Table table){
             super.display(table);
+            
             gms.display(table);
             displayExt(table);
         }
@@ -95,6 +101,7 @@ public class SporePyrolyser extends GenericCrafter implements GraphBlockBase{
         @Override
         public void displayBars(Table table){
             super.displayBars(table);
+            
             gms.displayBars(table);
             displayBarsExt(table);
         }
@@ -102,12 +109,14 @@ public class SporePyrolyser extends GenericCrafter implements GraphBlockBase{
         @Override
         public void drawSelect(){
             super.drawSelect();
+            
             gms.drawSelect();
         }
 
         @Override
         public void write(Writes write){
             super.write(write);
+            
             gms.write(write);
             writeExt(write);
         }
@@ -115,6 +124,7 @@ public class SporePyrolyser extends GenericCrafter implements GraphBlockBase{
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
+            
             gms.read(read, revision);
             readExt(read, revision);
         }
@@ -124,7 +134,6 @@ public class SporePyrolyser extends GenericCrafter implements GraphBlockBase{
             return gms;
         }
 
-        //not common probably separated?
         @Override
         public float getProgressIncrease(float baseTime){
             return Mathf.sqrt(Mathf.clamp((heat().getTemp() - 370f) / 300f)) / baseTime * edelta();
@@ -134,6 +143,7 @@ public class SporePyrolyser extends GenericCrafter implements GraphBlockBase{
         public void draw(){
             Draw.rect(region, x, y);
             UnityDrawf.drawHeat(heatRegion, x, y, 0f, heat().getTemp() * 1.5f);
+            
             drawTeamTop();
         }
     }
