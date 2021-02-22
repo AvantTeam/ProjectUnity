@@ -2,6 +2,7 @@ package unity.util;
 
 import arc.*;
 import arc.files.*;
+import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -9,7 +10,6 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.graphics.*;
-import unity.*;
 
 import java.io.*;
 
@@ -135,10 +135,15 @@ public class WavefrontObject{
     }
 
     public void draw(float x, float y, float rX, float rY, float rZ){
+        draw(x, y, rX, rY, rZ, null);
+    }
+
+    public void draw(float x, float y, float rX, float rY, float rZ, Cons<Vec3> cons){
         float oz = Draw.z();
         for(int i = 0; i < drawnVertices.size; i++){
             Vec3 v = drawnVertices.get(i).source;
             v.set(vertices.get(i));
+            if(cons != null) cons.get(v);
             v.scl(defaultScl * size).rotate(Vec3.X, rX).rotate(Vec3.Y, rY).rotate(Vec3.Z, rZ);
             float depth = Math.max(0f, (perspectiveDistance + v.z) / perspectiveDistance);
             v.scl(depth);

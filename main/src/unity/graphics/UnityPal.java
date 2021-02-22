@@ -5,7 +5,10 @@ import arc.graphics.Color;
 import static arc.graphics.Color.*;
 
 public class UnityPal{
-    public static Color 
+    public static Color
+
+        plague = valueOf("a3f080"),
+        plagueDark = valueOf("54de3b"),
     
         scarColor = valueOf("f53036"),
         scarColorAlpha = valueOf("f5303690"),

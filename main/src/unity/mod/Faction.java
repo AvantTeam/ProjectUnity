@@ -11,6 +11,7 @@ public enum Faction{
     dark("dark", Color.valueOf("fc6203")),
     advance("advance", Color.sky),
     imber("imber", Pal.surge),
+    plague("plague", Color.valueOf("a3f080")),
     koruh("koruh", Color.valueOf("61caff")),
     light("light", Color.valueOf("fffde8")),
     monolith("monolith", Color.teal),

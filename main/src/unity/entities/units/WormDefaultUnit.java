@@ -15,6 +15,7 @@ public class WormDefaultUnit extends UnitEntity{
     public UnityUnitType wormType;
     public WormSegmentUnit[] segmentUnits;
     protected Vec2[] segments, segmentVelocities;
+    protected boolean addSegments = true;
     protected final Vec2 lastVelocityC = new Vec2(), lastVelocityD = new Vec2();
 
     public int getSegmentLength(){
@@ -55,7 +56,8 @@ public class WormDefaultUnit extends UnitEntity{
     }
 
     protected void updateSegmentVLocal(Vec2 vec){
-        int len = getSegmentLength();
+        //int len = getSegmentLength();
+        int len = segmentUnits.length;
         for(int i = 0; i < len; i++){
             Vec2 seg = segments[i];
             Vec2 segV = segmentVelocities[i];
@@ -75,7 +77,7 @@ public class WormDefaultUnit extends UnitEntity{
             if(wormType.counterDrag) segV.scl(1f + drag);
             segmentUnits[i].vel.set(segV);
         }
-        for(int i = 0; i < len; i++) segmentVelocities[i].scl(Time.delta);
+        //for(int i = 0; i < len; i++) segmentVelocities[i].scl(Time.delta);
     }
 
     protected void updateSegmentsLocal(){
@@ -84,7 +86,8 @@ public class WormDefaultUnit extends UnitEntity{
         Tmp.v1.trns(angleC, segmentOffset);
         Tmp.v1.add(x, y);
         segments[0].set(Tmp.v1);
-        int len = getSegmentLength();
+        //int len = getSegmentLength();
+        int len = segmentUnits.length;
         for(int i = 1; i < len; i++){
             Vec2 seg = segments[i];
             float angle = Utils.clampedAngle(Angles.angle(seg.x, seg.y, segments[i - 1].x, segments[i - 1].y), segmentUnits[i - 1].rotation, wormType.angleLimit);
@@ -92,7 +95,7 @@ public class WormDefaultUnit extends UnitEntity{
             seg.set(segments[i - 1]);
             seg.sub(Tmp.v1);
         }
-        for(int i = 0; i < len; i++){
+        for(int i = 0; i < segmentUnits.length; i++){
             Vec2 seg = segments[i];
             Vec2 segV = segmentVelocities[i];
             WormSegmentUnit segU = segmentUnits[i];
@@ -117,7 +120,7 @@ public class WormDefaultUnit extends UnitEntity{
 
     public void drawShadow(){
         float originZ = Draw.z();
-        for(int i = 0, len = getSegmentLength(); i < len; i++){
+        for(int i = 0, len = segmentUnits.length; i < len; i++){
             Draw.z(originZ - (i + 1) / 10000f);
             segmentUnits[i].drawShadow();
         }
@@ -129,9 +132,19 @@ public class WormDefaultUnit extends UnitEntity{
     }
 
     @Override
+    public void remove(){
+        if(!added) return;
+        super.remove();
+        for(WormSegmentUnit segmentUnit : segmentUnits){
+            segmentUnit.remove();
+        }
+    }
+
+    @Override
     public void add(){
         if(added) return;
         super.add();
+        if(!addSegments) return;
         setEffects();
         Unit parent = this;
         for(int i = 0, len = getSegmentLength(); i < len; i++){

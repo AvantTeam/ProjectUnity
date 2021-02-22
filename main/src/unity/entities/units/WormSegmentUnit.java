@@ -1,6 +1,7 @@
 package unity.entities.units;
 
 import arc.math.*;
+import arc.math.geom.*;
 import arc.util.*;
 import arc.struct.Seq;
 import arc.graphics.g2d.*;
@@ -19,6 +20,7 @@ import static mindustry.Vars.*;
 
 public class WormSegmentUnit extends UnitEntity{
     public UnityUnitType wormType;
+    protected float segmentHealth;
     protected WormDefaultUnit trueParentUnit;
     protected Unit parentUnit;
     protected boolean isBugged;
@@ -60,7 +62,7 @@ public class WormSegmentUnit extends UnitEntity{
     @Override
     public void setType(UnitType type){
         this.type = type;
-        maxHealth = type.health;
+        maxHealth = segmentHealth = type.health;
         drag = type.drag;
         armor = type.armor;
         hitSize = type.hitSize;
@@ -86,12 +88,8 @@ public class WormSegmentUnit extends UnitEntity{
 
     @Override
     public void damage(float amount){
-        trueParentUnit.damage(amount);
-    }
-
-    @Override
-    public void damage(float amount, boolean withEffect){
-        trueParentUnit.damage(amount, withEffect);
+        if(wormType.splittable) segmentHealth -= amount;
+        trueParentUnit.damage((!wormType.splittable || trueParentUnit.segmentUnits.length <= 1) ? amount : amount / 4f);
     }
 
     @Override
@@ -126,6 +124,7 @@ public class WormSegmentUnit extends UnitEntity{
     public void heal(float amount){
         if(trueParentUnit != null) trueParentUnit.heal(amount);
         health += amount;
+        segmentHealth = Mathf.clamp(amount, 0f, maxHealth);
         clampHealth();
     }
 
@@ -158,7 +157,7 @@ public class WormSegmentUnit extends UnitEntity{
 
     @Override
     public void update(){
-        if(parentUnit == null || parentUnit.dead){
+        if(parentUnit == null || parentUnit.dead || !parentUnit.isAdded()){
             dead = true;
             remove();
         }
@@ -177,11 +176,54 @@ public class WormSegmentUnit extends UnitEntity{
         }else{
             return;
         }
+        if(wormType.splittable && segmentHealth <= 0f){
+            split();
+        }
         if(team != trueParentUnit.team) team = trueParentUnit.team;
         if(!net.client() && !dead && controller != null) controller.updateUnit();
         if(controller == null || !controller.isValidController()) resetController();
         updateWeapon();
         updateStatus();
+    }
+
+    //probably inefficient
+    protected void split(){
+        int index = 0;
+        WormDefaultUnit hd = trueParentUnit;
+        hd.maxHealth /= 2f;
+        hd.health = Math.min(hd.health, hd.maxHealth);
+        for(int i = 0; i < hd.segmentUnits.length; i++){
+            if(hd.segmentUnits[i] == this){
+                index = i;
+                break;
+            }
+        }
+        if(index <= 0 || index >= hd.segmentUnits.length - 1){
+            return;
+        }
+        hd.segmentUnits[index - 1].segmentType = 1;
+        WormDefaultUnit newHead = (WormDefaultUnit)type.create(team);
+        hd.segmentUnits[index + 1].parentUnit = newHead;
+        newHead.addSegments = false;
+        newHead.set(this);
+        newHead.vel.set(vel);
+        newHead.maxHealth /= 2f;
+        newHead.health /= 2f;
+        newHead.rotation = rotation;
+
+        SegmentData oldSeg = new SegmentData(hd.segmentUnits.length), newSeg = new SegmentData(hd.segmentUnits.length);
+        for(int i = 0; i < hd.segmentUnits.length; i++){
+            if(i < index){
+                oldSeg.add(hd, i);
+            }
+            if(i > index){
+                newSeg.add(hd, i);
+            }
+        }
+        oldSeg.set(hd);
+        newSeg.set(newHead);
+        newHead.add();
+        remove();
     }
 
     protected void updateStatus(){
@@ -336,5 +378,38 @@ public class WormSegmentUnit extends UnitEntity{
 
     public void setParent(Unit parent){
         parentUnit = parent;
+    }
+
+    private static class SegmentData{
+        WormSegmentUnit[] units;
+        Vec2[] pos;
+        Vec2[] vel;
+        int size = 0;
+
+        SegmentData(int size){
+            units = new WormSegmentUnit[size];
+            pos = new Vec2[size];
+            vel = new Vec2[size];
+        }
+
+        void add(WormDefaultUnit unit, int index){
+            //Unity.print(toString() + ":" + unit.segmentUnits[index] + ":" + unit.segments[index] + ":" + unit.segmentVelocities[index] + ":" + index);
+            units[size] = unit.segmentUnits[index];
+            pos[size] = unit.segments[index];
+            vel[size++] = unit.segmentVelocities[index];
+        }
+
+        void set(WormDefaultUnit unit){
+            for(WormSegmentUnit seg : units){
+                if(seg == null) break;
+                seg.trueParentUnit = unit;
+            }
+            unit.segmentUnits = new WormSegmentUnit[size];
+            unit.segments = new Vec2[size];
+            unit.segmentVelocities = new Vec2[size];
+            System.arraycopy(units, 0, unit.segmentUnits, 0, size);
+            System.arraycopy(pos, 0, unit.segments, 0, size);
+            System.arraycopy(vel, 0, unit.segmentVelocities, 0, size);
+        }
     }
 }

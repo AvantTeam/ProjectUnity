@@ -32,6 +32,7 @@ public class UnityUnitType extends UnitType{
     public int segmentLength = 9;
     public float segmentOffset = 23f;
     public float angleLimit = 30f;
+    public float regenTime = 15f * 60f;
     //hopefully make segment movement more consistant.
     public boolean counterDrag = false;
         // don't touch, please
@@ -272,7 +273,7 @@ public class UnityUnitType extends UnitType{
 
         //worm
         if(unit instanceof WormDefaultUnit wormUnit){
-            for(int i = 0; i < segmentLength; i++){
+            for(int i = 0; i < wormUnit.segmentUnits.length; i++){
                 Draw.z(z - (i + 1f) / 10000f);
                 wormUnit.segmentUnits[i].drawBody();
                 drawWeapons(wormUnit.segmentUnits[i]);

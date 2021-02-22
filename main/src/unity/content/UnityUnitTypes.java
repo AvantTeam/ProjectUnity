@@ -74,6 +74,9 @@ public class UnityUnitTypes implements ContentList{
     /** Imber 'whatever this is' units */
     public static @FactionDef(type = "imber")
     UnitType arcnelidia;
+
+    public static @FactionDef(type = "plague")
+    UnitType toxobyte;
     
     /** Koruh {@linkplain MechUnit mech} units */
     public static @FactionDef(type = "koruh") @EntityPoint(type = MechUnit.class)
@@ -1694,6 +1697,52 @@ public class UnityUnitTypes implements ContentList{
         }};
 
         //endregion
+        //region plague
+
+        setEntity("toxobyte", WormDefaultUnit::new);
+        toxobyte = new UnityUnitType("toxobyte"){{
+            flying = true;
+            health = 2000f;
+            speed = 3f;
+            accel = 0.035f;
+            drag = 0.012f;
+            hitSize = 15.75f;
+            segmentOffset = 16.25f;
+            splittable = true;
+            omniMovement = false;
+            angleLimit = 25f;
+            segmentLength = 25;
+
+            weapons.add(new Weapon(){{
+                rotate = false;
+                mirror = false;
+                reload = 70f;
+                shots = 12;
+                inaccuracy = 35f;
+                xRand = 2f;
+                shotDelay = 0.4f;
+                bullet = new SapBulletType(){{
+                    color = UnityPal.plague;
+                    damage = 20f;
+                    length = 130f;
+                    status = StatusEffects.none;
+                }};
+            }});
+            segWeapSeq.add(new Weapon(){{
+                rotate = true;
+                mirror = false;
+                reload = 90f;
+                bullet = new ArtilleryBulletType(5f, 7){{
+                    collidesTiles = true;
+                    splashDamage = 25f;
+                    splashDamageRadius = 25f;
+                    trailColor = hitColor = lightColor = backColor = UnityPal.plagueDark;
+                    frontColor = UnityPal.plague;
+                }};
+            }});
+        }};
+
+        //endregion
         //region koruh
         
         buffer = new UnityUnitType("buffer"){{
@@ -2410,7 +2459,7 @@ public class UnityUnitTypes implements ContentList{
             legTrns = 0.2f;
             rippleScale = 7f;
 
-            legSplashRange = 150f;
+            legSplashRange = 120f;
             legSplashDamage = 1600f;
 
             bottomWeapons.add("unity-ravager-nightmare");
