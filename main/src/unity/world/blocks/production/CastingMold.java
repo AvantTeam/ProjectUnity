@@ -28,6 +28,7 @@ public class CastingMold extends GraphBlock{
     @Override
     public void load(){
         super.load();
+        
         for(int i = 0; i < 4; i++){
             baseRegions[i] = Core.atlas.find(name + "-base" + (i + 1));
             topRegions[i] = Core.atlas.find(name + "-top" + (i + 1));
@@ -57,10 +58,12 @@ public class CastingMold extends GraphBlock{
             table.table(sub -> {
                 sub.clearChildren();
                 sub.left();
+                
                 if(castingMelt != null){
                     sub.image(castingMelt.item.icon(Cicon.medium));
                     sub.label(() -> {
                         if(pourProgress == 1f && castSpeed == 0f) return tooHot;
+                        
                         return Strings.fixed((pourProgress + castProgress) * 50f, 2) + "%";
                     }).color(Color.lightGray);
                 }else{
@@ -71,6 +74,7 @@ public class CastingMold extends GraphBlock{
 
         void updateOutput(){
             outputBuildings.clear();
+            
             for(int i = 0; i < 8; i++){
                 var pos = gms.getConnectSidePos(i);
                 var b = nearby(pos.toPos.x, pos.toPos.y);
@@ -107,10 +111,12 @@ public class CastingMold extends GraphBlock{
             if(castingMelt == null){
                 pourProgress = 0f;
                 castProgress = 0f;
+                
                 var cc = dex.getContained();
                 var melts = MeltInfo.all;
                                 
                 if(cc.isEmpty()) return;
+                
                 CrucibleData hpMelt = null;
                 MeltInfo hpMeltType = null;
                 
@@ -148,6 +154,7 @@ public class CastingMold extends GraphBlock{
                 if(pourProgress > 0f){
                     Draw.color(castingMelt.item.color, 1f - Math.abs(pourProgress - 0.5f) * 2f);
                     Draw.rect(liquidRegion, x, y, rotdeg());
+                    
                     Draw.color();
                     Draw.rect(castingMelt.item.icon(Cicon.medium), x, y, pourProgress * 8f, pourProgress * 8f);
                 }
@@ -155,6 +162,7 @@ public class CastingMold extends GraphBlock{
                     UnityDrawf.drawHeat(castingMelt.item.icon(Cicon.medium), x, y, 0f, Mathf.map(castProgress, 0f, 1f, castingMelt.meltPoint, 275f));
                 }
             }
+            
             Draw.rect(topRegions[rotation], x, y);
             drawTeamTop();
         }

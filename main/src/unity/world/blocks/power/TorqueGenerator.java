@@ -5,6 +5,7 @@ import unity.world.blocks.*;
 public class TorqueGenerator extends GraphBlock{
     public TorqueGenerator(String name){
         super(name);
+        
         rotate = true;
     }
 

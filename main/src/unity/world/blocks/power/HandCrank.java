@@ -10,11 +10,12 @@ import unity.world.blocks.*;
 import static arc.Core.atlas;
 
 public class HandCrank extends GraphBlock{
-    final TextureRegion[] shaftRegions = new TextureRegion[2];//shaft
-    TextureRegion handleRegion, baseRegion;//handle,base
+    public final TextureRegion[] shaftRegions = new TextureRegion[2];
+    public TextureRegion handleRegion, baseRegion;
 
     public HandCrank(String name){
         super(name);
+        
         rotate = configurable = true;
         config(Integer.class, (HandCrankBuild build, Integer value) -> {
             build.force = 40f;
@@ -25,9 +26,11 @@ public class HandCrank extends GraphBlock{
     @Override
     public void load(){
         super.load();
+        
         handleRegion = atlas.find(name + "-handle");
-        for(int i = 0; i < 2; i++) shaftRegions[i] = atlas.find(name + "-base" + (i + 1));
         baseRegion = atlas.find(name + "-bottom");
+        
+        for(int i = 0; i < 2; i++) shaftRegions[i] = atlas.find(name + "-base" + (i + 1));
     }
 
     public class HandCrankBuild extends GraphBuild{
@@ -44,6 +47,7 @@ public class HandCrank extends GraphBlock{
         public void updatePre(){
             var tGraph = torque();
             float ratio = (20f - tGraph.getNetwork().lastVelocity) / 20f;
+            
             tGraph.force = ratio * force;
             cooldown += Time.delta;
             force *= 0.8f;
@@ -52,9 +56,11 @@ public class HandCrank extends GraphBlock{
         @Override
         public void draw(){
             int variant = rotation == 2 || rotation == 1 ? 1 : 0;
+            
             Draw.rect(baseRegion, x, y);
             Draw.rect(shaftRegions[variant], x, y, rotdeg());
             Draw.rect(handleRegion, x, y, torque().getRotation());
+            
             drawTeamTop();
         }
     }

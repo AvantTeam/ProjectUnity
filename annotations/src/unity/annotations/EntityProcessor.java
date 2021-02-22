@@ -406,9 +406,11 @@ public class EntityProcessor extends BaseProcessor{
 
         @Override
         public boolean equals(Object obj){
-            return obj instanceof EntityDefinition def
-            ?   def.name.equals(name)
-            :   false;
+            if(obj instanceof EntityDefinition){
+                return ((EntityDefinition)obj).name.equals(name);
+            }else{
+                return false;
+            }
         }
 
         @Override

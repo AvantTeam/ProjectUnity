@@ -14,8 +14,9 @@ import static arc.Core.atlas;
 
 public class AugerDrill extends Drill implements GraphBlockBase{
     protected final Graphs graphs = new Graphs();
-    final TextureRegion[] bottomRegions = new TextureRegion[2], topRegions = new TextureRegion[2], oreRegions = new TextureRegion[2];//bottom,top,ore
-    TextureRegion rotorRegion, rotorRotateRegion, mbaseRegion, wormDrive, gearRegion, rotateRegion, overlayRegion;//rotor,rotortexture,mbase,rotate,gear,moving,overlaysprite
+    
+    public final TextureRegion[] bottomRegions = new TextureRegion[2], topRegions = new TextureRegion[2], oreRegions = new TextureRegion[2];
+    public TextureRegion rotorRegion, rotorRotateRegion, mbaseRegion, wormDrive, gearRegion, rotateRegion, overlayRegion;
 
     public AugerDrill(String name){
         super(name);
@@ -27,13 +28,16 @@ public class AugerDrill extends Drill implements GraphBlockBase{
     @Override
     public void load(){
         super.load();
+        
         rotorRegion = atlas.find(name + "-rotor");
         rotorRotateRegion = atlas.find(name + "-rotor-rotate");
         mbaseRegion = atlas.find(name + "-mbase");
+        
         gearRegion = atlas.find(name + "-gear");
         overlayRegion = atlas.find(name + "-overlay");
         rotateRegion = atlas.find(name + "-moving");
         wormDrive = atlas.find(name + "-rotate");
+        
         for(int i = 0; i < 2; i++){
             bottomRegions[i] = atlas.find(name + "-bottom" + (i + 1));
             topRegions[i] = atlas.find(name + "-top" + (i + 1));
@@ -44,6 +48,7 @@ public class AugerDrill extends Drill implements GraphBlockBase{
     @Override
     public void setStats(){
         super.setStats();
+        
         graphs.setStats(stats);
         setStatsExt(stats);
     }
@@ -56,6 +61,7 @@ public class AugerDrill extends Drill implements GraphBlockBase{
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         graphs.drawPlace(x, y, size, rotation, valid);
+        
         super.drawPlace(x, y, rotation, valid);
     }
 
@@ -83,6 +89,7 @@ public class AugerDrill extends Drill implements GraphBlockBase{
         public void onRemoved(){
             gms.updateGraphRemovals();
             onDelete();
+            
             super.onRemoved();
             onDeletePost();
         }
@@ -90,8 +97,10 @@ public class AugerDrill extends Drill implements GraphBlockBase{
         @Override
         public void updateTile(){
             if(graphs.useOriginalUpdate()) super.updateTile();
+            
             updatePre();
             gms.updateTile();
+            
             updatePost();
             gms.prevTileRotation(rotation);
         }
@@ -99,6 +108,7 @@ public class AugerDrill extends Drill implements GraphBlockBase{
         @Override
         public void onProximityUpdate(){
             super.onProximityUpdate();
+            
             gms.onProximityUpdate();
             proxUpdate();
         }
@@ -106,6 +116,7 @@ public class AugerDrill extends Drill implements GraphBlockBase{
         @Override
         public void display(Table table){
             super.display(table);
+            
             gms.display(table);
             displayExt(table);
         }
@@ -113,6 +124,7 @@ public class AugerDrill extends Drill implements GraphBlockBase{
         @Override
         public void displayBars(Table table){
             super.displayBars(table);
+            
             gms.displayBars(table);
             displayBarsExt(table);
         }
@@ -120,6 +132,7 @@ public class AugerDrill extends Drill implements GraphBlockBase{
         @Override
         public void write(Writes write){
             super.write(write);
+            
             gms.write(write);
             writeExt(write);
         }
@@ -127,6 +140,7 @@ public class AugerDrill extends Drill implements GraphBlockBase{
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
+            
             gms.read(read, revision);
             readExt(read, revision);
         }
@@ -139,6 +153,7 @@ public class AugerDrill extends Drill implements GraphBlockBase{
         @Override
         public void drawSelect(){
             super.drawSelect();
+            
             gms.drawSelect();
         }
 
@@ -151,32 +166,39 @@ public class AugerDrill extends Drill implements GraphBlockBase{
         public void draw(){
             float rot = torque().getRotation();
             float fixedRot = (rotdeg() + 90f) % 180f - 90f;
+            
             int variant = rotation % 2;
+            
             float deg = rotation == 0 || rotation == 3 ? rot : -rot;
             float shaftRot = rot * 2f;
+            
             var offset = Geometry.d4(rotation + 1);
+            
             Draw.rect(bottomRegions[variant], x, y);
             
-            //Target Region
+            //target region
             if(dominantItem != null && drawMineItem){
                 Draw.color(dominantItem.color);
                 Draw.rect(oreRegions[variant], x, y);
                 Draw.color();
             }
             
-            //Bottom rotor
+            //bottom rotor
             Draw.rect(rotorRegion, x, y, 360f - rot * 0.25f);
+            
             UnityDrawf.drawRotRect(rotorRotateRegion, x, y, 24f, 3.5f, 3.5f, 450f - rot * 0.25f, shaftRot, shaftRot + 180f);
             UnityDrawf.drawRotRect(rotorRotateRegion, x, y, 24f, 3.5f, 3.5f, 450f - rot * 0.25f, shaftRot + 180f, shaftRot + 360f);
 
-            //Shaft
+            //shaft
             Draw.rect(mbaseRegion, x, y, fixedRot);
+            
             UnityDrawf.drawRotRect(wormDrive, x, y, 24f, 3.5f, 3.5f, fixedRot, rot, rot + 180f);
             UnityDrawf.drawRotRect(wormDrive, x, y, 24f, 3.5f, 3.5f, fixedRot, rot + 180f, rot + 360f);
             UnityDrawf.drawRotRect(rotateRegion, x, y, 24f, 3.5f, 3.5f, fixedRot, rot, rot + 180f);
+            
             Draw.rect(overlayRegion, x, y, fixedRot);
             
-            //Gears
+            //gears
             Draw.rect(gearRegion, x + offset.x * 4f, y + offset.y * 4f, -deg/2);
             Draw.rect(gearRegion, x - offset.x * 4f, y - offset.y * 4f, deg/2);
             

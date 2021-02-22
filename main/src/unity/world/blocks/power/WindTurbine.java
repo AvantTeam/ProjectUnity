@@ -7,28 +7,33 @@ import unity.graphics.*;
 
 import static arc.Core.atlas;
 
-public class WindTurbin extends TorqueGenerator{
-    final TextureRegion[] overlayRegions = new TextureRegion[2], baseRegions = new TextureRegion[4], rotorRegions = new TextureRegion[2];
-    TextureRegion topRegion, movingRegion, bottomRegion, mbaseRegion;//topsprite,moving,bottom,mbase
+public class WindTurbine extends TorqueGenerator{
+    public final TextureRegion[] overlayRegions = new TextureRegion[2], baseRegions = new TextureRegion[4], rotorRegions = new TextureRegion[2];
+    public TextureRegion topRegion, movingRegion, bottomRegion, mbaseRegion;
 
-    public WindTurbin(String name){
+    public WindTurbine(String name){
         super(name);
+        
         solid = true;
     }
 
     @Override
     public void load(){
         super.load();
+        
         topRegion = atlas.find(name + "-top");
-        for(int i = 0; i < 2; i++) overlayRegions[i] = atlas.find(name + "-overlay" + (i + 1));
         movingRegion = atlas.find(name + "-moving");
         bottomRegion = atlas.find(name + "-bottom");
-        for(int i = 0; i < 4; i++) baseRegions[i] = atlas.find(name + "-base" + (i + 1));
         mbaseRegion = atlas.find(name + "-mbase");
-        for(int i = 0; i < 2; i++) rotorRegions[i] = atlas.find(name + "-rotor" + (i + 1));
+        
+        for(int i = 0; i < 4; i++) baseRegions[i] = atlas.find(name + "-base" + (i + 1));
+        for(int i = 0; i < 2; i++){
+            overlayRegions[i] = atlas.find(name + "-overlay" + (i + 1));
+            rotorRegions[i] = atlas.find(name + "-rotor" + (i + 1));
+        }
     }
 
-    public class WindTurbinBuild extends TorqueGeneratorBuild{
+    public class WindTurbineBuild extends TorqueGeneratorBuild{
         @Override
         protected float generateTorque(){
             float x = Time.time * 0.001f;
@@ -36,6 +41,7 @@ public class WindTurbin extends TorqueGenerator{
                 0f,
                 Mathf.sin(x) + 0.5f * Mathf.sin(2f * x + 50f) + 0.2f * Mathf.sin(7f * x + 90f) + 0.1f * Mathf.sin(23f * x + 10f) + 0.55f
             ) + 0.15f;
+            
             return mul;
         }
 
@@ -44,6 +50,7 @@ public class WindTurbin extends TorqueGenerator{
             float shaftRotog = torque().getRotation();
             int variant = (rotation + 1) % 4 >= 2 ? 1 : 0;
             float shaftRot = variant == 1 ? 360f - shaftRotog : shaftRotog;
+            
             Draw.rect(bottomRegion, x, y);
             Draw.rect(baseRegions[rotation], x, y);
             Draw.rect(mbaseRegion, x, y, rotdeg());

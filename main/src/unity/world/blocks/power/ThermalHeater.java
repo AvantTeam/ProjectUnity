@@ -10,17 +10,19 @@ import unity.world.blocks.power.*;
 import static arc.Core.atlas;
 
 public class ThermalHeater extends HeatGenerator{
-    final TextureRegion[] regions = new TextureRegion[4];//bottom
-    final Attribute attri = Attribute.heat;
+    public final TextureRegion[] regions = new TextureRegion[4];
+    public final Attribute attri = Attribute.heat;
 
     public ThermalHeater(String name){
         super(name);
+        
         rotate = true;
     }
 
     @Override
     public void load(){
         super.load();
+        
         for(int i = 0; i < 4; i++) regions[i] = atlas.find(name + (i + 1));
     }
 
@@ -41,12 +43,14 @@ public class ThermalHeater extends HeatGenerator{
         public void draw(){
             Draw.rect(regions[rotation], x, y);
             UnityDrawf.drawHeat(heatRegion, x, y, rotdeg(), heat().getTemp());
+            
             drawTeamTop();
         }
 
         @Override
         public void onProximityAdded(){
             super.onProximityAdded();
+            
             sum = sumAttribute(attri, tileX(), tileY());
         }
     }

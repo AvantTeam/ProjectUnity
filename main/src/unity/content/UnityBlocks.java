@@ -1786,14 +1786,14 @@ public class UnityBlocks implements ContentList{
             addGraph(new GraphTorque(0.01f, 3f).setAccept(1, 0, 0, 0));
         }};
 
-        windTurbine = new WindTurbin("wind-turbine"){{
+        windTurbine = new WindTurbine("wind-turbine"){{
             requirements(Category.power, with(Items.titanium, 20, Items.lead, 80, Items.copper, 70));
             size = 3;
             health = 1200;
             addGraph(new GraphTorqueGenerate(0.03f, 20f, 5f, 5f).setAccept(0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
         }};
 
-        waterTurbine = new WaterTurbin("water-turbine"){{
+        waterTurbine = new WaterTurbine("water-turbine"){{
             requirements(Category.power, with(Items.metaglass, 50, UnityItems.nickel, 20, Items.lead, 150, Items.copper, 100));
             size = 3;
             health = 1100;

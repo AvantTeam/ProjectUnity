@@ -13,10 +13,11 @@ import static arc.Core.atlas;
 import static mindustry.Vars.*;
 
 public class SolarReflector extends Block{
-    TextureRegion mirrorRegion, baseRegion;//mirror,base
+    public TextureRegion mirrorRegion, baseRegion;
 
     public SolarReflector(String name){
         super(name);
+        
         solid = update = configurable = true;
         config(Point2.class, (SolarReflectorBuild build, Point2 point) -> build.setLink(Point2.pack(point.x + build.tileX(), point.y + build.tileY())));
         config(Integer.class, (SolarReflectorBuild build, Integer point) -> build.setLink(point));
@@ -25,6 +26,7 @@ public class SolarReflector extends Block{
     @Override
     public void load(){
         super.load();
+        
         mirrorRegion = atlas.find(name + "-mirror");
         baseRegion = atlas.find(name + "-base");
     }
@@ -40,6 +42,7 @@ public class SolarReflector extends Block{
                 Building build = world.build(link);
                 if(build instanceof SolarCollectorBuild b) b.removeReflector(this);
             }
+            
             if(s != -1) hasChanged = true;
             link = s;
         }
@@ -47,10 +50,12 @@ public class SolarReflector extends Block{
         @Override
         public void updateTile(){
             mirrorRot += 0.4f;
-            Building build = world.build(link);//link
+            Building build = world.build(link);
+            
             if(linkValid()){
                 setLink(build.pos());
                 mirrorRot = Mathf.slerpDelta(mirrorRot, tile.angleTo(build.tile), 0.05f);
+                
                 if(hasChanged){
                     ((SolarCollectorBuild)build).appendSolarReflector(this);
                     hasChanged = false;
@@ -68,11 +73,13 @@ public class SolarReflector extends Block{
         @Override
         public void drawConfigure(){
             float sin = Mathf.absin(6f, 1f);
+            
             if(linkValid()){
                 Building target = world.build(link);
                 Drawf.circles(target.x, target.y, (target.block.size / 2f + 1f) * tilesize + sin - 2f, Pal.place);
                 Drawf.arrow(x, y, target.x, target.y, size * tilesize + sin, 4f + sin);
             }
+            
             Drawf.dashCircle(x, y, 100f, Pal.accent);
         }
 
@@ -89,6 +96,7 @@ public class SolarReflector extends Block{
                 configure(other.pos());
                 return false;
             }
+            
             return true;
         }
 
@@ -99,24 +107,27 @@ public class SolarReflector extends Block{
 
         boolean linkValid(){
             if(link == -1) return false;
-            Building build = world.build(link);//link
+            Building build = world.build(link);
+            
             if(build instanceof SolarCollectorBuild) return build.team == team && within(build, 100f);
+            
             return false;
         }
 
         @Override
         public void write(Writes write){
             super.write(write);
+            
             write.i(link);
         }
 
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
+            
             setLink(read.i());
         }
 
-        //내가 추가.
         @Override
         public void onRemoved(){
             Building build = world.build(link);

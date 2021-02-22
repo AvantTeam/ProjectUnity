@@ -11,6 +11,7 @@ public class StemGenericSmelter extends GenericSmelter{
     protected boolean preserveDraw = true, preserveUpdate = true;
     protected Cons<StemSmelterBuild> foreDrawer = e -> {}, afterDrawer = e -> {}, foreUpdate = e -> {}, afterUpdate = e -> {};
     protected final ObjectMap<String, TextureRegion> regions = new ObjectMap<>(3);
+    
     protected String[] spriteNames = new String[]{};
 
     public StemGenericSmelter(String name){
@@ -20,6 +21,7 @@ public class StemGenericSmelter extends GenericSmelter{
     @Override
     public void load(){
         super.load();
+        
         for(String s : spriteNames) regions.put(s, atlas.find(name + "-" + s));
     }
 
@@ -33,6 +35,7 @@ public class StemGenericSmelter extends GenericSmelter{
         @Override
         public void draw(){
             foreDrawer.get(this);
+            
             if(preserveDraw) super.draw();
             afterDrawer.get(this);
         }
@@ -40,6 +43,7 @@ public class StemGenericSmelter extends GenericSmelter{
         @Override
         public void updateTile(){
             foreUpdate.get(this);
+            
             if(preserveUpdate) super.updateTile();
             afterUpdate.get(this);
         }
