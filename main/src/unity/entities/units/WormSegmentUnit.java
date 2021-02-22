@@ -88,8 +88,8 @@ public class WormSegmentUnit extends UnitEntity{
 
     @Override
     public void damage(float amount){
-        if(wormType.splittable) segmentHealth -= amount;
-        trueParentUnit.damage((!wormType.splittable || trueParentUnit.segmentUnits.length <= 1) ? amount : amount / 4f);
+        if(wormType.splittable) segmentHealth -= amount * wormType.segmentDamageScl;
+        trueParentUnit.damage(amount);
     }
 
     @Override
@@ -124,7 +124,7 @@ public class WormSegmentUnit extends UnitEntity{
     public void heal(float amount){
         if(trueParentUnit != null) trueParentUnit.heal(amount);
         health += amount;
-        segmentHealth = Mathf.clamp(amount, 0f, maxHealth);
+        segmentHealth = Mathf.clamp(segmentHealth + amount, 0f, maxHealth);
         clampHealth();
     }
 
@@ -169,8 +169,13 @@ public class WormSegmentUnit extends UnitEntity{
 
     public void wormSegmentUpdate(){
         if(trueParentUnit != null){
-            health = trueParentUnit.health;
             maxHealth = trueParentUnit.maxHealth;
+            if(!wormType.splittable){
+                health = trueParentUnit.health;
+            }else{
+                if(segmentHealth > maxHealth) segmentHealth = maxHealth;
+                health = segmentHealth;
+            }
             hitTime = trueParentUnit.hitTime;
             ammo = trueParentUnit.ammo;
         }else{

@@ -1708,32 +1708,40 @@ public class UnityUnitTypes implements ContentList{
             drag = 0.012f;
             hitSize = 15.75f;
             segmentOffset = 16.25f;
+            regenTime = 15f * 60f;
             splittable = true;
+            circleTarget = true;
             omniMovement = false;
             angleLimit = 25f;
             segmentLength = 25;
+            segmentDamageScl = 8f;
+            engineSize = -1f;
 
             weapons.add(new Weapon(){{
+                x = 0f;
                 rotate = false;
                 mirror = false;
                 reload = 70f;
                 shots = 12;
+                shootCone = 90f;
                 inaccuracy = 35f;
                 xRand = 2f;
-                shotDelay = 0.4f;
+                shotDelay = 0.5f;
                 bullet = new SapBulletType(){{
                     color = UnityPal.plague;
                     damage = 20f;
                     length = 130f;
+                    width = 1f;
                     status = StatusEffects.none;
                 }};
             }});
             segWeapSeq.add(new Weapon(){{
                 rotate = true;
                 mirror = false;
-                reload = 90f;
+                reload = 60f;
                 bullet = new ArtilleryBulletType(5f, 7){{
-                    collidesTiles = true;
+                    collidesTiles = collidesAir = collidesGround = true;
+                    width = height = 11f;
                     splashDamage = 25f;
                     splashDamageRadius = 25f;
                     trailColor = hitColor = lightColor = backColor = UnityPal.plagueDark;

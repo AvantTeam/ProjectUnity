@@ -11,9 +11,12 @@ import unity.content.UnityUnitTypes;
 import unity.type.*;
 import unity.util.*;
 
+import java.util.*;
+
 public class WormDefaultUnit extends UnitEntity{
     public UnityUnitType wormType;
     public WormSegmentUnit[] segmentUnits;
+    public float repairTime = 0f;
     protected Vec2[] segments, segmentVelocities;
     protected boolean addSegments = true;
     protected final Vec2 lastVelocityC = new Vec2(), lastVelocityD = new Vec2();
@@ -53,6 +56,20 @@ public class WormDefaultUnit extends UnitEntity{
         super.update();
         updateSegmentVLocal(lastVelocityC);
         updateSegmentsLocal();
+        if(regenAvailable()){
+            if(repairTime >= wormType.regenTime){
+                float damage = (health / segmentUnits.length) / 2f;
+                damage(damage);
+                addSegment();
+                repairTime = 0f;
+            }else{
+                repairTime += Time.delta;
+            }
+        }
+    }
+
+    public boolean regenAvailable(){
+        return wormType.splittable && segmentUnits.length < wormType.segmentLength && wormType.regenTime > 0f;
     }
 
     protected void updateSegmentVLocal(Vec2 vec){
@@ -138,6 +155,38 @@ public class WormDefaultUnit extends UnitEntity{
         for(WormSegmentUnit segmentUnit : segmentUnits){
             segmentUnit.remove();
         }
+    }
+
+    @Override
+    public int count(){
+        return Math.max(super.count() / wormType.segmentLength, 1);
+    }
+
+    public void addSegment(){
+        int index = segments.length;
+        Unit parent = segmentUnits[index - 1];
+        Tmp.v1.trns(segmentUnits[index - 1].rotation + 180f, wormType.segmentOffset).add(segmentUnits[index - 1]);
+        segmentUnits[index - 1].segmentType = 0;
+        segmentUnits = Arrays.copyOf(segmentUnits, segmentUnits.length + 1);
+        segments = Arrays.copyOf(segments, segments.length + 1);
+        segmentVelocities = Arrays.copyOf(segmentVelocities, segmentVelocities.length + 1);
+
+        WormSegmentUnit segment = newSegment();
+        segment.elevation = elevation;
+        segment.segmentType = 1;
+        segment.setType(type);
+        segment.parentUnit = parent;
+        segment.trueParentUnit = this;
+        segment.set(Tmp.v1);
+        segment.team = team;
+        segment.health = health;
+        segment.maxHealth = maxHealth;
+        segment.segmentHealth = health;
+        segment.dead = false;
+        segment.add();
+        segmentUnits[segmentUnits.length - 1] = segment;
+        segments[segments.length - 1] = new Vec2(Tmp.v1);
+        segmentVelocities[segmentVelocities.length - 1] = new Vec2(segmentVelocities[segmentVelocities.length - 2]);
     }
 
     @Override
