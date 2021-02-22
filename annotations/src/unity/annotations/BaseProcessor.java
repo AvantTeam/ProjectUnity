@@ -16,12 +16,14 @@ import javax.lang.model.util.*;
 import javax.tools.*;
 
 import com.squareup.javapoet.*;
+import com.sun.tools.javac.model.*;
+import com.sun.tools.javac.processing.*;
 
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 public abstract class BaseProcessor extends AbstractProcessor{
     public static final String packageName = "unity.gen";
 
-    public static Elements elementUtils;
+    public static JavacElements elementUtils;
     public static Types typeUtils;
     public static Filer filer;
     public static Messager messager;
@@ -34,10 +36,12 @@ public abstract class BaseProcessor extends AbstractProcessor{
     public synchronized void init(ProcessingEnvironment processingEnv){
         super.init(processingEnv);
 
-        elementUtils = processingEnv.getElementUtils();
-        typeUtils = processingEnv.getTypeUtils();
-        filer = processingEnv.getFiler();
-        messager = processingEnv.getMessager();
+        JavacProcessingEnvironment javacProcessingEnv = (JavacProcessingEnvironment)processingEnv;
+
+        elementUtils = javacProcessingEnv.getElementUtils();
+        typeUtils = javacProcessingEnv.getTypeUtils();
+        filer = javacProcessingEnv.getFiler();
+        messager = javacProcessingEnv.getMessager();
     }
 
     @Override
