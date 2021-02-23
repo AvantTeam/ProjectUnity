@@ -92,7 +92,7 @@ public class UnityUnitTypes implements ContentList{
 
     /** Monolith {@linkplain LegsUnit legs} units */
     public static @FactionDef(type = "monolith") @EntityPoint(type = LegsUnit.class)
-    UnitType pylon, monument, colossus;
+    UnitType pylon, monument, colossus, bastion;
 
     public static @FactionDef(type = "koruh") @EntityDef(base = KamiUnit.class, def = Bossc.class)
     UnitType kami;
@@ -1936,6 +1936,7 @@ public class UnityUnitTypes implements ContentList{
             health = 200;
             canBoost = true;
             boostMultiplier = 2.5f;
+            outlineColor = Pal.darkestGray;
             weapons.add(new Weapon(name + "-shotgun"){{
                 top = false;
                 reload = 60f;
@@ -1993,6 +1994,7 @@ public class UnityUnitTypes implements ContentList{
             boostMultiplier = 2.5f;
             engineSize = 3.5f;
             engineOffset = 6f;
+            outlineColor = Pal.darkestGray;
             weapons.add(new Weapon(name + "-gun"){{
                 top = false;
                 x = 10.75f;
@@ -2034,6 +2036,7 @@ public class UnityUnitTypes implements ContentList{
             boostMultiplier = 2.5f;
             engineSize = 5f;
             engineOffset = 10f;
+            outlineColor = Pal.darkestGray;
             weapons.add(new Weapon("unity-monolith-medium-weapon-mount"){{
                 rotate = true;
                 x = 4f;
@@ -2082,6 +2085,7 @@ public class UnityUnitTypes implements ContentList{
             legBaseOffset = 11f;
             groundLayer = Layer.legUnit;
 
+            outlineColor = Pal.darkestGray;
             commandLimit = 8;
 
             weapons.add(new Weapon("unity-pylon-laser"){{
@@ -2137,6 +2141,7 @@ public class UnityUnitTypes implements ContentList{
             legSplashRange = 48f;
             visualElevation = 0.3f;
             groundLayer = Layer.legUnit;
+            outlineColor = Pal.darkestGray;
             weapons.add(new Weapon("unity-monolith-railgun-big"){{
                 x = 0f;
                 y = 12f;
@@ -2189,6 +2194,7 @@ public class UnityUnitTypes implements ContentList{
             legSplashDamage = 84f;
             legSplashRange = 48f;
             groundLayer = Layer.legUnit;
+            outlineColor = Pal.darkestGray;
             abilities.add(new LightningSpawnAbility());
             weapons.add(new Weapon(name + "-weapon"){{
                 top = false;
@@ -2215,6 +2221,31 @@ public class UnityUnitTypes implements ContentList{
                     lightningColor = Pal.lancerLaser;
                 }};
             }});
+        }};
+
+        bastion = new UnityUnitType("bastion"){{
+            health = 45000f;
+            speed = 0.22f;
+            rotateSpeed = 1.2f;
+            hitSize = 67f;
+            armor = 17f;
+
+            visualElevation = 0.7f;
+            allowLegStep = hovering = true;
+            legCount = 6;
+            legLength = 64f;
+            legExtension = 16f;
+            legSpeed = 0.12f;
+            legTrns = 0.6f;
+            legBaseOffset = 18f;
+            legMoveSpace = 0.6f;
+            legPairOffset = 3f;
+            legSplashDamage = 140f;
+            legSplashRange = 56f;
+
+            ammoType = AmmoTypes.powerHigh;
+            groundLayer = Layer.legUnit;
+            outlineColor = Pal.darkestGray;
         }};
 
         kami = new RainbowUnitType("kami-mkii"){{

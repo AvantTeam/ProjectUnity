@@ -29,8 +29,7 @@ public class IconGenerator implements Generator{
                 type.load();
                 type.init();
 
-                Color outc = Pal.darkerMetal;
-                Func<Sprite, Sprite> outline = i -> i.outline(3, outc);
+                Func<Sprite, Sprite> outline = i -> i.outline(3, type.outlineColor);
                 Func<TextureRegion, String> parseName = reg -> ((AtlasRegion)reg).name.replaceFirst("unity-", "");
                 Seq<String> optional = Seq.with("-joint", "-leg-back", "-leg-base-back", "-foot-back");
 

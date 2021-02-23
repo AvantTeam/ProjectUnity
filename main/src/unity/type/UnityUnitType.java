@@ -24,6 +24,7 @@ import static mindustry.Vars.*;
 note that as classes are integrated, inner classes are extracted.*/
 public class UnityUnitType extends UnitType{
     public final Seq<Weapon> segWeapSeq = new Seq<>();
+    public Color outlineColor = Pal.darkerMetal;
 
     public TextureRegion segmentRegion, tailRegion, segmentCellRegion, segmentOutline, tailOutline, legBackRegion, legBaseBackRegion, footBackRegion;
     public TextureRegion[] abilityRegions = new TextureRegion[AbilityTextures.values().length];
