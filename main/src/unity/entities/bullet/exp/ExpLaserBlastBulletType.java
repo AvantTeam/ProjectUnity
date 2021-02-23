@@ -1,14 +1,17 @@
 package unity.entities.bullet.exp;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import unity.content.*;
 import unity.entities.comp.*;
 import unity.graphics.*;
 
@@ -129,13 +132,27 @@ public class ExpLaserBlastBulletType extends LaserBulletType{
 
     @Override
     public void hitTile(Bullet b, Building build, float initialHealth, boolean direct){
-        if(build.team != b.team && b.owner instanceof ExpBuildc exp) exp.incExp(hitBuildingExpGain);
+        if(build.team != b.team && b.owner instanceof ExpBuildc exp){
+            if(exp.levelf() < 1 && Core.settings.getBool("hitexpeffect")){
+                for(int i = 0; i < Math.ceil(hitBuildingExpGain); i++){
+                    UnityFx.expGain.at(build.x(), build.y(), 0f, (Position)b.owner);
+                }
+            }
+            exp.incExp(hitBuildingExpGain);
+        }
         super.hitTile(b, build, initialHealth, direct);
     }
 
     @Override
     public void hitEntity(Bullet b, Hitboxc other, float initialHealth) {
-        if(b.owner instanceof ExpBuildc exp) exp.incExp(hitUnitExpGain);
+        if(b.owner instanceof ExpBuildc exp){
+            if(exp.levelf() < 1 && Core.settings.getBool("hitexpeffect")){
+                for(int i = 0; i < Math.ceil(hitUnitExpGain); i++){
+                    UnityFx.expGain.at(other.x(), other.y(), 0f, (Position)b.owner);
+                }
+            }
+            exp.incExp(hitUnitExpGain);
+        }
         super.hitEntity(b, other, initialHealth);
     }
 

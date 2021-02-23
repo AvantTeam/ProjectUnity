@@ -9,7 +9,7 @@ import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
-import mindustry.gen.Unit;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -33,6 +33,26 @@ public class UnityFx{
 
     public static final Effect
         //@formatter:off
+    expGain = new Effect(75f, 400f, e -> {
+        if(!(e.data instanceof Position pos)) return;
+
+        float fin = Mathf.curve(e.fin(), 0, Mathf.randomSeed(e.id, 0.25f, 1f));
+        if(fin >= 1) return;
+
+        float a = angle(e.x, e.y, pos.getX(), pos.getY()) - 90;
+        float d = Mathf.dst(e.x, e.y, pos.getX(), pos.getY());
+        float fslope = fin * (1f - fin) * 4f;
+        float sfin = Interp.pow2In.apply(fin);
+        float spread = d / 4f;
+        Tmp.v1.trns(a, Mathf.randomSeed(e.id * 2l, -spread, spread) * fslope, d * sfin);
+        Tmp.v1.add(e.x, e.y);
+
+        color(UnityPal.expColor, Color.white, 0.1f + 0.1f * Mathf.sin(Time.time * 0.03f + e.id * 3f));
+        Fill.circle(Tmp.v1.x, Tmp.v1.y, 1.5f);
+        stroke(0.5f);
+        for(int i = 0; i < 4; i++) Drawf.tri(Tmp.v1.x, Tmp.v1.y, 4f, 4 + 1.5f * Mathf.sin(Time.time * 0.12f + e.id * 4f), i * 90f + Mathf.sin(Time.time * 0.04f + e.id * 5f) * 28f);
+    }),
+
     laserCharge = new Effect(38f, e -> {
         color(e.color);
         randLenVectors(e.id, e.id % 3 + 1, 1f + 20f * e.fout(), e.rotation, 120f, (x, y) -> {

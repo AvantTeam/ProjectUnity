@@ -1,5 +1,6 @@
 package unity.entities.bullet.exp;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.geom.*;
@@ -9,6 +10,7 @@ import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import unity.content.*;
 import unity.entities.comp.*;
 import unity.graphics.*;
 
@@ -92,11 +94,25 @@ public class ExpLaserBulletType extends BulletType {
         if(target instanceof Hitboxc hit){
             hit.collision(b, hit.x(), hit.y());
             b.collision(hit, hit.x(), hit.y());
-            if(b.owner instanceof ExpBuildc exp) exp.incExp(hitUnitExpGain);
+            if(b.owner instanceof ExpBuildc exp){
+                if(exp.levelf() < 1 && Core.settings.getBool("hitexpeffect")){
+                    for(int i = 0; i < Math.ceil(hitUnitExpGain); i++){
+                        UnityFx.expGain.at(hit.x(), hit.y(), 0f, (Position)b.owner);
+                    }
+                }
+                exp.incExp(hitUnitExpGain);
+            }
         }else if(target instanceof Building tile && tile.collide(b)){
             tile.collision(b);
             hit(b, tile.x, tile.y);
-            if(b.owner instanceof ExpBuildc exp) exp.incExp(hitBuildingExpGain);
+            if(b.owner instanceof ExpBuildc exp){
+                if(exp.levelf() < 1 && Core.settings.getBool("hitexpeffect")){
+                    for(int i = 0; i < Math.ceil(hitBuildingExpGain); i++){
+                        UnityFx.expGain.at(tile.x, tile.y, 0f, (Position)b.owner);
+                    }
+                }
+                exp.incExp(hitBuildingExpGain);
+            }
         }else{
             b.data = new Vec2().trns(b.rotation(), getLength(b)).add(b.x, b.y);
         }
