@@ -7,6 +7,7 @@ import arc.graphics.g2d.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.pooling.*;
 import mindustry.ctype.*;
 import mindustry.type.*;
 import mindustry.gen.*;
@@ -1926,9 +1927,10 @@ public class UnityUnitTypes implements ContentList{
         //endregion
         //region monolith
 
+        //raw dps: 36
         stele = new UnityUnitType("stele"){{
-            health = 200f;
-            speed = 0.5f;
+            health = 150f;
+            speed = 0.6f;
             hitSize = 8f;
 
             canBoost = true;
@@ -1955,7 +1957,7 @@ public class UnityUnitTypes implements ContentList{
                         width = height = 2f;
                         weaveScale = 3f;
                         weaveMag = 5f;
-                        homingPower = 0.8f;
+                        homingPower = 0.7f;
 
                         shootEffect = Fx.hitLancer;
                         frontColor = Pal.lancerLaser;
@@ -1964,12 +1966,12 @@ public class UnityUnitTypes implements ContentList{
 
                     @Override
                     public void init(Bullet b){
-                        b.data = new FixedTrail(6);
+                        b.data = new Trail(6);
                     }
 
                     @Override
                     public void draw(Bullet b){
-                        if(b.data instanceof FixedTrail t){
+                        if(b.data instanceof Trail t){
                             t.draw(frontColor, width);
 
                             Draw.color(frontColor);
@@ -1981,17 +1983,18 @@ public class UnityUnitTypes implements ContentList{
                     @Override
                     public void update(Bullet b){
                         super.update(b);
-                        if(b.data instanceof FixedTrail t){
-                            t.update(b.x, b.y, b.rotation());
+                        if(b.data instanceof Trail t){
+                            t.update(b.x, b.y);
                         }
                     }
                 };
             }});
         }};
 
+        //raw dps: 108
         pedestal = new UnityUnitType("pedestal"){{
             health = 600;
-            speed = 0.42f;
+            speed = 0.5f;
             rotateSpeed = 2.6f;
             hitSize = 11f;
             armor = 3.5f;
@@ -2008,14 +2011,14 @@ public class UnityUnitTypes implements ContentList{
                 x = 10.75f;
                 y = 2.25f;
 
-                reload = 60f;
+                reload = 40f;
                 recoil = 3.2f;
                 shootSound = Sounds.shootBig;
 
                 BulletType subBullet = new LightningBulletType();
-                subBullet.damage = 10f;
+                subBullet.damage = 12f;
 
-                bullet = new BasicBulletType(3f, 12f, "shell"){
+                bullet = new BasicBulletType(3f, 36f, "shell"){
                     {
                         width = 20f;
                         height = 20f;
@@ -2027,18 +2030,37 @@ public class UnityUnitTypes implements ContentList{
 
                     @Override
                     public void init(Bullet b){
+                        b.data = new Trail(8);
                         for(int i = 0; i < 3; i++){
                             subBullet.create(b, b.x, b.y, b.vel.angle());
                             Sounds.spark.at(b.x, b.y, Mathf.random(0.6f, 0.8f));
+                        }
+                    }
+
+                    @Override
+                    public void draw(Bullet b){
+                        if(b.data instanceof Trail t){
+                            t.draw(frontColor, width);
+                        }
+
+                        super.draw(b);
+                    }
+
+                    @Override
+                    public void update(Bullet b){
+                        super.update(b);
+                        if(b.data instanceof Trail t){
+                            t.update(b.x, b.y);
                         }
                     }
                 };
             }});
         }};
 
+        //raw dps: 228
         pilaster = new UnityUnitType("pilaster"){{
             health = 1000f;
-            speed = 0.3f;
+            speed = 0.4f;
             rotateSpeed = 2.2f;
             hitSize = 26.5f;
             armor = 4f;
@@ -2048,6 +2070,8 @@ public class UnityUnitTypes implements ContentList{
             boostMultiplier = 2.5f;
             engineSize = 5f;
             engineOffset = 10f;
+
+            ammoType = AmmoTypes.power;
             outlineColor = UnityPal.darkOutline;
 
             weapons.add(new Weapon("unity-monolith-medium-weapon-mount"){{
@@ -2079,13 +2103,14 @@ public class UnityUnitTypes implements ContentList{
                 reload = 40f;
                 shootSound = Sounds.laser;
 
-                bullet = new LaserBulletType(100f);
+                bullet = new LaserBulletType(80f);
             }});
         }};
 
+        //raw dps: 302
         pylon = new UnityUnitType("pylon"){{
             health = 7200f;
-            speed = 0.28f;
+            speed = 0.43f;
             rotateSpeed = 1.48f;
             hitSize = 36f;
             armor = 7f;
@@ -2132,16 +2157,17 @@ public class UnityUnitTypes implements ContentList{
                 rotateSpeed = 3.5f;
                 shootSound = Sounds.laser;
                 shake = 5f;
-                reload = 60f;
+                reload = 36f;
                 recoil = 4f;
 
                 bullet = UnityBullets.pylonLaserSmall;
             }});
         }};
 
+        //raw dps: 1680
         monument = new UnityUnitType("monument"){{
             health = 16000f;
-            speed = 0.25f;
+            speed = 0.42f;
             rotateSpeed = 1.4f;
             hitSize = 48f;
             armor = 9f;
@@ -2163,7 +2189,7 @@ public class UnityUnitTypes implements ContentList{
             groundLayer = Layer.legUnit;
             outlineColor = UnityPal.darkOutline;
 
-            BulletType laser = new LaserBulletType(140f);
+            BulletType laser = new LaserBulletType(320f);
             weapons.add(new Weapon("unity-monolith-large2-weapon-mount"){{
                 top = false;
                 x = 14f;
@@ -2172,7 +2198,7 @@ public class UnityUnitTypes implements ContentList{
 
                 rotate = true;
                 rotateSpeed = 3.5f;
-                reload = 48f;
+                reload = 36f;
                 recoil = shake = 5f;
                 shootSound = Sounds.laser;
 
@@ -2185,7 +2211,7 @@ public class UnityUnitTypes implements ContentList{
 
                 rotate = true;
                 rotateSpeed = 3.5f;
-                reload = 60f;
+                reload = 48f;
                 recoil = shake = 5f;
                 shootSound = Sounds.laser;
 
@@ -2209,9 +2235,10 @@ public class UnityUnitTypes implements ContentList{
             }});
         }};
 
+        //raw dps: 2000
         colossus = new UnityUnitType("colossus"){{
             health = 30000f;
-            speed = 0.22f;
+            speed = 0.4f;
             rotateSpeed = 1.2f;
             hitSize = 64f;
             armor = 13f;
@@ -2241,17 +2268,17 @@ public class UnityUnitTypes implements ContentList{
                 y = 7.75f;
                 shootY = 20f;
 
-                reload = 60f;
+                reload = 144f;
                 recoil = 8f;
                 spacing = 1f;
                 inaccuracy = 6f;
                 shots = 5;
                 shotDelay = 3f;
-                shootSound = Sounds.laser;
+                shootSound = Sounds.laserblast;
 
-                bullet = new LaserBulletType(280f){{
+                bullet = new LaserBulletType(960f){{
                     width = 45f;
-                    length = 280f;
+                    length = 400f;
                     lifetime = 32f;
 
                     lightningSpacing = 35f;
@@ -2267,7 +2294,7 @@ public class UnityUnitTypes implements ContentList{
 
         bastion = new UnityUnitType("bastion"){{
             health = 45000f;
-            speed = 0.22f;
+            speed = 0.4f;
             rotateSpeed = 1.2f;
             hitSize = 67f;
             armor = 17f;

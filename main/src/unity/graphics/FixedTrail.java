@@ -6,25 +6,14 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.pooling.*;
-import arc.util.pooling.Pool.*;
 
-public class FixedTrail implements Poolable{
+public class FixedTrail{
     public int length;
-    private Seq<Vec3> points = new Seq<>();
+    private final Seq<Vec3> points;
 
     public FixedTrail(int length){
-        length(length);
-    }
-
-    public FixedTrail(){
-        length(0);
-    }
-
-    public FixedTrail length(int length){
         this.length = length;
-        points.setSize(length);
-
-        return this;
+        points = new Seq<>(length);
     }
 
     public void clear(){
@@ -53,10 +42,5 @@ public class FixedTrail implements Poolable{
         }
 
         points.add(Pools.obtain(Vec3.class, Vec3::new).set(x, y, -rotation * Mathf.degRad));
-    }
-
-    @Override
-    public void reset(){
-        clear();
     }
 }

@@ -680,7 +680,7 @@ public class UnityBullets implements ContentList{
             damage = 28f;
         }};
 
-        pylonLaser = new LaserBulletType(420f){
+        pylonLaser = new LaserBulletType(1000f){
             {
                 length = 520f;
                 width = 60f;
@@ -704,14 +704,14 @@ public class UnityBullets implements ContentList{
             }
         };
 
-        pylonLaserSmall = new LaserBulletType(48f){{
+        pylonLaserSmall = new LaserBulletType(96f){{
             length = 180f;
             width = 24f;
         }};
 
         monumentRailBullet = new PointBulletType(){{
-            damage = 1000;
-            buildingDamageMultiplier = 0.7f;
+            damage = 3000f;
+            buildingDamageMultiplier = 0.5f;
             speed = maxRange = 500f;
             lifetime = 1f;
             hitShake = 6f;

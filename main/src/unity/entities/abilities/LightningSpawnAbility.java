@@ -12,6 +12,7 @@ import mindustry.graphics.*;
 import unity.content.*;
 
 import static arc.Core.*;
+import static mindustry.Vars.*;
 
 public class LightningSpawnAbility extends Ability{
     protected float timerTarget = 48f, rotateSpeed = 2f, phase, phaseSpeed = 0.05f,
@@ -48,7 +49,13 @@ public class LightningSpawnAbility extends Ability{
                 }
             }
         }
-        phase = Mathf.lerpDelta(phase, unit.ammof(), phaseSpeed);
+
+        if(state.rules.unitAmmo){
+            phase = Mathf.lerpDelta(phase, unit.ammof(), phaseSpeed);
+        }else{
+            phase = 1f;
+        }
+
         if(phase < 0.01f) phase = 0f;
     }
 
