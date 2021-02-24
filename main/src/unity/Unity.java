@@ -23,6 +23,7 @@ public class Unity extends Mod{
     public static MusicHandler musicHandler;
     public static TapHandler tapHandler;
     public static UnityAntiCheat antiCheat;
+    public static UnitySettings unitySettings = new UnitySettings();
 
     private final ContentList[] unityContent = {
         new UnityItems(),
@@ -93,6 +94,10 @@ public class Unity extends Mod{
                 });
             });
         }
+
+        Events.on(ClientLoadEvent.class, e -> {
+            unitySettings.init();
+        });
     }
 
     @Override

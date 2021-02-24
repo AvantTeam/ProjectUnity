@@ -1,7 +1,10 @@
 package unity.entities.bullet.exp;
 
+import arc.*;
+import arc.math.geom.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
+import unity.content.*;
 import unity.entities.comp.*;
 
 public class ExpBulletType extends BulletType{
@@ -14,7 +17,14 @@ public class ExpBulletType extends BulletType{
 
     @Override
     public void hit(Bullet b, float x, float y) {
-        if(b.owner instanceof ExpBuildc exp) exp.incExp(expGain);
+        if(b.owner instanceof ExpBuildc exp){
+            if(exp.levelf() < 1 && Core.settings.getBool("hitexpeffect")){
+                for(int i = 0; i < Math.ceil(expGain); i++){
+                    UnityFx.expGain.at(x, y, 0f, (Position)b.owner);
+                }
+            }
+            exp.incExp(expGain);
+        }
         super.hit(b, x, y);
     }
 }
