@@ -15,19 +15,31 @@ import static arc.Core.*;
 import static mindustry.Vars.*;
 
 public class LightningSpawnAbility extends Ability{
-    protected float timerTarget = 48f, rotateSpeed = 2f, phase, phaseSpeed = 0.05f,
-        lightningRange = 120f, lightningOffset = 56f, lightningDamage = 100f, lightningRadius = 18f;
-    protected int lightningCount = 8;
+    protected final Interval timer = new Interval(1);
+    protected float timerTarget;
+
+    public float rotateSpeed;
+
+    public float phase;
+    public float phaseSpeed,
+        lightningRange, lightningOffset, lightningDamage, lightningRadius = 18f;
+
+    protected int lightningCount;
     protected Sound lightningSound = Sounds.spark;
     protected Color lightningColor = Pal.lancerLaser, backColor = Pal.lancerLaser.cpy().a(0.5f), frontColor = Color.white.cpy().a(0.8f);
     protected Effect shootEffect;
 
-    protected final Interval timer = new Interval(1);
-
-    {
-        shootEffect = UnityFx.lightningSpawnShoot;
-        //reset
+    public LightningSpawnAbility(int lightningCount, float timerTarget, float rotateSpeed, float phaseSpeed, float lightningRange, float lightningOffset, float lightningDamage){
         timer.get(timerTarget);
+
+        shootEffect = UnityFx.lightningSpawnShoot;
+        this.lightningCount = lightningCount;
+        this.timerTarget = timerTarget;
+        this.rotateSpeed = rotateSpeed;
+        this.phaseSpeed = phaseSpeed;
+        this.lightningRange = lightningRange;
+        this.lightningOffset = lightningOffset;
+        this.lightningDamage = lightningDamage;
     }
 
     @Override

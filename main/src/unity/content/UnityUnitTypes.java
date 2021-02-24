@@ -85,7 +85,7 @@ public class UnityUnitTypes implements ContentList{
     
     /** Koruh {@linkplain UnitEntity flying} units */
     public static @FactionDef(type = "koruh") @EntityPoint(type = UnitEntity.class)
-    UnitType cache, dijkstra, phantasm; // <- sk plz rename this, it's kinda off
+    UnitType cache, dijkstra, phantasm;
 
     /** Monolith {@linkplain MechUnit mech} units */
     public static @FactionDef(type = "monolith") @EntityPoint(type = MechUnit.class)
@@ -1937,7 +1937,8 @@ public class UnityUnitTypes implements ContentList{
             boostMultiplier = 2.5f;
             outlineColor = UnityPal.darkOutline;
 
-            weapons.add(new Weapon(name + "-shotgun"){{
+            weapons.add(
+            new Weapon(name + "-shotgun"){{
                 top = false;
                 x = 5.25f;
                 y = -0.25f;
@@ -1988,7 +1989,8 @@ public class UnityUnitTypes implements ContentList{
                         }
                     }
                 };
-            }});
+            }}
+            );
         }};
 
         //raw dps: 108
@@ -2006,7 +2008,8 @@ public class UnityUnitTypes implements ContentList{
             engineOffset = 6f;
             outlineColor = UnityPal.darkOutline;
 
-            weapons.add(new Weapon(name + "-gun"){{
+            weapons.add(
+            new Weapon(name + "-gun"){{
                 top = false;
                 x = 10.75f;
                 y = 2.25f;
@@ -2030,7 +2033,7 @@ public class UnityUnitTypes implements ContentList{
 
                     @Override
                     public void init(Bullet b){
-                        b.data = new Trail(8);
+                        b.data = new Trail(12);
                         for(int i = 0; i < 3; i++){
                             subBullet.create(b, b.x, b.y, b.vel.angle());
                             Sounds.spark.at(b.x, b.y, Mathf.random(0.6f, 0.8f));
@@ -2040,7 +2043,7 @@ public class UnityUnitTypes implements ContentList{
                     @Override
                     public void draw(Bullet b){
                         if(b.data instanceof Trail t){
-                            t.draw(frontColor, width);
+                            t.draw(frontColor, width * 0.4f);
                         }
 
                         super.draw(b);
@@ -2054,7 +2057,8 @@ public class UnityUnitTypes implements ContentList{
                         }
                     }
                 };
-            }});
+            }}
+            );
         }};
 
         //raw dps: 228
@@ -2074,7 +2078,8 @@ public class UnityUnitTypes implements ContentList{
             ammoType = AmmoTypes.power;
             outlineColor = UnityPal.darkOutline;
 
-            weapons.add(new Weapon("unity-monolith-medium-weapon-mount"){{
+            weapons.add(
+            new Weapon("unity-monolith-medium-weapon-mount"){{
                 top = false;
                 x = 4f;
                 y = 7.5f;
@@ -2091,7 +2096,8 @@ public class UnityUnitTypes implements ContentList{
                     damage = 15f;
                     lightningLength = 15;
                 }};
-            }}, new Weapon("unity-monolith-large-weapon-mount"){{
+            }},
+            new Weapon("unity-monolith-large-weapon-mount"){{
                 top = false;
                 x = 13f;
                 y = 2f;
@@ -2104,7 +2110,8 @@ public class UnityUnitTypes implements ContentList{
                 shootSound = Sounds.laser;
 
                 bullet = new LaserBulletType(80f);
-            }});
+            }}
+            );
         }};
 
         //raw dps: 302
@@ -2130,7 +2137,8 @@ public class UnityUnitTypes implements ContentList{
             groundLayer = Layer.legUnit;
             outlineColor = UnityPal.darkOutline;
 
-            weapons.add(new Weapon("unity-pylon-laser"){{
+            weapons.add(
+            new Weapon("unity-pylon-laser"){{
                 soundPitchMin = 1f;
                 top = false;
                 mirror = false;
@@ -2148,7 +2156,8 @@ public class UnityUnitTypes implements ContentList{
                 firstShotDelay = UnityFx.pylonLaserCharge.lifetime / 2f;
 
                 bullet = UnityBullets.pylonLaser;
-            }}, new Weapon("unity-monolith-large2-weapon-mount"){{
+            }},
+            new Weapon("unity-monolith-large2-weapon-mount"){{
                 x = 14f;
                 y = 5f;
                 shootY = 14f;
@@ -2161,7 +2170,8 @@ public class UnityUnitTypes implements ContentList{
                 recoil = 4f;
 
                 bullet = UnityBullets.pylonLaserSmall;
-            }});
+            }}
+            );
         }};
 
         //raw dps: 1680
@@ -2171,6 +2181,7 @@ public class UnityUnitTypes implements ContentList{
             rotateSpeed = 1.4f;
             hitSize = 48f;
             armor = 9f;
+            commandLimit = 8;
 
             visualElevation = 0.3f;
             allowLegStep = hovering = true;
@@ -2190,7 +2201,8 @@ public class UnityUnitTypes implements ContentList{
             outlineColor = UnityPal.darkOutline;
 
             BulletType laser = new LaserBulletType(320f);
-            weapons.add(new Weapon("unity-monolith-large2-weapon-mount"){{
+            weapons.add(
+            new Weapon("unity-monolith-large2-weapon-mount"){{
                 top = false;
                 x = 14f;
                 y = 12f;
@@ -2203,7 +2215,8 @@ public class UnityUnitTypes implements ContentList{
                 shootSound = Sounds.laser;
 
                 bullet = laser;
-            }}, new Weapon("unity-monolith-large2-weapon-mount"){{
+            }},
+            new Weapon("unity-monolith-large2-weapon-mount"){{
                 top = false;
                 x = 20f;
                 y = 3f;
@@ -2216,7 +2229,8 @@ public class UnityUnitTypes implements ContentList{
                 shootSound = Sounds.laser;
 
                 bullet = laser;
-            }}, new Weapon("unity-monolith-railgun-big"){{
+            }},
+            new Weapon("unity-monolith-railgun-big"){{
                 mirror = false;
                 x = 0f;
                 y = 12f;
@@ -2232,7 +2246,8 @@ public class UnityUnitTypes implements ContentList{
                 shootSound = Sounds.railgun;
 
                 bullet = UnityBullets.monumentRailBullet;
-            }});
+            }}
+            );
         }};
 
         //raw dps: 2000
@@ -2242,6 +2257,7 @@ public class UnityUnitTypes implements ContentList{
             rotateSpeed = 1.2f;
             hitSize = 64f;
             armor = 13f;
+            commandLimit = 8;
 
             visualElevation = 0.5f;
             allowLegStep = hovering = true;
@@ -2260,9 +2276,10 @@ public class UnityUnitTypes implements ContentList{
             groundLayer = Layer.legUnit;
             outlineColor = UnityPal.darkOutline;
 
-            abilities.add(new LightningSpawnAbility());
+            abilities.add(new LightningSpawnAbility(8, 48f, 2f, 0.05f, 120f, 56f, 100f));
 
-            weapons.add(new Weapon(name + "-weapon"){{
+            weapons.add(
+            new Weapon(name + "-weapon"){{
                 top = false;
                 x = 30f;
                 y = 7.75f;
@@ -2289,15 +2306,18 @@ public class UnityUnitTypes implements ContentList{
                     lightningAngleRand = 30f;
                     lightningColor = Pal.lancerLaser;
                 }};
-            }});
+            }}
+            );
         }};
 
+        //raw dps: 3720
         bastion = new UnityUnitType("bastion"){{
             health = 45000f;
             speed = 0.4f;
             rotateSpeed = 1.2f;
             hitSize = 67f;
             armor = 17f;
+            commandLimit = 8;
 
             visualElevation = 0.7f;
             allowLegStep = hovering = true;
@@ -2315,6 +2335,126 @@ public class UnityUnitTypes implements ContentList{
             ammoType = AmmoTypes.powerHigh;
             groundLayer = Layer.legUnit;
             outlineColor = UnityPal.darkOutline;
+
+            abilities.add(new LightningSpawnAbility(12, 24f, 3f, 0.05f, 160f, 96f, 200f));
+
+            BulletType energy = new BasicBulletType(5f, 20f, "shell"){
+                {
+                    width = 9f;
+                    height = 11f;
+                    shrinkY = 0.3f;
+                    lifetime = 24f;
+                    weaveScale = weaveMag = 3f;
+
+                    frontColor = Color.white;
+                    backColor = Pal.lancerLaser;
+                    shootEffect = Fx.lancerLaserShoot;
+                    smokeEffect = Fx.hitLancer;
+                    hitEffect = Fx.flakExplosion;
+
+                    splashDamage = 60f;
+                    splashDamageRadius = 10f;
+
+                    lightning = 3;
+                    lightningDamage = 12f;
+                    lightningColor = Pal.lancerLaser;
+                    lightningLength = 6;
+                }
+
+                @Override
+                public void init(Bullet b){
+                    b.data = new Trail(6);
+                }
+
+                @Override
+                public void update(Bullet b){
+                    super.update(b);
+                    if(b.data instanceof Trail t){
+                        t.update(b.x, b.y);
+                    }
+                }
+
+                @Override
+                public void draw(Bullet b){
+                    if(b.data instanceof Trail t){
+                        t.draw(backColor, width * 0.4f);
+                    }
+
+                    super.draw(b);
+                }
+            };
+
+            weapons.add(
+            new Weapon(name + "-mount"){{
+                x = 9f;
+                y = -11.5f;
+                shootY = 10f;
+
+                rotate = true;
+                rotateSpeed = 8f;
+
+                reload = 24f;
+                recoil = 6f;
+                shootSound = UnitySounds.energyBolt;
+
+                bullet = energy;
+            }},
+            new Weapon(name + "-mount"){{
+                x = 23.5f;
+                y = 5.5f;
+                shootY = 10f;
+
+                rotate = true;
+                rotateSpeed = 8f;
+
+                reload = 15f;
+                recoil = 6f;
+                shootSound = UnitySounds.energyBolt;
+
+                bullet = energy;
+            }},
+            new Weapon(name + "-gun"){{
+                x = 12.5f;
+                y = 12f;
+                shootY = 13.5f;
+
+                rotate = true;
+                rotateSpeed = 6f;
+                shots = 5;
+                shotDelay = 3f;
+
+                reload = 30f;
+                recoil = 8f;
+                shootSound = Sounds.shootBig;
+
+                bullet = new BasicBulletType(12.5f, 320f, "shell"){
+                    {
+                        width = 14f;
+                        height = 25f;
+                        shrinkY = 0.2f;
+                        lifetime = 24f;
+
+                        frontColor = Color.white;
+                        backColor = Pal.lancerLaser;
+                        shootEffect = Fx.lancerLaserShoot;
+                        smokeEffect = hitEffect = Fx.hitLancer;
+
+                        lightning = 3;
+                        lightningDamage = 12f;
+                        lightningColor = Pal.lancerLaser;
+                        lightningLength = 6;
+                    }
+
+                    @Override
+                    public void update(Bullet b){
+                        super.update(b);
+                        if(Mathf.chanceDelta(0.5f)){
+                            Lightning.create(b, backColor, lightningDamage, x, y, b.rotation(), lightningLength);
+                        }
+                    }
+                };
+            }}
+            );
         }};
 
         kami = new RainbowUnitType("kami-mkii"){{
