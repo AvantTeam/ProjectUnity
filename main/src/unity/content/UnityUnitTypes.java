@@ -1927,7 +1927,6 @@ public class UnityUnitTypes implements ContentList{
         //endregion
         //region monolith
 
-        //raw dps: 36
         stele = new UnityUnitType("stele"){{
             health = 150f;
             speed = 0.6f;
@@ -1993,7 +1992,6 @@ public class UnityUnitTypes implements ContentList{
             );
         }};
 
-        //raw dps: 108
         pedestal = new UnityUnitType("pedestal"){{
             health = 600;
             speed = 0.5f;
@@ -2016,7 +2014,7 @@ public class UnityUnitTypes implements ContentList{
 
                 reload = 40f;
                 recoil = 3.2f;
-                shootSound = Sounds.shootBig;
+                shootSound = UnitySounds.energyBolt;
 
                 BulletType subBullet = new LightningBulletType();
                 subBullet.damage = 12f;
@@ -2033,27 +2031,9 @@ public class UnityUnitTypes implements ContentList{
 
                     @Override
                     public void init(Bullet b){
-                        b.data = new Trail(12);
                         for(int i = 0; i < 3; i++){
                             subBullet.create(b, b.x, b.y, b.vel.angle());
                             Sounds.spark.at(b.x, b.y, Mathf.random(0.6f, 0.8f));
-                        }
-                    }
-
-                    @Override
-                    public void draw(Bullet b){
-                        if(b.data instanceof Trail t){
-                            t.draw(frontColor, width * 0.4f);
-                        }
-
-                        super.draw(b);
-                    }
-
-                    @Override
-                    public void update(Bullet b){
-                        super.update(b);
-                        if(b.data instanceof Trail t){
-                            t.update(b.x, b.y);
                         }
                     }
                 };
@@ -2061,7 +2041,6 @@ public class UnityUnitTypes implements ContentList{
             );
         }};
 
-        //raw dps: 228
         pilaster = new UnityUnitType("pilaster"){{
             health = 1000f;
             speed = 0.4f;
@@ -2114,7 +2093,6 @@ public class UnityUnitTypes implements ContentList{
             );
         }};
 
-        //raw dps: 302
         pylon = new UnityUnitType("pylon"){{
             health = 7200f;
             speed = 0.43f;
@@ -2145,7 +2123,7 @@ public class UnityUnitTypes implements ContentList{
                 shake = 15f;
                 shootY = 11f;
                 x = y = 0f;
-                reload = 420f;
+                reload = 280f;
                 recoil = 0f;
                 cooldownTime = 280f;
 
@@ -2166,7 +2144,7 @@ public class UnityUnitTypes implements ContentList{
                 rotateSpeed = 3.5f;
                 shootSound = Sounds.laser;
                 shake = 5f;
-                reload = 36f;
+                reload = 20f;
                 recoil = 4f;
 
                 bullet = UnityBullets.pylonLaserSmall;
@@ -2174,7 +2152,6 @@ public class UnityUnitTypes implements ContentList{
             );
         }};
 
-        //raw dps: 1680
         monument = new UnityUnitType("monument"){{
             health = 16000f;
             speed = 0.42f;
@@ -2250,7 +2227,6 @@ public class UnityUnitTypes implements ContentList{
             );
         }};
 
-        //raw dps: 2000
         colossus = new UnityUnitType("colossus"){{
             health = 30000f;
             speed = 0.4f;
@@ -2310,7 +2286,6 @@ public class UnityUnitTypes implements ContentList{
             );
         }};
 
-        //raw dps: 3720
         bastion = new UnityUnitType("bastion"){{
             health = 45000f;
             speed = 0.4f;
@@ -2343,7 +2318,7 @@ public class UnityUnitTypes implements ContentList{
                     width = 9f;
                     height = 11f;
                     shrinkY = 0.3f;
-                    lifetime = 24f;
+                    lifetime = 30f;
                     weaveScale = weaveMag = 3f;
 
                     frontColor = Color.white;
