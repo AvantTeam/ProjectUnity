@@ -1980,6 +1980,7 @@ public class UnityUnitTypes implements ContentList{
 
                     @Override
                     public void update(Bullet b){
+                        super.update(b);
                         if(b.data instanceof FixedTrail t){
                             t.update(b.x, b.y, b.rotation());
                         }

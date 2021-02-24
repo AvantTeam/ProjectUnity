@@ -1,19 +1,30 @@
 package unity.graphics;
 
-import arc.graphics.Color;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.math.geom.Vec3;
-import arc.struct.Seq;
-import arc.util.pooling.Pools;
+import arc.math.geom.*;
+import arc.struct.*;
+import arc.util.pooling.*;
+import arc.util.pooling.Pool.*;
 
-public class FixedTrail{
+public class FixedTrail implements Poolable{
     public int length;
-    private final Seq<Vec3> points;
+    private Seq<Vec3> points = new Seq<>();
 
     public FixedTrail(int length){
+        length(length);
+    }
+
+    public FixedTrail(){
+        length(0);
+    }
+
+    public FixedTrail length(int length){
         this.length = length;
-        points = new Seq<>(length);
+        points.setSize(length);
+
+        return this;
     }
 
     public void clear(){
@@ -41,6 +52,11 @@ public class FixedTrail{
             points.remove(0);
         }
 
-        points.add(Pools.obtain(Vec3.class, () -> new Vec3(x, y, -rotation * Mathf.degRad)));
+        points.add(Pools.obtain(Vec3.class, Vec3::new).set(x, y, -rotation * Mathf.degRad));
+    }
+
+    @Override
+    public void reset(){
+        clear();
     }
 }

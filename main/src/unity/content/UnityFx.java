@@ -1041,7 +1041,7 @@ public class UnityFx{
         Drawf.tri(e.x, e.y, 4f * e.fout(), 45f, (e.id * 57f - 90f) % 360f);
     }),
 
-    teleportPos = new Effect(48f, e -> {
+    teleportPos = new Effect(60f, e -> {
         if(e.data instanceof UnitType unit){
             blend(Blending.additive);
             alpha(e.fout());
