@@ -46,5 +46,6 @@ public class UnityPal{
         blueprintCol = valueOf("354654"),
 
         outline = Pal.darkerMetal,
-        darkOutline = valueOf("2e2c2c");
+        darkOutline = valueOf("38383d"),
+        darkerOutline = valueOf("2e2c2c");
 }
