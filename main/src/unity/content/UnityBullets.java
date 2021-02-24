@@ -40,8 +40,6 @@ public class UnityBullets implements ContentList{
 
         pylonLightning, pylonLaser, pylonLaserSmall, monumentRailBullet,
 
-        exporb,
-
         scarShrapnel, scarMissile,
 
         kamiBullet1, kamiLaser, kamiSmallLaser,
@@ -710,8 +708,6 @@ public class UnityBullets implements ContentList{
             length = 180f;
             width = 24f;
         }};
-
-        exporb = new ExpOrb();
 
         monumentRailBullet = new PointBulletType(){{
             damage = 1000;

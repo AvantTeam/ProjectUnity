@@ -3,6 +3,7 @@ package unity.logic;
 import mindustry.gen.*;
 import mindustry.logic.*;
 import mindustry.logic.LExecutor.*;
+import unity.entities.comp.ExpBuildc;
 import unity.world.blocks.*;
 
 public class ExpSenseI implements LInstruction{
@@ -16,28 +17,34 @@ public class ExpSenseI implements LInstruction{
     }
 
     @Override
-    public void run(LExecutor vm){
-        final int cont = this.cont.ordinal();
-        Object build = vm.obj(type);
-        if(!(build instanceof Building b)){
-            vm.setnum(res, 0);
-            return;
-        }
-        switch(cont){
-            case 0:
-                vm.setnum(res, (b instanceof ExpBuildBase expb) ? expb.totalExp() : 0);
-                break;
-            case 1:
-                //TODO
-                vm.setnum(res, (b instanceof ExpBuildFrame expb) ? expb.totalExp() : 0);
-                break;
-            case 2:
-                vm.setnum(res, (b.block instanceof ExpBlockBase expb) ? expb.expCapacity() : 0);
-                break;
-            case 3:
-                //TODO
-                vm.setnum(res, (b.block instanceof ExpBlockFrame expb) ? expb.getMaxLevel() : 0);
-                break;
+    public void run(LExecutor exec){
+        int i = cont.ordinal();
+        Object b = exec.obj(type);
+
+        if(b instanceof ExpBuildc build){
+            switch(i){
+                case 0: {
+                    exec.setnum(res, build.exp());
+                    break;
+                }
+
+                case 1: {
+                    exec.setnum(res, build.level());
+                    break;
+                }
+
+                case 2: {
+                    exec.setnum(res, build.expType().maxExp);
+                    break;
+                }
+
+                case 3: {
+                    exec.setnum(res, build.maxLevel());
+                    break;
+                }
+            }
+        }else{
+            exec.setnum(res, 0d);
         }
     }
 }

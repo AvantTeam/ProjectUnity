@@ -36,7 +36,6 @@ import unity.world.blocks.logic.*;
 import unity.world.blocks.power.*;
 import unity.world.blocks.production.*;
 import unity.world.blocks.sandbox.*;
-import unity.world.blocks.storage.*;
 import unity.world.blocks.units.*;
 import unity.world.consumers.*;
 import unity.world.draw.*;
@@ -91,7 +90,7 @@ public class UnityBlocks implements ContentList{
     
     daggerPad, novaPad, bufferPad, cachePad,
 
-    teleporter, teleunit, expOutput, expUnloader, expTank, expChest, expFountain, expVoid;
+    teleporter, teleunit; //expOutput, expUnloader, expTank, expChest, expFountain, expVoid;
 
     public static
     @ExpDef(type = ExpBlock.class)
@@ -917,46 +916,6 @@ public class UnityBlocks implements ContentList{
             ambientSound = Sounds.techloop;
             ambientSoundVolume = 0.02f;
             consumes.power(3f);
-        }};
-
-        expOutput = new ExpOutput("exp-output"){{
-            requirements(Category.effect, with(UnityItems.stone, 25, Items.copper, 25, Items.graphite, 10));
-            health = 60;
-            unloadAmount = 0.4f;
-            unloadTime = 20f;
-            consumes.power(0.06f);
-        }};
-
-        expUnloader = new ExpUnloader("exp-unloader"){{
-            requirements(Category.effect, with(Items.graphite, 25, Items.silicon, 25, UnityItems.steel, 25));
-            health = 80;
-            loadSides = true;
-            consumes.power(0.25f);
-        }};
-
-        expTank = new ExpStorageBlock("exp-tank"){{
-            requirements(Category.effect, with(Items.copper, 100, Items.graphite, 100, UnityItems.denseAlloy, 30));
-            size = 2;
-            health = 300;
-        }};
-
-        expChest = new ExpStorageBlock("exp-chest"){{
-            requirements(Category.effect, with(Items.copper, 400, UnityItems.steel, 250, Items.phaseFabric, 120));
-            size = 4;
-            health = 1200;
-            expCapacity = 3200;
-            lightRadius = 50f;
-            lightOpacity = 0.6f;
-        }};
-
-        expFountain = new ExpFountain("exp-fountain"){{
-            requirements(Category.effect, BuildVisibility.sandboxOnly, with());
-            health = 200;
-        }};
-
-        expVoid = new ExpVoid("exp-void"){{
-            requirements(Category.effect, BuildVisibility.sandboxOnly, with());
-            health = 200;
         }};
 
         laser = new ExpPowerTurret("laser-turret"){

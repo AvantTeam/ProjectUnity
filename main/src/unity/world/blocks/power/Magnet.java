@@ -5,7 +5,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.gen.*;
-import unity.entities.bullet.exp.*;
+import unity.entities.ExpOrbs.*;
 import unity.world.blocks.*;
 
 import static arc.Core.atlas;

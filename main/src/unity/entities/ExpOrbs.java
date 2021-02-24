@@ -44,7 +44,7 @@ public class ExpOrbs{
 
     //as private class can't be used in instanceof context, make this public if it is done.
     //it is needed in Magnet.java
-    private static class ExpOrb extends BulletType{
+    public static final class ExpOrb extends BulletType{
         {
             absorbable = false;
             damage = 8f;
@@ -66,6 +66,8 @@ public class ExpOrbs{
             shootEffect = Fx.none;
             //despawnEffect = expDespawn;
         }
+
+        private ExpOrb(){}
 
         @Override
         public void draw(Bullet b){
