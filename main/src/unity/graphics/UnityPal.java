@@ -1,6 +1,7 @@
 package unity.graphics;
 
-import arc.graphics.Color;
+import arc.graphics.*;
+import mindustry.graphics.*;
 
 import static arc.graphics.Color.*;
 
@@ -42,5 +43,8 @@ public class UnityPal{
 
         youngchaGray = valueOf("555555"),
 
-        blueprintCol = valueOf("354654");
+        blueprintCol = valueOf("354654"),
+
+        outline = Pal.darkerMetal,
+        darkOutline = valueOf("2e2c2c");
 }

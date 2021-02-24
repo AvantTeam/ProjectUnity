@@ -40,6 +40,7 @@ public class FixedTrail{
             Pools.free(points.first());
             points.remove(0);
         }
-        points.add(new Vec3(x, y, -rotation * Mathf.degRad));
+
+        points.add(Pools.obtain(Vec3.class, () -> new Vec3(x, y, -rotation * Mathf.degRad)));
     }
 }

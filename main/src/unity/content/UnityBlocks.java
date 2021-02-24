@@ -190,8 +190,11 @@ public class UnityBlocks implements ContentList{
             minTier = 6;
             upgrades.add(
                 new UnitType[]{UnitTypes.toxopid, UnityUnitTypes.projectSpiboss},
+
                 new UnitType[]{UnitTypes.corvus, UnityUnitTypes.ursa},
-                new UnitType[]{UnityUnitTypes.monument, UnityUnitTypes.colossus}
+
+                new UnitType[]{UnityUnitTypes.monument, UnityUnitTypes.colossus},
+                new UnitType[]{UnityUnitTypes.colossus, UnityUnitTypes.bastion}
             );
             otherUpgrades.add(new UnitType[]{UnityUnitTypes.projectSpiboss, UnityUnitTypes.arcaetana});
             consumes.power(5f);

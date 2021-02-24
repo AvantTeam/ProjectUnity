@@ -389,8 +389,6 @@ public class UnityUnitTypes implements ContentList{
             }
         }};
 
-        ((UnitFactory)Blocks.airFactory).plans.add(new UnitPlan(caelifera, 60f * 25, with(Items.silicon, 15, Items.titanium, 25)));
-
         angel = new UnityUnitType("angel"){{
             defaultController = UnitHealerAI::new;
             buildSpeed = 10f;
@@ -1028,8 +1026,6 @@ public class UnityUnitTypes implements ContentList{
             transformTime = 30f;
             weapons.add(craberNaval.weapons.get(0));
         }};
-
-        ((UnitFactory)Blocks.navalFactory).plans.add(new UnitPlan(amphibiNaval, 60f * 25f, with(Items.silicon, 15, Items.titanium, 25)));
 
         //endregion
         //region scar
@@ -1931,79 +1927,93 @@ public class UnityUnitTypes implements ContentList{
         //region monolith
 
         stele = new UnityUnitType("stele"){{
+            health = 200f;
             speed = 0.5f;
             hitSize = 8f;
-            health = 200;
+
             canBoost = true;
             boostMultiplier = 2.5f;
-            outlineColor = Pal.darkestGray;
+            outlineColor = UnityPal.darkOutline;
+
             weapons.add(new Weapon(name + "-shotgun"){{
                 top = false;
-                reload = 60f;
-                recoil = 2.5f;
                 x = 5.25f;
                 y = -0.25f;
+
+                reload = 60f;
+                recoil = 2.5f;
                 shots = 12;
+                shotDelay = 0f;
                 spacing = 0.3f;
                 inaccuracy = 0.5f;
                 velocityRnd = 0.2f;
-                shotDelay = 0f;
                 shootSound = Sounds.shootBig;
+
                 bullet = new BasicBulletType(3.5f, 3f){
                     {
-                        frontColor = Pal.lancerLaser;
-                        backColor = Pal.lancerLaser.cpy().mul(0.7f);
+                        lifetime = 60f;
                         width = height = 2f;
                         weaveScale = 3f;
                         weaveMag = 5f;
-                        homingPower = 1f;
-                        lifetime = 60f;
+                        homingPower = 0.8f;
+
                         shootEffect = Fx.hitLancer;
+                        frontColor = Pal.lancerLaser;
+                        backColor = Pal.lancerLaser.cpy().mul(0.7f);
                     }
 
                     @Override
                     public void init(Bullet b){
-                        b.data = new Trail(6);
+                        b.data = new FixedTrail(6);
                     }
 
                     @Override
                     public void draw(Bullet b){
-                        ((Trail)b.data).draw(frontColor, width);
-                        Draw.color(frontColor);
-                        Fill.circle(b.x, b.y, width);
-                        Draw.color();
+                        if(b.data instanceof FixedTrail t){
+                            t.draw(frontColor, width);
+
+                            Draw.color(frontColor);
+                            Fill.circle(b.x, b.y, width);
+                            Draw.color();
+                        }
                     }
 
                     @Override
                     public void update(Bullet b){
-                        super.update(b);
-                        ((Trail)b.data).update(b.x, b.y);
+                        if(b.data instanceof FixedTrail t){
+                            t.update(b.x, b.y, b.rotation());
+                        }
                     }
                 };
             }});
         }};
 
         pedestal = new UnityUnitType("pedestal"){{
-            speed = 0.42f;
-            hitSize = 11f;
             health = 600;
-            armor = 3.5f;
+            speed = 0.42f;
             rotateSpeed = 2.6f;
+            hitSize = 11f;
+            armor = 3.5f;
             singleTarget = true;
+
             canBoost = true;
             boostMultiplier = 2.5f;
             engineSize = 3.5f;
             engineOffset = 6f;
-            outlineColor = Pal.darkestGray;
+            outlineColor = UnityPal.darkOutline;
+
             weapons.add(new Weapon(name + "-gun"){{
                 top = false;
                 x = 10.75f;
                 y = 2.25f;
+
                 reload = 60f;
                 recoil = 3.2f;
                 shootSound = Sounds.shootBig;
+
                 BulletType subBullet = new LightningBulletType();
                 subBullet.damage = 10f;
+
                 bullet = new BasicBulletType(3f, 12f, "shell"){
                     {
                         width = 20f;
@@ -2026,55 +2036,61 @@ public class UnityUnitTypes implements ContentList{
         }};
 
         pilaster = new UnityUnitType("pilaster"){{
+            health = 1000f;
             speed = 0.3f;
-            hitSize = 26.5f;
-            health = 1000;
-            armor = 4f;
             rotateSpeed = 2.2f;
+            hitSize = 26.5f;
+            armor = 4f;
             mechFrontSway = 0.55f;
+
             canBoost = true;
             boostMultiplier = 2.5f;
             engineSize = 5f;
             engineOffset = 10f;
-            outlineColor = Pal.darkestGray;
+            outlineColor = UnityPal.darkOutline;
+
             weapons.add(new Weapon("unity-monolith-medium-weapon-mount"){{
-                rotate = true;
+                top = false;
                 x = 4f;
                 y = 7.5f;
                 shootY = 6f;
+
+                rotate = true;
                 recoil = 2.5f;
                 reload = 25f;
                 shots = 3;
                 spacing = 3f;
                 shootSound = Sounds.spark;
+
                 bullet = new LightningBulletType(){{
                     damage = 15f;
                     lightningLength = 15;
                 }};
             }}, new Weapon("unity-monolith-large-weapon-mount"){{
-                rotate = true;
-                rotateSpeed = 10f;
+                top = false;
                 x = 13f;
                 y = 2f;
                 shootY = 10.5f;
+
+                rotate = true;
+                rotateSpeed = 10f;
                 recoil = 3f;
                 reload = 40f;
                 shootSound = Sounds.laser;
+
                 bullet = new LaserBulletType(100f);
             }});
         }};
 
         pylon = new UnityUnitType("pylon"){{
-            speed = 0.28f;
-            hitSize = 36f;
             health = 7200f;
-            flying = false;
-            hovering = true;
-            armor = 7f;
+            speed = 0.28f;
             rotateSpeed = 1.48f;
-            ammoType = AmmoTypes.powerHigh;
+            hitSize = 36f;
+            armor = 7f;
+            commandLimit = 8;
 
-            allowLegStep = true;
+            allowLegStep = hovering = true;
             visualElevation = 0.2f;
             legCount = 4;
             legExtension = 8f;
@@ -2083,14 +2099,12 @@ public class UnityUnitTypes implements ContentList{
             legMoveSpace = 1.2f;
             legTrns = 0.5f;
             legBaseOffset = 11f;
-            groundLayer = Layer.legUnit;
 
-            outlineColor = Pal.darkestGray;
-            commandLimit = 8;
+            ammoType = AmmoTypes.powerHigh;
+            groundLayer = Layer.legUnit;
+            outlineColor = UnityPal.darkOutline;
 
             weapons.add(new Weapon("unity-pylon-laser"){{
-                shootSound = Sounds.laserblast;
-                chargeSound = Sounds.lasercharge;
                 soundPitchMin = 1f;
                 top = false;
                 mirror = false;
@@ -2103,17 +2117,20 @@ public class UnityUnitTypes implements ContentList{
 
                 shootStatusDuration = 60f * 1.8f;
                 shootStatus = StatusEffects.unmoving;
+                shootSound = Sounds.laserblast;
+                chargeSound = Sounds.lasercharge;
                 firstShotDelay = UnityFx.pylonLaserCharge.lifetime / 2f;
 
                 bullet = UnityBullets.pylonLaser;
             }}, new Weapon("unity-monolith-large2-weapon-mount"){{
+                x = 14f;
+                y = 5f;
+                shootY = 14f;
+
                 rotate = true;
                 rotateSpeed = 3.5f;
                 shootSound = Sounds.laser;
                 shake = 5f;
-                shootY = 14f;
-                x = 14f;
-                y = 5f;
                 reload = 60f;
                 recoil = 4f;
 
@@ -2122,12 +2139,13 @@ public class UnityUnitTypes implements ContentList{
         }};
 
         monument = new UnityUnitType("monument"){{
+            health = 16000f;
             speed = 0.25f;
             rotateSpeed = 1.4f;
-            health = 16000;
-            armor = 9f;
             hitSize = 48f;
-            ammoType = AmmoTypes.powerHigh;
+            armor = 9f;
+
+            visualElevation = 0.3f;
             allowLegStep = hovering = true;
             legCount = 6;
             legLength = 30f;
@@ -2139,48 +2157,64 @@ public class UnityUnitTypes implements ContentList{
             legPairOffset = 3f;
             legSplashDamage = 64f;
             legSplashRange = 48f;
-            visualElevation = 0.3f;
+
+            ammoType = AmmoTypes.powerHigh;
             groundLayer = Layer.legUnit;
-            outlineColor = Pal.darkestGray;
-            weapons.add(new Weapon("unity-monolith-railgun-big"){{
-                x = 0f;
-                y = 12f;
-                rotate = true;
-                rotateSpeed = 1.2f;
-                mirror = false;
-                shootY = 35f;
-                reload = 240f;
-                shootCone = 2f;
-                cooldownTime = 210f;
-                recoil = shake = 8f;
-                shadow = 30f;
-                shootSound = Sounds.railgun;
-                bullet = UnityBullets.monumentRailBullet;
-            }}, new Weapon("unity-monolith-large2-weapon-mount"){{
+            outlineColor = UnityPal.darkOutline;
+
+            BulletType laser = new LaserBulletType(140f);
+            weapons.add(new Weapon("unity-monolith-large2-weapon-mount"){{
+                top = false;
                 x = 14f;
                 y = 12f;
                 shootY = 14f;
+
                 rotate = true;
                 rotateSpeed = 3.5f;
                 reload = 48f;
                 recoil = shake = 5f;
                 shootSound = Sounds.laser;
-                bullet = new LaserBulletType(140f);
+
+                bullet = laser;
+            }}, new Weapon("unity-monolith-large2-weapon-mount"){{
+                top = false;
+                x = 20f;
+                y = 3f;
+                shootY = 14f;
+
+                rotate = true;
+                rotateSpeed = 3.5f;
+                reload = 60f;
+                recoil = shake = 5f;
+                shootSound = Sounds.laser;
+
+                bullet = laser;
+            }}, new Weapon("unity-monolith-railgun-big"){{
+                mirror = false;
+                x = 0f;
+                y = 12f;
+                shootY = 35f;
+                shadow = 30f;
+
+                rotate = true;
+                rotateSpeed = 1.2f;
+                reload = 240f;
+                recoil = shake = 8f;
+                shootCone = 2f;
+                cooldownTime = 210f;
+                shootSound = Sounds.railgun;
+
+                bullet = UnityBullets.monumentRailBullet;
             }});
-            Weapon laserGun2 = weapons.get(1).copy();
-            laserGun2.x = 20f;
-            laserGun2.y = 3f;
-            laserGun2.reload = 60f;
-            weapons.add(laserGun2);
         }};
 
         colossus = new UnityUnitType("colossus"){{
+            health = 30000f;
             speed = 0.22f;
             rotateSpeed = 1.2f;
-            health = 30000;
-            armor = 13f;
             hitSize = 64f;
-            ammoType = AmmoTypes.powerHigh;
+            armor = 13f;
+
             visualElevation = 0.5f;
             allowLegStep = hovering = true;
             legCount = 6;
@@ -2193,25 +2227,32 @@ public class UnityUnitTypes implements ContentList{
             legPairOffset = 3f;
             legSplashDamage = 84f;
             legSplashRange = 48f;
+
+            ammoType = AmmoTypes.powerHigh;
             groundLayer = Layer.legUnit;
-            outlineColor = Pal.darkestGray;
+            outlineColor = UnityPal.darkOutline;
+
             abilities.add(new LightningSpawnAbility());
+
             weapons.add(new Weapon(name + "-weapon"){{
                 top = false;
                 x = 30f;
                 y = 7.75f;
                 shootY = 20f;
+
                 reload = 60f;
+                recoil = 8f;
                 spacing = 1f;
                 inaccuracy = 6f;
                 shots = 5;
                 shotDelay = 3f;
-                recoil = 8f;
                 shootSound = Sounds.laser;
+
                 bullet = new LaserBulletType(280f){{
-                    lifetime = 32f;
                     width = 45f;
                     length = 280f;
+                    lifetime = 32f;
+
                     lightningSpacing = 35f;
                     lightningLength = 4;
                     lightningDelay = 1.5f;
@@ -2233,7 +2274,7 @@ public class UnityUnitTypes implements ContentList{
             visualElevation = 0.7f;
             allowLegStep = hovering = true;
             legCount = 6;
-            legLength = 64f;
+            legLength = 72f;
             legExtension = 16f;
             legSpeed = 0.12f;
             legTrns = 0.6f;
@@ -2245,7 +2286,7 @@ public class UnityUnitTypes implements ContentList{
 
             ammoType = AmmoTypes.powerHigh;
             groundLayer = Layer.legUnit;
-            outlineColor = Pal.darkestGray;
+            outlineColor = UnityPal.darkOutline;
         }};
 
         kami = new RainbowUnitType("kami-mkii"){{
@@ -2571,47 +2612,6 @@ public class UnityUnitTypes implements ContentList{
             }
         };
 
-        /*
-        setEntity("devourer", WormDefaultUnit::new);
-        devourer=new WormUnitType("devourer", 45) {{
-            
-        }};
-        */
-
         //endregion
-        //reconstructors    TODO should this be moved to OverWriter.java?
-
-        ((Reconstructor)Blocks.additiveReconstructor).upgrades.add(
-            //global
-            new UnitType[]{caelifera, schistocerca},
-            new UnitType[]{amphibiNaval, craberNaval},
-
-            //monolith
-            new UnitType[]{stele, pedestal}
-        );
-
-        ((Reconstructor)Blocks.multiplicativeReconstructor).upgrades.add(
-            //global
-            new UnitType[]{schistocerca, anthophila},
-
-            //monolith
-            new UnitType[]{pedestal, pilaster}
-        );
-
-        ((Reconstructor)Blocks.exponentialReconstructor).upgrades.add(
-            //global
-            new UnitType[]{anthophila, vespula},
-
-            //monolith
-            new UnitType[]{pilaster, pylon}
-        );
-
-        ((Reconstructor)Blocks.tetrativeReconstructor).upgrades.add(
-            //global
-            new UnitType[]{vespula, lepidoptera},
-
-            //monolith
-            new UnitType[]{pylon, monument}
-        );
     }
 }
