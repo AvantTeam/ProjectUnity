@@ -8,6 +8,7 @@ import arc.math.Interp.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.pooling.Pools;
 import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
@@ -30,6 +31,12 @@ public final class Utils{
     private static final Rect rect = new Rect(), rectAlt = new Rect(), hitRect = new Rect();
     private static Posc result;
     private static float cdist;
+    private static Point2[] dirs = new Point2[]{
+        new Point2(1, 0),
+        new Point2(0, 1),
+        new Point2(-1, 0),
+        new Point2(0, -1)
+    };
 
     public static <T extends Buildingc> Tile getBestTile(T build, int before, int after){
         Tile tile = build.tile();
@@ -101,6 +108,36 @@ public final class Utils{
         }
 
         return any;
+    }
+
+    public static SidePos getConnectSidePos(int index, int size, int rotation){
+        int side = Mathf.floor(index / size);
+        side = (side + rotation) % 4;
+
+        Point2 tangent = dirs[(side + 1) % 4];
+        int originx = 0;
+        int originy = 0;
+
+        if(size > 1){
+            originx += Mathf.floor(size / 2);
+            originy += Mathf.floor(size / 2);
+            originy -= (size - 1);
+            if(side > 0){
+                for(int i = 1; i <= side; i++){
+                    originx += dirs[i].x * (size - 1);
+                    originy += dirs[i].y * (size - 1);
+                }
+            }
+
+            originx += tangent.x * (index % size);
+            originy += tangent.y * (index % size);
+        }
+
+        return Pools.obtain(SidePos.class, SidePos::new).set(
+            Tmp.p1.set(originx, originy),
+            Tmp.p2.set(originx + dirs[side].x, originy + dirs[side].y),
+            side
+        );
     }
 
     public static float angleDistSigned(float a, float b){

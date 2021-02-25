@@ -175,9 +175,13 @@ public class UnityBlocks implements ContentList{
     public static @FactionDef(type = "end")
     Block terminalCrucible, endForge, endGame;
 
+    public static
+    @FactionDef(type = "youngcha")
+    @GraphDef(Heatg.class)
+    Block testGraph;
+
     @Override
     public void load(){
-        
         //region global
 
         recursiveReconstructor = new SelectableReconstructor("recursive-reconstructor"){{

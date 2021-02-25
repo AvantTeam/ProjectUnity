@@ -314,7 +314,7 @@ public class EntityProcessor extends BaseProcessor{
     protected ObjectMap<ExecutableElement, Seq<ExecutableElement>> getAppendedMethods(TypeElement base, TypeElement comp){
         ObjectMap<ExecutableElement, Seq<ExecutableElement>> appending = new ObjectMap<>();
         Seq<ExecutableElement> baseMethods = getMethodsRec(base);
-        Seq<ExecutableElement> toAppend = getMethods(comp).select(m ->
+        Seq<ExecutableElement> toAppend = methods(comp).select(m ->
             m.getModifiers().contains(Modifier.DEFAULT)
         );
 
@@ -346,7 +346,7 @@ public class EntityProcessor extends BaseProcessor{
 
     protected Seq<ExecutableElement> getGetters(TypeElement type){
         Seq<ExecutableElement> getters = new Seq<>();
-        getInterfaces(type).each(t -> getMethods(t).each(m ->
+        getInterfaces(type).each(t -> methods(t).each(m ->
             m.getReturnType().getKind() != VOID &&
             m.getParameters().isEmpty() &&
             !m.getModifiers().contains(Modifier.DEFAULT) &&
@@ -358,7 +358,7 @@ public class EntityProcessor extends BaseProcessor{
     }
 
     protected ExecutableElement getSetter(TypeElement type, ExecutableElement getter){
-        return getMethods(type).find(m ->
+        return methods(type).find(m ->
             m.getSimpleName().toString().equals(getter.getSimpleName().toString()) &&
             m.getReturnType().getKind() == VOID &&
             m.getParameters().size() == 1 &&
@@ -366,31 +366,16 @@ public class EntityProcessor extends BaseProcessor{
         );
     }
 
-    protected Seq<ExecutableElement> getMethods(TypeElement type){
-        return Seq.with(type.getEnclosedElements()).select(el -> el instanceof ExecutableElement).map(el -> (ExecutableElement)el);
-    }
-
     protected Seq<ExecutableElement> getMethodsRec(TypeElement type){
-        Seq<ExecutableElement> methods = getMethods(type);
+        Seq<ExecutableElement> methods = methods(type);
         getInterfaces(type).each(t -> 
-            getMethods(t).each(m ->
+        methods(t).each(m ->
                 !methods.contains(mm -> elementUtils.overrides(mm, m, type))
             ,
             methods::add)
         );
 
         return methods;
-    }
-
-    protected ExecutableElement getMethod(TypeElement type, String name, TypeMirror retType, List<? extends VariableElement> params){
-        return getMethods(type).find(m -> {
-            List<? extends VariableElement> realParams = m.getParameters();
-
-            return
-                m.getSimpleName().toString().equals(name) &&
-                m.getReturnType().equals(retType) &&
-                realParams.equals(params);
-        });
     }
 
     class EntityDefinition{

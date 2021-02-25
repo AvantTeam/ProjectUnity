@@ -11,7 +11,7 @@ public class Annotations{
     @Target(ElementType.FIELD)
     @Retention(RetentionPolicy.SOURCE)
     public @interface FactionDef{
-        /** @return The {@link Faction} */
+        /** @return The faction */
         String type();
     }
 
@@ -46,7 +46,7 @@ public class Annotations{
     @Target(ElementType.FIELD)
     @Retention(RetentionPolicy.SOURCE)
     public @interface MusicDef{
-        /** @return The {@link Faction} */
+        /** @return The faction */
         String facType();
 
         /**
@@ -70,13 +70,44 @@ public class Annotations{
     public @interface ExpBase{
     }
 
+    /** Wether this block class implements graph system */
+    @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface GraphComp{
+        /**
+         * @return Wether this is the base graph block class; every extensions will extend the class
+         * annotated with this assuming {@code base = true}.
+         * Only 1 class may use this.
+         */
+        boolean base() default false;
+    }
+
+    /** The graph interface */
+    @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface GraphInterface{}
+
+    /** Generates new types that implement graph system */
+    @Target(ElementType.FIELD)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface GraphDef{
+        /** @return The graph interfaces */
+        Class<?>[] value();
+    }
+
     // end region
     // region utilities
 
     /** Wether the field returned by this getter is meant to be read-only */
-    @Target(ElementType.METHOD)
+    @Target({ElementType.METHOD, ElementType.FIELD})
     @Retention(RetentionPolicy.SOURCE)
     public @interface ReadOnly{
+    }
+
+    /** Wether the field is "imported" from another class */
+    @Target(ElementType.FIELD)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface Import{
     }
 
     /** Wether this getter must be implemented by the type's subtypes */

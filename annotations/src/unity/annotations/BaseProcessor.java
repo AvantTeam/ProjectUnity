@@ -16,6 +16,7 @@ import javax.lang.model.util.*;
 import javax.tools.*;
 
 import com.squareup.javapoet.*;
+import com.sun.source.util.*;
 import com.sun.tools.javac.model.*;
 import com.sun.tools.javac.processing.*;
 
@@ -24,6 +25,7 @@ public abstract class BaseProcessor extends AbstractProcessor{
     public static final String packageName = "unity.gen";
 
     public static JavacElements elementUtils;
+    public static Trees treeUtils;
     public static Types typeUtils;
     public static Filer filer;
     public static Messager messager;
@@ -39,6 +41,7 @@ public abstract class BaseProcessor extends AbstractProcessor{
         JavacProcessingEnvironment javacProcessingEnv = (JavacProcessingEnvironment)processingEnv;
 
         elementUtils = javacProcessingEnv.getElementUtils();
+        treeUtils = Trees.instance(javacProcessingEnv);
         typeUtils = javacProcessingEnv.getTypeUtils();
         filer = javacProcessingEnv.getFiler();
         messager = javacProcessingEnv.getMessager();
@@ -136,6 +139,61 @@ public abstract class BaseProcessor extends AbstractProcessor{
 
     public String lnew(){
         return Character.toString('\n');
+    }
+
+    Seq<VariableElement> vars(TypeElement t){
+        return Seq.with(t.getEnclosedElements()).select(e -> e instanceof VariableElement).map(e -> (VariableElement)e);
+    }
+
+    Seq<ExecutableElement> methods(TypeElement t){
+        return Seq.with(t.getEnclosedElements()).select(e -> e instanceof ExecutableElement).map(e -> (ExecutableElement)e);
+    }
+
+    Seq<TypeElement> types(TypeElement t){
+        return Seq.with(t.getEnclosedElements()).select(e -> e instanceof TypeElement).map(e -> (TypeElement)e);
+    }
+
+    public String descString(VariableElement v){
+        return v.getEnclosingElement().toString() + "#" + v.getSimpleName().toString();
+    }
+
+    public String descString(ExecutableElement m){
+        return m.getEnclosingElement().toString() + "#" + m.getSimpleName().toString();
+    }
+
+    public boolean is(Element e, Modifier... modifiers){
+        for(Modifier m : modifiers){
+            if(e.getModifiers().contains(m)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isConstructor(ExecutableElement e){
+        return e.getSimpleName().toString().equals("<init>");
+    }
+
+    public String docs(Element e){
+        return elementUtils.getDocComment(e) == null ? "" : elementUtils.getDocComment(e);
+    }
+
+    ExecutableElement method(TypeElement type, String name, TypeMirror retType, List<? extends VariableElement> params){
+        return methods(type).find(m -> {
+            List<? extends VariableElement> realParams = m.getParameters();
+
+            return
+                m.getSimpleName().toString().equals(name) &&
+                typeUtils.isSameType(m.getReturnType(), retType) &&
+                realParams.equals(params);
+        });
+    }
+
+    VariableElement field(TypeElement type, String name, TypeMirror ftype){
+        return vars(type).find(f ->
+            f.getSimpleName().toString().equals(name) &&
+            typeUtils.isSameType(f.asType(), ftype)
+        );
     }
 
     @Override
