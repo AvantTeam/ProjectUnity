@@ -81,7 +81,7 @@ public class UnityUnitTypes implements ContentList{
     
     /** Koruh {@linkplain MechUnit mech} units */
     public static @FactionDef(type = "koruh") @EntityPoint(type = MechUnit.class)
-    UnitType buffer;
+    UnitType buffer, omega;
     
     /** Koruh {@linkplain UnitEntity flying} units */
     public static @FactionDef(type = "koruh") @EntityPoint(type = UnitEntity.class)
@@ -1757,7 +1757,7 @@ public class UnityUnitTypes implements ContentList{
             itemCapacity = 15;
             health = 150;
             buildSpeed = 0.9f;
-            //engineColor = Color.valueOf("d3ddff");
+            engineColor = Color.valueOf("d3ddff");
             canBoost = true;
             boostMultiplier = 1.5f;
             weapons.add(new Weapon("unity-buffer-shotgun"){{
@@ -1785,12 +1785,58 @@ public class UnityUnitTypes implements ContentList{
             }});
             abilities.add(new LightningBurstAbility(120f, 8, 8, 17f, 14, Pal.lancerLaser));
         }};
+
+        omega = new  UnityUnitType("omega"){{
+            mineTier = 2;
+            mineSpeed = 1.5f;
+            itemCapacity = 80;
+            speed = 0.36f;
+            canBoost = true;
+            boostMultiplier = 0.6f;
+            engineColor = Color.valueOf("feb380");
+            health = 350f;
+            buildSpeed = 1.5f;
+            weapons.add(new Weapon("unity-omega-cannon"){{
+                x = 1f;
+                y = 0f;
+                shootY = 1.5f;
+                recoil = 4f;
+                reload = 38f;
+                shots = 4;
+                spacing = 8f;
+                inaccuracy = 8f;
+                alternate = true;
+                ejectEffect = Fx.none;
+                shake = 3f;
+                shootSound = Sounds.shootBig;
+                bullet = new MissileBulletType(2.7f, 1f, "missile"){{
+                    width = height = 8f;
+                    shrinkX = shrinkY = 0f;
+                    drag = -0.003f;
+                    homingRange = 60f;
+                    keepVelocity = false;
+                    splashDamageRadius = 25f;
+                    splashDamage = 10f;
+                    lifetime = 120f;
+                    trailColor = Color.gray;
+                    backColor = Pal.bulletYellowBack;
+                    frontColor = Pal.bulletYellow;
+                    hitEffect = Fx.blastExplosion;
+                    despawnEffect = Fx.blastExplosion;
+                    weaveScale = 8f;
+                    weaveMag = 2f;
+                }};
+            }});
+            String armorRegion = "unity-omega-armor";
+            abilities.add(new ShootArmorAbility(50f, 0.06f, armorRegion));
+        }};
         
         cache = new UnityUnitType("cache"){{
             mineTier = -1;
             speed = 7f;
             drag = 0.001f;
             health = 560;
+            engineColor = Color.valueOf("d3ddff");
             flying = true;
             armor = 6f;
             accel = 0.02f;
@@ -1823,7 +1869,7 @@ public class UnityUnitTypes implements ContentList{
                     weaveMag = 2f;
                 }};
             }});
-            String shieldSprite = "unity-cache-shield";
+            String shieldSprite = name + "-shield";
             abilities.add(new MoveLightningAbility(10f, 14, 0.15f, 4f, 3.6f, 6f, Pal.lancerLaser, shieldSprite));
         }};
 

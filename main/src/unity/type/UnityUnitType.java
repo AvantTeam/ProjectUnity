@@ -52,6 +52,9 @@ public class UnityUnitType extends UnitType{
     public float rotorDeathSlowdown = 0.01f;
     public float fallRotateSpeed = 2.5f;
 
+    // mech apd units
+    public Color engineColor;
+    
     // legs extra
     protected static Vec2 legOffsetB = new Vec2();
 
@@ -303,6 +306,25 @@ public class UnityUnitType extends UnitType{
                 super.drawEngine(unit);
                 Draw.z(z);
             }
+        }else if(engineColor != null){
+            if(!unit.isFlying()) return;
+
+            float scale = unit.elevation;
+            float offset = engineOffset/2f + engineOffset/2f*scale;
+
+            Draw.color(engineColor);
+            Fill.circle(
+                unit.x + Angles.trnsx(unit.rotation + 180, offset),
+                unit.y + Angles.trnsy(unit.rotation + 180, offset),
+                (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f)) * scale
+            );
+            Draw.color(Color.white);
+            Fill.circle(
+                unit.x + Angles.trnsx(unit.rotation + 180, offset - 1f),
+                unit.y + Angles.trnsy(unit.rotation + 180, offset - 1f),
+                (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f)) / 2f  * scale
+            );
+            Draw.color();
         }else{
             super.drawEngine(unit);
         }
