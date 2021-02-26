@@ -48,16 +48,16 @@ public class ShootArmorAbility extends Ability{
         for(int i = 0; i < unit.mounts.length; i++){
             Weapon w = unit.mounts[i].weapon;
             if(w.mirror){
-                if(unit.type instanceof UnityUnitType type){
-                    float x = type.weaponXs.items[i];
-                    if(x > 0){
-                        w.x = x + spread * shootHeat;
-                    }else if(x < 0){
-                        w.x = x - spread * shootHeat;
+                try{
+                    if(unit.type instanceof UnityUnitType type){
+                        float x = type.weaponXs.items[i];
+                        if(x > 0){
+                            w.x = x + spread * shootHeat;
+                        }else if(x < 0){
+                            w.x = x - spread * shootHeat;
+                        }
                     }
-                }else{
-                    throw new IllegalStateException("Unit type for '" + unit.type.localizedName + "' is not an instance of 'UnityUnitType'!");
-                }
+                }catch(Throwable ignored){};
             }
         }
     }
