@@ -1760,6 +1760,7 @@ public class UnityUnitTypes implements ContentList{
             engineColor = Color.valueOf("d3ddff");
             canBoost = true;
             boostMultiplier = 1.5f;
+            landShake = 1f;
             weapons.add(new Weapon(name + "-shotgun"){{
                 top = false;
                 shake = 2f;
@@ -1796,7 +1797,9 @@ public class UnityUnitTypes implements ContentList{
             engineColor = Color.valueOf("feb380");
             health = 350f;
             buildSpeed = 1.5f;
+            landShake = 4f;
             weapons.add(new Weapon(name + "-cannon"){{
+                top = false;
                 x = 4f;
                 y = 0f;
                 shootX = 1f;
