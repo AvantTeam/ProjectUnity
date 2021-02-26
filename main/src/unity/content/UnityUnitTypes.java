@@ -1829,7 +1829,7 @@ public class UnityUnitTypes implements ContentList{
                 }};
             }});
             String armorRegion = name + "-armor";
-            abilities.add(new ShootArmorAbility(50f, 0.06f, 2f, armorRegion));
+            abilities.add(new ShootArmorAbility(50f, 0.06f, 2f, 0.5f, armorRegion));
         }};
         
         cache = new UnityUnitType("cache"){{

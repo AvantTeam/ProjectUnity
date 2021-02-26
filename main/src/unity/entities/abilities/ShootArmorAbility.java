@@ -16,7 +16,9 @@ public class ShootArmorAbility extends Ability{
     /** How much the shooter's amror increases */
     public float armorInc = 25f;
     /** How quickly the shield lerps */
-    public float speed = 0.06f;
+    public float warmup = 0.06f;
+    /** How much slower should the unit move (0 to 1) */
+    public float speedReduction = 0.5f;
     /** How much mirrored weapons shift away while active */
     public float spread = 2f;
     /** Sprite that appears when active */
@@ -27,19 +29,20 @@ public class ShootArmorAbility extends Ability{
 
     public ShootArmorAbility(){};
 
-    public ShootArmorAbility(float armorInc, float speed, float spread, String armorRegion){
+    public ShootArmorAbility(float armorInc, float warmup, float spread, float speedReduction, String armorRegion){
         this.armorInc = armorInc;
-        this.speed = speed;
+        this.warmup = warmup;
         this.spread = spread;
+        this.speedReduction = speedReduction;
         this.armorRegion = armorRegion;
     }
 
     @Override
     public void update(Unit unit)   {
-        shootHeat = Mathf.lerpDelta(shootHeat, unit.isShooting() ? 1f : 0f, speed);
+        shootHeat = Mathf.lerpDelta(shootHeat, unit.isShooting() ? 1f : 0f, warmup);
         unit.armor = unit.type.armor + armorInc * shootHeat;
 
-        float scl = 1f - shootHeat / 2f * Time.delta;
+        float scl = 1f - shootHeat * speedReduction * Time.delta;
         unit.vel.scl(scl);
 
         for(int i = 0; i < unit.mounts.length; i++){
