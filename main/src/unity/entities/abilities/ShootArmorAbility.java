@@ -37,7 +37,7 @@ public class ShootArmorAbility extends Ability{
         TextureRegion region = Core.atlas.find(armorRegion);
         if(shootHeat >= 0.01f && Core.atlas.isFound(region)){
             Draw.draw(Draw.z(), () -> {
-                Drawf.construct(unit.x, unit.y, region, unit.team.color, unit.rotation - 90f, 1, shootHeat, Time.time * 2 + unit.id());
+                Drawf.construct(unit.x, unit.y, region, unit.team.color, unit.rotation - 90f, shootHeat, 1, Time.time * 2 + unit.id());
             });
         }
     };

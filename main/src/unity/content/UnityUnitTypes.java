@@ -1763,9 +1763,9 @@ public class UnityUnitTypes implements ContentList{
             weapons.add(new Weapon("unity-buffer-shotgun"){{
                 top = false;
                 shake = 2f;
-                x = y = -1f;
-                shootY = 1f;
-                shootX = -0.125f;
+                x = 3f;
+                y = 0.5f;
+                shootX = 0f;
                 shootY = 3.5f;
                 reload = 55f;
                 shotDelay = 3f;
@@ -1797,9 +1797,10 @@ public class UnityUnitTypes implements ContentList{
             health = 350f;
             buildSpeed = 1.5f;
             weapons.add(new Weapon("unity-omega-cannon"){{
-                x = 1f;
+                x = 4f;
                 y = 0f;
-                shootY = 1.5f;
+                shootX = 1f;
+                shootY = 3f;
                 recoil = 4f;
                 reload = 38f;
                 shots = 4;
