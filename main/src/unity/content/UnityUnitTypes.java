@@ -2483,7 +2483,7 @@ public class UnityUnitTypes implements ContentList{
         }};
 
         kami = new RainbowUnitType("kami-mkii"){{
-            defaultController = KamiAI::new;
+            defaultController = EmptyAI::new;
             health = 120000f;
             speed = 15f;
             hitSize = 36f;

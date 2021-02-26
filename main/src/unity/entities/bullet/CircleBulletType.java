@@ -7,10 +7,9 @@ import arc.util.*;
 import mindustry.entities.bullet.*;
 import mindustry.game.*;
 import mindustry.gen.*;
-import unity.ai.KamiAI.*;
+import unity.ai.kami.KamiBulletDatas.*;
 import unity.entities.*;
 
-@SuppressWarnings({"unchecked", "rawtypes"})
 public class CircleBulletType extends BulletType{
     public Func<Bullet, Color> color = (Bullet b) -> Color.red;
 
@@ -22,23 +21,18 @@ public class CircleBulletType extends BulletType{
     @Override
     public void update(Bullet b){
         super.update(b);
-
-        if(b.data instanceof Cons c) c.get(b);
+        if(b.data instanceof KamiBulletData kd) kd.update(b);
     }
 
     @Override
     public void draw(Bullet b){
-        if(!(b.data instanceof KamiBulletData && ((KamiBulletData)b.data).hasDrawer())){
-            float z = Draw.z();
-            Draw.z(b.hitSize > 50f ? z - 0.001f : z);
-            Draw.color(color.get(b));
-            Fill.circle(b.x, b.y, b.hitSize + 1.5f);
-            Draw.color(Color.white);
-            Fill.circle(b.x, b.y, b.hitSize);
-            Draw.z(z);
-        }else{
-            ((KamiBulletData)b.data).draw(b);
-        }
+        float z = Draw.z();
+        Draw.z(b.hitSize > 50f ? z - 0.001f : z);
+        Draw.color(color.get(b));
+        Fill.circle(b.x, b.y, b.hitSize + 1.5f);
+        Draw.color(Color.white);
+        Fill.circle(b.x, b.y, b.hitSize);
+        Draw.z(z);
     }
 
     @Override

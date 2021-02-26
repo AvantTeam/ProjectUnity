@@ -1,28 +1,18 @@
 package unity.ai;
 
 import arc.func.*;
-import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
-import arc.util.pooling.*;
-import mindustry.entities.bullet.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
-import mindustry.io.*;
-import mindustry.net.Net.*;
-import mindustry.net.Packets.*;
 import unity.content.*;
 import unity.entities.units.KamiUnit;
 import unity.sync.*;
 import unity.type.*;
 
-import java.lang.reflect.*;
 import java.util.*;
-
-import static mindustry.Vars.*;
 
 public class KamiAI implements UnitController{
     public static int difficulty = 1;

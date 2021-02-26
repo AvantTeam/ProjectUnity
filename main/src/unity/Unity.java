@@ -9,6 +9,7 @@ import mindustry.mod.*;
 import mindustry.mod.Mods.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
+import unity.ai.kami.*;
 import unity.content.*;
 import unity.gen.*;
 import unity.mod.*;
@@ -42,6 +43,8 @@ public class Unity extends Mod{
 
     public Unity(){
         ContributorList.init();
+        KamiPatterns.load();
+        KamiBulletDatas.load();
 
         if(Core.assets != null){
             Core.assets.setLoader(WavefrontObject.class, new WavefrontObjectLoader(tree));
@@ -51,6 +54,7 @@ public class Unity extends Mod{
         if(!headless){
             Events.on(ContentInitEvent.class, e -> {
                 Regions.load();
+                KamiRegions.load();
             });
 
             Events.on(FileTreeInitEvent.class, e -> {
