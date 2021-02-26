@@ -38,7 +38,7 @@ public class ShootArmorAbility extends Ability{
     }
 
     @Override
-    public void update(Unit unit)   {
+    public void update(Unit unit){
         shootHeat = Mathf.lerpDelta(shootHeat, unit.isShooting() ? 1f : 0f, warmup);
         unit.armor = unit.type.armor + armorInc * shootHeat;
 
