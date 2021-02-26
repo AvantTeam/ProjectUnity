@@ -1925,6 +1925,8 @@ public class UnityBlocks implements ContentList{
             addGraph(new GraphHeat(120f, 0.05f, 0.02f).setAccept(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1));
         }};
 
+        testGraph = new Block("");
+
         //endregion
         //region advance
 
