@@ -1670,6 +1670,7 @@ public class UnityUnitTypes implements ContentList{
             flying = true;
             visualElevation = 0.8f;
             range = 210f;
+            outlineColor = UnityPal.darkerOutline;
             weapons.add(new Weapon(){{
                 x = 0f;
                 reload = 10f;
@@ -1713,6 +1714,7 @@ public class UnityUnitTypes implements ContentList{
             segmentLength = 25;
             segmentDamageScl = 8f;
             engineSize = -1f;
+            outlineColor = UnityPal.darkerOutline;
 
             weapons.add(new Weapon(){{
                 x = 0f;
@@ -2506,6 +2508,7 @@ public class UnityUnitTypes implements ContentList{
             circleTarget = false;
             engineOffset = 40f;
             engineSize = 6f;
+            outlineColor = UnityPal.darkerOutline;
 
             weapons.add(new Weapon(){{
                 mirror = false;
@@ -2566,6 +2569,7 @@ public class UnityUnitTypes implements ContentList{
             range = 480f;
             armor = 16f;
             omniMovement = false;
+            outlineColor = UnityPal.darkerOutline;
 
             BulletType t = new AntiCheatBasicBulletType(9.2f, 430f){{
                 hitSize = 8f;
@@ -2605,8 +2609,7 @@ public class UnityUnitTypes implements ContentList{
                     @Override
                     public void hitEntity(Bullet b, Hitboxc other, float initialHealth){
                         super.hitEntity(b, other, initialHealth);
-                        if(other instanceof Unit){
-                            Unit tmp = (Unit)other;
+                        if(other instanceof Unit tmp){
                             float threat = tmp.maxHealth + tmp.type.dpsEstimate;
                             if(Float.isInfinite(threat) || Float.isNaN(threat) || threat == Float.MAX_VALUE) UnityAntiCheat.annihilateEntity(other, false);
                         }
@@ -2734,6 +2737,7 @@ public class UnityUnitTypes implements ContentList{
 
             legSplashRange = 120f;
             legSplashDamage = 1600f;
+            outlineColor = UnityPal.darkerOutline;
 
             bottomWeapons.add("unity-ravager-nightmare");
             weapons.addAll(new Weapon("unity-ravager-nightmare"){{
