@@ -5,7 +5,6 @@ import arc.assets.loaders.*;
 import arc.assets.loaders.TextureLoader.*;
 import arc.files.*;
 import arc.graphics.*;
-import arc.graphics.g2d.*;
 import arc.graphics.g2d.TextureAtlas.*;
 import arc.graphics.g2d.TextureAtlas.TextureAtlasData.*;
 import arc.struct.*;
@@ -24,9 +23,9 @@ public class UnityTextureAtlasLoader extends SynchronousAssetLoader<UnityTexture
             page.texture = assetManager.get(page.textureFile.path().replaceAll("\\\\", "/"), Texture.class);
         }
 
-        TextureAtlas atlas = new TextureAtlas(data);
+        UnityTextureAtlas atlas = new UnityTextureAtlas(data);
         data = null;
-        return (UnityTextureAtlas)atlas;
+        return atlas;
     }
 
     @Override

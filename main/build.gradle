@@ -7,7 +7,7 @@ repositories{
 
 ext{
     assetsDir = new File(rootDir, "main/assets/")
-    atlasFile = new File(rootDir, "main/assets/sprites/unitysprites.atlas")
+    atlasFile = new File(rootDir, "main/assets/modsprites/unitysprites.atlas")
 }
 
 task deploy(type: Jar, dependsOn: configurations.runtimeClasspath){

@@ -10,7 +10,7 @@ ext{
 
     spritesGenFolder = "../main/assets-raw/sprites-gen/"
     spritesGenUIFolder = "../main/assets-raw/sprites-gen/ui/"
-    spritesAssetsFolder = "../main/assets/sprites/"
+    spritesAssetsFolder = "../main/assets/modsprites/"
 }
 
 task proc(dependsOn: [classes, configurations.runtimeClasspath]){

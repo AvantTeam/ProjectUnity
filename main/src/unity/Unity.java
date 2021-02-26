@@ -22,7 +22,7 @@ import unity.util.*;
 import static mindustry.Vars.*;
 
 @SuppressWarnings("unchecked")
-public class Unity extends Mod{
+public class Unity extends Mod implements ApplicationListener{
     public static MusicHandler musicHandler;
     public static TapHandler tapHandler;
     public static UnityAntiCheat antiCheat;
@@ -45,6 +45,9 @@ public class Unity extends Mod{
 
     public Unity(){
         ContributorList.init();
+        if(Core.app != null){
+            Core.app.addListener(this);
+        }
 
         if(Core.assets != null){
             Core.assets.setLoader(WavefrontObject.class, new WavefrontObjectLoader(tree));
@@ -60,10 +63,6 @@ public class Unity extends Mod{
                 UnityObjs.load();
                 UnitySounds.load();
                 UnityMusics.load();
-
-                Core.assets.setLoader(UnityTextureAtlas.class, new UnityTextureAtlasLoader(tree));
-                AssetDescriptor<UnityTextureAtlas> atlas = Core.assets.load("sprites/unitysprites.atlas", UnityTextureAtlas.class);
-                atlas.loaded = a -> a.merge(Core.atlas);
             });
 
             Events.on(ClientLoadEvent.class, e -> addCredits());
@@ -108,6 +107,24 @@ public class Unity extends Mod{
     }
 
     @Override
+    public void update(){
+        unity = mods.locateMod("unity");
+        if(unity != null){
+            Core.app.removeListener(this);
+            loadRegions();
+        }
+    }
+
+    private void loadRegions(){
+        Core.assets.setLoader(UnityTextureAtlas.class, new UnityTextureAtlasLoader(tree));
+
+        var atlas = new AssetDescriptor<>(unity.file, UnityTextureAtlas.class);
+        atlas.loaded = a -> a.merge(Core.atlas);
+
+        Core.assets.load(atlas);
+    }
+
+    @Override
     public void init(){
         enableConsole = true;
         musicHandler.setup();
@@ -115,7 +132,6 @@ public class Unity extends Mod{
         UnityCall.init();
 
         if(!headless){
-            unity = mods.locateMod("unity");
             Func<String, String> stringf = value -> Core.bundle.get("mod." + value);
 
             unity.meta.displayName = stringf.get(unity.meta.name + ".name");
@@ -174,7 +190,7 @@ public class Unity extends Mod{
 
     public static Class<?> forName(String canonical){
         try{
-            return Class.forName(canonical, true, ((Unity)unity.main).getClass().getClassLoader());
+            return Class.forName(canonical, true, unity.loader);
         }catch(Exception e){
             Log.err(e);
             return null;

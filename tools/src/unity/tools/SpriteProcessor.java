@@ -51,14 +51,15 @@ public class SpriteProcessor{
         content.setCurrentMod(null);
 
         Fi.get("./sprites/").walk(path -> {
-            if(!path.extEquals("png")) return;
-
-            path.copyTo(Fi.get("./sprites-gen"));
+            if(path.extEquals("png") || path.extEquals("json")){
+                path.copyTo(Fi.get("./sprites-gen"));
+            }
         });
 
         Fi.get("./sprites-gen/").walk(path -> {
-            String fname = path.nameWithoutExtension();
+            if(!path.extEquals("png")) return;
 
+            String fname = path.nameWithoutExtension();
             try{
                 BufferedImage sprite = ImageIO.read(path.file());
                 if(sprite == null) throw new IOException("sprite " + path.absolutePath() + " is corrupted or invalid!");
@@ -125,7 +126,7 @@ public class SpriteProcessor{
         Generators.generate();
 
         Fi.get("./sprites-gen/").walk(path -> {
-            if(path.absolutePath().contains("ui/")) return;
+            if(!path.extEquals("png") || path.absolutePath().contains("ui/")) return;
 
             try{
                 BufferedImage image = ImageIO.read(path.file());
@@ -140,7 +141,7 @@ public class SpriteProcessor{
 
         TexturePacker.process(
             "./sprites-gen/",
-            "../assets/sprites/",
+            "../assets/modsprites/",
             "unitysprites.atlas"
         );
 
