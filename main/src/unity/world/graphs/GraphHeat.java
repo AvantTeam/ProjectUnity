@@ -25,13 +25,13 @@ public class GraphHeat extends Graph{
         table.row().left();
         table.add("Heat system").color(Pal.accent).fillX().row();
         table.left();
-        table.add("[lightgray]" + bundle.get("stat.unity.heatCapacity") + ":[] ").left();
+        table.add("[lightgray]" + bundle.get("stat.unity.heatcapacity") + ":[] ").left();
         table.add(baseHeatCapacity + "K J/K").row();
         table.left();
-        table.add("[lightgray]" + bundle.get("stat.unity.heatConductivity") + ":[] ").left();
+        table.add("[lightgray]" + bundle.get("stat.unity.heatconductivity") + ":[] ").left();
         table.add(baseHeatConductivity + "W/mK").row();
         table.left();
-        table.add("[lightgray]" + bundle.get("stat.unity.heatRadiativity") + ":[] ").left();
+        table.add("[lightgray]" + bundle.get("stat.unity.heatradiativity") + ":[] ").left();
         table.add(baseHeatRadiativity * 1000f + "W/K");
         setStatsExt(table);
     }

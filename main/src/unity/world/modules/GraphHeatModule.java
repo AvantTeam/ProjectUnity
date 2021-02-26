@@ -36,7 +36,7 @@ public class GraphHeatModule extends GraphModule<GraphHeat, GraphHeatModule, Hea
     @Override
     void display(Table table){
         if(networks.get(0) == null) return;
-        String ps = Core.bundle.get("stat.unity.temperatureUnit");
+        String ps = Core.bundle.get("stat.unity.tempunit");
         table.row();
         table.table(sub -> {
             sub.clearChildren();

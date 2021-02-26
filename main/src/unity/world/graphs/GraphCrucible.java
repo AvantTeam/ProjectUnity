@@ -32,11 +32,11 @@ public class GraphCrucible extends Graph{
         table.add("Crucible system").color(Pal.accent).fillX();
         
         table.row().left();
-        table.add("[lightgray]" + bundle.get("stat.unity.liquidCapacity") + ":[] ").left();
+        table.add("[lightgray]" + bundle.get("stat.unity.liquidcapacity") + ":[] ").left();
         table.add(baseLiquidCapcity + " Units"); 
         
         table.row().left();
-        table.add("[lightgray]" + bundle.get("stat.unity.meltSpeed") + ":[] ").left();
+        table.add("[lightgray]" + bundle.get("stat.unity.meltspeed") + ":[] ").left();
             
             setStatsExt(table);
     }
