@@ -1760,7 +1760,7 @@ public class UnityUnitTypes implements ContentList{
             engineColor = Color.valueOf("d3ddff");
             canBoost = true;
             boostMultiplier = 1.5f;
-            weapons.add(new Weapon("unity-buffer-shotgun"){{
+            weapons.add(new Weapon(name + "-shotgun"){{
                 top = false;
                 shake = 2f;
                 x = 3f;
@@ -1796,7 +1796,7 @@ public class UnityUnitTypes implements ContentList{
             engineColor = Color.valueOf("feb380");
             health = 350f;
             buildSpeed = 1.5f;
-            weapons.add(new Weapon("unity-omega-cannon"){{
+            weapons.add(new Weapon(name + "-cannon"){{
                 x = 4f;
                 y = 0f;
                 shootX = 1f;
@@ -1810,7 +1810,7 @@ public class UnityUnitTypes implements ContentList{
                 ejectEffect = Fx.none;
                 shake = 3f;
                 shootSound = Sounds.shootBig;
-                bullet = new MissileBulletType(2.7f, 1f, "missile"){{
+                bullet = new MissileBulletType(2.7f, 12f, "missile"){{
                     width = height = 8f;
                     shrinkX = shrinkY = 0f;
                     drag = -0.003f;
@@ -1828,8 +1828,8 @@ public class UnityUnitTypes implements ContentList{
                     weaveMag = 2f;
                 }};
             }});
-            String armorRegion = "unity-omega-armor";
-            abilities.add(new ShootArmorAbility(50f, 0.06f, armorRegion));
+            String armorRegion = name + "-armor";
+            abilities.add(new ShootArmorAbility(50f, 0.06f, 2f, armorRegion));
         }};
         
         cache = new UnityUnitType("cache"){{

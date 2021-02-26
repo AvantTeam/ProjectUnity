@@ -9,12 +9,16 @@ import mindustry.entities.abilities.*;
 import mindustry.entities.comp.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.type.*;
+import unity.type.UnityUnitType;
 
 public class ShootArmorAbility extends Ability{
     /** How much the shooter's amror increases */
     public float armorInc = 25f;
     /** How quickly the shield lerps */
     public float speed = 0.06f;
+    /** How much mirrored weapons shift away while active */
+    public float spread = 2f;
     /** Sprite that appears when active */
     public String armorRegion = "error";
 
@@ -23,9 +27,10 @@ public class ShootArmorAbility extends Ability{
 
     public ShootArmorAbility(){};
 
-    public ShootArmorAbility(float armorInc, float speed, String armorRegion){
+    public ShootArmorAbility(float armorInc, float speed, float spread, String armorRegion){
         this.armorInc = armorInc;
         this.speed = speed;
+        this.spread = spread;
         this.armorRegion = armorRegion;
     }
 
@@ -33,6 +38,25 @@ public class ShootArmorAbility extends Ability{
     public void update(Unit unit)   {
         shootHeat = Mathf.lerpDelta(shootHeat, unit.isShooting() ? 1f : 0f, speed);
         unit.armor = unit.type.armor + armorInc * shootHeat;
+
+        float scl = 1f - shootHeat / 2f * Time.delta;
+        unit.vel.scl(scl);
+
+        for(int i = 0; i < unit.mounts.length; i++){
+            Weapon w = unit.mounts[i].weapon;
+            if(w.mirror){
+                if(unit.type instanceof UnityUnitType type){
+                    float x = type.weaponXs.items[i];
+                    if(x > 0){
+                        w.x = x + spread * shootHeat;
+                    }else if(x < 0){
+                        w.x = x - spread * shootHeat;
+                    }
+                }else{
+                    throw new IllegalStateException("Unit type for '" + unit.type.localizedName + "' is not an instance of 'UnityUnitType'!");
+                }
+            }
+        }
     }
 
     @Override
