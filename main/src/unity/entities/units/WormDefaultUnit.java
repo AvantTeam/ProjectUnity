@@ -237,7 +237,7 @@ public class WormDefaultUnit extends UnitEntity{
     }*/
 
     public void handleCollision(Hitboxc originUnit, Hitboxc other, float x, float y){
-        if(controller instanceof AdvanceWormAI f && other instanceof Bullet b){
+        if(controller instanceof WormAI f && other instanceof Bullet b){
             float damage = Utils.getBulletDamage(b.type);
             f.setTarget(b.x, b.y, damage);
         }

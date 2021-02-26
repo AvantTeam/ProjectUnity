@@ -105,11 +105,6 @@ public class IconGenerator implements Generator{
                     }
                 }
 
-                if(unit instanceof Wormc){
-                    outlSeparate.get("outline", type.bodyRegion);
-                    outlSeparate.get("outline", type.tailRegion);
-                }
-
                 for(TextureRegion reg : type.abilityRegions){
                     String fname = parseName.get(reg);
                     if(outlined.add(fname) && SpriteProcessor.has(fname)){

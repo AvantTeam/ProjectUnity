@@ -1,5 +1,4 @@
 sourceSets.main.java.srcDirs = ["src/", "$buildDir/generated/sources/annotationProcessor/java/main/"]
-sourceSets.main.resources.srcDirs = ["assets/"]
 
 repositories{
     mavenCentral()
@@ -7,34 +6,66 @@ repositories{
 }
 
 ext{
-    sdkRoot = System.getenv("ANDROID_HOME")
-    sdkVersion = "30.0.1"
+    assetsDir = new File(rootDir, "main/assets/")
+    atlasFile = new File(rootDir, "main/assets/sprites/unitysprites.atlas")
+}
 
-    doExec = {cmd ->
-        def proc = cmd.execute(null, new File("$buildDir/libs"))
-        proc.waitForProcessOutput(System.out, System.err)
+task deploy(type: Jar, dependsOn: configurations.runtimeClasspath){
+    archiveFileName = "${modName}Desktop.jar"
+
+    from files(sourceSets.main.output.classesDirs)
+    from files(sourceSets.main.output.resourcesDir)
+    from{
+        configurations.runtimeClasspath.collect{
+            it.isDirectory()
+            ?   it
+            :   zipTree(it)
+        }
+    }
+    from files(project.assetsDir)
+
+    doLast{
+        delete{ delete "$buildDir/libs/main-${version}.jar" }
     }
 }
 
 task dex{
+    dependsOn deploy
+
     doLast{
-        if(System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')){
-            doExec("cmd /c dx --dex --keep-classes --min-sdk-version=30 --output=${modName}Android.jar ${modName}Desktop.jar")
-        }else{
-            doExec("dx --dex --keep-classes --min-sdk-version=30 --output=${modName}Android.jar ${modName}Desktop.jar")
+        exec{
+            workingDir = "$buildDir/libs/"
+            def command = ["d8", "--min-api", "15", "--output", "${modName}Dexed.jar", "${modName}Desktop.jar"]
+
+            if(System.getProperty("os.name").toLowerCase(Locale.ROOT).contains("windows")){
+                commandLine("cmd", "/c", *command)
+            }else{
+                commandLine(*command)
+            }
         }
     }
 }
 
-jar{
-    archiveFileName = "${modName}Desktop.jar"
+task deployDex(type: Jar){
+    dependsOn deploy, dex
 
-    from{
-        configurations.runtimeClasspath.collect{it.isDirectory() ? it : zipTree(it)}
+    archiveFileName = "${modName}.jar"
+
+    from{[
+        zipTree("$buildDir/libs/${modName}Desktop.jar"),
+        zipTree("$buildDir/libs/${modName}Dexed.jar")
+    ]}
+
+    doLast{
+        delete{ delete "$buildDir/libs/${modName}Desktop.jar" }
+        delete{ delete "$buildDir/libs/${modName}Dexed.jar" }
     }
 }
 
-task deploy(dependsOn: [jar, dex])
+if(!atlasFile.exists()){
+    println "${atlasFile.absolutePath} not found; automatically packing sprites"
+    deploy.dependsOn ":tools:proc"
+}
 
 dependencies{
     compileOnly "com.github.Anuken.Arc:arc-core:$mindustryVersion"

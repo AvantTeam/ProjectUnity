@@ -22,7 +22,6 @@ import static mindustry.Vars.*;
 public class SpriteProcessor{
     static ObjectMap<String, TextureRegion> regionCache = new ObjectMap<>();
     static ObjectMap<String, BufferedImage> spriteCache = new ObjectMap<>();
-    static ColorBleedEffect bleeder = new ColorBleedEffect();
 
     public static Unity mod;
 
@@ -51,13 +50,13 @@ public class SpriteProcessor{
 
         content.setCurrentMod(null);
 
-        Fi.get("./sprites").walk(path -> {
+        Fi.get("./sprites/").walk(path -> {
             if(!path.extEquals("png")) return;
 
             path.copyTo(Fi.get("./sprites-gen"));
         });
 
-        Fi.get("./sprites-gen").walk(path -> {
+        Fi.get("./sprites-gen/").walk(path -> {
             String fname = path.nameWithoutExtension();
 
             try{
@@ -125,20 +124,25 @@ public class SpriteProcessor{
 
         Generators.generate();
 
-        Fi.get("./sprites-gen").walk(path -> {
+        Fi.get("./sprites-gen/").walk(path -> {
             if(path.absolutePath().contains("ui/")) return;
 
             try{
                 BufferedImage image = ImageIO.read(path.file());
 
                 Sprite sprite = new Sprite(image);
-                sprite.alphaBleed(2).antialias();
-
+                sprite.antialias();
                 sprite.save(path.nameWithoutExtension());
             }catch(IOException e){
                 throw new RuntimeException(e);
             }
         });
+
+        TexturePacker.process(
+            "./sprites-gen/",
+            "../assets/sprites/",
+            "unitysprites.atlas"
+        );
 
         Sprite.dispose();
     }

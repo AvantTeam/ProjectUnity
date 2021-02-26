@@ -209,12 +209,6 @@ public class Sprite{
         return out;
     }
 
-    Sprite alphaBleed(int maxIterations){
-        sprite = SpriteProcessor.bleeder.processImage(sprite, maxIterations);
-
-        return this;
-    }
-
     void save(String name){
         try{
             ImageIO.write(sprite, "png", Fi.get("./sprites-gen").child(name + ".png").file());

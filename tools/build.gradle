@@ -22,6 +22,7 @@ task proc(dependsOn: [classes, configurations.runtimeClasspath]){
 
         file("$spritesGenFolder").mkdirs()
         file("$spritesGenUIFolder").mkdirs()
+        file("$spritesAssetsFolder").mkdirs()
 
         javaexec{
             main = imageProcessorMain
@@ -29,13 +30,6 @@ task proc(dependsOn: [classes, configurations.runtimeClasspath]){
             jvmArgs("-Djava.awt.headless=true")
             standardInput = System.in
             workingDir = "../main/assets-raw/"
-        }
-
-        file("$spritesAssetsFolder").mkdirs()
-
-        copy{
-            from "$spritesGenFolder"
-            into "$spritesAssetsFolder"
         }
     }
 }

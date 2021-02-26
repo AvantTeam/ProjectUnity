@@ -1,6 +1,7 @@
 package unity;
 
 import arc.*;
+import arc.assets.*;
 import arc.func.*;
 import arc.scene.*;
 import arc.struct.Seq;
@@ -11,6 +12,7 @@ import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import unity.content.*;
 import unity.gen.*;
+import unity.graphics.g2d.*;
 import unity.mod.*;
 import unity.sync.*;
 import unity.ui.*;
@@ -19,6 +21,7 @@ import unity.util.*;
 
 import static mindustry.Vars.*;
 
+@SuppressWarnings("unchecked")
 public class Unity extends Mod{
     public static MusicHandler musicHandler;
     public static TapHandler tapHandler;
@@ -57,6 +60,10 @@ public class Unity extends Mod{
                 UnityObjs.load();
                 UnitySounds.load();
                 UnityMusics.load();
+
+                Core.assets.setLoader(UnityTextureAtlas.class, new UnityTextureAtlasLoader(tree));
+                AssetDescriptor<UnityTextureAtlas> atlas = Core.assets.load("sprites/unitysprites.atlas", UnityTextureAtlas.class);
+                atlas.loaded = a -> a.merge(Core.atlas);
             });
 
             Events.on(ClientLoadEvent.class, e -> addCredits());
