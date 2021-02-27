@@ -110,6 +110,12 @@ public class WormSegmentUnit extends UnitEntity{
     }
 
     @Override
+    public boolean isAI(){
+        if(trueParentUnit == null) return true;
+        return trueParentUnit.controller instanceof AIController;
+    }
+
+    @Override
     public Player getPlayer(){
         if(trueParentUnit == null) return null;
         return isPlayer() ? (Player)trueParentUnit.controller : null;

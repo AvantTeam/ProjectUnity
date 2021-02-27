@@ -126,10 +126,12 @@ public class AttractLaserTurret extends LaserTurret{
         protected void attractUnits(){
             Units.nearby(x - range() * 2f, y - range() * 2f, range() * 4f, range() * 4f, unit -> {
                 if(!unit.dead() && unit.within(x, y, range() * 2f)){
+                    float dst = unit.dst(this);
+                    float strength = Mathf.clamp(((range() * 2f) - dst) / (range() * 2f)) * Mathf.clamp(dst / (range() / 2f));
                     Tmp.v1.set(x - unit.x, y - unit.y)
                         .rotate(10f * (1f - charge))
                         .setLength(attractionStrength * charge * Time.delta)
-                        .scl(unit.dst(this) / range() / 2);
+                        .scl(strength);
 
                     unit.vel.add(Tmp.v1);
                 }
