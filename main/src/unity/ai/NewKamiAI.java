@@ -8,6 +8,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import unity.ai.kami.*;
 import unity.ai.kami.KamiPatterns.*;
 import unity.entities.units.*;
@@ -71,6 +72,7 @@ public class NewKamiAI implements UnitController, Position{
             Lines.stroke(3f * drawIn);
             Lines.circle(getX(), getY(), (1f - (patternTime / pattern.time)) * 240f);
         }
+        Draw.z(Layer.flyingUnitLow);
         if(pattern != null) pattern.draw(this);
         Draw.blend();
     }

@@ -96,7 +96,7 @@ public class KamiPatterns{
 
         //Atomic Fire "Nuclear Fusion"
         addPattern(new KamiPattern(){{
-            time = 10f * 60f;
+            time = 20f * 60f;
             maxDamage = 1000f;
             drawer = utsuhoDrawer;
             init = ai -> ai.kami().laserRotation = -1f;
@@ -104,7 +104,7 @@ public class KamiPatterns{
                 new KamiPatternStage(2f * 60f, ai -> {
                     int diff = 6 + Mathf.clamp(ai.difficulty, 0, 2);
                     float angleRand = Mathf.random(0f, 360f);
-                    float offset = 180f / diff;
+                    float offset = Mathf.random(45f);
                     for(int i = 0; i < diff; i++){
                         float angle = (i * (360f / diff)) + angleRand;
                         Bullet b = UnityBullets.kamiBullet1.create(ai.unit, ai.unit.team, ai.getX(), ai.getY(), angle, 0.3f + Mathf.range(0.1f), 1f / 0.3f);
@@ -134,6 +134,33 @@ public class KamiPatterns{
                             }
                         }
                         ai.reloads[1] += 2f;
+                        ai.reloads[0] = 0f;
+                    }
+                    ai.reloads[0] += Time.delta;
+                })
+            };
+        }}, 1);
+
+        //Explosion Sign "Mega Flare"
+        addPattern(new KamiPattern(){{
+            time = 20f * 60f;
+            maxDamage = 1000f;
+            drawer = utsuhoDrawer;
+            stages = new KamiPatternStage[]{
+                new KamiPatternStage(20f * 60f, ai -> {
+                    float diffReload = 30 - Mathf.clamp(ai.difficulty * 3f, 0f, 15f);
+                    int diff = 10 + Mathf.clamp(ai.difficulty * 2, 0, 8);
+                    if(ai.reloads[0] >= diffReload){
+                        tVec.trns(ai.relativeRotation - 90f, Mathf.range(150f * 2f), Mathf.range(20f)).add(ai);
+                        Bullet b = UnityBullets.kamiBullet1.create(ai.unit, ai.unit.team, tVec.x, tVec.y, ai.relativeRotation + 180f);
+                        b.vel.scl(0.8f);
+                        KamiBulletDatas.get(b, KamiBulletDatas.expandShrink);
+                        float offAng = Mathf.range(45f);
+                        for(int i = 0; i < diff; i++){
+                            float angle = (i * (360f / diff)) + offAng;
+                            Bullet c = UnityBullets.kamiBullet1.create(ai.unit, tVec.x, tVec.y, angle);
+                            c.hitSize = 7f;
+                        }
                         ai.reloads[0] = 0f;
                     }
                     ai.reloads[0] += Time.delta;
