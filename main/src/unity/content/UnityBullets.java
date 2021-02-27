@@ -25,10 +25,11 @@ import unity.graphics.*;
 import unity.util.*;
 
 import static mindustry.Vars.*;
+import static unity.content.UnityStatusEffects.distort;
 
 public class UnityBullets implements ContentList{
     public static BulletType
-        laser, shardLaserFrag, shardLaser, frostLaser, branchLaserFrag, branchLaser, kelvinWaterLaser,
+        laser, shardLaserFrag, shardLaser, frostLaser, branchLaserFrag, branchLaser, distField, fractalLaser, kelvinWaterLaser,
         kelvinSlagLaser, kelvinOilLaser, kelvinCryofluidLaser, kelvinLiquidLaser, celsiusSmoke, kelvinSmoke,
         breakthroughLaser,
 
@@ -269,6 +270,38 @@ public class UnityBullets implements ContentList{
                 Effect.shake(hitShake, hitShake, b);
             }
         };
+
+        distField = new DistFieldBulletType(0, -1){{
+            centerColor = Pal.lancerLaser.cpy().a(0);
+            edgeColor = Pal.place;
+            distSplashFx = UnityFx.distSplashFx;
+            distStart = UnityFx.distStart;
+            distStatus = distort;
+            fieldRadius = 85;
+
+            lifetime = 10 * 60;
+            collidesTiles = false;
+            collides = false;
+            collidesAir = false;
+            keepVelocity = false;
+
+            bulletSlowMultiplier = 0.94f; //nerfed
+            expGain = 0.01f; // 0.6 exp per sec for unit. 0.05 exp per sec for one bullet
+            damageLimit = 200f; //too strong damage cannot be slow
+            distDamage = 0.1f; //6 damage per sec
+        }};
+
+        fractalLaser = new ExpLaserFieldBulletType(170f, 130f){{
+            damageInc = 6f;
+            lengthInc = 2f;
+            hitUnitExpGain = hitBuildingExpGain = 1f;
+            fromColor = Pal.lancerLaser.cpy().lerp(Pal.place, 0.5f);
+            toColor = Pal.place;
+            maxRange = 150f + 2f * 30f; //Account for range increase
+
+            distField = UnityBullets.distField;
+            basicFieldRadius = 85;
+        }};
 
         kelvinWaterLaser = new ExpLaserBulletType(170f, 130f){{
             damageInc = 7f;

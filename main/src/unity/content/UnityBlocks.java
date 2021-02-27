@@ -22,6 +22,7 @@ import mindustry.ctype.*;
 import mindustry.content.*;
 import unity.annotations.Annotations.*;
 import unity.entities.bullet.*;
+import unity.entities.bullet.exp.ExpLaserFieldBulletType;
 import unity.gen.*;
 import unity.graphics.*;
 import unity.type.ExpType.*;
@@ -972,7 +973,7 @@ public class UnityBlocks implements ContentList{
 
         laserCharge = new ExpPowerChargeTurret("charge-laser-turret"){
             {
-                requirements(Category.turret, with(Items.copper, 190, Items.silicon, 110, Items.titanium, 15));
+                category = Category.turret;
                 size = 2;
                 health = 1400;
 
@@ -1014,7 +1015,7 @@ public class UnityBlocks implements ContentList{
                 block.maxExp = block.requiredExp(block.maxLevel);
 
                 block.addUpgrade(laserBranch, 15);
-                //block.addUpgrade(laserFractal, 15);
+                block.addUpgrade(laserFractal, 15);
                 block.addUpgrade(laserBreakthrough, 30);
 
                 block.addField(ExpFieldType.linear, ReloadTurret.class, "reloadTime", reloadTime, -1f);
@@ -1027,7 +1028,7 @@ public class UnityBlocks implements ContentList{
 
         laserFrost = new ExpLiquidTurret("frost-laser-turret"){
             {
-                requirements(Category.turret, with(Items.copper, 190, Items.silicon, 110, Items.titanium, 15));
+                category = Category.turret;
                 size = 2;
                 health = 1000;
 
@@ -1062,12 +1063,68 @@ public class UnityBlocks implements ContentList{
             }
         };
 
-        //TODO SK MAKE IDEAS NOW
-        laserFractal = new ExpPowerTurret("fractal-laser-turret");
+        //TODO SK MAKE SPRITES NOW
+        laserFractal = new ExpPowerFieldTurret("fractal-laser-turret"){
+            {
+                category = Category.turret;
+                size = 3;
+                health = 2000;
+
+                reloadTime = UnityBullets.distField.lifetime / 3f;
+                coolantMultiplier = 2f;
+                range = 140f;
+                chargeTime = 50f;
+                chargeMaxDelay = 40f;
+                chargeEffects = 5;
+                recoilAmount = 4f;
+                cooldown = 0.03f;
+                targetAir = true;
+                shootShake = 5f;
+
+                powerUse = 13f;
+
+                shootEffect = UnityFx.laserChargeShoot;
+                smokeEffect = Fx.none;
+                chargeEffect = UnityFx.laserCharge;
+                chargeBeginEffect = UnityFx.laserChargeBegin;
+                heatColor = Color.red;
+                shootSound = Sounds.laser;
+                fromColor = Pal.lancerLaser.cpy().lerp(Pal.sapBullet, 0.5f);
+                toColor = Pal.place;
+                shootType = UnityBullets.fractalLaser;
+                buildVisibility = BuildVisibility.sandboxOnly;
+
+                rangeInc = 0.35f * 8f;
+
+                basicFieldRadius = 85;
+            }
+
+            @Override
+            public void init(){
+                super.init();
+
+                ExpBlock block = ExpMeta.map(this);
+                block.hasExp = true;
+                block.condConfig = true;
+                block.enableUpgrade = true;
+
+                block.maxLevel = 30;
+                block.maxExp = block.requiredExp(block.maxLevel);
+
+                block.addField(ExpFieldType.linear, ReloadTurret.class, "reloadTime", reloadTime, -2f);
+                block.addField(ExpFieldType.linear, BaseTurret.class, "range", range, 0.35f * 8f);
+                block.addField(ExpFieldType.linear, ExpPowerFieldTurret.class, "basicFieldRadius", basicFieldRadius, 0.2f * 8f);
+
+                block.setupFields();
+                block.init();
+                block.setStats();
+            }
+        };
 
         laserBranch = new ExpPowerChargeTurret("swarm-laser-turret"){
             {
-                requirements(Category.turret, with(Items.copper, 190, Items.silicon, 110, Items.titanium, 15));
+                category = Category.turret;
+
                 size = 3;
                 health = 2400;
                 
@@ -1124,7 +1181,7 @@ public class UnityBlocks implements ContentList{
 
         laserKelvin = new ExpKelvinTurret("kelvin-laser-turret"){
             {
-                requirements(Category.turret, with(Items.copper, 190, Items.silicon, 110, Items.titanium, 15));
+                category = Category.turret;
                 size = 3;
                 health = 2100;
 
@@ -1159,7 +1216,7 @@ public class UnityBlocks implements ContentList{
 
         laserBreakthrough = new ExpPowerChargeTurret("bt-laser-turret"){
             {
-                requirements(Category.turret, with(Items.copper, 190, Items.silicon, 110, Items.titanium, 15));
+                category = Category.turret;
                 size = 4;
                 health = 2800;
 
