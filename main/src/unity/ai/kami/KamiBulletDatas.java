@@ -19,10 +19,10 @@ public class KamiBulletDatas{
         ));
 
         expandShrink = addData(b -> new KamiBulletData(b.rotation(),
-            new DataStage(10f, (data, bl) -> bl.hitSize = (Mathf.clamp(data.time / 10f) * 100f) + 10f),
+            new DataStage(10f, (data, bl) -> bl.hitSize = (Mathf.clamp(data.time / 10f) * 110f) + 10f),
             new DataStage(210f, (data, bl) -> {
                 float fout = Mathf.clamp(1f - (data.time / 210f));
-                bl.hitSize = (fout * 100f) + 10f;
+                bl.hitSize = (fout * 110f) + 10f;
             })
         ));
     }
@@ -40,7 +40,7 @@ public class KamiBulletDatas{
 
     public static class KamiBulletData{
         public float initialRotation, attribute = 0f;
-        public boolean modulate;
+        public boolean modulate, despawn = true;
         public DataStage[] stageA;
         int stage = 0;
         float time = 0f;

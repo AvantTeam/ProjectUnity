@@ -10,7 +10,9 @@ import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import unity.ai.kami.*;
+import unity.ai.kami.KamiBulletDatas.*;
 import unity.ai.kami.KamiPatterns.*;
+import unity.content.*;
 import unity.entities.units.*;
 
 import java.util.*;
@@ -23,10 +25,11 @@ public class NewKamiAI implements UnitController, Position{
     public Unit target;
     public Vec2 targetPos = new Vec2(), movePos = new Vec2();
     public float[] reloads = new float[16];
+    public Bullet[] bullets = new Bullet[16];
     public int difficulty = 0;
     public float patternTime, stageTime, stageDamage, moveTime, waitTime;
     public int stage = 0;
-    public float drawIn = 0f, relativeRotation = 90f;
+    public float drawIn = 0f, relativeRotation = 90f, maxTime = 5f * 60f;
     public boolean reseting = true, waiting = true;
 
     Interval timer = new Interval(2);
@@ -145,6 +148,8 @@ public class NewKamiAI implements UnitController, Position{
                 nonSpellSeq.removeIndex(rand);
                 spell = true;
             }
+            maxTime = pattern.waitTime;
+            pattern.start(this);
             waiting = true;
             waitTime = 0f;
             reseting = false;
@@ -153,7 +158,6 @@ public class NewKamiAI implements UnitController, Position{
             tmpVec.trns(relativeRotation, 270f).add(targetPos).sub(unit).scl(1f / 15f);
             unit.move(tmpVec.x, tmpVec.y);
             waitTime += Time.delta;
-            float maxTime = spell ? 2f * 60f : 5f * 60f;
             if(waitTime >= maxTime){
                 pattern.init(this);
                 waiting = false;
@@ -175,5 +179,37 @@ public class NewKamiAI implements UnitController, Position{
         kami().laser = null;
         stage = 0;
         reseting = true;
+
+        float size = 750f;
+        BulletClearGroup[] bGroup = new BulletClearGroup[48];
+        Groups.bullet.intersect(unit.x - size, unit.y - size, size * 2f, size * 2f, b -> {
+            boolean despawn = true;
+            if(b.data instanceof KamiBulletData kd) despawn = kd.despawn;
+            if(b.owner == unit && unit.within(b, size + b.hitSize) && despawn){
+                int dst = Mathf.clamp(Mathf.round((b.dst(unit) - 20f) / 20f), 0, bGroup.length - 1);
+                if(bGroup[dst] == null){
+                    BulletClearGroup bg1 = new BulletClearGroup();
+                    bg1.delay = 2f * dst;
+                    bGroup[dst] = bg1;
+                }
+                bGroup[dst].bullets.add(b);
+            }
+        });
+        for(BulletClearGroup bg : bGroup){
+            if(bg == null) continue;
+            Time.run(bg.delay, bg::clear);
+        }
+    }
+
+    static class BulletClearGroup{
+        private final Seq<Bullet> bullets = new Seq<>();
+        private float delay = 0f;
+
+        void clear(){
+            bullets.each(b -> {
+                UnityFx.kamiBulletDespawn.at(b.x, b.y, b.hitSize);
+                b.remove();
+            });
+        }
     }
 }

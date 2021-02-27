@@ -16,7 +16,7 @@ import java.util.*;
 public class KamiPatterns{
     public static KamiPattern[] minorPatterns, majorPatterns, finalPatterns;
     private final static Color tCol = new Color();
-    private final static Vec2 tVec = new Vec2();
+    private final static Vec2 tVec = new Vec2(), tVec2 = new Vec2();
 
     public static void addPattern(KamiPattern pattern, int type){
         if(type == 0){
@@ -96,7 +96,7 @@ public class KamiPatterns{
 
         //Atomic Fire "Nuclear Fusion"
         addPattern(new KamiPattern(){{
-            time = 20f * 60f;
+            time = 25f * 60f;
             maxDamage = 1000f;
             drawer = utsuhoDrawer;
             init = ai -> ai.kami().laserRotation = -1f;
@@ -108,12 +108,12 @@ public class KamiPatterns{
                     for(int i = 0; i < diff; i++){
                         float angle = (i * (360f / diff)) + angleRand;
                         Bullet b = UnityBullets.kamiBullet1.create(ai.unit, ai.unit.team, ai.getX(), ai.getY(), angle, 0.3f + Mathf.range(0.1f), 1f / 0.3f);
-                        b.hitSize = 110f;
+                        b.hitSize = 160f;
                         if(ai.difficulty > 2){
                             Time.run(2f * 60f, () -> {
                                 if(!ai.unit.dead && !ai.reseting){
                                     Bullet c = UnityBullets.kamiBullet1.create(ai.unit, ai.unit.team, ai.getX(), ai.getY(), angle + offset, 0.3f + Mathf.range(0.1f), 1f / 0.3f);
-                                    c.hitSize = 110f;
+                                    c.hitSize = 160f;
                                 }
                             });
                         }
@@ -126,9 +126,9 @@ public class KamiPatterns{
                     if(ai.reloads[0] >= 2f){
                         for(int i = 0; i < 3; i++){
                             float angle = (i * (360f / 3f)) + (ai.reloads[1] * ai.kami().laserRotation * 5f);
-                            int diff = Mathf.clamp(ai.difficulty + 1, 1, 4);
+                            int diff = Mathf.clamp(ai.difficulty + 2, 1, 5);
                             for(int j = 0; j < diff; j++){
-                                Bullet b = UnityBullets.kamiBullet1.create(ai.unit, ai.getX(), ai.getY(), angle + Mathf.range(2f));
+                                Bullet b = UnityBullets.kamiBullet1.create(ai.unit, ai.getX(), ai.getY(), angle + Mathf.range(4f));
                                 b.vel.scl(Mathf.random(0.8f, 1.2f) * 0.7f);
                                 b.lifetime *= 1f / 0.7f;
                             }
@@ -143,19 +143,20 @@ public class KamiPatterns{
 
         //Explosion Sign "Mega Flare"
         addPattern(new KamiPattern(){{
-            time = 20f * 60f;
+            time = 25f * 60f;
             maxDamage = 1000f;
             drawer = utsuhoDrawer;
             stages = new KamiPatternStage[]{
                 new KamiPatternStage(20f * 60f, ai -> {
-                    float diffReload = 30 - Mathf.clamp(ai.difficulty * 3f, 0f, 15f);
+                    float diffReload = 25 - Mathf.clamp(ai.difficulty * 4f, 0f, 15f);
                     int diff = 10 + Mathf.clamp(ai.difficulty * 2, 0, 8);
                     if(ai.reloads[0] >= diffReload){
-                        tVec.trns(ai.relativeRotation - 90f, Mathf.range(150f * 2f), Mathf.range(20f)).add(ai);
+                        tVec2.trns(ai.relativeRotation, 270f).add(ai.targetPos);
+                        tVec.trns(ai.relativeRotation - 90f, Mathf.range(150f * 2f), Mathf.range(20f)).add(tVec2);
                         Bullet b = UnityBullets.kamiBullet1.create(ai.unit, ai.unit.team, tVec.x, tVec.y, ai.relativeRotation + 180f);
                         b.vel.scl(0.8f);
                         KamiBulletDatas.get(b, KamiBulletDatas.expandShrink);
-                        float offAng = Mathf.range(45f);
+                        float offAng = Mathf.range(30f);
                         for(int i = 0; i < diff; i++){
                             float angle = (i * (360f / diff)) + offAng;
                             Bullet c = UnityBullets.kamiBullet1.create(ai.unit, tVec.x, tVec.y, angle);
@@ -163,6 +164,11 @@ public class KamiPatterns{
                         }
                         ai.reloads[0] = 0f;
                     }
+                    if(ai.reloads[1] >= 2f * 60f){
+                        ai.moveAround(1.5f * 60f);
+                        ai.reloads[1] = 0f;
+                    }
+                    ai.reloads[1] += Time.delta;
                     ai.reloads[0] += Time.delta;
                 })
             };
@@ -170,10 +176,10 @@ public class KamiPatterns{
     }
 
     public static class KamiPattern{
-        public Cons<NewKamiAI> drawer, effects, init;
+        public Cons<NewKamiAI> drawer, effects, init, start;
         public KamiPatternStage[] stages;
         public int type = -1;
-        public float time = 60f, maxDamage = Float.MAX_VALUE;
+        public float time = 60f, maxDamage = Float.MAX_VALUE, waitTime = 2f * 60f;
 
         public void update(NewKamiAI ai){
             if(effects != null) effects.get(ai);
@@ -184,6 +190,10 @@ public class KamiPatterns{
                 ai.stageTime = 0f;
                 if(stages[ai.stage % stages.length].init != null) stages[ai.stage % stages.length].init.get(ai);
             }
+        }
+
+        public void start(NewKamiAI ai){
+            if(start != null) start.get(ai);
         }
 
         public void draw(NewKamiAI ai){

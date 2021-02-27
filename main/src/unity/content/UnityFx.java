@@ -856,6 +856,18 @@ public class UnityFx{
         Draw.blend();
     }),
 
+    kamiBulletDespawn = new Effect(60f, e -> {
+        float size = Mathf.clamp(e.rotation, 0f, 15f);
+
+        Draw.blend(Blending.additive);
+        Draw.color(Tmp.c1.set(Color.red).shiftHue(((e.time + Time.time) / 2f) * 3f));
+        Lines.stroke(2f * e.fout());
+        Lines.circle(e.x, e.y, (e.finpow() * size) + (size / 2f));
+        Lines.stroke(e.fout());
+        Lines.circle(e.x, e.y, (e.finpow() * (size / 2f)) + size);
+        Draw.blend();
+    }),
+
     kamiEoLCharge = new Effect(60f, e -> {
         if(!(e.data instanceof Unit u)) return;
         Draw.blend(Blending.additive);
