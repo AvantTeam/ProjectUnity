@@ -11,8 +11,10 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import unity.graphics.*;
 
+import static unity.content.UnityFx.distortFx;
+
 public class UnityStatusEffects implements ContentList{
-    public static StatusEffect disabled, plasmaed, radiation, reloadFatigue, blueBurn, molten, tpCoolDown, teamConverted, boosted;
+    public static StatusEffect disabled, plasmaed, radiation, reloadFatigue, blueBurn, molten, tpCoolDown, teamConverted, boosted, distort;
 
     @Override
     public void load(){
@@ -92,5 +94,26 @@ public class UnityStatusEffects implements ContentList{
             effect = Fx.none;
             speedMultiplier = 2f;
         }};
+
+        distort = new StatusEffect("distort"){
+        {
+            speedMultiplier = 0.35f;
+            color = Pal.lancerLaser;
+            effect = distortFx;
+        }
+
+        public void update(Unit unit, float time){
+            if(damage > 0){
+                unit.damageContinuousPierce(damage);
+            }else if(damage < 0){ //heal unit
+                unit.heal(-1f * damage * Time.delta);
+            }
+
+            if(effect != Fx.none && Mathf.chanceDelta(effectChance)){
+                Tmp.v1.rnd(unit.type.hitSize /2f);
+                effect.at(unit.x + Tmp.v1.x, unit.y + Tmp.v1.y, 0, 45f);
+            }
+        }
+        };
     }
 }

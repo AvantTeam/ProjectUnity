@@ -1,5 +1,6 @@
 package unity.content;
 
+import arc.Core;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -1051,6 +1052,46 @@ public class UnityFx{
 
             rect(region, e.x, e.y, w, h, e.rotation - 90);
             blend();
+        }
+    }),
+
+    distortFx = new Effect(18, e -> {
+        if(!(e.data instanceof Float)) return;
+        Draw.color(Pal.lancerLaser, Pal.place, e.fin());
+        Fill.square(e.x, e.y, 0.1f + e.fout() * 2.5f, (float)e.data);
+    }),
+
+    distSplashFx = new Effect(80, e -> {
+        if(!(e.data instanceof Float[])) return;
+        Draw.color(Pal.lancerLaser, Pal.place, e.fin());
+        Lines.stroke(2 * e.fout());
+        Lines.circle(e.x, e.y, ((Float[])e.data)[0] * e.fin());
+    }){
+        @Override
+        public void at(float x, float y, float rotation, Object data){
+            Effect effect = this;
+            if((data instanceof Float[])) effect.lifetime = ((Float[])data)[1];
+
+            create(effect, x, y, rotation, Color.white, data);
+        }
+    },
+
+    distStart = new Effect(45, e -> {
+        if(!(e.data instanceof Float)) return;
+
+        float centerf = Color.clear.toFloatBits();
+        float edgef = Pal.lancerLaser.cpy().a(e.fout()).toFloatBits();
+        float sides = Mathf.ceil(Lines.circleVertices((float)e.data) / 2f) * 2;
+        float space = 360f / sides;
+
+        for(int i = 0; i < sides; i += 2){
+            float px = Angles.trnsx(space * i, (float)e.data);
+            float py = Angles.trnsy(space * i, (float)e.data);
+            float px2 = Angles.trnsx(space * (i + 1), (float)e.data);
+            float py2 = Angles.trnsy(space * (i + 1), (float)e.data);
+            float px3 = Angles.trnsx(space * (i + 2), (float)e.data);
+            float py3 = Angles.trnsy(space * (i + 2), (float)e.data);
+            Fill.quad(e.x, e.y, centerf, e.x + px, e.y + py, edgef, e.x + px2, e.y + py2, edgef, e.x + px3, e.y + py3, edgef);
         }
     });
 }
