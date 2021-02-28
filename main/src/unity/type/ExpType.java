@@ -166,7 +166,7 @@ public abstract class ExpType<T extends UnlockableContent>{
                     t.row();
 
                     for(ExpUpgrade upgrade : upgrades){
-                        if(upgrade.min > maxLevel) continue;
+                        if(upgrade.min > maxLevel || upgrade.hide) continue;
 
                         float size = 8f * 3f;
 
@@ -193,14 +193,15 @@ public abstract class ExpType<T extends UnlockableContent>{
         return level * level * 10f;
     }
 
-    public void addUpgrade(T type, int minLevel){
-        addUpgrade(type, minLevel, maxLevel);
+    public void addUpgrade(T type, int minLevel, boolean hidden){
+        addUpgrade(type, minLevel, maxLevel, hidden);
     }
 
-    public void addUpgrade(T type, int minLevel, int maxLevel){
+    public void addUpgrade(T type, int minLevel, int maxLevel, boolean hidden){
         upgrades.add(new ExpUpgrade(type){{
             min = minLevel;
             max = maxLevel;
+            hide = hidden;
         }});
     }
 
@@ -286,6 +287,8 @@ public abstract class ExpType<T extends UnlockableContent>{
 
         public int min = 1;
         public int max = maxLevel;
+
+        public boolean hide = false;
 
         public ExpUpgrade(T type){
             this.type = type;

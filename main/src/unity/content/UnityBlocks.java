@@ -959,8 +959,8 @@ public class UnityBlocks implements ContentList{
 
                 block.maxLevel = 10;
 
-                block.addUpgrade(laserCharge, 10);
-                block.addUpgrade(laserFrost, 10);
+                block.addUpgrade(laserCharge, 10, false);
+                block.addUpgrade(laserFrost, 10, false);
 
                 block.addField(ExpFieldType.linear, ReloadTurret.class, "reloadTime", reloadTime, -2f);
                 block.addField(ExpFieldType.bool, Turret.class, "targetAir", false, 5f);
@@ -1014,9 +1014,9 @@ public class UnityBlocks implements ContentList{
                 block.maxLevel = 30;
                 block.maxExp = block.requiredExp(block.maxLevel);
 
-                block.addUpgrade(laserBranch, 15);
-                block.addUpgrade(laserFractal, 15);
-                block.addUpgrade(laserBreakthrough, 30);
+                block.addUpgrade(laserBranch, 15, false);
+                block.addUpgrade(laserFractal, 15, false);
+                block.addUpgrade(laserBreakthrough, 30, true);
 
                 block.addField(ExpFieldType.linear, ReloadTurret.class, "reloadTime", reloadTime, -1f);
 
@@ -1054,8 +1054,8 @@ public class UnityBlocks implements ContentList{
                 block.maxLevel = 30;
                 block.maxExp = block.requiredExp(block.maxLevel);
                 
-                block.addUpgrade(laserKelvin, 15);
-                block.addUpgrade(laserBreakthrough, 30);
+                block.addUpgrade(laserKelvin, 15, false);
+                block.addUpgrade(laserBreakthrough, 30, true);
 
                 block.setupFields();
                 block.init();
