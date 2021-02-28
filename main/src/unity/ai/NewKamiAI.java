@@ -174,6 +174,7 @@ public class NewKamiAI implements UnitController, Position{
 
     void reset(){
         Arrays.fill(reloads, 0f);
+        Arrays.fill(bullets, null);
         stageDamage = stageTime = patternTime = moveTime = drawIn = 0f;
         kami().laserRotation = 0f;
         kami().laser = null;
