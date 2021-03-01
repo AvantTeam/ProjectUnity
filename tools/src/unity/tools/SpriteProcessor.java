@@ -123,21 +123,6 @@ public class SpriteProcessor{
         };
 
         Generators.generate();
-
-        Fi.get("./sprites-gen/").walk(path -> {
-            if(!path.extEquals("png") || path.absolutePath().contains("ui/")) return;
-
-            try{
-                BufferedImage image = ImageIO.read(path.file());
-
-                Sprite sprite = new Sprite(image);
-                sprite.antialias();
-                sprite.save(path.nameWithoutExtension());
-            }catch(IOException e){
-                throw new RuntimeException(e);
-            }
-        });
-
         Sprite.dispose();
     }
 
