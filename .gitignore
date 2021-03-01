@@ -8,7 +8,7 @@ build/
 main/bin/
 main/build/
 main/assets-raw/sprites-gen/
-main/assets/modsprites/
+main/assets/sprites/
 main/.settings/
 
 tools/bin/

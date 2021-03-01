@@ -7,7 +7,7 @@ repositories{
 
 ext{
     assetsDir = new File(rootDir, "main/assets/")
-    atlasFile = new File(rootDir, "main/assets/modsprites/unitysprites.atlas")
+    spriteFolder = new File(rootDir, "main/assets/sprites/")
 }
 
 task deploy(type: Jar, dependsOn: configurations.runtimeClasspath){
@@ -62,8 +62,8 @@ task deployDex(type: Jar){
     }
 }
 
-if(!atlasFile.exists()){
-    println "${atlasFile.absolutePath} not found; automatically packing sprites"
+if(!spriteFolder.exists()){
+    println "'${spriteFolder.absolutePath}' not found; automatically processing sprites"
     deploy.dependsOn ":tools:proc"
 }
 

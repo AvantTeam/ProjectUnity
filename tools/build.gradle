@@ -10,19 +10,19 @@ ext{
 
     spritesGenFolder = "../main/assets-raw/sprites-gen/"
     spritesGenUIFolder = "../main/assets-raw/sprites-gen/ui/"
-    spritesAssetsFolder = "../main/assets/modsprites/"
+    spritesAssetsFolder = "../main/assets/sprites/"
 }
 
 task proc(dependsOn: [classes, configurations.runtimeClasspath]){
     doLast{
         delete{
-            delete "$spritesGenFolder"
-            delete "$spritesAssetsFolder"
+            delete spritesGenFolder
+            delete spritesAssetsFolder
         }
 
-        file("$spritesGenFolder").mkdirs()
-        file("$spritesGenUIFolder").mkdirs()
-        file("$spritesAssetsFolder").mkdirs()
+        file(spritesGenFolder).mkdirs()
+        file(spritesGenUIFolder).mkdirs()
+        file(spritesAssetsFolder).mkdirs()
 
         javaexec{
             main = imageProcessorMain
@@ -30,6 +30,22 @@ task proc(dependsOn: [classes, configurations.runtimeClasspath]){
             jvmArgs("-Djava.awt.headless=true")
             standardInput = System.in
             workingDir = "../main/assets-raw/"
+        }
+
+        copy{
+            from spritesGenFolder
+            into spritesAssetsFolder
+        }
+
+        exec{
+            workingDir = "../main/"
+
+            def command = ["--replace", "./assets/sprites/"]
+            if(System.getProperty("os.name").toLowerCase(Locale.ROOT).contains("windows")){
+                commandLine("cmd", "/c", "alpha_bleeding.exe", *command)
+            }else{
+                commandLine("./alpha_bleeding.exe", *command)
+            }
         }
     }
 }

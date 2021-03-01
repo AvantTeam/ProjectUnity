@@ -13,7 +13,6 @@ import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import unity.content.*;
 import unity.gen.*;
-import unity.graphics.g2d.*;
 import unity.mod.*;
 import unity.sync.*;
 import unity.ui.*;
@@ -46,7 +45,6 @@ public class Unity extends Mod implements ApplicationListener{
     };
 
     private static LoadedMod unity;
-    private static AssetDescriptor<UnityTextureAtlas> atlas;
 
     public Unity(){
         ContributorList.init();
@@ -56,7 +54,6 @@ public class Unity extends Mod implements ApplicationListener{
 
         if(Core.assets != null){
             Core.assets.setLoader(WavefrontObject.class, new WavefrontObjectLoader(tree));
-            Core.assets.setLoader(UnityTextureAtlas.class, new UnityTextureAtlasLoader(tree));
         }
 
         if(!headless){
@@ -109,18 +106,6 @@ public class Unity extends Mod implements ApplicationListener{
         Events.on(ClientLoadEvent.class, e -> {
             unitySettings.init();
         });
-
-        Events.on(UnityLoadEvent.class, e -> {
-            print("Mod loaded");
-
-            atlas = Core.assets.load(new AssetDescriptor<>(unity.root.child("modsprites").child("unitysprites.atlas"), UnityTextureAtlas.class));
-            atlas.loaded = a -> {
-                a.merge(Core.atlas);
-                Core.assets.load(new UnityStyles());
-
-                print("Regions loaded");
-            };
-        });
     }
 
     @Override
@@ -128,7 +113,7 @@ public class Unity extends Mod implements ApplicationListener{
         unity = mods.locateMod("unity");
         if(unity != null){
             Core.app.removeListener(this);
-            Events.fire(new UnityLoadEvent());
+            Events.fire(new UnityModLoadEvent());
         }
     }
 
@@ -218,4 +203,6 @@ public class Unity extends Mod implements ApplicationListener{
             return null;
         }
     }
+
+    public static class UnityModLoadEvent{}
 }

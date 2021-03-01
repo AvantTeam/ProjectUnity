@@ -4,7 +4,6 @@ import arc.*;
 import arc.files.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g2d.TextureAtlas.*;
-import arc.packer.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.core.*;
@@ -138,12 +137,6 @@ public class SpriteProcessor{
                 throw new RuntimeException(e);
             }
         });
-
-        TexturePacker.process(
-            "./sprites-gen/",
-            "../assets/modsprites/",
-            "unitysprites.atlas"
-        );
 
         Sprite.dispose();
     }
