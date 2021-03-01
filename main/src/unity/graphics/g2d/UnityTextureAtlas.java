@@ -19,7 +19,7 @@ public class UnityTextureAtlas extends TextureAtlas{
 
         int i;
         if((i = parsed.lastIndexOf("/")) != -1){
-            parsed = parsed.substring(i + 1, parsed.length() - 1);
+            parsed = parsed.substring(i + 1, parsed.length());
         }
 
         if(!parsed.startsWith("unity")){

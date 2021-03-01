@@ -4,8 +4,9 @@ import arc.*;
 import arc.assets.*;
 import arc.func.*;
 import arc.scene.*;
-import arc.struct.Seq;
+import arc.struct.*;
 import arc.util.*;
+import arc.util.async.Threads;
 import mindustry.mod.*;
 import mindustry.mod.Mods.*;
 import mindustry.ctype.*;
@@ -18,6 +19,9 @@ import unity.sync.*;
 import unity.ui.*;
 import unity.ui.dialogs.*;
 import unity.util.*;
+
+import java.util.Scanner;
+import java.util.concurrent.*;
 
 import static mindustry.Vars.*;
 
@@ -42,6 +46,7 @@ public class Unity extends Mod implements ApplicationListener{
     };
 
     private static LoadedMod unity;
+    private static AssetDescriptor<UnityTextureAtlas> atlas;
 
     public Unity(){
         ContributorList.init();
@@ -51,7 +56,7 @@ public class Unity extends Mod implements ApplicationListener{
 
         if(Core.assets != null){
             Core.assets.setLoader(WavefrontObject.class, new WavefrontObjectLoader(tree));
-            Core.assets.load(new UnityStyles());
+            Core.assets.setLoader(UnityTextureAtlas.class, new UnityTextureAtlasLoader(tree));
         }
 
         if(!headless){
@@ -104,6 +109,18 @@ public class Unity extends Mod implements ApplicationListener{
         Events.on(ClientLoadEvent.class, e -> {
             unitySettings.init();
         });
+
+        Events.on(UnityLoadEvent.class, e -> {
+            print("Mod loaded");
+
+            atlas = Core.assets.load(new AssetDescriptor<>(unity.root.child("modsprites").child("unitysprites.atlas"), UnityTextureAtlas.class));
+            atlas.loaded = a -> {
+                a.merge(Core.atlas);
+                Core.assets.load(new UnityStyles());
+
+                print("Regions loaded");
+            };
+        });
     }
 
     @Override
@@ -111,17 +128,8 @@ public class Unity extends Mod implements ApplicationListener{
         unity = mods.locateMod("unity");
         if(unity != null){
             Core.app.removeListener(this);
-            loadRegions();
+            Events.fire(new UnityLoadEvent());
         }
-    }
-
-    private void loadRegions(){
-        Core.assets.setLoader(UnityTextureAtlas.class, new UnityTextureAtlasLoader(tree));
-
-        var atlas = new AssetDescriptor<>(unity.file, UnityTextureAtlas.class);
-        atlas.loaded = a -> a.merge(Core.atlas);
-
-        Core.assets.load(atlas);
     }
 
     @Override
@@ -146,7 +154,7 @@ public class Unity extends Mod implements ApplicationListener{
     public void loadContent(){
         for(ContentList list : unityContent){
             list.load();
-            Log.infoTag("unity", "Loaded content list: " + list.getClass().getSimpleName());
+            print("Loaded content list: " + list.getClass().getSimpleName());
         }
 
         FactionMeta.init();
