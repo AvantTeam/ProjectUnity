@@ -1,10 +1,5 @@
 sourceSets.main.java.srcDirs = ["src/"]
 
-repositories{
-    mavenCentral()
-    maven{url "https://www.jitpack.io"}
-}
-
 ext{
     imageProcessorMain = "unity.tools.SpriteProcessor"
 
@@ -27,7 +22,9 @@ task proc(dependsOn: [classes, configurations.runtimeClasspath]){
         javaexec{
             main = imageProcessorMain
             classpath = sourceSets.main.runtimeClasspath
-            jvmArgs("-Djava.awt.headless=true")
+            jvmArgs "-Djava.awt.headless=true"
+            systemProperty "alphableed", getProperty("alphableed")
+
             standardInput = System.in
             workingDir = "../main/assets-raw/"
         }
@@ -36,18 +33,12 @@ task proc(dependsOn: [classes, configurations.runtimeClasspath]){
             from spritesGenFolder
             into spritesAssetsFolder
         }
-
-        exec{
-            workingDir = "../main/"
-
-            def command = ["--replace", "./assets/sprites/"]
-            if(System.getProperty("os.name").toLowerCase(Locale.ROOT).contains("windows")){
-                commandLine("cmd", "/c", "alpha_bleeding.exe", *command)
-            }else{
-                commandLine("./alpha_bleeding.exe", *command)
-            }
-        }
     }
+}
+
+repositories{
+    mavenCentral()
+    maven{url "https://www.jitpack.io"}
 }
 
 dependencies{

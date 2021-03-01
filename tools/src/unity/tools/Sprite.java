@@ -18,7 +18,7 @@ import javax.imageio.*;
 public class Sprite{
     private static Seq<Sprite> toDispose = new Seq<>();
 
-    private BufferedImage sprite;
+    BufferedImage sprite;
     private Graphics2D graphics;
     private Color color = new Color();
 

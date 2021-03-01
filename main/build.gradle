@@ -1,13 +1,7 @@
 sourceSets.main.java.srcDirs = ["src/", "$buildDir/generated/sources/annotationProcessor/java/main/"]
 
-repositories{
-    mavenCentral()
-    maven{url "https://www.jitpack.io"}
-}
-
 ext{
     assetsDir = new File(rootDir, "main/assets/")
-    spriteFolder = new File(rootDir, "main/assets/sprites/")
 }
 
 task deploy(type: Jar, dependsOn: configurations.runtimeClasspath){
@@ -62,9 +56,14 @@ task deployDex(type: Jar){
     }
 }
 
-if(!spriteFolder.exists()){
-    println "'${spriteFolder.absolutePath}' not found; automatically processing sprites"
+if(!hasSprites()){
+    println "Sprites folder not found; automatically processing sprites"
     deploy.dependsOn ":tools:proc"
+}
+
+repositories{
+    mavenCentral()
+    maven{url "https://www.jitpack.io"}
 }
 
 dependencies{

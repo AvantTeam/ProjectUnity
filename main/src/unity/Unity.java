@@ -183,7 +183,7 @@ public class Unity extends Mod implements ApplicationListener{
             }
         }
 
-        Log.infoTag("unity", builder.toString());
+        Log.info("&lc&fb[unity]&fr @", builder.toString());
     }
 
     public static Class<?> forName(String canonical){
