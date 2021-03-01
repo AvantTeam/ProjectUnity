@@ -22,6 +22,7 @@ import mindustry.ctype.*;
 import mindustry.content.*;
 import unity.annotations.Annotations.*;
 import unity.entities.bullet.*;
+import unity.entities.bullet.exp.ExpLaserFieldBulletType;
 import unity.gen.*;
 import unity.graphics.*;
 import unity.type.ExpType.*;
@@ -958,8 +959,8 @@ public class UnityBlocks implements ContentList{
 
                 block.maxLevel = 10;
 
-                block.addUpgrade(laserCharge, 10);
-                block.addUpgrade(laserFrost, 10);
+                block.addUpgrade(laserCharge, 10, false);
+                block.addUpgrade(laserFrost, 10, false);
 
                 block.addField(ExpFieldType.linear, ReloadTurret.class, "reloadTime", reloadTime, -2f);
                 block.addField(ExpFieldType.bool, Turret.class, "targetAir", false, 5f);
@@ -972,7 +973,7 @@ public class UnityBlocks implements ContentList{
 
         laserCharge = new ExpPowerChargeTurret("charge-laser-turret"){
             {
-                requirements(Category.turret, with(Items.copper, 190, Items.silicon, 110, Items.titanium, 15));
+                category = Category.turret;
                 size = 2;
                 health = 1400;
 
@@ -1013,9 +1014,9 @@ public class UnityBlocks implements ContentList{
                 block.maxLevel = 30;
                 block.maxExp = block.requiredExp(block.maxLevel);
 
-                block.addUpgrade(laserBranch, 15);
-                //block.addUpgrade(laserFractal, 15);
-                block.addUpgrade(laserBreakthrough, 30);
+                block.addUpgrade(laserBranch, 15, false);
+                block.addUpgrade(laserFractal, 15, false);
+                block.addUpgrade(laserBreakthrough, 30, true);
 
                 block.addField(ExpFieldType.linear, ReloadTurret.class, "reloadTime", reloadTime, -1f);
 
@@ -1027,7 +1028,7 @@ public class UnityBlocks implements ContentList{
 
         laserFrost = new ExpLiquidTurret("frost-laser-turret"){
             {
-                requirements(Category.turret, with(Items.copper, 190, Items.silicon, 110, Items.titanium, 15));
+                category = Category.turret;
                 size = 2;
                 health = 1000;
 
@@ -1053,8 +1054,8 @@ public class UnityBlocks implements ContentList{
                 block.maxLevel = 30;
                 block.maxExp = block.requiredExp(block.maxLevel);
                 
-                block.addUpgrade(laserKelvin, 15);
-                block.addUpgrade(laserBreakthrough, 30);
+                block.addUpgrade(laserKelvin, 15, false);
+                block.addUpgrade(laserBreakthrough, 30, true);
 
                 block.setupFields();
                 block.init();
@@ -1062,12 +1063,68 @@ public class UnityBlocks implements ContentList{
             }
         };
 
-        //TODO SK MAKE IDEAS NOW
-        laserFractal = new ExpPowerTurret("fractal-laser-turret");
+        //TODO SK MAKE SPRITES NOW
+        laserFractal = new ExpPowerFieldTurret("fractal-laser-turret"){
+            {
+                category = Category.turret;
+                size = 3;
+                health = 2000;
+
+                reloadTime = UnityBullets.distField.lifetime / 3f;
+                coolantMultiplier = 2f;
+                range = 140f;
+                chargeTime = 50f;
+                chargeMaxDelay = 40f;
+                chargeEffects = 5;
+                recoilAmount = 4f;
+                cooldown = 0.03f;
+                targetAir = true;
+                shootShake = 5f;
+
+                powerUse = 13f;
+
+                shootEffect = UnityFx.laserChargeShoot;
+                smokeEffect = Fx.none;
+                chargeEffect = UnityFx.laserCharge;
+                chargeBeginEffect = UnityFx.laserChargeBegin;
+                heatColor = Color.red;
+                shootSound = Sounds.laser;
+                fromColor = Pal.lancerLaser.cpy().lerp(Pal.sapBullet, 0.5f);
+                toColor = Pal.place;
+                shootType = UnityBullets.fractalLaser;
+                buildVisibility = BuildVisibility.sandboxOnly;
+
+                rangeInc = 0.35f * 8f;
+
+                basicFieldRadius = 85;
+            }
+
+            @Override
+            public void init(){
+                super.init();
+
+                ExpBlock block = ExpMeta.map(this);
+                block.hasExp = true;
+                block.condConfig = true;
+                block.enableUpgrade = true;
+
+                block.maxLevel = 30;
+                block.maxExp = block.requiredExp(block.maxLevel);
+
+                block.addField(ExpFieldType.linear, ReloadTurret.class, "reloadTime", reloadTime, -2f);
+                block.addField(ExpFieldType.linear, BaseTurret.class, "range", range, 0.35f * 8f);
+                block.addField(ExpFieldType.linear, ExpPowerFieldTurret.class, "basicFieldRadius", basicFieldRadius, 0.2f * 8f);
+
+                block.setupFields();
+                block.init();
+                block.setStats();
+            }
+        };
 
         laserBranch = new ExpPowerChargeTurret("swarm-laser-turret"){
             {
-                requirements(Category.turret, with(Items.copper, 190, Items.silicon, 110, Items.titanium, 15));
+                category = Category.turret;
+
                 size = 3;
                 health = 2400;
                 
@@ -1124,7 +1181,7 @@ public class UnityBlocks implements ContentList{
 
         laserKelvin = new ExpKelvinTurret("kelvin-laser-turret"){
             {
-                requirements(Category.turret, with(Items.copper, 190, Items.silicon, 110, Items.titanium, 15));
+                category = Category.turret;
                 size = 3;
                 health = 2100;
 
@@ -1159,7 +1216,7 @@ public class UnityBlocks implements ContentList{
 
         laserBreakthrough = new ExpPowerChargeTurret("bt-laser-turret"){
             {
-                requirements(Category.turret, with(Items.copper, 190, Items.silicon, 110, Items.titanium, 15));
+                category = Category.turret;
                 size = 4;
                 health = 2800;
 
@@ -1874,22 +1931,22 @@ public class UnityBlocks implements ContentList{
             setGridW(7);
             setGridH(1);
             addPart(
-                "Pivot", "", PartType.blade, 4, 0, 1, 1, true, true,
+                bundle.get("part.unity.pivot.name"), bundle.get("part.unity.pivot.info"), PartType.blade, 4, 0, 1, 1, true, true,
                 new Point2(0, 0), new ItemStack[0], new byte[]{1, 0, 0, 0}, new byte[]{0, 0, 0, 0},
                 new PartStat(PartStatType.mass, 1), new PartStat(PartStatType.collides, false), new PartStat(PartStatType.hp, 10)
             );
             addPart(
-                "Blade", "Slices and knocks back enemies", PartType.blade, 0, 0, 1, 1,
+                bundle.get("part.unity.blade.name"), bundle.get("part.unity.blade.info"), PartType.blade, 0, 0, 1, 1,
                 with(UnityItems.nickel, 3, Items.titanium, 5), new byte[]{1, 0, 0, 0}, new byte[]{0, 0, 1, 0},
                 new PartStat(PartStatType.mass, 2), new PartStat(PartStatType.collides, true), new PartStat(PartStatType.hp, 80), new PartStat(PartStatType.damage, 5)
             );
             addPart(
-                "Serrated blade", "A heavy reinforced blade.", PartType.blade, 2, 0, 2, 1,
+                bundle.get("part.unity.serrated-blade.name"), bundle.get("part.unity.serrated-blade.info"), PartType.blade, 2, 0, 2, 1,
                 with(UnityItems.nickel, 8, Items.lead, 5), new byte[]{1, 0, 0, 0, 0, 0}, new byte[]{0, 0, 0, 1, 0, 0},
                 new PartStat(PartStatType.mass, 6), new PartStat(PartStatType.collides, true), new PartStat(PartStatType.hp, 120), new PartStat(PartStatType.damage, 12)
             );
             addPart(
-                "Rod", "Supporting structure, does not collide", PartType.blade, 1, 0, 1, 1,
+                bundle.get("part.unity.rod.name"), bundle.get("part.unity.rod.info"), PartType.blade, 1, 0, 1, 1,
                 with(Items.titanium, 3), new byte[]{1, 0, 0, 0}, new byte[]{0, 0, 1, 0},
                 new PartStat(PartStatType.mass, 1), new PartStat(PartStatType.collides, false), new PartStat(PartStatType.hp, 40)
             );

@@ -1670,6 +1670,7 @@ public class UnityUnitTypes implements ContentList{
             flying = true;
             visualElevation = 0.8f;
             range = 210f;
+            outlineColor = UnityPal.darkerOutline;
             weapons.add(new Weapon(){{
                 x = 0f;
                 reload = 10f;
@@ -1713,6 +1714,7 @@ public class UnityUnitTypes implements ContentList{
             segmentLength = 25;
             segmentDamageScl = 8f;
             engineSize = -1f;
+            outlineColor = UnityPal.darkerOutline;
 
             weapons.add(new Weapon(){{
                 x = 0f;
@@ -1760,12 +1762,13 @@ public class UnityUnitTypes implements ContentList{
             engineColor = Color.valueOf("d3ddff");
             canBoost = true;
             boostMultiplier = 1.5f;
-            weapons.add(new Weapon("unity-buffer-shotgun"){{
+            landShake = 1f;
+            weapons.add(new Weapon(name + "-shotgun"){{
                 top = false;
                 shake = 2f;
-                x = y = -1f;
-                shootY = 1f;
-                shootX = -0.125f;
+                x = 3f;
+                y = 0.5f;
+                shootX = 0f;
                 shootY = 3.5f;
                 reload = 55f;
                 shotDelay = 3f;
@@ -1796,10 +1799,13 @@ public class UnityUnitTypes implements ContentList{
             engineColor = Color.valueOf("feb380");
             health = 350f;
             buildSpeed = 1.5f;
-            weapons.add(new Weapon("unity-omega-cannon"){{
-                x = 1f;
+            landShake = 4f;
+            weapons.add(new Weapon(name + "-cannon"){{
+                top = false;
+                x = 4f;
                 y = 0f;
-                shootY = 1.5f;
+                shootX = 1f;
+                shootY = 3f;
                 recoil = 4f;
                 reload = 38f;
                 shots = 4;
@@ -1809,7 +1815,7 @@ public class UnityUnitTypes implements ContentList{
                 ejectEffect = Fx.none;
                 shake = 3f;
                 shootSound = Sounds.shootBig;
-                bullet = new MissileBulletType(2.7f, 1f, "missile"){{
+                bullet = new MissileBulletType(2.7f, 12f, "missile"){{
                     width = height = 8f;
                     shrinkX = shrinkY = 0f;
                     drag = -0.003f;
@@ -1827,8 +1833,8 @@ public class UnityUnitTypes implements ContentList{
                     weaveMag = 2f;
                 }};
             }});
-            String armorRegion = "unity-omega-armor";
-            abilities.add(new ShootArmorAbility(50f, 0.06f, armorRegion));
+            String armorRegion = name + "-armor";
+            abilities.add(new ShootArmorAbility(50f, 0.06f, 2f, 0.5f, armorRegion));
         }};
         
         cache = new UnityUnitType("cache"){{
@@ -2479,7 +2485,7 @@ public class UnityUnitTypes implements ContentList{
         }};
 
         kami = new RainbowUnitType("kami-mkii"){{
-            defaultController = KamiAI::new;
+            defaultController = EmptyAI::new;
             health = 120000f;
             speed = 15f;
             hitSize = 36f;
@@ -2502,6 +2508,7 @@ public class UnityUnitTypes implements ContentList{
             circleTarget = false;
             engineOffset = 40f;
             engineSize = 6f;
+            outlineColor = UnityPal.darkerOutline;
 
             weapons.add(new Weapon(){{
                 mirror = false;
@@ -2562,6 +2569,7 @@ public class UnityUnitTypes implements ContentList{
             range = 480f;
             armor = 16f;
             omniMovement = false;
+            outlineColor = UnityPal.darkerOutline;
 
             BulletType t = new AntiCheatBasicBulletType(9.2f, 430f){{
                 hitSize = 8f;
@@ -2601,8 +2609,7 @@ public class UnityUnitTypes implements ContentList{
                     @Override
                     public void hitEntity(Bullet b, Hitboxc other, float initialHealth){
                         super.hitEntity(b, other, initialHealth);
-                        if(other instanceof Unit){
-                            Unit tmp = (Unit)other;
+                        if(other instanceof Unit tmp){
                             float threat = tmp.maxHealth + tmp.type.dpsEstimate;
                             if(Float.isInfinite(threat) || Float.isNaN(threat) || threat == Float.MAX_VALUE) UnityAntiCheat.annihilateEntity(other, false);
                         }
@@ -2730,6 +2737,7 @@ public class UnityUnitTypes implements ContentList{
 
             legSplashRange = 120f;
             legSplashDamage = 1600f;
+            outlineColor = UnityPal.darkerOutline;
 
             bottomWeapons.add("unity-ravager-nightmare");
             weapons.addAll(new Weapon("unity-ravager-nightmare"){{

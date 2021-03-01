@@ -34,10 +34,10 @@ public class GraphTorqueConsume extends GraphTorque{
         table.add("[lightgray]" + bundle.get("stat.unity.nominalspeed") + ":[] ").left();
         table.add(nominalSpeed * 0.1f + "rps");
         table.row().left();
-        table.add("[lightgray]" + bundle.get("stat.unity.idlefric") + ":[] ").left();
+        table.add("[lightgray]" + bundle.get("stat.unity.idlefriction") + ":[] ").left();
         table.add(idleFriction * 1000f + "Nmv^-2");
         table.row().left();
-        table.add("[lightgray]" + bundle.get("stat.unity.workfric") + ":[] ").left();
+        table.add("[lightgray]" + bundle.get("stat.unity.workfriction") + ":[] ").left();
         table.add(workingFriction * 1000f + "Nmv^-2");
     }
 

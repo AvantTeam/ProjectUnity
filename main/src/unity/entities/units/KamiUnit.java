@@ -1,15 +1,19 @@
 package unity.entities.units;
 
+import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
+import unity.ai.*;
 
 import java.nio.*;
 
 public class KamiUnit extends UnitEntity{
     public Bullet laser;
     public float laserRotation = 0f;
+    private NewKamiAI trueController;
 
     private float laserRotationLast;
     private float laserRotationTarget;
@@ -20,6 +24,40 @@ public class KamiUnit extends UnitEntity{
         if(laser != null){
             laser.rotation(laserRotation);
         }
+        if(trueController.unit == this){
+            trueController.updateUnit();
+        }
+    }
+
+    @Override
+    public float clipSize(){
+        return super.clipSize() * 3f;
+    }
+
+    @Override
+    public void draw(){
+        super.draw();
+        if(trueController != null){
+            float z = Draw.z();
+            Draw.z(Layer.flyingUnit);
+            trueController.draw();
+            Draw.z(z);
+            Draw.reset();
+        }
+    }
+
+    @Override
+    public void add(){
+        if(isAdded()) return;
+        super.add();
+        trueController = new NewKamiAI();
+        trueController.unit(this);
+    }
+
+    @Override
+    public void damage(float amount){
+        super.damage(amount);
+        if(trueController.unit == this) trueController.stageDamage += amount;
     }
 
     @Override

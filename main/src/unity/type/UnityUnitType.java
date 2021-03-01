@@ -50,8 +50,11 @@ public class UnityUnitType extends UnitType{
     public float rotorDeathSlowdown = 0.01f;
     public float fallRotateSpeed = 2.5f;
 
-    // mech apd units
+    // mech pad units
     public Color engineColor;
+
+    // For shoot armor ability
+    public FloatSeq weaponXs = new FloatSeq();
     
     // legs extra
     protected static Vec2 legOffsetB = new Vec2();
@@ -112,6 +115,8 @@ public class UnityUnitType extends UnitType{
                 mapped.add(copy);
             }
         });
+
+        weapons.each(w -> weaponXs.add(w.x));
 
         rotors.set(mapped);
         //worm

@@ -157,7 +157,7 @@ public class GraphCrucibleModule extends GraphModule<GraphCrucible, GraphCrucibl
         CrucibleGraph net = networks.get(0);
         if(net == null) return;
         table.add(new Bar(
-            () -> bundle.get("stat.unity.liquidTotal") + ": " + Strings.fixed(net.getVolumeContained(), 1) + "/" + Strings.fixed(net.totalCapacity(), 1)
+            () -> bundle.get("stat.unity.liquidtotal") + ": " + Strings.fixed(net.getVolumeContained(), 1) + "/" + Strings.fixed(net.totalCapacity(), 1)
             , () -> Pal.darkishGray
             , () -> net.getVolumeContained() / net.totalCapacity()
         )).growX().row();

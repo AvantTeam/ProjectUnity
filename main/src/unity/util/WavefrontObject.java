@@ -170,7 +170,13 @@ public class WavefrontObject{
                 case normalAngle -> normalAngleDraw(face);
                 default -> Draw.color(lightColor);
             }
-            drawFace(face);
+            boolean shouldDraw = true;
+            if(hasNormal){
+                if(Math.abs(face.normal[0].angle(Vec3.Z)) >= 90f) shouldDraw = false;
+            }
+            if(shouldDraw){
+                drawFace(face);
+            }
         }
         Draw.reset();
         Draw.z(oz);
