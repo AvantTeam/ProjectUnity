@@ -49,14 +49,12 @@ public class Unity extends Mod implements ApplicationListener{
 
     public Unity(){
         ContributorList.init();
-<<<<<<< HEAD
         if(Core.app != null){
             Core.app.addListener(this);
         }
-=======
+
         KamiPatterns.load();
         KamiBulletDatas.load();
->>>>>>> 2f2dd294a078f71d1d99c8dafdae043fc49341db
 
         if(Core.assets != null){
             Core.assets.setLoader(WavefrontObject.class, new WavefrontObjectLoader(tree));
