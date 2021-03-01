@@ -208,6 +208,28 @@ public class IconGenerator implements Generator{
                 }
             }
         });
+
+        content.items().each(item -> {
+            if(item.minfo.mod == null) return;
+
+            try{
+                item.init();
+                item.load();
+
+                Sprite sprite = SpriteProcessor.get(item.name);
+                sprite.antialias();
+
+                String fname = item.name.replaceFirst("unity-", "");
+                sprite.save(fname);
+                genIcon(sprite, fname);
+            }catch(Exception e){
+                if(e instanceof IllegalArgumentException i){
+                    Log.err("Skipping item @: @", item.name, i.getMessage());
+                }else{
+                    Log.err(e);
+                }
+            }
+        });
     }
 
     private void genIcon(Sprite sprite, String name){

@@ -22,7 +22,7 @@ task proc(dependsOn: [classes, configurations.runtimeClasspath]){
         javaexec{
             main = imageProcessorMain
             classpath = sourceSets.main.runtimeClasspath
-            jvmArgs "-Djava.awt.headless=true"
+            jvmArgs += "-Djava.awt.headless=true"
             systemProperty "alphableed", getProperty("alphableed")
 
             standardInput = System.in
