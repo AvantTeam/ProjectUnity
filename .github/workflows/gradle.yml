@@ -17,10 +17,15 @@ jobs:
     - name: Set up PATH
       run: echo "${ANDROID_HOME}/build-tools/30.0.1" >> $GITHUB_PATH
 
-    - name: Build mod jar files
+    - name: Grant permissions
       run: |
         chmod +x gradlew
-        ./gradlew main:deployDex -Palphableed=true
+
+        chmod +x ./main/alpha-bleed
+        chmod +x ./main/alpha-bleeding-linux.exe
+
+    - name: Build and dexify mod jar file
+      run: ./gradlew main:deployDex
 
     #- name: Upload built mod jar file
       #uses: actions/upload-artifact@v2.2.1
