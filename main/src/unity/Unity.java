@@ -28,7 +28,6 @@ public class Unity extends Mod{
 
     private final ContentList[] unityContent = {
         new UnityItems(),
-        new OverWriter(),
         new UnityStatusEffects(),
         new UnityLiquids(),
         new UnityBullets(),
@@ -36,7 +35,8 @@ public class Unity extends Mod{
         new UnityBlocks(),
         new UnityPlanets(),
         new UnitySectorPresets(),
-        new UnityTechTree()
+        new UnityTechTree(),
+        new OverWriter()
     };
 
     private static LoadedMod unity;
