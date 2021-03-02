@@ -101,7 +101,7 @@ public class UnityBlocks implements ContentList{
     public static
     @ExpDef(type = ExpBlock.class)
     @FactionDef(type = "koruh")
-    @LoadRegs(value = {"bt-laser-turret-top"})
+    @LoadRegs("bt-laser-turret-top")
     Block laserBreakthrough;
 
     //public static @FactionDef(type = "light")
@@ -109,6 +109,8 @@ public class UnityBlocks implements ContentList{
 
     public static @FactionDef(type = "monolith")
     Block monolithAlloyForge,
+
+    electrophobicWall, electrophobicWallLarge,
 
     mage, oracle;
 
@@ -1344,6 +1346,32 @@ public class UnityBlocks implements ContentList{
             consumes.power(3.6f);
             consumes.items(with(Items.silicon, 3, Items.graphite, 2, UnityItems.monolite, 2));
             consumes.liquid(Liquids.cryofluid, 0.1f);
+        }};
+
+        electrophobicWall = new PowerWall("electrophobic-wall"){{
+            requirements(Category.defense, with(UnityItems.monolite, 4, Items.silicon, 2));
+
+            size = 1;
+            health = 400;
+
+            energyMultiplier.put(LightningBulletType.class, 15f);
+            energyMultiplier.put(LaserBulletType.class, 9f);
+            energyMultiplier.put(ContinuousLaserBulletType.class, 12f);
+            energyMultiplier.put(LaserBoltBulletType.class, 9f);
+        }};
+
+        electrophobicWallLarge = new PowerWall("electrophobic-wall-large"){{
+            requirements(Category.defense, with(UnityItems.monolite, 16, Items.silicon, 8));
+
+            size = 2;
+            health = 1600;
+            powerProduction = 4f;
+            damageThreshold = 300f;
+
+            energyMultiplier.put(LightningBulletType.class, 15f);
+            energyMultiplier.put(LaserBulletType.class, 9f);
+            energyMultiplier.put(ContinuousLaserBulletType.class, 12f);
+            energyMultiplier.put(LaserBoltBulletType.class, 9f);
         }};
 
         mage = new PowerTurret("mage"){{
