@@ -20,7 +20,7 @@ jobs:
     - name: Build mod jar files
       run: |
         chmod +x gradlew
-        ./gradlew main:deployDex -Palphableed=true
+        ./gradlew main:deployDex --stacktrace
 
     #- name: Upload built mod jar file
       #uses: actions/upload-artifact@v2.2.1
