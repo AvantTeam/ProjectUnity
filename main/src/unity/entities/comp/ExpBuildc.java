@@ -21,7 +21,7 @@ import unity.util.*;
 import static mindustry.Vars.*;
 
 public interface ExpBuildc extends ExpEntityc<Block, ExpBlock>, Buildingc{
-    @Initialize(eval = "false")
+    @Initialize("false")
     boolean checked();
 
     void checked(boolean checked);

@@ -60,27 +60,27 @@ public class UnityBlocks implements ContentList{
 
     oreNickel, oreUmbrium, oreLuminum, oreMonolite, oreImberium;
 
-    public static @FactionDef(type = "dark")
+    public static @FactionDef("dark")
     Block apparition, ghost, banshee, fallout, catastrophe, calamity, extinction,
 
     darkAlloyForge,
 
     darkWall, darkWallLarge;
 
-    public static @FactionDef(type = "light")
+    public static @FactionDef("light")
     Block photon, //graviton, gluon, higgsBoson, singularity,
     electron; /*,
     proton, zBoson,
     neutron, wBoson;*/
 
-    public static @FactionDef(type = "imber")
+    public static @FactionDef("imber")
     Block orb, shockwire, current, plasma, electrobomb, shielder,
 
     sparkAlloyForge,
 
     electroTile;
 
-    public static @FactionDef(type = "koruh")
+    public static @FactionDef("koruh")
     Block solidifier, steelSmelter, liquifier,
 
     stoneWall, denseWall, steelWall, steelWallLarge, diriumWall, diriumWallLarge,
@@ -94,20 +94,20 @@ public class UnityBlocks implements ContentList{
     teleporter, teleunit; //expOutput, expUnloader, expTank, expChest, expFountain, expVoid;
 
     public static
-    @ExpDef(type = ExpBlock.class)
-    @FactionDef(type = "koruh")
+    @ExpDef(ExpBlock.class)
+    @FactionDef("koruh")
     Block laser, laserCharge, laserFrost, laserBranch, laserFractal, laserKelvin, inferno; 
     
     public static
-    @ExpDef(type = ExpBlock.class)
-    @FactionDef(type = "koruh")
+    @ExpDef(ExpBlock.class)
+    @FactionDef("koruh")
     @LoadRegs("bt-laser-turret-top")
     Block laserBreakthrough;
 
     //public static @FactionDef(type = "light")
     //Block
 
-    public static @FactionDef(type = "monolith")
+    public static @FactionDef("monolith")
     Block monolithAlloyForge,
 
     electrophobicWall, electrophobicWallLarge,
@@ -115,7 +115,7 @@ public class UnityBlocks implements ContentList{
     mage, oracle;
 
     public static
-    @FactionDef(type = "monolith")
+    @FactionDef("monolith")
     @LoadRegs(value = {
         "supernova-head",
         "supernova-core",
@@ -127,7 +127,7 @@ public class UnityBlocks implements ContentList{
 
     //monolithGroundFactory;
 
-    public static @FactionDef(type = "youngcha")
+    public static @FactionDef("youngcha")
     Block concreteBlank, concreteFill, concreteNumber, concreteStripe, concrete, stoneFullTiles, stoneFull, stoneHalf, stoneTiles,
 
     heatPipe, smallRadiator, //heatdistributor
@@ -172,10 +172,10 @@ public class UnityBlocks implements ContentList{
 
     smallTurret, medTurret;
 
-    public static @FactionDef(type = "advance")
+    public static @FactionDef("advance")
     Block celsius, kelvin, xenoCorruptor, cube;
 
-    public static @FactionDef(type = "end")
+    public static @FactionDef("end")
     Block terminalCrucible, endForge, endGame;
 
     @Override

@@ -84,7 +84,7 @@ public class EntityProcessor extends BaseProcessor{
                         );
                         Initialize initializer = annotation(getter, Initialize.class);
                         if(initializer != null){
-                            field.initializer(initializer.eval(), elements(initializer::args).map(this::cName).toArray(Object.class));
+                            field.initializer(initializer.value(), elements(initializer::args).map(this::cName).toArray(Object.class));
                         }
 
                         MethodSpec.Builder getImpl = MethodSpec.overriding(getter)
@@ -248,7 +248,7 @@ public class EntityProcessor extends BaseProcessor{
             for(VariableElement e : pointers){
                 TypeElement up = (TypeElement)e.getEnclosingElement();
                 String c = e.getSimpleName().toString();
-                TypeElement type = (TypeElement)elements(annotation(e, EntityPoint.class)::type).first();
+                TypeElement type = (TypeElement)elements(annotation(e, EntityPoint.class)::value).first();
 
                 init.addStatement("put($T.$L, $T::create)", tName(up), c, tName(type));
                 first = false;

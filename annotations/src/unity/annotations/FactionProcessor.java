@@ -294,7 +294,7 @@ public class FactionProcessor extends BaseProcessor{
             String c = e.getSimpleName().toString();
             TypeName upf = tName(faction);
             FactionDef def = annotation(e, FactionDef.class);
-            String fac = def.type();
+            String fac = def.value();
 
             if(before != null && !fac.equals(before)){
                 initializer.addCode(lnew());

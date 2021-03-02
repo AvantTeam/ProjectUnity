@@ -8,7 +8,7 @@ import unity.entities.*;
 import unity.type.*;
 
 public abstract interface ExpEntityc<T extends UnlockableContent, E extends ExpType<T>> extends Healthc{
-    @Initialize(eval = "0f")
+    @Initialize("0f")
     float exp();
 
     void exp(float exp);

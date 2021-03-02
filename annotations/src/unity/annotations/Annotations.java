@@ -34,7 +34,7 @@ public class Annotations{
     @Retention(RetentionPolicy.SOURCE)
     public @interface FactionDef{
         /** @return The faction */
-        String type();
+        String value();
     }
 
     /** Indicates that this content implements an exp mechanism */
@@ -42,7 +42,7 @@ public class Annotations{
     @Retention(RetentionPolicy.SOURCE)
     public @interface ExpDef{
         /** @return The exp type */
-        Class<?> type();
+        Class<?> value();
     }
 
     /** Indicates that this content's entity type inherits interfaces */
@@ -61,7 +61,7 @@ public class Annotations{
     @Retention(RetentionPolicy.SOURCE)
     public @interface EntityPoint{
         /** @return The entity type */
-        Class<?> type();
+        Class<?> value();
     }
 
     /** Indicates that this music belongs to a specific faction in a specific category */
@@ -92,31 +92,24 @@ public class Annotations{
     public @interface ExpBase{
     }
 
-    /** Whether this block class implements graph system */
+    /** Works somewhat like {@code Object.assign(...)} for Block and Building */
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface GraphComp{
-        /**
-         * @return Whether this is the base graph block class; every extensions will extend the class
-         * annotated with this assuming {@code base = true}.
-         * Only 1 class may use this.
-         */
-        boolean base() default false;
+    public @interface Merge{
+        /** @return The base class */
+        Class<?> base();
+
+        /** @return The merged classes */
+        Class<?> values();
     }
 
     //end region
     //region utilities
 
     /** Whether the field returned by this getter is meant to be read-only */
-    @Target({ElementType.METHOD, ElementType.FIELD})
+    @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.SOURCE)
     public @interface ReadOnly{
-    }
-
-    /** Whether the field is "imported" from another class */
-    @Target(ElementType.FIELD)
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface Import{
     }
 
     /** Whether this getter must be implemented by the type's subtypes */
@@ -142,7 +135,7 @@ public class Annotations{
     @Retention(RetentionPolicy.SOURCE)
     public @interface Initialize{
         /** @return The code that is gonna be used to evaluate the initializer */
-        String eval();
+        String value();
 
         /** @return Class arguments to be parsed into {@link #eval()}. */
         Class<?>[] args() default {};
@@ -161,7 +154,8 @@ public class Annotations{
     //end region
 
     //anuke's implementation of annotation proxy maker, to replace the broken one from oracle
-    //thanks, oracle
+    //thanks, anuke
+    //damn you, oracle
     @SuppressWarnings({"sunapi", "unchecked", "rawtypes"})
     public static class AnnotationProxyMaker{
         private final Compound anno;

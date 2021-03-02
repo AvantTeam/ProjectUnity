@@ -7,11 +7,11 @@ import unity.annotations.Annotations.*;
 import unity.type.*;
 
 public interface Copterc extends Unitc{
-    @Initialize(eval = "1f")
+    @Initialize("1f")
     float rotorSpeedScl();
     void rotorSpeedScl(float scl);
 
-    @Initialize(eval = "new $T()", args = FloatSeq.class)
+    @Initialize(value = "new $T()", args = FloatSeq.class)
     FloatSeq rotorRot();
     void rotorRot(FloatSeq fSeq);
 

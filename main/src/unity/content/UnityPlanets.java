@@ -11,9 +11,9 @@ import unity.graphics.*;
 import unity.planets.*;
 
 public class UnityPlanets implements ContentList{
-    public static @FactionDef(type = "imber") Planet electrode, inert;
+    public static @FactionDef("imber") Planet electrode, inert;
 
-    public static @FactionDef(type = "monolith") Planet megalith;
+    public static @FactionDef("monolith") Planet megalith;
 
     @Override
     public void load(){

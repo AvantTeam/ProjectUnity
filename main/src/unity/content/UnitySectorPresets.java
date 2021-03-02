@@ -1,12 +1,14 @@
 package unity.content;
 
-import mindustry.type.SectorPreset;
-import mindustry.ctype.ContentList;
+import mindustry.type.*;
+import mindustry.ctype.*;
+import unity.annotations.Annotations.*;
 
 import static unity.content.UnityPlanets.*;
 
 public class UnitySectorPresets implements ContentList{
-    public static SectorPreset imberlands, accretion;
+    public static SectorPreset imberlands;
+    public static @FactionDef("monolith") SectorPreset accretion;
 
     @Override
     public void load(){

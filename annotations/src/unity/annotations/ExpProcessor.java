@@ -96,7 +96,7 @@ public class ExpProcessor extends BaseProcessor{
         TypeName before = null;
         for(VariableElement e : exps){
             ExpDef def = annotation(e, ExpDef.class);
-            TypeElement type = (TypeElement)elements(def::type).first();
+            TypeElement type = (TypeElement)elements(def::value).first();
             TypeName up = tName(e.getEnclosingElement());
             String c = e.getSimpleName().toString();
 

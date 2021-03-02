@@ -53,11 +53,11 @@ public class UnityUnitTypes implements ContentList{
     UnitType caelifera, schistocerca, anthophila, vespula, lepidoptera;
 
     /** Global {@linkplain UnitEntity flying} units */
-    public static @EntityPoint(type = UnitEntity.class)
+    public static @EntityPoint(UnitEntity.class)
     UnitType angel, malakhim;
     
     /** Global {@linkplain LegsUnit legs} units */
-    public static @EntityPoint(type = LegsUnit.class)
+    public static @EntityPoint(LegsUnit.class)
     UnitType ursa, arcaetana, projectSpiboss;
 
     /** Global naval units */
@@ -65,40 +65,40 @@ public class UnityUnitTypes implements ContentList{
     rexed, storm, amphibiNaval, amphibi, craberNaval, craber;
     //formatter:on
     /** Scar {@linkplain LegsUnit legs} units */
-    public static @FactionDef(type = "scar") @EntityPoint(type = LegsUnit.class)
+    public static @FactionDef("scar") @EntityPoint(LegsUnit.class)
     UnitType hovos, ryzer, zena, sundown, rex, excelsus;
 
     /** Scar {@linkplain UnitEntity flying} units */
-    public static @FactionDef(type = "scar") @EntityPoint(type = UnitEntity.class)
+    public static @FactionDef("scar") @EntityPoint(UnitEntity.class)
     UnitType whirlwind, jetstream, vortex;
 
-    /** Imber 'whatever this is' units */
-    public static @FactionDef(type = "imber")
+    /** Imber wyrm units */
+    public static @FactionDef("imber")
     UnitType arcnelidia;
 
-    public static @FactionDef(type = "plague")
+    public static @FactionDef("plague")
     UnitType toxobyte;
     
     /** Koruh {@linkplain MechUnit mech} units */
-    public static @FactionDef(type = "koruh") @EntityPoint(type = MechUnit.class)
+    public static @FactionDef("koruh") @EntityPoint(MechUnit.class)
     UnitType buffer, omega;
     
     /** Koruh {@linkplain UnitEntity flying} units */
-    public static @FactionDef(type = "koruh") @EntityPoint(type = UnitEntity.class)
+    public static @FactionDef("koruh") @EntityPoint(UnitEntity.class)
     UnitType cache, dijkstra, phantasm;
 
     /** Monolith {@linkplain MechUnit mech} units */
-    public static @FactionDef(type = "monolith") @EntityPoint(type = MechUnit.class)
+    public static @FactionDef("monolith") @EntityPoint(MechUnit.class)
     UnitType stele, pedestal, pilaster;
 
     /** Monolith {@linkplain LegsUnit legs} units */
-    public static @FactionDef(type = "monolith") @EntityPoint(type = LegsUnit.class)
+    public static @FactionDef("monolith") @EntityPoint(LegsUnit.class)
     UnitType pylon, monument, colossus, bastion;
 
-    public static @FactionDef(type = "koruh") @EntityDef(base = KamiUnit.class, def = Bossc.class)
+    public static @FactionDef("koruh") @EntityDef(base = KamiUnit.class, def = Bossc.class)
     UnitType kami;
 
-    public static @FactionDef(type = "end") UnitType opticaecus, devourer, ravager;
+    public static @FactionDef("end") UnitType opticaecus, devourer, ravager;
 
     public static int getClassId(int index){
         return classIDs[index];
