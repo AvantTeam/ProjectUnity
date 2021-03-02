@@ -1801,6 +1801,8 @@ public class UnityUnitTypes implements ContentList{
             health = 350f;
             buildSpeed = 1.5f;
             landShake = 4f;
+            rotateSpeed = 3f;
+
             weapons.add(new Weapon(name + "-cannon"){{
                 top = false;
                 x = 4f;
@@ -1832,6 +1834,9 @@ public class UnityUnitTypes implements ContentList{
                     despawnEffect = Fx.blastExplosion;
                     weaveScale = 8f;
                     weaveMag = 2f;
+
+                    status = StatusEffects.blasted;
+                    statusDuration = 60f;
                 }};
             }});
             String armorRegion = name + "-armor";
@@ -1979,9 +1984,9 @@ public class UnityUnitTypes implements ContentList{
 
         trident = new UnityUnitType("trident"){{
             mineTier = 2;
-            speed = 2.1f;
-            accel = 0.11f;
-            drag = 0.034f;
+            speed = 1.8f;
+            accel = 0.08f;
+            drag = 0.02f;
             faceTarget = false;
             health = 250f;
             itemCapacity = 30;
@@ -1990,10 +1995,13 @@ public class UnityUnitTypes implements ContentList{
             lowAltitude = false;
             flying = true;
             circleTarget = true;
+            rotateSpeed = 3.4f;
+            range = 140f;
 
             weapons.add(new Weapon(){{
                 x = 3f;
                 y = -0.75f;
+                shootY = 0f;
                 reload = 25f;
                 shotDelay = 1f;
                 shots = 8;
@@ -2010,6 +2018,9 @@ public class UnityUnitTypes implements ContentList{
                     shootEffect = Fx.none;
                     smokeEffect = Fx.none;
                     shootSound = Sounds.artillery;
+
+                    status = StatusEffects.blasted;
+                    statusDuration = 60f;
                 }};
             }});
         }};
@@ -2026,6 +2037,7 @@ public class UnityUnitTypes implements ContentList{
             buildSpeed = 1.2f;
             flying = true;
             circleTarget = true;
+            rotateSpeed = 19f;
 
             weapons.add(new Weapon(){{
                 x = 11f/4f;
@@ -2039,9 +2051,10 @@ public class UnityUnitTypes implements ContentList{
                     height = 12f;
                     frontColor = Color.valueOf("feb380");
                     backColor = Color.valueOf("ea8878");
-                    status = StatusEffects.burning;
                     makeFire = true;
                     lifetime = 60f;
+                    
+                    status = StatusEffects.burning;
                 }};
             }});
         }};
