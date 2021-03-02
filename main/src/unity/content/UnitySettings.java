@@ -8,15 +8,15 @@ import mindustry.*;
   * @author sk7725
 */
 public class UnitySettings{
-    public void addGraphicSetting(String key){
-        Vars.ui.settings.graphics.checkPref(key, Core.settings.getBool(key));
+    public void addGraphicSetting(String key, boolean def){
+        Vars.ui.settings.graphics.checkPref(key, Core.settings.getBool(key, def));
     }
 
     public void init(){
         boolean tmp = Core.settings.getBool("uiscalechanged", false);
         Core.settings.put("uiscalechanged", false);
 
-        addGraphicSetting("hitexpeffect");
+        addGraphicSetting("hitexpeffect", true);
 
         Core.settings.put("uiscalechanged", tmp);
     }
