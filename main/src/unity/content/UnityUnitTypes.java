@@ -85,7 +85,7 @@ public class UnityUnitTypes implements ContentList{
     
     /** Koruh {@linkplain UnitEntity flying} units */
     public static @FactionDef("koruh") @EntityPoint(UnitEntity.class)
-    UnitType cache, dijkstra, phantasm;
+    UnitType cache, dijkstra, phantasm, trident, glaive;
 
     /** Monolith {@linkplain MechUnit mech} units */
     public static @FactionDef("monolith") @EntityPoint(MechUnit.class)
@@ -1793,7 +1793,8 @@ public class UnityUnitTypes implements ContentList{
             mineTier = 2;
             mineSpeed = 1.5f;
             itemCapacity = 80;
-            speed = 0.36f;
+            speed = 0.4f;
+            accel = 0.36f;
             canBoost = true;
             boostMultiplier = 0.6f;
             engineColor = Color.valueOf("feb380");
@@ -1815,7 +1816,7 @@ public class UnityUnitTypes implements ContentList{
                 ejectEffect = Fx.none;
                 shake = 3f;
                 shootSound = Sounds.shootBig;
-                bullet = new MissileBulletType(2.7f, 12f, "missile"){{
+                bullet = new MissileBulletType(2.7f, 12f){{
                     width = height = 8f;
                     shrinkX = shrinkY = 0f;
                     drag = -0.003f;
@@ -1973,6 +1974,75 @@ public class UnityUnitTypes implements ContentList{
                 ejectEffect = Fx.casing2;
                 shootSound = Sounds.shootBig;
                 bullet = UnityBullets.phantasmalBullet;
+            }});
+        }};
+
+        trident = new UnityUnitType("trident"){{
+            mineTier = 2;
+            speed = 2.1f;
+            accel = 0.11f;
+            drag = 0.034f;
+            faceTarget = false;
+            health = 250f;
+            itemCapacity = 30;
+            engineColor = Color.valueOf("84f491");
+            buildSpeed = 2.5f;
+            lowAltitude = false;
+            flying = true;
+            circleTarget = true;
+
+            weapons.add(new Weapon(){{
+                x = 3f;
+                y = -0.75f;
+                reload = 25f;
+                shotDelay = 1f;
+                shots = 8;
+                alternate = true;
+                ejectEffect = Fx.none;
+                velocityRnd = 1f;
+                inaccuracy = 20f;
+                ignoreRotation = true;
+                minShootVelocity = 0.75f;
+                bullet = new BombBulletType(16f, 25f){{
+                    width = 10f;
+                    height = 14f;
+                    hitEffect = Fx.flakExplosion;
+                    shootEffect = Fx.none;
+                    smokeEffect = Fx.none;
+                    shootSound = Sounds.artillery;
+                }};
+            }});
+        }};
+
+        glaive = new UnityUnitType("glaive"){{
+            mineTier = 4;
+            mineSpeed = 1.3f;
+            speed = 3.7f;
+            accel = 0.32f;
+            drag = 0.06f;
+            health = 240f;
+            itemCapacity = 60;
+            engineColor = Color.valueOf("feb380");
+            buildSpeed = 1.2f;
+            flying = true;
+            circleTarget = true;
+
+            weapons.add(new Weapon(){{
+                x = 11f/4f;
+                y = 27f/4f;
+                reload = 13f;
+                alternate = true;
+                ejectEffect = Fx.casing1;
+                shootSound = Sounds.shootSnap;
+                bullet = new BasicBulletType(4f, 7.5f){{
+                    width = 10f;
+                    height = 12f;
+                    frontColor = Color.valueOf("feb380");
+                    backColor = Color.valueOf("ea8878");
+                    status = StatusEffects.burning;
+                    makeFire = true;
+                    lifetime = 60f;
+                }};
             }});
         }};
 
