@@ -6,18 +6,16 @@ import mindustry.content.TechTree.*;
 import mindustry.ctype.*;
 import mindustry.game.Objectives.*;
 import mindustry.type.*;
-import unity.content.*;
 
 import static unity.content.UnityBlocks.*;
 
-@SuppressWarnings("unused")
 public class UnityTechTree implements ContentList{
     private static TechNode context = null;
 
     @Override
     public void load(){
         //region blocks
-        
+
         attachNode(Blocks.surgeSmelter, () -> {
             node(darkAlloyForge);
             node(monolithAlloyForge);
@@ -32,7 +30,7 @@ public class UnityTechTree implements ContentList{
                 });
             });
         });
-        
+
         attachNode(Blocks.powerNode, () -> {
             node(lightLamp, () -> {
                 node(lightFilter, () -> {
@@ -40,7 +38,7 @@ public class UnityTechTree implements ContentList{
                         node(lightItemFilter);
                     });
                 });
-                
+
                 node(lightPanel);
                 node(lightReflector, () -> {
                     node(lightDivisor, () -> {
@@ -48,35 +46,39 @@ public class UnityTechTree implements ContentList{
                             node(lightInfluencer);
                         });
                     });
-                    
+
                     node(lightReflector1, () -> {
                         node(lightOmnimirror);
                     });
                 });
-                
+
                 node(oilLamp);
             });            
         });
-        
+
         attachNode(Blocks.arc, () -> {
             node(mage, () -> {
                 node(oracle);
             });
         });
-        
+
         attachNode(Blocks.titaniumWall, () -> {
             node(metaglassWall, () -> {
                 node(metaglassWallLarge);
             });
+
+            node(electrophobicWall, Seq.with(new Research(UnityItems.monolite)), () -> {
+                node(electrophobicWallLarge);
+            });
         });
-        
+
         //end region
         //region items
-        
+
         attachNode(Items.lead, () -> {
             nodeProduce(UnityItems.nickel);
         });
-        
+
         attachNode(Items.graphite, () -> {
             nodeProduce(UnityItems.stone, () -> {
                 nodeProduce(UnityItems.denseAlloy, () -> {
@@ -128,10 +130,10 @@ public class UnityTechTree implements ContentList{
     }
 
     private static void nodeProduce(UnlockableContent content, Runnable children){
-        nodeProduce(content, new Seq<>(), children);
+        nodeProduce(content, Seq.with(), children);
     }
     
     private static void nodeProduce(UnlockableContent content){
-        nodeProduce(content, new Seq<>(), () -> {});
+        nodeProduce(content, Seq.with(), () -> {});
     }
 }
