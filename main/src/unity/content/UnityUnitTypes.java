@@ -2556,7 +2556,7 @@ public class UnityUnitTypes implements ContentList{
             speed = 4f;
             accel = 0.053f;
             drag = 0.012f;
-            defaultController = AdvanceWormAI::new;
+            defaultController = WormAI::new;
             circleTarget = counterDrag = true;
             rotateShooting = faceTarget = false;
             hitSize = 41f * 1.55f;

@@ -1,10 +1,5 @@
 sourceSets.main.java.srcDirs = ["src/"]
 
-repositories{
-    mavenCentral()
-    maven{url "https://www.jitpack.io"}
-}
-
 ext{
     imageProcessorMain = "unity.tools.SpriteProcessor"
 
@@ -16,34 +11,49 @@ ext{
 task proc(dependsOn: [classes, configurations.runtimeClasspath]){
     doLast{
         delete{
-            delete "$spritesGenFolder"
-            delete "$spritesAssetsFolder"
+            delete spritesGenFolder
+            delete spritesAssetsFolder
         }
 
-        file("$spritesGenFolder").mkdirs()
-        file("$spritesGenUIFolder").mkdirs()
+        file(spritesGenFolder).mkdirs()
+        file(spritesGenUIFolder).mkdirs()
+        file(spritesAssetsFolder).mkdirs()
 
         javaexec{
             main = imageProcessorMain
             classpath = sourceSets.main.runtimeClasspath
-            jvmArgs("-Djava.awt.headless=true")
+            jvmArgs += "-Djava.awt.headless=true"
             standardInput = System.in
             workingDir = "../main/assets-raw/"
         }
 
-        file("$spritesAssetsFolder").mkdirs()
-
         copy{
-            from "$spritesGenFolder"
-            into "$spritesAssetsFolder"
+            from spritesGenFolder
+            into spritesAssetsFolder
+        }
+
+        exec{
+            workingDir = "../main/"
+
+            println()
+            println("Alpha-bleeding sprites...")
+            if(windows()){
+                commandLine("cmd", "/c", "alpha-bleeding-windows.exe", "--replace", "./assets/sprites/")
+            }else{
+                commandLine("echo", "replace")
+            }
         }
     }
+}
+
+repositories{
+    mavenCentral()
+    maven{url "https://www.jitpack.io"}
 }
 
 dependencies{
     implementation project(":main")
 
     implementation "com.github.Anuken.Arc:arc-core:$mindustryVersion"
-    implementation "com.github.Anuken.Arc:packer:$mindustryVersion"
     implementation "com.github.Anuken.Mindustry:core:$mindustryVersion"
 }

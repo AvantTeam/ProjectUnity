@@ -1,10 +1,12 @@
 package unity;
 
 import arc.*;
+import arc.assets.*;
 import arc.func.*;
 import arc.scene.*;
-import arc.struct.Seq;
+import arc.struct.*;
 import arc.util.*;
+import arc.util.async.Threads;
 import mindustry.mod.*;
 import mindustry.mod.Mods.*;
 import mindustry.ctype.*;
@@ -18,9 +20,13 @@ import unity.ui.*;
 import unity.ui.dialogs.*;
 import unity.util.*;
 
+import java.util.Scanner;
+import java.util.concurrent.*;
+
 import static mindustry.Vars.*;
 
-public class Unity extends Mod{
+@SuppressWarnings("unchecked")
+public class Unity extends Mod implements ApplicationListener{
     public static MusicHandler musicHandler;
     public static TapHandler tapHandler;
     public static UnityAntiCheat antiCheat;
@@ -43,12 +49,15 @@ public class Unity extends Mod{
 
     public Unity(){
         ContributorList.init();
+        if(Core.app != null){
+            Core.app.addListener(this);
+        }
+
         KamiPatterns.load();
         KamiBulletDatas.load();
 
         if(Core.assets != null){
             Core.assets.setLoader(WavefrontObject.class, new WavefrontObjectLoader(tree));
-            Core.assets.load(new UnityStyles());
         }
 
         if(!headless){
@@ -105,6 +114,15 @@ public class Unity extends Mod{
     }
 
     @Override
+    public void update(){
+        unity = mods.locateMod("unity");
+        if(unity != null){
+            Core.app.removeListener(this);
+            Events.fire(new UnityModLoadEvent());
+        }
+    }
+
+    @Override
     public void init(){
         enableConsole = true;
         musicHandler.setup();
@@ -112,7 +130,6 @@ public class Unity extends Mod{
         UnityCall.init();
 
         if(!headless){
-            unity = mods.locateMod("unity");
             Func<String, String> stringf = value -> Core.bundle.get("mod." + value);
 
             unity.meta.displayName = stringf.get(unity.meta.name + ".name");
@@ -127,7 +144,7 @@ public class Unity extends Mod{
     public void loadContent(){
         for(ContentList list : unityContent){
             list.load();
-            Log.infoTag("unity", "Loaded content list: " + list.getClass().getSimpleName());
+            print("Loaded content list: " + list.getClass().getSimpleName());
         }
 
         FactionMeta.init();
@@ -166,12 +183,12 @@ public class Unity extends Mod{
             }
         }
 
-        Log.infoTag("unity", builder.toString());
+        Log.info("&lc&fb[unity]&fr @", builder.toString());
     }
 
     public static Class<?> forName(String canonical){
         try{
-            return Class.forName(canonical, true, ((Unity)unity.main).getClass().getClassLoader());
+            return Class.forName(canonical, true, unity.loader);
         }catch(Exception e){
             Log.err(e);
             return null;
@@ -191,4 +208,6 @@ public class Unity extends Mod{
             return null;
         }
     }
+
+    public static class UnityModLoadEvent{}
 }

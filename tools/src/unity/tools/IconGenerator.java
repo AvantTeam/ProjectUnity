@@ -12,6 +12,7 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import unity.entities.comp.*;
+import unity.entities.units.*;
 import unity.type.*;
 
 import static mindustry.Vars.*;
@@ -40,6 +41,7 @@ public class IconGenerator implements Generator{
                         if(SpriteProcessor.has(fname)){
                             Sprite sprite = SpriteProcessor.get(fname);
                             sprite.draw(outline.get(sprite));
+                            sprite.antialias();
 
                             sprite.save(fname);
                         }else if(!optional.contains(fname::contains)){
@@ -56,6 +58,7 @@ public class IconGenerator implements Generator{
                         if(SpriteProcessor.has(fname)){
                             Sprite sprite = SpriteProcessor.get(fname);
                             sprite.draw(outline.get(sprite));
+                            sprite.antialias();
 
                             sprite.save(fname + "-" + suff);
                         }else{
@@ -67,6 +70,14 @@ public class IconGenerator implements Generator{
                 };
 
                 for(Weapon weapon : type.weapons){
+                    String fname = weapon.name.replaceFirst("unity-", "");
+
+                    if(outlined.add(fname) && SpriteProcessor.has(fname)){
+                        outlSeparate.get("outline", weapon.region);
+                    }
+                }
+
+                for(Weapon weapon : type.segWeapSeq){
                     String fname = weapon.name.replaceFirst("unity-", "");
 
                     if(outlined.add(fname) && SpriteProcessor.has(fname)){
@@ -105,11 +116,6 @@ public class IconGenerator implements Generator{
                     }
                 }
 
-                if(unit instanceof Wormc){
-                    outlSeparate.get("outline", type.bodyRegion);
-                    outlSeparate.get("outline", type.tailRegion);
-                }
-
                 for(TextureRegion reg : type.abilityRegions){
                     String fname = parseName.get(reg);
                     if(outlined.add(fname) && SpriteProcessor.has(fname)){
@@ -118,6 +124,10 @@ public class IconGenerator implements Generator{
                 }
 
                 outlSeparate.get("outline", type.region);
+                if(unit instanceof WormDefaultUnit){
+                    outlSeparate.get("outline", type.segmentRegion);
+                    outlSeparate.get("outline", type.tailRegion);
+                }
 
                 String fname = parseName.get(type.region);
                 Sprite outl = outline.get(SpriteProcessor.get(fname));
@@ -189,7 +199,7 @@ public class IconGenerator implements Generator{
                     }
                 }
 
-                genIcon(icon, fname);
+                genIcon(icon.antialias(), fname);
             }catch(Exception e){
                 if(e instanceof IllegalArgumentException i){
                     Log.err("Skipping unit @: @", type.name, i.getMessage());
@@ -198,9 +208,31 @@ public class IconGenerator implements Generator{
                 }
             }
         });
+
+        content.items().each(item -> {
+            if(item.minfo.mod == null) return;
+
+            try{
+                item.init();
+                item.load();
+
+                Sprite sprite = SpriteProcessor.get(item.name);
+                sprite.antialias();
+
+                String fname = item.name.replaceFirst("unity-", "");
+                sprite.save(fname);
+                genIcon(sprite, fname);
+            }catch(Exception e){
+                if(e instanceof IllegalArgumentException i){
+                    Log.err("Skipping item @: @", item.name, i.getMessage());
+                }else{
+                    Log.err(e);
+                }
+            }
+        });
     }
 
-    private void genIcon(Sprite sprite, String name) {
+    private void genIcon(Sprite sprite, String name){
         sprite.save(name + "-full");
         for(Cicon i : Cicon.scaled){
             Vec2 size = Scaling.fit.apply(sprite.width, sprite.height, i.size, i.size);

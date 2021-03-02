@@ -4,7 +4,6 @@ import arc.*;
 import arc.files.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g2d.TextureAtlas.*;
-import arc.packer.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.core.*;
@@ -22,9 +21,8 @@ import static mindustry.Vars.*;
 public class SpriteProcessor{
     static ObjectMap<String, TextureRegion> regionCache = new ObjectMap<>();
     static ObjectMap<String, BufferedImage> spriteCache = new ObjectMap<>();
-    static ColorBleedEffect bleeder = new ColorBleedEffect();
 
-    public static Unity mod;
+    static Unity mod;
 
     public static void main(String[] args) throws Exception{
         headless = true;
@@ -51,15 +49,16 @@ public class SpriteProcessor{
 
         content.setCurrentMod(null);
 
-        Fi.get("./sprites").walk(path -> {
-            if(!path.extEquals("png")) return;
-
-            path.copyTo(Fi.get("./sprites-gen"));
+        Fi.get("./sprites/").walk(path -> {
+            if(path.extEquals("png") || path.extEquals("json")){
+                path.copyTo(Fi.get("./sprites-gen"));
+            }
         });
 
-        Fi.get("./sprites-gen").walk(path -> {
-            String fname = path.nameWithoutExtension();
+        Fi.get("./sprites-gen/").walk(path -> {
+            if(!path.extEquals("png")) return;
 
+            String fname = path.nameWithoutExtension();
             try{
                 BufferedImage sprite = ImageIO.read(path.file());
                 if(sprite == null) throw new IOException("sprite " + path.absolutePath() + " is corrupted or invalid!");
@@ -124,22 +123,6 @@ public class SpriteProcessor{
         };
 
         Generators.generate();
-
-        Fi.get("./sprites-gen").walk(path -> {
-            if(path.absolutePath().contains("ui/")) return;
-
-            try{
-                BufferedImage image = ImageIO.read(path.file());
-
-                Sprite sprite = new Sprite(image);
-                sprite.alphaBleed(2).antialias();
-
-                sprite.save(path.nameWithoutExtension());
-            }catch(IOException e){
-                throw new RuntimeException(e);
-            }
-        });
-
         Sprite.dispose();
     }
 

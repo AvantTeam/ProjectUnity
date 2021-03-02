@@ -18,7 +18,7 @@ import javax.imageio.*;
 public class Sprite{
     private static Seq<Sprite> toDispose = new Seq<>();
 
-    private BufferedImage sprite;
+    BufferedImage sprite;
     private Graphics2D graphics;
     private Color color = new Color();
 
@@ -116,8 +116,8 @@ public class Sprite{
     }
 
     Sprite antialias(){
-        Color sum = new Color();
-        Color suma = new Color();
+        Color sum = Tmp.c1.set(0, 0, 0, 0);
+        Color suma = Tmp.c2.set(0, 0, 0, 0);
         int[] p = new int[9];
 
         for(int x = 0; x < sprite.getWidth(); x++){
@@ -191,7 +191,10 @@ public class Sprite{
                     outer:
                     for(int rx = -radius; rx <= radius; rx++){
                         for(int ry = -radius; ry <= radius; ry++){
-                            if(Mathf.dst(rx, ry) <= radius && getColor(rx + x, ry + y).a > 0.01f){
+                            if(
+                                Structs.inBounds(rx + x, ry + y, width, height) &&
+                                Mathf.within(rx, ry, radius) && getColor(rx + x, ry + y).a > 0.01f
+                            ){
                                 found = true;
 
                                 break outer;
@@ -207,12 +210,6 @@ public class Sprite{
         }
 
         return out;
-    }
-
-    Sprite alphaBleed(int maxIterations){
-        sprite = SpriteProcessor.bleeder.processImage(sprite, maxIterations);
-
-        return this;
     }
 
     void save(String name){

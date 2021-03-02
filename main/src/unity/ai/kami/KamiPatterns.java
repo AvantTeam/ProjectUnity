@@ -53,6 +53,11 @@ public class KamiPatterns{
                         ai.reloads[1] += (ai.reloads[2] % 16f >= 8f) ? 8f : -8f;
                         ai.reloads[2] += 1;
                     }
+                    if(ai.reloads[3] >= 60f * 1.5f){
+                        ai.moveAround(40f);
+                        ai.reloads[3] = 0f;
+                    }
+                    ai.reloads[3] += Time.delta;
                     ai.reloads[0] += Time.delta;
                 })
             };
@@ -104,16 +109,17 @@ public class KamiPatterns{
                 new KamiPatternStage(2f * 60f, ai -> {
                     int diff = 6 + Mathf.clamp(ai.difficulty, 0, 2);
                     float angleRand = Mathf.random(0f, 360f);
-                    float offset = Mathf.random(45f);
+                    float offset = Mathf.random(25f);
                     for(int i = 0; i < diff; i++){
                         float angle = (i * (360f / diff)) + angleRand;
-                        Bullet b = UnityBullets.kamiBullet1.create(ai.unit, ai.unit.team, ai.getX(), ai.getY(), angle, 0.3f + Mathf.range(0.1f), 1f / 0.3f);
-                        b.hitSize = 160f;
+                        float randV = Mathf.range(0.1f);
+                        Bullet b = UnityBullets.kamiBullet1.create(ai.unit, ai.unit.team, ai.getX(), ai.getY(), angle, 0.3f + randV, 1f / 0.3f);
+                        b.hitSize = 150f;
                         if(ai.difficulty > 2){
                             Time.run(2f * 60f, () -> {
-                                if(!ai.unit.dead && !ai.reseting){
-                                    Bullet c = UnityBullets.kamiBullet1.create(ai.unit, ai.unit.team, ai.getX(), ai.getY(), angle + offset, 0.3f + Mathf.range(0.1f), 1f / 0.3f);
-                                    c.hitSize = 160f;
+                                if(!ai.unit.dead && !ai.reseting && !ai.spell){
+                                    Bullet c = UnityBullets.kamiBullet1.create(ai.unit, ai.unit.team, ai.getX(), ai.getY(), angle + offset, 0.3f + randV, 1f / 0.3f);
+                                    c.hitSize = 150f;
                                 }
                             });
                         }
@@ -123,7 +129,7 @@ public class KamiPatterns{
                         ai.kami().laserRotation *= -1f;
                         ai.reloads[1] = 0f;
                     }, ai -> {
-                    if(ai.reloads[0] >= 2f){
+                    if(ai.reloads[0] >= 3f){
                         for(int i = 0; i < 3; i++){
                             float angle = (i * (360f / 3f)) + (ai.reloads[1] * ai.kami().laserRotation * 5f);
                             int diff = Mathf.clamp(ai.difficulty + 2, 1, 5);
@@ -147,8 +153,8 @@ public class KamiPatterns{
             maxDamage = 1000f;
             drawer = utsuhoDrawer;
             stages = new KamiPatternStage[]{
-                new KamiPatternStage(20f * 60f, ai -> {
-                    float diffReload = 25 - Mathf.clamp(ai.difficulty * 4f, 0f, 15f);
+                new KamiPatternStage(25f * 60f, ai -> {
+                    float diffReload = 25 - Mathf.clamp(ai.difficulty * 5f, 0f, 15f);
                     int diff = 10 + Mathf.clamp(ai.difficulty * 2, 0, 8);
                     if(ai.reloads[0] >= diffReload){
                         tVec2.trns(ai.relativeRotation, 270f).add(ai.targetPos);
@@ -170,6 +176,58 @@ public class KamiPatterns{
                     }
                     ai.reloads[1] += Time.delta;
                     ai.reloads[0] += Time.delta;
+                })
+            };
+        }}, 1);
+
+        //Blazing Star "Fixed Star"/Blazing Star "Planetary Revolution"
+        addPattern(new KamiPattern(){{
+            time = 25f * 60f;
+            maxDamage = 1000f;
+            drawer = utsuhoDrawer;
+            init = ai -> {
+                ai.reloads[1] = -2f * 60f;
+                //ai.reloads[2] = -1f;
+                int diff = 3 + Mathf.clamp(Mathf.ceil(ai.difficulty * 0.4f), 0, 2);
+                for(int i = 0; i < diff * 2; i++){
+                    Bullet b = UnityBullets.kamiBullet1.create(ai.unit, ai.unit.team, ai.getX(), ai.getY(), 0f);
+                    b.vel.scl(0f);
+                    b.lifetime = time;
+                    b.hitSize = 180f;
+                    KamiBulletDatas.get(b, KamiBulletDatas.nonDespawnable);
+                    ai.bullets[i] = b;
+                }
+            };
+            stages = new KamiPatternStage[]{
+                new KamiPatternStage(25f * 60f, ai -> {
+                    float reloadDiff = 35f - Mathf.clamp(ai.difficulty * 3, 0, 10);
+                    float rotateDiff = 0.15f + Mathf.clamp(ai.difficulty / 5f, 0f, 0.2f);
+                    int diff = 15 + Mathf.clamp(ai.difficulty * 5, 0, 15);
+                    int diffA = 3 + Mathf.clamp(Mathf.ceil(ai.difficulty * 0.4f), 0, 2);
+
+                    if(ai.reloads[1] >= reloadDiff){
+                        for(int i = 0; i < diff; i++){
+                            float angle = i * (360f / diff) + (ai.reloads[2]);
+                            Bullet b = UnityBullets.kamiBullet1.create(ai.unit, ai.unit.team, ai.getX(), ai.getY(), angle);
+                            b.vel.scl(0.75f);
+                            b.lifetime /= 0.75f;
+                            KamiBulletDatas.get(b, KamiBulletDatas.turnRegular).attribute(-0.3f);
+                        }
+                        ai.reloads[2] += 3;
+                        ai.reloads[1] = 0f;
+                    }
+                    float offset = (180f / diffA);
+                    for(int i = 0; i < diffA; i++){
+                        float angle = i * (360f / diffA);
+                        for(int j = 0; j < 2; j++){
+                            tVec.trns((angle + (offset * j)) + ai.reloads[4 + j], ai.reloads[0] * (j + 0.6f)).add(ai);
+                            ai.bullets[(i * 2) + j].set(tVec);
+                        }
+                    }
+                    ai.reloads[4] += Time.delta * rotateDiff;
+                    ai.reloads[5] += Time.delta * rotateDiff * (ai.difficulty >= 2 ? -1f : 1f);
+                    ai.reloads[1] += Time.delta;
+                    ai.reloads[0] = Mathf.clamp(ai.reloads[0] + (Time.delta * 1.4f), 0f, 360f);
                 })
             };
         }}, 1);

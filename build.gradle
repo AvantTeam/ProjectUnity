@@ -1,13 +1,4 @@
 buildscript{
-    ext{
-        props = new Properties().with{ p -> p.load(file("gradle.properties").newReader()); return p }
-
-        mindustryVersion = props["mindustryVersion"]
-        javapoetVersion = props["javapoetVersion"]
-        multilibVersion = props["multilibVersion"]
-        jabelVersion = props["jabelVersion"]
-    }
-
     repositories{
         mavenCentral()
         maven{ url "https://jitpack.io" }
@@ -27,24 +18,22 @@ allprojects{
     apply plugin: "java-library"
 
     group = "com.github.avant"
-    version = "0.4"
+    version = "0.1"
 
     ext{
-        mindustryVersion = props["mindustryVersion"]
-        javapoetVersion = props["javapoetVersion"]
-        multilibVersion = props["multilibVersion"]
-        jabelVersion = props["jabelVersion"]
-
-        modName = props["modName"]
-
         sdkVersion = "30"
         sdkRoot = System.getenv("ANDROID_HOME")
+
+        hasSprites = {
+            return new File(rootDir, "main/assets/sprites/").exists()
+        }
+
+        windows = {
+            return System.getProperty("os.name").toLowerCase(Locale.ROOT).contains("windows")
+        }
     }
 
     repositories{
-        mavenCentral()
-        maven{ url "https://oss.sonatype.org/content/repositories/snapshots/" }
-        maven{ url "https://oss.sonatype.org/content/repositories/releases/" }
         maven{ url "https://jitpack.io" }
         jcenter()
     }
@@ -76,5 +65,9 @@ configure(subprojects - project(":annotations")){
         doFirst{
             options.compilerArgs = options.compilerArgs.findAll{ it != '--enable-preview' }
         }
+    }
+
+    tasks.withType(JavaExec){
+        jvmArgs += "--enable-preview"
     }
 }

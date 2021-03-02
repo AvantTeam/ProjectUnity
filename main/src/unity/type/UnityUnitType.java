@@ -37,8 +37,6 @@ public class UnityUnitType extends UnitType{
     public float segmentDamageScl = 6f;
     //hopefully make segment movement more consistant.
     public boolean counterDrag = false;
-        // don't touch, please
-    public TextureRegion bodyRegion, bodyOutlineRegion, tailOutlineRegion;
     public boolean splittable = false;
     public float headDamage = 0f;
     public float headTimer = 5f;
@@ -95,11 +93,6 @@ public class UnityUnitType extends UnitType{
         for(AbilityTextures type : AbilityTextures.values()){
             abilityRegions[type.ordinal()] = atlas.find(name + "-" + type.name());
         }
-
-        //please do not the touch
-        bodyRegion = atlas.find(name + "-body");
-        bodyOutlineRegion = atlas.find(name + "-body-outline");
-        tailOutlineRegion = atlas.find(name + "-tail-outline");
 
         segWeapSeq.each(Weapon::load);
     }
@@ -228,23 +221,7 @@ public class UnityUnitType extends UnitType{
 
     @Override
     public void drawShadow(Unit unit){
-        if(unit instanceof Wormc){
-            var worm = (Unit & Wormc)unit;
-
-            Draw.color(Pal.shadow);
-            float e = Math.max(unit.elevation, visualElevation);
-
-            if(worm.isHead()){
-                Draw.rect(region, worm.x + shadowTX * e, worm.y + shadowTY * e, worm.rotation - 90);
-            }else if(worm.isTail()){
-                Draw.rect(tailRegion, worm.x + shadowTX * e, worm.y + shadowTY * e, worm.rotation - 90);
-            }else{
-                Draw.rect(bodyRegion, worm.x + shadowTX * e, worm.y + shadowTY * e, worm.rotation - 90);
-            }
-        }else{
-            super.drawShadow(unit);
-        }
-
+        super.drawShadow(unit);
         if(unit instanceof WormDefaultUnit wormUnit) wormUnit.drawShadow();
     }
 
@@ -262,25 +239,7 @@ public class UnityUnitType extends UnitType{
     public void drawBody(Unit unit){
         float z = Draw.z();
 
-        if(unit instanceof Wormc){
-            var worm = (Unit & Wormc)unit;
-
-            applyColor(unit);
-
-            Draw.z(1.01f + z + worm.layer());
-            if(worm.isHead()){
-                Draw.rect(region, worm.x, worm.y, worm.rotation - 90);
-            }else if(worm.isTail()){
-                Draw.rect(tailRegion, worm.x, worm.y, worm.rotation - 90);
-            }else{
-                Draw.rect(bodyRegion, worm.x, worm.y, worm.rotation - 90);
-            }
-
-            Draw.reset();
-        }else{
-            super.drawBody(unit);
-        }
-
+        super.drawBody(unit);
         //worm
         if(unit instanceof WormDefaultUnit wormUnit){
             for(int i = 0; i < wormUnit.segmentUnits.length; i++){
@@ -301,47 +260,8 @@ public class UnityUnitType extends UnitType{
     }
 
     @Override
-    public void drawEngine(Unit unit){
-        float z = Draw.z();
-
-        if(unit instanceof Wormc worm){
-            if(worm.isHead() && worm.child() == null){
-                Draw.z(1.01f + z + worm.layer());
-
-                super.drawEngine(unit);
-                Draw.z(z);
-            }
-        }else if(engineColor != null){
-            if(!unit.isFlying()) return;
-
-            float scale = unit.elevation;
-            float offset = engineOffset/2f + engineOffset/2f*scale;
-
-            Draw.color(engineColor);
-            Fill.circle(
-                unit.x + Angles.trnsx(unit.rotation + 180, offset),
-                unit.y + Angles.trnsy(unit.rotation + 180, offset),
-                (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f)) * scale
-            );
-            Draw.color(Color.white);
-            Fill.circle(
-                unit.x + Angles.trnsx(unit.rotation + 180, offset - 1f),
-                unit.y + Angles.trnsy(unit.rotation + 180, offset - 1f),
-                (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f)) / 2f  * scale
-            );
-            Draw.color();
-        }else{
-            super.drawEngine(unit);
-        }
-    }
-
-    @Override
     public void drawWeapons(Unit unit){
         float z = Draw.z();
-
-        if(unit instanceof Wormc worm){
-            Draw.z(1.01f + z + worm.layer());
-        }
 
         //super.drawWeapons(unit);
         applyColor(unit);
@@ -396,41 +316,6 @@ public class UnityUnitType extends UnitType{
         }
 
         Draw.reset();
-        Draw.z(z);
-    }
-
-    @Override
-    public void drawCell(Unit unit){
-        float z = Draw.z();
-
-        if(unit instanceof Wormc worm){
-            Draw.z(1.01f + z + worm.layer());
-        }
-
-        super.drawCell(unit);
-        Draw.z(z);
-    }
-
-    @Override
-    public void drawOutline(Unit unit){
-        float z = Draw.z();
-        Draw.reset();
-
-        if(unit instanceof Wormc){
-            var worm = (Unit & Wormc)unit;
-
-            Draw.z(1.01f + z + worm.layer());
-            if(worm.isHead()){
-                Draw.rect(outlineRegion, worm.x, worm.y, worm.rotation - 90);
-            }else if(worm.isTail()){
-                Draw.rect(tailOutlineRegion, worm.x, worm.y, worm.rotation - 90);
-            }else{
-                Draw.rect(bodyOutlineRegion, worm.x, worm.y, worm.rotation - 90);
-            }
-        }else{
-            super.drawOutline(unit);
-        }
-
         Draw.z(z);
     }
 

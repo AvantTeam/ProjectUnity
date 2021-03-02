@@ -1,40 +1,72 @@
 sourceSets.main.java.srcDirs = ["src/", "$buildDir/generated/sources/annotationProcessor/java/main/"]
-sourceSets.main.resources.srcDirs = ["assets/"]
+
+ext{
+    assetsDir = new File(rootDir, "main/assets/")
+}
+
+task deploy(type: Jar, dependsOn: configurations.runtimeClasspath){
+    archiveFileName = "${modName}Desktop.jar"
+
+    from files(sourceSets.main.output.classesDirs)
+    from files(sourceSets.main.output.resourcesDir)
+    from{
+        configurations.runtimeClasspath.collect{
+            it.isDirectory()
+            ?   it
+            :   zipTree(it)
+        }
+    }
+    from files(project.assetsDir)
+
+    doLast{
+        delete{ delete "$buildDir/libs/main-${version}.jar" }
+    }
+}
+
+task dex{
+    dependsOn deploy
+
+    doLast{
+        exec{
+            workingDir = "$buildDir/libs/"
+            def command = ["d8", "--min-api", "15", "--output", "${modName}Dexed.jar", "${modName}Desktop.jar"]
+
+            if(windows()){
+                commandLine("cmd", "/c", *command)
+            }else{
+                commandLine(*command)
+            }
+        }
+    }
+}
+
+task deployDex(type: Jar){
+    dependsOn deploy, dex
+
+    archiveFileName = "${modName}.jar"
+
+    from{[
+        zipTree("$buildDir/libs/${modName}Desktop.jar"),
+        zipTree("$buildDir/libs/${modName}Dexed.jar")
+    ]}
+
+    doLast{
+        delete{
+            delete "$buildDir/libs/${modName}Desktop.jar"
+            delete "$buildDir/libs/${modName}Dexed.jar"
+        }
+    }
+}
+
+if(!hasSprites()){
+    println "Sprites folder not found; automatically processing sprites..."
+    deploy.dependsOn ":tools:proc"
+}
 
 repositories{
     mavenCentral()
     maven{url "https://www.jitpack.io"}
 }
-
-ext{
-    sdkRoot = System.getenv("ANDROID_HOME")
-    sdkVersion = "30.0.1"
-
-    doExec = {cmd ->
-        def proc = cmd.execute(null, new File("$buildDir/libs"))
-        proc.waitForProcessOutput(System.out, System.err)
-    }
-}
-
-task dex{
-    doLast{
-        if(System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')){
-            doExec("cmd /c dx --dex --keep-classes --min-sdk-version=30 --output=${modName}Android.jar ${modName}Desktop.jar")
-        }else{
-            doExec("dx --dex --keep-classes --min-sdk-version=30 --output=${modName}Android.jar ${modName}Desktop.jar")
-        }
-    }
-}
-
-jar{
-    archiveFileName = "${modName}Desktop.jar"
-
-    from{
-        configurations.runtimeClasspath.collect{it.isDirectory() ? it : zipTree(it)}
-    }
-}
-
-task deploy(dependsOn: [jar, dex])
 
 dependencies{
     compileOnly "com.github.Anuken.Arc:arc-core:$mindustryVersion"
