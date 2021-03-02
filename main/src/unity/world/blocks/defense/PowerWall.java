@@ -1,6 +1,9 @@
 package unity.world.blocks.defense;
 
 import arc.*;
+import arc.graphics.Blending;
+import arc.graphics.*;
+import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
@@ -17,6 +20,10 @@ public class PowerWall extends Wall{
     public float damageThreshold = 150f;
     public float overloadDamage = 0.8f;
 
+    public TextureRegion heatRegion;
+    public float heatThreshold = 0.35f;
+    public Color heatColor = Color.red;
+
     public PowerWall(String name){
         super(name);
         update = true;
@@ -27,6 +34,12 @@ public class PowerWall extends Wall{
         outputsPower = true;
         hasPower = true;
         group = BlockGroup.walls;
+    }
+
+    @Override
+    public void load(){
+        super.load();
+        heatRegion = Core.atlas.find(name + "-heat");
     }
 
     @Override
@@ -42,8 +55,23 @@ public class PowerWall extends Wall{
     }
 
     public class PowerWallBuild extends WallBuild{
-        public float productionEfficiency = 0.0f;
+        public float productionEfficiency = 0f;
         protected boolean overloaded;
+
+        @Override
+        public void draw(){
+            super.draw();
+
+            if(productionEfficiency > heatThreshold){
+                float heat = 1f + ((productionEfficiency - heatThreshold) / (1f - heatThreshold)) * 5.4f;
+                heat += heat * Time.delta;
+
+                Draw.color(heatColor, Mathf.absin(heat, 9f, 1f) * Mathf.curve(productionEfficiency, heatThreshold, 1f));
+                Draw.blend(Blending.additive);
+                Draw.rect(heatRegion, x, y);
+                Draw.blend();
+            }
+        }
 
         @Override
         public void updateTile(){
