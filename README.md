@@ -12,13 +12,13 @@ _Relevant links_:
 
 ## Building
 
-Install JDK 15 or higher. Set `JAVA_HOME` environment variable to where it is located. Clone this repository then change your current working directory to where the cloned repository folder is. If you are compiling for Android, click [here](#Building for Android).
+Install JDK 15 or higher. Set `JAVA_HOME` environment variable to where it is located. Clone this repository then change your current working directory to where the cloned repository folder is. If you are compiling for Android, click [here](#Building-for-Android).
 
 ### Windows
 
 - `gradlew tools:proc` - Processes raw sprites and generates some other needed ones; will be automatically called if `./main/assets/sprites` directory isn't found.
 - `gradlew main:deploy` - Builds the mod `.jar` file for desktop only.
-- `gradlew main:deployDex` - Builds the mod `.jar` file for both desktop and Android _(see [**Android**](#Building for Android))_.
+- `gradlew main:deployDex` - Builds the mod `.jar` file for both desktop and Android _(see [**Android**](#Building-for-Android))_.
 
 #### Linux/MacOS
 
