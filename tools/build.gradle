@@ -40,7 +40,7 @@ task proc(dependsOn: [classes, configurations.runtimeClasspath]){
             if(windows()){
                 commandLine("cmd", "/c", "alpha-bleeding-windows.exe", "--replace", "./assets/sprites/")
             }else{
-                commandLine("echo !!Replace this!!")
+                commandLine("echo replace")
             }
         }
     }
