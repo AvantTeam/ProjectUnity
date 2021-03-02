@@ -79,6 +79,6 @@ dependencies{
     annotationProcessor project(":annotations")
 
     compileJava.options.compilerArgs.addAll([
-        "-processor", "unity.annotations.FactionProcessor,unity.annotations.ExpProcessor,unity.annotations.EntityProcessor,unity.annotations.LoadProcessor,unity.annotations.AssetsProcessor,unity.annotations.GraphProcessor"
+        "-processor", "unity.annotations.FactionProcessor,unity.annotations.ExpProcessor,unity.annotations.EntityProcessor,unity.annotations.LoadProcessor,unity.annotations.AssetsProcessor"
     ])
 }

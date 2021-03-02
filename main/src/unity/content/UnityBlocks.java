@@ -178,11 +178,6 @@ public class UnityBlocks implements ContentList{
     public static @FactionDef(type = "end")
     Block terminalCrucible, endForge, endGame;
 
-    public static
-    @FactionDef(type = "youngcha")
-    @GraphDef(Heatg.class)
-    Block testGraph;
-
     @Override
     public void load(){
         //region global
@@ -2009,8 +2004,6 @@ public class UnityBlocks implements ContentList{
             addGraph(new GraphTorque(0.05f, 150f).setAccept(0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
             addGraph(new GraphHeat(120f, 0.05f, 0.02f).setAccept(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1));
         }};
-
-        testGraph = new Block("");
 
         //endregion
         //region advance

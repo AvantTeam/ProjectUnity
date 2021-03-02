@@ -82,19 +82,6 @@ public class Annotations{
         boolean base() default false;
     }
 
-    /** The graph interface */
-    @Target(ElementType.TYPE)
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface GraphInterface{}
-
-    /** Generates new types that implement graph system */
-    @Target(ElementType.FIELD)
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface GraphDef{
-        /** @return The graph interfaces */
-        Class<?>[] value();
-    }
-
     // end region
     // region utilities
 
