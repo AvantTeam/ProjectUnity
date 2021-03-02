@@ -31,7 +31,7 @@ task dex{
             workingDir = "$buildDir/libs/"
             def command = ["d8", "--min-api", "15", "--output", "${modName}Dexed.jar", "${modName}Desktop.jar"]
 
-            if(System.getProperty("os.name").toLowerCase(Locale.ROOT).contains("windows")){
+            if(windows()){
                 commandLine("cmd", "/c", *command)
             }else{
                 commandLine(*command)
@@ -51,13 +51,15 @@ task deployDex(type: Jar){
     ]}
 
     doLast{
-        delete{ delete "$buildDir/libs/${modName}Desktop.jar" }
-        delete{ delete "$buildDir/libs/${modName}Dexed.jar" }
+        delete{
+            delete "$buildDir/libs/${modName}Desktop.jar"
+            delete "$buildDir/libs/${modName}Dexed.jar"
+        }
     }
 }
 
 if(!hasSprites()){
-    println "Sprites folder not found; automatically processing sprites"
+    println "Sprites folder not found; automatically processing sprites..."
     deploy.dependsOn ":tools:proc"
 }
 

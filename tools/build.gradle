@@ -23,8 +23,6 @@ task proc(dependsOn: [classes, configurations.runtimeClasspath]){
             main = imageProcessorMain
             classpath = sourceSets.main.runtimeClasspath
             jvmArgs += "-Djava.awt.headless=true"
-            systemProperty "alphableed", getProperty("alphableed")
-
             standardInput = System.in
             workingDir = "../main/assets-raw/"
         }
@@ -32,6 +30,18 @@ task proc(dependsOn: [classes, configurations.runtimeClasspath]){
         copy{
             from spritesGenFolder
             into spritesAssetsFolder
+        }
+
+        exec{
+            workingDir = "../main/"
+
+            println()
+            println("Alpha-bleeding sprites...")
+            if(windows()){
+                commandLine("cmd", "/c", "alpha-bleeding-windows.exe", "--replace", "./assets/sprites/")
+            }else{
+
+            }
         }
     }
 }
@@ -45,6 +55,5 @@ dependencies{
     implementation project(":main")
 
     implementation "com.github.Anuken.Arc:arc-core:$mindustryVersion"
-    implementation "com.github.Anuken.Arc:packer:$mindustryVersion"
     implementation "com.github.Anuken.Mindustry:core:$mindustryVersion"
 }

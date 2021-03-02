@@ -27,6 +27,10 @@ allprojects{
         hasSprites = {
             return new File(rootDir, "main/assets/sprites/").exists()
         }
+
+        windows = {
+            return System.getProperty("os.name").toLowerCase(Locale.ROOT).contains("windows")
+        }
     }
 
     repositories{

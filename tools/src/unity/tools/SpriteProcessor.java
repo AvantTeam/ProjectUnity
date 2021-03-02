@@ -4,7 +4,6 @@ import arc.*;
 import arc.files.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g2d.TextureAtlas.*;
-import arc.packer.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.core.*;
@@ -24,9 +23,6 @@ public class SpriteProcessor{
     static ObjectMap<String, BufferedImage> spriteCache = new ObjectMap<>();
 
     static Unity mod;
-    static ColorBleedEffect bleed = new ColorBleedEffect();
-
-    static boolean alphableed;
 
     public static void main(String[] args) throws Exception{
         headless = true;
@@ -45,12 +41,6 @@ public class SpriteProcessor{
             name = "unity";
         }}));
 
-        Log.info("Alpha-bleed sprites: " + (alphableed = Boolean.parseBoolean(System.getProperty("alphableed"))));
-        if(!alphableed){
-            Log.info("Use '-Palphableed=true' to enable alpha-bleeding");
-        }
-
-        System.out.println();
         try{
             mod.loadContent();
         }catch(Throwable t){
@@ -133,19 +123,6 @@ public class SpriteProcessor{
         };
 
         Generators.generate();
-
-        if(alphableed){
-            Log.info("Alpha-bleeding sprites...");
-            Fi.get("./sprites-gen/").walk(path -> {
-                try{
-                    BufferedImage sprite = ImageIO.read(path.file());
-                    bleed.processImage(sprite, 1);
-                }catch(IOException e){
-                    throw new RuntimeException(e);
-                }
-            });
-        }
-
         Sprite.dispose();
     }
 
