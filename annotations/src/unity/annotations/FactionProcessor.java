@@ -293,7 +293,7 @@ public class FactionProcessor extends BaseProcessor{
             TypeName up = tName(e.getEnclosingElement());
             String c = e.getSimpleName().toString();
             TypeName upf = tName(faction);
-            FactionDef def = e.getAnnotation(FactionDef.class);
+            FactionDef def = annotation(e, FactionDef.class);
             String fac = def.type();
 
             if(before != null && !fac.equals(before)){
@@ -308,7 +308,7 @@ public class FactionProcessor extends BaseProcessor{
             TypeName up = TypeName.get(e.getEnclosingElement().asType());
             String c = e.getSimpleName().toString();
             TypeName upf = tName(faction);
-            MusicDef def = e.getAnnotation(MusicDef.class);
+            MusicDef def = annotation(e, MusicDef.class);
 
             initializer.addCode(lnew());
             initializer.addStatement("put($T.$L, $T.$L)", up, c, upf, def.facType());

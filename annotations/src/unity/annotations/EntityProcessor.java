@@ -42,7 +42,7 @@ public class EntityProcessor extends BaseProcessor{
 
         if(round == 1){
             for(VariableElement e : defs){
-                EntityDef def = e.getAnnotation(EntityDef.class);
+                EntityDef def = annotation(e, EntityDef.class);
                 TypeElement base = (TypeElement)elements(def::base).first();
                 Seq<TypeElement> inters = elements(def::def).map(el -> (TypeElement)el);
                 ObjectSet<TypeElement> allInters = getInterfaces(base);
@@ -72,7 +72,7 @@ public class EntityProcessor extends BaseProcessor{
                     for(ExecutableElement getter : getters){
                         String n = getter.getSimpleName().toString();
 
-                        if(getter.getAnnotation(MustInherit.class) != null){
+                        if(annotation(getter, MustInherit.class) != null){
                             resolvedGetters.add(n);
                         }
                         if(resolvedGetters.contains(n)) continue;
@@ -80,9 +80,9 @@ public class EntityProcessor extends BaseProcessor{
                         FieldSpec.Builder field = FieldSpec.builder(
                             TypeName.get(getter.getReturnType()),
                             n,
-                            getter.getAnnotation(ReadOnly.class) != null ? Modifier.PROTECTED : Modifier.PUBLIC
+                            annotation(getter, ReadOnly.class) != null ? Modifier.PROTECTED : Modifier.PUBLIC
                         );
-                        Initialize initializer = getter.getAnnotation(Initialize.class);
+                        Initialize initializer = annotation(getter, Initialize.class);
                         if(initializer != null){
                             field.initializer(initializer.eval(), elements(initializer::args).map(this::cName).toArray(Object.class));
                         }
@@ -95,7 +95,7 @@ public class EntityProcessor extends BaseProcessor{
                             setImpl = MethodSpec.overriding(setter)
                                 .addStatement("this.$L = $L", n, setter.getParameters().get(0).getSimpleName().toString());
                         }else{
-                            setImpl = MethodSpec.methodBuilder(n).addModifiers(getter.getAnnotation(ReadOnly.class) != null ? Modifier.PROTECTED : Modifier.PUBLIC)
+                            setImpl = MethodSpec.methodBuilder(n).addModifiers(annotation(getter, ReadOnly.class) != null ? Modifier.PROTECTED : Modifier.PUBLIC)
                                 .addParameter(TypeName.get(getter.getReturnType()), n)
                                 .addStatement("this.$L = $L", n, n);
                         }
@@ -116,7 +116,7 @@ public class EntityProcessor extends BaseProcessor{
 
                 for(ExecutableElement appended : appending.keys().toSeq()){
                     Seq<ExecutableElement> appenders = appending.get(appended);
-                    boolean replace = appenders.contains(app -> app.getAnnotation(Replace.class) != null);
+                    boolean replace = appenders.contains(app -> annotation(app, Replace.class) != null);
                     boolean returns = appended.getReturnType().getKind() != VOID;
 
                     StringBuilder params = new StringBuilder();
@@ -135,13 +135,13 @@ public class EntityProcessor extends BaseProcessor{
                     if(!replace){
                         if(!returns){
                             appenders.sort(m -> {
-                                MethodPriority p = m.getAnnotation(MethodPriority.class);
+                                MethodPriority p = annotation(m, MethodPriority.class);
                                 return p == null ? 0 : p.value();
                             });
 
                             boolean superCalled = false;
                             for(ExecutableElement appender : appenders){
-                                MethodPriority p = appender.getAnnotation(MethodPriority.class);
+                                MethodPriority p = annotation(appender, MethodPriority.class);
                                 if((p == null || p.value() >= 0) && !superCalled){
                                     method
                                         .addStatement("super.$L(" + params.toString() + ")", args.toArray())
@@ -178,7 +178,7 @@ public class EntityProcessor extends BaseProcessor{
                             method.addStatement(builder.toString(), builderArgs.toArray());
                         }
                     }else{
-                        Seq<ExecutableElement> replacers = appenders.select(app -> app.getAnnotation(Replace.class) != null);
+                        Seq<ExecutableElement> replacers = appenders.select(app -> annotation(app, Replace.class) != null);
 
                         for(ExecutableElement replacer : replacers){
                             TypeElement up = (TypeElement)replacer.getEnclosingElement();
@@ -248,7 +248,7 @@ public class EntityProcessor extends BaseProcessor{
             for(VariableElement e : pointers){
                 TypeElement up = (TypeElement)e.getEnclosingElement();
                 String c = e.getSimpleName().toString();
-                TypeElement type = (TypeElement)elements(e.getAnnotation(EntityPoint.class)::type).first();
+                TypeElement type = (TypeElement)elements(annotation(e, EntityPoint.class)::type).first();
 
                 init.addStatement("put($T.$L, $T::create)", tName(up), c, tName(type));
                 first = false;
@@ -350,7 +350,7 @@ public class EntityProcessor extends BaseProcessor{
             m.getReturnType().getKind() != VOID &&
             m.getParameters().isEmpty() &&
             !m.getModifiers().contains(Modifier.DEFAULT) &&
-            m.getAnnotation(MustInherit.class) == null
+            annotation(m, MustInherit.class) == null
         ,
         getters::add));
 

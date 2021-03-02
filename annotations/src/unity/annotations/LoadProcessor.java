@@ -25,7 +25,7 @@ public class LoadProcessor extends BaseProcessor{
     @Override
     public void process(RoundEnvironment roundEnv) throws Exception{
         for(Element e : roundEnv.getElementsAnnotatedWith(LoadRegs.class)){
-            LoadRegs regs = e.getAnnotation(LoadRegs.class);
+            LoadRegs regs = annotation(e, LoadRegs.class);
 
             genericRegs.addAll(regs.value());
             if(regs.outline()){

@@ -5,6 +5,8 @@ import arc.struct.*;
 import arc.util.*;
 
 import java.io.*;
+import java.lang.annotation.*;
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.regex.*;
 
@@ -17,8 +19,14 @@ import javax.tools.*;
 
 import com.squareup.javapoet.*;
 import com.sun.source.util.*;
+import com.sun.tools.javac.code.AnnoConstruct;
+import com.sun.tools.javac.code.Attribute.*;
 import com.sun.tools.javac.model.*;
 import com.sun.tools.javac.processing.*;
+
+import unity.annotations.Annotations.AnnotationProxyMaker;
+
+import java.lang.Class;
 
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 public abstract class BaseProcessor extends AbstractProcessor{
@@ -194,6 +202,17 @@ public abstract class BaseProcessor extends AbstractProcessor{
             f.getSimpleName().toString().equals(name) &&
             typeUtils.isSameType(f.asType(), ftype)
         );
+    }
+
+    public <A extends Annotation> A annotation(Element e, Class<A> annotation){
+        try{
+            Method m = AnnoConstruct.class.getDeclaredMethod("getAttribute", Class.class);
+            m.setAccessible(true);
+            Compound compound = (Compound)m.invoke(e, annotation);
+            return compound == null ? null : AnnotationProxyMaker.generateAnnotation(compound, annotation);
+        }catch(Exception ex){
+            throw new RuntimeException(ex);
+        }
     }
 
     @Override
