@@ -2573,6 +2573,7 @@ public class UnityUnitTypes implements ContentList{
             speed = 15f;
             hitSize = 36f;
             flying = true;
+            drawCell = false;
 
             Unity.musicHandler.registerLoop(name, UnityMusics.radiantDischargeIntro, UnityMusics.radiantDischargeLoop);
         }};

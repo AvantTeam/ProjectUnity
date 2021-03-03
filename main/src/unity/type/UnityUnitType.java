@@ -260,6 +260,34 @@ public class UnityUnitType extends UnitType{
     }
 
     @Override
+    public void drawEngine(Unit unit){
+        float z = Draw.z();
+
+        if(engineColor != null){
+            if(!unit.isFlying()) return;
+
+            float scale = unit.elevation;
+            float offset = engineOffset / 2f + engineOffset / 2f * scale;
+
+            Draw.color(engineColor);
+            Fill.circle(
+                unit.x + Angles.trnsx(unit.rotation + 180, offset),
+                unit.y + Angles.trnsy(unit.rotation + 180, offset),
+                (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f)) * scale
+            );
+            Draw.color(Color.white);
+            Fill.circle(
+                unit.x + Angles.trnsx(unit.rotation + 180, offset - 1f),
+                unit.y + Angles.trnsy(unit.rotation + 180, offset - 1f),
+                (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f)) / 2f  * scale
+            );
+            Draw.color();
+        }else{
+            super.drawEngine(unit);
+        }
+    }
+
+    @Override
     public void drawWeapons(Unit unit){
         float z = Draw.z();
 
