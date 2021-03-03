@@ -23,7 +23,7 @@ public class NewKamiAI implements UnitController, Position{
 
     public Unit unit;
     public Unit target;
-    public Vec2 targetPos = new Vec2(), movePos = new Vec2();
+    public Vec2 truePosition = new Vec2(), movePos = new Vec2(), targetPos = new Vec2(), targetPos2 = new Vec2();
     public float[] reloads = new float[16];
     public Bullet[] bullets = new Bullet[16];
     public int difficulty = 0;
@@ -90,13 +90,13 @@ public class NewKamiAI implements UnitController, Position{
                 if(e.controller() instanceof Player && (next == null || dst < unit.dst(e))){
                     next = e;
                     target = e;
-                    targetPos.set(e);
+                    truePosition.set(e);
                     dst = unit.dst(e);
                 }
             }
         }
         if(target != null && !barrierActive){
-            barrier.setCentered(targetPos.x, targetPos.y, 300f * 2f, 340f * 2f);
+            barrier.setCentered(truePosition.x, truePosition.y, 300f * 2f, 340f * 2f);
             barrierActive = true;
         }
         if(barrierActive && (timer.get(1, 2f) || Groups.unit.size() < 15)){
@@ -133,6 +133,7 @@ public class NewKamiAI implements UnitController, Position{
     }
 
     void updateBulletHell(){
+        targetPos.set(target);
         if(reseting){
             if(spell){
                 int rand = Mathf.random(0, spellSeq.size - 1);
@@ -155,7 +156,7 @@ public class NewKamiAI implements UnitController, Position{
             reseting = false;
         }
         if(waiting){
-            tmpVec.trns(relativeRotation, 270f).add(targetPos).sub(unit).scl(1f / 15f);
+            tmpVec.trns(relativeRotation, 270f).add(truePosition).sub(unit).scl(1f / 15f);
             unit.move(tmpVec.x, tmpVec.y);
             waitTime += Time.delta;
             if(waitTime >= maxTime){

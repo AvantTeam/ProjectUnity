@@ -9,7 +9,7 @@ import mindustry.gen.*;
 public class RainbowUnitType extends UnityUnitType{
     private static final Color tmpColor = new Color();
 
-    public int segments = 5;
+    public int segments = 6;
     public float offset = 15f;
     public TextureRegion[] rainbowRegions;
     public TextureRegion trailRegion;

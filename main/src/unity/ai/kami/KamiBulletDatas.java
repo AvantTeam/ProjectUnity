@@ -10,7 +10,7 @@ import java.util.*;
 
 public class KamiBulletDatas{
     public static Seq<Func<Bullet, KamiBulletData>> dataSeq = new Seq<>();
-    public static int accelTurn, expandShrink, turnRegular, nonDespawnable;
+    public static int accelTurn, expandShrink, turnRegular, nonDespawnable, slowDownWaitAccel;
 
     //preset datas
     public static void load(){
@@ -33,6 +33,12 @@ public class KamiBulletDatas{
         nonDespawnable = addData(b -> new KamiBulletData(b.rotation(),
             new DataStage(b.lifetime, (data, bl) -> data.despawn = bl.time >= bl.lifetime)
         ));
+
+        slowDownWaitAccel = addData(b -> new KamiBulletData(b.rotation(),
+            new DataStage(40f, (data, bl) -> bl.vel.setLength(data.fout() * bl.type.speed * 0.75f)),
+            new DataStage(2f * 60f, null),
+            new DataStage(3f * 60f, (data, bl) -> bl.vel.set(1f, 0f).setLength(data.fin() * bl.type.speed * 1.1f).setAngle(data.initialRotation))
+        ));
     }
 
     public static KamiBulletData get(Bullet bullet, int type){
@@ -46,7 +52,7 @@ public class KamiBulletDatas{
         return dataSeq.size - 1;
     }
 
-    public static class KamiBulletData{
+    public static class KamiBulletData implements Scaled{
         public float initialRotation, attribute = 0f;
         public boolean modulate, despawn = true;
         public DataStage[] stageA;
@@ -74,10 +80,15 @@ public class KamiBulletDatas{
             return this;
         }
 
+        @Override
+        public float fin(){
+            return Mathf.clamp(time / stageA[stage % stageA.length].time);
+        }
+
         public void update(Bullet b){
             if(empty) return;
             DataStage a = stageA[stage % stageA.length];
-            a.data.get(this, b);
+            if(a.data != null) a.data.get(this, b);
             time += Time.delta;
             if(time >= a.time){
                 stage++;
