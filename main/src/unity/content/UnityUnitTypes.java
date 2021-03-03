@@ -893,52 +893,59 @@ public class UnityUnitTypes implements ContentList{
         }};
 
         setEntity("amphibi-naval", TransUnitWaterMove::new);
-        amphibiNaval = new UnityUnitType("amphibi-naval"){{
-            toTrans = () -> amphibi;
-            speed = 1.3f;
-            health = 365;
-            engineSize = 5f;
-            engineOffset = 12f;
-            accel = 0.3f;
-            baseRotateSpeed = 0.2f;
-            rotateSpeed = 1.6f;
-            hitSize = 12f;
-            armor = 2f;
-            immunities.add(StatusEffects.wet);
-            trailX = 3f;
-            trailY = -5f;
-            trailLength = 13;
-            trailScl = 1.75f;
-            rotateShooting = true;
-            transformTime = 10f;
-            weapons.add(new Weapon("artillery"){{
-                reload = 35f;
-                x = 5.5f;
-                y = -4f;
-                shots = 2;
-                shotDelay = 2f;
-                inaccuracy = 5f;
-                rotate = true;
-                shake = 3f;
-                rotateSpeed = 4f;
-                bullet = new ArtilleryBulletType(2.1f, 1f){{
-                    collidesTiles = true;
-                    hitEffect = Fx.blastExplosion;
-                    knockback = 0.8f;
-                    speed = 2.1f;
-                    lifetime = 80f;
-                    width = height = 11f;
-                    ammoMultiplier = 4f;
-                    splashDamageRadius = 35f;
-                    splashDamage = 25f;
-                    backColor = UnityPal.navalReddish;
-                    frontColor = lightningColor = UnityPal.navalYellowish;
-                    smokeEffect = Fx.shootBigSmoke2;
-                    shake = 4.5f;
-                    statusDuration = 60 * 10f;
-                }};
-            }});
-        }};
+        amphibiNaval = new UnityUnitType("amphibi-naval"){
+            {
+                toTrans = () -> amphibi;
+                speed = 1.3f;
+                health = 365;
+                engineSize = 5f;
+                engineOffset = 12f;
+                accel = 0.3f;
+                baseRotateSpeed = 0.2f;
+                rotateSpeed = 1.6f;
+                hitSize = 12f;
+                armor = 2f;
+                immunities.add(StatusEffects.wet);
+                trailX = 3f;
+                trailY = -5f;
+                trailLength = 13;
+                trailScl = 1.75f;
+                rotateShooting = true;
+                transformTime = 10f;
+                weapons.add(new Weapon("artillery"){{
+                    reload = 35f;
+                    x = 5.5f;
+                    y = -4f;
+                    shots = 2;
+                    shotDelay = 2f;
+                    inaccuracy = 5f;
+                    rotate = true;
+                    shake = 3f;
+                    rotateSpeed = 4f;
+                    bullet = new ArtilleryBulletType(2.1f, 1f){{
+                        collidesTiles = true;
+                        hitEffect = Fx.blastExplosion;
+                        knockback = 0.8f;
+                        speed = 2.1f;
+                        lifetime = 80f;
+                        width = height = 11f;
+                        ammoMultiplier = 4f;
+                        splashDamageRadius = 35f;
+                        splashDamage = 25f;
+                        backColor = UnityPal.navalReddish;
+                        frontColor = lightningColor = UnityPal.navalYellowish;
+                        smokeEffect = Fx.shootBigSmoke2;
+                        shake = 4.5f;
+                        statusDuration = 60 * 10f;
+                    }};
+                }});
+            }
+
+            @Override
+            public boolean isHidden(){
+                return true;
+            }
+        };
 
         setEntity("amphibi", TransLegsUnit::new);
         amphibi = new UnityUnitType("amphibi"){{
@@ -966,42 +973,49 @@ public class UnityUnitTypes implements ContentList{
         }};
 
         setEntity("craber-naval", TransUnitWaterMove::new);
-        craberNaval = new UnityUnitType("craber-naval"){{
-            toTrans = () -> craber;
-            speed = 1.2f;
-            health = 730;
-            engineSize = 5f;
-            engineOffset = 12f;
-            accel = 0.26f;
-            baseRotateSpeed = 1.6f;
-            hitSize = 16f;
-            armor = 2f;
-            immunities.add(StatusEffects.wet);
-            trailX = 3f;
-            trailY = -9f;
-            trailLength = 16;
-            trailScl = 1.85f;
-            rotateShooting = true;
-            transformTime = 30f;
-            weapons.add(new Weapon("unity-laser-weapon"){{
-                reload = 5f;
-                x = 6f;
-                y = -3f;
-                rotate = true;
-                shake = 1f;
-                rotateSpeed = 6f;
-                bullet = new SapBulletType(){{
-                    sapStrength = 0f;
-                    color = Color.white.cpy().lerp(Pal.lancerLaser, 0.5f);
-                    damage = 35f;
-                    lifetime = 22f;
-                    status = StatusEffects.shocked;
-                    statusDuration = 60f * 5f;
-                    width = 0.7f;
-                    length = 170f;
-                }};
-            }});
-        }};
+        craberNaval = new UnityUnitType("craber-naval"){
+            {
+                toTrans = () -> craber;
+                speed = 1.2f;
+                health = 730;
+                engineSize = 5f;
+                engineOffset = 12f;
+                accel = 0.26f;
+                baseRotateSpeed = 1.6f;
+                hitSize = 16f;
+                armor = 2f;
+                immunities.add(StatusEffects.wet);
+                trailX = 3f;
+                trailY = -9f;
+                trailLength = 16;
+                trailScl = 1.85f;
+                rotateShooting = true;
+                transformTime = 30f;
+                weapons.add(new Weapon("unity-laser-weapon"){{
+                    reload = 5f;
+                    x = 6f;
+                    y = -3f;
+                    rotate = true;
+                    shake = 1f;
+                    rotateSpeed = 6f;
+                    bullet = new SapBulletType(){{
+                        sapStrength = 0f;
+                        color = Color.white.cpy().lerp(Pal.lancerLaser, 0.5f);
+                        damage = 35f;
+                        lifetime = 22f;
+                        status = StatusEffects.shocked;
+                        statusDuration = 60f * 5f;
+                        width = 0.7f;
+                        length = 170f;
+                    }};
+                }});
+            }
+
+            @Override
+            public boolean isHidden(){
+                return true;
+            }
+        };
 
         setEntity("craber", TransLegsUnit::new);
         craber = new UnityUnitType("craber"){{
