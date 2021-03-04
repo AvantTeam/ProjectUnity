@@ -56,9 +56,10 @@ public class KamiLaserBulletType extends BulletType{
                     Position a = e.dst(tVecB) < e.dst(tVecD) ? tVecB : tVecD;
                     float ba = e.dst(tVecB) < e.dst(tVecD) ? 0f : 180f;
                     //float angle = Angles.within(a.angleTo(e), b.rotation() + ba, 90f) ? 1f + (Mathf.clamp(1f - (Angles.angleDist(a.angleTo(e), b.rotation() + ba) / 90f)) * curveScl) : 1f;
-                    float angle = angDist(a.angleTo(e), b.rotation() + ba) < 90f ? 1f + ((Mathf.clamp(1f - (angDist(a.angleTo(e), b.rotation() + ba) / 90f))) * curveScl) : 1f;
-                    angle = Interp.sineIn.apply(angle);
-                    if(Intersector.intersectSegmentCircle(tVecD, tVecB, tVecC, fout * fout * angle)){
+                    float shape = Mathf.clamp(1f - (angDist(a.angleTo(e), b.rotation() + ba) / 90f));
+                    float angle = angDist(a.angleTo(e), b.rotation() + ba) < 90f ? 1f + (Interp.sineIn.apply(shape) * curveScl) : 1f;
+                    //angle = Interp.sineIn.apply(angle);
+                    if(Intersector.intersectSegmentCircle(tVecD, tVecB, tVecC, (fout * fout * angle) + (e.hitSize * e.hitSize))){
                         b.collision(e, e.x, e.y);
                         //Unity.print("Hit: " + Time.time + ":" + angle);
                     }

@@ -4,6 +4,7 @@ import arc.func.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
+import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import unity.ai.*;
 import unity.ai.kami.KamiBulletDatas.*;
@@ -115,7 +116,7 @@ public class KamiPatterns{
                         }
                     }
                 }, null),
-                new KamiPatternStage(4f * 60f, ai -> {
+                new KamiPatternStage(5f * 60f, ai -> {
                         ai.kami().laserRotation *= -1f;
                         ai.reloads[1] = 0f;
                     }, ai -> {
@@ -291,6 +292,50 @@ public class KamiPatterns{
                         ai.reloads[7] = Mathf.mod(ai.reloads[7], 360f);
                     }
                 })
+            };
+        }}, 1);
+
+        //Byakuren
+        //Magic "Omen of Purple Clouds"/Good Omen "Cloudy Way in Purple"
+        addPattern(new KamiPattern(){{
+            time = 25f * 60f;
+            maxDamage = 1000f;
+            drawer = KamiDrawers.byakurenScrollDrawer;
+            init = ai -> ai.reloads[0] = -1f;
+            stages = new KamiPatternStage[]{
+                new KamiPatternStage(5f * 60f, ai -> {
+                    ai.reloads[0] *= -1f;
+                    ai.reloads[1] = Mathf.random(360f);
+                    ai.reloads[2] = Mathf.random(360f);
+                }, ai -> {
+                    float diffReload = 4f - Mathf.clamp(ai.difficulty / 1.5f, 0f, 2f);
+                    float extraSpeed = Mathf.clamp(ai.difficulty / 3f) * 0.5f;
+                    int diff = 1 + Mathf.clamp(ai.difficulty - 1, 0, 1);
+                    int diff2 = 2 + Mathf.clamp(ai.difficulty * 2, 0, 2);
+                    ai.reloads[3] += Time.delta;
+                    if(ai.reloads[3] >= diffReload){
+                        for(int i = 0; i < diff; i++){
+                            BulletType type = UnityBullets.kamiBullet1;
+                            float angle1 = Mathf.mod((ai.reloads[4] * Mathf.signs[i]) + ai.reloads[1], 360f);
+                            float angle2 = Mathf.mod((-ai.reloads[4] * Mathf.signs[i]) + ai.reloads[2], 360f);
+
+                            float fout1 = Mathf.clamp(1f - (ai.stageTime / (5f * 60f)));
+                            tVec.trns(angle1, fout1 * 50f).add(ai);
+                            KamiBulletPresets.shootLine(type, ai.unit, ai.unit.team, tVec.x, tVec.y, angle1, type.speed * 0.75f, (type.speed * 1.25f) + extraSpeed, diff2, b -> b.hitSize *= 1.5f);
+
+                            float fout2 = Mathf.clamp(1f - (ai.stageTime / (2.5f * 60f)));
+                            if(fout2 > 0f){
+                                tVec.trns(angle2, fout2 * 50f).add(ai);
+                                KamiBulletPresets.shootLine(type, ai.unit, ai.unit.team, tVec.x, tVec.y, angle2, type.speed * 0.5f, type.speed + extraSpeed, diff2, b -> b.hitSize *= 0.75f);
+
+                                if(ai.difficulty >= 3) KamiBulletPresets.shootLine(type, ai.unit, ai.unit.team, tVec.x, tVec.y, angle2, type.speed * 0.25f, (type.speed * 0.75f) + extraSpeed, diff2, b -> b.hitSize *= 0.75f);
+                            }
+                        }
+                        ai.reloads[3] = 0f;
+                        ai.reloads[4] += diffReload * 3.5f * ai.reloads[0];
+                    }
+                }),
+                new KamiPatternStage(1.5f * 60f, ai -> ai.moveAround(60f), null)
             };
         }}, 1);
     }

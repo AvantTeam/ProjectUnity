@@ -74,6 +74,7 @@ public class NewKamiAI implements UnitController, Position{
         if(patternTime > 0f){
             Lines.stroke(3f * drawIn);
             Lines.circle(getX(), getY(), (1f - (patternTime / pattern.time)) * 240f);
+            Lines.swirl(getX(), getY(), Mathf.clamp(((1f - (patternTime / pattern.time)) * 240f) - 9f, 0f, 240f), 1f - Mathf.clamp(stageDamage / pattern.maxDamage), 90f);
         }
         Draw.z(Layer.flyingUnitLow);
         if(pattern != null) pattern.draw(this);
@@ -175,6 +176,9 @@ public class NewKamiAI implements UnitController, Position{
 
     void reset(){
         Arrays.fill(reloads, 0f);
+        for(Bullet b : bullets){
+            if(b != null) b.remove();
+        }
         Arrays.fill(bullets, null);
         stageDamage = stageTime = patternTime = moveTime = drawIn = 0f;
         kami().laserRotation = 0f;

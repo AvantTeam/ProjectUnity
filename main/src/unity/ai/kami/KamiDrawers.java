@@ -10,8 +10,8 @@ import unity.ai.*;
 
 public class KamiDrawers{
     private final static Color tCol = new Color();
-    private final static Vec2 tVec = new Vec2();
-    public static Cons<NewKamiAI> utsuhoDrawer, marisaDrawer;
+    private final static Vec2 tVec = new Vec2(), tVec2 = new Vec2();
+    public static Cons<NewKamiAI> utsuhoDrawer, marisaDrawer, byakurenScrollDrawer;
 
     public static void load(){
         utsuhoDrawer = ai -> {
@@ -33,6 +33,23 @@ public class KamiDrawers{
                     Draw.color(tCol.set(Color.red).shiftHue((i * (360f / 5f)) + (Time.time * 2f)).a(Mathf.clamp(ai.drawIn * 1.2f)));
                     Fill.circle(tVec.x, tVec.y, 12f);
                 }
+            }
+        };
+
+        byakurenScrollDrawer = ai -> {
+            int progress = Mathf.floor(Time.time / 7f);
+            int trueLength = 20;
+            for(int i = 0; i < trueLength; i++){
+                TextureRegion region = KamiRegions.byakurenScroll[Mathf.mod(i + progress, KamiRegions.byakurenScroll.length)];
+                float spacing = 1.7f;
+                float mod = (Time.time / 7f) % 1f;
+                float offset = mod * spacing;
+                float angle = ((i * spacing - (trueLength - 1) * spacing / 2f) - (offset - (spacing / 2f))) * ai.drawIn;
+                float width = i == 0 || i >= trueLength - 1 ? (i != 0 ? mod : 1 - mod) : 1f;
+
+                Draw.color(tCol.set(Color.red).shiftHue(((Time.time * 2f) + (i * 5f))));
+                tVec.trns(angle + ai.relativeRotation, 300f).sub(tVec2.trns(ai.relativeRotation, 240f)).add(ai);
+                Draw.rect(region, tVec.x, tVec.y, region.width * Draw.scl * width * ai.drawIn, region.height * Draw.scl, (angle + ai.relativeRotation) - 90f);
             }
         };
     }
