@@ -12,7 +12,6 @@ import java.util.*;
 
 import javax.annotation.processing.*;
 import javax.lang.model.element.*;
-import javax.lang.model.type.*;
 
 import unity.annotations.Annotations.*;
 
@@ -293,57 +292,6 @@ public class EntityProcessor extends BaseProcessor{
         }
     }
 
-    protected ObjectSet<TypeElement> getInterfaces(TypeElement type){
-        if(type == null) return new ObjectSet<>();
-
-        Seq<TypeMirror> inters = (Seq<TypeMirror>)Seq.with(type.getInterfaces());
-        inters.add(type.asType());
-        inters.add(type.getSuperclass());
-
-        ObjectSet<TypeElement> all = ObjectSet.with(inters.map(this::toEl).map(e -> (TypeElement)e));
-        all.addAll(getInterfaces((TypeElement)toEl(type.getSuperclass())));
-        for(TypeMirror m : type.getInterfaces()){
-            if(!(m instanceof NoType)){
-                all.addAll(getInterfaces((TypeElement)toEl(m)));
-            }
-        }
-
-        return all.select(e -> !(e instanceof NoType));
-    }
-
-    protected ObjectMap<ExecutableElement, Seq<ExecutableElement>> getAppendedMethods(TypeElement base, TypeElement comp){
-        ObjectMap<ExecutableElement, Seq<ExecutableElement>> appending = new ObjectMap<>();
-        Seq<ExecutableElement> baseMethods = getMethodsRec(base);
-        Seq<ExecutableElement> toAppend = methods(comp).select(m ->
-            m.getModifiers().contains(Modifier.DEFAULT)
-        );
-
-        for(ExecutableElement e : toAppend){
-            ExecutableElement append = baseMethods.find(m -> {
-                boolean equal = m.getParameters().size() == e.getParameters().size();
-                for(int i = 0; i < m.getParameters().size(); i++){
-                    if(!equal) break;
-                    try{
-                        VariableElement up = m.getParameters().get(i);
-                        VariableElement c = e.getParameters().get(i);
-
-                        equal = typeUtils.isSameType(up.asType(), c.asType());
-                    }catch(IndexOutOfBoundsException ex){
-                        return false;
-                    }
-                }
-
-                return m.getSimpleName().toString().equals(e.getSimpleName().toString()) && equal;
-            });
-
-            if(append != null){
-                appending.get(append, Seq::new).add(e);
-            }
-        }
-
-        return appending;
-    }
-
     protected Seq<ExecutableElement> getGetters(TypeElement type){
         Seq<ExecutableElement> getters = new Seq<>();
         getInterfaces(type).each(t -> methods(t).each(m ->
@@ -364,18 +312,6 @@ public class EntityProcessor extends BaseProcessor{
             m.getParameters().size() == 1 &&
             !m.getModifiers().contains(Modifier.DEFAULT)
         );
-    }
-
-    protected Seq<ExecutableElement> getMethodsRec(TypeElement type){
-        Seq<ExecutableElement> methods = methods(type);
-        getInterfaces(type).each(t -> 
-        methods(t).each(m ->
-                !methods.contains(mm -> elementUtils.overrides(mm, m, type))
-            ,
-            methods::add)
-        );
-
-        return methods;
     }
 
     class EntityDefinition{

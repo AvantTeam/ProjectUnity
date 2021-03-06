@@ -83,10 +83,38 @@ public abstract class BaseProcessor extends AbstractProcessor{
     public abstract void process(RoundEnvironment roundEnv) throws Exception;
 
     public void write(TypeSpec spec) throws IOException{
-        JavaFile.builder(packageName, spec)
-        .indent("    ")
+        write(spec, Seq.with());
+    }
+
+    public void write(TypeSpec spec, Seq<String> imports) throws IOException{
+        JavaFile file = JavaFile.builder(packageName, spec)
+            .indent("    ")
             .skipJavaLangImports(true)
-        .build().writeTo(filer);
+        .build();
+
+        if(imports.isEmpty()){
+            file.writeTo(filer);
+        }else{
+            imports.distinct();
+
+            String rawSource = file.toString();
+            Seq<String> result = new Seq<>();
+            for(String s : rawSource.split("\n", -1)){
+                result.add(s);
+                if(s.startsWith("package ")){
+                    result.add("");
+                    for(String i : imports){
+                        result.add(i);
+                    }
+                }
+            }
+
+            String out = result.toString("\n");
+            JavaFileObject object = filer.createSourceFile(file.packageName + "." + file.typeSpec.name, file.typeSpec.originatingElements.toArray(new Element[0]));
+            OutputStream stream = object.openOutputStream();
+            stream.write(out.getBytes());
+            stream.close();
+        }
     }
 
     public Element toEl(TypeMirror t){
@@ -179,7 +207,9 @@ public abstract class BaseProcessor extends AbstractProcessor{
     }
 
     public boolean isConstructor(ExecutableElement e){
-        return e.getSimpleName().toString().equals("<init>");
+        return
+            e.getSimpleName().toString().equals("<init>") ||
+            e.getSimpleName().toString().equals("<clinit>");
     }
 
     public String docs(Element e){
@@ -202,6 +232,69 @@ public abstract class BaseProcessor extends AbstractProcessor{
             f.getSimpleName().toString().equals(name) &&
             typeUtils.isSameType(f.asType(), ftype)
         );
+    }
+
+    ObjectMap<ExecutableElement, Seq<ExecutableElement>> getAppendedMethods(TypeElement base, TypeElement comp){
+        ObjectMap<ExecutableElement, Seq<ExecutableElement>> appending = new ObjectMap<>();
+        Seq<ExecutableElement> baseMethods = getMethodsRec(base);
+        Seq<ExecutableElement> toAppend = methods(comp).select(m ->
+            m.getModifiers().contains(Modifier.DEFAULT)
+        );
+
+        for(ExecutableElement e : toAppend){
+            ExecutableElement append = baseMethods.find(m -> {
+                boolean equal = m.getParameters().size() == e.getParameters().size();
+                for(int i = 0; i < m.getParameters().size(); i++){
+                    if(!equal) break;
+                    try{
+                        VariableElement up = m.getParameters().get(i);
+                        VariableElement c = e.getParameters().get(i);
+
+                        equal = typeUtils.isSameType(up.asType(), c.asType());
+                    }catch(IndexOutOfBoundsException ex){
+                        return false;
+                    }
+                }
+
+                return m.getSimpleName().toString().equals(e.getSimpleName().toString()) && equal;
+            });
+
+            if(append != null){
+                appending.get(append, Seq::new).add(e);
+            }
+        }
+
+        return appending;
+    }
+
+    Seq<ExecutableElement> getMethodsRec(TypeElement type){
+        Seq<ExecutableElement> methods = methods(type);
+        getInterfaces(type).each(t -> 
+        methods(t).each(m ->
+                !methods.contains(mm -> elementUtils.overrides(mm, m, type))
+            ,
+            methods::add)
+        );
+
+        return methods;
+    }
+
+    ObjectSet<TypeElement> getInterfaces(TypeElement type){
+        if(type == null) return new ObjectSet<>();
+
+        Seq<TypeMirror> inters = Seq.with(type.getInterfaces()).as();
+        inters.add(type.asType());
+        inters.add(type.getSuperclass());
+
+        ObjectSet<TypeElement> all = ObjectSet.with(inters.map(this::toEl).map(e -> (TypeElement)e));
+        all.addAll(getInterfaces((TypeElement)toEl(type.getSuperclass())));
+        for(TypeMirror m : type.getInterfaces()){
+            if(!(m instanceof NoType)){
+                all.addAll(getInterfaces((TypeElement)toEl(m)));
+            }
+        }
+
+        return all.select(e -> !(e instanceof NoType));
     }
 
     public <A extends Annotation> A annotation(Element e, Class<A> annotation){

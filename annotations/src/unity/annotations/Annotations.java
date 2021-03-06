@@ -2,6 +2,8 @@ package unity.annotations;
 
 import arc.audio.*;
 import arc.func.*;
+import mindustry.gen.*;
+import mindustry.world.*;
 
 import com.sun.tools.javac.code.*;
 import com.sun.tools.javac.code.Attribute.Array;
@@ -93,21 +95,46 @@ public class Annotations{
     }
 
     /** Works somewhat like {@code Object.assign(...)} for Block and Building */
-    @Target(ElementType.TYPE)
+    @Target({ElementType.TYPE, ElementType.FIELD})
     @Retention(RetentionPolicy.SOURCE)
     public @interface Merge{
         /** @return The base class */
-        Class<?> base();
+        Class<?> base() default Block.class;
 
         /** @return The merged classes */
-        Class<?> values();
+        Class<?>[] value();
+    }
+
+    /** Notifies that this class is a component class; an interface will be generated out of this */
+    @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface MergeComp{
+    }
+
+    /** The generated interface from {@link Annotations.MergeComp} */
+    @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface MergeInterface{
+        Class<?> buildType() default Building.class;
     }
 
     //end region
     //region utilities
 
-    /** Whether the field returned by this getter is meant to be read-only */
+    /** Getter method, do not use directly */
     @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface Getter{
+    }
+
+    /** Setter method, do not use directly */
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface Setter{
+    }
+
+    /** Whether the field returned by this getter is meant to be read-only */
+    @Target({ElementType.METHOD, ElementType.FIELD})
     @Retention(RetentionPolicy.SOURCE)
     public @interface ReadOnly{
     }
