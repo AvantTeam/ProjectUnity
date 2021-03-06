@@ -190,14 +190,17 @@ public class UnityBlocks implements ContentList{
             constructTime = 20000f;
             minTier = 6;
             upgrades.add(
-                new UnitType[]{UnitTypes.toxopid, UnityUnitTypes.projectSpiboss},
+                new UnitType[]{UnitTypes.toxopid, UnityUnitTypes.araneidae},
 
                 new UnitType[]{UnitTypes.corvus, UnityUnitTypes.ursa},
 
-                new UnitType[]{UnityUnitTypes.monument, UnityUnitTypes.colossus},
+                new UnitType[]{UnityUnitTypes.monument, UnityUnitTypes.colossus}
+            );
+            otherUpgrades.add(
+                new UnitType[]{UnityUnitTypes.araneidae, UnityUnitTypes.theraphosidae},
+
                 new UnitType[]{UnityUnitTypes.colossus, UnityUnitTypes.bastion}
             );
-            otherUpgrades.add(new UnitType[]{UnityUnitTypes.projectSpiboss, UnityUnitTypes.arcaetana});
             consumes.power(5f);
             consumes.items(with(Items.silicon, 1200, Items.metaglass, 800, Items.thorium, 700, Items.surgeAlloy, 400, Items.plastanium, 600, Items.phaseFabric, 350));
             consumes.liquid(Liquids.cryofluid, 7f);
