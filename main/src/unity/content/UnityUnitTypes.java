@@ -98,6 +98,9 @@ public class UnityUnitTypes implements ContentList{
     public static @FactionDef("koruh") @EntityDef(base = KamiUnit.class, def = Bossc.class)
     UnitType kami;
 
+    public static @FactionDef("koruh") @EntityDef(base = UnitEntity.class, def = AntiKamic.class)
+    UnitType antiKamiTest;
+
     public static @FactionDef("end") UnitType opticaecus, devourer, ravager;
 
     public static int getClassId(int index){
@@ -2435,6 +2438,23 @@ public class UnityUnitTypes implements ContentList{
             drawCell = false;
 
             Unity.musicHandler.registerLoop(name, UnityMusics.radiantDischargeIntro, UnityMusics.radiantDischargeLoop);
+        }};
+
+        antiKamiTest = new UnityUnitType("anti-kami-test"){{
+            defaultController = EmptyAI::new;
+            speed = 4.3f;
+            flying = true;
+            rotateShooting = false;
+
+            weapons.add(new Weapon(){{
+                reload = 5f;
+                x = 0f;
+                mirror = false;
+                ignoreRotation = true;
+                shootCone = 180f;
+                
+                bullet = Bullets.standardThoriumBig;
+            }});
         }};
 
         //endregion
