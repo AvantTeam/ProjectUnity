@@ -2441,7 +2441,6 @@ public class UnityUnitTypes implements ContentList{
         }};
 
         antiKamiTest = new UnityUnitType("anti-kami-test"){{
-            defaultController = EmptyAI::new;
             speed = 4.3f;
             flying = true;
             rotateShooting = false;
