@@ -40,7 +40,7 @@ public class KamiLaserBulletType extends BulletType{
     @Override
     public void update(Bullet b){
         if(b.timer(1, 5f)){
-            float fout = Mathf.clamp(b.time > b.lifetime - fadeTime ? 1f - (b.time - (lifetime - fadeTime)) / fadeTime : 1f) * Mathf.clamp(b.time / fadeInTime) * width;
+            float fout = Mathf.clamp(b.time > b.lifetime - fadeTime ? 1f - (b.time - (b.lifetime - fadeTime)) / fadeTime : 1f) * Mathf.clamp(b.time / fadeInTime) * width;
 
             tVec.trns(b.rotation(), length + (width * curveScl)).add(b);
             tVecD.trns(b.rotation(), -width * curveScl).add(b);
@@ -56,8 +56,10 @@ public class KamiLaserBulletType extends BulletType{
                     Position a = e.dst(tVecB) < e.dst(tVecD) ? tVecB : tVecD;
                     float ba = e.dst(tVecB) < e.dst(tVecD) ? 0f : 180f;
                     //float angle = Angles.within(a.angleTo(e), b.rotation() + ba, 90f) ? 1f + (Mathf.clamp(1f - (Angles.angleDist(a.angleTo(e), b.rotation() + ba) / 90f)) * curveScl) : 1f;
-                    float angle = angDist(a.angleTo(e), b.rotation() + ba) < 90f ? 1f + ((Mathf.clamp(1f - (angDist(a.angleTo(e), b.rotation() + ba) / 90f))) * curveScl) : 1f;
-                    if(Intersector.intersectSegmentCircle(tVecD, tVecB, tVecC, fout * fout * angle)){
+                    float shape = Mathf.clamp(1f - (angDist(a.angleTo(e), b.rotation() + ba) / 90f));
+                    float angle = angDist(a.angleTo(e), b.rotation() + ba) < 90f ? 1f + (Interp.sineIn.apply(shape) * curveScl) : 1f;
+                    //angle = Interp.sineIn.apply(angle);
+                    if(Intersector.intersectSegmentCircle(tVecD, tVecB, tVecC, (fout * fout * angle) + (e.hitSize * e.hitSize))){
                         b.collision(e, e.x, e.y);
                         //Unity.print("Hit: " + Time.time + ":" + angle);
                     }
@@ -76,7 +78,7 @@ public class KamiLaserBulletType extends BulletType{
         if(circleRegion == null) circleRegion = Core.atlas.find("circle");
         tVecD.trns(b.rotation(), width * curveScl).add(b);
         float widthAlt = width + 3f;
-        float fout = Mathf.clamp(b.time > b.lifetime - fadeTime ? 1f - (b.time - (lifetime - fadeTime)) / fadeTime : 1f) * Mathf.clamp(b.time / fadeInTime);
+        float fout = Mathf.clamp(b.time > b.lifetime - fadeTime ? 1f - (b.time - (b.lifetime - fadeTime)) / fadeTime : 1f) * Mathf.clamp(b.time / fadeInTime);
         tVec.trns(b.rotation(), length).add(b);
         Draw.color(Tmp.c1.set(Color.red).shiftHue(Time.time * 3f));
         Draw.rect(circleRegion, tVecD, Draw.scl * widthAlt * curveScl * 8f, Draw.scl * widthAlt * fout * 8f, b.rotation());

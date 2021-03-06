@@ -62,7 +62,7 @@ public class UnityUnitTypes implements ContentList{
 
     /** Global naval units */
     public static UnitType//@formatter:off
-    rexed, storm, amphibiNaval, amphibi, craberNaval, craber;
+    amphibiNaval, amphibi, craberNaval, craber;
     //formatter:on
     /** Scar {@linkplain LegsUnit legs} units */
     public static @FactionDef("scar") @EntityPoint(LegsUnit.class)
@@ -85,7 +85,7 @@ public class UnityUnitTypes implements ContentList{
     
     /** Koruh {@linkplain UnitEntity flying} units */
     public static @FactionDef("koruh") @EntityPoint(UnitEntity.class)
-    UnitType cache, dijkstra, phantasm;
+    UnitType cache, dijkstra, phantasm, trident, glaive;
 
     /** Monolith {@linkplain MechUnit mech} units */
     public static @FactionDef("monolith") @EntityPoint(MechUnit.class)
@@ -733,212 +733,60 @@ public class UnityUnitTypes implements ContentList{
         //endregion
         //region naval-units
 
-        setEntity("rexed", UnitWaterMove::create);
-        rexed = new UnityUnitType("rexed"){{
-            speed = 0.6f;
-            health = 1370;
-            engineSize = 5f;
-            engineOffset = 12f;
-            accel = 0.2f;
-            baseRotateSpeed = 0.1f;
-            rotateSpeed = 1.6f;
-            hitSize = 29f;
-            armor = 3f;
-            immunities.add(StatusEffects.wet);
-            trailX = 9.75f;
-            trailY = -15f;
-            trailLength = 37;
-            trailScl = 1.75f;
-            rotateShooting = true;
-            abilities.add(new ForceFieldAbility(65f, 0.1f, 300f, 450f));
-            weapons.add(new Weapon("missiles-mount"){{
-                reload = 35f;
-                x = 3.5f;
-                y = 5f;
-                shots = 3;
-                shotDelay = 3f;
-                inaccuracy = 5f;
-                rotate = true;
-                shake = 3f;
-                rotateSpeed = 4f;
-                bullet = new MissileBulletType(3f, 3f){{
-                    lifetime = 49f;
-                    splashDamageRadius = 35f;
-                    splashDamage = 20f;
-                    weaveScale = 8f;
-                    weaveMag = 1f;
-                    despawnEffect = Fx.blastExplosion;
-                    width = height = 9f;
-                    backColor = Pal.bulletYellowBack;
-                    frontColor = Pal.bulletYellow;
-                    trailColor = Color.gray;
-                }};
-            }}, new Weapon(name + "-main"){{
-                reload = 120f;
-                shootY = 7f;
-                x = 0f;
-                y = -6f;
-                rotate = true;
-                shake = 3f;
-                rotateSpeed = 1.6f;
-                mirror = false;
-                inaccuracy = 3f;
-                bullet = new ArtilleryBulletType(2.9f, 1f){{
-                    collidesTiles = true;
-                    hitEffect = Fx.blastExplosion;
-                    knockback = 1.2f;
-                    lifetime = 128;
-                    width = height = 19f;
-                    ammoMultiplier = 3f;
-                    splashDamageRadius = 75f;
-                    splashDamage = 95f;
-                    backColor = UnityPal.navalReddish;
-                    frontColor = lightningColor = UnityPal.navalYellowish;
-                    smokeEffect = Fx.shootBigSmoke2;
-                    shake = 4.5f;
-                    statusDuration = 60f * 10f;
-                }};
-            }});
-        }};
-
-        setEntity("storm", UnitWaterMove::create);
-        storm = new UnityUnitType("storm"){{
-            speed = 0.5f;
-            health = 3450;
-            engineSize = 5f;
-            engineOffset = 12f;
-            accel = 0.2f;
-            baseRotateSpeed = 0.05f;
-            rotateSpeed = 0.7f;
-            hitSize = 41f;
-            armor = 7f;
-            immunities.add(StatusEffects.wet);
-            trailX = 15f;
-            trailY = -26f;
-            trailLength = 45;
-            trailScl = 2f;
-            rotateShooting = true;
-            Weapon missile1 = new Weapon("missiles-mount"){{
-                reload = 45f;
-                x = 15f;
-                y = 12f;
-                rotate = true;
-                shake = 2f;
-                rotateSpeed = 4f;
-                shots = 4;
-                shotDelay = 3f;
-                inaccuracy = 5f;
-                bullet = new MissileBulletType(3.5f, 5f){{
-                    lifetime = 49f;
-                    splashDamageRadius = 45f;
-                    splashDamage = 30f;
-                    weaveScale = 8f;
-                    weaveMag = 1f;
-                    despawnEffect = Fx.blastExplosion;
-                    width = height = 10f;
-                    backColor = Pal.bulletYellowBack;
-                    frontColor = Pal.bulletYellow;
-                    trailColor = Color.gray;
-                }};
-            }};
-            Weapon missile2 = missile1.copy();
-            missile2.reload = 35f;
-            missile2.x = 12f;
-            missile2.y = -8;
-            weapons.add(missile1, missile2,
-            new Weapon(name + "-main"){{
-                reload = 120f;
-                shootY = 7f;
-                x = 17f;
-                y = -5f;
-                rotate = true;
-                shake = 3f;
-                rotateSpeed = 1f;
-                bullet = new ArtilleryBulletType(2.9f, 1f){{
-                    hitEffect = Fx.blastExplosion;
-                    knockback = 1.5f;
-                    lifetime = 129f;
-                    width = height = 23f;
-                    collidesTiles = true;
-                    ammoMultiplier = 3;
-                    splashDamageRadius = 135f;
-                    splashDamage = 75f;
-                    backColor = UnityPal.navalReddish;
-                    frontColor = lightningColor = UnityPal.navalYellowish;
-                    smokeEffect = Fx.shootBigSmoke2;
-                    shake = 4.5f;
-                    statusDuration = 60f * 10f;
-                }};
-            }}, new Weapon(name + "-igniter"){{
-                shootSound = Sounds.laser;
-                shadow = 20f;
-                shootY = 10f;
-                reload = 170f;
-                x = 0f;
-                y = -2f;
-                rotate = true;
-                shake = 5f;
-                rotateSpeed = 1f;
-                mirror = false;
-                bullet = new LaserBulletType(155f){{
-                    sideAngle = 25f;
-                    sideWidth = 2f;
-                    sideLength = 25f;
-                    width = 25f;
-                    length = 220f;
-                    shootEffect = Fx.shockwave;
-                    colors = new Color[]{UnityPal.navalReddish, UnityPal.navalYellowish, Color.white};
-                }};
-            }});
-        }};
-
         setEntity("amphibi-naval", TransUnitWaterMove::new);
-        amphibiNaval = new UnityUnitType("amphibi-naval"){{
-            toTrans = () -> amphibi;
-            speed = 1.3f;
-            health = 365;
-            engineSize = 5f;
-            engineOffset = 12f;
-            accel = 0.3f;
-            baseRotateSpeed = 0.2f;
-            rotateSpeed = 1.6f;
-            hitSize = 12f;
-            armor = 2f;
-            immunities.add(StatusEffects.wet);
-            trailX = 3f;
-            trailY = -5f;
-            trailLength = 13;
-            trailScl = 1.75f;
-            rotateShooting = true;
-            transformTime = 10f;
-            weapons.add(new Weapon("artillery"){{
-                reload = 35f;
-                x = 5.5f;
-                y = -4f;
-                shots = 2;
-                shotDelay = 2f;
-                inaccuracy = 5f;
-                rotate = true;
-                shake = 3f;
-                rotateSpeed = 4f;
-                bullet = new ArtilleryBulletType(2.1f, 1f){{
-                    collidesTiles = true;
-                    hitEffect = Fx.blastExplosion;
-                    knockback = 0.8f;
-                    speed = 2.1f;
-                    lifetime = 80f;
-                    width = height = 11f;
-                    ammoMultiplier = 4f;
-                    splashDamageRadius = 35f;
-                    splashDamage = 25f;
-                    backColor = UnityPal.navalReddish;
-                    frontColor = lightningColor = UnityPal.navalYellowish;
-                    smokeEffect = Fx.shootBigSmoke2;
-                    shake = 4.5f;
-                    statusDuration = 60 * 10f;
-                }};
-            }});
-        }};
+        amphibiNaval = new UnityUnitType("amphibi-naval"){
+            {
+                toTrans = () -> amphibi;
+                speed = 1.3f;
+                health = 365;
+                engineSize = 5f;
+                engineOffset = 12f;
+                accel = 0.3f;
+                baseRotateSpeed = 0.2f;
+                rotateSpeed = 1.6f;
+                hitSize = 12f;
+                armor = 2f;
+                immunities.add(StatusEffects.wet);
+                trailX = 3f;
+                trailY = -5f;
+                trailLength = 13;
+                trailScl = 1.75f;
+                rotateShooting = true;
+                transformTime = 10f;
+                weapons.add(new Weapon("artillery"){{
+                    reload = 35f;
+                    x = 5.5f;
+                    y = -4f;
+                    shots = 2;
+                    shotDelay = 2f;
+                    inaccuracy = 5f;
+                    rotate = true;
+                    shake = 3f;
+                    rotateSpeed = 4f;
+                    bullet = new ArtilleryBulletType(2.1f, 1f){{
+                        collidesTiles = true;
+                        hitEffect = Fx.blastExplosion;
+                        knockback = 0.8f;
+                        speed = 2.1f;
+                        lifetime = 80f;
+                        width = height = 11f;
+                        ammoMultiplier = 4f;
+                        splashDamageRadius = 35f;
+                        splashDamage = 25f;
+                        backColor = UnityPal.navalReddish;
+                        frontColor = lightningColor = UnityPal.navalYellowish;
+                        smokeEffect = Fx.shootBigSmoke2;
+                        shake = 4.5f;
+                        statusDuration = 60 * 10f;
+                    }};
+                }});
+            }
+
+            @Override
+            public boolean isHidden(){
+                return true;
+            }
+        };
 
         setEntity("amphibi", TransLegsUnit::new);
         amphibi = new UnityUnitType("amphibi"){{
@@ -966,42 +814,49 @@ public class UnityUnitTypes implements ContentList{
         }};
 
         setEntity("craber-naval", TransUnitWaterMove::new);
-        craberNaval = new UnityUnitType("craber-naval"){{
-            toTrans = () -> craber;
-            speed = 1.2f;
-            health = 730;
-            engineSize = 5f;
-            engineOffset = 12f;
-            accel = 0.26f;
-            baseRotateSpeed = 1.6f;
-            hitSize = 16f;
-            armor = 2f;
-            immunities.add(StatusEffects.wet);
-            trailX = 3f;
-            trailY = -9f;
-            trailLength = 16;
-            trailScl = 1.85f;
-            rotateShooting = true;
-            transformTime = 30f;
-            weapons.add(new Weapon("unity-laser-weapon"){{
-                reload = 5f;
-                x = 6f;
-                y = -3f;
-                rotate = true;
-                shake = 1f;
-                rotateSpeed = 6f;
-                bullet = new SapBulletType(){{
-                    sapStrength = 0f;
-                    color = Color.white.cpy().lerp(Pal.lancerLaser, 0.5f);
-                    damage = 35f;
-                    lifetime = 22f;
-                    status = StatusEffects.shocked;
-                    statusDuration = 60f * 5f;
-                    width = 0.7f;
-                    length = 170f;
-                }};
-            }});
-        }};
+        craberNaval = new UnityUnitType("craber-naval"){
+            {
+                toTrans = () -> craber;
+                speed = 1.2f;
+                health = 730;
+                engineSize = 5f;
+                engineOffset = 12f;
+                accel = 0.26f;
+                baseRotateSpeed = 1.6f;
+                hitSize = 16f;
+                armor = 2f;
+                immunities.add(StatusEffects.wet);
+                trailX = 3f;
+                trailY = -9f;
+                trailLength = 16;
+                trailScl = 1.85f;
+                rotateShooting = true;
+                transformTime = 30f;
+                weapons.add(new Weapon("unity-laser-weapon"){{
+                    reload = 5f;
+                    x = 6f;
+                    y = -3f;
+                    rotate = true;
+                    shake = 1f;
+                    rotateSpeed = 6f;
+                    bullet = new SapBulletType(){{
+                        sapStrength = 0f;
+                        color = Color.white.cpy().lerp(Pal.lancerLaser, 0.5f);
+                        damage = 35f;
+                        lifetime = 22f;
+                        status = StatusEffects.shocked;
+                        statusDuration = 60f * 5f;
+                        width = 0.7f;
+                        length = 170f;
+                    }};
+                }});
+            }
+
+            @Override
+            public boolean isHidden(){
+                return true;
+            }
+        };
 
         setEntity("craber", TransLegsUnit::new);
         craber = new UnityUnitType("craber"){{
@@ -1793,13 +1648,16 @@ public class UnityUnitTypes implements ContentList{
             mineTier = 2;
             mineSpeed = 1.5f;
             itemCapacity = 80;
-            speed = 0.36f;
+            speed = 0.4f;
+            accel = 0.36f;
             canBoost = true;
             boostMultiplier = 0.6f;
             engineColor = Color.valueOf("feb380");
             health = 350f;
             buildSpeed = 1.5f;
             landShake = 4f;
+            rotateSpeed = 3f;
+
             weapons.add(new Weapon(name + "-cannon"){{
                 top = false;
                 x = 4f;
@@ -1815,7 +1673,7 @@ public class UnityUnitTypes implements ContentList{
                 ejectEffect = Fx.none;
                 shake = 3f;
                 shootSound = Sounds.shootBig;
-                bullet = new MissileBulletType(2.7f, 12f, "missile"){{
+                bullet = new MissileBulletType(2.7f, 12f){{
                     width = height = 8f;
                     shrinkX = shrinkY = 0f;
                     drag = -0.003f;
@@ -1831,6 +1689,9 @@ public class UnityUnitTypes implements ContentList{
                     despawnEffect = Fx.blastExplosion;
                     weaveScale = 8f;
                     weaveMag = 2f;
+
+                    status = StatusEffects.blasted;
+                    statusDuration = 60f;
                 }};
             }});
             String armorRegion = name + "-armor";
@@ -1973,6 +1834,83 @@ public class UnityUnitTypes implements ContentList{
                 ejectEffect = Fx.casing2;
                 shootSound = Sounds.shootBig;
                 bullet = UnityBullets.phantasmalBullet;
+            }});
+        }};
+
+        trident = new UnityUnitType("trident"){{
+            mineTier = 2;
+            speed = 1.8f;
+            accel = 0.08f;
+            drag = 0.02f;
+            faceTarget = false;
+            health = 250f;
+            itemCapacity = 30;
+            engineColor = Color.valueOf("84f491");
+            buildSpeed = 2.5f;
+            lowAltitude = false;
+            flying = true;
+            circleTarget = true;
+            rotateSpeed = 3.4f;
+            range = 140f;
+
+            weapons.add(new Weapon(){{
+                x = 3f;
+                y = -0.75f;
+                shootY = 0f;
+                reload = 25f;
+                shotDelay = 1f;
+                shots = 8;
+                alternate = true;
+                ejectEffect = Fx.none;
+                velocityRnd = 1f;
+                inaccuracy = 20f;
+                ignoreRotation = true;
+                minShootVelocity = 0.75f;
+                bullet = new BombBulletType(16f, 25f){{
+                    width = 10f;
+                    height = 14f;
+                    hitEffect = Fx.flakExplosion;
+                    shootEffect = Fx.none;
+                    smokeEffect = Fx.none;
+                    shootSound = Sounds.artillery;
+
+                    status = StatusEffects.blasted;
+                    statusDuration = 60f;
+                }};
+            }});
+        }};
+
+        glaive = new UnityUnitType("glaive"){{
+            mineTier = 4;
+            mineSpeed = 1.3f;
+            speed = 3.7f;
+            accel = 0.32f;
+            drag = 0.06f;
+            health = 240f;
+            itemCapacity = 60;
+            engineColor = Color.valueOf("feb380");
+            buildSpeed = 1.2f;
+            flying = true;
+            circleTarget = true;
+            rotateSpeed = 19f;
+
+            weapons.add(new Weapon(){{
+                x = 11f/4f;
+                y = 27f/4f;
+                reload = 13f;
+                alternate = true;
+                ejectEffect = Fx.casing1;
+                shootSound = Sounds.shootSnap;
+                bullet = new BasicBulletType(4f, 7.5f){{
+                    width = 10f;
+                    height = 12f;
+                    frontColor = Color.valueOf("feb380");
+                    backColor = Color.valueOf("ea8878");
+                    makeFire = true;
+                    lifetime = 60f;
+                    
+                    status = StatusEffects.burning;
+                }};
             }});
         }};
 
@@ -2490,6 +2428,7 @@ public class UnityUnitTypes implements ContentList{
             speed = 15f;
             hitSize = 36f;
             flying = true;
+            drawCell = false;
 
             Unity.musicHandler.registerLoop(name, UnityMusics.radiantDischargeIntro, UnityMusics.radiantDischargeLoop);
         }};

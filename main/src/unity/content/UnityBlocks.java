@@ -89,7 +89,7 @@ public class UnityBlocks implements ContentList{
 
     //laserTurret, inferno,
     
-    daggerPad, novaPad, bufferPad, cachePad, omegaPad,
+    daggerPad, bufferPad, novaPad, omegaPad, cachePad, tridentPad, glaivePad,
 
     teleporter, teleunit; //expOutput, expUnloader, expTank, expChest, expFountain, expVoid;
 
@@ -868,53 +868,58 @@ public class UnityBlocks implements ContentList{
         }};
         
         daggerPad = new MechPad("dagger-pad"){{
-            requirements(Category.units, with(Items.copper, 75, Items.lead, 100, Items.graphite, 100));
+            requirements(Category.units, with(Items.copper, 75, Items.lead, 100, Items.graphite, 50));
             size = 2;
             consumes.power(0.5f);
         }};
         
+        bufferPad = new MechPad("buffer-pad"){{
+            requirements(Category.units, with(UnityItems.stone, 120, Items.copper, 170, Items.lead, 150, Items.titanium, 150, Items.silicon, 180));
+            size = 2;
+            craftTime = 100;
+            consumes.power(0.7f);
+            unitType = UnityUnitTypes.buffer;
+        }};
+        
         novaPad = new MechPad("nova-pad"){{
-            requirements(Category.units, with(Items.copper, 125, Items.lead, 125, Items.silicon, 50, Items.titanium, 50));
+            requirements(Category.units, with(Items.copper, 125, Items.lead, 125, Items.silicon, 125, Items.titanium, 125));
             size = 2;
             craftTime = 120f;
             consumes.power(1f);
             unitType = UnitTypes.nova;
         }};
-        
-        bufferPad = new MechPad("buffer-pad"){{
-            requirements(Category.units, with(UnityItems.stone, 120, Items.copper, 100, Items.lead, 60, Items.silicon, 25));
-            size = 2;
-            craftTime = 300f;
-            consumes.power(0.7f);
-            unitType = UnityUnitTypes.buffer;
-        }};
-        
-        cachePad = new MechPad("cache-pad"){{
-            requirements(Category.units, with(UnityItems.stone, 150, Items.lead, 160, Items.silicon, 100, Items.titanium, 60, Items.plastanium, 50));
-            size = 2;
-            craftTime = 300f;
-            consumes.power(0.8f);
-            unitType = UnityUnitTypes.cache;
-        }};
 
         omegaPad = new MechPad("omega-pad"){{
-            requirements(Category.units, with(UnityItems.stone, 180, Items.lead, 200, Items.silicon, 130, Items.thorium, 70, Items.surgeAlloy, 100));
+            requirements(Category.units, with(UnityItems.stone, 220, Items.lead, 200, Items.silicon, 230, Items.thorium, 260, Items.surgeAlloy, 100));
             size = 3;
             craftTime = 300f;
             consumes.power(1.2f);
             unitType = UnityUnitTypes.omega;
         }};
-
-        /*inferno = new ExpItemTurret("inferno", 10){{
-            requirements(Category.turret, with(Items.copper, 150, Items.lead, 165, Items.graphite, 120, Items.silicon, 130));
-            ammo(Items.coal, UnityBullets.coalBlaze, Items.pyratite, UnityBullets.pyraBlaze);
+        
+        cachePad = new MechPad("cache-pad"){{
+            requirements(Category.units, with(UnityItems.stone, 150, Items.lead, 160, Items.silicon, 100, Items.titanium, 60, Items.plastanium, 120, Items.phaseFabric, 60));
+            size = 2;
+            craftTime = 130;
+            consumes.power(0.8f);
+            unitType = UnityUnitTypes.cache;
+        }};
+        
+        tridentPad = new MechPad("trident-pad"){{
+            requirements(Category.units, with(UnityItems.stone, 130, Items.lead, 100, Items.silicon, 80, Items.titanium, 130, Items.plastanium, 80));
+            size = 2;
+            craftTime = 120;
+            consumes.power(1f);
+            unitType = UnityUnitTypes.trident;
+        }};
+        
+        glaivePad = new MechPad("glaive-pad"){{
+            requirements(Category.units, with(UnityItems.stone, 190, Items.lead, 200, Items.silicon, 220, Items.titanium, 260, Items.plastanium, 150, Items.surgeAlloy, 70));
             size = 3;
-            health = 1500;
-            range = 80f;
-            reloadTime = 10f;
-            shootCone = 5f;
-            addExpField("exp", "useless", 0, 2);
-        }};TODO*/
+            craftTime = 180;
+            consumes.power(1.28f);
+            unitType = UnityUnitTypes.glaive;
+        }};
 
         teleporter = new Teleporter("teleporter"){{
             requirements(Category.distribution, with(Items.lead, 22, Items.silicon, 10, Items.phaseFabric, 32, UnityItems.dirium, 32));

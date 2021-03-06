@@ -13,6 +13,8 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+import mindustry.world.blocks.storage.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
 
 import static mindustry.Vars.*;
 
@@ -126,7 +128,11 @@ public class MechPad extends Block{
         }
         
         public UnitType getResultUnit(){
-            return revert ? UnitTypes.alpha : unitType;
+            return revert ? bestCoreUnit() : unitType;
+        }
+
+        public UnitType bestCoreUnit(){
+            return ((CoreBlock)thisU.getPlayer().bestCore().block).unitType;
         }
         
         public boolean inProgress(){
