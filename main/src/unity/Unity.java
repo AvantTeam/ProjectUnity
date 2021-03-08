@@ -8,11 +8,9 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.mod.*;
 import mindustry.mod.Mods.*;
-import mindustry.world.Block;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import unity.ai.kami.*;
-import unity.annotations.Annotations.Merge;
 import unity.content.*;
 import unity.gen.*;
 import unity.mod.*;
@@ -29,9 +27,6 @@ public class Unity extends Mod implements ApplicationListener{
     public static TapHandler tapHandler;
     public static UnityAntiCheat antiCheat;
     public static UnitySettings unitySettings = new UnitySettings();
-
-    private static @Merge(base = Block.class, value = unity.gen.Graph.class)
-    Block h;
 
     private final ContentList[] unityContent = {
         new UnityItems(),

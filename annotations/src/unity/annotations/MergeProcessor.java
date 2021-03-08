@@ -28,6 +28,7 @@ public class MergeProcessor extends BaseProcessor{
 
     StringMap varInitializers = new StringMap();
     StringMap methodBlocks = new StringMap();
+    ObjectMap<String, ObjectMap<Seq<? extends VariableElement>, ObjectMap<ExecutableElement, String>>> constructorBlocks = new ObjectMap<>();
     ObjectMap<String, Seq<String>> imports = new ObjectMap<>();
 
     {
@@ -143,7 +144,7 @@ public class MergeProcessor extends BaseProcessor{
         imports.put(interfaceName(comp), getImports(comp));
 
         ObjectSet<String> preserved = new ObjectSet<>();
-        for(ExecutableElement m : methods(comp)){
+        for(ExecutableElement m : methods(comp).select(me -> !isConstructor(me))){
             MethodTree tree = treeUtils.getTree(m);
             methodBlocks.put(descString(m), tree.getBody().toString()
                 .replaceAll("this\\.<(.*)>self\\(\\)", "this")
@@ -157,7 +158,7 @@ public class MergeProcessor extends BaseProcessor{
             String name = m.getSimpleName().toString();
             preserved.add(m.toString());
 
-            if(!isConstructor(m) && annotation(m, Override.class) == null){
+            if(annotation(m, Override.class) == null){
                 inter.addMethod(
                     MethodSpec.methodBuilder(name)
                         .addTypeVariables(Seq.with(m.getTypeParameters()).map(TypeVariableName::get))
@@ -168,6 +169,18 @@ public class MergeProcessor extends BaseProcessor{
                     .build()
                 );
             }
+        }
+
+        for(ExecutableElement cons : methods(comp).select(this::isConstructor)){
+            ObjectMap<ExecutableElement, String> map = findConstructorMap(interfaceName(comp), cons.getParameters());
+
+            MethodTree tree = treeUtils.getTree(cons);
+            map.put(cons, tree.getBody().toString()
+                .replaceAll("this\\.<(.*)>self\\(\\)", "this")
+                .replaceAll("self\\(\\)", "this")
+                .replaceAll(" yield ", "")
+                .replaceAll("\\/\\*missing\\*\\/", "var")
+            );
         }
 
         for(VariableElement var : vars(comp)){
@@ -313,6 +326,58 @@ public class MergeProcessor extends BaseProcessor{
                     .build()
                 );
             }
+
+            for(Entry<Seq<? extends VariableElement>, ObjectMap<ExecutableElement, String>> entry : constructorBlocks.get(inter.getSimpleName().toString())){
+                OrderedSet<Modifier> modifiers = new OrderedSet<>();
+                for(Entry<ExecutableElement, String> method : entry.value){
+                    modifiers.addAll(method.key.getModifiers().toArray(new Modifier[0]));
+                }
+
+                boolean err = false;
+                if(
+                    (modifiers.contains(Modifier.PUBLIC) && modifiers.contains(Modifier.PROTECTED)) ||
+                    (modifiers.contains(Modifier.PUBLIC) && modifiers.contains(Modifier.PRIVATE)) ||
+                    (modifiers.contains(Modifier.PROTECTED) && modifiers.contains(Modifier.PRIVATE))
+                ){
+                    err = true;
+                }
+
+                if(err) throw new IllegalStateException("Inconsistent visibility modifiers in constructor with params: " + entry.key.toString());
+                MethodSpec.Builder constructor = MethodSpec.constructorBuilder()
+                    .addModifiers(modifiers)
+                    .addParameters(entry.key.map(ParameterSpec::get));
+
+                StringBuilder params = new StringBuilder();
+                for(int i = 0; i < entry.key.size; i++){
+                    params.append(entry.key.get(i));
+                    if(i < entry.key.size - 1){
+                        params.append(", ");
+                    }
+                }
+
+                constructor.addStatement("super(" + params.toString() + ")");
+
+                for(Entry<ExecutableElement, String> method : entry.value){
+                    String label = method.key.getEnclosingElement().getSimpleName().toString().toLowerCase();
+                    label = label.substring(0, label.length() - 4);
+
+                    String code = method.value
+                    .replace("return;", "break " + label + ";");
+                    code = code.substring(1, code.length() - 1).trim().replace("\n    ", "\n");
+
+                    Seq<String> split = Seq.with(code.split("\n"));
+                    if(split.first().startsWith("super(")) split.remove(0);
+
+                    constructor
+                        .addCode(lnew())
+                        .beginControlFlow("$L:", label)
+                        .addCode(split.toString("\n"))
+                        .addCode(lnew())
+                    .endControlFlow();
+                }
+
+                type.addMethod(constructor.build());
+            }
         }
 
         ObjectMap<ExecutableElement, Seq<ExecutableElement>> appending = new ObjectMap<>();
@@ -383,6 +448,34 @@ public class MergeProcessor extends BaseProcessor{
             key = type;
             value = imports;
         }};
+    }
+
+    ObjectMap<ExecutableElement, String> findConstructorMap(String comp, List<? extends VariableElement> list){
+        ObjectMap<Seq<? extends VariableElement>, ObjectMap<ExecutableElement, String>> blocks = constructorBlocks.get(comp, ObjectMap::new);
+        Seq<? extends VariableElement> params = blocks.keys().toSeq().find(l -> {
+            try{
+                boolean same = true;
+                for(int i = 0; i < l.size; i++){
+                    if(same && !typeUtils.isSameType(
+                        l.get(i).asType(),
+                        list.get(i).asType()
+                    )){
+                        same = false;
+                    }
+                }
+
+                return same;
+            }catch(IndexOutOfBoundsException e){
+                return false;
+            }
+        });
+
+        if(params == null){
+            params = Seq.with(list);
+            blocks.put(params, new ObjectMap<>());
+        }
+
+        return blocks.get(params);
     }
 
     String interfaceName(TypeElement type){
