@@ -58,7 +58,7 @@ public class UnityUnitTypes implements ContentList{
     
     /** Global {@linkplain LegsUnit legs} units */
     public static @EntityPoint(LegsUnit.class)
-    UnitType ursa, arcaetana, projectSpiboss;
+    UnitType ursa, araneidae, theraphosidae;
 
     /** Global naval units */
     public static UnitType//@formatter:off
@@ -85,7 +85,7 @@ public class UnityUnitTypes implements ContentList{
     
     /** Koruh {@linkplain UnitEntity flying} units */
     public static @FactionDef("koruh") @EntityPoint(UnitEntity.class)
-    UnitType cache, dijkstra, phantasm, trident, glaive;
+    UnitType cache, dijkstra, phantasm;
 
     /** Monolith {@linkplain MechUnit mech} units */
     public static @FactionDef("monolith") @EntityPoint(MechUnit.class)
@@ -97,6 +97,9 @@ public class UnityUnitTypes implements ContentList{
 
     public static @FactionDef("koruh") @EntityDef(base = KamiUnit.class, def = Bossc.class)
     UnitType kami;
+
+    public static @FactionDef("koruh") @EntityDef(base = UnitEntity.class, def = AntiKamic.class)
+    UnitType antiKamiTest;
 
     public static @FactionDef("end") UnitType opticaecus, devourer, ravager;
 
@@ -491,17 +494,18 @@ public class UnityUnitTypes implements ContentList{
             }});
         }};
 
-        projectSpiboss = new UnityUnitType("project-spiboss"){{
+        araneidae = new UnityUnitType("araneidae"){{
             groundLayer = Layer.legUnit + 3f;
             drag = 0.1f;
             speed = 0.4f;
             hitSize = 34f;
             health = 20000;
-            legCount = 10;
-            legMoveSpace = 0.7f;
+            
+            legCount = 12;
+            legMoveSpace = 1f;
             legPairOffset = 0.7f;
             legGroupSize = 3;
-            legLength = 55f;
+            legLength = 77;
             legExtension = -12f;
             legBaseOffset = 22f;
             landShake = 2.4f;
@@ -509,16 +513,19 @@ public class UnityUnitTypes implements ContentList{
             kinematicScl = 0.7f;
             rippleScale = 2f;
             legSpeed = 0.2f;
+
             legSplashDamage = 80f;
             legSplashRange = 40f;
             hovering = true;
+
             armor = 13f;
             allowLegStep = true;
             visualElevation = 0.7f;
-            weapons.add(new Weapon("large-purple-mount"){{
+            weapons.add(new Weapon(name + "-sapper"){{
                 reload = 50f;
                 x = 13f;
                 y = -17f;
+                shootY = 5f;
                 rotate = true;
                 shake = 1f;
                 rotateSpeed = 1f;
@@ -568,7 +575,6 @@ public class UnityUnitTypes implements ContentList{
             weap3.y = 13f;
             weapons.insert(2, weap3);
             Weapon weap4 = weapons.get(2).copy();
-            weap4.name = "spiroct-weapon";
             weap4.reload = 23f;
             weap4.x = 15f;
             weap4.y = 18f;
@@ -583,13 +589,14 @@ public class UnityUnitTypes implements ContentList{
                 lifetime = 35f;
                 knockback = -1.5f;
             }};
+            weapons.insert(3, weap4);
             Weapon weap5 = weap4.copy();
             weap5.x = 25f;
             weap5.y = 5f;
-            weapons.add(weap4, weap5);
+            weapons.insert(4, weap5);
         }};
 
-        arcaetana = new UnityUnitType("arcaetana"){{
+        theraphosidae = new UnityUnitType("theraphosidae"){{
             speed = 0.4f;
             drag = 0.12f;
             hitSize = 29f;
@@ -598,7 +605,7 @@ public class UnityUnitTypes implements ContentList{
             health = 31000;
             armor = 16f;
             rotateSpeed = 1.3f;
-            legCount = 12;
+            legCount = 16;
             legGroupSize = 4;
             legMoveSpace = 0.4f;
             legPairOffset = 0.4f;
@@ -697,7 +704,7 @@ public class UnityUnitTypes implements ContentList{
                         drawSize = length * 2f + 20f;
                     }
                 };
-            }}, new Weapon("unity-gummy-main-sapper"){
+            }}, new Weapon(name + "-main-sapper"){
                 {
                     x = -17f;
                     y = -18.5f;
@@ -1837,83 +1844,6 @@ public class UnityUnitTypes implements ContentList{
             }});
         }};
 
-        trident = new UnityUnitType("trident"){{
-            mineTier = 2;
-            speed = 1.8f;
-            accel = 0.08f;
-            drag = 0.02f;
-            faceTarget = false;
-            health = 250f;
-            itemCapacity = 30;
-            engineColor = Color.valueOf("84f491");
-            buildSpeed = 2.5f;
-            lowAltitude = false;
-            flying = true;
-            circleTarget = true;
-            rotateSpeed = 3.4f;
-            range = 140f;
-
-            weapons.add(new Weapon(){{
-                x = 3f;
-                y = -0.75f;
-                shootY = 0f;
-                reload = 25f;
-                shotDelay = 1f;
-                shots = 8;
-                alternate = true;
-                ejectEffect = Fx.none;
-                velocityRnd = 1f;
-                inaccuracy = 20f;
-                ignoreRotation = true;
-                minShootVelocity = 0.75f;
-                bullet = new BombBulletType(16f, 25f){{
-                    width = 10f;
-                    height = 14f;
-                    hitEffect = Fx.flakExplosion;
-                    shootEffect = Fx.none;
-                    smokeEffect = Fx.none;
-                    shootSound = Sounds.artillery;
-
-                    status = StatusEffects.blasted;
-                    statusDuration = 60f;
-                }};
-            }});
-        }};
-
-        glaive = new UnityUnitType("glaive"){{
-            mineTier = 4;
-            mineSpeed = 1.3f;
-            speed = 3.7f;
-            accel = 0.32f;
-            drag = 0.06f;
-            health = 240f;
-            itemCapacity = 60;
-            engineColor = Color.valueOf("feb380");
-            buildSpeed = 1.2f;
-            flying = true;
-            circleTarget = true;
-            rotateSpeed = 19f;
-
-            weapons.add(new Weapon(){{
-                x = 11f/4f;
-                y = 27f/4f;
-                reload = 13f;
-                alternate = true;
-                ejectEffect = Fx.casing1;
-                shootSound = Sounds.shootSnap;
-                bullet = new BasicBulletType(4f, 7.5f){{
-                    width = 10f;
-                    height = 12f;
-                    frontColor = Color.valueOf("feb380");
-                    backColor = Color.valueOf("ea8878");
-                    makeFire = true;
-                    lifetime = 60f;
-                    
-                    status = StatusEffects.burning;
-                }};
-            }});
-        }};
-
         //endregion
         //region monolith
 
@@ -2431,6 +2361,22 @@ public class UnityUnitTypes implements ContentList{
             drawCell = false;
 
             Unity.musicHandler.registerLoop(name, UnityMusics.radiantDischargeIntro, UnityMusics.radiantDischargeLoop);
+        }};
+
+        antiKamiTest = new UnityUnitType("anti-kami-test"){{
+            speed = 4.3f;
+            flying = true;
+            rotateShooting = false;
+
+            weapons.add(new Weapon(){{
+                reload = 5f;
+                x = 0f;
+                mirror = false;
+                ignoreRotation = true;
+                shootCone = 180f;
+                
+                bullet = Bullets.standardThoriumBig;
+            }});
         }};
 
         //endregion

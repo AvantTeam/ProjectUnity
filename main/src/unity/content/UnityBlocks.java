@@ -89,7 +89,7 @@ public class UnityBlocks implements ContentList{
 
     //laserTurret, inferno,
     
-    daggerPad, bufferPad, novaPad, omegaPad, cachePad, tridentPad, glaivePad,
+    bufferPad, omegaPad, cachePad,
 
     teleporter, teleunit; //expOutput, expUnloader, expTank, expChest, expFountain, expVoid;
 
@@ -190,14 +190,17 @@ public class UnityBlocks implements ContentList{
             constructTime = 20000f;
             minTier = 6;
             upgrades.add(
-                new UnitType[]{UnitTypes.toxopid, UnityUnitTypes.projectSpiboss},
+                new UnitType[]{UnitTypes.toxopid, UnityUnitTypes.araneidae},
 
                 new UnitType[]{UnitTypes.corvus, UnityUnitTypes.ursa},
 
-                new UnitType[]{UnityUnitTypes.monument, UnityUnitTypes.colossus},
+                new UnitType[]{UnityUnitTypes.monument, UnityUnitTypes.colossus}
+            );
+            otherUpgrades.add(
+                new UnitType[]{UnityUnitTypes.araneidae, UnityUnitTypes.theraphosidae},
+
                 new UnitType[]{UnityUnitTypes.colossus, UnityUnitTypes.bastion}
             );
-            otherUpgrades.add(new UnitType[]{UnityUnitTypes.projectSpiboss, UnityUnitTypes.arcaetana});
             consumes.power(5f);
             consumes.items(with(Items.silicon, 1200, Items.metaglass, 800, Items.thorium, 700, Items.surgeAlloy, 400, Items.plastanium, 600, Items.phaseFabric, 350));
             consumes.liquid(Liquids.cryofluid, 7f);
@@ -867,26 +870,12 @@ public class UnityBlocks implements ContentList{
             drawMultiplier = 1.3f;
         }};
         
-        daggerPad = new MechPad("dagger-pad"){{
-            requirements(Category.units, with(Items.copper, 75, Items.lead, 100, Items.graphite, 50));
-            size = 2;
-            consumes.power(0.5f);
-        }};
-        
         bufferPad = new MechPad("buffer-pad"){{
             requirements(Category.units, with(UnityItems.stone, 120, Items.copper, 170, Items.lead, 150, Items.titanium, 150, Items.silicon, 180));
             size = 2;
             craftTime = 100;
             consumes.power(0.7f);
             unitType = UnityUnitTypes.buffer;
-        }};
-        
-        novaPad = new MechPad("nova-pad"){{
-            requirements(Category.units, with(Items.copper, 125, Items.lead, 125, Items.silicon, 125, Items.titanium, 125));
-            size = 2;
-            craftTime = 120f;
-            consumes.power(1f);
-            unitType = UnitTypes.nova;
         }};
 
         omegaPad = new MechPad("omega-pad"){{
@@ -903,22 +892,6 @@ public class UnityBlocks implements ContentList{
             craftTime = 130;
             consumes.power(0.8f);
             unitType = UnityUnitTypes.cache;
-        }};
-        
-        tridentPad = new MechPad("trident-pad"){{
-            requirements(Category.units, with(UnityItems.stone, 130, Items.lead, 100, Items.silicon, 80, Items.titanium, 130, Items.plastanium, 80));
-            size = 2;
-            craftTime = 120;
-            consumes.power(1f);
-            unitType = UnityUnitTypes.trident;
-        }};
-        
-        glaivePad = new MechPad("glaive-pad"){{
-            requirements(Category.units, with(UnityItems.stone, 190, Items.lead, 200, Items.silicon, 220, Items.titanium, 260, Items.plastanium, 150, Items.surgeAlloy, 70));
-            size = 3;
-            craftTime = 180;
-            consumes.power(1.28f);
-            unitType = UnityUnitTypes.glaive;
         }};
 
         teleporter = new Teleporter("teleporter"){{
