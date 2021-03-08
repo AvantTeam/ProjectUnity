@@ -24,9 +24,19 @@ class Graph extends Block{
     }
 
     public class GraphBuild extends Building{
+        @ReadOnly float progress = 0f;
+
         @Override
         public void updateTile(){
             Log.info("Updated.");
         }
+
+        public void doSomething(){
+            Log.info("Did something too.");
+        }
+    }
+
+    public class SomeUnrelatedClass{
+        
     }
 }
