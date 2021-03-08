@@ -25,7 +25,7 @@ public class MergeProcessor extends BaseProcessor{
 
     StringMap varInitializers = new StringMap();
     StringMap methodBlocks = new StringMap();
-    StringMap imports = new StringMap();
+    ObjectMap<String, Seq<String>> imports = new ObjectMap<>();
 
     {
         rounds = 2;
@@ -149,8 +149,10 @@ public class MergeProcessor extends BaseProcessor{
                 }
 
                 ObjectMap<ExecutableElement, Seq<ExecutableElement>> appending = new ObjectMap<>();
+                Seq<String> imports = new Seq<>();
                 for(TypeElement inter : value){
                     appending.putAll(getAppendedMethods(base, inter));
+                    imports.addAll(this.imports.get(inter.getSimpleName().toString(), Seq::with));
                 }
 
                 for(ExecutableElement appended : appending.keys().toSeq()){
@@ -178,9 +180,15 @@ public class MergeProcessor extends BaseProcessor{
                     if(!returns){
                         method.addStatement("super.$L(" + params.toString() + ")", args.toArray());
                         for(ExecutableElement app : appenders){
-                            TypeElement comp = comps.find(t -> t.getQualifiedName().toString().equals(
-                                docs(app.getEnclosingElement()).split("\\s+")[3]
-                            ));
+                            String doc = docs(app.getEnclosingElement());
+                            TypeElement comp;
+                            if(!doc.isEmpty()){
+                                comp = comps.find(t -> t.getQualifiedName().toString().equals(
+                                    doc.split("\\s+")[3]
+                                ));
+                            }else{
+                                comp = (TypeElement)app.getEnclosingElement();
+                            }
 
                             String label = app.getEnclosingElement().getSimpleName().toString().toLowerCase();
                             ExecutableElement up = method(comp, app.getSimpleName().toString(), app.getReturnType(), app.getParameters());
@@ -203,7 +211,7 @@ public class MergeProcessor extends BaseProcessor{
                     type.addMethod(method.build());
                 }
 
-                write(type.build());
+                write(type.build(), imports.distinct());
             }
         }
     }
@@ -216,6 +224,8 @@ public class MergeProcessor extends BaseProcessor{
             inter.addModifiers(Modifier.STATIC);
         }
 
+        imports.put(comp.getSimpleName().toString(), getImports(comp));
+
         ObjectSet<String> preserved = new ObjectSet<>();
         for(ExecutableElement m : methods(comp)){
             if(is(m, Modifier.PRIVATE, Modifier.STATIC)) continue;
@@ -226,7 +236,7 @@ public class MergeProcessor extends BaseProcessor{
             MethodTree tree = treeUtils.getTree(m);
             methodBlocks.put(descString(m), tree.getBody().toString());
 
-            if(!isConstructor(m)){
+            if(!isConstructor(m) && annotation(m, Override.class) == null){
                 inter.addMethod(
                     MethodSpec.methodBuilder(name)
                         .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
@@ -276,11 +286,17 @@ public class MergeProcessor extends BaseProcessor{
         return inter;
     }
 
+    Seq<String> getImports(Element e){
+        return Seq.with(treeUtils.getPath(e).getCompilationUnit().getImports()).map(Object::toString);
+    }
+
     @Override
-    ObjectMap<ExecutableElement, Seq<ExecutableElement>> getAppendedMethods(TypeElement base, TypeElement comp){
+    ObjectMap<ExecutableElement, Seq<ExecutableElement>> getAppendedMethods(TypeElement base, TypeElement inter){
         ObjectMap<ExecutableElement, Seq<ExecutableElement>> appending = new ObjectMap<>();
         Seq<ExecutableElement> baseMethods = getMethodsRec(base);
-        Seq<ExecutableElement> toAppend = methods(comp).select(m ->
+
+        TypeElement comp = elementUtils.getTypeElement(docs(inter).split("\\s+")[3]);
+        Seq<ExecutableElement> toAppend = methods(inter).and(methods(comp).select(m -> annotation(m, Override.class) != null)).select(m ->
             baseMethods.contains(e -> {
                 if(e.getParameters().size() != m.getParameters().size()) return false;
 

@@ -98,13 +98,17 @@ public abstract class BaseProcessor extends AbstractProcessor{
             imports.distinct();
 
             String rawSource = file.toString();
+            Seq<String> source = Seq.with(rawSource.split("\n", -1));
             Seq<String> result = new Seq<>();
-            for(String s : rawSource.split("\n", -1)){
+            for(int i = 0; i < source.size; i++){
+                String s = source.get(i);
+
                 result.add(s);
                 if(s.startsWith("package ")){
+                    source.remove(i + 1);
                     result.add("");
-                    for(String i : imports){
-                        result.add(i);
+                    for(String im : imports){
+                        result.add(im.replace("\n", ""));
                     }
                 }
             }
