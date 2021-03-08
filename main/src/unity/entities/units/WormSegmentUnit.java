@@ -92,6 +92,10 @@ public class WormSegmentUnit extends UnitEntity{
         trueParentUnit.damage(amount);
     }
 
+    public void segmentDamage(float amount){
+        segmentHealth -= amount;
+    }
+
     @Override
     public void controller(UnitController next){
         if(!(next instanceof Player)){
@@ -175,7 +179,7 @@ public class WormSegmentUnit extends UnitEntity{
 
     public void wormSegmentUpdate(){
         if(trueParentUnit != null){
-            maxHealth = trueParentUnit.maxHealth;
+            if(wormType.splittable && wormType.healthDistribution <= 0f) maxHealth = trueParentUnit.maxHealth;
             if(!wormType.splittable){
                 health = trueParentUnit.health;
             }else{
@@ -209,6 +213,7 @@ public class WormSegmentUnit extends UnitEntity{
                 break;
             }
         }
+        if(index >= hd.segmentUnits.length - 1) trueParentUnit.removeTail();
         if(index <= 0 || index >= hd.segmentUnits.length - 1){
             return;
         }
@@ -216,6 +221,7 @@ public class WormSegmentUnit extends UnitEntity{
         WormDefaultUnit newHead = (WormDefaultUnit)type.create(team);
         hd.segmentUnits[index + 1].parentUnit = newHead;
         newHead.addSegments = false;
+        newHead.attachTime = 0f;
         newHead.set(this);
         newHead.vel.set(vel);
         newHead.maxHealth /= 2f;
@@ -234,6 +240,7 @@ public class WormSegmentUnit extends UnitEntity{
         oldSeg.set(hd);
         newSeg.set(newHead);
         newHead.add();
+        wormType.splitSound.at(x, y, Mathf.random(0.9f, 1.1f));
         remove();
     }
 
@@ -391,7 +398,7 @@ public class WormSegmentUnit extends UnitEntity{
         parentUnit = parent;
     }
 
-    private static class SegmentData{
+    protected static class SegmentData{
         WormSegmentUnit[] units;
         Vec2[] pos;
         Vec2[] vel;
@@ -401,6 +408,12 @@ public class WormSegmentUnit extends UnitEntity{
             units = new WormSegmentUnit[size];
             pos = new Vec2[size];
             vel = new Vec2[size];
+        }
+
+        void add(WormSegmentUnit unit, Vec2 vel){
+            units[size] = unit;
+            pos[size] = new Vec2(unit.getX(), unit.getY());
+            this.vel[size++] = vel;
         }
 
         void add(WormDefaultUnit unit, int index){

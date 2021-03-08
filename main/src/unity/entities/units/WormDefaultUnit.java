@@ -4,10 +4,14 @@ import arc.util.*;
 import arc.math.*;
 import arc.math.geom.Vec2;
 import arc.graphics.g2d.Draw;
+import arc.util.io.*;
+import mindustry.entities.*;
+import mindustry.entities.abilities.*;
 import mindustry.gen.*;
 import mindustry.type.UnitType;
 import unity.ai.*;
 import unity.content.UnityUnitTypes;
+import unity.entities.units.WormSegmentUnit.*;
 import unity.type.*;
 import unity.util.*;
 
@@ -17,8 +21,12 @@ public class WormDefaultUnit extends UnitEntity{
     public UnityUnitType wormType;
     public WormSegmentUnit[] segmentUnits;
     public float repairTime = 0f;
+    protected float attachTime = 4f * 60f;
+    protected float healthDistributionEfficiency = 1f;
     protected Vec2[] segments, segmentVelocities;
     protected boolean addSegments = true;
+    protected boolean found;
+    protected final Interval scanTimer = new Interval();
     protected final Vec2 lastVelocityC = new Vec2(), lastVelocityD = new Vec2();
 
     public int getSegmentLength(){
@@ -50,16 +58,31 @@ public class WormDefaultUnit extends UnitEntity{
     }
 
     @Override
+    public void damage(float amount){
+        super.damage(amount);
+        healthDistributionEfficiency = Mathf.clamp(healthDistributionEfficiency - (amount / 15f));
+    }
+
+    @Override
     public void update(){
         lastVelocityD.set(lastVelocityC);
         lastVelocityC.set(vel);
         super.update();
+        healthDistributionEfficiency = Mathf.clamp(healthDistributionEfficiency + (Time.delta / 160f));
         updateSegmentVLocal(lastVelocityC);
         updateSegmentsLocal();
+        if(wormType.chainable && segmentUnits.length < wormType.maxSegments && scanTimer.get(15f) && attachTime >= 4f * 60f){
+            scanTailSegment();
+        }
+        attachTime += Time.delta;
         if(regenAvailable()){
             if(repairTime >= wormType.regenTime){
                 float damage = (health / segmentUnits.length) / 2f;
                 damage(damage);
+                for(WormSegmentUnit seg : segmentUnits){
+                    float sDamage = (seg.segmentHealth / segmentUnits.length) / 2f;
+                    seg.segmentDamage(sDamage);
+                }
                 addSegment();
                 repairTime = 0f;
             }else{
@@ -69,7 +92,7 @@ public class WormDefaultUnit extends UnitEntity{
     }
 
     public boolean regenAvailable(){
-        return wormType.splittable && segmentUnits.length < wormType.segmentLength && wormType.regenTime > 0f;
+        return wormType.splittable && (segmentUnits.length < wormType.segmentLength || segmentUnits.length < wormType.maxSegments) && wormType.regenTime > 0f;
     }
 
     protected void updateSegmentVLocal(Vec2 vec){
@@ -122,7 +145,39 @@ public class WormDefaultUnit extends UnitEntity{
             segU.set(seg.x, seg.y);
             segU.rotation = angleD;
             segU.wormSegmentUpdate();
+            if(wormType.healthDistribution > 0) distributeHealth(i);
         }
+    }
+
+    protected void distributeHealth(int index){
+        int idx = 0;
+        float mHealth = 0f;
+        float mMaxHealth = 0f;
+        for(int i = -1; i < 2; i++){
+            Unit seg = getSegment(i + index);
+            if(seg == null) break;
+            mHealth += seg.health;
+            mMaxHealth += seg.maxHealth;
+            idx++;
+        }
+        mMaxHealth /= idx;
+        mHealth /= idx;
+        for(int i = -1; i < 2; i++){
+            Unit seg = getSegment(i + index);
+            if(seg == null) break;
+            if(seg instanceof WormSegmentUnit ws){
+                if(!Mathf.equal(ws.segmentHealth, mHealth, 0.001f)) ws.segmentHealth = Mathf.lerpDelta(ws.segmentHealth, mHealth, wormType.healthDistribution * healthDistributionEfficiency);
+            }else{
+                if(!Mathf.equal(seg.health, mHealth, 0.001f)) seg.health = Mathf.lerpDelta(seg.health, mHealth, wormType.healthDistribution * healthDistributionEfficiency);
+            }
+            if(!Mathf.equal(seg.maxHealth, mMaxHealth, 0.001f)) seg.maxHealth = Mathf.lerpDelta(seg.maxHealth, mMaxHealth, wormType.healthDistribution * healthDistributionEfficiency);
+        }
+    }
+
+    protected Unit getSegment(int index){
+        if(index < 0) return this;
+        if(index >= segmentUnits.length) return null;
+        return segmentUnits[index];
     }
 
     @Override
@@ -132,7 +187,7 @@ public class WormDefaultUnit extends UnitEntity{
 
     @Override
     public float clipSize(){
-        return getSegmentLength() * wormType.segmentOffset * 2f;
+        return segmentUnits.length * wormType.segmentOffset * 2f;
     }
 
     public void drawShadow(){
@@ -149,6 +204,14 @@ public class WormDefaultUnit extends UnitEntity{
     }
 
     @Override
+    public void destroy(){
+        super.destroy();
+        for(WormSegmentUnit segmentUnit : segmentUnits){
+            segmentUnit.destroy();
+        }
+    }
+
+    @Override
     public void remove(){
         if(!added) return;
         super.remove();
@@ -157,9 +220,80 @@ public class WormDefaultUnit extends UnitEntity{
         }
     }
 
+    protected void superRemove(){
+        super.remove();
+    }
+
     @Override
     public int count(){
-        return Math.max(super.count() / wormType.segmentLength, 1);
+        return Math.max(super.count() / Math.max(wormType.segmentLength, wormType.maxSegments), 1);
+    }
+
+    protected void scanTailSegment(){
+        Tmp.v1.trns(rotation, wormType.segmentOffset).add(this);
+        float size = wormType.hitSize / 2f;
+        found = false;
+        Units.nearby(team, Tmp.v1.x - size, Tmp.v1.y - size, size * 2f, size * 2f, e -> {
+            if(found) return;
+            if(e instanceof WormSegmentUnit ws && ws.segmentType == 1 && ws.wormType == wormType && within(ws, (wormType.segmentOffset) + 5f) && Angles.within(angleTo(e), e.rotation, wormType.angleLimit + 2f)){
+                if(ws.trueParentUnit == null || ws.trueParentUnit.segmentUnits.length > wormType.maxSegments) return;
+                wormType.chainSound.at(this, Mathf.random(0.9f, 1.1f));
+                WormSegmentUnit head = newSegment();
+                head.setType(wormType);
+                head.set(this);
+                head.rotation = rotation;
+                head.vel.set(vel);
+                head.team = team;
+                head.maxHealth = maxHealth;
+                head.health = head.segmentHealth = health;
+                head.segmentType = 0;
+                segmentUnits[0].parentUnit = head;
+                head.add();
+                superRemove();
+
+                SegmentData data = new SegmentData(segmentUnits.length + 1);
+                data.add(head, head.vel);
+
+                for(int i = 0; i < segmentUnits.length; i++){
+                    data.add(this, i);
+                }
+                for(int i = 0; i < data.size; i++){
+                    ws.trueParentUnit.addSegment(data.units[i], data.pos[i], data.vel[i]);
+                }
+                found = true;
+            }
+        });
+    }
+
+    protected void removeTail(){
+        int index = segments.length - 1;
+        if(index <= 0) return;
+
+        segmentUnits[index].remove();
+        segmentUnits[index] = null;
+        segmentUnits[index - 1].segmentType = 1;
+
+        segmentUnits = Arrays.copyOf(segmentUnits, segmentUnits.length - 1);
+        segments = Arrays.copyOf(segments, segments.length - 1);
+        segmentVelocities = Arrays.copyOf(segmentVelocities, segmentVelocities.length - 1);
+    }
+
+    public void addSegment(WormSegmentUnit unit, Vec2 pos, Vec2 vel){
+        int index = segments.length;
+        Unit parent = segmentUnits[index - 1];
+        segmentUnits[index - 1].segmentType = 0;
+        segmentUnits = Arrays.copyOf(segmentUnits, segmentUnits.length + 1);
+        segments = Arrays.copyOf(segments, segments.length + 1);
+        segmentVelocities = Arrays.copyOf(segmentVelocities, segmentVelocities.length + 1);
+
+        unit.elevation = elevation;
+        unit.segmentType = 1;
+        unit.parentUnit = parent;
+        unit.trueParentUnit = this;
+
+        segmentUnits[segmentUnits.length - 1] = unit;
+        segments[segments.length - 1] = pos;
+        segmentVelocities[segmentVelocities.length - 1] = vel;
     }
 
     public void addSegment(){
@@ -193,7 +327,10 @@ public class WormDefaultUnit extends UnitEntity{
     public void add(){
         if(added) return;
         super.add();
-        if(!addSegments) return;
+        if(!addSegments){
+            postAdd();
+            return;
+        }
         setEffects();
         Unit parent = this;
         for(int i = 0, len = getSegmentLength(); i < len; i++){
@@ -204,8 +341,7 @@ public class WormDefaultUnit extends UnitEntity{
             temp.elevation = elevation;
             temp.setSegmentType(typeS);
             temp.type(type);
-            temp.controller = type.createController();
-            temp.controller.unit(temp);
+            temp.resetController();
             temp.team = team;
             temp.setTrueParent(this);
             temp.setParent(parent);
@@ -214,6 +350,76 @@ public class WormDefaultUnit extends UnitEntity{
             temp.heal();
             parent = temp;
             segmentUnits[i] = temp;
+        }
+    }
+
+    void postAdd(){
+        for(WormSegmentUnit ws : segmentUnits){
+            ws.add();
+        }
+    }
+
+    @Override
+    public void read(Reads read){
+        super.read(read);
+        addSegments = false;
+        int length = read.s();
+        boolean splittable = read.bool();
+        repairTime = read.f();
+
+        segmentUnits = new WormSegmentUnit[length];
+        segments = new Vec2[length];
+        segmentVelocities = new Vec2[length];
+
+        Unit parent = this;
+        for(int i = 0; i < length; i++){
+            segments[i] = new Vec2();
+            segmentVelocities[i] = new Vec2();
+            WormSegmentUnit temp = newSegment();
+            temp.elevation = elevation;
+            temp.type(type);
+            temp.team = team;
+            temp.drag = type.drag;
+            temp.armor = type.armor;
+            temp.hitSize = type.hitSize;
+            temp.hovering = type.hovering;
+            temp.setupWeapons(type);
+            temp.resetController();
+            temp.abilities = type.abilities.map(Ability::copy);
+            temp.setTrueParent(this);
+            temp.setParent(parent);
+
+            temp.x = segments[i].x = read.f();
+            temp.y = segments[i].y = read.f();
+            temp.rotation = read.f();
+            temp.segmentType = read.b();
+            if(splittable){
+                temp.segmentHealth = temp.health = read.f();
+                temp.maxHealth = read.f();
+            }
+
+            parent = temp;
+            segmentUnits[i] = temp;
+        }
+    }
+
+    @Override
+    public void write(Writes write){
+        super.write(write);
+
+        write.s(segmentUnits.length);
+        write.bool(wormType.splittable);
+        write.f(repairTime);
+
+        for(int i = 0; i < segmentUnits.length; i++){
+            write.f(segments[i].x);
+            write.f(segments[i].y);
+            write.f(segmentUnits[i].rotation);
+            write.b(segmentUnits[i].segmentType);
+            if(wormType.splittable){
+                write.f(segmentUnits[i].segmentHealth);
+                write.f(segmentUnits[i].maxHealth);
+            }
         }
     }
 
@@ -239,7 +445,7 @@ public class WormDefaultUnit extends UnitEntity{
     public void handleCollision(Hitboxc originUnit, Hitboxc other, float x, float y){
         if(controller instanceof WormAI f && other instanceof Bullet b){
             float damage = Utils.getBulletDamage(b.type);
-            f.setTarget(b.x, b.y, damage);
+            f.setTarget(x, y, damage);
         }
     }
 }

@@ -37,6 +37,8 @@ public class UnityBullets implements ContentList{
 
         falloutLaser, catastropheLaser, calamityLaser, extinctionLaser,
 
+        plagueMissile,
+
         orb, shockBeam, currentStroke, shielderBullet, plasmaFragTriangle, plasmaTriangle, surgeBomb,
 
         pylonLightning, pylonLaser, pylonLaserSmall, monumentRailBullet,
@@ -576,6 +578,18 @@ public class UnityBullets implements ContentList{
             incendSpread = 9f;
             incendAmount = 2;
             extinction = true;
+        }};
+
+        plagueMissile = new MissileBulletType(3.8f, 12f){{
+            width = height = 8f;
+            backColor = hitColor = lightColor = trailColor = UnityPal.plagueDark;
+            frontColor = UnityPal.plague;
+            shrinkY = 0f;
+            drag = -0.01f;
+            splashDamage = 30f;
+            splashDamageRadius = 35f;
+            hitEffect = Fx.blastExplosion;
+            despawnEffect = Fx.blastExplosion;
         }};
 
         orb = new BulletType(){

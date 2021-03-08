@@ -31,6 +31,7 @@ public final class Utils{
     private static final Rect rect = new Rect(), rectAlt = new Rect(), hitRect = new Rect();
     private static Posc result;
     private static float cdist;
+    private static Tile furthest;
     private static Point2[] dirs = new Point2[]{
         new Point2(1, 0),
         new Point2(0, 1),
@@ -286,6 +287,15 @@ public final class Utils{
         if(result == null) result = targetSeq.random();
         return result;
     }
+
+    public static float findLaserLength(float wx, float wy, float wx2, float wy2, Boolf<Tile> pred){
+        furthest = null;
+
+        boolean found = world.raycast(World.toTile(wx), World.toTile(wy), World.toTile(wx2), World.toTile(wy2),
+        (x, y) -> (furthest = world.tile(x, y)) != null && pred.get(furthest));
+
+        return found && furthest != null ? Math.max(6f, Mathf.dst(wx, wy, furthest.worldx(), furthest.worldy())) : Mathf.dst(wx, wy, wx2, wy2);
+    };
 
     public static void collideLineRaw(float x, float y, float x2, float y2, Boolf<Building> buildB, Boolf<Unit> unitB, Boolf<Building> buildC, Cons<Unit> unitC){
         collideLineRaw(x, y, x2, y2, buildB, unitB, buildC, unitC, null, null);

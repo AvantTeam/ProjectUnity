@@ -1,5 +1,6 @@
 package unity.type;
 
+import arc.audio.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -30,14 +31,15 @@ public class UnityUnitType extends UnitType{
     public TextureRegion[] abilityRegions = new TextureRegion[AbilityTextures.values().length];
     public Seq<String> bottomWeapons = new Seq<>();
     // worms
-    public int segmentLength = 9;
+    public int segmentLength = 9, maxSegments = -1;
     public float segmentOffset = 23f;
     public float angleLimit = 30f;
-    public float regenTime = -1f;
+    public float regenTime = -1f, healthDistribution = 0.1f;
     public float segmentDamageScl = 6f;
     //hopefully make segment movement more consistant.
     public boolean counterDrag = false;
-    public boolean splittable = false;
+    public boolean splittable = false, chainable = false;
+    public Sound splitSound = Sounds.door, chainSound = Sounds.door;
     public float headDamage = 0f;
     public float headTimer = 5f;
 
@@ -230,9 +232,15 @@ public class UnityUnitType extends UnitType{
         super.drawSoftShadow(unit);
         //worm
         if(!(unit instanceof WormDefaultUnit wormUnit)) return;
-        for(WormSegmentUnit s : wormUnit.segmentUnits){
+        /*for(WormSegmentUnit s : wormUnit.segmentUnits){
             wormUnit.type.drawSoftShadow(s);
+        }*/
+        float z = Draw.z();
+        for(int i = 0; i < wormUnit.segmentUnits.length; i++){
+            Draw.z(z - (i + 1.1f) / 10000f);
+            wormUnit.type.drawSoftShadow(wormUnit.segmentUnits[i]);
         }
+        Draw.z(z);
     }
 
     @Override

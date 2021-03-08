@@ -57,7 +57,7 @@ public class KamiUnit extends UnitEntity{
     @Override
     public void damage(float amount){
         super.damage(amount);
-        if(trueController.unit == this) trueController.stageDamage += amount;
+        if(trueController.unit == this && !trueController.waiting) trueController.stageDamage += amount;
     }
 
     @Override

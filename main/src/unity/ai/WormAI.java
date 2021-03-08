@@ -57,7 +57,7 @@ public class WormAI extends FlyingAI{
     }
 
     public void setTarget(float x, float y, float score){
-        if(this.score > score) return;
+        if(score < this.score) return;
         pos.set(x, y);
         this.score = score;
         time = 3f * 60;

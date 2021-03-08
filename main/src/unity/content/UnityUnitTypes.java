@@ -7,7 +7,6 @@ import arc.graphics.g2d.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.pooling.*;
 import mindustry.ctype.*;
 import mindustry.type.*;
 import mindustry.gen.*;
@@ -16,8 +15,6 @@ import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.graphics.*;
 import mindustry.content.*;
-import mindustry.world.blocks.units.*;
-import mindustry.world.blocks.units.UnitFactory.*;
 import unity.*;
 import unity.ai.*;
 import unity.annotations.Annotations.*;
@@ -32,7 +29,6 @@ import unity.type.*;
 import unity.util.*;
 
 import static mindustry.Vars.*;
-import static mindustry.type.ItemStack.*;
 
 public class UnityUnitTypes implements ContentList{
     private static final Prov<?>[] constructors = new Prov[]{
@@ -77,7 +73,7 @@ public class UnityUnitTypes implements ContentList{
     UnitType arcnelidia;
 
     public static @FactionDef("plague")
-    UnitType toxobyte;
+    UnitType toxobyte, catenapede;
     
     /** Koruh {@linkplain MechUnit mech} units */
     public static @FactionDef("koruh") @EntityPoint(MechUnit.class)
@@ -97,9 +93,6 @@ public class UnityUnitTypes implements ContentList{
 
     public static @FactionDef("koruh") @EntityDef(base = KamiUnit.class, def = Bossc.class)
     UnitType kami;
-
-    public static @FactionDef("koruh") @EntityDef(base = UnitEntity.class, def = AntiKamic.class)
-    UnitType antiKamiTest;
 
     public static @FactionDef("end") UnitType opticaecus, devourer, ravager;
 
@@ -1611,6 +1604,68 @@ public class UnityUnitTypes implements ContentList{
             }});
         }};
 
+        setEntity("catenapede", WormDefaultUnit::new);
+        catenapede = new UnityUnitType("catenapede"){{
+            flying = true;
+            health = 7500f;
+            speed = 2.4f;
+            accel = 0.06f;
+            drag = 0.03f;
+            hitSize = 30f;
+            segmentOffset = 31f;
+            regenTime = 30f * 60f;
+            splittable = true;
+            chainable = true;
+            circleTarget = true;
+            lowAltitude = true;
+            omniMovement = false;
+            rotateSpeed = 2f;
+            angleLimit = 25f;
+            segmentLength = 2;
+            maxSegments = 15;
+            segmentDamageScl = 12f;
+            healthDistribution = 0.15f;
+            engineSize = -1f;
+            outlineColor = UnityPal.darkerOutline;
+            range = 140f;
+
+            weapons.add(new Weapon("unity-drain-laser"){{
+                y = -9f;
+                x = 14f;
+                shootY = 6.75f;
+                rotateSpeed = 5f;
+                reload = 5f * 60f;
+                rotate = true;
+                continuous = true;
+                alternate = false;
+                shootSound = Sounds.respawning;
+
+                bullet = new PointDrainLaserBulletType(45f){{
+                    healPercent = 0.5f;
+                    maxLength = 160f;
+                    knockback = -34f;
+                    lifetime = 10f * 60f;
+                }};
+            }});
+            segWeapSeq.add(new Weapon("unity-small-plague-launcher"){{
+                y = -8f;
+                x = 14.75f;
+                rotate = true;
+                reload = 25f;
+                shootSound = Sounds.missile;
+
+                bullet = UnityBullets.plagueMissile;
+            }}, new Weapon("unity-small-plague-launcher"){{
+                y = -12.5f;
+                x = 7.25f;
+                rotate = true;
+                reload = 15f;
+                shootSound = Sounds.missile;
+
+                bullet = UnityBullets.plagueMissile;
+            }});
+        }};
+
         //endregion
         //region koruh
         
@@ -2361,22 +2416,6 @@ public class UnityUnitTypes implements ContentList{
             drawCell = false;
 
             Unity.musicHandler.registerLoop(name, UnityMusics.radiantDischargeIntro, UnityMusics.radiantDischargeLoop);
-        }};
-
-        antiKamiTest = new UnityUnitType("anti-kami-test"){{
-            speed = 4.3f;
-            flying = true;
-            rotateShooting = false;
-
-            weapons.add(new Weapon(){{
-                reload = 5f;
-                x = 0f;
-                mirror = false;
-                ignoreRotation = true;
-                shootCone = 180f;
-                
-                bullet = Bullets.standardThoriumBig;
-            }});
         }};
 
         //endregion
