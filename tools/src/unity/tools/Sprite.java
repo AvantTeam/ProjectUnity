@@ -191,12 +191,8 @@ public class Sprite{
                     outer:
                     for(int rx = -radius; rx <= radius; rx++){
                         for(int ry = -radius; ry <= radius; ry++){
-                            if(
-                                Structs.inBounds(rx + x, ry + y, width, height) &&
-                                Mathf.within(rx, ry, radius) && getColor(rx + x, ry + y).a > 0.01f
-                            ){
+                            if(Mathf.dst(rx, ry) <= radius && getColor(rx + x, ry + y).a > 0.01f){
                                 found = true;
-
                                 break outer;
                             }
                         }
