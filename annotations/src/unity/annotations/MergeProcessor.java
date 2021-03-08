@@ -44,18 +44,15 @@ public class MergeProcessor extends BaseProcessor{
             for(TypeElement comp : comps){
                 TypeSpec.Builder builder = toInterface(comp);
 
-                String build = null;
-                for(TypeElement inner : types(comp)){
+                if(types(comp).size > 1) throw new IllegalStateException("Multiple nested class in " + comp.getQualifiedName().toString());
+
+                TypeElement build = null;
+                if(!types(comp).isEmpty()){
+                    TypeElement inner = types(comp).first();
                     TypeSpec.Builder innerSpec = toInterface(inner);
 
-                    if(typeUtils.isSubtype(inner.asType(), elementUtils.getTypeElement("mindustry.gen.Buildingc").asType())){
-                        if(build == null){
-                            build = inner.getSimpleName().toString();
-                            innerSpec.addSuperinterface(Buildingc.class);
-                        }else{
-                            throw new IllegalStateException("Multiple building type in " + comp.getQualifiedName().toString());
-                        }
-                    }
+                    build = inner;
+                    innerSpec.addSuperinterface(Buildingc.class);
 
                     builder.addType(innerSpec.build());
                 }
@@ -65,7 +62,7 @@ public class MergeProcessor extends BaseProcessor{
                 }else{
                     builder.addAnnotation(
                         AnnotationSpec.builder(MergeInterface.class)
-                            .addMember("buildType", "$L.$L.class", comp.getSimpleName().toString(), build)
+                            .addMember("buildType", "$L.$L.class", interfaceName(comp), interfaceName(build))
                         .build()
                     );
                 }
@@ -123,85 +120,6 @@ public class MergeProcessor extends BaseProcessor{
                 block.key.addType(build.key.build());
                 imports.addAll(build.value);
 
-                Seq<TypeElement> otherComps = new Seq<>();
-                for(TypeElement t : value){
-                    otherComps.addAll(types(t)
-                        .select(ty -> !buildingComps.contains(t2 -> typeUtils.isSameType(
-                            t2.asType(),
-                            ty.asType()
-                        )))
-                    );
-                }
-
-                for(TypeElement inter : otherComps){
-                    TypeElement comp = elementUtils.getTypeElement(docs(inter).split("\\s+")[3]);
-
-                    TypeSpec.Builder type = TypeSpec.classBuilder(inter.getSimpleName().toString())
-                        .addModifiers(comp.getModifiers().toArray(new Modifier[0]))
-                        .addSuperinterface(cName(inter));
-
-                    for(VariableElement v : vars(comp)){
-                        String fname = v.getSimpleName().toString();
-
-                        FieldSpec.Builder var = FieldSpec.builder(
-                            tName(v),
-                            fname,
-                            annotation(v, ReadOnly.class) != null
-                            ?   Modifier.PROTECTED
-                            :   Modifier.PUBLIC
-                        );
-
-                        if(varInitializers.containsKey(descString(v))){
-                            var.initializer(varInitializers.get(descString(v)));
-                        }
-
-                        type.addField(var.build());
-
-                        Seq<ExecutableElement> methods = methods(inter);
-                        ExecutableElement getter = methods.find(m ->
-                            annotation(m, Getter.class) != null &&
-                            m.getSimpleName().toString().equals(fname) &&
-                            typeUtils.isSameType(m.getReturnType(), v.asType())
-                        );
-                        ExecutableElement setter = methods.find(m ->
-                            annotation(m, Setter.class) != null &&
-                            m.getSimpleName().toString().equals(fname) &&
-                            m.getParameters().size() == 1 &&
-                            typeUtils.isSameType(m.getParameters().get(0).asType(), v.asType())
-                        );
-
-                        if(getter != null){
-                            type.addMethod(
-                                MethodSpec.overriding(getter)
-                                    .addStatement("return this.$L", fname)
-                                .build()
-                            );
-                        }
-
-                        if(setter != null){
-                            type.addMethod(
-                                MethodSpec.overriding(setter)
-                                    .addStatement("this.$L = $L", fname, setter.getParameters().get(0).getSimpleName().toString())
-                                .build()
-                            );
-                        }
-                    }
-
-                    for(ExecutableElement m : methods(comp).select(me ->
-                        annotation(me, Override.class) == null &&
-                        !isConstructor(me)
-                    )){
-                        String code = methodBlocks.get(descString(m));
-                        type.addMethod(
-                            MethodSpec.overriding(m)
-                                .addCode(code.substring(2, code.length() - 1).trim())
-                            .build()
-                        );
-                    }
-
-                    block.key.addType(type.build());
-                }
-
                 block.key.addAnnotation(
                     AnnotationSpec.builder(SuppressWarnings.class)
                         .addMember("value", "$S", "unused")
@@ -214,7 +132,7 @@ public class MergeProcessor extends BaseProcessor{
     }
 
     TypeSpec.Builder toInterface(TypeElement comp){
-        TypeSpec.Builder inter = TypeSpec.interfaceBuilder(comp.getSimpleName().toString())
+        TypeSpec.Builder inter = TypeSpec.interfaceBuilder(interfaceName(comp))
             .addModifiers(Modifier.PUBLIC)
             .addJavadoc("Interface for $L", comp.getQualifiedName().toString());
 
@@ -222,21 +140,28 @@ public class MergeProcessor extends BaseProcessor{
             inter.addModifiers(Modifier.STATIC);
         }
 
-        imports.put(comp.getSimpleName().toString(), getImports(comp));
+        imports.put(interfaceName(comp), getImports(comp));
 
         ObjectSet<String> preserved = new ObjectSet<>();
         for(ExecutableElement m : methods(comp)){
+            MethodTree tree = treeUtils.getTree(m);
+            methodBlocks.put(descString(m), tree.getBody().toString()
+                .replaceAll("this\\.<(.*)>self\\(\\)", "this")
+                .replaceAll("self\\(\\)", "this")
+                .replaceAll(" yield ", "")
+                .replaceAll("\\/\\*missing\\*\\/", "var")
+            );
+
             if(is(m, Modifier.PRIVATE, Modifier.STATIC)) continue;
 
             String name = m.getSimpleName().toString();
             preserved.add(m.toString());
 
-            MethodTree tree = treeUtils.getTree(m);
-            methodBlocks.put(descString(m), tree.getBody().toString());
-
             if(!isConstructor(m) && annotation(m, Override.class) == null){
                 inter.addMethod(
                     MethodSpec.methodBuilder(name)
+                        .addTypeVariables(Seq.with(m.getTypeParameters()).map(TypeVariableName::get))
+                        .addExceptions(Seq.with(m.getThrownTypes()).map(TypeName::get))
                         .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                         .addParameters(Seq.with(m.getParameters()).map(ParameterSpec::get))
                         .returns(TypeName.get(m.getReturnType()))
@@ -359,13 +284,32 @@ public class MergeProcessor extends BaseProcessor{
             }
 
             for(ExecutableElement m : methods(comp).select(me ->
+                !is(me, Modifier.PRIVATE, Modifier.STATIC) &&
                 annotation(me, Override.class) == null &&
                 !isConstructor(me)
             )){
                 String code = methodBlocks.get(descString(m));
                 type.addMethod(
                     MethodSpec.overriding(m)
-                        .addCode(code.substring(2, code.length() - 1).trim())
+                        .addCode(code.substring(1, code.length() - 1).trim().replace("\n    ", ""))
+                    .build()
+                );
+            }
+
+            for(ExecutableElement m : methods(comp).select(me ->
+                is(me, Modifier.PRIVATE, Modifier.STATIC) &&
+                annotation(me, Override.class) == null &&
+                !isConstructor(me)
+            )){
+                String code = methodBlocks.get(descString(m));
+                type.addMethod(
+                    MethodSpec.methodBuilder(m.getSimpleName().toString())
+                        .addTypeVariables(Seq.with(m.getTypeParameters()).map(TypeVariableName::get))
+                        .addExceptions(Seq.with(m.getThrownTypes()).map(TypeName::get))
+                        .addModifiers(m.getModifiers())
+                        .addParameters(Seq.with(m.getParameters()).map(ParameterSpec::get))
+                        .returns(TypeName.get(m.getReturnType()))
+                        .addCode(code.substring(1, code.length() - 1).trim().replace("\n    ", ""))
                     .build()
                 );
             }
@@ -414,16 +358,17 @@ public class MergeProcessor extends BaseProcessor{
                     }
 
                     String label = app.getEnclosingElement().getSimpleName().toString().toLowerCase();
+                    label = label.substring(0, label.length() - 4);
                     ExecutableElement up = method(comp, app.getSimpleName().toString(), app.getReturnType(), app.getParameters());
 
-                    String body = methodBlocks.get(descString(up))
+                    String code = methodBlocks.get(descString(up))
                     .replace("return;", "break " + label + ";");
-                    body = body.substring(2, body.length() - 1).trim();
+                    code = code.substring(1, code.length() - 1).trim().replace("\n    ", "\n");
 
                     method
                         .addCode(lnew())
                         .beginControlFlow("$L:", label)
-                        .addCode(body)
+                        .addCode(code)
                         .addCode(lnew())
                     .endControlFlow();
                 }
@@ -438,6 +383,15 @@ public class MergeProcessor extends BaseProcessor{
             key = type;
             value = imports;
         }};
+    }
+
+    String interfaceName(TypeElement type){
+        String name = type.getSimpleName().toString();
+        if(!name.endsWith("Comp")){
+            throw new IllegalStateException("All types annotated with @MergeComp must have 'Comp' as the name's suffix");
+        }
+
+        return name.substring(0, name.length() - 4);
     }
 
     Seq<String> getImports(Element e){
