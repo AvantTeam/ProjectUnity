@@ -5,6 +5,8 @@ import arc.math.*;
 import arc.math.geom.Vec2;
 import arc.graphics.g2d.Draw;
 import arc.util.io.*;
+import mindustry.*;
+import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.abilities.*;
 import mindustry.gen.*;
@@ -205,9 +207,37 @@ public class WormDefaultUnit extends UnitEntity{
 
     @Override
     public void destroy(){
+        if(!added) return;
         super.destroy();
-        for(WormSegmentUnit segmentUnit : segmentUnits){
-            segmentUnit.destroy();
+        for(WormSegmentUnit seg : segmentUnits){
+            float explosiveness = 2f + seg.item().explosiveness * stack().amount * 1.53f;
+            float flammability = seg.item().flammability * seg.stack().amount / 1.9f;
+            float power = seg.item().charge * seg.stack().amount * 150f;
+
+            if(!spawnedByCore){
+                Damage.dynamicExplosion(seg.x, seg.y, flammability, explosiveness, power, bounds() / 2f, Vars.state.rules.damageExplosions, item().flammability > 1, team);
+            }
+
+            float shake = hitSize / 3f;
+
+            Effect.scorch(seg.x, seg.y, (int)(hitSize / 5));
+            Fx.explosion.at(seg);
+            Effect.shake(shake, shake, seg);
+            type.deathSound.at(seg);
+
+            if(type.flying && !spawnedByCore){
+                Damage.damage(team, seg.x, seg.y, Mathf.pow(seg.hitSize, 0.94f) * 1.25f, Mathf.pow(seg.hitSize, 0.75f) * type.crashDamageMultiplier * 5f, true, false, true);
+            }
+
+            if(!Vars.headless){
+                for(int i = 0; i < type.wreckRegions.length; i++){
+                    if(type.wreckRegions[i].found()){
+                        float range = type.hitSize / 4f;
+                        Tmp.v1.rnd(range);
+                        Effect.decal(type.wreckRegions[i], seg.x + Tmp.v1.x, seg.y + Tmp.v1.y, seg.rotation - 90);
+                    }
+                }
+            }
         }
     }
 
@@ -235,7 +265,7 @@ public class WormDefaultUnit extends UnitEntity{
         found = false;
         Units.nearby(team, Tmp.v1.x - size, Tmp.v1.y - size, size * 2f, size * 2f, e -> {
             if(found) return;
-            if(e instanceof WormSegmentUnit ws && ws.segmentType == 1 && ws.wormType == wormType && within(ws, (wormType.segmentOffset) + 5f) && Angles.within(angleTo(e), e.rotation, wormType.angleLimit + 2f)){
+            if(e instanceof WormSegmentUnit ws && ws.segmentType == 1 && ws.wormType == wormType && ws.trueParentUnit != this && within(ws, (wormType.segmentOffset) + 5f) && Angles.within(angleTo(e), e.rotation, wormType.angleLimit + 2f)){
                 if(ws.trueParentUnit == null || ws.trueParentUnit.segmentUnits.length > wormType.maxSegments) return;
                 wormType.chainSound.at(this, Mathf.random(0.9f, 1.1f));
                 WormSegmentUnit head = newSegment();

@@ -1619,7 +1619,7 @@ public class UnityUnitTypes implements ContentList{
             circleTarget = true;
             lowAltitude = true;
             omniMovement = false;
-            rotateSpeed = 2f;
+            rotateSpeed = 2.7f;
             angleLimit = 25f;
             segmentLength = 2;
             maxSegments = 15;
@@ -1627,7 +1627,7 @@ public class UnityUnitTypes implements ContentList{
             healthDistribution = 0.15f;
             engineSize = -1f;
             outlineColor = UnityPal.darkerOutline;
-            range = 140f;
+            range = 160f;
 
             weapons.add(new Weapon("unity-drain-laser"){{
                 y = -9f;
@@ -1635,6 +1635,7 @@ public class UnityUnitTypes implements ContentList{
                 shootY = 6.75f;
                 rotateSpeed = 5f;
                 reload = 5f * 60f;
+                shootCone = 45f;
                 rotate = true;
                 continuous = true;
                 alternate = false;
