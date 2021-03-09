@@ -12,47 +12,43 @@ public class WormAI extends FlyingAI{
     public Vec2 pos = new Vec2();
     public float score = 0f;
     public float time = 0f;
+    protected float rotateTime = 0f;
 
     @Override
     public void updateMovement(){
-        Position trgt = time <= 0f ? target : pos;
-        if(trgt != null && unit.hasWeapons() && command() == UnitCommand.attack){
+        //Position trgt = time <= 0f ? target : pos;
+        if(target == null && time > 0){
+            moveTo(pos, 0f);
+        }
+        if(target != null && unit.hasWeapons() && command() == UnitCommand.attack){
             if(!unit.type.circleTarget){
-                moveTo(trgt, unit.range() * 0.8f);
-                unit.lookAt(trgt);
+                moveTo(target, unit.range() * 0.8f);
+                unit.lookAt(target);
             }else{
                 attack(120f);
             }
         }
-        if(time <= 0) score = 0f;
-        time = Math.max(0f, time - Time.delta);
 
-        if(target == null && command() == UnitCommand.attack && Vars.state.rules.waves && unit.team == Vars.state.rules.defaultTeam){
+        if(target == null && time <= 0f && command() == UnitCommand.attack && Vars.state.rules.waves && unit.team == Vars.state.rules.defaultTeam){
             moveTo(getClosestSpawner(), Vars.state.rules.dropZoneRadius + 120f);
         }
 
         if(command() == UnitCommand.rally){
             moveTo(targetFlag(unit.x, unit.y, BlockFlag.rally, false), 60f);
         }
+        rotateTime = Math.max(0f, rotateTime - Time.delta);
+        if(time <= 0) score = 0f;
+        time = Math.max(0f, time - Time.delta);
     }
 
     @Override
     protected void attack(float circleLength){
-        Position target = time <= 0 ? this.target : pos;
-
-        vec.set(target).sub(unit);
-
-        float ang = unit.angleTo(target);
-        float diff = Angles.angleDist(ang, unit.rotation());
-
-        if(diff > 100f && vec.len() < circleLength){
-            vec.setAngle(unit.vel().angle());
-        }else{
-            vec.setAngle(Mathf.slerpDelta(unit.vel().angle(), vec.angle(), 0.3f));
+        vec.trns(unit.rotation, unit.speed());
+        float diff = Angles.angleDist(unit.rotation, unit.angleTo(target));
+        if((diff > 100f && !unit.within(target, circleLength)) || rotateTime > 0f){
+            vec.setAngle(Mathf.slerpDelta(vec.angle(), unit.angleTo(target), 0.2f));
+            if(rotateTime <= 0f) rotateTime = 40f;
         }
-
-        vec.setLength(unit.speed());
-
         unit.moveAt(vec);
     }
 

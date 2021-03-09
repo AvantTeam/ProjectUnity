@@ -4,6 +4,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import arc.struct.Seq;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import mindustry.audio.*;
 import mindustry.gen.*;
@@ -12,6 +13,7 @@ import mindustry.type.*;
 import mindustry.entities.units.*;
 import mindustry.entities.bullet.BulletType;
 import mindustry.entities.Effect;
+import unity.ai.*;
 import unity.content.UnityUnitTypes;
 import unity.type.*;
 
@@ -90,6 +92,9 @@ public class WormSegmentUnit extends UnitEntity{
     public void damage(float amount){
         if(wormType.splittable) segmentHealth -= amount * wormType.segmentDamageScl;
         trueParentUnit.damage(amount);
+        if(trueParentUnit.controller instanceof WormAI){
+            ((WormAI)trueParentUnit.controller).setTarget(x, y, amount);
+        }
     }
 
     public void segmentDamage(float amount){
@@ -230,6 +235,8 @@ public class WormSegmentUnit extends UnitEntity{
 
         SegmentData oldSeg = new SegmentData(hd.segmentUnits.length), newSeg = new SegmentData(hd.segmentUnits.length);
         for(int i = 0; i < hd.segmentUnits.length; i++){
+            hd.segmentUnits[i].maxHealth /= 2f;
+            hd.segmentUnits[i].clampHealth();
             if(i < index){
                 oldSeg.add(hd, i);
             }
@@ -358,6 +365,7 @@ public class WormSegmentUnit extends UnitEntity{
         if(segmentType == 0 && segCellReg != atlas.find("error")) drawCell(segCellReg);
         TextureRegion outline = wormType.segmentOutline == null || wormType.tailOutline == null ? null : segmentType == 0 ? wormType.segmentOutline : wormType.tailOutline;
         if(outline != null){
+            Draw.color(Color.white);
             Draw.z(Draw.z() - UnitType.outlineSpace);
             Draw.rect(outline, this, rotation - 90f);
             Draw.z(z);

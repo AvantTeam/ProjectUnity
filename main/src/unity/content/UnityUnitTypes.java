@@ -1554,6 +1554,7 @@ public class UnityUnitTypes implements ContentList{
 
         setEntity("toxobyte", WormDefaultUnit::new);
         toxobyte = new UnityUnitType("toxobyte"){{
+            defaultController = WormAI::new;
             flying = true;
             health = 2000f;
             speed = 3f;
@@ -1606,6 +1607,7 @@ public class UnityUnitTypes implements ContentList{
 
         setEntity("catenapede", WormDefaultUnit::new);
         catenapede = new UnityUnitType("catenapede"){{
+            defaultController = WormAI::new;
             flying = true;
             health = 7500f;
             speed = 2.4f;
@@ -2484,6 +2486,7 @@ public class UnityUnitTypes implements ContentList{
             defaultController = WormAI::new;
             circleTarget = counterDrag = true;
             rotateShooting = faceTarget = false;
+            splittable = chainable = false;
             hitSize = 41f * 1.55f;
             segmentOffset = (41f * 1.55f) + 1f;
             segmentLength = 45;
@@ -2536,7 +2539,7 @@ public class UnityUnitTypes implements ContentList{
                         super.hitEntity(b, other, initialHealth);
                         if(other instanceof Unit tmp){
                             float threat = tmp.maxHealth + tmp.type.dpsEstimate;
-                            if(Float.isInfinite(threat) || Float.isNaN(threat) || threat == Float.MAX_VALUE) UnityAntiCheat.annihilateEntity(other, false);
+                            if((Float.isInfinite(threat) || Float.isNaN(threat) || threat >= Float.MAX_VALUE) && !(other instanceof AntiCheatBase)) UnityAntiCheat.annihilateEntity(other, false);
                         }
                         if(other instanceof AntiCheatBase) ((AntiCheatBase)other).overrideAntiCheatDamage(damage * 4f, 2);
                     }

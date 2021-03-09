@@ -918,7 +918,7 @@ public class UnityBullets implements ContentList{
             @Override
             public void handleBuilding(Bullet b, Building build, float initialHealth){
                 float damage = auraDamage / (Math.max(2500f - Math.max(initialHealth - 150000f, 0f), 0f) / 2500f);
-                if(damage >= Float.MAX_VALUE || Float.isInfinite(damage)){
+                if((damage >= Float.MAX_VALUE || Float.isInfinite(damage))){
                     build.health = 0f;
                     UnityAntiCheat.annihilateEntity(build, false);
                 }else{
@@ -930,7 +930,7 @@ public class UnityBullets implements ContentList{
             public void hitEntity(Bullet b, Hitboxc other, float initialHealth){
                 if(!(other instanceof Unit h)) return;
                 float damage = auraDamage / (Math.max(4500f - Math.max(initialHealth - 350000f, 0f), 0f) / 4500f);
-                if(damage >= Float.MAX_VALUE || Float.isInfinite(damage)){
+                if((damage >= Float.MAX_VALUE || Float.isInfinite(damage)) && !(other instanceof AntiCheatBase)){
                     h.health = 0f;
                     UnityAntiCheat.annihilateEntity(other, false);
                 }else{

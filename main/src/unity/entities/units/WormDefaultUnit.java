@@ -11,7 +11,6 @@ import mindustry.entities.*;
 import mindustry.entities.abilities.*;
 import mindustry.gen.*;
 import mindustry.type.UnitType;
-import unity.ai.*;
 import unity.content.UnityUnitTypes;
 import unity.entities.units.WormSegmentUnit.*;
 import unity.type.*;
@@ -473,9 +472,6 @@ public class WormDefaultUnit extends UnitEntity{
     }*/
 
     public void handleCollision(Hitboxc originUnit, Hitboxc other, float x, float y){
-        if(controller instanceof WormAI f && other instanceof Bullet b){
-            float damage = Utils.getBulletDamage(b.type);
-            f.setTarget(x, y, damage);
-        }
+
     }
 }
