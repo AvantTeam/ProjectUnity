@@ -96,8 +96,13 @@ public class UnityBlocks implements ContentList{
     public static
     @ExpDef(ExpBlock.class)
     @FactionDef("koruh")
-    Block laser, laserCharge, laserFrost, laserBranch, laserFractal, laserKelvin, inferno; 
-    
+    Block /*laser,*/ laserCharge, laserFrost, laserBranch, laserFractal, laserKelvin, inferno; 
+
+    public static
+    @FactionDef("koruh")
+    @Merge(base = PowerTurret.class, value = Expc.class)
+    Block laser;
+
     public static
     @ExpDef(ExpBlock.class)
     @FactionDef("koruh")

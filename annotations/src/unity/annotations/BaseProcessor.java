@@ -198,7 +198,10 @@ public abstract class BaseProcessor extends AbstractProcessor{
     }
 
     public String descString(ExecutableElement m){
-        return m.getEnclosingElement().toString() + "#" + m.getSimpleName().toString();
+        String params = Arrays.toString(m.getParameters().toArray());
+        params = params.substring(1, params.length() - 1);
+
+        return m.getEnclosingElement().toString() + "#" + m.getSimpleName().toString() + "(" + params + ")";
     }
 
     public boolean is(Element e, Modifier... modifiers){

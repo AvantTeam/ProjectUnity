@@ -13,7 +13,9 @@ import javax.lang.model.type.*;
 import com.squareup.javapoet.*;
 import com.sun.source.tree.*;
 
+import java.lang.invoke.MethodHandleInfo;
 import java.util.*;
+import java.util.regex.*;
 
 @SuppressWarnings("unchecked")
 @SupportedAnnotationTypes({
@@ -79,11 +81,11 @@ public class MergeProcessor extends BaseProcessor{
                 }else{
                     base = (TypeElement)elements(merge::base).first();
                 }
-                Seq<TypeElement> value = elements(merge::value).<TypeElement>as().map(t -> inters.find(i ->
-                    i.getQualifiedName().toString().equals(
+                Seq<TypeElement> value = elements(merge::value).<TypeElement>as().map(t -> inters.find(i -> {
+                    return i.getSimpleName().toString().equals(
                         t.getSimpleName().toString()
-                    )
-                ));
+                    );
+                }));
 
                 Entry<TypeSpec.Builder, Seq<String>> block = toClass(base, value);
                 Seq<String> imports = block.value;
@@ -123,7 +125,7 @@ public class MergeProcessor extends BaseProcessor{
 
                 block.key.addAnnotation(
                     AnnotationSpec.builder(SuppressWarnings.class)
-                        .addMember("value", "$S", "unused")
+                        .addMember("value", "$S", "all")
                     .build()
                 );
 
@@ -226,6 +228,8 @@ public class MergeProcessor extends BaseProcessor{
         StringBuilder n = new StringBuilder();
         for(TypeElement t : value){
             String raw = t.getSimpleName().toString();
+            raw = raw.substring(0, raw.length() - 1);
+
             if(raw.endsWith("Build")){
                 raw = raw.substring(0, raw.length() - 5);
             }
@@ -409,9 +413,23 @@ public class MergeProcessor extends BaseProcessor{
                 args.add(var.getSimpleName().toString());
             }
 
+            boolean superCalled = false;
+            boolean first = true;
             if(!returns){
-                method.addStatement("super.$L(" + params.toString() + ")", args.toArray());
-                for(ExecutableElement app : appenders){
+                for(int i = 0; i < appenders.size; i++){
+                    ExecutableElement app = appenders.get(i);
+
+                    MethodPriority priority = annotation(app, MethodPriority.class);
+                    if(
+                        !superCalled && priority != null
+                        ?   priority.value() >= 0
+                        :   true
+                    ){
+                        method.addStatement("super.$L(" + params.toString() + ")", args.toArray());
+                        superCalled = true;
+                        first = false;
+                    }
+
                     String doc = docs(app.getEnclosingElement());
                     TypeElement comp;
                     if(!doc.isEmpty()){
@@ -430,15 +448,72 @@ public class MergeProcessor extends BaseProcessor{
                     .replace("return;", "break " + label + ";");
                     code = code.substring(1, code.length() - 1).trim().replace("\n    ", "\n");
 
+                    Seq<String> arguments = new Seq<>();
+
+                    Pattern fixer = Pattern.compile("\\\"\\$.");
+                    String fixed = new String(code);
+
+                    Matcher matcher = fixer.matcher(code);
+                    while(matcher.find()){
+                        String snip = matcher.group();
+                        fixed = fixed.replace(snip, "$L");
+                        arguments.add(snip);
+                    }
+
+                    if(first){
+                        first = false;
+                    }else{
+                        method.addCode(lnew());
+                    }
+
                     method
-                        .addCode(lnew())
                         .beginControlFlow("$L:", label)
-                        .addCode(code)
+                        .addCode(fixed, arguments.toArray(Object.class))
                         .addCode(lnew())
                     .endControlFlow();
+
+                    if(!superCalled && i == appenders.size - 1){
+                        method.addCode(lnew());
+                        method.addStatement("super.$L(" + params.toString() + ")", args.toArray());
+                    }
                 }
             }else{
-                
+                if(appenders.size > 1){
+                    throw new IllegalStateException("Multiple non-void return type methods appending: " + appended);
+                }else{
+                    ExecutableElement app = appenders.first();
+
+                    String doc = docs(app.getEnclosingElement());
+                    TypeElement comp;
+                    if(!doc.isEmpty()){
+                        comp = comps.find(t -> t.getQualifiedName().toString().equals(
+                            doc.split("\\s+")[3]
+                        ));
+                    }else{
+                        comp = (TypeElement)app.getEnclosingElement();
+                    }
+
+                    ExecutableElement up = method(comp, app.getSimpleName().toString(), app.getReturnType(), app.getParameters());
+
+                    String code = methodBlocks.get(descString(up));
+                    code = code.substring(1, code.length() - 1).trim().replace("\n    ", "\n");
+
+                    Seq<String> arguments = new Seq<>();
+
+                    Pattern fixer = Pattern.compile("\\\"\\$.");
+                    String fixed = new String(code);
+
+                    Matcher matcher = fixer.matcher(code);
+                    while(matcher.find()){
+                        String snip = matcher.group();
+                        fixed = fixed.replace(snip, "$L");
+                        arguments.add(snip);
+                    }
+
+                    method
+                        .addCode(fixed, arguments.toArray(Object.class))
+                        .addCode(lnew());
+                }
             }
 
             type.addMethod(method.build());
@@ -484,7 +559,7 @@ public class MergeProcessor extends BaseProcessor{
             throw new IllegalStateException("All types annotated with @MergeComp must have 'Comp' as the name's suffix");
         }
 
-        return name.substring(0, name.length() - 4);
+        return name.substring(0, name.length() - 4) + "c";
     }
 
     Seq<String> getImports(Element e){
