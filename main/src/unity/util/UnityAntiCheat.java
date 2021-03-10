@@ -9,6 +9,8 @@ import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.world.blocks.ConstructBlock.*;
 import unity.*;
+import unity.entities.comp.*;
+import unity.sync.*;
 
 public class UnityAntiCheat implements ApplicationListener{
     private final Interval timer = new Interval();
@@ -34,6 +36,7 @@ public class UnityAntiCheat implements ApplicationListener{
 
     public static void annihilateEntity(Entityc entity, boolean override, boolean setNaN){
         Groups.all.remove(entity);
+        if(entity instanceof Bossc) UnityCall.bossMusic(((Bossc)entity).type().name, false);
         if(entity instanceof Drawc) Groups.draw.remove((Drawc)entity);
         if(entity instanceof Syncc) Groups.sync.remove((Syncc)entity);
         if(entity instanceof Unit){
@@ -46,7 +49,10 @@ public class UnityAntiCheat implements ApplicationListener{
                 Unity.print(e);
             }
             if(setNaN){
-                tmp.x = tmp.y = Float.NaN;
+                tmp.x = tmp.y = tmp.rotation = Float.NaN;
+                for(WeaponMount mount : tmp.mounts){
+                    mount.reload = Float.NaN;
+                }
             }
 
             tmp.team.data().updateCount(tmp.type, -1);

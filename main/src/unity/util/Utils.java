@@ -271,20 +271,28 @@ public final class Utils{
      * Targets any units that is not in the array.
      * @returns the unit, picks a random target if all potential targets is in the array.
      */
-    public static Posc targetUnique(Team team, float x, float y, float radius, Seq<Posc> targetSeq){
+    public static Posc targetUnique(Team team, float x, float y, float radius, Posc[] targetArray){
         result = null;
         float radiusSquare = radius * radius;
         cdist = radiusSquare + 1;
 
+        Posc[] tmpArray = new Posc[targetArray.length];
+        int size = 0;
+        for(Posc posc : targetArray){
+            if(posc == null) continue;
+            tmpArray[size++] = posc;
+        }
+
         Units.nearbyEnemies(team, x - radius, y - radius, radius * 2, radius * 2, unit -> {
-            float dst = unit.dst(x, y);
-            if(!targetSeq.contains(unit) && dst < cdist && dst < radiusSquare){
+            float dst = unit.dst2(x, y);
+            if(!Structs.contains(targetArray, unit) && dst < cdist && dst < radiusSquare){
                 result = unit;
                 cdist = dst;
             }
         });
 
-        if(result == null) result = targetSeq.random();
+        if(result == null && size > 0) result = tmpArray[Mathf.random(0, size - 1)];
+
         return result;
     }
 
@@ -295,7 +303,7 @@ public final class Utils{
         (x, y) -> (furthest = world.tile(x, y)) != null && pred.get(furthest));
 
         return found && furthest != null ? Math.max(6f, Mathf.dst(wx, wy, furthest.worldx(), furthest.worldy())) : Mathf.dst(wx, wy, wx2, wy2);
-    };
+    }
 
     public static void collideLineRaw(float x, float y, float x2, float y2, Boolf<Building> buildB, Boolf<Unit> unitB, Boolf<Building> buildC, Cons<Unit> unitC){
         collideLineRaw(x, y, x2, y2, buildB, unitB, buildC, unitC, null, null);

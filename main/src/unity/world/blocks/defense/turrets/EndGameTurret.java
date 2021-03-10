@@ -20,11 +20,8 @@ import unity.*;
 import unity.content.*;
 import unity.entities.*;
 import unity.entities.effects.*;
-import unity.entities.units.*;
 import unity.gen.*;
 import unity.util.*;
-
-import java.util.*;
 
 public class EndGameTurret extends PowerTurret{
     private static int shouldLaser = 0;
@@ -229,13 +226,13 @@ public class EndGameTurret extends PowerTurret{
                     entitySeq.add(e);
                 }
             });
-            entitySeq.each(this::annihilate);
+            entitySeq.each(e -> UnityAntiCheat.annihilateEntity(e, true, false));
             entitySeq.clear();
         }
 
         void killTiles(){
             shouldLaser = 0;
-            Vars.indexer.eachBlock(null, x, y, range, build -> build.team != team, building -> {
+            Vars.indexer.eachBlock(null, x, y, range + 5f, build -> build.team != team, building -> {
                 if(!building.dead && building != this){
                     if(building.block.size >= 3) UnityFx.vapourizeTile.at(building.x, building.y, building.block.size, building);
                     if((shouldLaser % 5) == 0 || building.block.size >= 5){
@@ -247,10 +244,10 @@ public class EndGameTurret extends PowerTurret{
                     shouldLaser++;
                 }
             });
-            entitySeq.each(this::annihilate);
+            entitySeq.each(e -> UnityAntiCheat.annihilateEntity(e, true, false));
             entitySeq.clear();
         }
-
+        /*
         void attemptRemoveAdd(Unit unit){
             try{
                 unit.getClass().getField("added").setBoolean(unit, false);
@@ -261,6 +258,9 @@ public class EndGameTurret extends PowerTurret{
 
         void annihilate(Entityc entity){
             Groups.all.remove(entity);
+            if(entity instanceof Bossc bsc){
+                UnityCall.bossMusic(bsc.type().name, false);
+            }
             if(entity instanceof Unit){
                 Unit tmp = (Unit)entity;
                 
@@ -304,7 +304,7 @@ public class EndGameTurret extends PowerTurret{
             }
             if(entity instanceof Syncc s) Groups.sync.remove(s);
         }
-
+        */
         @Override
         public void kill(){
             if(lastHealth < 10f) super.kill();
@@ -327,7 +327,8 @@ public class EndGameTurret extends PowerTurret{
                     e.damage(490f * threatLevel);
                     if(e.dead){
                         UnityFx.vapourizeUnit.at(e.x, e.y, 0, e);
-                        annihilate(e);
+                        //annihilate(e);
+                        UnityAntiCheat.annihilateEntity(e, true, false);
                     }
                     UnityFx.endgameLaser.at(x, y, 0, new Object[]{new Vec2(ux, uy), e, 0.525f});
                 }
@@ -345,9 +346,12 @@ public class EndGameTurret extends PowerTurret{
         void eyeShoot(int index){
             Healthc e = (Healthc)targets[index];
             if(e != null){
-                e.damage(350 * threatLevel);
+                e.damage(350f * threatLevel);
                 if(e.dead()){
-                    annihilate(targets[index]);
+                    //annihilate(targets[index]);
+                    if(e instanceof Unit ut) UnityFx.vapourizeUnit.at(ut.x, ut.y, ut.rotation, ut);
+                    if(e instanceof Building build) UnityFx.vapourizeTile.at(build.x, build.y, build.block.size);
+                    UnityAntiCheat.annihilateEntity(e, true, false);
                 }
                 Object[] data = {eyesVecArray[index], e, 0.625f};
                 
@@ -360,7 +364,7 @@ public class EndGameTurret extends PowerTurret{
             threatLevel = 1f;
             Units.nearbyEnemies(team, x - range, y - range, range * 2, range * 2, e -> {
                 if(within(e, range) && e.isAdded()){
-                    threatLevel += Math.max(((e.maxHealth() + e.type.dpsEstimate) - 350f) / 710f, 0f);
+                    threatLevel += Math.max(((e.maxHealth() + e.type.dpsEstimate) - 450f) / 1300f, 0f);
                     if(e.realSpeed() >= 18f){
                         e.vel.setLength(0f);
                         //e.apply(UnityStatusEffects.endgameDisable);
@@ -395,7 +399,7 @@ public class EndGameTurret extends PowerTurret{
                 });
                 
                 for(int i = 0; i < 16; i++){
-                    Posc tmpTarget = Utils.targetUnique(team, x, y, range, new Seq<>(targets));
+                    Posc tmpTarget = Utils.targetUnique(team, x, y, range, targets);
                     if(tmpTarget == null && entitySeq.size >= 1){
                         tmpTarget = (Posc)entitySeq.random();
                     }
