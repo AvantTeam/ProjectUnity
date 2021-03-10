@@ -226,7 +226,10 @@ public class EndGameTurret extends PowerTurret{
                     entitySeq.add(e);
                 }
             });
-            entitySeq.each(e -> UnityAntiCheat.annihilateEntity(e, true, false));
+            entitySeq.each(e -> {
+                UnityAntiCheat.annihilateEntity(e, true, false);
+                tmpArray.add(new DeadUnitEntry((Unit)e));
+            });
             entitySeq.clear();
         }
 

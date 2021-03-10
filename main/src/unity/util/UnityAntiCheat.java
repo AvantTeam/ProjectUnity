@@ -10,7 +10,10 @@ import mindustry.gen.*;
 import mindustry.world.blocks.ConstructBlock.*;
 import unity.*;
 import unity.entities.comp.*;
+import unity.entities.units.*;
 import unity.sync.*;
+
+import java.util.*;
 
 public class UnityAntiCheat implements ApplicationListener{
     private final Interval timer = new Interval();
@@ -47,6 +50,10 @@ public class UnityAntiCheat implements ApplicationListener{
                 tmp.getClass().getField("added").setBoolean(tmp, false);
             }catch(Exception e){
                 Unity.print(e);
+            }
+            if(tmp instanceof WormDefaultUnit){
+                WormSegmentUnit nullUnit = new WormSegmentUnit();
+                Arrays.fill(((WormDefaultUnit)tmp).segmentUnits, nullUnit);
             }
             if(setNaN){
                 tmp.x = tmp.y = tmp.rotation = Float.NaN;
