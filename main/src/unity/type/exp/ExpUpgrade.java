@@ -1,10 +1,9 @@
 package unity.type.exp;
 
 import mindustry.world.*;
-import unity.gen.*;
 
-public class ExpUpgrade<T extends Block & Expc>{
-    public final T type;
+public class ExpUpgrade{
+    public final Block type;
     /** Do NOT modify directly */
     public int index;
 
@@ -13,8 +12,7 @@ public class ExpUpgrade<T extends Block & Expc>{
 
     public boolean hide = false;
 
-    public ExpUpgrade(T type){
+    public ExpUpgrade(Block type){
         this.type = type;
-        max = type.maxLevel();
     }
 }

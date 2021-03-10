@@ -13,7 +13,6 @@ import javax.lang.model.type.*;
 import com.squareup.javapoet.*;
 import com.sun.source.tree.*;
 
-import java.lang.invoke.MethodHandleInfo;
 import java.util.*;
 import java.util.regex.*;
 
@@ -95,13 +94,11 @@ public class MergeProcessor extends BaseProcessor{
 
                     while(
                         current != null &&
-                        typeUtils.isAssignable(elementUtils.getTypeElement("mindustry.world.Block").asType(), current.asType()) &&
                         !typeUtils.isSameType(current.asType(), elementUtils.getTypeElement("mindustry.world.Block").asType())
                     ){
                         TypeElement[] c = {current};
-                        TypeElement build = types(c[0]).find(t -> typeUtils.isAssignable(
-                            elementUtils.getTypeElement("mindustry.gen.Building").asType(),
-                            t.asType()
+                        TypeElement build = types(c[0]).find(t -> Seq.with(getInterfaces(t)).contains(t2 ->
+                            t2.getQualifiedName().toString().equals("mindustry.gen.Building")
                         ));
 
                         if(build != null){
@@ -330,59 +327,90 @@ public class MergeProcessor extends BaseProcessor{
                     .build()
                 );
             }
+        }
 
-            for(Entry<Seq<? extends VariableElement>, ObjectMap<ExecutableElement, String>> entry : constructorBlocks.get(inter.getSimpleName().toString())){
-                OrderedSet<Modifier> modifiers = new OrderedSet<>();
-                for(Entry<ExecutableElement, String> method : entry.value){
-                    modifiers.addAll(method.key.getModifiers().toArray(new Modifier[0]));
+        ObjectMap<Seq<? extends VariableElement>, ObjectMap<ExecutableElement, String>> constructors = new ObjectMap<>();
+        for(String ctype : constructorBlocks.keys().toSeq()){
+            if(!value.contains(t -> t.getSimpleName().toString().equals(ctype))) continue;
+
+            ObjectMap<Seq<? extends VariableElement>, ObjectMap<ExecutableElement, String>> map = constructorBlocks.get(ctype);
+            for(Entry<Seq<? extends VariableElement>, ObjectMap<ExecutableElement, String>> entry : map){
+                Seq<? extends VariableElement> actualKey = entry.key;
+                for(Seq<? extends VariableElement> key : constructors.keys()){
+                    try{
+                        boolean same = true;
+                        for(int i = 0; i < key.size; i++){
+                            if(same && !typeUtils.isSameType(
+                                key.get(i).asType(),
+                                entry.key.get(i).asType()
+                            )){
+                                same = false;
+                            }
+                        }
+
+                        if(same){
+                            actualKey = key;
+                            break;
+                        }
+                    }catch(IndexOutOfBoundsException e){}
                 }
 
-                boolean err = false;
-                if(
-                    (modifiers.contains(Modifier.PUBLIC) && modifiers.contains(Modifier.PROTECTED)) ||
-                    (modifiers.contains(Modifier.PUBLIC) && modifiers.contains(Modifier.PRIVATE)) ||
-                    (modifiers.contains(Modifier.PROTECTED) && modifiers.contains(Modifier.PRIVATE))
-                ){
-                    err = true;
-                }
-
-                if(err) throw new IllegalStateException("Inconsistent visibility modifiers in constructor with params: " + entry.key.toString());
-                MethodSpec.Builder constructor = MethodSpec.constructorBuilder()
-                    .addModifiers(modifiers)
-                    .addParameters(entry.key.map(ParameterSpec::get));
-
-                StringBuilder params = new StringBuilder();
-                for(int i = 0; i < entry.key.size; i++){
-                    params.append(entry.key.get(i));
-                    if(i < entry.key.size - 1){
-                        params.append(", ");
-                    }
-                }
-
-                constructor.addStatement("super(" + params.toString() + ")");
-
-                for(Entry<ExecutableElement, String> method : entry.value){
-                    String label = method.key.getEnclosingElement().getSimpleName().toString().toLowerCase();
-                    label = label.substring(0, label.length() - 4);
-
-                    String code = method.value
-                    .replace("return;", "break " + label + ";");
-                    code = code.substring(1, code.length() - 1).trim().replace("\n    ", "\n");
-
-                    Seq<String> split = Seq.with(code.split("\n"));
-                    if(split.first().startsWith("super(")) split.remove(0);
-
-                    constructor
-                        .addCode(lnew())
-                        .beginControlFlow("$L:", label)
-                        .addCode(split.toString("\n"))
-                        .addCode(lnew())
-                    .endControlFlow();
-                }
-
-                type.addMethod(constructor.build());
+                constructors.get(actualKey, ObjectMap::new).putAll(entry.value);
             }
         }
+
+        for(Entry<Seq<? extends VariableElement>, ObjectMap<ExecutableElement, String>> entry : constructors){
+            OrderedSet<Modifier> modifiers = new OrderedSet<>();
+            for(Entry<ExecutableElement, String> method : entry.value){
+                modifiers.addAll(method.key.getModifiers().toArray(new Modifier[0]));
+            }
+
+            boolean err = false;
+            if(
+                (modifiers.contains(Modifier.PUBLIC) && modifiers.contains(Modifier.PROTECTED)) ||
+                (modifiers.contains(Modifier.PUBLIC) && modifiers.contains(Modifier.PRIVATE)) ||
+                (modifiers.contains(Modifier.PROTECTED) && modifiers.contains(Modifier.PRIVATE))
+            ){
+                err = true;
+            }
+
+            if(err) throw new IllegalStateException("Inconsistent visibility modifiers in constructor with params: " + entry.key.toString());
+            MethodSpec.Builder constructor = MethodSpec.constructorBuilder()
+                .addModifiers(modifiers)
+                .addParameters(entry.key.map(ParameterSpec::get));
+
+            StringBuilder params = new StringBuilder();
+            for(int i = 0; i < entry.key.size; i++){
+                params.append(entry.key.get(i));
+                if(i < entry.key.size - 1){
+                    params.append(", ");
+                }
+            }
+
+            constructor.addStatement("super(" + params.toString() + ")");
+
+            for(Entry<ExecutableElement, String> method : entry.value){
+                String label = method.key.getEnclosingElement().getSimpleName().toString().toLowerCase();
+                label = label.substring(0, label.length() - 4);
+
+                String code = method.value
+                .replace("return;", "break " + label + ";");
+                code = code.substring(1, code.length() - 1).trim().replace("\n    ", "\n");
+
+                Seq<String> split = Seq.with(code.split("\n"));
+                if(split.first().startsWith("super(")) split.remove(0);
+
+                constructor
+                    .addCode(lnew())
+                    .beginControlFlow("$L:", label)
+                    .addCode(split.toString("\n"))
+                    .addCode(lnew())
+                .endControlFlow();
+            }
+
+            type.addMethod(constructor.build());
+        }
+        
 
         ObjectMap<ExecutableElement, Seq<ExecutableElement>> appending = new ObjectMap<>();
         Seq<String> imports = new Seq<>();
@@ -393,13 +421,45 @@ public class MergeProcessor extends BaseProcessor{
 
         for(ExecutableElement appended : appending.keys().toSeq()){
             Seq<ExecutableElement> appenders = appending.get(appended);
+            boolean replace = false;
+
+            if(replace = appenders.contains(app -> annotation(app, Replace.class) != null)){
+                appenders = appenders.select(app -> annotation(app, Replace.class) != null);
+            }
+
             appenders.sort(m -> {
                 MethodPriority p = annotation(m, MethodPriority.class);
                 return p == null ? 0 : p.value();
             });
 
+            Seq<ExecutableElement>[] tmp = new Seq[]{appenders};
+            boolean[] change = {false};
+
             boolean returns = appended.getReturnType().getKind() != TypeKind.VOID;
-            MethodSpec.Builder method = MethodSpec.overriding(appended);
+            MethodSpec.Builder method = //MethodSpec.overriding(appended);
+            MethodSpec.methodBuilder(appended.getSimpleName().toString())
+                .addAnnotation(cName(Override.class))
+                .addModifiers(Modifier.PUBLIC)
+                .addParameters(Seq.with(appended.getParameters()).map(p -> {
+                    String pname = p.getSimpleName().toString();
+
+                    try{
+                        Integer.parseInt(pname.substring(3, pname.length()));
+
+                        change[0] = true;
+                        VariableElement var = Seq.with(tmp[0].first().getParameters()).find(v ->
+                            typeUtils.isSameType(v.asType(), p.asType()) &&
+                            v.getModifiers().equals(p.getModifiers())
+                        );
+                        return ParameterSpec.get(var);
+                    }catch(NumberFormatException e){
+                        return ParameterSpec.get(p);
+                    }
+                } ))
+                .returns(TypeName.get(appended.getReturnType()))
+                .addTypeVariables(Seq.with(appended.getTypeParameters()).map(TypeVariableName::get))
+                .addExceptions(Seq.with(appended.getThrownTypes()).map(TypeName::get))
+                .varargs(appended.isVarArgs());
 
             StringBuilder params = new StringBuilder();
             Seq<Object> args = Seq.with(appended.getSimpleName().toString());
@@ -410,7 +470,15 @@ public class MergeProcessor extends BaseProcessor{
 
                 params.append("$L");
                 if(i < parameters.size() - 1) params.append(", ");
-                args.add(var.getSimpleName().toString());
+                if(change[0]){
+                    VariableElement v = Seq.with(tmp[0].first().getParameters()).find(v2 ->
+                        typeUtils.isSameType(v2.asType(), var.asType()) &&
+                        v2.getModifiers().equals(var.getModifiers())
+                    );
+                    args.add(v.getSimpleName().toString());
+                }else{
+                    args.add(var.getSimpleName().toString());
+                }
             }
 
             boolean superCalled = false;
@@ -421,6 +489,7 @@ public class MergeProcessor extends BaseProcessor{
 
                     MethodPriority priority = annotation(app, MethodPriority.class);
                     if(
+                        !replace &&
                         !superCalled && priority != null
                         ?   priority.value() >= 0
                         :   true
@@ -472,7 +541,7 @@ public class MergeProcessor extends BaseProcessor{
                         .addCode(lnew())
                     .endControlFlow();
 
-                    if(!superCalled && i == appenders.size - 1){
+                    if(!replace && !superCalled && i == appenders.size - 1){
                         method.addCode(lnew());
                         method.addStatement("super.$L(" + params.toString() + ")", args.toArray());
                     }

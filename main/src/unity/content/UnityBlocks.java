@@ -100,7 +100,7 @@ public class UnityBlocks implements ContentList{
 
     public static
     @FactionDef("koruh")
-    @Merge(base = PowerTurret.class, value = Expc.class)
+    @Merge(base = PowerTurret.class, value = {Expc.class, Turretc.class})
     Block laser;
 
     public static
@@ -911,7 +911,7 @@ public class UnityBlocks implements ContentList{
             consumes.power(3f);
         }};
 
-        laser = new ExpPowerTurret("laser-turret"){
+        /*laser = new ExpPowerTurret("laser-turret"){
             {
                 requirements(Category.turret, with(Items.copper, 190, Items.silicon, 110, Items.titanium, 15));
                 size = 2;
@@ -948,6 +948,36 @@ public class UnityBlocks implements ContentList{
                 block.setupFields();
                 block.init();
                 block.setStats();
+            }
+        };*/
+
+        laser = new unity.gen.ExpPowerTurret("laser-turret"){
+            {
+                requirements(Category.turret, with(Items.copper, 190, Items.silicon, 110, Items.titanium, 15));
+                size = 2;
+                health = 800;
+
+                reloadTime = 35f;
+                coolantMultiplier = 2f;
+                range = 140f;
+                targetAir = false;
+                shootSound = Sounds.laser;
+
+                powerUse = 7f;
+
+                shootType = UnityBullets.laser;
+
+                hasExp = true;
+                condConfig = true;
+                enableUpgrade = true;
+
+                maxLevel = 10;
+
+                addUpgrade(laserCharge, 10, false);
+                addUpgrade(laserFrost, 10, false);
+
+                addField(ExpFieldType.linear, ReloadTurret.class, "reloadTime", reloadTime, -2f);
+                addField(ExpFieldType.bool, Turret.class, "targetAir", false, 5f);
             }
         };
 

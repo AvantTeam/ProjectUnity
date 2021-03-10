@@ -32,7 +32,7 @@ import static mindustry.Vars.*;
 
 @MergeComp
 @SuppressWarnings({"rawtypes", "unchecked"})
-abstract class ExpComp extends Block implements Expc{
+class ExpComp extends Block{
     int maxLevel = 20;
     float maxExp = requiredExp(maxLevel);
     float orbRefund = 0.3f;
@@ -43,9 +43,9 @@ abstract class ExpComp extends Block implements Expc{
     Color maxExpColor = Color.valueOf("90ff00");
     Color upgradeColor = Color.green;
 
-    public Seq<ExpUpgrade<?>> upgrades = new Seq<>();
+    public Seq<ExpUpgrade> upgrades = new Seq<>();
     /** Maps {@link #upgrades} into 2D array. Do NOT modify */
-    public ExpUpgrade<?>[][] upgradesPerLevel;
+    public ExpUpgrade[][] upgradesPerLevel;
     public boolean enableUpgrade;
     public boolean hasUpgradeEffect = true;
     public float sparkleChance = 0.08f;
@@ -100,10 +100,10 @@ abstract class ExpComp extends Block implements Expc{
             upgrades.get(i).index = i;
         }
 
-        Seq<ExpUpgrade<?>[]> upgradesPerLevel = new Seq<>(ExpUpgrade[].class);
+        Seq<ExpUpgrade[]> upgradesPerLevel = new Seq<>(ExpUpgrade[].class);
         for(int i = 0; i <= maxLevel; i++){
-            Seq<ExpUpgrade<?>> level = new Seq<>(ExpUpgrade.class);
-            for(ExpUpgrade<?> upgrade : upgrades){
+            Seq<ExpUpgrade> level = new Seq<>(ExpUpgrade.class);
+            for(ExpUpgrade upgrade : upgrades){
                 if(upgrade.min < 0){
                     upgrade.min = maxLevel;
                 }
@@ -203,7 +203,7 @@ abstract class ExpComp extends Block implements Expc{
                     t.add("$explib.upgrades");
                     t.row();
 
-                    for(ExpUpgrade<?> upgrade : upgrades){
+                    for(ExpUpgrade upgrade : upgrades){
                         if(upgrade.min > maxLevel || upgrade.hide) continue;
 
                         float size = 8f * 3f;
@@ -220,7 +220,7 @@ abstract class ExpComp extends Block implements Expc{
     }
 
     @Override
-    public void setBars() {
+    public void setBars(){
         bars.add("level", b -> {
             if(b instanceof ExpBuildc build){
                 return new Bar(
@@ -260,12 +260,12 @@ abstract class ExpComp extends Block implements Expc{
         return level * level * 10f;
     }
 
-    public void addUpgrade(int minLevel, boolean hidden){
-        addUpgrade(minLevel, maxLevel, hidden);
+    public <T extends Block> void addUpgrade(T type, int minLevel, boolean hidden){
+        addUpgrade(type, minLevel, maxLevel, hidden);
     }
 
-    public void addUpgrade(int minLevel, int maxLevel, boolean hidden){
-        upgrades.add(new ExpUpgrade<>(this){{
+    public <T extends Block> void addUpgrade(T type, int minLevel, int maxLevel, boolean hidden){
+        upgrades.add(new ExpUpgrade(type){{
             min = minLevel;
             max = maxLevel;
             hide = hidden;
@@ -416,7 +416,7 @@ abstract class ExpComp extends Block implements Expc{
             }
         }
 
-        private <T extends Block & Expc> void upgradeBlock(T block){
+        private void upgradeBlock(Block block){
             Tile tile = this.tile;
             int[] links = power() == null ? new int[0] : power().links.toArray();
 
@@ -515,7 +515,7 @@ abstract class ExpComp extends Block implements Expc{
             }
         }
 
-        private <T extends Block & Expc> void infoButton(Table table, T block){
+        private void infoButton(Table table, Block block){
             table.button(Icon.infoCircle, Styles.emptyi, () -> {
                 ui.content.show(block);
             }).size(40);
@@ -529,7 +529,7 @@ abstract class ExpComp extends Block implements Expc{
             }).size(40);
         }
 
-        public ExpUpgrade<?>[] currentUpgrades(int level){
+        public ExpUpgrade[] currentUpgrades(int level){
             return upgradesPerLevel[level];
         }
 
