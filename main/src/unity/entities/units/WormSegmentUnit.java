@@ -4,6 +4,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import arc.struct.Seq;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import mindustry.audio.*;
 import mindustry.gen.*;
@@ -12,6 +13,7 @@ import mindustry.type.*;
 import mindustry.entities.units.*;
 import mindustry.entities.bullet.BulletType;
 import mindustry.entities.Effect;
+import unity.ai.*;
 import unity.content.UnityUnitTypes;
 import unity.type.*;
 
@@ -90,6 +92,13 @@ public class WormSegmentUnit extends UnitEntity{
     public void damage(float amount){
         if(wormType.splittable) segmentHealth -= amount * wormType.segmentDamageScl;
         trueParentUnit.damage(amount);
+        if(trueParentUnit.controller instanceof WormAI){
+            ((WormAI)trueParentUnit.controller).setTarget(x, y, amount);
+        }
+    }
+
+    public void segmentDamage(float amount){
+        segmentHealth -= amount;
     }
 
     @Override
@@ -175,7 +184,7 @@ public class WormSegmentUnit extends UnitEntity{
 
     public void wormSegmentUpdate(){
         if(trueParentUnit != null){
-            maxHealth = trueParentUnit.maxHealth;
+            if(wormType.splittable && wormType.healthDistribution <= 0f) maxHealth = trueParentUnit.maxHealth;
             if(!wormType.splittable){
                 health = trueParentUnit.health;
             }else{
@@ -209,6 +218,7 @@ public class WormSegmentUnit extends UnitEntity{
                 break;
             }
         }
+        if(index >= hd.segmentUnits.length - 1) trueParentUnit.removeTail();
         if(index <= 0 || index >= hd.segmentUnits.length - 1){
             return;
         }
@@ -216,6 +226,7 @@ public class WormSegmentUnit extends UnitEntity{
         WormDefaultUnit newHead = (WormDefaultUnit)type.create(team);
         hd.segmentUnits[index + 1].parentUnit = newHead;
         newHead.addSegments = false;
+        newHead.attachTime = 0f;
         newHead.set(this);
         newHead.vel.set(vel);
         newHead.maxHealth /= 2f;
@@ -224,6 +235,8 @@ public class WormSegmentUnit extends UnitEntity{
 
         SegmentData oldSeg = new SegmentData(hd.segmentUnits.length), newSeg = new SegmentData(hd.segmentUnits.length);
         for(int i = 0; i < hd.segmentUnits.length; i++){
+            hd.segmentUnits[i].maxHealth /= 2f;
+            hd.segmentUnits[i].clampHealth();
             if(i < index){
                 oldSeg.add(hd, i);
             }
@@ -234,6 +247,7 @@ public class WormSegmentUnit extends UnitEntity{
         oldSeg.set(hd);
         newSeg.set(newHead);
         newHead.add();
+        wormType.splitSound.at(x, y, Mathf.random(0.9f, 1.1f));
         remove();
     }
 
@@ -351,6 +365,7 @@ public class WormSegmentUnit extends UnitEntity{
         if(segmentType == 0 && segCellReg != atlas.find("error")) drawCell(segCellReg);
         TextureRegion outline = wormType.segmentOutline == null || wormType.tailOutline == null ? null : segmentType == 0 ? wormType.segmentOutline : wormType.tailOutline;
         if(outline != null){
+            Draw.color(Color.white);
             Draw.z(Draw.z() - UnitType.outlineSpace);
             Draw.rect(outline, this, rotation - 90f);
             Draw.z(z);
@@ -391,7 +406,7 @@ public class WormSegmentUnit extends UnitEntity{
         parentUnit = parent;
     }
 
-    private static class SegmentData{
+    protected static class SegmentData{
         WormSegmentUnit[] units;
         Vec2[] pos;
         Vec2[] vel;
@@ -401,6 +416,12 @@ public class WormSegmentUnit extends UnitEntity{
             units = new WormSegmentUnit[size];
             pos = new Vec2[size];
             vel = new Vec2[size];
+        }
+
+        void add(WormSegmentUnit unit, Vec2 vel){
+            units[size] = unit;
+            pos[size] = new Vec2(unit.getX(), unit.getY());
+            this.vel[size++] = vel;
         }
 
         void add(WormDefaultUnit unit, int index){

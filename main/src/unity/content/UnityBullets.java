@@ -37,6 +37,8 @@ public class UnityBullets implements ContentList{
 
         falloutLaser, catastropheLaser, calamityLaser, extinctionLaser,
 
+        plagueMissile,
+
         orb, shockBeam, currentStroke, shielderBullet, plasmaFragTriangle, plasmaTriangle, surgeBomb,
 
         pylonLightning, pylonLaser, pylonLaserSmall, monumentRailBullet,
@@ -578,6 +580,18 @@ public class UnityBullets implements ContentList{
             extinction = true;
         }};
 
+        plagueMissile = new MissileBulletType(3.8f, 12f){{
+            width = height = 8f;
+            backColor = hitColor = lightColor = trailColor = UnityPal.plagueDark;
+            frontColor = UnityPal.plague;
+            shrinkY = 0f;
+            drag = -0.01f;
+            splashDamage = 30f;
+            splashDamageRadius = 35f;
+            hitEffect = Fx.blastExplosion;
+            despawnEffect = Fx.blastExplosion;
+        }};
+
         orb = new BulletType(){
             {
                 lifetime = 240;
@@ -904,7 +918,7 @@ public class UnityBullets implements ContentList{
             @Override
             public void handleBuilding(Bullet b, Building build, float initialHealth){
                 float damage = auraDamage / (Math.max(2500f - Math.max(initialHealth - 150000f, 0f), 0f) / 2500f);
-                if(damage >= Float.MAX_VALUE || Float.isInfinite(damage)){
+                if((damage >= Float.MAX_VALUE || Float.isInfinite(damage))){
                     build.health = 0f;
                     UnityAntiCheat.annihilateEntity(build, false);
                 }else{
@@ -916,7 +930,7 @@ public class UnityBullets implements ContentList{
             public void hitEntity(Bullet b, Hitboxc other, float initialHealth){
                 if(!(other instanceof Unit h)) return;
                 float damage = auraDamage / (Math.max(4500f - Math.max(initialHealth - 350000f, 0f), 0f) / 4500f);
-                if(damage >= Float.MAX_VALUE || Float.isInfinite(damage)){
+                if((damage >= Float.MAX_VALUE || Float.isInfinite(damage)) && !(other instanceof AntiCheatBase)){
                     h.health = 0f;
                     UnityAntiCheat.annihilateEntity(other, false);
                 }else{

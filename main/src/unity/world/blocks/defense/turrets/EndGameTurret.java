@@ -20,8 +20,11 @@ import unity.*;
 import unity.content.*;
 import unity.entities.*;
 import unity.entities.effects.*;
+import unity.entities.units.*;
 import unity.gen.*;
 import unity.util.*;
+
+import java.util.*;
 
 public class EndGameTurret extends PowerTurret{
     private static int shouldLaser = 0;
@@ -285,6 +288,10 @@ public class EndGameTurret extends PowerTurret{
                     if(mount.sound != null){
                         mount.sound.stop();
                     }
+                }
+                if(entity instanceof WormDefaultUnit){
+                    WormSegmentUnit nullUnit = new WormSegmentUnit();
+                    Arrays.fill(((WormDefaultUnit)entity).segmentUnits, nullUnit);
                 }
             }
             if(entity instanceof Building build){

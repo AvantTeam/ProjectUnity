@@ -95,7 +95,7 @@ public class EndWormUnit extends WormDefaultUnit implements AntiCheatBase{
     public void damage(float amount){
         if(invTime < 30f) return;
         invTime = 0f;
-        float max = Math.max(220f, lastMaxHealth / 1500);
+        float max = Math.max(220f, lastMaxHealth / 700);
         float trueDamage = Mathf.clamp((amount / immunity) / rogueDamageResist, 0f, max);
         rogueDamageResist += 1.5f;
         immunity += Math.pow(amount / max, 2) * 2f;
@@ -121,7 +121,7 @@ public class EndWormUnit extends WormDefaultUnit implements AntiCheatBase{
     public static class EndWormSegmentUnit extends WormSegmentUnit implements AntiCheatBase{
         @Override
         public void remove(){
-            if(parentUnit == null || !parentUnit.isAdded()){
+            if(!Structs.contains(trueParentUnit.segmentUnits, this)){
                 super.remove();
             }
         }
