@@ -33,8 +33,6 @@ public class UnityAntiCheat implements ApplicationListener{
     }
 
     public static void annihilateEntity(Entityc entity, boolean override, boolean setNaN){
-        entity.remove();
-
         Groups.all.remove(entity);
         if(entity instanceof Drawc) Groups.draw.remove((Drawc)entity);
         if(entity instanceof Syncc) Groups.sync.remove((Syncc)entity);
