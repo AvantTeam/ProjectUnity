@@ -247,64 +247,7 @@ public class EndGameTurret extends PowerTurret{
             entitySeq.each(e -> UnityAntiCheat.annihilateEntity(e, true, false));
             entitySeq.clear();
         }
-        /*
-        void attemptRemoveAdd(Unit unit){
-            try{
-                unit.getClass().getField("added").setBoolean(unit, false);
-            }catch(Exception e){
-                throw new RuntimeException(e);
-            }
-        }
-
-        void annihilate(Entityc entity){
-            Groups.all.remove(entity);
-            if(entity instanceof Bossc bsc){
-                UnityCall.bossMusic(bsc.type().name, false);
-            }
-            if(entity instanceof Unit){
-                Unit tmp = (Unit)entity;
-                
-                Unity.antiCheat.removeUnit(tmp);
-                tmpArray.add(new DeadUnitEntry(tmp));
-                attemptRemoveAdd(tmp);
-                
-                UnityFx.vapourizeUnit.at(tmp.x, tmp.y, tmp.rotation, tmp);
-                
-                tmp.team.data().updateCount(tmp.type, -1);
-                tmp.clearCommand();
-                tmp.controller().removed(tmp);
-                
-                Groups.unit.remove(tmp);
-                Groups.draw.remove((Drawc)entity);
-                if(Vars.net.client()){
-                    Vars.netClient.addRemovedEntity(tmp.id);
-                }
-                
-                for(WeaponMount mount : tmp.mounts){
-                    if(mount.bullet != null){
-                        mount.bullet.time = mount.bullet.lifetime - 10f;
-                        mount.bullet = null;
-                    }
-                    if(mount.sound != null){
-                        mount.sound.stop();
-                    }
-                }
-                if(entity instanceof WormDefaultUnit){
-                    WormSegmentUnit nullUnit = new WormSegmentUnit();
-                    Arrays.fill(((WormDefaultUnit)entity).segmentUnits, nullUnit);
-                }
-            }
-            if(entity instanceof Building build){
-                Groups.build.remove(build);
-                build.tile.remove();
-                Unity.antiCheat.removeBuilding(build);
-                
-                if(build.sound != null) build.sound.stop();
-                build.added = false;
-            }
-            if(entity instanceof Syncc s) Groups.sync.remove(s);
-        }
-        */
+        
         @Override
         public void kill(){
             if(lastHealth < 10f) super.kill();
