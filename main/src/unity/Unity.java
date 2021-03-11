@@ -54,6 +54,7 @@ public class Unity extends Mod implements ApplicationListener{
 
         if(Core.assets != null){
             Core.assets.setLoader(WavefrontObject.class, new WavefrontObjectLoader(tree));
+            Core.assets.load(new UnityStyles());
         }
 
         if(!headless){
@@ -185,20 +186,6 @@ public class Unity extends Mod implements ApplicationListener{
     public static Class<?> forName(String canonical){
         try{
             return Class.forName(canonical, true, unity.loader);
-        }catch(Exception e){
-            Log.err(e);
-            return null;
-        }
-    }
-
-    public static <T> T newInstance(Class<T> type, Object... parameters){
-        try{
-            Class<?>[] types = Seq.with(parameters).map(param -> {
-                Class<?> ptype = param.getClass();
-                return ptype.isAnonymousClass() ? ptype.getSuperclass() : ptype;
-            }).toArray();
-
-            return type.getDeclaredConstructor(types).newInstance(parameters);
         }catch(Exception e){
             Log.err(e);
             return null;
