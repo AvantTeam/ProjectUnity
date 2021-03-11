@@ -119,8 +119,9 @@ public class MergeProcessor extends BaseProcessor{
 
                 Seq<TypeElement> buildingComps = value
                     .map(t -> (TypeElement)elements(annotation(t, MergeInterface.class)::buildType).first())
-                    .select(t -> t != null)
-                    .distinct();
+                    .select(t -> !t.getQualifiedName().toString().equals(
+                        Building.class.getCanonicalName()
+                    ));
 
                 Entry<TypeSpec.Builder, Seq<String>> build = toClass(findBuild.get(base), buildingComps);
                 block.key.addType(build.key.build());
@@ -153,7 +154,7 @@ public class MergeProcessor extends BaseProcessor{
             MethodTree tree = treeUtils.getTree(m);
             methodBlocks.put(descString(m), tree.getBody().toString()
                 .replaceAll("this\\.<(.*)>self\\(\\)", "this")
-                .replaceAll("self\\(\\)", "this")
+                .replaceAll("self\\(\\)(?!\\s+instanceof)", "this")
                 .replaceAll(" yield ", "")
                 .replaceAll("\\/\\*missing\\*\\/", "var")
             );
@@ -182,7 +183,7 @@ public class MergeProcessor extends BaseProcessor{
             MethodTree tree = treeUtils.getTree(cons);
             map.put(cons, tree.getBody().toString()
                 .replaceAll("this\\.<(.*)>self\\(\\)", "this")
-                .replaceAll("self\\(\\)", "this")
+                .replaceAll("self\\(\\)(?!\\s+instanceof)", "this")
                 .replaceAll(" yield ", "")
                 .replaceAll("\\/\\*missing\\*\\/", "var")
             );
