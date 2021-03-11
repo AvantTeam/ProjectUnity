@@ -95,8 +95,9 @@ class ExpComp extends Block{
     @Override
     public void init(){
         maxExp = requiredExp(maxLevel);
-        enableUpgrade = upgrades.size > 0;
+        setUpgrades();
 
+        enableUpgrade = upgrades.size > 0;
         for(int i = 0; i < upgrades.size; i++){
             upgrades.get(i).index = i;
         }
@@ -125,12 +126,23 @@ class ExpComp extends Block{
                 int amount = fields.size;
 
                 Class<?> classType = getClass();
+                boolean found = false;
                 while(
-                    classType.getDeclaredField(type.name() + "Inc") == null &&
+                    !found &&
                     Block.class.isAssignableFrom(classType)
                 ){
-                    classType = classType.getSuperclass();
+                    try{
+                        classType.getDeclaredField(type.name() + "Inc");
+                    }catch(NoSuchFieldException e){
+                        classType = classType.getSuperclass();
+                        continue;
+                    }
+
+                    found = true;
                 }
+
+                //should not happen
+                if(!found) throw new IllegalStateException("No parent block classes with exp fields detected.");
 
                 if(type != ExpFieldType.list){
                     Field fInc = classType.getDeclaredField(type.name() + "Inc");
@@ -191,6 +203,8 @@ class ExpComp extends Block{
             });
         }
     }
+
+    public void setUpgrades(){}
 
     @Override
     public void setStats(){

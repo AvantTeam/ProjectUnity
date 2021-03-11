@@ -941,11 +941,14 @@ public class UnityBlocks implements ContentList{
 
                 maxLevel = 10;
 
+                addField(unity.type.exp.ExpFieldType.linear, ReloadTurret.class, "reloadTime", reloadTime, -2f);
+                addField(unity.type.exp.ExpFieldType.bool, Turret.class, "targetAir", false, 5f);
+            }
+
+            @Override
+            public void setUpgrades(){
                 addUpgrade(laserCharge, 10, false);
                 addUpgrade(laserFrost, 10, false);
-
-                addField(ExpFieldType.linear, ReloadTurret.class, "reloadTime", reloadTime, -2f);
-                addField(ExpFieldType.bool, Turret.class, "targetAir", false, 5f);
             }
         };
 
@@ -985,11 +988,14 @@ public class UnityBlocks implements ContentList{
 
                 maxLevel = 30;
 
+                addField(unity.type.exp.ExpFieldType.linear, ReloadTurret.class, "reloadTime", reloadTime, -1f);
+            }
+
+            @Override
+            public void setUpgrades(){
                 addUpgrade(laserBranch, 15, false);
                 addUpgrade(laserFractal, 15, false);
                 addUpgrade(laserBreakthrough, 30, true);
-
-                addField(ExpFieldType.linear, ReloadTurret.class, "reloadTime", reloadTime, -1f);
             }
         };
 
@@ -1014,6 +1020,10 @@ public class UnityBlocks implements ContentList{
                 maxLevel = 30;
 
                 consumes.powerCond(1f, TurretBuild::isActive);
+            }
+
+            @Override
+            public void setUpgrades(){
                 addUpgrade(laserKelvin, 15, false);
                 addUpgrade(laserBreakthrough, 30, true);
             }
@@ -1059,9 +1069,9 @@ public class UnityBlocks implements ContentList{
 
                 maxLevel = 30;
 
-                addField(ExpFieldType.linear, ReloadTurret.class, "reloadTime", reloadTime, -2f);
-                addField(ExpFieldType.linear, BaseTurret.class, "range", range, rangeInc);
-                addField(ExpFieldType.linear, ExpTurretPowerTurret.class, "basicFieldRadius", basicFieldRadius, 0.2f * 8f);
+                addField(unity.type.exp.ExpFieldType.linear, ReloadTurret.class, "reloadTime", reloadTime, -2f);
+                addField(unity.type.exp.ExpFieldType.linear, BaseTurret.class, "range", range, rangeInc);
+                addField(unity.type.exp.ExpFieldType.linear, ExpTurretPowerTurret.class, "basicFieldRadius", basicFieldRadius, 0.2f * 8f);
             }
         };
 
@@ -1109,8 +1119,8 @@ public class UnityBlocks implements ContentList{
 
                 maxLevel = 30;
 
-                addField(ExpFieldType.linear, ReloadTurret.class, "reloadTime", reloadTime, -2f);
-                addField(ExpFieldType.linear, BaseTurret.class, "range", range, rangeInc);
+                addField(unity.type.exp.ExpFieldType.linear, ReloadTurret.class, "reloadTime", reloadTime, -2f);
+                addField(unity.type.exp.ExpFieldType.linear, BaseTurret.class, "range", range, rangeInc);
             }
         };
 
@@ -1188,12 +1198,12 @@ public class UnityBlocks implements ContentList{
                 ioPrecision = 20f;
                 orbMultiplier = 0.07f;
 
-                addField(ExpFieldType.list, Turret.class, "heatColor", Color.class, new Color[]{fromColor, toColor});
+                addField(unity.type.exp.ExpFieldType.list, Turret.class, "heatColor", Color.class, new Color[]{fromColor, toColor});
 
                 drawer = b -> {
                     if(b instanceof ExpTurretPowerTurretBuild tile){
                         Draw.rect(region, tile.x + tr2.x, tile.y + tr2.y, tile.rotation - 90f);
-                        if(tile.level() >= tile.maxlevel()){
+                        if(tile.level() >= tile.maxLevel()){
                             //Draw.blend(Blending.additive);
                             Draw.color(tile.getShootColor(tile.levelf()));
                             Draw.alpha(Mathf.absin(Time.time, 20f, 0.6f));
@@ -1231,10 +1241,10 @@ public class UnityBlocks implements ContentList{
 
                 maxLevel = 10;
 
-                addField(ExpFieldType.list, Turret.class, "shots", Integer.class, new Integer[]{
+                addField(unity.type.exp.ExpFieldType.list, Turret.class, "shots", Integer.class, new Integer[]{
                     1, 1, 2, 2, 2, 3, 3, 4, 4, 5, 5
                 });
-                addField(ExpFieldType.list, Turret.class, "spread", Float.class, new Float[]{
+                addField(unity.type.exp.ExpFieldType.list, Turret.class, "spread", Float.class, new Float[]{
                     0f, 0f, 5f, 10f, 15f, 7f, 14f, 8f, 10f, 6f, 9f
                 });
             }
