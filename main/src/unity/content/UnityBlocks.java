@@ -943,7 +943,6 @@ public class UnityBlocks implements ContentList{
                 shootSound = Sounds.laser;
 
                 powerUse = 7f;
-
                 shootType = UnityBullets.laser;
 
                 hasExp = true;
@@ -1066,8 +1065,11 @@ public class UnityBlocks implements ContentList{
                 chargeBeginEffect = UnityFx.laserChargeBegin;
                 heatColor = Color.red;
                 shootSound = Sounds.laser;
+
+                lerpColor = true;
                 fromColor = Pal.lancerLaser.cpy().lerp(Pal.sapBullet, 0.5f);
                 toColor = Pal.place;
+
                 shootType = UnityBullets.fractalLaser;
                 buildVisibility = BuildVisibility.sandboxOnly;
 
@@ -1113,6 +1115,7 @@ public class UnityBlocks implements ContentList{
                 chargeEffect = UnityFx.laserCharge;
                 chargeBeginEffect = UnityFx.laserChargeBegin;
                 heatColor = Color.red;
+                lerpColor = true;
                 fromColor = Pal.lancerLaser.cpy().lerp(Pal.sapBullet, 0.5f);
                 shootSound = Sounds.laser;
                 shootType = UnityBullets.branchLaser;
@@ -1194,6 +1197,7 @@ public class UnityBlocks implements ContentList{
                 chargeBeginEffect = UnityFx.laserBreakthroughChargeBegin;
 
                 heatColor = Pal.lancerLaser;
+                lerpColor = true;
                 toColor = UnityPal.expColor;
                 shootSound = Sounds.laserblast;
                 chargeSound = Sounds.lasercharge;

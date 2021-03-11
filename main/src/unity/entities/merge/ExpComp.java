@@ -566,7 +566,7 @@ class ExpComp extends Block{
 
         @Override
         public void killed(){
-            ExpOrbs.spreadExp(x(), y(), exp * orbRefund, spreadAmount());
+            ExpOrbs.spreadExp(x, y, exp * orbRefund, spreadAmount());
         }
 
         @Override

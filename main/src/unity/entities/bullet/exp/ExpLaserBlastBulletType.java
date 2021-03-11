@@ -12,7 +12,7 @@ import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import unity.content.*;
-import unity.entities.comp.*;
+import unity.gen.Expc.*;
 import unity.graphics.*;
 
 public class ExpLaserBlastBulletType extends LaserBulletType{

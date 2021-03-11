@@ -19,6 +19,7 @@ import unity.gen.Expc.*;
 class TurretComp extends Turret{
     /** Color of shoot effects. Shifts to second color as the turret levels up. */
     Color fromColor = Pal.lancerLaser, toColor = Pal.sapBullet;
+    boolean lerpColor = false;
 
     float rangeInc = 0f;
     Color rangeColor;
@@ -92,18 +93,18 @@ class TurretComp extends Turret{
         @Override
         @Replace
         public void shoot(BulletType type){
-            if(chargeTime > 0f){
+            if(chargeTime < 0f){
                 super.shoot(type);
             }else if(this instanceof ExpBuildc){
                 var exp = (TurretBuild & ExpBuildc)this;
 
                 useAmmo();
                 float lvl = exp.levelf();
-        
+
                 tr.trns(rotation, shootLength);
                 chargeBeginEffect.at(x + tr.x, y + tr.y, rotation, getShootColor(lvl));
                 chargeSound.at(x + tr.x, y + tr.y, 1f);
-        
+
                 for(int i = 0; i < chargeEffects; i++){
                     Time.run(Mathf.random(chargeMaxDelay), () -> {
                         if(isValid()){
@@ -118,7 +119,7 @@ class TurretComp extends Turret{
                 for(var i = 0; i < shots; i++){
                     Time.run(burstSpacing * i, () -> {
                         Time.run(chargeTime, () -> {
-                            if(!isValid()){
+                            if(isValid()){
                                 tr.trns(rotation, shootLength, Mathf.range(xRand));
                                 recoil = recoilAmount;
                                 heat = 1f;
@@ -130,13 +131,15 @@ class TurretComp extends Turret{
                         });
                     });
                 }
+            }else{
+                super.shoot(type);
             }
         }
 
         @Override
         @Replace
         public void effects(){
-            if(this instanceof ExpBuildc){
+            if(this instanceof ExpBuildc && lerpColor){
                 var exp = (TurretBuild & ExpBuildc)this;
 
                 recoil = recoilAmount;
