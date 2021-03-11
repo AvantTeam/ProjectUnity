@@ -443,8 +443,7 @@ public class MergeProcessor extends BaseProcessor{
             boolean[] change = {false};
 
             boolean returns = appended.getReturnType().getKind() != TypeKind.VOID;
-            MethodSpec.Builder method = //MethodSpec.overriding(appended);
-            MethodSpec.methodBuilder(appended.getSimpleName().toString())
+            MethodSpec.Builder method = MethodSpec.methodBuilder(appended.getSimpleName().toString())
                 .addAnnotation(cName(Override.class))
                 .addModifiers(Modifier.PUBLIC)
                 .addParameters(Seq.with(appended.getParameters()).map(p -> {
@@ -462,7 +461,7 @@ public class MergeProcessor extends BaseProcessor{
                     }catch(NumberFormatException e){
                         return ParameterSpec.get(p);
                     }
-                } ))
+                }))
                 .returns(TypeName.get(appended.getReturnType()))
                 .addTypeVariables(Seq.with(appended.getTypeParameters()).map(TypeVariableName::get))
                 .addExceptions(Seq.with(appended.getThrownTypes()).map(TypeName::get))
@@ -497,9 +496,12 @@ public class MergeProcessor extends BaseProcessor{
                     MethodPriority priority = annotation(app, MethodPriority.class);
                     if(
                         !replace &&
-                        !superCalled && priority != null
-                        ?   priority.value() >= 0
-                        :   true
+                        !superCalled &&
+                        (
+                            priority != null
+                            ?   priority.value() >= 0
+                            :   true
+                        )
                     ){
                         method.addStatement("super.$L(" + params.toString() + ")", args.toArray());
                         superCalled = true;

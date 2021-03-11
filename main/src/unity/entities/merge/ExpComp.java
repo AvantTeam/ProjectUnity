@@ -371,7 +371,7 @@ class ExpComp extends Block{
 
     public class ExpBuildComp extends Building{
         float exp;
-        boolean checked;
+        boolean checked = true;
 
         public float expf(){
             int level = level();
@@ -451,13 +451,11 @@ class ExpComp extends Block{
             Core.app.post(() -> {
                 if(build != null && build.isValid() && build.power != null && links.length > 0){
                     for(int link : links){
-                        try{
-                            Tile powtile = world.tile(link);
+                        Tile powtile = world.tile(link);
 
-                            if(powtile.block() instanceof PowerNode){
-                                powtile.build.configure(Integer.valueOf(link));
-                            }
-                        }catch(Throwable ignored){}
+                        if(powtile.block() instanceof PowerNode){
+                            powtile.build.configure(Integer.valueOf(link));
+                        }
                     }
                 }
             });
