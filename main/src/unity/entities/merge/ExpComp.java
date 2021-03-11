@@ -34,7 +34,7 @@ import static mindustry.Vars.*;
 @SuppressWarnings({"rawtypes", "unchecked"})
 class ExpComp extends Block{
     int maxLevel = 20;
-    float maxExp = requiredExp(maxLevel);
+    float maxExp;
     float orbRefund = 0.3f;
 
     Color minLevelColor = Pal.accent;
@@ -94,6 +94,7 @@ class ExpComp extends Block{
 
     @Override
     public void init(){
+        maxExp = requiredExp(maxLevel);
         enableUpgrade = upgrades.size > 0;
 
         for(int i = 0; i < upgrades.size; i++){
@@ -360,7 +361,7 @@ class ExpComp extends Block{
 
         public float expf(){
             int level = level();
-            if(level >= maxLevel) return 1f;
+            if(level >= maxLevel()) return 1f;
 
             float last = requiredExp(level);
             float next = requiredExp(level + 1);
@@ -369,11 +370,11 @@ class ExpComp extends Block{
         }
 
         public int level(){
-            return Math.min(Mathf.floorPositive(Mathf.sqrt(exp * 0.1f)), maxLevel);
+            return Math.min(Mathf.floorPositive(Mathf.sqrt(exp * 0.1f)), maxLevel());
         }
 
         public float levelf(){
-            return level() / (float)(maxLevel);
+            return level() / (float)(maxLevel());
         }
 
         public void incExp(float exp){
@@ -535,6 +536,14 @@ class ExpComp extends Block{
 
         public float spreadAmount(){
             return 3f * size;
+        }
+
+        public boolean consumesOrb(){
+            return exp < maxExp;
+        }
+
+        public int maxLevel(){
+            return maxLevel;
         }
 
         @Override

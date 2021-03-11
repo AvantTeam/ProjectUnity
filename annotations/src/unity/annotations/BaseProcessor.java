@@ -82,42 +82,48 @@ public abstract class BaseProcessor extends AbstractProcessor{
 
     public abstract void process(RoundEnvironment roundEnv) throws Exception;
 
-    public void write(TypeSpec spec) throws IOException{
+    public void write(TypeSpec spec) throws Exception{
         write(spec, Seq.with());
     }
 
-    public void write(TypeSpec spec, Seq<String> imports) throws IOException{
-        JavaFile file = JavaFile.builder(packageName, spec)
-            .indent("    ")
-            .skipJavaLangImports(true)
-        .build();
+    public void write(TypeSpec spec, Seq<String> imports) throws Exception{
+        try{
+            JavaFile file = JavaFile.builder(packageName, spec)
+                .indent("    ")
+                .skipJavaLangImports(true)
+            .build();
 
-        if(imports.isEmpty()){
-            file.writeTo(filer);
-        }else{
-            imports.distinct();
+            if(imports.isEmpty()){
+                file.writeTo(filer);
+            }else{
+                imports.distinct();
 
-            String rawSource = file.toString();
-            Seq<String> source = Seq.with(rawSource.split("\n", -1));
-            Seq<String> result = new Seq<>();
-            for(int i = 0; i < source.size; i++){
-                String s = source.get(i);
+                String rawSource = file.toString();
+                Seq<String> source = Seq.with(rawSource.split("\n", -1));
+                Seq<String> result = new Seq<>();
+                for(int i = 0; i < source.size; i++){
+                    String s = source.get(i);
 
-                result.add(s);
-                if(s.startsWith("package ")){
-                    source.remove(i + 1);
-                    result.add("");
-                    for(String im : imports){
-                        result.add(im.replace("\n", ""));
+                    result.add(s);
+                    if(s.startsWith("package ")){
+                        source.remove(i + 1);
+                        result.add("");
+                        for(String im : imports){
+                            result.add(im.replace("\n", ""));
+                        }
                     }
                 }
-            }
 
-            String out = result.toString("\n");
-            JavaFileObject object = filer.createSourceFile(file.packageName + "." + file.typeSpec.name, file.typeSpec.originatingElements.toArray(new Element[0]));
-            OutputStream stream = object.openOutputStream();
-            stream.write(out.getBytes());
-            stream.close();
+                String out = result.toString("\n");
+                JavaFileObject object = filer.createSourceFile(file.packageName + "." + file.typeSpec.name, file.typeSpec.originatingElements.toArray(new Element[0]));
+                OutputStream stream = object.openOutputStream();
+                stream.write(out.getBytes());
+                stream.close();
+            }
+        }catch(Exception e){
+            if(!(e instanceof FilerException && e.getMessage().contains("Attempt to recreate a file for type"))){
+                throw e;
+            }
         }
     }
 

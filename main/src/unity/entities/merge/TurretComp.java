@@ -6,9 +6,13 @@ import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.type.Liquid;
 import mindustry.world.blocks.defense.turrets.*;
+import mindustry.world.blocks.defense.turrets.LiquidTurret.*;
 import unity.annotations.Annotations.*;
+import unity.entities.bullet.exp.*;
 import unity.gen.Expc.*;
 
 @MergeComp
@@ -16,17 +20,73 @@ class TurretComp extends Turret{
     /** Color of shoot effects. Shifts to second color as the turret levels up. */
     Color fromColor = Pal.lancerLaser, toColor = Pal.sapBullet;
 
-    float secRange = range;
-    Color secColor;
+    float rangeInc = 0f;
+    Color rangeColor;
+
+    /** Whether to accept ammo type of all kinds */
+    boolean omni = false;
+    BulletType defaultBullet = Bullets.standardCopper;
+
+    float basicFieldRadius = -1f;
 
     public TurretComp(String name){
         super(name);
     }
 
-    class TurretBuildComp extends TurretBuild{
+    public class TurretBuildComp extends TurretBuild{
+        @Override
+        @Replace
+        public boolean acceptLiquid(Building source, Liquid liquid){
+            if(self() instanceof LiquidTurretBuild && omni){
+                return (liquids.current() == liquid || liquids.currentAmount() < 0.2f);
+            }else{
+                return super.acceptLiquid(source, liquid);
+            }
+        }
+
+        @Override
+        @Replace
+        public BulletType useAmmo(){
+            if(self() instanceof LiquidTurretBuild && omni){
+                BulletType b = peekAmmo();
+                liquids.remove(liquids.current(), 1f / b.ammoMultiplier);
+
+                return b;
+            }else{
+                return super.useAmmo();
+            }
+        }
+
+        @Override
+        @Replace
+        public BulletType peekAmmo(){
+            if(block instanceof LiquidTurret l && omni){
+                BulletType b = l.ammoTypes.get(liquids.current());
+                if(basicFieldRadius > 0f && b instanceof ExpLaserFieldBulletType type){
+                    type.basicFieldRadius = basicFieldRadius;
+                }
+
+                return b == null ? defaultBullet : b;
+            }else{
+                return super.peekAmmo();
+            }
+        }
+
+        @Override
+        @Replace
+        public boolean hasAmmo(){
+            if(self() instanceof LiquidTurretBuild && omni){
+                return liquids.total() >= 1f / peekAmmo().ammoMultiplier;
+            }else{
+                return super.hasAmmo();
+            }
+        }
+
         @Override
         public void drawSelect(){
-            Drawf.dashCircle(x, y, secRange, secColor == null ? team.color : secColor);
+            if(rangeInc != 0f){
+                Drawf.dashCircle(x, y, range + rangeInc, rangeColor == null ? team.color : rangeColor);
+            }
         }
 
         @Override

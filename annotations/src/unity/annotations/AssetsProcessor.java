@@ -31,7 +31,7 @@ public class AssetsProcessor extends BaseProcessor{
         }
     }
 
-    void processSounds() throws IOException{
+    void processSounds() throws Exception{
         TypeSpec.Builder soundSpec = TypeSpec.classBuilder("UnitySounds").addModifiers(Modifier.PUBLIC)
             .addJavadoc("Unity's {@link $T} effects", cName(Sound.class))
             .addMethod(
@@ -119,7 +119,7 @@ public class AssetsProcessor extends BaseProcessor{
         write(soundSpec.build());
     }
 
-    void processObjects() throws IOException{
+    void processObjects() throws Exception{
         TypeElement wavefrontObject = elementUtils.getTypeElement("unity.util.WavefrontObject");
 
         TypeSpec.Builder objSpec = TypeSpec.classBuilder("UnityObjs").addModifiers(Modifier.PUBLIC)

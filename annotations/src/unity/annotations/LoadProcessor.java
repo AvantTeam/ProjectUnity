@@ -6,8 +6,6 @@ import arc.struct.*;
 import arc.util.*;
 import unity.annotations.Annotations.*;
 
-import java.io.*;
-
 import javax.annotation.processing.*;
 import javax.lang.model.element.*;
 
@@ -36,7 +34,7 @@ public class LoadProcessor extends BaseProcessor{
         processGenerics();
     }
 
-    void processGenerics() throws IOException{
+    void processGenerics() throws Exception{
         TypeSpec.Builder spec = TypeSpec.classBuilder("Regions").addModifiers(Modifier.PUBLIC)
             .addJavadoc("Generic texture regions");
 

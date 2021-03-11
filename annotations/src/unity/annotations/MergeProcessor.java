@@ -69,6 +69,12 @@ public class MergeProcessor extends BaseProcessor{
                     );
                 }
 
+                builder.addAnnotation(
+                    AnnotationSpec.builder(SuppressWarnings.class)
+                        .addMember("value", "$S", "all")
+                    .build()
+                );
+
                 write(builder.build());
             }
         }else if(round == 2){
