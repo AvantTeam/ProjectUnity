@@ -218,6 +218,8 @@ public class UnityBlocks implements ContentList{
 
                 new UnitType[]{UnitTypes.corvus, UnityUnitTypes.ursa},
 
+                new UnitType[]{UnityUnitTypes.rex, UnityUnitTypes.excelsus},
+
                 new UnitType[]{UnityUnitTypes.monument, UnityUnitTypes.colossus}
             );
             otherUpgrades.add(
