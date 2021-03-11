@@ -52,6 +52,8 @@ public class UnityBlocks implements ContentList{
     public static Block//@formatter:off
     //order is load order. double newLine means next js file or json contents directory. eh, not that important.
     //global
+    distributionDrill,
+
     recursiveReconstructor,
     //@formatter:on
     lightLamp, oilLamp, lightLaser, lightLampInfi, lightReflector, lightReflector1, lightOmnimirror, lightFilter, lightInvertedFilter, lightDivisor, lightDivisor1, lightItemFilter, lightPanel, lightInfluencer,
@@ -194,6 +196,15 @@ public class UnityBlocks implements ContentList{
     @Override
     public void load(){
         //region global
+
+        distributionDrill = new DistributionDrill("distribution-drill"){{
+            requirements(Category.production, with(Items.copper, 20, Items.silicon, 15, Items.titanium, 20));
+            tier = 3;
+            drillTime = 450;
+            size = 2;
+
+            consumes.liquid(Liquids.water, 0.06f).boost();
+        }};
 
         recursiveReconstructor = new SelectableReconstructor("recursive-reconstructor"){{
             requirements(Category.units, with(Items.graphite, 1600, Items.silicon, 2000, Items.metaglass, 900, Items.thorium, 600, Items.lead, 1200, Items.plastanium, 3600));
