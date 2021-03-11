@@ -29,4 +29,14 @@ public interface AntiKamic extends Unitc{
         //limit speed to minimum formation speed to preserve formation
         return (isCommanding() ? minFormationSpeed() * 0.98f : type().speed) * strafePenalty;
     }
+
+    @Override
+    default void update(){
+        if(Groups.unit.contains(u -> u.type() == UnityUnitTypes.kami)){
+            type().faceTarget = false;
+            lookAt(90f); //Make units in formation also look up.
+        }else{
+            type().faceTarget = true;
+        }
+    }
 }
