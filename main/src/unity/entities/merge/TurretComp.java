@@ -21,7 +21,6 @@ class TurretComp extends Turret{
     Color fromColor = Pal.lancerLaser, toColor = Pal.sapBullet;
     boolean lerpColor = false;
 
-    float rangeInc = 0f;
     Color rangeColor;
 
     /** Whether to accept ammo type of all kinds */
@@ -84,10 +83,9 @@ class TurretComp extends Turret{
         }
 
         @Override
+        @Replace
         public void drawSelect(){
-            if(rangeInc != 0f){
-                Drawf.dashCircle(x, y, range + rangeInc, rangeColor == null ? team.color : rangeColor);
-            }
+            Drawf.dashCircle(x, y, range, rangeColor == null ? team.color : rangeColor);
         }
 
         @Override
