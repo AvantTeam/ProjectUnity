@@ -122,8 +122,10 @@ public class UnityBlocks implements ContentList{
     //public static @FactionDef(type = "light")
     //Block
 
-    public static @FactionDef("monolith")
-    Block monolithAlloyForge,
+    public static @FactionDef("monolith") Block
+    deflectorAura,
+
+    monolithAlloyForge,
 
     electrophobicWall, electrophobicWallLarge,
 
@@ -976,8 +978,8 @@ public class UnityBlocks implements ContentList{
 
                 maxLevel = 10;
 
-                addField(ExpFieldType.linear, ReloadTurret.class, "reloadTime", reloadTime, -2f);
-                addField(ExpFieldType.bool, Turret.class, "targetAir", false, 5f);
+                addField(ExpFieldType.linear, "reloadTime", reloadTime, -2f);
+                addField(ExpFieldType.bool, "targetAir", false, 5f);
             }
 
             @Override
@@ -1023,7 +1025,7 @@ public class UnityBlocks implements ContentList{
 
                 maxLevel = 30;
 
-                addField(ExpFieldType.linear, ReloadTurret.class, "reloadTime", reloadTime, -1f);
+                addField(ExpFieldType.linear, "reloadTime", reloadTime, -1f);
             }
 
             @Override
@@ -1107,9 +1109,9 @@ public class UnityBlocks implements ContentList{
 
                 maxLevel = 30;
 
-                addField(ExpFieldType.linear, ReloadTurret.class, "reloadTime", reloadTime, -2f);
-                addField(ExpFieldType.linear, BaseTurret.class, "range", range, rangeInc);
-                addField(ExpFieldType.linear, ExpTurretPowerTurret.class, "basicFieldRadius", basicFieldRadius, 0.2f * 8f);
+                addField(ExpFieldType.linear, "reloadTime", reloadTime, -2f);
+                addField(ExpFieldType.linear, "range", range, rangeInc);
+                addField(ExpFieldType.linear, "basicFieldRadius", basicFieldRadius, 0.2f * 8f);
             }
         };
 
@@ -1158,8 +1160,8 @@ public class UnityBlocks implements ContentList{
 
                 maxLevel = 30;
 
-                addField(ExpFieldType.linear, ReloadTurret.class, "reloadTime", reloadTime, -2f);
-                addField(ExpFieldType.linear, BaseTurret.class, "range", range, rangeInc);
+                addField(ExpFieldType.linear, "reloadTime", reloadTime, -2f);
+                addField(ExpFieldType.linear, "range", range, rangeInc);
             }
         };
 
@@ -1238,7 +1240,7 @@ public class UnityBlocks implements ContentList{
                 ioPrecision = 20f;
                 orbMultiplier = 0.07f;
 
-                addField(ExpFieldType.list, Turret.class, "heatColor", Color.class, new Color[]{fromColor, toColor});
+                addField(ExpFieldType.list, "heatColor", Color.class, new Color[]{fromColor, toColor});
 
                 drawer = b -> {
                     if(b instanceof ExpTurretPowerTurretBuild tile){
@@ -1281,10 +1283,10 @@ public class UnityBlocks implements ContentList{
 
                 maxLevel = 10;
 
-                addField(ExpFieldType.list, Turret.class, "shots", Integer.class, new Integer[]{
+                addField(ExpFieldType.list, "shots", Integer.class, new Integer[]{
                     1, 1, 2, 2, 2, 3, 3, 4, 4, 5, 5
                 });
-                addField(ExpFieldType.list, Turret.class, "spread", Float.class, new Float[]{
+                addField(ExpFieldType.list, "spread", Float.class, new Float[]{
                     0f, 0f, 5f, 10f, 15f, 7f, 14f, 8f, 10f, 6f, 9f
                 });
             }
@@ -1292,6 +1294,13 @@ public class UnityBlocks implements ContentList{
 
         //endregion
         //region monolith
+
+        deflectorAura = new DeflectProjector("deflector-aura"){{
+            requirements(Category.defense, with(Items.copper, 1));
+            size = 4;
+
+            consumes.power(4f);
+        }};
 
         monolithAlloyForge = new StemGenericSmelter("monolith-alloy-forge"){{
             requirements(Category.crafting, with(Items.lead, 380, UnityItems.monolite, 240, Items.silicon, 400, Items.titanium, 240, Items.thorium, 90, Items.surgeAlloy, 160));

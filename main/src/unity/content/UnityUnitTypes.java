@@ -96,6 +96,9 @@ public class UnityUnitTypes implements ContentList{
 
     public static @FactionDef("end") UnitType opticaecus, devourer, ravager;
 
+    public static @EntityDef(base = UnitEntity.class, def = Extensionc.class)
+    UnitType extension;
+
     public static int getClassId(int index){
         return classIDs[index];
     }
@@ -2753,6 +2756,22 @@ public class UnityUnitTypes implements ContentList{
             public void init(){
                 super.init();
                 immunities.addAll(content.getBy(ContentType.status));
+            }
+        };
+
+        extension = new UnityUnitType("extension"){
+            {
+                speed = 0f;
+                hitSize = 0f;
+                health = 1;
+                rotateSpeed = 360f;
+                itemCapacity = 0;
+                commandLimit = 0;
+            }
+
+            @Override
+            public boolean isHidden(){
+                return true;
             }
         };
 

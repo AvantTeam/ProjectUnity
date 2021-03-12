@@ -20,8 +20,11 @@ import mindustry.type.*;
 import mindustry.world.*;
 import unity.graphics.*;
 
+import java.lang.reflect.*;
+
 import static mindustry.Vars.*;
 
+@SuppressWarnings("unchecked")
 public final class Utils{
     public static final PowIn pow6In = new PowIn(6);
 
@@ -154,6 +157,55 @@ public final class Utils{
             return (angle - val) % 360f;
         }
         return angle;
+    }
+
+    /** Finds a class from the parent classes that has a specific field */
+    public static Class<?> findClass(Class<?> type, String field){
+        Class<?> current = type.isAnonymousClass() ? type.getSuperclass() : type;
+
+        boolean found = false;
+        while(!found){
+            try{
+                current.getDeclaredField(field);
+            }catch(NoSuchFieldException e){
+                current = current.getSuperclass();
+                continue;
+            }
+
+            found = true;
+        }
+
+        return current;
+    }
+
+    /** A utility function to find a field without throwing {@link NoSuchFieldException} */
+    public static Field findField(Class<?> type, String field, boolean access){
+        try{
+            var f = findClass(type, field).getDeclaredField(field);
+            if(access) f.setAccessible(true);
+
+            return f;
+        }catch(NoSuchFieldException e){
+            throw new RuntimeException(e);
+        }
+    }
+
+    /** Sets a field of an object without throwing {@link IllegalAccessException} */
+    public static void setField(Object object, Field field, Object value){
+        try{
+            field.set(object, value);
+        }catch(Exception e){
+            throw new RuntimeException(e);
+        }
+    }
+
+    /** Gets a value from a field of an object without throwing {@link IllegalAccessException} */
+    public static <T> T getField(Object object, Field field){
+        try{
+            return (T)field.get(object);
+        }catch(Exception e){
+            throw new RuntimeException(e);
+        }
     }
 
     /** Same thing like the drawer from UnitType without applyColor and outlines. */

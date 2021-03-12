@@ -121,73 +121,50 @@ class ExpComp extends Block{
         this.upgradesPerLevel = upgradesPerLevel.toArray();
 
         for(ExpFieldType type : ExpFieldType.all){
-            try{
-                Seq<ExpField> fields = expFields.get(type, Seq::new);
-                int amount = fields.size;
+            Seq<ExpField> fields = expFields.get(type, Seq::new);
+            int amount = fields.size;
 
-                Class<?> classType = getClass();
-                boolean found = false;
-                while(
-                    !found &&
-                    Block.class.isAssignableFrom(classType)
-                ){
-                    try{
-                        classType.getDeclaredField(type.name() + "Inc");
-                    }catch(NoSuchFieldException e){
-                        classType = classType.getSuperclass();
-                        continue;
+            if(type != ExpFieldType.list){
+                Field fInc = Utils.findField(getClass(), type.name() + "Inc", false);
+                Field fIncMul = Utils.findField(getClass(), type.name() + "IncMul", false);
+                Field fIncStart = Utils.findField(getClass(), type.name() + "IncStart", false);
+
+                Utils.setField(this, fInc, (Entry<Class, Field>[])new Entry[amount]);
+                Utils.setField(this, fIncStart, type == ExpFieldType.bool ? new boolean[amount] : new float[amount]);
+                Utils.setField(this, fIncMul, new float[amount]);
+
+                for(int i = 0; i < amount; i++){
+                    ExpField field = fields.get(i);
+
+                    Entry<Class, Field> entry = (Utils.<Entry<Class, Field>[]>getField(this, fInc)[i] = new Entry<>());
+                    entry.key = field.classType;
+                    entry.value = field.field;
+
+                    if(type == ExpFieldType.bool){
+                        Utils.<boolean[]>getField(this, fIncStart)[i] = field.startBool;
+                    }else{
+                        Utils.<float[]>getField(this, fIncStart)[i] = field.startFloat;
                     }
 
-                    found = true;
+                    Utils.<float[]>getField(this, fIncMul)[i] = field.intensity;
                 }
+            }else{
+                listInc = new Entry[amount];
+                listIncMul = new Entry[amount];
 
-                //should not happen
-                if(!found) throw new IllegalStateException("No parent block classes with exp fields detected.");
+                for(int i = 0; i < amount; i++){
+                    ExpField field = fields.get(i);
 
-                if(type != ExpFieldType.list){
-                    Field fInc = classType.getDeclaredField(type.name() + "Inc");
-                    Field fIncMul = classType.getDeclaredField(type.name() + "IncMul");
-                    Field fIncStart = classType.getDeclaredField(type.name() + "IncStart");
+                    listInc[i] = new Entry<>(){{
+                        key = field.classType;
+                        value = field.field;
+                    }};
 
-                    fInc.set(this, (Entry<Class, Field>[])new Entry[amount]);
-                    fIncStart.set(this, type == ExpFieldType.bool ? new boolean[amount] : new float[amount]);
-                    fIncMul.set(this, new float[amount]);
-
-                    for(int i = 0; i < amount; i++){
-                        ExpField field = fields.get(i);
-
-                        Entry<Class, Field> entry = (((Entry<Class, Field>[])fInc.get(this))[i] = new Entry<>());
-                        entry.key = field.classType;
-                        entry.value = field.field;
-
-                        if(type == ExpFieldType.bool){
-                            ((boolean[])fIncStart.get(this))[i] = field.startBool;
-                        }else{
-                            ((float[])fIncStart.get(this))[i] = field.startFloat;
-                        }
-
-                        ((float[])fIncMul.get(this))[i] = field.intensity;
-                    }
-                }else{
-                    listInc = new Entry[amount];
-                    listIncMul = new Entry[amount];
-
-                    for(int i = 0; i < amount; i++){
-                        ExpField field = fields.get(i);
-
-                        listInc[i] = new Entry<>(){{
-                            key = field.classType;
-                            value = field.field;
-                        }};
-
-                        listIncMul[i] = new Entry<>(){{
-                            key = field.intensityType;
-                            value = field.intensityList;
-                        }};
-                    }
+                    listIncMul[i] = new Entry<>(){{
+                        key = field.intensityType;
+                        value = field.intensityList;
+                    }};
                 }
-            }catch(Exception e){
-                throw new RuntimeException(e);
             }
         }
 
@@ -287,85 +264,76 @@ class ExpComp extends Block{
         }});
     }
 
-    public <E extends Block> void addField(ExpFieldType type, Class<E> enclosing, String field, float startFloat){
-        addField(type, enclosing, field, startFloat, false, 1f, null, null);
+    public void addField(ExpFieldType type, String field, float startFloat){
+        addField(type, field, startFloat, false, 1f, null, null);
     }
 
-    public <E extends Block> void addField(ExpFieldType type, Class<E> enclosing, String field, float startFloat, float intensity){
-        addField(type, enclosing, field, startFloat, false, intensity, null, null);
+    public void addField(ExpFieldType type, String field, float startFloat, float intensity){
+        addField(type, field, startFloat, false, intensity, null, null);
     }
 
-    public <E extends Block> void addField(ExpFieldType type, Class<E> enclosing, String field, boolean startBool){
-        addField(type, enclosing, field, 0f, startBool, 1f, null, null);
+    public void addField(ExpFieldType type, String field, boolean startBool){
+        addField(type, field, 0f, startBool, 1f, null, null);
     }
 
-    public <E extends Block> void addField(ExpFieldType type, Class<E> enclosing, String field, boolean startBool, float intensity){
-        addField(type, enclosing, field, 0f, startBool, intensity, null, null);
+    public void addField(ExpFieldType type, String field, boolean startBool, float intensity){
+        addField(type, field, 0f, startBool, intensity, null, null);
     }
 
-    public <E extends Block, I> void addField(ExpFieldType type, Class<E> enclosing, String field, Class<I> intensityType, I[] intensity){
-        addField(type, enclosing, field, 0f, false, 0f, intensityType, intensity);
+    public <I> void addField(ExpFieldType type, String field, Class<I> intensityType, I[] intensity){
+        addField(type, field, 0f, false, 0f, intensityType, intensity);
     }
 
-    public <E extends Block, I> void addField(ExpFieldType type, Class<E> enclosing, String field, float startFloat, boolean startBool, float intensity, Class<I> intensityType, I[] intensityList){
-        try{
-            //had to do this because java is drunk
-            float f = startFloat;
-            boolean b = startBool;
-            float i = intensity;
-            I[] il = intensityList;
+    public <I> void addField(ExpFieldType type, String field, float startFloat, boolean startBool, float intensity, Class<I> intensityType, I[] intensityList){
+        float f = startFloat;
+        boolean b = startBool;
+        float i = intensity;
+        I[] il = intensityList;
 
-            expFields.get(type, Seq::new).add(new ExpField(type, enclosing, intensityType, enclosing.getDeclaredField(field)){{
-                startFloat = f;
-                startBool = b;
-                intensity = i;
-                intensityList = il;
-            }});
-        }catch(Exception e){
-            throw new RuntimeException(e);
-        }
+        expFields.get(type, Seq::new).add(new ExpField(type, Utils.findClass(getClass(), field), intensityType, Utils.findField(getClass(), field, true)){{
+            startFloat = f;
+            startBool = b;
+            intensity = i;
+            intensityList = il;
+        }});
     }
 
     public void setExpStats(ExpBuildc e){
         int level = e.level();
-        try{
-            linearExp(level);
-            expExp(level);
-            rootExp(level);
-            boolExp(level);
-            listExp(level);
-        }catch(Exception ex){
-            throw new RuntimeException(ex);
-        }
+        linearExp(level);
+        expExp(level);
+        rootExp(level);
+        boolExp(level);
+        listExp(level);
     }
 
-    public void linearExp(int level) throws Exception{
+    public void linearExp(int level){
         for(int i = 0; i < linearInc.length; i++){
-            linearInc[i].value.set(linearInc[i].key.cast(this), Math.max(linearIncStart[i] + linearIncMul[i] * level, 0f));
+            Utils.setField(linearInc[i].key.cast(this), linearInc[i].value, Math.max(linearIncStart[i] + linearIncMul[i] * level, 0f));
         }
     }
 
-    public void expExp(int level) throws Exception{
+    public void expExp(int level){
         for(int i = 0; i < expInc.length; i++){
-            expInc[i].value.set(expInc[i].key.cast(this), Math.max(expIncStart[i] * Mathf.pow(expIncMul[i], level), 0f));
+            Utils.setField(expInc[i].key.cast(this), expInc[i].value, Math.max(expIncStart[i] * Mathf.pow(expIncMul[i], level), 0f));
         }
     }
 
-    public void rootExp(int level) throws Exception{
+    public void rootExp(int level){
         for(int i = 0; i < rootInc.length; i++){
-            rootInc[i].value.set(rootInc[i].key.cast(this), Math.max(rootIncStart[i] + Mathf.sqrt(rootIncMul[i] * level), 0f));
+            Utils.setField(rootInc[i].key.cast(this), rootInc[i].value, Math.max(rootIncStart[i] + Mathf.sqrt(rootIncMul[i] * level), 0f));
         }
     }
 
-    public void boolExp(int level) throws Exception{
+    public void boolExp(int level){
         for(int i = 0; i < boolInc.length; i++){
-            boolInc[i].value.set(boolInc[i].key.cast(this), (boolIncStart[i]) ? (level < boolIncMul[i]) : (level >= boolIncMul[i]));
+            Utils.setField(boolInc[i].key.cast(this), boolInc[i].value, (boolIncStart[i]) ? (level < boolIncMul[i]) : (level >= boolIncMul[i]));
         }
     }
 
-    public void listExp(int level) throws Exception{
+    public void listExp(int level){
         for(int i = 0; i < listInc.length; i++){
-            listInc[i].value.set(listInc[i].key.cast(this), listIncMul[i].key.cast(listIncMul[i].value[level]));
+            Utils.setField(listInc[i].key.cast(this), listInc[i].value, listIncMul[i].key.cast(listIncMul[i].value[level]));
         }
     }
 

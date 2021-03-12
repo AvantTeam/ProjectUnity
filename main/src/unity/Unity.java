@@ -13,6 +13,7 @@ import mindustry.game.EventType.*;
 import unity.ai.kami.*;
 import unity.content.*;
 import unity.gen.*;
+import unity.graphics.UnityShaders;
 import unity.mod.*;
 import unity.sync.*;
 import unity.ui.*;
@@ -67,6 +68,7 @@ public class Unity extends Mod implements ApplicationListener{
                 UnityObjs.load();
                 UnitySounds.load();
                 UnityMusics.load();
+                UnityShaders.load();
             });
 
             Events.on(ClientLoadEvent.class, e -> addCredits());

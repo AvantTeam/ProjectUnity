@@ -22,6 +22,5 @@ public class ExpField{
         this.intensityType = intensityType;
 
         this.field = field;
-        this.field.setAccessible(true);
     }
 }
