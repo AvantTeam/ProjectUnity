@@ -132,6 +132,7 @@ public class UnityUnitTypes implements ContentList{
                 reload = 6f;
                 x = 5.25f;
                 y = 6.5f;
+                shootY = 1.5f;
                 shootSound = Sounds.pew;
                 ejectEffect = Fx.casing1;
                 bullet = new BasicBulletType(5f, 7f){{
@@ -142,6 +143,7 @@ public class UnityUnitTypes implements ContentList{
                 reload = 30f;
                 x = 4.5f;
                 y = 0.5f;
+                shootY = 2.25f;
                 shootSound = Sounds.shootSnap;
                 ejectEffect = Fx.casing2;
                 bullet = new MissileBulletType(3f, 1f){{
@@ -174,6 +176,8 @@ public class UnityUnitTypes implements ContentList{
             weapons.add(new Weapon(name + "-gun"){{
                 x = 1.5f;
                 y = 11f;
+                shootX = -0.75f;
+                shootY = 3f;
                 shootSound = Sounds.pew;
                 ejectEffect = Fx.casing1;
                 reload = 8f;
@@ -184,6 +188,8 @@ public class UnityUnitTypes implements ContentList{
             }}, new Weapon(name + "-gun"){{
                 x = 4f;
                 y = 8.75f;
+                shootX = -0.75f;
+                shootY = 3f;
                 shootSound = Sounds.shootSnap;
                 ejectEffect = Fx.casing1;
                 reload = 12f;
@@ -196,6 +202,8 @@ public class UnityUnitTypes implements ContentList{
             }}, new Weapon(name + "-gun-big"){{
                 x = 6.75f;
                 y = 5.75f;
+                shootX = -0.5f;
+                shootY = 2f;
                 shootSound = Sounds.shootBig;
                 ejectEffect = Fx.casing2;
                 reload = 30f;
@@ -228,6 +236,8 @@ public class UnityUnitTypes implements ContentList{
             weapons.add(new Weapon(name + "-gun"){{
                 x = 4.25f;
                 y = 14f;
+                shootX = -1f;
+                shootY = 2.75f;
                 reload = 15;
                 shootSound = Sounds.shootBig;
                 bullet = Bullets.standardThoriumBig;
@@ -236,6 +246,7 @@ public class UnityUnitTypes implements ContentList{
             weapons.add(new Weapon(name + "-tesla"){{
                 x = 7.75f;
                 y = 8.25f;
+                shootY = 5.25f;
                 reload = 30f;
                 shots = 5;
                 shootSound = Sounds.spark;
@@ -272,12 +283,16 @@ public class UnityUnitTypes implements ContentList{
             weapons.add(new Weapon(name + "-gun-big"){{
                 x = 8.25f;
                 y = 9.5f;
+                shootX = -1f;
+                shootY = 7.25f;
                 reload = 12f;
                 shootSound = Sounds.shootBig;
                 bullet = Bullets.standardDenseBig;
             }}, new Weapon(name + "-gun"){{
                 x = 6.5f;
                 y = 21.5f;
+                shootX = -0.25f;
+                shootY = 5.75f;
                 reload = 20f;
                 shots = 4;
                 shotDelay = 2f;
@@ -286,6 +301,7 @@ public class UnityUnitTypes implements ContentList{
             }}, new Weapon(name + "-laser-gun"){{
                 x = 13.5f;
                 y = 15.5f;
+                shootY = 4.5f;
                 reload = 60f;
                 shootSound = Sounds.laser;
                 bullet = new LaserBulletType(240f){
@@ -324,6 +340,7 @@ public class UnityUnitTypes implements ContentList{
             weapons.add(new Weapon(name + "-gun"){{
                 x = 14f;
                 y = 27f;
+                shootY = 5.5f;
                 shootSound = Sounds.shootBig;
                 ejectEffect = Fx.casing3Double;
                 reload = 10f;
@@ -331,6 +348,7 @@ public class UnityUnitTypes implements ContentList{
             }}, new Weapon(name + "-launcher"){{
                 x = 17f;
                 y = 14f;
+                shootY = 5.75f;
                 shootSound = Sounds.shootSnap;
                 ejectEffect = Fx.casing2;
                 shots = 2;
@@ -354,6 +372,7 @@ public class UnityUnitTypes implements ContentList{
                 rotateSpeed = 3f;
                 x = 8f;
                 y = 3f;
+                shootY = 6.75f;
                 shootSound = Sounds.shotgun;
                 ejectEffect = Fx.none;
                 shots = 3;

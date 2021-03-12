@@ -52,6 +52,8 @@ public class UnityBlocks implements ContentList{
     //global
     distributionDrill,
 
+    infusor,
+
     recursiveReconstructor,
     //@formatter:on
     lightLamp, oilLamp, lightLaser, lightLampInfi, lightReflector, lightReflector1, lightOmnimirror, lightFilter, lightInvertedFilter, lightDivisor, lightDivisor1, lightItemFilter, lightPanel, lightInfluencer,
@@ -204,6 +206,29 @@ public class UnityBlocks implements ContentList{
             consumes.liquid(Liquids.water, 0.06f).boost();
         }};
 
+        infusor = new ExplosiveSeparator("infusor"){{
+            requirements(Category.crafting, with(Items.graphite, 60, Items.silicon, 80));
+            size = 3;
+            health = 600;
+            craftTime = 125f;
+            spinnerSpeed = 2f;
+            liquidCapacity = 150f;
+            itemCapacity = 30;
+            fuelItem = Items.thorium;
+            results = with(
+                UnityItems.imberium, 1,
+                UnityItems.monolite, 1,
+                UnityItems.luminum, 1,
+                UnityItems.contagium, 1,
+                UnityItems.umbrium, 1,
+                UnityItems.xenium, 1
+            );
+
+            consumes.power(2f);
+            consumes.items(with(Items.scrap, 2, Items.thorium, 1));
+            consumes.liquid(Liquids.cryofluid, 0.2f);
+        }};
+
         recursiveReconstructor = new SelectableReconstructor("recursive-reconstructor"){{
             requirements(Category.units, with(Items.graphite, 1600, Items.silicon, 2000, Items.metaglass, 900, Items.thorium, 600, Items.lead, 1200, Items.plastanium, 3600));
             size = 11;
@@ -215,6 +240,8 @@ public class UnityBlocks implements ContentList{
                 new UnitType[]{UnitTypes.toxopid, UnityUnitTypes.araneidae},
 
                 new UnitType[]{UnitTypes.corvus, UnityUnitTypes.ursa},
+
+                new UnitType[]{UnityUnitTypes.rex, UnityUnitTypes.excelsus},
 
                 new UnitType[]{UnityUnitTypes.monument, UnityUnitTypes.colossus}
             );
