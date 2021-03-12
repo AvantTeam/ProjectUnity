@@ -18,9 +18,9 @@ import mindustry.world.*;
 import mindustry.ctype.*;
 import unity.entities.bullet.*;
 import unity.entities.bullet.exp.*;
-import unity.entities.comp.*;
 import unity.entities.units.*;
 import unity.gen.*;
+import unity.gen.Expc.*;
 import unity.graphics.*;
 import unity.util.*;
 

@@ -145,7 +145,6 @@ public class Unity extends Mod implements ApplicationListener{
         }
 
         FactionMeta.init();
-        ExpMeta.init();
         UnityEntityMapping.init();
     }
 

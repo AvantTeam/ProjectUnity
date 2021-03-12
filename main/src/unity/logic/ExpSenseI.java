@@ -3,7 +3,8 @@ package unity.logic;
 import mindustry.gen.*;
 import mindustry.logic.*;
 import mindustry.logic.LExecutor.*;
-import unity.entities.comp.ExpBuildc;
+import unity.gen.*;
+import unity.gen.Expc.*;
 import unity.world.blocks.*;
 
 public class ExpSenseI implements LInstruction{
@@ -34,7 +35,7 @@ public class ExpSenseI implements LInstruction{
                 }
 
                 case 2: {
-                    exec.setnum(res, build.expType().maxExp);
+                    exec.setnum(res, ((Expc)build.block()).maxExp());
                     break;
                 }
 

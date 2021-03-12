@@ -1,17 +1,17 @@
 package unity.entities.bullet.exp;
 
-import arc.Core;
-import arc.math.Mathf;
+import arc.*;
+import arc.math.*;
 import arc.math.geom.*;
-import arc.util.Time;
-import mindustry.Vars;
-import mindustry.entities.Damage;
-import mindustry.entities.bullet.BulletType;
+import arc.util.*;
+import mindustry.*;
+import mindustry.entities.*;
+import mindustry.entities.bullet.*;
 import mindustry.gen.*;
-import unity.content.UnityFx;
-import unity.entities.comp.ExpBuildc;
+import unity.content.*;
+import unity.gen.Expc.*;
 
-public class ExpLaserFieldBulletType extends ExpLaserBulletType {
+public class ExpLaserFieldBulletType extends ExpLaserBulletType{
     public BulletType distField;
     public float basicFieldRadius;
 

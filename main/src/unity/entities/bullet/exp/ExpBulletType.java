@@ -5,7 +5,7 @@ import arc.math.geom.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import unity.content.*;
-import unity.entities.comp.*;
+import unity.gen.Expc.*;
 
 public class ExpBulletType extends BulletType{
     /** Exp gained on hit, if owner is an exp block */

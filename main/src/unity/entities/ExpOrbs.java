@@ -14,7 +14,8 @@ import mindustry.world.blocks.distribution.*;
 import mindustry.world.blocks.distribution.Conveyor.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.blocks.production.Incinerator.*;
-import unity.entities.comp.*;
+import unity.gen.*;
+import unity.gen.Expc.*;
 import unity.type.exp.*;
 
 import static mindustry.Vars.*;
@@ -89,23 +90,23 @@ public class ExpOrbs{
             Tile tile = world.tileWorld(b.x, b.y);
             if(tile == null || tile.build == null) return;
 
-            ExpBlock block = null;
+            Expc block = null;
             ExpBuildc build = null;
             if(tile.build instanceof ExpBuildc exp){
                 build = exp;
-                block = build.expType();
+                block = (Expc)build.block();
             }
 
-            if(block != null && block.hasExp && build.consumesOrb()){
+            if(block != null && block.hasExp() && build.consumesOrb()){
                 //TODO make the building absorb the orb
                 b.remove();
             }else if(tile.block() instanceof Conveyor){
-                if(block != null && block.conveyor){
+                if(block != null && block.conveyor()){
                     expConveyor(b, block, build);
                 }else{
                     conveyor(b, (Conveyor)tile.block(), (ConveyorBuild)tile.build);
                 }
-            }else if(block != null && block.noOrbCollision){
+            }else if(block != null && block.noOrbCollision()){
                 return;
             }else if(tile.block() instanceof Incinerator && ((IncineratorBuild)tile.build).heat > 0.5f){
                 //TODO the effect, glenn
@@ -124,8 +125,8 @@ public class ExpOrbs{
             b.vel.add(d4x[build.rotation] * speed * build.delta(), d4y[build.rotation] * speed * build.delta());
         }
 
-        protected void expConveyor(Bullet b, ExpBlock block, ExpBuildc build){
-            Conveyor conv = (Conveyor)block.type;
+        protected void expConveyor(Bullet b, Expc block, ExpBuildc build){
+            Conveyor conv = (Conveyor)block;
             ConveyorBuild convBuild = (ConveyorBuild)build;
 
             if(convBuild.clogHeat > 0.5f || !convBuild.enabled) return;

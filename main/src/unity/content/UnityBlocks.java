@@ -22,16 +22,14 @@ import mindustry.ctype.*;
 import mindustry.content.*;
 import unity.annotations.Annotations.*;
 import unity.entities.bullet.*;
-import unity.entities.bullet.exp.ExpLaserFieldBulletType;
+import unity.entities.bullet.exp.*;
 import unity.gen.*;
 import unity.graphics.*;
-import unity.type.ExpType.*;
 import unity.type.exp.*;
 import unity.util.*;
 import unity.world.blocks.*;
 import unity.world.blocks.defense.*;
 import unity.world.blocks.defense.turrets.*;
-import unity.world.blocks.defense.turrets.exp.*;
 import unity.world.blocks.distribution.*;
 import unity.world.blocks.logic.*;
 import unity.world.blocks.power.*;
@@ -951,8 +949,8 @@ public class UnityBlocks implements ContentList{
 
                 maxLevel = 10;
 
-                addField(unity.type.exp.ExpFieldType.linear, ReloadTurret.class, "reloadTime", reloadTime, -2f);
-                addField(unity.type.exp.ExpFieldType.bool, Turret.class, "targetAir", false, 5f);
+                addField(ExpFieldType.linear, ReloadTurret.class, "reloadTime", reloadTime, -2f);
+                addField(ExpFieldType.bool, Turret.class, "targetAir", false, 5f);
             }
 
             @Override
@@ -998,7 +996,7 @@ public class UnityBlocks implements ContentList{
 
                 maxLevel = 30;
 
-                addField(unity.type.exp.ExpFieldType.linear, ReloadTurret.class, "reloadTime", reloadTime, -1f);
+                addField(ExpFieldType.linear, ReloadTurret.class, "reloadTime", reloadTime, -1f);
             }
 
             @Override
@@ -1082,9 +1080,9 @@ public class UnityBlocks implements ContentList{
 
                 maxLevel = 30;
 
-                addField(unity.type.exp.ExpFieldType.linear, ReloadTurret.class, "reloadTime", reloadTime, -2f);
-                addField(unity.type.exp.ExpFieldType.linear, BaseTurret.class, "range", range, rangeInc);
-                addField(unity.type.exp.ExpFieldType.linear, ExpTurretPowerTurret.class, "basicFieldRadius", basicFieldRadius, 0.2f * 8f);
+                addField(ExpFieldType.linear, ReloadTurret.class, "reloadTime", reloadTime, -2f);
+                addField(ExpFieldType.linear, BaseTurret.class, "range", range, rangeInc);
+                addField(ExpFieldType.linear, ExpTurretPowerTurret.class, "basicFieldRadius", basicFieldRadius, 0.2f * 8f);
             }
         };
 
@@ -1133,8 +1131,8 @@ public class UnityBlocks implements ContentList{
 
                 maxLevel = 30;
 
-                addField(unity.type.exp.ExpFieldType.linear, ReloadTurret.class, "reloadTime", reloadTime, -2f);
-                addField(unity.type.exp.ExpFieldType.linear, BaseTurret.class, "range", range, rangeInc);
+                addField(ExpFieldType.linear, ReloadTurret.class, "reloadTime", reloadTime, -2f);
+                addField(ExpFieldType.linear, BaseTurret.class, "range", range, rangeInc);
             }
         };
 
@@ -1213,7 +1211,7 @@ public class UnityBlocks implements ContentList{
                 ioPrecision = 20f;
                 orbMultiplier = 0.07f;
 
-                addField(unity.type.exp.ExpFieldType.list, Turret.class, "heatColor", Color.class, new Color[]{fromColor, toColor});
+                addField(ExpFieldType.list, Turret.class, "heatColor", Color.class, new Color[]{fromColor, toColor});
 
                 drawer = b -> {
                     if(b instanceof ExpTurretPowerTurretBuild tile){
@@ -1256,10 +1254,10 @@ public class UnityBlocks implements ContentList{
 
                 maxLevel = 10;
 
-                addField(unity.type.exp.ExpFieldType.list, Turret.class, "shots", Integer.class, new Integer[]{
+                addField(ExpFieldType.list, Turret.class, "shots", Integer.class, new Integer[]{
                     1, 1, 2, 2, 2, 3, 3, 4, 4, 5, 5
                 });
-                addField(unity.type.exp.ExpFieldType.list, Turret.class, "spread", Float.class, new Float[]{
+                addField(ExpFieldType.list, Turret.class, "spread", Float.class, new Float[]{
                     0f, 0f, 5f, 10f, 15f, 7f, 14f, 8f, 10f, 6f, 9f
                 });
             }
