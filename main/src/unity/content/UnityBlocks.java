@@ -1098,7 +1098,6 @@ public class UnityBlocks implements ContentList{
                 shootType = UnityBullets.fractalLaser;
                 buildVisibility = BuildVisibility.sandboxOnly;
 
-                rangeInc = 0.35f * 8f;
                 basicFieldRadius = 85f;
 
                 hasExp = true;
@@ -1108,7 +1107,7 @@ public class UnityBlocks implements ContentList{
                 maxLevel = 30;
 
                 addField(ExpFieldType.linear, ReloadTurret.class, "reloadTime", reloadTime, -2f);
-                addField(ExpFieldType.linear, BaseTurret.class, "range", range, rangeInc);
+                addField(ExpFieldType.linear, BaseTurret.class, "range", range, 0.35f * 8f);
                 addField(ExpFieldType.linear, ExpTurretPowerTurret.class, "basicFieldRadius", basicFieldRadius, 0.2f * 8f);
             }
         };
@@ -1125,7 +1124,6 @@ public class UnityBlocks implements ContentList{
                 powerUse = 15f;
                 targetAir = true;
                 range = 150f;
-                rangeInc = 0.25f * 8f;
                 rangeColor = UnityPal.expColor;
 
                 chargeTime = 50f;
@@ -1159,7 +1157,7 @@ public class UnityBlocks implements ContentList{
                 maxLevel = 30;
 
                 addField(ExpFieldType.linear, ReloadTurret.class, "reloadTime", reloadTime, -2f);
-                addField(ExpFieldType.linear, BaseTurret.class, "range", range, rangeInc);
+                addField(ExpFieldType.linear, BaseTurret.class, "range", range, 0.25f * 8f);
             }
         };
 
