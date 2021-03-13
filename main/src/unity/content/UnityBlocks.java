@@ -69,7 +69,7 @@ public class UnityBlocks implements ContentList{
 
     public static @FactionDef("light")
     Block photon, //graviton, gluon, higgsBoson, singularity,
-    electron; /*,
+    electron, zBoson; /*,
     proton, zBoson,
     neutron, wBoson;*/
 
@@ -618,6 +618,48 @@ public class UnityBlocks implements ContentList{
                 }
             };
         }};
+
+        zBoson = new RampupPowerTurret("z-boson"){
+            @Override
+            public void load(){
+                super.load();
+                baseRegion = atlas.find("unity-block-" + size);
+            }
+
+            {
+                requirements(Category.turret, with(Items.silicon, 290, UnityItems.luminum, 430, Items.titanium, 190, Items.thorium, 120, Items.surgeAlloy, 20));
+                health = 4000;
+                size = 5;
+                reloadTime = 40f;
+                range = 230f;
+                shootCone = 20f;
+                heatColor = Color.valueOf("ccffff");
+                coolantMultiplier = 1.9f;
+                rotateSpeed = 2.7f;
+                recoilAmount = 2f;
+                restitution = 0.09f;
+                cooldown = 0.008f;
+                powerUse = 3.6f;
+                targetAir = true;
+                shootSound = UnitySounds.zbosonShoot;
+                alternate = true;
+                shots = 2;
+                spread = 14f;
+                inaccuracy = 2.3f;
+
+                lightning = true;
+                lightningThreshold = 12f;
+                baseLightningLength = 16;
+                lightningLengthDec = 1;
+                baseLightningDamage = 18f;
+                lightningDamageDec = 1f;
+
+                barBaseY = -10.75f;
+                barLength = 20f;
+
+                shootType = UnityBullets.zBosonBolt;
+            }
+        };
 
         //endregion
         //region imber

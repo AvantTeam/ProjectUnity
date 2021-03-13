@@ -39,6 +39,8 @@ public class UnityBullets implements ContentList{
 
         plagueMissile,
 
+        zBosonBolt,
+
         orb, shockBeam, currentStroke, shielderBullet, plasmaFragTriangle, plasmaTriangle, surgeBomb,
 
         pylonLightning, pylonLaser, pylonLaserSmall, monumentRailBullet,
@@ -624,6 +626,13 @@ public class UnityBullets implements ContentList{
             @Override
             public void drawLight(Bullet b){}
         };
+
+        zBosonBolt = new VelocityLaserBoltBulletType(9.5f, 56f){{
+            splashDamage = 8f;
+            splashDamageRadius = 16f;
+            drag = 0.005f;
+            lifetime = 27f;
+        }};
 
         shockBeam = new BeamBulletType(120f, 35f){{
             status = StatusEffects.shocked;
