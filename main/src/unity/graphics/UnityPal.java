@@ -19,6 +19,8 @@ public class UnityPal{
 
         advance = valueOf("a3e3ff"),
         advanceDark = valueOf("59a7ff"),
+
+        lightHeat = valueOf("ccffff"),
         
         purpleLightning = valueOf("bf92f9"),
 

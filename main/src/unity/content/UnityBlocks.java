@@ -582,6 +582,7 @@ public class UnityBlocks implements ContentList{
             shootCone = 30f;
             range = 120f;
             powerUse = 4.5f;
+            heatColor = UnityPal.lightHeat;
             shootType = new ContinuousLaserBulletType(16f){{
                 incendChance = -1f;
                 length = 130f;
@@ -601,6 +602,7 @@ public class UnityBlocks implements ContentList{
             coolantMultiplier = 2f;
             range = 170f;
             powerUse = 6.6f;
+            heatColor = UnityPal.lightHeat;
             shootType = new BasicBulletType(6f, 26f, "unity-electric-shell"){{
                 lifetime = 30f;
                 width = 12f;
@@ -633,7 +635,7 @@ public class UnityBlocks implements ContentList{
                 reloadTime = 40f;
                 range = 230f;
                 shootCone = 20f;
-                heatColor = Color.valueOf("ccffff");
+                heatColor = UnityPal.lightHeat;
                 coolantMultiplier = 1.9f;
                 rotateSpeed = 2.7f;
                 recoilAmount = 2f;
