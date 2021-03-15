@@ -67,7 +67,7 @@ public class UnitCutEffect extends EffectState{
         unit.hitTime = 0f;
         offset.add(vel.x * Time.delta, vel.y * Time.delta);
         vel.scl(1f - Math.min(unit.drag, 0.1f));
-        if(Mathf.chanceDelta(0.2f)){
+        if(Mathf.chanceDelta(0.3f * (unit.hitSize / 45f))){
             tmpPoint2.trns(cutDirection.z, 0f, Mathf.range(unit.hitSize / 2f)).add(cutDirection.x + offset.x, cutDirection.y + offset.y).add(unit);
             Fx.fallSmoke.at(tmpPoint2.x, tmpPoint2.y);
         }
@@ -88,8 +88,7 @@ public class UnitCutEffect extends EffectState{
             //code is intentionally coded to not capture other layers as it could interfere with other cut effects
             color.set(Color.green);
             UnityShaders.stencilShader.stencilColor.set(color);
-            Vars.renderer.effectBuffer.begin(color.a(0f));
-            color.a(1f);
+            Vars.renderer.effectBuffer.begin(Color.clear);
 
             unit.draw();
             Draw.reset();
