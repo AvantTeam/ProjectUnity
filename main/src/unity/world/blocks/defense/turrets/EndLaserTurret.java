@@ -12,8 +12,8 @@ import mindustry.world.blocks.defense.turrets.*;
 import unity.gen.*;
 
 public class EndLaserTurret extends PowerTurret{
-    public float minDamage = 150f, minDamageTaken = 800f;
-    public float resistScl = 0.06f;
+    public float minDamage = 200f, minDamageTaken = 700f;
+    public float resistScl = 0.12f;
     public TextureRegion[] lightRegions;
     protected static float turretRotation = 0f;
 
@@ -56,7 +56,7 @@ public class EndLaserTurret extends PowerTurret{
         @Override
         public void updateTile(){
             if(health < lastHealth) health = lastHealth;
-            if(invFrame <= 15f) invFrame += Time.delta;
+            if(invFrame < 30f) invFrame += Time.delta;
 
             super.updateTile();
 
@@ -86,8 +86,8 @@ public class EndLaserTurret extends PowerTurret{
         @Override
         public void damage(float damage){
             if(damage > minDamage) resistance += (damage - minDamage) * resistScl;
-            if(invFrame < 15f) return;
-            float trueDamage = Mathf.clamp(damage, 0f, minDamageTaken);
+            if(invFrame < 30f) return;
+            float trueDamage = Mathf.clamp(damage, 0f, minDamageTaken) / resistance;
             lastHealth -= trueDamage;
             super.damage(trueDamage);
         }

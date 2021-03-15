@@ -90,11 +90,18 @@ public class EndCutterLaserBulletType extends BulletType{
                 building.damage(damage);
                 return false;
             }, unit -> {
+                float lastHealth = unit.health;
+                float extraDamage = (float)Math.pow(Mathf.clamp((unit.maxHealth + unit.type.dpsEstimate - 34000f) / 14000f, 0f, 8f), 2f);
+                float trueDamage = damage + Mathf.clamp((unit.maxHealth + unit.type.dpsEstimate - 22000f) / 2f, 0f, 90000000f);
+                trueDamage += extraDamage * (damage / 3f);
                 unit.apply(status, statusDuration);
-                unit.damage(damage);
-                if(unit instanceof AntiCheatBase) ((AntiCheatBase)unit).overrideAntiCheatDamage(damage * antiCheatScl);
-                if(unit.dead && unit.hitSize >= 30f){
-                    unit.remove();
+                if(unit instanceof AntiCheatBase){
+                    ((AntiCheatBase)unit).overrideAntiCheatDamage(damage * antiCheatScl);
+                }else{
+                    unit.damage(trueDamage);
+                }
+                if((unit.dead || unit.health >= Float.MAX_VALUE || (lastHealth - trueDamage < 0f && !(unit instanceof AntiCheatBase))) && (unit.hitSize >= 30f || unit.health >= Float.MAX_VALUE)){
+                    UnityAntiCheat.annihilateEntity(unit, true);
                     Tmp.v2.trns(b.rotation(), maxlength * 1.5f).add(b);
                     UnitCutEffect.createCut(unit, b.x, b.y, Tmp.v2.x, Tmp.v2.y);
                 }
