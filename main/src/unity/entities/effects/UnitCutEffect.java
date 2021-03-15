@@ -12,6 +12,7 @@ import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import unity.content.*;
 import unity.graphics.*;
 
 public class UnitCutEffect extends EffectState{
@@ -35,9 +36,10 @@ public class UnitCutEffect extends EffectState{
             l.y = unit.y;
             l.unit = unit;
             l.offset.setZero();
-            l.vel.trns(rot + (i * 180f), unit.hitSize / 30f);
+            l.vel.trns(rot + (i * 180f), unit.hitSize / 70f);
             l.add();
         }
+        UnityFx.tenmeikiriCut.at(unit.x + tmpPoint.x, unit.y + tmpPoint.y, rot + 90f, unit.hitSize * 1.5f);
     }
 
     @Override
@@ -65,6 +67,10 @@ public class UnitCutEffect extends EffectState{
         unit.hitTime = 0f;
         offset.add(vel.x * Time.delta, vel.y * Time.delta);
         vel.scl(1f - Math.min(unit.drag, 0.1f));
+        if(Mathf.chanceDelta(0.2f)){
+            tmpPoint2.trns(cutDirection.z, 0f, Mathf.range(unit.hitSize / 2f)).add(cutDirection.x + offset.x, cutDirection.y + offset.y).add(unit);
+            Fx.fallSmoke.at(tmpPoint2.x, tmpPoint2.y);
+        }
         time += Time.delta;
     }
 
@@ -82,7 +88,8 @@ public class UnitCutEffect extends EffectState{
             //code is intentionally coded to not capture other layers as it could interfere with other cut effects
             color.set(Color.green);
             UnityShaders.stencilShader.stencilColor.set(color);
-            Vars.renderer.effectBuffer.begin(Color.clear);
+            Vars.renderer.effectBuffer.begin(color.a(0f));
+            color.a(1f);
 
             unit.draw();
             Draw.reset();

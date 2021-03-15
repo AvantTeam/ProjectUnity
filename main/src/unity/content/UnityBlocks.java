@@ -2178,7 +2178,7 @@ public class UnityBlocks implements ContentList{
             requirements(Category.turret, with(Items.phaseFabric, 3000, Items.surgeAlloy, 4000,
             UnityItems.darkAlloy, 1800, UnityItems.terminum, 1200, UnityItems.terminaAlloy, 200));
 
-            health = 21000;
+            health = 23000;
             range = 900f;
             size = 15;
 
@@ -2209,7 +2209,7 @@ public class UnityBlocks implements ContentList{
             requirements(Category.turret, with(Items.phaseFabric, 9500, Items.surgeAlloy, 10500,
                 UnityItems.darkAlloy, 2300, UnityItems.lightAlloy, 2300, UnityItems.advanceAlloy, 2300,
                 UnityItems.plagueAlloy, 2300, UnityItems.sparkAlloy, 2300, UnityItems.monolithAlloy, 2300,
-                UnityItems.superAlloy, 2300, UnityItems.terminum, 1600, UnityItems.terminaAlloy, 800
+                UnityItems.superAlloy, 2300, UnityItems.terminum, 1600, UnityItems.terminaAlloy, 800, UnityItems.terminationFragment, 100
             ));
 
             shootCone = 360f;

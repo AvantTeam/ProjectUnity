@@ -767,6 +767,13 @@ public class UnityFx{
         });
     }),
 
+    tenmeikiriCut = new Effect(20f, 150f, e -> {
+        if(!(e.data instanceof Float)) return;
+        Draw.color(UnityPal.scarColor);
+        Drawf.tri(e.x, e.y, 12f * e.fout(), (float)e.data, e.rotation);
+        Drawf.tri(e.x, e.y, 12f * e.fout(), (float)e.data, e.rotation + 180f);
+    }),
+
     endGameShoot = new Effect(45f, 820f * 2f, e -> {
         float curve = Mathf.curve(e.fin(), 0f, 0.2f) * 820f;
         float curveB = Mathf.curve(e.fin(), 0f, 0.7f);
