@@ -16,6 +16,7 @@ import static mindustry.Vars.*;
 
 public class UnityShaders implements Loadable, Disposable{
     public static HolographicShieldShader holoShield;
+    public static StencilShader stencilShader;
 
     protected static UnityShader[] all;
 
@@ -26,7 +27,8 @@ public class UnityShaders implements Loadable, Disposable{
     @Override
     public void loadSync(){
         all = new UnityShader[]{
-            holoShield = new HolographicShieldShader()
+            holoShield = new HolographicShieldShader(),
+            stencilShader = new StencilShader()
         };
 
         for(int i = 0; i < all.length; i++){
@@ -55,6 +57,7 @@ public class UnityShaders implements Loadable, Disposable{
     public void dispose(){
         if(!headless){
             holoShield.dispose();
+            stencilShader.dispose();
         }
     }
 
@@ -73,6 +76,21 @@ public class UnityShaders implements Loadable, Disposable{
 
         public float getLayer(){
             return layer;
+        }
+    }
+
+    public static class StencilShader extends UnityShader{
+        public Color stencilColor = new Color();
+
+        public StencilShader(){
+            super(Core.files.internal("shaders/screenspace.vert"),
+            tree.get("shaders/unitystencil.frag"),
+            () -> false);
+        }
+
+        @Override
+        public void apply(){
+            setUniformf("stencilcolor", stencilColor);
         }
     }
 

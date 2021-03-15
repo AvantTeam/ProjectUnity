@@ -186,7 +186,10 @@ public class UnityBlocks implements ContentList{
     Block celsius, kelvin, xenoCorruptor, cube;
 
     public static @FactionDef("end")
-    Block terminalCrucible, endForge, endGame;
+    @LoadRegs(value = {
+        "tenmeikiri-base"
+    }, outline = true)
+    Block terminalCrucible, endForge, endGame, tenmeikiri;
 
     @Override
     public void load(){
@@ -2169,6 +2172,37 @@ public class UnityBlocks implements ContentList{
             };
             consumes.power(86.7f);
             consumes.items(with(UnityItems.terminum, 3, UnityItems.darkAlloy, 5, UnityItems.lightAlloy, 5));
+        }};
+
+        tenmeikiri = new EndLaserTurret("tenmeikiri"){{
+            requirements(Category.turret, with(Items.phaseFabric, 3000, Items.surgeAlloy, 4000,
+            UnityItems.darkAlloy, 1800, UnityItems.terminum, 1200, UnityItems.terminaAlloy, 200));
+
+            health = 21000;
+            range = 900f;
+            size = 15;
+
+            shootCone = 1.5f;
+            reloadTime = 5f * 60f;
+            coolantMultiplier = 0.5f;
+            recoilAmount = 15f;
+            powerUse = 350f;
+            absorbLasers = true;
+            shootLength = 0f;
+            shootType = new EndCutterLaserBulletType(7800f){{
+                maxlength = 1200f;
+                lifetime = 2.5f * 60f;
+                width = 30f;
+                laserSpeed = 80f;
+                status = StatusEffects.melting;
+                antiCheatScl = 3f;
+                statusDuration = 200f;
+                lightningColor = UnityPal.scarColor;
+                lightningDamage = 85f;
+                lightningLength = 15;
+            }};
+
+            consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.25f && liquid.flammability < 0.1f, 3.1f)).update(false);
         }};
 
         endGame = new EndGameTurret("endgame"){{

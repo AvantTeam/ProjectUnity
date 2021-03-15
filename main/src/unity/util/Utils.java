@@ -357,6 +357,10 @@ public final class Utils{
         return found && furthest != null ? Math.max(6f, Mathf.dst(wx, wy, furthest.worldx(), furthest.worldy())) : Mathf.dst(wx, wy, wx2, wy2);
     }
 
+    public static void collideLineRawEnemy(Team team, float x, float y, float x2, float y2, Boolf<Building> buildC, Cons<Unit> unitC, Effect effect){
+        collideLineRaw(x, y, x2, y2, b -> b.team != team, u -> u.team != team, buildC, unitC, null, effect);
+    }
+
     public static void collideLineRaw(float x, float y, float x2, float y2, Boolf<Building> buildB, Boolf<Unit> unitB, Boolf<Building> buildC, Cons<Unit> unitC){
         collideLineRaw(x, y, x2, y2, buildB, unitB, buildC, unitC, null, null);
     }
@@ -370,7 +374,7 @@ public final class Utils{
                 if(tile != null && (buildB == null || buildB.get(tile)) && !collidedBlocks.contains(tile.pos())){
                     boolean s = buildC.get(tile);
                     collidedBlocks.add(tile.pos());
-                    if(effect != null) effect.at(cx, cy);
+                    if(effect != null) effect.at(cx * tilesize, cy * tilesize);
                     if(s){
                         //Mathf.dst();
                         tV.trns(Angles.angle(x, y, x2, y2), Mathf.dst(x, y, tile.x, tile.y));
