@@ -36,7 +36,7 @@ public class UnitCutEffect extends EffectState{
             l.y = unit.y;
             l.unit = unit;
             l.offset.setZero();
-            l.vel.trns(rot + (i * 180f), unit.hitSize / 70f);
+            l.vel.trns(rot + (i * 180f), unit.hitSize / 60f);
             l.add();
         }
         UnityFx.tenmeikiriCut.at(unit.x + tmpPoint.x, unit.y + tmpPoint.y, rot + 90f, unit.hitSize * 1.5f);
@@ -88,6 +88,7 @@ public class UnitCutEffect extends EffectState{
             //code is intentionally coded to not capture other layers as it could interfere with other cut effects
             color.set(Color.green);
             UnityShaders.stencilShader.stencilColor.set(color);
+            UnityShaders.stencilShader.heatColor.set(Pal.lightFlame).lerp(Pal.darkFlame, fin());
             Vars.renderer.effectBuffer.begin(Color.clear);
 
             unit.draw();
@@ -98,7 +99,7 @@ public class UnitCutEffect extends EffectState{
             int[] dy = {0, 1, 1, 0};
 
             for(int i = 0; i < 4; i++){
-                tmpPoint2.trns(cutDirection.z, dy[i] * unit.hitSize, dx[i] * unit.hitSize).add(cutDirection.x, cutDirection.y).add(unit);
+                tmpPoint2.trns(cutDirection.z, dy[i] * unit.hitSize * 1.5f, dx[i] * unit.hitSize * 1.5f).add(cutDirection.x, cutDirection.y).add(unit);
                 for(int j = 0; j < 2; j++){
                     verts[(i * 2) + j] = j == 0 ? tmpPoint2.x : tmpPoint2.y;
                 }

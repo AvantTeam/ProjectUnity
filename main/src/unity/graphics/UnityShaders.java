@@ -81,6 +81,7 @@ public class UnityShaders implements Loadable, Disposable{
 
     public static class StencilShader extends UnityShader{
         public Color stencilColor = new Color();
+        public Color heatColor = new Color();
 
         public StencilShader(){
             super(Core.files.internal("shaders/screenspace.vert"),
@@ -91,6 +92,8 @@ public class UnityShaders implements Loadable, Disposable{
         @Override
         public void apply(){
             setUniformf("stencilcolor", stencilColor);
+            setUniformf("heatcolor", heatColor);
+            setUniformf("u_invsize", 1f / Core.camera.width, 1f / Core.camera.height);
         }
     }
 
