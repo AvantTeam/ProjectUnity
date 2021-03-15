@@ -128,6 +128,13 @@ public class EndLaserTurret extends PowerTurret{
         }
 
         @Override
+        protected void updateShooting(){
+            if(consValid()){
+                super.updateShooting();
+            }
+        }
+
+        @Override
         protected float baseReloadSpeed(){
             return bullet == null ? super.baseReloadSpeed() : 0f;
         }
