@@ -18,6 +18,7 @@ import mindustry.world.blocks.defense.turrets.Turret.*;
 import unity.entities.UnitVecData;
 import unity.entities.abilities.BaseAbility.*;
 import unity.entities.bullet.*;
+import unity.entities.effects.*;
 import unity.graphics.*;
 import unity.type.*;
 import unity.util.*;
@@ -772,6 +773,21 @@ public class UnityFx{
         Draw.color(UnityPal.scarColor, UnityPal.endColor, e.fin());
         Drawf.tri(e.x, e.y, 12f * e.fout(), (float)e.data, e.rotation);
         Drawf.tri(e.x, e.y, 12f * e.fout(), (float)e.data, e.rotation + 180f);
+    }),
+
+    tenmeikiriChargeBegin = new ParentEffect(158f, e -> {
+        Color[] colors = {UnityPal.scarColor, UnityPal.endColor, Color.white};
+        for(int ii = 0; ii < 3; ii++){
+            float s = (3 - ii) / 3f;
+            float width = Mathf.clamp(e.time / 80f) * (20f + Mathf.absin(Time.time + (ii * 1.4f), 1.1f, 5f)) * s;
+            float length = e.fin() * (100f + Mathf.absin(Time.time + (ii * 1.4f), 1.1f, 9f)) * s;
+            Draw.color(colors[ii]);
+            for(int i : Mathf.signs){
+                float rotation = e.rotation + (i * 90f);
+                Drawf.tri(e.x, e.y, width, length * 0.5f, rotation);
+            }
+            Drawf.tri(e.x, e.y, width, length * 1.5f, e.rotation);
+        }
     }),
 
     endGameShoot = new Effect(45f, 820f * 2f, e -> {

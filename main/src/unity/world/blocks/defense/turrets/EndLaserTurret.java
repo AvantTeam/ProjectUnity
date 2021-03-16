@@ -54,6 +54,37 @@ public class EndLaserTurret extends PowerTurret{
         private float invFrame = 0f;
 
         @Override
+        protected void shoot(BulletType type){
+            if(chargeTime > 0){
+                useAmmo();
+
+                tr.trns(rotation, shootLength);
+                chargeBeginEffect.at(x + tr.x, y + tr.y, 0f, this);
+                chargeSound.at(x + tr.x, y + tr.y, 1);
+
+                for(int i = 0; i < chargeEffects; i++){
+                    Time.run(Mathf.random(chargeMaxDelay), () -> {
+                        if(!isValid()) return;
+                        tr.trns(rotation, shootLength);
+                        chargeEffect.at(x + tr.x, y + tr.y, rotation);
+                    });
+                }
+
+                charging = true;
+
+                Time.run(chargeTime, () -> {
+                    if(!isValid()) return;
+                    tr.trns(rotation, shootLength);
+                    recoil = recoilAmount;
+                    heat = 1f;
+                    bullet(type, rotation + Mathf.range(inaccuracy));
+                    effects();
+                    charging = false;
+                });
+            }
+        }
+
+        @Override
         public void updateTile(){
             if(health < lastHealth) health = lastHealth;
             if(invFrame < 30f) invFrame += Time.delta;
@@ -112,6 +143,11 @@ public class EndLaserTurret extends PowerTurret{
         }
 
         @Override
+        public boolean shouldTurn(){
+            return true;
+        }
+
+        @Override
         protected void bullet(BulletType type, float angle){
             bullet = type.create(tile.build, team, x + tr.x, y + tr.y, angle);
         }
@@ -129,7 +165,7 @@ public class EndLaserTurret extends PowerTurret{
 
         @Override
         protected void updateShooting(){
-            if(consValid()){
+            if(consValid() && !charging){
                 super.updateShooting();
             }
         }

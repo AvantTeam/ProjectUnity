@@ -22,7 +22,6 @@ import mindustry.ctype.*;
 import mindustry.content.*;
 import unity.annotations.Annotations.*;
 import unity.entities.bullet.*;
-import unity.entities.bullet.exp.*;
 import unity.gen.*;
 import unity.graphics.*;
 import unity.type.exp.*;
@@ -2188,7 +2187,12 @@ public class UnityBlocks implements ContentList{
             recoilAmount = 15f;
             powerUse = 350f;
             absorbLasers = true;
-            shootLength = 0f;
+            shootLength = 8f;
+            chargeTime = 158f;
+            chargeBeginEffect = UnityFx.tenmeikiriChargeBegin;
+            chargeSound = UnitySounds.tenmeikiriCharge;
+            shootSound = UnitySounds.tenmeikiriShoot;
+            shootShake = 4f;
             shootType = new EndCutterLaserBulletType(7800f){{
                 maxlength = 1200f;
                 lifetime = 2.5f * 60f;

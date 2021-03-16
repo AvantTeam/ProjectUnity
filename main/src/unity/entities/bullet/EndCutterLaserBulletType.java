@@ -113,7 +113,7 @@ public class EndCutterLaserBulletType extends BulletType{
             if(vec.y >= 1f && b.fdata > vec.x){
                 int dst = Math.max(Mathf.round((b.fdata - vec.x) / 5), 1);
                 for(int i = 0; i < dst; i++){
-                    float f = Mathf.lerp(vec.x, b.fdata, i / (float)dst);
+                    float f = Mathf.lerp(vec.x, b.fdata, (float)i / dst);
                     Tmp.v1.trns(b.rotation(), f).add(b);
                     Lightning.create(b.team, lightningColor, lightningDamage, Tmp.v1.x, Tmp.v1.y, b.rotation() + Mathf.range(20f), lightningLength);
                 }
