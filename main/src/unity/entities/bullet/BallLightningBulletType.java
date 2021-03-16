@@ -16,8 +16,11 @@ public class BallLightningBulletType extends BasicBulletType{
 
     public BallLightningBulletType(float speed, float damage, String sprite){
         super(speed, damage, sprite);
-        collides = false;
         shrinkY = 0f;
+        keepVelocity = false;
+        collides = false;
+        pierce = true;
+        hittable = false;
     }
 
     public BallLightningBulletType(float speed, float damage){
