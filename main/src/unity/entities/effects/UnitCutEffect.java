@@ -33,13 +33,13 @@ public class UnitCutEffect extends EffectState{
         for(int i = 0; i < 2; i++){
             UnitCutEffect l = Pools.obtain(UnitCutEffect.class, UnitCutEffect::new);
             l.cutDirection.set(tmpPoint.x, tmpPoint.y, rot + (i * 180f));
-            l.lifetime = 40f + (unit.hitSize / 20f) + Mathf.range(1f, 5f);
+            l.lifetime = 40f + (unit.hitSize / 20f) + Mathf.range(2f, 5f);
             l.x = unit.x;
             l.y = unit.y;
             l.unit = unit;
             l.rotationVelocity = -(Mathf.signs[i] * 1.2f) + Mathf.range(0.7f);
             l.offset.setZero();
-            l.vel.trns(rot + (i * 180f), unit.hitSize / 60f);
+            l.vel.trns(rot + 180f + (i * 180f), unit.hitSize / 60f);
             l.add();
         }
         UnityFx.tenmeikiriCut.at(unit.x + tmpPoint.x, unit.y + tmpPoint.y, rot + 90f, unit.hitSize * 1.5f);
@@ -91,7 +91,7 @@ public class UnitCutEffect extends EffectState{
 
         Draw.draw(z, () -> {
             tmpPoint.set(Core.camera.position);
-            Core.camera.position.set(tmpPoint).add(offset);
+            Core.camera.position.set(tmpPoint).sub(offset);
             Core.camera.update();
             Draw.proj(Core.camera);
 
