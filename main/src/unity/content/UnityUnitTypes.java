@@ -2559,8 +2559,13 @@ public class UnityUnitTypes implements ContentList{
                     @Override
                     public void hitEntity(Bullet b, Hitboxc other, float initialHealth){
                         super.hitEntity(b, other, initialHealth);
-                        if(other instanceof Unit tmp){
-                            float threat = tmp.maxHealth + tmp.type.dpsEstimate;
+                        if(other instanceof Unit unit){
+                            float threat = unit.maxHealth + unit.type.dpsEstimate;
+                            float extraDamage = (float)Math.pow(Mathf.clamp((unit.maxHealth + unit.type.dpsEstimate - 43000f) / 14000f, 0f, 8f), 2f);
+                            float trueDamage = damage + Mathf.clamp((unit.maxHealth + unit.type.dpsEstimate - 32000f) / 2f, 0f, 90000000f);
+                            trueDamage += extraDamage * (damage / 3f);
+
+                            if(!(other instanceof AntiCheatBase)) unit.damage(trueDamage);
                             if((Float.isInfinite(threat) || Float.isNaN(threat) || threat >= Float.MAX_VALUE) && !(other instanceof AntiCheatBase)) UnityAntiCheat.annihilateEntity(other, false);
                         }
                         if(other instanceof AntiCheatBase) ((AntiCheatBase)other).overrideAntiCheatDamage(damage * 4f, 2);
@@ -2649,6 +2654,32 @@ public class UnityUnitTypes implements ContentList{
                     @Override
                     public void hitEntity(Bullet b, Hitboxc other, float initialHealth){
                         super.hitEntity(b, other, initialHealth);
+                        if(other instanceof Unit unit){
+                            for(Ability ability : unit.abilities){
+                                if(ability instanceof ForceFieldAbility force){
+                                    if(force.max >= 10000){
+                                        force.max -= force.max / 35f;
+                                        unit.shield = Math.min(force.max, unit.shield);
+                                    }
+                                    if(force.radius > unit.hitSize * 4f){
+                                        force.radius -= force.radius / 20f;
+                                    }
+                                    if(force.regen > 2700f / 5f) force.regen /= 1.2f;
+                                    continue;
+                                }
+                                if(ability instanceof RepairFieldAbility repair){
+                                    if(repair.amount > unit.maxHealth / 7f) repair.amount *= 0.9f;
+                                    continue;
+                                }
+                                if(ability instanceof StatusFieldAbility status){
+                                    if((status.effect.damage < -unit.maxHealth / 20f || status.effect.reloadMultiplier > 8f) && status.duration > 20f){
+                                        statusDuration -= statusDuration / 15f;
+                                    }
+                                }
+                            }
+                            unit.shield -= damage * 0.4f;
+                            if(unit.armor > unit.hitSize) unit.armor -= Math.max(damage, unit.armor / 20f);
+                        }
                         if(other instanceof AntiCheatBase) ((AntiCheatBase)other).overrideAntiCheatDamage(damage * 6f, 3);
                     }
                 };

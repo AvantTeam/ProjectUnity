@@ -769,7 +769,7 @@ public class UnityFx{
 
     tenmeikiriCut = new Effect(20f, 150f, e -> {
         if(!(e.data instanceof Float)) return;
-        Draw.color(UnityPal.scarColor);
+        Draw.color(UnityPal.scarColor, UnityPal.endColor, e.fin());
         Drawf.tri(e.x, e.y, 12f * e.fout(), (float)e.data, e.rotation);
         Drawf.tri(e.x, e.y, 12f * e.fout(), (float)e.data, e.rotation + 180f);
     }),

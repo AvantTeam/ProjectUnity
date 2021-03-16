@@ -36,7 +36,7 @@ void main(){
         vec4 scanyn = texture2D(u_texture, T + vec2(0.0, -scan) * v);
         
         if(color.a > 0.1 && (cequal(scanxp.xyz, stencilcolor.xyz) || cequal(scanxn.xyz, stencilcolor.xyz) || cequal(scanyp.xyz, stencilcolor.xyz) || cequal(scanyn.xyz, stencilcolor.xyz))){
-            color += heatcolor;
+            color.xyz += heatcolor.xyz;
         }
     }
     

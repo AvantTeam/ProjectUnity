@@ -91,8 +91,8 @@ public class EndCutterLaserBulletType extends BulletType{
                 return false;
             }, unit -> {
                 float lastHealth = unit.health;
-                float extraDamage = (float)Math.pow(Mathf.clamp((unit.maxHealth + unit.type.dpsEstimate - 34000f) / 14000f, 0f, 8f), 2f);
-                float trueDamage = damage + Mathf.clamp((unit.maxHealth + unit.type.dpsEstimate - 22000f) / 2f, 0f, 90000000f);
+                float extraDamage = (float)Math.pow(Mathf.clamp((unit.maxHealth + unit.type.dpsEstimate - 43000f) / 14000f, 0f, 8f), 2f);
+                float trueDamage = damage + Mathf.clamp((unit.maxHealth + unit.type.dpsEstimate - 32000f) / 2f, 0f, 90000000f);
                 trueDamage += extraDamage * (damage / 3f);
                 unit.apply(status, statusDuration);
                 if(unit instanceof AntiCheatBase){

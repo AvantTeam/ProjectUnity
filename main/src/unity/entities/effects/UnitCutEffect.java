@@ -20,6 +20,8 @@ public class UnitCutEffect extends EffectState{
     static Color color = new Color();
     Unit unit;
     Vec3 cutDirection = new Vec3();
+    float rotationVelocity = 0f;
+    float rotationOffset = 0f;
     Vec2 vel = new Vec2(), offset = new Vec2();
 
     public static void createCut(Unit unit, float x, float y, float x2, float y2){
@@ -35,6 +37,7 @@ public class UnitCutEffect extends EffectState{
             l.x = unit.x;
             l.y = unit.y;
             l.unit = unit;
+            l.rotationVelocity = -(Mathf.signs[i] * 1.2f) + Mathf.range(0.7f);
             l.offset.setZero();
             l.vel.trns(rot + (i * 180f), unit.hitSize / 60f);
             l.add();
@@ -51,6 +54,8 @@ public class UnitCutEffect extends EffectState{
     public void reset(){
         super.reset();
         unit = null;
+        rotationVelocity = 0f;
+        rotationOffset = 0f;
     }
 
     @Override
@@ -66,12 +71,18 @@ public class UnitCutEffect extends EffectState{
         }
         unit.hitTime = 0f;
         offset.add(vel.x * Time.delta, vel.y * Time.delta);
-        vel.scl(1f - Math.min(unit.drag, 0.1f));
-        if(Mathf.chanceDelta(0.3f * (unit.hitSize / 45f))){
-            tmpPoint2.trns(cutDirection.z, 0f, Mathf.range(unit.hitSize / 2f)).add(cutDirection.x + offset.x, cutDirection.y + offset.y).add(unit);
+        rotationOffset += Time.delta * rotationVelocity;
+        vel.scl(1f - Math.min(unit.drag, 0.07f));
+        rotationVelocity *= 1f - Math.min(unit.drag, 0.07f);
+        if(Mathf.chanceDelta(0.4f * (unit.hitSize / 45f))){
+            tmpPoint2.trns(cutDirection.z + rotationOffset, 0f, Mathf.range(unit.hitSize / 2f)).add(cutDirection.x + offset.x, cutDirection.y + offset.y).add(unit);
             Fx.fallSmoke.at(tmpPoint2.x, tmpPoint2.y);
         }
         time += Time.delta;
+    }
+
+    public float size(){
+        return unit instanceof LegsUnit ? unit.hitSize + (unit.type.legLength * 2f) : unit.hitSize;
     }
 
     @Override
@@ -91,7 +102,10 @@ public class UnitCutEffect extends EffectState{
             UnityShaders.stencilShader.heatColor.set(Pal.lightFlame).lerp(Pal.darkFlame, fin());
             Vars.renderer.effectBuffer.begin(Color.clear);
 
+            float lastRotation = unit.rotation;
+            unit.rotation = lastRotation + rotationOffset;
             unit.draw();
+            unit.rotation = lastRotation;
             Draw.reset();
 
             float[] verts = new float[8];
@@ -99,7 +113,7 @@ public class UnitCutEffect extends EffectState{
             int[] dy = {0, 1, 1, 0};
 
             for(int i = 0; i < 4; i++){
-                tmpPoint2.trns(cutDirection.z, dy[i] * unit.hitSize * 1.5f, dx[i] * unit.hitSize * 1.5f).add(cutDirection.x, cutDirection.y).add(unit);
+                tmpPoint2.trns(cutDirection.z + rotationOffset, dy[i] * size() * 1.5f, dx[i] * size() * 1.5f).add(cutDirection.x, cutDirection.y).add(unit);
                 for(int j = 0; j < 2; j++){
                     verts[(i * 2) + j] = j == 0 ? tmpPoint2.x : tmpPoint2.y;
                 }
