@@ -1,5 +1,6 @@
 package unity.content;
 
+import arc.*;
 import arc.func.*;
 import arc.math.*;
 import arc.graphics.*;
@@ -54,7 +55,7 @@ public class UnityUnitTypes implements ContentList{
     
     /** Global {@linkplain LegsUnit legs} units */
     public static @EntityPoint(LegsUnit.class)
-    UnitType ursa, araneidae, theraphosidae;
+    UnitType orion, araneidae, theraphosidae;
 
     /** Global naval units */
     public static UnitType//@formatter:off
@@ -454,57 +455,67 @@ public class UnityUnitTypes implements ContentList{
         //endregion
         //region ground-units
         
-        ursa = new UnityUnitType("ursa"){{
+        orion = new UnityUnitType("orion"){{
             speed = 0.3f;
             health = 20000;
             mechFrontSway = 1.9f;
             mechSideSway = 0.6f;
             hitSize = 31f;
-            weapons.add(new Weapon(name + "-laser"){{
-                alternate = true;
-                reload = 40f;
+            weapons.add(new Weapon(){{
+                reload = 300f;
                 ejectEffect = Fx.none;
                 shootCone = 10f;
                 shootSound = Sounds.laserblast;
-                // chargeSound = Sounds.lasercharge;
+                chargeSound = Sounds.lasercharge;
+                firstShotDelay = Fx.greenLaserCharge.lifetime;
                 soundPitchMin = 1f;
+                mirror = false;
                 top = false;
+                x = 0f;
                 shake = 14f;
-                shootX = 1.5f;
-                shootY = 16f;
                 recoil = 5f;
-                x = 30.75f;
-                y = 0f;
-                x = 21;
                 shots = 1;
+                allowLegStep = true;
                 shootStatus = StatusEffects.unmoving;
-                shootStatusDuration = 45f;
-                // firstShotDelay = Fx.greenLaserCharge.lifetime;
-                bullet = new LaserBulletType(){{
-                    length = 460f;
-                    damage = 270f;
-                    width = 75f;
+                shootStatusDuration = 140f;
+                bullet = new BallLightningBulletType(0.5f, 20f, "unity-lightning-ball"){{
+                    frontColor = Color.white;
+                    backColor = ballLightningColor = Pal.heal;
+                    lifetime = 300f;
 
-                    lifetime = 65f;
+                    width = height = 24f;
+                    damageRadius = 12f;
 
-                    lightningSpacing = 35f;
-                    lightningLength = 5;
-                    lightningDelay = 1.1f;
-                    lightningLengthRand = 15;
-                    lightningDamage = 35;
-                    lightningAngleRand = 40f;
-                    largeHit = true;
-                    lightColor = lightningColor = Pal.heal;
+                    shootEffect = Fx.greenLaserCharge;
+                    hitEffect = Fx.none;
+                    despawnEffect = Fx.none;
+                    
+                    ballLightnings = 5;
+                    ballLightningInaccuracy = 30f;
+                    ballLightningRange = 80f;
+                    ballLightningDamage = 25f;
+                    ballLightningLength = 12;
+                    ballLightningLengthRand = 4;
 
-                    // shootEffect = Fx.greenLaserCharge;
+                    fragBullets = 3;
+                    fragCone = 45f;
+                    fragVelocityMin = 1f;
+                    fragBullet  = new BallLightningBulletType(0.5f, 5f, "unity-lightning-ball"){{
+                        frontColor = Color.white;
+                        backColor = ballLightningColor = Pal.heal;
+                        lifetime = 300f;
 
-                    healPercent = 10f;
-                    collidesTeam = true;
-
-                    sideAngle = 20f;
-                    sideWidth = 1f;
-                    sideLength = 140f;
-                    colors = new Color[]{Pal.heal.cpy().a(0.4f), Pal.heal, Color.white};
+                        width = height = 12f;
+                        damageRadius = 6f;
+                        
+                        hitEffect = Fx.none;
+                        despawnEffect = Fx.none;
+                        
+                        ballLightningRange = 50f;
+                        ballLightningDamage = 20f;
+                        ballLightningLength = 8;
+                        ballLightningLengthRand = 2;
+                    }};
                 }};
             }});
         }};

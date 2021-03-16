@@ -213,7 +213,7 @@ public class UnityBlocks implements ContentList{
             upgrades.add(
                 new UnitType[]{UnitTypes.toxopid, UnityUnitTypes.araneidae},
 
-                new UnitType[]{UnitTypes.corvus, UnityUnitTypes.ursa},
+                new UnitType[]{UnitTypes.corvus, UnityUnitTypes.orion},
 
                 new UnitType[]{UnityUnitTypes.rex, UnityUnitTypes.excelsus},
 
