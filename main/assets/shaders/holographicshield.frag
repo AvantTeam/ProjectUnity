@@ -20,12 +20,16 @@ void stripe(out vec4 color, vec2 coord, float stroke) {
 void main() {
     vec2 T = v_texCoords.xy;
     vec4 color = texture2D(u_texture, T);
+    float last = color.a;
 
-    stripe(color, T, 1.8 * u_scl);
-    vec2 pos = T - u_offset.xy;
+    if(color.a > 0.01){
+        stripe(color, T, 1.8 * u_scl);
+        vec2 pos = T - u_offset.xy;
 
-    color *= absin(pos.y + u_time * u_scl, 15.0 * u_scl, 0.6) + 0.4;
-    color.a = 0.36;
+        color *= absin(pos.y + u_time * u_scl, 15.0 * u_scl, 0.6) + 0.4;
+        color.a = 0.36;
+        color.a *= last;
+    }
 
     gl_FragColor = color;
 }
