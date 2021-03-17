@@ -18,7 +18,7 @@ import unity.util.*;
 public class EndCutterLaserBulletType extends BulletType{
     public float maxlength = 1000f;
     public float laserSpeed = 15f;
-    public float accel = 30f;
+    public float accel = 25f;
     public float width = 12f;
     public float antiCheatScl = 1f;
     public float fadeTime = 60f;
@@ -49,13 +49,14 @@ public class EndCutterLaserBulletType extends BulletType{
     @Override
     public void draw(Bullet b){
         float fade = Mathf.clamp(b.time > b.lifetime - fadeTime ? 1f - (b.time - (lifetime - fadeTime)) / fadeTime : 1f) * Mathf.clamp(b.time / fadeInTime);
+        float tipHeight = width / 2f;
 
         Lines.lineAngle(b.x, b.y, b.rotation(), b.fdata);
         for(int i = 0; i < colors.length; i++){
             float f = ((float)(colors.length - i) / colors.length);
             float w = f * (width + Mathf.absin(Time.time + (i * 1.4f), 1.1f, width / 4)) * fade;
 
-            Tmp.v2.trns(b.rotation(), b.fdata).add(b);
+            Tmp.v2.trns(b.rotation(), b.fdata - tipHeight).add(b);
             Tmp.v1.trns(b.rotation(), width * 2f).add(Tmp.v2);
             Draw.color(colors[i]);
             Fill.circle(b.x, b.y, w / 2f);
@@ -66,7 +67,7 @@ public class EndCutterLaserBulletType extends BulletType{
                 Fill.tri(Tmp.v2.x, Tmp.v2.y, Tmp.v1.x, Tmp.v1.y, Tmp.v2.x + Tmp.v3.x, Tmp.v2.y + Tmp.v3.y);
             }
         }
-        Tmp.v2.trns(b.rotation(), b.fdata + width).add(b);
+        Tmp.v2.trns(b.rotation(), b.fdata + tipHeight).add(b);
         Drawf.light(b.team, b.x, b.y, Tmp.v2.x, Tmp.v2.y, width * 2f, colors[0], 0.5f);
         Draw.reset();
     }
@@ -113,14 +114,15 @@ public class EndCutterLaserBulletType extends BulletType{
                 }else{
                     unit.damage(trueDamage);
                 }
-                if(unit.maxHealth > damage * 2f){
+                if(unit.health > damage){
                     Tmp.v2.trns(b.rotation(), maxlength * 1.5f).add(b);
                     float dst = Intersector.distanceLinePoint(b.x, b.y, Tmp.v2.x, Tmp.v2.y, unit.x, unit.y);
-                    b.fdata = ((b.dst(unit) - (unit.hitSize / 2f)) + dst) + 10f;
+                    b.fdata = ((b.dst(unit) - (unit.hitSize / 2f)) + dst) + 4f;
                     if(b.data instanceof LaserData){
-                        ((LaserData)b.data).velocity = 0f;
-                        ((LaserData)b.data).restartTime = 0f;
-                        ((LaserData)b.data).velocityTime = 0f;
+                        LaserData data = (LaserData)b.data;
+                        data.velocity = 0f;
+                        data.restartTime = 0f;
+                        data.velocityTime = 0f;
                     }
                     hit = true;
                 }

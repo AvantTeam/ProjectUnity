@@ -775,18 +775,27 @@ public class UnityFx{
         Drawf.tri(e.x, e.y, 12f * e.fout(), (float)e.data, e.rotation + 180f);
     }),
 
+    tenmeikiriChargeEffect = new ParentEffect(40f, e -> {
+        Angles.randLenVectors(e.id, 2, 10f, 90f, (x, y) -> {
+            float angle = Mathf.angle(x, y);
+            Draw.color(UnityPal.scarColor, UnityPal.endColor, e.fin());
+            Lines.stroke(1.5f);
+            Lines.lineAngleCenter(e.x + (x * e.fout()), e.y + (y * e.fout()), angle, e.fslope() * 13f);
+        });
+    }),
+
     tenmeikiriChargeBegin = new ParentEffect(158f, e -> {
         Color[] colors = {UnityPal.scarColor, UnityPal.endColor, Color.white};
         for(int ii = 0; ii < 3; ii++){
             float s = (3 - ii) / 3f;
-            float width = Mathf.clamp(e.time / 80f) * (20f + Mathf.absin(Time.time + (ii * 1.4f), 1.1f, 5f)) * s;
-            float length = e.fin() * (100f + Mathf.absin(Time.time + (ii * 1.4f), 1.1f, 9f)) * s;
+            float width = Mathf.clamp(e.time / 80f) * (20f + Mathf.absin(Time.time + (ii * 1.4f), 1.1f, 7f)) * s;
+            float length = e.fin() * (100f + Mathf.absin(Time.time + (ii * 1.4f), 1.1f, 11f)) * s;
             Draw.color(colors[ii]);
             for(int i : Mathf.signs){
                 float rotation = e.rotation + (i * 90f);
                 Drawf.tri(e.x, e.y, width, length * 0.5f, rotation);
             }
-            Drawf.tri(e.x, e.y, width, length * 1.5f, e.rotation);
+            Drawf.tri(e.x, e.y, width, length * 1.25f, e.rotation);
         }
     }),
 

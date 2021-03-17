@@ -2190,13 +2190,16 @@ public class UnityBlocks implements ContentList{
             absorbLasers = true;
             shootLength = 8f;
             chargeTime = 158f;
+            chargeEffects = 12;
+            chargeMaxDelay = 80f;
+            chargeEffect = UnityFx.tenmeikiriChargeEffect;
             chargeBeginEffect = UnityFx.tenmeikiriChargeBegin;
             chargeSound = UnitySounds.tenmeikiriCharge;
             shootSound = UnitySounds.tenmeikiriShoot;
             shootShake = 4f;
             shootType = new EndCutterLaserBulletType(7800f){{
                 maxlength = 1200f;
-                lifetime = 2.5f * 60f;
+                lifetime = 3f * 60f;
                 width = 30f;
                 laserSpeed = 80f;
                 status = StatusEffects.melting;
