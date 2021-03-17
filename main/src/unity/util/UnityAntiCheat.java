@@ -47,6 +47,7 @@ public class UnityAntiCheat implements ApplicationListener{
 
             if(Unity.antiCheat != null && override) Unity.antiCheat.removeUnit(tmp);
             try{
+                //Utils.setField(entity, Utils.findField(entity.getClass(), "added", true), false);
                 tmp.getClass().getField("added").setBoolean(tmp, false);
             }catch(Exception e){
                 Unity.print(e);

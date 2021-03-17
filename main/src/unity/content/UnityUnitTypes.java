@@ -14,6 +14,7 @@ import mindustry.gen.*;
 import mindustry.entities.*;
 import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
+import mindustry.game.*;
 import mindustry.graphics.*;
 import mindustry.content.*;
 import unity.*;
@@ -2814,6 +2815,16 @@ public class UnityUnitTypes implements ContentList{
             @Override
             public boolean isHidden(){
                 return true;
+            }
+
+            @Override
+            public Unit create(Team team){
+                Unit unit = super.create(team);
+                if(unit instanceof Extensionc){
+                    return unit;
+                }else{
+                    throw new ClassCastException("'extension's constructor must be an instance of Extensionc.");
+                }
             }
         };
 

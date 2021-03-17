@@ -1312,6 +1312,7 @@ public class UnityBlocks implements ContentList{
         deflectorAura = new DeflectProjector("deflector-aura"){{
             requirements(Category.defense, with(Items.copper, 1));
             size = 4;
+            radius = 20f * tilesize;
 
             consumes.power(4f);
         }};

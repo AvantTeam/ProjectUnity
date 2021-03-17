@@ -82,6 +82,7 @@ public class Unity extends Mod implements ApplicationListener{
             UnityObjs.dispose();
             UnitySounds.dispose();
             UnityMusics.dispose();
+            UnityShaders.dispose();
         });
 
         musicHandler = new MusicHandler();

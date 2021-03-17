@@ -12,10 +12,14 @@ void stroke(in vec4 color, in vec4 fragCoord, float stroke) {
     }
 }
 
-void main() {
+/*void main() {
     vec4 coords = gl_FragCoord * u_dp;
     stroke(gl_FragColor, coords, 5.5);
 
     float base = 0.3;
     gl_FragColor *= absin(coords.y + u_time, 15.0, 1.0 - base) + base;
+}*/
+
+void main() {
+    gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
 }

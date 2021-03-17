@@ -9,6 +9,7 @@ import arc.util.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
+import mindustry.world.meta.*;
 import unity.content.*;
 import unity.entities.*;
 import unity.entities.comp.*;
@@ -27,17 +28,36 @@ public class DeflectProjector extends Block{
 
     public Color shieldColor = Pal.lancerLaser;
 
-    static final Cons2<Bullet, DeflectProjectorBuild> deflector = (b, tile) -> {
-        if(b.team.isEnemy(tile.team) && b.type.absorbable && b.within(tile, 0f)){
-            Tmp.v1.set(b.x - tile.x, b.y - tile.y).nor();
+    public TextureRegion topRegion;
+
+    /** Static reference to building to avoid memory allocation */
+    private static DeflectProjectorBuild build;
+    static final Cons<Bullet> deflector = b -> {
+        if(b.team != build.team && b.type.absorbable && b.within(build, build.radf())){
+            Tmp.v1.set(b.x - build.x, b.y - build.y).nor();
             b.vel.sub(Tmp.v1.scl(2f * b.vel.dot(Tmp.v1)));
 
-            tile.hit = 1f;
+            build.hit = 1f;
+            build.deflected = true;
         }
     };
 
     public DeflectProjector(String name){
         super(name);
+        update = true;
+        solid = true;
+        group = BlockGroup.projectors;
+        hasPower = true;
+        hasLiquids = true;
+        hasItems = true;
+        ambientSound = Sounds.shield;
+        ambientSoundVolume = 0.08f;
+    }
+
+    @Override
+    public void load(){
+        super.load();
+        topRegion = Core.atlas.find(name + "-top");
     }
 
     public class DeflectProjectorBuild extends Building implements ExtensionHolder{
@@ -45,6 +65,7 @@ public class DeflectProjector extends Block{
 
         public float heat;
         public float hit;
+        protected boolean deflected;
 
         @Override
         public void created(){
@@ -97,16 +118,14 @@ public class DeflectProjector extends Block{
         public void updateTile(){
             super.updateTile();
 
-            heat = Mathf.lerpDelta(heat, edelta(), warmup);
+            heat = Mathf.lerpDelta(heat, efficiency(), warmup);
             if(timer.get(timerUse, deflectTime)){
-                boolean[] deflected = {false};
+                deflected = false;
 
-                Groups.bullet.intersect(x - radf(), y - radf(), radf() * 2f, radf() * 2f, b -> {
-                    deflected[0] = true;
-                    deflector.get(b, this);
-                });
+                build = this;
+                Groups.bullet.intersect(x - radf(), y - radf(), radf() * 2f, radf() * 2f, deflector);
 
-                if(!deflected[0]){
+                if(!deflected){
                     timer.reset(timerUse, 0f);
                 }
             }
@@ -114,6 +133,11 @@ public class DeflectProjector extends Block{
             if(hit > 0f){
                 hit -= 1f / 5f * Time.delta;
             }
+        }
+
+        @Override
+        public boolean shouldAmbientSound(){
+            return radf() > 1f;
         }
     }
 }

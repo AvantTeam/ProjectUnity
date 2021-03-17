@@ -14,7 +14,7 @@ import mindustry.graphics.*;
 
 import static mindustry.Vars.*;
 
-public class UnityShaders implements Loadable, Disposable{
+public class UnityShaders implements Loadable{
     public static HolographicShieldShader holoShield;
     public static StencilShader stencilShader;
 
@@ -39,12 +39,10 @@ public class UnityShaders implements Loadable, Disposable{
         }
 
         Events.run(Trigger.draw, () -> {
-            float range = (1f / all.length) - 0.01f;
-            for(int i = 0; i < all.length; i++){
-                UnityShader shader = all[i];
-
+            float range = (1f / all.length) / 2f;
+            for(UnityShader shader : all){
                 if(shader != null && shader.apply.get()){
-                    Draw.drawRange(shader.layer, range, () -> renderer.effectBuffer.begin(Color.clear), () -> {
+                    Draw.drawRange(shader.getLayer(), range, () -> renderer.effectBuffer.begin(Color.clear), () -> {
                         renderer.effectBuffer.end();
                         renderer.effectBuffer.blit(shader);
                     });
@@ -53,11 +51,11 @@ public class UnityShaders implements Loadable, Disposable{
         });
     }
 
-    @Override
-    public void dispose(){
+    public static void dispose(){
         if(!headless){
-            holoShield.dispose();
-            stencilShader.dispose();
+            for(UnityShader shader : all){
+                shader.dispose();
+            }
         }
     }
 
