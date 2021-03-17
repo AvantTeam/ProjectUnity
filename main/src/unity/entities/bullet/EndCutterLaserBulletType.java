@@ -25,6 +25,8 @@ public class EndCutterLaserBulletType extends BulletType{
     public float fadeInTime = 8f;
     public Color[] colors = {UnityPal.scarColorAlpha, UnityPal.scarColor, UnityPal.endColor, Color.white};
 
+    private boolean hit = false;
+
     public EndCutterLaserBulletType(float damage){
         super(0.005f, damage);
         despawnEffect = Fx.none;
@@ -77,19 +79,30 @@ public class EndCutterLaserBulletType extends BulletType{
     @Override
     public void init(Bullet b){
         super.init(b);
-        b.data = new Vec2();
+        b.data = new LaserData();
     }
 
     @Override
     public void update(Bullet b){
-        b.fdata = Mathf.clamp(b.fdata + (Mathf.clamp(b.time / accel) * laserSpeed * Time.delta), 0f, maxlength);
+        if(b.data instanceof LaserData){
+            LaserData vec = (LaserData)b.data;
+            if(vec.restartTime >= 5f){
+                vec.velocity = Mathf.clamp((vec.velocityTime / accel) + vec.velocity, 0f, laserSpeed);
+                b.fdata = Mathf.clamp(b.fdata + (vec.velocity * Time.delta), 0f, maxlength);
+                vec.velocityTime += Time.delta;
+            }else{
+                vec.restartTime += Time.delta;
+            }
+        }
 
         if(b.timer(0, 5f)){
+            hit = false;
             Tmp.v1.trns(b.rotation(), b.fdata).add(b);
             Utils.collideLineRawEnemy(b.team, b.x, b.y, Tmp.v1.x, Tmp.v1.y, building -> {
                 building.damage(damage);
                 return false;
             }, unit -> {
+                if(hit) return;
                 float lastHealth = unit.health;
                 float extraDamage = (float)Math.pow(Mathf.clamp((unit.maxHealth + unit.type.dpsEstimate - 43000f) / 14000f, 0f, 8f), 2f);
                 float trueDamage = damage + Mathf.clamp((unit.maxHealth + unit.type.dpsEstimate - 32000f) / 2f, 0f, 90000000f);
@@ -100,6 +113,18 @@ public class EndCutterLaserBulletType extends BulletType{
                 }else{
                     unit.damage(trueDamage);
                 }
+                if(unit.maxHealth > damage * 2f){
+                    Tmp.v2.trns(b.rotation(), maxlength * 1.5f).add(b);
+                    float dst = Intersector.distanceLinePoint(b.x, b.y, Tmp.v2.x, Tmp.v2.y, unit.x, unit.y);
+                    b.fdata = ((b.dst(unit) - (unit.hitSize / 2f)) + dst) + 10f;
+                    if(b.data instanceof LaserData){
+                        ((LaserData)b.data).velocity = 0f;
+                        ((LaserData)b.data).restartTime = 0f;
+                        ((LaserData)b.data).velocityTime = 0f;
+                    }
+                    hit = true;
+                }
+
                 if((unit.dead || unit.health >= Float.MAX_VALUE || (lastHealth - trueDamage < 0f && !(unit instanceof AntiCheatBase))) && (unit.hitSize >= 30f || unit.health >= Float.MAX_VALUE)){
                     UnityAntiCheat.annihilateEntity(unit, true);
                     Tmp.v2.trns(b.rotation(), maxlength * 1.5f).add(b);
@@ -108,19 +133,19 @@ public class EndCutterLaserBulletType extends BulletType{
             }, hitEffect);
         }
         
-        if(b.data instanceof Vec2){
-            Vec2 vec = (Vec2)b.data;
-            if(vec.y >= 1f && b.fdata > vec.x){
-                int dst = Math.max(Mathf.round((b.fdata - vec.x) / 5), 1);
+        if(b.data instanceof LaserData){
+            LaserData vec = (LaserData)b.data;
+            if(vec.lightningTime >= 1f && b.fdata > vec.lastLength){
+                int dst = Math.max(Mathf.round((b.fdata - vec.lastLength) / 5), 1);
                 for(int i = 0; i < dst; i++){
-                    float f = Mathf.lerp(vec.x, b.fdata, (float)i / dst);
+                    float f = Mathf.lerp(vec.lastLength, b.fdata, (float)i / dst);
                     Tmp.v1.trns(b.rotation(), f).add(b);
                     Lightning.create(b.team, lightningColor, lightningDamage, Tmp.v1.x, Tmp.v1.y, b.rotation() + Mathf.range(20f), lightningLength);
                 }
-                vec.y -= 1f;
-                vec.x = b.fdata;
+                vec.lightningTime -= 1f;
+                vec.lastLength = b.fdata;
             }
-            vec.y += Time.delta;
+            vec.lightningTime += Time.delta;
         }
     }
 
@@ -128,5 +153,9 @@ public class EndCutterLaserBulletType extends BulletType{
     public void init(){
         super.init();
         drawSize = maxlength * 2f;
+    }
+
+    static class LaserData{
+        float lastLength, lightningTime, velocity, velocityTime, restartTime = 5f;
     }
 }
