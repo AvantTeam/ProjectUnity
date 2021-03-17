@@ -107,7 +107,7 @@ public class UnityShaders implements Loadable{
         @Override
         public void apply(){
             setUniformf("u_time", Time.globalTime);
-            setUniformf("u_dp", Scl.scl(1f));
+            setUniformf("u_scl", Scl.scl(1f));
         }
     }
 }
