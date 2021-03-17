@@ -18,6 +18,7 @@ public class UnityShaders implements Loadable{
     public static HolographicShieldShader holoShield;
     public static StencilShader stencilShader;
 
+    protected static FrameBuffer buffer;
     protected static UnityShader[] all;
 
     public static void load(){
@@ -26,6 +27,9 @@ public class UnityShaders implements Loadable{
 
     @Override
     public void loadSync(){
+        if(headless) return;
+
+        buffer = new FrameBuffer();
         all = new UnityShader[]{
             holoShield = new HolographicShieldShader(),
             stencilShader = new StencilShader()
@@ -39,12 +43,14 @@ public class UnityShaders implements Loadable{
         }
 
         Events.run(Trigger.draw, () -> {
+            buffer.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
+
             float range = (1f / all.length) / 2f;
             for(UnityShader shader : all){
                 if(shader != null && shader.apply.get()){
-                    Draw.drawRange(shader.getLayer(), range, () -> renderer.effectBuffer.begin(Color.clear), () -> {
-                        renderer.effectBuffer.end();
-                        renderer.effectBuffer.blit(shader);
+                    Draw.drawRange(shader.getLayer(), range, () -> buffer.begin(Color.clear), () -> {
+                        buffer.end();
+                        Draw.blit(buffer, shader);
                     });
                 }
             }
@@ -53,6 +59,7 @@ public class UnityShaders implements Loadable{
 
     public static void dispose(){
         if(!headless){
+            buffer.dispose();
             for(UnityShader shader : all){
                 shader.dispose();
             }
@@ -106,8 +113,12 @@ public class UnityShaders implements Loadable{
 
         @Override
         public void apply(){
-            setUniformf("u_time", Time.globalTime);
-            setUniformf("u_scl", Scl.scl(1f));
+            setUniformf("u_time", Time.time / Scl.scl(1f));
+            setUniformf("u_scl", 1f / Core.camera.height);
+            setUniformf("u_offset",
+                Core.camera.position.x - Core.camera.width / 2f,
+                Core.camera.position.y - Core.camera.height / 2f
+            );
         }
     }
 }
