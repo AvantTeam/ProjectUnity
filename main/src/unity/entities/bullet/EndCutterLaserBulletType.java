@@ -5,18 +5,20 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import unity.content.*;
 import unity.entities.effects.*;
 import unity.entities.units.*;
 import unity.graphics.*;
 import unity.util.*;
 
 public class EndCutterLaserBulletType extends BulletType{
-    public float maxlength = 1000f;
+    public float maxLength = 1000f;
     public float laserSpeed = 15f;
     public float accel = 25f;
     public float width = 12f;
@@ -43,7 +45,7 @@ public class EndCutterLaserBulletType extends BulletType{
 
     @Override
     public float range(){
-        return maxlength / 2f;
+        return maxLength / 2f;
     }
 
     @Override
@@ -89,7 +91,7 @@ public class EndCutterLaserBulletType extends BulletType{
             LaserData vec = (LaserData)b.data;
             if(vec.restartTime >= 5f){
                 vec.velocity = Mathf.clamp((vec.velocityTime / accel) + vec.velocity, 0f, laserSpeed);
-                b.fdata = Mathf.clamp(b.fdata + (vec.velocity * Time.delta), 0f, maxlength);
+                b.fdata = Mathf.clamp(b.fdata + (vec.velocity * Time.delta), 0f, maxLength);
                 vec.velocityTime += Time.delta;
             }else{
                 vec.restartTime += Time.delta;
@@ -100,7 +102,22 @@ public class EndCutterLaserBulletType extends BulletType{
             hit = false;
             Tmp.v1.trns(b.rotation(), b.fdata).add(b);
             Utils.collideLineRawEnemy(b.team, b.x, b.y, Tmp.v1.x, Tmp.v1.y, building -> {
+                if(hit) return true;
                 building.damage(damage);
+                if(building.health > damage){
+                    Tmp.v2.trns(b.rotation(), maxLength * 1.5f).add(b);
+                    float dst = Intersector.distanceLinePoint(b.x, b.y, Tmp.v2.x, Tmp.v2.y, building.x, building.y);
+                    b.fdata = ((b.dst(building) - (building.block.size / (float)Vars.tilesize / 2f)) + dst) + 4f;
+                    if(b.data instanceof LaserData){
+                        LaserData data = (LaserData)b.data;
+                        data.velocity = 0f;
+                        data.restartTime = 0f;
+                        data.velocityTime = 0f;
+                    }
+                    Tmp.v2.trns(b.rotation(), b.fdata).add(b);
+                    UnityFx.tenmeikiriTipHit.at(Tmp.v2.x, Tmp.v2.y, b.rotation() + 180f);
+                    return true;
+                }
                 return false;
             }, unit -> {
                 if(hit) return;
@@ -115,7 +132,7 @@ public class EndCutterLaserBulletType extends BulletType{
                     unit.damage(trueDamage);
                 }
                 if(unit.health > damage){
-                    Tmp.v2.trns(b.rotation(), maxlength * 1.5f).add(b);
+                    Tmp.v2.trns(b.rotation(), maxLength * 1.5f).add(b);
                     float dst = Intersector.distanceLinePoint(b.x, b.y, Tmp.v2.x, Tmp.v2.y, unit.x, unit.y);
                     b.fdata = ((b.dst(unit) - (unit.hitSize / 2f)) + dst) + 4f;
                     if(b.data instanceof LaserData){
@@ -124,12 +141,16 @@ public class EndCutterLaserBulletType extends BulletType{
                         data.restartTime = 0f;
                         data.velocityTime = 0f;
                     }
+                    Tmp.v2.trns(b.rotation(), b.fdata).add(b);
+                    for(int i = 0; i < 4; i++){
+                        UnityFx.tenmeikiriTipHit.at(Tmp.v2.x + Mathf.range(4f), Tmp.v2.y + Mathf.range(4f), b.rotation() + 180f);
+                    }
                     hit = true;
                 }
 
                 if((unit.dead || unit.health >= Float.MAX_VALUE || (lastHealth - trueDamage < 0f && !(unit instanceof AntiCheatBase))) && (unit.hitSize >= 30f || unit.health >= Float.MAX_VALUE)){
                     UnityAntiCheat.annihilateEntity(unit, true);
-                    Tmp.v2.trns(b.rotation(), maxlength * 1.5f).add(b);
+                    Tmp.v2.trns(b.rotation(), maxLength * 1.5f).add(b);
                     UnitCutEffect.createCut(unit, b.x, b.y, Tmp.v2.x, Tmp.v2.y);
                 }
             }, hitEffect);
@@ -154,7 +175,7 @@ public class EndCutterLaserBulletType extends BulletType{
     @Override
     public void init(){
         super.init();
-        drawSize = maxlength * 2f;
+        drawSize = maxLength * 2f;
     }
 
     static class LaserData{

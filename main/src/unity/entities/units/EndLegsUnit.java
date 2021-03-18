@@ -103,6 +103,7 @@ public class EndLegsUnit extends LegsUnit implements AntiCheatBase{
     @Override
     public void overrideAntiCheatDamage(float v, int priority){
         if(invTimeB[Mathf.clamp(priority, 0, invTimeB.length - 1)] < 30f) return;
+        hitTime = 1f;
         invTimeB[Mathf.clamp(priority, 0, invTimeB.length - 1)] = 0f;
         lastHealth(lastHealth() - v);
         if(health() > lastHealth()) health(lastHealth());

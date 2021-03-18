@@ -84,7 +84,7 @@ public class PointBlastLaserBulletType extends BulletType{
             Tmp.v2.add(b.x, b.y);
             unit.damage(b.damage);
             unit.apply(status, statusDuration);
-        }, unit -> ((length * 1.5f) - (b.dst(unit) / 2f)) + unit.health, hitEffect);
+        }, unit -> ((length * 1.5f) - (b.dst(unit) / 2f)) + unit.health(), building -> building.block.absorbLasers, hitEffect);
 
         if(available){
             b.fdata = b.dst(Tmp.v2);

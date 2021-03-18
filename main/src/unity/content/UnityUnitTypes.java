@@ -2495,7 +2495,7 @@ public class UnityUnitTypes implements ContentList{
                 shotDelay = 2f;
                 shots = 10;
 
-                bullet = new MissileBulletType(6f, 220f){{
+                bullet = new MissileBulletType(6f, 170f){{
                     lifetime = 55f;
                     frontColor = UnityPal.endColor;
                     backColor = trailColor = lightColor = UnityPal.scarColor;

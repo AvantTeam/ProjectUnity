@@ -2198,12 +2198,12 @@ public class UnityBlocks implements ContentList{
             shootSound = UnitySounds.tenmeikiriShoot;
             shootShake = 4f;
             shootType = new EndCutterLaserBulletType(7800f){{
-                maxlength = 1200f;
+                maxLength = 1200f;
                 lifetime = 3f * 60f;
                 width = 30f;
                 laserSpeed = 80f;
                 status = StatusEffects.melting;
-                antiCheatScl = 3f;
+                antiCheatScl = 5f;
                 statusDuration = 200f;
                 lightningColor = UnityPal.scarColor;
                 lightningDamage = 85f;
