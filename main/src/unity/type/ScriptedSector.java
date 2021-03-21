@@ -20,7 +20,6 @@ public class ScriptedSector extends SectorPreset implements ApplicationListener{
                 if(valid()){
                     reset();
                     Core.app.addListener(this);
-                    unity.Unity.print("Added " + this.name + " into application listeners");
                 }
             }
         });
@@ -31,7 +30,6 @@ public class ScriptedSector extends SectorPreset implements ApplicationListener{
         if(!valid() && Core.app.getListeners().contains(this)){
             reset();
             Core.app.removeListener(this);
-            unity.Unity.print("Removed " + name + " from application listeners");
 
             return;
         }
