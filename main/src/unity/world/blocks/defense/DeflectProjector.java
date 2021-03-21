@@ -8,6 +8,7 @@ import arc.math.*;
 import arc.util.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 import unity.content.*;
@@ -60,7 +61,7 @@ public class DeflectProjector extends Block{
         topRegion = Core.atlas.find(name + "-top");
     }
 
-    public class DeflectProjectorBuild extends Building implements ExtensionHolder{
+    public class DeflectProjectorBuild extends Building implements ExtensionHolder, Ranged{
         protected Extensionc ext;
 
         public float heat;
@@ -124,20 +125,25 @@ public class DeflectProjector extends Block{
 
                 build = this;
                 Groups.bullet.intersect(x - radf(), y - radf(), radf() * 2f, radf() * 2f, deflector);
+            }
 
-                if(!deflected){
-                    timer.reset(timerUse, 0f);
-                }
+            if(!deflected){
+                timer.reset(timerUse, 0f);
             }
 
             if(hit > 0f){
-                hit -= 1f / 5f * Time.delta;
+                hit = Mathf.lerpDelta(hit, 0f, 0.01f);
             }
         }
 
         @Override
         public boolean shouldAmbientSound(){
             return radf() > 1f;
+        }
+
+        @Override
+        public float range(){
+            return radf();
         }
     }
 }
