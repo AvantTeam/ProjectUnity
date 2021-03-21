@@ -16,7 +16,7 @@ public class ScriptedSector extends SectorPreset implements ApplicationListener{
         super(name, planet, sector);
 
         Events.on(StateChangeEvent.class, e -> {
-            if(e.to == State.playing){
+            if(e.to == State.playing && !Core.app.getListeners().contains(this)){
                 if(valid()){
                     reset();
                     Core.app.addListener(this);
@@ -28,7 +28,7 @@ public class ScriptedSector extends SectorPreset implements ApplicationListener{
 
     @Override
     public void update(){
-        if(!valid()){
+        if(!valid() && Core.app.getListeners().contains(this)){
             reset();
             Core.app.removeListener(this);
             unity.Unity.print("Removed " + name + " from application listeners");
@@ -69,7 +69,7 @@ public class ScriptedSector extends SectorPreset implements ApplicationListener{
     public abstract class SectorObjective{
         public final SectorListener listener;
 
-        protected final int executions;
+        public final int executions;
         protected int execution;
 
         public SectorObjective(int executions, SectorListener listener){
@@ -89,39 +89,42 @@ public class ScriptedSector extends SectorPreset implements ApplicationListener{
             return execution >= executions;
         }
 
+        public int getExecution(){
+            return execution;
+        }
+
         public abstract boolean completed();
     }
 
     public class UnitDeathObjective extends SectorObjective{
         public final UnitType type;
-        protected int unitId = -1;
+        protected Unit unit;
 
         public UnitDeathObjective(UnitType type, int executions, SectorListener listener){
             super(executions, listener);
 
             this.type = type;
-            Events.on(UnitCreateEvent.class, e -> {
-                if(!isExecuted() && valid() && unitId == -1 && e.unit.type.id == type.id){
-                    unitId = e.unit.id;
+            Events.on(UnitDestroyEvent.class, e -> {
+                if(!isExecuted() && valid() && unit == null && e.unit.type.id == type.id){
+                    unit = e.unit;
                 }
             });
         }
 
         @Override
         public void reset(){
-            unitId = -1;
+            unit = null;
         }
 
         @Override
         public boolean completed(){
-            var unit = Groups.unit.getByID(unitId);
             return unit != null && unit.dead();
         }
 
         @Override
         public void execute(){
             super.execute();
-            unitId = -1;
+            unit = null;
         }
     }
 
