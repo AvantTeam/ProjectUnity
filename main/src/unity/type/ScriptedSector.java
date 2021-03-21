@@ -38,7 +38,7 @@ public class ScriptedSector extends SectorPreset implements ApplicationListener{
 
         for(SectorObjective objective : objectives){
             objective.update();
-            if(objective.completed() && !objective.isExecuted()){
+            if(objective.qualified()){
                 objective.execute();
                 objective.execution++;
             }
@@ -72,6 +72,8 @@ public class ScriptedSector extends SectorPreset implements ApplicationListener{
         public final int executions;
         protected int execution;
 
+        public Seq<SectorObjective> dependencies = new Seq<>();
+
         public SectorObjective(int executions, SectorListener listener){
             this.listener = listener;
             this.executions = executions;
@@ -85,46 +87,55 @@ public class ScriptedSector extends SectorPreset implements ApplicationListener{
             listener.execute();
         }
 
+        public abstract boolean completed();
+
         public boolean isExecuted(){
             return execution >= executions;
+        }
+
+        public boolean qualified(){
+            return !isExecuted() && completed() && dependencies.find(obj -> !obj.isExecuted()) == null;
         }
 
         public int getExecution(){
             return execution;
         }
-
-        public abstract boolean completed();
     }
 
     public class UnitDeathObjective extends SectorObjective{
         public final UnitType type;
-        protected Unit unit;
 
-        public UnitDeathObjective(UnitType type, int executions, SectorListener listener){
+        public final int counts;
+        protected int count;
+
+        public UnitDeathObjective(UnitType type, int counts, int executions, SectorListener listener){
             super(executions, listener);
 
             this.type = type;
+            this.counts = counts;
+
             Events.on(UnitDestroyEvent.class, e -> {
-                if(!isExecuted() && valid() && unit == null && e.unit.type.id == type.id){
-                    unit = e.unit;
+                Unit unit = e.unit;
+                if(!isExecuted() && valid() && state.rules.defaultTeam != unit.team && unit.type.id == type.id){
+                    count++;
                 }
             });
         }
 
         @Override
         public void reset(){
-            unit = null;
+            count = 0;
         }
 
         @Override
         public boolean completed(){
-            return unit != null && unit.dead();
+            return count >= counts;
         }
 
         @Override
         public void execute(){
             super.execute();
-            unit = null;
+            count = 0;
         }
     }
 

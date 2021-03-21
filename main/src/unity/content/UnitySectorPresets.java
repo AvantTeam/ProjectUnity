@@ -1,6 +1,5 @@
 package unity.content;
 
-import arc.util.*;
 import mindustry.type.*;
 import mindustry.ctype.*;
 import unity.annotations.Annotations.*;
@@ -29,8 +28,8 @@ public class UnitySectorPresets implements ContentList{
             alwaysUnlocked = true;
             captureWave = 15;
 
-            objectives.add(new UnitDeathObjective(UnityUnitTypes.kami, 2, () -> {
-                ui.announce("Kami has been defeated!", 2f * Time.toSeconds);
+            objectives.add(new UnitDeathObjective(UnityUnitTypes.kami, 1, 1, () -> {
+                ui.announce("Kami has been defeated!", 2f);
             }));
         }};
     }
