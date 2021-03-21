@@ -74,6 +74,11 @@ public class EndWormUnit extends WormDefaultUnit implements AntiCheatBase{
         }
         if(!added) return;
         Unity.antiCheat.removeUnit(this);
+        for(WormSegmentUnit segmentUnit : segmentUnits){
+            if(segmentUnit instanceof EndWormSegmentUnit s){
+                s.removed = true;
+            }
+        }
         super.remove();
     }
 
@@ -88,8 +93,8 @@ public class EndWormUnit extends WormDefaultUnit implements AntiCheatBase{
         if(invTimeB[Mathf.clamp(priority, 0, invTimeB.length - 1)] < 30f) return;
         hitTime = 1f;
         invTimeB[Mathf.clamp(priority, 0, invTimeB.length - 1)] = 0f;
-        lastHealth(lastHealth() - v);
-        if(health() > lastHealth()) health(lastHealth());
+        lastHealth -= v;
+        health -= v;
     }
 
     @Override
@@ -99,7 +104,7 @@ public class EndWormUnit extends WormDefaultUnit implements AntiCheatBase{
         float max = Math.max(220f, lastMaxHealth / 700);
         float trueDamage = Mathf.clamp((amount / immunity) / rogueDamageResist, 0f, max);
         rogueDamageResist += 1.5f;
-        immunity += Math.pow(amount / max, 2) * 2f;
+        immunity += Math.pow(Math.max(amount - max, 0f) / max, 2) * 2f;
         lastHealth -= trueDamage;
         super.damage(trueDamage);
     }
@@ -120,9 +125,11 @@ public class EndWormUnit extends WormDefaultUnit implements AntiCheatBase{
     }
 
     public static class EndWormSegmentUnit extends WormSegmentUnit implements AntiCheatBase{
+        private boolean removed = false;
+
         @Override
         public void remove(){
-            if(!Structs.contains(trueParentUnit.segmentUnits, this)){
+            if(!Structs.contains(trueParentUnit.segmentUnits, this) || removed){
                 super.remove();
             }
         }

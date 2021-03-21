@@ -28,6 +28,7 @@ public class EndInvisibleUnit extends UnitEntity implements AntiCheatBase{
     public void overrideAntiCheatDamage(float v){
         if(invFrame < 15f) return;
         invFrame = 0f;
+        hitTime = 1f;
         lastHealth -= v;
         super.damage(v);
     }
