@@ -86,6 +86,7 @@ public class EndWormUnit extends WormDefaultUnit implements AntiCheatBase{
     @Override
     public void overrideAntiCheatDamage(float v, int priority){
         if(invTimeB[Mathf.clamp(priority, 0, invTimeB.length - 1)] < 30f) return;
+        hitTime = 1f;
         invTimeB[Mathf.clamp(priority, 0, invTimeB.length - 1)] = 0f;
         lastHealth(lastHealth() - v);
         if(health() > lastHealth()) health(lastHealth());
@@ -127,14 +128,19 @@ public class EndWormUnit extends WormDefaultUnit implements AntiCheatBase{
         }
 
         @Override
+        public void overrideAntiCheatDamage(float v, int priority){
+            if(trueParentUnit instanceof AntiCheatBase) ((AntiCheatBase)trueParentUnit).overrideAntiCheatDamage(v / 3f, priority);
+        }
+
+        @Override
         public float lastHealth(){
-            if(parentUnit instanceof AntiCheatBase) return ((AntiCheatBase)parentUnit).lastHealth();
+            if(trueParentUnit instanceof AntiCheatBase) return ((AntiCheatBase)trueParentUnit).lastHealth();
             return health;
         }
 
         @Override
         public void lastHealth(float v){
-            if(parentUnit instanceof AntiCheatBase) ((AntiCheatBase)parentUnit).lastHealth(v);
+            if(trueParentUnit instanceof AntiCheatBase) ((AntiCheatBase)trueParentUnit).lastHealth(v);
         }
 
         @Override

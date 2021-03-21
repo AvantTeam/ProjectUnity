@@ -784,6 +784,15 @@ public class UnityFx{
         });
     }),
 
+    tenmeikiriTipHit = new Effect(27f, e -> {
+        Angles.randLenVectors(e.id, 8, 90f * e.fin(), e.rotation, 80f, (x, y) -> {
+            float angle = Mathf.angle(x, y);
+            Draw.color(UnityPal.scarColor, UnityPal.endColor, e.fin());
+            Lines.stroke(1.5f);
+            Lines.lineAngleCenter(e.x + x, e.y + y, angle, e.fslope() * 13f);
+        });
+    }),
+
     tenmeikiriChargeBegin = new ParentEffect(158f, e -> {
         Color[] colors = {UnityPal.scarColor, UnityPal.endColor, Color.white};
         for(int ii = 0; ii < 3; ii++){

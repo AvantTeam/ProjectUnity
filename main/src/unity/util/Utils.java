@@ -29,7 +29,7 @@ public final class Utils{
     public static final PowIn pow6In = new PowIn(6);
 
     private static final Vec2 tV = new Vec2();
-    private static final Seq<Unit> tmpUnitSeq = new Seq<>();
+    private static final Seq<Healthc> tmpUnitSeq = new Seq<>();
     private static final IntSet collidedBlocks = new IntSet();
     private static final Rect rect = new Rect(), rectAlt = new Rect(), hitRect = new Rect();
     private static Posc result;
@@ -365,14 +365,25 @@ public final class Utils{
         collideLineRaw(x, y, x2, y2, buildB, unitB, buildC, unitC, null, null);
     }
 
-    public static void collideLineRaw(float x, float y, float x2, float y2, Boolf<Building> buildB, Boolf<Unit> unitB, Boolf<Building> buildC, Cons<Unit> unitC, Floatf<Unit> sort, Effect effect){
+    public static void collideLineRaw(float x, float y, float x2, float y2, Boolf<Building> buildB, Boolf<Unit> unitB, Boolf<Building> buildC, Cons<Unit> unitC, Floatf<Healthc> sort, Effect effect){
+        collideLineRaw(x, y, x2, y2, buildB, unitB, buildC, unitC, sort, e -> false, effect);
+    }
+
+    public static void collideLineRaw(float x, float y, float x2, float y2, Boolf<Building> buildB, Boolf<Unit> unitB, Boolf<Building> buildC, Cons<Unit> unitC, Floatf<Healthc> sort, Boolf<Building> buildAlt, Effect effect){
         collidedBlocks.clear();
+        tmpUnitSeq.clear();
         tV.set(x2, y2);
         if(buildC != null){
             world.raycastEachWorld(x, y, x2, y2, (cx, cy) -> {
                 Building tile = world.build(cx, cy);
                 if(tile != null && (buildB == null || buildB.get(tile)) && !collidedBlocks.contains(tile.pos())){
-                    boolean s = buildC.get(tile);
+                    boolean s;
+                    if(sort == null){
+                        s = buildC.get(tile);
+                    }else{
+                        tmpUnitSeq.add(tile);
+                        s = buildAlt.get(tile);
+                    }
                     collidedBlocks.add(tile.pos());
                     if(effect != null) effect.at(cx * tilesize, cy * tilesize);
                     if(s){
@@ -417,7 +428,6 @@ public final class Utils{
                     }
                 });
             }else{
-                tmpUnitSeq.clear();
                 Groups.unit.intersect(rect.x, rect.y, rect.width, rect.height, unit -> {
                     if(unitB.get(unit)){
                         unit.hitbox(hitRect);
@@ -431,7 +441,10 @@ public final class Utils{
                         }
                     }
                 });
-                tmpUnitSeq.sort(sort).each(unitC);
+                tmpUnitSeq.sort(sort).each(e -> {
+                    if(e instanceof Unit) unitC.get((Unit)e);
+                    if(e instanceof Building && buildC != null) buildC.get((Building)e);
+                });
                 tmpUnitSeq.clear();
             }
         }

@@ -12,24 +12,38 @@ public class EndInvisibleUnit extends UnitEntity implements AntiCheatBase{
     protected Interval scanInterval = new Interval(2);
     public float invFrame = 0f;
     public float alphaLerp = 0f;
+    private float lastHealth = 0f;
 
     @Override
     public float lastHealth(){
-        return 0;
+        return lastHealth;
     }
 
     @Override
     public void lastHealth(float v){
-
+        lastHealth = v;
     }
 
     @Override
     public void overrideAntiCheatDamage(float v){
+        if(invFrame < 15f) return;
+        invFrame = 0f;
+        lastHealth -= v;
         super.damage(v);
     }
 
     @Override
+    public void add(){
+        if(added) return;
+        super.add();
+        lastHealth = health;
+    }
+
+    @Override
     public void update(){
+        if(health < lastHealth) health = lastHealth;
+        lastHealth = health;
+
         super.update();
 
         invFrame += Time.delta;
@@ -62,6 +76,10 @@ public class EndInvisibleUnit extends UnitEntity implements AntiCheatBase{
             setVisible();
         }else{
             setInvisible();
+            if(physref != null){
+                physref.x = x;
+                physref.y = y;
+            }
         }
     }
 
@@ -85,6 +103,7 @@ public class EndInvisibleUnit extends UnitEntity implements AntiCheatBase{
         invFrame = 0f;
         float trueDamage = Math.min(amount, 700f);
         disabledTime = Math.max(1.4f * 60, trueDamage / 25f);
+        lastHealth -= trueDamage;
         super.damage(trueDamage);
     }
 

@@ -12,8 +12,8 @@ import mindustry.world.blocks.defense.turrets.*;
 import unity.gen.*;
 
 public class EndLaserTurret extends PowerTurret{
-    public float minDamage = 200f, minDamageTaken = 700f;
-    public float resistScl = 0.12f;
+    public float minDamage = 170f, minDamageTaken = 600f;
+    public float resistScl = 0.25f;
     public TextureRegion[] lightRegions;
     protected static float turretRotation = 0f;
 

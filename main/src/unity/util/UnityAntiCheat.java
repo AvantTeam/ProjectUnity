@@ -54,7 +54,11 @@ public class UnityAntiCheat implements ApplicationListener{
             }
             if(tmp instanceof WormDefaultUnit){
                 WormSegmentUnit nullUnit = new WormSegmentUnit();
+                WormSegmentUnit[] tmpArray = Arrays.copyOf(((WormDefaultUnit)tmp).segmentUnits, ((WormDefaultUnit)tmp).segmentUnits.length);
                 Arrays.fill(((WormDefaultUnit)tmp).segmentUnits, nullUnit);
+                for(WormSegmentUnit segmentUnit : tmpArray){
+                    if(segmentUnit != null) segmentUnit.remove();
+                }
             }
             if(setNaN){
                 tmp.x = tmp.y = tmp.rotation = Float.NaN;
