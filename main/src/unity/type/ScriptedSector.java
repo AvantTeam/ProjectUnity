@@ -2,6 +2,7 @@ package unity.type;
 
 import arc.*;
 import arc.struct.*;
+import mindustry.core.GameState.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -14,11 +15,13 @@ public class ScriptedSector extends SectorPreset implements ApplicationListener{
     public ScriptedSector(String name, Planet planet, int sector){
         super(name, planet, sector);
 
-        Events.on(SectorLaunchEvent.class, e -> {
-            if(e.sector.id == sector) {
-                reset();
-                Core.app.addListener(this);
-                unity.Unity.print("Added into application listeners");
+        Events.on(StateChangeEvent.class, e -> {
+            if(e.to == State.playing){
+                if(valid()){
+                    reset();
+                    Core.app.addListener(this);
+                    unity.Unity.print("Added " + this.name + " into application listeners");
+                }
             }
         });
     }
@@ -28,7 +31,7 @@ public class ScriptedSector extends SectorPreset implements ApplicationListener{
         if(!valid()){
             reset();
             Core.app.removeListener(this);
-            unity.Unity.print("Removed from application listeners");
+            unity.Unity.print("Removed " + name + " from application listeners");
 
             return;
         }
@@ -50,13 +53,17 @@ public class ScriptedSector extends SectorPreset implements ApplicationListener{
     }
 
     public boolean valid(){
-        return state.rules != null
+        return state.map != null
+        ?   state.map.name().equals(generator.map.name())
+        :   (
+            state.rules != null
             ?   (
                 state.rules.sector != null
                 ?   state.rules.sector.id == sector.id
                 :   false
             )
-            :   false;
+            :   false
+        );
     }
 
     public abstract class SectorObjective{
