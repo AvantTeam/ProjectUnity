@@ -1,17 +1,16 @@
 package unity.type.sector;
 
 import arc.*;
-import arc.func.Prov;
+import arc.func.*;
 import arc.struct.*;
 import mindustry.game.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 
-import static mindustry.Vars.*;
-
+@SuppressWarnings("unchecked")
 public abstract class SectorObjective{
-    public final SectorExecutor executor;
+    private final Cons<SectorObjective> executor;
     public final ScriptedSector sector;
 
     public final int executions;
@@ -19,20 +18,50 @@ public abstract class SectorObjective{
 
     public Seq<SectorObjective> dependencies = new Seq<>();
 
-    public SectorObjective(ScriptedSector sector, int executions, SectorExecutor executor){
+    private Cons<SectorObjective> update = objective -> {};
+    private Cons<SectorObjective> draw = objective -> {};
+
+    public <T extends SectorObjective> SectorObjective(ScriptedSector sector, int executions, Cons<T> executor){
         this.sector = sector;
-        this.executor = executor;
+        this.executor = (Cons<SectorObjective>)executor;
         this.executions = executions;
     }
 
-    public void update(){}
+    public void update(){
+        update.get(this);
+    }
 
-    public void draw(){}
+    public void draw(){
+        draw.get(this);
+    }
+
+    public boolean shouldUpdate(){
+        return !isExecuted() && !completed() && dependencyCompleted();
+    }
+
+    public boolean shouldDraw(){
+        return shouldUpdate();
+    }
+
+    public <T extends SectorObjective> SectorObjective update(Cons<T> update){
+        this.update = (Cons<SectorObjective>)update;
+        return this;
+    }
+
+    public <T extends SectorObjective> SectorObjective draw(Cons<T> draw){
+        this.draw = (Cons<SectorObjective>)draw;
+        return this;
+    }
+
+    public SectorObjective dependencies(SectorObjective... dependencies){
+        this.dependencies.addAll(dependencies);
+        return this;
+    }
 
     public void reset(){}
 
     public void execute(){
-        executor.execute(sector, this);
+        executor.get(this);
     }
 
     public abstract boolean completed();
@@ -53,45 +82,94 @@ public abstract class SectorObjective{
         return execution;
     }
 
-    /** Triggers when a {@linkplain #counts specific amount} of units with a certain type dies. */
-    public static class UnitDeathObjective extends SectorObjective{
+    /** Triggers when a {@linkplain #counts specific amount} of units with a certain type spawns. */
+    public static class UnitSpawnObjective extends SectorObjective{
         public final UnitType type;
+        public final Team team;
 
         public final int counts;
-        protected int count;
+        protected IntSet ids = new IntSet();
 
-        public UnitDeathObjective(UnitType type, int counts, ScriptedSector sector, int executions, SectorExecutor listener){
-            super(sector, executions, listener);
+        public <T extends SectorObjective> UnitSpawnObjective(Team team, UnitType type, int counts, ScriptedSector sector, int executions, Cons<T> executor) {
+            super(sector, executions, executor);
 
+            this.team = team;
             this.type = type;
             this.counts = counts;
 
             Events.on(UnitDestroyEvent.class, e -> {
                 Unit unit = e.unit;
-                if(!isExecuted() && sector.valid() && state.rules.defaultTeam != unit.team && unit.type.id == type.id){
-                    count++;
+                if(!isExecuted() && sector.valid() && ids.contains(unit.id) && unit.team == this.team && unit.type.id == this.type.id){
+                    ids.remove(unit.id);
                 }
             });
         }
 
-        public int getCount(){
-            return count;
+        @Override
+        public void reset(){
+            ids.clear();
         }
 
         @Override
-        public void reset(){
-            count = 0;
+        public void update(){
+            super.update();
+            Groups.unit.each(
+                unit ->
+                    !isExecuted() && sector.valid() &&
+                    !ids.contains(unit.id) && unit.team == team && unit.type.id == type.id,
+                unit -> ids.add(unit.id)
+            );
         }
 
         @Override
         public boolean completed(){
-            return count >= counts;
+            return ids.size >= counts;
         }
 
         @Override
         public void execute(){
             super.execute();
-            count = 0;
+            ids.clear();
+        }
+    }
+
+    /** Triggers when a {@linkplain #counts specific amount} of units with a certain type dies. */
+    public static class UnitDeathObjective extends SectorObjective{
+        public final UnitType type;
+        public final Team team;
+
+        public final int counts;
+        protected IntSet ids = new IntSet();
+
+        public <T extends SectorObjective> UnitDeathObjective(Team team, UnitType type, int counts, ScriptedSector sector, int executions, Cons<T> listener){
+            super(sector, executions, listener);
+
+            this.team = team;
+            this.type = type;
+            this.counts = counts;
+
+            Events.on(UnitDestroyEvent.class, e -> {
+                Unit unit = e.unit;
+                if(!isExecuted() && sector.valid() && !ids.contains(unit.id) && unit.team == this.team && unit.type.id == this.type.id){
+                    ids.add(unit.id);
+                }
+            });
+        }
+
+        @Override
+        public void reset(){
+            ids.clear();
+        }
+
+        @Override
+        public boolean completed(){
+            return ids.size >= counts;
+        }
+
+        @Override
+        public void execute(){
+            super.execute();
+            ids.clear();
         }
     }
 
@@ -104,7 +182,7 @@ public abstract class SectorObjective{
         protected int count;
         private IntSet ids = new IntSet();
 
-        public UnitGroupObjective(Prov<Seq<Unit>> provider, boolean continuous, int counts, ScriptedSector sector, int executions, SectorExecutor executor){
+        public <T extends SectorObjective> UnitGroupObjective(Prov<Seq<Unit>> provider, boolean continuous, int counts, ScriptedSector sector, int executions, Cons<T> executor){
             super(sector, executions, executor);
 
             this.continuous = continuous;
@@ -139,7 +217,7 @@ public abstract class SectorObjective{
 
     /** Extends {@link UnitGroupObjective}; provides units in a certain area. */
     public static class UnitPositionObjective extends UnitGroupObjective{
-        public UnitPositionObjective(Team team, float x, float y, float width, float height, boolean continuous, int count, ScriptedSector sector, int executions, SectorExecutor executor){
+        public <T extends SectorObjective> UnitPositionObjective(Team team, float x, float y, float width, float height, boolean continuous, int count, ScriptedSector sector, int executions, Cons<T> executor){
             super(() ->
                 Groups.unit
                     .intersect(x, y, width, height)
@@ -148,7 +226,7 @@ public abstract class SectorObjective{
             );
         }
 
-        public UnitPositionObjective(Team team, float x, float y, float radius, boolean continuous, int count, ScriptedSector sector, int executions, SectorExecutor executor){
+        public <T extends SectorObjective> UnitPositionObjective(Team team, float x, float y, float radius, boolean continuous, int count, ScriptedSector sector, int executions, Cons<T> executor){
             super(() ->
                 Groups.unit
                     .intersect(x - radius, y - radius, radius * 2f, radius * 2f)
@@ -160,37 +238,24 @@ public abstract class SectorObjective{
 
     /** Extends {@link UnitGroupObjective}; provides players in a certain area. */
     public static class PlayerPositionObjective extends UnitGroupObjective{
-        protected static Seq<Unit> units = new Seq<>();
-
-        public PlayerPositionObjective(Team team, float x, float y, float width, float height, boolean continuous, int count, ScriptedSector sector, int executions, SectorExecutor executor){
-            super(() -> {
+        public <T extends SectorObjective> PlayerPositionObjective(Team team, float x, float y, float width, float height, boolean continuous, int count, ScriptedSector sector, int executions, Cons<T> executor){
+            super(() -> 
                 Groups.player
                     .intersect(x, y, width, height)
                     .select(player -> player.team() == team)
-                    .each(player -> units.add(player.unit()));
-
-                    return units;
-                },
+                    .map(Player::unit),
                 continuous, count, sector, executions, executor
             );
         }
 
-        public PlayerPositionObjective(Team team, float x, float y, float radius, boolean continuous, int count, ScriptedSector sector, int executions, SectorExecutor executor){
-            super(() -> {
+        public <T extends SectorObjective> PlayerPositionObjective(Team team, float x, float y, float radius, boolean continuous, int count, ScriptedSector sector, int executions, Cons<T> executor){
+            super(() -> 
                 Groups.player
                     .intersect(x - radius, y - radius, radius * 2f, radius * 2f)
                     .select(player -> player.team() == team)
-                    .each(player -> units.add(player.unit()));
-
-                    return units;
-                },
+                    .map(Player::unit),
                 continuous, count, sector, executions, executor
             );
         }
-    }
-
-    @FunctionalInterface
-    public interface SectorExecutor{
-        void execute(ScriptedSector sector, SectorObjective execution);
     }
 }

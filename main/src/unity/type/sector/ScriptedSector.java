@@ -43,7 +43,7 @@ public class ScriptedSector extends SectorPreset{
         }
 
         for(SectorObjective objective : objectives){
-            if(!objective.isExecuted() && !objective.completed() && objective.dependencyCompleted()){
+            if(objective.shouldUpdate()){
                 objective.update();
             }
 
@@ -56,7 +56,7 @@ public class ScriptedSector extends SectorPreset{
 
     public void draw(){
         for(SectorObjective objective : objectives){
-            if(!objective.isExecuted() && !objective.completed() && objective.dependencyCompleted()){
+            if(objective.shouldDraw()){
                 objective.draw();
             }
         }
