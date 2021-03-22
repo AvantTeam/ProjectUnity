@@ -11,8 +11,6 @@ import unity.world.modules.*;
 
 import java.util.Comparator;
 
-//BlockGraph 그래프 그자체
-//I had stroke.
 public abstract class BaseGraph<M extends GraphModule<? extends Graph, M, G>, G extends BaseGraph<M, G>>{
     public final OrderedSet<M> connected = new OrderedSet<>();
     public final int id;

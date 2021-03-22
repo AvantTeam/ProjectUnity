@@ -55,44 +55,63 @@ public class GraphCrucibleModule extends GraphModule<GraphCrucible, GraphCrucibl
         return 0f;
     }
 
-    StackedBarChart getStackedBars(){
+    public StackedBarChart getStackedBars(){
         return new StackedBarChart(200f, () -> {
             var cc = getContained();
             BarStat[] data;
             if(cc.isEmpty()){
-                data = new BarStat[]{new BarStat("Empty", 1f, 1f, UnityPal.youngchaGray)};
+                data = new BarStat[]{new BarStat(bundle.get("stat.unity.crucible.empty"), 1f, 1f, UnityPal.youngchaGray)};
             }else{
                 float tv = getVolumeContained();
                 int len = cc.size;
                 float min = Math.min(1f / len, 0.15f);
                 float remain = 1f - len * min;
+                
                 MeltInfo[] melts = MeltInfo.all;
                 data = new BarStat[len];
+                
                 for(int i = 0; i < len; i++){
                     CrucibleData ccl = cc.get(i);
                     MeltInfo m = melts[ccl.id];
                     Item item = m.item;
-                    if(item != null) data[i] = new BarStat(item.toString() + " - " + Strings.fixed(ccl.volume, 2) + " units", min + (remain * ccl.volume / tv), ccl.meltedRatio, item.color);
-                    else data[i] = new BarStat(m.name + " - " + Strings.fixed(ccl.volume, 2) + " untis", min + (remain * ccl.volume / tv), ccl.meltedRatio, UnityPal.youngchaGray);
+                    
+                    if(item != null){
+                        data[i] = new BarStat(
+                            bundle.format("stat.unity.crucible.iteminfo", item.toString(), Strings.fixed(ccl.volume, 2)),
+                            min + (remain * ccl.volume / tv),
+                            ccl.meltedRatio, item.color
+                        );
+                    }else{
+                        data[i] = new BarStat(
+                            bundle.format("stat.unity.crucible.iteminfo", m.name, Strings.fixed(ccl.volume, 2)),
+                            min + (remain * ccl.volume / tv),
+                            ccl.meltedRatio, UnityPal.youngchaGray
+                        );
+                    }
                 }
             }
             return data;
         });
     }
 
-    IconBar getIconBar(){
+    public IconBar getIconBar(){
         return new IconBar(96f, () -> {
-            var cc = getContained();
             float temp = 0f;
+            var cc = getContained();
             var net = networks.get(0);
+            
             if(net != null) temp = net.getAverageTemp();
+            
             Color tempCol = Utils.tempColor(temp);
             tempCol.mul(tempCol.a);
             tempCol.add(Color.gray);
             tempCol.a = 1f;
+            
             int len = 0;
+            
             if(cc != null) len = cc.size;
             IconBarStat data = new IconBarStat(temp - 273f, 500f, 0f, tempCol, len);
+            
             if(temp < 270f){
                 data.defaultMin = Math.max(-273.15f, 5f * (temp - 273f));
                 data.defaultMax = Math.max(20f, 500f + 5 * (temp - 273f));
@@ -114,8 +133,10 @@ public class GraphCrucibleModule extends GraphModule<GraphCrucible, GraphCrucibl
         CrucibleData[] cache = (CrucibleData[])saveCache.get(index);
         int len = cache.length;
         var cc = graph.contains();
+        
         if(cc.size == len) return;
         cc.clear();
+        
         for(var i : cache) cc.add(i);
     }
 
@@ -129,19 +150,7 @@ public class GraphCrucibleModule extends GraphModule<GraphCrucible, GraphCrucibl
     void proximityUpdateCustom(){}
 
     @Override
-    void display(Table table){
-        if(multi || networks.get(0) == null) return;
-        table.row();
-        table.table(sub -> {
-            sub.clearChildren();
-            sub.left();
-            sub.label(() -> "Crucible temparature:").color(Color.lightGray).growX().row();
-            sub.add(getIconBar()).padTop(3f).growX().row();
-            sub.label(() -> "Crucible contents:").color(Color.lightGray).growX().row();
-            sub.left();
-            sub.add(getStackedBars()).padTop(3f).growX();
-        }).left().growX();
-    }
+    void display(Table table){}
 
     @Override
     void initStats(){

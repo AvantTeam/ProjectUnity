@@ -159,7 +159,7 @@ public final class Utils{
         return angle;
     }
 
-    /** Finds a class from the parent classes that has a specific field */
+    /** Finds a class from the parent classes that has a specific field. */
     public static Class<?> findClass(Class<?> type, String field){
         Class<?> current = type.isAnonymousClass() ? type.getSuperclass() : type;
 
@@ -178,7 +178,7 @@ public final class Utils{
         return current;
     }
 
-    /** A utility function to find a field without throwing {@link NoSuchFieldException} */
+    /** A utility function to find a field without throwing {@link NoSuchFieldException}. */
     public static Field findField(Class<?> type, String field, boolean access){
         try{
             var f = findClass(type, field).getDeclaredField(field);
@@ -190,7 +190,7 @@ public final class Utils{
         }
     }
 
-    /** Sets a field of an object without throwing {@link IllegalAccessException} */
+    /** Sets a field of an object without throwing {@link IllegalAccessException}. */
     public static void setField(Object object, Field field, Object value){
         try{
             field.set(object, value);
@@ -199,7 +199,7 @@ public final class Utils{
         }
     }
 
-    /** Gets a value from a field of an object without throwing {@link IllegalAccessException} */
+    /** Gets a value from a field of an object without throwing {@link IllegalAccessException}. */
     public static <T> T getField(Object object, Field field){
         try{
             return (T)field.get(object);
@@ -511,46 +511,58 @@ public final class Utils{
         }
     }
 
-    //graph associated below
     public static float linear(float current, float target, float maxTorque, float coefficient){
         current = Math.min(target, current);
+        
         return Math.min(coefficient * (target - current) * maxTorque / target, 99999f);
     }
 
     public static TextureRegion getRegionRect(TextureRegion region, float x, float y, int rw, int rh, int w, int h){
-        TextureRegion nRegion = new TextureRegion(region);
-        float tileW = (nRegion.u2 - nRegion.u) / w;
+        TextureRegion reg = new TextureRegion(region);
+        float tileW = (reg.u2 - reg.u) / w;
         float tileH = (region.v2 - region.v) / h;
         float tileX = x / w;
         float tileY = y / h;
 
-        nRegion.u = Mathf.map(tileX, 0f, 1f, nRegion.u, nRegion.u2) + tileW * 0.02f;
-        nRegion.v = Mathf.map(tileY, 0f, 1f, nRegion.v, nRegion.v2) + tileH * 0.02f;
-        nRegion.u2 = nRegion.u + tileW * (rw - 0.02f);
-        nRegion.v2 = nRegion.v + tileH * (rh - 0.02f);
-        nRegion.width = 32 * rw;
-        nRegion.height = 32 * rh;
-        return nRegion;
+        reg.u = Mathf.map(tileX, 0f, 1f, reg.u, reg.u2) + tileW * 0.02f;
+        reg.v = Mathf.map(tileY, 0f, 1f, reg.v, reg.v2) + tileH * 0.02f;
+        reg.u2 = reg.u + tileW * (rw - 0.02f);
+        reg.v2 = reg.v + tileH * (rh - 0.02f);
+        reg.width = 32 * rw;
+        reg.height = 32 * rh;
+        
+        return reg;
     }
 
-    public static TextureRegion[] getRegions(TextureRegion region, int sheetW, int sheetH){
-        int size = sheetW * sheetH;
-        TextureRegion[] ret = new TextureRegion[size];
-        float tileW = (region.u2 - region.u) / sheetW;
-        float tileH = (region.v2 - region.v) / sheetH;
-        for(int i = 0; i < size; i++){
-            float tileX = ((float)(i % sheetW)) / sheetW;
-            float tileY = ((float)(i / sheetW)) / sheetH;
-            TextureRegion nRegion = new TextureRegion(region);
+    /**
+     * Gets multiple regions inside a {@link TextureRegion}. The size for each region has to be 32.
+     * @param w The amount of regions horizontally.
+     * @param h The amount of regions vertically.
+     */
+    public static TextureRegion[] getRegions(TextureRegion region, int w, int h){
+        int size = w * h;
+        TextureRegion[] regions = new TextureRegion[size];
+        
+        float tileW = (region.u2 - region.u) / w;
+        float tileH = (region.v2 - region.v) / h;
 
-            nRegion.u = Mathf.map(tileX, 0f, 1f, nRegion.u, nRegion.u2) + tileW * 0.02f;
-            nRegion.v = Mathf.map(tileY, 0f, 1f, nRegion.v, nRegion.v2) + tileH * 0.02f;
-            nRegion.u2 = nRegion.u + tileW * 0.96f;
-            nRegion.v2 = nRegion.v + tileH * 0.96f;
-            nRegion.width = nRegion.height = 32;
-            ret[i] = nRegion;
+        for(int i = 0; i < size; i++){
+            float tileX = ((float)(i % w)) / w;
+            float tileY = ((float)(i / w)) / h;
+            TextureRegion reg = new TextureRegion(region);
+
+            //start coordinate
+            reg.u = Mathf.map(tileX, 0f, 1f, reg.u, reg.u2) + tileW * 0.02f;
+            reg.v = Mathf.map(tileY, 0f, 1f, reg.v, reg.v2) + tileH * 0.02f;
+            //end coordinate
+            reg.u2 = reg.u + tileW * 0.96f;
+            reg.v2 = reg.v + tileH * 0.96f;
+            
+            reg.width = reg.height = 32;
+            
+            regions[i] = reg;
         }
-        return ret;
+        return regions;
     }
 
     public static Color tempColor(float temp){

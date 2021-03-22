@@ -6,7 +6,6 @@ import unity.world.graphs.*;
 import unity.world.meta.*;
 import unity.world.blocks.GraphBlockBase.*;
 
-//GraphCommonBuild. ㅁㄴ이라ㅓㅣ
 public class GraphModules{
     public final GraphBuildBase build;
     

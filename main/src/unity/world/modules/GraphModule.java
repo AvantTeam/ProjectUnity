@@ -13,26 +13,23 @@ import unity.world.blocks.GraphBlockBase.*;
 import unity.world.graph.*;
 import unity.world.graphs.*;
 
-//GraphPropsCommon building 에 들어갈 모듈. powerModule와 비슷한 역할?
-//I had stroke
 public abstract class GraphModule<T extends Graph, M extends GraphModule<T, M, G>, G extends BaseGraph<M, G>>{
     public final Seq<GraphData> acceptPorts = new Seq<>();
 
     public GraphModules parent;
-    public T graph;//parentBlock
+    public T graph;
     public int d;
 
     protected final IntMap<G> networks = new IntMap<>(4);
 
-    final OrderedMap<M, Integer> neighbours = new OrderedMap<>();//neighbourArray
+    final OrderedMap<M, Integer> neighbours = new OrderedMap<>();
     final Seq saveCache = new Seq(4);
 
     int lastRecalc;
-    boolean dead, needsNetworkUpdate = true, networkSaveState, multi;//
+    boolean dead, needsNetworkUpdate = true, networkSaveState, multi;
 
     private boolean initialized;
-    //private int blockSize;
-
+    
     GraphData getConnectSidePos(int index){
         return parent.getConnectSidePos(index);
     }

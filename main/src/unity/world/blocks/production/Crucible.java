@@ -5,10 +5,12 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
+import arc.util.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import unity.graphics.*;
+import unity.ui.dialogs.*;
 import unity.util.*;
 import unity.world.blocks.*;
 import unity.world.meta.*;
@@ -56,6 +58,7 @@ public class Crucible extends GraphBlock{
 
         @Override
         public void buildConfiguration(Table table){
+            table.button(Tex.whiteui, Styles.clearTransi, 50f, new CrucibleDialog(this)::show).size(50f).get().getStyle().imageUp = Icon.chartBar;
             table.button(Tex.whiteui, Styles.clearTransi, 50f, () -> configure(0)).size(50f).get().getStyle().imageUp = Icon.eye;
         }
 
@@ -96,7 +99,7 @@ public class Crucible extends GraphBlock{
             crucible().addItem(item);
         }
 
-        void drawContents(GraphCrucibleModule crucGraph, int tIndex){
+        protected void drawContents(GraphCrucibleModule crucGraph, int tIndex){
             color.set(0f, 0f, 0f);
             var cc = crucGraph.getContained();
             
@@ -137,7 +140,7 @@ public class Crucible extends GraphBlock{
                     if(ddd > 0.1f){
                         Draw.color(itemCol);
                         if(ddd > 1f) Draw.rect(solidItemStrips[Mathf.floor(ddd) - 1], x, y);
-                        
+
                         float siz = 8f * (ddd % 1f);
                         var pos = randomPos[Math.max(Mathf.floor(ddd), 5)];
                         

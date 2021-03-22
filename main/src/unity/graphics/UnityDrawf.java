@@ -14,32 +14,30 @@ public class UnityDrawf{
         38, 37, 38, 37, 17, 41, 17, 43, 38, 37, 38, 37, 26, 21, 26, 25,
         39, 36, 39, 36, 27, 16, 27, 24, 39, 36, 39, 36, 27, 16, 27, 24,
         38, 37, 38, 37, 17, 41, 17, 43, 38, 37, 38, 37, 26, 21, 26, 25,
-        3, 4, 3, 4, 15, 40, 15, 20, 3, 4, 3, 4, 15, 40, 15, 20,
-        5, 28, 5, 28, 29, 10, 29, 23, 5, 28, 5, 28, 31, 11, 31, 32,
-        3, 4, 3, 4, 15, 40, 15, 20, 3, 4, 3, 4, 15, 40, 15, 20,
-        2, 30, 2, 30, 9, 47, 9, 22, 2, 30, 2, 30, 14, 44, 14, 6,
+         3,  4,  3,  4, 15, 40, 15, 20,  3,  4,  3,  4, 15, 40, 15, 20,
+         5, 28,  5, 28, 29, 10, 29, 23,  5, 28,  5, 28, 31, 11, 31, 32,
+         3,  4,  3,  4, 15, 40, 15, 20,  3,  4,  3,  4, 15, 40, 15, 20,
+         2, 30,  2, 30,  9, 47,  9, 22,  2, 30,  2, 30, 14, 44, 14,  6,
         39, 36, 39, 36, 27, 16, 27, 24, 39, 36, 39, 36, 27, 16, 27, 24,
         38, 37, 38, 37, 17, 41, 17, 43, 38, 37, 38, 37, 26, 21, 26, 25,
         39, 36, 39, 36, 27, 16, 27, 24, 39, 36, 39, 36, 27, 16, 27, 24,
         38, 37, 38, 37, 17, 41, 17, 43, 38, 37, 38, 37, 26, 21, 26, 25,
-        3, 0, 3, 0, 15, 42, 15, 12, 3, 0, 3, 0, 15, 42, 15, 12,
-        5, 8, 5, 8, 29, 35, 29, 33, 5, 8, 5, 8, 31, 34, 31, 7,
-        3, 0, 3, 0, 15, 42, 15, 12, 3, 0, 3, 0, 15, 42, 15, 12,
-        2, 1, 2, 1, 9, 45, 9, 19, 2, 1, 2, 1, 14, 18, 14, 13
-    };//xelo..
+         3,  0,  3,  0, 15, 42, 15, 12,  3,  0,  3,  0, 15, 42, 15, 12,
+         5,  8,  5,  8, 29, 35, 29, 33,  5,  8,  5,  8, 31, 34, 31,  7,
+         3,  0,  3,  0, 15, 42, 15, 12,  3,  0,  3,  0, 15, 42, 15, 12,
+         2,  1,  2,  1,  9, 45,  9, 19,  2,  1,  2,  1, 14, 18, 14, 13
+    };
 
-    public static void snowFlake(float x, float y, float r, float s){
-        Lines.lineAngleCenter(x, y, 0 + r, s);
-        Lines.lineAngleCenter(x, y, 60 + r, s);
-        Lines.lineAngleCenter(x, y, 120 + r, s);
+    public static void snowFlake(float x, float y, float r, float s){ 
+        for(int i = 0; i < 3; i++){
+            Lines.lineAngleCenter(x, y, r + 60 * i, s);
+        }
     }
 
     public static void spark(float x, float y, float w, float h, float r){
-        Drawf.tri(x, y, w, h, r);
-        //is this order imporant?
-        Drawf.tri(x, y, w, h, r + 180f);
-        Drawf.tri(x, y, w, h, r + 90f);
-        Drawf.tri(x, y, w, h, r + 270f);
+        for(int i = 0; i < 4; i++){
+            Drawf.tri(x, y, w, h, r + 90 * i);
+        }
     }
 
     public static void drawHeat(TextureRegion reg, float x, float y, float rot, float temp){
@@ -51,7 +49,9 @@ public class UnityDrawf{
                 Color fCol = Pal.turretHeat.cpy().add(0, 0, 0.01f * a);
                 fCol.mul(a);
                 Draw.color(fCol, a);
-            }else Draw.color(Pal.turretHeat, a);
+            }else{
+                Draw.color(Pal.turretHeat, a);
+            }
         }else{
             a = 1f - Mathf.clamp(temp / 273.15f);
             if(a < 0.01f) return;
@@ -66,8 +66,10 @@ public class UnityDrawf{
     public static void drawSlideRect(TextureRegion region, float x, float y, float w, float h, float tw, float th, float rot, int step, float offset){
         if(region == null) return;
         nRegion.set(region);
+        
         float scaleX = w / tw;
         float texW = nRegion.u2 - nRegion.u;
+        
         nRegion.u += Mathf.map(offset % 1, 0f, 1f, 0f, texW * step / tw);
         nRegion.u2 = nRegion.u + scaleX * texW;
         Draw.rect(nRegion, x, y, w, h, w * 0.5f, h * 0.5f, rot);
@@ -118,23 +120,23 @@ public class UnityDrawf{
         });
     }
 
-    //An alternate to Anuke's method, this one allows triangles
+    /** An alternate version of {@link Fill.poly(float[], int)}, allows triangles. */
     public static void drawPolygon(float[] vertices){
         if(vertices.length < 6) return;
         for(int i = 2; i < vertices.length; i += 6){
             boolean isTriangle = vertices.length - i < 0;
             if(!isTriangle){
                 Fill.quad(
-                vertices[0], vertices[1],
-                vertices[i], vertices[i + 1],
-                vertices[i + 2], vertices[i + 3],
-                vertices[i + 4], vertices[i + 5]
+                    vertices[0], vertices[1],
+                    vertices[i], vertices[i + 1],
+                    vertices[i + 2], vertices[i + 3],
+                    vertices[i + 4], vertices[i + 5]
                 );
             }else{
                 Fill.tri(
-                vertices[0], vertices[1],
-                vertices[i], vertices[i + 1],
-                vertices[i + 2], vertices[i + 3]
+                    vertices[0], vertices[1],
+                    vertices[i], vertices[i + 1],
+                    vertices[i + 2], vertices[i + 3]
                 );
             }
         }
