@@ -3,7 +3,8 @@ package unity.content;
 import mindustry.type.*;
 import mindustry.ctype.*;
 import unity.annotations.Annotations.*;
-import unity.type.*;
+import unity.type.sector.*;
+import unity.type.sector.SectorObjective.*;
 
 import static mindustry.Vars.*;
 import static unity.content.UnityPlanets.*;
@@ -28,9 +29,11 @@ public class UnitySectorPresets implements ContentList{
             alwaysUnlocked = true;
             captureWave = 15;
 
-            objectives.add(new UnitDeathObjective(UnityUnitTypes.kami, 1, 1, () -> {
-                ui.announce("Kami has been defeated!", 2f);
-            }));
+            objectives.addAll(
+                new UnitDeathObjective(UnityUnitTypes.kami, 1, this, 1, (sector, execution) -> {
+                    ui.announce("Kami has been defeated!", 2f);
+                }
+            ));
         }};
     }
 }

@@ -11,8 +11,6 @@ import arc.util.io.PropertiesUtils;
 import com.squareup.javapoet.*;
 import mindustry.*;
 
-import java.io.*;
-
 import javax.annotation.processing.*;
 import javax.lang.model.element.*;
 
