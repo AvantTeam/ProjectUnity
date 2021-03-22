@@ -3,6 +3,7 @@ package unity.type.sector;
 import arc.*;
 import arc.func.Prov;
 import arc.struct.*;
+import mindustry.game.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -31,7 +32,7 @@ public abstract class SectorObjective{
     public void reset(){}
 
     public void execute(){
-        executor.execute(sector, execution);
+        executor.execute(sector, this);
     }
 
     public abstract boolean completed();
@@ -52,6 +53,7 @@ public abstract class SectorObjective{
         return execution;
     }
 
+    /** Triggers when a {@linkplain #counts specific amount} of units with a certain type dies. */
     public static class UnitDeathObjective extends SectorObjective{
         public final UnitType type;
 
@@ -72,6 +74,10 @@ public abstract class SectorObjective{
             });
         }
 
+        public int getCount(){
+            return count;
+        }
+
         @Override
         public void reset(){
             count = 0;
@@ -89,6 +95,7 @@ public abstract class SectorObjective{
         }
     }
 
+    /** Triggers when a provided unit groups's size is equal or larger to the {@linkplain #counts threshold}. */
     public static class UnitGroupObjective extends SectorObjective{
         public final Prov<Seq<Unit>> provider;
         public final boolean continuous;
@@ -130,19 +137,53 @@ public abstract class SectorObjective{
         }
     }
 
+    /** Extends {@link UnitGroupObjective}; provides units in a certain area. */
     public static class UnitPositionObjective extends UnitGroupObjective{
-        public UnitPositionObjective(float x, float y, float width, float height, boolean continuous, int count, ScriptedSector sector, int executions, SectorExecutor executor){
+        public UnitPositionObjective(Team team, float x, float y, float width, float height, boolean continuous, int count, ScriptedSector sector, int executions, SectorExecutor executor){
             super(() ->
-                Groups.unit.intersect(x, y, width, height),
+                Groups.unit
+                    .intersect(x, y, width, height)
+                    .select(unit -> unit.team == team),
                 continuous, count, sector, executions, executor
             );
         }
 
-        public UnitPositionObjective(float x, float y, float radius, boolean continuous, int count, ScriptedSector sector, int executions, SectorExecutor executor){
+        public UnitPositionObjective(Team team, float x, float y, float radius, boolean continuous, int count, ScriptedSector sector, int executions, SectorExecutor executor){
             super(() ->
                 Groups.unit
                     .intersect(x - radius, y - radius, radius * 2f, radius * 2f)
-                    .select(unit -> unit.dst(x, y) <= radius),
+                    .select(unit -> unit.dst(x, y) <= radius && unit.team == team),
+                continuous, count, sector, executions, executor
+            );
+        }
+    }
+
+    /** Extends {@link UnitGroupObjective}; provides players in a certain area. */
+    public static class PlayerPositionObjective extends UnitGroupObjective{
+        protected static Seq<Unit> units = new Seq<>();
+
+        public PlayerPositionObjective(Team team, float x, float y, float width, float height, boolean continuous, int count, ScriptedSector sector, int executions, SectorExecutor executor){
+            super(() -> {
+                Groups.player
+                    .intersect(x, y, width, height)
+                    .select(player -> player.team() == team)
+                    .each(player -> units.add(player.unit()));
+
+                    return units;
+                },
+                continuous, count, sector, executions, executor
+            );
+        }
+
+        public PlayerPositionObjective(Team team, float x, float y, float radius, boolean continuous, int count, ScriptedSector sector, int executions, SectorExecutor executor){
+            super(() -> {
+                Groups.player
+                    .intersect(x - radius, y - radius, radius * 2f, radius * 2f)
+                    .select(player -> player.team() == team)
+                    .each(player -> units.add(player.unit()));
+
+                    return units;
+                },
                 continuous, count, sector, executions, executor
             );
         }
@@ -150,6 +191,6 @@ public abstract class SectorObjective{
 
     @FunctionalInterface
     public interface SectorExecutor{
-        void execute(ScriptedSector sector, int execution);
+        void execute(ScriptedSector sector, SectorObjective execution);
     }
 }

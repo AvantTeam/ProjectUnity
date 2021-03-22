@@ -30,7 +30,7 @@ public class UnitySectorPresets implements ContentList{
             captureWave = 15;
 
             objectives.addAll(
-                new UnitDeathObjective(UnityUnitTypes.kami, 1, this, 1, (sector, execution) -> {
+                new UnitDeathObjective(UnityUnitTypes.kami, 1, this, 1, (sector, objective) -> {
                     ui.announce("Kami has been defeated!", 2f);
                 }
             ));
