@@ -32,6 +32,7 @@ public class Unity extends Mod implements ApplicationListener{
     private final ContentList[] unityContent = {
         new UnityItems(),
         new UnityStatusEffects(),
+        new UnityWeathers(),
         new UnityLiquids(),
         new UnityBullets(),
         new UnityUnitTypes(),
