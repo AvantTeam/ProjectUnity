@@ -83,7 +83,7 @@ public class DistFieldBulletType extends ExpBulletType {
         else radius = fieldRadius;
 
         if(b.time() % temp <= 1 && b.lifetime() - b.time() > 100){
-            if ((b.data instanceof Float[])) distSplashFx.at(b.x, b.y, 0, new Float[]{radius, (float)temp});
+            if((b.data instanceof Float[])) distSplashFx.at(b.x, b.y, 0, new Float[]{radius, (float)temp});
             else distSplashFx.at(b.x, b.y, 0, radius);
         }
 

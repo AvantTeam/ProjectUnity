@@ -456,7 +456,7 @@ public class WormDefaultUnit extends UnitEntity{
     @Override
     public void read(Reads read){
     	super.read(read);
-    	for (int i = 0, len = getSegmentLength(); i < len; i++){
+    	for(int i = 0, len = getSegmentLength(); i < len; i++){
     		segments[i].x = read.f();
     		segments[i].y = read.f();
     	}
@@ -465,7 +465,7 @@ public class WormDefaultUnit extends UnitEntity{
     @Override
     public void write(Writes write){
     	super.write(write);
-    	for (int i = 0, len = getSegmentLength(); i < len; i++){
+    	for(int i = 0, len = getSegmentLength(); i < len; i++){
     		write.f(segments[i].x);
     		write.f(segments[i].y);
     	}

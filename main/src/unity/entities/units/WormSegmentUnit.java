@@ -319,10 +319,10 @@ public class WormSegmentUnit extends UnitEntity{
         BulletType ammo = weapon.bullet;
         float lifeScl = ammo.scaleVelocity ? Mathf.clamp(Mathf.dst(x, y, aimX, aimY) / ammo.range()) : 1f;
         sequenceNum = 0;
-        if (delay){
+        if(delay){
             Angles.shotgun(weapon.shots, weapon.spacing, rotation, (f)->{
                 Time.run(sequenceNum * weapon.shotDelay + weapon.firstShotDelay, ()->{
-                    if (!isAdded()) return;
+                    if(!isAdded()) return;
                     mount.bullet = bullet(weapon, x + this.x - baseX, y + this.y - baseY, f + Mathf.range(weapon.inaccuracy), lifeScl);
                 });
                 sequenceNum++;
