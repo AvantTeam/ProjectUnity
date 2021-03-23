@@ -90,7 +90,7 @@ public abstract class SectorObjective{
         public final int counts;
         protected IntSet ids = new IntSet();
 
-        public <T extends SectorObjective> UnitSpawnObjective(Team team, UnitType type, int counts, ScriptedSector sector, int executions, Cons<T> executor) {
+        public <T extends SectorObjective> UnitSpawnObjective(Team team, UnitType type, int counts, ScriptedSector sector, int executions, Cons<T> executor){
             super(sector, executions, executor);
 
             this.team = team;

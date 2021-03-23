@@ -144,7 +144,7 @@ public class ExpLaserBlastBulletType extends LaserBulletType{
     }
 
     @Override
-    public void hitEntity(Bullet b, Hitboxc other, float initialHealth) {
+    public void hitEntity(Bullet b, Hitboxc other, float initialHealth){
         if(b.owner instanceof ExpBuildc exp){
             if(exp.levelf() < 1 && Core.settings.getBool("hitexpeffect")){
                 for(int i = 0; i < Math.ceil(hitUnitExpGain); i++){

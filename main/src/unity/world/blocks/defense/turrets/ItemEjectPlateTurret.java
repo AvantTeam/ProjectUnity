@@ -29,7 +29,7 @@ public class ItemEjectPlateTurret extends ItemTurret{
         Draw.rect(ejectRegions[(int)drawSide], tile.x + tr2.x + tr3.x, tile.y + tr2.y + tr3.y, tile.rotation - 90);
     };
 
-    public ItemEjectPlateTurret(String name) {
+    public ItemEjectPlateTurret(String name){
         super(name);
         ammoEjectX = ammoEjectY = -1f;
         ejectX = ejectY = 1f;

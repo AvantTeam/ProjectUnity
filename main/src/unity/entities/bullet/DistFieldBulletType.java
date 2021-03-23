@@ -59,13 +59,13 @@ public class DistFieldBulletType extends ExpBulletType {
     }
 
     @Override
-    public void hit(Bullet b, float x, float y) {
-
+    public void hit(Bullet b, float x, float y){
+        //Do nothing
     }
 
     @Override
     public void despawned(Bullet b){
-
+        //Do nothing
     }
 
     @Override
@@ -74,7 +74,7 @@ public class DistFieldBulletType extends ExpBulletType {
         int temp = 80;
         final float radius;
 
-        if(b.data instanceof Float[]) {
+        if(b.data instanceof Float[]){
             radius = ((Float[]) b.data)[0];
             temp /= ((Float[]) b.data)[1];
         }
@@ -82,7 +82,7 @@ public class DistFieldBulletType extends ExpBulletType {
         else if(b.data instanceof Float) radius = (float)b.data;
         else radius = fieldRadius;
 
-        if(b.time() % temp <= 1 && b.lifetime() - b.time() > 100) {
+        if(b.time() % temp <= 1 && b.lifetime() - b.time() > 100){
             if ((b.data instanceof Float[])) distSplashFx.at(b.x, b.y, 0, new Float[]{radius, (float)temp});
             else distSplashFx.at(b.x, b.y, 0, radius);
         }
@@ -102,14 +102,14 @@ public class DistFieldBulletType extends ExpBulletType {
         });
 
         Groups.bullet.intersect(b.x - radius, b.y - radius, b.x + radius, b.y + radius, e -> {
-            if(Mathf.within(b.x, b.y, e.x, e.y, radius) && e.team != b.team) {
+            if(Mathf.within(b.x, b.y, e.x, e.y, radius) && e.team != b.team){
                 if(e.damage() > damageLimit) return;
                 if(b.owner instanceof ExpBuildc block){
                     if(block.levelf() < 1 && Core.settings.getBool("hitexpeffect"))
                         for(int i = 0; i < Math.ceil(expGain); i++) UnityFx.expGain.at(e.x, e.y, 0f, block);
                     block.incExp(expGain / 30f);
                 }
-                if(!(e.owner instanceof KamiUnit)) { //nerf
+                if(!(e.owner instanceof KamiUnit)){ //nerf
                     e.vel.x = e.vel.x * bulletSlowMultiplier;
                     e.vel.y = e.vel.y * bulletSlowMultiplier;
                 }

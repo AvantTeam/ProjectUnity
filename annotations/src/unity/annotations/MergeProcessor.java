@@ -597,7 +597,7 @@ public class MergeProcessor extends BaseProcessor{
             type.addMethod(method.build());
         }
 
-        return new Entry<TypeSpec.Builder, Seq<String>>() {{
+        return new Entry<TypeSpec.Builder, Seq<String>>(){{
             key = type;
             value = imports;
         }};

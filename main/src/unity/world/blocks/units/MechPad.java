@@ -213,14 +213,14 @@ public class MechPad extends Block{
         }
         
         @Override
-        public void read(Reads read, byte revision) {
+        public void read(Reads read, byte revision){
             super.read(read, revision);
             time = read.f();
             revert = read.bool();
         }
         
         @Override
-        public void write(Writes write) {
+        public void write(Writes write){
             super.write(write);
             write.f(time);
             write.bool(revert);

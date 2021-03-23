@@ -16,7 +16,7 @@ public class ExpBulletType extends BulletType{
     }
 
     @Override
-    public void hit(Bullet b, float x, float y) {
+    public void hit(Bullet b, float x, float y){
         if(b.owner instanceof ExpBuildc exp){
             if(exp.levelf() < 1 && Core.settings.getBool("hitexpeffect")){
                 for(int i = 0; i < Math.ceil(expGain); i++){

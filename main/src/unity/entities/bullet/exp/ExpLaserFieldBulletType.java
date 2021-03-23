@@ -57,7 +57,7 @@ public class ExpLaserFieldBulletType extends ExpLaserBulletType{
                 exp.incExp(hitBuildingExpGain);
             }
         }
-        else {
+        else{
             b.data = new Vec2().trns(b.rotation(), getLength(b)).add(b.x, b.y);
             float tx = ((Vec2) b.data).x;
             float ty = ((Vec2) b.data).y;
