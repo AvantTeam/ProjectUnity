@@ -33,6 +33,7 @@ task proc(dependsOn: [classes, configurations.runtimeClasspath]){
         }
 
         exec{
+            ignoreExitValue = true
             workingDir = "../main/"
 
             println()
