@@ -926,7 +926,7 @@ public class UnityBullets implements ContentList{
 
             @Override
             public void handleBuilding(Bullet b, Building build, float initialHealth){
-                float damage = auraDamage / (Math.max(2500f - Math.max(initialHealth - 150000f, 0f), 0f) / 2500f);
+                float damage = auraDamage / (Math.max(3500f - Math.max(initialHealth - 150000f, 0f), 0f) / 3500f);
                 if((damage >= Float.MAX_VALUE || Float.isInfinite(damage))){
                     build.health = 0f;
                     UnityAntiCheat.annihilateEntity(build, false);
@@ -949,7 +949,7 @@ public class UnityBullets implements ContentList{
             }
         };
 
-        ravagerArtillery = new ArtilleryBulletType(4f, 170f){{
+        ravagerArtillery = new ArtilleryBulletType(4f, 130f){{
             lifetime = 110f;
             splashDamage = 325f;
             splashDamageRadius = 140f;
@@ -962,7 +962,7 @@ public class UnityBullets implements ContentList{
 
             fragBullets = 7;
             fragLifeMin = 0.9f;
-            fragBullet = new AntiCheatBasicBulletType(5.6f, 240f){{
+            fragBullet = new AntiCheatBasicBulletType(5.6f, 180f){{
                 lifetime = 30f;
                 pierce = pierceBuilding = true;
                 pierceCap = 5;
@@ -975,7 +975,7 @@ public class UnityBullets implements ContentList{
             }};
         }};
 
-        missileAntiCheat = new AntiCheatBasicBulletType(4f, 440f, "missile"){{
+        missileAntiCheat = new AntiCheatBasicBulletType(4f, 330f, "missile"){{
             lifetime = 60f;
             width = height = 12f;
             shrinkY = 0f;

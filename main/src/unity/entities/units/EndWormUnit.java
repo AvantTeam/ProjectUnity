@@ -104,6 +104,7 @@ public class EndWormUnit extends WormDefaultUnit implements AntiCheatBase{
         float max = Math.max(220f, lastMaxHealth / 700);
         float trueDamage = Mathf.clamp((amount / immunity) / rogueDamageResist, 0f, max);
         rogueDamageResist += 1.5f;
+        max *= 1.5f;
         immunity += Math.pow(Math.max(amount - max, 0f) / max, 2) * 2f;
         lastHealth -= trueDamage;
         super.damage(trueDamage);

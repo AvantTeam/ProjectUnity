@@ -85,6 +85,7 @@ public class EndLegsUnit extends LegsUnit implements AntiCheatBase{
         invTime = 0f;
         float max = Math.max(220f, lastMaxHealth / 700);
         float trueDamage = Mathf.clamp(amount / immunity, 0f, max);
+        max *= 1.5f;
         immunity += Math.pow(Math.max(amount - max, 0f) / max, 2) * 2f;
         lastHealth -= trueDamage;
         super.damage(trueDamage);

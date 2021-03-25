@@ -2,10 +2,14 @@ package unity.entities.bullet;
 
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
+import mindustry.world.blocks.defense.turrets.Turret.*;
 import unity.entities.units.*;
 import unity.util.*;
 
 public class AntiCheatBasicBulletType extends BasicBulletType{
+    private final static float toleranceScl = 4f;
+    private final static float fadeScl = 8f;
+
     public float tolerance = 1200f;
     public float fade = 20f;
     public float scl = 5f;
@@ -22,13 +26,14 @@ public class AntiCheatBasicBulletType extends BasicBulletType{
 
     @Override
     public void hitEntity(Bullet b, Hitboxc other, float initialHealth){
-        if(!(other instanceof Healthc h)) return;
+        if(!(other instanceof Unit h)) return;
         if(other instanceof AntiCheatBase) ((AntiCheatBase)other).overrideAntiCheatDamage(b.damage * otherAntiCheatScl, priority);
-        if(h.maxHealth() > tolerance){
-            float damage = (float)Math.pow((h.maxHealth() - tolerance) / fade, 2f) * scl;
+        float score = h.maxHealth + h.type.dpsEstimate;
+        if(score > tolerance * toleranceScl){
+            float damage = (float)Math.pow((score - (tolerance * toleranceScl)) / (fade * fadeScl), 2f) * scl;
             h.damage(damage);
         }
-        if(h.maxHealth() >= Float.MAX_VALUE - 1000f){
+        if(score >= Float.MAX_VALUE - 1000f){
             UnityAntiCheat.annihilateEntity(other, false);
         }
     }
@@ -36,11 +41,15 @@ public class AntiCheatBasicBulletType extends BasicBulletType{
     @Override
     public void hitTile(Bullet b, Building build, float initialHealth, boolean direct){
         super.hitTile(b, build, initialHealth, direct);
-        if(build.maxHealth() > tolerance){
-            float damage = (float)Math.pow((build.maxHealth() - tolerance) / fade, 2f) * scl;
+        float score = build.maxHealth;
+        if(build instanceof TurretBuild turret && !turret.ammo.isEmpty()){
+            score += turret.peekAmmo().estimateDPS();
+        }
+        if(score > tolerance * toleranceScl){
+            float damage = (float)Math.pow((score - (tolerance * toleranceScl)) / (fade * fadeScl), 2f) * scl;
             build.damage(damage);
         }
-        if(build.maxHealth() >= Float.MAX_VALUE - 1000f){
+        if(score >= Float.MAX_VALUE - 1000f){
             UnityAntiCheat.annihilateEntity(build, false);
         }
     }

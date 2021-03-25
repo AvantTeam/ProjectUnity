@@ -2533,7 +2533,7 @@ public class UnityUnitTypes implements ContentList{
             omniMovement = false;
             outlineColor = UnityPal.darkerOutline;
 
-            BulletType t = new AntiCheatBasicBulletType(9.2f, 430f){{
+            BulletType t = new AntiCheatBasicBulletType(9.2f, 325f){{
                 hitSize = 8f;
                 shrinkY = 0f;
                 width = 19f;
@@ -2613,7 +2613,7 @@ public class UnityUnitTypes implements ContentList{
                 xRand = 12f;
                 shootSound = Sounds.missile;
 
-                bullet = new AntiCheatBasicBulletType(6f, 120f, "missile"){{
+                bullet = new AntiCheatBasicBulletType(6f, 100f, "missile"){{
                     width = 9f;
                     height = 11f;
                     shrinkY = 0f;
