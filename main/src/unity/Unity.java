@@ -150,6 +150,10 @@ public class Unity extends Mod implements ApplicationListener{
 
         FactionMeta.init();
         UnityEntityMapping.init();
+
+        for(Faction faction : Faction.all) {
+            print(Strings.format("Faction @ has @ contents.", faction.toString(), FactionMeta.getByFaction(faction, Content.class).size));
+        }
     }
 
     protected void addCredits(){

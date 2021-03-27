@@ -114,15 +114,6 @@ public class UnityBlocks implements ContentList{
     //public static @FactionDef(type = "light")
     //Block
 
-    public static @FactionDef("monolith") Block
-    deflectorAura,
-
-    monolithAlloyForge,
-
-    electrophobicWall, electrophobicWallLarge,
-
-    mage, oracle;
-
     public static
     @FactionDef("monolith")
     @LoadRegs(value = {
@@ -132,9 +123,17 @@ public class UnityBlocks implements ContentList{
         "supernova-wing-left-bottom", "supernova-wing-right-bottom",
         "supernova-bottom"
     }, outline = true)
-    Block supernova;
+    Block deflectorAura,
 
-    //monolithGroundFactory;
+    monolithAlloyForge,
+
+    electrophobicWall, electrophobicWallLarge,
+
+    ricochet, shellshock, purge,
+
+    recluse, mage, oracle,
+
+    supernova;
 
     public static @FactionDef("youngcha")
     Block concreteBlank, concreteFill, concreteNumber, concreteStripe, concrete, stoneFullTiles, stoneFull, stoneHalf, stoneTiles,
@@ -1366,8 +1365,44 @@ public class UnityBlocks implements ContentList{
             energyMultiplier.put(LaserBoltBulletType.class, 9f);
         }};
 
+        ricochet = new PowerTurret("ricochet"){{
+            requirements(Category.turret, with(UnityItems.monolite, 40));
+
+            size = 1;
+            reloadTime = 60f;
+            restitution = 0.03f;
+            range = 180f;
+            shootCone = 15f;
+            ammoUseEffect = Fx.none;
+            health = 200;
+            inaccuracy = 2f;
+            rotateSpeed = 12f;
+            shootType = UnityBullets.ricochetSmall;
+            powerUse = 1f;
+        }};
+
+        recluse = new ItemTurret("recluse"){{
+            requirements(Category.turret, with(Items.lead, 15, UnityItems.monolite, 20));
+            ammo(
+                Items.lead, UnityBullets.stopLead,
+                UnityItems.monolite, UnityBullets.stopMonolite,
+                Items.silicon, UnityBullets.stopSilicon
+            );
+
+            size = 1;
+            spread = 4f;
+            reloadTime = 20f;
+            restitution = 0.03f;
+            range = 110f;
+            shootCone = 3f;
+            ammoUseEffect = Fx.none;
+            health = 200;
+            rotateSpeed = 12f;
+        }};
+
         mage = new PowerTurret("mage"){{
             requirements(Category.turret, with(Items.lead, 75, Items.silicon, 50, UnityItems.monolite, 25));
+
             size = 2;
             health = 600;
             range = 120f;
@@ -1378,12 +1413,25 @@ public class UnityBlocks implements ContentList{
             shootSound = Sounds.spark;
             powerUse = 2.5f;
             recoilAmount = 2.5f;
-            shootType = new LightningBulletType(){
-                {
-                    lightningLength = 20;
-                    damage = 32f;
-                }
-            };
+            rotateSpeed = 10f;
+            shootType = new LightningBulletType(){{
+                lightningLength = 20;
+                damage = 32f;
+            }};
+        }};
+
+        shellshock = new PowerTurret("shellshock"){{
+            requirements(Category.turret, with(Items.lead, 90, Items.graphite, 100, UnityItems.monolite, 80));
+
+            size = 2;
+            reloadTime = 75f;
+            range = 260f;
+            shootCone = 3f;
+            ammoUseEffect = Fx.none;
+            health = 720;
+            rotateSpeed = 10f;
+            shootType = UnityBullets.ricochetMedium;
+            powerUse = 2f;
         }};
 
         oracle = new BurstPowerTurret("oracle"){{
@@ -1402,25 +1450,36 @@ public class UnityBlocks implements ContentList{
             shootShake = 3f;
             powerUse = 3f;
             recoilAmount = 2.5f;
-            shootType = new LightningBulletType(){
-                {
-                    damage = 32f;
-                    shootEffect = Fx.lightningShoot;
-                }
-            };
+            rotateSpeed = 8f;
+            shootType = new LightningBulletType(){{
+                damage = 64f;
+                shootEffect = Fx.lightningShoot;
+            }};
             chargeEffect = UnityFx.oracleChage;
             chargeBeginEffect = UnityFx.oracleChargeBegin;
             subShots = 3;
             subBurstSpacing = 1f;
             subShootEffect = Fx.hitLancer;
             subShootSound = Sounds.laser;
-            subShootType = new LaserBulletType(64f){
-                {
-                    length = 180;
-                    sideAngle = 45f;
-                    inaccuracy = 8f;
-                }
-            };
+            subShootType = new LaserBulletType(96f){{
+                length = 180f;
+                sideAngle = 45f;
+                inaccuracy = 8f;
+            }};
+        }};
+
+        purge = new PowerTurret("purge"){{
+            requirements(Category.turret, with(Items.plastanium, 75, Items.lead, 350, UnityItems.monolite, 200, UnityItems.monolithAlloy, 75));
+
+            size = 3;
+            reloadTime = 90f;
+            range = 360f;
+            shootCone = 3f;
+            ammoUseEffect = Fx.none;
+            health = 1680;
+            rotateSpeed = 8f;
+            shootType = UnityBullets.ricochetBig;
+            powerUse = 3f;
         }};
 
         supernova = new AttractLaserTurret("supernova"){
