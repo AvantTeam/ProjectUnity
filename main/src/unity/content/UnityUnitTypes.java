@@ -2452,7 +2452,7 @@ public class UnityUnitTypes implements ContentList{
             flying = true;
             drawCell = false;
 
-            Unity.musicHandler.registerLoop(name, UnityMusics.radiantDischargeIntro, UnityMusics.radiantDischargeLoop);
+            Unity.musicHandler.registerLoop(name, UnityMusics.radiantDischarge);
         }};
 
         //endregion

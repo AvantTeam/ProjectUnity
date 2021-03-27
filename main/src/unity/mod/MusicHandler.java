@@ -124,6 +124,10 @@ public class MusicHandler implements ApplicationListener{
         currentMusic = null;
     }
 
+    public void registerLoop(String name, Music loop){
+        registerLoop(name, loop, loop);
+    }
+
     public void registerLoop(String name, Music intro, Music loop){
         loopDatas.put(name, new MusicLoopData(intro, loop));
     }
