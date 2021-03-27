@@ -48,7 +48,11 @@ public class UnityBullets implements ContentList{
         scarShrapnel, scarMissile,
 
         kamiBullet1, kamiLaser, kamiSmallLaser,
-        
+
+        ricochetSmall, ricochetMedium, ricochetBig,
+
+        stopLead, stopMonolite, stopSilicon,
+
         supernovaLaser,
 
         ravagerLaser, ravagerArtillery, missileAntiCheat, laserZap,
@@ -857,6 +861,69 @@ public class UnityBullets implements ContentList{
             fadeInTime = 15f;
             curveScl = 3f;
             drawSize = (length + (width * 2f)) * 2f;
+        }};
+
+        ricochetSmall = new RicochetBulletType(7f, 18f){{
+            width = 9f;
+            height = 12f;
+            ammoMultiplier = 4;
+            lifetime = 30f;
+            frontColor = Color.white;
+            backColor = Pal.lancerLaser;
+        }};
+
+        ricochetMedium = new RicochetBulletType(8.5f, 36f){{
+            width = 12f;
+            height = 16f;
+            ammoMultiplier = 4;
+            lifetime = 35f;
+            frontColor = Color.white;
+            backColor = Pal.lancerLaser;
+            pierceCap = 5;
+        }};
+
+        ricochetBig = new RicochetBulletType(10f, 96f){{
+            width = 14f;
+            height = 18f;
+            ammoMultiplier = 4;
+            lifetime = 40f;
+            frontColor = Color.white;
+            backColor = Pal.lancerLaser;
+            pierceCap = 8;
+        }};
+
+        stopLead = new BasicBulletType(3.6f, 18f, "shell"){{
+            width = 9f;
+            height = 12f;
+            ammoMultiplier = 4;
+            lifetime = 60f;
+            frontColor = Color.white;
+            backColor = Pal.lancerLaser;
+            status = StatusEffects.unmoving;
+            statusDuration = 4f;
+        }};
+
+        stopMonolite = new BasicBulletType(4f, 23f, "shell"){{
+            width = 9f;
+            height = 12f;
+            ammoMultiplier = 4;
+            lifetime = 60f;
+            frontColor = Color.white;
+            backColor = Pal.lancerLaser;
+            status = StatusEffects.unmoving;
+            statusDuration = 7f;
+        }};
+
+        stopSilicon = new BasicBulletType(4f, 19f, "shell"){{
+            width = 9f;
+            height = 12f;
+            ammoMultiplier = 4;
+            lifetime = 60f;
+            frontColor = Color.white;
+            backColor = Pal.lancerLaser;
+            status = StatusEffects.unmoving;
+            statusDuration = 14f;
+            homingPower = 0.08f;
         }};
 
         supernovaLaser = new ContinuousLaserBulletType(400f){

@@ -27,4 +27,9 @@ public enum Faction{
         this.name = Core.bundle.get("faction." + name, name);
         this.color = color.cpy();
     }
+
+    @Override
+    public String toString() {
+        return "[#" + color.toString() + "]" + name + "[]";
+    }
 }
