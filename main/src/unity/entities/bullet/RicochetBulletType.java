@@ -52,7 +52,7 @@ public class RicochetBulletType extends BasicBulletType{
     public void draw(Bullet b){
         RicochetBulletData data = (RicochetBulletData)b.data;
         if(data.trail != null){
-            data.trail.draw(backColor, width * 0.4f);
+            data.trail.draw(backColor, width * 0.18f);
         }
 
         super.draw(b);
@@ -74,9 +74,9 @@ public class RicochetBulletType extends BasicBulletType{
         if(data.ricochet < pierceCap){
             data.findEnemy(b);
             if(data.target != null){
-                //TODO doesn't seem right
                 Vec2 out = Predict.intercept(b, data.target, speed);
-                b.vel().setAngle(b.angleTo(out));
+                float rot = out.sub(b.x, b.y).angle();
+                b.vel.set(0f, speed).setAngle(rot);
             }else{
                 despawned(b);
             }

@@ -1378,6 +1378,7 @@ public class UnityBlocks implements ContentList{
             inaccuracy = 2f;
             rotateSpeed = 12f;
             shootType = UnityBullets.ricochetSmall;
+            shootSound = UnitySounds.energyBolt;
             powerUse = 1f;
         }};
 
@@ -1431,6 +1432,7 @@ public class UnityBlocks implements ContentList{
             health = 720;
             rotateSpeed = 10f;
             shootType = UnityBullets.ricochetMedium;
+            shootSound = UnitySounds.energyBolt;
             powerUse = 2f;
         }};
 
@@ -1479,6 +1481,7 @@ public class UnityBlocks implements ContentList{
             health = 1680;
             rotateSpeed = 8f;
             shootType = UnityBullets.ricochetBig;
+            shootSound = UnitySounds.energyBolt;
             powerUse = 3f;
         }};
 

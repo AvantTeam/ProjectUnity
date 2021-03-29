@@ -863,7 +863,7 @@ public class UnityBullets implements ContentList{
             drawSize = (length + (width * 2f)) * 2f;
         }};
 
-        ricochetSmall = new RicochetBulletType(7f, 18f){{
+        ricochetSmall = new RicochetBulletType(7f, 20f){{
             width = 9f;
             height = 12f;
             ammoMultiplier = 4;
@@ -872,7 +872,7 @@ public class UnityBullets implements ContentList{
             backColor = Pal.lancerLaser;
         }};
 
-        ricochetMedium = new RicochetBulletType(8.5f, 36f){{
+        ricochetMedium = new RicochetBulletType(8.5f, 42f){{
             width = 12f;
             height = 16f;
             ammoMultiplier = 4;
@@ -882,7 +882,7 @@ public class UnityBullets implements ContentList{
             pierceCap = 5;
         }};
 
-        ricochetBig = new RicochetBulletType(10f, 96f){{
+        ricochetBig = new RicochetBulletType(10f, 132f){{
             width = 14f;
             height = 18f;
             ammoMultiplier = 4;
