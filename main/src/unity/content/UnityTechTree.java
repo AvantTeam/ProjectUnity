@@ -16,7 +16,7 @@ public class UnityTechTree implements ContentList{
     public void load(){
         //region blocks
 
-        attachNode(Blocks.surgeSmelter, () -> {
+        attach(Blocks.surgeSmelter, () -> {
             node(darkAlloyForge);
             node(monolithAlloyForge);
             node(sparkAlloyForge, () -> {
@@ -31,7 +31,7 @@ public class UnityTechTree implements ContentList{
             });
         });
 
-        attachNode(Blocks.powerNode, () -> {
+        attach(Blocks.powerNode, () -> {
             node(lightLamp, () -> {
                 node(lightFilter, () -> {
                     node(lightInvertedFilter, () -> {
@@ -56,13 +56,21 @@ public class UnityTechTree implements ContentList{
             });            
         });
 
-        attachNode(Blocks.arc, () -> {
-            node(mage, () -> {
-                node(oracle);
+        attach(Blocks.arc, () -> {
+            node(recluse, () -> {
+                node(mage, () -> {
+                    node(oracle);
+                });
+            });
+
+            node(ricochet, () -> {
+                node(shellshock, () -> {
+                    node(purge);
+                });
             });
         });
 
-        attachNode(Blocks.titaniumWall, () -> {
+        attach(Blocks.titaniumWall, () -> {
             node(metaglassWall, () -> {
                 node(metaglassWallLarge);
             });
@@ -75,11 +83,11 @@ public class UnityTechTree implements ContentList{
         //end region
         //region items
 
-        attachNode(Items.lead, () -> {
+        attach(Items.lead, () -> {
             nodeProduce(UnityItems.nickel);
         });
 
-        attachNode(Items.graphite, () -> {
+        attach(Items.graphite, () -> {
             nodeProduce(UnityItems.stone, () -> {
                 nodeProduce(UnityItems.denseAlloy, () -> {
                     nodeProduce(UnityItems.steel, () -> {
@@ -93,7 +101,7 @@ public class UnityTechTree implements ContentList{
         });
     }
 
-    private static void attachNode(UnlockableContent parent, Runnable children){
+    private static void attach(UnlockableContent parent, Runnable children){
         TechNode parnode = TechTree.all.find(t -> t.content == parent);
         context = parnode;
         children.run();
