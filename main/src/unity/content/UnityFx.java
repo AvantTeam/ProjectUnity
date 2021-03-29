@@ -1146,5 +1146,32 @@ public class UnityFx{
             float py3 = Angles.trnsy(space * (i + 2), (float)e.data);
             Fill.quad(e.x, e.y, centerf, e.x + px, e.y + py, edgef, e.x + px2, e.y + py2, edgef, e.x + px3, e.y + py3, edgef);
         }
+    }),
+
+    ricochetTrailSmall = new Effect(12f, e -> {
+        randLenVectors(e.id, 4, e.fout() * 3.5f, (x, y) -> {
+            float w = 0.3f + e.fout();
+
+            Draw.color(e.color);
+            Fill.rect(e.x + x, e.y + y, w, w, 45f);
+        });
+    }),
+
+    ricochetTrailMedium = new Effect(16f, e -> {
+        randLenVectors(e.id, 5, e.fout() * 5f, (x, y) -> {
+            float w = 0.3f + e.fout() * 1.3f;
+
+            Draw.color(e.color);
+            Fill.rect(e.x + x, e.y + y, w, w, 45f);
+        });
+    }),
+
+    ricochetTrailBig = new Effect(20f, e -> {
+        randLenVectors(e.id, 6, e.fout() * 6.5f, (x, y) -> {
+            float w = 0.3f + e.fout() * 1.7f;
+
+            Draw.color(e.color);
+            Fill.rect(e.x + x, e.y + y, w, w, 45f);
+        });
     });
 }

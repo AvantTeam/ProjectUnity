@@ -1,9 +1,6 @@
 package unity.entities.bullet;
 
 import arc.math.geom.*;
-import arc.struct.*;
-import arc.util.pooling.*;
-import arc.util.pooling.Pool.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
@@ -17,12 +14,13 @@ public class RicochetBulletType extends BasicBulletType{
         pierce = true;
         pierceBuilding = true;
         pierceCap = 3;
+        trailChance = 1f;
     }
 
     @Override
     public void init(Bullet b){
         super.init(b);
-        b.data = Pools.obtain(RicochetBulletData.class, RicochetBulletData::new).set(0);
+        b.data = new RicochetBulletData();
     }
 
     @Override
@@ -58,56 +56,46 @@ public class RicochetBulletType extends BasicBulletType{
         super.draw(b);
     }
 
-    @Override
-    public void despawned(Bullet b){
-        super.despawned(b);
-        Pools.free(b.data);
-    }
-
     public void ricochet(Bullet b, Posc entity){
         RicochetBulletData data = (RicochetBulletData)b.data;
         if(data == null) return;
 
-        if(data.ids.contains(entity.id())) return;
-        data.ids.add(entity.id());
+        if(data.hit == entity.id()) return;
+
+        data.hit = entity.id();
+        b.collided.clear();
 
         if(data.ricochet < pierceCap){
             data.findEnemy(b);
             if(data.target != null){
-                Vec2 out = Predict.intercept(b, data.target, speed);
-                float rot = out.sub(b.x, b.y).angle();
-                b.vel.set(0f, speed).setAngle(rot);
+                if(data.target instanceof Velc){
+                    Vec2 out = Predict.intercept(b, data.target, b.vel.len());
+                    float rot = out.sub(b.x, b.y).angle();
+                    b.vel.setAngle(rot);
+                }else{
+                    b.vel.setAngle(b.angleTo(data.target));
+                }
             }else{
                 despawned(b);
             }
         }
     }
 
-    public class RicochetBulletData implements Poolable{
+    public class RicochetBulletData{
         protected int ricochet;
+
         protected Teamc target;
+        protected int hit;
 
         protected Trail trail = new Trail(trailLength);
-        protected IntSeq ids = new IntSeq();
 
-        protected RicochetBulletData set(int ricochet){
-            this.ricochet = ricochet;
-            return this;
-        }
+        protected RicochetBulletData(){}
 
         protected void findEnemy(Bullet b){
             target = Units.closestTarget(b.team, b.x, b.y, range() * b.fout(),
-                u -> u.isValid() && !b.collided.contains(u.id) && ((u.isFlying() && collidesAir) || (u.isGrounded() && collidesGround)),
-                t -> t.isValid() && !b.collided.contains(t.id) && collidesGround
+                u -> u.isValid() && u.id != hit && ((u.isFlying() && collidesAir) || (u.isGrounded() && collidesGround)),
+                t -> t.isValid() && t.id != hit && collidesGround
             );
-        }
-
-        @Override
-        public void reset(){
-            ricochet = 0;
-            target = null;
-            trail.clear();
-            ids.clear();
         }
     }
 }

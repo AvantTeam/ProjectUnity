@@ -868,8 +868,9 @@ public class UnityBullets implements ContentList{
             height = 12f;
             ammoMultiplier = 4;
             lifetime = 30f;
+            trailEffect = UnityFx.ricochetTrailSmall;
             frontColor = Color.white;
-            backColor = Pal.lancerLaser;
+            backColor = trailColor = Pal.lancerLaser;
         }};
 
         ricochetMedium = new RicochetBulletType(8.5f, 42f){{
@@ -877,9 +878,11 @@ public class UnityBullets implements ContentList{
             height = 16f;
             ammoMultiplier = 4;
             lifetime = 35f;
-            frontColor = Color.white;
-            backColor = Pal.lancerLaser;
             pierceCap = 5;
+            trailLength = 7;
+            trailEffect = UnityFx.ricochetTrailMedium;
+            frontColor = Color.white;
+            backColor = trailColor = Pal.lancerLaser;
         }};
 
         ricochetBig = new RicochetBulletType(10f, 132f){{
@@ -887,9 +890,11 @@ public class UnityBullets implements ContentList{
             height = 18f;
             ammoMultiplier = 4;
             lifetime = 40f;
-            frontColor = Color.white;
-            backColor = Pal.lancerLaser;
             pierceCap = 8;
+            trailLength = 8;
+            trailEffect = UnityFx.ricochetTrailBig;
+            frontColor = Color.white;
+            backColor = trailColor = Pal.lancerLaser;
         }};
 
         stopLead = new BasicBulletType(3.6f, 18f, "shell"){{
