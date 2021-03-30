@@ -2,19 +2,17 @@ package unity.world.blocks.defense.turrets;
 
 import arc.*;
 import arc.audio.*;
+import arc.func.*;
 import arc.math.*;
 import arc.util.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
-import mindustry.type.*;
 import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.consumers.*;
 import unity.util.*;
 
 import java.lang.reflect.*;
-
-import static mindustry.Vars.*;
 
 public class AttractLaserTurret extends LaserTurret{
     public float chargeWarmup = 0.002f;
@@ -23,7 +21,10 @@ public class AttractLaserTurret extends LaserTurret{
     public Sound chargeSound = Sounds.none;
     public float chargeSoundVolume = 1f;
 
-    public float attractionStrength = 0.85f;
+    public float attractionStrength = 6f;
+    public float attractionDamage = 60f;
+    public Cons2<AttractLaserTurretBuild, Unit> attractUnit = (tile, unit) -> {};
+    public Cons<AttractLaserTurretBuild> attractor = tile -> {};
 
     public AttractLaserTurret(String name){
         super(name);
@@ -42,20 +43,8 @@ public class AttractLaserTurret extends LaserTurret{
         protected PitchedSoundLoop sound = new PitchedSoundLoop(chargeSound, chargeSoundVolume);
 
         // thanks anuke for making the fields package-private
-        private Field bulletf;
-        private Field bulletLifef;
-
-        {
-            try{
-                bulletf = LaserTurretBuild.class.getDeclaredField("bullet");
-                bulletf.setAccessible(true);
-
-                bulletLifef = LaserTurretBuild.class.getDeclaredField("bulletLife");
-                bulletLifef.setAccessible(true);
-            }catch(NoSuchFieldException e){
-                throw new RuntimeException(e);
-            }
-        }
+        private Field bulletf = Utils.findField(getClass(), "bullet", true);
+        private Field bulletLifef = Utils.findField(getClass(), "bulletLife", true);
 
         @Override
         public void updateTile(){
@@ -63,12 +52,12 @@ public class AttractLaserTurret extends LaserTurret{
                 charge = Mathf.lerpDelta(charge, 0f, chargeCooldown);
                 charge = charge > 0.001f ? charge : 0f;
             }
-            if(bulletLife() <= 0f && bullet() == null){
+            if(isShooting() && (bulletLife() <= 0f && bullet() == null)){
                 attractUnits();
             }
 
             if(isShooting() || (bulletLife() > 0f && bullet() != null)){
-                phase = Mathf.clamp(phase + chargeWarmup * efficiency() * Time.delta, 0f, 1f);
+                phase = Mathf.clamp(phase + chargeWarmup * edelta(), 0f, 1f);
             }else{
                 phase = Mathf.lerpDelta(phase, 0f, chargeCooldown);
                 phase = phase > 0.001f ? phase : 0f;
@@ -76,8 +65,21 @@ public class AttractLaserTurret extends LaserTurret{
 
             super.updateTile();
 
+            if(isShooting() && (bulletLife() <= 0f && bullet() == null)){
+                var liquid = liquids.current();
+                float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;
+
+                float used = baseReloadSpeed() * ((cheating() ? maxUsed : Math.min(liquids.get(liquid), maxUsed * Time.delta)) * liquid.heatCapacity * coolantMultiplier);
+                charge += 120f * chargeWarmup * used;
+            }
+
             float prog = charge * 1.5f + 0.5f;
             sound.update(x, y, charge, prog);
+        }
+
+        @Override
+        public boolean isShooting(){
+            return super.isShooting() && efficiency() > 0f;
         }
 
         @Override
@@ -95,63 +97,37 @@ public class AttractLaserTurret extends LaserTurret{
         }
 
         @Override
-        protected void updateCooling(){
-            if(!isShooting() || (bulletLife() > 0f && bullet() != null)){
-                charge = Mathf.lerpDelta(charge, 0f, chargeCooldown);
-            }else{
-                float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;
-
-                Liquid liquid = liquids.current();
-
-                float used = Math.min(Math.min(liquids.get(liquid), maxUsed), Math.max(0f, ((reloadTime - reload) / coolantMultiplier) / liquid.heatCapacity)) * baseReloadSpeed();
-                charge = Mathf.clamp(charge + chargeWarmup * (1f - used) * Time.delta, 0f, 1f);
-                liquids.remove(liquid, used * Time.delta);
-
-                if(Mathf.chance(0.06f * used)){
-                    coolEffect.at(x + Mathf.range(size * tilesize / 2f), y + Mathf.range(size * tilesize / 2f));
-                }
-            }
-        }
-
-        @Override
         public void remove(){
             sound.stop();
             super.remove();
         }
 
-        protected boolean hasEnemyInProximity(){
-            return Units.closestTarget(team, x, y, range(), unit -> !unit.dead()) != null;
-        }
-
         protected void attractUnits(){
-            Units.nearby(x - range() * 2f, y - range() * 2f, range() * 4f, range() * 4f, unit -> {
-                if(!unit.dead() && unit.within(x, y, range() * 2f)){
+            float rad = range() * 2f;
+            Units.nearby(x - rad, y - rad, rad * 2f, rad * 2f, unit -> {
+                if(unit.isValid() && unit.within(this, rad)){
                     float dst = unit.dst(this);
-                    float strength = Mathf.clamp(((range() * 2f) - dst) / (range() * 2f)) * Mathf.clamp(dst / (range() / 2f));
+                    float strength = 1 - (dst / rad);
                     Tmp.v1.set(x - unit.x, y - unit.y)
                         .rotate(10f * (1f - charge))
                         .setLength(attractionStrength * charge * Time.delta)
                         .scl(strength);
 
-                    unit.vel.add(Tmp.v1);
+                    unit.impulseNet(Tmp.v1);
+                    if(unit.team != team) unit.damageContinuous((attractionDamage / 60f) * charge * strength);
+                    attractUnit.get(this, unit);
                 }
             });
+
+            attractor.get(this);
         }
 
         public float bulletLife(){
-            try{
-				return bulletLifef.getFloat(this);
-			}catch(Exception e){
-                throw new RuntimeException(e);
-            }
+            return Utils.getField(this, bulletLifef);
         }
 
         public Bullet bullet(){
-            try{
-                return (Bullet)bulletf.get(this);
-            }catch(Exception e){
-                throw new RuntimeException(e);
-            }
+            return Utils.getField(this, bulletf);
         }
     }
 }

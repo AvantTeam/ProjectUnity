@@ -32,6 +32,8 @@ public class UnitySectorPresets implements ContentList{
         //testing scripted sectors
         accretion = new ScriptedSector("accretion", megalith, 30){{
             alwaysUnlocked = true;
+            addStartingItems = true;
+            difficulty = 3f;
             captureWave = 15;
 
             float rad = 5f * tilesize;

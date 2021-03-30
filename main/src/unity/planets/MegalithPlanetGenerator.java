@@ -121,11 +121,7 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
                 int nscl = rand.random(20, 60);
                 int stroke = rand.random(4, 12);
 
-                try{
-                    brush(pathfind(x, y, to.x, to.y, tile -> (tile.solid() ? 5f : 0f) + noise(tile.x, tile.y, 1d, 1d, 1d / nscl) * 48f, Astar.manhattan), stroke);
-                }catch(Throwable e){
-                    Log.info("@, @", x, y);
-                }
+                brush(pathfind(x, y, to.x, to.y, tile -> (tile.solid() ? 5f : 0f) + noise(tile.x, tile.y, 1d, 1d, 1d / nscl) * 48f, Astar.manhattan), stroke);
             }
         }
 
@@ -203,7 +199,7 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
         cells(1);
         distort(10f, 6f);
         inverseFloodFill(tiles.getn(spawn.x, spawn.y));
-        
+
         Seq<Block> ores = Seq.with(Blocks.oreCopper, Blocks.oreLead, UnityBlocks.oreMonolite);
 
         float poles = Math.abs(sector.tile.v.y);
@@ -269,7 +265,7 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
 
                 Tmp.v1.trns(angle, r.radius - rand.random(r.radius / 2f)).add(r.x, r.y);
 
-                Tile tile = tiles.get((int)Tmp.v1.x, (int)Tmp.v1.y);
+                Tile tile = tiles.getn((int)Tmp.v1.x, (int)Tmp.v1.y);
                 if(rand.chance(0.1f) || i + angleStep2 >= 360){
                     hasMessage = true;
 
@@ -285,8 +281,6 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
 
                         return build;
                     });
-
-                    Log.info("@, @", (int)Tmp.v1.x, (int)Tmp.v1.y);
                 }
             }
         }

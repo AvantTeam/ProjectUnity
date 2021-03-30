@@ -15,13 +15,14 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.defense.turrets.Turret.*;
-import unity.entities.UnitVecData;
+import unity.entities.*;
 import unity.entities.abilities.BaseAbility.*;
 import unity.entities.bullet.*;
 import unity.entities.effects.*;
 import unity.graphics.*;
 import unity.type.*;
 import unity.util.*;
+import unity.util.struct.*;
 
 //fixing rect as Draw.rect not Lines.rect. currently no use
 import static arc.graphics.g2d.Draw.rect;
@@ -1074,6 +1075,23 @@ public class UnityFx{
                 color(Pal.lancerLaser);
                 Fill.circle(e.x + x, e.y + y, 2f * e.fin());
             });
+        }
+    }),
+
+    supernovaPullEffect = new Effect(30f, 500f, e -> {
+        if(e.data instanceof Float[] data){
+            if(data.length != 5) return;
+
+            long unit = Vec2Struct.get(data[0], data[1]);
+            long pos = Vec2Struct.get(data[2], data[3]);
+            float size = data[4];
+
+            float x = Vec2Struct.x(unit) + Mathf.randomSeedRange(e.id, 4f);
+            float y = Vec2Struct.y(unit) + Mathf.randomSeedRange(e.id + 1, 4f);
+            pos = Vec2Struct.scl(Vec2Struct.sub(pos, x, y), e.fin());
+
+            Draw.color(Pal.lancerLaser);
+            Fill.circle(x + Vec2Struct.x(pos), y + Vec2Struct.y(pos), size * (0.5f + e.fslope() * 0.5f));
         }
     }),
 

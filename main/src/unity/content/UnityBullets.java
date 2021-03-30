@@ -931,15 +931,27 @@ public class UnityBullets implements ContentList{
             homingPower = 0.08f;
         }};
 
-        supernovaLaser = new ContinuousLaserBulletType(400f){
-            final Effect plasmaEffect = new Effect(36f, e -> {
-                Draw.color(Color.white, Pal.lancerLaser, e.fin());
-                Fill.circle(
-                    e.x + Angles.trnsx(e.rotation, e.fin() * 24f),
-                    e.y + Angles.trnsy(e.rotation, e.fin() * 24f),
-                    e.fout() * 5f
-                );
-            });
+        supernovaLaser = new ContinuousLaserBulletType(600f){
+            final Effect plasmaEffect;
+
+            {
+                length = 280f;
+                colors = new Color[]{
+                    Color.valueOf("4be3ca55"),
+                    Color.valueOf("91eedeaa"),
+                    Pal.lancerLaser.cpy(),
+                    Color.white
+                };
+
+                plasmaEffect = new Effect(36f, e -> {
+                    Draw.color(Color.white, Pal.lancerLaser, e.fin());
+                    Fill.circle(
+                        e.x + Angles.trnsx(e.rotation, e.fin() * 24f),
+                        e.y + Angles.trnsy(e.rotation, e.fin() * 24f),
+                        e.fout() * 5f
+                    );
+                });
+            }
 
             @Override
             public void update(Bullet b){
@@ -953,33 +965,15 @@ public class UnityBullets implements ContentList{
                         b.rotation() + Mathf.randomSeedRange((long)(b.id + Time.time + 1f), 15f), Mathf.randomSeed((long)(b.id + Time.time + 2f), 10, 19)
                     );
                 }
-            }
 
-            @Override
-            public void draw(Bullet b){
-                super.draw(b);
-
-                if(!state.isPaused()){
-                    for(int i = 0; i < 2; i++){
-                        float f = Mathf.random(length * b.fout());
-                        plasmaEffect.at(
-                            b.x + Angles.trnsx(b.rotation(), f) + Mathf.range(6f),
-                            b.y + Angles.trnsy(b.rotation(), f) + Mathf.range(6f),
-                            b.rotation() + Mathf.range(85f)
-                        );
-                    }
+                for(int i = 0; i < 2; i++){
+                    float f = Mathf.random(length * b.fout());
+                    plasmaEffect.at(
+                        b.x + Angles.trnsx(b.rotation(), f) + Mathf.range(6f),
+                        b.y + Angles.trnsy(b.rotation(), f) + Mathf.range(6f),
+                        b.rotation() + Mathf.range(85f)
+                    );
                 }
-            }
-
-            {
-                colors = new Color[]{
-                    Color.valueOf("4be3ca55"),
-                    Color.valueOf("91eedeaa"),
-                    Pal.lancerLaser.cpy(),
-                    Color.white
-                };
-
-                length = 280f;
             }
         };
 
