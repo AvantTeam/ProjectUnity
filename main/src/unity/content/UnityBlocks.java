@@ -12,6 +12,7 @@ import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
+import mindustry.world.blocks.production.GenericCrafter;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 import mindustry.world.blocks.environment.*;
@@ -52,6 +53,8 @@ public class UnityBlocks implements ContentList{
     distributionDrill,
 
     recursiveReconstructor,
+
+    metalCompressor,
     //@formatter:on
     lightLamp, oilLamp, lightLaser, lightLampInfi, lightReflector, lightReflector1, lightOmnimirror, lightFilter, lightInvertedFilter, lightDivisor, lightDivisor1, lightItemFilter, lightPanel, lightInfluencer,
 
@@ -192,6 +195,15 @@ public class UnityBlocks implements ContentList{
     @Override
     public void load(){
         //region global
+
+        metalCompressor = new GenericCrafter("metal-compressor"){{
+            requirements(Category.crafting, with(Items.lead, 120, Items.silicon, 80, Items.titanium, 30));
+            outputItem = new ItemStack(UnityItems.metalPlating, 2);
+            size = 3;
+            craftTime = 50f;
+            consumes.power(1.2f);
+            consumes.items(with(UnityItems.steel, 3, Items.titanium, 3));
+        }};
 
         distributionDrill = new DistributionDrill("distribution-drill"){{
             requirements(Category.production, with(Items.copper, 20, Items.silicon, 15, Items.titanium, 20));

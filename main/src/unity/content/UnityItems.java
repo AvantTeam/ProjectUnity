@@ -14,7 +14,7 @@ public class UnityItems implements ContentList{
     terminationFragment, terminum,
     //@formatter:on
     //faction items
-    contagium, denseAlloy, imberium, luminum, monolite, nickel, steel, stone, umbrium, xenium;
+    contagium, denseAlloy, imberium, metalPlating, luminum, monolite, nickel, steel, stone, umbrium, xenium;
 
     @Override
     public void load(){
@@ -98,6 +98,10 @@ public class UnityItems implements ContentList{
             cost = 1.4f;
             hardness = 3;
             radioactivity = 0.6f;
+        }};
+
+        metalPlating = new Item("metal-plating", Color.valueOf("3d423e")){{
+            cost = 2f;
         }};
 
         luminum = new Item("luminum", Color.valueOf("e9eaf1")){{
