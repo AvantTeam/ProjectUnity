@@ -29,6 +29,8 @@ public class LoadOutlineGenerator implements Generator{
 
                 Sprite sprite = SpriteProcessor.get(fname);
                 sprite.draw(sprite.outline(4, outlineColor));
+                sprite.antialias();
+
                 sprite.save(fname + "-outline");
             }
 
