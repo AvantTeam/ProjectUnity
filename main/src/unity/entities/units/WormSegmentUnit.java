@@ -125,6 +125,11 @@ public class WormSegmentUnit extends UnitEntity{
     }
 
     @Override
+    public boolean isCounted(){
+        return false;
+    }
+
+    @Override
     public Player getPlayer(){
         if(trueParentUnit == null) return null;
         return isPlayer() ? (Player)trueParentUnit.controller : null;
