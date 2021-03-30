@@ -1,6 +1,5 @@
 package unity.content;
 
-import arc.*;
 import arc.func.*;
 import arc.math.*;
 import arc.graphics.*;
@@ -41,7 +40,8 @@ public class UnityUnitTypes implements ContentList{
         EndInvisibleUnit::new,
         EndWormUnit::new,
         EndWormSegmentUnit::new,
-        EndLegsUnit::new
+        EndLegsUnit::new,
+        ApocalypseUnit::new
     };
 
     private static final int[] classIDs = new int[constructors.length];
@@ -96,7 +96,7 @@ public class UnityUnitTypes implements ContentList{
     public static @FactionDef("koruh") @EntityDef(base = KamiUnit.class, def = Bossc.class)
     UnitType kami;
 
-    public static @FactionDef("end") UnitType opticaecus, devourer, ravager;
+    public static @FactionDef("end") UnitType opticaecus, devourer, apocalypse, ravager;
 
     public static @EntityDef(base = UnitEntity.class, def = Extensionc.class)
     UnitType extension;
@@ -2467,7 +2467,7 @@ public class UnityUnitTypes implements ContentList{
             flying = true;
             lowAltitude = true;
             circleTarget = false;
-            engineOffset = 40f;
+            engineOffset = 38f;
             engineSize = 6f;
             outlineColor = UnityPal.darkerOutline;
 
@@ -2654,53 +2654,92 @@ public class UnityUnitTypes implements ContentList{
                 shootSound = Sounds.beam;
                 continuous = true;
 
-                bullet = new ContinuousLaserBulletType(85f){{
-                    lifetime = 2f * 60;
-                    length = 230f;
-                    for(int i = 0; i < strokes.length; i++){
-                        strokes[i] *= 0.4f;
-                    }
-                    colors = new Color[]{UnityPal.scarColorAlpha, UnityPal.scarColor, UnityPal.endColor, Color.white};
-                }
-
-                    @Override
-                    public void hitEntity(Bullet b, Hitboxc other, float initialHealth){
-                        super.hitEntity(b, other, initialHealth);
-                        if(other instanceof Unit unit){
-                            for(Ability ability : unit.abilities){
-                                if(ability instanceof ForceFieldAbility force){
-                                    if(force.max >= 10000){
-                                        force.max -= force.max / 35f;
-                                        unit.shield = Math.min(force.max, unit.shield);
-                                    }
-                                    if(force.radius > unit.hitSize * 4f){
-                                        force.radius -= force.radius / 20f;
-                                    }
-                                    if(force.regen > 2700f / 5f) force.regen /= 1.2f;
-                                    continue;
-                                }
-                                if(ability instanceof RepairFieldAbility repair){
-                                    if(repair.amount > unit.maxHealth / 7f) repair.amount *= 0.9f;
-                                    continue;
-                                }
-                                if(ability instanceof StatusFieldAbility status){
-                                    if((status.effect.damage < -unit.maxHealth / 20f || status.effect.reloadMultiplier > 8f) && status.duration > 20f){
-                                        statusDuration -= statusDuration / 15f;
-                                    }
-                                }
-                            }
-                            unit.shield -= damage * 0.4f;
-                            if(unit.armor > unit.hitSize) unit.armor -= Math.max(damage, unit.armor / 20f);
-                        }
-                        if(other instanceof AntiCheatBase) ((AntiCheatBase)other).overrideAntiCheatDamage(damage * 6f, 3);
-                    }
-                };
+                bullet = UnityBullets.endLaserSmall;
             }});
         }
             @Override
             public void init(){
                 super.init();
                 immunities.addAll(content.getBy(ContentType.status));
+            }
+        };
+
+        setEntity("apocalypse", ApocalypseUnit::new);
+        apocalypse = new InvisibleUnitType("apocalypse"){{
+            health = 1725000f;
+            speed = 0.75f;
+            accel = 0.06f;
+            drag = 0.06f;
+            armor = 17f;
+            hitSize = 205f;
+            rotateSpeed = 1f;
+            visualElevation = 3f;
+            engineOffset = 116.5f;
+            engineSize = 14f;
+            flying = true;
+            lowAltitude = true;
+            outlineColor = UnityPal.darkerOutline;
+
+            tentacles.add(new TentacleType("unity-apocalypse-tentacle"){{
+                x = 101.75f;
+                y = -72.5f;
+                rotationOffset = 30f;
+
+                rotationSpeed = 3f;
+                speed = 2f;
+
+                segments = 20;
+                segmentLength = 27.75f;
+
+                bullet = UnityBullets.endLaserSmall;
+                continuous = true;
+                reload = 4f * 60f;
+            }}, new TentacleType("unity-apocalypse-tentacle"){{
+                x = 56.5f;
+                y = -71.75f;
+                rotationOffset = 10f;
+
+                rotationSpeed = 3f;
+                speed = 2f;
+
+                segments = 15;
+                segmentLength = 27.75f;
+                swayOffset = 90f;
+
+                bullet = UnityBullets.endLaserSmall;
+                continuous = true;
+                reload = 4f * 60f;
+            }});
+        }
+
+            @Override
+            public void init(){
+                super.init();
+                immunities.addAll(content.getBy(ContentType.status));
+            }
+
+            @Override
+            public void drawEngine(Unit unit){
+                if(!unit.isFlying()) return;
+
+                super.drawEngine(unit);
+
+                float scale = unit.elevation;
+                //float offset = (engineOffset / 2f) + ((engineOffset / 2f) * scale);
+
+                for(int i : Mathf.signs){
+                    float offset = 0.5f + (0.5f * scale);
+                    float engineSizeB = 3.25f;
+                    Tmp.v1.trns(unit.rotation, -105f * offset, 73.5f * i).add(unit);
+                    Draw.color(unit.team.color);
+                    if(unit instanceof EndInvisibleUnit e) Draw.alpha(fade(e));
+                    Fill.circle(Tmp.v1.x, Tmp.v1.y, (engineSizeB + Mathf.absin(Time.time + 90f, 2f, engineSizeB / 2f)) * scale);
+                    Tmp.v1.trns(unit.rotation, (-105f * offset) + 1f, 74f * i).add(unit);
+                    Draw.color(Color.white);
+                    if(unit instanceof EndInvisibleUnit e) Draw.alpha(fade(e));
+                    Fill.circle(Tmp.v1.x, Tmp.v1.y, (engineSizeB + Mathf.absin(Time.time + 90f, 2f, engineSizeB / 2f)) / 2f * scale);
+                    Draw.color();
+                }
             }
         };
 
