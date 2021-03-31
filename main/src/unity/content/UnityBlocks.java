@@ -1,5 +1,6 @@
 package unity.content;
 
+import arc.Core;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -36,6 +37,7 @@ import unity.world.blocks.power.*;
 import unity.world.blocks.production.*;
 import unity.world.blocks.sandbox.*;
 import unity.world.blocks.units.*;
+import unity.world.blocks.effect.*;
 import unity.world.consumers.*;
 import unity.world.draw.*;
 import unity.world.graphs.*;
@@ -55,6 +57,8 @@ public class UnityBlocks implements ContentList{
     recursiveReconstructor,
 
     metalCompressor,
+
+    plater,
     //@formatter:on
     lightLamp, oilLamp, lightLaser, lightLampInfi, lightReflector, lightReflector1, lightOmnimirror, lightFilter, lightInvertedFilter, lightDivisor, lightDivisor1, lightItemFilter, lightPanel, lightInfluencer,
 
@@ -196,15 +200,6 @@ public class UnityBlocks implements ContentList{
     public void load(){
         //region global
 
-        metalCompressor = new GenericCrafter("metal-compressor"){{
-            requirements(Category.crafting, with(Items.lead, 120, Items.silicon, 80, Items.titanium, 30));
-            outputItem = new ItemStack(UnityItems.metalPlating, 2);
-            size = 3;
-            craftTime = 50f;
-            consumes.power(1.2f);
-            consumes.items(with(UnityItems.steel, 3, Items.titanium, 3));
-        }};
-
         distributionDrill = new DistributionDrill("distribution-drill"){{
             requirements(Category.production, with(Items.copper, 20, Items.silicon, 15, Items.titanium, 20));
             tier = 3;
@@ -238,6 +233,22 @@ public class UnityBlocks implements ContentList{
             consumes.power(5f);
             consumes.items(with(Items.silicon, 1200, Items.metaglass, 800, Items.thorium, 700, Items.surgeAlloy, 400, Items.plastanium, 600, Items.phaseFabric, 350));
             consumes.liquid(Liquids.cryofluid, 7f);
+        }};
+
+        metalCompressor = new GenericCrafter("metal-compressor"){{
+            requirements(Category.crafting, with(Items.lead, 120, Items.silicon, 80, Items.titanium, 30));
+            outputItem = new ItemStack(UnityItems.metalPlating, 2);
+            size = 3;
+            craftTime = 50f;
+            consumes.power(1.2f);
+            consumes.items(with(Items.lead, 5, Items.titanium, 5, Items.silicon, 2));
+        }};
+
+        plater = new Reinforcer("plater"){{
+            requirements(Category.effect, with(Items.titanium, 60, Items.lead, 20, Items.silicon, 30));
+            size = 2;
+            consumes.power(0.4f);
+            consumes.items(with(UnityItems.metalPlating, 15));
         }};
 
         lightLamp = new LightSource("light-lamp"){{
