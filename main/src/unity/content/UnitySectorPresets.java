@@ -1,10 +1,12 @@
 package unity.content;
 
+import arc.*;
 import arc.graphics.g2d.*;
 import mindustry.type.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import unity.annotations.Annotations.*;
 import unity.graphics.*;
@@ -29,8 +31,14 @@ public class UnitySectorPresets implements ContentList{
             captureWave = 15;
         }};*/
 
+        Events.on(SectorLaunchEvent.class, e -> {
+            if(e.sector.planet.minfo.mod.name.equals("unity")){
+                state.rules.waves = true;
+            }
+        });
+
         //testing scripted sectors
-        accretion = new ScriptedSector("accretion", megalith, 30){{
+        accretion = new ScriptedSector("accretion", megalith, 60){{
             alwaysUnlocked = true;
             addStartingItems = true;
             difficulty = 3f;

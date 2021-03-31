@@ -24,8 +24,6 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
     protected float scl = 6f;
     protected float waterOffset = 0.07f;
 
-    protected int msgIndex;
-
     protected Block[][] blocks = {
         {water, darksandWater, snow, snow, snow, snow, snow, snow, snow, iceSnow, ice, ice, ice, ice},
         {water, darksandWater, darksand, stone, snow, snow, snow, snow, iceSnow, iceSnow, iceSnow, ice, ice, ice},
@@ -97,16 +95,29 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
         return (float)noise.octaveNoise3D(octaves, falloff, 1f / scl, v.x, v.y, v.z) * (float)mag;
     }
 
+    protected void clamp(Vec2 vec){
+        float margin = width / 16f;
+        vec.x = Math.max(Math.min(vec.x, width - margin), margin);
+        vec.y = Math.max(Math.min(vec.y, width - margin), margin);
+    }
+
     @Override
     protected void generate(){
         class Room{
-            int x;
-            int y;
-            int radius;
+            final String name;
+            final int x;
+            final int y;
+            final int radius;
 
             ObjectSet<Room> connected = new ObjectSet<>();
 
-            Room(int x, int y, int radius){
+            Room(String name, int x, int y, int radius){
+                this.name = name;
+
+                if((x < 0 || x >= width) || (y < 0 || y >= height)){
+                    throw new IllegalArgumentException(Strings.format("'@' out of bounds: (@, @) must be between (@, @) and exclusive (@, @)", name, x, y, 0, 0, width, height));
+                }
+
                 this.x = x;
                 this.y = y;
                 this.radius = radius;
@@ -118,10 +129,10 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
 
                 connected.add(to);
                 to.connected.add(this);
-                int nscl = rand.random(20, 60);
+                float nscl = rand.random(12f, 48f);
                 int stroke = rand.random(4, 12);
 
-                brush(pathfind(x, y, to.x, to.y, tile -> (tile.solid() ? 5f : 0f) + noise(tile.x, tile.y, 1d, 1d, 1d / nscl) * 48f, Astar.manhattan), stroke);
+                brush(pathfind(x, y, to.x, to.y, tile -> (tile.solid() ? 3f : 0f) + noise(tile.x, tile.y, 1, 1, 1f / nscl) * 32f, Astar.manhattan), stroke);
             }
         }
 
@@ -129,37 +140,41 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
         distort(10f, 12f);
 
         float roomPos = width / 2f / Mathf.sqrt3;
-        int roomCount = rand.random(4, 8);
+        int roomMin = 4, roomMax = 8, roomCount = rand.random(roomMin, roomMax);
         Seq<Room> rooms = new Seq<>();
 
+        float minRadius = 0.6f;
+        float scl = minRadius + (1f - (float)(roomCount - roomMin) / (float)(roomMax - roomMin)) * (1f - minRadius);
         for(int i = 0; i < roomCount; i++){
-            Tmp.v1.trns(rand.random(360f), rand.random(roomPos));
-            float tx = width / 2f + Tmp.v1.x;
-            float ty = height / 2f + Tmp.v2.y;
-            float rad = Math.min(rand.random(6f, (roomPos - Tmp.v1.len()) / 2f), 24f);
+            Tmp.v1.trns(rand.random(360f), rand.random(roomPos / 1.3f));
+            clamp(Tmp.v2.set(Tmp.v1).add(width / 2f, height / 2f));
 
-            rooms.add(new Room((int)tx, (int)ty, (int)rad));
+            float maxrad = scl * (roomPos - Tmp.v1.len());
+            float rad = Math.min(rand.random(9f, maxrad / 2f), 30f);
+            rooms.add(new Room("Room-" + i, (int)Tmp.v2.x, (int)Tmp.v2.y, (int)rad));
         }
 
-        Room spawn = null;
+        Room[] spawn = {null};
         Seq<Room> enemies = new Seq<>();
         int enemySpawns = rand.random(2, Math.max((int)(sector.threat * 4), 2));
         int angleStep = 5;
-        int offset = width / 2 - rand.random(26, 49);
+        int offset = (int)(width / 2f / Mathf.sqrt3 - rand.random(26f, 49f));
         int offsetAngle = rand.nextInt(360);
         int waterCheck = 5;
 
         for(int i = 0; i < 360; i += angleStep){
             int angle = offsetAngle + i;
 
-            int tx = (int)(width / 2 + Angles.trnsx(angle, offset));
-            int ty = (int)(height / 2 + Angles.trnsx(angle, offset));
+            Tmp.v1.set(
+                (int)((width / 2f) + Angles.trnsx(angle, offset)),
+                (int)((height / 2f) + Angles.trnsy(angle, offset))
+            );
 
             int waterTiles = 0;
 
             for(int rx = -waterCheck; rx <= waterCheck; rx++){
                 for(int ry = -waterCheck; ry <= waterCheck; ry++){
-                    Tile tile = tiles.get(tx + rx, ty + ry);
+                    Tile tile = tiles.get((int)Tmp.v1.x + rx, (int)Tmp.v1.y + ry);
 
                     if(tile == null || tile.floor().liquidDrop != null){
                         waterTiles++;
@@ -168,14 +183,18 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
             }
 
             if(waterTiles <= 4 || i + angleStep >= 360){
-                rooms.add(spawn = new Room(tx, ty, rand.random(16, 24)));
+                rooms.add(spawn[0] = new Room("Room-Spawn", (int)Tmp.v1.x, (int)Tmp.v1.y, rand.random(16, 24)));
 
                 for(int j = 0; j < enemySpawns; j++){
                     int enemyOffset = rand.range(60);
 
-                    Tmp.v1.set(tx - width / 2f, ty - height / 2f).rotate(180f + enemyOffset).add(width / 2f, height / 2f);
+                    clamp(Tmp.v2
+                        .set(Tmp.v1.x - width / 2f, Tmp.v1.y - height / 2f)
+                        .rotate(180f + enemyOffset)
+                        .add(width / 2f, height / 2f)
+                    );
 
-                    Room espawn = new Room((int)Tmp.v1.x, (int)Tmp.v1.y, rand.random(12, 16));
+                    Room espawn = new Room("Room-Espawn" + j, (int)Tmp.v2.x, (int)Tmp.v2.y, rand.random(12, 16));
 
                     rooms.add(espawn);
                     enemies.add(espawn);
@@ -185,7 +204,11 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
             }
         }
 
-        rooms.each(r -> erase(r.x, r.y, r.radius));
+        Log.info("Generated @ rooms", rooms.size);
+        for(Room room : rooms){
+            Log.info("Generated room @", room.name);
+            erase(room.x, room.y, room.radius);
+        }
 
         int connections = rand.random(Math.max(roomCount - 1, 1), roomCount + 3);
         for(int i = 0; i < connections; i++){
@@ -193,12 +216,12 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
         }
 
         for(Room r : rooms){
-            spawn.connect(r);
+            spawn[0].connect(r);
         }
 
         cells(1);
         distort(10f, 6f);
-        inverseFloodFill(tiles.getn(spawn.x, spawn.y));
+        inverseFloodFill(tiles.getn(spawn[0].x, spawn[0].y));
 
         Seq<Block> ores = Seq.with(Blocks.oreCopper, Blocks.oreLead, UnityBlocks.oreMonolite);
 
@@ -225,7 +248,6 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
 
         trimDark();
         median(2);
-        tech();
 
         pass((x, y) -> {
             if(floor.asFloor().isLiquid) return;
@@ -248,66 +270,91 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
             }
         });
 
-        float difficulty = sector.threat;
-        ints.clear();
-        ints.ensureCapacity(width * height / 4);
+        //don't generate message blocks if enemy base is present
+        if(!sector.hasEnemyBase()){
+            Seq<Room> msgRoom = rooms.select(r -> r != spawn[0] && !enemies.contains(r));
+            for(int r = 0; r < msgRoom.size; r++){
+                Room room = msgRoom.get(r);
+                if(rand.chance(0.3f) || r == msgRoom.size - 1){
+                    int angleStep2 = 10;
+                    int off = rand.random(360);
 
-        boolean hasMessage = false;
-        for(Room r : rooms){
-            if(r == spawn) continue;
-            if(hasMessage) return;
+                    for(int i = 0; i < 360; i += angleStep2){
+                        int angle = off + i;
 
-            int angleStep2 = 10;
-            int off = rand.random(360);
+                        Tmp.v1.trns(angle, room.radius - rand.random(room.radius / 2f)).add(room.x, room.y);
+                        Tile tile = tiles.getn((int)Tmp.v1.x, (int)Tmp.v1.y);
 
-            for(int i = 0; i < 360; i += angleStep2){
-                int angle = off + i;
+                        boolean hasMessage = false;
+                        if(!hasMessage && rand.chance(0.1f) || i + angleStep2 >= 360){
+                            if(tile == null){
+                                tile = new Tile((int)Tmp.v1.x, (int)Tmp.v1.y);
+                                tiles.set((int)Tmp.v1.x, (int)Tmp.v1.y, tile);
+                            }
 
-                Tmp.v1.trns(angle, r.radius - rand.random(r.radius / 2f)).add(r.x, r.y);
+                            Block[] floors = new Block[]{metalFloor, metalFloor2, metalFloor3, metalFloor5};
 
-                Tile tile = tiles.getn((int)Tmp.v1.x, (int)Tmp.v1.y);
-                if(rand.chance(0.1f) || i + angleStep2 >= 360){
-                    hasMessage = true;
+                            for(int tx = -4; tx < 4; tx++){
+                                for(int ty = -4; ty < 4; ty++){
+                                    if(
+                                        Mathf.within(tile.x, tile.y, tile.x + tx, tile.y + ty, 4f) &&
+                                        rand.chance((4f - Mathf.dst(tile.x, tile.y, tile.x + tx, tile.y + ty)) / 4f)
+                                    ){
+                                        Tile other = tiles.getn(tile.x + tx, tile.y + ty);
+                                        if(other == null){
+                                            other = new Tile(tile.x + tx, tile.y + ty);
+                                            tiles.set(other.x, other.y, other);
+                                        }
 
-                    if(tile == null){
-                        tile = new Tile((int)Tmp.v1.x, (int)Tmp.v1.y);
-                        tiles.set((int)Tmp.v1.x, (int)Tmp.v1.y, tile);
+                                        Block block = floors[rand.random(floors.length - 1)];
+
+                                        other.setFloor(block.asFloor());
+                                        if(other.solid() && !other.synthetic()){
+                                            other.setBlock(block);
+                                        }
+                                    }
+                                }
+                            }
+
+                            tile.setBlock(Blocks.message, Team.sharded, 0, () -> {
+                                MessageBuild build = Blocks.message.buildType.get().as();
+                                build.message.append(message(sector.id));
+                                return build;
+                            });
+
+                            hasMessage = true;
+                        }
                     }
 
-                    tile.setFloor(Blocks.metalFloor.asFloor());
-                    tile.setBlock(Blocks.message, Team.sharded, 0, () -> {
-                        MessageBuild build = (MessageBuild)Blocks.message.buildType.get();
-                        build.message.append(nextMessage());
-
-                        return build;
-                    });
+                    break;
                 }
             }
         }
 
-        Schematics.placeLaunchLoadout(spawn.x, spawn.y);
+        Schematics.placeLaunchLoadout(spawn[0].x, spawn[0].y);
 
         enemies.each(espawn -> tiles.getn(espawn.x, espawn.y).setOverlay(Blocks.spawn));
 
+        float difficulty = sector.threat;
         if(sector.hasEnemyBase()){
-            basegen.generate(tiles, enemies.map(r -> tiles.getn(r.x, r.y)), tiles.get(spawn.x, spawn.y), state.rules.waveTeam, sector, difficulty);
+            basegen.generate(tiles, enemies.map(r -> tiles.getn(r.x, r.y)), tiles.get(spawn[0].x, spawn[0].y), state.rules.waveTeam, sector, difficulty);
 
-            state.rules.attackMode = true;
+            state.rules.attackMode = sector.info.attack = true;
         }else{
-            state.rules.winWave = 15 * (int)Math.max(difficulty * 5f, 1f);
+            state.rules.winWave = sector.info.winWave = 15 * (int)Math.max(difficulty * 5f, 1f);
         }
 
         float waveTimeDec = 0.3f;
 
         state.rules.waveSpacing = Mathf.lerp(60f * 65f * 2f, 60f * 60f, Math.max(difficulty - waveTimeDec, 0) / 0.8f);
         state.rules.waves = sector.info.waves = true;
-        state.rules.enemyCoreBuildRadius = 600;
+        state.rules.enemyCoreBuildRadius = 600f;
 
         state.rules.spawns = Waves.generate(difficulty, new Rand(), state.rules.attackMode);
     }
 
-    protected String nextMessage(){
-        return Core.bundle.get("lore.unity.megalith-" + msgIndex++, "...");
+    protected String message(int id){
+        return Core.bundle.get("lore.unity.megalith-" + id, "...");
     }
 
     @Override
