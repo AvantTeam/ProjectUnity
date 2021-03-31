@@ -20,7 +20,7 @@ public class UnityTechTree implements ContentList{
             node(darkAlloyForge);
             node(monolithAlloyForge);
             node(sparkAlloyForge, () -> {
-               node(orb, () -> {
+                node(orb, () -> {
                     node(shielder);
                     node(shockwire, () -> {
                         node(current, () -> {
@@ -88,6 +88,8 @@ public class UnityTechTree implements ContentList{
         });
 
         attach(Items.graphite, () -> {
+            nodeProduce(UnityItems.monolite);
+
             nodeProduce(UnityItems.stone, () -> {
                 nodeProduce(UnityItems.denseAlloy, () -> {
                     nodeProduce(UnityItems.steel, () -> {
@@ -97,6 +99,12 @@ public class UnityTechTree implements ContentList{
                         });
                     });
                 });
+            });
+        });
+
+        attach(Items.thorium, () -> {
+            nodeProduce(UnityItems.archDebris, () -> {
+                nodeProduce(UnityItems.monolithAlloy);
             });
         });
     }

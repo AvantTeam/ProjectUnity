@@ -3,6 +3,7 @@ package unity;
 import arc.*;
 import arc.assets.*;
 import arc.func.*;
+import arc.graphics.*;
 import arc.scene.*;
 import arc.struct.*;
 import arc.util.*;
@@ -13,7 +14,7 @@ import mindustry.game.EventType.*;
 import unity.ai.kami.*;
 import unity.content.*;
 import unity.gen.*;
-import unity.graphics.UnityShaders;
+import unity.graphics.*;
 import unity.mod.*;
 import unity.sync.*;
 import unity.ui.*;
@@ -187,7 +188,7 @@ public class Unity extends Mod implements ApplicationListener{
             }
         }
 
-        Log.info("&lc&fb[unity]&fr @", builder.toString());
+        Log.info("[#@][unity][] @", Color.cyan, builder.toString());
     }
 
     public static Class<?> forName(String canonical){

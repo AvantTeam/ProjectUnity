@@ -16,7 +16,7 @@ public enum Faction{
     light("light", Color.valueOf("fffde8")),
     monolith("monolith", Color.teal),
     youngcha("youngcha", Color.valueOf("a69f95")),
-    end("end", Pal.removeBack);
+    end("end", Color.gray);
 
     public static final Faction[] all = values();
 
@@ -24,7 +24,7 @@ public enum Faction{
     public final Color color;
 
     Faction(String name, Color color){
-        this.name = Core.bundle.get("faction." + name, name);
         this.color = color.cpy();
+        this.name = Core.bundle.format("faction." + name, this.color);
     }
 }

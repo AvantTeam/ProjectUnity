@@ -14,6 +14,8 @@ import mindustry.maps.generators.*;
 import mindustry.world.*;
 import mindustry.world.blocks.logic.MessageBlock.*;
 import unity.content.*;
+import unity.mod.*;
+import unity.type.sector.*;
 
 import static mindustry.Vars.*;
 import static mindustry.content.Blocks.*;
@@ -204,9 +206,9 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
             }
         }
 
-        Log.info("Generated @ rooms", rooms.size);
+        Log.debug("Generated @ rooms", rooms.size);
         for(Room room : rooms){
-            Log.info("Generated room @", room.name);
+            Log.debug("Generated room @", room.name);
             erase(room.x, room.y, room.radius);
         }
 
@@ -346,11 +348,11 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
 
         float waveTimeDec = 0.3f;
 
-        state.rules.waveSpacing = Mathf.lerp(60f * 65f * 2f, 60f * 60f, Math.max(difficulty - waveTimeDec, 0) / 0.8f);
+        state.rules.waveSpacing = Mathf.lerp(Time.toSeconds * 50f * 2f, Time.toSeconds * 40f, Math.max(difficulty - waveTimeDec, 0) / 0.8f);
         state.rules.waves = sector.info.waves = true;
         state.rules.enemyCoreBuildRadius = 600f;
 
-        state.rules.spawns = Waves.generate(difficulty, new Rand(), state.rules.attackMode);
+        state.rules.spawns = UnityWaves.generate(Faction.monolith, difficulty, new Rand(), state.rules.attackMode);
     }
 
     protected String message(int id){
