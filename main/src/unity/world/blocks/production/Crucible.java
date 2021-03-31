@@ -10,6 +10,7 @@ import mindustry.ui.*;
 import unity.graphics.*;
 import unity.ui.dialogs.*;
 import unity.util.*;
+import unity.util.struct.*;
 import unity.world.blocks.*;
 import unity.world.meta.*;
 import unity.world.graph.*;
@@ -19,15 +20,15 @@ import static arc.Core.atlas;
 
 public class Crucible extends GraphBlock{
     CrucibleGraph viewPos;
-    private static final FixedPosition[] randomPos = new FixedPosition[]{
-        new FixedPosition(0f, 0f),
-        new FixedPosition(-1.6f, 1.6f),
-        new FixedPosition(-1.6f, -1.6f),
-        new FixedPosition(1.6f, -1.6f),
-        new FixedPosition(-1.6f, -1.6f),
-        new FixedPosition(0f, 0f)
+    private static final long[] randomPos = new long[]{
+        Vec2Struct.get(0f, 0f),
+        Vec2Struct.get(-1.6f, 1.6f),
+        Vec2Struct.get(-1.6f, -1.6f),
+        Vec2Struct.get(1.6f, -1.6f),
+        Vec2Struct.get(-1.6f, -1.6f),
+        Vec2Struct.get(0f, 0f)
     };
-    
+
     public TextureRegion[] liquidRegions, baseRegions, roofRegions, solidItemStrips, heatRegions;
     public TextureRegion floorRegion, solidItem;
 
@@ -140,13 +141,13 @@ public class Crucible extends GraphBlock{
                         if(ddd > 1f) Draw.rect(solidItemStrips[Mathf.floor(ddd) - 1], x, y);
 
                         float siz = 8f * (ddd % 1f);
-                        var pos = randomPos[Math.max(Mathf.floor(ddd), 5)];
+                        long pos = randomPos[Math.max(Mathf.floor(ddd), 5)];
                         
-                        Draw.rect(solidItem, pos.getX() + x, pos.getY() + y, siz, siz);
+                        Draw.rect(solidItem, Vec2Struct.x(pos) + x, Vec2Struct.y(pos) + y, siz, siz);
                     }
                 }
             }
-            
+
             Draw.color();
         }
     }
