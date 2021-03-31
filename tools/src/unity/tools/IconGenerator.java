@@ -20,6 +20,8 @@ import static mindustry.Vars.*;
 public class IconGenerator implements Generator{
     @Override
     public void generate(){
+        Func<TextureRegion, String> parseName = reg -> ((AtlasRegion)reg).name.replaceFirst("unity-", "");
+
         content.units().each(t -> {
             if(t.minfo.mod == null || !(t instanceof UnityUnitType)) return;
 
@@ -31,7 +33,6 @@ public class IconGenerator implements Generator{
                 type.init();
 
                 Func<Sprite, Sprite> outline = i -> i.outline(3, type.outlineColor);
-                Func<TextureRegion, String> parseName = reg -> ((AtlasRegion)reg).name.replaceFirst("unity-", "");
                 Seq<String> optional = Seq.with("-joint", "-leg-back", "-leg-base-back", "-foot-back");
 
                 Cons<TextureRegion> outliner = tr -> {
@@ -209,9 +210,43 @@ public class IconGenerator implements Generator{
                 }
 
                 genIcon(icon.antialias(), fname);
-            }catch(Exception e){
+            }catch(Throwable e){
                 if(e instanceof IllegalArgumentException i){
                     Log.err("Skipping unit @: @", type.name, i.getMessage());
+                }else{
+                    Log.err(e);
+                }
+            }
+        });
+
+        content.blocks().each(block -> {
+            if(block.minfo.mod == null || block.outlineIcon) return;
+
+            try{
+                block.init();
+                block.load();
+
+                ObjectSet<String> antialiased = new ObjectSet<>();
+                for(TextureRegion reg : block.getGeneratedIcons()){
+                    String fname = parseName.get(reg);
+                    if(antialiased.add(fname)){
+                        Sprite sprite = SpriteProcessor.get(fname);
+                        sprite.antialias();
+                        sprite.save(fname);
+                    }
+                }
+
+                for(TextureRegion reg : block.variantRegions()){
+                    String fname = parseName.get(reg);
+                    if(antialiased.add(fname)){
+                        Sprite sprite = SpriteProcessor.get(fname);
+                        sprite.antialias();
+                        sprite.save(fname);
+                    }
+                }
+            }catch(Throwable e){
+                if(e instanceof IllegalArgumentException i){
+                    Log.err("Skipping item @: @", block.name, i.getMessage());
                 }else{
                     Log.err(e);
                 }
@@ -244,7 +279,7 @@ public class IconGenerator implements Generator{
                     sprite.save(fname);
                     genIcon(sprite, fname);
                 }
-            }catch(Exception e){
+            }catch(Throwable e){
                 if(e instanceof IllegalArgumentException i){
                     Log.err("Skipping item @: @", item.name, i.getMessage());
                 }else{
