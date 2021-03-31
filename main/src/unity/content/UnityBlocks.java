@@ -95,6 +95,8 @@ public class UnityBlocks implements ContentList{
     
     bufferPad, omegaPad, cachePad,
 
+    convertPad,
+
     teleporter, teleunit; //expOutput, expUnloader, expTank, expChest, expFountain, expVoid;
 
     public static
@@ -979,9 +981,22 @@ public class UnityBlocks implements ContentList{
         cachePad = new MechPad("cache-pad"){{
             requirements(Category.units, with(UnityItems.stone, 150, Items.lead, 160, Items.silicon, 100, Items.titanium, 60, Items.plastanium, 120, Items.phaseFabric, 60));
             size = 2;
-            craftTime = 130;
+            craftTime = 130f;
             consumes.power(0.8f);
             unitType = UnityUnitTypes.cache;
+        }};
+
+        convertPad = new ConversionPad("conversion-pad"){{
+            requirements(Category.units, BuildVisibility.sandboxOnly, empty);
+            size = 2;
+            craftTime = 60f;
+            consumes.power(1f);
+            upgrades.add(
+                new UnitType[]{UnitTypes.dagger, UnitTypes.mace},
+                new UnitType[]{UnitTypes.flare, UnitTypes.horizon},
+                new UnitType[]{UnityUnitTypes.cache, UnityUnitTypes.dijkstra},
+                new UnitType[]{UnityUnitTypes.omega, UnitTypes.reign}
+            );
         }};
 
         teleporter = new Teleporter("teleporter"){{

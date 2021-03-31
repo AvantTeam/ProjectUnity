@@ -14,7 +14,6 @@ import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.storage.*;
-import mindustry.world.blocks.storage.CoreBlock.*;
 
 import static mindustry.Vars.*;
 
@@ -24,7 +23,8 @@ public class MechPad extends Block{
     public float cooldown = 0.1f;
     public float spawnRot = 90f;
     public float spawnForce = 3f;
-    public TextureRegion arrowRegion;
+
+    protected TextureRegion arrowRegion;
     
     public MechPad(String name){
         super(name);
@@ -161,6 +161,7 @@ public class MechPad extends Block{
             revert = false;
         }
         
+        @Override
         public void draw(){
             super.draw();
             if(!inProgress()) return;
@@ -204,7 +205,7 @@ public class MechPad extends Block{
 
             Lines.stroke(3);
             Draw.color(Pal.accent);
-            Lines.line(x - len, y + oy, x - len+ len*2*progress, y + oy, false);
+            Lines.line(x - len, y + oy, x - len+ len * 2f * progress, y + oy, false);
 
             Fill.tri(x + len, y + oy - Lines.getStroke() / 2f, x + len, y + oy + Lines.getStroke() / 2f, x + (len + Lines.getStroke() * heat), y + oy);
             Fill.tri(x + len * -1f, y + oy - Lines.getStroke() / 2f, x + len * -1f, y + oy + Lines.getStroke() / 2f, x + (len + Lines.getStroke() * heat) * -1f, y + oy);
