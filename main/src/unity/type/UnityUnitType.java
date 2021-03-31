@@ -47,6 +47,9 @@ public class UnityUnitType extends UnitType{
     public Prov<UnitType> toTrans;
     public float transformTime;
 
+    // tentacles
+    public Seq<TentacleType> tentacles = new Seq<>();
+
     // copters
     public final Seq<Rotor> rotors = new Seq<>(4);
     public float rotorDeathSlowdown = 0.01f;
@@ -97,6 +100,7 @@ public class UnityUnitType extends UnitType{
         }
 
         segWeapSeq.each(Weapon::load);
+        tentacles.each(TentacleType::load);
     }
 
     @Override
@@ -117,6 +121,8 @@ public class UnityUnitType extends UnitType{
                 mapped.add(copy);
             }
         });
+
+        TentacleType.set(tentacles);
 
         weapons.each(w -> weaponXs.add(w.x));
 
@@ -246,6 +252,10 @@ public class UnityUnitType extends UnitType{
     @Override
     public void drawBody(Unit unit){
         float z = Draw.z();
+
+        if(unit instanceof TentaclesBase t){
+            t.drawTentacles();
+        }
 
         super.drawBody(unit);
         //worm

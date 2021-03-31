@@ -123,6 +123,15 @@ public class IconGenerator implements Generator{
                     }
                 }
 
+                for(TentacleType tentacle : type.tentacles){
+                    if(outlined.add(tentacle.name)){
+                        outliner.get(tentacle.region);
+                    }
+                    if(outlined.add(tentacle.name + "-tip")){
+                        outliner.get(tentacle.tipRegion);
+                    }
+                }
+
                 outlSeparate.get("outline", type.region);
                 if(unit instanceof WormDefaultUnit){
                     outlSeparate.get("outline", type.segmentRegion);

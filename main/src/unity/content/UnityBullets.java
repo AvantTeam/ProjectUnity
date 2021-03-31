@@ -9,6 +9,7 @@ import arc.graphics.g2d.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.entities.abilities.*;
 import mindustry.gen.*;
 import mindustry.entities.bullet.*;
 import mindustry.graphics.*;
@@ -55,7 +56,7 @@ public class UnityBullets implements ContentList{
 
         supernovaLaser,
 
-        ravagerLaser, ravagerArtillery, missileAntiCheat, laserZap,
+        ravagerLaser, ravagerArtillery, missileAntiCheat, endLaserSmall, laserZap,
 
         plasmaBullet, phantasmalBullet,
 
@@ -1061,6 +1062,48 @@ public class UnityBullets implements ContentList{
             backColor = lightColor = trailColor = UnityPal.scarColor;
             frontColor = UnityPal.endColor;
         }};
+
+        endLaserSmall = new ContinuousLaserBulletType(85f){{
+            lifetime = 2f * 60;
+            length = 230f;
+            for(int i = 0; i < strokes.length; i++){
+                strokes[i] *= 0.4f;
+            }
+            colors = new Color[]{UnityPal.scarColorAlpha, UnityPal.scarColor, UnityPal.endColor, Color.white};
+        }
+
+            @Override
+            public void hitEntity(Bullet b, Hitboxc other, float initialHealth){
+                super.hitEntity(b, other, initialHealth);
+                if(other instanceof Unit unit){
+                    for(Ability ability : unit.abilities){
+                        if(ability instanceof ForceFieldAbility force){
+                            if(force.max >= 10000){
+                                force.max -= force.max / 35f;
+                                unit.shield = Math.min(force.max, unit.shield);
+                            }
+                            if(force.radius > unit.hitSize * 4f){
+                                force.radius -= force.radius / 20f;
+                            }
+                            if(force.regen > 2700f / 5f) force.regen /= 1.2f;
+                            continue;
+                        }
+                        if(ability instanceof RepairFieldAbility repair){
+                            if(repair.amount > unit.maxHealth / 7f) repair.amount *= 0.9f;
+                            continue;
+                        }
+                        if(ability instanceof StatusFieldAbility status){
+                            if((status.effect.damage < -unit.maxHealth / 20f || status.effect.reloadMultiplier > 8f) && status.duration > 20f){
+                                statusDuration -= statusDuration / 15f;
+                            }
+                        }
+                    }
+                    unit.shield -= damage * 0.4f;
+                    if(unit.armor > unit.hitSize) unit.armor -= Math.max(damage, unit.armor / 20f);
+                }
+                if(other instanceof AntiCheatBase) ((AntiCheatBase)other).overrideAntiCheatDamage(damage * 6f, 3);
+            }
+        };
 
         laserZap = new LaserBulletType(90f){{
             sideAngle = 15f;
