@@ -1,9 +1,6 @@
 package unity.content;
 
-import arc.Core;
 import arc.graphics.*;
-import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.Lines;
 import arc.math.*;
 import arc.util.*;
 import mindustry.content.*;
