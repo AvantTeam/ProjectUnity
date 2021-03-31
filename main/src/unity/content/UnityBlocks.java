@@ -56,7 +56,7 @@ public class UnityBlocks implements ContentList{
 
     recursiveReconstructor,
 
-    metalCompressor,
+    energyMixer,
 
     plater,
     //@formatter:on
@@ -235,13 +235,13 @@ public class UnityBlocks implements ContentList{
             consumes.liquid(Liquids.cryofluid, 7f);
         }};
 
-        metalCompressor = new GenericCrafter("metal-compressor"){{
+        energyMixer = new GenericCrafter("energy-mixer"){{
             requirements(Category.crafting, with(Items.lead, 120, Items.silicon, 80, Items.titanium, 30));
-            outputItem = new ItemStack(UnityItems.metalPlating, 2);
+            outputItem = new ItemStack(UnityItems.powerPack, 3);
             size = 3;
             craftTime = 50f;
             consumes.power(1.2f);
-            consumes.items(with(Items.lead, 5, Items.titanium, 5, Items.silicon, 2));
+            consumes.items(with(Items.thorium, 5, Items.titanium, 5, Items.surgeAlloy, 1));
         }};
 
         plater = new Reinforcer("plater"){{
@@ -249,7 +249,7 @@ public class UnityBlocks implements ContentList{
             size = 2;
             itemCapacity = 15;
             consumes.power(0.4f);
-            consumes.items(with(UnityItems.metalPlating, 15));
+            consumes.items(with(UnityItems.powerPack, 10));
         }};
 
         lightLamp = new LightSource("light-lamp"){{

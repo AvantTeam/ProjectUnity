@@ -31,10 +31,10 @@ public class Reinforcer extends Block {
 
     @Override
     public void load(){
-        region = Core.atlas.find(name);
+        super.load();
+
         laserRegion = Core.atlas.find("unity-pointy-laser");
         laserEndRegion = Core.atlas.find("unity-pointy-laser-end");
-        teamRegion = Core.atlas.find(name + "team");
         rotator = Core.atlas.find(name + "rotator");
     }
 
@@ -66,7 +66,7 @@ public class Reinforcer extends Block {
                     unit.apply(UnityStatusEffects.plated);
                     load = 0f;
                     laserWidth = 0f;
-                    items.remove(UnityItems.metalPlating, 15);
+                    items.remove(consumes.getItem().items);
                 }
             }
             load += 0.01f * Time.delta;
