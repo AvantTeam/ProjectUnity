@@ -123,6 +123,15 @@ public class IconGenerator implements Generator{
                     }
                 }
 
+                for(TentacleType tentacle : type.tentacles){
+                    if(outlined.add(tentacle.name)){
+                        outliner.get(tentacle.region);
+                    }
+                    if(outlined.add(tentacle.name + "-tip")){
+                        outliner.get(tentacle.tipRegion);
+                    }
+                }
+
                 outlSeparate.get("outline", type.region);
                 if(unit instanceof WormDefaultUnit){
                     outlSeparate.get("outline", type.segmentRegion);
@@ -216,12 +225,25 @@ public class IconGenerator implements Generator{
                 item.init();
                 item.load();
 
-                Sprite sprite = SpriteProcessor.get(item.name);
-                sprite.antialias();
+                if(item instanceof AnimatedItem anim){
+                    for(int i = 0; i < anim.animSize; i++){
+                        String fname = anim.name.replaceFirst("unity-", "") + (i + 1);
 
-                String fname = item.name.replaceFirst("unity-", "");
-                sprite.save(fname);
-                genIcon(sprite, fname);
+                        Sprite sprite = SpriteProcessor.get(fname);
+                        sprite.antialias();
+
+                        sprite.save(fname);
+                        genIcon(sprite, fname);
+                    }
+                }else{
+                    String fname = item.name.replaceFirst("unity-", "");
+
+                    Sprite sprite = SpriteProcessor.get(fname);
+                    sprite.antialias();
+
+                    sprite.save(fname);
+                    genIcon(sprite, fname);
+                }
             }catch(Exception e){
                 if(e instanceof IllegalArgumentException i){
                     Log.err("Skipping item @: @", item.name, i.getMessage());

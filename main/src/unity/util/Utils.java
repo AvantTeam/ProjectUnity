@@ -150,7 +150,13 @@ public final class Utils{
         return (d > 180f ? 360f - d : d) * sign;
     }
 
+    public static float angleDist(float a, float b){
+        float d = Math.abs(a - b) % 360f;
+        return (d > 180f ? 360f - d : d);
+    }
+
     public static float clampedAngle(float angle, float relative, float limit){
+        if(limit > 360) return angle;
         float dst = angleDistSigned(angle, relative);
         if(Math.abs(dst) > limit){
             float val = dst > 0 ? dst - limit : dst + limit;

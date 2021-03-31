@@ -9,6 +9,7 @@ import arc.graphics.g2d.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.entities.abilities.*;
 import mindustry.gen.*;
 import mindustry.entities.bullet.*;
 import mindustry.graphics.*;
@@ -55,7 +56,7 @@ public class UnityBullets implements ContentList{
 
         supernovaLaser,
 
-        ravagerLaser, ravagerArtillery, missileAntiCheat, laserZap,
+        ravagerLaser, ravagerArtillery, missileAntiCheat, endLaserSmall, laserZap,
 
         plasmaBullet, phantasmalBullet,
 
@@ -931,15 +932,27 @@ public class UnityBullets implements ContentList{
             homingPower = 0.08f;
         }};
 
-        supernovaLaser = new ContinuousLaserBulletType(400f){
-            final Effect plasmaEffect = new Effect(36f, e -> {
-                Draw.color(Color.white, Pal.lancerLaser, e.fin());
-                Fill.circle(
-                    e.x + Angles.trnsx(e.rotation, e.fin() * 24f),
-                    e.y + Angles.trnsy(e.rotation, e.fin() * 24f),
-                    e.fout() * 5f
-                );
-            });
+        supernovaLaser = new ContinuousLaserBulletType(600f){
+            final Effect plasmaEffect;
+
+            {
+                length = 280f;
+                colors = new Color[]{
+                    Color.valueOf("4be3ca55"),
+                    Color.valueOf("91eedeaa"),
+                    Pal.lancerLaser.cpy(),
+                    Color.white
+                };
+
+                plasmaEffect = new Effect(36f, e -> {
+                    Draw.color(Color.white, Pal.lancerLaser, e.fin());
+                    Fill.circle(
+                        e.x + Angles.trnsx(e.rotation, e.fin() * 24f),
+                        e.y + Angles.trnsy(e.rotation, e.fin() * 24f),
+                        e.fout() * 5f
+                    );
+                });
+            }
 
             @Override
             public void update(Bullet b){
@@ -953,33 +966,15 @@ public class UnityBullets implements ContentList{
                         b.rotation() + Mathf.randomSeedRange((long)(b.id + Time.time + 1f), 15f), Mathf.randomSeed((long)(b.id + Time.time + 2f), 10, 19)
                     );
                 }
-            }
 
-            @Override
-            public void draw(Bullet b){
-                super.draw(b);
-
-                if(!state.isPaused()){
-                    for(int i = 0; i < 2; i++){
-                        float f = Mathf.random(length * b.fout());
-                        plasmaEffect.at(
-                            b.x + Angles.trnsx(b.rotation(), f) + Mathf.range(6f),
-                            b.y + Angles.trnsy(b.rotation(), f) + Mathf.range(6f),
-                            b.rotation() + Mathf.range(85f)
-                        );
-                    }
+                for(int i = 0; i < 2; i++){
+                    float f = Mathf.random(length * b.fout());
+                    plasmaEffect.at(
+                        b.x + Angles.trnsx(b.rotation(), f) + Mathf.range(6f),
+                        b.y + Angles.trnsy(b.rotation(), f) + Mathf.range(6f),
+                        b.rotation() + Mathf.range(85f)
+                    );
                 }
-            }
-
-            {
-                colors = new Color[]{
-                    Color.valueOf("4be3ca55"),
-                    Color.valueOf("91eedeaa"),
-                    Pal.lancerLaser.cpy(),
-                    Color.white
-                };
-
-                length = 280f;
             }
         };
 
@@ -1067,6 +1062,48 @@ public class UnityBullets implements ContentList{
             backColor = lightColor = trailColor = UnityPal.scarColor;
             frontColor = UnityPal.endColor;
         }};
+
+        endLaserSmall = new ContinuousLaserBulletType(85f){{
+            lifetime = 2f * 60;
+            length = 230f;
+            for(int i = 0; i < strokes.length; i++){
+                strokes[i] *= 0.4f;
+            }
+            colors = new Color[]{UnityPal.scarColorAlpha, UnityPal.scarColor, UnityPal.endColor, Color.white};
+        }
+
+            @Override
+            public void hitEntity(Bullet b, Hitboxc other, float initialHealth){
+                super.hitEntity(b, other, initialHealth);
+                if(other instanceof Unit unit){
+                    for(Ability ability : unit.abilities){
+                        if(ability instanceof ForceFieldAbility force){
+                            if(force.max >= 10000){
+                                force.max -= force.max / 35f;
+                                unit.shield = Math.min(force.max, unit.shield);
+                            }
+                            if(force.radius > unit.hitSize * 4f){
+                                force.radius -= force.radius / 20f;
+                            }
+                            if(force.regen > 2700f / 5f) force.regen /= 1.2f;
+                            continue;
+                        }
+                        if(ability instanceof RepairFieldAbility repair){
+                            if(repair.amount > unit.maxHealth / 7f) repair.amount *= 0.9f;
+                            continue;
+                        }
+                        if(ability instanceof StatusFieldAbility status){
+                            if((status.effect.damage < -unit.maxHealth / 20f || status.effect.reloadMultiplier > 8f) && status.duration > 20f){
+                                statusDuration -= statusDuration / 15f;
+                            }
+                        }
+                    }
+                    unit.shield -= damage * 0.4f;
+                    if(unit.armor > unit.hitSize) unit.armor -= Math.max(damage, unit.armor / 20f);
+                }
+                if(other instanceof AntiCheatBase) ((AntiCheatBase)other).overrideAntiCheatDamage(damage * 6f, 3);
+            }
+        };
 
         laserZap = new LaserBulletType(90f){{
             sideAngle = 15f;

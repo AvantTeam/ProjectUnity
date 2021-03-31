@@ -1524,6 +1524,7 @@ public class UnityBlocks implements ContentList{
             final Effect chargeBeginEffect;
             final Effect starDecayEffect;
             final Effect heatWaveEffect;
+            final Effect pullEffect;
 
             {
                 requirements(Category.turret, with(Items.copper, 1));
@@ -1558,6 +1559,7 @@ public class UnityBlocks implements ContentList{
                 chargeBeginEffect = UnityFx.supernovaChargeBegin;
                 starDecayEffect = UnityFx.supernovaStarDecay;
                 heatWaveEffect = UnityFx.supernovaStarHeatwave;
+                pullEffect = UnityFx.supernovaPullEffect;
 
                 drawer = b -> {
                     if(b instanceof AttractLaserTurretBuild tile){
@@ -1712,6 +1714,32 @@ public class UnityBlocks implements ContentList{
                                 );
                             }
                         }
+                    }
+                };
+
+                attractor = tile -> {
+                    if(Mathf.chanceDelta(tile.charge)){
+                        Tmp.v1
+                            .trns(tile.rotation, -tile.recoil + starOffset + Mathf.curve(tile.phase, 0f, 0.3f) * -2f)
+                            .add(tile);
+
+                        Lightning.create(
+                            tile.team,
+                            Pal.lancerLaser,
+                            60f, Tmp.v1.x, Tmp.v1.y,
+                            Mathf.randomSeed((long)(tile.id + Time.time), 360f),
+                            Mathf.round(Mathf.randomTriangular(16f, 24f) * tile.charge)
+                        );
+                    }
+                };
+
+                attractUnit = (tile, unit) -> {
+                    if(Mathf.chanceDelta(0.1f)){
+                        Tmp.v1
+                            .trns(tile.rotation, -tile.recoil + starOffset + Mathf.curve(tile.phase, 0f, 0.3f) * -2f)
+                            .add(tile);
+
+                        pullEffect.at(tile.x, tile.y, tile.rotation, new Float[]{unit.x, unit.y, Tmp.v1.x, Tmp.v1.y, 3f + Mathf.range(0.2f)});
                     }
                 };
             }

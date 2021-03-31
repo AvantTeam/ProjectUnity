@@ -20,8 +20,10 @@ public class UnityPlanets implements ContentList{
         megalith = new Planet("megalith", Planets.sun, 3, 1){{
             generator = new MegalithPlanetGenerator();
             meshLoader = () -> new HexMesh(this, 6);
-            atmosphereColor = Color.valueOf("0f3ad2");
-            startSector = 30;
+            atmosphereColor = Pal.lancerLaser;
+            startSector = 60;
+            atmosphereRadIn = -0.01f;
+            atmosphereRadOut = 0.3f;
         }};
 
         electrode = new Planet("electrode", Planets.sun, 3, 1){{
