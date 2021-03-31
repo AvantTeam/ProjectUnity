@@ -14,7 +14,7 @@ import unity.graphics.*;
 import static unity.content.UnityFx.distortFx;
 
 public class UnityStatusEffects implements ContentList{
-    public static StatusEffect disabled, plasmaed, radiation, reloadFatigue, blueBurn, molten, tpCoolDown, teamConverted, boosted, distort;
+    public static StatusEffect disabled, plasmaed, radiation, reloadFatigue, blueBurn, molten, tpCoolDown, teamConverted, boosted, distort, plated;
 
     @Override
     public void load(){
@@ -115,5 +115,22 @@ public class UnityStatusEffects implements ContentList{
             }
         }
         };
+
+        plated = new StatusEffect("plated"){{
+            speedMultiplier = 0.75f;
+            damageMultiplier = 1.5f;
+            healthMultiplier = 2f;
+            reloadMultiplier = 1.2f;
+            permanent = true;
+            effect = UnityFx.plated;
+            effectChance = 0.4f;
+        }
+
+        public void update(Unit unit, float time){
+            if(Mathf.chanceDelta(effectChance) && (!unit.isFlying() || unit.moving())){
+                Tmp.v1.rnd(unit.type.hitSize / 2f);
+                effect.at(unit.x + Tmp.v1.x, unit.y + Tmp.v1.y, 0, Mathf.chance(0.5f) ? Pal.thoriumPink : Items.titanium.color, Mathf.random() + 0.1f);
+            }
+        }};
     }
 }

@@ -1191,5 +1191,12 @@ public class UnityFx{
             Draw.color(e.color);
             Fill.rect(e.x + x, e.y + y, w, w, 45f);
         });
+    }),
+
+    plated = new Effect(30f, e -> {
+        Draw.color(e.color);
+        Draw.z(Layer.effect);
+        Lines.circle(e.x, e.y, e.fout() * (float) e.data);
+        Draw.reset();
     });
 }
