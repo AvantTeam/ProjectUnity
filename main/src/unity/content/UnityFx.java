@@ -730,12 +730,12 @@ public class UnityFx{
     }).layer(Layer.flyingUnit + 1f),
 
     blueTriangleTrail = new Effect(50f, e -> {
-        Draw.color(Color.white, Pal.lancerLaser, e.fin());
+        color(Color.white, Pal.lancerLaser, e.fin());
         Fill.poly(e.x, e.y, 3, 4f * e.fout(), -90f);
     }),
 
     hitAdvanceFlame = new Effect(15f, e -> {
-        Draw.color(UnityPal.advance, UnityPal.advanceDark, e.fin());
+        color(UnityPal.advance, UnityPal.advanceDark, e.fin());
 
         Angles.randLenVectors(e.id, 2, e.finpow() * 17f, e.rotation, 60f, (x, y) -> {
             Fill.poly(e.x + x, e.y + y, 6, 3f + e.fout() * 3f, e.rotation);
@@ -743,26 +743,26 @@ public class UnityFx{
     }),
 
     advanceFlameTrail = new Effect(27f, e -> {
-        Draw.color(UnityPal.advance, UnityPal.advanceDark, e.fin());
+        color(UnityPal.advance, UnityPal.advanceDark, e.fin());
         float rot = Mathf.randomSeed(e.id, -1, 1) * 270f;
 
         Fill.poly(e.x, e.y, 6, e.fout() * 4.1f, e.rotation + e.fin() * rot);
     }),
 
     advanceFlameSmoke = new Effect(13f, e -> {
-        Draw.color(Color.valueOf("4d668f77"), Color.valueOf("35455f00"), e.fin());
+        color(Color.valueOf("4d668f77"), Color.valueOf("35455f00"), e.fin());
         float rot = Mathf.randomSeed(e.id, -1, 1) * 270f;
 
         Angles.randLenVectors(e.id, 2, e.finpow() * 13f, e.rotation, 60f, (x, y) -> Fill.poly(e.x + x, e.y + y, 6, e.fout() * 4.1f, e.rotation + e.fin() * rot));
     }),
 
     teamConvertedEffect = new Effect(18, e -> {
-        Draw.color(UnityPal.advance, Color.white, e.fin());
+        color(UnityPal.advance, Color.white, e.fin());
         Fill.square(e.x, e.y, 0.1f + e.fout() * 2.8f, 45f);
     }),
 
     blueBurnEffect = new Effect(35f, e -> {
-        Draw.color(UnityPal.advance, UnityPal.advanceDark, e.fin());
+        color(UnityPal.advance, UnityPal.advanceDark, e.fin());
 
         Angles.randLenVectors(e.id, 3, 2 + e.fin() * 7, (x, y) -> {
             Fill.circle(e.x + x, e.y + y, 0.1f + e.fout() * 1.4f);
@@ -771,7 +771,7 @@ public class UnityFx{
 
     tenmeikiriCut = new Effect(20f, 150f, e -> {
         if(!(e.data instanceof Float)) return;
-        Draw.color(UnityPal.scarColor, UnityPal.endColor, e.fin());
+        color(UnityPal.scarColor, UnityPal.endColor, e.fin());
         Drawf.tri(e.x, e.y, 12f * e.fout(), (float)e.data, e.rotation);
         Drawf.tri(e.x, e.y, 12f * e.fout(), (float)e.data, e.rotation + 180f);
     }),
@@ -779,7 +779,7 @@ public class UnityFx{
     tenmeikiriChargeEffect = new ParentEffect(40f, e -> {
         Angles.randLenVectors(e.id, 2, 10f, 90f, (x, y) -> {
             float angle = Mathf.angle(x, y);
-            Draw.color(UnityPal.scarColor, UnityPal.endColor, e.fin());
+            color(UnityPal.scarColor, UnityPal.endColor, e.fin());
             Lines.stroke(1.5f);
             Lines.lineAngleCenter(e.x + (x * e.fout()), e.y + (y * e.fout()), angle, e.fslope() * 13f);
         });
@@ -788,7 +788,7 @@ public class UnityFx{
     tenmeikiriTipHit = new Effect(27f, e -> {
         Angles.randLenVectors(e.id, 8, 90f * e.fin(), e.rotation, 80f, (x, y) -> {
             float angle = Mathf.angle(x, y);
-            Draw.color(UnityPal.scarColor, UnityPal.endColor, e.fin());
+            color(UnityPal.scarColor, UnityPal.endColor, e.fin());
             Lines.stroke(1.5f);
             Lines.lineAngleCenter(e.x + x, e.y + y, angle, e.fslope() * 13f);
         });
@@ -800,7 +800,7 @@ public class UnityFx{
             float s = (3 - ii) / 3f;
             float width = Mathf.clamp(e.time / 80f) * (20f + Mathf.absin(Time.time + (ii * 1.4f), 1.1f, 7f)) * s;
             float length = e.fin() * (100f + Mathf.absin(Time.time + (ii * 1.4f), 1.1f, 11f)) * s;
-            Draw.color(colors[ii]);
+            color(colors[ii]);
             for(int i : Mathf.signs){
                 float rotation = e.rotation + (i * 90f);
                 Drawf.tri(e.x, e.y, width, length * 0.5f, rotation);
@@ -813,57 +813,57 @@ public class UnityFx{
         float curve = Mathf.curve(e.fin(), 0f, 0.2f) * 820f;
         float curveB = Mathf.curve(e.fin(), 0f, 0.7f);
 
-        Draw.color(Color.red, Color.valueOf("ff000000"), curveB);
-        Draw.blend(Blending.additive);
+        color(Color.red, Color.valueOf("ff000000"), curveB);
+        blend(Blending.additive);
         Fill.poly(e.x, e.y, Lines.circleVertices(curve), curve);
-        Draw.blend();
+        blend();
     }).layer(110.99f),
 
     vapourizeTile = new Effect(126f, (float)(Vars.tilesize * 16), e -> {
-        Draw.color(Color.red);
-        Draw.blend(Blending.additive);
+        color(Color.red);
+        blend(Blending.additive);
 
         Fill.square(e.x, e.y, e.fout() * e.rotation * (Vars.tilesize / 2f));
 
         if(e.data instanceof TurretBuild turret){
-            Draw.mixcol(Color.red, 1f);
-            Draw.alpha(e.fout());
+            mixcol(Color.red, 1f);
+            alpha(e.fout());
             Draw.rect(turret.block.region, e.x, e.y, turret.rotation - 90f);
         }
 
-        Draw.blend();
-        Draw.mixcol();
-        Draw.color();
+        blend();
+        mixcol();
+        color();
     }).layer(111f),
 
     vapourizeUnit = new Effect(126f, 512f, e -> {
-        Draw.mixcol(Color.red, 1f);
-        Draw.color(1f, 1f, 1f, e.fout());
-        Draw.blend(Blending.additive);
+        mixcol(Color.red, 1f);
+        color(1f, 1f, 1f, e.fout());
+        blend(Blending.additive);
 
         Utils.simpleUnitDrawer((Unit)e.data, false);
 
-        Draw.blend();
-        Draw.color();
-        Draw.mixcol();
+        blend();
+        color();
+        mixcol();
     }).layer(111f),
 
     endgameLaser = new Effect(76f, 820f * 2f, e -> {
         if(e.data == null) return;
         Color[] colors = {Color.valueOf("f53036"), Color.valueOf("ff786e"), Color.white};
         float[] strokes = {2f, 1.3f, 0.6f};
-        float oz = Draw.z();
+        float oz = z();
         Object[] data = (Object[])e.data;
         Position a = (Position)data[0];
         Position b = (Position)data[1];
         float width = (float)data[2];
         Tmp.v1.set(a).lerp(b, Mathf.curve(e.fin(), 0f, 0.09f));
         for(int i = 0; i < 3; i++){
-            Draw.z(oz + (i / 1000f));
+            z(oz + (i / 1000f));
             if(i >= 2){
-                Draw.color(Color.white);
+                color(Color.white);
             }else{
-                Draw.color(Tmp.c1.set(colors[i]).mul(1f, 1f + Utils.offsetSinB(0f, 5f), 1f + Utils.offsetSinB(90f, 5f), 1f));
+                color(Tmp.c1.set(colors[i]).mul(1f, 1f + Utils.offsetSinB(0f, 5f), 1f + Utils.offsetSinB(90f, 5f), 1f));
             }
 
             Fill.circle(a.getX(), a.getY(), strokes[i] * 4f * width * e.fout());
@@ -872,14 +872,14 @@ public class UnityFx{
             Lines.stroke(strokes[i] * 4f * width * e.fout());
             Lines.line(a.getX(), a.getY(), Tmp.v1.x, Tmp.v1.y);
         }
-        Draw.z(oz);
+        z(oz);
     }),
 
     devourerShootEffect = new Effect(41f, e -> {
         Color[] colors = {UnityPal.scarColorAlpha, UnityPal.scarColor, UnityPal.endColor, Color.white};
 
         for(int i = 0; i < colors.length; i++){
-            Draw.color(colors[i]);
+            color(colors[i]);
             float size = Math.max(0f, (e.fslope() * 35f) - (i * ((7f + (1f - e.fslope())) * 2f)));
             Fill.circle(e.x, e.y, size);
 
@@ -893,40 +893,40 @@ public class UnityFx{
 
     rainbowTextureTrail = new Effect(80f, e -> {
         if(!(e.data instanceof RainbowUnitType t)) return;
-        Draw.blend(Blending.additive);
-        Draw.color(Tmp.c1.set(Color.red).shiftHue(e.time * 4f).a(Mathf.clamp(e.fout() * 1.5f)));
+        blend(Blending.additive);
+        color(Tmp.c1.set(Color.red).shiftHue(e.time * 4f).a(Mathf.clamp(e.fout() * 1.5f)));
         Draw.rect(t.trailRegion, e.x, e.y, e.rotation - 90f);
-        Draw.blend();
+        blend();
     }),
 
     kamiBulletDespawn = new Effect(60f, e -> {
         float size = Mathf.clamp(e.rotation, 0f, 15f);
 
-        Draw.blend(Blending.additive);
-        Draw.color(Tmp.c1.set(Color.red).shiftHue(((e.time + Time.time) / 2f) * 3f));
+        blend(Blending.additive);
+        color(Tmp.c1.set(Color.red).shiftHue(((e.time + Time.time) / 2f) * 3f));
         Lines.stroke(2f * e.fout());
         Lines.circle(e.x, e.y, (e.finpow() * size) + (size / 2f));
         Lines.stroke(e.fout());
         Lines.circle(e.x, e.y, (e.finpow() * (size / 2f)) + size);
-        Draw.blend();
+        blend();
     }),
 
     kamiEoLCharge = new Effect(60f, e -> {
         if(!(e.data instanceof Unit u)) return;
-        Draw.blend(Blending.additive);
+        blend(Blending.additive);
         for(int i = 0; i < 2; i++){
             float angle = i * 360f / 2f;
-            Draw.color(Tmp.c1.set(Color.red).shiftHue((e.time * 5f) + angle).a(Mathf.clamp(e.fout() * 1.5f)));
+            color(Tmp.c1.set(Color.red).shiftHue((e.time * 5f) + angle).a(Mathf.clamp(e.fout() * 1.5f)));
             Tmp.v1.trns(angle + (e.fin() * 180f), 150f * e.fslope()).add(u);
             Draw.rect(u.type.region, Tmp.v1.x, Tmp.v1.y, u.rotation - 90f);
         }
         for(int i = 0; i < 4; i++){
             float angle = i * 360f / 4f;
-            Draw.color(Tmp.c1.set(Color.red).shiftHue((e.time * 5f) + angle).a(Mathf.clamp(e.fout() * 1.5f)));
+            color(Tmp.c1.set(Color.red).shiftHue((e.time * 5f) + angle).a(Mathf.clamp(e.fout() * 1.5f)));
             Tmp.v1.trns(angle + (e.fin() * -270f), 100f * e.fslope()).add(u);
             Draw.rect(u.type.region, Tmp.v1.x, Tmp.v1.y, u.rotation - 90f);
         }
-        Draw.blend();
+        blend();
     }),
 
     kamiWarningLine = new Effect(120f, 670f * 2f, e -> {
@@ -935,7 +935,7 @@ public class UnityFx{
         Position a = data[0];
         Position b = data[1];
 
-        Draw.color(Tmp.c1.set(Color.red).shiftHue(e.time * 3f));
+        color(Tmp.c1.set(Color.red).shiftHue(e.time * 3f));
         Lines.stroke(Mathf.clamp(e.fslope() * 2f) * 1.2f);
         Lines.line(a.getX(), a.getY(), b.getX(), b.getY());
     }),
@@ -944,7 +944,7 @@ public class UnityFx{
         if(!(e.data instanceof PointBlastLaserBulletType btype)) return;
 
         for(int i = 0; i < btype.laserColors.length; i++){
-            Draw.color(btype.laserColors[i]);
+            color(btype.laserColors[i]);
             Fill.circle(e.x, e.y, (e.rotation - (btype.auraWidthReduction * i)) * e.fout());
         }
         Drawf.light(e.x, e.y, e.rotation * e.fout() * 3f, btype.laserColors[0], 0.66f);
@@ -1090,7 +1090,7 @@ public class UnityFx{
             float y = Vec2Struct.y(unit) + Mathf.randomSeedRange(e.id + 1, 4f);
             pos = Vec2Struct.scl(Vec2Struct.sub(pos, x, y), e.fin());
 
-            Draw.color(Pal.lancerLaser);
+            color(Pal.lancerLaser);
             Fill.circle(x + Vec2Struct.x(pos), y + Vec2Struct.y(pos), size * (0.5f + e.fslope() * 0.5f));
         }
     }),
@@ -1128,13 +1128,13 @@ public class UnityFx{
 
     distortFx = new Effect(18, e -> {
         if(!(e.data instanceof Float)) return;
-        Draw.color(Pal.lancerLaser, Pal.place, e.fin());
+        color(Pal.lancerLaser, Pal.place, e.fin());
         Fill.square(e.x, e.y, 0.1f + e.fout() * 2.5f, (float)e.data);
     }),
 
     distSplashFx = new Effect(80, e -> {
         if(!(e.data instanceof Float[])) return;
-        Draw.color(Pal.lancerLaser, Pal.place, e.fin());
+        color(Pal.lancerLaser, Pal.place, e.fin());
         Lines.stroke(2 * e.fout());
         Lines.circle(e.x, e.y, ((Float[])e.data)[0] * e.fin());
     }){
@@ -1170,7 +1170,7 @@ public class UnityFx{
         randLenVectors(e.id, 4, e.fout() * 3.5f, (x, y) -> {
             float w = 0.3f + e.fout();
 
-            Draw.color(e.color);
+            color(e.color);
             Fill.rect(e.x + x, e.y + y, w, w, 45f);
         });
     }),
@@ -1179,7 +1179,7 @@ public class UnityFx{
         randLenVectors(e.id, 5, e.fout() * 5f, (x, y) -> {
             float w = 0.3f + e.fout() * 1.3f;
 
-            Draw.color(e.color);
+            color(e.color);
             Fill.rect(e.x + x, e.y + y, w, w, 45f);
         });
     }),
@@ -1188,15 +1188,23 @@ public class UnityFx{
         randLenVectors(e.id, 6, e.fout() * 6.5f, (x, y) -> {
             float w = 0.3f + e.fout() * 1.7f;
 
-            Draw.color(e.color);
+            color(e.color);
             Fill.rect(e.x + x, e.y + y, w, w, 45f);
         });
     }),
 
     plated = new Effect(30f, e -> {
-        Draw.color(e.color);
-        Draw.z(Layer.effect);
+        color(e.color);
+        z(Layer.effect);
         Fill.circle(e.x, e.y, e.fout() * (float) e.data);
-        Draw.reset();
+    }),
+
+    archaicEnergy = new Effect(60f, e -> {
+        randLenVectors(e.id, 3, 6f, (x, y) -> {
+            color(UnityPal.monolith, UnityPal.monolithDark, e.finpow());
+
+            float w = 1f + e.fout() * 3f;
+            Fill.rect(e.x + x, e.y + y, w, w, 45f);
+        });
     });
 }
