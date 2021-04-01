@@ -5,18 +5,19 @@ import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
+import arc.struct.ObjectMap.*;
 import arc.util.*;
 import arc.util.noise.*;
 import mindustry.ai.*;
 import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.maps.generators.*;
-import mindustry.type.Sector;
+import mindustry.type.*;
 import mindustry.world.*;
-import mindustry.world.blocks.logic.MessageBlock.*;
 import unity.content.*;
 import unity.mod.*;
 import unity.type.sector.*;
+import unity.world.blocks.LoreMessageBlock.*;
 
 import static mindustry.Vars.*;
 import static mindustry.content.Blocks.*;
@@ -25,26 +26,30 @@ import static unity.content.UnityBlocks.*;
 public class MegalithPlanetGenerator extends PlanetGenerator{
     protected RidgedPerlin rid = new RidgedPerlin(1, 2);
     protected BaseGenerator basegen = new BaseGenerator();
-    protected float scl = 5.5f;
-    protected float waterOffset = 0.07f;
+    protected float scl = 7f;
+    protected float waterOffset = 0.1f;
     protected IntMap<String> messages = new IntMap<>();
 
     protected Block[][] blocks = {
-        {deepwater, water, darksandWater, darksandWater, darksand, darksandWater, stone, stone, darksandWater, snow, ruinousRock, iceSnow, iceSnow, ruinousRock},
+        {deepwater, water, darksandWater, darksandWater, darksand, darksandWater, stone, stone, darksandWater, snow, darksandWater, darksandWater, iceSnow, ruinousRock},
         {deepwater, water, darksandWater, darksand, darksand, stone, stone, stone, ruinousRock, dacite, stone, snow, snow, ice},
-        {deepwater, water, darksandWater, darksand, stone, dacite, darksandWater, dacite, stone, stone, ruinousRock, dacite, ruinousRock, ice},
-        {deepwater, water, darksandWater, darksand, darksand, stone, stone, stone, dacite, dacite, snow, iceSnow, iceSnow, ice},
+        {deepwater, water, darksandWater, darksand, stone, dacite, darksandWater, dacite, darksandWater, stone, ruinousRock, dacite, ruinousRock, ice},
+        {deepwater, water, darksandWater, darksand, darksand, stone, ruinousRock, stone, dacite, dacite, snow, iceSnow, iceSnow, ice},
 
         {deepwater, water, darksandWater, darksand, darksandWater, stone, stone, dacite, snow, dacite, snow, snow, ice, ice},
-        {water, water, darksandWater, darksand, darksand, stone, snow, ruinousRock, stone, ruinousRock, stone, iceSnow, ice, ice},
-        {water, darksandWater, darksand, stone, snow, ruinousRock, dacite, stone, dacite, iceSnow, iceSnow, ice, ice, ice},
-        {water, darksandWater, snow, ruinousRock, dacite, snow, ruinousRock, snow, dacite, iceSnow, ice, ice, ice, ice},
+        {water, water, darksandWater, darksand, darksand, stone, snow, ruinousRock, stone, darksandWater, ruinousRock, iceSnow, ice, ice},
+        {water, darksandWater, darksand, stone, darksand, ruinousRock, darksandWater, ruinousRock, dacite, iceSnow, iceSnow, ice, ice, ice},
+        {water, darksandWater, dacite, ruinousRock, dacite, snow, ruinousRock, snow, dacite, iceSnow, ice, ice, ice, ice},
 
         {deepwater, water, darksandWater, darksand, ruinousRock, darksand, stone, stone, snow, iceSnow, iceSnow, iceSnow, ice, ice},
-        {water, water, darksandWater, darksand, darksand, stone, snow, snow, dacite, snow, snow, iceSnow, ice, ice},
+        {water, water, darksandWater, darksand, darksandWater, stone, snow, snow, dacite, snow, snow, iceSnow, ice, ice},
         {water, darksandWater, darksand, stone, ruinousRock, dacite, ruinousRock, stone, snow, snow, iceSnow, ice, ice, ice},
         {water, darksandWater, ruinousRock, snow, dacite, stone, snow, dacite, iceSnow, snow, ice, ice, ice, ice}
     };
+
+    ObjectMap<Block, Entry<Block, float[]>> dec = ObjectMap.of(
+        ruinousRock, new Entry<Block, float[]>(){{ key = archEnergy; value = new float[]{0.005f, 0.02f}; }}
+    );
 
     protected float waterf = 4f / blocks[0].length;
 
@@ -219,9 +224,9 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
             }
         }
 
-        Log.info("Generated @ rooms", rooms.size);
+        Log.debug("Generated @ rooms", rooms.size);
         for(Room room : rooms){
-            Log.info("Generated room @", room.name);
+            Log.debug("Generated room @", room.name);
             erase(room.x, room.y, room.radius);
         }
 
@@ -263,6 +268,42 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
 
         trimDark();
         median(2);
+
+        float difficulty = sector.threat;
+
+        for(var entry : dec){
+            pass((x, y) -> {
+                Block key = entry.key;
+                var val = entry.value;
+
+                float chance = val.value[0] + val.value[1] * difficulty;
+                if(rand.chance(chance)){
+                    boolean found = false;
+                    if(floor == key){
+                        floor = val.key;
+                        found = true;
+                    }else if(block == key){
+                        block = val.key;
+                        found = true;
+                    }
+
+                    if(found){
+                        try{
+                            for(Point2 p : Geometry.d4){
+                                var tile = tiles.getn(x + p.x, y + p.y);
+                                if(rand.chance(1f / Geometry.d4.length)){
+                                    if(tile.floor() == key){
+                                        tile.setFloor(val.key.asFloor());
+                                    }else if(tile.block() == key){
+                                        tile.setBlock(val.key);
+                                    }
+                                }
+                            }
+                        }catch(Throwable ignored){}
+                    }
+                }
+            });
+        }
 
         pass((x, y) -> {
             if(floor.asFloor().isLiquid) return;
@@ -334,13 +375,13 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
                                 }
                             }
 
-                            tile.setBlock(Blocks.message, Team.sharded, 0, () -> {
-                                MessageBuild build = Blocks.message.buildType.get().as();
-                                build.message.append(message(sector.id));
+                            tile.setBlock(loreMonolith, Team.sharded, 0, () -> {
+                                LoreMessageBuild build = loreMonolith.newBuilding().as();
+                                build.setMessage(message(sector.id));
                                 return build;
                             });
 
-                            Log.info("Generated a message block at (@, @).", tile.x, tile.y);
+                            Log.debug("Generated a message block at (@, @).", tile.x, tile.y);
 
                             hasMessage = true;
                             break find;
@@ -351,12 +392,10 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
         }
 
         Schematics.placeLaunchLoadout(spawn[0].x, spawn[0].y);
-
         enemies.each(espawn -> tiles.getn(espawn.x, espawn.y).setOverlay(Blocks.spawn));
 
-        float difficulty = sector.threat;
         if(sector.hasEnemyBase()){
-            basegen.generate(tiles, enemies.map(r -> tiles.getn(r.x, r.y)), tiles.get(spawn[0].x, spawn[0].y), state.rules.waveTeam, sector, difficulty);
+            basegen.generate(tiles, enemies.map(r -> tiles.getn(r.x, r.y)), tiles.getn(spawn[0].x, spawn[0].y), state.rules.waveTeam, sector, difficulty);
 
             state.rules.attackMode = sector.info.attack = true;
         }else{

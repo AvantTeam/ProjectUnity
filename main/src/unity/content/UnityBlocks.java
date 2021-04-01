@@ -1,6 +1,6 @@
 package unity.content;
 
-import arc.Core;
+import arc.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -26,6 +26,7 @@ import unity.annotations.Annotations.*;
 import unity.entities.bullet.*;
 import unity.gen.*;
 import unity.graphics.*;
+import unity.mod.*;
 import unity.type.exp.*;
 import unity.util.*;
 import unity.world.blocks.*;
@@ -50,40 +51,40 @@ import static mindustry.Vars.*;
 import static mindustry.type.ItemStack.*;
 
 public class UnityBlocks implements ContentList{
-    public static Block//@formatter:off
-    //order is load order. double newLine means next js file or json contents directory. eh, not that important.
-    //global
+    public static Block
     distributionDrill,
 
     recursiveReconstructor,
 
     energyMixer,
 
-    plater,
-    //@formatter:on
-    lightLamp, oilLamp, lightLaser, lightLampInfi, lightReflector, lightReflector1, lightOmnimirror, lightFilter, lightInvertedFilter, lightDivisor, lightDivisor1, lightItemFilter, lightPanel, lightInfluencer,
+    plater;
 
-    metaglassWall, metaglassWallLarge,
+    public static @FactionDef("dark") Block
+    oreUmbrium,
 
-    oreNickel, oreUmbrium, oreLuminum, oreMonolite, oreImberium,
-
-    ruinousRock;
-
-    public static @FactionDef("dark")
-    Block apparition, ghost, banshee, fallout, catastrophe, calamity, extinction,
+    apparition, ghost, banshee, fallout, catastrophe, calamity, extinction,
 
     darkAlloyForge,
 
     darkWall, darkWallLarge;
 
-    public static @FactionDef("light")
-    Block photon, //graviton, gluon, higgsBoson, singularity,
-    electron, zBoson; /*,
+    public static @FactionDef("light") Block
+    oreLuminum,
+
+    photon, //graviton, gluon, higgsBoson, singularity,
+    electron, zBoson, /*,
     proton, zBoson,
     neutron, wBoson;*/
 
-    public static @FactionDef("imber")
-    Block orb, shockwire, current, plasma, electrobomb, shielder,
+    lightLamp, oilLamp, lightLaser, lightLampInfi, lightReflector, lightReflector1, lightOmnimirror, lightFilter, lightInvertedFilter, lightDivisor, lightDivisor1, lightItemFilter, lightPanel, lightInfluencer,
+
+    metaglassWall, metaglassWallLarge;
+
+    public static @FactionDef("imber") Block
+    oreImberium,
+
+    orb, shockwire, current, plasma, electrobomb, shielder,
 
     sparkAlloyForge,
 
@@ -135,20 +136,30 @@ public class UnityBlocks implements ContentList{
         "supernova-wing-left-bottom", "supernova-wing-right-bottom",
         "supernova-bottom"
     }, outline = true)
-    Block deflectorAura,
+    Block
+    //environments
+    oreMonolite, ruinousRock, archEnergy, loreMonolith,
 
+    //effects
+    deflectorAura,
+
+    //production
     monolithAlloyForge,
 
+    //defense
     electrophobicWall, electrophobicWallLarge,
 
+    //turrets
     ricochet, shellshock, purge,
-
     recluse, mage, oracle,
-
     supernova;
 
     public static @FactionDef("youngcha")
-    Block concreteBlank, concreteFill, concreteNumber, concreteStripe, concrete, stoneFullTiles, stoneFull, stoneHalf, stoneTiles,
+    Block
+
+    oreNickel,
+
+    concreteBlank, concreteFill, concreteNumber, concreteStripe, concrete, stoneFullTiles, stoneFull, stoneHalf, stoneTiles,
 
     heatPipe, smallRadiator, //heatdistributor
 
@@ -399,7 +410,20 @@ public class UnityBlocks implements ContentList{
             emitLight = true;
             lightRadius = 8f;
             lightColor = UnityPal.monolith.cpy().a(0.1f);
+            albedo = 0.25f;
         }};
+
+        archEnergy = new Floor("archaic-energy"){{
+            variants = 3;
+            updateEffect = UnityFx.archaicEnergy;
+            blendGroup = ruinousRock;
+            emitLight = true;
+            lightRadius = 16f;
+            lightColor = UnityPal.monolith.cpy().a(0.3f);
+            albedo = 0.4f;
+        }};
+
+        loreMonolith = new LoreMessageBlock("lore-monolith", Faction.monolith);
 
         //endregion
         //region dark

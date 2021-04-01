@@ -32,13 +32,13 @@ public class UnitySectorPresets implements ContentList{
         }};*/
 
         Events.on(SectorLaunchEvent.class, e -> {
-            if(e.sector.planet.minfo.mod.name.equals("unity")){
+            if(e.sector.planet.minfo.mod != null && e.sector.planet.minfo.mod.name.equals("unity")){
                 state.rules.waves = true;
             }
         });
 
         //testing scripted sectors
-        accretion = new ScriptedSector("accretion", megalith, 60){{
+        accretion = new ScriptedSector("accretion", megalith, 200){{
             alwaysUnlocked = true;
             addStartingItems = true;
             difficulty = 3f;
