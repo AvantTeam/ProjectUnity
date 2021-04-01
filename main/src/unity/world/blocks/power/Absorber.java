@@ -2,19 +2,14 @@ package unity.world.blocks.power;
 
 import arc.Core;
 import arc.math.*;
-import arc.math.geom.*;
 import arc.util.*;
-import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.struct.*;
-import mindustry.content.Blocks;
 import mindustry.content.StatusEffects;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.world.*;
 import mindustry.world.blocks.power.*;
-import unity.content.*;
 
 import static mindustry.Vars.*;
 
@@ -85,7 +80,7 @@ public class Absorber extends PowerGenerator {
             units2.each(e -> {
                 Draw.alpha(1);
                 Drawf.laser(team, laserRegion, laserEndRegion, x, y, e.x, e.y, 0.6f);
-                Draw.alpha(0.2f);
+                Draw.alpha(0.05f);
                 for(int i = 0; i < 6; i++){
                     Fill.circle(e.x, e.y, e.hitSize + i + Mathf.sin(Time.time / 8) / 3);
                 }
