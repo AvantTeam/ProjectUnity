@@ -1196,7 +1196,7 @@ public class UnityFx{
     plated = new Effect(30f, e -> {
         Draw.color(e.color);
         Draw.z(Layer.effect);
-        Lines.circle(e.x, e.y, e.fout() * (float) e.data);
+        Fill.circle(e.x, e.y, e.fout() * (float) e.data);
         Draw.reset();
     });
 }

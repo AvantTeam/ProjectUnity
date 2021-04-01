@@ -57,7 +57,7 @@ public class UnityBlocks implements ContentList{
 
     recursiveReconstructor,
 
-    metalCompressor,
+    energyMixer,
 
     plater,
     //@formatter:on
@@ -97,6 +97,8 @@ public class UnityBlocks implements ContentList{
     steelConveyor, diriumConveyor,
     
     bufferPad, omegaPad, cachePad,
+
+    convertPad,
 
     teleporter, teleunit; //expOutput, expUnloader, expTank, expChest, expFountain, expVoid;
 
@@ -238,20 +240,21 @@ public class UnityBlocks implements ContentList{
             consumes.liquid(Liquids.cryofluid, 7f);
         }};
 
-        metalCompressor = new GenericCrafter("metal-compressor"){{
+        energyMixer = new GenericCrafter("energy-mixer"){{
             requirements(Category.crafting, with(Items.lead, 120, Items.silicon, 80, Items.titanium, 30));
-            outputItem = new ItemStack(UnityItems.metalPlating, 2);
+            outputItem = new ItemStack(UnityItems.powerPack, 3);
             size = 3;
             craftTime = 50f;
             consumes.power(1.2f);
-            consumes.items(with(Items.lead, 5, Items.titanium, 5, Items.silicon, 2));
+            consumes.items(with(Items.thorium, 5, Items.titanium, 5, Items.surgeAlloy, 1));
         }};
 
         plater = new Reinforcer("plater"){{
             requirements(Category.effect, with(Items.titanium, 60, Items.lead, 20, Items.silicon, 30));
             size = 2;
+            itemCapacity = 15;
             consumes.power(0.4f);
-            consumes.items(with(UnityItems.metalPlating, 15));
+            consumes.items(with(UnityItems.powerPack, 10));
         }};
 
         lightLamp = new LightSource("light-lamp"){{
@@ -988,9 +991,22 @@ public class UnityBlocks implements ContentList{
         cachePad = new MechPad("cache-pad"){{
             requirements(Category.units, with(UnityItems.stone, 150, Items.lead, 160, Items.silicon, 100, Items.titanium, 60, Items.plastanium, 120, Items.phaseFabric, 60));
             size = 2;
-            craftTime = 130;
+            craftTime = 130f;
             consumes.power(0.8f);
             unitType = UnityUnitTypes.cache;
+        }};
+
+        convertPad = new ConversionPad("conversion-pad"){{
+            requirements(Category.units, BuildVisibility.sandboxOnly, empty);
+            size = 2;
+            craftTime = 60f;
+            consumes.power(1f);
+            upgrades.add(
+                new UnitType[]{UnitTypes.dagger, UnitTypes.mace},
+                new UnitType[]{UnitTypes.flare, UnitTypes.horizon},
+                new UnitType[]{UnityUnitTypes.cache, UnityUnitTypes.dijkstra},
+                new UnitType[]{UnityUnitTypes.omega, UnitTypes.reign}
+            );
         }};
 
         teleporter = new Teleporter("teleporter"){{
