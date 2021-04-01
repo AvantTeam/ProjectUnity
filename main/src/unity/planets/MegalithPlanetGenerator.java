@@ -20,29 +20,30 @@ import unity.type.sector.*;
 
 import static mindustry.Vars.*;
 import static mindustry.content.Blocks.*;
+import static unity.content.UnityBlocks.*;
 
 public class MegalithPlanetGenerator extends PlanetGenerator{
     protected RidgedPerlin rid = new RidgedPerlin(1, 2);
     protected BaseGenerator basegen = new BaseGenerator();
-    protected float scl = 6f;
+    protected float scl = 5.5f;
     protected float waterOffset = 0.07f;
     protected IntMap<String> messages = new IntMap<>();
 
     protected Block[][] blocks = {
-        {deepwater, water, darksandWater, darksandWater, darksand, darksandWater, stone, stone, darksandWater, snow, snow, iceSnow, iceSnow, ice},
-        {deepwater, water, darksandWater, darksand, darksand, stone, stone, stone, snow, dacite, stone, snow, snow, ice},
-        {deepwater, water, darksandWater, darksand, stone, dacite, darksandWater, dacite, stone, stone, dacite, dacite, iceSnow, ice},
+        {deepwater, water, darksandWater, darksandWater, darksand, darksandWater, stone, stone, darksandWater, snow, ruinousRock, iceSnow, iceSnow, ruinousRock},
+        {deepwater, water, darksandWater, darksand, darksand, stone, stone, stone, ruinousRock, dacite, stone, snow, snow, ice},
+        {deepwater, water, darksandWater, darksand, stone, dacite, darksandWater, dacite, stone, stone, ruinousRock, dacite, ruinousRock, ice},
         {deepwater, water, darksandWater, darksand, darksand, stone, stone, stone, dacite, dacite, snow, iceSnow, iceSnow, ice},
 
         {deepwater, water, darksandWater, darksand, darksandWater, stone, stone, dacite, snow, dacite, snow, snow, ice, ice},
-        {water, water, darksandWater, darksand, darksand, stone, snow, snow, stone, snow, stone, iceSnow, ice, ice},
-        {water, darksandWater, darksand, stone, snow, snow, dacite, stone, dacite, iceSnow, iceSnow, ice, ice, ice},
-        {water, darksandWater, snow, snow, dacite, snow, snow, snow, dacite, iceSnow, ice, ice, ice, ice},
+        {water, water, darksandWater, darksand, darksand, stone, snow, ruinousRock, stone, ruinousRock, stone, iceSnow, ice, ice},
+        {water, darksandWater, darksand, stone, snow, ruinousRock, dacite, stone, dacite, iceSnow, iceSnow, ice, ice, ice},
+        {water, darksandWater, snow, ruinousRock, dacite, snow, ruinousRock, snow, dacite, iceSnow, ice, ice, ice, ice},
 
-        {deepwater, water, darksandWater, darksand, darksand, darksand, stone, stone, snow, iceSnow, iceSnow, iceSnow, ice, ice},
+        {deepwater, water, darksandWater, darksand, ruinousRock, darksand, stone, stone, snow, iceSnow, iceSnow, iceSnow, ice, ice},
         {water, water, darksandWater, darksand, darksand, stone, snow, snow, dacite, snow, snow, iceSnow, ice, ice},
-        {water, darksandWater, darksand, stone, snow, dacite, snow, stone, snow, snow, iceSnow, ice, ice, ice},
-        {water, darksandWater, snow, snow, dacite, stone, snow, dacite, iceSnow, snow, ice, ice, ice, ice}
+        {water, darksandWater, darksand, stone, ruinousRock, dacite, ruinousRock, stone, snow, snow, iceSnow, ice, ice, ice},
+        {water, darksandWater, ruinousRock, snow, dacite, stone, snow, dacite, iceSnow, snow, ice, ice, ice, ice}
     };
 
     protected float waterf = 4f / blocks[0].length;
