@@ -38,6 +38,7 @@ import unity.world.blocks.production.*;
 import unity.world.blocks.sandbox.*;
 import unity.world.blocks.units.*;
 import unity.world.blocks.effect.*;
+import unity.world.blocks.environment.*;
 import unity.world.consumers.*;
 import unity.world.draw.*;
 import unity.world.graphs.*;
@@ -64,7 +65,9 @@ public class UnityBlocks implements ContentList{
 
     metaglassWall, metaglassWallLarge,
 
-    oreNickel, oreUmbrium, oreLuminum, oreMonolite, oreImberium;
+    oreNickel, oreUmbrium, oreLuminum, oreMonolite, oreImberium,
+
+    ruinousRock;
 
     public static @FactionDef("dark")
     Block apparition, ghost, banshee, fallout, catastrophe, calamity, extinction,
@@ -358,34 +361,41 @@ public class UnityBlocks implements ContentList{
             requirements(Category.defense, with(Items.lead, 24, Items.metaglass, 24));
         }};
 
-        oreNickel = new OreBlock(UnityItems.nickel){{
+        oreNickel = new UnityOreBlock(UnityItems.nickel){{
             oreScale = 24.77f;
             oreThreshold = 0.913f;
             oreDefault = true;
         }};
 
-        oreUmbrium = new OreBlock(UnityItems.umbrium){{
+        oreUmbrium = new UnityOreBlock(UnityItems.umbrium){{
             oreScale = 23.77f;
             oreThreshold = 0.813f;
             oreDefault = true;
         }};
 
-        oreLuminum = new OreBlock(UnityItems.luminum){{
+        oreLuminum = new UnityOreBlock(UnityItems.luminum){{
             oreScale = 23.77f;
             oreThreshold = 0.81f;
             oreDefault = true;
         }};
 
-        oreMonolite = new OreBlock(UnityItems.monolite){{
+        oreMonolite = new UnityOreBlock(UnityItems.monolite){{
             oreScale = 23.77f;
             oreThreshold = 0.807f;
             oreDefault = true;
         }};
 
-        oreImberium = new OreBlock(UnityItems.imberium){{
+        oreImberium = new UnityOreBlock(UnityItems.imberium){{
             oreScale = 23.77f;
             oreThreshold = 0.807f;
             oreDefault = true;
+        }};
+
+        ruinousRock = new Floor("ruinous-rock"){{
+            variants = 3;
+            emitLight = true;
+            lightRadius = 8f;
+            lightColor = UnityPal.monolith.cpy().a(0.1f);
         }};
 
         //endregion

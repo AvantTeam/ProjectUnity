@@ -284,10 +284,10 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
         });
 
         //don't generate message blocks if enemy base is present
-        if(!sector.hasEnemyBase() && !hasMessage(sector.id)){
+        if(!sector.hasEnemyBase()){
             Seq<Room> msgRoom = rooms.select(r -> r != spawn[0] && !enemies.contains(r));
-            boolean hasMessage = false;
 
+            boolean hasMessage = false;
             for(int r = 0; r < msgRoom.size; r++){
                 if(hasMessage) break;
 
@@ -339,6 +339,8 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
                                 return build;
                             });
 
+                            Log.info("Generated a message block at (@, @).", tile.x, tile.y);
+
                             hasMessage = true;
                             break find;
                         }
@@ -367,10 +369,6 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
         state.rules.enemyCoreBuildRadius = 600f;
 
         state.rules.spawns = UnityWaves.generate(Faction.monolith, difficulty, new Rand(), state.rules.attackMode);
-    }
-
-    protected boolean hasMessage(int id){
-        return messages.get(id) == null;
     }
 
     protected String message(int id){
