@@ -1368,7 +1368,7 @@ public class UnityBlocks implements ContentList{
             ambientSound = Sounds.machine;
             ambientSoundVolume = 0.6f;
             consumes.power(3.6f);
-            consumes.items(with(Items.silicon, 3, Items.graphite, 2, UnityItems.monolite, 2));
+            consumes.items(with(Items.silicon, 3, UnityItems.archDebris, 1, UnityItems.monolite, 2));
             consumes.liquid(Liquids.cryofluid, 0.1f);
         }};
 
