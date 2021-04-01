@@ -19,12 +19,14 @@ public class UnityTechTree implements ContentList{
         attach(Blocks.surgeSmelter, () -> {
             node(darkAlloyForge);
             node(monolithAlloyForge);
-            node(sparkAlloyForge, () -> {
+            node(sparkAlloyForge, Seq.with(new Research(UnityItems.sparkAlloy)), () -> {
                 node(orb, () -> {
                     node(shielder);
                     node(shockwire, () -> {
                         node(current, () -> {
-                            node(plasma);
+                            node(plasma, () -> {
+                                node(electrobomb);
+                            });
                         });
                     });
                 });
@@ -53,7 +55,7 @@ public class UnityTechTree implements ContentList{
                 });
 
                 node(oilLamp);
-            });            
+            });
         });
 
         attach(Blocks.arc, () -> {
@@ -107,6 +109,20 @@ public class UnityTechTree implements ContentList{
                 nodeProduce(UnityItems.monolithAlloy);
             });
         });
+
+        attach(Items.surgeAlloy, () -> {
+            nodeProduce(UnityItems.imberium, () -> {
+                nodeProduce(UnityItems.sparkAlloy);
+            });
+        });
+
+        attach(Blocks.siliconCrucible, () -> {
+            node(energyMixer, Seq.with(new Research(Items.thorium), new Research(Items.titanium), new Research(Items.surgeAlloy)));
+        });
+
+        attach(Blocks.overdriveProjector, () -> {
+            node(energyzer, Seq.with(new Research(energyMixer)));
+        });
     }
 
     private static void attach(UnlockableContent parent, Runnable children){
@@ -137,8 +153,20 @@ public class UnityTechTree implements ContentList{
         node(content, content.researchRequirements(), children);
     }
 
-    private static void node(UnlockableContent block){
-        node(block, () -> {});
+    private static void node(UnlockableContent content, Seq<Objective> objectives){
+        node(content, content.researchRequirements(), objectives, () -> {});
+    }
+
+    private static void node(UnlockableContent content, ItemStack[] requirements){
+        node(content, requirements, null, () -> {});
+    }
+
+    private static void node(UnlockableContent content, ItemStack[] requirements, Seq<Objective> objectives){
+        node(content, requirements, objectives, () -> {});
+    }
+
+    private static void node(UnlockableContent content){
+        node(content, () -> {});
     }
 
     private static void nodeProduce(UnlockableContent content, Seq<Objective> objectives, Runnable children){

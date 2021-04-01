@@ -58,7 +58,7 @@ public class UnityBlocks implements ContentList{
 
     energyMixer,
 
-    plater;
+    energyzer;
 
     public static @FactionDef("dark") Block
     oreUmbrium,
@@ -260,7 +260,7 @@ public class UnityBlocks implements ContentList{
             consumes.items(with(Items.thorium, 5, Items.titanium, 5, Items.surgeAlloy, 1));
         }};
 
-        plater = new Reinforcer("plater"){{
+        energyzer = new Reinforcer("energyzer"){{
             requirements(Category.effect, with(Items.titanium, 60, Items.lead, 20, Items.silicon, 30));
             size = 2;
             itemCapacity = 15;
