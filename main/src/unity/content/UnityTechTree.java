@@ -19,7 +19,7 @@ public class UnityTechTree implements ContentList{
         attach(Blocks.surgeSmelter, () -> {
             node(darkAlloyForge);
             node(monolithAlloyForge);
-            node(sparkAlloyForge, Seq.with(new SectorComplete(UnitySectorPresets.imberlands), new Research(UnityItems.sparkAlloy)), () -> {
+            node(sparkAlloyForge, Seq.with(new Research(UnityItems.sparkAlloy)), () -> {
                node(orb, () -> {
                     node(shielder);
                     node(shockwire, () -> {
@@ -55,7 +55,7 @@ public class UnityTechTree implements ContentList{
                 });
 
                 node(oilLamp);
-            });            
+            });
         });
 
         attach(Blocks.arc, () -> {

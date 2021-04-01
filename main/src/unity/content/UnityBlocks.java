@@ -38,6 +38,7 @@ import unity.world.blocks.production.*;
 import unity.world.blocks.sandbox.*;
 import unity.world.blocks.units.*;
 import unity.world.blocks.effect.*;
+import unity.world.blocks.environment.*;
 import unity.world.consumers.*;
 import unity.world.draw.*;
 import unity.world.graphs.*;
@@ -64,7 +65,9 @@ public class UnityBlocks implements ContentList{
 
     metaglassWall, metaglassWallLarge,
 
-    oreNickel, oreUmbrium, oreLuminum, oreMonolite, oreImberium;
+    oreNickel, oreUmbrium, oreLuminum, oreMonolite, oreImberium,
+
+    ruinousRock;
 
     public static @FactionDef("dark")
     Block apparition, ghost, banshee, fallout, catastrophe, calamity, extinction,
@@ -94,6 +97,8 @@ public class UnityBlocks implements ContentList{
     steelConveyor, diriumConveyor,
     
     bufferPad, omegaPad, cachePad,
+
+    convertPad,
 
     teleporter, teleunit; //expOutput, expUnloader, expTank, expChest, expFountain, expVoid;
 
@@ -359,34 +364,41 @@ public class UnityBlocks implements ContentList{
             requirements(Category.defense, with(Items.lead, 24, Items.metaglass, 24));
         }};
 
-        oreNickel = new OreBlock(UnityItems.nickel){{
+        oreNickel = new UnityOreBlock(UnityItems.nickel){{
             oreScale = 24.77f;
             oreThreshold = 0.913f;
             oreDefault = true;
         }};
 
-        oreUmbrium = new OreBlock(UnityItems.umbrium){{
+        oreUmbrium = new UnityOreBlock(UnityItems.umbrium){{
             oreScale = 23.77f;
             oreThreshold = 0.813f;
             oreDefault = true;
         }};
 
-        oreLuminum = new OreBlock(UnityItems.luminum){{
+        oreLuminum = new UnityOreBlock(UnityItems.luminum){{
             oreScale = 23.77f;
             oreThreshold = 0.81f;
             oreDefault = true;
         }};
 
-        oreMonolite = new OreBlock(UnityItems.monolite){{
+        oreMonolite = new UnityOreBlock(UnityItems.monolite){{
             oreScale = 23.77f;
             oreThreshold = 0.807f;
             oreDefault = true;
         }};
 
-        oreImberium = new OreBlock(UnityItems.imberium){{
+        oreImberium = new UnityOreBlock(UnityItems.imberium){{
             oreScale = 23.77f;
             oreThreshold = 0.807f;
             oreDefault = true;
+        }};
+
+        ruinousRock = new Floor("ruinous-rock"){{
+            variants = 3;
+            emitLight = true;
+            lightRadius = 8f;
+            lightColor = UnityPal.monolith.cpy().a(0.1f);
         }};
 
         //endregion
@@ -979,9 +991,22 @@ public class UnityBlocks implements ContentList{
         cachePad = new MechPad("cache-pad"){{
             requirements(Category.units, with(UnityItems.stone, 150, Items.lead, 160, Items.silicon, 100, Items.titanium, 60, Items.plastanium, 120, Items.phaseFabric, 60));
             size = 2;
-            craftTime = 130;
+            craftTime = 130f;
             consumes.power(0.8f);
             unitType = UnityUnitTypes.cache;
+        }};
+
+        convertPad = new ConversionPad("conversion-pad"){{
+            requirements(Category.units, BuildVisibility.sandboxOnly, empty);
+            size = 2;
+            craftTime = 60f;
+            consumes.power(1f);
+            upgrades.add(
+                new UnitType[]{UnitTypes.dagger, UnitTypes.mace},
+                new UnitType[]{UnitTypes.flare, UnitTypes.horizon},
+                new UnitType[]{UnityUnitTypes.cache, UnityUnitTypes.dijkstra},
+                new UnitType[]{UnityUnitTypes.omega, UnitTypes.reign}
+            );
         }};
 
         teleporter = new Teleporter("teleporter"){{
@@ -1359,7 +1384,7 @@ public class UnityBlocks implements ContentList{
             ambientSound = Sounds.machine;
             ambientSoundVolume = 0.6f;
             consumes.power(3.6f);
-            consumes.items(with(Items.silicon, 3, Items.graphite, 2, UnityItems.monolite, 2));
+            consumes.items(with(Items.silicon, 3, UnityItems.archDebris, 1, UnityItems.monolite, 2));
             consumes.liquid(Liquids.cryofluid, 0.1f);
         }};
 
@@ -1531,6 +1556,7 @@ public class UnityBlocks implements ContentList{
                 requirements(Category.turret, with(Items.copper, 1));
                 size = 7;
                 health = 8100;
+                outlineIcon = false;
 
                 shootLength = size * tilesize / 2f - 8f;
                 rotateSpeed = 1f;

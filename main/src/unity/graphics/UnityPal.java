@@ -7,15 +7,15 @@ import static arc.graphics.Color.*;
 
 public class UnityPal{
     public static Color
-
         plague = valueOf("a3f080"),
         plagueDark = valueOf("54de3b"),
     
         scarColor = valueOf("f53036"),
         scarColorAlpha = valueOf("f5303690"),
 
-        monolithLighter = valueOf("ffd2ae"),
-        monolithDarker = valueOf("e58956"),
+        monolithLight = valueOf("c0ecff"),
+        monolith = valueOf("87ceeb"),
+        monolithDark = valueOf("6586b0"),
 
         advance = valueOf("a3e3ff"),
         advanceDark = valueOf("59a7ff"),

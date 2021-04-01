@@ -4,6 +4,7 @@ import arc.graphics.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.type.*;
+import unity.graphics.UnityPal;
 import unity.type.*;
 import unity.world.meta.*;
 import unity.world.meta.CrucibleRecipe.*;
@@ -11,7 +12,7 @@ import unity.world.meta.CrucibleRecipe.*;
 public class UnityItems implements ContentList{
     public static Item//@formatter:off
     //faction-alloys
-    advanceAlloy, cupronickel, darkAlloy, dirium, lightAlloy, monolithAlloy, arcDebris, plagueAlloy, sparkAlloy, superAlloy, terminaAlloy,
+    advanceAlloy, cupronickel, darkAlloy, dirium, lightAlloy, monolithAlloy, archDebris, plagueAlloy, sparkAlloy, superAlloy, terminaAlloy,
     terminationFragment, terminum,
     //@formatter:on
     //faction items
@@ -45,13 +46,13 @@ public class UnityItems implements ContentList{
             radioactivity = 0.08f;
         }};
 
-        monolithAlloy = new Item("monolith-alloy", Color.valueOf("c0ecff")){{
+        monolithAlloy = new Item("monolith-alloy", UnityPal.monolithLight){{
             cost = 1.4f;
             flammability = 0.1f;
             radioactivity = 0.12f;
         }};
 
-        arcDebris = new AnimatedItem("archaic-debris", Color.valueOf("87ceeb")){{
+        archDebris = new AnimatedItem("archaic-debris", UnityPal.monolith){{
             cost = 1.3f;
             radioactivity = 0.1f;
             animSize = 7;
@@ -117,7 +118,7 @@ public class UnityItems implements ContentList{
             radioactivity = 0.1f;
         }};
 
-        monolite = new Item("monolite", Color.valueOf("6586b0")){{
+        monolite = new Item("monolite", UnityPal.monolithDark){{
             cost = 1.5f;
             hardness = 3;
             radioactivity = 0.2f;
