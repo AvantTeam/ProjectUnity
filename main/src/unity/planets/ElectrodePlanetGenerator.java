@@ -13,6 +13,7 @@ import mindustry.game.*;
 import mindustry.maps.generators.*;
 import mindustry.world.*;
 
+import static unity.content.UnityBlocks.*;
 import static mindustry.content.Blocks.*;
 import static mindustry.Vars.*;
 
@@ -24,27 +25,27 @@ public class ElectrodePlanetGenerator extends PlanetGenerator{
     float waterOffset = 0.07f;
 
     Block[][] arr = {
-        {metalFloor2, metalFloorDamaged, darkMetal, deepwater, metalFloorDamaged, deepwater, metalFloorDamaged, deepwater, deepwater, metalFloorDamaged, ice, ice, ice},
-        {metalFloor2, ice, deepwater, deepwater, metalFloorDamaged, darkMetal, deepwater, metalFloorDamaged, deepwater, darkMetal, metalFloorDamaged, ice, ice},
-        {water, metalFloor2, darksand, darkMetal, deepwater, deepwater, darkMetal, deepwater, deepwater, deepwater, metalFloorDamaged, metalFloorDamaged, ice},
-        {water, metalFloor2, metalFloor2, darkMetal, darksand, darksand, darkMetal, deepwater, darkMetal, deepwater, darkMetal, deepwater, metalFloorDamaged},
+        {metalFloor2, electroTile, darkMetal, deepwater, electroTile, deepwater, electroTile, deepwater, deepwater, electroTile, ice, ice, ice},
+        {metalFloor2, ice, deepwater, deepwater, electroTile, darkMetal, deepwater, electroTile, deepwater, darkMetal, electroTile, ice, ice},
+        {water, metalFloor2, darksand, darkMetal, deepwater, deepwater, darkMetal, deepwater, deepwater, deepwater, electroTile, electroTile, ice},
+        {water, metalFloor2, metalFloor2, darkMetal, darksand, darksand, darkMetal, deepwater, darkMetal, deepwater, darkMetal, deepwater, electroTile},
 
-        {deepwater, water, metalFloor2, darksand, darksand, darkMetal, darkMetal, darkMetal, darkMetal, basalt, deepwater, deepwater, metalFloorDamaged},
+        {deepwater, water, metalFloor2, darksand, darksand, darkMetal, darkMetal, darkMetal, darkMetal, basalt, deepwater, deepwater, electroTile},
         {deepwater, water, metalFloor2, darkMetal, darksand, darkMetal, darkMetal, darkMetal, basalt, basalt, darkMetal, deepwater, deepwater},
         {deepwater, water, metalFloor2, darksand, darkMetal, darkMetal, basalt, darkMetal, darkMetal, basalt, darkMetal, basalt, deepwater},
-        {deepwater, water, metalFloor2, darksand, darksand, darkMetal, basalt, darkMetal, basalt, basalt, deepwater, deepwater, metalFloorDamaged},
+        {deepwater, water, metalFloor2, darksand, darksand, darkMetal, basalt, darkMetal, basalt, basalt, deepwater, deepwater, electroTile},
 
-        {water, metalFloor2, metalFloor2, darksand, darksand, darkMetal, darkMetal, deepwater, metalFloorDamaged, deepwater, deepwater, deepwater, metalFloorDamaged},
-        {water, metalFloor2, darksand, darkMetal, deepwater, deepwater, metalFloorDamaged, deepwater, deepwater, deepwater, metalFloorDamaged, darkMetal, ice},
-        {metalFloor2, ice, deepwater, deepwater, metalFloorDamaged, deepwater, darkMetal, metalFloorDamaged, deepwater, darkMetal, metalFloorDamaged, ice, ice},
-        {metalFloor2, metalFloorDamaged, deepwater, deepwater, darkMetal, deepwater, metalFloorDamaged, deepwater, deepwater, metalFloorDamaged, ice, ice, ice}
+        {water, metalFloor2, metalFloor2, darksand, darksand, darkMetal, darkMetal, deepwater, electroTile, deepwater, deepwater, deepwater, electroTile},
+        {water, metalFloor2, darksand, darkMetal, deepwater, deepwater, electroTile, deepwater, deepwater, deepwater, electroTile, darkMetal, ice},
+        {metalFloor2, ice, deepwater, deepwater, electroTile, deepwater, darkMetal, electroTile, deepwater, darkMetal, electroTile, ice, ice},
+        {metalFloor2, electroTile, deepwater, deepwater, darkMetal, deepwater, electroTile, deepwater, deepwater, electroTile, ice, ice, ice}
     };
 
     float waterf = 2f / arr[0].length;
 
     float rawHeight(Vec3 position){
         position = Tmp.v33.set(position).scl(scl);
-        return (Mathf.pow((float)noise.octaveNoise3D(5, 0.5f, 1f / 3f, position.x, position.y, position.z), 3f) + Mathf.sin((position.x + position.y + position.z)/3) + waterOffset) / (1f + waterOffset);
+        return (Mathf.pow((float)noise.octaveNoise3D(5, 0.5f, 1f / 3f, position.x, position.y, position.z), 3f) + Math.abs(Mathf.sin(position.x) + Mathf.cos(position.y)) / 5 + waterOffset) / (1f + waterOffset);
     }
 
     @Override
