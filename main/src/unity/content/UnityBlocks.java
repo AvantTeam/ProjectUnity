@@ -1580,7 +1580,6 @@ public class UnityBlocks implements ContentList{
                 requirements(Category.turret, with(Items.copper, 1));
                 size = 7;
                 health = 8100;
-                outlineIcon = false;
 
                 shootLength = size * tilesize / 2f - 8f;
                 rotateSpeed = 1f;

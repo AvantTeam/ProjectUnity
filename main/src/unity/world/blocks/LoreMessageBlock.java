@@ -6,6 +6,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
+import arc.util.io.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
@@ -85,18 +86,36 @@ public class LoreMessageBlock extends Block{
                 cont.image(Tex.whiteui, color)
                     .growX()
                     .height(3f)
-                    .pad(4f);
+                    .pad(6f);
 
                 cont.row();
-                cont.table(Styles.black3, t -> t
-                    .label(() -> message)
+                var scrl = cont.pane(Styles.defaultPane, pane -> {
+                    pane.setBackground(Tex.scroll);
+                    pane.labelWrap(() -> message)
+                        .align(Align.topLeft)
+                        .grow()
+                        .pad(6f);
+                })
                     .grow()
-                    .pad(4f)
-                )
-                    .grow()
-                    .maxSize(320f, 160f)
-                    .pad(4f);
-            });
+                    .pad(6f)
+                    .get();
+                scrl.setScrollingDisabled(true, false);
+                scrl.setOverscroll(false, false);
+            }).size(360f, 240f);
+        }
+
+        @Override
+        public void write(Writes write){
+            super.write(write);
+            write.str(message);
+            write.bool(messageSet);
+        }
+
+        @Override
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            message = read.str();
+            messageSet = read.bool();
         }
     }
 }

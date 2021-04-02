@@ -30,7 +30,7 @@ public class Unity extends Mod implements ApplicationListener{
     public static UnityAntiCheat antiCheat;
     public static UnitySettings unitySettings = new UnitySettings();
 
-    private final ContentList[] unityContent = {
+    public final ContentList[] unityContent = new ContentList[]{
         new UnityItems(),
         new UnityStatusEffects(),
         new UnityWeathers(),
@@ -137,9 +137,36 @@ public class Unity extends Mod implements ApplicationListener{
             unity.meta.displayName = stringf.get(unity.meta.name + ".name");
             unity.meta.description = stringf.get(unity.meta.name + ".description");
 
-            Scripts scripts = mods.getScripts();
-            scripts.runConsole("const Unity = Vars.mods.locateMod(\"unity\").main");
+            initScripts();
         }
+    }
+
+    private void initScripts(){
+        Scripts scripts = mods.getScripts();
+        Cons2<String, String> register = (var, expression) -> {
+            scripts.runConsole(Strings.format("const @ = @", var, expression));
+        };
+
+        register.get(
+            getClass().getSimpleName(),
+            "Vars.mods.locateMod(\"unity\").main"
+        );
+
+        for(int i = 0; i < unityContent.length; i++){
+            var list = unityContent[i];
+            register.get(
+                list.getClass().getSimpleName(),
+                getClass().getSimpleName() + ".unityContent[" + i + "]"
+            );
+        }
+
+        register.get("skip", Strings.join(
+            "() => {",
+                "for(let i = Vars.state.wave; i < Vars.state.rules.winWave; i++){",
+                    "Vars.logic.runWave();",
+                "}",
+            "}"
+        ));
     }
 
     @Override
