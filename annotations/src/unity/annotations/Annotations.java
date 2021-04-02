@@ -183,7 +183,7 @@ public class Annotations{
     //anuke's implementation of annotation proxy maker, to replace the broken one from oracle
     //thanks, anuke
     //damn you, oracle
-    @SuppressWarnings({"sunapi", "unchecked", "rawtypes"})
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public static class AnnotationProxyMaker{
         private final Compound anno;
         private final Class<? extends Annotation> annoType;
