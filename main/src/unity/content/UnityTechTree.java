@@ -82,6 +82,18 @@ public class UnityTechTree implements ContentList{
             });
         });
 
+        attach(Blocks.siliconCrucible, () -> {
+            node(energyMixer, Seq.with(new Research(Items.thorium), new Research(Items.titanium), new Research(Items.surgeAlloy)));
+        });
+
+        attach(Blocks.overdriveProjector, () -> {
+            node(energyzer, Seq.with(new Research(energyMixer)));
+        });
+
+        attach(Blocks.surgeTower, () -> {
+            node(absorber, Seq.with(new Research(sparkAlloyForge)));
+        });
+
         //end region
         //region items
 
@@ -114,14 +126,6 @@ public class UnityTechTree implements ContentList{
             nodeProduce(UnityItems.imberium, () -> {
                 nodeProduce(UnityItems.sparkAlloy);
             });
-        });
-
-        attach(Blocks.siliconCrucible, () -> {
-            node(energyMixer, Seq.with(new Research(Items.thorium), new Research(Items.titanium), new Research(Items.surgeAlloy)));
-        });
-
-        attach(Blocks.overdriveProjector, () -> {
-            node(energyzer, Seq.with(new Research(energyMixer)));
         });
     }
 

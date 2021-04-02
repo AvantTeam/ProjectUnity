@@ -88,6 +88,8 @@ public class UnityBlocks implements ContentList{
 
     sparkAlloyForge,
 
+    absorber,
+
     electroTile;
 
     public static @FactionDef("koruh")
@@ -867,6 +869,11 @@ public class UnityBlocks implements ContentList{
             };
             consumes.power(2.6f);
             consumes.items(with(Items.surgeAlloy, 3, Items.titanium, 4, Items.silicon, 6, UnityItems.imberium, 3));
+        }};
+
+        absorber = new Absorber("absorber"){{
+            requirements(Category.power, with(UnityItems.sparkAlloy, 20, Items.lead, 20));
+            size = 2;
         }};
 
         electroTile = new Floor("electro-tile");

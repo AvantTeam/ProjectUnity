@@ -17,7 +17,7 @@ import static mindustry.Vars.*;
 
 public class Reinforcer extends Block {
     public float range = 60f;
-    public TextureRegion rotator, laserRegion, laserEndRegion;
+    public TextureRegion baseRegion, laserRegion, laserEndRegion;
     public float laserLength = -1f;
     public Color laserColor = Pal.thoriumPink;
     public float loadThreshold = 1f;
@@ -27,15 +27,21 @@ public class Reinforcer extends Block {
         update = true;
         acceptsItems = true;
         hasItems = true;
+        outlineIcon = true;
     }
 
     @Override
     public void load(){
         super.load();
 
+        baseRegion = Core.atlas.find(name + "-base");
         laserRegion = Core.atlas.find("unity-pointy-laser");
         laserEndRegion = Core.atlas.find("unity-pointy-laser-end");
-        rotator = Core.atlas.find(name + "rotator");
+    }
+
+    @Override
+    public TextureRegion[] icons(){
+        return new TextureRegion[]{baseRegion, region};
     }
 
     @Override
@@ -81,9 +87,9 @@ public class Reinforcer extends Block {
         }
 
         public void draw(){
-            super.draw();
+            Draw.rect(baseRegion, x, y);
             Draw.z(Layer.block);
-            Draw.rect(rotator, x, y, angle - 90);
+            Draw.rect(region, x, y, angle - 90);
 
             if(unit != null && laserWidth < 0.3f) {
                 Draw.color(laserColor);
