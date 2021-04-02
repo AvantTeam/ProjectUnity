@@ -15,6 +15,7 @@ import mindustry.maps.generators.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import unity.content.*;
+import unity.graphics.*;
 import unity.mod.*;
 import unity.type.sector.*;
 import unity.world.blocks.LoreMessageBlock.*;
@@ -28,7 +29,6 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
     protected BaseGenerator basegen = new BaseGenerator();
     protected float scl = 7f;
     protected float waterOffset = 0.1f;
-    protected IntMap<String> messages = new IntMap<>();
 
     protected Block[][] blocks = {
         {deepwater, water, darksandWater, darksandWater, darksand, darksandWater, stone, stone, darksandWater, snow, darksandWater, darksandWater, iceSnow, ruinousRock},
@@ -327,7 +327,13 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
 
         //don't generate message blocks if enemy base is present
         if(!sector.hasEnemyBase()){
-            Seq<Room> msgRoom = rooms.select(r -> r != spawn[0] && !enemies.contains(r));
+            Seq<Room> msgRoom = rooms.select(r ->
+                r != spawn[0] &&
+                !enemies.contains(e ->
+                    e.name.equals(r.name) ||
+                    Mathf.within(e.x, e.y, r.x, r.y, (state.rules.dropZoneRadius * 1.2f) / tilesize)
+                )
+            );
 
             boolean hasMessage = false;
             for(int r = 0; r < msgRoom.size; r++){
@@ -408,11 +414,14 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
         state.rules.waves = sector.info.waves = true;
         state.rules.enemyCoreBuildRadius = 600f;
 
+        state.rules.lighting = true;
+        state.rules.ambientLight = UnityPal.monolithAtmosphere;
+
         state.rules.spawns = UnityWaves.generate(Faction.monolith, difficulty, new Rand(), state.rules.attackMode);
     }
 
     protected String message(int id){
-        return messages.get(id, () -> Core.bundle.get("lore.unity.megalith-" + id, "..."));
+        return Core.bundle.get("lore.unity.megalith-" + id, "...");
     }
 
     @Override

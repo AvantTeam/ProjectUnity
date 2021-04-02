@@ -160,13 +160,13 @@ public class Unity extends Mod implements ApplicationListener{
             );
         }
 
-        register.get("skip", Strings.join(
-            "() => {",
-                "for(let i = Vars.state.wave; i < Vars.state.rules.winWave; i++){",
-                    "Vars.logic.runWave();",
-                "}",
+        register.get("skip", 
+            "() => {\n" +
+                "for(let i = Vars.state.wave; i < Vars.state.rules.winWave; i++){\n" +
+                    "Vars.logic.runWave();\n" +
+                "}\n" +
             "}"
-        ));
+        );
     }
 
     @Override

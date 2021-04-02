@@ -16,6 +16,7 @@ public class UnityPal{
         monolithLight = valueOf("c0ecff"),
         monolith = valueOf("87ceeb"),
         monolithDark = valueOf("6586b0"),
+        monolithAtmosphere = monolithDark.cpy().mul(0.4f),
 
         advance = valueOf("a3e3ff"),
         advanceDark = valueOf("59a7ff"),
