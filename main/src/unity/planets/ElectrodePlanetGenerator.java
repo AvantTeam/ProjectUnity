@@ -44,7 +44,7 @@ public class ElectrodePlanetGenerator extends PlanetGenerator{
 
     float rawHeight(Vec3 position){
         position = Tmp.v33.set(position).scl(scl);
-        return (Mathf.pow((float)noise.octaveNoise3D(7, 0.5f, 1f / 3f, position.x, position.y, position.z), 2.3f) + waterOffset) / (1f + waterOffset);
+        return (Mathf.pow((float)noise.octaveNoise3D(5, 0.5f, 1f / 3f, position.x, position.y, position.z), 3f) + Mathf.sin((position.x + position.y + position.z)/3) + waterOffset) / (1f + waterOffset);
     }
 
     @Override
