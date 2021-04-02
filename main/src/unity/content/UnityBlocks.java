@@ -1389,7 +1389,7 @@ public class UnityBlocks implements ContentList{
             updateEffect = UnityFx.archaicEnergy;
             blendGroup = infusedSharpslate;
             emitLight = true;
-            lightRadius = 16f;
+            lightRadius = 12f;
             lightColor = UnityPal.monolith.cpy().a(0.3f);
             albedo = 0.4f;
         }};
@@ -1405,7 +1405,12 @@ public class UnityBlocks implements ContentList{
             archSharpslate.asFloor().wall = this;
         }};
 
-        archEnergy = new OverlayFloor("archaic-energy");
+        archEnergy = new OverlayFloor("archaic-energy"){{
+            variants = 3;
+            emitLight = true;
+            lightRadius = 16f;
+            lightColor = UnityPal.monolith.cpy().a(0.5f);
+        }};
 
         loreMonolith = new LoreMessageBlock("lore-monolith", Faction.monolith);
 

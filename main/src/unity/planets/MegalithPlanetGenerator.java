@@ -29,20 +29,20 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
     protected float waterOffset = 0.1f;
 
     protected Block[][] blocks = {
-        {deepwater, water, darksandWater, darksandWater, darksand, darksandWater, sharpslate, darksand, darksandWater, darksand, darksandWater, darksand, sharpslate, infusedSharpslate},
-        {deepwater, water, darksandWater, darksand, darksand, sharpslate, darksand, sharpslate, darksand, stone, sharpslate, stone, sharpslate, stone},
-        {deepwater, water, darksandWater, darksand, sharpslate, darksand, darksandWater, darksand, darksandWater, darksand, infusedSharpslate, stone, infusedSharpslate, stone},
-        {deepwater, water, darksandWater, darksand, darksand, darksand, infusedSharpslate, sharpslate, stone, stone, sharpslate, sharpslate, snow, snow},
+        {deepwater, water, darksandWater, darksandWater, darksand, darksand, sharpslate, darksand, darksand, darksand, darksandWater, darksand, sharpslate, sharpslate},
+        {deepwater, water, darksandWater, darksand, darksand, sharpslate, darksand, sharpslate, darksand, sharpslate, sharpslate, sharpslate, sharpslate, sharpslate},
+        {deepwater, water, darksandWater, darksand, sharpslate, darksand, darksandWater, darksand, darksand, darksand, sharpslate, sharpslate, sharpslate, sharpslate},
+        {deepwater, water, darksandWater, darksand, darksand, darksand, sharpslate, sharpslate, sharpslate, sharpslate, sharpslate, sharpslate, snow, snow},
 
-        {deepwater, water, darksandWater, darksand, darksandWater, sharpslate, sharpslate, stone, sharpslate, stone, stone, snow, snow, ice},
-        {water, water, darksandWater, darksand, darksand, sharpslate, infusedSharpslate, infusedSharpslate, sharpslate, darksandWater, infusedSharpslate, snow, iceSnow, ice},
-        {water, darksandWater, darksand, sharpslate, darksand, sharpslate, darksandWater, sharpslate, infusedSharpslate, sharpslate, sharpslate, infusedSharpslate, ice, ice},
-        {water, darksandWater, stone, infusedSharpslate, stone, stone, infusedSharpslate, snow, stone, sharpslate, snow, iceSnow, ice, ice},
+        {deepwater, water, darksandWater, darksand, darksandWater, sharpslate, sharpslate, sharpslate, sharpslate, sharpslate, sharpslate, snow, snow, ice},
+        {water, water, darksandWater, darksand, darksand, sharpslate, sharpslate, sharpslate, sharpslate, darksandWater, sharpslate, snow, iceSnow, ice},
+        {water, darksandWater, darksand, sharpslate, darksand, sharpslate, darksandWater, sharpslate, sharpslate, sharpslate, sharpslate, sharpslate, ice, ice},
+        {water, darksandWater, sharpslate, sharpslate, sharpslate, sharpslate, sharpslate, snow, sharpslate, snow, snow, iceSnow, ice, ice},
 
-        {deepwater, water, darksandWater, darksand, infusedSharpslate, darksand, sharpslate, sharpslate, snow, snow, snow, iceSnow, ice, ice},
-        {water, water, darksandWater, darksand, darksandWater, sharpslate, snow, snow, stone, snow, snow, snow, ice, ice},
-        {water, darksandWater, darksand, sharpslate, sharpslate, stone, infusedSharpslate, sharpslate, snow, snow, snow, ice, ice, ice},
-        {water, darksandWater, infusedSharpslate, stone, stone, sharpslate, snow, stone, snow, iceSnow, ice, ice, ice, ice}
+        {deepwater, water, darksandWater, darksand, sharpslate, darksand, sharpslate, snow, snow, snow, snow, iceSnow, ice, ice},
+        {water, water, darksandWater, darksand, snow, sharpslate, snow, snow, sharpslate, snow, snow, snow, ice, ice},
+        {water, darksandWater, snow, sharpslate, snow, sharpslate, snow, snow, snow, snow, snow, ice, ice, ice},
+        {water, snow, sharpslate, snow, snow, snow, snow, snow, snow, iceSnow, ice, ice, ice, ice}
     };
 
     protected float waterf = 4f / blocks[0].length;
@@ -248,9 +248,20 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
 
         float difficulty = sector.threat;
 
+        //noise infused sharp slates on top of normal sharpslates
+        pass((x, y) -> {
+            if(floor == sharpslate && noise(x, y, 0.7d, 0.6d, 3d, 0.9d) > 0.7f){
+                floor = infusedSharpslate;
+
+                if(block == sharpslate.asFloor().wall){
+                    block = infusedSharpslate.asFloor().wall;
+                }
+            }
+        });
+
         //noise archaic sharp slates on top of infused sharpslates
         pass((x, y) -> {
-            if(floor == infusedSharpslate && Math.abs(0.5f - noise(x, y, 2.5d, 1.2d, 80f)) > 0.2d){
+            if(floor == infusedSharpslate && noise(x, y, 0.5d, 0.4d, 2d, 0.75d) > 0.5f){
                 floor = archSharpslate;
 
                 if(block == infusedSharpslate.asFloor().wall){
