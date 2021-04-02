@@ -1,6 +1,5 @@
 package unity.planets;
 
-import arc.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -383,7 +382,7 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
 
                             tile.setBlock(loreMonolith, Team.sharded, 0, () -> {
                                 LoreMessageBuild build = loreMonolith.newBuilding().as();
-                                build.setMessage(message(sector.id));
+                                build.setMessage("lore.unity.megalith-" + sector.id);
                                 return build;
                             });
 
@@ -418,10 +417,6 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
         state.rules.ambientLight = UnityPal.monolithAtmosphere;
 
         state.rules.spawns = UnityWaves.generate(Faction.monolith, difficulty, new Rand(), state.rules.attackMode);
-    }
-
-    protected String message(int id){
-        return Core.bundle.get("lore.unity.megalith-" + id, "...");
     }
 
     @Override

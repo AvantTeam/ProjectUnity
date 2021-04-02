@@ -47,6 +47,7 @@ public class LoreMessageBlock extends Block{
     }
 
     public class LoreMessageBuild extends Building{
+        /** The bundle key to the message */
         private String message;
         private boolean messageSet;
 
@@ -68,10 +69,6 @@ public class LoreMessageBlock extends Block{
             }
         }
 
-        public String getMessage(){
-            return message;
-        }
-
         @Override
         public void drawLight(){
             Drawf.light(team, this, 4f * tilesize, color, 0.5f);
@@ -91,7 +88,7 @@ public class LoreMessageBlock extends Block{
                 cont.row();
                 var scrl = cont.pane(Styles.defaultPane, pane -> {
                     pane.setBackground(Tex.scroll);
-                    pane.labelWrap(() -> message)
+                    pane.labelWrap(() -> Core.bundle.get(message, "..."))
                         .align(Align.topLeft)
                         .grow()
                         .pad(6f);
