@@ -140,7 +140,11 @@ public class UnityBlocks implements ContentList{
     }, outline = true)
     Block
     //environments
-    oreMonolite, ruinousRock, archEnergy, loreMonolith,
+    oreMonolite,
+    sharpslate, sharpslateWall,
+    infusedSharpslate, infusedSharpslateWall,
+    archSharpslate, archEnergy,
+    loreMonolith,
 
     //effects
     deflectorAura,
@@ -395,37 +399,11 @@ public class UnityBlocks implements ContentList{
             oreDefault = true;
         }};
 
-        oreMonolite = new UnityOreBlock(UnityItems.monolite){{
-            oreScale = 23.77f;
-            oreThreshold = 0.807f;
-            oreDefault = true;
-        }};
-
         oreImberium = new UnityOreBlock(UnityItems.imberium){{
             oreScale = 23.77f;
             oreThreshold = 0.807f;
             oreDefault = true;
         }};
-
-        ruinousRock = new Floor("ruinous-rock"){{
-            variants = 3;
-            emitLight = true;
-            lightRadius = 8f;
-            lightColor = UnityPal.monolith.cpy().a(0.1f);
-            albedo = 0.25f;
-        }};
-
-        archEnergy = new Floor("archaic-energy"){{
-            variants = 3;
-            updateEffect = UnityFx.archaicEnergy;
-            blendGroup = ruinousRock;
-            emitLight = true;
-            lightRadius = 16f;
-            lightColor = UnityPal.monolith.cpy().a(0.3f);
-            albedo = 0.4f;
-        }};
-
-        loreMonolith = new LoreMessageBlock("lore-monolith", Faction.monolith);
 
         //endregion
         //region dark
@@ -1388,6 +1366,54 @@ public class UnityBlocks implements ContentList{
         //endregion
         //region monolith
 
+        oreMonolite = new UnityOreBlock(UnityItems.monolite){{
+            oreScale = 23.77f;
+            oreThreshold = 0.807f;
+            oreDefault = true;
+        }};
+
+        sharpslate = new Floor("sharpslate"){{
+            variants = 3;
+        }};
+
+        infusedSharpslate = new Floor("infused-sharpslate"){{
+            variants = 3;
+            emitLight = true;
+            lightRadius = 8f;
+            lightColor = UnityPal.monolith.cpy().a(0.1f);
+            albedo = 0.25f;
+        }};
+
+        archSharpslate = new Floor("archaic-sharpslate"){{
+            variants = 3;
+            updateEffect = UnityFx.archaicEnergy;
+            blendGroup = infusedSharpslate;
+            emitLight = true;
+            lightRadius = 12f;
+            lightColor = UnityPal.monolith.cpy().a(0.3f);
+            albedo = 0.4f;
+        }};
+
+        sharpslateWall = new StaticWall("sharpslate-wall"){{
+            variants = 2;
+            sharpslate.asFloor().wall = this;
+        }};
+
+        infusedSharpslateWall = new StaticWall("infused-sharpslate-wall"){{
+            variants = 2;
+            infusedSharpslate.asFloor().wall = this;
+            archSharpslate.asFloor().wall = this;
+        }};
+
+        archEnergy = new OverlayFloor("archaic-energy"){{
+            variants = 3;
+            emitLight = true;
+            lightRadius = 16f;
+            lightColor = UnityPal.monolith.cpy().a(0.5f);
+        }};
+
+        loreMonolith = new LoreMessageBlock("lore-monolith", Faction.monolith);
+
         deflectorAura = new DeflectProjector("deflector-aura"){{
             requirements(Category.defense, with(Items.copper, 1));
             size = 4;
@@ -1587,7 +1613,6 @@ public class UnityBlocks implements ContentList{
                 requirements(Category.turret, with(Items.copper, 1));
                 size = 7;
                 health = 8100;
-                outlineIcon = false;
 
                 shootLength = size * tilesize / 2f - 8f;
                 rotateSpeed = 1f;

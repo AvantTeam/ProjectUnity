@@ -6,6 +6,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
+import arc.util.io.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
@@ -45,7 +46,26 @@ public class LoreMessageBlock extends Block{
         topRegion = Core.atlas.find("unity-lore-message-top");
     }
 
+    @Override
+    protected TextureRegion[] icons(){
+        return new TextureRegion[]{region, topRegion};
+    }
+
+    @Override
+    public TextureRegion icon(Cicon icon){
+        if(cicons[icon.ordinal()] == null){
+            String name = "unity-lore-message";
+            cicons[icon.ordinal()] =
+                Core.atlas.find(name + "-" + icon.name(),
+                Core.atlas.find(name + "-full",
+                Core.atlas.find(name)));
+        }
+
+        return cicons[icon.ordinal()];
+    }
+
     public class LoreMessageBuild extends Building{
+        /** The bundle key to the message */
         private String message;
         private boolean messageSet;
 
@@ -67,10 +87,6 @@ public class LoreMessageBlock extends Block{
             }
         }
 
-        public String getMessage(){
-            return message;
-        }
-
         @Override
         public void drawLight(){
             Drawf.light(team, this, 4f * tilesize, color, 0.5f);
@@ -85,18 +101,36 @@ public class LoreMessageBlock extends Block{
                 cont.image(Tex.whiteui, color)
                     .growX()
                     .height(3f)
-                    .pad(4f);
+                    .pad(6f);
 
                 cont.row();
-                cont.table(Styles.black3, t -> t
-                    .label(() -> message)
+                var scrl = cont.pane(Styles.defaultPane, pane -> {
+                    pane.setBackground(Tex.scroll);
+                    pane.labelWrap(() -> Core.bundle.get(message, "..."))
+                        .align(Align.topLeft)
+                        .grow()
+                        .pad(6f);
+                })
                     .grow()
-                    .pad(4f)
-                )
-                    .grow()
-                    .maxSize(320f, 160f)
-                    .pad(4f);
-            });
+                    .pad(6f)
+                    .get();
+                scrl.setScrollingDisabled(true, false);
+                scrl.setOverscroll(false, false);
+            }).size(360f, 240f);
+        }
+
+        @Override
+        public void write(Writes write){
+            super.write(write);
+            write.str(message);
+            write.bool(messageSet);
+        }
+
+        @Override
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            message = read.str();
+            messageSet = read.bool();
         }
     }
 }

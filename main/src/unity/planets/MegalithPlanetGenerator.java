@@ -1,11 +1,9 @@
 package unity.planets;
 
-import arc.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
-import arc.struct.ObjectMap.*;
 import arc.util.*;
 import arc.util.noise.*;
 import mindustry.ai.*;
@@ -15,6 +13,7 @@ import mindustry.maps.generators.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import unity.content.*;
+import unity.graphics.*;
 import unity.mod.*;
 import unity.type.sector.*;
 import unity.world.blocks.LoreMessageBlock.*;
@@ -28,28 +27,23 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
     protected BaseGenerator basegen = new BaseGenerator();
     protected float scl = 7f;
     protected float waterOffset = 0.1f;
-    protected IntMap<String> messages = new IntMap<>();
 
     protected Block[][] blocks = {
-        {deepwater, water, darksandWater, darksandWater, darksand, darksandWater, stone, stone, darksandWater, snow, darksandWater, darksandWater, iceSnow, ruinousRock},
-        {deepwater, water, darksandWater, darksand, darksand, stone, stone, stone, ruinousRock, dacite, stone, snow, snow, ice},
-        {deepwater, water, darksandWater, darksand, stone, dacite, darksandWater, dacite, darksandWater, stone, ruinousRock, dacite, ruinousRock, ice},
-        {deepwater, water, darksandWater, darksand, darksand, stone, ruinousRock, stone, dacite, dacite, snow, iceSnow, iceSnow, ice},
+        {deepwater, water, darksandWater, darksandWater, darksand, darksand, sharpslate, darksand, darksand, darksand, darksandWater, darksand, sharpslate, sharpslate},
+        {deepwater, water, darksandWater, darksand, darksand, sharpslate, darksand, sharpslate, darksand, sharpslate, sharpslate, sharpslate, sharpslate, sharpslate},
+        {deepwater, water, darksandWater, darksand, sharpslate, darksand, darksandWater, darksand, darksand, darksand, sharpslate, sharpslate, sharpslate, sharpslate},
+        {deepwater, water, darksandWater, darksand, darksand, darksand, sharpslate, sharpslate, sharpslate, sharpslate, sharpslate, sharpslate, snow, snow},
 
-        {deepwater, water, darksandWater, darksand, darksandWater, stone, stone, dacite, snow, dacite, snow, snow, ice, ice},
-        {water, water, darksandWater, darksand, darksand, stone, snow, ruinousRock, stone, darksandWater, ruinousRock, iceSnow, ice, ice},
-        {water, darksandWater, darksand, stone, darksand, ruinousRock, darksandWater, ruinousRock, dacite, iceSnow, iceSnow, ice, ice, ice},
-        {water, darksandWater, dacite, ruinousRock, dacite, snow, ruinousRock, snow, dacite, iceSnow, ice, ice, ice, ice},
+        {deepwater, water, darksandWater, darksand, darksandWater, sharpslate, sharpslate, sharpslate, sharpslate, sharpslate, sharpslate, snow, snow, ice},
+        {water, water, darksandWater, darksand, darksand, sharpslate, sharpslate, sharpslate, sharpslate, darksandWater, sharpslate, snow, iceSnow, ice},
+        {water, darksandWater, darksand, sharpslate, darksand, sharpslate, darksandWater, sharpslate, sharpslate, sharpslate, sharpslate, sharpslate, ice, ice},
+        {water, darksandWater, sharpslate, sharpslate, sharpslate, sharpslate, sharpslate, snow, sharpslate, snow, snow, iceSnow, ice, ice},
 
-        {deepwater, water, darksandWater, darksand, ruinousRock, darksand, stone, stone, snow, iceSnow, iceSnow, iceSnow, ice, ice},
-        {water, water, darksandWater, darksand, darksandWater, stone, snow, snow, dacite, snow, snow, iceSnow, ice, ice},
-        {water, darksandWater, darksand, stone, ruinousRock, dacite, ruinousRock, stone, snow, snow, iceSnow, ice, ice, ice},
-        {water, darksandWater, ruinousRock, snow, dacite, stone, snow, dacite, iceSnow, snow, ice, ice, ice, ice}
+        {deepwater, water, darksandWater, darksand, sharpslate, darksand, sharpslate, snow, snow, snow, snow, iceSnow, ice, ice},
+        {water, water, darksandWater, darksand, snow, sharpslate, snow, snow, sharpslate, snow, snow, snow, ice, ice},
+        {water, darksandWater, snow, sharpslate, snow, sharpslate, snow, snow, snow, snow, snow, ice, ice, ice},
+        {water, snow, sharpslate, snow, snow, snow, snow, snow, snow, iceSnow, ice, ice, ice, ice}
     };
-
-    ObjectMap<Block, Entry<Block, float[]>> dec = ObjectMap.of(
-        ruinousRock, new Entry<Block, float[]>(){{ key = archEnergy; value = new float[]{0.005f, 0.02f}; }}
-    );
 
     protected float waterf = 4f / blocks[0].length;
 
@@ -123,6 +117,7 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
 
     @Override
     protected void generate(){
+        //temporary "room" class, used for opening up spaces in the tile set
         class Room{
             final String name;
             final int x;
@@ -159,6 +154,7 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
         cells(4);
         distort(10f, 12f);
 
+        //generate empty rooms
         float roomPos = width / 2f / Mathf.sqrt3;
         int roomMin = 4, roomMax = 8, roomCount = rand.random(roomMin, roomMax);
         Seq<Room> rooms = new Seq<>();
@@ -174,6 +170,7 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
             rooms.add(new Room("Room-" + i, (int)Tmp.v2.x, (int)Tmp.v2.y, (int)rad));
         }
 
+        //generate spawn and enemy rooms
         Room[] spawn = {null};
         Seq<Room> enemies = new Seq<>();
         int enemySpawns = rand.random(2, Math.max((int)(sector.threat * 4), 2));
@@ -230,19 +227,83 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
             erase(room.x, room.y, room.radius);
         }
 
+        //connect random rooms
         int connections = rand.random(Math.max(roomCount - 1, 1), roomCount + 3);
         for(int i = 0; i < connections; i++){
             rooms.random(rand).connect(rooms.random(rand));
         }
 
+        //connect all rooms to the spawn room
         for(Room r : rooms){
             spawn[0].connect(r);
         }
 
+        //room post-processing
         cells(1);
         distort(10f, 6f);
         inverseFloodFill(tiles.getn(spawn[0].x, spawn[0].y));
 
+        trimDark();
+        median(2);
+
+        float difficulty = sector.threat;
+
+        //noise infused sharp slates on top of normal sharpslates
+        pass((x, y) -> {
+            if(floor == sharpslate && noise(x, y, 0.7d, 0.6d, 3d, 0.9d) > 0.7f){
+                floor = infusedSharpslate;
+
+                if(block == sharpslate.asFloor().wall){
+                    block = infusedSharpslate.asFloor().wall;
+                }
+            }
+        });
+
+        //noise archaic sharp slates on top of infused sharpslates
+        pass((x, y) -> {
+            if(floor == infusedSharpslate && noise(x, y, 0.5d, 0.4d, 2d, 0.75d) > 0.5f){
+                floor = archSharpslate;
+
+                if(block == infusedSharpslate.asFloor().wall){
+                    block = archSharpslate.asFloor().wall;
+                }
+            }
+        });
+
+        //scatter archaic energies on top of archaic sharpslates
+        Block target = archSharpslate;
+        Block over = archEnergy;
+        pass((x, y) -> {
+            float start = 0.008f;
+            float inc = 0.03f;
+
+            float chance = start + inc * difficulty;
+            if(rand.chance(chance)){
+                boolean found = false;
+                if(floor == target){
+                    ore = over;
+                    found = true;
+                }
+
+                if(found){
+                    for(Point2 p : Geometry.d4){
+                        var tile = tiles.get(x + p.x, y + p.y);
+                        if(tile != null && tile.floor() == target && rand.chance(1f / Geometry.d4.length)){
+                            tile.setOverlay(over);
+                        }
+                    }
+                }
+            }
+        });
+
+        //finalize the scattering
+        pass((x, y) -> {
+            if(ore == over && floor == target){
+                floor = sharpslate;
+            }
+        });
+
+        //generate ore frequencies
         Seq<Block> ores = Seq.with(Blocks.oreCopper, Blocks.oreLead, UnityBlocks.oreMonolite);
 
         float poles = Math.abs(sector.tile.v.y);
@@ -257,8 +318,12 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
             ores.add(Blocks.oreTitanium);
         }
 
-        if(noise.octaveNoise3D(2d, 0.5d, 1d, sector.tile.v.x + 3f, sector.tile.v.y, sector.tile.v.z) * nmag + poles > 0.7d * addscl){
+        if(noise.octaveNoise3D(2d, 0.5d, 1d, sector.tile.v.x + 2f, sector.tile.v.y, sector.tile.v.z) * nmag + poles > 0.7d * addscl){
             ores.add(Blocks.oreThorium);
+        }
+
+        if(rand.chance(0.3f)){
+            ores.add(Blocks.oreScrap);
         }
 
         FloatSeq frequencies = new FloatSeq();
@@ -266,45 +331,7 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
             frequencies.add(rand.random(-0.09f, 0.01f) - i * 0.01f);
         }
 
-        trimDark();
-        median(2);
-
-        float difficulty = sector.threat;
-
-        for(var entry : dec){
-            pass((x, y) -> {
-                Block key = entry.key;
-                var val = entry.value;
-
-                float chance = val.value[0] + val.value[1] * difficulty;
-                if(rand.chance(chance)){
-                    boolean found = false;
-                    if(floor == key){
-                        floor = val.key;
-                        found = true;
-                    }else if(block == key){
-                        block = val.key;
-                        found = true;
-                    }
-
-                    if(found){
-                        try{
-                            for(Point2 p : Geometry.d4){
-                                var tile = tiles.getn(x + p.x, y + p.y);
-                                if(rand.chance(1f / Geometry.d4.length)){
-                                    if(tile.floor() == key){
-                                        tile.setFloor(val.key.asFloor());
-                                    }else if(tile.block() == key){
-                                        tile.setBlock(val.key);
-                                    }
-                                }
-                            }
-                        }catch(Throwable ignored){}
-                    }
-                }
-            });
-        }
-
+        //generate ores in tile set
         pass((x, y) -> {
             if(floor.asFloor().isLiquid) return;
 
@@ -325,9 +352,15 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
             }
         });
 
-        //don't generate message blocks if enemy base is present
+        //generate random lore message block
         if(!sector.hasEnemyBase()){
-            Seq<Room> msgRoom = rooms.select(r -> r != spawn[0] && !enemies.contains(r));
+            Seq<Room> msgRoom = rooms.select(r ->
+                r != spawn[0] &&
+                !enemies.contains(e ->
+                    e.name.equals(r.name) ||
+                    Mathf.within(e.x, e.y, r.x, r.y, (state.rules.dropZoneRadius * 1.2f) / tilesize)
+                )
+            );
 
             boolean hasMessage = false;
             for(int r = 0; r < msgRoom.size; r++){
@@ -377,7 +410,7 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
 
                             tile.setBlock(loreMonolith, Team.sharded, 0, () -> {
                                 LoreMessageBuild build = loreMonolith.newBuilding().as();
-                                build.setMessage(message(sector.id));
+                                build.setMessage("lore.unity.megalith-" + sector.id);
                                 return build;
                             });
 
@@ -391,9 +424,11 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
             }
         }
 
+        //place launch loadout + enemy spawn point
         Schematics.placeLaunchLoadout(spawn[0].x, spawn[0].y);
         enemies.each(espawn -> tiles.getn(espawn.x, espawn.y).setOverlay(Blocks.spawn));
 
+        //generate enemy base if necessary
         if(sector.hasEnemyBase()){
             basegen.generate(tiles, enemies.map(r -> tiles.getn(r.x, r.y)), tiles.getn(spawn[0].x, spawn[0].y), state.rules.waveTeam, sector, difficulty);
 
@@ -402,17 +437,17 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
             state.rules.winWave = sector.info.winWave = 15 * (int)Math.max(difficulty * 5f, 1f);
         }
 
+        //rules applications
         float waveTimeDec = 0.3f;
 
         state.rules.waveSpacing = Mathf.lerp(Time.toSeconds * 50f * 2f, Time.toSeconds * 40f, Math.max(difficulty - waveTimeDec, 0) / 0.8f);
         state.rules.waves = sector.info.waves = true;
         state.rules.enemyCoreBuildRadius = 600f;
 
-        state.rules.spawns = UnityWaves.generate(Faction.monolith, difficulty, new Rand(), state.rules.attackMode);
-    }
+        state.rules.lighting = true;
+        state.rules.ambientLight = UnityPal.monolithAtmosphere;
 
-    protected String message(int id){
-        return messages.get(id, () -> Core.bundle.get("lore.unity.megalith-" + id, "..."));
+        state.rules.spawns = UnityWaves.generate(Faction.monolith, difficulty, new Rand(), state.rules.attackMode);
     }
 
     @Override
