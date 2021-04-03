@@ -185,8 +185,17 @@ public class Unity extends Mod implements ApplicationListener{
         FactionMeta.init();
         UnityEntityMapping.init();
 
-        for(Faction faction : Faction.all) {
-            print(Strings.format("Faction @ has @ contents.", faction.name, FactionMeta.getByFaction(faction, Content.class).size));
+        for(Faction faction : Faction.all){
+            var array = FactionMeta.getByFaction(faction, Object.class);
+            print(Strings.format("Faction @ has @ contents.", faction.name, array.size));
+
+            for(UnlockableContent unnamed : array
+                .select(o -> o instanceof UnlockableContent)
+                .<UnlockableContent>as()
+                .select(c -> Core.bundle.getOrNull(c.getContentType() + "." + c.name + ".name") == null)
+            ){
+                print(Strings.format("@: '@' has no bundle entry for name.", faction.name, unnamed.name));
+            }
         }
     }
 
