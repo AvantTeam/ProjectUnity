@@ -5,8 +5,10 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
+import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.type.*;
 import unity.entities.units.*;
 
 public class InvisibleUnitType extends UnityUnitType{
@@ -106,6 +108,69 @@ public class InvisibleUnitType extends UnityUnitType{
         if(lightRadius > 0){
             Drawf.light(unit.team, unit.x, unit.y, lightRadius, lightColor, lightOpacity * (1f - e.alphaLerp));
         }
+    }
+
+    @Override
+    public void drawWeapons(Unit unit){
+        float z = Draw.z();
+
+        //super.drawWeapons(unit);
+        //applyColor(unit);
+        for(WeaponMount mount : unit.mounts){
+            Weapon weapon = mount.weapon;
+            boolean found = bottomWeapons.contains(weapon.name);
+
+            float rotation = unit.rotation - 90;
+            float weaponRotation  = rotation + (weapon.rotate ? mount.rotation : 0);
+            float recoil = -((mount.reload) / weapon.reload * weapon.recoil);
+            float wx = unit.x + Angles.trnsx(rotation, weapon.x, weapon.y) + Angles.trnsx(weaponRotation, 0, recoil),
+            wy = unit.y + Angles.trnsy(rotation, weapon.x, weapon.y) + Angles.trnsy(weaponRotation, 0, recoil);
+
+            float zC = Draw.z();
+            if(found) Draw.z(zC - 0.005f);
+
+            if(weapon.shadow > 0){
+                float fade = 1f;
+                if(unit instanceof EndInvisibleUnit e) fade = fade(e);
+                Drawf.shadow(wx, wy, weapon.shadow, fade);
+            }
+
+            applyColor(unit);
+            if(weapon.outlineRegion.found()){
+                float zB = Draw.z();
+                if(!weapon.top || found) Draw.z(zB - outlineSpace);
+
+                Draw.rect(weapon.outlineRegion,
+                wx, wy,
+                weapon.outlineRegion.width * Draw.scl * -Mathf.sign(weapon.flipSprite),
+                weapon.region.height * Draw.scl,
+                weaponRotation);
+
+                Draw.z(zB);
+            }
+
+            Draw.rect(weapon.region,
+            wx, wy,
+            weapon.region.width * Draw.scl * -Mathf.sign(weapon.flipSprite),
+            weapon.region.height * Draw.scl,
+            weaponRotation);
+
+            if(weapon.heatRegion.found() && mount.heat > 0){
+                Draw.color(weapon.heatColor, mount.heat);
+                Draw.blend(Blending.additive);
+                Draw.rect(weapon.heatRegion,
+                wx, wy,
+                weapon.heatRegion.width * Draw.scl * -Mathf.sign(weapon.flipSprite),
+                weapon.heatRegion.height * Draw.scl,
+                weaponRotation);
+                Draw.blend();
+                Draw.color();
+            }
+            Draw.z(zC);
+        }
+
+        Draw.reset();
+        Draw.z(z);
     }
 
     @Override

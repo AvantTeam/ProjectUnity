@@ -36,6 +36,7 @@ public class Unity extends Mod implements ApplicationListener{
         new UnityWeathers(),
         new UnityLiquids(),
         new UnityBullets(),
+        new UnityWeaponTemplates(),
         new UnityUnitTypes(),
         new UnityBlocks(),
         new UnityPlanets(),

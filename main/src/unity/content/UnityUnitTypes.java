@@ -2519,7 +2519,7 @@ public class UnityUnitTypes implements ContentList{
             drag = 0.012f;
             defaultController = WormAI::new;
             circleTarget = counterDrag = true;
-            rotateShooting = faceTarget = false;
+            rotateShooting = false;
             splittable = chainable = false;
             hitSize = 41f * 1.55f;
             segmentOffset = (41f * 1.55f) + 1f;
@@ -2672,13 +2672,99 @@ public class UnityUnitTypes implements ContentList{
             drag = 0.06f;
             armor = 17f;
             hitSize = 205f;
-            rotateSpeed = 1f;
+            rotateSpeed = 0.8f;
             visualElevation = 3f;
             engineOffset = 116.5f;
             engineSize = 14f;
+            rotateShooting = false;
             flying = true;
             lowAltitude = true;
             outlineColor = UnityPal.darkerOutline;
+
+            CloneableSetWeapon a = UnityWeaponTemplates.apocalypseSmall,
+            b = UnityWeaponTemplates.apocalypseLaser, c = UnityWeaponTemplates.apocalypseLauncher;
+
+            weapons.addAll(a.set(w -> {
+                w.y = 47.25f;
+                w.x = 74.75f;
+            }), a.set(w -> {
+                w.y = 24.75f;
+                w.x = 80f;
+                w.reload += 2;
+            }), a.set(w -> {
+                w.y = -76.5f;
+                w.x = 108.5f;
+                w.reload += 4;
+            }), a.set(w -> {
+                w.y = -31.25f;
+                w.x = 70.25f;
+                w.reload += 6;
+            }), a.set(w -> {
+                w.y = -74.5f;
+                w.x = 56f;
+                w.reload += 8;
+            }), a.set(w -> {
+                w.y = 0f;
+                w.x = 51f;
+            }), a.set(w -> {
+                w.y = -80.25f;
+                w.x = 65.5f;
+                w.reload += 10;
+            }), a.set(w -> {
+                w.y = -63.5f;
+                w.x = 36.25f;
+                w.reload += 12;
+            }), b.set(w -> {
+                w.y = 37.25f;
+                w.x = 44.25f;
+            }), b.set(w -> {
+                w.y = -22.75f;
+                w.x = 51f;
+                w.reload += 2;
+            }), b.set(w -> {
+                w.y = -51.75f;
+                w.x = 62.25f;
+                w.reload += 4;
+            }), c.set(w -> {
+                w.x = 87f;
+                w.y = 0f;
+            }), c.set(w -> {
+                w.y = -23.25f;
+                w.x = 97f;
+                w.reload += 2;
+            }), c.set(w -> {
+                w.y = -50.5f;
+                w.x = 97.5f;
+                w.reload += 4;
+            }), c.set(w -> {
+                w.y = -74.75f;
+                w.x = 87f;
+                w.reload += 6;
+            }), new Weapon("unity-quetzalcoatl"){{
+                x = y = 0f;
+                shootY = -8.25f;
+                mirror = false;
+                rotate = true;
+                continuous = true;
+                rotateSpeed = 0.2f;
+                shadow = 63f;
+                shootCone = 1f;
+                reload = 6f * 60f;
+                bullet = new EndCutterLaserBulletType(3400f){{
+                    maxLength = 1200f;
+                    lifetime = 3f * 60f;
+                    width = 17f;
+                    antiCheatScl = 5f;
+                    laserSpeed = 70f;
+                    lightningColor = UnityPal.scarColor;
+                    lightningDamage = 65f;
+                    lightningLength = 13;
+
+                    minimumPower = 64000f;
+                    powerFade = 19000f;
+                    minimumUnitScore = 43000f;
+                }};
+            }});
 
             tentacles.add(new TentacleType("unity-apocalypse-tentacle"){{
                 x = 101.75f;
@@ -2693,6 +2779,7 @@ public class UnityUnitTypes implements ContentList{
                 //angleLimit = firstSegmentAngleLimit = 361f;
 
                 bullet = UnityBullets.endLaserSmall;
+                automatic = false;
                 continuous = true;
                 reload = 4f * 60f;
             }}, new TentacleType("unity-apocalypse-tentacle"){{
@@ -2709,6 +2796,7 @@ public class UnityUnitTypes implements ContentList{
                 //angleLimit = firstSegmentAngleLimit = 361f;
 
                 bullet = UnityBullets.endLaserSmall;
+                automatic = false;
                 continuous = true;
                 reload = 4f * 60f;
             }});
