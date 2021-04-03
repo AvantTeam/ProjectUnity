@@ -48,10 +48,11 @@ public class AttractLaserTurret extends LaserTurret{
 
         @Override
         public void updateTile(){
-            if(!validateTarget() || !consValid()){
+            if(!isShooting() || !validateTarget() || !consValid()){
                 charge = Mathf.lerpDelta(charge, 0f, chargeCooldown);
                 charge = charge > 0.001f ? charge : 0f;
             }
+
             if(isShooting() && (bulletLife() <= 0f && bullet() == null)){
                 attractUnits();
             }
@@ -70,11 +71,11 @@ public class AttractLaserTurret extends LaserTurret{
                 float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;
 
                 float used = baseReloadSpeed() * ((cheating() ? maxUsed : Math.min(liquids.get(liquid), maxUsed * Time.delta)) * liquid.heatCapacity * coolantMultiplier);
-                charge += 120f * chargeWarmup * used;
+                charge = Mathf.clamp(charge + 120f * chargeWarmup * used);
             }
 
             float prog = charge * 1.5f + 0.5f;
-            sound.update(x, y, charge, prog);
+            sound.update(x, y, Mathf.curve(charge, 0f, 0.4f) * 1.2f, prog);
         }
 
         @Override

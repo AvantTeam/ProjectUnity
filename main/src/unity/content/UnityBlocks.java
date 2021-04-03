@@ -1612,7 +1612,7 @@ public class UnityBlocks implements ContentList{
             final Effect pullEffect;
 
             {
-                requirements(Category.turret, with(Items.copper, 1));
+                requirements(Category.turret, with(Items.surgeAlloy, 500, Items.silicon, 650, UnityItems.archDebris, 350, UnityItems.monolithAlloy, 325));
                 size = 7;
                 health = 8100;
 
@@ -1824,7 +1824,7 @@ public class UnityBlocks implements ContentList{
                             .trns(tile.rotation, -tile.recoil + starOffset + Mathf.curve(tile.phase, 0f, 0.3f) * -2f)
                             .add(tile);
 
-                        pullEffect.at(tile.x, tile.y, tile.rotation, new Float[]{unit.x, unit.y, Tmp.v1.x, Tmp.v1.y, 3f + Mathf.range(0.2f)});
+                        pullEffect.at(tile.x, tile.y, tile.rotation, new Float[]{unit.x, unit.y, Tmp.v1.x, Tmp.v1.y, tile.charge * (3f + Mathf.range(0.2f))});
                     }
                 };
             }
