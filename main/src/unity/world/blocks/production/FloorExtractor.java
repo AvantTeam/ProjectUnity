@@ -8,6 +8,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.ctype.*;
+import mindustry.game.Team;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -65,7 +66,7 @@ public class FloorExtractor extends GenericCrafter{
         Tile tile = world.tiles.get(x, y);
         Item item = outputItem.item;
 
-        float width = drawPlaceText(Core.bundle.formatFloat("bar.extractspeed", 60f / craftTime * (size / count(tile)), 2), x, y, valid);
+        float width = drawPlaceText(Core.bundle.formatFloat("bar.extractspeed", 60f / craftTime * (count(tile) / size), 2), x, y, valid);
         float dx = x * tilesize + offset - width / 2f - 4f;
         float dy = y * tilesize + offset + size * tilesize / 2f + 5f;
 
@@ -76,6 +77,11 @@ public class FloorExtractor extends GenericCrafter{
         Draw.rect(item.icon(Cicon.small), dx, dy);
     }
 
+    @Override
+    public boolean canPlaceOn(Tile tile, Team team){
+        return super.canPlaceOn(tile, team) && count(tile) > 0f;
+    }
+
     public float count(Tile tile){
         return tile == null ? 0f : tile.getLinkedTilesAs(this, source).sumf(t -> sources.get(t.floorID(), sources.get(t.overlayID(), 0f)));
     }
@@ -84,7 +90,7 @@ public class FloorExtractor extends GenericCrafter{
         @Override
         public float getProgressIncrease(float baseTime){
             float incr = super.getProgressIncrease(baseTime);
-            return incr * (size / count(tile));
+            return incr * (count(tile) / size);
         }
     }
 }

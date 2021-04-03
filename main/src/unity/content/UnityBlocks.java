@@ -122,7 +122,12 @@ public class UnityBlocks implements ContentList{
     @Merge(base = ItemTurret.class, value = {Expc.class, Turretc.class})
     Block inferno;
 
-    public static @FactionDef("monolith")
+    public static
+    @FactionDef("monolith")
+    @LoadRegs({
+        "debris-extractor-heat1",
+        "debris-extractor-heat2"
+    })
     Block
     //environments
     oreMonolite,
@@ -1457,7 +1462,11 @@ public class UnityBlocks implements ContentList{
             consumes.power(4f);
         }};
 
-        debrisExtractor = new FloorExtractor("debris-extractor", infusedSharpslate, 0.08f, archEnergy, 1f){{
+        debrisExtractor = new FloorExtractor("debris-extractor",
+            infusedSharpslate, 0.04f,
+            archSharpslate, 0.08f,
+            archEnergy, 1f
+        ){{
             requirements(Category.crafting, with(UnityItems.monolite, 140, Items.surgeAlloy, 80, Items.thorium, 60));
 
             size = 2;
@@ -1472,13 +1481,16 @@ public class UnityBlocks implements ContentList{
                 public void draw(GenericCrafterBuild e){
                     Draw.rect(region, e.x, e.y);
 
-                    Draw.color(UnityPal.monolith, UnityPal.monolithLight, Mathf.absin(Time.time, 3f, 1f) * e.efficiency());
+                    Draw.color(UnityPal.monolith, UnityPal.monolithLight, Mathf.absin(Time.time, 6f, 1f) * e.warmup);
+                    Draw.alpha(e.warmup);
                     Draw.rect(Regions.debrisExtractorHeat1Region, e.x, e.y);
 
-                    Draw.color(UnityPal.monolith, UnityPal.monolithLight, Mathf.absin(Time.time + 20f, 3f, 1f) * e.efficiency());
+                    Draw.color(UnityPal.monolith, UnityPal.monolithLight, Mathf.absin(Time.time + 4f, 6f, 1f) * e.warmup);
+                    Draw.alpha(e.warmup);
                     Draw.rect(Regions.debrisExtractorHeat2Region, e.x, e.y);
 
                     Draw.color();
+                    Draw.alpha(1f);
                 }
             };
         }};
