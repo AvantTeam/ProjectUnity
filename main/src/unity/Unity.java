@@ -1,14 +1,10 @@
 package unity;
 
 import arc.*;
-import arc.assets.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.scene.*;
-import arc.struct.*;
 import arc.util.*;
-import mindustry.Vars;
-import mindustry.logic.GlobalConstants;
 import mindustry.mod.*;
 import mindustry.mod.Mods.*;
 import mindustry.ctype.*;
