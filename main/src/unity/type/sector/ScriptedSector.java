@@ -44,6 +44,9 @@ public class ScriptedSector extends SectorPreset{
 
         for(SectorObjective objective : objectives){
             if(objective.shouldUpdate()){
+                if(!objective.isInitialized()){
+                    objective.init();
+                }
                 objective.update();
             }
 
