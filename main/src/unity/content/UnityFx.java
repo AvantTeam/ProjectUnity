@@ -1206,5 +1206,13 @@ public class UnityFx{
             float w = 1f + e.fout() * 3f;
             Fill.rect(e.x + x, e.y + y, w, w, 45f);
         });
+    }),
+
+    spark = new Effect(15f, e -> {
+        Draw.color(e.color);
+        for (int j = 0; j < 4; j++) {
+            Drawf.tri(e.x, e.y, (float) e.data - e.fin(), (float) e.data + 1 - e.fin() * ((float) e.data + 1), 90 * j + e.rotation);
+        }
+        Draw.color();
     });
 }
