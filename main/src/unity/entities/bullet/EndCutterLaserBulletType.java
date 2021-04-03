@@ -27,6 +27,10 @@ public class EndCutterLaserBulletType extends BulletType{
     public float fadeInTime = 8f;
     public Color[] colors = {UnityPal.scarColorAlpha, UnityPal.scarColor, UnityPal.endColor, Color.white};
 
+    public float minimumPower = 43000f;
+    public float powerFade = 14000f;
+    public float minimumUnitScore = 32000f;
+
     private boolean hit = false;
 
     public EndCutterLaserBulletType(float damage){
@@ -122,8 +126,8 @@ public class EndCutterLaserBulletType extends BulletType{
             }, unit -> {
                 if(hit) return;
                 float lastHealth = unit.health;
-                float extraDamage = (float)Math.pow(Mathf.clamp((unit.maxHealth + unit.type.dpsEstimate - 43000f) / 14000f, 0f, 8f), 2f);
-                float trueDamage = damage + Mathf.clamp((unit.maxHealth + unit.type.dpsEstimate - 32000f) / 2f, 0f, 90000000f);
+                float extraDamage = (float)Math.pow(Mathf.clamp((unit.maxHealth + unit.type.dpsEstimate - minimumPower) / powerFade, 0f, 8f), 2f);
+                float trueDamage = damage + Mathf.clamp((unit.maxHealth + unit.type.dpsEstimate - minimumUnitScore) / 2f, 0f, 90000000f);
                 trueDamage += extraDamage * (damage / 3f);
                 unit.apply(status, statusDuration);
                 if(unit instanceof AntiCheatBase){

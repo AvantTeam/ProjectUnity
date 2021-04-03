@@ -41,27 +41,21 @@ public class Tentacle{
             last().updatePosition();
 
             boolean found = false;
-            int k = segments.length + 5;
             int j = 0;
 
             for(int i = 0; i < segments.length - 1; i++){
                 TentacleSegment segment = segments[i];
-                if(!Angles.near(segment.rotation, indexRotation(i + 1), segment.angleLimit() - 0.5f) || found || segments.length > k - 5){
+                if(!Angles.near(segment.rotation, indexRotation(i + 1), segment.angleLimit() - 0.5f) || found){
                     segment.rotation = Angles.moveToward(segment.rotation, segment.angleTo(targetPos) + 180f, type.rotationSpeed);
-                    if(segments.length <= k - 5){
-                        if(!found){
-                            found = true;
-                            j = 0;
-                        }else{
-                            j++;
-                            if(j > 4) found = false;
-                        }
+                    if(!found){
+                        found = true;
+                        j = 0;
+                    }else{
+                        j++;
+                        if(j > 4) found = false;
                     }
                 }
                 segment.updatePosition();
-                if(Angles.near(segment.rotation, segment.angleTo(targetPos) + 180f, 1f)){
-                    k = segment.index;
-                }
             }
             last().updatePosition();
         }
@@ -82,7 +76,7 @@ public class Tentacle{
         if(bullet != null){
             bullet.set(last());
             bullet.rotation(last().rotation + 180f);
-            if(bullet.time >= bullet.lifetime || !bullet.isAdded()) bullet = null;
+            if(bullet.time >= bullet.lifetime || !bullet.isAdded() || bullet.type != type.bullet) bullet = null;
         }
     }
 
@@ -90,12 +84,12 @@ public class Tentacle{
         Position origin = parentPosition(-1);
         TentacleSegment segment = segments[segments.length - 1];
         if(Units.invalidateTarget(target, unit.team, origin.getX(), origin.getY(), type.range())) target = null;
-        if(timer.get(20f) && !unit.isPlayer()){
+        if(timer.get(20f) && (!unit.isPlayer() || type.automatic)){
             target = Units.closestTarget(unit.team, segment.getX(), segment.getY(), type.range,
             unit -> origin.within(unit, type.range()) && unit.isValid(),
             building -> origin.within(building, type.range()));
         }
-        if(!unit.isPlayer()){
+        if(!unit.isPlayer() || type.automatic){
             if(target != null){
                 attacking = true;
                 targetPos.set(target);
