@@ -122,7 +122,12 @@ public class UnityBlocks implements ContentList{
     @Merge(base = ItemTurret.class, value = {Expc.class, Turretc.class})
     Block inferno;
 
-    public static @FactionDef("monolith")
+    public static
+    @FactionDef("monolith")
+    @LoadRegs({
+        "debris-extractor-heat1",
+        "debris-extractor-heat2"
+    })
     Block
     //environments
     oreMonolite,
