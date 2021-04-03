@@ -129,7 +129,7 @@ public class UnityStatusEffects implements ContentList{
         public void update(Unit unit, float time){
             if(Mathf.chanceDelta(effectChance) && (!unit.isFlying() || unit.moving())){
                 Tmp.v1.rnd(unit.type.hitSize / 2f);
-                effect.at(unit.x + Tmp.v1.x, unit.y + Tmp.v1.y, 0, Mathf.chance(0.5f) ? Pal.thoriumPink : Items.titanium.color, Mathf.random() + 0.1f);
+                effect.at(unit.x + Tmp.v1.x, unit.y + Tmp.v1.y, 0, Mathf.chance(0.5f) ? Pal.accent : Items.surgeAlloy.color, Mathf.random() + 0.1f);
             }
         }};
     }

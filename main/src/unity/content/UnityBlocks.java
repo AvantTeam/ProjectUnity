@@ -281,6 +281,7 @@ public class UnityBlocks implements ContentList{
             requirements(Category.effect, with(Items.titanium, 60, Items.lead, 20, Items.silicon, 30));
             size = 2;
             itemCapacity = 15;
+            laserColor = Items.surgeAlloy.color;
             consumes.power(0.4f);
             consumes.items(with(UnityItems.powerPack, 10));
         }};
