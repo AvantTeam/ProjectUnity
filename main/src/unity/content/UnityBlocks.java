@@ -271,10 +271,12 @@ public class UnityBlocks implements ContentList{
             consumes.liquid(Liquids.cryofluid, 7f);
         }};
 
-        energyMixer = new GenericCrafter("energy-mixer"){{
+        energyMixer = new Press("energy-mixer"){{
             requirements(Category.crafting, with(Items.lead, 120, Items.silicon, 80, Items.titanium, 30));
             outputItem = new ItemStack(UnityItems.powerPack, 3);
             size = 3;
+            movementSize = 29f;
+            fxYVariation = 25f / tilesize;
             craftTime = 50f;
             consumes.power(1.2f);
             consumes.items(with(Items.thorium, 5, Items.titanium, 5, Items.surgeAlloy, 1));
