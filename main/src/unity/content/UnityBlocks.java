@@ -57,9 +57,9 @@ public class UnityBlocks implements ContentList{
 
     recursiveReconstructor,
 
-    energyMixer,
+    irradiator,
 
-    energyzer;
+    superCharger;
 
     public static @FactionDef("dark") Block
     oreUmbrium,
@@ -271,9 +271,9 @@ public class UnityBlocks implements ContentList{
             consumes.liquid(Liquids.cryofluid, 7f);
         }};
 
-        energyMixer = new Press("energy-mixer"){{
+        irradiator = new Press("irradiator"){{
             requirements(Category.crafting, with(Items.lead, 120, Items.silicon, 80, Items.titanium, 30));
-            outputItem = new ItemStack(UnityItems.powerPack, 3);
+            outputItem = new ItemStack(UnityItems.irradiantSurge, 3);
             size = 3;
             movementSize = 29f;
             fxYVariation = 25f / tilesize;
@@ -282,13 +282,13 @@ public class UnityBlocks implements ContentList{
             consumes.items(with(Items.thorium, 5, Items.titanium, 5, Items.surgeAlloy, 1));
         }};
 
-        energyzer = new Reinforcer("energyzer"){{
+        superCharger = new Reinforcer("supercharger"){{
             requirements(Category.effect, with(Items.titanium, 60, Items.lead, 20, Items.silicon, 30));
             size = 2;
             itemCapacity = 15;
             laserColor = Items.surgeAlloy.color;
             consumes.power(0.4f);
-            consumes.items(with(UnityItems.powerPack, 10));
+            consumes.items(with(UnityItems.irradiantSurge, 10));
         }};
 
         lightLamp = new LightSource("light-lamp"){{
