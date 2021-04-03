@@ -9,11 +9,11 @@ import unity.gen.Stemc.*;
 @MergeComp
 @SuppressWarnings("unchecked")
 public class StemComp extends Block{
-    public boolean preserveDraw, preserveUpdate;
+    public boolean preserveDraw = true;
+    public boolean preserveUpdate = true;
 
-    protected @ReadOnly Cons<StemBuildc>
-        draw = e -> {},
-        update = e -> {};
+    protected @ReadOnly Cons<StemBuildc> draw = e -> {};
+    protected @ReadOnly Cons<StemBuildc> update = e -> {};
 
     public StemComp(String name){
         super(name);

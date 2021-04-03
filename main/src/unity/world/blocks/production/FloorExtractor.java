@@ -8,6 +8,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.ctype.*;
+import mindustry.game.Team;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -74,6 +75,11 @@ public class FloorExtractor extends GenericCrafter{
 
         Draw.reset();
         Draw.rect(item.icon(Cicon.small), dx, dy);
+    }
+
+    @Override
+    public boolean canPlaceOn(Tile tile, Team team){
+        return super.canPlaceOn(tile, team) && count(tile) > 0f;
     }
 
     public float count(Tile tile){

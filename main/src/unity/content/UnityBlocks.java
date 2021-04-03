@@ -1461,7 +1461,11 @@ public class UnityBlocks implements ContentList{
             consumes.power(4f);
         }};
 
-        debrisExtractor = new FloorExtractor("debris-extractor", infusedSharpslate, 0.08f, archEnergy, 1f){{
+        debrisExtractor = new FloorExtractor("debris-extractor",
+            infusedSharpslate, 0.04f,
+            archSharpslate, 0.08f,
+            archEnergy, 1f
+        ){{
             requirements(Category.crafting, with(UnityItems.monolite, 140, Items.surgeAlloy, 80, Items.thorium, 60));
 
             size = 2;
