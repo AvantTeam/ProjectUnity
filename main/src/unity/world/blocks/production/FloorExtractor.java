@@ -65,7 +65,7 @@ public class FloorExtractor extends GenericCrafter{
         Tile tile = world.tiles.get(x, y);
         Item item = outputItem.item;
 
-        float width = drawPlaceText(Core.bundle.formatFloat("bar.extractspeed", 60f / craftTime * (size / count(tile)), 2), x, y, valid);
+        float width = drawPlaceText(Core.bundle.formatFloat("bar.extractspeed", 60f / craftTime * (count(tile) / size), 2), x, y, valid);
         float dx = x * tilesize + offset - width / 2f - 4f;
         float dy = y * tilesize + offset + size * tilesize / 2f + 5f;
 
@@ -84,7 +84,7 @@ public class FloorExtractor extends GenericCrafter{
         @Override
         public float getProgressIncrease(float baseTime){
             float incr = super.getProgressIncrease(baseTime);
-            return incr * (size / count(tile));
+            return incr * (count(tile) / size);
         }
     }
 }
