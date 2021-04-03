@@ -7,6 +7,8 @@ import arc.graphics.*;
 import arc.scene.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.Vars;
+import mindustry.logic.GlobalConstants;
 import mindustry.mod.*;
 import mindustry.mod.Mods.*;
 import mindustry.ctype.*;
@@ -196,6 +198,14 @@ public class Unity extends Mod implements ApplicationListener{
                 .select(c -> Core.bundle.getOrNull(c.getContentType() + "." + c.name + ".name") == null)
             ){
                 print(Strings.format("@: '@' has no bundle entry for name.", faction.name, unnamed.name));
+            }
+
+            for (UnlockableContent unnamed : array
+                    .select(o -> o instanceof UnlockableContent)
+                    .<UnlockableContent>as()
+                    .select(c -> Core.bundle.getOrNull(c.getContentType() + "." + c.name + ".description") == null)
+            ) {
+                print(Strings.format("@: '@' has no bundle entry for description.", faction.name, unnamed.name));
             }
         }
     }
