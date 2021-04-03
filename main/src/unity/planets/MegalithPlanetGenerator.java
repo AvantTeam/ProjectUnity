@@ -95,7 +95,7 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
 
     @Override
     protected float noise(float x, float y, double octaves, double falloff, double scl, double mag){
-        Vec3 v = sector.rect.project(x, y).scl(5f);
+        Vec3 v = sector.rect.project(x, y).scl(this.scl);
         return (float)noise.octaveNoise3D(octaves, falloff, 1f / scl, v.x, v.y, v.z) * (float)mag;
     }
 
@@ -248,24 +248,29 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
 
         float difficulty = sector.threat;
 
-        //noise infused sharp slates on top of normal sharpslates
+        //replace sand with dark sand
         pass((x, y) -> {
-            if(floor == sharpslate && noise(x, y, 0.7d, 0.6d, 3d, 0.9d) > 0.7f){
-                floor = infusedSharpslate;
-
-                if(block == sharpslate.asFloor().wall){
-                    block = infusedSharpslate.asFloor().wall;
-                }
-            }
+            if(floor == sand) floor = darksand;
+            if(block == sandWall) block = duneWall;
         });
 
-        //noise archaic sharp slates on top of infused sharpslates
+        //noise archaic and infused sharpslates
         pass((x, y) -> {
-            if(floor == infusedSharpslate && noise(x, y, 0.5d, 0.4d, 2d, 0.75d) > 0.5f){
-                floor = archSharpslate;
+            if(floor == sharpslate){
+                float chance = noise(x, y, 4d, 17d, 560d);
+                if(!rand.chance(chance * chance)) return;
 
-                if(block == infusedSharpslate.asFloor().wall){
-                    block = archSharpslate.asFloor().wall;
+                float noise = noise(x, y, 6d, 30d, 360d, 0.63d);
+                if(noise > 0.4f){
+                    floor = archSharpslate;
+                    if(block == sharpslate.asFloor().wall){
+                        block = archSharpslate.asFloor().wall;
+                    }
+                }else if(noise > 0.3f){
+                    floor = infusedSharpslate;
+                    if(block == sharpslate.asFloor().wall){
+                        block = infusedSharpslate.asFloor().wall;
+                    }
                 }
             }
         });
@@ -274,8 +279,8 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
         Block target = archSharpslate;
         Block over = archEnergy;
         pass((x, y) -> {
-            float start = 0.008f;
-            float inc = 0.03f;
+            float start = 0.03f;
+            float inc = 0.01f;
 
             float chance = start + inc * difficulty;
             if(rand.chance(chance)){
@@ -293,13 +298,6 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
                         }
                     }
                 }
-            }
-        });
-
-        //finalize the scattering
-        pass((x, y) -> {
-            if(ore == over && floor == target){
-                floor = sharpslate;
             }
         });
 
