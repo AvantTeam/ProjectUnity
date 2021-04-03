@@ -7,6 +7,9 @@ import mindustry.game.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.type.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
+
+import static mindustry.Vars.*;
 
 @SuppressWarnings("unchecked")
 public abstract class SectorObjective{
@@ -18,6 +21,8 @@ public abstract class SectorObjective{
 
     public Seq<SectorObjective> dependencies = new Seq<>();
 
+    private boolean initialized;
+    private Cons<SectorObjective> init = objective -> {};
     private Cons<SectorObjective> update = objective -> {};
     private Cons<SectorObjective> draw = objective -> {};
 
@@ -25,6 +30,15 @@ public abstract class SectorObjective{
         this.sector = sector;
         this.executor = (Cons<SectorObjective>)executor;
         this.executions = executions;
+    }
+
+    public void init(){
+        init.get(this);
+        initialized = true;
+    }
+
+    public boolean isInitialized(){
+        return initialized;
     }
 
     public void update(){
@@ -41,6 +55,11 @@ public abstract class SectorObjective{
 
     public boolean shouldDraw(){
         return shouldUpdate();
+    }
+
+    public <T extends SectorObjective> SectorObjective init(Cons<T> init){
+        this.init = (Cons<SectorObjective>)init;
+        return this;
     }
 
     public <T extends SectorObjective> SectorObjective update(Cons<T> update){
@@ -256,6 +275,36 @@ public abstract class SectorObjective{
                     .map(Player::unit),
                 continuous, count, sector, executions, executor
             );
+        }
+    }
+
+    public static class ResourceAmountObjective extends SectorObjective{
+        public final ItemStack[] items;
+
+        public <T extends SectorObjective> ResourceAmountObjective(ItemStack[] items, ScriptedSector sector, int executions, Cons<T> executor){
+            super(sector, executions, executor);
+            this.items = items;
+        }
+
+        @Override
+        public void init(){
+            super.init();
+            //TODO hud ui stuff
+        }
+
+        @Override
+        public boolean completed(){
+            boolean complete = true;
+            for(CoreBuild core : state.teams.playerCores()){
+                for(ItemStack item : items){
+                    if(core.items.get(item.item) < item.amount){
+                        complete = false;
+                        break;
+                    }
+                }
+            }
+
+            return complete;
         }
     }
 }
