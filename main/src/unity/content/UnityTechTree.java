@@ -83,11 +83,11 @@ public class UnityTechTree implements ContentList{
         });
 
         attach(Blocks.siliconCrucible, () -> {
-            node(energyMixer, Seq.with(new Research(Items.thorium), new Research(Items.titanium), new Research(Items.surgeAlloy)));
+            node(irradiator, Seq.with(new Research(Items.thorium), new Research(Items.titanium), new Research(Items.surgeAlloy)));
         });
 
         attach(Blocks.overdriveProjector, () -> {
-            node(energyzer, Seq.with(new Research(energyMixer)));
+            node(superCharger, Seq.with(new Research(irradiator)));
         });
 
         attach(Blocks.surgeTower, () -> {
@@ -125,6 +125,8 @@ public class UnityTechTree implements ContentList{
         attach(Items.surgeAlloy, () -> {
             nodeProduce(UnityItems.imberium, () -> {
                 nodeProduce(UnityItems.sparkAlloy);
+
+                nodeProduce(UnityItems.irradiantSurge);
             });
         });
     }
