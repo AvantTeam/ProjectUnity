@@ -1392,7 +1392,7 @@ public class UnityBlocks implements ContentList{
             blendGroup = infusedSharpslate;
             emitLight = true;
             lightRadius = 12f;
-            lightColor = UnityPal.monolith.cpy().a(0.3f);
+            lightColor = UnityPal.monolith.cpy().a(0.16f);
             albedo = 0.4f;
         }};
 
@@ -1411,7 +1411,7 @@ public class UnityBlocks implements ContentList{
             variants = 3;
             emitLight = true;
             lightRadius = 16f;
-            lightColor = UnityPal.monolith.cpy().a(0.5f);
+            lightColor = UnityPal.monolith.cpy().a(0.24f);
         }};
 
         loreMonolith = new LoreMessageBlock("lore-monolith", Faction.monolith);
