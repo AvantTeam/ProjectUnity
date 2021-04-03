@@ -16,7 +16,7 @@ import static mindustry.Vars.*;
 public class Absorber extends PowerGenerator {
     public float range = 50f;
     public int capacity = 5;
-    public float powerProduction = 0.5f;
+    public float powerProduction = 0.15f;
     public TextureRegion laserRegion, laserEndRegion;
 
     public Absorber(String name){

@@ -8,7 +8,6 @@ import mindustry.entities.*;
 import mindustry.gen.*;
 import unity.type.*;
 import unity.util.*;
-import unity.util.CyclicCoordinateDescent.*;
 
 public class Tentacle{
     TentacleSegment[] segments;
@@ -26,24 +25,47 @@ public class Tentacle{
     public void updateMovement(){
         if(!attacking){
             swayScl = Mathf.lerpDelta(swayScl, 1f, 0.04f);
-            return;
+        }else{
+            swayScl = Mathf.lerpDelta(swayScl, 0f, 0.04f);
+
+            float speed = type.speed * type.accel;
+            Tmp.v1.set(last()).approachDelta(targetPos, speed).sub(last());
+            endVelocity.add(Tmp.v1).limit(type.speed);
         }
-        swayScl = Mathf.lerpDelta(swayScl, 0f, 0.04f);
-        float speed = type.speed * type.accel;
+        //float lastAngle = indexRotation(-1);
+        //Tmp.v1.set(last()).approachDelta(targetPos, speed).sub(last());
 
-        Position origin = parentPosition(-1);
+        //endVelocity.add(Tmp.v1).limit(type.speed);
+        if(attacking){
+            last().rotation = Angles.moveToward(last().rotation, last().angleTo(targetPos) + 180f, type.rotationSpeed);
+            last().updatePosition();
 
-        Tmp.v1.set(last()).approachDelta(targetPos, speed).sub(last());
-        endVelocity.add(Tmp.v1).limit(type.speed);
-        for(int i = 0; i < type.iKIteration; i++){
-            last().rotation = Mathf.slerpDelta(last().rotation, last().angleTo(targetPos) + 180f, (type.rotationSpeed * 0.05f) / type.iKIteration);
+            boolean found = false;
+            int k = segments.length + 5;
+            int j = 0;
 
-            CyclicCoordinateDescent.calculate(segments, last().getX() + (endVelocity.x * Time.delta), last().getY() + (endVelocity.y * Time.delta), origin.getX(), origin.getY(), 0.1f, type.angleLimit, 0.1f / type.iKIteration, true);
-
-            for(TentacleSegment segment : segments){
+            for(int i = 0; i < segments.length - 1; i++){
+                TentacleSegment segment = segments[i];
+                if(!Angles.near(segment.rotation, indexRotation(i + 1), segment.angleLimit() - 0.5f) || found || segments.length > k - 5){
+                    segment.rotation = Angles.moveToward(segment.rotation, segment.angleTo(targetPos) + 180f, type.rotationSpeed);
+                    if(segments.length <= k - 5){
+                        if(!found){
+                            found = true;
+                            j = 0;
+                        }else{
+                            j++;
+                            if(j > 4) found = false;
+                        }
+                    }
+                }
                 segment.updatePosition();
+                if(Angles.near(segment.rotation, segment.angleTo(targetPos) + 180f, 1f)){
+                    k = segment.index;
+                }
             }
+            last().updatePosition();
         }
+
         endVelocity.scl(1f - (type.drag * Time.delta));
     }
 
@@ -99,7 +121,7 @@ public class Tentacle{
 
     Position parentPosition(int index){
         if(index < 0){
-            return Tmp.v1.trns(unit.rotation - 90f, type.x, type.y).add(unit);
+            return Tmp.v4.trns(unit.rotation - 90f, type.x, type.y).add(unit);
         }
         if(index >= segments.length) return null;
         return segments[index];
@@ -169,59 +191,23 @@ public class Tentacle{
         return this;
     }
 
-    public static class TentacleSegment implements Bone{
+    public static class TentacleSegment implements Position{
         Vec2 pos = new Vec2();
         Vec2 vel = new Vec2();
         Tentacle main;
         int index;
         float rotation;
 
-        void updatePosition(){
+        float angleLimit(){
+            return index == 0 ? main.type.firstSegmentAngleLimit : main.type.angleLimit;
+        }
+
+        public void updatePosition(){
             float angle = main.indexRotation(index - 1);
             rotation = Utils.clampedAngle(rotation, angle, (index == 0 ? main.type.firstSegmentAngleLimit : main.type.angleLimit));
             Tmp.v2.trns(rotation, main.type.segmentLength / (index == 0 ? 2f : 1f)).add(this).sub(main.parentPosition(index - 1));
             pos.sub(Tmp.v2);
             vel.limit(main.type.speed);
-        }
-
-        @Override
-        public float angle(){
-            //return rotation;
-            return rotation + 180f;
-        }
-
-        @Override
-        public void angle(float d){
-            //rotation = d;
-            rotation = d + -180f;
-        }
-
-        @Override
-        public void setX(float x){
-            //Tmp.v1.trns(rotation, main.type.segmentLength).add(this);
-            //pos.x = x - Tmp.v1.x;
-            pos.x = x;
-        }
-
-        @Override
-        public void setY(float y){
-            //Tmp.v1.trns(rotation, main.type.segmentLength).add(this);
-            //pos.y = y - Tmp.v1.y;
-            pos.y = y;
-        }
-
-        @Override
-        public float getCCDPositionX(){
-            //Tmp.v1.trns(rotation, main.type.segmentLength).add(this);
-            //return Tmp.v1.x;
-            return pos.x;
-        }
-
-        @Override
-        public float getCCDPositionY(){
-            //Tmp.v1.trns(rotation, main.type.segmentLength).add(this);
-            //return Tmp.v1.y;
-            return pos.y;
         }
 
         @Override

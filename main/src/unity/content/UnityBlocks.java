@@ -854,7 +854,9 @@ public class UnityBlocks implements ContentList{
             size = 2;
         }};
 
-        electroTile = new Floor("electro-tile");
+        electroTile = new Floor("electro-tile"){{
+
+        }};
 
         //endregion
         //region koruh

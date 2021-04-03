@@ -11,6 +11,7 @@ public class TentacleType implements Cloneable{
     public float x, y, rotationOffset, segmentLength;
     public float speed, accel, rotationSpeed, drag = 0.06f, angleLimit = 65f, firstSegmentAngleLimit = 35f;
     public int segments = 10;
+    public float iKScl = 0.1f;
     public int iKIteration = 1;
     public boolean mirror = true, flipSprite;
 

@@ -2688,8 +2688,9 @@ public class UnityUnitTypes implements ContentList{
                 rotationSpeed = 3f;
                 speed = 2f;
 
-                segments = 20;
-                segmentLength = 27.75f;
+                segments = 15;
+                segmentLength = 37.25f;
+                //angleLimit = firstSegmentAngleLimit = 361f;
 
                 bullet = UnityBullets.endLaserSmall;
                 continuous = true;
@@ -2702,9 +2703,10 @@ public class UnityUnitTypes implements ContentList{
                 rotationSpeed = 3f;
                 speed = 2f;
 
-                segments = 15;
-                segmentLength = 27.75f;
+                segments = 10;
+                segmentLength = 37.25f;
                 swayOffset = 90f;
+                //angleLimit = firstSegmentAngleLimit = 361f;
 
                 bullet = UnityBullets.endLaserSmall;
                 continuous = true;
