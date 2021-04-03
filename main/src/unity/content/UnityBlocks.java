@@ -1476,13 +1476,16 @@ public class UnityBlocks implements ContentList{
                 public void draw(GenericCrafterBuild e){
                     Draw.rect(region, e.x, e.y);
 
-                    Draw.color(UnityPal.monolith, UnityPal.monolithLight, Mathf.absin(Time.time, 3f, 1f) * e.efficiency());
+                    Draw.color(UnityPal.monolith, UnityPal.monolithLight, Mathf.absin(Time.time, 6f, 1f) * e.warmup);
+                    Draw.alpha(e.warmup);
                     Draw.rect(Regions.debrisExtractorHeat1Region, e.x, e.y);
 
-                    Draw.color(UnityPal.monolith, UnityPal.monolithLight, Mathf.absin(Time.time + 20f, 3f, 1f) * e.efficiency());
+                    Draw.color(UnityPal.monolith, UnityPal.monolithLight, Mathf.absin(Time.time + 4f, 6f, 1f) * e.warmup);
+                    Draw.alpha(e.warmup);
                     Draw.rect(Regions.debrisExtractorHeat2Region, e.x, e.y);
 
                     Draw.color();
+                    Draw.alpha(1f);
                 }
             };
         }};
