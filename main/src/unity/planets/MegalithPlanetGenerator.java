@@ -29,20 +29,20 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
     protected float waterOffset = 0.1f;
 
     protected Block[][] blocks = {
-        {deepwater, water, darksandWater, darksandWater, darksand, darksand, sharpslate, darksand, darksand, darksand, darksandWater, darksand, sharpslate, sharpslate},
-        {deepwater, water, darksandWater, darksand, darksand, sharpslate, darksand, sharpslate, darksand, sharpslate, sharpslate, sharpslate, sharpslate, sharpslate},
-        {deepwater, water, darksandWater, darksand, sharpslate, darksand, darksandWater, darksand, darksand, darksand, sharpslate, sharpslate, sharpslate, sharpslate},
+        {deepwater, water, darksandWater, darksandWater, darksand, darksand, darksandWater, darksandWater, darksandWater, darksand, darksandWater, darksand, sharpslate, sharpslate},
+        {deepwater, water, darksandWater, darksand, darksand, darksandWater, darksand, sharpslate, darksandWater, sharpslate, sharpslate, sharpslate, sharpslate, sharpslate},
+        {deepwater, water, darksandWater, darksandWater, sharpslate, darksand, darksandWater, darksand, darksand, darksand, sharpslate, sharpslate, sharpslate, sharpslate},
         {deepwater, water, darksandWater, darksand, darksand, darksand, sharpslate, sharpslate, sharpslate, sharpslate, sharpslate, sharpslate, snow, snow},
 
         {deepwater, water, darksandWater, darksand, darksandWater, sharpslate, sharpslate, sharpslate, sharpslate, sharpslate, sharpslate, snow, snow, ice},
         {water, water, darksandWater, darksand, darksand, sharpslate, sharpslate, sharpslate, sharpslate, darksandWater, sharpslate, snow, iceSnow, ice},
-        {water, darksandWater, darksand, sharpslate, darksand, sharpslate, darksandWater, sharpslate, sharpslate, sharpslate, sharpslate, sharpslate, ice, ice},
+        {water, darksandWater, darksand, darksandWater, darksand, sharpslate, darksandWater, sharpslate, sharpslate, sharpslate, sharpslate, sharpslate, ice, ice},
         {water, darksandWater, sharpslate, sharpslate, sharpslate, sharpslate, sharpslate, snow, sharpslate, snow, snow, iceSnow, ice, ice},
 
         {deepwater, water, darksandWater, darksand, sharpslate, darksand, sharpslate, snow, snow, snow, snow, iceSnow, ice, ice},
-        {water, water, darksandWater, darksand, snow, sharpslate, snow, snow, sharpslate, snow, snow, snow, ice, ice},
-        {water, darksandWater, snow, sharpslate, snow, sharpslate, snow, snow, snow, snow, snow, ice, ice, ice},
-        {water, snow, sharpslate, snow, snow, snow, snow, snow, snow, iceSnow, ice, ice, ice, ice}
+        {water, darksandWater, snow, darksand, snow, sharpslate, snow, snow, sharpslate, snow, snow, snow, ice, ice},
+        {sharpslate, snow, snow, sharpslate, snow, sharpslate, snow, snow, snow, snow, snow, ice, ice, ice},
+        {snow, snow, snow, snow, snow, snow, snow, snow, snow, iceSnow, ice, ice, ice, ice}
     };
 
     protected float waterf = 4f / blocks[0].length;
@@ -147,7 +147,7 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
                 float nscl = rand.random(12f, 48f);
                 int stroke = rand.random(4, 12);
 
-                brush(pathfind(x, y, to.x, to.y, tile -> (tile.solid() ? 3f : 0f) + noise(tile.x, tile.y, 1, 1, 1f / nscl) * 32f, Astar.manhattan), stroke);
+                brush(pathfind(x, y, to.x, to.y, tile -> (tile.solid() ? 5f : 0f) + noise(tile.x, tile.y, 1, 1, 1f / nscl) * 32f, Astar.manhattan), stroke);
             }
         }
 
@@ -257,8 +257,8 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
         //noise archaic and infused sharpslates
         pass((x, y) -> {
             if(floor == sharpslate){
-                float chance = noise(x, y, 4d, 17d, 560d);
-                if(!rand.chance(chance * chance)) return;
+                float sel = noise(x, y, 4d, 17d, 460d, 0.84d);
+                if(sel < 0.5f || !rand.chance(sel)) return;
 
                 float noise = noise(x, y, 6d, 30d, 360d, 0.63d);
                 if(noise > 0.4f){

@@ -116,7 +116,7 @@ public class LoreMessageBlock extends Block{
                     .get();
                 scrl.setScrollingDisabled(true, false);
                 scrl.setOverscroll(false, false);
-            }).size(360f, 240f);
+            }).size(300f, 200f);
         }
 
         @Override
