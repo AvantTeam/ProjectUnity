@@ -14,6 +14,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
+import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.defense.*;
@@ -107,8 +108,9 @@ public class UnityBlocks implements ContentList{
 
     public static
     @FactionDef("koruh")
+    @LoadRegs("bt-laser-turret-top")
     @Merge(base = PowerTurret.class, value = {Expc.class, Turretc.class})
-    Block laser, laserCharge, laserBranch, laserFractal;
+    Block laser, laserCharge, laserBranch, laserFractal, laserBreakthrough;
 
     public static
     @FactionDef("koruh")
@@ -120,24 +122,7 @@ public class UnityBlocks implements ContentList{
     @Merge(base = ItemTurret.class, value = {Expc.class, Turretc.class})
     Block inferno;
 
-    public static
-    @FactionDef("koruh")
-    @Merge(base = PowerTurret.class, value = {Expc.class, Turretc.class})
-    @LoadRegs("bt-laser-turret-top")
-    Block laserBreakthrough;
-
-    //public static @FactionDef(type = "light")
-    //Block
-
-    public static
-    @FactionDef("monolith")
-    @LoadRegs(value = {
-        "supernova-head",
-        "supernova-core",
-        "supernova-wing-left", "supernova-wing-right",
-        "supernova-wing-left-bottom", "supernova-wing-right-bottom",
-        "supernova-bottom"
-    }, outline = true)
+    public static @FactionDef("monolith")
     Block
     //environments
     oreMonolite,
@@ -150,12 +135,23 @@ public class UnityBlocks implements ContentList{
     deflectorAura,
 
     //production
-    monolithAlloyForge,
+    debrisExtractor, monolithAlloyForge,
 
     //defense
-    electrophobicWall, electrophobicWallLarge,
+    electrophobicWall, electrophobicWallLarge;
 
     //turrets
+    public static
+    @FactionDef("monolith")
+    @LoadRegs(value = {
+        "supernova-head",
+        "supernova-core",
+        "supernova-wing-left", "supernova-wing-right",
+        "supernova-wing-left-bottom", "supernova-wing-right-bottom",
+        "supernova-bottom"
+    }, outline = true)
+    Block
+
     ricochet, shellshock, purge,
     recluse, mage, oracle,
     supernova;
@@ -212,11 +208,24 @@ public class UnityBlocks implements ContentList{
     public static @FactionDef("advance")
     Block celsius, kelvin, xenoCorruptor, cube;
 
-    public static @FactionDef("end")
+    public static
+    @FactionDef("end")
+    @LoadRegs({
+        "end-forge-lights",
+        "end-forge-top",
+        "end-forge-top-small",
+
+        "terminal-crucible-lights",
+        "terminal-crucible-top"
+    })
+    Block terminalCrucible, endForge;
+
+    public static
+    @FactionDef("end")
     @LoadRegs(value = {
         "tenmeikiri-base"
     }, outline = true)
-    Block terminalCrucible, endForge, endGame, tenmeikiri;
+    Block endGame, tenmeikiri;
 
     @Override
     public void load(){
@@ -591,15 +600,20 @@ public class UnityBlocks implements ContentList{
 
         darkAlloyForge = new StemGenericSmelter("dark-alloy-forge"){{
             requirements(Category.crafting, with(Items.copper, 30, Items.lead, 25));
+
             outputItem = new ItemStack(UnityItems.darkAlloy, 3);
             craftTime = 140f;
             size = 4;
             ambientSound = Sounds.respawning;
             ambientSoundVolume = 0.6f;
+
             consumes.items(with(Items.lead, 2, Items.silicon, 3, Items.blastCompound, 1, Items.phaseFabric, 1, UnityItems.umbrium, 2));
             consumes.power(3.2f);
-            afterUpdate = e -> {
-                if(e.consValid() && Mathf.chanceDelta(0.76f)) UnityFx.craftingEffect.at(e.getX(), e.getY(), Mathf.random(360f));
+
+            update = e -> {
+                if(e.consValid() && Mathf.chanceDelta(0.76f)){
+                    UnityFx.craftingEffect.at(e.getX(), e.getY(), Mathf.random(360f));
+                }
             };
         }};
 
@@ -835,20 +849,26 @@ public class UnityBlocks implements ContentList{
 
         sparkAlloyForge = new StemGenericSmelter("spark-alloy-forge"){{
             requirements(Category.crafting, with(Items.lead, 160, Items.graphite, 340, UnityItems.imberium, 270, Items.silicon, 250, Items.thorium, 120, Items.surgeAlloy, 100));
+
             outputItem = new ItemStack(UnityItems.sparkAlloy, 4);
             size = 4;
             craftTime = 160f;
             ambientSound = Sounds.machine;
             ambientSoundVolume = 0.6f;
             craftEffect = UnityFx.imberCircleSparkCraftingEffect;
-            afterUpdate = e -> {
-                if(e.consValid()){
-                    if(Mathf.chanceDelta(0.3f)) UnityFx.imberSparkCraftingEffect.at(e.getX(), e.getY(), Mathf.random(360f));
-                    else if(Mathf.chanceDelta(0.02f)) Lightning.create(e.team, UnityPal.imberColor, 5f, e.x, e.y, Mathf.random(360f), 5);
-                }
-            };
+
             consumes.power(2.6f);
             consumes.items(with(Items.surgeAlloy, 3, Items.titanium, 4, Items.silicon, 6, UnityItems.imberium, 3));
+
+            update = e -> {
+                if(e.consValid()){
+                    if(Mathf.chanceDelta(0.3f)){
+                        UnityFx.imberSparkCraftingEffect.at(e.getX(), e.getY(), Mathf.random(360f));
+                    }else if(Mathf.chanceDelta(0.02f)){
+                        Lightning.create(e.team(), UnityPal.imberColor, 5f, e.x(), e.y(), Mathf.random(360f), 5);
+                    }
+                }
+            };
         }};
 
         absorber = new Absorber("absorber"){{
@@ -865,6 +885,7 @@ public class UnityBlocks implements ContentList{
 
         solidifier = new LiquidsSmelter("solidifier"){{
             requirements(Category.crafting, with(Items.copper, 20, UnityItems.denseAlloy, 30));
+
             health = 150;
             hasItems = true;
             liquidCapacity = 12f;
@@ -873,16 +894,18 @@ public class UnityBlocks implements ContentList{
             craftTime = 60f;
             flameColor = Color.valueOf("ffb096");
             outputItem = new ItemStack(UnityItems.stone, 1);
+
+            consumes.add(new ConsumeLiquids(new LiquidStack[]{new LiquidStack(UnityLiquids.lava, 0.1f), new LiquidStack(Liquids.water, 0.1f)}));
+
             preserveDraw = false;
-            afterDrawer = e -> {
+            draw((StemSmelterBuild e) -> {
                 Draw.rect(region, e.x, e.y);
                 if(e.warmup > 0f){
                     Draw.color(liquids[0].color, e.liquids.get(liquids[0]) / liquidCapacity);
                     Draw.rect(topRegion, e.x, e.y);
                     Draw.color();
                 }
-            };
-            consumes.add(new ConsumeLiquids(new LiquidStack[]{new LiquidStack(UnityLiquids.lava, 0.1f), new LiquidStack(Liquids.water, 0.1f)}));
+            });
         }};
 
         steelSmelter = new StemGenericSmelter("steel-smelter"){{
@@ -892,17 +915,19 @@ public class UnityBlocks implements ContentList{
             craftEffect = UnityFx.craftFx;
             craftTime = 300f;
             outputItem = new ItemStack(UnityItems.steel, 1);
+
+            consumes.power(2f);
+            consumes.items(with(Items.coal, 2, Items.graphite, 2, UnityItems.denseAlloy, 3));
+
             preserveDraw = false;
-            afterDrawer = e -> {
+            draw((StemSmelterBuild e) -> {
                 Draw.rect(region, e.x, e.y);
                 if(e.warmup > 0f){
                     Draw.color(1f, 1f, 1f, e.warmup * Mathf.absin(8f, 0.6f));
                     Draw.rect(topRegion, e.x, e.y);
                     Draw.color();
                 }
-            };
-            consumes.power(2f);
-            consumes.items(with(Items.coal, 2, Items.graphite, 2, UnityItems.denseAlloy, 3));
+            });
         }};
 
         liquifier = new BurnerSmelter("liquifier"){{
@@ -912,12 +937,18 @@ public class UnityBlocks implements ContentList{
             updateEffect = Fx.fuelburn;
             craftTime = 30f;
             outputLiquid = new LiquidStack(UnityLiquids.lava, 0.1f);
+
             configClear(b -> Fires.create(b.tile));
-            afterUpdate = e -> {//eh is it chanceDelta?
-                if(e.progress == 0f && e.warmup > 0.001f && !Vars.net.client() && Mathf.chance(0.2f)) e.configureAny(null);
-            };
+            consumes.power(3.7f);
+
+            update((BurnerSmelterBuild e) -> {//eh is it chanceDelta?
+                if(e.progress == 0f && e.warmup > 0.001f && !Vars.net.client() && Mathf.chance(0.2f)){
+                    e.configureAny(null);
+                }
+            });
+
             preserveDraw = false;
-            afterDrawer = e -> {
+            draw((BurnerSmelterBuild e) -> {
                 Draw.rect(region, e.x, e.y);
                 if(e.warmup > 0f){
                     Liquid liquid = outputLiquid.liquid;
@@ -925,8 +956,7 @@ public class UnityBlocks implements ContentList{
                     Draw.rect(topRegion, e.x, e.y);
                     Draw.color();
                 }
-            };
-            consumes.power(3.7f);
+            });
         }};
 
         stoneWall = new LimitWall("ustone-wall"){{
@@ -1426,28 +1456,74 @@ public class UnityBlocks implements ContentList{
             consumes.power(4f);
         }};
 
-        monolithAlloyForge = new StemGenericSmelter("monolith-alloy-forge"){{
-            requirements(Category.crafting, with(Items.lead, 380, UnityItems.monolite, 240, Items.silicon, 400, Items.titanium, 240, Items.thorium, 90, Items.surgeAlloy, 160));
-            final int effectTimer = timers++;
-            afterUpdate = e -> {
-                if(e.consValid()) e.fdata = Mathf.lerpDelta(e.fdata, e.efficiency(), 0.02f);
-                else e.fdata = Mathf.lerpDelta(e.fdata, 0f, 0.02f);
-                float temp = e.fdata;
-                if(!Mathf.zero(temp)){
-                    if(e.timer.get(effectTimer, 45f)) UnityFx.effect.at(e.x, e.y, e.rotation, temp);
-                    //TODO not exactly same with js ver?.
-                    if(Mathf.chanceDelta(temp * 0.5f)) Lightning.create(e.team, Pal.lancerLaser, 1f, e.x, e.y, Mathf.randomSeed((int)Time.time + e.id, 360f), (int)(temp * 4f) + Mathf.random(3));
+        debrisExtractor = new FloorExtractor("debris-extractor", infusedSharpslate, 0.08f, archEnergy, 1f){{
+            requirements(Category.crafting, with(UnityItems.monolite, 140, Items.surgeAlloy, 80, Items.thorium, 60));
+
+            size = 2;
+            outputItem = new ItemStack(UnityItems.archDebris, 1);
+            craftTime = 84f;
+
+            consumes.power(2.4f);
+            consumes.liquid(Liquids.cryofluid, 0.08f);
+
+            drawer = new DrawBlock(){
+                @Override
+                public void draw(GenericCrafterBuild e){
+                    Draw.rect(region, e.x, e.y);
+
+                    Draw.color(UnityPal.monolith, UnityPal.monolithLight, Mathf.absin(Time.time, 3f, 1f) * e.efficiency());
+                    Draw.rect(Regions.debrisExtractorHeat1Region, e.x, e.y);
+
+                    Draw.color(UnityPal.monolith, UnityPal.monolithLight, Mathf.absin(Time.time + 20f, 3f, 1f) * e.efficiency());
+                    Draw.rect(Regions.debrisExtractorHeat2Region, e.x, e.y);
+
+                    Draw.color();
                 }
             };
-            outputItem = new ItemStack(UnityItems.monolithAlloy, 3);
-            size = 4;
-            flameColor = Pal.lancerLaser;
-            ambientSound = Sounds.machine;
-            ambientSoundVolume = 0.6f;
-            consumes.power(3.6f);
-            consumes.items(with(Items.silicon, 3, UnityItems.archDebris, 1, UnityItems.monolite, 2));
-            consumes.liquid(Liquids.cryofluid, 0.1f);
         }};
+
+        monolithAlloyForge = new StemGenericSmelter("monolith-alloy-forge"){
+            final int effectTimer = timers++;
+
+            {
+                requirements(Category.crafting, with(Items.lead, 380, UnityItems.monolite, 240, Items.silicon, 400, Items.titanium, 240, Items.thorium, 90, Items.surgeAlloy, 160));
+
+                outputItem = new ItemStack(UnityItems.monolithAlloy, 3);
+                size = 4;
+                flameColor = Pal.lancerLaser;
+                ambientSound = Sounds.machine;
+                ambientSoundVolume = 0.6f;
+
+                consumes.power(3.6f);
+                consumes.items(with(Items.silicon, 3, UnityItems.archDebris, 1, UnityItems.monolite, 2));
+                consumes.liquid(Liquids.cryofluid, 0.1f);
+
+                update((StemSmelterBuild e) -> {
+                    if(e.consValid()){
+                        e.fdata = Mathf.lerpDelta(e.fdata, e.efficiency(), 0.02f);
+                    }else{
+                        e.fdata = Mathf.lerpDelta(e.fdata, 0f, 0.02f);
+                    }
+
+                    float temp = e.fdata;
+                    if(!Mathf.zero(temp)){
+                        if(e.timer.get(effectTimer, 45f)){
+                            UnityFx.effect.at(e.x, e.y, e.rotation, temp);
+                        }
+
+                        if(Mathf.chanceDelta(temp * 0.5f)){
+                            Lightning.create(
+                                e.team,
+                                Pal.lancerLaser,
+                                1f,
+                                e.x, e.y,
+                                Mathf.randomSeed((int)Time.time + e.id, 360f), (int)(temp * 4f) + Mathf.random(3)
+                            );
+                        }
+                    }
+                });
+            }
+        };
 
         electrophobicWall = new PowerWall("electrophobic-wall"){{
             requirements(Category.defense, with(UnityItems.monolite, 4, Items.silicon, 2));
@@ -2311,28 +2387,33 @@ public class UnityBlocks implements ContentList{
         terminalCrucible = new StemGenericSmelter("terminal-crucible"){{
             requirements(Category.crafting, with(Items.lead, 810, Items.graphite, 720, Items.silicon, 520, Items.phaseFabric, 430, Items.surgeAlloy, 320, UnityItems.plagueAlloy, 120, UnityItems.darkAlloy, 120, UnityItems.lightAlloy, 120, UnityItems.advanceAlloy, 120, UnityItems.monolithAlloy, 120, UnityItems.sparkAlloy, 120, UnityItems.superAlloy, 120));
             flameColor = UnityPal.scarColor;
-            addSprites("lights");
-            preserveDraw = false;
-            afterDrawer = e -> {
-                drawer.draw(e);
-                if(e.warmup > 0f){
-                    Draw.blend(Blending.additive);
-                    Draw.color(1f, Mathf.absin(5f, 0.5f) + 0.5f, Mathf.absin(Time.time + 90f * Mathf.radDeg, 5f, 0.5f) + 0.5f, e.warmup);
-                    Draw.rect(regions.get("lights"), e.x, e.y);
-                    float b = (Mathf.absin(8f, 0.25f) + 0.75f) * e.warmup;
-                    Draw.color(1f, b, b, b);
-                    Draw.rect(topRegion, e.x, e.y);
-                    Draw.blend();
-                    Draw.color();
-                }
-            };
             outputItem = new ItemStack(UnityItems.terminum, 1);
             size = 6;
             craftTime = 310f;
             ambientSound = Sounds.respawning;
             ambientSoundVolume = 0.6f;
+
             consumes.power(45.2f);
             consumes.items(with(UnityItems.plagueAlloy, 3, UnityItems.darkAlloy, 3, UnityItems.lightAlloy, 3, UnityItems.advanceAlloy, 3, UnityItems.monolithAlloy, 3, UnityItems.sparkAlloy, 3, UnityItems.superAlloy, 3));
+
+            preserveDraw = false;
+            draw((StemSmelterBuild e) -> {
+                drawer.draw(e);
+                if(e.warmup > 0f){
+                    Draw.blend(Blending.additive);
+
+                    Draw.color(1f, Mathf.absin(5f, 0.5f) + 0.5f, Mathf.absin(Time.time + 90f * Mathf.radDeg, 5f, 0.5f) + 0.5f, e.warmup);
+                    Draw.rect(Regions.terminalCrucibleLightsRegion, e.x, e.y);
+
+                    float b = (Mathf.absin(8f, 0.25f) + 0.75f) * e.warmup;
+                    Draw.color(1f, b, b, b);
+
+                    Draw.rect(topRegion, e.x, e.y);
+
+                    Draw.blend();
+                    Draw.color();
+                }
+            });
         }};
 
         endForge = new StemGenericSmelter("end-forge"){{
@@ -2341,17 +2422,23 @@ public class UnityBlocks implements ContentList{
             size = 8;
             craftTime = 410f;
             ambientSoundVolume = 0.6f;
-            addSprites("lights", "top-small");
-            foreUpdate = e -> {
-                if(e.consValid() && Mathf.chanceDelta(0.7f * e.warmup)) UnityFx.forgeAbsorbEffect.at(e.x, e.y, Mathf.random(360f));
-            };
+
+            consumes.power(86.7f);
+            consumes.items(with(UnityItems.terminum, 3, UnityItems.darkAlloy, 5, UnityItems.lightAlloy, 5));
+
+            update((StemSmelterBuild e) -> {
+                if(e.consValid() && Mathf.chanceDelta(0.7f * e.warmup)){
+                    UnityFx.forgeAbsorbEffect.at(e.x, e.y, Mathf.random(360f));
+                }
+            });
+
             preserveDraw = false;
-            afterDrawer = e -> {
+            draw((StemSmelterBuild e) -> {
                 drawer.draw(e);
                 if(e.warmup <= 0.0001f) return;
                 Draw.blend(Blending.additive);
                 Draw.color(1f, Mathf.absin(5f, 0.5f) + 0.5f, Mathf.absin(Time.time + 90f * Mathf.radDeg, 5f, 0.5f) + 0.5f, e.warmup);
-                Draw.rect(regions.get("lights"), e.x, e.y);
+                Draw.rect(Regions.endForgeLightsRegion, e.x, e.y);
                 float b = (Mathf.absin(8f, 0.25f) + 0.75f) * e.warmup;
                 Draw.color(1f, b, b, b);
                 Draw.rect(topRegion, e.x, e.y);
@@ -2359,7 +2446,7 @@ public class UnityBlocks implements ContentList{
                     float ang = i * 90f;
                     for(int s = 0; s < 2; s++){
                         float offset = 360f / 8f * (i * 2 + s);
-                        TextureRegion reg = regions.get("top-small");
+                        TextureRegion reg = Regions.endForgeTopSmallRegion;
                         int sign = Mathf.signs[s];
                         float colA = (Mathf.absin(Time.time + offset * Mathf.radDeg, 8f, 0.25f) + 0.75f) * e.warmup;
                         float colB = (Mathf.absin(Time.time + (90f + offset) * Mathf.radDeg, 8f, 0.25f) + 0.75f) * e.warmup;
@@ -2369,9 +2456,7 @@ public class UnityBlocks implements ContentList{
                 }
                 Draw.blend();
                 Draw.color();
-            };
-            consumes.power(86.7f);
-            consumes.items(with(UnityItems.terminum, 3, UnityItems.darkAlloy, 5, UnityItems.lightAlloy, 5));
+            });
         }};
 
         tenmeikiri = new EndLaserTurret("tenmeikiri"){{

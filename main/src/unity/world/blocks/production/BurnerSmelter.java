@@ -5,19 +5,22 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+import mindustry.world.blocks.production.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
+import unity.annotations.Annotations.*;
 import unity.content.*;
+import unity.gen.*;
 
 import static arc.Core.bundle;
 
+@Merge(base = GenericSmelter.class, value = Stemc.class)
 public class BurnerSmelter extends StemGenericSmelter{
     public Item input;
     public float minEfficiency = 0.6f, boostScale = 1.25f, boostConstant = -0.75f;
 
     public BurnerSmelter(String name){
         super(name);
-        
         preserveUpdate = false;
     }
 
@@ -32,14 +35,12 @@ public class BurnerSmelter extends StemGenericSmelter{
     @Override
     public void setBars(){
         super.setBars();
-        
         bars.add("efficiency", (BurnerSmelterBuild build) -> new Bar(() -> bundle.format("bar.efficiency", (int)(100 * build.productionEfficiency)), () -> Pal.lighterOrange, () -> build.productionEfficiency));
     }
 
     @Override
     public void setStats(){
         stats.add(Stat.input, input);
-        
         super.setStats();
     }
 
@@ -82,6 +83,7 @@ public class BurnerSmelter extends StemGenericSmelter{
                 
                 warmup = Mathf.lerp(warmup, 0f, 0.02f);
             }
+
             if(progress >= 1f){
                 items.remove(input, 1);
                 
@@ -91,8 +93,10 @@ public class BurnerSmelter extends StemGenericSmelter{
                 progress = 0f;
             }
             
-            if(outputLiquid != null) dumpLiquid(outputLiquid.liquid);
-            
+            if(outputLiquid != null){
+                dumpLiquid(outputLiquid.liquid);
+            }
+
             super.updateTile();
         }
 
