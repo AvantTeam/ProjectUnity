@@ -3,6 +3,7 @@ package unity.world.blocks.production;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.consumers.*;
+import unity.gen.*;
 import unity.world.consumers.*;
 
 import static arc.Core.bundle;

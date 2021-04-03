@@ -80,12 +80,7 @@ public class MergeProcessor extends BaseProcessor{
         }else if(round == 2){
             for(Element e : defs){
                 Merge merge = annotation(e, Merge.class);
-                TypeElement base;
-                if(e instanceof TypeElement){
-                    base = (TypeElement)e;
-                }else{
-                    base = (TypeElement)elements(merge::base).first();
-                }
+                TypeElement base = (TypeElement)elements(merge::base).first();
                 Seq<TypeElement> value = elements(merge::value).<TypeElement>as().map(t -> inters.find(i -> {
                     return i.getSimpleName().toString().equals(
                         t.getSimpleName().toString()
