@@ -33,7 +33,8 @@ public class Tentacle{
             float dst = last().dst(Tmp.v2) / 200f;
             Tmp.v1.set(last()).approachDelta(Tmp.v2, Math.min(speed, dst)).sub(last());
             endVelocity.add(Tmp.v1).limit(type.speed);
-            last().rotation = Angles.moveToward(last().rotation, last().angleTo(targetPos) + 180f, type.rotationSpeed);
+            last().rotation = Angles.moveToward(last().rotation, last().angleTo(targetPos) + 180f, type.rotationSpeed * Time.delta);
+            last().rotation = Mathf.slerpDelta(last().rotation, last().angleTo(targetPos) + 180f, (endVelocity.len2() / (type.speed * type.speed)) * 0.25f);
             last().pos.add(endVelocity, Time.delta);
         }
 
