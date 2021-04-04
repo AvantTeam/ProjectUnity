@@ -36,7 +36,6 @@ public class ScriptedSector extends SectorPreset{
     public void update(){
         if(!valid() && added){
             added = false;
-            reset();
 
             Events.remove((Class<Trigger>)Trigger.update.getClass(), updater);
             Events.remove((Class<Trigger>)Trigger.draw.getClass(), drawer);
@@ -55,6 +54,10 @@ public class ScriptedSector extends SectorPreset{
             if(objective.qualified()){
                 objective.execution++;
                 objective.execute();
+            }
+
+            if(objective.isExecuted() && !objective.isFinalized()){
+                objective.doFinalize();
             }
         }
     }
@@ -75,15 +78,11 @@ public class ScriptedSector extends SectorPreset{
     }
 
     public boolean valid(){
-        return state.map != null
-        ?   state.map.name().equals(generator.map.name())
+        return state.getSector() != null
+        ?   state.getSector().id == sector.id
         :   (
-            state.getSector() != null
-            ?   (
-                state.getSector() != null
-                ?   state.getSector().id == sector.id
-                :   false
-            )
+            state.map != null
+            ?   state.map.name().equals(generator.map.name())
             :   false
         );
     }

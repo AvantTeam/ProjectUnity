@@ -46,13 +46,15 @@ public class UnitySectorPresets implements ContentList{
 
                     Sounds.unlock.play();
                 }).init((ResourceAmountObjective objective) -> {
-                    if(!GlobalObjective.reached(GlobalObjective.sectorAccretionComplete)){
-                        state.rules.winWave = -1;
-                        if(state.getSector() != null){
-                            state.getSector().info.winWave = -1;
+                    if(state.getSector() != null){
+                        if(!GlobalObjective.reached(GlobalObjective.sectorAccretionComplete)){
+                            state.rules.winWave = -1;
+                            if(state.getSector() != null){
+                                state.getSector().info.winWave = -1;
+                            }
+                        }else{
+                            objective.stop();
                         }
-                    }else{
-                        objective.stop();
                     }
                 })
             );

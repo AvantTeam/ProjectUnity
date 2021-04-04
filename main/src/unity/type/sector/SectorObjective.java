@@ -2,8 +2,12 @@ package unity.type.sector;
 
 import arc.*;
 import arc.func.*;
+import arc.graphics.Color;
+import arc.math.*;
 import arc.scene.*;
+import arc.scene.actions.*;
 import arc.scene.ui.*;
+import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.game.*;
@@ -25,6 +29,8 @@ public abstract class SectorObjective{
     public Seq<SectorObjective> dependencies = new Seq<>();
 
     private boolean initialized;
+    private boolean finalized;
+
     private Cons<SectorObjective> init = objective -> {};
     private Cons<SectorObjective> update = objective -> {};
     private Cons<SectorObjective> draw = objective -> {};
@@ -42,6 +48,15 @@ public abstract class SectorObjective{
 
     public boolean isInitialized(){
         return initialized;
+    }
+
+    //using 'do' because method name clash
+    public void doFinalize(){
+        finalized = true;
+    }
+
+    public boolean isFinalized(){
+        return finalized;
     }
 
     public void update(){
@@ -80,7 +95,10 @@ public abstract class SectorObjective{
         return this;
     }
 
-    public void reset(){}
+    public void reset(){
+        initialized = false;
+        finalized = false;
+    }
 
     public void execute(){
         executor.get(this);
@@ -133,6 +151,7 @@ public abstract class SectorObjective{
 
         @Override
         public void reset(){
+            super.reset();
             ids.clear();
         }
 
@@ -184,6 +203,7 @@ public abstract class SectorObjective{
 
         @Override
         public void reset(){
+            super.reset();
             ids.clear();
         }
 
@@ -218,6 +238,7 @@ public abstract class SectorObjective{
 
         @Override
         public void reset(){
+            super.reset();
             count = 0;
             ids.clear();
         }
@@ -286,11 +307,21 @@ public abstract class SectorObjective{
     }
 
     public static class ResourceAmountObjective extends SectorObjective{
+        protected Table container;
         public final ItemStack[] items;
 
+        public final Color from;
+        public final Color to;
+
         public <T extends SectorObjective> ResourceAmountObjective(ItemStack[] items, ScriptedSector sector, Cons<T> executor){
+            this(items, Color.lightGray, Color.green, sector, executor);
+        }
+
+        public <T extends SectorObjective> ResourceAmountObjective(ItemStack[] items, Color from, Color to, ScriptedSector sector, Cons<T> executor){
             super(sector, 1, executor);
             this.items = items;
+            this.from = from;
+            this.to = to;
         }
 
         @Override
@@ -300,9 +331,18 @@ public abstract class SectorObjective{
             if(!headless){
                 ui.hudGroup.fill(table -> {
                     table.name = "unity-resource-amount-objective";
+
+                    table.actions(
+                        Actions.scaleTo(0f, 1f),
+                        Actions.visible(true),
+                        Actions.scaleTo(1f, 1f, 0.07f, Interp.pow3Out)
+                    );
+
                     table.center().left();
 
-                    table.table(Styles.black6, t -> {
+                    var cell = table.table(Styles.black6, t -> {
+                        container = t;
+
                         ScrollPane pane = t.pane(Styles.defaultPane, cont -> {
                             cont.defaults().pad(4f);
 
@@ -319,11 +359,14 @@ public abstract class SectorObjective{
 
                                     hold.right();
                                     hold.labelWrap(() -> {
+                                        int amount = Math.min(state.teams.playerCores().sum(b -> b.items.get(item.item)), item.amount);
                                         return
-                                            "[lightgray]" + Math.min(state.teams.playerCores().sum(b -> b.items.get(item.item)), item.amount) +
+                                            "[#" + Tmp.c1.set(from).lerp(to, (float)amount / (float)item.amount).toString() + "]" + amount +
                                             " / [accent]" + item.amount + "[]";
                                     })
-                                        .grow();
+                                        .grow()
+                                        .get()
+                                        .setAlignment(Align.right);
                                 })
                                     .height(40f)
                                     .growX()
@@ -345,9 +388,10 @@ public abstract class SectorObjective{
                         pane.setScrollingDisabled(true, false);
                         pane.setOverscroll(false, false);
                     })
-                    .minSize(200f, 48f)
-                    .maxSize(240f, 156f)
-                    .visible(() -> ui.hudfrag.shown && sector.valid());
+                        .minSize(300f, 48f)
+                        .maxSize(300f, 156f);
+
+                    cell.visible(() -> ui.hudfrag.shown && sector.valid() && container == cell.get());
                 });
             }
         }
@@ -361,6 +405,26 @@ public abstract class SectorObjective{
             }
 
             return true;
+        }
+
+        @Override
+        public void doFinalize(){
+            super.doFinalize();
+            if(container != null){
+                container.actions(
+                    Actions.moveBy(-container.getWidth(), 0f, 2f, Interp.pow3In),
+                    Actions.visible(false),
+                    new Action(){
+                        @Override
+                        public boolean act(float delta){
+                            container.parent.removeChild(container);
+                            container = null;
+
+                            return true;
+                        }
+                    }
+                );
+            }
         }
     }
 }
