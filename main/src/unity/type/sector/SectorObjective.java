@@ -315,8 +315,7 @@ public abstract class SectorObjective{
 
                                     hold.left();
                                     hold.image(() -> item.item.icon(Cicon.medium))
-                                        .scaling(Scaling.bounded)
-                                        .left();
+                                        .scaling(Scaling.bounded);
 
                                     hold.right();
                                     hold.labelWrap(() -> {
@@ -324,7 +323,7 @@ public abstract class SectorObjective{
                                             "[lightgray]" + Math.min(state.teams.playerCores().sum(b -> b.items.get(item.item)), item.amount) +
                                             " / [accent]" + item.amount + "[]";
                                     })
-                                        .right();
+                                        .grow();
                                 })
                                     .height(40f)
                                     .growX()
