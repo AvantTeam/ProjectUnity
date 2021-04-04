@@ -2,12 +2,15 @@ package unity.type.sector;
 
 import arc.*;
 import arc.func.*;
+import arc.scene.*;
+import arc.scene.ui.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.game.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.type.*;
-import mindustry.world.blocks.storage.CoreBlock.*;
+import mindustry.ui.*;
 
 import static mindustry.Vars.*;
 
@@ -87,6 +90,10 @@ public abstract class SectorObjective{
 
     public boolean isExecuted(){
         return execution >= executions;
+    }
+
+    public void stop(){
+        execution = executions;
     }
 
     public boolean qualified(){
@@ -281,30 +288,80 @@ public abstract class SectorObjective{
     public static class ResourceAmountObjective extends SectorObjective{
         public final ItemStack[] items;
 
-        public <T extends SectorObjective> ResourceAmountObjective(ItemStack[] items, ScriptedSector sector, int executions, Cons<T> executor){
-            super(sector, executions, executor);
+        public <T extends SectorObjective> ResourceAmountObjective(ItemStack[] items, ScriptedSector sector, Cons<T> executor){
+            super(sector, 1, executor);
             this.items = items;
         }
 
         @Override
         public void init(){
             super.init();
-            //TODO hud ui stuff
+
+            if(!headless){
+                ui.hudGroup.fill(table -> {
+                    table.name = "unity-resource-amount-objective";
+                    table.center().left();
+
+                    table.table(Styles.black6, t -> {
+                        ScrollPane pane = t.pane(Styles.defaultPane, cont -> {
+                            cont.defaults().pad(4f);
+
+                            for(int i = 0; i < items.length; i++){
+                                if(i > 0) cont.row();
+
+                                ItemStack item = items[i];
+                                cont.table(Styles.black3, hold -> {
+                                    hold.defaults().pad(4f);
+
+                                    hold.left();
+                                    hold.image(() -> item.item.icon(Cicon.medium))
+                                        .scaling(Scaling.bounded)
+                                        .left();
+
+                                    hold.right();
+                                    hold.labelWrap(() -> {
+                                        return
+                                            "[lightgray]" + Math.min(state.teams.playerCores().sum(b -> b.items.get(item.item)), item.amount) +
+                                            " / [accent]" + item.amount + "[]";
+                                    })
+                                        .right();
+                                })
+                                    .height(40f)
+                                    .growX()
+                                    .left();
+                            }
+                        })
+                            .update(p -> {
+                                if(p.hasScroll()){
+                                    Element result = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
+                                    if(result == null || !result.isDescendantOf(p)){
+                                        Core.scene.setScrollFocus(null);
+                                    }
+                                }
+                            })
+                            .grow()
+                            .pad(4f, 0f, 4f, 4f)
+                            .get();
+
+                        pane.setScrollingDisabled(true, false);
+                        pane.setOverscroll(false, false);
+                    })
+                    .minSize(200f, 48f)
+                    .maxSize(240f, 156f)
+                    .visible(() -> ui.hudfrag.shown && sector.valid());
+                });
+            }
         }
 
         @Override
         public boolean completed(){
-            boolean complete = true;
-            for(CoreBuild core : state.teams.playerCores()){
-                for(ItemStack item : items){
-                    if(core.items.get(item.item) < item.amount){
-                        complete = false;
-                        break;
-                    }
+            for(ItemStack item : items){
+                if(state.teams.playerCores().sum(b -> b.items.get(item.item)) < item.amount){
+                    return false;
                 }
             }
 
-            return complete;
+            return true;
         }
     }
 }

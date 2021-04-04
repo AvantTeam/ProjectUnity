@@ -3,7 +3,9 @@ package unity.content;
 import mindustry.type.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
+import mindustry.gen.*;
 import unity.annotations.Annotations.*;
+import unity.type.GlobalObjective;
 import unity.type.sector.*;
 import unity.type.sector.SectorObjective.*;
 
@@ -33,11 +35,25 @@ public class UnitySectorPresets implements ContentList{
                     Items.lead, 5600,
                     Items.silicon, 3200,
                     UnityItems.monolite, 4800
-                ), this, 1, (ResourceAmountObjective objective) -> {
-                    int win = (state.wave / 5 + 1) * 5;
-                    state.rules.winWave = state.getSector().info.winWave = win;
+                ), this, (ResourceAmountObjective objective) -> {
+                    int win = Math.max((state.wave / 5 + 1) * 5, captureWave);
+
+                    state.rules.winWave = Math.max(win, win);
+                    if(state.getSector() != null){
+                        state.getSector().info.winWave = win;
+                        GlobalObjective.fire(GlobalObjective.sectorAccretionComplete);
+                    }
+
+                    Sounds.unlock.play();
                 }).init((ResourceAmountObjective objective) -> {
-                    state.rules.winWave = state.getSector().info.winWave = -1;
+                    if(!GlobalObjective.reached(GlobalObjective.sectorAccretionComplete)){
+                        state.rules.winWave = -1;
+                        if(state.getSector() != null){
+                            state.getSector().info.winWave = -1;
+                        }
+                    }else{
+                        objective.stop();
+                    }
                 })
             );
         }};

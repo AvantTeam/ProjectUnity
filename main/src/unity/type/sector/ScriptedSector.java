@@ -23,7 +23,9 @@ public class ScriptedSector extends SectorPreset{
         Events.on(StateChangeEvent.class, e -> {
             if(e.to == State.playing && !added && valid()){
                 added = true;
-                reset();
+                if(state.getSector() == null || state.getSector().hasBase()){
+                    reset();
+                }
 
                 Events.on((Class<Trigger>)Trigger.update.getClass(), updater);
                 Events.on((Class<Trigger>)Trigger.draw.getClass(), drawer);
@@ -76,10 +78,10 @@ public class ScriptedSector extends SectorPreset{
         return state.map != null
         ?   state.map.name().equals(generator.map.name())
         :   (
-            state.rules != null
+            state.getSector() != null
             ?   (
-                state.rules.sector != null
-                ?   state.rules.sector.id == sector.id
+                state.getSector() != null
+                ?   state.getSector().id == sector.id
                 :   false
             )
             :   false
