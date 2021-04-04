@@ -29,35 +29,27 @@ public class Tentacle{
             swayScl = Mathf.lerpDelta(swayScl, 0f, 0.04f);
 
             float speed = type.speed * type.accel;
-            Tmp.v1.set(last()).approachDelta(targetPos, speed).sub(last());
+            Tmp.v2.trns(last().angleTo(targetPos) + 180f, type.range / 3f).add(targetPos);
+            float dst = last().dst(Tmp.v2) / 200f;
+            Tmp.v1.set(last()).approachDelta(Tmp.v2, Math.min(speed, dst)).sub(last());
             endVelocity.add(Tmp.v1).limit(type.speed);
-        }
-        //float lastAngle = indexRotation(-1);
-        //Tmp.v1.set(last()).approachDelta(targetPos, speed).sub(last());
-
-        //endVelocity.add(Tmp.v1).limit(type.speed);
-        if(attacking){
             last().rotation = Angles.moveToward(last().rotation, last().angleTo(targetPos) + 180f, type.rotationSpeed);
-            last().updatePosition();
+            last().pos.add(endVelocity, Time.delta);
+        }
 
-            boolean found = false;
-            int j = 0;
+        if(endVelocity.len2() > 0.0001f){
+            for(int i = segments.length - 2; i >= 0; i--){
+                TentacleSegment seg = segments[i], segNext = segments[i + 1];
 
-            for(int i = 0; i < segments.length - 1; i++){
-                TentacleSegment segment = segments[i];
-                if(!Angles.near(segment.rotation, indexRotation(i + 1), segment.angleLimit() - 0.5f) || found){
-                    segment.rotation = Angles.moveToward(segment.rotation, segment.angleTo(targetPos) + 180f, type.rotationSpeed);
-                    if(!found){
-                        found = true;
-                        j = 0;
-                    }else{
-                        j++;
-                        if(j > 4) found = false;
-                    }
-                }
+                Position nextPos = Tmp.v1.set(segNext.oppositePosition());
+                float newAngle = seg.oppositePosition().angleTo(nextPos) + 180f;
+                newAngle = Utils.clampedAngle(newAngle, segNext.rotation, segNext.angleLimit());
+                seg.rotation = newAngle;
+                seg.updatePosBack();
+            }
+            for(TentacleSegment segment : segments){
                 segment.updatePosition();
             }
-            last().updatePosition();
         }
 
         endVelocity.scl(1f - (type.drag * Time.delta));
@@ -138,7 +130,7 @@ public class Tentacle{
                 
                 segment.rotation = Utils.clampedAngle(segment.angleTo(Tmp.v1) + offset, unit.rotation + type.rotationOffset, type.firstSegmentAngleLimit);
                 //segment.rotation = segment.angleTo(Tmp.v1) + offset;
-                Tmp.v2.trns(segment.rotation, type.segmentLength / 2f).add(segment).sub(Tmp.v1);
+                Tmp.v2.trns(segment.rotation, type.segmentLength).add(segment).sub(Tmp.v1);
                 segment.pos.sub(Tmp.v2);
                 Tmp.v3.trns(segment.rotation, Tmp.v2.len() / Time.delta);
             }else{
@@ -196,12 +188,25 @@ public class Tentacle{
             return index == 0 ? main.type.firstSegmentAngleLimit : main.type.angleLimit;
         }
 
-        public void updatePosition(){
+        void updatePosition(){
             float angle = main.indexRotation(index - 1);
             rotation = Utils.clampedAngle(rotation, angle, (index == 0 ? main.type.firstSegmentAngleLimit : main.type.angleLimit));
-            Tmp.v2.trns(rotation, main.type.segmentLength / (index == 0 ? 2f : 1f)).add(this).sub(main.parentPosition(index - 1));
+            Tmp.v2.trns(rotation, main.type.segmentLength).add(this).sub(main.parentPosition(index - 1));
             pos.sub(Tmp.v2);
             vel.limit(main.type.speed);
+        }
+
+        void updatePosBack(){
+            if(index >= main.segments.length - 1) return;
+            TentacleSegment next = main.segments[index + 1];
+            Tmp.v2.trns(next.rotation, main.type.segmentLength).add(next).sub(this);
+            vel.add(Tmp.v2);
+            vel.limit(main.type.speed);
+            pos.add(Tmp.v2);
+        }
+
+        Position oppositePosition(){
+            return Tmp.v4.trns(rotation, main.type.segmentLength).add(this);
         }
 
         @Override
