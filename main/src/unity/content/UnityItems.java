@@ -56,6 +56,8 @@ public class UnityItems implements ContentList{
             cost = 1.3f;
             radioactivity = 0.1f;
             animSize = 7;
+            animDuration = 3f;
+            animTrns = 1;
         }};
 
         plagueAlloy = new Item("plague-alloy", Color.valueOf("6a766a")){{

@@ -1,5 +1,6 @@
 package unity.util;
 
+import arc.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -573,6 +574,32 @@ public final class Utils{
             regions[i] = reg;
         }
         return regions;
+    }
+
+    /**
+     * Lerps 2 TextureRegions.
+     * @author sk7725
+     */
+    public static TextureRegion blendSprites(TextureRegion a, TextureRegion b, float f, String name){
+        PixmapRegion r1 = Core.atlas.getPixmap(a);
+        PixmapRegion r2 = Core.atlas.getPixmap(b);
+
+        Pixmap out = new Pixmap(r1.width, r1.height, r1.pixmap.getFormat());
+        out.setBlending(Pixmap.Blending.none);
+        Color color1 = new Color();
+        Color color2 = new Color();
+
+        for(int x = 0; x < r1.width; x++){
+            for(int y = 0; y < r1.height; y++){
+
+                r1.getPixel(x, y, color1);
+                r2.getPixel(x, y, color2);
+                out.draw(x, y, color1.lerp(color2, f));
+            }
+        }
+
+        Texture texture  = new Texture(out);
+        return Core.atlas.addRegion(name + "-blended-" + (int)(f * 100), new TextureRegion(texture));
     }
 
     public static Color tempColor(float temp){
