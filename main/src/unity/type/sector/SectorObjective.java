@@ -362,7 +362,7 @@ public abstract class SectorObjective{
                                         int amount = Math.min(state.teams.playerCores().sum(b -> b.items.get(item.item)), item.amount);
                                         return
                                             "[#" + Tmp.c1.set(from).lerp(to, (float)amount / (float)item.amount).toString() + "]" + amount +
-                                            " / [accent]" + item.amount + "[]";
+                                            " []/ [accent]" + item.amount + "[]";
                                     })
                                         .grow()
                                         .get()
