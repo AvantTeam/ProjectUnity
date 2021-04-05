@@ -22,8 +22,6 @@ public class AnimatedItem extends Item{
 
     @Override
     public void load(){
-        super.load();
-
         int n = animSize * (1 + animTrns);
         for(Cicon icon : Cicon.all){
             int ord = icon.ordinal();

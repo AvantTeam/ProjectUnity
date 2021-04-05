@@ -258,7 +258,6 @@ public class IconGenerator implements Generator{
 
             try{
                 item.init();
-                item.load();
 
                 if(item instanceof AnimatedItem anim){
                     for(int i = 0; i < anim.animSize; i++){

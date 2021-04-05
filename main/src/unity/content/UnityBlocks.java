@@ -158,6 +158,7 @@ public class UnityBlocks implements ContentList{
     Block
 
     ricochet, shellshock, purge,
+    absorberAura,
     recluse, mage, oracle,
     supernova;
 
@@ -1598,6 +1599,16 @@ public class UnityBlocks implements ContentList{
             ammoUseEffect = Fx.none;
             health = 200;
             rotateSpeed = 12f;
+        }};
+
+        absorberAura = new AbsorberTurret("absorber-aura"){{
+            requirements(Category.turret, with(Items.silicon, 75, UnityItems.monolite, 125));
+
+            size = 2;
+            health = 720;
+            range = 150f;
+
+            consumes.powerCond(1f, (AbsorberTurretBuild b) -> b.isShooting());
         }};
 
         mage = new PowerTurret("mage"){{
