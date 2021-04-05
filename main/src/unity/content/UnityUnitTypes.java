@@ -2672,7 +2672,7 @@ public class UnityUnitTypes implements ContentList{
             drag = 0.06f;
             armor = 17f;
             hitSize = 205f;
-            rotateSpeed = 0.8f;
+            rotateSpeed = 0.3f;
             visualElevation = 3f;
             engineOffset = 116.5f;
             engineSize = 14f;
@@ -2750,14 +2750,15 @@ public class UnityUnitTypes implements ContentList{
                 shadow = 63f;
                 shootCone = 1f;
                 reload = 6f * 60f;
-                bullet = new EndCutterLaserBulletType(3400f){{
+                bullet = new EndCutterLaserBulletType(3100f){{
                     maxLength = 1200f;
                     lifetime = 3f * 60f;
                     width = 17f;
                     antiCheatScl = 5f;
                     laserSpeed = 70f;
+                    buildingDamageMultiplier = 0.4f;
                     lightningColor = UnityPal.scarColor;
-                    lightningDamage = 65f;
+                    lightningDamage = 55f;
                     lightningLength = 13;
 
                     minimumPower = 64000f;
@@ -2772,7 +2773,8 @@ public class UnityUnitTypes implements ContentList{
                 rotationOffset = 30f;
 
                 rotationSpeed = 3f;
-                speed = 2f;
+                accel = 0.2f;
+                speed = 4f;
 
                 segments = 15;
                 segmentLength = 37.25f;
@@ -2788,7 +2790,8 @@ public class UnityUnitTypes implements ContentList{
                 rotationOffset = 10f;
 
                 rotationSpeed = 3f;
-                speed = 2f;
+                accel = 0.2f;
+                speed = 4f;
 
                 segments = 10;
                 segmentLength = 37.25f;

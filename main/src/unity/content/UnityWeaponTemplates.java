@@ -48,8 +48,8 @@ public class UnityWeaponTemplates implements ContentList{
             alternate = true;
             rotate = true;
 
-            bullet = new AntiCheatBasicBulletType(6f, 220f){{
-                lifetime = 90f;
+            bullet = new AntiCheatBasicBulletType(6f, 220f, "missile"){{
+                lifetime = 80f;
                 width = 15f;
                 height = 17f;
                 shrinkY = 0f;
@@ -61,7 +61,7 @@ public class UnityWeaponTemplates implements ContentList{
                 trailChance = 0.2f;
                 homingPower = 0.08f;
                 weaveScale = 6f;
-                weaveMag = 1f;
+                weaveMag = 1.2f;
                 priority = 2;
                 hitEffect = Fx.blastExplosion;
                 despawnEffect = Fx.blastExplosion;
