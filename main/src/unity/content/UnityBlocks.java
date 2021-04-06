@@ -158,7 +158,7 @@ public class UnityBlocks implements ContentList{
     Block
 
     ricochet, shellshock, purge,
-    absorberAura,
+    lifeStealer, absorberAura,
     recluse, mage, oracle,
     supernova;
 
@@ -1579,6 +1579,14 @@ public class UnityBlocks implements ContentList{
             rotateSpeed = 12f;
             shootType = UnityBullets.ricochetSmall;
             shootSound = UnitySounds.energyBolt;
+            powerUse = 1f;
+        }};
+
+        lifeStealer = new LifeStealerTurret("life-stealer"){{
+            requirements(Category.turret, with(Items.silicon, 50, UnityItems.monolite, 25));
+
+            size = 1;
+            health = 320;
             powerUse = 1f;
         }};
 

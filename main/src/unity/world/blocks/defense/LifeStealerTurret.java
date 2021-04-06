@@ -6,11 +6,11 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
+import mindustry.content.*;
+import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.ui.*;
 import mindustry.world.blocks.defense.turrets.*;
-import mindustry.world.meta.*;
 import unity.content.*;
 import unity.entities.*;
 import unity.entities.comp.*;
@@ -18,7 +18,7 @@ import unity.graphics.*;
 
 import static mindustry.Vars.*;
 
-public class AbsorberTurret extends BaseTurret{
+public class LifeStealerTurret extends BaseTurret{
     public final int timerTarget = timers++;
     public float retargetTime = 5f;
 
@@ -27,11 +27,13 @@ public class AbsorberTurret extends BaseTurret{
     public float shootLength = -1f;
 
     public float powerUse = 1f;
-    public float powerProduction = 2.5f;
-    public float powerUseThreshold = 0.5f;
-    public float resistance = 0.4f;
-    public float damageScale = 18f;
-    public float speedScale = 3.5f;
+    public float damage = 60f;
+    public float maxContain = 100f;
+    public float healPercent = 0.05f;
+
+    public Color healColor = UnityPal.monolithLight;
+    public Effect healEffect = Fx.healBlockFull;
+    public Effect healTrnsEffect = UnityFx.supernovaPullEffect;
 
     public Sound shootSound = Sounds.tractorbeam;
     public float shootSoundVolume = 0.9f;
@@ -41,7 +43,7 @@ public class AbsorberTurret extends BaseTurret{
     public TextureRegion laser;
     public TextureRegion laserEnd;
 
-    public AbsorberTurret(String name){
+    public LifeStealerTurret(String name){
         super(name);
 
         rotateSpeed = 20f;
@@ -49,7 +51,7 @@ public class AbsorberTurret extends BaseTurret{
         hasPower = consumesPower = outputsPower = true;
         acceptCoolant = false;
 
-        consumes.powerCond(powerUse, (AbsorberTurretBuild build) -> build.target != null);
+        consumes.powerCond(powerUse, (LifeStealerTurretBuild build) -> build.target != null);
     }
 
     @Override
@@ -67,32 +69,16 @@ public class AbsorberTurret extends BaseTurret{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
-        stats.add(Stat.basePowerGeneration, powerProduction * 60.0f, StatUnit.powerSecond);
-    }
-
-    @Override
-    public void setBars(){
-        super.setBars();
-
-        bars.add("power", (AbsorberTurretBuild entity) -> new Bar(() ->
-            Core.bundle.format("bar.poweroutput",
-            Strings.fixed(entity.getPowerProduction() * 60f * entity.timeScale(), 1)),
-            () -> Pal.powerBar,
-            () -> entity.getPowerProduction() / powerProduction)
-        );
-    }
-
-    @Override
     protected TextureRegion[] icons(){
         return new TextureRegion[]{baseRegion, region};
     }
 
-    public class AbsorberTurretBuild extends BaseTurretBuild implements ExtensionHolder{
+    public class LifeStealerTurretBuild extends BaseTurretBuild implements ExtensionHolder{
         protected Extensionc ext;
-        public Bullet target;
+        public Unit target;
         public float lastX, lastY, strength;
+
+        public float contained;
 
         @Override
         public void created(){
@@ -108,13 +94,13 @@ public class AbsorberTurret extends BaseTurret{
             super.updateTile();
 
             if(timer(timerTarget, retargetTime)){
-                target = Groups.bullet
+                target = Groups.unit
                     .intersect(x - range, y - range, range * 2f, range * 2f)
-                    .min(b -> b.team != team && b.type().hittable, b -> b.dst2(this));
+                    .min(u -> u.team != team, u -> u.dst2(this));
             }
 
             boolean shoot = false;
-            if(target != null && target.within(this, range + target.hitSize / 2f) && target.team() != team && efficiency() > powerUseThreshold){
+            if(target != null && target.within(this, range + target.hitSize / 2f) && target.team() != team && efficiency() > 0f){
                 if(!headless){
                     control.sound.loop(shootSound, this, shootSoundVolume);
                 }
@@ -124,19 +110,36 @@ public class AbsorberTurret extends BaseTurret{
                 shoot = Angles.within(rotation, dest, shootCone);
             }
 
-            if(shoot && target != null && efficiency() > powerUseThreshold){
-                target.vel.setLength(Math.max(target.vel.len() - resistance * strength, 0f));
-                target.damage = Math.max((resistance / 2f) * strength * Time.delta, 0f);
-
-                if(target.vel.isZero(0.01f) || target.damage <= 0f){
-                    target.remove();
-                }
+            if(shoot && target != null && efficiency() > 0f){
+                float health = (damage / 60f) * efficiency();
+                target.damageContinuous(health);
+                contained += health * Time.delta;
 
                 lastX = target.x;
                 lastY = target.y;
                 strength = Mathf.lerpDelta(strength, efficiency(), 0.1f);
             }else{
                 strength = Mathf.lerpDelta(strength, 0f, 0.1f);
+            }
+
+            if(contained >= maxContain){
+                tryHeal();
+            }
+        }
+
+        protected void tryHeal(){
+            boolean any = indexer.eachBlock(this, range, b -> b.isValid() && b.health() < b.maxHealth(), b -> {
+                healTrnsEffect.at(x, y, rotation, new Float[]{x, y, b.x, b.y, 2.5f + Mathf.range(0.3f)});
+                Time.run(healEffect.lifetime, () -> {
+                    if(b != null && b.isValid()){
+                        healEffect.at(b.x, b.y, b.block.size, healColor);
+                        b.healFract(healPercent);
+                    }
+                });
+            });
+
+            if(any){
+                contained %= maxContain;
             }
         }
 
@@ -168,13 +171,6 @@ public class AbsorberTurret extends BaseTurret{
 
                 Draw.mixcol();
             }
-        }
-
-        @Override
-        public float getPowerProduction(){
-            if(target == null || target.type == null) return 0f;
-
-            return (target.type.damage / damageScale) * (target.vel.len() / speedScale) * powerProduction;
         }
     }
 }

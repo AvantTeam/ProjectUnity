@@ -9,6 +9,7 @@ import mindustry.type.*;
 
 import static unity.content.UnityBlocks.*;
 
+@SuppressWarnings("unused")
 public class UnityTechTree implements ContentList{
     private static TechNode context = null;
 
@@ -70,7 +71,9 @@ public class UnityTechTree implements ContentList{
                     node(purge);
                 });
 
-                node(absorberAura);
+                node(lifeStealer, () -> {
+                    node(absorberAura);
+                });
             });
         });
 
