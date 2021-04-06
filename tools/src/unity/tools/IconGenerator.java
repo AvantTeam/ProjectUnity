@@ -209,7 +209,7 @@ public class IconGenerator implements Generator{
                     }
                 }
 
-                genIcon(icon.antialias(), fname);
+                icon.antialias().save(fname + "-full");
             }catch(Throwable e){
                 if(e instanceof IllegalArgumentException i){
                     Log.err("Skipping unit @: @", type.name, i.getMessage());
@@ -267,7 +267,6 @@ public class IconGenerator implements Generator{
                         sprite.antialias();
 
                         sprite.save(fname);
-                        genIcon(sprite, fname);
                     }
                 }else{
                     String fname = item.name.replaceFirst("unity-", "");
@@ -276,7 +275,6 @@ public class IconGenerator implements Generator{
                     sprite.antialias();
 
                     sprite.save(fname);
-                    genIcon(sprite, fname);
                 }
             }catch(Throwable e){
                 if(e instanceof IllegalArgumentException i){
@@ -286,16 +284,5 @@ public class IconGenerator implements Generator{
                 }
             }
         });
-    }
-
-    private void genIcon(Sprite sprite, String name){
-        sprite.save(name + "-full");
-        for(Cicon i : Cicon.scaled){
-            Vec2 size = Scaling.fit.apply(sprite.width, sprite.height, i.size, i.size);
-            Sprite scaled = new Sprite((int)size.x, (int)size.y);
-
-            scaled.drawScaled(sprite);
-            scaled.save("ui/" + name + "-" + i.name());
-        }
     }
 }
