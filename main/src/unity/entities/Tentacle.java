@@ -4,6 +4,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
+import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import unity.type.*;
@@ -14,32 +15,59 @@ public class Tentacle{
     TentacleType type;
     Unit unit;
     Teamc target;
-    Interval timer = new Interval();
+    Interval timer = new Interval(2);
     Vec2 targetPos = new Vec2();
     Vec2 endVelocity = new Vec2();
     float swayScl = 1f;
     float reloadTime = 0f;
+    float chargingTime = 0f, chargingTimeB = 0f;
+    float lastTipX, lastTipY;
     Bullet bullet;
     boolean attacking = false;
 
     public void updateMovement(){
-        if(!attacking){
+        if(!attacking && chargingTime <= 0f){
             swayScl = Mathf.lerpDelta(swayScl, 1f, 0.04f);
         }else{
             swayScl = Mathf.lerpDelta(swayScl, 0f, 0.04f);
 
-            float speed = type.speed * type.accel;
-            Tmp.v2.trns(last().angleTo(targetPos) + 180f, type.range / 3f).add(targetPos);
-            float dst = last().dst(Tmp.v2) / 200f;
-            Tmp.v1.set(last()).approachDelta(Tmp.v2, Math.min(speed, dst)).sub(last());
-            endVelocity.add(Tmp.v1).limit(type.speed);
-            last().rotation = Angles.moveToward(last().rotation, last().angleTo(targetPos) + 180f, type.rotationSpeed * Time.delta);
-            last().rotation = Mathf.slerpDelta(last().rotation, last().angleTo(targetPos) + 180f, (endVelocity.len2() / (type.speed * type.speed)) * 0.25f);
-            last().updatePosition();
-            last().pos.add(endVelocity, Time.delta);
+            if(type.bullet != null){
+                float speed = type.speed * type.accel;
+                Tmp.v2.trns(last().angleTo(targetPos) + 180f, type.range / 3f).add(targetPos);
+                float dst = last().dst(Tmp.v2) / 200f;
+                Tmp.v1.set(last()).approachDelta(Tmp.v2, Math.min(speed, dst)).sub(last());
+                endVelocity.add(Tmp.v1).limit(type.speed);
+                last().rotation = Angles.moveToward(last().rotation, last().angleTo(targetPos) + 180f, type.rotationSpeed * Time.delta);
+                last().rotation = Mathf.slerpDelta(last().rotation, last().angleTo(targetPos) + 180f, (endVelocity.len2() / (type.speed * type.speed)) * 0.25f);
+                last().updatePosition();
+            }else{
+                if(chargingTime < 80f){
+                    if(!(last().within(targetPos, 10f) || !Angles.within((last().rotation + 180f) % 360f, last().angleTo(targetPos), 90f))){
+                        last().rotation = Angles.moveToward(last().rotation, last().angleTo(targetPos) + 180f, type.rotationSpeed * Time.delta);
+                        last().rotation = Mathf.slerpDelta(last().rotation, last().angleTo(targetPos) + 180f, (endVelocity.len2() / (type.speed * type.speed)) * 0.25f);
+                        last().updatePosition();
+                    }else{
+                        chargingTime += Time.delta;
+                    }
+                    Tmp.v1.trns(last().rotation + 180f, type.speed * type.accel);
+                    endVelocity.add(Tmp.v1).limit(type.speed);
+                }else{
+                    Position origin = parentPosition(-1);
+                    Tmp.v2.trns(last().angleTo(origin) + 180f, type.range / 3f).add(origin);
+                    float dst = last().dst(Tmp.v2) / 200f;
+                    Tmp.v1.set(last()).approachDelta(Tmp.v2, Math.min(type.speed * type.accel, dst)).sub(last());
+                    endVelocity.add(Tmp.v1).limit(type.speed);
+                    chargingTimeB += Time.delta;
+                    if(chargingTimeB >= 2f * 60f){
+                        chargingTimeB = 0f;
+                        chargingTime = 0f;
+                    }
+                }
+            }
         }
 
         if(endVelocity.len2() > 0.0001f){
+            last().pos.add(endVelocity, Time.delta);
             for(int i = segments.length - 2; i >= 0; i--){
                 TentacleSegment seg = segments[i], segNext = segments[i + 1];
 
@@ -58,6 +86,21 @@ public class Tentacle{
     }
 
     void updateWeapon(){
+        if(type.tentacleDamage > 0 && timer.get(1, 5f)){
+            float startSqr = type.startVelocity * type.startVelocity;
+            if((endVelocity.len2() - startSqr) > 0.0001f && type.speed > 0){
+                float damage = type.tentacleDamage * Interp.exp5In.apply(Mathf.clamp((endVelocity.len2() - startSqr) / (type.speed * type.speed)));
+                if(damage > 0){
+                    Utils.collideLineRawEnemy(unit.team, last().getX(), last().getY(), lastTipX, lastTipY, building -> {
+                        building.damage(damage);
+                        return true;
+                    }, unit1 -> unit1.damage(damage), Fx.hitBulletSmall);
+                }
+            }
+            lastTipX = last().getX();
+            lastTipY = last().getY();
+        }
+        if(type.bullet == null) return;
         if(reloadTime >= type.reload){
             if(Angles.within(last().rotation + 180f, last().angleTo(targetPos), type.shootCone) && last().within(targetPos, type.range) && (target != null || (unit.isPlayer() && unit.isShooting()))){
                 Bullet b = type.bullet.create(unit, unit.team, last().getX(), last().getY(), last().rotation + 180f);
@@ -84,7 +127,7 @@ public class Tentacle{
             building -> origin.within(building, type.range()));
         }
         if(!unit.isPlayer() || type.automatic){
-            if(target != null){
+            if(target != null && (type.bullet != null || unit.isShooting())){
                 attacking = true;
                 targetPos.set(target);
             }else{
@@ -176,6 +219,8 @@ public class Tentacle{
             s.rotation = unit.rotation + 180f + type.rotationOffset;
             segments[i] = s;
         }
+        lastTipX = last().getX();
+        lastTipY = last().getY();
         return this;
     }
 
