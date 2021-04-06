@@ -50,12 +50,12 @@ public class LifeStealerTurret extends BaseTurret{
         hasItems = hasLiquids = false;
         hasPower = consumesPower = outputsPower = true;
         acceptCoolant = false;
-
-        consumes.powerCond(powerUse, (LifeStealerTurretBuild build) -> build.target != null);
     }
 
     @Override
     public void init(){
+        consumes.powerCond(powerUse, (LifeStealerTurretBuild build) -> build.target != null);
+
         super.init();
         if(shootLength < 0) shootLength = size * tilesize / 2f;
     }

@@ -159,7 +159,8 @@ public class UnityBlocks implements ContentList{
 
     ricochet, shellshock, purge,
     lifeStealer, absorberAura,
-    recluse, mage, oracle,
+    recluse, blackout,
+    diviner, mage, oracle,
     supernova;
 
     public static @FactionDef("youngcha")
@@ -1582,6 +1583,22 @@ public class UnityBlocks implements ContentList{
             powerUse = 1f;
         }};
 
+        diviner = new PowerTurret("diviner"){{
+            requirements(Category.turret, with(Items.lead, 15, UnityItems.monolite, 30));
+
+            size = 1;
+            reloadTime = 30f;
+            health = 240;
+            range = 70f;
+            powerUse = 1.5f;
+            targetGround = true;
+            targetAir = false;
+            shootSound = UnitySounds.energyBolt;
+            shootType = new LaserBulletType(50f){{
+                length = 80f;
+            }};
+        }};
+
         lifeStealer = new LifeStealerTurret("life-stealer"){{
             requirements(Category.turret, with(Items.silicon, 50, UnityItems.monolite, 25));
 
@@ -1624,7 +1641,7 @@ public class UnityBlocks implements ContentList{
             size = 2;
             health = 600;
             range = 120f;
-            reloadTime = 48;
+            reloadTime = 48f;
             shootCone = 15f;
             shots = 3;
             burstSpacing = 2f;
@@ -1636,6 +1653,45 @@ public class UnityBlocks implements ContentList{
                 lightningLength = 20;
                 damage = 32f;
             }};
+        }};
+
+        blackout = new PowerTurret("blackout"){{
+            requirements(Category.turret, with(Items.graphite, 85, Items.titanium, 25, UnityItems.monolite, 125));
+
+            size = 2;
+            reloadTime = 140f;
+            range = 200f;
+            health = 720;
+            rotateSpeed = 10f;
+            powerUse = 3f;
+            recoilAmount = 3f;
+            shootSound = Sounds.shootBig;
+            targetGround = true;
+            targetAir = false;
+            shootType = new BasicBulletType(6f, 60f, "shell"){
+                {
+                    lifetime = 35f;
+                    width = height = 20f;
+                    frontColor = UnityPal.monolith;
+                    backColor = UnityPal.monolithDark;
+                    hitEffect = despawnEffect = Fx.blastExplosion;
+                    splashDamage = 60f;
+                    splashDamageRadius = 3.2f * tilesize;
+                }
+
+                @Override
+                public void hitEntity(Bullet b, Hitboxc other, float initialHealth){
+                    super.hitEntity(b, other, initialHealth);
+
+                    float r = splashDamageRadius;
+                    Units.nearbyEnemies(b.team, b.x - r, b.y - r, r * 2f, r * 2f, unit -> {
+                        if(unit.within(b, r)){
+                            unit.apply(StatusEffects.unmoving, 60f);
+                            unit.apply(StatusEffects.disarmed, 60f);
+                        }
+                    });
+                }
+            };
         }};
 
         shellshock = new PowerTurret("shellshock"){{

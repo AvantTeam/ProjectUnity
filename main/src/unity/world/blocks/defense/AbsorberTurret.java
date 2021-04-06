@@ -48,12 +48,12 @@ public class AbsorberTurret extends BaseTurret{
         hasItems = hasLiquids = false;
         hasPower = consumesPower = outputsPower = true;
         acceptCoolant = false;
-
-        consumes.powerCond(powerUse, (AbsorberTurretBuild build) -> build.target != null);
     }
 
     @Override
     public void init(){
+        consumes.powerCond(powerUse, (AbsorberTurretBuild build) -> build.target != null);
+
         super.init();
         if(shootLength < 0) shootLength = size * tilesize / 2f;
     }

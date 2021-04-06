@@ -60,9 +60,13 @@ public class UnityTechTree implements ContentList{
         });
 
         attach(Blocks.arc, () -> {
-            node(recluse, Seq.with(new Research(UnityItems.monolite)), () -> {
+            node(diviner, Seq.with(new Research(UnityItems.monolite)), () -> {
                 node(mage, () -> {
                     node(oracle, Seq.with(new Research(UnityItems.monolithAlloy)));
+                });
+
+                node(recluse, () -> {
+                    node(blackout);
                 });
             });
 
