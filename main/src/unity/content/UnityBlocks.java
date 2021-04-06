@@ -1607,8 +1607,7 @@ public class UnityBlocks implements ContentList{
             size = 2;
             health = 720;
             range = 150f;
-
-            consumes.powerCond(1f, (AbsorberTurretBuild b) -> b.isShooting());
+            powerUse = 1f;
         }};
 
         mage = new PowerTurret("mage"){{

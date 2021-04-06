@@ -5,6 +5,7 @@ import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.util.Time;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.blocks.defense.turrets.*;
@@ -23,7 +24,9 @@ public class AbsorberTurret extends BaseTurret{
     public float shootCone = 6f;
     public float shootLength = -1f;
 
+    public float powerUse = 1f;
     public float powerProduction = 2.5f;
+    public float powerUseThreshold = 0.5f;
     public float resistance = 0.4f;
     public float damageScale = 18f;
     public float speedScale = 3.5f;
@@ -38,10 +41,13 @@ public class AbsorberTurret extends BaseTurret{
 
     public AbsorberTurret(String name){
         super(name);
+
         rotateSpeed = 20f;
         hasItems = hasLiquids = false;
         hasPower = consumesPower = outputsPower = true;
         acceptCoolant = false;
+
+        consumes.powerCond(powerUse, (AbsorberTurretBuild build) -> build.target != null);
     }
 
     @Override
@@ -65,10 +71,8 @@ public class AbsorberTurret extends BaseTurret{
 
     public class AbsorberTurretBuild extends BaseTurretBuild implements ExtensionHolder{
         protected Extensionc ext;
-        protected Bullet target;
+        public Bullet target;
         public float lastX, lastY, strength;
-
-        protected boolean shoot;
 
         public float productionEfficiency;
 
@@ -81,10 +85,6 @@ public class AbsorberTurret extends BaseTurret{
             ext.add();
         }
 
-        public boolean isShooting(){
-            return shoot;
-        }
-
         @Override
         public void updateTile(){
             super.updateTile();
@@ -95,7 +95,8 @@ public class AbsorberTurret extends BaseTurret{
                     .min(b -> b.team != team && b.type().hittable, b -> b.dst2(this));
             }
 
-            if(target != null && target.within(this, range + target.hitSize / 2f) && target.team() != team && efficiency() > 0.02f){
+            boolean shoot = false;
+            if(target != null && target.within(this, range + target.hitSize / 2f) && target.team() != team && efficiency() > powerUseThreshold){
                 if(!headless){
                     control.sound.loop(shootSound, this, shootSoundVolume);
                 }
@@ -103,19 +104,19 @@ public class AbsorberTurret extends BaseTurret{
                 float dest = angleTo(target);
                 rotation = Angles.moveToward(rotation, dest, rotateSpeed * edelta());
                 shoot = Angles.within(rotation, dest, shootCone);
-            }else{
-                shoot = false;
             }
 
-            if(shoot && target != null && efficiency() > 0.01f){
+            if(shoot && target != null && efficiency() > powerUseThreshold){
                 target.vel.setLength(Math.max(target.vel.len() - resistance * strength, 0f));
-                if(target.vel.isZero(0.01f)){
+                target.damage = Math.max((resistance / 2f) * strength * Time.delta, 0f);
+
+                if(target.vel.isZero(0.01f) || target.damage <= 0f){
                     target.remove();
                 }
 
                 lastX = target.x;
                 lastY = target.y;
-                strength = Mathf.lerpDelta(strength, 1f, 0.1f);
+                strength = Mathf.lerpDelta(strength, efficiency(), 0.1f);
             }else{
                 strength = Mathf.lerpDelta(strength, 0f, 0.1f);
             }
@@ -137,7 +138,7 @@ public class AbsorberTurret extends BaseTurret{
 
         @Override
         public void drawExt(){
-            if(shoot){
+            if(strength > 0.1f){
                 Draw.z(Layer.bullet);
                 float ang = angleTo(lastX, lastY);
 
