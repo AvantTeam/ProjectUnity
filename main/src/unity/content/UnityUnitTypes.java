@@ -2802,6 +2802,42 @@ public class UnityUnitTypes implements ContentList{
                 automatic = false;
                 continuous = true;
                 reload = 4f * 60f;
+            }}, new TentacleType("unity-apocalypse-small-tentacle"){{
+                x = 104.25f;
+                y = -49f;
+                rotationOffset = 35f;
+
+                rotationSpeed = 3f;
+                accel = 0.15f;
+                speed = 5f;
+
+                segments = 20;
+                segmentLength = 28f;
+                swayOffset = 120f;
+                swayMag = 0.7f;
+                swayScl = 90f;
+
+                bullet = null;
+                automatic = true;
+                tentacleDamage = 430f;
+            }}, new TentacleType("unity-apocalypse-small-tentacle"){{
+                x = 69.75f;
+                y = -74.25f;
+                rotationOffset = 20f;
+
+                rotationSpeed = 3f;
+                accel = 0.15f;
+                speed = 5f;
+
+                segments = 23;
+                segmentLength = 28f;
+                swayOffset = 70f;
+                swayMag = 0.7f;
+                swayScl = 90f;
+
+                bullet = null;
+                automatic = true;
+                tentacleDamage = 430f;
             }});
         }
 

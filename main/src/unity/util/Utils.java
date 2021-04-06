@@ -36,6 +36,7 @@ public final class Utils{
     private static Posc result;
     private static float cdist;
     private static Tile furthest;
+    private static boolean hit;
     private static Point2[] dirs = new Point2[]{
         new Point2(1, 0),
         new Point2(0, 1),
@@ -452,9 +453,10 @@ public final class Utils{
                         }
                     }
                 });
+                hit = false;
                 tmpUnitSeq.sort(sort).each(e -> {
                     if(e instanceof Unit) unitC.get((Unit)e);
-                    if(e instanceof Building && buildC != null) buildC.get((Building)e);
+                    if(e instanceof Building && buildC != null && !hit) hit = buildC.get((Building)e);
                 });
                 tmpUnitSeq.clear();
             }
