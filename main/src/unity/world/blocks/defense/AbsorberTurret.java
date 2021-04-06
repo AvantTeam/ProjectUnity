@@ -1,14 +1,16 @@
 package unity.world.blocks.defense;
 
-import arc.Core;
+import arc.*;
 import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.util.Time;
+import arc.util.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.ui.*;
 import mindustry.world.blocks.defense.turrets.*;
+import mindustry.world.meta.*;
 import unity.content.*;
 import unity.entities.*;
 import unity.entities.comp.*;
@@ -65,6 +67,24 @@ public class AbsorberTurret extends BaseTurret{
     }
 
     @Override
+    public void setStats(){
+        super.setStats();
+        stats.add(Stat.basePowerGeneration, powerProduction * 60.0f, StatUnit.powerSecond);
+    }
+
+    @Override
+    public void setBars(){
+        super.setBars();
+
+        bars.add("power", (AbsorberTurretBuild entity) -> new Bar(() ->
+            Core.bundle.format("bar.poweroutput",
+            Strings.fixed(entity.getPowerProduction() * 60f * entity.timeScale(), 1)),
+            () -> Pal.powerBar,
+            () -> entity.getPowerProduction() / powerProduction)
+        );
+    }
+
+    @Override
     protected TextureRegion[] icons(){
         return new TextureRegion[]{baseRegion, region};
     }
@@ -73,8 +93,6 @@ public class AbsorberTurret extends BaseTurret{
         protected Extensionc ext;
         public Bullet target;
         public float lastX, lastY, strength;
-
-        public float productionEfficiency;
 
         @Override
         public void created(){
