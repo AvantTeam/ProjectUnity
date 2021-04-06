@@ -110,8 +110,11 @@ public class UnityItems implements ContentList{
             radioactivity = 0.6f;
         }};
 
-        irradiantSurge = new Item("irradiant-surge", Color.valueOf("3d423e")){{
+        irradiantSurge = new AnimatedItem("irradiant-surge", Color.valueOf("3d423e")){{
             cost = 2f;
+            animSize = 2;
+            animDuration = 3f;
+            animTrns = 30;
         }};
 
         luminum = new Item("luminum", Color.valueOf("e9eaf1")){{

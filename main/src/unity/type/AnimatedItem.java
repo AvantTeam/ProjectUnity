@@ -10,8 +10,11 @@ import mindustry.ui.*;
 import unity.util.*;
 
 public class AnimatedItem extends Item{
+    /** Number of frames */
     public int animSize = 5;
+    /** Frame delay */
     public float animDuration = 5f;
+    /** Transition frames */
     public int animTrns = 0;
 
     protected TextureRegion[] animRegions;
