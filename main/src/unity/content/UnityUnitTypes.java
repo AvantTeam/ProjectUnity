@@ -2814,8 +2814,8 @@ public class UnityUnitTypes implements ContentList{
                 segments = 20;
                 segmentLength = 28f;
                 swayOffset = 120f;
-                swayMag = 0.7f;
-                swayScl = 90f;
+                swayMag = 0.02f;
+                swayScl = 120f;
 
                 bullet = null;
                 automatic = true;
@@ -2832,8 +2832,8 @@ public class UnityUnitTypes implements ContentList{
                 segments = 23;
                 segmentLength = 28f;
                 swayOffset = 70f;
-                swayMag = 0.7f;
-                swayScl = 90f;
+                swayMag = 0.02f;
+                swayScl = 120f;
 
                 bullet = null;
                 automatic = true;
