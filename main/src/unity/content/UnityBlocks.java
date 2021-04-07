@@ -160,6 +160,7 @@ public class UnityBlocks implements ContentList{
     ricochet, shellshock, purge,
     lifeStealer, absorberAura,
     recluse, blackout,
+    heatRay,
     diviner, mage, oracle,
     supernova;
 
@@ -1707,6 +1708,18 @@ public class UnityBlocks implements ContentList{
             shootType = UnityBullets.ricochetMedium;
             shootSound = UnitySounds.energyBolt;
             powerUse = 2f;
+        }};
+
+        heatRay = new HeatRayTurret("heat-ray"){{
+            requirements(Category.turret, with(Items.copper, 75, Items.lead, 50, Items.graphite, 25, Items.titanium, 45, UnityItems.monolite, 50));
+
+            size = 2;
+            range = 120f;
+            targetGround = true;
+            targetAir = false;
+            damage = 120f;
+            powerUse = 2f;
+            shootSound = UnitySounds.heatRay;
         }};
 
         oracle = new BurstPowerTurret("oracle"){{

@@ -62,6 +62,8 @@ public class UnityTechTree implements ContentList{
         attach(Blocks.arc, () -> {
             node(diviner, Seq.with(new Research(UnityItems.monolite)), () -> {
                 node(mage, () -> {
+                    node(heatRay);
+
                     node(oracle, Seq.with(new Research(UnityItems.monolithAlloy)));
                 });
 
