@@ -160,6 +160,7 @@ public class UnityBlocks implements ContentList{
     ricochet, shellshock, purge,
     lifeStealer, absorberAura,
     recluse, blackout,
+    heatRay,
     diviner, mage, oracle,
     supernova;
 
@@ -648,6 +649,7 @@ public class UnityBlocks implements ContentList{
             range = 120f;
             powerUse = 4.5f;
             heatColor = UnityPal.lightHeat;
+            loopSound = Sounds.respawning;
             shootType = new ContinuousLaserBulletType(16f){{
                 incendChance = -1f;
                 length = 130f;
@@ -668,6 +670,7 @@ public class UnityBlocks implements ContentList{
             range = 170f;
             powerUse = 6.6f;
             heatColor = UnityPal.lightHeat;
+            shootSound = Sounds.pew;
             shootType = new BasicBulletType(6f, 26f, "unity-electric-shell"){{
                 lifetime = 30f;
                 width = 12f;
@@ -1709,6 +1712,18 @@ public class UnityBlocks implements ContentList{
             powerUse = 2f;
         }};
 
+        heatRay = new HeatRayTurret("heat-ray"){{
+            requirements(Category.turret, with(Items.copper, 75, Items.lead, 50, Items.graphite, 25, Items.titanium, 45, UnityItems.monolite, 50));
+
+            size = 2;
+            range = 120f;
+            targetGround = true;
+            targetAir = false;
+            damage = 120f;
+            powerUse = 2f;
+            shootSound = UnitySounds.heatRay;
+        }};
+
         oracle = new BurstPowerTurret("oracle"){{
             requirements(Category.turret, with(Items.silicon, 175, Items.titanium, 150, UnityItems.monolithAlloy, 75));
             size = 3;
@@ -2424,6 +2439,9 @@ public class UnityBlocks implements ContentList{
                 powerUse = 45f;
                 shootShake = 3f;
                 recoilAmount = 8f;
+                shootSound = Sounds.laser;
+                loopSound = UnitySounds.xenoBeam;
+                loopSoundVolume = 2f;
                 shootType = new ChangeTeamLaserBulletType(60f){{
                     length = 300f;
                     lifetime = 18f;

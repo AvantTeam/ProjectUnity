@@ -10,9 +10,12 @@ import mindustry.ui.*;
 import unity.util.*;
 
 public class AnimatedItem extends Item{
-    public int animSize = 5;
-    public float animDuration = 5f;
-    public int animTrns = 0;
+    /** Number of frames */
+    public int frames = 5;
+    /** Number of generated transition frames between each frame */
+    public int transitionFrames = 0;
+    /** Ticks between each frame */
+    public float frameTime = 5f;
 
     protected TextureRegion[] animRegions;
     protected TextureRegion animIcon = new TextureRegion();
@@ -23,10 +26,10 @@ public class AnimatedItem extends Item{
 
     @Override
     public void load(){
-        int n = animSize * (1 + animTrns);
+        int n = frames * (1 + transitionFrames);
 
-        TextureRegion[] spriteArr = new TextureRegion[animSize];
-        for(int i = 1; i <= animSize; i++){
+        TextureRegion[] spriteArr = new TextureRegion[frames];
+        for(int i = 1; i <= frames; i++){
             spriteArr[i - 1] = Core.atlas.find(
                 name + i + "-full",
                 Core.atlas.find(name + i,
@@ -35,16 +38,16 @@ public class AnimatedItem extends Item{
         }
 
         animRegions = new TextureRegion[n];
-        for(int i = 0; i < animSize; i++){
-            if(animTrns <= 0){
+        for(int i = 0; i < frames; i++){
+            if(transitionFrames <= 0){
                 animRegions[i] = spriteArr[i];
             }else{
-                animRegions[i * (animTrns + 1)] = spriteArr[i];
-                for(int j = 1; j <= animTrns; j++){
-                    float f = (float)j / (animTrns + 1);
-                    animRegions[i * (animTrns + 1) + j] = Utils.blendSprites(
+                animRegions[i * (transitionFrames + 1)] = spriteArr[i];
+                for(int j = 1; j <= transitionFrames; j++){
+                    float f = (float)j / (transitionFrames + 1);
+                    animRegions[i * (transitionFrames + 1) + j] = Utils.blendSprites(
                         spriteArr[i],
-                        spriteArr[(i + 1) % animSize],
+                        spriteArr[(i + 1) % frames],
                         f,
                         name + i
                     );
@@ -56,7 +59,7 @@ public class AnimatedItem extends Item{
     }
 
     public void update(){
-        int i = (int)(Time.globalTime / animDuration) % animRegions.length;
+        int i = (int)(Time.globalTime / frameTime) % animRegions.length;
         animIcon.set(animRegions[i]);
     }
 

@@ -23,7 +23,7 @@ void main(){
     float last = color.a;
 
     if(color.a > 0.01){
-        stripe(color, T, 1.8 * u_scl);
+        stripe(color, T, 8 * u_scl);
         vec2 pos = T - u_offset.xy;
 
         color *= absin(pos.y + u_time * u_scl, 15.0 * u_scl, 0.6) + 0.4;
