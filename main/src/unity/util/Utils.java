@@ -156,6 +156,14 @@ public final class Utils{
         return (d > 180f ? 360f - d : d) * sign;
     }
 
+    public static float angleDistSigned(float a, float b, float start){
+        float dst = angleDistSigned(a, b);
+        if(Math.abs(dst) > start){
+            return dst > 0 ? dst - start : dst + start;
+        }
+        return 0f;
+    }
+
     public static float angleDist(float a, float b){
         float d = Math.abs(a - b) % 360f;
         return (d > 180f ? 360f - d : d);

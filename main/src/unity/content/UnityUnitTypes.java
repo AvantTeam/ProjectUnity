@@ -2535,10 +2535,11 @@ public class UnityUnitTypes implements ContentList{
             splittable = chainable = false;
             hitSize = 41f * 1.55f;
             segmentOffset = (41f * 1.55f) + 1f;
+            headOffset = 27.75f;
             segmentLength = 45;
             lowAltitude = true;
             visualElevation = 2f;
-            rotateSpeed = 3.2f;
+            rotateSpeed = 2.2f;
             engineSize = -1f;
             range = 480f;
             armor = 16f;
@@ -2560,7 +2561,7 @@ public class UnityUnitTypes implements ContentList{
                 mirror = false;
                 ignoreRotation = true;
                 x = 0f;
-                y = 18f;
+                y = 23f;
                 reload = 15f * 60f;
                 continuous = true;
                 shake = 4f;
@@ -2599,8 +2600,8 @@ public class UnityUnitTypes implements ContentList{
                 mirror = true;
                 ignoreRotation = true;
                 rotate = true;
-                x = 22f;
-                y = -17.75f;
+                x = 19.25f;
+                y = -22.75f;
                 shootY = 12f;
                 shadow = 16f;
                 reload = 1.5f * 60;

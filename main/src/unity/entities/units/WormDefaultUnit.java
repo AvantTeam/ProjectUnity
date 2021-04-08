@@ -115,39 +115,63 @@ public class WormDefaultUnit extends UnitEntity{
             Tmp.v1.trns(angleB, trueVel);
             segV.add(Tmp.v1);
             segV.setLength(trueVel);
-            if(wormType.counterDrag) segV.scl(1f + drag);
+            if(wormType.counterDrag) segV.scl(1f - drag);
             segmentUnits[i].vel.set(segV);
         }
         //for(int i = 0; i < len; i++) segmentVelocities[i].scl(Time.delta);
     }
 
     protected void updateSegmentsLocal(){
-        float segmentOffset = wormType.segmentOffset;
-        float angleC = Utils.clampedAngle(Angles.angle(segments[0].x, segments[0].y, x, y), rotation, wormType.angleLimit) + 180f;
-        Tmp.v1.trns(angleC, segmentOffset);
+        float segmentOffset = wormType.segmentOffset / 2f;
+        /*float angleC = Utils.clampedAngle(Angles.angle(segments[0].x, segments[0].y, x, y), rotation, wormType.angleLimit) + 180f;
+        Tmp.v1.trns(angleC, segmentOffset + wormType.headOffset);
         Tmp.v1.add(x, y);
-        segments[0].set(Tmp.v1);
+        segments[0].set(Tmp.v1);*/
         //int len = getSegmentLength();
+
+        segments[0].add(segmentVelocities[0]);
+
+        rotation -= Utils.angleDistSigned(rotation, segmentUnits[0].rotation, wormType.angleLimit) / 1.25f;
+        Tmp.v1.trns(rotation + 180f, segmentOffset + wormType.headOffset).add(this);
+        segmentUnits[0].rotation = Utils.clampedAngle(segments[0].angleTo(Tmp.v1), rotation, wormType.angleLimit);
+        Tmp.v2.trns(segmentUnits[0].rotation, segmentOffset).add(segments[0]).sub(Tmp.v1);
+        segments[0].sub(Tmp.v2);
+
+        segmentVelocities[0].scl(Mathf.clamp(1f - (drag * Time.delta)));
+        segmentUnits[0].set(segments[0].x, segments[0].y);
+        segmentUnits[0].wormSegmentUpdate();
+        if(wormType.healthDistribution > 0) distributeHealth(0);
+
         int len = segmentUnits.length;
         for(int i = 1; i < len; i++){
-            Vec2 seg = segments[i];
-            float angle = Utils.clampedAngle(Angles.angle(seg.x, seg.y, segments[i - 1].x, segments[i - 1].y), segmentUnits[i - 1].rotation, wormType.angleLimit);
-            Tmp.v1.trns(angle, segmentOffset);
-            seg.set(segments[i - 1]);
-            seg.sub(Tmp.v1);
-        }
-        for(int i = 0; i < segmentUnits.length; i++){
-            Vec2 seg = segments[i];
-            Vec2 segV = segmentVelocities[i];
-            WormSegmentUnit segU = segmentUnits[i];
-            seg.add(segV);
-            float angleD = i == 0 ? Angles.angle(seg.x, seg.y, x, y) : Angles.angle(seg.x, seg.y, segments[i - 1].x, segments[i - 1].y);
-            segV.scl(Mathf.clamp(1f - drag * Time.delta));
-            segU.set(seg.x, seg.y);
-            segU.rotation = angleD;
+            Vec2 seg = segments[i], segLast = segments[i - 1];
+            WormSegmentUnit segU = segmentUnits[i], segULast = segmentUnits[i - 1];
+
+            seg.add(segmentVelocities[i]);
+
+            segULast.rotation -= Utils.angleDistSigned(segULast.rotation, segU.rotation, wormType.angleLimit) / 1.25f;
+            Tmp.v1.trns(segULast.rotation + 180f, segmentOffset).add(segLast);
+            segU.rotation = Utils.clampedAngle(segU.angleTo(Tmp.v1), segULast.rotation, wormType.angleLimit);
+            Tmp.v2.trns(segU.rotation, segmentOffset).add(seg).sub(Tmp.v1);
+            seg.sub(Tmp.v2);
+
+            segmentVelocities[i].scl(Mathf.clamp(1f - (drag * Time.delta)));
+            segU.set(seg);
             segU.wormSegmentUpdate();
             if(wormType.healthDistribution > 0) distributeHealth(i);
         }
+        /*for(int i = 0; i < segmentUnits.length; i++){
+            Vec2 seg = segments[i];
+            Vec2 segV = segmentVelocities[i];
+            WormSegmentUnit segU = segmentUnits[i];
+            //seg.add(segV);
+            //float angleD = i == 0 ? Angles.angle(seg.x, seg.y, x, y) : Angles.angle(seg.x, seg.y, segments[i - 1].x, segments[i - 1].y);
+            segV.scl(Mathf.clamp(1f - drag * Time.delta));
+            segU.set(seg.x, seg.y);
+            //segU.rotation = angleD;
+            segU.wormSegmentUpdate();
+            if(wormType.healthDistribution > 0) distributeHealth(i);
+        }*/
     }
 
     protected void distributeHealth(int index){

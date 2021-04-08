@@ -5,6 +5,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -19,7 +20,8 @@ public class InvisibleUnitType extends UnityUnitType{
     }
 
     protected float fade(EndInvisibleUnit unit){
-        return Mathf.clamp(1f - unit.alphaLerp, 0.1f, 1f);
+        float minimum = Vars.player.team() == unit.team ? 0.1f : 0.01f;
+        return Mathf.clamp(1f - unit.alphaLerp, minimum, 1f);
     }
 
     @Override
@@ -135,8 +137,9 @@ public class InvisibleUnitType extends UnityUnitType{
                 Drawf.shadow(wx, wy, weapon.shadow, fade);
             }
 
+            boolean outlineFound = weapon.outlineRegion.found();
             applyColor(unit);
-            if(weapon.outlineRegion.found()){
+            if(outlineFound){
                 float zB = Draw.z();
                 if(!weapon.top || found) Draw.z(zB - outlineSpace);
 
@@ -149,6 +152,7 @@ public class InvisibleUnitType extends UnityUnitType{
                 Draw.z(zB);
             }
 
+            if(unit instanceof EndInvisibleUnit e && outlineFound) Draw.alpha(1f - e.alphaLerp);
             Draw.rect(weapon.region,
             wx, wy,
             weapon.region.width * Draw.scl * -Mathf.sign(weapon.flipSprite),
@@ -179,7 +183,8 @@ public class InvisibleUnitType extends UnityUnitType{
             super.applyColor(unit);
             return;
         }
-        float lerp = Mathf.lerp(1f, 0.1f, e.alphaLerp);
+        //float lerp = Mathf.lerp(1f, 0.1f, e.alphaLerp);
+        float lerp = fade(e);
         Tmp.c1.set(Color.white).lerp(tint, Mathf.lerp(0f, 0.5f, e.alphaLerp));
         Draw.color(Tmp.c1);
         Draw.alpha(lerp);

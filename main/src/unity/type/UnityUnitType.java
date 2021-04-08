@@ -32,7 +32,7 @@ public class UnityUnitType extends UnitType{
     public Seq<String> bottomWeapons = new Seq<>();
     // worms
     public int segmentLength = 9, maxSegments = -1;
-    public float segmentOffset = 23f;
+    public float segmentOffset = 23f, headOffset = 0f;
     public float angleLimit = 30f;
     public float regenTime = -1f, healthDistribution = 0.1f;
     public float segmentDamageScl = 6f;
