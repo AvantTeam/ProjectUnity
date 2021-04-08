@@ -79,6 +79,12 @@ public abstract class GenericTractorBeamTurret<T extends Teamc> extends BaseTurr
         }
 
         @Override
+        public void onRemoved(){
+            super.onRemoved();
+            ext.remove();
+        }
+
+        @Override
         public void updateTile(){
             super.updateTile();
 
@@ -121,9 +127,8 @@ public abstract class GenericTractorBeamTurret<T extends Teamc> extends BaseTurr
 
         @Override
         public float clipSizeExt(){
-            if(target == null) return 0f;
-
-            return dst(target) * 2f;
+            if(Float.isNaN(lastX) || Float.isNaN(lastY)) return 0f;
+            return dst(lastX, lastY) * 2f;
         }
 
         @Override
