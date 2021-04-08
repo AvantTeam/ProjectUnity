@@ -55,9 +55,9 @@ public class UnityItems implements ContentList{
         archDebris = new AnimatedItem("archaic-debris", UnityPal.monolith){{
             cost = 1.3f;
             radioactivity = 0.1f;
-            animSize = 7;
-            animDuration = 3f;
-            animTrns = 1;
+            frames = 7;
+            frameTime = 3f;
+            transitionFrames = 1;
         }};
 
         plagueAlloy = new Item("plague-alloy", Color.valueOf("6a766a")){{
@@ -112,9 +112,9 @@ public class UnityItems implements ContentList{
 
         irradiantSurge = new AnimatedItem("irradiant-surge", Color.valueOf("3d423e")){{
             cost = 2f;
-            animSize = 2;
-            animDuration = 3f;
-            animTrns = 30;
+            frames = 2;
+            frameTime = 3f;
+            transitionFrames = 30;
         }};
 
         luminum = new Item("luminum", Color.valueOf("e9eaf1")){{

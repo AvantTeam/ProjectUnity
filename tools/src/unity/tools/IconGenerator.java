@@ -260,7 +260,7 @@ public class IconGenerator implements Generator{
                 item.init();
 
                 if(item instanceof AnimatedItem anim){
-                    for(int i = 0; i < anim.animSize; i++){
+                    for(int i = 0; i < anim.frames; i++){
                         String fname = anim.name.replaceFirst("unity-", "") + (i + 1);
 
                         Sprite sprite = SpriteProcessor.get(fname);
