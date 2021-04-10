@@ -4,9 +4,11 @@ import arc.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.scene.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.mod.*;
 import mindustry.mod.Mods.*;
+import mindustry.world.blocks.environment.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import unity.ai.kami.*;
@@ -187,21 +189,24 @@ public class Unity extends Mod implements ApplicationListener{
         for(Faction faction : Faction.all){
             var array = FactionMeta.getByFaction(faction, Object.class);
             print(Strings.format("Faction @ has @ contents.", faction.name, array.size));
+        }
 
-            for(UnlockableContent unnamed : array
-                .select(o -> o instanceof UnlockableContent)
-                .<UnlockableContent>as()
-                .select(c -> Core.bundle.getOrNull(c.getContentType() + "." + c.name + ".name") == null)
-            ){
-                print(Strings.format("@: '@' has no bundle entry for name.", faction.name, unnamed.name));
+        Seq<Class<?>> ignored = Seq.with(Floor.class, Boulder.class);
+        for(UnlockableContent cont : content
+            .<UnlockableContent>getBy(ContentType.block)
+            .and(content.getBy(ContentType.item))
+            .and(content.getBy(ContentType.liquid))
+            .and(content.getBy(ContentType.planet))
+            .and(content.getBy(ContentType.sector))
+            .and(content.getBy(ContentType.status))
+            .and(content.getBy(ContentType.unit))
+        ){
+            if(Core.bundle.getOrNull(cont.getContentType() + "." + cont.name + ".name") == null){
+                print(Strings.format("@ has no bundle entry for name", cont));
             }
 
-            for (UnlockableContent unnamed : array
-                    .select(o -> o instanceof UnlockableContent)
-                    .<UnlockableContent>as()
-                    .select(c -> Core.bundle.getOrNull(c.getContentType() + "." + c.name + ".description") == null)
-            ) {
-                print(Strings.format("@: '@' has no bundle entry for description.", faction.name, unnamed.name));
+            if(!ignored.contains(c -> c.isAssignableFrom(cont.getClass())) && Core.bundle.getOrNull(cont.getContentType() + "." + cont.name + ".description") == null){
+                print(Strings.format("@ has no bundle entry for description", cont));
             }
         }
     }
