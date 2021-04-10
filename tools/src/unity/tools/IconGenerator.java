@@ -22,6 +22,38 @@ public class IconGenerator implements Generator{
     public void generate(){
         Func<TextureRegion, String> parseName = reg -> ((AtlasRegion)reg).name.replaceFirst("unity-", "");
 
+        content.items().each(item -> {
+            if(item.minfo.mod == null) return;
+
+            try{
+                item.init();
+
+                if(item instanceof AnimatedItem anim){
+                    for(int i = 0; i < anim.frames; i++){
+                        String fname = anim.name.replaceFirst("unity-", "") + (i + 1);
+
+                        Sprite sprite = SpriteProcessor.get(fname);
+                        sprite.antialias();
+
+                        sprite.save(fname);
+                    }
+                }else{
+                    String fname = item.name.replaceFirst("unity-", "");
+
+                    Sprite sprite = SpriteProcessor.get(fname);
+                    sprite.antialias();
+
+                    sprite.save(fname);
+                }
+            }catch(Throwable e){
+                if(e instanceof IllegalArgumentException i){
+                    Log.err("Skipping item @: @", item, i.getMessage());
+                }else{
+                    Log.err(Strings.format("Problematic item @", item), e);
+                }
+            }
+        });
+
         content.units().each(t -> {
             if(t.minfo.mod == null || !(t instanceof UnityUnitType)) return;
 
@@ -249,38 +281,6 @@ public class IconGenerator implements Generator{
                     Log.err("Skipping block @: @", block, i.getMessage());
                 }else{
                     Log.err(Strings.format("Problematic block @", block), e);
-                }
-            }
-        });
-
-        content.items().each(item -> {
-            if(item.minfo.mod == null) return;
-
-            try{
-                item.init();
-
-                if(item instanceof AnimatedItem anim){
-                    for(int i = 0; i < anim.frames; i++){
-                        String fname = anim.name.replaceFirst("unity-", "") + (i + 1);
-
-                        Sprite sprite = SpriteProcessor.get(fname);
-                        sprite.antialias();
-
-                        sprite.save(fname);
-                    }
-                }else{
-                    String fname = item.name.replaceFirst("unity-", "");
-
-                    Sprite sprite = SpriteProcessor.get(fname);
-                    sprite.antialias();
-
-                    sprite.save(fname);
-                }
-            }catch(Throwable e){
-                if(e instanceof IllegalArgumentException i){
-                    Log.err("Skipping item @: @", item, i.getMessage());
-                }else{
-                    Log.err(Strings.format("Problematic item @", item), e);
                 }
             }
         });
