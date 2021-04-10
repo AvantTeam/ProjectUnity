@@ -200,6 +200,7 @@ public class Unity extends Mod implements ApplicationListener{
             .and(content.getBy(ContentType.sector))
             .and(content.getBy(ContentType.status))
             .and(content.getBy(ContentType.unit))
+            .select(c -> c.minfo.mod != null && c.minfo.mod.name.equals("unity"))
         ){
             if(Core.bundle.getOrNull(cont.getContentType() + "." + cont.name + ".name") == null){
                 print(Strings.format("@ has no bundle entry for name", cont));
