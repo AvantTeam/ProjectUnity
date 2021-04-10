@@ -212,9 +212,9 @@ public class IconGenerator implements Generator{
                 icon.antialias().save(fname + "-full");
             }catch(Throwable e){
                 if(e instanceof IllegalArgumentException i){
-                    Log.err("Skipping unit @: @", type.name, i.getMessage());
+                    Log.err("Skipping unit @: @", type, i.getMessage());
                 }else{
-                    Log.err(e);
+                    Log.err(Strings.format("Problematic unit @", type), e);
                 }
             }
         });
@@ -246,9 +246,9 @@ public class IconGenerator implements Generator{
                 }
             }catch(Throwable e){
                 if(e instanceof IllegalArgumentException i){
-                    Log.err("Skipping item @: @", block.name, i.getMessage());
+                    Log.err("Skipping block @: @", block, i.getMessage());
                 }else{
-                    Log.err(e);
+                    Log.err(Strings.format("Problematic block @", block), e);
                 }
             }
         });
@@ -278,9 +278,9 @@ public class IconGenerator implements Generator{
                 }
             }catch(Throwable e){
                 if(e instanceof IllegalArgumentException i){
-                    Log.err("Skipping item @: @", item.name, i.getMessage());
+                    Log.err("Skipping item @: @", item, i.getMessage());
                 }else{
-                    Log.err(e);
+                    Log.err(Strings.format("Problematic item @", item), e);
                 }
             }
         });
