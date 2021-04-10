@@ -192,24 +192,27 @@ public class Unity extends Mod implements ApplicationListener{
         }
 
         Seq<Class<?>> ignored = Seq.with(Floor.class, Boulder.class);
-        for(UnlockableContent cont : content
-            .<UnlockableContent>getBy(ContentType.block)
-            .and(content.getBy(ContentType.item))
-            .and(content.getBy(ContentType.liquid))
-            .and(content.getBy(ContentType.planet))
-            .and(content.getBy(ContentType.sector))
-            .and(content.getBy(ContentType.status))
-            .and(content.getBy(ContentType.unit))
-            .select(c -> c.minfo.mod != null && c.minfo.mod.name.equals("unity"))
-        ){
-            if(Core.bundle.getOrNull(cont.getContentType() + "." + cont.name + ".name") == null){
-                print(Strings.format("@ has no bundle entry for name", cont));
-            }
+        Cons<Seq<? extends Content>> checker = list -> {
+            for(var cont : list){
+                if(!(cont instanceof UnlockableContent ucont)) continue;
 
-            if(!ignored.contains(c -> c.isAssignableFrom(cont.getClass())) && Core.bundle.getOrNull(cont.getContentType() + "." + cont.name + ".description") == null){
-                print(Strings.format("@ has no bundle entry for description", cont));
+                if(Core.bundle.getOrNull(ucont.getContentType() + "." + ucont.name + ".name") == null){
+                    print(Strings.format("@ has no bundle entry for name", ucont));
+                }
+
+                if(!ignored.contains(c -> c.isAssignableFrom(ucont.getClass())) && Core.bundle.getOrNull(ucont.getContentType() + "." + ucont.name + ".description") == null){
+                    print(Strings.format("@ has no bundle entry for description", ucont));
+                }
             }
-        }
+        };
+
+        checker.get(content.blocks());
+        checker.get(content.getBy(ContentType.item));
+        checker.get(content.getBy(ContentType.liquid));
+        checker.get(content.getBy(ContentType.planet));
+        checker.get(content.getBy(ContentType.sector));
+        checker.get(content.getBy(ContentType.status));
+        checker.get(content.getBy(ContentType.unit));
     }
 
     protected void addCredits(){
