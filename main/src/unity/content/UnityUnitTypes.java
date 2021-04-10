@@ -2539,7 +2539,7 @@ public class UnityUnitTypes implements ContentList{
             segmentLength = 45;
             lowAltitude = true;
             visualElevation = 2f;
-            rotateSpeed = 2.2f;
+            rotateSpeed = 1.9f;
             engineSize = -1f;
             range = 480f;
             armor = 16f;
