@@ -46,10 +46,13 @@ public class UnityItems implements ContentList{
             radioactivity = 0.08f;
         }};
 
-        monolithAlloy = new Item("monolith-alloy", UnityPal.monolithLight){{
+        monolithAlloy = new AnimatedItem("monolith-alloy", UnityPal.monolithLight){{
             cost = 1.4f;
             flammability = 0.1f;
             radioactivity = 0.12f;
+            frames = 14;
+            frameTime = 1f;
+            transitionFrames = 3;
         }};
 
         archDebris = new AnimatedItem("archaic-debris", UnityPal.monolith){{
