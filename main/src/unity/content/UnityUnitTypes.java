@@ -2536,7 +2536,7 @@ public class UnityUnitTypes implements ContentList{
             hitSize = 41f * 1.55f;
             segmentOffset = (41f * 1.55f) + 1f;
             headOffset = 27.75f;
-            segmentLength = 45;
+            segmentLength = 60;
             lowAltitude = true;
             visualElevation = 2f;
             rotateSpeed = 1.9f;
