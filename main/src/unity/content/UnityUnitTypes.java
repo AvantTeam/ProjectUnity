@@ -52,7 +52,8 @@ public class UnityUnitTypes implements ContentList{
 
     /** Global {@linkplain UnitEntity flying} units */
     public static @EntityPoint(UnitEntity.class)
-    UnitType angel, malakhim;
+    UnitType angel, malakhim,
+    discharge;
     
     /** Global {@linkplain LegsUnit legs} units */
     public static @EntityPoint(LegsUnit.class)
@@ -451,6 +452,37 @@ public class UnityUnitTypes implements ContentList{
                     healPercent = 5.5f;
                     collidesTeam = true;
                     backColor = Pal.heal;
+                    frontColor = Color.white;
+                }};
+            }});
+        }};
+
+        discharge = new UnityUnitType("discharge"){{
+            flying = true;
+            health = 40f;
+            speed = 2f;
+            accel = 0.09f;
+            drag = 0.02f;
+            hitSize = 11.5f;
+            engineOffset = 7.25f;
+            ammoType = AmmoTypes.power;
+
+            weapons.add(new Weapon(){{
+                rotate = false;
+                mirror = false;
+                x = 0f;
+                y = 0f;
+                shootY = 4f;
+                reload = 4f * 60f;
+
+                bullet = new EmpBasicBulletType(6f, 3f){{
+                    splashDamageRadius = 20f;
+                    splashDamage = 3f;
+                    shrinkY = 0f;
+                    height = 14f;
+                    width = 11f;
+
+                    backColor = lightColor = hitColor = Pal.lancerLaser;
                     frontColor = Color.white;
                 }};
             }});
