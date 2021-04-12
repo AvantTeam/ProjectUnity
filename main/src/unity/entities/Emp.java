@@ -10,6 +10,7 @@ import mindustry.logic.*;
 import mindustry.world.*;
 import mindustry.world.blocks.defense.turrets.ReloadTurret.*;
 import mindustry.world.blocks.logic.LogicBlock.*;
+import mindustry.world.blocks.logic.MemoryBlock.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.power.ImpactReactor.*;
 import mindustry.world.blocks.power.PowerGenerator.*;
@@ -80,6 +81,12 @@ public class Emp{
                 if(((building.block.hasPower || building.block.outputsPower) && building.power != null)){
                     building.powerGraphRemoved();
                 }
+                if(building instanceof MemoryBuild mb && logicIntensity > 0f && logicInstructions > 0){
+                    for(int i = 0; i < logicInstructions; i++){
+                        int index = Mathf.random(0, mb.memory.length - 1);
+                        mb.memory[index] += Mathf.range(logicIntensity);
+                    }
+                }
                 //kills your processor and your processor.
                 if(building instanceof LogicBuild lb && logicIntensity > 0f && logicInstructions > 0){
                     StringBuilder build = new StringBuilder();
@@ -127,6 +134,35 @@ public class Emp{
                                     line[3] = "0";
                                 }
                             }
+                            case "draw" -> {
+                                if(!line[1].equals("color")){
+                                    for(int j = 2; j < 8; j++){
+                                        String a = line[j];
+                                        if(Strings.canParseFloat(a)){
+                                            float par = Strings.parseFloat(a);
+                                            float l = par;
+                                            par += Mathf.range(logicIntensity);
+                                            if(par < 0f) par += l;
+                                            par = Math.max(0f, par);
+                                            line[j] = par + "";
+                                        }else if(logicIntensity > 256f && Mathf.chance((logicIntensity - 256f) / 64f)){
+                                            line[j] = Mathf.random(100f) + "";
+                                        }
+                                    }
+                                }else{
+                                    for(int j = 2; j < 6; j++){
+                                        String a = line[j];
+                                        if(Strings.canParseFloat(a)){
+                                            float par = Strings.parseFloat(a);
+                                            par += Mathf.range(logicIntensity);
+                                            par = Mathf.mod(par, 255f);
+                                            line[j] = par + "";
+                                        }else if(logicIntensity > 256f && Mathf.chance((logicIntensity - 256f) / 64f)){
+                                            line[j] = Mathf.random(255f) + "";
+                                        }
+                                    }
+                                }
+                            }
                         }
                         for(int j = 0; j < line.length; j++){
                             String s = line[j];
@@ -156,17 +192,15 @@ public class Emp{
         if(!build.block.hasPower) return;
         if(build instanceof GeneratorBuild gb){
             gb.productionEfficiency = 0f;
-            build.enabled = false;
-            build.enabledControlTime = duration;
-        }
-        if(build instanceof ImpactReactorBuild irb){
-            ImpactReactor r = (ImpactReactor)build.block;
-            irb.warmup = Mathf.clamp(irb.warmup - (duration * r.warmupSpeed));
+            if(build instanceof ImpactReactorBuild irb){
+                ImpactReactor r = (ImpactReactor)build.block;
+                irb.warmup = Mathf.clamp(irb.warmup - (duration * r.warmupSpeed));
+            }
         }
         if(build.block.consumes.hasPower() && build instanceof ReloadTurretBuild rtb){
             rtb.reload = 0f;
-            build.enabled = false;
-            build.enabledControlTime = duration;
         }
+        build.enabled = false;
+        build.enabledControlTime = duration;
     }
 }
