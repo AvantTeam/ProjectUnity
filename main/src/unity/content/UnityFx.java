@@ -729,6 +729,20 @@ public class UnityFx{
         color();
     }).layer(Layer.flyingUnit + 1f),
 
+    empShockwave = new Effect(30f, 800f, e -> {
+        color(Pal.lancerLaser);
+        Lines.stroke(e.fout() + 0.5f);
+        Lines.circle(e.x, e.y, e.rotation * Mathf.curve(e.fin(), 0f, 0.23f));
+    }),
+
+    empCharge = new Effect(70f, e -> {
+        color(Pal.lancerLaser);
+        UnityDrawf.shiningCircle(e.id * 63, Time.time, e.x, e.y, 4f * e.fin(), 7, 15f, 24f * e.fin(), 2f * e.fin());
+        color(Color.white);
+        UnityDrawf.shiningCircle(e.id * 63, Time.time, e.x, e.y, 2f * e.fin(), 7, 15f, 38f * e.fin(), e.fin());
+        color();
+    }),
+
     blueTriangleTrail = new Effect(50f, e -> {
         color(Color.white, Pal.lancerLaser, e.fin());
         Fill.poly(e.x, e.y, 3, 4f * e.fout(), -90f);

@@ -3,6 +3,7 @@ package unity.entities.bullet;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import unity.content.*;
 import unity.entities.*;
 
 public class EmpBasicBulletType extends BasicBulletType{
@@ -34,6 +35,9 @@ public class EmpBasicBulletType extends BasicBulletType{
     public void hit(Bullet b, float x, float y){
         super.hit(b, x, y);
         Emp.hitTile(x, y, b.team, empRange, empDuration, empBatteryDamage, empLogicDamage, 10, empDisconnectRange, empMaxRange, 7);
+        UnityFx.empShockwave.at(b.x, b.y, empRange);
+        if(Emp.hitDisconnect) UnityFx.empShockwave.at(b.x, b.y, empDisconnectRange);
+        if(Emp.hitPowerGrid) UnityFx.empShockwave.at(b.x, b.y, empMaxRange);
     }
 
     @Override
