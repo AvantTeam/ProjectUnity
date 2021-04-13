@@ -54,9 +54,9 @@ public interface Assistantc extends Unitc{
             float visualFadeTime = 1f - Mathf.curve(1f - textFadeTime(), 0.9f);
 
             font.setColor(1f, 1f, 1f, textFadeTime() <= 0f || lastText() == null ? 1f : visualFadeTime);
-            layout.setText(font, lastText(), Color.white, width, Align.bottom, true);
+            layout.setText(font, lastText(), Color.lightGray, width, Align.bottom, true);
 
-            Draw.color(1f, 1f, 1f, 1f * (textFadeTime() <= 0f || lastText() == null ? 1f : visualFadeTime));
+            Draw.color(0f, 0f, 0f, 0.3f * (textFadeTime() <= 0f || lastText() == null ? 1f : visualFadeTime));
             Fill.rect(x(), y() + textHeight + layout.height - layout.height / 2f, layout.width + 2f, layout.height + 3f);
 
             font.draw(lastText(), x() - width / 2f, y() + textHeight + layout.height, width, Align.center, true);

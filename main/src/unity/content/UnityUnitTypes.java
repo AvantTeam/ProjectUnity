@@ -96,7 +96,7 @@ public class UnityUnitTypes implements ContentList{
     UnitType pylon, monument, colossus, bastion;
 
     public static @FactionDef("monolith") @EntityDef(base = UnitEntity.class, def = Assistantc.class)
-    UnitType helper;
+    UnitType adsect/*, comitate, praesid*/;
 
     public static @FactionDef("monolith") @EntityPoint(UnitEntity.class)
     UnitType farSeeker;
@@ -2483,18 +2483,34 @@ public class UnityUnitTypes implements ContentList{
             );
         }};
 
-        helper = new UnityUnitType("helper"){{
-            defaultController = () -> new AssistantAI(Assistance.protectCore);
+        adsect = new UnityUnitType("adsect"){{
+            defaultController = AssistantAI.create(Assistance.mendCore);
             health = 240f;
-            speed = 5f;
+            speed = 4f;
+            rotateSpeed = 15f;
+            flying = true;
+
+            ammoType = AmmoTypes.powerLow;
+            engineColor = UnityPal.monolith;
+            outlineColor = UnityPal.darkOutline;
+
             weapons.add(
             new Weapon(){{
                 mirror = false;
-                reload = 25f;
+                rotate = false;
+                x = 0f;
+                y = 4f;
+                reload = 18f;
+                shootCone = 40f;
 
-                bullet = new BasicBulletType(4f, 23f){{
-                    healPercent = 0.1f;
+                shootSound = Sounds.lasershoot;
+                bullet = new LaserBoltBulletType(4f, 23f){{
+                    keepVelocity = false;
+                    healPercent = 2f;
                     lifetime = 40f;
+                    collidesTeam = true;
+                    frontColor = UnityPal.monolithLight;
+                    backColor = UnityPal.monolith;
                 }};
             }}
             );

@@ -194,7 +194,10 @@ public class Unity extends Mod implements ApplicationListener{
         Seq<Class<?>> ignored = Seq.with(Floor.class, Boulder.class);
         Cons<Seq<? extends Content>> checker = list -> {
             for(var cont : list){
-                if(!(cont instanceof UnlockableContent ucont)) continue;
+                if(
+                    !(cont instanceof UnlockableContent ucont) ||
+                    (cont.minfo.mod == null || !cont.minfo.mod.name.equals("unity"))
+                ) continue;
 
                 if(Core.bundle.getOrNull(ucont.getContentType() + "." + ucont.name + ".name") == null){
                     print(Strings.format("@ has no bundle entry for name", ucont));
