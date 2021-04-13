@@ -18,6 +18,7 @@ import mindustry.graphics.*;
 import mindustry.content.*;
 import unity.*;
 import unity.ai.*;
+import unity.ai.AssistantAI.*;
 import unity.annotations.Annotations.*;
 import unity.entities.abilities.*;
 import unity.entities.bullet.*;
@@ -92,6 +93,9 @@ public class UnityUnitTypes implements ContentList{
     /** Monolith {@linkplain LegsUnit legs} units */
     public static @FactionDef("monolith") @EntityPoint(LegsUnit.class)
     UnitType pylon, monument, colossus, bastion;
+
+    public static @FactionDef("monolith") @EntityDef(base = UnitEntity.class, def = Assistantc.class)
+    UnitType helper;
 
     public static @FactionDef("monolith") @EntityPoint(UnitEntity.class)
     UnitType farSeeker;
@@ -2443,6 +2447,23 @@ public class UnityUnitTypes implements ContentList{
                         }
                     }
                 };
+            }}
+            );
+        }};
+
+        helper = new UnityUnitType("helper"){{
+            defaultController = () -> new AssistantAI(Assistance.protectCore);
+            health = 240f;
+            speed = 5f;
+            weapons.add(
+            new Weapon(){{
+                mirror = false;
+                reload = 25f;
+
+                bullet = new BasicBulletType(4f, 23f){{
+                    healPercent = 0.1f;
+                    lifetime = 40f;
+                }};
             }}
             );
         }};
