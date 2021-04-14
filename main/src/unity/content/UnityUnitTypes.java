@@ -463,6 +463,7 @@ public class UnityUnitTypes implements ContentList{
 
         discharge = new UnityUnitType("discharge"){{
             flying = true;
+            lowAltitude = true;
             health = 60f;
             speed = 2f;
             accel = 0.09f;
@@ -495,6 +496,7 @@ public class UnityUnitTypes implements ContentList{
 
         pulse = new UnityUnitType("pulse"){{
             flying = true;
+            lowAltitude = true;
             health = 210f;
             speed = 1.8f;
             accel = 0.1f;
@@ -2774,7 +2776,7 @@ public class UnityUnitTypes implements ContentList{
                 y = 16.5f;
                 reload = 2f * 60;
                 shadow = 14f;
-                shootSound = Sounds.beam;
+                shootSound = UnitySounds.continuousLaserB;
                 continuous = true;
 
                 bullet = UnityBullets.endLaserSmall;
@@ -2873,6 +2875,7 @@ public class UnityUnitTypes implements ContentList{
                 shadow = 63f;
                 shootCone = 1f;
                 reload = 6f * 60f;
+                shootSound = UnitySounds.continuousLaserB;
                 bullet = new EndCutterLaserBulletType(3100f){{
                     maxLength = 1200f;
                     lifetime = 3f * 60f;

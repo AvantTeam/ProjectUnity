@@ -3,7 +3,6 @@ package unity.entities.effects;
 import arc.*;
 import arc.func.*;
 import arc.graphics.*;
-import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import arc.util.pooling.*;
