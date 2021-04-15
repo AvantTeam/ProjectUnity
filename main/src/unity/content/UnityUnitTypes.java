@@ -54,7 +54,7 @@ public class UnityUnitTypes implements ContentList{
     /** Global {@linkplain UnitEntity flying} units */
     public static @EntityPoint(UnitEntity.class)
     UnitType angel, malakhim,
-    discharge;
+    discharge, pulse;
     
     /** Global {@linkplain LegsUnit legs} units */
     public static @EntityPoint(LegsUnit.class)
@@ -463,7 +463,8 @@ public class UnityUnitTypes implements ContentList{
 
         discharge = new UnityUnitType("discharge"){{
             flying = true;
-            health = 40f;
+            lowAltitude = true;
+            health = 60f;
             speed = 2f;
             accel = 0.09f;
             drag = 0.02f;
@@ -480,6 +481,7 @@ public class UnityUnitTypes implements ContentList{
                 reload = 4f * 60f;
 
                 bullet = new EmpBasicBulletType(6f, 3f){{
+                    lifetime = 35f;
                     splashDamageRadius = 20f;
                     splashDamage = 3f;
                     shrinkY = 0f;
@@ -488,6 +490,47 @@ public class UnityUnitTypes implements ContentList{
 
                     backColor = lightColor = hitColor = Pal.lancerLaser;
                     frontColor = Color.white;
+                }};
+            }});
+        }};
+
+        pulse = new UnityUnitType("pulse"){{
+            flying = true;
+            lowAltitude = true;
+            health = 210f;
+            speed = 1.8f;
+            accel = 0.1f;
+            drag = 0.06f;
+            hitSize = 16.5f;
+            engineOffset = 8.25f;
+            ammoType = AmmoTypes.power;
+
+            weapons.add(new Weapon(){{
+                rotate = false;
+                mirror = false;
+                x = 0f;
+                y = 0f;
+                shootY = 12f;
+                reload = 3f * 60f;
+                firstShotDelay = 70f;
+                shootStatus = StatusEffects.unmoving;
+                shootStatusDuration = 70f;
+
+                bullet = new EmpBasicBulletType(6.25f, 4f){{
+                    splashDamageRadius = 25f;
+                    splashDamage = 9f;
+                    shrinkY = 0f;
+                    height = 16f;
+                    width = 12f;
+
+                    empRange = 120f;
+                    empDisconnectRange = 40f;
+                    empBatteryDamage = 11000f;
+                    empLogicDamage = 5f;
+
+                    backColor = lightColor = hitColor = Pal.lancerLaser;
+                    frontColor = Color.white;
+                    shootEffect = UnityFx.empCharge;
                 }};
             }});
         }};
@@ -2734,7 +2777,7 @@ public class UnityUnitTypes implements ContentList{
                 y = 16.5f;
                 reload = 2f * 60;
                 shadow = 14f;
-                shootSound = Sounds.beam;
+                shootSound = UnitySounds.continuousLaserB;
                 continuous = true;
 
                 bullet = UnityBullets.endLaserSmall;
@@ -2833,6 +2876,7 @@ public class UnityUnitTypes implements ContentList{
                 shadow = 63f;
                 shootCone = 1f;
                 reload = 6f * 60f;
+                shootSound = UnitySounds.continuousLaserB;
                 bullet = new EndCutterLaserBulletType(3100f){{
                     maxLength = 1200f;
                     lifetime = 3f * 60f;

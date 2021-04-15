@@ -22,6 +22,8 @@ public class Emp{
     static ObjectSet<PowerGraph> graphs = new ObjectSet<>();
     static Seq<Building> last = new Seq<>(), next = new Seq<>();
     static boolean hit = false;
+    /** Only use after hitTile is used. */
+    public static boolean hitPowerGrid, hitDisconnect;
 
     /**
      * @param validRange if a power block is within this range, the emp will start.
@@ -34,6 +36,7 @@ public class Emp{
      * */
     public static void hitTile(float x, float y, Team team, float validRange, float duration, float amount, float logicIntensity, int logicInstructions, float disconnectRange, float scanRange, int scans){
         hit = false;
+        hitPowerGrid = hitDisconnect = false;
         if(validRange > 0f){
             indexer.eachBlock(null, x, y, validRange, b -> b.team != team && !collided.contains(b.pos()) && b.block.hasPower, building -> {
                 if(building.power != null){
@@ -71,24 +74,28 @@ public class Emp{
                             next.clear();
                         }
                     }
+                    hitPowerGrid = true;
                     hit = true;
                 }
             });
         }
 
-        if(disconnectRange > 0f && hit){
+        if(disconnectRange > 0f && (hit || (logicIntensity > 0f && logicInstructions > 0))){
             indexer.eachBlock(null, x, y, disconnectRange, b -> b.team != team, building -> {
-                if(((building.block.hasPower || building.block.outputsPower) && building.power != null)){
+                if(((building.block.hasPower || building.block.outputsPower) && building.power != null && hit)){
                     building.powerGraphRemoved();
+                    hitDisconnect = true;
                 }
                 if(building instanceof MemoryBuild mb && logicIntensity > 0f && logicInstructions > 0){
                     for(int i = 0; i < logicInstructions; i++){
                         int index = Mathf.random(0, mb.memory.length - 1);
                         mb.memory[index] += Mathf.range(logicIntensity);
                     }
+                    hitDisconnect = true;
                 }
                 //kills your processor and your processor.
                 if(building instanceof LogicBuild lb && logicIntensity > 0f && logicInstructions > 0){
+                    hitDisconnect = true;
                     StringBuilder build = new StringBuilder();
                     String[] lines = lb.code.split("\n");
 

@@ -76,7 +76,7 @@ public class UnityWeaponTemplates implements ContentList{
             shootY = 6.5f;
             shootCone = 10f;
             shadow = 24f;
-            shootSound = UnitySounds.devourerMainLaser;
+            shootSound = UnitySounds.continuousLaserB;
             continuous = true;
             rotate = true;
             mirror = true;
