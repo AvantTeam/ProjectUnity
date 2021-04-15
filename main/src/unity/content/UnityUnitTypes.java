@@ -2484,11 +2484,12 @@ public class UnityUnitTypes implements ContentList{
         }};
 
         adsect = new UnityUnitType("adsect"){{
-            defaultController = AssistantAI.create(Assistance.mendCore);
+            defaultController = AssistantAI.create(Assistance.mendCore, Assistance.mine, Assistance.build);
             health = 240f;
             speed = 4f;
             rotateSpeed = 15f;
             flying = true;
+            mineTier = 2;
 
             ammoType = AmmoTypes.powerLow;
             engineColor = UnityPal.monolith;
@@ -2500,13 +2501,13 @@ public class UnityUnitTypes implements ContentList{
                 rotate = false;
                 x = 0f;
                 y = 4f;
-                reload = 18f;
+                reload = 10f;
                 shootCone = 40f;
 
                 shootSound = Sounds.lasershoot;
                 bullet = new LaserBoltBulletType(4f, 23f){{
                     keepVelocity = false;
-                    healPercent = 2f;
+                    healPercent = 1.5f;
                     lifetime = 40f;
                     collidesTeam = true;
                     frontColor = UnityPal.monolithLight;

@@ -49,17 +49,18 @@ public interface Assistantc extends Unitc{
         font.setUseIntegerPositions(false);
         font.getData().setScale(0.25f / Scl.scl(1f));
 
-        if(Core.settings.getBool("playerchat") && textFadeTime() > 0f && lastText() != null){
+        String text = lastText() != null ? Core.bundle.getOrNull(lastText()) : null;
+        if(Core.settings.getBool("playerchat") && textFadeTime() > 0f && text != null){
             float width = 100f;
             float visualFadeTime = 1f - Mathf.curve(1f - textFadeTime(), 0.9f);
 
-            font.setColor(1f, 1f, 1f, textFadeTime() <= 0f || lastText() == null ? 1f : visualFadeTime);
-            layout.setText(font, lastText(), Color.lightGray, width, Align.bottom, true);
+            font.setColor(1f, 1f, 1f, textFadeTime() <= 0f || text == null ? 1f : visualFadeTime);
+            layout.setText(font, text, Color.lightGray, width, Align.bottom, true);
 
-            Draw.color(0f, 0f, 0f, 0.3f * (textFadeTime() <= 0f || lastText() == null ? 1f : visualFadeTime));
+            Draw.color(0f, 0f, 0f, 0.3f * (textFadeTime() <= 0f || text == null ? 1f : visualFadeTime));
             Fill.rect(x(), y() + textHeight + layout.height - layout.height / 2f, layout.width + 2f, layout.height + 3f);
 
-            font.draw(lastText(), x() - width / 2f, y() + textHeight + layout.height, width, Align.center, true);
+            font.draw(text, x() - width / 2f, y() + textHeight + layout.height, width, Align.center, true);
         }
 
         Draw.reset();

@@ -11,9 +11,11 @@ import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
+import mindustry.world.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 import mindustry.world.meta.*;
 import unity.entities.comp.*;
+import unity.util.*;
 
 import static mindustry.Vars.*;
 
@@ -38,17 +40,31 @@ public class AssistantAI extends FlyingAI{
     @Override
     public void updateUnit(){
         updateAssistance();
-        updateVisuals();
         updateTargeting();
-        updateMovement();
+
+        if(fallback != null && target == null){
+            if(fallback.unit() != unit) fallback.unit(unit);
+            fallback.updateUnit();
+        }else{
+            updateVisuals();
+            updateMovement();
+        }
     }
 
     public void updateAssistance(){
         if(timer.get(0, 5f)){
             for(Assistance service : services){
+                if(current != null && !current.predicate.get(this)){
+                    current.dispose(this);
+                    current = null;
+                }
+
                 if(current != service && service.predicate.get(this)){
+                    if(current != null) current.dispose(this);
+
                     current = service;
                     current.init(this);
+
                     break;
                 }
             }
@@ -159,6 +175,7 @@ public class AssistantAI extends FlyingAI{
     @Override
     protected void init(){
         updateUser();
+        displayMessage("service.init");
     }
 
     /** Assistant service types. <b>Uses {@code ordinal()} for sorting</b>, with the lesser as the more prioritized. */
@@ -187,7 +204,12 @@ public class AssistantAI extends FlyingAI{
 
             @Override
             protected void init(AssistantAI ai){
-                ai.displayMessage(Core.bundle.get("service.coredamage"));
+                ai.displayMessage("service.core");
+            }
+
+            @Override
+            protected void dispose(AssistantAI ai){
+                ai.displayMessage("service.coredone");
             }
 
             @Override
@@ -238,6 +260,82 @@ public class AssistantAI extends FlyingAI{
                     }
                 }
             }
+        },
+
+        mine{
+            {
+                predicate = ai ->
+                    ai.unit.type.itemCapacity > 0 &&
+                    ai.user instanceof Minerc miner &&
+                    (miner.mining() || ai.unit.stack.amount > 0) &&
+                    ai.unit.validMine(miner.mineTile(), false) &&
+                    ai.unit.closestCore().acceptStack(miner.mineTile().drop(), 1, ai.unit) > 0;
+            }
+
+            @Override
+            protected void init(AssistantAI ai) {
+                ai.displayMessage("service.mine");
+            }
+
+            @Override
+            protected void update(AssistantAI ai){
+                if(!(ai.fallback instanceof MinerAI)){
+                    ai.fallback = new MinerAI();
+                }
+
+                if(ai.fallback instanceof MinerAI minAI && ai.user instanceof Minerc miner){
+                    Utils.setField(
+                    minAI, Utils.findField(minAI.getClass(), "targetItem", true),
+                    ai.unit.stack.amount > 0
+                    ?   ai.unit.stack.item
+                    :   (
+                        miner.mineTile() != null
+                        ?   miner.mineTile().drop()
+                        :   null
+                    ));
+                }
+            }
+
+            @Override
+            protected void dispose(AssistantAI ai){
+                if(ai.fallback instanceof MinerAI){
+                    ai.fallback = null;
+                    ai.unit.clearItem();
+                }
+            }
+        },
+
+        build{
+            {
+                predicate = ai ->
+                    ai.unit.type.buildSpeed > 0f &&
+                    ai.user instanceof Builderc builder &&
+                    builder.activelyBuilding();
+            }
+
+            @Override
+            protected void init(AssistantAI ai) {
+                ai.displayMessage("service.build");
+            }
+
+            @Override
+            protected void update(AssistantAI ai){
+                if(!(ai.fallback instanceof BuilderAI)){
+                    ai.fallback = new BuilderAI();
+                }
+
+                if(ai.user instanceof Builderc builder){
+                    ai.unit.addBuild(builder.buildPlan());
+                }
+            }
+
+            @Override
+            protected void dispose(AssistantAI ai){
+                if(ai.fallback instanceof BuilderAI){
+                    ai.fallback = null;
+                    ai.unit.clearBuilding();
+                }
+            }
         };
 
         protected Boolf<AssistantAI> predicate = ai -> false;
@@ -252,6 +350,8 @@ public class AssistantAI extends FlyingAI{
         protected void init(AssistantAI ai){}
 
         protected void update(AssistantAI ai){}
+
+        protected void dispose(AssistantAI ai){}
 
         protected void updateVisuals(AssistantAI ai){}
 
