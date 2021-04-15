@@ -2533,6 +2533,7 @@ public class UnityUnitTypes implements ContentList{
             rotateSpeed = 15f;
             flying = true;
             mineTier = 2;
+            mineSpeed = 2f;
 
             ammoType = AmmoTypes.powerLow;
             engineColor = UnityPal.monolith;
@@ -2551,7 +2552,7 @@ public class UnityUnitTypes implements ContentList{
                 bullet = new LaserBoltBulletType(4f, 23f){{
                     keepVelocity = false;
                     healPercent = 1.5f;
-                    lifetime = 40f;
+                    lifetime = 32f;
                     collidesTeam = true;
                     frontColor = UnityPal.monolithLight;
                     backColor = UnityPal.monolith;

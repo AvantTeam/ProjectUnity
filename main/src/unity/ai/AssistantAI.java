@@ -122,29 +122,14 @@ public class AssistantAI extends FlyingAI{
                 if(target != null){
                     attack(120f);
                 }else if(user != null){
-                    circle(user, unit.type.range * 0.8f);
+                    moveTo(user, unit.type.range * 0.9f, 20f);
                 }
             }
 
             current.updateMovement(this);
         }else if(user != null){
-            circle(user, unit.type.range * 0.8f);
+            moveTo(user, unit.type.range * 0.9f, 20f);
         }
-    }
-
-    @Override
-    protected void circle(Position target, float circleLength, float speed){
-        if(target == null) return;
-
-        vec.set(target).sub(unit);
-
-        boolean reached;
-        if(reached = (vec.len() < circleLength)){
-            vec.rotate((circleLength - vec.len()) / circleLength * 180f);
-        }
-
-        vec.setLength(reached ? unit.speed() / 2f : speed);
-        unit.moveAt(vec);
     }
 
     public void updateUser(){
@@ -227,7 +212,7 @@ public class AssistantAI extends FlyingAI{
             @Override
             protected void updateMovement(AssistantAI ai){
                 if(tile(ai) != null){
-                    ai.circle(tile(ai), canMend(ai) ? ai.unit.type.range * 0.8f : ai.unit.type.range * 1.2f);
+                    ai.circle(tile(ai), canMend(ai) ? ai.unit.type.range * 0.9f : ai.unit.type.range * 1.2f);
                 }
             }
 
