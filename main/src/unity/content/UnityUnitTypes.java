@@ -2533,7 +2533,7 @@ public class UnityUnitTypes implements ContentList{
             rotateSpeed = 15f;
             flying = true;
             mineTier = 2;
-            mineSpeed = 2f;
+            mineSpeed = 3f;
 
             ammoType = AmmoTypes.powerLow;
             engineColor = UnityPal.monolith;

@@ -250,15 +250,21 @@ public class AssistantAI extends FlyingAI{
         mine{
             {
                 predicate = ai ->
+                (
+                    ai.unit.stack.amount > 0 &&
+                    ai.unit.closestCore().acceptStack(ai.unit.stack.item, 1, ai.unit) > 0
+                ) || (
+                    ai.unit.type.mineTier > 0 &&
                     ai.unit.type.itemCapacity > 0 &&
                     ai.user instanceof Minerc miner &&
-                    (miner.mining() || ai.unit.stack.amount > 0) &&
+                    miner.mining() &&
                     ai.unit.validMine(miner.mineTile(), false) &&
-                    ai.unit.closestCore().acceptStack(miner.mineTile().drop(), 1, ai.unit) > 0;
+                    ai.unit.closestCore().acceptStack(miner.mineTile().drop(), 1, ai.unit) > 0
+                );
             }
 
             @Override
-            protected void init(AssistantAI ai) {
+            protected void init(AssistantAI ai){
                 ai.displayMessage("service.mine");
             }
 
@@ -299,7 +305,7 @@ public class AssistantAI extends FlyingAI{
             }
 
             @Override
-            protected void init(AssistantAI ai) {
+            protected void init(AssistantAI ai){
                 ai.displayMessage("service.build");
             }
 
