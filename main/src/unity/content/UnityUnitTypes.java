@@ -73,8 +73,8 @@ public class UnityUnitTypes implements ContentList{
     UnitType whirlwind, jetstream, vortex;
 
     /** Imber wyrm units */
-    public static @FactionDef("imber")
-    UnitType arcnelidia;
+    public static @FactionDef("imber") @EntityPoint(UnitEntity.class)
+    UnityUnitType arcnelidia, testLink, test;
 
     public static @FactionDef("plague")
     UnitType toxobyte, catenapede;
@@ -127,6 +127,36 @@ public class UnityUnitTypes implements ContentList{
                 if(j >= constructors.length) break;
             }
         }
+
+        testLink = new UnityUnitType("test-link"){{
+            defaultController = LinkedAI::new;
+            speed = 1f;
+            drag = 0.08f;
+            accel = 0.04f;
+            fallSpeed = 0.005f;
+            health = 75;
+            engineSize = 0f;
+            flying = true;
+            hitSize = 12f;
+            range = 140f;
+        }};
+
+        //TODO delete when tested
+        test = new UnityUnitType("test"){{
+            defaultController = LinkerAI::new;
+            linkType = testLink;
+            linkCount = 5;
+            speed = 1f;
+            drag = 0.08f;
+            accel = 0.04f;
+            fallSpeed = 0.005f;
+            health = 75;
+            engineSize = 0f;
+            flying = true;
+            hitSize = 12f;
+            range = 140f;
+        }};
+
         //region flying-units
 
         caelifera = new UnityUnitType("caelifera"){{

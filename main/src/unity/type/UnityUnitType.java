@@ -30,32 +30,32 @@ public class UnityUnitType extends UnitType{
     public TextureRegion segmentRegion, tailRegion, segmentCellRegion, segmentOutline, tailOutline, legBackRegion, legBaseBackRegion, footBackRegion;
     public TextureRegion[] abilityRegions = new TextureRegion[AbilityTextures.values().length];
     public Seq<String> bottomWeapons = new Seq<>();
-    // worms
+    // Worms
     public int segmentLength = 9, maxSegments = -1;
     public float segmentOffset = 23f, headOffset = 0f;
     public float angleLimit = 30f;
     public float regenTime = -1f, healthDistribution = 0.1f;
     public float segmentDamageScl = 6f;
-    //hopefully make segment movement more consistant.
+    // Hopefully make segment movement more consistent
     public boolean counterDrag = false;
     public boolean splittable = false, chainable = false;
     public Sound splitSound = Sounds.door, chainSound = Sounds.door;
     public float headDamage = 0f;
     public float headTimer = 5f;
 
-    // transforms
+    // Transforms
     public Prov<UnitType> toTrans;
     public float transformTime;
 
-    // tentacles
+    // Tentacles
     public Seq<TentacleType> tentacles = new Seq<>();
 
-    // copters
+    // Copters
     public final Seq<Rotor> rotors = new Seq<>(4);
     public float rotorDeathSlowdown = 0.01f;
     public float fallRotateSpeed = 2.5f;
 
-    // mech pad units
+    // Mech pad units
     public Color engineColor;
 
     // For shoot armor ability
@@ -69,6 +69,10 @@ public class UnityUnitType extends UnitType{
     // Worm Rendering
     private final static Rect viewport = new Rect(), viewport2 = new Rect();
     private final static int chunks = 4;
+
+    // Linked units
+    public UnityUnitType linkType;
+    public int linkCount = 1;
 
     public UnityUnitType(String name){
         super(name);
