@@ -54,7 +54,7 @@ public class UnityUnitTypes implements ContentList{
     /** Global {@linkplain UnitEntity flying} units */
     public static @EntityPoint(UnitEntity.class)
     UnitType angel, malakhim,
-    discharge, pulse;
+    discharge, pulse, emission;
     
     /** Global {@linkplain LegsUnit legs} units */
     public static @EntityPoint(LegsUnit.class)
@@ -509,6 +509,7 @@ public class UnityUnitTypes implements ContentList{
                 y = 0f;
                 shootY = 4f;
                 reload = 4f * 60f;
+                shootSound = UnitySounds.zbosonShoot;
 
                 bullet = new EmpBasicBulletType(6f, 3f){{
                     lifetime = 35f;
@@ -540,11 +541,12 @@ public class UnityUnitTypes implements ContentList{
                 mirror = false;
                 x = 0f;
                 y = 0f;
-                shootY = 12f;
+                shootY = 7f;
                 reload = 3f * 60f;
                 firstShotDelay = 70f;
                 shootStatus = StatusEffects.unmoving;
                 shootStatusDuration = 70f;
+                shootSound = UnitySounds.zbosonShoot;
 
                 bullet = new EmpBasicBulletType(6.25f, 4f){{
                     splashDamageRadius = 25f;
@@ -557,6 +559,76 @@ public class UnityUnitTypes implements ContentList{
                     empDisconnectRange = 40f;
                     empBatteryDamage = 11000f;
                     empLogicDamage = 5f;
+
+                    backColor = lightColor = hitColor = Pal.lancerLaser;
+                    frontColor = Color.white;
+                    shootEffect = UnityFx.empCharge;
+                }};
+            }});
+        }};
+
+        emission = new UnityUnitType("emission"){{
+            flying = true;
+            lowAltitude = true;
+            health = 550f;
+            speed = 1.2f;
+            accel = 0.1f;
+            drag = 0.07f;
+            hitSize = 24.5f;
+            engineOffset = 3.75f;
+            ammoType = AmmoTypes.power;
+
+            weapons.add(new Weapon("unity-emp-launcher"){{
+                rotate = true;
+                mirror = true;
+                x = 11.75f;
+                y = -7.25f;
+                shootY = 5f;
+                shootSound = UnitySounds.zbosonShoot;
+                reload = 1.7f * 60f;
+
+                bullet = new EmpBasicBulletType(6f, 2f){{
+                    lifetime = 35f;
+                    splashDamageRadius = 17f;
+                    splashDamage = 2f;
+                    shrinkY = 0f;
+                    height = 13f;
+                    width = 10f;
+
+                    powerGridIteration = 5;
+                    empDuration = 15f;
+                    empBatteryDamage = 4300f;
+                    empRange = 90f;
+
+                    backColor = lightColor = hitColor = Pal.lancerLaser;
+                    frontColor = Color.white;
+                }};
+            }}, new Weapon(){{
+                mirror = false;
+                x = 0f;
+                y = -11.5f;
+                shootY = 0f;
+                shootSound = UnitySounds.zbosonShoot;
+                shootStatus = StatusEffects.unmoving;
+                shootStatusDuration = 70f;
+                reload = 5f * 60f;
+                firstShotDelay = 70f;
+
+                bullet = new EmpBasicBulletType(6.7f, 8f){{
+                    splashDamageRadius = 30f;
+                    splashDamage = 12f;
+                    shrinkY = 0f;
+                    height = 17f;
+                    width = 13f;
+
+                    empRange = 150f;
+                    empDuration = 60f * 2f;
+                    empMaxRange = 800f;
+                    empDisconnectRange = 95f;
+                    empBatteryDamage = 26000f;
+                    empLogicDamage = 12f;
+                    powerGridIteration = 15;
+                    trailLength = 13;
 
                     backColor = lightColor = hitColor = Pal.lancerLaser;
                     frontColor = Color.white;
@@ -2564,6 +2636,8 @@ public class UnityUnitTypes implements ContentList{
             flying = true;
             mineTier = 2;
             mineSpeed = 3f;
+            buildSpeed = 0.8f;
+            circleTarget = false;
 
             ammoType = AmmoTypes.powerLow;
             engineColor = UnityPal.monolith;
@@ -2579,7 +2653,7 @@ public class UnityUnitTypes implements ContentList{
                 shootCone = 40f;
 
                 shootSound = Sounds.lasershoot;
-                bullet = new LaserBoltBulletType(4f, 23f){{
+                bullet = new LaserBoltBulletType(4f, 15f){{
                     keepVelocity = false;
                     healPercent = 1.5f;
                     lifetime = 32f;

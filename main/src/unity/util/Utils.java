@@ -27,6 +27,8 @@ import static mindustry.Vars.*;
 @SuppressWarnings("unchecked")
 public final class Utils{
     public static final PowIn pow6In = new PowIn(6);
+    public static final Object[] emptyObjects = new Object[0];
+    public static final Class<?>[] emptyClasses = new Class[0];
 
     private static final Vec2 tV = new Vec2();
     private static final Seq<Healthc> tmpUnitSeq = new Seq<>();
@@ -161,6 +163,24 @@ public final class Utils{
         return current;
     }
 
+    public static Class<?> findClassByMethod(Class<?> type, String method, Class<?>... args){
+        Class<?> current = type.isAnonymousClass() ? type.getSuperclass() : type;
+
+        boolean found = false;
+        while(!found){
+            try{
+                current.getDeclaredMethod(method, args);
+            }catch(NoSuchMethodException e){
+                current = current.getSuperclass();
+                continue;
+            }
+
+            found = true;
+        }
+
+        return current;
+    }
+
     /** A utility function to find a field without throwing {@link NoSuchFieldException}. */
     public static Field findField(Class<?> type, String field, boolean access){
         try{
@@ -186,6 +206,25 @@ public final class Utils{
     public static <T> T getField(Object object, Field field){
         try{
             return (T)field.get(object);
+        }catch(Exception e){
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static Method findMethod(Class<?> type, String methodName, boolean access, Class<?>...args){
+        try{
+            var m = findClassByMethod(type, methodName, args).getDeclaredMethod(methodName, args);
+            if(access) m.setAccessible(true);
+
+            return m;
+        }catch(NoSuchMethodException e){
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static <T> T invokeMethod(Object object, Method method, Object... args){
+        try{
+            return (T)method.invoke(object, args);
         }catch(Exception e){
             throw new RuntimeException(e);
         }
