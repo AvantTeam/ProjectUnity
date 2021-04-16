@@ -44,7 +44,26 @@ public class AssistantAI extends FlyingAI{
 
         if(fallback != null && target == null){
             if(fallback.unit() != unit) fallback.unit(unit);
-            fallback.updateUnit();
+
+            if(current != null){
+                if(current.preserveVisuals){
+                    Utils.invokeMethod(
+                    fallback,
+                    Utils.findMethod(fallback.getClass(), "updateVisuals", true, Utils.emptyClasses),
+                    Utils.emptyObjects
+                    );
+                }
+
+                if(current.preserveMovement){
+                    Utils.invokeMethod(
+                    fallback,
+                    Utils.findMethod(fallback.getClass(), "updateMovement", true, Utils.emptyClasses),
+                    Utils.emptyObjects
+                    );
+                }
+            }else{
+                fallback.updateUnit();
+            }
         }else{
             updateVisuals();
             updateMovement();
@@ -71,8 +90,7 @@ public class AssistantAI extends FlyingAI{
         }
 
         if((
-            user == null ||
-            !user.isAdded() ||
+            !userValid() ||
             user instanceof Unit unit
             ?   !unit.isPlayer()
             :   true
@@ -91,14 +109,14 @@ public class AssistantAI extends FlyingAI{
             unit.lookAt(unit.prefRotation());
         }else if(current != null && current.updateVisuals.get(this)){
             if(current.preserveVisuals){
-                if(target != null || user == null){
+                if(target != null || !userValid()){
                     unit.lookAt(unit.prefRotation());
                 }else if(user instanceof Rotc rot){
                     unit.lookAt(rot.rotation());
                 }
             }
             current.updateVisuals(this);
-        }else if(target != null || user == null){
+        }else if(target != null || !userValid()){
             unit.lookAt(unit.prefRotation());
         }else if(user instanceof Rotc rot){
             unit.lookAt(rot.rotation());
@@ -121,18 +139,20 @@ public class AssistantAI extends FlyingAI{
             if(current.preserveMovement){
                 if(target != null){
                     attack(120f);
-                }else if(user != null){
-                    moveTo(user, unit.type.range * 0.9f, 20f);
+                }else if(userValid()){
+                    moveTo(user, unit.type.range * 0.9f);
                 }
             }
 
             current.updateMovement(this);
-        }else if(user != null){
-            moveTo(user, unit.type.range * 0.9f, 20f);
+        }else if(userValid()){
+            moveTo(user, unit.type.range * 0.9f);
         }
     }
 
     public void updateUser(){
+        if(userValid()) hooks.get(user.id(), ObjectSet::new).remove(unit);
+
         Teamc next = null;
         int prev = Integer.MAX_VALUE;
 
@@ -148,6 +168,10 @@ public class AssistantAI extends FlyingAI{
         if(next != null) hooks.get(next.id(), ObjectSet::new).add(unit);
 
         user = next;
+    }
+
+    public boolean userValid(){
+        return user != null && user.isAdded() && (user instanceof Healthc health ? health.isValid() : true);
     }
 
     protected void displayMessage(String message){
@@ -212,7 +236,7 @@ public class AssistantAI extends FlyingAI{
             @Override
             protected void updateMovement(AssistantAI ai){
                 if(tile(ai) != null){
-                    ai.circle(tile(ai), canMend(ai) ? ai.unit.type.range * 0.9f : ai.unit.type.range * 1.2f);
+                    ai.circle(tile(ai), canMend(ai) ? ai.unit.type.range * 0.9f : ai.unit.type.range * 1.2f, ai.unit.speed() / 2f);
                 }
             }
 
@@ -243,6 +267,39 @@ public class AssistantAI extends FlyingAI{
                         ai.unit.aimX = mount.aimX;
                         ai.unit.aimY = mount.aimY;
                     }
+                }
+            }
+        },
+
+        build{
+            {
+                predicate = ai ->
+                    ai.unit.type.buildSpeed > 0f &&
+                    ai.user instanceof Builderc builder &&
+                    builder.activelyBuilding();
+            }
+
+            @Override
+            protected void init(AssistantAI ai){
+                ai.displayMessage("service.build");
+            }
+
+            @Override
+            protected void update(AssistantAI ai){
+                if(!(ai.fallback instanceof BuilderAI)){
+                    ai.fallback = new BuilderAI();
+                }
+
+                if(ai.fallback instanceof BuilderAI buildAI && ai.user instanceof Builderc builder){
+                    Utils.setField(buildAI, Utils.findField(buildAI.getClass(), "following", true), builder);
+                }
+            }
+
+            @Override
+            protected void dispose(AssistantAI ai){
+                if(ai.fallback instanceof BuilderAI){
+                    ai.fallback = null;
+                    ai.unit.clearBuilding();
                 }
             }
         },
@@ -292,39 +349,6 @@ public class AssistantAI extends FlyingAI{
                 if(ai.fallback instanceof MinerAI){
                     ai.fallback = null;
                     ai.unit.clearItem();
-                }
-            }
-        },
-
-        build{
-            {
-                predicate = ai ->
-                    ai.unit.type.buildSpeed > 0f &&
-                    ai.user instanceof Builderc builder &&
-                    builder.activelyBuilding();
-            }
-
-            @Override
-            protected void init(AssistantAI ai){
-                ai.displayMessage("service.build");
-            }
-
-            @Override
-            protected void update(AssistantAI ai){
-                if(!(ai.fallback instanceof BuilderAI)){
-                    ai.fallback = new BuilderAI();
-                }
-
-                if(ai.user instanceof Builderc builder){
-                    ai.unit.addBuild(builder.buildPlan());
-                }
-            }
-
-            @Override
-            protected void dispose(AssistantAI ai){
-                if(ai.fallback instanceof BuilderAI){
-                    ai.fallback = null;
-                    ai.unit.clearBuilding();
                 }
             }
         };
