@@ -72,7 +72,7 @@ public class Press extends GenericCrafter {
         @Override
         public void consume(){
             super.consume();
-            UnitySounds.clang.at(x, y, Mathf.random(0.6f, 0.8f));
+            UnitySounds.clang.at(x, y, Mathf.random(0.9f, 1.1f));
             for(int i = 0; i < 8; i++){
                 UnityFx.spark.at(x,  y + Mathf.random(-fxYVariation, fxYVariation), Mathf.random() * 360, Items.surgeAlloy.color, Mathf.random() + 0.5f);
             }
