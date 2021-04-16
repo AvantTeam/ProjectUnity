@@ -76,6 +76,7 @@ public class Press extends GenericCrafter {
         @Override
         public void consume(){
             super.consume();
+
             clangSound.at(x, y, Mathf.random(0.6f, 0.8f));
 
             for(int i = 0; i < 8; i++){
