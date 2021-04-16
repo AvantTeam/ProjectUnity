@@ -7,9 +7,10 @@ import mindustry.ctype.*;
 import mindustry.game.Objectives.*;
 import mindustry.type.*;
 
+import static unity.content.UnityItems.*;
 import static unity.content.UnityBlocks.*;
+import static unity.content.UnityUnitTypes.*;
 
-@SuppressWarnings("unused")
 public class UnityTechTree implements ContentList{
     private static TechNode context = null;
 
@@ -20,7 +21,7 @@ public class UnityTechTree implements ContentList{
         attach(Blocks.surgeSmelter, () -> {
             node(darkAlloyForge);
             node(monolithAlloyForge);
-            node(sparkAlloyForge, Seq.with(new Research(UnityItems.sparkAlloy)), () -> {
+            node(sparkAlloyForge, Seq.with(new Research(sparkAlloy)), () -> {
                 node(orb, () -> {
                     node(shielder);
                     node(shockwire, () -> {
@@ -60,11 +61,11 @@ public class UnityTechTree implements ContentList{
         });
 
         attach(Blocks.arc, () -> {
-            node(diviner, Seq.with(new Research(UnityItems.monolite)), () -> {
+            node(diviner, Seq.with(new Research(monolite)), () -> {
                 node(mage, () -> {
                     node(heatRay);
 
-                    node(oracle, Seq.with(new Research(UnityItems.monolithAlloy)));
+                    node(oracle, Seq.with(new Research(monolithAlloy)));
                 });
 
                 node(recluse, () -> {
@@ -72,8 +73,8 @@ public class UnityTechTree implements ContentList{
                 });
             });
 
-            node(ricochet, Seq.with(new Research(UnityItems.monolite)), () -> {
-                node(shellshock, Seq.with(new Research(UnityItems.monolithAlloy)), () -> {
+            node(ricochet, Seq.with(new Research(monolite)), () -> {
+                node(shellshock, Seq.with(new Research(monolithAlloy)), () -> {
                     node(purge);
                 });
 
@@ -88,7 +89,7 @@ public class UnityTechTree implements ContentList{
                 node(metaglassWallLarge);
             });
 
-            node(electrophobicWall, Seq.with(new Research(UnityItems.monolite)), () -> {
+            node(electrophobicWall, Seq.with(new Research(monolite)), () -> {
                 node(electrophobicWallLarge);
             });
         });
@@ -106,21 +107,44 @@ public class UnityTechTree implements ContentList{
         });
 
         //end region
+        //region units
+
+        attach(UnitTypes.fortress, () -> {
+            node(stele, () -> {
+                node(pedestal, () -> {
+                    node(pilaster, () -> {
+                        node(pylon, () -> {
+                            node(monument, () -> {
+                                node(colossus, () -> {
+                                    node(bastion);
+                                });
+                            });
+                        });
+                    });
+                });
+
+                node(adsect, () -> {
+                    node(comitate);
+                });
+            });
+        });
+
+        //end region
         //region items
 
         attach(Items.lead, () -> {
-            nodeProduce(UnityItems.nickel);
+            nodeProduce(nickel);
         });
 
         attach(Items.graphite, () -> {
-            nodeProduce(UnityItems.monolite);
+            nodeProduce(monolite);
 
-            nodeProduce(UnityItems.stone, () -> {
-                nodeProduce(UnityItems.denseAlloy, () -> {
-                    nodeProduce(UnityItems.steel, () -> {
-                        //nodeProduce(UnityItems.uranium);
+            nodeProduce(stone, () -> {
+                nodeProduce(denseAlloy, () -> {
+                    nodeProduce(steel, () -> {
+                        //nodeProduce(uranium);
                         nodeProduce(UnityLiquids.lava, () -> {
-                            nodeProduce(UnityItems.dirium);
+                            nodeProduce(dirium);
                         });
                     });
                 });
@@ -128,16 +152,16 @@ public class UnityTechTree implements ContentList{
         });
 
         attach(Items.thorium, () -> {
-            nodeProduce(UnityItems.archDebris, () -> {
-                nodeProduce(UnityItems.monolithAlloy);
+            nodeProduce(archDebris, Seq.with(new Research(monolite)), () -> {
+                nodeProduce(monolithAlloy);
             });
         });
 
         attach(Items.surgeAlloy, () -> {
-            nodeProduce(UnityItems.imberium, () -> {
-                nodeProduce(UnityItems.sparkAlloy);
+            nodeProduce(imberium, () -> {
+                nodeProduce(sparkAlloy);
 
-                nodeProduce(UnityItems.irradiantSurge);
+                nodeProduce(irradiantSurge);
             });
         });
     }
@@ -172,12 +196,15 @@ public class UnityTechTree implements ContentList{
 
     private static void node(UnlockableContent content, Seq<Objective> objectives){
         node(content, content.researchRequirements(), objectives, () -> {});
+
     }
 
+    @SuppressWarnings("unused")
     private static void node(UnlockableContent content, ItemStack[] requirements){
         node(content, requirements, null, () -> {});
     }
 
+    @SuppressWarnings("unused")
     private static void node(UnlockableContent content, ItemStack[] requirements, Seq<Objective> objectives){
         node(content, requirements, objectives, () -> {});
     }

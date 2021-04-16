@@ -1106,6 +1106,12 @@ public class UnityFx{
         }
     }),
 
+    hitMonolithLaser = new Effect(8, e -> {
+        color(UnityPal.monolithLight, UnityPal.monolithDark, e.finpow());
+        stroke(0.2f + e.fout() * 1.3f);
+        Lines.circle(e.x, e.y, e.fin() * 5f);
+    }),
+
     reflectResumeDynamic = new Effect(22f, e -> {
         color(Color.valueOf("FFF3D6"));
         stroke(e.fout() * 2f);

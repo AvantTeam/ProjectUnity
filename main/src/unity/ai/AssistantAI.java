@@ -27,7 +27,7 @@ public class AssistantAI extends FlyingAI{
     protected Assistance current;
 
     public AssistantAI(Assistance... services){
-        this.services = Seq.with(services).sort(Assistance::ordinal);
+        this.services = Seq.with(services).sort(service -> service.priority);
     }
 
     public static Prov<AssistantAI> create(Assistance... services){
@@ -184,9 +184,8 @@ public class AssistantAI extends FlyingAI{
         displayMessage("service.init");
     }
 
-    /** Assistant service types. <b>Uses {@code ordinal()} for sorting</b>, with the lesser as the more prioritized. */
     public enum Assistance{
-        mendCore{
+        mendCore(-100f){
             IntMap<CoreBuild> tiles = new IntMap<>();
 
             {
@@ -270,7 +269,7 @@ public class AssistantAI extends FlyingAI{
             }
         },
 
-        build{
+        build(0f){
             {
                 predicate = ai ->
                     ai.unit.type.buildSpeed > 0f &&
@@ -305,7 +304,7 @@ public class AssistantAI extends FlyingAI{
             }
         },
 
-        mine{
+        mine(10f){
             {
                 predicate = ai ->
                 (
@@ -334,31 +333,31 @@ public class AssistantAI extends FlyingAI{
 
             @Override
             protected void update(AssistantAI ai){
-                if(!(ai.fallback instanceof MinerAI)){
-                    ai.fallback = new MinerAI();
+                if(!(ai.fallback instanceof FixedMinerAI)){
+                    ai.fallback = new FixedMinerAI();
                 }
 
-                if(ai.fallback instanceof MinerAI minAI && ai.user instanceof Minerc miner){
-                    Utils.setField(
-                    minAI, Utils.findField(minAI.getClass(), "targetItem", true),
-                    ai.unit.stack.amount > 0
+                if(ai.fallback instanceof FixedMinerAI minAI && ai.user instanceof Minerc miner){
+                    minAI.targetItem = ai.unit.stack.amount > 0
                     ?   ai.unit.stack.item
                     :   (
                         miner.mineTile() != null
                         ?   miner.mineTile().drop()
                         :   null
-                    ));
+                    );
                 }
             }
 
             @Override
             protected void dispose(AssistantAI ai){
-                if(ai.fallback instanceof MinerAI){
+                if(ai.fallback instanceof FixedMinerAI){
                     ai.fallback = null;
                     ai.unit.clearItem();
                 }
             }
         };
+
+        protected final float priority;
 
         protected Boolf<AssistantAI> predicate = ai -> false;
         protected Boolf<AssistantAI> updateVisuals = ai -> false;
@@ -380,5 +379,9 @@ public class AssistantAI extends FlyingAI{
         protected void updateTargetting(AssistantAI ai){}
 
         protected void updateMovement(AssistantAI ai){}
+
+        Assistance(float priority){
+            this.priority = priority;
+        }
     }
 }
