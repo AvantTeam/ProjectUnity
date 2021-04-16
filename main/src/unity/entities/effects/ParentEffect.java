@@ -42,7 +42,10 @@ public class ParentEffect extends Effect{
                 entity.lifetime = (effect.lifetime);
                 entity.set(x, y);
                 entity.color.set(color);
-                if(data instanceof Posc) entity.parent = ((Posc)data);
+                if(data instanceof Posc){
+                    entity.parent = ((Posc)data);
+                    entity.positionRotation = (((Posc)data).angleTo(entity) - rotation);
+                }
                 entity.add();
             }
         }
@@ -54,6 +57,7 @@ public class ParentEffect extends Effect{
 
     public static class ParentEffectState extends EffectState{
         public float originalRotation = 0f;
+        public float positionRotation = 0f;
 
         @Override
         public void update(){
@@ -69,7 +73,7 @@ public class ParentEffect extends Effect{
                 rotation = rotationA - originalRotation;
                 //float angle = Mathf.angle(offsetX, offsetY);
                 float len = (float)Math.sqrt(offsetX * offsetX + offsetY * offsetY);
-                Tmp.v1.trns(rotationA, len).add(parent);
+                Tmp.v1.trns(rotationA - positionRotation, len).add(parent);
                 x = Tmp.v1.x;
                 y = Tmp.v1.y;
             }

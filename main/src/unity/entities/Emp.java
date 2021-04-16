@@ -79,11 +79,34 @@ public class Emp{
                 }
             });
         }
+        last.clear();
+        graphs.clear();
 
         if(disconnectRange > 0f && (hit || (logicIntensity > 0f && logicInstructions > 0))){
             indexer.eachBlock(null, x, y, disconnectRange, b -> b.team != team, building -> {
                 if(((building.block.hasPower || building.block.outputsPower) && building.power != null && hit)){
-                    building.powerGraphRemoved();
+                    for(int i = 0; i < building.power.links.size; i++){
+                        int p = building.power.links.get(i);
+                        Building s = world.build(p);
+                        if(s != null && s.power != null){
+                            s.power.links.removeValue(building.pos());
+                            last.add(s);
+                        }
+                    }
+                    building.power.links.clear();
+                    PowerGraph origin = new PowerGraph();
+                    origin.reflow(building);
+                    graphs.add(origin);
+                    for(Building build : last){
+                        if(!graphs.contains(build.power.graph)){
+                            PowerGraph n = new PowerGraph();
+                            n.reflow(build);
+                            graphs.add(n);
+                        }
+                    }
+                    last.clear();
+                    graphs.clear();
+
                     hitDisconnect = true;
                 }
                 if(building instanceof MemoryBuild mb && logicIntensity > 0f && logicInstructions > 0){
@@ -208,6 +231,6 @@ public class Emp{
             rtb.reload = 0f;
         }
         build.enabled = false;
-        build.enabledControlTime = duration;
+        build.enabledControlTime = Math.max(duration, build.enabledControlTime);
     }
 }
