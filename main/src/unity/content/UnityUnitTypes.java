@@ -96,7 +96,7 @@ public class UnityUnitTypes implements ContentList{
     UnitType pylon, monument, colossus, bastion;
 
     public static @FactionDef("monolith") @EntityDef(base = UnitEntity.class, def = Assistantc.class)
-    UnitType adsect/*, comitate, praesid*/;
+    UnitType adsect, comitate/*, praesid*/;
 
     public static @FactionDef("monolith") @EntityPoint(UnitEntity.class)
     UnitType farSeeker;
@@ -2630,8 +2630,10 @@ public class UnityUnitTypes implements ContentList{
 
         adsect = new UnityUnitType("adsect"){{
             defaultController = AssistantAI.create(Assistance.mendCore, Assistance.mine, Assistance.build);
-            health = 240f;
+            health = 180f;
             speed = 4f;
+            accel = 0.4f;
+            drag = 0.2f;
             rotateSpeed = 15f;
             flying = true;
             mineTier = 2;
@@ -2654,12 +2656,75 @@ public class UnityUnitTypes implements ContentList{
 
                 shootSound = Sounds.lasershoot;
                 bullet = new LaserBoltBulletType(4f, 15f){{
-                    keepVelocity = false;
                     healPercent = 1.5f;
-                    lifetime = 32f;
+                    lifetime = 40f;
                     collidesTeam = true;
                     frontColor = UnityPal.monolithLight;
                     backColor = UnityPal.monolith;
+                    smokeEffect = hitEffect = despawnEffect = UnityFx.hitMonolithLaser;
+                }};
+            }}
+            );
+        }};
+
+        comitate = new UnityUnitType("comitate"){{
+            defaultController = AssistantAI.create(Assistance.mendCore, Assistance.mine, Assistance.build);
+            health = 420f;
+            speed = 4.5f;
+            accel = 0.5f;
+            drag = 0.15f;
+            rotateSpeed = 15f;
+            flying = true;
+            mineTier = 3;
+            mineSpeed = 5f;
+            buildSpeed = 1.3f;
+            circleTarget = false;
+
+            ammoType = AmmoTypes.powerLow;
+            engineColor = UnityPal.monolith;
+            outlineColor = UnityPal.darkOutline;
+
+            weapons.add(
+            new Weapon(){{
+                mirror = false;
+                rotate = false;
+                x = 0f;
+                y = 6f;
+                reload = 20f;
+                shootCone = 40f;
+
+                shootSound = UnitySounds.energyBolt;
+                bullet = new LaserBoltBulletType(6.5f, 30f){{
+                    width = 4f;
+                    height = 12f;
+                    keepVelocity = false;
+                    healPercent = 3.5f;
+                    lifetime = 35f;
+                    collidesTeam = true;
+                    frontColor = UnityPal.monolithLight;
+                    backColor = UnityPal.monolith;
+                    smokeEffect = hitEffect = despawnEffect = UnityFx.hitMonolithLaser;
+                }};
+            }},
+
+            new Weapon("unity-monolith-small-weapon-mount"){{
+                top = false;
+                mirror = alternate = true;
+                x = 3f;
+                y = 3f;
+                reload = 56f;
+                shots = 2;
+                shotDelay = 5f;
+                shootCone = 20f;
+
+                shootSound = Sounds.lasershoot;
+                bullet = new LaserBoltBulletType(4f, 15f){{
+                    healPercent = 1.5f;
+                    lifetime = 40f;
+                    collidesTeam = true;
+                    frontColor = UnityPal.monolithLight;
+                    backColor = UnityPal.monolith;
+                    smokeEffect = hitEffect = despawnEffect = UnityFx.hitMonolithLaser;
                 }};
             }}
             );
