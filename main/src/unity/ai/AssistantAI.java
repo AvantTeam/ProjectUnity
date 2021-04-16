@@ -27,7 +27,7 @@ public class AssistantAI extends FlyingAI{
     protected Assistance current;
 
     public AssistantAI(Assistance... services){
-        this.services = Seq.with(services).sort(Assistance::ordinal);
+        this.services = Seq.with(services).sort(service -> service.priority);
     }
 
     public static Prov<AssistantAI> create(Assistance... services){
@@ -184,9 +184,8 @@ public class AssistantAI extends FlyingAI{
         displayMessage("service.init");
     }
 
-    /** Assistant service types. <b>Uses {@code ordinal()} for sorting</b>, with the lesser as the more prioritized. */
     public enum Assistance{
-        mendCore{
+        mendCore(-100f){
             IntMap<CoreBuild> tiles = new IntMap<>();
 
             {
@@ -270,7 +269,7 @@ public class AssistantAI extends FlyingAI{
             }
         },
 
-        build{
+        build(0f){
             {
                 predicate = ai ->
                     ai.unit.type.buildSpeed > 0f &&
@@ -305,7 +304,7 @@ public class AssistantAI extends FlyingAI{
             }
         },
 
-        mine{
+        mine(10f){
             {
                 predicate = ai ->
                 (
@@ -358,6 +357,8 @@ public class AssistantAI extends FlyingAI{
             }
         };
 
+        protected final float priority;
+
         protected Boolf<AssistantAI> predicate = ai -> false;
         protected Boolf<AssistantAI> updateVisuals = ai -> false;
         protected boolean preserveVisuals = false;
@@ -378,5 +379,9 @@ public class AssistantAI extends FlyingAI{
         protected void updateTargetting(AssistantAI ai){}
 
         protected void updateMovement(AssistantAI ai){}
+
+        Assistance(float priority){
+            this.priority = priority;
+        }
     }
 }
