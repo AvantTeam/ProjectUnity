@@ -13,6 +13,7 @@ public class EmpBasicBulletType extends BasicBulletType{
     public float empDisconnectRange = 0f;
     public float empLogicDamage = 0f;
     public float empBatteryDamage = 7000f;
+    public int powerGridIteration = 7;
     public int trailLength = 7;
 
     public EmpBasicBulletType(float speed, float damage){
@@ -34,7 +35,7 @@ public class EmpBasicBulletType extends BasicBulletType{
     @Override
     public void hit(Bullet b, float x, float y){
         super.hit(b, x, y);
-        Emp.hitTile(x, y, b.team, empRange, empDuration, empBatteryDamage, empLogicDamage, 10, empDisconnectRange, empMaxRange, 7);
+        Emp.hitTile(x, y, b.team, empRange, empDuration, empBatteryDamage, empLogicDamage, 10, empDisconnectRange, empMaxRange, powerGridIteration);
         UnityFx.empShockwave.at(b.x, b.y, empRange);
         if(Emp.hitDisconnect) UnityFx.empShockwave.at(b.x, b.y, empDisconnectRange);
         if(Emp.hitPowerGrid) UnityFx.empShockwave.at(b.x, b.y, empMaxRange);
