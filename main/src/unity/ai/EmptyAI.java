@@ -1,5 +1,6 @@
 package unity.ai;
 
+import mindustry.ai.types.MinerAI;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 
@@ -8,6 +9,7 @@ public class EmptyAI implements UnitController{
 
     @Override
     public Unit unit(){
+        MinerAI a;
         return unit;
     }
 

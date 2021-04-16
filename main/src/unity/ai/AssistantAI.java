@@ -23,7 +23,7 @@ public class AssistantAI extends FlyingAI{
     protected Teamc user;
 
     protected final Seq<Assistance> services;
-    protected final Interval timer = new Interval(2);
+    protected final Interval timer = new Interval(1);
     protected Assistance current;
 
     public AssistantAI(Assistance... services){
@@ -68,21 +68,19 @@ public class AssistantAI extends FlyingAI{
     }
 
     public void updateAssistance(){
-        if(timer.get(0, 5f)){
-            for(Assistance service : services){
-                if(current != null && !current.predicate.get(this)){
-                    current.dispose(this);
-                    current = null;
-                }
+        for(Assistance service : services){
+            if(current != null && !current.predicate.get(this)){
+                current.dispose(this);
+                current = null;
+            }
 
-                if(current != service && service.predicate.get(this)){
-                    if(current != null) current.dispose(this);
+            if(current != service && service.predicate.get(this)){
+                if(current != null) current.dispose(this);
 
-                    current = service;
-                    current.init(this);
+                current = service;
+                current.init(this);
 
-                    break;
-                }
+                break;
             }
         }
 
@@ -91,7 +89,7 @@ public class AssistantAI extends FlyingAI{
             user instanceof Unit unit
             ?   !unit.isPlayer()
             :   true
-        )) && timer.get(1, 5f)){
+        )) && timer.get(5f)){
             updateUser();
         }
 
@@ -312,7 +310,11 @@ public class AssistantAI extends FlyingAI{
                 predicate = ai ->
                 (
                     ai.unit.mining() &&
-                    ai.unit.closestCore().acceptStack(ai.unit.stack.item, 1, ai.unit) > 0
+                    ai.unit.closestCore().acceptStack(
+                        ai.unit.stack.item,
+                        ai.unit.stack.amount,
+                        ai.unit
+                    ) > 0
                 ) || (
                     ai.unit.type.mineTier > 0 &&
                     ai.unit.type.itemCapacity > 0 &&

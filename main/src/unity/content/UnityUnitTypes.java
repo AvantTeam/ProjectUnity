@@ -2534,6 +2534,7 @@ public class UnityUnitTypes implements ContentList{
             flying = true;
             mineTier = 2;
             mineSpeed = 3f;
+            buildSpeed = 0.8f;
             circleTarget = false;
 
             ammoType = AmmoTypes.powerLow;
