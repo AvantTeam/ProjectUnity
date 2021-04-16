@@ -73,6 +73,7 @@ public class UnityUnitType extends UnitType{
     // Linked units
     public UnityUnitType linkType;
     public int linkCount = 1;
+    public float rotationSpeed = 20f;
 
     public UnityUnitType(String name){
         super(name);

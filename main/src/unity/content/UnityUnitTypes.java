@@ -128,31 +128,33 @@ public class UnityUnitTypes implements ContentList{
             }
         }
 
+        //TODO delete when tested
         testLink = new UnityUnitType("test-link"){{
             defaultController = LinkedAI::new;
+            rotationSpeed = 65f;
             speed = 1f;
             drag = 0.08f;
             accel = 0.04f;
             fallSpeed = 0.005f;
             health = 75;
             engineSize = 0f;
-            flying = true;
+            hovering = true;
             hitSize = 12f;
             range = 140f;
         }};
 
-        //TODO delete when tested
         test = new UnityUnitType("test"){{
             defaultController = LinkerAI::new;
             linkType = testLink;
             linkCount = 5;
+            rotationSpeed = 65f;
             speed = 1f;
             drag = 0.08f;
             accel = 0.04f;
             fallSpeed = 0.005f;
             health = 75;
             engineSize = 0f;
-            flying = true;
+            hovering = true;
             hitSize = 12f;
             range = 140f;
         }};
