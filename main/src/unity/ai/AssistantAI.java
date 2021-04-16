@@ -1,6 +1,5 @@
 package unity.ai;
 
-import arc.*;
 import arc.func.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -11,7 +10,6 @@ import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
-import mindustry.world.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 import mindustry.world.meta.*;
 import unity.entities.comp.*;
@@ -19,7 +17,6 @@ import unity.util.*;
 
 import static mindustry.Vars.*;
 
-@SuppressWarnings("unchecked")
 public class AssistantAI extends FlyingAI{
     protected static IntMap<ObjectSet<Unit>> hooks = new IntMap<>();
 
@@ -90,11 +87,11 @@ public class AssistantAI extends FlyingAI{
         }
 
         if((
-            !userValid() ||
+            !userValid() || (
             user instanceof Unit unit
             ?   !unit.isPlayer()
             :   true
-        ) && timer.get(1, 5f)){
+        )) && timer.get(1, 5f)){
             updateUser();
         }
 
@@ -105,21 +102,13 @@ public class AssistantAI extends FlyingAI{
 
     @Override
     protected void updateVisuals(){
-        if(target != null){
-            unit.lookAt(unit.prefRotation());
-        }else if(current != null && current.updateVisuals.get(this)){
+        if(current != null && current.updateVisuals.get(this)){
             if(current.preserveVisuals){
-                if(target != null || !userValid()){
-                    unit.lookAt(unit.prefRotation());
-                }else if(user instanceof Rotc rot){
-                    unit.lookAt(rot.rotation());
-                }
+                unit.lookAt(unit.prefRotation());
             }
             current.updateVisuals(this);
-        }else if(target != null || !userValid()){
+        }else{
             unit.lookAt(unit.prefRotation());
-        }else if(user instanceof Rotc rot){
-            unit.lookAt(rot.rotation());
         }
     }
 
@@ -134,19 +123,29 @@ public class AssistantAI extends FlyingAI{
     @Override
     public void updateMovement(){
         if(target != null){
-            attack(120f);
+            if(!unit.type.circleTarget){
+                moveTo(target, unit.type.range * 0.8f);
+                unit.lookAt(target);
+            }else{
+                attack(120f);
+            }
         }else if(current != null && current.updateMovement.get(this)){
             if(current.preserveMovement){
                 if(target != null){
-                    attack(120f);
+                    if(!unit.type.circleTarget){
+                        moveTo(target, unit.type.range * 0.8f);
+                        unit.lookAt(target);
+                    }else{
+                        attack(120f);
+                    }
                 }else if(userValid()){
-                    moveTo(user, unit.type.range * 0.9f);
+                    moveTo(user, unit.type.range * 0.8f);
                 }
             }
 
             current.updateMovement(this);
         }else if(userValid()){
-            moveTo(user, unit.type.range * 0.9f);
+            moveTo(user, unit.type.range * 0.8f);
         }
     }
 
@@ -228,25 +227,27 @@ public class AssistantAI extends FlyingAI{
 
             @Override
             protected void updateVisuals(AssistantAI ai){
-                if(tile(ai) != null){
-                    ai.unit.lookAt(tile(ai));
+                var tile = tile(ai);
+                if(tile != null){
+                    ai.unit.lookAt(tile);
                 }
             }
 
             @Override
             protected void updateMovement(AssistantAI ai){
-                if(tile(ai) != null){
-                    ai.circle(tile(ai), canMend(ai) ? ai.unit.type.range * 0.9f : ai.unit.type.range * 1.2f, ai.unit.speed() / 2f);
+                var tile = tile(ai);
+                if(tile != null){
+                    ai.moveTo(tile, ai.unit.type.range * 0.9f);
                 }
             }
 
             @Override
             protected void updateTargetting(AssistantAI ai){
+                var tile = tile(ai);
                 for(WeaponMount mount : ai.unit.mounts){
                     Weapon weapon = mount.weapon;
                     if(weapon.bullet.healPercent <= 0f) continue;
 
-                    var tile = tile(ai);
                     float rotation = ai.unit.rotation - 90f;
 
                     float
@@ -277,6 +278,8 @@ public class AssistantAI extends FlyingAI{
                     ai.unit.type.buildSpeed > 0f &&
                     ai.user instanceof Builderc builder &&
                     builder.activelyBuilding();
+
+                preserveVisuals = preserveMovement = true;
             }
 
             @Override
@@ -308,7 +311,7 @@ public class AssistantAI extends FlyingAI{
             {
                 predicate = ai ->
                 (
-                    ai.unit.stack.amount > 0 &&
+                    ai.unit.mining() &&
                     ai.unit.closestCore().acceptStack(ai.unit.stack.item, 1, ai.unit) > 0
                 ) || (
                     ai.unit.type.mineTier > 0 &&
@@ -318,6 +321,8 @@ public class AssistantAI extends FlyingAI{
                     ai.unit.validMine(miner.mineTile(), false) &&
                     ai.unit.closestCore().acceptStack(miner.mineTile().drop(), 1, ai.unit) > 0
                 );
+
+                preserveVisuals = preserveMovement = true;
             }
 
             @Override

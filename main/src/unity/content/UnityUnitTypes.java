@@ -2534,6 +2534,7 @@ public class UnityUnitTypes implements ContentList{
             flying = true;
             mineTier = 2;
             mineSpeed = 3f;
+            circleTarget = false;
 
             ammoType = AmmoTypes.powerLow;
             engineColor = UnityPal.monolith;
@@ -2549,7 +2550,7 @@ public class UnityUnitTypes implements ContentList{
                 shootCone = 40f;
 
                 shootSound = Sounds.lasershoot;
-                bullet = new LaserBoltBulletType(4f, 23f){{
+                bullet = new LaserBoltBulletType(4f, 15f){{
                     keepVelocity = false;
                     healPercent = 1.5f;
                     lifetime = 32f;

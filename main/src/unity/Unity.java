@@ -23,7 +23,6 @@ import unity.util.*;
 
 import static mindustry.Vars.*;
 
-@SuppressWarnings("unchecked")
 public class Unity extends Mod implements ApplicationListener{
     public static MusicHandler musicHandler;
     public static TapHandler tapHandler;
