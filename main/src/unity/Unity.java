@@ -4,9 +4,11 @@ import arc.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.scene.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.mod.*;
 import mindustry.mod.Mods.*;
+import mindustry.world.blocks.environment.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import unity.ai.kami.*;
@@ -187,23 +189,33 @@ public class Unity extends Mod implements ApplicationListener{
         for(Faction faction : Faction.all){
             var array = FactionMeta.getByFaction(faction, Object.class);
             print(Strings.format("Faction @ has @ contents.", faction.name, array.size));
-
-            for(UnlockableContent unnamed : array
-                .select(o -> o instanceof UnlockableContent)
-                .<UnlockableContent>as()
-                .select(c -> Core.bundle.getOrNull(c.getContentType() + "." + c.name + ".name") == null)
-            ){
-                print(Strings.format("@: '@' has no bundle entry for name.", faction.name, unnamed.name));
-            }
-
-            for (UnlockableContent unnamed : array
-                    .select(o -> o instanceof UnlockableContent)
-                    .<UnlockableContent>as()
-                    .select(c -> Core.bundle.getOrNull(c.getContentType() + "." + c.name + ".description") == null)
-            ) {
-                print(Strings.format("@: '@' has no bundle entry for description.", faction.name, unnamed.name));
-            }
         }
+
+        Seq<Class<?>> ignored = Seq.with(Floor.class, Boulder.class);
+        Cons<Seq<? extends Content>> checker = list -> {
+            for(var cont : list){
+                if(
+                    !(cont instanceof UnlockableContent ucont) ||
+                    (cont.minfo.mod == null || !cont.minfo.mod.name.equals("unity"))
+                ) continue;
+
+                if(Core.bundle.getOrNull(ucont.getContentType() + "." + ucont.name + ".name") == null){
+                    print(Strings.format("@ has no bundle entry for name", ucont));
+                }
+
+                if(!ignored.contains(c -> c.isAssignableFrom(ucont.getClass())) && Core.bundle.getOrNull(ucont.getContentType() + "." + ucont.name + ".description") == null){
+                    print(Strings.format("@ has no bundle entry for description", ucont));
+                }
+            }
+        };
+
+        checker.get(content.blocks());
+        checker.get(content.getBy(ContentType.item));
+        checker.get(content.getBy(ContentType.liquid));
+        checker.get(content.getBy(ContentType.planet));
+        checker.get(content.getBy(ContentType.sector));
+        checker.get(content.getBy(ContentType.status));
+        checker.get(content.getBy(ContentType.unit));
     }
 
     protected void addCredits(){

@@ -32,7 +32,7 @@ public class UnityUnitType extends UnitType{
     public Seq<String> bottomWeapons = new Seq<>();
     // worms
     public int segmentLength = 9, maxSegments = -1;
-    public float segmentOffset = 23f;
+    public float segmentOffset = 23f, headOffset = 0f;
     public float angleLimit = 30f;
     public float regenTime = -1f, healthDistribution = 0.1f;
     public float segmentDamageScl = 6f;
@@ -65,6 +65,10 @@ public class UnityUnitType extends UnitType{
     protected static Vec2 legOffsetB = new Vec2();
 
     public boolean customBackLegs = false;
+
+    // Worm Rendering
+    private final static Rect viewport = new Rect(), viewport2 = new Rect();
+    private final static int chunks = 4;
 
     public UnityUnitType(String name){
         super(name);
@@ -254,23 +258,37 @@ public class UnityUnitType extends UnitType{
         float z = Draw.z();
 
         if(unit instanceof TentaclesBase t){
+            Draw.z(z - outlineSpace);
             t.drawTentacles();
+            Draw.z(z);
         }
 
         super.drawBody(unit);
         //worm
         if(unit instanceof WormDefaultUnit wormUnit){
+            camera.bounds(viewport);
+            int index = -chunks;
             for(int i = 0; i < wormUnit.segmentUnits.length; i++){
-                Draw.z(z - (i + 1f) / 10000f);
-                if(wormUnit.regenAvailable() && i == wormUnit.segmentUnits.length - 1){
-                    int finalI = i;
-                    Draw.draw(z - (i + 2f) / 10000f, () -> {
-                        Tmp.v1.trns(wormUnit.segmentUnits[finalI].rotation + 180f, segmentOffset).add(wormUnit.segmentUnits[finalI]);
-                        Drawf.construct(Tmp.v1.x, Tmp.v1.y, tailRegion, wormUnit.segmentUnits[finalI].rotation - 90f, wormUnit.repairTime / regenTime, 1f, wormUnit.repairTime);
-                    });
+                if(i >= index + chunks){
+                    index = i;
+                    Unit seg = wormUnit.segmentUnits[index];
+                    Unit segN = wormUnit.segmentUnits[Math.min(index + chunks, wormUnit.segmentUnits.length - 1)];
+                    float grow = wormUnit.regenAvailable() && (index + chunks) >= wormUnit.segmentUnits.length - 1 ? seg.clipSize() : 0f;
+                    Tmp.r3.setCentered(segN.x, segN.y, segN.clipSize());
+                    viewport2.setCentered(seg.x, seg.y, seg.clipSize()).merge(Tmp.r3).grow(grow + (seg.clipSize() / 2f));
                 }
-                wormUnit.segmentUnits[i].drawBody();
-                drawWeapons(wormUnit.segmentUnits[i]);
+                if(viewport.overlaps(viewport2)){
+                    Draw.z(z - (i + 1f) / 10000f);
+                    if(wormUnit.regenAvailable() && i == wormUnit.segmentUnits.length - 1){
+                        int finalI = i;
+                        Draw.draw(z - (i + 2f) / 10000f, () -> {
+                            Tmp.v1.trns(wormUnit.segmentUnits[finalI].rotation + 180f, segmentOffset).add(wormUnit.segmentUnits[finalI]);
+                            Drawf.construct(Tmp.v1.x, Tmp.v1.y, tailRegion, wormUnit.segmentUnits[finalI].rotation - 90f, wormUnit.repairTime / regenTime, 1f, wormUnit.repairTime);
+                        });
+                    }
+                    wormUnit.segmentUnits[i].drawBody();
+                    drawWeapons(wormUnit.segmentUnits[i]);
+                }
             }
         }
 

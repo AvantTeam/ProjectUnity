@@ -1,89 +1,64 @@
 package unity.world.blocks.defense;
 
-import arc.audio.*;
-import arc.math.*;
+import arc.*;
+import arc.util.*;
 import mindustry.gen.*;
-import mindustry.world.blocks.defense.turrets.*;
-import unity.content.*;
-import unity.entities.*;
-import unity.entities.comp.*;
+import mindustry.graphics.*;
+import mindustry.ui.*;
+import mindustry.world.meta.*;
 
-import static mindustry.Vars.*;
-
-public class AbsorberTurret extends BaseTurret{
-    public final int timerTarget = timers++;
-    public float retargetTime = 5f;
-
-    public float shootCone = 6f;
-
+public class AbsorberTurret extends GenericTractorBeamTurret<Bullet>{
     public float powerProduction = 2.5f;
-    public float resistance = 1f;
-
-    public Sound shootSound = Sounds.tractorbeam;
-    public float shootSoundVolume = 0.9f;
+    public float resistance = 0.4f;
+    public float damageScale = 18f;
+    public float speedScale = 3.5f;
 
     public AbsorberTurret(String name){
         super(name);
-        rotateSpeed = 20f;
-        hasItems = hasLiquids = false;
-        hasPower = consumesPower = true;
-        acceptCoolant = false;
+        outputsPower = true;
     }
 
-    public class AbsorberTurretBuild extends BaseTurretBuild implements ExtensionHolder{
-        protected Extensionc ext;
-        protected Bullet target;
-        protected boolean shoot;
+    @Override
+    public void setStats(){
+        super.setStats();
+        stats.add(Stat.basePowerGeneration, powerProduction * 60f, StatUnit.powerSecond);
+    }
 
-        public float productionEfficiency;
+    @Override
+    public void setBars(){
+        super.setBars();
 
+        bars.add("power", (AbsorberTurretBuild entity) -> new Bar(() ->
+            Core.bundle.format("bar.poweroutput",
+            Strings.fixed(entity.getPowerProduction() * 60f * entity.timeScale(), 1)),
+            () -> Pal.powerBar,
+            () -> entity.getPowerProduction() / powerProduction)
+        );
+    }
+
+    public class AbsorberTurretBuild extends GenericTractorBeamTurretBuild{
         @Override
-        public void created(){
-            super.created();
-            ext = (Extensionc)UnityUnitTypes.extension.create(team);
-            ext.holder(this);
-            ext.set(x, y);
-            ext.add();
+        protected void findTarget(){
+            target = Groups.bullet
+                .intersect(x - range, y - range, range * 2f, range * 2f)
+                .min(b -> b.team != team && b.type().hittable, b -> b.dst2(this));
         }
 
         @Override
-        public void updateTile(){
-            super.updateTile();
+        protected void apply(){
+            target.vel.setLength(Math.max(target.vel.len() - resistance * strength, 0f));
+            target.damage = Math.max((resistance / 2f) * strength * Time.delta, 0f);
 
-            if(timer(timerTarget, retargetTime)){
-                target = Groups.bullet
-                    .intersect(x - range, y - range, range * 2f, range * 2f)
-                    .min(b -> b.team != team && b.type().hittable, b -> b.dst2(this));
-            }
-
-            if(target != null && target.within(this, range + target.hitSize / 2f) && target.team() != team && efficiency() > 0.02f){
-                if(!headless){
-                    control.sound.loop(shootSound, this, shootSoundVolume);
-                }
-
-                float dest = angleTo(target);
-                rotation = Angles.moveToward(rotation, dest, rotateSpeed * edelta());
-                shoot = Angles.within(rotation, dest, shootCone);
-            }else{
-                shoot = false;
-            }
-
-            if(shoot){
-                //TODO work on this
+            if(target.vel.isZero(0.01f) || target.damage <= 0f){
+                target.remove();
             }
         }
 
         @Override
-        public float clipSizeExt(){
-            if(target == null){
-                return 0f;
-            }
-            return dst(target) * 2f;
-        }
+        public float getPowerProduction(){
+            if(target == null || target.type == null) return 0f;
 
-        @Override
-        public void drawExt(){
-            //TODO work on this
+            return (target.type.damage / damageScale) * (target.vel.len() / speedScale) * powerProduction;
         }
     }
 }

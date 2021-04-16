@@ -9,6 +9,7 @@ import mindustry.type.*;
 
 import static unity.content.UnityBlocks.*;
 
+@SuppressWarnings("unused")
 public class UnityTechTree implements ContentList{
     private static TechNode context = null;
 
@@ -59,15 +60,25 @@ public class UnityTechTree implements ContentList{
         });
 
         attach(Blocks.arc, () -> {
-            node(recluse, () -> {
+            node(diviner, Seq.with(new Research(UnityItems.monolite)), () -> {
                 node(mage, () -> {
-                    node(oracle);
+                    node(heatRay);
+
+                    node(oracle, Seq.with(new Research(UnityItems.monolithAlloy)));
+                });
+
+                node(recluse, () -> {
+                    node(blackout);
                 });
             });
 
-            node(ricochet, () -> {
-                node(shellshock, () -> {
+            node(ricochet, Seq.with(new Research(UnityItems.monolite)), () -> {
+                node(shellshock, Seq.with(new Research(UnityItems.monolithAlloy)), () -> {
                     node(purge);
+                });
+
+                node(lifeStealer, () -> {
+                    node(absorberAura);
                 });
             });
         });

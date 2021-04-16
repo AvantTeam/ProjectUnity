@@ -18,6 +18,7 @@ import mindustry.graphics.*;
 import mindustry.content.*;
 import unity.*;
 import unity.ai.*;
+import unity.ai.AssistantAI.*;
 import unity.annotations.Annotations.*;
 import unity.entities.abilities.*;
 import unity.entities.bullet.*;
@@ -52,7 +53,8 @@ public class UnityUnitTypes implements ContentList{
 
     /** Global {@linkplain UnitEntity flying} units */
     public static @EntityPoint(UnitEntity.class)
-    UnitType angel, malakhim;
+    UnitType angel, malakhim,
+    discharge, pulse;
     
     /** Global {@linkplain LegsUnit legs} units */
     public static @EntityPoint(LegsUnit.class)
@@ -92,6 +94,12 @@ public class UnityUnitTypes implements ContentList{
     /** Monolith {@linkplain LegsUnit legs} units */
     public static @FactionDef("monolith") @EntityPoint(LegsUnit.class)
     UnitType pylon, monument, colossus, bastion;
+
+    public static @FactionDef("monolith") @EntityDef(base = UnitEntity.class, def = Assistantc.class)
+    UnitType adsect/*, comitate, praesid*/;
+
+    public static @FactionDef("monolith") @EntityPoint(UnitEntity.class)
+    UnitType farSeeker;
 
     public static @FactionDef("koruh") @EntityDef(base = KamiUnit.class, def = Bossc.class)
     UnitType kami;
@@ -449,6 +457,80 @@ public class UnityUnitTypes implements ContentList{
                     collidesTeam = true;
                     backColor = Pal.heal;
                     frontColor = Color.white;
+                }};
+            }});
+        }};
+
+        discharge = new UnityUnitType("discharge"){{
+            flying = true;
+            lowAltitude = true;
+            health = 60f;
+            speed = 2f;
+            accel = 0.09f;
+            drag = 0.02f;
+            hitSize = 11.5f;
+            engineOffset = 7.25f;
+            ammoType = AmmoTypes.power;
+
+            weapons.add(new Weapon(){{
+                rotate = false;
+                mirror = false;
+                x = 0f;
+                y = 0f;
+                shootY = 4f;
+                reload = 4f * 60f;
+
+                bullet = new EmpBasicBulletType(6f, 3f){{
+                    lifetime = 35f;
+                    splashDamageRadius = 20f;
+                    splashDamage = 3f;
+                    shrinkY = 0f;
+                    height = 14f;
+                    width = 11f;
+
+                    backColor = lightColor = hitColor = Pal.lancerLaser;
+                    frontColor = Color.white;
+                }};
+            }});
+        }};
+
+        pulse = new UnityUnitType("pulse"){{
+            flying = true;
+            lowAltitude = true;
+            health = 210f;
+            speed = 1.8f;
+            accel = 0.1f;
+            drag = 0.06f;
+            hitSize = 16.5f;
+            engineOffset = 8.25f;
+            ammoType = AmmoTypes.power;
+
+            weapons.add(new Weapon(){{
+                rotate = false;
+                mirror = false;
+                x = 0f;
+                y = 0f;
+                shootY = 12f;
+                reload = 3f * 60f;
+                firstShotDelay = 70f;
+                shootStatus = StatusEffects.unmoving;
+                shootStatusDuration = 70f;
+
+                bullet = new EmpBasicBulletType(6.25f, 4f){{
+                    splashDamageRadius = 25f;
+                    splashDamage = 9f;
+                    shrinkY = 0f;
+                    height = 16f;
+                    width = 12f;
+
+                    empRange = 120f;
+                    empDisconnectRange = 40f;
+                    empBatteryDamage = 11000f;
+                    empLogicDamage = 5f;
+
+                    backColor = lightColor = hitColor = Pal.lancerLaser;
+                    frontColor = Color.white;
+                    shootEffect = UnityFx.empCharge;
                 }};
             }});
         }};
@@ -2444,6 +2526,50 @@ public class UnityUnitTypes implements ContentList{
             );
         }};
 
+        adsect = new UnityUnitType("adsect"){{
+            defaultController = AssistantAI.create(Assistance.mendCore, Assistance.mine, Assistance.build);
+            health = 240f;
+            speed = 4f;
+            rotateSpeed = 15f;
+            flying = true;
+            mineTier = 2;
+            mineSpeed = 3f;
+
+            ammoType = AmmoTypes.powerLow;
+            engineColor = UnityPal.monolith;
+            outlineColor = UnityPal.darkOutline;
+
+            weapons.add(
+            new Weapon(){{
+                mirror = false;
+                rotate = false;
+                x = 0f;
+                y = 4f;
+                reload = 10f;
+                shootCone = 40f;
+
+                shootSound = Sounds.lasershoot;
+                bullet = new LaserBoltBulletType(4f, 23f){{
+                    keepVelocity = false;
+                    healPercent = 1.5f;
+                    lifetime = 32f;
+                    collidesTeam = true;
+                    frontColor = UnityPal.monolithLight;
+                    backColor = UnityPal.monolith;
+                }};
+            }}
+            );
+        }};
+
+        farSeeker = new UnityUnitType("far-seeker"){{
+            defaultController = FarSeekerAI::new;
+            health = 100000f;
+            speed = 14f;
+            flying = true;
+            accel = 0.08f;
+            drawCell = false;
+        }};
+
         kami = new RainbowUnitType("kami-mkii"){{
             defaultController = EmptyAI::new;
             health = 120000f;
@@ -2523,10 +2649,11 @@ public class UnityUnitTypes implements ContentList{
             splittable = chainable = false;
             hitSize = 41f * 1.55f;
             segmentOffset = (41f * 1.55f) + 1f;
-            segmentLength = 45;
+            headOffset = 27.75f;
+            segmentLength = 60;
             lowAltitude = true;
             visualElevation = 2f;
-            rotateSpeed = 3.2f;
+            rotateSpeed = 1.9f;
             engineSize = -1f;
             range = 480f;
             armor = 16f;
@@ -2548,7 +2675,7 @@ public class UnityUnitTypes implements ContentList{
                 mirror = false;
                 ignoreRotation = true;
                 x = 0f;
-                y = 18f;
+                y = 23f;
                 reload = 15f * 60f;
                 continuous = true;
                 shake = 4f;
@@ -2587,8 +2714,8 @@ public class UnityUnitTypes implements ContentList{
                 mirror = true;
                 ignoreRotation = true;
                 rotate = true;
-                x = 22f;
-                y = -17.75f;
+                x = 19.25f;
+                y = -22.75f;
                 shootY = 12f;
                 shadow = 16f;
                 reload = 1.5f * 60;
@@ -2651,7 +2778,7 @@ public class UnityUnitTypes implements ContentList{
                 y = 16.5f;
                 reload = 2f * 60;
                 shadow = 14f;
-                shootSound = Sounds.beam;
+                shootSound = UnitySounds.continuousLaserB;
                 continuous = true;
 
                 bullet = UnityBullets.endLaserSmall;
@@ -2672,7 +2799,7 @@ public class UnityUnitTypes implements ContentList{
             drag = 0.06f;
             armor = 17f;
             hitSize = 205f;
-            rotateSpeed = 0.8f;
+            rotateSpeed = 0.3f;
             visualElevation = 3f;
             engineOffset = 116.5f;
             engineSize = 14f;
@@ -2750,14 +2877,16 @@ public class UnityUnitTypes implements ContentList{
                 shadow = 63f;
                 shootCone = 1f;
                 reload = 6f * 60f;
-                bullet = new EndCutterLaserBulletType(3400f){{
+                shootSound = UnitySounds.continuousLaserB;
+                bullet = new EndCutterLaserBulletType(3100f){{
                     maxLength = 1200f;
                     lifetime = 3f * 60f;
                     width = 17f;
                     antiCheatScl = 5f;
                     laserSpeed = 70f;
+                    buildingDamageMultiplier = 0.4f;
                     lightningColor = UnityPal.scarColor;
-                    lightningDamage = 65f;
+                    lightningDamage = 55f;
                     lightningLength = 13;
 
                     minimumPower = 64000f;
@@ -2772,7 +2901,8 @@ public class UnityUnitTypes implements ContentList{
                 rotationOffset = 30f;
 
                 rotationSpeed = 3f;
-                speed = 2f;
+                accel = 0.2f;
+                speed = 4f;
 
                 segments = 15;
                 segmentLength = 37.25f;
@@ -2788,7 +2918,8 @@ public class UnityUnitTypes implements ContentList{
                 rotationOffset = 10f;
 
                 rotationSpeed = 3f;
-                speed = 2f;
+                accel = 0.2f;
+                speed = 4f;
 
                 segments = 10;
                 segmentLength = 37.25f;
@@ -2799,6 +2930,42 @@ public class UnityUnitTypes implements ContentList{
                 automatic = false;
                 continuous = true;
                 reload = 4f * 60f;
+            }}, new TentacleType("unity-apocalypse-small-tentacle"){{
+                x = 104.25f;
+                y = -49f;
+                rotationOffset = 35f;
+
+                rotationSpeed = 3f;
+                accel = 0.15f;
+                speed = 5f;
+
+                segments = 20;
+                segmentLength = 28f;
+                swayOffset = 120f;
+                swayMag = 0.02f;
+                swayScl = 120f;
+
+                bullet = null;
+                automatic = true;
+                tentacleDamage = 430f;
+            }}, new TentacleType("unity-apocalypse-small-tentacle"){{
+                x = 69.75f;
+                y = -74.25f;
+                rotationOffset = 20f;
+
+                rotationSpeed = 3f;
+                accel = 0.15f;
+                speed = 5f;
+
+                segments = 23;
+                segmentLength = 28f;
+                swayOffset = 70f;
+                swayMag = 0.02f;
+                swayScl = 120f;
+
+                bullet = null;
+                automatic = true;
+                tentacleDamage = 430f;
             }});
         }
 

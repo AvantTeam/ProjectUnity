@@ -22,6 +22,38 @@ public class IconGenerator implements Generator{
     public void generate(){
         Func<TextureRegion, String> parseName = reg -> ((AtlasRegion)reg).name.replaceFirst("unity-", "");
 
+        content.items().each(item -> {
+            if(item.minfo.mod == null) return;
+
+            try{
+                item.init();
+
+                if(item instanceof AnimatedItem anim){
+                    for(int i = 0; i < anim.frames; i++){
+                        String fname = anim.name.replaceFirst("unity-", "") + (i + 1);
+
+                        Sprite sprite = SpriteProcessor.get(fname);
+                        sprite.antialias();
+
+                        sprite.save(fname);
+                    }
+                }else{
+                    String fname = item.name.replaceFirst("unity-", "");
+
+                    Sprite sprite = SpriteProcessor.get(fname);
+                    sprite.antialias();
+
+                    sprite.save(fname);
+                }
+            }catch(Throwable e){
+                if(e instanceof IllegalArgumentException i){
+                    Log.err("Skipping item @: @", item, i.getMessage());
+                }else{
+                    Log.err(Strings.format("Problematic item @", item), e);
+                }
+            }
+        });
+
         content.units().each(t -> {
             if(t.minfo.mod == null || !(t instanceof UnityUnitType)) return;
 
@@ -209,12 +241,12 @@ public class IconGenerator implements Generator{
                     }
                 }
 
-                genIcon(icon.antialias(), fname);
+                icon.antialias().save(fname + "-full");
             }catch(Throwable e){
                 if(e instanceof IllegalArgumentException i){
-                    Log.err("Skipping unit @: @", type.name, i.getMessage());
+                    Log.err("Skipping unit @: @", type, i.getMessage());
                 }else{
-                    Log.err(e);
+                    Log.err(Strings.format("Problematic unit @", type), e);
                 }
             }
         });
@@ -246,57 +278,11 @@ public class IconGenerator implements Generator{
                 }
             }catch(Throwable e){
                 if(e instanceof IllegalArgumentException i){
-                    Log.err("Skipping item @: @", block.name, i.getMessage());
+                    Log.err("Skipping block @: @", block, i.getMessage());
                 }else{
-                    Log.err(e);
+                    Log.err(Strings.format("Problematic block @", block), e);
                 }
             }
         });
-
-        content.items().each(item -> {
-            if(item.minfo.mod == null) return;
-
-            try{
-                item.init();
-                item.load();
-
-                if(item instanceof AnimatedItem anim){
-                    for(int i = 0; i < anim.animSize; i++){
-                        String fname = anim.name.replaceFirst("unity-", "") + (i + 1);
-
-                        Sprite sprite = SpriteProcessor.get(fname);
-                        sprite.antialias();
-
-                        sprite.save(fname);
-                        genIcon(sprite, fname);
-                    }
-                }else{
-                    String fname = item.name.replaceFirst("unity-", "");
-
-                    Sprite sprite = SpriteProcessor.get(fname);
-                    sprite.antialias();
-
-                    sprite.save(fname);
-                    genIcon(sprite, fname);
-                }
-            }catch(Throwable e){
-                if(e instanceof IllegalArgumentException i){
-                    Log.err("Skipping item @: @", item.name, i.getMessage());
-                }else{
-                    Log.err(e);
-                }
-            }
-        });
-    }
-
-    private void genIcon(Sprite sprite, String name){
-        sprite.save(name + "-full");
-        for(Cicon i : Cicon.scaled){
-            Vec2 size = Scaling.fit.apply(sprite.width, sprite.height, i.size, i.size);
-            Sprite scaled = new Sprite((int)size.x, (int)size.y);
-
-            scaled.drawScaled(sprite);
-            scaled.save("ui/" + name + "-" + i.name());
-        }
     }
 }

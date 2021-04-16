@@ -23,10 +23,19 @@ public class ScriptedSector extends SectorPreset{
         Events.on(StateChangeEvent.class, e -> {
             if(e.to == State.playing && !added && valid()){
                 added = true;
-                reset();
 
-                Events.on((Class<Trigger>)Trigger.update.getClass(), updater);
-                Events.on((Class<Trigger>)Trigger.draw.getClass(), drawer);
+                Cons<Trigger>[] set = new Cons[1];
+                set[0] = t -> {
+                    if(state.getSector() == null || !state.getSector().hasBase()){
+                        reset();
+                    }
+    
+                    Events.on((Class<Trigger>)Trigger.update.getClass(), updater);
+                    Events.on((Class<Trigger>)Trigger.draw.getClass(), drawer);
+                    Events.remove((Class<Trigger>)Trigger.newGame.getClass(), set[0]);
+                };
+
+                Events.on((Class<Trigger>)Trigger.newGame.getClass(), set[0]);
             }
         });
     }
@@ -34,7 +43,6 @@ public class ScriptedSector extends SectorPreset{
     public void update(){
         if(!valid() && added){
             added = false;
-            reset();
 
             Events.remove((Class<Trigger>)Trigger.update.getClass(), updater);
             Events.remove((Class<Trigger>)Trigger.draw.getClass(), drawer);
@@ -53,6 +61,10 @@ public class ScriptedSector extends SectorPreset{
             if(objective.qualified()){
                 objective.execution++;
                 objective.execute();
+            }
+
+            if(objective.isExecuted() && !objective.isFinalized()){
+                objective.doFinalize();
             }
         }
     }
@@ -73,14 +85,13 @@ public class ScriptedSector extends SectorPreset{
     }
 
     public boolean valid(){
-        return state.map != null
-        ?   state.map.name().equals(generator.map.name())
+        return state.getSector() != null
+        ?   state.getSector().id == sector.id
         :   (
-            state.rules != null
+            state.map != null
             ?   (
-                state.rules.sector != null
-                ?   state.rules.sector.id == sector.id
-                :   false
+                state.map.name().equals(generator.map.name()) &&
+                state.map.mod != null && state.map.mod.name.equals("unity")
             )
             :   false
         );

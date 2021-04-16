@@ -1,5 +1,6 @@
 package unity.util;
 
+import arc.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -8,7 +9,6 @@ import arc.math.Interp.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.pooling.Pools;
 import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
@@ -35,12 +35,7 @@ public final class Utils{
     private static Posc result;
     private static float cdist;
     private static Tile furthest;
-    private static Point2[] dirs = new Point2[]{
-        new Point2(1, 0),
-        new Point2(0, 1),
-        new Point2(-1, 0),
-        new Point2(0, -1)
-    };
+    private static boolean hit;
 
     public static <T extends Buildingc> Tile getBestTile(T build, int before, int after){
         Tile tile = build.tile();
@@ -114,36 +109,6 @@ public final class Utils{
         return any;
     }
 
-    public static SidePos getConnectSidePos(int index, int size, int rotation){
-        int side = Mathf.floor(index / size);
-        side = (side + rotation) % 4;
-
-        Point2 tangent = dirs[(side + 1) % 4];
-        int originx = 0;
-        int originy = 0;
-
-        if(size > 1){
-            originx += Mathf.floor(size / 2);
-            originy += Mathf.floor(size / 2);
-            originy -= (size - 1);
-            if(side > 0){
-                for(int i = 1; i <= side; i++){
-                    originx += dirs[i].x * (size - 1);
-                    originy += dirs[i].y * (size - 1);
-                }
-            }
-
-            originx += tangent.x * (index % size);
-            originy += tangent.y * (index % size);
-        }
-
-        return Pools.obtain(SidePos.class, SidePos::new).set(
-            Tmp.p1.set(originx, originy),
-            Tmp.p2.set(originx + dirs[side].x, originy + dirs[side].y),
-            side
-        );
-    }
-
     public static float angleDistSigned(float a, float b){
         a += 360f;
         a %= 360f;
@@ -152,6 +117,14 @@ public final class Utils{
         float d = Math.abs(a - b) % 360f;
         int sign = (a - b >= 0f && a - b <= 180f) || (a - b <= -180f && a - b >= -360f) ? 1 : -1;
         return (d > 180f ? 360f - d : d) * sign;
+    }
+
+    public static float angleDistSigned(float a, float b, float start){
+        float dst = angleDistSigned(a, b);
+        if(Math.abs(dst) > start){
+            return dst > 0 ? dst - start : dst + start;
+        }
+        return 0f;
     }
 
     public static float angleDist(float a, float b){
@@ -451,9 +424,10 @@ public final class Utils{
                         }
                     }
                 });
+                hit = false;
                 tmpUnitSeq.sort(sort).each(e -> {
                     if(e instanceof Unit) unitC.get((Unit)e);
-                    if(e instanceof Building && buildC != null) buildC.get((Building)e);
+                    if(e instanceof Building && buildC != null && !hit) hit = buildC.get((Building)e);
                 });
                 tmpUnitSeq.clear();
             }
@@ -573,6 +547,32 @@ public final class Utils{
             regions[i] = reg;
         }
         return regions;
+    }
+
+    /**
+     * Lerps 2 TextureRegions.
+     * @author sk7725
+     */
+    public static TextureRegion blendSprites(TextureRegion a, TextureRegion b, float f, String name){
+        PixmapRegion r1 = Core.atlas.getPixmap(a);
+        PixmapRegion r2 = Core.atlas.getPixmap(b);
+
+        Pixmap out = new Pixmap(r1.width, r1.height, r1.pixmap.getFormat());
+        out.setBlending(Pixmap.Blending.none);
+        Color color1 = new Color();
+        Color color2 = new Color();
+
+        for(int x = 0; x < r1.width; x++){
+            for(int y = 0; y < r1.height; y++){
+
+                r1.getPixel(x, y, color1);
+                r2.getPixel(x, y, color2);
+                out.draw(x, y, color1.lerp(color2, f));
+            }
+        }
+
+        Texture texture  = new Texture(out);
+        return Core.atlas.addRegion(name + "-blended-" + (int)(f * 100), new TextureRegion(texture));
     }
 
     public static Color tempColor(float temp){

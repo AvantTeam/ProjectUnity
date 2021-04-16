@@ -4,6 +4,7 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.scene.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.io.*;
@@ -111,6 +112,14 @@ public class LoreMessageBlock extends Block{
                         .grow()
                         .pad(6f);
                 })
+                    .update(p -> {
+                        if(p.hasScroll()){
+                            Element result = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
+                            if(result == null || !result.isDescendantOf(p)){
+                                Core.scene.setScrollFocus(null);
+                            }
+                        }
+                    })
                     .grow()
                     .pad(6f)
                     .get();

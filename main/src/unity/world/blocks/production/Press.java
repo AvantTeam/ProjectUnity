@@ -1,10 +1,12 @@
 package unity.world.blocks.production;
 
-import arc.Core;
+import arc.*;
+import arc.audio.*;
 import arc.math.*;
 import arc.graphics.g2d.*;
 import arc.util.*;
 import mindustry.content.*;
+import mindustry.entities.*;
 import mindustry.game.*;
 import mindustry.world.blocks.production.*;
 import unity.content.*;
@@ -15,6 +17,8 @@ import static mindustry.Vars.*;
 public class Press extends GenericCrafter {
     public float movementSize = 10f;
     public float fxYVariation = 15f / tilesize;
+    public Sound clangSound = UnitySounds.clang;
+    public Effect sparkEffect = UnityFx.spark;
     public TextureRegion leftRegion, rightRegion, baseRegion;
 
     public Press(String name){
@@ -72,9 +76,10 @@ public class Press extends GenericCrafter {
         @Override
         public void consume(){
             super.consume();
-            UnitySounds.clang.at(x, y, Mathf.random(0.9f, 1.1f));
+            clangSound.at(x, y, Mathf.random(0.6f, 0.8f));
+
             for(int i = 0; i < 8; i++){
-                UnityFx.spark.at(x,  y + Mathf.random(-fxYVariation, fxYVariation), Mathf.random() * 360, Items.surgeAlloy.color, Mathf.random() + 0.5f);
+                sparkEffect.at(x,  y + Mathf.range(fxYVariation), Mathf.random() * 360, Items.surgeAlloy.color, Mathf.random() + 0.5f);
             }
         }
     }

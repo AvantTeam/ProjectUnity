@@ -729,6 +729,20 @@ public class UnityFx{
         color();
     }).layer(Layer.flyingUnit + 1f),
 
+    empShockwave = new Effect(30f, 800f, e -> {
+        color(Pal.lancerLaser);
+        Lines.stroke(e.fout() + 0.5f);
+        Lines.circle(e.x, e.y, e.rotation * Mathf.curve(e.fin(), 0f, 0.23f));
+    }),
+
+    empCharge = new Effect(70f, e -> {
+        color(Pal.lancerLaser);
+        UnityDrawf.shiningCircle(e.id * 63, Time.time, e.x, e.y, 4f * e.fin(), 7, 15f, 24f * e.fin(), 2f * e.fin());
+        color(Color.white);
+        UnityDrawf.shiningCircle(e.id * 63, Time.time, e.x, e.y, 2f * e.fin(), 7, 15f, 38f * e.fin(), e.fin());
+        color();
+    }),
+
     blueTriangleTrail = new Effect(50f, e -> {
         color(Color.white, Pal.lancerLaser, e.fin());
         Fill.poly(e.x, e.y, 3, 4f * e.fout(), -90f);
@@ -875,19 +889,16 @@ public class UnityFx{
         z(oz);
     }),
 
-    devourerShootEffect = new Effect(41f, e -> {
-        Color[] colors = {UnityPal.scarColorAlpha, UnityPal.scarColor, UnityPal.endColor, Color.white};
+    devourerShootEffect = new ParentEffect(41f, e -> {
+        Color[] colors = {UnityPal.scarColor, UnityPal.endColor, Color.white};
 
         for(int i = 0; i < colors.length; i++){
             color(colors[i]);
-            float size = Math.max(0f, (e.fslope() * 35f) - (i * ((7f + (1f - e.fslope())) * 2f)));
-            Fill.circle(e.x, e.y, size);
+            float scl = (colors.length - (i / 1.25f)) * (17f / colors.length);
+            float width = (35f / (1f + (i / Mathf.pi))) * e.fin();
+            float spikeIn = e.fslope() * scl * 1.5f;
 
-            int finalI = i;
-            Angles.randLenVectors(e.id, 13, 140f, (x, y) -> {
-                float s = 3.4f + (colors.length - finalI);
-                Fill.circle(e.x + (x * (1f - e.finpow())), e.y + (y * (1f - e.finpow())), e.fin() * 2f * s);
-            });
+            UnityDrawf.shiningCircle(e.id * 241, Time.time + (i * 3f), e.x, e.y, scl * e.fin(), 9, 12f, width, spikeIn);
         }
     }),
 

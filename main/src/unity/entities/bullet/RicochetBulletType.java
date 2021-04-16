@@ -68,8 +68,8 @@ public class RicochetBulletType extends BasicBulletType{
         if(data.ricochet < pierceCap){
             data.findEnemy(b);
             if(data.target != null){
-                if(data.target instanceof Velc){
-                    Vec2 out = Predict.intercept(b, data.target, b.vel.len());
+                if(data.target instanceof Hitboxc v){
+                    Vec2 out = Predict.intercept(b.x, b.y, v.x(), v.y(), v.deltaX(), v.deltaY(), b.vel.len());
                     float rot = out.sub(b.x, b.y).angle();
                     b.vel.setAngle(rot);
                 }else{

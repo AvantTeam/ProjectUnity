@@ -5,6 +5,7 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.util.*;
 import mindustry.graphics.*;
 
 public class UnityDrawf{
@@ -27,6 +28,31 @@ public class UnityDrawf{
          3,  0,  3,  0, 15, 42, 15, 12,  3,  0,  3,  0, 15, 42, 15, 12,
          2,  1,  2,  1,  9, 45,  9, 19,  2,  1,  2,  1, 14, 18, 14, 13
     };
+
+    public static void shiningCircle(int seed, float time, float x, float y, float radius, int spikes, float spikeDuration, float spikeWidth, float spikeHeight){
+        Fill.circle(x, y, radius);
+        spikeWidth = Math.min(spikeWidth, 90f);
+        float[] v = new float[6];
+        int idx = 0;
+
+        for(int i = 0; i < spikes; i++){
+            float timeOffset = Mathf.randomSeed((seed + i) * 314L, 0f, spikeDuration);
+            int timeSeed = Mathf.floor((time + timeOffset) / spikeDuration);
+            float fin = ((time + timeOffset) % spikeDuration) / spikeDuration;
+            float fslope = (0.5f - Math.abs(fin - 0.5f)) * 2f;
+            float angle = Mathf.randomSeed(Math.max(timeSeed, 1) + ((i + seed) * 245L), 360f);
+            if(fslope > 0.0001f){
+                idx = 0;
+                for(int j = 0; j < 3; j++){
+                    float angB = (j * spikeWidth - (2f) * spikeWidth / 2f) + angle;
+                    Tmp.v1.trns(angB, radius + (j == 1 ? (spikeHeight * fslope) : 0f)).add(x, y);
+                    v[idx++] = Tmp.v1.x;
+                    v[idx++] = Tmp.v1.y;
+                }
+                Fill.tri(v[0], v[1], v[2], v[3], v[4], v[5]);
+            }
+        }
+    }
 
     public static void snowFlake(float x, float y, float r, float s){ 
         for(int i = 0; i < 3; i++){
