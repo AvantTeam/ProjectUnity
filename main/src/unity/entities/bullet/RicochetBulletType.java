@@ -6,6 +6,7 @@ import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 
+/** @author GlennFolker */
 public class RicochetBulletType extends BasicBulletType{
     public int trailLength = 6;
 

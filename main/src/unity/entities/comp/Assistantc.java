@@ -12,6 +12,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
 
+/** @author GlennFolker */
 public interface Assistantc extends Unitc{
     String lastText();
     void lastText(String lastText);

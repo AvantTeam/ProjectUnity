@@ -22,6 +22,7 @@ import static mindustry.Vars.*;
 import static mindustry.content.Blocks.*;
 import static unity.content.UnityBlocks.*;
 
+/** @author GlennFolker */
 public class MegalithPlanetGenerator extends PlanetGenerator{
     protected RidgedPerlin rid = new RidgedPerlin(1, 2);
     protected BaseGenerator basegen = new BaseGenerator();

@@ -18,6 +18,7 @@ import unity.graphics.*;
 
 import static mindustry.Vars.*;
 
+/** @author GlennFolker */
 public class DeflectProjector extends Block{
     public final int timerUse = timers++;
 

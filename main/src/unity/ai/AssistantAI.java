@@ -17,6 +17,7 @@ import unity.util.*;
 
 import static mindustry.Vars.*;
 
+/** @author GlennFolker */
 public class AssistantAI extends FlyingAI{
     protected static IntMap<ObjectSet<Unit>> hooks = new IntMap<>();
 

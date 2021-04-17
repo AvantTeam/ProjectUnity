@@ -1,5 +1,9 @@
 package unity.type.exp;
 
+/**
+ * @author GlennFolker
+ * @author sk7725
+ */
 public enum ExpFieldType{
     linear,
     exp,

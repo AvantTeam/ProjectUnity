@@ -5,6 +5,7 @@ import mindustry.gen.*;
 import unity.annotations.Annotations.*;
 import unity.sync.*;
 
+/** @author GlennFolker */
 public interface Bossc extends Unitc{
     @Override
     @MethodPriority(-1)

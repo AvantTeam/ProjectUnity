@@ -17,6 +17,7 @@ import unity.mod.*;
 
 import static mindustry.Vars.*;
 
+/** @author GlennFolker */
 public class LoreMessageBlock extends Block{
     public final Faction faction;
     public final Color color;

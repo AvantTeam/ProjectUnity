@@ -6,6 +6,7 @@ import arc.files.*;
 import arc.struct.*;
 import arc.util.*;
 
+/** @author GlennFolker */
 @SuppressWarnings("rawtypes")
 public class WavefrontObjectLoader extends AsynchronousAssetLoader<WavefrontObject, WavefrontObjectLoader.WavefrontObjectParameters>{
     private WavefrontObject object;

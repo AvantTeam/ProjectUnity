@@ -15,6 +15,7 @@ import unity.graphics.*;
 
 import static mindustry.Vars.*;
 
+/** @author GlennFolker */
 public abstract class GenericTractorBeamTurret<T extends Teamc> extends BaseTurret{
     public final int timerTarget = timers++;
     public float retargetTime = 5f;

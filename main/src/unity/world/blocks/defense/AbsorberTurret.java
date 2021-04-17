@@ -7,6 +7,7 @@ import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.world.meta.*;
 
+/** @author GlennFolker */
 public class AbsorberTurret extends GenericTractorBeamTurret<Bullet>{
     public float powerProduction = 2.5f;
     public float resistance = 0.4f;

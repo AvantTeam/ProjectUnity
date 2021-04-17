@@ -9,6 +9,7 @@ import mindustry.type.*;
 
 import static mindustry.Vars.*;
 
+/** @author GlennFolker */
 @SuppressWarnings("unchecked")
 public class ScriptedSector extends SectorPreset{
     public Seq<SectorObjective> objectives = new Seq<>();

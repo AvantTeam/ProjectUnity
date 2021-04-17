@@ -14,6 +14,7 @@ import unity.graphics.*;
 
 import static mindustry.Vars.*;
 
+/** @author GlennFolker */
 public class LifeStealerTurret extends GenericTractorBeamTurret<Teamc>{
     public boolean targetAir = true;
     public boolean targetGround = true;
@@ -53,6 +54,7 @@ public class LifeStealerTurret extends GenericTractorBeamTurret<Teamc>{
             }
         }
 
+        //TODO why did the code that calls this method gone missing
         protected void tryHeal(){
             boolean any = indexer.eachBlock(this, range, b -> b.health() < b.maxHealth(), b -> {
                 healTrnsEffect.at(x, y, rotation, new Float[]{x, y, b.x, b.y, 2.5f + Mathf.range(0.3f)});

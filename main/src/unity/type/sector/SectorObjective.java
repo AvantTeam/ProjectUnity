@@ -18,6 +18,7 @@ import mindustry.ui.*;
 
 import static mindustry.Vars.*;
 
+/** @author GlennFolker */
 @SuppressWarnings("unchecked")
 public abstract class SectorObjective{
     private final Cons<SectorObjective> executor;

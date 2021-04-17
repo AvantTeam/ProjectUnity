@@ -14,6 +14,7 @@ import unity.mod.TapHandler.*;
 
 import static mindustry.Vars.*;
 
+/** @author GlennFolker */
 public abstract class BaseAbility extends Ability implements TapListener{
     public boolean useSlots = true;
     /** If true, ability will use {@link #rechargeTime} and calls {@link #use(Unit, float, float)}.

@@ -5,6 +5,7 @@ import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 
+/** @author GlennFolker */
 public class HeatRayTurret extends GenericTractorBeamTurret<Teamc>{
     public boolean targetAir = true;
     public boolean targetGround = true;

@@ -12,6 +12,7 @@ import unity.mod.*;
 import static mindustry.content.UnitTypes.*;
 import static unity.content.UnityUnitTypes.*;
 
+/** @author GlennFolker */
 public final class UnityWaves{
     private static ObjectMap<Faction, Func3<Float, Rand, Boolean, Seq<SpawnGroup>>> generators = new ObjectMap<>();
 

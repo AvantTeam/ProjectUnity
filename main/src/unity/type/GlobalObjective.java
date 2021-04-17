@@ -2,7 +2,10 @@ package unity.type;
 
 import arc.*;
 
-/** Maximum amount is 64 */
+/**
+ * Maximum amount is 64.
+ * @author GlennFolker
+ */
 public enum GlobalObjective{
     sectorAccretionComplete;
 

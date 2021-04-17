@@ -7,6 +7,10 @@ import arc.util.*;
 import unity.annotations.Annotations.*;
 import unity.type.*;
 
+/**
+ * @author GlennFolker
+ * @author MEEPofFaith
+ */
 public interface Copterc extends Unitc{
     @Initialize("1f")
     float rotorSpeedScl();

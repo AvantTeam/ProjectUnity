@@ -6,6 +6,7 @@ import mindustry.graphics.*;
 import unity.annotations.Annotations.*;
 import unity.graphics.*;
 
+/** @author GlennFolker */
 @FactionBase
 public enum Faction{
     scar("scar", Pal.remove),

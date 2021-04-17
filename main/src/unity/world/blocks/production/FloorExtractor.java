@@ -17,6 +17,7 @@ import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
+/** @author GlennFolker */
 public class FloorExtractor extends GenericCrafter{
     private static Seq<Tile> source = new Seq<>();
 

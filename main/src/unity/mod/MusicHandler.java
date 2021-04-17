@@ -11,6 +11,7 @@ import unity.gen.*;
 
 import static mindustry.Vars.*;
 
+/** @author GlennFolker */
 public class MusicHandler implements ApplicationListener{
     private ObjectMap<String, MusicLoopData> loopDatas = new ObjectMap<>();
     private MusicLoopData currentData = null;
@@ -20,28 +21,6 @@ public class MusicHandler implements ApplicationListener{
     private boolean introPassed = false;
 
     public void setup(){
-        /*if(netClient != null){
-            netClient.addPacketHandler("unity.bossmusic.play", this::play);
-
-            netClient.addPacketHandler("unity.bossmusic.stop", this::stop);
-        }else{
-            Log.warn("netClient is null");
-        }
-
-        if(netServer != null){
-            netServer.addPacketHandler("unity.bossmusic.play", (p, name) -> {
-                Log.info("Sending packet to client");
-                Call.clientPacketReliable("unity.bossmusic.play", name);
-            });
-
-            netServer.addPacketHandler("unity.bossmusic.stop", (p, name) -> {
-                Log.info("Sending packet to client");
-                Call.clientPacketReliable("unity.bossmusic.stop", name);
-            });
-        }else{
-            Log.warn("netServer is null");
-        }*/
-
         Events.on(SectorLaunchEvent.class, e -> {
             Planet p = e.sector.planet;
 

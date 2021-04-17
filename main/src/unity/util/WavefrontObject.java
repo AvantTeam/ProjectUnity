@@ -21,6 +21,7 @@ import java.io.*;
  * The faces should not intersect. (no crashes, its just that the renderer doesnt support it.)
  * 
  * @author EyeOfDarkness
+ * @author GlennFolker
  */
 public class WavefrontObject{
     protected static final float zScale = 0.01f;

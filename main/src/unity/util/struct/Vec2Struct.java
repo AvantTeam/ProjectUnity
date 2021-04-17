@@ -2,6 +2,7 @@ package unity.util.struct;
 
 import arc.math.geom.*;
 
+/** @author GlennFolker */
 public final class Vec2Struct{
     private static final Vec2 ref = new Vec2();
     private static final long bits32f = 0b0000000000000000000000000000000011111111111111111111111111111111L;

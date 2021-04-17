@@ -13,6 +13,7 @@ import unity.content.*;
 
 import static mindustry.Vars.*;
 
+/** @author GlennFolker */
 public class TeleportAbility<T extends Teamc & Hitboxc> extends BaseAbility{
     public float teleportDistance;
 

@@ -30,6 +30,7 @@ import java.lang.reflect.*;
 
 import static mindustry.Vars.*;
 
+/** @author GlennFolker */
 @MergeComp
 @SuppressWarnings({"rawtypes", "unchecked"})
 class ExpComp extends Block{

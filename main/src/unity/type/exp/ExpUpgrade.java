@@ -2,6 +2,7 @@ package unity.type.exp;
 
 import mindustry.world.*;
 
+/** @author GlennFolker */
 public class ExpUpgrade{
     public final Block type;
     /** Do NOT modify directly */

@@ -5,6 +5,7 @@ import unity.annotations.Annotations.*;
 import unity.entities.*;
 import unity.util.*;
 
+/** @author GlennFolker */
 public interface Extensionc extends Drawc{
     ExtensionHolder holder();
     void holder(ExtensionHolder holder);

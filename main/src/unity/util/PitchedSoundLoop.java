@@ -3,6 +3,7 @@ package unity.util;
 import arc.*;
 import arc.audio.*;
 
+/** @author GlennFolker */
 public class PitchedSoundLoop{
     private final Sound sound;
     private int id = -1;

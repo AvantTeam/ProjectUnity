@@ -20,6 +20,7 @@ import unity.type.exp.*;
 
 import static mindustry.Vars.*;
 
+/** @author GlennFolker */
 public class ExpOrbs{
     public static final float expAmount = 10f;
 

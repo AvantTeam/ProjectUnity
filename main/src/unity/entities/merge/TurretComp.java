@@ -15,6 +15,7 @@ import unity.annotations.Annotations.*;
 import unity.entities.bullet.exp.*;
 import unity.gen.Expc.*;
 
+/** @author GlennFolker */
 @MergeComp
 class TurretComp extends Turret{
     /** Color of shoot effects. Shifts to second color as the turret levels up. */

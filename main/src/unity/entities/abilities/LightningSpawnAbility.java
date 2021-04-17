@@ -14,6 +14,7 @@ import unity.content.*;
 import static arc.Core.*;
 import static mindustry.Vars.*;
 
+/** @author GlennFolker */
 public class LightningSpawnAbility extends Ability{
     protected final Interval timer = new Interval(1);
     protected float timerTarget;

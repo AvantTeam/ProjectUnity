@@ -10,6 +10,7 @@ import mindustry.gen.*;
 
 import static mindustry.Vars.*;
 
+/** @author GlennFolker */
 public class FarSeekerAI implements UnitController{
     protected Unit unit;
     protected Teamc target;

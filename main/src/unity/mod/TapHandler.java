@@ -12,6 +12,7 @@ import unity.sync.*;
 
 import static mindustry.Vars.*;
 
+/** @author GlennFolker */
 public class TapHandler{
     private Seq<TapListener> listeners = new Seq<>();
     private boolean press = false;

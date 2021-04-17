@@ -2,6 +2,7 @@ package unity.type.exp;
 
 import java.lang.reflect.*;
 
+/** @author GlennFolker */
 @SuppressWarnings("rawtypes")
 public class ExpField{
     public final ExpFieldType type;

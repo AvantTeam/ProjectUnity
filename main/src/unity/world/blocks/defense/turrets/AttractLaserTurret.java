@@ -14,6 +14,7 @@ import unity.util.*;
 
 import java.lang.reflect.*;
 
+/** @author GlennFolker */
 public class AttractLaserTurret extends LaserTurret{
     public float chargeWarmup = 0.002f;
     public float chargeCooldown = 0.01f;

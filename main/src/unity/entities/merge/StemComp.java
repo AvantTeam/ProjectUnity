@@ -6,6 +6,7 @@ import mindustry.world.*;
 import unity.annotations.Annotations.*;
 import unity.gen.Stemc.*;
 
+/** @author GlennFolker */
 @MergeComp
 @SuppressWarnings("unchecked")
 public class StemComp extends Block{

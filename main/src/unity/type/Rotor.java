@@ -4,7 +4,10 @@ import arc.*;
 import arc.graphics.g2d.*;
 import mindustry.io.*;
 
-//same as Weapon directory.
+/**
+ * @author younggam
+ * @author GlennFolker
+ */
 public class Rotor{
     public final String name;
 

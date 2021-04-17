@@ -14,6 +14,7 @@ import unity.content.*;
 
 import static mindustry.Vars.*;
 
+/** @author GlennFolker */
 public class SlashAbility extends BaseAbility{
     public float slashDistance = 18f * tilesize;
 

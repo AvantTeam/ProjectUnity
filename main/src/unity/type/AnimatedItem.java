@@ -9,6 +9,10 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import unity.util.*;
 
+/**
+ * @author GlennFolker
+ * @author sk7725
+ */
 public class AnimatedItem extends Item{
     /** Number of frames */
     public int frames = 5;
