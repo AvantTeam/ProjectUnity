@@ -193,6 +193,15 @@ public class Emp{
                                     }
                                 }
                             }
+                            default -> {
+                                for(int j = 1; j < line.length; j++){
+                                    if(Strings.canParseFloat(line[j])){
+                                        float par = Strings.parseFloat(line[j]);
+                                        par += Mathf.range(logicIntensity);
+                                        line[j] = par + "";
+                                    }
+                                }
+                            }
                         }
                         for(int j = 0; j < line.length; j++){
                             String s = line[j];
