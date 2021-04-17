@@ -193,6 +193,14 @@ public class Emp{
                                     }
                                 }
                             }
+                            case "jump" -> {
+                                if(Strings.canParseInt(line[1]) && Mathf.round((logicIntensity - 30f) / 5f) >= 1){
+                                    int par = Strings.parseInt(line[1]);
+                                    par += Mathf.range(Mathf.round((logicIntensity - 30f) / 5f));
+                                    par = Mathf.clamp(par, 0, lines.length - 1);
+                                    line[1] = par + "";
+                                }
+                            }
                             default -> {
                                 for(int j = 1; j < line.length; j++){
                                     if(Strings.canParseFloat(line[j])){
