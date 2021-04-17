@@ -2668,7 +2668,7 @@ public class UnityUnitTypes implements ContentList{
         }};
 
         comitate = new UnityUnitType("comitate"){{
-            defaultController = AssistantAI.create(Assistance.mendCore, Assistance.mine, Assistance.build);
+            defaultController = AssistantAI.create(Assistance.mendCore, Assistance.mine, Assistance.build, Assistance.heal);
             health = 420f;
             speed = 4.5f;
             accel = 0.5f;

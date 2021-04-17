@@ -43,6 +43,12 @@ public class AssistantAI extends FlyingAI{
             if(fallback.unit() != unit) fallback.unit(unit);
 
             if(current != null){
+                Utils.invokeMethod(
+                fallback,
+                Utils.findMethod(fallback.getClass(), "updateTargeting", true, Utils.emptyClasses),
+                Utils.emptyObjects
+                );
+
                 if(current.preserveVisuals){
                     Utils.invokeMethod(
                     fallback,
@@ -186,7 +192,7 @@ public class AssistantAI extends FlyingAI{
 
     public enum Assistance{
         mendCore(-100f){
-            IntMap<CoreBuild> tiles = new IntMap<>();
+            final IntMap<CoreBuild> tiles = new IntMap<>();
 
             {
                 predicate = ai -> canMend(ai) && state.teams.cores(ai.unit.team).contains(b -> b.health() < b.maxHealth());
@@ -200,7 +206,7 @@ public class AssistantAI extends FlyingAI{
             }
 
             boolean canMend(AssistantAI ai){
-                return ai.unit.type.weapons.contains(w -> w.bullet.healPercent > 0f && w.bullet.collidesTeam);
+                return ai.unit.ammof() > 0f && ai.unit.type.weapons.contains(w -> w.bullet.healPercent > 0f && w.bullet.collidesTeam);
             }
 
             CoreBuild tile(AssistantAI ai){
@@ -214,7 +220,11 @@ public class AssistantAI extends FlyingAI{
 
             @Override
             protected void dispose(AssistantAI ai){
-                ai.displayMessage("service.coredone");
+                if(state.teams.cores(ai.unit.team).contains(b -> b.health() < b.maxHealth()) || ai.unit.ammof() <= 0f){
+                    ai.displayMessage("service.outofammo");
+                }else{
+                    ai.displayMessage("service.coredone");
+                }
             }
 
             @Override
@@ -353,6 +363,52 @@ public class AssistantAI extends FlyingAI{
                 if(ai.fallback instanceof FixedMinerAI){
                     ai.fallback = null;
                     ai.unit.clearItem();
+                }
+            }
+        },
+
+        heal(20f){
+            final float rad = 30f * tilesize;
+            final Boolf2<Healthc, AssistantAI> pred;
+
+            {
+                pred = (target, ai) ->
+                    target.within(ai.unit, rad) &&
+                    target.health() < target.maxHealth();
+
+                predicate = ai -> ai.unit.ammof() > 0f && hasTarget(ai);
+
+                preserveVisuals = preserveMovement = true;
+            }
+
+            boolean hasTarget(AssistantAI ai){
+                return
+                    Groups.unit.contains(unit -> pred.get(unit, ai)) ||
+                    indexer.findTile(ai.unit.team, ai.unit.x, ai.unit.y, rad, tile -> pred.get(tile, ai)) != null;
+            }
+
+            @Override
+            protected void init(AssistantAI ai){
+                ai.displayMessage("service.mend");
+            }
+
+            @Override
+            protected void dispose(AssistantAI ai){
+                if(ai.fallback instanceof UnitHealerAI){
+                    ai.fallback = null;
+                }
+
+                if(hasTarget(ai) || ai.unit.ammof() <= 0f){
+                    ai.displayMessage("service.outofammo");
+                }else{
+                    ai.displayMessage("service.menddone");
+                }
+            }
+
+            @Override
+            protected void update(AssistantAI ai){
+                if(!(ai.fallback instanceof UnitHealerAI)){
+                    ai.fallback = new UnitHealerAI();
                 }
             }
         };
