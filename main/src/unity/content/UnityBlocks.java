@@ -717,7 +717,7 @@ public class UnityBlocks implements ContentList{
         orb = new PowerTurret("orb"){{
             requirements(Category.turret, with(Items.copper, 55, Items.lead, 30, Items.graphite, 25, Items.silicon, 35, UnityItems.imberium, 20));
             size = 2;
-            health = 1320;
+            health = 480;
             range = 145f;
             reloadTime = 130f;
             coolantMultiplier = 2f;
