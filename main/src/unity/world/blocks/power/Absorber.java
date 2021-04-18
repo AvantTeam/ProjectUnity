@@ -1,18 +1,16 @@
 package unity.world.blocks.power;
 
 import arc.Core;
-import arc.graphics.Color;
 import arc.math.*;
 import arc.util.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.struct.*;
-import mindustry.content.StatusEffects;
+import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.type.StatusEffect;
+import mindustry.type.*;
 import mindustry.world.blocks.power.*;
-import unity.content.UnityStatusEffects;
 
 import static mindustry.Vars.*;
 
