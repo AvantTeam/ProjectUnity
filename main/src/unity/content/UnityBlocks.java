@@ -727,7 +727,7 @@ public class UnityBlocks implements ContentList{
             chargeTime = 65f;
             chargeEffects = 5;
             chargeMaxDelay = 25f;
-            powerUse = 10.4f;
+            powerUse = 4.2069f;
             targetAir = false;
             shootType = UnityBullets.orb;
             shootSound = Sounds.laser;
@@ -741,13 +741,13 @@ public class UnityBlocks implements ContentList{
         shockwire = new LaserTurret("shockwire"){{
             requirements(Category.turret, with(Items.copper, 150, Items.lead, 145, Items.titanium, 160, Items.silicon, 130, UnityItems.imberium, 70));
             size = 2;
-            health = 1400;
+            health = 860;
             range = 125f;
             reloadTime = 140f;
             coolantMultiplier = 2f;
             shootCone = 1f;
             inaccuracy = 0f;
-            powerUse = 8.6f;
+            powerUse = 6.9420f;
             targetAir = false;
             shootType = UnityBullets.shockBeam;
             shootSound = Sounds.thruster;
@@ -759,14 +759,14 @@ public class UnityBlocks implements ContentList{
             size = 3;
             health = 2400;
             range = 220f;
-            reloadTime = 480f;
+            reloadTime = 120f;
             coolantMultiplier = 2;
             shootCone = 0.01f;
             inaccuracy = 0f;
-            chargeTime = 240f;
+            chargeTime = 60f;
             chargeEffects = 4;
             chargeMaxDelay = 260;
-            powerUse = 13.8f;
+            powerUse = 6.8f;
             shootType = UnityBullets.currentStroke;
             shootSound = Sounds.laserbig;
             chargeEffect = UnityFx.currentCharge;
@@ -785,7 +785,7 @@ public class UnityBlocks implements ContentList{
             liquidCapacity = 20f;
             shootCone = 1f;
             inaccuracy = 0f;
-            powerUse = 15.2f;
+            powerUse = 8.2f;
             shootType = UnityBullets.plasmaTriangle;
             shootSound = Sounds.shotgun;
             consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability <= 0.1f, 0.52f)).boost();
@@ -794,13 +794,15 @@ public class UnityBlocks implements ContentList{
         electrobomb = new ItemTurret("electrobomb"){            
             {
                 requirements(Category.turret, with(Items.titanium, 360, Items.thorium, 630, Items.silicon, 240, UnityItems.sparkAlloy, 420));
+                health = 3650;
                 size = 5;
                 range = 400f;
                 minRange = 60f;
                 reloadTime = 320f;
                 coolantMultiplier = 2f;
                 shootCone = 20f;
-                shots = 1;
+                shots = 2;
+                spread = 60f;
                 inaccuracy = 0f;
                 targetAir = false;
                 ammo(UnityItems.sparkAlloy, UnityBullets.surgeBomb);
