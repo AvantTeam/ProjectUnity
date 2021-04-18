@@ -1,6 +1,7 @@
 package unity.world.blocks.power;
 
 import arc.Core;
+import arc.audio.*;
 import arc.math.*;
 import arc.util.*;
 import arc.graphics.*;
@@ -20,6 +21,9 @@ public class Absorber extends PowerGenerator {
     public float powerProduction = 1.2f;
     public StatusEffect status = StatusEffects.slow;
     public TextureRegion laserRegion, laserEndRegion, baseRegion;
+    public float rotateSpeed = 2f;
+    public float cone = 2f;
+    public float damagePerTick = 1f;
 
     public Absorber(String name){
         super(name);
@@ -45,17 +49,34 @@ public class Absorber extends PowerGenerator {
     public class AbsorberBuilding extends GeneratorBuild {
         public Unit unit;
         public float time = 0f;
-        public float angle = 90f;
+        public float rotation = 90f;
+        public float targetRot = 90f;
+        public boolean canAbsorb = false;
 
         @Override
         public void update(){
             super.update();
 
+            canAbsorb = Angles.angleDist(rotation, targetRot) <= cone;
+
             unit = Units.closestEnemy(this.team, this.x, this.y, range, e -> !e.dead() && !e.isFlying());
-            if(unit != null) unit.apply(status);
+
+            if(unit != null){
+                targetRot = Angles.angle(x, y, unit.x, unit.y);
+
+                turnToTarget(targetRot);
+
+                if(canAbsorb){
+                    unit.apply(status);
+                    unit.damage(damagePerTick);
+                }
+            }
+
+            turnToTarget(targetRot);
+
             productionEfficiency = unit == null ? 0f : 1f;
 
-            time += 1f / 60f;
+            time += 1f / 60f * Time.delta;
         }
 
         @Override
@@ -75,13 +96,11 @@ public class Absorber extends PowerGenerator {
             Draw.z(Layer.block);
 
             Draw.rect(baseRegion, x, y);
-            Draw.rect(region, x, y, angle - 90f);
+            Draw.rect(region, x, y, rotation - 90f);
 
-            if(unit == null) return;
+            if(unit == null || !canAbsorb) return;
 
-            angle = Angles.angle(x, y, unit.x, unit.y);
-
-            Tmp.v1.set(0, 0).trns(angle, size * tilesize / 2f);
+            Tmp.v1.set(0, 0).trns(rotation, size * tilesize / 2f);
 
             Draw.z(Layer.flyingUnit - 1);
             Draw.color(unit.team.color);
@@ -90,6 +109,10 @@ public class Absorber extends PowerGenerator {
             Drawf.laser(team, laserRegion, laserEndRegion, x + Tmp.v1.x + Mathf.sin(time * 2), y + Tmp.v1.y + Mathf.cos(time * 2), unit.x, unit.y, 0.6f);
 
             Draw.reset();
+        }
+
+        public void turnToTarget(float targetRot){
+            rotation = Angles.moveToward(rotation, targetRot, rotateSpeed * Time.delta);
         }
     }
 }

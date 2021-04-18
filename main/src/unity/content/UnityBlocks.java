@@ -865,7 +865,7 @@ public class UnityBlocks implements ContentList{
         }};
 
         absorber = new Absorber("absorber"){{
-            requirements(Category.power, with(UnityItems.sparkAlloy, 20, Items.lead, 20));
+            requirements(Category.power, with(UnityItems.imberium, 20, Items.lead, 20));
             size = 2;
         }};
 
