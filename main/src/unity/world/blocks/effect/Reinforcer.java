@@ -36,7 +36,7 @@ public class Reinforcer extends Block {
     public void load(){
         super.load();
 
-        baseRegion = Core.atlas.find(name + "-base");
+        baseRegion = Core.atlas.find("block-" + size);
         laserRegion = Core.atlas.find("unity-pointy-laser");
         laserEndRegion = Core.atlas.find("unity-pointy-laser-end");
     }
@@ -69,7 +69,7 @@ public class Reinforcer extends Block {
         public Unit prevUnit;
 
         @Override
-        public void update(){
+        public void updateTile(){
             if(consValid()){
                 unit = Units.closest(this.team, x, y, range, u -> u != null && !u.hasEffect(UnityStatusEffects.plated));
 

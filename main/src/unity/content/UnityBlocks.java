@@ -87,6 +87,8 @@ public class UnityBlocks implements ContentList{
 
     orb, shockwire, current, plasma, electrobomb, shielder,
 
+    powerPlant,
+
     sparkAlloyForge,
 
     absorber,
@@ -801,8 +803,7 @@ public class UnityBlocks implements ContentList{
                 reloadTime = 320f;
                 coolantMultiplier = 2f;
                 shootCone = 20f;
-                shots = 2;
-                spread = 60f;
+                shots = 1;
                 inaccuracy = 0f;
                 targetAir = false;
                 ammo(UnityItems.sparkAlloy, UnityBullets.surgeBomb);
@@ -838,6 +839,12 @@ public class UnityBlocks implements ContentList{
             });
             chargeBeginEffect = Fx.none;
             consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability <= 0.1f, 0.4f)).update(false);
+        }};
+
+        powerPlant = new PowerPlant("power-plant"){{
+            requirements(Category.power, BuildVisibility.editorOnly, ItemStack.with(Items.copper, 1));
+
+            powerProduction = 8.6f;
         }};
 
         sparkAlloyForge = new StemGenericSmelter("spark-alloy-forge"){{
