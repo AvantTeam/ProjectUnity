@@ -74,7 +74,7 @@ public class UnityBlocks implements ContentList{
     oreLuminum,
 
     photon, //graviton, gluon, higgsBoson, singularity,
-    electron, zBoson, /*,
+    electron, zBoson, wBoson, /*,
     proton, zBoson,
     neutron, wBoson;*/
 
@@ -710,6 +710,60 @@ public class UnityBlocks implements ContentList{
                 barLength = 20f;
 
                 shootType = UnityBullets.zBosonBolt;
+            }
+        };
+
+        wBoson = new PowerTurret("w-boson"){
+            @Override
+            public void load(){
+                super.load();
+                baseRegion = atlas.find("unity-block-" + size);
+            }
+
+            {
+                requirements(Category.turret, with(Items.silicon, 300, UnityItems.luminum, 430, Items.titanium, 190, Items.thorium, 110, Items.surgeAlloy, 20));
+                health = 4000;
+                size = 5;
+                reloadTime = 90f;
+                range = 250f;
+                rotateSpeed = 2.5f;
+                shootCone = 20f;
+                heatColor = UnityPal.lightHeat;
+                chargeTime = 40f;
+                cooldown = 0.008f;
+                powerUse = 8.6f;
+
+                shootType = new DecayBasicBulletType(8.5f, 24f, "unity-electric-shell"){{
+                    drag = 0.026f;
+                    lifetime = 48f;
+                    collides = false;
+                    backColor = trailColor = hitColor = lightColor = Pal.lancerLaser;
+                    hitEffect = despawnEffect = Fx.hitLancer;
+                    frontColor = Color.white;
+                    trailEffect = UnityFx.lineTrail;
+                    trailChanceAlt = 0.4f;
+                    height = 13f;
+                    width = 12f;
+                    decayBullet = new BasicBulletType(4.8f, 24f, "unity-electric-shell"){{
+                        drag = 0.04f;
+                        lifetime = 18f;
+                        pierce = true;
+                        pierceCap = 3;
+                        height = 9f;
+                        width = 8f;
+                        backColor = trailColor = hitColor = lightColor = Pal.lancerLaser;
+                        trailEffect = Fx.missileTrail;
+                        trailChance = 0.5f;
+                        hitEffect = despawnEffect = Fx.hitLancer;
+                        frontColor = Color.white;
+                    }};
+                    fragBullet = decayBullet;
+                    fragBullets = 12;
+                    fragVelocityMin = 0.75f;
+                    fragVelocityMax = 1.25f;
+                    fragLifeMin = 1.2f;
+                    fragLifeMax = 1.3f;
+                }};
             }
         };
 
