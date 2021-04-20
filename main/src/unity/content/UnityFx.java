@@ -729,6 +729,12 @@ public class UnityFx{
         color();
     }).layer(Layer.flyingUnit + 1f),
 
+    lineTrail = new Effect(36f, e -> {
+        Draw.color(e.color);
+        Lines.stroke(1.5f);
+        Lines.lineAngleCenter(e.x, e.y, e.rotation, e.fslope() * 6f);
+    }),
+
     empShockwave = new Effect(30f, 800f, e -> {
         color(Pal.lancerLaser);
         Lines.stroke(e.fout() + 0.5f);

@@ -20,7 +20,9 @@ public class Reinforcer extends Block {
     public TextureRegion baseRegion, laserRegion, laserEndRegion;
     public float laserLength = -1f;
     public Color laserColor = Pal.thoriumPink;
+    public float rotateSpeed = 2f;
     public float loadThreshold = 1f;
+    public float cone = 2f;
 
     public Reinforcer(String name){
         super(name);
@@ -34,7 +36,7 @@ public class Reinforcer extends Block {
     public void load(){
         super.load();
 
-        baseRegion = Core.atlas.find(name + "-base");
+        baseRegion = Core.atlas.find("block-" + size);
         laserRegion = Core.atlas.find("unity-pointy-laser");
         laserEndRegion = Core.atlas.find("unity-pointy-laser-end");
     }
@@ -57,24 +59,39 @@ public class Reinforcer extends Block {
     }
 
     public class ReinforcerBuilding extends Building {
-        public float load = 0f;
-        public float laserWidth = 0f;
-        public float angle = 90f;
+        public float load = loadThreshold;
+        public float laserWidth = 0.3f;
+        public float rotation = 90f;
+        public float targetRot = 90f;
         public Vec2 posOffset = new Vec2(0, 0);
         public Unit unit;
+        public boolean canReinforce = false;
+        public Unit prevUnit;
 
         @Override
         public void updateTile(){
-            if(consValid() && load >= loadThreshold){
+            if(consValid()){
                 unit = Units.closest(this.team, x, y, range, u -> u != null && !u.hasEffect(UnityStatusEffects.plated));
 
                 if(unit != null) {
-                    unit.apply(UnityStatusEffects.plated);
-                    load = 0f;
-                    laserWidth = 0f;
-                    items.remove(consumes.getItem().items);
+                    prevUnit = unit;
+
+                    turnToTarget(Angles.angle(x, y, unit.x, unit.y));
+
+                    targetRot = Angles.angle(x, y, unit.x, unit.y);
+
+                    canReinforce = Angles.angleDist(rotation, targetRot) <= cone;
+
+                    if (canReinforce && load >= loadThreshold) {
+                        unit.apply(UnityStatusEffects.plated);
+                        load = 0f;
+                        laserWidth = 0f;
+                        items.remove(consumes.getItem().items);
+                    }
                 }
             }
+
+
             load += 0.01f * Time.delta;
             laserWidth += 0.01f * Time.delta;
             if(load > loadThreshold) load = loadThreshold;
@@ -89,16 +106,19 @@ public class Reinforcer extends Block {
         public void draw(){
             Draw.rect(baseRegion, x, y);
             Draw.z(Layer.block);
-            Draw.rect(region, x, y, angle - 90);
+            Draw.rect(region, x, y, rotation - 90);
 
-            if(unit != null && laserWidth < 0.3f) {
+            if(prevUnit != null && laserWidth < 0.3f) {
                 Draw.color(laserColor);
                 Draw.z(Layer.effect);
-                if(laserLength > 0f) posOffset.trns(angle, laserLength);
-                Drawf.laser(this.team, laserRegion, laserEndRegion, x + posOffset.x, y + posOffset.y, unit.x, unit.y, (0.3f - laserWidth) / 0.3f);
+                if(laserLength > 0f) posOffset.trns(rotation, laserLength);
+                Drawf.laser(this.team, laserRegion, laserEndRegion, x + posOffset.x, y + posOffset.y, prevUnit.x, prevUnit.y, (0.3f - laserWidth) / 0.3f);
                 Draw.color();
-                angle = Angles.angle(x, y, unit.x, unit.y);
             }
+        }
+
+        public void turnToTarget(float targetRot){
+            rotation = Angles.moveToward(rotation, targetRot, rotateSpeed * Time.delta);
         }
     }
 }

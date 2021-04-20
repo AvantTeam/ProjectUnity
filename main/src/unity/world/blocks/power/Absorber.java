@@ -1,14 +1,16 @@
 package unity.world.blocks.power;
 
 import arc.Core;
+import arc.audio.*;
 import arc.math.*;
 import arc.util.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.struct.*;
-import mindustry.content.StatusEffects;
+import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.type.*;
 import mindustry.world.blocks.power.*;
 
 import static mindustry.Vars.*;
@@ -16,12 +18,17 @@ import static mindustry.Vars.*;
 public class Absorber extends PowerGenerator {
     public float range = 50f;
     public int capacity = 5;
-    public float powerProduction = 0.15f;
-    public TextureRegion laserRegion, laserEndRegion;
+    public float powerProduction = 1.2f;
+    public StatusEffect status = StatusEffects.slow;
+    public TextureRegion laserRegion, laserEndRegion, baseRegion;
+    public float rotateSpeed = 2f;
+    public float cone = 2f;
+    public float damagePerTick = 1f;
 
     public Absorber(String name){
         super(name);
         update = true;
+        outlineIcon = true;
     }
 
     @Override
@@ -30,6 +37,7 @@ public class Absorber extends PowerGenerator {
 
         laserRegion = Core.atlas.find("laser");
         laserEndRegion = Core.atlas.find("laser-end");
+        baseRegion = Core.atlas.find("block-" + size);
     }
 
     @Override
@@ -39,26 +47,36 @@ public class Absorber extends PowerGenerator {
     }
 
     public class AbsorberBuilding extends GeneratorBuild {
-        public Seq<Unit> units = new Seq<Unit>();
-        public Seq<Unit> units2 = new Seq<Unit>();
-        public int index;
+        public Unit unit;
+        public float time = 0f;
+        public float rotation = 90f;
+        public float targetRot = 90f;
+        public boolean canAbsorb = false;
 
         @Override
         public void update(){
             super.update();
 
-            Units.nearbyEnemies(this.team, this.x - range, this.y - range, range * 2, range * 2, e -> {
-                if(!e.dead() && !e.isFlying() && Mathf.sqrt(Mathf.sqr(e.x - x) + Mathf.sqr(e.y - y)) <= range && index <= capacity){
-                    e.apply(StatusEffects.slow);
-                    units.add(e);
-                    index += 1;
-                }
-            });
-            productionEfficiency = units.size;
-            units2 = units;
-            units = new Seq<Unit>();
+            canAbsorb = Angles.angleDist(rotation, targetRot) <= cone;
 
-            index = 0;
+            unit = Units.closestEnemy(this.team, this.x, this.y, range, e -> !e.dead() && !e.isFlying());
+
+            if(unit != null){
+                targetRot = Angles.angle(x, y, unit.x, unit.y);
+
+                turnToTarget(targetRot);
+
+                if(canAbsorb){
+                    unit.apply(status);
+                    unit.damage(damagePerTick);
+                }
+            }
+
+            turnToTarget(targetRot);
+
+            productionEfficiency = unit == null ? 0f : 1f;
+
+            time += 1f / 60f * Time.delta;
         }
 
         @Override
@@ -75,18 +93,26 @@ public class Absorber extends PowerGenerator {
         public void draw(){
             super.draw();
 
-            Draw.color(this.team.color);
-            Draw.z(Layer.flyingUnit + 1);
-            units2.each(e -> {
-                Draw.alpha(1);
-                Drawf.laser(team, laserRegion, laserEndRegion, x, y, e.x, e.y, 0.6f);
-                Draw.alpha(0.05f);
-                for(int i = 0; i < 6; i++){
-                    Fill.circle(e.x, e.y, e.hitSize + i + Mathf.sin(Time.time / 8) / 3);
-                }
-            });
-            Draw.alpha(1);
+            Draw.z(Layer.block);
+
+            Draw.rect(baseRegion, x, y);
+            Draw.rect(region, x, y, rotation - 90f);
+
+            if(unit == null || !canAbsorb) return;
+
+            Tmp.v1.set(0, 0).trns(rotation, size * tilesize / 2f);
+
+            Draw.z(Layer.flyingUnit - 1);
+            Draw.color(unit.team.color);
+            Lines.circle(unit.x, unit.y, unit.hitSize + Mathf.sin(time * 2f));
+            Draw.color(Color.white);
+            Drawf.laser(team, laserRegion, laserEndRegion, x + Tmp.v1.x + Mathf.sin(time * 2), y + Tmp.v1.y + Mathf.cos(time * 2), unit.x, unit.y, 0.6f);
+
             Draw.reset();
+        }
+
+        public void turnToTarget(float targetRot){
+            rotation = Angles.moveToward(rotation, targetRot, rotateSpeed * Time.delta);
         }
     }
 }

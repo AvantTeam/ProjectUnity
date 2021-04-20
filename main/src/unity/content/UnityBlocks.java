@@ -74,7 +74,7 @@ public class UnityBlocks implements ContentList{
     oreLuminum,
 
     photon, //graviton, gluon, higgsBoson, singularity,
-    electron, zBoson, /*,
+    electron, zBoson, wBoson, /*,
     proton, zBoson,
     neutron, wBoson;*/
 
@@ -86,6 +86,8 @@ public class UnityBlocks implements ContentList{
     oreImberium,
 
     orb, shockwire, current, plasma, electrobomb, shielder,
+
+    powerPlant,
 
     sparkAlloyForge,
 
@@ -711,13 +713,67 @@ public class UnityBlocks implements ContentList{
             }
         };
 
+        wBoson = new PowerTurret("w-boson"){
+            @Override
+            public void load(){
+                super.load();
+                baseRegion = atlas.find("unity-block-" + size);
+            }
+
+            {
+                requirements(Category.turret, with(Items.silicon, 300, UnityItems.luminum, 430, Items.titanium, 190, Items.thorium, 110, Items.surgeAlloy, 20));
+                health = 4000;
+                size = 5;
+                reloadTime = 90f;
+                range = 250f;
+                rotateSpeed = 2.5f;
+                shootCone = 20f;
+                heatColor = UnityPal.lightHeat;
+                chargeTime = 40f;
+                cooldown = 0.008f;
+                powerUse = 8.6f;
+
+                shootType = new DecayBasicBulletType(8.5f, 24f, "unity-electric-shell"){{
+                    drag = 0.026f;
+                    lifetime = 48f;
+                    collides = false;
+                    backColor = trailColor = hitColor = lightColor = Pal.lancerLaser;
+                    hitEffect = despawnEffect = Fx.hitLancer;
+                    frontColor = Color.white;
+                    trailEffect = UnityFx.lineTrail;
+                    trailChanceAlt = 0.4f;
+                    height = 13f;
+                    width = 12f;
+                    decayBullet = new BasicBulletType(4.8f, 24f, "unity-electric-shell"){{
+                        drag = 0.04f;
+                        lifetime = 18f;
+                        pierce = true;
+                        pierceCap = 3;
+                        height = 9f;
+                        width = 8f;
+                        backColor = trailColor = hitColor = lightColor = Pal.lancerLaser;
+                        trailEffect = Fx.missileTrail;
+                        trailChance = 0.5f;
+                        hitEffect = despawnEffect = Fx.hitLancer;
+                        frontColor = Color.white;
+                    }};
+                    fragBullet = decayBullet;
+                    fragBullets = 12;
+                    fragVelocityMin = 0.75f;
+                    fragVelocityMax = 1.25f;
+                    fragLifeMin = 1.2f;
+                    fragLifeMax = 1.3f;
+                }};
+            }
+        };
+
         //endregion
         //region imber
 
         orb = new PowerTurret("orb"){{
             requirements(Category.turret, with(Items.copper, 55, Items.lead, 30, Items.graphite, 25, Items.silicon, 35, UnityItems.imberium, 20));
             size = 2;
-            health = 1320;
+            health = 480;
             range = 145f;
             reloadTime = 130f;
             coolantMultiplier = 2f;
@@ -727,7 +783,7 @@ public class UnityBlocks implements ContentList{
             chargeTime = 65f;
             chargeEffects = 5;
             chargeMaxDelay = 25f;
-            powerUse = 10.4f;
+            powerUse = 4.2069f;
             targetAir = false;
             shootType = UnityBullets.orb;
             shootSound = Sounds.laser;
@@ -741,13 +797,13 @@ public class UnityBlocks implements ContentList{
         shockwire = new LaserTurret("shockwire"){{
             requirements(Category.turret, with(Items.copper, 150, Items.lead, 145, Items.titanium, 160, Items.silicon, 130, UnityItems.imberium, 70));
             size = 2;
-            health = 1400;
+            health = 860;
             range = 125f;
             reloadTime = 140f;
             coolantMultiplier = 2f;
             shootCone = 1f;
             inaccuracy = 0f;
-            powerUse = 8.6f;
+            powerUse = 6.9420f;
             targetAir = false;
             shootType = UnityBullets.shockBeam;
             shootSound = Sounds.thruster;
@@ -759,14 +815,14 @@ public class UnityBlocks implements ContentList{
             size = 3;
             health = 2400;
             range = 220f;
-            reloadTime = 480f;
+            reloadTime = 120f;
             coolantMultiplier = 2;
             shootCone = 0.01f;
             inaccuracy = 0f;
-            chargeTime = 240f;
+            chargeTime = 60f;
             chargeEffects = 4;
             chargeMaxDelay = 260;
-            powerUse = 13.8f;
+            powerUse = 6.8f;
             shootType = UnityBullets.currentStroke;
             shootSound = Sounds.laserbig;
             chargeEffect = UnityFx.currentCharge;
@@ -785,7 +841,7 @@ public class UnityBlocks implements ContentList{
             liquidCapacity = 20f;
             shootCone = 1f;
             inaccuracy = 0f;
-            powerUse = 15.2f;
+            powerUse = 8.2f;
             shootType = UnityBullets.plasmaTriangle;
             shootSound = Sounds.shotgun;
             consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability <= 0.1f, 0.52f)).boost();
@@ -794,6 +850,7 @@ public class UnityBlocks implements ContentList{
         electrobomb = new ItemTurret("electrobomb"){            
             {
                 requirements(Category.turret, with(Items.titanium, 360, Items.thorium, 630, Items.silicon, 240, UnityItems.sparkAlloy, 420));
+                health = 3650;
                 size = 5;
                 range = 400f;
                 minRange = 60f;
@@ -838,6 +895,12 @@ public class UnityBlocks implements ContentList{
             consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability <= 0.1f, 0.4f)).update(false);
         }};
 
+        powerPlant = new PowerPlant("power-plant"){{
+            requirements(Category.power, BuildVisibility.editorOnly, ItemStack.with(Items.copper, 1));
+
+            powerProduction = 8.6f;
+        }};
+
         sparkAlloyForge = new StemGenericSmelter("spark-alloy-forge"){{
             requirements(Category.crafting, with(Items.lead, 160, Items.graphite, 340, UnityItems.imberium, 270, Items.silicon, 250, Items.thorium, 120, Items.surgeAlloy, 100));
 
@@ -863,7 +926,7 @@ public class UnityBlocks implements ContentList{
         }};
 
         absorber = new Absorber("absorber"){{
-            requirements(Category.power, with(UnityItems.sparkAlloy, 20, Items.lead, 20));
+            requirements(Category.power, with(UnityItems.imberium, 20, Items.lead, 20));
             size = 2;
         }};
 
