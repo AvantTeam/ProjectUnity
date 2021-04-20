@@ -54,7 +54,7 @@ public class UnityUnitTypes implements ContentList{
     /** Global {@linkplain UnitEntity flying} units */
     public static @EntityPoint(UnitEntity.class)
     UnitType angel, malakhim,
-    discharge, pulse, emission;
+    discharge, pulse, emission, waveform;
     
     /** Global {@linkplain LegsUnit legs} units */
     public static @EntityPoint(LegsUnit.class)
@@ -521,6 +521,7 @@ public class UnityUnitTypes implements ContentList{
                     height = 14f;
                     width = 11f;
 
+                    hitEffect = Fx.hitLancer;
                     backColor = lightColor = hitColor = Pal.lancerLaser;
                     frontColor = Color.white;
                 }};
@@ -562,6 +563,7 @@ public class UnityUnitTypes implements ContentList{
                     empBatteryDamage = 11000f;
                     empLogicDamage = 5f;
 
+                    hitEffect = Fx.hitLancer;
                     backColor = lightColor = hitColor = Pal.lancerLaser;
                     frontColor = Color.white;
                     shootEffect = UnityFx.empCharge;
@@ -602,6 +604,7 @@ public class UnityUnitTypes implements ContentList{
                     empBatteryDamage = 4300f;
                     empRange = 90f;
 
+                    hitEffect = Fx.hitLancer;
                     backColor = lightColor = hitColor = Pal.lancerLaser;
                     frontColor = Color.white;
                 }};
@@ -632,9 +635,81 @@ public class UnityUnitTypes implements ContentList{
                     powerGridIteration = 15;
                     trailLength = 13;
 
+                    hitEffect = Fx.hitLancer;
                     backColor = lightColor = hitColor = Pal.lancerLaser;
                     frontColor = Color.white;
                     shootEffect = UnityFx.empCharge;
+                }};
+            }});
+        }};
+
+        waveform = new UnityUnitType("waveform"){{
+            flying = true;
+            lowAltitude = true;
+            health = 4500f;
+            speed = 0.9f;
+            accel = 0.09f;
+            drag = 0.07f;
+            hitSize = 41.5f;
+            engineOffset = 24.25f;
+            ammoType = AmmoTypes.powerHigh;
+
+            CloneableSetWeapon t = UnityWeaponTemplates.waveformSmallMount;
+
+            weapons.addAll(t.set(w -> {
+                w.x = 15.75f;
+                w.y = 4f;
+                w.reload *= 4f;
+                w.otherSide = 1;
+            }), t.set(w -> {
+                w.x = -15.75f;
+                w.y = 4f;
+                w.reload *= 4f;
+                w.flipSprite = true;
+                w.otherSide = 2;
+            }), t.set(w -> {
+                w.x = -19.25f;
+                w.y = -15.25f;
+                w.reload *= 4f;
+                w.flipSprite = true;
+                w.otherSide = 3;
+            }), t.set(w -> {
+                w.x = 19.25f;
+                w.y = -15.25f;
+                w.reload *= 4f;
+                w.flipSprite = true;
+                w.otherSide = 0;
+                w.name = "unity-emp-small-mount-flipped";
+            }), new Weapon("unity-emp-launcher"){{
+                x = 10f;
+                y = -8.5f;
+                reload = 4f * 60f;
+                mirror = true;
+                rotate = true;
+                rotateSpeed = 3f;
+                shootY = 5f;
+                shootSound = UnitySounds.zbosonShoot;
+
+                bullet = new EmpBasicBulletType(6.8f, 8f){{
+                    hitSize = 6f;
+                    splashDamageRadius = 30f;
+                    splashDamage = 14f;
+                    shrinkY = 0f;
+                    height = 18f;
+                    width = 14f;
+
+                    empRange = 160f;
+                    empDuration = 60f * 2f;
+                    empMaxRange = 800f;
+                    empDisconnectRange = 100f;
+                    empBatteryDamage = 30000f;
+                    empLogicDamage = 12f;
+                    powerGridIteration = 15;
+                    trailLength = 15;
+
+                    hitEffect = Fx.hitLancer;
+                    backColor = lightColor = hitColor = Pal.lancerLaser;
+                    frontColor = Color.white;
                 }};
             }});
         }};

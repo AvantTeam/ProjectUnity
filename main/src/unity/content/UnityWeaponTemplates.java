@@ -1,14 +1,16 @@
 package unity.content;
 
+import arc.graphics.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
+import mindustry.graphics.*;
 import unity.entities.bullet.*;
 import unity.gen.*;
 import unity.graphics.*;
 import unity.type.*;
 
 public class UnityWeaponTemplates implements ContentList{
-    public static CloneableSetWeapon apocalypseSmall, apocalypseLauncher, apocalypseLaser;
+    public static CloneableSetWeapon apocalypseSmall, apocalypseLauncher, apocalypseLaser, waveformSmallMount;
 
     @Override
     public void load(){
@@ -83,6 +85,32 @@ public class UnityWeaponTemplates implements ContentList{
             alternate = false;
 
             bullet = UnityBullets.endLaserSmall;
+        }};
+
+        waveformSmallMount = new CloneableSetWeapon("unity-emp-small-mount"){{
+            reload = 6f;
+            mirror = false;
+            alternate = true;
+            rotate = true;
+            shootSound = UnitySounds.zbosonShoot;
+
+            bullet = new EmpBasicBulletType(5.5f, 9f){{
+                lifetime = 38f;
+                splashDamageRadius = 15f;
+                splashDamage = 1.5f;
+                shrinkY = 0f;
+                height = 13f;
+                width = 10f;
+
+                powerGridIteration = 1;
+                empDuration = 0f;
+                empBatteryDamage = 4000f;
+                empRange = 90f;
+
+                hitEffect = Fx.hitLancer;
+                backColor = lightColor = hitColor = Pal.lancerLaser;
+                frontColor = Color.white;
+            }};
         }};
     }
 }
