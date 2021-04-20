@@ -55,6 +55,11 @@ public class UnityUnitType extends UnitType{
     public float rotorDeathSlowdown = 0.01f;
     public float fallRotateSpeed = 2.5f;
 
+    // Lasers
+    public Color laserColor = Pal.heal;
+    public TextureRegion laserRegion, laserEndRegion;
+    public float laserWidth = 0.6f;
+
     // Mech pad units
     public Color engineColor;
 
@@ -103,6 +108,8 @@ public class UnityUnitType extends UnitType{
         legBackRegion = atlas.find(name + "-leg-back");
         legBaseBackRegion = atlas.find(name + "-leg-base-back");
         footBackRegion = atlas.find(name + "-foot-back");
+        laserRegion = atlas.find("laser");
+        laserEndRegion = atlas.find("laser-end");
         //abilities
         for(AbilityTextures type : AbilityTextures.values()){
             abilityRegions[type.ordinal()] = atlas.find(name + "-" + type.name());
