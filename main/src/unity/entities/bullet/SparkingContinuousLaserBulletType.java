@@ -53,49 +53,44 @@ public class SparkingContinuousLaserBulletType extends ContinuousLaserBulletType
 
         if(extinction){
             if(b.timer(2, 15f)){
-                Utils.castCone(b.x, b.y, length * coneRange, b.rotation(), 70, (tile, build, dst, angD) -> {
-                    if(Mathf.chance(angD * 0.2f * Mathf.clamp(dst * 1.7f))) Fires.create(tile);
-                    if(build != null && b.team != build.team){
-                        build.damage(angD * 23.3f * Mathf.clamp(dst * 1.7f));
+                b.data = Utils.castConeTile(b.x, b.y, length * coneRange, b.rotation(), 70f, 45, (build, tile) -> {
+                    float angD = Mathf.clamp(1f - (Utils.angleDist(Angles.angle(tile.worldx() - b.x, tile.worldy() - b.y), b.rotation()) / 70f));
+                    float dst = Mathf.clamp(1f - (Mathf.dst(tile.worldx() - b.x, tile.worldy() - b.y) / (length * coneRange)));
+                    if(Mathf.chance(Interp.pow3In.apply(angD) * 0.2f * Mathf.clamp(dst * 1.7f))) Fires.create(tile);
+                    //UnityFx.tilePosIndicatorTest.at(tile.worldx(), tile.worldy());
+                    if(build != null && build.team != b.team){
+                        build.damage(Interp.pow3In.apply(angD) * 23.3f * Mathf.clamp(dst * 1.7f));
                         ExtraEffect.addMoltenBlock(build);
                     }
-                });
+                }, tile -> tile.block().absorbLasers || tile.block().insulated);
             }
-            Utils.castCone(b.x, b.y, length * coneRange, b.rotation(), 70f, (e, dst, angD) -> {
-                float clamped = Mathf.clamp(dst * 1.7f);
-                if(!e.dead){
-                    float damageMulti = e.team != b.team ? 0.25f : 1f;
-                    e.damage(28f * angD * dst * damageMulti);
-                    Tmp.v1.trns(Angles.angle(b.x, b.y, e.x, e.y), angD * clamped * 160f * (e.hitSize / 20f + 0.95f));
-                    e.impulse(Tmp.v1);
-                    if(Mathf.chanceDelta(Mathf.clamp(angD * dst * 12f) * 0.9f)) ExtraEffect.createEvaporation(e.x, e.y, e, b.owner);
-                    e.apply(UnityStatusEffects.radiation, angD * damageMulti * 3800.3f * clamped);
-                    e.apply(StatusEffects.melting, angD * damageMulti * 240.3f * clamped);
-                }else{
-                    tempSeq.add(e);
-                    Tmp.v1.trns(Angles.angle(b.x, b.y, e.x, e.y), angD * clamped * 130f / Math.max(e.mass() / 120f + 119f / 120f, 1f));
-                    Tmp.v1.scl(12f);
-                    UnityFx.evaporateDeath.at(e.x, e.y, 0f, new UnitVecData(e, Tmp.v1.cpy()));
-                    for(int i = 0; i < 12; i++) ExtraEffect.createEvaporation(e.x, e.y, e, b.owner);
-                }
-            });
-            tempSeq.each(e -> {
-                e.remove();
-            });
-            tempSeq.clear();
-        }
-    }
 
-    @Override
-    public void init(Bullet b){
-        if(extinction){
-            Utils.castCone(b.x, b.y, length * 1.3f, b.rotation(), 80f, (tile, build, dst, angD) -> {
-                if(Mathf.chance(angD * 0.9f * Mathf.clamp(dst * 1.7f))) Fires.create(tile);
-                if(build != null && b.team != build.team) build.damage(angD * 258.3f * Mathf.clamp(dst * 1.7f));
-            }, (e, dst, angD) -> {
-                float damageMulti = e.team != b.team ? 0.25f : 1f;
-                e.apply(StatusEffects.melting, angD * damageMulti * 1200.3f * Mathf.clamp(dst * 1.7f));
-            });
+            if(b.data instanceof float[] data){
+                Utils.castCone(b.x, b.y, length * coneRange, b.rotation(), 70f, (e, dst, angD) -> {
+                    float clamped = Mathf.clamp(dst * 1.7f);
+                    int idx = Mathf.clamp(Mathf.round(((Utils.angleDistSigned(b.angleTo(e), b.rotation()) + 70f) / 140f) * (data.length - 1)), 0, data.length - 1);
+                    boolean h = (b.dst2(e) + (e.hitSize / 2f)) < data[idx] || e.isFlying();
+                    if(h){
+                        if(!e.dead){
+                            float damageMulti = e.team != b.team ? 0.25f : 1f;
+                            e.damage(28f * angD * dst * damageMulti);
+                            Tmp.v1.trns(Angles.angle(b.x, b.y, e.x, e.y), angD * clamped * 160f * (e.hitSize / 20f + 0.95f));
+                            e.impulse(Tmp.v1);
+                            if(Mathf.chanceDelta(Mathf.clamp(angD * dst * 12f) * 0.9f)) ExtraEffect.createEvaporation(e.x, e.y, e, b.owner);
+                            e.apply(UnityStatusEffects.radiation, angD * damageMulti * 3800.3f * clamped);
+                            e.apply(StatusEffects.melting, angD * damageMulti * 240.3f * clamped);
+                        }else{
+                            tempSeq.add(e);
+                            Tmp.v1.trns(Angles.angle(b.x, b.y, e.x, e.y), angD * clamped * 130f / Math.max(e.mass() / 120f + 119f / 120f, 1f));
+                            Tmp.v1.scl(12f);
+                            UnityFx.evaporateDeath.at(e.x, e.y, 0f, new UnitVecData(e, Tmp.v1.cpy()));
+                            for(int i = 0; i < 12; i++) ExtraEffect.createEvaporation(e.x, e.y, e, b.owner);
+                        }
+                    }
+                });
+                tempSeq.each(Unitc::remove);
+                tempSeq.clear();
+            }
         }
     }
 }

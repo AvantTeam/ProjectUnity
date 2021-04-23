@@ -7,7 +7,9 @@ import arc.math.geom.Position;
 import arc.util.Tmp;
 import mindustry.gen.*;
 import mindustry.graphics.Layer;
+import mindustry.type.*;
 import unity.content.UnityFx;
+import unity.entities.*;
 import unity.util.Utils;
 
 //I doubt that is this way appropriate?
@@ -15,7 +17,7 @@ public class VapourizeEffectState extends EffectState{
     protected Entityc influence;
 
     public VapourizeEffectState(){
-        lifetime = 40f;
+        lifetime = 50f;
     }
 
     public VapourizeEffectState(float x, float y, Unit parent, Entityc influence){
@@ -57,11 +59,13 @@ public class VapourizeEffectState extends EffectState{
     @Override
     public void draw(){
         if(!(parent instanceof Unit unit)) return;
+        UnitType type = unit.type;
         float oz = Draw.z();
-        float slope = (0.4f - Math.abs(fin() - 0.5f)) * 2f;
-        Draw.z(Layer.flyingUnit + 0.01f);
+        float z = (unit.elevation > 0.5f ? (type.lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit) : type.groundLayer + Mathf.clamp(type.hitSize / 4000f, 0, 0.01f)) + 0.001f;
+        float slope = (0.5f - Math.abs(fin() - 0.5f)) * 2f;
+        Draw.z(z);
         Tmp.c1.set(Color.black);
-        Tmp.c1.a = slope * Interp.pow3In.apply(1 - unit.healthf());
+        Tmp.c1.a = Mathf.clamp(slope * (1 - unit.healthf()) * 1.4f);
         Draw.color(Tmp.c1);
         Utils.simpleUnitDrawer(unit, false);
         Draw.z(oz);
@@ -73,6 +77,7 @@ public class VapourizeEffectState extends EffectState{
         if(!added) return;
         Groups.all.remove(this);
         Groups.draw.remove(this);
+        ExtraEffect.removeEvaporation(parent.id());
         added = false;
     }
 }

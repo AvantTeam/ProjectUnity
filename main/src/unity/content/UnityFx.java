@@ -539,6 +539,12 @@ public class UnityFx{
         }
     }),
 
+    tilePosIndicatorTest = new Effect(16f, e -> {
+        color(Color.white);
+        Lines.stroke(2f);
+        Lines.square(e.x, e.y, 8f);
+    }),
+
     evaporateDeath = new Effect(64f, 800f, e -> {
         if(!(e.data instanceof UnitVecData temp)) return;
         Unit unit = temp.unit;

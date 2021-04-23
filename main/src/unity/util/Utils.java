@@ -36,6 +36,7 @@ public final class Utils{
     private static final Rect rect = new Rect(), rectAlt = new Rect(), hitRect = new Rect();
     private static Posc result;
     private static float cdist;
+    private static int idx;
     private static Tile furthest;
     private static boolean hit;
 
@@ -253,6 +254,69 @@ public final class Utils{
 
             Draw.rect(weapon.region, wx, wy, weapon.region.width * Draw.scl * -Mathf.sign(weapon.flipSprite), weapon.region.height * Draw.scl, weaponRotation);
         }
+    }
+
+    public static void shotgunRange(int points, float range, float angle, Floatc cons){
+        if(points <= 1){
+            cons.get(angle);
+            return;
+        }
+        for(int i = 0; i < points; i++){
+            float in = Mathf.lerp(-range, range, i / (points - 1f));
+            cons.get(in + angle);
+        }
+    }
+
+    public static float[] castConeTile(float wx, float wy, float range, float angle, float cone, int rays, Cons2<Building, Tile> consBuilding, Boolf<Tile> insulator){
+        collidedBlocks.clear();
+        idx = 0;
+        float expand = 3;
+        float[] hits = new float[rays];
+        rect.setCentered(wx, wy, expand);
+        shotgunRange(3, cone, angle, con -> {
+            tV.trns(con, range).add(wx, wy);
+            rectAlt.setCentered(tV.x, tV.y, expand);
+            rect.merge(rectAlt);
+        });
+        shotgunRange(rays, cone, angle, con -> {
+            tV.trns(con, range).add(wx, wy);
+            hits[idx] = range * range;
+            world.raycastEachWorld(wx, wy, tV.x, tV.y, (x, y) -> {
+                Tile tile = world.tile(x, y);
+                if(tile != null && insulator.get(tile)){
+                    hits[idx] = Mathf.dst2(wx, wy, x * tilesize, y * tilesize);
+                    return true;
+                }
+                return false;
+            });
+            idx++;
+        });
+        int tx = Mathf.round(rect.x / tilesize);
+        int ty = Mathf.round(rect.y / tilesize);
+        int tw = tx + Mathf.round(rect.width / tilesize);
+        int th = ty + Mathf.round(rect.height / tilesize);
+        for(int x = tx; x <= tw; x++){
+            for(int y = ty; y <= th; y++){
+                float ofX = (x * tilesize) - wx, ofY = (y * tilesize) - wy;
+                int angIdx = Mathf.clamp(Mathf.round(((angleDistSigned(Angles.angle(ofX, ofY), angle) + cone) / (cone * 2f)) * (rays - 1)), 0, rays - 1);
+                float dst = hits[angIdx];
+                float dst2 = Mathf.dst2(ofX, ofY);
+                if(dst2 < dst && dst2 < range * range && angleDist(Angles.angle(ofX, ofY), angle) < cone){
+                    Tile tile = world.tile(x, y);
+                    Building building = null;
+                    if(tile != null){
+                        Building b = world.build(x, y);
+                        if(b != null && !collidedBlocks.contains(b.id)){
+                            building = b;
+                            collidedBlocks.add(b.id);
+                        }
+                        consBuilding.get(building, tile);
+                    }
+                }
+            }
+        }
+        collidedBlocks.clear();
+        return hits;
     }
 
     public static void castCone(float wx, float wy, float range, float angle, float cone, Cons4<Tile, Building, Float, Float> consTile, Cons3<Unit, Float, Float> consUnit){
