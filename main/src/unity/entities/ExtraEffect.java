@@ -65,6 +65,10 @@ public class ExtraEffect{
     }
 
     public static void createEvaporation(float x, float y, Unit host, Entityc influence){
+        createEvaporation(x, y, 0.001f, host, influence);
+    }
+
+    public static void createEvaporation(float x, float y, float strength, Unit host, Entityc influence){
         if(host == null || influence == null) return;
         VapourizeEffectState tmp = vapourizeMap.get(host.id);
         if(tmp == null){
@@ -73,6 +77,7 @@ public class ExtraEffect{
             tmp.add();
         }else{
             //tmp.time = Math.min(tmp.lifetime / 2f, tmp.time);
+            tmp.extraAlpha = Mathf.clamp((strength * Time.delta) + tmp.extraAlpha);
             tmp.time = Mathf.lerpDelta(tmp.time, tmp.lifetime / 2f, 0.3f);
         }
         //new VapourizeEffectState(x, y, host, influence).add();

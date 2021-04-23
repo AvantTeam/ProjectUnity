@@ -1,8 +1,9 @@
 package unity.entities.bullet;
 
 import arc.math.*;
+import arc.math.geom.*;
 import arc.struct.Seq;
-import arc.util.Tmp;
+import arc.util.*;
 import mindustry.gen.*;
 import unity.content.*;
 import unity.entities.*;
@@ -56,10 +57,10 @@ public class SparkingContinuousLaserBulletType extends ContinuousLaserBulletType
                 b.data = Utils.castConeTile(b.x, b.y, length * coneRange, b.rotation(), 70f, 45, (build, tile) -> {
                     float angD = Mathf.clamp(1f - (Utils.angleDist(Angles.angle(tile.worldx() - b.x, tile.worldy() - b.y), b.rotation()) / 70f));
                     float dst = Mathf.clamp(1f - (Mathf.dst(tile.worldx() - b.x, tile.worldy() - b.y) / (length * coneRange)));
-                    if(Mathf.chance(Interp.pow3In.apply(angD) * 0.2f * Mathf.clamp(dst * 1.7f))) Fires.create(tile);
+                    if(Mathf.chance(Interp.pow2In.apply(angD) * 0.2f * Mathf.clamp(dst * 1.7f))) Fires.create(tile);
                     //UnityFx.tilePosIndicatorTest.at(tile.worldx(), tile.worldy());
                     if(build != null && build.team != b.team){
-                        build.damage(Interp.pow3In.apply(angD) * 23.3f * Mathf.clamp(dst * 1.7f));
+                        build.damage(Interp.pow2In.apply(angD) * 23.3f * Mathf.clamp(dst * 1.7f));
                         ExtraEffect.addMoltenBlock(build);
                     }
                 }, tile -> tile.block().absorbLasers || tile.block().insulated);
@@ -73,10 +74,10 @@ public class SparkingContinuousLaserBulletType extends ContinuousLaserBulletType
                     if(h){
                         if(!e.dead){
                             float damageMulti = e.team != b.team ? 0.25f : 1f;
-                            e.damage(28f * angD * dst * damageMulti);
+                            e.damage(28f * angD * dst * damageMulti * Time.delta);
                             Tmp.v1.trns(Angles.angle(b.x, b.y, e.x, e.y), angD * clamped * 160f * (e.hitSize / 20f + 0.95f));
                             e.impulse(Tmp.v1);
-                            if(Mathf.chanceDelta(Mathf.clamp(angD * dst * 12f) * 0.9f)) ExtraEffect.createEvaporation(e.x, e.y, e, b.owner);
+                            if(Mathf.chanceDelta(Mathf.clamp(angD * dst * 12f) * 0.9f)) ExtraEffect.createEvaporation(e.x, e.y, (angD * dst) / 70f, e, b.owner);
                             e.apply(UnityStatusEffects.radiation, angD * damageMulti * 3800.3f * clamped);
                             e.apply(StatusEffects.melting, angD * damageMulti * 240.3f * clamped);
                         }else{
@@ -84,7 +85,12 @@ public class SparkingContinuousLaserBulletType extends ContinuousLaserBulletType
                             Tmp.v1.trns(Angles.angle(b.x, b.y, e.x, e.y), angD * clamped * 130f / Math.max(e.mass() / 120f + 119f / 120f, 1f));
                             Tmp.v1.scl(12f);
                             UnityFx.evaporateDeath.at(e.x, e.y, 0f, new UnitVecData(e, Tmp.v1.cpy()));
-                            for(int i = 0; i < 12; i++) ExtraEffect.createEvaporation(e.x, e.y, e, b.owner);
+                            //for(int i = 0; i < 12; i++) ExtraEffect.createEvaporation(e.x, e.y, e, b.owner);
+                            for(int i = 0; i < 12; i++){
+                                Tmp.v1.trns(Angles.angle(b.x, b.y, e.x(), e.y()), 65f + Mathf.range(0.3f)).add(e);
+                                Tmp.v2.trns(Mathf.random(360f), Mathf.random(e.hitSize / 1.25f));
+                                UnityFx.vaporation.at(e.x, e.y, 0f, new Position[]{e, Tmp.v1.cpy(), Tmp.v2.cpy()});
+                            }
                         }
                     }
                 });

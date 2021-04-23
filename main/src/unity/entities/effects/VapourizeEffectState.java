@@ -15,6 +15,7 @@ import unity.util.Utils;
 //I doubt that is this way appropriate?
 public class VapourizeEffectState extends EffectState{
     protected Entityc influence;
+    public float extraAlpha = 0f;
 
     public VapourizeEffectState(){
         lifetime = 50f;
@@ -65,7 +66,7 @@ public class VapourizeEffectState extends EffectState{
         float slope = (0.5f - Math.abs(fin() - 0.5f)) * 2f;
         Draw.z(z);
         Tmp.c1.set(Color.black);
-        Tmp.c1.a = Mathf.clamp(slope * (1 - unit.healthf()) * 1.4f);
+        Tmp.c1.a = Mathf.clamp(slope * ((1 - unit.healthf()) + extraAlpha) * 1.4f);
         Draw.color(Tmp.c1);
         Utils.simpleUnitDrawer(unit, false);
         Draw.z(oz);
