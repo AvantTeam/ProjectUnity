@@ -9,7 +9,7 @@ import arc.util.serialization.*;
 ext{
     assetsDir = new File(rootDir, "main/assets/")
 
-    fetchPackage = 'mindustry/fetched'
+    fetchPackage = 'unity/fetched'
     fetchDir = new File("$buildDir/generated/sources/annotationProcessor/java/main/$fetchPackage/")
 }
 
@@ -105,29 +105,47 @@ task fetchComps {
                 def filename = val.get('name').asString()
                 def fileurl = val.get('download_url').asString()
 
+                UnsafeRunnable run = {
                 Core.net.http(
                 new Net.HttpRequest()
-                    .timeout(0)
                     .header('Accept', 'application/json')
                     .method(Net.HttpMethod.GET)
                     .url(fileurl),
 
-                { comp -> try {
+                { comp -> 
                     def content = comp.getResultAsString()
                         .replace('mindustry.entities.comp', "$fetchPackage".replace('/', '.'))
                         .replace('mindustry.annotations.Annotations.*', 'unity.annotations.Annotations.*')
+                        .replaceAll('\\@Component\\(*.*\\)*\n*', '')
+                        .replaceAll('\\@EntityDef\\(*.*\\)*\n*', '')
 
                     def fi = new Fi("$fetchDir/$filename")
                     fi.writeString(content)
 
                     done[0]--
                     println "Wrote '$filename': ${done[0]} left."
-                } catch(Throwable t) {
-                    throw new RuntimeException(t)
-                }},
+                },
 
                 { err -> throw err }
                 )
+                }
+
+                Throwable error = null
+                try {
+                    run.run()
+                    error = null
+                } catch(Throwable t) {
+                    error = t
+                }
+
+                while(error != null) {
+                    try {
+                        run.run()
+                        error = null
+                    } catch(Throwable t) {
+                        error = t
+                    }
+                }
             }
         } catch(Throwable t) {
             throw new RuntimeException(t)

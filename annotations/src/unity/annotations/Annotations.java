@@ -47,6 +47,16 @@ public class Annotations{
         Class<?> value();
     }
 
+    /** Indicates that this class is an entity component */
+    @Target({ElementType.TYPE, ElementType.FIELD})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface EntityComp{}
+
+    /** Indicates that this interface wraps an entity component */
+    @Target({ElementType.TYPE, ElementType.FIELD})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface EntityInterface{}
+
     /** Indicates that this content's entity type inherits interfaces */
     @Target(ElementType.FIELD)
     @Retention(RetentionPolicy.SOURCE)
@@ -120,6 +130,12 @@ public class Annotations{
 
     //end region
     //region utilities
+
+    /** Indicates that the field annotated with this came from another component class */
+    @Target(ElementType.FIELD)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface Import{
+    }
 
     /** Getter method, do not use directly */
     @Target(ElementType.METHOD)
