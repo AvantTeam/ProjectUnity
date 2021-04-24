@@ -18,5 +18,113 @@ import com.sun.source.tree.*;
     "unity.annotations.Annotations.EntityDef"
 })
 public class EntityProcessor extends BaseProcessor{
-    
+    Seq<TypeElement> comps = new Seq<>();
+    Seq<TypeElement> inters = new Seq<>();
+    Seq<VariableElement> defs = new Seq<>();
+
+    StringMap varInitializers = new StringMap();
+    StringMap methodBlocks = new StringMap();
+    ObjectMap<String, Seq<String>> imports = new ObjectMap<>();
+
+    @Override
+    public void process(RoundEnvironment roundEnv) throws Exception{
+        comps.addAll((Set<TypeElement>)roundEnv.getElementsAnnotatedWith(EntityComp.class));
+        inters.addAll((Set<TypeElement>)roundEnv.getElementsAnnotatedWith(EntityInterface.class));
+        defs.addAll((Set<VariableElement>)roundEnv.getElementsAnnotatedWith(EntityDef.class));
+
+        if(round == 1){
+            for(TypeElement comp : comps){
+                TypeSpec.Builder inter = TypeSpec.interfaceBuilder(interfaceName(comp))
+                    .addModifiers(Modifier.PUBLIC)
+                    .addJavadoc("Interface for $L", comp.getQualifiedName().toString());
+
+                if(comp.getEnclosingElement() instanceof TypeElement){
+                    inter.addModifiers(Modifier.STATIC);
+                }
+
+                imports.put(interfaceName(comp), getImports(comp));
+
+                ObjectSet<String> preserved = new ObjectSet<>();
+                for(ExecutableElement m : methods(comp).select(me -> !isConstructor(me))){
+                    MethodTree tree = treeUtils.getTree(m);
+                    methodBlocks.put(descString(m), tree.getBody().toString()
+                        .replaceAll("this\\.<(.*)>self\\(\\)", "this")
+                        .replaceAll("self\\(\\)(?!\\s+instanceof)", "this")
+                        .replaceAll(" yield ", "")
+                        .replaceAll("\\/\\*missing\\*\\/", "var")
+                    );
+
+                    if(is(m, Modifier.PRIVATE, Modifier.STATIC)) continue;
+
+                    String name = m.getSimpleName().toString();
+                    preserved.add(m.toString());
+
+                    if(annotation(m, Override.class) == null){
+                        inter.addMethod(
+                            MethodSpec.methodBuilder(name)
+                                .addTypeVariables(Seq.with(m.getTypeParameters()).map(TypeVariableName::get))
+                                .addExceptions(Seq.with(m.getThrownTypes()).map(TypeName::get))
+                                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                                .addParameters(Seq.with(m.getParameters()).map(ParameterSpec::get))
+                                .returns(TypeName.get(m.getReturnType()))
+                            .build()
+                        );
+                    }
+                }
+
+                for(VariableElement var : vars(comp)){
+                    String name = var.getSimpleName().toString();
+
+                    VariableTree tree = (VariableTree)treeUtils.getTree(var);
+                    if(tree.getInitializer() != null){
+                        varInitializers.put(descString(var), tree.getInitializer().toString());
+                    }
+
+                    if(!preserved.contains(name + "()")){
+                        inter.addMethod(
+                            MethodSpec.methodBuilder(name)
+                                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                                .addAnnotation(Getter.class)
+                                .returns(tName(var))
+                            .build()
+                        );
+                    }
+
+                    if(
+                        !preserved.contains(name + "(" + var.asType().toString() + ")") &&
+                        annotation(var, ReadOnly.class) == null
+                    ){
+                        inter.addMethod(
+                            MethodSpec.methodBuilder(name)
+                                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                                .addParameter(
+                                    ParameterSpec.builder(tName(var), name)
+                                    .build()
+                                )
+                                .addAnnotation(Setter.class)
+                                .returns(TypeName.VOID)
+                            .build()
+                        );
+                    }
+                }
+
+                write(inter.build());
+            }
+        }else if(round == 2){
+
+        }
+    }
+
+    String interfaceName(TypeElement type){
+        String name = type.getSimpleName().toString();
+        if(!name.endsWith("Comp")){
+            throw new IllegalStateException("All types annotated with @EntityComp must have 'Comp' as the name's suffix");
+        }
+
+        return name.substring(0, name.length() - 4) + "c";
+    }
+
+    Seq<String> getImports(Element e){
+        return Seq.with(treeUtils.getPath(e).getCompilationUnit().getImports()).map(Object::toString);
+    }
 }
