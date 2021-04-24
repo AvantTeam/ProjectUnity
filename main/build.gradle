@@ -1,10 +1,5 @@
 sourceSets.main.java.srcDirs = ["src/", "$buildDir/generated/sources/annotationProcessor/java/main/"]
 
-import arc.*;
-import arc.files.*;
-import arc.struct.*;
-import arc.util.serialization.*;
-
 ext{
     assetsDir = new File(rootDir, "main/assets/")
 }
@@ -73,71 +68,7 @@ repositories{
     maven{url "https://www.jitpack.io"}
 }
 
-task fetchComps {
-    doFirst {
-        def folder = file("$buildDir/generated/sources/annotationProcessor/java/main/mindustry/fetched/")
-        delete { delete folder }
-        folder.mkdir()
-
-        Core.net = new Net()
-        Core.net.setBlock(true)
-
-        println 'Fetching mindustry entity comps...'
-
-        Core.net.http(
-        new Net.HttpRequest()
-            .timeout(60000)
-            .header('Accept', 'application/json')
-            .method(Net.HttpMethod.GET)
-            .url("https://api.github.com/repos/Anuken/Mindustry/contents/core/src/mindustry/entities/comp?ref=$mindustryVersion"),
-
-        { res -> try {
-            println 'Found mindustry entity comps.'
-
-            def list = Jval.read(res.getResultAsString()).asArray()
-            for(def val : list) {
-                def filename = val.get('name').asString()
-                def fileurl = val.get('download_url').asString()
-
-                println "Fetching '$filename'..."
-
-                Core.net.http(
-                new Net.HttpRequest()
-                    .timeout(60000)
-                    .header('Accept', 'application/json')
-                    .method(Net.HttpMethod.GET)
-                    .url(fileurl),
-
-                { comp -> try {
-                    println "Writing '$filename'..."
-
-                    def content = comp.getResultAsString()
-                        .replace('mindustry.entities.comp', 'mindustry.fetched')
-                        .replace('mindustry.annotations.Annotations.*', 'unity.annotations.Annotations.*')
-
-                    def fi = new Fi("$buildDir/generated/sources/annotationProcessor/java/main/mindustry/fetched/$filename")
-                    fi.writeString(content)
-                } catch(Throwable t) {
-                    throw new GradleException("Failed to write '$filename'", t)
-                }},
-
-                { err -> throw new GradleException("Failed to fetch '$filename'", err) }
-                )
-            }
-        } catch(Throwable t) {
-            throw new GradleException(t)
-        }},
-
-        { err -> throw new GradleException('Failed to fetch mindustry entity components', err) }
-        )
-
-        println 'Done writing.'
-    }
-}
-
 dependencies{
-    compileJava.dependsOn fetchComps
-
     compileOnly "com.github.Anuken.Arc:arc-core:$mindustryVersion"
     compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
 
