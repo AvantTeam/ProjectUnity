@@ -48,14 +48,14 @@ public class Annotations{
     }
 
     /** Indicates that this content's entity type inherits interfaces */
-    @Target(ElementType.FIELD)
+    @Target({ElementType.FIELD, ElementType.TYPE})
     @Retention(RetentionPolicy.SOURCE)
     public @interface EntityDef{
         /** @return The base class for the generated entity class */
         Class<?> base();
 
         /** @return The interfaces that will be inherited by the generated entity class */
-        Class<?>[] def();
+        Class<?>[] value();
     }
 
     /** Indicates that this content's entity will be the one that is pointed */
@@ -123,7 +123,7 @@ public class Annotations{
         boolean write() default true;
     }
 
-    /** Indicates that this interface wraps an entity component */
+    /** Whether this interface wraps an entity component */
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.SOURCE)
     public @interface EntityInterface{}

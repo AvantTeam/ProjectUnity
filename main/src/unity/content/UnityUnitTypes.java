@@ -48,7 +48,7 @@ public class UnityUnitTypes implements ContentList{
     private static final int[] classIDs = new int[constructors.length];
 
     /** Global {@linkplain Copterc copter} units */
-    public static @EntityDef(base = UnitEntity.class, def = Copterc.class)
+    public static @EntityDef(base = UnitEntity.class, value = {Unitc.class, unity.gen.Copterc.class})
     UnitType caelifera, schistocerca, anthophila, vespula, lepidoptera;
 
     /** Global {@linkplain UnitEntity flying} units */
@@ -95,18 +95,18 @@ public class UnityUnitTypes implements ContentList{
     public static @FactionDef("monolith") @EntityPoint(LegsUnit.class)
     UnitType pylon, monument, colossus, bastion;
 
-    public static @FactionDef("monolith") @EntityDef(base = UnitEntity.class, def = Assistantc.class)
+    public static @FactionDef("monolith") @EntityDef(base = UnitEntity.class, value = Assistantc.class)
     UnitType adsect, comitate/*, praesid*/;
 
     public static @FactionDef("monolith") @EntityPoint(UnitEntity.class)
     UnitType farSeeker;
 
-    public static @FactionDef("koruh") @EntityDef(base = KamiUnit.class, def = Bossc.class)
+    public static @FactionDef("koruh") @EntityDef(base = KamiUnit.class, value = Bossc.class)
     UnitType kami;
 
     public static @FactionDef("end") UnitType opticaecus, devourer, apocalypse, ravager;
 
-    public static @EntityDef(base = UnitEntity.class, def = Extensionc.class)
+    public static @EntityDef(base = UnitEntity.class, value = Extensionc.class)
     UnitType extension;
 
     public static int getClassId(int index){

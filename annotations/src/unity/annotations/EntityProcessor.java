@@ -1,12 +1,15 @@
 package unity.annotations;
 
 import arc.struct.*;
+import arc.struct.ObjectMap.*;
 import unity.annotations.Annotations.*;
 
 import java.util.*;
+import java.util.regex.*;
 
 import javax.annotation.processing.*;
 import javax.lang.model.element.*;
+import javax.lang.model.type.*;
 
 import com.squareup.javapoet.*;
 import com.sun.source.tree.*;
@@ -14,33 +17,50 @@ import com.sun.source.tree.*;
 @SuppressWarnings("unchecked")
 @SupportedAnnotationTypes({
     "unity.annotations.Annotations.EntityComponent",
-    "unity.annotations.Annotations.EntityInterface",
     "unity.annotations.Annotations.EntityDef"
 })
 public class EntityProcessor extends BaseProcessor{
     Seq<TypeElement> comps = new Seq<>();
     Seq<TypeElement> inters = new Seq<>();
-    Seq<VariableElement> defs = new Seq<>();
+    Seq<Element> defs = new Seq<>();
 
     StringMap varInitializers = new StringMap();
     StringMap methodBlocks = new StringMap();
     ObjectMap<String, Seq<String>> imports = new ObjectMap<>();
 
+    {
+        rounds = 2;
+    }
+
     @Override
     public void process(RoundEnvironment roundEnv) throws Exception{
         comps.addAll((Set<TypeElement>)roundEnv.getElementsAnnotatedWith(EntityComponent.class));
         inters.addAll((Set<TypeElement>)roundEnv.getElementsAnnotatedWith(EntityInterface.class));
-        defs.addAll((Set<VariableElement>)roundEnv.getElementsAnnotatedWith(EntityDef.class));
+        defs.addAll(roundEnv.getElementsAnnotatedWith(EntityDef.class));
 
         if(round == 1){
+            for(TypeElement comp : (List<TypeElement>)((PackageElement)elementUtils.getPackageElement("unity.fetched")).getEnclosedElements()){
+                comps.add(comp);
+            }
+
+            for(TypeElement inter : (List<TypeElement>)((PackageElement)elementUtils.getPackageElement("mindustry.gen")).getEnclosedElements()){
+                if(
+                    inter.getSimpleName().toString().endsWith("c") &&
+                    inter.getKind() == ElementKind.INTERFACE
+                ){
+                    inters.add(inter);
+                }
+            }
+
             for(TypeElement comp : comps){
                 EntityComponent compAnno = annotation(comp, EntityComponent.class);
                 TypeSpec.Builder inter = null;
 
-                boolean write = compAnno.write();
+                boolean write = compAnno == null ? false : compAnno.write();
                 if(write){
                     inter = TypeSpec.interfaceBuilder(interfaceName(comp))
                         .addModifiers(Modifier.PUBLIC)
+                        .addAnnotation(EntityInterface.class)
                         .addJavadoc("Interface for $L", comp.getQualifiedName().toString());
                 }
 
@@ -48,7 +68,7 @@ public class EntityProcessor extends BaseProcessor{
                     inter.addModifiers(Modifier.STATIC);
                 }
 
-                imports.put(interfaceName(comp), getImports(comp));
+                if(write) imports.put(interfaceName(comp), getImports(comp));
 
                 ObjectSet<String> preserved = new ObjectSet<>();
                 for(ExecutableElement m : methods(comp).select(me -> !isConstructor(me))){
@@ -80,7 +100,7 @@ public class EntityProcessor extends BaseProcessor{
                     }
                 }
 
-                for(VariableElement var : vars(comp)){
+                for(VariableElement var : vars(comp).select(v -> annotation(v, Import.class) == null)){
                     String name = var.getSimpleName().toString();
 
                     VariableTree tree = (VariableTree)treeUtils.getTree(var);
@@ -92,7 +112,6 @@ public class EntityProcessor extends BaseProcessor{
                         inter.addMethod(
                             MethodSpec.methodBuilder(name)
                                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                                .addAnnotation(Getter.class)
                                 .returns(tName(var))
                             .build()
                         );
@@ -110,7 +129,6 @@ public class EntityProcessor extends BaseProcessor{
                                     ParameterSpec.builder(tName(var), name)
                                     .build()
                                 )
-                                .addAnnotation(Setter.class)
                                 .returns(TypeName.VOID)
                             .build()
                         );
@@ -120,13 +138,36 @@ public class EntityProcessor extends BaseProcessor{
                 if(write) write(inter.build());
             }
         }else if(round == 2){
+            for(Element def : defs){
+                EntityDef definition = annotation(def, EntityDef.class);
+                Seq<TypeElement> value = elements(definition::value).<TypeElement>as().map(t -> inters.find(i -> {
+                    return simpleName(i).equals(simpleName(t));
+                })).select(e -> e != null);
 
+                StringBuilder n = new StringBuilder();
+                for(TypeElement t : value){
+                    String raw = t.getSimpleName().toString();
+                    raw = raw.substring(0, raw.length() - 1);
+
+                    n.append(raw);
+                }
+
+                String name = n.toString();
+                TypeSpec.Builder builder = TypeSpec.classBuilder(name).addModifiers(Modifier.PUBLIC);
+            }
         }
+    }
+
+    TypeElement toComp(TypeElement inter){
+        String name = inter.getSimpleName().toString();
+        return comps.find(t -> t.getSimpleName().toString().equals(
+            name.substring(0, name.length() - 1) + "Comp"
+        ));
     }
 
     String interfaceName(TypeElement type){
         String name = type.getSimpleName().toString();
-        if(!name.endsWith("Comp")){
+        if( !name.endsWith("Comp") && !name.endsWith("Def")){
             throw new IllegalStateException("All types annotated with @EntityComp must have 'Comp' as the name's suffix");
         }
 

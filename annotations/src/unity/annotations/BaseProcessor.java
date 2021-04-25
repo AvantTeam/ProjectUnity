@@ -321,6 +321,17 @@ public abstract class BaseProcessor extends AbstractProcessor{
         }
     }
 
+    public String simpleName(TypeElement e){
+        return simpleName(e.getSimpleName().toString());
+    }
+
+    public String simpleName(String canonical){
+        if(canonical.contains(".")){
+            canonical = canonical.substring(canonical.lastIndexOf(".") + 1, canonical.length());
+        }
+        return canonical;
+    }
+
     @Override
     public SourceVersion getSupportedSourceVersion(){
         return SourceVersion.RELEASE_8;

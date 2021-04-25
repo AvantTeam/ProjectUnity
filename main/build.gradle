@@ -172,7 +172,20 @@ task fetchComps {
     }
 }
 
+clean {
+    delete "$projectDir/fetched"
+}
+
 compileJava {
+    options.compilerArgs += [
+        '-processor', 
+            'unity.annotations.FactionProcessor,' +
+            'unity.annotations.EntityProcessor,' +
+            'unity.annotations.LoadProcessor,' +
+            'unity.annotations.AssetsProcessor,' +
+            'unity.annotations.MergeProcessor'
+    ]
+
     if(!fetchDir.exists() || !fetchTemp.exists()) {
         println "Fetched mindustry entity comps not found; fetching components..."
         dependsOn fetchComps
@@ -190,15 +203,6 @@ compileJava {
             dependsOn fetchComps
         }
     }
-
-    options.compilerArgs += [
-        '-processor', 
-            'unity.annotations.FactionProcessor,' +
-            'unity.annotations.EntityProcessor,' +
-            'unity.annotations.LoadProcessor,' +
-            'unity.annotations.AssetsProcessor,' +
-            'unity.annotations.MergeProcessor'
-    ]
 }
 
 dependencies{
