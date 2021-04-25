@@ -310,6 +310,23 @@ public abstract class BaseProcessor extends AbstractProcessor{
         return all.select(e -> !(e instanceof NoType));
     }
 
+    public static String getDefault(String value){
+        switch(value){
+            case "float":
+            case "double":
+            case "int":
+            case "long":
+            case "short":
+            case "char":
+            case "byte":
+                return "0";
+            case "boolean":
+                return "false";
+            default:
+                return "null";
+        }
+    }
+
     public <A extends Annotation> A annotation(Element e, Class<A> annotation){
         try{
             Method m = AnnoConstruct.class.getDeclaredMethod("getAttribute", Class.class);
@@ -325,7 +342,7 @@ public abstract class BaseProcessor extends AbstractProcessor{
         return elementUtils.getTypeElement(type.getCanonicalName());
     }
 
-    public String simpleName(TypeElement e){
+    public String simpleName(Element e){
         return simpleName(e.getSimpleName().toString());
     }
 
@@ -334,6 +351,10 @@ public abstract class BaseProcessor extends AbstractProcessor{
             canonical = canonical.substring(canonical.lastIndexOf(".") + 1, canonical.length());
         }
         return canonical;
+    }
+
+    public String simpleString(ExecutableElement e){
+        return simpleName(e) + "(" + Seq.with(e.getParameters()).toString(", ", p -> simpleName(p.asType().toString())) + ")";
     }
 
     @Override

@@ -56,6 +56,15 @@ public class Annotations{
 
         /** @return The interfaces that will be inherited by the generated entity class */
         Class<?>[] value();
+
+        /** @return Whether the class can serialize itself */
+        boolean serialize() default true;
+
+        /** @return Whether the class can write/read to/from save files */
+        boolean genio() default true;
+
+        /** @return Whether the class is poolable */
+        boolean pooled() default false;
     }
 
     /** Indicates that this content's entity will be the one that is pointed */
@@ -179,6 +188,11 @@ public class Annotations{
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.SOURCE)
     public @interface Replace{}
+
+    /** Whether this method is implemented in annotation-processing time */
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface InternalImpl{}
 
     /** Used for method appender sorting */
     public @interface MethodPriority{
