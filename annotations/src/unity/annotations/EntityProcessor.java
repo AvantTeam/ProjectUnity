@@ -13,7 +13,7 @@ import com.sun.source.tree.*;
 
 @SuppressWarnings("unchecked")
 @SupportedAnnotationTypes({
-    "unity.annotations.Annotations.EntityComp",
+    "unity.annotations.Annotations.EntityComponent",
     "unity.annotations.Annotations.EntityInterface",
     "unity.annotations.Annotations.EntityDef"
 })
@@ -28,17 +28,23 @@ public class EntityProcessor extends BaseProcessor{
 
     @Override
     public void process(RoundEnvironment roundEnv) throws Exception{
-        comps.addAll((Set<TypeElement>)roundEnv.getElementsAnnotatedWith(EntityComp.class));
+        comps.addAll((Set<TypeElement>)roundEnv.getElementsAnnotatedWith(EntityComponent.class));
         inters.addAll((Set<TypeElement>)roundEnv.getElementsAnnotatedWith(EntityInterface.class));
         defs.addAll((Set<VariableElement>)roundEnv.getElementsAnnotatedWith(EntityDef.class));
 
         if(round == 1){
             for(TypeElement comp : comps){
-                TypeSpec.Builder inter = TypeSpec.interfaceBuilder(interfaceName(comp))
-                    .addModifiers(Modifier.PUBLIC)
-                    .addJavadoc("Interface for $L", comp.getQualifiedName().toString());
+                EntityComponent compAnno = annotation(comp, EntityComponent.class);
+                TypeSpec.Builder inter = null;
 
-                if(comp.getEnclosingElement() instanceof TypeElement){
+                boolean write = compAnno.write();
+                if(write){
+                    inter = TypeSpec.interfaceBuilder(interfaceName(comp))
+                        .addModifiers(Modifier.PUBLIC)
+                        .addJavadoc("Interface for $L", comp.getQualifiedName().toString());
+                }
+
+                if(write && comp.getEnclosingElement() instanceof TypeElement){
                     inter.addModifiers(Modifier.STATIC);
                 }
 
@@ -46,20 +52,22 @@ public class EntityProcessor extends BaseProcessor{
 
                 ObjectSet<String> preserved = new ObjectSet<>();
                 for(ExecutableElement m : methods(comp).select(me -> !isConstructor(me))){
-                    MethodTree tree = treeUtils.getTree(m);
-                    methodBlocks.put(descString(m), tree.getBody().toString()
-                        .replaceAll("this\\.<(.*)>self\\(\\)", "this")
-                        .replaceAll("self\\(\\)(?!\\s+instanceof)", "this")
-                        .replaceAll(" yield ", "")
-                        .replaceAll("\\/\\*missing\\*\\/", "var")
-                    );
+                    BlockTree tree = treeUtils.getTree(m).getBody();
+                    if(tree != null){
+                        methodBlocks.put(descString(m), tree.toString()
+                            .replaceAll("this\\.<(.*)>self\\(\\)", "this")
+                            .replaceAll("self\\(\\)(?!\\s+instanceof)", "this")
+                            .replaceAll(" yield ", "")
+                            .replaceAll("\\/\\*missing\\*\\/", "var")
+                        );
+                    }
 
                     if(is(m, Modifier.PRIVATE, Modifier.STATIC)) continue;
 
                     String name = m.getSimpleName().toString();
                     preserved.add(m.toString());
 
-                    if(annotation(m, Override.class) == null){
+                    if(write && annotation(m, Override.class) == null){
                         inter.addMethod(
                             MethodSpec.methodBuilder(name)
                                 .addTypeVariables(Seq.with(m.getTypeParameters()).map(TypeVariableName::get))
@@ -80,7 +88,7 @@ public class EntityProcessor extends BaseProcessor{
                         varInitializers.put(descString(var), tree.getInitializer().toString());
                     }
 
-                    if(!preserved.contains(name + "()")){
+                    if(write && !preserved.contains(name + "()")){
                         inter.addMethod(
                             MethodSpec.methodBuilder(name)
                                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
@@ -91,6 +99,7 @@ public class EntityProcessor extends BaseProcessor{
                     }
 
                     if(
+                        write &&
                         !preserved.contains(name + "(" + var.asType().toString() + ")") &&
                         annotation(var, ReadOnly.class) == null
                     ){
@@ -108,7 +117,7 @@ public class EntityProcessor extends BaseProcessor{
                     }
                 }
 
-                write(inter.build());
+                if(write) write(inter.build());
             }
         }else if(round == 2){
 

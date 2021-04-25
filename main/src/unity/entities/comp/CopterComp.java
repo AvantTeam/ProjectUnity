@@ -7,7 +7,7 @@ import mindustry.gen.*;
 import unity.annotations.Annotations.*;
 import unity.type.*;
 
-@EntityComp
+@EntityComponent
 abstract class CopterComp implements Unitc{
     FloatSeq rotorRot = new FloatSeq();
     float rotorSpeedScl;

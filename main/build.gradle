@@ -1,4 +1,4 @@
-sourceSets.main.java.srcDirs = ["src/", "$buildDir/generated/sources/annotationProcessor/java/main/"]
+sourceSets.main.java.srcDirs = ['src/', "$buildDir/generated/sources/annotationProcessor/java/main/", "$projectDir/fetched"]
 
 import arc.*;
 import arc.files.*;
@@ -10,13 +10,18 @@ ext{
     assetsDir = new File(rootDir, "main/assets/")
 
     fetchPackage = 'unity/fetched'
-    fetchDir = new File("$buildDir/generated/sources/annotationProcessor/java/main/$fetchPackage/")
+    fetchDir = new File("$projectDir/fetched/$fetchPackage")
 
     fetchTemp = new Fi("$projectDir/fetch.txt")
-    fetchRevision = 0
+    fetchRevision = 2
 }
 
 task deploy(type: Jar, dependsOn: configurations.runtimeClasspath){
+    if(!hasSprites()){
+        println "Sprites folder not found; automatically processing sprites..."
+        dependsOn project(':tools').tasks.proc
+    }
+
     archiveFileName = "${modName}Desktop.jar"
 
     from files(sourceSets.main.output.classesDirs)
@@ -70,11 +75,6 @@ task deployDex(type: Jar){
     }
 }
 
-if(!hasSprites()){
-    println "Sprites folder not found; automatically processing sprites..."
-    deploy.dependsOn ":tools:proc"
-}
-
 repositories{
     mavenCentral()
     maven{url "https://www.jitpack.io"}
@@ -118,7 +118,11 @@ task fetchComps {
                 def content = comp.getResultAsString()
                     .replace('mindustry.entities.comp', "$fetchPackage".replace('/', '.'))
                     .replace('mindustry.annotations.Annotations.*', 'unity.annotations.Annotations.*')
-                    .replaceAll('\\@Component\\(*.*\\)*\n*', '@EntityComp(write = false)\n')
+                    .replaceAll('\\@Component\\(*.*\\)*\n*', '@EntityComponent(write = false)\n')
+                    .replaceAll('\\@BaseComponent\n*', '')
+                    .replaceAll('\\@CallSuper\n*', '')
+                    .replaceAll('\\@Final\n*', '')
+                    .replaceAll('\\@InternalImpl\n*', '')
                     .replaceAll('\\@EntityDef\\(*.*\\)*\n*', '')
 
                 def fi = new Fi("$fetchDir/$filename")
@@ -168,25 +172,36 @@ task fetchComps {
     }
 }
 
-dependencies{
-    if(!fetchTemp.exists()) {
-        println "Fetched mindustry entity comps temp data not found; fetching components..."
-        compileJava.dependsOn fetchComps
+compileJava {
+    if(!fetchDir.exists() || !fetchTemp.exists()) {
+        println "Fetched mindustry entity comps not found; fetching components..."
+        dependsOn fetchComps
     } else {
         String[] content = fetchTemp.readString().split('/')
         String ver = content[0]
         String rev = content[1]
 
-        if(!ver.equals(new String(mindustryVersion)) || !rev.equals(Integer.toString(fetchRevision))) {
+        if(!ver.equals(new String("$mindustryVersion")) || !rev.equals(Integer.toString(fetchRevision))) {
             println 'Temp fetch data mismatch:'
             println "Stored  : { version: $ver, revision: $rev }"
             println "Required: { version: $mindustryVersion, revision: $fetchRevision }"
             println "Fetching components..."
 
-            compileJava.dependsOn fetchComps
+            dependsOn fetchComps
         }
     }
 
+    options.compilerArgs += [
+        '-processor', 
+            'unity.annotations.FactionProcessor,' +
+            'unity.annotations.EntityProcessor,' +
+            'unity.annotations.LoadProcessor,' +
+            'unity.annotations.AssetsProcessor,' +
+            'unity.annotations.MergeProcessor'
+    ]
+}
+
+dependencies{
     compileOnly "com.github.Anuken.Arc:arc-core:$mindustryVersion"
     compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
 
@@ -195,13 +210,4 @@ dependencies{
 
     compileOnly project(":annotations")
     annotationProcessor project(":annotations")
-
-    compileJava.options.compilerArgs.addAll([
-        "-processor", 
-            "unity.annotations.FactionProcessor," +
-            "unity.annotations.EntityProcessor," +
-            "unity.annotations.LoadProcessor," +
-            "unity.annotations.AssetsProcessor," +
-            "unity.annotations.MergeProcessor"
-    ])
 }

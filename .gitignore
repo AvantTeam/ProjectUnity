@@ -9,6 +9,7 @@ main/bin/
 main/build/
 main/assets-raw/sprites-gen/
 main/assets/sprites/
+main/fetched/
 main/.settings/
 
 tools/bin/

@@ -118,7 +118,7 @@ public class Annotations{
     /** Indicates that this class is an entity component */
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface EntityComp{
+    public @interface EntityComponent{
         /** @return Whether the component should be interpreted into interfaces */
         boolean write() default true;
     }
@@ -130,6 +130,22 @@ public class Annotations{
 
     //end region
     //region utilities
+
+    /** Indicates that a field will be interpolated when synced. */
+    @Target({ElementType.FIELD})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface SyncField{
+        /** If true, the field will be linearly interpolated. If false, it will be interpolated as an angle. */
+        boolean value();
+
+        /** If true, the field is clamped to 0-1. */
+        boolean clamped() default false;
+    }
+
+    /** Indicates that a field will not be read from the server when syncing the local player state. */
+    @Target({ElementType.FIELD})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface SyncLocal{}
 
     /** Indicates that the field annotated with this came from another component class */
     @Target(ElementType.FIELD)
