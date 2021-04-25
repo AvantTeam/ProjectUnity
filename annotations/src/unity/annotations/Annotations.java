@@ -47,16 +47,6 @@ public class Annotations{
         Class<?> value();
     }
 
-    /** Indicates that this class is an entity component */
-    @Target({ElementType.TYPE, ElementType.FIELD})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface EntityComp{}
-
-    /** Indicates that this interface wraps an entity component */
-    @Target({ElementType.TYPE, ElementType.FIELD})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface EntityInterface{}
-
     /** Indicates that this content's entity type inherits interfaces */
     @Target(ElementType.FIELD)
     @Retention(RetentionPolicy.SOURCE)
@@ -95,14 +85,12 @@ public class Annotations{
     /** Whether this class is the base class for faction enum. Only one type may use this */
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface FactionBase{
-    }
+    public @interface FactionBase{}
 
     /** Whether this class is the base class for exp types. Only one type may use this */
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface ExpBase{
-    }
+    public @interface ExpBase{}
 
     /** Works somewhat like {@code Object.assign(...)} for Block and Building */
     @Target({ElementType.TYPE, ElementType.FIELD})
@@ -118,8 +106,7 @@ public class Annotations{
     /** Notifies that this class is a component class; an interface will be generated out of this */
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface MergeComp{
-    }
+    public @interface MergeComp{}
 
     /** The generated interface from {@link Annotations.MergeComp} */
     @Target(ElementType.TYPE)
@@ -128,44 +115,51 @@ public class Annotations{
         Class<?> buildType() default Building.class;
     }
 
+    /** Indicates that this class is an entity component */
+    @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface EntityComp{
+        /** @return Whether the component should be interpreted into interfaces */
+        boolean write() default true;
+    }
+
+    /** Indicates that this interface wraps an entity component */
+    @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface EntityInterface{}
+
     //end region
     //region utilities
 
     /** Indicates that the field annotated with this came from another component class */
     @Target(ElementType.FIELD)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface Import{
-    }
+    public @interface Import{}
 
     /** Getter method, do not use directly */
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface Getter{
-    }
+    public @interface Getter{}
 
     /** Setter method, do not use directly */
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface Setter{
-    }
+    public @interface Setter{}
 
     /** Whether the field returned by this getter is meant to be read-only */
     @Target({ElementType.METHOD, ElementType.FIELD})
     @Retention(RetentionPolicy.SOURCE)
-    public @interface ReadOnly{
-    }
+    public @interface ReadOnly{}
 
     /** Whether this getter must be implemented by the type's subtypes */
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface MustInherit{
-    }
+    public @interface MustInherit{}
 
     /** Whether this method replaces the actual method in the base class */
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface Replace{
-    }
+    public @interface Replace{}
 
     /** Used for method appender sorting */
     public @interface MethodPriority{

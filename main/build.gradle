@@ -11,6 +11,9 @@ ext{
 
     fetchPackage = 'unity/fetched'
     fetchDir = new File("$buildDir/generated/sources/annotationProcessor/java/main/$fetchPackage/")
+
+    fetchTemp = new Fi("$projectDir/fetch.txt")
+    fetchRevision = 0
 }
 
 task deploy(type: Jar, dependsOn: configurations.runtimeClasspath){
@@ -84,82 +87,105 @@ task fetchComps {
 
         Core.net = new Net()
         Core.net.setBlock(true)
-        println 'Fetching mindustry entity comps...'
 
         int[] done = [Integer.MAX_VALUE]
 
+        UnsafeRunnable mainRun = {
         Core.net.http(
         new Net.HttpRequest()
-            .timeout(0)
             .header('Accept', 'application/json')
             .method(Net.HttpMethod.GET)
             .url("https://api.github.com/repos/Anuken/Mindustry/contents/core/src/mindustry/entities/comp?ref=$mindustryVersion"),
 
-        { res -> try {
-            def list = Jval.read(res.getResultAsString()).asArray()
-            done[0] = list.size
+        { res ->
+        def list = Jval.read(res.getResultAsString()).asArray()
+        done[0] = list.size
 
-            println "Found all ${done[0]} mindustry entity comps."
+        println "Found all ${done[0]} mindustry entity comps."
 
-            for(def val : list) {
-                def filename = val.get('name').asString()
-                def fileurl = val.get('download_url').asString()
+        for(def val : list) {
+            def filename = val.get('name').asString()
+            def fileurl = val.get('download_url').asString()
 
-                UnsafeRunnable run = {
-                Core.net.http(
-                new Net.HttpRequest()
-                    .header('Accept', 'application/json')
-                    .method(Net.HttpMethod.GET)
-                    .url(fileurl),
+            UnsafeRunnable run = {
+            Core.net.http(
+            new Net.HttpRequest()
+                .header('Accept', 'application/json')
+                .method(Net.HttpMethod.GET)
+                .url(fileurl),
 
-                { comp -> 
-                    def content = comp.getResultAsString()
-                        .replace('mindustry.entities.comp', "$fetchPackage".replace('/', '.'))
-                        .replace('mindustry.annotations.Annotations.*', 'unity.annotations.Annotations.*')
-                        .replaceAll('\\@Component\\(*.*\\)*\n*', '')
-                        .replaceAll('\\@EntityDef\\(*.*\\)*\n*', '')
+            { comp -> 
+                def content = comp.getResultAsString()
+                    .replace('mindustry.entities.comp', "$fetchPackage".replace('/', '.'))
+                    .replace('mindustry.annotations.Annotations.*', 'unity.annotations.Annotations.*')
+                    .replaceAll('\\@Component\\(*.*\\)*\n*', '@EntityComp(write = false)\n')
+                    .replaceAll('\\@EntityDef\\(*.*\\)*\n*', '')
 
-                    def fi = new Fi("$fetchDir/$filename")
-                    fi.writeString(content)
+                def fi = new Fi("$fetchDir/$filename")
+                fi.writeString(content)
 
-                    done[0]--
-                    println "Wrote '$filename': ${done[0]} left."
-                },
+                done[0]--
+                println "Wrote '$filename': ${done[0]} left."
+            },
 
-                { err -> throw err }
-                )
-                }
+            { err -> throw err })}
 
-                Throwable error = null
-                try {
-                    run.run()
-                    error = null
-                } catch(Throwable t) {
-                    error = t
-                }
-
-                while(error != null) {
-                    try {
-                        run.run()
-                        error = null
-                    } catch(Throwable t) {
-                        error = t
-                    }
-                }
+            Throwable error = null
+            try {
+                run.run()
+                error = null
+            } catch(Throwable t) {
+                error = t
             }
-        } catch(Throwable t) {
-            throw new RuntimeException(t)
+
+            while(error != null) { try {
+                run.run()
+                error = null
+            } catch(Throwable t) {
+                error = t
+            }}
         }},
 
-        { err -> throw err }
-        )
+        { err -> throw err })}
 
+        Throwable error = null
+        try {
+            mainRun.run()
+            error = null
+        } catch(Throwable t) {
+            error = t
+        }
+
+        while(error != null) { try {
+            mainRun.run()
+            error = null
+        } catch(Throwable t) {
+            error = t
+        }}
+
+        fetchTemp.writeString("$mindustryVersion/$fetchRevision")
         println 'Done writing.'
     }
 }
 
 dependencies{
-    compileJava.dependsOn fetchComps
+    if(!fetchTemp.exists()) {
+        println "Fetched mindustry entity comps temp data not found; fetching components..."
+        compileJava.dependsOn fetchComps
+    } else {
+        String[] content = fetchTemp.readString().split('/')
+        String ver = content[0]
+        String rev = content[1]
+
+        if(!ver.equals(new String(mindustryVersion)) || !rev.equals(Integer.toString(fetchRevision))) {
+            println 'Temp fetch data mismatch:'
+            println "Stored  : { version: $ver, revision: $rev }"
+            println "Required: { version: $mindustryVersion, revision: $fetchRevision }"
+            println "Fetching components..."
+
+            compileJava.dependsOn fetchComps
+        }
+    }
 
     compileOnly "com.github.Anuken.Arc:arc-core:$mindustryVersion"
     compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"

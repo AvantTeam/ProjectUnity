@@ -19,5 +19,6 @@ tools/.settings/
 *.classpath
 *.aseprite
 *.psd
+*.txt
 
 .kateproject
