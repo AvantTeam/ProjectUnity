@@ -321,6 +321,10 @@ public abstract class BaseProcessor extends AbstractProcessor{
         }
     }
 
+    public TypeElement toType(Class<?> type){
+        return elementUtils.getTypeElement(type.getCanonicalName());
+    }
+
     public String simpleName(TypeElement e){
         return simpleName(e.getSimpleName().toString());
     }

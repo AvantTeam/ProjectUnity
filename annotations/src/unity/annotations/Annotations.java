@@ -121,6 +121,9 @@ public class Annotations{
     public @interface EntityComponent{
         /** @return Whether the component should be interpreted into interfaces */
         boolean write() default true;
+
+        /** @return Whether the component should generate a base class for itself */
+        boolean base() default false;
     }
 
     /** Whether this interface wraps an entity component */

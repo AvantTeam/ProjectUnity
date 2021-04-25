@@ -1,15 +1,13 @@
 package unity.annotations;
 
 import arc.struct.*;
-import arc.struct.ObjectMap.*;
+import mindustry.gen.*;
 import unity.annotations.Annotations.*;
 
 import java.util.*;
-import java.util.regex.*;
 
 import javax.annotation.processing.*;
 import javax.lang.model.element.*;
-import javax.lang.model.type.*;
 
 import com.squareup.javapoet.*;
 import com.sun.source.tree.*;
@@ -21,12 +19,14 @@ import com.sun.source.tree.*;
 })
 public class EntityProcessor extends BaseProcessor{
     Seq<TypeElement> comps = new Seq<>();
+    ObjectMap<String, TypeElement> compNames = new ObjectMap<>();
     Seq<TypeElement> inters = new Seq<>();
     Seq<Element> defs = new Seq<>();
 
     StringMap varInitializers = new StringMap();
     StringMap methodBlocks = new StringMap();
     ObjectMap<String, Seq<String>> imports = new ObjectMap<>();
+    ObjectMap<TypeElement, String> groups;
 
     {
         rounds = 2;
@@ -39,9 +39,18 @@ public class EntityProcessor extends BaseProcessor{
         defs.addAll(roundEnv.getElementsAnnotatedWith(EntityDef.class));
 
         if(round == 1){
-            for(TypeElement comp : (List<TypeElement>)((PackageElement)elementUtils.getPackageElement("unity.fetched")).getEnclosedElements()){
-                comps.add(comp);
-            }
+            groups = ObjectMap.of(
+                toComp(Entityc.class), "all",
+                toComp(Playerc.class), "player",
+                toComp(Bulletc.class), "bullet",
+                toComp(Unitc.class), "unit",
+                toComp(Buildingc.class), "build",
+                toComp(Syncc.class), "sync",
+                toComp(Drawc.class), "draw",
+                toComp(Firec.class), "fire",
+                toComp(Puddlec.class), "puddle",
+                toComp(WeatherStatec.class), "weather"
+            );
 
             for(TypeElement inter : (List<TypeElement>)((PackageElement)elementUtils.getPackageElement("mindustry.gen")).getEnclosedElements()){
                 if(
@@ -53,107 +62,31 @@ public class EntityProcessor extends BaseProcessor{
             }
 
             for(TypeElement comp : comps){
-                EntityComponent compAnno = annotation(comp, EntityComponent.class);
-                TypeSpec.Builder inter = null;
+                for(ExecutableElement m : methods(comp)){
+                    if(is(m, Modifier.ABSTRACT, Modifier.NATIVE)) continue;
 
-                boolean write = compAnno == null ? false : compAnno.write();
-                if(write){
-                    inter = TypeSpec.interfaceBuilder(interfaceName(comp))
-                        .addModifiers(Modifier.PUBLIC)
-                        .addAnnotation(EntityInterface.class)
-                        .addJavadoc("Interface for $L", comp.getQualifiedName().toString());
+                    methodBlocks.put(descString(m), treeUtils.getTree(m).getBody().toString()
+                        .replaceAll("this\\.<(.*)>self\\(\\)", "this")
+                        .replaceAll("self\\(\\)(?!\\s+instanceof)", "this")
+                        .replaceAll(" yield ", "")
+                        .replaceAll("\\/\\*missing\\*\\/", "var")
+                    );
                 }
 
-                if(write && comp.getEnclosingElement() instanceof TypeElement){
-                    inter.addModifiers(Modifier.STATIC);
-                }
-
-                if(write) imports.put(interfaceName(comp), getImports(comp));
-
-                ObjectSet<String> preserved = new ObjectSet<>();
-                for(ExecutableElement m : methods(comp).select(me -> !isConstructor(me))){
-                    BlockTree tree = treeUtils.getTree(m).getBody();
-                    if(tree != null){
-                        methodBlocks.put(descString(m), tree.toString()
-                            .replaceAll("this\\.<(.*)>self\\(\\)", "this")
-                            .replaceAll("self\\(\\)(?!\\s+instanceof)", "this")
-                            .replaceAll(" yield ", "")
-                            .replaceAll("\\/\\*missing\\*\\/", "var")
-                        );
-                    }
-
-                    if(is(m, Modifier.PRIVATE, Modifier.STATIC)) continue;
-
-                    String name = m.getSimpleName().toString();
-                    preserved.add(m.toString());
-
-                    if(write && annotation(m, Override.class) == null){
-                        inter.addMethod(
-                            MethodSpec.methodBuilder(name)
-                                .addTypeVariables(Seq.with(m.getTypeParameters()).map(TypeVariableName::get))
-                                .addExceptions(Seq.with(m.getThrownTypes()).map(TypeName::get))
-                                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                                .addParameters(Seq.with(m.getParameters()).map(ParameterSpec::get))
-                                .returns(TypeName.get(m.getReturnType()))
-                            .build()
-                        );
-                    }
-                }
-
-                for(VariableElement var : vars(comp).select(v -> annotation(v, Import.class) == null)){
-                    String name = var.getSimpleName().toString();
-
+                for(VariableElement var : vars(comp)){
                     VariableTree tree = (VariableTree)treeUtils.getTree(var);
                     if(tree.getInitializer() != null){
                         varInitializers.put(descString(var), tree.getInitializer().toString());
                     }
-
-                    if(write && !preserved.contains(name + "()")){
-                        inter.addMethod(
-                            MethodSpec.methodBuilder(name)
-                                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                                .returns(tName(var))
-                            .build()
-                        );
-                    }
-
-                    if(
-                        write &&
-                        !preserved.contains(name + "(" + var.asType().toString() + ")") &&
-                        annotation(var, ReadOnly.class) == null
-                    ){
-                        inter.addMethod(
-                            MethodSpec.methodBuilder(name)
-                                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                                .addParameter(
-                                    ParameterSpec.builder(tName(var), name)
-                                    .build()
-                                )
-                                .returns(TypeName.VOID)
-                            .build()
-                        );
-                    }
                 }
 
-                if(write) write(inter.build());
-            }
-        }else if(round == 2){
-            for(Element def : defs){
-                EntityDef definition = annotation(def, EntityDef.class);
-                Seq<TypeElement> value = elements(definition::value).<TypeElement>as().map(t -> inters.find(i -> {
-                    return simpleName(i).equals(simpleName(t));
-                })).select(e -> e != null);
+                imports.put(interfaceName(comp), getImports(comp));
+                compNames.put(comp.getSimpleName().toString(), comp);
 
-                StringBuilder n = new StringBuilder();
-                for(TypeElement t : value){
-                    String raw = t.getSimpleName().toString();
-                    raw = raw.substring(0, raw.length() - 1);
-
-                    n.append(raw);
+                EntityComponent compAnno = annotation(comp, EntityComponent.class);
+                if(compAnno.write()){
+                    
                 }
-
-                String name = n.toString();
-                TypeSpec.Builder builder = TypeSpec.classBuilder(name).addModifiers(Modifier.PUBLIC);
             }
         }
     }
@@ -165,9 +98,13 @@ public class EntityProcessor extends BaseProcessor{
         ));
     }
 
+    TypeElement toComp(Class<?> inter){
+        return toComp(elementUtils.getTypeElement(inter.getCanonicalName()));
+    }
+
     String interfaceName(TypeElement type){
         String name = type.getSimpleName().toString();
-        if( !name.endsWith("Comp") && !name.endsWith("Def")){
+        if(!name.endsWith("Comp")){
             throw new IllegalStateException("All types annotated with @EntityComp must have 'Comp' as the name's suffix");
         }
 
