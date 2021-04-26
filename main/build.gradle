@@ -17,11 +17,6 @@ ext {
 }
 
 task deploy(type: Jar, dependsOn: configurations.runtimeClasspath) {
-    if(!hasSprites()) {
-        println 'Sprites folder not found; automatically processing sprites...'
-        dependsOn "tools:proc"
-    }
-
     archiveFileName = "${modName}Desktop.jar"
 
     from {
@@ -67,6 +62,11 @@ task deployDex(type: Jar) {
         delete "$buildDir/libs/${modName}Desktop.jar"
         delete "$buildDir/libs/${modName}Dexed.jar"
     }}
+}
+
+if(!hasSprites()) {
+    println 'Sprites folder not found; automatically processing sprites...'
+    deploy.dependsOn "tools:proc"
 }
 
 repositories {
