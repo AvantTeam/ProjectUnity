@@ -19,7 +19,7 @@ ext{
 task deploy(type: Jar, dependsOn: configurations.runtimeClasspath){
     if(!hasSprites()){
         println "Sprites folder not found; automatically processing sprites..."
-        dependsOn project(':tools').tasks.proc
+        dependsOn "tools:proc"
     }
 
     archiveFileName = "${modName}Desktop.jar"

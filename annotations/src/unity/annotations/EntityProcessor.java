@@ -135,7 +135,6 @@ public class EntityProcessor extends BaseProcessor{
                             inter.addMethod(
                                 MethodSpec.methodBuilder(name)
                                     .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                                    .addAnnotation(Getter.class)
                                     .returns(tName(var))
                                 .build()
                             );
@@ -150,7 +149,6 @@ public class EntityProcessor extends BaseProcessor{
                                 MethodSpec.methodBuilder(name)
                                     .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                                     .addParameter(tName(var), name)
-                                    .addAnnotation(Setter.class)
                                     .returns(TypeName.VOID)
                                 .build()
                             );
