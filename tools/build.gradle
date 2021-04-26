@@ -18,11 +18,11 @@ task proc(dependsOn: [classes, configurations.runtimeClasspath]) {
         file(spritesAssetsFolder).mkdirs()
 
         javaexec {
-            main = imageProcessorMain
-            classpath = sourceSets.main.runtimeClasspath
+            main imageProcessorMain
+            classpath sourceSets.main.runtimeClasspath
             jvmArgs += '-Djava.awt.headless=true'
-            standardInput = System.in
-            workingDir = '../main/assets-raw/'
+            standardInput System.in
+            workingDir file('../main/assets-raw/')
         }
 
         copy {
@@ -31,8 +31,8 @@ task proc(dependsOn: [classes, configurations.runtimeClasspath]) {
         }
 
         exec {
-            ignoreExitValue = true
-            workingDir = "../main/"
+            ignoreExitValue true
+            workingDir file('../main/')
 
             println()
             println 'Alpha-bleeding sprites...'
@@ -47,11 +47,11 @@ task proc(dependsOn: [classes, configurations.runtimeClasspath]) {
 
 repositories {
     mavenCentral()
-    maven { url "https://www.jitpack.io"}
+    maven { url 'https://www.jitpack.io' }
 }
 
 dependencies {
-    implementation project(":main")
+    implementation project(':main')
 
     implementation "com.github.Anuken.Arc:arc-core:$mindustryVersion"
     implementation "com.github.Anuken.Mindustry:core:$mindustryVersion"

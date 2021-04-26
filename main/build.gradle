@@ -17,6 +17,11 @@ ext {
 }
 
 task deploy(type: Jar, dependsOn: configurations.runtimeClasspath) {
+    if(!hasSprites()) {
+        println 'Sprites folder not found; automatically processing sprites...'
+        deploy.dependsOn ":tools:proc"
+    }
+
     archiveFileName = "${modName}Desktop.jar"
 
     from {
@@ -64,14 +69,9 @@ task deployDex(type: Jar) {
     }}
 }
 
-if(!hasSprites()) {
-    println 'Sprites folder not found; automatically processing sprites...'
-    deploy.dependsOn "tools:proc"
-}
-
 repositories {
     mavenCentral()
-    maven { url "https://www.jitpack.io"}
+    maven { url 'https://www.jitpack.io' }
 }
 
 task fetchComps {
@@ -168,6 +168,7 @@ task fetchComps {
 
 clean {
     delete "$projectDir/fetched"
+    delete "$fetchTemp"
 }
 
 compileJava {
