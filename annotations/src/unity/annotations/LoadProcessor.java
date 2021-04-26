@@ -11,6 +11,7 @@ import javax.lang.model.element.*;
 
 import com.squareup.javapoet.*;
 
+/** @author GlennFolker */
 @SupportedAnnotationTypes("unity.annotations.Annotations.LoadRegs")
 public class LoadProcessor extends BaseProcessor{
     Seq<VariableElement> toLoad = new Seq<>();

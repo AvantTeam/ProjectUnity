@@ -16,6 +16,10 @@ import javax.lang.model.type.*;
 import com.squareup.javapoet.*;
 import com.sun.source.tree.*;
 
+/**
+ * @author Anuke
+ * @author GlennFolker
+ */
 @SuppressWarnings("unchecked")
 @SupportedAnnotationTypes({
     "unity.annotations.Annotations.EntityComponent",

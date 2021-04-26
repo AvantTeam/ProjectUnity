@@ -28,6 +28,7 @@ import unity.annotations.Annotations.AnnotationProxyMaker;
 
 import java.lang.Class;
 
+/** @author GlennFolker */
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 public abstract class BaseProcessor extends AbstractProcessor{
     public static final String packageName = "unity.gen";

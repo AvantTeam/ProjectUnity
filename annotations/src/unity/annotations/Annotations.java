@@ -28,6 +28,7 @@ import java.lang.reflect.*;
 import java.util.*;
 import java.util.Map.*;
 
+/** @author GlennFolker */
 public class Annotations{
     //region definitions
 

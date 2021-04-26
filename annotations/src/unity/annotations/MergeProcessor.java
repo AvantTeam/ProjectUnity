@@ -16,6 +16,7 @@ import com.sun.source.tree.*;
 import java.util.*;
 import java.util.regex.*;
 
+/** @author GlennFolker */
 @SuppressWarnings("unchecked")
 @SupportedAnnotationTypes({
     "unity.annotations.Annotations.Merge",
