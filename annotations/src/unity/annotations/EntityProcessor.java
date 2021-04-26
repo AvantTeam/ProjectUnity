@@ -1,10 +1,10 @@
 package unity.annotations;
 
+import arc.func.*;
 import arc.struct.*;
 import arc.struct.ObjectMap.*;
 import arc.util.*;
 import arc.util.pooling.Pool.*;
-import mindustry.gen.*;
 import unity.annotations.Annotations.*;
 
 import java.util.*;
@@ -19,13 +19,16 @@ import com.sun.source.tree.*;
 @SuppressWarnings("unchecked")
 @SupportedAnnotationTypes({
     "unity.annotations.Annotations.EntityComponent",
+    "unity.annotations.Annotations.EntityBaseComponent",
     "unity.annotations.Annotations.EntityDef"
 })
 public class EntityProcessor extends BaseProcessor{
     Seq<TypeElement> comps = new Seq<>();
+    Seq<TypeElement> baseComps = new Seq<>();
     ObjectMap<String, TypeElement> compNames = new ObjectMap<>();
     Seq<TypeSpec.Builder> baseClasses = new Seq<>();
     ObjectMap<TypeElement, ObjectSet<TypeElement>> baseClassDeps = new ObjectMap<>();
+    ObjectMap<TypeElement, Seq<TypeElement>> componentDependencies = new ObjectMap<>();
     Seq<TypeElement> inters = new Seq<>();
     Seq<Element> defs = new Seq<>();
     Seq<EntityDefinition> definitions = new Seq<>();
@@ -42,6 +45,7 @@ public class EntityProcessor extends BaseProcessor{
     @Override
     public void process(RoundEnvironment roundEnv) throws Exception{
         comps.addAll((Set<TypeElement>)roundEnv.getElementsAnnotatedWith(EntityComponent.class));
+        baseComps.addAll((Set<TypeElement>)roundEnv.getElementsAnnotatedWith(EntityBaseComponent.class));
         inters.addAll((Set<TypeElement>)roundEnv.getElementsAnnotatedWith(EntityInterface.class));
         defs.addAll(roundEnv.getElementsAnnotatedWith(EntityDef.class));
 
@@ -90,15 +94,16 @@ public class EntityProcessor extends BaseProcessor{
                 imports.put(interfaceName(comp), getImports(comp));
                 compNames.put(simpleName(comp), comp);
 
+                Seq<TypeElement> depends = getDependencies(comp);
+
                 EntityComponent compAnno = annotation(comp, EntityComponent.class);
                 if(compAnno.write()){
                     TypeSpec.Builder inter = TypeSpec.interfaceBuilder(interfaceName(comp))
                         .addModifiers(Modifier.PUBLIC)
                         .addAnnotation(EntityInterface.class);
 
-                    Seq<TypeElement> depends = Seq.with(comp.getInterfaces()).map(this::toEl).<TypeElement>as().select(t -> toComp(t) == null);
                     for(TypeElement type : depends){
-                        inter.addSuperinterface(cName(type));
+                        inter.addSuperinterface(procName(type, this::interfaceName));
                     }
 
                     ObjectSet<String> preserved = new ObjectSet<>();
@@ -140,10 +145,7 @@ public class EntityProcessor extends BaseProcessor{
                             inter.addMethod(
                                 MethodSpec.methodBuilder(name)
                                     .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                                    .addParameter(
-                                        ParameterSpec.builder(tName(var), name)
-                                        .build()
-                                    )
+                                    .addParameter(tName(var), name)
                                     .addAnnotation(Setter.class)
                                     .returns(TypeName.VOID)
                                 .build()
@@ -154,7 +156,7 @@ public class EntityProcessor extends BaseProcessor{
                     write(inter.build());
 
                     if(compAnno.base()){
-                        Seq<TypeElement> deps = depends.map(this::toComp).and(comp);
+                        Seq<TypeElement> deps = depends.copy().and(comp);
                         baseClassDeps.get(comp, ObjectSet::new).addAll(deps);
 
                         if(annotation(comp, EntityDef.class) == null){
@@ -174,12 +176,15 @@ public class EntityProcessor extends BaseProcessor{
                                     base.addField(field.build());
                                 }
 
-                                base.addSuperinterface(ClassName.get(packageName, interfaceName(comp)));
+                                base.addSuperinterface(procName(dep, this::interfaceName));
                             }
 
                             baseClasses.add(base);
                         }
                     }
+                }else if(compAnno.base()){
+                    Seq<TypeElement> deps = depends.copy().and(comp);
+                    baseClassDeps.get(comp, ObjectSet::new).addAll(deps);
                 }
             }
         }else if(round == 2){
@@ -189,12 +194,14 @@ public class EntityProcessor extends BaseProcessor{
             for(Element def : defs){
                 EntityDef ann = annotation(def, EntityDef.class);
 
-                Seq<TypeElement> defInters = elements(ann::value)
+                Seq<TypeElement> defComps = elements(ann::value)
                     .<TypeElement>as()
                     .map(t -> inters.find(i -> simpleName(i).equals(simpleName(t))))
-                    .select(t -> t != null);
+                    .select(t -> t != null)
+                    .map(this::toComp);
 
-                Seq<TypeElement> defComps = defInters.map(this::toComp);
+                if(defComps.isEmpty()) continue;
+
                 Seq<String> defGroups = groups.values().toSeq().select(name -> defComps.contains(groups.findKey(name, false)));
 
                 ObjectMap<String, Seq<ExecutableElement>> methods = new ObjectMap<>();
@@ -207,7 +214,10 @@ public class EntityProcessor extends BaseProcessor{
                 }
 
                 TypeElement baseClassType = baseClasses.any() ? baseClasses.first() : null;
-                TypeName baseClass = baseClasses.any() ? ClassName.get(packageName, baseName(baseClassType)) : null;
+                TypeName baseClass = baseClasses.any()
+                ?   procName(baseClassType, this::baseName)
+                :   null;
+
                 boolean typeIsBase = baseClassType != null && annotation(def, EntityComponent.class) != null && annotation(def, EntityComponent.class).base();
 
                 if(def instanceof TypeElement && !simpleName(def).endsWith("Comp")){
@@ -216,7 +226,9 @@ public class EntityProcessor extends BaseProcessor{
 
                 String name = def instanceof TypeElement ?
                     simpleName(def).replace("Comp", "") :
-                    createName(def);
+                    createName(defComps);
+
+                defComps.addAll(defComps.copy().flatMap(this::getDependencies)).distinct();
 
                 if(!typeIsBase && baseClass != null && name.equals(baseName(baseClassType))){
                     name += "Entity";
@@ -227,7 +239,14 @@ public class EntityProcessor extends BaseProcessor{
                     continue;
                 }
 
-                TypeSpec.Builder builder = TypeSpec.classBuilder(name).addModifiers(Modifier.PUBLIC);
+                TypeSpec.Builder builder = TypeSpec.classBuilder(name)
+                    .addModifiers(Modifier.PUBLIC)
+                    .addAnnotation(
+                        AnnotationSpec.builder(SuppressWarnings.class)
+                            .addMember("value", "$S", "all")
+                        .build()
+                    );
+
                 builder.addMethod(
                     MethodSpec.methodBuilder("serialize").addModifiers(Modifier.PUBLIC)
                         .addAnnotation(Override.class)
@@ -243,7 +262,7 @@ public class EntityProcessor extends BaseProcessor{
                 boolean isSync = defComps.contains(s -> simpleName(s).contains("Sync"));
 
                 for(TypeElement comp : defComps){
-                    boolean isShadowed = baseClass != null && !typeIsBase && baseClassDeps.get(baseClassType).contains(comp);
+                    boolean isShadowed = baseClass != null && !typeIsBase && baseClassDeps.get(baseClassType, ObjectSet::new).contains(comp);
 
                     Seq<VariableElement> fields = vars(comp).select(v -> annotation(v, Import.class) == null);
                     for(VariableElement field : fields){
@@ -290,12 +309,13 @@ public class EntityProcessor extends BaseProcessor{
                         }
                     }
 
-                    for(ExecutableElement elem : methods(comp)){
+                    for(ExecutableElement elem : methods(comp).select(m -> !isConstructor(m))){
                         methods.get(elem.toString(), Seq::new).add(elem);
                     }
                 }
 
                 syncedFields.sortComparing(e -> simpleName(e));
+
                 builder.addMethod(
                     MethodSpec.methodBuilder("toString")
                         .addAnnotation(Override.class)
@@ -309,7 +329,17 @@ public class EntityProcessor extends BaseProcessor{
 
                 for(Entry<String, Seq<ExecutableElement>> entry : methods){
                     if(entry.value.contains(m -> annotation(m, Replace.class) != null)){
-                        entry.value = entry.value.select(m -> annotation(m, Replace.class) != null);
+                        if(entry.value.first().getReturnType().getKind() == TypeKind.VOID){
+                            entry.value = entry.value.select(m -> annotation(m, Replace.class) != null);
+                        }else{
+                            if(entry.value.count(m -> annotation(m, Replace.class) != null) > 1){
+                                throw new IllegalStateException("Type " + simpleName(def) + " has multiple components replacing non-void method " + entry.key + ".");
+                            }
+    
+                            ExecutableElement base = entry.value.find(m -> annotation(m, Replace.class) != null);
+                            entry.value.clear();
+                            entry.value.add(base);
+                        }
                     }
 
                     if(entry.value.count(m -> !is(m, Modifier.NATIVE, Modifier.ABSTRACT) && m.getReturnType().getKind() != TypeKind.VOID) > 1){
@@ -324,7 +354,10 @@ public class EntityProcessor extends BaseProcessor{
                         continue;
                     }
 
-                    MethodSpec.Builder mbuilder = MethodSpec.methodBuilder(simpleName(first)).addModifiers(is(first, Modifier.PRIVATE) ? Modifier.PRIVATE : Modifier.PUBLIC);
+                    boolean isPrivate = is(first, Modifier.PRIVATE);
+                    MethodSpec.Builder mbuilder = MethodSpec.methodBuilder(simpleName(first)).addModifiers(isPrivate ? Modifier.PRIVATE : Modifier.PUBLIC);
+                    if(!isPrivate) mbuilder.addAnnotation(Override.class);
+
                     if(is(first, Modifier.STATIC)) mbuilder.addModifiers(Modifier.STATIC);
                     mbuilder.addTypeVariables(Seq.with(first.getTypeParameters()).map(TypeVariableName::get));
                     mbuilder.returns(TypeName.get(first.getReturnType()));
@@ -348,11 +381,9 @@ public class EntityProcessor extends BaseProcessor{
                         }
                     }
 
-                    boolean specialIO = false;
                     if(hasIO){
                         if(simpleName(first).equals("read") || simpleName(first).equals("write")){
                             //io.write(mbuilder, simpleName(first).equals("write"));
-                            specialIO = true;
                         }
 
                         if(simpleName(first).equals("readSync") || simpleName(first).equals("writeSync")){
@@ -382,37 +413,37 @@ public class EntityProcessor extends BaseProcessor{
                         }
                     }
 
+                    boolean firstc = true;
                     for(ExecutableElement elem : entry.value){
+                        if(!firstc) mbuilder.addCode(lnew());
+                        firstc = false;
+
                         String descStr = descString(elem);
 
                         if(is(elem, Modifier.ABSTRACT) || is(elem, Modifier.NATIVE) || !methodBlocks.containsKey(descStr)) continue;
 
-                        String str = methodBlocks.get(descStr);
                         String blockName = simpleName(elem.getEnclosingElement()).toLowerCase().replace("comp", "");
-
-                        if(str.replace("{", "").replace("\n", "").replace("}", "").replace("\t", "").replace(" ", "").isEmpty()){
-                            continue;
-                        }
+                        String str = methodBlocks.get(descStr);
+                        str = str.substring(1, str.length() - 1).trim().replace("\n    ", "\n");
+                        str += '\n';
 
                         if(writeBlock){
                             str = str.replace("return;", "break " + blockName + ";");
-                            mbuilder.addCode(blockName + ": {\n");
-                        }
 
-                        str = str.substring(2, str.length() - 1);
+                            if(str.isBlank()) continue;
+                            mbuilder.beginControlFlow("$L:", blockName);
+                        }
 
                         mbuilder.addCode(str);
 
-                        if(writeBlock) mbuilder.addCode("}\n");
+                        if(writeBlock) mbuilder.endControlFlow();
                     }
 
                     if(simpleName(first).equals("remove") && ann.pooled()){
                         mbuilder.addStatement("mindustry.gen.Groups.queueFree(($T)this)", Poolable.class);
                     }
 
-                    if(specialIO){
-                        builder.addMethod(mbuilder.build());
-                    }
+                    builder.addMethod(mbuilder.build());
                 }
 
                 if(ann.pooled()){
@@ -452,7 +483,8 @@ public class EntityProcessor extends BaseProcessor{
             }
         }else if(round == 3){
             for(TypeSpec.Builder b : baseClasses){
-                write(b.build(), imports.get(Reflect.get(TypeSpec.Builder.class, b, "name")));
+                TypeSpec spec = b.build();
+                write(spec, imports.get(spec.name));
             }
 
             for(EntityDefinition def : definitions){
@@ -477,18 +509,69 @@ public class EntityProcessor extends BaseProcessor{
                         if(field == null || methodNames.contains(simpleString(method))) continue;
 
                         if(method.getReturnType().getKind() != TypeKind.VOID){
-                            def.builder.addMethod(MethodSpec.overriding(method).addStatement("return " + var).build());
+                            def.builder.addMethod(
+                                MethodSpec.methodBuilder(var).addModifiers(Modifier.PUBLIC)
+                                    .returns(TypeName.get(method.getReturnType()))
+                                    .addAnnotation(Override.class)
+                                    .addStatement("return $L", var)
+                                .build()
+                            );
                         }
 
-                        if(method.getReturnType().getKind() == TypeKind.VOID && !Seq.with(field.annotations).contains(f -> f.type.toString().equals("@mindustry.annotations.Annotations.ReadOnly"))){
-                            def.builder.addMethod(MethodSpec.overriding(method).addStatement("this." + var + " = " + var).build());
+                        if(method.getReturnType().getKind() == TypeKind.VOID && !Seq.with(field.annotations).contains(f -> f.type.toString().equals("@unity.annotations.Annotations.ReadOnly"))){
+                            def.builder.addMethod(
+                                MethodSpec.methodBuilder(var).addModifiers(Modifier.PUBLIC)
+                                    .returns(TypeName.VOID)
+                                    .addAnnotation(Override.class)
+                                    .addParameter(field.type, var)
+                                    .addStatement("this.$L = $L", var, var)
+                                .build()
+                            );
                         }
                     }
                 }
 
-                write(def.builder.build(), imports.get(Reflect.get(TypeSpec.Builder.class, def.builder, "name")));
+                write(def.builder.build(), def.components.flatMap(comp -> imports.get(interfaceName(comp))));
             }
         }
+    }
+
+    Seq<TypeElement> getDependencies(TypeElement component){
+        if(!componentDependencies.containsKey(component)){
+            ObjectSet<TypeElement> out = new ObjectSet<>();
+
+            out.addAll(Seq.with(component.getInterfaces())
+                .map(this::toEl)
+                .<TypeElement>as()
+                .map(t -> inters.find(i -> simpleName(t).equals(simpleName(i))))
+                .select(t -> t != null)
+                .map(this::toComp)
+            );
+
+            out.remove(component);
+
+            ObjectSet<TypeElement> result = new ObjectSet<>();
+            for(TypeElement type : out){
+                result.add(type);
+                result.addAll(getDependencies(type));
+            }
+
+            if(annotation(component, EntityBaseComponent.class) == null){
+                result.addAll(baseComps);
+            }
+
+            out.remove(component);
+            componentDependencies.put(component, result.asArray());
+        }
+
+        return componentDependencies.get(component);
+    }
+
+    TypeName procName(TypeElement comp, Func<TypeElement, String> name){
+        return ClassName.get(
+            comp.getEnclosingElement().toString().contains("fetched") ? "mindustry.gen" : packageName,
+            name.get(comp)
+        );
     }
 
     TypeElement toComp(TypeElement inter){
@@ -517,8 +600,7 @@ public class EntityProcessor extends BaseProcessor{
         return name.substring(0, name.length() - 4);
     }
 
-    String createName(Element elem){
-        Seq<TypeElement> comps = elements(annotation(elem, EntityDef.class)::value).map(e -> toComp((TypeElement)e));
+    String createName(Seq<TypeElement> comps){
         comps.sortComparing(e -> simpleName(e));
         return comps.toString("", s -> simpleName(s).replace("Comp", ""));
     }

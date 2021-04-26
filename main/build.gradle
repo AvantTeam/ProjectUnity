@@ -13,7 +13,7 @@ ext{
     fetchDir = new File("$projectDir/fetched/$fetchPackage")
 
     fetchTemp = new Fi("$projectDir/fetch.txt")
-    fetchRevision = 3
+    fetchRevision = 1
 }
 
 task deploy(type: Jar, dependsOn: configurations.runtimeClasspath){
@@ -118,8 +118,9 @@ task fetchComps {
                 def content = comp.getResultAsString()
                     .replace('mindustry.entities.comp', "$fetchPackage".replace('/', '.'))
                     .replace('mindustry.annotations.Annotations.*', 'unity.annotations.Annotations.*')
-                    .replaceAll('\\@Component\\(*.*\\)*\n*', '@EntityComponent(write = false)\n')
-                    .replaceAll('\\@BaseComponent\n*', '')
+                    .replaceAll('\\@Component\\((base = true|.)+\\)\n*', '@EntityComponent(base = true, write = false)\n')
+                    .replaceAll('\\@Component\n*', '@EntityComponent(write = false)\n')
+                    .replaceAll('\\@BaseComponent\n*', '@EntityBaseComponent\n')
                     .replaceAll('\\@CallSuper\n*', '')
                     .replaceAll('\\@Final\n*', '')
                     .replaceAll('\\@EntityDef\\(*.*\\)*\n*', '')

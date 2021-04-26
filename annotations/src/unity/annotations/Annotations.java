@@ -135,6 +135,11 @@ public class Annotations{
         boolean base() default false;
     }
 
+    /** All entity components will inherit from this */
+    @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface EntityBaseComponent{}
+
     /** Whether this interface wraps an entity component */
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.SOURCE)
