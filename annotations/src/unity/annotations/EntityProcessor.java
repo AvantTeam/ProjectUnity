@@ -5,6 +5,7 @@ import arc.struct.*;
 import arc.struct.ObjectMap.*;
 import arc.util.*;
 import arc.util.pooling.Pool.*;
+import mindustry.gen.*;
 import unity.annotations.Annotations.*;
 
 import java.util.*;
@@ -55,7 +56,7 @@ public class EntityProcessor extends BaseProcessor{
 
         if(round == 1){
             groups = ObjectMap.of(
-                /*toComp(Entityc.class), "all",
+                toComp(Entityc.class), "all",
                 toComp(Playerc.class), "player",
                 toComp(Bulletc.class), "bullet",
                 toComp(Unitc.class), "unit",
@@ -63,8 +64,7 @@ public class EntityProcessor extends BaseProcessor{
                 toComp(Syncc.class), "sync",
                 toComp(Drawc.class), "draw",
                 toComp(Firec.class), "fire",
-                toComp(Puddlec.class), "puddle",
-                toComp(WeatherStatec.class), "weather"*/
+                toComp(Puddlec.class), "puddle"
             );
 
             for(TypeElement inter : (List<TypeElement>)((PackageElement)elementUtils.getPackageElement("mindustry.gen")).getEnclosedElements()){
@@ -206,8 +206,6 @@ public class EntityProcessor extends BaseProcessor{
 
                 if(defComps.isEmpty()) continue;
 
-                Seq<String> defGroups = groups.values().toSeq().select(name -> defComps.contains(groups.findKey(name, false)));
-
                 ObjectMap<String, Seq<ExecutableElement>> methods = new ObjectMap<>();
                 ObjectMap<FieldSpec, VariableElement> specVariables = new ObjectMap<>();
                 ObjectSet<String> usedFields = new ObjectSet<>();
@@ -233,6 +231,7 @@ public class EntityProcessor extends BaseProcessor{
                     createName(defComps);
 
                 defComps.addAll(defComps.copy().flatMap(this::getDependencies)).distinct();
+                Seq<String> defGroups = groups.values().toSeq().select(val -> defComps.contains(groups.findKey(val, false)));
 
                 if(!typeIsBase && baseClass != null && name.equals(baseName(baseClassType))){
                     name += "Entity";
@@ -582,9 +581,8 @@ public class EntityProcessor extends BaseProcessor{
         String name = simpleName(inter);
         if(!name.endsWith("c")) return null;
 
-        return comps.find(t -> simpleName(t).equals(
-            name.substring(0, name.length() - 1) + "Comp"
-        ));
+        String compName = name.substring(0, name.length() - 1) + "Comp";
+        return comps.find(t -> simpleName(t).equals(compName));
     }
 
     TypeElement toComp(Class<?> inter){
