@@ -50,7 +50,7 @@ configure(project(':annotations')) {
     }
 }
 
-configure(subprojects - project(":annotations")) {
+configure(subprojects - project(':annotations')) {
     sourceCompatibility = 15
     targetCompatibility = 8
 
