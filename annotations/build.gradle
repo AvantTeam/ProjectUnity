@@ -1,12 +1,12 @@
-sourceSets.main.java.srcDirs = ["src/"]
+sourceSets.main.java.srcDirs = ['src/']
 
-repositories{
+repositories {
     mavenCentral()
     jcenter()
-    maven{url "https://www.jitpack.io"}
+    maven { url "https://www.jitpack.io"}
 }
 
-dependencies{
+dependencies {
     implementation "com.github.Anuken.Arc:arc-core:$mindustryVersion"
     implementation "com.github.Anuken.Mindustry:core:$mindustryVersion"
     implementation "com.squareup:javapoet:$javapoetVersion"

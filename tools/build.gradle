@@ -1,15 +1,15 @@
-sourceSets.main.java.srcDirs = ["src/"]
+sourceSets.main.java.srcDirs = ['src/']
 
-ext{
-    imageProcessorMain = "unity.tools.SpriteProcessor"
+ext {
+    imageProcessorMain = 'unity.tools.SpriteProcessor'
 
-    spritesGenFolder = "../main/assets-raw/sprites-gen/"
-    spritesAssetsFolder = "../main/assets/sprites/"
+    spritesGenFolder = '../main/assets-raw/sprites-gen/'
+    spritesAssetsFolder = '../main/assets/sprites/'
 }
 
-task proc(dependsOn: [classes, configurations.runtimeClasspath]){
-    doLast{
-        delete{
+task proc(dependsOn: [classes, configurations.runtimeClasspath]) {
+    doLast {
+        delete {
             delete spritesGenFolder
             delete spritesAssetsFolder
         }
@@ -17,40 +17,40 @@ task proc(dependsOn: [classes, configurations.runtimeClasspath]){
         file(spritesGenFolder).mkdirs()
         file(spritesAssetsFolder).mkdirs()
 
-        javaexec{
+        javaexec {
             main = imageProcessorMain
             classpath = sourceSets.main.runtimeClasspath
-            jvmArgs += "-Djava.awt.headless=true"
+            jvmArgs += '-Djava.awt.headless=true'
             standardInput = System.in
-            workingDir = "../main/assets-raw/"
+            workingDir = '../main/assets-raw/'
         }
 
-        copy{
+        copy {
             from spritesGenFolder
             into spritesAssetsFolder
         }
 
-        exec{
+        exec {
             ignoreExitValue = true
             workingDir = "../main/"
 
             println()
-            println("Alpha-bleeding sprites...")
-            if(windows()){
-                commandLine("cmd", "/c", "alpha-bleeding-windows.exe", "--replace", "./assets/sprites/")
-            }else{
-                commandLine("./alpha-bleed", "./assets/sprites/")
+            println 'Alpha-bleeding sprites...'
+            if(windows()) {
+                commandLine('cmd', '/c', 'alpha-bleeding-windows.exe', '--replace', ''./assets/sprites/'')
+            } else {
+                commandLine('./alpha-bleed', './assets/sprites/')
             }
         }
     }
 }
 
-repositories{
+repositories {
     mavenCentral()
-    maven{url "https://www.jitpack.io"}
+    maven { url "https://www.jitpack.io"}
 }
 
-dependencies{
+dependencies {
     implementation project(":main")
 
     implementation "com.github.Anuken.Arc:arc-core:$mindustryVersion"

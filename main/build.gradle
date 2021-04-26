@@ -6,7 +6,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.serialization.*;
 
-ext{
+ext {
     assetsDir = new File(rootDir, "main/assets/")
 
     fetchPackage = 'unity/fetched'
@@ -16,68 +16,62 @@ ext{
     fetchRevision = 1
 }
 
-task deploy(type: Jar, dependsOn: configurations.runtimeClasspath){
-    if(!hasSprites()){
-        println "Sprites folder not found; automatically processing sprites..."
+task deploy(type: Jar, dependsOn: configurations.runtimeClasspath) {
+    if(!hasSprites()) {
+        println 'Sprites folder not found; automatically processing sprites...'
         dependsOn "tools:proc"
     }
 
     archiveFileName = "${modName}Desktop.jar"
 
-    from files(sourceSets.main.output.classesDirs)
-    from files(sourceSets.main.output.resourcesDir)
-    from{
-        configurations.runtimeClasspath.collect{
-            it.isDirectory()
-            ?   it
-            :   zipTree(it)
-        }
+    from {
+        files(sourceSets.main.output.classesDirs)
+        files(sourceSets.main.output.resourcesDir)
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+        files(project.assetsDir)
     }
-    from files(project.assetsDir)
 
-    doLast{
-        delete{ delete "$buildDir/libs/main-${version}.jar" }
-    }
+    doLast { delete {
+        delete "$buildDir/libs/main-${version}.jar"
+    }}
 }
 
-task dex{
+task dex {
     dependsOn deploy
 
-    doLast{
-        exec{
+    doLast {
+        exec {
             workingDir = "$buildDir/libs/"
-            def command = ["d8", "--min-api", "15", "--output", "${modName}Dexed.jar", "${modName}Desktop.jar"]
+            def command = ['d8', '--min-api', '15', '--output', "${modName}Dexed.jar", "${modName}Desktop.jar"]
 
-            if(windows()){
-                commandLine("cmd", "/c", *command)
-            }else{
+            if(windows()) {
+                commandLine('cmd', '/c', *command)
+            } else {
                 commandLine(*command)
             }
         }
     }
 }
 
-task deployDex(type: Jar){
+task deployDex(type: Jar) {
     dependsOn deploy, dex
 
     archiveFileName = "${modName}.jar"
 
-    from{[
+    from {[
         zipTree("$buildDir/libs/${modName}Desktop.jar"),
         zipTree("$buildDir/libs/${modName}Dexed.jar")
     ]}
 
-    doLast{
-        delete{
-            delete "$buildDir/libs/${modName}Desktop.jar"
-            delete "$buildDir/libs/${modName}Dexed.jar"
-        }
-    }
+    doLast { delete {
+        delete "$buildDir/libs/${modName}Desktop.jar"
+        delete "$buildDir/libs/${modName}Dexed.jar"
+    }}
 }
 
-repositories{
+repositories {
     mavenCentral()
-    maven{url "https://www.jitpack.io"}
+    maven { url "https://www.jitpack.io"}
 }
 
 task fetchComps {
@@ -205,13 +199,13 @@ compileJava {
     }
 }
 
-dependencies{
+dependencies {
     compileOnly "com.github.Anuken.Arc:arc-core:$mindustryVersion"
     compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
 
     implementation "com.github.younggam:multi-lib:$multilibVersion"
     annotationProcessor "com.github.Anuken:jabel:$jabelVersion"
 
-    compileOnly project(":annotations")
-    annotationProcessor project(":annotations")
+    compileOnly project(':annotations')
+    annotationProcessor project(':annotations')
 }
