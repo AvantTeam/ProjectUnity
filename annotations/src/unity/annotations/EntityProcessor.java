@@ -44,7 +44,7 @@ public class EntityProcessor extends BaseProcessor{
     ObjectMap<TypeElement, String> groups;
 
     {
-        rounds = 3;
+        rounds = 4;
     }
 
     @Override
@@ -485,6 +485,110 @@ public class EntityProcessor extends BaseProcessor{
                 definitions.add(new EntityDefinition(packageName + "." + name, builder, def, typeIsBase ? null : baseClass, defComps, defGroups, allFieldSpecs));
             }
         }else if(round == 3){
+            TypeSpec.Builder map = TypeSpec.classBuilder("UnityEntityMapping").addModifiers(Modifier.PUBLIC)
+                .addField(
+                    FieldSpec.builder(ParameterizedTypeName.get(
+                        cName(ObjectIntMap.class),
+                        ParameterizedTypeName.get(
+                            cName(Class.class),
+                            WildcardTypeName.subtypeOf(cName(Entityc.class))
+                        )
+                    ), "ids")
+                        .addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.VOLATILE)
+                        .initializer("new $T<>()", cName(ObjectIntMap.class))
+                    .build()
+                )
+                .addField(
+                    FieldSpec.builder(TypeName.INT, "last")
+                        .addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.VOLATILE)
+                    .build()
+                )
+                .addMethod(
+                    MethodSpec.methodBuilder("register")
+                        .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                        .returns(TypeName.VOID)
+                        .addTypeVariable(tvName("T", cName(Entityc.class)))
+                        .addParameter(
+                            ParameterizedTypeName.get(cName(Class.class), tvName("T")),
+                            "type"
+                        )
+                        .addParameter(
+                            ParameterizedTypeName.get(cName(Prov.class), tvName("T")),
+                            "prov"
+                        )
+                        .beginControlFlow("synchronized($T.class)", ClassName.get(packageName, "UnityEntityMapping"))
+                            .addStatement("if(ids.containsKey(type)) return")
+                            .addCode(lnew())
+                            .beginControlFlow("for(; last < $T.idMap.length; last++)", cName(EntityMapping.class))
+                                .beginControlFlow("if($T.idMap[last] == null)", cName(EntityMapping.class))
+                                    .addStatement("$T.idMap[last] = prov", cName(EntityMapping.class))
+                                    .addStatement("ids.put(type, last)")
+                                    .addCode(lnew())
+                                    .addStatement("$T.nameMap.put(type.getSimpleName(), prov)", cName(EntityMapping.class))
+                                    .addStatement("$T.nameMap.put($T.camelToKebab(type.getSimpleName()), prov)", cName(EntityMapping.class), cName(Strings.class))
+                                    .addCode(lnew())
+                                    .addStatement("break")
+                                .endControlFlow()
+                            .endControlFlow()
+                        .endControlFlow()
+                    .build()
+                )
+                .addMethod(
+                    MethodSpec.methodBuilder("register")
+                        .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                        .returns(TypeName.VOID)
+                        .addTypeVariable(tvName("T", cName(Entityc.class)))
+                        .addParameter(cName(String.class), "name")
+                        .addParameter(
+                            ParameterizedTypeName.get(cName(Class.class), tvName("T")),
+                            "type"
+                        )
+                        .addParameter(
+                            ParameterizedTypeName.get(cName(Prov.class), tvName("T")),
+                            "prov"
+                        )
+                        .addStatement("register(type, prov)")
+                        .addStatement("$T.nameMap.put(name.replaceFirst($S, $S), prov)", cName(EntityMapping.class), "unity-", "")
+                    .build()
+                )
+                .addMethod(
+                    MethodSpec.methodBuilder("classId")
+                        .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                        .addTypeVariable(tvName("T", cName(Entityc.class)))
+                        .addParameter(
+                            ParameterizedTypeName.get(cName(Class.class), tvName("T")),
+                            "type"
+                        )
+                        .returns(TypeName.INT)
+                        .addStatement("return ids.get(type, -1)")
+                    .build()
+                );
+
+            MethodSpec.Builder init = MethodSpec.methodBuilder("init")
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .returns(TypeName.VOID);
+
+            for(EntityDefinition def : definitions){
+                ClassName type = ClassName.get(packageName, def.name);
+
+                def.builder.addMethod(
+                    MethodSpec.methodBuilder("classId").addModifiers(Modifier.PUBLIC)
+                        .addAnnotation(Override.class)
+                        .returns(TypeName.INT)
+                        .addStatement("return $T.classId($T.class)", ClassName.get(packageName, "UnityEntityMapping"), type)
+                    .build()
+                );
+
+                TypeElement up = (TypeElement)def.naming.getEnclosingElement();
+                String c = simpleName(def.naming);
+                init.addStatement("register($T.$L.name, $T.class, $T::create)", up, c, type, type);
+            }
+
+            write(map
+                .addMethod(init.build())
+                .build()
+            );
+        }else if(round == 4){
             for(TypeSpec.Builder b : baseClasses){
                 TypeSpec spec = b.build();
                 write(spec, imports.get(spec.name));
@@ -618,8 +722,7 @@ public class EntityProcessor extends BaseProcessor{
         final TypeSpec.Builder builder;
         final Element naming;
         final String name;
-        final @Nullable TypeName extend;
-        int classID;
+        final TypeName extend;
 
         public EntityDefinition(String name, TypeSpec.Builder builder, Element naming, TypeName extend, Seq<TypeElement> components, Seq<String> groups, Seq<FieldSpec> fieldSpec){
             this.builder = builder;
