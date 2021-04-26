@@ -3,45 +3,31 @@ package unity.entities.comp;
 import mindustry.gen.*;
 import unity.annotations.Annotations.*;
 import unity.entities.*;
+import unity.gen.*;
 import unity.util.*;
 
 /** @author GlennFolker */
-public interface Extensionc extends Drawc{
-    ExtensionHolder holder();
-    void holder(ExtensionHolder holder);
+@EntityDef(base = UnitEntity.class, value = {Extensionc.class}, serialize = false)
+@EntityComponent(base = true)
+abstract class ExtensionComp implements Drawc{
+    @ReadOnly ExtensionHolder holder;
+
+    @Override
+    public void add(){
+        if(holder == null) remove();
+    }
 
     @Override
     @Replace
-    default void add(){
-        if(!isAdded() && holder() != null){
-            Groups.draw.add(this);
-            Utils.setField(this, Utils.findField(getClass(), "added", true), true);
+    public void draw(){
+        if(holder != null){
+            holder.drawExt();
         }
     }
 
     @Override
     @Replace
-    default void remove(){
-        if(isAdded()){
-            Groups.draw.remove(this);
-            Utils.setField(this, Utils.findField(getClass(), "added", true), false);
-        }
-    }
-
-    @Override
-    @Replace
-    default void draw(){
-        if(holder() != null){
-            holder().drawExt();
-        }
-    }
-
-    @Override
-    @Replace
-    default float clipSize(){
-        if(holder() != null){
-            return holder().clipSizeExt();
-        }
-        return 0f;
+    public float clipSize(){
+        return holder != null ? holder.clipSizeExt() : 0f;
     }
 }

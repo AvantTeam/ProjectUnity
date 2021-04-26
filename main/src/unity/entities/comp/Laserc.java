@@ -8,6 +8,7 @@ import mindustry.graphics.*;
 import unity.annotations.Annotations.*;
 import unity.content.*;
 import unity.entities.*;
+import unity.gen.*;
 import unity.type.*;
 
 public interface Laserc extends Unitc, ExtensionHolder {

@@ -14,6 +14,7 @@ import mindustry.world.meta.*;
 import unity.content.*;
 import unity.entities.*;
 import unity.entities.comp.*;
+import unity.gen.*;
 import unity.graphics.*;
 
 import static mindustry.Vars.*;
