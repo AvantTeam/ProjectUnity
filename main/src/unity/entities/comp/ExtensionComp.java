@@ -10,7 +10,7 @@ import unity.util.*;
 @EntityDef(base = UnitEntity.class, value = {Extensionc.class}, serialize = false)
 @EntityComponent(base = true)
 abstract class ExtensionComp implements Drawc{
-    @ReadOnly ExtensionHolder holder;
+    ExtensionHolder holder;
 
     @Override
     public void add(){

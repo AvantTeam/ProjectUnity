@@ -64,7 +64,7 @@ public class DeflectProjector extends Block{
     }
 
     public class DeflectProjectorBuild extends Building implements ExtensionHolder, Ranged{
-        protected Extensionc ext;
+        protected Extension ext;
 
         public float heat;
         public float hit;
@@ -73,8 +73,8 @@ public class DeflectProjector extends Block{
         @Override
         public void created(){
             super.created();
-            ext = (Extensionc)UnityUnitTypes.extension.create(team);
-            ext.holder(this);
+            ext = Extension.create();
+            ext.holder = this;
             ext.set(x, y);
             ext.add();
         }

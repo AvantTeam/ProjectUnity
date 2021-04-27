@@ -13,7 +13,6 @@ import mindustry.gen.*;
 import mindustry.entities.*;
 import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
-import mindustry.game.*;
 import mindustry.graphics.*;
 import mindustry.content.*;
 import unity.*;
@@ -105,9 +104,6 @@ public class UnityUnitTypes implements ContentList{
     UnitType kami;
 
     public static @FactionDef("end") UnitType opticaecus, devourer, apocalypse, ravager;
-
-    public static @EntityDef(base = UnitEntity.class, value = Extensionc.class)
-    UnitType extension;
 
     public static int getClassId(int index){
         return classIDs[index];
@@ -3341,32 +3337,6 @@ public class UnityUnitTypes implements ContentList{
             public void init(){
                 super.init();
                 immunities.addAll(content.getBy(ContentType.status));
-            }
-        };
-
-        extension = new UnityUnitType("extension"){
-            {
-                speed = 0f;
-                hitSize = 0f;
-                health = 1;
-                rotateSpeed = 360f;
-                itemCapacity = 0;
-                commandLimit = 0;
-            }
-
-            @Override
-            public boolean isHidden(){
-                return true;
-            }
-
-            @Override
-            public Unit create(Team team){
-                Unit unit = super.create(team);
-                if(unit instanceof Extensionc){
-                    return unit;
-                }else{
-                    throw new ClassCastException("'extension's constructor must be an instance of Extensionc.");
-                }
             }
         };
 
