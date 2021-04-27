@@ -242,7 +242,7 @@ public abstract class BaseProcessor extends AbstractProcessor{
 
             return
                 m.getSimpleName().toString().equals(name) &&
-                typeUtils.isSameType(m.getReturnType(), retType) &&
+                (retType != null ? typeUtils.isSameType(m.getReturnType(), retType) : true) &&
                 realParams.equals(params);
         });
     }

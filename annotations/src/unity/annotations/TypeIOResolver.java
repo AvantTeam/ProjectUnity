@@ -2,8 +2,6 @@ package unity.annotations;
 
 import arc.struct.*;
 import mindustry.io.*;
-import unity.annotations.Annotations.*;
-import unity.annotations.*;
 
 import javax.lang.model.element.*;
 import javax.lang.model.type.*;

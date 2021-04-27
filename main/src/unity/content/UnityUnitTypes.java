@@ -21,7 +21,6 @@ import unity.ai.AssistantAI.*;
 import unity.annotations.Annotations.*;
 import unity.entities.abilities.*;
 import unity.entities.bullet.*;
-import unity.entities.comp.*;
 import unity.entities.units.*;
 import unity.entities.units.EndWormUnit.*;
 import unity.gen.*;
@@ -32,98 +31,89 @@ import unity.util.*;
 import static mindustry.Vars.*;
 
 public class UnityUnitTypes implements ContentList{
-    private static final Prov<?>[] constructors = new Prov[]{
-        WormSegmentUnit::new,
-        WormDefaultUnit::new,
-        TransUnitWaterMove::new,
-        TransLegsUnit::new,
-        EndInvisibleUnit::new,
-        EndWormUnit::new,
-        EndWormSegmentUnit::new,
-        EndLegsUnit::new,
-        ApocalypseUnit::new
-    };
-
-    private static final int[] classIDs = new int[constructors.length];
-
-    /** Global {@linkplain Copterc copter} units */
-    public static @EntityDef({Unitc.class, unity.gen.Copterc.class})
+    // global unit + copter
+    public static @EntityDef({Unitc.class, Copterc.class})
     UnitType caelifera, schistocerca, anthophila, vespula, lepidoptera;
 
-    /** Global {@linkplain UnitEntity flying} units */
+    // global flying
     public static @EntityPoint(UnitEntity.class)
     UnitType angel, malakhim,
     discharge, pulse, emission, waveform;
     
-    /** Global {@linkplain LegsUnit legs} units */
+    // global legs
     public static @EntityPoint(LegsUnit.class)
     UnitType orion, araneidae, theraphosidae;
 
-    /** Global naval units */
-    public static UnitType//@formatter:off
-    amphibiNaval, amphibi, craberNaval, craber;
-    //formatter:on
-    /** Scar {@linkplain LegsUnit legs} units */
+    // global transforming naval
+    public static @EntityPoint(TransUnitWaterMove.class)
+    UnitType amphibiNaval, amphibi;
+
+    // global transforming legs
+    public static @EntityPoint(TransLegsUnit.class)
+    UnitType craberNaval, craber;
+
+    // scar legs
     public static @FactionDef("scar") @EntityPoint(LegsUnit.class)
     UnitType hovos, ryzer, zena, sundown, rex, excelsus;
 
-    /** Scar {@linkplain UnitEntity flying} units */
+    // scar flying
     public static @FactionDef("scar") @EntityPoint(UnitEntity.class)
     UnitType whirlwind, jetstream, vortex;
 
-    /** Imber wyrm units */
-    public static @FactionDef("imber") @EntityPoint(UnitEntity.class)
-    UnityUnitType arcnelidia, testLink, test;
+    // imber worm
+    public static @FactionDef("imber") @EntityPoint(WormDefaultUnit.class)
+    UnitType arcnelidia;
 
-    public static @FactionDef("plague")
+    // imber... random stuff
+    public static @FactionDef("imber") @EntityPoint(UnitEntity.class)
+    UnityUnitType testLink, test;
+
+    // plague worm
+    public static @FactionDef("plague") @EntityPoint(WormDefaultUnit.class)
     UnitType toxobyte, catenapede;
-    
-    /** Koruh {@linkplain MechUnit mech} units */
+
+    // koruh mech
     public static @FactionDef("koruh") @EntityPoint(MechUnit.class)
     UnitType buffer, omega;
-    
-    /** Koruh {@linkplain UnitEntity flying} units */
+
+    // koruh flying
     public static @FactionDef("koruh") @EntityPoint(UnitEntity.class)
     UnitType cache, dijkstra, phantasm;
 
-    /** Monolith {@linkplain MechUnit mech} units */
+    // monolith mech
     public static @FactionDef("monolith") @EntityPoint(MechUnit.class)
     UnitType stele, pedestal, pilaster;
 
-    /** Monolith {@linkplain LegsUnit legs} units */
+    // monolith legs
     public static @FactionDef("monolith") @EntityPoint(LegsUnit.class)
     UnitType pylon, monument, colossus, bastion;
 
+    // monolith unit + trail + assistant
     public static @FactionDef("monolith") @EntityDef({Unitc.class, Trailc.class, Assistantc.class})
     UnitType adsect, comitate/*, praesid*/;
 
+    // don't
     public static @FactionDef("monolith") @EntityPoint(UnitEntity.class)
     UnitType farSeeker;
 
+    // koruh kami
     public static @FactionDef("koruh") @EntityDef({Unitc.class, Bossc.class})
     UnitType kami;
 
-    public static @FactionDef("end") UnitType opticaecus, devourer, apocalypse, ravager;
+    // end invisible
+    public static @FactionDef("end") @EntityPoint(EndInvisibleUnit.class) UnitType opticaecus;
 
-    public static int getClassId(int index){
-        return classIDs[index];
-    }
+    // end worm
+    public static @FactionDef("end") @EntityPoint(EndWormUnit.class) UnitType devourer;
 
-    private static void setEntity(String name, Prov<?> c){
-        EntityMapping.nameMap.put(name, c);
-    }
+    // end apocalypse
+    public static @FactionDef("end") @EntityPoint(ApocalypseUnit.class) UnitType apocalypse;
+
+    // end legs
+    public static @FactionDef("end") @EntityPoint(EndLegsUnit.class) UnitType ravager;
 
     @Override
     public void load(){
-        for(int i = 0, j = 0, len = EntityMapping.idMap.length; i < len; i++){
-            if(EntityMapping.idMap[i] == null){
-                classIDs[j] = i;
-                EntityMapping.idMap[i] = constructors[j++];
-
-                if(j >= constructors.length) break;
-            }
-        }
-
         //TODO delete when tested
         testLink = new UnityUnitType("test-link"){{
             defaultController = LinkedAI::new;
@@ -1024,7 +1014,6 @@ public class UnityUnitTypes implements ContentList{
         //endregion
         //region naval-units
 
-        setEntity("amphibi-naval", TransUnitWaterMove::new);
         amphibiNaval = new UnityUnitType("amphibi-naval"){
             {
                 toTrans = () -> amphibi;
@@ -1079,7 +1068,6 @@ public class UnityUnitTypes implements ContentList{
             }
         };
 
-        setEntity("amphibi", TransLegsUnit::new);
         amphibi = new UnityUnitType("amphibi"){{
             toTrans = () -> amphibiNaval;
             speed = 0.3f;
@@ -1104,7 +1092,6 @@ public class UnityUnitTypes implements ContentList{
             weapons.add(amphibiNaval.weapons.get(0));
         }};
 
-        setEntity("craber-naval", TransUnitWaterMove::new);
         craberNaval = new UnityUnitType("craber-naval"){
             {
                 toTrans = () -> craber;
@@ -1149,7 +1136,6 @@ public class UnityUnitTypes implements ContentList{
             }
         };
 
-        setEntity("craber", TransLegsUnit::new);
         craber = new UnityUnitType("craber"){{
             toTrans = () -> craberNaval;
             speed = 0.3f;
@@ -1801,7 +1787,6 @@ public class UnityUnitTypes implements ContentList{
         //endregion
         //region imber
 
-        setEntity("arcnelidia", WormDefaultUnit::new);
         arcnelidia = new UnityUnitType("arcnelidia"){{
             segmentOffset = 23f;
             hitSize = 17f;
@@ -1843,7 +1828,6 @@ public class UnityUnitTypes implements ContentList{
         //endregion
         //region plague
 
-        setEntity("toxobyte", WormDefaultUnit::new);
         toxobyte = new UnityUnitType("toxobyte"){{
             defaultController = WormAI::new;
             flying = true;
@@ -1896,7 +1880,6 @@ public class UnityUnitTypes implements ContentList{
             }});
         }};
 
-        setEntity("catenapede", WormDefaultUnit::new);
         catenapede = new UnityUnitType("catenapede"){{
             defaultController = WormAI::new;
             flying = true;
@@ -2826,7 +2809,6 @@ public class UnityUnitTypes implements ContentList{
         //endregion
         //region dark
 
-        setEntity("opticaecus", EndInvisibleUnit::new);
         opticaecus = new InvisibleUnitType("opticaecus"){{
             health = 60000f;
             speed = 1.8f;
@@ -2878,7 +2860,6 @@ public class UnityUnitTypes implements ContentList{
             }});
         }};
 
-        setEntity("devourer-of-eldrich-gods", EndWormUnit::new);
         devourer = new UnityUnitType("devourer-of-eldrich-gods"){{
             health = 1250000f;
             flying = true;
@@ -3033,7 +3014,6 @@ public class UnityUnitTypes implements ContentList{
             }
         };
 
-        setEntity("apocalypse", ApocalypseUnit::new);
         apocalypse = new InvisibleUnitType("apocalypse"){{
             health = 1725000f;
             speed = 0.75f;
@@ -3242,7 +3222,6 @@ public class UnityUnitTypes implements ContentList{
             }
         };
 
-        setEntity("ravager", EndLegsUnit::new);
         ravager = new UnityUnitType("ravager"){{
             health = 1650000f;
             speed = 0.65f;

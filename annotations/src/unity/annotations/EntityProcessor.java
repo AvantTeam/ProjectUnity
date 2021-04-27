@@ -17,6 +17,7 @@ import java.util.*;
 
 import javax.annotation.processing.*;
 import javax.lang.model.element.*;
+import javax.lang.model.type.*;
 
 import com.squareup.javapoet.*;
 import com.sun.source.tree.*;
@@ -31,11 +32,13 @@ import static javax.lang.model.type.TypeKind.*;
 @SupportedAnnotationTypes({
     "unity.annotations.Annotations.EntityComponent",
     "unity.annotations.Annotations.EntityBaseComponent",
-    "unity.annotations.Annotations.EntityDef"
+    "unity.annotations.Annotations.EntityDef",
+    "unity.annotations.Annotations.EntityPoint"
 })
 public class EntityProcessor extends BaseProcessor{
     Seq<TypeElement> comps = new Seq<>();
     Seq<TypeElement> baseComps = new Seq<>();
+    Seq<Element> pointers = new Seq<>();
     ObjectMap<String, TypeElement> compNames = new ObjectMap<>();
     Seq<TypeSpec.Builder> baseClasses = new Seq<>();
     ObjectMap<TypeElement, ObjectSet<TypeElement>> baseClassDeps = new ObjectMap<>();
@@ -60,6 +63,7 @@ public class EntityProcessor extends BaseProcessor{
         baseComps.addAll((Set<TypeElement>)roundEnv.getElementsAnnotatedWith(EntityBaseComponent.class));
         inters.addAll((Set<TypeElement>)roundEnv.getElementsAnnotatedWith(EntityInterface.class));
         defs.addAll(roundEnv.getElementsAnnotatedWith(EntityDef.class));
+        pointers.addAll(roundEnv.getElementsAnnotatedWith(EntityPoint.class));
 
         if(round == 1){
             serializer = TypeIOResolver.resolve(this);
@@ -528,7 +532,7 @@ public class EntityProcessor extends BaseProcessor{
                             "prov"
                         )
                         .beginControlFlow("synchronized($T.class)", ClassName.get(packageName, "UnityEntityMapping"))
-                            .addStatement("if(ids.containsKey(type)) return")
+                            .addStatement("if(ids.containsKey(type) || $T.nameMap.containsKey(type.getSimpleName())) return", cName(EntityMapping.class))
                             .addCode(lnew())
                             .beginControlFlow("for(; last < $T.idMap.length; last++)", cName(EntityMapping.class))
                                 .beginControlFlow("if($T.idMap[last] == null)", cName(EntityMapping.class))
@@ -608,17 +612,29 @@ public class EntityProcessor extends BaseProcessor{
                     .build()
                 );
 
-                boolean isUnit = typeUtils.isAssignable(
-                    elementUtils.getTypeElement(UnitType.class.getCanonicalName()).asType(),
-                    def.naming.asType()
-                );
-
-                if(isUnit){
-                    TypeElement up = (TypeElement)def.naming.getEnclosingElement();
+                if(def.naming instanceof VariableElement){
+                    TypeMirror up = def.naming.getEnclosingElement().asType();
                     String c = simpleName(def.naming);
-                    init.addStatement("register($T.$L, $T.class, $T::create)", up, c, type, type);
+                    init.addStatement("register($T.$L, $T.class, $T::create)", TypeName.get(up), c, type, type);
                 }else{
                     init.addStatement("register($T.class, $T::create)", type, type);
+                }
+            }
+
+            for(Element e : pointers){
+                EntityPoint point = annotation(e, EntityPoint.class);
+                boolean isUnit = e instanceof VariableElement;
+
+                TypeElement type = (TypeElement)toEl(isUnit ? elements(point::value).first().asType() : e.asType());
+                ExecutableElement create = method(type, "create", type.asType(), List.of());
+                String constructor = create == null ? "new" : "create";
+
+                if(isUnit){
+                    TypeMirror up = e.getEnclosingElement().asType();
+                    String c = simpleName(e);
+                    init.addStatement("register($T.$L, $T.class, $T::$L)", TypeName.get(up), c, type, type, constructor);
+                }else{
+                    init.addStatement("register($T.class, $T::$L)", type, type, constructor);
                 }
             }
 

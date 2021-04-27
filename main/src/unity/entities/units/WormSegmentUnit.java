@@ -3,23 +3,25 @@ package unity.entities.units;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
-import arc.struct.Seq;
+import arc.struct.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import mindustry.audio.*;
 import mindustry.gen.*;
-import mindustry.graphics.Pal;
+import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.entities.units.*;
-import mindustry.entities.bullet.BulletType;
+import mindustry.entities.bullet.*;
 import mindustry.entities.Effect;
 import unity.ai.*;
-import unity.content.UnityUnitTypes;
+import unity.annotations.Annotations.*;
+import unity.gen.*;
 import unity.type.*;
 
 import static arc.Core.atlas;
 import static mindustry.Vars.*;
 
+@EntityPoint
 public class WormSegmentUnit extends UnitEntity{
     public UnityUnitType wormType;
     protected float segmentHealth;
@@ -137,7 +139,7 @@ public class WormSegmentUnit extends UnitEntity{
 
     @Override
     public int classId(){
-        return UnityUnitTypes.getClassId(0);
+        return UnityEntityMapping.classId(WormSegmentUnit.class);
     }
 
     @Override

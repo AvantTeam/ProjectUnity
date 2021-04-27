@@ -1,8 +1,10 @@
 package unity.entities.units;
 
-import mindustry.gen.LegsUnit;
-import unity.content.UnityUnitTypes;
+import mindustry.gen.*;
+import unity.annotations.Annotations.*;
+import unity.gen.*;
 
+@EntityPoint
 public class TransLegsUnit extends LegsUnit implements TransformerBase{
     protected float timeTrans;
 
@@ -24,6 +26,6 @@ public class TransLegsUnit extends LegsUnit implements TransformerBase{
 
     @Override
     public int classId(){
-        return UnityUnitTypes.getClassId(3);
+        return UnityEntityMapping.classId(TransLegsUnit.class);
     }
 }

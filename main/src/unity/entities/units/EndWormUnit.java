@@ -5,8 +5,10 @@ import arc.util.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import unity.*;
-import unity.content.*;
+import unity.annotations.Annotations.*;
+import unity.gen.*;
 
+@EntityPoint
 public class EndWormUnit extends WormDefaultUnit implements AntiCheatBase{
     private float invTime = 0f;
     private final float[] invTimeB = new float[5];
@@ -122,9 +124,10 @@ public class EndWormUnit extends WormDefaultUnit implements AntiCheatBase{
 
     @Override
     public int classId(){
-        return UnityUnitTypes.getClassId(5);
+        return UnityEntityMapping.classId(EndWormUnit.class);
     }
 
+    @EntityPoint
     public static class EndWormSegmentUnit extends WormSegmentUnit implements AntiCheatBase{
         private boolean removed = false;
 
@@ -153,7 +156,7 @@ public class EndWormUnit extends WormDefaultUnit implements AntiCheatBase{
 
         @Override
         public int classId(){
-            return UnityUnitTypes.getClassId(6);
+            return UnityEntityMapping.classId(EndWormSegmentUnit.class);
         }
     }
 }

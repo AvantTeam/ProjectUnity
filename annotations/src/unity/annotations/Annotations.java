@@ -57,12 +57,12 @@ public class Annotations{
         boolean pooled() default false;
     }
 
-    /** Indicates that this content's entity will be the one that is pointed */
-    @Target(ElementType.FIELD)
+    /** Indicates that this content's entity will be the one that is pointed, or if it's the type it will get mapped to the entity mapping */
+    @Target({ElementType.FIELD, ElementType.TYPE})
     @Retention(RetentionPolicy.SOURCE)
     public @interface EntityPoint{
         /** @return The entity type */
-        Class<?> value();
+        Class<?> value() default Void.class;
     }
 
     /** Indicates that this music belongs to a specific faction in a specific category */
