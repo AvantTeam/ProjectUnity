@@ -4,7 +4,6 @@ import mindustry.gen.*;
 import unity.annotations.Annotations.*;
 import unity.entities.*;
 import unity.gen.*;
-import unity.util.*;
 
 /** @author GlennFolker */
 @EntityDef(value = Extensionc.class, serialize = false)

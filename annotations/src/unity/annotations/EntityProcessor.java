@@ -1,6 +1,7 @@
 package unity.annotations;
 
 import arc.func.*;
+import arc.math.*;
 import arc.struct.*;
 import arc.struct.ObjectMap.*;
 import arc.util.*;
@@ -400,11 +401,11 @@ public class EntityProcessor extends BaseProcessor{
                         }
 
                         if(simpleName(first).equals("readSyncManual") || simpleName(first).equals("writeSyncManual")){
-                            //io.writeSyncManual(mbuilder, simpleName(first).equals("writeSyncManual"), syncedFields);
+                            io.writeSyncManual(mbuilder, simpleName(first).equals("writeSyncManual"), syncedFields);
                         }
 
                         if(simpleName(first).equals("interpolate")){
-                            //io.writeInterpolate(mbuilder, syncedFields);
+                            io.writeInterpolate(mbuilder, syncedFields);
                         }
 
                         if(simpleName(first).equals("snapSync")){
@@ -853,6 +854,49 @@ public class EntityProcessor extends BaseProcessor{
 
                 st("afterSync()");
             }
+        }
+
+        void writeSyncManual(MethodSpec.Builder method, boolean write, Seq<VariableElement> syncFields) throws Exception{
+            this.method = method;
+            this.write = write;
+
+            if(write){
+                for(VariableElement field : syncFields){
+                    st("buffer.put(this.$L)", simpleName(field));
+                }
+            }else{
+                st("if(lastUpdated != 0) updateSpacing = $T.timeSinceMillis(lastUpdated)", Time.class);
+                st("lastUpdated = $T.millis()", Time.class);
+
+                for(VariableElement field : syncFields){
+                    st("this.$L = this.$L", simpleName(field) + "_LAST_", simpleName(field));
+                    st("this.$L = buffer.get()", simpleName(field) + "_TARGET_");
+                }
+            }
+        }
+
+        void writeInterpolate(MethodSpec.Builder method, Seq<VariableElement> fields) throws Exception{
+            this.method = method;
+
+            cont("if(lastUpdated != 0 && updateSpacing != 0)");
+
+            st("float timeSinceUpdate = Time.timeSinceMillis(lastUpdated)");
+            st("float alpha = Math.min(timeSinceUpdate / updateSpacing, 2f)");
+
+            for(VariableElement field : fields){
+                String name = simpleName(field);
+                String targetName = name + "_TARGET_";
+                String lastName = name + "_LAST_";
+                st("$L = $L($T.$L($L, $L, alpha))", name, annotation(field, SyncField.class).clamped() ? "arc.math.Mathf.clamp" : "", cName(Mathf.class), annotation(field, SyncField.class).value() ? "lerp" : "slerp", lastName, targetName);
+            }
+
+            ncont("else if(lastUpdated != 0)");
+
+            for(VariableElement field : fields){
+                st("$L = $L", simpleName(field), simpleName(field) + "_TARGET_");
+            }
+
+            econt();
         }
 
         void io(String type, String field){

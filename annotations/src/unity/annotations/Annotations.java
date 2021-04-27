@@ -40,14 +40,6 @@ public class Annotations{
         String value();
     }
 
-    /** Indicates that this content implements an exp mechanism */
-    @Target(ElementType.FIELD)
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface ExpDef{
-        /** @return The exp type */
-        Class<?> value();
-    }
-
     /** Indicates that this content's entity type inherits interfaces */
     @Target({ElementType.FIELD, ElementType.TYPE})
     @Retention(RetentionPolicy.SOURCE)

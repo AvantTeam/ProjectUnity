@@ -7,7 +7,6 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import unity.annotations.Annotations.*;
-import unity.content.*;
 import unity.entities.*;
 import unity.gen.*;
 import unity.type.*;

@@ -16,7 +16,7 @@ import unity.annotations.Annotations.*;
 @EntityComponent
 abstract class AssistantComp implements Unitc{
     @ReadOnly String lastText;
-    @ReadOnly float textFadeTime;
+    @ReadOnly @SyncField(true) float textFadeTime;
 
     @Import float x, y;
 
