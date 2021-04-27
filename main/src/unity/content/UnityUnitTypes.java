@@ -76,6 +76,9 @@ public class UnityUnitTypes implements ContentList{
     public static @FactionDef("imber") @EntityPoint(UnitEntity.class)
     UnityUnitType arcnelidia, testLink, test;
 
+    public static @FactionDef("plague") @EntityDef(base = UnitEntity.class, def = TriJointLegsc.class)
+    UnitType exowalker;
+
     public static @FactionDef("plague")
     UnitType toxobyte, catenapede;
     
@@ -1846,6 +1849,27 @@ public class UnityUnitTypes implements ContentList{
 
         //endregion
         //region plague
+
+        exowalker = new UnityUnitType("exowalker"){{
+            health = 6000f;
+            speed = 0.7f;
+            drag = 0.1f;
+
+            rotateSpeed = 2f;
+
+            legCount = 8;
+            legGroupSize = 4;
+            legLength = 90f;
+            legBaseOffset = 9f;
+            legMoveSpace = 0.6f;
+            legPairOffset = 1.5f;
+            legTrns = 0.5f;
+
+            hovering = true;
+            allowLegStep = true;
+            visualElevation = 0.7f;
+            groundLayer = Layer.legUnit;
+        }};
 
         setEntity("toxobyte", WormDefaultUnit::new);
         toxobyte = new UnityUnitType("toxobyte"){{

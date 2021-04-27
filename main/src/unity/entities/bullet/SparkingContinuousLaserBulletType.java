@@ -57,10 +57,10 @@ public class SparkingContinuousLaserBulletType extends ContinuousLaserBulletType
                 b.data = Utils.castConeTile(b.x, b.y, length * coneRange, b.rotation(), 70f, 45, (build, tile) -> {
                     float angD = Mathf.clamp(1f - (Utils.angleDist(Angles.angle(tile.worldx() - b.x, tile.worldy() - b.y), b.rotation()) / 70f));
                     float dst = Mathf.clamp(1f - (Mathf.dst(tile.worldx() - b.x, tile.worldy() - b.y) / (length * coneRange)));
-                    if(Mathf.chance(Interp.pow2In.apply(angD) * 0.2f * Mathf.clamp(dst * 1.7f))) Fires.create(tile);
+                    if(Mathf.chance(Interp.smooth.apply(angD) * 0.32f * Mathf.clamp(dst * 1.7f))) Fires.create(tile);
                     //UnityFx.tilePosIndicatorTest.at(tile.worldx(), tile.worldy());
                     if(build != null && build.team != b.team){
-                        build.damage(Interp.pow2In.apply(angD) * 23.3f * Mathf.clamp(dst * 1.7f));
+                        build.damage(Interp.smooth.apply(angD) * 23.3f * Mathf.clamp(dst * 1.7f));
                         ExtraEffect.addMoltenBlock(build);
                     }
                 }, tile -> tile.block().absorbLasers || tile.block().insulated);

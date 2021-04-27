@@ -27,7 +27,7 @@ public class UnityUnitType extends UnitType{
     public final Seq<Weapon> segWeapSeq = new Seq<>();
     public Color outlineColor = Pal.darkerMetal;
 
-    public TextureRegion segmentRegion, tailRegion, segmentCellRegion, segmentOutline, tailOutline, legBackRegion, legBaseBackRegion, footBackRegion;
+    public TextureRegion segmentRegion, tailRegion, segmentCellRegion, segmentOutline, tailOutline, legBackRegion, legBaseBackRegion, footBackRegion, legMiddleRegion;
     public TextureRegion[] abilityRegions = new TextureRegion[AbilityTextures.values().length];
     public Seq<String> bottomWeapons = new Seq<>();
     // Worms
@@ -68,6 +68,7 @@ public class UnityUnitType extends UnitType{
     
     // legs extra
     protected static Vec2 legOffsetB = new Vec2();
+    protected static float[][] jointOffsets = new float[2][2];
 
     public boolean customBackLegs = false;
 
@@ -108,6 +109,7 @@ public class UnityUnitType extends UnitType{
         legBackRegion = atlas.find(name + "-leg-back");
         legBaseBackRegion = atlas.find(name + "-leg-base-back");
         footBackRegion = atlas.find(name + "-foot-back");
+        legMiddleRegion = atlas.find(name + "-leg-middle", legRegion);
         laserRegion = atlas.find("laser");
         laserEndRegion = atlas.find("laser-end");
         //abilities
@@ -175,6 +177,66 @@ public class UnityUnitType extends UnitType{
         if(unit instanceof Copterc){
             drawRotors(unit);
         }
+    }
+
+    public <T extends Unit & TriJointLegsc> void drawTriLegs(T unit){
+        applyColor(unit);
+
+        TriJointLeg[] legs = unit.legs();
+
+        float ssize = footRegion.width * Draw.scl * 1.5f;
+        float rotation = unit.baseRotation();
+
+        for(TriJointLeg leg : legs){
+            Drawf.shadow(leg.joints[2].x, leg.joints[2].y, ssize);
+        }
+
+        for(int j = legs.length - 1; j >= 0; j--){
+            int i = (j % 2 == 0 ? (j / 2) : legs.length - 1 - (j / 2));
+            TriJointLeg leg = legs[i];
+            float angle = unit.legAngle(rotation, i);
+            boolean flip = i >= legs.length / 2f;
+            int flips = Mathf.sign(flip);
+
+
+            Vec2 position = legOffsetB.trns(angle, legBaseOffset).add(unit);
+            for(int k = 0; k < 2; k++){
+                Tmp.v1.set(leg.joints[1 + k]).sub(leg.joints[k]).inv().setLength(legExtension);
+                jointOffsets[k][0] = Tmp.v1.x;
+                jointOffsets[k][1] = Tmp.v1.y;
+            }
+
+            if(leg.moving && visualElevation > 0f){
+                float scl = visualElevation;
+                float elev = Mathf.slope(1f - leg.stage) * scl;
+                Draw.color(Pal.shadow);
+                Draw.rect(footRegion, leg.joints[2].x + shadowTX * elev, leg.joints[2].y + shadowTY * elev, position.angleTo(leg.joints[2]));
+                applyColor(unit);
+            }
+
+            Draw.rect(footRegion, leg.joints[2].x, leg.joints[2].y, position.angleTo(leg.joints[2]));
+
+            Lines.stroke(legRegion.height * Draw.scl * flips);
+            Lines.line(legRegion, position.x, position.y, leg.joints[0].x, leg.joints[0].y, false);
+            for(int k = 0; k < 2; k++){
+                TextureRegion region = k == 0 ? legMiddleRegion : legBaseRegion;
+                Lines.stroke(region.height * Draw.scl * flips);
+                Lines.line(region, leg.joints[k].x + jointOffsets[k][0], leg.joints[k].y + jointOffsets[k][1], leg.joints[k + 1].x, leg.joints[k + 1].y, false);
+            }
+            if(baseJointRegion.found() && jointRegion.found()){
+                for(int k = -1; k < 2; k++){
+                    Vec2 pos = k == -1 ? position : leg.joints[k];
+                    TextureRegion region = k == -1 ? baseJointRegion : jointRegion;
+                    Draw.rect(region, pos.x, pos.y, k == -1 ? rotation : 0f);
+                }
+            }
+        }
+
+        if(baseRegion.found()){
+            Draw.rect(baseRegion, unit.x, unit.y, rotation);
+        }
+
+        Draw.reset();
     }
 
     @Override
@@ -251,6 +313,13 @@ public class UnityUnitType extends UnitType{
 
     @Override
     public void drawSoftShadow(Unit unit){
+        if(unit instanceof TriJointLegsc){
+            float oz = Draw.z();
+            Draw.z(oz - 0.01f);
+            drawTriLegs((Unit & TriJointLegsc)unit);
+            Draw.z(oz);
+        }
+
         super.drawSoftShadow(unit);
         //worm
         if(!(unit instanceof WormDefaultUnit wormUnit)) return;
