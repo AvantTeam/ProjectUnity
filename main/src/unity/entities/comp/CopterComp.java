@@ -7,6 +7,10 @@ import mindustry.gen.*;
 import unity.annotations.Annotations.*;
 import unity.type.*;
 
+/**
+ * @author GlennFolker
+ * @author MEEPofFaith
+ */
 @EntityComponent
 abstract class CopterComp implements Unitc{
     transient FloatSeq rotorRot = new FloatSeq();

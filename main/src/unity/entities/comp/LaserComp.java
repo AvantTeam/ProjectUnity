@@ -12,8 +12,9 @@ import unity.entities.*;
 import unity.gen.*;
 import unity.type.*;
 
+/** @author GlennFolker */
 @EntityComponent
-abstract class LaserComp implements Unitc, ExtensionHolder {
+abstract class LaserComp implements Unitc, ExtensionHolder{
     transient Extension ext;
     transient Teamc target;
 
@@ -41,7 +42,7 @@ abstract class LaserComp implements Unitc, ExtensionHolder {
     }
 
     @Override
-    public void drawExt() {
+    public void drawExt(){
         if(strength > 0.1f){
             UnityUnitType type = (UnityUnitType)this.type;
             float focusLen = hitSize / 2f + Mathf.absin(Time.time, 1.1f, 0.5f);
@@ -58,7 +59,7 @@ abstract class LaserComp implements Unitc, ExtensionHolder {
     }
 
     @Override
-    public float clipSizeExt() {
+    public float clipSizeExt(){
         if(Float.isNaN(laserX) || Float.isNaN(laserY)) return 0f;
         return dst(laserX, laserY) * 2f;
     }

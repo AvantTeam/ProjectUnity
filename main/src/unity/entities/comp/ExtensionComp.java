@@ -7,10 +7,10 @@ import unity.gen.*;
 import unity.util.*;
 
 /** @author GlennFolker */
-@EntityDef(base = UnitEntity.class, value = {Extensionc.class}, serialize = false)
+@EntityDef(value = Extensionc.class, serialize = false)
 @EntityComponent(base = true)
 abstract class ExtensionComp implements Drawc{
-    ExtensionHolder holder;
+    transient ExtensionHolder holder;
 
     @Override
     public void add(){

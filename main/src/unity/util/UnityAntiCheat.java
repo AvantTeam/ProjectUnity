@@ -9,8 +9,8 @@ import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.world.blocks.ConstructBlock.*;
 import unity.*;
-import unity.entities.comp.*;
 import unity.entities.units.*;
+import unity.gen.*;
 import unity.sync.*;
 
 import java.util.*;
@@ -39,7 +39,7 @@ public class UnityAntiCheat implements ApplicationListener{
 
     public static void annihilateEntity(Entityc entity, boolean override, boolean setNaN){
         Groups.all.remove(entity);
-        if(entity instanceof Bossc) UnityCall.bossMusic(((Bossc)entity).type().name, false);
+        if(entity instanceof Bossc boss) UnityCall.bossMusic(boss.type().name, false);
         if(entity instanceof Drawc) Groups.draw.remove((Drawc)entity);
         if(entity instanceof Syncc) Groups.sync.remove((Syncc)entity);
         if(entity instanceof Unit){

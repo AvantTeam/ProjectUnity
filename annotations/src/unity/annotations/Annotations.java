@@ -52,9 +52,6 @@ public class Annotations{
     @Target({ElementType.FIELD, ElementType.TYPE})
     @Retention(RetentionPolicy.SOURCE)
     public @interface EntityDef{
-        /** @return The base class for the generated entity class */
-        Class<?> base();
-
         /** @return The interfaces that will be inherited by the generated entity class */
         Class<?>[] value();
 
