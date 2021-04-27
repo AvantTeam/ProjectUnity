@@ -8,6 +8,7 @@ import arc.util.pooling.Pool.*;
 import mindustry.*;
 import mindustry.ctype.*;
 import mindustry.gen.*;
+import mindustry.type.*;
 import unity.annotations.Annotations.*;
 import unity.annotations.TypeIOResolver.*;
 
@@ -561,6 +562,24 @@ public class EntityProcessor extends BaseProcessor{
                     .build()
                 )
                 .addMethod(
+                    MethodSpec.methodBuilder("register")
+                        .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                        .returns(TypeName.VOID)
+                        .addTypeVariable(tvName("T", cName(Unit.class)))
+                        .addParameter(cName(UnitType.class), "unit")
+                        .addParameter(
+                            ParameterizedTypeName.get(cName(Class.class), tvName("T")),
+                            "type"
+                        )
+                        .addParameter(
+                            ParameterizedTypeName.get(cName(Prov.class), tvName("T")),
+                            "prov"
+                        )
+                        .addStatement("register(unit.name, type, prov)")
+                        .addStatement("unit.constructor = prov")
+                    .build()
+                )
+                .addMethod(
                     MethodSpec.methodBuilder("classId")
                         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                         .addTypeVariable(tvName("T", cName(Entityc.class)))
@@ -588,9 +607,18 @@ public class EntityProcessor extends BaseProcessor{
                     .build()
                 );
 
-                TypeElement up = (TypeElement)def.naming.getEnclosingElement();
-                String c = simpleName(def.naming);
-                init.addStatement("register($T.$L.name, $T.class, $T::create)", up, c, type, type);
+                boolean isUnit = typeUtils.isAssignable(
+                    elementUtils.getTypeElement(UnitType.class.getCanonicalName()).asType(),
+                    def.naming.asType()
+                );
+
+                if(isUnit){
+                    TypeElement up = (TypeElement)def.naming.getEnclosingElement();
+                    String c = simpleName(def.naming);
+                    init.addStatement("register($T.$L, $T.class, $T::create)", up, c, type, type);
+                }else{
+                    init.addStatement("register($T.class, $T::create)", type, type);
+                }
             }
 
             write(map
