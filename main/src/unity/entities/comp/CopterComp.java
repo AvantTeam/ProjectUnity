@@ -9,8 +9,8 @@ import unity.type.*;
 
 @EntityComponent
 abstract class CopterComp implements Unitc{
-    FloatSeq rotorRot = new FloatSeq();
-    float rotorSpeedScl;
+    transient FloatSeq rotorRot = new FloatSeq();
+    transient float rotorSpeedScl;
 
     @Import boolean dead;
     @Import float health, rotation;

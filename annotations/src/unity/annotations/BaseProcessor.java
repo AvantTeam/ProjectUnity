@@ -134,33 +134,33 @@ public abstract class BaseProcessor extends AbstractProcessor{
         }
     }
 
-    public Element toEl(TypeMirror t){
+    public static Element toEl(TypeMirror t){
         return typeUtils.asElement(t);
     }
 
-    public Seq<Element> elements(Runnable run){
+    public static Seq<Element> elements(Runnable run){
         try{
             run.run();
         }catch(MirroredTypesException ex){
-            return Seq.with(ex.getTypeMirrors()).map(this::toEl);
+            return Seq.with(ex.getTypeMirrors()).map(BaseProcessor::toEl);
         }
 
         return Seq.with();
     }
 
-    public TypeName tName(Class<?> type){
+    public static TypeName tName(Class<?> type){
         return ClassName.get(type).box();
     }
 
-    public TypeName tName(Element e){
+    public static TypeName tName(Element e){
         return TypeName.get(e.asType());
     }
 
-    public ClassName cName(Class<?> type){
+    public static ClassName cName(Class<?> type){
         return ClassName.get(type);
     }
 
-    public ClassName cName(String canonical){
+    public static ClassName cName(String canonical){
         Matcher matcher = Pattern.compile("\\.[A-Z]").matcher(canonical);
         matcher.find();
         int offset = matcher.start();
@@ -174,23 +174,23 @@ public abstract class BaseProcessor extends AbstractProcessor{
         return ClassName.get(pkgName, simpleName, simpleNames.toArray());
     }
 
-    public ClassName cName(Element e){
+    public static ClassName cName(Element e){
         return cName(stripTV(e.asType().toString()));
     }
 
-    public TypeVariableName tvName(String name, TypeName... bounds){
+    public static TypeVariableName tvName(String name, TypeName... bounds){
         return TypeVariableName.get(name, bounds);
     }
 
-    public String stripTV(String canonical){
+    public static String stripTV(String canonical){
         return canonical.replaceAll("\\<[A-Z]+\\>", "");
     }
 
-    public ClassName withoutTV(TypeElement t){
+    public static ClassName withoutTV(TypeElement t){
         return cName(stripTV(t.getQualifiedName().toString()));
     }
 
-    public String lnew(){
+    public static String lnew(){
         return Character.toString('\n');
     }
 
@@ -306,7 +306,7 @@ public abstract class BaseProcessor extends AbstractProcessor{
         inters.add(type.asType());
         inters.add(type.getSuperclass());
 
-        ObjectSet<TypeElement> all = ObjectSet.with(inters.map(this::toEl).map(e -> (TypeElement)e));
+        ObjectSet<TypeElement> all = ObjectSet.with(inters.map(BaseProcessor::toEl).map(e -> (TypeElement)e));
         all.addAll(getInterfaces((TypeElement)toEl(type.getSuperclass())));
         for(TypeMirror m : type.getInterfaces()){
             if(!(m instanceof NoType)){
@@ -334,7 +334,18 @@ public abstract class BaseProcessor extends AbstractProcessor{
         }
     }
 
-    public <A extends Annotation> A annotation(Element e, Class<A> annotation){
+    public static boolean instanceOf(String type, String other){
+        TypeElement a = elementUtils.getTypeElement(type);
+        TypeElement b = elementUtils.getTypeElement(other);
+        return a != null && b != null && typeUtils.isSubtype(a.asType(), b.asType());
+    }
+
+    public static boolean isPrimitive(String type){
+        return type.equals("boolean") || type.equals("byte") || type.equals("short") || type.equals("int")
+        || type.equals("long") || type.equals("float") || type.equals("double") || type.equals("char");
+    }
+
+    public static <A extends Annotation> A annotation(Element e, Class<A> annotation){
         try{
             Method m = AnnoConstruct.class.getDeclaredMethod("getAttribute", Class.class);
             m.setAccessible(true);
@@ -345,22 +356,26 @@ public abstract class BaseProcessor extends AbstractProcessor{
         }
     }
 
-    public TypeElement toType(Class<?> type){
+    public static TypeElement toType(Class<?> type){
         return elementUtils.getTypeElement(type.getCanonicalName());
     }
 
-    public String simpleName(Element e){
+    public static String fullName(Element e){
+        return e.asType().toString();
+    }
+
+    public static String simpleName(Element e){
         return simpleName(e.getSimpleName().toString());
     }
 
-    public String simpleName(String canonical){
+    public static String simpleName(String canonical){
         if(canonical.contains(".")){
             canonical = canonical.substring(canonical.lastIndexOf(".") + 1, canonical.length());
         }
         return canonical;
     }
 
-    public String simpleString(ExecutableElement e){
+    public static String simpleString(ExecutableElement e){
         return simpleName(e) + "(" + Seq.with(e.getParameters()).toString(", ", p -> simpleName(p.asType().toString())) + ")";
     }
 

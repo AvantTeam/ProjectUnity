@@ -6,6 +6,17 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.serialization.*;
 
+dependencies {
+    compileOnly "com.github.Anuken.Arc:arc-core:$mindustryVersion"
+    compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
+
+    implementation "com.github.younggam:multi-lib:$multilibVersion"
+    annotationProcessor "com.github.Anuken:jabel:$jabelVersion"
+
+    compileOnly project(':annotations')
+    annotationProcessor project(':annotations')
+}
+
 ext {
     assetsDir = new File(rootDir, "main/assets/")
 
@@ -24,12 +35,10 @@ task deploy(type: Jar, dependsOn: configurations.runtimeClasspath) {
 
     archiveFileName = "${modName}Desktop.jar"
 
-    from {
-        files(sourceSets.main.output.classesDirs)
-        files(sourceSets.main.output.resourcesDir)
-        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-        files(project.assetsDir)
-    }
+    from files(sourceSets.main.output.classesDirs)
+    from files(sourceSets.main.output.resourcesDir)
+    from configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    from files(project.assetsDir)
 
     doLast { delete {
         delete "$buildDir/libs/main-${version}.jar"
@@ -198,15 +207,4 @@ compileJava {
             dependsOn fetchComps
         }
     }
-}
-
-dependencies {
-    compileOnly "com.github.Anuken.Arc:arc-core:$mindustryVersion"
-    compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
-
-    implementation "com.github.younggam:multi-lib:$multilibVersion"
-    annotationProcessor "com.github.Anuken:jabel:$jabelVersion"
-
-    compileOnly project(':annotations')
-    annotationProcessor project(':annotations')
 }

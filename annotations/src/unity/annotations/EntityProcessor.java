@@ -5,17 +5,21 @@ import arc.struct.*;
 import arc.struct.ObjectMap.*;
 import arc.util.*;
 import arc.util.pooling.Pool.*;
+import mindustry.*;
+import mindustry.ctype.*;
 import mindustry.gen.*;
 import unity.annotations.Annotations.*;
+import unity.annotations.TypeIOResolver.*;
 
 import java.util.*;
 
 import javax.annotation.processing.*;
 import javax.lang.model.element.*;
-import javax.lang.model.type.*;
 
 import com.squareup.javapoet.*;
 import com.sun.source.tree.*;
+
+import static javax.lang.model.type.TypeKind.*;
 
 /**
  * @author Anuke
@@ -42,6 +46,7 @@ public class EntityProcessor extends BaseProcessor{
     StringMap methodBlocks = new StringMap();
     ObjectMap<String, Seq<String>> imports = new ObjectMap<>();
     ObjectMap<TypeElement, String> groups;
+    ClassSerializer serializer;
 
     {
         rounds = 4;
@@ -55,6 +60,7 @@ public class EntityProcessor extends BaseProcessor{
         defs.addAll(roundEnv.getElementsAnnotatedWith(EntityDef.class));
 
         if(round == 1){
+            serializer = TypeIOResolver.resolve(this);
             groups = ObjectMap.of(
                 toComp(Entityc.class), "all",
                 toComp(Playerc.class), "player",
@@ -302,7 +308,7 @@ public class EntityProcessor extends BaseProcessor{
                         allFields.add(field);
 
                         if(annotation(field, SyncField.class) != null && isSync){
-                            if(field.asType().getKind() != TypeKind.FLOAT) throw new IllegalStateException("All SyncFields must be of type float");
+                            if(field.asType().getKind() != FLOAT) throw new IllegalStateException("All SyncFields must be of type float");
 
                             syncedFields.add(field);
                             builder.addField(FieldSpec.builder(TypeName.FLOAT, simpleName(field) + "_TARGET_").addModifiers(Modifier.TRANSIENT, Modifier.PRIVATE).build());
@@ -326,11 +332,12 @@ public class EntityProcessor extends BaseProcessor{
                     .build()
                 );
 
+                EntityIO io = new EntityIO(simpleName(def), builder, serializer);
                 boolean hasIO = ann.genio() && (defComps.contains(s -> simpleName(s).contains("Sync")) || ann.serialize());
 
                 for(Entry<String, Seq<ExecutableElement>> entry : methods){
                     if(entry.value.contains(m -> annotation(m, Replace.class) != null)){
-                        if(entry.value.first().getReturnType().getKind() == TypeKind.VOID){
+                        if(entry.value.first().getReturnType().getKind() == VOID){
                             entry.value = entry.value.select(m -> annotation(m, Replace.class) != null);
                         }else{
                             if(entry.value.count(m -> annotation(m, Replace.class) != null) > 1){
@@ -343,7 +350,7 @@ public class EntityProcessor extends BaseProcessor{
                         }
                     }
 
-                    if(entry.value.count(m -> !is(m, Modifier.NATIVE, Modifier.ABSTRACT) && m.getReturnType().getKind() != TypeKind.VOID) > 1){
+                    if(entry.value.count(m -> !is(m, Modifier.NATIVE, Modifier.ABSTRACT) && m.getReturnType().getKind() != VOID) > 1){
                         throw new IllegalStateException("Type " + simpleName(def) + " has multiple components implementing non-void method " + entry.key + ".");
                     }
 
@@ -368,7 +375,7 @@ public class EntityProcessor extends BaseProcessor{
                         mbuilder.addParameter(tName(var), simpleName(var));
                     }
 
-                    boolean writeBlock = first.getReturnType().getKind() == TypeKind.VOID && entry.value.size > 1;
+                    boolean writeBlock = first.getReturnType().getKind() == VOID && entry.value.size > 1;
 
                     if((is(entry.value.first(), Modifier.ABSTRACT) || is(entry.value.first(), Modifier.NATIVE)) && entry.value.size == 1 && annotation(entry.value.first(), InternalImpl.class) == null){
                         throw new IllegalStateException(simpleName(entry.value.first().getEnclosingElement()) + "#" + entry.value.first() + " is an abstract method and must be implemented in some component");
@@ -384,15 +391,19 @@ public class EntityProcessor extends BaseProcessor{
 
                     if(hasIO){
                         if(simpleName(first).equals("read") || simpleName(first).equals("write")){
-                            //io.write(mbuilder, simpleName(first).equals("write"));
+                            io.write(mbuilder, simpleName(first).equals("write"), allFields);
                         }
 
                         if(simpleName(first).equals("readSync") || simpleName(first).equals("writeSync")){
-                            //io.writeSync(mbuilder, simpleName(first).equals("writeSync"), syncedFields, allFields);
+                            io.writeSync(mbuilder, simpleName(first).equals("writeSync"), syncedFields, allFields);
                         }
 
                         if(simpleName(first).equals("readSyncManual") || simpleName(first).equals("writeSyncManual")){
                             //io.writeSyncManual(mbuilder, simpleName(first).equals("writeSyncManual"), syncedFields);
+                        }
+
+                        if(simpleName(first).equals("interpolate")){
+                            //io.writeInterpolate(mbuilder, syncedFields);
                         }
 
                         if(simpleName(first).equals("snapSync")){
@@ -425,7 +436,7 @@ public class EntityProcessor extends BaseProcessor{
 
                         String blockName = simpleName(elem.getEnclosingElement()).toLowerCase().replace("comp", "");
                         String str = methodBlocks.get(descStr);
-                        str = str.substring(1, str.length() - 1).trim().replace("\n    ", "\n");
+                        str = str.substring(1, str.length() - 1).trim().replace("\n    ", "\n").trim();
                         str += '\n';
 
                         if(writeBlock){
@@ -593,7 +604,7 @@ public class EntityProcessor extends BaseProcessor{
             }
 
             for(EntityDefinition def : definitions){
-                ObjectSet<String> methodNames = def.components.flatMap(type -> methods(type).map(this::simpleString)).asSet();
+                ObjectSet<String> methodNames = def.components.flatMap(type -> methods(type).map(BaseProcessor::simpleString)).asSet();
 
                 if(def.extend != null){
                     def.builder.superclass(def.extend);
@@ -613,7 +624,7 @@ public class EntityProcessor extends BaseProcessor{
 
                         if(field == null || methodNames.contains(simpleString(method))) continue;
 
-                        if(method.getReturnType().getKind() != TypeKind.VOID){
+                        if(method.getReturnType().getKind() != VOID){
                             def.builder.addMethod(
                                 MethodSpec.methodBuilder(var).addModifiers(Modifier.PUBLIC)
                                     .returns(TypeName.get(method.getReturnType()))
@@ -623,7 +634,7 @@ public class EntityProcessor extends BaseProcessor{
                             );
                         }
 
-                        if(method.getReturnType().getKind() == TypeKind.VOID && !Seq.with(field.annotations).contains(f -> f.type.toString().equals("@unity.annotations.Annotations.ReadOnly"))){
+                        if(method.getReturnType().getKind() == VOID && !Seq.with(field.annotations).contains(f -> f.type.toString().equals("@unity.annotations.Annotations.ReadOnly"))){
                             def.builder.addMethod(
                                 MethodSpec.methodBuilder(var).addModifiers(Modifier.PUBLIC)
                                     .returns(TypeName.VOID)
@@ -646,7 +657,7 @@ public class EntityProcessor extends BaseProcessor{
             ObjectSet<TypeElement> out = new ObjectSet<>();
 
             out.addAll(Seq.with(component.getInterfaces())
-                .map(this::toEl)
+                .map(BaseProcessor::toEl)
                 .<TypeElement>as()
                 .map(t -> inters.find(i -> simpleName(t).equals(simpleName(i))))
                 .select(t -> t != null)
@@ -739,6 +750,174 @@ public class EntityProcessor extends BaseProcessor{
             "components=" + components +
             ", base=" + naming +
             '}';
+        }
+    }
+
+    static class EntityIO{
+        final String name;
+        final TypeSpec.Builder type;
+        final ClassSerializer serializer;
+
+        MethodSpec.Builder method;
+        boolean write;
+
+        EntityIO(String name, TypeSpec.Builder type, ClassSerializer serializer){
+            this.name = name;
+            this.type = type;
+            this.serializer = serializer;
+        }
+
+        Seq<VariableElement> sel(Seq<VariableElement> fields){
+            return fields.select(f ->
+                !f.getModifiers().contains(Modifier.TRANSIENT) &&
+                !f.getModifiers().contains(Modifier.STATIC) &&
+                !f.getModifiers().contains(Modifier.FINAL)
+            );
+        }
+
+        void write(MethodSpec.Builder method, boolean write, Seq<VariableElement> fields){
+            this.method = method;
+            this.write = write;
+
+            for(VariableElement e : sel(fields)){
+                io(e.asType().toString(), "this." + simpleName(e) + (write ? "" : " = "));
+            }
+        }
+
+        void writeSync(MethodSpec.Builder method, boolean write, Seq<VariableElement> syncFields, Seq<VariableElement> allFields){
+            this.method = method;
+            this.write = write;
+
+            if(write){
+                for(VariableElement e : sel(allFields)){
+                    io(e.asType().toString(), "this." + simpleName(e));
+                }
+            }else{
+                st("if(lastUpdated != 0) updateSpacing = $T.timeSinceMillis(lastUpdated)", Time.class);
+                st("lastUpdated = $T.millis()", Time.class);
+                st("boolean islocal = isLocal()");
+
+                for(VariableElement e : sel(allFields)){
+                    boolean sf = annotation(e, SyncField.class) != null;
+                    boolean sl = annotation(e, SyncLocal.class) != null;
+
+                    if(sl) cont("if(!islocal)");
+
+                    if(sf){
+                        st(simpleName(e) + "_LAST_" + " = this." + simpleName(e));
+                    }
+
+                    io(e.asType().toString(), "this." + (sf ? simpleName(e) + "_TARGET_" : simpleName(e)) + " = ");
+
+                    if(sl){
+                        ncont("else" );
+
+                        io(e.asType().toString(), "");
+
+                        if(sf){
+                            st(simpleName(e) + "_LAST_" + " = this." + simpleName(e));
+                            st(simpleName(e) + "_TARGET_" + " = this." + simpleName(e));
+                        }
+
+                        econt();
+                    }
+                }
+
+                st("afterSync()");
+            }
+        }
+
+        void io(String type, String field){
+            type = type.replace("mindustry.gen.", "").replace("unity.gen.", "");
+
+            if(isPrimitive(type)){
+                s(type.equals("boolean") ? "bool" : type.charAt(0) + "", field);
+            }else if(instanceOf(type, "mindustry.ctype.Content")){
+                if(write){
+                    s("s", field + ".id");
+                }else{
+                    st(field + "$T.content.getByID($T.$L, read.s())", cName(Vars.class), cName(ContentType.class), simpleName(type).toLowerCase().replace("type", ""));
+                }
+            }else if(serializer.writers.containsKey(type) && write){
+                st("$L(write, $L)", serializer.writers.get(type), field);
+            }else if(serializer.mutatorReaders.containsKey(type) && !write && !field.replace(" = ", "").contains(" ") && !field.isEmpty()){
+                st("$L$L(read, $L)", field, serializer.mutatorReaders.get(type), field.replace(" = ", ""));
+            }else if(serializer.readers.containsKey(type) && !write){
+                st("$L$L(read)", field, serializer.readers.get(type));
+            }else if(type.endsWith("[]")){
+                String rawType = type.substring(0, type.length() - 2);
+    
+                if(write){
+                    s("i", field + ".length");
+                    cont("for(int INDEX = 0; INDEX < $L.length; INDEX ++)", field);
+                    io(rawType, field + "[INDEX]");
+                }else{
+                    String fieldName = field.replace(" = ", "").replace("this.", "");
+                    String lenf = fieldName + "_LENGTH";
+                    s("i", "int " + lenf + " = ");
+                    if(!field.isEmpty()){
+                        st("$Lnew $L[$L]", field, type.replace("[]", ""), lenf);
+                    }
+                    cont("for(int INDEX = 0; INDEX < $L; INDEX ++)", lenf);
+                    io(rawType, field.replace(" = ", "[INDEX] = "));
+                }
+    
+                econt();
+            }else if(type.startsWith("arc.struct") && type.contains("<")){ //it's some type of data structure
+                String struct = type.substring(0, type.indexOf("<"));
+                String generic = type.substring(type.indexOf("<") + 1, type.indexOf(">"));
+    
+                if(struct.equals("arc.struct.Queue") || struct.equals("arc.struct.Seq")){
+                    if(write){
+                        s("i", field + ".size");
+                        cont("for(int INDEX = 0; INDEX < $L.size; INDEX ++)", field);
+                        io(generic, field + ".get(INDEX)");
+                    }else{
+                        String fieldName = field.replace(" = ", "").replace("this.", "");
+                        String lenf = fieldName + "_LENGTH";
+                        s("i", "int " + lenf + " = ");
+                        if(!field.isEmpty()){
+                            st("$L.clear()", field.replace(" = ", ""));
+                        }
+                        cont("for(int INDEX = 0; INDEX < $L; INDEX ++)", lenf);
+                        io(generic, field.replace(" = ", "_ITEM = ").replace("this.", generic + " "));
+                        if(!field.isEmpty()){
+                            String temp = field.replace(" = ", "_ITEM").replace("this.", "");
+                            st("if($L != null) $L.add($L)", temp, field.replace(" = ", ""), temp);
+                        }
+                    }
+    
+                    econt();
+                }else{
+                    Log.warn("Missing serialization code for collection '@' in '@'", type, name);
+                }
+            }else{
+                Log.warn("Missing serialization code for type '@' in '@'", type, name);
+            }
+        }
+
+        void cont(String text, Object... fmt){
+            method.beginControlFlow(text, fmt);
+        }
+    
+        void econt(){
+            method.endControlFlow();
+        }
+    
+        void ncont(String text, Object... fmt){
+            method.nextControlFlow(text, fmt);
+        }
+    
+        void st(String text, Object... args){
+            method.addStatement(text, args);
+        }
+    
+        void s(String type, String field){
+            if(write){
+                method.addStatement("write.$L($L)", type, field);
+            }else{
+                method.addStatement("$Lread.$L()", field, type);
+            }
         }
     }
 }
