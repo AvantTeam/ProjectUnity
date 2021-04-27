@@ -621,6 +621,7 @@ public class EntityProcessor extends BaseProcessor{
                 }
             }
 
+            ObjectSet<String> usedNames = new ObjectSet<>();
             for(Element e : pointers){
                 EntityPoint point = annotation(e, EntityPoint.class);
                 boolean isUnit = e instanceof VariableElement;
@@ -633,7 +634,9 @@ public class EntityProcessor extends BaseProcessor{
                     TypeMirror up = e.getEnclosingElement().asType();
                     String c = simpleName(e);
                     init.addStatement("register($T.$L, $T.class, $T::$L)", TypeName.get(up), c, type, type, constructor);
-                }else{
+
+                    usedNames.add(simpleName(type));
+                }else if(!usedNames.contains(simpleName(type))){
                     init.addStatement("register($T.class, $T::$L)", type, type, constructor);
                 }
             }
