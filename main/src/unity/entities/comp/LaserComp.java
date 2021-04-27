@@ -3,6 +3,7 @@ package unity.entities.comp;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -21,8 +22,9 @@ abstract class LaserComp implements Unitc, ExtensionHolder{
     transient float laserY;
     transient float strength;
 
-    @Import float x, y, rotation, hitSize;
     @Import UnitType type;
+    @Import Team team;
+    @Import float x, y, rotation, hitSize;
 
     @Override
     public void add(){
@@ -46,13 +48,13 @@ abstract class LaserComp implements Unitc, ExtensionHolder{
             UnityUnitType type = (UnityUnitType)this.type;
             float focusLen = hitSize / 2f + Mathf.absin(Time.time, 1.1f, 0.5f);
 
-            float px = x() + Angles.trnsx(rotation, focusLen);
-            float py = y() + Angles.trnsy(rotation, focusLen);
+            float px = x + Angles.trnsx(rotation, focusLen);
+            float py = y + Angles.trnsy(rotation, focusLen);
 
             Draw.z(Layer.bullet);
 
             Draw.mixcol(type.laserColor, Mathf.absin(4f, 0.6f));
-            Drawf.laser(team(), type.laserRegion, type.laserEndRegion, px, py, laserX, laserY, strength * type.laserWidth);
+            Drawf.laser(team, type.laserRegion, type.laserEndRegion, px, py, laserX, laserY, strength * type.laserWidth);
             Draw.mixcol();
         }
     }

@@ -4,6 +4,7 @@ import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.gen.*;
+import mindustry.type.*;
 import unity.annotations.Annotations.*;
 import unity.type.*;
 
@@ -16,6 +17,7 @@ abstract class CopterComp implements Unitc{
     transient FloatSeq rotorRot = new FloatSeq();
     transient float rotorSpeedScl;
 
+    @Import UnitType type;
     @Import boolean dead;
     @Import float health, rotation;
     @Import int id;
@@ -27,7 +29,7 @@ abstract class CopterComp implements Unitc{
 
     @Override
     public void update(){
-        UnityUnitType type = (UnityUnitType)type();
+        UnityUnitType type = (UnityUnitType)this.type;
         if(dead || health < 0f){
             rotation = rotation + type.fallRotateSpeed * Mathf.signs[id % 2];
             rotorSpeedScl = Mathf.lerpDelta(rotorSpeedScl, 0f, type.rotorDeathSlowdown);
