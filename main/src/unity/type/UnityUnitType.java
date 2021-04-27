@@ -223,11 +223,11 @@ public class UnityUnitType extends UnitType{
                 Lines.stroke(region.height * Draw.scl * flips);
                 Lines.line(region, leg.joints[k].x + jointOffsets[k][0], leg.joints[k].y + jointOffsets[k][1], leg.joints[k + 1].x, leg.joints[k + 1].y, false);
             }
-            if(baseJointRegion.found() && jointRegion.found()){
+            if(baseJointRegion.found() || jointRegion.found()){
                 for(int k = -1; k < 2; k++){
                     Vec2 pos = k == -1 ? position : leg.joints[k];
                     TextureRegion region = k == -1 ? baseJointRegion : jointRegion;
-                    Draw.rect(region, pos.x, pos.y, k == -1 ? rotation : 0f);
+                    if(region.found()) Draw.rect(region, pos.x, pos.y, k == -1 ? rotation : 0f);
                 }
             }
         }
