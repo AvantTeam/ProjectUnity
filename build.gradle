@@ -22,7 +22,10 @@ allprojects {
 
     ext {
         sdkVersion = '30'
-        sdkRoot = System.getenv("ANDROID_HOME")
+
+        sdkRoot = {
+            return System.getenv('ANDROID_SDK_ROOT')
+        }
 
         hasSprites = {
             return new File(rootDir, 'main/assets/sprites/').exists()

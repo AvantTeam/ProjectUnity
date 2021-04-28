@@ -45,36 +45,46 @@ task deploy(type: Jar, dependsOn: configurations.runtimeClasspath) {
     }}
 }
 
-task dex {
-    dependsOn deploy
+task dex(dependsOn: deploy) {
+    def jarArtifact = file(tasks.deploy.archiveFile.get())
+    def dexedArtifact = new File("$buildDir/libs", 'Dexed.jar')
 
-    doLast {
-        exec {
-            workingDir = "$buildDir/libs/"
-            def command = ['d8', '--min-api', '15', '--output', "${modName}Dexed.jar", "${modName}Desktop.jar"]
+    doLast { exec {
+        workingDir "$buildDir/libs"
 
-            if(windows()) {
-                commandLine('cmd', '/c', *command)
-            } else {
-                commandLine(*command)
-            }
+        def command = ['d8']
+        def files = (
+            configurations.compileClasspath.asList() +
+            configurations.runtimeClasspath.asList() +
+            [new File("${sdkRoot()}/platforms/android-$sdkVersion/android.jar")]
+        )
+
+        for(def file : files) {
+            command += '--classpath'
+            command += file.path
         }
-    }
+
+        command += ['--min-api', sdkVersion, '--output', dexedArtifact, jarArtifact]
+        if(windows()) {
+            commandLine('cmd', '/c', *command)
+        } else {
+            commandLine(*command)
+        }
+    }}
 }
 
-task deployDex(type: Jar) {
-    dependsOn deploy, dex
+task deployDex(type: Jar, dependsOn: [deploy, dex]) {
+    archiveFileName = "${modName}Dexed.jar"
 
-    archiveFileName = "${modName}.jar"
+    def jarArtifact = file(tasks.deploy.archiveFile.get())
+    def dexedArtifact = new File("$buildDir/libs", 'Dexed.jar')
 
-    from {[
-        zipTree("$buildDir/libs/${modName}Desktop.jar"),
-        zipTree("$buildDir/libs/${modName}Dexed.jar")
-    ]}
+    from zipTree(jarArtifact)
+    from zipTree(dexedArtifact)
 
     doLast { delete {
-        delete "$buildDir/libs/${modName}Desktop.jar"
-        delete "$buildDir/libs/${modName}Dexed.jar"
+        delete jarArtifact
+        delete dexedArtifact
     }}
 }
 
