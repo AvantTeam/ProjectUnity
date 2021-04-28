@@ -14,6 +14,7 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.world.blocks.environment.*;
 import unity.entities.*;
 import unity.entities.units.*;
 import unity.gen.*;
@@ -43,7 +44,11 @@ public class UnityUnitType extends UnitType{
     public float headTimer = 5f;
 
     // Transforms
-    public Prov<UnitType> toTrans;
+    public Func<Unit, UnitType> toTrans;
+    public Boolf<Unit> transPred = unit -> {
+        Floor floor = unit.floorOn();
+        return floor.isLiquid && !(floor instanceof ShallowLiquid) ^ unit instanceof WaterMovec;
+    };
     public float transformTime;
 
     // Tentacles
@@ -88,7 +93,7 @@ public class UnityUnitType extends UnitType{
     public Unit create(Team team){
         Unit ret = super.create(team);
         //transformer
-        if(ret instanceof TransformerBase transformer) transformer.setTimeTrans(transformTime);
+        if(ret instanceof Transc trans) trans.transformTime(transformTime);
         return ret;
     }
 

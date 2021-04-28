@@ -766,8 +766,10 @@ public class EntityProcessor extends BaseProcessor{
     }
 
     String createName(Seq<TypeElement> comps){
-        comps.sortComparing(e -> simpleName(e));
-        return comps.toString("", s -> simpleName(s).replace("Comp", ""));
+        Seq<TypeElement> rev = comps.copy();
+        rev.reverse();
+
+        return rev.toString("", s -> simpleName(s).replace("Comp", ""));
     }
 
     Seq<String> getImports(Element e){

@@ -45,11 +45,11 @@ public class UnityUnitTypes implements ContentList{
     UnitType orion, araneidae, theraphosidae;
 
     // global transforming naval
-    public static @EntityPoint(TransUnitWaterMove.class)
+    public static @EntityDef({Unitc.class, WaterMovec.class, Transc.class})
     UnitType amphibiNaval, amphibi;
 
     // global transforming legs
-    public static @EntityPoint(TransLegsUnit.class)
+    public static @EntityDef({Unitc.class, Legsc.class, Transc.class})
     UnitType craberNaval, craber;
 
     // scar legs
@@ -1020,7 +1020,7 @@ public class UnityUnitTypes implements ContentList{
 
         amphibiNaval = new UnityUnitType("amphibi-naval"){
             {
-                toTrans = () -> amphibi;
+                toTrans = unit -> amphibi;
                 speed = 1.3f;
                 health = 365;
                 engineSize = 5f;
@@ -1073,7 +1073,7 @@ public class UnityUnitTypes implements ContentList{
         };
 
         amphibi = new UnityUnitType("amphibi"){{
-            toTrans = () -> amphibiNaval;
+            toTrans = unit -> amphibiNaval;
             speed = 0.3f;
             health = 365;
             armor = 1f;
@@ -1098,7 +1098,7 @@ public class UnityUnitTypes implements ContentList{
 
         craberNaval = new UnityUnitType("craber-naval"){
             {
-                toTrans = () -> craber;
+                toTrans = unit -> craber;
                 speed = 1.2f;
                 health = 730;
                 engineSize = 5f;
@@ -1141,7 +1141,7 @@ public class UnityUnitTypes implements ContentList{
         };
 
         craber = new UnityUnitType("craber"){{
-            toTrans = () -> craberNaval;
+            toTrans = unit -> craberNaval;
             speed = 0.3f;
             health = 730;
             armor = 10f;
