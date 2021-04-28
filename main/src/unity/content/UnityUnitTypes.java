@@ -1841,9 +1841,9 @@ public class UnityUnitTypes implements ContentList{
 
             legCount = 8;
             legGroupSize = 4;
-            legLength = 90f;
+            legLength = 120f;
             legBaseOffset = 9f;
-            legMoveSpace = 0.6f;
+            legMoveSpace = 0.9f;
             legPairOffset = 1.5f;
             legTrns = 0.5f;
 
