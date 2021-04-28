@@ -170,14 +170,9 @@ public class Annotations{
     public @interface Setter{}
 
     /** Whether the field returned by this getter is meant to be read-only */
-    @Target({ElementType.METHOD, ElementType.FIELD})
+    @Target(ElementType.FIELD)
     @Retention(RetentionPolicy.SOURCE)
     public @interface ReadOnly{}
-
-    /** Whether this getter must be implemented by the type's subtypes */
-    @Target(ElementType.METHOD)
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface MustInherit{}
 
     /** Whether this method replaces the actual method in the base class */
     @Target(ElementType.METHOD)
@@ -193,17 +188,6 @@ public class Annotations{
     public @interface MethodPriority{
         /** @return The priority */
         int value();
-    }
-
-    /** Indicates that the following field returned by this getter is gonna be initialized */
-    @Target(ElementType.METHOD)
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface Initialize{
-        /** @return The code that is gonna be used to evaluate the initializer */
-        String value();
-
-        /** @return Class arguments to be parsed into {@link #eval()}. */
-        Class<?>[] args() default {};
     }
 
     /** Loads texture regions but does not assign them to their acquirers */

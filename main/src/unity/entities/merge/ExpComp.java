@@ -42,48 +42,48 @@ class ExpComp extends Block{
     Color maxExpColor = Color.valueOf("90ff00");
     Color upgradeColor = Color.green;
 
-    public Seq<ExpUpgrade> upgrades = new Seq<>();
+    Seq<ExpUpgrade> upgrades = new Seq<>();
     /** Maps {@link #upgrades} into 2D array. Do NOT modify */
-    public ExpUpgrade[][] upgradesPerLevel;
-    public boolean enableUpgrade;
-    public boolean hasUpgradeEffect = true;
-    public float sparkleChance = 0.08f;
-    public Effect sparkleEffect = UnityFx.sparkleFx;
-    public Effect upgradeEffect = UnityFx.upgradeBlockFx;
-    public Sound upgradeSound = Sounds.message;
+    ExpUpgrade[][] upgradesPerLevel;
+    boolean enableUpgrade;
+    boolean hasUpgradeEffect = true;
+    float sparkleChance = 0.08f;
+    Effect sparkleEffect = UnityFx.sparkleFx;
+    Effect upgradeEffect = UnityFx.upgradeBlockFx;
+    Sound upgradeSound = Sounds.message;
 
     /** The floating point in which exp will be multiplied on save and divided on load.
      * Use only if you increment exp in floats */
-    public float ioPrecision = 1f;
+    float ioPrecision = 1f;
 
-    public ObjectMap<ExpFieldType, Seq<ExpField>> expFields = new ObjectMap<>();
-    public Entry<Class, Field>[] linearInc;
-    public float[] linearIncStart;
-    public float[] linearIncMul;
+    ObjectMap<ExpFieldType, Seq<ExpField>> expFields = new ObjectMap<>();
+    Entry<Class, Field>[] linearInc;
+    float[] linearIncStart;
+    float[] linearIncMul;
 
-    public Entry<Class, Field>[] expInc;
-    public float[] expIncStart;
-    public float[] expIncMul;
+    Entry<Class, Field>[] expInc;
+    float[] expIncStart;
+    float[] expIncMul;
 
-    public Entry<Class, Field>[] rootInc;
-    public float[] rootIncStart;
-    public float[] rootIncMul;
+    Entry<Class, Field>[] rootInc;
+    float[] rootIncStart;
+    float[] rootIncMul;
 
-    public Entry<Class, Field>[] boolInc;
-    public boolean[] boolIncStart;
-    public float[] boolIncMul;
+    Entry<Class, Field>[] boolInc;
+    boolean[] boolIncStart;
+    float[] boolIncMul;
 
-    public Entry<Class, Field>[] listInc;
-    public Entry<Class, Object[]>[] listIncMul;
+    Entry<Class, Field>[] listInc;
+    Entry<Class, Object[]>[] listIncMul;
 
-    public boolean hasExp = false;
+    boolean hasExp = false;
 
-    public boolean hub = false;
-    public boolean conveyor = false;
-    public boolean noOrbCollision = true;
+    boolean hub = false;
+    boolean conveyor = false;
+    boolean noOrbCollision = true;
 
-    public float orbMultiplier = 0.8f;
-    public boolean condConfig;
+    float orbMultiplier = 0.8f;
+    boolean condConfig;
 
     public ExpComp(String name){
         super(name);

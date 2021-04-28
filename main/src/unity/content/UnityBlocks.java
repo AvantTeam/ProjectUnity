@@ -215,9 +215,19 @@ public class UnityBlocks implements ContentList{
     }, outline = true)
     Block endGame, tenmeikiri;
 
+    public static
+    @FactionDef("koruh")
+    @Merge(base = Block.class, value = {LightHoldc.class})
+    Block lightTest;
+
     @Override
     public void load(){
         //region global
+
+        lightTest = new LightHoldBlock("light-test"){{
+            lightRange = 80f;
+            holdsLight = isSource = true;
+        }};
 
         distributionDrill = new DistributionDrill("distribution-drill"){{
             requirements(Category.production, with(Items.copper, 20, Items.silicon, 15, Items.titanium, 20));
@@ -272,113 +282,6 @@ public class UnityBlocks implements ContentList{
             laserColor = Items.surgeAlloy.color;
             consumes.power(0.4f);
             consumes.items(with(UnityItems.irradiantSurge, 10));
-        }};
-
-        lightLamp = new LightSource("light-lamp"){{
-            consumes.power(1f);
-            requirements(Category.logic, with(Items.lead, 5, Items.metaglass, 10));
-            drawer = new DrawLightSource();
-            lightLength = 30;
-        }};
-
-        oilLamp = new LightSource("oil-lamp", true){{
-            size = 3;
-            health = 240;
-            consumes.power(1.8f);
-            consumes.liquid(Liquids.oil, 0.1f);
-            requirements(Category.logic, with(Items.lead, 20, Items.metaglass, 20, Items.titanium, 15));
-            drawer = new DrawLightSource();
-            lightLength = 150;
-            lightStrength = 750;
-        }};
-
-        lightLaser = new LightSource("light-laser"){{
-            health = 60;
-            consumes.power(1.5f);
-            requirements(Category.logic, BuildVisibility.sandboxOnly, with(Items.metaglass, 10, Items.silicon, 5, Items.titanium, 5));
-            alwaysUnlocked = true;
-            drawer = new DrawLightSource();
-            lightLength = 30;
-            lightInterval = 0;
-        }};
-
-        lightLampInfi = new LightSource("light-lamp-infi"){{
-            hasPower = false;
-            consumesPower = false;
-            requirements(Category.logic, BuildVisibility.sandboxOnly, with());
-            alwaysUnlocked = true;
-            drawer = new DrawLightSource();
-            lightLength = 150;
-            lightStrength = 600000;
-            scaleStatus = false;
-            maxLightLength = 7500;
-        }};
-
-        lightReflector = new LightReflector("light-reflector"){{
-            requirements(Category.logic, with(Items.metaglass, 10));
-        }};
-
-        lightReflector1 = new LightReflector("light-reflector-1"){{
-            diagonal = false;
-            requirements(Category.logic, with(Items.metaglass, 10));
-        }};
-
-        lightOmnimirror = new LightOmniReflector("light-omnimirror"){{
-            health = 80;
-            requirements(Category.logic, with(Items.metaglass, 10, Items.silicon, 5));
-        }};
-
-        lightFilter = new LightFilter("light-filter"){{
-            health = 60;
-            requirements(Category.logic, with(Items.graphite, 10, Items.metaglass, 10));
-        }};
-
-        lightInvertedFilter = new LightFilter("light-inverted-filter", true){{
-            health = 60;
-            requirements(Category.logic, with(Items.graphite, 10, Items.metaglass, 10));
-        }};
-
-        lightDivisor = new LightDivisor("light-divisor"){{
-            health = 80;
-            requirements(Category.logic, with(Items.metaglass, 10, Items.titanium, 2));
-        }};
-
-        lightDivisor1 = new LightDivisor("light-divisor-1"){{
-            diagonal = false;
-            health = 80;
-            requirements(Category.logic, with(Items.metaglass, 10, Items.titanium, 2));
-        }};
-
-        lightItemFilter = new LightRouter("light-item-filter"){{
-            health = 60;
-            requirements(Category.logic, with(Items.graphite, 5, Items.metaglass, 20, Items.silicon, 10));
-        }};
-
-        lightPanel = new LightGenerator("light-panel"){{
-            health = 100;
-            lightStrength = 80f;
-            scaleStatus = true;
-            powerProduction = 1f;
-            requirements(Category.logic, with(Items.copper, 15, Items.graphite, 10, Items.silicon, 15));
-        }};
-
-        lightInfluencer = new LightInfluencer("light-influencer"){{
-            health = 60;
-            lightStrength = 1f;
-            scaleStatus = true;
-            powerProduction = 1f;
-            requirements(Category.logic, with(Items.lead, 15, Items.metaglass, 10, Items.silicon, 5));
-        }};
-
-        metaglassWall = new LightWall("metaglass-wall"){{
-            health = 350;
-            requirements(Category.defense, with(Items.lead, 6, Items.metaglass, 6));
-        }};
-
-        metaglassWallLarge = new LightWall("metaglass-wall-large"){{
-            size = 2;
-            health = 1400;
-            requirements(Category.defense, with(Items.lead, 24, Items.metaglass, 24));
         }};
 
         oreNickel = new UnityOreBlock(UnityItems.nickel){{
@@ -764,6 +667,113 @@ public class UnityBlocks implements ContentList{
                 }};
             }
         };
+
+        lightLamp = new LightSource("light-lamp"){{
+            consumes.power(1f);
+            requirements(Category.logic, with(Items.lead, 5, Items.metaglass, 10));
+            drawer = new DrawLightSource();
+            lightLength = 30;
+        }};
+
+        oilLamp = new LightSource("oil-lamp", true){{
+            size = 3;
+            health = 240;
+            consumes.power(1.8f);
+            consumes.liquid(Liquids.oil, 0.1f);
+            requirements(Category.logic, with(Items.lead, 20, Items.metaglass, 20, Items.titanium, 15));
+            drawer = new DrawLightSource();
+            lightLength = 150;
+            lightStrength = 750;
+        }};
+
+        lightLaser = new LightSource("light-laser"){{
+            health = 60;
+            consumes.power(1.5f);
+            requirements(Category.logic, BuildVisibility.sandboxOnly, with(Items.metaglass, 10, Items.silicon, 5, Items.titanium, 5));
+            alwaysUnlocked = true;
+            drawer = new DrawLightSource();
+            lightLength = 30;
+            lightInterval = 0;
+        }};
+
+        lightLampInfi = new LightSource("light-lamp-infi"){{
+            hasPower = false;
+            consumesPower = false;
+            requirements(Category.logic, BuildVisibility.sandboxOnly, with());
+            alwaysUnlocked = true;
+            drawer = new DrawLightSource();
+            lightLength = 150;
+            lightStrength = 600000;
+            scaleStatus = false;
+            maxLightLength = 7500;
+        }};
+
+        lightReflector = new LightReflector("light-reflector"){{
+            requirements(Category.logic, with(Items.metaglass, 10));
+        }};
+
+        lightReflector1 = new LightReflector("light-reflector-1"){{
+            diagonal = false;
+            requirements(Category.logic, with(Items.metaglass, 10));
+        }};
+
+        lightOmnimirror = new LightOmniReflector("light-omnimirror"){{
+            health = 80;
+            requirements(Category.logic, with(Items.metaglass, 10, Items.silicon, 5));
+        }};
+
+        lightFilter = new LightFilter("light-filter"){{
+            health = 60;
+            requirements(Category.logic, with(Items.graphite, 10, Items.metaglass, 10));
+        }};
+
+        lightInvertedFilter = new LightFilter("light-inverted-filter", true){{
+            health = 60;
+            requirements(Category.logic, with(Items.graphite, 10, Items.metaglass, 10));
+        }};
+
+        lightDivisor = new LightDivisor("light-divisor"){{
+            health = 80;
+            requirements(Category.logic, with(Items.metaglass, 10, Items.titanium, 2));
+        }};
+
+        lightDivisor1 = new LightDivisor("light-divisor-1"){{
+            diagonal = false;
+            health = 80;
+            requirements(Category.logic, with(Items.metaglass, 10, Items.titanium, 2));
+        }};
+
+        lightItemFilter = new LightRouter("light-item-filter"){{
+            health = 60;
+            requirements(Category.logic, with(Items.graphite, 5, Items.metaglass, 20, Items.silicon, 10));
+        }};
+
+        lightPanel = new LightGenerator("light-panel"){{
+            health = 100;
+            lightStrength = 80f;
+            scaleStatus = true;
+            powerProduction = 1f;
+            requirements(Category.logic, with(Items.copper, 15, Items.graphite, 10, Items.silicon, 15));
+        }};
+
+        lightInfluencer = new LightInfluencer("light-influencer"){{
+            health = 60;
+            lightStrength = 1f;
+            scaleStatus = true;
+            powerProduction = 1f;
+            requirements(Category.logic, with(Items.lead, 15, Items.metaglass, 10, Items.silicon, 5));
+        }};
+
+        metaglassWall = new LightWall("metaglass-wall"){{
+            health = 350;
+            requirements(Category.defense, with(Items.lead, 6, Items.metaglass, 6));
+        }};
+
+        metaglassWallLarge = new LightWall("metaglass-wall-large"){{
+            size = 2;
+            health = 1400;
+            requirements(Category.defense, with(Items.lead, 24, Items.metaglass, 24));
+        }};
 
         //endregion
         //region imber

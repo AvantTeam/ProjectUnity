@@ -167,7 +167,7 @@ public class EntityProcessor extends BaseProcessor{
                         }
                     }
 
-                    write(inter.build());
+                    write(inter.build(), getImports(comp));
 
                     if(compAnno.base()){
                         Seq<TypeElement> deps = depends.copy().and(comp);
@@ -493,7 +493,7 @@ public class EntityProcessor extends BaseProcessor{
                 builder.addMethod(
                     MethodSpec.methodBuilder("create").addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                         .returns(ClassName.get(packageName, name))
-                        .addStatement(ann.pooled() ? "return Pools.obtain($L.class, " + name + "::new)" : "return new $L()", name)
+                        .addStatement(ann.pooled() ? "return arc.util.pooling.Pools.obtain($L.class, " + name + "::new)" : "return new $L()", name)
                     .build()
                 );
 

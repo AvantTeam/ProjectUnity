@@ -76,7 +76,7 @@ public class MergeProcessor extends BaseProcessor{
                     .build()
                 );
 
-                write(builder.build());
+                write(builder.build(), imports.get(interfaceName(comp)));
             }
         }else if(round == 2){
             for(Element e : defs){
