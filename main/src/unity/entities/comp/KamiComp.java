@@ -1,18 +1,13 @@
 package unity.entities.comp;
 
 import arc.graphics.g2d.*;
-import arc.math.*;
-import arc.util.*;
-import arc.util.io.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import unity.ai.*;
 import unity.annotations.Annotations.*;
 import unity.gen.*;
 
-import java.nio.*;
-
-@EntityDef({Unitc.class, Kamic.class})
+@EntityDef({Unitc.class, Bossc.class, Kamic.class})
 @EntityComponent
 abstract class KamiComp implements Unitc{
     transient Bullet laser;
