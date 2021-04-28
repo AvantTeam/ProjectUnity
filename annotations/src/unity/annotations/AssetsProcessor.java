@@ -14,6 +14,7 @@ import mindustry.*;
 import javax.annotation.processing.*;
 import javax.lang.model.element.*;
 
+/** @author GlennFolker */
 @SupportedAnnotationTypes("java.lang.Override")
 public class AssetsProcessor extends BaseProcessor{
     {

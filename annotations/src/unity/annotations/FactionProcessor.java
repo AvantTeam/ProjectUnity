@@ -19,6 +19,7 @@ import com.squareup.javapoet.*;
 
 import unity.annotations.Annotations.*;
 
+/** @author GlennFolker */
 @SuppressWarnings({"unchecked"})
 @SupportedAnnotationTypes({
     "unity.annotations.Annotations.FactionDef",

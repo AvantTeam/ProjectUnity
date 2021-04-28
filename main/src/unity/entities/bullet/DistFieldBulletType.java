@@ -12,6 +12,7 @@ import mindustry.type.*;
 import unity.content.*;
 import unity.entities.bullet.exp.*;
 import unity.entities.units.*;
+import unity.gen.*;
 import unity.gen.Expc.*;
 
 public class DistFieldBulletType extends ExpBulletType {
@@ -109,7 +110,7 @@ public class DistFieldBulletType extends ExpBulletType {
                         for(int i = 0; i < Math.ceil(expGain); i++) UnityFx.expGain.at(e.x, e.y, 0f, block);
                     block.incExp(expGain / 30f);
                 }
-                if(!(e.owner instanceof KamiUnit)){ //nerf
+                if(!(e.owner instanceof Kami)){ //nerf
                     e.vel.x = e.vel.x * bulletSlowMultiplier;
                     e.vel.y = e.vel.y * bulletSlowMultiplier;
                 }

@@ -1,89 +1,210 @@
-sourceSets.main.java.srcDirs = ["src/", "$buildDir/generated/sources/annotationProcessor/java/main/"]
+sourceSets.main.java.srcDirs = ['src/', "$buildDir/generated/sources/annotationProcessor/java/main/", "$projectDir/fetched"]
 
-ext{
-    assetsDir = new File(rootDir, "main/assets/")
-}
+import arc.*;
+import arc.files.*;
+import arc.struct.*;
+import arc.util.*;
+import arc.util.serialization.*;
 
-task deploy(type: Jar, dependsOn: configurations.runtimeClasspath){
-    archiveFileName = "${modName}Desktop.jar"
-
-    from files(sourceSets.main.output.classesDirs)
-    from files(sourceSets.main.output.resourcesDir)
-    from{
-        configurations.runtimeClasspath.collect{
-            it.isDirectory()
-            ?   it
-            :   zipTree(it)
-        }
-    }
-    from files(project.assetsDir)
-
-    doLast{
-        delete{ delete "$buildDir/libs/main-${version}.jar" }
-    }
-}
-
-task dex{
-    dependsOn deploy
-
-    doLast{
-        exec{
-            workingDir = "$buildDir/libs/"
-            def command = ["d8", "--min-api", "15", "--output", "${modName}Dexed.jar", "${modName}Desktop.jar"]
-
-            if(windows()){
-                commandLine("cmd", "/c", *command)
-            }else{
-                commandLine(*command)
-            }
-        }
-    }
-}
-
-task deployDex(type: Jar){
-    dependsOn deploy, dex
-
-    archiveFileName = "${modName}.jar"
-
-    from{[
-        zipTree("$buildDir/libs/${modName}Desktop.jar"),
-        zipTree("$buildDir/libs/${modName}Dexed.jar")
-    ]}
-
-    doLast{
-        delete{
-            delete "$buildDir/libs/${modName}Desktop.jar"
-            delete "$buildDir/libs/${modName}Dexed.jar"
-        }
-    }
-}
-
-if(!hasSprites()){
-    println "Sprites folder not found; automatically processing sprites..."
-    deploy.dependsOn ":tools:proc"
-}
-
-repositories{
-    mavenCentral()
-    maven{url "https://www.jitpack.io"}
-}
-
-dependencies{
+dependencies {
     compileOnly "com.github.Anuken.Arc:arc-core:$mindustryVersion"
     compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
 
     implementation "com.github.younggam:multi-lib:$multilibVersion"
     annotationProcessor "com.github.Anuken:jabel:$jabelVersion"
 
-    compileOnly project(":annotations")
-    annotationProcessor project(":annotations")
+    compileOnly project(':annotations')
+    annotationProcessor project(':annotations')
+}
 
-    compileJava.options.compilerArgs.addAll([
-        "-processor", 
-            "unity.annotations.FactionProcessor," +
-            "unity.annotations.EntityProcessor," +
-            "unity.annotations.LoadProcessor," +
-            "unity.annotations.AssetsProcessor," +
-            "unity.annotations.MergeProcessor"
-    ])
+ext {
+    assetsDir = new File(rootDir, "main/assets/")
+
+    fetchPackage = 'unity/fetched'
+    fetchDir = new File("$projectDir/fetched/$fetchPackage")
+
+    fetchTemp = new Fi("$projectDir/fetch.txt")
+    fetchRevision = 1
+}
+
+task deploy(type: Jar, dependsOn: configurations.runtimeClasspath) {
+    if(!hasSprites()) {
+        println 'Sprites folder not found; automatically processing sprites...'
+        deploy.dependsOn ":tools:proc"
+    }
+
+    archiveFileName = "${modName}Desktop.jar"
+
+    from files(sourceSets.main.output.classesDirs)
+    from files(sourceSets.main.output.resourcesDir)
+    from configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    from files(project.assetsDir)
+
+    doLast { delete {
+        delete "$buildDir/libs/main-${version}.jar"
+    }}
+}
+
+task dex {
+    dependsOn deploy
+
+    doLast {
+        exec {
+            workingDir = "$buildDir/libs/"
+            def command = ['d8', '--min-api', '15', '--output', "${modName}Dexed.jar", "${modName}Desktop.jar"]
+
+            if(windows()) {
+                commandLine('cmd', '/c', *command)
+            } else {
+                commandLine(*command)
+            }
+        }
+    }
+}
+
+task deployDex(type: Jar) {
+    dependsOn deploy, dex
+
+    archiveFileName = "${modName}.jar"
+
+    from {[
+        zipTree("$buildDir/libs/${modName}Desktop.jar"),
+        zipTree("$buildDir/libs/${modName}Dexed.jar")
+    ]}
+
+    doLast { delete {
+        delete "$buildDir/libs/${modName}Desktop.jar"
+        delete "$buildDir/libs/${modName}Dexed.jar"
+    }}
+}
+
+repositories {
+    mavenCentral()
+    maven { url 'https://www.jitpack.io' }
+}
+
+task fetchComps {
+    doFirst {
+        delete { delete fetchDir }
+        fetchDir.mkdir()
+
+        Core.net = new Net()
+        Core.net.setBlock(true)
+
+        int[] done = [Integer.MAX_VALUE]
+
+        UnsafeRunnable mainRun = {
+        Core.net.http(
+        new Net.HttpRequest()
+            .header('Accept', 'application/json')
+            .method(Net.HttpMethod.GET)
+            .url("https://api.github.com/repos/Anuken/Mindustry/contents/core/src/mindustry/entities/comp?ref=$mindustryVersion"),
+
+        { res ->
+        def list = Jval.read(res.getResultAsString()).asArray()
+        done[0] = list.size
+
+        println "Found all ${done[0]} mindustry entity comps."
+
+        for(def val : list) {
+            def filename = val.get('name').asString()
+            def fileurl = val.get('download_url').asString()
+
+            UnsafeRunnable run = {
+            Core.net.http(
+            new Net.HttpRequest()
+                .header('Accept', 'application/json')
+                .method(Net.HttpMethod.GET)
+                .url(fileurl),
+
+            { comp -> 
+                def content = comp.getResultAsString()
+                    .replace('mindustry.entities.comp', "$fetchPackage".replace('/', '.'))
+                    .replace('mindustry.annotations.Annotations.*', 'unity.annotations.Annotations.*')
+                    .replaceAll('\\@Component\\((base = true|.)+\\)\n*', '@EntityComponent(base = true, write = false)\n')
+                    .replaceAll('\\@Component\n*', '@EntityComponent(write = false)\n')
+                    .replaceAll('\\@BaseComponent\n*', '@EntityBaseComponent\n')
+                    .replaceAll('\\@CallSuper\n*', '')
+                    .replaceAll('\\@Final\n*', '')
+                    .replaceAll('\\@EntityDef\\(*.*\\)*\n*', '')
+
+                def fi = new Fi("$fetchDir/$filename")
+                fi.writeString(content)
+
+                done[0]--
+                println "Wrote '$filename': ${done[0]} left."
+            },
+
+            { err -> throw err })}
+
+            Throwable error = null
+            try {
+                run.run()
+                error = null
+            } catch(Throwable t) {
+                error = t
+            }
+
+            while(error != null) { try {
+                run.run()
+                error = null
+            } catch(Throwable t) {
+                error = t
+            }}
+        }},
+
+        { err -> throw err })}
+
+        Throwable error = null
+        try {
+            mainRun.run()
+            error = null
+        } catch(Throwable t) {
+            error = t
+        }
+
+        while(error != null) { try {
+            mainRun.run()
+            error = null
+        } catch(Throwable t) {
+            error = t
+        }}
+
+        fetchTemp.writeString("$mindustryVersion/$fetchRevision")
+        println 'Done writing.'
+    }
+}
+
+clean {
+    delete "$projectDir/fetched"
+    delete "$fetchTemp"
+}
+
+compileJava {
+    options.compilerArgs += [
+        '-processor', 
+            'unity.annotations.FactionProcessor,' +
+            'unity.annotations.EntityProcessor,' +
+            'unity.annotations.LoadProcessor,' +
+            'unity.annotations.AssetsProcessor,' +
+            'unity.annotations.MergeProcessor'
+    ]
+
+    if(!fetchDir.exists() || !fetchTemp.exists()) {
+        println "Fetched mindustry entity comps not found; fetching components..."
+        dependsOn fetchComps
+    } else {
+        String[] content = fetchTemp.readString().split('/')
+        String ver = content[0]
+        String rev = content[1]
+
+        if(!ver.equals(new String("$mindustryVersion")) || !rev.equals(Integer.toString(fetchRevision))) {
+            println 'Temp fetch data mismatch:'
+            println "Stored  : { version: $ver, revision: $rev }"
+            println "Required: { version: $mindustryVersion, revision: $fetchRevision }"
+            println "Fetching components..."
+
+            dependsOn fetchComps
+        }
+    }
 }

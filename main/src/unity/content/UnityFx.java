@@ -1,6 +1,5 @@
 package unity.content;
 
-import arc.Core;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;

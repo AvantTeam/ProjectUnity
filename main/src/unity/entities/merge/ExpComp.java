@@ -21,7 +21,6 @@ import mindustry.world.meta.*;
 import unity.annotations.Annotations.*;
 import unity.content.*;
 import unity.entities.*;
-import unity.gen.*;
 import unity.gen.Expc.*;
 import unity.type.exp.*;
 import unity.util.*;

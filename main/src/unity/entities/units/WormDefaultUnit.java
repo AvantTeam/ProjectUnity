@@ -2,22 +2,24 @@ package unity.entities.units;
 
 import arc.util.*;
 import arc.math.*;
-import arc.math.geom.Vec2;
-import arc.graphics.g2d.Draw;
+import arc.math.geom.*;
+import arc.graphics.g2d.*;
 import arc.util.io.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.abilities.*;
 import mindustry.gen.*;
-import mindustry.type.UnitType;
-import unity.content.UnityUnitTypes;
+import mindustry.type.*;
+import unity.annotations.Annotations.*;
 import unity.entities.units.WormSegmentUnit.*;
+import unity.gen.*;
 import unity.type.*;
 import unity.util.*;
 
 import java.util.*;
 
+@EntityPoint
 public class WormDefaultUnit extends UnitEntity{
     public UnityUnitType wormType;
     public WormSegmentUnit[] segmentUnits;
@@ -207,7 +209,7 @@ public class WormDefaultUnit extends UnitEntity{
 
     @Override
     public int classId(){
-        return UnityUnitTypes.getClassId(1);
+        return UnityEntityMapping.classId(WormDefaultUnit.class);
     }
 
     @Override

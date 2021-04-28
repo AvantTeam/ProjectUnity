@@ -5,8 +5,10 @@ import arc.util.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import unity.*;
-import unity.content.*;
+import unity.annotations.Annotations.*;
+import unity.gen.*;
 
+@EntityPoint
 public class EndLegsUnit extends LegsUnit implements AntiCheatBase{
     private float lastHealth = 0f;
     private float lastMaxHealth = 0f;
@@ -76,7 +78,7 @@ public class EndLegsUnit extends LegsUnit implements AntiCheatBase{
 
     @Override
     public int classId(){
-        return UnityUnitTypes.getClassId(7);
+        return UnityEntityMapping.classId(EndLegsUnit.class);
     }
 
     @Override

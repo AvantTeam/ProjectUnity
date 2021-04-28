@@ -3,9 +3,11 @@ package unity.entities.units;
 import arc.math.*;
 import arc.util.*;
 import mindustry.gen.*;
-import unity.content.*;
+import unity.annotations.Annotations.*;
+import unity.gen.*;
 import unity.util.*;
 
+@EntityPoint
 public class EndInvisibleUnit extends UnitEntity implements AntiCheatBase{
     protected boolean isInvisible = false;
     protected float disabledTime = 0f;
@@ -117,6 +119,6 @@ public class EndInvisibleUnit extends UnitEntity implements AntiCheatBase{
 
     @Override
     public int classId(){
-        return UnityUnitTypes.getClassId(4);
+        return UnityEntityMapping.classId(EndInvisibleUnit.class);
     }
 }

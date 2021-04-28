@@ -28,6 +28,7 @@ import java.lang.reflect.*;
 import java.util.*;
 import java.util.Map.*;
 
+/** @author GlennFolker */
 public class Annotations{
     //region definitions
 
@@ -39,31 +40,29 @@ public class Annotations{
         String value();
     }
 
-    /** Indicates that this content implements an exp mechanism */
-    @Target(ElementType.FIELD)
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface ExpDef{
-        /** @return The exp type */
-        Class<?> value();
-    }
-
     /** Indicates that this content's entity type inherits interfaces */
-    @Target(ElementType.FIELD)
+    @Target({ElementType.FIELD, ElementType.TYPE})
     @Retention(RetentionPolicy.SOURCE)
     public @interface EntityDef{
-        /** @return The base class for the generated entity class */
-        Class<?> base();
-
         /** @return The interfaces that will be inherited by the generated entity class */
-        Class<?>[] def();
+        Class<?>[] value();
+
+        /** @return Whether the class can serialize itself */
+        boolean serialize() default true;
+
+        /** @return Whether the class can write/read to/from save files */
+        boolean genio() default true;
+
+        /** @return Whether the class is poolable */
+        boolean pooled() default false;
     }
 
-    /** Indicates that this content's entity will be the one that is pointed */
-    @Target(ElementType.FIELD)
+    /** Indicates that this content's entity will be the one that is pointed, or if it's the type it will get mapped to the entity mapping */
+    @Target({ElementType.FIELD, ElementType.TYPE})
     @Retention(RetentionPolicy.SOURCE)
     public @interface EntityPoint{
         /** @return The entity type */
-        Class<?> value();
+        Class<?> value() default Void.class;
     }
 
     /** Indicates that this music belongs to a specific faction in a specific category */
@@ -85,14 +84,12 @@ public class Annotations{
     /** Whether this class is the base class for faction enum. Only one type may use this */
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface FactionBase{
-    }
+    public @interface FactionBase{}
 
     /** Whether this class is the base class for exp types. Only one type may use this */
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface ExpBase{
-    }
+    public @interface ExpBase{}
 
     /** Works somewhat like {@code Object.assign(...)} for Block and Building */
     @Target({ElementType.TYPE, ElementType.FIELD})
@@ -108,8 +105,7 @@ public class Annotations{
     /** Notifies that this class is a component class; an interface will be generated out of this */
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface MergeComp{
-    }
+    public @interface MergeComp{}
 
     /** The generated interface from {@link Annotations.MergeComp} */
     @Target(ElementType.TYPE)
@@ -118,38 +114,80 @@ public class Annotations{
         Class<?> buildType() default Building.class;
     }
 
+    /** Indicates that this class is an entity component */
+    @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface EntityComponent{
+        /** @return Whether the component should be interpreted into interfaces */
+        boolean write() default true;
+
+        /** @return Whether the component should generate a base class for itself */
+        boolean base() default false;
+    }
+
+    /** All entity components will inherit from this */
+    @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface EntityBaseComponent{}
+
+    /** Whether this interface wraps an entity component */
+    @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface EntityInterface{}
+
     //end region
     //region utilities
+
+    /** Indicates that a field will be interpolated when synced. */
+    @Target({ElementType.FIELD})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface SyncField{
+        /** If true, the field will be linearly interpolated. If false, it will be interpolated as an angle. */
+        boolean value();
+
+        /** If true, the field is clamped to 0-1. */
+        boolean clamped() default false;
+    }
+
+    /** Indicates that a field will not be read from the server when syncing the local player state. */
+    @Target({ElementType.FIELD})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface SyncLocal{}
+
+    /** Indicates that the field annotated with this came from another component class */
+    @Target(ElementType.FIELD)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface Import{}
 
     /** Getter method, do not use directly */
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface Getter{
-    }
+    public @interface Getter{}
 
     /** Setter method, do not use directly */
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface Setter{
-    }
+    public @interface Setter{}
 
     /** Whether the field returned by this getter is meant to be read-only */
     @Target({ElementType.METHOD, ElementType.FIELD})
     @Retention(RetentionPolicy.SOURCE)
-    public @interface ReadOnly{
-    }
+    public @interface ReadOnly{}
 
     /** Whether this getter must be implemented by the type's subtypes */
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface MustInherit{
-    }
+    public @interface MustInherit{}
 
     /** Whether this method replaces the actual method in the base class */
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface Replace{
-    }
+    public @interface Replace{}
+
+    /** Whether this method is implemented in annotation-processing time */
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface InternalImpl{}
 
     /** Used for method appender sorting */
     public @interface MethodPriority{

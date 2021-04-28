@@ -8,7 +8,7 @@ import arc.util.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import unity.content.*;
-import unity.entities.units.KamiUnit;
+import unity.gen.*;
 import unity.sync.*;
 import unity.type.*;
 
@@ -450,7 +450,7 @@ public class KamiAI implements UnitController{
         return unit;
     }
 
-    protected KamiUnit kami(){
+    protected Kami kami(){
         return unit.as();
     }
 

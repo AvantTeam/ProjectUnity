@@ -3,9 +3,11 @@ package unity.entities.units;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
-import unity.content.*;
+import unity.annotations.Annotations.*;
 import unity.entities.*;
+import unity.gen.*;
 
+@EntityPoint
 public class ApocalypseUnit extends EndInvisibleUnit implements TentaclesBase{
     Seq<Tentacle> tentacles;
     private float immunity = 1f;
@@ -71,6 +73,6 @@ public class ApocalypseUnit extends EndInvisibleUnit implements TentaclesBase{
 
     @Override
     public int classId(){
-        return UnityUnitTypes.getClassId(8);
+        return UnityEntityMapping.classId(ApocalypseUnit.class);
     }
 }

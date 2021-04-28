@@ -15,11 +15,10 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import unity.entities.*;
-import unity.entities.comp.*;
 import unity.entities.units.*;
+import unity.gen.*;
 
 import static arc.Core.*;
-import static mindustry.Vars.*;
 
 /*unit.entities.units might be gradually deleted.
 note that as classes are integrated, inner classes are extracted.*/
@@ -378,13 +377,16 @@ public class UnityUnitType extends UnitType{
 
     @Override
     public void drawEngine(Unit unit){
-        float z = Draw.z();
-
         if(engineColor != null){
             if(!unit.isFlying()) return;
 
             float scale = unit.elevation;
             float offset = engineOffset / 2f + engineOffset / 2f * scale;
+
+            if(unit instanceof Trailc trail){
+                Trail t = trail.trail();
+                t.draw(engineColor, (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f) * scale) * trailScl);
+            }
 
             Draw.color(engineColor);
             Fill.circle(

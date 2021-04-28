@@ -11,6 +11,7 @@ import mindustry.world.blocks.defense.turrets.*;
 import unity.content.*;
 import unity.entities.*;
 import unity.entities.comp.*;
+import unity.gen.*;
 import unity.graphics.*;
 
 import static mindustry.Vars.*;
@@ -66,15 +67,15 @@ public abstract class GenericTractorBeamTurret<T extends Teamc> extends BaseTurr
     }
 
     public abstract class GenericTractorBeamTurretBuild extends BaseTurretBuild implements ExtensionHolder{
-        protected Extensionc ext;
+        protected Extension ext;
         public T target;
         public float lastX, lastY, strength;
 
         @Override
         public void created(){
             super.created();
-            ext = (Extensionc)UnityUnitTypes.extension.create(team);
-            ext.holder(this);
+            ext = Extension.create();
+            ext.holder = this;
             ext.set(x, y);
             ext.add();
         }

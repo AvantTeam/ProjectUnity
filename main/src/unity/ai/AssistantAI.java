@@ -13,6 +13,7 @@ import mindustry.type.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 import mindustry.world.meta.*;
 import unity.entities.comp.*;
+import unity.gen.*;
 import unity.util.*;
 
 import static mindustry.Vars.*;
@@ -180,8 +181,7 @@ public class AssistantAI extends FlyingAI{
 
     protected void displayMessage(String message){
         if(unit instanceof Assistantc assist){
-            assist.textFadeTime(1f);
-            assist.lastText(message);
+            assist.display(message);
         }
     }
 

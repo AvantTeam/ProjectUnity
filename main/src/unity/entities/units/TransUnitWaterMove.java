@@ -1,8 +1,10 @@
 package unity.entities.units;
 
 import mindustry.gen.*;
-import unity.content.UnityUnitTypes;
+import unity.annotations.Annotations.*;
+import unity.gen.*;
 
+@EntityPoint
 public class TransUnitWaterMove extends UnitWaterMove implements TransformerBase{
     protected float timeTrans;
 
@@ -24,6 +26,6 @@ public class TransUnitWaterMove extends UnitWaterMove implements TransformerBase
 
     @Override
     public int classId(){
-        return UnityUnitTypes.getClassId(2);
+        return UnityEntityMapping.classId(TransUnitWaterMove.class);
     }
 }

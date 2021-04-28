@@ -1,10 +1,10 @@
-buildscript{
-    repositories{
+buildscript {
+    repositories {
         mavenCentral()
-        maven{ url "https://jitpack.io" }
+        maven { url 'https://jitpack.io' }
     }
 
-    dependencies{
+    dependencies {
         classpath "com.github.Anuken.Arc:arc-core:$mindustryVersion"
         classpath "com.github.Anuken.Mindustry:core:$mindustryVersion"
         classpath "com.squareup:javapoet:$javapoetVersion"
@@ -13,61 +13,62 @@ buildscript{
     }
 }
 
-allprojects{
-    apply plugin: "java"
-    apply plugin: "java-library"
+allprojects {
+    apply plugin: 'java'
+    apply plugin: 'java-library'
 
-    group = "com.github.avant"
-    version = "0.1"
+    group = 'com.github.AvantTeam'
+    version = '0.1'
 
-    ext{
-        sdkVersion = "30"
+    ext {
+        sdkVersion = '30'
         sdkRoot = System.getenv("ANDROID_HOME")
 
         hasSprites = {
-            return new File(rootDir, "main/assets/sprites/").exists()
+            return new File(rootDir, 'main/assets/sprites/').exists()
         }
 
         windows = {
-            return System.getProperty("os.name").toLowerCase(Locale.ROOT).contains("windows")
+            return System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')
         }
     }
 
-    repositories{
-        maven{ url "https://jitpack.io" }
+    repositories {
+        mavenCentral()
+        maven { url "https://jitpack.io" }
         jcenter()
     }
 }
 
-configure(project(":annotations")){
+configure(project(':annotations')) {
     sourceCompatibility = 8
     targetCompatibility = 8
 
-    tasks.withType(JavaCompile){
+    tasks.withType(JavaCompile).all {
         targetCompatibility = 8
         sourceCompatibility = 8
     }
 }
 
-configure(subprojects - project(":annotations")){
+configure(subprojects - project(':annotations')) {
     sourceCompatibility = 15
     targetCompatibility = 8
 
-    tasks.withType(JavaCompile){
+    tasks.withType(JavaCompile).all {
         sourceCompatibility = 15
         targetCompatibility = 8
 
-        options.encoding("UTF-8")
-        if(JavaVersion.current() != JavaVersion.VERSION_1_8){
+        options.encoding 'UTF-8'
+        if(JavaVersion.current() != JavaVersion.VERSION_1_8) {
             options.compilerArgs.addAll(['--release', '8', '--enable-preview'])
         }
 
-        doFirst{
-            options.compilerArgs = options.compilerArgs.findAll{ it != '--enable-preview' }
+        doFirst {
+            options.compilerArgs = options.compilerArgs.findAll { it != '--enable-preview' }
         }
     }
 
-    tasks.withType(JavaExec){
+    tasks.withType(JavaExec).all {
         jvmArgs += "--enable-preview"
     }
 }
