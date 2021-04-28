@@ -14,6 +14,7 @@ import unity.type.*;
 
 import java.util.*;
 
+@SuppressWarnings("all")
 public class KamiAI implements UnitController{
     public static int difficulty = 1;
     private static final Vec2 tmpVec = new Vec2();

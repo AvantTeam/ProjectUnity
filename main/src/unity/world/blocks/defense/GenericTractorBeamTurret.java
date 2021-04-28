@@ -8,9 +8,7 @@ import arc.math.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.blocks.defense.turrets.*;
-import unity.content.*;
 import unity.entities.*;
-import unity.entities.comp.*;
 import unity.gen.*;
 import unity.graphics.*;
 

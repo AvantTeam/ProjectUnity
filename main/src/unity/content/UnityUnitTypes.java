@@ -1,6 +1,5 @@
 package unity.content;
 
-import arc.func.*;
 import arc.math.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -22,7 +21,6 @@ import unity.annotations.Annotations.*;
 import unity.entities.abilities.*;
 import unity.entities.bullet.*;
 import unity.entities.units.*;
-import unity.entities.units.EndWormUnit.*;
 import unity.gen.*;
 import unity.graphics.*;
 import unity.type.*;

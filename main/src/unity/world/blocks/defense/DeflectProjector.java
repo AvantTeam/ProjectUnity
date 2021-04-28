@@ -11,9 +11,7 @@ import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
-import unity.content.*;
 import unity.entities.*;
-import unity.entities.comp.*;
 import unity.gen.*;
 import unity.graphics.*;
 

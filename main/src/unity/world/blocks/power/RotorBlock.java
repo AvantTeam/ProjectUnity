@@ -11,7 +11,6 @@ import mindustry.world.blocks.power.*;
 import unity.graphics.*;
 import unity.world.blocks.*;
 import unity.world.graphs.*;
-import unity.world.meta.*;
 import unity.world.modules.*;
 
 import static arc.Core.*;

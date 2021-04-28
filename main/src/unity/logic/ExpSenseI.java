@@ -1,11 +1,9 @@
 package unity.logic;
 
-import mindustry.gen.*;
 import mindustry.logic.*;
 import mindustry.logic.LExecutor.*;
 import unity.gen.*;
 import unity.gen.Expc.*;
-import unity.world.blocks.*;
 
 public class ExpSenseI implements LInstruction{
     public int res, type;

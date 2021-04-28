@@ -4,8 +4,6 @@ import arc.graphics.g2d.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.util.io.*;
-import arc.util.*;
-import arc.math.*;
 import mindustry.graphics.*;
 import mindustry.world.blocks.production.*;
 import unity.graphics.*;

@@ -12,7 +12,6 @@ import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 import mindustry.world.meta.*;
-import unity.entities.comp.*;
 import unity.gen.*;
 import unity.util.*;
 

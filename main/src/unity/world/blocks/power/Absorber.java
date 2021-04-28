@@ -1,7 +1,6 @@
 package unity.world.blocks.power;
 
-import arc.Core;
-import arc.audio.*;
+import arc.*;
 import arc.math.*;
 import arc.util.*;
 import arc.graphics.*;

@@ -11,7 +11,6 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import unity.content.*;
 import unity.entities.bullet.exp.*;
-import unity.entities.units.*;
 import unity.gen.*;
 import unity.gen.Expc.*;
 
