@@ -101,7 +101,7 @@ public class UnityUnitTypes implements ContentList{
     UnitType farSeeker;
 
     // koruh kami
-    public static @FactionDef("koruh") @EntityDef({Unitc.class, Bossc.class})
+    public static @FactionDef("koruh") @EntityPoint(Kami.class)
     UnitType kami;
 
     // end invisible
@@ -2827,6 +2827,7 @@ public class UnityUnitTypes implements ContentList{
             hitSize = 36f;
             flying = true;
             drawCell = false;
+            clipSize = 1000f;
 
             Unity.musicHandler.registerLoop(name, UnityMusics.radiantDischarge);
         }};

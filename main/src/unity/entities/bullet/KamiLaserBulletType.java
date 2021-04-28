@@ -10,7 +10,7 @@ import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
-import unity.entities.units.*;
+import unity.gen.*;
 
 public class KamiLaserBulletType extends BulletType{
     private static final Vec2 tVec = new Vec2();
@@ -96,7 +96,7 @@ public class KamiLaserBulletType extends BulletType{
     @Override
     public void init(Bullet b){
         super.init(b);
-        if(b.owner instanceof KamiUnit kami){
+        if(b.owner instanceof Kami kami){
             kami.laser = b;
         }
     }
@@ -104,7 +104,7 @@ public class KamiLaserBulletType extends BulletType{
     @Override
     public void despawned(Bullet b){
         super.despawned(b);
-        if(b.owner instanceof KamiUnit kami && kami.laser == b){
+        if(b.owner instanceof Kami kami && kami.laser == b){
             kami.laser = null;
         }
     }

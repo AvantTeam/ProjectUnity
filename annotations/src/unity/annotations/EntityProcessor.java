@@ -633,11 +633,13 @@ public class EntityProcessor extends BaseProcessor{
                 if(isUnit){
                     TypeMirror up = e.getEnclosingElement().asType();
                     String c = simpleName(e);
-                    init.addStatement("register($T.$L, $T.class, $T::$L)", TypeName.get(up), c, type, type, constructor);
+                    init.addStatement("register($T.$L, $T.class, $T::$L)", TypeName.get(up), c, cName(type), cName(type), constructor);
 
                     usedNames.add(simpleName(type));
                 }else if(!usedNames.contains(simpleName(type))){
-                    init.addStatement("register($T.class, $T::$L)", type, type, constructor);
+                    init.addStatement("register($T.class, $T::$L)", cName(type), cName(type), constructor);
+
+                    usedNames.add(simpleName(type));
                 }
             }
 

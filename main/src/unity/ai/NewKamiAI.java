@@ -13,6 +13,7 @@ import unity.ai.kami.*;
 import unity.ai.kami.KamiBulletDatas.*;
 import unity.ai.kami.KamiPatterns.*;
 import unity.content.*;
+import unity.gen.*;
 import unity.entities.units.*;
 
 import java.util.*;
@@ -60,7 +61,7 @@ public class NewKamiAI implements UnitController, Position{
         return unit.y;
     }
 
-    public KamiUnit kami(){
+    public Kami kami(){
         return unit.as();
     }
 

@@ -94,7 +94,7 @@ public abstract class BaseProcessor extends AbstractProcessor{
                 .skipJavaLangImports(true)
             .build();
 
-            if(imports.isEmpty()){
+            if(imports == null || imports.isEmpty()){
                 file.writeTo(filer);
             }else{
                 imports.distinct();
@@ -161,6 +161,8 @@ public abstract class BaseProcessor extends AbstractProcessor{
     }
 
     public static ClassName cName(String canonical){
+        canonical = canonical.replace("<any?>", "unity.gen");
+
         Matcher matcher = Pattern.compile("\\.[A-Z]").matcher(canonical);
         matcher.find();
         int offset = matcher.start();
