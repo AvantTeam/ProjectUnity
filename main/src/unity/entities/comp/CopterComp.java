@@ -1,11 +1,11 @@
 package unity.entities.comp;
 
 import arc.math.*;
-import arc.struct.*;
 import arc.util.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import unity.annotations.Annotations.*;
+import unity.entities.*;
 import unity.type.*;
 
 /**
@@ -14,8 +14,8 @@ import unity.type.*;
  */
 @EntityComponent
 abstract class CopterComp implements Unitc{
-    transient FloatSeq rotorRot = new FloatSeq();
-    transient float rotorSpeedScl;
+    transient RotorMount[] rotors;
+    transient float rotorSpeedScl = 1f;
 
     @Import UnitType type;
     @Import boolean dead;
@@ -24,7 +24,14 @@ abstract class CopterComp implements Unitc{
 
     @Override
     public void add(){
-        rotorRot.setSize(rotorCount());
+        UnityUnitType type = (UnityUnitType)this.type;
+
+        rotors = new RotorMount[type.rotors.size];
+        for(int i = 0; i < rotors.length; i++){
+            Rotor rotor = type.rotors.get(i);
+            rotors[i] = new RotorMount(rotor);
+            rotors[i].rotorRot = rotor.rotOffset;
+        }
     }
 
     @Override
@@ -33,17 +40,17 @@ abstract class CopterComp implements Unitc{
         if(dead || health < 0f){
             rotation = rotation + type.fallRotateSpeed * Mathf.signs[id % 2];
             rotorSpeedScl = Mathf.lerpDelta(rotorSpeedScl, 0f, type.rotorDeathSlowdown);
-        }else{ //In case heal() is run while it's dying.
+        }else{
             rotorSpeedScl = Mathf.lerpDelta(rotorSpeedScl, 1f, type.rotorDeathSlowdown);
         }
 
-        for(Rotor rotor : type.rotors){
-            int index = type.rotors.indexOf(rotor);
-            rotorRot.set(index, (rotorRot.get(index) + rotor.speed * rotorSpeedScl * Time.delta) % 360);
-        }
-    }
+        for(RotorMount rotor : rotors){
+            float add = rotor.rotor.speed * rotorSpeedScl * Time.delta;
+            rotor.rotorRot += add;
+            rotor.rotorRot %= 360f;
 
-    public int rotorCount(){
-        return ((UnityUnitType)type()).rotors.size;
+            rotor.rotorShadeRot -= add / 30f;
+            rotor.rotorShadeRot %= 360f;
+        }
     }
 }

@@ -18,6 +18,7 @@ import unity.*;
 import unity.ai.*;
 import unity.ai.AssistantAI.*;
 import unity.annotations.Annotations.*;
+import unity.entities.*;
 import unity.entities.abilities.*;
 import unity.entities.bullet.*;
 import unity.entities.units.*;
@@ -42,11 +43,11 @@ public class UnityUnitTypes implements ContentList{
     public static @EntityPoint(LegsUnit.class)
     UnitType orion, araneidae, theraphosidae;
 
-    // global transforming naval
+    // global unit + watermove + transform
     public static @EntityDef({Unitc.class, WaterMovec.class, Transc.class})
     UnitType amphibiNaval, amphibi;
 
-    // global transforming legs
+    // global unit + legs + transform
     public static @EntityDef({Unitc.class, Legsc.class, Transc.class})
     UnitType craberNaval, craber;
 

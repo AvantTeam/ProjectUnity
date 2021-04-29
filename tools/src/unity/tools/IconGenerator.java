@@ -8,6 +8,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.gen.*;
 import mindustry.type.*;
+import unity.entities.*;
 import unity.entities.units.*;
 import unity.gen.*;
 import unity.type.*;

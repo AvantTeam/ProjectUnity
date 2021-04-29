@@ -58,6 +58,7 @@ public class UnityUnitType extends UnitType{
     public final Seq<Rotor> rotors = new Seq<>(4);
     public float rotorDeathSlowdown = 0.01f;
     public float fallRotateSpeed = 2.5f;
+    public TextureRegion bladeGhostRegion, bladeShadeRegion;
 
     // Lasers
     public Color laserColor = Pal.heal;
@@ -138,7 +139,7 @@ public class UnityUnitType extends UnitType{
                 Rotor copy = rotor.copy();
                 copy.x *= -1f;
                 copy.speed *= -1f;
-                copy.rotOffset += 180f; //might change later
+                copy.rotOffset += 360f / (copy.bladeCount * 2);
 
                 mapped.add(copy);
             }
@@ -179,7 +180,7 @@ public class UnityUnitType extends UnitType{
 
         // copter
         if(unit instanceof Copterc){
-            drawRotors(unit);
+            drawRotors((Unit & Copterc)unit);
         }
     }
 
@@ -471,27 +472,50 @@ public class UnityUnitType extends UnitType{
         Draw.z(z);
     }
 
-    public void drawRotors(Unit unit){
+    public <T extends Unit & Copterc> void drawRotors(T unit){
         Draw.mixcol(Color.white, unit.hitTime);
-        for(Rotor rotor : rotors){
+
+        for(RotorMount mount : unit.rotors()){
+            Rotor rotor = mount.rotor;
+
             float offX = Angles.trnsx(unit.rotation - 90, rotor.x, rotor.y);
             float offY = Angles.trnsy(unit.rotation - 90, rotor.x, rotor.y);
 
-            float w = rotor.bladeRegion.width * rotor.scale * Draw.scl;
-            float h = rotor.bladeRegion.height * rotor.scale * Draw.scl;
+            float alpha = Mathf.curve(unit.rotorSpeedScl(), 0.2f, 1f);
+            Draw.alpha(alpha * rotor.ghostAlpha);
+            Draw.rect(rotor.bladeGhostRegion, unit.x + offX, unit.y + offY,
+                rotor.bladeGhostRegion.width * rotor.scale * Draw.scl,
+                rotor.bladeGhostRegion.height * rotor.scale * Draw.scl,
+                mount.rotorRot
+            );
 
+            Draw.rect(rotor.bladeShadeRegion, unit.x + offX, unit.y + offY,
+                rotor.bladeShadeRegion.width * rotor.scale * Draw.scl,
+                rotor.bladeShadeRegion.height * rotor.scale * Draw.scl,
+                mount.rotorShadeRot
+            );
+
+            float z = Draw.z();
+            Draw.z(z - 0.001f);
+
+            Draw.alpha(1f - alpha);
             for(int i = 0; i < 2; i++){
+                Draw.z(z + i * 0.001f);
                 for(int j = 0; j < rotor.bladeCount; j++){
                     float angle = (
-                        unit.rotation
-                        + (unit.id * 24f + (((Copterc)unit).rotorRot().get(rotors.indexOf(rotor)))
-                        + (360f / (float)rotor.bladeCount) * j + rotor.rotOffset)
+                        unit.rotation +
+                        (unit.id * 24f + mount.rotorRot +
+                        (360f / (float)rotor.bladeCount) * j)
                     ) % 360;
 
-                    Draw.rect(i == 0 ? rotor.bladeOutlineRegion : rotor.bladeRegion, unit.x + offX, unit.y + offY, w, h, angle);
+                    Draw.rect(i == 0 ? rotor.bladeOutlineRegion : rotor.bladeRegion, unit.x + offX, unit.y + offY,
+                        rotor.bladeRegion.width * rotor.scale * Draw.scl,
+                        rotor.bladeRegion.height * rotor.scale * Draw.scl,
+                    angle);
                 }
             }
 
+            Draw.z(z);
             Draw.alpha(1f);
             Draw.rect(rotor.topRegion, unit.x + offX, unit.y + offY, unit.rotation - 90f);
         }
