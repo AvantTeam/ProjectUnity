@@ -33,6 +33,7 @@ abstract class CopterComp implements Unitc{
             Rotor rotor = type.rotors.get(i);
             rotors[i] = new RotorMount(rotor);
             rotors[i].rotorRot = rotor.rotOffset;
+            rotors[i].rotorShadeRot = rotor.rotOffset;
         }
     }
 

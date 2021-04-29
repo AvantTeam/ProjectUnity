@@ -139,6 +139,7 @@ public class UnityUnitType extends UnitType{
                 Rotor copy = rotor.copy();
                 copy.x *= -1f;
                 copy.speed *= -1f;
+                copy.shadeSpeed *= -1f;
                 copy.rotOffset += 360f / (copy.bladeCount * 2);
 
                 mapped.add(copy);
