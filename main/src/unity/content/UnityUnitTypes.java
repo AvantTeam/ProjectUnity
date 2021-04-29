@@ -249,6 +249,8 @@ public class UnityUnitTypes implements ContentList{
                     x = 0f;
                     y = 6.5f;
                     bladeCount = 3;
+                    ghostAlpha = 0.4f;
+                    shadeSpeed = 3f * i;
                     speed = 29f * i;
                 }});
             }
