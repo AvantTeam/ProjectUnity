@@ -8,6 +8,8 @@ import unity.annotations.Annotations.*;
 import unity.entities.*;
 import unity.type.*;
 
+import static mindustry.Vars.*;
+
 /**
  * @author GlennFolker
  * @author MEEPofFaith
@@ -38,18 +40,20 @@ abstract class CopterComp implements Unitc{
     public void update(){
         UnityUnitType type = (UnityUnitType)this.type;
         if(dead || health < 0f){
-            rotation = rotation + type.fallRotateSpeed * Mathf.signs[id % 2];
+            if(!net.client() || isLocal()){
+                rotation += type.fallRotateSpeed * Mathf.signs[id % 2] * Time.delta;
+            }
+
             rotorSpeedScl = Mathf.lerpDelta(rotorSpeedScl, 0f, type.rotorDeathSlowdown);
         }else{
             rotorSpeedScl = Mathf.lerpDelta(rotorSpeedScl, 1f, type.rotorDeathSlowdown);
         }
 
         for(RotorMount rotor : rotors){
-            float add = rotor.rotor.speed * rotorSpeedScl * Time.delta;
-            rotor.rotorRot += add;
+            rotor.rotorRot += rotor.rotor.speed * rotorSpeedScl * Time.delta;
             rotor.rotorRot %= 360f;
 
-            rotor.rotorShadeRot -= add / 30f;
+            rotor.rotorShadeRot += rotor.rotor.shadeSpeed * Time.delta;
             rotor.rotorShadeRot %= 360f;
         }
     }

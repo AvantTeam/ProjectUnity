@@ -20,7 +20,8 @@ public class Rotor{
 
     public float rotOffset = 0f;
     public float speed = 29f;
-    public float ghostAlpha = 0.5f;
+    public float shadeSpeed = 3f;
+    public float ghostAlpha = 0.4f;
 
     public int bladeCount = 4;
 

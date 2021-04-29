@@ -496,7 +496,6 @@ public class UnityUnitType extends UnitType{
             );
 
             float z = Draw.z();
-            Draw.z(z - 0.001f);
 
             Draw.alpha(1f - alpha);
             for(int i = 0; i < 2; i++){
@@ -515,9 +514,11 @@ public class UnityUnitType extends UnitType{
                 }
             }
 
-            Draw.z(z);
+            Draw.z(z + 0.002f);
             Draw.alpha(1f);
             Draw.rect(rotor.topRegion, unit.x + offX, unit.y + offY, unit.rotation - 90f);
+
+            Draw.z(z);
         }
 
         Draw.mixcol();
