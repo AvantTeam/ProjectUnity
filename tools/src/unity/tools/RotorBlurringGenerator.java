@@ -23,8 +23,8 @@ public class RotorBlurringGenerator implements Generator {
 		for (UnityUnitType unitType : copters) {
 			// Normally these should be called after IconGenerator which however already invokes these, so we can just skip.
 			// Unless someone else has bigger ideas, I'll leave these here and commented out
-			//unitType.load();
-			//unitType.init();
+			unitType.load();
+			unitType.init();
 
 			String bladeSpriteName = unitType.name + "-rotor-blade";
 			String ghostSpriteName = unitType.name + "-rotor-blade-ghost";
@@ -39,7 +39,7 @@ public class RotorBlurringGenerator implements Generator {
 
 			Sprite bladeSprite = SpriteProcessor.get(bladeSpriteName);
 
-			// This array is to be loaded in the order where colors at index 0 are located towards the center,
+			// This array is to be written in the order where colors at index 0 are located towards the center,
 			// and colors at the end of the array is located towards at the edge.
 			int[] heightAverageColors = new int[(bladeSprite.height / 2) + 1]; // Go one extra so it becomes transparent especially if blade is full length
 			int bladeLength = populateColorArray(heightAverageColors, bladeSprite, bladeSprite.height / 2);
@@ -47,11 +47,26 @@ public class RotorBlurringGenerator implements Generator {
 			@SuppressWarnings("SuspiciousNameCombination") // Shut
 			Sprite ghostSprite = new Sprite(bladeSprite.height, bladeSprite.height);
 
-			drawRadial(ghostSprite, heightAverageColors, bladeLength);
+			// Instead of ACTUALLY accounting for the insanity that is the variation of rotor configurations
+			// including counter-rotating propellers and that jazz, number 4 will be used instead.
+			drawRadial(ghostSprite, heightAverageColors, bladeLength, 4);
 
 			ghostSpriteName = ghostSpriteName.replace("unity-", "");
 			Log.info("Saving @", ghostSpriteName);
 			ghostSprite.save(ghostSpriteName);
+
+			String shadeSpriteName = unitType.name + "-rotor-blade-shade";
+
+			if (SpriteProcessor.has(shadeSpriteName)) {
+				Log.info("Rotor Blade shade sprite override for @ exists, skipping", shadeSpriteName);
+				continue;
+			}
+
+			@SuppressWarnings("SuspiciousNameCombination") // Also shut
+			Sprite shadeSprite = new Sprite(bladeSprite.height, bladeSprite.height);
+
+			drawShade(shadeSprite, bladeLength);
+			//shadeSprite.save(shadeSpriteName);
 		}
 
 		Log.info("Rotors complete");
@@ -100,19 +115,26 @@ public class RotorBlurringGenerator implements Generator {
 		return length;
 	}
 
-	private void drawRadial(Sprite ghostSprite, final int[] colorTable, final int canonicalTableSize) {
-		ghostSprite.each((x, y) -> {
+	private void drawRadial(Sprite sprite, final int[] colorTable, final int tableLimit, final int bladeCount) {
+		final float spriteCenter = 0.5f - (sprite.height / 2f);
+		sprite.each((x, y) -> {
 			// 0.5f is required since mathematically it'll put the position at an intersection between 4 pixels, since the sprites are even-sized
-			float positionLength = Mathf.len(x + 0.5f - (ghostSprite.height / 2f), y + 0.5f - (ghostSprite.height / 2f));
+			float positionLength = Mathf.len(x + spriteCenter, y + spriteCenter);
 
-			if (positionLength < canonicalTableSize) {
-				int arrayIndex = Mathf.clamp((int) positionLength, 0, canonicalTableSize);
-				// TODO Radially variate the tranlucency and reduce the alpha a small bit as the position moves away from the center
-				ghostSprite.draw(x, y, colorLerp(Tmp.c1.rgba8888(colorTable[arrayIndex]), Tmp.c2.rgba8888(colorTable[arrayIndex + 1]), positionLength % 1f));
+			if (positionLength < tableLimit) {
+				int arrayIndex = Mathf.clamp((int) positionLength, 0, tableLimit);
+				float a = Mathf.cos(Mathf.atan2(x + spriteCenter, y + spriteCenter) * 2 * bladeCount) * 0.05f + 0.95f;
+				a *= a * (1 - (0.5f / (tableLimit - positionLength + 0.5f)));
+
+				sprite.draw(x, y, colorLerp(Tmp.c1.rgba8888(colorTable[arrayIndex]), Tmp.c2.rgba8888(colorTable[arrayIndex + 1]), positionLength % 1f).mula(a));
 			} else {
-				ghostSprite.draw(x, y, Tmp.c1.rgba8888(0x00_00_00_00));
+				sprite.draw(x, y, Tmp.c1.rgba8888(0x00_00_00_00));
 			}
 		});
+	}
+
+	private void drawShade(Sprite shineSprite, final int length) {
+
 	}
 
 	private static Color colorLerp(Color a, Color b, float frac) {
