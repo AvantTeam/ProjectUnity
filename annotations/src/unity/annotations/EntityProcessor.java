@@ -116,7 +116,12 @@ public class EntityProcessor extends BaseProcessor{
                 if(compAnno.write()){
                     TypeSpec.Builder inter = TypeSpec.interfaceBuilder(interfaceName(comp))
                         .addModifiers(Modifier.PUBLIC)
-                        .addAnnotation(EntityInterface.class);
+                        .addAnnotation(cName(EntityInterface.class))
+                        .addAnnotation(
+                            AnnotationSpec.builder(cName(SuppressWarnings.class))
+                                .addMember("value", "$S", "all")
+                            .build()
+                        );
 
                     for(TypeElement type : depends){
                         inter.addSuperinterface(procName(type, this::interfaceName));
@@ -262,7 +267,7 @@ public class EntityProcessor extends BaseProcessor{
 
                 builder.addMethod(
                     MethodSpec.methodBuilder("serialize").addModifiers(Modifier.PUBLIC)
-                        .addAnnotation(Override.class)
+                        .addAnnotation(cName(Override.class))
                         .returns(TypeName.BOOLEAN)
                         .addStatement("return " + ann.serialize())
                     .build()
@@ -331,7 +336,7 @@ public class EntityProcessor extends BaseProcessor{
 
                 builder.addMethod(
                     MethodSpec.methodBuilder("toString")
-                        .addAnnotation(Override.class)
+                        .addAnnotation(cName(Override.class))
                         .returns(String.class)
                         .addModifiers(Modifier.PUBLIC)
                         .addStatement("return $S + $L", name + "#", "id")
@@ -370,7 +375,7 @@ public class EntityProcessor extends BaseProcessor{
 
                     boolean isPrivate = is(first, Modifier.PRIVATE);
                     MethodSpec.Builder mbuilder = MethodSpec.methodBuilder(simpleName(first)).addModifiers(isPrivate ? Modifier.PRIVATE : Modifier.PUBLIC);
-                    if(!isPrivate) mbuilder.addAnnotation(Override.class);
+                    if(!isPrivate) mbuilder.addAnnotation(cName(Override.class));
 
                     if(is(first, Modifier.STATIC)) mbuilder.addModifiers(Modifier.STATIC);
                     mbuilder.addTypeVariables(Seq.with(first.getTypeParameters()).map(TypeVariableName::get));
@@ -469,7 +474,7 @@ public class EntityProcessor extends BaseProcessor{
 
                     MethodSpec.Builder resetBuilder = MethodSpec.methodBuilder("reset")
                         .addModifiers(Modifier.PUBLIC)
-                        .addAnnotation(Override.class);
+                        .addAnnotation(cName(Override.class));
 
                     for(FieldSpec spec : allFieldSpecs){
                         VariableElement variable = specVariables.get(spec);
@@ -606,7 +611,7 @@ public class EntityProcessor extends BaseProcessor{
 
                 def.builder.addMethod(
                     MethodSpec.methodBuilder("classId").addModifiers(Modifier.PUBLIC)
-                        .addAnnotation(Override.class)
+                        .addAnnotation(cName(Override.class))
                         .returns(TypeName.INT)
                         .addStatement("return $T.classId($T.class)", ClassName.get(packageName, "UnityEntityMapping"), type)
                     .build()
@@ -678,7 +683,7 @@ public class EntityProcessor extends BaseProcessor{
                             def.builder.addMethod(
                                 MethodSpec.methodBuilder(var).addModifiers(Modifier.PUBLIC)
                                     .returns(TypeName.get(method.getReturnType()))
-                                    .addAnnotation(Override.class)
+                                    .addAnnotation(cName(Override.class))
                                     .addStatement("return $L", var)
                                 .build()
                             );
@@ -688,7 +693,7 @@ public class EntityProcessor extends BaseProcessor{
                             def.builder.addMethod(
                                 MethodSpec.methodBuilder(var).addModifiers(Modifier.PUBLIC)
                                     .returns(TypeName.VOID)
-                                    .addAnnotation(Override.class)
+                                    .addAnnotation(cName(Override.class))
                                     .addParameter(field.type, var)
                                     .addStatement("this.$L = $L", var, var)
                                 .build()
