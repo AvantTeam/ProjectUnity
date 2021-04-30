@@ -1837,6 +1837,7 @@ public class UnityUnitTypes implements ContentList{
             health = 6000f;
             speed = 0.7f;
             drag = 0.1f;
+            hitSize = 33f;
 
             rotateSpeed = 2f;
 
@@ -1852,6 +1853,46 @@ public class UnityUnitTypes implements ContentList{
             allowLegStep = true;
             visualElevation = 0.7f;
             groundLayer = Layer.legUnit;
+            outlineColor = UnityPal.darkerOutline;
+
+            CloneableSetWeapon t = UnityWeaponTemplates.plagueSmallMount;
+
+            weapons.addAll(t.set(w -> {
+                w.x = 9.5f;
+                w.y = 8f;
+                w.otherSide = 2;
+            }), t.set(w -> {
+                w.x = -9.5f;
+                w.y = 8f;
+                w.flipSprite = true;
+                w.otherSide = 0;
+            }), t.set(w -> {
+                w.x = 12.25f;
+                w.y = -12.25f;
+                w.name += "-flipped";
+                w.flipSprite = true;
+                w.otherSide = 3;
+            }), t.set(w -> {
+                w.x = -12.25f;
+                w.y = -12.25f;
+                w.flipSprite = true;
+                w.otherSide = 1;
+            }), new Weapon("unity-drain-laser"){{
+                x = 16f;
+                y = -2.25f;
+                shootY = 6.25f;
+                mirror = true;
+                rotate = true;
+                shots = 3;
+                spacing = 17.5f;
+                reload = 1.5f * 60f;
+
+                bullet = new ShrapnelBulletType(){{
+                    damage = 43f;
+                    length = 80f;
+                    toColor = UnityPal.plague;
+                }};
+            }});
         }};
 
         toxobyte = new UnityUnitType("toxobyte"){{

@@ -3,6 +3,7 @@ package unity.content;
 import arc.graphics.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
+import mindustry.entities.bullet.*;
 import mindustry.graphics.*;
 import unity.entities.bullet.*;
 import unity.gen.*;
@@ -10,7 +11,7 @@ import unity.graphics.*;
 import unity.type.*;
 
 public class UnityWeaponTemplates implements ContentList{
-    public static CloneableSetWeapon apocalypseSmall, apocalypseLauncher, apocalypseLaser, waveformSmallMount;
+    public static CloneableSetWeapon apocalypseSmall, apocalypseLauncher, apocalypseLaser, waveformSmallMount, plagueSmallMount;
 
     @Override
     public void load(){
@@ -110,6 +111,31 @@ public class UnityWeaponTemplates implements ContentList{
                 hitEffect = Fx.hitLancer;
                 backColor = lightColor = hitColor = Pal.lancerLaser;
                 frontColor = Color.white;
+            }};
+        }};
+
+        plagueSmallMount = new CloneableSetWeapon("unity-small-plague-launcher"){{
+            shootY = 4.75f;
+            reload = 1.5f * 60f;
+            shots = 4;
+            inaccuracy = 15f;
+            mirror = false;
+            alternate = true;
+            rotate = true;
+
+            bullet = new MissileBulletType(3.8f, 9f){{
+                width = height = 8f;
+                lifetime = 45f;
+                backColor = hitColor = lightColor = trailColor = UnityPal.plagueDark;
+                frontColor = UnityPal.plague;
+                shrinkY = 0f;
+                drag = -0.01f;
+                splashDamage = 17f;
+                splashDamageRadius = 30f;
+                weaveScale = 8f;
+                weaveMag = 2f;
+                hitEffect = Fx.blastExplosion;
+                despawnEffect = Fx.blastExplosion;
             }};
         }};
     }
