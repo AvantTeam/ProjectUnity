@@ -215,19 +215,9 @@ public class UnityBlocks implements ContentList{
     }, outline = true)
     Block endGame, tenmeikiri;
 
-    public static
-    @FactionDef("koruh")
-    @Merge(base = Block.class, value = {LightHoldc.class})
-    Block lightTest;
-
     @Override
     public void load(){
         //region global
-
-        lightTest = new LightHoldBlock("light-test"){{
-            lightRange = 80f;
-            holdsLight = isSource = true;
-        }};
 
         distributionDrill = new DistributionDrill("distribution-drill"){{
             requirements(Category.production, with(Items.copper, 20, Items.silicon, 15, Items.titanium, 20));
