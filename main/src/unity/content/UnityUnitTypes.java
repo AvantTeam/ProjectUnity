@@ -208,6 +208,7 @@ public class UnityUnitTypes implements ContentList{
             range = 165f;
 
             weapons.add(new Weapon(name + "-gun"){{
+                top = false;
                 x = 1.5f;
                 y = 11f;
                 shootX = -0.75f;
@@ -220,6 +221,7 @@ public class UnityUnitTypes implements ContentList{
                     shrinkY = 0.2f;
                 }};
             }}, new Weapon(name + "-gun"){{
+                top = false;
                 x = 4f;
                 y = 8.75f;
                 shootX = -0.75f;
