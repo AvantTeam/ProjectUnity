@@ -291,11 +291,19 @@ public class UnityUnitTypes implements ContentList{
                 }};
             }});
 
+            for(int i : Mathf.signs){
+                rotors.add(new Rotor(name + "-rotor"){{
+                    x = 0f;
+                    y = -13f;
+                    scale = 0.5f;
+                    bladeCount = 2;
+                    ghostAlpha = 0.4f;
+                    shadeSpeed = 3f * i;
+                    speed = 29f * i;
+                }});
+            }
+
             rotors.add(new Rotor(name + "-rotor"){{
-                x = 0f;
-                y = -13f;
-                scale = 0.6f;
-            }}, new Rotor(name + "-rotor"){{
                 mirror = true;
                 x = 13f;
                 y = 3f;
@@ -353,8 +361,10 @@ public class UnityUnitTypes implements ContentList{
                     mirror = true;
                     x = 15f;
                     y = 6.75f;
+                    scale = 1.2f;
                     speed = 29f * i;
-                    rotOffset = 180f * i;
+                    ghostAlpha = 0.4f;
+                    shadeSpeed = 3f * i;
                 }});
             }
         }};
@@ -430,6 +440,8 @@ public class UnityUnitTypes implements ContentList{
                     y = 21.25f;
                     bladeCount = 3;
                     speed = 19f * i;
+                    ghostAlpha = 0.4f;
+                    shadeSpeed = 3f * i;
                 }}, new Rotor(name + "-rotor"){{
                     mirror = true;
                     x = 17.25f;
@@ -437,6 +449,8 @@ public class UnityUnitTypes implements ContentList{
                     scale = 0.8f;
                     bladeCount = 2;
                     speed = 23f * i;
+                    ghostAlpha = 0.4f;
+                    shadeSpeed = 3f * i;
                 }});
             }
         }};
