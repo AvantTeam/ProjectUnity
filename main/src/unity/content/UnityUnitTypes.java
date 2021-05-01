@@ -817,7 +817,7 @@ public class UnityUnitTypes implements ContentList{
                     empMaxRange = 800f;
                     empDisconnectRange = 125f;
                     empBatteryDamage = 40000f;
-                    empLogicDamage = 12f;
+                    empLogicDamage = 26f;
                     powerGridIteration = 15;
                     trailLength = 15;
 
