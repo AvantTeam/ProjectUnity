@@ -20,6 +20,7 @@ import unity.sync.*;
 import unity.ui.*;
 import unity.ui.dialogs.*;
 import unity.util.*;
+import younggamExperimental.Parts;
 
 import static mindustry.Vars.*;
 
@@ -41,10 +42,14 @@ public class Unity extends Mod implements ApplicationListener{
         new UnityPlanets(),
         new UnitySectorPresets(),
         new UnityTechTree(),
+        new Parts(),
         new OverWriter()
     };
 
     private static LoadedMod unity;
+
+    //testing
+    public static BlockMovement blockMovement= new BlockMovement();
 
     public Unity(){
         ContributorList.init();
@@ -122,6 +127,7 @@ public class Unity extends Mod implements ApplicationListener{
             Core.app.removeListener(this);
             Events.fire(new UnityModLoadEvent());
         }
+
     }
 
     @Override
@@ -130,6 +136,7 @@ public class Unity extends Mod implements ApplicationListener{
         musicHandler.setup();
         antiCheat.setup();
         UnityCall.init();
+        BlockMovement.init();
 
         if(!headless){
             Func<String, String> stringf = value -> Core.bundle.get("mod." + value);
@@ -139,6 +146,7 @@ public class Unity extends Mod implements ApplicationListener{
 
             initScripts();
         }
+
     }
 
     private void initScripts(){

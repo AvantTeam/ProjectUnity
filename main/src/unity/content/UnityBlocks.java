@@ -189,7 +189,9 @@ public class UnityBlocks implements ContentList{
 
     //defense
     cupronickelWall, cupronickelWallLarge,
-    
+
+    //other?
+    smallThruster,
     //sandbox
     infiHeater, infiCooler, infiTorque, neodymiumStator;
 
@@ -2419,6 +2421,15 @@ public class UnityBlocks implements ContentList{
             requirements(Category.power, BuildVisibility.sandboxOnly, with());
             health = 400;
             addGraph(new GraphFlux(200f).setAccept(1, 0, 0, 0));
+        }};
+        smallThruster = new y.world.blocks.effect.UnityThruster("small-thruster"){{
+            requirements(Category.effect, with(Items.silicon, 20, Items.graphite, 30, UnityItems.nickel, 25));
+            health = 400;
+            acceleration=0.2f;
+            maxSpeed=5;
+            maxBlocks=5;
+            consumes.item(Items.blastCompound);
+            itemDuration=300;
         }};
 
         //endregion

@@ -17,7 +17,7 @@ public class PartStat{
         this(category, value, null);
     }
 
-    //I really don't like this.
+    //I really don't like this. THEN DONT
     public String asString(){
         return (String)value;
     }
