@@ -146,9 +146,14 @@ task fetchComps {
                         .replaceAll('\\@Final\n*', '')
                         .replaceAll('\\@EntityDef\\(*.*\\)*\n*', '')
 
+                    if(content.isBlank()) throw new IllegalStateException()
+
                     final UnsafeRunnable write = {
                         final def fi = Fi.get("$fetchDir/$filename")
                         fi.writeString(content, false)
+                        while(!fi.readString().equals(content)) {
+                            fi.writeString(content, false)
+                        }
 
                         done[0]--
                         println "Wrote '$filename': ${done[0]} left."
