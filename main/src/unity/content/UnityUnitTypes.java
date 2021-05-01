@@ -39,9 +39,17 @@ public class UnityUnitTypes implements ContentList{
     UnitType angel, malakhim,
     discharge, pulse, emission, waveform;
     
-    // global legs
+    // global T6/7 units
+
+    // reign
+    // corvus + toxopid
     public static @EntityPoint(LegsUnit.class)
     UnitType orion, araneidae, theraphosidae;
+    // eclipse
+    // oct
+    public static @EntityDef({Unitc.class, Payloadc.class})
+    UnitType sedec;
+    // omura
 
     // global unit + watermove + transform
     public static @EntityDef({Unitc.class, WaterMovec.class, Transc.class})
@@ -722,7 +730,7 @@ public class UnityUnitTypes implements ContentList{
         }};
 
         //endregion
-        //region ground-units
+        //region T6/7
         
         orion = new UnityUnitType("orion"){{
             speed = 0.3f;
@@ -1030,6 +1038,70 @@ public class UnityUnitTypes implements ContentList{
             temp.x = 10.25f;
             temp.y = -23.25f;
             temp.flipSprite = false;
+        }};
+
+        sedec = new UnityUnitType("sedec"){{
+            health = 34000f;
+            armor = 20f;
+            speed = 0.7f;
+            rotateSpeed = 1f;
+            accel = 0.04f;
+            drag = 0.018f;
+            flying = true;
+            engineOffset = 46f;
+            engineSize = 7.8f;
+            rotateShooting = false;
+            hitSize = 60f;
+            payloadCapacity = (6.2f * 6.2f) * tilePayload;
+            buildSpeed = 5f;
+            drawShields = false;
+            commandLimit = 8;
+            buildBeamOffset = 43;
+
+            ammoCapacity = 1700;
+            ammoResupplyAmount = 30;
+
+            abilities.add(new ForceFieldAbility(180f, 6f, 8000f, 60f * 12), new RepairFieldAbility(180f, 60f * 2, 160f));
+
+            bottomWeapons.add(name + "-laser");
+            weapons.add(new Weapon(name + "-laser"){{
+                x = 0f;
+                y = -6.5f;
+                shootY = 36f;
+                reload = 260f;
+                recoil = 8f;
+
+                cooldownTime = 320f;
+                continuous = rotate = true;
+
+                mirror = false;
+                rotateSpeed = 1f;
+
+                shootStatusDuration = Fx.greenLaserCharge.lifetime;
+                shootStatus = StatusEffects.unmoving;
+                firstShotDelay = Fx.greenLaserCharge.lifetime;
+
+                chargeSound = Sounds.lasercharge;
+                shootSound = Sounds.beam;
+                bullet = new ContinuousLaserBulletType(66f){{
+                    length = 230f;
+                    width = 8.5f;
+                    hitEffect = Fx.hitMeltHeal;
+                    drawSize = 420f;
+                    lifetime = 240f;
+                    shake = 1f;
+                    
+                    shootEffect = Fx.greenLaserCharge;
+                    despawnEffect = Fx.smokeCloud;
+                    smokeEffect = Fx.none;
+
+                    //constant healing
+                    healPercent = 1.5f;
+                    collidesTeam = true;
+
+                    colors = new Color[]{Pal.heal.cpy().a(0.2f), Pal.heal.cpy().a(0.5f), Pal.heal.cpy().mul(1.2f), Color.white};
+                }};
+            }});
         }};
 
         //endregion
@@ -1443,7 +1515,7 @@ public class UnityUnitTypes implements ContentList{
             legMoveSpace = 0.57f;
             legPairOffset = 0.8f;
 
-            weapons.add(new Weapon("unity-rex-railgun"){{
+            weapons.add(new Weapon(name + "-railgun"){{
                 x = 31.25f;
                 y = -12.25f;
                 shootY = 23.25f;
@@ -1627,7 +1699,7 @@ public class UnityUnitTypes implements ContentList{
                     hitEffect = UnityFx.scarHitSmall;
                 }};
             }},
-            new Weapon("unity-excelsus-laser-weapon"){{
+            new Weapon(name + "-laser-weapon"){{
                 x = 29.75f;
                 y = -20.5f;
                 shootY = 7f;
@@ -2180,7 +2252,7 @@ public class UnityUnitTypes implements ContentList{
                 ) != null
             ));
 
-            weapons.add(new Weapon("unity-dijkstra-laser"){{
+            weapons.add(new Weapon(name + "-laser"){{
                 rotate = true;
                 rotateSpeed = 8f;
                 shadow = 20f;
@@ -2193,7 +2265,7 @@ public class UnityUnitTypes implements ContentList{
                 bullet = UnityBullets.laserZap;
                 shootSound = Sounds.laser;
                 mirror = false;
-            }}, new Weapon("unity-dijkstra-plasmagun"){{
+            }}, new Weapon(name + "-plasmagun"){{
                 x = 0f;
                 y = 0f;
                 reload = 7f;
@@ -2246,7 +2318,7 @@ public class UnityUnitTypes implements ContentList{
                 delayEffect = UnityFx.smallRingEffect2;
             }});
 
-            weapons.add(new Weapon("unity-phantasmal-gun"){{
+            weapons.add(new Weapon(name + "-gun"){{
                 top = false;
                 x = 1.25f;
                 y = 3.25f;
@@ -2451,7 +2523,7 @@ public class UnityUnitTypes implements ContentList{
             outlineColor = UnityPal.darkOutline;
 
             weapons.add(
-            new Weapon("unity-pylon-laser"){{
+            new Weapon(name + "-laser"){{
                 soundPitchMin = 1f;
                 top = false;
                 mirror = false;
@@ -3201,7 +3273,7 @@ public class UnityUnitTypes implements ContentList{
                 }};
             }});
 
-            tentacles.add(new TentacleType("unity-apocalypse-tentacle"){{
+            tentacles.add(new TentacleType(name + "-tentacle"){{
                 x = 101.75f;
                 y = -72.5f;
                 rotationOffset = 30f;
@@ -3218,7 +3290,7 @@ public class UnityUnitTypes implements ContentList{
                 automatic = false;
                 continuous = true;
                 reload = 4f * 60f;
-            }}, new TentacleType("unity-apocalypse-tentacle"){{
+            }}, new TentacleType(name + "-tentacle"){{
                 x = 56.5f;
                 y = -71.75f;
                 rotationOffset = 10f;
@@ -3236,7 +3308,7 @@ public class UnityUnitTypes implements ContentList{
                 automatic = false;
                 continuous = true;
                 reload = 4f * 60f;
-            }}, new TentacleType("unity-apocalypse-small-tentacle"){{
+            }}, new TentacleType(name + "-small-tentacle"){{
                 x = 104.25f;
                 y = -49f;
                 rotationOffset = 35f;
@@ -3254,7 +3326,7 @@ public class UnityUnitTypes implements ContentList{
                 bullet = null;
                 automatic = true;
                 tentacleDamage = 430f;
-            }}, new TentacleType("unity-apocalypse-small-tentacle"){{
+            }}, new TentacleType(name + "-small-tentacle"){{
                 x = 69.75f;
                 y = -74.25f;
                 rotationOffset = 20f;
@@ -3333,8 +3405,8 @@ public class UnityUnitTypes implements ContentList{
             legSplashDamage = 1600f;
             outlineColor = UnityPal.darkerOutline;
 
-            bottomWeapons.add("unity-ravager-nightmare");
-            weapons.addAll(new Weapon("unity-ravager-nightmare"){{
+            bottomWeapons.add(name + "-nightmare");
+            weapons.addAll(new Weapon(name + "-nightmare"){{
                 x = 80.25f;
                 y = -7.75f;
                 shootY = 75f;
@@ -3344,7 +3416,7 @@ public class UnityUnitTypes implements ContentList{
                 rotate = false;
                 shootSound = UnitySounds.ravagerNightmareShoot;
                 bullet = UnityBullets.ravagerLaser;
-            }}, new Weapon("unity-ravager-artillery"){{
+            }}, new Weapon(name + "-artillery"){{
                 shootY = 11f;
                 shots = 5;
                 inaccuracy = 10f;
@@ -3357,7 +3429,7 @@ public class UnityUnitTypes implements ContentList{
                 reload = 2f * 50f;
                 shootSound = Sounds.artillery;
                 bullet = UnityBullets.ravagerArtillery;
-            }}, new Weapon("unity-ravager-artillery"){{
+            }}, new Weapon(name + "-artillery"){{
                 shootY = 11f;
                 shots = 5;
                 inaccuracy = 10f;
@@ -3370,7 +3442,7 @@ public class UnityUnitTypes implements ContentList{
                 reload = 2.25f * 50f;
                 shootSound = Sounds.artillery;
                 bullet = UnityBullets.ravagerArtillery;
-            }}, new Weapon("unity-ravager-small-turret"){{
+            }}, new Weapon(name + "-small-turret"){{
                 shootY = 7f;
                 inaccuracy = 2f;
                 shadow = 9.25f * 2f;
@@ -3382,7 +3454,7 @@ public class UnityUnitTypes implements ContentList{
                 shootSound = Sounds.missile;
 
                 bullet = UnityBullets.missileAntiCheat;
-            }}, new Weapon("unity-ravager-small-turret"){{
+            }}, new Weapon(name + "-small-turret"){{
                 shootY = 7f;
                 inaccuracy = 2f;
                 shadow = 9.25f * 2f;
