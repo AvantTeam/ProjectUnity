@@ -39,9 +39,17 @@ public class UnityUnitTypes implements ContentList{
     UnitType angel, malakhim,
     discharge, pulse, emission, waveform;
     
-    // global legs
+    // global T6/7 units
+
+    // reign
+    // corvus + toxopid
     public static @EntityPoint(LegsUnit.class)
     UnitType orion, araneidae, theraphosidae;
+    // eclipse
+    // oct
+    public static @EntityDef({Unitc.class, Payloadc.class})
+    UnitType sedec;
+    // omura
 
     // global unit + watermove + transform
     public static @EntityDef({Unitc.class, WaterMovec.class, Transc.class})
@@ -722,7 +730,7 @@ public class UnityUnitTypes implements ContentList{
         }};
 
         //endregion
-        //region ground-units
+        //region T6/7
         
         orion = new UnityUnitType("orion"){{
             speed = 0.3f;
@@ -1030,6 +1038,70 @@ public class UnityUnitTypes implements ContentList{
             temp.x = 10.25f;
             temp.y = -23.25f;
             temp.flipSprite = false;
+        }};
+
+        sedec = new UnityUnitType("sedec"){{
+            health = 34000f;
+            armor = 20f;
+            speed = 0.7f;
+            rotateSpeed = 1f;
+            accel = 0.04f;
+            drag = 0.018f;
+            flying = true;
+            engineOffset = 46f;
+            engineSize = 7.8f;
+            rotateShooting = false;
+            hitSize = 60f;
+            payloadCapacity = (6.2f * 6.2f) * tilePayload;
+            buildSpeed = 5f;
+            drawShields = false;
+            commandLimit = 8;
+            buildBeamOffset = 43;
+
+            ammoCapacity = 1700;
+            ammoResupplyAmount = 30;
+
+            abilities.add(new ForceFieldAbility(180f, 6f, 8000f, 60f * 12), new RepairFieldAbility(180f, 60f * 2, 160f));
+
+            bottomWeapons.add(name + "-laser");
+            weapons.add(new Weapon(name + "-laser"){{
+                x = 0f;
+                y = -6.5f;
+                shootY = 36f;
+                reload = 260f;
+                recoil = 8f;
+
+                cooldownTime = 320f;
+                continuous = rotate = true;
+
+                mirror = false;
+                rotateSpeed = 1f;
+
+                shootStatusDuration = Fx.greenLaserCharge.lifetime;
+                shootStatus = StatusEffects.unmoving;
+                firstShotDelay = Fx.greenLaserCharge.lifetime;
+
+                chargeSound = Sounds.lasercharge;
+                shootSound = Sounds.beam;
+                bullet = new ContinuousLaserBulletType(66f){{
+                    length = 230f;
+                    width = 8.5f;
+                    hitEffect = Fx.hitMeltHeal;
+                    drawSize = 420f;
+                    lifetime = 240f;
+                    shake = 1f;
+                    
+                    shootEffect = Fx.greenLaserCharge;
+                    despawnEffect = Fx.smokeCloud;
+                    smokeEffect = Fx.none;
+
+                    //constant healing
+                    healPercent = 1.5f;
+                    collidesTeam = true;
+
+                    colors = new Color[]{Pal.heal.cpy().a(0.2f), Pal.heal.cpy().a(0.5f), Pal.heal.cpy().mul(1.2f), Color.white};
+                }};
+            }});
         }};
 
         //endregion
