@@ -170,6 +170,7 @@ public class UnityUnitTypes implements ContentList{
             hitSize = 12f;
             range = 140f;
 
+            bottomWeapons.add(name + "-gun");
             weapons.add(new Weapon(name + "-gun"){{
                 reload = 6f;
                 x = 5.25f;
@@ -215,6 +216,7 @@ public class UnityUnitTypes implements ContentList{
             hitSize = 13f;
             range = 165f;
 
+            bottomWeapons.add(name + "-gun");
             weapons.add(new Weapon(name + "-gun"){{
                 top = false;
                 x = 1.5f;
@@ -279,6 +281,7 @@ public class UnityUnitTypes implements ContentList{
             range = 165f;
             fallRotateSpeed = 2f;
 
+            bottomWeapons.add(name + "-gun");
             weapons.add(new Weapon(name + "-gun"){{
                 x = 4.25f;
                 y = 14f;
@@ -334,6 +337,7 @@ public class UnityUnitTypes implements ContentList{
             range = 165f;
             lowAltitude = true;
 
+            bottomWeapons.add(name + "-gun");
             weapons.add(new Weapon(name + "-gun-big"){{
                 x = 8.25f;
                 y = 9.5f;
@@ -393,6 +397,7 @@ public class UnityUnitTypes implements ContentList{
             lowAltitude = true;
             fallRotateSpeed = 0.8f;
 
+            bottomWeapons.add(name + "-gun");
             weapons.add(new Weapon(name + "-gun"){{
                 x = 14f;
                 y = 27f;
