@@ -11,7 +11,7 @@ import unity.graphics.*;
 import unity.type.*;
 
 public class UnityWeaponTemplates implements ContentList{
-    public static CloneableSetWeapon apocalypseSmall, apocalypseLauncher, apocalypseLaser, waveformSmallMount, plagueSmallMount;
+    public static CloneableSetWeapon apocalypseSmall, apocalypseLauncher, apocalypseLaser, waveformSmallMount, ultravioletMount, plagueSmallMount;
 
     @Override
     public void load(){
@@ -100,13 +100,40 @@ public class UnityWeaponTemplates implements ContentList{
                 splashDamageRadius = 15f;
                 splashDamage = 1.5f;
                 shrinkY = 0f;
-                height = 13f;
-                width = 10f;
+                height = 12f;
+                width = 9f;
 
                 powerGridIteration = 1;
                 empDuration = 0f;
                 empBatteryDamage = 4000f;
                 empRange = 90f;
+
+                hitEffect = Fx.hitLancer;
+                backColor = lightColor = hitColor = Pal.lancerLaser;
+                frontColor = Color.white;
+            }};
+        }};
+
+        ultravioletMount = new CloneableSetWeapon("unity-emp-small-launcher"){{
+            shootY = 6.75f;
+            reload = 20f;
+            mirror = false;
+            alternate = true;
+            rotate = true;
+            shootSound = UnitySounds.zbosonShoot;
+
+            bullet = new EmpBasicBulletType(5.7f, 25f){{
+                lifetime = 40f;
+                splashDamageRadius = 15f;
+                splashDamage = 5f;
+                shrinkY = 0f;
+                height = 14f;
+                width = 10f;
+
+                powerGridIteration = 7;
+                empDuration = 20f;
+                empBatteryDamage = 8000f;
+                empRange = 120f;
 
                 hitEffect = Fx.hitLancer;
                 backColor = lightColor = hitColor = Pal.lancerLaser;

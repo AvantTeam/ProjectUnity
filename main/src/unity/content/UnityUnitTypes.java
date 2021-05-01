@@ -37,7 +37,7 @@ public class UnityUnitTypes implements ContentList{
     // global flying
     public static @EntityPoint(UnitEntity.class)
     UnitType angel, malakhim,
-    discharge, pulse, emission, waveform;
+    discharge, pulse, emission, waveform, ultraviolet;
     
     // global T6/7 units
 
@@ -718,6 +718,100 @@ public class UnityUnitTypes implements ContentList{
                     empMaxRange = 800f;
                     empDisconnectRange = 100f;
                     empBatteryDamage = 30000f;
+                    empLogicDamage = 12f;
+                    powerGridIteration = 15;
+                    trailLength = 15;
+
+                    hitEffect = Fx.hitLancer;
+                    backColor = lightColor = hitColor = Pal.lancerLaser;
+                    frontColor = Color.white;
+                }};
+            }});
+        }};
+
+        ultraviolet = new UnityUnitType("ultraviolet"){{
+            flying = true;
+            lowAltitude = true;
+            health = 12000f;
+            speed = 0.53f;
+            accel = 0.06f;
+            drag = 0.07f;
+            hitSize = 57.5f;
+            engineOffset = 33.75f;
+            engineSize = 3.5f;
+            ammoType = AmmoTypes.powerHigh;
+
+            CloneableSetWeapon t = UnityWeaponTemplates.ultravioletMount;
+
+            weapons.addAll(t.set(w -> {
+                w.x = 13.25f;
+                w.y = 20.25f;
+                w.otherSide = 2;
+            }), t.set(w -> {
+                w.x = -13.25f;
+                w.y = 20.25f;
+                w.flipSprite = true;
+                w.otherSide = 0;
+            }), t.flp(w -> {
+                w.x = 19.75f;
+                w.y = 12f;
+                w.otherSide = 4;
+            }), t.set(w -> {
+                w.x = -19.75f;
+                w.y = 12f;
+                w.flipSprite = true;
+                w.otherSide = 1;
+            }), t.flp(w -> {
+                w.x = 25.25f;
+                w.y = 0f;
+                w.otherSide = 6;
+            }), t.set(w -> {
+                w.x = -25.25f;
+                w.y = 0f;
+                w.flipSprite = true;
+                w.otherSide = 3;
+            }), t.flp(w -> {
+                w.x = 22.75f;
+                w.y = -12f;
+                w.otherSide = 8;
+            }), t.set(w -> {
+                w.x = -22.75f;
+                w.y = -12f;
+                w.flipSprite = true;
+                w.otherSide = 5;
+            }), t.flp(w -> {
+                w.x = 16f;
+                w.y = -19.5f;
+                w.otherSide = 9;
+            }), t.set(w -> {
+                w.x = -16f;
+                w.y = -19.5f;
+                w.flipSprite = true;
+                w.otherSide = 7;
+            }), new Weapon("unity-emp-large-launcher"){{
+                x = 0f;
+                y = -20.25f;
+                shootY = 11f;
+                mirror = false;
+                rotate = true;
+                rotateSpeed = 2f;
+                reload = 4f * 60f;
+                shootSound = UnitySounds.zbosonShoot;
+
+                bullet = new EmpBasicBulletType(6.8f, 9f){{
+                    lifetime = 42f;
+                    hitSize = 6f;
+                    splashDamageRadius = 45f;
+                    splashDamage = 23f;
+                    shrinkY = 0f;
+                    height = 19f;
+                    width = 14.5f;
+
+                    empRange = 175f;
+                    empDuration = 60f * 2f;
+                    empMaxRange = 800f;
+                    empDisconnectRange = 125f;
+                    empBatteryDamage = 40000f;
                     empLogicDamage = 12f;
                     powerGridIteration = 15;
                     trailLength = 15;

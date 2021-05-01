@@ -1003,16 +1003,15 @@ public class UnityBullets implements ContentList{
             }
 
             @Override
-            public void hitEntity(Bullet b, Hitboxc other, float initialHealth){
-                if(!(other instanceof Unit h)) return;
+            public void handleUnit(Bullet b, Unit unit, float initialHealth){
                 float damage = auraDamage / (Math.max(4500f - Math.max(initialHealth - 350000f, 0f), 0f) / 4500f);
-                if((damage >= Float.MAX_VALUE || Float.isInfinite(damage)) && !(other instanceof AntiCheatBase)){
-                    h.health = 0f;
-                    UnityAntiCheat.annihilateEntity(other, false);
+                if((damage >= Float.MAX_VALUE || Float.isInfinite(damage)) && !(unit instanceof AntiCheatBase)){
+                    unit.health = 0f;
+                    UnityAntiCheat.annihilateEntity(unit, false);
                 }else{
-                    h.damage(damage);
+                    unit.damage(damage);
                 }
-                if(other instanceof AntiCheatBase) ((AntiCheatBase)other).overrideAntiCheatDamage(auraDamage, 1);
+                if(unit instanceof AntiCheatBase) ((AntiCheatBase)unit).overrideAntiCheatDamage(auraDamage, 1);
             }
         };
 

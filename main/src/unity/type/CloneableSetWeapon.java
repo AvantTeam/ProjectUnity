@@ -14,4 +14,12 @@ public class CloneableSetWeapon extends Weapon{
         con.get(w);
         return w;
     }
+
+    public Weapon flp(Cons<Weapon> con){
+        Weapon w = copy();
+        w.name += "-flipped";
+        w.flipSprite = true;
+        con.get(w);
+        return w;
+    }
 }
