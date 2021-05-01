@@ -4,6 +4,7 @@ import arc.*;
 import arc.files.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.async.*;
 import arc.util.serialization.*;
 
 dependencies {
@@ -101,52 +102,7 @@ task fetchComps {
         Core.net = new Net()
         Core.net.setBlock(true)
 
-        int[] done = [Integer.MAX_VALUE]
-
-        UnsafeRunnable mainRun = {
-        Core.net.http(
-        new Net.HttpRequest()
-            .header('Accept', 'application/json')
-            .method(Net.HttpMethod.GET)
-            .url("https://api.github.com/repos/Anuken/Mindustry/contents/core/src/mindustry/entities/comp?ref=$mindustryVersion"),
-
-        { res ->
-        def list = Jval.read(res.getResultAsString()).asArray()
-        done[0] = list.size
-
-        println "Found all ${done[0]} mindustry entity comps."
-
-        for(def val : list) {
-            def filename = val.get('name').asString()
-            def fileurl = val.get('download_url').asString()
-
-            UnsafeRunnable run = {
-            Core.net.http(
-            new Net.HttpRequest()
-                .header('Accept', 'application/json')
-                .method(Net.HttpMethod.GET)
-                .url(fileurl),
-
-            { comp -> 
-                def content = comp.getResultAsString()
-                    .replace('mindustry.entities.comp', "$fetchPackage".replace('/', '.'))
-                    .replace('mindustry.annotations.Annotations.*', 'unity.annotations.Annotations.*')
-                    .replaceAll('\\@Component\\((base = true|.)+\\)\n*', '@EntityComponent(base = true, write = false)\n')
-                    .replaceAll('\\@Component\n*', '@EntityComponent(write = false)\n')
-                    .replaceAll('\\@BaseComponent\n*', '@EntityBaseComponent\n')
-                    .replaceAll('\\@CallSuper\n*', '')
-                    .replaceAll('\\@Final\n*', '')
-                    .replaceAll('\\@EntityDef\\(*.*\\)*\n*', '')
-
-                def fi = new Fi("$fetchDir/$filename")
-                fi.writeString(content)
-
-                done[0]--
-                println "Wrote '$filename': ${done[0]} left."
-            },
-
-            { err -> throw err })}
-
+        final def execute = { final UnsafeRunnable run ->
             Throwable error = null
             try {
                 run.run()
@@ -161,33 +117,67 @@ task fetchComps {
             } catch(Throwable t) {
                 error = t
             }}
-        }},
-
-        { err -> throw err })}
-
-        Throwable error = null
-        try {
-            mainRun.run()
-            error = null
-        } catch(Throwable t) {
-            error = t
         }
 
-        while(error != null) { try {
-            mainRun.run()
-            error = null
-        } catch(Throwable t) {
-            error = t
-        }}
+        final int[] done = [Integer.MAX_VALUE]
+
+        final UnsafeRunnable mainRun = {
+        Core.net.httpGet(
+        "https://api.github.com/repos/Anuken/Mindustry/contents/core/src/mindustry/entities/comp?ref=$mindustryVersion",
+        { res ->
+            final def list = Jval.read(res.getResultAsString()).asArray()
+            done[0] = list.size
+
+            for(def val : list) {
+                final def filename = val.get('name').asString()
+                final def fileurl = val.get('download_url').asString()
+
+                final UnsafeRunnable run = {
+                Core.net.httpGet(
+                fileurl,
+                { comp -> 
+                    final def content = comp.getResultAsString()
+                        .replace('mindustry.entities.comp', "$fetchPackage".replace('/', '.'))
+                        .replace('mindustry.annotations.Annotations.*', 'unity.annotations.Annotations.*')
+                        .replaceAll('\\@Component\\((base = true|.)+\\)\n*', '@EntityComponent(base = true, write = false)\n')
+                        .replaceAll('\\@Component\n*', '@EntityComponent(write = false)\n')
+                        .replaceAll('\\@BaseComponent\n*', '@EntityBaseComponent\n')
+                        .replaceAll('\\@CallSuper\n*', '')
+                        .replaceAll('\\@Final\n*', '')
+                        .replaceAll('\\@EntityDef\\(*.*\\)*\n*', '')
+
+                    final UnsafeRunnable write = {
+                        final def fi = Fi.get("$fetchDir/$filename")
+                        fi.writeString(content, false)
+
+                        done[0]--
+                        println "Wrote '$filename': ${done[0]} left."
+                    }
+
+                    execute(write)
+                },
+                { err -> throw new RuntimeException(err) })}
+
+                Threads.thread({ execute(run) });
+            }
+        },
+        { err -> throw new RuntimeException(err) })}
+
+        execute(mainRun)
+        while(done[0] > 0) Threads.yield()
 
         fetchTemp.writeString("$mindustryVersion/$fetchRevision")
         println 'Done writing.'
     }
 }
 
-clean {
+task cleanFetched(type: Delete) {
     delete "$projectDir/fetched"
     delete "$fetchTemp"
+}
+
+clean {
+    finalizedBy cleanFetched
 }
 
 compileJava {
