@@ -258,7 +258,9 @@ public class IconGenerator implements Generator{
 
                         propellers.each((x, y) -> {
                             for(int blade = 0; blade < rotorConfig.bladeCount; blade++){
-                                float deg = blade * bladeSeparation + rotorConfig.rotOffset;
+                                // Ideally the rotation would be offset, but as per Mindustry's significance of symmetry
+                                // unit composites should have rotors in symmetrical configurations. This is at EoD's request
+                                float deg = blade * bladeSeparation/* + rotorConfig.rotOffset*/;
                                 float cos = Mathf.cosDeg(deg);
                                 float sin = Mathf.sinDeg(deg);
 
