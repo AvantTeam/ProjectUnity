@@ -5,19 +5,18 @@ import arc.files.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.graphics.g2d.TextureAtlas.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.graphics.*;
 
 import java.io.*;
 
 /**
  * Wavefront Object Converter and Renderer for Arc/libGDX
- * Renders objects orthographically.
- * No culling, textures, nor normals yet.
- * The faces MUST be a quad, because of "limitations."
  * The faces should not intersect. (no crashes, its just that the renderer doesnt support it.)
  * 
  * @author EyeOfDarkness
@@ -29,11 +28,16 @@ public class WavefrontObject{
     protected static final float perspectiveDistance = 350f;
 
     public Seq<Vec3> vertices = new Seq<>();
+    public Seq<Vec2> uvs = new Seq<>();
     public Seq<Vec3> normals = new Seq<>();
     public Seq<Face> faces = new Seq<>();
+    public String textureName = "";
     private final Seq<Vertex> drawnVertices = new Seq<>();
     private final Seq<Vec3> drawnNormals = new Seq<>();
+    private AtlasRegion texture = null;
     private boolean hasNormal = false;
+    private boolean hasTexture = false;
+    private boolean odd = false;
 
     public ShadingType shadingType = ShadingType.normalAngle;
     public Color lightColor = Color.white;
@@ -66,6 +70,15 @@ public class WavefrontObject{
                     vertices.add(new Vec3(vec[0], vec[1], vec[2]));
                 }
 
+                if(line.contains("vt ")){
+                    if(!hasTexture) hasTexture = true;
+                    String[] pos = line.replaceFirst("vt ", "").split("\\s+");
+                    Vec2 uv = new Vec2();
+                    uv.x = Strings.parseFloat(pos[0], 0f);
+                    uv.y = Strings.parseFloat(pos[1], 0f);
+                    uvs.add(uv);
+                }
+
                 if(line.contains("vn ")){
                     if(!hasNormal) hasNormal = true;
                     String[] pos = line.replaceFirst("vn ", "").split("\\s+");
@@ -87,6 +100,8 @@ public class WavefrontObject{
                     Face face = new Face();
                     face.verts = new Vertex[segments.length];
                     if(hasNormal) face.normal = new Vec3[segments.length];
+                    if(hasTexture) face.vertexTexture = new Vec2[segments.length];
+                    if(segments.length != 4) odd = true;
 
                     int[] i = {0};
                     for(String segment : segments){
@@ -97,9 +112,12 @@ public class WavefrontObject{
                         if(hasNormal){
                             face.normal[i[0]] = drawnNormals.get(getFaceVal(faceIndex[2]));
                         }
+                        if(hasTexture){
+                            face.vertexTexture[i[0]] = uvs.get(getFaceVal(faceIndex[1]));
+                        }
 
                         for(int sign : Mathf.signs){
-                            Vertex v = drawnVertices.get(faceTypeIndex(segments[Mathf.mod(sign + i[0], segments.length)], 0));
+                            Vertex v = drawnVertices.get(faceVertIndex(segments[Mathf.mod(sign + i[0], segments.length)]));
 
                             if(!face.verts[i[0]].neighbors.contains(v)){
                                 face.verts[i[0]].neighbors.add(v);
@@ -133,6 +151,9 @@ public class WavefrontObject{
                 throw new RuntimeException(e);
             }
         }
+        if(!Vars.headless && Core.atlas != null && hasTexture){
+            texture = Core.atlas.find("unity-" + textureName + "-tex");
+        }
     }
 
     public void draw(float x, float y, float rX, float rY, float rZ){
@@ -163,7 +184,8 @@ public class WavefrontObject{
                 indexerA++;
             }
             indexerZ /= indexerA;
-            Draw.z((indexerZ * zScale) + drawLayer);
+            float z = (indexerZ * zScale) + drawLayer;
+            Draw.z(z);
 
             switch(shadingType){
                 case zMedian -> zMedianDraw(face);
@@ -171,12 +193,19 @@ public class WavefrontObject{
                 case normalAngle -> normalAngleDraw(face);
                 default -> Draw.color(lightColor);
             }
+
+            float color = Draw.getColor().toFloatBits();
+            float mColor = Draw.getMixColor().toFloatBits();
             boolean shouldDraw = true;
             if(hasNormal){
                 if(Math.abs(face.normal[0].angle(Vec3.Z)) >= 90f) shouldDraw = false;
             }
             if(shouldDraw){
-                drawFace(face);
+                if(!odd){
+                    drawFace(face, color, mColor);
+                }else{
+                    Draw.draw(z, () -> drawFace(face, color, mColor));
+                }
             }
         }
         Draw.reset();
@@ -235,24 +264,31 @@ public class WavefrontObject{
         Draw.color(Tmp.c1);
     }
 
-    protected void drawFace(Face face){
+    protected void drawFace(Face face, float color, float mixColor){
         float[] dface = new float[face.size];
         TextureRegion region = Core.atlas.white();
         for(int i = 0; i < face.verts.length; i++){
             int s = i * 6;
             dface[s] = face.verts[i].source.x;
             dface[s + 1] = face.verts[i].source.y;
-            dface[s + 2] = Draw.getColor().toFloatBits();
-            dface[s + 3] = region.u;
-            dface[s + 4] = region.v;
-            dface[s + 5] = Draw.getMixColor().toFloatBits();
+            dface[s + 2] = color;
+            if(!hasTexture || texture == null){
+                dface[s + 3] = region.u;
+                dface[s + 4] = region.v;
+            }else{
+                float u = texture.u, v = texture.v;
+                float u2 = texture.u2, v2 = texture.v2;
+                dface[s + 3] = Mathf.lerp(u2, u, face.vertexTexture[i].x);
+                dface[s + 4] = Mathf.lerp(v, v2, face.vertexTexture[i].y);
+            }
+            dface[s + 5] = mixColor;
         }
 
-        Draw.vert(region.texture, dface, 0, dface.length);
+        Draw.vert((texture == null || !hasTexture) ? region.texture : texture.texture, dface, 0, dface.length);
     }
 
-    protected static int faceTypeIndex(String node, int type){
-        return getFaceVal(node.split("/")[type]);
+    protected static int faceVertIndex(String node){
+        return getFaceVal(node.split("/")[0]);
     }
 
     protected static int getFaceVal(String value){
