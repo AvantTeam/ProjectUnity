@@ -69,12 +69,12 @@ public class Sprite{
     }
 
     // Almost Bilinear Interpolation except the underlying color interpolator uses SpriteProcessor#pythagoreanLerp
-    Color getColor(float x, float y) {
+    Color getColor(float x, float y){
         // Cast floats into ints twice instead of casting 20 times
         int xInt = (int) x;
         int yInt = (int) y;
 
-        if (!Structs.inBounds(xInt, yInt, width, height)) return color.set(0, 0, 0, 0);
+        if(!Structs.inBounds(xInt, yInt, width, height)) return color.set(0, 0, 0, 0);
 
         // A lot of these booleans are commonly checked, so let's run each check just once
         boolean isXInt = x == xInt;
@@ -83,11 +83,11 @@ public class Sprite{
         boolean yOverflow = y + 1 > height;
 
         // Remember: x & y values themselves are already checked if in-bounds
-        if ((isXInt && isYInt) || (xOverflow && yOverflow)) return getColor(xInt, yInt);
+        if((isXInt && isYInt) || (xOverflow && yOverflow)) return getColor(xInt, yInt);
 
-        if (isXInt || xOverflow) {
+        if(isXInt || xOverflow){
             return color.set(MathUtil.colorLerp(Tmp.c1.set(getAlphaMedianColor(xInt, yInt)), getAlphaMedianColor(xInt, yInt + 1), y % 1));
-        } else if (isYInt || yOverflow) {
+        }else if(isYInt || yOverflow){
             return color.set(MathUtil.colorLerp(Tmp.c1.set(getAlphaMedianColor(xInt, yInt)), getAlphaMedianColor(xInt + 1, yInt), x % 1));
         }
 
@@ -100,9 +100,9 @@ public class Sprite{
         return color.set(MathUtil.colorLerp(Tmp.c1, Tmp.c2, y % 1));
     }
 
-    Color getAlphaMedianColor(int x, int y) {
+    Color getAlphaMedianColor(int x, int y){
         float alpha = getColor(x, y).a;
-        if (alpha >= 0.1f) return color;
+        if(alpha >= 0.1f) return color;
 
         return alphaMedian(
                 color.cpy(),
@@ -113,35 +113,35 @@ public class Sprite{
         ).a(alpha);
     }
 
-    Color alphaMedian(Color main, Color... colors) {
+    Color alphaMedian(Color main, Color... colors){
         ObjectIntMap<Color> matches = new ObjectIntMap<>();
         int count, primaryCount = -1, secondaryCount = -1;
 
         Tmp.c3.set(main);
         Tmp.c4.set(main);
 
-        for (Color color : colors) {
-            if (color.a < 0.1f) continue;
+        for(Color color : colors){
+            if(color.a < 0.1f) continue;
 
             count = matches.increment(color) + 1;
 
-            if (count > primaryCount) {
+            if(count > primaryCount){
                 secondaryCount = primaryCount;
                 Tmp.c4.set(Tmp.c3);
 
                 primaryCount = count;
                 Tmp.c3.set(color);
-            } else if (count > secondaryCount) {
+            }else if(count > secondaryCount){
                 secondaryCount = count;
                 Tmp.c4.set(color);
             }
         }
 
-        if (primaryCount > secondaryCount) {
+        if(primaryCount > secondaryCount){
             return color.set(Tmp.c3);
-        } else if (primaryCount == -1) {
+        }else if(primaryCount == -1){
             return color.set(main);
-        } else {
+        }else{
             return color.set(MathUtil.averageColor(Tmp.c3, Tmp.c4));
         }
     }
@@ -171,14 +171,15 @@ public class Sprite{
         int ofx = 0, ofy = 0;
 
         graphics.drawImage(sprite.sprite,
-        x, y,
-        x + sprite.width,
-        y + sprite.height,
-        (flipx ? sprite.width : 0) + ofx,
-        (flipy ? sprite.height : 0) + ofy,
-        (flipx ? 0 : sprite.width) + ofx,
-        (flipy ? 0 : sprite.height) + ofy,
-        null);
+            x, y,
+            x + sprite.width,
+            y + sprite.height,
+            (flipx ? sprite.width : 0) + ofx,
+            (flipy ? sprite.height : 0) + ofy,
+            (flipx ? 0 : sprite.width) + ofx,
+            (flipy ? 0 : sprite.height) + ofy,
+            null
+        );
     }
 
     void drawCenter(Sprite sprite){
