@@ -14,7 +14,8 @@ then
             echo $a
 
             # Alpha-bleeds the sprite.
-            ./alphableed-linux.exe $a
+            ./alpha-bleeding-linux.exe $a $a-bleed
+            mv $a-bleed $a
         fi
     done
 else
