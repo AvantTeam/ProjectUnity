@@ -37,7 +37,7 @@ task proc(dependsOn: [classes, configurations.runtimeClasspath]) {
             println()
             println 'Alpha-bleeding sprites...'
             if(windows()) {
-                commandLine('cmd', '/c', 'alpha-bleeding-windows.exe', '--replace', './assets/sprites/')
+                commandLine('cmd', '/c', 'alphableed.bat', './assets/sprites/')
             } else {
                 commandLine('./alpha-bleed', './assets/sprites/')
             }
