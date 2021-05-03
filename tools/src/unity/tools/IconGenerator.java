@@ -240,29 +240,29 @@ public class IconGenerator implements Generator{
                     }
                 }
 
-                if(unit instanceof Copterc) {
+                if(unit instanceof Copterc){
                     Sprite propellers = new Sprite(icon.width, icon.height);
 
-                    for(Rotor rotor : type.rotors) {
+                    for(Rotor rotor : type.rotors){
                         Sprite bladeSprite = SpriteProcessor.get(rotor.name.replace("unity-", "") + "-blade");
 
                         float bladeSeparation = 360f / rotor.bladeCount;
 
-                        float propXCenter = ( rotor.x * 4f / Draw.scl + icon.width  / 2f) - 0.5f;
+                        float propXCenter = (rotor.x * 4f / Draw.scl + icon.width / 2f) - 0.5f;
                         float propYCenter = (-rotor.y * 4f / Draw.scl + icon.height / 2f) - 0.5f;
 
                         float bladeSpriteXCenter = bladeSprite.width  / 2f - 0.5f;
                         float bladeSpriteYCenter = bladeSprite.height / 2f - 0.5f;
 
                         propellers.each((x, y) -> {
-                            for (int blade = 0; blade < rotor.bladeCount; blade++) {
+                            for(int blade = 0; blade < rotor.bladeCount; blade++){
                                 float deg = blade * bladeSeparation + rotor.rotOffset;
                                 float cos = Mathf.cosDeg(deg);
                                 float sin = Mathf.sinDeg(deg);
 
                                 Tmp.c1.set(bladeSprite.getColor(
-                                        ((propXCenter - x) * cos + (propYCenter - y) * sin) / rotor.scale + bladeSpriteXCenter,
-                                        ((propXCenter - x) * sin - (propYCenter - y) * cos) / rotor.scale + bladeSpriteYCenter
+                                    ((propXCenter - x) * cos + (propYCenter - y) * sin) / rotor.scale + bladeSpriteXCenter,
+                                    ((propXCenter - x) * sin - (propYCenter - y) * cos) / rotor.scale + bladeSpriteYCenter
                                 ));
 
                                 propellers.draw(x, y, Tmp.c1);
