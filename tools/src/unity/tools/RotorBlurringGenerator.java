@@ -1,6 +1,5 @@
 package unity.tools;
 
-import arc.graphics.Color;
 import arc.math.Mathf;
 import arc.util.Log;
 import arc.util.Tmp;
@@ -130,7 +129,7 @@ public class RotorBlurringGenerator implements Generator {
 				a *= a;
 
 				sprite.draw(x, y,
-						colorLerp(Tmp.c1.rgba8888(colorTable[arrayIndex]), Tmp.c2.rgba8888(colorTable[arrayIndex + 1]), positionLength % 1f)
+						MathUtil.colorLerp(Tmp.c1.rgba8888(colorTable[arrayIndex]), Tmp.c2.rgba8888(colorTable[arrayIndex + 1]), positionLength % 1f)
 								.mul(a, a, a, a * (1 - 0.5f / (tableLimit - positionLength + 0.5f)))
 				);
 			} else {
@@ -159,7 +158,7 @@ public class RotorBlurringGenerator implements Generator {
 			float positionLength = Mathf.len(x + spriteCenter, y + spriteCenter);
 
 			int arrayIndex = Mathf.clamp((int) positionLength >> 2 & 0xEFFFFFFE, 0, offsets.length - 2);
-			float offset = pythagoreanLerp(offsets[arrayIndex], offsets[arrayIndex + 1], (positionLength / 8f) % 1);
+			float offset = MathUtil.pythagoreanLerp(offsets[arrayIndex], offsets[arrayIndex + 1], (positionLength / 8f) % 1);
 
 			float a = Mathf.sin(Mathf.atan2(x + spriteCenter, y + spriteCenter) + offset);
 			a *= a; // Square the sine wave to make it all positive values
@@ -169,21 +168,4 @@ public class RotorBlurringGenerator implements Generator {
 			sprite.draw(x, y, Tmp.c1.rgb888(0xFF_FF_FF).a(Mathf.round(a) * Mathf.clamp(length - positionLength, 0f, 1f)));
 		});
  	}
-
-	private static Color colorLerp(Color a, Color b, float frac) {
-		return a.set(
-				pythagoreanLerp(a.r, b.r, frac),
-				pythagoreanLerp(a.g, b.g, frac),
-				pythagoreanLerp(a.b, b.b, frac),
-				pythagoreanLerp(a.a, b.a, frac)
-		);
-	}
-
-	// Pythagorean-style interpolation will result in color transitions that appear more natural than linear interpolation
-	private static float pythagoreanLerp(float a, float b, float frac) {
-		a *= a * (1 - frac);
-		b *= b * frac;
-
-		return Mathf.sqrt(a + b);
-	}
 }
