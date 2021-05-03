@@ -22,7 +22,7 @@ jobs:
         chmod +x gradlew
 
         chmod +x ./main/alpha-bleed
-        chmod +x ./main/alphableed-linux.exe
+        chmod +x ./main/alpha-bleeding-linux.exe
 
     - name: Build and dexify mod jar file
       run: ./gradlew main:deployDex
