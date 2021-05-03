@@ -58,6 +58,10 @@ public class PointBlastLaserBulletType extends BulletType{
         drawSize = Math.max(drawSize, length + damageRadius * 2f);
     }
 
+    public void handleUnit(Bullet b, Unit unit, float initialHealth){
+
+    }
+
     //new function instead of hitTile, to avoid hit() function
     public void handleBuilding(Bullet b, Building build, float initialHealth){
         build.damage(auraDamage);
@@ -92,7 +96,7 @@ public class PointBlastLaserBulletType extends BulletType{
             Units.nearby(Tmp.v2.x - damageRadius, Tmp.v2.y - damageRadius, damageRadius * 2f, damageRadius * 2f, unit -> {
                 if(unit.team != b.team && unit.within(Tmp.v2.x, Tmp.v2.y, damageRadius)){
                     float ratio = b.damage / damage;
-                    hitEntity(b, unit, unit.health);
+                    handleUnit(b, unit, unit.health);
                     unit.damage(auraDamage * ratio);
                     unit.apply(status, statusDuration);
                 }
