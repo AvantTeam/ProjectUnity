@@ -50,15 +50,9 @@ public class SpriteProcessor{
         content.setCurrentMod(null);
 
         Fi.get("./sprites/").walk(path -> {
-            if(path.extEquals("png") || path.extEquals("json")){
-                path.copyTo(Fi.get("./sprites-gen"));
-            }
-        });
-
-        Fi.get("./sprites-gen/").walk(path -> {
             if(!path.extEquals("png")) return;
 
-            String fname = path.nameWithoutExtension();
+            String fname = path.nameWithoutExtension().replaceFirst("/sprites/", "/sprites-gen/");
             try{
                 BufferedImage sprite = ImageIO.read(path.file());
                 if(sprite == null) throw new IOException("sprite " + path.absolutePath() + " is corrupted or invalid!");

@@ -3,6 +3,7 @@ sourceSets.main.java.srcDirs = ['src/']
 ext {
     imageProcessorMain = 'unity.tools.SpriteProcessor'
 
+    spritesRawFolder = '../main/assets-raw/sprites/'
     spritesGenFolder = '../main/assets-raw/sprites-gen/'
     spritesAssetsFolder = '../main/assets/sprites/'
 }
@@ -23,6 +24,11 @@ task proc(dependsOn: [classes, configurations.runtimeClasspath]) {
             jvmArgs += '-Djava.awt.headless=true'
             standardInput System.in
             workingDir file('../main/assets-raw/')
+        }
+
+        copy {
+            from spritesRawFolder
+            into spritesAssetsFolder
         }
 
         copy {
