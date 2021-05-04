@@ -278,8 +278,8 @@ public class WavefrontObject{
             }else{
                 float u = texture.u, v = texture.v;
                 float u2 = texture.u2, v2 = texture.v2;
-                dface[s + 3] = Mathf.lerp(u2, u, face.vertexTexture[i].x);
-                dface[s + 4] = Mathf.lerp(v, v2, face.vertexTexture[i].y);
+                dface[s + 3] = Mathf.lerp(u, u2, face.vertexTexture[i].x);
+                dface[s + 4] = Mathf.lerp(v2, v, face.vertexTexture[i].y);
             }
             dface[s + 5] = mixColor;
         }
