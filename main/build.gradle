@@ -40,6 +40,7 @@ task deploy(type: Jar, dependsOn: configurations.runtimeClasspath) {
     from files(sourceSets.main.output.resourcesDir)
     from configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     from files(project.assetsDir)
+    from(rootDir) { include 'mod.json' }
 
     doLast { delete {
         delete "$buildDir/libs/main-${version}.jar"
