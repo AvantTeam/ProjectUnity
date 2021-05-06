@@ -44,25 +44,25 @@ public class AssistantAI extends FlyingAI{
             if(fallback.unit() != unit) fallback.unit(unit);
 
             if(current != null){
-                Utils.invokeMethod(
+                ReflectUtils.invokeMethod(
                 fallback,
-                Utils.findMethod(fallback.getClass(), "updateTargeting", true, Utils.emptyClasses),
-                Utils.emptyObjects
+                ReflectUtils.findMethod(fallback.getClass(), "updateTargeting", true, ReflectUtils.emptyClasses),
+                ReflectUtils.emptyObjects
                 );
 
                 if(current.preserveVisuals){
-                    Utils.invokeMethod(
+                    ReflectUtils.invokeMethod(
                     fallback,
-                    Utils.findMethod(fallback.getClass(), "updateVisuals", true, Utils.emptyClasses),
-                    Utils.emptyObjects
+                    ReflectUtils.findMethod(fallback.getClass(), "updateVisuals", true, ReflectUtils.emptyClasses),
+                    ReflectUtils.emptyObjects
                     );
                 }
 
                 if(current.preserveMovement){
-                    Utils.invokeMethod(
+                    ReflectUtils.invokeMethod(
                     fallback,
-                    Utils.findMethod(fallback.getClass(), "updateMovement", true, Utils.emptyClasses),
-                    Utils.emptyObjects
+                    ReflectUtils.findMethod(fallback.getClass(), "updateMovement", true, ReflectUtils.emptyClasses),
+                    ReflectUtils.emptyObjects
                     );
                 }
             }else{
@@ -301,7 +301,7 @@ public class AssistantAI extends FlyingAI{
                 }
 
                 if(ai.fallback instanceof BuilderAI buildAI && ai.user instanceof Builderc builder){
-                    Utils.setField(buildAI, Utils.findField(buildAI.getClass(), "following", true), builder);
+                    ReflectUtils.setField(buildAI, ReflectUtils.findField(buildAI.getClass(), "following", true), builder);
                 }
             }
 

@@ -65,7 +65,7 @@ task dex(dependsOn: deploy) {
             command += file.path
         }
 
-        command += ['--min-api', sdkVersion, '--output', dexedArtifact, jarArtifact]
+        command += ['--min-api', sdkAPI, '--output', dexedArtifact, jarArtifact]
         if(windows()) {
             commandLine('cmd', '/c', *command)
         } else {

@@ -44,8 +44,8 @@ public class AttractLaserTurret extends LaserTurret{
         protected PitchedSoundLoop sound = new PitchedSoundLoop(chargeSound, chargeSoundVolume);
 
         // thanks anuke for making the fields package-private
-        private Field bulletf = Utils.findField(getClass(), "bullet", true);
-        private Field bulletLifef = Utils.findField(getClass(), "bulletLife", true);
+        private Field bulletf = ReflectUtils.findField(getClass(), "bullet", true);
+        private Field bulletLifef = ReflectUtils.findField(getClass(), "bulletLife", true);
 
         @Override
         public void updateTile(){
@@ -125,11 +125,11 @@ public class AttractLaserTurret extends LaserTurret{
         }
 
         public float bulletLife(){
-            return Utils.getField(this, bulletLifef);
+            return ReflectUtils.getField(this, bulletLifef);
         }
 
         public Bullet bullet(){
-            return Utils.getField(this, bulletf);
+            return ReflectUtils.getField(this, bulletf);
         }
     }
 }

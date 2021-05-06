@@ -22,6 +22,7 @@ allprojects {
 
     ext {
         sdkVersion = '30'
+        sdkAPI = '26'
 
         sdkRoot = {
             return System.getenv('ANDROID_SDK_ROOT')
