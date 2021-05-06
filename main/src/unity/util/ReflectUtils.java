@@ -10,12 +10,11 @@ import java.lang.invoke.MethodHandles.*;
 import java.lang.reflect.*;
 
 import static unity.Unity.*;
+import static mindustry.Vars.*;
 
 /** @author GlennFolker */
 @SuppressWarnings({"unchecked", "rawtypes"})
 public final class ReflectUtils{
-    private static final boolean android = Core.app.getType() == ApplicationType.android;
-
     private static final MethodHandle modifiers;
     private static final MethodHandle declClass;
     private static final Field modifiersAnd;
