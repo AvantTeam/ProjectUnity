@@ -191,7 +191,7 @@ public class IconGenerator implements Generator{
                     weapon.load();
                     String wname = weapon.name.replaceFirst("unity-", "");
 
-                    if(!weapon.top && SpriteProcessor.has(wname)){
+                    if((!weapon.top || type.bottomWeapons.contains(weapon.name)) && SpriteProcessor.has(wname)){
                         Sprite weapSprite = SpriteProcessor.get(wname);
 
                         icon.draw(weapSprite,
@@ -221,7 +221,7 @@ public class IconGenerator implements Generator{
                     weapon.load();
                     String wname = weapon.name.replaceFirst("unity-", "");
 
-                    if(SpriteProcessor.has(wname)){
+                    if(SpriteProcessor.has(wname) && !type.bottomWeapons.contains(weapon.name)){
                         Sprite weapSprite = SpriteProcessor.get(wname);
 
                         icon.draw(weapSprite,
