@@ -27,7 +27,7 @@ public class UnityUnitType extends UnitType{
     public final Seq<Weapon> segWeapSeq = new Seq<>();
     public Color outlineColor = Pal.darkerMetal;
 
-    public TextureRegion segmentRegion, tailRegion, segmentCellRegion, segmentOutline, tailOutline, legBackRegion, legBaseBackRegion, footBackRegion, legMiddleRegion;
+    public TextureRegion segmentRegion, tailRegion, segmentCellRegion, segmentOutline, tailOutline, legBackRegion, legBaseBackRegion, footBackRegion, legMiddleRegion, payloadCellRegion;
     public TextureRegion[] abilityRegions = new TextureRegion[AbilityTextures.values().length];
     public Seq<String> bottomWeapons = new Seq<>();
     // Worms
@@ -115,6 +115,7 @@ public class UnityUnitType extends UnitType{
         legBaseBackRegion = atlas.find(name + "-leg-base-back");
         footBackRegion = atlas.find(name + "-foot-back");
         legMiddleRegion = atlas.find(name + "-leg-middle", legRegion);
+        payloadCellRegion = atlas.find(name + "-cell-payload", cellRegion);
         laserRegion = atlas.find("laser");
         laserEndRegion = atlas.find("laser-end");
         //abilities
@@ -182,6 +183,19 @@ public class UnityUnitType extends UnitType{
         // copter
         if(unit instanceof Copterc){
             drawRotors((Unit & Copterc)unit);
+        }
+    }
+
+    @Override
+    public void drawCell(Unit unit) {
+        if (unit.isAdded()) {
+            super.drawCell(unit);
+        } else {
+            applyColor(unit);
+
+            Draw.color(cellColor(unit));
+            Draw.rect(payloadCellRegion, unit.x, unit.y, unit.rotation - 90);
+            Draw.reset();
         }
     }
 

@@ -191,7 +191,7 @@ public class IconGenerator implements Generator{
                     weapon.load();
                     String wname = weapon.name.replaceFirst("unity-", "");
 
-                    if(!weapon.top && SpriteProcessor.has(wname)){
+                    if((!weapon.top || type.bottomWeapons.contains(weapon.name)) && SpriteProcessor.has(wname)){
                         Sprite weapSprite = SpriteProcessor.get(wname);
 
                         icon.draw(weapSprite,
@@ -221,7 +221,7 @@ public class IconGenerator implements Generator{
                     weapon.load();
                     String wname = weapon.name.replaceFirst("unity-", "");
 
-                    if(SpriteProcessor.has(wname)){
+                    if(SpriteProcessor.has(wname) && !type.bottomWeapons.contains(weapon.name)){
                         Sprite weapSprite = SpriteProcessor.get(wname);
 
                         icon.draw(weapSprite,
@@ -279,10 +279,28 @@ public class IconGenerator implements Generator{
                         tops.draw(topSprite, topXCenter, topYCenter);
                     }
 
-                    icon.draw(propellers.outline(3, type.outlineColor));
-                    icon.draw(propellers);
+                    Sprite propOutlined = propellers.outline(3, type.outlineColor);
+                    propOutlined.draw(propellers, 0, 0);
+
+                    icon.draw(propOutlined);
                     icon.draw(tops.outline(3, type.outlineColor));
                     icon.draw(tops);
+
+                    Sprite payloadCell = new Sprite(baseCell.width, baseCell.height);
+                    int cellCenterX = payloadCell.width / 2;
+                    int cellCenterY = payloadCell.height / 2;
+                    int propCenterX = propOutlined.width / 2;
+                    int propCenterY = propOutlined.height / 2;
+
+                    payloadCell.each((x, y) -> {
+                        int cellX = x - cellCenterX;
+                        int cellY = y - cellCenterY;
+
+                        float alpha = propOutlined.getColor(cellX + propCenterX, cellY + propCenterY).a;
+                        payloadCell.draw(x, y, baseCell.getColor(x, y).mul(1, 1, 1, 1 - alpha));
+                    });
+
+                    payloadCell.save(fname + "-cell-payload");
                 }
 
                 icon.antialias().save(fname + "-full");
