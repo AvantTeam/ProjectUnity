@@ -42,9 +42,16 @@ public class ParentEffect extends Effect{
                 entity.lifetime = (effect.lifetime);
                 entity.set(x, y);
                 entity.color.set(color);
+                float rotationA = 0f;
+                if(data instanceof Rotc){
+                    rotationA = ((Rotc)data).rotation();
+                }else if(data instanceof BaseTurretBuild){
+                    rotationA = ((BaseTurretBuild)data).rotation;
+                }
                 if(data instanceof Posc){
                     entity.parent = ((Posc)data);
-                    entity.positionRotation = (((Posc)data).angleTo(entity) - rotation);
+                    //entity.positionRotation = (((Posc)data).angleTo(entity) - rotation);
+                    entity.positionRotation = (((Posc)data).angleTo(entity) - rotationA);
                 }
                 entity.add();
             }

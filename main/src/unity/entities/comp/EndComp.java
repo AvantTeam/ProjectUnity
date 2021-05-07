@@ -7,7 +7,6 @@ import mindustry.content.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
-import unity.*;
 import unity.annotations.Annotations.*;
 import unity.type.*;
 
@@ -19,7 +18,7 @@ abstract class EndComp implements Unitc{
     private float[] invFrames;
     private transient int invIndex = 0;
     private float resist, resistMax, resistTime;
-    private transient boolean failed;
+    //private transient boolean failed = false;
 
     @Import UnitType type;
     @Import WeaponMount[] mounts;
@@ -28,7 +27,7 @@ abstract class EndComp implements Unitc{
 
     @Override
     public void add(){
-        if(!failed){
+        /*if(!failed){
             UnityUnitType utype = (UnityUnitType)type;
             AntiCheatVariables aType = utype.antiCheatType;
 
@@ -38,9 +37,17 @@ abstract class EndComp implements Unitc{
             if(aType != null) invFrames = new float[aType.invincibilityArray];
 
             Unity.antiCheat.addUnit(self());
-        }
+        }*/
+        UnityUnitType utype = (UnityUnitType)type;
+        AntiCheatVariables aType = utype.antiCheatType;
+
+        lastHealth = type.health;
+        lastMaxHealth = type.health;
+
+        if(aType != null) invFrames = new float[aType.invincibilityArray];
     }
 
+    /*
     @MethodPriority(100)
     @Override
     public void remove(){
@@ -54,6 +61,7 @@ abstract class EndComp implements Unitc{
             Unity.antiCheat.removeUnit(self());
         }
     }
+    */
 
     @Override
     @Replace
