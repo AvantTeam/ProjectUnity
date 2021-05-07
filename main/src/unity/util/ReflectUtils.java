@@ -1,7 +1,5 @@
 package unity.util;
 
-import arc.*;
-import arc.Application.*;
 import arc.struct.*;
 import arc.util.Structs;
 
