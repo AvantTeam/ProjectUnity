@@ -303,7 +303,12 @@ public class EntityProcessor extends BaseProcessor{
                             fbuilder.initializer(varInitializers.get(descString(field)));
                         }
 
-                        fbuilder.addModifiers(annotation(field, ReadOnly.class) != null ? Modifier.PROTECTED : Modifier.PUBLIC);
+                        if(is(field, Modifier.PRIVATE)){
+                            fbuilder.addModifiers(Modifier.PRIVATE);
+                        }else{
+                            fbuilder.addModifiers(annotation(field, ReadOnly.class) != null ? Modifier.PROTECTED : Modifier.PUBLIC);
+                        }
+
                         fbuilder.addAnnotations(Seq.with(field.getAnnotationMirrors()).map(AnnotationSpec::get));
                         FieldSpec spec = fbuilder.build();
 
