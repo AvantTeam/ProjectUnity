@@ -111,6 +111,9 @@ public class UnityUnitTypes implements ContentList{
     public static @FactionDef("koruh") @EntityPoint(Kami.class)
     UnitType kami;
 
+    // end
+    public static @FactionDef("end") @EntityDef({Unitc.class, Endc.class}) UnitType voidVessel;
+
     // end invisible
     public static @FactionDef("end") @EntityPoint(EndInvisibleUnit.class) UnitType opticaecus;
 
@@ -3062,7 +3065,43 @@ public class UnityUnitTypes implements ContentList{
         }};
 
         //endregion
-        //region dark
+        //region end
+
+        voidVessel = new UnityUnitType("void-vessel"){{
+            health = 10000f;
+            speed = 3f;
+            accel = 0.1f;
+            drag = 0.03f;
+            hitSize = 16f;
+            engineOffset = 12.5f;
+            engineSize = 1.5f;
+            flying = true;
+            lowAltitude = true;
+            outlineColor = UnityPal.darkerOutline;
+
+            antiCheatType = new AntiCheatVariables(health / 25f, health / 1.5f, health / 15f, health / 30f, 0.5f, 6f * 60f, 3f * 60f, 15f, 4);
+            weapons.add(new Weapon("unity-end-small-mount"){{
+                x = 5.75f;
+                y = -0.5f;
+                mirror = true;
+                rotate = true;
+                reload = 30f;
+                shots = 2;
+                spacing = 15f;
+
+                bullet = UnityBullets.endTentacleSmall;
+            }}, new Weapon("unity-end-small-mount"){{
+                x = 10.75f;
+                y = -5f;
+                mirror = true;
+                rotate = true;
+                reload = 30f;
+                shots = 2;
+                spacing = 20f;
+
+                bullet = UnityBullets.endTentacleSmall;
+            }});
+        }};
 
         opticaecus = new InvisibleUnitType("opticaecus"){{
             health = 60000f;

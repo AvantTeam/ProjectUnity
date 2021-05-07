@@ -29,7 +29,7 @@ public class UnityUnitType extends UnitType{
 
     public TextureRegion segmentRegion, tailRegion, segmentCellRegion, segmentOutline, tailOutline, legBackRegion, legBaseBackRegion, footBackRegion, legMiddleRegion, payloadCellRegion;
     public TextureRegion[] abilityRegions = new TextureRegion[AbilityTextures.values().length];
-    public Seq<String> bottomWeapons = new Seq<>();
+    public ObjectSet<String> bottomWeapons = new ObjectSet<>();
     // Worms
     public int segmentLength = 9, maxSegments = -1;
     public float segmentOffset = 23f, headOffset = 0f;
@@ -85,6 +85,10 @@ public class UnityUnitType extends UnitType{
     public UnityUnitType linkType;
     public int linkCount = 1;
     public float rotationSpeed = 20f;
+
+    // End units
+
+    public AntiCheatVariables antiCheatType;
 
     public UnityUnitType(String name){
         super(name);

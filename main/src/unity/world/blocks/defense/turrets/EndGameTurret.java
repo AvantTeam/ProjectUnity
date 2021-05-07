@@ -60,6 +60,7 @@ public class EndGameTurret extends PowerTurret{
         absorbLasers = true;
         shootShake = 2.2f;
         outlineIcon = false;
+        noUpdateDisabled = false;
         loopSound = UnitySounds.endgameActive;
         shootSound = UnitySounds.endgameShoot;
     }
@@ -456,6 +457,7 @@ public class EndGameTurret extends PowerTurret{
 
         @Override
         public void updateTile(){
+            enabled = true;
             lastHealth = health;
             charge = Math.max(0f, charge - (Time.delta / 20f));
             

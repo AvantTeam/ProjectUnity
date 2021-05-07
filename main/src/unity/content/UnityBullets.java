@@ -56,7 +56,9 @@ public class UnityBullets implements ContentList{
 
         supernovaLaser,
 
-        ravagerLaser, ravagerArtillery, missileAntiCheat, endLaserSmall, laserZap,
+        ravagerLaser, ravagerArtillery, missileAntiCheat, endLaserSmall, endTentacleSmall,
+
+        laserZap,
 
         plasmaBullet, phantasmalBullet,
 
@@ -1103,6 +1105,14 @@ public class UnityBullets implements ContentList{
                 if(other instanceof AntiCheatBase) ((AntiCheatBase)other).overrideAntiCheatDamage(damage * 6f, 3);
             }
         };
+
+        endTentacleSmall = new TentacleBulletType(120f){{
+            fromColor = Color.red;
+            toColor = Color.black;
+            length = 190f;
+            width = 6f;
+            segments = 12;
+        }};
 
         laserZap = new LaserBulletType(90f){{
             sideAngle = 15f;
