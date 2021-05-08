@@ -43,6 +43,7 @@ public class EntityProcessor extends BaseProcessor{
     Seq<TypeSpec.Builder> baseClasses = new Seq<>();
     ObjectMap<TypeElement, ObjectSet<TypeElement>> baseClassDeps = new ObjectMap<>();
     ObjectMap<TypeElement, Seq<TypeElement>> componentDependencies = new ObjectMap<>();
+    ObjectMap<TypeElement, ObjectMap<String, Seq<ExecutableElement>>> inserters = new ObjectMap<>();
     Seq<TypeElement> inters = new Seq<>();
     Seq<Element> defs = new Seq<>();
     Seq<EntityDefinition> definitions = new Seq<>();
@@ -64,6 +65,16 @@ public class EntityProcessor extends BaseProcessor{
         inters.addAll((Set<TypeElement>)roundEnv.getElementsAnnotatedWith(EntityInterface.class));
         defs.addAll(roundEnv.getElementsAnnotatedWith(EntityDef.class));
         pointers.addAll(roundEnv.getElementsAnnotatedWith(EntityPoint.class));
+
+        for(ExecutableElement e : (Set<ExecutableElement>)roundEnv.getElementsAnnotatedWith(Insert.class)){
+            if(!e.getParameters().isEmpty()) throw new IllegalStateException("All @Insert methods must not have parameters");
+
+            Insert ann = annotation(e, Insert.class);
+            inserters
+                .get(comps.find(c -> simpleName(c).equals(simpleName(e.getEnclosingElement()))), ObjectMap::new)
+                .get(ann.value(), Seq::new)
+                .add(e);
+        }
 
         if(round == 1){
             serializer = TypeIOResolver.resolve(this);
@@ -279,7 +290,14 @@ public class EntityProcessor extends BaseProcessor{
 
                 boolean isSync = defComps.contains(s -> simpleName(s).contains("Sync"));
 
+                ObjectMap<String, Seq<ExecutableElement>> ins = new ObjectMap<>();
+
                 for(TypeElement comp : defComps){
+                    ObjectMap<String, Seq<ExecutableElement>> insComp = inserters.get(comp, ObjectMap::new);
+                    for(String s : insComp.keys()){
+                        ins.get(s, Seq::new).addAll(insComp.get(s));
+                    }
+
                     boolean isShadowed = baseClass != null && !typeIsBase && baseClassDeps.get(baseClassType, ObjectSet::new).contains(comp);
 
                     Seq<VariableElement> fields = vars(comp).select(v -> annotation(v, Import.class) == null);
@@ -370,7 +388,7 @@ public class EntityProcessor extends BaseProcessor{
                         throw new IllegalStateException("Type " + simpleName(def) + " has multiple components implementing non-void method " + entry.key + ".");
                     }
 
-                    entry.value.sort(Structs.comps(Structs.comparingFloat(m -> annotation(m, MethodPriority.class) != null ? annotation(m, MethodPriority.class).value() : 0), Structs.comparing(e -> simpleName(e))));
+                    entry.value.sort(Structs.comps(Structs.comparingFloat(m -> annotation(m, MethodPriority.class) != null ? annotation(m, MethodPriority.class).value() : 0), Structs.comparing(BaseProcessor::simpleName)));
 
                     ExecutableElement first = entry.value.first();
 
@@ -398,11 +416,33 @@ public class EntityProcessor extends BaseProcessor{
                     }
 
                     if(simpleName(first).equals("add") || simpleName(first).equals("remove")){
-                        mbuilder.addStatement("if(added == $L) return", simpleName(first).equals("add"));
+                        mbuilder.addStatement("if($Ladded) return", simpleName(first).equals("add") ? "" : "!");
 
                         for(String group : defGroups){
                             mbuilder.addStatement("Groups.$L.$L(this)", group, simpleName(first));
                         }
+                    }
+
+                    Seq<ExecutableElement> inserts = ins.get(entry.key, Seq::new);
+                    if(first.getReturnType().getKind() != VOID && !inserts.isEmpty()){
+                        throw new IllegalStateException("Method " + entry.key + " is not void, therefore no methods can @Insert to it");
+                    }
+
+                    Seq<ExecutableElement> noComp = inserts.select(e -> typeUtils.isSameType(
+                        elements(annotation(e, Insert.class)::block).first().asType(),
+                        elementUtils.getTypeElement("java.lang.Void").asType()
+                    ));
+
+                    Seq<ExecutableElement> noCompBefore = noComp.select(e -> !annotation(e, Insert.class).after());
+                    noCompBefore.sort(Structs.comps(Structs.comparingFloat(m -> annotation(m, MethodPriority.class) != null ? annotation(m, MethodPriority.class).value() : 0), Structs.comparing(BaseProcessor::simpleName)));
+
+                    Seq<ExecutableElement> noCompAfter = noComp.select(e -> annotation(e, Insert.class).after());
+                    noCompAfter.sort(Structs.comps(Structs.comparingFloat(m -> annotation(m, MethodPriority.class) != null ? annotation(m, MethodPriority.class).value() : 0), Structs.comparing(BaseProcessor::simpleName)));
+
+                    inserts = inserts.select(e -> !noComp.contains(e));
+
+                    for(ExecutableElement e : noCompBefore){
+                        mbuilder.addStatement("this.$L()", simpleName(e));
                     }
 
                     if(hasIO){
@@ -443,17 +483,32 @@ public class EntityProcessor extends BaseProcessor{
 
                     boolean firstc = true;
                     for(ExecutableElement elem : entry.value){
+                        String descStr = descString(elem);
+                        String blockName = simpleName(elem.getEnclosingElement()).toLowerCase().replace("comp", "");
+
+                        Seq<ExecutableElement> insertComp = inserts.select(e ->
+                            simpleName(toComp((TypeElement)elements(annotation(e, Insert.class)::block).first()))
+                            .toLowerCase().replace("comp", "")
+                            .equals(blockName)
+                        );
+
+                        if(is(elem, Modifier.ABSTRACT) || is(elem, Modifier.NATIVE) || (!methodBlocks.containsKey(descStr) && insertComp.isEmpty())) continue;
                         if(!firstc) mbuilder.addCode(lnew());
                         firstc = false;
 
-                        String descStr = descString(elem);
+                        Seq<ExecutableElement> compBefore = insertComp.select(e -> !annotation(e, Insert.class).after());
+                        compBefore.sort(Structs.comps(Structs.comparingFloat(m -> annotation(m, MethodPriority.class) != null ? annotation(m, MethodPriority.class).value() : 0), Structs.comparing(BaseProcessor::simpleName)));
 
-                        if(is(elem, Modifier.ABSTRACT) || is(elem, Modifier.NATIVE) || !methodBlocks.containsKey(descStr)) continue;
+                        Seq<ExecutableElement> compAfter = insertComp.select(e -> annotation(e, Insert.class).after());
+                        compAfter.sort(Structs.comps(Structs.comparingFloat(m -> annotation(m, MethodPriority.class) != null ? annotation(m, MethodPriority.class).value() : 0), Structs.comparing(BaseProcessor::simpleName)));
 
-                        String blockName = simpleName(elem.getEnclosingElement()).toLowerCase().replace("comp", "");
                         String str = methodBlocks.get(descStr);
                         str = str.substring(1, str.length() - 1).trim().replace("\n    ", "\n").trim();
                         str += '\n';
+
+                        for(ExecutableElement e : compBefore){
+                            mbuilder.addStatement("this.$L()", simpleName(e));
+                        }
 
                         if(writeBlock){
                             str = str.replace("return;", "break " + blockName + ";");
@@ -465,6 +520,15 @@ public class EntityProcessor extends BaseProcessor{
                         mbuilder.addCode(str);
 
                         if(writeBlock) mbuilder.endControlFlow();
+
+                        for(ExecutableElement e : compAfter){
+                            mbuilder.addStatement("this.$L()", simpleName(e));
+                        }
+                    }
+
+                    if(!firstc && !noCompAfter.isEmpty()) mbuilder.addCode(lnew());
+                    for(ExecutableElement e : noCompAfter){
+                        mbuilder.addStatement("this.$L()", simpleName(e));
                     }
 
                     if(simpleName(first).equals("remove") && ann.pooled()){

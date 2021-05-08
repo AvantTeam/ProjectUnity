@@ -185,9 +185,29 @@ public class Annotations{
     public @interface InternalImpl{}
 
     /** Used for method appender sorting */
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.SOURCE)
     public @interface MethodPriority{
         /** @return The priority */
         int value();
+    }
+
+    /** Inserts this parameter-less method into another void method */
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface Insert{
+        /**
+         * @return The target method described in {@link String} with the format {@code <methodName>(<paramType>...)}.
+         * For example, when targetting {@code void call(String arg, int prior)}, the target descriptor must be
+         * {@code call(java.lang.String, int)}
+         */
+        String value();
+
+        /** @return The component-specific method implementation to target */
+        Class<?> block() default Void.class;
+
+        /** @return Whether the call to this method is after the default or not */
+        boolean after() default true;
     }
 
     /** Loads texture regions but does not assign them to their acquirers */
