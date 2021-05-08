@@ -75,20 +75,30 @@ public class AssistantAI extends FlyingAI{
     }
 
     public void updateAssistance(){
+        if(current != null && !current.predicate.get(this)){
+            current.dispose(this);
+            current.initialized = false;
+
+            current = null;
+        }
+
         for(Assistance service : services){
             if(current != null && !current.predicate.get(this)){
                 current.dispose(this);
                 current = null;
             }
 
-            if(current != service && service.predicate.get(this)){
+            if(current != service && (current == null || service.priority < current.priority) && service.predicate.get(this)){
                 if(current != null) current.dispose(this);
 
                 current = service;
-                current.init(this);
-
                 break;
             }
+        }
+
+        if(current != null && !current.initialized){
+            current.init(this);
+            current.initialized = true;
         }
 
         if((
@@ -187,7 +197,13 @@ public class AssistantAI extends FlyingAI{
     @Override
     protected void init(){
         updateUser();
-        displayMessage("service.init");
+        if(!unit.dead()){
+            displayMessage("service.init");
+        }
+    }
+
+    protected boolean hasAmmo(){
+        return !state.rules.unitAmmo || unit.ammof() > 0f;
     }
 
     public enum Assistance{
@@ -206,7 +222,7 @@ public class AssistantAI extends FlyingAI{
             }
 
             boolean canMend(AssistantAI ai){
-                return ai.unit.ammof() > 0f && ai.unit.type.weapons.contains(w -> w.bullet.healPercent > 0f && w.bullet.collidesTeam);
+                return ai.hasAmmo() && ai.unit.type.weapons.contains(w -> w.bullet.healPercent > 0f && w.bullet.collidesTeam);
             }
 
             CoreBuild tile(AssistantAI ai){
@@ -220,7 +236,7 @@ public class AssistantAI extends FlyingAI{
 
             @Override
             protected void dispose(AssistantAI ai){
-                if(state.teams.cores(ai.unit.team).contains(b -> b.health() < b.maxHealth()) || ai.unit.ammof() <= 0f){
+                if(state.teams.cores(ai.unit.team).contains(b -> b.health() < b.maxHealth()) || ai.hasAmmo()){
                     ai.displayMessage("service.outofammo");
                 }else{
                     ai.displayMessage("service.coredone");
@@ -376,7 +392,7 @@ public class AssistantAI extends FlyingAI{
                     target.within(ai.unit, rad) &&
                     target.health() < target.maxHealth();
 
-                predicate = ai -> ai.unit.ammof() > 0f && hasTarget(ai);
+                predicate = ai -> ai.hasAmmo() && hasTarget(ai);
 
                 preserveVisuals = preserveMovement = true;
             }
@@ -398,10 +414,8 @@ public class AssistantAI extends FlyingAI{
                     ai.fallback = null;
                 }
 
-                if(hasTarget(ai) || ai.unit.ammof() <= 0f){
+                if(hasTarget(ai) || !ai.hasAmmo()){
                     ai.displayMessage("service.outofammo");
-                }else{
-                    ai.displayMessage("service.menddone");
                 }
             }
 
@@ -423,6 +437,8 @@ public class AssistantAI extends FlyingAI{
 
         protected Boolf<AssistantAI> updateMovement = ai -> false;
         protected boolean preserveMovement = false;
+
+        protected boolean initialized = false;
 
         protected void init(AssistantAI ai){}
 
