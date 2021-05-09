@@ -1109,9 +1109,12 @@ public class UnityBullets implements ContentList{
         endTentacleSmall = new TentacleBulletType(120f){{
             fromColor = Color.red;
             toColor = Color.black;
-            length = 190f;
+            length = 290f;
             width = 6f;
-            segments = 12;
+            segments = 13;
+            lifetime = 35f;
+            angleVelocity = 6.5f;
+            angleDrag = 0.16f;
         }};
 
         laserZap = new LaserBulletType(90f){{

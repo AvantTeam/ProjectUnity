@@ -75,12 +75,14 @@ public class PointBlastLaserBulletType extends BulletType{
         Tmp.v1.trns(b.rotation(), length);
         Tmp.v1.add(b);
         available = false;
-        Utils.collideLineRaw(b.x, b.y, Tmp.v1.x, Tmp.v1.y, building -> building.team != b.team, unit -> unit.team != b.team, building -> {
-            building.damage(b.damage);
-            available = true;
-            b.fdata = b.dst(building);
-            Tmp.v2.trns(b.rotation(), b.dst(building));
-            Tmp.v2.add(b.x, b.y);
+        Utils.collideLineRawEnemy(b.team, b.x, b.y, Tmp.v1.x, Tmp.v1.y, (building, direct) -> {
+            if(direct){
+                building.damage(b.damage);
+                available = true;
+                b.fdata = b.dst(building);
+                Tmp.v2.trns(b.rotation(), b.dst(building));
+                Tmp.v2.add(b.x, b.y);
+            }
             return building.block.absorbLasers;
         }, unit -> {
             available = true;
@@ -88,7 +90,7 @@ public class PointBlastLaserBulletType extends BulletType{
             Tmp.v2.add(b.x, b.y);
             unit.damage(b.damage);
             unit.apply(status, statusDuration);
-        }, unit -> ((length * 1.5f) - (b.dst(unit) / 2f)) + unit.health(), building -> building.block.absorbLasers, hitEffect);
+        }, entity -> (b.dst(entity) / 2f) - entity.health(), (ex, ey) -> hitEffect.at(ex, ey, b.rotation()));
 
         if(available){
             b.fdata = b.dst(Tmp.v2);

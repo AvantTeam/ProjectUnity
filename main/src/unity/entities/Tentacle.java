@@ -97,10 +97,12 @@ public class Tentacle{
             if((endVelocity.len() - type.startVelocity) > 0.0001f && type.speed > 0){
                 float damage = type.tentacleDamage * Interp.pow2In.apply(Mathf.clamp(((endVelocity.len() - type.startVelocity) * (1f + (type.startVelocity / type.speed))) / type.speed));
                 if(damage > 0){
-                    Utils.collideLineRawEnemy(unit.team, last().getX(), last().getY(), lastTipX, lastTipY, building -> {
-                        building.damage(damage);
-                        return true;
-                    }, unit1 -> unit1.damage(damage), Fx.hitBulletSmall);
+                    Utils.collideLineRawEnemy(unit.team, last().getX(), last().getY(), lastTipX, lastTipY, (building, aBoolean) -> {
+                        if(aBoolean){
+                            building.damage(damage);
+                        }
+                        return false;
+                    }, unit1 -> unit1.damage(damage), null, Fx.hitBulletSmall::at);
                 }
             }
             lastTipX = last().getX();

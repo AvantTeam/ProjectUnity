@@ -105,27 +105,30 @@ public class EndCutterLaserBulletType extends BulletType{
         if(b.timer(0, 5f)){
             hit = false;
             Tmp.v1.trns(b.rotation(), b.fdata).add(b);
-            Utils.collideLineRawEnemy(b.team, b.x, b.y, Tmp.v1.x, Tmp.v1.y, building -> {
+            Utils.collideLineRawEnemy(b.team, b.x, b.y, Tmp.v1.x, Tmp.v1.y, (building, direct) -> {
                 if(hit) return true;
-                if(building.health > damage * buildingDamageMultiplier){
-                    Tmp.v2.trns(b.rotation(), maxLength * 1.5f).add(b);
-                    float dst = Intersector.distanceLinePoint(b.x, b.y, Tmp.v2.x, Tmp.v2.y, building.x, building.y);
-                    b.fdata = ((b.dst(building) - (building.block.size / (float)Vars.tilesize / 2f)) + dst) + 4f;
-                    if(b.data instanceof LaserData){
-                        LaserData data = (LaserData)b.data;
-                        data.velocity = 0f;
-                        data.restartTime = 0f;
-                        data.velocityTime = 0f;
-                    }
-                    Tmp.v2.trns(b.rotation(), b.fdata).add(b);
-                    //UnityFx.tenmeikiriTipHit.at(Tmp.v2.x, Tmp.v2.y, b.rotation() + 180f);
-                    for(int i = 0; i < 2; i++){
-                        UnityFx.tenmeikiriTipHit.at(Tmp.v2.x + Mathf.range(4f), Tmp.v2.y + Mathf.range(4f), b.rotation() + 180f);
+                if(direct){
+                    if(building.health > damage * buildingDamageMultiplier * 0.5f){
+                        Tmp.v2.trns(b.rotation(), maxLength * 1.5f).add(b);
+                        float dst = Intersector.distanceLinePoint(b.x, b.y, Tmp.v2.x, Tmp.v2.y, building.x, building.y);
+                        b.fdata = ((b.dst(building) - (building.block.size / (float)Vars.tilesize / 2f)) + dst) + 4f;
+                        if(b.data instanceof LaserData){
+                            LaserData data = (LaserData)b.data;
+                            data.velocity = 0f;
+                            data.restartTime = 0f;
+                            data.velocityTime = 0f;
+                        }
+                        Tmp.v2.trns(b.rotation(), b.fdata).add(b);
+                        //UnityFx.tenmeikiriTipHit.at(Tmp.v2.x, Tmp.v2.y, b.rotation() + 180f);
+                        for(int i = 0; i < 2; i++){
+                            UnityFx.tenmeikiriTipHit.at(Tmp.v2.x + Mathf.range(4f), Tmp.v2.y + Mathf.range(4f), b.rotation() + 180f);
+                        }
+                        building.damage(damage * buildingDamageMultiplier);
+                        hit = true;
+                        return true;
                     }
                     building.damage(damage * buildingDamageMultiplier);
-                    return true;
                 }
-                building.damage(damage * buildingDamageMultiplier);
                 return false;
             }, unit -> {
                 if(hit) return;
@@ -145,7 +148,7 @@ public class EndCutterLaserBulletType extends BulletType{
                     }
                     hit = true;
                 }
-                
+
                 float lastHealth = unit.health;
                 float extraDamage = (float)Math.pow(Mathf.clamp((unit.maxHealth + unit.type.dpsEstimate - minimumPower) / powerFade, 0f, 8f), 2f);
                 float trueDamage = damage + Mathf.clamp((unit.maxHealth + unit.type.dpsEstimate - minimumUnitScore) / 2f, 0f, 90000000f);
@@ -162,7 +165,7 @@ public class EndCutterLaserBulletType extends BulletType{
                     Tmp.v2.trns(b.rotation(), maxLength * 1.5f).add(b);
                     UnitCutEffect.createCut(unit, b.x, b.y, Tmp.v2.x, Tmp.v2.y);
                 }
-            }, hitEffect);
+            }, (ex, ey) -> hitEffect.at(ex, ey, b.rotation()), true);
         }
         
         if(b.data instanceof LaserData){

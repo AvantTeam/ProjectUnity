@@ -352,18 +352,102 @@ public final class Utils{
         return found && furthest != null ? Math.max(6f, Mathf.dst(wx, wy, furthest.worldx(), furthest.worldy())) : Mathf.dst(wx, wy, wx2, wy2);
     }
 
+    public static void collideLineRawEnemy(Team team, float x, float y, float x2, float y2, Boolf2<Building, Boolean> buildingCons, Cons<Unit> unitCons, Floatc2 effectHandler){
+        collideLineRaw(x, y, x2, y2, 3f, b -> b.team != team, u -> u.team != team, buildingCons, unitCons, healthc -> healthc.dst2(x, y), effectHandler);
+    }
+
+    public static void collideLineRawEnemy(Team team, float x, float y, float x2, float y2, Boolf2<Building, Boolean> buildingCons, Cons<Unit> unitCons, Floatc2 effectHandler, boolean stopSort){
+        collideLineRaw(x, y, x2, y2, 3f, b -> b.team != team, u -> u.team != team, buildingCons, unitCons, healthc -> healthc.dst2(x, y), effectHandler, stopSort);
+    }
+
+    public static void collideLineRawEnemy(Team team, float x, float y, float x2, float y2, Boolf2<Building, Boolean> buildingCons, Cons<Unit> unitCons, Floatf<Healthc> sort, Floatc2 effectHandler){
+        collideLineRaw(x, y, x2, y2, 3f, b -> b.team != team, u -> u.team != team, buildingCons, unitCons, sort, effectHandler);
+    }
+
+    public static void collideLineRaw(float x, float y, float x2, float y2, float unitWidth, Boolf<Building> buildingFilter, Boolf<Unit> unitFilter, Boolf2<Building, Boolean> buildingCons, Cons<Unit> unitCons, Floatf<Healthc> sort, Floatc2 effectHandler){
+        collideLineRaw(x, y, x2, y2, unitWidth, buildingFilter, unitFilter, buildingCons, unitCons, sort, effectHandler, false);
+    }
+
+    public static void collideLineRaw(float x, float y, float x2, float y2, float unitWidth, Boolf<Building> buildingFilter, Boolf<Unit> unitFilter, Boolf2<Building, Boolean> buildingCons, Cons<Unit> unitCons, Floatf<Healthc> sort, Floatc2 effectHandler, boolean stopSort){
+        collidedBlocks.clear();
+        tmpUnitSeq.clear();
+        tV.set(x2, y2);
+        if(buildingCons != null){
+            world.raycastEachWorld(x, y, x2, y2, (cx, cy) -> {
+                Building build = world.build(cx, cy);
+                if(build != null && (buildingFilter == null || buildingFilter.get(build)) && !collidedBlocks.add(build.pos())){
+                    boolean hit;
+                    if(effectHandler != null) effectHandler.get(cx * tilesize, cy * tilesize);
+                    if(sort == null){
+                        hit = buildingCons.get(build, true);
+                    }else{
+                        tmpUnitSeq.add(build);
+                        hit = buildingCons.get(build, false);
+                    }
+                    if(hit) tV.trns(Angles.angle(x, y, x2, y2), Mathf.dst(x, y, build.x, build.y)).add(x, y);
+                    return hit;
+                }
+                return false;
+            });
+        }
+        if(unitCons != null){
+            rect.setPosition(x, y).setSize(tV.x - x, tV.y - y);
+
+            if(rect.width < 0){
+                rect.x += rect.width;
+                rect.width *= -1;
+            }
+            if(rect.height < 0){
+                rect.y += rect.height;
+                rect.height *= -1;
+            }
+
+            rect.grow(unitWidth * 2f);
+
+            Groups.unit.intersect(rect.x, rect.y, rect.width, rect.height, unit -> {
+                if(unitFilter.get(unit)){
+                    unit.hitbox(hitRect);
+                    hitRect.grow(unitWidth * 2);
+
+                    Vec2 vec = Geometry.raycastRect(x, y, tV.x, tV.y, hitRect);
+
+                    if(vec != null){
+                        if(effectHandler != null) effectHandler.get(vec.x, vec.y);
+                        if(sort == null){
+                            unitCons.get(unit);
+                        }else{
+                            tmpUnitSeq.add(unit);
+                        }
+                    }
+                }
+            });
+        }
+        if(sort != null){
+            hit = false;
+            tmpUnitSeq.sort(sort).each(e -> {
+                if(e instanceof Building && buildingCons != null && (!stopSort || !hit)) hit = buildingCons.get(((Building)e), true);
+                if(e instanceof Unit && unitCons != null && (!stopSort || !hit)) unitCons.get(((Unit)e));
+            });
+        }
+        tmpUnitSeq.clear();
+    }
+
+    @Deprecated
     public static void collideLineRawEnemy(Team team, float x, float y, float x2, float y2, Boolf<Building> buildC, Cons<Unit> unitC, Effect effect){
         collideLineRaw(x, y, x2, y2, b -> b.team != team, u -> u.team != team, buildC, unitC, unit -> unit.dst2(x, y), effect);
     }
 
+    @Deprecated
     public static void collideLineRaw(float x, float y, float x2, float y2, Boolf<Building> buildB, Boolf<Unit> unitB, Boolf<Building> buildC, Cons<Unit> unitC){
         collideLineRaw(x, y, x2, y2, buildB, unitB, buildC, unitC, null, null);
     }
 
+    @Deprecated
     public static void collideLineRaw(float x, float y, float x2, float y2, Boolf<Building> buildB, Boolf<Unit> unitB, Boolf<Building> buildC, Cons<Unit> unitC, Floatf<Healthc> sort, Effect effect){
         collideLineRaw(x, y, x2, y2, buildB, unitB, buildC, unitC, sort, e -> false, effect);
     }
 
+    @Deprecated
     public static void collideLineRaw(float x, float y, float x2, float y2, Boolf<Building> buildB, Boolf<Unit> unitB, Boolf<Building> buildC, Cons<Unit> unitC, Floatf<Healthc> sort, Boolf<Building> buildAlt, Effect effect){
         collidedBlocks.clear();
         tmpUnitSeq.clear();
@@ -438,8 +522,8 @@ public final class Utils{
                 });
                 hit = false;
                 tmpUnitSeq.sort(sort).each(e -> {
-                    if(e instanceof Unit) unitC.get((Unit)e);
                     if(e instanceof Building && buildC != null && !hit) hit = buildC.get((Building)e);
+                    if(e instanceof Unit) unitC.get((Unit)e);
                 });
                 tmpUnitSeq.clear();
             }

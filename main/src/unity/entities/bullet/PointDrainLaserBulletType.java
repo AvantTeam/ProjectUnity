@@ -50,7 +50,7 @@ public class PointDrainLaserBulletType extends BulletType{
         dld.pos.setLength(length).add(b);
         dld.trail.update(dld.pos.x, dld.pos.y);
         if(b.timer(1, 5f)){
-            Utils.collideLineRaw(b.x, b.y, dld.pos.x, dld.pos.y, build -> build.team != b.team, unit -> unit.team != b.team, building -> {
+            /*Utils.collideLineRaw(b.x, b.y, dld.pos.x, dld.pos.y, build -> build.team != b.team, unit -> unit.team != b.team, building -> {
                 hit(b, building.x, building.y);
                 building.damage(damage * buildingDamageMultiplier);
                 return false;
@@ -59,7 +59,17 @@ public class PointDrainLaserBulletType extends BulletType{
                 unit.damage(damage);
                 Tmp.v1.trns(b.rotation(), knockback);
                 if(knockback != 0) unit.impulse(Tmp.v1);
-            });
+            });*/
+            Utils.collideLineRawEnemy(b.team, b.x, b.y, dld.pos.x, dld.pos.y, (building, direct) -> {
+                if(direct){
+                    building.damage(damage * buildingDamageMultiplier);
+                }
+                return false;
+            }, unit -> {
+                unit.damage(damage);
+                Tmp.v1.trns(b.rotation(), knockback);
+                if(knockback != 0) unit.impulse(Tmp.v1);
+            }, null, (ex, ey) -> hit(b, ex, ey));
             Damage.damageUnits(b.team, dld.pos.x, dld.pos.y, area, damage, unit -> unit.within(dld.pos, area), unit -> hOwner.heal(damage * drainPercent));
             Vars.indexer.eachBlock(null, dld.pos.x, dld.pos.y, area, build -> build.team != b.team, build -> {
                 build.damage(damage * buildingDamageMultiplier);

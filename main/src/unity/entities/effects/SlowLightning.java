@@ -12,6 +12,7 @@ import arc.util.pooling.Pool.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import unity.content.*;
 import unity.util.*;
 
 public class SlowLightning extends EffectState{
@@ -175,18 +176,20 @@ public class SlowLightning extends EffectState{
         public void init(){
             origin.nodes.add(this);
             float tDamage = origin.liveDamage != null ? origin.liveDamage.get() : origin.damage;
-            Boolf<Building> bf = building -> {
-                building.damage(tDamage);
-                if(building.block.absorbLasers){
-                    Tmp.v1.trns(rotation, fromPos.dst(building));
-                    Tmp.v1.add(fromPos);
-                    toPos.set(Tmp.v1);
-                    score = origin.range + 1f;
+            Boolf2<Building, Boolean> bf = (building, direct) -> {
+                if(direct){
+                    building.damage(tDamage);
+                    if(building.block.absorbLasers){
+                        Tmp.v1.trns(rotation, fromPos.dst(building));
+                        Tmp.v1.add(fromPos);
+                        toPos.set(Tmp.v1);
+                        score = origin.range + 1f;
+                    }
                 }
                 return building.block.absorbLasers;
             };
             Cons<Unit> uc = unit -> unit.damage(tDamage);
-            Utils.collideLineRaw(fromPos.x, fromPos.y, toPos.x, toPos.y, t -> t.team != origin.team, u -> u.team != origin.team, bf, uc);
+            Utils.collideLineRawEnemy(origin.team, fromPos.x, fromPos.y, toPos.x, toPos.y, bf, uc, null, (ex, ey) -> UnityFx.coloredHitSmall.at(ex, ey, origin.colorFrom));
         }
     }
 }
