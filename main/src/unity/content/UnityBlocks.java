@@ -196,7 +196,7 @@ public class UnityBlocks implements ContentList{
     infiHeater, infiCooler, infiTorque, neodymiumStator;
 
     public static @FactionDef("advance")
-    Block celsius, kelvin, xenoCorruptor, cube;
+    Block celsius, kelvin, /*caster, storm,*/ eclipse, xenoCorruptor, cube;
 
     public static
     @FactionDef("end")
@@ -2422,14 +2422,15 @@ public class UnityBlocks implements ContentList{
             health = 400;
             addGraph(new GraphFlux(200f).setAccept(1, 0, 0, 0));
         }};
+
         smallThruster = new y.world.blocks.effect.UnityThruster("small-thruster"){{
             requirements(Category.effect, with(Items.silicon, 20, Items.graphite, 30, UnityItems.nickel, 25));
             health = 400;
-            acceleration=0.2f;
-            maxSpeed=5;
-            maxBlocks=5;
+            acceleration = 0.2f;
+            maxSpeed = 5;
+            maxBlocks = 5;
+            itemDuration = 300;
             consumes.item(Items.blastCompound);
-            itemDuration=300;
         }};
 
         //endregion
@@ -2478,7 +2479,53 @@ public class UnityBlocks implements ContentList{
             shootType = UnityBullets.kelvinSmoke;
         }};
 
-        xenoCorruptor = new LaserTurret("xeno-corruptor"){{
+        eclipse = new LaserTurret("blue-eclipse"){
+            {
+                requirements(Category.turret, with(Items.lead, 620, Items.titanium, 520, Items.surgeAlloy, 720, Items.silicon, 760, Items.phaseFabric, 120, UnityItems.xenium, 620, UnityItems.advanceAlloy, 680));
+                size = 7;
+                health = 9000;
+                range = 340f;
+                reloadTime = 280f;
+                coolantMultiplier = 2.4f;
+                shootCone = 40f;
+                powerUse = 19f;
+                shootShake = 3f;
+                shootEffect = Fx.shootBigSmoke2;
+                recoilAmount = 8;
+                shootSound = Sounds.laser;
+                loopSound = UnitySounds.eclipseBeam;
+                loopSoundVolume = 2.5f;
+                heatColor = UnityPal.advanceDark;
+                rotateSpeed = 1.9f;
+                shootDuration = 320f;
+                firingMoveFract = 0.12f;
+                shootLength = size * tilesize / 2f - recoilAmount;
+                shootType = new NoPierceLaserBulletType(390f){{
+                    colors = new Color[]{Color.valueOf("59a7ff55"), Color.valueOf("59a7ffaa"), Color.valueOf("a3e3ff"), Color.white};
+                    tscales = new float[]{1f, 0.74f, 0.5f, 0.24f};
+                    strokes = new float[]{2.8f, 2f, 1.6f, 0.8f};
+                    lenscales = new float[]{0.92f, 1f, 1.017f, 1.025f};
+                    length = 490f;
+                    knockback = 2.2f;
+                    lifetime = 18f;
+                    shootEffect = Fx.none;
+                    smokeEffect = Fx.none;
+                    hitEffect = UnityFx.eclipseHit;
+                    hitSize = 7f;
+                }};
+
+                consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.4f && liquid.flammability < 0.1f, 2.1f)).update(false);
+            }
+
+            @Override
+            public void load(){
+                super.load();
+                baseRegion = atlas.find("unity-block-" + size);
+            }
+        };
+
+        xenoCorruptor = new LaserTurret("xeno-corruptor"){
+            {
                 requirements(Category.turret, with(Items.lead, 640, Items.graphite, 740, Items.titanium, 560, Items.surgeAlloy, 650, Items.silicon, 720, Items.thorium, 400, UnityItems.xenium, 340, UnityItems.advanceAlloy, 640));
                 health = 7900;
                 size = 7;
@@ -2494,6 +2541,7 @@ public class UnityBlocks implements ContentList{
                 shootSound = Sounds.laser;
                 loopSound = UnitySounds.xenoBeam;
                 loopSoundVolume = 2f;
+                heatColor = UnityPal.advanceDark;
                 shootType = new ChangeTeamLaserBulletType(60f){{
                     length = 300f;
                     lifetime = 18f;

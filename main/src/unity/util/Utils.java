@@ -33,6 +33,8 @@ public final class Utils{
     private static float cdist;
     private static int idx;
     private static Tile furthest;
+    private static Building tmpBuilding;
+    private static Unit tmpUnit;
     private static boolean hit;
 
     public static <T extends Buildingc> Tile getBestTile(T build, int before, int after){
@@ -708,5 +710,76 @@ public final class Utils{
             for(int k = 0; k < am; k++) out.add(val);
         }
         return out;
+    }
+
+    /**
+     * Casts forward in a line.
+     * @return the first encountered object.
+     * There's an issue with the one in 126.2, which I fixed in a pr. This can be removed after the next Mindustry release.
+     */
+    public static Healthc linecast(Bullet hitter, float x, float y, float angle, float length){
+        tV.trns(angle, length);
+        
+        tmpBuilding = null;
+
+        if(hitter.type.collidesGround){
+            world.raycastEachWorld(x, y, x + tV.x, y + tV.y, (cx, cy) -> {
+                Building tile = world.build(cx, cy);
+                if(tile != null && tile.team != hitter.team){
+                    tmpBuilding = tile;
+                    return true;
+                }
+                return false;
+            });
+        }
+
+        rect.setPosition(x, y).setSize(tV.x, tV.y);
+        float x2 = tV.x + x, y2 = tV.y + y;
+
+        if(rect.width < 0){
+            rect.x += rect.width;
+            rect.width *= -1;
+        }
+
+        if(rect.height < 0){
+            rect.y += rect.height;
+            rect.height *= -1;
+        }
+
+        float expand = 3f;
+
+        rect.y -= expand;
+        rect.x -= expand;
+        rect.width += expand * 2;
+        rect.height += expand * 2;
+
+        tmpUnit = null;
+
+        Units.nearbyEnemies(hitter.team, rect, e -> {
+            if((tmpUnit != null && e.dst2(x, y) > tmpUnit.dst2(x, y)) || !e.checkTarget(hitter.type.collidesAir, hitter.type.collidesGround)) return;
+
+            e.hitbox(hitRect);
+            Rect other = hitRect;
+            other.y -= expand;
+            other.x -= expand;
+            other.width += expand * 2;
+            other.height += expand * 2;
+
+            Vec2 vec = Geometry.raycastRect(x, y, x2, y2, other);
+
+            if(vec != null){
+                tmpUnit = e;
+            }
+        });
+
+        if(tmpBuilding != null && tmpUnit != null){
+            if(Mathf.dst2(x, y, tmpBuilding.getX(), tmpBuilding.getY()) <= Mathf.dst2(x, y, tmpUnit.getX(), tmpUnit.getY())){
+                return tmpBuilding;
+            }
+        }else if(tmpBuilding != null){
+            return tmpBuilding;
+        }
+
+        return tmpUnit;
     }
 }

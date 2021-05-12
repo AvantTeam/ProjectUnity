@@ -781,6 +781,23 @@ public class UnityFx{
         Angles.randLenVectors(e.id, 2, e.finpow() * 13f, e.rotation, 60f, (x, y) -> Fill.poly(e.x + x, e.y + y, 6, e.fout() * 4.1f, e.rotation + e.fin() * rot));
     }),
 
+    eclipseHit = new Effect(15f, e -> {
+        color(Color.valueOf("c2ebff"), Color.valueOf("68c0ff"), e.fin());
+        
+        randLenVectors(e.id, 4, e.finpow() * 28f, e.rotation, 360, (x, y) -> {
+            Fill.poly(e.x + x, e.y + y, 4, 3f + e.fout() * 9f, 0f);
+        });
+
+        color(Color.valueOf("ffffff"), Color.valueOf("a9d8ff"), e.fin());
+	
+	   stroke(1.5f * e.fout());
+       
+       randLenVectors(e.id * 2, 7, e.finpow() * 42f, e.rotation, 360, (x, y) -> {
+            float a = Mathf.angle(x, y);
+            lineAngle(e.x + x, e.y + y, a, e.fout() * 8f + 1.5f);
+        });
+    }),
+
     teamConvertedEffect = new Effect(18, e -> {
         color(UnityPal.advance, Color.white, e.fin());
         Fill.square(e.x, e.y, 0.1f + e.fout() * 2.8f, 45f);
