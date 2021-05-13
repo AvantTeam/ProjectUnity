@@ -427,18 +427,26 @@ public class EntityProcessor extends BaseProcessor{
                         throw new IllegalStateException(simpleName(entry.value.first().getEnclosingElement()) + "#" + entry.value.first() + " is an abstract method and must be implemented in some component");
                     }
 
+                    Seq<ExecutableElement> inserts = ins.get(entry.key, Seq::new);
+                    if(first.getReturnType().getKind() != VOID && !inserts.isEmpty()){
+                        throw new IllegalStateException("Method " + entry.key + " is not void, therefore no methods can @Insert to it");
+                    }
+
                     if(simpleName(first).equals("add") || simpleName(first).equals("remove")){
+                        Seq<ExecutableElement> bypass = entry.value.select(m -> annotation(m, BypassGroupCheck.class) != null);
+                        entry.value.removeAll(bypass);
+
+                        boolean firstc = append(mbuilder, bypass, inserts, writeBlock, first);
+                        if(!firstc){
+                            mbuilder.addCode(lnew());
+                        }
+
                         mbuilder.addStatement("if($Ladded) return", simpleName(first).equals("add") ? "" : "!");
 
                         for(String group : defGroups){
                             mbuilder.addStatement("Groups.$L.$L(this)", group, simpleName(first));
                         }
                         mbuilder.addCode(lnew());
-                    }
-
-                    Seq<ExecutableElement> inserts = ins.get(entry.key, Seq::new);
-                    if(first.getReturnType().getKind() != VOID && !inserts.isEmpty()){
-                        throw new IllegalStateException("Method " + entry.key + " is not void, therefore no methods can @Insert to it");
                     }
 
                     Seq<ExecutableElement> noComp = inserts.select(e -> typeUtils.isSameType(
@@ -494,55 +502,7 @@ public class EntityProcessor extends BaseProcessor{
                         }
                     }
 
-                    boolean firstc = true;
-                    for(ExecutableElement elem : entry.value){
-                        String descStr = descString(elem);
-                        String blockName = simpleName(elem.getEnclosingElement()).toLowerCase().replace("comp", "");
-
-                        Seq<ExecutableElement> insertComp = inserts.select(e ->
-                            simpleName(toComp((TypeElement)elements(annotation(e, Insert.class)::block).first()))
-                            .toLowerCase().replace("comp", "")
-                            .equals(blockName)
-                        );
-
-                        if(is(elem, Modifier.ABSTRACT) || is(elem, Modifier.NATIVE) || (!methodBlocks.containsKey(descStr) && insertComp.isEmpty())) continue;
-                        if(!firstc) mbuilder.addCode(lnew());
-                        firstc = false;
-
-                        Seq<ExecutableElement> compBefore = insertComp.select(e -> !annotation(e, Insert.class).after());
-                        compBefore.sort(Structs.comps(Structs.comparingFloat(m -> annotation(m, MethodPriority.class) != null ? annotation(m, MethodPriority.class).value() : 0), Structs.comparing(BaseProcessor::simpleName)));
-
-                        Seq<ExecutableElement> compAfter = insertComp.select(e -> annotation(e, Insert.class).after());
-                        compAfter.sort(Structs.comps(Structs.comparingFloat(m -> annotation(m, MethodPriority.class) != null ? annotation(m, MethodPriority.class).value() : 0), Structs.comparing(BaseProcessor::simpleName)));
-
-                        String str = methodBlocks.get(descStr);
-                        str = str.substring(1, str.length() - 1).trim().replace("\n    ", "\n").trim();
-                        str += '\n';
-
-                        for(ExecutableElement e : compBefore){
-                            mbuilder.addStatement("this.$L()", simpleName(e));
-                        }
-
-                        if(writeBlock){
-                            str = str.replace("return;", "break " + blockName + ";");
-
-                            if(str
-                                .replaceAll("\\s+", "")
-                                .replace("\n", "")
-                                .isEmpty()
-                            ) continue;
-
-                            mbuilder.beginControlFlow("$L:", blockName);
-                        }
-
-                        mbuilder.addCode(str);
-
-                        if(writeBlock) mbuilder.endControlFlow();
-
-                        for(ExecutableElement e : compAfter){
-                            mbuilder.addStatement("this.$L()", simpleName(e));
-                        }
-                    }
+                    boolean firstc = append(mbuilder, entry.value, inserts, writeBlock, first);
 
                     if(!firstc && !noCompAfter.isEmpty()) mbuilder.addCode(lnew());
                     for(ExecutableElement e : noCompAfter){
@@ -792,6 +752,60 @@ public class EntityProcessor extends BaseProcessor{
                 write(def.builder.build(), def.components.flatMap(comp -> imports.get(interfaceName(comp))));
             }
         }
+    }
+
+    boolean append(MethodSpec.Builder mbuilder, Seq<ExecutableElement> values, Seq<ExecutableElement> inserts, boolean writeBlock, ExecutableElement first){
+        boolean firstc = true;
+        for(ExecutableElement elem : values){
+            String descStr = descString(elem);
+            String blockName = simpleName(elem.getEnclosingElement()).toLowerCase().replace("comp", "");
+
+            Seq<ExecutableElement> insertComp = inserts.select(e ->
+                simpleName(toComp((TypeElement)elements(annotation(e, Insert.class)::block).first()))
+                    .toLowerCase().replace("comp", "")
+                    .equals(blockName)
+            );
+
+            if(is(elem, Modifier.ABSTRACT) || is(elem, Modifier.NATIVE) || (!methodBlocks.containsKey(descStr) && insertComp.isEmpty())) continue;
+            if(!firstc) mbuilder.addCode(lnew());
+            firstc = false;
+
+            Seq<ExecutableElement> compBefore = insertComp.select(e -> !annotation(e, Insert.class).after());
+            compBefore.sort(Structs.comps(Structs.comparingFloat(m -> annotation(m, MethodPriority.class) != null ? annotation(m, MethodPriority.class).value() : 0), Structs.comparing(BaseProcessor::simpleName)));
+
+            Seq<ExecutableElement> compAfter = insertComp.select(e -> annotation(e, Insert.class).after());
+            compAfter.sort(Structs.comps(Structs.comparingFloat(m -> annotation(m, MethodPriority.class) != null ? annotation(m, MethodPriority.class).value() : 0), Structs.comparing(BaseProcessor::simpleName)));
+
+            String str = methodBlocks.get(descStr);
+            str = str.substring(1, str.length() - 1).trim().replace("\n    ", "\n").trim();
+            str += '\n';
+
+            for(ExecutableElement e : compBefore){
+                mbuilder.addStatement("this.$L()", simpleName(e));
+            }
+
+            if(writeBlock){
+                str = str.replace("return;", "break " + blockName + ";");
+
+                if(str
+                    .replaceAll("\\s+", "")
+                    .replace("\n", "")
+                    .isEmpty()
+                ) continue;
+
+                mbuilder.beginControlFlow("$L:", blockName);
+            }
+
+            mbuilder.addCode(str);
+
+            if(writeBlock) mbuilder.endControlFlow();
+
+            for(ExecutableElement e : compAfter){
+                mbuilder.addStatement("this.$L()", simpleName(e));
+            }
+        }
+
+        return firstc;
     }
 
     Seq<TypeElement> getDependencies(TypeElement component){

@@ -213,6 +213,11 @@ public class Annotations{
         boolean after() default true;
     }
 
+    /** Appends this {@code add()}/{@code remove()} method before the {@code if([!]added)} check */
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface BypassGroupCheck{}
+
     /** Loads texture regions but does not assign them to their acquirers */
     @Retention(RetentionPolicy.SOURCE)
     public @interface LoadRegs{

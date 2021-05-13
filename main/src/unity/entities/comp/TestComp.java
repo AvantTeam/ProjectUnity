@@ -27,4 +27,16 @@ abstract class TestComp implements Unitc{
     @Insert(value = "update()", block = Weaponsc.class)
     @MethodPriority(-5)
     private void updatePostWeaponsB(){}
+
+    @Override
+    @BypassGroupCheck
+    public void add(){
+        destroy();
+    }
+
+    @Override
+    @BypassGroupCheck
+    public void remove(){
+        destroy();
+    }
 }
