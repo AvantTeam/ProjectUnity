@@ -194,7 +194,7 @@ public class UnityBlocks implements ContentList{
     infiHeater, infiCooler, infiTorque, neodymiumStator;
 
     public static @FactionDef("advance")
-    Block celsius, kelvin, /*caster, storm,*/ eclipse, xenoCorruptor, cube;
+    Block celsius, kelvin, caster, storm, eclipse, xenoCorruptor, cube;
 
     public static
     @FactionDef("end")
@@ -2693,9 +2693,72 @@ public class UnityBlocks implements ContentList{
             shootType = UnityBullets.kelvinSmoke;
         }};
 
-        //Arc Caster
+        caster = new PowerTurret("arc-caster"){{
+            requirements(Category.turret, with(Items.silicon, 20, UnityItems.xenium, 15, Items.titanium, 30, UnityItems.advanceAlloy, 25));
+            size = 3;
+            health = 4600;
+            range = 190f;
+            reloadTime = 120f;
+            shootCone = 30f;
+            inaccuracy = 9.2f;
+            rotateSpeed = 5.5f;
+            recoilAmount = 1f;
+            powerUse = 9.4f;
+            heatColor = UnityPal.lightHeat;
+            cooldown = 0.01f;
+            shootSound = Sounds.flame;
+            shootEffect = Fx.none;
+            chargeTime = 51f;
+            chargeMaxDelay = 24f;
+            chargeEffects = 5;
+            chargeEffect = UnityFx.arcCharge;
+            shootType = new ArcBulletType(4.6f, 8f){{
+                lifetime = 43f;
+                hitSize = 21f;
 
-        //Arc Storm
+                lightningChance1 = 0.5f;
+                lightningDamage1 = 29f;
+                lightningChance2 = 0.2f;
+                lightningDamage2 = 14f;
+                length1 = 11;
+                lengthRand1 = 7;
+            }};
+        }};
+
+        storm = new PowerTurret("arc-storm"){{
+            requirements(Category.turret, with(Items.silicon, 80, UnityItems.xenium, 35, Items.titanium, 90, UnityItems.advanceAlloy, 50));
+            size = 4;
+            health = 7600;
+            range = 210f;
+            reloadTime = 180f;
+            shots = 5;
+            shootCone = 30f;
+            inaccuracy = 11.2f;
+            rotateSpeed = 5.5f;
+            recoilAmount = 2f;
+            powerUse = 33.4f;
+            heatColor = UnityPal.lightHeat;
+            cooldown = 0.01f;
+            shootSound = Sounds.flame;
+            shootEffect = Fx.none;
+            shootEffect = Fx.none;
+            chargeTime = 51f;
+            chargeMaxDelay = 24f;
+            chargeEffects = 5;
+            chargeEffect = UnityFx.arcCharge;
+            shootType = new ArcBulletType(4.6f, 8.6f){{
+                lifetime = 53f;
+                hitSize = 28f;
+
+                radius = 13f;
+                lightningChance1 = 0.7f;
+                lightningDamage1 = 31f;
+                lightningChance2 = 0.3f;
+                lightningDamage2 = 17f;
+                length1 = 13;
+                lengthRand1 = 9;
+            }};
+        }};
 
         eclipse = new LaserTurret("blue-eclipse"){
             {

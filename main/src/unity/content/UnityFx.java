@@ -872,6 +872,29 @@ public class UnityFx{
         Angles.randLenVectors(e.id, 2, e.finpow() * 13f, e.rotation, 60f, (x, y) -> Fill.poly(e.x + x, e.y + y, 6, e.fout() * 4.1f, e.rotation + e.fin() * rot));
     }),
 
+    arcCharge = new Effect(27f, e -> {
+        color(Color.valueOf("606571"), Color.valueOf("6c8fc7"), e.fin());
+
+        Angles.randLenVectors(e.id, 2, e.fout() * 40f, e.rotation, 135f, (x, y) -> {
+            Fill.poly(e.x + x, e.y + y, 6, 1f + Mathf.sin(e.fin() * 3f, 1f, 2f) * 5f, e.rotation);
+        });
+    }),
+
+    arcSmoke = new Effect(27f, e -> {
+        color(Color.valueOf("6c8fc7"), Color.valueOf("606571"), e.fin());
+        
+        Angles.randLenVectors(e.id, 3, e.finpow() * 20f, e.rotation, 180f, (x, y) -> {
+            Fill.poly(e.x + x, e.y + y, 6, e.fout() * 9f, e.rotation);
+        });
+    }),
+
+    arcSmoke2 = new Effect(27f, e -> {
+        color(Color.valueOf("6c8fc7"), Color.valueOf("606571"), e.fin());
+        
+        Tmp.v1.trns(e.rotation, e.fin() * 4.6f * 15f);
+        Fill.poly(e.x + Tmp.v1.x, e.y + Tmp.v1.y, 6, e.fout() * 16f, e.rotation);
+    }),
+
     eclipseHit = new Effect(15f, e -> {
         color(Color.valueOf("c2ebff"), Color.valueOf("68c0ff"), e.fin());
         
