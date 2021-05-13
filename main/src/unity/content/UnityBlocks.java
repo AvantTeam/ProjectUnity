@@ -59,8 +59,8 @@ public class UnityBlocks implements ContentList{
 
     superCharger;
 
-    public static @FactionDef("dark") Block
-    oreUmbrium,
+    public static @FactionDef("dark")
+    Block oreUmbrium,
 
     apparition, ghost, banshee, fallout, catastrophe, calamity, extinction,
 
@@ -68,17 +68,17 @@ public class UnityBlocks implements ContentList{
 
     darkWall, darkWallLarge;
 
-    public static @FactionDef("light") Block
-    oreLuminum,
+    public static @FactionDef("light")
+    Block oreLuminum,
 
-    photon, electron, /*graviton,*/ proton, neutron, /*gluon,*/ wBoson, zBoson, /*higgsBoson, singularity, muon, ephemeron,*/
+    photon, electron, /*graviton,*/ proton, neutron, /*gluon,*/ wBoson, zBoson, higgsBoson, /*singularity,*/ muon, /*ephemeron,*/
 
     lightLamp, oilLamp, lightLaser, lightLampInfi, lightReflector, lightReflector1, lightOmnimirror, lightFilter, lightInvertedFilter, lightDivisor, lightDivisor1, lightItemFilter, lightPanel, lightInfluencer,
 
     metaglassWall, metaglassWallLarge;
 
-    public static @FactionDef("imber") Block
-    oreImberium,
+    public static @FactionDef("imber")
+    Block oreImberium,
 
     orb, shockwire, current, plasma, electrobomb, shielder,
 
@@ -189,6 +189,7 @@ public class UnityBlocks implements ContentList{
 
     //other?
     smallThruster,
+
     //sandbox
     infiHeater, infiCooler, infiTorque, neodymiumStator;
 
@@ -673,7 +674,9 @@ public class UnityBlocks implements ContentList{
                     lifetime = 48f;
                     collides = false;
                     backColor = trailColor = hitColor = lightColor = Pal.lancerLaser;
-                    hitEffect = despawnEffect = Fx.hitLancer;
+                    shootEffect = smokeEffect = Fx.none;
+                    hitEffect = Fx.hitLancer;
+                    despawnEffect = UnityFx.wBosonHitEffect;
                     frontColor = Color.white;
                     decayEffect = UnityFx.wBosonEffectLong;
                     height = 13f;
@@ -687,7 +690,8 @@ public class UnityBlocks implements ContentList{
                             height = 9f;
                             width = 8f;
                             backColor = trailColor = hitColor = lightColor = Pal.lancerLaser;
-                            hitEffect = despawnEffect = Fx.hitLancer;
+                            hitEffect = Fx.hitLancer;
+                            despawnEffect = UnityFx.wBosonDecayHitEffect;
                             frontColor = Color.white;
                         }
     
@@ -760,6 +764,9 @@ public class UnityBlocks implements ContentList{
                     splashDamageRadius = 16f;
                     drag = 0.005f;
                     lifetime = 27f;
+                    hitSize = 8f;
+                    shootEffect = smokeEffect = Fx.none;
+                    hitEffect = Fx.hitLancer;
                 }};
             }
             
@@ -770,11 +777,77 @@ public class UnityBlocks implements ContentList{
             }
         };
 
-        //Higgs Boson
+        higgsBoson = new PowerTurret("higgs-boson"){
+            {
+                requirements(Category.turret, with(Items.silicon, 290, UnityItems.luminum, 430, Items.titanium, 190, Items.thorium, 120, Items.surgeAlloy, 20));
+                size = 6;
+                health = 6000;
+                reloadTime = 13f;
+                alternate = true;
+                spread = 8.625f;
+                range = 260f;
+                shootCone = 20f;
+                heatColor = UnityPal.lightHeat;
+                coolantMultiplier = 3.4f;
+                rotateSpeed = 2.2f;
+                recoilAmount = 1.5f;
+                shootLength = size * tilesize / 2f - 1.5f;
+                restitution = 0.09f;
+                powerUse = 10.4f;
+                shootSound = UnitySounds.higgsBosonShoot;
+                cooldown = 0.008f;
+                shootType = new RoundLaserBulletType(85f){{
+                    length = 270f;
+                    width = 5.8f;
+                    hitSize = 13f;
+                    drawSize = 460f;
+                    shootEffect = smokeEffect = Fx.none;
+                }};
+            }
+            
+            @Override
+            public void load(){
+                super.load();
+                baseRegion = atlas.find("unity-block-" + size);
+            }
+        };
 
         //Singularity
 
-        //Muon
+        muon = new PowerTurret("muon"){ //Should it be animated? Since the animation in AC was disabled.
+            {
+                size = 8;
+                health = 9800;
+                shots = 9;
+                spread = 6f;
+                reloadTime = 90f;
+                coolantMultiplier = 1.9f;
+                shootCone = 80f;
+                shootShake = 5f;
+                recoilAmount = 8f;
+                shootLength = size * tilesize / 2f - 8f;
+                shootSound = UnitySounds.muonShoot;
+                rotateSpeed = 1.9f;
+                heatColor = UnityPal.lightHeat;
+                cooldown = 0.009f;
+                shootType = new RoundLaserBulletType(200f){{
+                    length = 330f;
+                    width = 3.8f;
+                    hitSize = 13f;
+                    hitEffect = Fx.hitLancer;
+                    despawnEffect = Fx.none;
+                    drawSize = 460f;
+                    shootEffect = Fx.lightningShoot;
+                    smokeEffect = Fx.none;
+                }};
+            }
+            
+            @Override
+            public void load(){
+                super.load();
+                baseRegion = atlas.find("unity-block-" + size);
+            }
+        };
 
         //Ephemeron
 
