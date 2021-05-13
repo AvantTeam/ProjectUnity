@@ -67,8 +67,10 @@ public class PointDrainLaserBulletType extends BulletType{
                 return false;
             }, unit -> {
                 unit.damage(damage);
-                Tmp.v1.trns(b.rotation(), knockback);
-                if(knockback != 0) unit.impulse(Tmp.v1);
+                if(knockback != 0){
+                    Tmp.v1.trns(b.rotation(), knockback * 80f);
+                    unit.impulse(Tmp.v1);
+                }
             }, null, (ex, ey) -> hit(b, ex, ey));
             Damage.damageUnits(b.team, dld.pos.x, dld.pos.y, area, damage, unit -> unit.within(dld.pos, area), unit -> hOwner.heal(damage * drainPercent));
             Vars.indexer.eachBlock(null, dld.pos.x, dld.pos.y, area, build -> build.team != b.team, build -> {

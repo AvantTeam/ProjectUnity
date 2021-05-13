@@ -27,6 +27,7 @@ public final class Utils{
 
     private static final Vec2 tV = new Vec2();
     private static final Seq<Healthc> tmpUnitSeq = new Seq<>();
+    private static final IntMap<Float[]> effectArray = new IntMap<>(204);
     private static final IntSet collidedBlocks = new IntSet();
     private static final Rect rect = new Rect(), rectAlt = new Rect(), hitRect = new Rect();
     private static Posc result;
@@ -354,11 +355,11 @@ public final class Utils{
         return found && furthest != null ? Math.max(6f, Mathf.dst(wx, wy, furthest.worldx(), furthest.worldy())) : Mathf.dst(wx, wy, wx2, wy2);
     }
 
-    public static void collideLineRawEnemy(Team team, float x, float y, float x2, float y2, Boolf2<Building, Boolean> buildingCons, Cons<Unit> unitCons, Floatc2 effectHandler){
-        collideLineRaw(x, y, x2, y2, 3f, b -> b.team != team, u -> u.team != team, buildingCons, unitCons, healthc -> healthc.dst2(x, y), effectHandler);
+    public static void collideLineRawEnemy(Team team, float x, float y, float x2, float y2, Boolf2<Building, Boolean> buildingCons, Cons<Unit> unitCons, Floatc2 effectHandler, boolean stopSort){
+        collideLineRaw(x, y, x2, y2, 3f, b -> b.team != team, u -> u.team != team, buildingCons, unitCons, healthc -> healthc.dst2(x, y), effectHandler, stopSort);
     }
 
-    public static void collideLineRawEnemy(Team team, float x, float y, float x2, float y2, Boolf2<Building, Boolean> buildingCons, Cons<Unit> unitCons, Floatc2 effectHandler, boolean stopSort){
+    public static void collideLineRawEnemy(Team team, float x, float y, float x2, float y2, Boolf2<Building, Boolean> buildingCons, Boolf<Unit> unitCons, Floatc2 effectHandler, boolean stopSort){
         collideLineRaw(x, y, x2, y2, 3f, b -> b.team != team, u -> u.team != team, buildingCons, unitCons, healthc -> healthc.dst2(x, y), effectHandler, stopSort);
     }
 
@@ -371,18 +372,32 @@ public final class Utils{
     }
 
     public static void collideLineRaw(float x, float y, float x2, float y2, float unitWidth, Boolf<Building> buildingFilter, Boolf<Unit> unitFilter, Boolf2<Building, Boolean> buildingCons, Cons<Unit> unitCons, Floatf<Healthc> sort, Floatc2 effectHandler, boolean stopSort){
+        Boolf<Unit> ucons = unit -> {
+            unitCons.get(unit);
+            return false;
+        };
+        collideLineRaw(x, y, x2, y2, unitWidth, buildingFilter, unitFilter, buildingCons, unitCons == null ? null : ucons, sort, effectHandler, stopSort);
+    }
+
+    public static void collideLineRaw(float x, float y, float x2, float y2, float unitWidth, Boolf<Building> buildingFilter, Boolf<Unit> unitFilter, Boolf2<Building, Boolean> buildingCons, Boolf<Unit> unitCons, Floatf<Healthc> sort, Floatc2 effectHandler, boolean stopSort){
         collidedBlocks.clear();
         tmpUnitSeq.clear();
+        effectArray.clear();
+        idx = 0;
         tV.set(x2, y2);
         if(buildingCons != null){
             world.raycastEachWorld(x, y, x2, y2, (cx, cy) -> {
                 Building build = world.build(cx, cy);
                 if(build != null && (buildingFilter == null || buildingFilter.get(build)) && !collidedBlocks.add(build.pos())){
                     boolean hit;
-                    if(effectHandler != null) effectHandler.get(cx * tilesize, cy * tilesize);
+                    //if(effectHandler != null) effectHandler.get(cx * tilesize, cy * tilesize);
                     if(sort == null){
+                        if(effectHandler != null) effectHandler.get(cx * tilesize, cy * tilesize);
                         hit = buildingCons.get(build, true);
                     }else{
+                        if(effectHandler != null){
+                            effectArray.put(build.id, new Float[]{cx * (float)tilesize, cy * (float)tilesize});
+                        }
                         tmpUnitSeq.add(build);
                         hit = buildingCons.get(build, false);
                     }
@@ -414,10 +429,11 @@ public final class Utils{
                     Vec2 vec = Geometry.raycastRect(x, y, tV.x, tV.y, hitRect);
 
                     if(vec != null){
-                        if(effectHandler != null) effectHandler.get(vec.x, vec.y);
                         if(sort == null){
+                            if(effectHandler != null) effectHandler.get(vec.x, vec.y);
                             unitCons.get(unit);
                         }else{
+                            if(effectHandler != null) effectArray.put(unit.id, new Float[]{vec.x, vec.y});
                             tmpUnitSeq.add(unit);
                         }
                     }
@@ -427,10 +443,18 @@ public final class Utils{
         if(sort != null){
             hit = false;
             tmpUnitSeq.sort(sort).each(e -> {
-                if(e instanceof Building && buildingCons != null && (!stopSort || !hit)) hit = buildingCons.get(((Building)e), true);
-                if(e instanceof Unit && unitCons != null && (!stopSort || !hit)) unitCons.get(((Unit)e));
+                Float[] eff = effectArray.get(e.id());
+                if(e instanceof Building && buildingCons != null && (!stopSort || !hit)){
+                    hit = buildingCons.get(((Building)e), true);
+                    if(eff != null) effectHandler.get(eff[0], eff[1]);
+                }
+                if(e instanceof Unit && unitCons != null && (!stopSort || !hit)){
+                    hit |= unitCons.get(((Unit)e));
+                    if(eff != null) effectHandler.get(eff[0], eff[1]);
+                }
             });
         }
+        effectArray.clear();
         tmpUnitSeq.clear();
     }
 

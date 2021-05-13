@@ -71,7 +71,7 @@ public class UnityBlocks implements ContentList{
     public static @FactionDef("light")
     Block oreLuminum,
 
-    photon, electron, /*graviton,*/ proton, neutron, /*gluon,*/ wBoson, zBoson, higgsBoson, /*singularity,*/ muon, /*ephemeron,*/
+    photon, electron, graviton, proton, neutron, /*gluon,*/ wBoson, zBoson, higgsBoson, /*singularity,*/ muon, /*ephemeron,*/
 
     lightLamp, oilLamp, lightLaser, lightLampInfi, lightReflector, lightReflector1, lightOmnimirror, lightFilter, lightInvertedFilter, lightDivisor, lightDivisor1, lightItemFilter, lightPanel, lightInfluencer,
 
@@ -535,8 +535,29 @@ public class UnityBlocks implements ContentList{
             consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.2f)).update(false);
         }};
 
+        graviton = new LaserTurret("graviton"){{
+            requirements(Category.turret, with(Items.lead, 110, Items.graphite, 90, Items.silicon, 70, UnityItems.luminum, 180, Items.titanium, 135));
+            size = 3;
+            health = 2780;
+            reloadTime = 150f;
+            recoilAmount = 2f;
+            shootCone = 30f;
+            range = 230f;
+            powerUse = 5.75f;
+            heatColor = UnityPal.lightHeat;
+            loopSound = UnitySounds.xenoBeam;
+            shootType = new GravitonLaserBulletType(0.8f){{
+                length = 260f;
+                knockback = -5f;
+                incendChance = -1f;
+                colors = new Color[]{UnityPal.advanceDark.cpy().a(0.1f), Pal.lancerLaser.cpy().a(0.2f)};
+                strokes = new float[]{2.4f, 1.8f};
+            }};
+            consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.25f)).update(false);
+        }};
+
         electron = new PowerTurret("electron"){{
-            requirements(Category.turret, with(Items.lead, 110, Items.silicon, 75, UnityItems.luminum, 165, Items.titanium, 135));
+            requirements(Category.turret, with(Items.lead, 110, Items.silicon, 75, UnityItems.luminum, 165, Items.titanium, 125));
             size = 3;
             health = 2540;
             reloadTime = 60f;
@@ -567,7 +588,7 @@ public class UnityBlocks implements ContentList{
             };
         }};
 
-        //graviton
+        //Gluon
 
         proton = new PowerTurret("proton"){{
             requirements(Category.turret, with(Items.lead, 110, Items.silicon, 75, UnityItems.luminum, 165, Items.titanium, 135));
@@ -583,7 +604,7 @@ public class UnityBlocks implements ContentList{
             targetAir = false;
             cooldown = 0.008f;
             shootEffect = UnityFx.blueTriangleShoot;
-            shootType = new ArtilleryBulletType(8f, 44f){
+            shootType = new ArtilleryBulletType(8f, 44f, "unity-electric-shell"){
                 {
                     lifetime = 35f;
                     width = 18f;
@@ -635,6 +656,7 @@ public class UnityBlocks implements ContentList{
                     splashDamageRadius = 34f;
                     shrinkX = shrinkY = 0f;
                     hitSize = 7;
+                    sprite = "unity-electric-shell";
                     hitEffect = UnityFx.neutronHit;
                     collides = collidesGround = true;
                     backColor = lightColor = hitColor = Pal.lancerLaser;
@@ -651,11 +673,9 @@ public class UnityBlocks implements ContentList{
             };
         }};
 
-        //gluon
-
         wBoson = new PowerTurret("w-boson"){
             {
-                requirements(Category.turret, with(Items.silicon, 300, UnityItems.luminum, 430, Items.titanium, 190, Items.thorium, 110, Items.surgeAlloy, 20));
+                requirements(Category.turret, with(Items.silicon, 300, UnityItems.luminum, 430, Items.titanium, 190, Items.thorium, 110, UnityItems.lightAlloy, 15));
                 health = 4000;
                 size = 5;
                 reloadTime = 90f;
@@ -729,7 +749,7 @@ public class UnityBlocks implements ContentList{
 
         zBoson = new RampupPowerTurret("z-boson"){
             {
-                requirements(Category.turret, with(Items.silicon, 290, UnityItems.luminum, 430, Items.titanium, 190, Items.thorium, 120, Items.surgeAlloy, 20));
+                requirements(Category.turret, with(Items.silicon, 290, UnityItems.luminum, 430, Items.titanium, 190, Items.thorium, 120, UnityItems.lightAlloy, 15));
                 health = 4000;
                 size = 5;
                 reloadTime = 40f;
