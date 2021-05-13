@@ -344,7 +344,7 @@ public class UnityBlocks implements ContentList{
             requirements(Category.turret, with(Items.copper, 1150, Items.graphite, 1420, Items.silicon, 960, Items.plastanium, 800, Items.thorium, 1230, UnityItems.darkAlloy, 380));
         }};
 
-        banshee = new unity.world.blocks.defense.turrets.BarrelsItemTurret("banshee"){{
+        banshee = new BarrelsItemTurret("banshee"){{
             size = 12;
             health = 22000;
             range = 370f;
