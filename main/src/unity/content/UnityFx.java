@@ -251,7 +251,88 @@ public class UnityFx{
             float rot = Mathf.lerp((i - (int)(spikes / 2f)) * spread, 0, rotpow);
             Drawf.tri(e.x, e.y, shrink * 5f * (1f + 3f * rotpow), 80f * slope, e.rotation + rot);
         }
-    }), 
+    }),
+
+    electronHit = new Effect(12f, e -> {
+        color(Pal.lancerLaser, Color.valueOf("4787ff"), e.fin());
+        stroke(e.fout() * 3f);
+        Lines.circle(e.x, e.y, e.fin() * 90f);
+
+        randLenVectors(e.id, 7, e.finpow() * 45f, (x, y) -> {
+            float a = Mathf.angle(x, y);
+            Fill.poly(e.x + x, e.y + y, 3, e.fout() * 4f, e.fin() * 120f + e.rotation + a);
+        });
+    }),
+
+    protonHit = new Effect(20f, e -> {
+        color(Pal.lancerLaser, Color.valueOf("4787ff00"), e.fin());
+        stroke(e.fout() * 4f);
+	    Lines.circle(e.x, e.y, e.fin() * 150f);
+
+        randLenVectors(e.id, 12, e.finpow() * 64f, (x, y) -> {
+            float a = Mathf.angle(x, y);
+            Fill.poly(e.x + x, e.y + y, 3, e.fout() * 6f, e.fin() * 135f + e.rotation + a);
+        });
+    }),
+
+    neutronHit = new Effect(28f, e -> {
+        color(Pal.lancerLaser, Color.valueOf("4787ff"), e.fin());
+
+        randLenVectors(e.id, 7, e.finpow() * 50f, (x, y) -> {
+            float a = Mathf.angle(x, y);
+            Fill.poly(e.x + x, e.y + y, 3, e.fout() * 5f, e.fin() * 120f + e.rotation + a);
+        });
+    }),
+
+    wBosonChargeBeginEffect = new Effect(38f, e -> {
+        color(Color.valueOf("4787ff"), Pal.lancerLaser, e.fin());
+        Fill.circle(e.x, e.y, 3f + e.fin() * 6f);
+        color(Color.white);
+        Fill.circle(e.x, e.y, 1.75f + e.fin() * 5.75f);
+    }),
+
+    wBosonChargeEffect = new Effect(24f, e -> {
+        color(Color.valueOf("4787ff"), Pal.lancerLaser, e.fin());
+	    stroke(1.5f);
+
+        randLenVectors(e.id, 2, (1f - e.finpow()) * 50f, (x, y) -> {
+            float a = Mathf.angle(x, y);
+            lineAngle(e.x + x, e.y + y, a, Mathf.sin(e.finpow() * 3f, 1f, 8f) + 1.5f);
+            Fill.circle(e.x + x, e.y + y, 2f + e.fin() * 1.75f);
+        });
+    }),
+
+    wBosonHitEffect = new Effect(13f, e -> {
+        color(Pal.lancerLaser, Color.valueOf("4787ff"), e.fin());
+	    stroke(0.5f + e.fout());
+
+        randLenVectors(e.id, 17, e.finpow() * 40f, (x, y) -> {
+            float a = Mathf.angle(x, y);
+            lineAngle(e.x + x, e.y + y, a, e.fout() * 8f);
+        });
+    }),
+
+    wBosonDecayHitEffect = new Effect(13f, e -> {
+        color(Pal.lancerLaser, Color.valueOf("4787ff"), e.fin());
+	    stroke(0.5f + e.fout());
+
+        randLenVectors(e.id, 17, e.finpow() * 20f, (x, y) -> {
+            float a = Mathf.angle(x, y);
+            lineAngle(e.x + x, e.y + y, a, e.fout() * 8f);
+        });
+    }),
+
+    wBosonEffect = new Effect(24f, e -> {
+        color(Pal.lancerLaser, Color.valueOf("4787ff"), e.fin());
+        stroke(1.25f);
+        lineAngle(e.x, e.y, e.rotation, e.fout() * 4f);
+    }),
+
+    wBosonEffectLong = new Effect(47f, e -> {
+        color(Pal.lancerLaser, Color.valueOf("4787ff"), e.fin());
+        stroke(1.25f);
+        lineAngle(e.x, e.y, e.rotation, e.fout() * 7f);
+    }),
 
     orbHit = new Effect(12f, e -> {
         color(Pal.surge);
@@ -754,9 +835,19 @@ public class UnityFx{
         color();
     }),
 
+    blueTriangleShoot = new Effect(23f, e -> {
+        color(Pal.lancerLaser);
+
+        Fill.poly(e.x, e.y, 3, e.fout() * 24f, e.rotation);
+        Fill.circle(e.x, e.y, e.fout() * 11f);
+    
+        color(Color.white);
+        Fill.circle(e.x, e.y, e.fout() * 9f);
+    }),
+
     blueTriangleTrail = new Effect(50f, e -> {
         color(Color.white, Pal.lancerLaser, e.fin());
-        Fill.poly(e.x, e.y, 3, 4f * e.fout(), -90f);
+        Fill.poly(e.x, e.y, 3, 4f * e.fout(), e.rotation + 180f);
     }),
 
     hitAdvanceFlame = new Effect(15f, e -> {
@@ -784,15 +875,15 @@ public class UnityFx{
     eclipseHit = new Effect(15f, e -> {
         color(Color.valueOf("c2ebff"), Color.valueOf("68c0ff"), e.fin());
         
-        randLenVectors(e.id, 4, e.finpow() * 28f, e.rotation, 360, (x, y) -> {
+        randLenVectors(e.id, 4, e.finpow() * 28f, (x, y) -> {
             Fill.poly(e.x + x, e.y + y, 4, 3f + e.fout() * 9f, 0f);
         });
 
-        color(Color.valueOf("ffffff"), Color.valueOf("a9d8ff"), e.fin());
+        color(Color.white, Pal.lancerLaser, e.fin());
 	
 	   stroke(1.5f * e.fout());
        
-       randLenVectors(e.id * 2, 7, e.finpow() * 42f, e.rotation, 360, (x, y) -> {
+       randLenVectors(e.id * 2, 7, e.finpow() * 42f, (x, y) -> {
             float a = Mathf.angle(x, y);
             lineAngle(e.x + x, e.y + y, a, e.fout() * 8f + 1.5f);
         });

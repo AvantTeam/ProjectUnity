@@ -71,10 +71,7 @@ public class UnityBlocks implements ContentList{
     public static @FactionDef("light") Block
     oreLuminum,
 
-    photon, //graviton, gluon, higgsBoson, singularity,
-    electron, zBoson, wBoson, /*,
-    proton, zBoson,
-    neutron, wBoson;*/
+    photon, electron, /*graviton,*/ proton, neutron, /*gluon,*/ wBoson, zBoson, /*higgsBoson, singularity, muon, ephemeron,*/
 
     lightLamp, oilLamp, lightLaser, lightLampInfi, lightReflector, lightReflector1, lightOmnimirror, lightFilter, lightInvertedFilter, lightDivisor, lightDivisor1, lightItemFilter, lightPanel, lightInfluencer,
 
@@ -304,12 +301,6 @@ public class UnityBlocks implements ContentList{
         //region dark
 
         apparition = new ItemTurret("apparition"){
-            @Override
-            public void load(){
-                super.load();
-                baseRegion = atlas.find("unity-block-" + size);
-            }
-
             {
                 requirements(Category.turret, with(Items.copper, 350, Items.graphite, 380, Items.silicon, 360, Items.plastanium, 200, Items.thorium, 220, UnityItems.umbrium, 370, Items.surgeAlloy, 290));
                 size = 5;
@@ -325,6 +316,13 @@ public class UnityBlocks implements ContentList{
                 recoilAmount = 3f;
                 rotateSpeed = 4.5f;
                 ammo(Items.graphite, UnityBullets.standardDenseLarge, Items.silicon, UnityBullets.standardHomingLarge, Items.pyratite, UnityBullets.standardIncendiaryLarge, Items.thorium, UnityBullets.standardThoriumLarge);
+            }
+
+            
+            @Override
+            public void load(){
+                super.load();
+                baseRegion = atlas.find("unity-block-" + size);
             }
         };
 
@@ -367,12 +365,6 @@ public class UnityBlocks implements ContentList{
         }};
 
         fallout = new LaserTurret("fallout"){
-            @Override
-            public void load(){
-                super.load();
-                baseRegion = atlas.find("unity-block-" + size);
-            }
-
             {
                 size = 5;
                 health = 3975;
@@ -395,6 +387,12 @@ public class UnityBlocks implements ContentList{
                 requirements(Category.turret, with(Items.copper, 450, Items.lead, 350, Items.graphite, 390, Items.silicon, 360, Items.titanium, 250, UnityItems.umbrium, 370, Items.surgeAlloy, 360));
                 shootType = UnityBullets.falloutLaser;
                 consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.58f)).update(false);
+            }
+ 
+            @Override
+            public void load(){
+                super.load();
+                baseRegion = atlas.find("unity-block-" + size);
             }
         };
 
@@ -545,32 +543,187 @@ public class UnityBlocks implements ContentList{
             range = 170f;
             powerUse = 6.6f;
             heatColor = UnityPal.lightHeat;
+            shootEffect = UnityFx.blueTriangleShoot;
             shootSound = Sounds.pew;
-            shootType = new BasicBulletType(6f, 26f, "unity-electric-shell"){{
-                lifetime = 30f;
-                width = 12f;
-                height = 19f;
-                backColor = lightColor = hitColor = Pal.lancerLaser;
-                frontColor = Color.white;
-            }
+            shootType = new BasicBulletType(9f, 34f, "unity-electric-shell"){
+                {
+                    lifetime = 22f;
+                    width = 12f;
+                    height = 19f;
+                    shrinkX = shrinkY = 0f;
+                    backColor = lightColor = hitColor = Pal.lancerLaser;
+                    frontColor = Color.white;
+                    hitEffect = UnityFx.electronHit;
+                }
 
                 @Override
                 public void update(Bullet b){
                     super.update(b);
-                    if(b.timer(0, 1f + b.fslope() * 2f)){
-                        UnityFx.blueTriangleTrail.at(b.x, b.y);
+                    if(b.timer(0, 2f + b.fslope() * 1.5f)){
+                        UnityFx.blueTriangleTrail.at(b.x, b.y, b.rotation());
                     }
                 }
             };
         }};
 
-        zBoson = new RampupPowerTurret("z-boson"){
+        //graviton
+
+        proton = new PowerTurret("proton"){{
+            requirements(Category.turret, with(Items.lead, 110, Items.silicon, 75, UnityItems.luminum, 165, Items.titanium, 135));
+            size = 4;
+            health = 2540;
+            reloadTime = 60f;
+            range = 245f;
+            shootCone = 20f;
+            heatColor = UnityPal.lightHeat;
+            rotateSpeed = 1.5f;
+            recoilAmount = 4f;
+            powerUse = 4.9f;
+            targetAir = false;
+            cooldown = 0.008f;
+            shootEffect = UnityFx.blueTriangleShoot;
+            shootType = new ArtilleryBulletType(8f, 44f){
+                {
+                    lifetime = 35f;
+                    width = 18f;
+                    splashDamage = 23f;
+                    splashDamageRadius = 45f;
+                    height = 27f;
+                    shrinkX = shrinkY = 0f;
+                    hitSize = 15f;
+                    hitEffect = UnityFx.protonHit;
+                    collides = false;
+                    backColor = lightColor = hitColor = lightningColor = Pal.lancerLaser;
+                    frontColor = Color.white;
+                    lightning = 3;
+                    lightningDamage = 18f;
+                    lightningLength = 10;
+                    lightningLengthRand = 6;
+                }
+
+                @Override
+                public void update(Bullet b){
+                    super.update(b);
+                    if(b.timer(0, 2f + b.fslope() * 1.5f)){
+                        UnityFx.blueTriangleTrail.at(b.x, b.y, b.rotation());
+                    }
+                }
+            };
+        }};
+        
+        neutron = new PowerTurret("neutron"){{
+            requirements(Category.turret, with(Items.lead, 110, Items.silicon, 75, UnityItems.luminum, 165, Items.titanium, 135));
+            size = 4;
+            health = 2520;
+            reloadTime = 10f;
+            range = 235f;
+            shootCone = 20f;
+            heatColor = UnityPal.lightHeat;
+            rotateSpeed = 3.9f;
+            recoilAmount = 4f;
+            powerUse = 4.9f;
+            cooldown = 0.008f;
+            inaccuracy = 3.4f;
+            shootEffect = UnityFx.blueTriangleShoot;
+            shootType = new FlakBulletType(8.7f, 7f){
+                {
+                    lifetime = 30f;
+                    width = 8f;
+                    height = 14f;
+                    splashDamage = 28f;
+                    splashDamageRadius = 34f;
+                    shrinkX = shrinkY = 0f;
+                    hitSize = 7;
+                    hitEffect = UnityFx.neutronHit;
+                    collides = collidesGround = true;
+                    backColor = lightColor = hitColor = Pal.lancerLaser;
+                    frontColor = Color.white;
+                }
+
+                @Override
+                public void update(Bullet b){
+                    super.update(b);
+                    if(b.timer(0, 2f + b.fslope() * 1.5f)){
+                        UnityFx.blueTriangleTrail.at(b.x, b.y, b.rotation());
+                    }
+                }
+            };
+        }};
+
+        //gluon
+
+        wBoson = new PowerTurret("w-boson"){
+            {
+                requirements(Category.turret, with(Items.silicon, 300, UnityItems.luminum, 430, Items.titanium, 190, Items.thorium, 110, Items.surgeAlloy, 20));
+                health = 4000;
+                size = 5;
+                reloadTime = 90f;
+                range = 250f;
+                rotateSpeed = 2.5f;
+                shootCone = 20f;
+                heatColor = UnityPal.lightHeat;
+                chargeBeginEffect = UnityFx.wBosonChargeBeginEffect;
+                chargeEffect = UnityFx.wBosonChargeEffect;
+                chargeTime = 38f;
+                cooldown = 0.008f;
+                powerUse = 8.6f;
+
+                shootType = new DecayBasicBulletType(8.5f, 24f){{
+                    drag = 0.026f;
+                    lifetime = 48f;
+                    collides = false;
+                    backColor = trailColor = hitColor = lightColor = Pal.lancerLaser;
+                    hitEffect = despawnEffect = Fx.hitLancer;
+                    frontColor = Color.white;
+                    decayEffect = UnityFx.wBosonEffectLong;
+                    height = 13f;
+                    width = 12f;
+                    decayBullet = new BasicBulletType(4.8f, 24f){
+                        {
+                            drag = 0.04f;
+                            lifetime = 18f;
+                            pierce = true;
+                            pierceCap = 3;
+                            height = 9f;
+                            width = 8f;
+                            backColor = trailColor = hitColor = lightColor = Pal.lancerLaser;
+                            hitEffect = despawnEffect = Fx.hitLancer;
+                            frontColor = Color.white;
+                        }
+    
+                        @Override
+                        public void draw(Bullet b){
+                            Draw.color(backColor);
+                            Fill.circle(b.x, b.y, 1.5f + (b.fout() * 3f));
+                            Draw.color(frontColor);
+                            Fill.circle(b.x, b.y, 0.75f + (b.fout() * 2.75f));
+                        }
+
+                        @Override
+                        public void update(Bullet b){
+                            super.update(b);
+                            if(Mathf.chance(0.8f)){
+                                UnityFx.wBosonEffect.at(b, b.rotation() + 180f);
+                            }
+                        }
+                    };
+                    fragBullet = decayBullet;
+                    fragBullets = 12;
+                    fragVelocityMin = 0.75f;
+                    fragVelocityMax = 1.25f;
+                    fragLifeMin = 1.2f;
+                    fragLifeMax = 1.3f;
+                }};
+            }
+
             @Override
             public void load(){
                 super.load();
                 baseRegion = atlas.find("unity-block-" + size);
             }
+        };
 
+        zBoson = new RampupPowerTurret("z-boson"){
             {
                 requirements(Category.turret, with(Items.silicon, 290, UnityItems.luminum, 430, Items.titanium, 190, Items.thorium, 120, Items.surgeAlloy, 20));
                 health = 4000;
@@ -602,63 +755,28 @@ public class UnityBlocks implements ContentList{
                 barBaseY = -10.75f;
                 barLength = 20f;
 
-                shootType = UnityBullets.zBosonBolt;
+                shootType = new VelocityLaserBoltBulletType(9.5f, 56f){{
+                    splashDamage = 8f;
+                    splashDamageRadius = 16f;
+                    drag = 0.005f;
+                    lifetime = 27f;
+                }};
             }
-        };
-
-        wBoson = new PowerTurret("w-boson"){
+            
             @Override
             public void load(){
                 super.load();
                 baseRegion = atlas.find("unity-block-" + size);
             }
-
-            {
-                requirements(Category.turret, with(Items.silicon, 300, UnityItems.luminum, 430, Items.titanium, 190, Items.thorium, 110, Items.surgeAlloy, 20));
-                health = 4000;
-                size = 5;
-                reloadTime = 90f;
-                range = 250f;
-                rotateSpeed = 2.5f;
-                shootCone = 20f;
-                heatColor = UnityPal.lightHeat;
-                chargeTime = 40f;
-                cooldown = 0.008f;
-                powerUse = 8.6f;
-
-                shootType = new DecayBasicBulletType(8.5f, 24f, "unity-electric-shell"){{
-                    drag = 0.026f;
-                    lifetime = 48f;
-                    collides = false;
-                    backColor = trailColor = hitColor = lightColor = Pal.lancerLaser;
-                    hitEffect = despawnEffect = Fx.hitLancer;
-                    frontColor = Color.white;
-                    trailEffect = UnityFx.lineTrail;
-                    trailChanceAlt = 0.4f;
-                    height = 13f;
-                    width = 12f;
-                    decayBullet = new BasicBulletType(4.8f, 24f, "unity-electric-shell"){{
-                        drag = 0.04f;
-                        lifetime = 18f;
-                        pierce = true;
-                        pierceCap = 3;
-                        height = 9f;
-                        width = 8f;
-                        backColor = trailColor = hitColor = lightColor = Pal.lancerLaser;
-                        trailEffect = Fx.missileTrail;
-                        trailChance = 0.5f;
-                        hitEffect = despawnEffect = Fx.hitLancer;
-                        frontColor = Color.white;
-                    }};
-                    fragBullet = decayBullet;
-                    fragBullets = 12;
-                    fragVelocityMin = 0.75f;
-                    fragVelocityMax = 1.25f;
-                    fragLifeMin = 1.2f;
-                    fragLifeMax = 1.3f;
-                }};
-            }
         };
+
+        //Higgs Boson
+
+        //Singularity
+
+        //Muon
+
+        //Ephemeron
 
         lightLamp = new LightSource("light-lamp"){{
             consumes.power(1f);
@@ -2478,6 +2596,10 @@ public class UnityBlocks implements ContentList{
             cooldown = 0.01f;
             shootType = UnityBullets.kelvinSmoke;
         }};
+
+        //Arc Caster
+
+        //Arc Storm
 
         eclipse = new LaserTurret("blue-eclipse"){
             {
