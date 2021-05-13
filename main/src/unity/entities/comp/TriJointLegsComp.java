@@ -14,6 +14,7 @@ import unity.annotations.Annotations.*;
 import unity.entities.*;
 import unity.util.*;
 
+@SuppressWarnings("unused")
 @EntityComponent
 abstract class TriJointLegsComp implements Unitc{
     transient TriJointLeg[] legs;

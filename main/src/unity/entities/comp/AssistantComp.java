@@ -13,6 +13,7 @@ import mindustry.ui.*;
 import unity.annotations.Annotations.*;
 
 /** @author GlennFolker */
+@SuppressWarnings("unused")
 @EntityComponent
 abstract class AssistantComp implements Unitc{
     @ReadOnly String lastText;

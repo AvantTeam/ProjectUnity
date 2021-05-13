@@ -13,6 +13,7 @@ import unity.gen.*;
 import unity.type.*;
 
 /** @author GlennFolker */
+@SuppressWarnings("unused")
 @EntityComponent
 abstract class LaserComp implements Unitc, ExtensionHolder{
     transient Extension ext;

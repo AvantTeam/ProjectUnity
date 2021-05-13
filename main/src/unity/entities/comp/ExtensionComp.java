@@ -6,6 +6,7 @@ import unity.entities.*;
 import unity.gen.*;
 
 /** @author GlennFolker */
+@SuppressWarnings("unused")
 @EntityDef(value = Extensionc.class, serialize = false)
 @EntityComponent(base = true)
 abstract class ExtensionComp implements Drawc{

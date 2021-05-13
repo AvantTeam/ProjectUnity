@@ -86,11 +86,6 @@ public class Annotations{
     @Retention(RetentionPolicy.SOURCE)
     public @interface FactionBase{}
 
-    /** Whether this class is the base class for exp types. Only one type may use this */
-    @Target(ElementType.TYPE)
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface ExpBase{}
-
     /** Works somewhat like {@code Object.assign(...)} for Block and Building */
     @Target({ElementType.TYPE, ElementType.FIELD})
     @Retention(RetentionPolicy.SOURCE)
@@ -105,9 +100,9 @@ public class Annotations{
     /** Notifies that this class is a component class; an interface will be generated out of this */
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface MergeComp{}
+    public @interface MergeComponent{}
 
-    /** The generated interface from {@link Annotations.MergeComp} */
+    /** The generated interface from {@link MergeComponent} */
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.SOURCE)
     public @interface MergeInterface{
@@ -134,6 +129,14 @@ public class Annotations{
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.SOURCE)
     public @interface EntityInterface{}
+
+    /** Prevents this component from getting added into an entity group, specified by the group's element type */
+    @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface ExcludeGroups{
+        /** @return The excluded group's element type */
+        Class<?>[] value();
+    }
 
     //end region
     //region utilities
@@ -237,7 +240,7 @@ public class Annotations{
 
         public static <A extends Annotation> A generateAnnotation(Compound var0, Class<A> var1){
             AnnotationProxyMaker var2 = new AnnotationProxyMaker(var0, var1);
-            return (A)var1.cast(var2.generateAnnotation());
+            return var1.cast(var2.generateAnnotation());
         }
 
         private Annotation generateAnnotation(){
@@ -246,12 +249,10 @@ public class Annotations{
 
         private Map<String, Object> getAllReflectedValues(){
             LinkedHashMap var1 = new LinkedHashMap();
-            Iterator var2 = this.getAllValues().entrySet().iterator();
 
-            while(var2.hasNext()){
-                Entry var3 = (Entry)var2.next();
-                MethodSymbol var4 = (MethodSymbol)var3.getKey();
-                Object var5 = this.generateValue(var4, (Attribute)var3.getValue());
+            for(Entry<MethodSymbol, Attribute> var3 : this.getAllValues().entrySet()){
+                MethodSymbol var4 = var3.getKey();
+                Object var5 = this.generateValue(var4, var3.getValue());
                 if(var5 != null){
                     var1.put(var4.name.toString(), var5);
                 }
@@ -262,7 +263,7 @@ public class Annotations{
 
         private Map<MethodSymbol, Attribute> getAllValues(){
             LinkedHashMap map = new LinkedHashMap();
-            ClassSymbol cl = (ClassSymbol)this.anno.type.tsym;
+            ClassSymbol cl = (ClassSymbol)anno.type.tsym;
 
             try{
                 Class entryClass = Class.forName("com.sun.tools.javac.code.Scope$Entry");
@@ -274,7 +275,6 @@ public class Annotations{
                 for(Object currEntry = elems; currEntry != null; currEntry = siblingField.get(currEntry)){
                     handleSymbol((Symbol)symField.get(currEntry), map);
                 }
-
             }catch(Throwable e){
                 try{
                     Class lookupClass = Class.forName("com.sun.tools.javac.code.Scope$LookupKind");
@@ -283,9 +283,8 @@ public class Annotations{
                     Scope scope = cl.members();
                     Method getSyms = scope.getClass().getMethod("getSymbols", lookupClass);
                     Iterable<Symbol> it = (Iterable<Symbol>)getSyms.invoke(scope, nonRec);
-                    Iterator<Symbol> i = it.iterator();
-                    while(i.hasNext()){
-                        handleSymbol(i.next(), map);
+                    for(Symbol symbol : it){
+                        handleSymbol(symbol, map);
                     }
                 }catch(Throwable death){
                     throw new RuntimeException(death);
@@ -315,7 +314,7 @@ public class Annotations{
         }
 
         private class ValueVisitor implements Visitor{
-            private MethodSymbol meth;
+            private final MethodSymbol meth;
             private Class<?> returnClass;
             private Object value;
 
@@ -326,7 +325,7 @@ public class Annotations{
             Object getValue(Attribute var1){
                 Method var2;
                 try{
-                    var2 = AnnotationProxyMaker.this.annoType.getMethod(this.meth.name.toString());
+                    var2 = AnnotationProxyMaker.this.annoType.getMethod(meth.name.toString());
                 }catch(NoSuchMethodException var4){
                     return null;
                 }

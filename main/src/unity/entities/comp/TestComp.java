@@ -4,6 +4,7 @@ import mindustry.gen.*;
 import unity.annotations.Annotations.*;
 import unity.gen.*;
 
+@SuppressWarnings("unused")
 @EntityDef({Unitc.class, Testc.class})
 @EntityComponent
 abstract class TestComp implements Unitc{

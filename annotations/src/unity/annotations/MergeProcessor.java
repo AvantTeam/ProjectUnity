@@ -20,7 +20,7 @@ import java.util.regex.*;
 @SuppressWarnings("unchecked")
 @SupportedAnnotationTypes({
     "unity.annotations.Annotations.Merge",
-    "unity.annotations.Annotations.MergeComp",
+    "unity.annotations.Annotations.MergeComponent",
     "unity.annotations.Annotations.MergeInterface"
 })
 public class MergeProcessor extends BaseProcessor{
@@ -39,7 +39,7 @@ public class MergeProcessor extends BaseProcessor{
 
     @Override
     public void process(RoundEnvironment roundEnv) throws Exception{
-        comps.addAll((Set<TypeElement>)roundEnv.getElementsAnnotatedWith(MergeComp.class));
+        comps.addAll((Set<TypeElement>)roundEnv.getElementsAnnotatedWith(MergeComponent.class));
         inters.addAll((Set<TypeElement>)roundEnv.getElementsAnnotatedWith(MergeInterface.class));
         defs.addAll(roundEnv.getElementsAnnotatedWith(Merge.class));
 
@@ -630,7 +630,7 @@ public class MergeProcessor extends BaseProcessor{
     String interfaceName(TypeElement type){
         String name = type.getSimpleName().toString();
         if(!name.endsWith("Comp")){
-            throw new IllegalStateException("All types annotated with @MergeComp must have 'Comp' as the name's suffix");
+            throw new IllegalStateException("All types annotated with @MergeComponent must have 'Comp' as the name's suffix");
         }
 
         return name.substring(0, name.length() - 4) + "c";

@@ -101,12 +101,7 @@ public class AssistantAI extends FlyingAI{
             current.initialized = true;
         }
 
-        if((
-            !userValid() || (
-            user instanceof Unit unit
-            ?   !unit.isPlayer()
-            :   true
-        )) && timer.get(5f)){
+        if((!userValid() || (!(user instanceof Unit unit) || !unit.isPlayer())) && timer.get(5f)){
             updateUser();
         }
 
@@ -185,7 +180,7 @@ public class AssistantAI extends FlyingAI{
     }
 
     public boolean userValid(){
-        return user != null && user.isAdded() && (user instanceof Healthc health ? health.isValid() : true);
+        return user != null && user.isAdded() && (!(user instanceof Healthc health) || health.isValid());
     }
 
     protected void displayMessage(String message){
@@ -316,7 +311,8 @@ public class AssistantAI extends FlyingAI{
                     ai.fallback = new BuilderAI();
                 }
 
-                if(ai.fallback instanceof BuilderAI buildAI && ai.user instanceof Builderc builder){
+                BuilderAI buildAI = (BuilderAI)ai.fallback;
+                if(ai.user instanceof Builderc builder){
                     ReflectUtils.setField(buildAI, ReflectUtils.findField(buildAI.getClass(), "following", true), builder);
                 }
             }
@@ -363,7 +359,8 @@ public class AssistantAI extends FlyingAI{
                     ai.fallback = new FixedMinerAI();
                 }
 
-                if(ai.fallback instanceof FixedMinerAI minAI && ai.user instanceof Minerc miner){
+                FixedMinerAI minAI = (FixedMinerAI)ai.fallback;
+                if(ai.user instanceof Minerc miner){
                     minAI.targetItem = ai.unit.stack.amount > 0
                     ?   ai.unit.stack.item
                     :   (

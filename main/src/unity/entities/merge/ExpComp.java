@@ -29,7 +29,7 @@ import java.lang.reflect.*;
 
 import static mindustry.Vars.*;
 
-@MergeComp
+@MergeComponent
 @SuppressWarnings({"rawtypes", "unchecked"})
 class ExpComp extends Block{
     int maxLevel = 20;

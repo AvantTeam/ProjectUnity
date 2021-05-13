@@ -227,7 +227,7 @@ public class EntityProcessor extends BaseProcessor{
                 Seq<TypeElement> defComps = elements(ann::value)
                     .<TypeElement>as()
                     .map(t -> inters.find(i -> simpleName(i).equals(simpleName(t))))
-                    .select(t -> t != null)
+                    .select(Objects::nonNull)
                     .map(this::toComp);
 
                 if(defComps.isEmpty()) continue;
@@ -257,7 +257,19 @@ public class EntityProcessor extends BaseProcessor{
                     createName(defComps);
 
                 defComps.addAll(defComps.copy().flatMap(this::getDependencies)).distinct();
-                Seq<String> defGroups = groups.values().toSeq().select(val -> defComps.contains(groups.findKey(val, false)));
+                Seq<TypeElement> empty = Seq.with();
+                Seq<TypeElement> excludeGroups = Seq.with(defComps)
+                    .flatMap(t -> annotation(t, ExcludeGroups.class) != null ? elements(annotation(t, ExcludeGroups.class)::value).as() : empty)
+                    .distinct()
+                    .map(this::toComp);
+
+                Seq<String> defGroups = groups.values().toSeq().select(val -> {
+                    TypeElement type = groups.findKey(val, false);
+                    return
+                        defComps.contains(type) &&
+                        !excludeGroups.contains(type);
+                    }
+                );
 
                 if(!typeIsBase && baseClass != null && name.equals(baseName(baseClassType))){
                     name += "Entity";
@@ -355,7 +367,7 @@ public class EntityProcessor extends BaseProcessor{
                     }
                 }
 
-                syncedFields.sortComparing(e -> simpleName(e));
+                syncedFields.sortComparing(BaseProcessor::simpleName);
 
                 builder.addMethod(
                     MethodSpec.methodBuilder("toString")
@@ -421,6 +433,7 @@ public class EntityProcessor extends BaseProcessor{
                         for(String group : defGroups){
                             mbuilder.addStatement("Groups.$L.$L(this)", group, simpleName(first));
                         }
+                        mbuilder.addCode(lnew());
                     }
 
                     Seq<ExecutableElement> inserts = ins.get(entry.key, Seq::new);
@@ -513,7 +526,12 @@ public class EntityProcessor extends BaseProcessor{
                         if(writeBlock){
                             str = str.replace("return;", "break " + blockName + ";");
 
-                            if(str.isBlank()) continue;
+                            if(str
+                                .replaceAll("\\s+", "")
+                                .replace("\n", "")
+                                .isEmpty()
+                            ) continue;
+
                             mbuilder.beginControlFlow("$L:", blockName);
                         }
 
@@ -701,7 +719,7 @@ public class EntityProcessor extends BaseProcessor{
                 boolean isUnit = e instanceof VariableElement;
 
                 TypeElement type = (TypeElement)toEl(isUnit ? elements(point::value).first().asType() : e.asType());
-                ExecutableElement create = method(type, "create", type.asType(), List.of());
+                ExecutableElement create = method(type, "create", type.asType(), Collections.emptyList());
                 String constructor = create == null ? "new" : "create";
 
                 if(isUnit){

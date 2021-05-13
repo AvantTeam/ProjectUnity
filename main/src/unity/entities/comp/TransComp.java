@@ -8,6 +8,7 @@ import mindustry.type.*;
 import unity.annotations.Annotations.*;
 import unity.type.*;
 
+@SuppressWarnings("unused")
 @EntityComponent
 abstract class TransComp implements Unitc{
     @SyncLocal float transformTime;

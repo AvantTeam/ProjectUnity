@@ -14,6 +14,7 @@ import static mindustry.Vars.*;
  * @author GlennFolker
  * @author MEEPofFaith
  */
+@SuppressWarnings("unused")
 @EntityComponent
 abstract class CopterComp implements Unitc{
     transient RotorMount[] rotors;

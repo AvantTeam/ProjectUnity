@@ -10,6 +10,7 @@ import mindustry.type.*;
 import unity.annotations.Annotations.*;
 import unity.type.*;
 
+@SuppressWarnings("unused")
 @EntityComponent
 abstract class EndComp implements Unitc{
     @SyncLocal private float lastHealth, lastMaxHealth;

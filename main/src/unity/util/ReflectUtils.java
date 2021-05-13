@@ -227,7 +227,7 @@ public final class ReflectUtils{
         }
     }
 
-    private static <T> Object getConstructorAccessor(Class<T> enumClass, Constructor<T> constructor){
+    private static <T> Object getConstructorAccessor(Constructor<T> constructor){
         try{
             return j8NewConsAccessor.invoke(j8RefFac, constructor);
         }catch(Throwable e){
@@ -283,7 +283,7 @@ public final class ReflectUtils{
             System.arraycopy(args, 0, arguments, 2, args.length);
 
             if(useSun){
-                return type.cast(j8NewInstance.invoke(getConstructorAccessor(type, cons), arguments));
+                return type.cast(j8NewInstance.invoke(getConstructorAccessor(cons), arguments));
             }else{
                 cons.setAccessible(true);
 

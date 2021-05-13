@@ -6,7 +6,7 @@ import mindustry.world.*;
 import unity.annotations.Annotations.*;
 import unity.gen.Stemc.*;
 
-@MergeComp
+@MergeComponent
 @SuppressWarnings("unchecked")
 class StemComp extends Block{
     boolean preserveDraw = true;

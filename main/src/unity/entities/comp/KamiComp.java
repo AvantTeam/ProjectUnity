@@ -7,6 +7,7 @@ import unity.ai.*;
 import unity.annotations.Annotations.*;
 import unity.gen.*;
 
+@SuppressWarnings("unused")
 @EntityDef({Unitc.class, Bossc.class, Kamic.class})
 @EntityComponent
 abstract class KamiComp implements Unitc{

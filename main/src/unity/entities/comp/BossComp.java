@@ -7,6 +7,7 @@ import unity.annotations.Annotations.*;
 import unity.sync.*;
 
 /** @author GlennFolker */
+@SuppressWarnings("unused")
 @EntityComponent
 abstract class BossComp implements Unitc{
     @Import UnitType type;
