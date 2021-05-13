@@ -819,11 +819,13 @@ public class UnityBlocks implements ContentList{
                 requirements(Category.turret, with(Items.silicon, 290, UnityItems.luminum, 430, Items.titanium, 190, Items.thorium, 120, Items.surgeAlloy, 20));
                 size = 8;
                 health = 9800;
+                range = 310f;
                 shots = 9;
                 spread = 12f;
                 reloadTime = 90f;
                 coolantMultiplier = 1.9f;
                 shootCone = 80f;
+                powerUse = 18f;
                 shootShake = 5f;
                 recoilAmount = 8f;
                 shootLength = size * tilesize / 2f - 8f;
