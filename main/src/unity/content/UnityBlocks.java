@@ -784,14 +784,14 @@ public class UnityBlocks implements ContentList{
                 health = 6000;
                 reloadTime = 13f;
                 alternate = true;
-                spread = 8.625f;
+                spread = 17.25f;
+                shots = 2;
                 range = 260f;
                 shootCone = 20f;
                 heatColor = UnityPal.lightHeat;
                 coolantMultiplier = 3.4f;
                 rotateSpeed = 2.2f;
                 recoilAmount = 1.5f;
-                shootLength = size * tilesize / 2f - 1.5f;
                 restitution = 0.09f;
                 powerUse = 10.4f;
                 shootSound = UnitySounds.higgsBosonShoot;
@@ -816,10 +816,11 @@ public class UnityBlocks implements ContentList{
 
         muon = new PowerTurret("muon"){ //Should it be animated? Since the animation in AC was disabled.
             {
+                requirements(Category.turret, with(Items.silicon, 290, UnityItems.luminum, 430, Items.titanium, 190, Items.thorium, 120, Items.surgeAlloy, 20));
                 size = 8;
                 health = 9800;
                 shots = 9;
-                spread = 6f;
+                spread = 12f;
                 reloadTime = 90f;
                 coolantMultiplier = 1.9f;
                 shootCone = 80f;
