@@ -11,7 +11,6 @@ dependencies {
     compileOnly "com.github.Anuken.Arc:arc-core:$mindustryVersion"
     compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
 
-    implementation "com.github.younggam:multi-lib:$multilibVersion"
     annotationProcessor "com.github.Anuken:jabel:$jabelVersion"
 
     compileOnly project(':annotations')
@@ -62,7 +61,7 @@ task dex(dependsOn: deploy) {
         def files = (
             configurations.compileClasspath.asList() +
             configurations.runtimeClasspath.asList() +
-            [new File("${sdkRoot()}/platforms/android-$sdkVersion/android.jar")]
+            [new File("${sdkRoot()}/platforms/android-${sdkVersion()}/android.jar")]
         )
 
         for(def file : files) {
@@ -70,7 +69,7 @@ task dex(dependsOn: deploy) {
             command += file.path
         }
 
-        command += ['--min-api', sdkAPI, '--output', dexedArtifact, jarArtifact]
+        command += ['--min-api', sdkAPI(), '--output', dexedArtifact, jarArtifact]
         if(windows()) {
             commandLine('cmd', '/c', *command)
         } else {

@@ -8,7 +8,6 @@ buildscript {
         classpath "com.github.Anuken.Arc:arc-core:$mindustryVersion"
         classpath "com.github.Anuken.Mindustry:core:$mindustryVersion"
         classpath "com.squareup:javapoet:$javapoetVersion"
-        classpath "com.github.younggam:multi-lib:$multilibVersion"
         classpath "com.github.Anuken:jabel:$jabelVersion"
     }
 }
@@ -21,20 +20,11 @@ allprojects {
     version = '0.1'
 
     ext {
-        sdkVersion = '30'
-        sdkAPI = '26'
-
-        sdkRoot = {
-            return System.getenv('ANDROID_SDK_ROOT')
-        }
-
-        hasSprites = {
-            return new File(rootDir, 'main/assets/sprites/').exists()
-        }
-
-        windows = {
-            return System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')
-        }
+        sdkVersion = { return '30' }
+        sdkAPI = { return '26' }
+        sdkRoot = { return System.getenv('ANDROID_SDK_ROOT') }
+        hasSprites = { return new File(rootDir, 'main/assets/sprites/').exists() }
+        windows = { return System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows') }
     }
 
     repositories {
