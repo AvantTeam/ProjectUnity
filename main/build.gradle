@@ -42,6 +42,10 @@ task deploy(type: Jar, dependsOn: configurations.runtimeClasspath) {
     from files(project.assetsDir)
     from(rootDir) { include 'mod.json' }
 
+    exclude 'unity/fetched/**'
+    exclude 'unity/entities/comp/**'
+    exclude 'unity/entities/merge/**'
+
     doLast { delete {
         delete "$buildDir/libs/main-${version}.jar"
     }}
@@ -213,4 +217,10 @@ compileJava {
             dependsOn fetchComps
         }
     }
+}
+
+jar {
+    exclude 'unity/fetched/**'
+    exclude 'unity/entities/comp/**'
+    exclude 'unity/entities/merge/**'
 }

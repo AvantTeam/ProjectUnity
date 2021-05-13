@@ -16,6 +16,7 @@ tools/bin/
 tools/build/
 tools/.settings/
 
+*.gitconfig
 *.project
 *.classpath
 *.aseprite
