@@ -91,16 +91,19 @@ public class UnityUnitTypes implements ContentList{
     public static @FactionDef("koruh") @EntityPoint(UnitEntity.class)
     UnitType cache, dijkstra, phantasm;
 
-    // monolith mech
-    public static @FactionDef("monolith") @EntityPoint(MechUnit.class)
+    public static @FactionDef("monolith") @EntityPoint(MonolithSoul.class)
+    UnitType monolithSoul;
+
+    // monolith unit + mech
+    public static @FactionDef("monolith") @EntityDef({Unitc.class, Mechc.class, Monolithc.class})
     UnitType stele, pedestal, pilaster;
 
-    // monolith legs
-    public static @FactionDef("monolith") @EntityPoint(LegsUnit.class)
+    // monolith unit + legs
+    public static @FactionDef("monolith") @EntityDef({Unitc.class, Legsc.class, Monolithc.class})
     UnitType pylon, monument, colossus, bastion;
 
     // monolith unit + trail + assistant
-    public static @FactionDef("monolith") @EntityDef({Unitc.class, Trailc.class, Assistantc.class})
+    public static @FactionDef("monolith") @EntityDef({Unitc.class, Trailc.class, Assistantc.class, Monolithc.class})
     UnitType adsect, comitate/*, praesid*/;
 
     // don't
@@ -2435,6 +2438,29 @@ public class UnityUnitTypes implements ContentList{
 
         //endregion
         //region monolith
+
+        monolithSoul = new UnityUnitType("monolith-soul"){
+            {
+                defaultController = MonolithSoulAI::new;
+
+                health = 100f;
+                speed = 4f;
+                accel = 0.2f;
+                drag = 0.08f;
+                omniMovement = false;
+            }
+
+            @Override
+            public boolean isHidden(){
+                return true;
+            }
+
+            @Override
+            public void applyColor(Unit unit){
+                Draw.mixcol(UnityPal.monolithLight, 0.8f);
+                Draw.alpha(0.8f);
+            }
+        };
 
         stele = new UnityUnitType("stele"){{
             health = 150f;
