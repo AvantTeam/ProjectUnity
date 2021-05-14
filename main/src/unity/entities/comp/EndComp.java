@@ -3,7 +3,6 @@ package unity.entities.comp;
 import arc.math.*;
 import arc.util.*;
 import mindustry.*;
-import mindustry.content.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -19,6 +18,7 @@ abstract class EndComp implements Unitc{
     private float aggressionTime = 0f;
     private float[] invFrames;
     private transient int invIndex = 0;
+    private transient float invTimer = 0f;
     private float resist, resistMax, resistTime;
 
     @Import UnitType type;
@@ -78,6 +78,7 @@ abstract class EndComp implements Unitc{
                 invFrames[i] = Math.max(invFrames[i] - Time.delta, 0f);
             }
         }
+        if(invTimer > 0f) invTimer -= Time.delta;
         if(aggression > 0f){
             for(WeaponMount mount : mounts){
                 mount.reload = Math.max(0f, mount.reload - (aggression * Time.delta));
@@ -117,8 +118,11 @@ abstract class EndComp implements Unitc{
                 amount = nextAmount / ((resist * aType.resistScl) + 1f);
 
                 invFrames[invIndex] = aType.invincibilityDuration;
-                invIndex++;
-                invIndex %= invFrames.length;
+                if(invTimer <= 0f){
+                    invIndex++;
+                    invIndex %= invFrames.length;
+                    invTimer = 3f;
+                }
             }else{
                 return;
             }
