@@ -127,10 +127,16 @@ abstract class EndComp implements Unitc{
                 return;
             }
         }
-        amount = Math.max(amount - armor, Vars.minArmorDamage * amount);
-        amount /= healthMultiplier;
+        float tmpAmount = Math.max(amount - armor, Vars.minArmorDamage * amount) / healthMultiplier;
 
-        if(amount > 0) lastHealth -= amount;
+        if(tmpAmount > 0){
+            float shieldDamage = Math.min(Math.max(shield, 0), tmpAmount);
+            tmpAmount -= shieldDamage;
+
+            if(tmpAmount > 0){
+                lastHealth -= tmpAmount;
+            }
+        }
     }
 
     @Override
@@ -140,6 +146,4 @@ abstract class EndComp implements Unitc{
         lastHealth = health;
         clampHealth();
     }
-
-
 }
