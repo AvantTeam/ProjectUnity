@@ -218,6 +218,11 @@ public class Annotations{
     @Retention(RetentionPolicy.SOURCE)
     public @interface BypassGroupCheck{}
 
+    /** Will not replace {@code return;} to {@code break [block];}, hence breaking the entire method statement */
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface BreakAll{}
+
     /** Loads texture regions but does not assign them to their acquirers */
     @Retention(RetentionPolicy.SOURCE)
     public @interface LoadRegs{

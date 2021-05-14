@@ -8,6 +8,8 @@ import unity.gen.*;
 @EntityDef({Unitc.class, Testc.class})
 @EntityComponent
 abstract class TestComp implements Unitc{
+    @Import float health, maxHealth;
+
     @Insert(value = "update()", after = false)
     private void updatePre(){}
 
@@ -38,5 +40,14 @@ abstract class TestComp implements Unitc{
     @BypassGroupCheck
     public void remove(){
         destroy();
+    }
+
+    @Override
+    @BreakAll
+    public void update(){
+        if(health < maxHealth / 2f){
+            destroy();
+            return;
+        }
     }
 }

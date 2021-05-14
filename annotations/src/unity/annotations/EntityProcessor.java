@@ -785,7 +785,9 @@ public class EntityProcessor extends BaseProcessor{
             }
 
             if(writeBlock){
-                str = str.replace("return;", "break " + blockName + ";");
+                if(annotation(elem, BreakAll.class) == null){
+                    str = str.replace("return;", "break " + blockName + ";");
+                }
 
                 if(str
                     .replaceAll("\\s+", "")

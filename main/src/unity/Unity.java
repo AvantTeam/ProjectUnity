@@ -176,7 +176,7 @@ public class Unity extends Mod implements ApplicationListener{
             "}"
         );
 
-        register.get("skip", 
+        register.get("skip",
             "() => {\n" +
                 "for(let i = Vars.state.wave; i < Vars.state.rules.winWave; i++){\n" +
                     "Vars.logic.runWave();\n" +
