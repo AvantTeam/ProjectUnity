@@ -18,6 +18,7 @@ import unity.entities.*;
 import unity.entities.abilities.BaseAbility.*;
 import unity.entities.bullet.*;
 import unity.entities.effects.*;
+import unity.gen.*;
 import unity.graphics.*;
 import unity.type.*;
 import unity.util.*;
@@ -1363,6 +1364,17 @@ public class UnityFx{
             color(UnityPal.monolith, UnityPal.monolithDark, e.finpow());
 
             float w = 1f + e.fout() * 3f;
+            Fill.rect(e.x + x, e.y + y, w, w, 45f);
+        });
+    }),
+
+    monolithSoul = new Effect(60f, e -> {
+        if(!(e.data instanceof Float data)) return;
+
+        randLenVectors(e.id, 2, data, (x, y) -> {
+            color(UnityPal.monolith, UnityPal.monolithDark, e.fin());
+
+            float w = 1f + e.fout() * 4f;
             Fill.rect(e.x + x, e.y + y, w, w, 45f);
         });
     }),

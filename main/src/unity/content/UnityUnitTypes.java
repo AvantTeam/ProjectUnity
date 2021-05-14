@@ -1,5 +1,6 @@
 package unity.content;
 
+import arc.*;
 import arc.math.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -2444,7 +2445,8 @@ public class UnityUnitTypes implements ContentList{
                 defaultController = MonolithSoulAI::new;
 
                 health = 100f;
-                speed = 4f;
+                speed = 1.4f;
+                rotationSpeed = 15f;
                 accel = 0.2f;
                 drag = 0.08f;
                 omniMovement = false;
@@ -2459,6 +2461,24 @@ public class UnityUnitTypes implements ContentList{
             public void applyColor(Unit unit){
                 Draw.mixcol(UnityPal.monolithLight, 0.8f);
                 Draw.alpha(0.8f);
+            }
+
+            @Override
+            public void draw(Unit unit){
+                float z = Draw.z();
+                Draw.z(Layer.effect);
+
+                Draw.color(UnityPal.monolithLight);
+                Lines.polySeg(48, 0, (int)(48f * unit.healthf()), unit.x, unit.y, unit.hitSize + 8f, 0f);
+                Draw.color();
+
+                Draw.z(z);
+            }
+
+            @Override
+            public void load(){
+                super.load();
+                region = Core.atlas.find("clear");
             }
         };
 

@@ -23,7 +23,7 @@ public abstract class BaseAbility extends Ability implements TapListener{
     public boolean interactive = false;
     /**
      * Whether {@link #use(Unit)} will only activate when player taps the screen / presses
-     * {@link Binding.boost}.
+     * {@link Binding#boost}.
      * 
      * Only valid if {@link #interactive} is true
      */
