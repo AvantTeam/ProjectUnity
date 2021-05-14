@@ -3079,7 +3079,7 @@ public class UnityUnitTypes implements ContentList{
             lowAltitude = true;
             outlineColor = UnityPal.darkerOutline;
 
-            antiCheatType = new AntiCheatVariables(health / 25f, health / 1.5f, health / 15f, health / 30f, 0.5f, 6f * 60f, 3f * 60f, 15f, 4);
+            antiCheatType = new AntiCheatVariables(health / 20f, health / 1.25f, health / 15f, health / 25f, 0.2f, 6f * 60f, 3f * 60f, 15f, 4);
             weapons.add(new Weapon("unity-end-small-mount"){{
                 x = 5.75f;
                 y = -0.5f;

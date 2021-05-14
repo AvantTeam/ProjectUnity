@@ -39,6 +39,7 @@ abstract class EndComp implements Unitc{
 
     @Override
     @BypassGroupCheck
+    @BreakAll
     public void remove(){
         if(lastHealth > 0){
             aggression = 4f;
@@ -89,21 +90,23 @@ abstract class EndComp implements Unitc{
         }
     }
 
-    @Override
     @Replace
+    @MethodPriority(-1)
+    @Override
+    @BreakAll
     public void damage(float amount){
         UnityUnitType utype = (UnityUnitType)type;
         AntiCheatVariables aType = utype.antiCheatType;
 
         if(aType != null){
-            if(invFrames[invIndex] < 0f){
+            if(invFrames[invIndex] <= 0f){
                 float nextAmount = Math.min(amount, aType.maxDamageTaken);
                 if(amount > aType.resistStart){
                     float a = amount - aType.resistStart;
                     resist += a;
                     resistMax = Math.max(resistMax, resist);
                     resistTime = aType.resistTime;
-                    aggression += Math.min(a / (lastMaxHealth / 10f), 2f);
+                    aggression += Math.min(a / (lastMaxHealth / 5f), 1.5f);
                     aggression = Math.min(aggression, 4f);
                     aggressionTime = 5f * 60f;
                 }
@@ -119,48 +122,11 @@ abstract class EndComp implements Unitc{
             }else{
                 return;
             }
-            amount = Math.max(amount - armor, Vars.minArmorDamage * amount);
-            amount /= healthMultiplier;
-            hitTime = 1.0f;
-            boolean hadShields = shield > 1.0e-4f;
-            if(hadShields){
-                shieldAlpha = 1f;
-            }
-            float shieldDamage = Math.min(Math.max(shield, 0f), amount);
-            shield -= shieldDamage;
-            amount -= shieldDamage;
-            if(amount > 0){
-                health -= amount;
-                lastHealth -= amount;
-                if(health <= 0 && !dead){
-                    kill();
-                }
-                if(hadShields && shield <= 1.0e-4f){
-                    Fx.unitShieldBreak.at(x, y, 0, this);
-                }
-            }
-        }else{
-            amount = Math.max(amount - armor, Vars.minArmorDamage * amount);
-            amount /= healthMultiplier;
-            hitTime = 1.0f;
-            boolean hadShields = shield > 1.0e-4f;
-            if(hadShields){
-                shieldAlpha = 1f;
-            }
-            float shieldDamage = Math.min(Math.max(shield, 0f), amount);
-            shield -= shieldDamage;
-            amount -= shieldDamage;
-            if(amount > 0){
-                health -= amount;
-                lastHealth -= amount;
-                if(health <= 0 && !dead){
-                    kill();
-                }
-                if(hadShields && shield <= 1.0e-4f){
-                    Fx.unitShieldBreak.at(x, y, 0, this);
-                }
-            }
         }
+        amount = Math.max(amount - armor, Vars.minArmorDamage * amount);
+        amount /= healthMultiplier;
+
+        if(amount > 0) lastHealth -= amount;
     }
 
     @Override
@@ -170,4 +136,6 @@ abstract class EndComp implements Unitc{
         lastHealth = health;
         clampHealth();
     }
+
+
 }
