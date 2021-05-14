@@ -34,7 +34,7 @@ abstract class MonolithSoulComp implements Unitc{
     @Override
     public void update(){
         if(controller == null){
-            kill();
+            health = 0f;
         }else{
             health -= maxHealth / (5f * Time.toSeconds) * Time.delta;
 
@@ -55,7 +55,7 @@ abstract class MonolithSoulComp implements Unitc{
         }
 
         if(Mathf.chanceDelta(0.5f)){
-            UnityFx.monolithSoul.at(x, y, rotation, hitSize * 2f);
+            UnityFx.monolithSoul.at(x, y, rotation, hitSize * 1.5f);
         }
 
         if(dead){
@@ -71,6 +71,6 @@ abstract class MonolithSoulComp implements Unitc{
 
     public void invoke(Unit unit){
         unit.heal(healAmount);
-        kill();
+        health = 0f;
     }
 }

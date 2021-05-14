@@ -31,7 +31,7 @@ public class MonolithSoulAI implements UnitController{
     @Override
     public void updateUnit(){
         if(empty){
-            unit.kill();
+            unit.health = 0f;
         }
 
         if(timer.get(5f)){

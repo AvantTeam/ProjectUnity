@@ -30,7 +30,7 @@ abstract class MonolithComp implements Unitc{
                 Tmp.v1.trns(start + 360f / amount * i, Mathf.random(6f, 12f));
                 soul.rotation = Tmp.v1.angle();
                 soul.vel.set(Tmp.v1.x, Tmp.v1.y);
-                soul.healAmount = maxHealth / 15f / amount;
+                soul.healAmount = maxHealth / 10f / amount;
 
                 if(isPlayer() && !transferred && (Mathf.chance(1f / amount) || i == amount - 1)){
                     soul.controller(getPlayer());

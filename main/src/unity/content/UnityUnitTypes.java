@@ -2449,6 +2449,9 @@ public class UnityUnitTypes implements ContentList{
                 rotationSpeed = 15f;
                 accel = 0.2f;
                 drag = 0.08f;
+                flying = true;
+                lowAltitude = true;
+                fallSpeed = 1f;
                 omniMovement = false;
             }
 
@@ -2459,12 +2462,16 @@ public class UnityUnitTypes implements ContentList{
 
             @Override
             public void applyColor(Unit unit){
-                Draw.mixcol(UnityPal.monolithLight, 0.8f);
+                Draw.mixcol(UnityPal.monolithDark, 0.8f);
                 Draw.alpha(0.8f);
             }
 
             @Override
             public void draw(Unit unit){
+                Draw.blend(Blending.additive);
+                super.draw(unit);
+                Draw.blend();
+
                 float z = Draw.z();
                 Draw.z(Layer.effect);
 
@@ -2473,12 +2480,6 @@ public class UnityUnitTypes implements ContentList{
                 Draw.color();
 
                 Draw.z(z);
-            }
-
-            @Override
-            public void load(){
-                super.load();
-                region = Core.atlas.find("clear");
             }
         };
 
