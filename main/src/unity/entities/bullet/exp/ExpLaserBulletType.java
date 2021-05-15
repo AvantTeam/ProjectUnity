@@ -13,6 +13,7 @@ import mindustry.graphics.*;
 import unity.content.*;
 import unity.gen.Expc.*;
 import unity.graphics.*;
+import unity.util.*;
 
 public class ExpLaserBulletType extends BulletType {
     /** Color of laser. Shifts to second color as the turret levels up. */
@@ -88,7 +89,7 @@ public class ExpLaserBulletType extends BulletType {
 
         setDamage(b);
 
-        Healthc target = Damage.linecast(b, b.x, b.y, b.rotation(), getLength(b));
+        Healthc target = Utils.linecast(b, b.x, b.y, b.rotation(), getLength(b));
         b.data = target;
 
         if(target instanceof Hitboxc hit){
