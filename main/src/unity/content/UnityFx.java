@@ -17,6 +17,7 @@ import mindustry.world.blocks.defense.turrets.Turret.*;
 import unity.entities.*;
 import unity.entities.abilities.BaseAbility.*;
 import unity.entities.bullet.*;
+import unity.entities.bullet.EphemeronBullet.*;
 import unity.entities.effects.*;
 import unity.gen.*;
 import unity.graphics.*;
@@ -255,7 +256,7 @@ public class UnityFx{
     }),
 
     electronHit = new Effect(12f, e -> {
-        color(Pal.lancerLaser, Color.valueOf("4787ff"), e.fin());
+        color(Pal.lancerLaser, UnityPal.lightEffect, e.fin());
         stroke(e.fout() * 3f);
         Lines.circle(e.x, e.y, e.fin() * 90f);
 
@@ -277,7 +278,7 @@ public class UnityFx{
     }),
 
     neutronHit = new Effect(28f, e -> {
-        color(Pal.lancerLaser, Color.valueOf("4787ff"), e.fin());
+        color(Pal.lancerLaser, UnityPal.lightEffect, e.fin());
 
         randLenVectors(e.id, 7, e.finpow() * 50f, (x, y) -> {
             float a = Mathf.angle(x, y);
@@ -286,14 +287,14 @@ public class UnityFx{
     }),
 
     wBosonChargeBeginEffect = new Effect(38f, e -> {
-        color(Color.valueOf("4787ff"), Pal.lancerLaser, e.fin());
+        color(UnityPal.lightEffect, Pal.lancerLaser, e.fin());
         Fill.circle(e.x, e.y, 3f + e.fin() * 6f);
         color(Color.white);
         Fill.circle(e.x, e.y, 1.75f + e.fin() * 5.75f);
     }),
 
     wBosonChargeEffect = new Effect(24f, e -> {
-        color(Color.valueOf("4787ff"), Pal.lancerLaser, e.fin());
+        color(UnityPal.lightEffect, Pal.lancerLaser, e.fin());
 	    stroke(1.5f);
 
         randLenVectors(e.id, 2, (1f - e.finpow()) * 50f, (x, y) -> {
@@ -304,7 +305,7 @@ public class UnityFx{
     }),
 
     wBosonHitEffect = new Effect(13f, e -> {
-        color(Pal.lancerLaser, Color.valueOf("4787ff"), e.fin());
+        color(Pal.lancerLaser, UnityPal.lightEffect, e.fin());
 	    stroke(0.5f + e.fout());
 
         randLenVectors(e.id, 17, e.finpow() * 40f, (x, y) -> {
@@ -314,7 +315,7 @@ public class UnityFx{
     }),
 
     wBosonDecayHitEffect = new Effect(13f, e -> {
-        color(Pal.lancerLaser, Color.valueOf("4787ff"), e.fin());
+        color(Pal.lancerLaser, UnityPal.lightEffect, e.fin());
 	    stroke(0.5f + e.fout());
 
         randLenVectors(e.id, 17, e.finpow() * 20f, (x, y) -> {
@@ -324,15 +325,42 @@ public class UnityFx{
     }),
 
     wBosonEffect = new Effect(24f, e -> {
-        color(Pal.lancerLaser, Color.valueOf("4787ff"), e.fin());
+        color(Pal.lancerLaser, UnityPal.lightEffect, e.fin());
         stroke(1.25f);
         lineAngle(e.x, e.y, e.rotation, e.fout() * 4f);
     }),
 
     wBosonEffectLong = new Effect(47f, e -> {
-        color(Pal.lancerLaser, Color.valueOf("4787ff"), e.fin());
+        color(Pal.lancerLaser, UnityPal.lightEffect, e.fin());
         stroke(1.25f);
         lineAngle(e.x, e.y, e.rotation, e.fout() * 7f);
+    }),
+
+    ephmeronCharge = new Effect(80f, e -> {
+        color(Pal.lancerLaser);
+		Fill.circle(e.x, e.y, e.fin() * 9.5f);
+		color(Color.white);
+		Fill.circle(e.x, e.y, e.fin() * 7.5f);
+    }),
+
+    ephemeronLaser = new Effect(19f, 100f, e -> {
+        if(e.data instanceof EphemeronEffectData d && d.b instanceof Bullet b && b.isAdded()){
+            stroke(3.6f * e.fout(), e.color);
+            line(b.x, b.y, d.x, d.y, false);
+        }
+    }),
+
+    ephemeronHit = new Effect(15f, e -> {
+        color(Pal.lancerLaser, UnityPal.lightEffect, e.fin());
+        stroke(0.5f + e.fout());
+
+        randLenVectors(e.id, 17, e.finpow() * 50f, (x, y) -> {
+            float a = Mathf.angle(x, y);
+            lineAngle(e.x + x, e.y + y, a, e.fout() * 8f);
+        });
+
+        stroke(0.5f + e.fout() * 1.2f);
+	    Lines.circle(e.x, e.y, e.finpow() * 30f);
     }),
 
     orbHit = new Effect(12f, e -> {

@@ -22,6 +22,7 @@ public class UnityPal{
         advanceDark = valueOf("59a7ff"),
 
         lightHeat = valueOf("ccffff"),
+        lightEffect = valueOf("4787ff"),
         
         purpleLightning = valueOf("bf92f9"),
 

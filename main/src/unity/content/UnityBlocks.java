@@ -71,7 +71,7 @@ public class UnityBlocks implements ContentList{
     public static @FactionDef("light")
     Block oreLuminum,
 
-    photon, electron, graviton, proton, neutron, /*gluon,*/ wBoson, zBoson, higgsBoson, /*singularity,*/ muon, /*ephemeron,*/
+    photon, electron, graviton, proton, neutron, /*gluon,*/ wBoson, zBoson, higgsBoson, /*singularity,*/ muon, ephemeron,
 
     lightLamp, oilLamp, lightLaser, lightLampInfi, lightReflector, lightReflector1, lightOmnimirror, lightFilter, lightInvertedFilter, lightDivisor, lightDivisor1, lightItemFilter, lightPanel, lightInfluencer,
 
@@ -872,7 +872,119 @@ public class UnityBlocks implements ContentList{
             }
         };
 
-        //Ephemeron
+        ephemeron = new PowerTurret("ephemeron"){
+            {
+                requirements(Category.turret, with(Items.silicon, 290, UnityItems.luminum, 430, Items.titanium, 190, Items.thorium, 120, Items.surgeAlloy, 20));
+                size = 8;
+                health = 9800;
+                range = 320f;
+                reloadTime = 70f;
+                coolantMultiplier = 1.9f;
+                powerUse = 26f;
+                shootShake = 2f;
+                recoilAmount = 4f;
+                shootSound = UnitySounds.ephemeronShoot;
+                rotateSpeed = 1.9f;
+                heatColor = UnityPal.lightHeat;
+                cooldown = 0.009f;
+                chargeTime = 80f;
+                chargeBeginEffect = UnityFx.ephmeronCharge;
+                
+                shootType = new EphemeronBullet(7.7f, 10f){{
+                    lifetime = 70f;
+                    hitSize = 12f;
+                    pierce = true;
+                    collidesTiles = false;
+                    scaleVelocity = true;
+                    shootEffect = Fx.lightningShoot;
+                    hitEffect = Fx.hitLancer;
+                    despawnEffect = smokeEffect = Fx.none;
+                    positive = new BasicBulletType(0.001f, 4f){
+                        {
+                            lifetime = 300f;
+                            frontColor = Pal.lancerLaser;
+                            backColor = Color.white;
+                            hitEffect = Fx.hitLancer;
+                            despawnEffect = Fx.none;
+                            hitSound = Sounds.spark;
+                            hitSize = 8f;
+                            pierce = true;
+                            collidesTiles = false;
+                        }
+
+                        @Override
+                        public void draw(Bullet b){
+                            Draw.color(frontColor);
+                            Fill.circle(b.x, b.y, 4f + (b.fout() * 1.5f));
+                            Draw.color(backColor);
+                            Fill.circle(b.x, b.y, 2.5f + (b.fout() * 1f));
+                        }
+
+                        @Override
+                        public void update(Bullet b){
+                            super.update(b);
+
+                            if(b.data instanceof Bullet n){
+                                Tmp.v1.trns(b.angleTo(n), Time.delta);
+                                b.vel.add(Tmp.v1);
+                                
+                                Tmp.v1.rotate(180f);
+                                n.vel.add(Tmp.v1);
+
+                                if(b.vel.len() > b.dst(n.x + n.vel.x, n.y + n.vel.y)){
+                                    b.vel.setLength(b.dst(n.x + n.vel.x, n.y + n.vel.y));
+                                }
+
+                                if(n.vel.len() > n.dst(b.x + b.vel.x, b.y + b.vel.y)){
+                                    n.vel.setLength(n.dst(b.x + b.vel.x, b.y + b.vel.y));
+                                }
+
+                                b.hitbox(Tmp.r1);
+                                n.hitbox(Tmp.r2);
+
+                                if(Tmp.r1.overlaps(Tmp.r2)){
+                                    b.remove();
+                                    n.remove();
+
+                                    Tmp.v1.set((b.x + n.x) / 2f, (b.y + n.y) / 2f);
+
+                                    UnityFx.ephemeronHit.at(Tmp.v1);
+                                    Damage.damage(b.team, Tmp.v1.x, Tmp.v1.y, 40f, 80f);
+                                }
+                            }
+                        }
+                    };
+                    negative = new BasicBulletType(0.001f, 4f){
+                        {
+                            lifetime = 300f;
+                            drag = 0.013f;
+                            frontColor = Color.white;
+                            backColor = Pal.lancerLaser;
+                            hitEffect = Fx.hitLancer;
+                            despawnEffect = Fx.none;
+                            hitSound = Sounds.spark;
+                            hitSize = 8f;
+                            pierce = true;
+                            collidesTiles = false;
+                        }
+
+                        @Override
+                        public void draw(Bullet b){
+                            Draw.color(frontColor);
+                            Fill.circle(b.x, b.y, 4f + (b.fout() * 1.5f));
+                            Draw.color(backColor);
+                            Fill.circle(b.x, b.y, 2.5f + (b.fout() * 1f));
+                        }
+                    };
+                }};
+            }
+            
+            @Override
+            public void load(){
+                super.load();
+                baseRegion = atlas.find("unity-block-" + size);
+            }
+        };
 
         lightLamp = new LightSource("light-lamp"){{
             consumes.power(1f);
