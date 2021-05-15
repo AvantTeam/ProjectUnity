@@ -28,6 +28,7 @@ public class NewKamiAI implements UnitController, Position{
     public float[] reloads = new float[16];
     public Bullet[] bullets = new Bullet[16];
     public int difficulty = 0;
+    private int difficultyCounter = 0;
     public float patternTime, stageTime, stageDamage, moveTime, waitTime;
     public int stage = 0;
     public float drawIn = 0f, relativeRotation = 90f, maxTime = 5f * 60f;
@@ -142,7 +143,8 @@ public class NewKamiAI implements UnitController, Position{
                 int t = spellSeq.get(rand);
                 pattern = KamiPatterns.majorPatterns[t];
                 spellSeq.removeIndex(rand);
-                if(spellSeq.isEmpty()) difficulty++;
+                //if(spellSeq.isEmpty()) difficulty++;
+                difficultyCounter++;
                 spell = false;
             }else{
                 int rand = Mathf.random(0, nonSpellSeq.size - 1);
@@ -150,6 +152,10 @@ public class NewKamiAI implements UnitController, Position{
                 pattern = KamiPatterns.minorPatterns[t];
                 nonSpellSeq.removeIndex(rand);
                 spell = true;
+            }
+            if(difficultyCounter >= 5){
+                difficulty++;
+                difficultyCounter = 0;
             }
             maxTime = pattern.waitTime;
             pattern.start(this);

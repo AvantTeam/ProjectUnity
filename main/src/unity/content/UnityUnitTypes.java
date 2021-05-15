@@ -3106,6 +3106,7 @@ public class UnityUnitTypes implements ContentList{
             hitSize = 36f;
             flying = true;
             drawCell = false;
+            outlineColor = Color.valueOf("464a61");
             clipSize = 1000f;
 
             Unity.musicHandler.registerLoop(name, UnityMusics.radiantDischarge);
