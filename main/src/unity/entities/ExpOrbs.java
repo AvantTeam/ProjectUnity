@@ -23,17 +23,17 @@ import static mindustry.Vars.*;
 public class ExpOrbs{
     public static final float expAmount = 10f;
 
-    private static Color expColor = Color.valueOf("84ff00");
-    private static int[] d4x = new int[]{1, 0, -1, 0};
-    private static int[] d4y = new int[]{0, 1, 0, -1};
-    private static ExpOrb expOrb = new ExpOrb();
+    private static final Color expColor = Color.valueOf("84ff00");
+    private static final int[] d4x = new int[]{1, 0, -1, 0};
+    private static final int[] d4y = new int[]{0, 1, 0, -1};
+    private static final ExpOrb expOrb = new ExpOrb();
 
     public static void spreadExp(float x, float y, float amount){
         spreadExp(x, y, amount, 4f);
     }
 
     public static void spreadExp(float x, float y, float amount, float v){
-        if(!net.client()){
+        if(net.server() || !net.active()){
             v *= 1000f;
 
             int n = Mathf.floorPositive(amount / expAmount);
@@ -43,8 +43,6 @@ public class ExpOrbs{
         }
     }
 
-    //as private class can't be used in instanceof context, make this public if it is done.
-    //it is needed in Magnet.java
     public static final class ExpOrb extends BulletType{
         {
             absorbable = false;
