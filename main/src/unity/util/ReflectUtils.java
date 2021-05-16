@@ -31,7 +31,7 @@ public final class ReflectUtils{
 
     static{
         try {
-            boolean use = false;
+            boolean use;
             try{
                 Method getReflectionFactory = Class.forName("sun.reflect.ReflectionFactory").getDeclaredMethod("getReflectionFactory");
                 j8RefFac = getReflectionFactory.invoke(null);
@@ -60,26 +60,18 @@ public final class ReflectUtils{
 
                 modifiersAnd = null;
 
-                Method setf = null;
-                Method[] methodsf = Field.class.getDeclaredMethods();
-                for(Method method : methodsf) {
-                    if(method.getName().contains("setFieldAccessor")) {
-                        setf = method;
-                        break;
-                    }
-                }
-
+                Method setf = Structs.find(Field.class.getDeclaredMethods(), m -> m.getName().contains("setFieldAccessor"));
                 setAccessor = newLookup(Field.class).unreflect(setf);
             }
 
             print("Reflection/invocation utility has been initialized.");
-            print("Usage of sun packages: @.", useSun);
+            print("Usage of sun packages: " + useSun);
         }catch(Exception e){
             throw new RuntimeException(e);
         }
     }
 
-    public static Lookup newLookup(Class<?> in) {
+    public static Lookup newLookup(Class<?> in){
         Seq<Class<?>> argTypes = new Seq<>(Class.class);
         argTypes.addAll(Class.class, Class.class, int.class);
 
@@ -88,12 +80,12 @@ public final class ReflectUtils{
 
         try {
             Lookup.class.getDeclaredField("prevLookupClass");
-        } catch(NoSuchFieldException e) {
+        }catch(NoSuchFieldException e){
             argTypes.remove(1);
             args.remove(1);
         }
 
-        try {
+        try{
             Constructor<Lookup> cons = Lookup.class.getDeclaredConstructor(argTypes.toArray());
             cons.setAccessible(true);
 
@@ -102,69 +94,50 @@ public final class ReflectUtils{
 
             String prev = in.getName();
 
-            name.set(in, prev.substring(prev.lastIndexOf("."), prev.length()));
+            name.set(in, prev.substring(prev.lastIndexOf(".")));
             Lookup lookup = cons.newInstance(args.toArray());
             name.set(in, prev);
 
             return lookup;
-        } catch(Exception e) {
+        }catch(Exception e){
             throw new RuntimeException(e);
         }
     }
 
     /** Finds a class from the parent classes that has a specific field. */
     public static Class<?> findClassf(Class<?> type, String field){
-        Class<?> current = type.isAnonymousClass() ? type.getSuperclass() : type;
-
-        boolean found = false;
-        while(!found && current != null){
+        for(; type != null; type = type.getSuperclass()){
             try{
-                current.getDeclaredField(field);
-            }catch(NoSuchFieldException e){
-                current = current.getSuperclass();
-                continue;
-            }
-
-            found = true;
+                type.getDeclaredField(field);
+                break;
+            }catch(NoSuchFieldException ignored){}
         }
 
-        return current;
+        return type;
     }
 
+    /** Finds a class from the parent classes that has a specific method. */
     public static Class<?> findClassm(Class<?> type, String method, Class<?>... args){
-        Class<?> current = type.isAnonymousClass() ? type.getSuperclass() : type;
-
-        boolean found = false;
-        while(!found && current != null){
+        for(; type != null; type = type.getSuperclass()){
             try{
-                current.getDeclaredMethod(method, args);
-            }catch(NoSuchMethodException e){
-                current = current.getSuperclass();
-                continue;
-            }
-
-            found = true;
+                type.getDeclaredMethod(method, args);
+                break;
+            }catch(NoSuchMethodException ignored){}
         }
 
-        return current;
+        return type;
     }
 
+    /** Finds a class from the parent classes that has a specific constructor. */
     public static Class<?> findClassc(Class<?> type, Class<?>... args){
-        Class<?> current = type.isAnonymousClass() ? type.getSuperclass() : type;
-
-        boolean found = false;
-        while(!found && current != null){
+        for(; type != null; type = type.getSuperclass()){
             try{
-                current.getDeclaredConstructor(args);
-            }catch(NoSuchMethodException e){
-                current = current.getSuperclass();
-                continue;
-            }
-
-            found = true;
+                type.getDeclaredConstructor(args);
+                break;
+            }catch(NoSuchMethodException ignored){}
         }
 
-        return current;
+        return type;
     }
 
     /** A utility function to find a field without throwing {@link NoSuchFieldException}. */
@@ -197,6 +170,7 @@ public final class ReflectUtils{
         }
     }
 
+    /** A utility function to find a method without throwing {@link NoSuchMethodException}. */
     public static Method findMethod(Class<?> type, String methodName, boolean access, Class<?>... args){
         try{
             var m = findClassm(type, methodName, args).getDeclaredMethod(methodName, args);
@@ -208,6 +182,7 @@ public final class ReflectUtils{
         }
     }
 
+    /** Reflectively invokes a method without throwing {@link IllegalAccessException}. */
     public static <T> T invokeMethod(Object object, Method method, Object... args){
         try{
             return (T)method.invoke(object, args);
@@ -216,6 +191,7 @@ public final class ReflectUtils{
         }
     }
 
+    /** A utility function to find a constructor without throwing {@link NoSuchMethodException}. */
     public static <T> Constructor<T> findConstructor(Class<T> type, boolean access, Class<?>... args){
         try{
             var c = ((Class<T>)findClassc(type, args)).getDeclaredConstructor(args);
@@ -235,6 +211,7 @@ public final class ReflectUtils{
         }
     }
 
+    /** Revokes a modifier from a field. <b>Using this to primitive types / {@link String} constant expressions has no use.</b> */
     public static void revokeModifier(Field field, int modifier){
         try{
             field.setAccessible(true);
@@ -255,6 +232,7 @@ public final class ReflectUtils{
         }
     }
 
+    /** Invokes a modifier to a field. <b>Using this to primitive types / {@link String} constant expressions has no use.</b> */
     public static void invokeModifier(Field field, int modifier){
         try{
             field.setAccessible(true);
