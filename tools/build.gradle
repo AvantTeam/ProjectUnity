@@ -18,17 +18,17 @@ task proc(dependsOn: [classes, configurations.runtimeClasspath]) {
         file(spritesGenFolder).mkdirs()
         file(spritesAssetsFolder).mkdirs()
 
+        copy {
+            from spritesRawFolder
+            into spritesAssetsFolder
+        }
+
         javaexec {
             main imageProcessorMain
             classpath sourceSets.main.runtimeClasspath
             jvmArgs += '-Djava.awt.headless=true'
             standardInput System.in
-            workingDir file('../main/assets-raw/')
-        }
-
-        copy {
-            from spritesRawFolder
-            into spritesAssetsFolder
+            workingDir file('../main/assets/')
         }
 
         copy {

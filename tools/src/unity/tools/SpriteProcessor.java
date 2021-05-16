@@ -19,16 +19,18 @@ import javax.imageio.*;
 import static mindustry.Vars.*;
 
 public class SpriteProcessor{
-    static ObjectMap<String, TextureRegion> regionCache = new ObjectMap<>();
+    static ObjectMap<String, GenRegion> regionCache = new ObjectMap<>();
     static ObjectMap<String, BufferedImage> spriteCache = new ObjectMap<>();
 
     static Unity mod;
+
+    static final Fi spritesGen = Fi.get("../assets-raw/sprites-gen/");
 
     public static void main(String[] args) throws Exception{
         headless = true;
         loadLogger();
 
-        Fi handle = Fi.get("../assets/bundles/bundle");
+        Fi handle = Fi.get("bundles/bundle");
         Core.bundle = I18NBundle.createBundle(handle, Locale.getDefault());
 
         mod = new Unity();
@@ -49,13 +51,13 @@ public class SpriteProcessor{
 
         content.setCurrentMod(null);
 
-        Fi.get("./sprites/").walk(path -> {
+        Fi.get("sprites/").walk(path -> {
             if(!path.extEquals("png")) return;
 
-            String fname = path.nameWithoutExtension().replaceFirst("/sprites/", "/sprites-gen/");
+            String fname = path.nameWithoutExtension();
             try{
                 BufferedImage sprite = ImageIO.read(path.file());
-                if(sprite == null) throw new IOException("sprite " + path.absolutePath() + " is corrupted or invalid!");
+                if(sprite == null) throw new IOException("sprite " + fname + " is corrupted or invalid!");
 
                 GenRegion region = new GenRegion(fname, path){
                     {
@@ -85,7 +87,7 @@ public class SpriteProcessor{
                     return region;
                 }
 
-                return (AtlasRegion)regionCache.get(fname);
+                return regionCache.get(fname);
             }
 
             @Override
@@ -96,7 +98,7 @@ public class SpriteProcessor{
                     return (AtlasRegion)def;
                 }
 
-                return (AtlasRegion)regionCache.get(fname);
+                return regionCache.get(fname);
             }
 
             @Override
@@ -104,10 +106,10 @@ public class SpriteProcessor{
                 String fname = name.replaceFirst("unity-", "");
 
                 if(!regionCache.containsKey(fname)){
-                    return (AtlasRegion)regionCache.get(def.replaceFirst("unity-", ""));
+                    return regionCache.get(def.replaceFirst("unity-", ""));
                 }
 
-                return (AtlasRegion)regionCache.get(fname);
+                return regionCache.get(fname);
             }
 
             @Override
@@ -142,7 +144,7 @@ public class SpriteProcessor{
         return new Sprite(spriteCache.get(((AtlasRegion)region).name.replaceFirst("unity-", "")));
     }
 
-    static TextureRegion getRegion(String name){
+    static GenRegion getRegion(String name){
         return regionCache.get(name.replaceFirst("unity-", ""));
     }
 

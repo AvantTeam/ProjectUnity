@@ -15,10 +15,9 @@ public class LoadOutlineGenerator implements Generator{
         try{
             Regions.load();
 
+            Func<TextureRegion, String> parseName = reg -> ((AtlasRegion)reg).name.replaceFirst("unity-", "");
             for(Field field : Regions.class.getDeclaredFields()){
-                if(!field.getName().endsWith("OutlineRegion")) continue;
-
-                Func<TextureRegion, String> parseName = reg -> ((AtlasRegion)reg).name.replaceFirst("unity-", "");
+                if(!TextureRegion.class.isAssignableFrom(field.getType()) || !field.getName().endsWith("OutlineRegion")) continue;
 
                 Field raw = Regions.class.getDeclaredField(field.getName().replaceFirst("Outline", ""));
                 TextureRegion region = (TextureRegion)raw.get(null);

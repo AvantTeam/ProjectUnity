@@ -12,6 +12,7 @@ import mindustry.type.*;
 import unity.entities.*;
 import unity.entities.units.*;
 import unity.gen.*;
+import unity.tools.SpriteProcessor.*;
 import unity.type.*;
 
 import static mindustry.Vars.*;
@@ -31,17 +32,21 @@ public class IconGenerator implements Generator{
                     for(int i = 0; i < anim.frames; i++){
                         String fname = anim.name.replaceFirst("unity-", "") + (i + 1);
 
-                        Sprite sprite = SpriteProcessor.get(fname);
-                        sprite.antialias();
+                        GenRegion region = SpriteProcessor.getRegion(fname);
+                        Sprite sprite = SpriteProcessor.get(region);
 
+                        sprite.antialias();
+                        region.path.delete();
                         sprite.save(fname);
                     }
                 }else{
                     String fname = item.name.replaceFirst("unity-", "");
 
-                    Sprite sprite = SpriteProcessor.get(fname);
-                    sprite.antialias();
+                    GenRegion region = SpriteProcessor.getRegion(fname);
+                    Sprite sprite = SpriteProcessor.get(region);
 
+                    sprite.antialias();
+                    region.path.delete();
                     sprite.save(fname);
                 }
             }catch(Throwable e){
@@ -54,11 +59,9 @@ public class IconGenerator implements Generator{
         });
 
         content.units().each(t -> {
-            if(t.minfo.mod == null || !(t instanceof UnityUnitType)) return;
+            if(t.minfo.mod == null || !(t instanceof UnityUnitType type)) return;
 
-            UnityUnitType type = (UnityUnitType)t;
             ObjectSet<String> outlined = new ObjectSet<>();
-
             try{
                 type.load();
                 type.init();
@@ -71,10 +74,13 @@ public class IconGenerator implements Generator{
                         String fname = parseName.get(tr);
 
                         if(SpriteProcessor.has(fname)){
+                            GenRegion region = SpriteProcessor.getRegion(fname);
                             Sprite sprite = SpriteProcessor.get(fname);
-                            sprite.draw(outline.get(sprite));
-                            sprite.antialias();
 
+                            sprite.draw(outline.get(sprite));
+
+                            sprite.antialias();
+                            region.path.delete();
                             sprite.save(fname);
                         }else if(!optional.contains(fname::contains)){
                             Log.warn("@ not found", fname);
@@ -324,8 +330,11 @@ public class IconGenerator implements Generator{
                 for(TextureRegion reg : block.getGeneratedIcons()){
                     String fname = parseName.get(reg);
                     if(antialiased.add(fname)){
-                        Sprite sprite = SpriteProcessor.get(fname);
+                        GenRegion region = SpriteProcessor.getRegion(fname);
+                        Sprite sprite = SpriteProcessor.get(region);
+
                         sprite.antialias();
+                        region.path.delete();
                         sprite.save(fname);
                     }
                 }
@@ -333,8 +342,11 @@ public class IconGenerator implements Generator{
                 for(TextureRegion reg : block.variantRegions()){
                     String fname = parseName.get(reg);
                     if(antialiased.add(fname)){
-                        Sprite sprite = SpriteProcessor.get(fname);
+                        GenRegion region = SpriteProcessor.getRegion(fname);
+                        Sprite sprite = SpriteProcessor.get(region);
+
                         sprite.antialias();
+                        region.path.delete();
                         sprite.save(fname);
                     }
                 }
