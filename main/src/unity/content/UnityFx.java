@@ -17,7 +17,7 @@ import mindustry.world.blocks.defense.turrets.Turret.*;
 import unity.entities.*;
 import unity.entities.abilities.BaseAbility.*;
 import unity.entities.bullet.*;
-import unity.entities.bullet.EphemeronBullet.*;
+import unity.entities.bullet.EphemeronBulletType.*;
 import unity.entities.effects.*;
 import unity.gen.*;
 import unity.graphics.*;
@@ -344,7 +344,7 @@ public class UnityFx{
     }),
 
     ephemeronLaser = new Effect(19f, 100f, e -> {
-        if(e.data instanceof EphemeronEffectData d && d.b instanceof Bullet b && b.isAdded()){
+        if(e.data instanceof EphemeronEffectData d && d.b instanceof Bullet b && b.type instanceof EphemeronPairBulletType && b.isAdded()){
             stroke(3.6f * e.fout(), e.color);
             line(b.x, b.y, d.x, d.y, false);
         }

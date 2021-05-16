@@ -9,14 +9,14 @@ import mindustry.gen.Bullet;
 import mindustry.graphics.*;
 import unity.content.*;
 
-public class EphemeronBullet extends BasicBulletType{
+public class EphemeronBulletType extends BasicBulletType{
     public Color midColor = Pal.lancerLaser;
     public float[] baseRadius = {11f, 8f, 6.5f}, extraRadius = {2.5f, 1.5f, 1f};
     public float maxRadius = 80f;
     public int pairs = 15;
     public BulletType positive, negative;
 
-    public EphemeronBullet(float speed, float damage){
+    public EphemeronBulletType(float speed, float damage){
         super(speed, damage);
 
         hittable = false;
