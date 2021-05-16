@@ -57,10 +57,6 @@ abstract class MonolithSoulComp implements Unitc{
         if(Mathf.chanceDelta(0.5f)){
             UnityFx.monolithSoul.at(x, y, rotation, hitSize * 1.5f);
         }
-
-        if(dead){
-            destroy();
-        }
     }
 
     @Override
@@ -70,7 +66,9 @@ abstract class MonolithSoulComp implements Unitc{
     }
 
     public void invoke(Unit unit){
+        float remain = unit.health + healAmount - unit.maxHealth;
         unit.heal(healAmount);
-        health = 0f;
+
+        unit.shield += Math.max(remain / 60f, 0f);
     }
 }

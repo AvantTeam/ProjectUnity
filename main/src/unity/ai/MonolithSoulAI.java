@@ -6,6 +6,7 @@ import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import unity.gen.*;
+import unity.mod.*;
 
 public class MonolithSoulAI implements UnitController{
     protected static final Vec2 vec = new Vec2();
@@ -35,7 +36,7 @@ public class MonolithSoulAI implements UnitController{
         }
 
         if(timer.get(5f)){
-            target = Units.closest(unit.team, unit.x, unit.y, u -> u.health < u.maxHealth);
+            target = Units.closest(unit.team, unit.x, unit.y, u -> FactionMeta.map(u) == Faction.monolith);
         }
 
         if(target != null && !unit.dead){

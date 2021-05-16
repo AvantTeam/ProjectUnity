@@ -19,7 +19,7 @@ abstract class MonolithComp implements Unitc{
     @Override
     public void killed(){
         if(net.server() || !net.active()){
-            int amount = (int)(Math.max(hitSize, MonolithSoul.maxSize + 1) % MonolithSoul.maxSize);
+            int amount = Math.max(Mathf.round(hitSize / MonolithSoul.maxSize), 1);
             boolean transferred = false;
 
             float start = Mathf.random(360f);
