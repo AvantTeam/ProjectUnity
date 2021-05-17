@@ -67,7 +67,7 @@ public class IconGenerator implements Generator{
                 type.init();
 
                 Func<Sprite, Sprite> outline = i -> i.outline(3, type.outlineColor);
-                Seq<String> optional = Seq.with("-joint", "-leg-back", "-leg-base-back", "-foot-back");
+                Seq<String> optional = Seq.with("-joint", "-leg-back", "-leg-middle", "-leg-base-back", "-foot-back");
 
                 Cons<TextureRegion> outliner = tr -> {
                     if(tr != null){
@@ -125,12 +125,14 @@ public class IconGenerator implements Generator{
 
                 Unit unit = type.constructor.get();
 
-                if(unit instanceof Legsc){
+                if(unit instanceof Legsc || unit instanceof TriJointLegsc){
                     outliner.get(type.jointRegion);
                     outliner.get(type.footRegion);
                     outliner.get(type.legBaseRegion);
                     outliner.get(type.baseJointRegion);
                     outliner.get(type.legRegion);
+
+                    outliner.get(type.legMiddleRegion);
 
                     outliner.get(type.legBackRegion);
                     outliner.get(type.legBaseBackRegion);
