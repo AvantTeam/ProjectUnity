@@ -64,7 +64,9 @@ abstract class EndComp implements Unitc{
 
         if(aType != null){
             if(health < lastHealth) health = lastHealth;
+            lastHealth = health;
             if(maxHealth < lastMaxHealth) maxHealth = lastMaxHealth;
+            lastMaxHealth = maxHealth;
             if(resistTime <= 0f){
                 resist -= resistMax / aType.resistDuration;
                 resist = Math.max(resist, 0f);
