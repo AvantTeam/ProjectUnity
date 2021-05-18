@@ -23,9 +23,11 @@ public class FloorExtractor extends GenericCrafter{
 
     public IntFloatMap sources = new IntFloatMap();
 
-    public FloorExtractor(String name, Object... arr){
+    public FloorExtractor(String name){
         super(name);
+    }
 
+    public void setup(Object... arr) {
         if(arr.length % 2 > 0) throw new IllegalArgumentException("map must be [Block, float, Block, float, ...]");
         for(int i = 0; i < arr.length; i += 2){
             Block block = (Block)arr[i];

@@ -10,19 +10,20 @@ import unity.mod.*;
 
 import static mindustry.Vars.*;
 
+@SuppressWarnings("unused")
 @MergeComponent
 class SoulHoldComp extends Block{
     int maxSouls = 3;
-    boolean affectEfficiency = true;
+    float efficiencyFrom = 0.3f;
+    float efficiencyTo = 1f;
 
     public SoulHoldComp(String name){
         super(name);
-        world.build(0);
     }
 
     public class SoulBuildComp extends Building implements ControlBlock{
         BlockUnitc unit = Nulls.blockUnit;
-        private boolean wasPlayer;
+        @ReadOnly boolean wasPlayer;
 
         int souls;
 
@@ -58,7 +59,7 @@ class SoulHoldComp extends Block{
 
         @Override
         public float efficiency(){
-            return super.efficiency() * (!affectEfficiency ? 1f : (souls / (float)maxSouls));
+            return super.efficiency() * ((souls / (float)maxSouls) * (efficiencyTo - efficiencyFrom) + efficiencyFrom);
         }
 
         public boolean canJoin(){

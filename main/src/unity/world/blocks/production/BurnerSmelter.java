@@ -21,7 +21,6 @@ public class BurnerSmelter extends StemGenericSmelter{
 
     public BurnerSmelter(String name){
         super(name);
-        preserveUpdate = false;
     }
 
     @Override

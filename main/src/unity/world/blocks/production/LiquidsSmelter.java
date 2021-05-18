@@ -2,12 +2,15 @@ package unity.world.blocks.production;
 
 import mindustry.type.*;
 import mindustry.ui.*;
+import mindustry.world.blocks.production.*;
 import mindustry.world.consumers.*;
+import unity.annotations.Annotations.*;
 import unity.gen.*;
 import unity.world.consumers.*;
 
 import static arc.Core.bundle;
 
+@Merge(base = GenericSmelter.class, value = Stemc.class)
 public class LiquidsSmelter extends StemGenericSmelter{
     protected Liquid[] liquids;
 

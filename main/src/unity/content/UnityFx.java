@@ -474,7 +474,7 @@ public class UnityFx{
         }
     }),
 
-    oracleChage = new Effect(30f, e -> {
+    oracleCharge = new Effect(30f, e -> {
         color(Pal.lancerLaser);
         Tmp.v1.trns(Mathf.randomSeed(e.id, 360f) + Time.time, (1 - e.finpow()) * 20f);
         Fill.square(e.x + Tmp.v1.x, e.y + Tmp.v1.y, e.fin() * 4.5f, 45f);

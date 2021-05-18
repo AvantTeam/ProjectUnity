@@ -29,8 +29,8 @@ import java.lang.reflect.*;
 
 import static mindustry.Vars.*;
 
+@SuppressWarnings({"rawtypes", "unchecked", "unused"})
 @MergeComponent
-@SuppressWarnings({"rawtypes", "unchecked"})
 class ExpComp extends Block{
     int maxLevel = 20;
     float maxExp;
@@ -128,7 +128,7 @@ class ExpComp extends Block{
                 Field fIncMul = ReflectUtils.findField(getClass(), type.name() + "IncMul", false);
                 Field fIncStart = ReflectUtils.findField(getClass(), type.name() + "IncStart", false);
 
-                ReflectUtils.setField(this, fInc, (Entry<Class, Field>[])new Entry[amount]);
+                ReflectUtils.setField(this, fInc, new Entry[amount]);
                 ReflectUtils.setField(this, fIncStart, type == ExpFieldType.bool ? new boolean[amount] : new float[amount]);
                 ReflectUtils.setField(this, fIncMul, new float[amount]);
 
@@ -172,9 +172,8 @@ class ExpComp extends Block{
             saveConfig = false;
 
             config(Integer.class, (build, value) -> {
-                int i = value.intValue();
-                if(i >= 0 && build instanceof ExpBuildc exp){
-                    exp.upgrade(i);
+                if(value >= 0 && build instanceof ExpBuildc exp){
+                    exp.upgrade(value);
                 }
             });
         }
@@ -188,25 +187,23 @@ class ExpComp extends Block{
         stats.add(Stat.itemCapacity, "@", format("explib.expAmount", requiredExp(maxLevel)));
 
         if(upgrades.size > 0){
-            stats.add(Stat.abilities, table -> {
-                table.table(t -> {
+            stats.add(Stat.abilities, table -> table.table(t -> {
+                t.row();
+                t.add("$explib.upgrades");
+                t.row();
+
+                for(ExpUpgrade upgrade : upgrades){
+                    if(upgrade.min > maxLevel || upgrade.hide) continue;
+
+                    float size = 8f * 3f;
+
+                    t.add("[green]" + Core.bundle.get("explib.level") + " " + upgrade.min + "[] ");
+
+                    t.image(upgrade.type.icon(Cicon.small)).size(size).padRight(4).scaling(Scaling.fit);
+                    t.add(upgrade.type.localizedName).left();
                     t.row();
-                    t.add("$explib.upgrades");
-                    t.row();
-
-                    for(ExpUpgrade upgrade : upgrades){
-                        if(upgrade.min > maxLevel || upgrade.hide) continue;
-
-                        float size = 8f * 3f;
-
-                        t.add("[green]" + Core.bundle.get("explib.level") + " " + upgrade.min + "[] ");
-
-                        t.image(upgrade.type.icon(Cicon.small)).size(size).padRight(4).scaling(Scaling.fit);
-                        t.add(upgrade.type.localizedName).left();
-                        t.row();
-                    }
-                });
-            });
+                }
+            }));
         }
     }
 
@@ -217,7 +214,7 @@ class ExpComp extends Block{
                 return new Bar(
                     () -> Core.bundle.get("explib.level") + " " + build.level(),
                     () -> Tmp.c1.set(minLevelColor).lerp(maxLevelColor, build.levelf()),
-                    () -> build.levelf()
+                    build::levelf
                 );
             }else{
                 throw new IllegalStateException("Building type for '" + localizedName + "' is not an instance of 'ExpBuildc'!");
@@ -231,7 +228,7 @@ class ExpComp extends Block{
                     ?    Core.bundle.get("explib.exp")
                     :   Core.bundle.get("explib.max"),
                     () -> Tmp.c1.set(minExpColor).lerp(maxExpColor, build.expf()),
-                    () -> build.expf()
+                    build::expf
                 );
             }else{
                 throw new IllegalStateException("Building type for '" + localizedName + "' is not an instance of 'ExpBuildc'!");
@@ -326,7 +323,7 @@ class ExpComp extends Block{
 
     public void boolExp(int level){
         for(int i = 0; i < boolInc.length; i++){
-            ReflectUtils.setField(boolInc[i].key.cast(this), boolInc[i].value, (boolIncStart[i]) ? (level < boolIncMul[i]) : (level >= boolIncMul[i]));
+            ReflectUtils.setField(boolInc[i].key.cast(this), boolInc[i].value, boolIncStart[i] == (level < boolIncMul[i]));
         }
     }
 
@@ -421,7 +418,7 @@ class ExpComp extends Block{
                         Tile powtile = world.tile(link);
 
                         if(powtile.block() instanceof PowerNode){
-                            powtile.build.configure(Integer.valueOf(link));
+                            powtile.build.configure(link);
                         }
                     }
                 }
@@ -496,13 +493,11 @@ class ExpComp extends Block{
         }
 
         private void infoButton(Table table, Block block){
-            table.button(Icon.infoCircle, Styles.emptyi, () -> {
-                ui.content.show(block);
-            }).size(40);
+            table.button(Icon.infoCircle, Styles.emptyi, () -> ui.content.show(block)).size(40);
         }
 
         private void upgradeButton(Table table, int index, int level){
-            Integer i = Integer.valueOf(index);
+            Integer i = index;
             table.button(Icon.up, Styles.emptyi, () -> {
                 control.input.frag.config.hideConfig();
                 configure(i);
