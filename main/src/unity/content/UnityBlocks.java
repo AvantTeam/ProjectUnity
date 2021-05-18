@@ -1800,25 +1800,18 @@ public class UnityBlocks implements ContentList{
             consumes.power(2.4f);
             consumes.liquid(Liquids.cryofluid, 0.08f);
 
-            drawer = new DrawBlock(){
-                @Override
-                public void draw(GenericCrafterBuild build){
-                    if(!(build instanceof SoulFloorExtractorBuild e)) return;
+            draw((StemSoulFloorExtractorBuild e) -> {
+                Draw.color(UnityPal.monolith, UnityPal.monolithLight, Mathf.absin(Time.time, 6f, 1f) * e.warmup);
+                Draw.alpha(e.warmup);
+                Draw.rect(Regions.debrisExtractorHeat1Region, e.x, e.y);
 
-                    Draw.rect(region, e.x, e.y);
+                Draw.color(UnityPal.monolith, UnityPal.monolithLight, Mathf.absin(Time.time + 4f, 6f, 1f) * e.warmup);
+                Draw.alpha(e.warmup);
+                Draw.rect(Regions.debrisExtractorHeat2Region, e.x, e.y);
 
-                    Draw.color(UnityPal.monolith, UnityPal.monolithLight, Mathf.absin(Time.time, 6f, 1f) * e.warmup);
-                    Draw.alpha(e.warmup);
-                    Draw.rect(Regions.debrisExtractorHeat1Region, e.x, e.y);
-
-                    Draw.color(UnityPal.monolith, UnityPal.monolithLight, Mathf.absin(Time.time + 4f, 6f, 1f) * e.warmup);
-                    Draw.alpha(e.warmup);
-                    Draw.rect(Regions.debrisExtractorHeat2Region, e.x, e.y);
-
-                    Draw.color();
-                    Draw.alpha(1f);
-                }
-            };
+                Draw.color();
+                Draw.alpha(1f);
+            });
         }};
 
         monolithAlloyForge = new StemSoulHoldGenericSmelter("monolith-alloy-forge"){
@@ -1837,7 +1830,7 @@ public class UnityBlocks implements ContentList{
                 consumes.items(with(Items.silicon, 3, UnityItems.archDebris, 1, UnityItems.monolite, 2));
                 consumes.liquid(Liquids.cryofluid, 0.1f);
 
-                update((SoulStemSmelterBuild e) -> {
+                update((StemSoulSmelterBuild e) -> {
                     StemData data = e.data();
                     if(e.consValid()){
                         data.floatValue = Mathf.lerpDelta(data.floatValue, e.efficiency(), 0.02f);
