@@ -308,31 +308,33 @@ public class KamiPatterns{
                     ai.reloads[1] = Mathf.random(360f);
                     ai.reloads[2] = Mathf.random(360f);
                 }, ai -> {
-                    float diffReload = 3f - (Mathf.clamp(ai.difficulty / 2f, 0f, 1f) + (Mathf.clamp(ai.stageTime / 4f * 60f) * 1f));
+                    BulletType type = UnityBullets.kamiBullet1;
+                    float diffReload = 7f - Mathf.clamp(ai.difficulty / 2f, 0f, 1f);
                     float extraSpeed = Mathf.clamp(ai.difficulty / 3f) * 0.5f;
                     int diff = 1 + Mathf.clamp(ai.difficulty - 1, 0, 1);
                     int diff2 = 2 + Mathf.clamp(ai.difficulty * 2, 0, 2);
                     ai.reloads[3] += Time.delta;
-                    if(ai.reloads[3] >= diffReload){
+                    ai.reloads[5] += Time.delta;
+                    if(ai.reloads[3] >= diffReload - (Interp.pow2In.apply(Mathf.clamp((ai.stageTime - 90f) / ((4.75f * 60f) - 90f))) * 4.5f)){
                         for(int i = 0; i < diff; i++){
-                            BulletType type = UnityBullets.kamiBullet1;
                             float angle1 = Mathf.mod((ai.reloads[4] * Mathf.signs[i]) + ai.reloads[1], 360f);
-                            float angle2 = Mathf.mod((-ai.reloads[4] * Mathf.signs[i]) + ai.reloads[2], 360f);
 
-                            float fout1 = Mathf.clamp(1f - (ai.stageTime / (5f * 60f)));
+                            float fout1 = Interp.pow3InInverse.apply(Mathf.clamp((1f - (ai.stageTime / (5f * 60f))) * 1.6f));
                             tVec.trns(angle1, fout1 * 60f).add(ai);
                             KamiBulletPresets.shootLine(type, ai.unit, ai.unit.team, tVec.x, tVec.y, angle1, type.speed * 0.75f, (type.speed * 1.25f) + extraSpeed, diff2, b -> b.hitSize *= 1.6f);
-
-                            float fout2 = Mathf.clamp(1f - (ai.stageTime / (2.5f * 60f)));
-                            if(fout2 > 0f){
-                                tVec.trns(angle2, fout2 * 60f).add(ai);
-                                KamiBulletPresets.shootLine(type, ai.unit, ai.unit.team, tVec.x, tVec.y, angle2, type.speed * 0.5f, type.speed + extraSpeed, diff2, b -> b.hitSize *= 0.75f);
-
-                                //if(ai.difficulty >= 3) KamiBulletPresets.shootLine(type, ai.unit, ai.unit.team, tVec.x, tVec.y, angle2, type.speed * 0.15f, (type.speed * 0.3f) + extraSpeed, diff2, b -> b.hitSize *= 0.5f);
-                            }
                         }
                         ai.reloads[3] = 0f;
-                        ai.reloads[4] += diffReload * 6.5f * ai.reloads[0];
+                        ai.reloads[4] += diffReload * 3.4f * ai.reloads[0];
+                    }
+                    if(ai.reloads[5] >= diffReload - (Interp.pow2In.apply(Mathf.clamp((ai.stageTime - 90f) / ((3.5f * 60f) - 90f))) * 4.5f) && 1f - (ai.stageTime / (3.75f * 60f)) > 0f){
+                        for(int i = 0; i < diff; i++){
+                            float angle1 = Mathf.mod((ai.reloads[6] * Mathf.signs[i]) + ai.reloads[2], 360f);
+                            float fout1 = Interp.pow2InInverse.apply(Mathf.clamp(1f - (ai.stageTime / (3.75f * 60f))));
+                            tVec.trns(angle1, fout1 * 60f).add(ai);
+                            KamiBulletPresets.shootLine(type, ai.unit, ai.unit.team, tVec.x, tVec.y, angle1, type.speed * 0.5f, type.speed + extraSpeed, diff2, b -> b.hitSize *= 0.75f);
+                        }
+                        ai.reloads[5] = 0f;
+                        ai.reloads[6] += -diffReload * 3.4f * ai.reloads[0];
                     }
                 }),
                 new KamiPatternStage(1.5f * 60f, ai -> ai.moveAround(60f), null)

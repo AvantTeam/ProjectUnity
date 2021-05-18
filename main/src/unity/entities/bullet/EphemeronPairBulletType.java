@@ -20,7 +20,7 @@ public class EphemeronPairBulletType extends BasicBulletType{
         hitSound = Sounds.spark;
         hitSize = 8f;
         pierce = true;
-        collidesTiles = false;
+        hittable = absorbable = reflectable = collidesTiles = false;
     }
 
     @Override
@@ -28,7 +28,7 @@ public class EphemeronPairBulletType extends BasicBulletType{
         Draw.color(frontColor);
         Fill.circle(b.x, b.y, 4f + (b.fout() * 1.5f));
         Draw.color(backColor);
-        Fill.circle(b.x, b.y, 2.5f + (b.fout() * 1f));
+        Fill.circle(b.x, b.y, 2.5f + (b.fout()));
     }
 
     @Override
@@ -36,6 +36,8 @@ public class EphemeronPairBulletType extends BasicBulletType{
         super.update(b);
 
         if(positive && b.data instanceof Bullet n){
+            b.time(0f);
+            
             Tmp.v1.trns(b.angleTo(n), Time.delta);
             b.vel.add(Tmp.v1);
             
@@ -62,6 +64,8 @@ public class EphemeronPairBulletType extends BasicBulletType{
                 UnityFx.ephemeronHit.at(Tmp.v1);
                 Damage.damage(b.team, Tmp.v1.x, Tmp.v1.y, 40f, 80f);
             }
+        }else{
+            b.absorb();
         }
     }
 }

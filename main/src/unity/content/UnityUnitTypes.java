@@ -119,13 +119,13 @@ public class UnityUnitTypes implements ContentList{
     public static @FactionDef("end") @EntityDef({Unitc.class, Endc.class}) UnitType voidVessel;
 
     // end invisible
-    public static @FactionDef("end") @EntityPoint(EndInvisibleUnit.class) UnitType opticaecus;
+    public static @FactionDef("end") @EntityDef({Unitc.class, Endc.class, Invisiblec.class}) UnitType opticaecus;
 
     // end worm
     public static @FactionDef("end") @EntityPoint(EndWormUnit.class) UnitType devourer;
 
     // end apocalypse
-    public static @FactionDef("end") @EntityPoint(ApocalypseUnit.class) UnitType apocalypse;
+    public static @FactionDef("end") @EntityDef({Unitc.class, Endc.class, Invisiblec.class, Tentaclec.class}) UnitType apocalypse;
 
     // end legs
     public static @FactionDef("end") @EntityPoint(EndLegsUnit.class) UnitType ravager;
@@ -2046,7 +2046,7 @@ public class UnityUnitTypes implements ContentList{
             hovering = true;
             allowLegStep = true;
             visualElevation = 0.7f;
-            groundLayer = Layer.legUnit;
+            groundLayer = Layer.legUnit + 0.01f;
             outlineColor = UnityPal.darkerOutline;
 
             CloneableSetWeapon t = UnityWeaponTemplates.plagueSmallMount;
@@ -3163,6 +3163,8 @@ public class UnityUnitTypes implements ContentList{
             engineSize = 6f;
             outlineColor = UnityPal.darkerOutline;
 
+            antiCheatType = new AntiCheatVariables(health / 15f, health / 1.5f, health / 12.5f, health / 20f, 0.2f, 6f * 60f, 3f * 60f, 30f, 4);
+
             weapons.add(new Weapon(){{
                 mirror = false;
                 rotate = false;
@@ -3372,6 +3374,8 @@ public class UnityUnitTypes implements ContentList{
             lowAltitude = true;
             outlineColor = UnityPal.darkerOutline;
 
+            antiCheatType = new AntiCheatVariables(health / 600f, health / 200f, health / 600f, health / 100f, 0.6f, 7f * 60f, 8f * 60f, 35f, 4);
+
             CloneableSetWeapon a = UnityWeaponTemplates.apocalypseSmall,
             b = UnityWeaponTemplates.apocalypseLaser, c = UnityWeaponTemplates.apocalypseLauncher;
 
@@ -3553,11 +3557,11 @@ public class UnityUnitTypes implements ContentList{
                     float engineSizeB = 3.25f;
                     Tmp.v1.trns(unit.rotation, -105f * offset, 73.5f * i).add(unit);
                     Draw.color(unit.team.color);
-                    if(unit instanceof EndInvisibleUnit e) Draw.alpha(fade(e));
+                    if(unit instanceof Invisiblec e) Draw.alpha(fade(e));
                     Fill.circle(Tmp.v1.x, Tmp.v1.y, (engineSizeB + Mathf.absin(Time.time + 90f, 2f, engineSizeB / 2f)) * scale);
                     Tmp.v1.trns(unit.rotation, (-105f * offset) + 1f, 74f * i).add(unit);
                     Draw.color(Color.white);
-                    if(unit instanceof EndInvisibleUnit e) Draw.alpha(fade(e));
+                    if(unit instanceof Invisiblec e) Draw.alpha(fade(e));
                     Fill.circle(Tmp.v1.x, Tmp.v1.y, (engineSizeB + Mathf.absin(Time.time + 90f, 2f, engineSizeB / 2f)) / 2f * scale);
                     Draw.color();
                 }

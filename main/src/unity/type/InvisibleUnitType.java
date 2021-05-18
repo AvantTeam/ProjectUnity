@@ -11,6 +11,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import unity.entities.units.*;
+import unity.gen.*;
 
 public class InvisibleUnitType extends UnityUnitType{
     public Color tint = Color.red;
@@ -19,20 +20,20 @@ public class InvisibleUnitType extends UnityUnitType{
         super(name);
     }
 
-    protected float fade(EndInvisibleUnit unit){
-        float minimum = Vars.player.team() == unit.team ? 0.1f : 0.01f;
-        return Mathf.clamp(1f - unit.alphaLerp, minimum, 1f);
+    protected float fade(Invisiblec unit){
+        float minimum = Vars.player.team() == unit.team() ? 0.1f : 0.01f;
+        return Mathf.clamp(1f - unit.alphaLerp(), minimum, 1f);
     }
 
     @Override
     public void drawOutline(Unit unit){
-        if(!(unit instanceof EndInvisibleUnit e)){
+        if(!(unit instanceof Invisiblec e)){
             super.drawOutline(unit);
             return;
         }
-        Tmp.c1.set(Color.white).lerp(tint, Mathf.lerp(0f, 0.5f, e.alphaLerp));
+        Tmp.c1.set(Color.white).lerp(tint, Mathf.lerp(0f, 0.5f, e.alphaLerp()));
         Draw.color(Tmp.c1);
-        Draw.alpha(1f - e.alphaLerp);
+        Draw.alpha(1f - e.alphaLerp());
 
         if(Core.atlas.isFound(outlineRegion)){
             Draw.rect(outlineRegion, unit.x, unit.y, unit.rotation - 90);
@@ -41,7 +42,7 @@ public class InvisibleUnitType extends UnityUnitType{
 
     @Override
     public Color cellColor(Unit unit){
-        if(unit instanceof EndInvisibleUnit e) return super.cellColor(unit).a(fade(e));
+        if(unit instanceof Invisiblec e) return super.cellColor(unit).a(fade(e));
         return super.cellColor(unit);
     }
 
@@ -58,14 +59,14 @@ public class InvisibleUnitType extends UnityUnitType{
         }
 
         Draw.color(unit.team.color);
-        if(unit instanceof EndInvisibleUnit e) Draw.alpha(fade(e));
+        if(unit instanceof Invisiblec e) Draw.alpha(fade(e));
         Fill.circle(
         unit.x + Angles.trnsx(unit.rotation + 180, offset),
         unit.y + Angles.trnsy(unit.rotation + 180, offset),
         (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f)) * scale
         );
         Draw.color(Color.white);
-        if(unit instanceof EndInvisibleUnit e) Draw.alpha(fade(e));
+        if(unit instanceof Invisiblec e) Draw.alpha(fade(e));
         Fill.circle(
         unit.x + Angles.trnsx(unit.rotation + 180, offset - 1f),
         unit.y + Angles.trnsy(unit.rotation + 180, offset - 1f),
@@ -76,7 +77,7 @@ public class InvisibleUnitType extends UnityUnitType{
 
     @Override
     public void drawSoftShadow(Unit unit){
-        if(!(unit instanceof EndInvisibleUnit e)){
+        if(!(unit instanceof Invisiblec e)){
             super.drawSoftShadow(unit);
             return;
         }
@@ -89,7 +90,7 @@ public class InvisibleUnitType extends UnityUnitType{
 
     @Override
     public void drawShadow(Unit unit){
-        if(!(unit instanceof EndInvisibleUnit e)){
+        if(!(unit instanceof Invisiblec e)){
             super.drawShadow(unit);
             return;
         }
@@ -103,12 +104,12 @@ public class InvisibleUnitType extends UnityUnitType{
 
     @Override
     public void drawLight(Unit unit){
-        if(!(unit instanceof EndInvisibleUnit e)){
+        if(!(unit instanceof Invisiblec e)){
             super.drawLight(unit);
             return;
         }
         if(lightRadius > 0){
-            Drawf.light(unit.team, unit.x, unit.y, lightRadius, lightColor, lightOpacity * (1f - e.alphaLerp));
+            Drawf.light(unit.team, unit.x, unit.y, lightRadius, lightColor, lightOpacity * (1f - e.alphaLerp()));
         }
     }
 
@@ -133,7 +134,7 @@ public class InvisibleUnitType extends UnityUnitType{
 
             if(weapon.shadow > 0){
                 float fade = 1f;
-                if(unit instanceof EndInvisibleUnit e) fade = fade(e);
+                if(unit instanceof Invisiblec e) fade = fade(e);
                 Drawf.shadow(wx, wy, weapon.shadow, fade);
             }
 
@@ -152,7 +153,7 @@ public class InvisibleUnitType extends UnityUnitType{
                 Draw.z(zB);
             }
 
-            if(unit instanceof EndInvisibleUnit e && outlineFound) Draw.alpha(1f - e.alphaLerp);
+            if(unit instanceof Invisiblec e && outlineFound) Draw.alpha(1f - e.alphaLerp());
             Draw.rect(weapon.region,
             wx, wy,
             weapon.region.width * Draw.scl * -Mathf.sign(weapon.flipSprite),
@@ -179,13 +180,13 @@ public class InvisibleUnitType extends UnityUnitType{
 
     @Override
     public void applyColor(Unit unit){
-        if(!(unit instanceof EndInvisibleUnit e)){
+        if(!(unit instanceof Invisiblec e)){
             super.applyColor(unit);
             return;
         }
         //float lerp = Mathf.lerp(1f, 0.1f, e.alphaLerp);
         float lerp = fade(e);
-        Tmp.c1.set(Color.white).lerp(tint, Mathf.lerp(0f, 0.5f, e.alphaLerp));
+        Tmp.c1.set(Color.white).lerp(tint, Mathf.lerp(0f, 0.5f, e.alphaLerp()));
         Draw.color(Tmp.c1);
         Draw.alpha(lerp);
         Draw.mixcol(Color.white, unit.hitTime);

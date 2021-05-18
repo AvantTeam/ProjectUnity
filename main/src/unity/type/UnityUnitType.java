@@ -362,7 +362,7 @@ public class UnityUnitType extends UnitType{
     public void drawBody(Unit unit){
         float z = Draw.z();
 
-        if(unit instanceof TentaclesBase t){
+        if(unit instanceof Tentaclec t){
             Draw.z(z - outlineSpace);
             t.drawTentacles();
             Draw.z(z);
