@@ -614,7 +614,7 @@ public class UnityBlocks implements ContentList{
                     shrinkX = shrinkY = 0f;
                     hitSize = 15f;
                     hitEffect = UnityFx.protonHit;
-                    collides = false;
+                    hittable = collides = false;
                     backColor = lightColor = hitColor = lightningColor = Pal.lancerLaser;
                     frontColor = Color.white;
                     lightning = 3;
@@ -659,6 +659,7 @@ public class UnityBlocks implements ContentList{
                     sprite = "unity-electric-shell";
                     hitEffect = UnityFx.neutronHit;
                     collides = collidesGround = true;
+                    hittable = false;
                     backColor = lightColor = hitColor = Pal.lancerLaser;
                     frontColor = Color.white;
                 }
@@ -692,7 +693,7 @@ public class UnityBlocks implements ContentList{
                 shootType = new DecayBasicBulletType(8.5f, 24f){{
                     drag = 0.026f;
                     lifetime = 48f;
-                    collides = false;
+                    hittable = absorbable = collides = false;
                     backColor = trailColor = hitColor = lightColor = Pal.lancerLaser;
                     shootEffect = smokeEffect = Fx.none;
                     hitEffect = Fx.hitLancer;
@@ -713,6 +714,7 @@ public class UnityBlocks implements ContentList{
                             hitEffect = Fx.hitLancer;
                             despawnEffect = UnityFx.wBosonDecayHitEffect;
                             frontColor = Color.white;
+                            hittable = false;
                         }
     
                         @Override
@@ -787,6 +789,7 @@ public class UnityBlocks implements ContentList{
                     hitSize = 8f;
                     shootEffect = smokeEffect = Fx.none;
                     hitEffect = Fx.hitLancer;
+                    hittable = false;
                 }};
             }
             

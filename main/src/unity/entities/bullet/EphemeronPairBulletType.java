@@ -20,7 +20,7 @@ public class EphemeronPairBulletType extends BasicBulletType{
         hitSound = Sounds.spark;
         hitSize = 8f;
         pierce = true;
-        collidesTiles = false;
+        hittable = absorbable = reflectable = collidesTiles = false;
     }
 
     @Override
