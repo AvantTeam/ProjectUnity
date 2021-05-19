@@ -183,8 +183,13 @@ class ExpComp extends Block{
 
     @Override
     public void setStats(){
-        stats.add(Stat.itemCapacity, "@", format("explib.lvlAmount", maxLevel));
-        stats.add(Stat.itemCapacity, "@", format("explib.expAmount", requiredExp(maxLevel)));
+        if(headless){
+            stats.add(Stat.itemCapacity, "@", Core.bundle.get("explib.lvlAmount"));
+            stats.add(Stat.itemCapacity, "@", Core.bundle.get("explib.expAmount"));
+        }else{
+            stats.add(Stat.itemCapacity, "@", Core.bundle.format("explib.lvlAmount", maxLevel));
+            stats.add(Stat.itemCapacity, "@", Core.bundle.format("explib.expAmount", requiredExp(maxLevel)));
+        }
 
         if(upgrades.size > 0){
             stats.add(Stat.abilities, table -> table.table(t -> {
@@ -234,14 +239,6 @@ class ExpComp extends Block{
                 throw new IllegalStateException("Building type for '" + localizedName + "' is not an instance of 'ExpBuildc'!");
             }
         });
-    }
-
-    public String format(String format, Object... args){
-        if(headless){
-            return format;
-        }else{
-            return Core.bundle.format(format, args);
-        }
     }
 
     public float requiredExp(int level){

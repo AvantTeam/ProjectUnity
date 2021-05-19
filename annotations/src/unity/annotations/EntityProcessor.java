@@ -1,13 +1,10 @@
 package unity.annotations;
 
 import arc.func.*;
-import arc.math.*;
 import arc.struct.*;
 import arc.struct.ObjectMap.*;
 import arc.util.*;
 import arc.util.pooling.Pool.*;
-import mindustry.*;
-import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import unity.annotations.Annotations.*;
@@ -68,9 +65,12 @@ public class EntityProcessor extends BaseProcessor{
         for(ExecutableElement e : (Set<ExecutableElement>)roundEnv.getElementsAnnotatedWith(Insert.class)){
             if(!e.getParameters().isEmpty()) throw new IllegalStateException("All @Insert methods must not have parameters");
 
+            TypeElement type = comps.find(c -> simpleName(c).equals(simpleName(e.getEnclosingElement())));
+            if(type == null) continue;
+
             Insert ann = annotation(e, Insert.class);
             inserters
-                .get(comps.find(c -> simpleName(c).equals(simpleName(e.getEnclosingElement()))), ObjectMap::new)
+                .get(type, ObjectMap::new)
                 .get(ann.value(), Seq::new)
                 .add(e);
         }

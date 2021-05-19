@@ -3,17 +3,14 @@ package unity.annotations;
 import arc.struct.*;
 import arc.struct.ObjectMap.*;
 import arc.util.*;
-import arc.util.pooling.Pool.*;
 import com.squareup.javapoet.*;
 import com.sun.source.tree.*;
 import mindustry.gen.*;
 import unity.annotations.Annotations.*;
-import unity.annotations.EntityProcessor.*;
 import unity.annotations.TypeIOResolver.*;
 
 import javax.annotation.processing.*;
 import javax.lang.model.element.*;
-import javax.lang.model.type.*;
 import java.util.*;
 import java.util.regex.*;
 
@@ -65,6 +62,8 @@ public class MergeProcessor extends BaseProcessor{
             serializer = TypeIOResolver.resolve(this);
 
             for(TypeElement comp : comps.select(t -> t.getEnclosingElement() instanceof PackageElement)){
+                constructor(comp);
+
                 TypeSpec.Builder builder = toInterface(comp, getDependencies(comp))
                     .addAnnotation(
                         AnnotationSpec.builder(cName(SuppressWarnings.class))
@@ -87,15 +86,10 @@ public class MergeProcessor extends BaseProcessor{
                     }
 
                     TypeSpec.Builder subBuilder = toInterface(buildType, getDependencies(buildType));
-                    builder.addType(subBuilder.build());
-
-                    builder.addAnnotation(
-                        AnnotationSpec.builder(cName(MergeInterface.class))
-                            .addMember("value", "$L.$L.class", interfaceName(comp), interfaceName(buildType))
-                        .build()
-                    );
-                }else{
-                    builder.addAnnotation(cName(MergeInterface.class));
+                    subBuilder.addSuperinterface(cName(Buildingc.class));
+                    builder
+                        .addType(subBuilder.build())
+                        .addAnnotation(cName(MergeInterface.class));
                 }
 
                 write(builder.build());
@@ -108,23 +102,22 @@ public class MergeProcessor extends BaseProcessor{
                 Seq<TypeElement> defComps = elements(ann::value)
                     .<TypeElement>as()
                     .map(t -> inters.find(i -> simpleName(i).equals(simpleName(t))))
-                    .select(Objects::nonNull)
-                    .select(t -> t.getEnclosingElement() instanceof PackageElement)
+                    .select(t -> t != null && t.getEnclosingElement() instanceof PackageElement)
                     .map(this::toComp);
+                System.out.println(defComps.toString("\n"));
+
+                Seq<TypeElement> defCompsBuild = defComps
+                    .map(t -> comps.find(i -> simpleName(i).equals(simpleName(findBuild(t)))))
+                    .select(Objects::nonNull);
+                System.out.println(defCompsBuild.toString("\n"));
+                System.out.println("\n");
 
                 if(defComps.isEmpty()) continue;
 
                 MergeDefinition definition = toClass(def, usedNames, defComps);
                 if(definition == null) continue;
 
-                defComps = defComps
-                    .map(t -> inters.find(i -> simpleName(i).equals(interfaceName(t))))
-                    .select(Objects::nonNull)
-                    .map(t -> elements(annotation(t, MergeInterface.class)::value).<TypeElement>as())
-                    .select(t -> t != null && !t.isEmpty())
-                    .map(s -> toComp(s.first()));
-
-                MergeDefinition buildDefinition = toClass(def, usedNames, defComps);
+                MergeDefinition buildDefinition = toClass(def, usedNames, defCompsBuild);
                 buildDefinition.parent = definition;
 
                 definitions.add(buildDefinition, definition);
@@ -154,7 +147,19 @@ public class MergeProcessor extends BaseProcessor{
             inter.addSuperinterface(cName(type));
         }
 
-        for(ExecutableElement m : methods(comp)){
+        if(!isBuild){
+            ExecutableElement constructor = constructor(comp);
+            String str = treeUtils.getTree(constructor).getBody().toString()
+                .replaceAll("this\\.<(.*)>self\\(\\)", "this")
+                .replaceAll("self\\(\\)(?!\\s+instanceof)", "this")
+                .replaceAll(" yield ", "")
+                .replaceAll("\\/\\*missing\\*\\/", "var")
+                .replace("super(name);", "");
+
+            methodBlocks.put(descString(constructor), str);
+        }
+
+        for(ExecutableElement m : methods(comp).select(t -> !isConstructor(t))){
             if(is(m, Modifier.ABSTRACT, Modifier.NATIVE)) continue;
 
             methodBlocks.put(descString(m), treeUtils.getTree(m).getBody().toString()
@@ -224,14 +229,22 @@ public class MergeProcessor extends BaseProcessor{
 
     MergeDefinition toClass(Element def, ObjectMap<String, Element> usedNames, Seq<TypeElement> defComps){
         ObjectMap<String, Seq<ExecutableElement>> methods = new ObjectMap<>();
+        Seq<ExecutableElement> constructors = new Seq<>();
         ObjectMap<FieldSpec, VariableElement> specVariables = new ObjectMap<>();
         ObjectSet<String> usedFields = new ObjectSet<>();
 
+        boolean isBuild = defComps.contains(t -> t.getEnclosingElement() instanceof TypeElement);
+
         Seq<TypeElement> naming = Seq.with(defComps);
-        naming.insert(0, (TypeElement)elements(annotation(def, Merge.class)::base).first());
+        TypeElement baseClass = (TypeElement)elements(annotation(def, Merge.class)::base).first();
+        if(!isBuild){
+            naming.insert(0, baseClass);
+        }else{
+            naming.insert(0, findBuild(baseClass));
+        }
 
         String name = createName(naming);
-        if(defComps.contains(t -> t.getEnclosingElement() instanceof TypeElement)) name += "Build";
+        if(isBuild) name += "Build";
         if(usedNames.containsKey(name)) return null;
 
         defComps.addAll(defComps.copy().flatMap(this::getDependencies)).distinct();
@@ -289,19 +302,62 @@ public class MergeProcessor extends BaseProcessor{
             for(ExecutableElement elem : methods(comp).select(m -> !isConstructor(m))){
                 methods.get(elem.toString(), Seq::new).add(elem);
             }
+
+            if(!isBuild){
+                constructors.add(constructor(comp));
+            }
         }
 
-        builder.addMethod(
-            MethodSpec.methodBuilder("toString")
-                .addAnnotation(cName(Override.class))
-                .returns(String.class)
+        if(isBuild){
+            builder.addMethod(
+                MethodSpec.methodBuilder("toString")
+                    .addAnnotation(cName(Override.class))
+                    .returns(String.class)
+                    .addModifiers(Modifier.PUBLIC)
+                    .addStatement("return $S + $L", name + "#", "id")
+                .build()
+            );
+        }
+
+        if(!isBuild){
+            MethodSpec.Builder mbuilder = MethodSpec.constructorBuilder()
                 .addModifiers(Modifier.PUBLIC)
-                .addStatement("return $S + $L", name + "#", "id")
-            .build()
-        );
+                .addParameter(cName(String.class), "name")
+                .addStatement("super(name)");
+
+            boolean writeBlock = constructors.size > 1;
+
+            Seq<ExecutableElement> inserts = ins.get("constructor", Seq::new);
+
+            Seq<ExecutableElement> noComp = inserts.select(e -> typeUtils.isSameType(
+                elements(annotation(e, Insert.class)::block).first().asType(),
+                elementUtils.getTypeElement("java.lang.Void").asType()
+            ));
+
+            Seq<ExecutableElement> noCompBefore = noComp.select(e -> !annotation(e, Insert.class).after());
+            noCompBefore.sort(Structs.comps(Structs.comparingFloat(m -> annotation(m, MethodPriority.class) != null ? annotation(m, MethodPriority.class).value() : 0), Structs.comparing(BaseProcessor::simpleName)));
+
+            Seq<ExecutableElement> noCompAfter = noComp.select(e -> annotation(e, Insert.class).after());
+            noCompAfter.sort(Structs.comps(Structs.comparingFloat(m -> annotation(m, MethodPriority.class) != null ? annotation(m, MethodPriority.class).value() : 0), Structs.comparing(BaseProcessor::simpleName)));
+
+            inserts = inserts.select(e -> !noComp.contains(e));
+
+            for(ExecutableElement e : noCompBefore){
+                mbuilder.addStatement("this.$L()", simpleName(e));
+            }
+
+            ExecutableElement first = constructors.first();
+            boolean firstc = append(mbuilder, constructors, inserts, writeBlock, first);
+
+            if(!firstc && !noCompAfter.isEmpty()) mbuilder.addCode(lnew());
+            for(ExecutableElement e : noCompAfter){
+                mbuilder.addStatement("this.$L()", simpleName(e));
+            }
+
+            builder.addMethod(mbuilder.build());
+        }
 
         EntityIO io = new EntityIO(simpleName(def), builder, serializer);
-
         for(Entry<String, Seq<ExecutableElement>> entry : methods){
             if(entry.value.contains(m -> annotation(m, Replace.class) != null)){
                 if(entry.value.first().getReturnType().getKind() == VOID){
@@ -434,6 +490,19 @@ public class MergeProcessor extends BaseProcessor{
         }
 
         return def.parent == null;
+    }
+
+    ExecutableElement constructor(TypeElement comp){
+        ExecutableElement cons = null;
+        for(ExecutableElement e : methods(comp).select(BaseProcessor::isConstructor)){
+            if(e.getParameters().size() == 1 && e.getParameters().get(0).asType().toString().equals("java.lang.String")){
+                cons = e;
+            }else{
+                throw new IllegalStateException("Invalid constructor: " + e + ". Valid constructor is Comp(java.lang.String)");
+            }
+        }
+
+        return cons;
     }
 
     boolean isCompInterface(TypeElement type){

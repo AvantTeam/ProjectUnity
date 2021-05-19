@@ -105,9 +105,7 @@ public class Annotations{
     /** The generated interface from {@link MergeComponent} */
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface MergeInterface{
-        Class<?> value() default Building.class;
-    }
+    public @interface MergeInterface{}
 
     /** Indicates that this class is an entity component */
     @Target(ElementType.TYPE)

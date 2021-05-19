@@ -216,7 +216,7 @@ public abstract class BaseProcessor extends AbstractProcessor{
         String params = Arrays.toString(m.getParameters().toArray());
         params = params.substring(1, params.length() - 1);
 
-        return m.getEnclosingElement().toString() + "#" + m.getSimpleName().toString() + "(" + params + ")";
+        return m.getEnclosingElement().toString() + "#" + simpleName(m) + "(" + params + ")";
     }
 
     public boolean is(Element e, Modifier... modifiers){
@@ -228,10 +228,10 @@ public abstract class BaseProcessor extends AbstractProcessor{
         return false;
     }
 
-    public boolean isConstructor(ExecutableElement e){
+    public static boolean isConstructor(ExecutableElement e){
         return
-            e.getSimpleName().toString().equals("<init>") ||
-            e.getSimpleName().toString().equals("<clinit>");
+            simpleName(e).equals("<init>") ||
+            simpleName(e).equals("<clinit>");
     }
 
     public String docs(Element e){

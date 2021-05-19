@@ -107,17 +107,17 @@ public class UnityBlocks implements ContentList{
     public static
     @FactionDef("koruh")
     @LoadRegs("bt-laser-turret-top")
-    @Merge(base = PowerTurret.class, value = {Expc.class, Turretc.class})
+    @Merge(base = PowerTurret.class, value = {Turretc.class, Expc.class})
     Block laser, laserCharge, laserBranch, laserFractal, laserBreakthrough;
 
     public static
     @FactionDef("koruh")
-    @Merge(base = LiquidTurret.class, value = {Expc.class, Turretc.class})
+    @Merge(base = LiquidTurret.class, value = {Turretc.class, Expc.class})
     Block laserFrost, laserKelvin;
 
     public static
     @FactionDef("koruh")
-    @Merge(base = ItemTurret.class, value = {Expc.class, Turretc.class})
+    @Merge(base = ItemTurret.class, value = {Turretc.class, Expc.class})
     Block inferno;
 
     //monolith
@@ -140,7 +140,7 @@ public class UnityBlocks implements ContentList{
         "debris-extractor-heat1",
         "debris-extractor-heat2"
     })
-    @Merge(base = FloorExtractor.class, value = {Stemc.class, SoulHoldc.class})
+    @Merge(base = FloorExtractor.class, value = {SoulHoldc.class, Stemc.class})
     Block
     //production
     debrisExtractor;
@@ -151,7 +151,7 @@ public class UnityBlocks implements ContentList{
         "debris-extractor-heat1",
         "debris-extractor-heat2"
     })
-    @Merge(base = GenericSmelter.class, value = {Stemc.class, SoulHoldc.class})
+    @Merge(base = GenericSmelter.class, value = {SoulHoldc.class, Stemc.class})
     Block
     monolithAlloyForge;
 
