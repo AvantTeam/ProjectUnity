@@ -822,7 +822,7 @@ public class UnityBlocks implements ContentList{
 
         higgsBoson = new PowerTurret("higgs-boson"){
             {
-                requirements(Category.turret, with(Items.silicon, 290, UnityItems.luminum, 430, Items.titanium, 190, Items.thorium, 120, Items.surgeAlloy, 20));
+                requirements(Category.turret, with(Items.silicon, 290, UnityItems.luminum, 430, Items.titanium, 190, Items.thorium, 120, UnityItems.lightAlloy, 20));
                 size = 6;
                 health = 6000;
                 reloadTime = 13f;
@@ -859,7 +859,7 @@ public class UnityBlocks implements ContentList{
 
         muon = new PowerTurret("muon"){ //Should it be animated? Since the animation in AC was disabled.
             {
-                requirements(Category.turret, with(Items.silicon, 290, UnityItems.luminum, 430, Items.titanium, 190, Items.thorium, 120, Items.surgeAlloy, 20));
+                requirements(Category.turret, with(Items.silicon, 290, UnityItems.luminum, 430, Items.titanium, 190, Items.thorium, 120, UnityItems.lightAlloy, 25));
                 size = 8;
                 health = 9800;
                 range = 310f;
@@ -897,7 +897,7 @@ public class UnityBlocks implements ContentList{
 
         ephemeron = new PowerTurret("ephemeron"){
             {
-                requirements(Category.turret, with(Items.silicon, 290, UnityItems.luminum, 430, Items.titanium, 190, Items.thorium, 120, Items.surgeAlloy, 20));
+                requirements(Category.turret, with(Items.silicon, 290, UnityItems.luminum, 430, Items.titanium, 190, Items.thorium, 120, UnityItems.lightAlloy, 25));
                 size = 8;
                 health = 9800;
                 range = 320f;
