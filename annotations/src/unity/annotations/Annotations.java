@@ -106,7 +106,7 @@ public class Annotations{
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.SOURCE)
     public @interface MergeInterface{
-        Class<?> buildType() default Building.class;
+        Class<?> value() default Building.class;
     }
 
     /** Indicates that this class is an entity component */

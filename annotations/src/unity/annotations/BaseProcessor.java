@@ -35,7 +35,7 @@ public abstract class BaseProcessor extends AbstractProcessor{
 
     public static JavacElements elementUtils;
     public static Trees treeUtils;
-    public static Types typeUtils;
+    public static JavacTypes typeUtils;
     public static Filer filer;
     public static Messager messager;
     public static Fi rootDir;

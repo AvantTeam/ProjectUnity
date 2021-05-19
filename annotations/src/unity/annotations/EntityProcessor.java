@@ -220,8 +220,6 @@ public class EntityProcessor extends BaseProcessor{
             }
         }else if(round == 2){
             ObjectMap<String, Element> usedNames = new ObjectMap<>();
-            ObjectMap<Element, ObjectSet<String>> extraNames = new ObjectMap<>();
-
             for(Element def : defs){
                 EntityDef ann = annotation(def, EntityDef.class);
 
@@ -276,10 +274,7 @@ public class EntityProcessor extends BaseProcessor{
                     name += "Entity";
                 }
 
-                if(usedNames.containsKey(name)){
-                    extraNames.get(usedNames.get(name), ObjectSet::new).add(simpleName(def));
-                    continue;
-                }
+                if(usedNames.containsKey(name)) continue;
 
                 TypeSpec.Builder builder = TypeSpec.classBuilder(name)
                     .addModifiers(Modifier.PUBLIC)
@@ -872,7 +867,7 @@ public class EntityProcessor extends BaseProcessor{
     String baseName(TypeElement type){
         String name = simpleName(type);
         if(!name.endsWith("Comp")){
-            throw new IllegalStateException("All types annotated with @EntityComp must have 'Comp' as the name's suffix");
+            throw new IllegalStateException("All types annotated with @EntityComponent must have 'Comp' as the name's suffix");
         }
 
         return name.substring(0, name.length() - 4);
@@ -885,7 +880,7 @@ public class EntityProcessor extends BaseProcessor{
         return rev.toString("", s -> simpleName(s).replace("Comp", ""));
     }
 
-    class EntityDefinition{
+    private static class EntityDefinition{
         final Seq<String> groups;
         final Seq<TypeElement> components;
         final Seq<FieldSpec> fieldSpecs;
@@ -894,7 +889,7 @@ public class EntityProcessor extends BaseProcessor{
         final String name;
         final TypeName extend;
 
-        public EntityDefinition(String name, TypeSpec.Builder builder, Element naming, TypeName extend, Seq<TypeElement> components, Seq<String> groups, Seq<FieldSpec> fieldSpec){
+        EntityDefinition(String name, TypeSpec.Builder builder, Element naming, TypeName extend, Seq<TypeElement> components, Seq<String> groups, Seq<FieldSpec> fieldSpec){
             this.builder = builder;
             this.name = name;
             this.naming = naming;
@@ -906,222 +901,12 @@ public class EntityProcessor extends BaseProcessor{
 
         @Override
         public String toString(){
-            return "Definition{" +
-            "groups=" + groups +
-            "components=" + components +
-            ", base=" + naming +
+            return
+            "EntityDefinition{" +
+                "groups=" + groups +
+                "components=" + components +
+                ", base=" + naming +
             '}';
-        }
-    }
-
-    static class EntityIO{
-        final String name;
-        final TypeSpec.Builder type;
-        final ClassSerializer serializer;
-
-        MethodSpec.Builder method;
-        boolean write;
-
-        EntityIO(String name, TypeSpec.Builder type, ClassSerializer serializer){
-            this.name = name;
-            this.type = type;
-            this.serializer = serializer;
-        }
-
-        Seq<VariableElement> sel(Seq<VariableElement> fields){
-            return fields.select(f ->
-                !f.getModifiers().contains(Modifier.TRANSIENT) &&
-                !f.getModifiers().contains(Modifier.STATIC) &&
-                !f.getModifiers().contains(Modifier.FINAL)
-            );
-        }
-
-        void write(MethodSpec.Builder method, boolean write, Seq<VariableElement> fields){
-            this.method = method;
-            this.write = write;
-
-            for(VariableElement e : sel(fields)){
-                io(e.asType().toString(), "this." + simpleName(e) + (write ? "" : " = "));
-            }
-        }
-
-        void writeSync(MethodSpec.Builder method, boolean write, Seq<VariableElement> syncFields, Seq<VariableElement> allFields){
-            this.method = method;
-            this.write = write;
-
-            if(write){
-                for(VariableElement e : sel(allFields)){
-                    io(e.asType().toString(), "this." + simpleName(e));
-                }
-            }else{
-                st("if(lastUpdated != 0) updateSpacing = $T.timeSinceMillis(lastUpdated)", Time.class);
-                st("lastUpdated = $T.millis()", Time.class);
-                st("boolean islocal = isLocal()");
-
-                for(VariableElement e : sel(allFields)){
-                    boolean sf = annotation(e, SyncField.class) != null;
-                    boolean sl = annotation(e, SyncLocal.class) != null;
-
-                    if(sl) cont("if(!islocal)");
-
-                    if(sf){
-                        st(simpleName(e) + "_LAST_" + " = this." + simpleName(e));
-                    }
-
-                    io(e.asType().toString(), "this." + (sf ? simpleName(e) + "_TARGET_" : simpleName(e)) + " = ");
-
-                    if(sl){
-                        ncont("else" );
-
-                        io(e.asType().toString(), "");
-
-                        if(sf){
-                            st(simpleName(e) + "_LAST_" + " = this." + simpleName(e));
-                            st(simpleName(e) + "_TARGET_" + " = this." + simpleName(e));
-                        }
-
-                        econt();
-                    }
-                }
-
-                st("afterSync()");
-            }
-        }
-
-        void writeSyncManual(MethodSpec.Builder method, boolean write, Seq<VariableElement> syncFields) throws Exception{
-            this.method = method;
-            this.write = write;
-
-            if(write){
-                for(VariableElement field : syncFields){
-                    st("buffer.put(this.$L)", simpleName(field));
-                }
-            }else{
-                st("if(lastUpdated != 0) updateSpacing = $T.timeSinceMillis(lastUpdated)", Time.class);
-                st("lastUpdated = $T.millis()", Time.class);
-
-                for(VariableElement field : syncFields){
-                    st("this.$L = this.$L", simpleName(field) + "_LAST_", simpleName(field));
-                    st("this.$L = buffer.get()", simpleName(field) + "_TARGET_");
-                }
-            }
-        }
-
-        void writeInterpolate(MethodSpec.Builder method, Seq<VariableElement> fields) throws Exception{
-            this.method = method;
-
-            cont("if(lastUpdated != 0 && updateSpacing != 0)");
-
-            st("float timeSinceUpdate = Time.timeSinceMillis(lastUpdated)");
-            st("float alpha = Math.min(timeSinceUpdate / updateSpacing, 2f)");
-
-            for(VariableElement field : fields){
-                String name = simpleName(field);
-                String targetName = name + "_TARGET_";
-                String lastName = name + "_LAST_";
-                st("$L = $L($T.$L($L, $L, alpha))", name, annotation(field, SyncField.class).clamped() ? "arc.math.Mathf.clamp" : "", cName(Mathf.class), annotation(field, SyncField.class).value() ? "lerp" : "slerp", lastName, targetName);
-            }
-
-            ncont("else if(lastUpdated != 0)");
-
-            for(VariableElement field : fields){
-                st("$L = $L", simpleName(field), simpleName(field) + "_TARGET_");
-            }
-
-            econt();
-        }
-
-        void io(String type, String field){
-            type = type.replace("mindustry.gen.", "").replace("unity.gen.", "");
-
-            if(isPrimitive(type)){
-                s(type.equals("boolean") ? "bool" : type.charAt(0) + "", field);
-            }else if(instanceOf(type, "mindustry.ctype.Content")){
-                if(write){
-                    s("s", field + ".id");
-                }else{
-                    st(field + "$T.content.getByID($T.$L, read.s())", cName(Vars.class), cName(ContentType.class), simpleName(type).toLowerCase().replace("type", ""));
-                }
-            }else if(serializer.writers.containsKey(type) && write){
-                st("$L(write, $L)", serializer.writers.get(type), field);
-            }else if(serializer.mutatorReaders.containsKey(type) && !write && !field.replace(" = ", "").contains(" ") && !field.isEmpty()){
-                st("$L$L(read, $L)", field, serializer.mutatorReaders.get(type), field.replace(" = ", ""));
-            }else if(serializer.readers.containsKey(type) && !write){
-                st("$L$L(read)", field, serializer.readers.get(type));
-            }else if(type.endsWith("[]")){
-                String rawType = type.substring(0, type.length() - 2);
-    
-                if(write){
-                    s("i", field + ".length");
-                    cont("for(int INDEX = 0; INDEX < $L.length; INDEX ++)", field);
-                    io(rawType, field + "[INDEX]");
-                }else{
-                    String fieldName = field.replace(" = ", "").replace("this.", "");
-                    String lenf = fieldName + "_LENGTH";
-                    s("i", "int " + lenf + " = ");
-                    if(!field.isEmpty()){
-                        st("$Lnew $L[$L]", field, type.replace("[]", ""), lenf);
-                    }
-                    cont("for(int INDEX = 0; INDEX < $L; INDEX ++)", lenf);
-                    io(rawType, field.replace(" = ", "[INDEX] = "));
-                }
-    
-                econt();
-            }else if(type.startsWith("arc.struct") && type.contains("<")){ //it's some type of data structure
-                String struct = type.substring(0, type.indexOf("<"));
-                String generic = type.substring(type.indexOf("<") + 1, type.indexOf(">"));
-    
-                if(struct.equals("arc.struct.Queue") || struct.equals("arc.struct.Seq")){
-                    if(write){
-                        s("i", field + ".size");
-                        cont("for(int INDEX = 0; INDEX < $L.size; INDEX ++)", field);
-                        io(generic, field + ".get(INDEX)");
-                    }else{
-                        String fieldName = field.replace(" = ", "").replace("this.", "");
-                        String lenf = fieldName + "_LENGTH";
-                        s("i", "int " + lenf + " = ");
-                        if(!field.isEmpty()){
-                            st("$L.clear()", field.replace(" = ", ""));
-                        }
-                        cont("for(int INDEX = 0; INDEX < $L; INDEX ++)", lenf);
-                        io(generic, field.replace(" = ", "_ITEM = ").replace("this.", generic + " "));
-                        if(!field.isEmpty()){
-                            String temp = field.replace(" = ", "_ITEM").replace("this.", "");
-                            st("if($L != null) $L.add($L)", temp, field.replace(" = ", ""), temp);
-                        }
-                    }
-    
-                    econt();
-                }else{
-                    Log.warn("Missing serialization code for collection '@' in '@'", type, name);
-                }
-            }else{
-                Log.warn("Missing serialization code for type '@' in '@'", type, name);
-            }
-        }
-
-        void cont(String text, Object... fmt){
-            method.beginControlFlow(text, fmt);
-        }
-    
-        void econt(){
-            method.endControlFlow();
-        }
-    
-        void ncont(String text, Object... fmt){
-            method.nextControlFlow(text, fmt);
-        }
-    
-        void st(String text, Object... args){
-            method.addStatement(text, args);
-        }
-    
-        void s(String type, String field){
-            if(write){
-                method.addStatement("write.$L($L)", type, field);
-            }else{
-                method.addStatement("$Lread.$L()", field, type);
-            }
         }
     }
 }
