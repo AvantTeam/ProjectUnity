@@ -127,7 +127,7 @@ public class MergeProcessor extends BaseProcessor{
                 MergeDefinition buildDefinition = toClass(def, usedNames, defComps);
                 buildDefinition.parent = definition;
 
-                definitions.add(definition, buildDefinition);
+                definitions.add(buildDefinition, definition);
             }
         }else if(round == 3){
             for(MergeDefinition def : definitions){
@@ -231,6 +231,7 @@ public class MergeProcessor extends BaseProcessor{
         naming.insert(0, (TypeElement)elements(annotation(def, Merge.class)::base).first());
 
         String name = createName(naming);
+        if(defComps.contains(t -> t.getEnclosingElement() instanceof TypeElement)) name += "Build";
         if(usedNames.containsKey(name)) return null;
 
         defComps.addAll(defComps.copy().flatMap(this::getDependencies)).distinct();
@@ -381,14 +382,6 @@ public class MergeProcessor extends BaseProcessor{
             builder.addMethod(mbuilder.build());
         }
 
-        builder.addMethod(MethodSpec.constructorBuilder().addModifiers(Modifier.PROTECTED).build());
-        builder.addMethod(
-            MethodSpec.methodBuilder("create").addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                .returns(ClassName.get(packageName, name))
-                .addStatement("return new $L()", name)
-            .build()
-        );
-
         return new MergeDefinition(packageName + "." + name, builder, def, defComps, allFieldSpecs);
     }
 
@@ -432,11 +425,12 @@ public class MergeProcessor extends BaseProcessor{
             }
         }
 
+        TypeElement block = (TypeElement)elements(annotation(def.naming, Merge.class)::base).first();
         if(def.parent != null){
-            def.builder.superclass(cName(Building.class));
+            def.builder.superclass(cName(findBuild(block)));
             def.parent.builder.addType(def.builder.build());
         }else{
-            def.builder.superclass(tName(elements(annotation(def.naming, Merge.class)::base).first()));
+            def.builder.superclass(tName(block));
         }
 
         return def.parent == null;
@@ -457,6 +451,19 @@ public class MergeProcessor extends BaseProcessor{
         }
 
         return name.substring(0, name.length() - 4);
+    }
+
+    TypeElement findBuild(TypeElement block){
+        TypeElement building = elementUtils.getTypeElement(Building.class.getCanonicalName());
+        for(TypeElement type : types(block)){
+            if(typeUtils.isAssignable(
+                type.asType(),
+                building.asType()
+            )){
+                return type;
+            }
+        }
+        return building;
     }
 
     TypeElement toComp(TypeElement inter){
@@ -498,7 +505,12 @@ public class MergeProcessor extends BaseProcessor{
         Seq<TypeElement> rev = comps.copy();
         rev.reverse();
 
-        return rev.toString("", s -> simpleName(s).replace("Comp", ""));
+        return rev.toString("", s -> {
+            String name = simpleName(s);
+            if(name.endsWith("Comp")) name = name.substring(0, name.length() - 4);
+            if(name.endsWith("Build")) name = name.substring(0, name.length() - 5);
+            return name;
+        });
     }
 
     boolean append(MethodSpec.Builder mbuilder, Seq<ExecutableElement> values, Seq<ExecutableElement> inserts, boolean writeBlock, ExecutableElement first){
