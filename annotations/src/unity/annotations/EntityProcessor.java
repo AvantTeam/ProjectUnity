@@ -39,7 +39,6 @@ public class EntityProcessor extends BaseProcessor{
     Seq<TypeElement> comps = new Seq<>();
     Seq<TypeElement> baseComps = new Seq<>();
     Seq<Element> pointers = new Seq<>();
-    ObjectMap<String, TypeElement> compNames = new ObjectMap<>();
     Seq<TypeSpec.Builder> baseClasses = new Seq<>();
     ObjectMap<TypeElement, ObjectSet<TypeElement>> baseClassDeps = new ObjectMap<>();
     ObjectMap<TypeElement, Seq<TypeElement>> componentDependencies = new ObjectMap<>();
@@ -119,8 +118,6 @@ public class EntityProcessor extends BaseProcessor{
                 }
 
                 imports.put(interfaceName(comp), getImports(comp));
-                compNames.put(simpleName(comp), comp);
-
                 Seq<TypeElement> depends = getDependencies(comp);
 
                 EntityComponent compAnno = annotation(comp, EntityComponent.class);
@@ -133,6 +130,10 @@ public class EntityProcessor extends BaseProcessor{
                                 .addMember("value", "$S", "all")
                             .build()
                         );
+
+                    for(TypeElement extraInterface : Seq.with(comp.getInterfaces()).map(BaseProcessor::toEl).<TypeElement>as().select(i -> !isCompInterface(i))){
+                        inter.addSuperinterface(cName(extraInterface));
+                    }
 
                     for(TypeElement type : depends){
                         inter.addSuperinterface(procName(type, this::interfaceName));
@@ -841,6 +842,10 @@ public class EntityProcessor extends BaseProcessor{
         return componentDependencies.get(component);
     }
 
+    boolean isCompInterface(TypeElement type){
+        return toComp(type) != null;
+    }
+
     TypeName procName(TypeElement comp, Func<TypeElement, String> name){
         return ClassName.get(
             comp.getEnclosingElement().toString().contains("fetched") ? "mindustry.gen" : packageName,
@@ -878,10 +883,6 @@ public class EntityProcessor extends BaseProcessor{
         rev.reverse();
 
         return rev.toString("", s -> simpleName(s).replace("Comp", ""));
-    }
-
-    Seq<String> getImports(Element e){
-        return Seq.with(treeUtils.getPath(e).getCompilationUnit().getImports()).map(Object::toString);
     }
 
     class EntityDefinition{

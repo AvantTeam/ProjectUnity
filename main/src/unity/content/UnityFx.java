@@ -485,7 +485,7 @@ public class UnityFx{
         Fill.circle(e.x, e.y, e.fin() * 6f);
     }),
 
-    effect = new Effect(60f, e -> {
+    monolithRingEffect = new Effect(60f, e -> {
         color(Pal.lancerLaser);
         float temp = (float)e.data;
         stroke(e.fout() * 3f * temp);

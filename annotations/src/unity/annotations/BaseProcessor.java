@@ -319,6 +319,10 @@ public abstract class BaseProcessor extends AbstractProcessor{
         return all.select(e -> !(e instanceof NoType));
     }
 
+    Seq<String> getImports(Element e){
+        return Seq.with(treeUtils.getPath(e).getCompilationUnit().getImports()).map(Object::toString);
+    }
+
     public static String getDefault(String value){
         switch(value){
             case "float":

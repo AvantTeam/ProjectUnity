@@ -14,7 +14,6 @@ import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.consumers.*;
-import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.defense.*;
@@ -1785,34 +1784,54 @@ public class UnityBlocks implements ContentList{
             consumes.power(4f);
         }};
 
-        debrisExtractor = new StemSoulHoldFloorExtractor("debris-extractor"){{
-            requirements(Category.crafting, with(UnityItems.monolite, 140, Items.surgeAlloy, 80, Items.thorium, 60));
-            setup(
-                infusedSharpslate, 0.04f,
-                archSharpslate, 0.08f,
-                archEnergy, 1f
-            );
+        debrisExtractor = new StemSoulHoldFloorExtractor("debris-extractor"){
+            final int effectTimer = timers++;
 
-            size = 2;
-            outputItem = new ItemStack(UnityItems.archDebris, 1);
-            craftTime = 84f;
+            {
+                requirements(Category.crafting, with(UnityItems.monolite, 140, Items.surgeAlloy, 80, Items.thorium, 60));
+                setup(
+                    infusedSharpslate, 0.04f,
+                    archSharpslate, 0.08f,
+                    archEnergy, 1f
+                );
 
-            consumes.power(2.4f);
-            consumes.liquid(Liquids.cryofluid, 0.08f);
+                size = 2;
+                outputItem = new ItemStack(UnityItems.archDebris, 1);
+                craftTime = 84f;
 
-            draw((StemSoulFloorExtractorBuild e) -> {
-                Draw.color(UnityPal.monolith, UnityPal.monolithLight, Mathf.absin(Time.time, 6f, 1f) * e.warmup);
-                Draw.alpha(e.warmup);
-                Draw.rect(Regions.debrisExtractorHeat1Region, e.x, e.y);
+                consumes.power(2.4f);
+                consumes.liquid(Liquids.cryofluid, 0.08f);
 
-                Draw.color(UnityPal.monolith, UnityPal.monolithLight, Mathf.absin(Time.time + 4f, 6f, 1f) * e.warmup);
-                Draw.alpha(e.warmup);
-                Draw.rect(Regions.debrisExtractorHeat2Region, e.x, e.y);
+                draw((StemSoulFloorExtractorBuild e) -> {
+                    Draw.color(UnityPal.monolith, UnityPal.monolithLight, Mathf.absin(Time.time, 6f, 1f) * e.warmup);
+                    Draw.alpha(e.warmup);
+                    Draw.rect(Regions.debrisExtractorHeat1Region, e.x, e.y);
 
-                Draw.color();
-                Draw.alpha(1f);
-            });
-        }};
+                    Draw.color(UnityPal.monolith, UnityPal.monolithLight, Mathf.absin(Time.time + 4f, 6f, 1f) * e.warmup);
+                    Draw.alpha(e.warmup);
+                    Draw.rect(Regions.debrisExtractorHeat2Region, e.x, e.y);
+
+                    Draw.color();
+                    Draw.alpha(1f);
+                });
+
+                update((StemSoulFloorExtractorBuild e) -> {
+                    StemData data = e.data();
+                    if(e.consValid()){
+                        data.floatValue = Mathf.lerpDelta(data.floatValue, e.efficiency(), 0.02f);
+                    }else{
+                        data.floatValue = Mathf.lerpDelta(data.floatValue, 0f, 0.02f);
+                    }
+
+                    if(!Mathf.zero(data.floatValue)){
+                        float f = e.souls / (float)maxSouls;
+                        if(e.timer.get(effectTimer, 45f - f * 15f)){
+                            UnityFx.monolithRingEffect.at(e.x, e.y, e.rotation, data.floatValue / 2f);
+                        }
+                    }
+                });
+            }
+        };
 
         monolithAlloyForge = new StemSoulHoldGenericSmelter("monolith-alloy-forge"){
             final int effectTimer = timers++;
@@ -1838,19 +1857,19 @@ public class UnityBlocks implements ContentList{
                         data.floatValue = Mathf.lerpDelta(data.floatValue, 0f, 0.02f);
                     }
 
-                    float temp = data.floatValue;
-                    if(!Mathf.zero(temp)){
-                        if(e.timer.get(effectTimer, 45f)){
-                            UnityFx.effect.at(e.x, e.y, e.rotation, temp);
+                    if(!Mathf.zero(data.floatValue)){
+                        float f = e.souls / (float)maxSouls;
+                        if(e.timer.get(effectTimer, 45f - f * 15f)){
+                            UnityFx.monolithRingEffect.at(e.x, e.y, e.rotation, data.floatValue);
                         }
 
-                        if(Mathf.chanceDelta(temp * 0.5f)){
+                        if(Mathf.chanceDelta(data.floatValue * 0.5f)){
                             Lightning.create(
                                 e.team,
                                 Pal.lancerLaser,
                                 1f,
                                 e.x, e.y,
-                                Mathf.randomSeed((int)Time.time + e.id, 360f), (int)(temp * 4f) + Mathf.random(3)
+                                Mathf.randomSeed((int)Time.time + e.id, 360f), (int)(data.floatValue * 4f) + Mathf.random(3)
                             );
                         }
                     }

@@ -162,16 +162,6 @@ public class Annotations{
     @Retention(RetentionPolicy.SOURCE)
     public @interface Import{}
 
-    /** Getter method, do not use directly */
-    @Target(ElementType.METHOD)
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface Getter{}
-
-    /** Setter method, do not use directly */
-    @Target(ElementType.METHOD)
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface Setter{}
-
     /** Whether the field returned by this getter is meant to be read-only */
     @Target(ElementType.FIELD)
     @Retention(RetentionPolicy.SOURCE)
