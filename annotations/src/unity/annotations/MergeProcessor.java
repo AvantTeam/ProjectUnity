@@ -637,16 +637,16 @@ public class MergeProcessor extends BaseProcessor{
                 mbuilder.addStatement("this.$L()", simpleName(e));
             }
 
+            if(str
+                .replaceAll("\\s+", "")
+                .replace("\n", "")
+                .isEmpty()
+            ) continue;
+
             if(writeBlock){
                 if(annotation(elem, BreakAll.class) == null){
                     str = str.replace("return;", "break " + blockName + ";");
                 }
-
-                if(str
-                    .replaceAll("\\s+", "")
-                    .replace("\n", "")
-                    .isEmpty()
-                ) continue;
 
                 mbuilder.beginControlFlow("$L:", blockName);
             }
