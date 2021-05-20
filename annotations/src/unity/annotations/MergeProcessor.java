@@ -346,8 +346,7 @@ public class MergeProcessor extends BaseProcessor{
                 mbuilder.addStatement("this.$L()", simpleName(e));
             }
 
-            ExecutableElement first = constructors.first();
-            boolean firstc = append(mbuilder, constructors, inserts, writeBlock, first);
+            boolean firstc = append(mbuilder, constructors, inserts, writeBlock, false);
 
             if(!firstc && !noCompAfter.isEmpty()) mbuilder.addCode(lnew());
             for(ExecutableElement e : noCompAfter){
@@ -359,6 +358,7 @@ public class MergeProcessor extends BaseProcessor{
 
         EntityIO io = new EntityIO(simpleName(def), builder, serializer);
         for(Entry<String, Seq<ExecutableElement>> entry : methods){
+            boolean superCall = true;
             if(entry.value.contains(m -> annotation(m, Replace.class) != null)){
                 if(entry.value.first().getReturnType().getKind() == VOID){
                     entry.value = entry.value.select(m -> annotation(m, Replace.class) != null);
@@ -371,6 +371,7 @@ public class MergeProcessor extends BaseProcessor{
                     entry.value.clear();
                     entry.value.add(base);
                 }
+                superCall = false;
             }
 
             if(entry.value.count(m -> !is(m, Modifier.NATIVE, Modifier.ABSTRACT) && m.getReturnType().getKind() != VOID) > 1){
@@ -424,11 +425,17 @@ public class MergeProcessor extends BaseProcessor{
                 mbuilder.addStatement("this.$L()", simpleName(e));
             }
 
-            if(simpleName(first).equals("read") || (simpleName(first).equals("write") && first.getParameters().size() == 2)){
+            if((simpleName(first).equals("read") && first.getParameters().size() == 2) || simpleName(first).equals("write")){
+                Seq<ParameterSpec> params = Seq.with(mbuilder.parameters);
+                String argLiteral = params.toString(", ", e -> "$L");
+                Object[] args = Seq.with(simpleName(first)).and(params.map(p -> p.name)).toArray(Object.class);
+
+                mbuilder.addStatement("super.$L(" + argLiteral + ")", args);
+
                 io.write(mbuilder, simpleName(first).equals("write"), allFields);
             }
 
-            boolean firstc = append(mbuilder, entry.value, inserts, writeBlock, first);
+            boolean firstc = append(mbuilder, entry.value, inserts, writeBlock, superCall);
 
             if(!firstc && !noCompAfter.isEmpty()) mbuilder.addCode(lnew());
             for(ExecutableElement e : noCompAfter){
@@ -582,9 +589,30 @@ public class MergeProcessor extends BaseProcessor{
         });
     }
 
-    boolean append(MethodSpec.Builder mbuilder, Seq<ExecutableElement> values, Seq<ExecutableElement> inserts, boolean writeBlock, ExecutableElement first){
+    boolean append(MethodSpec.Builder mbuilder, Seq<ExecutableElement> values, Seq<ExecutableElement> inserts, boolean writeBlock, boolean superCall){
         boolean firstc = true;
+        boolean superCalled = false;
+
         for(ExecutableElement elem : values){
+            int priority = annotation(elem, MethodPriority.class) == null ? 0 : annotation(elem, MethodPriority.class).value();
+            if(
+                annotation(elem, Override.class) != null &&
+                elem.getReturnType().getKind() == VOID &&
+                !(
+                    simpleName(elem).equals("write") ||
+                    (simpleName(elem).equals("read") && elem.getParameters().size() == 2)
+                ) &&
+                superCall && !superCalled && priority == 0
+            ){
+                superCalled = true;
+
+                Seq<ParameterSpec> params = Seq.with(mbuilder.parameters);
+                String argLiteral = params.toString(", ", e -> "$L");
+                Object[] args = Seq.with(simpleName(elem)).and(params.map(p -> p.name)).toArray(Object.class);
+
+                mbuilder.addStatement("super.$L(" + argLiteral + ")", args);
+            }
+
             String descStr = descString(elem);
             String blockName = simpleName(elem.getEnclosingElement()).toLowerCase().replace("comp", "");
 
