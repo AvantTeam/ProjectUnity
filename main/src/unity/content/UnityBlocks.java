@@ -512,11 +512,11 @@ public class UnityBlocks implements ContentList{
             consumes.items(with(Items.lead, 2, Items.silicon, 3, Items.blastCompound, 1, Items.phaseFabric, 1, UnityItems.umbrium, 2));
             consumes.power(3.2f);
 
-            update = e -> {
+            update((StemSmelterBuild e) -> {
                 if(e.consValid() && Mathf.chanceDelta(0.76f)){
-                    UnityFx.craftingEffect.at(e.getX(), e.getY(), Mathf.random(360f));
+                    UnityFx.craftingEffect.at(e.x, e.y, Mathf.random(360f));
                 }
-            };
+            });
         }};
 
         darkWall = new Wall("dark-wall"){{
@@ -1194,15 +1194,15 @@ public class UnityBlocks implements ContentList{
             consumes.power(2.6f);
             consumes.items(with(Items.surgeAlloy, 3, Items.titanium, 4, Items.silicon, 6, UnityItems.imberium, 3));
 
-            update = e -> {
+            update((StemSmelterBuild e) -> {
                 if(e.consValid()){
                     if(Mathf.chanceDelta(0.3f)){
-                        UnityFx.imberSparkCraftingEffect.at(e.getX(), e.getY(), Mathf.random(360f));
+                        UnityFx.imberSparkCraftingEffect.at(e.x, e.y, Mathf.random(360f));
                     }else if(Mathf.chanceDelta(0.02f)){
-                        Lightning.create(e.team(), UnityPal.imberColor, 5f, e.x(), e.y(), Mathf.random(360f), 5);
+                        Lightning.create(e.team, UnityPal.imberColor, 5f, e.x, e.y, Mathf.random(360f), 5);
                     }
                 }
-            };
+            });
         }};
 
         absorber = new Absorber("absorber"){{
