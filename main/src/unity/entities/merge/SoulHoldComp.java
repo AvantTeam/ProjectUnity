@@ -22,7 +22,7 @@ class SoulHoldComp extends Block{
     }
 
     public class SoulBuildComp extends Building implements ControlBlock{
-        BlockUnitc unit = Nulls.blockUnit;
+        transient BlockUnitc unit = Nulls.blockUnit;
         @ReadOnly boolean wasPlayer;
 
         int souls;
@@ -45,7 +45,7 @@ class SoulHoldComp extends Block{
         }
 
         @Override
-        public void update(){
+        public void updateTile(){
             if(!wasPlayer && unit.isPlayer()){
                 join();
                 wasPlayer = true;

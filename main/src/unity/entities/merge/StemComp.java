@@ -27,7 +27,7 @@ class StemComp extends Block{
     }
 
     public class StemBuildComp extends Building{
-        @ReadOnly StemData data = new StemData();
+        transient @ReadOnly StemData data = new StemData();
 
         @Override
         public void draw(){
