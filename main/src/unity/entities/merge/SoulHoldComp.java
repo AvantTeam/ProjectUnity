@@ -58,6 +58,7 @@ class SoulHoldComp extends Block{
         }
 
         @Override
+        @Replace
         public float efficiency(){
             return super.efficiency() * ((souls / (float)maxSouls) * (efficiencyTo - efficiencyFrom) + efficiencyFrom);
         }

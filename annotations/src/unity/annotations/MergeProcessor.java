@@ -104,13 +104,10 @@ public class MergeProcessor extends BaseProcessor{
                     .map(t -> inters.find(i -> simpleName(i).equals(simpleName(t))))
                     .select(t -> t != null && t.getEnclosingElement() instanceof PackageElement)
                     .map(this::toComp);
-                System.out.println(defComps.toString("\n"));
 
                 Seq<TypeElement> defCompsBuild = defComps
                     .map(t -> comps.find(i -> simpleName(i).equals(simpleName(findBuild(t)))))
                     .select(Objects::nonNull);
-                System.out.println(defCompsBuild.toString("\n"));
-                System.out.println("\n");
 
                 if(defComps.isEmpty()) continue;
 
