@@ -338,9 +338,9 @@ public class UnityFx{
 
     ephmeronCharge = new Effect(80f, e -> {
         color(Pal.lancerLaser);
-		Fill.circle(e.x, e.y, e.fin() * 9.5f);
+        UnityDrawf.shiningCircle(e.id, Time.time, e.x, e.y, e.fin() * 9.5f, 6, 25f, 20f, 3f * e.fin());
 		color(Color.white);
-		Fill.circle(e.x, e.y, e.fin() * 7.5f);
+        UnityDrawf.shiningCircle(e.id, Time.time, e.x, e.y, e.fin() * 7.5f, 6, 25f, 20f, 2.5f * e.fin());
     }),
 
     ephemeronLaser = new Effect(19f, 100f, e -> {

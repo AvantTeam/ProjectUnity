@@ -14,11 +14,12 @@ public class EphemeronPairBulletType extends BasicBulletType{
     public EphemeronPairBulletType(float damage){
         super(0.001f, damage);
 
-        lifetime = 300f;
+        lifetime = 360f;
         hitEffect = Fx.hitLancer;
         despawnEffect = Fx.none;
         hitSound = Sounds.spark;
         hitSize = 8f;
+        drag = 0.015f;
         pierce = true;
         hittable = absorbable = reflectable = collidesTiles = false;
     }
@@ -35,22 +36,12 @@ public class EphemeronPairBulletType extends BasicBulletType{
     public void update(Bullet b){
         super.update(b);
 
-        if(positive && b.data instanceof Bullet n){
-            b.time(0f);
-            
-            Tmp.v1.trns(b.angleTo(n), Time.delta);
+        if(b.data instanceof Bullet n && n.added){
+            float dst = hitSize / Math.max(b.dst(n) / 2f, hitSize);
+            Tmp.v1.set(n).sub(b).nor().scl(dst);
             b.vel.add(Tmp.v1);
-            
-            Tmp.v1.rotate(180f);
-            n.vel.add(Tmp.v1);
 
-            if(b.vel.len() > b.dst(n.x + n.vel.x, n.y + n.vel.y)){
-                b.vel.setLength(b.dst(n.x + n.vel.x, n.y + n.vel.y));
-            }
-
-            if(n.vel.len() > n.dst(b.x + b.vel.x, b.y + b.vel.y)){
-                n.vel.setLength(n.dst(b.x + b.vel.x, b.y + b.vel.y));
-            }
+            if(!positive) return;
 
             b.hitbox(Tmp.r1);
             n.hitbox(Tmp.r2);
