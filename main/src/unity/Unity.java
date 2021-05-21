@@ -129,7 +129,6 @@ public class Unity extends Mod implements ApplicationListener{
             Core.app.removeListener(this);
             Events.fire(new UnityModLoadEvent());
         }
-
     }
 
     @Override
@@ -148,7 +147,6 @@ public class Unity extends Mod implements ApplicationListener{
 
             initScripts();
         }
-
     }
 
     private void initScripts(){
