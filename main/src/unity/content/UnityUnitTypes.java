@@ -2553,7 +2553,7 @@ public class UnityUnitTypes implements ContentList{
             speed = 0.5f;
             rotateSpeed = 2.6f;
             hitSize = 11f;
-            armor = 3.5f;
+            armor = 5f;
             singleTarget = true;
 
             canBoost = true;
@@ -2602,7 +2602,7 @@ public class UnityUnitTypes implements ContentList{
             speed = 0.4f;
             rotateSpeed = 2.2f;
             hitSize = 26.5f;
-            armor = 4f;
+            armor = 7f;
             mechFrontSway = 0.55f;
 
             canBoost = true;
@@ -2654,7 +2654,7 @@ public class UnityUnitTypes implements ContentList{
             speed = 0.43f;
             rotateSpeed = 1.48f;
             hitSize = 36f;
-            armor = 7f;
+            armor = 11f;
             commandLimit = 8;
 
             allowLegStep = hovering = true;
@@ -2713,7 +2713,7 @@ public class UnityUnitTypes implements ContentList{
             speed = 0.42f;
             rotateSpeed = 1.4f;
             hitSize = 48f;
-            armor = 9f;
+            armor = 16f;
             commandLimit = 8;
 
             visualElevation = 0.3f;
@@ -2788,7 +2788,7 @@ public class UnityUnitTypes implements ContentList{
             speed = 0.4f;
             rotateSpeed = 1.2f;
             hitSize = 64f;
-            armor = 13f;
+            armor = 23f;
             commandLimit = 8;
 
             visualElevation = 0.5f;
@@ -2847,7 +2847,7 @@ public class UnityUnitTypes implements ContentList{
             speed = 0.4f;
             rotateSpeed = 1.2f;
             hitSize = 67f;
-            armor = 17f;
+            armor = 30f;
             commandLimit = 8;
 
             visualElevation = 0.7f;
@@ -2869,7 +2869,7 @@ public class UnityUnitTypes implements ContentList{
 
             abilities.add(new LightningSpawnAbility(12, 24f, 3f, 0.05f, 160f, 96f, 200f));
 
-            BulletType energy = new BasicBulletType(5f, 20f, "shell"){
+            BulletType energy = new RicochetBulletType(5f, 20f, "shell"){
                 {
                     width = 9f;
                     height = 11f;
@@ -2958,7 +2958,7 @@ public class UnityUnitTypes implements ContentList{
                 recoil = 8f;
                 shootSound = Sounds.shootBig;
 
-                bullet = new BasicBulletType(12.5f, 320f, "shell"){
+                bullet = new RicochetBulletType(12.5f, 320f, "shell"){
                     {
                         width = 14f;
                         height = 25f;
@@ -2979,7 +2979,7 @@ public class UnityUnitTypes implements ContentList{
                     @Override
                     public void update(Bullet b){
                         super.update(b);
-                        if(Mathf.chanceDelta(0.5f)){
+                        if(Mathf.chanceDelta(0.75f)){
                             Lightning.create(b, backColor, lightningDamage, x, y, b.rotation(), lightningLength);
                         }
                     }

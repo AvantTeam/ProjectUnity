@@ -11,7 +11,11 @@ public class RicochetBulletType extends BasicBulletType{
     public int trailLength = 6;
 
     public RicochetBulletType(float speed, float damage){
-        super(speed, damage);
+        this(speed, damage, "bullet");
+    }
+
+    public RicochetBulletType(float speed, float damage, String spriteName){
+        super(speed, damage, spriteName);
         pierce = true;
         pierceBuilding = true;
         pierceCap = 3;
