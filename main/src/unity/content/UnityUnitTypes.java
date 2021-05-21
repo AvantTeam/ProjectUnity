@@ -1154,58 +1154,41 @@ public class UnityUnitTypes implements ContentList{
             accel = 0.04f;
             drag = 0.018f;
             flying = true;
-            engineOffset = 46f;
+            engineOffset = 48f;
             engineSize = 7.8f;
             rotateShooting = false;
-            hitSize = 60f;
+            hitSize = 85f;
             payloadCapacity = (6.2f * 6.2f) * tilePayload;
             buildSpeed = 5f;
             drawShields = false;
             commandLimit = 8;
-            buildBeamOffset = 43;
+            buildBeamOffset = 29.5f;
 
             ammoCapacity = 1700;
             ammoResupplyAmount = 30;
 
-            abilities.add(new ForceFieldAbility(180f, 6f, 8000f, 60f * 12), new RepairFieldAbility(180f, 60f * 2, 160f));
+            abilities.add(new ForceFieldAbility(190f, 6f, 8000f, 60f * 12), new RepairFieldAbility(180f, 60f * 2, 160f));
 
             bottomWeapons.add(name + "-laser");
             weapons.add(new Weapon(name + "-laser"){{
                 x = 0f;
-                y = -6.5f;
-                shootY = 36f;
+                y = 0f;
+                shootY = 42f - 3f;
                 reload = 260f;
-                recoil = 8f;
+                recoil = 3f;
 
-                cooldownTime = 320f;
                 continuous = rotate = true;
 
                 mirror = false;
-                rotateSpeed = 1f;
+                rotateSpeed = 1.5f;
 
-                shootStatusDuration = Fx.greenLaserCharge.lifetime;
-                shootStatus = StatusEffects.unmoving;
-                firstShotDelay = Fx.greenLaserCharge.lifetime;
-
-                chargeSound = Sounds.lasercharge;
-                shootSound = Sounds.beam;
-                bullet = new ContinuousLaserBulletType(66f){{
-                    length = 230f;
-                    width = 8.5f;
-                    hitEffect = Fx.hitMeltHeal;
-                    drawSize = 420f;
-                    lifetime = 240f;
-                    shake = 1f;
-                    
-                    shootEffect = Fx.greenLaserCharge;
-                    despawnEffect = Fx.smokeCloud;
-                    smokeEffect = Fx.none;
-
-                    //constant healing
-                    healPercent = 1.5f;
-                    collidesTeam = true;
-
-                    colors = new Color[]{Pal.heal.cpy().a(0.2f), Pal.heal.cpy().a(0.5f), Pal.heal.cpy().mul(1.2f), Color.white};
+                bullet = new HealingConeBulletType(3f){{
+                    healPercent = 6f;
+                    allyStatus = StatusEffects.overclock;
+                    allyStatusDuration = 9f * 60f;
+                    status = StatusEffects.slow;
+                    statusDuration = 40f;
+                    lifetime = 6f * 60f;
                 }};
             }});
         }};
