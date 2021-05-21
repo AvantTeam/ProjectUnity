@@ -1,7 +1,9 @@
 package unity.util;
 
 import arc.struct.*;
-import arc.util.Structs;
+import arc.util.*;
+import mindustry.mod.*;
+import rhino.*;
 
 import java.lang.invoke.*;
 import java.lang.invoke.MethodHandles.*;
@@ -13,7 +15,12 @@ import static mindustry.Vars.*;
 /** @author GlennFolker */
 @SuppressWarnings("unchecked")
 public final class ReflectUtils{
-    private static final Method handleInvoker;
+    private static final Seq<String> blacklist = new Seq<>();
+    private static final Seq<Object> jsArgs = new Seq<>();
+    private static final Context context;
+    private static final Scriptable scope;
+    private static final Function handleInvoker;
+
     private static final MethodHandle modifiers;
     private static final MethodHandle declClass;
     private static final Field modifiersAnd;
@@ -48,15 +55,28 @@ public final class ReflectUtils{
             }
             useSun = use;
 
+            if(mods != null){
+                Scripts scripts = mods.getScripts();
+                context = getField(scripts, findField(Scripts.class, "context", true));
+                scope = getField(scripts, findField(Scripts.class, "scope", true));
+            }else{
+                context = Context.enter();
+                context.setOptimizationLevel(9);
+                context.getWrapFactory().setJavaPrimitiveWrap(false);
+                context.setLanguageVersion(Context.VERSION_ES6);
+
+                scope = new ImporterTopLevel(context);
+            }
+
             if(android){
-                handleInvoker = null;
                 modifiers = null;
                 declClass = null;
 
                 modifiersAnd = findField(Field.class, "accessFlags", true);
                 setAccessor = null;
+
+                handleInvoker = null;
             }else{
-                handleInvoker = findMethod(MethodHandle.class, "invokeWithArguments", true, Object[].class);
                 modifiers = getLookup(Field.class).findSetter(Field.class, "modifiers", int.class);
                 declClass = getLookup(Constructor.class).findSetter(Constructor.class, "clazz", Class.class);
 
@@ -64,12 +84,35 @@ public final class ReflectUtils{
 
                 Method setf = Structs.find(Field.class.getDeclaredMethods(), m -> m.getName().contains("setFieldAccessor"));
                 setAccessor = getLookup(Field.class).unreflect(setf);
+
+                handleInvoker = context.compileFunction(scope, """
+                    function(handle, args){
+                        return handle.invokeWithArguments(args.toArray());
+                    };
+                    """, "unity_impl.js", 0, null
+                );
             }
 
             print("Reflection/invocation utility has been initialized.");
             print("Usage of sun packages: " + useSun);
         }catch(Exception e){
             throw new RuntimeException(e);
+        }
+    }
+
+    private static <T> T handleInvoke(MethodHandle handle, Object... args){
+        synchronized(jsArgs){
+            jsArgs.clear();
+
+            Object[] all = new Object[2];
+            all[0] = handle;
+            all[1] = jsArgs.addAll(args);
+
+            unblacklist();
+            T obj = (T)handleInvoker.call(context, scope, scope, all);
+            blacklist();
+
+            return obj;
         }
     }
 
@@ -212,10 +255,26 @@ public final class ReflectUtils{
 
     private static <T> Object getConstructorAccessor(Constructor<T> constructor){
         try{
-            return invokeMethod(j8NewConsAccessor, handleInvoker, j8RefFac, constructor);
+            return handleInvoke(j8NewConsAccessor, j8RefFac, constructor);
         }catch(Throwable e){
             throw new RuntimeException(e);
         }
+    }
+
+    public static void unblacklist(){
+        if(!blacklist.isEmpty() || mods == null) return;
+
+        Seq<String> current = getField(mods.getScripts(), findField(Scripts.class, "blacklist", true));
+        blacklist.addAll(current);
+        current.clear();
+    }
+
+    public static void blacklist(){
+        if(blacklist.isEmpty() || mods == null) return;
+
+        Seq<String> current = getField(mods.getScripts(), findField(Scripts.class, "blacklist", true));
+        current.addAll(blacklist);
+        blacklist.clear();
     }
 
     /** Revokes a modifier from a field. <b>Using this to primitive types / {@link String} constant expressions has no use.</b> */
@@ -227,12 +286,12 @@ public final class ReflectUtils{
             if(android){
                 modifiersAnd.setInt(field, mods & ~modifier);
             }else{
-                invokeMethod(modifiers, handleInvoker, field, mods & ~modifier);
+                handleInvoke(modifiers, field, mods & ~modifier);
             }
 
-            if(setAccessor != null) {
-                invokeMethod(setAccessor, handleInvoker, field, null, false);
-                invokeMethod(setAccessor, handleInvoker, field, null, true);
+            if(setAccessor != null){
+                handleInvoke(setAccessor, field, null, false);
+                handleInvoke(setAccessor, field, null, true);
             }
         }catch(Throwable e){
             throw new RuntimeException(e);
@@ -248,19 +307,19 @@ public final class ReflectUtils{
             if(android){
                 modifiersAnd.setInt(field, mods | modifier);
             }else{
-                invokeMethod(modifiers, handleInvoker, field, mods | modifier);
+                handleInvoke(modifiers, field, mods | modifier);
             }
 
-            if(setAccessor != null) {
-                invokeMethod(setAccessor, handleInvoker, field, null, false);
-                invokeMethod(setAccessor, handleInvoker, field, null, true);
+            if(setAccessor != null){
+                handleInvoke(setAccessor, field, null, false);
+                handleInvoke(setAccessor, field, null, true);
             }
         }catch(Throwable e){
             throw new RuntimeException(e);
         }
     }
 
-    private static <T> T createEnum(Constructor<T> cons, String name, int ordinal, Object... args){
+    private static <T extends Enum<T>> T createEnum(Constructor<T> cons, String name, int ordinal, Object... args){
         try{
             Object[] arguments = new Object[args.length + 2];
             arguments[0] = name;
@@ -268,15 +327,15 @@ public final class ReflectUtils{
             System.arraycopy(args, 0, arguments, 2, args.length);
 
             if(useSun){
-                return invokeMethod(j8NewInstance, handleInvoker, getConstructorAccessor(cons), arguments);
+                return (T)handleInvoke(j8NewInstance, getConstructorAccessor(cons), arguments);
             }else{
                 cons.setAccessible(true);
 
                 Class<T> before = cons.getDeclaringClass();
-                if(!android) invokeMethod(declClass, handleInvoker, cons, Object.class);
+                if(!android) handleInvoke(declClass, cons, Object.class);
 
                 T obj = cons.newInstance(arguments);
-                if(!android) invokeMethod(declClass, handleInvoker, cons, before);
+                if(!android) handleInvoke(declClass, cons, before);
 
                 return obj;
             }
@@ -285,11 +344,7 @@ public final class ReflectUtils{
         }
     }
 
-    public static <T> T addEnumEntry(Class<T> type, Constructor<T> cons, String name, Object... args){
-        if(!Enum.class.isAssignableFrom(type)){
-            throw new IllegalArgumentException("must be enum");
-        }
-
+    public static <T extends Enum<T>> T addEnumEntry(Class<T> type, Constructor<T> cons, String name, Object... args){
         Field valuesField = Structs.find(type.getDeclaredFields(), f -> f.getName().contains("$VALUES"));
 
         if(valuesField == null) throw new IllegalStateException("values field is null");
