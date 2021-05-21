@@ -2869,7 +2869,7 @@ public class UnityUnitTypes implements ContentList{
 
             abilities.add(new LightningSpawnAbility(12, 24f, 3f, 0.05f, 160f, 96f, 200f));
 
-            BulletType energy = new RicochetBulletType(5f, 20f, "shell"){
+            BulletType energy = new BasicBulletType(5f, 24f, "shell"){
                 {
                     width = 9f;
                     height = 11f;
@@ -2960,13 +2960,13 @@ public class UnityUnitTypes implements ContentList{
 
                 bullet = new RicochetBulletType(12.5f, 320f, "shell"){
                     {
-                        width = 14f;
+                        width = 16f;
                         height = 25f;
                         shrinkY = 0.2f;
                         lifetime = 24f;
 
                         frontColor = Color.white;
-                        backColor = Pal.lancerLaser;
+                        backColor = trailColor = Pal.lancerLaser;
                         shootEffect = Fx.lancerLaserShoot;
                         smokeEffect = hitEffect = Fx.hitLancer;
 
