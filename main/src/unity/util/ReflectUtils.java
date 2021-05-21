@@ -56,7 +56,7 @@ public final class ReflectUtils{
                 modifiersAnd = findField(Field.class, "accessFlags", true);
                 setAccessor = null;
             }else{
-                handleInvoker = findMethod(MethodHandle.class, "invoke", true, Object[].class);
+                handleInvoker = findMethod(MethodHandle.class, "invokeWithArguments", true, Object[].class);
                 modifiers = getLookup(Field.class).findSetter(Field.class, "modifiers", int.class);
                 declClass = getLookup(Constructor.class).findSetter(Constructor.class, "clazz", Class.class);
 
