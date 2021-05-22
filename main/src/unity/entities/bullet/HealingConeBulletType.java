@@ -64,7 +64,7 @@ public class HealingConeBulletType extends BulletType{
             Tmp.v1.trns(ang, length).add(b);
             Vars.world.raycastEachWorld(b.x, b.y, Tmp.v1.x, Tmp.v1.y, (cx, cy) -> {
                 Tile tile = Vars.world.tile(cx, cy);
-                boolean bl = tile.build != null && tile.team() != b.team && tile.block() != null && tile.block().absorbLasers;
+                boolean bl = tile != null && tile.build != null && tile.team() != b.team && tile.block() != null && tile.block().absorbLasers;
                 if(bl){
                     float dst = Math.min(b.dst(cx * Vars.tilesize, cy * Vars.tilesize), length);
                     data[idx] = dst * dst;
