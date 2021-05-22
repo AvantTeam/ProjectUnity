@@ -2538,6 +2538,7 @@ public class UnityUnitTypes implements ContentList{
             hitSize = 11f;
             armor = 5f;
             singleTarget = true;
+            maxSouls = 4;
 
             canBoost = true;
             boostMultiplier = 2.5f;
@@ -2587,6 +2588,7 @@ public class UnityUnitTypes implements ContentList{
             hitSize = 26.5f;
             armor = 7f;
             mechFrontSway = 0.55f;
+            maxSouls = 5;
 
             canBoost = true;
             boostMultiplier = 2.5f;
@@ -2639,6 +2641,7 @@ public class UnityUnitTypes implements ContentList{
             hitSize = 36f;
             armor = 11f;
             commandLimit = 8;
+            maxSouls = 7;
 
             allowLegStep = hovering = true;
             visualElevation = 0.2f;
@@ -2698,6 +2701,7 @@ public class UnityUnitTypes implements ContentList{
             hitSize = 48f;
             armor = 16f;
             commandLimit = 8;
+            maxSouls = 9;
 
             visualElevation = 0.3f;
             allowLegStep = hovering = true;
@@ -2773,6 +2777,7 @@ public class UnityUnitTypes implements ContentList{
             hitSize = 64f;
             armor = 23f;
             commandLimit = 8;
+            maxSouls = 12;
 
             visualElevation = 0.5f;
             allowLegStep = hovering = true;
@@ -2832,6 +2837,7 @@ public class UnityUnitTypes implements ContentList{
             hitSize = 67f;
             armor = 30f;
             commandLimit = 8;
+            maxSouls = 15;
 
             visualElevation = 0.7f;
             allowLegStep = hovering = true;

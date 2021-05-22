@@ -71,7 +71,7 @@ public class UnityUnitType extends UnitType{
     // For shoot armor ability
     public FloatSeq weaponXs = new FloatSeq();
     
-    // legs extra
+    // Legs extra
     protected static Vec2 legOffsetB = new Vec2();
     protected static float[][] jointOffsets = new float[2][2];
 
@@ -86,20 +86,14 @@ public class UnityUnitType extends UnitType{
     public int linkCount = 1;
     public float rotationSpeed = 20f;
 
-    // End units
+    // Monolith units
+    public int maxSouls = 3;
 
+    // End units
     public AntiCheatVariables antiCheatType;
 
     public UnityUnitType(String name){
         super(name);
-    }
-
-    @Override
-    public Unit create(Team team){
-        Unit ret = super.create(team);
-        //transformer
-        if(ret instanceof Transc trans) trans.transformTime(transformTime);
-        return ret;
     }
 
     @Override
@@ -191,10 +185,19 @@ public class UnityUnitType extends UnitType{
     }
 
     @Override
+    public Color cellColor(Unit unit){
+        if(unit instanceof Monolithc e && e.disabled()){
+            return Tmp.c1.set(Color.black).lerp(unit.team.color, 0.1f);
+        }else{
+            return super.cellColor(unit);
+        }
+    }
+
+    @Override
     public void drawCell(Unit unit) {
-        if (unit.isAdded()) {
+        if(unit.isAdded()){
             super.drawCell(unit);
-        } else {
+        }else{
             applyColor(unit);
 
             Draw.color(cellColor(unit));

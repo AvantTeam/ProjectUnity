@@ -18,9 +18,10 @@ public class UnityStatusEffects implements ContentList{
 
     @Override
     public void load(){
-        disabled = new StatusEffect("diabled"){{
+        disabled = new StatusEffect("disabled"){{
             reloadMultiplier = 0f;
             speedMultiplier = 0f;
+            disarm = true;
         }};
 
         plasmaed = new StatusEffect("plasmaed"){{
