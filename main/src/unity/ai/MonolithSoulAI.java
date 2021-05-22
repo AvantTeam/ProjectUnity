@@ -39,10 +39,18 @@ public class MonolithSoulAI implements UnitController{
             Unit targetUnit = Units.closest(unit.team, unit.x, unit.y, u -> unit.isSameFaction(u));
             Building targetBuilding = indexer.findTile(unit.team, unit.x, unit.y, Float.MAX_VALUE, b -> b instanceof SoulBuildc soul && soul.canJoin());
 
-            if(unit.dst2(targetUnit) > unit.dst2(targetBuilding)){
-                target = targetBuilding;
+            if(targetUnit != null && targetBuilding != null){
+                if(unit.dst2(targetUnit) > unit.dst2(targetBuilding)){
+                    target = targetBuilding;
+                }else{
+                    target = targetUnit;
+                }
             }else{
-                target = targetUnit;
+                if(targetUnit != null){
+                    target = targetUnit;
+                }else if(targetBuilding != null){
+                    target = targetBuilding;
+                }
             }
         }
 

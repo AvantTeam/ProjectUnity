@@ -9,7 +9,6 @@ import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.type.*;
-import mindustry.world.blocks.*;
 import unity.annotations.Annotations.*;
 import unity.content.*;
 import unity.gen.*;
@@ -52,11 +51,11 @@ abstract class MonolithSoulComp implements Unitc, Factionc{
             if(!dead){
                 boolean[] invoked = {false};
                 Units.nearby(team, x, y, hitSize, unit -> {
-                    if(!invoked[0] && !dead && !unit.dead){
+                    if(!invoked[0] && !dead && !unit.dead && unit instanceof Monolithc soul && soul.canJoin() && isSameFaction(unit)){
                         hitbox(rec1);
                         unit.hitbox(rec2);
 
-                        if(isSameFaction(unit) && rec1.overlaps(rec2)){
+                        if(rec1.overlaps(rec2)){
                             invoked[0] = true;
                             invoke(unit);
 
