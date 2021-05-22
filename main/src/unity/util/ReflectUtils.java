@@ -86,7 +86,7 @@ public final class ReflectUtils{
 
                 handleInvoker = context.compileFunction(scope, """
                     function(handle, args){
-                        return handle.invokeWithArguments(args.toArray());
+                        return handle.invokeWithArguments(args);
                     };
                     """, "unity_impl.js", 0, null
                 );
