@@ -16,7 +16,6 @@ import static mindustry.Vars.*;
 @SuppressWarnings("unchecked")
 public final class ReflectUtils{
     private static final Seq<String> blacklist = new Seq<>();
-    private static final Seq<Object> jsArgs = new Seq<>();
     private static final Context context;
     private static final Scriptable scope;
     private static final Function handleInvoker;
@@ -101,19 +100,17 @@ public final class ReflectUtils{
     }
 
     private static <T> T handleInvoke(MethodHandle handle, Object... args){
-        synchronized(jsArgs){
-            jsArgs.clear();
+        Object[] all = new Object[2];
+        all[0] = handle;
+        all[1] = Structs.arr(args);
 
-            Object[] all = new Object[2];
-            all[0] = handle;
-            all[1] = jsArgs.addAll(args);
+        unblacklist();
+        Object obj = handleInvoker.call(context, scope, scope, all);
+        blacklist();
 
-            unblacklist();
-            T obj = (T)handleInvoker.call(context, scope, scope, all);
-            blacklist();
+        if(obj instanceof NativeJavaObject n) obj = n.unwrap();
 
-            return obj;
-        }
+        return (T)obj;
     }
 
     public static Lookup getLookup(Class<?> in){
