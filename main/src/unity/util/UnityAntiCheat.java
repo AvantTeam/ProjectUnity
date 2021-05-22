@@ -31,6 +31,7 @@ public class UnityAntiCheat implements ApplicationListener{
             }
         });
         Events.on(ResetEvent.class, event -> {
+            exclude.clear();
             unitSeq.clear();
             buildingSeq.clear();
             sampler.clear();
