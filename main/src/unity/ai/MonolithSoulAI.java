@@ -6,15 +6,15 @@ import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import unity.gen.*;
-import unity.mod.*;
+import unity.gen.SoulHoldc.*;
+
+import static mindustry.Vars.*;
 
 public class MonolithSoulAI implements UnitController{
     protected static final Vec2 vec = new Vec2();
-    protected static final Rect rec1 = new Rect();
-    protected static final Rect rec2 = new Rect();
     protected MonolithSoul unit;
 
-    protected Unit target;
+    protected Teamc target;
     protected Interval timer = new Interval(1);
 
     public boolean empty = true;
@@ -36,7 +36,14 @@ public class MonolithSoulAI implements UnitController{
         }
 
         if(timer.get(5f)){
-            target = Units.closest(unit.team, unit.x, unit.y, u -> FactionMeta.map(u) == Faction.monolith);
+            Unit targetUnit = Units.closest(unit.team, unit.x, unit.y, u -> unit.isSameFaction(u));
+            Building targetBuilding = indexer.findTile(unit.team, unit.x, unit.y, Float.MAX_VALUE, b -> b instanceof SoulBuildc soul && soul.canJoin());
+
+            if(unit.dst2(targetUnit) > unit.dst2(targetBuilding)){
+                target = targetBuilding;
+            }else{
+                target = targetUnit;
+            }
         }
 
         if(target != null && !unit.dead){
@@ -46,12 +53,6 @@ public class MonolithSoulAI implements UnitController{
 
             unit.moveAt(vec);
             unit.lookAt(unit.prefRotation());
-
-            unit.hitbox(rec1);
-            target.hitbox(rec2);
-            if(rec1.overlaps(rec2)){
-                unit.invoke(target);
-            }
         }
     }
 }

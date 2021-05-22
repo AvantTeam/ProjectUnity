@@ -1824,7 +1824,7 @@ public class UnityBlocks implements ContentList{
                     }
 
                     if(!Mathf.zero(data.floatValue)){
-                        float f = e.souls / (float)maxSouls;
+                        float f = e.souls() / (float)maxSouls;
                         if(e.timer.get(effectTimer, 45f - f * 15f)){
                             UnityFx.monolithRingEffect.at(e.x, e.y, e.rotation, data.floatValue / 2f);
                         }
@@ -1858,7 +1858,7 @@ public class UnityBlocks implements ContentList{
                     }
 
                     if(!Mathf.zero(data.floatValue)){
-                        float f = e.souls / (float)maxSouls;
+                        float f = e.souls() / (float)maxSouls;
                         if(e.timer.get(effectTimer, 45f - f * 15f)){
                             UnityFx.monolithRingEffect.at(e.x, e.y, e.rotation, data.floatValue);
                         }

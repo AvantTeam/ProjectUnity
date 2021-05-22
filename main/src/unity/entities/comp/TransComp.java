@@ -20,6 +20,13 @@ abstract class TransComp implements Unitc{
     @Import Vec2 vel;
 
     @Override
+    public void setType(UnitType type){
+        if(type instanceof UnityUnitType def){
+            transformTime = def.transformTime;
+        }
+    }
+
+    @Override
     public void update(){
         UnityUnitType type = (UnityUnitType)this.type;
         if(type.transPred.get(self())){
