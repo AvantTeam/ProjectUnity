@@ -376,7 +376,7 @@ public abstract class BaseProcessor extends AbstractProcessor{
 
     public static String simpleName(String canonical){
         if(canonical.contains(".")){
-            canonical = canonical.substring(canonical.lastIndexOf(".") + 1, canonical.length());
+            canonical = canonical.substring(canonical.lastIndexOf(".") + 1);
         }
         return canonical;
     }
