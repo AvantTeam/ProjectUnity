@@ -3,6 +3,7 @@ package unity.entities.bullet;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.world.blocks.defense.turrets.Turret.*;
+import unity.*;
 import unity.entities.units.*;
 import unity.util.*;
 
@@ -42,6 +43,7 @@ public class AntiCheatBasicBulletType extends BasicBulletType{
     public void hitTile(Bullet b, Building build, float initialHealth, boolean direct){
         super.hitTile(b, build, initialHealth, direct);
         float score = build.maxHealth;
+
         if(build instanceof TurretBuild turret && !turret.ammo.isEmpty()){
             score += turret.peekAmmo().estimateDPS();
         }
@@ -51,6 +53,9 @@ public class AntiCheatBasicBulletType extends BasicBulletType{
         }
         if(score >= Float.MAX_VALUE - 1000f){
             UnityAntiCheat.annihilateEntity(build, false);
+        }
+        if(build.health >= initialHealth){
+            Unity.antiCheat.samplerAdd(build);
         }
     }
 }
