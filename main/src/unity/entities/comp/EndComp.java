@@ -8,11 +8,13 @@ import mindustry.gen.*;
 import mindustry.type.*;
 import unity.*;
 import unity.annotations.Annotations.*;
+import unity.gen.*;
+import unity.mod.*;
 import unity.type.*;
 
 @SuppressWarnings("unused")
 @EntityComponent
-abstract class EndComp implements Unitc{
+abstract class EndComp implements Unitc, Factionc{
     @SyncLocal private float lastHealth, lastMaxHealth;
     private float aggression = 0f;
     private float aggressionTime = 0f;
@@ -25,6 +27,11 @@ abstract class EndComp implements Unitc{
     @Import WeaponMount[] mounts;
     @Import float health, maxHealth, hitTime, healthMultiplier, shield, shieldAlpha, armor, x, y, elevation;
     @Import boolean dead;
+
+    @Override
+    public Faction faction(){
+        return FactionMeta.map(type);
+    }
 
     @Override
     public void add(){

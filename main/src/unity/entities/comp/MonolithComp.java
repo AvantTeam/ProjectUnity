@@ -4,35 +4,61 @@ import arc.math.*;
 import arc.util.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.type.*;
 import unity.ai.*;
 import unity.annotations.Annotations.*;
+import unity.content.*;
 import unity.gen.*;
+import unity.mod.*;
+import unity.type.*;
 
 import static mindustry.Vars.*;
 
 @SuppressWarnings("unused")
 @EntityComponent
-abstract class MonolithComp implements Unitc{
+abstract class MonolithComp implements Unitc, Factionc{
     @Import Team team;
     @Import float x, y, hitSize, maxHealth;
+    @Import UnitType type;
+
+    @ReadOnly int souls;
+    transient int maxSouls;
+
+    @Override
+    public Faction faction(){
+        return FactionMeta.map(type);
+    }
+
+    @Override
+    public void setType(UnitType type){
+        if(type instanceof UnityUnitType def){
+            maxSouls = def.maxSouls;
+        }
+    }
+
+    @Override
+    public void update(){
+        if(disabled()){
+            apply(UnityStatusEffects.disabled);
+        }
+    }
 
     @Override
     public void killed(){
         if(net.server() || !net.active()){
-            int amount = Math.max(Mathf.round(hitSize / MonolithSoul.maxSize), 1);
             boolean transferred = false;
 
             float start = Mathf.random(360f);
-            for(int i = 0; i < amount; i++){
+            for(int i = 0; i < souls; i++){
                 MonolithSoul soul = MonolithSoul.defaultType.get().create(team).as();
                 soul.set(x + Mathf.range(hitSize), y + Mathf.range(hitSize));
 
-                Tmp.v1.trns(start + 360f / amount * i, Mathf.random(6f, 12f));
+                Tmp.v1.trns(start + 360f / souls * i, Mathf.random(6f, 12f));
                 soul.rotation = Tmp.v1.angle();
                 soul.vel.set(Tmp.v1.x, Tmp.v1.y);
-                soul.healAmount = maxHealth / 10f / amount;
+                soul.healAmount = maxHealth / 10f / souls;
 
-                if(isPlayer() && !transferred && (Mathf.chance(1f / amount) || i == amount - 1)){
+                if(isPlayer() && !transferred && (Mathf.chance(1f / souls) || i == souls - 1)){
                     soul.controller(getPlayer());
                     transferred = true;
                 }
@@ -43,5 +69,21 @@ abstract class MonolithComp implements Unitc{
                 soul.add();
             }
         }
+    }
+
+    public boolean disabled(){
+        return souls <= 0;
+    }
+
+    public boolean canJoin(){
+        return souls < maxSouls;
+    }
+
+    public void join(){
+        if(canJoin()) souls++;
+    }
+
+    public void unjoin(){
+        if(souls > 0) souls--;
     }
 }

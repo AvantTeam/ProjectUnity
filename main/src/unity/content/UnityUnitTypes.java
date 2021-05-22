@@ -2538,6 +2538,7 @@ public class UnityUnitTypes implements ContentList{
             hitSize = 11f;
             armor = 5f;
             singleTarget = true;
+            maxSouls = 4;
 
             canBoost = true;
             boostMultiplier = 2.5f;
@@ -2587,6 +2588,7 @@ public class UnityUnitTypes implements ContentList{
             hitSize = 26.5f;
             armor = 7f;
             mechFrontSway = 0.55f;
+            maxSouls = 5;
 
             canBoost = true;
             boostMultiplier = 2.5f;
@@ -2639,6 +2641,7 @@ public class UnityUnitTypes implements ContentList{
             hitSize = 36f;
             armor = 11f;
             commandLimit = 8;
+            maxSouls = 7;
 
             allowLegStep = hovering = true;
             visualElevation = 0.2f;
@@ -2698,6 +2701,7 @@ public class UnityUnitTypes implements ContentList{
             hitSize = 48f;
             armor = 16f;
             commandLimit = 8;
+            maxSouls = 9;
 
             visualElevation = 0.3f;
             allowLegStep = hovering = true;
@@ -2773,6 +2777,7 @@ public class UnityUnitTypes implements ContentList{
             hitSize = 64f;
             armor = 23f;
             commandLimit = 8;
+            maxSouls = 12;
 
             visualElevation = 0.5f;
             allowLegStep = hovering = true;
@@ -2832,6 +2837,7 @@ public class UnityUnitTypes implements ContentList{
             hitSize = 67f;
             armor = 30f;
             commandLimit = 8;
+            maxSouls = 15;
 
             visualElevation = 0.7f;
             allowLegStep = hovering = true;
@@ -2850,14 +2856,14 @@ public class UnityUnitTypes implements ContentList{
             groundLayer = Layer.legUnit;
             outlineColor = UnityPal.darkOutline;
 
-            abilities.add(new LightningSpawnAbility(12, 24f, 3f, 0.05f, 160f, 96f, 200f));
+            abilities.add(new LightningSpawnAbility(12, 24f, 3f, 0.05f, 240f, 96f, 320f));
 
-            BulletType energy = new BasicBulletType(5f, 24f, "shell"){
+            BulletType energy = new RicochetBulletType(5f, 24f, "shell"){
                 {
                     width = 9f;
                     height = 11f;
                     shrinkY = 0.3f;
-                    lifetime = 30f;
+                    lifetime = 45f;
                     weaveScale = weaveMag = 3f;
 
                     frontColor = Color.white;
@@ -2873,28 +2879,6 @@ public class UnityUnitTypes implements ContentList{
                     lightningDamage = 12f;
                     lightningColor = Pal.lancerLaser;
                     lightningLength = 6;
-                }
-
-                @Override
-                public void init(Bullet b){
-                    b.data = new Trail(6);
-                }
-
-                @Override
-                public void update(Bullet b){
-                    super.update(b);
-                    if(b.data instanceof Trail t){
-                        t.update(b.x, b.y);
-                    }
-                }
-
-                @Override
-                public void draw(Bullet b){
-                    if(b.data instanceof Trail t){
-                        t.draw(backColor, width * 0.4f);
-                    }
-
-                    super.draw(b);
                 }
             };
 
@@ -2946,7 +2930,7 @@ public class UnityUnitTypes implements ContentList{
                         width = 16f;
                         height = 25f;
                         shrinkY = 0.2f;
-                        lifetime = 24f;
+                        lifetime = 30f;
 
                         frontColor = Color.white;
                         backColor = trailColor = Pal.lancerLaser;

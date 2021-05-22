@@ -109,10 +109,12 @@ public final class ReflectUtils{
             all[1] = jsArgs.addAll(args);
 
             unblacklist();
-            T obj = (T)handleInvoker.call(context, scope, scope, all);
+            Object obj = handleInvoker.call(context, scope, scope, all);
             blacklist();
 
-            return obj;
+            if(obj instanceof NativeJavaObject n) obj = n.unwrap();
+
+            return (T)obj;
         }
     }
 

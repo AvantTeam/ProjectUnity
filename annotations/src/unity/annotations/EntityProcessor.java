@@ -810,14 +810,11 @@ public class EntityProcessor extends BaseProcessor{
         if(!componentDependencies.containsKey(component)){
             ObjectSet<TypeElement> out = new ObjectSet<>();
 
-            out.addAll(Seq.with(component.getInterfaces())
-                .map(BaseProcessor::toEl)
-                .<TypeElement>as()
-                .map(t -> inters.find(i -> simpleName(t).equals(simpleName(i))))
-                .select(t -> t != null)
-                .map(this::toComp)
-            );
+            Seq<TypeElement> list = Seq.with(component.getInterfaces())
+                .map(i -> toComp(compName(simpleName(toEl(i)))))
+                .select(Objects::nonNull);
 
+            out.addAll(list);
             out.remove(component);
 
             ObjectSet<TypeElement> result = new ObjectSet<>();
@@ -848,11 +845,18 @@ public class EntityProcessor extends BaseProcessor{
         );
     }
 
+    String compName(String interfaceName){
+        return interfaceName.substring(0, interfaceName.length() - 1) + "Comp";
+    }
+
     TypeElement toComp(TypeElement inter){
         String name = simpleName(inter);
         if(!name.endsWith("c")) return null;
 
-        String compName = name.substring(0, name.length() - 1) + "Comp";
+        return toComp(compName(name));
+    }
+
+    TypeElement toComp(String compName){
         return comps.find(t -> simpleName(t).equals(compName));
     }
 

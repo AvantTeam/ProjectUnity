@@ -23,9 +23,9 @@ class SoulHoldComp extends Block{
 
     public class SoulBuildComp extends Building implements ControlBlock{
         transient BlockUnitc unit = Nulls.blockUnit;
-        @ReadOnly boolean wasPlayer;
 
-        int souls;
+        @ReadOnly boolean wasPlayer;
+        @ReadOnly int souls;
 
         @Override
         @Replace

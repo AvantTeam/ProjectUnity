@@ -857,7 +857,7 @@ public class UnityBullets implements ContentList{
             drawSize = (length + (width * 2f)) * 2f;
         }};
 
-        ricochetSmall = new RicochetBulletType(7f, 20f){{
+        ricochetSmall = new RicochetBulletType(7f, 40f){{
             width = 9f;
             height = 12f;
             ammoMultiplier = 4;
@@ -867,7 +867,7 @@ public class UnityBullets implements ContentList{
             backColor = trailColor = Pal.lancerLaser;
         }};
 
-        ricochetMedium = new RicochetBulletType(8.5f, 42f){{
+        ricochetMedium = new RicochetBulletType(8.5f, 84f){{
             width = 12f;
             height = 16f;
             ammoMultiplier = 4;
@@ -879,7 +879,7 @@ public class UnityBullets implements ContentList{
             backColor = trailColor = Pal.lancerLaser;
         }};
 
-        ricochetBig = new RicochetBulletType(10f, 132f){{
+        ricochetBig = new RicochetBulletType(10f, 264f){{
             width = 14f;
             height = 18f;
             ammoMultiplier = 4;
@@ -891,7 +891,7 @@ public class UnityBullets implements ContentList{
             backColor = trailColor = Pal.lancerLaser;
         }};
 
-        stopLead = new BasicBulletType(3.6f, 18f, "shell"){{
+        stopLead = new BasicBulletType(3.6f, 36f, "shell"){{
             width = 9f;
             height = 12f;
             ammoMultiplier = 4;
@@ -902,7 +902,7 @@ public class UnityBullets implements ContentList{
             statusDuration = 4f;
         }};
 
-        stopMonolite = new BasicBulletType(4f, 23f, "shell"){{
+        stopMonolite = new BasicBulletType(4f, 46f, "shell"){{
             width = 9f;
             height = 12f;
             ammoMultiplier = 4;
@@ -913,7 +913,7 @@ public class UnityBullets implements ContentList{
             statusDuration = 7f;
         }};
 
-        stopSilicon = new BasicBulletType(4f, 19f, "shell"){{
+        stopSilicon = new BasicBulletType(4f, 38f, "shell"){{
             width = 9f;
             height = 12f;
             ammoMultiplier = 4;
@@ -925,7 +925,7 @@ public class UnityBullets implements ContentList{
             homingPower = 0.08f;
         }};
 
-        supernovaLaser = new ContinuousLaserBulletType(600f){
+        supernovaLaser = new ContinuousLaserBulletType(1200f){
             final Effect plasmaEffect;
 
             {

@@ -12,24 +12,34 @@ import mindustry.type.*;
 import unity.annotations.Annotations.*;
 import unity.content.*;
 import unity.gen.*;
+import unity.gen.SoulHoldc.*;
+import unity.mod.*;
+
+import static mindustry.Vars.*;
 
 @SuppressWarnings("unused")
 @EntityDef({Unitc.class, MonolithSoulc.class})
 @EntityComponent
 @ExcludeGroups(Unitc.class)
-abstract class MonolithSoulComp implements Unitc{
+abstract class MonolithSoulComp implements Unitc, Factionc{
     static final Rect rec1 = new Rect();
     static final Rect rec2 = new Rect();
 
-    static final float maxSize = 12f;
     static final Prov<UnitType> defaultType = () -> UnityUnitTypes.monolithSoul;
 
     float healAmount;
 
+    @Import UnitType type;
     @Import UnitController controller;
     @Import Team team;
     @Import float x, y, rotation, health, maxHealth, hitSize;
     @Import boolean dead;
+    @Import int id;
+
+    @Override
+    public Faction faction(){
+        return FactionMeta.map(type);
+    }
 
     @Override
     public void update(){
@@ -38,19 +48,44 @@ abstract class MonolithSoulComp implements Unitc{
         }else{
             health -= maxHealth / (5f * Time.toSeconds) * Time.delta;
 
-            if(!dead && isPlayer()){
+            if(!dead){
+                boolean[] invoked = {false};
                 Units.nearby(team, x, y, hitSize, unit -> {
-                    hitbox(rec1);
-                    unit.hitbox(rec2);
+                    if(!invoked[0] && !dead && !unit.dead && unit instanceof Monolithc soul && soul.canJoin() && isSameFaction(unit)){
+                        hitbox(rec1);
+                        unit.hitbox(rec2);
 
-                    if(!unit.dead && rec1.overlaps(rec2)){
-                        invoke(unit);
+                        if(rec1.overlaps(rec2)){
+                            invoked[0] = true;
+                            invoke(unit);
 
-                        if(unit.getPlayer() == null){
-                            unit.controller(getPlayer());
+                            if(isPlayer() && !unit.isPlayer()){
+                                getPlayer().unit(unit);
+                            }
                         }
                     }
                 });
+
+                if(!invoked[0]){
+                    indexer.eachBlock(this, hitSize * 2f, b -> {
+                        if(b instanceof SoulBuildc soul && soul.canJoin()){
+                            hitbox(rec1);
+                            b.hitbox(rec2);
+                            return !invoked[0] && rec1.overlaps(rec2);
+                        }else{
+                            return false;
+                        }
+                    }, b -> {
+                        if(!invoked[0]){
+                            invoked[0] = true;
+                            invoke(b);
+
+                            if(isPlayer() && b instanceof SoulBuildc cont && (cont.canControl() && !cont.isControlled())){
+                                getPlayer().unit(cont.unit());
+                            }
+                        }
+                    });
+                }
             }
         }
 
@@ -65,10 +100,25 @@ abstract class MonolithSoulComp implements Unitc{
         return Integer.MAX_VALUE;
     }
 
-    public void invoke(Unit unit){
-        float remain = unit.health + healAmount - unit.maxHealth;
-        unit.heal(healAmount);
+    public <T extends Entityc> void invoke(T ent){
+        float remain = 0f;
+        if(ent instanceof Healthc h){
+            remain = h.health() + healAmount - h.maxHealth();
+            h.heal(healAmount);
+        }
 
-        unit.shield += Math.max(remain / 60f, 0f);
+        if(ent instanceof Shieldc s){
+            s.armor(s.armor() + Math.max(remain / 60f, 0f));
+        }
+
+        if(ent instanceof Monolithc e){
+            e.join();
+        }
+
+        if(ent instanceof SoulBuildc b){
+            b.join();
+        }
+
+        Call.unitDeath(id);
     }
 }
