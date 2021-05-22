@@ -16,6 +16,7 @@ import static mindustry.Vars.*;
 @SuppressWarnings("unchecked")
 public final class ReflectUtils{
     private static final Seq<String> blacklist = new Seq<>();
+    private static final Seq<Object> jsArgs = new Seq<>();
     private static final Context context;
     private static final Scriptable scope;
     private static final Function handleInvoker;
@@ -86,7 +87,7 @@ public final class ReflectUtils{
 
                 handleInvoker = context.compileFunction(scope, """
                     function(handle, args){
-                        return handle.invokeWithArguments(args);
+                        return handle.invokeWithArguments(args.toArray());
                     };
                     """, "unity_impl.js", 0, null
                 );
@@ -100,17 +101,21 @@ public final class ReflectUtils{
     }
 
     private static <T> T handleInvoke(MethodHandle handle, Object... args){
-        Object[] all = new Object[2];
-        all[0] = handle;
-        all[1] = Structs.arr(args);
+        synchronized(jsArgs){
+            jsArgs.clear();
 
-        unblacklist();
-        Object obj = handleInvoker.call(context, scope, scope, all);
-        blacklist();
+            Object[] all = new Object[2];
+            all[0] = handle;
+            all[1] = jsArgs.addAll(args);
 
-        if(obj instanceof NativeJavaObject n) obj = n.unwrap();
+            unblacklist();
+            Object obj = handleInvoker.call(context, scope, scope, all);
+            blacklist();
 
-        return (T)obj;
+            if(obj instanceof NativeJavaObject n) obj = n.unwrap();
+
+            return (T)obj;
+        }
     }
 
     public static Lookup getLookup(Class<?> in){
