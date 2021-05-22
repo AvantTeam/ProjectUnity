@@ -4,17 +4,25 @@ import arc.math.*;
 import arc.util.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.type.*;
 import unity.ai.*;
 import unity.annotations.Annotations.*;
 import unity.gen.*;
+import unity.mod.*;
 
 import static mindustry.Vars.*;
 
 @SuppressWarnings("unused")
 @EntityComponent
-abstract class MonolithComp implements Unitc{
+abstract class MonolithComp implements Unitc, Factionc{
     @Import Team team;
     @Import float x, y, hitSize, maxHealth;
+    @Import UnitType type;
+
+    @Override
+    public Faction faction(){
+        return FactionMeta.map(type);
+    }
 
     @Override
     public void killed(){

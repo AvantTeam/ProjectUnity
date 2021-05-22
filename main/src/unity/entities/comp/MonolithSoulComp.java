@@ -12,12 +12,13 @@ import mindustry.type.*;
 import unity.annotations.Annotations.*;
 import unity.content.*;
 import unity.gen.*;
+import unity.mod.*;
 
 @SuppressWarnings("unused")
 @EntityDef({Unitc.class, MonolithSoulc.class})
 @EntityComponent
 @ExcludeGroups(Unitc.class)
-abstract class MonolithSoulComp implements Unitc{
+abstract class MonolithSoulComp implements Unitc, Factionc{
     static final Rect rec1 = new Rect();
     static final Rect rec2 = new Rect();
 
@@ -30,6 +31,12 @@ abstract class MonolithSoulComp implements Unitc{
     @Import Team team;
     @Import float x, y, rotation, health, maxHealth, hitSize;
     @Import boolean dead;
+    @Import UnitType type;
+
+    @Override
+    public Faction faction(){
+        return FactionMeta.map(type);
+    }
 
     @Override
     public void update(){
@@ -38,7 +45,7 @@ abstract class MonolithSoulComp implements Unitc{
         }else{
             health -= maxHealth / (5f * Time.toSeconds) * Time.delta;
 
-            if(!dead && isPlayer()){
+            if(!dead){
                 Units.nearby(team, x, y, hitSize, unit -> {
                     hitbox(rec1);
                     unit.hitbox(rec2);
@@ -69,6 +76,6 @@ abstract class MonolithSoulComp implements Unitc{
         float remain = unit.health + healAmount - unit.maxHealth;
         unit.heal(healAmount);
 
-        unit.shield += Math.max(remain / 60f, 0f);
+        unit.armor += Math.max(remain / 60f, 0f);
     }
 }
