@@ -1,5 +1,6 @@
 package unity.entities.merge;
 
+import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.util.*;
@@ -14,8 +15,9 @@ import mindustry.world.blocks.defense.turrets.LiquidTurret.*;
 import unity.annotations.Annotations.*;
 import unity.entities.bullet.exp.*;
 import unity.gen.Expc.*;
+import unity.gen.Turretc.*;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "unchecked"})
 @MergeComponent
 class TurretComp extends Turret{
     /** Color of shoot effects. Shifts to second color as the turret levels up. */
@@ -30,8 +32,19 @@ class TurretComp extends Turret{
 
     float basicFieldRadius = -1f;
 
+    @ReadOnly Floatf<TurretBuildc> damageMultiplier = b -> 1f;
+    @ReadOnly Func<TurretBuildc, Object> bulletData = b -> null;
+
     public TurretComp(String name){
         super(name);
+    }
+
+    public <T extends TurretBuildc> void damageMultiplier(Floatf<T> draw){
+        this.damageMultiplier = (Floatf<TurretBuildc>)draw;
+    }
+
+    public <T extends TurretBuildc> void bulletData(Func<T, Object> update){
+        this.bulletData = (Func<TurretBuildc, Object>)update;
     }
 
     public class TurretBuildComp extends TurretBuild{
@@ -155,6 +168,26 @@ class TurretComp extends Turret{
             }else{
                 super.effects();
             }
+        }
+
+        @Override
+        @Replace
+        protected void bullet(BulletType type, float angle){
+            type.create(
+                this, team,
+                x + tr.x, y + tr.y, angle,
+                type.damage * damageMultiplier(), 1f + Mathf.range(velocityInaccuracy),
+                type.scaleVelocity ? Mathf.clamp(Mathf.dst(x + tr.x, y + tr.y, targetPos.x, targetPos.y) / type.range(), minRange / type.range(), range / type.range()) : 1f,
+                bulletData()
+            );
+        }
+
+        public float damageMultiplier(){
+            return damageMultiplier.get(self());
+        }
+
+        public Object bulletData(){
+            return bulletData.get(self());
         }
 
         public Color getShootColor(float progress){

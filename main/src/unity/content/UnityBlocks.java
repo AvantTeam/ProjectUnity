@@ -164,6 +164,32 @@ public class UnityBlocks implements ContentList{
     //turrets
     public static
     @FactionDef("monolith")
+    Block
+    lifeStealer, absorberAura,
+    heatRay;
+
+    public static
+    @FactionDef("monolith")
+    @Merge(base = PowerTurret.class, value = {Turretc.class, SoulHoldc.class})
+    Block
+    ricochet, shellshock, purge,
+    blackout,
+    diviner, mage;
+
+    public static
+    @FactionDef("monolith")
+    @Merge(base = ItemTurret.class, value = {Turretc.class, SoulHoldc.class})
+    Block
+    recluse;
+
+    public static
+    @FactionDef("monolith")
+    @Merge(base = BurstPowerTurret.class, value = {Turretc.class, SoulHoldc.class})
+    Block
+    oracle;
+
+    public static
+    @FactionDef("monolith")
     @LoadRegs(value = {
         "supernova-head",
         "supernova-core",
@@ -171,13 +197,8 @@ public class UnityBlocks implements ContentList{
         "supernova-wing-left-bottom", "supernova-wing-right-bottom",
         "supernova-bottom"
     }, outline = true)
+    @Merge(base = AttractLaserTurret.class, value = {Turretc.class, SoulHoldc.class})
     Block
-
-    ricochet, shellshock, purge,
-    lifeStealer, absorberAura,
-    recluse, blackout,
-    heatRay,
-    diviner, mage, oracle,
     supernova;
 
     public static @FactionDef("youngcha")
@@ -1903,37 +1924,49 @@ public class UnityBlocks implements ContentList{
             energyMultiplier.put(LaserBoltBulletType.class, 9f);
         }};
 
-        ricochet = new PowerTurret("ricochet"){{
+        ricochet = new SoulHoldTurretPowerTurret("ricochet"){{
             requirements(Category.turret, with(UnityItems.monolite, 40));
 
             size = 1;
+            health = 200;
+            powerUse = 1f;
+
             reloadTime = 60f;
             restitution = 0.03f;
             range = 180f;
             shootCone = 15f;
             ammoUseEffect = Fx.none;
-            health = 200;
             inaccuracy = 2f;
             rotateSpeed = 12f;
-            shootType = UnityBullets.ricochetSmall;
             shootSound = UnitySounds.energyBolt;
-            powerUse = 1f;
+            shootType = UnityBullets.ricochetSmall;
+
+            efficiencyFrom = 0.5f;
+            efficiencyTo = 1.5f;
+
+            damageMultiplier((SoulTurretPowerTurretBuild build) -> efficiencyFrom + (build.souls() / (float)maxSouls) * efficiencyTo);
         }};
 
-        diviner = new PowerTurret("diviner"){{
+        diviner = new SoulHoldTurretPowerTurret("diviner"){{
             requirements(Category.turret, with(Items.lead, 15, UnityItems.monolite, 30));
 
             size = 1;
-            reloadTime = 30f;
             health = 240;
-            range = 70f;
             powerUse = 1.5f;
+
+            reloadTime = 30f;
+            range = 70f;
             targetGround = true;
             targetAir = false;
             shootSound = UnitySounds.energyBolt;
-            shootType = new LaserBulletType(50f){{
+            shootType = new LaserBulletType(100f){{
                 length = 80f;
             }};
+
+            efficiencyFrom = 0.5f;
+            efficiencyTo = 1.5f;
+
+            damageMultiplier((SoulTurretPowerTurretBuild build) -> efficiencyFrom + (build.souls() / (float)maxSouls) * efficiencyTo);
         }};
 
         lifeStealer = new LifeStealerTurret("life-stealer"){{
@@ -1944,7 +1977,7 @@ public class UnityBlocks implements ContentList{
             powerUse = 1f;
         }};
 
-        recluse = new ItemTurret("recluse"){{
+        recluse = new SoulHoldTurretItemTurret("recluse"){{
             requirements(Category.turret, with(Items.lead, 15, UnityItems.monolite, 20));
             ammo(
                 Items.lead, UnityBullets.stopLead,
@@ -1953,14 +1986,19 @@ public class UnityBlocks implements ContentList{
             );
 
             size = 1;
+            health = 200;
             spread = 4f;
             reloadTime = 20f;
             restitution = 0.03f;
             range = 110f;
             shootCone = 3f;
             ammoUseEffect = Fx.none;
-            health = 200;
             rotateSpeed = 12f;
+
+            efficiencyFrom = 0.5f;
+            efficiencyTo = 1.5f;
+
+            damageMultiplier((SoulTurretItemTurretBuild build) -> efficiencyFrom + (build.souls() / (float)maxSouls) * efficiencyTo);
         }};
 
         absorberAura = new AbsorberTurret("absorber-aura"){{
@@ -1972,47 +2010,55 @@ public class UnityBlocks implements ContentList{
             powerUse = 1f;
         }};
 
-        mage = new PowerTurret("mage"){{
+        mage = new SoulHoldTurretPowerTurret("mage"){{
             requirements(Category.turret, with(Items.lead, 75, Items.silicon, 50, UnityItems.monolite, 25));
 
             size = 2;
             health = 600;
+            powerUse = 2.5f;
+
             range = 120f;
             reloadTime = 48f;
             shootCone = 15f;
             shots = 3;
             burstSpacing = 2f;
             shootSound = Sounds.spark;
-            powerUse = 2.5f;
             recoilAmount = 2.5f;
             rotateSpeed = 10f;
             shootType = new LightningBulletType(){{
                 lightningLength = 20;
-                damage = 32f;
+                damage = 64f;
             }};
+
+            maxSouls = 5;
+            efficiencyFrom = 0.5f;
+            efficiencyTo = 1.6f;
+
+            damageMultiplier((SoulTurretPowerTurretBuild build) -> efficiencyFrom + (build.souls() / (float)maxSouls) * efficiencyTo);
         }};
 
-        blackout = new PowerTurret("blackout"){{
+        blackout = new SoulHoldTurretPowerTurret("blackout"){{
             requirements(Category.turret, with(Items.graphite, 85, Items.titanium, 25, UnityItems.monolite, 125));
 
             size = 2;
+            health = 720;
+            powerUse = 3f;
+
             reloadTime = 140f;
             range = 200f;
-            health = 720;
             rotateSpeed = 10f;
-            powerUse = 3f;
             recoilAmount = 3f;
             shootSound = Sounds.shootBig;
             targetGround = true;
             targetAir = false;
-            shootType = new BasicBulletType(6f, 60f, "shell"){
+            shootType = new BasicBulletType(6f, 90f, "shell"){
                 {
                     lifetime = 35f;
                     width = height = 20f;
                     frontColor = UnityPal.monolith;
                     backColor = UnityPal.monolithDark;
                     hitEffect = despawnEffect = Fx.blastExplosion;
-                    splashDamage = 60f;
+                    splashDamage = 90f;
                     splashDamageRadius = 3.2f * tilesize;
                 }
 
@@ -2029,21 +2075,33 @@ public class UnityBlocks implements ContentList{
                     });
                 }
             };
+
+            efficiencyFrom = 0.5f;
+            efficiencyTo = 1.5f;
+
+            damageMultiplier((SoulTurretPowerTurretBuild build) -> efficiencyFrom + (build.souls() / (float)maxSouls) * efficiencyTo);
         }};
 
-        shellshock = new PowerTurret("shellshock"){{
+        shellshock = new SoulHoldTurretPowerTurret("shellshock"){{
             requirements(Category.turret, with(Items.lead, 90, Items.graphite, 100, UnityItems.monolite, 80));
 
             size = 2;
+            health = 720;
+            powerUse = 2f;
+
             reloadTime = 75f;
             range = 260f;
             shootCone = 3f;
             ammoUseEffect = Fx.none;
-            health = 720;
             rotateSpeed = 10f;
             shootType = UnityBullets.ricochetMedium;
             shootSound = UnitySounds.energyBolt;
-            powerUse = 2f;
+
+            maxSouls = 5;
+            efficiencyFrom = 0.5f;
+            efficiencyTo = 1.6f;
+
+            damageMultiplier((SoulTurretPowerTurretBuild build) -> efficiencyFrom + (build.souls() / (float)maxSouls) * efficiencyTo);
         }};
 
         heatRay = new HeatRayTurret("heat-ray"){{
@@ -2058,10 +2116,13 @@ public class UnityBlocks implements ContentList{
             shootSound = UnitySounds.heatRay;
         }};
 
-        oracle = new BurstPowerTurret("oracle"){{
+        oracle = new SoulHoldTurretBurstPowerTurret("oracle"){{
             requirements(Category.turret, with(Items.silicon, 175, Items.titanium, 150, UnityItems.monolithAlloy, 75));
+
             size = 3;
             health = 1440;
+            powerUse = 3f;
+
             range = 180f;
             reloadTime = 72f;
             chargeTime = 30f;
@@ -2070,50 +2131,63 @@ public class UnityBlocks implements ContentList{
             shootCone = 5f;
             shots = 8;
             burstSpacing = 2f;
+            chargeEffect = UnityFx.oracleCharge;
+            chargeBeginEffect = UnityFx.oracleChargeBegin;
             shootSound = Sounds.spark;
             shootShake = 3f;
-            powerUse = 3f;
             recoilAmount = 2.5f;
             rotateSpeed = 8f;
             shootType = new LightningBulletType(){{
-                damage = 64f;
+                damage = 96f;
                 shootEffect = Fx.lightningShoot;
             }};
-            chargeEffect = UnityFx.oracleCharge;
-            chargeBeginEffect = UnityFx.oracleChargeBegin;
+
             subShots = 3;
             subBurstSpacing = 1f;
             subShootEffect = Fx.hitLancer;
             subShootSound = Sounds.laser;
-            subShootType = new LaserBulletType(96f){{
+            subShootType = new LaserBulletType(144f){{
                 length = 180f;
                 sideAngle = 45f;
                 inaccuracy = 8f;
             }};
+
+            maxSouls = 7;
+            efficiencyFrom = 0.5f;
+            efficiencyTo = 1.67f;
+
+            damageMultiplier((SoulTurretBurstPowerTurretBuild build) -> efficiencyFrom + (build.souls() / (float)maxSouls) * efficiencyTo);
         }};
 
-        purge = new PowerTurret("purge"){{
+        purge = new SoulHoldTurretPowerTurret("purge"){{
             requirements(Category.turret, with(Items.plastanium, 75, Items.lead, 350, UnityItems.monolite, 200, UnityItems.monolithAlloy, 75));
 
             size = 3;
+            health = 1680;
+            powerUse = 3f;
+
             reloadTime = 90f;
             range = 360f;
             shootCone = 3f;
             ammoUseEffect = Fx.none;
-            health = 1680;
             rotateSpeed = 8f;
             shootType = UnityBullets.ricochetBig;
             shootSound = UnitySounds.energyBolt;
-            powerUse = 3f;
+
+            maxSouls = 7;
+            efficiencyFrom = 0.5f;
+            efficiencyTo = 1.67f;
+
+            damageMultiplier((SoulTurretPowerTurretBuild build) -> efficiencyFrom + (build.souls() / (float)maxSouls) * efficiencyTo);
         }};
 
-        supernova = new AttractLaserTurret("supernova"){
+        supernova = new SoulHoldTurretAttractLaserTurret("supernova"){
             /** Temporary vector array to be used in the drawing method */
             final Vec2[] phases = new Vec2[]{new Vec2(), new Vec2(), new Vec2(), new Vec2(), new Vec2(), new Vec2()};
 
             final float starRadius;
             final float starOffset;
-            Cons<AttractLaserTurretBuild> effectDrawer;
+            Cons<SoulTurretAttractLaserTurretBuild> effectDrawer;
 
             final int timerChargeStar = timers++;
             final Effect starEffect;
@@ -2127,13 +2201,14 @@ public class UnityBlocks implements ContentList{
 
             {
                 requirements(Category.turret, with(Items.surgeAlloy, 500, Items.silicon, 650, UnityItems.archDebris, 350, UnityItems.monolithAlloy, 325));
+
                 size = 7;
                 health = 8100;
+                powerUse = 24f;
 
                 shootLength = size * tilesize / 2f - 8f;
                 rotateSpeed = 1f;
                 recoilAmount = 4f;
-                powerUse = 24f;
                 cooldown = 0.006f;
 
                 shootCone = 15f;
@@ -2160,8 +2235,14 @@ public class UnityBlocks implements ContentList{
                 heatWaveEffect = UnityFx.supernovaStarHeatwave;
                 pullEffect = UnityFx.supernovaPullEffect;
 
+                maxSouls = 12;
+                efficiencyFrom = 0.5f;
+                efficiencyTo = 1.8f;
+
+                damageMultiplier((SoulTurretAttractLaserTurretBuild build) -> efficiencyFrom + (build.souls() / (float)maxSouls) * efficiencyTo);
+
                 drawer = b -> {
-                    if(b instanceof AttractLaserTurretBuild tile){
+                    if(b instanceof SoulTurretAttractLaserTurretBuild tile){
                         //core
                         phases[0].trns(tile.rotation, -tile.recoil + Mathf.curve(tile.phase, 0f, 0.3f) * -2f);
                         //left wing
