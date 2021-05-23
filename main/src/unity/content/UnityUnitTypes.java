@@ -48,7 +48,7 @@ public class UnityUnitTypes implements ContentList{
     UnitType orion, araneidae, theraphosidae;
     // eclipse
     // oct
-    public static @EntityPoint(PayloadUnit.class)
+    public static @EntityDef({Unitc.class, Payloadc.class})
     UnitType sedec;
     // omura
 
@@ -1182,8 +1182,8 @@ public class UnityUnitTypes implements ContentList{
                 mirror = false;
                 rotateSpeed = 1.5f;
 
-                bullet = new HealingConeBulletType(32f){{
-                    healPercent = 2f;
+                bullet = new HealingConeBulletType(3f){{
+                    healPercent = 6f;
                     allyStatus = StatusEffects.overclock;
                     allyStatusDuration = 9f * 60f;
                     status = StatusEffects.slow;
