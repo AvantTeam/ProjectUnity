@@ -106,7 +106,7 @@ public class UnityUnitType extends UnitType{
 
         if(fromWave){
             if(unit instanceof Monolithc e){
-                int count = Mathf.random(Math.min(maxSouls, 1), maxSouls);
+                int count = Mathf.random(Mathf.clamp(e.maxSouls(), 0, 1), maxSouls);
                 for(int i = 0; i < count; i++){
                     e.join();
                 }
