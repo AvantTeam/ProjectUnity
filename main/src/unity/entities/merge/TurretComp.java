@@ -11,11 +11,13 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.Liquid;
 import mindustry.world.blocks.defense.turrets.*;
+import mindustry.world.blocks.defense.turrets.LaserTurret.*;
 import mindustry.world.blocks.defense.turrets.LiquidTurret.*;
 import unity.annotations.Annotations.*;
 import unity.entities.bullet.exp.*;
 import unity.gen.Expc.*;
 import unity.gen.Turretc.*;
+import unity.util.*;
 
 @SuppressWarnings({"unused", "unchecked"})
 @MergeComponent
@@ -173,13 +175,18 @@ class TurretComp extends Turret{
         @Override
         @Replace
         protected void bullet(BulletType type, float angle){
-            type.create(
+            Bullet bullet = type.create(
                 this, team,
                 x + tr.x, y + tr.y, angle,
                 type.damage * damageMultiplier(), 1f + Mathf.range(velocityInaccuracy),
                 type.scaleVelocity ? Mathf.clamp(Mathf.dst(x + tr.x, y + tr.y, targetPos.x, targetPos.y) / type.range(), minRange / type.range(), range / type.range()) : 1f,
                 bulletData()
             );
+
+            if(self() instanceof LaserTurretBuild laser && block instanceof LaserTurret turret){
+                ReflectUtils.setField(this, ReflectUtils.findField(LaserTurretBuild.class, "bullet", true), bullet);
+                ReflectUtils.setField(this, ReflectUtils.findField(LaserTurretBuild.class, "bulletLife", true), turret.shootDuration);
+            }
         }
 
         public float damageMultiplier(){

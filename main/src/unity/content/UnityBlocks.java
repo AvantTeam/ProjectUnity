@@ -1941,6 +1941,7 @@ public class UnityBlocks implements ContentList{
             shootSound = UnitySounds.energyBolt;
             shootType = UnityBullets.ricochetSmall;
 
+            requireSoul = false;
             efficiencyFrom = 0.8f;
             efficiencyTo = 1.5f;
 
@@ -1963,6 +1964,7 @@ public class UnityBlocks implements ContentList{
                 length = 85f;
             }};
 
+            requireSoul = false;
             efficiencyFrom = 0.8f;
             efficiencyTo = 1.5f;
 
@@ -1996,6 +1998,7 @@ public class UnityBlocks implements ContentList{
             ammoUseEffect = Fx.none;
             rotateSpeed = 12f;
 
+            requireSoul = false;
             efficiencyFrom = 0.8f;
             efficiencyTo = 1.5f;
 
@@ -2032,6 +2035,7 @@ public class UnityBlocks implements ContentList{
                 damage = 128f;
             }};
 
+            requireSoul = false;
             maxSouls = 5;
             efficiencyFrom = 0.8f;
             efficiencyTo = 1.6f;
@@ -2078,6 +2082,7 @@ public class UnityBlocks implements ContentList{
                 }
             };
 
+            requireSoul = false;
             maxSouls = 5;
             efficiencyFrom = 0.8f;
             efficiencyTo = 1.6f;
@@ -2100,6 +2105,7 @@ public class UnityBlocks implements ContentList{
             shootType = UnityBullets.ricochetMedium;
             shootSound = UnitySounds.energyBolt;
 
+            requireSoul = false;
             maxSouls = 5;
             efficiencyFrom = 0.8f;
             efficiencyTo = 1.6f;
@@ -2155,6 +2161,7 @@ public class UnityBlocks implements ContentList{
                 inaccuracy = 8f;
             }};
 
+            requireSoul = false;
             maxSouls = 7;
             efficiencyFrom = 0.7f;
             efficiencyTo = 1.67f;
@@ -2177,6 +2184,7 @@ public class UnityBlocks implements ContentList{
             shootType = UnityBullets.ricochetBig;
             shootSound = UnitySounds.energyBolt;
 
+            requireSoul = false;
             maxSouls = 7;
             efficiencyFrom = 0.7f;
             efficiencyTo = 1.67f;
@@ -2238,6 +2246,7 @@ public class UnityBlocks implements ContentList{
                 heatWaveEffect = UnityFx.supernovaStarHeatwave;
                 pullEffect = UnityFx.supernovaPullEffect;
 
+                requireSoul = false;
                 maxSouls = 12;
                 efficiencyFrom = 0.5f;
                 efficiencyTo = 1.9f;

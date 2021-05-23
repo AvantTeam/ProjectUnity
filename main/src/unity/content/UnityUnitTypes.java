@@ -2560,18 +2560,22 @@ public class UnityUnitTypes implements ContentList{
                 BulletType subBullet = new LightningBulletType();
                 subBullet.damage = 24f;
 
-                bullet = new BasicBulletType(3f, 72f, "shell"){
+                bullet = new RicochetBulletType(3f, 72f, "shell"){
                     {
                         width = 20f;
                         height = 20f;
                         lifetime = 60f;
-                        frontColor = Pal.lancerLaser;
-                        backColor = Pal.lancerLaser.cpy().mul(0.6f);
+                        frontColor = UnityPal.monolithLight;
+                        backColor = UnityPal.monolith.cpy().mul(0.75f);
+                        trailColor = UnityPal.monolithDark.cpy().mul(0.5f);
+
+                        trailEffect = UnityFx.ricochetTrailSmall;
                         shootEffect = Fx.lightningShoot;
                     }
 
                     @Override
                     public void init(Bullet b){
+                        super.init(b);
                         for(int i = 0; i < 3; i++){
                             subBullet.create(b, b.x, b.y, b.vel.angle());
                             Sounds.spark.at(b.x, b.y, Mathf.random(0.6f, 0.8f));
@@ -2859,16 +2863,18 @@ public class UnityUnitTypes implements ContentList{
 
             abilities.add(new LightningSpawnAbility(12, 16f, 3f, 0.05f, 300f, 96f, 640f));
 
-            BulletType energy = new RicochetBulletType(5f, 50f, "shell"){
+            BulletType energy = new RicochetBulletType(6f, 50f, "shell"){
                 {
                     width = 9f;
                     height = 11f;
                     shrinkY = 0.3f;
                     lifetime = 45f;
                     weaveScale = weaveMag = 3f;
+                    trailChance = 0.3f;
 
-                    frontColor = Color.white;
-                    backColor = trailColor = Pal.lancerLaser;
+                    frontColor = UnityPal.monolithLight;
+                    backColor = UnityPal.monolith;
+                    trailColor = UnityPal.monolithDark;
                     shootEffect = Fx.lancerLaserShoot;
                     smokeEffect = Fx.hitLancer;
                     hitEffect = Fx.flakExplosion;
@@ -2895,6 +2901,7 @@ public class UnityUnitTypes implements ContentList{
                 reload = 24f;
                 recoil = 6f;
                 shots = 8;
+                velocityRnd = 0.3f;
                 spacing = 5f;
                 shootSound = UnitySounds.energyBolt;
 
@@ -2911,6 +2918,7 @@ public class UnityUnitTypes implements ContentList{
                 reload = 15f;
                 recoil = 6f;
                 shots = 5;
+                velocityRnd = 0.3f;
                 spacing = 6f;
                 shootSound = UnitySounds.energyBolt;
 
@@ -2936,9 +2944,12 @@ public class UnityUnitTypes implements ContentList{
                         height = 25f;
                         shrinkY = 0.2f;
                         lifetime = 30f;
+                        trailLength = 3;
+                        pierceCap = 6;
 
                         frontColor = Color.white;
-                        backColor = trailColor = Pal.lancerLaser;
+                        backColor = UnityPal.monolithLight;
+                        trailColor = UnityPal.monolith;
                         shootEffect = Fx.lancerLaserShoot;
                         smokeEffect = hitEffect = Fx.hitLancer;
 
@@ -2951,8 +2962,8 @@ public class UnityUnitTypes implements ContentList{
                     @Override
                     public void update(Bullet b){
                         super.update(b);
-                        if(Mathf.chanceDelta(0.8f)){
-                            Lightning.create(b, backColor, lightningDamage, b.x, b.y, b.rotation(), lightningLength);
+                        if(Mathf.chanceDelta(0.3f)){
+                            Lightning.create(b, lightningColor, lightningDamage, b.x, b.y, b.rotation(), lightningLength / 2);
                         }
                     }
                 };

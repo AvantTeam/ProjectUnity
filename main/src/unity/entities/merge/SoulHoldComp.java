@@ -17,6 +17,8 @@ class SoulHoldComp extends Block{
     float efficiencyFrom = 0.3f;
     float efficiencyTo = 1f;
 
+    boolean requireSoul = true;
+
     public SoulHoldComp(String name){
         super(name);
     }
@@ -60,7 +62,7 @@ class SoulHoldComp extends Block{
         @Override
         @Replace
         public float efficiency(){
-            return disabled() ? 0f : (super.efficiency() * ((souls / (float)maxSouls) * (efficiencyTo - efficiencyFrom) + efficiencyFrom));
+            return (requireSoul && disabled()) ? 0f : (super.efficiency() * ((souls / (float)maxSouls) * (efficiencyTo - efficiencyFrom) + efficiencyFrom));
         }
 
         public boolean disabled(){
