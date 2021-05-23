@@ -2385,7 +2385,7 @@ public class UnityUnitTypes implements ContentList{
             engineOffset = 4.6f;
             engineSize = 2.5f;
 
-            abilities.add(new TeleportAbility<Bullet>(unit -> {
+            abilities.add(new TeleportAbility<>(unit -> {
                 Bullet[] should = {null};
 
                 float rad = 3f * tilesize + unit.hitSize() / 2f;
