@@ -731,10 +731,10 @@ public class UnityBullets implements ContentList{
         pylonLightning = new LightningBulletType(){{
             lightningLength = 32;
             lightningLengthRand = 12;
-            damage = 28f;
+            damage = 56f;
         }};
 
-        pylonLaser = new LaserBulletType(1000f){
+        pylonLaser = new LaserBulletType(2000f){
             {
                 length = 520f;
                 width = 60f;
@@ -758,15 +758,15 @@ public class UnityBullets implements ContentList{
             }
         };
 
-        pylonLaserSmall = new LaserBulletType(96f){{
+        pylonLaserSmall = new LaserBulletType(192f){{
             length = 180f;
             width = 24f;
         }};
 
         monumentRailBullet = new PointBulletType(){{
-            damage = 3000f;
-            buildingDamageMultiplier = 0.5f;
-            speed = maxRange = 500f;
+            damage = 6000f;
+            buildingDamageMultiplier = 0.8f;
+            speed = maxRange = 540f;
             lifetime = 1f;
             hitShake = 6f;
             trailSpacing = 35f;
@@ -857,7 +857,7 @@ public class UnityBullets implements ContentList{
             drawSize = (length + (width * 2f)) * 2f;
         }};
 
-        ricochetSmall = new RicochetBulletType(7f, 40f){{
+        ricochetSmall = new RicochetBulletType(7f, 80f){{
             width = 9f;
             height = 12f;
             ammoMultiplier = 4;
@@ -867,7 +867,7 @@ public class UnityBullets implements ContentList{
             backColor = trailColor = Pal.lancerLaser;
         }};
 
-        ricochetMedium = new RicochetBulletType(8.5f, 84f){{
+        ricochetMedium = new RicochetBulletType(8.5f, 168f){{
             width = 12f;
             height = 16f;
             ammoMultiplier = 4;
@@ -879,7 +879,7 @@ public class UnityBullets implements ContentList{
             backColor = trailColor = Pal.lancerLaser;
         }};
 
-        ricochetBig = new RicochetBulletType(10f, 264f){{
+        ricochetBig = new RicochetBulletType(10f, 528f){{
             width = 14f;
             height = 18f;
             ammoMultiplier = 4;
@@ -891,7 +891,7 @@ public class UnityBullets implements ContentList{
             backColor = trailColor = Pal.lancerLaser;
         }};
 
-        stopLead = new BasicBulletType(3.6f, 36f, "shell"){{
+        stopLead = new BasicBulletType(3.6f, 72f, "shell"){{
             width = 9f;
             height = 12f;
             ammoMultiplier = 4;
@@ -899,10 +899,10 @@ public class UnityBullets implements ContentList{
             frontColor = Color.white;
             backColor = Pal.lancerLaser;
             status = StatusEffects.unmoving;
-            statusDuration = 4f;
+            statusDuration = 5f;
         }};
 
-        stopMonolite = new BasicBulletType(4f, 46f, "shell"){{
+        stopMonolite = new BasicBulletType(4f, 100f, "shell"){{
             width = 9f;
             height = 12f;
             ammoMultiplier = 4;
@@ -910,10 +910,10 @@ public class UnityBullets implements ContentList{
             frontColor = Color.white;
             backColor = Pal.lancerLaser;
             status = StatusEffects.unmoving;
-            statusDuration = 7f;
+            statusDuration = 8f;
         }};
 
-        stopSilicon = new BasicBulletType(4f, 38f, "shell"){{
+        stopSilicon = new BasicBulletType(4f, 72f, "shell"){{
             width = 9f;
             height = 12f;
             ammoMultiplier = 4;
@@ -921,11 +921,11 @@ public class UnityBullets implements ContentList{
             frontColor = Color.white;
             backColor = Pal.lancerLaser;
             status = StatusEffects.unmoving;
-            statusDuration = 14f;
+            statusDuration = 16f;
             homingPower = 0.08f;
         }};
 
-        supernovaLaser = new ContinuousLaserBulletType(1200f){
+        supernovaLaser = new ContinuousLaserBulletType(3200f){
             final Effect plasmaEffect;
 
             {

@@ -2467,9 +2467,10 @@ public class UnityUnitTypes implements ContentList{
         };
 
         stele = new UnityUnitType("stele"){{
-            health = 150f;
+            health = 300f;
             speed = 0.6f;
             hitSize = 8f;
+            armor = 5f;
 
             canBoost = true;
             boostMultiplier = 2.5f;
@@ -2490,7 +2491,7 @@ public class UnityUnitTypes implements ContentList{
                 velocityRnd = 0.2f;
                 shootSound = Sounds.shootBig;
 
-                bullet = new BasicBulletType(3.5f, 3f){
+                bullet = new BasicBulletType(3.5f, 6f){
                     {
                         lifetime = 60f;
                         width = height = 2f;
@@ -2532,11 +2533,11 @@ public class UnityUnitTypes implements ContentList{
         }};
 
         pedestal = new UnityUnitType("pedestal"){{
-            health = 600;
+            health = 1200f;
             speed = 0.5f;
             rotateSpeed = 2.6f;
             hitSize = 11f;
-            armor = 5f;
+            armor = 10f;
             singleTarget = true;
             maxSouls = 4;
 
@@ -2557,9 +2558,9 @@ public class UnityUnitTypes implements ContentList{
                 shootSound = UnitySounds.energyBolt;
 
                 BulletType subBullet = new LightningBulletType();
-                subBullet.damage = 12f;
+                subBullet.damage = 24f;
 
-                bullet = new BasicBulletType(3f, 36f, "shell"){
+                bullet = new BasicBulletType(3f, 72f, "shell"){
                     {
                         width = 20f;
                         height = 20f;
@@ -2582,11 +2583,11 @@ public class UnityUnitTypes implements ContentList{
         }};
 
         pilaster = new UnityUnitType("pilaster"){{
-            health = 1000f;
+            health = 2000f;
             speed = 0.4f;
             rotateSpeed = 2.2f;
             hitSize = 26.5f;
-            armor = 7f;
+            armor = 15f;
             mechFrontSway = 0.55f;
             maxSouls = 5;
 
@@ -2613,8 +2614,8 @@ public class UnityUnitTypes implements ContentList{
                 shootSound = Sounds.spark;
 
                 bullet = new LightningBulletType(){{
-                    damage = 15f;
-                    lightningLength = 15;
+                    damage = 30f;
+                    lightningLength = 18;
                 }};
             }},
             new Weapon("unity-monolith-large-weapon-mount"){{
@@ -2629,17 +2630,17 @@ public class UnityUnitTypes implements ContentList{
                 reload = 40f;
                 shootSound = Sounds.laser;
 
-                bullet = new LaserBulletType(80f);
+                bullet = new LaserBulletType(160f);
             }}
             );
         }};
 
         pylon = new UnityUnitType("pylon"){{
-            health = 7200f;
+            health = 14400f;
             speed = 0.43f;
             rotateSpeed = 1.48f;
             hitSize = 36f;
-            armor = 11f;
+            armor = 23f;
             commandLimit = 8;
             maxSouls = 7;
 
@@ -2695,11 +2696,11 @@ public class UnityUnitTypes implements ContentList{
         }};
 
         monument = new UnityUnitType("monument"){{
-            health = 16000f;
+            health = 32000f;
             speed = 0.42f;
             rotateSpeed = 1.4f;
             hitSize = 48f;
-            armor = 16f;
+            armor = 32f;
             commandLimit = 8;
             maxSouls = 9;
 
@@ -2720,7 +2721,7 @@ public class UnityUnitTypes implements ContentList{
             groundLayer = Layer.legUnit;
             outlineColor = UnityPal.darkOutline;
 
-            BulletType laser = new LaserBulletType(320f);
+            BulletType laser = new LaserBulletType(640f);
             weapons.add(
             new Weapon("unity-monolith-large2-weapon-mount"){{
                 top = false;
@@ -2759,7 +2760,7 @@ public class UnityUnitTypes implements ContentList{
 
                 rotate = true;
                 rotateSpeed = 1.2f;
-                reload = 240f;
+                reload = 200f;
                 recoil = shake = 8f;
                 shootCone = 2f;
                 cooldownTime = 210f;
@@ -2771,11 +2772,11 @@ public class UnityUnitTypes implements ContentList{
         }};
 
         colossus = new UnityUnitType("colossus"){{
-            health = 30000f;
+            health = 60000f;
             speed = 0.4f;
             rotateSpeed = 1.2f;
             hitSize = 64f;
-            armor = 23f;
+            armor = 45f;
             commandLimit = 8;
             maxSouls = 12;
 
@@ -2796,7 +2797,7 @@ public class UnityUnitTypes implements ContentList{
             groundLayer = Layer.legUnit;
             outlineColor = UnityPal.darkOutline;
 
-            abilities.add(new LightningSpawnAbility(8, 48f, 2f, 0.05f, 120f, 56f, 100f));
+            abilities.add(new LightningSpawnAbility(8, 32f, 2f, 0.05f, 180f, 56f, 200f));
 
             weapons.add(
             new Weapon(name + "-weapon"){{
@@ -2813,7 +2814,7 @@ public class UnityUnitTypes implements ContentList{
                 shotDelay = 3f;
                 shootSound = Sounds.laserblast;
 
-                bullet = new LaserBulletType(960f){{
+                bullet = new LaserBulletType(1920f){{
                     width = 45f;
                     length = 400f;
                     lifetime = 32f;
@@ -2831,11 +2832,11 @@ public class UnityUnitTypes implements ContentList{
         }};
 
         bastion = new UnityUnitType("bastion"){{
-            health = 45000f;
+            health = 120000f;
             speed = 0.4f;
             rotateSpeed = 1.2f;
             hitSize = 67f;
-            armor = 30f;
+            armor = 100f;
             commandLimit = 8;
             maxSouls = 15;
 
@@ -2856,9 +2857,9 @@ public class UnityUnitTypes implements ContentList{
             groundLayer = Layer.legUnit;
             outlineColor = UnityPal.darkOutline;
 
-            abilities.add(new LightningSpawnAbility(12, 24f, 3f, 0.05f, 240f, 96f, 320f));
+            abilities.add(new LightningSpawnAbility(12, 16f, 3f, 0.05f, 300f, 96f, 640f));
 
-            BulletType energy = new RicochetBulletType(5f, 24f, "shell"){
+            BulletType energy = new RicochetBulletType(5f, 50f, "shell"){
                 {
                     width = 9f;
                     height = 11f;
@@ -2867,7 +2868,7 @@ public class UnityUnitTypes implements ContentList{
                     weaveScale = weaveMag = 3f;
 
                     frontColor = Color.white;
-                    backColor = Pal.lancerLaser;
+                    backColor = trailColor = Pal.lancerLaser;
                     shootEffect = Fx.lancerLaserShoot;
                     smokeEffect = Fx.hitLancer;
                     hitEffect = Fx.flakExplosion;
@@ -2893,6 +2894,8 @@ public class UnityUnitTypes implements ContentList{
 
                 reload = 24f;
                 recoil = 6f;
+                shots = 8;
+                spacing = 5f;
                 shootSound = UnitySounds.energyBolt;
 
                 bullet = energy;
@@ -2907,6 +2910,8 @@ public class UnityUnitTypes implements ContentList{
 
                 reload = 15f;
                 recoil = 6f;
+                shots = 5;
+                spacing = 6f;
                 shootSound = UnitySounds.energyBolt;
 
                 bullet = energy;
@@ -2918,16 +2923,16 @@ public class UnityUnitTypes implements ContentList{
 
                 rotate = true;
                 rotateSpeed = 6f;
-                shots = 5;
+                shots = 8;
                 shotDelay = 3f;
 
                 reload = 30f;
                 recoil = 8f;
                 shootSound = Sounds.shootBig;
 
-                bullet = new RicochetBulletType(12.5f, 320f, "shell"){
+                bullet = new RicochetBulletType(12.5f, 640f, "shell"){
                     {
-                        width = 16f;
+                        width = 20f;
                         height = 25f;
                         shrinkY = 0.2f;
                         lifetime = 30f;
@@ -2940,14 +2945,14 @@ public class UnityUnitTypes implements ContentList{
                         lightning = 3;
                         lightningDamage = 12f;
                         lightningColor = Pal.lancerLaser;
-                        lightningLength = 6;
+                        lightningLength = 15;
                     }
 
                     @Override
                     public void update(Bullet b){
                         super.update(b);
-                        if(Mathf.chanceDelta(0.75f)){
-                            Lightning.create(b, backColor, lightningDamage, x, y, b.rotation(), lightningLength);
+                        if(Mathf.chanceDelta(0.8f)){
+                            Lightning.create(b, backColor, lightningDamage, b.x, b.y, b.rotation(), lightningLength);
                         }
                     }
                 };
@@ -2978,11 +2983,11 @@ public class UnityUnitTypes implements ContentList{
                 rotate = false;
                 x = 0f;
                 y = 4f;
-                reload = 10f;
+                reload = 6f;
                 shootCone = 40f;
 
                 shootSound = Sounds.lasershoot;
-                bullet = new LaserBoltBulletType(4f, 15f){{
+                bullet = new LaserBoltBulletType(4f, 23f){{
                     healPercent = 1.5f;
                     lifetime = 40f;
                     collidesTeam = true;
@@ -3017,11 +3022,11 @@ public class UnityUnitTypes implements ContentList{
                 rotate = false;
                 x = 0f;
                 y = 6f;
-                reload = 20f;
+                reload = 12f;
                 shootCone = 40f;
 
                 shootSound = UnitySounds.energyBolt;
-                bullet = new LaserBoltBulletType(6.5f, 30f){{
+                bullet = new LaserBoltBulletType(6.5f, 60f){{
                     width = 4f;
                     height = 12f;
                     keepVelocity = false;
@@ -3039,13 +3044,13 @@ public class UnityUnitTypes implements ContentList{
                 mirror = alternate = true;
                 x = 3f;
                 y = 3f;
-                reload = 56f;
+                reload = 40f;
                 shots = 2;
                 shotDelay = 5f;
                 shootCone = 20f;
 
                 shootSound = Sounds.lasershoot;
-                bullet = new LaserBoltBulletType(4f, 15f){{
+                bullet = new LaserBoltBulletType(4f, 30f){{
                     healPercent = 1.5f;
                     lifetime = 40f;
                     collidesTeam = true;

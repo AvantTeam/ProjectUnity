@@ -59,7 +59,7 @@ public class LifeStealerTurret extends GenericTractorBeamTurret<Teamc>{
             boolean any = indexer.eachBlock(this, range, b -> b.health() < b.maxHealth(), b -> {
                 healTrnsEffect.at(x, y, rotation, new Float[]{x, y, b.x, b.y, 2.5f + Mathf.range(0.3f)});
                 Time.run(healEffect.lifetime, () -> {
-                    if(b != null && b.isValid()){
+                    if(b.isValid()){
                         healEffect.at(b.x, b.y, b.block.size, healColor);
                         b.healFract(healPercent);
                     }

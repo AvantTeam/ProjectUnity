@@ -1955,12 +1955,12 @@ public class UnityBlocks implements ContentList{
             powerUse = 1.5f;
 
             reloadTime = 30f;
-            range = 70f;
+            range = 75f;
             targetGround = true;
             targetAir = false;
             shootSound = UnitySounds.energyBolt;
-            shootType = new LaserBulletType(100f){{
-                length = 80f;
+            shootType = new LaserBulletType(200f){{
+                length = 85f;
             }};
 
             efficiencyFrom = 0.5f;
@@ -1975,6 +1975,7 @@ public class UnityBlocks implements ContentList{
             size = 1;
             health = 320;
             powerUse = 1f;
+            damage = 120f;
         }};
 
         recluse = new SoulHoldTurretItemTurret("recluse"){{
@@ -2008,6 +2009,7 @@ public class UnityBlocks implements ContentList{
             health = 720;
             range = 150f;
             powerUse = 1f;
+            resistance = 0.8f;
         }};
 
         mage = new SoulHoldTurretPowerTurret("mage"){{
@@ -2027,7 +2029,7 @@ public class UnityBlocks implements ContentList{
             rotateSpeed = 10f;
             shootType = new LightningBulletType(){{
                 lightningLength = 20;
-                damage = 64f;
+                damage = 128f;
             }};
 
             maxSouls = 5;
@@ -2051,7 +2053,7 @@ public class UnityBlocks implements ContentList{
             shootSound = Sounds.shootBig;
             targetGround = true;
             targetAir = false;
-            shootType = new BasicBulletType(6f, 90f, "shell"){
+            shootType = new BasicBulletType(6f, 180f, "shell"){
                 {
                     lifetime = 35f;
                     width = height = 20f;
@@ -2111,7 +2113,7 @@ public class UnityBlocks implements ContentList{
             range = 120f;
             targetGround = true;
             targetAir = false;
-            damage = 120f;
+            damage = 240f;
             powerUse = 2f;
             shootSound = UnitySounds.heatRay;
         }};
@@ -2138,7 +2140,7 @@ public class UnityBlocks implements ContentList{
             recoilAmount = 2.5f;
             rotateSpeed = 8f;
             shootType = new LightningBulletType(){{
-                damage = 96f;
+                damage = 192f;
                 shootEffect = Fx.lightningShoot;
             }};
 
@@ -2146,7 +2148,7 @@ public class UnityBlocks implements ContentList{
             subBurstSpacing = 1f;
             subShootEffect = Fx.hitLancer;
             subShootSound = Sounds.laser;
-            subShootType = new LaserBulletType(144f){{
+            subShootType = new LaserBulletType(288f){{
                 length = 180f;
                 sideAngle = 45f;
                 inaccuracy = 8f;
