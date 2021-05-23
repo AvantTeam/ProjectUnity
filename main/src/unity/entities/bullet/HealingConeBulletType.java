@@ -42,12 +42,14 @@ public class HealingConeBulletType extends BulletType{
 
     @Override
     public float continuousDamage(){
-        return damage / 30f * 60f;
+        return damage / 5f * 60f;
     }
 
     @Override
     public float estimateDPS(){
-        return damage * 100f / 30f * 3f;
+        //assume firing duration is about 100 by default, may not be accurate there's no way of knowing in this method
+        //assume it pierces 3 blocks/units
+        return damage * 100f / 5f * 3f;
     }
 
     @Override
@@ -75,7 +77,8 @@ public class HealingConeBulletType extends BulletType{
             });
             idx++;
         });
-        if(b.timer(1, 30f)){
+
+        if(b.timer(1, 2f)){
             Tmp.r1.setCentered(b.x, b.y, 1f);
             Utils.shotgunRange(3, cone, b.rotation(), ang -> {
                 Tmp.v1.trns(ang, length).add(b);
