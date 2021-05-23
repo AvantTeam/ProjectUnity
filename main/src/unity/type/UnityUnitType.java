@@ -18,6 +18,7 @@ import mindustry.world.blocks.environment.*;
 import unity.entities.*;
 import unity.entities.units.*;
 import unity.gen.*;
+import unity.util.*;
 
 import static arc.Core.*;
 
@@ -94,6 +95,25 @@ public class UnityUnitType extends UnitType{
 
     public UnityUnitType(String name){
         super(name);
+    }
+
+    @Override
+    public Unit create(Team team){
+        Unit unit = super.create(team);
+
+        Class<?> caller = ReflectUtils.classCaller();
+        boolean fromWave = caller != null && SpawnGroup.class.isAssignableFrom(caller);
+
+        if(fromWave){
+            if(unit instanceof Monolithc e){
+                int count = Mathf.random(Math.min(maxSouls, 1), maxSouls);
+                for(int i = 0; i < count; i++){
+                    e.join();
+                }
+            }
+        }
+
+        return unit;
     }
 
     @Override
