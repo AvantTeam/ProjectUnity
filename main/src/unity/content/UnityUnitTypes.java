@@ -48,7 +48,7 @@ public class UnityUnitTypes implements ContentList{
     UnitType orion, araneidae, theraphosidae;
     // eclipse
     // oct
-    public static @EntityDef({Unitc.class, Payloadc.class})
+    public static @EntityPoint(PayloadUnit.class)
     UnitType sedec;
     // omura
 

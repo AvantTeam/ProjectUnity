@@ -163,10 +163,13 @@ public class UnityAntiCheat implements ApplicationListener{
         if(exclude.contains(entity.id())) return;
         EntitySampler ent;
         if((ent = samplerMap.get(entity.id())) != null){
-            if(entity.health() >= ent.lastHealth && ent.penalty++ >= 5){
-                annihilateEntity(entity, true);
-                samplerMap.remove(entity.id());
-                sampler.remove(ent);
+            if(entity.health() >= ent.lastHealth){
+                ent.duration = Math.max(30f, ent.duration);
+                if(ent.penalty++ >= 5){
+                    annihilateEntity(entity, true);
+                    samplerMap.remove(entity.id());
+                    sampler.remove(ent);
+                }
             }
             return;
         }
