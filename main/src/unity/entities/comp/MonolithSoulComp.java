@@ -14,13 +14,13 @@ import unity.content.*;
 import unity.gen.*;
 import unity.gen.SoulHoldc.*;
 import unity.mod.*;
+import unity.util.*;
 
 import static mindustry.Vars.*;
 
 @SuppressWarnings("unused")
 @EntityDef({Unitc.class, MonolithSoulc.class})
 @EntityComponent
-@ExcludeGroups(Unitc.class)
 abstract class MonolithSoulComp implements Unitc, Factionc{
     static final Rect rec1 = new Rect();
     static final Rect rec2 = new Rect();
@@ -44,7 +44,7 @@ abstract class MonolithSoulComp implements Unitc, Factionc{
     @Override
     public void update(){
         if(controller == null){
-            health = 0f;
+            kill();
         }else{
             health -= maxHealth / (5f * Time.toSeconds) * Time.delta;
 
@@ -119,6 +119,17 @@ abstract class MonolithSoulComp implements Unitc, Factionc{
             b.join();
         }
 
-        Call.unitDeath(id);
+        kill();
+    }
+
+    @Override
+    @MethodPriority(-1)
+    @BreakAll
+    public void hitbox(Rect rect){
+        Class<?> caller = ReflectUtils.classCaller();
+        if(caller != null && QuadTree.class.isAssignableFrom(caller)){
+            rect.set(x, y, Float.NaN, Float.NaN);
+            return;
+        }
     }
 }

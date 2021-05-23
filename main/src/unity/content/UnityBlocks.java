@@ -1941,7 +1941,7 @@ public class UnityBlocks implements ContentList{
             shootSound = UnitySounds.energyBolt;
             shootType = UnityBullets.ricochetSmall;
 
-            efficiencyFrom = 0.5f;
+            efficiencyFrom = 0.8f;
             efficiencyTo = 1.5f;
 
             damageMultiplier((SoulTurretPowerTurretBuild build) -> efficiencyFrom + (build.souls() / (float)maxSouls) * efficiencyTo);
@@ -1963,7 +1963,7 @@ public class UnityBlocks implements ContentList{
                 length = 85f;
             }};
 
-            efficiencyFrom = 0.5f;
+            efficiencyFrom = 0.8f;
             efficiencyTo = 1.5f;
 
             damageMultiplier((SoulTurretPowerTurretBuild build) -> efficiencyFrom + (build.souls() / (float)maxSouls) * efficiencyTo);
@@ -1996,7 +1996,7 @@ public class UnityBlocks implements ContentList{
             ammoUseEffect = Fx.none;
             rotateSpeed = 12f;
 
-            efficiencyFrom = 0.5f;
+            efficiencyFrom = 0.8f;
             efficiencyTo = 1.5f;
 
             damageMultiplier((SoulTurretItemTurretBuild build) -> efficiencyFrom + (build.souls() / (float)maxSouls) * efficiencyTo);
@@ -2033,7 +2033,7 @@ public class UnityBlocks implements ContentList{
             }};
 
             maxSouls = 5;
-            efficiencyFrom = 0.5f;
+            efficiencyFrom = 0.8f;
             efficiencyTo = 1.6f;
 
             damageMultiplier((SoulTurretPowerTurretBuild build) -> efficiencyFrom + (build.souls() / (float)maxSouls) * efficiencyTo);
@@ -2078,8 +2078,9 @@ public class UnityBlocks implements ContentList{
                 }
             };
 
-            efficiencyFrom = 0.5f;
-            efficiencyTo = 1.5f;
+            maxSouls = 5;
+            efficiencyFrom = 0.8f;
+            efficiencyTo = 1.6f;
 
             damageMultiplier((SoulTurretPowerTurretBuild build) -> efficiencyFrom + (build.souls() / (float)maxSouls) * efficiencyTo);
         }};
@@ -2100,7 +2101,7 @@ public class UnityBlocks implements ContentList{
             shootSound = UnitySounds.energyBolt;
 
             maxSouls = 5;
-            efficiencyFrom = 0.5f;
+            efficiencyFrom = 0.8f;
             efficiencyTo = 1.6f;
 
             damageMultiplier((SoulTurretPowerTurretBuild build) -> efficiencyFrom + (build.souls() / (float)maxSouls) * efficiencyTo);
@@ -2155,7 +2156,7 @@ public class UnityBlocks implements ContentList{
             }};
 
             maxSouls = 7;
-            efficiencyFrom = 0.5f;
+            efficiencyFrom = 0.7f;
             efficiencyTo = 1.67f;
 
             damageMultiplier((SoulTurretBurstPowerTurretBuild build) -> efficiencyFrom + (build.souls() / (float)maxSouls) * efficiencyTo);
@@ -2177,7 +2178,7 @@ public class UnityBlocks implements ContentList{
             shootSound = UnitySounds.energyBolt;
 
             maxSouls = 7;
-            efficiencyFrom = 0.5f;
+            efficiencyFrom = 0.7f;
             efficiencyTo = 1.67f;
 
             damageMultiplier((SoulTurretPowerTurretBuild build) -> efficiencyFrom + (build.souls() / (float)maxSouls) * efficiencyTo);
@@ -2239,7 +2240,7 @@ public class UnityBlocks implements ContentList{
 
                 maxSouls = 12;
                 efficiencyFrom = 0.5f;
-                efficiencyTo = 1.8f;
+                efficiencyTo = 1.9f;
 
                 damageMultiplier((SoulTurretAttractLaserTurretBuild build) -> efficiencyFrom + (build.souls() / (float)maxSouls) * efficiencyTo);
 

@@ -42,7 +42,11 @@ abstract class MonolithComp implements Unitc, Factionc{
     @MethodPriority(-5)
     public void update(){
         if(disabled()){
-            apply(UnityStatusEffects.disabled);
+            if(!hasEffect(UnityStatusEffects.disabled)){
+                apply(UnityStatusEffects.disabled, Float.MAX_VALUE);
+            }
+        }else{
+            unapply(UnityStatusEffects.disabled);
         }
     }
 

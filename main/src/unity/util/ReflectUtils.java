@@ -369,4 +369,14 @@ public final class ReflectUtils{
             throw new RuntimeException(e);
         }
     }
+
+    public static Class<?> classCaller(){
+        var thread = Thread.currentThread();
+        var trace = thread.getStackTrace();
+        try{
+            return Class.forName(trace[3].getClassName(), false, thread.getContextClassLoader());
+        }catch(ClassNotFoundException e){
+            return null;
+        }
+    }
 }
