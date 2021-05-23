@@ -35,7 +35,7 @@ class SoulHoldComp extends Block{
 
         @Override
         public boolean canControl(){
-            return canJoin() && (headless || (player != null && player.unit() instanceof Monolithc unit && FactionMeta.map(unit) == Faction.monolith));
+            return canJoin() && (headless || (player != null && player.unit() instanceof Monolithc unit && unit.isSameFaction(this)));
         }
 
         @Override

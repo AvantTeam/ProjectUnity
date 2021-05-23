@@ -13,4 +13,8 @@ abstract class FactionComp implements Entityc{
     public boolean isSameFaction(Entityc other){
         return other instanceof Factionc fac && faction() == fac.faction();
     }
+
+    public boolean isSameFaction(Building other){
+        return faction() == FactionMeta.map(other.block);
+    }
 }

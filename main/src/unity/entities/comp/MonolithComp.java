@@ -2,6 +2,7 @@ package unity.entities.comp;
 
 import arc.math.*;
 import arc.util.*;
+import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -17,6 +18,7 @@ import static mindustry.Vars.*;
 @SuppressWarnings("unused")
 @EntityComponent
 abstract class MonolithComp implements Unitc, Factionc{
+    @Import UnitController controller;
     @Import Team team;
     @Import float x, y, hitSize, maxHealth;
     @Import UnitType type;
@@ -37,6 +39,7 @@ abstract class MonolithComp implements Unitc, Factionc{
     }
 
     @Override
+    @MethodPriority(-5)
     public void update(){
         if(disabled()){
             apply(UnityStatusEffects.disabled);
@@ -85,5 +88,15 @@ abstract class MonolithComp implements Unitc, Factionc{
 
     public void unjoin(){
         if(souls > 0) souls--;
+    }
+
+    public boolean canControl(){
+        return canJoin() && (headless || (player != null && player.unit() instanceof Monolithc unit && unit.isSameFaction(this)));
+    }
+
+    @Override
+    @Replace
+    public boolean isAI(){
+        return controller instanceof AIController && canControl();
     }
 }
