@@ -50,9 +50,6 @@ public class Unity extends Mod implements ApplicationListener{
 
     private static LoadedMod unity;
 
-    //testing
-    public static BlockMovement blockMovement= new BlockMovement();
-
     public Unity(){
         ContributorList.init();
         if(Core.app != null){
