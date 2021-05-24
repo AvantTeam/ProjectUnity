@@ -26,7 +26,7 @@ task proc(dependsOn: [classes, configurations.runtimeClasspath]) {
         javaexec {
             main imageProcessorMain
             classpath sourceSets.main.runtimeClasspath
-            jvmArgs += ['-Xms1024m', '-Xmx1024m', -'Djava.awt.headless=true']
+            jvmArgs += ['-Xms1024m', '-Xmx1024m', '-Djava.awt.headless=true']
             standardInput System.in
             workingDir file('../main/assets/')
         }
