@@ -6,6 +6,8 @@ import mindustry.graphics.*;
 import unity.annotations.Annotations.*;
 import unity.graphics.*;
 
+import static mindustry.Vars.*;
+
 /** @author GlennFolker */
 @FactionBase
 public enum Faction{
@@ -27,6 +29,6 @@ public enum Faction{
 
     Faction(String name, Color color){
         this.color = color.cpy();
-        this.name = Core.bundle.format("faction." + name, this.color);
+        this.name = headless ? name : Core.bundle.format("faction." + name, this.color);
     }
 }
