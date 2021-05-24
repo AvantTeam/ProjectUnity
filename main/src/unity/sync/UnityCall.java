@@ -13,6 +13,8 @@ import mindustry.net.Net.*;
 import mindustry.net.Packets.*;
 import unity.*;
 import unity.ai.KamiAI.*;
+import unity.gen.*;
+import unity.gen.SoulHoldc.*;
 
 import java.io.*;
 import java.util.*;
@@ -121,7 +123,9 @@ public class UnityCall{
     }
 
     public static void tap(Player player, float x, float y){
-        Unity.tapHandler.tap(player, x, y);
+        if(net.client() || !net.active()){
+            Unity.tapHandler.tap(player, x, y);
+        }
 
         if(net.server() || net.client()){
             out.reset();
@@ -141,7 +145,7 @@ public class UnityCall{
     }
 
     public static void effect(Effect effect, float x, float y, float rotation, Object data){
-        if(net.client() || !net.active()){
+        if(net.server() || !net.active()){
             effect.at(x, y, rotation, data);
         }
 
@@ -172,6 +176,39 @@ public class UnityCall{
             }
 
             client(null, true, 3, out.getBytes());
+        }
+    }
+
+    public static void soulJoin(MonolithSoul soul, Entityc ent){
+        if(net.server() || !net.active()){
+            float remain = 0f;
+            if(ent instanceof Healthc h){
+                remain = h.health() + soul.healAmount - h.maxHealth();
+                h.heal(soul.healAmount);
+            }
+
+            if(ent instanceof Shieldc s){
+                s.armor(s.armor() + Math.max(remain / 60f, 0f));
+            }
+
+            if(ent instanceof Monolithc e){
+                e.join();
+            }
+
+            if(ent instanceof SoulBuildc b){
+                b.join();
+            }
+
+            soul.kill();
+        }
+
+        if(net.server()){
+            out.reset();
+
+            TypeIO.writeEntity(write, soul);
+            TypeIO.writeEntity(write, ent);
+
+            client(null, true, 4, out.getBytes());
         }
     }
 

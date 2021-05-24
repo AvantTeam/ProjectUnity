@@ -80,7 +80,7 @@ public class TeleportAbility<T extends Teamc & Hitboxc> extends BaseAbility{
             unit.snapInterpolation();
         }
 
-        if(mobile && !headless && unit.getPlayer() == player){
+        if(mobile && !headless && unit.isLocal()){
             Core.camera.position.set(pos.x + unit.x, pos.y + unit.y);
         }
 

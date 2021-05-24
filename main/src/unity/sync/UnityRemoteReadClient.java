@@ -8,10 +8,9 @@ import mindustry.gen.*;
 import mindustry.io.*;
 import unity.*;
 import unity.ai.KamiAI.*;
+import unity.gen.*;
 
 import java.io.*;
-
-import static mindustry.Vars.*;
 
 /** @author GlennFolker */
 public class UnityRemoteReadClient{
@@ -53,9 +52,7 @@ public class UnityRemoteReadClient{
             float x = read.f();
             float y = read.f();
 
-            if(p != player){
-                Unity.tapHandler.tap(p, x, y);
-            }
+            Unity.tapHandler.tap(p, x, y);
         });
 
         map.put(3, () -> {
@@ -86,6 +83,31 @@ public class UnityRemoteReadClient{
             }
 
             effect.at(x, y, rotation, data);
+        });
+
+        map.put(4, () -> {
+            MonolithSoul soul = TypeIO.readEntity(read);
+            Entityc ent = TypeIO.readEntity(read);
+
+            float remain = 0f;
+            if(ent instanceof Healthc h){
+                remain = h.health() + soul.healAmount - h.maxHealth();
+                h.heal(soul.healAmount);
+            }
+
+            if(ent instanceof Shieldc s){
+                s.armor(s.armor() + Math.max(remain / 60f, 0f));
+            }
+
+            if(ent instanceof Monolithc e){
+                e.join();
+            }
+
+            if(ent instanceof SoulBuildc b){
+                b.join();
+            }
+
+            soul.kill();
         });
     }
 

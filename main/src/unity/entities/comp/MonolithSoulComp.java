@@ -14,12 +14,13 @@ import unity.content.*;
 import unity.gen.*;
 import unity.gen.SoulHoldc.*;
 import unity.mod.*;
+import unity.sync.*;
 import unity.util.*;
 
 import static mindustry.Vars.*;
 
 @SuppressWarnings("unused")
-@EntityDef({Unitc.class, MonolithSoulc.class})
+@EntityDef({Unitc.class, MonolithSoulc.class, Factionc.class})
 @EntityComponent
 abstract class MonolithSoulComp implements Unitc, Factionc{
     static final Rect rec1 = new Rect();
@@ -48,7 +49,7 @@ abstract class MonolithSoulComp implements Unitc, Factionc{
         }else{
             health -= maxHealth / (5f * Time.toSeconds) * Time.delta;
 
-            if(!dead){
+            if(!dead && (net.server() || !net.active())){
                 boolean[] invoked = {false};
                 Units.nearby(team, x, y, hitSize, unit -> {
                     if(!invoked[0] && !dead && !unit.dead && unit instanceof Monolithc soul && soul.canJoin() && isSameFaction(unit)){
@@ -101,25 +102,7 @@ abstract class MonolithSoulComp implements Unitc, Factionc{
     }
 
     public <T extends Entityc> void invoke(T ent){
-        float remain = 0f;
-        if(ent instanceof Healthc h){
-            remain = h.health() + healAmount - h.maxHealth();
-            h.heal(healAmount);
-        }
-
-        if(ent instanceof Shieldc s){
-            s.armor(s.armor() + Math.max(remain / 60f, 0f));
-        }
-
-        if(ent instanceof Monolithc e){
-            e.join();
-        }
-
-        if(ent instanceof SoulBuildc b){
-            b.join();
-        }
-
-        kill();
+        UnityCall.soulJoin(self(), ent);
     }
 
     @Override
