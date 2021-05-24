@@ -70,22 +70,18 @@ public class UnityRemoteReadClient{
             }catch(IllegalArgumentException no){
                 byte type = Byte.parseByte(no.getMessage().split(":")[1].trim());
                 switch(type){
-                    case 16: {
+                    case 16 -> {
                         Position[] pos = new Position[read.b()];
                         for(int i = 0; i < pos.length; i++){
                             pos[i] = new Vec2(read.f(), read.f());
                         }
 
                         data = pos;
-                        break;
                     }
 
-                    case 17: {
-                        data = TypeIO.<Unit>readEntity(read);
-                        break;
-                    }
+                    case 17 -> data = TypeIO.<Unit>readEntity(read);
 
-                    default: throw new IllegalArgumentException("Unknown object type: " + type);
+                    default -> throw new IllegalArgumentException("Unknown object type: " + type);
                 }
             }
 

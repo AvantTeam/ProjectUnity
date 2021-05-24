@@ -59,7 +59,6 @@ public class UnityUnitType extends UnitType{
     public final Seq<Rotor> rotors = new Seq<>(4);
     public float rotorDeathSlowdown = 0.01f;
     public float fallRotateSpeed = 2.5f;
-    public TextureRegion bladeGhostRegion, bladeShadeRegion;
 
     // Lasers
     public Color laserColor = Pal.heal;

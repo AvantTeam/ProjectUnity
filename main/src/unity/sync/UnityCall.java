@@ -3,10 +3,14 @@ package unity.sync;
 import arc.math.geom.*;
 import arc.util.*;
 import arc.util.io.*;
+import arc.util.pooling.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.io.*;
+import mindustry.net.*;
+import mindustry.net.Net.*;
+import mindustry.net.Packets.*;
 import unity.*;
 import unity.ai.KamiAI.*;
 
@@ -19,6 +23,9 @@ import static mindustry.Vars.*;
 public class UnityCall{
     private static final ReusableByteOutStream out = new ReusableByteOutStream();
     private static final Writes write = new Writes(new DataOutputStream(out));
+
+    private static final ReusableByteOutStream outSend = new ReusableByteOutStream();
+    private static final Writes writeSend = new Writes(new DataOutputStream(outSend));
 
     public static void init(){
         if(netClient != null){
@@ -90,7 +97,7 @@ public class UnityCall{
             write.f(fdata);
             write.f(time);
 
-            Call.clientPacketUnreliable("unity.call", "0:" + pack(out.getBytes()));
+            client(null, false, 0, out.getBytes());
         }
     }
 
@@ -109,7 +116,7 @@ public class UnityCall{
             write.str(name);
             write.bool(play);
 
-            Call.clientPacketReliable("unity.call", "1:" + pack(out.getBytes()));
+            client(null, true, 1, out.getBytes());
         }
     }
 
@@ -126,15 +133,15 @@ public class UnityCall{
             write.f(y);
 
             if(net.client()){
-                Call.serverPacketReliable("unity.call", "2:" + pack(out.getBytes()));
+                server(true, 2, out.getBytes());
             }else if(net.server()){
-                Call.clientPacketReliable("unity.call", "2:" + pack(out.getBytes()));
+                client(player.con, true, 2, out.getBytes());
             }
         }
     }
 
     public static void effect(Effect effect, float x, float y, float rotation, Object data){
-        if(!net.active()){
+        if(net.client() || !net.active()){
             effect.at(x, y, rotation, data);
         }
 
@@ -164,7 +171,47 @@ public class UnityCall{
                 }
             }
 
-            Call.clientPacketReliable("unity.call", "3:" + pack(out.getBytes()));
+            client(null, true, 3, out.getBytes());
+        }
+    }
+
+    protected static void client(NetConnection except, boolean reliable, int type, byte[] content){
+        if(net.server()){
+            outSend.reset();
+
+            InvokePacket packet = Pools.obtain(InvokePacket.class, InvokePacket::new);
+            packet.priority = 0;
+            packet.type = 74;
+
+            TypeIO.writeString(writeSend, "unity.call");
+            TypeIO.writeString(writeSend, type + ":" + pack(content));
+
+            packet.bytes = outSend.getBytes();
+            packet.length = outSend.size();
+
+            if(except != null){
+                net.sendExcept(except, packet, reliable ? SendMode.tcp : SendMode.udp);
+            }else{
+                net.send(packet, reliable ? SendMode.tcp : SendMode.udp);
+            }
+        }
+    }
+
+    protected static void server(boolean reliable, int type, byte[] content){
+        if(net.client()){
+            outSend.reset();
+
+            InvokePacket packet = Pools.obtain(InvokePacket.class, InvokePacket::new);
+            packet.priority = 0;
+            packet.type = 32;
+
+            TypeIO.writeString(writeSend, type + ":");
+            TypeIO.writeString(writeSend, pack(content));
+
+            packet.bytes = outSend.getBytes();
+            packet.length = outSend.size();
+
+            net.send(packet, reliable ? SendMode.tcp : SendMode.udp);
         }
     }
 }

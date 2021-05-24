@@ -58,7 +58,9 @@ abstract class MonolithComp implements Unitc, Factionc{
             float start = Mathf.random(360f);
             for(int i = 0; i < souls; i++){
                 MonolithSoul soul = MonolithSoul.defaultType.get().create(team).as();
-                soul.set(x + Mathf.range(hitSize), y + Mathf.range(hitSize));
+
+                Tmp.v1.trns(Mathf.random(360f), Mathf.random(hitSize));
+                soul.set(x + Tmp.v1.x, y + Tmp.v1.y);
 
                 Tmp.v1.trns(start + 360f / souls * i, Mathf.random(6f, 12f));
                 soul.rotation = Tmp.v1.angle();

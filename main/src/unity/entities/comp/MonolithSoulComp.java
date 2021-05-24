@@ -67,11 +67,11 @@ abstract class MonolithSoulComp implements Unitc, Factionc{
                 });
 
                 if(!invoked[0]){
-                    indexer.eachBlock(this, hitSize * 2f, b -> {
-                        if(b instanceof SoulBuildc soul && soul.canJoin()){
+                    indexer.eachBlock(this, hitSize, b -> {
+                        if(!invoked[0] && b instanceof SoulBuildc soul && soul.canJoin()){
                             hitbox(rec1);
                             b.hitbox(rec2);
-                            return !invoked[0] && rec1.overlaps(rec2);
+                            return rec1.overlaps(rec2);
                         }else{
                             return false;
                         }

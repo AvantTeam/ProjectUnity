@@ -2194,7 +2194,7 @@ public class UnityBlocks implements ContentList{
 
         supernova = new SoulHoldTurretAttractLaserTurret("supernova"){
             /** Temporary vector array to be used in the drawing method */
-            final Vec2[] phases = new Vec2[]{new Vec2(), new Vec2(), new Vec2(), new Vec2(), new Vec2(), new Vec2()};
+            final Vec2[] phases = {new Vec2(), new Vec2(), new Vec2(), new Vec2(), new Vec2(), new Vec2()};
 
             final float starRadius;
             final float starOffset;
