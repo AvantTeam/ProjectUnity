@@ -37,6 +37,12 @@ public class AntiCheatBasicBulletType extends BasicBulletType{
         if(score >= Float.MAX_VALUE - 1000f){
             UnityAntiCheat.annihilateEntity(other, false);
         }
+
+        if(h.health >= initialHealth){
+            Unity.antiCheat.samplerAdd(h);
+        }else{
+            Unity.antiCheat.samplerAdd(h, true);
+        }
     }
 
     @Override
@@ -56,6 +62,8 @@ public class AntiCheatBasicBulletType extends BasicBulletType{
         }
         if(build.health >= initialHealth){
             Unity.antiCheat.samplerAdd(build);
+        }else{
+            Unity.antiCheat.samplerAdd(build, true);
         }
     }
 }

@@ -17,6 +17,7 @@ import mindustry.io.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.ctype.*;
+import unity.*;
 import unity.entities.bullet.*;
 import unity.entities.bullet.exp.*;
 import unity.entities.units.*;
@@ -980,6 +981,7 @@ public class UnityBullets implements ContentList{
                 auraWidthReduction = 4f;
                 damageRadius = 110f;
                 auraDamage = 9000f;
+                overrideDamage = true;
 
                 laserColors = new Color[]{UnityPal.scarColorAlpha, UnityPal.scarColor, UnityPal.endColor, Color.black};
             }
@@ -1005,6 +1007,12 @@ public class UnityBullets implements ContentList{
                     unit.damage(damage);
                 }
                 if(unit instanceof AntiCheatBase) ((AntiCheatBase)unit).overrideAntiCheatDamage(auraDamage, 1);
+
+                if(unit.health >= initialHealth){
+                    Unity.antiCheat.samplerAdd(unit);
+                }else{
+                    Unity.antiCheat.samplerAdd(unit, true);
+                }
             }
         };
 
