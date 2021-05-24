@@ -141,12 +141,14 @@ public class Unity extends Mod implements ApplicationListener{
 
             unity.meta.displayName = stringf.get(unity.meta.name + ".name");
             unity.meta.description = stringf.get(unity.meta.name + ".description");
-
-            initScripts();
         }
+        
+        initScripts();
     }
 
     private void initScripts(){
+        if(mods == null || platform == null) return;
+
         Scripts scripts = mods.getScripts();
         Cons2<String, String> register = (var, expression) -> {
             scripts.runConsole(Strings.format("const @ = @", var, expression));
