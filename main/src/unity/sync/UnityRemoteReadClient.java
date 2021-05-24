@@ -9,6 +9,7 @@ import mindustry.io.*;
 import unity.*;
 import unity.ai.KamiAI.*;
 import unity.gen.*;
+import unity.gen.SoulHoldc.*;
 
 import java.io.*;
 
