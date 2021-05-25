@@ -899,6 +899,7 @@ public class UnityBlocks implements ContentList{
                         despawnEffect = hitEffect = Fx.none;
                         fragBullets = 1;
                         fragBullet = new SingularityBulletType(13f){{
+                            lifetime = 3.5f * 60f;
                             hitSize = 19f;
                         }};
                     }
