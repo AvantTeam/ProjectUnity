@@ -297,7 +297,7 @@ public final class Utils{
     }
 
     /** Iterates over all blocks in a radius. */
-    public static void trueEachBlock(int wx, int wy, float range, Cons<Building> cons){
+    public static void trueEachBlock(float wx, float wy, float range, Cons<Building> cons){
         collidedBlocks.clear();
 
         int tx = World.toTile(wx);

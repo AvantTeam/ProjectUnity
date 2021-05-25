@@ -72,7 +72,7 @@ public class UnityBlocks implements ContentList{
     public static @FactionDef("light")
     Block oreLuminum,
 
-    photon, electron, graviton, proton, neutron, /*gluon,*/ wBoson, zBoson, higgsBoson, /*singularity,*/ muon, ephemeron,
+    photon, electron, graviton, proton, neutron, /*gluon,*/ wBoson, zBoson, higgsBoson, singularity, muon, ephemeron,
 
     lightLamp, oilLamp, lightLaser, lightLampInfi, lightReflector, lightReflector1, lightOmnimirror, lightFilter, lightInvertedFilter, lightDivisor, lightDivisor1, lightItemFilter, lightPanel, lightInfluencer,
 
@@ -875,7 +875,63 @@ public class UnityBlocks implements ContentList{
             }
         };
 
-        //Singularity
+        singularity = new PowerTurret("singularity"){
+            {
+                requirements(Category.turret, with(Items.silicon, 290, UnityItems.luminum, 430, Items.titanium, 190, Items.thorium, 120, UnityItems.lightAlloy, 20));
+                size = 7;
+                health = 9800;
+                reloadTime = 220f;
+                coolantMultiplier = 1.1f;
+                shootCone = 30f;
+                range = 310f;
+                heatColor = UnityPal.lightHeat;
+                rotateSpeed = 3.3f;
+                recoilAmount = 6f;
+                powerUse = 39.3f;
+                cooldown = 0.012f;
+                shootSound = UnitySounds.singularityShoot;
+                shootType = new BasicBulletType(6.6f, 7f){
+                    {
+                        lifetime = 110f;
+                        drag = 0.018f;
+                        pierce = pierceBuilding = true;
+                        hitSize = 9f;
+                        despawnEffect = hitEffect = Fx.none;
+                        fragBullets = 1;
+                        fragBullet = new SingularityBulletType(13f){{
+                            hitSize = 19f;
+                        }};
+                    }
+
+                    @Override
+                    public void update(Bullet b){
+                        super.update(b);
+
+                        if(Units.closestTarget(b.team, b.x, b.y, 20f) != null){
+                            b.remove();
+                        }
+
+                        if(b.timer.get(0, 2f + b.fslope() * 1.5f)){
+                            UnityFx.singularityTrail.at(b.x, b.y, 1f + b.fslope() * 4f, backColor);
+                        }
+                    }
+
+                    @Override
+                    public void draw(Bullet b){
+                        Draw.color(Pal.lancerLaser);
+                        Fill.circle(b.x, b.y, 7f + b.fout() * 1.5f);
+                        Draw.color(Color.white);
+                        Fill.circle(b.x, b.y, 5.5f + b.fout() * 1f);
+                    }
+                };
+            }
+
+            @Override
+            public void load(){
+                super.load();
+                baseRegion = atlas.find("unity-block-" + size);
+            }
+        };
 
         muon = new PowerTurret("muon"){ //Should it be animated? Since the animation in AC was disabled.
             {
