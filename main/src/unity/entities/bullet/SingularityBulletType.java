@@ -12,13 +12,14 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
 import unity.content.*;
+import unity.entities.bullet.GluonOrbBulletType.*;
 import unity.graphics.*;
 import unity.util.*;
 
 public class SingularityBulletType extends BasicBulletType{
-    public float force = 8f, scaledForce = 7f, tileDamage = 150f, radius = 230f, size = 5f;
+    public float force = 8f, scaledForce = 5f, tileDamage = 150f, radius = 230f, size = 5f;
     public float[] scales = {8.6f, 7f, 5.5f, 4.3f, 4.1f, 3.9f};
-    public Color[] colors = colors = new Color[]{Color.valueOf("4787ff80"), Pal.lancerLaser, Color.white, Pal.lancerLaser, UnityPal.lightEffect, Color.black};
+    public Color[] colors = new Color[]{Color.valueOf("4787ff80"), Pal.lancerLaser, Color.white, Pal.lancerLaser, UnityPal.lightEffect, Color.black};
 
     public SingularityBulletType(float damage){
         super(0.001f, damage);
@@ -26,6 +27,13 @@ public class SingularityBulletType extends BasicBulletType{
         pierce = pierceBuilding = true;
         hitEffect = Fx.none;
         despawnEffect = UnityFx.singularityDespawn;
+    }
+
+    @Override
+    public void init(Bullet b){
+        super.init(b);
+
+        b.data = new GluonOrbData();
     }
 
     @Override
@@ -47,27 +55,36 @@ public class SingularityBulletType extends BasicBulletType{
                          }
                      }
 
-                     float dst = Math.abs((Mathf.dst(b.x, b.y, e.x, e.y) / radius) - 1f);
+                     float dst = Math.abs(1f - (Mathf.dst(b.x, b.y, e.x, e.y) / radius));
 
                      e.damage(tileDamage * buildingDamageMultiplier * dst);
                  }
             });
         }
 
-        if(b.timer(2, 2f)){
-            Units.nearbyEnemies(b.team, b.x - radius, b.y - radius, 2 * radius, 2 * radius, u -> {
-                if(u != null && Mathf.within(b.x, b.y, u.x, u.y, radius)){
-                    Tmp.v1.trns(u.angleTo(b), force + (1f - u.dst(b) / radius) * scaledForce * b.fin(Interp.exp10Out) * (u.isFlying() ? 1.5f : 1f));
+        if(b.data instanceof GluonOrbData data){
+            if(b.timer(2, 2f)){
+                data.units.clear();
+                Units.nearbyEnemies(b.team, b.x - radius, b.y - radius, 2 * radius, 2 * radius, u -> {
+                    if(u != null && Mathf.within(b.x, b.y, u.x, u.y, radius)){
+                        data.units.add(u);
+
+                        if(Mathf.within(b.x, b.y, u.x, u.y, (interp * size * 3.9f) + u.hitSize / 2f)){
+                            u.damage(120);
+                        }
+                    }
+                });
+
+                Damage.damage(b.team, b.x, b.y, hitSize, damage);
+            }
+
+            data.units.each(u -> {
+                if(!u.dead){
+                    Tmp.v1.trns(u.angleTo(b), force + ((1f - u.dst(b) / radius) * scaledForce * b.fin(Interp.exp10Out) * (u.isFlying() ? 1.5f : 1f))).scl(80f);
 
                     u.impulse(Tmp.v1);
-
-                    if(Mathf.within(b.x, b.y, u.x, u.y, (interp * size * 3.9f) + u.hitSize / 2f)){
-                        u.damage(120);
-                    }
                 }
             });
-
-            Damage.damage(b.team, b.x, b.y, hitSize, damage);
         }
     }
 

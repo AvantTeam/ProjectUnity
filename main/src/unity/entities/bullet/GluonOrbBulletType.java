@@ -53,19 +53,24 @@ public class GluonOrbBulletType extends BasicBulletType{
 
             Units.nearbyEnemies(b.team, b.x - radius, b.y - radius, radius * 2f, radius * 2f, u -> {
                 if(u != null && Mathf.within(b.x, b.y, u.x, u.y, radius)){
-                    float ang = u.angleTo(b);
-
-                    if(Angles.angleDist(b.rotation() - 180f, ang) < 90f){
-                        Tmp.v1.trns(ang, force + (1f - u.dst(b) / radius) * scaledForce * (u.isFlying() ? 1.5f : 1f));
-
-                        u.impulse(Tmp.v1);
-                    }
-
                     d.units.add(u);
                 }
             });
 
             Damage.damage(b.team, b.x, b.y, hitSize, damage);
+        }
+
+        if(b.data instanceof GluonOrbData d){
+            d.units.each(u -> {
+                if(u.dead) return;
+                float ang = u.angleTo(b);
+
+                if(Angles.angleDist(b.rotation() - 180f, ang) < 90f){
+                    Tmp.v1.trns(ang, force + ((1f - (u.dst(b) / radius)) * scaledForce * (u.isFlying() ? 1.5f : 1f))).scl(80f);
+
+                    u.impulse(Tmp.v1);
+                }
+            });
         }
     }
 
@@ -86,11 +91,7 @@ public class GluonOrbBulletType extends BasicBulletType{
         Fill.circle(b.x, b.y, 4.5f + b.fout());
     }
 
-    public class GluonOrbData{ //Couldn't just make `b.data` a Seq<Unit> because of casting from Object issues or whatever idk Glenn could probably do this better.
+    public static class GluonOrbData{ //Couldn't just make `b.data` a Seq<Unit> because of casting from Object issues or whatever idk Glenn could probably do this better.
         Seq<Unit> units = new Seq<>();
-
-        public GluonOrbData(){
-            //Nothing needed
-        }
     }
 }
