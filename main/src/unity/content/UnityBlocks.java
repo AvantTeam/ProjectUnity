@@ -72,7 +72,7 @@ public class UnityBlocks implements ContentList{
     public static @FactionDef("light")
     Block oreLuminum,
 
-    photon, electron, graviton, proton, neutron, /*gluon,*/ wBoson, zBoson, higgsBoson, singularity, muon, ephemeron,
+    photon, electron, graviton, proton, neutron, gluon, wBoson, zBoson, higgsBoson, singularity, muon, ephemeron,
 
     lightLamp, oilLamp, lightLaser, lightLampInfi, lightReflector, lightReflector1, lightOmnimirror, lightFilter, lightInvertedFilter, lightDivisor, lightDivisor1, lightItemFilter, lightPanel, lightInfluencer,
 
@@ -628,8 +628,6 @@ public class UnityBlocks implements ContentList{
             };
         }};
 
-        //Gluon
-
         proton = new PowerTurret("proton"){{
             requirements(Category.turret, with(Items.lead, 110, Items.silicon, 75, UnityItems.luminum, 165, Items.titanium, 135));
             size = 4;
@@ -712,6 +710,23 @@ public class UnityBlocks implements ContentList{
                     }
                 }
             };
+        }};
+
+        gluon = new PowerTurret("gluon"){{
+            requirements(Category.turret, with(Items.silicon, 300, UnityItems.luminum, 430, Items.titanium, 190, Items.thorium, 110, UnityItems.lightAlloy, 15));
+            size = 4;
+            health = 5000;
+            reloadTime = 90f;
+            coolantMultiplier = 3f;
+            shootCone = 30f;
+            range = 200f;
+            heatColor = UnityPal.lightHeat;
+            rotateSpeed = 4.3f;
+            recoilAmount = 2f;
+            powerUse = 1.9f;
+            cooldown = 0.012f;
+            shootSound = UnitySounds.gluonShoot;
+            shootType = UnityBullets.gluonOrb;
         }};
 
         wBoson = new PowerTurret("w-boson"){
@@ -890,41 +905,7 @@ public class UnityBlocks implements ContentList{
                 powerUse = 39.3f;
                 cooldown = 0.012f;
                 shootSound = UnitySounds.singularityShoot;
-                shootType = new BasicBulletType(6.6f, 7f){
-                    {
-                        lifetime = 110f;
-                        drag = 0.018f;
-                        pierce = pierceBuilding = true;
-                        hitSize = 9f;
-                        despawnEffect = hitEffect = Fx.none;
-                        fragBullets = 1;
-                        fragBullet = new SingularityBulletType(13f){{
-                            lifetime = 3.5f * 60f;
-                            hitSize = 19f;
-                        }};
-                    }
-
-                    @Override
-                    public void update(Bullet b){
-                        super.update(b);
-
-                        if(Units.closestTarget(b.team, b.x, b.y, 20f) != null){
-                            b.remove();
-                        }
-
-                        if(b.timer.get(0, 2f + b.fslope() * 1.5f)){
-                            UnityFx.singularityTrail.at(b.x, b.y, 1f + b.fslope() * 4f, backColor);
-                        }
-                    }
-
-                    @Override
-                    public void draw(Bullet b){
-                        Draw.color(Pal.lancerLaser);
-                        Fill.circle(b.x, b.y, 7f + b.fout() * 1.5f);
-                        Draw.color(Color.white);
-                        Fill.circle(b.x, b.y, 5.5f + b.fout() * 1f);
-                    }
-                };
+                shootType = UnityBullets.singularityOrb;
             }
 
             @Override

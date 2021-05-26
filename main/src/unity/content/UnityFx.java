@@ -266,6 +266,30 @@ public class UnityFx{
         });
     }),
 
+    whirl = new Effect(65f, e -> {
+        for(var i = 0; i < 2; i++){
+            var h = i * 2;
+            var r1 = Interp.exp5In.apply((Mathf.randomSeedRange(e.id + h, 1f) + 1f) / 2f);
+            var r2 = (Mathf.randomSeedRange(e.id * 2L + h, 360) + 360f) / 2f;
+            var r3 = (Mathf.randomSeedRange(e.id * 4L + h, 5) + 5f) / 2f;
+            var a = r2 + ((180f + r3) * e.fin());
+
+            Tmp.v1.trns(a, r1 * 70f * e.fout());
+
+            color(Pal.lancerLaser);
+            stroke(e.fout() + 0.25f);
+            lineAngle(e.x + Tmp.v1.x, e.y + Tmp.v1.y, a + 270f + 15f, e.fout() * 8f);
+        }
+    }),
+
+    lightHexagonTrail = new Effect(55f, e -> {
+        color(Pal.lancerLaser, UnityPal.lightEffect, e.fin());
+
+        Fill.poly(e.x, e.y, 6, e.rotation * e.fout(), e.rotation);
+
+        color();
+    }),
+
     protonHit = new Effect(20f, e -> {
         color(Pal.lancerLaser, Color.valueOf("4787ff00"), e.fin());
         stroke(e.fout() * 4f);
@@ -384,14 +408,6 @@ public class UnityFx{
             rect(d.region, lerpx, lerpy, d.region.width * scl * size, d.region.height * scl * size, (e.fin() * Mathf.randomSeedRange(e.id, 32f)) + rot);
         }
     }).layer(Layer.effect + 0.02f),
-
-    singularityTrail = new Effect(55f, e -> {
-        color(Pal.lancerLaser, UnityPal.lightEffect, e.fin());
-
-        Fill.poly(e.x, e.y, 6, e.rotation * e.fout(), e.rotation);
-
-        color();
-    }),
 
     orbHit = new Effect(12f, e -> {
         color(Pal.surge);

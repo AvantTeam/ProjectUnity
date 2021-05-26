@@ -41,6 +41,8 @@ public class UnityBullets implements ContentList{
 
         plagueMissile,
 
+        gluonWhirl, gluonOrb, singularityBlackHole, singularityOrb,
+
         orb, shockBeam, currentStroke, shielderBullet, plasmaFragTriangle, plasmaTriangle, surgeBomb,
 
         pylonLightning, pylonLaser, pylonLaserSmall, monumentRailBullet,
@@ -599,6 +601,69 @@ public class UnityBullets implements ContentList{
             hitEffect = Fx.blastExplosion;
             despawnEffect = Fx.blastExplosion;
         }};
+
+        gluonWhirl = new GluonWhirlBulletType(4f){{
+            lifetime = 5f * 60f;
+            hitSize = 12f;
+        }};
+
+        gluonOrb = new GluonOrbBulletType(8.6f, 10f){
+            {
+                lifetime = 50f;
+                drag = 0.03f;
+                hitSize = 9f;
+            }
+
+            @Override
+            public void despawned(Bullet b){
+                super.despawned(b);
+
+                gluonWhirl.create(b, b.x, b.y, 0f);
+            }
+        };
+
+        singularityBlackHole = new SingularityBulletType(26f){{
+            lifetime = 3.5f * 60f;
+            hitSize = 19f;
+        }};
+
+        singularityOrb = new BasicBulletType(6.6f, 7f){
+            {
+                lifetime = 110f;
+                drag = 0.018f;
+                pierce = pierceBuilding = true;
+                hitSize = 9f;
+                despawnEffect = hitEffect = Fx.none;
+            }
+
+            @Override
+            public void update(Bullet b){
+                super.update(b);
+
+                if(Units.closestTarget(b.team, b.x, b.y, 20f) != null){
+                    b.remove();
+                }
+
+                if(b.timer.get(0, 2f + b.fslope() * 1.5f)){
+                    UnityFx.lightHexagonTrail.at(b.x, b.y, 1f + b.fslope() * 4f, backColor);
+                }
+            }
+
+            @Override
+            public void despawned(Bullet b){
+                super.despawned(b);
+
+                singularityBlackHole.create(b, b.x, b.y, 0f);
+            }
+
+            @Override
+            public void draw(Bullet b){
+                Draw.color(Pal.lancerLaser);
+                Fill.circle(b.x, b.y, 7f + b.fout() * 1.5f);
+                Draw.color(Color.white);
+                Fill.circle(b.x, b.y, 5.5f + b.fout());
+            }
+        };
 
         orb = new BulletType(){
             {
