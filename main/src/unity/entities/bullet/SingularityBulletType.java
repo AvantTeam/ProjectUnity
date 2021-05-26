@@ -18,8 +18,8 @@ import unity.util.*;
 
 public class SingularityBulletType extends BasicBulletType{
     public float force = 8f, scaledForce = 5f, tileDamage = 150f, radius = 230f, size = 5f;
-    public float[] scales = {8.6f, 7f, 5.5f, 4.3f, 4.1f, 3.9f};
-    public Color[] colors = new Color[]{Color.valueOf("4787ff80"), Pal.lancerLaser, Color.white, Pal.lancerLaser, UnityPal.lightEffect, Color.black};
+    public float[] scales = {8.6f, 7f, 5.5f, 4.2f, 3.9f};
+    public Color[] colors = new Color[]{Color.valueOf("4787ff80"), Pal.lancerLaser, Color.white, Pal.lancerLaser, Color.black};
 
     public SingularityBulletType(float damage){
         super(0.001f, damage);
@@ -94,7 +94,11 @@ public class SingularityBulletType extends BasicBulletType{
 
         for(int i = 0; i < colors.length; i++){
             Draw.color(colors[i]);
-            Fill.circle(b.x + Mathf.range(1), b.y + Mathf.range(1), interp * size * scales[i]);
+            if(i != 0f){
+                UnityDrawf.shiningCircle(b.id, Time.time - i, b.x + Mathf.range(0.5f), b.y + Mathf.range(0.5f), interp * size * scales[i], 6, 30f, 17f, 10f * interp, 60f);
+            }else{
+                Fill.circle(b.x + Mathf.range(0.5f), b.y + Mathf.range(0.5f), interp * size * scales[i]);
+            }
         }
 
         Draw.color();
