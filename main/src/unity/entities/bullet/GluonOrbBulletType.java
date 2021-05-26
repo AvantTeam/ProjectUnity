@@ -65,8 +65,8 @@ public class GluonOrbBulletType extends BasicBulletType{
                 if(u.dead) return;
                 float ang = u.angleTo(b);
 
-                if(Angles.angleDist(b.rotation() - 180f, ang) < 90f){
-                    Tmp.v1.trns(ang, force + ((1f - (u.dst(b) / radius)) * scaledForce * (u.isFlying() ? 1.5f : 1f))).scl(80f);
+                if(Angles.angleDist(b.rotation(), ang) < 90f){
+                    Tmp.v1.trns(ang, force + ((1f - (u.dst(b) / radius)) * scaledForce * (u.isFlying() ? 1.5f : 1f))).scl(20f);
 
                     u.impulse(Tmp.v1);
                 }

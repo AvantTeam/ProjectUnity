@@ -80,7 +80,7 @@ public class SingularityBulletType extends BasicBulletType{
 
             data.units.each(u -> {
                 if(!u.dead){
-                    Tmp.v1.trns(u.angleTo(b), force + ((1f - u.dst(b) / radius) * scaledForce * b.fin(Interp.exp10Out) * (u.isFlying() ? 1.5f : 1f))).scl(80f);
+                    Tmp.v1.trns(u.angleTo(b), force + ((1f - u.dst(b) / radius) * scaledForce * b.fin(Interp.exp10Out) * (u.isFlying() ? 1.5f : 1f))).scl(20f);
 
                     u.impulse(Tmp.v1);
                 }
