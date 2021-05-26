@@ -27,7 +27,7 @@ import unity.graphics.*;
 import unity.util.*;
 
 import static mindustry.Vars.*;
-import static unity.content.UnityStatusEffects.distort;
+import static unity.content.UnityStatusEffects.*;
 
 public class UnityBullets implements ContentList{
     public static BulletType
@@ -41,7 +41,7 @@ public class UnityBullets implements ContentList{
 
         plagueMissile,
 
-        gluonWhirl, gluonOrb, singularityBlackHole, singularityOrb,
+        gluonWhirl, gluonEnergyBall, singularityBlackHole, singularityEnergyBall,
 
         orb, shockBeam, currentStroke, shielderBullet, plasmaFragTriangle, plasmaTriangle, surgeBomb,
 
@@ -607,7 +607,7 @@ public class UnityBullets implements ContentList{
             hitSize = 12f;
         }};
 
-        gluonOrb = new GluonOrbBulletType(8.6f, 10f){
+        gluonEnergyBall = new GluonOrbBulletType(8.6f, 10f){
             {
                 lifetime = 50f;
                 drag = 0.03f;
@@ -627,7 +627,7 @@ public class UnityBullets implements ContentList{
             hitSize = 19f;
         }};
 
-        singularityOrb = new BasicBulletType(6.6f, 7f){
+        singularityEnergyBall = new BasicBulletType(6.6f, 7f){
             {
                 lifetime = 110f;
                 drag = 0.018f;

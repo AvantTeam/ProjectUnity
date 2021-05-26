@@ -726,7 +726,7 @@ public class UnityBlocks implements ContentList{
             powerUse = 1.9f;
             cooldown = 0.012f;
             shootSound = UnitySounds.gluonShoot;
-            shootType = UnityBullets.gluonOrb;
+            shootType = UnityBullets.gluonEnergyBall;
         }};
 
         wBoson = new PowerTurret("w-boson"){
@@ -905,7 +905,7 @@ public class UnityBlocks implements ContentList{
                 powerUse = 39.3f;
                 cooldown = 0.012f;
                 shootSound = UnitySounds.singularityShoot;
-                shootType = UnityBullets.singularityOrb;
+                shootType = UnityBullets.singularityEnergyBall;
             }
 
             @Override
