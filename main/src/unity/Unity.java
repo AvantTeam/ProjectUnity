@@ -32,7 +32,7 @@ public class Unity extends Mod implements ApplicationListener{
     public static UnityAntiCheat antiCheat;
     public static UnitySettings unitySettings = new UnitySettings();
 
-    public final ContentList[] unityContent = new ContentList[]{
+    private final ContentList[] unityContent = {
         new UnityContentTypes(),
         new UnityItems(),
         new UnityStatusEffects(),

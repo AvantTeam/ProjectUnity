@@ -672,6 +672,23 @@ public class MergeProcessor extends BaseProcessor{
             }
         }
 
+        ExecutableElement elem = values.first();
+        if(
+            annotation(elem, Override.class) != null &&
+            elem.getReturnType().getKind() == VOID &&
+            !(
+                simpleName(elem).equals("write") ||
+                (simpleName(elem).equals("read") && elem.getParameters().size() == 2)
+            ) &&
+            superCall && !superCalled
+        ){
+            Seq<ParameterSpec> params = Seq.with(mbuilder.parameters);
+            String argLiteral = params.toString(", ", e -> "$L");
+            Object[] args = Seq.with(simpleName(values.first())).and(params.map(p -> p.name)).toArray(Object.class);
+
+            mbuilder.addStatement("super.$L(" + argLiteral + ")", args);
+        }
+
         return firstc;
     }
 

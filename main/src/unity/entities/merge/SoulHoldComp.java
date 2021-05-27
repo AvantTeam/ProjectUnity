@@ -4,6 +4,7 @@ import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+import mindustry.world.blocks.defense.turrets.Turret.*;
 import unity.annotations.Annotations.*;
 import unity.gen.*;
 import unity.mod.*;
@@ -37,13 +38,17 @@ class SoulHoldComp extends Block{
 
         @Override
         public boolean canControl(){
-            return canJoin() && (headless || (player != null && player.unit() instanceof Monolithc unit && unit.isSameFaction(this)));
+            return canJoin() && (headless || (player != null && player.unit() instanceof Monolithc unit && unit.souls() > 0 && unit.isSameFaction(this)));
         }
 
         @Override
         public void created(){
-            unit = UnitTypes.block.create(team).as();
-            unit.tile(this);
+            if(self() instanceof TurretBuild build){
+                unit = build.unit;
+            }else{
+                unit = UnitTypes.block.create(team).as();
+                unit.tile(this);
+            }
         }
 
         @Override

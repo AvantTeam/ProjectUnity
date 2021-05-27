@@ -41,12 +41,12 @@ class TurretComp extends Turret{
         super(name);
     }
 
-    public <T extends TurretBuildc> void damageMultiplier(Floatf<T> draw){
-        this.damageMultiplier = (Floatf<TurretBuildc>)draw;
+    public <T extends TurretBuildc> void damageMultiplier(Floatf<T> damageMultiplier){
+        this.damageMultiplier = (Floatf<TurretBuildc>)damageMultiplier;
     }
 
-    public <T extends TurretBuildc> void bulletData(Func<T, Object> update){
-        this.bulletData = (Func<TurretBuildc, Object>)update;
+    public <T extends TurretBuildc> void bulletData(Func<T, Object> bulletData){
+        this.bulletData = (Func<TurretBuildc, Object>)bulletData;
     }
 
     public class TurretBuildComp extends TurretBuild{
