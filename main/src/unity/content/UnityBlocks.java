@@ -72,7 +72,7 @@ public class UnityBlocks implements ContentList{
     public static @FactionDef("light")
     Block oreLuminum,
 
-    photon, electron, graviton, proton, neutron, /*gluon,*/ wBoson, zBoson, higgsBoson, /*singularity,*/ muon, ephemeron,
+    photon, electron, graviton, proton, neutron, gluon, wBoson, zBoson, higgsBoson, singularity, muon, ephemeron,
 
     lightLamp, oilLamp, lightLaser, lightLampInfi, lightReflector, lightReflector1, lightOmnimirror, lightFilter, lightInvertedFilter, lightDivisor, lightDivisor1, lightItemFilter, lightPanel, lightInfluencer,
 
@@ -628,8 +628,6 @@ public class UnityBlocks implements ContentList{
             };
         }};
 
-        //Gluon
-
         proton = new PowerTurret("proton"){{
             requirements(Category.turret, with(Items.lead, 110, Items.silicon, 75, UnityItems.luminum, 165, Items.titanium, 135));
             size = 4;
@@ -712,6 +710,23 @@ public class UnityBlocks implements ContentList{
                     }
                 }
             };
+        }};
+
+        gluon = new PowerTurret("gluon"){{
+            requirements(Category.turret, with(Items.silicon, 300, UnityItems.luminum, 430, Items.titanium, 190, Items.thorium, 110, UnityItems.lightAlloy, 15));
+            size = 4;
+            health = 5000;
+            reloadTime = 90f;
+            coolantMultiplier = 3f;
+            shootCone = 30f;
+            range = 200f;
+            heatColor = UnityPal.lightHeat;
+            rotateSpeed = 4.3f;
+            recoilAmount = 2f;
+            powerUse = 1.9f;
+            cooldown = 0.012f;
+            shootSound = UnitySounds.gluonShoot;
+            shootType = UnityBullets.gluonEnergyBall;
         }};
 
         wBoson = new PowerTurret("w-boson"){
@@ -875,7 +890,30 @@ public class UnityBlocks implements ContentList{
             }
         };
 
-        //Singularity
+        singularity = new PowerTurret("singularity"){
+            {
+                requirements(Category.turret, with(Items.silicon, 290, UnityItems.luminum, 430, Items.titanium, 190, Items.thorium, 120, UnityItems.lightAlloy, 20));
+                size = 7;
+                health = 9800;
+                reloadTime = 220f;
+                coolantMultiplier = 1.1f;
+                shootCone = 30f;
+                range = 310f;
+                heatColor = UnityPal.lightHeat;
+                rotateSpeed = 3.3f;
+                recoilAmount = 6f;
+                powerUse = 39.3f;
+                cooldown = 0.012f;
+                shootSound = UnitySounds.singularityShoot;
+                shootType = UnityBullets.singularityEnergyBall;
+            }
+
+            @Override
+            public void load(){
+                super.load();
+                baseRegion = atlas.find("unity-block-" + size);
+            }
+        };
 
         muon = new PowerTurret("muon"){ //Should it be animated? Since the animation in AC was disabled.
             {

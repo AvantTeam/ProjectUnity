@@ -14,7 +14,7 @@ import unity.graphics.*;
 import static unity.content.UnityFx.distortFx;
 
 public class UnityStatusEffects implements ContentList{
-    public static StatusEffect disabled, plasmaed, radiation, reloadFatigue, blueBurn, molten, tpCoolDown, teamConverted, boosted, distort, plated;
+    public static StatusEffect disabled, weaken, plasmaed, radiation, reloadFatigue, blueBurn, molten, tpCoolDown, teamConverted, boosted, distort, plated;
 
     @Override
     public void load(){
@@ -22,6 +22,12 @@ public class UnityStatusEffects implements ContentList{
             reloadMultiplier = 0f;
             speedMultiplier = 0f;
             disarm = true;
+        }};
+
+        weaken = new StatusEffect("weaken"){{
+            damageMultiplier = 0.75f;
+            healthMultiplier = 0.75f;
+            speedMultiplier = 0.5f;
         }};
 
         plasmaed = new StatusEffect("plasmaed"){{

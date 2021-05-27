@@ -18,8 +18,8 @@ import unity.entities.*;
 import unity.entities.abilities.BaseAbility.*;
 import unity.entities.bullet.*;
 import unity.entities.bullet.EphemeronBulletType.*;
+import unity.entities.bullet.SingularityBulletType.*;
 import unity.entities.effects.*;
-import unity.gen.*;
 import unity.graphics.*;
 import unity.type.*;
 import unity.util.*;
@@ -48,7 +48,7 @@ public class UnityFx{
         float fslope = fin * (1f - fin) * 4f;
         float sfin = Interp.pow2In.apply(fin);
         float spread = d / 4f;
-        Tmp.v1.trns(a, Mathf.randomSeed(e.id * 2l, -spread, spread) * fslope, d * sfin);
+        Tmp.v1.trns(a, Mathf.randomSeed(e.id * 2L, -spread, spread) * fslope, d * sfin);
         Tmp.v1.add(e.x, e.y);
 
         color(UnityPal.expColor, Color.white, 0.1f + 0.1f * Mathf.sin(Time.time * 0.03f + e.id * 3f));
@@ -170,7 +170,7 @@ public class UnityFx{
     craftingEffect = new Effect(67f, 35f, e -> {
         float value = Mathf.randomSeed(e.id);
 
-        Tmp.v1.trns(value * 360f + ((value + 4f) * e.fin() * 80f), (Mathf.randomSeed(e.id * 126) + 1f) * 34f * (1f - e.finpow()));
+        Tmp.v1.trns(value * 360f + ((value + 4f) * e.fin() * 80f), (Mathf.randomSeed(e.id * 126L) + 1f) * 34f * (1f - e.finpow()));
 
         color(UnityPal.laserOrange);
         Fill.square(e.x + Tmp.v1.x, e.y + Tmp.v1.y, e.fslope() * 3f, 45f);
@@ -264,6 +264,30 @@ public class UnityFx{
             float a = Mathf.angle(x, y);
             Fill.poly(e.x + x, e.y + y, 3, e.fout() * 4f, e.fin() * 120f + e.rotation + a);
         });
+    }),
+
+    whirl = new Effect(65f, e -> {
+        for(var i = 0; i < 2; i++){
+            var h = i * 2;
+            var r1 = Interp.exp5In.apply((Mathf.randomSeedRange(e.id + h, 1f) + 1f) / 2f);
+            var r2 = (Mathf.randomSeedRange(e.id * 2L + h, 360) + 360f) / 2f;
+            var r3 = (Mathf.randomSeedRange(e.id * 4L + h, 5) + 5f) / 2f;
+            var a = r2 + ((180f + r3) * e.fin());
+
+            Tmp.v1.trns(a, r1 * 70f * e.fout());
+
+            color(Pal.lancerLaser);
+            stroke(e.fout() + 0.25f);
+            lineAngle(e.x + Tmp.v1.x, e.y + Tmp.v1.y, a + 270f + 15f, e.fout() * 8f);
+        }
+    }),
+
+    lightHexagonTrail = new Effect(55f, e -> {
+        color(Pal.lancerLaser, UnityPal.lightEffect, e.fin());
+
+        Fill.poly(e.x, e.y, 6, e.rotation * e.fout(), e.rotation);
+
+        color();
     }),
 
     protonHit = new Effect(20f, e -> {
@@ -363,6 +387,28 @@ public class UnityFx{
 	    Lines.circle(e.x, e.y, e.finpow() * 30f);
     }),
 
+    singularityDespawn = new Effect(12f, e -> {
+        float[] scales = {8.6f, 7f, 5.5f, 4.3f, 4.1f, 3.9f};
+        Color[] colors = new Color[]{Color.valueOf("4787ff80"), Pal.lancerLaser, Color.white, Pal.lancerLaser, UnityPal.lightEffect, Color.black    };
+
+        for(int i = 0; i < colors.length; i++){
+            color(colors[i]);
+            Fill.circle(e.x + Mathf.range(1), e.y + Mathf.range(1), e.fout() * 5f * scales[i]);
+        }
+    }),
+
+    singularityAttraction = new Effect(23f, 180f, e -> {
+        if(e.data instanceof SingularityAbsorbEffectData d){
+            float interp = e.fin(Interp.pow3In);
+            float size = 1f - e.fin(Interp.pow5In);
+            float rot = e.rotation * 90f;
+            float lerpx = Mathf.lerp(d.x, e.x, interp);
+            float lerpy = Mathf.lerp(d.y, e.y, interp);
+
+            rect(d.region, lerpx, lerpy, d.region.width * scl * size, d.region.height * scl * size, (e.fin() * Mathf.randomSeedRange(e.id, 32f)) + rot);
+        }
+    }).layer(Layer.effect + 0.02f),
+
     orbHit = new Effect(12f, e -> {
         color(Pal.surge);
         stroke(e.fout() * 1.5f);
@@ -381,18 +427,13 @@ public class UnityFx{
     }),
 
     orbTrail = new Effect(43f, e -> {
-        float originalZ = z();
+        Tmp.v1.trns(Mathf.randomSeed(e.id) * 360f, Mathf.randomSeed(e.id * 341L) * 12f * e.fin());
 
-        Tmp.v1.trns(Mathf.randomSeed(e.id) * 360f, Mathf.randomSeed(e.id * 341) * 12f * e.fin());
-
-        z(Layer.bullet - 0.01f);
         Drawf.light(e.x + Tmp.v1.x, e.y + Tmp.v1.y, 4.7f * e.fout() + 3f, Pal.surge, 0.6f);
 
         color(Pal.surge);
         Fill.circle(e.x + Tmp.v1.x, e.y + Tmp.v1.y, e.fout() * 2.7f);
-
-        z(originalZ);
-    }),
+    }).layer(Layer.bullet - 0.01f),
 
     orbShootSmoke = new Effect(26f, e -> {
         color(Pal.surge);
@@ -439,22 +480,14 @@ public class UnityFx{
     }),
 
     plasmaFragAppear = new Effect(12f, e -> {
-        z(Layer.bullet - 0.01f);
-
         color(Color.white);
         Drawf.tri(e.x, e.y, e.fin() * 12f, e.fin() * 13f, e.rotation);
-
-        z();
-    }),
+    }).layer(Layer.bullet - 0.01f),
 
     plasmaFragDisappear = new Effect(12f, e -> {
-        z(Layer.bullet - 0.01f);
-
         color(Pal.surge, Color.white, e.fin());
         Drawf.tri(e.x, e.y, e.fout() * 10f, e.fout() * 11f, e.rotation);
-
-        z();
-    }),
+    }).layer(Layer.bullet - 0.01f),
     
     surgeSplash = new Effect(40f, 100f, e -> {
         color(Pal.surge);
@@ -544,10 +577,10 @@ public class UnityFx{
         color(e.color, Color.white, e.fin());
         //unity.Unity.print(lenInt,"  ",length);
         for(int i = 0; i < lenInt; i++){
-            float offsetXA = i == 0 ? 0 : Mathf.randomSeed(e.id + i * 6413, -4.5f, 4.5f);
+            float offsetXA = i == 0 ? 0 : Mathf.randomSeed(e.id + i * 6413L, -4.5f, 4.5f);
             float offsetYA = length / lenInt * i;
             int j = i + 1;
-            float offsetXB = j == lenInt ? 0 : Mathf.randomSeed(e.id + j * 6413, -4.5f, 4.5f);
+            float offsetXB = j == lenInt ? 0 : Mathf.randomSeed(e.id + j * 6413L, -4.5f, 4.5f);
             float offsetYB = length / lenInt * j;
             Tmp.v1.trns(e.rotation, offsetYA, offsetXA);
             Tmp.v1.add(e.x, e.y);
@@ -704,38 +737,34 @@ public class UnityFx{
         float whenReady = (float)data[0];
         Unit u = (Unit)data[1];
         if(u == null || !u.isValid() || u.dead) return;
-        z(Layer.effect - 0.00001f);
         color(e.color);
         stroke(e.fout() * 1.5f);
         polySeg(60, 0, (int)(60 * (1 - (e.rotation - Time.time) / whenReady)), u.x, u.y, 8f, 0f);
-    }),
+    }).layer(Layer.effect - 0.00001f),
 
     //^ this but better
     waitEffect = new Effect(30f, e -> {
         if(e.data instanceof WaitEffectData data){
             if(data.unit() == null || !data.unit().isValid() || data.unit().dead) return;
 
-            z(Layer.effect - 0.00001f);
             color(e.color);
             stroke(e.fout() * 1.5f);
             polySeg(60, 0, (int)(60f * data.progress()), data.unit().x, data.unit().y, 8f, 0f);
         }
-    }),
+    }).layer(Layer.effect - 0.00001f),
 
     waitEffect2 = new Effect(30f, e -> {
         if(e.data instanceof WaitEffectData data){
             if(data.unit() == null || !data.unit().isValid() || data.unit().dead) return;
 
-            z(Layer.effect - 0.00001f);
             color(e.color);
             stroke(e.fout() * 1.5f);
             polySeg(90, 0, (int)(90f * data.progress()), data.unit().x, data.unit().y, 12f, 0f);
         }
-    }),
+    }).layer(Layer.effect - 0.00001f),
 
     ringFx = new Effect(25f, e -> {
-        if(!(e.data instanceof Unit)) return;
-        Unit u = (Unit)e.data;
+        if(!(e.data instanceof Unit u)) return;
         if(!u.isValid() || u.dead) return;
         color(Color.white, e.color, e.fin());
         stroke(e.fout() * 1.5f);
@@ -753,8 +782,7 @@ public class UnityFx{
     }),
 
     smallRingFx = new Effect(20f, e -> {
-        if(!(e.data instanceof Unit)) return;
-        Unit u = (Unit)e.data;
+        if(!(e.data instanceof Unit u)) return;
         if(!u.isValid() || u.dead) return;
         color(Color.white, e.color, e.fin());
         stroke(e.fin());
@@ -772,8 +800,7 @@ public class UnityFx{
     }),
 
     squareFx = new Effect(25f, e -> {
-        if(!(e.data instanceof Unit)) return;
-        Unit u = (Unit)e.data;
+        if(!(e.data instanceof Unit u)) return;
         if(!u.isValid() || u.dead) return;
         color(Color.white, e.color, e.fin());
         stroke(e.fout() * 2.5f);
@@ -1002,7 +1029,7 @@ public class UnityFx{
         blend(Blending.additive);
         Fill.poly(e.x, e.y, Lines.circleVertices(curve), curve);
         blend();
-    }).layer(110.99f),
+    }).layer(Layer.effect + 0.99f),
 
     vapourizeTile = new Effect(126f, (float)(Vars.tilesize * 16), e -> {
         color(Color.red);
@@ -1019,7 +1046,7 @@ public class UnityFx{
         blend();
         mixcol();
         color();
-    }).layer(111f),
+    }).layer(Layer.effect + 1f),
 
     vapourizeUnit = new Effect(126f, 512f, e -> {
         mixcol(Color.red, 1f);
@@ -1031,7 +1058,7 @@ public class UnityFx{
         blend();
         color();
         mixcol();
-    }).layer(111f),
+    }).layer(Layer.effect + 1f),
 
     endgameLaser = new Effect(76f, 820f * 2f, e -> {
         if(e.data == null) return;
@@ -1198,7 +1225,7 @@ public class UnityFx{
             float a = Mathf.randomSeed(e.id, 360f);
             float d = 0.5f + e.fout() * 0.5f;
 
-            float r = data.floatValue();
+            float r = data;
 
             color(Pal.lancerLaser);
             alpha(0.6f * e.fout());
@@ -1208,7 +1235,7 @@ public class UnityFx{
 
     supernovaCharge = new Effect(20f, e -> {
         if(e.data instanceof Float data){
-            float r = data.floatValue();
+            float r = data;
 
             color(Pal.lancerLaser);
             alpha(0.6f * e.fout());
@@ -1218,7 +1245,7 @@ public class UnityFx{
 
     supernovaChargeBegin = new Effect(27f, e -> {
         if(e.data instanceof Float data){
-            float r = data.floatValue();
+            float r = data;
             randLenVectors(e.id, (int)(2f * r), 1f + 27f * e.fout(), (x, y) -> {
                 color(Pal.lancerLaser);
                 lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), (1f + e.fslope() * 6f) * r);
@@ -1235,7 +1262,7 @@ public class UnityFx{
 
     supernovaChargeStar = new Effect(30f, e -> {
         if(e.data instanceof Float data){
-            float r = data.floatValue();
+            float r = data;
 
             color(Pal.lancerLaser);
             alpha(e.fin() * 2f * r);
@@ -1252,7 +1279,7 @@ public class UnityFx{
 
     supernovaChargeStar2 = new Effect(27f, e -> {
         if(e.data instanceof Float data){
-            float r = data.floatValue();
+            float r = data;
             randLenVectors(e.id, (int)(3f * r), e.fout() * ((90f + r * 150f) * (0.3f + Mathf.randomSeed(e.id, 0.7f))), (x, y) -> {
                 color(Pal.lancerLaser);
                 Fill.circle(e.x + x, e.y + y, 2f * e.fin());
@@ -1383,7 +1410,6 @@ public class UnityFx{
 
     plated = new Effect(30f, e -> {
         color(e.color);
-        z(Layer.effect);
         Fill.circle(e.x, e.y, e.fout() * (float) e.data);
     }),
 

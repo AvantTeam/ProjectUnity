@@ -146,10 +146,11 @@ public class UnityAntiCheat implements ApplicationListener{
                 b.counter++;
             });
             sampler.each(es -> {
-                if(es.duration <= 0f){
+                if(es.duration <= 0f && es.excludeDuration <= 0f){
                     samplerTmp.add(es);
                     samplerMap.remove(es.entity.id());
                 }
+                es.excludeDuration -= 15f;
                 es.duration -= 15f;
             });
             sampler.removeAll(samplerTmp);
@@ -160,24 +161,41 @@ public class UnityAntiCheat implements ApplicationListener{
     }
 
     public void samplerAdd(Healthc entity){
-        if(exclude.contains(entity.id())) return;
-        EntitySampler ent;
-        if((ent = samplerMap.get(entity.id())) != null){
-            if(entity.health() >= ent.lastHealth){
-                ent.duration = Math.max(30f, ent.duration);
-                if(ent.penalty++ >= 5){
-                    annihilateEntity(entity, true);
-                    samplerMap.remove(entity.id());
-                    sampler.remove(ent);
+        samplerAdd(entity, false);
+    }
+
+    public void samplerAdd(Healthc entity, boolean verified){
+        if(!verified){
+            if(exclude.contains(entity.id())) return;
+            EntitySampler ent;
+            if((ent = samplerMap.get(entity.id())) != null){
+                if(entity.health() >= ent.lastHealth && ent.excludeDuration <= 0f){
+                    ent.duration = Math.max(30f, ent.duration);
+                    if(ent.penalty++ >= 5){
+                        annihilateEntity(entity, false);
+                        samplerMap.remove(entity.id());
+                        sampler.remove(ent);
+                    }
                 }
+                return;
             }
-            return;
+            EntitySampler s = new EntitySampler(entity);
+            s.duration = 2f * 60f;
+            s.lastHealth = entity.health();
+            sampler.add(s);
+            samplerMap.put(entity.id(), s);
+        }else{
+            EntitySampler ent = samplerMap.get(entity.id());
+            if(ent != null){
+                ent.excludeDuration = 2 * 60f;
+            }else{
+                EntitySampler s = new EntitySampler(entity);
+                s.excludeDuration = 2 * 60f;
+                s.duration = 0f;
+                sampler.add(s);
+                samplerMap.put(entity.id(), s);
+            }
         }
-        EntitySampler s = new EntitySampler(entity);
-        s.duration = 2f * 60f;
-        s.lastHealth = entity.health();
-        sampler.add(s);
-        samplerMap.put(entity.id(), s);
     }
 
     public void removeBuilding(Building building){
@@ -219,7 +237,7 @@ public class UnityAntiCheat implements ApplicationListener{
 
     static class EntitySampler{
         Healthc entity;
-        float duration, lastHealth;
+        float duration, excludeDuration = 0f, lastHealth;
         int penalty = 0;
 
         EntitySampler(Healthc entity){

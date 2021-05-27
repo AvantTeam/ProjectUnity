@@ -1186,7 +1186,7 @@ public class UnityUnitTypes implements ContentList{
                     healPercent = 6f;
                     allyStatus = StatusEffects.overclock;
                     allyStatusDuration = 9f * 60f;
-                    status = StatusEffects.slow;
+                    status = UnityStatusEffects.weaken;
                     statusDuration = 40f;
                     lifetime = 6f * 60f;
                 }};

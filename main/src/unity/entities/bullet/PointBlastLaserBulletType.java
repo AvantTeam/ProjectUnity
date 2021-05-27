@@ -20,6 +20,7 @@ public class PointBlastLaserBulletType extends BulletType{
     public float width = 12f;
     public float widthReduction = 2f;
     public float auraWidthReduction = 3f;
+    public boolean overrideDamage = false;
     public Color[] laserColors = {Color.white};
 
     private static boolean available = false;
@@ -98,8 +99,9 @@ public class PointBlastLaserBulletType extends BulletType{
             Units.nearby(Tmp.v2.x - damageRadius, Tmp.v2.y - damageRadius, damageRadius * 2f, damageRadius * 2f, unit -> {
                 if(unit.team != b.team && unit.within(Tmp.v2.x, Tmp.v2.y, damageRadius)){
                     float ratio = b.damage / damage;
-                    handleUnit(b, unit, unit.health);
-                    unit.damage(auraDamage * ratio);
+                    float health = unit.health;
+                    if(!overrideDamage) unit.damage(auraDamage * ratio);
+                    handleUnit(b, unit, health);
                     unit.apply(status, statusDuration);
                 }
             });

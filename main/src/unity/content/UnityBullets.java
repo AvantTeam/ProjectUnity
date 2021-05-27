@@ -17,6 +17,7 @@ import mindustry.io.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.ctype.*;
+import unity.*;
 import unity.entities.bullet.*;
 import unity.entities.bullet.exp.*;
 import unity.entities.units.*;
@@ -26,7 +27,7 @@ import unity.graphics.*;
 import unity.util.*;
 
 import static mindustry.Vars.*;
-import static unity.content.UnityStatusEffects.distort;
+import static unity.content.UnityStatusEffects.*;
 
 public class UnityBullets implements ContentList{
     public static BulletType
@@ -39,6 +40,8 @@ public class UnityBullets implements ContentList{
         falloutLaser, catastropheLaser, calamityLaser, extinctionLaser,
 
         plagueMissile,
+
+        gluonWhirl, gluonEnergyBall, singularityBlackHole, singularityEnergyBall,
 
         orb, shockBeam, currentStroke, shielderBullet, plasmaFragTriangle, plasmaTriangle, surgeBomb,
 
@@ -599,6 +602,69 @@ public class UnityBullets implements ContentList{
             despawnEffect = Fx.blastExplosion;
         }};
 
+        gluonWhirl = new GluonWhirlBulletType(4f){{
+            lifetime = 5f * 60f;
+            hitSize = 12f;
+        }};
+
+        gluonEnergyBall = new GluonOrbBulletType(8.6f, 10f){
+            {
+                lifetime = 50f;
+                drag = 0.03f;
+                hitSize = 9f;
+            }
+
+            @Override
+            public void despawned(Bullet b){
+                super.despawned(b);
+
+                gluonWhirl.create(b, b.x, b.y, 0f);
+            }
+        };
+
+        singularityBlackHole = new SingularityBulletType(26f){{
+            lifetime = 3.5f * 60f;
+            hitSize = 19f;
+        }};
+
+        singularityEnergyBall = new BasicBulletType(6.6f, 7f){
+            {
+                lifetime = 110f;
+                drag = 0.018f;
+                pierce = pierceBuilding = true;
+                hitSize = 9f;
+                despawnEffect = hitEffect = Fx.none;
+            }
+
+            @Override
+            public void update(Bullet b){
+                super.update(b);
+
+                if(Units.closestTarget(b.team, b.x, b.y, 20f) != null){
+                    b.remove();
+                }
+
+                if(b.timer.get(0, 2f + b.fslope() * 1.5f)){
+                    UnityFx.lightHexagonTrail.at(b.x, b.y, 1f + b.fslope() * 4f, backColor);
+                }
+            }
+
+            @Override
+            public void despawned(Bullet b){
+                super.despawned(b);
+
+                singularityBlackHole.create(b, b.x, b.y, 0f);
+            }
+
+            @Override
+            public void draw(Bullet b){
+                Draw.color(Pal.lancerLaser);
+                Fill.circle(b.x, b.y, 7f + b.fout() * 1.5f);
+                Draw.color(Color.white);
+                Fill.circle(b.x, b.y, 5.5f + b.fout());
+            }
+        };
+
         orb = new BulletType(){
             {
                 lifetime = 240;
@@ -980,6 +1046,7 @@ public class UnityBullets implements ContentList{
                 auraWidthReduction = 4f;
                 damageRadius = 110f;
                 auraDamage = 9000f;
+                overrideDamage = true;
 
                 laserColors = new Color[]{UnityPal.scarColorAlpha, UnityPal.scarColor, UnityPal.endColor, Color.black};
             }
@@ -1005,6 +1072,12 @@ public class UnityBullets implements ContentList{
                     unit.damage(damage);
                 }
                 if(unit instanceof AntiCheatBase) ((AntiCheatBase)unit).overrideAntiCheatDamage(auraDamage, 1);
+
+                if(unit.health >= initialHealth){
+                    Unity.antiCheat.samplerAdd(unit);
+                }else{
+                    Unity.antiCheat.samplerAdd(unit, true);
+                }
             }
         };
 
