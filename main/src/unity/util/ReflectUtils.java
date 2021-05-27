@@ -112,7 +112,7 @@ public final class ReflectUtils{
             Object obj = handleInvoker.call(context, scope, scope, all);
             blacklist();
 
-            if(obj instanceof NativeJavaObject n) obj = n.unwrap();
+            if(obj instanceof Wrapper w) obj = w.unwrap();
 
             return (T)obj;
         }

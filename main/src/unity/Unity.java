@@ -11,6 +11,7 @@ import mindustry.mod.Mods.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
+import rhino.*;
 import unity.ai.kami.*;
 import unity.content.*;
 import unity.gen.*;
@@ -130,9 +131,9 @@ public class Unity extends Mod implements ApplicationListener{
 
     @Override
     public void init(){
-        enableConsole = true;
         musicHandler.setup();
         antiCheat.setup();
+
         UnityCall.init();
         BlockMovement.init();
 
@@ -146,44 +147,29 @@ public class Unity extends Mod implements ApplicationListener{
         initScripts();
     }
 
+    @SuppressWarnings("deprecation")
     private void initScripts(){
         if(mods == null || platform == null) return;
 
-        Scripts scripts = mods.getScripts();
-        Cons2<String, String> register = (var, expression) -> {
-            scripts.runConsole(Strings.format("const @ = @", var, expression));
-        };
+        Time.mark();
 
-        register.get(
-            getClass().getSimpleName(),
-            "Vars.mods.locateMod(\"unity\").main"
-        );
+        enableConsole = true;
+        ImporterTopLevel scope = ReflectUtils.getField(mods.getScripts(), ReflectUtils.findField(Scripts.class, "scope", true));
+        Seq<NativeJavaPackage> packages = new Seq<>(NativeJavaPackage.class);
 
-        for(int i = 0; i < unityContent.length; i++){
-            var list = unityContent[i];
-            register.get(
-                list.getClass().getSimpleName(),
-                getClass().getSimpleName() + ".unityContent[" + i + "]"
-            );
+        for(Package pkg : Package.getPackages()){
+            if(!pkg.getName().startsWith("unity")) continue;
+
+            NativeJavaPackage n = new NativeJavaPackage(pkg.getName(), unity.loader);
+            n.setParentScope(scope);
+
+            packages.add(n);
         }
 
-        register.get("launch",
-            """
-            (planet, i) => {
-                Vars.control.playSector(planet.sectors.get(i));
-            }
-            """
-        );
+        scope.importPackage(null, null, packages.toArray(), null);
+        ReflectUtils.unblacklist();
 
-        register.get("skip",
-            """
-            () => {
-                for(let i = Vars.state.wave; i < Vars.state.rules.winWave; i++){
-                    Vars.logic.runWave();
-                }
-            }
-            """
-        );
+        print(Strings.format("Total time to unblacklist and import unity packages: @ms", Time.elapsed()));
     }
 
     @Override
