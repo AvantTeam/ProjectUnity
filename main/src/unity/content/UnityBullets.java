@@ -436,6 +436,9 @@ public class UnityBullets implements ContentList{
 
         //TODO Implement SK's any liquid idea.
         kelvinLiquidLaser = new ExpLaserBulletType(170f, 130f){
+            final float damageMultiplier = 150f; //Multiply the liquid's heat capacity
+            final float damageMultiplierInc = 10f;
+
             {
                 status = StatusEffects.freezing;
                 statusDuration = 3 * 60f;
@@ -446,18 +449,15 @@ public class UnityBullets implements ContentList{
                 toColor = Color.cyan;
             }
 
-            public float dmgMult = 150f; //Multiply the liquid's heat capacity
-            public float dmgMultInc = 10f;
-
             @Override
             public void setDamage(Bullet b){
                 Liquid liquid = Liquids.cryofluid;
                 if(b.owner instanceof Building build && !build.cheating()) liquid = build.liquids.current();
-                float mul = dmgMult + dmgMultInc * getLevel(b);
+                float mul = damageMultiplier + damageMultiplierInc * getLevel(b);
                 b.damage = liquid.heatCapacity * mul * b.damageMultiplier();
             }
 
-            public void freezePos(Bullet b, float x, float y){
+            void freezePos(Bullet b, float x, float y){
                 var lvl = getLevel(b);
                 float rad = 4.5f;
                 if(!Vars.headless) UnityFx.freezeEffect.at(x, y, lvl / rad + 10f, getColor(b));

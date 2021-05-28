@@ -23,6 +23,7 @@ import mindustry.ctype.*;
 import mindustry.content.*;
 import unity.annotations.Annotations.*;
 import unity.entities.bullet.*;
+import unity.entities.bullet.exp.*;
 import unity.gen.*;
 import unity.graphics.*;
 import unity.mod.*;
@@ -1592,7 +1593,6 @@ public class UnityBlocks implements ContentList{
                 toColor = Pal.place;
 
                 shootType = UnityBullets.fractalLaser;
-                buildVisibility = BuildVisibility.sandboxOnly;
 
                 basicFieldRadius = 85f;
 
@@ -1605,6 +1605,8 @@ public class UnityBlocks implements ContentList{
                 addField(ExpFieldType.linear, "reloadTime", reloadTime, -2f);
                 addField(ExpFieldType.linear, "range", range, 0.35f * 8f);
                 addField(ExpFieldType.linear, "basicFieldRadius", basicFieldRadius, 0.2f * 8f);
+
+                bulletCons((ExpLaserFieldBulletType type, Bullet b) -> type.basicFieldRadius = basicFieldRadius);
             }
         };
 

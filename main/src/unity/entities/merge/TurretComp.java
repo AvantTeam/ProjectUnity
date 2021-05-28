@@ -36,6 +36,7 @@ class TurretComp extends Turret{
 
     @ReadOnly Floatf<TurretBuildc> damageMultiplier = b -> 1f;
     @ReadOnly Func<TurretBuildc, Object> bulletData = b -> null;
+    @ReadOnly Cons2<BulletType, Bullet> bulletCons = (type, b) -> {};
 
     public TurretComp(String name){
         super(name);
@@ -47,6 +48,10 @@ class TurretComp extends Turret{
 
     public <T extends TurretBuildc> void bulletData(Func<T, Object> bulletData){
         this.bulletData = (Func<TurretBuildc, Object>)bulletData;
+    }
+
+    public <T extends BulletType> void bulletCons(Cons2<T, Bullet> bulletCons){
+        this.bulletCons = (Cons2<BulletType, Bullet>)bulletCons;
     }
 
     public class TurretBuildComp extends TurretBuild{
@@ -78,10 +83,6 @@ class TurretComp extends Turret{
         public BulletType peekAmmo(){
             if(block instanceof LiquidTurret l && omni){
                 BulletType b = l.ammoTypes.get(liquids.current());
-                if(basicFieldRadius > 0f && b instanceof ExpLaserFieldBulletType type){
-                    type.basicFieldRadius = basicFieldRadius;
-                }
-
                 return b == null ? defaultBullet : b;
             }else{
                 return super.peekAmmo();
@@ -107,9 +108,7 @@ class TurretComp extends Turret{
         @Override
         @Replace
         public void shoot(BulletType type){
-            if(chargeTime < 0f){
-                super.shoot(type);
-            }else if(this instanceof ExpBuildc){
+            if(chargeTime > 0f && this instanceof ExpBuildc){
                 var exp = (TurretBuild & ExpBuildc)this;
 
                 useAmmo();
@@ -131,19 +130,17 @@ class TurretComp extends Turret{
                 charging = true;
 
                 for(var i = 0; i < shots; i++){
-                    Time.run(burstSpacing * i, () -> {
-                        Time.run(chargeTime, () -> {
-                            if(isValid()){
-                                tr.trns(rotation, shootLength, Mathf.range(xRand));
-                                recoil = recoilAmount;
-                                heat = 1f;
+                    Time.run(burstSpacing * i, () -> Time.run(chargeTime, () -> {
+                        if(isValid()){
+                            tr.trns(rotation, shootLength, Mathf.range(xRand));
+                            recoil = recoilAmount;
+                            heat = 1f;
 
-                                bullet(type, rotation + Mathf.range(inaccuracy));
-                                effects();
-                                charging = false;
-                            }
-                        });
-                    });
+                            bullet(type, rotation + Mathf.range(inaccuracy));
+                            effects();
+                            charging = false;
+                        }
+                    }));
                 }
             }else{
                 super.shoot(type);
@@ -183,6 +180,7 @@ class TurretComp extends Turret{
                 bulletData()
             );
 
+            bulletCons(type, bullet);
             if(self() instanceof LaserTurretBuild laser && block instanceof LaserTurret turret){
                 ReflectUtils.setField(this, ReflectUtils.findField(LaserTurretBuild.class, "bullet", true), bullet);
                 ReflectUtils.setField(this, ReflectUtils.findField(LaserTurretBuild.class, "bulletLife", true), turret.shootDuration);
@@ -195,6 +193,10 @@ class TurretComp extends Turret{
 
         public Object bulletData(){
             return bulletData.get(self());
+        }
+
+        public void bulletCons(BulletType type, Bullet b){
+            bulletCons.get(type, b);
         }
 
         public Color getShootColor(float progress){
