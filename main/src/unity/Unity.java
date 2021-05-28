@@ -108,16 +108,12 @@ public class Unity extends Mod implements ApplicationListener{
         }
 
         if(Core.settings != null){
-            Core.settings.getBoolOnce("unity-install", () -> {
-                Events.on(ClientLoadEvent.class, e -> {
-                    Time.runTask(5f, CreditsDialog::showList);
-                });
-            });
+            Core.settings.getBoolOnce("unity-install", () -> Events.on(ClientLoadEvent.class, e ->
+                Time.runTask(5f, CreditsDialog::showList)
+            ));
         }
 
-        Events.on(ClientLoadEvent.class, e -> {
-            unitySettings.init();
-        });
+        Events.on(ClientLoadEvent.class, e -> unitySettings.init());
     }
 
     @Override
@@ -248,15 +244,6 @@ public class Unity extends Mod implements ApplicationListener{
         }
 
         Log.info("[#@][unity][] @", Color.cyan, builder.toString());
-    }
-
-    public static Class<?> forName(String canonical){
-        try{
-            return Class.forName(canonical, true, unity.loader);
-        }catch(Exception e){
-            Log.err(e);
-            return null;
-        }
     }
 
     public static class UnityModLoadEvent{}
