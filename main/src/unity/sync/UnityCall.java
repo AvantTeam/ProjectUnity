@@ -123,23 +123,21 @@ public class UnityCall{
     }
 
     public static void tap(Player player, float x, float y){
-        if(net.client() || !net.active()){
+        if(net.server() || !net.active()){
             Unity.tapHandler.tap(player, x, y);
         }
 
         if(net.server() || net.client()){
             out.reset();
 
-            if(net.server()){
-                TypeIO.writeEntity(write, player);
-            }
+            if(net.server()) TypeIO.writeEntity(write, player);
             write.f(x);
             write.f(y);
 
             if(net.client()){
-                server(true, 2, out.getBytes());
+                server(false, 2, out.getBytes());
             }else if(net.server()){
-                client(player.con, true, 2, out.getBytes());
+                client(null, false, 2, out.getBytes());
             }
         }
     }

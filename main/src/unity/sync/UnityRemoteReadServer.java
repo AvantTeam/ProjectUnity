@@ -15,9 +15,7 @@ public class UnityRemoteReadServer{
     private static final IntMap<Cons<Player>> map = new IntMap<>();
 
     public static void registerHandlers(){
-        map.put(2, player -> {
-            UnityCall.tap(player, read.f(), read.f());
-        });
+        map.put(2, player -> UnityCall.tap(player, read.f(), read.f()));
     }
 
     public static void readPacket(byte[] bytes, byte type, Player player){
