@@ -94,8 +94,10 @@ public class SingularityBulletType extends BasicBulletType{
 
         for(int i = 0; i < colors.length; i++){
             Draw.color(colors[i]);
-            if(i != 0f){
-                UnityDrawf.shiningCircle(b.id, Time.time - i, b.x + Mathf.range(0.5f), b.y + Mathf.range(0.5f), interp * size * scales[i], 6, 30f, 17f, 10f * interp, 60f);
+            if(i != 0){
+                float extra = (colors.length - (i + 1f)) * (11f / (colors.length - 1f));
+                
+                UnityDrawf.shiningCircle(b.id, Time.time - i, b.x + Mathf.range(0.5f), b.y + Mathf.range(0.5f), interp * size * scales[i], 6, 30f, 17f + (extra / 2f), (10f + extra) * interp, 60f);
             }else{
                 Fill.circle(b.x + Mathf.range(0.5f), b.y + Mathf.range(0.5f), interp * size * scales[i]);
             }
