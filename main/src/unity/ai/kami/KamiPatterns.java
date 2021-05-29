@@ -343,12 +343,12 @@ public class KamiPatterns{
     }
 
     public static class KamiPattern{
-        public Cons<NewKamiAI> drawer, effects, init, start;
+        public Cons<KamiAI> drawer, effects, init, start;
         public KamiPatternStage[] stages;
         public int type = -1;
         public float time = 60f, maxDamage = Float.MAX_VALUE, waitTime = 2f * 60f;
 
-        public void update(NewKamiAI ai){
+        public void update(KamiAI ai){
             if(effects != null) effects.get(ai);
             if(stages[ai.stage % stages.length].stage != null) stages[ai.stage % stages.length].stage.get(ai);
             ai.stageTime += Time.delta;
@@ -359,31 +359,31 @@ public class KamiPatterns{
             }
         }
 
-        public void start(NewKamiAI ai){
+        public void start(KamiAI ai){
             if(start != null) start.get(ai);
         }
 
-        public void draw(NewKamiAI ai){
+        public void draw(KamiAI ai){
             if(drawer != null) drawer.get(ai);
         }
 
-        public void init(NewKamiAI ai){
+        public void init(KamiAI ai){
             if(init != null) init.get(ai);
             if(stages[0].init != null) stages[0].init.get(ai);
         }
     }
 
     public static class KamiPatternStage{
-        Cons<NewKamiAI> stage, init;
+        Cons<KamiAI> stage, init;
         float time;
 
-        public KamiPatternStage(float time, Cons<NewKamiAI> init, Cons<NewKamiAI> stage){
+        public KamiPatternStage(float time, Cons<KamiAI> init, Cons<KamiAI> stage){
             this.stage = stage;
             this.init = init;
             this.time = time;
         }
 
-        public KamiPatternStage(float time, Cons<NewKamiAI> stage){
+        public KamiPatternStage(float time, Cons<KamiAI> stage){
             this(time, null, stage);
         }
     }

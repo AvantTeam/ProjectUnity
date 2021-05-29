@@ -14,7 +14,7 @@ abstract class KamiComp implements Unitc{
     transient Bullet laser;
     @SyncField(true) float laserRotation = 0f;
 
-    @ReadOnly transient NewKamiAI trueController;
+    @ReadOnly transient KamiAI trueController;
 
     @Override
     public void update(){
@@ -40,7 +40,7 @@ abstract class KamiComp implements Unitc{
 
     @Override
     public void add(){
-        trueController = new NewKamiAI();
+        trueController = new KamiAI();
         trueController.unit(self());
     }
 

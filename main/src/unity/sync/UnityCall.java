@@ -12,9 +12,7 @@ import mindustry.net.*;
 import mindustry.net.Net.*;
 import mindustry.net.Packets.*;
 import unity.*;
-import unity.ai.KamiAI.*;
 import unity.gen.*;
-import unity.gen.SoulHoldc.*;
 
 import java.io.*;
 import java.util.*;

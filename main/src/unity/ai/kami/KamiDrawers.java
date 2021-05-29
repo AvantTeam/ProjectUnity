@@ -11,7 +11,7 @@ import unity.ai.*;
 public class KamiDrawers{
     private final static Color tCol = new Color();
     private final static Vec2 tVec = new Vec2(), tVec2 = new Vec2();
-    public static Cons<NewKamiAI> utsuhoDrawer, marisaDrawer, byakurenScrollDrawer;
+    public static Cons<KamiAI> utsuhoDrawer, marisaDrawer, byakurenScrollDrawer;
 
     public static void load(){
         utsuhoDrawer = ai -> {
