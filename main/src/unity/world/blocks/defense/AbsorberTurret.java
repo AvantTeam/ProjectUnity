@@ -1,6 +1,7 @@
 package unity.world.blocks.defense;
 
 import arc.*;
+import arc.math.geom.*;
 import arc.util.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -43,6 +44,14 @@ public class AbsorberTurret extends GenericTractorBeamTurret<Bullet>{
             target = Groups.bullet
                 .intersect(x - range, y - range, range * 2f, range * 2f)
                 .min(b -> b.team != team && b.type().hittable, b -> b.dst2(this));
+        }
+
+        @Override
+        protected void findTarget(Vec2 pos){
+            float r = laserWidth / 2f;
+            target = Groups.bullet
+                .intersect(pos.x - r, pos.y - r, r * 2f, r * 2f)
+                .min(b -> b.team != team && b.type().hittable, b -> b.dst2(pos));
         }
 
         @Override

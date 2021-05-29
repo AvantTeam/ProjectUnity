@@ -2,6 +2,7 @@ package unity.world.blocks.defense;
 
 import arc.graphics.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -32,6 +33,22 @@ public class LifeStealerTurret extends GenericTractorBeamTurret<Teamc>{
         public float contained;
 
         @Override
+        protected void findTarget(){
+            target = Units.closestTarget(team, x, y, range,
+                unit -> unit.team != team && unit.isValid() && unit.checkTarget(targetAir, targetGround),
+                tile -> targetGround && tile.isValid()
+            );
+        }
+
+        @Override
+        protected void findTarget(Vec2 pos){
+            target = Units.closestTarget(team, pos.x, pos.y, laserWidth,
+                unit -> unit.team != team && unit.isValid() && unit.checkTarget(targetAir, targetGround),
+                tile -> targetGround && tile.isValid()
+            );
+        }
+
+        @Override
         protected void apply(){
             if(target instanceof Healthc h){
                 float health = (damage / 60f) * efficiency();
@@ -41,17 +58,6 @@ public class LifeStealerTurret extends GenericTractorBeamTurret<Teamc>{
 
             if(contained >= maxContain){
                 tryHeal();
-            }
-        }
-
-        @Override
-        protected void findTarget(){
-            target = Groups.unit
-                .intersect(x - range, y - range, range * 2f, range * 2f)
-                .min(u -> u.team != team && ((u.isFlying() && targetAir) || (u.isGrounded() && targetGround)), u -> u.dst2(this));
-
-            if(target == null && targetGround){
-                target = Units.findEnemyTile(team, x, y, range, tile -> tile.team != team && tile.isValid());
             }
         }
 

@@ -1,5 +1,6 @@
 package unity.world.blocks.defense;
 
+import arc.math.geom.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
@@ -22,8 +23,16 @@ public class HeatRayTurret extends GenericTractorBeamTurret<Teamc>{
         @Override
         protected void findTarget(){
             target = Units.closestTarget(team, x, y, range, 
-                unit -> unit.team != team && unit.isValid() && ((unit.isFlying() && targetAir) || (unit.isGrounded() && targetGround)),
-                tile -> tile.isValid() && targetGround
+                unit -> unit.team != team && unit.isValid() && unit.checkTarget(targetAir, targetGround),
+                tile -> targetGround && tile.isValid()
+            );
+        }
+
+        @Override
+        protected void findTarget(Vec2 pos){
+            target = Units.closestTarget(team, pos.x, pos.y, laserWidth,
+                unit -> unit.team != team && unit.isValid() && unit.checkTarget(targetAir, targetGround),
+                tile -> targetGround && tile.isValid()
             );
         }
 

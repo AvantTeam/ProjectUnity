@@ -6,8 +6,10 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.util.*;
 import mindustry.content.*;
 import mindustry.core.*;
+import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
@@ -69,13 +71,16 @@ public abstract class GenericTractorBeamTurret<T extends Teamc> extends BaseTurr
         return new TextureRegion[]{baseRegion, region};
     }
 
-    public abstract class GenericTractorBeamTurretBuild extends BaseTurretBuild implements ExtensionHolder, ControlBlock{
+    public abstract class GenericTractorBeamTurretBuild extends BaseTurretBuild implements ExtensionHolder, ControlBlock, Senseable{
         public BlockUnitc unit;
         protected Extension ext;
 
         public T target;
         public Vec2 targetPos = new Vec2();
         public float strength;
+
+        public float logicControlTime = -1f;
+        public boolean logicShooting = false;
 
         @Override
         public void created(){
@@ -98,6 +103,8 @@ public abstract class GenericTractorBeamTurret<T extends Teamc> extends BaseTurr
         public void control(LAccess type, double p1, double p2, double p3, double p4){
             if(type == LAccess.shoot && !unit.isPlayer()){
                 targetPos.set(World.unconv((float)p1), World.unconv((float)p2));
+                logicControlTime = Turret.logicControlCooldown;
+                logicShooting = !Mathf.zero(p3);
             }
 
             super.control(type, p1, p2, p3, p4);
@@ -106,12 +113,30 @@ public abstract class GenericTractorBeamTurret<T extends Teamc> extends BaseTurr
         @Override
         public void control(LAccess type, Object p1, double p2, double p3, double p4){
             if(type == LAccess.shootp && !unit.isPlayer()){
+                logicControlTime = Turret.logicControlCooldown;
+                logicShooting = !Mathf.zero(p2);
+
                 if(p1 instanceof Posc pos){
                     targetPos.set(pos.x(), pos.y());
                 }
             }
 
             super.control(type, p1, p2, p3, p4);
+        }
+
+        @Override
+        public double sense(LAccess sensor){
+            return switch(sensor){
+                case rotation -> rotation;
+                case shootX -> World.conv(targetPos.x);
+                case shootY -> World.conv(targetPos.y);
+                case shooting -> isShooting() ? 1 : 0;
+                default -> super.sense(sensor);
+            };
+        }
+
+        public boolean isShooting(){
+            return (isControlled() ? unit.isShooting() : logicControlled() ? logicShooting : (canShoot() && target != null));
         }
 
         @Override
@@ -122,34 +147,81 @@ public abstract class GenericTractorBeamTurret<T extends Teamc> extends BaseTurr
 
         @Override
         public void updateTile(){
-            super.updateTile();
+            if(!validateTarget()) target = null;
 
-            if(timer(timerTarget, retargetTime)){
-                findTarget();
+            unit.health(health);
+            unit.rotation(rotation);
+            unit.team(team);
+            unit.set(x, y);
+
+            if(logicControlTime > 0){
+                logicControlTime -= Time.delta;
             }
 
-            boolean shoot = false;
-            if(target != null && target.within(this, range) && target.team() != team && efficiency() > powerUseThreshold){
-                if(!headless){
-                    control.sound.loop(shootSound, this, shootSoundVolume);
+            if(canShoot()){
+                if(!logicControlled() && !isControlled() && timer(timerTarget, retargetTime)){
+                    findTarget();
                 }
 
-                float dest = angleTo(target);
-                rotation = Angles.moveToward(rotation, dest, rotateSpeed * edelta());
-                shoot = Angles.within(rotation, dest, shootCone);
+                if(validateTarget()){
+                    float targetRot = angleTo(targetPos);
+                    turnToTarget(targetRot);
+
+                    boolean shoot = true;
+                    if(isControlled()){
+                        targetPos.set(unit.aimX(), unit.aimX());
+                        shoot = unit.isShooting();
+                    }else if(logicControlled()){
+                        shoot = logicShooting;
+                    }else{
+                        targetPos.set(target.x(), target.y());
+
+                        if(Float.isNaN(rotation)){
+                            rotation = 0;
+                        }
+                    }
+
+                    if(shoot && Angles.angleDist(rotation, targetRot) < shootCone){
+                        updateShooting();
+                    }
+                }
+            }
+        }
+
+        protected void updateShooting(){
+            if(logicControlled() || isControlled()){
+                findTarget(targetPos);
             }
 
-            if(shoot && target != null && efficiency() > powerUseThreshold){
-                apply();
+            if(target != null){
+                control.sound.loop(shootSound, this, shootSoundVolume);
 
-                targetPos.set(target.x(), target.y());
+                apply();
                 strength = Mathf.lerpDelta(strength, efficiency(), 0.1f);
             }else{
                 strength = Mathf.lerpDelta(strength, 0f, 0.1f);
             }
         }
 
+        protected void turnToTarget(float targetRot){
+            rotation = Angles.moveToward(rotation, targetRot, rotateSpeed * edelta());
+        }
+
+        protected boolean validateTarget(){
+            return !Units.invalidateTarget(target, team, x, y) || isControlled() || logicControlled();
+        }
+
+        public boolean logicControlled(){
+            return logicControlTime > 0;
+        }
+
+        public boolean canShoot(){
+            return efficiency() > powerUseThreshold;
+        }
+
         protected abstract void findTarget();
+
+        protected abstract void findTarget(Vec2 pos);
 
         protected abstract void apply();
 
