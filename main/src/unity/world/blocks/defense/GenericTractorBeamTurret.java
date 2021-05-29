@@ -158,6 +158,7 @@ public abstract class GenericTractorBeamTurret<T extends Teamc> extends BaseTurr
                 logicControlTime -= Time.delta;
             }
 
+            boolean shot = false;
             if(canShoot()){
                 if(!logicControlled() && !isControlled() && timer(timerTarget, retargetTime)){
                     findTarget();
@@ -182,13 +183,19 @@ public abstract class GenericTractorBeamTurret<T extends Teamc> extends BaseTurr
                     }
 
                     if(shoot && Angles.angleDist(rotation, targetRot) < shootCone){
-                        updateShooting();
+                        shot = updateShooting();
                     }
                 }
             }
+
+            if(shot){
+                strength = Mathf.lerpDelta(strength, efficiency(), 0.1f);
+            }else{
+                strength = Mathf.lerpDelta(strength, 0f, 0.1f);
+            }
         }
 
-        protected void updateShooting(){
+        protected boolean updateShooting(){
             if(logicControlled() || isControlled()){
                 findTarget(targetPos);
             }
@@ -197,9 +204,9 @@ public abstract class GenericTractorBeamTurret<T extends Teamc> extends BaseTurr
                 control.sound.loop(shootSound, this, shootSoundVolume);
 
                 apply();
-                strength = Mathf.lerpDelta(strength, efficiency(), 0.1f);
+                return true;
             }else{
-                strength = Mathf.lerpDelta(strength, 0f, 0.1f);
+                return false;
             }
         }
 
