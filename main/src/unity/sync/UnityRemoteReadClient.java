@@ -7,9 +7,8 @@ import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.io.*;
 import unity.*;
-import unity.ai.KamiAI.*;
+import unity.ai.kami.*;
 import unity.gen.*;
-import unity.gen.SoulHoldc.*;
 
 import java.io.*;
 
@@ -32,7 +31,7 @@ public class UnityRemoteReadClient{
 
             float h = read.f();
             b.hitSize = h < 0f ? b.type.hitSize : h;
-            b.data = KamiBulletDatas.get(read.i());
+            b.data = KamiBulletDatas.get(b, read.i());
             b.fdata = read.f();
             b.time = read.f();
         });

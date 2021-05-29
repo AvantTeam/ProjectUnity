@@ -12,6 +12,7 @@ import mindustry.net.*;
 import mindustry.net.Net.*;
 import mindustry.net.Packets.*;
 import unity.*;
+import unity.ai.kami.*;
 import unity.gen.*;
 
 import java.io.*;
@@ -76,7 +77,7 @@ public class UnityCall{
             b.vel.scl(velocityScl);
             b.lifetime = type.lifetime * lifetimeScl;
             b.hitSize = hitSize < 0f ? type.hitSize : hitSize;
-            b.data = KamiBulletDatas.get(data);
+            b.data = KamiBulletDatas.get(b, data);
             b.fdata = fdata;
             b.time = time;
         }

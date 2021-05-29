@@ -246,5 +246,9 @@ public class Unity extends Mod implements ApplicationListener{
         Log.info("[#@][unity][] @", Color.cyan, builder.toString());
     }
 
+    public static LoadedMod mod(){
+        return unity;
+    }
+
     public static class UnityModLoadEvent{}
 }
