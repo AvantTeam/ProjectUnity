@@ -51,23 +51,17 @@ public class SlashAbility extends BaseAbility{
         Vec2 pos = Tmp.v1.set(slashDistance, 0f).setAngle(dir);
         unit.set(pos.x + unit.x, pos.y + unit.y);
 
+        unit.snapSync();
         if(unit.isPlayer()){
-            unit.getPlayer().snapInterpolation();
-            if(headless){
-                unit.getPlayer().snapSync();
-            }
-        }else{
-            unit.snapInterpolation();
+            unit.getPlayer().snapSync();
         }
 
         if(mobile && !headless && unit.getPlayer() == player){
             Core.camera.position.set(pos.x + unit.x, pos.y + unit.y);
         }
 
-        if(!headless){
-            teleportSound.at(pos.x + unit.x, pos.y + unit.y, 1.6f);
-            postTeleportEffect.at(unit.x, unit.y, (dir + 180f) % 360f);
-        }
+        teleportSound.at(pos.x + unit.x, pos.y + unit.y, 1.6f);
+        postTeleportEffect.at(unit.x, unit.y, (dir + 180f) % 360f);
 
         unit.vel.trns(dir, 4f);
     }

@@ -71,13 +71,9 @@ public class TeleportAbility<T extends Teamc & Hitboxc> extends BaseAbility{
         teleportPosEffect.at(unit.x, unit.y, unit.rotation, unit.type);
         teleportSound.at(unit);
 
+        unit.snapSync();
         if(unit.isPlayer()){
-            unit.getPlayer().snapInterpolation();
-            if(headless){
-                unit.getPlayer().snapSync();
-            }
-        }else{
-            unit.snapInterpolation();
+            unit.getPlayer().snapSync();
         }
 
         if(mobile && !headless && unit.isLocal()){

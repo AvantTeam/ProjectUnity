@@ -179,32 +179,22 @@ public class UnityCall{
 
     public static void soulJoin(MonolithSoul soul, Entityc ent){
         if(net.server() || !net.active()){
-            float remain = 0f;
-            if(ent instanceof Healthc h){
-                remain = h.health() + soul.healAmount - h.maxHealth();
-                h.heal(soul.healAmount);
-            }
-
-            if(ent instanceof Shieldc s){
-                s.armor(s.armor() + Math.max(remain / 60f, 0f));
-            }
-
-            if(ent instanceof Monolithc e){
-                e.join();
-            }
-
-            if(ent instanceof SoulBuildc b){
-                b.join();
-            }
-
-            soul.kill();
+            MonolithSoul.soulJoin(soul, ent);
         }
 
         if(net.server()){
             out.reset();
 
-            TypeIO.writeEntity(write, soul);
-            TypeIO.writeEntity(write, ent);
+            TypeIO.writeUnit(write, soul);
+            if(ent instanceof Building b){
+                write.b(0);
+                TypeIO.writeBuilding(write, b);
+            }else if(ent instanceof Syncc s){
+                write.b(1);
+                TypeIO.writeEntity(write, s);
+            }else{
+                throw new IllegalArgumentException("Invalid joined entity: " + ent.getClass());
+            }
 
             client(null, true, 4, out.getBytes());
         }

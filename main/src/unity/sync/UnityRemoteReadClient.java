@@ -77,7 +77,7 @@ public class UnityRemoteReadClient{
                         data = pos;
                     }
 
-                    case 17 -> data = TypeIO.<Unit>readEntity(read);
+                    case 17 -> data = TypeIO.readEntity(read);
 
                     default -> throw new IllegalArgumentException("Unknown object type: " + type);
                 }
@@ -87,28 +87,14 @@ public class UnityRemoteReadClient{
         });
 
         map.put(4, () -> {
-            MonolithSoul soul = TypeIO.readEntity(read);
-            Entityc ent = TypeIO.readEntity(read);
+            MonolithSoul soul = TypeIO.readUnit(read).as();
+            Entityc ent = switch(read.b()){
+                case 0 -> TypeIO.readBuilding(read);
+                case 1 -> TypeIO.readEntity(read);
+                default -> throw new IllegalStateException("Invalid ID!");
+            };
 
-            float remain = 0f;
-            if(ent instanceof Healthc h){
-                remain = h.health() + soul.healAmount - h.maxHealth();
-                h.heal(soul.healAmount);
-            }
-
-            if(ent instanceof Shieldc s){
-                s.armor(s.armor() + Math.max(remain / 60f, 0f));
-            }
-
-            if(ent instanceof Monolithc e){
-                e.join();
-            }
-
-            if(ent instanceof SoulBuildc b){
-                b.join();
-            }
-
-            soul.kill();
+            MonolithSoul.soulJoin(soul, ent);
         });
     }
 
@@ -117,11 +103,7 @@ public class UnityRemoteReadClient{
         if(!map.containsKey(type)){
             throw new RuntimeException("Unknown packet type: '" + type + "'");
         }else{
-            try{
-                map.get(type).run();
-            }catch(Exception e){
-                throw new RuntimeException(e);
-            }
+            map.get(type).run();
         }
     }
 }

@@ -72,7 +72,7 @@ abstract class MonolithComp implements Unitc, Factionc{
                     transferred = true;
                 }
 
-                if(soul.controller() instanceof MonolithSoulAI ai){
+                if(controller instanceof MonolithSoulAI ai){
                     ai.empty = false;
                 }
                 soul.add();

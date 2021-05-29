@@ -9,6 +9,7 @@ import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.type.*;
+import unity.ai.*;
 import unity.annotations.Annotations.*;
 import unity.content.*;
 import unity.gen.*;
@@ -101,10 +102,6 @@ abstract class MonolithSoulComp implements Unitc, Factionc{
         return Integer.MAX_VALUE;
     }
 
-    public <T extends Entityc> void invoke(T ent){
-        UnityCall.soulJoin(self(), ent);
-    }
-
     @Override
     @MethodPriority(-1)
     @BreakAll
@@ -114,5 +111,37 @@ abstract class MonolithSoulComp implements Unitc, Factionc{
             rect.set(x, y, Float.NaN, Float.NaN);
             return;
         }
+    }
+
+    public <T extends Entityc> void invoke(T ent){
+        UnityCall.soulJoin(self(), ent);
+    }
+
+    public static <T extends Entityc> void soulJoin(MonolithSoul soul, T ent){
+        float remain = 0f;
+        if(ent instanceof Healthc h){
+            remain = h.health() + soul.healAmount - h.maxHealth();
+            h.heal(soul.healAmount);
+        }
+
+        if(ent instanceof Shieldc s){
+            s.armor(s.armor() + Math.max(remain / 60f, 0f));
+        }
+
+        if(ent instanceof Monolithc e){
+            e.join();
+            if(soul.isPlayer()){
+                soul.getPlayer().unit((Unit)e);
+            }
+        }
+
+        if(ent instanceof SoulBuildc b){
+            b.join();
+            if(soul.isPlayer()){
+                soul.getPlayer().unit(b.unit());
+            }
+        }
+
+        Units.unitDeath(soul.id);
     }
 }

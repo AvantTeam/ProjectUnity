@@ -32,11 +32,11 @@ public class MonolithSoulAI implements UnitController{
     @Override
     public void updateUnit(){
         if(empty){
-            unit.health = 0f;
+            unit.kill();
         }
 
         if(timer.get(5f)){
-            Unit targetUnit = Units.closest(unit.team, unit.x, unit.y, u -> unit.isSameFaction(u));
+            Unit targetUnit = Units.closest(unit.team, unit.x, unit.y, u -> u instanceof Monolithc m && m.canJoin());
             Building targetBuilding = indexer.findTile(unit.team, unit.x, unit.y, Float.MAX_VALUE, b -> b instanceof SoulBuildc soul && soul.canJoin());
 
             if(targetUnit != null && targetBuilding != null){

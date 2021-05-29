@@ -107,10 +107,6 @@ public class UnityUnitTypes implements ContentList{
     public static @FactionDef("monolith") @EntityDef({Unitc.class, Trailc.class, Assistantc.class, Monolithc.class})
     UnitType adsect, comitate/*, praesid*/;
 
-    // don't
-    public static @FactionDef("monolith") @EntityPoint(UnitEntity.class)
-    UnitType farSeeker;
-
     // koruh kami
     public static @FactionDef("koruh") @EntityPoint(Kami.class)
     UnitType kami;
@@ -3071,15 +3067,6 @@ public class UnityUnitTypes implements ContentList{
                 }};
             }}
             );
-        }};
-
-        farSeeker = new UnityUnitType("far-seeker"){{
-            defaultController = FarSeekerAI::new;
-            health = 100000f;
-            speed = 14f;
-            flying = true;
-            accel = 0.08f;
-            drawCell = false;
         }};
 
         kami = new RainbowUnitType("kami-mkii"){{
