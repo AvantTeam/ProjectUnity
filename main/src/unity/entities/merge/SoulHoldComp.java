@@ -7,7 +7,8 @@ import mindustry.world.blocks.*;
 import mindustry.world.blocks.defense.turrets.Turret.*;
 import unity.annotations.Annotations.*;
 import unity.gen.*;
-import unity.mod.*;
+import unity.world.blocks.defense.*;
+import unity.world.blocks.defense.GenericTractorBeamTurret.*;
 
 import static mindustry.Vars.*;
 
@@ -44,6 +45,8 @@ class SoulHoldComp extends Block{
         @Override
         public void created(){
             if(self() instanceof TurretBuild build){
+                unit = build.unit;
+            }else if(self() instanceof GenericTractorBeamTurret<?>.GenericTractorBeamTurretBuild build){
                 unit = build.unit;
             }else{
                 unit = UnitTypes.block.create(team).as();

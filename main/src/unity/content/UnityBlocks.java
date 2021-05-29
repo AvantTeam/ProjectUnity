@@ -165,8 +165,20 @@ public class UnityBlocks implements ContentList{
     //turrets
     public static
     @FactionDef("monolith")
+    @Merge(base = LifeStealerTurret.class, value = SoulHoldc.class)
     Block
-    lifeStealer, absorberAura,
+    lifeStealer;
+
+    public static
+    @FactionDef("monolith")
+    @Merge(base = AbsorberTurret.class, value = SoulHoldc.class)
+    Block
+    absorberAura;
+
+    public static
+    @FactionDef("monolith")
+    @Merge(base = HeatRayTurret.class, value = SoulHoldc.class)
+    Block
     heatRay;
 
     public static
@@ -2011,13 +2023,17 @@ public class UnityBlocks implements ContentList{
             damageMultiplier((SoulTurretPowerTurretBuild build) -> efficiencyFrom + (build.souls() / (float)maxSouls) * efficiencyTo);
         }};
 
-        lifeStealer = new LifeStealerTurret("life-stealer"){{
+        lifeStealer = new SoulHoldLifeStealerTurret("life-stealer"){{
             requirements(Category.turret, with(Items.silicon, 50, UnityItems.monolite, 25));
 
             size = 1;
             health = 320;
             powerUse = 1f;
             damage = 120f;
+
+            requireSoul = false;
+            efficiencyFrom = 0.8f;
+            efficiencyTo = 1.5f;
         }};
 
         recluse = new SoulHoldTurretItemTurret("recluse"){{
@@ -2045,7 +2061,7 @@ public class UnityBlocks implements ContentList{
             damageMultiplier((SoulTurretItemTurretBuild build) -> efficiencyFrom + (build.souls() / (float)maxSouls) * efficiencyTo);
         }};
 
-        absorberAura = new AbsorberTurret("absorber-aura"){{
+        absorberAura = new SoulHoldAbsorberTurret("absorber-aura"){{
             requirements(Category.turret, with(Items.silicon, 75, UnityItems.monolite, 125));
 
             size = 2;
@@ -2053,6 +2069,10 @@ public class UnityBlocks implements ContentList{
             range = 150f;
             powerUse = 1f;
             resistance = 0.8f;
+
+            requireSoul = false;
+            efficiencyFrom = 0.8f;
+            efficiencyTo = 1.6f;
         }};
 
         mage = new SoulHoldTurretPowerTurret("mage"){{
@@ -2153,7 +2173,7 @@ public class UnityBlocks implements ContentList{
             damageMultiplier((SoulTurretPowerTurretBuild build) -> efficiencyFrom + (build.souls() / (float)maxSouls) * efficiencyTo);
         }};
 
-        heatRay = new HeatRayTurret("heat-ray"){{
+        heatRay = new SoulHoldHeatRayTurret("heat-ray"){{
             requirements(Category.turret, with(Items.copper, 75, Items.lead, 50, Items.graphite, 25, Items.titanium, 45, UnityItems.monolite, 50));
 
             size = 2;
@@ -2163,6 +2183,10 @@ public class UnityBlocks implements ContentList{
             damage = 240f;
             powerUse = 2f;
             shootSound = UnitySounds.heatRay;
+
+            requireSoul = false;
+            efficiencyFrom = 0.8f;
+            efficiencyTo = 1.6f;
         }};
 
         oracle = new SoulHoldTurretBurstPowerTurret("oracle"){{
