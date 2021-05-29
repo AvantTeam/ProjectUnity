@@ -16,7 +16,7 @@ import unity.ai.kami.*;
 import unity.gen.*;
 
 import java.io.*;
-import java.util.*;
+import java.nio.charset.*;
 
 import static mindustry.Vars.*;
 
@@ -32,8 +32,8 @@ public class UnityCall{
         if(netClient != null){
             UnityRemoteReadClient.registerHandlers();
             netClient.addPacketHandler("unity.call", handler -> {
-                String[] split = handler.split(":");
-                UnityRemoteReadClient.readPacket(unpack(split[1]), Byte.parseByte(split[0]));
+                int i = handler.indexOf(":");
+                UnityRemoteReadClient.readPacket(handler.substring(i + 1).getBytes(StandardCharsets.UTF_16), Byte.parseByte(handler.substring(0, i)));
             });
         }else{
             Log.warn("'netClient' is null");
@@ -42,28 +42,12 @@ public class UnityCall{
         if(netServer != null){
             UnityRemoteReadServer.registerHandlers();
             netServer.addPacketHandler("unity.call", (player, handler) -> {
-                String[] split = handler.split(":");
-                UnityRemoteReadServer.readPacket(unpack(split[1]), Byte.parseByte(split[0]), player);
+                int i = handler.indexOf(":");
+                UnityRemoteReadServer.readPacket(handler.substring(i + 1).getBytes(StandardCharsets.UTF_16), Byte.parseByte(handler.substring(0, i)), player);
             });
         }else{
             Log.warn("'netServer' is null");
         }
-    }
-
-    protected static String pack(byte[] bytes){
-        String arr = Arrays.toString(bytes).replace(" ", "");
-        return arr.substring(1, arr.length() - 1);
-    }
-
-    protected static byte[] unpack(String str){
-        String[] split = str.split(",");
-
-        byte[] bytes = new byte[split.length];
-        for(int i = 0; i < split.length; i++){
-            bytes[i] = Byte.parseByte(split[i]);
-        }
-
-        return bytes;
     }
 
     public static void createKamiBullet(
@@ -98,7 +82,7 @@ public class UnityCall{
             write.f(fdata);
             write.f(time);
 
-            client(null, false, 0, out.getBytes());
+            client(null, false, 0);
         }
     }
 
@@ -117,7 +101,7 @@ public class UnityCall{
             write.str(name);
             write.bool(play);
 
-            client(null, true, 1, out.getBytes());
+            client(null, true, 1);
         }
     }
 
@@ -134,9 +118,9 @@ public class UnityCall{
             write.f(y);
 
             if(net.client()){
-                server(false, 2, out.getBytes());
+                server(false, 2);
             }else if(net.server()){
-                client(null, false, 2, out.getBytes());
+                client(null, false, 2);
             }
         }
     }
@@ -172,7 +156,7 @@ public class UnityCall{
                 }
             }
 
-            client(null, true, 3, out.getBytes());
+            client(null, true, 3);
         }
     }
 
@@ -195,11 +179,11 @@ public class UnityCall{
                 throw new IllegalArgumentException("Invalid joined entity: " + ent.getClass());
             }
 
-            client(null, true, 4, out.getBytes());
+            client(null, true, 4);
         }
     }
 
-    protected static void client(NetConnection except, boolean reliable, int type, byte[] content){
+    protected static void client(NetConnection except, boolean reliable, int type){
         if(net.server()){
             outSend.reset();
 
@@ -207,8 +191,9 @@ public class UnityCall{
             packet.priority = 0;
             packet.type = 74;
 
+            byte[] bytes = out.getBytes();
             TypeIO.writeString(writeSend, "unity.call");
-            TypeIO.writeString(writeSend, type + ":" + pack(content));
+            TypeIO.writeString(writeSend, type + ":" + new String(bytes, 0, bytes.length, StandardCharsets.UTF_16));
 
             packet.bytes = outSend.getBytes();
             packet.length = outSend.size();
@@ -221,7 +206,7 @@ public class UnityCall{
         }
     }
 
-    protected static void server(boolean reliable, int type, byte[] content){
+    protected static void server(boolean reliable, int type){
         if(net.client()){
             outSend.reset();
 
@@ -229,8 +214,9 @@ public class UnityCall{
             packet.priority = 0;
             packet.type = 32;
 
-            TypeIO.writeString(writeSend, type + ":");
-            TypeIO.writeString(writeSend, pack(content));
+            byte[] bytes = out.getBytes();
+            TypeIO.writeString(writeSend, "unity.call");
+            TypeIO.writeString(writeSend, type + ":" + new String(bytes, 0, bytes.length, StandardCharsets.UTF_16));
 
             packet.bytes = outSend.getBytes();
             packet.length = outSend.size();
