@@ -383,7 +383,7 @@ public class MergeProcessor extends BaseProcessor{
 
             boolean isPrivate = is(first, Modifier.PRIVATE);
             MethodSpec.Builder mbuilder = MethodSpec.methodBuilder(simpleName(first)).addModifiers(isPrivate ? Modifier.PRIVATE : Modifier.PUBLIC);
-            if(!isPrivate) mbuilder.addAnnotation(cName(Override.class));
+            if(!isPrivate && !is(first, Modifier.STATIC)) mbuilder.addAnnotation(cName(Override.class));
 
             if(is(first, Modifier.STATIC)) mbuilder.addModifiers(Modifier.STATIC);
             mbuilder.addTypeVariables(Seq.with(first.getTypeParameters()).map(TypeVariableName::get));
