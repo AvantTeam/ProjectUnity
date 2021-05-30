@@ -164,10 +164,10 @@ public abstract class GenericTractorBeamTurret<T extends Teamc> extends BaseTurr
                 logicControlTime -= Time.delta;
             }
 
+            tr.trns(rotation, shootLength);
             boolean shot = false;
-            if(canShoot()){
-                targetPos.sub(this).limit(range).add(this);
 
+            if(canShoot()){
                 if(!logicControlled() && !isControlled() && timer(timerTarget, retargetTime)){
                     findTarget();
                 }
@@ -190,6 +190,7 @@ public abstract class GenericTractorBeamTurret<T extends Teamc> extends BaseTurr
                         }
                     }
 
+                    targetPos.sub(this).limit(range).add(this);
                     if(shoot && Angles.angleDist(rotation, targetRot) < shootCone){
                         shot = true;
                         updateShooting();
@@ -206,8 +207,6 @@ public abstract class GenericTractorBeamTurret<T extends Teamc> extends BaseTurr
         }
 
         protected void updateShooting(){
-            tr.trns(rotation, shootLength);
-
             if(logicControlled() || isControlled()){
                 findTarget(targetPos);
             }
@@ -261,7 +260,7 @@ public abstract class GenericTractorBeamTurret<T extends Teamc> extends BaseTurr
                     y + tr.y,
                     targetPos.x,
                     targetPos.y,
-                strength * efficiency() * laserWidth
+                    strength * efficiency() * laserWidth
                 );
 
                 Draw.mixcol();
