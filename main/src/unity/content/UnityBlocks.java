@@ -25,6 +25,7 @@ import unity.annotations.Annotations.*;
 import unity.entities.bullet.*;
 import unity.entities.bullet.exp.*;
 import unity.gen.*;
+import unity.gen.SoulHoldLifeStealerTurret.*;
 import unity.graphics.*;
 import unity.mod.*;
 import unity.type.exp.*;
@@ -179,7 +180,7 @@ public class UnityBlocks implements ContentList{
     @FactionDef("monolith")
     @Merge(base = HeatRayTurret.class, value = SoulHoldc.class)
     Block
-    heatRay;
+    heatRay, incandescence;
 
     public static
     @FactionDef("monolith")
@@ -2034,6 +2035,8 @@ public class UnityBlocks implements ContentList{
             requireSoul = false;
             efficiencyFrom = 0.8f;
             efficiencyTo = 1.5f;
+
+            laserAlpha((SoulLifeStealerTurretBuild b) -> b.power.status * (0.5f + b.soulf() * 0.5f));
         }};
 
         recluse = new SoulHoldTurretItemTurret("recluse"){{
@@ -2073,6 +2076,8 @@ public class UnityBlocks implements ContentList{
             requireSoul = false;
             efficiencyFrom = 0.8f;
             efficiencyTo = 1.6f;
+
+            laserAlpha((SoulAbsorberTurretBuild b) -> b.power.status * (0.5f + b.soulf() * 0.5f));
         }};
 
         mage = new SoulHoldTurretPowerTurret("mage"){{
@@ -2185,8 +2190,11 @@ public class UnityBlocks implements ContentList{
             shootSound = UnitySounds.heatRay;
 
             requireSoul = false;
+            maxSouls = 5;
             efficiencyFrom = 0.8f;
             efficiencyTo = 1.6f;
+
+            laserAlpha((SoulHeatRayTurretBuild b) -> b.power.status * (0.5f + b.soulf() * 0.5f));
         }};
 
         oracle = new SoulHoldTurretBurstPowerTurret("oracle"){{
@@ -2254,6 +2262,27 @@ public class UnityBlocks implements ContentList{
             efficiencyTo = 1.67f;
 
             damageMultiplier((SoulTurretPowerTurretBuild build) -> efficiencyFrom + (build.souls() / (float)maxSouls) * efficiencyTo);
+        }};
+
+        incandescence = new SoulHoldHeatRayTurret("incandescence"){{
+            requirements(Category.turret, with(UnityItems.monolite, 250, Items.phaseFabric, 45, UnityItems.monolithAlloy, 100));
+
+            size = 3;
+            range = 180f;
+            targetGround = true;
+            targetAir = true;
+            damage = 480f;
+            powerUse = 4f;
+            shootSound = UnitySounds.heatRay;
+            laserWidth = 0.54f;
+            shootLength = 6f;
+
+            requireSoul = false;
+            maxSouls = 7;
+            efficiencyFrom = 0.7f;
+            efficiencyTo = 1.67f;
+
+            laserAlpha((SoulHeatRayTurretBuild b) -> b.power.status * (0.5f + b.soulf() * 0.5f));
         }};
 
         supernova = new SoulHoldTurretAttractLaserTurret("supernova"){

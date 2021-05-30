@@ -289,7 +289,7 @@ public class Sprite{
 
     void save(String name){
         try{
-            ImageIO.write(sprite, "png", Fi.get("../assets-raw/sprites-gen").child(name + ".png").file());
+            ImageIO.write(sprite, "png", SpriteProcessor.spritesGen.child(name + ".png").file());
         }catch(IOException e){
             throw new RuntimeException(e);
         }
