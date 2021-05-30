@@ -63,7 +63,9 @@ public class UnityTechTree implements ContentList{
         attach(Blocks.arc, () -> {
             node(diviner, Seq.with(new Research(monolite)), () -> {
                 node(mage, () -> {
-                    node(heatRay);
+                    node(heatRay, () -> {
+                        node(incandescence);
+                    });
 
                     node(oracle, Seq.with(new Research(monolithAlloy)));
                 });
@@ -167,8 +169,7 @@ public class UnityTechTree implements ContentList{
     }
 
     private static void attach(UnlockableContent parent, Runnable children){
-        TechNode parnode = TechTree.all.find(t -> t.content == parent);
-        context = parnode;
+        context = TechTree.get(parent);
         children.run();
     }
 
