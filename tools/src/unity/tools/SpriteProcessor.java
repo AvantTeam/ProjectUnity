@@ -26,12 +26,12 @@ public class SpriteProcessor{
 
     static final Fi spritesGen = Fi.get("../assets-raw/sprites-gen/");
 
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args){
         headless = true;
         loadLogger();
 
         Fi handle = Fi.get("bundles/bundle");
-        Core.bundle = I18NBundle.createBundle(handle, Locale.getDefault());
+        Core.bundle = I18NBundle.createBundle(handle, Locale.ROOT);
 
         mod = new Unity();
 

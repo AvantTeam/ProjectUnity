@@ -1,14 +1,15 @@
 package unity.entities.merge;
 
+import arc.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.defense.turrets.Turret.*;
+import mindustry.world.meta.*;
 import unity.annotations.Annotations.*;
 import unity.gen.*;
-import unity.world.blocks.defense.*;
-import unity.world.blocks.defense.GenericTractorBeamTurret.*;
+import unity.world.blocks.defense.turrets.*;
 
 import static mindustry.Vars.*;
 
@@ -23,6 +24,24 @@ class SoulHoldComp extends Block{
 
     public SoulHoldComp(String name){
         super(name);
+    }
+
+    @Override
+    public void setStats(){
+        stats.add(Stat.abilities, cont -> {
+            cont.row();
+            cont.table(bt -> {
+                bt.left().defaults().padRight(3).left();
+
+                bt.row();
+                bt.add(Core.bundle.get(requireSoul ? "soul.require" : "soul.optional"));
+
+                if(maxSouls > 0){
+                    bt.row();
+                    bt.add(Core.bundle.format("soul.max", maxSouls));
+                }
+            });
+        });
     }
 
     public class SoulBuildComp extends Building implements ControlBlock{

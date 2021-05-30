@@ -1,4 +1,4 @@
-package unity.world.blocks.defense;
+package unity.world.blocks.defense.turrets;
 
 import arc.math.geom.*;
 import mindustry.content.*;
