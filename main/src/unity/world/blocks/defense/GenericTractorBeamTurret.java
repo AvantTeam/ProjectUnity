@@ -21,7 +21,11 @@ import unity.graphics.*;
 
 import static mindustry.Vars.*;
 
-/** @author GlennFolker */
+/**
+ * A generic controllable and sensible tractor beam turret that can specify its own target type.
+ * @param <T> The target type, such as {@link Bullet} or {@link Unit}.
+ * @author GlennFolker
+ */
 public abstract class GenericTractorBeamTurret<T extends Teamc> extends BaseTurret{
     public final int timerTarget = timers++;
     public float retargetTime = 5f;
@@ -40,6 +44,8 @@ public abstract class GenericTractorBeamTurret<T extends Teamc> extends BaseTurr
     public float laserWidth = 0.4f;
     public TextureRegion laser;
     public TextureRegion laserEnd;
+
+    protected Vec2 tr = new Vec2();
 
     protected GenericTractorBeamTurret(String name){
         super(name);
@@ -160,6 +166,8 @@ public abstract class GenericTractorBeamTurret<T extends Teamc> extends BaseTurr
 
             boolean shot = false;
             if(canShoot()){
+                targetPos.limit(range);
+
                 if(!logicControlled() && !isControlled() && timer(timerTarget, retargetTime)){
                     findTarget();
                 }
@@ -170,7 +178,7 @@ public abstract class GenericTractorBeamTurret<T extends Teamc> extends BaseTurr
 
                     boolean shoot = true;
                     if(isControlled()){
-                        targetPos.set(unit.aimX(), unit.aimX());
+                        targetPos.set(unit.aimX(), unit.aimY());
                         shoot = unit.isShooting();
                     }else if(logicControlled()){
                         shoot = logicShooting;
@@ -196,14 +204,16 @@ public abstract class GenericTractorBeamTurret<T extends Teamc> extends BaseTurr
         }
 
         protected boolean updateShooting(){
+            tr.trns(rotation, shootLength);
+
             if(logicControlled() || isControlled()){
                 findTarget(targetPos);
             }
 
             if(target != null){
-                control.sound.loop(shootSound, this, shootSoundVolume);
-
                 apply();
+                if(strength > 0.01f) control.sound.loop(shootSound, this, shootSoundVolume);
+
                 return true;
             }else{
                 return false;
@@ -247,15 +257,17 @@ public abstract class GenericTractorBeamTurret<T extends Teamc> extends BaseTurr
 
         @Override
         public void drawExt(){
-            if(strength > 0.1f){
+            if(strength > 0.01f){
                 Draw.z(Layer.bullet);
-                float ang = angleTo(targetPos.x, targetPos.y);
-
                 Draw.mixcol(laserColor, Mathf.absin(4f, 0.6f));
 
                 Drawf.laser(team, laser, laserEnd,
-                x + Angles.trnsx(ang, shootLength), y + Angles.trnsy(ang, shootLength),
-                    targetPos.x, targetPos.y, strength * efficiency() * laserWidth);
+                    x + tr.x,
+                    y + tr.y,
+                    targetPos.x,
+                    targetPos.y,
+                strength * efficiency() * laserWidth
+                );
 
                 Draw.mixcol();
             }
