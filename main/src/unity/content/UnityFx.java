@@ -1138,6 +1138,28 @@ public class UnityFx{
         blend();
     }),
 
+    kamiCharge = new Effect(60f, e -> {
+        blend(Blending.additive);
+        color(Tmp.c1.set(Color.red).shiftHue(e.time * 3f));
+        e.scaled(20f, s -> {
+            stroke(3f * Mathf.clamp(s.fin() * 2f));
+            circle(e.x, e.y, s.fout() * 300f);
+        });
+        for(int i = 0; i < 15; i++){
+            float fout = 1f - Mathf.clamp(Mathf.randomSeed(e.id + (i * 121), 1f, 2f) * e.fin());
+            float angle = Mathf.randomSeed(e.id + (i * 3542), 360f);
+            float rad = Mathf.randomSeed(e.id + (i * 2451), 150f, 300f);
+
+            if(fout > 0.0001f){
+                Tmp.v1.trns(angle, rad * fout).add(e.x, e.y);
+                float slope = (0.5f - Math.abs(fout - 0.5f)) * 2f;
+                color(Tmp.c1.set(Color.red).shiftHue((e.time + Mathf.randomSeed(e.id + (i * 231), 360f)) * 3f));
+                Fill.square(Tmp.v1.x, Tmp.v1.y, 13f * slope, 45f);
+            }
+        }
+        blend();
+    }),
+
     kamiWarningLine = new Effect(120f, 670f * 2f, e -> {
         if(e.data == null) return;
         Position[] data = (Position[])e.data;
