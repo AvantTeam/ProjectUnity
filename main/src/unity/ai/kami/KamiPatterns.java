@@ -370,11 +370,11 @@ public class KamiPatterns{
                     ai.reloads[2] = 0f;
                     ai.kami().laserRotation = ai.angleTo(ai.targetPos);
                 }, ai -> {
-                    if(ai.reloads[1] >= 15f){
+                    if(ai.reloads[1] >= 18f){
                         int diff = 10 + Mathf.clamp(ai.difficulty * 6, 0, 6 * 3);
                         KamiBulletPresets.square(UnityBullets.kamiBullet1, ai.unit, ai.unit.team, ai.getX(), ai.getY(), ai.kami().laserRotation + ai.reloads[2], 3.75f, diff, b -> b.hitSize /= 1.5f);
                         ai.reloads[1] = 0f;
-                        ai.reloads[2] += 12f * ai.reloads[0];
+                        ai.reloads[2] += 13f * ai.reloads[0];
                     }
                     ai.reloads[1] += Time.delta;
                 }),
