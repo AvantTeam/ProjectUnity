@@ -5,6 +5,7 @@ import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.type.*;
+import mindustry.world.meta.*;
 
 /** @author GlennFolker */
 public class HeatRayTurret extends GenericTractorBeamTurret<Teamc>{
@@ -17,6 +18,16 @@ public class HeatRayTurret extends GenericTractorBeamTurret<Teamc>{
 
     public HeatRayTurret(String name){
         super(name);
+    }
+
+    @Override
+    public void setStats(){
+        super.setStats();
+
+        //TODO display status
+        stats.add(Stat.damage, damage / 60f, StatUnit.perSecond);
+        stats.add(Stat.targetsAir, targetAir);
+        stats.add(Stat.targetsGround, targetGround);
     }
 
     public class HeatRayTurretBuild extends GenericTractorBeamTurretBuild{

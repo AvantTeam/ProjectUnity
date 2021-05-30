@@ -1,5 +1,6 @@
 package unity.world.blocks.defense;
 
+import arc.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -7,6 +8,7 @@ import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
+import mindustry.world.meta.*;
 import unity.content.*;
 import unity.graphics.*;
 
@@ -27,6 +29,27 @@ public class LifeStealerTurret extends GenericTractorBeamTurret<Teamc>{
 
     public LifeStealerTurret(String name){
         super(name);
+    }
+
+    @Override
+    public void setStats(){
+        super.setStats();
+
+        stats.add(Stat.damage, damage / 60f, StatUnit.perSecond);
+        stats.add(Stat.targetsAir, targetAir);
+        stats.add(Stat.targetsGround, targetGround);
+        stats.add(Stat.abilities, cont -> {
+            cont.row();
+            cont.table(bt -> {
+                bt.left().defaults().padRight(3).left();
+
+                bt.row();
+                bt.add(Core.bundle.format("stat.unity.maxcontain", maxContain));
+
+                bt.row();
+                bt.add(Core.bundle.format("stat.unity.healpercent", healPercent));
+            });
+        });
     }
 
     public class LifeStealerTurretBuild extends GenericTractorBeamTurretBuild{
