@@ -107,5 +107,9 @@ class SoulHoldComp extends Block{
         public void unjoin(){
             if(souls > 0) souls--;
         }
+
+        public float soulf(){
+            return souls / (float)maxSouls;
+        }
     }
 }

@@ -96,6 +96,10 @@ abstract class MonolithComp implements Unitc, Factionc{
         if(souls > 0) souls--;
     }
 
+    public float soulf(){
+        return souls / (float)maxSouls;
+    }
+
     public boolean canControl(){
         return canJoin() && (headless || (player != null && player.unit() instanceof Monolithc unit && unit.isSameFaction(this)));
     }

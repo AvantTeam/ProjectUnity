@@ -2,6 +2,7 @@ package unity.world.blocks.defense.turrets;
 
 import arc.*;
 import arc.audio.*;
+import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -26,6 +27,7 @@ import static mindustry.Vars.*;
  * @param <T> The target type, such as {@link Bullet} or {@link Unit}.
  * @author GlennFolker
  */
+@SuppressWarnings("unchecked")
 public abstract class GenericTractorBeamTurret<T extends Teamc> extends BaseTurret{
     public final int timerTarget = timers++;
     public float retargetTime = 5f;
@@ -46,6 +48,7 @@ public abstract class GenericTractorBeamTurret<T extends Teamc> extends BaseTurr
     public TextureRegion laserEnd;
 
     protected Vec2 tr = new Vec2();
+    protected Floatf<GenericTractorBeamTurretBuild> laserAlpha = Building::efficiency;
 
     protected GenericTractorBeamTurret(String name){
         super(name);
@@ -54,6 +57,10 @@ public abstract class GenericTractorBeamTurret<T extends Teamc> extends BaseTurr
         hasItems = hasLiquids = false;
         hasPower = consumesPower = true;
         acceptCoolant = false;
+    }
+
+    public <E extends GenericTractorBeamTurretBuild> void laserAlpha(Floatf<E> laserAlpha){
+        this.laserAlpha = (Floatf<GenericTractorBeamTurretBuild>) laserAlpha;
     }
 
     @Override
@@ -199,8 +206,8 @@ public abstract class GenericTractorBeamTurret<T extends Teamc> extends BaseTurr
             }
 
             if(shot){
-                control.sound.loop(shootSound, this, shootSoundVolume);
-                strength = Mathf.lerpDelta(strength, efficiency(), 0.1f);
+                strength = Mathf.lerpDelta(strength, Mathf.clamp(efficiency()), 0.1f);
+                if(strength > 0.1f) control.sound.loop(shootSound, this, shootSoundVolume);
             }else{
                 strength = Mathf.lerpDelta(strength, 0f, 0.1f);
             }
@@ -211,7 +218,9 @@ public abstract class GenericTractorBeamTurret<T extends Teamc> extends BaseTurr
                 findTarget(targetPos);
             }
 
-            if(target != null) apply();
+            if(target != null && strength > 0.1f){
+                apply();
+            }
         }
 
         protected void turnToTarget(float targetRot){
@@ -251,16 +260,18 @@ public abstract class GenericTractorBeamTurret<T extends Teamc> extends BaseTurr
 
         @Override
         public void drawExt(){
-            if(strength > 0.01f){
+            if(strength > 0.1f){
                 Draw.z(Layer.bullet);
+
                 Draw.mixcol(laserColor, Mathf.absin(4f, 0.6f));
+                Draw.alpha(efficiency());
 
                 Drawf.laser(team, laser, laserEnd,
                     x + tr.x,
                     y + tr.y,
                     targetPos.x,
                     targetPos.y,
-                    strength * efficiency() * laserWidth
+                    strength * laserWidth
                 );
 
                 Draw.mixcol();

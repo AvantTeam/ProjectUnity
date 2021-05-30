@@ -25,6 +25,7 @@ import unity.annotations.Annotations.*;
 import unity.entities.bullet.*;
 import unity.entities.bullet.exp.*;
 import unity.gen.*;
+import unity.gen.SoulHoldLifeStealerTurret.*;
 import unity.graphics.*;
 import unity.mod.*;
 import unity.type.exp.*;
@@ -2034,6 +2035,8 @@ public class UnityBlocks implements ContentList{
             requireSoul = false;
             efficiencyFrom = 0.8f;
             efficiencyTo = 1.5f;
+
+            laserAlpha((SoulLifeStealerTurretBuild b) -> b.power.status * (0.5f + b.soulf() * 0.5f));
         }};
 
         recluse = new SoulHoldTurretItemTurret("recluse"){{
@@ -2073,6 +2076,8 @@ public class UnityBlocks implements ContentList{
             requireSoul = false;
             efficiencyFrom = 0.8f;
             efficiencyTo = 1.6f;
+
+            laserAlpha((SoulAbsorberTurretBuild b) -> b.power.status * (0.5f + b.soulf() * 0.5f));
         }};
 
         mage = new SoulHoldTurretPowerTurret("mage"){{
@@ -2188,6 +2193,8 @@ public class UnityBlocks implements ContentList{
             maxSouls = 5;
             efficiencyFrom = 0.8f;
             efficiencyTo = 1.6f;
+
+            laserAlpha((SoulHeatRayTurretBuild b) -> b.power.status * (0.5f + b.soulf() * 0.5f));
         }};
 
         oracle = new SoulHoldTurretBurstPowerTurret("oracle"){{
@@ -2274,6 +2281,8 @@ public class UnityBlocks implements ContentList{
             maxSouls = 7;
             efficiencyFrom = 0.7f;
             efficiencyTo = 1.67f;
+
+            laserAlpha((SoulHeatRayTurretBuild b) -> b.power.status * (0.5f + b.soulf() * 0.5f));
         }};
 
         supernova = new SoulHoldTurretAttractLaserTurret("supernova"){
