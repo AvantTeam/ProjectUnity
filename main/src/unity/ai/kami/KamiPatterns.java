@@ -340,6 +340,47 @@ public class KamiPatterns{
                 new KamiPatternStage(1.5f * 60f, ai -> ai.moveAround(60f), null)
             };
         }}, 1);
+
+        //Keiki
+        //Square Shape "Square-Shaped Sculpting Art"/Square Shape "Square Creature"
+        addPattern(new KamiPattern(){{
+            time = 25f * 60f;
+            maxDamage = 1000f;
+            init = ai -> ai.reloads[0] = -1f;
+            stages = new KamiPatternStage[]{
+                new KamiPatternStage(60f, ai -> {
+                    ai.reloads[1] = 15f;
+                    ai.reloads[2] = 0f;
+                    ai.kami().laserRotation = ai.angleTo(ai.targetPos);
+                }, ai -> {
+                    if(ai.reloads[2] < 2f){
+                        if(ai.reloads[1] >= 20f){
+                            int diff = 10 + Mathf.clamp(ai.difficulty * 6, 0, 6 * 3);
+                            KamiBulletPresets.square(UnityBullets.kamiBullet1, ai.unit, ai.unit.team, ai.getX(), ai.getY(), ai.kami().laserRotation + (ai.reloads[2] * 45f), 3.75f, diff, b -> b.hitSize /= 1.5f);
+                            ai.reloads[1] = 0f;
+                            ai.reloads[2] += 1f;
+                        }
+                        ai.reloads[1] += Time.delta;
+                    }
+                }),
+                new KamiPatternStage(60f, ai -> UnityFx.kamiCharge.at(ai.getX(), ai.getY(), 0f, ai.unit), null),
+                new KamiPatternStage(5f * 60f, ai -> {
+                    ai.reloads[0] *= -1f;
+                    ai.reloads[1] = 10f;
+                    ai.reloads[2] = 0f;
+                    ai.kami().laserRotation = ai.angleTo(ai.targetPos);
+                }, ai -> {
+                    if(ai.reloads[1] >= 15f){
+                        int diff = 10 + Mathf.clamp(ai.difficulty * 6, 0, 6 * 3);
+                        KamiBulletPresets.square(UnityBullets.kamiBullet1, ai.unit, ai.unit.team, ai.getX(), ai.getY(), ai.kami().laserRotation + ai.reloads[2], 3.75f, diff, b -> b.hitSize /= 1.5f);
+                        ai.reloads[1] = 0f;
+                        ai.reloads[2] += 12f * ai.reloads[0];
+                    }
+                    ai.reloads[1] += Time.delta;
+                }),
+                new KamiPatternStage(35f, ai -> ai.moveAround(30f), null)
+            };
+        }}, 1);
     }
 
     public static class KamiPattern{
