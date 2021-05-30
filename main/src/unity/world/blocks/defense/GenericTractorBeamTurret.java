@@ -166,7 +166,7 @@ public abstract class GenericTractorBeamTurret<T extends Teamc> extends BaseTurr
 
             boolean shot = false;
             if(canShoot()){
-                targetPos.limit(range);
+                targetPos.sub(this).limit(range).add(this);
 
                 if(!logicControlled() && !isControlled() && timer(timerTarget, retargetTime)){
                     findTarget();
@@ -191,33 +191,28 @@ public abstract class GenericTractorBeamTurret<T extends Teamc> extends BaseTurr
                     }
 
                     if(shoot && Angles.angleDist(rotation, targetRot) < shootCone){
-                        shot = updateShooting();
+                        shot = true;
+                        updateShooting();
                     }
                 }
             }
 
             if(shot){
+                control.sound.loop(shootSound, this, shootSoundVolume);
                 strength = Mathf.lerpDelta(strength, efficiency(), 0.1f);
             }else{
                 strength = Mathf.lerpDelta(strength, 0f, 0.1f);
             }
         }
 
-        protected boolean updateShooting(){
+        protected void updateShooting(){
             tr.trns(rotation, shootLength);
 
             if(logicControlled() || isControlled()){
                 findTarget(targetPos);
             }
 
-            if(target != null){
-                apply();
-                if(strength > 0.01f) control.sound.loop(shootSound, this, shootSoundVolume);
-
-                return true;
-            }else{
-                return false;
-            }
+            if(target != null) apply();
         }
 
         protected void turnToTarget(float targetRot){
