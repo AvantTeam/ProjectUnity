@@ -123,14 +123,11 @@ task fetchComps {
             }}
         }
 
-        final int[] done = [Integer.MAX_VALUE]
-
         final UnsafeRunnable mainRun = {
         Core.net.httpGet(
         "https://api.github.com/repos/Anuken/Mindustry/contents/core/src/mindustry/entities/comp?ref=$mindustryVersion",
         { res ->
             final def list = Jval.read(res.getResultAsString()).asArray()
-            done[0] = list.size
 
             for(def val : list) {
                 final def filename = val.get('name').asString()
@@ -159,8 +156,7 @@ task fetchComps {
                             fi.writeString(content, false)
                         }
 
-                        done[0]--
-                        println "Wrote '$filename': ${done[0]} left."
+                        println "Wrote '$filename'"
                     }
 
                     execute(write)
@@ -173,7 +169,6 @@ task fetchComps {
         { err -> throw new RuntimeException(err) })}
 
         execute(mainRun)
-        while(done[0] > 0) Threads.yield()
 
         fetchTemp.writeString("$mindustryVersion/$fetchRevision")
         println 'Done writing.'
