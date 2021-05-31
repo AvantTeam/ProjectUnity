@@ -131,7 +131,7 @@ public class EntityProcessor extends BaseProcessor{
                             .build()
                         );
 
-                    for(TypeElement extraInterface : Seq.with(comp.getInterfaces()).map(BaseProcessor::toEl).<TypeElement>as().select(i -> !isCompInterface(i))){
+                    for(TypeElement extraInterface : Seq.with(comp.getInterfaces()).map(BaseProcessor::toEl).select(i -> !isCompInterface(i))){
                         inter.addSuperinterface(cName(extraInterface));
                     }
 
@@ -432,7 +432,7 @@ public class EntityProcessor extends BaseProcessor{
                         Seq<ExecutableElement> bypass = entry.value.select(m -> annotation(m, BypassGroupCheck.class) != null);
                         entry.value.removeAll(bypass);
 
-                        boolean firstc = append(mbuilder, bypass, inserts, writeBlock, first);
+                        boolean firstc = append(mbuilder, bypass, inserts, writeBlock);
                         if(!firstc){
                             mbuilder.addCode(lnew());
                         }
@@ -498,7 +498,7 @@ public class EntityProcessor extends BaseProcessor{
                         }
                     }
 
-                    boolean firstc = append(mbuilder, entry.value, inserts, writeBlock, first);
+                    boolean firstc = append(mbuilder, entry.value, inserts, writeBlock);
 
                     if(!firstc && !noCompAfter.isEmpty()) mbuilder.addCode(lnew());
                     for(ExecutableElement e : noCompAfter){
@@ -674,7 +674,7 @@ public class EntityProcessor extends BaseProcessor{
                 EntityPoint point = annotation(e, EntityPoint.class);
                 boolean isUnit = e instanceof VariableElement;
 
-                TypeElement type = (TypeElement)toEl(isUnit ? elements(point::value).first().asType() : e.asType());
+                TypeElement type = toEl(isUnit ? elements(point::value).first().asType() : e.asType());
                 ExecutableElement create = method(type, "create", type.asType(), Collections.emptyList());
                 String constructor = create == null ? "new" : "create";
 
@@ -750,7 +750,7 @@ public class EntityProcessor extends BaseProcessor{
         }
     }
 
-    boolean append(MethodSpec.Builder mbuilder, Seq<ExecutableElement> values, Seq<ExecutableElement> inserts, boolean writeBlock, ExecutableElement first){
+    boolean append(MethodSpec.Builder mbuilder, Seq<ExecutableElement> values, Seq<ExecutableElement> inserts, boolean writeBlock){
         boolean firstc = true;
         for(ExecutableElement elem : values){
             String descStr = descString(elem);
@@ -861,7 +861,7 @@ public class EntityProcessor extends BaseProcessor{
     }
 
     TypeElement toComp(Class<?> inter){
-        return toComp(elementUtils.getTypeElement(inter.getCanonicalName()));
+        return toComp(toType(inter));
     }
 
     String interfaceName(TypeElement type){

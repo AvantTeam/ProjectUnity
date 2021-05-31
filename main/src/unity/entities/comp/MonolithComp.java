@@ -9,6 +9,7 @@ import mindustry.type.*;
 import unity.ai.*;
 import unity.annotations.Annotations.*;
 import unity.content.*;
+import unity.entities.*;
 import unity.gen.*;
 import unity.mod.*;
 import unity.type.*;
@@ -17,14 +18,14 @@ import static mindustry.Vars.*;
 
 @SuppressWarnings("unused")
 @EntityComponent
-abstract class MonolithComp implements Unitc, Factionc{
+abstract class MonolithComp implements Unitc, Factionc, Soul{
     @Import UnitController controller;
     @Import Team team;
     @Import float x, y, hitSize, maxHealth;
     @Import UnitType type;
 
-    @ReadOnly int souls;
-    transient int maxSouls;
+    private int souls;
+    private transient int maxSouls;
 
     @Override
     public Faction faction(){
@@ -84,24 +85,28 @@ abstract class MonolithComp implements Unitc, Factionc{
         return souls <= 0;
     }
 
-    public boolean canJoin(){
-        return souls < maxSouls;
+    @Override
+    public int souls(){
+        return souls;
     }
 
+    @Override
+    public int maxSouls(){
+        return maxSouls;
+    }
+
+    @Override
     public void join(){
         if(canJoin()) souls++;
     }
 
+    @Override
     public void unjoin(){
         if(souls > 0) souls--;
     }
 
-    public float soulf(){
-        return souls / (float)maxSouls;
-    }
-
     public boolean canControl(){
-        return canJoin() && (headless || (player != null && player.unit() instanceof Monolithc unit && unit.isSameFaction(this)));
+        return canJoin() && (headless || acceptSoul(player.unit()) > 0);
     }
 
     @Override

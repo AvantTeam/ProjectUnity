@@ -5,6 +5,7 @@ import arc.util.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
+import unity.entities.*;
 import unity.gen.*;
 import unity.gen.SoulHoldc.*;
 
@@ -31,27 +32,13 @@ public class MonolithSoulAI implements UnitController{
 
     @Override
     public void updateUnit(){
-        if(empty){
-            unit.kill();
-        }
+        if(empty) unit.kill();
 
         if(timer.get(5f)){
-            Unit targetUnit = Units.closest(unit.team, unit.x, unit.y, u -> u instanceof Monolithc m && m.canJoin());
-            Building targetBuilding = indexer.findTile(unit.team, unit.x, unit.y, Float.MAX_VALUE, b -> b instanceof SoulBuildc soul && soul.canJoin());
-
-            if(targetUnit != null && targetBuilding != null){
-                if(unit.dst2(targetUnit) > unit.dst2(targetBuilding)){
-                    target = targetBuilding;
-                }else{
-                    target = targetUnit;
-                }
-            }else{
-                if(targetUnit != null){
-                    target = targetUnit;
-                }else if(targetBuilding != null){
-                    target = targetBuilding;
-                }
-            }
+            target = Units.closest(unit.team, unit.x, unit.y, u -> {
+                Soul soul = Soul.toSoul(u);
+                return soul != null && soul.acceptSoul(unit) > 0;
+            });
         }
 
         if(target != null && !unit.dead){

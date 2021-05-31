@@ -8,7 +8,7 @@ import mindustry.world.blocks.*;
 import mindustry.world.blocks.defense.turrets.Turret.*;
 import mindustry.world.meta.*;
 import unity.annotations.Annotations.*;
-import unity.gen.*;
+import unity.entities.*;
 import unity.world.blocks.defense.turrets.*;
 
 import static mindustry.Vars.*;
@@ -44,11 +44,11 @@ class SoulHoldComp extends Block{
         });
     }
 
-    public class SoulBuildComp extends Building implements ControlBlock{
+    public class SoulBuildComp extends Building implements ControlBlock, Soul{
         transient BlockUnitc unit = Nulls.blockUnit;
 
         @ReadOnly boolean wasPlayer;
-        @ReadOnly int souls;
+        private int souls;
 
         @Override
         @Replace
@@ -58,7 +58,7 @@ class SoulHoldComp extends Block{
 
         @Override
         public boolean canControl(){
-            return canJoin() && (headless || (player != null && player.unit() instanceof Monolithc unit && unit.souls() > 0 && unit.isSameFaction(this)));
+            return canJoin() && (headless || acceptSoul(player.unit()) > 0);
         }
 
         @Override
@@ -92,24 +92,28 @@ class SoulHoldComp extends Block{
             return (requireSoul && disabled()) ? 0f : (super.efficiency() * ((souls / (float)maxSouls) * (efficiencyTo - efficiencyFrom) + efficiencyFrom));
         }
 
+        @Override
+        public int souls(){
+            return souls;
+        }
+
+        @Override
+        public int maxSouls(){
+            return maxSouls;
+        }
+
         public boolean disabled(){
-            return souls <= 0;
+            return !hasSouls();
         }
 
-        public boolean canJoin(){
-            return souls < maxSouls;
-        }
-
+        @Override
         public void join(){
             if(canJoin()) souls++;
         }
 
+        @Override
         public void unjoin(){
             if(souls > 0) souls--;
-        }
-
-        public float soulf(){
-            return souls / (float)maxSouls;
         }
     }
 }

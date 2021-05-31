@@ -14,7 +14,6 @@ import javax.annotation.processing.*;
 import javax.lang.model.*;
 import javax.lang.model.element.*;
 import javax.lang.model.type.*;
-import javax.lang.model.util.*;
 import javax.tools.*;
 
 import com.squareup.javapoet.*;
@@ -134,8 +133,8 @@ public abstract class BaseProcessor extends AbstractProcessor{
         }
     }
 
-    public static Element toEl(TypeMirror t){
-        return typeUtils.asElement(t);
+    public static TypeElement toEl(TypeMirror t){
+        return (TypeElement)typeUtils.asElement(t);
     }
 
     public static Seq<Element> elements(Runnable run){
@@ -185,11 +184,7 @@ public abstract class BaseProcessor extends AbstractProcessor{
     }
 
     public static String stripTV(String canonical){
-        return canonical.replaceAll("\\<[A-Z]+\\>", "");
-    }
-
-    public static ClassName withoutTV(TypeElement t){
-        return cName(stripTV(t.getQualifiedName().toString()));
+        return canonical.replaceAll("<[A-Z]+>", "");
     }
 
     public static String lnew(){
@@ -234,8 +229,13 @@ public abstract class BaseProcessor extends AbstractProcessor{
             simpleName(e).equals("<clinit>");
     }
 
-    public String docs(Element e){
-        return elementUtils.getDocComment(e) == null ? "" : elementUtils.getDocComment(e);
+    boolean hasMethod(TypeElement type, ExecutableElement method){
+        for(; !(type.getSuperclass() instanceof NoType); type = toEl(type.getSuperclass())){
+            if(method(type, simpleName(method), method.getReturnType(), method.getParameters()) != null){
+                return true;
+            }
+        }
+        return false;
     }
 
     ExecutableElement method(TypeElement type, String name, TypeMirror retType, List<? extends VariableElement> params){
@@ -243,80 +243,24 @@ public abstract class BaseProcessor extends AbstractProcessor{
             List<? extends VariableElement> realParams = m.getParameters();
 
             return
-                m.getSimpleName().toString().equals(name) &&
-                (retType != null ? typeUtils.isSameType(m.getReturnType(), retType) : true) &&
-                realParams.equals(params);
+                simpleName(m).equals(name) &&
+                (retType == null || typeUtils.isSameType(m.getReturnType(), retType)) &&
+                paramEquals(realParams, params);
         });
     }
 
-    VariableElement field(TypeElement type, String name, TypeMirror ftype){
-        return vars(type).find(f ->
-            f.getSimpleName().toString().equals(name) &&
-            typeUtils.isSameType(f.asType(), ftype)
-        );
-    }
+    boolean paramEquals(List<? extends VariableElement> first, List<? extends VariableElement> second){
+        if(first.size() != second.size()) return false;
 
-    ObjectMap<ExecutableElement, Seq<ExecutableElement>> getAppendedMethods(TypeElement base, TypeElement comp){
-        ObjectMap<ExecutableElement, Seq<ExecutableElement>> appending = new ObjectMap<>();
-        Seq<ExecutableElement> baseMethods = getMethodsRec(base);
-        Seq<ExecutableElement> toAppend = methods(comp).select(m ->
-            m.getModifiers().contains(Modifier.DEFAULT)
-        );
+        boolean same = true;
+        for(int i = 0; same && i < first.size(); i++){
+            VariableElement a = first.get(i);
+            VariableElement b = second.get(i);
 
-        for(ExecutableElement e : toAppend){
-            ExecutableElement append = baseMethods.find(m -> {
-                boolean equal = m.getParameters().size() == e.getParameters().size();
-                for(int i = 0; i < m.getParameters().size(); i++){
-                    if(!equal) break;
-                    try{
-                        VariableElement up = m.getParameters().get(i);
-                        VariableElement c = e.getParameters().get(i);
-
-                        equal = typeUtils.isSameType(up.asType(), c.asType());
-                    }catch(IndexOutOfBoundsException ex){
-                        return false;
-                    }
-                }
-
-                return m.getSimpleName().toString().equals(e.getSimpleName().toString()) && equal;
-            });
-
-            if(append != null){
-                appending.get(append, Seq::new).add(e);
-            }
+            if(!typeUtils.isSameType(a.asType(), b.asType())) same = false;
         }
 
-        return appending;
-    }
-
-    Seq<ExecutableElement> getMethodsRec(TypeElement type){
-        Seq<ExecutableElement> methods = methods(type);
-        getInterfaces(type).each(t -> 
-        methods(t).each(m ->
-                !methods.contains(mm -> elementUtils.overrides(mm, m, type))
-            ,
-            methods::add)
-        );
-
-        return methods;
-    }
-
-    ObjectSet<TypeElement> getInterfaces(TypeElement type){
-        if(type == null) return new ObjectSet<>();
-
-        Seq<TypeMirror> inters = Seq.with(type.getInterfaces()).as();
-        inters.add(type.asType());
-        inters.add(type.getSuperclass());
-
-        ObjectSet<TypeElement> all = ObjectSet.with(inters.map(BaseProcessor::toEl).map(e -> (TypeElement)e));
-        all.addAll(getInterfaces((TypeElement)toEl(type.getSuperclass())));
-        for(TypeMirror m : type.getInterfaces()){
-            if(!(m instanceof NoType)){
-                all.addAll(getInterfaces((TypeElement)toEl(m)));
-            }
-        }
-
-        return all.select(e -> !(e instanceof NoType));
+        return same;
     }
 
     Seq<String> getImports(Element e){

@@ -136,7 +136,7 @@ public class MergeProcessor extends BaseProcessor{
             inter.addModifiers(Modifier.STATIC);
         }
 
-        for(TypeElement extraInterface : Seq.with(comp.getInterfaces()).map(BaseProcessor::toEl).<TypeElement>as().select(i -> !isCompInterface(i))){
+        for(TypeElement extraInterface : Seq.with(comp.getInterfaces()).map(BaseProcessor::toEl).select(i -> !isCompInterface(i))){
             inter.addSuperinterface(cName(extraInterface));
         }
 
@@ -378,6 +378,9 @@ public class MergeProcessor extends BaseProcessor{
             entry.value.sort(Structs.comps(Structs.comparingFloat(m -> annotation(m, MethodPriority.class) != null ? annotation(m, MethodPriority.class).value() : 0), Structs.comparing(BaseProcessor::simpleName)));
 
             ExecutableElement first = entry.value.first();
+            if(superCall){
+                superCall = hasMethod(isBuild ? findBuild(baseClass) : baseClass, first);
+            }
 
             if(annotation(first, InternalImpl.class) != null) continue;
 
@@ -553,7 +556,6 @@ public class MergeProcessor extends BaseProcessor{
 
             out.addAll(Seq.with(component.getInterfaces())
                 .map(BaseProcessor::toEl)
-                .<TypeElement>as()
                 .map(t -> inters.find(i -> simpleName(t).equals(simpleName(i))))
                 .select(Objects::nonNull)
                 .map(this::toComp)
