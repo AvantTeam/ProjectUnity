@@ -19,6 +19,7 @@ public class KamiLaserBulletType extends BulletType{
     private static final Vec2 tVecD = new Vec2();
     private static final Rect tRect1 = new Rect();
     private static final Rect tRect2 = new Rect();
+    private static final Ellipse tElpse = new Ellipse();
     private static TextureRegion circleRegion;
 
     public float length = 280f;
@@ -55,6 +56,8 @@ public class KamiLaserBulletType extends BulletType{
                 if(b.team != e.team){
                     Position a = e.dst(tVecB) < e.dst(tVecD) ? tVecB : tVecD;
                     float ba = e.dst(tVecB) < e.dst(tVecD) ? 0f : 180f;
+                    float size = e.hitSize / 2f;
+                    /*
                     //float angle = Angles.within(a.angleTo(e), b.rotation() + ba, 90f) ? 1f + (Mathf.clamp(1f - (Angles.angleDist(a.angleTo(e), b.rotation() + ba) / 90f)) * curveScl) : 1f;
                     float shape = Mathf.clamp(1f - (angDist(a.angleTo(e), b.rotation() + ba) / 90f));
                     float angle = angDist(a.angleTo(e), b.rotation() + ba) < 90f ? 1f + (Interp.sineIn.apply(shape) * curveScl) : 1f;
@@ -62,6 +65,19 @@ public class KamiLaserBulletType extends BulletType{
                     if(Intersector.intersectSegmentCircle(tVecD, tVecB, tVecC, (fout * fout * angle) + (e.hitSize * e.hitSize))){
                         b.collision(e, e.x, e.y);
                         //Unity.print("Hit: " + Time.time + ":" + angle);
+                    }
+                    */
+                    if(angDist(a.angleTo(e), b.rotation() + ba) < 90f){
+                        tVec.trns(-b.rotation(), e.x, e.y);
+                        Tmp.v1.set(e).sub(a).rotate(-b.rotation());
+                        tElpse.set(0f, 0f, ((curveScl * fout) + size) * 2f, (fout + size) * 2f);
+                        if(tElpse.contains(Tmp.v1)){
+                            hitEffect.at(e.x, e.y);
+                            b.collision(e, e.x, e.y);
+                        }
+                    }else if(Intersector.intersectSegmentCircle(tVecD, tVecB, tVecC, (fout * fout) + (size * size))){
+                        hitEffect.at(e.x, e.y);
+                        b.collision(e, e.x, e.y);
                     }
                 }
             });
