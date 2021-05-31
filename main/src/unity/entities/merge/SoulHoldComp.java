@@ -24,6 +24,9 @@ class SoulHoldComp extends Block{
 
     public SoulHoldComp(String name){
         super(name);
+        update = true;
+        destructible = true;
+        sync = true;
     }
 
     @Override

@@ -24,7 +24,11 @@ public interface Soul{
     }
 
     default int acceptSoul(Soul other){
-        return Math.min(maxSouls() - souls(), other.souls());
+        return acceptSoul(other.souls());
+    }
+
+    default int acceptSoul(int amount){
+        return Math.min(maxSouls() - souls(), amount);
     }
 
     void join();
