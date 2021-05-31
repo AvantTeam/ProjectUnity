@@ -11,19 +11,19 @@ import unity.world.meta.*;
 @SuppressWarnings({"unchecked", "unused"})
 @MergeComponent
 class StemComp extends Block{
-    @ReadOnly Cons<StemBuildc> draw = e -> {};
-    @ReadOnly Cons<StemBuildc> update = e -> {};
+    @ReadOnly Cons<StemBuildc> drawStem = e -> {};
+    @ReadOnly Cons<StemBuildc> updateStem = e -> {};
 
     public StemComp(String name){
         super(name);
     }
     
     public <T extends StemBuildc> void draw(Cons<T> draw){
-        this.draw = (Cons<StemBuildc>)draw;
+        drawStem = (Cons<StemBuildc>)draw;
     }
 
     public <T extends StemBuildc> void update(Cons<T> update){
-        this.update = (Cons<StemBuildc>)update;
+        updateStem = (Cons<StemBuildc>)update;
     }
 
     public class StemBuildComp extends Building{
@@ -31,12 +31,12 @@ class StemComp extends Block{
 
         @Override
         public void draw(){
-            draw.get(self());
+            drawStem.get(self());
         }
 
         @Override
         public void updateTile(){
-            update.get(self());
+            updateStem.get(self());
         }
 
         @Override
