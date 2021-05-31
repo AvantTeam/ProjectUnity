@@ -583,6 +583,7 @@ public class MergeProcessor extends BaseProcessor{
         return rev.toString("", s -> {
             String name = simpleName(s);
             if(name.endsWith("Comp")) name = name.substring(0, name.length() - 4);
+            if(name.endsWith("Building")) name = name.substring(0, name.length() - 8);
             if(name.endsWith("Build")) name = name.substring(0, name.length() - 5);
             return name;
         });

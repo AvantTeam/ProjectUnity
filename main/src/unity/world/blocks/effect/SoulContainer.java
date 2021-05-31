@@ -9,8 +9,7 @@ public class SoulContainer extends SoulHoldBlock{
         super(name);
     }
 
-    //TODO also strip the "Building" suffix in the annotation processor to result "SoulBuild" instead
-    public class SoulContainerBuild extends SoulBuildingBuild{
+    public class SoulContainerBuild extends SoulBuild{
 
     }
 }
