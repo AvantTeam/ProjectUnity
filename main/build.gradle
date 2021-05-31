@@ -128,7 +128,6 @@ task fetchComps {
         "https://api.github.com/repos/Anuken/Mindustry/contents/core/src/mindustry/entities/comp?ref=$mindustryVersion",
         { res ->
             final def list = Jval.read(res.getResultAsString()).asArray()
-            print "Found $list.size comps"
 
             for(def val : list) {
                 final def filename = val.get('name').asString()
