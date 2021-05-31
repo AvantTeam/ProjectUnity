@@ -2036,7 +2036,7 @@ public class UnityBlocks implements ContentList{
             efficiencyFrom = 0.8f;
             efficiencyTo = 1.5f;
 
-            laserAlpha((SoulLifeStealerTurretBuild b) -> b.power.status * (0.5f + b.soulf() * 0.5f));
+            laserAlpha((SoulLifeStealerTurretBuild b) -> b.power.status * (0.7f + b.soulf() * 0.3f));
         }};
 
         recluse = new SoulHoldTurretItemTurret("recluse"){{
@@ -2077,7 +2077,7 @@ public class UnityBlocks implements ContentList{
             efficiencyFrom = 0.8f;
             efficiencyTo = 1.6f;
 
-            laserAlpha((SoulAbsorberTurretBuild b) -> b.power.status * (0.5f + b.soulf() * 0.5f));
+            laserAlpha((SoulAbsorberTurretBuild b) -> b.power.status * (0.7f + b.soulf() * 0.3f));
         }};
 
         mage = new SoulHoldTurretPowerTurret("mage"){{
@@ -2194,7 +2194,7 @@ public class UnityBlocks implements ContentList{
             efficiencyFrom = 0.8f;
             efficiencyTo = 1.6f;
 
-            laserAlpha((SoulHeatRayTurretBuild b) -> b.power.status * (0.5f + b.soulf() * 0.5f));
+            laserAlpha((SoulHeatRayTurretBuild b) -> b.power.status * (0.7f + b.soulf() * 0.3f));
         }};
 
         oracle = new SoulHoldTurretBurstPowerTurret("oracle"){{
@@ -2282,7 +2282,7 @@ public class UnityBlocks implements ContentList{
             efficiencyFrom = 0.7f;
             efficiencyTo = 1.67f;
 
-            laserAlpha((SoulHeatRayTurretBuild b) -> b.power.status * (0.5f + b.soulf() * 0.5f));
+            laserAlpha((SoulHeatRayTurretBuild b) -> b.power.status * (0.7f + b.soulf() * 0.3f));
         }};
 
         supernova = new SoulHoldTurretAttractLaserTurret("supernova"){

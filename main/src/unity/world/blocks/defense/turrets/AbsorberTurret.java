@@ -57,7 +57,7 @@ public class AbsorberTurret extends GenericTractorBeamTurret<Bullet>{
         @Override
         protected void apply(){
             target.vel.setLength(Math.max(target.vel.len() - resistance * strength, 0f));
-            target.damage = Math.max((resistance / 2f) * strength * Time.delta, 0f);
+            target.damage = Math.max(target.damage - (resistance / 2f) * strength * Time.delta, 0f);
 
             if(target.vel.isZero(0.01f) || target.damage <= 0f){
                 target.remove();
