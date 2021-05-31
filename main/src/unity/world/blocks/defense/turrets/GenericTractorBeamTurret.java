@@ -264,7 +264,7 @@ public abstract class GenericTractorBeamTurret<T extends Teamc> extends BaseTurr
                 Draw.z(Layer.bullet);
 
                 Draw.mixcol(laserColor, Mathf.absin(4f, 0.6f));
-                Draw.alpha(efficiency());
+                Draw.alpha(laserAlpha());
 
                 Drawf.laser(team, laser, laserEnd,
                     x + tr.x,
@@ -276,6 +276,10 @@ public abstract class GenericTractorBeamTurret<T extends Teamc> extends BaseTurr
 
                 Draw.mixcol();
             }
+        }
+
+        public float laserAlpha(){
+            return laserAlpha.get(this);
         }
     }
 }
