@@ -171,7 +171,6 @@ public abstract class GenericTractorBeamTurret<T extends Teamc> extends BaseTurr
                 logicControlTime -= Time.delta;
             }
 
-            tr.trns(rotation, shootLength);
             boolean shot = false;
 
             if(canShoot()){
@@ -261,6 +260,8 @@ public abstract class GenericTractorBeamTurret<T extends Teamc> extends BaseTurr
         @Override
         public void drawExt(){
             if(strength > 0.1f){
+                tr.trns(rotation, shootLength);
+
                 Draw.z(Layer.bullet);
 
                 Draw.mixcol(laserColor, Mathf.absin(4f, 0.6f));
