@@ -66,18 +66,20 @@ public class FloorExtractor extends GenericCrafter{
     public void drawPlace(int x, int y, int rotation, boolean valid){
         super.drawPlace(x, y, rotation, valid);
 
-        Tile tile = world.tiles.get(x, y);
-        Item item = outputItem.item;
+        Tile tile = world.tile(x, y);
+        Item item = outputItem != null ? outputItem.item : null;
 
         float width = drawPlaceText(Core.bundle.formatFloat("bar.extractspeed", 60f / craftTime * (count(tile) / size), 2), x, y, valid);
         float dx = x * tilesize + offset - width / 2f - 4f;
         float dy = y * tilesize + offset + size * tilesize / 2f + 5f;
 
-        Draw.mixcol(Color.darkGray, 1f);
-        Draw.rect(item.icon(Cicon.small), dx, dy - 1);
+        if(item != null){
+            Draw.mixcol(Color.darkGray, 1f);
+            Draw.rect(item.icon(Cicon.small), dx, dy - 1);
 
-        Draw.reset();
-        Draw.rect(item.icon(Cicon.small), dx, dy);
+            Draw.reset();
+            Draw.rect(item.icon(Cicon.small), dx, dy);
+        }
     }
 
     @Override

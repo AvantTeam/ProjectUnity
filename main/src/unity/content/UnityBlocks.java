@@ -123,87 +123,64 @@ public class UnityBlocks implements ContentList{
     Block inferno;
 
     //monolith
-    public static
-    @FactionDef("monolith")
+    public static @FactionDef("monolith")
     Block
     //environments
     oreMonolite,
     sharpslate, sharpslateWall,
     infusedSharpslate, infusedSharpslateWall,
     archSharpslate, archEnergy,
-    loreMonolith,
+    loreMonolith;
 
-    //effects
-    deflectorAura;
-
-    public static
-    @FactionDef("monolith")
+    //production
+    public static @FactionDef("monolith")
     @LoadRegs({
         "debris-extractor-heat1",
         "debris-extractor-heat2"
     })
     @Merge(base = FloorExtractor.class, value = {SoulHoldc.class, Stemc.class})
-    Block
-    //production
-    debrisExtractor;
+    Block debrisExtractor;
 
-    public static
-    @FactionDef("monolith")
-    @LoadRegs({
-        "debris-extractor-heat1",
-        "debris-extractor-heat2"
-    })
+    public static @FactionDef("monolith")
+    Block soulInfuser;
+
+    public static @FactionDef("monolith")
     @Merge(base = GenericSmelter.class, value = {SoulHoldc.class, Stemc.class})
-    Block
-    monolithAlloyForge;
+    Block monolithAlloyForge;
 
-    public static
-    @FactionDef("monolith")
-    Block
     //defense
-    electrophobicWall, electrophobicWallLarge;
+    public static @FactionDef("monolith")
+    Block electrophobicWall, electrophobicWallLarge, deflectorAura;
 
     //turrets
-    public static
-    @FactionDef("monolith")
+    public static @FactionDef("monolith")
     @Merge(base = LifeStealerTurret.class, value = SoulHoldc.class)
-    Block
-    lifeStealer;
+    Block lifeStealer;
 
-    public static
-    @FactionDef("monolith")
+    public static @FactionDef("monolith")
     @Merge(base = AbsorberTurret.class, value = SoulHoldc.class)
-    Block
-    absorberAura;
+    Block absorberAura;
 
-    public static
-    @FactionDef("monolith")
+    public static @FactionDef("monolith")
     @Merge(base = HeatRayTurret.class, value = SoulHoldc.class)
-    Block
-    heatRay, incandescence;
+    Block heatRay, incandescence;
 
-    public static
-    @FactionDef("monolith")
+    public static @FactionDef("monolith")
     @Merge(base = PowerTurret.class, value = {Turretc.class, SoulHoldc.class})
     Block
     ricochet, shellshock, purge,
     blackout,
     diviner, mage;
 
-    public static
-    @FactionDef("monolith")
+    public static @FactionDef("monolith")
     @Merge(base = ItemTurret.class, value = {Turretc.class, SoulHoldc.class})
-    Block
-    recluse;
+    Block recluse;
 
-    public static
-    @FactionDef("monolith")
+    public static @FactionDef("monolith")
     @Merge(base = BurstPowerTurret.class, value = {Turretc.class, SoulHoldc.class})
-    Block
-    oracle;
+    Block oracle;
 
-    public static
-    @FactionDef("monolith")
+    public static @FactionDef("monolith")
     @LoadRegs(value = {
         "supernova-head",
         "supernova-core",
@@ -212,8 +189,7 @@ public class UnityBlocks implements ContentList{
         "supernova-bottom"
     }, outline = true)
     @Merge(base = AttractLaserTurret.class, value = {Turretc.class, SoulHoldc.class})
-    Block
-    supernova;
+    Block supernova;
 
     public static @FactionDef("youngcha")
     Block
@@ -1906,6 +1882,21 @@ public class UnityBlocks implements ContentList{
                 });
             }
         };
+
+        soulInfuser = new SoulInfuser("soul-infuser"){{
+            requirements(Category.crafting, with(UnityItems.monolite, 200, Items.titanium, 250, Items.silicon, 420));
+            setup(
+                infusedSharpslate, 0.6f,
+                archSharpslate, 1f,
+                archEnergy, 1.4f
+            );
+
+            size = 3;
+            craftTime = 60f;
+
+            consumes.power(3.2f);
+            consumes.liquid(Liquids.cryofluid, 0.2f);
+        }};
 
         monolithAlloyForge = new StemSoulHoldGenericSmelter("monolith-alloy-forge"){
             final int effectTimer = timers++;
