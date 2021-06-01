@@ -25,7 +25,9 @@ public class AttractLaserTurret extends LaserTurret{
     public float attractionStrength = 6f;
     public float attractionDamage = 60f;
     public Cons2<AttractLaserTurretBuild, Unit> attractUnit = (tile, unit) -> {};
-    public Cons<AttractLaserTurretBuild> attractor = tile -> {};
+
+    private static final Field bulletf = ReflectUtils.findField(LaserTurretBuild.class, "bullet", true);
+    private static final Field bulletLifef = ReflectUtils.findField(LaserTurretBuild.class, "bulletLife", true);
 
     public AttractLaserTurret(String name){
         super(name);
@@ -42,10 +44,6 @@ public class AttractLaserTurret extends LaserTurret{
         public float phase;
 
         protected PitchedSoundLoop sound = new PitchedSoundLoop(chargeSound, chargeSoundVolume);
-
-        // thanks anuke for making the fields package-private
-        private Field bulletf = ReflectUtils.findField(getClass(), "bullet", true);
-        private Field bulletLifef = ReflectUtils.findField(getClass(), "bulletLife", true);
 
         @Override
         public void updateTile(){
@@ -120,8 +118,6 @@ public class AttractLaserTurret extends LaserTurret{
                     attractUnit.get(this, unit);
                 }
             });
-
-            attractor.get(this);
         }
 
         public float bulletLife(){

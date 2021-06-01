@@ -188,7 +188,7 @@ public class UnityBlocks implements ContentList{
         "supernova-wing-left-bottom", "supernova-wing-right-bottom",
         "supernova-bottom"
     }, outline = true)
-    @Merge(base = AttractLaserTurret.class, value = {Turretc.class, SoulHoldc.class})
+    @Merge(base = AttractLaserTurret.class, value = {Turretc.class, SoulHoldc.class, Stemc.class})
     Block supernova;
 
     public static @FactionDef("youngcha")
@@ -2276,17 +2276,14 @@ public class UnityBlocks implements ContentList{
             laserAlpha((SoulHeatRayTurretBuild b) -> b.power.status * (0.7f + b.soulf() * 0.3f));
         }};
 
-        supernova = new SoulHoldTurretAttractLaserTurret("supernova"){
+        supernova = new StemSoulHoldTurretAttractLaserTurret("supernova"){
             /** Temporary vector array to be used in the drawing method */
             final Vec2[] phases = {new Vec2(), new Vec2(), new Vec2(), new Vec2(), new Vec2(), new Vec2()};
-
             final float starRadius;
             final float starOffset;
-            Cons<SoulTurretAttractLaserTurretBuild> effectDrawer;
 
             final int timerChargeStar = timers++;
             final Effect starEffect;
-            final Effect chargeEffect;
             final Effect chargeStarEffect;
             final Effect chargeStar2Effect;
             final Effect chargeBeginEffect;
@@ -2322,7 +2319,6 @@ public class UnityBlocks implements ContentList{
                 shootType = UnityBullets.supernovaLaser;
 
                 starEffect = UnityFx.supernovaStar;
-                chargeEffect = UnityFx.supernovaCharge;
                 chargeStarEffect = UnityFx.supernovaChargeStar;
                 chargeStar2Effect = UnityFx.supernovaChargeStar2;
                 chargeBeginEffect = UnityFx.supernovaChargeBegin;
@@ -2335,10 +2331,10 @@ public class UnityBlocks implements ContentList{
                 efficiencyFrom = 0.5f;
                 efficiencyTo = 1.9f;
 
-                damageMultiplier((SoulTurretAttractLaserTurretBuild build) -> efficiencyFrom + (build.souls() / (float)maxSouls) * efficiencyTo);
+                damageMultiplier((StemSoulTurretAttractLaserTurretBuild build) -> efficiencyFrom + (build.souls() / (float)maxSouls) * efficiencyTo);
 
                 drawer = b -> {
-                    if(b instanceof SoulTurretAttractLaserTurretBuild tile){
+                    if(b instanceof StemSoulTurretAttractLaserTurretBuild tile){
                         //core
                         phases[0].trns(tile.rotation, -tile.recoil + Mathf.curve(tile.phase, 0f, 0.3f) * -2f);
                         //left wing
@@ -2394,8 +2390,6 @@ public class UnityBlocks implements ContentList{
 
                         Draw.rect(Regions.supernovaCoreRegion, tile.x + phases[0].x, tile.y + phases[0].y, tile.rotation - 90);
                         Draw.z(z);
-
-                        effectDrawer.get(tile);
                     }else{
                         throw new IllegalStateException("building isn't an instance of AttractLaserTurretBuild");
                     }
@@ -2418,83 +2412,92 @@ public class UnityBlocks implements ContentList{
                     Draw.blend();
                 };
 
-                effectDrawer = tile -> {
+                draw((StemSoulTurretAttractLaserTurretBuild tile) -> {
                     boolean notShooting = tile.bulletLife() <= 0f || tile.bullet() == null;
-                    float ch = notShooting ? tile.charge : 1f;
                     Tmp.v1.trns(tile.rotation, -tile.recoil + starOffset + Mathf.curve(tile.phase, 0f, 0.3f) * -2f);
 
-                    Draw.color(Pal.lancerLaser);
-                    Fill.circle(
+                    float z = Draw.z();
+                    Draw.z(Layer.effect);
+
+                    float rad = tile.data().floatValue;
+                    Draw.color(UnityPal.monolith);
+                    UnityDrawf.shiningCircle(tile.id, Time.time,
                         tile.x + Tmp.v1.x,
                         tile.y + Tmp.v1.y,
-                        ch * starRadius
+                        rad * starRadius,
+                        6, 20f,
+                        rad * starRadius, rad * starRadius * 1.5f,
+                        120f
                     );
 
                     if(notShooting){
-                        Fill.circle(
-                            tile.x + Tmp.v1.x,
-                            tile.y + Tmp.v1.y,
-                            tile.charge * starRadius * 0.67f
-                        );
+                        if(!Mathf.zero(tile.charge)){
+                            UnityDrawf.shiningCircle(tile.id + 1, Time.time,
+                                tile.x + Angles.trnsx(tile.rotation, -tile.recoil + shootLength),
+                                tile.y + Angles.trnsy(tile.rotation, -tile.recoil + shootLength),
+                                tile.charge * 4f,
+                                6, 12f,
+                                tile.charge * 4f, tile.charge * 8f,
+                                120f
+                            );
+                        }
                     }
 
-                    if(!state.isPaused()){
-                        float a = Mathf.random(360f);
-                        float d = 0.3f;
+                    Draw.reset();
+                    Draw.z(z);
+                });
 
-                        starEffect.at(
-                            tile.x + Tmp.v1.x + Angles.trnsx(a, d),
-                            tile.y + Tmp.v1.y + Angles.trnsy(a, d),
-                            tile.rotation, ch * starRadius
-                        );
-                        chargeEffect.at(
-                            tile.x + Angles.trnsx(tile.rotation, -tile.recoil + shootLength),
-                            tile.y + Angles.trnsy(tile.rotation, -tile.recoil + shootLength),
-                            tile.rotation, tile.charge * starRadius * 0.67f
-                        );
+                update((StemSoulTurretAttractLaserTurretBuild tile) -> {
+                    boolean notShooting = tile.bulletLife() <= 0f || tile.bullet() == null;
+                    boolean tick = Mathf.chanceDelta(1f);
+                    boolean tickCharge = Mathf.chanceDelta(tile.charge);
 
-                        if(notShooting){
-                            if(tile.charge > 0.1f && tile.timer(timerChargeStar, 20f)){
-                                chargeStarEffect.at(
-                                    tile.x + Tmp.v1.x,
-                                    tile.y + Tmp.v1.y,
-                                    tile.rotation, tile.charge
-                                );
-                            }
+                    tile.data().floatValue = Mathf.approachDelta(tile.data().floatValue, notShooting ? tile.charge : 1f, chargeWarmup * 60f);
 
-                            if(Mathf.chanceDelta(tile.charge)){
-                                chargeBeginEffect.at(
-                                    tile.x + Angles.trnsx(tile.rotation, -tile.recoil + shootLength),
-                                    tile.y + Angles.trnsy(tile.rotation, -tile.recoil + shootLength),
-                                    tile.rotation, tile.charge
-                                );
+                    Tmp.v1.trns(tile.rotation, -tile.recoil + starOffset + Mathf.curve(tile.phase, 0f, 0.3f) * -2f);
+                    if(notShooting){
+                        if(tile.charge > 0.1f && tile.timer(timerChargeStar, 20f)){
+                            chargeStarEffect.at(
+                                tile.x + Tmp.v1.x,
+                                tile.y + Tmp.v1.y,
+                                tile.rotation, tile.charge
+                            );
+                        }
 
-                                chargeStar2Effect.at(
-                                    tile.x + Tmp.v1.x,
-                                    tile.y + Tmp.v1.y,
-                                    tile.rotation, tile.charge
-                                );
-                            }
-                        }else{
+                        if(!Mathf.zero(tile.charge) && tickCharge){
+                            chargeStar2Effect.at(
+                                tile.x + Tmp.v1.x,
+                                tile.y + Tmp.v1.y,
+                                tile.rotation, tile.charge
+                            );
+                        }
+
+                        if(tickCharge){
+                            chargeBeginEffect.at(
+                                tile.x + Angles.trnsx(tile.rotation, -tile.recoil + shootLength),
+                                tile.y + Angles.trnsy(tile.rotation, -tile.recoil + shootLength),
+                                tile.rotation, tile.charge
+                            );
+                        }
+                    }else{
+                        if(tick){
                             starDecayEffect.at(
                                 tile.x + Tmp.v1.x,
                                 tile.y + Tmp.v1.y,
                                 tile.rotation
                             );
+                        }
 
-                            if(tile.timer(timerChargeStar, 20f)){
-                                heatWaveEffect.at(
-                                    tile.x + Tmp.v1.x,
-                                    tile.y + Tmp.v1.y,
-                                    tile.rotation
-                                );
-                            }
+                        if(tile.timer(timerChargeStar, 20f)){
+                            heatWaveEffect.at(
+                                tile.x + Tmp.v1.x,
+                                tile.y + Tmp.v1.y,
+                                tile.rotation
+                            );
                         }
                     }
-                };
 
-                attractor = tile -> {
-                    if(Mathf.chanceDelta(tile.charge)){
+                    if(Mathf.chanceDelta(notShooting ? tile.charge : 1f)){
                         Tmp.v1
                             .trns(tile.rotation, -tile.recoil + starOffset + Mathf.curve(tile.phase, 0f, 0.3f) * -2f)
                             .add(tile);
@@ -2504,10 +2507,10 @@ public class UnityBlocks implements ContentList{
                             Pal.lancerLaser,
                             60f, Tmp.v1.x, Tmp.v1.y,
                             Mathf.randomSeed((long)(tile.id + Time.time), 360f),
-                            Mathf.round(Mathf.randomTriangular(16f, 24f) * tile.charge)
+                            Mathf.round(Mathf.randomTriangular(12f, 18f) * (notShooting ? tile.charge : 1f))
                         );
                     }
-                };
+                });
 
                 attractUnit = (tile, unit) -> {
                     if(Mathf.chanceDelta(0.1f)){
@@ -2520,13 +2523,6 @@ public class UnityBlocks implements ContentList{
                 };
             }
         };
-
-        /*monolithGroundFactory = new UnitFactory("monolith-ground-factory"){{
-            requirements(Category.units, with());
-            size = 3;
-            plans = Seq.with(new UnitPlan(UnityUnitTypes.stele, 900f, with(Items.silicon, 10, UnityItems.monolite, 15)));
-            consumes.power(1.2f);
-        }};*/
 
         //endregion
         //region youngcha

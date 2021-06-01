@@ -1,5 +1,6 @@
 package unity.entities;
 
+import mindustry.entities.units.*;
 import mindustry.gen.*;
 
 public interface Soul{
@@ -33,19 +34,21 @@ public interface Soul{
 
     void join();
     void unjoin();
+    default void joined(){}
 
     default float soulf(){
         return souls() / (float)maxSouls();
     }
 
-    static boolean isSoul(Entityc e){
-        if(e instanceof BlockUnitc unit) return unit.tile() instanceof Soul;
-        return e instanceof Soul;
+    static boolean isSoul(Object e){
+        return toSoul(e) != null;
     }
 
-    static Soul toSoul(Entityc e){
-        if(e instanceof BlockUnitc unit && unit.tile() instanceof Soul soul) return soul;
+    static Soul toSoul(Object e){
+        if(e instanceof UnitController cont) e = cont.unit();
+        if(e instanceof BlockUnitc unit) e = unit.tile();
         if(e instanceof Soul soul) return soul;
+
         return null;
     }
 }
