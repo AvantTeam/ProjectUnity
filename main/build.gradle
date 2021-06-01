@@ -98,6 +98,29 @@ repositories {
     maven { url 'https://www.jitpack.io' }
 }
 
+class Fetcher {
+    String name;
+    UnsafeRunnable run;
+
+    void execute() {
+        // If only Gradle doesn't scream at me for using 'do-while' statement
+        Throwable error
+        try {
+            run.run()
+            error = null
+        } catch(Throwable e) {
+            error = e
+        }
+
+        while(error != null) { try {
+            run.run()
+            error = null
+        } catch(Throwable e) {
+            error = e
+        }}
+    }
+}
+
 task fetchComps {
     doFirst {
         delete { delete fetchDir }
@@ -106,22 +129,7 @@ task fetchComps {
         Core.net = new Net()
         Core.net.setBlock(true)
 
-        final def execute = { final UnsafeRunnable run ->
-            Throwable error = null
-            try {
-                run.run()
-                error = null
-            } catch(Throwable t) {
-                error = t
-            }
-
-            while(error != null) { try {
-                run.run()
-                error = null
-            } catch(Throwable t) {
-                error = t
-            }}
-        }
+        final Seq<Fetcher> fetches = new Seq<Fetcher>(Fetcher.class)
 
         final UnsafeRunnable mainRun = {
         Core.net.httpGet(
@@ -136,7 +144,7 @@ task fetchComps {
                 final UnsafeRunnable run = {
                 Core.net.httpGet(
                 fileurl,
-                { comp -> 
+                { comp ->
                     final def content = comp.getResultAsString()
                         .replace('mindustry.entities.comp', "$fetchPackage".replace('/', '.'))
                         .replace('mindustry.annotations.Annotations.*', 'unity.annotations.Annotations.*')
@@ -149,26 +157,28 @@ task fetchComps {
 
                     if(content.isBlank()) throw new IllegalStateException()
 
-                    final UnsafeRunnable write = {
-                        final def fi = Fi.get("$fetchDir/$filename")
-                        fi.writeString(content, false)
-                        while(!fi.readString().equals(content)) {
-                            fi.writeString(content, false)
-                        }
-
-                        println "Wrote '$filename'"
-                    }
-
-                    execute(write)
+                    final def fi = Fi.get("$fetchDir/$filename")
+                    fi.writeString(content, false)
                 },
                 { err -> throw new RuntimeException(err) })}
 
-                Threads.thread({ execute(run) });
+                fetches.add(new Fetcher(name: filename, run: run))
             }
         },
         { err -> throw new RuntimeException(err) })}
 
-        execute(mainRun)
+        new Fetcher(run: mainRun).execute()
+
+        fetches.each({ final Fetcher fetch -> Threads.thread({
+            fetch.execute()
+            synchronized(fetches) {
+                fetches.remove(fetch)
+
+                println "Wrote '$fetch.name', $fetches.size left."
+            }
+        }) })
+
+        while(!fetches.isEmpty()) Threads.yield()
 
         fetchTemp.writeString("$mindustryVersion/$fetchRevision")
         println 'Done writing.'
@@ -202,7 +212,7 @@ compileJava {
         String ver = content[0]
         String rev = content[1]
 
-        if(!ver.equals(new String("$mindustryVersion")) || !rev.equals(Integer.toString(fetchRevision))) {
+        if(ver != new String("$mindustryVersion") || rev != Integer.toString(fetchRevision as int)) {
             println 'Temp fetch data mismatch:'
             println "Stored  : { version: $ver, revision: $rev }"
             println "Required: { version: $mindustryVersion, revision: $fetchRevision }"
