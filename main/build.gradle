@@ -139,7 +139,7 @@ task fetchComps {
             final def list = Jval.read(res.getResultAsString()).asArray()
             Fetcher.prints.add("Found $list.size entity components.")
 
-            for(def val : list) {
+            list.each({ final Jval val ->
                 final def filename = val.get('name').asString()
                 final def fileurl = val.get('download_url').asString()
 
@@ -165,7 +165,7 @@ task fetchComps {
                 { err -> throw new RuntimeException(err) })}
 
                 fetches.add(new Fetcher(name: filename, run: run))
-            }
+            })
         },
         { err -> throw new RuntimeException(err) })}
 
