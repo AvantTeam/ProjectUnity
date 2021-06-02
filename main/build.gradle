@@ -101,6 +101,8 @@ repositories {
 }
 
 class Fetcher {
+    static Seq<String> prints = new Seq<String>()
+
     String name
     UnsafeRunnable run
 
@@ -108,10 +110,12 @@ class Fetcher {
 
     void execute() {
         Closure<Boolean> exec = { final UnsafeRunnable run ->
+            if(name != null) prints.add("---- Trying to fetch '$name'...")
             try {
                 run.run()
                 error = null
             } catch(Throwable e) {
+                if(name != null) prints.add("------ Failed to fetch '$name'. Trying again.")
                 error = e
             }
 
@@ -124,8 +128,6 @@ class Fetcher {
 
 task fetchComps {
     doFirst {
-        println 'Fetching mindustry entity components...'
-
         delete { delete fetchDir }
         fetchDir.mkdir()
 
@@ -139,6 +141,7 @@ task fetchComps {
         "https://api.github.com/repos/Anuken/Mindustry/contents/core/src/mindustry/entities/comp?ref=$mindustryVersion",
         { res ->
             final def list = Jval.read(res.getResultAsString()).asArray()
+            Fetcher.prints.add("Found $list.size entity components.")
 
             for(def val : list) {
                 final def filename = val.get('name').asString()
@@ -172,17 +175,16 @@ task fetchComps {
 
         new Fetcher(run: mainRun).execute()
 
-        Seq<String> prints = new Seq<String>(String.class)
         fetches.each({ final Fetcher fetch -> Threads.thread({
             fetch.execute()
             synchronized(fetches) {
                 fetches.remove(fetch)
-                prints.add("Wrote '$fetch.name', $fetches.size left." as String)
+                Fetcher.prints.add("-- Wrote '$fetch.name', $fetches.size left." as String)
             }
         }) })
 
-        while(!fetches.isEmpty() || !prints.isEmpty()) {
-            Iterator<String> ite = prints.iterator()
+        while(!fetches.isEmpty() || !Fetcher.prints.isEmpty()) {
+            Iterator<String> ite = Fetcher.prints.iterator()
             while(ite.hasNext()) {
                 println ite.next()
                 ite.remove()
