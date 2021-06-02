@@ -346,6 +346,7 @@ public class KamiPatterns{
         addPattern(new KamiPattern(){{
             time = 25f * 60f;
             maxDamage = 1000f;
+            drawer = KamiDrawers.keikiDrawer;
             init = ai -> ai.reloads[0] = -1f;
             stages = new KamiPatternStage[]{
                 new KamiPatternStage(60f, ai -> {
@@ -356,7 +357,7 @@ public class KamiPatterns{
                     if(ai.reloads[2] < 2f){
                         if(ai.reloads[1] >= 20f){
                             int diff = 10 + Mathf.clamp(ai.difficulty * 6, 0, 6 * 3);
-                            KamiBulletPresets.square(UnityBullets.kamiBullet1, ai.unit, ai.unit.team, ai.getX(), ai.getY(), ai.kami().laserRotation + (ai.reloads[2] * 45f), 3.75f, diff, b -> b.hitSize /= 1.5f);
+                            KamiBulletPresets.square(UnityBullets.kamiBullet1, ai.unit, ai.unit.team, ai.getX(), ai.getY(), ai.kami().laserRotation + (ai.reloads[2] * 45f), 3.5f, diff, b -> b.hitSize /= 1.5f);
                             ai.reloads[1] = 0f;
                             ai.reloads[2] += 1f;
                         }
@@ -372,9 +373,9 @@ public class KamiPatterns{
                 }, ai -> {
                     if(ai.reloads[1] >= 18f){
                         int diff = 10 + Mathf.clamp(ai.difficulty * 6, 0, 6 * 3);
-                        KamiBulletPresets.square(UnityBullets.kamiBullet1, ai.unit, ai.unit.team, ai.getX(), ai.getY(), ai.kami().laserRotation + ai.reloads[2], 3.75f, diff, b -> b.hitSize /= 1.5f);
+                        KamiBulletPresets.square(UnityBullets.kamiBullet1, ai.unit, ai.unit.team, ai.getX(), ai.getY(), ai.kami().laserRotation + ai.reloads[2], 3.5f, diff, b -> b.hitSize /= 1.5f);
                         ai.reloads[1] = 0f;
-                        ai.reloads[2] += 13f * ai.reloads[0];
+                        ai.reloads[2] += 14f * ai.reloads[0];
                     }
                     ai.reloads[1] += Time.delta;
                 }),

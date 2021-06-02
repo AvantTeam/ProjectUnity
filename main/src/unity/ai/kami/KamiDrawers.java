@@ -11,7 +11,7 @@ import unity.ai.*;
 public class KamiDrawers{
     private final static Color tCol = new Color();
     private final static Vec2 tVec = new Vec2(), tVec2 = new Vec2();
-    public static Cons<KamiAI> utsuhoDrawer, marisaDrawer, byakurenScrollDrawer;
+    public static Cons<KamiAI> utsuhoDrawer, marisaDrawer, byakurenScrollDrawer, keikiDrawer;
 
     public static void load(){
         utsuhoDrawer = ai -> {
@@ -50,6 +50,20 @@ public class KamiDrawers{
                 Draw.color(tCol.set(Color.red).shiftHue(((Time.time * 2f) + (i * 5f))));
                 tVec.trns(angle + ai.relativeRotation, 300f).sub(tVec2.trns(ai.relativeRotation, 240f)).add(ai);
                 Draw.rect(region, tVec.x, tVec.y, region.width * Draw.scl * width * ai.drawIn, region.height * Draw.scl, (angle + ai.relativeRotation) - 90f);
+            }
+        };
+
+        keikiDrawer = ai -> {
+            int len = KamiRegions.keikiSpirit.length;
+            for(int i = 0; i < len; i++){
+                Draw.color(tCol.set(Color.red).a(ai.drawIn).shiftHue(((Time.time * 2f) + (i * 8f))));
+                Draw.rect(KamiRegions.keikiSpirit[i], ai, (Time.time / 2f) % 360f);
+                if(i < 8){
+                    float ang = -(i * 360f / 8f) - 22.5f;
+                    tVec.trns(ang, 70f + Mathf.sinDeg((Time.time + (i * 360f / 8f)) * 2f)).add(ai);
+                    Draw.color(tCol.set(Color.red).a(ai.drawIn).shiftHue(((Time.time * 1.5f) + (i * 360f / 8f))));
+                    Draw.rect(KamiRegions.keikiTools[i], tVec.x, tVec.y, Mathf.mod(ang - 90f, 360f));
+                }
             }
         };
     }
