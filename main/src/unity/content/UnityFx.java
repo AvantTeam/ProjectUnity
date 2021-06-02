@@ -519,10 +519,12 @@ public class UnityFx{
     }),
 
     monolithRingEffect = new Effect(60f, e -> {
-        color(Pal.lancerLaser);
-        float temp = (float)e.data;
-        stroke(e.fout() * 3f * temp);
-        circle(e.x, e.y, e.finpow() * 24f * temp);
+        if(e.data instanceof Float data){
+            color(Pal.lancerLaser);
+
+            stroke(e.fout() * 3f * data);
+            circle(e.x, e.y, e.finpow() * 24f * data);
+        }
     }),
 
     scarHitSmall = new Effect(14f, e -> {

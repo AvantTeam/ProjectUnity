@@ -1,6 +1,7 @@
 package unity.entities.merge;
 
 import arc.*;
+import arc.func.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.world.*;
@@ -9,24 +10,32 @@ import mindustry.world.blocks.defense.turrets.Turret.*;
 import mindustry.world.meta.*;
 import unity.annotations.Annotations.*;
 import unity.entities.*;
+import unity.gen.*;
+import unity.gen.SoulHoldc.*;
 import unity.world.blocks.defense.turrets.*;
 
 import static mindustry.Vars.*;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "unchecked"})
 @MergeComponent
-class SoulHoldComp extends Block{
+abstract class SoulHoldComp extends Block implements Stemc{
     int maxSouls = 3;
     float efficiencyFrom = 0.3f;
     float efficiencyTo = 1f;
 
     boolean requireSoul = true;
 
+    @ReadOnly Cons<SoulBuildc> joined = b -> {};
+
     public SoulHoldComp(String name){
         super(name);
         update = true;
         destructible = true;
         sync = true;
+    }
+
+    public <T extends SoulBuildc> void joined(Cons<T> joined){
+        this.joined = (Cons<SoulBuildc>)joined;
     }
 
     @Override
@@ -47,7 +56,7 @@ class SoulHoldComp extends Block{
         });
     }
 
-    public class SoulBuildComp extends Building implements ControlBlock, Soul{
+    public abstract class SoulBuildComp extends Building implements StemBuildc, ControlBlock, Soul{
         transient BlockUnitc unit = Nulls.blockUnit;
 
         @ReadOnly boolean wasPlayer;
@@ -107,6 +116,11 @@ class SoulHoldComp extends Block{
 
         public boolean disabled(){
             return !hasSouls();
+        }
+
+        @Override
+        public void joined(){
+            joined.get(self());
         }
 
         @Override

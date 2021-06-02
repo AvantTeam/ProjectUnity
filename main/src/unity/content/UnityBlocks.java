@@ -14,6 +14,7 @@ import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.consumers.*;
+import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.defense.*;
@@ -1874,7 +1875,7 @@ public class UnityBlocks implements ContentList{
                     }
 
                     if(!Mathf.zero(data.floatValue)){
-                        float f = e.souls() / (float)maxSouls;
+                        float f = e.soulf();
                         if(e.timer.get(effectTimer, 45f - f * 15f)){
                             UnityFx.monolithRingEffect.at(e.x, e.y, e.rotation, data.floatValue / 2f);
                         }
@@ -1883,20 +1884,76 @@ public class UnityBlocks implements ContentList{
             }
         };
 
-        soulInfuser = new SoulInfuser("soul-infuser"){{
-            requirements(Category.crafting, with(UnityItems.monolite, 200, Items.titanium, 250, Items.silicon, 420));
-            setup(
-                infusedSharpslate, 0.6f,
-                archSharpslate, 1f,
-                archEnergy, 1.4f
-            );
+        soulInfuser = new SoulInfuser("soul-infuser"){
+            final float[] scales = {1f, 0.9f, 0.7f};
+            final Color[] colors = {UnityPal.monolithDark, UnityPal.monolith, UnityPal.monolithLight};
 
-            size = 3;
-            craftTime = 60f;
+            final int effectTimer = timers++;
 
-            consumes.power(3.2f);
-            consumes.liquid(Liquids.cryofluid, 0.2f);
-        }};
+            {
+                requirements(Category.crafting, with(UnityItems.monolite, 200, Items.titanium, 250, Items.silicon, 420));
+                setup(
+                    infusedSharpslate, 0.6f,
+                    archSharpslate, 1f,
+                    archEnergy, 1.4f
+                );
+
+                size = 3;
+                craftTime = 60f;
+                updateEffect = Fx.smeltsmoke;
+                craftEffect = Fx.producesmoke;
+
+                consumes.power(3.2f);
+                consumes.liquid(Liquids.cryofluid, 0.2f);
+
+                drawer = new DrawGlow();
+                draw((SoulInfuserBuild e) -> {
+                    float z = Draw.z();
+                    Draw.z(Layer.effect);
+
+                    for(int i = 0; i < colors.length; i++){
+                        Color color = colors[i];
+                        float scl = e.warmup * 4f * scales[i];
+
+                        Draw.color(color);
+                        UnityDrawf.shiningCircle(e.id, Time.time + i,
+                            e.x, e.y, scl,
+                            3, 20f,
+                            scl * 2f, scl * 2f,
+                            60f
+                        );
+                    }
+
+                    Draw.z(z);
+                });
+
+                update((SoulInfuserBuild e) -> {
+                    StemData data = e.data();
+                    if(e.consValid()){
+                        data.floatValue = Mathf.lerpDelta(data.floatValue, e.efficiency(), 0.02f);
+                    }else{
+                        data.floatValue = Mathf.lerpDelta(data.floatValue, 0f, 0.02f);
+                    }
+
+                    if(!Mathf.zero(data.floatValue)){
+                        float f = e.soulf();
+                        if(e.timer.get(effectTimer, 45f - f * 15f)){
+                            UnityFx.monolithRingEffect.at(e.x, e.y, e.rotation, data.floatValue * 3f / 4f);
+                        }
+
+                        if(Mathf.chanceDelta(data.floatValue * 0.5f)){
+                            Lightning.create(
+                                e.team,
+                                Pal.lancerLaser,
+                                1f,
+                                e.x, e.y,
+                                Mathf.randomSeed((int)Time.time + e.id, 360f), (int)(data.floatValue * 3f) + Mathf.random(3)
+                            );
+                        }
+                    }
+                });
+            }
+        };
 
         monolithAlloyForge = new StemSoulHoldGenericSmelter("monolith-alloy-forge"){
             final int effectTimer = timers++;
@@ -1923,7 +1980,7 @@ public class UnityBlocks implements ContentList{
                     }
 
                     if(!Mathf.zero(data.floatValue)){
-                        float f = e.souls() / (float)maxSouls;
+                        float f = e.soulf();
                         if(e.timer.get(effectTimer, 45f - f * 15f)){
                             UnityFx.monolithRingEffect.at(e.x, e.y, e.rotation, data.floatValue);
                         }

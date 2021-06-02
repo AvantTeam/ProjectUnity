@@ -118,7 +118,7 @@ class Fetcher {
             error != null
         }
 
-        while(exec(run)) continue
+        while(exec(run)) {}
     }
 }
 
@@ -199,12 +199,12 @@ task cleanFetched(type: Delete) {
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
-    archiveClassifier = 'sources'
+    archiveClassifier.set('sources')
     from sourceSets.main.allSource
 }
 
 task assetsJar(type: Jar, dependsOn: ":tools:proc") {
-    archiveClassifier = 'assets'
+    archiveClassifier.set('assets')
     from files(assetsDir)
 }
 
