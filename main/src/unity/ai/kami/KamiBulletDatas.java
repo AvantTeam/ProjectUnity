@@ -5,12 +5,15 @@ import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.gen.*;
+import unity.content.*;
+import unity.entities.bullet.*;
+import unity.entities.bullet.KamiAltLaserBulletType.*;
 
 import java.util.*;
 
 public class KamiBulletDatas{
     public static Seq<Func<Bullet, KamiBulletData>> dataSeq = new Seq<>();
-    public static int accelTurn, expandShrink, turnRegular, nonDespawnable, slowDownWaitAccel;
+    public static int accelTurn, expandShrink, turnRegular, nonDespawnable, slowDownWaitAccel, junkoSlowDown, junkoLaser;
 
     //preset datas
     public static void load(){
@@ -39,6 +42,36 @@ public class KamiBulletDatas{
             new DataStage(2f * 60f, null),
             new DataStage(3f * 60f, (data, bl) -> bl.vel.set(1f, 0f).setLength(data.fin() * bl.type.speed * 1.1f).setAngle(data.initialRotation))
         ));
+
+        junkoSlowDown = addData(b -> new KamiBulletData(b.vel().len(),
+            new DataStage(65f, (data, bl) -> {}),
+            new DataStage(20f, (data, bl) -> bl.vel.setLength(Mathf.lerp(data.initialRotation, data.initialRotation / 3f, data.fin())))
+        ));
+
+        junkoLaser = addData(b -> new KamiBulletData(b.rotation(),
+            new DataStage(25f, (data, bl) -> {}),
+            new DataStage(-1f, (data, bl) -> {
+                bl.hitSize /= 1.5f;
+                KamiAltLaserBulletType lType = ((KamiAltLaserBulletType)UnityBullets.kamiVariableLaser);
+                KamiLaserData dat = new KamiLaserData();
+                dat.x = dat.x2 = bl.x;
+                dat.y = dat.y2 = bl.y;
+                dat.width = 3f;
+                dat.data = bl;
+                dat.update = (dt, b2) -> {
+                    dt.x = ((Bullet)dt.data).x;
+                    dt.y = ((Bullet)dt.data).y;
+                    Tmp.v1.set(dt.x2, dt.y2).sub(dt.x, dt.y).limit(140f).add(dt.x, dt.y);
+                    dt.x2 = Tmp.v1.x;
+                    dt.y2 = Tmp.v1.y;
+                };
+                Bullet b3 = lType.create(bl.owner, ((Teamc)bl.owner).team(), dat);
+                b3.lifetime = bl.lifetime;
+                b3.time = bl.time;
+                //Unity.print("kL");
+            }),
+            new DataStage(45f, (data, bl) -> bl.vel.set(1f, 0f).setLength(data.fin() * data.attribute).setAngle(data.initialRotation))).attribute(b.vel.len())
+        );
     }
 
     public static KamiBulletData get(Bullet bullet, int type){

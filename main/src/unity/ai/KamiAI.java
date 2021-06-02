@@ -141,6 +141,7 @@ public class KamiAI implements UnitController, Position{
                 int rand = Mathf.random(0, spellSeq.size - 1);
                 int t = spellSeq.get(rand);
                 pattern = KamiPatterns.majorPatterns[t];
+                //pattern = KamiPatterns.majorPatterns[6];
                 spellSeq.removeIndex(rand);
                 //if(spellSeq.isEmpty()) difficulty++;
                 difficultyCounter++;

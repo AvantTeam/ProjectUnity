@@ -49,7 +49,7 @@ public class UnityBullets implements ContentList{
 
         scarShrapnel, scarMissile,
 
-        kamiBullet1, kamiLaser, kamiSmallLaser,
+        kamiBullet1, kamiLaser, kamiVariableLaser, kamiSmallLaser,
 
         ricochetSmall, ricochetMedium, ricochetBig,
 
@@ -913,6 +913,8 @@ public class UnityBullets implements ContentList{
             fadeInTime = 60f;
             drawSize = (length + (width * 2f)) * 2f;
         }};
+
+        kamiVariableLaser = new KamiAltLaserBulletType(60f);
 
         kamiSmallLaser = new KamiLaserBulletType(230f){{
             lifetime = 2f * 60f;

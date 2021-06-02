@@ -382,6 +382,72 @@ public class KamiPatterns{
                 new KamiPatternStage(35f, ai -> ai.moveAround(30f), null)
             };
         }}, 1);
+
+        //Junko
+        //"Pure Light of the Palm"
+        addPattern(new KamiPattern(){{
+            time = 35f * 60f;
+            maxDamage = 1000f;
+            init = ai -> ai.reloads[4] = -1f;
+            stages = new KamiPatternStage[]{
+                new KamiPatternStage(6.25f * 60f, ai -> {
+                    ai.reloads[0] = 100f;
+                    ai.reloads[1] = 0f;
+                    ai.reloads[2] = 0f;
+                }, ai -> {
+                    if(ai.reloads[0] >= 2f * 60f && ai.reloads[2] < 3f){
+                        int diff = 48 + Mathf.clamp(ai.difficulty * 12, 0, 36);
+                        for(int i = 0; i < diff; i++){
+                            float angle = (i * 360f / diff) + ai.angleTo(ai.targetPos);
+                            if(i % 2 == 0){
+                                Bullet bullet = UnityBullets.kamiBullet1.create(ai.unit, ai.unit.team, ai.getX(), ai.getY(), angle, 1.5f);
+                                bullet.lifetime += 60f;
+                                KamiBulletDatas.get(bullet, KamiBulletDatas.junkoSlowDown);
+                            }else{
+                                Bullet bullet = UnityBullets.kamiBullet1.create(ai.unit, ai.unit.team, ai.getX(), ai.getY(), angle, 1.5f);
+                                KamiBulletDatas.get(bullet, KamiBulletDatas.junkoLaser);
+                            }
+                        }
+                        ai.reloads[0] = 0f;
+                        ai.reloads[1] = 1f;
+                        ai.reloads[2] += 1f;
+                    }
+                    if(ai.reloads[1] == 1f){
+                        ai.moveAround(60f);
+                        ai.reloads[1] = 0f;
+                    }
+                    ai.reloads[0] += Time.delta;
+                }),
+                new KamiPatternStage(60f, ai -> UnityFx.kamiCharge.at(ai.getX(), ai.getY(), 0f, ai.unit), null),
+                new KamiPatternStage(3f * 60f, ai -> {
+                    ai.reloads[0] = 9f;
+                    ai.reloads[1] = 0f;
+                    ai.reloads[2] = 0f;
+                    ai.reloads[3] += 2f;
+                    ai.reloads[4] *= -1f;
+                }, ai -> {
+                    float a = 2f + Mathf.clamp(ai.reloads[3], 0f, 4f);
+                    if(ai.reloads[0] >= 9f && ai.reloads[2] < a){
+                        int diff = (48 + Mathf.clamp(ai.difficulty * 12, 0, 36)) / 2;
+                        for(int i = 0; i < diff; i++){
+                            float angle = (i * 360f / diff) + ai.reloads[1];
+                            if(i % 2 == 0){
+                                Bullet bullet = UnityBullets.kamiBullet1.create(ai.unit, ai.unit.team, ai.getX(), ai.getY(), angle, 1.5f);
+                                bullet.lifetime += 60f;
+                                KamiBulletDatas.get(bullet, KamiBulletDatas.junkoSlowDown);
+                            }else{
+                                Bullet bullet = UnityBullets.kamiBullet1.create(ai.unit, ai.unit.team, ai.getX(), ai.getY(), angle, 1.5f);
+                                KamiBulletDatas.get(bullet, KamiBulletDatas.junkoLaser);
+                            }
+                        }
+                        ai.reloads[2] += 1f;
+                        ai.reloads[1] += (360f / diff) * (2f / a) * ai.reloads[4];
+                        ai.reloads[0] = 0f;
+                    }
+                    ai.reloads[0] += Time.delta;
+                })
+            };
+        }}, 1);
     }
 
     public static class KamiPattern{

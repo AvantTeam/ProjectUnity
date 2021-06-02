@@ -16,6 +16,7 @@ import mindustry.gen.*;
 public class KamiAltLaserBulletType extends BulletType{
     public float fadeOut = 20f;
     public float fadeIn = 20f;
+    private static final boolean test = false;
     private static final Ellipse tElpse = new Ellipse();
     private static TextureRegion circleRegion;
 
@@ -24,6 +25,7 @@ public class KamiAltLaserBulletType extends BulletType{
         speed = 0.01f;
         hitEffect = Fx.none;
         despawnEffect = Fx.none;
+        drawSize = 10000f;
         keepVelocity = false;
         collides = false;
         pierce = true;
@@ -55,11 +57,16 @@ public class KamiAltLaserBulletType extends BulletType{
                 Tmp.r1.merge(Tmp.r2);
 
                 Units.nearby(Tmp.r1, e -> {
-                    if(e.team != b.team){
+                    if(e.team != b.team || test){
+                        float size = e.hitSize / 2f;
                         Tmp.v2.set(e).sub(Tmp.v1).rotate(-ang);
-                        tElpse.set(0f, 0f, dst, fout * 2f);
+                        tElpse.set(0f, 0f, (dst * 2f) + size, (fout * 2f) + size);
                         if(tElpse.contains(Tmp.v2)){
-                            b.collision(e, e.x, e.y);
+                            if(!test){
+                                b.collision(e, e.x, e.y);
+                            }else{
+                                Fx.hitBulletSmall.at(e);
+                            }
                         }
                     }
                 });
@@ -72,9 +79,11 @@ public class KamiAltLaserBulletType extends BulletType{
         if(b.data instanceof KamiLaserData data){
             if(circleRegion == null) circleRegion = Core.atlas.find("circle");
             float fout = Mathf.clamp(b.time > b.lifetime - fadeOut ? 1f - (b.time - (b.lifetime - fadeOut)) / fadeOut : 1f) * Mathf.clamp(b.time / fadeIn);
-            Draw.color(Tmp.c1.set(Color.red).shiftHue(Time.time * 3f));
-            Lines.stroke( (data.width + 3f) * fout * 2f);
-            Lines.line(circleRegion, data.x, data.y, data.x2, data.y2, false);
+            Draw.color(Tmp.c1.set(Color.red).shiftHue(b.time * 3f));
+            Lines.stroke((data.width + 3f) * fout * 2f);
+            Tmp.v1.set(data.x, data.y).sub(data.x2, data.y2).setLength(3f);
+            Tmp.v2.set(data.x2, data.y2).sub(data.x, data.y).setLength(3f);
+            Lines.line(circleRegion, data.x + Tmp.v1.x, data.y + Tmp.v1.y, data.x2 + Tmp.v2.x, data.y2 + Tmp.v2.y, false);
             Draw.color();
             Lines.stroke( data.width * fout * 2f);
             Lines.line(circleRegion, data.x, data.y, data.x2, data.y2, false);
@@ -96,5 +105,6 @@ public class KamiAltLaserBulletType extends BulletType{
         public Cons2<KamiLaserData, Bullet> update = (data, b) -> {}, init = (data, bullet) -> {};
         public float x, y, x2, y2;
         public float width;
+        public Object data;
     }
 }
