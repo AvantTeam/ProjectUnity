@@ -426,7 +426,7 @@ public class KamiPatterns{
                     ai.reloads[3] += 2f;
                     ai.reloads[4] *= -1f;
                 }, ai -> {
-                    float a = 2f + Mathf.clamp(ai.reloads[3], 0f, 4f);
+                    float a = 2f + Mathf.clamp(ai.reloads[3] - 1f, 0f, 3f);
                     if(ai.reloads[0] >= 9f && ai.reloads[2] < a){
                         int diff = (48 + Mathf.clamp(ai.difficulty * 12, 0, 36)) / 2;
                         for(int i = 0; i < diff; i++){
