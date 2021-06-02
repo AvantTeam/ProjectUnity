@@ -1,11 +1,13 @@
 sourceSets.main.java.srcDirs = ['src/', "$buildDir/generated/sources/annotationProcessor/java/main/", "$projectDir/fetched"]
 
-import arc.*;
-import arc.files.*;
-import arc.struct.*;
-import arc.util.*;
-import arc.util.async.*;
-import arc.util.serialization.*;
+import arc.*
+import arc.files.*
+import arc.struct.*
+import arc.util.*
+import arc.util.async.*
+import arc.util.serialization.*
+
+import java.util.*
 
 dependencies {
     compileOnly "com.github.Anuken.Arc:arc-core:$mindustryVersion"
@@ -99,30 +101,31 @@ repositories {
 }
 
 class Fetcher {
-    String name;
-    UnsafeRunnable run;
+    String name
+    UnsafeRunnable run
+
+    private Throwable error = null
 
     void execute() {
-        // If only Gradle doesn't scream at me for using 'do-while' statement
-        Throwable error
-        try {
-            run.run()
-            error = null
-        } catch(Throwable e) {
-            error = e
+        Closure<Boolean> exec = { final UnsafeRunnable run ->
+            try {
+                run.run()
+                error = null
+            } catch(Throwable e) {
+                error = e
+            }
+
+            error != null
         }
 
-        while(error != null) { try {
-            run.run()
-            error = null
-        } catch(Throwable e) {
-            error = e
-        }}
+        while(exec(run)) continue
     }
 }
 
 task fetchComps {
     doFirst {
+        println 'Fetching mindustry entity components...'
+
         delete { delete fetchDir }
         fetchDir.mkdir()
 
@@ -169,16 +172,22 @@ task fetchComps {
 
         new Fetcher(run: mainRun).execute()
 
+        Seq<String> prints = new Seq<String>(String.class)
         fetches.each({ final Fetcher fetch -> Threads.thread({
             fetch.execute()
             synchronized(fetches) {
                 fetches.remove(fetch)
-
-                println "Wrote '$fetch.name', $fetches.size left."
+                prints.add("Wrote '$fetch.name', $fetches.size left." as String)
             }
         }) })
 
-        while(!fetches.isEmpty()) Threads.yield()
+        while(!fetches.isEmpty() || !prints.isEmpty()) {
+            Iterator<String> ite = prints.iterator()
+            while(ite.hasNext()) {
+                println ite.next()
+                ite.remove()
+            }
+        }
 
         fetchTemp.writeString("$mindustryVersion/$fetchRevision")
         println 'Done writing.'
@@ -205,7 +214,6 @@ compileJava {
     ]
 
     if(!fetchDir.exists() || !fetchTemp.exists()) {
-        println "Fetched mindustry entity comps not found; fetching components..."
         dependsOn fetchComps
     } else {
         String[] content = fetchTemp.readString().split('/')
@@ -216,7 +224,6 @@ compileJava {
             println 'Temp fetch data mismatch:'
             println "Stored  : { version: $ver, revision: $rev }"
             println "Required: { version: $mindustryVersion, revision: $fetchRevision }"
-            println "Fetching components..."
 
             dependsOn fetchComps
         }

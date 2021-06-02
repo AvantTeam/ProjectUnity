@@ -2,7 +2,6 @@ sourceSets.main.java.srcDirs = ['src/']
 
 repositories {
     mavenCentral()
-    jcenter()
     maven { url "https://www.jitpack.io"}
 }
 
