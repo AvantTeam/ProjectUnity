@@ -46,10 +46,6 @@ task deploy(type: Jar, dependsOn: configurations.runtimeClasspath) {
     exclude 'unity/fetched/**'
     exclude 'unity/entities/comp/**'
     exclude 'unity/entities/merge/**'
-
-    doLast { delete {
-        delete "$buildDir/libs/main-${version}.jar"
-    }}
 }
 
 task dex(dependsOn: deploy) {
@@ -199,6 +195,21 @@ task fetchComps {
 task cleanFetched(type: Delete) {
     delete "$projectDir/fetched"
     delete "$fetchTemp"
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    archiveClassifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task assetsJar(type: Jar, dependsOn: ":tools:proc") {
+    archiveClassifier = 'assets'
+    from files(assetsDir)
+}
+
+artifacts {
+    archives sourcesJar
+    archives assetsJar
 }
 
 clean {
