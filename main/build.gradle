@@ -106,12 +106,12 @@ class Fetcher {
 
     void execute() {
         Closure<Boolean> exec = { final UnsafeRunnable run ->
-            if(name != null) prints.add("---- Trying to fetch '$name'...")
+            if(name != null) prints.add("---- Trying to fetch '$name'..." as String)
             try {
                 run.run()
                 error = null
             } catch(Throwable e) {
-                if(name != null) prints.add("------ Failed to fetch '$name'. Trying again.")
+                if(name != null) prints.add("------ Failed to fetch '$name'. Trying again." as String)
                 error = e
             }
 
@@ -137,9 +137,7 @@ task fetchComps {
         "https://api.github.com/repos/Anuken/Mindustry/contents/core/src/mindustry/entities/comp?ref=$mindustryVersion",
         { res ->
             final def list = Jval.read(res.getResultAsString()).asArray()
-            Fetcher.prints.add("Found $list.size entity components.")
-
-            list.each({ final Jval val ->
+            for(final Jval val : list) {
                 final def filename = val.get('name').asString()
                 final def fileurl = val.get('download_url').asString()
 
@@ -165,13 +163,15 @@ task fetchComps {
                 { err -> throw new RuntimeException(err) })}
 
                 fetches.add(new Fetcher(name: filename, run: run))
-            })
+            }
         },
         { err -> throw new RuntimeException(err) })}
 
         new Fetcher(run: mainRun).execute()
+        Fetcher.prints.add("Found $fetches.size entity components." as String)
 
-        fetches.each({ final Fetcher fetch -> Threads.thread({
+        Seq<Thread> threads = new Seq<Thread>(Thread.class)
+        threads = fetches.map({ final Fetcher fetch -> new Thread({
             fetch.execute()
             synchronized(fetches) {
                 fetches.remove(fetch)
@@ -179,6 +179,7 @@ task fetchComps {
             }
         }) })
 
+        threads.each(Thread::start)
         while(!fetches.isEmpty() || !Fetcher.prints.isEmpty()) {
             Iterator<String> ite = Fetcher.prints.iterator()
             while(ite.hasNext()) {
