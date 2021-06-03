@@ -35,19 +35,6 @@ task proc(dependsOn: [classes, configurations.runtimeClasspath]) {
             from spritesGenFolder
             into spritesAssetsFolder
         }
-
-        exec {
-            ignoreExitValue true
-            workingDir file('../main/')
-
-            println()
-            println 'Alpha-bleeding sprites...'
-            if(windows()) {
-                commandLine('cmd', '/c', 'alpha-bleeding-windows.exe', '--replace', './assets/sprites/')
-            } else {
-                commandLine('./alpha-bleed', './assets/sprites/')
-            }
-        }
     }
 }
 
