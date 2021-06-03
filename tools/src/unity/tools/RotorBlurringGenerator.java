@@ -1,42 +1,41 @@
 package unity.tools;
 
+import arc.graphics.*;
 import arc.math.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.noise.*;
-import unity.content.*;
+import unity.gen.*;
 import unity.type.*;
+
+import static mindustry.Vars.*;
+import static unity.tools.SpriteProcessor.*;
 
 public class RotorBlurringGenerator implements Generator{
     @Override
     public void generate(){
         Log.info("Generating Rotor Sprites");
 
-        UnityUnitType[] copters = new UnityUnitType[]{
-            (UnityUnitType)UnityUnitTypes.caelifera,
-            (UnityUnitType)UnityUnitTypes.schistocerca,
-            (UnityUnitType)UnityUnitTypes.anthophila, // Has the longest blades for testing with
-            (UnityUnitType)UnityUnitTypes.vespula,
-            (UnityUnitType)UnityUnitTypes.lepidoptera
-        };
-
-        for(UnityUnitType unitType : copters){
+        Seq<UnityUnitType> copters = content.units().select(type -> type instanceof UnityUnitType && type.minfo.mod != null && type.constructor.get() instanceof Copterc).as();
+        for(UnityUnitType type : copters){
             // Normally these should be called after IconGenerator which however already invokes these, so we can just skip.
             // Unless someone else has bigger ideas, I'll leave these here and commented out
-            //unitType.load();
-            //unitType.init();
+            //type.load();
+            //type.init();
 
-            String bladeSpriteName = unitType.name + "-rotor-blade";
-            String ghostSpriteName = unitType.name + "-rotor-blade-ghost";
+            String fname = fixName(type.name);
+            String bladeSpriteName = fname + "-rotor-blade";
+            String ghostSpriteName = fname + "-rotor-blade-ghost";
 
-            if(SpriteProcessor.has(ghostSpriteName)){
+            if(has(ghostSpriteName)){
                 Log.info("Rotor Blade sprite override for @ exists, skipping", ghostSpriteName);
                 continue;
-            }else if(!SpriteProcessor.has(bladeSpriteName)){
+            }else if(!has(bladeSpriteName)){
                 Log.warn("@ not found", bladeSpriteName);
                 continue;
             }
 
-            Sprite bladeSprite = SpriteProcessor.get(bladeSpriteName);
+            Pixmap bladeSprite = get(bladeSpriteName);
 
             // This array is to be written in the order where colors at index 0 are located towards the center,
             // and colors at the end of the array is located towards at the edge.
@@ -44,17 +43,16 @@ public class RotorBlurringGenerator implements Generator{
             int bladeLength = populateColorArray(heightAverageColors, bladeSprite, bladeSprite.height >> 1);
 
             @SuppressWarnings("SuspiciousNameCombination") // Shut
-            Sprite ghostSprite = new Sprite(bladeSprite.height, bladeSprite.height);
+            Pixmap ghostSprite = new Pixmap(bladeSprite.height, bladeSprite.height);
 
             // Instead of ACTUALLY accounting for the insanity that is the variation of rotor configurations
             // including counter-rotating propellers and that jazz, number 4 will be used instead.
             drawRadial(ghostSprite, heightAverageColors, bladeLength, 4);
 
-            ghostSpriteName = ghostSpriteName.replace("unity-", "");
             Log.info("Saving @ with blade length @", ghostSpriteName, bladeLength);
-            ghostSprite.save(ghostSpriteName);
+            save(ghostSprite, fname, ghostSpriteName);
 
-            String shadeSpriteName = unitType.name + "-rotor-blade-shade";
+            String shadeSpriteName = type.name + "-rotor-blade-shade";
 
             if(SpriteProcessor.has(shadeSpriteName)){
                 Log.info("Rotor Blade shade sprite override for @ exists, skipping", shadeSpriteName);
@@ -62,26 +60,25 @@ public class RotorBlurringGenerator implements Generator{
             }
 
             @SuppressWarnings("SuspiciousNameCombination") // Also shut
-            Sprite shadeSprite = new Sprite(bladeSprite.height, bladeSprite.height);
+            Pixmap shadeSprite = new Pixmap(bladeSprite.height, bladeSprite.height);
 
             drawShade(shadeSprite, bladeLength);
 
-            shadeSpriteName = shadeSpriteName.replace("unity-", "");
             Log.info("Saving @ with blade length @", shadeSpriteName, bladeLength);
-            shadeSprite.antialias().save(shadeSpriteName);
+            save(shadeSprite, fname, shadeSpriteName);
         }
 
         Log.info("Rotors complete");
     }
 
-    private int populateColorArray(int[] heightAverageColors, Sprite bladeSprite, int halfHeight){
+    private int populateColorArray(int[] heightAverageColors, Pixmap bladeSprite, int halfHeight){
         Tmp.c1.rgba8888(0x00_00_00_00);
         float hits = 0;
         int length = 0;
 
         for(int y = halfHeight - 1; y >= 0; y--){
             for(int x = 0; x < bladeSprite.width; x++){
-                Tmp.c3.set(bladeSprite.getColor(x, y));
+                Tmp.c3.set(bladeSprite.get(x, y));
 
                 if(Tmp.c3.a > 0){
                     hits++;
@@ -116,7 +113,7 @@ public class RotorBlurringGenerator implements Generator{
         return length;
     }
 
-    private void drawRadial(Sprite sprite, final int[] colorTable, final int tableLimit, final int bladeCount){
+    private void drawRadial(Pixmap sprite, final int[] colorTable, final int tableLimit, final int bladeCount){
         final float spriteCenter = 0.5f - (sprite.height >> 1);
         sprite.each((x, y) -> {
             // 0.5f is required since mathematically it'll put the position at an intersection between 4 pixels, since the sprites are even-sized
@@ -127,12 +124,12 @@ public class RotorBlurringGenerator implements Generator{
                 float a = Mathf.cos(Mathf.atan2(x + spriteCenter, y + spriteCenter) * (bladeCount << 1)) * 0.05f + 0.95f;
                 a *= a;
 
-                sprite.draw(x, y,
+                sprite.set(x, y,
                     MathUtil.colorLerp(Tmp.c1.rgba8888(colorTable[arrayIndex]), Tmp.c2.rgba8888(colorTable[arrayIndex + 1]), positionLength % 1f)
                         .mul(a, a, a, a * (1 - 0.5f / (tableLimit - positionLength + 0.5f)))
                 );
             }else{
-                sprite.draw(x, y, Tmp.c1.rgba8888(0x00_00_00_00));
+                sprite.set(x, y, Tmp.c1.rgba8888(0x00_00_00_00));
             }
         });
     }
@@ -142,7 +139,7 @@ public class RotorBlurringGenerator implements Generator{
     // 	 Within each band exists a circumferential parallelogram, which the upper and bottom lines are offset differently.
     //   Entire parallelograms are offset as well.
     // The resulting drawing looks like a very nice swooshy hourglass. It must be antialiased afterwards.
-    private void drawShade(Sprite sprite, final int length){
+    private void drawShade(Pixmap sprite, final int length){
         final float spriteCenter = 0.5f - (sprite.height >> 1);
         // Divide by 2 then round down to nearest even positive number. This array will be accessed by pairs, hence the even number size.
         float[] offsets = new float[length >> 2 & 0xEFFFFFFE];
@@ -164,7 +161,7 @@ public class RotorBlurringGenerator implements Generator{
             a *= a; // Square sine again to thin out intervals of value increases
             a *= a; // Sine to the 8th power - Perfection
             // To maintain the geometric-sharpness, the resulting alpha fractional is rounded to binary integer.
-            sprite.draw(x, y, Tmp.c1.rgb888(0xFF_FF_FF).a(Mathf.round(a) * Mathf.clamp(length - positionLength, 0f, 1f)));
+            sprite.set(x, y, Tmp.c1.rgb888(0xFF_FF_FF).a(Mathf.round(a) * Mathf.clamp(length - positionLength, 0f, 1f)));
         });
     }
 }
