@@ -10,7 +10,7 @@ import arc.util.serialization.*
 dependencies {
     compileOnly "com.github.Anuken.Arc:arc-core:$arcVersion"
     //compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
-    compileOnly zipTree(coreJar())
+    compileOnly files(coreJar())
 
     annotationProcessor "com.github.Anuken:jabel:$jabelVersion"
 

@@ -61,5 +61,5 @@ dependencies {
 
     implementation "com.github.Anuken.Arc:arc-core:$mindustryVersion"
     //implementation "com.github.Anuken.Mindustry:core:$mindustryVersion"
-    implementation zipTree(coreJar())
+    implementation files(coreJar())
 }
