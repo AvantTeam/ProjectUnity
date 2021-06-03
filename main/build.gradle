@@ -126,9 +126,6 @@ task fetchComps {
         delete { delete fetchDir }
         fetchDir.mkdir()
 
-        println Class.forName 'arc.Core'
-        println Class.forName 'arc.Net'
-
         Core.net = new Net()
         Core.net.setBlock(true)
 
@@ -219,7 +216,7 @@ clean {
     finalizedBy cleanFetched
 }
 
-compileJava {
+tasks.withType(JavaCompile).all {
     options.compilerArgs += [
         '-processor', 
             'unity.annotations.FactionProcessor,' +
@@ -232,7 +229,7 @@ compileJava {
     if(!fetchDir.exists() || !fetchTemp.exists()) {
         dependsOn fetchComps
     } else {
-        String[] content = fetchTemp.readString().split('/')
+        String[] content = fetchTemp.text.split('/')
         String ver = content[0]
         String rev = content[1]
 
