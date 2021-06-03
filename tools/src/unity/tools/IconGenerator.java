@@ -72,7 +72,7 @@ public class IconGenerator implements Generator{
                     for(Rotor rotor : type.rotors){
                         String fname = fixName(type.name) + "-rotor";
                         if(outlined.add(fname + "-blade")){
-                            save(outline.get(get(fname + "-blade")), fname, fname + "-outline");
+                            save(outline.get(get(fname + "-blade")), fixName(type.name), fname + "-outline");
                         }
 
                         if(outlined.add(fname + "-top")){

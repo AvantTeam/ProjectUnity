@@ -206,7 +206,7 @@ public class SpriteProcessor{
     static void replace(String name, Pixmap image){
         name = name.replaceFirst("unity-", "");
 
-        Fi.get(name + ".png").writePng(image);
+        cache.get(name).file.sibling(name + ".png").writePng(image);
         ((GenRegion)Core.atlas.find(name)).path.delete();
     }
 
