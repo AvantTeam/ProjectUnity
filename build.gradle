@@ -35,10 +35,6 @@ allprojects {
         maven { url "https://jitpack.io" }
     }
 
-    java {
-        withSourcesJar()
-    }
-
     publishing {
         publications {
             maven(MavenPublication) {

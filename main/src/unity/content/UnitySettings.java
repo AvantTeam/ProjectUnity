@@ -9,7 +9,7 @@ import mindustry.*;
 */
 public class UnitySettings{
     public void addGraphicSetting(String key, boolean def){
-        Vars.ui.settings.graphics.checkPref(key, Core.settings.getBool(key, def));
+        //Vars.ui.settings.graphics.checkPref(key, Core.settings.getBool(key, def));
     }
 
     public void init(){
