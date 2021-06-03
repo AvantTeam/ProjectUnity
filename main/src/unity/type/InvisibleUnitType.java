@@ -142,7 +142,7 @@ public class InvisibleUnitType extends UnityUnitType{
             applyColor(unit);
             if(outlineFound){
                 float zB = Draw.z();
-                if(!weapon.top || found) Draw.z(zB - outlineSpace);
+                if(!weapon.top || found) Draw.z(zB/* - outlineSpace*/);
 
                 Draw.rect(weapon.outlineRegion,
                 wx, wy,

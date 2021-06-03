@@ -2,6 +2,7 @@ package unity.entities.merge;
 
 import arc.*;
 import arc.func.*;
+import arc.util.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.world.*;
@@ -57,7 +58,7 @@ abstract class SoulHoldComp extends Block implements Stemc{
     }
 
     public abstract class SoulBuildComp extends Building implements StemBuildc, ControlBlock, Soul{
-        transient BlockUnitc unit = Nulls.blockUnit;
+        @Nullable transient BlockUnitc unit;
 
         @ReadOnly boolean wasPlayer;
         private int souls;

@@ -53,7 +53,7 @@ public class WormSegmentUnit extends UnitEntity{
 
     @Override
     public void add(){
-        if(added == true) return;
+        if(added) return;
         isBugged = true;
         Groups.all.add(this);
         Groups.unit.add(this);
@@ -325,14 +325,14 @@ public class WormSegmentUnit extends UnitEntity{
         (delay ? weapon.chargeSound : weapon.continuous ? Sounds.none : weapon.shootSound).at(x, y, Mathf.random(weapon.soundPitchMin, weapon.soundPitchMax));
         BulletType ammo = weapon.bullet;
         float lifeScl = ammo.scaleVelocity ? Mathf.clamp(Mathf.dst(x, y, aimX, aimY) / ammo.range()) : 1f;
-        sequenceNum = 0;
+        //sequenceNum = 0;
         if(delay){
             Angles.shotgun(weapon.shots, weapon.spacing, rotation, (f)->{
-                Time.run(sequenceNum * weapon.shotDelay + weapon.firstShotDelay, ()->{
+                Time.run(/*sequenceNum * */weapon.shotDelay + weapon.firstShotDelay, ()->{
                     if(!isAdded()) return;
                     mount.bullet = bullet(weapon, x + this.x - baseX, y + this.y - baseY, f + Mathf.range(weapon.inaccuracy), lifeScl);
                 });
-                sequenceNum++;
+                //sequenceNum++;
             });
         } else {
             Angles.shotgun(weapon.shots, weapon.spacing, rotation, f -> mount.bullet = bullet(weapon, x, y, f + Mathf.range(weapon.inaccuracy), lifeScl));
@@ -373,7 +373,7 @@ public class WormSegmentUnit extends UnitEntity{
         TextureRegion outline = wormType.segmentOutline == null || wormType.tailOutline == null ? null : segmentType == 0 ? wormType.segmentOutline : wormType.tailOutline;
         if(outline != null){
             Draw.color(Color.white);
-            Draw.z(Draw.z() - UnitType.outlineSpace);
+            Draw.z(Draw.z()/* - UnitType.outlineSpace*/);
             Draw.rect(outline, this, rotation - 90f);
             Draw.z(z);
         }

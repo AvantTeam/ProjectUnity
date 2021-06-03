@@ -355,25 +355,26 @@ public class AssistantAI extends FlyingAI{
 
             @Override
             protected void update(AssistantAI ai){
-                if(!(ai.fallback instanceof FixedMinerAI)){
-                    ai.fallback = new FixedMinerAI();
+                if(!(ai.fallback instanceof MinerAI)){
+                    ai.fallback = new MinerAI();
                 }
 
-                FixedMinerAI minAI = (FixedMinerAI)ai.fallback;
+                MinerAI minAI = (MinerAI)ai.fallback;
                 if(ai.user instanceof Minerc miner){
-                    minAI.targetItem = ai.unit.stack.amount > 0
+                    ReflectUtils.setField(minAI, ReflectUtils.findField(MinerAI.class, "targetItem", true),
+                    ai.unit.stack.amount > 0
                     ?   ai.unit.stack.item
                     :   (
-                        miner.mineTile() != null
+                    miner.mineTile() != null
                         ?   miner.mineTile().drop()
                         :   null
-                    );
+                    ));
                 }
             }
 
             @Override
             protected void dispose(AssistantAI ai){
-                if(ai.fallback instanceof FixedMinerAI){
+                if(ai.fallback instanceof MinerAI){
                     ai.fallback = null;
                     ai.unit.clearItem();
                 }

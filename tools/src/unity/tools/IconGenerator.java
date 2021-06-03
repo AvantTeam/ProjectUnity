@@ -3,7 +3,6 @@ package unity.tools;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.graphics.g2d.TextureAtlas.*;
 import arc.math.Mathf;
 import arc.struct.*;
 import arc.util.*;
@@ -12,119 +11,45 @@ import mindustry.type.*;
 import unity.entities.*;
 import unity.entities.units.*;
 import unity.gen.*;
-import unity.tools.SpriteProcessor.*;
 import unity.type.*;
 
 import static mindustry.Vars.*;
+import static unity.tools.SpriteProcessor.*;
 
 public class IconGenerator implements Generator{
     @Override
     public void generate(){
-        Func<TextureRegion, String> parseName = reg -> ((AtlasRegion)reg).name.replaceFirst("unity-", "");
-
-        content.items().each(item -> {
-            if(item.minfo.mod == null) return;
-
-            try{
-                item.init();
-
-                if(item instanceof AnimatedItem anim){
-                    for(int i = 0; i < anim.frames; i++){
-                        String fname = anim.name.replaceFirst("unity-", "") + (i + 1);
-
-                        GenRegion region = SpriteProcessor.getRegion(fname);
-                        Sprite sprite = SpriteProcessor.get(region);
-
-                        sprite.antialias();
-                        region.path.delete();
-                        sprite.save(fname);
-                    }
-                }else{
-                    String fname = item.name.replaceFirst("unity-", "");
-
-                    GenRegion region = SpriteProcessor.getRegion(fname);
-                    Sprite sprite = SpriteProcessor.get(region);
-
-                    sprite.antialias();
-                    region.path.delete();
-                    sprite.save(fname);
-                }
-            }catch(Throwable e){
-                if(e instanceof IllegalArgumentException i){
-                    Log.err("Skipping item @: @", item, i.getMessage());
-                }else{
-                    Log.err(Strings.format("Problematic item @", item), e);
-                }
-            }
-        });
-
         content.units().each(t -> {
             if(t.minfo.mod == null || !(t instanceof UnityUnitType type)) return;
 
             ObjectSet<String> outlined = new ObjectSet<>();
             try{
-                type.load();
                 type.init();
+                type.load();
+                type.loadIcon();
 
-                Func<Sprite, Sprite> outline = i -> i.outline(3, type.outlineColor);
-                Seq<String> optional = Seq.with("-joint", "-leg-back", "-leg-middle", "-leg-base-back", "-foot-back");
-
+                Func<Pixmap, Pixmap> outline = i -> i.outline(type.outlineColor, type.outlineRadius);
                 Cons<TextureRegion> outliner = tr -> {
-                    if(tr != null){
-                        String fname = parseName.get(tr);
-
-                        if(SpriteProcessor.has(fname)){
-                            GenRegion region = SpriteProcessor.getRegion(fname);
-                            Sprite sprite = SpriteProcessor.get(fname);
-
-                            sprite.draw(outline.get(sprite));
-
-                            sprite.antialias();
-                            region.path.delete();
-                            sprite.save(fname);
-                        }else if(!optional.contains(fname::contains)){
-                            Log.warn("@ not found", fname);
-                        }
-                    }else{
-                        Log.warn("A region is null");
-                    }
-                };
-                Cons2<String, TextureRegion> outlSeparate = (suff, tr) -> {
-                    if(tr != null){
-                        String fname = parseName.get(tr);
-
-                        if(SpriteProcessor.has(fname)){
-                            Sprite sprite = SpriteProcessor.get(fname);
-                            sprite.draw(outline.get(sprite));
-                            sprite.antialias();
-
-                            sprite.save(fname + "-" + suff);
-                        }else{
-                            Log.warn("@ not found", fname);
-                        }
-                    }else{
-                        Log.warn("A region is null");
+                    if(tr != null && tr.found()){
+                        replace(tr, outline.get(get(tr)));
                     }
                 };
 
                 for(Weapon weapon : type.weapons){
-                    String fname = weapon.name.replaceFirst("unity-", "");
-
-                    if(outlined.add(fname) && SpriteProcessor.has(fname)){
-                        outlSeparate.get("outline", weapon.region);
+                    String fname = fixName(weapon.name);
+                    if(outlined.add(fname) && has(fname)){
+                        save(outline.get(get(fname)), fname, fname + "-outline");
                     }
                 }
 
                 for(Weapon weapon : type.segWeapSeq){
-                    String fname = weapon.name.replaceFirst("unity-", "");
-
-                    if(outlined.add(fname) && SpriteProcessor.has(fname)){
-                        outlSeparate.get("outline", weapon.region);
+                    String fname = fixName(weapon.name);
+                    if(outlined.add(fname) && has(fname)){
+                        save(outline.get(get(fname)), fname, fname + "-outline");
                     }
                 }
 
                 Unit unit = type.constructor.get();
-
                 if(unit instanceof Legsc || unit instanceof TriJointLegsc){
                     outliner.get(type.jointRegion);
                     outliner.get(type.footRegion);
@@ -145,156 +70,137 @@ public class IconGenerator implements Generator{
 
                 if(unit instanceof Copterc){
                     for(Rotor rotor : type.rotors){
-                        String fname = type.name.replaceFirst("unity-", "") + "-rotor";
-
+                        String fname = fixName(type.name) + "-rotor";
                         if(outlined.add(fname + "-blade")){
-                            outlSeparate.get("outline", rotor.bladeRegion);
+                            save(outline.get(get(fname + "-blade")), fixName(type.name), fname + "-outline");
                         }
+
                         if(outlined.add(fname + "-top")){
                             outliner.get(rotor.topRegion);
                         }
                     }
                 }
 
+                if(unit instanceof WormDefaultUnit){
+                    save(outline.get(get(type.segmentRegion)), fixName(type.segmentRegion), fixName(type.segmentRegion) + "-outline");
+                    save(outline.get(get(type.tailRegion)), fixName(type.tailRegion), fixName(type.tailRegion) + "-outline");
+                }
+
                 for(TextureRegion reg : type.abilityRegions){
-                    String fname = parseName.get(reg);
-                    if(outlined.add(fname) && SpriteProcessor.has(fname)){
+                    String fname = fixName(reg);
+                    if(outlined.add(fname) && has(fname)){
                         outliner.get(reg);
                     }
                 }
 
                 for(TentacleType tentacle : type.tentacles){
-                    if(outlined.add(tentacle.name)){
+                    String fname = fixName(tentacle.name);
+                    if(outlined.add(fname) && has(fname)){
                         outliner.get(tentacle.region);
                     }
-                    if(outlined.add(tentacle.name + "-tip")){
+
+                    if(outlined.add(fname + "-tip") && has(fname + "-tip")){
                         outliner.get(tentacle.tipRegion);
                     }
                 }
 
-                outlSeparate.get("outline", type.region);
-                if(unit instanceof WormDefaultUnit){
-                    outlSeparate.get("outline", type.segmentRegion);
-                    outlSeparate.get("outline", type.tailRegion);
-                }
+                String fname = fixName(type.name);
 
-                String fname = parseName.get(type.region);
-                Sprite outl = outline.get(SpriteProcessor.get(fname));
-                Sprite region = SpriteProcessor.get(fname);
-
-                Sprite icon = Sprite.createEmpty(region.width, region.height);
-                icon.draw(region);
-                icon.draw(outline.get(region));
+                Pixmap icon = outline.get(get(type.region));
+                save(icon, fname, fname + "-outline");
 
                 if(unit instanceof Mechc){
-                    Sprite leg = SpriteProcessor.get(parseName.get(type.legRegion));
-                    icon.drawCenter(leg);
-                    icon.drawCenter(leg, true, false);
-
-                    icon.draw(region);
-                    icon.draw(outl);
+                    drawCenter(icon, get(type.baseRegion));
+                    drawCenter(icon, get(type.legRegion));
+                    drawCenter(icon, get(type.legRegion).flipX());
+                    icon.draw(get(type.region), true);
                 }
 
                 for(Weapon weapon : type.weapons){
                     weapon.load();
-                    String wname = weapon.name.replaceFirst("unity-", "");
+                    String wname = fixName(weapon.name);
 
-                    if((!weapon.top || type.bottomWeapons.contains(weapon.name)) && SpriteProcessor.has(wname)){
-                        Sprite weapSprite = SpriteProcessor.get(wname);
-
-                        icon.draw(weapSprite,
-                            (int)(weapon.x * 4f / Draw.scl + icon.width / 2f - weapSprite.width / 2f),
-                            (int)(-weapon.y * 4f / Draw.scl + icon.height / 2f - weapSprite.height / 2f),
-                            weapon.flipSprite, false
-                        );
-
-                        icon.draw(outline.get(weapSprite),
-                            (int)(weapon.x * 4f / Draw.scl + icon.width / 2f - weapSprite.width / 2f),
-                            (int)(-weapon.y * 4f / Draw.scl + icon.height / 2f - weapSprite.height / 2f),
-                            weapon.flipSprite, false
+                    if((!weapon.top || type.bottomWeapons.contains(weapon.name)) && has(wname)){
+                        icon.draw(weapon.flipSprite ? outline.get(get(weapon.region)).flipX() : outline.get(get(weapon.region)),
+                            (int)(weapon.x / Draw.scl + icon.width / 2f - weapon.region.width / 2f),
+                            (int)(-weapon.y / Draw.scl + icon.height / 2f - weapon.region.height / 2f),
+                            true
                         );
                     }
                 }
 
-                icon.draw(region);
-                icon.draw(outl);
+                icon.draw(get(type.region), true);
+                int baseColor = Color.valueOf("ffa665").rgba();
 
-                Sprite baseCell = SpriteProcessor.get(parseName.get(type.cellRegion));
-                Sprite cell = new Sprite(baseCell.width, baseCell.height);
-                cell.each((x, y) -> cell.draw(x, y, baseCell.getColor(x, y).mul(Color.valueOf("ffa665"))));
+                Pixmap baseCell = get(type.cellRegion);
+                Pixmap cell = new Pixmap(type.cellRegion.width, type.cellRegion.height);
+                cell.each((x, y) -> cell.set(x, y, Color.muli(baseCell.getRaw(x, y), baseColor)));
 
-                icon.draw(cell, icon.width / 2 - cell.width / 2, icon.height / 2 - cell.height / 2);
+                icon.draw(cell, icon.width / 2 - cell.width / 2, icon.height / 2 - cell.height / 2, true);
 
                 for(Weapon weapon : type.weapons){
                     weapon.load();
-                    String wname = weapon.name.replaceFirst("unity-", "");
 
-                    if(SpriteProcessor.has(wname) && !type.bottomWeapons.contains(weapon.name)){
-                        Sprite weapSprite = SpriteProcessor.get(wname);
-
-                        icon.draw(weapSprite,
-                            (int)(weapon.x * 4f / Draw.scl + icon.width / 2f - weapSprite.width / 2f),
-                            (int)(-weapon.y * 4f / Draw.scl + icon.height / 2f - weapSprite.height / 2f),
-                            weapon.flipSprite, false
-                        );
-
-                        if(weapon.top){
-                            icon.draw(outline.get(weapSprite),
-                                (int)(weapon.x * 4f / Draw.scl + icon.width / 2f - weapSprite.width / 2f),
-                                (int)(-weapon.y * 4f / Draw.scl + icon.height / 2f - weapSprite.height / 2f),
-                                weapon.flipSprite, false
-                            );
-                        }
+                    Pixmap wepReg = weapon.top ? outline.get(get(weapon.region)) : get(weapon.region);
+                    if(weapon.flipSprite){
+                        wepReg = wepReg.flipX();
                     }
+
+                    icon.draw(wepReg,
+                        (int)(weapon.x / Draw.scl + icon.width / 2f - weapon.region.width / 2f),
+                        (int)(-weapon.y / Draw.scl + icon.height / 2f - weapon.region.height / 2f),
+                        true
+                    );
                 }
 
                 if(unit instanceof Copterc){
-                    Sprite propellers = new Sprite(icon.width, icon.height);
-                    Sprite tops = new Sprite(icon.width, icon.height);
+                    Pixmap propellers = new Pixmap(icon.width, icon.height);
+                    Pixmap tops = new Pixmap(icon.width, icon.height);
 
-                    for(Rotor rotorConfig : type.rotors){
-                        String fileName = rotorConfig.name.replace("unity-", "");
-                        Sprite bladeSprite = SpriteProcessor.get(fileName + "-blade");
+                    for(Rotor rotor : type.rotors){
+                        String rname = fixName(rotor.name);
+                        Pixmap bladeSprite = get(rname + "-blade");
 
-                        float bladeSeparation = 360f / rotorConfig.bladeCount;
+                        float bladeSeparation = 360f / rotor.bladeCount;
 
-                        float propXCenter = (rotorConfig.x * 4f / Draw.scl + icon.width / 2f) - 0.5f;
-                        float propYCenter = (-rotorConfig.y * 4f / Draw.scl + icon.height / 2f) - 0.5f;
+                        float propXCenter = (rotor.x * 4f / Draw.scl + icon.width / 2f) - 0.5f;
+                        float propYCenter = (-rotor.y * 4f / Draw.scl + icon.height / 2f) - 0.5f;
 
                         float bladeSpriteXCenter = bladeSprite.width  / 2f - 0.5f;
                         float bladeSpriteYCenter = bladeSprite.height / 2f - 0.5f;
 
                         propellers.each((x, y) -> {
-                            for(int blade = 0; blade < rotorConfig.bladeCount; blade++){
+                            for(int blade = 0; blade < rotor.bladeCount; blade++){
                                 // Ideally the rotation would be offset, but as per Mindustry's significance of symmetry
                                 // unit composites should have rotors in symmetrical configurations. This is at EoD's request
-                                float deg = blade * bladeSeparation/* + rotorConfig.rotOffset*/;
+                                float deg = blade * bladeSeparation/* + rotor.rotOffset*/;
                                 float cos = Mathf.cosDeg(deg);
                                 float sin = Mathf.sinDeg(deg);
 
-                                Tmp.c1.set(bladeSprite.getColor(
-                                    ((propXCenter - x) * cos + (propYCenter - y) * sin) / rotorConfig.scale + bladeSpriteXCenter,
-                                    ((propXCenter - x) * sin - (propYCenter - y) * cos) / rotorConfig.scale + bladeSpriteYCenter
+                                Tmp.c1.set(getColor(
+                                    bladeSprite,
+                                    ((propXCenter - x) * cos + (propYCenter - y) * sin) / rotor.scale + bladeSpriteXCenter,
+                                    ((propXCenter - x) * sin - (propYCenter - y) * cos) / rotor.scale + bladeSpriteYCenter
                                 ));
 
-                                propellers.draw(x, y, Tmp.c1);
+                                propellers.set(x, y, Tmp.c1);
                             }
                         });
 
-                        Sprite topSprite = SpriteProcessor.get(fileName + "-top");
-                        int topXCenter = (int)(rotorConfig.x * 4f / Draw.scl + icon.width / 2f - topSprite.width / 2f);
-                        int topYCenter = (int)(-rotorConfig.y * 4f / Draw.scl + icon.height / 2f - topSprite.height / 2f);
-                        tops.draw(topSprite, topXCenter, topYCenter);
+                        Pixmap topSprite = get(rname + "-top");
+                        int topXCenter = (int)(rotor.x * 4f / Draw.scl + icon.width / 2f - topSprite.width / 2f);
+                        int topYCenter = (int)(-rotor.y * 4f / Draw.scl + icon.height / 2f - topSprite.height / 2f);
+
+                        tops.draw(topSprite, topXCenter, topYCenter, true);
                     }
 
-                    Sprite propOutlined = propellers.outline(3, type.outlineColor);
+                    Pixmap propOutlined = outline.get(propellers);
                     propOutlined.draw(propellers, 0, 0);
 
                     icon.draw(propOutlined);
-                    icon.draw(tops.outline(3, type.outlineColor));
-                    icon.draw(tops);
+                    icon.draw(outline.get(tops));
 
-                    Sprite payloadCell = new Sprite(baseCell.width, baseCell.height);
+                    Pixmap payloadCell = new Pixmap(baseCell.width, baseCell.height);
                     int cellCenterX = payloadCell.width / 2;
                     int cellCenterY = payloadCell.height / 2;
                     int propCenterX = propOutlined.width / 2;
@@ -304,59 +210,20 @@ public class IconGenerator implements Generator{
                         int cellX = x - cellCenterX;
                         int cellY = y - cellCenterY;
 
-                        float alpha = propOutlined.getColor(cellX + propCenterX, cellY + propCenterY).a;
-                        payloadCell.draw(x, y, baseCell.getColor(x, y).mul(1, 1, 1, 1 - alpha));
+                        float alpha = color.set(propOutlined.get(cellX + propCenterX, cellY + propCenterY)).a;
+                        payloadCell.set(x, y, color.set(baseCell.get(x, y)).mul(1, 1, 1, 1 - alpha));
                     });
 
-                    payloadCell.save(fname + "-cell-payload");
+                    save(payloadCell, fname, fname + "-cell-payload");
                 }
 
-                icon.antialias().save(fname + "-full");
+                //icon.antialias().save(fname + "-full");
+                save(icon, fname, fname + "-full");
             }catch(Throwable e){
                 if(e instanceof IllegalArgumentException i){
                     Log.err("Skipping unit @: @", type, i.getMessage());
                 }else{
                     Log.err(Strings.format("Problematic unit @", type), e);
-                }
-            }
-        });
-
-        content.blocks().each(block -> {
-            if(block.minfo.mod == null || block.outlineIcon) return;
-
-            try{
-                block.init();
-                block.load();
-
-                ObjectSet<String> antialiased = new ObjectSet<>();
-                for(TextureRegion reg : block.getGeneratedIcons()){
-                    String fname = parseName.get(reg);
-                    if(antialiased.add(fname)){
-                        GenRegion region = SpriteProcessor.getRegion(fname);
-                        Sprite sprite = SpriteProcessor.get(region);
-
-                        sprite.antialias();
-                        region.path.delete();
-                        sprite.save(fname);
-                    }
-                }
-
-                for(TextureRegion reg : block.variantRegions()){
-                    String fname = parseName.get(reg);
-                    if(antialiased.add(fname)){
-                        GenRegion region = SpriteProcessor.getRegion(fname);
-                        Sprite sprite = SpriteProcessor.get(region);
-
-                        sprite.antialias();
-                        region.path.delete();
-                        sprite.save(fname);
-                    }
-                }
-            }catch(Throwable e){
-                if(e instanceof IllegalArgumentException i){
-                    Log.err("Skipping block @: @", block, i.getMessage());
-                }else{
-                    Log.err(Strings.format("Problematic block @", block), e);
                 }
             }
         });

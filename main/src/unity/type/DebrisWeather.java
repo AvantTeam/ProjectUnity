@@ -38,7 +38,7 @@ public class DebrisWeather extends ParticleWeather{
         super.update(state);
     }
 
-    @Override
+    /*@Override
     public void drawParticles(TextureRegion region, Color color,
                               float sizeMin, float sizeMax,
                               float density, float intensity, float opacity,
@@ -73,5 +73,5 @@ public class DebrisWeather extends ParticleWeather{
                 Draw.rect(region, x, y, size, size, rotation);
             }
         }
-    }
+    }*/
 }

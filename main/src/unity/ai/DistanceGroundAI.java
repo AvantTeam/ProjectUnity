@@ -1,7 +1,5 @@
 package unity.ai;
 
-import java.util.Arrays;
-
 import arc.util.Time;
 import mindustry.gen.*;
 import mindustry.type.UnitType;
@@ -29,7 +27,6 @@ public class DistanceGroundAI extends GroundAI{
 
         if(core != null && unit.within(core, range / 1.1f + core.block.size * tilesize / 2f)){
             target = core;
-            Arrays.fill(targets, core);
         }
 
         if(target != null && target.team() != team && unit.within(target, range / 1.7f)){

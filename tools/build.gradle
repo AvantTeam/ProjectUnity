@@ -35,30 +35,21 @@ task proc(dependsOn: [classes, configurations.runtimeClasspath]) {
             from spritesGenFolder
             into spritesAssetsFolder
         }
-
-        exec {
-            ignoreExitValue true
-            workingDir file('../main/')
-
-            println()
-            println 'Alpha-bleeding sprites...'
-            if(windows()) {
-                commandLine('cmd', '/c', 'alpha-bleeding-windows.exe', '--replace', './assets/sprites/')
-            } else {
-                commandLine('./alpha-bleed', './assets/sprites/')
-            }
-        }
     }
 }
 
 repositories {
     mavenCentral()
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+    maven { url "https://oss.sonatype.org/content/repositories/releases/" }
     maven { url 'https://www.jitpack.io' }
 }
 
 dependencies {
     implementation project(':main')
 
-    implementation "com.github.Anuken.Arc:arc-core:$mindustryVersion"
-    implementation "com.github.Anuken.Mindustry:core:$mindustryVersion"
+    implementation "com.github.Anuken.Arc:arc-core:$arcVersion"
+    implementation "com.github.Anuken.Arc:natives-desktop:$arcVersion"
+    //implementation "com.github.Anuken.Mindustry:core:$mindustryVersion"
+    implementation files(coreJar())
 }

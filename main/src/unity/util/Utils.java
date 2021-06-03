@@ -70,9 +70,7 @@ public final class Utils{
                 Tile check = ttile.nearby(i, j);
 
                 if(check.solid()){
-                    if(check.build != null && check.build.tile == tile){
-                        continue;
-                    }else{
+                    if(check.build == null || check.build.tile != tile){
                         return false;
                     }
                 }
@@ -324,7 +322,7 @@ public final class Utils{
 
     /**
      * Targets any units that is not in the array.
-     * @returns the unit, picks a random target if all potential targets is in the array.
+     * @return the unit, picks a random target if all potential targets is in the array.
      */
     public static Posc targetUnique(Team team, float x, float y, float radius, Posc[] targetArray){
         result = null;
@@ -684,17 +682,17 @@ public final class Utils{
         PixmapRegion r1 = Core.atlas.getPixmap(a);
         PixmapRegion r2 = Core.atlas.getPixmap(b);
 
-        Pixmap out = new Pixmap(r1.width, r1.height, r1.pixmap.getFormat());
-        out.setBlending(Pixmap.Blending.none);
+        Pixmap out = new Pixmap(r1.width, r1.height);
+        //out.setBlending(Pixmap.Blending.none);
         Color color1 = new Color();
         Color color2 = new Color();
 
         for(int x = 0; x < r1.width; x++){
             for(int y = 0; y < r1.height; y++){
 
-                r1.getPixel(x, y, color1);
-                r2.getPixel(x, y, color2);
-                out.draw(x, y, color1.lerp(color2, f));
+                r1.get(x, y, color1);
+                r2.get(x, y, color2);
+                out.set(x, y, color1.lerp(color2, f));
             }
         }
 

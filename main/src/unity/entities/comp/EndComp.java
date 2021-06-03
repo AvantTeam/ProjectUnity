@@ -15,7 +15,7 @@ import unity.type.*;
 @SuppressWarnings("unused")
 @EntityComponent
 abstract class EndComp implements Unitc, Factionc{
-    @SyncLocal private float lastHealth, lastMaxHealth;
+    @SyncLocal private float trueHealth, trueMaxHealth;
     private float aggression = 0f;
     private float aggressionTime = 0f;
     private float[] invFrames;
@@ -38,8 +38,8 @@ abstract class EndComp implements Unitc, Factionc{
         UnityUnitType utype = (UnityUnitType)type;
         AntiCheatVariables aType = utype.antiCheatType;
 
-        lastHealth = type.health;
-        lastMaxHealth = type.health;
+        trueHealth = type.health;
+        trueMaxHealth = type.health;
 
         if(aType != null) invFrames = new float[aType.invincibilityArray];
     }
@@ -48,7 +48,7 @@ abstract class EndComp implements Unitc, Factionc{
     @BypassGroupCheck
     @BreakAll
     public void remove(){
-        if(lastHealth > 0){
+        if(trueHealth > 0){
             aggression = 4f;
             aggressionTime = 10f * 60f;
             return;
@@ -70,10 +70,10 @@ abstract class EndComp implements Unitc, Factionc{
         AntiCheatVariables aType = utype.antiCheatType;
 
         if(aType != null){
-            if(health < lastHealth) health = lastHealth;
-            lastHealth = health;
-            if(maxHealth < lastMaxHealth) maxHealth = lastMaxHealth;
-            lastMaxHealth = maxHealth;
+            if(health < trueHealth) health = trueHealth;
+            trueHealth = health;
+            if(maxHealth < trueMaxHealth) maxHealth = trueMaxHealth;
+            trueMaxHealth = maxHealth;
             if(resistTime <= 0f){
                 resist -= resistMax / aType.resistDuration;
                 resist = Math.max(resist, 0f);
@@ -116,7 +116,7 @@ abstract class EndComp implements Unitc, Factionc{
                     resist += a;
                     resistMax = Math.max(resistMax, resist);
                     resistTime = aType.resistTime;
-                    aggression += Math.min(a / (lastMaxHealth / 5f), 1.5f);
+                    aggression += Math.min(a / (trueMaxHealth / 5f), 1.5f);
                     aggression = Math.min(aggression, 4f);
                     aggressionTime = 5f * 60f;
                 }
@@ -143,7 +143,7 @@ abstract class EndComp implements Unitc, Factionc{
             tmpAmount -= shieldDamage;
 
             if(tmpAmount > 0){
-                lastHealth -= tmpAmount;
+                trueHealth -= tmpAmount;
             }
         }
     }
@@ -152,7 +152,7 @@ abstract class EndComp implements Unitc, Factionc{
     @Replace
     public void heal(float amount){
         health += Math.max(0f, amount);
-        lastHealth = health;
+        trueHealth = health;
         clampHealth();
     }
 }

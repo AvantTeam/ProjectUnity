@@ -1,13 +1,13 @@
 package unity.tools;
 
-import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.graphics.g2d.TextureAtlas.*;
 import arc.util.*;
 import unity.gen.*;
 
 import java.lang.reflect.*;
+
+import static unity.tools.SpriteProcessor.*;
 
 public class LoadOutlineGenerator implements Generator{
     @Override
@@ -15,22 +15,20 @@ public class LoadOutlineGenerator implements Generator{
         try{
             Regions.load();
 
-            Func<TextureRegion, String> parseName = reg -> ((AtlasRegion)reg).name.replaceFirst("unity-", "");
+            int outlineColor = Color.valueOf("404049").rgba();
             for(Field field : Regions.class.getDeclaredFields()){
                 if(!TextureRegion.class.isAssignableFrom(field.getType()) || !field.getName().endsWith("OutlineRegion")) continue;
 
                 Field raw = Regions.class.getDeclaredField(field.getName().replaceFirst("Outline", ""));
                 TextureRegion region = (TextureRegion)raw.get(null);
-                Color outlineColor = Color.valueOf("404049");
 
-                String fname = parseName.get(region);
-                if(!SpriteProcessor.has(fname)) continue;
+                String fname = fixName(region);
+                if(!has(fname)) continue;
 
-                Sprite sprite = SpriteProcessor.get(fname);
-                sprite.draw(sprite.outline(4, outlineColor));
-                sprite.antialias();
+                Pixmap sprite = get(fname);
+                sprite.draw(sprite.outline(outlineColor, 4));
 
-                sprite.save(fname + "-outline");
+                save(sprite, fname, fname + "-outline");
             }
 
             Regions.load();

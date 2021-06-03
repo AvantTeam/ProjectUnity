@@ -94,6 +94,7 @@ public class UnityUnitType extends UnitType{
 
     public UnityUnitType(String name){
         super(name);
+        outlines = false;
     }
 
     @Override
@@ -385,7 +386,7 @@ public class UnityUnitType extends UnitType{
         float z = Draw.z();
 
         if(unit instanceof Tentaclec t){
-            Draw.z(z - outlineSpace);
+            Draw.z(Math.min(z - 0.01f, 99f));
             t.drawTentacles();
             Draw.z(z);
         }
@@ -478,7 +479,7 @@ public class UnityUnitType extends UnitType{
 
             if(weapon.outlineRegion.found()){
                 float zB = Draw.z();
-                if(!weapon.top || found) Draw.z(zB - outlineSpace);
+                if(!weapon.top || found) Draw.z(Math.min(zB - 0.01f, 99f));
 
                 Draw.rect(weapon.outlineRegion,
                 wx, wy,

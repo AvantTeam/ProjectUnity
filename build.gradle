@@ -1,12 +1,14 @@
 buildscript {
     repositories {
         mavenCentral()
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        maven { url "https://oss.sonatype.org/content/repositories/releases/" }
         maven { url 'https://jitpack.io' }
     }
 
     dependencies {
-        classpath "com.github.Anuken.Arc:arc-core:$mindustryVersion"
-        classpath "com.github.Anuken.Mindustry:core:$mindustryVersion"
+        classpath "com.github.Anuken.Arc:arc-core:$arcVersion"
+        //classpath "com.github.Anuken.Mindustry:core:$mindustryVersion"
         classpath "com.squareup:javapoet:$javapoetVersion"
         classpath "com.github.Anuken:jabel:$jabelVersion"
     }
@@ -15,6 +17,7 @@ buildscript {
 allprojects {
     apply plugin: 'java'
     apply plugin: 'java-library'
+    apply plugin: 'maven-publish'
 
     group = 'com.github.AvantTeam'
     version = '0.1'
@@ -25,11 +28,22 @@ allprojects {
         sdkRoot = { return System.getenv('ANDROID_SDK_ROOT') }
         hasSprites = { return new File(rootDir, 'main/assets/sprites/').exists() }
         windows = { return System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows') }
+        coreJar = { return file(new File(rootDir, 'main/libs/core.jar')) }
     }
 
     repositories {
         mavenCentral()
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        maven { url "https://oss.sonatype.org/content/repositories/releases/" }
         maven { url "https://jitpack.io" }
+    }
+
+    publishing {
+        publications {
+            maven(MavenPublication) {
+                from components.java
+            }
+        }
     }
 }
 

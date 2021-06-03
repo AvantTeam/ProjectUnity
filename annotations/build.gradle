@@ -2,12 +2,15 @@ sourceSets.main.java.srcDirs = ['src/']
 
 repositories {
     mavenCentral()
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+    maven { url "https://oss.sonatype.org/content/repositories/releases/" }
     maven { url "https://www.jitpack.io"}
 }
 
 dependencies {
-    implementation "com.github.Anuken.Arc:arc-core:$mindustryVersion"
-    implementation "com.github.Anuken.Mindustry:core:$mindustryVersion"
+    implementation "com.github.Anuken.Arc:arc-core:$arcVersion"
+    //implementation "com.github.Anuken.Mindustry:core:$mindustryVersion"
+    implementation files(coreJar())
     implementation "com.squareup:javapoet:$javapoetVersion"
 
     annotationProcessor "com.github.Anuken:jabel:$jabelVersion"
