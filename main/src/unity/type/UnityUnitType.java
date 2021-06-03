@@ -94,6 +94,7 @@ public class UnityUnitType extends UnitType{
 
     public UnityUnitType(String name){
         super(name);
+        outlines = false;
     }
 
     @Override
