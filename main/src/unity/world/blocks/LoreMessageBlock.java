@@ -54,16 +54,9 @@ public class LoreMessageBlock extends Block{
     }
 
     @Override
-    public TextureRegion icon(Cicon icon){
-        if(cicons[icon.ordinal()] == null){
-            String name = "unity-lore-message";
-            cicons[icon.ordinal()] =
-                Core.atlas.find(name + "-" + icon.name(),
-                Core.atlas.find(name + "-full",
-                Core.atlas.find(name)));
-        }
-
-        return cicons[icon.ordinal()];
+    public void loadIcon(){
+        fullIcon = Core.atlas.find("unity-lore-message");
+        uiIcon = Core.atlas.find("unity-lore-message-ui", fullIcon);
     }
 
     public class LoreMessageBuild extends Building{

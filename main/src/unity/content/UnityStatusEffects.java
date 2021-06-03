@@ -63,11 +63,11 @@ public class UnityStatusEffects implements ContentList{
             effect = UnityFx.blueBurnEffect;
             init(() -> {
                 opposite(StatusEffects.wet, StatusEffects.freezing);
-                trans(StatusEffects.tarred, (unit, time, newTime, result) -> {
+                /*trans(StatusEffects.tarred, (unit, time, newTime, result) -> {
                     unit.damagePierce(8f);
                     effect.at(unit.x() + Mathf.range(unit.bounds() / 2), unit.y() + Mathf.range(unit.bounds() / 2));
                     result.set(this, Math.min(time + newTime, 400f));
-                });
+                });*/
             });
         }};
 

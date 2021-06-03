@@ -85,7 +85,7 @@ public abstract class GenericTractorBeamTurret<T extends Teamc> extends BaseTurr
     }
 
     public abstract class GenericTractorBeamTurretBuild extends BaseTurretBuild implements ExtensionHolder, ControlBlock, Senseable{
-        public BlockUnitc unit;
+        public @Nullable BlockUnitc unit;
         protected Extension ext;
 
         public T target;
