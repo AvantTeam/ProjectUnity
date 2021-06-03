@@ -4,13 +4,10 @@ import arc.*
 import arc.files.*
 import arc.struct.*
 import arc.util.*
-import arc.util.async.*
 import arc.util.serialization.*
 
-import java.util.*
-
 dependencies {
-    compileOnly "com.github.Anuken.Arc:arc-core:$mindustryVersion"
+    compileOnly "com.github.Anuken.Arc:arc-core:$arcVersion"
     compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
 
     annotationProcessor "com.github.Anuken:jabel:$jabelVersion"
@@ -19,13 +16,20 @@ dependencies {
     annotationProcessor project(':annotations')
 }
 
+repositories {
+    mavenCentral()
+    maven{ url "https://oss.sonatype.org/content/repositories/snapshots/" }
+    maven{ url "https://oss.sonatype.org/content/repositories/releases/" }
+    maven { url 'https://www.jitpack.io' }
+}
+
 ext {
     assetsDir = new File(rootDir, "main/assets/")
 
     fetchPackage = 'unity/fetched'
     fetchDir = new File("$projectDir/fetched/$fetchPackage")
 
-    fetchTemp = new Fi("$projectDir/fetch.txt")
+    fetchTemp = new File("$projectDir/fetch.txt")
     fetchRevision = 1
 }
 
@@ -91,11 +95,6 @@ task deployDex(type: Jar, dependsOn: [deploy, dex]) {
     }}
 }
 
-repositories {
-    mavenCentral()
-    maven { url 'https://www.jitpack.io' }
-}
-
 class Fetcher {
     static Seq<String> prints = new Seq<String>()
 
@@ -127,6 +126,9 @@ task fetchComps {
         delete { delete fetchDir }
         fetchDir.mkdir()
 
+        println Class.forName 'arc.Core'
+        println Class.forName 'arc.Net'
+
         Core.net = new Net()
         Core.net.setBlock(true)
 
@@ -146,14 +148,14 @@ task fetchComps {
                 fileurl,
                 { comp ->
                     final def content = comp.getResultAsString()
-                        .replace('mindustry.entities.comp', "$fetchPackage".replace('/', '.'))
+                        .replace('mindustry.entities.comp', "$fetchPackage".replace('/', '.') as String)
                         .replace('mindustry.annotations.Annotations.*', 'unity.annotations.Annotations.*')
-                        .replaceAll('\\@Component\\((base = true|.)+\\)\n*', '@EntityComponent(base = true, write = false)\n')
-                        .replaceAll('\\@Component\n*', '@EntityComponent(write = false)\n')
-                        .replaceAll('\\@BaseComponent\n*', '@EntityBaseComponent\n')
-                        .replaceAll('\\@CallSuper\n*', '')
-                        .replaceAll('\\@Final\n*', '')
-                        .replaceAll('\\@EntityDef\\(*.*\\)*\n*', '')
+                        .replaceAll('@Component\\((base = true|.)+\\)\n*', '@EntityComponent(base = true, write = false)\n')
+                        .replaceAll('@Component\n*', '@EntityComponent(write = false)\n')
+                        .replaceAll('@BaseComponent\n*', '@EntityBaseComponent\n')
+                        .replaceAll('@CallSuper\n*', '')
+                        .replaceAll('@Final\n*', '')
+                        .replaceAll('@EntityDef\\(*.*\\)*\n*', '')
 
                     if(content.isBlank()) throw new IllegalStateException()
 
@@ -188,7 +190,7 @@ task fetchComps {
             }
         }
 
-        fetchTemp.writeString("$mindustryVersion/$fetchRevision")
+        fetchTemp.text = "$mindustryVersion/$fetchRevision"
         println 'Done writing.'
     }
 }
