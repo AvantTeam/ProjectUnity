@@ -243,7 +243,7 @@ public class Unity extends Mod implements ApplicationListener{
             }
         }
 
-        Log.info("[#@][unity][] @", Color.cyan, builder.toString());
+        Log.info("&lm&fb[unity]&fr @", builder.toString());
     }
 
     public static LoadedMod mod(){
