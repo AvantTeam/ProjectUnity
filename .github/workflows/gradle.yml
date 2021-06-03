@@ -19,8 +19,8 @@ jobs:
 
     - name: Build and dexify mod jar file
       run: |
-        ./gradlew main:deployDex
         chmod +x gradlew
+        ./gradlew main:deployDex
 
     #- name: Upload built mod jar file
       #uses: actions/upload-artifact@v2.2.1
