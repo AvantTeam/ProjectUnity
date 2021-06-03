@@ -185,7 +185,7 @@ public class Unity extends Mod implements ApplicationListener{
             print(Strings.format("Faction @ has @ contents.", faction.name, array.size));
         }
 
-        Seq<Class<?>> ignored = Seq.with(Floor.class, Boulder.class);
+        Seq<Class<?>> ignored = Seq.with(Floor.class, Prop.class);
         Cons<Seq<? extends Content>> checker = list -> {
             for(var cont : list){
                 if(

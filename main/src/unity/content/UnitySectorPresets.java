@@ -62,7 +62,7 @@ public class UnitySectorPresets implements ContentList{
                 ), this, (ResourceAmountObjective objective) -> {
                     int win = Math.max((state.wave / 5 + 1) * 5, captureWave);
 
-                    state.rules.winWave = Math.max(win, win);
+                    state.rules.winWave = Math.max(captureWave, win);
                     if(state.getSector() != null){
                         state.getSector().info.winWave = win;
                         GlobalObjective.fire(GlobalObjective.sectorAccretionComplete);

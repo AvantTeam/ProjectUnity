@@ -185,7 +185,7 @@ public class UnityCall{
 
     protected static void client(NetConnection except, boolean reliable, int type){
         if(net.server()){
-            outSend.reset();
+            /*outSend.reset();
 
             InvokePacket packet = Pools.obtain(InvokePacket.class, InvokePacket::new);
             packet.priority = 0;
@@ -202,13 +202,13 @@ public class UnityCall{
                 net.sendExcept(except, packet, reliable ? SendMode.tcp : SendMode.udp);
             }else{
                 net.send(packet, reliable ? SendMode.tcp : SendMode.udp);
-            }
+            }*/
         }
     }
 
     protected static void server(boolean reliable, int type){
         if(net.client()){
-            outSend.reset();
+            /*outSend.reset();
 
             InvokePacket packet = Pools.obtain(InvokePacket.class, InvokePacket::new);
             packet.priority = 0;
@@ -221,7 +221,7 @@ public class UnityCall{
             packet.bytes = outSend.getBytes();
             packet.length = outSend.size();
 
-            net.send(packet, reliable ? SendMode.tcp : SendMode.udp);
+            net.send(packet, reliable ? SendMode.tcp : SendMode.udp);*/
         }
     }
 }
