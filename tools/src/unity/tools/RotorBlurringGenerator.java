@@ -54,7 +54,7 @@ public class RotorBlurringGenerator implements Generator{
 
             String shadeSpriteName = type.name + "-rotor-blade-shade";
 
-            if(SpriteProcessor.has(shadeSpriteName)){
+            if(has(shadeSpriteName)){
                 Log.info("Rotor Blade shade sprite override for @ exists, skipping", shadeSpriteName);
                 continue;
             }

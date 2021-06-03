@@ -11,11 +11,7 @@ import mindustry.core.*;
 import mindustry.mod.Mods.*;
 import unity.*;
 
-import java.awt.image.*;
-import java.io.*;
 import java.util.*;
-
-import javax.imageio.*;
 
 import static mindustry.Vars.*;
 
@@ -24,8 +20,6 @@ public class SpriteProcessor{
     static Color color = new Color();
 
     static Unity mod;
-
-    static final Fi spritesGen = Fi.get("../assets-raw/sprites-gen/");
 
     public static void main(String[] args){
         headless = true;
@@ -110,7 +104,6 @@ public class SpriteProcessor{
         };
 
         Generators.generate();
-        Sprite.dispose();
     }
 
     static void drawCenter(Pixmap pix, Pixmap other){

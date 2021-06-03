@@ -1,9 +1,7 @@
 package unity.tools;
 
-import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.graphics.g2d.TextureAtlas.*;
 import arc.util.*;
 import unity.gen.*;
 

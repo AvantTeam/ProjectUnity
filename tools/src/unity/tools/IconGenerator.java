@@ -72,7 +72,6 @@ public class IconGenerator implements Generator{
                     for(Rotor rotor : type.rotors){
                         String fname = fixName(type.name) + "-rotor";
                         if(outlined.add(fname + "-blade")){
-                            //outlSeparate.get("outline", rotor.bladeRegion);
                             save(outline.get(get(fname + "-blade")), fname, fname + "-outline");
                         }
 
@@ -201,7 +200,7 @@ public class IconGenerator implements Generator{
                     icon.draw(propOutlined);
                     icon.draw(outline.get(tops));
 
-                    Sprite payloadCell = new Sprite(baseCell.width, baseCell.height);
+                    Pixmap payloadCell = new Pixmap(baseCell.width, baseCell.height);
                     int cellCenterX = payloadCell.width / 2;
                     int cellCenterY = payloadCell.height / 2;
                     int propCenterX = propOutlined.width / 2;
@@ -212,10 +211,10 @@ public class IconGenerator implements Generator{
                         int cellY = y - cellCenterY;
 
                         float alpha = color.set(propOutlined.get(cellX + propCenterX, cellY + propCenterY)).a;
-                        payloadCell.draw(x, y, color.set(baseCell.get(x, y)).mul(1, 1, 1, 1 - alpha));
+                        payloadCell.set(x, y, color.set(baseCell.get(x, y)).mul(1, 1, 1, 1 - alpha));
                     });
 
-                    payloadCell.save(fname + "-cell-payload");
+                    save(payloadCell, fname, fname + "-cell-payload");
                 }
 
                 //icon.antialias().save(fname + "-full");
