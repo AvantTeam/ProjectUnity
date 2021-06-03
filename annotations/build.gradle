@@ -9,8 +9,7 @@ repositories {
 
 dependencies {
     implementation "com.github.Anuken.Arc:arc-core:$arcVersion"
-    //implementation "com.github.Anuken.Mindustry:core:$mindustryVersion"
-    implementation files(coreJar())
+    implementation "com.github.Anuken.Mindustry:core:$mindustryVersion"
     implementation "com.squareup:javapoet:$javapoetVersion"
 
     annotationProcessor "com.github.Anuken:jabel:$jabelVersion"

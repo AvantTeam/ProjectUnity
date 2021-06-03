@@ -8,6 +8,21 @@ ext {
     spritesAssetsFolder = '../main/assets/sprites/'
 }
 
+repositories {
+    mavenCentral()
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+    maven { url "https://oss.sonatype.org/content/repositories/releases/" }
+    maven { url 'https://www.jitpack.io' }
+}
+
+dependencies {
+    implementation project(':main')
+
+    implementation "com.github.Anuken.Arc:arc-core:$arcVersion"
+    implementation "com.github.Anuken.Arc:natives-desktop:$arcVersion"
+    implementation "com.github.Anuken.Mindustry:core:$mindustryVersion"
+}
+
 task proc(dependsOn: [classes, configurations.runtimeClasspath]) {
     doLast {
         delete {
@@ -36,20 +51,4 @@ task proc(dependsOn: [classes, configurations.runtimeClasspath]) {
             into spritesAssetsFolder
         }
     }
-}
-
-repositories {
-    mavenCentral()
-    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-    maven { url "https://oss.sonatype.org/content/repositories/releases/" }
-    maven { url 'https://www.jitpack.io' }
-}
-
-dependencies {
-    implementation project(':main')
-
-    implementation "com.github.Anuken.Arc:arc-core:$arcVersion"
-    implementation "com.github.Anuken.Arc:natives-desktop:$arcVersion"
-    //implementation "com.github.Anuken.Mindustry:core:$mindustryVersion"
-    implementation files(coreJar())
 }

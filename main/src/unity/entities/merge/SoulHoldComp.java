@@ -19,7 +19,7 @@ import static mindustry.Vars.*;
 
 @SuppressWarnings({"unused", "unchecked"})
 @MergeComponent
-abstract class SoulHoldComp extends Block implements Stemc{
+class SoulHoldComp extends Block{
     int maxSouls = 3;
     float efficiencyFrom = 0.3f;
     float efficiencyTo = 1f;
@@ -57,7 +57,7 @@ abstract class SoulHoldComp extends Block implements Stemc{
         });
     }
 
-    public abstract class SoulBuildComp extends Building implements StemBuildc, ControlBlock, Soul{
+    public class SoulBuildComp extends Building implements ControlBlock, Soul{
         @Nullable transient BlockUnitc unit;
 
         @ReadOnly boolean wasPlayer;
