@@ -2,6 +2,7 @@ sourceSets.main.java.srcDirs = ['src/', "$buildDir/generated/sources/annotationP
 
 import arc.*
 import arc.files.*
+import arc.func.*
 import arc.struct.*
 import arc.util.*
 import arc.util.serialization.*
@@ -104,7 +105,7 @@ class Fetcher {
     private Throwable error = null
 
     void execute() {
-        Closure<Boolean> exec = { final UnsafeRunnable run ->
+        Boolf<UnsafeRunnable> exec = { final UnsafeRunnable run ->
             if(name != null) prints.add("---- Trying to fetch '$name'..." as String)
             try {
                 run.run()
@@ -117,7 +118,7 @@ class Fetcher {
             error != null
         }
 
-        while(exec(run)) {}
+        while(exec.get(run)) {}
     }
 }
 
@@ -169,8 +170,7 @@ task fetchComps {
         new Fetcher(run: mainRun).execute()
         Fetcher.prints.add("Found $fetches.size entity components." as String)
 
-        Seq<Thread> threads = new Seq<Thread>(Thread.class)
-        threads = fetches.map({ final Fetcher fetch -> new Thread({
+        Seq<Thread> threads = fetches.map({ final Fetcher fetch -> new Thread({
             fetch.execute()
             synchronized(fetches) {
                 fetches.remove(fetch)
