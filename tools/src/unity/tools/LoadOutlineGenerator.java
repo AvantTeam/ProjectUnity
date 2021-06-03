@@ -15,7 +15,7 @@ public class LoadOutlineGenerator implements Generator{
         try{
             Regions.load();
 
-            int outlineColor = Color.valueOf("404049").argb8888();
+            int outlineColor = Color.valueOf("404049").rgba();
             for(Field field : Regions.class.getDeclaredFields()){
                 if(!TextureRegion.class.isAssignableFrom(field.getType()) || !field.getName().endsWith("OutlineRegion")) continue;
 

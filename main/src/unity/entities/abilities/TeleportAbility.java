@@ -15,6 +15,8 @@ import static mindustry.Vars.*;
 
 /** @author GlennFolker */
 public class TeleportAbility<T extends Teamc & Hitboxc> extends BaseAbility{
+    private static Vec2 vec = new Vec2();
+
     public float teleportDistance;
 
     public Sound teleportSound = Sounds.lasershoot;
@@ -43,21 +45,21 @@ public class TeleportAbility<T extends Teamc & Hitboxc> extends BaseAbility{
 
         Vec2 pos;
         if(!Float.isNaN(x) && !Float.isNaN(y)){
-            pos = Tmp.v1.set(x, y).sub(unit).limit(teleportDistance);
+            pos = vec.set(x, y).sub(unit).limit(teleportDistance);
         }else if(toAvoid != null){
             if(toAvoid instanceof Velc vel){
                 int i = Mathf.randomSeed((long)(Time.time + unit.id)) > 0.5f ? 1 : -1;
-                pos = Tmp.v1.trns(
+                pos = vec.trns(
                     vel.vel().angle() - 90,
                     i * Math.min(unit.dst(vel) * 2f, teleportDistance)
                 );
             }else{
-                pos = Tmp.v1.set(unit).sub(toAvoid)
+                pos = vec.set(unit).sub(toAvoid)
                     .rotate(Mathf.randomSeed((long)(Time.time + unit.id), 360f))
-                    .setLength(Math.min(Tmp.v1.len() * 2f, teleportDistance));
+                    .setLength(Math.min(vec.len() * 2f, teleportDistance));
             }
         }else{
-            pos = Tmp.v1.trns(
+            pos = vec.trns(
                 Mathf.randomSeed((long)(Time.time + unit.id), 360f),
                 Mathf.randomSeed((long)(Time.time + 1f + unit.id), unit.hitSize() * 2f, teleportDistance)
             );

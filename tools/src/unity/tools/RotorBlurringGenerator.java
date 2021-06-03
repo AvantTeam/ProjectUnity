@@ -5,6 +5,7 @@ import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.noise.*;
+import unity.*;
 import unity.gen.*;
 import unity.type.*;
 
@@ -14,8 +15,6 @@ import static unity.tools.SpriteProcessor.*;
 public class RotorBlurringGenerator implements Generator{
     @Override
     public void generate(){
-        Log.info("Generating Rotor Sprites");
-
         Seq<UnityUnitType> copters = content.units().select(type -> type instanceof UnityUnitType && type.minfo.mod != null && type.constructor.get() instanceof Copterc).as();
         for(UnityUnitType type : copters){
             // Normally these should be called after IconGenerator which however already invokes these, so we can just skip.
@@ -28,7 +27,7 @@ public class RotorBlurringGenerator implements Generator{
             String ghostSpriteName = fname + "-rotor-blade-ghost";
 
             if(has(ghostSpriteName)){
-                Log.info("Rotor Blade sprite override for @ exists, skipping", ghostSpriteName);
+                Unity.print(Strings.format("Rotor Blade sprite override for @ exists, skipping", ghostSpriteName));
                 continue;
             }else if(!has(bladeSpriteName)){
                 Log.warn("@ not found", bladeSpriteName);
@@ -49,13 +48,13 @@ public class RotorBlurringGenerator implements Generator{
             // including counter-rotating propellers and that jazz, number 4 will be used instead.
             drawRadial(ghostSprite, heightAverageColors, bladeLength, 4);
 
-            Log.info("Saving @ with blade length @", ghostSpriteName, bladeLength);
+            Unity.print(Strings.format("Saving @ with blade length @", ghostSpriteName, bladeLength));
             save(ghostSprite, fname, ghostSpriteName);
 
             String shadeSpriteName = type.name + "-rotor-blade-shade";
 
             if(has(shadeSpriteName)){
-                Log.info("Rotor Blade shade sprite override for @ exists, skipping", shadeSpriteName);
+                Unity.print(Strings.format("Rotor Blade shade sprite override for @ exists, skipping", shadeSpriteName));
                 continue;
             }
 
@@ -64,11 +63,9 @@ public class RotorBlurringGenerator implements Generator{
 
             drawShade(shadeSprite, bladeLength);
 
-            Log.info("Saving @ with blade length @", shadeSpriteName, bladeLength);
+            Unity.print(Strings.format("Saving @ with blade length @", shadeSpriteName, bladeLength));
             save(shadeSprite, fname, shadeSpriteName);
         }
-
-        Log.info("Rotors complete");
     }
 
     private int populateColorArray(int[] heightAverageColors, Pixmap bladeSprite, int halfHeight){
