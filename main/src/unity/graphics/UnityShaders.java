@@ -59,7 +59,7 @@ public class UnityShaders implements Loadable{
 
     public static void dispose(){
         if(!headless){
-            buffer.dispose();
+            if(buffer != null) buffer.dispose();
             for(UnityShader shader : all){
                 shader.dispose();
             }

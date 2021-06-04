@@ -88,13 +88,7 @@ public class ScriptedSector extends SectorPreset{
     public boolean valid(){
         return state.getSector() != null
         ?   state.getSector().id == sector.id
-        :   (
-            state.map != null
-            ?   (
-                state.map.name().equals(generator.map.name()) &&
-                state.map.mod != null && state.map.mod.name.equals("unity")
-            )
-            :   false
+        :   (state.map != null && (state.map.name().equals(generator.map.name()) && state.map.mod != null && state.map.mod.name.equals("unity"))
         );
     }
 }

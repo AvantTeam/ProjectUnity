@@ -10,7 +10,6 @@ import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
-import unity.entities.units.*;
 import unity.gen.*;
 
 public class InvisibleUnitType extends UnityUnitType{

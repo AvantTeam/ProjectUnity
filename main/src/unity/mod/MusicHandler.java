@@ -5,7 +5,9 @@ import arc.audio.*;
 import arc.func.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.core.GameState.*;
 import mindustry.game.EventType.*;
+import mindustry.gen.*;
 import mindustry.type.*;
 import unity.gen.*;
 
@@ -13,32 +15,70 @@ import static mindustry.Vars.*;
 
 /** @author GlennFolker */
 public class MusicHandler implements ApplicationListener{
-    private ObjectMap<String, MusicLoopData> loopDatas = new ObjectMap<>();
+    private final ObjectMap<String, MusicLoopData> loopDatas = new ObjectMap<>();
     private MusicLoopData currentData = null;
-    private Music currentMusic = null;
-    private Boolp currentPredicate;
-
     private boolean introPassed = false;
 
-    public void setup(){
-        Events.on(SectorLaunchEvent.class, e -> {
-            Planet p = e.sector.planet;
+    private final Seq<Music> oldAmbient = new Seq<>();
+    private final Seq<Music> oldDark = new Seq<>();
+    private final Seq<Music> oldBoss = new Seq<>();
 
-            for(Faction fac : Faction.all){
-                if(fac.equals(FactionMeta.map(p))){
-                    FactionMeta.getByFaction(fac, Music.class).each(music -> {
-                        Seq<Music> category = FactionMeta.getMusicCategory(music);
-                        if(!category.contains(music)){
-                            category.add(music);
+    private Boolp currentPredicate = state::isPlaying;
+    private @Nullable Music currentMusic;
+
+    private Music originalPlanet;
+    private ObjectMap<Faction, Music> planetMusics = new ObjectMap<>();
+
+    public void setup(){
+        Events.on(ClientLoadEvent.class, e -> {
+            originalPlanet = Musics.launch;
+            planetMusics = ObjectMap.of(
+                Faction.monolith, UnityMusics.soulsOfTheFallen
+            );
+        });
+
+        Events.on(StateChangeEvent.class, e -> {
+            if(e.to == State.playing){
+                if(state.map != null && state.map.mod != null && state.map.mod.name.equals("unity")){
+                    SectorPreset sec = content.sectors().find(s -> s.generator.map.name().equals(state.map.name()));
+                    if(sec != null){
+                        Faction fac = FactionMeta.map(sec);
+                        if(fac == null) return;
+
+                        Seq<Music> newMusics = FactionMeta.getByFaction(fac, Music.class);
+                        Seq<Music> newAmbient = newMusics.select(m -> FactionMeta.getMusicCategory(m) == control.sound.ambientMusic);
+                        Seq<Music> newDark = newMusics.select(m -> FactionMeta.getMusicCategory(m) == control.sound.darkMusic);
+                        Seq<Music> newBoss = newMusics.select(m -> FactionMeta.getMusicCategory(m) == control.sound.bossMusic);
+
+                        if(!newAmbient.isEmpty()){
+                            oldAmbient.addAll(control.sound.ambientMusic);
+
+                            control.sound.ambientMusic.clear();
+                            control.sound.ambientMusic.addAll(newAmbient);
                         }
-                    });
+
+                        if(!newDark.isEmpty()){
+                            oldDark.addAll(control.sound.darkMusic);
+
+                            control.sound.darkMusic.clear();
+                            control.sound.darkMusic.addAll(newDark);
+                        }
+
+                        if(!newBoss.isEmpty()){
+                            oldBoss.addAll(control.sound.bossMusic);
+
+                            control.sound.bossMusic.clear();
+                            control.sound.bossMusic.addAll(newBoss);
+                        }
+                    }
                 }else{
-                    FactionMeta.getByFaction(fac, Music.class).each(music -> {
-                        Seq<Music> category = FactionMeta.getMusicCategory(music);
-                        if(category.contains(music)){
-                            category.remove(music);
-                        }
-                    });
+                    control.sound.ambientMusic.addAll(oldAmbient).distinct();
+                    control.sound.darkMusic.addAll(oldDark).distinct();
+                    control.sound.bossMusic.addAll(oldBoss).distinct();
+
+                    oldAmbient.clear();
+                    oldDark.clear();
+                    oldBoss.clear();
                 }
             }
         });
@@ -46,6 +86,17 @@ public class MusicHandler implements ApplicationListener{
 
     @Override
     public void update(){
+        if(!headless && ui.planet.isShown() && state.isMenu()){
+            Planet planet = ui.planet.planets.planet;
+
+            Faction fac = FactionMeta.map(planet);
+            if(fac != null){
+                Musics.launch = planetMusics.get(fac, originalPlanet);
+            }else{
+                Musics.launch = originalPlanet;
+            }
+        }
+
         if(headless){
             currentData = null;
             if(currentMusic != null) currentMusic.stop();
@@ -122,20 +173,12 @@ public class MusicHandler implements ApplicationListener{
     public void play(String name, Boolp predicate){
         currentData = loopDatas.get(name);
         currentPredicate = predicate == null ? () -> (state.isPlaying() || state.isPaused()) : predicate;
-
-        /*if(net.server()){
-            Call.serverPacketReliable("unity.bossmusic.play", name);
-        }*/
     }
 
     public void stop(String name){
         if(currentData == loopDatas.get(name)){
             currentData = null;
         }
-
-        /*if(net.server()){
-            Call.serverPacketReliable("unity.bossmusic.stop", name);
-        }*/
     }
 
     public MusicLoopData getCurrentData(){
