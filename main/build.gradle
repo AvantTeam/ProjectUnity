@@ -97,8 +97,6 @@ task deployDex(type: Jar, dependsOn: [deploy, dex]) {
 }
 
 class Fetcher {
-    static Seq<String> prints = new Seq<String>()
-
     String name
     UnsafeRunnable run
 
@@ -106,12 +104,10 @@ class Fetcher {
 
     void execute() {
         Boolf<UnsafeRunnable> exec = { final UnsafeRunnable run ->
-            if(name != null) prints.add("---- Trying to fetch '$name'..." as String)
             try {
                 run.run()
                 error = null
             } catch(Throwable e) {
-                if(name != null) prints.add("------ Failed to fetch '$name'. Trying again." as String)
                 error = e
             }
 
@@ -168,27 +164,20 @@ task fetchComps {
         { err -> throw new RuntimeException(err) })}
 
         new Fetcher(run: mainRun).execute()
-        Fetcher.prints.add("Found $fetches.size entity components." as String)
+        final def found = fetches.size
 
         Seq<Thread> threads = fetches.map({ final Fetcher fetch -> new Thread({
             fetch.execute()
             synchronized(fetches) {
                 fetches.remove(fetch)
-                Fetcher.prints.add("-- Wrote '$fetch.name', $fetches.size left." as String)
             }
         }) })
 
         threads.each(Thread::start)
-        while(!fetches.isEmpty() || !Fetcher.prints.isEmpty()) {
-            Iterator<String> ite = Fetcher.prints.iterator()
-            while(ite.hasNext()) {
-                println ite.next()
-                ite.remove()
-            }
-        }
+        while(!fetches.isEmpty()) Thread.currentThread().yield()
 
         fetchTemp.text = "$mindustryVersion/$fetchRevision"
-        println 'Done writing.'
+        println "Wrote $found entity components."
     }
 }
 
@@ -233,11 +222,7 @@ tasks.withType(JavaCompile).all {
         String ver = content[0]
         String rev = content[1]
 
-        if(ver != new String("$mindustryVersion") || rev != Integer.toString(fetchRevision as int)) {
-            println 'Temp fetch data mismatch:'
-            println "Stored  : { version: $ver, revision: $rev }"
-            println "Required: { version: $mindustryVersion, revision: $fetchRevision }"
-
+        if(ver != "$mindustryVersion" as String || rev != Integer.toString(fetchRevision as int)) {
             dependsOn fetchComps
         }
     }
