@@ -23,7 +23,7 @@ public class MusicHandler implements ApplicationListener{
     private final Seq<Music> oldDark = new Seq<>();
     private final Seq<Music> oldBoss = new Seq<>();
 
-    private Boolp currentPredicate = state::isPlaying;
+    private Boolp currentPredicate = () -> state != null && state.isPlaying();
     private @Nullable Music currentMusic;
 
     private Music originalPlanet;
