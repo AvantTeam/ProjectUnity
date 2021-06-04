@@ -396,7 +396,7 @@ public class KamiPatterns{
                     ai.reloads[2] = 0f;
                 }, ai -> {
                     if(ai.reloads[0] >= 2f * 60f && ai.reloads[2] < 3f){
-                        int diff = 48 + Mathf.clamp(ai.difficulty * 12, 0, 36);
+                        int diff = (48 + Mathf.clamp(ai.difficulty * 12, 0, 36)) * 2;
                         for(int i = 0; i < diff; i++){
                             float angle = (i * 360f / diff) + ai.angleTo(ai.targetPos);
                             if(i % 2 == 0){
