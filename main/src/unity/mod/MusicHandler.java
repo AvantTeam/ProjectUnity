@@ -6,6 +6,7 @@ import arc.func.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.core.GameState.*;
+import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -27,6 +28,7 @@ public class MusicHandler implements ApplicationListener{
     private @Nullable Music currentMusic;
 
     private Music originalPlanet;
+    private boolean resetPlanet = true;
     private ObjectMap<Faction, Music> planetMusics = new ObjectMap<>();
 
     public void setup(){
@@ -39,37 +41,41 @@ public class MusicHandler implements ApplicationListener{
 
         Events.on(StateChangeEvent.class, e -> {
             if(e.to == State.playing){
-                if(state.map != null && state.map.mod != null && state.map.mod.name.equals("unity")){
-                    SectorPreset sec = content.sectors().find(s -> s.generator.map.name().equals(state.map.name()));
-                    if(sec != null){
-                        Faction fac = FactionMeta.map(sec);
-                        if(fac == null) return;
+                UnlockableContent ref = null;
+                if(state.hasSector()){
+                    ref = state.getSector().planet;
+                }else if(state.map != null && state.map.mod != null && state.map.mod.name.equals("unity")){
+                    ref = content.sectors().find(s -> state.map.name().equals(s.generator.map.name()) || state.map.name().equals(s.localizedName));
+                }
 
-                        Seq<Music> newMusics = FactionMeta.getByFaction(fac, Music.class);
-                        Seq<Music> newAmbient = newMusics.select(m -> FactionMeta.getMusicCategory(m) == control.sound.ambientMusic);
-                        Seq<Music> newDark = newMusics.select(m -> FactionMeta.getMusicCategory(m) == control.sound.darkMusic);
-                        Seq<Music> newBoss = newMusics.select(m -> FactionMeta.getMusicCategory(m) == control.sound.bossMusic);
+                if(ref != null){
+                    Faction fac = FactionMeta.map(ref);
+                    if(fac == null) return;
 
-                        if(!newAmbient.isEmpty()){
-                            oldAmbient.addAll(control.sound.ambientMusic);
+                    Seq<Music> newMusics = FactionMeta.getByFaction(fac, Music.class);
+                    Seq<Music> newAmbient = newMusics.select(m -> FactionMeta.getMusicCategory(m) == control.sound.ambientMusic);
+                    Seq<Music> newDark = newMusics.select(m -> FactionMeta.getMusicCategory(m) == control.sound.darkMusic);
+                    Seq<Music> newBoss = newMusics.select(m -> FactionMeta.getMusicCategory(m) == control.sound.bossMusic);
 
-                            control.sound.ambientMusic.clear();
-                            control.sound.ambientMusic.addAll(newAmbient);
-                        }
+                    if(!newAmbient.isEmpty()){
+                        oldAmbient.addAll(control.sound.ambientMusic);
 
-                        if(!newDark.isEmpty()){
-                            oldDark.addAll(control.sound.darkMusic);
+                        control.sound.ambientMusic.clear();
+                        control.sound.ambientMusic.addAll(newAmbient);
+                    }
 
-                            control.sound.darkMusic.clear();
-                            control.sound.darkMusic.addAll(newDark);
-                        }
+                    if(!newDark.isEmpty()){
+                        oldDark.addAll(control.sound.darkMusic);
 
-                        if(!newBoss.isEmpty()){
-                            oldBoss.addAll(control.sound.bossMusic);
+                        control.sound.darkMusic.clear();
+                        control.sound.darkMusic.addAll(newDark);
+                    }
 
-                            control.sound.bossMusic.clear();
-                            control.sound.bossMusic.addAll(newBoss);
-                        }
+                    if(!newBoss.isEmpty()){
+                        oldBoss.addAll(control.sound.bossMusic);
+
+                        control.sound.bossMusic.clear();
+                        control.sound.bossMusic.addAll(newBoss);
                     }
                 }else{
                     control.sound.ambientMusic.addAll(oldAmbient).distinct();
@@ -92,8 +98,10 @@ public class MusicHandler implements ApplicationListener{
             Faction fac = FactionMeta.map(planet);
             if(fac != null){
                 Musics.launch = planetMusics.get(fac, originalPlanet);
-            }else{
+                resetPlanet = false;
+            }else if(!resetPlanet){
                 Musics.launch = originalPlanet;
+                resetPlanet = true;
             }
         }
 
@@ -189,7 +197,7 @@ public class MusicHandler implements ApplicationListener{
         return currentMusic;
     }
 
-    class MusicLoopData{
+    static class MusicLoopData{
         final Music intro;
         final Music loop;
 

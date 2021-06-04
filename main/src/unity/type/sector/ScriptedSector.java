@@ -6,6 +6,7 @@ import arc.struct.*;
 import mindustry.core.GameState.*;
 import mindustry.game.EventType.*;
 import mindustry.type.*;
+import unity.mod.*;
 
 import static mindustry.Vars.*;
 
@@ -15,8 +16,9 @@ public class ScriptedSector extends SectorPreset{
     public Seq<SectorObjective> objectives = new Seq<>();
     protected boolean added = false;
 
-    public final Cons<Trigger> updater = e -> update();
-    public final Cons<Trigger> drawer = e -> draw();
+    protected Cons<Trigger> updater;
+    protected Cons<Trigger> drawer;
+    protected Cons<Trigger> starter;
 
     public ScriptedSector(String name, Planet planet, int sector){
         super(name, planet, sector);
@@ -25,18 +27,15 @@ public class ScriptedSector extends SectorPreset{
             if(e.to == State.playing && !added && valid()){
                 added = true;
 
-                Cons<Trigger>[] set = new Cons[1];
-                set[0] = t -> {
-                    if(state.getSector() == null || !state.getSector().hasBase()){
+                starter = Triggers.listen(Trigger.newGame, () -> {
+                    if(state.hasSector() || !state.getSector().hasBase()){
                         reset();
                     }
-    
-                    Events.on((Class<Trigger>)Trigger.update.getClass(), updater);
-                    Events.on((Class<Trigger>)Trigger.draw.getClass(), drawer);
-                    Events.remove((Class<Trigger>)Trigger.newGame.getClass(), set[0]);
-                };
 
-                Events.on((Class<Trigger>)Trigger.newGame.getClass(), set[0]);
+                    updater = Triggers.listen(Trigger.update, this::update);
+                    drawer = Triggers.listen(Trigger.draw, this::draw);
+                    Triggers.detach(Trigger.newGame, starter);
+                });
             }
         });
     }
@@ -45,8 +44,8 @@ public class ScriptedSector extends SectorPreset{
         if(!valid() && added){
             added = false;
 
-            Events.remove((Class<Trigger>)Trigger.update.getClass(), updater);
-            Events.remove((Class<Trigger>)Trigger.draw.getClass(), drawer);
+            Triggers.detach(Trigger.update, updater);
+            Triggers.detach(Trigger.draw, drawer);
 
             return;
         }
@@ -86,9 +85,11 @@ public class ScriptedSector extends SectorPreset{
     }
 
     public boolean valid(){
-        return state.getSector() != null
+        return state.hasSector()
         ?   state.getSector().id == sector.id
-        :   (state.map != null && (state.map.name().equals(generator.map.name()) && state.map.mod != null && state.map.mod.name.equals("unity"))
-        );
+        :   (state.map != null && (
+            state.map.mod != null && state.map.mod.name.equals("unity") &&
+            (state.map.name().equals(generator.map.name()) || state.map.name().equals(localizedName))
+        ));
     }
 }
