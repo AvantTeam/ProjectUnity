@@ -134,7 +134,7 @@ public class IconGenerator implements Generator{
 
                 Pixmap baseCell = get(type.cellRegion);
                 Pixmap cell = new Pixmap(type.cellRegion.width, type.cellRegion.height);
-                cell.each((x, y) -> cell.set(x, y, Color.muli(baseCell.getRaw(x, y), baseColor)));
+                cell.each((x, y) -> cell.set(x, y, Color.muli(baseCell.get(x, y), baseColor)));
 
                 icon.draw(cell, icon.width / 2 - cell.width / 2, icon.height / 2 - cell.height / 2, true);
 
@@ -163,10 +163,10 @@ public class IconGenerator implements Generator{
 
                         float bladeSeparation = 360f / rotor.bladeCount;
 
-                        float propXCenter = (rotor.x * 4f / Draw.scl + icon.width / 2f) - 0.5f;
-                        float propYCenter = (-rotor.y * 4f / Draw.scl + icon.height / 2f) - 0.5f;
+                        float propXCenter = (rotor.x / Draw.scl + icon.width / 2f) - 0.5f;
+                        float propYCenter = (-rotor.y / Draw.scl + icon.height / 2f) - 0.5f;
 
-                        float bladeSpriteXCenter = bladeSprite.width  / 2f - 0.5f;
+                        float bladeSpriteXCenter = bladeSprite.width / 2f - 0.5f;
                         float bladeSpriteYCenter = bladeSprite.height / 2f - 0.5f;
 
                         propellers.each((x, y) -> {
@@ -188,17 +188,16 @@ public class IconGenerator implements Generator{
                         });
 
                         Pixmap topSprite = get(rname + "-top");
-                        int topXCenter = (int)(rotor.x * 4f / Draw.scl + icon.width / 2f - topSprite.width / 2f);
-                        int topYCenter = (int)(-rotor.y * 4f / Draw.scl + icon.height / 2f - topSprite.height / 2f);
+                        int topXCenter = (int)(rotor.x / Draw.scl + icon.width / 2f - topSprite.width / 2f);
+                        int topYCenter = (int)(-rotor.y / Draw.scl + icon.height / 2f - topSprite.height / 2f);
 
                         tops.draw(topSprite, topXCenter, topYCenter, true);
                     }
 
                     Pixmap propOutlined = outline.get(propellers);
-                    propOutlined.draw(propellers, 0, 0);
 
-                    icon.draw(propOutlined);
-                    icon.draw(outline.get(tops));
+                    icon.draw(propOutlined, true);
+                    icon.draw(outline.get(tops), true);
 
                     Pixmap payloadCell = new Pixmap(baseCell.width, baseCell.height);
                     int cellCenterX = payloadCell.width / 2;

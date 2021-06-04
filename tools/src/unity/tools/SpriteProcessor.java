@@ -105,6 +105,7 @@ public class SpriteProcessor{
             }
         };
 
+        Draw.scl = 0.25f;
         Generators.generate();
     }
 
