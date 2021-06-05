@@ -1791,9 +1791,8 @@ public class UnityBlocks implements ContentList{
         infusedSharpslate = new Floor("infused-sharpslate"){{
             variants = 3;
             emitLight = true;
-            lightRadius = 8f;
+            lightRadius = 24f;
             lightColor = UnityPal.monolith.cpy().a(0.1f);
-            albedo = 0.25f;
         }};
 
         archSharpslate = new Floor("archaic-sharpslate"){{
@@ -1801,9 +1800,8 @@ public class UnityBlocks implements ContentList{
             updateEffect = UnityFx.archaicEnergy;
             blendGroup = infusedSharpslate;
             emitLight = true;
-            lightRadius = 12f;
-            lightColor = UnityPal.monolith.cpy().a(0.16f);
-            albedo = 0.4f;
+            lightRadius = 24f;
+            lightColor = UnityPal.monolithLight.cpy().a(0.12f);
         }};
 
         sharpslateWall = new StaticWall("sharpslate-wall"){{
@@ -1820,8 +1818,8 @@ public class UnityBlocks implements ContentList{
         archEnergy = new OverlayFloor("archaic-energy"){{
             variants = 3;
             emitLight = true;
-            lightRadius = 16f;
-            lightColor = UnityPal.monolith.cpy().a(0.24f);
+            lightRadius = 24f;
+            lightColor = UnityPal.monolithLight.cpy().a(0.24f);
         }};
 
         loreMonolith = new LoreMessageBlock("lore-monolith", Faction.monolith);

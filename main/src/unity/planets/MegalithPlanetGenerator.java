@@ -26,44 +26,49 @@ import static unity.content.UnityBlocks.*;
 public class MegalithPlanetGenerator extends PlanetGenerator{
     protected RidgedPerlin rid = new RidgedPerlin(1, 2);
     protected BaseGenerator basegen = new BaseGenerator();
-    protected float scl = 7f;
+    protected float scl = 5.6f;
     protected float waterOffset = 0.1f;
 
     protected Block[][] blocks = {
-        {deepwater, water, darksandWater, darksandWater, darksand, darksand, darksandWater, darksandWater, darksandWater, darksand, darksandWater, darksand, sharpslate, sharpslate},
-        {deepwater, water, darksandWater, darksand, darksand, darksandWater, darksand, sharpslate, darksandWater, sharpslate, sharpslate, sharpslate, sharpslate, sharpslate},
-        {deepwater, water, darksandWater, darksandWater, sharpslate, darksand, darksandWater, darksand, darksand, darksand, sharpslate, sharpslate, sharpslate, sharpslate},
-        {deepwater, water, darksandWater, darksand, darksand, darksand, sharpslate, sharpslate, sharpslate, sharpslate, sharpslate, sharpslate, snow, snow},
+        {deepwater, water, water, darksandWater, darksand, darksand, darksand, basalt, sharpslate, darksand},
+        {deepwater, water, water, darksandWater, darksand, sharpslate, sharpslate, basalt, sharpslate, dacite},
+        {deepwater, water, darksandWater, darksand, darksand, basalt, sharpslate, sharpslate, darksand, sharpslate},
+        {deepwater, water, darksandWater, darksand, sharpslate, darksand, darksand, sharpslate, sharpslate, sharpslate},
 
-        {deepwater, water, darksandWater, darksand, darksandWater, sharpslate, sharpslate, sharpslate, sharpslate, sharpslate, sharpslate, snow, snow, ice},
-        {water, water, darksandWater, darksand, darksand, sharpslate, sharpslate, sharpslate, sharpslate, darksandWater, sharpslate, snow, iceSnow, ice},
-        {water, darksandWater, darksand, darksandWater, darksand, sharpslate, darksandWater, sharpslate, sharpslate, sharpslate, sharpslate, sharpslate, ice, ice},
-        {water, darksandWater, sharpslate, sharpslate, sharpslate, sharpslate, sharpslate, snow, sharpslate, snow, snow, iceSnow, ice, ice},
+        {water, darksandWater, darksand, darksand, basalt, sharpslate, sharpslate, sharpslate, sharpslate, dacite},
+        {water, darksandWater, darksand, sharpslate, darksand, sharpslate, sharpslate, dacite, snow, dacite},
+        {darksandWater, darksand, darksand, basalt, sharpslate, sharpslate, sharpslate, snow, dacite, snow},
+        {sharpslate, sharpslate, sharpslate, sharpslate, sharpslate, dacite, snow, dacite, snow, snow},
 
-        {deepwater, water, darksandWater, darksand, sharpslate, darksand, sharpslate, snow, snow, snow, snow, iceSnow, ice, ice},
-        {water, darksandWater, snow, darksand, snow, sharpslate, snow, snow, sharpslate, snow, snow, snow, ice, ice},
-        {sharpslate, snow, snow, sharpslate, snow, sharpslate, snow, snow, snow, snow, snow, ice, ice, ice},
-        {snow, snow, snow, snow, snow, snow, snow, snow, snow, iceSnow, ice, ice, ice, ice}
+        {sharpslate, sharpslate, sharpslate, dacite, snow, sharpslate, snow, sharpslate, snow, iceSnow},
+        {sharpslate, dacite, dacite, dacite, snow, sharpslate, snow, snow, iceSnow, ice},
+        {dacite, dacite, sharpslate, dacite, snow, snow, snow, snow, iceSnow, ice},
+        {sharpslate, dacite, snow, snow, sharpslate, snow, snow, iceSnow, ice, ice}
     };
 
-    protected float waterf = 4f / blocks[0].length;
+    protected float waterHeight = 2f / blocks[3].length;
 
     protected float rawHeight(Vec3 position){
         position = Tmp.v33.set(position).scl(scl);
-        return (Mathf.pow((float)noise.octaveNoise3D(7, 0.5f, 1f / 3f, position.x, position.y, position.z), 2.3f) + waterOffset) / (1f + waterOffset);
+        return (Mathf.pow((float)noise.octaveNoise3D(6d, 0.5d, 1d / 3d, position.x, position.y, position.z), 2.3f) + waterOffset) / (1f + waterOffset);
     }
 
     @Override
     public float getHeight(Vec3 position){
         float height = rawHeight(position);
-        return Math.max(height, waterf);
+        return Math.max(height, waterHeight);
     }
 
     @Override
     public Color getColor(Vec3 position){
         Block block = getBlock(position);
 
-        if(block == null) return Color.white.cpy();
+        Color base = Tmp.c1.set(block.mapColor);
+        if(block == sharpslate){
+            float res = (float)noise.octaveNoise3D(6d, 0.5d, 0.5d, position.x, position.y, position.z) * 0.2f;
+            base.lerp(UnityPal.monolithLight, res);
+        }
+
         return Tmp.c1.set(block.mapColor).a(1f - block.albedo);
     }
 
@@ -72,14 +77,12 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
         tile.floor = getBlock(position);
         tile.block = tile.floor.asFloor().wall;
 
-        if(rid.getValue(position.x, position.y, position.z, 22) > 0.32){
+        if(rid.getValue(position.x, position.y, position.z, 22f) > 0.32f){
             tile.block = Blocks.air;
         }
     }
 
-    Block getBlock(Vec3 position){
-        float height = rawHeight(position);
-
+    Block[] getBlockset(Vec3 position){
         Tmp.v31.set(position);
         position = Tmp.v33.set(position).scl(scl);
 
@@ -88,10 +91,13 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
         float tnoise = (float)noise.octaveNoise3D(7, 0.56, 1f / 3f, position.x, position.y + 999f, position.z);
 
         temp = Mathf.lerp(temp, tnoise, 0.5f);
-        height *= 1.2f;
-        height = Mathf.clamp(height);
 
-        return blocks[Mathf.clamp((int)(temp * blocks.length), 0, blocks[0].length - 1)][Mathf.clamp((int)(height * blocks[0].length), 0, blocks[0].length - 1)];
+        return blocks[Mathf.clamp((int)(temp * blocks.length), 0, blocks.length - 1)];
+    }
+
+    Block getBlock(Vec3 position){
+        var set = getBlockset(position);
+        return set[Mathf.clamp((int)(Mathf.clamp(rawHeight(position) * 1.2f) * set.length), 0, set.length - 1)];
     }
 
     @Override
@@ -125,7 +131,7 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
             final int y;
             final int radius;
 
-            ObjectSet<Room> connected = new ObjectSet<>();
+            final ObjectSet<Room> connected = new ObjectSet<>();
 
             Room(String name, int x, int y, int radius){
                 this.name = name;
@@ -370,7 +376,6 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
                     int angleStep2 = 10;
                     int off = rand.random(360);
 
-                    find:
                     for(int i = 0; i < 360; i += angleStep2){
                         int angle = off + i;
 
@@ -387,10 +392,7 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
 
                             for(int tx = -4; tx < 4; tx++){
                                 for(int ty = -4; ty < 4; ty++){
-                                    if(
-                                        Mathf.within(tile.x, tile.y, tile.x + tx, tile.y + ty, 4f) &&
-                                        rand.chance((4f - Mathf.dst(tile.x, tile.y, tile.x + tx, tile.y + ty)) / 4f)
-                                    ){
+                                    if(Mathf.within(tile.x, tile.y, tile.x + tx, tile.y + ty, 4f) && rand.chance((4f - Mathf.dst(tile.x, tile.y, tile.x + tx, tile.y + ty)) / 4f)){
                                         Tile other = tiles.getn(tile.x + tx, tile.y + ty);
                                         if(other == null){
                                             other = new Tile(tile.x + tx, tile.y + ty);
@@ -416,7 +418,7 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
                             Log.debug("Generated a message block at (@, @).", tile.x, tile.y);
 
                             hasMessage = true;
-                            break find;
+                            break;
                         }
                     }
                 }

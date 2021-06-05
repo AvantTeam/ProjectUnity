@@ -1,26 +1,17 @@
-.idea/
-.vscode/
-.gradle/
-.settings/
+# Gradle / Java
 bin/
 build/
+.gradle/
+.settings/
+.project
+.classpath
 
-main/bin/
-main/build/
-main/assets-raw/sprites-gen/
+# Project
 main/assets/sprites/
-main/fetched/
-main/.settings/
+main/fetched
+main/fetch.txt
 
-tools/bin/
-tools/build/
-tools/.settings/
-
-*.gitconfig
-*.project
-*.classpath
-*.aseprite
-*.psd
-*.txt
-
+# IDE-specific
+.idea/
+.vscode/
 .kateproject
