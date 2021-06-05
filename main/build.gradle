@@ -205,7 +205,7 @@ clean {
     finalizedBy cleanFetched
 }
 
-tasks.withType(JavaCompile).all {
+tasks.withType(JavaCompile) {
     options.compilerArgs += [
         '-processor', 
             'unity.annotations.FactionProcessor,' +

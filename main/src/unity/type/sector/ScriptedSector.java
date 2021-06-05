@@ -11,14 +11,21 @@ import unity.mod.*;
 import static mindustry.Vars.*;
 
 /** @author GlennFolker */
-@SuppressWarnings("unchecked")
 public class ScriptedSector extends SectorPreset{
     public Seq<SectorObjective> objectives = new Seq<>();
     protected boolean added = false;
 
-    protected Cons<Trigger> updater;
-    protected Cons<Trigger> drawer;
-    protected Cons<Trigger> starter;
+    protected Cons<Trigger> updater = Triggers.cons(this::update);
+    protected Cons<Trigger> drawer = Triggers.cons(this::draw);
+    protected Cons<Trigger> starter = Triggers.cons(() -> {
+        if(!state.hasSector() || !state.getSector().hasBase()){
+            reset();
+        }
+
+        updater = Triggers.listen(Trigger.update, this::update);
+        drawer = Triggers.listen(Trigger.draw, this::draw);
+        Triggers.detach(Trigger.newGame, this.starter);
+    });
 
     public ScriptedSector(String name, Planet planet, int sector){
         super(name, planet, sector);
@@ -26,16 +33,7 @@ public class ScriptedSector extends SectorPreset{
         Events.on(StateChangeEvent.class, e -> {
             if(e.to == State.playing && !added && valid()){
                 added = true;
-
-                starter = Triggers.listen(Trigger.newGame, () -> {
-                    if(state.hasSector() || !state.getSector().hasBase()){
-                        reset();
-                    }
-
-                    updater = Triggers.listen(Trigger.update, this::update);
-                    drawer = Triggers.listen(Trigger.draw, this::draw);
-                    Triggers.detach(Trigger.newGame, starter);
-                });
+                Triggers.listen(Trigger.newGame, starter);
             }
         });
     }
