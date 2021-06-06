@@ -44,6 +44,14 @@ allprojects {
             }
         }
     }
+
+    tasks.withType(JavaCompile) {
+        options.compilerArgs += '-Xlint:deprecation'
+    }
+
+    tasks.withType(JavaExec) {
+        jvmArgs += "--enable-preview"
+    }
 }
 
 configure(project(':annotations')) {
@@ -75,9 +83,5 @@ configure(subprojects - project(':annotations')) {
         doFirst {
             options.compilerArgs = options.compilerArgs.findAll { it != '--enable-preview' }
         }
-    }
-
-    tasks.withType(JavaExec) {
-        jvmArgs += "--enable-preview"
     }
 }
