@@ -150,7 +150,7 @@ public class MergeProcessor extends BaseProcessor{
                 .replaceAll("this\\.<(.*)>self\\(\\)", "this")
                 .replaceAll("self\\(\\)(?!\\s+instanceof)", "this")
                 .replaceAll(" yield ", "")
-                .replaceAll("\\/\\*missing\\*\\/", "var")
+                .replaceAll("/\\*missing\\*/", "var")
                 .replace("super(name);", "");
 
             methodBlocks.put(descString(constructor), str);
@@ -163,7 +163,7 @@ public class MergeProcessor extends BaseProcessor{
                 .replaceAll("this\\.<(.*)>self\\(\\)", "this")
                 .replaceAll("self\\(\\)(?!\\s+instanceof)", "this")
                 .replaceAll(" yield ", "")
-                .replaceAll("\\/\\*missing\\*\\/", "var")
+                .replaceAll("/\\*missing\\*/", "var")
             );
         }
 
