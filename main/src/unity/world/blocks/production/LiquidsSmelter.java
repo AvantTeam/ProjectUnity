@@ -10,8 +10,8 @@ import unity.world.consumers.*;
 
 import static arc.Core.bundle;
 
-@Merge(base = GenericSmelter.class, value = Stemc.class)
-public class LiquidsSmelter extends StemGenericSmelter{
+@Merge(base = GenericCrafter.class, value = Stemc.class)
+public class LiquidsSmelter extends StemGenericCrafter{
     protected Liquid[] liquids;
 
     public LiquidsSmelter(String name){

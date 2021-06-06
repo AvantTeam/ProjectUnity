@@ -171,7 +171,7 @@ public class MechPad extends Block{
             Lines.stroke(2f * heat);
             Fill.poly(x, y, 4, 10f * heat);
             Draw.reset();
-            TextureRegion region = getResultUnit().icon(Cicon.full);
+            TextureRegion region = getResultUnit().fullIcon;
 
             //Draw.rect(from, x, y);
             Draw.color(0, 0, 0, 0.4f * progress);

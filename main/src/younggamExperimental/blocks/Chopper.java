@@ -16,7 +16,6 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
-import mindustry.world.meta.*;
 import unity.graphics.*;
 import unity.util.*;
 import unity.world.blocks.*;
@@ -128,7 +127,6 @@ public class Chopper extends GraphBlock{
 
         @Override
         public void displayExt(Table table){
-            String ps = " " + StatUnit.perSecond.localized();
             table.row();
             table.table().left().update(sub -> {
                 sub.clearChildren();
@@ -137,7 +135,7 @@ public class Chopper extends GraphBlock{
                 if(blueprintRemainingCost.isEmpty()) sub.labelWrap("No blueprint").color(Color.lightGray);
                 else{//idk
                     for(var i : blueprintRemainingCost){
-                        sub.image(i.key.icon(Cicon.medium));
+                        sub.image(i.key.uiIcon);
                         sub.add((i.value >>> 16) + "/" + (i.value & mask));
                         sub.row();
                     }

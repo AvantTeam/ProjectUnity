@@ -81,7 +81,7 @@ public class ModularConstructorUI extends Element{
                     butt.table(botTable -> {
                         int i = 0;
                         for(var cst : pinfo.cost){
-                            botTable.image(cst.item.icon(Cicon.small)).left();
+                            botTable.image(cst.item.uiIcon).left();
                             botTable.add("[gray]" + Mathf.floor(cst.amount * costInc)).padLeft(2f).left().padRight(4f);
                             if(i++ % 2 == 1) botTable.row();
                         }
@@ -117,7 +117,7 @@ public class ModularConstructorUI extends Element{
             cstTable.table(botTable -> {
                 var csTot = modElement.getTotalCost();
                 for(var cost : csTot){
-                    botTable.image(cost.key.icon(Cicon.small)).left();
+                    botTable.image(cost.key.uiIcon).left();
                     botTable.add("[gray]" + cost.value).padLeft(2f).left().padRight(4f).row();
                 }
             });
@@ -235,7 +235,7 @@ public class ModularConstructorUI extends Element{
     }
 
     boolean inBoundsRect(int x, int y, int w, int h){
-        return !(x < 0 || x + w > gridW || x < 0 || y + h > gridH);
+        return !(x < 0 || x + w > gridW || y < 0 || y + h > gridH);
     }
 
     boolean canPlace(PartInfo partType, int x, int y){
@@ -375,7 +375,7 @@ public class ModularConstructorUI extends Element{
     }
 
     boolean onIsHovering(InputEvent event, float x, float y){
-        if(x < 0f || x > width || x < 0f || y > height){
+        if(x < 0f || x > width || y < 0f || y > height){
             hover = null;
             return false;
         }
@@ -470,7 +470,7 @@ public class ModularConstructorUI extends Element{
         }
     }
 
-    class PartPlaceObj{
+    static class PartPlaceObj{
         final PartInfo part;
         final int x, y;
         int flash;

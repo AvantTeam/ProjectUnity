@@ -204,7 +204,7 @@ class ExpComp extends Block{
 
                     t.add("[green]" + Core.bundle.get("explib.level") + " " + upgrade.min + "[] ");
 
-                    t.image(upgrade.type.icon(Cicon.small)).size(size).padRight(4).scaling(Scaling.fit);
+                    t.image(upgrade.type.uiIcon).size(size).padRight(4).scaling(Scaling.fit);
                     t.add(upgrade.type.localizedName).left();
                     t.row();
                 }
@@ -463,7 +463,7 @@ class ExpComp extends Block{
                 var block = upgrades[i[0]].type;
                 table.table(t -> {
                     t.background(Tex.button);
-                    t.image(block.icon(Cicon.medium)).size(38).padRight(2);
+                    t.image(block.uiIcon).size(38).padRight(2);
 
                     t.table(info -> {
                         info.left();

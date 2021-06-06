@@ -14,8 +14,8 @@ import unity.gen.*;
 
 import static arc.Core.bundle;
 
-@Merge(base = GenericSmelter.class, value = Stemc.class)
-public class BurnerSmelter extends StemGenericSmelter{
+@Merge(base = GenericCrafter.class, value = Stemc.class)
+public class BurnerSmelter extends StemGenericCrafter{
     public Item input;
     public float minEfficiency = 0.6f, boostScale = 1.25f, boostConstant = -0.75f;
 
@@ -47,7 +47,7 @@ public class BurnerSmelter extends StemGenericSmelter{
         return item.flammability;
     }
 
-    public class BurnerSmelterBuild extends StemSmelterBuild{
+    public class BurnerSmelterBuild extends StemGenericCrafterBuild{
         public float itemDuration, productionEfficiency;
 
         @Override

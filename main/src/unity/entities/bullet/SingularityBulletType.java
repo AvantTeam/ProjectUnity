@@ -10,7 +10,6 @@ import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.ui.*;
 import unity.content.*;
 import unity.entities.bullet.GluonOrbBulletType.*;
 import unity.graphics.*;
@@ -51,7 +50,7 @@ public class SingularityBulletType extends BasicBulletType{
                      if(e.health < tileDamage || Mathf.within(b.x, b.y, e.x, e.y, (interp * size * 3.9f) + e.block.size / 2f)){
                          e.kill();
                          if(!Vars.headless){
-                             UnityFx.singularityAttraction.at(b.x, b.y, e.rotation, new SingularityAbsorbEffectData(e.block.icon(Cicon.full), e.x, e.y));
+                             UnityFx.singularityAttraction.at(b.x, b.y, e.rotation, new SingularityAbsorbEffectData(e.block.fullIcon, e.x, e.y));
                          }
                      }
 

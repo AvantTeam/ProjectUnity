@@ -28,7 +28,7 @@ public class ConsumeLiquids extends Consume{
     @Override
     public void build(Building build, Table table){
         for(LiquidStack stack : liquids){
-            table.add(new ReqImage(stack.liquid.icon(Cicon.medium), () -> build.liquids != null && build.liquids.get(stack.liquid) >= stack.amount)).padRight(8f);
+            table.add(new ReqImage(stack.liquid.uiIcon, () -> build.liquids != null && build.liquids.get(stack.liquid) >= stack.amount)).padRight(8f);
         }
     }
 

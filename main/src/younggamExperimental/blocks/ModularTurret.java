@@ -145,7 +145,6 @@ public class ModularTurret extends Turret implements GraphBlockBase{
 
         @Override
         public void displayExt(Table table){
-            String ps = " " + StatUnit.perSecond.localized();
             table.row();
             table.table().left().update(sub -> {
                 sub.clearChildren();
@@ -154,7 +153,7 @@ public class ModularTurret extends Turret implements GraphBlockBase{
                 if(blueprintRemainingCost.isEmpty()) sub.labelWrap("No blueprint").color(Color.lightGray);
                 else{//idk
                     for(var i : blueprintRemainingCost){
-                        sub.image(i.key.icon(Cicon.medium));
+                        sub.image(i.key.uiIcon);
                         sub.add((i.value >>> 16) + "/" + (i.value & mask));
                         sub.row();
                     }

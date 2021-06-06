@@ -69,7 +69,7 @@ public class CruciblePump extends GraphBlock{
                 sub.clearChildren();
                 sub.left();
                 if(filterItem != null){
-                    sub.image(filterItem.icon(Cicon.medium));
+                    sub.image(filterItem.uiIcon);
                     sub.label(() -> Strings.fixed(flowRate * 10f, 2) + "units" + ps).color(Color.lightGray);
                 }else{
                     sub.labelWrap("No filter selected").color(Color.lightGray);

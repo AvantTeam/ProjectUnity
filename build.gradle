@@ -44,15 +44,25 @@ allprojects {
             }
         }
     }
+
+    tasks.withType(JavaCompile) {
+        options.compilerArgs += '-Xlint:deprecation'
+    }
+
+    tasks.withType(JavaExec) {
+        jvmArgs += "--enable-preview"
+    }
 }
 
 configure(project(':annotations')) {
     sourceCompatibility = 8
     targetCompatibility = 8
 
-    tasks.withType(JavaCompile).all {
+    tasks.withType(JavaCompile) {
         targetCompatibility = 8
         sourceCompatibility = 8
+
+        options.incremental = true
     }
 }
 
@@ -60,10 +70,11 @@ configure(subprojects - project(':annotations')) {
     sourceCompatibility = 15
     targetCompatibility = 8
 
-    tasks.withType(JavaCompile).all {
+    tasks.withType(JavaCompile) {
         sourceCompatibility = 15
         targetCompatibility = 8
 
+        options.incremental = true
         options.encoding 'UTF-8'
         if(JavaVersion.current() != JavaVersion.VERSION_1_8) {
             options.compilerArgs.addAll(['--release', '8', '--enable-preview'])
@@ -72,9 +83,5 @@ configure(subprojects - project(':annotations')) {
         doFirst {
             options.compilerArgs = options.compilerArgs.findAll { it != '--enable-preview' }
         }
-    }
-
-    tasks.withType(JavaExec).all {
-        jvmArgs += "--enable-preview"
     }
 }

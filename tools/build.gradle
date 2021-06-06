@@ -4,7 +4,6 @@ ext {
     imageProcessorMain = 'unity.tools.SpriteProcessor'
 
     spritesRawFolder = '../main/assets-raw/sprites/'
-    spritesGenFolder = '../main/assets-raw/sprites-gen/'
     spritesAssetsFolder = '../main/assets/sprites/'
 }
 
@@ -25,12 +24,8 @@ dependencies {
 
 task proc(dependsOn: [classes, configurations.runtimeClasspath]) {
     doLast {
-        delete {
-            delete spritesGenFolder
-            delete spritesAssetsFolder
-        }
+        delete { delete spritesAssetsFolder }
 
-        file(spritesGenFolder).mkdirs()
         file(spritesAssetsFolder).mkdirs()
 
         copy {
@@ -44,11 +39,6 @@ task proc(dependsOn: [classes, configurations.runtimeClasspath]) {
             jvmArgs += ['-Xms1024m', '-Xmx1024m', '-Djava.awt.headless=true']
             standardInput System.in
             workingDir file('../main/assets/')
-        }
-
-        copy {
-            from spritesGenFolder
-            into spritesAssetsFolder
         }
     }
 }

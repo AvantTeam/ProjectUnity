@@ -8,7 +8,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.ctype.*;
-import mindustry.game.Team;
+import mindustry.game.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -19,7 +19,7 @@ import static mindustry.Vars.*;
 
 /** @author GlennFolker */
 public class FloorExtractor extends GenericCrafter{
-    private static Seq<Tile> source = new Seq<>();
+    private static final Seq<Tile> source = new Seq<>();
 
     public IntFloatMap sources = new IntFloatMap();
 
@@ -50,7 +50,7 @@ public class FloorExtractor extends GenericCrafter{
 
         for(Block block : blocks){
             stats.add(Stat.tiles, table -> table.stack(
-                new Image(block.icon(Cicon.medium))
+                new Image(block.uiIcon)
                     .setScaling(Scaling.fit), new Table(cont ->
                         cont.top()
                             .right()
@@ -74,11 +74,13 @@ public class FloorExtractor extends GenericCrafter{
         float dy = y * tilesize + offset + size * tilesize / 2f + 5f;
 
         if(item != null){
+            float s = iconSmall / 4f;
+
             Draw.mixcol(Color.darkGray, 1f);
-            Draw.rect(item.icon(Cicon.small), dx, dy - 1);
+            Draw.rect(item.uiIcon, dx, dy - 1, s, s);
 
             Draw.reset();
-            Draw.rect(item.icon(Cicon.small), dx, dy);
+            Draw.rect(item.uiIcon, dx, dy, s, s);
         }
     }
 

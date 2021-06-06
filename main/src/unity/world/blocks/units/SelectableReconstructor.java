@@ -1,16 +1,15 @@
 package unity.world.blocks.units;
 
-import arc.scene.ui.layout.Table;
-import arc.struct.Seq;
-import arc.util.Scaling;
+import arc.scene.ui.layout.*;
+import arc.struct.*;
+import arc.util.*;
 import arc.util.io.*;
-import mindustry.type.UnitType;
-import mindustry.ui.Cicon;
-import mindustry.ui.Styles;
-import mindustry.world.blocks.units.Reconstructor;
-import mindustry.world.meta.Stat;
+import mindustry.type.*;
+import mindustry.ui.*;
+import mindustry.world.blocks.units.*;
+import mindustry.world.meta.*;
 
-import static arc.Core.atlas;
+import static arc.Core.*;
 
 public class SelectableReconstructor extends Reconstructor{
     public Seq<UnitType[]> otherUpgrades = new Seq<>();
@@ -40,10 +39,10 @@ public class SelectableReconstructor extends Reconstructor{
             table.add("[accent]T" + (minTier + 1)).row();
             otherUpgrades.each(upgrade->{
                 if(upgrade[0].unlockedNow() && upgrade[1].unlockedNow()){
-                    table.image(upgrade[0].icon(Cicon.small)).size(size).padRight(4f).padLeft(10f).scaling(Scaling.fit).right();
+                    table.image(upgrade[0].uiIcon).size(size).padRight(4f).padLeft(10f).scaling(Scaling.fit).right();
                     table.add(upgrade[0].localizedName).left();
                     table.add("[lightgray] -> ");
-                    table.image(upgrade[1].icon(Cicon.small)).size(size).padRight(4f).scaling(Scaling.fit);
+                    table.image(upgrade[1].uiIcon).size(size).padRight(4f).scaling(Scaling.fit);
                     table.add(upgrade[1].localizedName).left();
                     table.row();
                 }
@@ -56,12 +55,13 @@ public class SelectableReconstructor extends Reconstructor{
 
         @Override
         public void buildConfiguration(Table table){
-            table.button("T" + minTier, Styles.togglet, () -> {
-                tier = minTier;
-            }).width(50f).height(50f).update(b -> b.setChecked(tier == minTier));
-            table.button("T" + (minTier + 1), Styles.togglet, () -> {
-                tier = minTier + 1;
-            }).width(50f).height(50f).update(b -> b.setChecked(tier == minTier + 1));
+            table.button("T" + minTier, Styles.togglet, () -> tier = minTier)
+                .width(50f).height(50f)
+                .update(b -> b.setChecked(tier == minTier));
+
+            table.button("T" + (minTier + 1), Styles.togglet, () -> tier = minTier + 1)
+                .width(50f).height(50f)
+                .update(b -> b.setChecked(tier == minTier + 1));
         }
 
         @Override
