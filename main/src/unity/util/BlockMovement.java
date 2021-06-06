@@ -1,28 +1,25 @@
 package unity.util;
 
-import arc.Events;
-import arc.func.Boolf;
-import arc.math.Mathf;
-import arc.struct.ObjectMap;
-import arc.struct.Seq;
-import arc.util.Time;
-import mindustry.Vars;
-import mindustry.content.Liquids;
-import mindustry.entities.Units;
-import mindustry.game.EventType;
-import mindustry.gen.Building;
-import mindustry.world.Block;
-import mindustry.world.Build;
-import mindustry.world.Tile;
-import mindustry.world.blocks.distribution.PayloadConveyor;
-import mindustry.world.blocks.payloads.BuildPayload;
-import mindustry.world.blocks.production.PayloadAcceptor;
-import mindustry.world.blocks.storage.CoreBlock;
-import unity.world.blocks.ConnectedBlock;
+import arc.*;
+import arc.func.*;
+import arc.math.*;
+import arc.struct.*;
+import arc.util.*;
+import mindustry.*;
+import mindustry.content.*;
+import mindustry.entities.*;
+import mindustry.game.*;
+import mindustry.gen.*;
+import mindustry.world.*;
+import mindustry.world.blocks.distribution.*;
+import mindustry.world.blocks.payloads.*;
+import mindustry.world.blocks.production.*;
+import mindustry.world.blocks.storage.*;
+import unity.world.blocks.*;
 
-import java.util.PriorityQueue;
+import java.util.*;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 public class BlockMovement{
     //ported from Facdustrio
@@ -43,8 +40,8 @@ public class BlockMovement{
         for(int size = 1;size<=16;size++){
             int originx = 0;
             int originy = 0;
-            originx += Mathf.floor(size / 2);
-            originy += Mathf.floor(size / 2);
+            originx += Mathf.floor(size / 2f);
+            originy += Mathf.floor(size / 2f);
             originy -= (size - 1);
             for(int side = 0;side<4;side++){
                 int ogx = originx;
@@ -62,7 +59,7 @@ public class BlockMovement{
             }
         }
         Events.run(EventType.Trigger.update, BlockMovement::onUpdate);
-        Events.on(EventType.WorldLoadEvent.class, e->{BlockMovement.onMapLoad();});
+        Events.on(EventType.WorldLoadEvent.class, e-> BlockMovement.onMapLoad());
     }
 
     public static IntVec2 getNearbyPosition(Block block,int direction,int index){
@@ -81,7 +78,7 @@ public class BlockMovement{
     }
 
     static boolean isPayloadBlock(Building build){
-        return build!=null && (build.block instanceof PayloadConveyor || build.block instanceof PayloadAcceptor );
+        return build!=null && (build.block instanceof PayloadConveyor || build.block instanceof PayloadBlock );
     }
 
     //returns whether a block is allowed to be on this tile, disregarding existing pushable buildings and team circles
@@ -89,32 +86,26 @@ public class BlockMovement{
         if(tile==null){
             return false;
         }
+
         if(tile.build!=null){
             return pushable(tile.build);
         }
+
         if(
             tile.solid() ||
                 !tile.floor().placeableOn ||
                 (block.requiresWater && tile.floor().liquidDrop != Liquids.water)||
                 (tile.floor().isDeep() && !block.floating && !block.requiresWater && !block.placeableLiquid)
 
-        )
-        {
+        ){
             return false;
         }
-        if((block.solid || block.solidifes) &&
-            Units.anyEntities(	tile.x * tilesize + block.offset - block.size* tilesize/2.0f,
-                tile.y * tilesize + block.offset - block.size* tilesize/2.0f,
-                block.size * tilesize,
-                block.size * tilesize)){
-            return false;
-        }
-        return true;
-
+        return (!block.solid && !block.solidifes) || !Units.anyEntities(tile.x * tilesize + block.offset - block.size * tilesize / 2.0f, tile.y * tilesize + block.offset - block.size * tilesize / 2.0f, block.size * tilesize, block.size * tilesize);
     }
     //returns whether a tile can be pushed in this direction, disregarding buildings.
     static boolean canPush(Building build, int direction){
-        if(!pushable(build)){return false;}
+        if(!pushable(build)) return false;
+
         IntVec2 tangent = dirs[(direction + 1) % 4];
         IntVec2 o = origins[build.block.size-1][direction];
         for(int i=0;i<build.block.size;i++){ // iterate over forward edge.
@@ -123,11 +114,9 @@ public class BlockMovement{
                 return false;
             }
         }
+
         Tile next = build.tile.nearby(dirs[direction].x,dirs[direction].y);
-        if(!build.block.canPlaceOn(next, build.team)){
-            return false;
-        }
-        return true;
+        return build.block.canPlaceOn(next, build.team);
     }
 
     //pushes a single building.
@@ -213,7 +202,7 @@ public class BlockMovement{
                 }
             }
         }
-        if(contacts.size<=max){
+        if(contacts != null && contacts.size<=max){
             return contacts;
         }else{
             return null;
@@ -326,7 +315,7 @@ public class BlockMovement{
         currentlyPushing.put(build,bmu);
         bmu.update();
     }
-    private static Seq<Building> toRemove= new Seq<>();
+    private static final Seq<Building> toRemove= new Seq<>();
     public static void onUpdate(){
         currentlyPushing.each((b,animate)->{
             animate.update();

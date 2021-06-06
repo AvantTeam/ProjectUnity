@@ -59,9 +59,9 @@ public class UnityFx{
 
     laserCharge = new Effect(38f, e -> {
         color(e.color);
-        randLenVectors(e.id, e.id % 3 + 1, 1f + 20f * e.fout(), e.rotation, 120f, (x, y) -> {
-            lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fslope() * 3f + 1f);
-        });
+        randLenVectors(e.id, e.id % 3 + 1, 1f + 20f * e.fout(), e.rotation, 120f, (x, y) ->
+            lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fslope() * 3f + 1f)
+        );
     }),
 
     laserChargeBegin = new Effect(60f, e -> {
@@ -123,16 +123,15 @@ public class UnityFx{
     laserBreakthroughChargeBegin = new Effect(100f, 100f, e -> {
         color(e.color);
         stroke(e.fin() * 3f);
+
         Lines.circle(e.x, e.y, 4f + e.fout() * 120f);
-    
         Fill.circle(e.x, e.y, e.fin() * 23.5f);
-    
-        randLenVectors(e.id, 20, 50f * e.fout(), (x, y) -> {
-            Fill.circle(e.x + x, e.y + y, e.fin() * 6f);
-        });
+
+        randLenVectors(e.id, 20, 50f * e.fout(), (x, y) ->
+            Fill.circle(e.x + x, e.y + y, e.fin() * 6f)
+        );
     
         color();
-    
         Fill.circle(e.x, e.y, e.fin() * 13);
     }),
     
@@ -856,7 +855,7 @@ public class UnityFx{
 
     tpIn = new Effect(50f, e -> {
         if(!(e.data instanceof UnitType type)) return;
-        TextureRegion region = type.icon(Cicon.full);
+        TextureRegion region = type.fullIcon;
         color();
         mixcol(UnityPal.diriumColor, 1f);
         rect(region, e.x, e.y, region.width * scl * e.fout(), region.height * scl * e.fout(), e.rotation);
@@ -865,7 +864,7 @@ public class UnityFx{
 
     tpFlash = new Effect(30f, e -> {
         if(!(e.data instanceof Unit unit) || !unit.isValid()) return;
-        TextureRegion region = unit.type.icon(Cicon.full);
+        TextureRegion region = unit.type.fullIcon;
         mixcol(UnityPal.diriumColor2, 1f);
         alpha(e.fout());
         rect(region, unit.x, unit.y, unit.rotation - 90f);
@@ -1356,7 +1355,7 @@ public class UnityFx{
         if(e.data instanceof UnitType unit){
             blend(Blending.additive);
             alpha(e.fout());
-            TextureRegion region = unit.icon(Cicon.full);
+            TextureRegion region = unit.fullIcon;
             float w = region.width * scl * e.fout();
             float h = region.height * scl * e.fout();
 

@@ -17,7 +17,7 @@ import unity.ui.StackedBarChart.*;
 import unity.world.graph.*;
 import unity.world.graphs.*;
 
-import static arc.Core.bundle;
+import static arc.Core.*;
 
 public class GraphCrucibleModule extends GraphModule<GraphCrucible, GraphCrucibleModule, CrucibleGraph>{
     public final IntMap<Seq<CrucibleData>> propsList = new IntMap<>(4);
@@ -121,7 +121,7 @@ public class GraphCrucibleModule extends GraphModule<GraphCrucible, GraphCrucibl
                 for(var i : cc){
                     MeltInfo m = melts[i.id];
                     Item item = m.item;
-                    if(item != null) data.push(m.meltPoint - 273f, item.icon(Cicon.xlarge));
+                    if(item != null) data.push(m.meltPoint - 273f, item.uiIcon);
                 }
             }
             return data;

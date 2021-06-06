@@ -10,7 +10,6 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.gen.*;
 import mindustry.type.*;
-import mindustry.ui.*;
 import unity.graphics.*;
 import unity.world.blocks.*;
 import unity.world.meta.*;
@@ -60,7 +59,7 @@ public class CastingMold extends GraphBlock{
                 sub.left();
                 
                 if(castingMelt != null){
-                    sub.image(castingMelt.item.icon(Cicon.medium));
+                    sub.image(castingMelt.item.uiIcon);
                     sub.label(() -> {
                         if(pourProgress == 1f && castSpeed == 0f) return tooHot;
                         
@@ -156,13 +155,13 @@ public class CastingMold extends GraphBlock{
                     Draw.rect(liquidRegion, x, y, rotdeg());
                     
                     Draw.color();
-                    Draw.rect(castingMelt.item.icon(Cicon.medium), x, y, pourProgress * 8f, pourProgress * 8f);
+                    Draw.rect(castingMelt.item.uiIcon, x, y, pourProgress * 8f, pourProgress * 8f);
                 }
                 if(castProgress < 1f && pourProgress > 0f){
-                    UnityDrawf.drawHeat(castingMelt.item.icon(Cicon.medium), x, y, 0f, Mathf.map(castProgress, 0f, 1f, castingMelt.meltPoint, 275f));
+                    UnityDrawf.drawHeat(castingMelt.item.uiIcon, x, y, 0f, Mathf.map(castProgress, 0f, 1f, castingMelt.meltPoint, 275f));
                 }
             }
-            
+
             Draw.rect(topRegions[rotation], x, y);
             drawTeamTop();
         }

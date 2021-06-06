@@ -227,7 +227,7 @@ public abstract class SectorObjective{
 
         public final int counts;
         protected int count;
-        private IntSet ids = new IntSet();
+        private final IntSet ids = new IntSet();
 
         public <T extends SectorObjective> UnitGroupObjective(Prov<Seq<Unit>> provider, boolean continuous, int counts, ScriptedSector sector, int executions, Cons<T> executor){
             super(sector, executions, executor);
@@ -355,7 +355,7 @@ public abstract class SectorObjective{
                                     hold.defaults().pad(4f);
 
                                     hold.left();
-                                    hold.image(() -> item.item.icon(Cicon.medium))
+                                    hold.image(() -> item.item.uiIcon)
                                         .scaling(Scaling.bounded);
 
                                     hold.right();

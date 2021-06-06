@@ -6,7 +6,7 @@ import arc.graphics.g2d.*;
 import arc.util.*;
 import mindustry.game.EventType.*;
 import mindustry.type.*;
-import mindustry.ui.*;
+import unity.mod.*;
 import unity.util.*;
 
 /**
@@ -22,7 +22,6 @@ public class AnimatedItem extends Item{
     public float frameTime = 5f;
 
     protected TextureRegion[] animRegions;
-    protected TextureRegion animIcon = new TextureRegion();
 
     public AnimatedItem(String name, Color color){
         super(name, color);
@@ -59,16 +58,13 @@ public class AnimatedItem extends Item{
             }
         }
 
-        Events.run(Trigger.update, this::update);
+        Triggers.listen(Trigger.update, this::update);
     }
 
     public void update(){
         int i = (int)(Time.globalTime / frameTime) % animRegions.length;
-        animIcon.set(animRegions[i]);
-    }
 
-    @Override
-    public TextureRegion icon(Cicon icon){
-        return animIcon;
+        fullIcon.set(animRegions[i]);
+        uiIcon.set(animRegions[i]);
     }
 }
