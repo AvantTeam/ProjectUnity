@@ -23,6 +23,7 @@ import com.sun.tools.javac.code.Attribute.*;
 import com.sun.tools.javac.model.*;
 import com.sun.tools.javac.processing.*;
 
+import mindustry.*;
 import unity.annotations.Annotations.AnnotationProxyMaker;
 
 import java.lang.Class;
@@ -42,6 +43,10 @@ public abstract class BaseProcessor extends AbstractProcessor{
     protected int round;
     protected int rounds = 1;
 
+    static{
+        Vars.loadLogger();
+    }
+
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv){
         super.init(processingEnv);
@@ -53,6 +58,8 @@ public abstract class BaseProcessor extends AbstractProcessor{
         typeUtils = javacProcessingEnv.getTypeUtils();
         filer = javacProcessingEnv.getFiler();
         messager = javacProcessingEnv.getMessager();
+
+        Log.info("Initialized annotation processor '@'.", getClass().getSimpleName());
     }
 
     @Override
@@ -126,6 +133,8 @@ public abstract class BaseProcessor extends AbstractProcessor{
                 stream.write(out.getBytes());
                 stream.close();
             }
+
+            Log.info("Generated Java file '@' (round @).", spec.name, round);
         }catch(Exception e){
             if(!(e instanceof FilerException && e.getMessage().contains("Attempt to recreate a file for type"))){
                 throw e;

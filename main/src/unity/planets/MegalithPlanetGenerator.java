@@ -24,39 +24,60 @@ import static unity.content.UnityBlocks.*;
 
 /** @author GlennFolker */
 public class MegalithPlanetGenerator extends PlanetGenerator{
-    protected RidgedPerlin rid = new RidgedPerlin(1, 2);
+    protected RidgedPerlin rid = new RidgedPerlin(1, 3);
     protected BaseGenerator basegen = new BaseGenerator();
-    protected float scl = 5.6f;
+    protected float scl = 5f;
     protected float waterOffset = 0.1f;
 
     protected Block[][] blocks = {
-        {deepwater, water, water, darksandWater, darksand, darksand, darksand, basalt, sharpslate, darksand},
+        {deepwater, water, water, water, darksandWater, darksandWater, darksand, basalt, sharpslate, darksand},
         {deepwater, water, water, darksandWater, darksand, sharpslate, sharpslate, basalt, sharpslate, dacite},
-        {deepwater, water, darksandWater, darksand, darksand, basalt, sharpslate, sharpslate, darksand, sharpslate},
+        {deepwater, water, darksandWater, darksand, darksand, basalt, sharpslate, sharpslate, darksand, snow},
         {deepwater, water, darksandWater, darksand, sharpslate, darksand, darksand, sharpslate, sharpslate, sharpslate},
 
-        {water, darksandWater, darksand, darksand, basalt, sharpslate, sharpslate, sharpslate, sharpslate, dacite},
-        {water, darksandWater, darksand, sharpslate, darksand, sharpslate, sharpslate, dacite, snow, dacite},
-        {darksandWater, darksand, darksand, basalt, sharpslate, sharpslate, sharpslate, snow, dacite, snow},
-        {sharpslate, sharpslate, sharpslate, sharpslate, sharpslate, dacite, snow, dacite, snow, snow},
+        {water, darksandWater, darksand, darksand, basalt, darksandWater, snow, sharpslate, sharpslate, dacite},
+        {water, darksandWater, darksand, sharpslate, darksandWater, water, darksandWater, dacite, sharpslate, dacite},
+        {darksandWater, darksand, darksand, darksandWater, water, deepwater, water, darksandWater, dacite, sharpslate},
+        {sharpslate, sharpslate, sharpslate, sharpslate, darksandWater, water, darksandWater, dacite, snow, snow},
 
-        {sharpslate, sharpslate, sharpslate, dacite, snow, sharpslate, snow, sharpslate, snow, iceSnow},
-        {sharpslate, dacite, dacite, dacite, snow, sharpslate, snow, snow, iceSnow, ice},
+        {sharpslate, darksand, sharpslate, dacite, snow, darksandWater, snow, sharpslate, snow, iceSnow},
+        {sharpslate, dacite, dacite, dacite, sharpslate, sharpslate, snow, snow, iceSnow, ice},
         {dacite, dacite, sharpslate, dacite, snow, snow, snow, snow, iceSnow, ice},
-        {sharpslate, dacite, snow, snow, sharpslate, snow, snow, iceSnow, ice, ice}
+        {dacite, snow, snow, snow, sharpslate, snow, snow, iceSnow, ice, ice}
     };
 
-    protected float waterHeight = 2f / blocks[3].length;
+    protected float waterHeight = 2f / blocks[0].length;
+
+    protected Vec3 crater = new Vec3(-0.023117876f, 0.36916345f, -0.9290769f);
+    protected float craterRadius = 0.4f;
+    protected float craterDepth = 1f;
+
+    protected boolean withinCrater(Vec3 position){
+        return withinCrater(position, 0f);
+    }
+
+    protected boolean withinCrater(Vec3 position, float excess){
+        return position.within(crater, craterRadius + excess);
+    }
 
     protected float rawHeight(Vec3 position){
-        position = Tmp.v33.set(position).scl(scl);
-        return (Mathf.pow((float)noise.octaveNoise3D(6d, 0.5d, 1d / 3d, position.x, position.y, position.z), 2.3f) + waterOffset) / (1f + waterOffset);
+        Tmp.v33.set(position).scl(scl);
+        float res = (Mathf.pow((float)noise.octaveNoise3D(6d, 0.5d, 1d / 3d, Tmp.v33.x, Tmp.v33.y, Tmp.v33.z), 2.3f) + waterOffset) / (1f + waterOffset);
+
+        if(withinCrater(position)){
+            float n = (float)noise.octaveNoise3D(8.4d, 0.4d, 0.27d, Tmp.v33.x, Tmp.v33.y, Tmp.v33.z) * (craterRadius / 4f);
+            float depth = Interp.pow2Out.apply(1f - (position.dst(crater) / craterRadius));
+
+            return res - (craterDepth * depth + depth * n);
+        }
+
+        return res;
     }
 
     @Override
     public float getHeight(Vec3 position){
         float height = rawHeight(position);
-        return Math.max(height, waterHeight);
+        return withinCrater(position) ? height : Math.max(height, waterHeight);
     }
 
     @Override
@@ -69,7 +90,7 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
             base.lerp(UnityPal.monolithLight, res);
         }
 
-        return Tmp.c1.set(block.mapColor).a(1f - block.albedo);
+        return base.a(1f - block.albedo);
     }
 
     @Override
@@ -83,11 +104,10 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
     }
 
     Block[] getBlockset(Vec3 position){
-        Tmp.v31.set(position);
         position = Tmp.v33.set(position).scl(scl);
 
         float rad = scl;
-        float temp = Mathf.clamp(Math.abs(position.y * 2f) / (rad));
+        float temp = Mathf.clamp(Math.abs(position.y * 2f) / rad);
         float tnoise = (float)noise.octaveNoise3D(7, 0.56, 1f / 3f, position.x, position.y + 999f, position.z);
 
         temp = Mathf.lerp(temp, tnoise, 0.5f);
@@ -95,9 +115,17 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
         return blocks[Mathf.clamp((int)(temp * blocks.length), 0, blocks.length - 1)];
     }
 
-    Block getBlock(Vec3 position){
+    protected Block getBlock(Vec3 position){
         var set = getBlockset(position);
-        return set[Mathf.clamp((int)(Mathf.clamp(rawHeight(position) * 1.2f) * set.length), 0, set.length - 1)];
+
+        int i = Mathf.clamp((int)(Mathf.clamp(rawHeight(position) * 1.2f) * set.length), 0, set.length - 1);
+        if(withinCrater(position, 0.1f)){
+            while(i < set.length && set[i].asFloor().isLiquid){
+                i++;
+            }
+        }
+
+        return set[i];
     }
 
     @Override
