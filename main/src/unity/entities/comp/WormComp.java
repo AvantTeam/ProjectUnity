@@ -222,7 +222,7 @@ abstract class WormComp implements Unitc{
         if(isTail() && waitTime > 0){
             waitTime -= Time.delta;
         }
-        if(!uType.splittable){
+        if(!uType.splittable && !isHead()){
             health = head.health;
         }
         if(uType.splittable && (parent != null || child != null) && dead){
