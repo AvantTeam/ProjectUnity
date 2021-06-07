@@ -126,7 +126,7 @@ public class UnityUnitType extends UnitType{
         //worm
 
         segmentRegion = atlas.find(name + "-segment");
-        segmentCellRegion = atlas.find(name + "-segment-cell");
+        segmentCellRegion = atlas.find(name + "-segment-cell", cellRegion);
         tailRegion = atlas.find(name + "-tail");
         segmentOutline = atlas.find(name + "-segment-outline");
         tailOutline = atlas.find(name + "-tail-outline");
@@ -236,11 +236,12 @@ public class UnityUnitType extends UnitType{
 
         Draw.z(z);
 
-        TextureRegion tmp = region, tmpOutline = outlineRegion;
+        TextureRegion tmp = region, tmpOutline = outlineRegion, tmpCell = cellRegion;
         if(!unit.isHead() || unit.isTail()){
             region = unit.isTail() ? tailRegion : segmentRegion;
             outlineRegion = unit.isTail() ? tailOutline : segmentOutline;
         }
+        if(!unit.isHead()) cellRegion = segmentCellRegion;
 
         drawOutline(unit);
         drawWeaponOutlines(unit);
@@ -253,7 +254,9 @@ public class UnityUnitType extends UnitType{
         }
 
         drawBody(unit);
+        if(drawCell && !unit.isTail()) drawCell(unit);
 
+        cellRegion = tmpCell;
         region = tmp;
         outlineRegion = tmpOutline;
 

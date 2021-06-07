@@ -15,7 +15,7 @@ import unity.type.*;
 import unity.util.*;
 
 //TODO custom saving
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "UnnecessaryReturnStatement"})
 @EntityComponent
 abstract class WormComp implements Unitc{
     private static Unit last;
@@ -50,12 +50,21 @@ abstract class WormComp implements Unitc{
     private void connect(Wormc other){
         if(isHead() && other.isTail()){
             int z = other.countFoward() + 1;
-            distributeActionBack(u -> u.layer(u.layer() + z));
+            distributeActionBack(u -> {
+                u.layer(u.layer() + z);
+                u.head(other.head());
+            });
             other.child(self());
             parent = (Unit)other;
             head = other.head();
             setupWeapons(type);
             ((UnityUnitType)type).chainSound.at(self());
+            if(controller() instanceof Player){
+                UnitController con = controller();
+                other.head().controller(con);
+                con.unit(other.head());
+                controller(type.createController());
+            }
         }
     }
 
@@ -104,12 +113,23 @@ abstract class WormComp implements Unitc{
         return controller() instanceof AIController;
     }
 
+    @Replace
     @MethodPriority(-2)
     @Override
     @BreakAll
-    public void damage(float v){
+    public void damage(float amount){
         if(!isHead() && head != null && !((UnityUnitType)type).splittable){
-            head.damage(v);
+            head.damage(amount);
+            return;
+        }
+    }
+
+    @MethodPriority(-1)
+    @Override
+    @BreakAll
+    public void heal(float amount){
+        if(!isHead() && head != null && !((UnityUnitType)type).splittable){
+            head.heal(amount);
             return;
         }
     }
@@ -150,9 +170,9 @@ abstract class WormComp implements Unitc{
     @Override
     public void update(){
         UnityUnitType uType = (UnityUnitType)type;
-        if(uType.splittable && isTail()){
+        if(uType.splittable && isTail() && uType.regenTime > 0f){
             int forward = countFoward();
-            if(forward < uType.maxSegments){
+            if(forward < Math.max(uType.maxSegments, uType.segmentLength)){
                 regenTime += Time.delta;
                 if(regenTime >= uType.regenTime){
                     regenTime = 0f;
@@ -164,40 +184,17 @@ abstract class WormComp implements Unitc{
                     }
                 }
             }
-            if(waitTime > 0){
-                waitTime -= Time.delta;
-            }
         }else{
             regenTime = 0f;
+        }
+        if(isTail() && waitTime > 0){
+            waitTime -= Time.delta;
         }
         if(!uType.splittable){
             health = head.health;
         }
-        if(uType.splittable && dead){
-            if(child != null){
-                Wormc wc = ((Wormc)child);
-                wc.head(null);
-                float z = countFoward() + 1f;
-                distributeActionBack(u -> {
-                    if(u != self()){
-                        u.layer(u.layer() - z);
-                        u.splitHealthDiv(u.splitHealthDiv() * 2f);
-                        u.head(child);
-                        if(u.isTail()) u.waitTime(5f * 60f);
-                    }
-                });
-                wc.parent(null);
-                child.setupWeapons(type);
-            }
-            if(parent != null){
-                Wormc wp = ((Wormc)parent);
-                distributeActionForward(u -> {
-                    if(u != self()){
-                        u.splitHealthDiv(u.splitHealthDiv() * 2f);
-                    }
-                });
-                wp.child(null);
-            }
+        if(uType.splittable && (parent != null || child != null) && dead){
+            destroy();
         }
     }
 
@@ -244,9 +241,8 @@ abstract class WormComp implements Unitc{
 
                 Tmp.v1.set(u.vel).rotate(-u.rotation);
                 Tmp.v1.x = 0f;
-                Tmp.v1.rotate(u.rotation).scl(0.3f * Time.delta);
+                Tmp.v1.rotate(u.rotation).scl(0.1f * Time.delta);
                 u.vel.sub(Tmp.v1);
-                //Tmp.v1.trns(last.rotation + 180f, (uType.segmentOffset / 2f) + offset).add(last);
 
                 Tmp.v1.trns(u.angleTo(last), last.vel().len());
                 float lastLen = u.vel.len();
@@ -255,6 +251,11 @@ abstract class WormComp implements Unitc{
                 float nextHealth = (last.health() + u.health()) / 2f;
                 if(!Mathf.equal(nextHealth, last.health(), 0.0001f)) last.health(Mathf.lerpDelta(last.health(), nextHealth, uType.healthDistribution));
                 if(!Mathf.equal(nextHealth, u.health(), 0.0001f)) u.health(Mathf.lerpDelta(u.health(), nextHealth, uType.healthDistribution));
+
+                Wormc wrm = ((Wormc)last);
+                float nextHealthDv = (wrm.splitHealthDiv() + u.splitHealthDiv()) / 2f;
+                if(!Mathf.equal(nextHealth, wrm.splitHealthDiv(), 0.0001f)) wrm.splitHealthDiv(Mathf.lerpDelta(wrm.splitHealthDiv(), nextHealthDv, uType.healthDistribution));
+                if(!Mathf.equal(nextHealth, u.splitHealthDiv(), 0.0001f)) u.splitHealthDiv(Mathf.lerpDelta(u.splitHealthDiv(), nextHealthDv, uType.healthDistribution));
                 last = u;
             });
             scanTime += Time.delta;
@@ -290,6 +291,36 @@ abstract class WormComp implements Unitc{
     @BreakAll
     public void remove(){
         UnityUnitType uType = (UnityUnitType)type;
+        if(uType.splittable){
+            if(child != null && parent != null) uType.splitSound.at(x(), y());
+            if(child != null){
+                Wormc wc = ((Wormc)child);
+                wc.head(null);
+                float z = countFoward() + 1f;
+                distributeActionBack(u -> {
+                    if(u != self()){
+                        u.layer(u.layer() - z);
+                        u.splitHealthDiv(u.splitHealthDiv() * 2f);
+                        u.head(child);
+                        if(u.isTail()) u.waitTime(5f * 60f);
+                    }
+                });
+                wc.parent(null);
+                child.setupWeapons(type);
+            }
+            if(parent != null){
+                Wormc wp = ((Wormc)parent);
+                distributeActionForward(u -> {
+                    if(u != self()){
+                        u.splitHealthDiv(u.splitHealthDiv() * 2f);
+                    }
+                });
+                wp.child(null);
+                wp.waitTime(5f * 60f);
+            }
+            parent = null;
+            child = null;
+        }
         if(!isHead() && !uType.splittable && !removing){
             head.remove();
             return;

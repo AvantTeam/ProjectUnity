@@ -81,7 +81,7 @@ public class IconGenerator implements Generator{
                     }
                 }
 
-                if(unit instanceof WormDefaultUnit){
+                if(unit instanceof WormDefaultUnit || unit instanceof Wormc){
                     save(outline.get(get(type.segmentRegion)), fixName(type.segmentRegion), fixName(type.segmentRegion) + "-outline");
                     save(outline.get(get(type.tailRegion)), fixName(type.tailRegion), fixName(type.tailRegion) + "-outline");
                 }
