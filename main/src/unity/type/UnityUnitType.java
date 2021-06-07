@@ -9,6 +9,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.entities.*;
+import mindustry.entities.abilities.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -125,7 +126,7 @@ public class UnityUnitType extends UnitType{
         //worm
 
         segmentRegion = atlas.find(name + "-segment");
-        segmentCellRegion = atlas.find(name + "-segment-cell");
+        segmentCellRegion = atlas.find(name + "-segment-cell", cellRegion);
         tailRegion = atlas.find(name + "-tail");
         segmentOutline = atlas.find(name + "-segment-outline");
         tailOutline = atlas.find(name + "-tail-outline");
@@ -194,9 +195,98 @@ public class UnityUnitType extends UnitType{
         weaponSeq.set(mapped);
     }
 
+    public <T extends Unit & Wormc> void drawWorm(T unit){
+        Mechc mech = unit instanceof Mechc ? (Mechc)unit : null;
+        float z = (unit.elevation > 0.5f ? (lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit) : groundLayer + Mathf.clamp(hitSize / 4000f, 0, 0.01f)) - (unit.layer() * 0.00001f);
+
+        if(unit.isFlying() || visualElevation > 0){
+            TextureRegion tmpShadow = shadowRegion;
+            if(!unit.isHead() || unit.isTail()){
+                shadowRegion = unit.isTail() ? tailRegion : segmentRegion;
+            }
+
+            Draw.z(Math.min(Layer.darkness, z - 1f));
+            drawShadow(unit);
+            shadowRegion = tmpShadow;
+        }
+
+        Draw.z(z - 0.02f);
+        if(mech != null){
+            drawMech(mech);
+
+            //side
+            legOffsetB.trns(mech.baseRotation(), 0f, Mathf.lerp(Mathf.sin(mech.walkExtend(true), 2f/Mathf.PI, 1) * mechSideSway, 0f, unit.elevation));
+
+            //front
+            legOffsetB.add(Tmp.v1.trns(mech.baseRotation() + 90, 0f, Mathf.lerp(Mathf.sin(mech.walkExtend(true), 1f/Mathf.PI, 1) * mechFrontSway, 0f, unit.elevation)));
+
+            unit.trns(legOffsetB.x, legOffsetB.y);
+        }
+        if(unit instanceof Legsc){
+            drawLegs((Unit & Legsc)unit);
+        }
+
+        Draw.z(Math.min(z - 0.01f, Layer.bullet - 1f));
+
+        if(unit instanceof Payloadc){
+            drawPayload((Unit & Payloadc)unit);
+        }
+
+        drawSoftShadow(unit);
+
+        Draw.z(z);
+
+        TextureRegion tmp = region, tmpOutline = outlineRegion, tmpCell = cellRegion;
+        if(!unit.isHead() || unit.isTail()){
+            region = unit.isTail() ? tailRegion : segmentRegion;
+            outlineRegion = unit.isTail() ? tailOutline : segmentOutline;
+        }
+        if(!unit.isHead()) cellRegion = segmentCellRegion;
+
+        drawOutline(unit);
+        drawWeaponOutlines(unit);
+
+        if(unit.isTail()){
+            Draw.draw(z, () -> {
+                Tmp.v1.trns(unit.rotation + 180f, segmentOffset).add(unit);
+                Drawf.construct(Tmp.v1.x, Tmp.v1.y, tailRegion, unit.rotation - 90f, unit.regenTime() / regenTime, 1f, unit.regenTime());
+            });
+        }
+
+        drawBody(unit);
+        if(drawCell && !unit.isTail()) drawCell(unit);
+
+        cellRegion = tmpCell;
+        region = tmp;
+        outlineRegion = tmpOutline;
+
+        drawWeapons(unit);
+
+        if(unit.shieldAlpha > 0 && drawShields){
+            drawShield(unit);
+        }
+
+        if(mech != null){
+            unit.trns(-legOffsetB.x, -legOffsetB.y);
+        }
+
+        if(unit.abilities.size > 0){
+            for(Ability a : unit.abilities){
+                Draw.reset();
+                a.draw(unit);
+            }
+
+            Draw.reset();
+        }
+    }
+
     @Override
     public void draw(Unit unit){
-        super.draw(unit);
+        if(unit instanceof Wormc w && !w.isHead()){
+            drawWorm((Unit & Wormc)w);
+        }else{
+            super.draw(unit);
+        }
 
         // copter
         if(unit instanceof Copterc){
@@ -390,7 +480,6 @@ public class UnityUnitType extends UnitType{
             t.drawTentacles();
             Draw.z(z);
         }
-
         super.drawBody(unit);
         //worm
         if(unit instanceof WormDefaultUnit wormUnit){

@@ -4,6 +4,7 @@ import arc.math.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.entities.units.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import unity.*;
@@ -16,6 +17,7 @@ import unity.type.*;
 @EntityComponent
 abstract class EndComp implements Unitc, Factionc{
     @SyncLocal private float trueHealth, trueMaxHealth;
+    private transient Team trueTeam;
     private float aggression = 0f;
     private float aggressionTime = 0f;
     private float[] invFrames;
@@ -25,6 +27,7 @@ abstract class EndComp implements Unitc, Factionc{
 
     @Import UnitType type;
     @Import WeaponMount[] mounts;
+    @Import Team team;
     @Import float health, maxHealth, hitTime, healthMultiplier, shield, shieldAlpha, armor, x, y, elevation;
     @Import boolean dead;
 
@@ -40,6 +43,9 @@ abstract class EndComp implements Unitc, Factionc{
 
         trueHealth = type.health;
         trueMaxHealth = type.health;
+        trueTeam = team;
+
+        Unity.antiCheat.addUnit(self());
 
         if(aType != null) invFrames = new float[aType.invincibilityArray];
     }
@@ -70,10 +76,12 @@ abstract class EndComp implements Unitc, Factionc{
         AntiCheatVariables aType = utype.antiCheatType;
 
         if(aType != null){
+            if(team != trueTeam && trueHealth >= Math.min(trueMaxHealth / 100f, 150f)) team = trueTeam;
             if(health < trueHealth) health = trueHealth;
             trueHealth = health;
             if(maxHealth < trueMaxHealth) maxHealth = trueMaxHealth;
             trueMaxHealth = maxHealth;
+            if(trueHealth > 0f) dead = false;
             if(resistTime <= 0f){
                 resist -= resistMax / aType.resistDuration;
                 resist = Math.max(resist, 0f);

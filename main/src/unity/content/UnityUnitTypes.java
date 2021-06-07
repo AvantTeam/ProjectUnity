@@ -15,6 +15,7 @@ import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.graphics.*;
 import mindustry.content.*;
+import mindustry.world.meta.*;
 import unity.*;
 import unity.ai.*;
 import unity.ai.AssistantAI.*;
@@ -81,7 +82,7 @@ public class UnityUnitTypes implements ContentList{
     UnitType exowalker;
 
     // plague unit + worm
-    public static @FactionDef("plague") @EntityPoint(WormDefaultUnit.class)
+    public static @FactionDef("plague") @EntityDef({Unitc.class, Wormc.class})
     UnitType toxobyte, catenapede;
 
     // koruh mech
@@ -2071,7 +2072,7 @@ public class UnityUnitTypes implements ContentList{
         toxobyte = new UnityUnitType("toxobyte"){{
             defaultController = WormAI::new;
             flying = true;
-            health = 2000f;
+            health = 200f;
             speed = 3f;
             accel = 0.035f;
             drag = 0.012f;
@@ -2123,7 +2124,7 @@ public class UnityUnitTypes implements ContentList{
         catenapede = new UnityUnitType("catenapede"){{
             defaultController = WormAI::new;
             flying = true;
-            health = 7500f;
+            health = 750f;
             speed = 2.4f;
             accel = 0.06f;
             drag = 0.03f;
@@ -3196,6 +3197,7 @@ public class UnityUnitTypes implements ContentList{
             armor = 16f;
             omniMovement = false;
             outlineColor = UnityPal.darkerOutline;
+            envEnabled = Env.terrestrial | Env.space;
 
             BulletType t = new AntiCheatBasicBulletType(9.2f, 325f){{
                 hitSize = 8f;
