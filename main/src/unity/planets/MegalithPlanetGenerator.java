@@ -26,7 +26,7 @@ import static unity.content.UnityBlocks.*;
 public class MegalithPlanetGenerator extends PlanetGenerator{
     protected RidgedPerlin rid = new RidgedPerlin(1, 3);
     protected BaseGenerator basegen = new BaseGenerator();
-    protected float scl = 5f;
+    protected float scl = 4.5f;
     protected float waterOffset = 0.1f;
 
     protected Block[][] blocks = {
@@ -49,7 +49,7 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
     protected float waterHeight = 2f / blocks[0].length;
 
     protected Vec3 crater = new Vec3(-0.023117876f, 0.36916345f, -0.9290769f);
-    protected float craterRadius = 0.4f;
+    protected float craterRadius = 0.36f;
     protected float craterDepth = 1f;
 
     protected boolean withinCrater(Vec3 position){
@@ -64,11 +64,11 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
         Tmp.v33.set(position).scl(scl);
         float res = (Mathf.pow((float)noise.octaveNoise3D(6d, 0.5d, 1d / 3d, Tmp.v33.x, Tmp.v33.y, Tmp.v33.z), 2.3f) + waterOffset) / (1f + waterOffset);
 
-        if(withinCrater(position)){
+        if(withinCrater(position, 0.05f)){
             float n = (float)noise.octaveNoise3D(8.4d, 0.4d, 0.27d, Tmp.v33.x, Tmp.v33.y, Tmp.v33.z) * (craterRadius / 4f);
             float depth = Interp.pow2Out.apply(1f - (position.dst(crater) / craterRadius));
 
-            return res - (craterDepth * depth + depth * n);
+            return res - (craterDepth * depth + (1f - depth) * n);
         }
 
         return res;

@@ -191,8 +191,12 @@ public class SpriteProcessor{
         }
     }
 
-    static void save(Pixmap pix, String sibling, String path){
-        cache.get(sibling).file.sibling(path + ".png").writePng(pix);
+    static void replace(TextureRegion region, Pixmap image){
+        cache.get(fixName(region)).file.writePng(image);
+    }
+
+    static void save(Pixmap image, String sibling, String path){
+        cache.get(sibling).file.sibling(path + ".png").writePng(image);
     }
 
     static String fixName(String name){
@@ -204,17 +208,6 @@ public class SpriteProcessor{
 
     static String fixName(TextureRegion t){
         return fixName(((AtlasRegion)t).name);
-    }
-
-    static void replace(String name, Pixmap image){
-        name = name.replaceFirst("unity-", "");
-
-        cache.get(name).file.sibling(name + ".png").writePng(image);
-        ((GenRegion)Core.atlas.find(name)).path.delete();
-    }
-
-    static void replace(TextureRegion region, Pixmap image){
-        replace(fixName(region), image);
     }
 
     static Pixmap get(String name){
