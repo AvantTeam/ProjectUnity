@@ -1,5 +1,6 @@
 package unity.entities.comp;
 
+import arc.math.*;
 import mindustry.gen.*;
 import unity.annotations.Annotations.*;
 import unity.gen.*;
@@ -9,6 +10,8 @@ import unity.gen.*;
 @EntityComponent
 abstract class TestComp implements Unitc{
     @Import float health, maxHealth;
+
+    @ReadOnly float chance = 0.5f;
 
     @Insert(value = "update()", after = false)
     private void updatePre(){}
@@ -49,5 +52,10 @@ abstract class TestComp implements Unitc{
             destroy();
             return;
         }
+    }
+
+    @Override
+    public boolean serialize(){
+        return Mathf.chance(chance);
     }
 }

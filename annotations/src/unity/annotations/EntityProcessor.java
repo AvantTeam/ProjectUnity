@@ -106,7 +106,7 @@ public class EntityProcessor extends BaseProcessor{
                         .replaceAll("this\\.<(.*)>self\\(\\)", "this")
                         .replaceAll("self\\(\\)(?!\\s+instanceof)", "this")
                         .replaceAll(" yield ", "")
-                        .replaceAll("\\/\\*missing\\*\\/", "var")
+                        .replaceAll("/\\*missing\\*/", "var")
                     );
                 }
 
@@ -284,14 +284,6 @@ public class EntityProcessor extends BaseProcessor{
                         .build()
                     );
 
-                builder.addMethod(
-                    MethodSpec.methodBuilder("serialize").addModifiers(Modifier.PUBLIC)
-                        .addAnnotation(cName(Override.class))
-                        .returns(TypeName.BOOLEAN)
-                        .addStatement("return " + ann.serialize())
-                    .build()
-                );
-
                 Seq<VariableElement> syncedFields = new Seq<>();
                 Seq<VariableElement> allFields = new Seq<>();
                 Seq<FieldSpec> allFieldSpecs = new Seq<>();
@@ -377,6 +369,7 @@ public class EntityProcessor extends BaseProcessor{
                 EntityIO io = new EntityIO(simpleName(def), builder, serializer);
                 boolean hasIO = ann.genio() && (defComps.contains(s -> simpleName(s).contains("Sync")) || ann.serialize());
 
+                boolean serializeOverride = false;
                 for(Entry<String, Seq<ExecutableElement>> entry : methods){
                     if(entry.value.contains(m -> annotation(m, Replace.class) != null)){
                         if(entry.value.first().getReturnType().getKind() == VOID){
@@ -399,8 +392,9 @@ public class EntityProcessor extends BaseProcessor{
                     entry.value.sort(Structs.comps(Structs.comparingFloat(m -> annotation(m, MethodPriority.class) != null ? annotation(m, MethodPriority.class).value() : 0), Structs.comparing(BaseProcessor::simpleName)));
 
                     ExecutableElement first = entry.value.first();
-
-                    if(annotation(first, InternalImpl.class) != null){
+                    if(!is(first, Modifier.ABSTRACT) && simpleName(first).equals("serialize") && first.getReturnType().getKind() == BOOLEAN && first.getParameters().size() == 0){
+                        serializeOverride = true;
+                    }else if(annotation(first, InternalImpl.class) != null){
                         continue;
                     }
 
@@ -510,6 +504,16 @@ public class EntityProcessor extends BaseProcessor{
                     }
 
                     builder.addMethod(mbuilder.build());
+                }
+
+                if(!serializeOverride){
+                    builder.addMethod(
+                        MethodSpec.methodBuilder("serialize").addModifiers(Modifier.PUBLIC)
+                            .addAnnotation(cName(Override.class))
+                            .returns(TypeName.BOOLEAN)
+                            .addStatement("return " + ann.serialize())
+                            .build()
+                    );
                 }
 
                 if(ann.pooled()){
@@ -696,13 +700,8 @@ public class EntityProcessor extends BaseProcessor{
                 .build()
             );
         }else if(round == 4){
-            for(TypeSpec.Builder b : baseClasses){
-                TypeSpec spec = b.build();
-                write(spec, imports.get(spec.name));
-            }
-
             for(EntityDefinition def : definitions){
-                ObjectSet<String> methodNames = def.components.flatMap(type -> methods(type).map(BaseProcessor::simpleString)).asSet();
+                ObjectSet<String> methodNames = def.components.flatMap(type -> methods(type).map(BaseProcessor::simpleString)).<String>as().asSet();
 
                 if(def.extend != null){
                     def.builder.superclass(def.extend);
@@ -711,41 +710,66 @@ public class EntityProcessor extends BaseProcessor{
                 for(TypeElement comp : def.components){
                     TypeElement inter = inters.find(i -> simpleName(i).equals(interfaceName(comp)));
                     if(inter == null){
-                        throw new IllegalStateException("Failed to generate interface for " + simpleName(comp));
+                        throw new IllegalStateException("Failed to generate interface for " + comp);
                     }
 
                     def.builder.addSuperinterface(cName(inter));
 
+                    TypeSpec.Builder superclass = null;
+                    TypeElement superclassVanilla = null;
+
+                    if(def.extend != null){
+                        superclass = baseClasses.find(b -> (packageName + "." + Reflect.get(b, "name")).equals(def.extend.toString()));
+                        if(superclass == null){
+                            superclassVanilla = elementUtils.getTypeElement(def.extend.toString());
+                        }
+                    }
+
                     for(ExecutableElement method : methods(inter)){
                         String var = simpleName(method);
-                        FieldSpec field = Seq.with(def.fieldSpecs).find(f -> f.name.equals(var));
+                        FieldSpec field = def.fieldSpecs.find(f -> f.name.equals(var));
 
                         if(field == null || methodNames.contains(simpleString(method))) continue;
 
+                        MethodSpec result = null;
+
                         if(method.getReturnType().getKind() != VOID){
-                            def.builder.addMethod(
-                                MethodSpec.methodBuilder(var).addModifiers(Modifier.PUBLIC)
-                                    .returns(TypeName.get(method.getReturnType()))
-                                    .addAnnotation(cName(Override.class))
-                                    .addStatement("return $L", var)
-                                .build()
-                            );
+                            result = MethodSpec.overriding(method).addStatement("return " + var).build();
                         }
 
                         if(method.getReturnType().getKind() == VOID && !Seq.with(field.annotations).contains(f -> f.type.toString().equals("@unity.annotations.Annotations.ReadOnly"))){
-                            def.builder.addMethod(
-                                MethodSpec.methodBuilder(var).addModifiers(Modifier.PUBLIC)
-                                    .returns(TypeName.VOID)
-                                    .addAnnotation(cName(Override.class))
-                                    .addParameter(field.type, var)
-                                    .addStatement("this.$L = $L", var, var)
-                                .build()
-                            );
+                            result = MethodSpec.overriding(method).addStatement("this." + var + " = " + var).build();
+                        }
+
+                        if(result != null){
+                            if(superclass != null){
+                                FieldSpec superField = Seq.with(superclass.fieldSpecs).find(f -> f.name.equals(var));
+
+                                if(superField != null){
+                                    MethodSpec fr = result;
+                                    MethodSpec targetMethod = Seq.with(superclass.methodSpecs).find(m -> m.name.equals(var) && m.returnType.equals(fr.returnType));
+                                    if(targetMethod == null){
+                                        superclass.addMethod(result);
+                                    }
+
+                                    continue;
+                                }
+                            }else if(superclassVanilla != null){
+                                VariableElement superField = vars(superclassVanilla).find(f -> simpleName(f).equals(var));
+                                if(superField != null) continue;
+                            }
+
+                            def.builder.addMethod(result);
                         }
                     }
                 }
 
                 write(def.builder.build(), def.components.flatMap(comp -> imports.get(interfaceName(comp))));
+            }
+
+            for(TypeSpec.Builder b : baseClasses){
+                TypeSpec spec = b.build();
+                write(spec, imports.get(spec.name));
             }
         }
     }
