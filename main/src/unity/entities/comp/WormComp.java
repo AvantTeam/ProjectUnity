@@ -4,6 +4,7 @@ import arc.func.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.io.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
@@ -33,11 +34,10 @@ abstract class WormComp implements Unitc{
     @Import WeaponMount[] mounts;
     @Import Team team;
 
-    /*@Override
+    @Override
     public boolean serialize(){
         return isHead();
     }
-     */
 
     public boolean isHead(){
         return parent == null || head == null || head == self();
@@ -103,6 +103,38 @@ abstract class WormComp implements Unitc{
         if(next instanceof Player && head != null && !isHead()){
             head.controller(next);
             return;
+        }
+    }
+
+    @MethodPriority(100)
+    @Override
+    public void read(Reads read){
+        if(read.bool()){
+            int seg = read.s();
+            Wormc current = self();
+            for(int i = 0; i < seg; i++){
+                Unit u = type.constructor.get();
+                Wormc w = (Wormc)u;
+                u.read(read);
+                current.child(u);
+                w.parent((Unit)current);
+                w.head(self());
+                current = w;
+            }
+        }
+    }
+
+    @MethodPriority(100)
+    @Override
+    public void write(Writes write){
+        write.bool(isHead());
+        if(isHead()){
+            write.s(countBackward());
+            distributeActionBack(u -> {
+                if(u != self()){
+                    u.write(write);
+                }
+            });
         }
     }
 
@@ -341,20 +373,28 @@ abstract class WormComp implements Unitc{
         UnityUnitType uType = (UnityUnitType)type;
         Unit current = self();
         if(isHead()){
-            for(int i = 0; i < uType.segmentLength; i++){
-                Unit t = uType.create(team());
-                t.x = x() - (i * uType.segmentOffset);
-                t.y = y();
-                t.elevation = elevation();
-                Wormc wt = (Wormc)t;
-                wt.layer(i + 1f);
-                wt.head(self());
-                wt.parent(current);
-                ((Wormc)current).child(t);
-                t.setupWeapons(uType);
-                t.heal();
-                t.add();
-                current = t;
+            if(child == null){
+                for(int i = 0; i < uType.segmentLength; i++){
+                    Unit t = uType.create(team());
+                    t.x = x() - (i * uType.segmentOffset);
+                    t.y = y();
+                    t.elevation = elevation();
+                    Wormc wt = (Wormc)t;
+                    wt.layer(i + 1f);
+                    wt.head(self());
+                    wt.parent(current);
+                    ((Wormc)current).child(t);
+                    t.setupWeapons(uType);
+                    t.heal();
+                    t.add();
+                    current = t;
+                }
+            }else{
+                distributeActionBack(u -> {
+                    if(u != self()){
+                        u.add();
+                    }
+                });
             }
         }
     }

@@ -44,7 +44,7 @@ public class KamiBulletDatas{
         ));
 
         junkoSlowDown = addData(b -> new KamiBulletData(b.vel().len(),
-            new DataStage(65f, (data, bl) -> {}),
+            new DataStage(50f, (data, bl) -> {}),
             new DataStage(20f, (data, bl) -> bl.vel.setLength(Mathf.lerp(data.initialRotation, data.initialRotation / 3f, data.fin())))
         ));
 

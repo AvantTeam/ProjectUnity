@@ -119,7 +119,7 @@ public class UnityUnitTypes implements ContentList{
     public static @FactionDef("end") @EntityDef({Unitc.class, Endc.class, Invisiblec.class}) UnitType opticaecus;
 
     // end worm
-    public static @FactionDef("end") @EntityPoint(EndWormUnit.class) UnitType devourer;
+    public static @FactionDef("end") @EntityDef({Unitc.class, Endc.class, Wormc.class}) UnitType devourer;
 
     // end apocalypse
     public static @FactionDef("end") @EntityDef({Unitc.class, Endc.class, Invisiblec.class, Tentaclec.class}) UnitType apocalypse;
@@ -3198,6 +3198,8 @@ public class UnityUnitTypes implements ContentList{
             omniMovement = false;
             outlineColor = UnityPal.darkerOutline;
             envEnabled = Env.terrestrial | Env.space;
+
+            antiCheatType = new AntiCheatVariables(health / 600f, health / 190f, health / 610f, health / 100f, 0.6f, 7f * 60f, 8f * 60f, 35f, 4);
 
             BulletType t = new AntiCheatBasicBulletType(9.2f, 325f){{
                 hitSize = 8f;
