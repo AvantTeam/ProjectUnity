@@ -401,7 +401,7 @@ public class KamiPatterns{
                             float angle = (i * 360f / diff) + ai.angleTo(ai.targetPos);
                             if(i % 2 == 0){
                                 Bullet bullet = UnityBullets.kamiBullet1.create(ai.unit, ai.unit.team, ai.getX(), ai.getY(), angle, 1.5f);
-                                bullet.lifetime += 60f;
+                                bullet.lifetime += 80f;
                                 KamiBulletDatas.get(bullet, KamiBulletDatas.junkoSlowDown);
                             }else{
                                 Bullet bullet = UnityBullets.kamiBullet1.create(ai.unit, ai.unit.team, ai.getX(), ai.getY(), angle, 1.5f);
@@ -433,7 +433,7 @@ public class KamiPatterns{
                             float angle = (i * 360f / diff) + ai.reloads[1];
                             if(i % 2 == 0){
                                 Bullet bullet = UnityBullets.kamiBullet1.create(ai.unit, ai.unit.team, ai.getX(), ai.getY(), angle, 1.5f);
-                                bullet.lifetime += 60f;
+                                bullet.lifetime += 80f;
                                 KamiBulletDatas.get(bullet, KamiBulletDatas.junkoSlowDown);
                             }else{
                                 Bullet bullet = UnityBullets.kamiBullet1.create(ai.unit, ai.unit.team, ai.getX(), ai.getY(), angle, 1.5f);
