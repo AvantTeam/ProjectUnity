@@ -2072,7 +2072,7 @@ public class UnityUnitTypes implements ContentList{
         toxobyte = new UnityUnitType("toxobyte"){{
             defaultController = WormAI::new;
             flying = true;
-            health = 2000f;
+            health = 200f;
             speed = 3f;
             accel = 0.035f;
             drag = 0.012f;
@@ -2124,7 +2124,7 @@ public class UnityUnitTypes implements ContentList{
         catenapede = new UnityUnitType("catenapede"){{
             defaultController = WormAI::new;
             flying = true;
-            health = 7500f;
+            health = 750f;
             speed = 2.4f;
             accel = 0.06f;
             drag = 0.03f;
