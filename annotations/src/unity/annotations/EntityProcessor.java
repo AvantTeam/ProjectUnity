@@ -392,7 +392,7 @@ public class EntityProcessor extends BaseProcessor{
                     entry.value.sort(Structs.comps(Structs.comparingFloat(m -> annotation(m, MethodPriority.class) != null ? annotation(m, MethodPriority.class).value() : 0), Structs.comparing(BaseProcessor::simpleName)));
 
                     ExecutableElement first = entry.value.first();
-                    if(!is(first, Modifier.ABSTRACT) && simpleName(first).equals("serialize") && first.getReturnType().getKind() == BOOLEAN && first.getParameters().size() == 0){
+                    if(entry.value.size > 1 && simpleName(first).equals("serialize") && first.getReturnType().getKind() == BOOLEAN && first.getParameters().size() == 0){
                         serializeOverride = true;
                     }else if(annotation(first, InternalImpl.class) != null){
                         continue;

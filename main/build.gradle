@@ -201,10 +201,6 @@ artifacts {
     archives assetsJar
 }
 
-clean {
-    finalizedBy cleanFetched
-}
-
 tasks.withType(JavaCompile) {
     options.compilerArgs += [
         '-processor', 
