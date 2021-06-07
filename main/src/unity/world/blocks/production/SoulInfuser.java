@@ -13,8 +13,8 @@ import unity.world.blocks.effect.SoulContainer.*;
 
 import static mindustry.Vars.*;
 
-@Merge(base = FloorExtractor.class, value = {SoulHoldc.class, Stemc.class})
-public class SoulInfuser extends StemSoulHoldFloorExtractor{
+@Merge(base = FloorExtractor.class, value = Soulc.class)
+public class SoulInfuser extends SoulFloorExtractor{
     public int amount = 1;
     public int maxContainers = 3;
     public float range = 15f;
@@ -46,7 +46,7 @@ public class SoulInfuser extends StemSoulHoldFloorExtractor{
         Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range * tilesize, Pal.accent);
     }
 
-    public class SoulInfuserBuild extends StemSoulFloorExtractorBuild{
+    public class SoulInfuserBuild extends SoulFloorExtractorBuild{
         public IntSeq containers = new IntSeq();
 
         @Override

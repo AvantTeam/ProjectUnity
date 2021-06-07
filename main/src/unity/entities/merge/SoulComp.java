@@ -12,14 +12,14 @@ import mindustry.world.meta.*;
 import unity.annotations.Annotations.*;
 import unity.entities.*;
 import unity.gen.*;
-import unity.gen.SoulHoldc.*;
+import unity.gen.Soulc.*;
 import unity.world.blocks.defense.turrets.*;
 
 import static mindustry.Vars.*;
 
 @SuppressWarnings({"unused", "unchecked"})
 @MergeComponent
-class SoulHoldComp extends Block{
+abstract class SoulComp extends Block implements Stemc{
     int maxSouls = 3;
     float efficiencyFrom = 0.3f;
     float efficiencyTo = 1f;
@@ -28,7 +28,7 @@ class SoulHoldComp extends Block{
 
     @ReadOnly Cons<SoulBuildc> joined = b -> {};
 
-    public SoulHoldComp(String name){
+    public SoulComp(String name){
         super(name);
         update = true;
         destructible = true;
@@ -57,7 +57,7 @@ class SoulHoldComp extends Block{
         });
     }
 
-    public class SoulBuildComp extends Building implements ControlBlock, Soul{
+    public abstract class SoulBuildComp extends Building implements StemBuildc, ControlBlock, Soul{
         @Nullable transient BlockUnitc unit;
 
         @ReadOnly boolean wasPlayer;

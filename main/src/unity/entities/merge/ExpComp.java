@@ -21,6 +21,7 @@ import mindustry.world.meta.*;
 import unity.annotations.Annotations.*;
 import unity.content.*;
 import unity.entities.*;
+import unity.gen.*;
 import unity.gen.Expc.*;
 import unity.type.exp.*;
 import unity.util.*;
@@ -31,7 +32,7 @@ import static mindustry.Vars.*;
 
 @SuppressWarnings({"rawtypes", "unchecked", "unused"})
 @MergeComponent
-class ExpComp extends Block{
+abstract class ExpComp extends Block implements Stemc{
     int maxLevel = 20;
     float maxExp;
     float orbRefund = 0.3f;
@@ -330,7 +331,7 @@ class ExpComp extends Block{
         }
     }
 
-    public class ExpBuildComp extends Building{
+    public abstract class ExpBuildComp extends Building implements StemBuildc{
         float exp;
         boolean checked = true;
 

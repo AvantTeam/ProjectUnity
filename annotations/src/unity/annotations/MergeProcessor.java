@@ -1,5 +1,6 @@
 package unity.annotations;
 
+import arc.func.*;
 import arc.struct.*;
 import arc.struct.ObjectMap.*;
 import arc.util.*;
@@ -80,7 +81,7 @@ public class MergeProcessor extends BaseProcessor{
                 if(buildType != null){
                     if(!typeUtils.isAssignable(
                         buildType.asType(),
-                        elementUtils.getTypeElement(Building.class.getCanonicalName()).asType()
+                        toType(Building.class).asType()
                     )){
                         throw new IllegalStateException("@MergeComponent class' nested class must be the building type");
                     }
@@ -141,7 +142,7 @@ public class MergeProcessor extends BaseProcessor{
         }
 
         for(TypeElement type : depends){
-            inter.addSuperinterface(cName(type));
+            inter.addSuperinterface(procName(type, this::interfaceName));
         }
 
         if(!isBuild){
@@ -516,6 +517,13 @@ public class MergeProcessor extends BaseProcessor{
         return toComp(type) != null;
     }
 
+    TypeName procName(TypeElement comp, Func<TypeElement, String> name){
+        return ClassName.get(
+            comp.getEnclosingElement().toString().contains("fetched") ? "mindustry.gen" : packageName,
+            name.get(comp)
+        );
+    }
+
     String interfaceName(TypeElement type){
         return baseName(type) + "c";
     }
@@ -530,7 +538,7 @@ public class MergeProcessor extends BaseProcessor{
     }
 
     TypeElement findBuild(TypeElement block){
-        TypeElement building = elementUtils.getTypeElement(Building.class.getCanonicalName());
+        TypeElement building = toType(Building.class);
         for(TypeElement type : types(block)){
             if(typeUtils.isAssignable(
                 type.asType(),
@@ -542,11 +550,18 @@ public class MergeProcessor extends BaseProcessor{
         return building;
     }
 
+    String compName(String interfaceName){
+        return interfaceName.substring(0, interfaceName.length() - 1) + "Comp";
+    }
+
     TypeElement toComp(TypeElement inter){
         String name = simpleName(inter);
         if(!name.endsWith("c")) return null;
 
-        String compName = name.substring(0, name.length() - 1) + "Comp";
+        return toComp(compName(name));
+    }
+
+    TypeElement toComp(String compName){
         return comps.find(t -> simpleName(t).equals(compName));
     }
 
@@ -554,13 +569,11 @@ public class MergeProcessor extends BaseProcessor{
         if(!componentDependencies.containsKey(component)){
             ObjectSet<TypeElement> out = new ObjectSet<>();
 
-            out.addAll(Seq.with(component.getInterfaces())
-                .map(BaseProcessor::toEl)
-                .map(t -> inters.find(i -> simpleName(t).equals(simpleName(i))))
-                .select(Objects::nonNull)
-                .map(this::toComp)
-            );
+            Seq<TypeElement> list = Seq.with(component.getInterfaces())
+                .map(i -> toComp(compName(simpleName(toEl(i)))))
+                .select(Objects::nonNull);
 
+            out.addAll(list);
             out.remove(component);
 
             ObjectSet<TypeElement> result = new ObjectSet<>();
