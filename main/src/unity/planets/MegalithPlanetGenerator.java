@@ -64,7 +64,7 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
         Tmp.v33.set(position).scl(scl);
         float res = (Mathf.pow((float)noise.octaveNoise3D(6d, 0.5d, 1d / 3d, Tmp.v33.x, Tmp.v33.y, Tmp.v33.z), 2.3f) + waterOffset) / (1f + waterOffset);
 
-        if(withinCrater(position, 0.05f)){
+        if(withinCrater(position, 0.03f)){
             float n = (float)noise.octaveNoise3D(8.4d, 0.4d, 0.27d, Tmp.v33.x, Tmp.v33.y, Tmp.v33.z) * (craterRadius / 4f);
             float depth = Interp.pow2Out.apply(1f - (position.dst(crater) / craterRadius));
 
