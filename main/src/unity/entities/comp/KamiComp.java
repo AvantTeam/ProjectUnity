@@ -6,11 +6,12 @@ import mindustry.graphics.*;
 import unity.ai.*;
 import unity.annotations.Annotations.*;
 import unity.gen.*;
+import unity.mod.*;
 
 @SuppressWarnings("unused")
-@EntityDef({Unitc.class, Bossc.class, Kamic.class})
+@EntityDef({Unitc.class, Bossc.class, Factionc.class, Kamic.class})
 @EntityComponent
-abstract class KamiComp implements Unitc{
+abstract class KamiComp implements Unitc, Factionc{
     transient Bullet laser;
     @SyncField(true) float laserRotation = 0f;
 
@@ -49,5 +50,10 @@ abstract class KamiComp implements Unitc{
         if(trueController.unit == self() && !trueController.waiting){
             trueController.stageDamage += amount;
         }
+    }
+
+    @Override
+    public Faction faction(){
+        return Faction.koruh;
     }
 }

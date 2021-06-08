@@ -5,11 +5,12 @@ import arc.util.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import unity.annotations.Annotations.*;
+import unity.gen.*;
 import unity.util.*;
 
 @SuppressWarnings("unused")
 @EntityComponent
-abstract class InvisibleComp implements Unitc{
+abstract class InvisibleComp implements Unitc, Unintersectablec{
     @SyncLocal @ReadOnly boolean invisible;
     @ReadOnly transient float disabledTime = 120f;
     @ReadOnly transient Interval scanInterval = new Interval(2);
@@ -46,7 +47,7 @@ abstract class InvisibleComp implements Unitc{
             alphaLerp = Mathf.lerpDelta(alphaLerp, 0f, 0.1f);
         }
 
-        if(alphaLerp < 0.5f){
+        /*if(alphaLerp < 0.5f){
             if(invisible){
                 Groups.unit.add(self());
                 invisible = false;
@@ -56,23 +57,19 @@ abstract class InvisibleComp implements Unitc{
                 Groups.unit.remove(self());
                 invisible = true;
             }
-        }
+        }*/
 
-        if(physref() != null){
-            if(invisible){
-                physref().body.radius = -Float.MAX_VALUE;
-            }else{
-                if(physref().body.radius < 0f){
-                    physref().body.radius = 0f;
-                }
-                physref().body.radius = Mathf.lerpDelta(physref().body.radius, hitSize() / 2f, 0.2f);
-            }
-        }
+        invisible = alphaLerp >= 0.5f;
     }
 
     @Replace
     @Override
     public void damage(float amount){
         disabledTime = Math.max(disabledTime, Math.max(1.4f * 60f, amount / 25f));
+    }
+
+    @Override
+    public boolean intersects(){
+        return !invisible;
     }
 }

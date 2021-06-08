@@ -172,8 +172,8 @@ public abstract class BaseProcessor extends AbstractProcessor{
         canonical = canonical.replace("<any?>", "unity.gen");
 
         Matcher matcher = Pattern.compile("\\.[A-Z]").matcher(canonical);
-        matcher.find();
-        int offset = matcher.start();
+        boolean find = matcher.find();
+        int offset = find ? matcher.start() : 0;
 
         String pkgName = canonical.substring(0, offset);
         Seq<String> simpleNames = Seq.with(canonical.substring(offset + 1).split("\\."));
@@ -181,7 +181,7 @@ public abstract class BaseProcessor extends AbstractProcessor{
         String simpleName = simpleNames.pop();
         simpleNames.reverse();
 
-        return ClassName.get(pkgName, simpleName, simpleNames.toArray());
+        return ClassName.get(pkgName.isEmpty() ? packageName : pkgName, simpleName, simpleNames.toArray());
     }
 
     public static ClassName cName(Element e){
