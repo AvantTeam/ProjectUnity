@@ -201,6 +201,21 @@ public class Annotations{
         boolean after() default true;
     }
 
+    /** Wraps a component-specific method implementation with this boolean parameterless method */
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface Wrap{
+        /**
+         * @return The target method described in {@link String} with the format {@code <methodName>(<paramType>...)}.
+         * For example, when targetting {@code void call(String arg, int prior)}, the target descriptor must be
+         * {@code call(java.lang.String, int)}
+         */
+        String value();
+
+        /** @return The component-specific method implementation to target */
+        Class<?> block() default Void.class;
+    }
+
     /** Appends this {@code add()}/{@code remove()} method before the {@code if([!]added)} check */
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.SOURCE)
