@@ -62,7 +62,7 @@ public abstract class BaseAbility extends Ability implements TapListener{
         try{
 			BaseAbility ability = (BaseAbility)clone();
             if(ability.interactive && ability.useTap){
-                Unity.tapHandler.addListener(ability);
+                Unity.tap.addListener(ability);
             }
 
             return ability;
@@ -83,7 +83,7 @@ public abstract class BaseAbility extends Ability implements TapListener{
     public void tap(Player player, float x, float y){
         Unit unit = player.unit();
         if(!unit.isValid() || !unit.abilities.contains(this)){
-            Unity.tapHandler.removeListener(this);
+            Unity.tap.removeListener(this);
         }else{
             if(useSlots && delayProgress >= delayTime){
                 use(unit, x, y);

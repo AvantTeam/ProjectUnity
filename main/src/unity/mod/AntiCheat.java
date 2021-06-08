@@ -1,4 +1,4 @@
-package unity.util;
+package unity.mod;
 
 import arc.*;
 import arc.struct.*;
@@ -12,10 +12,11 @@ import unity.*;
 import unity.entities.units.*;
 import unity.gen.*;
 import unity.sync.*;
+import unity.util.*;
 
 import java.util.*;
 
-public class UnityAntiCheat implements ApplicationListener{
+public class AntiCheat implements ApplicationListener{
     private final Interval timer = new Interval();
     private final Seq<UnitQueue> unitSeq = new Seq<>();
     private final Seq<BuildingQueue> buildingSeq = new Seq<>();
@@ -46,44 +47,42 @@ public class UnityAntiCheat implements ApplicationListener{
 
     public static void annihilateEntity(Entityc entity, boolean override, boolean setNaN){
         Groups.all.remove(entity);
-        if(entity instanceof Bossc boss) UnityCall.bossMusic(boss.type().name, false);
-        if(entity instanceof Drawc) Groups.draw.remove((Drawc)entity);
-        if(entity instanceof Syncc) Groups.sync.remove((Syncc)entity);
-        if(entity instanceof Unit){
-            Unit tmp = (Unit)entity;
 
-            if(Unity.antiCheat != null && override) Unity.antiCheat.removeUnit(tmp);
+        if(entity instanceof Bossc boss) UnityCall.bossMusic(boss.type().name, false);
+        if(entity instanceof Drawc draw) Groups.draw.remove(draw);
+        if(entity instanceof Syncc sync) Groups.sync.remove(sync);
+        if(entity instanceof Unit unit){
+            if(Unity.antiCheat != null && override) Unity.antiCheat.removeUnit(unit);
             try{
-                //Utils.setField(entity, Utils.findField(entity.getClass(), "added", true), false);
-                tmp.getClass().getField("added").setBoolean(tmp, false);
+                ReflectUtils.setField(unit, ReflectUtils.findField(unit.getClass(), "added", true), false);
             }catch(Exception e){
                 Unity.print(e);
             }
-            if(tmp instanceof WormDefaultUnit){
+            if(unit instanceof WormDefaultUnit){
                 WormSegmentUnit nullUnit = new WormSegmentUnit();
-                WormSegmentUnit[] tmpArray = Arrays.copyOf(((WormDefaultUnit)tmp).segmentUnits, ((WormDefaultUnit)tmp).segmentUnits.length);
-                Arrays.fill(((WormDefaultUnit)tmp).segmentUnits, nullUnit);
+                WormSegmentUnit[] tmpArray = Arrays.copyOf(((WormDefaultUnit)unit).segmentUnits, ((WormDefaultUnit)unit).segmentUnits.length);
+                Arrays.fill(((WormDefaultUnit)unit).segmentUnits, nullUnit);
                 for(WormSegmentUnit segmentUnit : tmpArray){
                     if(segmentUnit != null) segmentUnit.remove();
                 }
             }
             if(setNaN){
-                tmp.x = tmp.y = tmp.rotation = Float.NaN;
-                for(WeaponMount mount : tmp.mounts){
+                unit.x = unit.y = unit.rotation = Float.NaN;
+                for(WeaponMount mount : unit.mounts){
                     mount.reload = Float.NaN;
                 }
             }
 
-            tmp.team.data().updateCount(tmp.type, -1);
-            tmp.clearCommand();
-            tmp.controller().removed(tmp);
+            unit.team.data().updateCount(unit.type, -1);
+            unit.clearCommand();
+            unit.controller().removed(unit);
 
-            Groups.unit.remove(tmp);
+            Groups.unit.remove(unit);
             if(Vars.net.client()){
-                Vars.netClient.addRemovedEntity(tmp.id);
+                Vars.netClient.addRemovedEntity(unit.id);
             }
 
-            for(WeaponMount mount : tmp.mounts){
+            for(WeaponMount mount : unit.mounts){
                 if(mount.bullet != null){
                     mount.bullet.time = mount.bullet.lifetime;
                     mount.bullet = null;
@@ -93,8 +92,7 @@ public class UnityAntiCheat implements ApplicationListener{
                 }
             }
         }
-        if(entity instanceof Building){
-            Building building = (Building)entity;
+        if(entity instanceof Building building){
             Groups.build.remove(building);
             building.tile.remove();
             if(Unity.antiCheat != null && override) Unity.antiCheat.removeBuilding(building);

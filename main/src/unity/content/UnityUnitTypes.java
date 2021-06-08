@@ -1,6 +1,5 @@
 package unity.content;
 
-import arc.*;
 import arc.math.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -26,8 +25,8 @@ import unity.entities.bullet.*;
 import unity.entities.units.*;
 import unity.gen.*;
 import unity.graphics.*;
+import unity.mod.*;
 import unity.type.*;
-import unity.util.*;
 
 import static mindustry.Vars.*;
 
@@ -3080,7 +3079,7 @@ public class UnityUnitTypes implements ContentList{
             outlineColor = Color.valueOf("464a61");
             clipSize = 1000f;
 
-            Unity.musicHandler.registerLoop(name, UnityMusics.radiantDischarge);
+            Unity.music.registerLoop(name, UnityMusics.radiantDischarge);
         }};
 
         //endregion
@@ -3249,7 +3248,7 @@ public class UnityUnitTypes implements ContentList{
                             trueDamage += extraDamage * (damage / 3f);
 
                             if(!(other instanceof AntiCheatBase)) unit.damage(trueDamage);
-                            if((Float.isInfinite(threat) || Float.isNaN(threat) || threat >= Float.MAX_VALUE) && !(other instanceof AntiCheatBase)) UnityAntiCheat.annihilateEntity(other, false);
+                            if((Float.isInfinite(threat) || Float.isNaN(threat) || threat >= Float.MAX_VALUE) && !(other instanceof AntiCheatBase)) AntiCheat.annihilateEntity(other, false);
                         }
                         if(other instanceof AntiCheatBase) ((AntiCheatBase)other).overrideAntiCheatDamage(damage * 4f, 2);
                     }

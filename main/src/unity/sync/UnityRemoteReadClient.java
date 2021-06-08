@@ -41,9 +41,9 @@ public class UnityRemoteReadClient{
             boolean play = read.bool();
 
             if(play){
-                Unity.musicHandler.play(name);
+                Unity.music.play(name);
             }else{
-                Unity.musicHandler.stop(name);
+                Unity.music.stop(name);
             }
         });
 
@@ -52,7 +52,7 @@ public class UnityRemoteReadClient{
             float x = read.f();
             float y = read.f();
 
-            Unity.tapHandler.tap(p, x, y);
+            Unity.tap.tap(p, x, y);
         });
 
         map.put(3, () -> {

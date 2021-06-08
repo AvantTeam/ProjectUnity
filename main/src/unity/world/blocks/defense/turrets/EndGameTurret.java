@@ -21,6 +21,7 @@ import unity.content.*;
 import unity.entities.*;
 import unity.entities.effects.*;
 import unity.gen.*;
+import unity.mod.*;
 import unity.util.*;
 
 public class EndGameTurret extends PowerTurret{
@@ -228,7 +229,7 @@ public class EndGameTurret extends PowerTurret{
                 }
             });
             entitySeq.each(e -> {
-                UnityAntiCheat.annihilateEntity(e, true, false);
+                AntiCheat.annihilateEntity(e, true, false);
                 tmpArray.add(new DeadUnitEntry((Unit)e));
             });
             entitySeq.clear();
@@ -248,7 +249,7 @@ public class EndGameTurret extends PowerTurret{
                     shouldLaser++;
                 }
             });
-            entitySeq.each(e -> UnityAntiCheat.annihilateEntity(e, true, false));
+            entitySeq.each(e -> AntiCheat.annihilateEntity(e, true, false));
             entitySeq.clear();
         }
         
@@ -275,7 +276,7 @@ public class EndGameTurret extends PowerTurret{
                     if(e.dead){
                         UnityFx.vapourizeUnit.at(e.x, e.y, 0, e);
                         //annihilate(e);
-                        UnityAntiCheat.annihilateEntity(e, true, false);
+                        AntiCheat.annihilateEntity(e, true, false);
                     }
                     UnityFx.endgameLaser.at(x, y, 0, new Object[]{new Vec2(ux, uy), e, 0.525f});
                 }
@@ -298,7 +299,7 @@ public class EndGameTurret extends PowerTurret{
                     //annihilate(targets[index]);
                     if(e instanceof Unit ut) UnityFx.vapourizeUnit.at(ut.x, ut.y, ut.rotation, ut);
                     if(e instanceof Building build) UnityFx.vapourizeTile.at(build.x, build.y, build.block.size);
-                    UnityAntiCheat.annihilateEntity(e, true, false);
+                    AntiCheat.annihilateEntity(e, true, false);
                 }
                 Object[] data = {eyesVecArray[index], e, 0.625f};
                 

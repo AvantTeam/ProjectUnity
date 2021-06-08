@@ -5,7 +5,7 @@ import mindustry.gen.*;
 import mindustry.world.blocks.defense.turrets.Turret.*;
 import unity.*;
 import unity.entities.units.*;
-import unity.util.*;
+import unity.mod.*;
 
 public class AntiCheatBasicBulletType extends BasicBulletType{
     private final static float toleranceScl = 4f;
@@ -35,7 +35,7 @@ public class AntiCheatBasicBulletType extends BasicBulletType{
             h.damage(damage);
         }
         if(score >= Float.MAX_VALUE - 1000f){
-            UnityAntiCheat.annihilateEntity(other, false);
+            AntiCheat.annihilateEntity(other, false);
         }
 
         if(h.health >= initialHealth){
@@ -58,7 +58,7 @@ public class AntiCheatBasicBulletType extends BasicBulletType{
             build.damage(damage);
         }
         if(score >= Float.MAX_VALUE - 1000f){
-            UnityAntiCheat.annihilateEntity(build, false);
+            AntiCheat.annihilateEntity(build, false);
         }
         if(build.health >= initialHealth){
             Unity.antiCheat.samplerAdd(build);

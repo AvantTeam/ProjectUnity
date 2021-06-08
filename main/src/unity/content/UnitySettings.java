@@ -8,11 +8,11 @@ import mindustry.*;
   * @author sk7725
 */
 public class UnitySettings{
-    public void addGraphicSetting(String key, boolean def){
+    public static void addGraphicSetting(String key, boolean def){
         Vars.ui.settings.graphics.checkPref(key, Core.settings.getBool(key, def));
     }
 
-    public void init(){
+    public static void init(){
         boolean tmp = Core.settings.getBool("uiscalechanged", false);
         Core.settings.put("uiscalechanged", false);
 

@@ -3,14 +3,11 @@ package unity.sync;
 import arc.math.geom.*;
 import arc.util.*;
 import arc.util.io.*;
-import arc.util.pooling.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.io.*;
 import mindustry.net.*;
-import mindustry.net.Net.*;
-import mindustry.net.Packets.*;
 import unity.*;
 import unity.ai.kami.*;
 import unity.gen.*;
@@ -89,9 +86,9 @@ public class UnityCall{
     public static void bossMusic(String name, boolean play){
         if(net.server() || !net.active()){
             if(play){
-                Unity.musicHandler.play(name);
+                Unity.music.play(name);
             }else{
-                Unity.musicHandler.stop(name);
+                Unity.music.stop(name);
             }
         }
 
@@ -107,7 +104,7 @@ public class UnityCall{
 
     public static void tap(Player player, float x, float y){
         if(net.server() || !net.active()){
-            Unity.tapHandler.tap(player, x, y);
+            Unity.tap.tap(player, x, y);
         }
 
         if(net.server() || net.client()){

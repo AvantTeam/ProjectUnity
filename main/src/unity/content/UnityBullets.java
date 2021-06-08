@@ -24,7 +24,7 @@ import unity.entities.units.*;
 import unity.gen.*;
 import unity.gen.Expc.*;
 import unity.graphics.*;
-import unity.util.*;
+import unity.mod.*;
 
 import static mindustry.Vars.*;
 import static unity.content.UnityStatusEffects.*;
@@ -1058,7 +1058,7 @@ public class UnityBullets implements ContentList{
                 float damage = auraDamage / (Math.max(3500f - Math.max(initialHealth - 150000f, 0f), 0f) / 3500f);
                 if((damage >= Float.MAX_VALUE || Float.isInfinite(damage))){
                     build.health = 0f;
-                    UnityAntiCheat.annihilateEntity(build, false);
+                    AntiCheat.annihilateEntity(build, false);
                 }else{
                     build.damage(damage);
                 }
@@ -1069,7 +1069,7 @@ public class UnityBullets implements ContentList{
                 float damage = auraDamage / (Math.max(4500f - Math.max(initialHealth - 350000f, 0f), 0f) / 4500f);
                 if((damage >= Float.MAX_VALUE || Float.isInfinite(damage)) && !(unit instanceof AntiCheatBase)){
                     unit.health = 0f;
-                    UnityAntiCheat.annihilateEntity(unit, false);
+                    AntiCheat.annihilateEntity(unit, false);
                 }else{
                     unit.damage(damage);
                 }

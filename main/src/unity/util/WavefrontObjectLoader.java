@@ -37,6 +37,8 @@ public class WavefrontObjectLoader extends AsynchronousAssetLoader<WavefrontObje
 		return null;
 	}
 
+
+
     public static class WavefrontObjectParameters extends AssetLoaderParameters<WavefrontObject>{
         public @Nullable WavefrontObject object;
 

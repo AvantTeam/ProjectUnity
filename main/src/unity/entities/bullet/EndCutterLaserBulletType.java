@@ -15,6 +15,7 @@ import unity.content.*;
 import unity.entities.effects.*;
 import unity.entities.units.*;
 import unity.graphics.*;
+import unity.mod.*;
 import unity.util.*;
 
 public class EndCutterLaserBulletType extends BulletType{
@@ -161,7 +162,7 @@ public class EndCutterLaserBulletType extends BulletType{
                 }
 
                 if((unit.dead || unit.health >= Float.MAX_VALUE || (lastHealth - trueDamage < 0f && !(unit instanceof AntiCheatBase))) && (unit.hitSize >= 30f || unit.health >= Float.MAX_VALUE)){
-                    UnityAntiCheat.annihilateEntity(unit, true);
+                    AntiCheat.annihilateEntity(unit, true);
                     Tmp.v2.trns(b.rotation(), maxLength * 1.5f).add(b);
                     UnitCutEffect.createCut(unit, b.x, b.y, Tmp.v2.x, Tmp.v2.y);
                 }

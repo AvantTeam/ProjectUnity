@@ -2,16 +2,15 @@ package unity;
 
 import arc.*;
 import arc.func.*;
-import arc.graphics.*;
 import arc.scene.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.mod.*;
 import mindustry.mod.Mods.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
-import rhino.*;
 import unity.ai.kami.*;
 import unity.content.*;
 import unity.gen.*;
@@ -26,13 +25,14 @@ import younggamExperimental.Parts;
 
 import static mindustry.Vars.*;
 
+@SuppressWarnings("unchecked")
 public class Unity extends Mod implements ApplicationListener{
-    public static MusicHandler musicHandler;
-    public static TapHandler tapHandler;
-    public static UnityAntiCheat antiCheat;
-    public static UnitySettings unitySettings = new UnitySettings();
+    public static MusicHandler music;
+    public static TapHandler tap;
+    public static AntiCheat antiCheat;
+    public static DevBuild dev;
 
-    private final ContentList[] unityContent = {
+    private final ContentList[] content = {
         new UnityContentTypes(),
         new UnityItems(),
         new UnityStatusEffects(),
@@ -55,6 +55,14 @@ public class Unity extends Mod implements ApplicationListener{
         ContributorList.init();
         if(Core.app != null){
             Core.app.addListener(this);
+        }
+
+        try{
+            Class<? extends DevBuild> impl = (Class<? extends DevBuild>)Class.forName("unity.mod.DevBuildImpl");
+            dev = impl.getDeclaredConstructor().newInstance();
+        }catch(Throwable e){
+            print("Dev build class implementation not found, defaulting to regular user implementation.");
+            dev = new DevBuild(){};
         }
 
         KamiPatterns.load();
@@ -92,17 +100,17 @@ public class Unity extends Mod implements ApplicationListener{
             UnityShaders.dispose();
         });
 
-        musicHandler = new MusicHandler();
-        tapHandler = new TapHandler();
-        antiCheat = new UnityAntiCheat();
+        music = new MusicHandler();
+        tap = new TapHandler();
+        antiCheat = new AntiCheat();
 
         if(Core.app != null){
             ApplicationListener listener = Core.app.getListeners().first();
             if(listener instanceof ApplicationCore core){
-                core.add(musicHandler);
+                core.add(music);
                 core.add(antiCheat);
             }else{
-                Core.app.addListener(musicHandler);
+                Core.app.addListener(music);
                 Core.app.addListener(antiCheat);
             }
         }
@@ -113,7 +121,7 @@ public class Unity extends Mod implements ApplicationListener{
             ));
         }
 
-        Events.on(ClientLoadEvent.class, e -> unitySettings.init());
+        Events.on(ClientLoadEvent.class, e -> UnitySettings.init());
     }
 
     @Override
@@ -127,8 +135,9 @@ public class Unity extends Mod implements ApplicationListener{
 
     @Override
     public void init(){
-        musicHandler.setup();
+        music.setup();
         antiCheat.setup();
+        dev.setup();
 
         UnityCall.init();
         BlockMovement.init();
@@ -140,37 +149,12 @@ public class Unity extends Mod implements ApplicationListener{
             unity.meta.description = stringf.get(unity.meta.name + ".description");
         }
         
-        initScripts();
-    }
-
-    @SuppressWarnings("deprecation")
-    private void initScripts(){
-        if(mods == null || platform == null) return;
-
-        Time.mark();
-
-        enableConsole = true;
-        ImporterTopLevel scope = ReflectUtils.getField(mods.getScripts(), ReflectUtils.findField(Scripts.class, "scope", true));
-        Seq<NativeJavaPackage> packages = new Seq<>(NativeJavaPackage.class);
-
-        for(Package pkg : Package.getPackages()){
-            if(!pkg.getName().startsWith("unity")) continue;
-
-            NativeJavaPackage n = new NativeJavaPackage(pkg.getName(), unity.loader);
-            n.setParentScope(scope);
-
-            packages.add(n);
-        }
-
-        scope.importPackage(null, null, packages.toArray(), null);
-        ReflectUtils.unblacklist();
-
-        print(Strings.format("Total time to unblacklist and import unity packages: @ms", Time.elapsed()));
+        dev.initScripts();
     }
 
     @Override
     public void loadContent(){
-        for(ContentList list : unityContent){
+        for(ContentList list : content){
             list.load();
             print("Loaded content list: " + list.getClass().getSimpleName());
         }
@@ -203,13 +187,13 @@ public class Unity extends Mod implements ApplicationListener{
             }
         };
 
-        checker.get(content.blocks());
-        checker.get(content.getBy(ContentType.item));
-        checker.get(content.getBy(ContentType.liquid));
-        checker.get(content.getBy(ContentType.planet));
-        checker.get(content.getBy(ContentType.sector));
-        checker.get(content.getBy(ContentType.status));
-        checker.get(content.getBy(ContentType.unit));
+        checker.get(Vars.content.blocks());
+        checker.get(Vars.content.getBy(ContentType.item));
+        checker.get(Vars.content.getBy(ContentType.liquid));
+        checker.get(Vars.content.getBy(ContentType.planet));
+        checker.get(Vars.content.getBy(ContentType.sector));
+        checker.get(Vars.content.getBy(ContentType.status));
+        checker.get(Vars.content.getBy(ContentType.unit));
     }
 
     protected void addCredits(){
