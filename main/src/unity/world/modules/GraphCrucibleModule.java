@@ -121,7 +121,7 @@ public class GraphCrucibleModule extends GraphModule<GraphCrucible, GraphCrucibl
                 for(var i : cc){
                     MeltInfo m = melts[i.id];
                     Item item = m.item;
-                    if(item != null) data.push(m.meltPoint - 273f, item.uiIcon);
+                    if(item != null) data.push(m.meltPoint - 273f, item.fullIcon);
                 }
             }
             return data;

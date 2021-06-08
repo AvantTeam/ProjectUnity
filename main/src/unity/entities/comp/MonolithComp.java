@@ -59,6 +59,7 @@ abstract class MonolithComp implements Unitc, Factionc, Soul{
             float start = Mathf.random(360f);
             for(int i = 0; i < souls; i++){
                 MonolithSoul soul = MonolithSoul.defaultType.get().create(team).as();
+                soul.resetController();
 
                 Tmp.v1.trns(Mathf.random(360f), Mathf.random(hitSize));
                 soul.set(x + Tmp.v1.x, y + Tmp.v1.y);
@@ -82,7 +83,7 @@ abstract class MonolithComp implements Unitc, Factionc, Soul{
     }
 
     public boolean disabled(){
-        return souls <= 0;
+        return !hasSouls();
     }
 
     @Override

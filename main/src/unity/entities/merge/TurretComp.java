@@ -14,13 +14,14 @@ import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.blocks.defense.turrets.LaserTurret.*;
 import mindustry.world.blocks.defense.turrets.LiquidTurret.*;
 import unity.annotations.Annotations.*;
+import unity.gen.*;
 import unity.gen.Expc.*;
 import unity.gen.Turretc.*;
 import unity.util.*;
 
 @SuppressWarnings({"unused", "unchecked"})
 @MergeComponent
-class TurretComp extends Turret{
+abstract class TurretComp extends Turret implements Stemc{
     /** Color of shoot effects. Shifts to second color as the turret levels up. */
     Color fromColor = Pal.lancerLaser, toColor = Pal.sapBullet;
     boolean lerpColor = false;
@@ -53,7 +54,7 @@ class TurretComp extends Turret{
         this.bulletCons = (Cons2<BulletType, Bullet>)bulletCons;
     }
 
-    public class TurretBuildComp extends TurretBuild{
+    public abstract class TurretBuildComp extends TurretBuild implements StemBuildc{
         @Override
         @Replace
         public boolean acceptLiquid(Building source, Liquid liquid){

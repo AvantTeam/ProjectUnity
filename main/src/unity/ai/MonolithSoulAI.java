@@ -7,9 +7,6 @@ import mindustry.entities.units.*;
 import mindustry.gen.*;
 import unity.entities.*;
 import unity.gen.*;
-import unity.gen.SoulHoldc.*;
-
-import static mindustry.Vars.*;
 
 public class MonolithSoulAI implements UnitController{
     protected static final Vec2 vec = new Vec2();

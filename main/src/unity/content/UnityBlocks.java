@@ -160,14 +160,14 @@ public class UnityBlocks implements ContentList{
         "debris-extractor-heat1",
         "debris-extractor-heat2"
     })
-    @Merge(base = FloorExtractor.class, value = {SoulHoldc.class, Stemc.class})
+    @Merge(base = FloorExtractor.class, value = Soulc.class)
     Block debrisExtractor;
 
     public static @FactionDef("monolith")
     Block soulInfuser;
 
     public static @FactionDef("monolith")
-    @Merge(base = GenericCrafter.class, value = {SoulHoldc.class, Stemc.class})
+    @Merge(base = GenericCrafter.class, value = Soulc.class)
     Block monolithAlloyForge;
 
     //defense
@@ -176,30 +176,30 @@ public class UnityBlocks implements ContentList{
 
     //turret
     public static @FactionDef("monolith")
-    @Merge(base = LifeStealerTurret.class, value = SoulHoldc.class)
+    @Merge(base = LifeStealerTurret.class, value = Soulc.class)
     Block lifeStealer;
 
     public static @FactionDef("monolith")
-    @Merge(base = AbsorberTurret.class, value = SoulHoldc.class)
+    @Merge(base = AbsorberTurret.class, value = Soulc.class)
     Block absorberAura;
 
     public static @FactionDef("monolith")
-    @Merge(base = HeatRayTurret.class, value = SoulHoldc.class)
+    @Merge(base = HeatRayTurret.class, value = Soulc.class)
     Block heatRay, incandescence;
 
     public static @FactionDef("monolith")
-    @Merge(base = PowerTurret.class, value = {Turretc.class, SoulHoldc.class})
+    @Merge(base = PowerTurret.class, value = {Turretc.class, Soulc.class})
     Block
     ricochet, shellshock, purge,
     blackout,
     diviner, mage;
 
     public static @FactionDef("monolith")
-    @Merge(base = ItemTurret.class, value = {Turretc.class, SoulHoldc.class})
+    @Merge(base = ItemTurret.class, value = {Turretc.class, Soulc.class})
     Block recluse;
 
     public static @FactionDef("monolith")
-    @Merge(base = BurstPowerTurret.class, value = {Turretc.class, SoulHoldc.class})
+    @Merge(base = BurstPowerTurret.class, value = {Turretc.class, Soulc.class})
     Block oracle;
 
     public static @FactionDef("monolith")
@@ -210,7 +210,7 @@ public class UnityBlocks implements ContentList{
         "supernova-wing-left-bottom", "supernova-wing-right-bottom",
         "supernova-bottom"
     }, outline = true)
-    @Merge(base = AttractLaserTurret.class, value = {Turretc.class, SoulHoldc.class, Stemc.class})
+    @Merge(base = AttractLaserTurret.class, value = {Turretc.class, Soulc.class})
     Block supernova;
 
     //---------- youngcha faction ----------
@@ -1863,7 +1863,7 @@ public class UnityBlocks implements ContentList{
             consumes.power(4f);
         }};
 
-        debrisExtractor = new StemSoulHoldFloorExtractor("debris-extractor"){
+        debrisExtractor = new SoulFloorExtractor("debris-extractor"){
             final int effectTimer = timers++;
 
             {
@@ -1881,7 +1881,7 @@ public class UnityBlocks implements ContentList{
                 consumes.power(2.4f);
                 consumes.liquid(Liquids.cryofluid, 0.08f);
 
-                draw((StemSoulFloorExtractorBuild e) -> {
+                draw((SoulFloorExtractorBuild e) -> {
                     Draw.color(UnityPal.monolith, UnityPal.monolithLight, Mathf.absin(Time.time, 6f, 1f) * e.warmup);
                     Draw.alpha(e.warmup);
                     Draw.rect(Regions.debrisExtractorHeat1Region, e.x, e.y);
@@ -1894,7 +1894,7 @@ public class UnityBlocks implements ContentList{
                     Draw.alpha(1f);
                 });
 
-                update((StemSoulFloorExtractorBuild e) -> {
+                update((SoulFloorExtractorBuild e) -> {
                     StemData data = e.data();
                     if(e.consValid()){
                         data.floatValue = Mathf.lerpDelta(data.floatValue, e.efficiency(), 0.02f);
@@ -1983,7 +1983,7 @@ public class UnityBlocks implements ContentList{
             }
         };
 
-        monolithAlloyForge = new StemSoulHoldGenericCrafter("monolith-alloy-forge"){
+        monolithAlloyForge = new SoulGenericCrafter("monolith-alloy-forge"){
             final int effectTimer = timers++;
 
             {
@@ -2002,7 +2002,7 @@ public class UnityBlocks implements ContentList{
                 consumes.items(with(Items.silicon, 3, UnityItems.archDebris, 1, UnityItems.monolite, 2));
                 consumes.liquid(Liquids.cryofluid, 0.1f);
 
-                update((StemSoulGenericCrafterBuild e) -> {
+                update((SoulGenericCrafterBuild e) -> {
                     StemData data = e.data();
                     if(e.consValid()){
                         data.floatValue = Mathf.lerpDelta(data.floatValue, e.efficiency(), 0.02f);
@@ -2056,7 +2056,7 @@ public class UnityBlocks implements ContentList{
             energyMultiplier.put(LaserBoltBulletType.class, 9f);
         }};
 
-        ricochet = new SoulHoldTurretPowerTurret("ricochet"){{
+        ricochet = new SoulTurretPowerTurret("ricochet"){{
             requirements(Category.turret, with(UnityItems.monolite, 40));
 
             size = 1;
@@ -2080,7 +2080,7 @@ public class UnityBlocks implements ContentList{
             damageMultiplier((SoulTurretPowerTurretBuild build) -> efficiencyFrom + (build.souls() / (float)maxSouls) * efficiencyTo);
         }};
 
-        diviner = new SoulHoldTurretPowerTurret("diviner"){{
+        diviner = new SoulTurretPowerTurret("diviner"){{
             requirements(Category.turret, with(Items.lead, 15, UnityItems.monolite, 30));
 
             size = 1;
@@ -2103,7 +2103,7 @@ public class UnityBlocks implements ContentList{
             damageMultiplier((SoulTurretPowerTurretBuild build) -> efficiencyFrom + (build.souls() / (float)maxSouls) * efficiencyTo);
         }};
 
-        lifeStealer = new SoulHoldLifeStealerTurret("life-stealer"){{
+        lifeStealer = new SoulLifeStealerTurret("life-stealer"){{
             requirements(Category.turret, with(Items.silicon, 50, UnityItems.monolite, 25));
 
             size = 1;
@@ -2118,7 +2118,7 @@ public class UnityBlocks implements ContentList{
             laserAlpha((SoulLifeStealerTurretBuild b) -> b.power.status * (0.7f + b.soulf() * 0.3f));
         }};
 
-        recluse = new SoulHoldTurretItemTurret("recluse"){{
+        recluse = new SoulTurretItemTurret("recluse"){{
             requirements(Category.turret, with(Items.lead, 15, UnityItems.monolite, 20));
             ammo(
                 Items.lead, UnityBullets.stopLead,
@@ -2143,7 +2143,7 @@ public class UnityBlocks implements ContentList{
             damageMultiplier((SoulTurretItemTurretBuild build) -> efficiencyFrom + (build.souls() / (float)maxSouls) * efficiencyTo);
         }};
 
-        absorberAura = new SoulHoldAbsorberTurret("absorber-aura"){{
+        absorberAura = new SoulAbsorberTurret("absorber-aura"){{
             requirements(Category.turret, with(Items.silicon, 75, UnityItems.monolite, 125));
 
             size = 2;
@@ -2159,7 +2159,7 @@ public class UnityBlocks implements ContentList{
             laserAlpha((SoulAbsorberTurretBuild b) -> b.power.status * (0.7f + b.soulf() * 0.3f));
         }};
 
-        mage = new SoulHoldTurretPowerTurret("mage"){{
+        mage = new SoulTurretPowerTurret("mage"){{
             requirements(Category.turret, with(Items.lead, 75, Items.silicon, 50, UnityItems.monolite, 25));
 
             size = 2;
@@ -2187,7 +2187,7 @@ public class UnityBlocks implements ContentList{
             damageMultiplier((SoulTurretPowerTurretBuild build) -> efficiencyFrom + (build.souls() / (float)maxSouls) * efficiencyTo);
         }};
 
-        blackout = new SoulHoldTurretPowerTurret("blackout"){{
+        blackout = new SoulTurretPowerTurret("blackout"){{
             requirements(Category.turret, with(Items.graphite, 85, Items.titanium, 25, UnityItems.monolite, 125));
 
             size = 2;
@@ -2234,7 +2234,7 @@ public class UnityBlocks implements ContentList{
             damageMultiplier((SoulTurretPowerTurretBuild build) -> efficiencyFrom + (build.souls() / (float)maxSouls) * efficiencyTo);
         }};
 
-        shellshock = new SoulHoldTurretPowerTurret("shellshock"){{
+        shellshock = new SoulTurretPowerTurret("shellshock"){{
             requirements(Category.turret, with(Items.lead, 90, Items.graphite, 100, UnityItems.monolite, 80));
 
             size = 2;
@@ -2257,7 +2257,7 @@ public class UnityBlocks implements ContentList{
             damageMultiplier((SoulTurretPowerTurretBuild build) -> efficiencyFrom + (build.souls() / (float)maxSouls) * efficiencyTo);
         }};
 
-        heatRay = new SoulHoldHeatRayTurret("heat-ray"){{
+        heatRay = new SoulHeatRayTurret("heat-ray"){{
             requirements(Category.turret, with(Items.copper, 75, Items.lead, 50, Items.graphite, 25, Items.titanium, 45, UnityItems.monolite, 50));
 
             size = 2;
@@ -2276,7 +2276,7 @@ public class UnityBlocks implements ContentList{
             laserAlpha((SoulHeatRayTurretBuild b) -> b.power.status * (0.7f + b.soulf() * 0.3f));
         }};
 
-        oracle = new SoulHoldTurretBurstPowerTurret("oracle"){{
+        oracle = new SoulTurretBurstPowerTurret("oracle"){{
             requirements(Category.turret, with(Items.silicon, 175, Items.titanium, 150, UnityItems.monolithAlloy, 75));
 
             size = 3;
@@ -2320,7 +2320,7 @@ public class UnityBlocks implements ContentList{
             damageMultiplier((SoulTurretBurstPowerTurretBuild build) -> efficiencyFrom + (build.souls() / (float)maxSouls) * efficiencyTo);
         }};
 
-        purge = new SoulHoldTurretPowerTurret("purge"){{
+        purge = new SoulTurretPowerTurret("purge"){{
             requirements(Category.turret, with(Items.plastanium, 75, Items.lead, 350, UnityItems.monolite, 200, UnityItems.monolithAlloy, 75));
 
             size = 3;
@@ -2343,7 +2343,7 @@ public class UnityBlocks implements ContentList{
             damageMultiplier((SoulTurretPowerTurretBuild build) -> efficiencyFrom + (build.souls() / (float)maxSouls) * efficiencyTo);
         }};
 
-        incandescence = new SoulHoldHeatRayTurret("incandescence"){{
+        incandescence = new SoulHeatRayTurret("incandescence"){{
             requirements(Category.turret, with(UnityItems.monolite, 250, Items.phaseFabric, 45, UnityItems.monolithAlloy, 100));
 
             size = 3;
@@ -2364,7 +2364,7 @@ public class UnityBlocks implements ContentList{
             laserAlpha((SoulHeatRayTurretBuild b) -> b.power.status * (0.7f + b.soulf() * 0.3f));
         }};
 
-        supernova = new StemSoulHoldTurretAttractLaserTurret("supernova"){
+        supernova = new SoulTurretAttractLaserTurret("supernova"){
             /** Temporary vector array to be used in the drawing method */
             final Vec2[] phases = {new Vec2(), new Vec2(), new Vec2(), new Vec2(), new Vec2(), new Vec2()};
             final float starRadius;
@@ -2419,10 +2419,10 @@ public class UnityBlocks implements ContentList{
                 efficiencyFrom = 0.5f;
                 efficiencyTo = 1.9f;
 
-                damageMultiplier((StemSoulTurretAttractLaserTurretBuild build) -> efficiencyFrom + (build.souls() / (float)maxSouls) * efficiencyTo);
+                damageMultiplier((SoulTurretAttractLaserTurretBuild build) -> efficiencyFrom + (build.souls() / (float)maxSouls) * efficiencyTo);
 
                 drawer = b -> {
-                    if(b instanceof StemSoulTurretAttractLaserTurretBuild tile){
+                    if(b instanceof SoulTurretAttractLaserTurretBuild tile){
                         //core
                         phases[0].trns(tile.rotation, -tile.recoil + Mathf.curve(tile.phase, 0f, 0.3f) * -2f);
                         //left wing
@@ -2500,7 +2500,7 @@ public class UnityBlocks implements ContentList{
                     Draw.blend();
                 };
 
-                draw((StemSoulTurretAttractLaserTurretBuild tile) -> {
+                draw((SoulTurretAttractLaserTurretBuild tile) -> {
                     boolean notShooting = tile.bulletLife() <= 0f || tile.bullet() == null;
                     Tmp.v1.trns(tile.rotation, -tile.recoil + starOffset + Mathf.curve(tile.phase, 0f, 0.3f) * -2f);
 
@@ -2535,7 +2535,7 @@ public class UnityBlocks implements ContentList{
                     Draw.z(z);
                 });
 
-                update((StemSoulTurretAttractLaserTurretBuild tile) -> {
+                update((SoulTurretAttractLaserTurretBuild tile) -> {
                     boolean notShooting = tile.bulletLife() <= 0f || tile.bullet() == null;
                     boolean tick = Mathf.chanceDelta(1f);
                     boolean tickCharge = Mathf.chanceDelta(tile.charge);

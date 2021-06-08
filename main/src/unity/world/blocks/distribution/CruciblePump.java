@@ -16,6 +16,8 @@ import unity.graphics.*;
 import unity.world.blocks.*;
 import unity.world.meta.*;
 
+import static mindustry.Vars.*;
+
 public class CruciblePump extends GraphBlock{
     public static final float[] fillAm = new float[]{1f, 0.5f, 0.25f};
     public final TextureRegion[] topRegions = new TextureRegion[4];
@@ -69,7 +71,7 @@ public class CruciblePump extends GraphBlock{
                 sub.clearChildren();
                 sub.left();
                 if(filterItem != null){
-                    sub.image(filterItem.uiIcon);
+                    sub.image(filterItem.uiIcon).size(iconMed);
                     sub.label(() -> Strings.fixed(flowRate * 10f, 2) + "units" + ps).color(Color.lightGray);
                 }else{
                     sub.labelWrap("No filter selected").color(Color.lightGray);

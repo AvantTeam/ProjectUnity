@@ -14,6 +14,8 @@ import unity.graphics.*;
 import unity.world.blocks.*;
 import unity.world.meta.*;
 
+import static mindustry.Vars.*;
+
 public class CastingMold extends GraphBlock{
     final TextureRegion[] baseRegions = new TextureRegion[4], topRegions = new TextureRegion[4];
 
@@ -59,7 +61,7 @@ public class CastingMold extends GraphBlock{
                 sub.left();
                 
                 if(castingMelt != null){
-                    sub.image(castingMelt.item.uiIcon);
+                    sub.image(castingMelt.item.uiIcon).size(iconMed);
                     sub.label(() -> {
                         if(pourProgress == 1f && castSpeed == 0f) return tooHot;
                         
@@ -155,10 +157,10 @@ public class CastingMold extends GraphBlock{
                     Draw.rect(liquidRegion, x, y, rotdeg());
                     
                     Draw.color();
-                    Draw.rect(castingMelt.item.uiIcon, x, y, pourProgress * 8f, pourProgress * 8f);
+                    Draw.rect(castingMelt.item.fullIcon, x, y, pourProgress * 8f, pourProgress * 8f);
                 }
                 if(castProgress < 1f && pourProgress > 0f){
-                    UnityDrawf.drawHeat(castingMelt.item.uiIcon, x, y, 0f, Mathf.map(castProgress, 0f, 1f, castingMelt.meltPoint, 275f));
+                    UnityDrawf.drawHeat(castingMelt.item.fullIcon, x, y, 0f, Mathf.map(castProgress, 0f, 1f, castingMelt.meltPoint, 275f));
                 }
             }
 

@@ -20,6 +20,8 @@ import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import unity.graphics.*;
 
+import static mindustry.Vars.*;
+
 public class ModularConstructorUI extends Element{
     static final Color[] colorPorts = new Color[100];
     static ImageButton prevChecked;
@@ -81,7 +83,7 @@ public class ModularConstructorUI extends Element{
                     butt.table(botTable -> {
                         int i = 0;
                         for(var cst : pinfo.cost){
-                            botTable.image(cst.item.uiIcon).left();
+                            botTable.image(cst.item.uiIcon).size(iconSmall).left();
                             botTable.add("[gray]" + Mathf.floor(cst.amount * costInc)).padLeft(2f).left().padRight(4f);
                             if(i++ % 2 == 1) botTable.row();
                         }
@@ -117,7 +119,7 @@ public class ModularConstructorUI extends Element{
             cstTable.table(botTable -> {
                 var csTot = modElement.getTotalCost();
                 for(var cost : csTot){
-                    botTable.image(cost.key.uiIcon).left();
+                    botTable.image(cost.key.uiIcon).size(iconSmall).left();
                     botTable.add("[gray]" + cost.value).padLeft(2f).left().padRight(4f).row();
                 }
             });
