@@ -274,6 +274,13 @@ abstract class WormComp implements Unitc{
                 u.rotation(u.rotation() + (limit * side * smooth));
                 Tmp.v2.trns(u.rotation(), uType.segmentOffset / 2f).add(u);
                 Tmp.v1.trns(last.rotation() + 180f, (uType.segmentOffset / 2f) + offset).add(last);
+
+                if(!u.within(Tmp.v1, uType.segmentOffset + 0.001f)){
+                    float dst = Mathf.clamp(Tmp.v2.dst(Tmp.v1) / 6f) / 2f;
+                    last.rotation = Mathf.slerp(last.rotation, u.angleTo(last), dst);
+                    Tmp.v1.trns(last.rotation() + 180f, (uType.segmentOffset / 2f) + offset).add(last);
+                }
+
                 Tmp.v2.sub(Tmp.v1).scl(uType.jointStrength);
 
                 u.set(u.x - Tmp.v2.x, u.y - Tmp.v2.y);
