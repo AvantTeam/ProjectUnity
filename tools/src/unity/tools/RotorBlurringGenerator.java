@@ -25,6 +25,7 @@ public class RotorBlurringGenerator implements Generator{
             String fname = fixName(type.name);
             String bladeSpriteName = fname + "-rotor-blade";
             String ghostSpriteName = fname + "-rotor-blade-ghost";
+            String shadeSpriteName = fname + "-rotor-blade-shade";
 
             if(has(ghostSpriteName)){
                 Unity.print(Strings.format("Rotor Blade sprite override for @ exists, skipping", ghostSpriteName));
@@ -50,8 +51,6 @@ public class RotorBlurringGenerator implements Generator{
 
             Unity.print(Strings.format("Saving @ with blade length @", ghostSpriteName, bladeLength));
             save(ghostSprite, fname, ghostSpriteName);
-
-            String shadeSpriteName = type.name + "-rotor-blade-shade";
 
             if(has(shadeSpriteName)){
                 Unity.print(Strings.format("Rotor Blade shade sprite override for @ exists, skipping", shadeSpriteName));

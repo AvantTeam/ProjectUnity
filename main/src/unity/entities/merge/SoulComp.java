@@ -2,6 +2,7 @@ package unity.entities.merge;
 
 import arc.*;
 import arc.func.*;
+import arc.math.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.gen.*;
@@ -9,6 +10,7 @@ import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.defense.turrets.Turret.*;
 import mindustry.world.meta.*;
+import unity.ai.*;
 import unity.annotations.Annotations.*;
 import unity.entities.*;
 import unity.gen.*;
@@ -97,6 +99,34 @@ abstract class SoulComp extends Block implements Stemc{
                 unjoin();
                 wasPlayer = false;
             }
+        }
+
+        @Override
+        public void onRemoved(){
+            if(net.server() || !net.active()){
+                spreadSouls();
+            }
+        }
+
+        @Override
+        public void onDestroyed(){
+            if(net.server() || !net.active()){
+                spreadSouls();
+            }
+        }
+
+        @Override
+        public boolean apply(MonolithSoul soul, int index, boolean transferred){
+            if(isControlled() && !transferred && (Mathf.chance(1f / souls) || index == souls - 1)){
+                soul.controller(unit.getPlayer());
+                transferred = true;
+            }
+
+            if(soul.controller() instanceof MonolithSoulAI ai){
+                ai.empty = false;
+            }
+
+            return transferred;
         }
 
         @Override

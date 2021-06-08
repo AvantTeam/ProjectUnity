@@ -1,7 +1,6 @@
 package unity.entities.comp;
 
 import arc.math.*;
-import arc.util.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -54,32 +53,22 @@ abstract class MonolithComp implements Unitc, Factionc, Soul{
     @Override
     public void killed(){
         if(net.server() || !net.active()){
-            boolean transferred = false;
-
-            float start = Mathf.random(360f);
-            for(int i = 0; i < souls; i++){
-                MonolithSoul soul = MonolithSoul.defaultType.get().create(team).as();
-                soul.resetController();
-
-                Tmp.v1.trns(Mathf.random(360f), Mathf.random(hitSize));
-                soul.set(x + Tmp.v1.x, y + Tmp.v1.y);
-
-                Tmp.v1.trns(start + 360f / souls * i, Mathf.random(6f, 12f));
-                soul.rotation = Tmp.v1.angle();
-                soul.vel.set(Tmp.v1.x, Tmp.v1.y);
-                soul.healAmount = maxHealth / 10f / souls;
-
-                if(isPlayer() && !transferred && (Mathf.chance(1f / souls) || i == souls - 1)){
-                    soul.controller(getPlayer());
-                    transferred = true;
-                }
-
-                if(controller instanceof MonolithSoulAI ai){
-                    ai.empty = false;
-                }
-                soul.add();
-            }
+            spreadSouls();
         }
+    }
+
+    @Override
+    public boolean apply(MonolithSoul soul, int index, boolean transferred){
+        if(isPlayer() && !transferred && (Mathf.chance(1f / souls) || index == souls - 1)){
+            soul.controller(getPlayer());
+            transferred = true;
+        }
+
+        if(soul.controller() instanceof MonolithSoulAI ai){
+            ai.empty = false;
+        }
+
+        return transferred;
     }
 
     public boolean disabled(){

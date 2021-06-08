@@ -15,14 +15,13 @@ import unity.gen.*;
 import unity.gen.Soulc.*;
 import unity.mod.*;
 import unity.sync.*;
-import unity.util.*;
 
 import static mindustry.Vars.*;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused"})
 @EntityDef({Unitc.class, MonolithSoulc.class, Factionc.class})
 @EntityComponent
-abstract class MonolithSoulComp implements Unitc, Factionc{
+abstract class MonolithSoulComp implements Unitc, Unintersectablec, Factionc{
     static final Rect rec1 = new Rect();
     static final Rect rec2 = new Rect();
 
@@ -101,17 +100,6 @@ abstract class MonolithSoulComp implements Unitc, Factionc{
         return Integer.MAX_VALUE;
     }
 
-    @Override
-    @MethodPriority(-1)
-    @BreakAll
-    public void hitbox(Rect rect){
-        Class<?> caller = ReflectUtils.classCaller();
-        if(caller != null && QuadTree.class.isAssignableFrom(caller)){
-            rect.set(x, y, Float.NaN, Float.NaN);
-            return;
-        }
-    }
-
     public <T extends Entityc> void invoke(T ent){
         UnityCall.soulJoin(self(), ent);
     }
@@ -142,5 +130,10 @@ abstract class MonolithSoulComp implements Unitc, Factionc{
         }
 
         Units.unitDeath(soul.id);
+    }
+
+    @Override
+    public boolean intersects(){
+        return false;
     }
 }
