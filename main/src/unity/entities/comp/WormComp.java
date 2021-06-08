@@ -230,6 +230,11 @@ abstract class WormComp implements Unitc{
         }
     }
 
+    @Wrap(value = "update()", block = Boundedc.class)
+    public boolean updateBounded(){
+        return isHead();
+    }
+
     @Insert(value = "update()", block = Statusc.class)
     private void updateHealthDiv(){
         healthMultiplier /= splitHealthDiv;
@@ -269,18 +274,21 @@ abstract class WormComp implements Unitc{
                 u.rotation(u.rotation() + (limit * side * smooth));
                 Tmp.v2.trns(u.rotation(), uType.segmentOffset / 2f).add(u);
                 Tmp.v1.trns(last.rotation() + 180f, (uType.segmentOffset / 2f) + offset).add(last);
-                Tmp.v2.sub(Tmp.v1);
+                Tmp.v2.sub(Tmp.v1).scl(uType.jointStrength);
 
-                u.move(-Tmp.v2.x, -Tmp.v2.y);
+                u.set(u.x - Tmp.v2.x, u.y - Tmp.v2.y);
 
                 Tmp.v1.set(u.vel).rotate(-u.rotation);
                 Tmp.v1.x = 0f;
-                Tmp.v1.rotate(u.rotation).scl(0.7f * Time.delta);
+                Tmp.v1.rotate(u.rotation).scl(0.1f * Time.delta);
                 u.vel.sub(Tmp.v1);
 
                 float vl = vel().len();
                 Tmp.v1.trns(u.angleTo(last), vl).add(u.vel).setLength(vl);
-                u.vel.lerpDelta(Tmp.v1, type.speed * type.accel);
+                u.vel.lerpDelta(Tmp.v1, type.accel * type.speed).limit(vl);
+                if(u.deltaLen() > last.vel().len()){
+                    u.vel.scl(1f - Mathf.clamp(0.3f * Time.delta));
+                }
 
                 float nextHealth = (last.health() + u.health()) / 2f;
                 if(!Mathf.equal(nextHealth, last.health(), 0.0001f)) last.health(Mathf.lerpDelta(last.health(), nextHealth, uType.healthDistribution));
@@ -376,11 +384,19 @@ abstract class WormComp implements Unitc{
         Unit current = self();
         if(isHead()){
             if(child == null){
+                float rot = rotation() + uType.angleLimit;
+                Tmp.v1.trns(rot + 180f, uType.segmentOffset + uType.headOffset).add(self());
                 for(int i = 0; i < uType.segmentLength; i++){
                     Unit t = uType.create(team());
-                    t.x = x() - (i * uType.segmentOffset);
-                    t.y = y();
+                    t.x = Tmp.v1.x;
+                    t.y = Tmp.v1.y;
+                    t.rotation = rot;
                     t.elevation = elevation();
+
+                    rot += uType.angleLimit;
+                    Tmp.v2.trns(rot + 180f, uType.segmentOffset);
+                    Tmp.v1.add(Tmp.v2);
+
                     Wormc wt = (Wormc)t;
                     wt.layer(i + 1f);
                     wt.head(self());

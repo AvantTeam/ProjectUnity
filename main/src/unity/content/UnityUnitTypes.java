@@ -3186,7 +3186,7 @@ public class UnityUnitTypes implements ContentList{
             rotateShooting = false;
             splittable = chainable = false;
             hitSize = 41f * 1.55f;
-            segmentOffset = (41f * 1.55f) + 4f;
+            segmentOffset = (41f * 1.55f) + 7f;
             headOffset = 27.75f;
             segmentLength = 60;
             lowAltitude = true;
@@ -3195,8 +3195,9 @@ public class UnityUnitTypes implements ContentList{
             engineSize = -1f;
             range = 480f;
             armor = 16f;
-            anglePhysicsSide = 0.1f;
-            anglePhysicsSmooth = 0.4f;
+            anglePhysicsSide = 0.05f;
+            anglePhysicsSmooth = 0.5f;
+            jointStrength = 0.9f;
             omniMovement = false;
             outlineColor = UnityPal.darkerOutline;
             envEnabled = Env.terrestrial | Env.space;

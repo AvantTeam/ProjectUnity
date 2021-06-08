@@ -40,6 +40,7 @@ public class UnityUnitType extends UnitType{
     public float segmentDamageScl = 6f;
     public float anglePhysicsSide = 0.25f;
     public float anglePhysicsSmooth = 0f;
+    public float jointStrength = 1f;
     // Hopefully make segment movement more consistent
     public boolean counterDrag = false;
     public boolean splittable = false, chainable = false;
