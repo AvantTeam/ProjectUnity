@@ -5,11 +5,38 @@ import mindustry.gen.*;
 import unity.annotations.Annotations.*;
 import unity.gen.*;
 
-/** A test component whose purpose is to test out annotation implementations. Do not use! */
+/**
+ * A test component whose purpose is to test out annotation implementations. Do not use directly!
+ *
+ * <p>This component will generate {@link Testc} interface of which declared methods are all methods in this comp
+ * that aren't {@code protected}/{@code private} and has no {@link Override}, <i>and</i> getter/setters of which
+ * requirements are:
+ *
+ * <ol>
+ * <li> Getter:
+ *   <ol>
+ *
+ *   <li> Has no {@link Import}.
+ *   <li> Must have no modifiers <i>(implicitly {@code public})</i>.
+ *   <li> Is not {@code private}.
+ *
+ *   </ol>
+ * <li> Setter:
+ *   <ol>
+ *
+ *   <li> Has no {@link Import}.
+ *   <li> Must have no modifiers <i>(implicitly {@code public})</i>.
+ *   <li> Is not {@code private}.
+ *   <li> Has no {@link ReadOnly}. If this is the case, the generated field in future entity class(es) will be
+ *     {@code protected}.
+ *
+ *   </ol>
+ * </ol>
+ */
 @SuppressWarnings({"unused", "UnnecessaryReturnStatement"})
 @EntityDef({Unitc.class, Testc.class})
 @EntityComponent
-abstract class TestComp implements Unitc{
+public abstract class TestComp implements Unitc{
     /** Import fields from another component */
     @Import float health, maxHealth;
 
