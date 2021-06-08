@@ -27,7 +27,8 @@ import unity.world.modules.*;
 import younggamExperimental.*;
 import younggamExperimental.blocks.Chopper.*;
 
-import static arc.Core.atlas;
+import static arc.Core.*;
+import static mindustry.Vars.*;
 
 public class ModularTurret extends Turret implements GraphBlockBase{
     static final int mask = 65535;
@@ -153,7 +154,7 @@ public class ModularTurret extends Turret implements GraphBlockBase{
                 if(blueprintRemainingCost.isEmpty()) sub.labelWrap("No blueprint").color(Color.lightGray);
                 else{//idk
                     for(var i : blueprintRemainingCost){
-                        sub.image(i.key.uiIcon);
+                        sub.image(i.key.uiIcon).size(iconMed);
                         sub.add((i.value >>> 16) + "/" + (i.value & mask));
                         sub.row();
                     }

@@ -50,14 +50,17 @@ public class FloorExtractor extends GenericCrafter{
 
         for(Block block : blocks){
             stats.add(Stat.tiles, table -> table.stack(
-                new Image(block.uiIcon)
-                    .setScaling(Scaling.fit), new Table(cont ->
-                        cont.top()
-                            .right()
-                            .add("[accent]" + (int)((sources.get(block.id)) * 100f) + "%")
-                            .style(Styles.outlineLabel)
-                    )
-                )
+                new Image(block.uiIcon){{
+                    setSize(iconMed);
+                    setScaling(Scaling.fit);
+                }},
+
+                new Table(cont ->
+                    cont.top()
+                        .right()
+                        .add("[accent]" + (int)((sources.get(block.id)) * 100f) + "%")
+                        .style(Styles.outlineLabel)
+                ))
             );
         }
     }

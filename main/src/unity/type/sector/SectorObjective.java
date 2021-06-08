@@ -356,7 +356,7 @@ public abstract class SectorObjective{
 
                                     hold.left();
                                     hold.image(() -> item.item.uiIcon)
-                                        .scaling(Scaling.bounded);
+                                        .size(iconMed);
 
                                     hold.right();
                                     hold.labelWrap(() -> {
