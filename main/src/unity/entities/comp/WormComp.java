@@ -262,9 +262,11 @@ abstract class WormComp implements Unitc{
                 float offset = self() == last ? uType.headOffset : 0f;
                 Tmp.v1.trns(last.rotation + 180f, (uType.segmentOffset / 2f) + offset).add(last);
                 u.rotation = u.angleTo(Tmp.v1);
-                float limit = Utils.angleDistSigned(last.rotation(), u.rotation(), uType.angleLimit) / 2f;
-                last.rotation(last.rotation() - limit);
-                u.rotation(u.rotation() + limit);
+                float limit = Utils.angleDistSigned(last.rotation(), u.rotation(), uType.angleLimit);
+                float side = 1f - uType.anglePhysicsSide;
+                float smooth = 1f - uType.anglePhysicsSmooth;
+                last.rotation(last.rotation() - (limit * uType.anglePhysicsSide * smooth));
+                u.rotation(u.rotation() + (limit * side * smooth));
                 Tmp.v2.trns(u.rotation(), uType.segmentOffset / 2f).add(u);
                 Tmp.v1.trns(last.rotation() + 180f, (uType.segmentOffset / 2f) + offset).add(last);
                 Tmp.v2.sub(Tmp.v1);
@@ -273,12 +275,12 @@ abstract class WormComp implements Unitc{
 
                 Tmp.v1.set(u.vel).rotate(-u.rotation);
                 Tmp.v1.x = 0f;
-                Tmp.v1.rotate(u.rotation).scl(0.1f * Time.delta);
+                Tmp.v1.rotate(u.rotation).scl(0.7f * Time.delta);
                 u.vel.sub(Tmp.v1);
 
-                Tmp.v1.trns(u.angleTo(last), last.vel().len());
-                float lastLen = u.vel.len();
-                u.vel().add(Tmp.v1).setLength(Math.max(last.vel().len(), lastLen));
+                float vl = vel().len();
+                Tmp.v1.trns(u.angleTo(last), vl).add(u.vel).setLength(vl);
+                u.vel.lerpDelta(Tmp.v1, type.speed * type.accel);
 
                 float nextHealth = (last.health() + u.health()) / 2f;
                 if(!Mathf.equal(nextHealth, last.health(), 0.0001f)) last.health(Mathf.lerpDelta(last.health(), nextHealth, uType.healthDistribution));
@@ -290,12 +292,12 @@ abstract class WormComp implements Unitc{
                 if(!Mathf.equal(nextHealth, u.splitHealthDiv(), 0.0001f)) u.splitHealthDiv(Mathf.lerpDelta(u.splitHealthDiv(), nextHealthDv, uType.healthDistribution));
                 last = u;
             });
-            scanTime += Time.delta;
-            if(scanTime >= 5f && uType.chainable){
+            if(isHead()) scanTime += Time.delta;
+            if(scanTime >= 5f && uType.chainable && isHead()){
                 Tmp.v1.trns(rotation(), uType.segmentOffset / 2f).add(self());
                 Tmp.r1.setCentered(Tmp.v1.x, Tmp.v1.y, hitSize());
                 Units.nearby(Tmp.r1, u -> {
-                    if(u.team == team && isHead() && u.type == type && u instanceof Wormc w && w.head() != self() && w.isTail() && w.waitTime() <= 0f && within(u, uType.segmentOffset) && Utils.angleDist(rotation(), angleTo(u)) < uType.angleLimit){
+                    if(u.team == team && u.type == type && u instanceof Wormc w && w.head() != self() && w.isTail() && w.waitTime() <= 0f && within(u, uType.segmentOffset) && Utils.angleDist(rotation(), angleTo(u)) < uType.angleLimit){
                         connect(w);
                     }
                 });

@@ -38,6 +38,8 @@ public class UnityUnitType extends UnitType{
     public float angleLimit = 30f;
     public float regenTime = -1f, healthDistribution = 0.1f;
     public float segmentDamageScl = 6f;
+    public float anglePhysicsSide = 0.25f;
+    public float anglePhysicsSmooth = 0f;
     // Hopefully make segment movement more consistent
     public boolean counterDrag = false;
     public boolean splittable = false, chainable = false;
