@@ -28,6 +28,7 @@ allprojects {
         sdkRoot = { return System.getenv('ANDROID_SDK_ROOT') }
         hasSprites = { return new File(rootDir, 'main/assets/sprites/').exists() }
         windows = { return System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows') }
+        devBuild = { return project.hasProperty('dev') && Boolean.parseBoolean(project.property('dev') as String) }
     }
 
     repositories {

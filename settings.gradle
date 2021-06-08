@@ -5,3 +5,5 @@ if(JavaVersion.current().ordinal() < JavaVersion.VERSION_15.ordinal()){
 include 'annotations', 'tools', 'main'
 
 rootProject.name = 'project-unity'
+include 'dev'
+

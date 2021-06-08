@@ -37,8 +37,10 @@ ext {
 task deploy(type: Jar, dependsOn: configurations.runtimeClasspath) {
     if(!hasSprites()) {
         println 'Sprites folder not found; automatically processing sprites...'
-        deploy.dependsOn ":tools:proc"
+        dependsOn ":tools:proc"
     }
+
+    println "Compiling ${devBuild() ? 'dev' : 'user'} build."
 
     archiveFileName = "${modName}Desktop.jar"
 
@@ -51,6 +53,9 @@ task deploy(type: Jar, dependsOn: configurations.runtimeClasspath) {
     exclude 'unity/fetched/**'
     exclude 'unity/entities/comp/**'
     exclude 'unity/entities/merge/**'
+    if(!devBuild()) {
+        exclude 'unity/mod/DevBuildImpl*'
+    }
 }
 
 task dex(dependsOn: deploy) {
@@ -228,4 +233,7 @@ jar {
     exclude 'unity/fetched/**'
     exclude 'unity/entities/comp/**'
     exclude 'unity/entities/merge/**'
+    if(!devBuild()) {
+        exclude 'unity/mod/DevBuildImpl*'
+    }
 }

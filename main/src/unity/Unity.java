@@ -60,8 +60,10 @@ public class Unity extends Mod implements ApplicationListener{
         try{
             Class<? extends DevBuild> impl = (Class<? extends DevBuild>)Class.forName("unity.mod.DevBuildImpl");
             dev = impl.getDeclaredConstructor().newInstance();
+
+            print("Dev build class implementation found and instantiated.");
         }catch(Throwable e){
-            print("Dev build class implementation not found, defaulting to regular user implementation.");
+            print("Dev build class implementation not found; defaulting to regular user implementation.");
             dev = new DevBuild(){};
         }
 
