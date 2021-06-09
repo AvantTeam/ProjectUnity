@@ -17,8 +17,7 @@ repositories {
 dependencies {
     implementation project(':main')
 
-    implementation "com.github.Anuken.Arc:arc-core:$arcVersion"
-    implementation "com.github.Anuken.Arc:natives-desktop:$arcVersion"
+    implementation "com.github.Anuken.Arc:natives-desktop:2583b8229309dbe5a5c30b647779be5163feb68f"
     implementation "com.github.Anuken.Mindustry:core:$mindustryVersion"
 }
 
@@ -36,7 +35,7 @@ task proc(dependsOn: [classes, configurations.runtimeClasspath]) {
         javaexec {
             main imageProcessorMain
             classpath sourceSets.main.runtimeClasspath
-            jvmArgs += ['-Xms1024m', '-Xmx1024m', '-Djava.awt.headless=true']
+            jvmArgs += '-Djava.awt.headless=true'
             standardInput System.in
             workingDir file('../main/assets/')
         }

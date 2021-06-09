@@ -8,7 +8,6 @@ import arc.util.*
 import arc.util.serialization.*
 
 dependencies {
-    compileOnly "com.github.Anuken.Arc:arc-core:$arcVersion"
     compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
 
     annotationProcessor "com.github.Anuken:jabel:$jabelVersion"
