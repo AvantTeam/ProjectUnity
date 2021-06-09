@@ -102,17 +102,15 @@ public class Unity extends Mod implements ApplicationListener{
             UnityShaders.dispose();
         });
 
-        music = new MusicHandler();
+        music = new MusicHandler(){};
         tap = new TapHandler();
         antiCheat = new AntiCheat();
 
         if(Core.app != null){
             ApplicationListener listener = Core.app.getListeners().first();
             if(listener instanceof ApplicationCore core){
-                core.add(music);
                 core.add(antiCheat);
             }else{
-                Core.app.addListener(music);
                 Core.app.addListener(antiCheat);
             }
         }

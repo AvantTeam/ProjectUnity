@@ -1,12 +1,7 @@
 package unity.annotations;
 
-import arc.*;
-import arc.assets.*;
-import arc.assets.loaders.MusicLoader.*;
 import arc.audio.*;
 import arc.struct.*;
-import arc.util.*;
-import arc.util.io.*;
 import mindustry.*;
 import mindustry.ctype.*;
 
@@ -23,17 +18,11 @@ import unity.annotations.Annotations.*;
 @SuppressWarnings({"unchecked"})
 @SupportedAnnotationTypes({
     "unity.annotations.Annotations.FactionDef",
-    "unity.annotations.Annotations.MusicDef",
     "unity.annotations.Annotations.FactionBase"
 })
 public class FactionProcessor extends BaseProcessor{
     Seq<VariableElement> factions = new Seq<>();
-    Seq<VariableElement> musics = new Seq<>();
     TypeElement faction;
-
-    {
-        rounds = 2;
-    }
 
     @Override
     public void process(RoundEnvironment roundEnv) throws Exception{
@@ -48,106 +37,8 @@ public class FactionProcessor extends BaseProcessor{
         }
 
         if(round == 1){
-            processMusics();
-        }else if(round == 2){
-            musics.addAll((Set<VariableElement>)roundEnv.getElementsAnnotatedWith(MusicDef.class));
             processFactions();
         }
-    }
-
-    protected void processMusics() throws Exception{
-        TypeSpec.Builder musicSpec = TypeSpec.classBuilder("UnityMusics").addModifiers(Modifier.PUBLIC)
-            .addJavadoc("Unity's {@link $T}s", cName(Music.class))
-            .addMethod(
-                MethodSpec.methodBuilder("loadMusic").addModifiers(Modifier.PROTECTED, Modifier.STATIC)
-                    .addJavadoc(
-                        CodeBlock.builder()
-                            .add("Loads a {@link $T}" + lnew(), cName(Music.class))
-                            .add("@param musicName The {@link $T} name" + lnew(), cName(Music.class))
-                            .add("@return The {@link $T}", cName(Music.class))
-                        .build()
-                    )
-                    .returns(cName(Music.class))
-                    .addParameter(cName(String.class), "musicName")
-                    .beginControlFlow("if(!$T.headless)", cName(Vars.class))
-                        .addStatement("$T name = $S + musicName", cName(String.class), "music/")
-                        .addStatement("$T path = $T.tree.get(name + $S).exists() ? name + $S : name + $S", cName(String.class), cName(Vars.class), ".ogg", ".ogg", ".mp3")
-                        .addCode(lnew())
-                        .addStatement("var music = new $T()", cName(Music.class))
-                        .addCode(lnew())
-                        .addStatement("$T<?> desc = $T.assets.load(path, $T.class, new $T(music))", cName(AssetDescriptor.class), cName(Core.class), cName(Music.class), cName(MusicParameter.class))
-                        .addStatement("desc.errored = $T::printStackTrace", cName(Throwable.class))
-                        .addCode(lnew())
-                        .addStatement("return music")
-                    .nextControlFlow("else")
-                        .addStatement("return new $T()", cName(Music.class))
-                    .endControlFlow()
-                .build()
-            )
-            .addMethod(
-                MethodSpec.methodBuilder("disposeMusic").addModifiers(Modifier.PROTECTED, Modifier.STATIC)
-                    .addJavadoc(
-                        CodeBlock.builder()
-                            .add("Disposes a {@link $T}" + lnew(), cName(Music.class))
-                            .add("@param musicName The {@link $T} name" + lnew(), cName(Music.class))
-                            .add("@return {@code null}")
-                        .build()
-                    )
-                    .returns(cName(Music.class))
-                    .addParameter(cName(String.class), "musicName")
-                    .beginControlFlow("if(!$T.headless)", cName(Vars.class))
-                        .addStatement("$T name = $S + musicName", cName(String.class), "music/")
-                        .addStatement("$T path = name + $S", cName(String.class), ".mp3")
-                        .addCode(lnew())
-                        .beginControlFlow("if($T.assets.isLoaded(path, $T.class))", cName(Core.class), cName(Music.class))
-                            .addStatement("$T.assets.unload(path)", cName(Core.class))
-                        .endControlFlow()
-                    .endControlFlow()
-                    .addCode(lnew())
-                    .addStatement("return null")
-                .build()
-            );
-        MethodSpec.Builder load = MethodSpec.methodBuilder("load").addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-            .addJavadoc("Loads all {@link $T}s", cName(Music.class))
-            .returns(TypeName.VOID);
-
-        MethodSpec.Builder dispose = MethodSpec.methodBuilder("dispose").addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-            .addJavadoc("Disposes all {@link $T}s", cName(Music.class))
-            .returns(TypeName.VOID);
-
-        ObjectMap<String, String> musProp = new ObjectMap<>();
-        PropertiesUtils.load(musProp, rootDir.child("main/assets/music/music.properties").reader());
-
-        String dir = "main/assets/music/";
-        rootDir.child(dir).walk(path -> {
-            if(!path.name().endsWith(".mp3")) return;
-
-            String p = path.absolutePath();
-            String name = p.substring(p.lastIndexOf(dir) + dir.length(), p.length());
-            String fname = path.nameWithoutExtension();
-            String stripped = name.substring(0, name.length() - 4);
-
-            FieldSpec.Builder music = FieldSpec.builder(tName(Music.class), Strings.kebabToCamel(fname), Modifier.PUBLIC, Modifier.STATIC);
-            if(musProp.containsKey("music." + stripped + ".faction")){
-                music.addAnnotation(
-                    AnnotationSpec.builder(cName(MusicDef.class))
-                        .addMember("facType", "$S", musProp.get("music." + stripped + ".faction"))
-                        .addMember("category", "$S", musProp.get("music." + stripped + ".category", "ambient"))
-                    .build()
-                );
-            }
-
-            musicSpec.addField(music.build());
-
-            load.addStatement("$L = loadMusic($S)", Strings.kebabToCamel(fname), stripped);
-            dispose.addStatement("$L = disposeMusic($S)", Strings.kebabToCamel(fname), stripped);
-        });
-
-        musicSpec
-            .addMethod(load.build())
-            .addMethod(dispose.build());
-
-        write(musicSpec.build());
     }
 
     protected void processFactions() throws Exception{
@@ -303,17 +194,6 @@ public class FactionProcessor extends BaseProcessor{
             before = fac;
 
             initializer.addStatement("put($T.$L, $T.$L)", up, c, upf, fac);
-        }
-
-        for(VariableElement e : musics){
-            TypeName up = TypeName.get(e.getEnclosingElement().asType());
-            String c = e.getSimpleName().toString();
-            TypeName upf = tName(faction);
-            MusicDef def = annotation(e, MusicDef.class);
-
-            initializer.addCode(lnew());
-            initializer.addStatement("put($T.$L, $T.$L)", up, c, upf, def.facType());
-            initializer.addStatement("music.put($T.$L, $S)", up, c, def.category());
         }
 
         facMeta.addMethod(initializer.build());
