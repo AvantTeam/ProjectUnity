@@ -84,7 +84,6 @@ public class Unity extends Mod implements ApplicationListener{
             Events.on(FileTreeInitEvent.class, e -> {
                 UnityObjs.load();
                 UnitySounds.load();
-                UnityMusics.load();
                 UnityShaders.load();
             });
 
@@ -92,13 +91,11 @@ public class Unity extends Mod implements ApplicationListener{
         }else{
             UnityObjs.load();
             UnitySounds.load();
-            UnityMusics.load();
         }
 
         Events.on(DisposeEvent.class, e -> {
             UnityObjs.dispose();
             UnitySounds.dispose();
-            UnityMusics.dispose();
             UnityShaders.dispose();
         });
 
