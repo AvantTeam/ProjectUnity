@@ -65,6 +65,10 @@ public class KamiAI implements UnitController, Position{
         return unit.as();
     }
 
+    public Rect barrier(){
+        return barrier;
+    }
+
     public void draw(){
         Draw.color(tcolor.set(Color.red).shiftHue(Time.time * 3f));
         Draw.blend(Blending.additive);

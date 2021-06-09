@@ -2,6 +2,7 @@ package unity.ai.kami;
 
 import arc.func.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.gen.*;
@@ -13,7 +14,8 @@ import java.util.*;
 
 public class KamiBulletDatas{
     public static Seq<Func<Bullet, KamiBulletData>> dataSeq = new Seq<>();
-    public static int accelTurn, expandShrink, turnRegular, nonDespawnable, slowDownWaitAccel, junkoSlowDown, junkoLaser;
+    public static int accelTurn, expandShrink, turnRegular, nonDespawnable, slowDownWaitAccel,
+    junkoSlowDown, junkoLaser, bounceSimple;
 
     //preset datas
     public static void load(){
@@ -68,10 +70,11 @@ public class KamiBulletDatas{
                 Bullet b3 = lType.create(bl.owner, ((Teamc)bl.owner).team(), dat);
                 b3.lifetime = bl.lifetime;
                 b3.time = bl.time;
-                //Unity.print("kL");
             }),
             new DataStage(45f, (data, bl) -> bl.vel.set(1f, 0f).setLength(data.fin() * data.attribute).setAngle(data.initialRotation))).attribute(b.vel.len())
         );
+
+        bounceSimple = addData(b -> new KamiBulletData(true).setBounce(true, true, false, false, 2));
     }
 
     public static KamiBulletData get(Bullet bullet, int type){
@@ -89,12 +92,15 @@ public class KamiBulletDatas{
         public float initialRotation, attribute = 0f;
         public boolean modulate, despawn = true;
         public DataStage[] stageA;
+        public Cons<Bullet> onBounce;
         public boolean empty = false;
+        public byte bounce = 0;
+        public Rect barrier;
         int stage = 0;
         float time = 0f;
 
-        public KamiBulletData(){
-            despawn = false;
+        public KamiBulletData(boolean despawn){
+            this.despawn = despawn;
             empty = true;
         }
 
@@ -113,12 +119,71 @@ public class KamiBulletDatas{
             return this;
         }
 
+        public KamiBulletData setBounce(boolean left, boolean right, boolean up, boolean down, int bounces){
+            bounces = Math.min(bounces, 15);
+            if(left) bounce |= 1;
+            if(right) bounce |= 1 << 1;
+            if(up) bounce |= 1 << 2;
+            if(down) bounce |= 1 << 3;
+            bounce |= bounces << 4;
+            return this;
+        }
+
+        public boolean bl(){
+            return (bounce & 1) != 0;
+        }
+
+        public boolean br(){
+            return (bounce & 2) != 0;
+        }
+
+        public boolean bu(){
+            return (bounce & 4) != 0;
+        }
+
+        public boolean bd(){
+            return (bounce & 8) != 0;
+        }
+
+        public int bounces(){
+            return bounce >>> 4;
+        }
+
+        public void useBounce(){
+            int b = (bounce >>> 4);
+            b -= 1;
+            b = b << 4;
+            if(b <= 0){
+                bounce = 0;
+                barrier = null;
+                return;
+            }
+            bounce &= 15;
+            bounce |= b;
+        }
+
         @Override
         public float fin(){
             return Mathf.clamp(time / stageA[stage % stageA.length].time);
         }
 
         public void update(Bullet b){
+            if(barrier != null){
+                if(((b.x <= barrier.x && bl()) || (b.x >= barrier.x + barrier.width && br())) && bounces() > 0){
+                    if(b.x >= barrier.x + barrier.width) b.x = barrier.x + barrier.width - 0.01f;
+                    if(b.x <= barrier.x) b.x = barrier.x + 0.01f;
+                    if(onBounce != null) onBounce.get(b);
+                    b.vel.x *= -1f;
+                    useBounce();
+                }
+                if(barrier != null && ((b.y <= barrier.y && bd()) || (b.y >= barrier.y + barrier.height && bu())) && bounces() > 0){
+                    if(b.y >= barrier.y + barrier.height) b.y = barrier.y + barrier.height - 0.01f;
+                    if(b.y <= barrier.y) b.y = barrier.y + 0.01f;
+                    if(onBounce != null) onBounce.get(b);
+                    b.vel.y *= -1f;
+                    useBounce();
+                }
+            }
             if(empty) return;
             DataStage a = stageA[stage % stageA.length];
             if(a.data != null) a.data.get(this, b);

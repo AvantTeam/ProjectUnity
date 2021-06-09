@@ -383,6 +383,10 @@ public final class Utils{
     }
 
     public static void collideLineRaw(float x, float y, float x2, float y2, float unitWidth, Boolf<Building> buildingFilter, Boolf<Unit> unitFilter, Boolf2<Building, Boolean> buildingCons, Boolf<Unit> unitCons, Floatf<Healthc> sort, Floatc2 effectHandler, boolean stopSort){
+        collideLineRaw(x, y, x2, y2, unitWidth, 0f, buildingFilter, unitFilter, buildingCons, unitCons, sort, effectHandler, stopSort);
+    }
+
+    public static void collideLineRaw(float x, float y, float x2, float y2, float unitWidth, float tileWidth, Boolf<Building> buildingFilter, Boolf<Unit> unitFilter, Boolf2<Building, Boolean> buildingCons, Boolf<Unit> unitCons, Floatf<Healthc> sort, Floatc2 effectHandler, boolean stopSort){
         collidedBlocks.clear();
         tmpUnitSeq.clear();
         effectArray.clear();
@@ -390,22 +394,51 @@ public final class Utils{
         tV.set(x2, y2);
         if(buildingCons != null){
             world.raycastEachWorld(x, y, x2, y2, (cx, cy) -> {
-                Building build = world.build(cx, cy);
-                if(build != null && (buildingFilter == null || buildingFilter.get(build)) && !collidedBlocks.add(build.pos())){
-                    boolean hit;
-                    //if(effectHandler != null) effectHandler.get(cx * tilesize, cy * tilesize);
-                    if(sort == null){
-                        if(effectHandler != null) effectHandler.get(cx * tilesize, cy * tilesize);
-                        hit = buildingCons.get(build, true);
-                    }else{
-                        if(effectHandler != null){
-                            effectArray.put(build.id, new Float[]{cx * (float)tilesize, cy * (float)tilesize});
+                if(tileWidth >= 1f){
+                    Building build = world.build(cx, cy);
+                    if(build != null && (buildingFilter == null || buildingFilter.get(build)) && collidedBlocks.add(build.pos())){
+                        boolean hit;
+                        //if(effectHandler != null) effectHandler.get(cx * tilesize, cy * tilesize);
+                        if(sort == null){
+                            if(effectHandler != null) effectHandler.get(cx * tilesize, cy * tilesize);
+                            hit = buildingCons.get(build, true);
+                        }else{
+                            if(effectHandler != null){
+                                effectArray.put(build.id, new Float[]{cx * (float)tilesize, cy * (float)tilesize});
+                            }
+                            tmpUnitSeq.add(build);
+                            hit = buildingCons.get(build, false);
                         }
-                        tmpUnitSeq.add(build);
-                        hit = buildingCons.get(build, false);
+                        if(hit) tV.trns(Angles.angle(x, y, x2, y2), Mathf.dst(x, y, build.x, build.y)).add(x, y);
+                        return hit;
                     }
-                    if(hit) tV.trns(Angles.angle(x, y, x2, y2), Mathf.dst(x, y, build.x, build.y)).add(x, y);
-                    return hit;
+                }else{
+                    rect.setCentered(cx * tilesize, cy * tilesize, tileWidth);
+                    int tx = Mathf.round(rect.x / tilesize);
+                    int ty = Mathf.round(rect.y / tilesize);
+                    int tw = tx + Mathf.round(rect.width / tilesize);
+                    int th = ty + Mathf.round(rect.height / tilesize);
+                    for(int ix = tx; ix <= tw; ix++){
+                        for(int iy = ty; iy <= th; iy++){
+                            Building build = world.build(ix, iy);
+                            if(build != null && (buildingFilter == null || buildingFilter.get(build)) && collidedBlocks.add(build.pos())){
+                                boolean hit;
+                                //if(effectHandler != null) effectHandler.get(cx * tilesize, cy * tilesize);
+                                if(sort == null){
+                                    if(effectHandler != null) effectHandler.get(cx * tilesize, cy * tilesize);
+                                    hit = buildingCons.get(build, true);
+                                }else{
+                                    if(effectHandler != null){
+                                        effectArray.put(build.id, new Float[]{cx * (float)tilesize, cy * (float)tilesize});
+                                    }
+                                    tmpUnitSeq.add(build);
+                                    hit = buildingCons.get(build, false);
+                                }
+                                if(hit) tV.trns(Angles.angle(x, y, x2, y2), Mathf.dst(x, y, build.x, build.y)).add(x, y);
+                                return hit;
+                            }
+                        }
+                    }
                 }
                 return false;
             });

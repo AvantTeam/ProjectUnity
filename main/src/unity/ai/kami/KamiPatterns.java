@@ -89,6 +89,28 @@ public class KamiPatterns{
             };
         }}, 0);
 
+        addPattern(new KamiPattern(){{
+            time = 30f * 60f;
+            maxDamage = 2000f;
+            stages = new KamiPatternStage[]{
+                new KamiPatternStage(30f * 60f, ai -> {
+                    if(ai.reloads[0] >= 30f){
+                        int diff = 10 + Mathf.clamp(ai.difficulty * 2, 0, 5);
+                        for(int i = 0; i < diff; i++){
+                            float ang = (i * 360f / diff) + ai.angleTo(ai.targetPos);
+                            Bullet b = UnityBullets.kamiBullet1.create(ai.unit, ai.unit.team, ai.getX(), ai.getY(), ang, 0.9f);
+                            b.hitSize = 5f;
+                            b.lifetime += 60f * 5f;
+                            KamiBulletData data = KamiBulletDatas.get(b, KamiBulletDatas.bounceSimple);
+                            data.barrier = ai.barrier();
+                        }
+                        ai.reloads[0] = 0f;
+                    }
+                    ai.reloads[0] += Time.delta;
+                })
+            };
+        }}, 0);
+
         //Utsuho
         //Atomic Fire "Nuclear Fusion"
         addPattern(new KamiPattern(){{
