@@ -88,7 +88,7 @@ public final class ReflectUtils{
                 handleInvoker = context.compileFunction(scope, """
                     function(handle, args){
                         let format = 'handle.invokeWithArguments(handle';
-                        for(let i = 0; i < args.length; i++){
+                        for(let i = 0; i < args.size; i++){
                             format += ', args.get(' + i + ')';
                         }
                         format += ');';
