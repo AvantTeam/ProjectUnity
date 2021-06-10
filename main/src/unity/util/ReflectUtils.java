@@ -89,7 +89,7 @@ public final class ReflectUtils{
                     function(handle, args){
                         let format = 'handle.invokeWithArguments(handle';
                         for(let i = 0; i < args.length; i++){
-                            format += ', args[' + i + ']';
+                            format += ', args.get(' + i + ')';
                         }
                         format += ');';
 
