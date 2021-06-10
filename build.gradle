@@ -38,6 +38,21 @@ allprojects {
         maven { url "https://jitpack.io" }
     }
 
+    task sourcesJar(type: Jar, dependsOn: classes) {
+        archiveClassifier.set('sources')
+        from sourceSets.main.allSource
+    }
+
+    task assetsJar(type: Jar, dependsOn: ":tools:proc") {
+        archiveClassifier.set('assets')
+        from files('main/assets/')
+    }
+
+    artifacts {
+        archives sourcesJar
+        archives assetsJar
+    }
+
     publishing {
         publications {
             maven(MavenPublication) {

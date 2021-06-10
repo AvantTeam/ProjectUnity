@@ -190,21 +190,6 @@ task cleanFetched(type: Delete) {
     delete "$fetchTemp"
 }
 
-task sourcesJar(type: Jar, dependsOn: classes) {
-    archiveClassifier.set('sources')
-    from sourceSets.main.allSource
-}
-
-task assetsJar(type: Jar, dependsOn: ":tools:proc") {
-    archiveClassifier.set('assets')
-    from files(assetsDir)
-}
-
-artifacts {
-    archives sourcesJar
-    archives assetsJar
-}
-
 tasks.withType(JavaCompile) {
     options.compilerArgs += [
         '-processor', 
