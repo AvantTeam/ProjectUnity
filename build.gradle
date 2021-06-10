@@ -53,14 +53,6 @@ allprojects {
         archives assetsJar
     }
 
-    publishing {
-        publications {
-            maven(MavenPublication) {
-                from components.java
-            }
-        }
-    }
-
     tasks.withType(JavaCompile) {
         options.compilerArgs += '-Xlint:deprecation'
     }
@@ -83,6 +75,19 @@ configure(project(':annotations')) {
 }
 
 configure(subprojects - project(':annotations')) {
+    java {
+        withJavadocJar()
+        withSourcesJar()
+    }
+
+    publishing {
+        publications {
+            maven(MavenPublication) {
+                from components.java
+            }
+        }
+    }
+
     sourceCompatibility = 15
     targetCompatibility = 8
 
