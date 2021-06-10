@@ -48,7 +48,6 @@ public class AntiCheat implements ApplicationListener{
     public static void annihilateEntity(Entityc entity, boolean override, boolean setNaN){
         Groups.all.remove(entity);
 
-        if(entity instanceof Bossc boss) UnityCall.bossMusic(boss.type().name, false);
         if(entity instanceof Drawc draw) Groups.draw.remove(draw);
         if(entity instanceof Syncc sync) Groups.sync.remove(sync);
         if(entity instanceof Unit unit){

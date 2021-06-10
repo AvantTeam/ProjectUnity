@@ -8,7 +8,6 @@ import arc.util.*
 import arc.util.serialization.*
 
 dependencies {
-    compileOnly "com.github.Anuken.Arc:arc-core:$arcVersion"
     compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
 
     annotationProcessor "com.github.Anuken:jabel:$jabelVersion"
@@ -189,21 +188,6 @@ task fetchComps {
 task cleanFetched(type: Delete) {
     delete "$projectDir/fetched"
     delete "$fetchTemp"
-}
-
-task sourcesJar(type: Jar, dependsOn: classes) {
-    archiveClassifier.set('sources')
-    from sourceSets.main.allSource
-}
-
-task assetsJar(type: Jar, dependsOn: ":tools:proc") {
-    archiveClassifier.set('assets')
-    from files(assetsDir)
-}
-
-artifacts {
-    archives sourcesJar
-    archives assetsJar
 }
 
 tasks.withType(JavaCompile) {

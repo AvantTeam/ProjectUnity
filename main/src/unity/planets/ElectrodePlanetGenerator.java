@@ -19,7 +19,6 @@ import static mindustry.Vars.*;
 
 public class ElectrodePlanetGenerator extends PlanetGenerator{
     Simplex noise = new Simplex();
-    RidgedPerlin rid = new RidgedPerlin(1, 2);
     BaseGenerator basegen = new BaseGenerator();
     float scl = 6f;
     float waterOffset = 0.07f;
@@ -67,7 +66,7 @@ public class ElectrodePlanetGenerator extends PlanetGenerator{
         tile.floor = getBlock(position);
         tile.block = tile.floor.asFloor().wall;
 
-        if(rid.getValue(position.x, position.y, position.z, 22) > 0.32){
+        if(RidgedPerlin.noise3d(1, position.x, position.y, position.z, 2, 22) > 0.32){
             tile.block = Blocks.air;
         }
     }

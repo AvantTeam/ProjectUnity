@@ -38,12 +38,19 @@ allprojects {
         maven { url "https://jitpack.io" }
     }
 
-    publishing {
-        publications {
-            maven(MavenPublication) {
-                from components.java
-            }
-        }
+    task sourcesJar(type: Jar, dependsOn: classes) {
+        archiveClassifier.set('sources')
+        from sourceSets.main.allSource
+    }
+
+    task assetsJar(type: Jar, dependsOn: ":tools:proc") {
+        archiveClassifier.set('assets')
+        from files('main/assets/')
+    }
+
+    artifacts {
+        archives sourcesJar
+        archives assetsJar
     }
 
     tasks.withType(JavaCompile) {
@@ -68,6 +75,19 @@ configure(project(':annotations')) {
 }
 
 configure(subprojects - project(':annotations')) {
+    java {
+        withJavadocJar()
+        withSourcesJar()
+    }
+
+    publishing {
+        publications {
+            maven(MavenPublication) {
+                from components.java
+            }
+        }
+    }
+
     sourceCompatibility = 15
     targetCompatibility = 8
 
@@ -83,6 +103,14 @@ configure(subprojects - project(':annotations')) {
 
         doFirst {
             options.compilerArgs = options.compilerArgs.findAll { it != '--enable-preview' }
+        }
+    }
+
+    tasks.withType(Javadoc) {
+        options {
+            addStringOption('Xdoclint:none', '-quiet')
+            addBooleanOption('-enable-preview', true)
+            addStringOption('-release', '15')
         }
     }
 }

@@ -3080,8 +3080,6 @@ public class UnityUnitTypes implements ContentList{
             clipSize = 1100f;
 
             antiCheatType = new AntiCheatVariables(health / 15f, health / 1.5f, 10f, health / 20f, 0.2f, 6f * 60f, 3f * 60f, 5f, 1);
-
-            Unity.music.registerLoop(name, UnityMusics.radiantDischarge);
         }};
 
         //endregion

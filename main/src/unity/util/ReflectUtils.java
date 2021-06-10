@@ -85,11 +85,13 @@ public final class ReflectUtils{
                 Method setf = Structs.find(Field.class.getDeclaredMethods(), m -> m.getName().contains("setFieldAccessor"));
                 setAccessor = getLookup(Field.class).unreflect(setf);
 
-                handleInvoker = context.compileFunction(scope, """
+                handleInvoker = context.compileFunction(scope,
+                    """
                     function(handle, args){
                         return handle.invokeWithArguments(args.toArray());
-                    };
-                    """, "unity_impl.js", 0, null
+                    }
+                    """,
+                    "unity_impl.js", 0
                 );
             }
 

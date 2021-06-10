@@ -24,7 +24,6 @@ import static unity.content.UnityBlocks.*;
 
 /** @author GlennFolker */
 public class MegalithPlanetGenerator extends PlanetGenerator{
-    protected RidgedPerlin rid = new RidgedPerlin(1, 3);
     protected BaseGenerator basegen = new BaseGenerator();
     protected float scl = 4.5f;
     protected float waterOffset = 0.1f;
@@ -98,7 +97,7 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
         tile.floor = getBlock(position);
         tile.block = tile.floor.asFloor().wall;
 
-        if(rid.getValue(position.x, position.y, position.z, 22f) > 0.32f){
+        if(RidgedPerlin.noise3d(1, position.x, position.y, position.z, 3, 22f) > 0.32f){
             tile.block = Blocks.air;
         }
     }

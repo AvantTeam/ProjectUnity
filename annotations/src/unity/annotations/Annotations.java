@@ -65,22 +65,6 @@ public class Annotations{
         Class<?> value() default Void.class;
     }
 
-    /** Indicates that this music belongs to a specific faction in a specific category */
-    @Target(ElementType.FIELD)
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface MusicDef{
-        /** @return The faction */
-        String facType();
-
-        /**
-         * The category of this {@link Music}.<br>
-         * <br>
-         * Reserved keywords are {@code "ambient"}, {@code "dark"}, and {@code "boss"}
-         * @return The music category.
-         */
-        String category() default "ambient";
-    }
-
     /** Whether this class is the base class for faction enum. Only one type may use this */
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.SOURCE)
