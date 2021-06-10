@@ -12,6 +12,8 @@ import unity.content.*;
 
 import java.util.*;
 
+import static unity.gen.UnitySounds.*;
+
 public class KamiPatterns{
     public static KamiPattern[] minorPatterns, majorPatterns, finalPatterns;
     private final static Vec2 tVec = new Vec2(), tVec2 = new Vec2();
@@ -48,6 +50,7 @@ public class KamiPatterns{
                             float angle = (i * (360f / diff)) + ai.reloads[1];
                             UnityBullets.kamiBullet1.create(ai.unit, ai.unit.team, ai.getX(), ai.getY(), angle);
                         }
+                        ai.createSound(kamiShootSimple, ai.getX(), ai.getY(), 1f);
                         ai.reloads[0] = 0f;
                         ai.reloads[1] += (ai.reloads[2] % 16f >= 8f) ? 8f : -8f;
                         ai.reloads[2] += 1;
@@ -81,6 +84,7 @@ public class KamiPatterns{
                                 data.attribute = s * 1.2f;
                             }
                         }
+                        ai.createSound(kamiShootChime, ai.getX(), ai.getY(), 1f);
                         ai.reloads[0] = 0f;
                     }
                     ai.reloads[0] += Time.delta;
@@ -104,6 +108,7 @@ public class KamiPatterns{
                             KamiBulletData data = KamiBulletDatas.get(b, KamiBulletDatas.bounceSimple);
                             data.barrier = ai.barrier();
                         }
+                        ai.createSound(kamiShootSimple, ai.getX(), ai.getY(), 1f);
                         ai.reloads[0] = 0f;
                     }
                     ai.reloads[0] += Time.delta;
@@ -122,21 +127,23 @@ public class KamiPatterns{
                 new KamiPatternStage(2f * 60f, ai -> {
                     int diff = 6 + Mathf.clamp(ai.difficulty, 0, 2);
                     float angleRand = Mathf.random(0f, 360f);
-                    float offset = Mathf.random(25f);
+                    float offset = Mathf.random(5f);
                     for(int i = 0; i < diff; i++){
                         float angle = (i * (360f / diff)) + angleRand;
                         float randV = Mathf.range(0.1f);
                         Bullet b = UnityBullets.kamiBullet1.create(ai.unit, ai.unit.team, ai.getX(), ai.getY(), angle, 0.3f + randV, 1f / 0.3f);
-                        b.hitSize = 150f;
+                        b.hitSize = 140f;
                         if(ai.difficulty > 2){
                             Time.run(2f * 60f, () -> {
                                 if(!ai.unit.dead && !ai.reseting && !ai.spell){
                                     Bullet c = UnityBullets.kamiBullet1.create(ai.unit, ai.unit.team, ai.getX(), ai.getY(), angle + offset, 0.3f + randV, 1f / 0.3f);
-                                    c.hitSize = 150f;
+                                    c.hitSize = 140f;
+                                    ai.createSound(kamiShootSimpleB, ai.getX(), ai.getY(), 1f);
                                 }
                             });
                         }
                     }
+                    ai.createSound(kamiShootSimpleB, ai.getX(), ai.getY(), 1f);
                 }, null),
                 new KamiPatternStage(5f * 60f, ai -> {
                         ai.kami().laserRotation *= -1f;
@@ -152,6 +159,7 @@ public class KamiPatterns{
                                 b.lifetime *= 1f / 0.7f;
                             }
                         }
+                        ai.createSound(kamiShootSimple, ai.getX(), ai.getY(), 1f);
                         ai.reloads[1] += 2f;
                         ai.reloads[0] = 0f;
                     }
@@ -181,6 +189,7 @@ public class KamiPatterns{
                             Bullet c = UnityBullets.kamiBullet1.create(ai.unit, tVec.x, tVec.y, angle);
                             c.hitSize = 7f;
                         }
+                        ai.createSound(kamiShootSimpleB, ai.getX(), ai.getY(), 1f);
                         ai.reloads[0] = 0f;
                     }
                     if(ai.reloads[1] >= 2f * 60f){
@@ -210,6 +219,7 @@ public class KamiPatterns{
                     KamiBulletDatas.get(b, KamiBulletDatas.nonDespawnable);
                     ai.bullets[i] = b;
                 }
+                ai.createSound(kamiShootChime, ai.getX(), ai.getY(), 1f);
             };
             stages = new KamiPatternStage[]{
                 new KamiPatternStage(25f * 60f, ai -> {
@@ -226,6 +236,7 @@ public class KamiPatterns{
                             b.lifetime /= 0.5f;
                             KamiBulletDatas.get(b, KamiBulletDatas.turnRegular).attribute(-0.2f);
                         }
+                        ai.createSound(kamiShootSimple, ai.getX(), ai.getY(), 1f);
                         ai.reloads[2] += 4;
                         ai.reloads[1] = 0f;
                     }
@@ -279,6 +290,7 @@ public class KamiPatterns{
                         tVec.trns(ai.kami().laserRotation, 20f).add(ai);
                         ai.bullets[0] = UnityBullets.kamiLaser.create(ai.unit, ai.unit.team, tVec.x, tVec.y, ai.kami().laserRotation);
                         ai.bullets[0].lifetime = 5f * 60f;
+                        ai.createSound(kamiMasterspark, ai.getX(), ai.getY(), 1f);
                     }
                     if(ai.bullets[0] != null && ai.reloads[3] >= 90f){
                         ai.kami().laserRotation = Mathf.slerpDelta(ai.kami().laserRotation, ai.angleTo(ai.targetPos), 0.003f);
@@ -294,13 +306,14 @@ public class KamiPatterns{
                         for(int i = 0; i < diff; i++){
                             float angle = (i * (360f / diff)) + ai.reloads[6];
                             Bullet b = UnityBullets.kamiBullet1.create(ai.unit, ai.unit.team, ai.getX(), ai.getY(), angle, 0.75f);
-                            b.data = KamiBulletDatas.get(b, KamiBulletDatas.slowDownWaitAccel);
+                            KamiBulletDatas.get(b, KamiBulletDatas.slowDownWaitAccel).ai = ai;
                             b.lifetime *= 2f;
                             b.hitSize *= 1.3f;
                         }
                         ai.reloads[1] = 0f;
                         ai.reloads[6] += diffReload1 * ai.reloads[0];
                         ai.reloads[6] = Mathf.mod(ai.reloads[6], 360f);
+                        ai.createSound(kamiShootSimple, ai.getX(), ai.getY(), 1f);
                     }
                     if(ai.reloads[5] >= diffReload2){
                         int diff = 5 + Mathf.clamp((ai.difficulty - 2) * 3, 0, 3);
@@ -312,6 +325,7 @@ public class KamiPatterns{
                         ai.reloads[5] = 0;
                         ai.reloads[7] -= (90f / diff) * ai.reloads[0];
                         ai.reloads[7] = Mathf.mod(ai.reloads[7], 360f);
+                        ai.createSound(kamiShootSimple, ai.getX(), ai.getY(), 1f);
                     }
                 })
             };
@@ -427,12 +441,13 @@ public class KamiPatterns{
                                 KamiBulletDatas.get(bullet, KamiBulletDatas.junkoSlowDown);
                             }else{
                                 Bullet bullet = UnityBullets.kamiBullet1.create(ai.unit, ai.unit.team, ai.getX(), ai.getY(), angle, 1.5f);
-                                KamiBulletDatas.get(bullet, KamiBulletDatas.junkoLaser);
+                                KamiBulletDatas.get(bullet, KamiBulletDatas.junkoLaser).ai = ai;
                             }
                         }
                         ai.reloads[0] = 0f;
                         ai.reloads[1] = 1f;
                         ai.reloads[2] += 1f;
+                        ai.createSound(kamiShootChime, ai.getX(), ai.getY(), 1f);
                     }
                     if(ai.reloads[1] == 1f){
                         ai.moveAround(60f);
@@ -459,12 +474,13 @@ public class KamiPatterns{
                                 KamiBulletDatas.get(bullet, KamiBulletDatas.junkoSlowDown);
                             }else{
                                 Bullet bullet = UnityBullets.kamiBullet1.create(ai.unit, ai.unit.team, ai.getX(), ai.getY(), angle, 1.5f);
-                                KamiBulletDatas.get(bullet, KamiBulletDatas.junkoLaser);
+                                KamiBulletDatas.get(bullet, KamiBulletDatas.junkoLaser).ai = ai;
                             }
                         }
                         ai.reloads[2] += 1f;
                         ai.reloads[1] += (360f / diff) * (2f / a) * ai.reloads[4];
                         ai.reloads[0] = 0f;
+                        ai.createSound(kamiShootChime, ai.getX(), ai.getY(), 1f);
                     }
                     ai.reloads[0] += Time.delta;
                 })

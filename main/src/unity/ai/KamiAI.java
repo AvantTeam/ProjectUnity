@@ -1,5 +1,7 @@
 package unity.ai;
 
+import arc.*;
+import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -37,6 +39,9 @@ public class KamiAI implements UnitController, Position{
     protected IntSeq spellSeq = new IntSeq(), nonSpellSeq = new IntSeq();
     protected Rect barrier = new Rect();
     protected boolean barrierActive = false;
+    protected ObjectIntMap<String> soundMap = new ObjectIntMap<>();
+    protected IntSeq soundIds = new IntSeq();
+    protected BoolSeq soundActive = new BoolSeq();
 
     public KamiPattern pattern;
     public boolean spell = false;
@@ -86,6 +91,24 @@ public class KamiAI implements UnitController, Position{
         Draw.blend();
     }
 
+    public void createSound(Sound sound, float x, float y, float pitch){
+        int idx = soundMap.get(sound.toString() + pitch, -1);
+        if(idx == -1){
+            soundMap.put(sound.toString() + pitch, soundIds.size);
+            idx = soundIds.size;
+            soundIds.add(-1);
+            soundActive.add(false);
+        }
+        if(soundActive.get(idx)) return;
+        if(soundIds.get(idx) != -1){
+            Core.audio.stop(soundIds.get(idx));
+        }
+        int id = sound.at(x, y, pitch);
+        Core.audio.setVolume(id, 1f);
+        soundActive.set(idx, true);
+        soundIds.set(idx, id);
+    }
+
     @Override
     public void updateUnit(){
         if(!reseting) drawIn = Mathf.clamp(drawIn + (Time.delta / 180f));
@@ -104,6 +127,11 @@ public class KamiAI implements UnitController, Position{
         if(target != null && !barrierActive){
             barrier.setCentered(truePosition.x, truePosition.y, 300f * 2f, 340f * 2f);
             barrierActive = true;
+        }
+        if(!soundActive.isEmpty()){
+            for(int i = 0; i < soundActive.size; i++){
+                soundActive.set(i, false);
+            }
         }
         if(barrierActive && (timer.get(1, 2f) || Groups.unit.size() < 15)){
             for(Unit e : Groups.unit){
