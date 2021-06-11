@@ -394,7 +394,7 @@ public final class Utils{
         tV.set(x2, y2);
         if(buildingCons != null){
             world.raycastEachWorld(x, y, x2, y2, (cx, cy) -> {
-                if(tileWidth >= 1f){
+                if(tileWidth <= 1f){
                     Building build = world.build(cx, cy);
                     if(build != null && (buildingFilter == null || buildingFilter.get(build)) && collidedBlocks.add(build.pos())){
                         boolean hit;
