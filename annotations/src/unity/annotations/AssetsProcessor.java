@@ -6,7 +6,7 @@ import arc.assets.loaders.SoundLoader.*;
 import arc.audio.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.PropertiesUtils;
+import arc.util.io.*;
 
 import com.squareup.javapoet.*;
 import mindustry.*;
@@ -15,6 +15,7 @@ import javax.annotation.processing.*;
 import javax.lang.model.element.*;
 
 /** @author GlennFolker */
+@SuppressWarnings("unused")
 @SupportedAnnotationTypes("java.lang.Override")
 public class AssetsProcessor extends BaseProcessor{
     {
@@ -25,7 +26,7 @@ public class AssetsProcessor extends BaseProcessor{
     public void process(RoundEnvironment roundEnv) throws Exception{
         if(round == 1){
             processSounds();
-        }else{
+        }else if(round == 2){
             processObjects();
         }
     }
@@ -58,44 +59,17 @@ public class AssetsProcessor extends BaseProcessor{
                         .addStatement("return new $T()", cName(Sound.class))
                     .endControlFlow()
                 .build()
-            )
-            .addMethod(
-                MethodSpec.methodBuilder("disposeSound").addModifiers(Modifier.PROTECTED, Modifier.STATIC)
-                    .addJavadoc(
-                        CodeBlock.builder()
-                            .add("Disposes a {@link $T}" + lnew(), cName(Sound.class))
-                            .add("@param soundName The {@link $T} name" + lnew(), cName(Sound.class))
-                            .add("@return {@code null}")
-                        .build()
-                    )
-                    .returns(cName(Sound.class))
-                    .addParameter(cName(String.class), "soundName")
-                    .beginControlFlow("if(!$T.headless)", cName(Vars.class))
-                        .addStatement("$T name = $S + soundName", cName(String.class), "sounds/")
-                        .addStatement("$T path = $T.tree.get(name + $S).exists() ? name + $S : name + $S", cName(String.class), cName(Vars.class), ".ogg", ".ogg", ".mp3")
-                        .addCode(lnew())
-                        .beginControlFlow("if($T.assets.isLoaded(path, $T.class))", cName(Core.class), cName(Sound.class))
-                            .addStatement("$T.assets.unload(path)", cName(Core.class))
-                        .endControlFlow()
-                    .endControlFlow()
-                    .addCode(lnew())
-                    .addStatement("return null")
-                .build()
             );
         MethodSpec.Builder load = MethodSpec.methodBuilder("load").addModifiers(Modifier.PUBLIC, Modifier.STATIC)
             .addJavadoc("Loads all {@link $T}s", cName(Sound.class))
             .returns(TypeName.VOID);
 
-        MethodSpec.Builder dispose = MethodSpec.methodBuilder("dispose").addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-            .addJavadoc("Disposes all {@link $T}s", cName(Sound.class))
-            .returns(TypeName.VOID);
-
         String dir = "main/assets/sounds/";
         rootDir.child(dir).walk(path -> {
             String p = path.absolutePath();
-            String name = p.substring(p.lastIndexOf(dir) + dir.length(), p.length());
+            String name = p.substring(p.lastIndexOf(dir) + dir.length());
             String fname = path.nameWithoutExtension();
-            int ex = 4;
+            int ex = path.extension().length() + 1;
 
             soundSpec.addField(
                 FieldSpec.builder(
@@ -108,13 +82,9 @@ public class AssetsProcessor extends BaseProcessor{
 
             String stripped = name.substring(0, name.length() - ex);
             load.addStatement("$L = loadSound($S)", Strings.kebabToCamel(fname), stripped);
-            dispose.addStatement("$L = disposeSound($S)", Strings.kebabToCamel(fname), stripped);
         });
 
-        soundSpec
-            .addMethod(load.build())
-            .addMethod(dispose.build());
-
+        soundSpec.addMethod(load.build());
         write(soundSpec.build());
     }
 
@@ -148,36 +118,9 @@ public class AssetsProcessor extends BaseProcessor{
                         .addStatement("return new $T()", tName(wavefrontObject))
                     .endControlFlow()
                 .build()
-            )
-            .addMethod(
-                MethodSpec.methodBuilder("disposeObject").addModifiers(Modifier.PROTECTED, Modifier.STATIC)
-                    .addJavadoc(
-                        CodeBlock.builder()
-                            .add("Disposes a {@link $T}" + lnew(), tName(wavefrontObject))
-                            .add("@param objName The {@link $T} name" + lnew(), tName(wavefrontObject))
-                            .add("@return {@code null}")
-                        .build()
-                    )
-                    .returns(tName(wavefrontObject))
-                    .addParameter(cName(String.class), "objName")
-                    .beginControlFlow("if(!$T.headless)", cName(Vars.class))
-                        .addStatement("$T name = $S + objName", cName(String.class), "objects/")
-                        .addStatement("$T path = name + $S", cName(String.class), ".ogg")
-                        .addCode(lnew())
-                        .beginControlFlow("if($T.assets.isLoaded(path, $T.class))", cName(Core.class), tName(wavefrontObject))
-                            .addStatement("$T.assets.unload(path)", cName(Core.class))
-                        .endControlFlow()
-                    .endControlFlow()
-                    .addCode(lnew())
-                    .addStatement("return null")
-                .build()
             );
         MethodSpec.Builder load = MethodSpec.methodBuilder("load").addModifiers(Modifier.PUBLIC, Modifier.STATIC)
             .addJavadoc("Loads all {@link $T}s", tName(wavefrontObject))
-            .returns(TypeName.VOID);
-
-        MethodSpec.Builder dispose = MethodSpec.methodBuilder("dispose").addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-            .addJavadoc("Disposes all {@link $T}s", tName(wavefrontObject))
             .returns(TypeName.VOID);
 
         ObjectMap<String, String> objProp = new ObjectMap<>();
@@ -186,10 +129,10 @@ public class AssetsProcessor extends BaseProcessor{
         String dir = "main/assets/objects/";
         boolean[] first = {true};
         rootDir.child(dir).walk(path -> {
-            if(!path.name().endsWith(".obj")) return;
+            if(!path.extEquals("obj")) return;
 
             String p = path.absolutePath();
-            String name = p.substring(p.lastIndexOf(dir) + dir.length(), p.length());
+            String name = p.substring(p.lastIndexOf(dir) + dir.length());
             String fname = path.nameWithoutExtension();
             int ex = 4;
 
@@ -202,9 +145,8 @@ public class AssetsProcessor extends BaseProcessor{
                 .build()
             );
 
-            if(!first[0]){
-                load.addStatement(lnew());
-            }
+            if(!first[0]) load.addStatement(lnew());
+
             String stripped = name.substring(0, name.length() - ex);
             load.addStatement("$L = loadObject($S)", Strings.kebabToCamel(fname), stripped);
 
@@ -228,13 +170,9 @@ public class AssetsProcessor extends BaseProcessor{
             }
 
             first[0] = false;
-            dispose.addStatement("$L = disposeObject($S)", Strings.kebabToCamel(fname), stripped);
         });
 
-        objSpec
-            .addMethod(load.build())
-            .addMethod(dispose.build());
-
+        objSpec.addMethod(load.build());
         write(objSpec.build());
     }
 }

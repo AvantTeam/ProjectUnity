@@ -3,7 +3,7 @@ package unity.mod;
 import arc.struct.*;
 
 public final class ContributorList{
-    private static IntMap<Seq<String>> contributors = new IntMap<>(ContributionType.all.length);
+    private static final IntMap<Seq<String>> contributors = new IntMap<>(ContributionType.all.length);
 
     public static void init(){
         for(ContributionType type : ContributionType.all){
@@ -26,9 +26,11 @@ public final class ContributorList{
             "younggam",
             "MEEP of Faith"
         );
+
         contributors.get(ContributionType.contributor.ordinal()).addAll(
-            // will always be empty...
+            "Drullkus"
         );
+
         contributors.get(ContributionType.translator.ordinal()).addAll(
             "sk7725 (Korean)",
             "Xusk (Russian)"

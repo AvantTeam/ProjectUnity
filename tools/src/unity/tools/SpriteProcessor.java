@@ -10,6 +10,9 @@ import arc.util.*;
 import mindustry.core.*;
 import mindustry.mod.Mods.*;
 import unity.*;
+import unity.ai.kami.*;
+import unity.gen.*;
+import unity.graphics.*;
 
 import java.util.*;
 
@@ -40,12 +43,7 @@ public class SpriteProcessor{
             name = "unity";
         }}));
 
-        try{
-            mod.loadContent();
-        }catch(Throwable t){
-            Log.err(t);
-        }
-
+        mod.loadContent();
         content.setCurrentMod(null);
 
         Fi.get("sprites/").walk(path -> {
@@ -104,6 +102,12 @@ public class SpriteProcessor{
                 return cache.containsKey(name);
             }
         };
+
+        Regions.load();
+        KamiRegions.load();
+        UnityObjs.load();
+        UnitySounds.load();
+        UnityShaders.load();
 
         Draw.scl = 0.25f;
         Generators.generate();

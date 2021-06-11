@@ -10,13 +10,11 @@ import mindustry.gen.*;
 import mindustry.world.blocks.ConstructBlock.*;
 import unity.*;
 import unity.entities.units.*;
-import unity.gen.*;
-import unity.sync.*;
 import unity.util.*;
 
 import java.util.*;
 
-public class AntiCheat implements ApplicationListener{
+public class AntiCheat{
     private final Interval timer = new Interval();
     private final Seq<UnitQueue> unitSeq = new Seq<>();
     private final Seq<BuildingQueue> buildingSeq = new Seq<>();
@@ -25,12 +23,15 @@ public class AntiCheat implements ApplicationListener{
     private final IntMap<EntitySampler> samplerMap = new IntMap<>(409);
 
     public void setup(){
+        Triggers.listen(Trigger.update, this::update);
+
         Events.on(BlockBuildBeginEvent.class, event -> {
-            //sometimes doesnt work in sandbox mode.
+            //sometimes doesn't work in sandbox mode.
             if(event.breaking && event.tile.build != null && event.unit != null && event.unit.team == event.tile.build.team){
                 removeBuilding(event.tile.build);
             }
         });
+
         Events.on(ResetEvent.class, event -> {
             exclude.clear();
             unitSeq.clear();
@@ -104,8 +105,7 @@ public class AntiCheat implements ApplicationListener{
         }
     }
 
-    @Override
-    public void update(){
+    void update(){
         if(timer.get(15f) && (!unitSeq.isEmpty() || !buildingSeq.isEmpty())){
             for(Entityc e : Groups.all){
                 if(e instanceof Unit){

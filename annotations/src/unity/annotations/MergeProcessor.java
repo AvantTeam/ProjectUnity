@@ -244,6 +244,7 @@ public class MergeProcessor extends BaseProcessor{
         String name = createName(naming);
         if(isBuild) name += "Build";
         if(usedNames.containsKey(name)) return null;
+        usedNames.put(name, def);
 
         defComps.addAll(defComps.copy().flatMap(this::getDependencies)).distinct();
 

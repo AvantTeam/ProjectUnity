@@ -32,7 +32,7 @@ public class Unity extends Mod implements ApplicationListener{
     public static AntiCheat antiCheat;
     public static DevBuild dev;
 
-    private final ContentList[] content = {
+    private static final ContentList[] content = {
         new UnityContentTypes(),
         new UnityItems(),
         new UnityStatusEffects(),
@@ -57,6 +57,32 @@ public class Unity extends Mod implements ApplicationListener{
             Core.app.addListener(this);
         }
 
+        if(Core.assets != null){
+            Core.assets.setLoader(WavefrontObject.class, new WavefrontObjectLoader(tree));
+            Core.assets.load(new UnityStyles());
+        }
+
+        KamiPatterns.load();
+        KamiBulletDatas.load();
+
+        Events.on(ContentInitEvent.class, e -> {
+            Regions.load();
+            KamiRegions.load();
+        });
+
+        Events.on(FileTreeInitEvent.class, e -> {
+            UnityObjs.load();
+            UnitySounds.load();
+            UnityShaders.load();
+        });
+
+        Events.on(ClientLoadEvent.class, e -> {
+            UnitySettings.init();
+
+            addCredits();
+            Core.settings.getBoolOnce("unity-install", () -> Time.runTask(5f, CreditsDialog::showList));
+        });
+
         try{
             Class<? extends DevBuild> impl = (Class<? extends DevBuild>)Class.forName("unity.mod.DevBuildImpl");
             dev = impl.getDeclaredConstructor().newInstance();
@@ -67,58 +93,9 @@ public class Unity extends Mod implements ApplicationListener{
             dev = new DevBuild(){};
         }
 
-        KamiPatterns.load();
-        KamiBulletDatas.load();
-
-        if(Core.assets != null){
-            Core.assets.setLoader(WavefrontObject.class, new WavefrontObjectLoader(tree));
-            Core.assets.load(new UnityStyles());
-        }
-
-        if(!headless){
-            Events.on(ContentInitEvent.class, e -> {
-                Regions.load();
-                KamiRegions.load();
-            });
-
-            Events.on(FileTreeInitEvent.class, e -> {
-                UnityObjs.load();
-                UnitySounds.load();
-                UnityShaders.load();
-            });
-
-            Events.on(ClientLoadEvent.class, e -> addCredits());
-        }else{
-            UnityObjs.load();
-            UnitySounds.load();
-        }
-
-        Events.on(DisposeEvent.class, e -> {
-            UnityObjs.dispose();
-            UnitySounds.dispose();
-            UnityShaders.dispose();
-        });
-
         music = new MusicHandler(){};
         tap = new TapHandler();
         antiCheat = new AntiCheat();
-
-        if(Core.app != null){
-            ApplicationListener listener = Core.app.getListeners().first();
-            if(listener instanceof ApplicationCore core){
-                core.add(antiCheat);
-            }else{
-                Core.app.addListener(antiCheat);
-            }
-        }
-
-        if(Core.settings != null){
-            Core.settings.getBoolOnce("unity-install", () -> Events.on(ClientLoadEvent.class, e ->
-                Time.runTask(5f, CreditsDialog::showList)
-            ));
-        }
-
-        Events.on(ClientLoadEvent.class, e -> UnitySettings.init());
     }
 
     @Override
@@ -185,12 +162,12 @@ public class Unity extends Mod implements ApplicationListener{
         };
 
         checker.get(Vars.content.blocks());
-        checker.get(Vars.content.getBy(ContentType.item));
-        checker.get(Vars.content.getBy(ContentType.liquid));
-        checker.get(Vars.content.getBy(ContentType.planet));
-        checker.get(Vars.content.getBy(ContentType.sector));
-        checker.get(Vars.content.getBy(ContentType.status));
-        checker.get(Vars.content.getBy(ContentType.unit));
+        checker.get(Vars.content.items());
+        checker.get(Vars.content.liquids());
+        checker.get(Vars.content.planets());
+        checker.get(Vars.content.sectors());
+        checker.get(Vars.content.statusEffects());
+        checker.get(Vars.content.units());
     }
 
     protected void addCredits(){

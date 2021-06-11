@@ -614,7 +614,7 @@ public class EntityProcessor extends BaseProcessor{
                             WildcardTypeName.subtypeOf(cName(Entityc.class))
                         )
                     ), "ids")
-                        .addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.VOLATILE)
+                        .addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
                         .initializer("new $T<>()", cName(ObjectIntMap.class))
                     .build()
                 )
@@ -668,7 +668,8 @@ public class EntityProcessor extends BaseProcessor{
                             "prov"
                         )
                         .addStatement("register(type, prov)")
-                        .addStatement("$T.nameMap.put(name.replaceFirst($S, $S), prov)", cName(EntityMapping.class), "unity-", "")
+                        .addStatement("$T.nameMap.put(name, prov)", cName(EntityMapping.class))
+                        .addStatement("$T.customIdMap.put(classId(type), name)", cName(EntityMapping.class))
                     .build()
                 )
                 .addMethod(
@@ -753,7 +754,10 @@ public class EntityProcessor extends BaseProcessor{
                 .build()
             );
         }else if(round == 4){
+            ObjectSet<String> usedNames = new ObjectSet<>();
             for(EntityDefinition def : definitions){
+                if(!usedNames.add(Reflect.get(TypeSpec.Builder.class, def.builder, "name"))) continue;
+
                 ObjectSet<String> methodNames = def.components.flatMap(type -> methods(type).map(BaseProcessor::simpleString)).<String>as().asSet();
 
                 if(def.extend != null){

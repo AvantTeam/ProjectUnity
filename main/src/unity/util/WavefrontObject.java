@@ -17,7 +17,7 @@ import java.io.*;
 
 /**
  * Wavefront Object Converter and Renderer for Arc/libGDX
- * The faces should not intersect. (no crashes, its just that the renderer doesnt support it.)
+ * The faces should not intersect. (no crashes, its just that the renderer doesn't support it.)
  * 
  * @author EyeOfDarkness
  * @author GlennFolker
@@ -48,7 +48,7 @@ public class WavefrontObject{
     protected int indexerA;
     protected float indexerZ;
 
-    public void load(Fi file){
+    public void load(Fi file, @Nullable Fi material){
         BufferedReader reader = file.reader(64);
         while(true){
             try{

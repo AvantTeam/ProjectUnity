@@ -1,16 +1,20 @@
 package unity.mod;
 
+import arc.func.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.mod.*;
+import rhino.*;
 import unity.*;
 import unity.util.*;
+
+import java.lang.reflect.*;
 
 import static mindustry.Vars.*;
 
 @SuppressWarnings("unused")
 public class DevBuildImpl implements DevBuild{
     @Override
-    @SuppressWarnings("deprecation")
     public void initScripts(){
         if(mods == null || platform == null) return;
 
@@ -18,10 +22,30 @@ public class DevBuildImpl implements DevBuild{
 
         enableConsole = true;
         Scripts scripts = mods.getScripts();
-        for(Package pkg : Package.getPackages()){
-            if(!pkg.getName().startsWith("unity")) continue;
 
-            scripts.runConsole(Strings.format("importPackage(Packages.@)", pkg.getName()));
+        ImporterTopLevel scope = ReflectUtils.getField(mods.getScripts(), ReflectUtils.findField(Scripts.class, "scope", true));
+        Constructor<NativeJavaPackage> constr = ReflectUtils.findConstructor(NativeJavaPackage.class, true,
+            boolean.class, String.class, ClassLoader.class
+        );
+        Method importPack = ReflectUtils.findMethod(ImporterTopLevel.class, "importPackage", true, NativeJavaPackage.class);
+        ClassLoader loader = getClass().getClassLoader();
+        Cons<String> importPackage = name -> {
+            NativeJavaPackage n = ReflectUtils.newInstance(constr, true, name, loader);
+            n.setParentScope(scope);
+
+            ReflectUtils.invokeMethod(scope, importPack, n);
+        };
+        Seq<String> permit = Seq.with(
+            "unity",
+            "rhino",
+            "java.lang",
+            "java.io",
+            "java.util"
+        );
+
+        for(Package pkg : Package.getPackages()){
+            if(!permit.contains(pkg.getName()::startsWith)) continue;
+            importPackage.get(pkg.getName());
         }
 
         ReflectUtils.unblacklist();

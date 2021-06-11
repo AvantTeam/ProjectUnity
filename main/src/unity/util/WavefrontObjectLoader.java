@@ -17,11 +17,14 @@ public class WavefrontObjectLoader extends AsynchronousAssetLoader<WavefrontObje
 
     @Override
     public void loadAsync(AssetManager assetManager, String fileName, Fi file, WavefrontObjectParameters parameter){
+        Fi material = file.parent().child(file.nameWithoutExtension() + ".mtl");
+        if(!material.exists()) material = null;
+
         if(parameter != null && parameter.object != null){
-            (object = parameter.object).load(file);
+            (object = parameter.object).load(file, material);
         }else{
             object = new WavefrontObject();
-            object.load(file);
+            object.load(file, material);
         }
     }
 
@@ -37,12 +40,8 @@ public class WavefrontObjectLoader extends AsynchronousAssetLoader<WavefrontObje
 		return null;
 	}
 
-
-
     public static class WavefrontObjectParameters extends AssetLoaderParameters<WavefrontObject>{
         public @Nullable WavefrontObject object;
-
-        public WavefrontObjectParameters(){}
 
         public WavefrontObjectParameters(@Nullable WavefrontObject object){
             this.object = object;
