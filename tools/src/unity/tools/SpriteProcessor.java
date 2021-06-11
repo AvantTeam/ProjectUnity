@@ -107,7 +107,6 @@ public class SpriteProcessor{
         KamiRegions.load();
         UnityObjs.load();
         UnitySounds.load();
-        UnityShaders.load();
 
         Draw.scl = 0.25f;
         Generators.generate();
