@@ -6,6 +6,7 @@ import arc.util.*;
 import mindustry.mod.*;
 import rhino.*;
 import unity.*;
+import unity.cinematic.*;
 import unity.util.*;
 
 import java.lang.reflect.*;

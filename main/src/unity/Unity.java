@@ -12,6 +12,7 @@ import mindustry.world.blocks.environment.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import unity.ai.kami.*;
+import unity.cinematic.*;
 import unity.content.*;
 import unity.gen.*;
 import unity.graphics.*;
@@ -77,9 +78,10 @@ public class Unity extends Mod implements ApplicationListener{
         });
 
         Events.on(ClientLoadEvent.class, e -> {
-            UnitySettings.init();
-
             addCredits();
+            UnitySettings.init();
+            SpeechDialog.init();
+
             Core.settings.getBoolOnce("unity-install", () -> Time.runTask(5f, CreditsDialog::showList));
         });
 

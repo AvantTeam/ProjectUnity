@@ -2,87 +2,145 @@ package unity.cinematic;
 
 import arc.func.*;
 import arc.graphics.*;
-import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.scene.*;
 import arc.scene.actions.*;
+import arc.scene.style.*;
 import arc.scene.ui.*;
+import arc.scene.ui.Label.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
-import mindustry.graphics.*;
 import mindustry.ui.*;
-import mindustry.ui.fragments.*;
 import unity.mod.*;
 
 import static mindustry.Vars.*;
 
-public class SpeechDialog extends Table{
-    public SpeechUpdater update;
+public class SpeechDialog{
+    public static SpeechDialog dialog;
+    private static boolean shown;
+    private static boolean initialized;
 
-    protected boolean shown;
-    protected Cons<Trigger> updater;
+    public final Prov<CharSequence> title;
+    public final SpeechProvider content;
+    public final Prov<Drawable> image;
+    public final Prov<Color> color;
 
-    public SpeechDialog(String title, String content, TextureRegion image){
-        this(() -> title, content, () -> image, Pal.accent);
+    protected SpeechDialog parent;
+    protected SpeechDialog next;
+    private boolean done;
+
+    public static void init(){
+        if(initialized) return;
+        initialized = true;
+
+        dialog = new SpeechDialog();
+
+        Table table = placement().row()
+            .table(Tex.wavepane, t -> {
+                t.setClip(true);
+                t.defaults().pad(3f);
+
+                t.left().top()
+                    .image().update(i -> {
+                        if(dialog.next != null){
+                            i.setDrawable(dialog.next.image.get());
+                        }
+                    })
+                    .size(iconXLarge)
+                    .name("image");
+
+                t.table(Styles.black6, cont -> {
+                    cont.name = "content";
+
+                    Label title = cont.labelWrap(() -> dialog.next != null ? dialog.next.title.get() : "")
+                        .fill().name("title")
+                        .get();
+
+                    LabelStyle titleSt = title.getStyle();
+                    titleSt.background = Styles.black3;
+
+                    cont.row()
+                        .image(Tex.whiteui).update(i -> {
+                            if(dialog.next != null){
+                                i.setColor(dialog.next.color.get());
+                            }
+                        })
+                        .fillX().height(3f).pad(6f)
+                        .name("separator");
+
+                    Label content = cont.row().labelWrap(() -> dialog.next != null ? dialog.next.content.get() : "")
+                        .fillX().growY().name("content")
+                        .get();
+
+                    LabelStyle contentSt = content.getStyle();
+                    contentSt.background = Styles.black3;
+                    contentSt.font = Fonts.tech;
+                }).fillX().growY();
+            })
+            .width(65f * 5)
+            .fillY()
+            .update(t -> {
+                if(dialog.next != null && !dialog.next.done && !shown){
+                    shown = true;
+                    t.actions(
+                        Actions.sizeBy(1f, 1f, 0.2f, Interp.pow3Out),
+                        Actions.action(SpeechUpdateAction.class, SpeechUpdateAction::new).dialog(dialog.next)
+                    );
+                }
+
+                if(dialog.next != null && dialog.next.done){
+                    if(dialog.next.next != null){
+                        SpeechDialog child = dialog.next.next;
+                        dialog.next.parent = null;
+                        dialog.next.next = null;
+
+                        dialog.next = child;
+                    }else if(shown){
+                        shown = false;
+                        t.actions(Actions.sizeBy(1f, 0f, 0.2f, Interp.pow3In));
+                    }
+                }
+            })
+            .name("speechdialog")
+            .get();
+
+        table.sizeBy(1f, 0f);
     }
 
-    public SpeechDialog(Prov<CharSequence> title, String content, Prov<TextureRegion> image, Color color){
-        defaults().pad(6f);
-        background(Tex.wavepane);
-
-        left().top().image(image).size(iconXLarge).fill().name("image");
-        table(t -> {
-            t.add(new Label(title){{
-                setWrap(true);
-                background(Styles.black3);
-            }})
-                .update(l -> l.setColor(color)).name("title")
-                .grow();
-
-            t.row()
-                .image(Tex.whiteui, color).name("separator")
-                .growX()
-                .height(3f)
-                .pad(6f);
-
-            t.row()
-                .labelWrap(update = new SpeechUpdater(content, 1f){{
-                    background(Styles.black3);
-                }}).name("content")
-                .grow();
-        }).grow();
-
-        visible = false;
-        updater = Triggers.cons(update::update);
+    private SpeechDialog(){
+        title = null;
+        content = null;
+        image = null;
+        color = null;
     }
 
-    public void show(){
-        if(!shown){
-            shown = true;
-            update.reset();
-            Triggers.listen(Trigger.update, updater);
+    protected SpeechDialog(SpeechDialog parent, Prov<CharSequence> title, String content, float speed, Prov<Drawable> image, Prov<Color> color){
+        this.parent = parent;
+        this.title = title;
+        this.content = new SpeechProvider(content, speed);
+        this.image = image;
+        this.color = color;
+    }
 
-            actions(
-                Actions.sizeBy(1f, 0f, 0f),
-                Actions.visible(true),
-                Actions.sizeBy(1f, 1f, 0.12f, Interp.pow3Out)
-            );
+    public SpeechDialog show(Prov<CharSequence> title, String content, float speed, Prov<Drawable> image, Prov<Color> color){
+        return last().next = new SpeechDialog(this, title, content, speed, image, color);
+    }
 
-            placement().row().add(left()).width(65f * 5 + 4f).pad(0f);
+    public SpeechDialog last(){
+        SpeechDialog current = this;
+        while(current.next != null){
+            current = current.next;
         }
+
+        return current;
     }
 
-    public void hide(){
-        if(shown){
-            shown = false;
-            Triggers.detach(Trigger.update, updater);
-
-            actions(
-                Actions.sizeBy(1f, 0f, 0.12f, Interp.pow3In),
-                Actions.visible(false),
-                Actions.remove()
-            );
+    public void clear(){
+        if(next != null){
+            next.clear();
+            next = null;
         }
     }
 
@@ -91,24 +149,24 @@ public class SpeechDialog extends Table{
             .<Table>find("overlaymarker")
             .<Stack>find("waves/editor")
             .<Table>find("waves")
-            .<Table>find(e -> e instanceof Table t && t.find("status") != null)
-            .find("status");
+            .find(e -> e instanceof Table t && t.find("status") != null);
     }
 
-    public class SpeechUpdater implements Prov<CharSequence>{
+    protected class SpeechProvider implements Prov<CharSequence>{
         public final String content;
         public final float speed;
 
-        protected float last = Time.time;
+        protected float last;
         protected int index = 0;
-        protected boolean done;
 
-        public SpeechUpdater(String content, float speed){
+        protected Cons<Trigger> updater;
+
+        protected SpeechProvider(String content, float speed){
             this.content = content;
             this.speed = speed;
         }
 
-        public void update(){
+        protected void update(){
             if(index < content.length()){
                 float elapsed = Time.time - last;
                 if(elapsed >= speed){
@@ -119,13 +177,13 @@ public class SpeechDialog extends Table{
                 }
             }
 
-            if(index >= content.length() && !done){
-                done = true;
-                Time.run(5f * Time.toSeconds, SpeechDialog.this::hide);
+            if(index >= content.length()){
+                Triggers.detach(Trigger.update, updater);
+                Time.run(Math.max(5f, content.length() / 20f) * Time.toSeconds, () -> done = true);
             }
         }
 
-        public void reset(){
+        protected void reset(){
             last = Time.time;
             index = 0;
             done = false;
@@ -134,6 +192,31 @@ public class SpeechDialog extends Table{
         @Override
         public String get(){
             return content.substring(0, index);
+        }
+    }
+
+    protected static class SpeechUpdateAction extends Action{
+        protected SpeechDialog dialog;
+
+        @Override
+        public boolean act(float delta){
+            if(dialog != null && dialog.content != null){
+                dialog.content.last = Time.time;
+                dialog.content.updater = Triggers.listen(Trigger.update, dialog.content::update);
+            }
+
+            return true;
+        }
+
+        @Override
+        public void reset(){
+            super.reset();
+            dialog = null;
+        }
+
+        protected SpeechUpdateAction dialog(SpeechDialog dialog){
+            this.dialog = dialog;
+            return this;
         }
     }
 }
