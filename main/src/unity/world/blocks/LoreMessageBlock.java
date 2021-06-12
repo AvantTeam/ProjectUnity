@@ -102,7 +102,6 @@ public class LoreMessageBlock extends Block{
                 var scrl = cont.pane(Styles.defaultPane, pane -> {
                     pane.setBackground(Tex.scroll);
                     pane.labelWrap(() -> Core.bundle.get(message, "..."))
-                        .align(Align.topLeft)
                         .grow()
                         .pad(6f);
                 })

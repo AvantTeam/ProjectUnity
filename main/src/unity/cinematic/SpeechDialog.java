@@ -1,5 +1,6 @@
 package unity.cinematic;
 
+import arc.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
@@ -12,8 +13,10 @@ import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.ui.*;
 import unity.mod.*;
+import unity.ui.*;
 
 import static mindustry.Vars.*;
 
@@ -37,29 +40,27 @@ public class SpeechDialog{
 
         dialog = new SpeechDialog();
 
-        Table table = placement().row()
-            .table(Tex.wavepane, t -> {
+        placement().row()
+            .table(Tex.buttonRight, t -> {
                 t.setClip(true);
-                t.defaults().pad(3f);
 
-                t.left().top()
-                    .image().update(i -> {
+                t.image()
+                    .update(i -> {
                         if(dialog.next != null){
                             i.setDrawable(dialog.next.image.get());
                         }
                     })
-                    .size(iconXLarge)
+                    .align(Align.topLeft).size(iconXLarge).pad(6f)
                     .name("image");
 
-                t.table(Styles.black6, cont -> {
+                t.table(Styles.black3, cont -> {
                     cont.name = "content";
 
-                    Label title = cont.labelWrap(() -> dialog.next != null ? dialog.next.title.get() : "")
-                        .fill().name("title")
-                        .get();
-
-                    LabelStyle titleSt = title.getStyle();
-                    titleSt.background = Styles.black3;
+                    cont.labelWrap(() -> dialog.next != null ? dialog.next.title.get() : "")
+                        .style(UnityStyles.speechtitlet)
+                        .align(Align.left).pad(6f)
+                        .growX().fillY().name("title")
+                        .get().setOrigin(Align.left);
 
                     cont.row()
                         .image(Tex.whiteui).update(i -> {
@@ -67,27 +68,30 @@ public class SpeechDialog{
                                 i.setColor(dialog.next.color.get());
                             }
                         })
-                        .fillX().height(3f).pad(6f)
+                        .growX().height(3f).pad(6f)
                         .name("separator");
 
-                    Label content = cont.row().labelWrap(() -> dialog.next != null ? dialog.next.content.get() : "")
-                        .fillX().growY().name("content")
-                        .get();
-
-                    LabelStyle contentSt = content.getStyle();
-                    contentSt.background = Styles.black3;
-                    contentSt.font = Fonts.tech;
-                }).fillX().growY();
+                    cont.row().labelWrap(() -> dialog.next != null ? dialog.next.content.get() : "")
+                        .style(UnityStyles.speecht)
+                        .align(Align.topLeft).pad(6f)
+                        .grow().name("content")
+                        .get().setOrigin(Align.topLeft);
+                }).grow();
             })
-            .width(65f * 5)
-            .fillY()
+            .size(320f, 200f).align(Align.bottomLeft)
             .update(t -> {
+                if(!(state.isPlaying() || state.isPaused())){
+                    dialog.clear();
+                    shown = false;
+
+                    return;
+                }
+
                 if(dialog.next != null && !dialog.next.done && !shown){
                     shown = true;
-                    t.actions(
-                        Actions.sizeBy(1f, 1f, 0.2f, Interp.pow3Out),
-                        Actions.action(SpeechUpdateAction.class, SpeechUpdateAction::new).dialog(dialog.next)
-                    );
+
+                    t.actions(Actions.scaleTo(1f, 1f, 0.2f, Interp.pow3Out));
+                    Time.run(0.2f * Time.toSeconds, () -> t.actions(Actions.action(SpeechUpdateAction.class, SpeechUpdateAction::new).dialog(dialog.next)));
                 }
 
                 if(dialog.next != null && dialog.next.done){
@@ -97,16 +101,20 @@ public class SpeechDialog{
                         dialog.next.next = null;
 
                         dialog.next = child;
+
+                        Time.run(0.2f * Time.toSeconds, () -> t.actions(Actions.action(SpeechUpdateAction.class, SpeechUpdateAction::new).dialog(dialog.next)));
                     }else if(shown){
                         shown = false;
-                        t.actions(Actions.sizeBy(1f, 0f, 0.2f, Interp.pow3In));
+                        t.actions(Actions.scaleTo(1f, 0f, 0.2f, Interp.pow3In));
                     }
+                }
+
+                if(dialog.next == null){
+                    t.actions(Actions.scaleTo(1f, 0f));
                 }
             })
             .name("speechdialog")
-            .get();
-
-        table.sizeBy(1f, 0f);
+            .get().setOrigin(Align.topLeft);
     }
 
     private SpeechDialog(){
@@ -122,6 +130,10 @@ public class SpeechDialog{
         this.content = new SpeechProvider(content, speed);
         this.image = image;
         this.color = color;
+    }
+
+    public SpeechDialog show(String title, String content){
+        return show(() -> title, content, 1f, () -> Core.atlas.drawable("clear"), () -> Pal.accent);
     }
 
     public SpeechDialog show(Prov<CharSequence> title, String content, float speed, Prov<Drawable> image, Prov<Color> color){
