@@ -25,8 +25,6 @@ public class SpriteProcessor{
     static Unity mod;
 
     public static void main(String[] args){
-        ArcNativesLoader.load();
-
         headless = true;
         loadLogger();
 

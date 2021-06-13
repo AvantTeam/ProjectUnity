@@ -16,8 +16,6 @@ repositories {
 
 dependencies {
     implementation project(':main')
-
-    implementation "com.github.Anuken.Arc:natives-desktop:$arcVersion"
     implementation "com.github.Anuken.Mindustry:core:$mindustryVersion"
 }
 

@@ -7,7 +7,6 @@ buildscript {
     }
 
     dependencies {
-        classpath "com.github.Anuken.Arc:arc-core:$arcVersion"
         classpath "com.github.Anuken.Mindustry:core:$mindustryVersion"
         classpath "com.squareup:javapoet:$javapoetVersion"
         classpath "com.github.Anuken:jabel:$jabelVersion"
