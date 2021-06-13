@@ -62,7 +62,6 @@ public class Unity extends Mod implements ApplicationListener{
             Core.assets.setLoader(WavefrontObject.class, new WavefrontObjectLoader(tree));
         }
 
-        UnityStyles.load();
         KamiPatterns.load();
         KamiBulletDatas.load();
 
@@ -76,6 +75,7 @@ public class Unity extends Mod implements ApplicationListener{
             UnitySounds.load();
             UnityShaders.load();
             UnityFonts.load();
+            UnityStyles.load();
         });
 
         Events.on(DisposeEvent.class, e ->
