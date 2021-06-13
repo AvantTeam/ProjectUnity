@@ -24,7 +24,7 @@ public class UnityShaders{
     public static void load(){
         if(headless) return;
 
-        buffer = new FrameBuffer();
+        //buffer = new FrameBuffer();
         all = new UnityShader[]{
             holoShield = new HolographicShieldShader(),
             stencilShader = new StencilShader()
@@ -38,6 +38,7 @@ public class UnityShaders{
         }
 
         Events.run(Trigger.draw, () -> {
+            if(buffer == null) return;
             buffer.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
 
             float range = (1f / all.length) / 2f;
