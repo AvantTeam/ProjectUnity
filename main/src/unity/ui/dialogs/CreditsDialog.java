@@ -3,6 +3,7 @@ package unity.ui.dialogs;
 import arc.*;
 import arc.func.*;
 import arc.graphics.*;
+import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
@@ -21,9 +22,7 @@ public class CreditsDialog extends BaseDialog{
     public CreditsDialog(){
         super("@credits");
 
-        shown(() -> {
-            Core.app.post(this::setup);
-        });
+        shown(() -> Core.app.post(this::setup));
 
         shown(this::setup);
         onResize(this::setup);
@@ -39,31 +38,31 @@ public class CreditsDialog extends BaseDialog{
         Table in = new Table();
         ScrollPane pane = new ScrollPane(in);
 
-        for(LinkEntry link : ModLinks.getLinks()){
+        for(ModLink link : ModLink.all){
             Table table = new Table(Tex.underline);
             table.margin(0);
 
             table.table(img -> {
-                img.image().height(h - 5).width(40f).color(link.color);
+                img.image().height(h - 5).width(40f).color(link.entry.color);
                 img.row();
-                img.image().height(5).width(40f).color(link.color.cpy().mul(0.8f, 0.8f, 0.8f, 1f));
+                img.image().height(5).width(40f).color(link.entry.color.cpy().mul(0.8f, 0.8f, 0.8f, 1f));
             }).expandY();
 
             table.table(i -> {
                 i.background(Tex.buttonEdge3);
-                i.image(link.icon);
+                i.image(link.entry.icon);
             }).size(h - 5, h);
 
             table.table(inset -> {
-                inset.add("[accent]" + link.title).growX().left();
+                inset.add("[accent]" + link.entry.title).growX().left();
                 inset.row();
-                inset.labelWrap(link.description).width(w - 100f).color(Color.lightGray).growX();
+                inset.labelWrap(link.entry.description).width(w - 100f).color(Color.lightGray).growX();
             }).padLeft(8);
 
             table.button(Icon.link, () -> {
-                if(!Core.app.openURI(link.link)){
+                if(!Core.app.openURI(link.entry.link)){
                     Vars.ui.showErrorMessage("@linkfail");
-                    Core.app.setClipboardText(link.link);
+                    Core.app.setClipboardText(link.entry.link);
                 }
             }).size(h - 5, h);
 
@@ -121,20 +120,18 @@ public class CreditsDialog extends BaseDialog{
         dialog.show();
     }
 
-    static class ModLinks{
-        private static LinkEntry[] links;
+    enum ModLink{
+        discord("avant-discord", "https://discord.gg/V6ygvgGVqE", Icon.discord, Color.valueOf("7289da")),
+        changelog("changelog", "https://github.com/AvantTeam/ProjectUnity/releases", Icon.list, Pal.accent),
+        github("avant-github", "https://github.com/AvantTeam/ProjectUnity", Icon.github, Color.valueOf("24292e")),
+        bug("bug", "https://github.com/AvantTeam/ProjectUnity/issues/new", Icon.wrench, Color.valueOf("ec7458"));
 
-        static{
-            links = new LinkEntry[]{
-                new LinkEntry("avant-discord", "https://discord.gg/V6ygvgGVqE", Icon.discord, Color.valueOf("7289da")),
-                new LinkEntry("changelog", "https://github.com/AvantTeam/ProjectUnity/releases", Icon.list, Pal.accent.cpy()),
-                new LinkEntry("avant-github", "https://github.com/AvantTeam/ProjectUnity", Icon.github, Color.valueOf("24292e")),
-                new LinkEntry("bug", "https://github.com/AvantTeam/ProjectUnity/issues/new", Icon.wrench, Color.valueOf("ec7458"))
-            };
-        }
+        public static final ModLink[] all = values();
 
-        public static LinkEntry[] getLinks(){
-            return links;
+        final LinkEntry entry;
+
+        ModLink(String name, String link, Drawable icon, Color color){
+            entry = new LinkEntry(name, link, icon, color);
         }
     }
 }

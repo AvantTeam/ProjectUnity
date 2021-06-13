@@ -74,7 +74,7 @@ public class TapHandler{
         listeners.remove(listener);
     }
 
-    public static interface TapListener{
+    public interface TapListener{
         void tap(Player player, float x, float y);
     }
 }

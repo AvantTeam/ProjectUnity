@@ -1,14 +1,14 @@
 package unity.cinematic;
 
 import arc.*;
+import arc.audio.*;
 import arc.func.*;
 import arc.graphics.*;
+import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.*;
 import arc.scene.actions.*;
 import arc.scene.style.*;
-import arc.scene.ui.*;
-import arc.scene.ui.Label.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.game.EventType.*;
@@ -44,22 +44,23 @@ public class SpeechDialog{
             .table(Tex.buttonRight, t -> {
                 t.setClip(true);
 
-                t.image()
+                t.table(Styles.black3, cont -> cont.image()
                     .update(i -> {
                         if(dialog.next != null){
                             i.setDrawable(dialog.next.image.get());
                         }
                     })
-                    .align(Align.topLeft).size(iconXLarge).pad(6f)
-                    .name("image");
+                    .pad(5f).grow()
+                    .name("image")
+                ).align(Align.topLeft).size(iconXLarge + 10f);
 
                 t.table(Styles.black3, cont -> {
                     cont.name = "content";
 
                     cont.labelWrap(() -> dialog.next != null ? dialog.next.title.get() : "")
                         .style(UnityStyles.speechtitlet)
-                        .align(Align.left).pad(6f)
-                        .growX().fillY().name("title")
+                        .align(Align.left).pad(5f)
+                        .fill().name("title")
                         .get().setOrigin(Align.left);
 
                     cont.row()
@@ -68,18 +69,20 @@ public class SpeechDialog{
                                 i.setColor(dialog.next.color.get());
                             }
                         })
-                        .growX().height(3f).pad(6f)
+                        .growX().height(3f).pad(5f)
                         .name("separator");
 
                     cont.row().labelWrap(() -> dialog.next != null ? dialog.next.content.get() : "")
                         .style(UnityStyles.speecht)
-                        .align(Align.topLeft).pad(6f)
+                        .align(Align.topLeft).pad(5f)
                         .grow().name("content")
                         .get().setOrigin(Align.topLeft);
                 }).grow();
             })
-            .size(320f, 200f).align(Align.bottomLeft)
+            .size(320f, 200f).align(Align.topLeft)
             .update(t -> {
+                t.setOrigin(Align.topLeft);
+
                 if(!(state.isPlaying() || state.isPaused())){
                     dialog.clear();
                     shown = false;
@@ -113,8 +116,7 @@ public class SpeechDialog{
                     t.actions(Actions.scaleTo(1f, 0f));
                 }
             })
-            .name("speechdialog")
-            .get().setOrigin(Align.topLeft);
+            .name("speechdialog");
     }
 
     private SpeechDialog(){
@@ -124,20 +126,29 @@ public class SpeechDialog{
         color = null;
     }
 
-    protected SpeechDialog(SpeechDialog parent, Prov<CharSequence> title, String content, float speed, Prov<Drawable> image, Prov<Color> color){
+    protected SpeechDialog(SpeechDialog parent, Prov<CharSequence> title, String content, Sound sound, float speed, Prov<Drawable> image, Prov<Color> color){
         this.parent = parent;
         this.title = title;
-        this.content = new SpeechProvider(content, speed);
+        this.content = new SpeechProvider(content, sound, speed);
         this.image = image;
         this.color = color;
     }
 
     public SpeechDialog show(String title, String content){
-        return show(() -> title, content, 1f, () -> Core.atlas.drawable("clear"), () -> Pal.accent);
+        return show(() -> title, content, Sounds.click, 1f, () -> Core.atlas.drawable("clear"), () -> Pal.accent);
     }
 
-    public SpeechDialog show(Prov<CharSequence> title, String content, float speed, Prov<Drawable> image, Prov<Color> color){
-        return last().next = new SpeechDialog(this, title, content, speed, image, color);
+    public SpeechDialog show(String title, String content, Drawable image, Color color){
+        return show(() -> title, content, Sounds.click, 1f, () -> image, () -> color);
+    }
+
+    public SpeechDialog show(String title, String content, TextureRegion image, Color color){
+        Drawable draw = new TextureRegionDrawable(image);
+        return show(() -> title, content, Sounds.click, 1f, () -> draw, () -> color);
+    }
+
+    public SpeechDialog show(Prov<CharSequence> title, String content, Sound sound, float speed, Prov<Drawable> image, Prov<Color> color){
+        return last().next = new SpeechDialog(this, title, content, sound, speed, image, color);
     }
 
     public SpeechDialog last(){
@@ -150,6 +161,10 @@ public class SpeechDialog{
     }
 
     public void clear(){
+        if(content != null){
+            content.stop();
+        }
+
         if(next != null){
             next.clear();
             next = null;
@@ -166,6 +181,7 @@ public class SpeechDialog{
 
     protected class SpeechProvider implements Prov<CharSequence>{
         public final String content;
+        public final Sound sound;
         public final float speed;
 
         protected float last;
@@ -173,8 +189,9 @@ public class SpeechDialog{
 
         protected Cons<Trigger> updater;
 
-        protected SpeechProvider(String content, float speed){
+        protected SpeechProvider(String content, Sound sound, float speed){
             this.content = content;
+            this.sound = sound;
             this.speed = speed;
         }
 
@@ -190,15 +207,13 @@ public class SpeechDialog{
             }
 
             if(index >= content.length()){
-                Triggers.detach(Trigger.update, updater);
-                Time.run(Math.max(5f, content.length() / 20f) * Time.toSeconds, () -> done = true);
+                stop();
             }
         }
 
-        protected void reset(){
-            last = Time.time;
-            index = 0;
-            done = false;
+        protected void stop(){
+            Triggers.detach(Trigger.update, updater);
+            Time.run(Math.max(5f, content.length() / 20f) * Time.toSeconds, () -> done = true);
         }
 
         @Override
@@ -212,7 +227,7 @@ public class SpeechDialog{
 
         @Override
         public boolean act(float delta){
-            if(dialog != null && dialog.content != null){
+            if(dialog != null && dialog.content != null && dialog.content.updater == null){
                 dialog.content.last = Time.time;
                 dialog.content.updater = Triggers.listen(Trigger.update, dialog.content::update);
             }

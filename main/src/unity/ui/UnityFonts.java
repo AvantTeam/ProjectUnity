@@ -1,17 +1,15 @@
 package unity.ui;
 
 import arc.*;
-import arc.assets.*;
 import arc.freetype.FreeTypeFontGenerator.*;
 import arc.freetype.FreetypeFontLoader.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 
-public class UnityFonts implements Loadable{
+public class UnityFonts{
     public static Font speech, speechtitle;
 
-    @Override
-    public void loadSync(){
+    public static void load(){
         Core.assets.load("unityspeech", Font.class, new FreeTypeFontLoaderParameter("fonts/font.woff", new FreeTypeFontParameter(){{
             size = 12;
             incremental = true;
