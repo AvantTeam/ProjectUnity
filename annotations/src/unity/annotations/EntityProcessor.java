@@ -621,6 +621,7 @@ public class EntityProcessor extends BaseProcessor{
                 .addField(
                     FieldSpec.builder(TypeName.INT, "last")
                         .addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.VOLATILE)
+                        .initializer("0")
                     .build()
                 )
                 .addMethod(
@@ -669,7 +670,11 @@ public class EntityProcessor extends BaseProcessor{
                         )
                         .addStatement("register(type, prov)")
                         .addStatement("$T.nameMap.put(name, prov)", cName(EntityMapping.class))
-                        .addStatement("$T.customIdMap.put(classId(type), name)", cName(EntityMapping.class))
+                        .addCode(lnew())
+                        .addStatement("int id = classId(type)")
+                        .beginControlFlow("if(id != -1)")
+                            .addStatement("$T.customIdMap.put(classId(type), name)", cName(EntityMapping.class))
+                        .endControlFlow()
                     .build()
                 )
                 .addMethod(
