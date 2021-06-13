@@ -6,12 +6,15 @@ import arc.scene.ui.TextButton.*;
 import mindustry.ui.*;
 
 import static arc.Core.*;
+import static mindustry.Vars.*;
 
 public class UnityStyles{
     public static TextButtonStyle creditst;
     public static LabelStyle speecht, speechtitlet;
 
     public static void load(){
+        if(headless) return;
+
         creditst = new TextButtonStyle(){{
             font = Fonts.def;
             fontColor = Color.white;

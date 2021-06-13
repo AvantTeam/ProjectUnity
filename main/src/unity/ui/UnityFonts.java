@@ -6,10 +6,14 @@ import arc.freetype.FreetypeFontLoader.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 
+import static mindustry.Vars.*;
+
 public class UnityFonts{
     public static Font speech, speechtitle;
 
     public static void load(){
+        if(headless) return;
+
         Core.assets.load("unityspeech", Font.class, new FreeTypeFontLoaderParameter("fonts/font.woff", new FreeTypeFontParameter(){{
             size = 12;
             incremental = true;
