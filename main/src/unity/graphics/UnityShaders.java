@@ -14,7 +14,7 @@ import mindustry.graphics.*;
 
 import static mindustry.Vars.*;
 
-public class UnityShaders{
+public class UnityShaders implements Loadable{
     public static HolographicShieldShader holoShield;
     public static StencilShader stencilShader;
 
@@ -23,7 +23,11 @@ public class UnityShaders{
 
     public static void load(){
         if(headless) return;
+        Core.assets.load(new UnityShaders());
+    }
 
+    @Override
+    public void loadSync(){
         buffer = new FrameBuffer();
         all = new UnityShader[]{
             holoShield = new HolographicShieldShader(),

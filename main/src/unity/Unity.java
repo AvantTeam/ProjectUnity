@@ -68,14 +68,14 @@ public class Unity extends Mod implements ApplicationListener{
         Events.on(ContentInitEvent.class, e -> {
             Regions.load();
             KamiRegions.load();
+            UnityFonts.load();
+            UnityStyles.load();
         });
 
         Events.on(FileTreeInitEvent.class, e -> {
             UnityObjs.load();
             UnitySounds.load();
             UnityShaders.load();
-            UnityFonts.load();
-            UnityStyles.load();
         });
 
         Events.on(DisposeEvent.class, e ->
