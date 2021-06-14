@@ -69,14 +69,14 @@ public class WavefrontTurret extends PowerTurret{
 
             tr2.trns(rotation, -recoil);
 
-            object.draw(x + tr2.x, y + tr2.y, angle, 0f, -rotation, v -> {
+            object.draw(x + tr2.x, y + tr2.y, angle, 90f, -rotation, v -> {
                 if(v.z > 0f){
                     v.z += offset;
                 }else{
                     v.z -= offset;
                 }
             });
-            object.draw(x + tr2.x, y + tr2.y, -angle + 90f, 0f, -rotation, v -> {
+            object.draw(x + tr2.x, y + tr2.y, -angle + 90f, 90f, -rotation, v -> {
                 if(v.z > 0f){
                     v.z += gap + offset;
                 }else{

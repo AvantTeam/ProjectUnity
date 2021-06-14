@@ -76,7 +76,7 @@ public class WavefrontObject{
                         hasMaterial = true;
                     }
 
-                    if(line.contains("Ka ") && current != null){
+                    if(line.startsWith("Ka ") && current != null){
                         String[] val = line.replaceFirst("Ka ", "").split("\\s+");
                         float[] col = new float[3];
 
@@ -92,7 +92,7 @@ public class WavefrontObject{
                         }
                     }
 
-                    if(line.contains("Kd ") && current != null){
+                    if(line.startsWith("Kd ") && current != null){
                         String[] val = line.replaceFirst("Kd ", "").split("\\s+");
                         float[] col = new float[3];
 
@@ -108,7 +108,7 @@ public class WavefrontObject{
                         }
                     }
 
-                    if(line.contains("Ke ") && current != null){
+                    if(line.startsWith("Ke ") && current != null){
                         String[] val = line.replaceFirst("Ke ", "").split("\\s+");
                         float[] col = new float[3];
 

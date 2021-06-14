@@ -14,11 +14,12 @@ import unity.util.*;
 
 public class WavefrontLaser extends BulletType{
     public float length = 450f;
-    public float accel = 20f, laserSpeed = 20f;
+    public float accel = 20f, laserSpeed = 40f;
     public Color[] colors = {UnityPal.advanceDark.cpy().mul(0.9f, 1f, 1f, 0.4f), UnityPal.advanceDark, UnityPal.advance, Color.white};
 
     public WavefrontLaser(float damage){
         super(0.005f, damage);
+        lifetime = 76f;
         despawnEffect = Fx.none;
         collides = false;
         pierce = true;
