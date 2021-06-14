@@ -175,7 +175,7 @@ public class WavefrontObject{
                 if(line.contains("vn ")){
                     if(!hasNormal) hasNormal = true;
                     String[] pos = line.replaceFirst("vn ", "").split("\\s+");
-                    if(pos.length != 3) throw new IllegalStateException("'v' must define all 3 vector points")
+                    if(pos.length != 3) throw new IllegalStateException("'v' must define all 3 vector points");
 
                     float[] vec = new float[3];
                     for(int i = 0; i < 3; i++){
