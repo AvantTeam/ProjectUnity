@@ -21,6 +21,7 @@ import static mindustry.Vars.*;
 public class FloorExtractor extends GenericCrafter{
     private static final Seq<Tile> source = new Seq<>();
 
+    /** @deprecated {@link Attribute} is no longer an enum, might as well use it instead. */
     public IntFloatMap sources = new IntFloatMap();
 
     public FloorExtractor(String name){
