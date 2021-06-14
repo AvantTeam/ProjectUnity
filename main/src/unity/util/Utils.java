@@ -37,11 +37,15 @@ public final class Utils{
     private static Tile furthest;
     private static Building tmpBuilding;
     private static Unit tmpUnit;
-    private static boolean hit;
+    private static boolean hit, hitB;
 
     private static final DynamicBoolGrid collideLineCollided = new DynamicBoolGrid();
     private static final Seq<Point2> collideLineCast = new Seq<>();
     private static final Seq<Point2> collideLineCastNext = new Seq<>();
+
+    private static final Point2[][] dd5 = {
+        {}
+    };
 
     public static <T extends Buildingc> Tile getBestTile(T build, int before, int after){
         Tile tile = build.tile();
@@ -430,51 +434,14 @@ public final class Utils{
                 int intOffX = Mathf.round(Math.max(Math.abs(x2 - x), tilesize) / tilesize);
                 int intOffY = Mathf.round(Math.max(Math.abs(y2 - y), tilesize) / tilesize);
                 collideLineCollided.updateSize(intOffX + (offset * 2), intOffY + (offset * 2));
-                int offsetX = x2 - x > 0 ? offset : intOffX - offset;
-                int offsetY = y2 - y > 0 ? offset : intOffY - offset;
+                int offsetX = x2 > x ? offset : intOffX - offset;
+                int offsetY = y2 > y ? offset : intOffY - offset;
                 int tileX = Mathf.round(x / tilesize);
                 int tileY = Mathf.round(y / tilesize);
-                int tileX2 = Mathf.round(x2 / tilesize);
-                int tileY2 = Mathf.round(y2 / tilesize);
 
-                Point2 p1 = Pools.obtain(Point2.class, Point2::new);
-                collideLineCast.add(p1.set(Mathf.round(x / tilesize), Mathf.round(y / tilesize)));
-                int px = (p1.x - tileX) + offsetX;
-                int py = (p1.y - tileY) + offsetY;
-                px = collideLineCollided.clampX(px);
-                py = collideLineCollided.clampY(py);
-                collideLineCollided.set(px, py, true);
-                boolean hitInsulated = false;
+                hitB = false;
 
-                int x0 = tileX, y0 = tileY;
-                int dx = Math.abs(tileX2 - tileX), dy = Math.abs(tileY2 - tileY);
-                int sx = tileX < tileX2 ? 1 : -1, sy = tileY < tileY2 ? 1 : -1;
-                int err = dx - dy;
-                int e2;
-
-                while(!collideLineCast.isEmpty()){
-                    if((!(x0 == tileX2 && y0 == tileY2) && !hitInsulated)){
-                        int tpx = (x0 - tileX) + offsetX;
-                        int tpy = (y0 - tileY) + offsetX;
-
-                        e2 = 2 * err;
-                        if(e2 > -dy){
-                            err = err - dy;
-                            x0 = x0 + sx;
-                        }
-
-                        if(e2 < dx){
-                            err = err + dx;
-                            y0 = y0 + sy;
-                        }
-
-                        if(collideLineCollided.within(tpx, tpy) && !collideLineCollided.get(tpx, tpy)){
-                            Point2 pn = Pools.obtain(Point2.class, Point2::new);
-                            collideLineCast.add(pn.set(x0, y0));
-                            collideLineCollided.set(tpx, tpy, true);
-                        }
-                    }
-
+                Runnable updateCast = () -> {
                     for(Point2 p : collideLineCast){
                         Building build = world.build(p.x, p.y);
                         boolean hit = false;
@@ -489,9 +456,9 @@ public final class Utils{
                                 tmpUnitSeq.add(build);
                                 hit = buildingCons.get(build, false);
                             }
-                            if(hit && !hitInsulated){
+                            if(hit && !hitB){
                                 tV.trns(Angles.angle(x, y, x2, y2), Mathf.dst(x, y, build.x, build.y)).add(x, y);
-                                hitInsulated = true;
+                                hitB = true;
                             }
                         }
 
@@ -503,7 +470,7 @@ public final class Utils{
                                 int newY = (p.y + p2.y);
                                 int npx = (newX - tileX) + offsetX;
                                 int npy = (newY - tileY) + offsetY;
-                                boolean within = !hitInsulated || Mathf.within(x, y, newX * tilesize, newY * tilesize, tV.dst(x, y));
+                                boolean within = !hitB || Mathf.within(x, y, newX * tilesize, newY * tilesize, tV.dst(x, y));
                                 if(segment.within(newX * tilesize, newY * tilesize, tileWidth) && collideLineCollided.within(npx, npy) && !collideLineCollided.get(npx, npy) && within){
                                     Point2 pn = Pools.obtain(Point2.class, Point2::new);
                                     collideLineCastNext.add(pn.set(newX, newY));
@@ -515,6 +482,24 @@ public final class Utils{
                     collideLineCast.clear();
                     collideLineCast.addAll(collideLineCastNext);
                     collideLineCastNext.clear();
+                };
+
+                world.raycastEachWorld(x, y, x2, y2, (cx, cy) -> {
+                    int px = (cx - tileX) + offsetX;
+                    int py = (cy - tileY) + offsetY;
+                    px = collideLineCollided.clampX(px);
+                    py = collideLineCollided.clampY(py);
+                    if(collideLineCollided.within(px, py) && !collideLineCollided.get(px, py)){
+                        Point2 p1 = Pools.obtain(Point2.class, Point2::new);
+                        collideLineCast.add(p1.set(cx, cy));
+                        collideLineCollided.set(px, py, true);
+                    }
+                    updateCast.run();
+                    return hitB;
+                });
+
+                while(!collideLineCast.isEmpty()){
+                    updateCast.run();
                 }
                 collideLineCollided.clear();
             }
