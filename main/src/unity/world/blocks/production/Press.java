@@ -40,7 +40,7 @@ public class Press extends GenericCrafter {
         return new TextureRegion[]{region, leftRegion, rightRegion};
     }
 
-    public class PressBuilding extends GenericCrafterBuild {
+    public class PressBuild extends GenericCrafterBuild {
         public float realMovementSize = movementSize / tilesize;
         public float alphaValueMax = 0.4f;
         public float alphaValue = 0f;

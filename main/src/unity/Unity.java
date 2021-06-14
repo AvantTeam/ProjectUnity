@@ -12,6 +12,7 @@ import mindustry.world.blocks.environment.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import unity.ai.kami.*;
+import unity.async.*;
 import unity.cinematic.*;
 import unity.content.*;
 import unity.gen.*;
@@ -103,6 +104,8 @@ public class Unity extends Mod implements ApplicationListener{
         music = new MusicHandler(){};
         tap = new TapHandler();
         antiCheat = new AntiCheat();
+
+        asyncCore.processes.add(new LightProcess());
     }
 
     @Override

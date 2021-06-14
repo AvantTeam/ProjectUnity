@@ -14,7 +14,7 @@ abstract class InvisibleComp implements Unitc, Unintersectablec{
     @SyncLocal @ReadOnly boolean invisible;
     @ReadOnly transient float disabledTime = 120f;
     @ReadOnly transient Interval scanInterval = new Interval(2);
-    public float alphaLerp;
+    @SyncLocal @SyncField(true) float alphaLerp;
 
     @Import Team team;
     @Import float x, y, hitSize, health, maxHealth;
@@ -46,18 +46,6 @@ abstract class InvisibleComp implements Unitc, Unintersectablec{
         }else{
             alphaLerp = Mathf.lerpDelta(alphaLerp, 0f, 0.1f);
         }
-
-        /*if(alphaLerp < 0.5f){
-            if(invisible){
-                Groups.unit.add(self());
-                invisible = false;
-            }
-        }else{
-            if(!invisible){
-                Groups.unit.remove(self());
-                invisible = true;
-            }
-        }*/
 
         invisible = alphaLerp >= 0.5f;
     }

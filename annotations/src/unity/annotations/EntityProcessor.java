@@ -549,7 +549,7 @@ public class EntityProcessor extends BaseProcessor{
                     }
 
                     if(simpleName(first).equals("remove") && ann.pooled()){
-                        mbuilder.addStatement("mindustry.gen.Groups.queueFree(($T)this)", Poolable.class);
+                        mbuilder.addStatement("$T.queueFree(this)", cName(Groups.class));
                     }
 
                     if(!noCompWrappers.isEmpty()){

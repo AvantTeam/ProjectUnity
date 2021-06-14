@@ -96,6 +96,9 @@ public class UnityBlocks implements ContentList{
     //defense
     metaglassWall, metaglassWallLarge;
 
+    //test
+    public static @FactionDef("light") Block lightSource;
+
     //---------- imber faction ----------
     public static @FactionDef("imber")
     //environment
@@ -1118,6 +1121,10 @@ public class UnityBlocks implements ContentList{
             size = 2;
             health = 1400;
             requirements(Category.defense, with(Items.lead, 24, Items.metaglass, 24));
+        }};
+
+        lightSource = new unity.world.blocks.light.LightSource("light-source"){{
+            requirements(Category.crafting, with(Items.copper, 1));
         }};
 
         //endregion

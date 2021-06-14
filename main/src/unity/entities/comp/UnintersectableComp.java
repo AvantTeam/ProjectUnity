@@ -39,11 +39,5 @@ abstract class UnintersectableComp implements Hitboxc{
         }
     }
 
-    @Override
-    @Replace
-    public float hitSize(){
-        return intersects() ? hitSize : Float.NaN;
-    }
-
     public abstract boolean intersects();
 }

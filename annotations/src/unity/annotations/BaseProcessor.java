@@ -94,46 +94,50 @@ public abstract class BaseProcessor extends AbstractProcessor{
     }
 
     public void write(TypeSpec spec, Seq<String> imports) throws Exception{
-        JavaFile file = JavaFile.builder(packageName, spec)
-            .indent("    ")
-            .skipJavaLangImports(true)
-            .build();
+        try{
+            JavaFile file = JavaFile.builder(packageName, spec)
+                .indent("    ")
+                .skipJavaLangImports(true)
+                .build();
 
-        if(imports == null || imports.isEmpty()){
-            file.writeTo(filer);
-        }else{
-            imports.distinct();
+            if(imports == null || imports.isEmpty()){
+                file.writeTo(filer);
+            }else{
+                imports.distinct();
 
-            Seq<String> statics = imports.select(i -> i.contains("import static ")).sort();
-            imports = imports.select(i -> !statics.contains(s -> s.equals(i))).sort();
-            if(!statics.isEmpty()){
-                imports = statics.addAll("\n").and(imports);
-            }
+                Seq<String> statics = imports.select(i -> i.contains("import static ")).sort();
+                imports = imports.select(i -> !statics.contains(s -> s.equals(i))).sort();
+                if(!statics.isEmpty()){
+                    imports = statics.addAll("\n").and(imports);
+                }
 
-            String rawSource = file.toString();
-            Seq<String> source = Seq.with(rawSource.split("\n", -1));
-            Seq<String> result = new Seq<>();
-            for(int i = 0; i < source.size; i++){
-                String s = source.get(i);
+                String rawSource = file.toString();
+                Seq<String> source = Seq.with(rawSource.split("\n", -1));
+                Seq<String> result = new Seq<>();
+                for(int i = 0; i < source.size; i++){
+                    String s = source.get(i);
 
-                result.add(s);
-                if(s.startsWith("package ")){
-                    source.remove(i + 1);
-                    result.add("");
-                    for(String im : imports){
-                        result.add(im.replace("\n", ""));
+                    result.add(s);
+                    if(s.startsWith("package ")){
+                        source.remove(i + 1);
+                        result.add("");
+                        for(String im : imports){
+                            result.add(im.replace("\n", ""));
+                        }
                     }
                 }
+
+                String out = result.toString("\n");
+                JavaFileObject object = filer.createSourceFile(file.packageName + "." + file.typeSpec.name, file.typeSpec.originatingElements.toArray(new Element[0]));
+                OutputStream stream = object.openOutputStream();
+                stream.write(out.getBytes());
+                stream.close();
             }
 
-            String out = result.toString("\n");
-            JavaFileObject object = filer.createSourceFile(file.packageName + "." + file.typeSpec.name, file.typeSpec.originatingElements.toArray(new Element[0]));
-            OutputStream stream = object.openOutputStream();
-            stream.write(out.getBytes());
-            stream.close();
+            Log.info("Generated Java file '@' (round @).", spec.name, round);
+        }catch(FilerException e){
+            throw new Exception("Misbehaving files prevent annotation processing from being done. Try running `gradlew clean`", e);
         }
-
-        Log.info("Generated Java file '@' (round @).", spec.name, round);
     }
 
     public static TypeElement toEl(TypeMirror t){

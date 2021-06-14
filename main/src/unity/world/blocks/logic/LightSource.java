@@ -44,9 +44,7 @@ public class LightSource extends GenericCrafter{
             configurable = true;
             saveConfig = true;
             lastConfig = 0;
-            config(Integer.class, (LightSourceBuild build, Integer value) -> {
-                build.addAngle(value);
-            });
+            config(Integer.class, LightSourceBuild::addAngle);
         }
     }
 
@@ -98,9 +96,7 @@ public class LightSource extends GenericCrafter{
         protected LightData lightData = new LightData(lightLength, lightColor);
 
         {
-            Events.run(Trigger.draw, () -> {
-                if(this != null) drawLightLasers();
-            });
+            Events.run(Trigger.draw, this::drawLightLasers);
         }
 
         protected void setInit(boolean a){
