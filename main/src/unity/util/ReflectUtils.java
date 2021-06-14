@@ -15,7 +15,6 @@ import static mindustry.Vars.*;
 /** @author GlennFolker */
 @SuppressWarnings("unchecked")
 public final class ReflectUtils{
-    private static final Seq<String> blacklist = new Seq<>();
     private static final Seq<Object> jsArgs = new Seq<>();
     private static final Context context;
     private static final Scriptable scope;
@@ -110,9 +109,7 @@ public final class ReflectUtils{
             all[0] = handle;
             all[1] = jsArgs.addAll(args);
 
-            unblacklist();
             Object obj = handleInvoker.call(context, scope, scope, all);
-            blacklist();
 
             if(obj instanceof Wrapper w) obj = w.unwrap();
 
@@ -263,22 +260,6 @@ public final class ReflectUtils{
         }catch(Throwable e){
             throw new RuntimeException(e);
         }
-    }
-
-    public static void unblacklist(){
-        if(!blacklist.isEmpty() || mods == null) return;
-
-        Seq<String> current = getField(mods.getScripts(), findField(Scripts.class, "blacklist", true));
-        blacklist.addAll(current);
-        current.clear();
-    }
-
-    public static void blacklist(){
-        if(blacklist.isEmpty() || mods == null) return;
-
-        Seq<String> current = getField(mods.getScripts(), findField(Scripts.class, "blacklist", true));
-        current.addAll(blacklist);
-        blacklist.clear();
     }
 
     /** Revokes a modifier from a field. <b>Using this to primitive types / {@link String} constant expressions has no use.</b> */
