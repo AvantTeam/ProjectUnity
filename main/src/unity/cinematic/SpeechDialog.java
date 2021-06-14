@@ -190,7 +190,7 @@ public class SpeechDialog{
         protected Cons<Trigger> updater;
 
         protected SpeechProvider(String content, Sound sound, float speed){
-            this.content = content;
+            this.content = Strings.stripColors(content);
             this.sound = sound;
             this.speed = speed;
         }
@@ -213,7 +213,7 @@ public class SpeechDialog{
 
         protected void stop(){
             Triggers.detach(Trigger.update, updater);
-            Time.run(Math.max(5f, content.length() / 20f) * Time.toSeconds, () -> done = true);
+            Time.run(Math.max(2f, content.length() / 20f) * Time.toSeconds, () -> done = true);
         }
 
         @Override

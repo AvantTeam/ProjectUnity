@@ -1826,7 +1826,6 @@ public class UnityBlocks implements ContentList{
                 emitLight = true;
                 lightRadius = 24f;
                 lightColor = UnityPal.monolith.cpy().a(0.1f);
-                Blocks a;
             }
 
             @Override
