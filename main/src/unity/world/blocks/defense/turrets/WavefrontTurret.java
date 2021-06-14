@@ -33,9 +33,9 @@ public class WavefrontTurret extends PowerTurret{
         public void updateTile(){
             super.updateTile();
             if(isShooting() && consValid()){
-                gap = Math.min(0.13f, gap + (0.005f * Time.delta));
+                gap = Math.min(0.25f, gap + (0.005f * Time.delta));
                 angle += (reload / reloadTime) * objectRotationSpeed;
-                offset = (reload / reloadTime) * 0.1f;
+                offset = (reload / reloadTime) * 0.25f;
             }else{
                 angle = Mathf.slerp(angle, Mathf.round(angle / 90f) * 90f, 0.1f);
                 if(resetAvailable()){
@@ -69,14 +69,14 @@ public class WavefrontTurret extends PowerTurret{
 
             tr2.trns(rotation, -recoil);
 
-            object.draw(x + tr2.x, y + tr2.y, angle, 90f, -rotation, v -> {
+            object.draw(x + tr2.x, y + tr2.y, 0f, angle, -rotation, v -> {
                 if(v.z > 0f){
                     v.z += offset;
                 }else{
                     v.z -= offset;
                 }
             });
-            object.draw(x + tr2.x, y + tr2.y, -angle + 90f, 90f, -rotation, v -> {
+            object.draw(x + tr2.x, y + tr2.y, 0f, -angle + 90f, -rotation, v -> {
                 if(v.z > 0f){
                     v.z += gap + offset;
                 }else{

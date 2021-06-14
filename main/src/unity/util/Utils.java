@@ -43,8 +43,15 @@ public final class Utils{
     private static final Seq<Point2> collideLineCast = new Seq<>();
     private static final Seq<Point2> collideLineCastNext = new Seq<>();
 
-    private static final Point2[][] dd5 = {
-        {}
+    private static final Point2[][] d8d5 = {
+        {Geometry.d4[0], Geometry.d8edge[0], Geometry.d8edge[3], Geometry.d4[1], Geometry.d4[3]},
+        {Geometry.d8edge[3], Geometry.d4[0], Geometry.d4[3], Geometry.d8edge[0], Geometry.d8edge[2]},
+        {Geometry.d4[3], Geometry.d8edge[3], Geometry.d8edge[2], Geometry.d4[0], Geometry.d4[2]},
+        {Geometry.d8edge[2], Geometry.d4[3], Geometry.d4[2], Geometry.d8edge[3], Geometry.d8edge[1]},
+        {Geometry.d4[2], Geometry.d8edge[2], Geometry.d8edge[1], Geometry.d4[3], Geometry.d4[1]},
+        {Geometry.d8edge[1], Geometry.d4[2], Geometry.d4[1], Geometry.d8edge[2], Geometry.d8edge[0]},
+        {Geometry.d4[1], Geometry.d8edge[1], Geometry.d8edge[0], Geometry.d4[2], Geometry.d4[0]},
+        {Geometry.d8edge[0], Geometry.d4[1], Geometry.d4[0], Geometry.d8edge[1], Geometry.d8edge[3]}
     };
 
     public static <T extends Buildingc> Tile getBestTile(T build, int before, int after){
@@ -438,6 +445,7 @@ public final class Utils{
                 int offsetY = y2 > y ? offset : intOffY - offset;
                 int tileX = Mathf.round(x / tilesize);
                 int tileY = Mathf.round(y / tilesize);
+                int direction = Mathf.mod(Mathf.round(Angles.angle(x, y, x2, y2) / 45f), d8d5.length);
 
                 hitB = false;
 
@@ -465,7 +473,7 @@ public final class Utils{
                         Vec2 segment = Intersector.nearestSegmentPoint(x, y, tV.x, tV.y, p.x * tilesize, p.y * tilesize, tV2);
                         if(!hit){
                             Pools.free(p);
-                            for(Point2 p2 : Geometry.d4){
+                            for(Point2 p2 : d8d5[direction]){
                                 int newX = (p.x + p2.x);
                                 int newY = (p.y + p2.y);
                                 int npx = (newX - tileX) + offsetX;
