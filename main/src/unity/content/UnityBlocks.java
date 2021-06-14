@@ -11,6 +11,7 @@ import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
+import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.consumers.*;
 import mindustry.world.draw.*;
@@ -1819,20 +1820,36 @@ public class UnityBlocks implements ContentList{
             variants = 3;
         }};
 
-        infusedSharpslate = new Floor("infused-sharpslate"){{
-            variants = 3;
-            emitLight = true;
-            lightRadius = 24f;
-            lightColor = UnityPal.monolith.cpy().a(0.1f);
-        }};
+        infusedSharpslate = new Floor("infused-sharpslate"){
+            {
+                variants = 3;
+                emitLight = true;
+                lightRadius = 24f;
+                lightColor = UnityPal.monolith.cpy().a(0.1f);
+            }
 
-        archSharpslate = new Floor("archaic-sharpslate"){{
-            variants = 3;
-            updateEffect = UnityFx.archaicEnergy;
-            emitLight = true;
-            lightRadius = 24f;
-            lightColor = UnityPal.monolithLight.cpy().a(0.12f);
-        }};
+            @Override
+            public void createIcons(MultiPacker packer){
+                super.createIcons(packer);
+                mapColor.lerp(UnityPal.monolith, 0.2f);
+            }
+        };
+
+        archSharpslate = new Floor("archaic-sharpslate"){
+            {
+                variants = 3;
+                updateEffect = UnityFx.archaicEnergy;
+                emitLight = true;
+                lightRadius = 24f;
+                lightColor = UnityPal.monolithLight.cpy().a(0.12f);
+            }
+
+            @Override
+            public void createIcons(MultiPacker packer){
+                super.createIcons(packer);
+                mapColor.lerp(UnityPal.monolith, 0.4f);
+            }
+        };
 
         sharpslateWall = new StaticWall("sharpslate-wall"){{
             variants = 2;
