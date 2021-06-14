@@ -15,6 +15,7 @@ import mindustry.graphics.*;
 import unity.*;
 
 import java.io.*;
+import java.util.*;
 
 /**
  * Wavefront Object Converter and Renderer for Arc/libGDX
@@ -65,49 +66,64 @@ public class WavefrontObject{
                 try{
                     String line = matR.readLine();
                     if(line == null) break;
+
                     if(line.contains("newmtl ")){
                         current = new Material();
                         current.name = line.replaceFirst("newmtl ", "");
+
                         if(materials == null) materials = new ObjectMap<>();
                         materials.put(current.name, current);
                         hasMaterial = true;
                     }
+
                     if(line.contains("Ka ") && current != null){
                         String[] val = line.replaceFirst("Ka ", "").split("\\s+");
                         float[] col = new float[3];
+
+                        if(val.length != 3) throw new IllegalStateException("'Ka' must be followed with 3 arguments. Required: [r, g, b], found: " + Arrays.toString(val));
                         for(int i = 0; i < 3; i++){
                             col[i] = Strings.parseFloat(val[i], 0f);
                         }
+
                         Tmp.c1.set(col[0], col[1], col[2]).a(1f);
                         current.ambientCol = Tmp.c1.rgba8888();
                         if(!Tmp.c1.equals(Color.white)){
                             current.hasColor = true;
                         }
                     }
+
                     if(line.contains("Kd ") && current != null){
                         String[] val = line.replaceFirst("Kd ", "").split("\\s+");
                         float[] col = new float[3];
+
+                        if(val.length != 3) throw new IllegalStateException("'Kd' must be followed with 3 arguments. Required: [r, g, b], found: " + Arrays.toString(val));
                         for(int i = 0; i < 3; i++){
                             col[i] = Strings.parseFloat(val[i], 0f);
                         }
+
                         Tmp.c1.set(col[0], col[1], col[2]).a(1f);
                         current.diffuseCol = Tmp.c1.rgba8888();
                         if(!Tmp.c1.equals(Color.white)){
                             current.hasColor = true;
                         }
                     }
+
                     if(line.contains("Ke ") && current != null){
                         String[] val = line.replaceFirst("Ke ", "").split("\\s+");
                         float[] col = new float[3];
+
+                        if(val.length != 3) throw new IllegalStateException("'Ke' must be followed with 3 arguments. Required: [r, g, b], found: " + Arrays.toString(val));
                         for(int i = 0; i < 3; i++){
                             col[i] = Strings.parseFloat(val[i], 0f);
                         }
+
                         Tmp.c1.set(col[0], col[1], col[2]).a(1f);
                         current.emitCol = Tmp.c1.rgba8888();
                         if(!Tmp.c1.equals(Color.black)){
                             current.hasColor = true;
                         }
                     }
+
                     if(line.contains("map_Kd ") && current != null){
                         hasTexture = true;
                         hasMaterialTex = true;
@@ -116,15 +132,17 @@ public class WavefrontObject{
                             current.diffTex = Core.atlas.find("unity-" + n);
                         }
                     }
+
                     if(line.contains("map_Ke ") && current != null && canLoadTex()){
                         String n = line.replaceFirst("map_Ke ", "");
                         current.emitTex = Core.atlas.find("unity-" + n);
                     }
-                }catch(Exception e){
+                }catch(Throwable e){
                     throw new RuntimeException(e);
                 }
             }
         }
+
         BufferedReader reader = file.reader(64);
         Material current = null;
         while(true){
@@ -134,9 +152,7 @@ public class WavefrontObject{
 
                 if(line.contains("v ")){
                     String[] pos = line.replaceFirst("v ", "").split("\\s+");
-                    if(pos.length != 3){
-                        throw new IllegalStateException("'v' must define all 3 vector points");
-                    }
+                    if(pos.length != 3) throw new IllegalStateException("'v' must define all 3 vector points");
 
                     float[] vec = new float[3];    
                     for(int i = 0; i < 3; i++){
@@ -159,9 +175,7 @@ public class WavefrontObject{
                 if(line.contains("vn ")){
                     if(!hasNormal) hasNormal = true;
                     String[] pos = line.replaceFirst("vn ", "").split("\\s+");
-                    if(pos.length != 3){
-                        throw new IllegalStateException("'v' must define all 3 vector points");
-                    }
+                    if(pos.length != 3) throw new IllegalStateException("'v' must define all 3 vector points")
 
                     float[] vec = new float[3];
                     for(int i = 0; i < 3; i++){
@@ -230,7 +244,7 @@ public class WavefrontObject{
                     face.shadingValue /= i[0];
                     faces.add(face);
                 }
-            }catch(Exception e){
+            }catch(Throwable e){
                 throw new RuntimeException(e);
             }
         }
