@@ -20,6 +20,7 @@ public class UnityPal{
 
         advance = valueOf("a3e3ff"),
         advanceDark = valueOf("59a7ff"),
+        wavefrontDark = valueOf("9e9f9f"),
 
         lightHeat = valueOf("ccffff"),
         lightEffect = valueOf("4787ff"),

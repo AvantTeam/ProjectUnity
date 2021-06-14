@@ -12,6 +12,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.graphics.*;
+import unity.*;
 
 import java.io.*;
 
@@ -32,11 +33,14 @@ public class WavefrontObject{
     public Seq<Vec3> normals = new Seq<>();
     public Seq<Face> faces = new Seq<>();
     public String textureName = "";
+    public ObjectMap<String, Material> materials;
     private final Seq<Vertex> drawnVertices = new Seq<>();
     private final Seq<Vec3> drawnNormals = new Seq<>();
     private AtlasRegion texture = null;
+    private boolean hasMaterial = false;
     private boolean hasNormal = false;
     private boolean hasTexture = false;
+    private boolean hasMaterialTex = false;
     private boolean odd = false;
 
     public ShadingType shadingType = ShadingType.normalAngle;
@@ -49,7 +53,75 @@ public class WavefrontObject{
     protected float indexerZ;
 
     public void load(Fi file, @Nullable Fi material){
+        if(material != null){
+            BufferedReader matR = material.reader(64);
+            Material current = null;
+            while(true){
+                try{
+                    String line = matR.readLine();
+                    if(line == null) break;
+                    if(line.contains("newmtl ")){
+                        current = new Material();
+                        current.name = line.replaceFirst("newmtl ", "");
+                        if(materials == null) materials = new ObjectMap<>();
+                        materials.put(current.name, current);
+                        hasMaterial = true;
+                    }
+                    if(line.contains("Ka ") && current != null){
+                        String[] val = line.replaceFirst("Ka ", "").split("\\s+");
+                        float[] col = new float[3];
+                        for(int i = 0; i < 3; i++){
+                            col[i] = Strings.parseFloat(val[i], 0f);
+                        }
+                        Tmp.c1.set(col[0], col[1], col[2]).a(1f);
+                        current.ambientCol = Tmp.c1.rgba8888();
+                        if(!Tmp.c1.equals(Color.white)){
+                            current.hasColor = true;
+                        }
+                    }
+                    if(line.contains("Kd ") && current != null){
+                        String[] val = line.replaceFirst("Kd ", "").split("\\s+");
+                        float[] col = new float[3];
+                        for(int i = 0; i < 3; i++){
+                            col[i] = Strings.parseFloat(val[i], 0f);
+                        }
+                        Tmp.c1.set(col[0], col[1], col[2]).a(1f);
+                        current.diffuseCol = Tmp.c1.rgba8888();
+                        if(!Tmp.c1.equals(Color.white)){
+                            current.hasColor = true;
+                        }
+                    }
+                    if(line.contains("Ke ") && current != null){
+                        String[] val = line.replaceFirst("Ke ", "").split("\\s+");
+                        float[] col = new float[3];
+                        for(int i = 0; i < 3; i++){
+                            col[i] = Strings.parseFloat(val[i], 0f);
+                        }
+                        Tmp.c1.set(col[0], col[1], col[2]).a(1f);
+                        current.emitCol = Tmp.c1.rgba8888();
+                        if(!Tmp.c1.equals(Color.black)){
+                            current.hasColor = true;
+                        }
+                    }
+                    if(line.contains("map_Kd ") && current != null){
+                        hasTexture = true;
+                        hasMaterialTex = true;
+                        if(canLoadTex()){
+                            String n = line.replaceFirst("map_Kd ", "");
+                            current.diffTex = Core.atlas.find("unity-" + n);
+                        }
+                    }
+                    if(line.contains("map_Ke ") && current != null && canLoadTex()){
+                        String n = line.replaceFirst("map_Ke ", "");
+                        current.emitTex = Core.atlas.find("unity-" + n);
+                    }
+                }catch(Exception e){
+                    throw new RuntimeException(e);
+                }
+            }
+        }
         BufferedReader reader = file.reader(64);
+        Material current = null;
         while(true){
             try{
                 String line = reader.readLine();
@@ -95,12 +167,18 @@ public class WavefrontObject{
                     normals.add(new Vec3(vec[0], vec[1], vec[2]));
                 }
 
+                if(hasMaterial && line.contains("usemtl ")){
+                    String key = line.replace("usemtl ", "");
+                    current = materials.get(key);
+                }
+
                 if(line.contains("f ")){
                     String[] segments = line.replace("f ", "").split("\\s+");
                     Face face = new Face();
                     face.verts = new Vertex[segments.length];
                     if(hasNormal) face.normal = new Vec3[segments.length];
                     if(hasTexture) face.vertexTexture = new Vec2[segments.length];
+                    if(hasMaterial && current != null) face.mat = current;
                     if(segments.length != 4) odd = true;
 
                     int[] i = {0};
@@ -151,9 +229,15 @@ public class WavefrontObject{
                 throw new RuntimeException(e);
             }
         }
-        if(!Vars.headless && Core.atlas != null && hasTexture){
+        if(canLoadTex()){
             texture = Core.atlas.find("unity-" + textureName + "-tex");
         }
+
+        Unity.print(drawnVertices.size + " : " + faces.size);
+    }
+
+    private boolean canLoadTex(){
+        return !Vars.headless && Core.atlas != null && hasTexture;
     }
 
     public void draw(float x, float y, float rX, float rY, float rZ){
@@ -187,6 +271,10 @@ public class WavefrontObject{
             float z = (indexerZ * zScale) + drawLayer;
             Draw.z(z);
 
+            if(hasNormal){
+                if(Math.abs(face.normal[0].angle(Vec3.Z)) >= 90f) continue;
+            }
+
             switch(shadingType){
                 case zMedian -> zMedianDraw(face);
                 case zDistance -> zDistanceDraw(face);
@@ -196,16 +284,11 @@ public class WavefrontObject{
 
             float color = Draw.getColor().toFloatBits();
             float mColor = Draw.getMixColor().toFloatBits();
-            boolean shouldDraw = true;
-            if(hasNormal){
-                if(Math.abs(face.normal[0].angle(Vec3.Z)) >= 90f) shouldDraw = false;
-            }
-            if(shouldDraw){
-                if(!odd){
-                    drawFace(face, color, mColor);
-                }else{
-                    Draw.draw(z, () -> drawFace(face, color, mColor));
-                }
+
+            if(!odd){
+                drawFace(face, color, mColor);
+            }else{
+                Draw.draw(z, () -> drawFace(face, color, mColor));
             }
         }
         Draw.reset();
@@ -225,8 +308,17 @@ public class WavefrontObject{
         }
         tmp.scl(1f / indexerA);
 
+        if(face.mat != null && face.mat.hasColor){
+            Tmp.c2.rgba8888(face.mat.ambientCol).mul(shadeColor);
+            Tmp.c3.rgba8888(face.mat.diffuseCol).mul(lightColor);
+            Tmp.c4.rgba8888(face.mat.emitCol);
+            Tmp.c2.r = Mathf.lerp(Tmp.c2.r, Tmp.c3.r, Tmp.c4.r);
+            Tmp.c2.g = Mathf.lerp(Tmp.c2.g, Tmp.c3.g, Tmp.c4.g);
+            Tmp.c2.b = Mathf.lerp(Tmp.c2.b, Tmp.c3.b, Tmp.c4.b);
+        }
+
         float angle = (Math.abs(tmp.angleRad(Vec3.Z)) / (45f * Mathf.degRad)) / shadingSmoothness;
-        Tmp.c1.set(lightColor).lerp(shadeColor, Mathf.clamp(angle));
+        Tmp.c1.set(face.mat != null ? Tmp.c3 : lightColor).lerp(face.mat != null ? Tmp.c2 : shadeColor, Mathf.clamp(angle));
         Draw.color(Tmp.c1);
     }
 
@@ -253,7 +345,6 @@ public class WavefrontObject{
                 }
                 return false;
             }, vertex -> {
-                //indexerZ += Math.abs(vertex.source.z / shadingSmoothness) * Math.abs(vert.source.z / shadingSmoothness);
                 indexerZ += Math.abs(vertex.source.z - vert.source.z) / face.shadingValue / (shadingSmoothness * defaultScl);
                 indexerA++;
             });
@@ -266,25 +357,36 @@ public class WavefrontObject{
 
     protected void drawFace(Face face, float color, float mixColor){
         float[] dface = new float[face.size];
-        TextureRegion region = Core.atlas.white();
-        for(int i = 0; i < face.verts.length; i++){
-            int s = i * 6;
-            dface[s] = face.verts[i].source.x;
-            dface[s + 1] = face.verts[i].source.y;
-            dface[s + 2] = color;
-            if(!hasTexture || texture == null){
-                dface[s + 3] = region.u;
-                dface[s + 4] = region.v;
-            }else{
-                float u = texture.u, v = texture.v;
-                float u2 = texture.u2, v2 = texture.v2;
-                dface[s + 3] = Mathf.lerp(u, u2, face.vertexTexture[i].x);
-                dface[s + 4] = Mathf.lerp(v2, v, face.vertexTexture[i].y);
-            }
-            dface[s + 5] = mixColor;
-        }
+        for(int f = 0; f < (face.mat != null && face.mat.emitTex != null ? 2 : 1); f++){
+            AtlasRegion textureB = texture;
 
-        Draw.vert((texture == null || !hasTexture) ? region.texture : texture.texture, dface, 0, dface.length);
+            if(face.mat != null){
+                textureB = f <= 0 ? face.mat.diffTex : face.mat.emitTex;
+            }
+
+            TextureRegion region = Core.atlas.white();
+            if(f > 0){
+                color = Color.whiteFloatBits;
+            }
+            for(int i = 0; i < face.verts.length; i++){
+                int s = i * 6;
+                dface[s] = face.verts[i].source.x;
+                dface[s + 1] = face.verts[i].source.y;
+                dface[s + 2] = color;
+                if(!hasTexture || textureB == null){
+                    dface[s + 3] = region.u;
+                    dface[s + 4] = region.v;
+                }else{
+                    float u = textureB.u, v = textureB.v;
+                    float u2 = textureB.u2, v2 = textureB.v2;
+                    dface[s + 3] = Mathf.lerp(u, u2, face.vertexTexture[i].x);
+                    dface[s + 4] = Mathf.lerp(v2, v, face.vertexTexture[i].y);
+                }
+                dface[s + 5] = mixColor;
+            }
+
+            Draw.vert((textureB == null || !hasTexture) ? region.texture : textureB.texture, dface, 0, dface.length);
+        }
     }
 
     protected static int faceVertIndex(String node){
@@ -305,6 +407,7 @@ public class WavefrontObject{
     }
 
     public static class Face{
+        public Material mat;
         public Vertex[] verts;
         public Vec3[] normal;
         public Vec2[] vertexTexture;
@@ -319,6 +422,13 @@ public class WavefrontObject{
         public Vertex(float x, float y, float z){
             source = new Vec3(x, y, z);
         }
+    }
+
+    public static class Material{
+        public String name;
+        public int ambientCol = 0xffffffff, diffuseCol = 0xffffffff, emitCol = 0x00000000;
+        public boolean hasColor = false;
+        public AtlasRegion diffTex, emitTex;
     }
 
     public enum ShadingType{

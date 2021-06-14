@@ -9,6 +9,7 @@ import arc.math.Interp.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.pooling.*;
 import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
@@ -25,7 +26,7 @@ import static mindustry.Vars.*;
 public final class Utils{
     public static final PowIn pow6In = new PowIn(6);
 
-    private static final Vec2 tV = new Vec2();
+    private static final Vec2 tV = new Vec2(), tV2 = new Vec2();
     private static final Seq<Healthc> tmpUnitSeq = new Seq<>();
     private static final IntMap<Float[]> effectArray = new IntMap<>(204);
     private static final IntSet collidedBlocks = new IntSet();
@@ -37,6 +38,10 @@ public final class Utils{
     private static Building tmpBuilding;
     private static Unit tmpUnit;
     private static boolean hit;
+
+    private static final DynamicBoolGrid collideLineCollided = new DynamicBoolGrid();
+    private static final Seq<Point2> collideLineCast = new Seq<>();
+    private static final Seq<Point2> collideLineCastNext = new Seq<>();
 
     public static <T extends Buildingc> Tile getBestTile(T build, int before, int after){
         Tile tile = build.tile();
@@ -362,6 +367,10 @@ public final class Utils{
         collideLineRaw(x, y, x2, y2, 3f, b -> b.team != team, u -> u.team != team, buildingCons, unitCons, healthc -> healthc.dst2(x, y), effectHandler, stopSort);
     }
 
+    public static void collideLineRawEnemy(Team team, float x, float y, float x2, float y2, float width, Boolf2<Building, Boolean> buildingCons, Boolf<Unit> unitCons, Floatc2 effectHandler, boolean stopSort){
+        collideLineRaw(x, y, x2, y2, width, width, b -> b.team != team, u -> u.team != team, buildingCons, unitCons, healthc -> healthc.dst2(x, y), effectHandler, stopSort);
+    }
+
     public static void collideLineRawEnemy(Team team, float x, float y, float x2, float y2, Boolf2<Building, Boolean> buildingCons, Boolf<Unit> unitCons, Floatc2 effectHandler, boolean stopSort){
         collideLineRaw(x, y, x2, y2, 3f, b -> b.team != team, u -> u.team != team, buildingCons, unitCons, healthc -> healthc.dst2(x, y), effectHandler, stopSort);
     }
@@ -390,15 +399,17 @@ public final class Utils{
         collidedBlocks.clear();
         tmpUnitSeq.clear();
         effectArray.clear();
+        collideLineCast.clear();
+        collideLineCastNext.clear();
+
         idx = 0;
         tV.set(x2, y2);
         if(buildingCons != null){
-            world.raycastEachWorld(x, y, x2, y2, (cx, cy) -> {
-                if(tileWidth <= 1f){
+            if(tileWidth <= 2f){
+                world.raycastEachWorld(x, y, x2, y2, (cx, cy) -> {
                     Building build = world.build(cx, cy);
                     if(build != null && (buildingFilter == null || buildingFilter.get(build)) && collidedBlocks.add(build.pos())){
                         boolean hit;
-                        //if(effectHandler != null) effectHandler.get(cx * tilesize, cy * tilesize);
                         if(sort == null){
                             if(effectHandler != null) effectHandler.get(cx * tilesize, cy * tilesize);
                             hit = buildingCons.get(build, true);
@@ -412,36 +423,101 @@ public final class Utils{
                         if(hit) tV.trns(Angles.angle(x, y, x2, y2), Mathf.dst(x, y, build.x, build.y)).add(x, y);
                         return hit;
                     }
-                }else{
-                    rect.setCentered(cx * tilesize, cy * tilesize, tileWidth);
-                    int tx = Mathf.round(rect.x / tilesize);
-                    int ty = Mathf.round(rect.y / tilesize);
-                    int tw = tx + Mathf.round(rect.width / tilesize);
-                    int th = ty + Mathf.round(rect.height / tilesize);
-                    for(int ix = tx; ix <= tw; ix++){
-                        for(int iy = ty; iy <= th; iy++){
-                            Building build = world.build(ix, iy);
-                            if(build != null && (buildingFilter == null || buildingFilter.get(build)) && collidedBlocks.add(build.pos())){
-                                boolean hit;
-                                //if(effectHandler != null) effectHandler.get(cx * tilesize, cy * tilesize);
-                                if(sort == null){
-                                    if(effectHandler != null) effectHandler.get(cx * tilesize, cy * tilesize);
-                                    hit = buildingCons.get(build, true);
-                                }else{
-                                    if(effectHandler != null){
-                                        effectArray.put(build.id, new Float[]{cx * (float)tilesize, cy * (float)tilesize});
-                                    }
-                                    tmpUnitSeq.add(build);
-                                    hit = buildingCons.get(build, false);
+                    return false;
+                });
+            }else{
+                int offset = Mathf.ceil(tileWidth / tilesize);
+                int intOffX = Mathf.round(Math.max(Math.abs(x2 - x), tilesize) / tilesize);
+                int intOffY = Mathf.round(Math.max(Math.abs(y2 - y), tilesize) / tilesize);
+                collideLineCollided.updateSize(intOffX + (offset * 2), intOffY + (offset * 2));
+                int offsetX = x2 - x > 0 ? offset : intOffX - offset;
+                int offsetY = y2 - y > 0 ? offset : intOffY - offset;
+                int tileX = Mathf.round(x / tilesize);
+                int tileY = Mathf.round(y / tilesize);
+                int tileX2 = Mathf.round(x2 / tilesize);
+                int tileY2 = Mathf.round(y2 / tilesize);
+
+                Point2 p1 = Pools.obtain(Point2.class, Point2::new);
+                collideLineCast.add(p1.set(Mathf.round(x / tilesize), Mathf.round(y / tilesize)));
+                int px = (p1.x - tileX) + offsetX;
+                int py = (p1.y - tileY) + offsetY;
+                px = collideLineCollided.clampX(px);
+                py = collideLineCollided.clampY(py);
+                collideLineCollided.set(px, py, true);
+                boolean hitInsulated = false;
+
+                int x0 = tileX, y0 = tileY;
+                int dx = Math.abs(tileX2 - tileX), dy = Math.abs(tileY2 - tileY);
+                int sx = tileX < tileX2 ? 1 : -1, sy = tileY < tileY2 ? 1 : -1;
+                int err = dx - dy;
+                int e2;
+
+                while(!collideLineCast.isEmpty()){
+                    if((!(x0 == tileX2 && y0 == tileY2) && !hitInsulated)){
+                        int tpx = (x0 - tileX) + offsetX;
+                        int tpy = (y0 - tileY) + offsetX;
+
+                        e2 = 2 * err;
+                        if(e2 > -dy){
+                            err = err - dy;
+                            x0 = x0 + sx;
+                        }
+
+                        if(e2 < dx){
+                            err = err + dx;
+                            y0 = y0 + sy;
+                        }
+
+                        if(collideLineCollided.within(tpx, tpy) && !collideLineCollided.get(tpx, tpy)){
+                            Point2 pn = Pools.obtain(Point2.class, Point2::new);
+                            collideLineCast.add(pn.set(x0, y0));
+                            collideLineCollided.set(tpx, tpy, true);
+                        }
+                    }
+
+                    for(Point2 p : collideLineCast){
+                        Building build = world.build(p.x, p.y);
+                        boolean hit = false;
+                        if(build != null && (buildingFilter == null || buildingFilter.get(build)) && collidedBlocks.add(build.pos())){
+                            if(sort == null){
+                                if(effectHandler != null) effectHandler.get(p.x * tilesize, p.y * tilesize);
+                                hit = buildingCons.get(build, true);
+                            }else{
+                                if(effectHandler != null){
+                                    effectArray.put(build.id, new Float[]{p.x * (float)tilesize, p.y * (float)tilesize});
                                 }
-                                if(hit) tV.trns(Angles.angle(x, y, x2, y2), Mathf.dst(x, y, build.x, build.y)).add(x, y);
-                                return hit;
+                                tmpUnitSeq.add(build);
+                                hit = buildingCons.get(build, false);
+                            }
+                            if(hit && !hitInsulated){
+                                tV.trns(Angles.angle(x, y, x2, y2), Mathf.dst(x, y, build.x, build.y)).add(x, y);
+                                hitInsulated = true;
+                            }
+                        }
+
+                        Vec2 segment = Intersector.nearestSegmentPoint(x, y, tV.x, tV.y, p.x * tilesize, p.y * tilesize, tV2);
+                        if(!hit){
+                            Pools.free(p);
+                            for(Point2 p2 : Geometry.d4){
+                                int newX = (p.x + p2.x);
+                                int newY = (p.y + p2.y);
+                                int npx = (newX - tileX) + offsetX;
+                                int npy = (newY - tileY) + offsetY;
+                                boolean within = !hitInsulated || Mathf.within(x, y, newX * tilesize, newY * tilesize, tV.dst(x, y));
+                                if(segment.within(newX * tilesize, newY * tilesize, tileWidth) && collideLineCollided.within(npx, npy) && !collideLineCollided.get(npx, npy) && within){
+                                    Point2 pn = Pools.obtain(Point2.class, Point2::new);
+                                    collideLineCastNext.add(pn.set(newX, newY));
+                                    collideLineCollided.set(npx, npy, true);
+                                }
                             }
                         }
                     }
+                    collideLineCast.clear();
+                    collideLineCast.addAll(collideLineCastNext);
+                    collideLineCastNext.clear();
                 }
-                return false;
-            });
+                collideLineCollided.clear();
+            }
         }
         if(unitCons != null){
             rect.setPosition(x, y).setSize(tV.x - x, tV.y - y);

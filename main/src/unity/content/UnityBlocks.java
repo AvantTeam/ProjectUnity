@@ -249,7 +249,7 @@ public class UnityBlocks implements ContentList{
     public static @FactionDef("advance")
     Block
     //turret
-    celsius, kelvin, caster, storm, eclipse, xenoCorruptor, cube;
+    celsius, kelvin, caster, storm, eclipse, xenoCorruptor, cube, wavefront;
 
     //---------- end faction ----------
     public static @FactionDef("end")
@@ -3201,6 +3201,21 @@ public class UnityBlocks implements ContentList{
                 damageRadius = 120f;
                 laserColors = new Color[]{UnityPal.advance};
             }};
+        }};
+
+        wavefront = new WavefrontTurret("wavefront"){{
+            requirements(Category.turret, with(Items.copper, 4900, Items.graphite, 6000, Items.silicon, 5000, Items.titanium, 6500, UnityItems.xenium, 1500, UnityItems.advanceAlloy, 1500, UnityItems.terminum, 700, UnityItems.terminaAlloy, 500));
+            health = 50625;
+            object = UnityObjs.wavefront;
+            size = 15;
+            range = 420f;
+            rotateSpeed = 3f;
+            reloadTime = 240f;
+            powerUse = 260f;
+            coolantMultiplier = 0.9f;
+            shootSound = UnitySounds.cubeBlast;
+
+            shootType = new WavefrontLaser(2400f);
         }};
 
         //endregion
