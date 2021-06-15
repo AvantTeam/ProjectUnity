@@ -105,7 +105,9 @@ public class Unity extends Mod implements ApplicationListener{
         tap = new TapHandler();
         antiCheat = new AntiCheat();
 
-        asyncCore.processes.add(new LightProcess());
+        if(asyncCore != null){
+            asyncCore.processes.add(new LightProcess());
+        }
     }
 
     @Override

@@ -28,6 +28,7 @@ abstract class LightHoldComp extends Block implements Stemc{
     /**
      * There are no direct {@link Light} definition here, as light holders are not necessarily meant to hold only
      * one light laser. Define these on inheriting classes.
+     * @author GlennFolker
      */
     public class LightHoldBuildComp extends Building{
         /** {@link Light}s that point to this building. */
