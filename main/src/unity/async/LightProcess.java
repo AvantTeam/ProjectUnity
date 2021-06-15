@@ -4,6 +4,8 @@ import mindustry.async.*;
 import mindustry.gen.*;
 import unity.gen.*;
 
+import static mindustry.Vars.*;
+
 public class LightProcess implements AsyncProcess{
     private volatile boolean processing = false;
 
@@ -22,6 +24,6 @@ public class LightProcess implements AsyncProcess{
 
     @Override
     public boolean shouldProcess(){
-        return !processing;
+        return !processing && !state.isPaused();
     }
 }

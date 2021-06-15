@@ -34,12 +34,10 @@ abstract class LightHoldComp extends Block implements Stemc{
         /** {@link Light}s that point to this building. */
         @ReadOnly Seq<Light> sources = new Seq<>();
 
-        /** Called in the asynchronous process. */
         public void addSource(Light light){
             sources.add(light);
         }
 
-        /** Called in the asynchronous process. */
         public void removeSource(Light light){
             sources.remove(light);
         }
@@ -49,7 +47,7 @@ abstract class LightHoldComp extends Block implements Stemc{
         }
 
         public float lightf(){
-            return sources.sumf(Light::strength) / requiredLight;
+            return sources.sumf(Light::endStrength) / requiredLight;
         }
 
         @Override

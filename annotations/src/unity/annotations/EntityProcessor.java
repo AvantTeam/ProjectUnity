@@ -213,6 +213,7 @@ public class EntityProcessor extends BaseProcessor{
                                     FieldSpec.Builder field = FieldSpec.builder(tName(var), simpleName(var), Modifier.PUBLIC);
 
                                     if(is(var, Modifier.TRANSIENT)) field.addModifiers(Modifier.TRANSIENT);
+                                    if(is(var, Modifier.VOLATILE)) field.addModifiers(Modifier.VOLATILE);
                                     field.addAnnotations(Seq.with(var.getAnnotationMirrors()).map(AnnotationSpec::get));
 
                                     if(varInitializers.containsKey(descString(var))){
@@ -334,9 +335,8 @@ public class EntityProcessor extends BaseProcessor{
                             if(is(field, Modifier.FINAL)) fbuilder.addModifiers(Modifier.FINAL);
                         }
 
-                        if(is(field, Modifier.TRANSIENT)){
-                            fbuilder.addModifiers(Modifier.TRANSIENT);
-                        }
+                        if(is(field, Modifier.TRANSIENT)) fbuilder.addModifiers(Modifier.TRANSIENT);
+                        if(is(field, Modifier.VOLATILE)) fbuilder.addModifiers(Modifier.VOLATILE);
 
                         if(varInitializers.containsKey(descString(field))){
                             fbuilder.initializer(varInitializers.get(descString(field)));

@@ -14,6 +14,7 @@ public class LightSource extends LightHoldGenericCrafter{
 
     public LightSource(String name){
         super(name);
+        solid = true;
         requiresLight = false;
         configurable = true;
 

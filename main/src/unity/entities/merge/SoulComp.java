@@ -109,13 +109,6 @@ abstract class SoulComp extends Block implements Stemc{
         }
 
         @Override
-        public void onDestroyed(){
-            if(net.server() || !net.active()){
-                spreadSouls();
-            }
-        }
-
-        @Override
         public boolean apply(MonolithSoul soul, int index, boolean transferred){
             if(isControlled() && !transferred && (Mathf.chance(1f / souls) || index == souls - 1)){
                 soul.controller(unit.getPlayer());

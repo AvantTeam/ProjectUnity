@@ -274,9 +274,8 @@ public class MergeProcessor extends BaseProcessor{
                     if(is(field, Modifier.FINAL)) fbuilder.addModifiers(Modifier.FINAL);
                 }
 
-                if(is(field, Modifier.TRANSIENT)){
-                    fbuilder.addModifiers(Modifier.TRANSIENT);
-                }
+                if(is(field, Modifier.TRANSIENT)) fbuilder.addModifiers(Modifier.TRANSIENT);
+                if(is(field, Modifier.VOLATILE)) fbuilder.addModifiers(Modifier.VOLATILE);
 
                 if(varInitializers.containsKey(descString(field))){
                     fbuilder.initializer(varInitializers.get(descString(field)));
