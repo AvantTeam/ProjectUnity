@@ -903,20 +903,19 @@ public class UnityUnitTypes implements ContentList{
         araneidae = new UnityUnitType("araneidae"){{
             groundLayer = Layer.legUnit + 1f;
             drag = 0.1f;
-            speed = 0.4f;
+            speed = 0.42f;
             hitSize = 35.5f;
             health = 20000;
             
             legCount = 8;
-            legMoveSpace = 1f;
+            legMoveSpace = 0.76f;
             legPairOffset = 0.7f;
             legGroupSize = 2;
-            legLength = 77;
-            legExtension = -12f;
-            legBaseOffset = 22f;
+            legLength = 112f;
+            legExtension = -8.25f;
+            legBaseOffset = 8f;
             landShake = 2.4f;
             legLengthScl = 1f;
-            kinematicScl = 0.7f;
             rippleScale = 2f;
             legSpeed = 0.2f;
 
