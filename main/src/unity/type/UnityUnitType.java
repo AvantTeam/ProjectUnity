@@ -553,53 +553,8 @@ public class UnityUnitType extends UnitType{
         //super.drawWeapons(unit);
         applyColor(unit);
         for(WeaponMount mount : unit.mounts){
-            Weapon weapon = mount.weapon;
-            boolean found = bottomWeapons.contains(weapon.name);
-
-            float rotation = unit.rotation - 90;
-            float weaponRotation  = rotation + (weapon.rotate ? mount.rotation : 0);
-            float recoil = -((mount.reload) / weapon.reload * weapon.recoil);
-            float wx = unit.x + Angles.trnsx(rotation, weapon.x, weapon.y) + Angles.trnsx(weaponRotation, 0, recoil),
-            wy = unit.y + Angles.trnsy(rotation, weapon.x, weapon.y) + Angles.trnsy(weaponRotation, 0, recoil);
-
-            float zC = Draw.z();
-            if(found) Draw.z(zC - 0.005f);
-
-            if(weapon.shadow > 0){
-                Drawf.shadow(wx, wy, weapon.shadow);
-            }
-
-            if(weapon.outlineRegion.found()){
-                float zB = Draw.z();
-                if(!weapon.top || found) Draw.z(Math.min(zB - 0.01f, 99f));
-
-                Draw.rect(weapon.outlineRegion,
-                wx, wy,
-                weapon.outlineRegion.width * Draw.scl * -Mathf.sign(weapon.flipSprite),
-                weapon.region.height * Draw.scl,
-                weaponRotation);
-
-                Draw.z(zB);
-            }
-
-            Draw.rect(weapon.region,
-            wx, wy,
-            weapon.region.width * Draw.scl * -Mathf.sign(weapon.flipSprite),
-            weapon.region.height * Draw.scl,
-            weaponRotation);
-
-            if(weapon.heatRegion.found() && mount.heat > 0){
-                Draw.color(weapon.heatColor, mount.heat);
-                Draw.blend(Blending.additive);
-                Draw.rect(weapon.heatRegion,
-                wx, wy,
-                weapon.heatRegion.width * Draw.scl * -Mathf.sign(weapon.flipSprite),
-                weapon.heatRegion.height * Draw.scl,
-                weaponRotation);
-                Draw.blend();
-                Draw.color();
-            }
-            Draw.z(zC);
+            if(bottomWeapons.contains(mount.weapon.name)) Draw.z(z - 0.0001f);
+            mount.weapon.draw(unit, mount);
         }
 
         Draw.reset();

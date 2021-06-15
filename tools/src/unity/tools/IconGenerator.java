@@ -12,6 +12,7 @@ import unity.entities.*;
 import unity.entities.units.*;
 import unity.gen.*;
 import unity.type.*;
+import unity.type.weapons.*;
 
 import static mindustry.Vars.*;
 import static unity.tools.SpriteProcessor.*;
@@ -39,6 +40,12 @@ public class IconGenerator implements Generator{
                     String fname = fixName(weapon.name);
                     if(outlined.add(fname) && has(fname)){
                         save(outline.get(get(fname)), fname, fname + "-outline");
+                    }
+                    if(weapon instanceof MultiBarrelWeapon){
+                        String fnameb = fixName(weapon.name + "-barrel");
+                        if(outlined.add(fnameb) && has(fnameb)){
+                            save(outline.get(get(fnameb)), fnameb, fnameb + "-outline");
+                        }
                     }
                 }
 

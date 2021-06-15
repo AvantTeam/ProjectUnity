@@ -27,6 +27,7 @@ import unity.gen.*;
 import unity.graphics.*;
 import unity.mod.*;
 import unity.type.*;
+import unity.type.weapons.*;
 
 import static mindustry.Vars.*;
 
@@ -900,16 +901,16 @@ public class UnityUnitTypes implements ContentList{
         }};
 
         araneidae = new UnityUnitType("araneidae"){{
-            groundLayer = Layer.legUnit + 3f;
+            groundLayer = Layer.legUnit + 1f;
             drag = 0.1f;
             speed = 0.4f;
-            hitSize = 34f;
+            hitSize = 35.5f;
             health = 20000;
             
-            legCount = 12;
+            legCount = 8;
             legMoveSpace = 1f;
             legPairOffset = 0.7f;
-            legGroupSize = 3;
+            legGroupSize = 2;
             legLength = 77;
             legExtension = -12f;
             legBaseOffset = 22f;
@@ -926,79 +927,73 @@ public class UnityUnitTypes implements ContentList{
             armor = 13f;
             allowLegStep = true;
             visualElevation = 0.7f;
-            weapons.add(new Weapon(name + "-sapper"){{
-                reload = 50f;
-                x = 13f;
-                y = -17f;
-                shootY = 5f;
-                rotate = true;
-                shake = 1f;
+
+            weapons.add(new MultiBarrelWeapon("unity-araneidae-cannon"){{
+                mirror = false;
+                x = 0f;
+                y = -12.25f;
+                shootY = 22f;
+                reload = 120f;
+                shake = 10f;
+                recoil = 3f;
                 rotateSpeed = 1f;
-                shots = 5;
-                shotDelay = 6f;
+                ejectEffect = Fx.casing3;
                 shootSound = Sounds.artillery;
-                bullet = new ArtilleryBulletType(2.5f, 1f){{
+                rotate = true;
+                shadow = 40f;
+                barrelSpacing = 11.25f;
+                barrelOffset = 8.5f;
+                barrelRecoil = 5f;
+                barrels = 2;
+
+                bullet = new ArtilleryBulletType(3f, 50){{
                     hitEffect = Fx.sapExplosion;
                     knockback = 0.8f;
-                    speed = 2.5f;
-                    lifetime = 70f;
-                    width = height = 19f;
+                    lifetime = 80f;
+                    width = height = 25f;
+                    collidesTiles = collides = true;
                     ammoMultiplier = 4f;
-                    splashDamageRadius = 95f;
-                    splashDamage = 55f;
+                    splashDamageRadius = 80f;
+                    splashDamage = 75f;
                     backColor = Pal.sapBulletBack;
                     frontColor = lightningColor = Pal.sapBullet;
-                    lightning = 3;
-                    lightningLength = 10;
+                    lightning = 5;
+                    lightningLength = 20;
                     smokeEffect = Fx.shootBigSmoke2;
-                    shake = 5f;
+                    hitShake = 10f;
+                    lightRadius = 40f;
+                    lightColor = Pal.sap;
+                    lightOpacity = 0.6f;
+
                     status = StatusEffects.sapped;
-                    statusDuration = 60f * 10f;
-                }};
-            }}, new Weapon("mount-purple-weapon"){{
-                reload = 20f;
-                x = 25f;
-                y = 10f;
-                rotate = true;
-                shake = 1f;
-                rotateSpeed = 5f;
-                shootSound = Sounds.flame;
-                alternate = false;
-                bullet = new SapBulletType(){{
-                    sapStrength = 0.8f;
-                    length = 90f;
-                    damage = 25f;
-                    shootEffect = Fx.shootSmall;
-                    hitColor = color = UnityPal.purpleLightning;
-                    width = 0.7f;
-                    lifetime = 35f;
-                    knockback = -1.5f;
+                    statusDuration = 60f * 10;
+
+                    fragLifeMin = 0.3f;
+                    fragBullets = 9;
+
+                    fragBullet = new ArtilleryBulletType(2.3f, 30){{
+                        hitEffect = Fx.sapExplosion;
+                        knockback = 0.8f;
+                        lifetime = 90f;
+                        width = height = 20f;
+                        collidesTiles = false;
+                        splashDamageRadius = 70f;
+                        splashDamage = 40f;
+                        backColor = Pal.sapBulletBack;
+                        frontColor = lightningColor = Pal.sapBullet;
+                        lightning = 2;
+                        lightningLength = 5;
+                        smokeEffect = Fx.shootBigSmoke2;
+                        hitShake = 5f;
+                        lightRadius = 30f;
+                        lightColor = Pal.sap;
+                        lightOpacity = 0.5f;
+
+                        status = StatusEffects.sapped;
+                        statusDuration = 60f * 10;
+                    }};
                 }};
             }});
-            Weapon weap3 = weapons.get(1).copy();
-            weap3.x = 20f;
-            weap3.y = 13f;
-            weapons.insert(2, weap3);
-            Weapon weap4 = weapons.get(2).copy();
-            weap4.reload = 23f;
-            weap4.x = 15f;
-            weap4.y = 18f;
-            weap4.rotateSpeed = 3f;
-            weap4.bullet = new SapBulletType(){{
-                sapStrength = 0.9f;
-                length = 90f;
-                damage = 30f;
-                shootEffect = Fx.shootSmall;
-                hitColor = color = UnityPal.purpleLightning;
-                width = 0.75f;
-                lifetime = 35f;
-                knockback = -1.5f;
-            }};
-            weapons.insert(3, weap4);
-            Weapon weap5 = weap4.copy();
-            weap5.x = 25f;
-            weap5.y = 5f;
-            weapons.insert(4, weap5);
         }};
 
         theraphosidae = new UnityUnitType("theraphosidae"){{
