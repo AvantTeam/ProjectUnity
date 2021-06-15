@@ -7,6 +7,8 @@ import mindustry.world.*;
 import unity.annotations.Annotations.*;
 import unity.gen.*;
 
+import java.util.*;
+
 /**
  * A component that defines a type of block that holds "light lasers". These lasers acts like some type of consumer,
  * affects {@link Building#efficiency()} and {@link Building#consValid()}.
@@ -40,7 +42,10 @@ abstract class LightHoldComp extends Block implements Stemc{
 
         public void removeSource(Light light){
             sources.remove(light);
+            removed(light);
         }
+
+        public void removed(Light light){}
 
         public boolean acceptLight(Light light){
             return requiresLight;
@@ -48,6 +53,18 @@ abstract class LightHoldComp extends Block implements Stemc{
 
         public float lightf(){
             return sources.sumf(Light::endStrength) / requiredLight;
+        }
+
+        @Override
+        public void updateTile(){
+            Iterator<Light> it = sources.iterator();
+            while(it.hasNext()){
+                Light next = it.next();
+                if(next == null || !next.isAdded() || next.calcStrength(x, y) <= 0f){
+                    it.remove();
+                    removed(next);
+                }
+            }
         }
 
         @Override

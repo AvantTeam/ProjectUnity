@@ -35,9 +35,12 @@ public class LightRouter extends LightHoldBlock{
         @Override
         public void onRemoved(){
             super.onRemoved();
+            for(Light source : routes.keys()){
+                removeRoute(source);
+            }
         }
 
-        protected void removeRoute(Light light){
+        public void removeRoute(Light light){
             if(routes.containsKey(light)){
                 var r = routes.get(light);
                 r.each(Light::remove);
@@ -68,23 +71,21 @@ public class LightRouter extends LightHoldBlock{
         }
 
         @Override
+        public void removed(Light light){
+            if(routes.containsKey(light)){
+                var r = routes.remove(light);
+                r.each(Light::remove);
+                r.clear();
+            }
+        }
+
+        @Override
         public void updateTile(){
             super.updateTile();
 
-            var it = routes.entries();
-            while(it.hasNext()){
-                var route = it.next();
-
+            for(var route : routes.entries()){
                 var origin = route.key;
                 var r = route.value;
-
-                if(origin == null || !origin.isAdded()){
-                    r.each(Light::remove);
-                    r.clear();
-
-                    it.remove();
-                    continue;
-                }
 
                 assert r.size == 3;
                 for(int i = 0; i < 3; i++){

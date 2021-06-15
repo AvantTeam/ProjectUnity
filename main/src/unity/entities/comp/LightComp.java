@@ -1,5 +1,6 @@
 package unity.entities.comp;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -66,15 +67,19 @@ abstract class LightComp implements Drawc, Rotc{
             endY = target.worldy();
 
             if(target.build instanceof LightHoldBuildc hold){
-                if(before != hold){
-                    if(before != null) before.removeSource(self());
-                    if(hold.acceptLight(self())) hold.addSource(self());
-                }
+                Core.app.post(() -> {
+                    if(before != hold){
+                        if(before != null) before.removeSource(self());
+                        if(hold.acceptLight(self())) hold.addSource(self());
+                    }
 
-                before = hold;
-            }else if(before != null){
-                before.removeSource(self());
-                before = null;
+                    before = hold;
+                });
+            }else{
+                Core.app.post(() -> {
+                    if(before != null) before.removeSource(self());
+                    before = null;
+                });
             }
         }else{
             //just set the end position to the maximum travel distance
