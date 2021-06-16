@@ -18,6 +18,7 @@ import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.consumers.*;
 import unity.*;
 import unity.content.*;
+import unity.content.effects.*;
 import unity.entities.*;
 import unity.entities.effects.*;
 import unity.gen.*;
@@ -557,7 +558,7 @@ public class EndGameTurret extends PowerTurret{
             killTiles();
             killUnits();
             
-            UnityFx.endGameShoot.at(x, y);
+            ShootFx.endGameShoot.at(x, y);
             UnitySounds.endgameShoot.at(x, y);
         }
 

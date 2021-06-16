@@ -15,10 +15,10 @@ import mindustry.entities.bullet.*;
 import mindustry.graphics.*;
 import mindustry.content.*;
 import mindustry.world.meta.*;
-import unity.*;
 import unity.ai.*;
 import unity.ai.AssistantAI.*;
 import unity.annotations.Annotations.*;
+import unity.content.effects.*;
 import unity.entities.*;
 import unity.entities.abilities.*;
 import unity.entities.bullet.*;
@@ -927,7 +927,22 @@ public class UnityUnitTypes implements ContentList{
             allowLegStep = true;
             visualElevation = 0.7f;
 
-            weapons.add(new MultiBarrelWeapon("unity-araneidae-cannon"){{
+            weapons.add(new Weapon("unity-araneidae-mount"){{
+                x = 15f;
+                y = -1.75f;
+                shootY = 7.5f;
+                reload = 30f;
+                shake = 4f;
+                rotateSpeed = 2f;
+                rotate = true;
+                shadow = 15f;
+                shots = 3;
+                spacing = 15f;
+                shootSound = Sounds.laser;
+
+                bullet = UnityBullets.sapLaser;
+            }},
+            new MultiBarrelWeapon("unity-araneidae-cannon"){{
                 mirror = false;
                 x = 0f;
                 y = -12.25f;
@@ -936,7 +951,7 @@ public class UnityUnitTypes implements ContentList{
                 shake = 10f;
                 recoil = 3f;
                 rotateSpeed = 1f;
-                ejectEffect = Fx.casing3;
+                ejectEffect = Fx.none;
                 shootSound = Sounds.artillery;
                 rotate = true;
                 shadow = 40f;
@@ -1363,8 +1378,8 @@ public class UnityUnitTypes implements ContentList{
                     //lifetime = 8f;
                     length = 59f * 6f;
                     updateEffectSeg = 59f;
-                    shootEffect = UnityFx.scarRailShoot;
-                    pierceEffect = UnityFx.scarRailHit;
+                    shootEffect = ShootFx.scarRailShoot;
+                    pierceEffect = HitFx.scarRailHit;
                     updateEffect = UnityFx.scarRailTrail;
                     hitEffect = Fx.massiveExplosion;
                     pierceDamageFactor = 0.3f;
@@ -1399,8 +1414,8 @@ public class UnityUnitTypes implements ContentList{
                     //lifetime = 8f;
                     length = 59f * 7f;
                     updateEffectSeg = 59f;
-                    shootEffect = UnityFx.scarRailShoot;
-                    pierceEffect = UnityFx.scarRailHit;
+                    shootEffect = ShootFx.scarRailShoot;
+                    pierceEffect = HitFx.scarRailHit;
                     updateEffect = UnityFx.scarRailTrail;
                     hitEffect = Fx.massiveExplosion;
                     pierceDamageFactor = 0.3f;
@@ -1455,8 +1470,8 @@ public class UnityUnitTypes implements ContentList{
                         damage = 780f;
                         length = 60f * 7f;
                         updateEffectSeg = 60f;
-                        shootEffect = UnityFx.scarRailShoot;
-                        pierceEffect = UnityFx.scarRailHit;
+                        shootEffect = ShootFx.scarRailShoot;
+                        pierceEffect = HitFx.scarRailHit;
                         updateEffect = UnityFx.scarRailTrail;
                         hitEffect = Fx.massiveExplosion;
                         pierceDamageFactor = 0.2f;
@@ -1473,8 +1488,8 @@ public class UnityUnitTypes implements ContentList{
                         damage = 230f;
                         length = 40f * 7f;
                         updateEffectSeg = 40f;
-                        shootEffect = UnityFx.scarRailShoot;
-                        pierceEffect = UnityFx.scarRailHit;
+                        shootEffect = ShootFx.scarRailShoot;
+                        pierceEffect = HitFx.scarRailHit;
                         updateEffect = UnityFx.scarRailTrail;
                         hitEffect = Fx.massiveExplosion;
                         pierceDamageFactor = 0.5f;
@@ -1555,8 +1570,8 @@ public class UnityUnitTypes implements ContentList{
                         damage = 880f;
                         length = 61f * 7f;
                         updateEffectSeg = 61f;
-                        shootEffect = UnityFx.scarRailShoot;
-                        pierceEffect = UnityFx.scarRailHit;
+                        shootEffect = ShootFx.scarRailShoot;
+                        pierceEffect = HitFx.scarRailHit;
                         updateEffect = UnityFx.scarRailTrail;
                         hitEffect = Fx.massiveExplosion;
                         pierceDamageFactor = 0.2f;
@@ -1610,8 +1625,8 @@ public class UnityUnitTypes implements ContentList{
                         buildingDamageMultiplier = 0.5f;
                         length = 61f * 8f;
                         updateEffectSeg = 61f;
-                        shootEffect = UnityFx.scarRailShoot;
-                        pierceEffect = UnityFx.scarRailHit;
+                        shootEffect = ShootFx.scarRailShoot;
+                        pierceEffect = HitFx.scarRailHit;
                         updateEffect = UnityFx.scarRailTrail;
                         hitEffect = Fx.massiveExplosion;
                         pierceDamageFactor = 0.35f;
@@ -1775,7 +1790,7 @@ public class UnityUnitTypes implements ContentList{
                     width = 4f;
                     hitColor = UnityPal.scarColor;
                     lightColor = UnityPal.scarColorAlpha;
-                    hitEffect = UnityFx.scarHitSmall;
+                    hitEffect = HitFx.scarHitSmall;
                 }};
             }},
             new Weapon(name + "-laser-weapon"){{
@@ -1799,7 +1814,7 @@ public class UnityUnitTypes implements ContentList{
                     width = 8f;
                     hitColor = UnityPal.scarColor;
                     lightColor = UnityPal.scarColorAlpha;
-                    hitEffect = UnityFx.scarHitSmall;
+                    hitEffect = HitFx.scarHitSmall;
                 }};
             }});
             
@@ -1836,7 +1851,7 @@ public class UnityUnitTypes implements ContentList{
                     length = 160f;
                     width = 5f;
                     incendChance = 0f;
-                    hitEffect = UnityFx.coloredHitSmall;
+                    hitEffect = HitFx.coloredHitSmall;
                     lightColor = hitColor = UnityPal.scarColorAlpha;
                     colors = new Color[]{UnityPal.scarColorAlpha, UnityPal.endColor, Color.white};
                     strokes = new float[]{1.5f, 1f, 0.3f};
@@ -1892,7 +1907,7 @@ public class UnityUnitTypes implements ContentList{
                     length = 150f;
                     width = 5f;
                     incendChance = 0f;
-                    hitEffect = UnityFx.coloredHitSmall;
+                    hitEffect = HitFx.coloredHitSmall;
                     lightColor = hitColor = UnityPal.scarColorAlpha;
                     colors = new Color[]{UnityPal.scarColorAlpha, UnityPal.endColor, Color.white};
                     strokes = new float[]{1.5f, 1f, 0.3f};
@@ -1946,7 +1961,7 @@ public class UnityUnitTypes implements ContentList{
                     length = 190f;
                     width = 5f;
                     incendChance = 0f;
-                    hitEffect = UnityFx.coloredHitSmall;
+                    hitEffect = HitFx.coloredHitSmall;
                     lightColor = hitColor = UnityPal.scarColorAlpha;
                     colors = new Color[]{UnityPal.scarColorAlpha, UnityPal.endColor, Color.white};
                     strokes = new float[]{1.5f, 1f, 0.3f};
@@ -2994,7 +3009,7 @@ public class UnityUnitTypes implements ContentList{
                     collidesTeam = true;
                     frontColor = UnityPal.monolithLight;
                     backColor = UnityPal.monolith;
-                    smokeEffect = hitEffect = despawnEffect = UnityFx.hitMonolithLaser;
+                    smokeEffect = hitEffect = despawnEffect = HitFx.hitMonolithLaser;
                 }};
             }}
             );
@@ -3036,7 +3051,7 @@ public class UnityUnitTypes implements ContentList{
                     collidesTeam = true;
                     frontColor = UnityPal.monolithLight;
                     backColor = UnityPal.monolith;
-                    smokeEffect = hitEffect = despawnEffect = UnityFx.hitMonolithLaser;
+                    smokeEffect = hitEffect = despawnEffect = HitFx.hitMonolithLaser;
                 }};
             }},
 
@@ -3057,7 +3072,7 @@ public class UnityUnitTypes implements ContentList{
                     collidesTeam = true;
                     frontColor = UnityPal.monolithLight;
                     backColor = UnityPal.monolith;
-                    smokeEffect = hitEffect = despawnEffect = UnityFx.hitMonolithLaser;
+                    smokeEffect = hitEffect = despawnEffect = HitFx.hitMonolithLaser;
                 }};
             }}
             );
@@ -3226,7 +3241,7 @@ public class UnityUnitTypes implements ContentList{
                     fromBlockAmount = 1;
                     fromBlockChance = 0.4f;
                     fromBlockDamage = 80f;
-                    shootEffect = UnityFx.devourerShootEffect;
+                    shootEffect = UnityFx.devourerChargeEffect;
                     keepVelocity = true;
                     lightColor = lightningColor = hitColor = UnityPal.scarColor;
                     colors = new Color[]{UnityPal.scarColorAlpha, UnityPal.scarColor, UnityPal.endColor, Color.white};
