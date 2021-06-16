@@ -151,6 +151,7 @@ public class MultiBarrelWeapon extends Weapon{
 
         mMount.recoils[Mathf.mod(mMount.inUse, mMount.recoils.length)] = barrelRecoil;
         mMount.inUse += Mathf.sign(flipSprite);
+        mMount.inUse %= mMount.recoils.length;
     }
 
     public static class MultiBarrelMount extends WeaponMount{
@@ -160,6 +161,7 @@ public class MultiBarrelWeapon extends Weapon{
         public MultiBarrelMount(Weapon weapon){
             super(weapon);
             recoils = new float[((MultiBarrelWeapon)weapon).barrels];
+            if(weapon.flipSprite) inUse = recoils.length - 1;
         }
     }
 }

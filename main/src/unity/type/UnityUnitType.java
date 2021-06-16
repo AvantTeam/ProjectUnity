@@ -555,10 +555,10 @@ public class UnityUnitType extends UnitType{
         for(WeaponMount mount : unit.mounts){
             if(bottomWeapons.contains(mount.weapon.name)) Draw.z(z - 0.0001f);
             mount.weapon.draw(unit, mount);
+            Draw.z(z);
         }
 
         Draw.reset();
-        Draw.z(z);
     }
 
     public <T extends Unit & Copterc> void drawRotors(T unit){
