@@ -4,7 +4,6 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.math.geom.*;
 import arc.util.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -25,7 +24,6 @@ abstract class LightComp implements Drawc, Rotc{
     /** A {@link #strength} with value {@code 1f} will make the light be this thick. */
     static final float width = 5f;
 
-    transient Vec2 vec = new Vec2();
     transient Color color = Color.white;
     /**
      * Never, <b>ever</b>, forget to set this to the building source unless you want this light to
@@ -46,14 +44,15 @@ abstract class LightComp implements Drawc, Rotc{
 
     /** Called asynchronously. */
     public void walk(){
-        vec.trns(rotation, strength * yield);
+        float targetX = x + Angles.trnsx(rotation, strength * yield);
+        float targetY = y + Angles.trnsy(rotation, strength * yield);
 
         target = null;
-        world.raycastEachWorld(x, y, x + vec.x, y + vec.y, (tx, ty) -> {
+        world.raycastEachWorld(x, y, targetX, targetY, (tx, ty) -> {
             Tile tile = world.tile(tx, ty);
             if(tile == null || tile.build == source) return false;
 
-            if(tile.solid() || tile.build instanceof LightHoldBuildc){
+            if(tile.solid() || (tile.build instanceof LightHoldBuildc hold && hold.acceptLight(self()))){
                 target = tile;
                 return true;
             }
@@ -63,8 +62,12 @@ abstract class LightComp implements Drawc, Rotc{
 
         if(target != null){
             //this light just hit a solid tile
-            endX = target.worldx();
-            endY = target.worldy();
+            float dst = dst(target.worldx(), target.worldy());
+            float estimateX = x + Angles.trnsx(rotation, dst);
+            float estimateY = y + Angles.trnsy(rotation, dst);
+
+            endX = Mathf.round(estimateX / 4f) * 4f;
+            endY = Mathf.round(estimateY / 4f) * 4f;
 
             if(target.build instanceof LightHoldBuildc hold){
                 Core.app.post(() -> {
@@ -83,8 +86,8 @@ abstract class LightComp implements Drawc, Rotc{
             }
         }else{
             //just set the end position to the maximum travel distance
-            endX = Mathf.round((x + vec.x) / tilesize) * tilesize;
-            endY = Mathf.round((y + vec.y) / tilesize) * tilesize;
+            endX = Mathf.round(targetX / 4f) * 4f;
+            endY = Mathf.round(targetY / 4f) * 4f;
         }
     }
 

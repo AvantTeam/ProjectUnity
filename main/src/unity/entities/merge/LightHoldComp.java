@@ -18,6 +18,7 @@ import java.util.*;
 @MergeComponent
 abstract class LightHoldComp extends Block implements Stemc{
     boolean requiresLight = true;
+    boolean acceptsLight = true;
     float requiredLight = 1f;
 
     public LightHoldComp(String name){
@@ -38,6 +39,7 @@ abstract class LightHoldComp extends Block implements Stemc{
 
         public void addSource(Light light){
             sources.add(light);
+            added(light);
         }
 
         public void removeSource(Light light){
@@ -45,14 +47,26 @@ abstract class LightHoldComp extends Block implements Stemc{
             removed(light);
         }
 
+        public void added(Light light){}
+
         public void removed(Light light){}
 
         public boolean acceptLight(Light light){
-            return requiresLight;
+            return acceptsLight || requiresLight;
         }
 
         public float lightf(){
             return sources.sumf(Light::endStrength) / requiredLight;
+        }
+
+        /** Note that this does not apply {@link Light#strength}! */
+        public Light apply(Light from, Light to){
+            to.relX = from.endX() - x;
+            to.relY = from.endY() - y;
+            to.set(this);
+            to.source = self();
+
+            return to;
         }
 
         @Override

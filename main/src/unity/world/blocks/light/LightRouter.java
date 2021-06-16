@@ -10,6 +10,7 @@ public class LightRouter extends LightHoldBlock{
         super(name);
         solid = true;
         requiresLight = false;
+        acceptsLight = true;
     }
 
     public class LightRouterBuild extends LightHoldBuild{
@@ -21,14 +22,12 @@ public class LightRouter extends LightHoldBlock{
         }
 
         @Override
-        public void addSource(Light light){
-            super.addSource(light);
+        public void added(Light light){
             addRoute(light);
         }
 
         @Override
-        public void removeSource(Light light){
-            super.removeSource(light);
+        public void removed(Light light){
             removeRoute(light);
         }
 
@@ -42,11 +41,9 @@ public class LightRouter extends LightHoldBlock{
 
         public void removeRoute(Light light){
             if(routes.containsKey(light)){
-                var r = routes.get(light);
+                var r = routes.remove(light);
                 r.each(Light::remove);
                 r.clear();
-
-                routes.remove(light);
             }
         }
 
@@ -54,11 +51,7 @@ public class LightRouter extends LightHoldBlock{
             if(!routes.containsKey(light)){
                 Seq<Light> r = new Seq<>(3);
                 for(int i = 0; i < 3; i++){
-                    Light l = Light.create();
-                    l.relX = light.endX() - x;
-                    l.relY = light.endY() - y;
-                    l.set(this);
-                    l.source = this;
+                    Light l = apply(light, Light.create());
                     l.rotation = light.rotation + 90f * (i - 1);
                     l.strength = light.endStrength() / 3f;
                     l.add();
@@ -71,27 +64,14 @@ public class LightRouter extends LightHoldBlock{
         }
 
         @Override
-        public void removed(Light light){
-            if(routes.containsKey(light)){
-                var r = routes.remove(light);
-                r.each(Light::remove);
-                r.clear();
-            }
-        }
-
-        @Override
         public void updateTile(){
             super.updateTile();
-
             for(var route : routes.entries()){
                 var origin = route.key;
                 var r = route.value;
 
-                assert r.size == 3;
-                for(int i = 0; i < 3; i++){
-                    Light l = r.get(i);
-                    l.set(this);
-                    l.source = this;
+                for(int i = 0; i < r.size; i++){
+                    Light l = apply(origin, r.get(i));
                     l.rotation = origin.rotation + 90f * (i - 1);
                     l.strength = origin.endStrength() / 3f;
                 }

@@ -98,7 +98,7 @@ public class UnityBlocks implements ContentList{
     metaglassWall, metaglassWallLarge;
 
     //test
-    public static @FactionDef("light") Block lightSource, lightRouter;
+    public static @FactionDef("light") Block lightSource, lightRouter, lightReflectorBetterAF;
 
     //---------- imber faction ----------
     public static @FactionDef("imber")
@@ -1127,7 +1127,11 @@ public class UnityBlocks implements ContentList{
         }};
 
         lightRouter = new unity.world.blocks.light.LightRouter("light-router"){{
-            requirements(Category.crafting, with(Items.copper, 1));
+            requirements(Category.logic, with(Items.copper, 1));
+        }};
+
+        lightReflectorBetterAF = new unity.world.blocks.light.LightReflector("light-reflector-better-af"){{
+            requirements(Category.logic, with(Items.copper, 1));
         }};
 
         //endregion
