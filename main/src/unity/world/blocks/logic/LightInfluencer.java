@@ -1,14 +1,15 @@
 package unity.world.blocks.logic;
 
-import arc.graphics.Blending;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.math.geom.Geometry;
+import arc.math.geom.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import unity.world.blocks.logic.LightFilter.LightFilterBuild;
+import unity.world.blocks.logic.LightFilter.*;
 
 import static arc.Core.*;
 
+/** @deprecated Use the blocks in the {@link unity.world.blocks.light} package instead! */
 public class LightInfluencer extends LightGenerator{
     protected TextureRegion topRegion;
 

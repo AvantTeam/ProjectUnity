@@ -1,18 +1,18 @@
 package unity.world.blocks.logic;
 
-import arc.util.Eachable;
-import arc.util.io.*;
 import arc.graphics.g2d.*;
-import arc.scene.ui.layout.Table;
+import arc.scene.ui.layout.*;
+import arc.util.*;
+import arc.util.io.*;
+import mindustry.entities.units.*;
 import mindustry.gen.*;
-import mindustry.graphics.Layer;
-import mindustry.ui.Styles;
-import unity.world.blocks.logic.LightReflector.LightReflectorBuild;
-import mindustry.entities.units.BuildPlan;
+import mindustry.graphics.*;
+import mindustry.ui.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
 
+/** @deprecated Use the blocks in the {@link unity.world.blocks.light} package instead! */
 @SuppressWarnings("unused")
 public class LightOmniReflector extends LightReflector{
     protected TextureRegion baseRegion, topRegion;

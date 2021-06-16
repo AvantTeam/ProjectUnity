@@ -1,17 +1,19 @@
 package unity.world.blocks.logic;
 
-import java.util.ArrayList;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
-import mindustry.graphics.Layer;
-import mindustry.ui.Bar;
-import mindustry.world.meta.Stat;
-import mindustry.world.blocks.power.SolarGenerator;
-import unity.world.meta.LightData;
-import unity.world.blocks.logic.LightSource.LightSourceBuild;
+import mindustry.graphics.*;
+import mindustry.ui.*;
+import mindustry.world.blocks.power.*;
+import mindustry.world.meta.*;
+import unity.world.blocks.logic.LightSource.*;
+import unity.world.meta.*;
+
+import java.util.*;
 
 import static arc.Core.*;
 
+/** @deprecated Use the blocks in the {@link unity.world.blocks.light} package instead! */
 public class LightGenerator extends SolarGenerator{
     protected float lightStrength = 60f;
     protected Color lightFilter = Color.white;

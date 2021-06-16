@@ -1,30 +1,31 @@
 package unity.world.blocks.logic;
 
-import java.util.ArrayList;
-
-import arc.Events;
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.util.Eachable;
-import arc.util.io.*;
 import arc.math.geom.*;
-import arc.scene.ui.layout.Table;
+import arc.scene.ui.layout.*;
+import arc.util.*;
+import arc.util.io.*;
+import mindustry.entities.units.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
-import mindustry.entities.units.BuildPlan;
-import mindustry.game.EventType.Trigger;
 import mindustry.graphics.*;
 import mindustry.ui.*;
-import mindustry.world.Tile;
+import mindustry.world.*;
+import mindustry.world.blocks.production.*;
 import mindustry.world.meta.*;
-import mindustry.world.blocks.production.GenericCrafter;
-import unity.world.meta.LightData;
-import unity.world.blocks.LightRepeaterBuildBase;
-import unity.world.blocks.logic.LightGenerator.LightGeneratorBuild;
-import unity.world.blocks.logic.LightReflector.LightReflectorBuild;
+import unity.world.blocks.*;
+import unity.world.blocks.logic.LightGenerator.*;
+import unity.world.blocks.logic.LightReflector.*;
+import unity.world.meta.*;
+
+import java.util.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
 
+/** @deprecated Use the blocks in the {@link unity.world.blocks.light} package instead! */
 public class LightSource extends GenericCrafter{
     public int lightStrength = 60, lightLength = 50, maxLightLength = 5000, maxReflections = 128, lightInterval = 20;
     protected final int reflowTimer = timers++;

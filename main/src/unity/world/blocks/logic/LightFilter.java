@@ -1,24 +1,25 @@
 package unity.world.blocks.logic;
 
-import arc.math.Mathf;
-import arc.util.Eachable;
-import arc.util.io.*;
-import arc.graphics.Color;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.scene.ui.ImageButton;
-import arc.scene.ui.layout.Table;
+import arc.math.*;
+import arc.scene.ui.*;
+import arc.scene.ui.layout.*;
+import arc.util.*;
+import arc.util.io.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.world.*;
-import unity.world.meta.LightData;
-import unity.world.blocks.LightRepeaterBuildBase;
-import unity.world.blocks.logic.LightInfluencer.LightInfluencerBuild;
+import unity.world.blocks.*;
+import unity.world.blocks.logic.LightInfluencer.*;
+import unity.world.meta.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
 
+/** @deprecated Use the blocks in the {@link unity.world.blocks.light} package instead! */
 public class LightFilter extends Block{
     public static final Color[] colors = {Color.white, Color.red, Color.green, Color.blue}, ncolors = {Color.black, Color.cyan, Color.magenta, Color.yellow};
     protected TextureRegion baseRegion, lightRegion;

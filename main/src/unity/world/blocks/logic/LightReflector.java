@@ -1,14 +1,15 @@
 package unity.world.blocks.logic;
 
-import arc.util.Eachable;
 import arc.graphics.g2d.*;
+import arc.util.*;
+import mindustry.entities.units.*;
 import mindustry.gen.*;
-import mindustry.world.Block;
-import mindustry.entities.units.BuildPlan;
+import mindustry.world.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
 
+/** @deprecated Use the blocks in the {@link unity.world.blocks.light} package instead! */
 public class LightReflector extends Block{
     protected boolean diagonal = true;
     protected final TextureRegion[] angleRegions = new TextureRegion[2];

@@ -1,15 +1,16 @@
 package unity.world.blocks.logic;
 
-import arc.math.Mathf;
-import arc.graphics.Color;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
-import mindustry.graphics.Layer;
-import mindustry.world.blocks.distribution.Router;
-import unity.world.meta.LightData;
-import unity.world.blocks.LightRepeaterBuildBase;
+import arc.math.*;
+import mindustry.graphics.*;
+import mindustry.world.blocks.distribution.*;
+import unity.world.blocks.*;
+import unity.world.meta.*;
 
 import static arc.Core.*;
 
+/** @deprecated Use the blocks in the {@link unity.world.blocks.light} package instead! */
 public class LightRouter extends Router{
     public TextureRegion baseRegion, lightRegion;
 

@@ -1,7 +1,8 @@
 package unity.world.blocks.logic;
 
-import static arc.Core.atlas;
+import static arc.Core.*;
 
+/** @deprecated Use the blocks in the {@link unity.world.blocks.light} package instead! */
 public class LightDivisor extends LightReflector{
     /** change this */
     private static final String spriteName = "unity-light-divisor";
