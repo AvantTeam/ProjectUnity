@@ -12,7 +12,7 @@ import arc.util.pooling.Pool.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import unity.content.*;
+import unity.content.effects.*;
 import unity.util.*;
 
 public class SlowLightning extends EffectState{
@@ -189,7 +189,7 @@ public class SlowLightning extends EffectState{
                 return building.block.absorbLasers;
             };
             Cons<Unit> uc = unit -> unit.damage(tDamage);
-            Utils.collideLineRawEnemy(origin.team, fromPos.x, fromPos.y, toPos.x, toPos.y, bf, uc, null, (ex, ey) -> UnityFx.coloredHitSmall.at(ex, ey, origin.colorFrom));
+            Utils.collideLineRawEnemy(origin.team, fromPos.x, fromPos.y, toPos.x, toPos.y, bf, uc, null, (ex, ey) -> HitFx.coloredHitSmall.at(ex, ey, origin.colorFrom));
         }
     }
 }

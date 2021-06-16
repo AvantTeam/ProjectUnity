@@ -36,6 +36,8 @@ public class UnityBullets implements ContentList{
         kelvinSlagLaser, kelvinOilLaser, kelvinCryofluidLaser, kelvinLiquidLaser, celsiusSmoke, kelvinSmoke,
         breakthroughLaser,
 
+        sapLaser,
+
         coalBlaze, pyraBlaze,
 
         falloutLaser, catastropheLaser, calamityLaser, extinctionLaser,
@@ -538,6 +540,21 @@ public class UnityBullets implements ContentList{
             expGain = 0.6f;
         }};
 
+        sapLaser = new LaserBulletType(80f){{
+            colors = new Color[]{Pal.sapBulletBack.cpy().a(0.4f), Pal.sapBullet, Color.white};
+            length = 150f;
+            width = 20f;
+            sideLength = sideWidth = 0f;
+            shootEffect = ShootFx.sapPlasmaShoot;
+            hitColor = lightColor = lightningColor = Pal.sapBullet;
+            lightningSpacing = 17f;
+            lightningDelay = 0.12f;
+            lightningDamage = 15f;
+            lightningLength = 4;
+            lightningLengthRand = 2;
+            lightningAngleRand = 15f;
+        }};
+
         falloutLaser = new SparkingContinuousLaserBulletType(95f){{
             length = 230f;
             fromBlockChance = 0.12f;
@@ -837,7 +854,7 @@ public class UnityBullets implements ContentList{
             lifetime = 1f;
             hitShake = 6f;
             trailSpacing = 35f;
-            shootEffect = UnityFx.monumentShoot;
+            shootEffect = ShootFx.monumentShoot;
             despawnEffect = UnityFx.monumentDespawn;
             smokeEffect = shootEffect = Fx.blastExplosion;
             trailEffect = UnityFx.monumentTrail;

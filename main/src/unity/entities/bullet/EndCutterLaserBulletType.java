@@ -12,6 +12,7 @@ import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import unity.content.*;
+import unity.content.effects.*;
 import unity.entities.effects.*;
 import unity.entities.units.*;
 import unity.graphics.*;
@@ -122,7 +123,7 @@ public class EndCutterLaserBulletType extends BulletType{
                         Tmp.v2.trns(b.rotation(), b.fdata).add(b);
                         //UnityFx.tenmeikiriTipHit.at(Tmp.v2.x, Tmp.v2.y, b.rotation() + 180f);
                         for(int i = 0; i < 2; i++){
-                            UnityFx.tenmeikiriTipHit.at(Tmp.v2.x + Mathf.range(4f), Tmp.v2.y + Mathf.range(4f), b.rotation() + 180f);
+                            HitFx.tenmeikiriTipHit.at(Tmp.v2.x + Mathf.range(4f), Tmp.v2.y + Mathf.range(4f), b.rotation() + 180f);
                         }
                         building.damage(damage * buildingDamageMultiplier);
                         hit = true;
@@ -145,7 +146,7 @@ public class EndCutterLaserBulletType extends BulletType{
                     }
                     Tmp.v2.trns(b.rotation(), b.fdata).add(b);
                     for(int i = 0; i < 2; i++){
-                        UnityFx.tenmeikiriTipHit.at(Tmp.v2.x + Mathf.range(4f), Tmp.v2.y + Mathf.range(4f), b.rotation() + 180f);
+                        HitFx.tenmeikiriTipHit.at(Tmp.v2.x + Mathf.range(4f), Tmp.v2.y + Mathf.range(4f), b.rotation() + 180f);
                     }
                     hit = true;
                 }

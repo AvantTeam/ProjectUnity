@@ -3153,7 +3153,7 @@ public class UnityBlocks implements ContentList{
                     lifetime = 18f;
                     shootEffect = Fx.none;
                     smokeEffect = Fx.none;
-                    hitEffect = UnityFx.eclipseHit;
+                    hitEffect = HitFx.eclipseHit;
                     hitSize = 7f;
                 }};
 

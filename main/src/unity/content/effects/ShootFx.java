@@ -55,5 +55,51 @@ public class ShootFx{
             int l = Mathf.signs[i];
             Drawf.tri(e.x, e.y, 4f * e.fout(), 29f, e.rotation + 67 * l);
         }
+    }),
+
+    scarRailShoot = new Effect(24f, e -> {
+        e.scaled(10f, b -> {
+            color(Color.white, Color.lightGray, b.fin());
+            stroke(b.fout() * 3f + 0.2f);
+            circle(b.x, b.y, b.fin() * 50f);
+        });
+        for(int i = 0; i < 2; i++){
+            int sign = Mathf.signs[i];
+            color(UnityPal.scarColor);
+            Drawf.tri(e.x, e.y, 13 * e.fout(), 85f, e.rotation + 90f * sign);
+            color(Color.white);
+            Drawf.tri(e.x, e.y, Math.max(13 * e.fout() - 4f, 0f), 81f, e.rotation + 90f * sign);
+        }
+    }),
+
+    endGameShoot = new Effect(45f, 820f * 2f, e -> {
+        float curve = Mathf.curve(e.fin(), 0f, 0.2f) * 820f;
+        float curveB = Mathf.curve(e.fin(), 0f, 0.7f);
+
+        color(Color.red, Color.valueOf("ff000000"), curveB);
+        blend(Blending.additive);
+        Fill.poly(e.x, e.y, Lines.circleVertices(curve), curve);
+        blend();
+    }).layer(Layer.effect + 0.99f),
+
+    monumentShoot = new Effect(48f, e -> {
+        color(Color.white, Pal.lancerLaser, Color.cyan, e.fin());
+        randLenVectors(e.id, 12, e.finpow() * 64f, e.rotation, 16f, (x, y) -> Fill.circle(e.x + x, e.y + y, 1f + e.fout() * 5f));
+    }),
+
+    coloredPlasmaShoot = new Effect(25f, e -> {
+        color(Color.white, e.color, e.fin());
+        randLenVectors(e.id, 13, e.finpow() * 20f, e.rotation, 23f, (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, e.fout() * 5f);
+            Fill.circle(e.x + x / 1.2f, e.y + y / 1.2f, e.fout() * 3f);
+        });
+    }),
+    
+    sapPlasmaShoot = new Effect(25f, e -> {
+        color(Color.white, Pal.sapBullet, e.fin());
+        randLenVectors(e.id, 13, e.finpow() * 20f, e.rotation, 23f, (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, e.fout() * 5f);
+            Fill.circle(e.x + x / 1.2f, e.y + y / 1.2f, e.fout() * 3f);
+        });
     });
 }
