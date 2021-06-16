@@ -968,7 +968,7 @@ public class UnityUnitTypes implements ContentList{
                     collidesTiles = collides = true;
                     ammoMultiplier = 4f;
                     splashDamageRadius = 80f;
-                    splashDamage = 75f;
+                    splashDamage = 80f;
                     backColor = Pal.sapBulletBack;
                     frontColor = lightningColor = Pal.sapBullet;
                     lightning = 5;
@@ -992,7 +992,7 @@ public class UnityUnitTypes implements ContentList{
                         width = height = 20f;
                         collidesTiles = false;
                         splashDamageRadius = 70f;
-                        splashDamage = 40f;
+                        splashDamage = 60f;
                         backColor = Pal.sapBulletBack;
                         frontColor = lightningColor = Pal.sapBullet;
                         lightning = 2;
@@ -1013,7 +1013,7 @@ public class UnityUnitTypes implements ContentList{
         theraphosidae = new UnityUnitType("theraphosidae"){{
             speed = 0.4f;
             drag = 0.12f;
-            hitSize = 29f;
+            hitSize = 49f;
             hovering = true;
             allowLegStep = true;
             health = 31000;
@@ -1029,31 +1029,33 @@ public class UnityUnitTypes implements ContentList{
             legBaseOffset = 9f;
             legSpeed = 0.092f;
             visualElevation = 1f;
-            groundLayer = 79f;
+            groundLayer = Layer.legUnit + 1.3f;
             rippleScale = 3.4f;
             legSplashDamage = 130f;
             legSplashRange = 60f;
             targetAir = false;
             commandLimit = 5;
-            weapons.add(new Weapon(name + "-cannon"){{
-                x = 32.5f;
-                y = -1.75f;
-                shootX = -7.5f;
-                shootY = 30.25f;
-                inaccuracy = 7.3f;
-                velocityRnd = 0.1f;
-                shots = 4;
-                shotDelay = 7f;
+            weapons.add(new MultiBarrelWeapon(name + "-cannon"){{
+                x = 20.5f;
+                y = -10f;
+                shootY = 22.75f;
                 shootSound = Sounds.artillery;
-                rotate = false;
-                reload = 130f;
+                rotate = true;
+                alternate = false;
+                rotationSpeed = 0.9f;
+                reload = 60f;
                 shake = 6f;
                 recoil = 5f;
-                bullet = new ArtilleryBulletType(3.5f, 45f){
+                barrels = 3;
+                barrelOffset = 9.25f;
+                barrelSpacing = 8.25f;
+                barrelRecoil = 6.5f;
+
+                bullet = new ArtilleryBulletType(3.5f, 70f){
                     @Override
                     public void update(Bullet b){
                         super.update(b);
-                        if(Mathf.chanceDelta(0.3f)) Lightning.create(b, UnityPal.purpleLightning, 43f, b.x, b.y, Mathf.range(56f) + b.rotation(), 8);
+                        if(Mathf.chanceDelta(0.3f)) Lightning.create(b, Pal.sapBullet, 43f, b.x, b.y, Mathf.range(56f) + b.rotation(), 8);
                     }
 
                     {
@@ -1061,7 +1063,7 @@ public class UnityUnitTypes implements ContentList{
                         collides = true;
                         collidesTiles = true;
                         splashDamageRadius = 90f;
-                        splashDamage = 50f;
+                        splashDamage = 90f;
                         width = height = 27f;
                         ammoMultiplier = 3f;
                         knockback = 0.9f;
@@ -1075,10 +1077,11 @@ public class UnityUnitTypes implements ContentList{
                         lightningLength = 23;
                         fragLifeMin = 0.3f;
                         fragBullets = 13;
-                        fragBullet = new ArtilleryBulletType(2.5f, 23f){{
+                        fragBullet = new ArtilleryBulletType(2.5f, 35f){{
+                            collidesTiles = false;
                             lifetime = 82f;
-                            splashDamageRadius = 40f;
-                            splashDamage = 20f;
+                            splashDamageRadius = 70f;
+                            splashDamage = 70f;
                             width = height = 20f;
                             hitShake = 4f;
                             status = StatusEffects.sapped;
@@ -1091,64 +1094,7 @@ public class UnityUnitTypes implements ContentList{
                         }};
                     }
                 };
-            }}, new Weapon(name + "-main-laser"){{
-                x = 18.75f;
-                y = -11f;
-                shootY = 19f;
-                rotateSpeed = 1f;
-                shootSound = Sounds.laser;
-                reload = 60f;
-                recoil = 4f;
-                rotate = true;
-                shadow = 15f;
-                shake = 4f;
-                bullet = new LaserBulletType(325f){
-                    @Override
-                    public void hit(Bullet b, float x, float y){
-                        super.hit(b, x, y);
-                        if(Mathf.chance(0.4f)) Lightning.create(b, UnityPal.purpleLightning, 34f, x, y, Mathf.range(30f) + b.rotation(), 12);
-                    }
-
-                    {
-                        colors = new Color[]{Color.valueOf("a96bfa80"), UnityPal.purpleLightning, Color.white};
-                        length = 290f;
-                        ammoMultiplier = 4f;
-                        width = 43f;
-                        sideLength = 45f;
-                        drawSize = length * 2f + 20f;
-                    }
-                };
-            }}, new Weapon(name + "-main-sapper"){
-                {
-                    x = -17f;
-                    y = -18.5f;
-                    shootY = 8f;
-                    shootSound = Sounds.laser;
-                    reload = 30f;
-                    rotate = true;
-                    flipSprite = true;
-                    bullet = new LaserBulletType(98f){
-                        @Override
-                        public void hit(Bullet b, float x, float y){
-                            super.hit(b, x, y);
-                            if(Mathf.chance(0.3f)) Lightning.create(b, UnityPal.purpleLightning, 12f, x, y, Mathf.range(30f) + b.rotation(), 7);
-                        }
-
-                        {
-                            colors = new Color[]{Color.valueOf("a96bfa80"), UnityPal.purpleLightning, Color.white};
-                            length = 195f;
-                            ammoMultiplier = 6f;
-                            width = 19f;
-                            drawSize = length * 2f + 20f;
-                        }
-                    };
-                }
-            });
-            weapons.add(weapons.get(2).copy());
-            Weapon temp = weapons.get(3);
-            temp.x = 10.25f;
-            temp.y = -23.25f;
-            temp.flipSprite = false;
+            }});
         }};
 
         sedec = new UnityUnitType("sedec"){{
