@@ -1033,7 +1033,46 @@ public class UnityUnitTypes implements ContentList{
             legSplashRange = 60f;
             targetAir = false;
             commandLimit = 5;
-            weapons.add(new LimitedAngleWeapon(name + "-mount"){{
+            weapons.add(new LimitedAngleWeapon(name + "-launcher"){{
+                x = 33f;
+                y = 8.5f;
+                shootY = 6.25f - 1f;
+                reload = 7f;
+                recoil = 1f;
+                rotate = true;
+                shootCone = 20f;
+                angleCone = 60f;
+                angleOffset = 45f;
+                inaccuracy = 25f;
+                xRand = 2.25f;
+                shots = 2;
+
+                bullet = new MissileBulletType(3.7f, 15f){{
+                    width = 10f;
+                    height = 12f;
+                    shrinkY = 0f;
+                    drag = -0.01f;
+                    splashDamageRadius = 30f;
+                    splashDamage = 55f;
+                    ammoMultiplier = 5f;
+                    hitEffect = Fx.blastExplosion;
+                    despawnEffect = Fx.blastExplosion;
+                    backColor = trailColor = Pal.sapBulletBack;
+                    frontColor = lightningColor = lightColor = Pal.sapBullet;
+                    trailLength = 13;
+                    homingRange = 80f;
+                    weaveScale = 8f;
+                    weaveMag = 2f;
+                    lightning = 2;
+                    lightningLength = 2;
+                    lightningLengthRand = 1;
+                    lightningCone = 15f;
+
+                    status = StatusEffects.blasted;
+                    statusDuration = 60f;
+                }};
+            }},
+            new LimitedAngleWeapon(name + "-mount"){{
                 x = 26.75f;
                 y = 7.5f;
                 shootY = 10.25f - 5f;
