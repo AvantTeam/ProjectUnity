@@ -18,6 +18,7 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.ctype.*;
 import unity.*;
+import unity.content.effects.*;
 import unity.entities.bullet.*;
 import unity.entities.bullet.exp.*;
 import unity.entities.units.*;
@@ -513,7 +514,7 @@ public class UnityBullets implements ContentList{
             lifetime = 24f;
             pierce = true;
             statusDuration = 60 * 4f;
-            shootEffect = UnityFx.shootSmallBlaze;
+            shootEffect = ShootFx.shootSmallBlaze;
             hitEffect = Fx.hitFlameSmall;
             despawnEffect = Fx.none;
             status = StatusEffects.burning;
@@ -528,7 +529,7 @@ public class UnityBullets implements ContentList{
             lifetime = 24f;
             pierce = true;
             statusDuration = 60 * 4f;
-            shootEffect = UnityFx.shootPyraBlaze;
+            shootEffect = ShootFx.shootPyraBlaze;
             hitEffect = Fx.hitFlameSmall;
             despawnEffect = Fx.none;
             status = StatusEffects.burning;
@@ -672,7 +673,7 @@ public class UnityBullets implements ContentList{
                 damage = 23;
                 pierce = true;
                 hittable = false;
-                hitEffect = UnityFx.orbHit;
+                hitEffect = HitFx.orbHit;
                 trailEffect = UnityFx.orbTrail;
                 trailChance = 0.4f;
             }
@@ -758,7 +759,7 @@ public class UnityBullets implements ContentList{
             trailLength = 14;
             homingPower = 0.06f;
             hitSound = Sounds.plasmaboom;
-            hitEffect = UnityFx.plasmaTriangleHit;
+            hitEffect = HitFx.plasmaTriangleHit;
             despawnEffect = Fx.none;
             fragBullet = plasmaFragTriangle;
             fragBullets = 8;

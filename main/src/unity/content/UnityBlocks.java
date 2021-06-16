@@ -22,6 +22,7 @@ import mindustry.type.*;
 import mindustry.ctype.*;
 import mindustry.content.*;
 import unity.annotations.Annotations.*;
+import unity.content.effects.*;
 import unity.entities.bullet.*;
 import unity.entities.bullet.exp.*;
 import unity.gen.*;
@@ -531,8 +532,6 @@ public class UnityBlocks implements ContentList{
             shootSound = UnitySounds.extinctionShoot;
             loopSound = UnitySounds.beamIntenseHighpitchTone;
             loopSoundVolume = 2f;
-            chargeBeginEffect = UnityFx.extinctionCharge;
-            // chargeTime = UnityFx.extinctionCharge.lifetime;
             shootType = UnityBullets.extinctionLaser;
             consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.27f && liquid.flammability < 0.1f, 2.5f)).update(false);
         }};
@@ -632,7 +631,7 @@ public class UnityBlocks implements ContentList{
                     shrinkX = shrinkY = 0f;
                     backColor = lightColor = hitColor = Pal.lancerLaser;
                     frontColor = Color.white;
-                    hitEffect = UnityFx.electronHit;
+                    hitEffect = HitFx.electronHit;
                 }
 
                 @Override
@@ -668,7 +667,7 @@ public class UnityBlocks implements ContentList{
                     height = 27f;
                     shrinkX = shrinkY = 0f;
                     hitSize = 15f;
-                    hitEffect = UnityFx.protonHit;
+                    hitEffect = HitFx.protonHit;
                     hittable = collides = false;
                     backColor = lightColor = hitColor = lightningColor = Pal.lancerLaser;
                     frontColor = Color.white;
@@ -712,7 +711,7 @@ public class UnityBlocks implements ContentList{
                     shrinkX = shrinkY = 0f;
                     hitSize = 7;
                     sprite = "unity-electric-shell";
-                    hitEffect = UnityFx.neutronHit;
+                    hitEffect = HitFx.neutronHit;
                     collides = collidesGround = true;
                     hittable = false;
                     backColor = lightColor = hitColor = Pal.lancerLaser;
@@ -769,7 +768,7 @@ public class UnityBlocks implements ContentList{
                     backColor = trailColor = hitColor = lightColor = Pal.lancerLaser;
                     shootEffect = smokeEffect = Fx.none;
                     hitEffect = Fx.hitLancer;
-                    despawnEffect = UnityFx.wBosonHitEffect;
+                    despawnEffect = HitFx.LightHitLarge;
                     frontColor = Color.white;
                     decayEffect = UnityFx.wBosonEffectLong;
                     height = 13f;
@@ -784,7 +783,7 @@ public class UnityBlocks implements ContentList{
                             width = 8f;
                             backColor = trailColor = hitColor = lightColor = Pal.lancerLaser;
                             hitEffect = Fx.hitLancer;
-                            despawnEffect = UnityFx.wBosonDecayHitEffect;
+                            despawnEffect = HitFx.wBosonDecayHitEffect;
                             frontColor = Color.white;
                             hittable = false;
                         }
@@ -1152,7 +1151,7 @@ public class UnityBlocks implements ContentList{
             shootType = UnityBullets.orb;
             shootSound = Sounds.laser;
             heatColor = Pal.turretHeat;
-            shootEffect = UnityFx.orbShoot;
+            shootEffect = ShootFx.orbShoot;
             smokeEffect = Fx.none;
             chargeEffect = UnityFx.orbCharge;
             chargeBeginEffect = UnityFx.orbChargeBegin;
@@ -1535,7 +1534,7 @@ public class UnityBlocks implements ContentList{
 
                 powerUse = 7f;
 
-                shootEffect = UnityFx.laserChargeShoot;
+                shootEffect = ShootFx.laserChargeShoot;
                 smokeEffect = Fx.none;
                 chargeEffect = UnityFx.laserCharge;
                 chargeBeginEffect = UnityFx.laserChargeBegin;
@@ -1612,7 +1611,7 @@ public class UnityBlocks implements ContentList{
                 shootShake = 5f;
                 powerUse = 13f;
 
-                shootEffect = UnityFx.laserChargeShoot;
+                shootEffect = ShootFx.laserChargeShoot;
                 smokeEffect = Fx.none;
                 chargeEffect = UnityFx.laserCharge;
                 chargeBeginEffect = UnityFx.laserChargeBegin;
@@ -1662,7 +1661,7 @@ public class UnityBlocks implements ContentList{
 
                 cooldown = 0.03f;
                 shootShake = 2f;
-                shootEffect = UnityFx.laserChargeShoot;
+                shootEffect = ShootFx.laserChargeShoot;
                 smokeEffect = Fx.none;
                 chargeEffect = UnityFx.laserCharge;
                 chargeBeginEffect = UnityFx.laserChargeBegin;
@@ -1743,7 +1742,7 @@ public class UnityBlocks implements ContentList{
                 powerUse = 17f;
 
                 shootShake = 4f;
-                shootEffect = UnityFx.laserBreakthroughShoot;
+                shootEffect = ShootFx.laserBreakthroughShoot;
                 smokeEffect = Fx.none;
                 chargeEffect = Fx.none;
                 chargeBeginEffect = UnityFx.laserBreakthroughChargeBegin;

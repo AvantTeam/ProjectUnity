@@ -7,6 +7,7 @@ import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import unity.content.*;
+import unity.content.effects.*;
 
 public class EphemeronPairBulletType extends BasicBulletType{
     public boolean positive;
@@ -52,7 +53,7 @@ public class EphemeronPairBulletType extends BasicBulletType{
 
                 Tmp.v1.set((b.x + n.x) / 2f, (b.y + n.y) / 2f);
 
-                UnityFx.ephemeronHit.at(Tmp.v1);
+                HitFx.LightHitLarge.at(Tmp.v1);
                 Damage.damage(b.team, Tmp.v1.x, Tmp.v1.y, 40f, 80f);
             }
         }else{

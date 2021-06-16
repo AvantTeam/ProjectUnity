@@ -72,14 +72,6 @@ public class UnityFx{
         Fill.square(e.x, e.y, e.fin() * 2f, 45f);
     }),
 
-    laserChargeShoot = new Effect(21f, e -> {
-        color(e.color, Color.white, e.fout());
-
-        for(var i=0; i<4; i++){
-            Drawf.tri(e.x, e.y, 4f * e.fout(), 29f, e.rotation + 90f * i + e.finpow() * 112f);
-        }
-    }),
-
     freezeEffect = new Effect(30f, e -> {
         color(Color.white, e.color, e.fin());
         stroke(e.fout() * 2);
@@ -112,10 +104,10 @@ public class UnityFx{
 
     branchFragHit = new Effect(8f, e -> {
         color(Color.white, Pal.lancerLaser, e.fin());
-    
+
         stroke(0.5f + e.fout());
         Lines.circle(e.x, e.y, e.fin() * 5f);
-    
+
         stroke(e.fout());
         Lines.circle(e.x, e.y, e.fin() * 6f);
     }),
@@ -134,37 +126,6 @@ public class UnityFx{
         color();
         Fill.circle(e.x, e.y, e.fin() * 13);
     }),
-    
-    laserBreakthroughShoot = new Effect(40f, e -> {
-        color(e.color);
-    
-        stroke(e.fout() * 2.5f);
-        Lines.circle(e.x, e.y, e.finpow() * 100f);
-    
-        stroke(e.fout() * 5f);
-        Lines.circle(e.x, e.y, e.fin() * 100f);
-    
-        color(e.color, Color.white, e.fout());
-    
-        randLenVectors(e.id, 20, 80f * e.finpow(), (x, y) -> {
-            Fill.circle(e.x + x, e.y + y, e.fout() * 5f);
-        });
-    
-    
-        for(int i = 0; i < 4; i++){
-            Drawf.tri(e.x, e.y, 9f * e.fout(), 170f, e.rotation + Mathf.randomSeed(e.id, 360f) + 90f * i + e.finpow() * (0.5f - Mathf.randomSeed(e.id)) * 150f);
-        }
-    }),
-    
-    shootSmallBlaze = new Effect(22f, e -> {
-        color(Pal.lightFlame, Pal.darkFlame, Pal.gray, e.fin());
-        randLenVectors(e.id, 16, e.finpow() * 60f, e.rotation, 18f, (x, y) -> Fill.circle(e.x + x, e.y + y, 0.85f + e.fout() * 3.5f));
-    }),
-
-    shootPyraBlaze = new Effect(32f, e -> {
-        color(Pal.lightPyraFlame, Pal.darkPyraFlame, Pal.gray, e.fin());
-        randLenVectors(e.id, 16, e.finpow() * 60f, e.rotation, 18f, (x, y) -> Fill.circle(e.x + x, e.y + y, 0.85f + e.fout() * 3.5f));
-    }),
 
     craftingEffect = new Effect(67f, 35f, e -> {
         float value = Mathf.randomSeed(e.id);
@@ -174,95 +135,6 @@ public class UnityFx{
         color(UnityPal.laserOrange);
         Fill.square(e.x + Tmp.v1.x, e.y + Tmp.v1.y, e.fslope() * 3f, 45f);
         color();
-    }),
-    
-    catastropheCharge = new Effect(70f, e -> {
-        float slope = Interp.pow2Out.apply(Mathf.curve(e.fin(), 0f, 0.70f)) - Interp.pow5In.apply(Mathf.curve(e.fin(), 0.85f, 1f));
-        float shrink = 1 - Mathf.curve(e.fin(), 0.85f, 1f);
-        float foutpow = Interp.pow3Out.apply(e.fout());
-        float rotpow = Interp.pow3Out.apply(e.fin());
-        int spikes = 7;
-        float spread = 50;
-        
-        color(Color.valueOf("ff9c5a"));
-        stroke(e.fin() * 6f);
-        Lines.circle(e.x, e.y, foutpow * 28f);
-
-        Fill.circle(e.x, e.y, slope * 6f * (1f + 3f * rotpow) / 2f);
-        for(int i = 0; i < spikes; i++){
-            float rot = Mathf.lerp((i - (int)(spikes / 2f)) * spread, 0, rotpow);
-            Drawf.tri(e.x, e.y, shrink * 6f * (1f + 3f * rotpow), 80f * slope, e.rotation + rot);
-        }
-
-        color();
-        Fill.circle(e.x, e.y, slope * 3f * (1f + 3f * rotpow) / 2f);
-        for(int i = 0; i < spikes; i++){
-            float rot = Mathf.lerp((i - (int)(spikes / 2f)) * spread, 0, rotpow);
-            Drawf.tri(e.x, e.y, shrink * 3f * (1f + 3f * rotpow), 30f * slope, e.rotation + rot);
-        }
-    }), 
-    
-    calamityCharge = new Effect(140f, e -> {
-        float slope = Interp.pow2Out.apply(Mathf.curve(e.fin(), 0f, 0.70f)) - Interp.pow5In.apply(Mathf.curve(e.fin(), 0.85f, 1f));
-        float shrink = 1 - Mathf.curve(e.fin(), 0.85f, 1f);
-        float foutpow = Interp.pow3Out.apply(e.fout());
-        float rotpow = Interp.pow3Out.apply(e.fin());
-        int spikes = 9;
-        float spread = 39f;
-        
-        color(Color.valueOf("ff9c5a"));
-        stroke(e.fin() * 8f);
-        Lines.circle(e.x, e.y, foutpow * 45f);
-
-        Fill.circle(e.x, e.y, slope * 8f * (1f + 3f * rotpow) / 2f);
-        for(int i = 0; i < spikes; i++){
-            float rot = Mathf.lerp((i - (int)(spikes / 2f)) * spread, 0, rotpow);
-            Drawf.tri(e.x, e.y, shrink * 8f * (1f + 3f * rotpow), 140f * slope, e.rotation + rot);
-        }
-
-        color();
-        Fill.circle(e.x, e.y, slope * 4f * (1f + 3f * rotpow) / 2f);
-        for(int i = 0; i < spikes; i++){
-            float rot = Mathf.lerp((i - (int)(spikes / 2f)) * spread, 0, rotpow);
-            Drawf.tri(e.x, e.y, shrink * 4f * (1f + 3f * rotpow), 50f * slope, e.rotation + rot);
-        }
-    }), 
-    
-    extinctionCharge = new Effect(210f, e -> {
-        float slope = Interp.pow2Out.apply(Mathf.curve(e.fin(), 0f, 0.70f)) - Interp.pow5In.apply(Mathf.curve(e.fin(), 0.85f, 1f));
-        float shrink = 1 - Mathf.curve(e.fin(), 0.85f, 1f);
-        float foutpow = Interp.pow3Out.apply(e.fout());
-        float rotpow = Interp.pow3Out.apply(e.fin());
-        int spikes = 13;
-        float spread = 27f;
-        
-        color(Color.valueOf("ff9c5a"));
-        stroke(e.fin() * 10f);
-        Lines.circle(e.x, e.y, foutpow * 70f);
-
-        Fill.circle(e.x, e.y, slope * 10f * (1f + 3f * rotpow) / 2f);
-        for(int i = 0; i < spikes; i++){
-            float rot = Mathf.lerp((i - (int)(spikes / 2f)) * spread, 0, rotpow);
-            Drawf.tri(e.x, e.y, shrink * 10f * (1f + 3f * rotpow), 200f * slope, e.rotation + rot);
-        }
-
-        color();
-        Fill.circle(e.x, e.y, slope * 5f * (1f + 3f * rotpow) / 2f);
-        for(int i = 0; i < spikes; i++){
-            float rot = Mathf.lerp((i - (int)(spikes / 2f)) * spread, 0, rotpow);
-            Drawf.tri(e.x, e.y, shrink * 5f * (1f + 3f * rotpow), 80f * slope, e.rotation + rot);
-        }
-    }),
-
-    electronHit = new Effect(12f, e -> {
-        color(Pal.lancerLaser, UnityPal.lightEffect, e.fin());
-        stroke(e.fout() * 3f);
-        Lines.circle(e.x, e.y, e.fin() * 90f);
-
-        randLenVectors(e.id, 7, e.finpow() * 45f, (x, y) -> {
-            float a = Mathf.angle(x, y);
-            Fill.poly(e.x + x, e.y + y, 3, e.fout() * 4f, e.fin() * 120f + e.rotation + a);
-        });
     }),
 
     whirl = new Effect(65f, e -> {
@@ -289,26 +161,6 @@ public class UnityFx{
         color();
     }),
 
-    protonHit = new Effect(20f, e -> {
-        color(Pal.lancerLaser, Color.valueOf("4787ff00"), e.fin());
-        stroke(e.fout() * 4f);
-	    Lines.circle(e.x, e.y, e.fin() * 150f);
-
-        randLenVectors(e.id, 12, e.finpow() * 64f, (x, y) -> {
-            float a = Mathf.angle(x, y);
-            Fill.poly(e.x + x, e.y + y, 3, e.fout() * 6f, e.fin() * 135f + e.rotation + a);
-        });
-    }),
-
-    neutronHit = new Effect(28f, e -> {
-        color(Pal.lancerLaser, UnityPal.lightEffect, e.fin());
-
-        randLenVectors(e.id, 7, e.finpow() * 50f, (x, y) -> {
-            float a = Mathf.angle(x, y);
-            Fill.poly(e.x + x, e.y + y, 3, e.fout() * 5f, e.fin() * 120f + e.rotation + a);
-        });
-    }),
-
     wBosonChargeBeginEffect = new Effect(38f, e -> {
         color(UnityPal.lightEffect, Pal.lancerLaser, e.fin());
         Fill.circle(e.x, e.y, 3f + e.fin() * 6f);
@@ -324,26 +176,6 @@ public class UnityFx{
             float a = Mathf.angle(x, y);
             lineAngle(e.x + x, e.y + y, a, Mathf.sin(e.finpow() * 3f, 1f, 8f) + 1.5f);
             Fill.circle(e.x + x, e.y + y, 2f + e.fin() * 1.75f);
-        });
-    }),
-
-    wBosonHitEffect = new Effect(13f, e -> {
-        color(Pal.lancerLaser, UnityPal.lightEffect, e.fin());
-	    stroke(0.5f + e.fout());
-
-        randLenVectors(e.id, 17, e.finpow() * 40f, (x, y) -> {
-            float a = Mathf.angle(x, y);
-            lineAngle(e.x + x, e.y + y, a, e.fout() * 8f);
-        });
-    }),
-
-    wBosonDecayHitEffect = new Effect(13f, e -> {
-        color(Pal.lancerLaser, UnityPal.lightEffect, e.fin());
-	    stroke(0.5f + e.fout());
-
-        randLenVectors(e.id, 17, e.finpow() * 20f, (x, y) -> {
-            float a = Mathf.angle(x, y);
-            lineAngle(e.x + x, e.y + y, a, e.fout() * 8f);
         });
     }),
 
@@ -373,19 +205,6 @@ public class UnityFx{
         }
     }),
 
-    ephemeronHit = new Effect(15f, e -> {
-        color(Pal.lancerLaser, UnityPal.lightEffect, e.fin());
-        stroke(0.5f + e.fout());
-
-        randLenVectors(e.id, 17, e.finpow() * 50f, (x, y) -> {
-            float a = Mathf.angle(x, y);
-            lineAngle(e.x + x, e.y + y, a, e.fout() * 8f);
-        });
-
-        stroke(0.5f + e.fout() * 1.2f);
-	    Lines.circle(e.x, e.y, e.finpow() * 30f);
-    }),
-
     singularityDespawn = new Effect(12f, e -> {
         float[] scales = {8.6f, 7f, 5.5f, 4.3f, 4.1f, 3.9f};
         Color[] colors = new Color[]{Color.valueOf("4787ff80"), Pal.lancerLaser, Color.white, Pal.lancerLaser, UnityPal.lightEffect, Color.black    };
@@ -407,23 +226,6 @@ public class UnityFx{
             rect(d.region, lerpx, lerpy, d.region.width * scl * size, d.region.height * scl * size, (e.fin() * Mathf.randomSeedRange(e.id, 32f)) + rot);
         }
     }).layer(Layer.effect + 0.02f),
-
-    orbHit = new Effect(12f, e -> {
-        color(Pal.surge);
-        stroke(e.fout() * 1.5f);
-        randLenVectors(e.id, 8, e.finpow() * 17f, e.rotation, 360f, (x, y) -> {
-            float ang = Mathf.angle(x, y);
-            lineAngle(e.x + x, e.y + y, ang, e.fout() * 4f + 1f);
-        });
-    }),
-
-    orbShoot = new Effect(21f, e -> {
-        color(Pal.surge);
-        for(int i = 0; i < 2; i++){
-            int l = Mathf.signs[i];
-            Drawf.tri(e.x, e.y, 4f * e.fout(), 29f, e.rotation + 67 * l);
-        }
-    }),
 
     orbTrail = new Effect(43f, e -> {
         Tmp.v1.trns(Mathf.randomSeed(e.id) * 360f, Mathf.randomSeed(e.id * 341L) * 12f * e.fin());
@@ -469,13 +271,6 @@ public class UnityFx{
 
         color();
         Fill.circle(e.x, e.y, e.fin() * 3f);
-    }),
-
-    plasmaTriangleHit = new Effect(30f, e -> {
-        color(Pal.surge);
-
-        stroke(e.fout() * 2.8f);
-        circle(e.x, e.y, e.fin() * 60);
     }),
 
     plasmaFragAppear = new Effect(12f, e -> {
