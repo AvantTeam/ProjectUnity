@@ -4,6 +4,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.io.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import unity.annotations.Annotations.*;
@@ -42,8 +43,8 @@ public class LightDistributor extends LightHoldBlock{
                 Light light = Light.create();
                 light.set(this);
                 light.source = this;
-                light.rotation = angleTo(target);
                 light.strength = lightsum() / routes.size;
+                light.rotation = angleTo(target);
                 light.add();
 
                 routes.put(target.pos(), light);
@@ -114,6 +115,34 @@ public class LightDistributor extends LightHoldBlock{
                 Lines.stroke(1f, Pal.placing);
                 Lines.dashLine(x, y, build.x, build.y, seg);
                 Draw.reset();
+            }
+        }
+
+        @Override
+        public void write(Writes write){
+            super.write(write);
+            write.i(routes.size);
+
+            var keys = routes.keys();
+            while(keys.hasNext){
+                write.i(keys.next());
+            }
+        }
+
+        @Override
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+
+            int amount = read.i();
+            for(int i = 0; i < amount; i++){
+                Building build = world.build(read.i());
+                if(build == null) continue;
+
+                Light light = Light.create();
+                light.set(this);
+                light.source = this;
+                light.rotation = angleTo(build);
+                routes.put(build.pos(), light);
             }
         }
     }

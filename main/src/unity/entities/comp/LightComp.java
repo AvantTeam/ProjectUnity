@@ -109,7 +109,7 @@ abstract class LightComp implements Drawc, Rotc{
         Tmp.c1.set(color);
         float
             c1 = Tmp.c1.a(s).toFloatBits(),
-            c2 = Tmp.c1.a(cs).toFloatBits();
+            c2 = Tmp.c1.a(0.5f + cs * 0.5f).toFloatBits();
 
         float z = Draw.z();
         Draw.z(Layer.effect);

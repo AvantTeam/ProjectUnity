@@ -3,6 +3,7 @@ package unity.world.blocks.light;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
+import arc.util.io.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.blocks.production.*;
@@ -97,6 +98,34 @@ public class LightSource extends LightHoldGenericCrafter{
                 Lines.dashLine(x, y, target.x, target.y, seg);
                 Draw.reset();
             }
+        }
+
+        @Override
+        public void write(Writes write){
+            super.write(write);
+
+            write.f(rotation);
+            write.f(targetRotation);
+
+            if(target != null){
+                write.b(1);
+                write.i(target.pos());
+            }else{
+                write.b(0);
+            }
+        }
+
+        @Override
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+
+            rotation = read.f();
+            targetRotation = read.f();
+            target = switch(read.b()){
+                case 0 -> null;
+                case 1 -> world.build(read.i());
+                default -> throw new IllegalStateException("Invalid state");
+            };
         }
     }
 }

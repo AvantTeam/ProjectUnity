@@ -4,6 +4,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.io.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import unity.annotations.Annotations.*;
@@ -150,6 +151,48 @@ public class LightReflector extends LightHoldBlock{
                 Lines.dashLine(x, y, target2.x, target2.y, seg);
                 Draw.reset();
             }
+        }
+
+        @Override
+        public void write(Writes write){
+            super.write(write);
+
+            write.f(rotation);
+            write.f(targetRotation);
+
+            if(target1 != null && target1.isValid()){
+                write.b(1);
+                write.i(target1.pos());
+            }else{
+                write.b(0);
+            }
+
+            if(target2 != null && target2.isValid()){
+                write.b(1);
+                write.i(target2.pos());
+            }else{
+                write.b(0);
+            }
+        }
+
+        @Override
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+
+            rotation = read.f();
+            targetRotation = read.f();
+
+            target1 = switch(read.b()){
+                case 0 -> null;
+                case 1 -> world.build(read.i());
+                default -> throw new IllegalStateException("Invalid state");
+            };
+
+            target2 = switch(read.b()){
+                case 0 -> null;
+                case 1 -> world.build(read.i());
+                default -> throw new IllegalStateException("Invalid state");
+            };
         }
     }
 }
