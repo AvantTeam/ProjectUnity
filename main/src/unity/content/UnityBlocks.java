@@ -34,7 +34,10 @@ import unity.world.blocks.*;
 import unity.world.blocks.defense.*;
 import unity.world.blocks.defense.turrets.*;
 import unity.world.blocks.distribution.*;
+import unity.world.blocks.light.*;
 import unity.world.blocks.logic.*;
+import unity.world.blocks.logic.LightReflector;
+import unity.world.blocks.logic.LightSource;
 import unity.world.blocks.power.*;
 import unity.world.blocks.production.*;
 import unity.world.blocks.sandbox.*;
@@ -98,7 +101,7 @@ public class UnityBlocks implements ContentList{
     metaglassWall, metaglassWallLarge;
 
     //test
-    public static @FactionDef("light") Block lightSource, lightRouter, lightReflectorBetterAF;
+    public static @FactionDef("light") Block lightSource, lightDistributor, lightReflectorBetterAF;
 
     //---------- imber faction ----------
     public static @FactionDef("imber")
@@ -1126,7 +1129,7 @@ public class UnityBlocks implements ContentList{
             requirements(Category.crafting, with(Items.copper, 1));
         }};
 
-        lightRouter = new unity.world.blocks.light.LightRouter("light-router"){{
+        lightDistributor = new LightDistributor("light-distributor"){{
             requirements(Category.logic, with(Items.copper, 1));
         }};
 

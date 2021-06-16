@@ -55,8 +55,12 @@ abstract class LightHoldComp extends Block implements Stemc{
             return acceptsLight || requiresLight;
         }
 
+        public float lightsum(){
+            return sources.sumf(Light::endStrength);
+        }
+
         public float lightf(){
-            return sources.sumf(Light::endStrength) / requiredLight;
+            return lightsum() / requiredLight;
         }
 
         /** Note that this does not apply {@link Light#strength}! */

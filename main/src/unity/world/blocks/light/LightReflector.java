@@ -20,6 +20,7 @@ public class LightReflector extends LightHoldBlock{
         solid = true;
         requiresLight = false;
         acceptsLight = true;
+        configurable = true;
 
         config(Integer.class, (LightReflectorBuild tile, Integer value) -> {
             Building build = world.build(value);
