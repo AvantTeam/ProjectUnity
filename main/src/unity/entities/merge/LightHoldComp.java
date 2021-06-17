@@ -19,6 +19,7 @@ import java.util.*;
 abstract class LightHoldComp extends Block implements Stemc{
     boolean requiresLight = true;
     boolean acceptsLight = true;
+
     float requiredLight = 1f;
 
     public LightHoldComp(String name){
@@ -26,6 +27,18 @@ abstract class LightHoldComp extends Block implements Stemc{
         update = true;
         sync = true;
         destructible = true;
+    }
+
+    public boolean hasRotation(Building build){
+        return false;
+    }
+
+    /**
+     * The default for this method will throw an exception; override {@link #hasRotation(Building)} in order to
+     * safely proceed.
+     */
+    public float getRotation(Building build){
+        throw new UnsupportedOperationException();
     }
 
     /**

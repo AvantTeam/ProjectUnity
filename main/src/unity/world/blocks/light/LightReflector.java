@@ -2,6 +2,7 @@ package unity.world.blocks.light;
 
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
@@ -10,10 +11,17 @@ import mindustry.graphics.*;
 import unity.annotations.Annotations.*;
 import unity.gen.*;
 
+import java.util.*;
+
 import static mindustry.Vars.*;
 
+/**
+ * A type of light block in which the inputted lights are reflected.
+ * @author GlennFolker
+ */
 @Merge(LightHoldc.class)
 public class LightReflector extends LightHoldBlock{
+    public float angleRange = 22.5f;
     public float rotateSpeed = 5f;
 
     public LightReflector(String name){
@@ -26,23 +34,50 @@ public class LightReflector extends LightHoldBlock{
         config(Integer.class, (LightReflectorBuild tile, Integer value) -> {
             Building build = world.build(value);
             if(build != null && build.isValid()){
-                if(tile.target1 == build){
-                    tile.target1 = null;
-                }else if(tile.target2 == build){
-                    tile.target2 = null;
-                }else if(tile.target1 == null){
-                    tile.target1 = build;
-                }else if(tile.target2 == null){
-                    tile.target2 = build;
+                int cur = Structs.indexOf(tile.targets, build);
+                if(cur != -1){
+                    tile.targets[cur] = null;
+                }else{
+                    int next = Structs.indexOf(tile.targets, (Building)null);
+                    if(next != -1){
+                        tile.targets[next] = build;
+                    }
                 }
             }
         });
+
+        config(Boolean.class, (LightReflectorBuild tile, Boolean value) -> {
+            if(tile.targets[0] != null || tile.targets[1] != null){
+                Arrays.fill(tile.targets, null);
+
+                tile.targetRotation = Mathf.floor(tile.targetRotation / angleRange) * angleRange;
+                if(value){
+                    tile.targetRotation += angleRange;
+                }
+            }else{
+                tile.targetRotation += angleRange * Mathf.sign(value);
+            }
+        });
+    }
+
+    @Override
+    public boolean hasRotation(Building build){
+        return build instanceof LightReflectorBuild;
+    }
+
+    @Override
+    public float getRotation(Building build){
+        if(build instanceof LightReflectorBuild hold){
+            return hold.rotation;
+        }else{
+            throw new UnsupportedOperationException();
+        }
     }
 
     public class LightReflectorBuild extends LightHoldBuild{
         public ObjectMap<Light, Light> reflect = new ObjectMap<>();
 
-        public Building target1, target2;
+        public final Building[] targets = new Building[2];
 
         public float rotation = 90f;
         public float targetRotation = rotation;
@@ -87,14 +122,18 @@ public class LightReflector extends LightHoldBlock{
         public void updateTile(){
             super.updateTile();
 
-            if(target1 != null && !target1.isValid()) target1 = null;
-            if(target2 != null && !target2.isValid()) target2 = null;
-
-            if(target1 != null && target2 != null){
-                targetRotation = (target1.angleTo(this) + target2.angleTo(this)) / 2f;
+            for(int i = 0; i < targets.length; i++){
+                if(targets[i] != null && !targets[i].isValid()){
+                    targets[i] = null;
+                }
             }
 
-            rotation = Mathf.slerpDelta(rotation, targetRotation, rotateSpeed);
+            if(targets[0] != null && targets[1] != null){
+                targetRotation = (targets[0].angleTo(this) + targets[1].angleTo(this)) / 2f;
+            }
+
+            targetRotation %= 360f;
+            rotation = Angles.moveToward(rotation, targetRotation, rotateSpeed * edelta());
 
             for(var entry : reflect.entries()){
                 var origin = entry.key;
@@ -115,6 +154,12 @@ public class LightReflector extends LightHoldBlock{
         }
 
         @Override
+        public void buildConfiguration(Table table){
+            table.button(Icon.left, () -> configure(true)).size(40f);
+            table.button(Icon.right, () -> configure(false)).size(40f);
+        }
+
+        @Override
         public boolean onConfigureTileTapped(Building other){
             if(other != this){
                 configure(other.pos());
@@ -128,27 +173,17 @@ public class LightReflector extends LightHoldBlock{
         public void drawConfigure(){
             Drawf.circles(x, y, tile.block().size * tilesize / 2f + 1f + Mathf.absin(Time.time, 4f, 1f));
 
-            if(target1 != null){
-                Drawf.circles(target1.x, target1.y, target1.tile.block().size * tilesize / 2f + 1f + Mathf.absin(Time.time, 4f, 1f), Pal.place);
+            for(Building target : targets){
+                if(target == null) continue;
 
-                int seg = (int)(dst(target1.x, target1.y) / tilesize);
+                Drawf.circles(target.x, target.y, target.tile.block().size * tilesize / 2f + 1f + Mathf.absin(Time.time, 4f, 1f), Pal.place);
 
-                Lines.stroke(2f, Pal.gray);
-                Lines.dashLine(x, y, target1.x, target1.y, seg);
-                Lines.stroke(1f, Pal.placing);
-                Lines.dashLine(x, y, target1.x, target1.y, seg);
-                Draw.reset();
-            }
-
-            if(target2 != null){
-                Drawf.circles(target2.x, target2.y, target2.tile.block().size * tilesize / 2f + 1f + Mathf.absin(Time.time, 4f, 1f), Pal.place);
-
-                int seg = (int)(dst(target2.x, target2.y) / tilesize);
+                int seg = (int) (dst(target.x, target.y) / tilesize);
 
                 Lines.stroke(2f, Pal.gray);
-                Lines.dashLine(x, y, target2.x, target2.y, seg);
+                Lines.dashLine(x, y, target.x, target.y, seg);
                 Lines.stroke(1f, Pal.placing);
-                Lines.dashLine(x, y, target2.x, target2.y, seg);
+                Lines.dashLine(x, y, target.x, target.y, seg);
                 Draw.reset();
             }
         }
@@ -160,18 +195,13 @@ public class LightReflector extends LightHoldBlock{
             write.f(rotation);
             write.f(targetRotation);
 
-            if(target1 != null && target1.isValid()){
-                write.b(1);
-                write.i(target1.pos());
-            }else{
-                write.b(0);
-            }
+            for(Building target : targets){
+                if(target == null || !target.isValid()){
+                    write.b(0);
+                    continue;
+                }
 
-            if(target2 != null && target2.isValid()){
-                write.b(1);
-                write.i(target2.pos());
-            }else{
-                write.b(0);
+                write.i(target.pos());
             }
         }
 
@@ -182,17 +212,13 @@ public class LightReflector extends LightHoldBlock{
             rotation = read.f();
             targetRotation = read.f();
 
-            target1 = switch(read.b()){
-                case 0 -> null;
-                case 1 -> world.build(read.i());
-                default -> throw new IllegalStateException("Invalid state");
-            };
-
-            target2 = switch(read.b()){
-                case 0 -> null;
-                case 1 -> world.build(read.i());
-                default -> throw new IllegalStateException("Invalid state");
-            };
+            for(int i = 0; i < 2; i++){
+                targets[i] = switch(read.b()){
+                    case 0 -> null;
+                    case 1 -> world.build(read.i());
+                    default -> throw new IllegalStateException("Illegal state");
+                };
+            }
         }
     }
 }

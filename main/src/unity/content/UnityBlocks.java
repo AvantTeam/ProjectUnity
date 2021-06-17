@@ -34,7 +34,7 @@ import unity.world.blocks.*;
 import unity.world.blocks.defense.*;
 import unity.world.blocks.defense.turrets.*;
 import unity.world.blocks.distribution.*;
-import unity.world.blocks.light.*;
+import unity.world.blocks.light.LightRouter;
 import unity.world.blocks.logic.*;
 import unity.world.blocks.logic.LightReflector;
 import unity.world.blocks.logic.LightSource;
@@ -468,7 +468,6 @@ public class UnityBlocks implements ContentList{
             coolantMultiplier = 0.6f;
             shootCone = 40f;
             shootDuration = 320f;
-            // shootLength = 12f;
             powerUse = 39f;
             shootShake = 4f;
             firingMoveFract = 0.16f;
@@ -481,8 +480,6 @@ public class UnityBlocks implements ContentList{
             loopSound = Sounds.beam;
             loopSoundVolume = 2.2f;
             requirements(Category.turret, with(Items.copper, 1250, Items.lead, 1320, Items.graphite, 1100, Items.titanium, 1340, Items.surgeAlloy, 1240, Items.silicon, 1350, Items.thorium, 770, UnityItems.darkAlloy, 370));
-            // chargeBeginEffect = UnityFx.catastropheCharge;
-            // chargeTime = UnityFx.catastropheCharge.lifetime;
             shootType = UnityBullets.catastropheLaser;
             consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.4f && liquid.flammability < 0.1f, 1.3f)).update(false);
         }};
@@ -495,7 +492,6 @@ public class UnityBlocks implements ContentList{
             coolantMultiplier = 0.6f;
             shootCone = 23f;
             shootDuration = 360f;
-            // shootLength = 14f;
             powerUse = 87f;
             shootShake = 4f;
             firingMoveFract = 0.09f;
@@ -508,8 +504,6 @@ public class UnityBlocks implements ContentList{
             loopSound = Sounds.beam;
             loopSoundVolume = 2.6f;
             requirements(Category.turret, with(Items.copper, 2800, Items.lead, 2970, Items.graphite, 2475, Items.titanium, 3100, Items.surgeAlloy, 2790, Items.silicon, 3025, Items.thorium, 1750, UnityItems.darkAlloy, 1250));
-            // chargeBeginEffect = UnityFx.calamityCharge;
-            // chargeTime = UnityFx.calamityCharge.lifetime;
             shootType = UnityBullets.calamityLaser;
             consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.3f && liquid.flammability < 0.1f, 2.1f)).update(false);
         }};
@@ -1018,11 +1012,20 @@ public class UnityBlocks implements ContentList{
             }
         };
 
-        lightLamp = new LightSource("light-lamp"){{
+        /*lightLamp = new LightSource("light-lamp"){{
             consumes.power(1f);
             requirements(Category.logic, with(Items.lead, 5, Items.metaglass, 10));
-            drawer = new DrawLightSource();
+            drawer = new DrawLightBlock();
             lightLength = 30;
+        }};*/
+
+        lightLamp = new unity.world.blocks.light.LightSource("light-lamp"){{
+            requirements(Category.crafting, with(Items.lead, 5, Items.metaglass, 10));
+
+            lightProduction = 1f;
+            consumes.power(1f);
+
+            drawer = new DrawLightBlock();
         }};
 
         oilLamp = new LightSource("oil-lamp", true){{
@@ -1031,7 +1034,7 @@ public class UnityBlocks implements ContentList{
             consumes.power(1.8f);
             consumes.liquid(Liquids.oil, 0.1f);
             requirements(Category.logic, with(Items.lead, 20, Items.metaglass, 20, Items.titanium, 15));
-            drawer = new DrawLightSource();
+            drawer = new DrawLightBlock();
             lightLength = 150;
             lightStrength = 750;
         }};
@@ -1041,7 +1044,7 @@ public class UnityBlocks implements ContentList{
             consumes.power(1.5f);
             requirements(Category.logic, BuildVisibility.sandboxOnly, with(Items.metaglass, 10, Items.silicon, 5, Items.titanium, 5));
             alwaysUnlocked = true;
-            drawer = new DrawLightSource();
+            drawer = new DrawLightBlock();
             lightLength = 30;
             lightInterval = 0;
         }};
@@ -1051,7 +1054,7 @@ public class UnityBlocks implements ContentList{
             consumesPower = false;
             requirements(Category.logic, BuildVisibility.sandboxOnly, with());
             alwaysUnlocked = true;
-            drawer = new DrawLightSource();
+            drawer = new DrawLightBlock();
             lightLength = 150;
             lightStrength = 600000;
             scaleStatus = false;
@@ -1093,7 +1096,7 @@ public class UnityBlocks implements ContentList{
             requirements(Category.logic, with(Items.metaglass, 10, Items.titanium, 2));
         }};
 
-        lightItemFilter = new LightRouter("light-item-filter"){{
+        lightItemFilter = new unity.world.blocks.logic.LightRouter("light-item-filter"){{
             health = 60;
             requirements(Category.logic, with(Items.graphite, 5, Items.metaglass, 20, Items.silicon, 10));
         }};
@@ -1129,7 +1132,7 @@ public class UnityBlocks implements ContentList{
             requirements(Category.crafting, with(Items.copper, 1));
         }};
 
-        lightDistributor = new LightDistributor("light-distributor"){{
+        lightDistributor = new LightRouter("light-distributor"){{
             requirements(Category.logic, with(Items.copper, 1));
         }};
 
