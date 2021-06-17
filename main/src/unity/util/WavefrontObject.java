@@ -327,7 +327,8 @@ public class WavefrontObject{
         }
         tmp.scl(1f / indexerA);
 
-        if(face.mat != null && face.mat.hasColor){
+        boolean matB = face.mat != null && face.mat.hasColor;
+        if(matB){
             Tmp.c2.rgba8888(face.mat.ambientCol).mul(shadeColor);
             Tmp.c3.rgba8888(face.mat.diffuseCol).mul(lightColor);
             Tmp.c4.rgba8888(face.mat.emitCol);
@@ -337,7 +338,7 @@ public class WavefrontObject{
         }
 
         float angle = (Math.abs(tmp.angleRad(Vec3.Z)) / (45f * Mathf.degRad)) / shadingSmoothness;
-        Tmp.c1.set(face.mat != null ? Tmp.c3 : lightColor).lerp(face.mat != null ? Tmp.c2 : shadeColor, Mathf.clamp(angle));
+        Tmp.c1.set(matB ? Tmp.c3 : lightColor).lerp(matB ? Tmp.c2 : shadeColor, Mathf.clamp(angle));
         Draw.color(Tmp.c1);
     }
 
