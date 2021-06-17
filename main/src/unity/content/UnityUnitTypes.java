@@ -906,6 +906,7 @@ public class UnityUnitTypes implements ContentList{
             speed = 0.42f;
             hitSize = 35.5f;
             health = 20000;
+            rotateSpeed = 1.3f;
             
             legCount = 8;
             legMoveSpace = 0.76f;
@@ -1023,8 +1024,8 @@ public class UnityUnitTypes implements ContentList{
             legGroupSize = 2;
             legMoveSpace = 0.7f;
             legPairOffset = 0.2f;
-            legLength = 121f;
-            legExtension = -13.5f;
+            legLength = 176f;
+            legExtension = -24f;
             legBaseOffset = 9f;
             visualElevation = 1f;
             groundLayer = Layer.legUnit + 0.02f;
@@ -1033,6 +1034,7 @@ public class UnityUnitTypes implements ContentList{
             legSplashRange = 60f;
             targetAir = false;
             commandLimit = 5;
+            bottomWeapons.add(name + "-launcher");
             weapons.add(new LimitedAngleWeapon(name + "-launcher"){{
                 x = 33f;
                 y = 8.5f;
