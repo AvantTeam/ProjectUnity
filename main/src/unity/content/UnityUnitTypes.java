@@ -901,11 +901,12 @@ public class UnityUnitTypes implements ContentList{
         }};
 
         araneidae = new UnityUnitType("araneidae"){{
-            groundLayer = Layer.legUnit + 1f;
+            groundLayer = Layer.legUnit + 0.01f;
             drag = 0.1f;
             speed = 0.42f;
             hitSize = 35.5f;
             health = 20000;
+            rotateSpeed = 1.3f;
             
             legCount = 8;
             legMoveSpace = 0.76f;
@@ -925,7 +926,7 @@ public class UnityUnitTypes implements ContentList{
 
             armor = 13f;
             allowLegStep = true;
-            visualElevation = 0.7f;
+            visualElevation = 0.95f;
 
             weapons.add(new Weapon("unity-araneidae-mount"){{
                 x = 15f;
@@ -1019,37 +1020,89 @@ public class UnityUnitTypes implements ContentList{
             health = 31000;
             armor = 16f;
             rotateSpeed = 1.3f;
-            legCount = 16;
-            legGroupSize = 4;
-            legMoveSpace = 0.4f;
-            legPairOffset = 0.4f;
-            legLength = 121f;
-            legExtension = -13.5f;
-            kinematicScl = 0.8f;
+            legCount = 8;
+            legGroupSize = 2;
+            legMoveSpace = 0.7f;
+            legPairOffset = 0.2f;
+            legLength = 176f;
+            legExtension = -24f;
             legBaseOffset = 9f;
-            legSpeed = 0.092f;
             visualElevation = 1f;
-            groundLayer = Layer.legUnit + 1.3f;
+            groundLayer = Layer.legUnit + 0.02f;
             rippleScale = 3.4f;
             legSplashDamage = 130f;
             legSplashRange = 60f;
             targetAir = false;
             commandLimit = 5;
-            weapons.add(new MultiBarrelWeapon(name + "-cannon"){{
+            bottomWeapons.add(name + "-launcher");
+            weapons.add(new LimitedAngleWeapon(name + "-launcher"){{
+                x = 33f;
+                y = 8.5f;
+                shootY = 6.25f - 1f;
+                reload = 7f;
+                recoil = 1f;
+                rotate = true;
+                shootCone = 20f;
+                angleCone = 60f;
+                angleOffset = 45f;
+                inaccuracy = 25f;
+                xRand = 2.25f;
+                shots = 2;
+
+                bullet = new MissileBulletType(3.7f, 15f){{
+                    width = 10f;
+                    height = 12f;
+                    shrinkY = 0f;
+                    drag = -0.01f;
+                    splashDamageRadius = 30f;
+                    splashDamage = 55f;
+                    ammoMultiplier = 5f;
+                    hitEffect = Fx.blastExplosion;
+                    despawnEffect = Fx.blastExplosion;
+                    backColor = trailColor = Pal.sapBulletBack;
+                    frontColor = lightningColor = lightColor = Pal.sapBullet;
+                    trailLength = 13;
+                    homingRange = 80f;
+                    weaveScale = 8f;
+                    weaveMag = 2f;
+                    lightning = 2;
+                    lightningLength = 2;
+                    lightningLengthRand = 1;
+                    lightningCone = 15f;
+
+                    status = StatusEffects.blasted;
+                    statusDuration = 60f;
+                }};
+            }},
+            new LimitedAngleWeapon(name + "-mount"){{
+                x = 26.75f;
+                y = 7.5f;
+                shootY = 10.25f - 5f;
+                reload = 120f;
+                angleCone = 60f;
+                rotate = true;
+                continuous = true;
+                alternate = false;
+                rotateSpeed = 1.5f;
+                recoil = 5f;
+                
+                bullet = UnityBullets.continuousSapLaser;
+            }},
+            new MultiBarrelWeapon(name + "-cannon"){{
                 x = 20.5f;
                 y = -10f;
-                shootY = 22.75f;
+                shootY = 20.5f - 10.5f;
                 shootSound = Sounds.artillery;
                 rotate = true;
-                alternate = false;
-                rotationSpeed = 0.9f;
-                reload = 60f;
+                alternate = true;
+                rotateSpeed = 0.9f;
+                reload = 50f;
                 shake = 6f;
                 recoil = 5f;
-                barrels = 3;
-                barrelOffset = 9.25f;
-                barrelSpacing = 8.25f;
-                barrelRecoil = 6.5f;
+                barrels = 2;
+                barrelOffset = 7.25f;
+                barrelSpacing = 11.25f;
+                barrelRecoil = 5.5f;
 
                 bullet = new ArtilleryBulletType(3.5f, 70f){
                     @Override

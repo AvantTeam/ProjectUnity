@@ -36,7 +36,7 @@ public class UnityBullets implements ContentList{
         kelvinSlagLaser, kelvinOilLaser, kelvinCryofluidLaser, kelvinLiquidLaser, celsiusSmoke, kelvinSmoke,
         breakthroughLaser,
 
-        sapLaser,
+        sapLaser, continuousSapLaser,
 
         coalBlaze, pyraBlaze,
 
@@ -543,10 +543,12 @@ public class UnityBullets implements ContentList{
         sapLaser = new LaserBulletType(80f){{
             colors = new Color[]{Pal.sapBulletBack.cpy().a(0.4f), Pal.sapBullet, Color.white};
             length = 150f;
-            width = 20f;
+            width = 25f;
             sideLength = sideWidth = 0f;
             shootEffect = ShootFx.sapPlasmaShoot;
             hitColor = lightColor = lightningColor = Pal.sapBullet;
+            status = StatusEffects.sapped;
+            statusDuration = 80f;
             lightningSpacing = 17f;
             lightningDelay = 0.12f;
             lightningDamage = 15f;
@@ -554,6 +556,30 @@ public class UnityBullets implements ContentList{
             lightningLengthRand = 2;
             lightningAngleRand = 15f;
         }};
+
+        continuousSapLaser = new ContinuousLaserBulletType(60f){
+            {
+                colors = new Color[]{Pal.sapBulletBack.cpy().a(0.3f), Pal.sapBullet.cpy().a(0.6f), Pal.sapBullet, Color.white};
+                length = 190f;
+                width = 5f;
+                shootEffect = ShootFx.sapPlasmaShoot;
+                hitColor = lightColor = lightningColor = Pal.sapBullet;
+                hitEffect = HitFx.coloredHitSmall;
+                status = StatusEffects.sapped;
+                statusDuration = 80f;
+                lifetime = 180f;
+                incendChance = 0f;
+                largeHit = false;
+            }
+
+            @Override
+            public void hitEntity(Bullet b, Hitboxc entity, float health){
+                super.hitEntity(b, entity, health);
+                if(entity instanceof Healthc h && b.owner instanceof Healthc owner){
+                    owner.heal(Math.max(health - h.health(), 0f) * 0.2f);
+                }
+            }
+        };
 
         falloutLaser = new SparkingContinuousLaserBulletType(95f){{
             length = 230f;
