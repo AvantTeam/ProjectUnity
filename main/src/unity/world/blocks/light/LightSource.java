@@ -2,6 +2,7 @@ package unity.world.blocks.light;
 
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.gen.*;
@@ -12,9 +13,17 @@ import unity.gen.*;
 
 import static mindustry.Vars.*;
 
+/**
+ * A type of light block in which it produces a light laser in which strength is bound to the building's efficiency.
+ * The rotation of the outputted light is configurable, either manually rotating the direction or by linking it to
+ * another {@link Building}.
+ * @author GlennFolker
+ */
 @Merge(base = GenericCrafter.class, value = LightHoldc.class)
 public class LightSource extends LightHoldGenericCrafter{
     public float lightProduction = 1f;
+
+    public float angleRange = 22.5f;
     public float rotateSpeed = 5f;
 
     public LightSource(String name){
@@ -34,6 +43,33 @@ public class LightSource extends LightHoldGenericCrafter{
                 }
             }
         });
+
+        config(Boolean.class, (LightSourceBuild tile, Boolean value) -> {
+            if(tile.target != null){
+                tile.target = null;
+
+                tile.targetRotation = Mathf.floor(tile.targetRotation / angleRange) * angleRange;
+                if(value){
+                    tile.targetRotation += angleRange;
+                }
+            }else{
+                tile.targetRotation += angleRange * Mathf.sign(value);
+            }
+        });
+    }
+
+    @Override
+    public boolean hasRotation(Building build){
+        return build instanceof LightSourceBuild;
+    }
+
+    @Override
+    public float getRotation(Building build){
+        if(build instanceof LightSourceBuild hold){
+            return hold.rotation;
+        }else{
+            throw new UnsupportedOperationException();
+        }
     }
 
     public class LightSourceBuild extends LightHoldGenericCrafterBuild{
@@ -60,7 +96,8 @@ public class LightSource extends LightHoldGenericCrafter{
             if(target != null && !target.isValid()) target = null;
             if(target != null) targetRotation = angleTo(target);
 
-            rotation = Mathf.slerpDelta(rotation, targetRotation, rotateSpeed);
+            targetRotation %= 360f;
+            rotation = Angles.moveToward(rotation, targetRotation, rotateSpeed * edelta());
 
             light.set(this);
             light.strength = efficiency() * lightProduction;
@@ -71,6 +108,12 @@ public class LightSource extends LightHoldGenericCrafter{
         public void onRemoved(){
             super.onRemoved();
             light.remove();
+        }
+
+        @Override
+        public void buildConfiguration(Table table){
+            table.button(Icon.left, () -> configure(true)).size(40f);
+            table.button(Icon.right, () -> configure(false)).size(40f);
         }
 
         @Override
