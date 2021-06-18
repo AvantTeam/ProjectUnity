@@ -304,10 +304,16 @@ public class WavefrontObject{
             float color = Draw.getColor().toFloatBits();
             float mColor = Draw.getMixColor().toFloatBits();
 
-            if(!odd){
+            if(!odd || face.verts.length == 4){
                 drawFace(face, color, mColor);
             }else{
-                Draw.draw(z, () -> drawFace(face, color, mColor));
+                float[] verts = new float[face.verts.length * 2];
+                for(int i = 0; i < face.verts.length; i++){
+                    int ix = i * 2;
+                    verts[ix] = face.verts[i].source.x;
+                    verts[ix + 1] = face.verts[i].source.y;
+                }
+                Draw.draw(z, () -> drawFaceLambda(face, verts, color, mColor));
             }
         }
         Draw.reset();
@@ -373,6 +379,41 @@ public class WavefrontObject{
 
         Tmp.c1.set(lightColor).lerp(shadeColor, Mathf.clamp(indexerZ));
         Draw.color(Tmp.c1);
+    }
+
+    protected void drawFaceLambda(Face face, float[] verts, float color, float mixColor){
+        float[] dface = new float[face.size];
+        for(int f = 0; f < (face.mat != null && face.mat.emitTex != null ? 2 : 1); f++){
+            AtlasRegion textureB = texture;
+
+            if(face.mat != null){
+                textureB = f <= 0 ? face.mat.diffTex : face.mat.emitTex;
+            }
+
+            TextureRegion region = Core.atlas.white();
+            if(f > 0){
+                color = Color.whiteFloatBits;
+            }
+            for(int i = 0; i < face.verts.length; i++){
+                int s = i * 6;
+                int ix = i * 2;
+                dface[s] = verts[ix];
+                dface[s + 1] = verts[ix + 1];
+                dface[s + 2] = color;
+                if(!hasTexture || textureB == null){
+                    dface[s + 3] = region.u;
+                    dface[s + 4] = region.v;
+                }else{
+                    float u = textureB.u, v = textureB.v;
+                    float u2 = textureB.u2, v2 = textureB.v2;
+                    dface[s + 3] = Mathf.lerp(u, u2, face.vertexTexture[i].x);
+                    dface[s + 4] = Mathf.lerp(v2, v, face.vertexTexture[i].y);
+                }
+                dface[s + 5] = mixColor;
+            }
+
+            Draw.vert((textureB == null || !hasTexture) ? region.texture : textureB.texture, dface, 0, dface.length);
+        }
     }
 
     protected void drawFace(Face face, float color, float mixColor){
