@@ -41,9 +41,7 @@ public class LoadProcessor extends BaseProcessor{
             .addJavadoc("Generic texture regions");
 
         MethodSpec.Builder load = MethodSpec.methodBuilder("load").addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-            .addJavadoc("Loads the texture regions")
-            .addStatement("if($T.headless) return", cName(Vars.class))
-            .addCode(lnew());
+            .addJavadoc("Loads the texture regions");
 
         for(String reg : genericRegs){
             String name = Strings.kebabToCamel(reg) + "Region";

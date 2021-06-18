@@ -11,6 +11,7 @@ import static unity.content.UnityItems.*;
 import static unity.content.UnityBlocks.*;
 import static unity.content.UnityUnitTypes.*;
 
+@SuppressWarnings("all")
 public class UnityTechTree implements ContentList{
     private static TechNode context = null;
 
@@ -38,9 +39,7 @@ public class UnityTechTree implements ContentList{
         attach(Blocks.powerNode, () -> {
             node(lightLamp, () -> {
                 node(lightFilter, () -> {
-                    node(lightInvertedFilter, () -> {
-                        node(lightItemFilter);
-                    });
+                    node(lightInvertedFilter);
                 });
 
                 node(lightPanel);
@@ -49,10 +48,6 @@ public class UnityTechTree implements ContentList{
                         node(lightDivisor1, () -> {
                             node(lightInfluencer);
                         });
-                    });
-
-                    node(lightReflector1, () -> {
-                        node(lightOmnimirror);
                     });
                 });
 

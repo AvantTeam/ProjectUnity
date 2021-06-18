@@ -14,22 +14,22 @@ import unity.gen.*;
  * @author GlennFolker
  */
 @Merge(LightHoldc.class)
-public class LightRouter extends LightHoldBlock{
+public class LightDiffractor extends LightHoldBlock{
     public int diffractionCount = 3;
     public float minAngle = 22.5f;
     public float maxAngle = 90f;
 
-    public LightRouter(String name){
+    public LightDiffractor(String name){
         super(name);
         solid = true;
         requiresLight = false;
         acceptsLight = true;
         configurable = true;
 
-        config(Float.class, (LightRouterBuild tile, Float value) -> tile.angleDist = Mathf.clamp(tile.angleDist + value, minAngle, maxAngle));
+        config(Float.class, (LightDiffractorBuild tile, Float value) -> tile.angleDist = Mathf.clamp(tile.angleDist + value, minAngle, maxAngle));
     }
 
-    public class LightRouterBuild extends LightHoldBuild{
+    public class LightDiffractorBuild extends LightHoldBuild{
         public ObjectMap<Light, Seq<Light>> diffraction = new ObjectMap<>();
 
         public float angleDist = (minAngle + maxAngle) / 2f;

@@ -1,5 +1,6 @@
 package unity.world.blocks.light;
 
+import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.ui.layout.*;
@@ -24,12 +25,15 @@ public class LightReflector extends LightHoldBlock{
     public float angleRange = 22.5f;
     public float rotateSpeed = 5f;
 
+    public TextureRegion mirrorRegion;
+
     public LightReflector(String name){
         super(name);
         solid = true;
         requiresLight = false;
         acceptsLight = true;
         configurable = true;
+        outlineIcon = true;
 
         config(Integer.class, (LightReflectorBuild tile, Integer value) -> {
             Building build = world.build(value);
@@ -74,6 +78,17 @@ public class LightReflector extends LightHoldBlock{
         }
     }
 
+    @Override
+    public void load(){
+        super.load();
+        mirrorRegion = Core.atlas.find(name + "-mirror");
+    }
+
+    @Override
+    protected TextureRegion[] icons(){
+        return new TextureRegion[]{region, mirrorRegion};
+    }
+
     public class LightReflectorBuild extends LightHoldBuild{
         public ObjectMap<Light, Light> reflect = new ObjectMap<>();
 
@@ -116,6 +131,14 @@ public class LightReflector extends LightHoldBlock{
                 Light ref = reflect.remove(light);
                 ref.remove();
             }
+        }
+
+        @Override
+        public void draw(){
+            super.draw();
+
+            Draw.z(Layer.effect + 2f);
+            Draw.rect(mirrorRegion, x, y, rotation - 90f);
         }
 
         @Override

@@ -32,6 +32,7 @@ public class LightSource extends LightHoldGenericCrafter{
         requiresLight = false;
         acceptsLight = false;
         configurable = true;
+        outlineIcon = true;
 
         config(Integer.class, (LightSourceBuild tile, Integer position) -> {
             Building build = world.build(position);

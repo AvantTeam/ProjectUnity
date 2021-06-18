@@ -67,8 +67,11 @@ public class Unity extends Mod implements ApplicationListener{
         KamiBulletDatas.load();
 
         Events.on(ContentInitEvent.class, e -> {
-            Regions.load();
-            KamiRegions.load();
+            if(!headless){
+                Regions.load();
+                KamiRegions.load();
+            }
+
             UnityFonts.load();
             UnityStyles.load();
         });

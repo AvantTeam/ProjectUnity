@@ -34,10 +34,8 @@ import unity.world.blocks.*;
 import unity.world.blocks.defense.*;
 import unity.world.blocks.defense.turrets.*;
 import unity.world.blocks.distribution.*;
-import unity.world.blocks.light.LightRouter;
+import unity.world.blocks.light.LightDiffractor;
 import unity.world.blocks.logic.*;
-import unity.world.blocks.logic.LightReflector;
-import unity.world.blocks.logic.LightSource;
 import unity.world.blocks.power.*;
 import unity.world.blocks.production.*;
 import unity.world.blocks.sandbox.*;
@@ -71,9 +69,9 @@ public class UnityBlocks implements ContentList{
     superCharger;
 
     //---------- dark faction ----------
-    public static @FactionDef("dark")
+    public static @FactionDef("dark") Block
     //environment
-    Block oreUmbrium,
+    oreUmbrium,
 
     //turrets
     apparition, ghost, banshee, fallout, catastrophe, calamity, extinction,
@@ -87,26 +85,27 @@ public class UnityBlocks implements ContentList{
     Block darkAlloyForge;
 
     //---------- light faction ----------
-    public static @FactionDef("light")
+    public static @FactionDef("light") Block
     //environment
-    Block oreLuminum,
+    oreLuminum,
 
     //turret
     photon, electron, graviton, proton, neutron, gluon, wBoson, zBoson, higgsBoson, singularity, muon, ephemeron,
 
     //light
-    lightLamp, oilLamp, lightLaser, lightLampInfi, lightReflector, lightReflector1, lightOmnimirror, lightFilter, lightInvertedFilter, lightDivisor, lightDivisor1, lightItemFilter, lightPanel, lightInfluencer,
+    lightLamp, oilLamp, lightLampInfi,
+    lightReflector,
+    lightFilter, lightInvertedFilter,
+    lightDivisor, lightDivisor1,
+    lightRouter,
+    lightPanel, lightInfluencer,
 
     //defense
     metaglassWall, metaglassWallLarge;
 
-    //test
-    public static @FactionDef("light") Block lightSource, lightDistributor, lightReflectorBetterAF;
-
     //---------- imber faction ----------
-    public static @FactionDef("imber")
+    public static @FactionDef("imber") Block
     //environment
-    Block
     oreImberium, electroTile,
 
     //turret
@@ -121,8 +120,7 @@ public class UnityBlocks implements ContentList{
     Block sparkAlloyForge;
 
     //---------- koruh faction ----------
-    public static @FactionDef("koruh")
-    Block
+    public static @FactionDef("koruh") Block
     //crafting
     solidifier, steelSmelter, liquifier,
 
@@ -135,6 +133,7 @@ public class UnityBlocks implements ContentList{
     //unit
     bufferPad, omegaPad, cachePad, convertPad;
 
+    //TODO
     //expOutput, expUnloader, expTank, expChest, expFountain, expVoid;
 
     //turret
@@ -152,8 +151,7 @@ public class UnityBlocks implements ContentList{
     Block inferno;
 
     //---------- monolith faction ----------
-    public static @FactionDef("monolith")
-    Block
+    public static @FactionDef("monolith") Block
     //environments
     oreMonolite,
     sharpslate, sharpslateWall,
@@ -221,8 +219,7 @@ public class UnityBlocks implements ContentList{
     Block supernova;
 
     //---------- youngcha faction ----------
-    public static @FactionDef("youngcha")
-    Block
+    public static @FactionDef("youngcha") Block
     //environments
     oreNickel, concreteBlank, concreteFill, concreteNumber, concreteStripe, concrete, stoneFullTiles, stoneFull,
     stoneHalf, stoneTiles,
@@ -253,8 +250,7 @@ public class UnityBlocks implements ContentList{
     infiHeater, infiCooler, infiTorque, neodymiumStator;
 
     //---------- advance faction ----------
-    public static @FactionDef("advance")
-    Block
+    public static @FactionDef("advance") Block
     //turret
     celsius, kelvin, caster, storm, eclipse, xenoCorruptor, cube, wavefront;
 
@@ -1012,66 +1008,36 @@ public class UnityBlocks implements ContentList{
             }
         };
 
-        /*lightLamp = new LightSource("light-lamp"){{
-            consumes.power(1f);
-            requirements(Category.logic, with(Items.lead, 5, Items.metaglass, 10));
-            drawer = new DrawLightBlock();
-            lightLength = 30;
-        }};*/
-
         lightLamp = new unity.world.blocks.light.LightSource("light-lamp"){{
             requirements(Category.crafting, with(Items.lead, 5, Items.metaglass, 10));
 
-            lightProduction = 1f;
+            lightProduction = 0.6f;
             consumes.power(1f);
 
             drawer = new DrawLightBlock();
         }};
 
-        oilLamp = new LightSource("oil-lamp", true){{
+        oilLamp = new unity.world.blocks.light.LightSource("oil-lamp"){{
+            requirements(Category.logic, with(Items.lead, 20, Items.metaglass, 20, Items.titanium, 15));
+
             size = 3;
             health = 240;
+            lightProduction = 2f;
+
             consumes.power(1.8f);
             consumes.liquid(Liquids.oil, 0.1f);
-            requirements(Category.logic, with(Items.lead, 20, Items.metaglass, 20, Items.titanium, 15));
+
             drawer = new DrawLightBlock();
-            lightLength = 150;
-            lightStrength = 750;
         }};
 
-        lightLaser = new LightSource("light-laser"){{
-            health = 60;
-            consumes.power(1.5f);
-            requirements(Category.logic, BuildVisibility.sandboxOnly, with(Items.metaglass, 10, Items.silicon, 5, Items.titanium, 5));
-            alwaysUnlocked = true;
-            drawer = new DrawLightBlock();
-            lightLength = 30;
-            lightInterval = 0;
-        }};
-
-        lightLampInfi = new LightSource("light-lamp-infi"){{
-            hasPower = false;
-            consumesPower = false;
+        lightLampInfi = new unity.world.blocks.light.LightSource("light-lamp-infi"){{
             requirements(Category.logic, BuildVisibility.sandboxOnly, with());
-            alwaysUnlocked = true;
+
+            lightProduction = 600000f;
             drawer = new DrawLightBlock();
-            lightLength = 150;
-            lightStrength = 600000;
-            scaleStatus = false;
-            maxLightLength = 7500;
         }};
 
-        lightReflector = new LightReflector("light-reflector"){{
-            requirements(Category.logic, with(Items.metaglass, 10));
-        }};
-
-        lightReflector1 = new LightReflector("light-reflector-1"){{
-            diagonal = false;
-            requirements(Category.logic, with(Items.metaglass, 10));
-        }};
-
-        lightOmnimirror = new LightOmniReflector("light-omnimirror"){{
-            health = 80;
+        lightReflector = new unity.world.blocks.light.LightReflector("light-reflector"){{
             requirements(Category.logic, with(Items.metaglass, 10, Items.silicon, 5));
         }};
 
@@ -1096,7 +1062,7 @@ public class UnityBlocks implements ContentList{
             requirements(Category.logic, with(Items.metaglass, 10, Items.titanium, 2));
         }};
 
-        lightItemFilter = new unity.world.blocks.logic.LightRouter("light-item-filter"){{
+        lightRouter = new LightDiffractor("light-item-filter"){{
             health = 60;
             requirements(Category.logic, with(Items.graphite, 5, Items.metaglass, 20, Items.silicon, 10));
         }};
@@ -1126,18 +1092,6 @@ public class UnityBlocks implements ContentList{
             size = 2;
             health = 1400;
             requirements(Category.defense, with(Items.lead, 24, Items.metaglass, 24));
-        }};
-
-        lightSource = new unity.world.blocks.light.LightSource("light-source"){{
-            requirements(Category.crafting, with(Items.copper, 1));
-        }};
-
-        lightDistributor = new LightRouter("light-distributor"){{
-            requirements(Category.logic, with(Items.copper, 1));
-        }};
-
-        lightReflectorBetterAF = new unity.world.blocks.light.LightReflector("light-reflector-better-af"){{
-            requirements(Category.logic, with(Items.copper, 1));
         }};
 
         //endregion
