@@ -61,10 +61,10 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
 
     protected float rawHeight(Vec3 position){
         Tmp.v33.set(position).scl(scl);
-        float res = (Mathf.pow((float)noise.octaveNoise3D(6d, 0.5d, 1d / 3d, Tmp.v33.x, Tmp.v33.y, Tmp.v33.z), 2.3f) + waterOffset) / (1f + waterOffset);
+        float res = (Mathf.pow((float)Simplex.noise3d(0, 6d, 0.5d, 1d / 3d, Tmp.v33.x, Tmp.v33.y, Tmp.v33.z), 2.3f) + waterOffset) / (1f + waterOffset);
 
         if(withinCrater(position, 0.03f)){
-            float n = (float)noise.octaveNoise3D(8.4d, 0.4d, 0.27d, Tmp.v33.x, Tmp.v33.y, Tmp.v33.z) * (craterRadius / 4f);
+            float n = (float)Simplex.noise3d(0, 8.4d, 0.4d, 0.27d, Tmp.v33.x, Tmp.v33.y, Tmp.v33.z) * (craterRadius / 4f);
             float depth = Interp.pow2Out.apply(1f - (position.dst(crater) / craterRadius));
 
             return res - (craterDepth * depth + (1f - depth) * n);
@@ -85,7 +85,7 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
 
         Color base = Tmp.c1.set(block.mapColor);
         if(block == sharpslate){
-            float res = (float)noise.octaveNoise3D(6d, 0.5d, 0.5d, position.x, position.y, position.z) * 0.2f;
+            float res = (float)Simplex.noise3d(0, 6d, 0.5d, 0.5d, position.x, position.y, position.z) * 0.2f;
             base.lerp(UnityPal.monolithLight, res);
         }
 
@@ -97,7 +97,7 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
         tile.floor = getBlock(position);
         tile.block = tile.floor.asFloor().wall;
 
-        if(RidgedPerlin.noise3d(1, position.x, position.y, position.z, 3, 22f) > 0.32f){
+        if(Ridged.noise3d(1, position.x, position.y, position.z, 3, 22f) > 0.32f){
             tile.block = Blocks.air;
         }
     }
@@ -107,7 +107,7 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
 
         float rad = scl;
         float temp = Mathf.clamp(Math.abs(position.y * 2f) / rad);
-        float tnoise = (float)noise.octaveNoise3D(7, 0.56, 1f / 3f, position.x, position.y + 999f, position.z);
+        float tnoise = (float)Simplex.noise3d(0, 7, 0.56, 1f / 3f, position.x, position.y + 999f, position.z);
 
         temp = Mathf.lerp(temp, tnoise, 0.5f);
 
@@ -130,7 +130,7 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
     @Override
     protected float noise(float x, float y, double octaves, double falloff, double scl, double mag){
         Vec3 v = sector.rect.project(x, y).scl(this.scl);
-        return (float)noise.octaveNoise3D(octaves, falloff, 1f / scl, v.x, v.y, v.z) * (float)mag;
+        return (float)Simplex.noise3d(0, octaves, falloff, 1f / scl, v.x, v.y, v.z) * (float)mag;
     }
 
     protected void clamp(Vec2 vec){
@@ -342,15 +342,15 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
         float nmag = 0.5f;
         float addscl = 1.3f;
 
-        if(noise.octaveNoise3D(2d, 0.5d, 1d, sector.tile.v.x, sector.tile.v.y, sector.tile.v.z) * nmag + poles > 0.25d * addscl){
+        if(Simplex.noise3d(0, 2d, 0.5d, 1d, sector.tile.v.x, sector.tile.v.y, sector.tile.v.z) * nmag + poles > 0.25d * addscl){
             ores.add(Blocks.oreCoal);
         }
 
-        if(noise.octaveNoise3D(2d, 0.5d, 1d, sector.tile.v.x + 1f, sector.tile.v.y, sector.tile.v.z) * nmag + poles > 0.5d * addscl){
+        if(Simplex.noise3d(0, 2d, 0.5d, 1d, sector.tile.v.x + 1f, sector.tile.v.y, sector.tile.v.z) * nmag + poles > 0.5d * addscl){
             ores.add(Blocks.oreTitanium);
         }
 
-        if(noise.octaveNoise3D(2d, 0.5d, 1d, sector.tile.v.x + 2f, sector.tile.v.y, sector.tile.v.z) * nmag + poles > 0.7d * addscl){
+        if(Simplex.noise3d(0, 2d, 0.5d, 1d, sector.tile.v.x + 2f, sector.tile.v.y, sector.tile.v.z) * nmag + poles > 0.7d * addscl){
             ores.add(Blocks.oreThorium);
         }
 

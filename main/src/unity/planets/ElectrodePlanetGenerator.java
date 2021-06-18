@@ -18,7 +18,6 @@ import static mindustry.content.Blocks.*;
 import static mindustry.Vars.*;
 
 public class ElectrodePlanetGenerator extends PlanetGenerator{
-    Simplex noise = new Simplex();
     BaseGenerator basegen = new BaseGenerator();
     float scl = 6f;
     float waterOffset = 0.07f;
@@ -44,7 +43,7 @@ public class ElectrodePlanetGenerator extends PlanetGenerator{
 
     float rawHeight(Vec3 position){
         position = Tmp.v33.set(position).scl(scl);
-        return (Mathf.pow((float)noise.octaveNoise3D(5, 0.5f, 1f / 3f, position.x, position.y, position.z), 3f) + Math.abs(Mathf.sin(position.x) + Mathf.cos(position.y)) / 5 + waterOffset) / (1f + waterOffset);
+        return (Mathf.pow((float)Simplex.noise3d(0, 5, 0.5f, 1f / 3f, position.x, position.y, position.z), 3f) + Math.abs(Mathf.sin(position.x) + Mathf.cos(position.y)) / 5 + waterOffset) / (1f + waterOffset);
     }
 
     @Override
@@ -66,7 +65,7 @@ public class ElectrodePlanetGenerator extends PlanetGenerator{
         tile.floor = getBlock(position);
         tile.block = tile.floor.asFloor().wall;
 
-        if(RidgedPerlin.noise3d(1, position.x, position.y, position.z, 2, 22) > 0.32){
+        if(Ridged.noise3d(1, position.x, position.y, position.z, 2, 22) > 0.32){
             tile.block = Blocks.air;
         }
     }
@@ -79,7 +78,7 @@ public class ElectrodePlanetGenerator extends PlanetGenerator{
 
         float rad = scl;
         float temp = Mathf.clamp(Math.abs(position.y * 2f) / (rad));
-        float tnoise = (float)noise.octaveNoise3D(7, 0.56, 1f / 3f, position.x, position.y + 999f, position.z);
+        float tnoise = (float)Simplex.noise3d(0, 7, 0.56, 1f / 3f, position.x, position.y + 999f, position.z);
 
         temp = Mathf.lerp(temp, tnoise, 0.5f);
         height *= 1.2f;
@@ -91,7 +90,7 @@ public class ElectrodePlanetGenerator extends PlanetGenerator{
     @Override
     protected float noise(float x, float y, double octaves, double falloff, double scl, double mag){
         Vec3 v = sector.rect.project(x, y).scl(5f);
-        return (float)noise.octaveNoise3D(octaves, falloff, 1f / scl, v.x, v.y, v.z) * (float)mag;
+        return (float)Simplex.noise3d(0, octaves, falloff, 1f / scl, v.x, v.y, v.z) * (float)mag;
     }
 
     @Override
@@ -200,15 +199,15 @@ public class ElectrodePlanetGenerator extends PlanetGenerator{
         float scl = 1f;
         float addscl = 1.3f;
 
-        if(noise.octaveNoise3D(2, 0.5, scl, sector.tile.v.x, sector.tile.v.y, sector.tile.v.z) * nmag + poles > 0.25f * addscl){
+        if(Simplex.noise3d(0, 2, 0.5, scl, sector.tile.v.x, sector.tile.v.y, sector.tile.v.z) * nmag + poles > 0.25f * addscl){
             ores.add(Blocks.oreCoal);
         }
 
-        if(noise.octaveNoise3D(2, 0.5, scl, sector.tile.v.x + 1, sector.tile.v.y, sector.tile.v.z) * nmag + poles > 0.5f * addscl){
+        if(Simplex.noise3d(0, 2, 0.5, scl, sector.tile.v.x + 1, sector.tile.v.y, sector.tile.v.z) * nmag + poles > 0.5f * addscl){
             ores.add(Blocks.oreTitanium);
         }
 
-        if(noise.octaveNoise3D(2, 0.5, scl, sector.tile.v.x + 2, sector.tile.v.y, sector.tile.v.z) * nmag + poles > 0.7f * addscl){
+        if(Simplex.noise3d(0, 2, 0.5, scl, sector.tile.v.x + 2, sector.tile.v.y, sector.tile.v.z) * nmag + poles > 0.7f * addscl){
             ores.add(Blocks.oreThorium);
         }
 
