@@ -16,6 +16,7 @@ public class MultiBarrelWeapon extends Weapon{
     public float barrelSpacing = 6f;
     public float barrelOffset = 0f;
     public float barrelRecoil = 0f;
+    public boolean mirrorBarrels = false;
     public TextureRegion barrelRegion, barrelOutlineRegion;
     private final static Vec2 tv = new Vec2();
 
@@ -58,10 +59,11 @@ public class MultiBarrelWeapon extends Weapon{
 
             Intc drawBarrel = i -> {
                 float offset = i * barrelSpacing - (barrels - 1) * barrelSpacing / 2f;
+                int s = Mathf.sign(!mirrorBarrels || offset < 0);
                 tv.trns(weaponRotation - 90f, barrelOffset + -mMount.recoils[i], offset).add(wx, wy);
                 Draw.rect(barrelOutlineRegion,
                 tv.x, tv.y,
-                barrelOutlineRegion.width * Draw.scl * -Mathf.sign(flipSprite),
+                barrelOutlineRegion.width * Draw.scl * -Mathf.sign(flipSprite) * s,
                 barrelOutlineRegion.height * Draw.scl,
                 weaponRotation);
             };
@@ -107,17 +109,18 @@ public class MultiBarrelWeapon extends Weapon{
 
         Intc drawBarrel = i -> {
             float offset = i * barrelSpacing - (barrels - 1) * barrelSpacing / 2f;
+            int s = Mathf.sign(!mirrorBarrels || offset < 0);
             tv.trns(weaponRotation + 90f, barrelOffset + -mMount.recoils[i], offset).add(wx, wy);
             if(top && barrelOutlineRegion.found()){
                 Draw.rect(barrelOutlineRegion,
                 tv.x, tv.y,
-                barrelOutlineRegion.width * Draw.scl * -Mathf.sign(flipSprite),
+                barrelOutlineRegion.width * Draw.scl * -Mathf.sign(flipSprite) * s,
                 barrelOutlineRegion.height * Draw.scl,
                 weaponRotation);
             }
             Draw.rect(barrelRegion,
             tv.x, tv.y,
-            barrelRegion.width * Draw.scl * -Mathf.sign(flipSprite),
+            barrelRegion.width * Draw.scl * -Mathf.sign(flipSprite) * s,
             barrelRegion.height * Draw.scl,
             weaponRotation);
         };

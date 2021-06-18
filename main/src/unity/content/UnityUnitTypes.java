@@ -53,6 +53,9 @@ public class UnityUnitTypes implements ContentList{
     UnitType sedec;
     // omura
 
+    public static @EntityPoint(UnitWaterMove.class)
+    UnitType fin;
+
     // global unit + watermove + transform
     public static @EntityDef({Unitc.class, WaterMovec.class, Transc.class})
     UnitType amphibiNaval, amphibi;
@@ -1199,6 +1202,52 @@ public class UnityUnitTypes implements ContentList{
 
         //endregion
         //region naval-units
+
+        fin = new UnityUnitType("fin"){{
+            health = 29000f;
+            speed = 0.5f;
+            drag = 0.18f;
+            hitSize = 66.5f;
+            armor = 17f;
+            accel = 0.19f;
+            rotateSpeed = 0.86f;
+            rotateShooting = false;
+
+            trailLength = 70;
+            trailX = 18f;
+            trailY = -32f;
+            trailScl = 3.5f;
+
+            weapons.add(new MultiBarrelWeapon(name + "-cannon"){{
+                x = 0f;
+                y = -8.5f;
+                shootY = 22.5f;
+                rotate = true;
+                rotateSpeed = 8f;
+                inaccuracy = 5f;
+                mirror = false;
+                mirrorBarrels = true;
+                barrels = 2;
+                barrelOffset = 8.5f;
+                barrelSpacing = 9.25f;
+                reload = 6f;
+                recoil = 3f;
+                barrelRecoil = 3f;
+                shadow = 50f;
+                bullet = new AntiBulletFlakBulletType(6f, 6f){{
+                    shootEffect = Fx.shootBig;
+                    splashDamage = 46f;
+                    splashDamageRadius = 75f;
+                    bulletRadius = 70f;
+                    explodeRange = 45f;
+                    width = 12f;
+                    height = 15f;
+
+                    status = StatusEffects.blasted;
+                    statusDuration = 60f;
+                }};
+            }});
+        }};
 
         amphibiNaval = new UnityUnitType("amphibi-naval"){
             {
