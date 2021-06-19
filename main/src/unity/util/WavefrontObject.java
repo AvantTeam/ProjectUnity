@@ -226,6 +226,8 @@ public class WavefrontObject{
                         i[0]++;
                     }
 
+                    face.data = new float[face.size];
+
                     i[0] = 0;
                     for(Vertex vt : face.verts){
                         vt.neighbors.each(vs -> {
@@ -304,10 +306,12 @@ public class WavefrontObject{
             float color = Draw.getColor().toFloatBits();
             float mColor = Draw.getMixColor().toFloatBits();
 
-            if(!odd){
-                drawFace(face, color, mColor);
+            updateFace(face, color, mColor);
+
+            if(!odd || face.verts.length == 4){
+                face.draw();
             }else{
-                Draw.draw(z, () -> drawFace(face, color, mColor));
+                Draw.draw(z, face::draw);
             }
         }
         Draw.reset();
@@ -375,37 +379,30 @@ public class WavefrontObject{
         Draw.color(Tmp.c1);
     }
 
-    protected void drawFace(Face face, float color, float mixColor){
-        float[] dface = new float[face.size];
-        for(int f = 0; f < (face.mat != null && face.mat.emitTex != null ? 2 : 1); f++){
-            AtlasRegion textureB = texture;
+    protected void updateFace(Face face, float color, float mColor){
+        float[] dface = face.data;
 
-            if(face.mat != null){
-                textureB = f <= 0 ? face.mat.diffTex : face.mat.emitTex;
-            }
+        AtlasRegion textureB = texture, region = Core.atlas.white();
 
-            TextureRegion region = Core.atlas.white();
-            if(f > 0){
-                color = Color.whiteFloatBits;
-            }
-            for(int i = 0; i < face.verts.length; i++){
-                int s = i * 6;
-                dface[s] = face.verts[i].source.x;
-                dface[s + 1] = face.verts[i].source.y;
-                dface[s + 2] = color;
-                if(!hasTexture || textureB == null){
-                    dface[s + 3] = region.u;
-                    dface[s + 4] = region.v;
-                }else{
-                    float u = textureB.u, v = textureB.v;
-                    float u2 = textureB.u2, v2 = textureB.v2;
-                    dface[s + 3] = Mathf.lerp(u, u2, face.vertexTexture[i].x);
-                    dface[s + 4] = Mathf.lerp(v2, v, face.vertexTexture[i].y);
-                }
-                dface[s + 5] = mixColor;
-            }
+        if(face.mat != null && face.mat.diffTex != null){
+            textureB = face.mat.diffTex;
+        }
 
-            Draw.vert((textureB == null || !hasTexture) ? region.texture : textureB.texture, dface, 0, dface.length);
+        for(int i = 0; i < face.verts.length; i++){
+            int s = i * 6;
+            dface[s] = face.verts[i].source.x;
+            dface[s + 1] = face.verts[i].source.y;
+            dface[s + 2] = color;
+            if(!hasTexture || textureB == null){
+                dface[s + 3] = region.u;
+                dface[s + 4] = region.v;
+            }else{
+                float u = textureB.u, v = textureB.v;
+                float u2 = textureB.u2, v2 = textureB.v2;
+                dface[s + 3] = Mathf.lerp(u, u2, face.vertexTexture[i].x);
+                dface[s + 4] = Mathf.lerp(v2, v, face.vertexTexture[i].y);
+            }
+            dface[s + 5] = mColor;
         }
     }
 
@@ -426,13 +423,32 @@ public class WavefrontObject{
         '}';
     }
 
-    public static class Face{
+    public class Face{
         public Material mat;
         public Vertex[] verts;
         public Vec3[] normal;
         public Vec2[] vertexTexture;
         public float shadingValue = 0f;
         public int size = 0;
+        public float[] data;
+
+        protected void draw(){
+            AtlasRegion textureB = texture, region = Core.atlas.white();
+            for(int f = 0; f < (mat != null && mat.emitTex != null ? 2 : 1); f++){
+                boolean emit = f > 0;
+
+                if(mat != null){
+                    textureB = f <= 0 ? mat.diffTex : mat.emitTex;
+                }
+
+                for(int i = 0; i < verts.length; i++){
+                    int s = i * 6;
+                    if(emit) data[s + 2] = Color.whiteFloatBits;
+                }
+
+                Draw.vert((textureB == null || !hasTexture) ? region.texture : textureB.texture, data, 0, data.length);
+            }
+        }
     }
 
     public static class Vertex{
