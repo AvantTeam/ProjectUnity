@@ -1207,7 +1207,7 @@ public class UnityUnitTypes implements ContentList{
             health = 29000f;
             speed = 0.5f;
             drag = 0.18f;
-            hitSize = 66.5f;
+            hitSize = 77.5f;
             armor = 17f;
             accel = 0.19f;
             rotateSpeed = 0.86f;
@@ -1219,13 +1219,13 @@ public class UnityUnitTypes implements ContentList{
             trailScl = 3.5f;
 
             weapons.add(new MultiBarrelWeapon(name + "-cannon"){{
-                x = 0f;
-                y = -8.5f;
+                x = 27f;
+                y = -20f;
                 shootY = 22.5f;
                 rotate = true;
-                rotateSpeed = 8f;
+                alternate = false;
+                rotateSpeed = 7f;
                 inaccuracy = 5f;
-                mirror = false;
                 mirrorBarrels = true;
                 barrels = 2;
                 barrelOffset = 8.5f;
@@ -1233,15 +1233,16 @@ public class UnityUnitTypes implements ContentList{
                 reload = 6f;
                 recoil = 3f;
                 barrelRecoil = 3f;
-                shadow = 50f;
+                shadow = 40f;
                 bullet = new AntiBulletFlakBulletType(6f, 6f){{
                     shootEffect = Fx.shootBig;
                     splashDamage = 46f;
                     splashDamageRadius = 75f;
                     bulletRadius = 70f;
                     explodeRange = 45f;
-                    width = 12f;
-                    height = 15f;
+                    bulletDamage = 12f;
+                    width = 10f;
+                    height = 14f;
                     scaleVelocity = true;
 
                     status = StatusEffects.blasted;

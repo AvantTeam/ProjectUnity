@@ -40,7 +40,7 @@ public class MultiBarrelWeapon extends Weapon{
         super.update(unit, mount);
         MultiBarrelMount mMount = ((MultiBarrelMount)mount);
         for(int i = 0; i < mMount.recoils.length; i++){
-            mMount.recoils[i] = Math.max(0f, mMount.recoils[i] - ((barrelRecoil / reload) * Time.delta));
+            mMount.recoils[i] = Math.max(0f, mMount.recoils[i] - (((barrelRecoil / reload) / barrels) * Time.delta));
         }
     }
 
