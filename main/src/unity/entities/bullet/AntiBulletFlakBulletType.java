@@ -8,13 +8,14 @@ import mindustry.gen.*;
 
 public class AntiBulletFlakBulletType extends FlakBulletType{
     public float bulletDamage = 5f;
-    public float bulletSlowDownScl = 0.3f;
+    public float bulletSlowDownScl = 0.5f;
     public float bulletRadius = 40f;
     public Interp interp = Interp.pow3;
 
     public AntiBulletFlakBulletType(float speed, float damage){
         super(speed, damage);
         collidesGround = true;
+        despawnHit = true;
     }
 
     @Override

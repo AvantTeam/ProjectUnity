@@ -1242,6 +1242,7 @@ public class UnityUnitTypes implements ContentList{
                     explodeRange = 45f;
                     width = 12f;
                     height = 15f;
+                    scaleVelocity = true;
 
                     status = StatusEffects.blasted;
                     statusDuration = 60f;
