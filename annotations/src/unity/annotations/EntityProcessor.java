@@ -117,12 +117,7 @@ public class EntityProcessor extends BaseProcessor{
                 for(ExecutableElement m : methods(comp)){
                     if(is(m, Modifier.ABSTRACT, Modifier.NATIVE)) continue;
 
-                    methodBlocks.put(descString(m), treeUtils.getTree(m).getBody().toString()
-                        .replaceAll("this\\.<(.*)>self\\(\\)", "this")
-                        .replaceAll("self\\(\\)(?!\\s+instanceof)", "this")
-                        .replaceAll(" yield ", "")
-                        .replaceAll("/\\*missing\\*/", "var")
-                    );
+                    methodBlocks.put(descString(m), procBlock(treeUtils.getTree(m).getBody().toString()));
                 }
 
                 for(VariableElement var : vars(comp)){
@@ -453,9 +448,7 @@ public class EntityProcessor extends BaseProcessor{
                         entry.value.removeAll(bypass);
 
                         boolean firstc = append(mbuilder, bypass, inserts, methodWrappers, writeBlock);
-                        if(!firstc){
-                            mbuilder.addCode(lnew());
-                        }
+                        if(!firstc) mbuilder.addCode(lnew());
 
                         mbuilder.addStatement("if($Ladded) return", simpleName(first).equals("add") ? "" : "!");
 
@@ -578,13 +571,15 @@ public class EntityProcessor extends BaseProcessor{
 
                     for(FieldSpec spec : allFieldSpecs){
                         VariableElement variable = specVariables.get(spec);
-                        if(variable != null && is(variable, Modifier.STATIC, Modifier.FINAL)) continue;
+                        if(variable == null || is(variable, Modifier.STATIC, Modifier.FINAL)) continue;
+
                         String desc = descString(variable);
 
                         if(spec.type.isPrimitive()){
-                            resetBuilder.addStatement("$L = $L", spec.name, variable != null && varInitializers.containsKey(desc) ? varInitializers.get(desc) : getDefault(spec.type.toString()));
+                            resetBuilder.addStatement("$L = $L", spec.name, varInitializers.containsKey(desc) ? varInitializers.get(desc) : getDefault(spec.type.toString()));
                         }else{
-                            if(!varInitializers.containsKey(desc)){
+                            String init = varInitializers.get(desc);
+                            if(init == null || init.equals("null")){
                                 resetBuilder.addStatement("$L = null", spec.name);
                             }
                         }
@@ -855,7 +850,6 @@ public class EntityProcessor extends BaseProcessor{
             );
 
             if(is(elem, Modifier.ABSTRACT) || is(elem, Modifier.NATIVE) || (!methodBlocks.containsKey(descStr) && insertComp.isEmpty())) continue;
-            if(!firstc) mbuilder.addCode(lnew());
             firstc = false;
 
             Seq<ExecutableElement> compBefore = insertComp.select(e -> !annotation(e, Insert.class).after());
@@ -865,10 +859,14 @@ public class EntityProcessor extends BaseProcessor{
             compAfter.sort(Structs.comps(Structs.comparingFloat(m -> annotation(m, MethodPriority.class) != null ? annotation(m, MethodPriority.class).value() : 0), Structs.comparing(BaseProcessor::simpleName)));
 
             String str = methodBlocks.get(descStr);
-            str = str.substring(1, str.length() - 1).trim().replace("\n    ", "\n").trim();
-            str += '\n';
 
+            boolean newlined = false;
             if(!wrapComp.isEmpty()){
+                if(!firstc){
+                    mbuilder.addCode(lnew());
+                    newlined = true;
+                }
+
                 StringBuilder format = new StringBuilder("if(");
                 Seq<Object> args = new Seq<>();
 
@@ -885,6 +883,7 @@ public class EntityProcessor extends BaseProcessor{
                 mbuilder.beginControlFlow(format.toString(), args.toArray());
             }
 
+            if(!firstc && !newlined && !compBefore.isEmpty()) mbuilder.addCode(lnew());
             for(ExecutableElement e : compBefore){
                 mbuilder.addStatement("this.$L()", simpleName(e));
             }
@@ -899,6 +898,11 @@ public class EntityProcessor extends BaseProcessor{
                     .replace("\n", "")
                     .isEmpty()
                 ) continue;
+
+                if(!firstc && !newlined){
+                    mbuilder.addCode(lnew());
+                    newlined = true;
+                }
 
                 mbuilder.beginControlFlow("$L:", blockName);
             }

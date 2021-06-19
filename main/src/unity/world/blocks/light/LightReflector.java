@@ -25,7 +25,7 @@ public class LightReflector extends LightHoldBlock{
     public float angleRange = 22.5f;
     public float rotateSpeed = 5f;
 
-    public TextureRegion mirrorRegion;
+    public TextureRegion baseRegion;
 
     public LightReflector(String name){
         super(name);
@@ -81,12 +81,12 @@ public class LightReflector extends LightHoldBlock{
     @Override
     public void load(){
         super.load();
-        mirrorRegion = Core.atlas.find(name + "-mirror");
+        baseRegion = Core.atlas.find(name + "-base");
     }
 
     @Override
     protected TextureRegion[] icons(){
-        return new TextureRegion[]{region, mirrorRegion};
+        return new TextureRegion[]{baseRegion, region};
     }
 
     public class LightReflectorBuild extends LightHoldBuild{
@@ -118,7 +118,7 @@ public class LightReflector extends LightHoldBlock{
         protected void addReflect(Light light){
             if(!reflect.containsKey(light)){
                 Light ref = apply(light, Light.create());
-                ref.strength = light.endStrength();
+                ref.strength(light.endStrength());
                 ref.rotation = calcRotation(light);
 
                 ref.add();
@@ -135,10 +135,10 @@ public class LightReflector extends LightHoldBlock{
 
         @Override
         public void draw(){
-            super.draw();
+            Draw.rect(baseRegion, x, y);
 
             Draw.z(Layer.effect + 2f);
-            Draw.rect(mirrorRegion, x, y, rotation - 90f);
+            Draw.rect(region, x, y, rotation - 90f);
         }
 
         @Override
@@ -163,7 +163,7 @@ public class LightReflector extends LightHoldBlock{
                 var ref = entry.value;
 
                 apply(origin, ref);
-                ref.strength = origin.endStrength();
+                ref.strength(origin.endStrength());
                 ref.rotation = calcRotation(origin);
             }
         }
@@ -236,10 +236,11 @@ public class LightReflector extends LightHoldBlock{
             targetRotation = read.f();
 
             for(int i = 0; i < 2; i++){
-                targets[i] = switch(read.b()){
+                int type = read.b();
+                targets[i] = switch(type){
                     case 0 -> null;
                     case 1 -> world.build(read.i());
-                    default -> throw new IllegalStateException("Illegal state");
+                    default -> throw new IllegalStateException("Illegal state: " + type);
                 };
             }
         }

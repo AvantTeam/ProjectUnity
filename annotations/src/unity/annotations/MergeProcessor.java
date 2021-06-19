@@ -147,25 +147,17 @@ public class MergeProcessor extends BaseProcessor{
 
         if(!isBuild){
             ExecutableElement constructor = constructor(comp);
-            String str = treeUtils.getTree(constructor).getBody().toString()
-                .replaceAll("this\\.<(.*)>self\\(\\)", "this")
-                .replaceAll("self\\(\\)(?!\\s+instanceof)", "this")
-                .replaceAll(" yield ", "")
-                .replaceAll("/\\*missing\\*/", "var")
-                .replace("super(name);", "");
 
-            methodBlocks.put(descString(constructor), str);
+            String block = procBlock(treeUtils.getTree(constructor).getBody().toString());
+            if(block.startsWith("super(")) block = block.substring(block.indexOf("\n") + 1);
+
+            methodBlocks.put(descString(constructor), block);
         }
 
         for(ExecutableElement m : methods(comp).select(t -> !isConstructor(t))){
             if(is(m, Modifier.ABSTRACT, Modifier.NATIVE)) continue;
 
-            methodBlocks.put(descString(m), treeUtils.getTree(m).getBody().toString()
-                .replaceAll("this\\.<(.*)>self\\(\\)", "this")
-                .replaceAll("self\\(\\)(?!\\s+instanceof)", "this")
-                .replaceAll(" yield ", "")
-                .replaceAll("/\\*missing\\*/", "var")
-            );
+            methodBlocks.put(descString(m), procBlock(treeUtils.getTree(m).getBody().toString()));
         }
 
         for(VariableElement var : vars(comp)){
@@ -636,7 +628,6 @@ public class MergeProcessor extends BaseProcessor{
             );
 
             if(is(elem, Modifier.ABSTRACT) || is(elem, Modifier.NATIVE) || (!methodBlocks.containsKey(descStr) && insertComp.isEmpty())) continue;
-            if(!firstc) mbuilder.addCode(lnew());
             firstc = false;
 
             Seq<ExecutableElement> compBefore = insertComp.select(e -> !annotation(e, Insert.class).after());
@@ -646,8 +637,12 @@ public class MergeProcessor extends BaseProcessor{
             compAfter.sort(Structs.comps(Structs.comparingFloat(m -> annotation(m, MethodPriority.class) != null ? annotation(m, MethodPriority.class).value() : 0), Structs.comparing(BaseProcessor::simpleName)));
 
             String str = methodBlocks.get(descStr);
-            str = str.substring(1, str.length() - 1).trim().replace("\n    ", "\n").trim();
-            str += '\n';
+
+            boolean newlined = false;
+            if(!firstc && !compBefore.isEmpty()){
+                mbuilder.addCode(lnew());
+                newlined = true;
+            }
 
             for(ExecutableElement e : compBefore){
                 mbuilder.addStatement("this.$L()", simpleName(e));
@@ -662,6 +657,11 @@ public class MergeProcessor extends BaseProcessor{
             if(writeBlock){
                 if(annotation(elem, BreakAll.class) == null){
                     str = str.replace("return;", "break " + blockName + ";");
+                }
+
+                if(!firstc && !newlined){
+                    mbuilder.addCode(lnew());
+                    newlined = true;
                 }
 
                 mbuilder.beginControlFlow("$L:", blockName);

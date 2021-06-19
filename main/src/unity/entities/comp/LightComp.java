@@ -1,9 +1,9 @@
 package unity.entities.comp;
 
-import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -11,6 +11,8 @@ import mindustry.world.*;
 import unity.annotations.Annotations.*;
 import unity.gen.*;
 import unity.gen.LightHoldc.*;
+
+import java.util.*;
 
 import static mindustry.Vars.*;
 
@@ -24,28 +26,34 @@ abstract class LightComp implements Drawc, Rotc{
     /** A {@link #strength} with value {@code 1f} will make the light be this thick. */
     static final float width = 5f;
 
-    transient Color color = Color.white;
+    transient int color = Color.whiteRgba;
     /**
      * Never, <b>ever</b>, forget to set this to the building source unless you want this light to
      * endlessly {@link LightHoldBuildc#addSource(Light)} to its own source causing an out of memory
      * error.
      */
-    transient volatile LightHoldBuildc source;
+    transient volatile LightHoldBuildc source = null;
 
     private volatile @Nullable Tile target = null;
-    private volatile @Nullable LightHoldBuildc before;
+    private volatile @Nullable LightHoldBuildc before = null;
 
     /** Decreases by {@code 1f} every {@link #yield}} distance. */
-    transient float strength;
+    private transient volatile float strength;
     transient float relX, relY;
-    volatile @ReadOnly float endX, endY;
+    volatile @ReadOnly float endX = 0f, endY = 0f;
 
+    private final Seq<Light> absorbs = new Seq<>();
+    volatile @ReadOnly boolean absorbed = false;
+
+    @Import int id;
     @Import float x, y, rotation;
 
     /** Called asynchronously. */
-    public void walk(){
-        float targetX = x + Angles.trnsx(rotation, strength * yield);
-        float targetY = y + Angles.trnsy(rotation, strength * yield);
+    public void walk(Seq<Runnable> tasks){
+        if(absorbed) return;
+
+        float targetX = x + Angles.trnsx(rotation, strength() * yield);
+        float targetY = y + Angles.trnsy(rotation, strength() * yield);
 
         target = null;
         world.raycastEachWorld(x, y, targetX, targetY, (tx, ty) -> {
@@ -70,7 +78,7 @@ abstract class LightComp implements Drawc, Rotc{
             endY = Mathf.round(estimateY / 4f) * 4f;
 
             if(target.build instanceof LightHoldBuildc hold){
-                Core.app.post(() -> {
+                tasks.add(() -> {
                     if(before != hold){
                         if(before != null) before.removeSource(self());
                         if(hold.acceptLight(self())) hold.addSource(self());
@@ -79,7 +87,7 @@ abstract class LightComp implements Drawc, Rotc{
                     before = hold;
                 });
             }else{
-                Core.app.post(() -> {
+                tasks.add(() -> {
                     if(before != null) before.removeSource(self());
                     before = null;
                 });
@@ -91,10 +99,82 @@ abstract class LightComp implements Drawc, Rotc{
         }
     }
 
+    public boolean overlaps(Light other){
+        float r1 = realRotation();
+        return
+            self() != other &&
+            (
+                Mathf.equal(Angles.angle(x, y, other.x, other.y), r1) || (
+                    Mathf.equal(x, other.x) &&
+                    Mathf.equal(y, other.y)
+                )
+            ) &&
+            Mathf.equal(r1, other.realRotation());
+    }
+
+    /** Merges its strength to the other light. Call synchronously. */
+    public void absorb(){
+        if(absorbed) return;
+        absorbed = true;
+    }
+
+    /** Should be called to set {@link #absorbed} to {@code false}. */
+    public void release(){
+        absorbed = false;
+    }
+
+    public void strength(float strength){
+        this.strength = strength;
+    }
+
+    public float strength(){
+        return strength + absorbs.sumf(l -> l == null ? 0f : l.strength());
+    }
+
+    @Override
+    public void update(){
+        Groups.draw.each(
+            e ->
+                e instanceof Light light &&
+                !light.absorbed() &&
+                overlaps(light),
+
+            e -> {
+                if(
+                    isAdded() &&
+                    !absorbed &&
+                    e instanceof Light light &&
+                    light.isAdded() &&
+                    !light.absorbed() &&
+                    overlaps(light)
+                ){
+                    absorbs.add(light);
+                    light.absorb();
+                }
+            }
+        );
+
+        Iterator<Light> it = absorbs.iterator();
+        while(it.hasNext()){
+            var next = it.next();
+            if(overlaps(next)){
+                next.release();
+                it.remove();
+            }
+        }
+    }
+
+    @Override
+    public void remove(){
+        absorbs.each(Light::release);
+    }
+
     @Override
     public void draw(){
+        if(absorbed) return;
+
         float rotation = angleTo(endX, endY);
-        float s = Mathf.clamp(strength);
+        float s = Mathf.clamp(strength());
         float cs = Mathf.clamp(endStrength());
 
         float w = s * (width / 2f);
@@ -108,8 +188,8 @@ abstract class LightComp implements Drawc, Rotc{
 
         Tmp.c1.set(color);
         float
-            c1 = Tmp.c1.a(s).toFloatBits(),
-            c2 = Tmp.c1.a(0.5f + cs * 0.5f).toFloatBits();
+            c1 = Tmp.c1.a(Math.max(0.5f, s)).toFloatBits(),
+            c2 = Tmp.c1.a(Math.max(0.5f, cs)).toFloatBits();
 
         float z = Draw.z();
         Draw.z(Layer.effect);
@@ -124,7 +204,7 @@ abstract class LightComp implements Drawc, Rotc{
     @Override
     @Replace
     public float clipSize(){
-        return dst(endX, endY) * 2f + 2f * tilesize;
+        return absorbed ? 0f : length() * 2f + 2f * tilesize;
     }
 
     @Override
@@ -134,8 +214,16 @@ abstract class LightComp implements Drawc, Rotc{
         this.y = y + relY;
     }
 
+    public float realRotation(){
+        return angleTo(endX, endY);
+    }
+
+    public float length(){
+        return dst(endX, endY);
+    }
+
     public float endStrength(){
-        return calcStrength(dst(endX, endY));
+        return calcStrength(length());
     }
 
     public float calcStrength(float endX, float endY){
@@ -143,6 +231,6 @@ abstract class LightComp implements Drawc, Rotc{
     }
 
     public float calcStrength(float dst){
-        return strength - dst / yield;
+        return strength() - dst / yield;
     }
 }

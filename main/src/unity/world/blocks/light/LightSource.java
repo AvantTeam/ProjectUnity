@@ -101,7 +101,7 @@ public class LightSource extends LightHoldGenericCrafter{
             rotation = Angles.moveToward(rotation, targetRotation, rotateSpeed * edelta());
 
             light.set(this);
-            light.strength = efficiency() * lightProduction;
+            light.strength(efficiency() * lightProduction);
             light.rotation = rotation;
         }
 
@@ -165,10 +165,12 @@ public class LightSource extends LightHoldGenericCrafter{
 
             rotation = read.f();
             targetRotation = read.f();
-            target = switch(read.b()){
+
+            int type = read.b();
+            target = switch(type){
                 case 0 -> null;
                 case 1 -> world.build(read.i());
-                default -> throw new IllegalStateException("Invalid state");
+                default -> throw new IllegalStateException("Invalid state: " + type);
             };
         }
     }

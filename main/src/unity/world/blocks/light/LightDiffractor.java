@@ -60,7 +60,7 @@ public class LightDiffractor extends LightHoldBlock{
 
                 for(int i = 0; i < diffractionCount; i++){
                     Light d = apply(light, Light.create());
-                    d.strength = light.endStrength() / diffractionCount;
+                    d.strength(light.endStrength() / diffractionCount);
                     d.rotation = (light.rotation + i * angleDist) - (angleDist * (diffractionCount - 1)) / 2f;
 
                     d.add();
@@ -96,7 +96,7 @@ public class LightDiffractor extends LightHoldBlock{
 
                 for(int i = 0; i < dif.size; i++){
                     Light d = dif.get(i);
-                    d.strength = origin.endStrength() / diffractionCount;
+                    d.strength(origin.endStrength() / diffractionCount);
                     d.rotation = (origin.rotation + i * angleDist) - (angleDist * (diffractionCount - 1)) / 2f;
                 }
             }

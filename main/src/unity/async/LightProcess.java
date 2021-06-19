@@ -10,12 +10,15 @@ import static mindustry.Vars.*;
 /**
  * An asynchronous task manager for processing {@link Light} ray-casting. First, it collects all lights synchronously,
  * which won't be done if it's still processing, then the collected lights will do their ray-casting in a separate
- * thread.
+ * thread, whose finalization will be done again synchronously.
  * @author GlennFolker
  */
 public class LightProcess implements AsyncProcess{
     private volatile boolean processing = false;
+    private volatile boolean ending = false;
+
     private final Seq<Light> toProcess = new Seq<>();
+    private final Seq<Runnable> toRun = new Seq<>();
 
     @Override
     public void begin(){
@@ -32,8 +35,23 @@ public class LightProcess implements AsyncProcess{
     @Override
     public void process(){
         processing = true;
-        toProcess.each(Light::walk);
+        toProcess.each(l -> l.walk(toRun));
+
         processing = false;
+        ending = true;
+    }
+
+    @Override
+    public void end(){
+        if(ending){
+            var it = toRun.iterator();
+            while(it.hasNext()){
+                it.next().run();
+                it.remove();
+            }
+
+            ending = false;
+        }
     }
 
     @Override

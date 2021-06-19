@@ -336,6 +336,26 @@ public abstract class BaseProcessor extends AbstractProcessor{
         return simpleName(e) + "(" + Seq.with(e.getParameters()).toString(", ", p -> simpleName(p.asType().toString())) + ")";
     }
 
+    public static String procBlock(String methodBlock){
+        StringBuilder builder = new StringBuilder();
+        String[] lines = methodBlock.split("\n");
+
+        for(String line : lines){
+            if(line.startsWith("    ")) line = line.substring(4);
+
+            line = line
+                .replaceAll("this\\.<(.*)>self\\(\\)", "this")
+                .replaceAll("self\\(\\)(?!\\s+instanceof)", "this")
+                .replaceAll(" yield ", "")
+                .replaceAll("/\\*missing\\*/", "var");
+
+            builder.append(line).append('\n');
+        }
+
+        String result = builder.toString();
+        return result.substring(result.indexOf("{") + 1, result.lastIndexOf("}")).trim() + "\n";
+    }
+
     @Override
     public SourceVersion getSupportedSourceVersion(){
         return SourceVersion.RELEASE_8;
