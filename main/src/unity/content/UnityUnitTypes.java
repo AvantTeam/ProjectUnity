@@ -1051,6 +1051,7 @@ public class UnityUnitTypes implements ContentList{
                 inaccuracy = 25f;
                 xRand = 2.25f;
                 shots = 2;
+                shootSound = Sounds.missile;
 
                 bullet = new MissileBulletType(3.7f, 15f){{
                     width = 10f;
@@ -1088,6 +1089,7 @@ public class UnityUnitTypes implements ContentList{
                 alternate = false;
                 rotateSpeed = 1.5f;
                 recoil = 5f;
+                shootSound = UnitySounds.continuousLaserA;
                 
                 bullet = UnityBullets.continuousSapLaser;
             }},
@@ -1218,7 +1220,31 @@ public class UnityUnitTypes implements ContentList{
             trailY = -32f;
             trailScl = 3.5f;
 
-            weapons.add(new MultiBarrelWeapon(name + "-cannon"){{
+            weapons.add(new Weapon(name + "-launcher"){{
+                x = 19f;
+                y = 14f;
+                shootY = 8f;
+                rotate = true;
+                inaccuracy = 15f;
+                reload = 7f;
+                xRand = 2.25f;
+                shootSound = Sounds.missile;
+
+                bullet = UnityBullets.basicMissile;
+            }},
+            new Weapon(name + "-launcher"){{
+                x = 24.5f;
+                y = -39.25f;
+                shootY = 8f;
+                rotate = true;
+                inaccuracy = 15f;
+                reload = 7f;
+                xRand = 2.25f;
+                shootSound = Sounds.missile;
+
+                bullet = UnityBullets.basicMissile;
+            }},
+            new MultiBarrelWeapon(name + "-cannon"){{
                 x = 27f;
                 y = -20f;
                 shootY = 22.5f;
@@ -1234,6 +1260,7 @@ public class UnityUnitTypes implements ContentList{
                 recoil = 3f;
                 barrelRecoil = 3f;
                 shadow = 40f;
+                shootSound = Sounds.artillery;
                 bullet = new AntiBulletFlakBulletType(6f, 6f){{
                     shootEffect = Fx.shootBig;
                     splashDamage = 46f;

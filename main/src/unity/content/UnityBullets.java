@@ -36,6 +36,8 @@ public class UnityBullets implements ContentList{
         kelvinSlagLaser, kelvinOilLaser, kelvinCryofluidLaser, kelvinLiquidLaser, celsiusSmoke, kelvinSmoke,
         breakthroughLaser,
 
+        basicMissile,
+
         sapLaser, continuousSapLaser,
 
         coalBlaze, pyraBlaze,
@@ -538,6 +540,24 @@ public class UnityBullets implements ContentList{
             keepVelocity = false;
             hittable = false;
             expGain = 0.6f;
+        }};
+
+        basicMissile = new MissileBulletType(4.2f, 15){{
+            homingPower = 0.12f;
+            width = 8f;
+            height = 8f;
+            shrinkX = shrinkY = 0f;
+            drag = -0.003f;
+            homingRange = 80f;
+            keepVelocity = false;
+            splashDamageRadius = 35f;
+            splashDamage = 30f;
+            lifetime = 62f;
+            trailColor = Pal.missileYellowBack;
+            hitEffect = Fx.blastExplosion;
+            despawnEffect = Fx.blastExplosion;
+            weaveScale = 8f;
+            weaveMag = 2f;
         }};
 
         sapLaser = new LaserBulletType(80f){{
