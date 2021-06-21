@@ -1295,29 +1295,27 @@ public class UnityUnitTypes implements ContentList{
             trailY = -42f;
             trailScl = 4f;
 
+            float spawnTime = 15f * 60f;
+
+            abilities.add(new UnitSpawnAbility(schistocerca, spawnTime, 24.75f, -29.5f), new UnitSpawnAbility(schistocerca, spawnTime, -24.75f, -29.5f));
+
             bottomWeapons.add(name + "-side-silo");
             bottomWeapons.add(name + "-front-cannon");
-            weapons.add(new LimitedAngleWeapon(name + "-front-cannon"){{
+            weapons.addAll(new LimitedAngleWeapon(name + "-front-cannon"){{
                 x = 22.25f;
                 y = 30.25f;
                 shootY = 9.5f;
                 recoil = 5f;
-                shots = 3;
-                spacing = 15f;
+                shots = 5;
+                shotDelay = 3f;
+                inaccuracy = 5f;
                 shootCone = 15f;
                 rotate = true;
-                angleLimit = 2.5f;
-                shootSound = Sounds.shotgun;
+                angleLimit = 3f;
+                shootSound = Sounds.artillery;
                 reload = 25f;
 
-                bullet = new ShrapnelBulletType(){{
-                    damage = 110f;
-                    length = 110f;
-                    toColor = Pal.bulletYellow;
-                    serrationLenScl = 8f;
-                    shootEffect = ShootFx.shrapnelShoot;
-                    smokeEffect = Fx.shootBigSmoke2;
-                }};
+                bullet = Bullets.standardThoriumBig;
             }},
             new LimitedAngleWeapon(name + "-side-silo"){
                 {
@@ -1370,6 +1368,20 @@ public class UnityUnitTypes implements ContentList{
                     return b;
                 }
             },
+            new LimitedAngleWeapon(fin.name + "-launcher"){{
+                x = 0f;
+                y = 21f;
+                shootY = 8f;
+                rotate = true;
+                mirror = false;
+                inaccuracy = 15f;
+                reload = 7f;
+                xRand = 2.25f;
+                shootSound = Sounds.missile;
+                angleCone = 135f;
+
+                bullet = UnityBullets.basicMissile;
+            }},
             new PointDefenceMultiBarrelWeapon(name + "-flak-turret"){{
                 x = 26.5f;
                 y = 15f;
