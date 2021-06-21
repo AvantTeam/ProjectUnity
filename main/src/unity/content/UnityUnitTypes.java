@@ -6,7 +6,9 @@ import arc.graphics.g2d.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.pooling.*;
 import mindustry.ctype.*;
+import mindustry.entities.units.*;
 import mindustry.type.*;
 import mindustry.gen.*;
 import mindustry.entities.*;
@@ -54,7 +56,7 @@ public class UnityUnitTypes implements ContentList{
     // omura
 
     public static @EntityPoint(UnitWaterMove.class)
-    UnitType fin;
+    UnitType fin, blue;
 
     // global unit + watermove + transform
     public static @EntityDef({Unitc.class, WaterMovec.class, Transc.class})
@@ -1275,6 +1277,147 @@ public class UnityUnitTypes implements ContentList{
                     status = StatusEffects.blasted;
                     statusDuration = 60f;
                 }};
+            }});
+        }};
+
+        blue = new UnityUnitType("blue"){{
+            health = 34000f;
+            speed = 0.4f;
+            drag = 0.18f;
+            hitSize = 80f;
+            armor = 18f;
+            accel = 0.19f;
+            rotateSpeed = 0.78f;
+            rotateShooting = false;
+
+            trailLength = 70;
+            trailX = 26f;
+            trailY = -42f;
+            trailScl = 4f;
+
+            bottomWeapons.add(name + "-side-silo");
+            bottomWeapons.add(name + "-front-cannon");
+            weapons.add(new LimitedAngleWeapon(name + "-front-cannon"){{
+                x = 22.25f;
+                y = 30.25f;
+                shootY = 9.5f;
+                recoil = 5f;
+                shots = 3;
+                spacing = 15f;
+                shootCone = 15f;
+                rotate = true;
+                angleLimit = 2.5f;
+                shootSound = Sounds.shotgun;
+                reload = 25f;
+
+                bullet = new ShrapnelBulletType(){{
+                    damage = 110f;
+                    length = 110f;
+                    toColor = Pal.bulletYellow;
+                    serrationLenScl = 8f;
+                    shootEffect = ShootFx.shrapnelShoot;
+                    smokeEffect = Fx.shootBigSmoke2;
+                }};
+            }},
+            new LimitedAngleWeapon(name + "-side-silo"){
+                {
+                    x = 29.75f;
+                    y = -13f;
+                    shootY = 7f;
+                    xRand = 9f;
+                    defaultAngle = angleOffset = 90f;
+                    angleCone = 0f;
+                    shootCone = 125f;
+                    alternate = false;
+                    rotate = true;
+                    reload = 50f;
+                    shots = 12;
+                    shotDelay = 3f;
+                    inaccuracy = 5f;
+                    shootSound = Sounds.missile;
+
+                    bullet = new GuidedMissileBulletType(3f, 20f){{
+                        homingPower = 0.09f;
+                        width = 8f;
+                        height = 8f;
+                        shrinkX = shrinkY = 0f;
+                        drag = -0.003f;
+                        keepVelocity = false;
+                        splashDamageRadius = 40f;
+                        splashDamage = 45f;
+                        lifetime = 65f;
+                        trailColor = Pal.missileYellowBack;
+                        hitEffect = Fx.blastExplosion;
+                        despawnEffect = Fx.blastExplosion;
+                    }};
+                }
+
+                @Override
+                protected Bullet bullet(Unit unit, float shootX, float shootY, float angle, float lifescl){
+                    Bullet b = super.bullet(unit, shootX, shootY, angle, lifescl);
+                    if(b.type instanceof GuidedMissileBulletType){
+                        WeaponMount m = null;
+                        for(WeaponMount mount : unit.mounts){
+                            if(mount.weapon == this){
+                                m = mount;
+                                break;
+                            }
+                        }
+                        if(m != null){
+                            b.data = m;
+                        }
+                    }
+                    return b;
+                }
+            },
+            new PointDefenceMultiBarrelWeapon(name + "-flak-turret"){{
+                x = 26.5f;
+                y = 15f;
+                shootY = 15.75f;
+                barrels = 2;
+                barrelOffset = 5.25f;
+                barrelSpacing = 6.5f;
+                barrelRecoil = 4f;
+                rotate = true;
+                mirrorBarrels = true;
+                alternate = false;
+                reload = 6f;
+                recoil = 0.5f;
+                shootCone = 7f;
+                shadow = 30f;
+                targetInterval = 20f;
+                autoTarget = true;
+                controllable = false;
+                bullet = new AntiBulletFlakBulletType(8f, 6f){{
+                    lifetime = 45f;
+                    splashDamage = 12f;
+                    splashDamageRadius = 60f;
+                    bulletRadius = 60f;
+                    explodeRange = 45f;
+                    bulletDamage = 18f;
+                    width = 8f;
+                    height = 12f;
+                    scaleVelocity = true;
+                    collidesGround = false;
+                    status = StatusEffects.blasted;
+                    statusDuration = 60f;
+                }};
+            }}, new MultiBarrelWeapon(name + "-turret"){{
+                x = 0f;
+                y = -6f;
+                shootY = 20f;
+                barrelOffset = 4.5f;
+                barrelSpacing = 4.5f;
+                barrelRecoil = 4f;
+                barrels = 4;
+                mirror = false;
+                rotate = true;
+                rotateSpeed = 2f;
+                shadow = 46f;
+                reload = 15f;
+                shootSound = Sounds.artillery;
+
+                bullet = UnityBullets.artilleryExplosiveT2;
             }});
         }};
 

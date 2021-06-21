@@ -59,7 +59,7 @@ public class MultiBarrelWeapon extends Weapon{
 
             Intc drawBarrel = i -> {
                 float offset = i * barrelSpacing - (barrels - 1) * barrelSpacing / 2f;
-                int s = Mathf.sign(!mirrorBarrels || offset < 0);
+                int s = Mathf.sign((!mirrorBarrels || offset < 0) != flipSprite);
                 tv.trns(weaponRotation - 90f, barrelOffset + -mMount.recoils[i], offset).add(wx, wy);
                 Draw.rect(barrelOutlineRegion,
                 tv.x, tv.y,
@@ -109,7 +109,7 @@ public class MultiBarrelWeapon extends Weapon{
 
         Intc drawBarrel = i -> {
             float offset = i * barrelSpacing - (barrels - 1) * barrelSpacing / 2f;
-            int s = Mathf.sign(!mirrorBarrels || offset < 0);
+            int s = Mathf.sign((!mirrorBarrels || offset < 0) != flipSprite);
             tv.trns(weaponRotation + 90f, barrelOffset + -mMount.recoils[i], offset).add(wx, wy);
             if(top && barrelOutlineRegion.found()){
                 Draw.rect(barrelOutlineRegion,

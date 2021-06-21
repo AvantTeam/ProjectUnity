@@ -16,6 +16,7 @@ public class AntiBulletFlakBulletType extends FlakBulletType{
         super(speed, damage);
         collidesGround = true;
         despawnHit = true;
+        shrinkY = 0.2f;
     }
 
     @Override

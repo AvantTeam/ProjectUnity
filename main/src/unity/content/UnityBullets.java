@@ -13,7 +13,6 @@ import mindustry.entities.abilities.*;
 import mindustry.gen.*;
 import mindustry.entities.bullet.*;
 import mindustry.graphics.*;
-import mindustry.io.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.ctype.*;
@@ -73,13 +72,13 @@ public class UnityBullets implements ContentList{
     //only enhanced
     public static BasicBulletType standardDenseLarge, standardHomingLarge, standardIncendiaryLarge, standardThoriumLarge, standardDenseHeavy, standardHomingHeavy, standardIncendiaryHeavy, standardThoriumHeavy, standardDenseMassive, standardHomingMassive,
         standardIncendiaryMassive, standardThoriumMassive;
+    public static ArtilleryBulletType artilleryExplosiveT2;
 
     @SuppressWarnings("unchecked")
-    private <T extends BulletType> T copy(BulletType from, Prov<T> constructor, Cons<T> setter){
-        T target = constructor.get();
-        JsonIO.copy((T)from, target);
-        setter.get(target);
-        return target;
+    private <T extends BulletType> T copy(BulletType from, Cons<T> setter){
+        T bullet = (T)from.copy();
+        setter.get(bullet);
+        return bullet;
     }
 
     @Override
@@ -1338,14 +1337,14 @@ public class UnityBullets implements ContentList{
 
         //only enhanced
 
-        standardDenseLarge = copy(Bullets.standardDenseBig, BasicBulletType::new, (BasicBulletType t) -> {
+        standardDenseLarge = copy(Bullets.standardDenseBig, (BasicBulletType t) -> {
             t.damage *= 1.4f;
             t.speed *= 1.1f;
             t.width *= 1.12f;
             t.height *= 1.12f;
         });
 
-        standardHomingLarge = copy(Bullets.standardDenseBig, BasicBulletType::new, (BasicBulletType t) -> {
+        standardHomingLarge = copy(Bullets.standardDenseBig, (BasicBulletType t) -> {
             t.damage *= 1.23f;
             t.reloadMultiplier = 1.3f;
             t.homingPower = 0.09f;
@@ -1354,28 +1353,28 @@ public class UnityBullets implements ContentList{
             t.height *= 1.09f;
         });
 
-        standardIncendiaryLarge = copy(Bullets.standardIncendiaryBig, BasicBulletType::new, (BasicBulletType t) -> {
+        standardIncendiaryLarge = copy(Bullets.standardIncendiaryBig, (BasicBulletType t) -> {
             t.damage *= 1.4f;
             t.speed *= 1.1f;
             t.width *= 1.12f;
             t.height *= 1.12f;
         });
 
-        standardThoriumLarge = copy(Bullets.standardThoriumBig, BasicBulletType::new, (BasicBulletType t) -> {
+        standardThoriumLarge = copy(Bullets.standardThoriumBig, (BasicBulletType t) -> {
             t.damage *= 1.4f;
             t.speed *= 1.1f;
             t.width *= 1.12f;
             t.height *= 1.12f;
         });
 
-        standardDenseHeavy = copy(Bullets.standardDenseBig, BasicBulletType::new, (BasicBulletType t) -> {
+        standardDenseHeavy = copy(Bullets.standardDenseBig, (BasicBulletType t) -> {
             t.damage *= 1.7f;
             t.speed *= 1.3f;
             t.width *= 1.32f;
             t.height *= 1.32f;
         });
 
-        standardHomingHeavy = copy(Bullets.standardDenseBig, BasicBulletType::new, (BasicBulletType t) -> {
+        standardHomingHeavy = copy(Bullets.standardDenseBig, (BasicBulletType t) -> {
             t.damage *= 1.4f;
             t.reloadMultiplier = 1.3f;
             t.homingPower = 0.09f;
@@ -1384,21 +1383,21 @@ public class UnityBullets implements ContentList{
             t.height *= 1.19f;
         });
 
-        standardIncendiaryHeavy = copy(Bullets.standardIncendiaryBig, BasicBulletType::new, (BasicBulletType t) -> {
+        standardIncendiaryHeavy = copy(Bullets.standardIncendiaryBig, (BasicBulletType t) -> {
             t.damage *= 1.7f;
             t.speed *= 1.3f;
             t.width *= 1.32f;
             t.height *= 1.32f;
         });
 
-        standardThoriumHeavy = copy(Bullets.standardThoriumBig, BasicBulletType::new, (BasicBulletType t) -> {
+        standardThoriumHeavy = copy(Bullets.standardThoriumBig, (BasicBulletType t) -> {
             t.damage *= 1.7f;
             t.speed *= 1.3f;
             t.width *= 1.32f;
             t.height *= 1.32f;
         });
 
-        standardDenseMassive = copy(Bullets.standardDenseBig, BasicBulletType::new, (BasicBulletType t) -> {
+        standardDenseMassive = copy(Bullets.standardDenseBig, (BasicBulletType t) -> {
             t.damage *= 1.8f;
             t.speed *= 1.3f;
             t.width *= 1.34f;
@@ -1406,7 +1405,7 @@ public class UnityBullets implements ContentList{
             t.lifetime *= 1.1f;
         });
 
-        standardHomingMassive = copy(Bullets.standardDenseBig, BasicBulletType::new, (BasicBulletType t) -> {
+        standardHomingMassive = copy(Bullets.standardDenseBig, (BasicBulletType t) -> {
             t.damage *= 1.6f;
             t.reloadMultiplier = 1.3f;
             t.homingPower = 0.09f;
@@ -1416,7 +1415,7 @@ public class UnityBullets implements ContentList{
             t.lifetime *= 1.1f;
         });
 
-        standardIncendiaryMassive = copy(Bullets.standardIncendiaryBig, BasicBulletType::new, (BasicBulletType t) -> {
+        standardIncendiaryMassive = copy(Bullets.standardIncendiaryBig, (BasicBulletType t) -> {
             t.damage *= 1.8f;
             t.speed *= 1.3f;
             t.width *= 1.34f;
@@ -1424,12 +1423,20 @@ public class UnityBullets implements ContentList{
             t.lifetime *= 1.1f;
         });
 
-        standardThoriumMassive = copy(Bullets.standardThoriumBig, BasicBulletType::new, (BasicBulletType t) -> {
+        standardThoriumMassive = copy(Bullets.standardThoriumBig, (BasicBulletType t) -> {
             t.damage *= 1.8f;
             t.speed *= 1.3f;
             t.width *= 1.34f;
             t.height *= 1.34f;
             t.lifetime *= 1.1f;
+        });
+
+        artilleryExplosiveT2 = copy(Bullets.artilleryExplosive, (ArtilleryBulletType t) -> {
+            t.speed = 4.5f;
+            t.lifetime = 74f;
+            t.ammoMultiplier = 2f;
+            t.splashDamageRadius *= 1.3f;
+            t.splashDamage *= 3f;
         });
 
         //endregion
