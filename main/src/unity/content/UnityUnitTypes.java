@@ -46,6 +46,8 @@ public class UnityUnitTypes implements ContentList{
     // global T6/7 units
 
     // reign
+    public static @EntityPoint(MechUnit.class)
+    UnitType citadel;
     // corvus + toxopid
     public static @EntityPoint(LegsUnit.class)
     UnitType orion, araneidae, theraphosidae;
@@ -839,6 +841,50 @@ public class UnityUnitTypes implements ContentList{
 
         //endregion
         //region T6/7
+
+        citadel = new UnityUnitType("citadel"){{
+            speed = 0.3f;
+            hitSize = 49f;
+            rotateSpeed = 1.5f;
+            health = 39000f;
+            armor = 15f;
+            mechStepParticles = true;
+            mechStepShake = 0.8f;
+            canDrown = false;
+            mechFrontSway = 2f;
+            mechSideSway = 0.7f;
+            mechStride = (4f + (hitSize - 8f) / 2.1f) / 1.25f;
+
+            weapons.add(new Weapon(name + "-weapon"){{
+                top = false;
+                x = 31.75f;
+                y = -6.25f;
+                shootY = 30.25f;
+                reload = 17f;
+                recoil = 5f;
+                shake = 2f;
+                shots = 5;
+                shotDelay = 2f;
+                ejectEffect = Fx.casing4;
+                shootSound = Sounds.bang;
+
+                bullet = UnityBullets.reignBulletWeakened;
+            }}, new LimitedAngleWeapon(name + "-flamethrower"){{
+                x = 17.75f;
+                y = 11.25f;
+                shootY = 5.5f;
+                reload = 5f;
+                recoil = 0f;
+                shootSound = Sounds.flame;
+                angleCone = 80f;
+                rotate = true;
+
+                bullet = new FlameBulletType(4.2f, 32f){{
+                    lifetime = 19f;
+                    particleAmount = 16;
+                }};
+            }});
+        }};
         
         orion = new UnityUnitType("orion"){{
             speed = 0.3f;

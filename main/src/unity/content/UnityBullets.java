@@ -71,12 +71,22 @@ public class UnityBullets implements ContentList{
 
     //only enhanced
     public static BasicBulletType standardDenseLarge, standardHomingLarge, standardIncendiaryLarge, standardThoriumLarge, standardDenseHeavy, standardHomingHeavy, standardIncendiaryHeavy, standardThoriumHeavy, standardDenseMassive, standardHomingMassive,
-        standardIncendiaryMassive, standardThoriumMassive;
+        standardIncendiaryMassive, standardThoriumMassive, reignBulletWeakened;
     public static ArtilleryBulletType artilleryExplosiveT2;
 
     @SuppressWarnings("unchecked")
     private <T extends BulletType> T copy(BulletType from, Cons<T> setter){
         T bullet = (T)from.copy();
+        setter.get(bullet);
+        return bullet;
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T extends BulletType> T deepCopy(BulletType from, Cons<T> setter){
+        T bullet = (T)from.copy();
+        if(from.fragBullet != null){
+            bullet.fragBullet = deepCopy(bullet.fragBullet, b -> {});
+        }
         setter.get(bullet);
         return bullet;
     }
@@ -1429,6 +1439,10 @@ public class UnityBullets implements ContentList{
             t.width *= 1.34f;
             t.height *= 1.34f;
             t.lifetime *= 1.1f;
+        });
+
+        reignBulletWeakened = copy(UnitTypes.reign.weapons.get(0).bullet, (BasicBulletType t) -> {
+            t.damage = 45f;
         });
 
         artilleryExplosiveT2 = copy(Bullets.artilleryExplosive, (ArtilleryBulletType t) -> {
