@@ -857,7 +857,7 @@ public class UnityUnitTypes implements ContentList{
 
             weapons.add(new Weapon(name + "-weapon"){{
                 top = false;
-                x = 31.75f;
+                x = 31.5f;
                 y = -6.25f;
                 shootY = 30.25f;
                 reload = 17f;
