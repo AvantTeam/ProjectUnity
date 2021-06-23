@@ -14,7 +14,10 @@ abstract class UnintersectableComp implements Hitboxc{
     @Override
     @MethodPriority(-10)
     public void update(){
-        if(this instanceof Physicsc e && e.physref() != null){
+        if(this instanceof Physicsc){
+            var e = (Physicsc)this;
+            if(e.physref() == null) return;
+
             if(intersects()){
                 if(e.physref().body.radius < 0f){
                     e.physref().body.radius = 0f;

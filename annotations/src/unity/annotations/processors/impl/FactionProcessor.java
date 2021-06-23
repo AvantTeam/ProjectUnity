@@ -1,18 +1,16 @@
-package unity.annotations;
+package unity.annotations.processors.impl;
 
 import arc.audio.*;
 import arc.struct.*;
+import com.squareup.javapoet.*;
 import mindustry.*;
 import mindustry.ctype.*;
-
-import java.util.*;
+import unity.annotations.Annotations.*;
+import unity.annotations.processors.*;
 
 import javax.annotation.processing.*;
 import javax.lang.model.element.*;
-
-import com.squareup.javapoet.*;
-
-import unity.annotations.Annotations.*;
+import java.util.*;
 
 /** @author GlennFolker */
 @SuppressWarnings({"unchecked"})

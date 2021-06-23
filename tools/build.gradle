@@ -1,17 +1,12 @@
-sourceSets.main.java.srcDirs = ['src/']
+sourceSets.main {
+    java.srcDirs = ['src/']
+}
 
 ext {
     imageProcessorMain = 'unity.tools.SpriteProcessor'
 
     spritesRawFolder = '../main/assets-raw/sprites/'
     spritesAssetsFolder = '../main/assets/sprites/'
-}
-
-repositories {
-    mavenCentral()
-    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-    maven { url "https://oss.sonatype.org/content/repositories/releases/" }
-    maven { url 'https://www.jitpack.io' }
 }
 
 dependencies {

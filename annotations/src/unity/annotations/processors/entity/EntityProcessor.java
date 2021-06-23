@@ -1,23 +1,23 @@
-package unity.annotations;
+package unity.annotations.processors.entity;
 
 import arc.func.*;
 import arc.struct.*;
 import arc.struct.ObjectMap.*;
 import arc.util.*;
 import arc.util.pooling.Pool.*;
+import com.squareup.javapoet.*;
+import com.sun.source.tree.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import unity.annotations.Annotations.*;
-import unity.annotations.TypeIOResolver.*;
-
-import java.util.*;
+import unity.annotations.processors.*;
+import unity.annotations.processors.util.*;
+import unity.annotations.processors.util.TypeIOResolver.*;
 
 import javax.annotation.processing.*;
 import javax.lang.model.element.*;
 import javax.lang.model.type.*;
-
-import com.squareup.javapoet.*;
-import com.sun.source.tree.*;
+import java.util.*;
 
 import static javax.lang.model.type.TypeKind.*;
 
@@ -25,7 +25,7 @@ import static javax.lang.model.type.TypeKind.*;
  * @author Anuke
  * @author GlennFolker
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings("all")
 @SupportedAnnotationTypes({
     "unity.annotations.Annotations.EntityComponent",
     "unity.annotations.Annotations.EntityBaseComponent",
@@ -104,7 +104,7 @@ public class EntityProcessor extends BaseProcessor{
                 toComp(Puddlec.class), "puddle"
             );
 
-            for(TypeElement inter : (List<TypeElement>)((PackageElement)elementUtils.getPackageElement("mindustry.gen")).getEnclosedElements()){
+            for(TypeElement inter : (List<TypeElement>)((PackageElement) elements.getPackageElement("mindustry.gen")).getEnclosedElements()){
                 if(
                     simpleName(inter).endsWith("c") &&
                     inter.getKind() == ElementKind.INTERFACE
@@ -117,11 +117,11 @@ public class EntityProcessor extends BaseProcessor{
                 for(ExecutableElement m : methods(comp)){
                     if(is(m, Modifier.ABSTRACT, Modifier.NATIVE)) continue;
 
-                    methodBlocks.put(descString(m), procBlock(treeUtils.getTree(m).getBody().toString()));
+                    methodBlocks.put(descString(m), procBlock(trees.getTree(m).getBody().toString()));
                 }
 
                 for(VariableElement var : vars(comp)){
-                    VariableTree tree = (VariableTree)treeUtils.getTree(var);
+                    VariableTree tree = (VariableTree) trees.getTree(var);
                     if(tree.getInitializer() != null){
                         varInitializers.put(descString(var), tree.getInitializer().toString());
                     }
@@ -141,7 +141,7 @@ public class EntityProcessor extends BaseProcessor{
                             .build()
                         );
 
-                    for(TypeElement extraInterface : Seq.with(comp.getInterfaces()).map(BaseProcessor::toEl).select(i -> !isCompInterface(i))){
+                    for(TypeElement extraInterface : Seq.with(comp.getInterfaces()).map(this::toEl).select(i -> !isCompInterface(i))){
                         inter.addSuperinterface(cName(extraInterface));
                     }
 
@@ -458,7 +458,7 @@ public class EntityProcessor extends BaseProcessor{
                         mbuilder.addCode(lnew());
                     }
 
-                    Seq<ExecutableElement> noCompInserts = inserts.select(e -> typeUtils.isSameType(
+                    Seq<ExecutableElement> noCompInserts = inserts.select(e -> types.isSameType(
                         elements(annotation(e, Insert.class)::block).first().asType(),
                         toType(Void.class).asType()
                     ));
@@ -469,7 +469,7 @@ public class EntityProcessor extends BaseProcessor{
                     Seq<ExecutableElement> noCompAfter = noCompInserts.select(e -> annotation(e, Insert.class).after());
                     noCompAfter.sort(Structs.comps(Structs.comparingFloat(m -> annotation(m, MethodPriority.class) != null ? annotation(m, MethodPriority.class).value() : 0), Structs.comparing(BaseProcessor::simpleName)));
 
-                    Seq<ExecutableElement> noCompWrappers = methodWrappers.select(e -> typeUtils.isSameType(
+                    Seq<ExecutableElement> noCompWrappers = methodWrappers.select(e -> types.isSameType(
                         elements(annotation(e, Wrap.class)::block).first().asType(),
                         toType(Void.class).asType()
                     ));
@@ -500,11 +500,11 @@ public class EntityProcessor extends BaseProcessor{
 
                     if(hasIO){
                         if(simpleName(first).equals("read") || simpleName(first).equals("write")){
-                            io.write(mbuilder, simpleName(first).equals("write"), allFields);
+                            io.write(this, mbuilder, simpleName(first).equals("write"), allFields);
                         }
 
                         if(simpleName(first).equals("readSync") || simpleName(first).equals("writeSync")){
-                            io.writeSync(mbuilder, simpleName(first).equals("writeSync"), syncedFields, allFields);
+                            io.writeSync(this, mbuilder, simpleName(first).equals("writeSync"), syncedFields, allFields);
                         }
 
                         if(simpleName(first).equals("readSyncManual") || simpleName(first).equals("writeSyncManual")){
@@ -778,7 +778,7 @@ public class EntityProcessor extends BaseProcessor{
                     if(def.extend != null){
                         superclass = baseClasses.find(b -> (packageName + "." + Reflect.get(b, "name")).equals(def.extend.toString()));
                         if(superclass == null){
-                            superclassVanilla = elementUtils.getTypeElement(def.extend.toString());
+                            superclassVanilla = elements.getTypeElement(def.extend.toString());
                         }
                     }
 

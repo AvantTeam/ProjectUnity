@@ -1,21 +1,19 @@
-package unity.annotations;
+package unity.annotations.processors.impl;
 
 import arc.*;
 import arc.graphics.g2d.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.*;
+import com.squareup.javapoet.*;
 import unity.annotations.Annotations.*;
+import unity.annotations.processors.*;
 
 import javax.annotation.processing.*;
 import javax.lang.model.element.*;
 
-import com.squareup.javapoet.*;
-
 /** @author GlennFolker */
 @SupportedAnnotationTypes("unity.annotations.Annotations.LoadRegs")
 public class LoadProcessor extends BaseProcessor{
-    Seq<VariableElement> toLoad = new Seq<>();
     ObjectSet<String> genericRegs = new ObjectSet<>();
 
     {

@@ -1,4 +1,4 @@
-package unity.annotations;
+package unity.annotations.processors.entity;
 
 import arc.func.*;
 import arc.struct.*;
@@ -8,7 +8,9 @@ import com.squareup.javapoet.*;
 import com.sun.source.tree.*;
 import mindustry.gen.*;
 import unity.annotations.Annotations.*;
-import unity.annotations.TypeIOResolver.*;
+import unity.annotations.processors.*;
+import unity.annotations.processors.util.*;
+import unity.annotations.processors.util.TypeIOResolver.*;
 
 import javax.annotation.processing.*;
 import javax.lang.model.element.*;
@@ -18,7 +20,7 @@ import java.util.regex.*;
 import static javax.lang.model.type.TypeKind.*;
 
 /** @author GlennFolker */
-@SuppressWarnings("unchecked")
+@SuppressWarnings("all")
 @SupportedAnnotationTypes({
     "unity.annotations.Annotations.Merge",
     "unity.annotations.Annotations.MergeComponent",
@@ -79,7 +81,7 @@ public class MergeProcessor extends BaseProcessor{
 
                 TypeElement buildType = types.isEmpty() ? null : types.first();
                 if(buildType != null){
-                    if(!typeUtils.isAssignable(
+                    if(!this.types.isAssignable(
                         buildType.asType(),
                         toType(Building.class).asType()
                     )){
@@ -137,7 +139,7 @@ public class MergeProcessor extends BaseProcessor{
             inter.addModifiers(Modifier.STATIC);
         }
 
-        for(TypeElement extraInterface : Seq.with(comp.getInterfaces()).map(BaseProcessor::toEl).select(i -> !isCompInterface(i))){
+        for(TypeElement extraInterface : Seq.with(comp.getInterfaces()).map(this::toEl).select(i -> !isCompInterface(i))){
             inter.addSuperinterface(cName(extraInterface));
         }
 
@@ -148,7 +150,7 @@ public class MergeProcessor extends BaseProcessor{
         if(!isBuild){
             ExecutableElement constructor = constructor(comp);
 
-            String block = procBlock(treeUtils.getTree(constructor).getBody().toString());
+            String block = procBlock(trees.getTree(constructor).getBody().toString());
             if(block.startsWith("super(")) block = block.substring(block.indexOf("\n") + 1);
 
             methodBlocks.put(descString(constructor), block);
@@ -157,11 +159,11 @@ public class MergeProcessor extends BaseProcessor{
         for(ExecutableElement m : methods(comp).select(t -> !isConstructor(t))){
             if(is(m, Modifier.ABSTRACT, Modifier.NATIVE)) continue;
 
-            methodBlocks.put(descString(m), procBlock(treeUtils.getTree(m).getBody().toString()));
+            methodBlocks.put(descString(m), procBlock(trees.getTree(m).getBody().toString()));
         }
 
         for(VariableElement var : vars(comp)){
-            VariableTree tree = (VariableTree)treeUtils.getTree(var);
+            VariableTree tree = (VariableTree) trees.getTree(var);
             if(tree.getInitializer() != null){
                 varInitializers.put(descString(var), tree.getInitializer().toString());
             }
@@ -319,9 +321,9 @@ public class MergeProcessor extends BaseProcessor{
 
             Seq<ExecutableElement> inserts = ins.get("constructor", Seq::new);
 
-            Seq<ExecutableElement> noComp = inserts.select(e -> typeUtils.isSameType(
+            Seq<ExecutableElement> noComp = inserts.select(e -> types.isSameType(
                 elements(annotation(e, Insert.class)::block).first().asType(),
-                elementUtils.getTypeElement("java.lang.Void").asType()
+                elements.getTypeElement("java.lang.Void").asType()
             ));
 
             Seq<ExecutableElement> noCompBefore = noComp.select(e -> !annotation(e, Insert.class).after());
@@ -401,9 +403,9 @@ public class MergeProcessor extends BaseProcessor{
                 throw new IllegalStateException("Method " + entry.key + " is not void, therefore no methods can @Insert to it");
             }
 
-            Seq<ExecutableElement> noComp = inserts.select(e -> typeUtils.isSameType(
+            Seq<ExecutableElement> noComp = inserts.select(e -> types.isSameType(
                 elements(annotation(e, Insert.class)::block).first().asType(),
-                elementUtils.getTypeElement("java.lang.Void").asType()
+                elements.getTypeElement("java.lang.Void").asType()
             ));
 
             Seq<ExecutableElement> noCompBefore = noComp.select(e -> !annotation(e, Insert.class).after());
@@ -425,7 +427,7 @@ public class MergeProcessor extends BaseProcessor{
 
                 mbuilder.addStatement("super.$L(" + argLiteral + ")", args);
 
-                io.write(mbuilder, simpleName(first).equals("write"), allFields);
+                io.write(this, mbuilder, simpleName(first).equals("write"), allFields);
             }
 
             boolean firstc = append(mbuilder, entry.value, inserts, writeBlock, superCall);
@@ -532,7 +534,7 @@ public class MergeProcessor extends BaseProcessor{
     TypeElement findBuild(TypeElement block){
         TypeElement building = toType(Building.class);
         for(TypeElement type : types(block)){
-            if(typeUtils.isAssignable(
+            if(types.isAssignable(
                 type.asType(),
                 building.asType()
             )){

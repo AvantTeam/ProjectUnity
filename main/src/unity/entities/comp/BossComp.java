@@ -5,7 +5,6 @@ import mindustry.gen.*;
 import mindustry.type.*;
 import unity.*;
 import unity.annotations.Annotations.*;
-import unity.sync.*;
 
 /** @author GlennFolker */
 @SuppressWarnings("unused")

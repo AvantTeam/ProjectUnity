@@ -1,4 +1,4 @@
-package unity.annotations;
+package unity.annotations.processors.impl;
 
 import arc.*;
 import arc.assets.*;
@@ -7,9 +7,9 @@ import arc.audio.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
-
 import com.squareup.javapoet.*;
 import mindustry.*;
+import unity.annotations.processors.*;
 
 import javax.annotation.processing.*;
 import javax.lang.model.element.*;
@@ -89,7 +89,7 @@ public class AssetsProcessor extends BaseProcessor{
     }
 
     void processObjects() throws Exception{
-        TypeElement wavefrontObject = elementUtils.getTypeElement("unity.util.WavefrontObject");
+        TypeElement wavefrontObject = elements.getTypeElement("unity.util.WavefrontObject");
 
         TypeSpec.Builder objSpec = TypeSpec.classBuilder("UnityObjs").addModifiers(Modifier.PUBLIC)
             .addJavadoc("Unity's wavefront objects")
@@ -110,7 +110,7 @@ public class AssetsProcessor extends BaseProcessor{
                         .addCode(lnew())
                         .addStatement("var object = new $T()", tName(wavefrontObject))
                         .addCode(lnew())
-                        .addStatement("$T<?> desc = $T.assets.load(path, $T.class, new $T(object))", cName(AssetDescriptor.class), cName(Core.class), tName(wavefrontObject), tName(elementUtils.getTypeElement("unity.util.WavefrontObjectLoader.WavefrontObjectParameters")))
+                        .addStatement("$T<?> desc = $T.assets.load(path, $T.class, new $T(object))", cName(AssetDescriptor.class), cName(Core.class), tName(wavefrontObject), tName(elements.getTypeElement("unity.util.WavefrontObjectLoader.WavefrontObjectParameters")))
                         .addStatement("desc.errored = $T::printStackTrace", cName(Throwable.class))
                         .addCode(lnew())
                         .addStatement("return object")
@@ -161,7 +161,7 @@ public class AssetsProcessor extends BaseProcessor{
                     Seq<String> rawargs = Seq.with(val.substring(1, val.length() - 1).split("\\s*,\\s*"));
                     String format = rawargs.remove(0);
 
-                    Seq<Object> args = rawargs.map(elementUtils::getTypeElement);
+                    Seq<Object> args = rawargs.map(elements::getTypeElement);
                     args.insert(0, Strings.kebabToCamel(fname));
                     args.insert(1, field);
 

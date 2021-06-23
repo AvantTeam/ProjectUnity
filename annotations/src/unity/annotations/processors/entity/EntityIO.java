@@ -1,4 +1,4 @@
-package unity.annotations;
+package unity.annotations.processors.entity;
 
 import arc.math.*;
 import arc.struct.*;
@@ -7,7 +7,8 @@ import com.squareup.javapoet.*;
 import mindustry.*;
 import mindustry.ctype.*;
 import unity.annotations.Annotations.*;
-import unity.annotations.TypeIOResolver.*;
+import unity.annotations.processors.*;
+import unity.annotations.processors.util.TypeIOResolver.*;
 
 import javax.lang.model.element.*;
 
@@ -33,22 +34,22 @@ public class EntityIO{
         );
     }
 
-    public void write(MethodSpec.Builder method, boolean write, Seq<VariableElement> fields){
+    public void write(BaseProcessor proc, MethodSpec.Builder method, boolean write, Seq<VariableElement> fields){
         this.method = method;
         this.write = write;
 
         for(VariableElement e : sel(fields)){
-            io(e.asType().toString(), "this." + BaseProcessor.simpleName(e) + (write ? "" : " = "));
+            io(proc, e.asType().toString(), "this." + BaseProcessor.simpleName(e) + (write ? "" : " = "));
         }
     }
 
-    public void writeSync(MethodSpec.Builder method, boolean write, Seq<VariableElement> syncFields, Seq<VariableElement> allFields){
+    public void writeSync(BaseProcessor proc, MethodSpec.Builder method, boolean write, Seq<VariableElement> syncFields, Seq<VariableElement> allFields){
         this.method = method;
         this.write = write;
 
         if(write){
             for(VariableElement e : sel(allFields)){
-                io(e.asType().toString(), "this." + BaseProcessor.simpleName(e));
+                io(proc, e.asType().toString(), "this." + BaseProcessor.simpleName(e));
             }
         }else{
             st("if(lastUpdated != 0) updateSpacing = $T.timeSinceMillis(lastUpdated)", Time.class);
@@ -65,12 +66,12 @@ public class EntityIO{
                     st(BaseProcessor.simpleName(e) + "_LAST_" + " = this." + BaseProcessor.simpleName(e));
                 }
 
-                io(e.asType().toString(), "this." + (sf ? BaseProcessor.simpleName(e) + "_TARGET_" : BaseProcessor.simpleName(e)) + " = ");
+                io(proc, e.asType().toString(), "this." + (sf ? BaseProcessor.simpleName(e) + "_TARGET_" : BaseProcessor.simpleName(e)) + " = ");
 
                 if(sl){
                     ncont("else" );
 
-                    io(e.asType().toString(), "");
+                    io(proc, e.asType().toString(), "");
 
                     if(sf){
                         st(BaseProcessor.simpleName(e) + "_LAST_" + " = this." + BaseProcessor.simpleName(e));
@@ -104,7 +105,7 @@ public class EntityIO{
         }
     }
 
-    public void writeInterpolate(MethodSpec.Builder method, Seq<VariableElement> fields) throws Exception{
+    public void writeInterpolate(MethodSpec.Builder method, Seq<VariableElement> fields){
         this.method = method;
 
         cont("if(lastUpdated != 0 && updateSpacing != 0)");
@@ -128,12 +129,12 @@ public class EntityIO{
         econt();
     }
 
-    public void io(String type, String field){
+    public void io(BaseProcessor proc, String type, String field){
         type = type.replace("mindustry.gen.", "").replace("unity.gen.", "");
 
         if(BaseProcessor.isPrimitive(type)){
             s(type.equals("boolean") ? "bool" : type.charAt(0) + "", field);
-        }else if(BaseProcessor.instanceOf(type, "mindustry.ctype.Content")){
+        }else if(proc.instanceOf(type, "mindustry.ctype.Content")){
             if(write){
                 s("s", field + ".id");
             }else{
@@ -151,7 +152,7 @@ public class EntityIO{
             if(write){
                 s("i", field + ".length");
                 cont("for(int INDEX = 0; INDEX < $L.length; INDEX ++)", field);
-                io(rawType, field + "[INDEX]");
+                io(proc, rawType, field + "[INDEX]");
             }else{
                 String fieldName = field.replace(" = ", "").replace("this.", "");
                 String lenf = fieldName + "_LENGTH";
@@ -160,7 +161,7 @@ public class EntityIO{
                     st("$Lnew $L[$L]", field, type.replace("[]", ""), lenf);
                 }
                 cont("for(int INDEX = 0; INDEX < $L; INDEX ++)", lenf);
-                io(rawType, field.replace(" = ", "[INDEX] = "));
+                io(proc, rawType, field.replace(" = ", "[INDEX] = "));
             }
 
             econt();
@@ -172,7 +173,7 @@ public class EntityIO{
                 if(write){
                     s("i", field + ".size");
                     cont("for(int INDEX = 0; INDEX < $L.size; INDEX ++)", field);
-                    io(generic, field + ".get(INDEX)");
+                    io(proc, generic, field + ".get(INDEX)");
                 }else{
                     String fieldName = field.replace(" = ", "").replace("this.", "");
                     String lenf = fieldName + "_LENGTH";
@@ -181,7 +182,7 @@ public class EntityIO{
                         st("$L.clear()", field.replace(" = ", ""));
                     }
                     cont("for(int INDEX = 0; INDEX < $L; INDEX ++)", lenf);
-                    io(generic, field.replace(" = ", "_ITEM = ").replace("this.", generic + " "));
+                    io(proc, generic, field.replace(" = ", "_ITEM = ").replace("this.", generic + " "));
                     if(!field.isEmpty()){
                         String temp = field.replace(" = ", "_ITEM").replace("this.", "");
                         st("if($L != null) $L.add($L)", temp, field.replace(" = ", ""), temp);
