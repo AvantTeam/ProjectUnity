@@ -19,7 +19,6 @@ import unity.gen.*;
 import unity.graphics.*;
 import unity.mod.*;
 import unity.sync.*;
-import unity.type.*;
 import unity.ui.*;
 import unity.ui.dialogs.*;
 import unity.util.*;
@@ -35,7 +34,6 @@ public class Unity extends Mod implements ApplicationListener{
     public static DevBuild dev;
 
     private static final ContentList[] content = {
-        new UnityContentTypes(),
         new UnityItems(),
         new UnityStatusEffects(),
         new UnityWeathers(),
@@ -150,8 +148,6 @@ public class Unity extends Mod implements ApplicationListener{
 
         FactionMeta.init();
         UnityEntityMapping.init();
-
-        new TestType("test");
 
         for(Faction faction : Faction.all){
             var array = FactionMeta.getByFaction(faction, Object.class);

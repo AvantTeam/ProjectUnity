@@ -31,11 +31,6 @@ ext {
 }
 
 task deploy(type: Jar, dependsOn: configurations.runtimeClasspath) {
-    if(!hasSprites) {
-        println 'Sprites folder not found; automatically processing sprites...'
-        dependsOn ":tools:proc"
-    }
-
     println "Compiling ${devBuild ? 'dev' : 'user'} build."
 
     archiveFileName = "${modName}Desktop.jar"
