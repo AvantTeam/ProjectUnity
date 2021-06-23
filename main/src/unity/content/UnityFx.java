@@ -200,9 +200,9 @@ public class UnityFx{
     }),
 
     ephemeronLaser = new Effect(19f, 100f, e -> {
-        if(e.data instanceof EphemeronEffectData d && d.b instanceof Bullet b && b.type instanceof EphemeronPairBulletType && b.isAdded()){
+        if(e.data instanceof EphemeronEffectData d && d.b != null && d.b.type instanceof EphemeronPairBulletType && d.b.isAdded()){
             stroke(3.6f * e.fout(), e.color);
-            line(b.x, b.y, d.x, d.y, false);
+            line(d.b.x, d.b.y, d.x, d.y, false);
         }
     }),
 

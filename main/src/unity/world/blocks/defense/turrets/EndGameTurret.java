@@ -627,6 +627,7 @@ public class EndGameTurret extends PowerTurret{
         }
     }
 
+    /** @deprecated Duplication of {@link AntiCheat#annihilateEntity(Entityc, boolean, boolean)} */
     private static class DeadUnitEntry{
         Unit entity;
         float lx;
@@ -661,22 +662,22 @@ public class EndGameTurret extends PowerTurret{
 
         void tryDestroy(){
             Groups.all.remove(entity);
-            Unit tmp = entity;
-            attemptRemoveAdd(tmp);
+            attemptRemoveAdd(entity);
             
-            UnityFx.vapourizeUnit.at(tmp.x, tmp.y, tmp.rotation, tmp);
-            
-            tmp.team.data().updateCount(tmp.type, -1);
-            tmp.clearCommand();
-            tmp.controller().removed(tmp);
-            
-            Groups.unit.remove(tmp);
+            UnityFx.vapourizeUnit.at(entity.x, entity.y, entity.rotation, entity);
+
+            entity.team.data().updateCount(entity.type, -1);
+            entity.clearCommand();
+            entity.controller().removed(entity);
+
+            Groups.unit.remove(entity);
             Groups.draw.remove(entity);
+            Groups.sync.remove(entity);
             if(Vars.net.client()){
-                Vars.netClient.addRemovedEntity(tmp.id);
+                Vars.netClient.addRemovedEntity(entity.id);
             }
             
-            for(WeaponMount mount : tmp.mounts){
+            for(WeaponMount mount : entity.mounts){
                 if(mount.bullet != null){
                     mount.bullet.time = mount.bullet.lifetime - 10f;
                     mount.bullet = null;
@@ -685,8 +686,6 @@ public class EndGameTurret extends PowerTurret{
                     mount.sound.stop();
                 }
             }
-
-            if(entity instanceof Syncc s) Groups.sync.remove(s);
         }
     }
 }
