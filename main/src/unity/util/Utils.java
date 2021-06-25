@@ -124,6 +124,20 @@ public final class Utils{
         return any;
     }
 
+    public static Bullet nearestBullet(float x, float y, float range, Boolf<Bullet> boolf){
+        result = null;
+        cdist = range;
+        Tmp.r1.setCentered(x, y, range * 2);
+        Groups.bullet.intersect(Tmp.r1.x, Tmp.r1.y, Tmp.r1.width, Tmp.r1.height, b -> {
+            float dst = b.dst(x, y);
+            if(boolf.get(b) && b.within(x, y, range + b.hitSize) && (result == null || dst < cdist)){
+                result = b;
+                cdist = dst;
+            }
+        });
+        return (Bullet)result;
+    }
+
     public static float angleDistSigned(float a, float b){
         a += 360f;
         a %= 360f;
@@ -148,7 +162,8 @@ public final class Utils{
     }
 
     public static float clampedAngle(float angle, float relative, float limit){
-        if(limit > 360) return angle;
+        if(limit >= 180) return angle;
+        if(limit <= 0) return relative;
         float dst = angleDistSigned(angle, relative);
         if(Math.abs(dst) > limit){
             float val = dst > 0 ? dst - limit : dst + limit;

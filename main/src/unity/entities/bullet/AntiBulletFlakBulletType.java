@@ -16,6 +16,7 @@ public class AntiBulletFlakBulletType extends FlakBulletType{
         super(speed, damage);
         collidesGround = true;
         despawnHit = true;
+        shrinkY = 0.2f;
     }
 
     @Override
@@ -23,7 +24,7 @@ public class AntiBulletFlakBulletType extends FlakBulletType{
         super.hit(b, x, y);
         Rect r1 = Tmp.r1.setSize(bulletRadius * 2f).setCenter(b.x, b.y);
         Groups.bullet.intersect(r1.x, r1.y, r1.width, r1.height, bl -> {
-            if(b.team != bl.team && b.within(bl, bulletRadius)){
+            if(b.team != bl.team && bl.type.hittable && b.within(bl, bulletRadius)){
                 float in = interp.apply(Mathf.clamp((bulletRadius - b.dst(bl)) / bulletRadius));
                 bl.vel.scl(Mathf.lerp(1f, bulletSlowDownScl, in));
                 bl.damage -= bulletDamage * in;

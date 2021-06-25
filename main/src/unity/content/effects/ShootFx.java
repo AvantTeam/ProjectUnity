@@ -57,6 +57,13 @@ public class ShootFx{
         }
     }),
 
+    shrapnelShoot = new Effect(13f, e -> {
+        color(Color.white, Pal.bulletYellow, Pal.lightOrange, e.fin());
+        stroke(e.fout() * 1.2f + 0.5f);
+
+        randLenVectors(e.id, 10, 30f * e.finpow(), e.rotation, 50f, (x, y) -> lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fin() * 5f + 2f));
+    }),
+
     scarRailShoot = new Effect(24f, e -> {
         e.scaled(10f, b -> {
             color(Color.white, Color.lightGray, b.fin());
