@@ -47,7 +47,7 @@ public class UnityUnitTypes implements ContentList{
 
     // reign
     public static @EntityPoint(MechUnit.class)
-    UnitType citadel;
+    UnitType citadel, empire;
     // corvus + toxopid
     public static @EntityPoint(LegsUnit.class)
     UnitType orion, araneidae, theraphosidae;
@@ -882,6 +882,79 @@ public class UnityUnitTypes implements ContentList{
                 bullet = new FlameBulletType(4.2f, 32f){{
                     lifetime = 19f;
                     particleAmount = 16;
+                }};
+            }});
+        }};
+
+        empire = new UnityUnitType("empire"){{
+            speed = 0.25f;
+            hitSize = 49f;
+            rotateSpeed = 1.25f;
+            health = 52000f;
+            armor = 16f;
+            mechStepParticles = true;
+            mechStepShake = 0.83f;
+            canDrown = false;
+            mechFrontSway = 4f;
+            mechSideSway = 0.7f;
+            mechStride = (4f + (hitSize - 8f) / 2.1f) / 1.3f;
+            immunities.addAll(StatusEffects.burning, StatusEffects.melting);
+
+            bottomWeapons.add(name + "-weapon");
+            weapons.add(new LimitedAngleWeapon(name + "-weapon"){{
+                x = 36.5f;
+                y = 2.75f;
+                shootY = 19.25f;
+                xRand = 4.5f;
+                alternate = false;
+                rotate = true;
+                rotateSpeed = 1.2f;
+                inaccuracy = 4f;
+                reload = 3f;
+                shots = 2;
+                angleCone = 20f;
+                angleOffset = -15f;
+                shootCone = 20f;
+                shootSound = Sounds.flame;
+
+                bullet = new FlameBulletType(6.5f, 63f){{
+                    lifetime = 33f;
+                    pierceCap = 6;
+                    pierceBuilding = true;
+                    collidesAir = true;
+                    incendChance = 0.2f;
+                    incendAmount = 1;
+                    particleAmount = 23;
+                    particleSizeScl = 8f;
+                    particleSpread = 11f;
+                    hitSize = 9f;
+                    status = StatusEffects.melting;
+                    smokeColors = new Color[]{Pal.darkFlame, Color.darkGray, Color.gray};
+                    colors = new Color[]{Color.white, Color.valueOf("fff4ac"), Pal.lightFlame, Pal.darkFlame, Color.gray};
+                }};
+            }}, new Weapon(name + "-cannon"){{
+                x = 20.75f;
+                y = -4f;
+                shootY = 9.75f;
+                rotate = true;
+                rotateSpeed = 4f;
+                inaccuracy = 10f;
+                shots = 8;
+                velocityRnd = 0.2f;
+                shootSound = Sounds.artillery;
+                reload = 40f;
+
+                bullet = new ArtilleryBulletType(3f, 15, "shell"){{
+                    hitEffect = Fx.blastExplosion;
+                    knockback = 0.8f;
+                    lifetime = 110f;
+                    width = height = 14f;
+                    collides = true;
+                    collidesTiles = true;
+                    splashDamageRadius = 45f;
+                    splashDamage = 95f;
+                    backColor = Pal.bulletYellowBack;
+                    frontColor = Pal.bulletYellow;
                 }};
             }});
         }};

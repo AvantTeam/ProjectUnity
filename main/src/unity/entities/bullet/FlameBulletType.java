@@ -12,6 +12,7 @@ import java.util.*;
 
 public class FlameBulletType extends BulletType{
     public Color[] colors = {Pal.lightFlame, Pal.darkFlame, Color.gray};
+    public Color[] smokeColors = {};
     public float particleSpread = 10f, particleSizeScl = 1.5f;
     public int particleAmount = 8;
     private final Color tc = new Color();
@@ -34,12 +35,22 @@ public class FlameBulletType extends BulletType{
     public void init(){
         super.init();
         hitColors = Arrays.copyOf(colors, Math.max(1, colors.length - 1));
-        shootEffect = new Effect(lifetime, range() * 2f, e -> {
+        shootEffect = new Effect(lifetime + 15f, range() * 2f, e -> {
             Draw.color(tc.lerp(colors, e.fin()));
 
-            Angles.randLenVectors(e.id, particleAmount, e.finpow() * range() + 15f, e.rotation, particleSpread, (x, y) ->
+            Angles.randLenVectors(e.id, particleAmount, e.finpow() * (range() + 15f), e.rotation, particleSpread, (x, y) ->
             Fill.circle(e.x + x, e.y + y, 0.65f + e.fout() * particleSizeScl));
         });
+        if(smokeColors != null && smokeColors.length > 0){
+            smokeEffect = new Effect(lifetime * 2f, range() * 2.5f, e -> {
+                Draw.color(tc.lerp(smokeColors, e.fin()));
+
+                float slope = (0.5f - Math.abs(e.fin(Interp.pow2In) - 0.5f)) * 2f;
+
+                Angles.randLenVectors(e.id, particleAmount, e.fin(Interp.pow4Out) * ((range() * 1.25f) + 15f), e.rotation, particleSpread, (x, y) ->
+                Fill.circle(e.x + x, e.y + y, 0.65f + slope * particleSizeScl));
+            }).followParent(false);
+        }
         hitEffect = new Effect(14f, e -> {
             Draw.color(tc.lerp(hitColors, e.fin()));
             Lines.stroke(0.5f + e.fout());
