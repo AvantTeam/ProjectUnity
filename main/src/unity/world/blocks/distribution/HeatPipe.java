@@ -25,8 +25,8 @@ public class HeatPipe extends GraphBlock{
     @Override
     public void load(){
         super.load();
-        heatRegions = Utils.getRegions(heatRegion, 8, 2);
-        regions = Utils.getRegions(atlas.find(name + "-tiles"), 8, 2);
+        heatRegions = GraphicUtils.getRegions(heatRegion, 8, 2);
+        regions = GraphicUtils.getRegions(atlas.find(name + "-tiles"), 8, 2);
     }
 
     @Override

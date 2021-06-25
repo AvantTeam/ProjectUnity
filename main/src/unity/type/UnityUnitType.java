@@ -27,7 +27,6 @@ import static arc.Core.*;
 note that as classes are integrated, inner classes are extracted.*/
 public class UnityUnitType extends UnitType{
     public final Seq<Weapon> segWeapSeq = new Seq<>();
-    public Color outlineColor = Pal.darkerMetal;
 
     public TextureRegion segmentRegion, tailRegion, segmentCellRegion, segmentOutline, tailOutline, legBackRegion, legBaseBackRegion, footBackRegion, legMiddleRegion, payloadCellRegion;
     public TextureRegion[] abilityRegions = new TextureRegion[AbilityTextures.values().length];
@@ -611,5 +610,14 @@ public class UnityUnitType extends UnitType{
         }
 
         Draw.mixcol();
+    }
+
+    @Override
+    public void createIcons(MultiPacker packer){
+        super.createIcons(packer);
+
+        if(outlines){
+
+        }
     }
 }

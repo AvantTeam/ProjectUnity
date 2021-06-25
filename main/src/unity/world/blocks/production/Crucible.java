@@ -42,14 +42,14 @@ public class Crucible extends GraphBlock{
     public void load(){
         super.load();
         
-        liquidRegions = Utils.getRegions(liquidRegion, 12, 4);
-        baseRegions = Utils.getRegions(atlas.find(name + "-base"), 12, 4);
+        liquidRegions = GraphicUtils.getRegions(liquidRegion, 12, 4);
+        baseRegions = GraphicUtils.getRegions(atlas.find(name + "-base"), 12, 4);
         floorRegion = atlas.find(name + "-floor");
-        roofRegions = Utils.getRegions(atlas.find(name + "-roof"), 12, 4);
+        roofRegions = GraphicUtils.getRegions(atlas.find(name + "-roof"), 12, 4);
         
         solidItem = atlas.find(name + "-solid");
-        solidItemStrips = Utils.getRegions(atlas.find(name + "-solidstrip"), 6, 1);
-        heatRegions = Utils.getRegions(heatRegion, 12, 4);
+        solidItemStrips = GraphicUtils.getRegions(atlas.find(name + "-solidstrip"), 6, 1);
+        heatRegions = GraphicUtils.getRegions(heatRegion, 12, 4);
     }
 
     public class CrucibleBuild extends GraphBuild{

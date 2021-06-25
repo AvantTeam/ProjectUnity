@@ -157,31 +157,6 @@ public final class Utils{
         return angle;
     }
 
-    /** Same thing like the drawer from UnitType without applyColor and outlines. */
-    public static void simpleUnitDrawer(Unit unit, boolean drawLegs){
-        UnitType type = unit.type;
-
-        if(drawLegs){
-            if(unit instanceof Mechc){
-                //TODO draw the legs
-            }
-        }
-
-        Draw.rect(type.region, unit.x, unit.y, unit.rotation - 90f);
-        float rotation = unit.rotation - 90f;
-        for(WeaponMount mount : unit.mounts){
-            Weapon weapon = mount.weapon;
-
-            float weaponRotation = rotation + (weapon.rotate ? mount.rotation : 0f);
-            float recoil = -(mount.reload / weapon.reload * weapon.recoil);
-
-            float wx = unit.x + Angles.trnsx(rotation, weapon.x, weapon.y) + Angles.trnsx(weaponRotation, 0f, recoil);
-            float wy = unit.y + Angles.trnsy(rotation, weapon.x, weapon.y) + Angles.trnsy(weaponRotation, 0f, recoil);
-
-            Draw.rect(weapon.region, wx, wy, weapon.region.width * Draw.scl * -Mathf.sign(weapon.flipSprite), weapon.region.height * Draw.scl, weaponRotation);
-        }
-    }
-
     public static void shotgunRange(int points, float range, float angle, Floatc cons){
         if(points <= 1){
             cons.get(angle);
@@ -726,80 +701,6 @@ public final class Utils{
         current = Math.min(target, current);
         
         return Math.min(coefficient * (target - current) * maxTorque / target, 99999f);
-    }
-
-    public static TextureRegion getRegionRect(TextureRegion region, float x, float y, int rw, int rh, int w, int h){
-        TextureRegion reg = new TextureRegion(region);
-        float tileW = (reg.u2 - reg.u) / w;
-        float tileH = (region.v2 - region.v) / h;
-        float tileX = x / w;
-        float tileY = y / h;
-
-        reg.u = Mathf.map(tileX, 0f, 1f, reg.u, reg.u2) + tileW * 0.02f;
-        reg.v = Mathf.map(tileY, 0f, 1f, reg.v, reg.v2) + tileH * 0.02f;
-        reg.u2 = reg.u + tileW * (rw - 0.02f);
-        reg.v2 = reg.v + tileH * (rh - 0.02f);
-        reg.width = 32 * rw;
-        reg.height = 32 * rh;
-        
-        return reg;
-    }
-
-    /**
-     * Gets multiple regions inside a {@link TextureRegion}. The size for each region has to be 32.
-     * @param w The amount of regions horizontally.
-     * @param h The amount of regions vertically.
-     */
-    public static TextureRegion[] getRegions(TextureRegion region, int w, int h){
-        int size = w * h;
-        TextureRegion[] regions = new TextureRegion[size];
-        
-        float tileW = (region.u2 - region.u) / w;
-        float tileH = (region.v2 - region.v) / h;
-
-        for(int i = 0; i < size; i++){
-            float tileX = ((float)(i % w)) / w;
-            float tileY = ((float)(i / w)) / h;
-            TextureRegion reg = new TextureRegion(region);
-
-            //start coordinate
-            reg.u = Mathf.map(tileX, 0f, 1f, reg.u, reg.u2) + tileW * 0.02f;
-            reg.v = Mathf.map(tileY, 0f, 1f, reg.v, reg.v2) + tileH * 0.02f;
-            //end coordinate
-            reg.u2 = reg.u + tileW * 0.96f;
-            reg.v2 = reg.v + tileH * 0.96f;
-            
-            reg.width = reg.height = 32;
-            
-            regions[i] = reg;
-        }
-        return regions;
-    }
-
-    /**
-     * Lerps 2 TextureRegions.
-     * @author sk7725
-     */
-    public static TextureRegion blendSprites(TextureRegion a, TextureRegion b, float f, String name){
-        PixmapRegion r1 = Core.atlas.getPixmap(a);
-        PixmapRegion r2 = Core.atlas.getPixmap(b);
-
-        Pixmap out = new Pixmap(r1.width, r1.height);
-        //out.setBlending(Pixmap.Blending.none);
-        Color color1 = new Color();
-        Color color2 = new Color();
-
-        for(int x = 0; x < r1.width; x++){
-            for(int y = 0; y < r1.height; y++){
-
-                r1.get(x, y, color1);
-                r2.get(x, y, color2);
-                out.set(x, y, color1.lerp(color2, f));
-            }
-        }
-
-        Texture texture  = new Texture(out);
-        return Core.atlas.addRegion(name + "-blended-" + (int)(f * 100), new TextureRegion(texture));
     }
 
     public static Color tempColor(float temp){

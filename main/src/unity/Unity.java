@@ -2,9 +2,11 @@ package unity;
 
 import arc.*;
 import arc.func.*;
+import arc.graphics.g2d.TextureAtlas.*;
 import arc.scene.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.async.*;
 import mindustry.*;
 import mindustry.mod.*;
 import mindustry.mod.Mods.*;
@@ -134,8 +136,22 @@ public class Unity extends Mod implements ApplicationListener{
 
             unity.meta.displayName = stringf.get(unity.meta.name + ".name");
             unity.meta.description = stringf.get(unity.meta.name + ".description");
+
+            var exec = new AsyncExecutor();
+            for(AtlasRegion region : Core.atlas.getRegions()){
+                //assume `unity-` is always the PU sprites
+                if(!region.name.startsWith("unity-")) continue;
+
+                exec.submit(() -> {
+                    try{
+                        GraphicUtils.antialias(region);
+                    }catch(Throwable t){
+                        Log.err(Strings.format("Failed to antialias @", region.name), t);
+                    }
+                });
+            }
         }
-        
+
         dev.initScripts();
     }
 

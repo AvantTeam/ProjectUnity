@@ -12,7 +12,6 @@ import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
-import mindustry.ui.*;
 import mindustry.world.blocks.defense.turrets.Turret.*;
 import unity.entities.*;
 import unity.entities.abilities.BaseAbility.*;
@@ -769,7 +768,7 @@ public class UnityFx{
         color(1f, 1f, 1f, e.fout());
         blend(Blending.additive);
 
-        Utils.simpleUnitDrawer((Unit)e.data, false);
+        GraphicUtils.simpleUnitDrawer((Unit)e.data, false);
 
         blend();
         color();

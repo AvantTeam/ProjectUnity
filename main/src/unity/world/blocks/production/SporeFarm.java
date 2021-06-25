@@ -38,7 +38,7 @@ public class SporeFarm extends Block{
             groundRegions[i] = atlas.find(name + "-ground" + (i + 1));
         }
         
-        fenceRegions = Utils.getRegions(atlas.find(name + "-fence"), 12, 4);
+        fenceRegions = GraphicUtils.getRegions(atlas.find(name + "-fence"), 12, 4);
         cageFloor = atlas.find(name + "-floor");
     }
 
