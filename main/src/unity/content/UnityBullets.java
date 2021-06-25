@@ -602,6 +602,14 @@ public class UnityBullets implements ContentList{
             }
 
             @Override
+            public void hitTile(Bullet b, Building build, float initialHealth, boolean direct){
+                super.hitTile(b, build, initialHealth, direct);
+                if(b.owner instanceof Healthc owner){
+                    owner.heal(Math.max(initialHealth - build.health(), 0f) * 0.2f);
+                }
+            }
+
+            @Override
             public void hitEntity(Bullet b, Hitboxc entity, float health){
                 super.hitEntity(b, entity, health);
                 if(entity instanceof Healthc h && b.owner instanceof Healthc owner){
