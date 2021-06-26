@@ -2,6 +2,8 @@ package unity;
 
 import arc.*;
 import arc.func.*;
+import arc.graphics.*;
+import arc.graphics.g2d.*;
 import arc.graphics.g2d.TextureAtlas.*;
 import arc.scene.*;
 import arc.struct.*;
@@ -51,24 +53,39 @@ public class Unity extends Mod implements ApplicationListener{
         new OverWriter()
     };
 
+    private final AsyncExecutor exec = new AsyncExecutor();
     private static LoadedMod unity;
 
     public Unity(){
         ContributorList.init();
-        if(Core.app != null){
-            Core.app.addListener(this);
-        }
 
-        if(Core.assets != null){
-            Core.assets.setLoader(WavefrontObject.class, new WavefrontObjectLoader(tree));
-        }
+        Core.app.addListener(this);
+        Core.assets.setLoader(WavefrontObject.class, new WavefrontObjectLoader(tree));
 
         KamiPatterns.load();
         KamiBulletDatas.load();
 
         Events.on(ContentInitEvent.class, e -> {
             if(!headless){
-                Regions.load();
+                Regions.load(); //load existing regions
+
+                //TODO use runtime annotations for outline color
+                Color outlineColor = Color.valueOf("404049");
+                for(var field : Regions.class.getDeclaredFields()){
+                    if(!TextureRegion.class.isAssignableFrom(field.getType()) || !field.getName().endsWith("OutlineRegion")) continue;
+
+                    var f = ReflectUtils.findField(Regions.class, field.getName().replaceFirst("Outline", ""), false);
+                    TextureRegion raw = ReflectUtils.getField(null, f);
+
+                    if(raw instanceof AtlasRegion at && at.found()){
+                        PixmapRegion sprite = Core.atlas.getPixmap(at);
+                        Texture out = new Texture(Pixmaps.outline(sprite, outlineColor, 4));
+
+                        Core.atlas.addRegion(at.name + "-outline", out, 0, 0, out.width, out.height);
+                    }
+                }
+
+                Regions.load(); //load generated regions
                 KamiRegions.load();
             }
 
@@ -88,6 +105,7 @@ public class Unity extends Mod implements ApplicationListener{
 
         Events.on(ClientLoadEvent.class, e -> {
             addCredits();
+
             UnitySettings.init();
             SpeechDialog.init();
 
@@ -108,9 +126,7 @@ public class Unity extends Mod implements ApplicationListener{
         tap = new TapHandler();
         antiCheat = new AntiCheat();
 
-        if(asyncCore != null){
-            asyncCore.processes.add(new LightProcess());
-        }
+        asyncCore.processes.add(new LightProcess());
     }
 
     @Override
@@ -137,7 +153,6 @@ public class Unity extends Mod implements ApplicationListener{
             unity.meta.displayName = stringf.get(unity.meta.name + ".name");
             unity.meta.description = stringf.get(unity.meta.name + ".description");
 
-            var exec = new AsyncExecutor();
             for(AtlasRegion region : Core.atlas.getRegions()){
                 //assume `unity-` is always the PU sprites
                 if(!region.name.startsWith("unity-")) continue;
@@ -217,6 +232,7 @@ public class Unity extends Mod implements ApplicationListener{
         }
     }
 
+    //TODO support for LogLevel too
     public static void print(Object... args){
         StringBuilder builder = new StringBuilder();
         if(args == null){

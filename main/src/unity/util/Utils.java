@@ -1,9 +1,7 @@
 package unity.util;
 
-import arc.*;
 import arc.func.*;
 import arc.graphics.*;
-import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.Interp.*;
 import arc.math.geom.*;
@@ -13,11 +11,9 @@ import arc.util.pooling.*;
 import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
-import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.type.*;
 import mindustry.world.*;
 import unity.graphics.*;
 
@@ -25,6 +21,8 @@ import static mindustry.Vars.*;
 
 public final class Utils{
     public static final PowIn pow6In = new PowIn(6);
+
+    public static final float sqrtHalf = Mathf.sqrt(0.5f);
 
     private static final Vec2 tV = new Vec2(), tV2 = new Vec2();
     private static final Seq<Healthc> tmpUnitSeq = new Seq<>();
@@ -57,7 +55,7 @@ public final class Utils{
     public static <T extends Buildingc> Tile getBestTile(T build, int before, int after){
         Tile tile = build.tile();
         int bound = before - after + 1;
-        int offset = Mathf.floorPositive(bound / 2);
+        int offset = Mathf.floorPositive(bound / 2f);
 
         if(bound % 2 == 0 && after % 2 == 0) offset--;
         offset *= -1;
@@ -79,7 +77,7 @@ public final class Utils{
 
     public static boolean notSolid(Tile tile, int size, int x, int y){
         Tile ttile = tile.nearby(x, y);
-        int off = Mathf.floorPositive((size - 1) / 2) * -1;
+        int off = Mathf.floorPositive((size - 1) / 2f) * -1;
 
         for(int i = off; i < size + off; i++){
             for(int j = off; j < size + off; j++){

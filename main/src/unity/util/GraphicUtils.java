@@ -1,12 +1,17 @@
 package unity.util;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g2d.TextureAtlas.*;
 import arc.math.*;
+import arc.struct.*;
+import arc.util.*;
 import arc.util.pooling.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
+import mindustry.graphics.MultiPacker.*;
 import mindustry.type.*;
 
 import java.util.*;
@@ -62,31 +67,6 @@ public final class GraphicUtils{
         return regions;
     }
 
-    /**
-     * Interpolates 2 {@link TextureRegion}s.
-     * @author sk7725
-     */
-    public static TextureRegion blendSprites(TextureRegion a, TextureRegion b, float f, String name){
-        PixmapRegion r1 = atlas.getPixmap(a);
-        PixmapRegion r2 = atlas.getPixmap(b);
-
-        Pixmap out = new Pixmap(r1.width, r1.height);
-        Color color1 = new Color();
-        Color color2 = new Color();
-
-        for(int x = 0; x < r1.width; x++){
-            for(int y = 0; y < r1.height; y++){
-
-                r1.get(x, y, color1);
-                r2.get(x, y, color2);
-                out.setRaw(x, y, color1.lerp(color2, f).rgba());
-            }
-        }
-
-        Texture tex  = new Texture(out);
-        return atlas.addRegion(name + "-blended-" + (int)(f * 100), tex, 0, 0, tex.width, tex.height);
-    }
-
     /** Same thing like the drawer from {@link UnitType} without applyColor and outlines. */
     public static void simpleUnitDrawer(Unit unit, boolean drawLegs){
         UnitType type = unit.type;
@@ -112,12 +92,80 @@ public final class GraphicUtils{
         }
     }
 
-    public static TextureRegion outline(TextureRegion region, Color color, int width){
-        if(!(region instanceof AtlasRegion at)) throw new IllegalArgumentException("region must be AtlasRegion");
+    /**
+     * Interpolates 2 {@link TextureRegion}s.
+     * @author sk7725
+     */
+    public static TextureRegion blendSprites(TextureRegion a, TextureRegion b, float f, String name){
+        PixmapRegion r1 = atlas.getPixmap(a);
+        PixmapRegion r2 = atlas.getPixmap(b);
 
-        var pix = Pixmaps.outline(atlas.getPixmap(region), color, width);
-        var tex = new Texture(pix);
-        return atlas.addRegion(at.name + "-outline", tex, 0, 0, tex.width, tex.height);
+        Pixmap out = new Pixmap(r1.width, r1.height);
+        Color color1 = new Color();
+        Color color2 = new Color();
+
+        for(int x = 0; x < r1.width; x++){
+            for(int y = 0; y < r1.height; y++){
+                r1.get(x, y, color1);
+                r2.get(x, y, color2);
+                out.setRaw(x, y, color1.lerp(color2, f).rgba());
+            }
+        }
+
+        Texture tex  = new Texture(out);
+        return atlas.addRegion(name + "-blended-" + (int)(f * 100), tex, 0, 0, tex.width, tex.height);
+    }
+
+    public static Pixmap outline(TextureRegion region, Color color, int width){
+        var out = Pixmaps.outline(atlas.getPixmap(region), color, width);
+        if(Core.settings.getBool("linear")){
+            Pixmaps.bleed(out);
+        }
+
+        return out;
+    }
+
+    public static Pixmap outline(Pixmap pixmap, Color color, int width){
+        var out = Pixmaps.outline(new PixmapRegion(pixmap), color, width);
+        if(Core.settings.getBool("linear")){
+            Pixmaps.bleed(out);
+        }
+
+        return out;
+    }
+
+    public static void outline(MultiPacker packer, TextureRegion region, Color color, int width){
+        if(region instanceof AtlasRegion at && at.found()){
+            outline(packer, region, color, width, at.name + "-outline", false);
+        }
+    }
+
+    public static void outline(MultiPacker packer, TextureRegion region, Color color, int width, String name, boolean override){
+        if(region instanceof AtlasRegion at && at.found() && (override || !packer.has(name))){
+            packer.add(PageType.main, name, outline(region, color, width));
+        }
+    }
+
+    public static void drawCenter(Pixmap pix, Pixmap other){
+        pix.draw(other, pix.width / 2 - other.width / 2, pix.height / 2 - other.height / 2, true);
+    }
+
+    public static Pixmap get(MultiPacker packer, TextureRegion region){
+        if(region instanceof AtlasRegion at){
+            var reg = packer.get(at.name);
+            if(reg != null) return reg.pixmap;
+
+            return atlas.getPixmap(at.name).pixmap;
+        }else{
+            return null;
+        }
+    }
+
+    public static Pixmap get(MultiPacker packer, String name){
+        var reg = packer.get(name);
+        if(reg != null) return reg.pixmap;
+
+        return atlas.getPixmap(name).pixmap;
     }
 
     public static void antialias(TextureRegion region){
@@ -211,5 +259,140 @@ public final class GraphicUtils{
 
     public static int getColorClamped(Pixmap image, int x, int y){
         return image.getRaw(Math.max(Math.min(x, image.width - 1), 0), Math.max(Math.min(y, image.height - 1), 0));
+    }
+
+    /** @author Drullkus */
+    public static Color colorLerp(Color a, Color b, float frac){
+        return a.set(
+            pythagoreanLerp(a.r, b.r, frac),
+            pythagoreanLerp(a.g, b.g, frac),
+            pythagoreanLerp(a.b, b.b, frac),
+            pythagoreanLerp(a.a, b.a, frac)
+        );
+    }
+
+    /** @author Drullkus */
+    public static Color averageColor(Color a, Color b){
+        return a.set(
+            pythagoreanAverage(a.r, b.r),
+            pythagoreanAverage(a.g, b.g),
+            pythagoreanAverage(a.b, b.b),
+            pythagoreanAverage(a.a, b.a)
+        );
+    }
+
+    /**
+     * Pythagorean-style interpolation will result in color transitions that appear more natural than linear interpolation
+     * @author Drullkus
+     */
+    public static float pythagoreanLerp(float a, float b, float frac){
+        if(a == b || frac <= 0) return a;
+        if(frac >= 1) return b;
+
+        a *= a * (1 - frac);
+        b *= b * frac;
+
+        return Mathf.sqrt(a + b);
+    }
+
+    /** @author Drullkus */
+    public static float pythagoreanAverage(float a, float b){
+        return Mathf.sqrt(a * a + b * b) * Utils.sqrtHalf;
+    }
+
+    /**
+     * Almost Bilinear Interpolation except the underlying color interpolator uses {@link #pythagoreanLerp(float, float, float)}.
+     * @author Drullkus
+     */
+    public static Color getColor(Pixmap pix, Color ref, float x, float y){
+        // Cast floats into ints twice instead of casting 20 times
+        int xInt = (int)x;
+        int yInt = (int)y;
+
+        if(!Structs.inBounds(xInt, yInt, pix.width, pix.height)) return ref.set(0, 0, 0, 0);
+
+        // A lot of these booleans are commonly checked, so let's run each check just once
+        boolean isXInt = x == xInt;
+        boolean isYInt = y == yInt;
+        boolean xOverflow = x + 1 > pix.width;
+        boolean yOverflow = y + 1 > pix.height;
+
+        // Remember: x & y values themselves are already checked if in-bounds
+        if((isXInt && isYInt) || (xOverflow && yOverflow)) return ref.set(pix.get(xInt, yInt));
+
+        if(isXInt || xOverflow){
+            return ref.set(colorLerp(Tmp.c1.set(getAlphaMedianColor(pix, ref, xInt, yInt)), getAlphaMedianColor(pix, ref, xInt, yInt + 1), y % 1));
+        }else if(isYInt || yOverflow){
+            return ref.set(colorLerp(Tmp.c1.set(getAlphaMedianColor(pix, ref, xInt, yInt)), getAlphaMedianColor(pix, ref, xInt + 1, yInt), x % 1));
+        }
+
+        // Because Color is mutable, strictly 3 Color objects are effectively pooled; this sprite's color ("c0") and Temp's c1 & c2.
+        // The first row sets color to c0, which is then set to c1. New color is set to c0, and #colorLerp() puts result of c1 and c0 onto c1.
+        // The second row does the same thing, but with c2 in the place of c1. Finally on return line, the result between c1 and c2 is put onto c1, which is then set to c0
+        colorLerp(Tmp.c1.set(getAlphaMedianColor(pix, ref, xInt, yInt)), getAlphaMedianColor(pix, ref, xInt + 1, yInt), x % 1);
+        colorLerp(Tmp.c2.set(getAlphaMedianColor(pix, ref, xInt, yInt + 1)), getAlphaMedianColor(pix, ref, xInt + 1, yInt + 1), x % 1);
+
+        return ref.set(colorLerp(Tmp.c1, Tmp.c2, y % 1));
+    }
+
+    /** @author Drullkus */
+    public static Color getAlphaMedianColor(Pixmap pix, Color ref, int x, int y){
+        float alpha = ref.set(pix.get(x, y)).a;
+        if(alpha >= 0.1f) return ref;
+
+        Color
+            c1 = Pools.obtain(Color.class, Color::new).set(0f, 0f, 0f, 0f),
+            c2 = Pools.obtain(Color.class, Color::new).set(0f, 0f, 0f, 0f),
+            c3 = Pools.obtain(Color.class, Color::new).set(0f, 0f, 0f, 0f),
+            c4 = Pools.obtain(Color.class, Color::new).set(0f, 0f, 0f, 0f);
+
+        Color out = alphaMedian(
+            ref.cpy(),
+            c1.set(pix.get(x + 1, y)),
+            c2.set(pix.get(x, y + 1)),
+            c3.set(pix.get(x - 1, y)),
+            c4.set(pix.get(x, y - 1))
+        ).a(alpha);
+
+        Pools.free(c1);
+        Pools.free(c2);
+        Pools.free(c3);
+        Pools.free(c4);
+
+        return out;
+    }
+
+    /** @author Drullkus */
+    public static Color alphaMedian(Color main, Color ref, Color... colors){
+        ObjectIntMap<Color> matches = new ObjectIntMap<>();
+        int count, primaryCount = -1, secondaryCount = -1;
+
+        Tmp.c3.set(main);
+        Tmp.c4.set(main);
+
+        for(Color color : colors){
+            if(color.a < 0.1f) continue;
+
+            count = matches.increment(color) + 1;
+
+            if(count > primaryCount){
+                secondaryCount = primaryCount;
+                Tmp.c4.set(Tmp.c3);
+
+                primaryCount = count;
+                Tmp.c3.set(color);
+            }else if(count > secondaryCount){
+                secondaryCount = count;
+                Tmp.c4.set(color);
+            }
+        }
+
+        if(primaryCount > secondaryCount){
+            return ref.set(Tmp.c3);
+        }else if(primaryCount == -1){
+            return ref.set(main);
+        }else{
+            return ref.set(averageColor(Tmp.c3, Tmp.c4));
+        }
     }
 }

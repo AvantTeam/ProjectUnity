@@ -5,6 +5,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.util.*;
 import mindustry.game.EventType.*;
+import mindustry.graphics.*;
 import mindustry.type.*;
 import unity.mod.*;
 import unity.util.*;
@@ -40,6 +41,7 @@ public class AnimatedItem extends Item{
             );
         }
 
+        //TODO this should be done in createIcons(), i'm looking at you sk
         animRegions = new TextureRegion[n];
         for(int i = 0; i < frames; i++){
             if(transitionFrames <= 0){
