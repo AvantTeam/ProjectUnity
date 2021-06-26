@@ -150,22 +150,28 @@ public final class GraphicUtils{
         pix.draw(other, pix.width / 2 - other.width / 2, pix.height / 2 - other.height / 2, true);
     }
 
-    public static Pixmap get(MultiPacker packer, TextureRegion region){
+    public static void drawCenter(Pixmap pix, PixmapRegion other){
+        var copy = other.crop();
+        drawCenter(pix, copy);
+        copy.dispose();
+    }
+
+    public static PixmapRegion get(MultiPacker packer, TextureRegion region){
         if(region instanceof AtlasRegion at){
             var reg = packer.get(at.name);
-            if(reg != null) return reg.pixmap;
+            if(reg != null) return reg;
 
-            return atlas.getPixmap(at.name).pixmap;
+            return atlas.getPixmap(at.name);
         }else{
             return null;
         }
     }
 
-    public static Pixmap get(MultiPacker packer, String name){
+    public static PixmapRegion get(MultiPacker packer, String name){
         var reg = packer.get(name);
-        if(reg != null) return reg.pixmap;
+        if(reg != null) return reg;
 
-        return atlas.getPixmap(name).pixmap;
+        return atlas.getPixmap(name);
     }
 
     public static void antialias(TextureRegion region){
@@ -180,9 +186,9 @@ public final class GraphicUtils{
     public static void antialias(Pixmap image){
         var out = image.copy();
 
-        var color = Pools.obtain(Color.class, Color::new).set(0);
-        var sum = Pools.obtain(Color.class, Color::new).set(0);
-        var suma = Pools.obtain(Color.class, Color::new).set(0);
+        var color = Pools.obtain(Color.class, Color::new).set(0f, 0f, 0f, 0f);
+        var sum = Pools.obtain(Color.class, Color::new).set(0f, 0f, 0f, 0f);
+        var suma = Pools.obtain(Color.class, Color::new).set(0f, 0f, 0f, 0f);
         var p = new int[9];
 
         for(int x = 0; x < image.width; x++){
@@ -208,7 +214,7 @@ public final class GraphicUtils{
                 if((F == H && F != B && H != D && E != G) || (H == D && H != F && D != B && E != I)) p[7] = H;
                 if(F == H && F != B && H != D) p[8] = F;
 
-                suma.set(0);
+                suma.set(0f, 0f, 0f, 0f);
 
                 for(int val : p){
                     color.rgba8888(val);
@@ -253,7 +259,6 @@ public final class GraphicUtils{
         pixels.position(0);
         pixels.put(outp);
         pixels.position(0);
-
         out.dispose();
     }
 
@@ -304,7 +309,7 @@ public final class GraphicUtils{
      * Almost Bilinear Interpolation except the underlying color interpolator uses {@link #pythagoreanLerp(float, float, float)}.
      * @author Drullkus
      */
-    public static Color getColor(Pixmap pix, Color ref, float x, float y){
+    public static Color getColor(PixmapRegion pix, Color ref, float x, float y){
         // Cast floats into ints twice instead of casting 20 times
         int xInt = (int)x;
         int yInt = (int)y;
@@ -336,7 +341,7 @@ public final class GraphicUtils{
     }
 
     /** @author Drullkus */
-    public static Color getAlphaMedianColor(Pixmap pix, Color ref, int x, int y){
+    public static Color getAlphaMedianColor(PixmapRegion pix, Color ref, int x, int y){
         float alpha = ref.set(pix.get(x, y)).a;
         if(alpha >= 0.1f) return ref;
 

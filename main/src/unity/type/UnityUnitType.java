@@ -98,7 +98,6 @@ public class UnityUnitType extends UnitType{
 
     public UnityUnitType(String name){
         super(name);
-        outlines = false;
     }
 
     @Override
@@ -617,9 +616,9 @@ public class UnityUnitType extends UnitType{
     public void createIcons(MultiPacker packer){
         super.createIcons(packer);
 
-        if(outlines){
+        Color color = Pools.obtain(Color.class, Color::new).set(0f, 0f, 0f, 0f);
+        try{
             float scl = Draw.scl / 4f;
-            Color color = Pools.obtain(Color.class, Color::new).set(0f, 0f, 0f, 0f);
 
             Cons<TextureRegion> outliner = t -> {
                 if(t instanceof AtlasRegion at && outlined.add(at.name)){
@@ -660,7 +659,8 @@ public class UnityUnitType extends UnitType{
 
                     if(atlas.has(rotor.name + "-blade-ghost") || !atlas.has(rotor.name + "-blade")) continue;
 
-                    Pixmap bladeSprite = GraphicUtils.get(packer, rotor.name + "-blade");
+                    PixmapRegion bladeSprite = atlas.getPixmap(rotor.name + "-blade");
+                    Unity.print(bladeSprite.width, bladeSprite.height);
 
                     // This array is to be written in the order where colors at index 0 are located towards the center,
                     // and colors at the end of the array is located towards at the edge.
@@ -703,42 +703,62 @@ public class UnityUnitType extends UnitType{
             if(unit instanceof Mechc){
                 GraphicUtils.drawCenter(icon, GraphicUtils.get(packer, baseRegion));
                 GraphicUtils.drawCenter(icon, GraphicUtils.get(packer, legRegion));
-                GraphicUtils.drawCenter(icon, GraphicUtils.get(packer, legRegion).flipX());
+
+                var flip = GraphicUtils.get(packer, legRegion).crop().flipX();
+                GraphicUtils.drawCenter(icon, flip);
+                flip.dispose();
+
                 icon.draw(GraphicUtils.get(packer, name), true);
             }
 
             for(Weapon weapon : weapons){
                 if((!weapon.top || bottomWeapons.contains(weapon.name))){
                     var out = GraphicUtils.get(packer, weapon.name + "-outline");
+                    Pixmap pix = out.crop();
 
-                    icon.draw(weapon.flipSprite ? out.flipX() : out,
+                    if(weapon.flipSprite){
+                        var newPix = pix.flipX();
+                        pix.dispose();
+                        pix = newPix;
+                    }
+
+                    icon.draw(pix,
                         (int)(weapon.x / scl + icon.width / 2f - out.width / 2f),
                         (int)(-weapon.y / scl + icon.height / 2f - out.height / 2f),
                         true
                     );
+
+                    pix.dispose();
                 }
             }
 
             icon.draw(GraphicUtils.get(packer, name), true);
             int baseColor = Color.valueOf(color, "ffa665").rgba();
 
-            Pixmap baseCell = atlas.getPixmap(cellRegion).pixmap;
+            Pixmap baseCell = atlas.getPixmap(cellRegion).crop();
             Pixmap cell = new Pixmap(cellRegion.width, cellRegion.height);
             cell.each((x, y) -> cell.set(x, y, Color.muli(baseCell.get(x, y), baseColor)));
 
+            baseCell.dispose();
             icon.draw(cell, icon.width / 2 - cell.width / 2, icon.height / 2 - cell.height / 2, true);
 
             for(Weapon weapon : weapons){
-                Pixmap wepReg = weapon.top ? GraphicUtils.get(packer, weapon.name + "-outline") : GraphicUtils.get(packer, weapon.region);
+                PixmapRegion wepReg = weapon.top ? GraphicUtils.get(packer, weapon.name + "-outline") : GraphicUtils.get(packer, weapon.region);
+                Pixmap pix = wepReg.crop();
+
                 if(weapon.flipSprite){
-                    wepReg = wepReg.flipX();
+                    var newPix = pix.flipX();
+                    pix.dispose();
+                    pix = newPix;
                 }
 
-                icon.draw(wepReg,
+                icon.draw(pix,
                     (int)(weapon.x / scl + icon.width / 2f - weapon.region.width / 2f),
                     (int)(-weapon.y / scl + icon.height / 2f - weapon.region.height / 2f),
                     true
                 );
+
+                pix.dispose();
             }
 
             if(unit instanceof Copterc){
@@ -746,7 +766,7 @@ public class UnityUnitType extends UnitType{
                 Pixmap tops = new Pixmap(icon.width, icon.height);
 
                 for(Rotor rotor : rotors){
-                    Pixmap bladeSprite = GraphicUtils.get(packer, rotor.bladeRegion);
+                    PixmapRegion bladeSprite = GraphicUtils.get(packer, rotor.bladeRegion);
 
                     float bladeSeparation = 360f / rotor.bladeCount;
 
@@ -772,11 +792,13 @@ public class UnityUnitType extends UnitType{
                         }
                     });
 
-                    Pixmap topSprite = GraphicUtils.get(packer, rotor.topRegion);
+                    PixmapRegion topSprite = GraphicUtils.get(packer, rotor.topRegion);
                     int topXCenter = (int)(rotor.x / scl + icon.width / 2f - topSprite.width / 2f);
                     int topYCenter = (int)(-rotor.y / scl + icon.height / 2f - topSprite.height / 2f);
 
-                    tops.draw(topSprite, topXCenter, topYCenter, true);
+                    var out = topSprite.crop();
+                    tops.draw(out, topXCenter, topYCenter, true);
+                    out.dispose();
                 }
 
                 Pixmap propOutlined = GraphicUtils.outline(propellers, outlineColor, outlineRadius);
@@ -801,11 +823,16 @@ public class UnityUnitType extends UnitType{
                 packer.add(PageType.main, name + "-cell-payload", payloadCell);
             }
 
+            packer.add(PageType.main, name + "-full", icon);
+            Unity.print(Strings.format("Created icons for @", name));
+        }catch(Throwable t){
+            Log.err(Strings.format("Couldn't create icons for @", name), t);
+        }finally{
             Pools.free(color);
         }
     }
 
-    private int populateColorArray(int[] heightAverageColors, Pixmap bladeSprite, int halfHeight){
+    private int populateColorArray(int[] heightAverageColors, PixmapRegion bladeSprite, int halfHeight){
         Color
             c1 = Pools.obtain(Color.class, Color::new).set(0f, 0f, 0f, 0f),
             c2 = Pools.obtain(Color.class, Color::new).set(0f, 0f, 0f, 0f),
@@ -815,7 +842,7 @@ public class UnityUnitType extends UnitType{
 
         for(int y = halfHeight - 1; y >= 0; y--){
             for(int x = 0; x < bladeSprite.width; x++){
-                c2.set(bladeSprite.get(x, y));
+                bladeSprite.get(x, y, c2);
 
                 if(c2.a > 0){
                     hits++;

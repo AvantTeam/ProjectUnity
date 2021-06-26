@@ -3,12 +3,12 @@ package unity;
 import arc.*;
 import arc.func.*;
 import arc.graphics.*;
+import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g2d.TextureAtlas.*;
 import arc.scene.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.async.*;
 import mindustry.*;
 import mindustry.mod.*;
 import mindustry.mod.Mods.*;
@@ -53,7 +53,6 @@ public class Unity extends Mod implements ApplicationListener{
         new OverWriter()
     };
 
-    private final AsyncExecutor exec = new AsyncExecutor();
     private static LoadedMod unity;
 
     public Unity(){
@@ -69,7 +68,6 @@ public class Unity extends Mod implements ApplicationListener{
             if(!headless){
                 Regions.load(); //load existing regions
 
-                //TODO use runtime annotations for outline color
                 Color outlineColor = Color.valueOf("404049");
                 for(var field : Regions.class.getDeclaredFields()){
                     if(!TextureRegion.class.isAssignableFrom(field.getType()) || !field.getName().endsWith("OutlineRegion")) continue;
@@ -79,13 +77,17 @@ public class Unity extends Mod implements ApplicationListener{
 
                     if(raw instanceof AtlasRegion at && at.found()){
                         PixmapRegion sprite = Core.atlas.getPixmap(at);
-                        Texture out = new Texture(Pixmaps.outline(sprite, outlineColor, 4));
 
-                        Core.atlas.addRegion(at.name + "-outline", out, 0, 0, out.width, out.height);
+                        Texture out = new Texture(Pixmaps.outline(sprite, outlineColor, 4));
+                        TextureFilter filter = Core.settings.getBool("linear")
+                        ?   TextureFilter.linear
+                        :   TextureFilter.nearest;
+
+                        out.setFilter(filter, filter);
+                        ReflectUtils.setField(null, f, Core.atlas.addRegion(at.name + "-outline", out, 0, 0, out.width, out.height));
                     }
                 }
 
-                Regions.load(); //load generated regions
                 KamiRegions.load();
             }
 
@@ -108,6 +110,10 @@ public class Unity extends Mod implements ApplicationListener{
 
             UnitySettings.init();
             SpeechDialog.init();
+
+            Func<String, String> stringf = value -> Core.bundle.get("mod." + value);
+            unity.meta.displayName = stringf.get(unity.meta.name + ".name");
+            unity.meta.description = stringf.get(unity.meta.name + ".description");
 
             Core.settings.getBoolOnce("unity-install", () -> Time.runTask(5f, CreditsDialog::showList));
         });
@@ -147,27 +153,7 @@ public class Unity extends Mod implements ApplicationListener{
         UnityCall.init();
         BlockMovement.init();
 
-        if(!headless){
-            Func<String, String> stringf = value -> Core.bundle.get("mod." + value);
-
-            unity.meta.displayName = stringf.get(unity.meta.name + ".name");
-            unity.meta.description = stringf.get(unity.meta.name + ".description");
-
-            for(AtlasRegion region : Core.atlas.getRegions()){
-                //assume `unity-` is always the PU sprites
-                if(!region.name.startsWith("unity-")) continue;
-
-                exec.submit(() -> {
-                    try{
-                        GraphicUtils.antialias(region);
-                    }catch(Throwable t){
-                        Log.err(Strings.format("Failed to antialias @", region.name), t);
-                    }
-                });
-            }
-        }
-
-        dev.initScripts();
+        dev.init();
     }
 
     @Override
