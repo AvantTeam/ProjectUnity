@@ -215,7 +215,7 @@ public class Unity extends Mod{
             content.each(c -> {
                 if(
                     !(c instanceof UnlockableContent cont) ||
-                    (c.minfo.mod == null || c.minfo.mod.main.getClass() != Unity.class)
+                    (c.minfo.mod == null || c.minfo.mod.main == null || c.minfo.mod.main.getClass() != Unity.class)
                 ) return;
 
                 if(Core.bundle.getOrNull(cont.getContentType() + "." + cont.name + ".name") == null){
