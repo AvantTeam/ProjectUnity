@@ -129,6 +129,8 @@ public class Unity extends Mod{
 
     @Override
     public void loadContent(){
+        Faction.init();
+
         for(ContentList list : content){
             list.load();
             print("Loaded content list: " + list.getClass().getSimpleName());
@@ -205,7 +207,7 @@ public class Unity extends Mod{
     public void logContent(){
         for(Faction faction : Faction.all){
             var array = FactionMeta.getByFaction(faction, Object.class);
-            print(Strings.format("Faction @ has @ contents.", faction.localizedName, array.size));
+            print(Strings.format("Faction @ has @ contents.", faction, array.size));
         }
 
         Seq<Class<?>> ignored = Seq.with(Floor.class, Prop.class);

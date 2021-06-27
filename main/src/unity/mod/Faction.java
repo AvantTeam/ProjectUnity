@@ -28,16 +28,19 @@ public enum Faction{
 
     public final Color color;
 
-    static{
-        Events.on(ClientLoadEvent.class, e -> {
-            for(Faction faction : all){
-                faction.localizedName = Core.bundle.format("faction." + faction.name, faction.color);
-            }
-        });
+    public static void init(){
+        for(Faction faction : all){
+            faction.localizedName = Core.bundle.format("faction." + faction.name, faction.color);
+        }
     }
 
     Faction(String name, Color color){
         this.name = name;
         this.color = color.cpy();
+    }
+
+    @Override
+    public String toString(){
+        return localizedName;
     }
 }
