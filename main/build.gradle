@@ -14,10 +14,13 @@ dependencies {
 }
 
 import arc.*
+import arc.files.*
 import arc.func.*
 import arc.struct.*
 import arc.util.*
 import arc.util.serialization.*
+
+import java.util.concurrent.*
 
 ext {
     assetsDir = new File(rootDir, "main/assets/")
@@ -122,7 +125,7 @@ task fetchComps {
         Core.net = new Net()
         Core.net.setBlock(true)
 
-        final Seq<Fetcher> fetches = new Seq<Fetcher>(Fetcher.class)
+        final CopyOnWriteArrayList<Fetcher> fetches = new CopyOnWriteArrayList<>()
 
         final UnsafeRunnable mainRun = {
         Core.net.httpGet(
@@ -160,9 +163,9 @@ task fetchComps {
         { err -> throw new RuntimeException(err) })}
 
         new Fetcher(run: mainRun).execute()
-        final def found = fetches.size
+        final def found = fetches.size()
 
-        Seq<Thread> threads = fetches.map({ final Fetcher fetch -> new Thread({
+        Seq<Thread> threads = Seq.with(fetches).map({ final Fetcher fetch -> new Thread({
             fetch.execute()
             synchronized(fetches) {
                 fetches.remove(fetch)
