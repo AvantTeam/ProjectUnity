@@ -8,6 +8,7 @@ import mindustry.graphics.*;
 import unity.graphics.*;
 
 import static arc.graphics.g2d.Draw.*;
+import static arc.graphics.g2d.Lines.circle;
 import static arc.graphics.g2d.Lines.*;
 import static arc.math.Angles.*;
 

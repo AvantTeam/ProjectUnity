@@ -5,7 +5,7 @@ import arc.math.*;
 import arc.util.*;
 import unity.graphics.*;
 
-import static arc.Core.atlas;
+import static arc.Core.*;
 
 public class WindTurbine extends TorqueGenerator{
     public final TextureRegion[] overlayRegions = new TextureRegion[2], baseRegions = new TextureRegion[4], rotorRegions = new TextureRegion[2];

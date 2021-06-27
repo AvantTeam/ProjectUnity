@@ -8,10 +8,10 @@ import arc.struct.ObjectMap.*;
 import arc.util.io.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import unity.world.meta.*;
 import unity.world.blocks.GraphBlockBase.*;
 import unity.world.graph.*;
 import unity.world.graphs.*;
+import unity.world.meta.*;
 
 public abstract class GraphModule<T extends Graph, M extends GraphModule<T, M, G>, G extends BaseGraph<M, G>>{
     public final Seq<GraphData> acceptPorts = new Seq<>();

@@ -9,7 +9,7 @@ import mindustry.entities.abilities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
-import unity.type.UnityUnitType;
+import unity.type.*;
 
 public class ShootArmorAbility extends Ability{
     /** How much the shooter's amror increases */

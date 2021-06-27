@@ -1,6 +1,6 @@
 package unity.world.meta;
 
-import arc.graphics.Color;
+import arc.graphics.*;
 
 public class LightData{
     private boolean initialized = false;

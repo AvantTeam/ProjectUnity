@@ -10,7 +10,7 @@ import unity.world.blocks.*;
 import unity.world.graphs.*;
 import unity.world.modules.*;
 
-import static arc.Core.atlas;
+import static arc.Core.*;
 
 public class AugerDrill extends Drill implements GraphBlockBase{
     protected final Graphs graphs = new Graphs();

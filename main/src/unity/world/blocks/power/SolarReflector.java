@@ -9,7 +9,7 @@ import mindustry.graphics.*;
 import mindustry.world.*;
 import unity.world.blocks.power.SolarCollector.*;
 
-import static arc.Core.atlas;
+import static arc.Core.*;
 import static mindustry.Vars.*;
 
 public class SolarReflector extends Block{

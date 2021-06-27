@@ -14,8 +14,15 @@ import unity.logic.*;
 import static mindustry.content.Blocks.*;
 import static unity.content.UnityUnitTypes.*;
 
+/**
+ * <p> An overwriter class designed to easily modify vanilla contents. This has to be used with <em>huge
+ * responsibility</em>, we do not want to break other mods or even the vanilla Mindustry itself.
+ *
+ * <p> <em>Things like {@link Floor#itemDrop} and such are <bold>not</bold> to be modified, no matter
+ * what!</em>
+ */
 @SuppressWarnings("unchecked")
-public class OverWriter implements ContentList{
+public class Overwriter implements ContentList{
     public <T extends UnlockableContent> void overwrite(UnlockableContent target, Cons<T> setter){
         setter.get((T)target);
     }
@@ -24,6 +31,8 @@ public class OverWriter implements ContentList{
     public void load(){
         //region contents
 
+        //TODO overriding these first four is an *absolutely* bad idea, OBJECTIVELY.
+        //     a specific stone drill would do better than this
         overwrite(basalt, (Floor t) -> {
             t.itemDrop = UnityItems.stone;
             t.playerUnmineable = true;

@@ -5,7 +5,7 @@ import arc.math.geom.*;
 import unity.graphics.*;
 import unity.world.blocks.*;
 
-import static arc.Core.atlas;
+import static arc.Core.*;
 
 public class SimpleTransmission extends GraphBlock{
     final TextureRegion[] topRegions = new TextureRegion[2], overlayRegions = new TextureRegion[2], movingRegions = new TextureRegion[3];//topsprite,overlaysprite,moving

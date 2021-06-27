@@ -12,7 +12,7 @@ import unity.annotations.Annotations.*;
 import unity.content.*;
 import unity.gen.*;
 
-import static arc.Core.bundle;
+import static arc.Core.*;
 
 @Merge(base = GenericCrafter.class, value = Stemc.class)
 public class BurnerSmelter extends StemGenericCrafter{

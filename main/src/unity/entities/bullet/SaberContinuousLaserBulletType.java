@@ -3,15 +3,15 @@ package unity.entities.bullet;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
-import mindustry.content.Fx;
+import mindustry.content.*;
 import mindustry.entities.*;
-import mindustry.entities.bullet.ContinuousLaserBulletType;
+import mindustry.entities.bullet.*;
 import mindustry.gen.*;
-import mindustry.graphics.Drawf;
-import unity.content.UnityFx;
-import unity.entities.SaberData;
-import unity.graphics.UnityPal;
-import unity.util.Utils;
+import mindustry.graphics.*;
+import unity.content.*;
+import unity.entities.*;
+import unity.graphics.*;
+import unity.util.*;
 
 public class SaberContinuousLaserBulletType extends ContinuousLaserBulletType{
     protected boolean swipe;

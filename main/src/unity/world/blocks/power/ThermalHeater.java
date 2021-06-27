@@ -6,7 +6,7 @@ import mindustry.world.*;
 import mindustry.world.meta.*;
 import unity.graphics.*;
 
-import static arc.Core.atlas;
+import static arc.Core.*;
 
 public class ThermalHeater extends HeatGenerator{
     public final TextureRegion[] regions = new TextureRegion[4];

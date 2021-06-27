@@ -8,9 +8,9 @@ import arc.util.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import unity.graphics.*;
+import unity.world.blocks.GraphBlockBase.*;
 import unity.world.meta.*;
 import unity.world.meta.CrucibleRecipe.*;
-import unity.world.blocks.GraphBlockBase.*;
 import unity.world.modules.*;
 
 public class CrucibleGraph extends BaseGraph<GraphCrucibleModule, CrucibleGraph>{

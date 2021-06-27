@@ -11,7 +11,6 @@ import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import unity.content.*;
 import unity.content.effects.*;
 import unity.entities.effects.*;
 import unity.entities.units.*;

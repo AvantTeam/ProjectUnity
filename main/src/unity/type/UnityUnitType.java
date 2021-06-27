@@ -8,6 +8,7 @@ import arc.graphics.g2d.TextureAtlas.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
+import arc.util.Log.*;
 import arc.util.*;
 import arc.util.noise.*;
 import arc.util.pooling.*;
@@ -887,7 +888,7 @@ public class UnityUnitType extends UnitType{
             packer.add(PageType.main, name + "-full", icon);
             Unity.print(Strings.format("Created icons for @", name));
         }catch(Throwable t){
-            Log.err(Strings.format("Couldn't create icons for @", name), t);
+            Unity.print(LogLevel.err, Strings.format("Couldn't create icons for @", name), Strings.getFinalCause(t));
         }finally{
             Pools.free(color);
         }

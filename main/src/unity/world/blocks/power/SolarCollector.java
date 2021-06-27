@@ -8,7 +8,7 @@ import mindustry.graphics.*;
 import unity.graphics.*;
 import unity.world.blocks.power.SolarReflector.*;
 
-import static arc.Core.atlas;
+import static arc.Core.*;
 
 public class SolarCollector extends HeatGenerator{
     public final TextureRegion[] regions = new TextureRegion[4];

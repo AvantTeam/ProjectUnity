@@ -14,8 +14,6 @@ import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
 import mindustry.type.*;
 
-import java.util.*;
-
 import static arc.Core.*;
 
 public final class GraphicUtils{

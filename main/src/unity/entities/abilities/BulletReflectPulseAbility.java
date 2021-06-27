@@ -1,14 +1,14 @@
 package unity.entities.abilities;
 
-import arc.util.*;
 import arc.math.*;
-import arc.struct.Seq;
+import arc.struct.*;
+import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
-import mindustry.entities.abilities.Ability;
+import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
-import unity.content.UnityFx;
+import unity.content.*;
 
 import static arc.Core.*;
 

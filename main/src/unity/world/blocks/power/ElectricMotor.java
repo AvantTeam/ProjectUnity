@@ -3,7 +3,7 @@ package unity.world.blocks.power;
 import arc.graphics.g2d.*;
 import unity.graphics.*;
 
-import static arc.Core.atlas;
+import static arc.Core.*;
 
 public class ElectricMotor extends TorqueGenerator{
     public final TextureRegion[] overlayRegions = new TextureRegion[2], baseRegions = new TextureRegion[2], coilRegions = new TextureRegion[2];

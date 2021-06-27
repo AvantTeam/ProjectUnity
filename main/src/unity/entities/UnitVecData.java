@@ -1,7 +1,7 @@
 package unity.entities;
 
-import arc.math.geom.Vec2;
-import mindustry.gen.Unit;
+import arc.math.geom.*;
+import mindustry.gen.*;
 
 public class UnitVecData{
     public final Unit unit;

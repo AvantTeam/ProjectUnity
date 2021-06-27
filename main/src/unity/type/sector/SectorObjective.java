@@ -2,7 +2,7 @@ package unity.type.sector;
 
 import arc.*;
 import arc.func.*;
-import arc.graphics.Color;
+import arc.graphics.*;
 import arc.math.*;
 import arc.scene.*;
 import arc.scene.actions.*;
@@ -10,8 +10,8 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.game.*;
 import mindustry.game.EventType.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;

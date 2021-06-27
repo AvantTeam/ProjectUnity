@@ -6,9 +6,9 @@ import arc.math.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.io.*;
-import unity.world.meta.*;
 import unity.world.graph.*;
 import unity.world.graphs.*;
+import unity.world.meta.*;
 
 //not considered to be multi
 public class GraphHeatModule extends GraphModule<GraphHeat, GraphHeatModule, HeatGraph>{

@@ -10,8 +10,8 @@ import mindustry.gen.*;
 import unity.util.*;
 import unity.world.blocks.*;
 
-import static arc.Core.atlas;
-import static mindustry.Vars.tilesize;
+import static arc.Core.*;
+import static mindustry.Vars.*;
 
 public class HeatPipe extends GraphBlock{
     final static Color baseColor = Color.valueOf("6e7080");

@@ -7,8 +7,6 @@ import mindustry.graphics.*;
 import unity.annotations.Annotations.*;
 import unity.graphics.*;
 
-import static mindustry.Vars.*;
-
 /** @author GlennFolker */
 @FactionBase
 public enum Faction{

@@ -2,10 +2,10 @@ package younggamExperimental;
 
 import arc.struct.*;
 import mindustry.content.*;
-import mindustry.ctype.ContentList;
+import mindustry.ctype.*;
 import unity.content.*;
 
-import static mindustry.type.ItemStack.with;
+import static mindustry.type.ItemStack.*;
 
 public class Parts implements ContentList{
     public static final ObjectMap<String,PartInfo> parts = new ObjectMap<>();

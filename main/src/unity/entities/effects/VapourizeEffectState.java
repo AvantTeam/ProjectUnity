@@ -1,14 +1,14 @@
 package unity.entities.effects;
 
-import arc.graphics.Color;
-import arc.graphics.g2d.Draw;
+import arc.graphics.*;
+import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.math.geom.Position;
-import arc.util.Tmp;
+import arc.math.geom.*;
+import arc.util.*;
 import mindustry.gen.*;
-import mindustry.graphics.Layer;
+import mindustry.graphics.*;
 import mindustry.type.*;
-import unity.content.UnityFx;
+import unity.content.*;
 import unity.entities.*;
 import unity.util.*;
 

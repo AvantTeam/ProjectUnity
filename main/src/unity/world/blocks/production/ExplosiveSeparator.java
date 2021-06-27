@@ -10,7 +10,7 @@ import arc.util.io.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
-import mindustry.gen.Sounds;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.type.*;
@@ -18,7 +18,7 @@ import mindustry.ui.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.consumers.*;
 
-import static arc.Core.atlas;
+import static arc.Core.*;
 import static mindustry.Vars.*;
 
 public class ExplosiveSeparator extends Separator{

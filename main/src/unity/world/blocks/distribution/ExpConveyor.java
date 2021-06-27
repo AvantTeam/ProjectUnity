@@ -1,6 +1,6 @@
 package unity.world.blocks.distribution;
 
-import mindustry.world.blocks.distribution.Conveyor;
+import mindustry.world.blocks.distribution.*;
 
 public class ExpConveyor extends Conveyor{
     protected float realSpeed, drawMultiplier;

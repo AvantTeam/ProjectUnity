@@ -12,7 +12,7 @@ import mindustry.world.blocks.environment.*;
 import unity.graphics.*;
 import unity.util.*;
 
-import static arc.Core.atlas;
+import static arc.Core.*;
 
 public class SporeFarm extends Block{
     static final int frames = 5;

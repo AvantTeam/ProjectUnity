@@ -8,9 +8,9 @@ import arc.util.io.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.meta.*;
-import unity.world.meta.*;
 import unity.world.graph.*;
 import unity.world.graphs.*;
+import unity.world.meta.*;
 
 //_RotPowerPropsCommon
 public class GraphTorqueModule<T extends GraphTorque> extends GraphModule<T, GraphTorqueModule<T>, TorqueGraph<T>>{

@@ -5,7 +5,7 @@ import arc.math.geom.*;
 import unity.graphics.*;
 import unity.world.blocks.*;
 
-import static arc.Core.atlas;
+import static arc.Core.*;
 
 public class InlineGearbox extends GraphBlock{
     TextureRegion topRegion, overlayRegion, movingRegion, baseRegion, mbaseRegion, gearRegion;//topsprite,overlaysprite,moving,base,mbase,gear

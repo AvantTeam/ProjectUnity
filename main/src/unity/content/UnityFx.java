@@ -15,8 +15,8 @@ import mindustry.type.*;
 import mindustry.world.blocks.defense.turrets.Turret.*;
 import unity.entities.*;
 import unity.entities.abilities.BaseAbility.*;
-import unity.entities.bullet.*;
 import unity.entities.bullet.EphemeronBulletType.*;
+import unity.entities.bullet.*;
 import unity.entities.bullet.SingularityBulletType.*;
 import unity.entities.effects.*;
 import unity.graphics.*;
@@ -24,9 +24,9 @@ import unity.type.*;
 import unity.util.*;
 import unity.util.struct.*;
 
-//fixing rect as Draw.rect not Lines.rect. currently no use
 import static arc.graphics.g2d.Draw.rect;
 import static arc.graphics.g2d.Draw.*;
+import static arc.graphics.g2d.Lines.circle;
 import static arc.graphics.g2d.Lines.*;
 import static arc.math.Angles.*;
 import static unity.content.UnityBullets.*;

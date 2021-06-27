@@ -12,11 +12,11 @@ import unity.ui.dialogs.*;
 import unity.util.*;
 import unity.util.struct.*;
 import unity.world.blocks.*;
-import unity.world.meta.*;
 import unity.world.graph.*;
+import unity.world.meta.*;
 import unity.world.modules.*;
 
-import static arc.Core.atlas;
+import static arc.Core.*;
 
 public class Crucible extends GraphBlock{
     CrucibleGraph viewPos;

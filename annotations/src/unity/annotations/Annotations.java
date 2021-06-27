@@ -24,7 +24,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.*;
 import java.lang.reflect.*;
 import java.util.*;
-import java.util.Map.*;
+import java.util.Map.Entry;
 
 /** @author GlennFolker */
 public class Annotations{

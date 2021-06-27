@@ -5,7 +5,6 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.util.*;
 import mindustry.game.EventType.*;
-import mindustry.graphics.*;
 import mindustry.type.*;
 import unity.mod.*;
 import unity.util.*;

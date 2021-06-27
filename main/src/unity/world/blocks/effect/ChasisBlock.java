@@ -1,8 +1,7 @@
 package unity.world.blocks.effect;
 
-import mindustry.gen.Building;
-import unity.world.blocks.ConnectedBlock;
-import unity.world.blocks.GraphBlock;
+import mindustry.gen.*;
+import unity.world.blocks.*;
 
 //this does nothing for now.
 //It requires a new graph to function, however i need to unfuck the graph system first.

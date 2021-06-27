@@ -8,7 +8,7 @@ import mindustry.ui.*;
 import unity.util.*;
 import unity.world.graphs.*;
 
-import static arc.Core.bundle;
+import static arc.Core.*;
 
 public class GraphTorqueGenerateModule extends GraphTorqueModule<GraphTorqueGenerate>{
     final WindowedMean smoothedForce = new WindowedMean(40);

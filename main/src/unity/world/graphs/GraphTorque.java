@@ -8,8 +8,8 @@ import mindustry.graphics.*;
 import unity.world.meta.*;
 import unity.world.modules.*;
 
-import static arc.Core.bundle;
-import static mindustry.Vars.tilesize;
+import static arc.Core.*;
+import static mindustry.Vars.*;
 
 public class GraphTorque extends Graph{
     public final float baseFriction, baseInertia;

@@ -6,19 +6,18 @@ sourceSets.main {
     ]
 }
 
-import arc.*
-import arc.files.*
-import arc.func.*
-import arc.struct.*
-import arc.util.*
-import arc.util.serialization.*
-
 dependencies {
     compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
 
     compileOnly project(':annotations')
     annotationProcessor project(':annotations')
 }
+
+import arc.*
+import arc.func.*
+import arc.struct.*
+import arc.util.*
+import arc.util.serialization.*
 
 ext {
     assetsDir = new File(rootDir, "main/assets/")

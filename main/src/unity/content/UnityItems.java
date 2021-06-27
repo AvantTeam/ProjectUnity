@@ -4,7 +4,7 @@ import arc.graphics.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.type.*;
-import unity.graphics.UnityPal;
+import unity.graphics.*;
 import unity.type.*;
 import unity.world.meta.*;
 import unity.world.meta.CrucibleRecipe.*;

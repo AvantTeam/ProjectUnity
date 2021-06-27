@@ -1,16 +1,15 @@
 package unity.world.blocks.defense;
 
 import arc.*;
-import arc.graphics.Blending;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
-import mindustry.ui.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.ui.*;
 import mindustry.world.blocks.defense.*;
 import mindustry.world.meta.*;
 

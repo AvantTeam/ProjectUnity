@@ -1,7 +1,7 @@
 package unity.entities;
 
-import arc.math.WindowedMean;
-import unity.graphics.FixedTrail;
+import arc.math.*;
+import unity.graphics.*;
 
 public class SaberData{
     public float f, rot;

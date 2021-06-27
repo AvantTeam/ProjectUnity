@@ -1,9 +1,9 @@
 package unity.world.blocks.defense.turrets;
 
 import arc.*;
-import arc.struct.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import mindustry.entities.bullet.*;
 import mindustry.world.blocks.defense.turrets.*;
 

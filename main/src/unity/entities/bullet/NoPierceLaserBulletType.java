@@ -7,7 +7,7 @@ import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import unity.util.Utils;
+import unity.util.*;
 
 public class NoPierceLaserBulletType extends ContinuousLaserBulletType{
     public NoPierceLaserBulletType(float damage){

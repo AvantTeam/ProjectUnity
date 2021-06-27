@@ -8,7 +8,7 @@ import mindustry.gen.*;
 import unity.entities.ExpOrbs.*;
 import unity.world.blocks.*;
 
-import static arc.Core.atlas;
+import static arc.Core.*;
 
 public class Magnet extends GraphBlock{
     public final TextureRegion[] regions = new TextureRegion[4];

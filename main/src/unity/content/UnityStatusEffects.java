@@ -11,7 +11,7 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import unity.graphics.*;
 
-import static unity.content.UnityFx.distortFx;
+import static unity.content.UnityFx.*;
 
 public class UnityStatusEffects implements ContentList{
     public static StatusEffect disabled, weaken, plasmaed, radiation, reloadFatigue, blueBurn, molten, tpCoolDown, teamConverted, boosted, distort, plated;

@@ -3,18 +3,19 @@ package unity;
 import arc.*;
 import arc.func.*;
 import arc.graphics.*;
-import arc.graphics.g2d.*;
 import arc.graphics.g2d.TextureAtlas.*;
+import arc.graphics.g2d.*;
 import arc.scene.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.Log.*;
 import mindustry.*;
+import mindustry.ctype.*;
+import mindustry.game.EventType.*;
 import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
 import mindustry.mod.*;
 import mindustry.world.blocks.environment.*;
-import mindustry.ctype.*;
-import mindustry.game.EventType.*;
 import unity.ai.kami.*;
 import unity.async.*;
 import unity.cinematic.*;
@@ -27,7 +28,7 @@ import unity.sync.*;
 import unity.ui.*;
 import unity.ui.dialogs.*;
 import unity.util.*;
-import younggamExperimental.Parts;
+import younggamExperimental.*;
 
 import static mindustry.Vars.*;
 
@@ -51,7 +52,7 @@ public class Unity extends Mod{
         new UnitySectorPresets(),
         new UnityTechTree(),
         new Parts(),
-        new OverWriter()
+        new Overwriter()
     };
 
     public Unity(){
@@ -208,30 +209,22 @@ public class Unity extends Mod{
         }
 
         Seq<Class<?>> ignored = Seq.with(Floor.class, Prop.class);
-        Cons<Seq<? extends Content>> checker = list -> {
-            for(var cont : list){
+        for(var content : Vars.content.getContentMap()){
+            content.each(c -> {
                 if(
-                    !(cont instanceof UnlockableContent ucont) ||
-                        (cont.minfo.mod == null || !cont.minfo.mod.name.equals("unity"))
-                ) continue;
+                    !(c instanceof UnlockableContent cont) ||
+                    (c.minfo.mod == null || c.minfo.mod.main.getClass() != Unity.class)
+                ) return;
 
-                if(Core.bundle.getOrNull(ucont.getContentType() + "." + ucont.name + ".name") == null){
-                    print(Strings.format("@ has no bundle entry for name", ucont));
+                if(Core.bundle.getOrNull(cont.getContentType() + "." + cont.name + ".name") == null){
+                    print(Strings.format("@ has no bundle entry for name", cont));
                 }
 
-                if(!ignored.contains(c -> c.isAssignableFrom(ucont.getClass())) && Core.bundle.getOrNull(ucont.getContentType() + "." + ucont.name + ".description") == null){
-                    print(Strings.format("@ has no bundle entry for description", ucont));
+                if(!ignored.contains(t -> t.isAssignableFrom(cont.getClass())) && Core.bundle.getOrNull(cont.getContentType() + "." + cont.name + ".description") == null){
+                    print(Strings.format("@ has no bundle entry for description", cont));
                 }
-            }
-        };
-
-        checker.get(Vars.content.blocks());
-        checker.get(Vars.content.items());
-        checker.get(Vars.content.liquids());
-        checker.get(Vars.content.planets());
-        checker.get(Vars.content.sectors());
-        checker.get(Vars.content.statusEffects());
-        checker.get(Vars.content.units());
+            });
+        }
     }
 
     protected void addCredits(){
@@ -250,22 +243,33 @@ public class Unity extends Mod{
                 );
             }
         }catch(Throwable t){
-            Log.err("Couldn't create Unity's credits button", t);
+            print(LogLevel.err, "Couldn't create Unity's credits button", Strings.getFinalCause(t));
         }
     }
 
-    //TODO support for LogLevel too
     public static void print(Object... args){
+        print(LogLevel.info, " ", args);
+    }
+
+    public static void print(LogLevel level, Object... args){
+        print(level, " ", args);
+    }
+
+    public static void print(String separator, Object... args){
+        print(LogLevel.info, separator, args);
+    }
+
+    public static void print(LogLevel level, String separator, Object... args){
         StringBuilder builder = new StringBuilder();
         if(args == null){
             builder.append("null");
         }else{
             for(int i = 0; i < args.length; i++){
                 builder.append(args[i]);
-                if(i < args.length - 1) builder.append(", ");
+                if(i < args.length - 1) builder.append(separator);
             }
         }
 
-        Log.info("&lm&fb[unity]&fr @", builder.toString());
+        Log.log(level, "&lm&fb[unity]&fr @", builder.toString());
     }
 }

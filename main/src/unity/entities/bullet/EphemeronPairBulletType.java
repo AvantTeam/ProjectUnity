@@ -6,7 +6,6 @@ import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
-import unity.content.*;
 import unity.content.effects.*;
 
 public class EphemeronPairBulletType extends BasicBulletType{

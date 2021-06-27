@@ -30,7 +30,6 @@ public class LinkerAI extends FlyingAI{
             LinkedAI link = new LinkedAI();
             link.spawner = unit;
             Tmp.v1.set(0, 0).trns(360f / linkCount * i, 20);
-            Log.info(360f / (linkCount + 1) * i);
             link.unit(((UnityUnitType) unit.type).linkType.spawn(unit.team, unit.x + Tmp.v1.x, unit.y + Tmp.v1.y));
             links.add(link);
         }
