@@ -2697,7 +2697,7 @@ public class UnityUnitTypes implements ContentList{
                 ) != null
             ));
 
-            weapons.add(new Weapon(name + "-laser"){{
+            weapons.add(new Weapon(){{
                 rotate = true;
                 rotateSpeed = 8f;
                 shadow = 20f;
@@ -2710,7 +2710,7 @@ public class UnityUnitTypes implements ContentList{
                 bullet = UnityBullets.laserZap;
                 shootSound = Sounds.laser;
                 mirror = false;
-            }}, new Weapon(name + "-plasmagun"){{
+            }}, new Weapon(){{
                 x = 0f;
                 y = 0f;
                 reload = 7f;
@@ -2763,7 +2763,7 @@ public class UnityUnitTypes implements ContentList{
                 delayEffect = UnityFx.smallRingEffect2;
             }});
 
-            weapons.add(new Weapon(name + "-gun"){{
+            weapons.add(new Weapon("unity-phantasmal-gun"){{
                 top = false;
                 x = 1.25f;
                 y = 3.25f;

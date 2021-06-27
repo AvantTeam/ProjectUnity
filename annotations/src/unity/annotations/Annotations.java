@@ -214,8 +214,14 @@ public class Annotations{
         /** @return The regions' name */
         String[] value();
 
-        /** @return Whether it should load the outlined region as well */
+        /** @return Whether it should outline the region, as a separate texture */
         boolean outline() default false;
+
+        /** @return The outline color, only valid if {@link #outline()} is true */
+        String outlineColor() default "464649";
+
+        /** @return The outline radius, only valid if {@link #outline()} is true */
+        int outlineRadius() default 4;
     }
 
     //end region

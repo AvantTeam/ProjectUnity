@@ -174,17 +174,13 @@ public final class GraphicUtils{
         return atlas.getPixmap(name);
     }
 
-    public static void antialias(TextureRegion region){
-        antialias(atlas.getPixmap(region).pixmap);
-    }
-
     /**
-     * Anti-aliases a {@link Pixmap}, based on {@code Mindustry/tools/build.gradle}. Note that
-     * this <em>overwrites</em> the given pixmap.
-     * @param image The texture region that is going to be anti-aliased.
+     * Anti-aliases a {@link PixmapRegion}, based on {@code Mindustry/tools/build.gradle}. Note that
+     * this <em>overwrites</em> the given region.
+     * @param image The pixmap region that is going to be anti-aliased.
      */
-    public static void antialias(Pixmap image){
-        var out = image.copy();
+    public static void antialias(PixmapRegion image){
+        var out = image.crop();
 
         var color = Pools.obtain(Color.class, Color::new).set(0f, 0f, 0f, 0f);
         var sum = Pools.obtain(Color.class, Color::new).set(0f, 0f, 0f, 0f);
@@ -228,7 +224,7 @@ public final class GraphicUtils{
                 suma.mul(fm, fm, fm, fm);
 
                 float total = 0;
-                sum.set(0);
+                sum.set(0f, 0f, 0f, 0f);
 
                 for(int val : p){
                     color.rgba8888(val);
@@ -244,7 +240,7 @@ public final class GraphicUtils{
                 fm = 1f / total;
                 sum.mul(fm, fm, fm, fm);
                 out.setRaw(x, y, sum.rgba8888());
-                sum.set(0);
+                sum.set(0f, 0f, 0f, 0f);
             }
         }
 
@@ -252,14 +248,7 @@ public final class GraphicUtils{
         Pools.free(sum);
         Pools.free(suma);
 
-        var pixels = image.getPixels();
-        var outp = out.getPixels();
-
-        outp.position(0);
-        pixels.position(0);
-        pixels.put(outp);
-        pixels.position(0);
-        out.dispose();
+        image.set(out);
     }
 
     public static int getColorClamped(Pixmap image, int x, int y){

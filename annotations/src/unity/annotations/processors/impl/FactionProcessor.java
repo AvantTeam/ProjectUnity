@@ -102,7 +102,7 @@ public class FactionProcessor extends BaseProcessor{
                     .addParameter(tName(faction), "faction")
                     .addStatement("map.put(content, faction)")
                     .beginControlFlow("if(content instanceof $T unlockable)", cName(UnlockableContent.class))
-                        .addStatement("unlockable.description += $S + $S + faction.name", "\n", "[gray]Faction:[] ")
+                        .addStatement("unlockable.description += $S + $S + faction.localizedName", "\n", "[gray]Faction:[] ")
                     .endControlFlow()
                 .build()
             )

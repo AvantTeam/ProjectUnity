@@ -2,6 +2,7 @@ package unity.mod;
 
 import arc.*;
 import arc.graphics.*;
+import mindustry.game.EventType.*;
 import mindustry.graphics.*;
 import unity.annotations.Annotations.*;
 import unity.graphics.*;
@@ -25,10 +26,20 @@ public enum Faction{
     public static final Faction[] all = values();
 
     public final String name;
+    public String localizedName;
+
     public final Color color;
 
+    static{
+        Events.on(ClientLoadEvent.class, e -> {
+            for(Faction faction : all){
+                faction.localizedName = Core.bundle.format("faction." + faction.name, faction.color);
+            }
+        });
+    }
+
     Faction(String name, Color color){
+        this.name = name;
         this.color = color.cpy();
-        this.name = headless ? name : Core.bundle.format("faction." + name, this.color);
     }
 }

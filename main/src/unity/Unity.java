@@ -3,15 +3,15 @@ package unity;
 import arc.*;
 import arc.func.*;
 import arc.graphics.*;
-import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g2d.TextureAtlas.*;
 import arc.scene.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.graphics.*;
+import mindustry.graphics.MultiPacker.*;
 import mindustry.mod.*;
-import mindustry.mod.Mods.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
@@ -20,6 +20,7 @@ import unity.async.*;
 import unity.cinematic.*;
 import unity.content.*;
 import unity.gen.*;
+import unity.gen.Regions.*;
 import unity.graphics.*;
 import unity.mod.*;
 import unity.sync.*;
@@ -31,7 +32,7 @@ import younggamExperimental.Parts;
 import static mindustry.Vars.*;
 
 @SuppressWarnings("unchecked")
-public class Unity extends Mod implements ApplicationListener{
+public class Unity extends Mod{
     public static MusicHandler music;
     public static TapHandler tap;
     public static AntiCheat antiCheat;
@@ -53,12 +54,9 @@ public class Unity extends Mod implements ApplicationListener{
         new OverWriter()
     };
 
-    private static LoadedMod unity;
-
     public Unity(){
         ContributorList.init();
 
-        Core.app.addListener(this);
         Core.assets.setLoader(WavefrontObject.class, new WavefrontObjectLoader(tree));
 
         KamiPatterns.load();
@@ -66,28 +64,7 @@ public class Unity extends Mod implements ApplicationListener{
 
         Events.on(ContentInitEvent.class, e -> {
             if(!headless){
-                Regions.load(); //load existing regions
-
-                Color outlineColor = Color.valueOf("404049");
-                for(var field : Regions.class.getDeclaredFields()){
-                    if(!TextureRegion.class.isAssignableFrom(field.getType()) || !field.getName().endsWith("OutlineRegion")) continue;
-
-                    var f = ReflectUtils.findField(Regions.class, field.getName().replaceFirst("Outline", ""), false);
-                    TextureRegion raw = ReflectUtils.getField(null, f);
-
-                    if(raw instanceof AtlasRegion at && at.found()){
-                        PixmapRegion sprite = Core.atlas.getPixmap(at);
-
-                        Texture out = new Texture(Pixmaps.outline(sprite, outlineColor, 4));
-                        TextureFilter filter = Core.settings.getBool("linear")
-                        ?   TextureFilter.linear
-                        :   TextureFilter.nearest;
-
-                        out.setFilter(filter, filter);
-                        ReflectUtils.setField(null, f, Core.atlas.addRegion(at.name + "-outline", out, 0, 0, out.width, out.height));
-                    }
-                }
-
+                Regions.load();
                 KamiRegions.load();
             }
 
@@ -111,9 +88,11 @@ public class Unity extends Mod implements ApplicationListener{
             UnitySettings.init();
             SpeechDialog.init();
 
-            Func<String, String> stringf = value -> Core.bundle.get("mod." + value);
-            unity.meta.displayName = stringf.get(unity.meta.name + ".name");
-            unity.meta.description = stringf.get(unity.meta.name + ".description");
+            var mod = mods.getMod(Unity.class);
+
+            Func<String, String> stringf = value -> Core.bundle.get("mod." + mod.name + "." + value);
+            mod.meta.displayName = stringf.get("name");
+            mod.meta.description = stringf.get("description");
 
             Core.settings.getBoolOnce("unity-install", () -> Time.runTask(5f, CreditsDialog::showList));
         });
@@ -133,15 +112,6 @@ public class Unity extends Mod implements ApplicationListener{
         antiCheat = new AntiCheat();
 
         asyncCore.processes.add(new LightProcess());
-    }
-
-    @Override
-    public void update(){
-        unity = mods.locateMod("unity");
-        if(unity != null){
-            Core.app.removeListener(this);
-            Events.fire(new UnityModLoadEvent());
-        }
     }
 
     @Override
@@ -166,9 +136,75 @@ public class Unity extends Mod implements ApplicationListener{
         FactionMeta.init();
         UnityEntityMapping.init();
 
+        logContent();
+
+        //this internal implementation is used for loading Regions' outlines and such
+        new UnlockableContent("internal-implementation"){
+            @Override
+            public void loadIcon(){
+                fullIcon = Core.atlas.find("clear");
+                uiIcon = Core.atlas.find("clear");
+            }
+
+            @Override
+            public boolean isHidden(){
+                return false;
+            }
+
+            @Override
+            public boolean logicVisible(){
+                return false;
+            }
+
+            @Override
+            public void unlock(){
+                //does nothing
+            }
+
+            @Override
+            public void quietUnlock(){
+                //does nothing
+            }
+
+            @Override
+            public void createIcons(MultiPacker packer){
+                Regions.load(); //load shadowed regions first
+
+                var color = new Color();
+                for(var field : Regions.class.getDeclaredFields()){
+                    if(!TextureRegion.class.isAssignableFrom(field.getType()) || !field.getName().endsWith("OutlineRegion")) continue;
+
+                    var raw = ReflectUtils.findField(Regions.class, field.getName().replace("Outline", ""), false);
+                    AtlasRegion region = ReflectUtils.getField(null, raw);
+
+                    if(region.found()){
+                        var meta = raw.getAnnotation(Outline.class);
+                        var outlineColor = Color.valueOf(color, meta == null ? "464649" : meta.color());
+                        var outlineRadius = meta == null ? 4 : meta.radius();
+
+                        var pix = GraphicUtils.get(packer, region);
+                        var out = Pixmaps.outline(pix, outlineColor, outlineRadius);
+
+                        if(Core.settings.getBool("linear")){
+                            Pixmaps.bleed(out);
+                        }
+
+                        packer.add(PageType.main, region.name + "-outline", out);
+                    }
+                }
+            }
+
+            @Override
+            public ContentType getContentType(){
+                return ContentType.typeid_UNUSED;
+            }
+        };
+    }
+
+    public void logContent(){
         for(Faction faction : Faction.all){
             var array = FactionMeta.getByFaction(faction, Object.class);
-            print(Strings.format("Faction @ has @ contents.", faction.name, array.size));
+            print(Strings.format("Faction @ has @ contents.", faction.localizedName, array.size));
         }
 
         Seq<Class<?>> ignored = Seq.with(Floor.class, Prop.class);
@@ -176,7 +212,7 @@ public class Unity extends Mod implements ApplicationListener{
             for(var cont : list){
                 if(
                     !(cont instanceof UnlockableContent ucont) ||
-                    (cont.minfo.mod == null || !cont.minfo.mod.name.equals("unity"))
+                        (cont.minfo.mod == null || !cont.minfo.mod.name.equals("unity"))
                 ) continue;
 
                 if(Core.bundle.getOrNull(ucont.getContentType() + "." + ucont.name + ".name") == null){
@@ -232,10 +268,4 @@ public class Unity extends Mod implements ApplicationListener{
 
         Log.info("&lm&fb[unity]&fr @", builder.toString());
     }
-
-    public static LoadedMod mod(){
-        return unity;
-    }
-
-    public static class UnityModLoadEvent{}
 }

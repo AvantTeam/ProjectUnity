@@ -660,7 +660,6 @@ public class UnityUnitType extends UnitType{
                     if(atlas.has(rotor.name + "-blade-ghost") || !atlas.has(rotor.name + "-blade")) continue;
 
                     PixmapRegion bladeSprite = atlas.getPixmap(rotor.name + "-blade");
-                    Unity.print(bladeSprite.width, bladeSprite.height);
 
                     // This array is to be written in the order where colors at index 0 are located towards the center,
                     // and colors at the end of the array is located towards at the edge.
@@ -670,16 +669,13 @@ public class UnityUnitType extends UnitType{
                     Pixmap ghostSprite = new Pixmap(bladeSprite.height, bladeSprite.height);
                     drawRadial(ghostSprite, heightAverageColors, bladeLength);
 
-                    Unity.print(Strings.format("Saving @ with blade length @", rotor.name + "-blade-ghost", bladeLength));
                     packer.add(PageType.main, rotor.name + "-blade-ghost", ghostSprite);
 
                     if(atlas.has(rotor.name + "-blade-shade")) continue;
 
                     Pixmap shadeSprite = new Pixmap(bladeSprite.height, bladeSprite.height);
-
                     drawShade(shadeSprite, bladeLength);
 
-                    Unity.print(Strings.format("Saving @ with blade length @", rotor.name + "-blade-shade", bladeLength));
                     packer.add(PageType.main, rotor.name + "-blade-shade", shadeSprite);
                 }
             }
@@ -712,6 +708,7 @@ public class UnityUnitType extends UnitType{
             }
 
             for(Weapon weapon : weapons){
+                if(weapon.name.isEmpty()) continue;
                 if((!weapon.top || bottomWeapons.contains(weapon.name))){
                     var out = GraphicUtils.get(packer, weapon.name + "-outline");
                     Pixmap pix = out.crop();
@@ -728,6 +725,18 @@ public class UnityUnitType extends UnitType{
                         true
                     );
 
+                    if(weapon.mirror){
+                        var mirror = pix.flipX();
+
+                        icon.draw(mirror,
+                            (int)(-weapon.x / scl + icon.width / 2f - out.width / 2f),
+                            (int)(-weapon.y / scl + icon.height / 2f - out.height / 2f),
+                            true
+                        );
+
+                        mirror.dispose();
+                    }
+
                     pix.dispose();
                 }
             }
@@ -737,12 +746,14 @@ public class UnityUnitType extends UnitType{
 
             Pixmap baseCell = atlas.getPixmap(cellRegion).crop();
             Pixmap cell = new Pixmap(cellRegion.width, cellRegion.height);
-            cell.each((x, y) -> cell.set(x, y, Color.muli(baseCell.get(x, y), baseColor)));
+            cell.each((x, y) -> cell.setRaw(x, y, Color.muli(baseCell.getRaw(x, y), baseColor)));
 
             baseCell.dispose();
             icon.draw(cell, icon.width / 2 - cell.width / 2, icon.height / 2 - cell.height / 2, true);
 
             for(Weapon weapon : weapons){
+                if(weapon.name.isEmpty()) continue;
+
                 PixmapRegion wepReg = weapon.top ? GraphicUtils.get(packer, weapon.name + "-outline") : GraphicUtils.get(packer, weapon.region);
                 Pixmap pix = wepReg.crop();
 
@@ -757,6 +768,18 @@ public class UnityUnitType extends UnitType{
                     (int)(-weapon.y / scl + icon.height / 2f - weapon.region.height / 2f),
                     true
                 );
+
+                if(weapon.mirror){
+                    var mirror = pix.flipX();
+
+                    icon.draw(mirror,
+                        (int)(-weapon.x / scl + icon.width / 2f - weapon.region.width / 2f),
+                        (int)(-weapon.y / scl + icon.height / 2f - weapon.region.height / 2f),
+                        true
+                    );
+
+                    mirror.dispose();
+                }
 
                 pix.dispose();
             }
@@ -776,21 +799,27 @@ public class UnityUnitType extends UnitType{
                     float bladeSpriteXCenter = bladeSprite.width / 2f - 0.5f;
                     float bladeSpriteYCenter = bladeSprite.height / 2f - 0.5f;
 
-                    propellers.each((x, y) -> {
-                        for(int blade = 0; blade < rotor.bladeCount; blade++){
-                            // Ideally the rotation would be offset, but as per Mindustry's significance of symmetry
-                            // unit composites should have rotors in symmetrical configurations. This is at EoD's request
-                            float deg = blade * bladeSeparation/* + rotor.rotOffset*/;
-                            float cos = Mathf.cosDeg(deg);
-                            float sin = Mathf.sinDeg(deg);
+                    int propWidth = propellers.width;
+                    int propHeight = propellers.height;
+                    for(int x = 0; x < propWidth; x++){
+                        for(int y = 0; y < propHeight; y++){
+                            for(int blade = 0; blade < rotor.bladeCount; blade++){
+                                float deg = blade * bladeSeparation;
+                                float cos = Mathf.cosDeg(deg);
+                                float sin = Mathf.sinDeg(deg);
+                                int col = GraphicUtils.getColor(
+                                    bladeSprite, color,
+                                    ((propXCenter - x) * cos + (propYCenter - y) * sin) / rotor.scale + bladeSpriteXCenter,
+                                    ((propXCenter - x) * sin - (propYCenter - y) * cos) / rotor.scale + bladeSpriteYCenter
+                                ).rgba();
 
-                            propellers.set(x, y, GraphicUtils.getColor(
-                                bladeSprite, color,
-                                ((propXCenter - x) * cos + (propYCenter - y) * sin) / rotor.scale + bladeSpriteXCenter,
-                                ((propXCenter - x) * sin - (propYCenter - y) * cos) / rotor.scale + bladeSpriteYCenter
-                            ));
+                                propellers.setRaw(x, y, Pixmap.blend(
+                                    propellers.getRaw(x, y),
+                                    col
+                                ));
+                            }
                         }
-                    });
+                    }
 
                     PixmapRegion topSprite = GraphicUtils.get(packer, rotor.topRegion);
                     int topXCenter = (int)(rotor.x / scl + icon.width / 2f - topSprite.width / 2f);
@@ -798,13 +827,43 @@ public class UnityUnitType extends UnitType{
 
                     var out = topSprite.crop();
                     tops.draw(out, topXCenter, topYCenter, true);
+
+                    if(rotor.mirror){
+                        propXCenter = (-rotor.x / scl + icon.width / 2f) - 0.5f;
+                        topXCenter = (int)(-rotor.x / scl + icon.width / 2f - topSprite.width / 2f);
+
+                        for(int x = 0; x < propWidth; x++){
+                            for(int y = 0; y < propHeight; y++){
+                                for(int blade = 0; blade < rotor.bladeCount; blade++){
+                                    float deg = blade * bladeSeparation;
+                                    float cos = Mathf.cosDeg(deg);
+                                    float sin = Mathf.sinDeg(deg);
+                                    int col = GraphicUtils.getColor(
+                                        bladeSprite, color,
+                                        ((propXCenter - x) * cos + (propYCenter - y) * sin) / rotor.scale + bladeSpriteXCenter,
+                                        ((propXCenter - x) * sin - (propYCenter - y) * cos) / rotor.scale + bladeSpriteYCenter
+                                    ).rgba();
+
+                                    propellers.setRaw(x, y, Pixmap.blend(
+                                        propellers.getRaw(x, y),
+                                        col
+                                    ));
+                                }
+                            }
+                        }
+
+                        tops.draw(out, topXCenter, topYCenter, true);
+                    }
+
                     out.dispose();
                 }
 
                 Pixmap propOutlined = GraphicUtils.outline(propellers, outlineColor, outlineRadius);
-
                 icon.draw(propOutlined, true);
-                icon.draw(GraphicUtils.outline(tops, outlineColor, outlineRadius), true);
+                icon.draw(tops, true);
+
+                propellers.dispose();
+                tops.dispose();
 
                 Pixmap payloadCell = new Pixmap(baseCell.width, baseCell.height);
                 int cellCenterX = payloadCell.width / 2;
@@ -819,6 +878,8 @@ public class UnityUnitType extends UnitType{
                     float alpha = color.set(propOutlined.get(cellX + propCenterX, cellY + propCenterY)).a;
                     payloadCell.setRaw(x, y, color.set(baseCell.getRaw(x, y)).mul(1, 1, 1, 1 - alpha).rgba());
                 });
+
+                propOutlined.dispose();
 
                 packer.add(PageType.main, name + "-cell-payload", payloadCell);
             }
