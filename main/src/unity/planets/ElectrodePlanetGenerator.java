@@ -13,9 +13,9 @@ import mindustry.game.*;
 import mindustry.maps.generators.*;
 import mindustry.world.*;
 
-import static unity.content.UnityBlocks.*;
-import static mindustry.content.Blocks.*;
 import static mindustry.Vars.*;
+import static mindustry.content.Blocks.*;
+import static unity.content.UnityBlocks.*;
 
 public class ElectrodePlanetGenerator extends PlanetGenerator{
     BaseGenerator basegen = new BaseGenerator();

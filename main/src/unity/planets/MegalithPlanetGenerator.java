@@ -4,6 +4,7 @@ import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
+import arc.util.Log.*;
 import arc.util.*;
 import arc.util.noise.*;
 import mindustry.ai.*;
@@ -12,6 +13,7 @@ import mindustry.game.*;
 import mindustry.maps.generators.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import unity.*;
 import unity.content.*;
 import unity.graphics.*;
 import unity.mod.*;
@@ -255,9 +257,9 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
             }
         }
 
-        Log.debug("Generated @ rooms", rooms.size);
+        Unity.print(LogLevel.debug, Strings.format("Generated @ rooms", rooms.size));
         for(Room room : rooms){
-            Log.debug("Generated room @", room.name);
+            Unity.print(LogLevel.debug, Strings.format("Generated room @", room.name));
             erase(room.x, room.y, room.radius);
         }
 
@@ -442,7 +444,7 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
                                 return build;
                             });
 
-                            Log.debug("Generated a message block at (@, @).", tile.x, tile.y);
+                            Unity.print(LogLevel.debug, Strings.format("Generated a message block at (@, @).", tile.x, tile.y));
 
                             hasMessage = true;
                             break;

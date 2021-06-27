@@ -2,6 +2,7 @@ package unity.mod;
 
 import arc.struct.*;
 
+/** @deprecated There's got to be a better way to do this */
 public final class ContributorList{
     private static final IntMap<Seq<String>> contributors = new IntMap<>(ContributionType.all.length);
 

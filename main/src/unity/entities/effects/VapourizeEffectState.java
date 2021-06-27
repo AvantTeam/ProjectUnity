@@ -1,16 +1,16 @@
 package unity.entities.effects;
 
-import arc.graphics.Color;
-import arc.graphics.g2d.Draw;
+import arc.graphics.*;
+import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.math.geom.Position;
-import arc.util.Tmp;
+import arc.math.geom.*;
+import arc.util.*;
 import mindustry.gen.*;
-import mindustry.graphics.Layer;
+import mindustry.graphics.*;
 import mindustry.type.*;
-import unity.content.UnityFx;
+import unity.content.*;
 import unity.entities.*;
-import unity.util.Utils;
+import unity.util.*;
 
 //I doubt that is this way appropriate?
 public class VapourizeEffectState extends EffectState{
@@ -68,7 +68,7 @@ public class VapourizeEffectState extends EffectState{
         Tmp.c1.set(Color.black);
         Tmp.c1.a = Mathf.clamp(slope * ((1 - unit.healthf()) + extraAlpha) * 1.4f);
         Draw.color(Tmp.c1);
-        Utils.simpleUnitDrawer(unit, false);
+        GraphicUtils.simpleUnitDrawer(unit, false);
         Draw.z(oz);
     }
 

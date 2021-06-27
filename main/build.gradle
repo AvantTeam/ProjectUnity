@@ -1,25 +1,23 @@
-sourceSets.main.java.srcDirs = ['src/', "$buildDir/generated/sources/annotationProcessor/java/main/", "$projectDir/fetched"]
-
-import arc.*
-import arc.files.*
-import arc.func.*
-import arc.struct.*
-import arc.util.*
-import arc.util.serialization.*
+sourceSets.main {
+    java.srcDirs = [
+        'src/',
+        "$projectDir/fetched",
+        "$buildDir/generated/sources/annotationProcessor/java/main/"
+    ]
+}
 
 dependencies {
     compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
-
-    annotationProcessor "com.github.Anuken:jabel:$jabelVersion"
 
     compileOnly project(':annotations')
     annotationProcessor project(':annotations')
 }
 
-repositories {
-    mavenCentral()
-    maven { url 'https://www.jitpack.io' }
-}
+import arc.*
+import arc.func.*
+import arc.struct.*
+import arc.util.*
+import arc.util.serialization.*
 
 ext {
     assetsDir = new File(rootDir, "main/assets/")
@@ -32,12 +30,7 @@ ext {
 }
 
 task deploy(type: Jar, dependsOn: configurations.runtimeClasspath) {
-    if(!hasSprites()) {
-        println 'Sprites folder not found; automatically processing sprites...'
-        dependsOn ":tools:proc"
-    }
-
-    println "Compiling ${devBuild() ? 'dev' : 'user'} build."
+    println "Compiling ${devBuild ? 'dev' : 'user'} build."
 
     archiveFileName = "${modName}Desktop.jar"
 
@@ -50,7 +43,7 @@ task deploy(type: Jar, dependsOn: configurations.runtimeClasspath) {
     exclude 'unity/fetched/**'
     exclude 'unity/entities/comp/**'
     exclude 'unity/entities/merge/**'
-    if(!devBuild()) {
+    if(!devBuild) {
         exclude 'unity/mod/DevBuildImpl*'
     }
 }
@@ -66,7 +59,7 @@ task dex(dependsOn: deploy) {
         def files = (
             configurations.compileClasspath.asList() +
             configurations.runtimeClasspath.asList() +
-            [new File("${sdkRoot()}/platforms/android-${sdkVersion()}/android.jar")]
+            [new File("${sdkRoot}/platforms/android-${sdkVersion}/android.jar")]
         )
 
         for(def file : files) {
@@ -74,8 +67,8 @@ task dex(dependsOn: deploy) {
             command += file.path
         }
 
-        command += ['--min-api', sdkAPI(), '--output', dexedArtifact, jarArtifact]
-        if(windows()) {
+        command += ['--min-api', sdkAPI, '--output', dexedArtifact, jarArtifact]
+        if(windows) {
             commandLine('cmd', '/c', *command)
         } else {
             commandLine(*command)
@@ -104,6 +97,7 @@ class Fetcher {
 
     private Throwable error = null
 
+    @SuppressWarnings('all')
     void execute() {
         Boolf<UnsafeRunnable> exec = { final UnsafeRunnable run ->
             try {
@@ -189,15 +183,6 @@ task cleanFetched(type: Delete) {
 }
 
 tasks.withType(JavaCompile) {
-    options.compilerArgs += [
-        '-processor', 
-            'unity.annotations.FactionProcessor,' +
-            'unity.annotations.EntityProcessor,' +
-            'unity.annotations.LoadProcessor,' +
-            'unity.annotations.AssetsProcessor,' +
-            'unity.annotations.MergeProcessor'
-    ]
-
     if(!fetchDir.exists() || !fetchTemp.exists()) {
         dependsOn fetchComps
     } else {
@@ -215,7 +200,7 @@ jar {
     exclude 'unity/fetched/**'
     exclude 'unity/entities/comp/**'
     exclude 'unity/entities/merge/**'
-    if(!devBuild()) {
+    if(!devBuild) {
         exclude 'unity/mod/DevBuildImpl*'
     }
 }

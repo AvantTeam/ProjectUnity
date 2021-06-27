@@ -2,16 +2,16 @@ package unity.entities.bullet;
 
 import arc.math.*;
 import arc.math.geom.*;
-import arc.struct.Seq;
+import arc.struct.*;
 import arc.util.*;
+import mindustry.content.*;
+import mindustry.entities.*;
+import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import unity.content.*;
 import unity.entities.*;
-import unity.graphics.UnityPal;
-import unity.util.Utils;
-import mindustry.content.StatusEffects;
-import mindustry.entities.*;
-import mindustry.entities.bullet.ContinuousLaserBulletType;
+import unity.graphics.*;
+import unity.util.*;
 
 //lmao
 public class SparkingContinuousLaserBulletType extends ContinuousLaserBulletType{

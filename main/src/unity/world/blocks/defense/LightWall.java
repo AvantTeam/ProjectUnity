@@ -1,7 +1,7 @@
 package unity.world.blocks.defense;
 
-import mindustry.world.blocks.defense.Wall;
-import unity.world.blocks.LightRepeaterBuildBase;
+import mindustry.world.blocks.defense.*;
+import unity.world.blocks.*;
 
 /** @deprecated Just don't use it. */
 public class LightWall extends Wall{

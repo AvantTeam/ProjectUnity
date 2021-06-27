@@ -2,11 +2,10 @@ package unity.mod;
 
 import arc.*;
 import arc.graphics.*;
+import mindustry.game.EventType.*;
 import mindustry.graphics.*;
 import unity.annotations.Annotations.*;
 import unity.graphics.*;
-
-import static mindustry.Vars.*;
 
 /** @author GlennFolker */
 @FactionBase
@@ -25,10 +24,23 @@ public enum Faction{
     public static final Faction[] all = values();
 
     public final String name;
+    public String localizedName;
+
     public final Color color;
 
+    public static void init(){
+        for(Faction faction : all){
+            faction.localizedName = Core.bundle.format("faction." + faction.name, faction.color);
+        }
+    }
+
     Faction(String name, Color color){
+        this.name = name;
         this.color = color.cpy();
-        this.name = headless ? name : Core.bundle.format("faction." + name, this.color);
+    }
+
+    @Override
+    public String toString(){
+        return localizedName;
     }
 }

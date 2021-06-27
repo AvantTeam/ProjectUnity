@@ -4,7 +4,7 @@ import arc.graphics.g2d.*;
 import unity.graphics.*;
 import unity.world.blocks.*;
 
-import static arc.Core.atlas;
+import static arc.Core.*;
 
 public class DriveShaft extends GraphBlock{
     final TextureRegion[] baseRegions = new TextureRegion[4];

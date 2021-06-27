@@ -1,6 +1,5 @@
 package younggamExperimental;
 
-import arc.func.*;
 import arc.struct.*;
 
 public class IntPacker{

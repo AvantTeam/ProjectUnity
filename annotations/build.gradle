@@ -1,15 +1,14 @@
-sourceSets.main.java.srcDirs = ['src/']
-
-repositories {
-    mavenCentral()
-    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-    maven { url "https://oss.sonatype.org/content/repositories/releases/" }
-    maven { url "https://www.jitpack.io"}
+sourceSets.main {
+    java.srcDirs = ['src/']
+    resources.srcDirs = ['assets/']
 }
 
 dependencies {
     implementation "com.github.Anuken.Mindustry:core:$mindustryVersion"
     implementation "com.squareup:javapoet:$javapoetVersion"
+}
 
-    annotationProcessor "com.github.Anuken:jabel:$jabelVersion"
+repositories {
+    mavenCentral()
+    maven { url "https://www.jitpack.io" }
 }

@@ -40,6 +40,7 @@ public class AnimatedItem extends Item{
             );
         }
 
+        //TODO this should be done in createIcons(), i'm looking at you sk
         animRegions = new TextureRegion[n];
         for(int i = 0; i < frames; i++){
             if(transitionFrames <= 0){
@@ -48,7 +49,7 @@ public class AnimatedItem extends Item{
                 animRegions[i * (transitionFrames + 1)] = spriteArr[i];
                 for(int j = 1; j <= transitionFrames; j++){
                     float f = (float)j / (transitionFrames + 1);
-                    animRegions[i * (transitionFrames + 1) + j] = Utils.blendSprites(
+                    animRegions[i * (transitionFrames + 1) + j] = GraphicUtils.blendSprites(
                         spriteArr[i],
                         spriteArr[(i + 1) % frames],
                         f,

@@ -7,7 +7,6 @@ import mindustry.world.blocks.production.GenericCrafter.*;
 import mindustry.world.consumers.*;
 import mindustry.world.draw.*;
 import unity.gen.*;
-import unity.gen.LightHoldc.*;
 
 import static arc.Core.*;
 

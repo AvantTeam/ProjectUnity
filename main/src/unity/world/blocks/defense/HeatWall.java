@@ -13,7 +13,7 @@ import unity.world.blocks.*;
 import unity.world.graphs.*;
 import unity.world.modules.*;
 
-import static arc.Core.atlas;
+import static arc.Core.*;
 
 //youngchaWalls
 public class HeatWall extends Block implements GraphBlockBase{

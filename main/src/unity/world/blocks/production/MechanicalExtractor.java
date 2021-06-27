@@ -11,7 +11,7 @@ import unity.world.blocks.*;
 import unity.world.graphs.*;
 import unity.world.modules.*;
 
-import static arc.Core.atlas;
+import static arc.Core.*;
 
 public class MechanicalExtractor extends SolidPump implements GraphBlockBase{
     protected final Graphs graphs = new Graphs();

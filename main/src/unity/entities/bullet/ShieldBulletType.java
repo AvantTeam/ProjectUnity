@@ -2,17 +2,16 @@ package unity.entities.bullet;
 
 import arc.*;
 import arc.audio.*;
-
-import arc.graphics.Color;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.util.Time;
-import mindustry.content.Fx;
+import arc.util.*;
+import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.world.blocks.defense.turrets.Turret.TurretBuild;
+import mindustry.world.blocks.defense.turrets.Turret.*;
 
 public class ShieldBulletType extends BasicBulletType{
     /** Shield stats */

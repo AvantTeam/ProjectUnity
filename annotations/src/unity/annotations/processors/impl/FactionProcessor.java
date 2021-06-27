@@ -1,18 +1,16 @@
-package unity.annotations;
+package unity.annotations.processors.impl;
 
 import arc.audio.*;
 import arc.struct.*;
+import com.squareup.javapoet.*;
 import mindustry.*;
 import mindustry.ctype.*;
-
-import java.util.*;
+import unity.annotations.Annotations.*;
+import unity.annotations.processors.*;
 
 import javax.annotation.processing.*;
 import javax.lang.model.element.*;
-
-import com.squareup.javapoet.*;
-
-import unity.annotations.Annotations.*;
+import java.util.*;
 
 /** @author GlennFolker */
 @SuppressWarnings({"unchecked"})
@@ -104,7 +102,7 @@ public class FactionProcessor extends BaseProcessor{
                     .addParameter(tName(faction), "faction")
                     .addStatement("map.put(content, faction)")
                     .beginControlFlow("if(content instanceof $T unlockable)", cName(UnlockableContent.class))
-                        .addStatement("unlockable.description += $S + $S + faction.name", "\n", "[gray]Faction:[] ")
+                        .addStatement("unlockable.description += $S + $S + faction.localizedName", "\n", "[gray]Faction:[] ")
                     .endControlFlow()
                 .build()
             )

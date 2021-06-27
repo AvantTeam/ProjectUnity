@@ -1,24 +1,25 @@
 package unity.entities.units;
 
-import arc.math.*;
-import arc.math.geom.*;
-import arc.util.*;
-import arc.struct.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.math.*;
+import arc.math.geom.*;
+import arc.struct.*;
+import arc.util.*;
 import mindustry.audio.*;
+import mindustry.entities.*;
+import mindustry.entities.bullet.*;
+import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
-import mindustry.entities.units.*;
-import mindustry.entities.bullet.*;
-import mindustry.entities.Effect;
 import unity.ai.*;
 import unity.annotations.Annotations.*;
 import unity.gen.*;
 import unity.type.*;
 
-import static arc.Core.atlas;
+import static arc.Core.*;
+import static mindustry.Vars.net;
 import static mindustry.Vars.*;
 
 @EntityPoint

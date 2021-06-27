@@ -4,7 +4,7 @@ import arc.graphics.g2d.*;
 import unity.graphics.*;
 import unity.world.blocks.power.*;
 
-import static arc.Core.atlas;
+import static arc.Core.*;
 
 public class HeatSource extends HeatGenerator{
     protected boolean isVoid;

@@ -7,9 +7,9 @@ import arc.util.io.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 import unity.graphics.*;
+import unity.world.graphs.*;
 import unity.world.meta.*;
 import unity.world.modules.*;
-import unity.world.graphs.*;
 
 public class GraphBlock extends Block implements GraphBlockBase{
     protected final Graphs graphs = new Graphs();

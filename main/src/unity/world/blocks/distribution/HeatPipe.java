@@ -10,8 +10,8 @@ import mindustry.gen.*;
 import unity.util.*;
 import unity.world.blocks.*;
 
-import static arc.Core.atlas;
-import static mindustry.Vars.tilesize;
+import static arc.Core.*;
+import static mindustry.Vars.*;
 
 public class HeatPipe extends GraphBlock{
     final static Color baseColor = Color.valueOf("6e7080");
@@ -25,8 +25,8 @@ public class HeatPipe extends GraphBlock{
     @Override
     public void load(){
         super.load();
-        heatRegions = Utils.getRegions(heatRegion, 8, 2);
-        regions = Utils.getRegions(atlas.find(name + "-tiles"), 8, 2);
+        heatRegions = GraphicUtils.getRegions(heatRegion, 8, 2);
+        regions = GraphicUtils.getRegions(atlas.find(name + "-tiles"), 8, 2);
     }
 
     @Override

@@ -7,7 +7,7 @@ import mindustry.gen.*;
 import mindustry.ui.*;
 import unity.world.blocks.*;
 
-import static arc.Core.atlas;
+import static arc.Core.*;
 
 public class HandCrank extends GraphBlock{
     public final TextureRegion[] shaftRegions = new TextureRegion[2];

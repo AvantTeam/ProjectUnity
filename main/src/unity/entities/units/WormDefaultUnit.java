@@ -1,9 +1,9 @@
 package unity.entities.units;
 
-import arc.util.*;
+import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
-import arc.graphics.g2d.*;
+import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
 import mindustry.content.*;

@@ -12,7 +12,7 @@ import mindustry.world.blocks.environment.*;
 import unity.graphics.*;
 import unity.util.*;
 
-import static arc.Core.atlas;
+import static arc.Core.*;
 
 public class SporeFarm extends Block{
     static final int frames = 5;
@@ -38,7 +38,7 @@ public class SporeFarm extends Block{
             groundRegions[i] = atlas.find(name + "-ground" + (i + 1));
         }
         
-        fenceRegions = Utils.getRegions(atlas.find(name + "-fence"), 12, 4);
+        fenceRegions = GraphicUtils.getRegions(atlas.find(name + "-fence"), 12, 4);
         cageFloor = atlas.find(name + "-floor");
     }
 

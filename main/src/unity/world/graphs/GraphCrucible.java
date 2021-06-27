@@ -1,12 +1,11 @@
 package unity.world.graphs;
 
 import arc.scene.ui.layout.*;
-import arc.util.*;
 import mindustry.graphics.*;
 import unity.world.meta.*;
 import unity.world.modules.*;
 
-import static arc.Core.bundle;
+import static arc.Core.*;
 
 public class GraphCrucible extends Graph{
     public final float baseLiquidCapcity, meltSpeed;

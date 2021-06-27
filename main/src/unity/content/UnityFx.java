@@ -12,12 +12,11 @@ import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
-import mindustry.ui.*;
 import mindustry.world.blocks.defense.turrets.Turret.*;
 import unity.entities.*;
 import unity.entities.abilities.BaseAbility.*;
-import unity.entities.bullet.*;
 import unity.entities.bullet.EphemeronBulletType.*;
+import unity.entities.bullet.*;
 import unity.entities.bullet.SingularityBulletType.*;
 import unity.entities.effects.*;
 import unity.graphics.*;
@@ -25,9 +24,9 @@ import unity.type.*;
 import unity.util.*;
 import unity.util.struct.*;
 
-//fixing rect as Draw.rect not Lines.rect. currently no use
 import static arc.graphics.g2d.Draw.rect;
 import static arc.graphics.g2d.Draw.*;
+import static arc.graphics.g2d.Lines.circle;
 import static arc.graphics.g2d.Lines.*;
 import static arc.math.Angles.*;
 import static unity.content.UnityBullets.*;
@@ -200,9 +199,9 @@ public class UnityFx{
     }),
 
     ephemeronLaser = new Effect(19f, 100f, e -> {
-        if(e.data instanceof EphemeronEffectData d && d.b instanceof Bullet b && b.type instanceof EphemeronPairBulletType && b.isAdded()){
+        if(e.data instanceof EphemeronEffectData d && d.b != null && d.b.type instanceof EphemeronPairBulletType && d.b.isAdded()){
             stroke(3.6f * e.fout(), e.color);
-            line(b.x, b.y, d.x, d.y, false);
+            line(d.b.x, d.b.y, d.x, d.y, false);
         }
     }),
 
@@ -769,7 +768,7 @@ public class UnityFx{
         color(1f, 1f, 1f, e.fout());
         blend(Blending.additive);
 
-        Utils.simpleUnitDrawer((Unit)e.data, false);
+        GraphicUtils.simpleUnitDrawer((Unit)e.data, false);
 
         blend();
         color();

@@ -1,13 +1,12 @@
 package unity.world.blocks.defense;
 
+import arc.util.*;
 import mindustry.entities.*;
 import mindustry.world.blocks.defense.*;
 import mindustry.world.meta.*;
 import unity.content.*;
 
-import static arc.Core.bundle;
-
-import arc.util.Time;
+import static arc.Core.*;
 
 public class LimitWall extends Wall{
     protected Effect maxDamageFx = UnityFx.maxDamageFx, withstandFx = UnityFx.withstandFx, blinkFx = UnityFx.blinkFx;

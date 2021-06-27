@@ -2,13 +2,13 @@ package unity.content;
 
 import arc.*;
 import arc.func.*;
-import mindustry.type.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
+import mindustry.type.*;
 import unity.annotations.Annotations.*;
-import unity.type.GlobalObjective;
+import unity.type.*;
 import unity.type.sector.*;
 import unity.type.sector.SectorObjective.*;
 

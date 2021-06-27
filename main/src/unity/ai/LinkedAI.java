@@ -1,9 +1,9 @@
 package unity.ai;
 
-import arc.util.Time;
+import arc.util.*;
 import mindustry.ai.types.*;
 import mindustry.gen.*;
-import unity.type.UnityUnitType;
+import unity.type.*;
 
 public class LinkedAI extends FlyingAI{
     public Unit spawner;

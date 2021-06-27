@@ -2,9 +2,9 @@ package unity.world.modules;
 
 import arc.scene.ui.layout.*;
 import arc.util.io.*;
+import unity.world.blocks.GraphBlockBase.*;
 import unity.world.graphs.*;
 import unity.world.meta.*;
-import unity.world.blocks.GraphBlockBase.*;
 
 public class GraphModules{
     public final GraphBuildBase build;

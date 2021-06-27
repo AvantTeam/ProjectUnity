@@ -1,43 +1,43 @@
-package unity.annotations;
+package unity.annotations.processors;
 
 import arc.files.*;
 import arc.struct.*;
 import arc.util.*;
-
-import java.io.*;
-import java.lang.annotation.*;
-import java.lang.reflect.Method;
-import java.util.*;
-import java.util.regex.*;
-
-import javax.annotation.processing.*;
-import javax.lang.model.*;
-import javax.lang.model.element.*;
-import javax.lang.model.type.*;
-import javax.tools.*;
-
 import com.squareup.javapoet.*;
-import com.sun.source.util.*;
-import com.sun.tools.javac.code.AnnoConstruct;
+import com.sun.tools.javac.api.*;
+import com.sun.tools.javac.code.*;
 import com.sun.tools.javac.code.Attribute.*;
 import com.sun.tools.javac.model.*;
 import com.sun.tools.javac.processing.*;
-
 import mindustry.*;
 import unity.annotations.Annotations.AnnotationProxyMaker;
 
+import javax.annotation.processing.*;
+import javax.lang.model.*;
+import javax.lang.model.element.Modifier;
+import javax.lang.model.element.*;
+import javax.lang.model.type.*;
+import javax.tools.*;
+import java.io.*;
 import java.lang.Class;
+import java.lang.annotation.*;
+import java.lang.reflect.*;
+import java.util.*;
+import java.util.regex.*;
 
-/** @author GlennFolker */
+/**
+ * @author Anuke
+ * @author GlennFolker
+ */
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 public abstract class BaseProcessor extends AbstractProcessor{
     public static final String packageName = "unity.gen";
 
-    public static JavacElements elementUtils;
-    public static Trees treeUtils;
-    public static JavacTypes typeUtils;
-    public static Filer filer;
-    public static Messager messager;
+    public JavacElements elements;
+    public JavacTrees trees;
+    public JavacTypes types;
+    public JavacFiler filer;
+    public JavacMessager message;
     public static Fi rootDir;
 
     protected int round;
@@ -53,11 +53,11 @@ public abstract class BaseProcessor extends AbstractProcessor{
 
         JavacProcessingEnvironment javacProcessingEnv = (JavacProcessingEnvironment)processingEnv;
 
-        elementUtils = javacProcessingEnv.getElementUtils();
-        treeUtils = Trees.instance(javacProcessingEnv);
-        typeUtils = javacProcessingEnv.getTypeUtils();
+        elements = javacProcessingEnv.getElementUtils();
+        trees = JavacTrees.instance(javacProcessingEnv);
+        types = javacProcessingEnv.getTypeUtils();
         filer = javacProcessingEnv.getFiler();
-        messager = javacProcessingEnv.getMessager();
+        message = (JavacMessager)javacProcessingEnv.getMessager();
 
         Log.info("Initialized annotation processor '@'.", getClass().getSimpleName());
     }
@@ -68,8 +68,8 @@ public abstract class BaseProcessor extends AbstractProcessor{
         if(rootDir == null){
             try{
                 String path = Fi.get(filer.getResource(StandardLocation.CLASS_OUTPUT, "no", "no")
-                .toUri().toURL().toString().substring(OS.isWindows ? 6 : "file:".length()))
-                .parent().parent().parent().parent().parent().parent().parent().toString().replace("%20", " ");
+                    .toUri().toURL().toString().substring(OS.isWindows ? 6 : "file:".length()))
+                    .parent().parent().parent().parent().parent().parent().parent().toString().replace("%20", " ");
 
                 rootDir = Fi.get(path);
             }catch(IOException e){
@@ -140,15 +140,15 @@ public abstract class BaseProcessor extends AbstractProcessor{
         }
     }
 
-    public static TypeElement toEl(TypeMirror t){
-        return (TypeElement)typeUtils.asElement(t);
+    public TypeElement toEl(TypeMirror t){
+        return (TypeElement)types.asElement(t);
     }
 
-    public static Seq<Element> elements(Runnable run){
+    public Seq<Element> elements(Runnable run){
         try{
             run.run();
         }catch(MirroredTypesException ex){
-            return Seq.with(ex.getTypeMirrors()).map(BaseProcessor::toEl);
+            return Seq.with(ex.getTypeMirrors()).map(this::toEl);
         }
 
         return Seq.with();
@@ -198,15 +198,15 @@ public abstract class BaseProcessor extends AbstractProcessor{
         return Character.toString('\n');
     }
 
-    Seq<VariableElement> vars(TypeElement t){
+    public Seq<VariableElement> vars(TypeElement t){
         return Seq.with(t.getEnclosedElements()).select(e -> e instanceof VariableElement).map(e -> (VariableElement)e);
     }
 
-    Seq<ExecutableElement> methods(TypeElement t){
+    public Seq<ExecutableElement> methods(TypeElement t){
         return Seq.with(t.getEnclosedElements()).select(e -> e instanceof ExecutableElement).map(e -> (ExecutableElement)e);
     }
 
-    Seq<TypeElement> types(TypeElement t){
+    public Seq<TypeElement> types(TypeElement t){
         return Seq.with(t.getEnclosedElements()).select(e -> e instanceof TypeElement).map(e -> (TypeElement)e);
     }
 
@@ -233,10 +233,10 @@ public abstract class BaseProcessor extends AbstractProcessor{
     public static boolean isConstructor(ExecutableElement e){
         return
             simpleName(e).equals("<init>") ||
-            simpleName(e).equals("<clinit>");
+                simpleName(e).equals("<clinit>");
     }
 
-    boolean hasMethod(TypeElement type, ExecutableElement method){
+    public boolean hasMethod(TypeElement type, ExecutableElement method){
         for(; !(type.getSuperclass() instanceof NoType); type = toEl(type.getSuperclass())){
             if(method(type, simpleName(method), method.getReturnType(), method.getParameters()) != null){
                 return true;
@@ -245,14 +245,14 @@ public abstract class BaseProcessor extends AbstractProcessor{
         return false;
     }
 
-    ExecutableElement method(TypeElement type, String name, TypeMirror retType, List<? extends VariableElement> params){
+    public ExecutableElement method(TypeElement type, String name, TypeMirror retType, List<? extends VariableElement> params){
         return methods(type).find(m -> {
             List<? extends VariableElement> realParams = m.getParameters();
 
             return
                 simpleName(m).equals(name) &&
-                (retType == null || typeUtils.isSameType(m.getReturnType(), retType)) &&
-                paramEquals(realParams, params);
+                    (retType == null || types.isSameType(m.getReturnType(), retType)) &&
+                    paramEquals(realParams, params);
         });
     }
 
@@ -264,14 +264,14 @@ public abstract class BaseProcessor extends AbstractProcessor{
             VariableElement a = first.get(i);
             VariableElement b = second.get(i);
 
-            if(!typeUtils.isSameType(a.asType(), b.asType())) same = false;
+            if(!types.isSameType(a.asType(), b.asType())) same = false;
         }
 
         return same;
     }
 
-    Seq<String> getImports(Element e){
-        return Seq.with(treeUtils.getPath(e).getCompilationUnit().getImports()).map(Object::toString);
+    public Seq<String> getImports(Element e){
+        return Seq.with(trees.getPath(e).getCompilationUnit().getImports()).map(Object::toString);
     }
 
     public static String getDefault(String value){
@@ -291,15 +291,15 @@ public abstract class BaseProcessor extends AbstractProcessor{
         }
     }
 
-    public static boolean instanceOf(String type, String other){
-        TypeElement a = elementUtils.getTypeElement(type);
-        TypeElement b = elementUtils.getTypeElement(other);
-        return a != null && b != null && typeUtils.isSubtype(a.asType(), b.asType());
+    public boolean instanceOf(String type, String other){
+        TypeElement a = elements.getTypeElement(type);
+        TypeElement b = elements.getTypeElement(other);
+        return a != null && b != null && types.isSubtype(a.asType(), b.asType());
     }
 
     public static boolean isPrimitive(String type){
         return type.equals("boolean") || type.equals("byte") || type.equals("short") || type.equals("int")
-        || type.equals("long") || type.equals("float") || type.equals("double") || type.equals("char");
+            || type.equals("long") || type.equals("float") || type.equals("double") || type.equals("char");
     }
 
     public static <A extends Annotation> A annotation(Element e, Class<A> annotation){
@@ -313,8 +313,8 @@ public abstract class BaseProcessor extends AbstractProcessor{
         }
     }
 
-    public static TypeElement toType(Class<?> type){
-        return elementUtils.getTypeElement(type.getCanonicalName());
+    public TypeElement toType(Class<?> type){
+        return elements.getTypeElement(type.getCanonicalName());
     }
 
     public static String fullName(Element e){

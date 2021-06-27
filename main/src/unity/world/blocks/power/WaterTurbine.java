@@ -14,7 +14,7 @@ import unity.world.graphs.*;
 import unity.world.meta.*;
 import unity.world.modules.*;
 
-import static arc.Core.atlas;
+import static arc.Core.*;
 
 public class WaterTurbine extends ArmoredConduit implements GraphBlockBase{
     protected final Graphs graphs = new Graphs();

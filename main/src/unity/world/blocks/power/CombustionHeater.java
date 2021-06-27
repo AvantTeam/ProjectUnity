@@ -8,7 +8,7 @@ import mindustry.type.*;
 import mindustry.world.consumers.*;
 import unity.graphics.*;
 
-import static arc.Core.atlas;
+import static arc.Core.*;
 
 public class CombustionHeater extends HeatGenerator{
     public final TextureRegion[] baseRegions = new TextureRegion[4];

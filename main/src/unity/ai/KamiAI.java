@@ -143,7 +143,7 @@ public class KamiAI implements UnitController, Position{
                 }
             }
         }
-        if(target instanceof Unit e && !(e.controller() instanceof Player)) target = null;
+        if(target != null && !(target.controller() instanceof Player)) target = null;
         if(spellSeq.isEmpty()){
             for(int i = 0; i < KamiPatterns.majorPatterns.length; i++){
                 spellSeq.add(i);

@@ -1,32 +1,30 @@
 package unity.annotations;
 
-import arc.audio.*;
 import arc.func.*;
-import mindustry.gen.*;
-import mindustry.world.*;
-
 import com.sun.tools.javac.code.*;
 import com.sun.tools.javac.code.Attribute.Array;
 import com.sun.tools.javac.code.Attribute.Enum;
 import com.sun.tools.javac.code.Attribute.Error;
 import com.sun.tools.javac.code.Attribute.Visitor;
 import com.sun.tools.javac.code.Attribute.*;
+import com.sun.tools.javac.code.Scope.*;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.code.Symbol.*;
 import com.sun.tools.javac.code.Type.ArrayType;
 import com.sun.tools.javac.util.List;
 import com.sun.tools.javac.util.Name;
 import com.sun.tools.javac.util.*;
+import mindustry.world.*;
 import sun.reflect.annotation.*;
 
 import javax.lang.model.element.*;
 import javax.lang.model.type.*;
 import java.lang.Class;
-import java.lang.annotation.*;
 import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.*;
 import java.lang.reflect.*;
 import java.util.*;
-import java.util.Map.*;
+import java.util.Map.Entry;
 
 /** @author GlennFolker */
 public class Annotations{
@@ -216,8 +214,14 @@ public class Annotations{
         /** @return The regions' name */
         String[] value();
 
-        /** @return Whether it should load the outlined region as well */
+        /** @return Whether it should outline the region, as a separate texture */
         boolean outline() default false;
+
+        /** @return The outline color, only valid if {@link #outline()} is true */
+        String outlineColor() default "464649";
+
+        /** @return The outline radius, only valid if {@link #outline()} is true */
+        int outlineRadius() default 4;
     }
 
     //end region
@@ -225,59 +229,62 @@ public class Annotations{
     //anuke's implementation of annotation proxy maker, to replace the broken one from oracle
     //thanks, anuke
     //damn you, oracle
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    @SuppressWarnings({"unchecked"})
     public static class AnnotationProxyMaker{
         private final Compound anno;
         private final Class<? extends Annotation> annoType;
 
-        private AnnotationProxyMaker(Compound var1, Class<? extends Annotation> var2){
-            this.anno = var1;
-            this.annoType = var2;
+        private AnnotationProxyMaker(Compound anno, Class<? extends Annotation> annoType){
+            this.anno = anno;
+            this.annoType = annoType;
         }
 
-        public static <A extends Annotation> A generateAnnotation(Compound var0, Class<A> var1){
-            AnnotationProxyMaker var2 = new AnnotationProxyMaker(var0, var1);
-            return var1.cast(var2.generateAnnotation());
+        public static <A extends Annotation> A generateAnnotation(Compound anno, Class<A> annoType){
+            AnnotationProxyMaker var2 = new AnnotationProxyMaker(anno, annoType);
+            return annoType.cast(var2.generateAnnotation());
         }
 
         private Annotation generateAnnotation(){
-            return AnnotationParser.annotationForMap(this.annoType, this.getAllReflectedValues());
+            return AnnotationParser.annotationForMap(annoType, getAllReflectedValues());
         }
 
         private Map<String, Object> getAllReflectedValues(){
-            LinkedHashMap var1 = new LinkedHashMap();
+            Map<String, Object> res = new LinkedHashMap<>();
 
-            for(Entry<MethodSymbol, Attribute> var3 : this.getAllValues().entrySet()){
-                MethodSymbol var4 = var3.getKey();
-                Object var5 = this.generateValue(var4, var3.getValue());
-                if(var5 != null){
-                    var1.put(var4.name.toString(), var5);
+            for(Entry<MethodSymbol, Attribute> entry : getAllValues().entrySet()){
+                MethodSymbol meth = entry.getKey();
+                Object value = generateValue(meth, entry.getValue());
+                if(value != null){
+                    res.put(meth.name.toString(), value);
                 }
             }
 
-            return var1;
+            return res;
         }
 
         private Map<MethodSymbol, Attribute> getAllValues(){
-            LinkedHashMap map = new LinkedHashMap();
+            Map<MethodSymbol, Attribute> map = new LinkedHashMap<>();
             ClassSymbol cl = (ClassSymbol)anno.type.tsym;
 
             try{
-                Class entryClass = Class.forName("com.sun.tools.javac.code.Scope$Entry");
-                Object members = cl.members();
-                Field field = members.getClass().getField("elems");
-                Object elems = field.get(members);
+                Class<?> entryClass = Class.forName("com.sun.tools.javac.code.Scope$Entry");
                 Field siblingField = entryClass.getField("sibling");
                 Field symField = entryClass.getField("sym");
+
+                WriteableScope members = cl.members();
+                Field field = members.getClass().getField("elems");
+                Object elems = field.get(members);
+
                 for(Object currEntry = elems; currEntry != null; currEntry = siblingField.get(currEntry)){
                     handleSymbol((Symbol)symField.get(currEntry), map);
                 }
             }catch(Throwable e){
                 try{
-                    Class lookupClass = Class.forName("com.sun.tools.javac.code.Scope$LookupKind");
+                    Class<?> lookupClass = Class.forName("com.sun.tools.javac.code.Scope$LookupKind");
                     Field nonRecField = lookupClass.getField("NON_RECURSIVE");
                     Object nonRec = nonRecField.get(null);
-                    Scope scope = cl.members();
+
+                    WriteableScope scope = cl.members();
                     Method getSyms = scope.getClass().getMethod("getSymbols", lookupClass);
                     Iterable<Symbol> it = (Iterable<Symbol>)getSyms.invoke(scope, nonRec);
                     for(Symbol symbol : it){
@@ -288,19 +295,19 @@ public class Annotations{
                 }
             }
 
-            for(Pair var7 : this.anno.values){
+            for(Pair<MethodSymbol, Attribute> var7 : this.anno.values){
                 map.put(var7.fst, var7.snd);
             }
 
             return map;
         }
 
-        private void handleSymbol(Symbol sym, LinkedHashMap map){
+        private <T extends Symbol> void handleSymbol(Symbol sym, Map<T, Attribute> map){
             if(sym.getKind() == ElementKind.METHOD){
                 MethodSymbol var4 = (MethodSymbol)sym;
                 Attribute var5 = var4.getDefaultValue();
                 if(var5 != null){
-                    map.put(var4, var5);
+                    map.put((T)var4, var5);
                 }
             }
         }
@@ -336,14 +343,17 @@ public class Annotations{
                 return this.value;
             }
 
+            @Override
             public void visitConstant(Constant var1){
                 this.value = var1.getValue();
             }
 
+            @Override
             public void visitClass(com.sun.tools.javac.code.Attribute.Class var1){
                 this.value = mirrorProxy(var1.classType);
             }
 
+            @Override
             public void visitArray(Array var1){
                 Name var2 = ((ArrayType)var1.type).elemtype.tsym.getQualifiedName();
                 int var6;
@@ -388,6 +398,7 @@ public class Annotations{
                 }
             }
 
+            @Override
             public void visitEnum(Enum var1){
                 if(this.returnClass.isEnum()){
                     String var2 = var1.value.toString();
@@ -402,6 +413,7 @@ public class Annotations{
                 }
             }
 
+            @Override
             public void visitCompound(Compound var1){
                 try{
                     Class var2 = this.returnClass.asSubclass(Annotation.class);
@@ -412,6 +424,7 @@ public class Annotations{
 
             }
 
+            @Override
             public void visitError(Error var1){
                 if(var1 instanceof UnresolvedClass){
                     this.value = mirrorProxy(((UnresolvedClass)var1).classType);

@@ -5,7 +5,7 @@ import mindustry.graphics.*;
 import unity.world.meta.*;
 import unity.world.modules.*;
 
-import static arc.Core.bundle;
+import static arc.Core.*;
 
 public class GraphHeat extends Graph{
     public final float baseHeatCapacity, baseHeatConductivity, baseHeatRadiativity;

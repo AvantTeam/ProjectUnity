@@ -3,7 +3,7 @@ package unity.world.graphs;
 import arc.scene.ui.layout.*;
 import unity.world.modules.*;
 
-import static arc.Core.bundle;
+import static arc.Core.*;
 
 public class GraphTorqueConsume extends GraphTorque{
     public final float nominalSpeed, oversupplyFalloff, idleFriction, workingFriction;

@@ -8,8 +8,9 @@ import mindustry.graphics.*;
 import unity.graphics.*;
 
 import static arc.graphics.g2d.Draw.*;
+import static arc.graphics.g2d.Lines.circle;
 import static arc.graphics.g2d.Lines.*;
-import static arc.math.Angles.randLenVectors;
+import static arc.math.Angles.*;
 
 public class HitFx{
     public static Effect electronHit = new Effect(12f, e -> {

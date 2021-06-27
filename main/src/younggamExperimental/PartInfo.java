@@ -1,6 +1,5 @@
 package younggamExperimental;
 
-import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.math.geom.*;
 import arc.struct.*;
@@ -62,7 +61,7 @@ public class PartInfo{
         for(int i = 0, len = partsConfig.length; i < len; i++){
             var pinfo = partsConfig[i];
             pinfo.id = i;
-            pinfo.texRegion = Utils.getRegionRect(partsSprite, pinfo.tx, pinfo.ty, pinfo.tw, pinfo.th, spriteW, spriteH);
+            pinfo.texRegion = GraphicUtils.getRegionRect(partsSprite, pinfo.tx, pinfo.ty, pinfo.tw, pinfo.th, spriteW, spriteH);
         }
     }
 }

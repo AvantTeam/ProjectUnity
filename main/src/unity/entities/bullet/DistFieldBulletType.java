@@ -4,15 +4,14 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.util.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import unity.content.*;
 import unity.entities.bullet.exp.*;
-import unity.gen.*;
 import unity.gen.Expc.*;
+import unity.gen.*;
 
 public class DistFieldBulletType extends ExpBulletType {
     public Color centerColor, edgeColor;
@@ -26,7 +25,6 @@ public class DistFieldBulletType extends ExpBulletType {
     public DistFieldBulletType(float speed, float damage){
         super(speed, damage);
     }
-
 
     @Override
     public void draw(Bullet b){
@@ -70,7 +68,6 @@ public class DistFieldBulletType extends ExpBulletType {
 
     @Override
     public void update(Bullet b){
-        Log.info(b.owner); //how can i get exp
         int temp = 80;
         final float radius;
 

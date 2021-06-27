@@ -3,7 +3,7 @@ package unity.world.blocks.power;
 import arc.struct.*;
 import mindustry.game.*;
 import mindustry.gen.*;
-import mindustry.type.ItemStack;
+import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.power.*;
 
