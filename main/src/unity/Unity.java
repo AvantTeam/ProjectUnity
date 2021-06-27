@@ -257,10 +257,6 @@ public class Unity extends Mod{
         print(level, " ", args);
     }
 
-    public static void print(String separator, Object... args){
-        print(LogLevel.info, separator, args);
-    }
-
     public static void print(LogLevel level, String separator, Object... args){
         StringBuilder builder = new StringBuilder();
         if(args == null){
