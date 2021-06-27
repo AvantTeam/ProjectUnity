@@ -7,7 +7,6 @@ build/
 .classpath
 
 # Project
-main/assets/sprites/
 main/fetched
 main/fetch.txt
 
