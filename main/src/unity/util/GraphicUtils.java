@@ -187,8 +187,8 @@ public final class GraphicUtils{
         var suma = Pools.obtain(Color.class, Color::new).set(0f, 0f, 0f, 0f);
         var p = new int[9];
 
-        for(int x = 0; x < image.width; x++){
-            for(int y = 0; y < image.height; y++){
+        for(int x = 0; x < out.width; x++){
+            for(int y = 0; y < out.height; y++){
                 int A = getColorClamped(out, x - 1, y + 1),
                     B = getColorClamped(out, x, y + 1),
                     C = getColorClamped(out, x + 1, y + 1),
@@ -213,7 +213,7 @@ public final class GraphicUtils{
                 suma.set(0f, 0f, 0f, 0f);
 
                 for(int val : p){
-                    color.rgba8888(val);
+                    color.set(val);
                     suma.r += color.r * color.a;
                     suma.g += color.g * color.a;
                     suma.b += color.b * color.a;
@@ -227,7 +227,7 @@ public final class GraphicUtils{
                 sum.set(0f, 0f, 0f, 0f);
 
                 for(int val : p){
-                    color.rgba8888(val);
+                    color.set(val);
                     float a = color.a;
                     color.lerp(suma, 1f - a);
                     sum.r += color.r;
@@ -239,7 +239,7 @@ public final class GraphicUtils{
 
                 fm = 1f / total;
                 sum.mul(fm, fm, fm, fm);
-                out.setRaw(x, y, sum.rgba8888());
+                out.setRaw(x, y, sum.rgba());
                 sum.set(0f, 0f, 0f, 0f);
             }
         }
@@ -248,7 +248,8 @@ public final class GraphicUtils{
         Pools.free(sum);
         Pools.free(suma);
 
-        image.set(out);
+        image.pixmap.draw(out, image.x, image.y, false);
+        out.dispose();
     }
 
     public static int getColorClamped(Pixmap image, int x, int y){
