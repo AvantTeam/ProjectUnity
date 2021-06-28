@@ -13,7 +13,6 @@ buildscript {
 
 allprojects {
     apply plugin: 'java'
-    apply plugin: 'java-library'
     apply plugin: 'maven-publish'
 
     group = 'com.github.AvantTeam'
@@ -38,14 +37,8 @@ allprojects {
         from sourceSets.main.allSource
     }
 
-    task assetsJar(type: Jar, dependsOn: ":tools:proc") {
-        archiveClassifier.set('assets')
-        from files('main/assets/')
-    }
-
     artifacts {
         archives sourcesJar
-        archives assetsJar
     }
 
     java {
@@ -62,6 +55,10 @@ allprojects {
     }
 
     tasks.withType(JavaCompile) {
+        options.incremental = true
+        options.encoding = 'UTF-8'
+        options.compilerArgs += '-Xlint:deprecation'
+
         options.fork = true
         options.forkOptions.jvmArgs += [
             '--add-opens=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED',
@@ -80,42 +77,5 @@ allprojects {
             addStringOption('Xdoclint:none', '-quiet')
             addStringOption('-release', '16')
         }
-    }
-}
-
-configure(project(':annotations')) {
-    sourceCompatibility = 8
-    targetCompatibility = 8
-
-    tasks.withType(JavaCompile) {
-        sourceCompatibility = 8
-        targetCompatibility = 8
-    }
-}
-
-configure(subprojects - project(':annotations')) {
-    sourceCompatibility = 16
-    targetCompatibility = 8
-
-    tasks.withType(JavaCompile) {
-        sourceCompatibility = 16
-        targetCompatibility = 8
-
-        options.incremental = true
-        options.encoding = 'UTF-8'
-
-        options.compilerArgs += '-Xlint:deprecation'
-        if(JavaVersion.current() != JavaVersion.VERSION_1_8) {
-            options.compilerArgs += ['--release', '8']
-        }
-    }
-
-    dependencies {
-        annotationProcessor "com.github.bsideup.jabel:jabel-javac-plugin:$jabelVersion"
-    }
-
-    repositories {
-        mavenCentral()
-        maven { url 'https://jitpack.io' }
     }
 }

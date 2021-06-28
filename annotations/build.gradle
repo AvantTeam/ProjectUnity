@@ -3,12 +3,15 @@ sourceSets.main {
     resources.srcDirs = ['assets/']
 }
 
+sourceCompatibility = 8
+targetCompatibility = 8
+
 dependencies {
     implementation "com.github.Anuken.Mindustry:core:$mindustryVersion"
     implementation "com.squareup:javapoet:$javapoetVersion"
 }
 
-repositories {
-    mavenCentral()
-    maven { url "https://www.jitpack.io" }
+tasks.withType(JavaCompile) {
+    sourceCompatibility = 8
+    targetCompatibility = 8
 }
