@@ -5,6 +5,8 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.TextureAtlas.*;
 import arc.graphics.g2d.*;
+import arc.graphics.g3d.*;
+import arc.math.geom.*;
 import arc.scene.*;
 import arc.struct.*;
 import arc.util.*;
@@ -14,9 +16,11 @@ import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
+import mindustry.graphics.g3d.*;
 import mindustry.mod.*;
 import mindustry.world.blocks.environment.*;
 import unity.ai.kami.*;
+import unity.assets.type.g3d.*;
 import unity.async.*;
 import unity.cinematic.*;
 import unity.content.*;
@@ -38,6 +42,7 @@ public class Unity extends Mod{
     public static TapHandler tap;
     public static AntiCheat antiCheat;
     public static DevBuild dev;
+    public static Models model;
 
     private static final ContentList[] content = {
         new UnityItems(),
@@ -111,6 +116,7 @@ public class Unity extends Mod{
         music = new MusicHandler(){};
         tap = new TapHandler();
         antiCheat = new AntiCheat();
+        model = new Models();
 
         asyncCore.processes.add(new LightProcess());
     }

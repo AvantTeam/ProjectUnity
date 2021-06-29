@@ -11,12 +11,16 @@ import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
+import unity.assets.type.g3d.*;
+import unity.assets.type.g3d.attribute.type.*;
 
 import static mindustry.Vars.*;
+import static unity.Unity.*;
 
 public class UnityShaders implements Loadable{
     public static HolographicShieldShader holoShield;
     public static StencilShader stencilShader;
+    public static Graphics3DShader graphics3D;
 
     protected static FrameBuffer buffer;
     protected static UnityShader[] all;
@@ -31,7 +35,8 @@ public class UnityShaders implements Loadable{
         buffer = new FrameBuffer();
         all = new UnityShader[]{
             holoShield = new HolographicShieldShader(),
-            stencilShader = new StencilShader()
+            stencilShader = new StencilShader(),
+            graphics3D = new Graphics3DShader()
         };
 
         for(int i = 0; i < all.length; i++){
@@ -68,10 +73,6 @@ public class UnityShaders implements Loadable{
     public static class UnityShader extends Shader{
         public final Boolp apply;
         protected float layer;
-
-        public UnityShader(Fi vert, Fi frag){
-            this(vert, frag, () -> true);
-        }
 
         public UnityShader(Fi vert, Fi frag, Boolp apply){
             super(vert, frag);
@@ -118,6 +119,26 @@ public class UnityShaders implements Loadable{
                 Core.camera.position.x - Core.camera.width / 2f,
                 Core.camera.position.y - Core.camera.height / 2f
             );
+        }
+    }
+
+    public static class Graphics3DShader extends UnityShader{
+        public Graphics3DShader(){
+            super(tree.get("shaders/g3d.vert"), tree.get("shaders/g3d.frag"), () -> false);
+        }
+
+        public void apply(Renderable render){
+            setUniformMatrix4("u_worldTrans", render.worldTransform.val);
+            setUniformMatrix4("u_projViewTrans", Core.camera.mat);
+            setUniformMatrix("u_normalMatrix", Tmp.m1.set(render.worldTransform.val).inv().transpose());
+
+            TextureAttribute diff = render.material.get(TextureAttribute.diffuse);
+            TextureAttribute spec = render.material.get(TextureAttribute.specular);
+            TextureAttribute norm = render.material.get(TextureAttribute.normal);
+
+            if(diff != null) setUniformi("u_diffuseTexture", model.bind(diff));
+            if(spec != null) setUniformi("u_specularTexture", model.bind(spec));
+            if(norm != null) setUniformi("u_normalTexture", model.bind(norm));
         }
     }
 }

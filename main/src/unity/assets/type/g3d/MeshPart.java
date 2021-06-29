@@ -120,7 +120,7 @@ public class MeshPart{
         radius = halfExtents.len();
     }
 
-    public void extendBoundingBox(Mat transform){
+    public void extendBoundingBox(Mat3D transform){
         int numIndices = mesh.getNumIndices();
         int numVertices = mesh.getNumVertices();
         int max = numIndices == 0 ? numVertices : numIndices;
@@ -146,7 +146,7 @@ public class MeshPart{
             for(int i = offset; i < end; i++){
                 int idx = (index.get(i) & 0xFFFF) * vertSize + posoff;
                 Tmp.v31.set(verts.get(idx), verts.get(idx + 1), verts.get(idx + 2));
-                if(transform != null) Tmp.v31.mul(transform);
+                if(transform != null) Mat3D.prj(Tmp.v31, transform);
 
                 bounds.ext(Tmp.v31);
             }
@@ -187,13 +187,5 @@ public class MeshPart{
      */
     public void render(Shader shader, boolean autoBind){
         mesh.render(shader, primitiveType, offset, size, autoBind);
-    }
-
-    /**
-     * Renders the mesh part using the specified shader, must be called after {@link Shader#bind()}.
-     * @param shader the shader to be used
-     */
-    public void render(Shader shader){
-        mesh.render(shader, primitiveType, offset, size);
     }
 }

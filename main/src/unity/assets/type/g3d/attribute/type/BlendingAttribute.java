@@ -5,11 +5,11 @@ import arc.math.*;
 import unity.assets.type.g3d.attribute.*;
 
 public class BlendingAttribute extends Attribute{
-    public final static String Alias = "blended";
-    public final static long Type = register(Alias);
+    public final static String blendAlias = "blended";
+    public final static long blend = register(blendAlias);
 
     public static boolean is(long mask){
-        return (mask & Type) == mask;
+        return (mask & blend) == mask;
     }
 
     /**
@@ -38,7 +38,7 @@ public class BlendingAttribute extends Attribute{
     }
 
     public BlendingAttribute(final boolean blended, final int sourceFunc, final int destFunc, final float opacity){
-        super(Type);
+        super(blend);
         this.blended = blended;
         this.sourceFunction = sourceFunc;
         this.destFunction = destFunc;

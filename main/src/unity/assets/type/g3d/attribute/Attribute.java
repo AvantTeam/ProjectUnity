@@ -28,7 +28,7 @@ public abstract class Attribute implements Comparable<Attribute>{
     }
 
     /**
-     * @return The alias of the specified attribute type, or null if not available.
+     * @return The blendAlias of the specified attribute type, or null if not available.
      */
     public static String getAttributeAlias(long type){
         int idx = -1;
