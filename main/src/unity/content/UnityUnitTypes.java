@@ -23,6 +23,7 @@ import unity.content.effects.*;
 import unity.entities.*;
 import unity.entities.abilities.*;
 import unity.entities.bullet.*;
+import unity.entities.effects.*;
 import unity.entities.units.*;
 import unity.gen.*;
 import unity.graphics.*;
@@ -49,7 +50,7 @@ public class UnityUnitTypes implements ContentList{
     UnitType citadel, empire;
     // corvus + toxopid
     public static @EntityPoint(LegsUnit.class)
-    UnitType orion, araneidae, theraphosidae;
+    UnitType cygnus, araneidae, theraphosidae;
     // eclipse
     // oct
     public static @EntityPoint(PayloadUnit.class)
@@ -957,68 +958,135 @@ public class UnityUnitTypes implements ContentList{
                 }};
             }});
         }};
-        
-        orion = new UnityUnitType("orion"){{
-            speed = 0.3f;
-            health = 20000;
-            mechFrontSway = 1.9f;
-            mechSideSway = 0.6f;
-            hitSize = 31f;
+
+        cygnus = new UnityUnitType("cygnus"){{
+            speed = 0.26f;
+            health = 21000;
+            hitSize = 37f;
+            armor = 10f;
+            landShake = 1.5f;
+            commandLimit = 8;
+            rotateSpeed = 1.3f;
+
+            legCount = 6;
+            legLength = 29f;
+            legBaseOffset = 8f;
+            legMoveSpace = 0.7f;
+            legTrns = 0.6f;
+            hovering = true;
+            visualElevation = 0.23f;
+            allowLegStep = true;
+            ammoType = AmmoTypes.powerHigh;
+            groundLayer = Layer.legUnit;
+
             weapons.add(new Weapon(){{
-                reload = 300f;
-                ejectEffect = Fx.none;
-                shootCone = 10f;
-                shootSound = Sounds.laserblast;
-                chargeSound = Sounds.lasercharge;
-                firstShotDelay = Fx.greenLaserCharge.lifetime;
-                soundPitchMin = 1f;
-                mirror = false;
-                top = false;
                 x = 0f;
-                shake = 14f;
-                recoil = 5f;
-                shots = 1;
-                allowLegStep = true;
-                shootStatus = StatusEffects.unmoving;
-                shootStatusDuration = 140f;
-                bullet = new BallLightningBulletType(0.5f, 20f, "unity-lightning-ball"){{
+                y = 8.25f;
+                mirror = false;
+                reload = 4f * 60f;
+                recoil = 0f;
+                shootStatus = StatusEffects.slow;
+                shootStatusDuration = 80f;
+
+                BulletType t = new CygnusBulletType(){{
+                    float rad = 170f;
+
+                    damage = 45f;
+                    speed = 4.3f;
+                    lifetime = 75f;
+                    shootEffect = Fx.hitEmpSpark;
+                    smokeEffect = Fx.shootBigSmoke2;
+                    healPercent = 12f;
+                    trailLength = 35;
+                    trailWidth = 9f;
+                    clipSize = (size + trailLength * speed) * 2.5f;
+                    scaleVelocity = true;
+                    unitDamageScl = 0.7f;
+                    hitShake = 7f;
+                    splashDamage = 95f;
+                    splashDamageRadius = rad;
+                    radius = rad;
+                    timeIncrease = 1.75f;
+                    timeDuration = 60f * 20f;
+                    powerDamageScl = 3f;
+                    allyStatusDuration = 60f * 15f;
+                    status = StatusEffects.electrified;
+                    lightning = 6;
+                    lightningLength = 10;
+                    lightningLengthRand = 4;
+                    lightningDamage = 35f;
+                    backColor = trailColor = lightningColor = Pal.heal;
                     frontColor = Color.white;
-                    backColor = ballLightningColor = Pal.heal;
-                    lifetime = 300f;
 
-                    width = height = 24f;
-                    damageRadius = 12f;
+                    hitEffect = new Effect(50f, 100f, e -> {
+                        e.scaled(7f, b -> {
+                            Draw.color(Pal.heal, b.fout());
+                            Fill.circle(e.x, e.y, rad);
+                        });
 
-                    shootEffect = Fx.greenLaserCharge;
-                    hitEffect = Fx.none;
-                    despawnEffect = Fx.none;
-                    
-                    ballLightnings = 5;
-                    ballLightningInaccuracy = 30f;
-                    ballLightningRange = 80f;
-                    ballLightningDamage = 25f;
-                    ballLightningLength = 12;
-                    ballLightningLengthRand = 4;
+                        Draw.color(Pal.heal);
+                        Lines.stroke(e.fout() * 3f);
+                        Lines.circle(e.x, e.y, rad);
 
-                    fragBullets = 3;
-                    fragCone = 45f;
-                    fragVelocityMin = 1f;
-                    fragBullet  = new BallLightningBulletType(0.5f, 5f, "unity-lightning-ball"){{
-                        frontColor = Color.white;
-                        backColor = ballLightningColor = Pal.heal;
-                        lifetime = 300f;
+                        int points = 10;
+                        float offset = Mathf.randomSeed(e.id, 360f);
+                        for(int i = 0; i < points; i++){
+                            float angle = i* 360f / points + offset;
+                            Drawf.tri(e.x + Angles.trnsx(angle, rad), e.y + Angles.trnsy(angle, rad), 6f, 50f * e.fout(), angle);
+                        }
 
-                        width = height = 12f;
-                        damageRadius = 6f;
-                        
-                        hitEffect = Fx.none;
-                        despawnEffect = Fx.none;
-                        
-                        ballLightningRange = 50f;
-                        ballLightningDamage = 20f;
-                        ballLightningLength = 8;
-                        ballLightningLengthRand = 2;
-                    }};
+                        Fill.circle(e.x, e.y, 12f * e.fout());
+                        Draw.color();
+                        Fill.circle(e.x, e.y, 6f * e.fout());
+                        Drawf.light(e.x, e.y, rad * 1.6f, Pal.heal, e.fout());
+                    });
+                }};
+
+                bullet = new MultiBulletType(){{
+                    lifetime = ChargeFx.greenLaserChargeParent.lifetime;
+                    shootEffect = ChargeFx.greenLaserChargeParent;
+                    mirror = false;
+                    bullets = new MultiBulletData[]{
+                        new MultiBulletData(t, 0f, 0f, 0f)
+                    };
+                }};
+            }},
+            new Weapon(name + "-mount"){{
+                x = 22.5f;
+                y = -3f;
+                shootY = 8.75f;
+                rotate = true;
+                alternate = false;
+                rotateSpeed = 2f;
+                reload = 140f;
+                continuous = true;
+                chargeSound = Sounds.lasercharge2;
+                shootSound = Sounds.beam;
+                firstShotDelay = ChargeFx.greenLaserChargeSmallParent.lifetime - 1f;
+                cooldownTime = 130f;
+
+                bullet = new ContinuousLaserBulletType(){{
+                    damage = 45f;
+                    length = 150f;
+                    width = 5f;
+                    hitEffect = Fx.hitMeltHeal;
+                    drawSize = 420f;
+                    lifetime = 140f;
+                    shake = 1f;
+                    despawnEffect = Fx.smokeCloud;
+                    smokeEffect = Fx.none;
+
+                    shootEffect = ChargeFx.greenLaserChargeSmallParent;
+
+                    incendChance = 0.1f;
+                    incendSpread = 5f;
+                    incendAmount = 1;
+
+                    healPercent = 1.2f;
+                    collidesTeam = true;
+                    largeHit = false;
+
+                    colors = new Color[]{Pal.heal.cpy().a(0.2f), Pal.heal.cpy().a(0.5f), Pal.heal.cpy().mul(1.2f), Color.white};
                 }};
             }});
         }};
@@ -1028,7 +1096,7 @@ public class UnityUnitTypes implements ContentList{
             drag = 0.1f;
             speed = 0.42f;
             hitSize = 35.5f;
-            health = 20000;
+            health = 24000;
             rotateSpeed = 1.3f;
             
             legCount = 8;
@@ -3591,7 +3659,7 @@ public class UnityUnitTypes implements ContentList{
                     fromBlockAmount = 1;
                     fromBlockChance = 0.4f;
                     fromBlockDamage = 80f;
-                    shootEffect = UnityFx.devourerChargeEffect;
+                    shootEffect = ChargeFx.devourerChargeEffect;
                     keepVelocity = true;
                     lightColor = lightningColor = hitColor = UnityPal.scarColor;
                     colors = new Color[]{UnityPal.scarColorAlpha, UnityPal.scarColor, UnityPal.endColor, Color.white};

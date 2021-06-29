@@ -102,16 +102,6 @@ public class UnityFx{
         Fill.square(e.x, e.y, e.fslope() * 2f, 45f);
     }),
 
-    branchFragHit = new Effect(8f, e -> {
-        color(Color.white, Pal.lancerLaser, e.fin());
-
-        stroke(0.5f + e.fout());
-        Lines.circle(e.x, e.y, e.fin() * 5f);
-
-        stroke(e.fout());
-        Lines.circle(e.x, e.y, e.fin() * 6f);
-    }),
-
     laserBreakthroughChargeBegin = new Effect(100f, 100f, e -> {
         color(e.color);
         stroke(e.fin() * 3f);
@@ -161,24 +151,6 @@ public class UnityFx{
         color();
     }),
 
-    wBosonChargeBeginEffect = new Effect(38f, e -> {
-        color(UnityPal.lightEffect, Pal.lancerLaser, e.fin());
-        Fill.circle(e.x, e.y, 3f + e.fin() * 6f);
-        color(Color.white);
-        Fill.circle(e.x, e.y, 1.75f + e.fin() * 5.75f);
-    }),
-
-    wBosonChargeEffect = new Effect(24f, e -> {
-        color(UnityPal.lightEffect, Pal.lancerLaser, e.fin());
-	    stroke(1.5f);
-
-        randLenVectors(e.id, 2, (1f - e.finpow()) * 50f, (x, y) -> {
-            float a = Mathf.angle(x, y);
-            lineAngle(e.x + x, e.y + y, a, Mathf.sin(e.finpow() * 3f, 1f, 8f) + 1.5f);
-            Fill.circle(e.x + x, e.y + y, 2f + e.fin() * 1.75f);
-        });
-    }),
-
     wBosonEffect = new Effect(24f, e -> {
         color(Pal.lancerLaser, UnityPal.lightEffect, e.fin());
         stroke(1.25f);
@@ -189,13 +161,6 @@ public class UnityFx{
         color(Pal.lancerLaser, UnityPal.lightEffect, e.fin());
         stroke(1.25f);
         lineAngle(e.x, e.y, e.rotation, e.fout() * 7f);
-    }),
-
-    ephmeronCharge = new Effect(80f, e -> {
-        color(Pal.lancerLaser);
-        UnityDrawf.shiningCircle(e.id, Time.time, e.x, e.y, e.fin() * 9.5f, 6, 25f, 20f, 3f * e.fin());
-		color(Color.white);
-        UnityDrawf.shiningCircle(e.id, Time.time, e.x, e.y, e.fin() * 7.5f, 6, 25f, 20f, 2.5f * e.fin());
     }),
 
     ephemeronLaser = new Effect(19f, 100f, e -> {
@@ -642,27 +607,9 @@ public class UnityFx{
         color();
     }),
 
-    blueTriangleShoot = new Effect(23f, e -> {
-        color(Pal.lancerLaser);
-
-        Fill.poly(e.x, e.y, 3, e.fout() * 24f, e.rotation);
-        Fill.circle(e.x, e.y, e.fout() * 11f);
-    
-        color(Color.white);
-        Fill.circle(e.x, e.y, e.fout() * 9f);
-    }),
-
     blueTriangleTrail = new Effect(50f, e -> {
         color(Color.white, Pal.lancerLaser, e.fin());
         Fill.poly(e.x, e.y, 3, 4f * e.fout(), e.rotation + 180f);
-    }),
-
-    hitAdvanceFlame = new Effect(15f, e -> {
-        color(UnityPal.advance, UnityPal.advanceDark, e.fin());
-
-        Angles.randLenVectors(e.id, 2, e.finpow() * 17f, e.rotation, 60f, (x, y) -> {
-            Fill.poly(e.x + x, e.y + y, 6, 3f + e.fout() * 3f, e.rotation);
-        });
     }),
 
     advanceFlameTrail = new Effect(27f, e -> {
@@ -722,30 +669,6 @@ public class UnityFx{
         Drawf.tri(e.x, e.y, 12f * e.fout(), (float)e.data, e.rotation + 180f);
     }),
 
-    tenmeikiriChargeEffect = new ParentEffect(40f, e -> {
-        Angles.randLenVectors(e.id, 2, 10f, 90f, (x, y) -> {
-            float angle = Mathf.angle(x, y);
-            color(UnityPal.scarColor, UnityPal.endColor, e.fin());
-            Lines.stroke(1.5f);
-            Lines.lineAngleCenter(e.x + (x * e.fout()), e.y + (y * e.fout()), angle, e.fslope() * 13f);
-        });
-    }),
-
-    tenmeikiriChargeBegin = new ParentEffect(158f, e -> {
-        Color[] colors = {UnityPal.scarColor, UnityPal.endColor, Color.white};
-        for(int ii = 0; ii < 3; ii++){
-            float s = (3 - ii) / 3f;
-            float width = Mathf.clamp(e.time / 80f) * (20f + Mathf.absin(Time.time + (ii * 1.4f), 1.1f, 7f)) * s;
-            float length = e.fin() * (100f + Mathf.absin(Time.time + (ii * 1.4f), 1.1f, 11f)) * s;
-            color(colors[ii]);
-            for(int i : Mathf.signs){
-                float rotation = e.rotation + (i * 90f);
-                Drawf.tri(e.x, e.y, width, length * 0.5f, rotation);
-            }
-            Drawf.tri(e.x, e.y, width, length * 1.25f, e.rotation);
-        }
-    }),
-
     vapourizeTile = new Effect(126f, (float)(Vars.tilesize * 16), e -> {
         color(Color.red);
         blend(Blending.additive);
@@ -800,19 +723,6 @@ public class UnityFx{
             Lines.line(a.getX(), a.getY(), Tmp.v1.x, Tmp.v1.y);
         }
         z(oz);
-    }),
-
-    devourerChargeEffect = new ParentEffect(41f, e -> {
-        Color[] colors = {UnityPal.scarColor, UnityPal.endColor, Color.white};
-
-        for(int i = 0; i < colors.length; i++){
-            color(colors[i]);
-            float scl = (colors.length - (i / 1.25f)) * (17f / colors.length);
-            float width = (35f / (1f + (i / Mathf.pi))) * e.fin();
-            float spikeIn = e.fslope() * scl * 1.5f;
-
-            UnityDrawf.shiningCircle(e.id * 241, Time.time + (i * 3f), e.x, e.y, scl * e.fin(), 9, 12f, width, spikeIn);
-        }
     }),
 
     rainbowTextureTrail = new Effect(80f, e -> {

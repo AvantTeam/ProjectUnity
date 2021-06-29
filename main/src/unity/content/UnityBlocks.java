@@ -294,16 +294,20 @@ public class UnityBlocks implements ContentList{
             configurable = true;
             constructTime = 20000f;
             minTier = 6;
-            upgrades.add(
+            upgrades.addAll(
+                new UnitType[]{UnitTypes.reign, UnityUnitTypes.citadel},
+
                 new UnitType[]{UnitTypes.toxopid, UnityUnitTypes.araneidae},
 
-                new UnitType[]{UnitTypes.corvus, UnityUnitTypes.orion},
+                new UnitType[]{UnitTypes.corvus, UnityUnitTypes.cygnus},
 
                 new UnitType[]{UnityUnitTypes.rex, UnityUnitTypes.excelsus},
 
                 new UnitType[]{UnityUnitTypes.monument, UnityUnitTypes.colossus}
             );
             otherUpgrades.add(
+                new UnitType[]{UnityUnitTypes.citadel, UnityUnitTypes.empire},
+
                 new UnitType[]{UnityUnitTypes.araneidae, UnityUnitTypes.theraphosidae},
 
                 new UnitType[]{UnityUnitTypes.colossus, UnityUnitTypes.bastion}
@@ -614,7 +618,7 @@ public class UnityBlocks implements ContentList{
             range = 170f;
             powerUse = 6.6f;
             heatColor = UnityPal.lightHeat;
-            shootEffect = UnityFx.blueTriangleShoot;
+            shootEffect = ShootFx.blueTriangleShoot;
             shootSound = Sounds.pew;
             shootType = new BasicBulletType(9f, 34f, "unity-electric-shell"){
                 {
@@ -650,7 +654,7 @@ public class UnityBlocks implements ContentList{
             powerUse = 4.9f;
             targetAir = false;
             cooldown = 0.008f;
-            shootEffect = UnityFx.blueTriangleShoot;
+            shootEffect = ShootFx.blueTriangleShoot;
             shootType = new ArtilleryBulletType(8f, 44f, "unity-electric-shell"){
                 {
                     lifetime = 35f;
@@ -693,7 +697,7 @@ public class UnityBlocks implements ContentList{
             powerUse = 4.9f;
             cooldown = 0.008f;
             inaccuracy = 3.4f;
-            shootEffect = UnityFx.blueTriangleShoot;
+            shootEffect = ShootFx.blueTriangleShoot;
             shootType = new FlakBulletType(8.7f, 7f){
                 {
                     lifetime = 30f;
@@ -748,8 +752,8 @@ public class UnityBlocks implements ContentList{
                 rotateSpeed = 2.5f;
                 shootCone = 20f;
                 heatColor = UnityPal.lightHeat;
-                chargeBeginEffect = UnityFx.wBosonChargeBeginEffect;
-                chargeEffect = UnityFx.wBosonChargeEffect;
+                chargeBeginEffect = ChargeFx.wBosonChargeBeginEffect;
+                chargeEffect = ChargeFx.wBosonChargeEffect;
                 chargeTime = 38f;
                 cooldown = 0.008f;
                 powerUse = 8.6f;
@@ -978,7 +982,7 @@ public class UnityBlocks implements ContentList{
                 heatColor = UnityPal.lightHeat;
                 cooldown = 0.009f;
                 chargeTime = 80f;
-                chargeBeginEffect = UnityFx.ephmeronCharge;
+                chargeBeginEffect = ChargeFx.ephmeronCharge;
                 
                 shootType = new EphemeronBulletType(7.7f, 10f){{
                     lifetime = 70f;
@@ -3312,8 +3316,8 @@ public class UnityBlocks implements ContentList{
             chargeTime = 158f;
             chargeEffects = 12;
             chargeMaxDelay = 80f;
-            chargeEffect = UnityFx.tenmeikiriChargeEffect;
-            chargeBeginEffect = UnityFx.tenmeikiriChargeBegin;
+            chargeEffect = ChargeFx.tenmeikiriChargeEffect;
+            chargeBeginEffect = ChargeFx.tenmeikiriChargeBegin;
             chargeSound = UnitySounds.tenmeikiriCharge;
             shootSound = UnitySounds.tenmeikiriShoot;
             shootShake = 4f;

@@ -425,7 +425,7 @@ public final class Utils{
                     return false;
                 });
             }else{
-                int offset = Mathf.ceil(tileWidth / tilesize);
+                int offset = Mathf.ceil(tileWidth / tilesize) * 2;
                 int intOffX = Mathf.round(Math.max(Math.abs(x2 - x), tilesize) / tilesize);
                 int intOffY = Mathf.round(Math.max(Math.abs(y2 - y), tilesize) / tilesize);
                 collideLineCollided.updateSize(intOffX + (offset * 2), intOffY + (offset * 2));
@@ -460,19 +460,19 @@ public final class Utils{
 
                         Vec2 segment = Intersector.nearestSegmentPoint(x, y, tV.x, tV.y, p.x * tilesize, p.y * tilesize, tV2);
                         if(!hit){
-                            Pools.free(p);
                             for(Point2 p2 : d8d5[direction]){
                                 int newX = (p.x + p2.x);
                                 int newY = (p.y + p2.y);
                                 int npx = (newX - tileX) + offsetX;
                                 int npy = (newY - tileY) + offsetY;
-                                boolean within = !hitB || Mathf.within(x, y, newX * tilesize, newY * tilesize, tV.dst(x, y));
-                                if(segment.within(newX * tilesize, newY * tilesize, tileWidth) && collideLineCollided.within(npx, npy) && !collideLineCollided.get(npx, npy) && within){
+                                boolean within = !hitB || Mathf.within(x, y, newX, newY, tV.dst(x, y) / tilesize);
+                                if(segment.within(newX, newY, tileWidth / tilesize) && collideLineCollided.within(npx, npy) && !collideLineCollided.get(npx, npy) && within){
                                     Point2 pn = Pools.obtain(Point2.class, Point2::new);
                                     collideLineCastNext.add(pn.set(newX, newY));
                                     collideLineCollided.set(npx, npy, true);
                                 }
                             }
+                            Pools.free(p);
                         }
                     }
                     collideLineCast.clear();

@@ -17,6 +17,10 @@ public class ParentEffect extends Effect{
         super(life, renderer);
     }
 
+    public ParentEffect(float life, float clipSize, Cons<EffectContainer> renderer){
+        super(life, clipSize, renderer);
+    }
+
     @Override
     public void at(float x, float y, float rotation, Object data){
         at(x, y, rotation, Color.white, data);

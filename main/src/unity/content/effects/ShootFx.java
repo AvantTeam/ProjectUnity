@@ -109,5 +109,15 @@ public class ShootFx{
             Fill.circle(e.x + x, e.y + y, e.fout() * 5f);
             Fill.circle(e.x + x / 1.2f, e.y + y / 1.2f, e.fout() * 3f);
         });
+    }),
+
+    blueTriangleShoot = new Effect(23f, e -> {
+        color(Pal.lancerLaser);
+
+        Fill.poly(e.x, e.y, 3, e.fout() * 24f, e.rotation);
+        Fill.circle(e.x, e.y, e.fout() * 11f);
+
+        color(Color.white);
+        Fill.circle(e.x, e.y, e.fout() * 9f);
     });
 }
