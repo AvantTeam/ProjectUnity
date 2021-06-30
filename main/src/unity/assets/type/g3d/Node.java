@@ -85,8 +85,8 @@ public class Node{
             }
 
             int i = 0;
-            for(var entry : part.invBoneBindTransforms.entries()){
-                part.bones[i].set(entry.key.globalTransform).mul(entry.value);
+            for(var key : part.invBoneBindTransforms.orderedKeys()){
+                part.bones[i].set(key.globalTransform).mul(part.invBoneBindTransforms.get(key));
                 i++;
             }
         }

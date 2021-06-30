@@ -6,12 +6,15 @@ import arc.files.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.graphics.g3d.*;
 import arc.graphics.gl.*;
+import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
 import unity.assets.type.g3d.*;
+import unity.assets.type.g3d.attribute.*;
 import unity.assets.type.g3d.attribute.type.*;
 
 import static mindustry.Vars.*;
@@ -123,22 +126,87 @@ public class UnityShaders implements Loadable{
     }
 
     public static class Graphics3DShader extends UnityShader{
+        private final Mat3D temp = new Mat3D();
+        private final static Mat3D idtMatrix = new Mat3D();
+        public final float[] bones = new float[12 * 16];
+
         public Graphics3DShader(){
             super(tree.get("shaders/g3d.vert"), tree.get("shaders/g3d.frag"), () -> false);
         }
 
         public void apply(Renderable render){
+            Camera3D camera = model.camera;
+            Material material = render.material;
+
+            setUniformMatrix4("u_projTrans", camera.projection.val);
+            setUniformMatrix4("u_viewTrans", camera.view.val);
+            setUniformMatrix4("u_projViewTrans", camera.combined.val);
+
+            setUniformf("u_cameraPosition", camera.position.x, camera.position.y, camera.position.z, 1.1881f / (camera.far * camera.far));
+            setUniformf("u_cameraDirection", camera.direction);
+            setUniformf("u_cameraUp", camera.up);
+            setUniformf("u_cameraNearFar", camera.near, camera.far);
+
+            setUniformf("u_time", Time.time);
+
             setUniformMatrix4("u_worldTrans", render.worldTransform.val);
-            setUniformMatrix4("u_projViewTrans", Core.camera.mat);
-            setUniformMatrix("u_normalMatrix", Tmp.m1.set(render.worldTransform.val).inv().transpose());
+            setUniformMatrix4("u_viewWorldTrans", temp.set(camera.view).mul(render.worldTransform).val);
+            setUniformMatrix4("u_projViewWorldTrans", temp.set(camera.combined).mul(render.worldTransform).val);
+            setUniformMatrix("u_normalMatrix", Tmp.m1.set(render.worldTransform.toNormalMatrix().val));
 
-            TextureAttribute diff = render.material.get(TextureAttribute.diffuse);
-            TextureAttribute spec = render.material.get(TextureAttribute.specular);
-            TextureAttribute norm = render.material.get(TextureAttribute.normal);
+            for(int i = 0; i < bones.length; i += 16){
+                int idx = i / 16;
+                if(render.bones == null || idx >= render.bones.length || render.bones[idx] == null){
+                    System.arraycopy(idtMatrix.val, 0, bones, i, 16);
+                }else{
+                    System.arraycopy(render.bones[idx].val, 0, bones, i, 16);
+                }
+            }
 
-            if(diff != null) setUniformi("u_diffuseTexture", model.bind(diff));
-            if(spec != null) setUniformi("u_specularTexture", model.bind(spec));
-            if(norm != null) setUniformi("u_normalTexture", model.bind(norm));
+            setUniformMatrix4fv("u_bones", bones, 0, bones.length);
+
+            FloatAttribute shine = material.get(FloatAttribute.shininess);
+            if(shine != null) setUniformf("u_shininess", shine.value);
+
+            TextureAttribute diff = material.get(TextureAttribute.diffuse);
+            if(diff != null){
+                setUniformf("u_diffuseColor", material.<ColorAttribute>get(ColorAttribute.diffuse).color);
+                setUniformi("u_diffuseTexture", model.bind(diff));
+                setUniformf("u_diffuseUVTransform", diff.offsetU, diff.offsetV, diff.scaleU, diff.scaleV);
+            }
+
+            TextureAttribute spec = material.get(TextureAttribute.specular);
+            if(spec != null){
+                setUniformf("u_specularColor", material.<ColorAttribute>get(ColorAttribute.specular).color);
+                setUniformi("u_specularTexture", model.bind(spec));
+                setUniformf("u_specularUVTransform", spec.offsetU, spec.offsetV, spec.scaleU, spec.scaleV);
+            }
+
+            TextureAttribute em = material.get(TextureAttribute.emissive);
+            if(em != null){
+                setUniformf("u_emissiveColor", material.<ColorAttribute>get(ColorAttribute.emissive).color);
+                setUniformi("u_emissiveTexture", model.bind(em));
+                setUniformf("u_emissiveUVTransform", em.offsetU, em.offsetV, em.scaleU, em.scaleV);
+            }
+
+            TextureAttribute ref = material.get(TextureAttribute.reflection);
+            if(ref != null){
+                setUniformf("u_reflectionColor", material.<ColorAttribute>get(ColorAttribute.reflection).color);
+                setUniformi("u_reflectionTexture", model.bind(ref));
+                setUniformf("u_reflectionUVTransform", ref.offsetU, ref.offsetV, ref.scaleU, ref.scaleV);
+            }
+
+            TextureAttribute nor = material.get(TextureAttribute.normal);
+            if(nor != null){
+                setUniformi("u_normalTexture", model.bind(nor));
+                setUniformf("u_normalUVTransform", nor.offsetU, nor.offsetV, nor.scaleU, nor.scaleV);
+            }
+
+            TextureAttribute am = material.get(TextureAttribute.ambient);
+            if(am != null){
+                setUniformi("u_ambientTexture", model.bind(am));
+                setUniformf("u_ambientUVTransform", am.offsetU, am.offsetV, am.scaleU, am.scaleV);
+            }
         }
     }
 }

@@ -11,13 +11,13 @@ public abstract class Attribute implements Comparable<Attribute>{
     public final long type;
     private final int typeBit;
 
-    protected Attribute(final long type){
+    protected Attribute(long type){
         this.type = type;
         this.typeBit = Long.numberOfTrailingZeros(type);
     }
 
     /** @return The ID of the specified attribute type, or zero if not available */
-    public static long getAttributeType(final String alias){
+    public static long getAttributeType(String alias){
         for(int i = 0; i < types.size; i++){
             if(types.get(i).compareTo(alias) == 0){
                 return 1L << i;

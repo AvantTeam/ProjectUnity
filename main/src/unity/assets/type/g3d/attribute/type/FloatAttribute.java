@@ -4,18 +4,18 @@ import arc.math.*;
 import unity.assets.type.g3d.attribute.*;
 
 public class FloatAttribute extends Attribute{
-    public static final String ShininessAlias = "shininess";
-    public static final long Shininess = register(ShininessAlias);
+    public static final String shininessAlias = "shininess";
+    public static final long shininess = register(shininessAlias);
+
+    public static final String alphaTestAlias = "alphaTest";
+    public static final long alphaTest = register(alphaTestAlias);
 
     public static FloatAttribute createShininess(float value){
-        return new FloatAttribute(Shininess, value);
+        return new FloatAttribute(shininess, value);
     }
 
-    public static final String AlphaTestAlias = "alphaTest";
-    public static final long AlphaTest = register(AlphaTestAlias);
-
     public static FloatAttribute createAlphaTest(float value){
-        return new FloatAttribute(AlphaTest, value);
+        return new FloatAttribute(alphaTest, value);
     }
 
     public float value;

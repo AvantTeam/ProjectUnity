@@ -22,6 +22,18 @@ public class DevBuildImpl implements DevBuild{
         initCommandLine();
     }
 
+    public void importClass(String canonical) throws ClassNotFoundException{
+        importClass(Class.forName(canonical, true, mods.mainLoader()));
+    }
+
+    public void importClass(Class<?> type){
+        ImporterTopLevel scope = ReflectUtils.getField(mods.getScripts(), ReflectUtils.findField(Scripts.class, "scope", true));
+        NativeJavaClass nat = new NativeJavaClass(scope, type);
+        nat.setParentScope(scope);
+
+        ReflectUtils.invokeMethod(scope, ReflectUtils.findMethod(ImporterTopLevel.class, "importClass", true, NativeJavaClass.class), nat);
+    }
+
     private void initScripts(){
         Time.mark();
 

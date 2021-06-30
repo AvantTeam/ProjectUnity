@@ -1,14 +1,14 @@
 package unity.assets.type.g3d;
 
 import arc.graphics.*;
+import arc.graphics.g3d.*;
 import arc.struct.*;
 import arc.util.pooling.*;
 import unity.assets.type.g3d.attribute.type.*;
 import unity.graphics.*;
 
-import static arc.Core.*;
-
 public class Models{
+    public Camera3D camera = new Camera3D();
     public RenderableSorter sorter = new RenderableSorter();
     protected Seq<Renderable> renders = new Seq<>();
 
@@ -25,7 +25,7 @@ public class Models{
         for(Renderable render : renders){
             UnityShaders.graphics3D.bind();
             UnityShaders.graphics3D.apply(render);
-            render.meshPart.render(UnityShaders.graphics3D, true);
+            render.meshPart.render(UnityShaders.graphics3D, false);
 
             Gl.activeTexture(GL20.GL_TEXTURE0);
         }

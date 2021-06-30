@@ -4,81 +4,81 @@ import arc.graphics.*;
 import unity.assets.type.g3d.attribute.*;
 
 public class ColorAttribute extends Attribute{
-    public final static String DiffuseAlias = "diffuseColor";
-    public final static long Diffuse = register(DiffuseAlias);
-    public final static String SpecularAlias = "specularColor";
-    public final static long Specular = register(SpecularAlias);
-    public final static String AmbientAlias = "ambientColor";
-    public static final long Ambient = register(AmbientAlias);
-    public final static String EmissiveAlias = "emissiveColor";
-    public static final long Emissive = register(EmissiveAlias);
-    public final static String ReflectionAlias = "reflectionColor";
-    public static final long Reflection = register(ReflectionAlias);
-    public final static String AmbientLightAlias = "ambientLightColor";
-    public static final long AmbientLight = register(AmbientLightAlias);
-    public final static String FogAlias = "fogColor";
-    public static final long Fog = register(FogAlias);
+    public final static String diffuseAlias = "diffuseColor";
+    public final static long diffuse = register(diffuseAlias);
+    public final static String specularAlias = "specularColor";
+    public final static long specular = register(specularAlias);
+    public final static String ambientAlias = "ambientColor";
+    public static final long ambient = register(ambientAlias);
+    public final static String emissiveAlias = "emissiveColor";
+    public static final long emissive = register(emissiveAlias);
+    public final static String reflectionAlias = "reflectionColor";
+    public static final long reflection = register(reflectionAlias);
+    public final static String ambientLightAlias = "ambientLightColor";
+    public static final long ambientLight = register(ambientLightAlias);
+    public final static String fogAlias = "fogColor";
+    public static final long fog = register(fogAlias);
 
-    protected static long Mask = Ambient | Diffuse | Specular | Emissive | Reflection | AmbientLight | Fog;
+    protected static long Mask = ambient | diffuse | specular | emissive | reflection | ambientLight | fog;
 
     public static boolean is(final long mask){
         return (mask & Mask) != 0;
     }
 
     public static ColorAttribute createAmbient(final Color color){
-        return new ColorAttribute(Ambient, color);
+        return new ColorAttribute(ambient, color);
     }
 
     public static ColorAttribute createAmbient(float r, float g, float b, float a){
-        return new ColorAttribute(Ambient, r, g, b, a);
+        return new ColorAttribute(ambient, r, g, b, a);
     }
 
     public static ColorAttribute createDiffuse(final Color color){
-        return new ColorAttribute(Diffuse, color);
+        return new ColorAttribute(diffuse, color);
     }
 
     public static ColorAttribute createDiffuse(float r, float g, float b, float a){
-        return new ColorAttribute(Diffuse, r, g, b, a);
+        return new ColorAttribute(diffuse, r, g, b, a);
     }
 
     public static ColorAttribute createSpecular(final Color color){
-        return new ColorAttribute(Specular, color);
+        return new ColorAttribute(specular, color);
     }
 
     public static ColorAttribute createSpecular(float r, float g, float b, float a){
-        return new ColorAttribute(Specular, r, g, b, a);
+        return new ColorAttribute(specular, r, g, b, a);
     }
 
     public static ColorAttribute createReflection(final Color color){
-        return new ColorAttribute(Reflection, color);
+        return new ColorAttribute(reflection, color);
     }
 
     public static ColorAttribute createReflection(float r, float g, float b, float a){
-        return new ColorAttribute(Reflection, r, g, b, a);
+        return new ColorAttribute(reflection, r, g, b, a);
     }
 
     public static ColorAttribute createEmissive(final Color color){
-        return new ColorAttribute(Emissive, color);
+        return new ColorAttribute(emissive, color);
     }
 
     public static ColorAttribute createEmissive(float r, float g, float b, float a){
-        return new ColorAttribute(Emissive, r, g, b, a);
+        return new ColorAttribute(emissive, r, g, b, a);
     }
 
     public static ColorAttribute createAmbientLight(final Color color){
-        return new ColorAttribute(AmbientLight, color);
+        return new ColorAttribute(ambientLight, color);
     }
 
     public static ColorAttribute createAmbientLight(float r, float g, float b, float a){
-        return new ColorAttribute(AmbientLight, r, g, b, a);
+        return new ColorAttribute(ambientLight, r, g, b, a);
     }
 
     public static ColorAttribute createFog(final Color color){
-        return new ColorAttribute(Fog, color);
+        return new ColorAttribute(fog, color);
     }
 
     public static ColorAttribute createFog(float r, float g, float b, float a){
-        return new ColorAttribute(Fog, r, g, b, a);
+        return new ColorAttribute(fog, r, g, b, a);
     }
 
     public final Color color = new Color();

@@ -17,10 +17,9 @@ public class NodePart{
 
     /**
      * Mapping to each bone (node) and the inverse transform of the bind pose. Will be used to fill the
-     * {@link #bones} array. May
-     * be null.
+     * {@link #bones} array. May be null.
      */
-    public OrderedMap<Node, Mat3D> invBoneBindTransforms = new OrderedMap<>();
+    public OrderedMap<Node, Mat3D> invBoneBindTransforms;
 
     /**
      * The current transformation (relative to the bind pose) of each bone, may be null. When the part is skinned,

@@ -4,6 +4,7 @@ import arc.graphics.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import unity.assets.loaders.*;
 import unity.assets.type.g3d.attribute.*;
 import unity.assets.type.g3d.attribute.type.*;
 import unity.assets.type.g3d.model.*;
@@ -39,7 +40,7 @@ public class Model implements Disposable{
         load(modelData);
     }
 
-    protected void load(ModelData modelData){
+    public void load(ModelData modelData){
         loadMeshes(modelData.meshes);
         loadMaterials(modelData.materials);
         loadNodes(modelData.nodes);
@@ -106,8 +107,9 @@ public class Model implements Disposable{
                 nodePart.meshPart = meshPart;
                 nodePart.material = meshMaterial;
                 node.parts.add(nodePart);
-                if(modelNodePart.bones != null)
+                if(modelNodePart.bones != null){
                     nodePartBones.put(nodePart, modelNodePart.bones);
+                }
             }
         }
 
@@ -133,10 +135,11 @@ public class Model implements Disposable{
         }
         boolean hasIndices = numIndices > 0;
 
-        int numVertices = 0;
+        int vertSize = 0;
         for(var vert : modelMesh.attributes){
-            numVertices += vert.size;
+            vertSize += vert.size;
         }
+        int numVertices = modelMesh.vertices.length / (vertSize / 4);
 
         Mesh mesh = new Mesh(true, numVertices, numIndices, modelMesh.attributes);
         meshes.add(mesh);
@@ -175,12 +178,12 @@ public class Model implements Disposable{
     protected Material convertMaterial(ModelMaterial mtl){
         Material result = new Material();
         result.id = mtl.id;
-        if(mtl.ambient != null) result.set(new ColorAttribute(ColorAttribute.Ambient, mtl.ambient));
-        if(mtl.diffuse != null) result.set(new ColorAttribute(ColorAttribute.Diffuse, mtl.diffuse));
-        if(mtl.specular != null) result.set(new ColorAttribute(ColorAttribute.Specular, mtl.specular));
-        if(mtl.emissive != null) result.set(new ColorAttribute(ColorAttribute.Emissive, mtl.emissive));
-        if(mtl.reflection != null) result.set(new ColorAttribute(ColorAttribute.Reflection, mtl.reflection));
-        if(mtl.shininess > 0f) result.set(new FloatAttribute(FloatAttribute.Shininess, mtl.shininess));
+        if(mtl.ambient != null) result.set(new ColorAttribute(ColorAttribute.ambient, mtl.ambient));
+        if(mtl.diffuse != null) result.set(new ColorAttribute(ColorAttribute.diffuse, mtl.diffuse));
+        if(mtl.specular != null) result.set(new ColorAttribute(ColorAttribute.specular, mtl.specular));
+        if(mtl.emissive != null) result.set(new ColorAttribute(ColorAttribute.emissive, mtl.emissive));
+        if(mtl.reflection != null) result.set(new ColorAttribute(ColorAttribute.reflection, mtl.reflection));
+        if(mtl.shininess > 0f) result.set(new FloatAttribute(FloatAttribute.shininess, mtl.shininess));
         if(mtl.opacity != 1.f) result.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, mtl.opacity));
 
         if(mtl.textures != null){

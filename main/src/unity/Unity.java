@@ -5,21 +5,22 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.TextureAtlas.*;
 import arc.graphics.g2d.*;
-import arc.graphics.g3d.*;
 import arc.math.geom.*;
 import arc.scene.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
+import arc.util.serialization.*;
 import mindustry.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
-import mindustry.graphics.g3d.*;
 import mindustry.mod.*;
 import mindustry.world.blocks.environment.*;
 import unity.ai.kami.*;
+import unity.assets.list.*;
+import unity.assets.loaders.*;
 import unity.assets.type.g3d.*;
 import unity.async.*;
 import unity.cinematic.*;
@@ -63,6 +64,7 @@ public class Unity extends Mod{
     public Unity(){
         ContributorList.init();
 
+        Core.assets.setLoader(Model.class, new ModelLoader(new UBJsonReader(), tree));
         Core.assets.setLoader(WavefrontObject.class, new WavefrontObjectLoader(tree));
 
         KamiPatterns.load();
@@ -80,6 +82,7 @@ public class Unity extends Mod{
 
         Events.on(FileTreeInitEvent.class, e -> {
             UnityObjs.load();
+            UnityModels.load();
             UnitySounds.load();
             UnityShaders.load();
         });
@@ -93,6 +96,14 @@ public class Unity extends Mod{
 
             UnitySettings.init();
             SpeechDialog.init();
+
+            Triggers.listen(Trigger.preDraw, () -> {
+                model.camera.up.set(Vec3.Y);
+                model.camera.position.set(Core.camera.position, 50f);
+
+                model.camera.normalizeUp();
+                model.camera.update();
+            });
 
             var mod = mods.getMod(Unity.class);
 

@@ -1,6 +1,6 @@
 package unity.assets.type.g3d;
 
-import arc.graphics.*;
+import arc.graphics.g3d.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import unity.assets.type.g3d.attribute.type.*;
@@ -8,12 +8,11 @@ import unity.assets.type.g3d.attribute.type.*;
 import java.util.*;
 
 public class RenderableSorter implements Comparator<Renderable>{
-    private Camera camera;
+    private Camera3D camera;
     private final Vec3 tmpV1 = new Vec3();
     private final Vec3 tmpV2 = new Vec3();
-    private final Vec2 tmp = new Vec2();
 
-    public void sort(Camera camera, Seq<Renderable> renderables){
+    public void sort(Camera3D camera, Seq<Renderable> renderables){
         this.camera = camera;
         renderables.sort(this);
         this.camera = null;
@@ -38,7 +37,7 @@ public class RenderableSorter implements Comparator<Renderable>{
         if(b1 != b2) return b1 ? 1 : -1;
         getTranslation(o1.worldTransform, o1.meshPart.center, tmpV1);
         getTranslation(o2.worldTransform, o2.meshPart.center, tmpV2);
-        float dst = (int)(1000f * camera.position.dst2(tmp.set(tmpV1))) - (int)(1000f * camera.position.dst2(tmp.set(tmpV2)));
+        float dst = (int)(1000f * camera.position.dst2(tmpV1)) - (int)(1000f * camera.position.dst2(tmpV2));
         int result = dst < 0 ? -1 : (dst > 0 ? 1 : 0);
         return b1 ? -result : result;
     }

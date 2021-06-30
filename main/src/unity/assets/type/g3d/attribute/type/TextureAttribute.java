@@ -111,7 +111,7 @@ public class TextureAttribute extends Attribute{
         if(!is(type)) throw new IllegalArgumentException("Invalid type specified");
 
         textureDescription = new TextureDescriptor<>();
-        Events.on(ContentInitEvent.class, e -> {
+        Events.on(ClientLoadEvent.class, e -> {
             var region = Core.atlas.find("unity-" + textureDescription.fileName);
             var tex = region.texture;
 

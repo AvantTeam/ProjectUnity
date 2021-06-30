@@ -29,6 +29,7 @@ public class ModelInstance implements RenderableProvider{
         }else{
             copyNodes(model.nodes, rootNodeIds);
         }
+
         calculateTransforms();
     }
 
@@ -103,10 +104,6 @@ public class ModelInstance implements RenderableProvider{
         }
     }
 
-    public Renderable getRenderable(Renderable out, Node node){
-        return getRenderable(out, node, node.parts.get(0));
-    }
-
     public Renderable getRenderable(Renderable out, Node node, NodePart nodePart){
         nodePart.setRenderable(out);
         if(nodePart.bones == null && transform != null){
@@ -156,23 +153,6 @@ public class ModelInstance implements RenderableProvider{
         for(int i = 0; i < n; i++){
             nodes.get(i).calculateBoneTransforms(true);
         }
-    }
-
-    /**
-     * Extends the bounding box with the bounds of this model instance. This is a potential slow operation, it is 
-     * advised to cache
-     * the result.
-     *
-     * @param out the {@link BoundingBox} that will be extended with the bounds.
-     * @return the out parameter for chaining
-     */
-    public BoundingBox extendBoundingBox(BoundingBox out){
-        int n = nodes.size;
-        for(int i = 0; i < n; i++){
-            nodes.get(i).extendBoundingBox(out);
-        }
-
-        return out;
     }
 
     /**
