@@ -52,6 +52,8 @@ public class UnityUnitTypes implements ContentList{
     public static @EntityPoint(LegsUnit.class)
     UnitType cygnus, araneidae, theraphosidae;
     // eclipse
+    public static @EntityPoint(UnitEntity.class)
+    UnitType mantle;
     // oct
     public static @EntityPoint(PayloadUnit.class)
     UnitType sedec;
@@ -1343,8 +1345,44 @@ public class UnityUnitTypes implements ContentList{
             }});
         }};
 
-        sedec = new UnityUnitType("sedec"){{
+        mantle = new UnityUnitType("mantle"){{
             health = 34000f;
+            armor = 17f;
+            speed = 0.4f;
+            accel = 0.04f;
+            drag = 0.04f;
+            rotateSpeed = 0.9f;
+            flying = true;
+            lowAltitude = true;
+            destructibleWreck = false;
+            targetFlag = BlockFlag.reactor;
+            hitSize = 80f;
+            engineOffset = 42.75f;
+            engineSize = 8.7f;
+
+            weapons.add(new Weapon(){{
+                x = 0f;
+                y = 4f;
+                mirror = false;
+                reload = 4f * 60f;
+                continuous = true;
+                recoil = 0f;
+
+                bullet = new AcceleratingLaserBulletType(210f){{
+                    lifetime = 180f;
+                    maxLength = 450f;
+                    maxRange = 420f;
+                    oscOffset = 0.1f;
+                    incendChance = 0.2f;
+                    incendAmount = 2;
+                    width = 27f;
+                    collisionWidth = 10f;
+                }};
+            }});
+        }};
+
+        sedec = new UnityUnitType("sedec"){{
+            health = 36000f;
             armor = 20f;
             speed = 0.7f;
             rotateSpeed = 1f;

@@ -2,18 +2,42 @@ package unity.util;
 
 import arc.math.*;
 
+import java.util.*;
+
 public class DynamicBoolGrid{
     boolean[][] array;
+    boolean multiArray;
     int width, height;
 
+    public DynamicBoolGrid(){
+        this(true);
+    }
+
+    public DynamicBoolGrid(boolean multi){
+        multiArray = multi;
+        if(!multi){
+            array = new boolean[1][1];
+        }
+    }
+
     public void updateSize(int newWidth, int newHeight){
-        if(newWidth != width || newHeight != height) array = new boolean[newWidth][newHeight];
+        if(newWidth != width || newHeight != height){
+            if(multiArray){
+                array = new boolean[newWidth][newHeight];
+            }else{
+                array[0] = new boolean[newWidth * newHeight];
+            }
+        }
         width = newWidth;
         height = newHeight;
     }
 
     public void clear(){
-        array = new boolean[width][height];
+        if(multiArray){
+            array = new boolean[width][height];
+        }else{
+            Arrays.fill(array[0], false);
+        }
     }
 
     public boolean within(int x, int y){
@@ -21,6 +45,7 @@ public class DynamicBoolGrid{
     }
 
     public boolean get(int x, int y){
+        if(!multiArray) return array[0][(x * width) + y];
         return array[x][y];
     }
 
@@ -33,6 +58,10 @@ public class DynamicBoolGrid{
     }
 
     public void set(int x, int y, boolean b){
-        array[x][y] = b;
+        if(multiArray){
+            array[x][y] = b;
+        }else{
+            array[0][(x * width) + y] = b;
+        }
     }
 }

@@ -1,5 +1,6 @@
 package unity.util;
 
+import arc.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
@@ -37,7 +38,7 @@ public final class Utils{
     private static Unit tmpUnit;
     private static boolean hit, hitB;
 
-    private static final DynamicBoolGrid collideLineCollided = new DynamicBoolGrid();
+    private static final DynamicBoolGrid collideLineCollided = new DynamicBoolGrid(false);
     private static final Seq<Point2> collideLineCast = new Seq<>();
     private static final Seq<Point2> collideLineCastNext = new Seq<>();
 
@@ -51,6 +52,10 @@ public final class Utils{
         {Geometry.d4[1], Geometry.d8edge[1], Geometry.d8edge[0], Geometry.d4[2], Geometry.d4[0]},
         {Geometry.d8edge[0], Geometry.d4[1], Geometry.d4[0], Geometry.d8edge[1], Geometry.d8edge[3]}
     };
+
+    static{
+        Events.on(EventType.WorldLoadEvent.class, event -> collideLineCollided.updateSize(world.width(), world.height()));
+    }
 
     public static <T extends Buildingc> Tile getBestTile(T build, int before, int after){
         Tile tile = build.tile();
@@ -370,6 +375,10 @@ public final class Utils{
         collideLineRaw(x, y, x2, y2, width, width, b -> b.team != team, u -> u.team != team, buildingCons, unitCons, healthc -> healthc.dst2(x, y), effectHandler, stopSort);
     }
 
+    public static void collideLineRawEnemy(Team team, float x, float y, float x2, float y2, float unitWidth, float tileWidth, Boolf2<Building, Boolean> buildingCons, Boolf<Unit> unitCons, Floatc2 effectHandler, boolean stopSort){
+        collideLineRaw(x, y, x2, y2, unitWidth, tileWidth, b -> b.team != team, u -> u.team != team, buildingCons, unitCons, healthc -> healthc.dst2(x, y), effectHandler, stopSort);
+    }
+
     public static void collideLineRawEnemy(Team team, float x, float y, float x2, float y2, Boolf2<Building, Boolean> buildingCons, Boolf<Unit> unitCons, Floatc2 effectHandler, boolean stopSort){
         collideLineRaw(x, y, x2, y2, 3f, b -> b.team != team, u -> u.team != team, buildingCons, unitCons, healthc -> healthc.dst2(x, y), effectHandler, stopSort);
     }
@@ -425,15 +434,10 @@ public final class Utils{
                     return false;
                 });
             }else{
-                int offset = Mathf.ceil(tileWidth / tilesize) * 2;
-                int intOffX = Mathf.round(Math.max(Math.abs(x2 - x), tilesize) / tilesize);
-                int intOffY = Mathf.round(Math.max(Math.abs(y2 - y), tilesize) / tilesize);
-                collideLineCollided.updateSize(intOffX + (offset * 2), intOffY + (offset * 2));
-                int offsetX = x2 > x ? offset : intOffX - offset;
-                int offsetY = y2 > y ? offset : intOffY - offset;
+                collideLineCollided.clear();
                 int tileX = Mathf.round(x / tilesize);
                 int tileY = Mathf.round(y / tilesize);
-                int direction = Mathf.mod(Mathf.round(Angles.angle(x, y, x2, y2) / 45f), d8d5.length);
+                //int direction = Mathf.mod(Mathf.round(Angles.angle(x, y, x2, y2) / 45f), d8d5.length);
 
                 hitB = false;
 
@@ -460,16 +464,14 @@ public final class Utils{
 
                         Vec2 segment = Intersector.nearestSegmentPoint(x, y, tV.x, tV.y, p.x * tilesize, p.y * tilesize, tV2);
                         if(!hit){
-                            for(Point2 p2 : d8d5[direction]){
+                            for(Point2 p2 : Geometry.d8){
                                 int newX = (p.x + p2.x);
                                 int newY = (p.y + p2.y);
-                                int npx = (newX - tileX) + offsetX;
-                                int npy = (newY - tileY) + offsetY;
-                                boolean within = !hitB || Mathf.within(x, y, newX, newY, tV.dst(x, y) / tilesize);
-                                if(segment.within(newX, newY, tileWidth / tilesize) && collideLineCollided.within(npx, npy) && !collideLineCollided.get(npx, npy) && within){
+                                boolean within = !hitB || Mathf.within(tileX, tileY, newX, newY, tV.dst(x, y) / tilesize);
+                                if(segment.within(newX * tilesize, newY * tilesize, tileWidth) && collideLineCollided.within(newX, newY) && !collideLineCollided.get(newX, newY) && within){
                                     Point2 pn = Pools.obtain(Point2.class, Point2::new);
                                     collideLineCastNext.add(pn.set(newX, newY));
-                                    collideLineCollided.set(npx, npy, true);
+                                    collideLineCollided.set(newX, newY, true);
                                 }
                             }
                             Pools.free(p);
@@ -481,14 +483,12 @@ public final class Utils{
                 };
 
                 world.raycastEachWorld(x, y, x2, y2, (cx, cy) -> {
-                    int px = (cx - tileX) + offsetX;
-                    int py = (cy - tileY) + offsetY;
-                    px = collideLineCollided.clampX(px);
-                    py = collideLineCollided.clampY(py);
-                    if(collideLineCollided.within(px, py) && !collideLineCollided.get(px, py)){
+                    //cx = collideLineCollided.clampX(cx);
+                    //cy = collideLineCollided.clampY(cy);
+                    if(collideLineCollided.within(cx, cy) && !collideLineCollided.get(cx, cy)){
                         Point2 p1 = Pools.obtain(Point2.class, Point2::new);
                         collideLineCast.add(p1.set(cx, cy));
-                        collideLineCollided.set(px, py, true);
+                        collideLineCollided.set(cx, cy, true);
                     }
                     updateCast.run();
                     return hitB;
@@ -497,7 +497,6 @@ public final class Utils{
                 while(!collideLineCast.isEmpty()){
                     updateCast.run();
                 }
-                collideLineCollided.clear();
             }
         }
         if(unitCons != null){
