@@ -1363,7 +1363,7 @@ public class UnityUnitTypes implements ContentList{
             BulletType b = UnitTypes.scepter.weapons.get(0).bullet.copy();
             b.speed = 6.5f;
             b.damage = 60f;
-            b.lifetime = 60f;
+            b.lifetime = 55f;
 
             weapons.add(new Weapon(){{
                 x = 0f;

@@ -3111,18 +3111,22 @@ public class UnityBlocks implements ContentList{
                 shootDuration = 320f;
                 firingMoveFract = 0.12f;
                 shootLength = size * tilesize / 2f - recoilAmount;
-                shootType = new NoPierceLaserBulletType(390f){{
+
+                shootType = new AcceleratingLaserBulletType(390f){{
                     colors = new Color[]{Color.valueOf("59a7ff55"), Color.valueOf("59a7ffaa"), Color.valueOf("a3e3ff"), Color.white};
-                    tscales = new float[]{1f, 0.74f, 0.5f, 0.24f};
-                    strokes = new float[]{2.8f, 2f, 1.6f, 0.8f};
-                    lenscales = new float[]{0.92f, 1f, 1.017f, 1.025f};
-                    length = 490f;
+                    width = 29.2f;
+                    collisionWidth = 12f;
                     knockback = 2.2f;
                     lifetime = 18f;
+                    accel = 0f;
+                    fadeInTime = 0f;
+                    fadeTime = 18f;
+                    maxLength = 490f;
                     shootEffect = Fx.none;
                     smokeEffect = Fx.none;
                     hitEffect = HitFx.eclipseHit;
-                    hitSize = 7f;
+                    buildingInsulator = (b, building) -> true;
+                    unitInsulator = (b, u) -> true;
                 }};
 
                 consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.4f && liquid.flammability < 0.1f, 2.1f)).update(false);
