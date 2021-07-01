@@ -139,7 +139,7 @@ public class AcceleratingLaserBulletType extends BulletType{
                 }
                 hitEntity(b, unit, unit.health);
                 return h;
-            }, (ex, ey) -> hitEffect.at(ex, ey, b.rotation()), true);
+            }, (ex, ey) -> hit(b, ex, ey), true);
         }
     }
 }

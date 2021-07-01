@@ -1360,6 +1360,11 @@ public class UnityUnitTypes implements ContentList{
             engineOffset = 42.75f;
             engineSize = 8.7f;
 
+            BulletType b = UnitTypes.scepter.weapons.get(0).bullet.copy();
+            b.speed = 6.5f;
+            b.damage = 60f;
+            b.lifetime = 60f;
+
             weapons.add(new Weapon(){{
                 x = 0f;
                 y = 4f;
@@ -1368,7 +1373,7 @@ public class UnityUnitTypes implements ContentList{
                 continuous = true;
                 recoil = 0f;
 
-                bullet = new AcceleratingLaserBulletType(210f){{
+                bullet = new AcceleratingLaserBulletType(230f){{
                     lifetime = 180f;
                     maxLength = 450f;
                     maxRange = 420f;
@@ -1378,6 +1383,34 @@ public class UnityUnitTypes implements ContentList{
                     width = 27f;
                     collisionWidth = 10f;
                 }};
+            }}, new Weapon(name + "-mount"){{
+                x = 30.75f;
+                y = -6.25f;
+                shootY = 10.5f;
+                alternate = true;
+                rotate = true;
+                recoil = 5f;
+                reload = 55f;
+                shots = 4;
+                shotDelay = 4f;
+                rotateSpeed = 3f;
+                shadow = 22f;
+
+                bullet = b;
+            }}, new Weapon(name + "-mount"){{
+                x = 19f;
+                y = -18f;
+                shootY = 10.5f;
+                alternate = true;
+                rotate = true;
+                recoil = 5f;
+                reload = 60f;
+                shots = 4;
+                shotDelay = 4f;
+                rotateSpeed = 3f;
+                shadow = 22f;
+
+                bullet = b;
             }});
         }};
 
