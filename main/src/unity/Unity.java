@@ -5,7 +5,6 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.TextureAtlas.*;
 import arc.graphics.g2d.*;
-import arc.math.geom.*;
 import arc.scene.*;
 import arc.struct.*;
 import arc.util.*;
@@ -64,7 +63,7 @@ public class Unity extends Mod{
     public Unity(){
         ContributorList.init();
 
-        Core.assets.setLoader(Model.class, new ModelLoader(new UBJsonReader(), tree));
+        Core.assets.setLoader(Model.class, new ModelLoader(tree));
         Core.assets.setLoader(WavefrontObject.class, new WavefrontObjectLoader(tree));
 
         KamiPatterns.load();
@@ -81,15 +80,16 @@ public class Unity extends Mod{
         });
 
         Events.on(FileTreeInitEvent.class, e -> {
+            UnityShaders.load();
             UnityObjs.load();
             UnityModels.load();
             UnitySounds.load();
-            UnityShaders.load();
         });
 
-        Events.on(DisposeEvent.class, e ->
-            UnityShaders.dispose()
-        );
+        Events.on(DisposeEvent.class, e -> {
+            UnityModels.dispose();
+            UnityShaders.dispose();
+        });
 
         Events.on(ClientLoadEvent.class, e -> {
             addCredits();
@@ -98,10 +98,8 @@ public class Unity extends Mod{
             SpeechDialog.init();
 
             Triggers.listen(Trigger.preDraw, () -> {
-                model.camera.up.set(Vec3.Y);
-                model.camera.position.set(Core.camera.position, 50f);
-
-                model.camera.normalizeUp();
+                model.camera.position.set(Core.camera.position.x, Core.camera.position.y, 0f);
+                model.camera.resize(Core.camera.width, Core.camera.height);
                 model.camera.update();
             });
 

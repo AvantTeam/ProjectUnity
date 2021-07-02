@@ -72,10 +72,6 @@ public class ModelInstance implements RenderableProvider{
     private void invalidate(Node node){
         for(int i = 0, n = node.parts.size; i < n; ++i){
             NodePart part = node.parts.get(i);
-            OrderedMap<Node, Mat3D> bindPose = part.invBoneBindTransforms;
-            if(bindPose != null){
-                bindPose.orderedKeys().set(bindPose.orderedKeys().map(e -> getNode(e.id)));
-            }
 
             if(!materials.contains(part.material, true)){
                 int midx = materials.indexOf(part.material, false);
@@ -104,11 +100,9 @@ public class ModelInstance implements RenderableProvider{
         }
     }
 
-    public Renderable getRenderable(Renderable out, Node node, NodePart nodePart){
+    public Renderable getRenderable(Renderable out, NodePart nodePart){
         nodePart.setRenderable(out);
-        if(nodePart.bones == null && transform != null){
-            out.worldTransform.set(transform).mul(node.globalTransform);
-        }else if(transform != null){
+        if(transform != null){
             out.worldTransform.set(transform);
         }else{
             out.worldTransform.idt();
@@ -122,7 +116,7 @@ public class ModelInstance implements RenderableProvider{
         if(node.parts.size > 0){
             for(NodePart nodePart : node.parts){
                 if(nodePart.enabled){
-                    renders.add(getRenderable(Pools.obtain(Renderable.class, Renderable::new), node, nodePart));
+                    renders.add(getRenderable(Pools.obtain(Renderable.class, Renderable::new), nodePart));
                 }
             }
         }
@@ -148,10 +142,6 @@ public class ModelInstance implements RenderableProvider{
         int n = nodes.size;
         for(int i = 0; i < n; i++){
             nodes.get(i).calculateTransforms(true);
-        }
-
-        for(int i = 0; i < n; i++){
-            nodes.get(i).calculateBoneTransforms(true);
         }
     }
 

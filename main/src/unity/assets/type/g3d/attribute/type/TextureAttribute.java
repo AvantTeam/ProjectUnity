@@ -1,12 +1,9 @@
 package unity.assets.type.g3d.attribute.type;
 
-import arc.*;
 import arc.graphics.*;
-import arc.graphics.g2d.*;
+import arc.graphics.Texture.*;
 import arc.math.*;
-import mindustry.game.EventType.*;
 import unity.assets.type.g3d.attribute.*;
-import unity.graphics.*;
 
 public class TextureAttribute extends Attribute{
     public final static String diffuseAlias = "diffuseTexture";
@@ -40,128 +37,57 @@ public class TextureAttribute extends Attribute{
         return new TextureAttribute(diffuse, texture);
     }
 
-    public static TextureAttribute createDiffuse(TextureRegion region){
-        return new TextureAttribute(diffuse, region);
-    }
-
     public static TextureAttribute createSpecular(Texture texture){
         return new TextureAttribute(specular, texture);
-    }
-
-    public static TextureAttribute createSpecular(TextureRegion region){
-        return new TextureAttribute(specular, region);
     }
 
     public static TextureAttribute createNormal(Texture texture){
         return new TextureAttribute(normal, texture);
     }
 
-    public static TextureAttribute createNormal(TextureRegion region){
-        return new TextureAttribute(normal, region);
-    }
-
     public static TextureAttribute createBump(Texture texture){
         return new TextureAttribute(bump, texture);
-    }
-
-    public static TextureAttribute createBump(TextureRegion region){
-        return new TextureAttribute(bump, region);
     }
 
     public static TextureAttribute createAmbient(Texture texture){
         return new TextureAttribute(ambient, texture);
     }
 
-    public static TextureAttribute createAmbient(TextureRegion region){
-        return new TextureAttribute(ambient, region);
-    }
-
     public static TextureAttribute createEmissive(Texture texture){
         return new TextureAttribute(emissive, texture);
-    }
-
-    public static TextureAttribute createEmissive(TextureRegion region){
-        return new TextureAttribute(emissive, region);
     }
 
     public static TextureAttribute createReflection(Texture texture){
         return new TextureAttribute(reflection, texture);
     }
 
-    public static TextureAttribute createReflection(TextureRegion region){
-        return new TextureAttribute(reflection, region);
-    }
-
-    public final TextureDescriptor<Texture> textureDescription;
+    public final Texture texture;
     public float offsetU = 0f;
     public float offsetV = 0f;
     public float scaleU = 1f;
     public float scaleV = 1f;
 
-    /**
-     * The index of the texture coordinate vertex attribute to use for this TextureAttribute. Whether this value is
-     * used, depends on the shader and {@link Attribute#type} value. For basic (model specific) types (e.g. {@link
-     * #diffuse}, {@link #normal}, etc.), this value is usually ignored and the first texture coordinate vertex
-     * attribute is used.
-     */
-    public int uvIndex = 0;
-
-    public TextureAttribute(long type){
+    public TextureAttribute(long type, Texture texture){
         super(type);
-        if(!is(type)) throw new IllegalArgumentException("Invalid type specified");
-
-        textureDescription = new TextureDescriptor<>();
-        Events.on(ClientLoadEvent.class, e -> {
-            var region = Core.atlas.find("unity-" + textureDescription.fileName);
-            var tex = region.texture;
-
-            textureDescription.set(tex);
-            offsetU = region.u + offsetU * region.width;
-            offsetV = region.v + offsetV * region.height;
-            scaleU = region.u2 - scaleU * region.width;
-            scaleV = region.v2 - scaleV * region.height;
-        });
+        this.texture = texture;
+        this.texture.setWrap(TextureWrap.repeat, TextureWrap.repeat);
     }
 
-    public <T extends Texture> TextureAttribute(long type, TextureDescriptor<T> textureDescription){
-        this(type);
-        this.textureDescription.set(textureDescription);
-    }
-
-    public <T extends Texture> TextureAttribute(long type, TextureDescriptor<T> textureDescription, float offsetU, float offsetV, float scaleU, float scaleV, int uvIndex){
-        this(type, textureDescription);
+    public TextureAttribute(long type, Texture texture, float offsetU, float offsetV, float scaleU, float scaleV){
+        this(type, texture);
         this.offsetU = offsetU;
         this.offsetV = offsetV;
         this.scaleU = scaleU;
         this.scaleV = scaleV;
-        this.uvIndex = uvIndex;
-    }
-
-    public <T extends Texture> TextureAttribute(long type, TextureDescriptor<T> textureDescription, float offsetU, float offsetV, float scaleU, float scaleV){
-        this(type, textureDescription, offsetU, offsetV, scaleU, scaleV, 0);
-    }
-
-    public TextureAttribute(long type, Texture texture){
-        this(type);
-        textureDescription.texture = texture;
-    }
-
-    public TextureAttribute(long type, TextureRegion region){
-        this(type);
-        set(region);
     }
 
     public TextureAttribute(TextureAttribute copyFrom){
-        this(copyFrom.type, copyFrom.textureDescription, copyFrom.offsetU, copyFrom.offsetV, copyFrom.scaleU,
-            copyFrom.scaleV, copyFrom.uvIndex);
-    }
-
-    public void set(TextureRegion region){
-        textureDescription.texture = region.texture;
-        offsetU = region.u;
-        offsetV = region.v;
-        scaleU = region.u2 - offsetU;
-        scaleV = region.v2 - offsetV;
+        this(
+            copyFrom.type,
+            copyFrom.texture,
+            copyFrom.offsetU, copyFrom.offsetV, copyFrom.scaleU,
+            copyFrom.scaleV
+        );
     }
 
     @Override
@@ -172,12 +98,11 @@ public class TextureAttribute extends Attribute{
     @Override
     public int hashCode(){
         int result = super.hashCode();
-        result = 991 * result + textureDescription.hashCode();
+        result = 991 * result + texture.getTextureObjectHandle();
         result = 991 * result + Float.floatToRawIntBits(offsetU);
         result = 991 * result + Float.floatToRawIntBits(offsetV);
         result = 991 * result + Float.floatToRawIntBits(scaleU);
         result = 991 * result + Float.floatToRawIntBits(scaleV);
-        result = 991 * result + uvIndex;
         return result;
     }
 
@@ -186,9 +111,8 @@ public class TextureAttribute extends Attribute{
         if(type != o.type) return type < o.type ? -1 : 1;
         TextureAttribute other = (TextureAttribute)o;
 
-        int c = textureDescription.compareTo(other.textureDescription);
+        int c = Integer.compare(texture.getTextureObjectHandle(), other.texture.getTextureObjectHandle());
         if(c != 0) return c;
-        if(uvIndex != other.uvIndex) return uvIndex - other.uvIndex;
 
         if(!Mathf.equal(scaleU, other.scaleU)) return scaleU > other.scaleU ? 1 : -1;
         if(!Mathf.equal(scaleV, other.scaleV)) return scaleV > other.scaleV ? 1 : -1;

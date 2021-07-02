@@ -20,7 +20,6 @@ import java.util.*;
 /**
  * Wavefront Object Converter and Renderer for Arc/libGDX
  * The faces should not intersect. (no crashes, its just that the renderer doesn't support it.)
- * 
  * @author EyeOfDarkness
  * @author GlennFolker
  */

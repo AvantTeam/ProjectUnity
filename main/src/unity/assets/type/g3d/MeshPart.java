@@ -185,7 +185,7 @@ public class MeshPart{
      * @param shader   the shader to be used
      * @param autoBind overrides the autoBind member of the Mesh
      */
-    public void render(Shader shader, boolean autoBind){
-        mesh.render(shader, primitiveType, offset, size, autoBind);
+    public void render(Shader shader){
+        mesh.render(shader, primitiveType, offset, size, true);
     }
 }

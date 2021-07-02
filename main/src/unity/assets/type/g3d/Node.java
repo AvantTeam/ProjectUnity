@@ -78,40 +78,6 @@ public class Node{
         }
     }
 
-    public void calculateBoneTransforms(boolean recursive){
-        for(NodePart part : parts){
-            if(part.invBoneBindTransforms == null || part.bones == null || part.invBoneBindTransforms.size != part.bones.length){
-                continue;
-            }
-
-            int i = 0;
-            for(var key : part.invBoneBindTransforms.orderedKeys()){
-                part.bones[i].set(key.globalTransform).mul(part.invBoneBindTransforms.get(key));
-                i++;
-            }
-        }
-
-        if(recursive){
-            for(Node child : children){
-                child.calculateBoneTransforms(true);
-            }
-        }
-    }
-
-    /** Calculate the bounding box of this Node. This is a potential slow operation, it is advised to cache the result. */
-    public BoundingBox calculateBoundingBox(BoundingBox out){
-        out.inf();
-        return extendBoundingBox(out);
-    }
-
-    /**
-     * Calculate the bounding box of this Node. This is a potential slow operation, it is advised to cache the result.
-     */
-    public BoundingBox calculateBoundingBox(BoundingBox out, boolean transform){
-        out.inf();
-        return extendBoundingBox(out, transform);
-    }
-
     /**
      * Extends the bounding box with the bounds of this Node. This is a potential slow operation, it is advised to
      * cache the result.

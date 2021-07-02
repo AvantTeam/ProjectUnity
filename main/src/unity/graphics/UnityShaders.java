@@ -8,8 +8,8 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g3d.*;
 import arc.graphics.gl.*;
-import arc.math.geom.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
@@ -23,10 +23,13 @@ import static unity.Unity.*;
 public class UnityShaders implements Loadable{
     public static HolographicShieldShader holoShield;
     public static StencilShader stencilShader;
-    public static Graphics3DShader graphics3D;
+
+    public static Graphics3DShaderProvider graphics3DProvider;
 
     protected static FrameBuffer buffer;
     protected static UnityShader[] all;
+
+    protected static boolean loaded;
 
     public static void load(){
         if(headless) return;
@@ -38,9 +41,9 @@ public class UnityShaders implements Loadable{
         buffer = new FrameBuffer();
         all = new UnityShader[]{
             holoShield = new HolographicShieldShader(),
-            stencilShader = new StencilShader(),
-            graphics3D = new Graphics3DShader()
+            stencilShader = new StencilShader()
         };
+        graphics3DProvider = new Graphics3DShaderProvider();
 
         for(int i = 0; i < all.length; i++){
             UnityShader shader = all[i];
@@ -55,21 +58,24 @@ public class UnityShaders implements Loadable{
             float range = (1f / all.length) / 2f;
             for(UnityShader shader : all){
                 if(shader != null && shader.apply.get()){
-                    Draw.drawRange(shader.getLayer(), range, () -> buffer.begin(Color.clear), () -> {
+                    Draw.drawRange(shader.getLayer() + range / 2f, range, () -> buffer.begin(Color.clear), () -> {
                         buffer.end();
                         Draw.blit(buffer, shader);
                     });
                 }
             }
         });
+
+        loaded = true;
     }
 
     public static void dispose(){
-        if(!headless){
-            if(buffer != null) buffer.dispose();
+        if(!headless || !loaded){
+            buffer.dispose();
             for(UnityShader shader : all){
                 shader.dispose();
             }
+            graphics3DProvider.dispose();
         }
     }
 
@@ -125,21 +131,55 @@ public class UnityShaders implements Loadable{
         }
     }
 
-    public static class Graphics3DShader extends UnityShader{
-        private final Mat3D temp = new Mat3D();
-        private final static Mat3D idtMatrix = new Mat3D();
-        public final float[] bones = new float[12 * 16];
+    public static class Graphics3DShaderProvider implements Disposable{
+        protected final String vertSource;
+        protected final String fragSource;
+        protected LongMap<Graphics3DShader> shaders = new LongMap<>();
 
-        public Graphics3DShader(){
-            super(tree.get("shaders/g3d.vert"), tree.get("shaders/g3d.frag"), () -> false);
+        public Graphics3DShaderProvider(){
+            vertSource = tree.get("shaders/g3d.vert").readString();
+            fragSource = tree.get("shaders/g3d.frag").readString();
+        }
+
+        public Graphics3DShader get(Renderable render){
+            return get(render.material.mask());
+        }
+
+        public Graphics3DShader get(long mask){
+            if(!shaders.containsKey(mask)){
+                String prefix = "\n";
+
+                if((mask & TextureAttribute.diffuse) != 0) prefix += "#define diffuseTextureFlag\n";
+                if((mask & ColorAttribute.diffuse) != 0) prefix += "#define diffuseColorFlag\n";
+                if((mask & TextureAttribute.specular) != 0) prefix += "#define specularTextureFlag\n";
+                if((mask & ColorAttribute.specular) != 0) prefix += "#define specularColorFlag\n";
+                if((mask & TextureAttribute.emissive) != 0) prefix += "#define emissiveTextureFlag\n";
+                if((mask & ColorAttribute.emissive) != 0) prefix += "#define emissiveColorFlag\n";
+
+                shaders.put(mask, new Graphics3DShader(prefix + vertSource, prefix + fragSource));
+            }
+
+            return shaders.get(mask);
+        }
+
+        @Override
+        public void dispose(){
+            for(var it = shaders.entries(); it.hasNext;){
+                it.next().value.dispose();
+                it.remove();
+            }
+        }
+    }
+
+    public static class Graphics3DShader extends Shader{
+        protected Graphics3DShader(String vertexShader, String fragmentShader){
+            super(vertexShader, fragmentShader);
         }
 
         public void apply(Renderable render){
             Camera3D camera = model.camera;
             Material material = render.material;
 
-            setUniformMatrix4("u_projTrans", camera.projection.val);
-            setUniformMatrix4("u_viewTrans", camera.view.val);
             setUniformMatrix4("u_projViewTrans", camera.combined.val);
 
             setUniformf("u_cameraPosition", camera.position.x, camera.position.y, camera.position.z, 1.1881f / (camera.far * camera.far));
@@ -147,65 +187,56 @@ public class UnityShaders implements Loadable{
             setUniformf("u_cameraUp", camera.up);
             setUniformf("u_cameraNearFar", camera.near, camera.far);
 
-            setUniformf("u_time", Time.time);
-
             setUniformMatrix4("u_worldTrans", render.worldTransform.val);
-            setUniformMatrix4("u_viewWorldTrans", temp.set(camera.view).mul(render.worldTransform).val);
-            setUniformMatrix4("u_projViewWorldTrans", temp.set(camera.combined).mul(render.worldTransform).val);
             setUniformMatrix("u_normalMatrix", Tmp.m1.set(render.worldTransform.toNormalMatrix().val));
-
-            for(int i = 0; i < bones.length; i += 16){
-                int idx = i / 16;
-                if(render.bones == null || idx >= render.bones.length || render.bones[idx] == null){
-                    System.arraycopy(idtMatrix.val, 0, bones, i, 16);
-                }else{
-                    System.arraycopy(render.bones[idx].val, 0, bones, i, 16);
-                }
-            }
-
-            setUniformMatrix4fv("u_bones", bones, 0, bones.length);
 
             FloatAttribute shine = material.get(FloatAttribute.shininess);
             if(shine != null) setUniformf("u_shininess", shine.value);
 
             TextureAttribute diff = material.get(TextureAttribute.diffuse);
+            ColorAttribute diffCol = material.get(ColorAttribute.diffuse);
+            if(diffCol != null) setUniformf("u_diffuseColor", diffCol.color);
             if(diff != null){
-                setUniformf("u_diffuseColor", material.<ColorAttribute>get(ColorAttribute.diffuse).color);
-                setUniformi("u_diffuseTexture", model.bind(diff));
+                setUniformi("u_diffuseTexture", model.bind(diff, 5));
                 setUniformf("u_diffuseUVTransform", diff.offsetU, diff.offsetV, diff.scaleU, diff.scaleV);
             }
 
             TextureAttribute spec = material.get(TextureAttribute.specular);
+            ColorAttribute specCol = material.get(ColorAttribute.specular);
+            if(specCol != null) setUniformf("u_specularColor", specCol.color);
             if(spec != null){
-                setUniformf("u_specularColor", material.<ColorAttribute>get(ColorAttribute.specular).color);
-                setUniformi("u_specularTexture", model.bind(spec));
+                setUniformi("u_specularTexture", model.bind(spec, 4));
                 setUniformf("u_specularUVTransform", spec.offsetU, spec.offsetV, spec.scaleU, spec.scaleV);
             }
 
             TextureAttribute em = material.get(TextureAttribute.emissive);
+            ColorAttribute emCol = material.get(ColorAttribute.emissive);
+            if(emCol != null) setUniformf("u_emissiveColor", emCol.color);
             if(em != null){
-                setUniformf("u_emissiveColor", material.<ColorAttribute>get(ColorAttribute.emissive).color);
-                setUniformi("u_emissiveTexture", model.bind(em));
+                setUniformi("u_emissiveTexture", model.bind(em, 3));
                 setUniformf("u_emissiveUVTransform", em.offsetU, em.offsetV, em.scaleU, em.scaleV);
             }
 
             TextureAttribute ref = material.get(TextureAttribute.reflection);
+            ColorAttribute refCol = material.get(ColorAttribute.reflection);
+            if(refCol != null) setUniformf("u_reflectionColor", refCol.color);
             if(ref != null){
-                setUniformf("u_reflectionColor", material.<ColorAttribute>get(ColorAttribute.reflection).color);
-                setUniformi("u_reflectionTexture", model.bind(ref));
+                setUniformi("u_reflectionTexture", model.bind(ref, 2));
                 setUniformf("u_reflectionUVTransform", ref.offsetU, ref.offsetV, ref.scaleU, ref.scaleV);
+            }
+
+            TextureAttribute am = material.get(TextureAttribute.ambient);
+            ColorAttribute amCol = material.get(ColorAttribute.ambient);
+            if(amCol != null) setUniformf("u_ambientColor", amCol.color);
+            if(am != null){
+                setUniformi("u_ambientTexture", model.bind(am, 1));
+                setUniformf("u_ambientUVTransform", am.offsetU, am.offsetV, am.scaleU, am.scaleV);
             }
 
             TextureAttribute nor = material.get(TextureAttribute.normal);
             if(nor != null){
-                setUniformi("u_normalTexture", model.bind(nor));
+                setUniformi("u_normalTexture", model.bind(nor, 0));
                 setUniformf("u_normalUVTransform", nor.offsetU, nor.offsetV, nor.scaleU, nor.scaleV);
-            }
-
-            TextureAttribute am = material.get(TextureAttribute.ambient);
-            if(am != null){
-                setUniformi("u_ambientTexture", model.bind(am));
-                setUniformf("u_ambientUVTransform", am.offsetU, am.offsetV, am.scaleU, am.scaleV);
             }
         }
     }

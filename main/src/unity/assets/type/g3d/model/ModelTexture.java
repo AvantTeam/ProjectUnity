@@ -2,7 +2,7 @@ package unity.assets.type.g3d.model;
 
 import arc.math.geom.*;
 
-public class ModelTexture {
+public class ModelTexture{
     public final static int usageUnknown = 0;
     public final static int usageNone = 1;
     public final static int usageDiffuse = 2;

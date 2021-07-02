@@ -12,21 +12,23 @@ import unity.assets.type.g3d.*;
 import unity.assets.type.g3d.model.*;
 
 @SuppressWarnings("rawtypes")
-public class ModelLoader extends AsynchronousAssetLoader<Model, ModelLoader.ModelParameter>{
+public class ModelLoader extends SynchronousAssetLoader<Model, ModelLoader.ModelParameter>{
     public static final short versionHi = 0;
     public static final short versionLo = 1;
 
-    protected Model model;
-    protected final BaseJsonReader reader;
+    protected final UBJsonReader readerBin;
+    protected final JsonReader readerText;
     protected final Quat tmpQuat = new Quat();
 
-    public ModelLoader(BaseJsonReader reader, FileHandleResolver tree){
+    public ModelLoader(FileHandleResolver tree){
         super(tree);
-        this.reader = reader;
+        readerBin = new UBJsonReader();
+        readerText = new JsonReader();
     }
 
     @Override
-    public void loadAsync(AssetManager manager, String fileName, Fi file, ModelParameter parameter){
+    public Model load(AssetManager manager, String fileName, Fi file, ModelParameter parameter){
+        Model model;
         if(parameter != null && parameter.model != null){
             model = parameter.model;
         }else{
@@ -34,16 +36,13 @@ public class ModelLoader extends AsynchronousAssetLoader<Model, ModelLoader.Mode
         }
 
         model.load(parseModel(file));
-    }
-
-    @Override
-    public Model loadSync(AssetManager manager, String fileName, Fi file, ModelParameter parameter){
-        var model = this.model;
-        this.model = null;
         return model;
     }
 
     public ModelData parseModel(Fi handle){
+        BaseJsonReader reader = handle.extEquals("g3db") ? readerBin : (handle.extEquals("g3dj") ? readerText : null);
+        if(reader == null) throw new IllegalArgumentException("Unknown model type: " + handle.extension() + " (" + handle.name() + ")");
+
         JsonValue json = reader.parse(handle);
         ModelData model = new ModelData();
         JsonValue version = json.require("version");
@@ -290,35 +289,6 @@ public class ModelLoader extends AsynchronousAssetLoader<Model, ModelLoader.Mode
                 nodePart.materialId = materialId;
                 nodePart.meshPartId = meshPartId;
 
-                JsonValue bones = material.get("bones");
-                if(bones != null){
-                    nodePart.bones = new OrderedMap<>(bones.size);
-                    int j = 0;
-                    for(JsonValue bone = bones.child; bone != null; bone = bone.next, j++){
-                        String nodeId = bone.getString("node", null);
-                        if(nodeId == null) throw new IllegalArgumentException("Bone node ID missing");
-
-                        Mat3D transform = new Mat3D();
-
-                        JsonValue val = bone.get("translation");
-                        if(val != null && val.size >= 3){
-                            transform.translate(val.getFloat(0), val.getFloat(1), val.getFloat(2));
-                        }
-
-                        val = bone.get("rotation");
-                        if(val != null && val.size >= 4){
-                            transform.rotate(tmpQuat.set(val.getFloat(0), val.getFloat(1), val.getFloat(2), val.getFloat(3)));
-                        }
-
-                        val = bone.get("scale");
-                        if(val != null && val.size >= 3){
-                            transform.scale(val.getFloat(0), val.getFloat(1), val.getFloat(2));
-                        }
-
-                        nodePart.bones.put(nodeId, transform);
-                    }
-                }
-
                 jsonNode.parts[i] = nodePart;
             }
         }
@@ -347,7 +317,5 @@ public class ModelLoader extends AsynchronousAssetLoader<Model, ModelLoader.Mode
         public ModelParameter(Model model){
             this.model = model;
         }
-
-        public ModelParameter(){}
     }
 }
