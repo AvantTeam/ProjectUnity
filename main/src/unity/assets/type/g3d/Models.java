@@ -15,6 +15,8 @@ public class Models{
 
     {
         camera.perspective = false;
+        camera.near = -10000f;
+        camera.far = 10000f;
     }
 
     public void render(RenderableProvider prov){
