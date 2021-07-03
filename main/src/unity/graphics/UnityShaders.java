@@ -149,6 +149,7 @@ public class UnityShaders implements Loadable{
             if(!shaders.containsKey(mask)){
                 String prefix = "\n";
 
+                if((mask & BlendingAttribute.blend) != 0) prefix += "#define blendedFrag";
                 if((mask & TextureAttribute.diffuse) != 0) prefix += "#define diffuseTextureFlag\n";
                 if((mask & ColorAttribute.diffuse) != 0) prefix += "#define diffuseColorFlag\n";
                 if((mask & TextureAttribute.specular) != 0) prefix += "#define specularTextureFlag\n";
@@ -189,6 +190,9 @@ public class UnityShaders implements Loadable{
 
             setUniformMatrix4("u_worldTrans", render.worldTransform.val);
             setUniformMatrix("u_normalMatrix", Tmp.m1.set(render.worldTransform.toNormalMatrix().val));
+
+            BlendingAttribute blend = material.get(BlendingAttribute.blend);
+            if(blend != null) setUniformf("u_opacity", blend.opacity);
 
             FloatAttribute shine = material.get(FloatAttribute.shininess);
             if(shine != null) setUniformf("u_shininess", shine.value);
