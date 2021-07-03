@@ -16,6 +16,7 @@ import mindustry.graphics.*;
 import unity.assets.type.g3d.*;
 import unity.assets.type.g3d.attribute.*;
 import unity.assets.type.g3d.attribute.type.*;
+import unity.assets.type.g3d.attribute.type.light.*;
 
 import static mindustry.Vars.*;
 import static unity.Unity.*;
@@ -142,25 +143,53 @@ public class UnityShaders implements Loadable{
         }
 
         public Graphics3DShader get(Renderable render){
-            return get(render.material.mask());
+            return get(render.material.mask(), render.meshPart.mesh.attributes);
         }
 
-        public Graphics3DShader get(long mask){
+        public Graphics3DShader get(long mask, VertexAttribute[] attributes){
+            mask |= model.environment.mask();
+
             if(!shaders.containsKey(mask)){
                 String prefix = "\n";
 
-                if((mask & BlendingAttribute.blend) != 0) prefix += "#define blendedFrag";
-                if((mask & TextureAttribute.diffuse) != 0) prefix += "#define diffuseTextureFlag\n";
-                if((mask & ColorAttribute.diffuse) != 0) prefix += "#define diffuseColorFlag\n";
-                if((mask & TextureAttribute.specular) != 0) prefix += "#define specularTextureFlag\n";
-                if((mask & ColorAttribute.specular) != 0) prefix += "#define specularColorFlag\n";
-                if((mask & TextureAttribute.emissive) != 0) prefix += "#define emissiveTextureFlag\n";
-                if((mask & ColorAttribute.emissive) != 0) prefix += "#define emissiveColorFlag\n";
+                if(Structs.indexOf(attributes, VertexAttribute.position3) != -1) prefix += define("position");
+                if(Structs.indexOf(attributes, VertexAttribute.color) != -1) prefix += define("color");
+                if(Structs.indexOf(attributes, VertexAttribute.normal) != -1) prefix += define("normal");
+
+                prefix += define("lighting");
+                if((mask & ColorAttribute.ambientLight) != 0) prefix += define(ColorAttribute.ambientLightAlias);
+                if((mask & DirectionalLightsAttribute.light) != 0){
+                    prefix += defineRaw("numDirectionalLights " + model.environment.<DirectionalLightsAttribute>get(DirectionalLightsAttribute.light).lights.size);
+                }else{
+                    prefix += defineRaw("numDirectionalLights 0");
+                }
+
+                if((mask & PointLightsAttribute.light) != 0){
+                    prefix += defineRaw("numPointLights " + model.environment.<PointLightsAttribute>get(PointLightsAttribute.light).lights.size);
+                }else{
+                    prefix += defineRaw("numPointLights 0");
+                }
+
+                if((mask & BlendingAttribute.blend) != 0) prefix += define(BlendingAttribute.blendAlias);
+                if((mask & TextureAttribute.diffuse) != 0) prefix += define(TextureAttribute.diffuseAlias);
+                if((mask & ColorAttribute.diffuse) != 0) prefix += define(ColorAttribute.diffuseAlias);
+                if((mask & TextureAttribute.specular) != 0) prefix += define(TextureAttribute.specularAlias);
+                if((mask & ColorAttribute.specular) != 0) prefix += define(ColorAttribute.specularAlias);
+                if((mask & TextureAttribute.emissive) != 0) prefix += define(TextureAttribute.emissiveAlias);
+                if((mask & ColorAttribute.emissive) != 0) prefix += define(ColorAttribute.emissiveAlias);
 
                 shaders.put(mask, new Graphics3DShader(prefix + vertSource, prefix + fragSource));
             }
 
             return shaders.get(mask);
+        }
+
+        public String define(String alias){
+            return "#define " + alias + "Flag" + "\n";
+        }
+
+        public String defineRaw(String alias){
+            return "#define " + alias + "\n";
         }
 
         @Override
@@ -180,6 +209,7 @@ public class UnityShaders implements Loadable{
         public void apply(Renderable render){
             Camera3D camera = model.camera;
             Material material = render.material;
+            Environment env = model.environment;
 
             setUniformMatrix4("u_projViewTrans", camera.combined.val);
 
@@ -241,6 +271,20 @@ public class UnityShaders implements Loadable{
             if(nor != null){
                 setUniformi("u_normalTexture", model.bind(nor, 0));
                 setUniformf("u_normalUVTransform", nor.offsetU, nor.offsetV, nor.scaleU, nor.scaleV);
+            }
+
+            render.worldTransform.getTranslation(Tmp.v31);
+
+            ColorAttribute aml = env.get(ColorAttribute.ambientLight);
+            if(aml != null) setUniformf("u_ambientLight", aml.color);
+
+            DirectionalLightsAttribute dirl = env.get(DirectionalLightsAttribute.light);
+            if(dirl != null){
+                for(int i = 0; i < dirl.lights.size; i++){
+                    var light = dirl.lights.get(i);
+                    setUniformf("u_dirLights[" + i + "].color", light.color);
+                    setUniformf("u_dirLights[" + i + "].direction", light.direction);
+                }
             }
         }
     }

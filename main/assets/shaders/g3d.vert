@@ -20,11 +20,9 @@ uniform mat4 u_projViewTrans;
     attribute vec4 a_color;
 #endif
 
-#ifdef normalFlag
-    attribute vec3 a_normal;
-    uniform mat3 u_normalMatrix;
-    varying vec3 v_normal;
-#endif
+attribute vec3 a_normal;
+uniform mat3 u_normalMatrix;
+varying vec3 v_normal;
 
 #ifdef textureFlag
     attribute vec2 a_texCoord0;
@@ -148,31 +146,29 @@ void main(){
     gl_Position = u_projViewTrans * u_worldTrans * a_position;
 
     #ifdef shadowMapFlag
-        vec4 spos = u_shadowMapProjViewTrans * pos;
+        vec4 spos = u_shadowMapProjViewTrans * a_position;
         v_shadowMapUv.xyz = (spos.xyz / spos.w) * 0.5 + 0.5;
         v_shadowMapUv.z = min(v_shadowMapUv.z, 0.998);
     #endif
 
-    #if defined(normalFlag)
-        v_normal = normalize(u_normalMatrix * a_normal);
-    #endif
+    v_normal = normalize(u_normalMatrix * a_normal);
 
     #ifdef fogFlag
-        vec3 flen = u_cameraPosition.xyz - pos.xyz;
+        vec3 flen = u_cameraPosition.xyz - a_position.xyz;
         float fog = dot(flen, flen) * u_cameraPosition.w;
         v_fog = min(fog, 1.0);
     #endif
 
     #ifdef lightingFlag
-        #if    defined(ambientLightFlag)
+        #if defined(ambientLightFlag)
             vec3 ambientLight = u_ambientLight;
         #elif defined(ambientFlag)
             vec3 ambientLight = vec3(0.0);
         #endif
 
         #ifdef ambientCubemapFlag
-            vec3 squaredNormal = normal * normal;
-            vec3 isPositive  = step(0.0, normal);
+            vec3 squaredNormal = v_normal * v_normal;
+            vec3 isPositive  = step(0.0, v_normal);
             ambientLight += squaredNormal.x * mix(u_ambientCubemap[0], u_ambientCubemap[1], isPositive.x) +
             squaredNormal.y * mix(u_ambientCubemap[2], u_ambientCubemap[3], isPositive.y) +
             squaredNormal.z * mix(u_ambientCubemap[4], u_ambientCubemap[5], isPositive.z);
@@ -180,14 +176,14 @@ void main(){
 
         #ifdef sphericalHarmonicsFlag
             ambientLight += u_sphericalHarmonics[0];
-            ambientLight += u_sphericalHarmonics[1] * normal.x;
-            ambientLight += u_sphericalHarmonics[2] * normal.y;
-            ambientLight += u_sphericalHarmonics[3] * normal.z;
-            ambientLight += u_sphericalHarmonics[4] * (normal.x * normal.z);
-            ambientLight += u_sphericalHarmonics[5] * (normal.z * normal.y);
-            ambientLight += u_sphericalHarmonics[6] * (normal.y * normal.x);
-            ambientLight += u_sphericalHarmonics[7] * (3.0 * normal.z * normal.z - 1.0);
-            ambientLight += u_sphericalHarmonics[8] * (normal.x * normal.x - normal.y * normal.y);
+            ambientLight += u_sphericalHarmonics[1] * v_normal.x;
+            ambientLight += u_sphericalHarmonics[2] * v_normal.y;
+            ambientLight += u_sphericalHarmonics[3] * v_normal.z;
+            ambientLight += u_sphericalHarmonics[4] * (v_normal.x * v_normal.z);
+            ambientLight += u_sphericalHarmonics[5] * (v_normal.z * v_normal.y);
+            ambientLight += u_sphericalHarmonics[6] * (v_normal.y * v_normal.x);
+            ambientLight += u_sphericalHarmonics[7] * (3.0 * v_normal.z * v_normal.z - 1.0);
+            ambientLight += u_sphericalHarmonics[8] * (v_normal.x * v_normal.x - v_normal.y * v_normal.y);
         #endif
 
         #ifdef ambientFlag
@@ -203,32 +199,32 @@ void main(){
 
         #ifdef specularFlag
             v_lightSpecular = vec3(0.0);
-            vec3 viewVec = normalize(u_cameraPosition.xyz - pos.xyz);
+            vec3 viewVec = normalize(u_cameraPosition.xyz - a_position.xyz);
         #endif
 
-        #if(numDirectionalLights > 0) && defined(normalFlag)
+        #if(numDirectionalLights > 0)
             for(int i = 0; i < numDirectionalLights; i++){
                 vec3 lightDir = -u_dirLights[i].direction;
-                float NdotL = clamp(dot(normal, lightDir), 0.0, 1.0);
+                float NdotL = clamp(dot(v_normal, lightDir), 0.0, 1.0);
                 vec3 value = u_dirLights[i].color * NdotL;
                 v_lightDiffuse += value;
                 #ifdef specularFlag
-                    float halfDotView = max(0.0, dot(normal, normalize(lightDir + viewVec)));
+                    float halfDotView = max(0.0, dot(v_normal, normalize(lightDir + viewVec)));
                     v_lightSpecular += value * pow(halfDotView, u_shininess);
                 #endif
             }
         #endif
 
-        #if(numPointLights > 0) && defined(normalFlag)
+        #if(numPointLights > 0)
             for(int i = 0; i < numPointLights; i++){
-                vec3 lightDir = u_pointLights[i].position - pos.xyz;
+                vec3 lightDir = u_pointLights[i].position - a_position.xyz;
                 float dist2 = dot(lightDir, lightDir);
                 lightDir *= inversesqrt(dist2);
-                float NdotL = clamp(dot(normal, lightDir), 0.0, 1.0);
+                float NdotL = clamp(dot(v_normal, lightDir), 0.0, 1.0);
                 vec3 value = u_pointLights[i].color * (NdotL / (1.0 + dist2));
                 v_lightDiffuse += value;
                 #ifdef specularFlag
-                    float halfDotView = max(0.0, dot(normal, normalize(lightDir + viewVec)));
+                    float halfDotView = max(0.0, dot(v_normal, normalize(lightDir + viewVec)));
                     v_lightSpecular += value * pow(halfDotView, u_shininess);
                 #endif
             }

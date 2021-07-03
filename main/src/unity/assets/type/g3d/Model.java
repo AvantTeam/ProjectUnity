@@ -7,7 +7,6 @@ import unity.assets.loaders.*;
 import unity.assets.type.g3d.attribute.*;
 import unity.assets.type.g3d.attribute.type.*;
 import unity.assets.type.g3d.model.*;
-import unity.graphics.*;
 
 import static mindustry.Vars.*;
 
@@ -154,9 +153,6 @@ public class Model implements Disposable{
         for(ModelMaterial mtl : modelMaterials){
             materials.add(convertMaterial(mtl));
         }
-
-        //generate shaders first-hand
-        materials.each(mtl -> UnityShaders.graphics3DProvider.get(mtl.mask()));
     }
 
     protected Material convertMaterial(ModelMaterial mtl){

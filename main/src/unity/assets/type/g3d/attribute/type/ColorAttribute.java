@@ -21,11 +21,11 @@ public class ColorAttribute extends Attribute{
 
     protected static long Mask = ambient | diffuse | specular | emissive | reflection | ambientLight | fog;
 
-    public static boolean is(final long mask){
+    public static boolean is(long mask){
         return (mask & Mask) != 0;
     }
 
-    public static ColorAttribute createAmbient(final Color color){
+    public static ColorAttribute createAmbient(Color color){
         return new ColorAttribute(ambient, color);
     }
 
@@ -33,7 +33,7 @@ public class ColorAttribute extends Attribute{
         return new ColorAttribute(ambient, r, g, b, a);
     }
 
-    public static ColorAttribute createDiffuse(final Color color){
+    public static ColorAttribute createDiffuse(Color color){
         return new ColorAttribute(diffuse, color);
     }
 
@@ -41,7 +41,7 @@ public class ColorAttribute extends Attribute{
         return new ColorAttribute(diffuse, r, g, b, a);
     }
 
-    public static ColorAttribute createSpecular(final Color color){
+    public static ColorAttribute createSpecular(Color color){
         return new ColorAttribute(specular, color);
     }
 
@@ -49,7 +49,7 @@ public class ColorAttribute extends Attribute{
         return new ColorAttribute(specular, r, g, b, a);
     }
 
-    public static ColorAttribute createReflection(final Color color){
+    public static ColorAttribute createReflection(Color color){
         return new ColorAttribute(reflection, color);
     }
 
@@ -57,7 +57,7 @@ public class ColorAttribute extends Attribute{
         return new ColorAttribute(reflection, r, g, b, a);
     }
 
-    public static ColorAttribute createEmissive(final Color color){
+    public static ColorAttribute createEmissive(Color color){
         return new ColorAttribute(emissive, color);
     }
 
@@ -73,7 +73,7 @@ public class ColorAttribute extends Attribute{
         return new ColorAttribute(ambientLight, r, g, b, a);
     }
 
-    public static ColorAttribute createFog(final Color color){
+    public static ColorAttribute createFog(Color color){
         return new ColorAttribute(fog, color);
     }
 
