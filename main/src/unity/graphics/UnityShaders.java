@@ -143,12 +143,10 @@ public class UnityShaders implements Loadable{
         }
 
         public Graphics3DShader get(Renderable render){
-            return get(render.material.mask(), render.meshPart.mesh.attributes);
+            return get(render.material.mask() | model.environment.mask(), render.meshPart.mesh.attributes);
         }
 
         public Graphics3DShader get(long mask, VertexAttribute[] attributes){
-            mask |= model.environment.mask();
-
             if(!shaders.containsKey(mask)){
                 String prefix = "\n";
 
@@ -156,8 +154,8 @@ public class UnityShaders implements Loadable{
                 if(Structs.indexOf(attributes, VertexAttribute.color) != -1) prefix += define("color");
                 if(Structs.indexOf(attributes, VertexAttribute.normal) != -1) prefix += define("normal");
 
-                prefix += define("lighting");
-                if((mask & ColorAttribute.ambientLight) != 0) prefix += define(ColorAttribute.ambientLightAlias);
+                //prefix += define("lighting");
+                if((mask & ColorAttribute.ambientLight) != 0) prefix += define("ambientLight");
                 if((mask & DirectionalLightsAttribute.light) != 0){
                     prefix += defineRaw("numDirectionalLights " + model.environment.<DirectionalLightsAttribute>get(DirectionalLightsAttribute.light).lights.size);
                 }else{
@@ -227,11 +225,14 @@ public class UnityShaders implements Loadable{
             FloatAttribute shine = material.get(FloatAttribute.shininess);
             if(shine != null) setUniformf("u_shininess", shine.value);
 
+            boolean rebind = false;
+
             TextureAttribute diff = material.get(TextureAttribute.diffuse);
             ColorAttribute diffCol = material.get(ColorAttribute.diffuse);
             if(diffCol != null) setUniformf("u_diffuseColor", diffCol.color);
             if(diff != null){
-                setUniformi("u_diffuseTexture", model.bind(diff, 5));
+                rebind = true;
+                setUniformi("u_diffuseTexture", model.bind(diff, 6));
                 setUniformf("u_diffuseUVTransform", diff.offsetU, diff.offsetV, diff.scaleU, diff.scaleV);
             }
 
@@ -239,7 +240,8 @@ public class UnityShaders implements Loadable{
             ColorAttribute specCol = material.get(ColorAttribute.specular);
             if(specCol != null) setUniformf("u_specularColor", specCol.color);
             if(spec != null){
-                setUniformi("u_specularTexture", model.bind(spec, 4));
+                rebind = true;
+                setUniformi("u_specularTexture", model.bind(spec, 5));
                 setUniformf("u_specularUVTransform", spec.offsetU, spec.offsetV, spec.scaleU, spec.scaleV);
             }
 
@@ -247,7 +249,8 @@ public class UnityShaders implements Loadable{
             ColorAttribute emCol = material.get(ColorAttribute.emissive);
             if(emCol != null) setUniformf("u_emissiveColor", emCol.color);
             if(em != null){
-                setUniformi("u_emissiveTexture", model.bind(em, 3));
+                rebind = true;
+                setUniformi("u_emissiveTexture", model.bind(em, 4));
                 setUniformf("u_emissiveUVTransform", em.offsetU, em.offsetV, em.scaleU, em.scaleV);
             }
 
@@ -255,7 +258,8 @@ public class UnityShaders implements Loadable{
             ColorAttribute refCol = material.get(ColorAttribute.reflection);
             if(refCol != null) setUniformf("u_reflectionColor", refCol.color);
             if(ref != null){
-                setUniformi("u_reflectionTexture", model.bind(ref, 2));
+                rebind = true;
+                setUniformi("u_reflectionTexture", model.bind(ref, 3));
                 setUniformf("u_reflectionUVTransform", ref.offsetU, ref.offsetV, ref.scaleU, ref.scaleV);
             }
 
@@ -263,15 +267,19 @@ public class UnityShaders implements Loadable{
             ColorAttribute amCol = material.get(ColorAttribute.ambient);
             if(amCol != null) setUniformf("u_ambientColor", amCol.color);
             if(am != null){
-                setUniformi("u_ambientTexture", model.bind(am, 1));
+                rebind = true;
+                setUniformi("u_ambientTexture", model.bind(am, 2));
                 setUniformf("u_ambientUVTransform", am.offsetU, am.offsetV, am.scaleU, am.scaleV);
             }
 
             TextureAttribute nor = material.get(TextureAttribute.normal);
             if(nor != null){
-                setUniformi("u_normalTexture", model.bind(nor, 0));
+                rebind = true;
+                setUniformi("u_normalTexture", model.bind(nor, 1));
                 setUniformf("u_normalUVTransform", nor.offsetU, nor.offsetV, nor.scaleU, nor.scaleV);
             }
+
+            if(rebind) renderer.effectBuffer.getTexture().bind(0);
 
             render.worldTransform.getTranslation(Tmp.v31);
 

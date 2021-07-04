@@ -1,6 +1,7 @@
 package unity.assets.type.g3d.attribute.type;
 
 import arc.graphics.*;
+import arc.graphics.Texture.*;
 import arc.math.*;
 import unity.assets.type.g3d.attribute.*;
 
@@ -68,6 +69,9 @@ public class TextureAttribute extends Attribute{
 
     public TextureAttribute(long type, Texture texture){
         super(type);
+
+        texture.setFilter(TextureFilter.linear);
+        texture.setWrap(TextureWrap.repeat);
         this.texture = texture;
     }
 

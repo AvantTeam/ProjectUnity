@@ -169,7 +169,7 @@ public class Model implements Disposable{
 
         if(mtl.textures != null){
             for(ModelTexture tex : mtl.textures){
-                Texture texture = new Texture(tree.get(tex.fileName + ".png"));
+                Texture texture = new Texture(tree.get(tex.fileName));
 
                 float offsetU = tex.uvTranslation == null ? 0f : tex.uvTranslation.x;
                 float offsetV = tex.uvTranslation == null ? 0f : tex.uvTranslation.y;

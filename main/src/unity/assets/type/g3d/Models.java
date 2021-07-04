@@ -15,6 +15,7 @@ public class Models{
     public RenderableSorter sorter = new RenderableSorter();
     public Environment environment = new Environment();
     protected Seq<Renderable> renders = new Seq<>();
+    public int cullFace = Gl.back;
 
     {
         camera.perspective = false;
@@ -30,14 +31,17 @@ public class Models{
         prov.getRenderables(renders);
 
         sorter.sort(camera, renders);
+
+        Gl.enable(Gl.cullFace);
+        Gl.cullFace(cullFace);
         for(Renderable render : renders){
             Graphics3DShader shader = UnityShaders.graphics3DProvider.get(render);
             shader.bind();
             shader.apply(render);
             render.meshPart.render(shader);
-
-            Gl.activeTexture(GL20.GL_TEXTURE0);
         }
+        Gl.disable(Gl.cullFace);
+        Gl.activeTexture(Gl.texture0);
 
         Pools.freeAll(renders);
     }
