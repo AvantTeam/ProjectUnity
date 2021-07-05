@@ -252,7 +252,7 @@ public class UnityBlocks implements ContentList{
     //---------- advance faction ----------
     public static @FactionDef("advance") Block
     //unit
-    advanceConstructor,
+    advanceConstructorModule, advanceConstructor,
 
     //turret
     celsius, kelvin, caster, storm, eclipse, xenoCorruptor, cube, wavefront;
@@ -2984,24 +2984,36 @@ public class UnityBlocks implements ContentList{
         //endregion
         //region advance
 
+        advanceConstructorModule = new ModularConstructorPart("advance-constructor-module"){{
+            requirements(Category.units, with(UnityItems.xenium, 300, Items.silicon, 200, Items.graphite, 300, Items.thorium, 400, Items.phaseFabric, 50, Items.surgeAlloy, 100, UnityItems.advanceAlloy, 300));
+            size = 6;
+            liquidCapacity = 20f;
+
+            consumes.liquid(Liquids.cryofluid, 0.7f);
+            consumes.power(3f);
+            hasLiquids = true;
+            hasPower = true;
+        }};
+
         advanceConstructor = new ModularConstructor("advance-constructor"){{
             requirements(Category.units, with(UnityItems.xenium, 3000, Items.silicon, 5000, Items.graphite, 2000, Items.thorium, 3000, Items.phaseFabric, 800, Items.surgeAlloy, 700, UnityItems.advanceAlloy, 1500));
             size = 13;
+            efficiencyPerTier = 10f * 60f;
 
             plans.addAll(
-                new ModularConstructorPlan(UnitTypes.antumbra, 15f * 60f, 0,
+                new ModularConstructorPlan(UnitTypes.antumbra, 30f * 60f, 0,
                 with(Items.silicon, 690, Items.graphite, 40, Items.titanium, 550, Items.metaglass, 40, Items.plastanium, 420)),
 
-                new ModularConstructorPlan(UnitTypes.scepter, 15f * 60f, 0,
+                new ModularConstructorPlan(UnitTypes.scepter, 30f * 60f, 0,
                 with(Items.silicon, 690, Items.lead, 60, Items.graphite, 30, Items.titanium, 550, Items.metaglass, 40, Items.plastanium, 420)),
 
-                new ModularConstructorPlan(UnitTypes.eclipse, 25f * 60f, 1,
+                new ModularConstructorPlan(UnitTypes.eclipse, 40f * 60f, 1,
                 with(Items.silicon, 1350, Items.graphite, 120, Items.titanium, 550, Items.metaglass, 100, Items.plastanium, 830, Items.surgeAlloy, 330, Items.phaseFabric, 250)),
 
-                new ModularConstructorPlan(UnitTypes.reign, 25f * 60f, 1,
+                new ModularConstructorPlan(UnitTypes.reign, 40f * 60f, 1,
                 with(Items.silicon, 1350, Items.lead, 160, Items.graphite, 90, Items.titanium, 550, Items.metaglass, 100, Items.plastanium, 830, Items.surgeAlloy, 330, Items.phaseFabric, 250)),
 
-                new ModularConstructorPlan(UnityUnitTypes.mantle, 35f * 60f, 2,
+                new ModularConstructorPlan(UnityUnitTypes.mantle, 50f * 60f, 2,
                 with(Items.silicon, 2050, Items.graphite, 180, Items.titanium, 830, Items.metaglass, 150, Items.plastanium, 1250, Items.surgeAlloy, 500, Items.phaseFabric, 375))
             );
 
