@@ -1377,7 +1377,7 @@ public class UnityUnitTypes implements ContentList{
                 bullet = new AcceleratingLaserBulletType(230f){{
                     lifetime = 180f;
                     maxLength = 380f;
-                    maxRange = 420f;
+                    maxRange = 330f;
                     oscOffset = 0.1f;
                     incendChance = 0.2f;
                     incendAmount = 2;
@@ -1477,7 +1477,7 @@ public class UnityUnitTypes implements ContentList{
                 bullet = new AcceleratingLaserBulletType(320f){{
                     lifetime = 4f * 60f;
                     maxLength = 430f;
-                    maxRange = 550f;
+                    maxRange = 400f;
                     oscOffset = 0.2f;
                     incendChance = 0.3f;
                     incendAmount = 2;
