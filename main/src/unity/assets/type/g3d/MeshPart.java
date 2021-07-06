@@ -2,7 +2,6 @@ package unity.assets.type.g3d;
 
 import arc.graphics.*;
 import arc.graphics.gl.*;
-import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 
@@ -55,13 +54,13 @@ public class MeshPart{
 
     /**
      * Construct a new MeshPart and set all its values.
-     * @param id     The id of the new part, may be null.
-     * @param mesh   The mesh which holds all vertices and (optional) indices of this part.
+     * @param id The id of the new part, may be null.
+     * @param mesh The mesh which holds all vertices and (optional) indices of this part.
      * @param offset The offset within the mesh to this part.
-     * @param size   The size (in total number of vertices) of the part.
-     * @param type   The primitive type of the part (e.g. GL_TRIANGLES, GL_LINE_STRIP, etc.).
+     * @param size The size (in total number of vertices) of the part.
+     * @param type The primitive type of the part (e.g. GL_TRIANGLES, GL_LINE_STRIP, etc.).
      */
-    public MeshPart(final String id, final Mesh mesh, final int offset, final int size, final int type){
+    public MeshPart(String id, Mesh mesh, int offset, int size, int type){
         set(id, mesh, offset, size, type);
     }
 
@@ -69,7 +68,7 @@ public class MeshPart{
      * Construct a new MeshPart which is an exact copy of the provided MeshPart.
      * @param copyFrom The MeshPart to copy.
      */
-    public MeshPart(final MeshPart copyFrom){
+    public MeshPart(MeshPart copyFrom){
         set(copyFrom);
     }
 
@@ -78,7 +77,7 @@ public class MeshPart{
      * @param other The MeshPart from which to copy the values
      * @return this MeshPart, for chaining
      */
-    public MeshPart set(final MeshPart other){
+    public MeshPart set(MeshPart other){
         this.id = other.id;
         this.mesh = other.mesh;
         this.offset = other.offset;
@@ -95,7 +94,7 @@ public class MeshPart{
      *
      * @return this MeshPart, for chaining.
      */
-    public MeshPart set(final String id, final Mesh mesh, final int offset, final int size, final int type){
+    public MeshPart set(String id, Mesh mesh, int offset, int size, int type){
         this.id = id;
         this.mesh = mesh;
         this.offset = offset;
@@ -182,8 +181,7 @@ public class MeshPart{
 
     /**
      * Renders the mesh part using the specified shader, must be called after {@link Shader#bind()}.
-     * @param shader   the shader to be used
-     * @param autoBind overrides the autoBind member of the Mesh
+     * @param shader the shader to be used
      */
     public void render(Shader shader){
         mesh.render(shader, primitiveType, offset, size, true);

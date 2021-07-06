@@ -4,6 +4,7 @@ import arc.struct.*;
 import unity.assets.type.g3d.attribute.light.*;
 import unity.assets.type.g3d.attribute.type.light.*;
 
+/** Only add lights before rendering anything. */
 public class Environment extends Attributes{
     public ShadowMap shadowMap;
 

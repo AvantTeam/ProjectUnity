@@ -62,10 +62,10 @@ uniform mat4 u_worldTrans;
 #endif
 
 #ifdef lightingFlag
-    varying vec3 v_lightDiffuse;
+    varying vec4 v_lightDiffuse;
 
     #ifdef ambientLightFlag
-        uniform vec3 u_ambientLight;
+        uniform vec4 u_ambientLight;
     #endif
 
     #ifdef ambientCubemapFlag
@@ -73,11 +73,11 @@ uniform mat4 u_worldTrans;
     #endif
 
     #ifdef sphericalHarmonicsFlag
-        uniform vec3 u_sphericalHarmonics[9];
+        uniform vec4 u_sphericalHarmonics[9];
     #endif
 
     #ifdef specularFlag
-        varying vec3 v_lightSpecular;
+        varying vec4 v_lightSpecular;
     #endif
 
     #ifdef cameraPositionFlag
@@ -90,7 +90,7 @@ uniform mat4 u_worldTrans;
 
     #if numDirectionalLights > 0
         struct DirectionalLight{
-            vec3 color;
+            vec4 color;
             vec3 direction;
         };
         uniform DirectionalLight u_dirLights[numDirectionalLights];
@@ -98,7 +98,7 @@ uniform mat4 u_worldTrans;
 
     #if numPointLights > 0
         struct PointLight{
-            vec3 color;
+            vec4 color;
             vec3 position;
         };
         uniform PointLight u_pointLights[numPointLights];
@@ -113,9 +113,9 @@ uniform mat4 u_worldTrans;
         varying vec3 v_shadowMapUv;
         #define separateAmbientFlag
     #endif
-
+    
     #if defined(ambientFlag) && defined(separateAmbientFlag)
-        varying vec3 v_ambientLight;
+        varying vec4 v_ambientLight;
     #endif
 #endif
 
@@ -161,9 +161,9 @@ void main(){
 
     #ifdef lightingFlag
         #if defined(ambientLightFlag)
-            vec3 ambientLight = u_ambientLight;
+            vec4 ambientLight = u_ambientLight;
         #elif defined(ambientFlag)
-            vec3 ambientLight = vec3(0.0);
+            vec4 ambientLight = vec4(0.0);
         #endif
 
         #ifdef ambientCubemapFlag
@@ -189,16 +189,16 @@ void main(){
         #ifdef ambientFlag
             #ifdef separateAmbientFlag
                 v_ambientLight = ambientLight;
-                v_lightDiffuse = vec3(0.0);
+                v_lightDiffuse = vec4(0.0);
             #else
                 v_lightDiffuse = ambientLight;
             #endif
         #else
-            v_lightDiffuse = vec3(0.0);
+            v_lightDiffuse = vec4(0.0);
         #endif
 
         #ifdef specularFlag
-            v_lightSpecular = vec3(0.0);
+            v_lightSpecular = vec4(0.0);
             vec3 viewVec = normalize(u_cameraPosition.xyz - a_position.xyz);
         #endif
 
@@ -206,7 +206,7 @@ void main(){
             for(int i = 0; i < numDirectionalLights; i++){
                 vec3 lightDir = -u_dirLights[i].direction;
                 float NdotL = clamp(dot(v_normal, lightDir), 0.0, 1.0);
-                vec3 value = u_dirLights[i].color * NdotL;
+                vec4 value = u_dirLights[i].color * NdotL;
                 v_lightDiffuse += value;
                 #ifdef specularFlag
                     float halfDotView = max(0.0, dot(v_normal, normalize(lightDir + viewVec)));
@@ -221,7 +221,7 @@ void main(){
                 float dist2 = dot(lightDir, lightDir);
                 lightDir *= inversesqrt(dist2);
                 float NdotL = clamp(dot(v_normal, lightDir), 0.0, 1.0);
-                vec3 value = u_pointLights[i].color * (NdotL / (1.0 + dist2));
+                vec4 value = u_pointLights[i].color * (NdotL / (1.0 + dist2));
                 v_lightDiffuse += value;
                 #ifdef specularFlag
                     float halfDotView = max(0.0, dot(v_normal, normalize(lightDir + viewVec)));
