@@ -26,7 +26,7 @@ public class AcceleratingLaserBulletType extends BulletType{
     public boolean fastUpdateLength = true;
     public Color[] colors = {Color.valueOf("ec745855"), Color.valueOf("ec7458aa"), Color.valueOf("ff9c5a"), Color.white};
     public Boolf2<Bullet, Building> buildingInsulator = (b, building) -> building.block.absorbLasers || building.health > (damage * buildingDamageMultiplier) / 2f;
-    public Boolf2<Bullet, Unit> unitInsulator = (b, unit) -> unit.health > damage / 2f && unit.hitSize > width * 1.5f;
+    public Boolf2<Bullet, Unit> unitInsulator = (b, unit) -> unit.health > damage / 2f && unit.hitSize > width;
 
     public AcceleratingLaserBulletType(float damage){
         super(0f, damage);

@@ -1346,7 +1346,7 @@ public class UnityUnitTypes implements ContentList{
         }};
 
         mantle = new UnityUnitType("mantle"){{
-            health = 34000f;
+            health = 33000f;
             armor = 17f;
             speed = 0.4f;
             accel = 0.04f;
@@ -1363,7 +1363,7 @@ public class UnityUnitTypes implements ContentList{
             BulletType b = UnitTypes.scepter.weapons.get(0).bullet.copy();
             b.speed = 6.5f;
             b.damage = 60f;
-            b.lifetime = 55f;
+            b.lifetime = 47f;
 
             weapons.add(new Weapon(){{
                 x = 0f;
@@ -1416,7 +1416,7 @@ public class UnityUnitTypes implements ContentList{
         }};
 
         aphelion = new UnityUnitType("aphelion"){{
-            health = 41000f;
+            health = 40000f;
             armor = 16f;
             speed = 0.37f;
             accel = 0.04f;
@@ -1436,7 +1436,7 @@ public class UnityUnitTypes implements ContentList{
             b.lightning = 3;
             b.lightningDamage = 27f;
             b.lightningCone = 360f;
-            b.lifetime = 55f;
+            b.lifetime = 50f;
             b.lightningLength = 14;
             b.lightningType = new BulletType(0f, 10f){
                 {
