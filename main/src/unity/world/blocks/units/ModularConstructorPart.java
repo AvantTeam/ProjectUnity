@@ -115,6 +115,19 @@ public class ModularConstructorPart extends Block{
                 Fx.healBlockFull.at(mod.x, mod.y, mod.block.size, effectColor);
                 Fx.healBlockFull.at(x, y, size, effectColor);
             }
+
+            updateBack();
+        }
+
+        public void updateBack(){
+            Building back = back();
+            if(back instanceof ModularConstructorPartBuild mod && consConnected(mod)){
+                mod.module.graph = module.graph;
+                if(mod.module.graph != null) mod.module.graph.all.add(mod);
+                mod.front = this;
+                this.back = mod;
+                mod.updateBack();
+            }
         }
 
         public void removePart(){

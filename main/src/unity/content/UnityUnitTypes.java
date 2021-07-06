@@ -53,7 +53,7 @@ public class UnityUnitTypes implements ContentList{
     UnitType cygnus, araneidae, theraphosidae;
     // eclipse
     public static @EntityPoint(UnitEntity.class)
-    UnitType mantle;
+    UnitType mantle, aphelion;
     // oct
     public static @EntityPoint(PayloadUnit.class)
     UnitType sedec;
@@ -1358,7 +1358,7 @@ public class UnityUnitTypes implements ContentList{
             targetFlag = BlockFlag.reactor;
             hitSize = 80f;
             engineOffset = 42.75f;
-            engineSize = 8.7f;
+            engineSize = 5.75f;
 
             BulletType b = UnitTypes.scepter.weapons.get(0).bullet.copy();
             b.speed = 6.5f;
@@ -1367,7 +1367,8 @@ public class UnityUnitTypes implements ContentList{
 
             weapons.add(new Weapon(){{
                 x = 0f;
-                y = 4f;
+                y = 0f;
+                shootY = 4f;
                 mirror = false;
                 reload = 4f * 60f;
                 continuous = true;
@@ -1375,7 +1376,7 @@ public class UnityUnitTypes implements ContentList{
 
                 bullet = new AcceleratingLaserBulletType(230f){{
                     lifetime = 180f;
-                    maxLength = 450f;
+                    maxLength = 380f;
                     maxRange = 420f;
                     oscOffset = 0.1f;
                     incendChance = 0.2f;
@@ -1411,6 +1412,49 @@ public class UnityUnitTypes implements ContentList{
                 shadow = 22f;
 
                 bullet = b;
+            }});
+        }};
+
+        aphelion = new UnityUnitType("aphelion"){{
+            health = 41000f;
+            armor = 16f;
+            speed = 0.37f;
+            accel = 0.04f;
+            drag = 0.03f;
+            rotateSpeed = 0.7f;
+            flying = true;
+            lowAltitude = true;
+            destructibleWreck = false;
+            targetFlag = BlockFlag.reactor;
+            hitSize = 96f;
+            engineOffset = 46.5f;
+            engineSize = 6.75f;
+
+            weapons.add(new Weapon(){{
+                x = 0f;
+                y = 0f;
+                shootY = 34.25f;
+                shootCone = 2f;
+                mirror = false;
+                reload = 7f * 60f;
+                continuous = true;
+                recoil = 0f;
+
+                bullet = new AcceleratingLaserBulletType(320f){{
+                    lifetime = 4f * 60f;
+                    maxLength = 430f;
+                    maxRange = 550f;
+                    oscOffset = 0.2f;
+                    incendChance = 0.3f;
+                    incendAmount = 2;
+                    width = 37f;
+                    collisionWidth = 16f;
+                    accel = 60f;
+                    laserSpeed = 20f;
+                }};
+
+                shootStatus = StatusEffects.slow;
+                shootStatusDuration = bullet.lifetime;
             }});
         }};
 

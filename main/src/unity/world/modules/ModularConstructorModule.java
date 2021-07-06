@@ -56,15 +56,7 @@ public class ModularConstructorModule extends BlockModule{
                 if(other instanceof ModularConstructorPartBuild mod && b.consConnected(other) && tmp.add(other.pos())){
                     mod.module.graph = this;
                     all.add(mod);
-                }
-            }
-            for(ModularConstructorPartBuild mod : all){
-                Building other = mod.back();
-                if(other instanceof ModularConstructorPartBuild modb && mod.consConnected(modb) && tmp.add(other.pos())){
-                    modb.module.graph = this;
-                    modb.front = mod;
-                    mod.back = modb;
-                    all.add(modb);
+                    mod.updateBack();
                 }
             }
             tmp.clear();
