@@ -1430,6 +1430,40 @@ public class UnityUnitTypes implements ContentList{
             engineOffset = 46.5f;
             engineSize = 6.75f;
 
+            BulletType b = UnitTypes.scepter.weapons.get(0).bullet.copy();
+            b.speed = 6.5f;
+            b.damage = 40f;
+            b.lightning = 3;
+            b.lightningDamage = 27f;
+            b.lightningCone = 360f;
+            b.lifetime = 55f;
+            b.lightningLength = 14;
+            b.lightningType = new BulletType(0f, 10f){
+                {
+                    lifetime = Fx.lightning.lifetime;
+                    hitEffect = Fx.hitLancer;
+                    despawnEffect = Fx.none;
+                    status = StatusEffects.shocked;
+                    statusDuration = 60f;
+                    hittable = false;
+                    lightningColor = b.lightningColor;
+                    lightning = 1;
+                    lightningCone = 65f;
+                    lightningLength = 6;
+                    lightningLengthRand = 3;
+                }
+
+                @Override
+                public void init(Bullet b){
+                    if(Mathf.chance(0.3f)) Lightning.create(b.team, lightningColor, damage, b.x, b.y, b.rotation() + Mathf.range(lightningCone), lightningLength + Mathf.random(lightningLengthRand));
+                }
+
+                @Override
+                public void hit(Bullet b, float x, float y){
+
+                }
+            };
+
             weapons.add(new Weapon(){{
                 x = 0f;
                 y = 0f;
@@ -1455,6 +1489,18 @@ public class UnityUnitTypes implements ContentList{
 
                 shootStatus = StatusEffects.slow;
                 shootStatusDuration = bullet.lifetime;
+            }}, new Weapon(name + "-mount"){{
+                x = 30f;
+                y = -9.5f;
+                shootY = 14.25f;
+                shadow = 32f;
+                rotate = true;
+                rotateSpeed = 2f;
+                reload = 2f;
+                xRand = 3f;
+                inaccuracy = 4f;
+
+                bullet = b;
             }});
         }};
 
