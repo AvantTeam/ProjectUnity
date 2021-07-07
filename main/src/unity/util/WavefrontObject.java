@@ -53,7 +53,7 @@ public class WavefrontObject{
     protected float indexerZ;
 
     public void load(Fi file, @Nullable Fi material){
-        Unity.print(Strings.format("Loading wavefront object: {file='@' (exists: @), material='@' (exists: @)}",
+        Unity.print(Strings.format("Loading wavefront model: {file='@' (exists: @), material='@' (exists: @)}",
             file, file.exists(),
             material, material != null ? material.exists() : "false")
         );

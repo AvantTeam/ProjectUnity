@@ -11,8 +11,9 @@ import unity.assets.type.g3d.model.*;
 import static mindustry.Vars.*;
 
 /**
- * A 3-dimensional model object representing a {@code .g3d[b|j]} files. Implementation is heavily based
- * on libGDX. Animations and bones are not supported.
+ * A 3-dimensional model model representing a {@code .g3d[b|j]} files. Implementation is heavily based
+ * on libGDX. Animations and bones are not supported yet. Normal and bump texture maps are yet to be
+ * implemented.
  * @author Xoppa
  * @author badlogic
  */

@@ -58,7 +58,7 @@ public final class ReflectUtils{
         }
     }
 
-    /** Sets a field of an object without throwing exceptions. */
+    /** Sets a field of an model without throwing exceptions. */
     public static void setField(Object object, Field field, Object value){
         try{
             field.set(object, value);
@@ -67,7 +67,7 @@ public final class ReflectUtils{
         }
     }
 
-    /** Gets a value from a field of an object without throwing exceptions. */
+    /** Gets a value from a field of an model without throwing exceptions. */
     public static <T> T getField(Object object, Field field){
         try{
             return (T)field.get(object);

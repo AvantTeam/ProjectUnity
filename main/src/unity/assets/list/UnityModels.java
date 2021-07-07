@@ -9,11 +9,12 @@ import unity.assets.type.g3d.*;
 import static mindustry.Vars.*;
 
 public class UnityModels{
-    public static Model wavefront, cube;
+    public static Model wavefront, cube, intersection;
 
     public static void load(){
         wavefront = load("wavefront");
         cube = load("cube");
+        intersection = load("intersection");
     }
 
     public static void dispose(){
