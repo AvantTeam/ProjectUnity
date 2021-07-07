@@ -26,12 +26,9 @@ import static unity.Unity.*;
 public class UnityShaders implements Loadable{
     public static HolographicShieldShader holoShield;
     public static StencilShader stencilShader;
-
     public static Graphics3DShaderProvider graphics3DProvider;
 
     protected static FrameBuffer buffer;
-    protected static UnityShader[] all;
-
     protected static boolean loaded;
 
     public static void load(){
@@ -42,25 +39,24 @@ public class UnityShaders implements Loadable{
     @Override
     public void loadSync(){
         buffer = new FrameBuffer();
-        all = new UnityShader[]{
-            holoShield = new HolographicShieldShader(),
-            stencilShader = new StencilShader()
+
+        CondShader[] conds = new CondShader[]{
+            holoShield = new HolographicShieldShader()
         };
+        stencilShader = new StencilShader();
         graphics3DProvider = new Graphics3DShaderProvider();
 
-        for(int i = 0; i < all.length; i++){
-            UnityShader shader = all[i];
-            if(shader != null){
-                shader.layer = Layer.shields + 2f + i * ((1f / all.length) - 0.01f);
-            }
+        for(int i = 0; i < conds.length; i++){
+            CondShader shader = conds[i];
+            shader.layer = Layer.shields + 2f + i * ((1f / conds.length) - 0.01f);
         }
 
         Events.run(Trigger.draw, () -> {
             buffer.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
 
-            float range = (1f / all.length) / 2f;
-            for(UnityShader shader : all){
-                if(shader != null && shader.apply.get()){
+            float range = (1f / conds.length) / 2f;
+            for(CondShader shader : conds){
+                if(shader.apply.get()){
                     Draw.drawRange(shader.getLayer() + range / 2f, range, () -> buffer.begin(Color.clear), () -> {
                         buffer.end();
                         Draw.blit(buffer, shader);
@@ -73,20 +69,20 @@ public class UnityShaders implements Loadable{
     }
 
     public static void dispose(){
-        if(!headless || !loaded){
+        if(!headless && loaded){
             buffer.dispose();
-            for(UnityShader shader : all){
-                shader.dispose();
-            }
+
+            holoShield.dispose();
+            stencilShader.dispose();
             graphics3DProvider.dispose();
         }
     }
 
-    public static class UnityShader extends Shader{
+    public static class CondShader extends Shader{
         public final Boolp apply;
         protected float layer;
 
-        public UnityShader(Fi vert, Fi frag, Boolp apply){
+        public CondShader(Fi vert, Fi frag, Boolp apply){
             super(vert, frag);
             this.apply = apply;
         }
@@ -96,14 +92,15 @@ public class UnityShaders implements Loadable{
         }
     }
 
-    public static class StencilShader extends UnityShader{
+    public static class StencilShader extends Shader{
         public Color stencilColor = new Color();
         public Color heatColor = new Color();
 
         public StencilShader(){
-            super(Core.files.internal("shaders/screenspace.vert"),
-            tree.get("shaders/unitystencil.frag"),
-            () -> false);
+            super(
+                Core.files.internal("shaders/screenspace.vert"),
+                tree.get("shaders/unitystencil.frag")
+            );
         }
 
         @Override
@@ -114,7 +111,7 @@ public class UnityShaders implements Loadable{
         }
     }
 
-    public static class HolographicShieldShader extends UnityShader{
+    public static class HolographicShieldShader extends CondShader{
         public HolographicShieldShader(){
             super(
                 Core.files.internal("shaders/screenspace.vert"),
