@@ -23,7 +23,7 @@ import unity.assets.type.g3d.attribute.type.light.*;
 import static mindustry.Vars.*;
 import static unity.Unity.*;
 
-public class UnityShaders implements Loadable{
+public class UnityShaders{
     public static HolographicShieldShader holoShield;
     public static StencilShader stencilShader;
     public static Graphics3DShaderProvider graphics3DProvider;
@@ -33,11 +33,10 @@ public class UnityShaders implements Loadable{
 
     public static void load(){
         if(headless) return;
-        Core.assets.load(new UnityShaders());
+        Core.assets.loadRun("unity-shaders-load", UnityShaders.class, () -> {}, UnityShaders::loadSync);
     }
 
-    @Override
-    public void loadSync(){
+    protected static void loadSync(){
         buffer = new FrameBuffer();
 
         CondShader[] conds = new CondShader[]{

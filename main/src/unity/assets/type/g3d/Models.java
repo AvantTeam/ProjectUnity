@@ -32,8 +32,10 @@ public class Models{
         environment.set(ColorAttribute.createAmbientLight(0.4f, 0.4f, 0.4f, 1f));
         environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -1f, -0.3f));
 
-        Core.assets.loadRun("unity-models-initializer", Models.class, () -> {}, () -> buffer = new FrameBuffer(Format.rgba8888, 2, 2, true));
-        Triggers.listen(Trigger.preDraw, () -> buffer.resize(Core.graphics.getWidth(), Core.graphics.getHeight()));
+        Core.assets.loadRun("unity-models-init", Models.class, () -> {}, () -> buffer = new FrameBuffer(Format.rgba8888, 2, 2, true));
+        Triggers.listen(Trigger.preDraw, () -> {
+            if(buffer != null) buffer.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
+        });
     }
 
     public void render(RenderableProvider prov){
@@ -65,7 +67,7 @@ public class Models{
 
         Gl.enable(Gl.depthTest);
         Gl.depthFunc(Gl.less);
-        Gl.depthRangef(0f, 1f);
+        Gl.depthRangef(camera.near, camera.far);
         Gl.depthMask(true);
 
         buffer.begin(Color.clear);

@@ -55,7 +55,8 @@ task dex(dependsOn: deploy) {
     def jarArtifact = file(deploy.archiveFile.get())
     def dexedArtifact = new File("$buildDir/libs", 'Dexed.jar')
 
-    doLast {
+    doFirst {
+        println 'Dexifying...'
         exec {
             workingDir "$buildDir/libs"
 

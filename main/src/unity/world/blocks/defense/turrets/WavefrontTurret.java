@@ -61,8 +61,10 @@ public class WavefrontTurret extends PowerTurret{
             tr2.trns(rotation, -recoil);
             inst.transform.set(
                 Tmp.v31.set(x + tr2.x, y + tr2.y, 0f),
-                Utils.q1.set(Tmp.v32.set(Tmp.v1.trns(rotation - 90f, 1f), 0f), angle),
-                Tmp.v33.set(scale, scale, scale)
+                Utils.q1
+                    .setFromAxis(0f, 0f, 1f, rotation)
+                    .mul(Utils.q2.setFromAxis(0f, 1f, 0f, angle)),
+                Tmp.v32.set(scale, scale, scale)
             );
         }
 
