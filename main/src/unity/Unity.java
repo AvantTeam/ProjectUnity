@@ -61,13 +61,8 @@ public class Unity extends Mod{
     };
 
     public Unity(){
-        ContributorList.init();
-
         Core.assets.setLoader(Model.class, new ModelLoader(tree));
         Core.assets.setLoader(WavefrontObject.class, new WavefrontObjectLoader(tree));
-
-        KamiPatterns.load();
-        KamiBulletDatas.load();
 
         Events.on(ContentInitEvent.class, e -> {
             if(!headless){
@@ -112,22 +107,30 @@ public class Unity extends Mod{
             Core.settings.getBoolOnce("unity-install", () -> Time.runTask(5f, CreditsDialog::showList));
         });
 
-        try{
-            Class<? extends DevBuild> impl = (Class<? extends DevBuild>)Class.forName("unity.mod.DevBuildImpl");
-            dev = impl.getDeclaredConstructor().newInstance();
+        //delay these statements to run in the main thread instead, for safety reasons
+        Core.app.post(() -> {
+            ContributorList.init();
 
-            print("Dev build class implementation found and instantiated.");
-        }catch(Throwable e){
-            print("Dev build class implementation not found; defaulting to regular user implementation.");
-            dev = new DevBuild(){};
-        }
+            KamiPatterns.load();
+            KamiBulletDatas.load();
 
-        music = new MusicHandler(){};
-        tap = new TapHandler();
-        antiCheat = new AntiCheat();
-        model = new Models();
+            try{
+                Class<? extends DevBuild> impl = (Class<? extends DevBuild>)Class.forName("unity.mod.DevBuildImpl");
+                dev = impl.getDeclaredConstructor().newInstance();
 
-        asyncCore.processes.add(new LightProcess());
+                print("Dev build class implementation found and instantiated.");
+            }catch(Throwable e){
+                print("Dev build class implementation not found; defaulting to regular user implementation.");
+                dev = new DevBuild(){};
+            }
+
+            music = new MusicHandler(){};
+            tap = new TapHandler();
+            antiCheat = new AntiCheat();
+            model = new Models();
+
+            asyncCore.processes.add(new LightProcess());
+        });
     }
 
     @Override
