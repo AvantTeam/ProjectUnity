@@ -1098,13 +1098,13 @@ public class UnityUnitTypes implements ContentList{
             health = 35000;
             hitSize = 55f;
             armor = 12f;
-            landShake = 1.75f;
+            landShake = 2f;
             commandLimit = 8;
             rotateSpeed = 1.2f;
 
-            legCount = 6;
-            legLength = 29f;
-            legBaseOffset = 8f;
+            legCount = 4;
+            legLength = 34.36f;
+            legBaseOffset = 11f;
             legMoveSpace = 0.7f;
             legTrns = 0.6f;
             hovering = true;
@@ -1129,17 +1129,17 @@ public class UnityUnitTypes implements ContentList{
                 rotate = true;
                 alternate = false;
                 shots = 2;
-                bullet = new ArrowBulletType(7f, 35f){{
+                bullet = new ArrowBulletType(7f, 25f){{
                     lifetime = 60f;
                     pierce = true;
                     pierceBuilding = true;
-                    pierceCap = 5;
+                    pierceCap = 4;
                     backColor = trailColor = hitColor = lightColor = lightningColor = Pal.heal;
                     frontColor = Color.white;
                     trailWidth = 4f;
                     width = 9f;
                     height = 15f;
-                    splashDamage = 22f;
+                    splashDamage = 15f;
                     splashDamageRadius = 25f;
                     healPercent = 3f;
                     homingRange = 70f;
