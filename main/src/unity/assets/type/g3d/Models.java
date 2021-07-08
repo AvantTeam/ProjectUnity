@@ -30,7 +30,7 @@ public class Models{
         camera.far = 10000f;
 
         environment.set(ColorAttribute.createAmbientLight(0.4f, 0.4f, 0.4f, 1f));
-        environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -1f, -0.3f));
+        environment.add(new DirectionalLight().set(0.56f, 0.56f, 0.56f, -1f, -1f, 0.2f));
 
         Core.assets.loadRun("unity-models-init", Models.class, () -> {}, () -> buffer = new FrameBuffer(Format.rgba8888, 2, 2, true));
         Triggers.listen(Trigger.preDraw, () -> {

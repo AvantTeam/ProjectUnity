@@ -62,7 +62,7 @@ public class WavefrontTurret extends PowerTurret{
             inst.transform.set(
                 Tmp.v31.set(x + tr2.x, y + tr2.y, 0f),
                 Utils.q1
-                    .setFromAxis(0f, 0f, 1f, rotation)
+                    .setFromAxis(0f, 0f, 1f, rotation - 90f)
                     .mul(Utils.q2.setFromAxis(0f, 1f, 0f, angle)),
                 Tmp.v32.set(scale, scale, scale)
             );
@@ -88,24 +88,7 @@ public class WavefrontTurret extends PowerTurret{
             Draw.rect(baseRegion, x, y);
             Draw.color();
 
-            /*model.draw(x + tr2.x, y + tr2.y, 0f, angle, -rotation + 90f, v -> {
-                if(v.z > 0f){
-                    v.z += offset;
-                }else{
-                    v.z -= offset;
-                }
-            });*/
-            /*
-            model.draw(x + tr2.x, y + tr2.y, 0f, -angle + 90f, -rotation + 90f, v -> {
-                if(v.z > 0f){
-                    v.z += gap + offset;
-                }else{
-                    v.z -= gap + offset;
-                }
-            });
-             */
-
-            Draw.draw(Layer.turret, inst::render);
+            Draw.draw(Layer.turret + Mathf.FLOAT_ROUNDING_ERROR, inst::render);
         }
     }
 }
