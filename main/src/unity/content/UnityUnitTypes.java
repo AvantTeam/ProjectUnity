@@ -50,7 +50,7 @@ public class UnityUnitTypes implements ContentList{
     UnitType citadel, empire;
     // corvus + toxopid
     public static @EntityPoint(LegsUnit.class)
-    UnitType cygnus, araneidae, theraphosidae;
+    UnitType cygnus, sagittarius, araneidae, theraphosidae;
     // eclipse
     public static @EntityPoint(UnitEntity.class)
     UnitType mantle, aphelion;
@@ -1089,6 +1089,61 @@ public class UnityUnitTypes implements ContentList{
                     largeHit = false;
 
                     colors = new Color[]{Pal.heal.cpy().a(0.2f), Pal.heal.cpy().a(0.5f), Pal.heal.cpy().mul(1.2f), Color.white};
+                }};
+            }});
+        }};
+
+        sagittarius = new UnityUnitType("sagittarius"){{
+            speed = 0.2f;
+            health = 35000;
+            hitSize = 55f;
+            armor = 12f;
+            landShake = 1.75f;
+            commandLimit = 8;
+            rotateSpeed = 1.2f;
+
+            legCount = 6;
+            legLength = 29f;
+            legBaseOffset = 8f;
+            legMoveSpace = 0.7f;
+            legTrns = 0.6f;
+            hovering = true;
+            visualElevation = 0.23f;
+            allowLegStep = true;
+            ammoType = AmmoTypes.powerHigh;
+            groundLayer = Layer.legUnit;
+            drawShields = false;
+
+            abilities.add(new ForceFieldAbility(130f, 3f, 3500f, 60f * 7));
+
+            weapons.add(new AcceleratingWeapon(name + "-mount"){{
+                x = 28.25f;
+                y = -9.25f;
+                shootY = 17f;
+                reload = 30f;
+                accelCooldownWaitTime = 31f;
+                minReload = 5f;
+                accelPerShot = 0.5f;
+                rotateSpeed = 5f;
+                inaccuracy = 5f;
+                rotate = true;
+                alternate = false;
+                shots = 2;
+                bullet = new ArrowBulletType(7f, 35f){{
+                    lifetime = 60f;
+                    pierce = true;
+                    pierceBuilding = true;
+                    pierceCap = 5;
+                    backColor = trailColor = hitColor = lightColor = lightningColor = Pal.heal;
+                    frontColor = Color.white;
+                    trailWidth = 4f;
+                    width = 9f;
+                    height = 15f;
+                    splashDamage = 22f;
+                    splashDamageRadius = 25f;
+                    healPercent = 3f;
+                    homingRange = 70f;
+                    homingPower = 0.05f;
                 }};
             }});
         }};
