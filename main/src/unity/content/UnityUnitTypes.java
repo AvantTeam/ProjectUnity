@@ -56,9 +56,8 @@ public class UnityUnitTypes implements ContentList{
     UnitType mantle, aphelion;
     // oct
     public static @EntityPoint(PayloadUnit.class)
-    UnitType sedec;
+    UnitType sedec, trigintaduo;
     // omura
-
     public static @EntityPoint(UnitWaterMove.class)
     UnitType fin, blue;
 
@@ -1560,6 +1559,7 @@ public class UnityUnitTypes implements ContentList{
         }};
 
         sedec = new UnityUnitType("sedec"){{
+            defaultController = HealingDefenderAI::new;
             health = 36000f;
             armor = 20f;
             speed = 0.7f;
@@ -1597,6 +1597,53 @@ public class UnityUnitTypes implements ContentList{
 
                 bullet = new HealingConeBulletType(3f){{
                     healPercent = 6f;
+                    allyStatus = StatusEffects.overclock;
+                    allyStatusDuration = 9f * 60f;
+                    status = UnityStatusEffects.weaken;
+                    statusDuration = 40f;
+                    lifetime = 6f * 60f;
+                }};
+            }});
+        }};
+
+        trigintaduo = new UnityUnitType("trigintaduo"){{
+            defaultController = HealingDefenderAI::new;
+            health = 42000f;
+            armor = 22f;
+            speed = 0.6f;
+            rotateSpeed = 1f;
+            accel = 0.04f;
+            drag = 0.018f;
+            flying = true;
+            engineOffset = 41.25f;
+            engineSize = 6.5f;
+            rotateShooting = false;
+            hitSize = 105.5f;
+            payloadCapacity = (8.1f * 8.1f) * tilePayload;
+            buildSpeed = 6f;
+            drawShields = false;
+            commandLimit = 12;
+            buildBeamOffset = 47.75f;
+
+            ammoCapacity = 2000;
+            ammoResupplyAmount = 35;
+
+            weapons.add(new Weapon(name + "-heal-mount"){{
+                x = 33.5f;
+                y = -7.75f;
+                shootY = 10.25f;
+                reload = 220f;
+                recoil = 3f;
+                shadow = 30f;
+
+                continuous = rotate = true;
+                alternate = false;
+                rotateSpeed = 3.5f;
+
+                bullet = new HealingConeBulletType(3f){{
+                    healPercent = 3f;
+                    cone = 15f;
+                    scanAccuracy = 25;
                     allyStatus = StatusEffects.overclock;
                     allyStatusDuration = 9f * 60f;
                     status = UnityStatusEffects.weaken;
