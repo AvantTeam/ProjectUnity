@@ -483,8 +483,6 @@ public final class Utils{
                 };
 
                 world.raycastEachWorld(x, y, x2, y2, (cx, cy) -> {
-                    //cx = collideLineCollided.clampX(cx);
-                    //cy = collideLineCollided.clampY(cy);
                     if(collideLineCollided.within(cx, cy) && !collideLineCollided.get(cx, cy)){
                         Point2 p1 = Pools.obtain(Point2.class, Point2::new);
                         collideLineCast.add(p1.set(cx, cy));
@@ -521,6 +519,8 @@ public final class Utils{
                     Vec2 vec = Geometry.raycastRect(x, y, tV.x, tV.y, hitRect);
 
                     if(vec != null){
+                        float scl = unit.hitSize / (unit.hitSize + unitWidth);
+                        vec.sub(unit).scl(scl).add(unit);
                         if(sort == null){
                             if(effectHandler != null) effectHandler.get(vec.x, vec.y);
                             unitCons.get(unit);

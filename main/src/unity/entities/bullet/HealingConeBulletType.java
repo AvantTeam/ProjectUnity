@@ -19,7 +19,7 @@ public class HealingConeBulletType extends BulletType{
     public int scanAccuracy = 30;
     public StatusEffect allyStatus = StatusEffects.none;
     public float allyStatusDuration = 0f;
-    public Color color = Pal.heal.cpy().a(0.4f);
+    public Color color = Pal.heal;
 
     private int idx = 0;
 
@@ -115,6 +115,8 @@ public class HealingConeBulletType extends BulletType{
     @Override
     public void draw(Bullet b){
         if(!(b.data instanceof float[] data)) return;
+        float z = Draw.z();
+        Draw.z(Layer.buildBeam);
         float fout = Mathf.clamp(b.time > b.lifetime - 16f ? 1f - (b.time - (b.lifetime - 16f)) / 16f : 1f) * Mathf.clamp(b.time / 16f) * length;
         
         Tmp.v1.trns(b.rotation() - cone, Math.min(Mathf.sqrt(data[0]), fout)).add(b);
@@ -126,6 +128,7 @@ public class HealingConeBulletType extends BulletType{
             Tmp.v1.set(Tmp.v2);
         }
         Draw.color();
+        Draw.z(z);
     }
 
     @Override

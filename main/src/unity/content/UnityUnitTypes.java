@@ -1634,7 +1634,7 @@ public class UnityUnitTypes implements ContentList{
                 shootY = 10.25f;
                 reload = 220f;
                 recoil = 3f;
-                shadow = 30f;
+                shadow = 22f;
 
                 continuous = rotate = true;
                 alternate = false;
@@ -1649,6 +1649,34 @@ public class UnityUnitTypes implements ContentList{
                     status = UnityStatusEffects.weaken;
                     statusDuration = 40f;
                     lifetime = 6f * 60f;
+                }};
+            }}, new EnergyChargeWeapon(""){{
+                mirror = false;
+                x = 0f;
+                y = 10.75f;
+                shootY = 0f;
+
+                reload = 30f * 60f;
+                shootCone = 360f;
+                ignoreRotation = true;
+
+                drawCharge = (unit, mount, charge) -> {
+                    float rotation = unit.rotation - 90f,
+                    wx = unit.x + Angles.trnsx(rotation, x, y),
+                    wy = unit.y + Angles.trnsy(rotation, x, y);
+
+                    Draw.color(Pal.heal);
+                    UnityDrawf.shiningCircle(unit.id, Time.time, wx, wy, 13f * charge, 5, 70f, 15f, 6f * charge, 360f);
+                    Draw.color(Color.white);
+                    UnityDrawf.shiningCircle(unit.id, Time.time, wx, wy, 6.5f * charge, 5, 70f, 15f, 4f * charge, 360f);
+                };
+
+                bullet = new HealingShockWaveBulletType(5f){{
+                    healPercent = 40f;
+                    lifetime = 3.1f * 60f;
+                    shockwaveSpeed = 3f;
+                    status = UnityStatusEffects.disabled;
+                    statusDuration = 60f * 1.5f;
                 }};
             }});
         }};
