@@ -1,8 +1,8 @@
 package unity.assets.type.g3d;
 
+import arc.func.*;
 import arc.math.geom.*;
 import arc.struct.*;
-import arc.util.pooling.*;
 import unity.assets.type.g3d.attribute.*;
 
 public class ModelInstance implements RenderableProvider{
@@ -94,13 +94,13 @@ public class ModelInstance implements RenderableProvider{
     }
 
     @Override
-    public void getRenderables(Seq<Renderable> renders){
+    public void getRenderables(Prov<Renderable> renders){
         for(Node node : nodes){
             getRenderables(node, renders);
         }
     }
 
-    public Renderable getRenderable(Renderable out, NodePart nodePart){
+    public void getRenderable(Renderable out, NodePart nodePart){
         nodePart.setRenderable(out);
         if(transform != null){
             out.worldTransform.set(transform);
@@ -109,14 +109,13 @@ public class ModelInstance implements RenderableProvider{
         }
 
         out.userData = userData;
-        return out;
     }
 
-    protected void getRenderables(Node node, Seq<Renderable> renders){
+    protected void getRenderables(Node node, Prov<Renderable> renders){
         if(node.parts.size > 0){
             for(NodePart nodePart : node.parts){
                 if(nodePart.enabled){
-                    renders.add(getRenderable(Pools.obtain(Renderable.class, Renderable::new), nodePart));
+                    getRenderable(renders.get(), nodePart);
                 }
             }
         }
@@ -154,7 +153,7 @@ public class ModelInstance implements RenderableProvider{
     }
 
     /**
-     * @param id         The ID of the material to fetch.
+     * @param id The ID of the material to fetch.
      * @param ignoreCase whether to use case sensitivity when comparing the material id.
      * @return The {@link Material} with the specified id, or null if not available.
      */
@@ -187,7 +186,7 @@ public class ModelInstance implements RenderableProvider{
     }
 
     /**
-     * @param id        The ID of the node to fetch.
+     * @param id The ID of the node to fetch.
      * @param recursive false to fetch a root node only, true to search the entire node tree for the specified node.
      * @return The {@link Node} with the specified id, or null if not found.
      */
@@ -196,7 +195,7 @@ public class ModelInstance implements RenderableProvider{
     }
 
     /**
-     * @param id         The ID of the node to fetch.
+     * @param id The ID of the node to fetch.
      * @param recursive  false to fetch a root node only, true to search the entire node tree for the specified node.
      * @param ignoreCase whether to use case sensitivity when comparing the node id.
      * @return The {@link Node} with the specified id, or null if not found.

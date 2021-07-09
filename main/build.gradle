@@ -61,6 +61,7 @@ task dex(dependsOn: deploy) {
             workingDir "$buildDir/libs"
 
             def command = ['d8']
+
             def files = (
                 configurations.compileClasspath.asList() +
                 configurations.runtimeClasspath.asList() +

@@ -1,7 +1,6 @@
 package unity.graphics;
 
 import arc.*;
-import arc.assets.*;
 import arc.files.*;
 import arc.func.*;
 import arc.graphics.*;

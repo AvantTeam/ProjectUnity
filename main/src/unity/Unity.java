@@ -9,7 +9,6 @@ import arc.scene.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
-import arc.util.serialization.*;
 import mindustry.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
@@ -107,30 +106,27 @@ public class Unity extends Mod{
             Core.settings.getBoolOnce("unity-install", () -> Time.runTask(5f, CreditsDialog::showList));
         });
 
-        //delay these statements to run in the main thread instead, for safety reasons
-        Core.app.post(() -> {
-            ContributorList.init();
+        ContributorList.init();
 
-            KamiPatterns.load();
-            KamiBulletDatas.load();
+        KamiPatterns.load();
+        KamiBulletDatas.load();
 
-            try{
-                Class<? extends DevBuild> impl = (Class<? extends DevBuild>)Class.forName("unity.mod.DevBuildImpl");
-                dev = impl.getDeclaredConstructor().newInstance();
+        try{
+            Class<? extends DevBuild> impl = (Class<? extends DevBuild>)Class.forName("unity.mod.DevBuildImpl");
+            dev = impl.getDeclaredConstructor().newInstance();
 
-                print("Dev build class implementation found and instantiated.");
-            }catch(Throwable e){
-                print("Dev build class implementation not found; defaulting to regular user implementation.");
-                dev = new DevBuild(){};
-            }
+            print("Dev build class implementation found and instantiated.");
+        }catch(Throwable e){
+            print("Dev build class implementation not found; defaulting to regular user implementation.");
+            dev = new DevBuild(){};
+        }
 
-            music = new MusicHandler(){};
-            tap = new TapHandler();
-            antiCheat = new AntiCheat();
-            model = new Models();
+        music = new MusicHandler(){};
+        tap = new TapHandler();
+        antiCheat = new AntiCheat();
+        model = new Models();
 
-            asyncCore.processes.add(new LightProcess());
-        });
+        asyncCore.processes.add(new LightProcess());
     }
 
     @Override

@@ -18,7 +18,7 @@ public class RenderableSorter implements Comparator<Renderable>{
         this.camera = null;
     }
 
-    private Vec3 getTranslation(Mat3D worldTransform, Vec3 center, Vec3 output){
+    private void getTranslation(Mat3D worldTransform, Vec3 center, Vec3 output){
         if(center.isZero()){
             worldTransform.getTranslation(output);
         }else if(!worldTransform.hasRotationOrScaling()){
@@ -26,8 +26,6 @@ public class RenderableSorter implements Comparator<Renderable>{
         }else{
             Mat3D.prj(output.set(center), worldTransform);
         }
-
-        return output;
     }
 
     @Override

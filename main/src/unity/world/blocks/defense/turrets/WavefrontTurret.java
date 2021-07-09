@@ -88,7 +88,7 @@ public class WavefrontTurret extends PowerTurret{
             Draw.rect(baseRegion, x, y);
             Draw.color();
 
-            Draw.draw(Layer.turret + Mathf.FLOAT_ROUNDING_ERROR, inst::render);
+            Draw.draw(Layer.turret + 0.01f, inst::render);
         }
     }
 }
