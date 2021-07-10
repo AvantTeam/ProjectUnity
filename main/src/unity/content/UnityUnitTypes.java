@@ -917,8 +917,9 @@ public class UnityUnitTypes implements ContentList{
                 angleOffset = -15f;
                 shootCone = 20f;
                 shootSound = Sounds.flame;
+                cooldownTime = 180f;
 
-                bullet = new FlameBulletType(6.5f, 63f){{
+                bullet = new FlameBulletType(6.6f, 63f){{
                     lifetime = 33f;
                     pierceCap = 6;
                     pierceBuilding = true;
@@ -1672,9 +1673,9 @@ public class UnityUnitTypes implements ContentList{
                 };
 
                 bullet = new HealingShockWaveBulletType(5f){{
-                    healPercent = 40f;
+                    healPercent = 50f;
                     lifetime = 3.1f * 60f;
-                    shockwaveSpeed = 3f;
+                    shockwaveSpeed = 3.2f;
                     status = UnityStatusEffects.disabled;
                     statusDuration = 60f * 1.5f;
                 }};
