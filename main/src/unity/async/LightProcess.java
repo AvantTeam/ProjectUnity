@@ -21,6 +21,12 @@ public class LightProcess implements AsyncProcess{
     private final Seq<Runnable> toRun = new Seq<>();
 
     @Override
+    public void init(){}
+
+    @Override
+    public void reset(){}
+
+    @Override
     public void begin(){
         if(shouldProcess()){
             toProcess.clear();

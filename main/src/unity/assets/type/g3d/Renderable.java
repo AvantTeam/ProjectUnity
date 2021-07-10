@@ -3,6 +3,7 @@ package unity.assets.type.g3d;
 import arc.math.geom.*;
 import arc.util.pooling.Pool.*;
 import unity.assets.type.g3d.attribute.*;
+import unity.graphics.*;
 
 public class Renderable implements Poolable{
     public final Mat3D worldTransform = new Mat3D();

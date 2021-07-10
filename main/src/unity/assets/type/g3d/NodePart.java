@@ -1,6 +1,7 @@
 package unity.assets.type.g3d;
 
 import unity.assets.type.g3d.attribute.*;
+import unity.graphics.*;
 
 /**
  * @author badlogic

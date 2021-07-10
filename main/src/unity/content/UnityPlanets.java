@@ -7,8 +7,11 @@ import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
 import mindustry.type.*;
 import unity.annotations.Annotations.*;
+import unity.assets.list.*;
 import unity.graphics.*;
+import unity.graphics.CompositeMesh.*;
 import unity.planets.*;
+import unity.util.*;
 
 public class UnityPlanets implements ContentList{
     public static @FactionDef("imber") Planet electrode, inert;
@@ -19,7 +22,16 @@ public class UnityPlanets implements ContentList{
     public void load(){
         megalith = new Planet("megalith", Planets.sun, 3, 1){{
             generator = new MegalithPlanetGenerator();
-            meshLoader = () -> new HexMesh(this, 6);
+            meshLoader = () -> new CompositeMesh(this,
+                //planet
+                CompositeMesh.defMesh(this, 6),
+                CompositeMesh.defShader(this),
+
+                //ring
+                GraphicUtils.copy(UnityModels.megalithRing.meshes.first()),
+                new ShaderRef<>(UnityShaders.megalithRingShader, UnityShaders.megalithRingShader.cons(this))
+            );
+
             atmosphereColor = UnityPal.monolithAtmosphere;
             startSector = 200;
             atmosphereRadIn = 0.04f;

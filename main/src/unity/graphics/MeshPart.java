@@ -1,9 +1,10 @@
-package unity.assets.type.g3d;
+package unity.graphics;
 
 import arc.graphics.*;
 import arc.graphics.gl.*;
 import arc.math.geom.*;
 import arc.util.*;
+import unity.assets.type.g3d.*;
 
 import java.nio.*;
 
@@ -31,22 +32,11 @@ public class MeshPart{
     /** The Mesh the part references, also stored in {@link Model} */
     public Mesh mesh;
 
-    /** The offset to the center of the bounding box of the shape, only valid after the call to {@link #update()}. */
+    /**
+     * The offset to the center of the bounding box of the shape, only valid after the call to {@link #calculateCenter()}.
+     * Only use in 3D models.
+     */
     public final Vec3 center = new Vec3();
-
-    /**
-     * The location, relative to {@link #center}, of the corner of the axis aligned bounding box of the shape. Or, in
-     * other words: half the dimensions of the bounding box of the shape, where {@link Vec3#x} is half the width,
-     * {@link Vec3#y} is half the height and {@link Vec3#z} is half the depth. Only valid after the call to
-     * {@link #update()}.
-     */
-    public final Vec3 halfExtents = new Vec3();
-
-    /**
-     * The radius relative to {@link #center} of the bounding sphere of the shape, or negative if not calculated yet.
-     * This is the same as the length of the {@link #halfExtents} member. See {@link #update()}.
-     */
-    public float radius = -1;
 
     private final static BoundingBox bounds = new BoundingBox();
 
@@ -84,13 +74,11 @@ public class MeshPart{
         this.size = other.size;
         this.primitiveType = other.primitiveType;
         this.center.set(other.center);
-        this.halfExtents.set(other.halfExtents);
-        this.radius = other.radius;
         return this;
     }
 
     /**
-     * Set this MeshPart to given values, does not {@link #update()} the bounding box values.
+     * Set this MeshPart to given values, does not {@link #calculateCenter()} the bounding box values.
      *
      * @return this MeshPart, for chaining.
      */
@@ -101,22 +89,13 @@ public class MeshPart{
         this.size = size;
         this.primitiveType = type;
         this.center.set(0, 0, 0);
-        this.halfExtents.set(0, 0, 0);
-        this.radius = -1f;
         return this;
     }
 
-    /**
-     * Calculates and updates the {@link #center}, {@link #halfExtents} and {@link #radius} values. This is considered a
-     * costly operation and should not be called frequently. All vertices (points) of the shape are traversed to calculate
-     * the maximum and minimum x, y and z coordinate of the shape. Note that MeshPart is not aware of any transformation
-     * that might be applied when rendering. It calculates the untransformed (not moved, not scaled, not rotated) values.
-     */
-    public void update(){
+    /** Calculates the {@link #center}. */
+    public void calculateCenter(){
         extendBoundingBox(null);
         bounds.getCenter(center);
-        bounds.getDimensions(halfExtents).scl(0.5f);
-        radius = halfExtents.len();
     }
 
     public void extendBoundingBox(Mat3D transform){

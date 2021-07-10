@@ -9,7 +9,6 @@ import arc.graphics.gl.*;
 import arc.struct.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
-import mindustry.ui.dialogs.*;
 import unity.assets.type.g3d.attribute.*;
 import unity.assets.type.g3d.attribute.light.*;
 import unity.assets.type.g3d.attribute.type.*;

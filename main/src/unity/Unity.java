@@ -73,12 +73,12 @@ public class Unity extends Mod{
             UnityStyles.load();
         });
 
-        Events.on(FileTreeInitEvent.class, e -> {
+        Events.on(FileTreeInitEvent.class, e -> Core.app.post(() -> {
             UnityShaders.load();
             UnityObjs.load();
             UnityModels.load();
             UnitySounds.load();
-        });
+        }));
 
         Events.on(DisposeEvent.class, e -> {
             UnityModels.dispose();

@@ -31,7 +31,8 @@ import static arc.graphics.g2d.Lines.*;
 import static arc.math.Angles.*;
 import static unity.content.UnityBullets.*;
 
-/** @deprecated These fields will eventually all be interpreted in the classes in {@link unity.content.effects} package. */
+//deprecate the deprecation ^-^
+//** @deprecated These fields will eventually all be interpreted in the classes in {@link unity.content.effects} package. */
 public class UnityFx{
     private static int integer;
 

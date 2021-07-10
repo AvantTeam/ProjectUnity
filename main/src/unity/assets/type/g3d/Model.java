@@ -7,6 +7,7 @@ import unity.assets.loaders.*;
 import unity.assets.type.g3d.attribute.*;
 import unity.assets.type.g3d.attribute.type.*;
 import unity.assets.type.g3d.model.*;
+import unity.graphics.*;
 
 import static mindustry.Vars.*;
 
@@ -146,7 +147,7 @@ public class Model implements Disposable{
 
         mesh.getIndicesBuffer().position(0);
         for(MeshPart part : meshParts){
-            part.update();
+            part.calculateCenter();
         }
     }
 

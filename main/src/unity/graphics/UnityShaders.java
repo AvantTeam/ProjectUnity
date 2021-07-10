@@ -4,6 +4,7 @@ import arc.*;
 import arc.files.*;
 import arc.func.*;
 import arc.graphics.*;
+import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g3d.*;
 import arc.graphics.gl.*;
@@ -14,6 +15,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
+import mindustry.type.*;
 import unity.assets.type.g3d.*;
 import unity.assets.type.g3d.attribute.*;
 import unity.assets.type.g3d.attribute.type.*;
@@ -25,6 +27,7 @@ import static unity.Unity.*;
 public class UnityShaders{
     public static HolographicShieldShader holoShield;
     public static StencilShader stencilShader;
+    public static MegalithRingShader megalithRingShader;
     public static Graphics3DShaderProvider graphics3DProvider;
 
     protected static FrameBuffer buffer;
@@ -32,16 +35,13 @@ public class UnityShaders{
 
     public static void load(){
         if(headless) return;
-        Core.assets.loadRun("unity-shaders-load", UnityShaders.class, () -> {}, UnityShaders::loadSync);
-    }
 
-    protected static void loadSync(){
         buffer = new FrameBuffer();
-
         CondShader[] conds = new CondShader[]{
             holoShield = new HolographicShieldShader()
         };
         stencilShader = new StencilShader();
+        megalithRingShader = new MegalithRingShader();
         graphics3DProvider = new Graphics3DShaderProvider();
 
         for(int i = 0; i < conds.length; i++){
@@ -57,7 +57,7 @@ public class UnityShaders{
                 if(shader.apply.get()){
                     Draw.drawRange(shader.getLayer() + range / 2f, range, () -> buffer.begin(Color.clear), () -> {
                         buffer.end();
-                        Draw.blit(buffer, shader);
+                        Draw.blit(buffer.getTexture(), shader);
                     });
                 }
             }
@@ -68,10 +68,11 @@ public class UnityShaders{
 
     public static void dispose(){
         if(!headless && loaded){
-            buffer.dispose();
+            if(buffer != null) buffer.dispose();
 
             holoShield.dispose();
             stencilShader.dispose();
+            megalithRingShader.dispose();
             graphics3DProvider.dispose();
         }
     }
@@ -126,6 +127,57 @@ public class UnityShaders{
                 Core.camera.position.x - Core.camera.width / 2f,
                 Core.camera.position.y - Core.camera.height / 2f
             );
+        }
+    }
+
+    public static class PlanetObjectShader extends Shader{
+        public Vec3 lightDir = new Vec3(1, 1, 1).nor();
+        public Color ambientColor = Color.white.cpy();
+        public Vec3 camDir = new Vec3();
+
+        public PlanetObjectShader(Fi vert, Fi frag){
+            super(vert, frag);
+        }
+
+        @Override
+        public void apply(){
+            camDir.set(renderer.planets.cam.direction).rotate(Vec3.Y, renderer.planets.planet.getRotation());
+
+            setUniformf("u_lightdir", lightDir);
+            setUniformf("u_ambientColor", ambientColor.r, ambientColor.g, ambientColor.b);
+            setUniformf("u_camdir", camDir);
+        }
+
+        public <T extends PlanetObjectShader> Cons<T> cons(Planet planet){
+            return s -> {
+                s.lightDir.set(planet.solarSystem.position).sub(planet.position).rotate(Vec3.Y, planet.getRotation()).nor();
+                s.ambientColor.set(planet.solarSystem.lightColor);
+            };
+        }
+    }
+
+    public static class MegalithRingShader extends PlanetObjectShader{
+        protected final Texture texture;
+
+        public MegalithRingShader(){
+            super(
+                tree.get("shaders/megalithring.vert"),
+                tree.get("shaders/megalithring.frag")
+            );
+
+            texture = new Texture(tree.get("objects/megalithring.png"));
+            texture.setFilter(TextureFilter.linear);
+            texture.setWrap(TextureWrap.repeat);
+        }
+
+        @Override
+        public void apply(){
+            super.apply();
+
+            texture.bind(1);
+            renderer.effectBuffer.getTexture().bind(0);
+
+            setUniformf("u_ringTexture", 1);
         }
     }
 
@@ -206,14 +258,13 @@ public class UnityShaders{
             Material material = render.material;
             Environment env = model.environment;
 
-            setUniformMatrix4("u_projViewTrans", camera.combined.val);
+            setUniformMatrix4("u_proj", camera.combined.val);
+            setUniformMatrix4("u_trans", render.worldTransform.val);
 
             setUniformf("u_cameraPosition", camera.position.x, camera.position.y, camera.position.z, 1.1881f / (camera.far * camera.far));
             setUniformf("u_cameraDirection", camera.direction);
             setUniformf("u_cameraUp", camera.up);
             setUniformf("u_cameraNearFar", camera.near, camera.far);
-
-            setUniformMatrix4("u_worldTrans", render.worldTransform.val);
 
             Tmp.m1.val[Mat.M00] = render.worldTransform.val[Mat3D.M00];
             Tmp.m1.val[Mat.M10] = render.worldTransform.val[Mat3D.M10];

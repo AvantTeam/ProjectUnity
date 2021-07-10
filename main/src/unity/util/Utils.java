@@ -17,6 +17,8 @@ import mindustry.graphics.*;
 import mindustry.world.*;
 import unity.graphics.*;
 
+import java.util.*;
+
 import static mindustry.Vars.*;
 
 public final class Utils{
@@ -826,5 +828,23 @@ public final class Utils{
         }
 
         return tmpUnit;
+    }
+
+    public static <T> int sum(Iterable<T> it, Intf<T> summer){
+        int res = 0;
+        for(var t : it){
+            res += summer.get(t);
+        }
+
+        return res;
+    }
+
+    public static <T> int sum(T[] it, Intf<T> summer){
+        int res = 0;
+        for(var t : it){
+            res += summer.get(t);
+        }
+
+        return res;
     }
 }

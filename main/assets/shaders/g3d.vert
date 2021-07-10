@@ -13,7 +13,7 @@
 #endif
 
 attribute vec4 a_position;
-uniform mat4 u_projViewTrans;
+uniform mat4 u_proj;
 
 #if defined(colorFlag)
     varying vec4 v_color;
@@ -43,7 +43,7 @@ varying vec3 v_normal;
     varying vec2 v_specularUV;
 #endif
 
-uniform mat4 u_worldTrans;
+uniform mat4 u_trans;
 
 #ifdef shininessFlag
     uniform float u_shininess;
@@ -143,7 +143,7 @@ void main(){
         #endif
     #endif
 
-    gl_Position = u_projViewTrans * u_worldTrans * a_position;
+    gl_Position = u_proj * u_trans * a_position;
 
     #ifdef shadowMapFlag
         vec4 spos = u_shadowMapProjViewTrans * a_position;

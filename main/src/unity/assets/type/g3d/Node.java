@@ -2,6 +2,7 @@ package unity.assets.type.g3d;
 
 import arc.math.geom.*;
 import arc.struct.*;
+import unity.graphics.*;
 
 /**
  * @author badlogic
@@ -275,7 +276,7 @@ public class Node{
      * using the {@link NodePart#copy()} method. Note that that method copies the material and nodes (bones) by
      * reference. If you
      * intend to use the copy in a different node tree (e.g. a different Model or ModelInstance) then you will need
-     * to update these
+     * to calculateCenter these
      * references afterwards.
      * <p>
      * Override this method in your custom Node class to instantiate that class, in that case you should override the
@@ -292,7 +293,7 @@ public class Node{
      * using the
      * {@link NodePart#copy()} method. Note that that method copies the material and nodes (bones) by reference. If
      * you intend to
-     * use this node in a different node tree (e.g. a different Model or ModelInstance) then you will need to update
+     * use this node in a different node tree (e.g. a different Model or ModelInstance) then you will need to calculateCenter
      * these
      * references afterwards.
      * <p>
