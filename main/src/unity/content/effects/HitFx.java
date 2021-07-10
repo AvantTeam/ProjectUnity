@@ -140,5 +140,23 @@ public class HitFx{
         color(UnityPal.monolithLight, UnityPal.monolithDark, e.finpow());
         stroke(0.2f + e.fout() * 1.3f);
         Lines.circle(e.x, e.y, e.fin() * 5f);
+    }),
+
+    hitAdvanceFlame = new Effect(15f, e -> {
+        color(UnityPal.advance, UnityPal.advanceDark, e.fin());
+
+        Angles.randLenVectors(e.id, 2, e.finpow() * 17f, e.rotation, 60f, (x, y) -> {
+            Fill.poly(e.x + x, e.y + y, 6, 3f + e.fout() * 3f, e.rotation);
+        });
+    }),
+
+    branchFragHit = new Effect(8f, e -> {
+        color(Color.white, Pal.lancerLaser, e.fin());
+
+        stroke(0.5f + e.fout());
+        Lines.circle(e.x, e.y, e.fin() * 5f);
+
+        stroke(e.fout());
+        Lines.circle(e.x, e.y, e.fin() * 6f);
     });
 }

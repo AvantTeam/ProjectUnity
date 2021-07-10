@@ -40,15 +40,17 @@ public class FlameBulletType extends BulletType{
 
             Angles.randLenVectors(e.id, particleAmount, e.finpow() * (range() + 15f), e.rotation, particleSpread, (x, y) ->
             Fill.circle(e.x + x, e.y + y, 0.65f + e.fout() * particleSizeScl));
-        });
+        }).layer(Layer.effect + 0.001f);
         if(smokeColors != null && smokeColors.length > 0){
-            smokeEffect = new Effect(lifetime * 2f, range() * 2.5f, e -> {
+            smokeEffect = new Effect(lifetime * 3f, range() * 2.25f, e -> {
                 Draw.color(tc.lerp(smokeColors, e.fin()));
 
-                float slope = (0.5f - Math.abs(e.fin(Interp.pow2In) - 0.5f)) * 2f;
+                float slope = (0.5f - Math.abs(e.fin(Interp.pow2InInverse) - 0.5f)) * 2f;
 
-                Angles.randLenVectors(e.id, particleAmount, e.fin(Interp.pow4Out) * ((range() * 1.25f) + 15f), e.rotation, particleSpread, (x, y) ->
-                Fill.circle(e.x + x, e.y + y, 0.65f + slope * particleSizeScl));
+                Angles.randLenVectors(e.id, particleAmount, e.fin(Interp.pow5Out) * ((range() * 1.125f) + 15f), e.rotation, particleSpread, (x, y) -> {
+                    Fill.circle(e.x + x, e.y + y, 0.65f + slope * particleSizeScl);
+                    Fill.circle(e.x + (x / 2f), e.y + (y / 2f), 0.5f + slope * (particleSizeScl / 2f));
+                });
             }).followParent(false);
         }
         hitEffect = new Effect(14f, e -> {

@@ -219,7 +219,7 @@ public class UnityBullets implements ContentList{
                 homingPower = 0.4f;
                 lifetime = 30f;
                 shootEffect = Fx.hitLancer;
-                hitEffect = despawnEffect = UnityFx.branchFragHit;
+                hitEffect = despawnEffect = HitFx.branchFragHit;
                 pierceCap = 10;
                 pierceBuilding = true;
                 splashDamageRadius = 4f;
@@ -952,7 +952,7 @@ public class UnityBullets implements ContentList{
             hitSize = 4f;
             shootEffect = Fx.none;
             smokeEffect = Fx.none;
-            hitEffect = UnityFx.hitAdvanceFlame;
+            hitEffect = HitFx.hitAdvanceFlame;
             despawnEffect = Fx.none;
             collides = true;
             collidesTiles = true;
@@ -968,7 +968,7 @@ public class UnityBullets implements ContentList{
             hitSize = 4f;
             shootEffect = Fx.none;
             smokeEffect = Fx.none;
-            hitEffect = UnityFx.hitAdvanceFlame;
+            hitEffect = HitFx.hitAdvanceFlame;
             despawnEffect = Fx.none;
             collides = true;
             collidesTiles = true;

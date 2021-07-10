@@ -112,7 +112,7 @@ public class EndCutterLaserBulletType extends BulletType{
                     if(building.health > damage * buildingDamageMultiplier * 0.5f){
                         Tmp.v2.trns(b.rotation(), maxLength * 1.5f).add(b);
                         float dst = Intersector.distanceLinePoint(b.x, b.y, Tmp.v2.x, Tmp.v2.y, building.x, building.y);
-                        b.fdata = ((b.dst(building) - (building.block.size / (float)Vars.tilesize / 2f)) + dst) + 4f;
+                        b.fdata = ((b.dst(building) - (building.block.size * Vars.tilesize / 2f)) + dst) + 4f;
                         if(b.data instanceof LaserData){
                             LaserData data = (LaserData)b.data;
                             data.velocity = 0f;
@@ -192,6 +192,7 @@ public class EndCutterLaserBulletType extends BulletType{
     }
 
     static class LaserData{
-        float lastLength, lightningTime, velocity, velocityTime, restartTime = 5f;
+        float lastLength, lightningTime, velocity, velocityTime, targetSize, restartTime = 5f;
+        Position target;
     }
 }

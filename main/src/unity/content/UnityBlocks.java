@@ -252,6 +252,9 @@ public class UnityBlocks implements ContentList{
 
     //---------- advance faction ----------
     public static @FactionDef("advance") Block
+    //unit
+    advanceConstructorModule, advanceConstructor,
+
     //turret
     celsius, kelvin, caster, storm, eclipse, xenoCorruptor, cube, wavefront;
 
@@ -295,16 +298,20 @@ public class UnityBlocks implements ContentList{
             configurable = true;
             constructTime = 20000f;
             minTier = 6;
-            upgrades.add(
+            upgrades.addAll(
+                new UnitType[]{UnitTypes.reign, UnityUnitTypes.citadel},
+
                 new UnitType[]{UnitTypes.toxopid, UnityUnitTypes.araneidae},
 
-                new UnitType[]{UnitTypes.corvus, UnityUnitTypes.orion},
+                new UnitType[]{UnitTypes.corvus, UnityUnitTypes.cygnus},
 
                 new UnitType[]{UnityUnitTypes.rex, UnityUnitTypes.excelsus},
 
                 new UnitType[]{UnityUnitTypes.monument, UnityUnitTypes.colossus}
             );
             otherUpgrades.add(
+                new UnitType[]{UnityUnitTypes.citadel, UnityUnitTypes.empire},
+
                 new UnitType[]{UnityUnitTypes.araneidae, UnityUnitTypes.theraphosidae},
 
                 new UnitType[]{UnityUnitTypes.colossus, UnityUnitTypes.bastion}
@@ -615,7 +622,7 @@ public class UnityBlocks implements ContentList{
             range = 170f;
             powerUse = 6.6f;
             heatColor = UnityPal.lightHeat;
-            shootEffect = UnityFx.blueTriangleShoot;
+            shootEffect = ShootFx.blueTriangleShoot;
             shootSound = Sounds.pew;
             shootType = new BasicBulletType(9f, 34f, "unity-electric-shell"){
                 {
@@ -651,7 +658,7 @@ public class UnityBlocks implements ContentList{
             powerUse = 4.9f;
             targetAir = false;
             cooldown = 0.008f;
-            shootEffect = UnityFx.blueTriangleShoot;
+            shootEffect = ShootFx.blueTriangleShoot;
             shootType = new ArtilleryBulletType(8f, 44f, "unity-electric-shell"){
                 {
                     lifetime = 35f;
@@ -694,7 +701,7 @@ public class UnityBlocks implements ContentList{
             powerUse = 4.9f;
             cooldown = 0.008f;
             inaccuracy = 3.4f;
-            shootEffect = UnityFx.blueTriangleShoot;
+            shootEffect = ShootFx.blueTriangleShoot;
             shootType = new FlakBulletType(8.7f, 7f){
                 {
                     lifetime = 30f;
@@ -749,8 +756,8 @@ public class UnityBlocks implements ContentList{
                 rotateSpeed = 2.5f;
                 shootCone = 20f;
                 heatColor = UnityPal.lightHeat;
-                chargeBeginEffect = UnityFx.wBosonChargeBeginEffect;
-                chargeEffect = UnityFx.wBosonChargeEffect;
+                chargeBeginEffect = ChargeFx.wBosonChargeBeginEffect;
+                chargeEffect = ChargeFx.wBosonChargeEffect;
                 chargeTime = 38f;
                 cooldown = 0.008f;
                 powerUse = 8.6f;
@@ -979,7 +986,7 @@ public class UnityBlocks implements ContentList{
                 heatColor = UnityPal.lightHeat;
                 cooldown = 0.009f;
                 chargeTime = 80f;
-                chargeBeginEffect = UnityFx.ephmeronCharge;
+                chargeBeginEffect = ChargeFx.ephmeronCharge;
                 
                 shootType = new EphemeronBulletType(7.7f, 10f){{
                     lifetime = 70f;
@@ -2978,6 +2985,42 @@ public class UnityBlocks implements ContentList{
         //endregion
         //region advance
 
+        advanceConstructorModule = new ModularConstructorPart("advance-constructor-module"){{
+            requirements(Category.units, with(UnityItems.xenium, 300, Items.silicon, 200, Items.graphite, 300, Items.thorium, 400, Items.phaseFabric, 50, Items.surgeAlloy, 100, UnityItems.advanceAlloy, 300));
+            size = 6;
+            liquidCapacity = 20f;
+
+            consumes.liquid(Liquids.cryofluid, 0.7f);
+            consumes.power(3f);
+            hasLiquids = true;
+            hasPower = true;
+        }};
+
+        advanceConstructor = new ModularConstructor("advance-constructor"){{
+            requirements(Category.units, with(UnityItems.xenium, 3000, Items.silicon, 5000, Items.graphite, 2000, Items.thorium, 3000, Items.phaseFabric, 800, Items.surgeAlloy, 700, UnityItems.advanceAlloy, 1500));
+            size = 13;
+            efficiencyPerTier = 10f * 60f;
+
+            plans.addAll(
+                new ModularConstructorPlan(UnitTypes.antumbra, 30f * 60f, 0,
+                with(Items.silicon, 690, Items.graphite, 40, Items.titanium, 550, Items.metaglass, 40, Items.plastanium, 420)),
+
+                new ModularConstructorPlan(UnitTypes.scepter, 30f * 60f, 0,
+                with(Items.silicon, 690, Items.lead, 60, Items.graphite, 30, Items.titanium, 550, Items.metaglass, 40, Items.plastanium, 420)),
+
+                new ModularConstructorPlan(UnitTypes.eclipse, 40f * 60f, 1,
+                with(Items.silicon, 1350, Items.graphite, 120, Items.titanium, 550, Items.metaglass, 100, Items.plastanium, 830, Items.surgeAlloy, 330, Items.phaseFabric, 250)),
+
+                new ModularConstructorPlan(UnitTypes.reign, 40f * 60f, 1,
+                with(Items.silicon, 1350, Items.lead, 160, Items.graphite, 90, Items.titanium, 550, Items.metaglass, 100, Items.plastanium, 830, Items.surgeAlloy, 330, Items.phaseFabric, 250)),
+
+                new ModularConstructorPlan(UnityUnitTypes.mantle, 50f * 60f, 2,
+                with(Items.silicon, 2050, Items.graphite, 180, Items.titanium, 830, Items.metaglass, 150, Items.plastanium, 1250, Items.surgeAlloy, 500, Items.phaseFabric, 375))
+            );
+
+            consumes.power(13f);
+        }};
+
         celsius = new PowerTurret("celsius"){{
             requirements(Category.turret, with(Items.silicon, 20, UnityItems.xenium, 15, Items.titanium, 30, UnityItems.advanceAlloy, 25));
             health = 780;
@@ -3108,18 +3151,22 @@ public class UnityBlocks implements ContentList{
                 shootDuration = 320f;
                 firingMoveFract = 0.12f;
                 shootLength = size * tilesize / 2f - recoilAmount;
-                shootType = new NoPierceLaserBulletType(390f){{
+
+                shootType = new AcceleratingLaserBulletType(390f){{
                     colors = new Color[]{Color.valueOf("59a7ff55"), Color.valueOf("59a7ffaa"), Color.valueOf("a3e3ff"), Color.white};
-                    tscales = new float[]{1f, 0.74f, 0.5f, 0.24f};
-                    strokes = new float[]{2.8f, 2f, 1.6f, 0.8f};
-                    lenscales = new float[]{0.92f, 1f, 1.017f, 1.025f};
-                    length = 490f;
+                    width = 29.2f;
+                    collisionWidth = 12f;
                     knockback = 2.2f;
                     lifetime = 18f;
+                    accel = 0f;
+                    fadeInTime = 0f;
+                    fadeTime = 18f;
+                    maxLength = 490f;
                     shootEffect = Fx.none;
                     smokeEffect = Fx.none;
                     hitEffect = HitFx.eclipseHit;
-                    hitSize = 7f;
+                    buildingInsulator = (b, building) -> true;
+                    unitInsulator = (b, u) -> true;
                 }};
 
                 consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.4f && liquid.flammability < 0.1f, 2.1f)).update(false);
@@ -3313,8 +3360,8 @@ public class UnityBlocks implements ContentList{
             chargeTime = 158f;
             chargeEffects = 12;
             chargeMaxDelay = 80f;
-            chargeEffect = UnityFx.tenmeikiriChargeEffect;
-            chargeBeginEffect = UnityFx.tenmeikiriChargeBegin;
+            chargeEffect = ChargeFx.tenmeikiriChargeEffect;
+            chargeBeginEffect = ChargeFx.tenmeikiriChargeBegin;
             chargeSound = UnitySounds.tenmeikiriCharge;
             shootSound = UnitySounds.tenmeikiriShoot;
             shootShake = 4f;

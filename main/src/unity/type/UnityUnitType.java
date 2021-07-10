@@ -25,6 +25,7 @@ import unity.*;
 import unity.entities.*;
 import unity.entities.units.*;
 import unity.gen.*;
+import unity.type.weapons.*;
 import unity.util.*;
 
 import static arc.Core.*;
@@ -710,6 +711,9 @@ public class UnityUnitType extends UnitType{
 
             for(Weapon weapon : weapons){
                 if(weapon.name.isEmpty()) continue;
+                if(weapon instanceof MultiBarrelWeapon m && outlined.add(weapon.name + "-barrel")){
+                    outlSeparate.get(m.barrelRegion, "outline");
+                }
                 if((!weapon.top || bottomWeapons.contains(weapon.name))){
                     var out = GraphicUtils.get(packer, weapon.name + "-outline");
                     Pixmap pix = out.crop();
