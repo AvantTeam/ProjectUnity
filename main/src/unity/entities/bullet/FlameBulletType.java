@@ -38,10 +38,10 @@ public class FlameBulletType extends BulletType{
         hitColors = Arrays.copyOf(colors, Math.max(1, colors.length - 1));
         shootEffect = new Effect(lifetime + 15f, range() * 2f, e -> {
             Draw.color(tc.lerp(colors, e.fin()));
+            tc2.set(tc).shiftSaturation(0.77f);
 
             Angles.randLenVectors(e.id, particleAmount, e.finpow() * (range() + 15f), e.rotation, particleSpread, (x, y) -> {
                 Fill.circle(e.x + x, e.y + y, 0.65f + e.fout() * particleSizeScl);
-                tc2.set(tc).shiftSaturation(0.77f);
                 Drawf.light(null, e.x + x, e.y + y, (0.65f + e.fout(Interp.pow4Out) * particleSizeScl) * 4f, tc2, 0.5f * e.fout(Interp.pow2Out));
             });
         }).layer(Layer.effect + 0.001f);
