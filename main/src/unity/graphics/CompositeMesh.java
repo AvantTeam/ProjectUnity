@@ -15,7 +15,7 @@ public class CompositeMesh extends PlanetMesh{
 
     /**
      * Note that the {@link #mesh} won't be actually used.
-     * @param objects Pair of Mesh and ShaderRef. Note that all the meshes will be disposed after usage.
+     * @param objects Pair of Mesh and ShaderRef. Note that all the meshes will be disposed after usage no matter what.
      *                See {@link unity.util.GraphicUtils#copy(Mesh)}.
      */
     public CompositeMesh(Planet planet, Object... objects){

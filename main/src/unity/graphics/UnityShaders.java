@@ -172,12 +172,10 @@ public class UnityShaders{
 
         @Override
         public void apply(){
-            super.apply();
-
             texture.bind(1);
             renderer.effectBuffer.getTexture().bind(0);
 
-            setUniformf("u_ringTexture", 1);
+            setUniformi("u_ringTexture", 1);
         }
     }
 
