@@ -172,6 +172,8 @@ public class UnityShaders{
 
         @Override
         public void apply(){
+            super.apply();
+
             texture.bind(1);
             renderer.effectBuffer.getTexture().bind(0);
 
