@@ -6,6 +6,7 @@ import arc.math.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 
 import java.util.*;
@@ -15,7 +16,7 @@ public class FlameBulletType extends BulletType{
     public Color[] smokeColors = {};
     public float particleSpread = 10f, particleSizeScl = 1.5f;
     public int particleAmount = 8;
-    private final Color tc = new Color();
+    private final Color tc = new Color(), tc2 = new Color();
     private Color[] hitColors;
 
     public FlameBulletType(float speed, float damage){
@@ -38,8 +39,11 @@ public class FlameBulletType extends BulletType{
         shootEffect = new Effect(lifetime + 15f, range() * 2f, e -> {
             Draw.color(tc.lerp(colors, e.fin()));
 
-            Angles.randLenVectors(e.id, particleAmount, e.finpow() * (range() + 15f), e.rotation, particleSpread, (x, y) ->
-            Fill.circle(e.x + x, e.y + y, 0.65f + e.fout() * particleSizeScl));
+            Angles.randLenVectors(e.id, particleAmount, e.finpow() * (range() + 15f), e.rotation, particleSpread, (x, y) -> {
+                Fill.circle(e.x + x, e.y + y, 0.65f + e.fout() * particleSizeScl);
+                tc2.set(tc).shiftSaturation(0.77f);
+                Drawf.light(null, e.x + x, e.y + y, (0.65f + e.fout(Interp.pow4Out) * particleSizeScl) * 4f, tc2, 0.5f * e.fout(Interp.pow2Out));
+            });
         }).layer(Layer.effect + 0.001f);
         if(smokeColors != null && smokeColors.length > 0){
             smokeEffect = new Effect(lifetime * 3f, range() * 2.25f, e -> {
@@ -62,5 +66,10 @@ public class FlameBulletType extends BulletType{
                 Lines.lineAngle(e.x + x, e.y + y, ang, e.fout() * 3 + 1f);
             });
         });
+    }
+
+    @Override
+    public void drawLight(Bullet b){
+
     }
 }
