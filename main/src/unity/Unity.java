@@ -136,7 +136,7 @@ public class Unity extends Mod{
         dev.setup();
 
         UnityCall.init();
-        BlockMovement.init();
+        //BlockMovement.init();
 
         dev.init();
     }
