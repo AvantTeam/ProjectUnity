@@ -3,6 +3,7 @@ package unity.mod;
 import arc.*;
 import arc.input.*;
 import arc.input.GestureDetector.*;
+import arc.math.geom.*;
 import arc.scene.ui.*;
 import arc.struct.*;
 import mindustry.game.EventType.*;
@@ -14,7 +15,7 @@ import static mindustry.Vars.*;
 
 /** @author GlennFolker */
 public class TapHandler{
-    private Seq<TapListener> listeners = new Seq<>();
+    private final Seq<TapListener> listeners = new Seq<>();
     private boolean press = false;
 
     public TapHandler(){
@@ -41,6 +42,45 @@ public class TapHandler{
 
                     return false;
                 }
+
+                //this is to suppress android throwing AbstractMethodError which happens because of god knows what.
+                @Override
+                public boolean touchDown(float x, float y, int pointer, KeyCode button){
+                    return false;
+                }
+
+                @Override
+                public boolean longPress(float x, float y){
+                    return false;
+                }
+
+                @Override
+                public boolean fling(float velocityX, float velocityY, KeyCode button){
+                    return false;
+                }
+
+                @Override
+                public boolean pan(float x, float y, float deltaX, float deltaY){
+                    return false;
+                }
+
+                @Override
+                public boolean panStop(float x, float y, int pointer, KeyCode button){
+                    return false;
+                }
+
+                @Override
+                public boolean zoom(float initialDistance, float distance){
+                    return false;
+                }
+
+                @Override
+                public boolean pinch(Vec2 initialPointer1, Vec2 initialPointer2, Vec2 pointer1, Vec2 pointer2){
+                    return false;
+                }
+
+                @Override
+                public void pinchStop(){}
             }));
         }else{
             Events.run(Trigger.update, () -> {

@@ -51,51 +51,36 @@ task deploy(type: Jar, dependsOn: configurations.runtimeClasspath) {
     }
 }
 
-task dex(dependsOn: deploy) {
-    def jarArtifact = file(deploy.archiveFile.get())
-    def dexedArtifact = new File("$buildDir/libs", 'Dexed.jar')
+task deployDex(type: Jar, dependsOn: deploy) {
+    archiveFileName.set "${modName}.jar"
+
+    final def desktopJar = deploy.archiveFile.get()
+    final def dexJar = new File(deployDex.getTemporaryDir(), 'Dexed.jar')
 
     doFirst {
         println 'Dexifying...'
         exec {
-            workingDir "$buildDir/libs"
-
-            def command = ['d8']
-
-            def files = (
+            def command = ['d8', '--min-api', sdkAPI, '--output', dexJar, desktopJar]
+            File[] files =
                 configurations.compileClasspath.asList() +
                 configurations.runtimeClasspath.asList() +
-                [new File("${sdkRoot}/platforms/android-${sdkVersion}/android.jar")]
-            )
+                file("$sdkRoot/platforms/android-$sdkVersion/android.jar")
 
             for(def file : files) {
-                command += '--classpath'
-                command += file.path
+                assert file.exists()
+                command += ['--lib', file.path]
             }
 
-            command += ['--min-api', sdkAPI, '--output', dexedArtifact, jarArtifact]
-            if(windows) {
-                commandLine('cmd', '/c', *command)
-            } else {
-                commandLine(*command)
+            if(System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
+                command = ['cmd', '/c'] + command
             }
+
+            commandLine(*command)
         }
     }
-}
 
-task deployDex(type: Jar, dependsOn: [deploy, dex]) {
-    archiveFileName.set "${modName}Dexed.jar"
-
-    def jarArtifact = file(tasks.deploy.archiveFile.get())
-    def dexedArtifact = new File("$buildDir/libs", 'Dexed.jar')
-
-    from zipTree(jarArtifact)
-    from zipTree(dexedArtifact)
-
-    doLast { delete {
-        delete jarArtifact
-        delete dexedArtifact
-    }}
+    from zipTree(desktopJar)
+    from zipTree(dexJar)
 }
 
 class Fetcher {
