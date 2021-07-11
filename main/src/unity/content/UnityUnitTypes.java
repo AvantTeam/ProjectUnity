@@ -847,7 +847,7 @@ public class UnityUnitTypes implements ContentList{
             speed = 0.3f;
             hitSize = 49f;
             rotateSpeed = 1.5f;
-            health = 39000f;
+            health = 48750f;
             armor = 15f;
             mechStepParticles = true;
             mechStepShake = 0.8f;
@@ -861,29 +861,50 @@ public class UnityUnitTypes implements ContentList{
                 x = 31.5f;
                 y = -6.25f;
                 shootY = 30.25f;
-                reload = 17f;
-                recoil = 5f;
-                shake = 2f;
-                shots = 5;
-                shotDelay = 2f;
+                reload = 90f;
+                recoil = 7f;
+                shake = 3f;
                 ejectEffect = Fx.casing4;
                 shootSound = Sounds.bang;
 
-                bullet = UnityBullets.reignBulletWeakened;
+                bullet = new SlowRailBulletType(25f, 250f){{
+                    lifetime = 13f;
+                    trailSpacing = 25f;
+                    splashDamage = 80f;
+                    splashDamageRadius = 50f;
+                    hitEffect = Fx.hitBulletBig;
+                    shootEffect = Fx.instShoot;
+                    trailEffect = TrailFx.coloredRailgunSmallTrail;
+                    width = 7f;
+                    height = 15f;
+                    shrinkY = 0f;
+                    shrinkX = 0f;
+                    pierceCap = 7;
+                    backColor = hitColor = trailColor = Pal.bulletYellowBack;
+                    frontColor = Color.white;
+                }};
             }}, new LimitedAngleWeapon(name + "-flamethrower"){{
                 x = 17.75f;
                 y = 11.25f;
                 shootY = 5.5f;
                 reload = 5f;
-                recoil = 0f;
+                recoil = 0.5f;
                 shootSound = Sounds.flame;
                 angleCone = 80f;
                 rotate = true;
 
-                bullet = new FlameBulletType(4.2f, 32f){{
-                    lifetime = 19f;
-                    particleAmount = 16;
-                }};
+                bullet = UnityBullets.citadelFlame;
+            }}, new LimitedAngleWeapon(name + "-flamethrower"){{
+                x = 14f;
+                y = -9f;
+                shootY = 5.5f;
+                reload = 4f;
+                recoil = 0.5f;
+                shootSound = Sounds.flame;
+                angleCone = 80f;
+                rotate = true;
+
+                bullet = UnityBullets.citadelFlame;
             }});
         }};
 
@@ -891,7 +912,7 @@ public class UnityUnitTypes implements ContentList{
             speed = 0.25f;
             hitSize = 49f;
             rotateSpeed = 1.25f;
-            health = 52000f;
+            health = 65000f;
             armor = 16f;
             mechStepParticles = true;
             mechStepShake = 0.83f;
@@ -963,7 +984,7 @@ public class UnityUnitTypes implements ContentList{
 
         cygnus = new UnityUnitType("cygnus"){{
             speed = 0.26f;
-            health = 21000;
+            health = 26250;
             hitSize = 37f;
             armor = 10f;
             landShake = 1.5f;
@@ -1095,7 +1116,7 @@ public class UnityUnitTypes implements ContentList{
 
         sagittarius = new UnityUnitType("sagittarius"){{
             speed = 0.2f;
-            health = 35000;
+            health = 43750;
             hitSize = 55f;
             armor = 12f;
             landShake = 2f;
@@ -1153,7 +1174,7 @@ public class UnityUnitTypes implements ContentList{
             drag = 0.1f;
             speed = 0.42f;
             hitSize = 35.5f;
-            health = 24000;
+            health = 30000;
             rotateSpeed = 1.3f;
             
             legCount = 8;
@@ -1265,7 +1286,7 @@ public class UnityUnitTypes implements ContentList{
             hitSize = 49f;
             hovering = true;
             allowLegStep = true;
-            health = 31000;
+            health = 38750;
             armor = 16f;
             rotateSpeed = 1.3f;
             legCount = 8;
@@ -1401,9 +1422,9 @@ public class UnityUnitTypes implements ContentList{
         }};
 
         mantle = new UnityUnitType("mantle"){{
-            health = 33000f;
+            health = 41250f;
             armor = 17f;
-            speed = 0.4f;
+            speed = 0.45f;
             accel = 0.04f;
             drag = 0.04f;
             rotateSpeed = 0.9f;
@@ -1428,6 +1449,8 @@ public class UnityUnitTypes implements ContentList{
                 reload = 4f * 60f;
                 continuous = true;
                 recoil = 0f;
+                shootStatus = StatusEffects.slow;
+                shootStatusDuration = 180f;
 
                 bullet = new AcceleratingLaserBulletType(230f){{
                     lifetime = 180f;
@@ -1471,9 +1494,9 @@ public class UnityUnitTypes implements ContentList{
         }};
 
         aphelion = new UnityUnitType("aphelion"){{
-            health = 40000f;
+            health = 50000f;
             armor = 16f;
-            speed = 0.37f;
+            speed = 0.44f;
             accel = 0.04f;
             drag = 0.03f;
             rotateSpeed = 0.7f;
@@ -1540,6 +1563,9 @@ public class UnityUnitTypes implements ContentList{
                     collisionWidth = 16f;
                     accel = 60f;
                     laserSpeed = 20f;
+                    splashDamage = 40f;
+                    splashDamageRadius = 50f;
+                    pierceCap = 5;
                 }};
 
                 shootStatus = StatusEffects.slow;
@@ -1561,7 +1587,7 @@ public class UnityUnitTypes implements ContentList{
 
         sedec = new UnityUnitType("sedec"){{
             defaultController = HealingDefenderAI::new;
-            health = 36000f;
+            health = 45000f;
             armor = 20f;
             speed = 0.7f;
             rotateSpeed = 1f;
@@ -1609,7 +1635,7 @@ public class UnityUnitTypes implements ContentList{
 
         trigintaduo = new UnityUnitType("trigintaduo"){{
             defaultController = HealingDefenderAI::new;
-            health = 42000f;
+            health = 52500f;
             armor = 22f;
             speed = 0.6f;
             rotateSpeed = 1f;
@@ -1686,7 +1712,7 @@ public class UnityUnitTypes implements ContentList{
         //region naval-units
 
         fin = new UnityUnitType("fin"){{
-            health = 29000f;
+            health = 36250f;
             speed = 0.5f;
             drag = 0.18f;
             hitSize = 77.5f;
@@ -1759,7 +1785,7 @@ public class UnityUnitTypes implements ContentList{
         }};
 
         blue = new UnityUnitType("blue"){{
-            health = 34000f;
+            health = 42500f;
             speed = 0.4f;
             drag = 0.18f;
             hitSize = 80f;

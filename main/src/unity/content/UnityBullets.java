@@ -35,7 +35,7 @@ public class UnityBullets implements ContentList{
         kelvinSlagLaser, kelvinOilLaser, kelvinCryofluidLaser, kelvinLiquidLaser, celsiusSmoke, kelvinSmoke,
         breakthroughLaser,
 
-        basicMissile,
+        basicMissile, citadelFlame,
 
         sapLaser, continuousSapLaser,
 
@@ -567,6 +567,11 @@ public class UnityBullets implements ContentList{
             despawnEffect = Fx.blastExplosion;
             weaveScale = 8f;
             weaveMag = 2f;
+        }};
+
+        citadelFlame = new FlameBulletType(4.2f, 45f){{
+            lifetime = 20f;
+            particleAmount = 17;
         }};
 
         sapLaser = new LaserBulletType(80f){{

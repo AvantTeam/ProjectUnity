@@ -192,6 +192,7 @@ public class EndCutterLaserBulletType extends BulletType{
     }
 
     static class LaserData{
+        int pierceCounter = 0;
         float lastLength, lightningTime, velocity, velocityTime, targetSize, restartTime = 5f;
         Position target;
     }

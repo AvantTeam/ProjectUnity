@@ -123,48 +123,53 @@ public class AcceleratingLaserBulletType extends BulletType{
         }
 
         if(timer){
+            boolean p = pierceCap > 0;
             Tmp.v1.trns(b.rotation(), b.fdata).add(b);
-            Utils.collideLineRawEnemy(b.team, b.x, b.y, Tmp.v1.x, Tmp.v1.y, collisionWidth, collisionWidth, (building, direct) -> {
-                boolean h = buildingInsulator.get(b, building);
-                if(direct){
+            if(b.data instanceof LaserData){
+                LaserData data = (LaserData)b.data;
+                if(p) data.pierceCounter = 0;
+                Utils.collideLineRawEnemy(b.team, b.x, b.y, Tmp.v1.x, Tmp.v1.y, collisionWidth, collisionWidth, (building, direct) -> {
+                    boolean h = buildingInsulator.get(b, building);
+                    if(direct){
+                        if(h){
+                            if(p) data.pierceCounter++;
+                            if(!p || data.pierceCounter >= pierceCap){
+                                Tmp.v2.trns(b.rotation(), maxLength * 1.5f).add(b);
+                                float dst = Intersector.distanceLinePoint(b.x, b.y, Tmp.v2.x, Tmp.v2.y, building.x, building.y);
+                                b.fdata = ((b.dst(building) - (building.block.size * Vars.tilesize / 2f)) + dst) + pierceAmount;
+                                data.velocity = 0f;
+                                data.restartTime = 0f;
+                                data.velocityTime = 0f;
+                                if(fastUpdateLength){
+                                    data.target = building;
+                                    data.targetSize = building.block.size * Vars.tilesize / 2f;
+                                }
+                            }
+                        }
+                        building.damage(damage * buildingDamageMultiplier);
+                    }
+                    return !p ? h : data.pierceCounter >= pierceCap;
+                }, unit -> {
+                    boolean h = unitInsulator.get(b, unit);
                     if(h){
-                        Tmp.v2.trns(b.rotation(), maxLength * 1.5f).add(b);
-                        float dst = Intersector.distanceLinePoint(b.x, b.y, Tmp.v2.x, Tmp.v2.y, building.x, building.y);
-                        b.fdata = ((b.dst(building) - (building.block.size * Vars.tilesize / 2f)) + dst) + pierceAmount;
-                        if(b.data instanceof LaserData){
-                            LaserData data = (LaserData)b.data;
+                        if(p) b.collided.add(unit.id);
+                        if(!p || b.collided.size >= pierceCap){
+                            Tmp.v2.trns(b.rotation(), maxLength * 1.5f).add(b);
+                            float dst = Intersector.distanceLinePoint(b.x, b.y, Tmp.v2.x, Tmp.v2.y, unit.x, unit.y);
+                            b.fdata = ((b.dst(unit) - (unit.hitSize / 2f)) + dst) + pierceAmount;
                             data.velocity = 0f;
                             data.restartTime = 0f;
                             data.velocityTime = 0f;
                             if(fastUpdateLength){
-                                data.target = building;
-                                data.targetSize = building.block.size * Vars.tilesize / 2f;
+                                data.target = unit;
+                                data.targetSize = unit.hitSize / 2f;
                             }
                         }
                     }
-                    building.damage(damage * buildingDamageMultiplier);
-                }
-                return h;
-            }, unit -> {
-                boolean h = unitInsulator.get(b, unit);
-                if(h){
-                    Tmp.v2.trns(b.rotation(), maxLength * 1.5f).add(b);
-                    float dst = Intersector.distanceLinePoint(b.x, b.y, Tmp.v2.x, Tmp.v2.y, unit.x, unit.y);
-                    b.fdata = ((b.dst(unit) - (unit.hitSize / 2f)) + dst) + pierceAmount;
-                    if(b.data instanceof LaserData){
-                        LaserData data = (LaserData)b.data;
-                        data.velocity = 0f;
-                        data.restartTime = 0f;
-                        data.velocityTime = 0f;
-                        if(fastUpdateLength){
-                            data.target = unit;
-                            data.targetSize = unit.hitSize / 2f;
-                        }
-                    }
-                }
-                hitEntity(b, unit, unit.health);
-                return h;
-            }, (ex, ey) -> hit(b, ex, ey), true);
+                    hitEntity(b, unit, unit.health);
+                    return !p ? h : data.pierceCounter >= pierceCap;
+                }, (ex, ey) -> hit(b, ex, ey), true);
+            }
         }
     }
 }
