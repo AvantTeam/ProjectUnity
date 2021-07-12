@@ -86,23 +86,23 @@ task deployDex(type: Jar, dependsOn: deploy) {
 class Fetcher {
     UnsafeRunnable run
 
-    private volatile Throwable error = null
+    private volatile Throwable lastErr = null
 
     @SuppressWarnings('all')
     void execute() {
         Boolf<UnsafeRunnable> exec = { final UnsafeRunnable run ->
             try {
                 run.run()
-                error = null
+                lastErr = null
             } catch(Throwable e) {
-                error = e
+                lastErr = e
             }
 
-            return error != null
+            return lastErr != null
         }
 
         //while(exec.get(run)) {}
-        if(exec.get(run)) Log.err(error)
+        if(exec.get(run)) println lastErr
     }
 }
 
