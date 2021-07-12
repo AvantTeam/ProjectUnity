@@ -102,7 +102,7 @@ class Fetcher {
         }
 
         //while(exec.get(run)) {}
-        println exec.get(run)
+        if(exec.get(run)) Log.err(error)
     }
 }
 
