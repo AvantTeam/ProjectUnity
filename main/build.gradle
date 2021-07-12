@@ -98,7 +98,7 @@ class Fetcher {
                 lastErr = e
             }
 
-            println lastErr
+            println String.valueOf(lastErr)
             return lastErr != null
         }
 
