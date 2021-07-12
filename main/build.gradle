@@ -86,7 +86,7 @@ task deployDex(type: Jar, dependsOn: deploy) {
 class Fetcher {
     UnsafeRunnable run
 
-    private Throwable error = null
+    private volatile Throwable error = null
 
     @SuppressWarnings('all')
     void execute() {
@@ -102,7 +102,7 @@ class Fetcher {
         }
 
         //while(exec.get(run)) {}
-        exec.get(run);
+        println exec.get(run)
     }
 }
 
