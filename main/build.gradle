@@ -68,7 +68,7 @@ task deployDex(type: Jar, dependsOn: deploy) {
 
             for(def file : files) {
                 assert file.exists()
-                command += ['--lib', file.path]
+                command += ['--classpath', file.path]
             }
 
             if(System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {

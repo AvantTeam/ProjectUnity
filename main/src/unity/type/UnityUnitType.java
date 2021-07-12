@@ -618,6 +618,7 @@ public class UnityUnitType extends UnitType{
     public void createIcons(MultiPacker packer){
         super.createIcons(packer);
 
+        if(true) return;
         Color color = Pools.obtain(Color.class, Color::new).set(0f, 0f, 0f, 0f);
         try{
             float scl = Draw.scl / 4f;
