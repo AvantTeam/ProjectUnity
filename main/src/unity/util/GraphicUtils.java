@@ -14,6 +14,8 @@ import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
 import mindustry.type.*;
 
+import java.nio.*;
+
 import static arc.Core.*;
 
 public final class GraphicUtils{
@@ -305,5 +307,29 @@ public final class GraphicUtils{
         }else{
             return ref.set(averageColor(Tmp.c3, Tmp.c4));
         }
+    }
+
+    public static Mesh copy(Mesh mesh){
+        var originf = mesh.getVerticesBuffer();
+        originf.clear();
+
+        var origini = mesh.getIndicesBuffer();
+        origini.clear();
+
+        Mesh out = new Mesh(true, mesh.getNumVertices(), mesh.getNumIndices(), mesh.attributes);
+
+        var dstf = out.getVerticesBuffer();
+        dstf.clear();
+        dstf.put(originf);
+        originf.clear();
+        dstf.clear();
+
+        var dsti = out.getIndicesBuffer();
+        dsti.clear();
+        dsti.put(origini);
+        origini.clear();
+        dsti.clear();
+
+        return out;
     }
 }

@@ -18,12 +18,16 @@ import mindustry.graphics.*;
 import mindustry.world.*;
 import unity.graphics.*;
 
+import java.util.*;
+
 import static mindustry.Vars.*;
 
 public final class Utils{
     public static final PowIn pow6In = new PowIn(6);
 
     public static final float sqrtHalf = Mathf.sqrt(0.5f);
+
+    public static final Quat q1 = new Quat(), q2 = new Quat();
 
     private static final Vec2 tV = new Vec2(), tV2 = new Vec2();
     private static final Seq<Healthc> tmpUnitSeq = new Seq<>();
@@ -756,7 +760,7 @@ public final class Utils{
 
     /**
      * Casts forward in a line.
-     * @return the first encountered object.
+     * @return the first encountered model.
      * There's an issue with the one in 126.2, which I fixed in a pr. This can be removed after the next Mindustry release.
      */
     public static Healthc linecast(Bullet hitter, float x, float y, float angle, float length){
@@ -823,5 +827,23 @@ public final class Utils{
         }
 
         return tmpUnit;
+    }
+
+    public static <T> int sum(Iterable<T> it, Intf<T> summer){
+        int res = 0;
+        for(var t : it){
+            res += summer.get(t);
+        }
+
+        return res;
+    }
+
+    public static <T> int sum(T[] it, Intf<T> summer){
+        int res = 0;
+        for(var t : it){
+            res += summer.get(t);
+        }
+
+        return res;
     }
 }

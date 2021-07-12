@@ -17,6 +17,9 @@ import mindustry.graphics.MultiPacker.*;
 import mindustry.mod.*;
 import mindustry.world.blocks.environment.*;
 import unity.ai.kami.*;
+import unity.assets.list.*;
+import unity.assets.loaders.*;
+import unity.assets.type.g3d.*;
 import unity.async.*;
 import unity.cinematic.*;
 import unity.content.*;
@@ -38,6 +41,7 @@ public class Unity extends Mod{
     public static TapHandler tap;
     public static AntiCheat antiCheat;
     public static DevBuild dev;
+    public static Models model;
 
     private static final ContentList[] content = {
         new UnityItems(),
@@ -56,12 +60,8 @@ public class Unity extends Mod{
     };
 
     public Unity(){
-        ContributorList.init();
-
+        Core.assets.setLoader(Model.class, new ModelLoader(tree));
         Core.assets.setLoader(WavefrontObject.class, new WavefrontObjectLoader(tree));
-
-        KamiPatterns.load();
-        KamiBulletDatas.load();
 
         Events.on(ContentInitEvent.class, e -> {
             if(!headless){
@@ -73,21 +73,29 @@ public class Unity extends Mod{
             UnityStyles.load();
         });
 
-        Events.on(FileTreeInitEvent.class, e -> {
-            UnityObjs.load();
-            UnitySounds.load();
+        Events.on(FileTreeInitEvent.class, e -> Core.app.post(() -> {
             UnityShaders.load();
-        });
+            UnityObjs.load();
+            UnityModels.load();
+            UnitySounds.load();
+        }));
 
-        Events.on(DisposeEvent.class, e ->
-            UnityShaders.dispose()
-        );
+        Events.on(DisposeEvent.class, e -> {
+            UnityModels.dispose();
+            UnityShaders.dispose();
+        });
 
         Events.on(ClientLoadEvent.class, e -> {
             addCredits();
 
             UnitySettings.init();
             SpeechDialog.init();
+
+            Triggers.listen(Trigger.preDraw, () -> {
+                model.camera.position.set(Core.camera.position.x, Core.camera.position.y, 0f);
+                model.camera.resize(Core.camera.width, Core.camera.height);
+                model.camera.update();
+            });
 
             var mod = mods.getMod(Unity.class);
 
@@ -97,6 +105,11 @@ public class Unity extends Mod{
 
             Core.settings.getBoolOnce("unity-install", () -> Time.runTask(5f, CreditsDialog::showList));
         });
+
+        ContributorList.init();
+
+        KamiPatterns.load();
+        KamiBulletDatas.load();
 
         try{
             Class<? extends DevBuild> impl = (Class<? extends DevBuild>)Class.forName("unity.mod.DevBuildImpl");
@@ -111,6 +124,7 @@ public class Unity extends Mod{
         music = new MusicHandler(){};
         tap = new TapHandler();
         antiCheat = new AntiCheat();
+        model = new Models();
 
         asyncCore.processes.add(new LightProcess());
     }
@@ -122,7 +136,7 @@ public class Unity extends Mod{
         dev.setup();
 
         UnityCall.init();
-        BlockMovement.init();
+        //BlockMovement.init();
 
         dev.init();
     }

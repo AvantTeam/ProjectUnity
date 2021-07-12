@@ -3,6 +3,7 @@ package unity.mod;
 import arc.*;
 import arc.input.*;
 import arc.input.GestureDetector.*;
+import arc.math.geom.*;
 import arc.scene.ui.*;
 import arc.struct.*;
 import mindustry.game.EventType.*;
@@ -14,7 +15,7 @@ import static mindustry.Vars.*;
 
 /** @author GlennFolker */
 public class TapHandler{
-    private Seq<TapListener> listeners = new Seq<>();
+    private final Seq<TapListener> listeners = new Seq<>();
     private boolean press = false;
 
     public TapHandler(){

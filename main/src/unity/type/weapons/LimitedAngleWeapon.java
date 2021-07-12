@@ -75,7 +75,7 @@ public class LimitedAngleWeapon extends Weapon{
             //logic will return shooting as false even if these return true, which is fine
         }
 
-        //update continuous state
+        //calculateCenter continuous state
         if(continuous && mount.bullet != null){
             if(!mount.bullet.isAdded() || mount.bullet.time >= mount.bullet.lifetime || mount.bullet.type != bullet){
                 mount.bullet = null;

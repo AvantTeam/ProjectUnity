@@ -5,11 +5,15 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import mindustry.entities.bullet.*;
+import mindustry.graphics.*;
 import mindustry.world.blocks.defense.turrets.*;
+import unity.assets.type.g3d.*;
 import unity.util.*;
 
 public class WavefrontTurret extends PowerTurret{
-    public WavefrontObject object;
+    public Model model;
+    public float scale = 20f;
+
     public float objectRotationSpeed = 7f;
 
     public WavefrontTurret(String name){
@@ -24,10 +28,18 @@ public class WavefrontTurret extends PowerTurret{
     }
 
     public class WavefrontTurretBuild extends PowerTurretBuild{
+        public ModelInstance inst;
+
         float gap = 0f;
         float offset = 0f;
         float angle = 0f;
         float waitTime = 0f;
+
+        @Override
+        public void created(){
+            super.created();
+            inst = new ModelInstance(model);
+        }
 
         @Override
         public void updateTile(){
@@ -45,6 +57,15 @@ public class WavefrontTurret extends PowerTurret{
             if(waitTime > 0f){
                 waitTime -= Time.delta;
             }
+
+            tr2.trns(rotation, -recoil);
+            inst.transform.set(
+                Tmp.v31.set(x + tr2.x, y + tr2.y, 0f),
+                Utils.q1
+                    .setFromAxis(0f, 0f, 1f, rotation - 90f)
+                    .mul(Utils.q2.setFromAxis(0f, 1f, 0f, angle)),
+                Tmp.v32.set(scale, scale, scale)
+            );
         }
 
         @Override
@@ -67,24 +88,7 @@ public class WavefrontTurret extends PowerTurret{
             Draw.rect(baseRegion, x, y);
             Draw.color();
 
-            tr2.trns(rotation, -recoil);
-
-            object.draw(x + tr2.x, y + tr2.y, 0f, angle, -rotation + 90f, v -> {
-                if(v.z > 0f){
-                    v.z += offset;
-                }else{
-                    v.z -= offset;
-                }
-            });
-            /*
-            object.draw(x + tr2.x, y + tr2.y, 0f, -angle + 90f, -rotation + 90f, v -> {
-                if(v.z > 0f){
-                    v.z += gap + offset;
-                }else{
-                    v.z -= gap + offset;
-                }
-            });
-             */
+            Draw.draw(Layer.turret + 0.01f, inst::render);
         }
     }
 }

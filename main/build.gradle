@@ -36,6 +36,7 @@ import arc.util.*
 import arc.util.serialization.*
 
 import java.util.concurrent.*
+import java.util.concurrent.atomic.*
 
 task deploy(type: Jar, dependsOn: configurations.runtimeClasspath) {
     archiveFileName.set "${modName}Desktop.jar"
@@ -51,56 +52,42 @@ task deploy(type: Jar, dependsOn: configurations.runtimeClasspath) {
     }
 }
 
-task dex(dependsOn: deploy) {
-    def jarArtifact = file(deploy.archiveFile.get())
-    def dexedArtifact = new File("$buildDir/libs", 'Dexed.jar')
+task deployDex(type: Jar, dependsOn: deploy) {
+    archiveFileName.set "${modName}.jar"
 
-    doLast {
+    final def desktopJar = deploy.archiveFile.get()
+    final def dexJar = new File(deployDex.getTemporaryDir(), 'Dexed.jar')
+
+    doFirst {
+        println 'Dexifying...'
         exec {
-            workingDir "$buildDir/libs"
-
-            def command = ['d8']
-            def files = (
+            def command = ['d8', '--min-api', sdkAPI, '--output', dexJar, desktopJar]
+            final File[] files =
                 configurations.compileClasspath.asList() +
                 configurations.runtimeClasspath.asList() +
-                [new File("${sdkRoot}/platforms/android-${sdkVersion}/android.jar")]
-            )
+                file("$sdkRoot/platforms/android-$sdkVersion/android.jar")
 
             for(def file : files) {
-                command += '--classpath'
-                command += file.path
+                assert file.exists()
+                command += ['--classpath', file.path]
             }
 
-            command += ['--min-api', sdkAPI, '--output', dexedArtifact, jarArtifact]
-            if(windows) {
-                commandLine('cmd', '/c', *command)
-            } else {
-                commandLine(*command)
+            if(System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
+                command = ['cmd', '/c'] + command
             }
+
+            commandLine(*command)
         }
     }
-}
 
-task deployDex(type: Jar, dependsOn: [deploy, dex]) {
-    archiveFileName.set "${modName}Dexed.jar"
-
-    def jarArtifact = file(tasks.deploy.archiveFile.get())
-    def dexedArtifact = new File("$buildDir/libs", 'Dexed.jar')
-
-    from zipTree(jarArtifact)
-    from zipTree(dexedArtifact)
-
-    doLast { delete {
-        delete jarArtifact
-        delete dexedArtifact
-    }}
+    from zipTree(desktopJar)
+    from zipTree(dexJar)
 }
 
 class Fetcher {
-    String name
     UnsafeRunnable run
 
-    private Throwable error = null
+    private volatile Throwable error = null
 
     @SuppressWarnings('all')
     void execute() {
@@ -112,7 +99,7 @@ class Fetcher {
                 error = e
             }
 
-            error != null
+            return error != null
         }
 
         while(exec.get(run)) {}
@@ -124,53 +111,55 @@ task fetchComps {
         delete { delete fetchDir }
         fetchDir.mkdir()
 
-        Core.net = new Net()
-        Core.net.setBlock(true)
-
         final CopyOnWriteArrayList<Fetcher> fetches = new CopyOnWriteArrayList<>()
 
-        final UnsafeRunnable mainRun = {
-        Core.net.httpGet(
-        "https://api.github.com/repos/Anuken/Mindustry/contents/core/src/mindustry/entities/comp?ref=$mindustryVersion",
-        { res ->
-            final def list = Jval.read(res.getResultAsString()).asArray()
-            for(final Jval val : list) {
-                final def filename = val.get('name').asString()
-                final def fileurl = val.get('download_url').asString()
+        UnsafeRunnable mainRun = {
+        Http.get("https://api.github.com/repos/Anuken/Mindustry/contents/core/src/mindustry/entities/comp?ref=$mindustryVersion")
+            .error({ final t -> throw new RuntimeException(t) })
+            .block({ final res ->
+                final def list = Jval.read(res.getResultAsString()).asArray()
+                println "Found $list.size entity components."
 
-                final UnsafeRunnable run = {
-                Core.net.httpGet(
-                fileurl,
-                { comp ->
-                    final def content = comp.getResultAsString()
-                        .replace('mindustry.entities.comp', "$fetchPackage".replace('/', '.') as String)
-                        .replace('mindustry.annotations.Annotations.*', 'unity.annotations.Annotations.*')
-                        .replaceAll('@Component\\((base = true|.)+\\)\n*', '@EntityComponent(base = true, write = false)\n')
-                        .replaceAll('@Component\n*', '@EntityComponent(write = false)\n')
-                        .replaceAll('@BaseComponent\n*', '@EntityBaseComponent\n')
-                        .replaceAll('@CallSuper\n*', '')
-                        .replaceAll('@Final\n*', '')
-                        .replaceAll('@EntityDef\\(*.*\\)*\n*', '')
+                for(final Jval val : list) {
+                    final def filename = val.get('name').asString()
+                    final def fileurl = val.get('download_url').asString()
 
-                    if(content.isBlank()) throw new IllegalStateException()
+                    final UnsafeRunnable run = {
+                    Http.get(fileurl)
+                        .error({ final t -> throw new RuntimeException(t) })
+                        .block({ final comp ->
+                            final def content = comp.getResultAsString()
+                                .replace('mindustry.entities.comp', "$fetchPackage".replace('/', '.') as String)
+                                .replace('mindustry.annotations.Annotations.*', 'unity.annotations.Annotations.*')
+                                .replaceAll('@Component\\((base = true|.)+\\)\n*', '@EntityComponent(base = true, write = false)\n')
+                                .replaceAll('@Component\n*', '@EntityComponent(write = false)\n')
+                                .replaceAll('@BaseComponent\n*', '@EntityBaseComponent\n')
+                                .replaceAll('@CallSuper\n*', '')
+                                .replaceAll('@Final\n*', '')
+                                .replaceAll('@EntityDef\\(*.*\\)*\n*', '')
 
-                    final def fi = Fi.get("$fetchDir/$filename")
-                    fi.writeString(content, false)
-                },
-                { err -> throw new RuntimeException(err) })}
+                            if(content.isEmpty()) throw new IllegalStateException()
 
-                fetches.add(new Fetcher(name: filename, run: run))
-            }
-        },
-        { err -> throw new RuntimeException(err) })}
+                            final def fi = Fi.get("$fetchDir/$filename")
+                            fi.writeString(content, false)
+                        })
+                    }
+
+                    fetches.add(new Fetcher(run: run))
+                }
+            })
+        }
 
         new Fetcher(run: mainRun).execute()
+
         final def found = fetches.size()
+        def progress = new AtomicInteger(found)
 
         Seq<Thread> threads = Seq.with(fetches).map({ final Fetcher fetch -> new Thread({
             fetch.execute()
             synchronized(fetches) {
                 fetches.remove(fetch)
+                print '\b'
             }
         }) })
 

@@ -22,6 +22,7 @@ import mindustry.world.consumers.*;
 import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 import unity.annotations.Annotations.*;
+import unity.assets.list.*;
 import unity.content.effects.*;
 import unity.entities.bullet.*;
 import unity.entities.bullet.exp.*;
@@ -3243,7 +3244,7 @@ public class UnityBlocks implements ContentList{
         wavefront = new WavefrontTurret("wavefront"){{
             requirements(Category.turret, with(Items.copper, 4900, Items.graphite, 6000, Items.silicon, 5000, Items.titanium, 6500, UnityItems.xenium, 1500, UnityItems.advanceAlloy, 1500, UnityItems.terminum, 700, UnityItems.terminaAlloy, 500));
             health = 50625;
-            object = UnityObjs.wavefront;
+            model = UnityModels.wavefront;
             size = 15;
             range = 420f;
             rotateSpeed = 3f;

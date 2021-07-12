@@ -22,7 +22,6 @@ allprojects {
         sdkVersion = '30'
         sdkAPI = '14'
         sdkRoot = System.getenv('ANDROID_SDK_ROOT')
-        hasSprites = new File(rootDir, 'main/assets/sprites/').exists()
         windows = System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')
         devBuild = project.hasProperty('dev') && Boolean.parseBoolean(project.property('dev') as String)
     }

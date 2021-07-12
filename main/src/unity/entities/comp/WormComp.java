@@ -230,12 +230,12 @@ abstract class WormComp implements Unitc{
         }
     }
 
-    @Wrap(value = "update()", block = Boundedc.class)
+    @Wrap(value = "calculateCenter()", block = Boundedc.class)
     public boolean updateBounded(){
         return isHead();
     }
 
-    @Insert(value = "update()", block = Statusc.class)
+    @Insert(value = "calculateCenter()", block = Statusc.class)
     private void updateHealthDiv(){
         healthMultiplier /= splitHealthDiv;
     }
@@ -257,7 +257,7 @@ abstract class WormComp implements Unitc{
         return tail;
     }
 
-    @Insert("update()")
+    @Insert("calculateCenter()")
     private void updatePost(){
         if(isHead()){
             UnityUnitType uType = (UnityUnitType)type;

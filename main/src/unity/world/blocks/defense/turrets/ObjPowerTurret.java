@@ -55,7 +55,7 @@ public class ObjPowerTurret extends PowerTurret{
             };
 
             object.draw(x, y, Mathf.cos(time, 76f, 120f), Mathf.sin(time, 76f, 120f), -rotation, distort);
-            //object.draw(x, y, 0f, 0f, -rotation);
+            //model.draw(x, y, 0f, 0f, -rotation);
         }
     }
 }
