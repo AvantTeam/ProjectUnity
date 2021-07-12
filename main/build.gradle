@@ -88,7 +88,7 @@ class Fetcher {
 
     @SuppressWarnings('all')
     void execute() {
-        if(doTry() != null) println('wtf')
+        println(doTry())
     }
 
     Throwable doTry() {
