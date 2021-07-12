@@ -95,11 +95,10 @@ class Fetcher {
                 run.run()
                 error = null
             } catch(Throwable e) {
-                Log.err(e)
                 error = e
             }
 
-            error != null
+            return error != null
         }
 
         //while(exec.get(run)) {}
