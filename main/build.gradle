@@ -61,7 +61,7 @@ task deployDex(type: Jar, dependsOn: deploy) {
         println 'Dexifying...'
         exec {
             def command = ['d8', '--min-api', sdkAPI, '--output', dexJar, desktopJar]
-            File[] files =
+            final File[] files =
                 configurations.compileClasspath.asList() +
                 configurations.runtimeClasspath.asList() +
                 file("$sdkRoot/platforms/android-$sdkVersion/android.jar")
@@ -84,7 +84,6 @@ task deployDex(type: Jar, dependsOn: deploy) {
 }
 
 class Fetcher {
-    String name
     UnsafeRunnable run
 
     private Throwable error = null
@@ -111,45 +110,46 @@ task fetchComps {
         delete { delete fetchDir }
         fetchDir.mkdir()
 
-        Core.net = new Net()
-        Core.net.setBlock(true)
-
         final CopyOnWriteArrayList<Fetcher> fetches = new CopyOnWriteArrayList<>()
 
-        final UnsafeRunnable mainRun = {
-        Core.net.httpGet(
-        "https://api.github.com/repos/Anuken/Mindustry/contents/core/src/mindustry/entities/comp?ref=$mindustryVersion",
-        { res ->
-            final def list = Jval.read(res.getResultAsString()).asArray()
-            for(final Jval val : list) {
-                final def filename = val.get('name').asString()
-                final def fileurl = val.get('download_url').asString()
+        UnsafeRunnable mainRun = {
+        Http.get("https://api.github.com/repos/Anuken/Mindustry/contents/core/src/mindustry/entities/comp?ref=$mindustryVersion")
+            .timeout(0)
+            .block({ final res ->
+                final def list = Jval.read(res.getResultAsString()).asArray()
+                println "Found $list.size entity components."
 
-                final UnsafeRunnable run = {
-                Core.net.httpGet(
-                fileurl,
-                { comp ->
-                    final def content = comp.getResultAsString()
-                        .replace('mindustry.entities.comp', "$fetchPackage".replace('/', '.') as String)
-                        .replace('mindustry.annotations.Annotations.*', 'unity.annotations.Annotations.*')
-                        .replaceAll('@Component\\((base = true|.)+\\)\n*', '@EntityComponent(base = true, write = false)\n')
-                        .replaceAll('@Component\n*', '@EntityComponent(write = false)\n')
-                        .replaceAll('@BaseComponent\n*', '@EntityBaseComponent\n')
-                        .replaceAll('@CallSuper\n*', '')
-                        .replaceAll('@Final\n*', '')
-                        .replaceAll('@EntityDef\\(*.*\\)*\n*', '')
+                for(final Jval val : list) {
+                    final def filename = val.get('name').asString()
+                    final def fileurl = val.get('download_url').asString()
 
-                    if(content.isBlank()) throw new IllegalStateException()
+                    final UnsafeRunnable run = {
+                    Http.get(fileurl)
+                        .timeout(0)
+                        .block({ final comp ->
+                            final def content = comp.getResultAsString()
+                                .replace('mindustry.entities.comp', "$fetchPackage".replace('/', '.') as String)
+                                .replace('mindustry.annotations.Annotations.*', 'unity.annotations.Annotations.*')
+                                .replaceAll('@Component\\((base = true|.)+\\)\n*', '@EntityComponent(base = true, write = false)\n')
+                                .replaceAll('@Component\n*', '@EntityComponent(write = false)\n')
+                                .replaceAll('@BaseComponent\n*', '@EntityBaseComponent\n')
+                                .replaceAll('@CallSuper\n*', '')
+                                .replaceAll('@Final\n*', '')
+                                .replaceAll('@EntityDef\\(*.*\\)*\n*', '')
 
-                    final def fi = Fi.get("$fetchDir/$filename")
-                    fi.writeString(content, false)
-                },
-                { err -> throw new RuntimeException(err) })}
+                            if(content.isEmpty()) throw new IllegalStateException()
 
-                fetches.add(new Fetcher(name: filename, run: run))
-            }
-        },
-        { err -> throw new RuntimeException(err) })}
+                            final def fi = Fi.get("$fetchDir/$filename")
+                            fi.writeString(content, false)
+                        })
+                        .error({ final t -> throw new RuntimeException(t) })
+                    }
+
+                    fetches.add(new Fetcher(run: run))
+                }
+            })
+            .error({ final t -> throw new RuntimeException(t) })
+        }
 
         new Fetcher(run: mainRun).execute()
         final def found = fetches.size()
