@@ -98,6 +98,7 @@ class Fetcher {
                 lastErr = e
             }
 
+            println lastErr
             return lastErr != null
         }
 
