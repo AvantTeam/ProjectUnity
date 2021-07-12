@@ -115,9 +115,10 @@ public class AcceleratingLaserBulletType extends BulletType{
             }else{
                 vec.restartTime += Time.delta;
                 if(fastUpdateLength && vec.target != null){
+                    vec.pierceOffsetSmooth = Mathf.lerpDelta(vec.pierceOffsetSmooth, vec.pierceOffset, 0.2f);
                     Tmp.v2.trns(b.rotation(), maxLength * 1.5f).add(b);
                     float dst = Intersector.distanceLinePoint(b.x, b.y, Tmp.v2.x, Tmp.v2.y, vec.target.getX(), vec.target.getY());
-                    b.fdata = ((b.dst(vec.target) - vec.targetSize) + dst) + pierceAmount;
+                    b.fdata = ((b.dst(vec.target) - vec.targetSize) + dst) + pierceAmount + (vec.pierceOffsetSmooth * vec.targetSize);
                 }
             }
         }
@@ -127,47 +128,54 @@ public class AcceleratingLaserBulletType extends BulletType{
             Tmp.v1.trns(b.rotation(), b.fdata).add(b);
             if(b.data instanceof LaserData){
                 LaserData data = (LaserData)b.data;
-                if(p) data.pierceCounter = 0;
+                if(p){
+                    data.pierceScore = 0f;
+                    data.pierceOffset = 0f;
+                }
                 Utils.collideLineRawEnemy(b.team, b.x, b.y, Tmp.v1.x, Tmp.v1.y, collisionWidth, collisionWidth, (building, direct) -> {
                     boolean h = buildingInsulator.get(b, building);
                     if(direct){
                         if(h){
-                            if(p) data.pierceCounter++;
-                            if(!p || data.pierceCounter >= pierceCap){
+                            if(p) data.pierceScore += building.block.size * (building.block.absorbLasers ? 3f : 1f);
+                            if(!p || data.pierceScore >= pierceCap){
                                 Tmp.v2.trns(b.rotation(), maxLength * 1.5f).add(b);
                                 float dst = Intersector.distanceLinePoint(b.x, b.y, Tmp.v2.x, Tmp.v2.y, building.x, building.y);
-                                b.fdata = ((b.dst(building) - (building.block.size * Vars.tilesize / 2f)) + dst) + pierceAmount;
                                 data.velocity = 0f;
                                 data.restartTime = 0f;
                                 data.velocityTime = 0f;
+                                data.pierceOffset = 1f - Mathf.clamp(data.pierceScore - pierceCap);
                                 if(fastUpdateLength){
+                                    if(building != data.target) data.pierceOffsetSmooth = data.pierceOffset;
                                     data.target = building;
                                     data.targetSize = building.block.size * Vars.tilesize / 2f;
                                 }
+                                b.fdata = ((b.dst(building) - (building.block.size * Vars.tilesize / 2f)) + dst) + pierceAmount + (data.pierceOffsetSmooth * data.targetSize);
                             }
                         }
                         building.damage(damage * buildingDamageMultiplier);
                     }
-                    return !p ? h : data.pierceCounter >= pierceCap;
+                    return !p ? h : data.pierceScore >= pierceCap;
                 }, unit -> {
                     boolean h = unitInsulator.get(b, unit);
                     if(h){
-                        if(p) b.collided.add(unit.id);
-                        if(!p || b.collided.size >= pierceCap){
+                        if(p) data.pierceScore += ((unit.hitSize / Vars.tilesize) / 2f) + (unit.health / 4000f);
+                        if(!p || data.pierceScore >= pierceCap){
                             Tmp.v2.trns(b.rotation(), maxLength * 1.5f).add(b);
                             float dst = Intersector.distanceLinePoint(b.x, b.y, Tmp.v2.x, Tmp.v2.y, unit.x, unit.y);
-                            b.fdata = ((b.dst(unit) - (unit.hitSize / 2f)) + dst) + pierceAmount;
                             data.velocity = 0f;
                             data.restartTime = 0f;
                             data.velocityTime = 0f;
+                            data.pierceOffset = 1f - Mathf.clamp(data.pierceScore - pierceCap);
                             if(fastUpdateLength){
+                                if(unit != data.target) data.pierceOffsetSmooth = data.pierceOffset;
                                 data.target = unit;
                                 data.targetSize = unit.hitSize / 2f;
                             }
+                            b.fdata = ((b.dst(unit) - (unit.hitSize / 2f)) + dst) + pierceAmount + (data.pierceOffsetSmooth * data.targetSize);
                         }
                     }
                     hitEntity(b, unit, unit.health);
-                    return !p ? h : data.pierceCounter >= pierceCap;
+                    return !p ? h : data.pierceScore >= pierceCap;
                 }, (ex, ey) -> hit(b, ex, ey), true);
             }
         }
