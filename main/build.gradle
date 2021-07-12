@@ -101,7 +101,8 @@ class Fetcher {
             error != null
         }
 
-        while(exec.get(run)) {}
+        //while(exec.get(run)) {}
+        exec.get(run);
     }
 }
 
