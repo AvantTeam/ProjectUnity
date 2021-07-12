@@ -44,28 +44,28 @@ public abstract class TestComp implements Unitc{
     @ReadOnly float chance = 0.5f;
 
     /** Calls {@code updatePre()} at the beginning of {@link #update()} block */
-    @Insert(value = "calculateCenter()", after = false)
+    @Insert(value = "update()", after = false)
     private void updatePre(){}
 
     /** Calls {@code #updatePost()} at the end of {@link #update()} block */
-    @Insert("calculateCenter()")
+    @Insert("update()")
     private void updatePost(){}
 
     /** Calls {@code updatePreWeapons()} at the beginning of {@link Weaponsc}'s {@link #update()} block */
-    @Insert(value = "calculateCenter()", block = Weaponsc.class, after = false)
+    @Insert(value = "update()", block = Weaponsc.class, after = false)
     private void updatePreWeapons(){}
 
     /** Calls {@code updatePreWeaponsB()} at the beginning of {@link Weaponsc}'s {@link #update()} block, with the priority of -5 */
-    @Insert(value = "calculateCenter()", block = Weaponsc.class, after = false)
+    @Insert(value = "update()", block = Weaponsc.class, after = false)
     @MethodPriority(-5)
     private void updatePreWeaponsB(){}
 
     /** Calls {@code updatePostWeapons()} at the end of {@link Weaponsc}'s {@link #update()} block */
-    @Insert(value = "calculateCenter()", block = Weaponsc.class)
+    @Insert(value = "update()", block = Weaponsc.class)
     private void updatePostWeapons(){}
 
     /** Calls {@code updatePostWeaponsB()} at the end of {@link Weaponsc}'s {@link #update()} block, with the priority of -5 */
-    @Insert(value = "calculateCenter()", block = Weaponsc.class)
+    @Insert(value = "update()", block = Weaponsc.class)
     @MethodPriority(-5)
     private void updatePostWeaponsB(){}
 
@@ -101,13 +101,13 @@ public abstract class TestComp implements Unitc{
     }
 
     /** Wraps {@link #update()} with {@code if(this.shouldUpdate())} */
-    @Wrap(value = "calculateCenter()")
+    @Wrap(value = "update()")
     public boolean shouldUpdate(){
         return false;
     }
 
     /** Wraps {@link Weaponsc}'s {@link #update()} implementation with {@code if(this.shouldUpdateWeapons())} */
-    @Wrap(value = "calculateCenter()", block = Weaponsc.class)
+    @Wrap(value = "update()", block = Weaponsc.class)
     public boolean shouldUpdateWeapons(){
         return false;
     }
@@ -116,7 +116,7 @@ public abstract class TestComp implements Unitc{
      * Wraps {@link Unitc}'s {@link #update()} implementation with <code>if(this.shouldUpdateUnit() && this.{@link #shouldUpdateUnitB()})</code>
      * @see #shouldUpdateUnitB()
      */
-    @Wrap(value = "calculateCenter()", block = Unitc.class)
+    @Wrap(value = "update()", block = Unitc.class)
     public boolean shouldUpdateUnit(){
         return false;
     }
@@ -125,7 +125,7 @@ public abstract class TestComp implements Unitc{
      * Wraps {@link Unitc}'s {@link #update()} implementation with <code>if(this.{@link #shouldUpdateUnit()} && this.shouldUpdateUnitB)</code>
      * @see #shouldUpdateUnit()
      */
-    @Wrap(value = "calculateCenter()", block = Unitc.class)
+    @Wrap(value = "update()", block = Unitc.class)
     public boolean shouldUpdateUnitB(){
         return false;
     }

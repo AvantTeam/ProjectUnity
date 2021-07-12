@@ -276,8 +276,7 @@ public class Node{
      * using the {@link NodePart#copy()} method. Note that that method copies the material and nodes (bones) by
      * reference. If you
      * intend to use the copy in a different node tree (e.g. a different Model or ModelInstance) then you will need
-     * to calculateCenter these
-     * references afterwards.
+     * to update these references afterwards.
      * <p>
      * Override this method in your custom Node class to instantiate that class, in that case you should override the
      * {@link #set(Node)} method as well.
@@ -293,7 +292,7 @@ public class Node{
      * using the
      * {@link NodePart#copy()} method. Note that that method copies the material and nodes (bones) by reference. If
      * you intend to
-     * use this node in a different node tree (e.g. a different Model or ModelInstance) then you will need to calculateCenter
+     * use this node in a different node tree (e.g. a different Model or ModelInstance) then you will need to update
      * these
      * references afterwards.
      * <p>
