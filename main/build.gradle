@@ -83,18 +83,37 @@ task deployDex(type: Jar, dependsOn: deploy) {
     from zipTree(dexJar)
 }
 
+class Fetcher {
+    UnsafeRunnable run
+
+    @SuppressWarnings('all')
+    void execute() {
+        println(doTry())
+    }
+
+    Throwable doTry() {
+        try {
+            run.run()
+            return null
+        } catch(Throwable t) {
+            return t
+        }
+    }
+}
+
 task fetchComps {
     doFirst {
         delete { delete fetchDir }
         fetchDir.mkdir()
 
-        final CopyOnWriteArrayList<Runnable> fetches = new CopyOnWriteArrayList<>()
+        final CopyOnWriteArrayList<Fetcher> fetches = new CopyOnWriteArrayList<>()
 
+        UnsafeRunnable mainRun = {
         Http.get("https://api.github.com/repos/Anuken/Mindustry/contents/core/src/mindustry/entities/comp?ref=$mindustryVersion")
             .timeout(0)
             .block({ final res ->
                 final def list = Jval.read(res.getResultAsString()).asArray()
-                //println "Found $list.size entity components."
+                println "Found $list.size entity components."
 
                 for(final Jval val : list) {
                     final def filename = val.get('name').asString()
@@ -122,15 +141,17 @@ task fetchComps {
                         .error({ final t -> throw new RuntimeException(t) })
                     }
 
-                    fetches.add(run)
+                    fetches.add(new Fetcher(run: run))
                 }
             })
             .error({ final t -> throw new RuntimeException(t) })
+        }
 
+        new Fetcher(run: mainRun).execute()
         final def found = fetches.size()
 
-        Seq<Thread> threads = Seq.with(fetches).map({ final Runnable fetch -> new Thread({
-            fetch.run()
+        Seq<Thread> threads = Seq.with(fetches).map({ final Fetcher fetch -> new Thread({
+            fetch.execute()
             synchronized(fetches) {
                 fetches.remove(fetch)
             }
