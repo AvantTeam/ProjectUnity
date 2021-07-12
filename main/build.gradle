@@ -36,6 +36,7 @@ import arc.util.*
 import arc.util.serialization.*
 
 import java.util.concurrent.*
+import java.util.concurrent.atomic.*
 
 task deploy(type: Jar, dependsOn: configurations.runtimeClasspath) {
     archiveFileName.set "${modName}Desktop.jar"
@@ -86,18 +87,22 @@ task deployDex(type: Jar, dependsOn: deploy) {
 class Fetcher {
     UnsafeRunnable run
 
+    private volatile Throwable error = null
+
     @SuppressWarnings('all')
     void execute() {
-        println(doTry())
-    }
+        Boolf<UnsafeRunnable> exec = { final UnsafeRunnable run ->
+            try {
+                run.run()
+                error = null
+            } catch(Throwable e) {
+                error = e
+            }
 
-    Throwable doTry() {
-        try {
-            run.run()
-            return null
-        } catch(Throwable t) {
-            return t
+            return error != null
         }
+
+        while(exec.get(run)) {}
     }
 }
 
@@ -110,7 +115,7 @@ task fetchComps {
 
         UnsafeRunnable mainRun = {
         Http.get("https://api.github.com/repos/Anuken/Mindustry/contents/core/src/mindustry/entities/comp?ref=$mindustryVersion")
-            .timeout(0)
+            .error({ final t -> throw new RuntimeException(t) })
             .block({ final res ->
                 final def list = Jval.read(res.getResultAsString()).asArray()
                 println "Found $list.size entity components."
@@ -121,7 +126,7 @@ task fetchComps {
 
                     final UnsafeRunnable run = {
                     Http.get(fileurl)
-                        .timeout(0)
+                        .error({ final t -> throw new RuntimeException(t) })
                         .block({ final comp ->
                             final def content = comp.getResultAsString()
                                 .replace('mindustry.entities.comp', "$fetchPackage".replace('/', '.') as String)
@@ -138,22 +143,23 @@ task fetchComps {
                             final def fi = Fi.get("$fetchDir/$filename")
                             fi.writeString(content, false)
                         })
-                        .error({ final t -> throw new RuntimeException(t) })
                     }
 
                     fetches.add(new Fetcher(run: run))
                 }
             })
-            .error({ final t -> throw new RuntimeException(t) })
         }
 
         new Fetcher(run: mainRun).execute()
+
         final def found = fetches.size()
+        def progress = new AtomicInteger(found)
 
         Seq<Thread> threads = Seq.with(fetches).map({ final Fetcher fetch -> new Thread({
             fetch.execute()
             synchronized(fetches) {
                 fetches.remove(fetch)
+                print '\b'
             }
         }) })
 
