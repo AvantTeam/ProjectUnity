@@ -27,7 +27,7 @@ public class SlowRailBulletType extends BasicBulletType{
     public void update(Bullet b){
         hit = false;
         Utils.collideLineRawEnemy(b.team, b.lastX, b.lastY, b.x, b.y, 3f, 3f, (building, direct) -> {
-            if(direct && !b.collided.contains(building.id)){
+            if(direct && collidesGround && !b.collided.contains(building.id)){
                 float h = building.health;
                 building.collision(b);
                 hitTile(b, building, h, true);
@@ -35,7 +35,7 @@ public class SlowRailBulletType extends BasicBulletType{
             }
             return (hit = (building.block.absorbLasers || b.collided.size >= pierceCap));
         }, unit -> {
-            if(!b.collided.contains(unit.id)){
+            if(unit.checkTarget(collidesAir, collidesGround) && !b.collided.contains(unit.id)){
                 hitEntity(b, unit, unit.health);
                 b.collided.add(unit.id);
             }

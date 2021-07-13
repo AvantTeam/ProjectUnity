@@ -1230,35 +1230,39 @@ public class UnityUnitTypes implements ContentList{
                 barrelRecoil = 5f;
                 barrels = 2;
 
-                bullet = new ArtilleryBulletType(3f, 50){{
+                bullet = new SlowRailBulletType(15f, 95f){{
+                    lifetime = 20f;
+                    splashDamageRadius = 90f;
+                    splashDamage = 90f;
                     hitEffect = Fx.sapExplosion;
-                    knockback = 0.8f;
-                    lifetime = 80f;
-                    width = height = 25f;
-                    collidesTiles = collides = true;
                     ammoMultiplier = 4f;
-                    splashDamageRadius = 80f;
-                    splashDamage = 80f;
-                    backColor = Pal.sapBulletBack;
+                    trailEffect = TrailFx.coloredRailgunSmallTrail;
+                    trailSpacing = 15f;
+                    backColor = trailColor = Pal.sapBulletBack;
                     frontColor = lightningColor = Pal.sapBullet;
-                    lightning = 5;
+                    lightning = 3;
                     lightningLength = 20;
                     smokeEffect = Fx.shootBigSmoke2;
                     hitShake = 10f;
                     lightRadius = 40f;
                     lightColor = Pal.sap;
                     lightOpacity = 0.6f;
+                    width = 12f;
+                    height = 23f;
+                    collidesAir = false;
+                    scaleVelocity = true;
+                    pierceCap = 2;
 
                     status = StatusEffects.sapped;
                     statusDuration = 60f * 10;
 
                     fragLifeMin = 0.3f;
-                    fragBullets = 9;
+                    fragBullets = 4;
 
                     fragBullet = new ArtilleryBulletType(2.3f, 30){{
                         hitEffect = Fx.sapExplosion;
                         knockback = 0.8f;
-                        lifetime = 90f;
+                        lifetime = 70f;
                         width = height = 20f;
                         collidesTiles = false;
                         splashDamageRadius = 70f;
