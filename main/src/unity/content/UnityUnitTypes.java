@@ -1461,6 +1461,7 @@ public class UnityUnitTypes implements ContentList{
                     incendAmount = 2;
                     width = 27f;
                     collisionWidth = 10f;
+                    pierceCap = 2;
                 }};
             }}, new Weapon(name + "-mount"){{
                 x = 30.75f;
