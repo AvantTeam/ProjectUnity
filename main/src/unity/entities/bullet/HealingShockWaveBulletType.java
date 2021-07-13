@@ -4,6 +4,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
+import arc.util.*;
 import arc.util.pooling.*;
 import mindustry.*;
 import mindustry.content.*;
@@ -83,8 +84,8 @@ public class HealingShockWaveBulletType extends BulletType{
                 ShockWavePositionData d = data.posData[i];
                 float ang = i * 360f / data.posData.length;
                 if(!d.hit){
-                    d.x += Angles.trnsx(ang, shockwaveSpeed);
-                    d.y += Angles.trnsy(ang, shockwaveSpeed);
+                    d.x += Angles.trnsx(ang, shockwaveSpeed) * Time.delta;
+                    d.y += Angles.trnsy(ang, shockwaveSpeed) * Time.delta;
                 }
                 Building ins = Vars.world.buildWorld(d.x, d.y);
                 if(ins != null && ins.block.absorbLasers) d.hit = true;
