@@ -58,6 +58,7 @@ public class AcceleratingLaserBulletType extends BulletType{
     public void init(){
         super.init();
         drawSize = maxLength * 2f;
+        despawnHit = false;
     }
 
     @Override

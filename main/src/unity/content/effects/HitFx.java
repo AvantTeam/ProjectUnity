@@ -113,6 +113,16 @@ public class HitFx{
         randLenVectors(e.id, 5, e.fin() * 15f, (x, y) -> lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fout() * 3f + 1f));
     }),
 
+    coloredHitLarge = new Effect(21f, e -> {
+        color(Color.white, e.color, e.fin());
+        e.scaled(8f, s -> {
+            stroke(0.5f + s.fout());
+            circle(e.x, e.y, s.fin() * 11f);
+        });
+        stroke(0.5f + e.fout());
+        randLenVectors(e.id, 6, e.fin() * 35f, e.rotation + 180f, 45f, (x, y) -> lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fout() * 7f + 1f));
+    }),
+
     eclipseHit = new Effect(15f, e -> {
         color(Color.valueOf("c2ebff"), Color.valueOf("68c0ff"), e.fin());
 

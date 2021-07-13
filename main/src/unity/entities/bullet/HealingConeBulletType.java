@@ -51,6 +51,12 @@ public class HealingConeBulletType extends BulletType{
     }
 
     @Override
+    public void init(){
+        super.init();
+        drawSize = Math.max(drawSize, length * 2f);
+    }
+
+    @Override
     public void init(Bullet b){
         super.init(b);
         b.data = new float[scanAccuracy];

@@ -1462,6 +1462,8 @@ public class UnityUnitTypes implements ContentList{
                     width = 27f;
                     collisionWidth = 10f;
                     pierceCap = 2;
+                    hitEffect = HitFx.coloredHitLarge;
+                    hitColor = Pal.meltdownHit;
                 }};
             }}, new Weapon(name + "-mount"){{
                 x = 30.75f;
@@ -1543,7 +1545,7 @@ public class UnityUnitTypes implements ContentList{
                 }
             };
 
-            weapons.add(new Weapon(){{
+            weapons.add(new Weapon(name + "-laser"){{
                 x = 0f;
                 y = 0f;
                 shootY = 34.25f;
@@ -1552,6 +1554,7 @@ public class UnityUnitTypes implements ContentList{
                 reload = 7f * 60f;
                 continuous = true;
                 recoil = 0f;
+                cooldownTime = 6f * 60f;
 
                 bullet = new AcceleratingLaserBulletType(320f){{
                     lifetime = 4f * 60f;
@@ -1567,6 +1570,8 @@ public class UnityUnitTypes implements ContentList{
                     splashDamage = 40f;
                     splashDamageRadius = 50f;
                     pierceCap = 5;
+                    hitEffect = HitFx.coloredHitLarge;
+                    hitColor = Pal.meltdownHit;
                 }};
 
                 shootStatus = StatusEffects.slow;
