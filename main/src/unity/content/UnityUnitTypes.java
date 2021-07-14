@@ -855,6 +855,7 @@ public class UnityUnitTypes implements ContentList{
             mechFrontSway = 2f;
             mechSideSway = 0.7f;
             mechStride = (4f + (hitSize - 8f) / 2.1f) / 1.25f;
+            immunities.add(StatusEffects.burning);
 
             weapons.add(new Weapon(name + "-weapon"){{
                 top = false;
@@ -870,13 +871,13 @@ public class UnityUnitTypes implements ContentList{
                 bullet = new SlowRailBulletType(25f, 250f){{
                     lifetime = 13f;
                     trailSpacing = 25f;
-                    splashDamage = 80f;
+                    splashDamage = 95f;
                     splashDamageRadius = 50f;
                     hitEffect = Fx.hitBulletBig;
                     shootEffect = Fx.instShoot;
                     trailEffect = TrailFx.coloredRailgunSmallTrail;
-                    width = 7f;
-                    height = 15f;
+                    width = 9f;
+                    height = 17f;
                     shrinkY = 0f;
                     shrinkX = 0f;
                     pierceCap = 7;

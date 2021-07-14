@@ -569,7 +569,7 @@ public class UnityBullets implements ContentList{
             weaveMag = 2f;
         }};
 
-        citadelFlame = new FlameBulletType(4.2f, 45f){{
+        citadelFlame = new FlameBulletType(4.2f, 50f){{
             lifetime = 20f;
             particleAmount = 17;
         }};

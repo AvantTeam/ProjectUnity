@@ -96,6 +96,7 @@ public class AcceleratingLaserBulletType extends BulletType{
     @Override
     public void init(Bullet b){
         super.init(b);
+        despawnHit = false;
         b.data = new LaserData();
     }
 
