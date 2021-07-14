@@ -24,6 +24,12 @@ public class SlowRailBulletType extends BasicBulletType{
     }
 
     @Override
+    public void init(){
+        super.init();
+        drawSize = Math.max(drawSize, (Math.max(height, width) + (speed * lifetime * 0.75f)) * 2f);
+    }
+
+    @Override
     public void update(Bullet b){
         hit = false;
         Utils.collideLineRawEnemy(b.team, b.lastX, b.lastY, b.x, b.y, 3f, 3f, (building, direct) -> {
@@ -59,7 +65,7 @@ public class SlowRailBulletType extends BasicBulletType{
     public void draw(Bullet b){
         drawTrail(b);
         float height = this.height * ((1f - shrinkY) + shrinkY * b.fout());
-        float width = this.width * ((1f - shrinkX) + shrinkX * b.fout());
+        float width = (this.width * ((1f - shrinkX) + shrinkX * b.fout())) / 1.5f;
         Tmp.v1.trns(b.rotation(), height / 2f);
         Draw.color(backColor);
         Drawf.tri(b.x, b.y, width, speed * lifetime * 0.75f * b.fin(), b.rotation() + 180f);

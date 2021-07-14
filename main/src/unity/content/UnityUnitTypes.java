@@ -1249,6 +1249,7 @@ public class UnityUnitTypes implements ContentList{
                     lightOpacity = 0.6f;
                     width = 12f;
                     height = 23f;
+                    shrinkY = 0f;
                     collidesAir = false;
                     scaleVelocity = true;
                     pierceCap = 2;
@@ -1259,27 +1260,7 @@ public class UnityUnitTypes implements ContentList{
                     fragLifeMin = 0.3f;
                     fragBullets = 4;
 
-                    fragBullet = new ArtilleryBulletType(2.3f, 30){{
-                        hitEffect = Fx.sapExplosion;
-                        knockback = 0.8f;
-                        lifetime = 70f;
-                        width = height = 20f;
-                        collidesTiles = false;
-                        splashDamageRadius = 70f;
-                        splashDamage = 60f;
-                        backColor = Pal.sapBulletBack;
-                        frontColor = lightningColor = Pal.sapBullet;
-                        lightning = 2;
-                        lightningLength = 5;
-                        smokeEffect = Fx.shootBigSmoke2;
-                        hitShake = 5f;
-                        lightRadius = 30f;
-                        lightColor = Pal.sap;
-                        lightOpacity = 0.5f;
-
-                        status = StatusEffects.sapped;
-                        statusDuration = 60f * 10;
-                    }};
+                    fragBullet = UnityBullets.sapArtilleryFrag;
                 }};
             }});
         }};
@@ -1363,65 +1344,51 @@ public class UnityUnitTypes implements ContentList{
                 
                 bullet = UnityBullets.continuousSapLaser;
             }},
-            new MultiBarrelWeapon(name + "-cannon"){{
+            new Weapon(name + "-railgun"){{
                 x = 20.5f;
                 y = -10f;
-                shootY = 20.5f - 10.5f;
+                shootY = 20.5f - 4f;
                 shootSound = Sounds.artillery;
                 rotate = true;
                 alternate = true;
                 rotateSpeed = 0.9f;
-                reload = 50f;
+                cooldownTime = 90f;
+                reload = 90f;
                 shake = 6f;
-                recoil = 5f;
-                barrels = 2;
-                barrelOffset = 7.25f;
-                barrelSpacing = 11.25f;
-                barrelRecoil = 5.5f;
+                recoil = 8f;
 
-                bullet = new ArtilleryBulletType(3.5f, 70f){
-                    @Override
-                    public void update(Bullet b){
-                        super.update(b);
-                        if(Mathf.chanceDelta(0.3f)) Lightning.create(b, Pal.sapBullet, 43f, b.x, b.y, Mathf.range(56f) + b.rotation(), 8);
-                    }
+                bullet = new SlowRailBulletType(15f, 95f){{
+                    lifetime = 23f;
+                    splashDamageRadius = 110f;
+                    splashDamage = 90f;
+                    hitEffect = Fx.sapExplosion;
+                    ammoMultiplier = 4f;
+                    trailEffect = TrailFx.coloredRailgunSmallTrail;
+                    trailSpacing = 15f;
+                    backColor = trailColor = Pal.sapBulletBack;
+                    frontColor = lightningColor = Pal.sapBullet;
+                    lightning = 3;
+                    lightningLength = 20;
+                    smokeEffect = Fx.shootBigSmoke2;
+                    hitShake = 10f;
+                    lightRadius = 40f;
+                    lightColor = Pal.sap;
+                    lightOpacity = 0.6f;
+                    width = 13f;
+                    height = 27f;
+                    shrinkY = 0f;
+                    collidesAir = false;
+                    scaleVelocity = true;
+                    pierceCap = 3;
 
-                    {
-                        lifetime = 85f;
-                        collides = true;
-                        collidesTiles = true;
-                        splashDamageRadius = 90f;
-                        splashDamage = 90f;
-                        width = height = 27f;
-                        ammoMultiplier = 3f;
-                        knockback = 0.9f;
-                        hitShake = 7f;
-                        status = StatusEffects.sapped;
-                        statusDuration = 60f * 10f;
-                        smokeEffect = Fx.shootBigSmoke2;
-                        backColor = Pal.sapBulletBack;
-                        frontColor = lightningColor = Pal.sapBullet;
-                        lightning = 6;
-                        lightningLength = 23;
-                        fragLifeMin = 0.3f;
-                        fragBullets = 13;
-                        fragBullet = new ArtilleryBulletType(2.5f, 35f){{
-                            collidesTiles = false;
-                            lifetime = 82f;
-                            splashDamageRadius = 70f;
-                            splashDamage = 70f;
-                            width = height = 20f;
-                            hitShake = 4f;
-                            status = StatusEffects.sapped;
-                            statusDuration = 60f * 10f;
-                            smokeEffect = Fx.shootBigSmoke2;
-                            backColor = Pal.sapBulletBack;
-                            frontColor = lightningColor = Pal.sapBullet;
-                            lightning = 3;
-                            lightningLength = 6;
-                        }};
-                    }
-                };
+                    status = StatusEffects.sapped;
+                    statusDuration = 60f * 10;
+
+                    fragLifeMin = 0.3f;
+                    fragBullets = 4;
+
+                    fragBullet = UnityBullets.sapArtilleryFrag;
+                }};
             }});
         }};
 

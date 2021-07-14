@@ -37,7 +37,7 @@ public class UnityBullets implements ContentList{
 
         basicMissile, citadelFlame,
 
-        sapLaser, continuousSapLaser,
+        sapLaser, sapArtilleryFrag, continuousSapLaser,
 
         coalBlaze, pyraBlaze,
 
@@ -572,6 +572,28 @@ public class UnityBullets implements ContentList{
         citadelFlame = new FlameBulletType(4.2f, 45f){{
             lifetime = 20f;
             particleAmount = 17;
+        }};
+
+        sapArtilleryFrag = new ArtilleryBulletType(2.3f, 30){{
+            hitEffect = Fx.sapExplosion;
+            knockback = 0.8f;
+            lifetime = 70f;
+            width = height = 20f;
+            collidesTiles = false;
+            splashDamageRadius = 70f;
+            splashDamage = 60f;
+            backColor = Pal.sapBulletBack;
+            frontColor = lightningColor = Pal.sapBullet;
+            lightning = 2;
+            lightningLength = 5;
+            smokeEffect = Fx.shootBigSmoke2;
+            hitShake = 5f;
+            lightRadius = 30f;
+            lightColor = Pal.sap;
+            lightOpacity = 0.5f;
+
+            status = StatusEffects.sapped;
+            statusDuration = 60f * 10;
         }};
 
         sapLaser = new LaserBulletType(80f){{
