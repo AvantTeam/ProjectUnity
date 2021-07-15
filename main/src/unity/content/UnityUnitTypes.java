@@ -866,7 +866,7 @@ public class UnityUnitTypes implements ContentList{
                 recoil = 7f;
                 shake = 3f;
                 ejectEffect = Fx.casing4;
-                shootSound = Sounds.bang;
+                shootSound = Sounds.railgun;
 
                 bullet = new SlowRailBulletType(25f, 250f){{
                     lifetime = 13f;
@@ -1223,7 +1223,7 @@ public class UnityUnitTypes implements ContentList{
                 recoil = 3f;
                 rotateSpeed = 1f;
                 ejectEffect = Fx.none;
-                shootSound = Sounds.artillery;
+                shootSound = Sounds.railgun;
                 rotate = true;
                 shadow = 40f;
                 barrelSpacing = 11.25f;
@@ -1349,7 +1349,7 @@ public class UnityUnitTypes implements ContentList{
                 x = 20.5f;
                 y = -10f;
                 shootY = 20.5f - 4f;
-                shootSound = Sounds.artillery;
+                shootSound = Sounds.railgun;
                 rotate = true;
                 alternate = true;
                 rotateSpeed = 0.9f;
@@ -1896,22 +1896,29 @@ public class UnityUnitTypes implements ContentList{
                     status = StatusEffects.blasted;
                     statusDuration = 60f;
                 }};
-            }}, new MultiBarrelWeapon(name + "-turret"){{
+            }}, new Weapon(name + "-railgun"){{
                 x = 0f;
-                y = -6f;
-                shootY = 20f;
-                barrelOffset = 4.5f;
-                barrelSpacing = 4.5f;
-                barrelRecoil = 4f;
-                barrels = 4;
+                y = 0f;
+                shootY = 38.5f;
                 mirror = false;
                 rotate = true;
-                rotateSpeed = 2f;
+                rotateSpeed = 0.7f;
                 shadow = 46f;
-                reload = 15f;
-                shootSound = Sounds.artillery;
+                reload = 60f * 2.5f;
+                shootSound = Sounds.railgun;
 
-                bullet = UnityBullets.artilleryExplosiveT2;
+                bullet = new SlowRailBulletType(70f, 2100f){{
+                    lifetime = 10f;
+                    width = 20f;
+                    height = 38f;
+                    pierceDamageFactor = 0.15f;
+                    pierceCap = -1;
+                    trailSpacing = 40f;
+                    trailEffect = TrailFx.coloredArrowTrail;
+                    backColor = trailColor = Pal.bulletYellowBack;
+                    frontColor = Pal.bulletYellow;
+                    collisionWidth = 12f;
+                }};
             }});
         }};
 

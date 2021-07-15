@@ -1,6 +1,8 @@
 package unity.content.effects;
 
+import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.util.*;
 import mindustry.entities.*;
 import mindustry.graphics.*;
 
@@ -20,6 +22,15 @@ public class TrailFx{
             int sign = Mathf.signs[i];
             color(e.color);
             Drawf.tri(e.x, e.y, 5f * e.fout(), 12f, e.rotation + 90f + 90f * sign);
+        }
+    }),
+
+    coloredArrowTrail = new Effect(40f, 80f, e -> {
+        Tmp.v1.trns(e.rotation, 5f * e.fout());
+        Draw.color(e.color);
+        for(int s : Mathf.signs){
+            Tmp.v2.trns(e.rotation - 90f, 9f * s * ((e.fout() + 2f) / 3f), -20f);
+            Fill.tri(Tmp.v1.x + e.x, Tmp.v1.y + e.y, -Tmp.v1.x + e.x, -Tmp.v1.y + e.y, Tmp.v2.x + e.x, Tmp.v2.y + e.y);
         }
     });
 }

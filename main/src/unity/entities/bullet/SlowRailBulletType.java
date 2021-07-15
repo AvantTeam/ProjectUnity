@@ -14,11 +14,13 @@ import unity.util.*;
  */
 public class SlowRailBulletType extends BasicBulletType{
     public float trailSpacing = 5f;
+    public float collisionWidth = 3f;
+    public float pierceDamageFactor = 0f;
     private static boolean hit = false;
 
     public SlowRailBulletType(float speed, float damage){
         super(speed, damage);
-        collides = collidesTiles = false;
+        collides = collidesTiles = backMove = reflectable = false;
         pierce = pierceBuilding = true;
         trailEffect = TrailFx.coloredRailgunTrail;
     }
@@ -32,20 +34,24 @@ public class SlowRailBulletType extends BasicBulletType{
     @Override
     public void update(Bullet b){
         hit = false;
-        Utils.collideLineRawEnemy(b.team, b.lastX, b.lastY, b.x, b.y, 3f, 3f, (building, direct) -> {
+        Utils.collideLineRawEnemy(b.team, b.lastX, b.lastY, b.x, b.y, collisionWidth, collisionWidth, (building, direct) -> {
             if(direct && collidesGround && !b.collided.contains(building.id)){
                 float h = building.health;
+                float sub = Math.max(building.health * pierceDamageFactor, 0);
                 building.collision(b);
                 hitTile(b, building, h, true);
-                b.collided.add(building.id);
+                if(pierceCap > 0) b.collided.add(building.id);
+                b.damage -= sub;
             }
-            return (hit = (building.block.absorbLasers || b.collided.size >= pierceCap));
+            return (hit = (building.block.absorbLasers || (pierceCap > 0 && b.collided.size >= pierceCap) || b.damage <= 0f));
         }, unit -> {
             if(unit.checkTarget(collidesAir, collidesGround) && !b.collided.contains(unit.id)){
+                float sub = Math.max(unit.health * pierceDamageFactor, 0);
                 hitEntity(b, unit, unit.health);
-                b.collided.add(unit.id);
+                if(pierceCap > 0) b.collided.add(unit.id);
+                b.damage -= sub;
             }
-            return (hit = b.collided.size >= pierceCap);
+            return (hit = ((pierceCap > 0 && b.collided.size >= pierceCap) || b.damage <= 0f));
         }, (x, y) -> {
             if(hit){
                 Tmp.v1.trns(b.rotation(), Mathf.dst(b.lastX, b.lastY, x, y)).add(b.lastX, b.lastY);
@@ -54,10 +60,16 @@ public class SlowRailBulletType extends BasicBulletType{
             }
             hit(b, x, y);
         }, true);
-        b.fdata += b.deltaLen();
+        float len = b.deltaLen();
+        b.fdata += Mathf.dst(b.lastX, b.lastY, b.x, b.y);
         if(b.fdata >= trailSpacing){
-            trailEffect.at(b.x, b.y, b.rotation(), trailColor);
-            b.fdata = 0f;
+            while(b.fdata >= trailSpacing){
+                Tmp.v1.trns(b.rotation(), speed).add(b.lastX, b.lastY);
+                float ex = Mathf.lerp(b.lastX, Tmp.v1.x, 1f - (b.fdata / len));
+                float ey = Mathf.lerp(b.lastY, Tmp.v1.y, 1f - (b.fdata / len));
+                trailEffect.at(ex, ey, b.rotation(), trailColor);
+                b.fdata -= trailSpacing;
+            }
         }
     }
 
