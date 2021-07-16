@@ -36,7 +36,6 @@ import arc.util.*
 import arc.util.serialization.*
 
 import java.util.concurrent.*
-import java.util.concurrent.atomic.*
 
 task deploy(type: Jar, dependsOn: configurations.runtimeClasspath) {
     archiveFileName.set "${modName}Desktop.jar"
@@ -153,7 +152,6 @@ task fetchComps {
         new Fetcher(run: mainRun).execute()
 
         final def found = fetches.size()
-        def progress = new AtomicInteger(found)
 
         Seq<Thread> threads = Seq.with(fetches).map({ final Fetcher fetch -> new Thread({
             fetch.execute()
