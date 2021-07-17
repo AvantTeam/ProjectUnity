@@ -20,9 +20,6 @@ public class LimitedAngleWeapon extends Weapon{
 
     public LimitedAngleWeapon(String name){
         super(name);
-    }
-
-    {
         mountType = weapon -> {
             WeaponMount mount = new WeaponMount(weapon);
             mount.rotation = defaultAngle * Mathf.sign(flipSprite);

@@ -155,9 +155,8 @@ public class HitFx{
     hitAdvanceFlame = new Effect(15f, e -> {
         color(UnityPal.advance, UnityPal.advanceDark, e.fin());
 
-        Angles.randLenVectors(e.id, 2, e.finpow() * 17f, e.rotation, 60f, (x, y) -> {
-            Fill.poly(e.x + x, e.y + y, 6, 3f + e.fout() * 3f, e.rotation);
-        });
+        Angles.randLenVectors(e.id, 2, e.finpow() * 17f, e.rotation, 60f, (x, y) ->
+        Fill.poly(e.x + x, e.y + y, 6, 3f + e.fout() * 3f, e.rotation));
     }),
 
     branchFragHit = new Effect(8f, e -> {
@@ -168,5 +167,26 @@ public class HitFx{
 
         stroke(e.fout());
         Lines.circle(e.x, e.y, e.fin() * 6f);
+    }),
+
+    hitExplosionMassive = new Effect(70f, 370f, e -> {
+        e.scaled(17f, s -> {
+            Draw.color(Color.white, Color.lightGray, e.fin());
+            stroke(s.fout() + 0.5f);
+            Lines.circle(e.x, e.y, e.fin() * 185f);
+        });
+
+        color(Color.gray);
+
+        randLenVectors(e.id, 12, 5f + 135f * e.finpow(), (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, e.fout() * 22f + 0.5f);
+            Fill.circle(e.x + x / 2f, e.y + y / 2f, e.fout() * 9f);
+        });
+
+        color(Pal.lighterOrange, Pal.lightOrange, Color.gray, e.fin());
+        stroke(1.5f * e.fout());
+
+        randLenVectors(e.id + 1, 14, 1f + 160f * e.finpow(), (x, y) ->
+        lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1f + e.fout() * 3f));
     });
 }

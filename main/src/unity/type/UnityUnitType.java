@@ -714,6 +714,10 @@ public class UnityUnitType extends UnitType{
                 if(weapon instanceof MultiBarrelWeapon m && outlined.add(weapon.name + "-barrel")){
                     outlSeparate.get(m.barrelRegion, "outline");
                 }
+                if(weapon instanceof MortarWeapon m){
+                    outliner.get(m.barrelRegion);
+                    outliner.get(m.barrelEndRegion);
+                }
                 if((!weapon.top || bottomWeapons.contains(weapon.name))){
                     var out = GraphicUtils.get(packer, weapon.name + "-outline");
                     Pixmap pix = out.crop();

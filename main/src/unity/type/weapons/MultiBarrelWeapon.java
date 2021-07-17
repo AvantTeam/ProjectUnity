@@ -22,9 +22,6 @@ public class MultiBarrelWeapon extends Weapon{
 
     public MultiBarrelWeapon(String name){
         super(name);
-    }
-
-    {
         mountType = MultiBarrelMount::new;
     }
 

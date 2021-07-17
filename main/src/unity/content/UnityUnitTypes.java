@@ -1727,37 +1727,33 @@ public class UnityUnitTypes implements ContentList{
                 shootSound = Sounds.missile;
 
                 bullet = UnityBullets.basicMissile;
-            }},
-            new MultiBarrelWeapon(name + "-cannon"){{
-                x = 27f;
-                y = -20f;
-                shootY = 22.5f;
+            }}, new MortarWeapon(name + "-mortar"){{
+                x = 0f;
+                y = -13.75f;
+                shootY = 39.5f;
+                mirror = false;
                 rotate = true;
-                alternate = false;
-                rotateSpeed = 7f;
-                inaccuracy = 5f;
-                mirrorBarrels = true;
-                barrels = 2;
-                barrelOffset = 8.5f;
-                barrelSpacing = 9.25f;
-                reload = 6f;
-                recoil = 3f;
-                barrelRecoil = 3f;
-                shadow = 40f;
-                shootSound = Sounds.artillery;
-                bullet = new AntiBulletFlakBulletType(6f, 6f){{
-                    shootEffect = Fx.shootBig;
-                    splashDamage = 46f;
-                    splashDamageRadius = 75f;
-                    bulletRadius = 70f;
-                    explodeRange = 45f;
-                    bulletDamage = 12f;
-                    width = 10f;
-                    height = 14f;
-                    scaleVelocity = true;
+                rotateSpeed = 1f;
+                shots = 3;
+                inaccuracy = 3f;
+                velocityRnd = 0.1f;
+                reload = 60f * 2f;
+                recoil = 2f;
 
-                    status = StatusEffects.blasted;
-                    statusDuration = 60f;
+                bullet = new MortarBulletType(7f, 4f){{
+                    width = height = 22f;
+                    splashDamageRadius = 160f;
+                    splashDamage = 160f;
+                    trailWidth = 7f;
+                    trailColor = Pal.bulletYellowBack;
+                    hitEffect = HitFx.hitExplosionMassive;
+                    lifetime = 65f;
+                    fragBullet = Bullets.artilleryDense;
+                    fragBullets = 7;
+                    fragLifeMax = 0.15f;
+                    fragLifeMin = 0.15f;
+                    despawnHit = true;
+                    collidesAir = false;
                 }};
             }});
         }};
@@ -1911,8 +1907,15 @@ public class UnityUnitTypes implements ContentList{
                     lifetime = 10f;
                     width = 20f;
                     height = 38f;
+                    splashDamage = 50f;
+                    splashDamageRadius = 30f;
                     pierceDamageFactor = 0.15f;
                     pierceCap = -1;
+                    fragBullet = Bullets.standardDense;
+                    fragBullets = 2;
+                    fragCone = 20f;
+                    fragLifeMin = 0.4f;
+                    fragLifeMax = 0.7f;
                     trailSpacing = 40f;
                     trailEffect = TrailFx.coloredArrowTrail;
                     backColor = trailColor = Pal.bulletYellowBack;
