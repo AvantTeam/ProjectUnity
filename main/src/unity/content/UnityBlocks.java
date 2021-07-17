@@ -1819,7 +1819,7 @@ public class UnityBlocks implements ContentList{
         archSharpslate = new Floor("archaic-sharpslate"){
             {
                 variants = 3;
-                updateEffect = UnityFx.archaicEnergy;
+                //updateEffect = UnityFx.archaicEnergy;
                 emitLight = true;
                 lightRadius = 24f;
                 lightColor = UnityPal.monolithLight.cpy().a(0.12f);
