@@ -4,7 +4,6 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
-import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
@@ -26,7 +25,7 @@ public class PointBlastLaserBulletType extends BulletType{
     private static boolean available = false;
 
     public PointBlastLaserBulletType(float damage){
-        speed = 0.01f;
+        speed = 0f;
         this.damage = damage;
 
         hitEffect = Fx.hitLancer;
@@ -95,7 +94,12 @@ public class PointBlastLaserBulletType extends BulletType{
 
         if(available){
             b.fdata = b.dst(Tmp.v2);
-            Vars.indexer.eachBlock(null, Tmp.v2.x, Tmp.v2.y, damageRadius, building -> building.team != b.team, building -> handleBuilding(b, building, building.health));
+            //Vars.indexer.eachBlock(null, Tmp.v2.x, Tmp.v2.y, damageRadius, building -> building.team != b.team, building -> handleBuilding(b, building, building.health));
+            Utils.trueEachBlock(Tmp.v2.x, Tmp.v2.y, damageRadius, building -> {
+                if(building.team != b.team){
+                    handleBuilding(b, building, building.health);
+                }
+            });
             Units.nearby(Tmp.v2.x - damageRadius, Tmp.v2.y - damageRadius, damageRadius * 2f, damageRadius * 2f, unit -> {
                 if(unit.team != b.team && unit.within(Tmp.v2.x, Tmp.v2.y, damageRadius)){
                     float ratio = b.damage / damage;
