@@ -126,7 +126,7 @@ public class Unity extends Mod{
         antiCheat = new AntiCheat();
         model = new Models();
 
-        asyncCore.processes.add(new LightProcess());
+        asyncCore.processes.add(new LightProcess(), new ContentScoreProcess());
     }
 
     @Override

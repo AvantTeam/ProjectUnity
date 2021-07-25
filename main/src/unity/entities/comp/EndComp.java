@@ -112,6 +112,22 @@ abstract class EndComp implements Unitc, Factionc{
     @MethodPriority(-1)
     @Override
     @BreakAll
+    public void damagePierce(float amount, boolean withEffect){
+        float pre = hitTime;
+
+        damage(amount);
+
+        if(!withEffect){
+            hitTime = pre;
+        }
+        //TODO make new annotation
+        if(true) return;
+    }
+
+    @Replace
+    @MethodPriority(-1)
+    @Override
+    @BreakAll
     public void damage(float amount){
         UnityUnitType utype = (UnityUnitType)type;
         AntiCheatVariables aType = utype.antiCheatType;
