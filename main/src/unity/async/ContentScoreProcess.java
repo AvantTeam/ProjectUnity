@@ -25,6 +25,7 @@ import java.util.*;
 
 @SuppressWarnings("unchecked")
 public class ContentScoreProcess implements AsyncProcess{
+    private static final int iterationError = 6;
     private boolean init = false, processing, finished = false;
     private final Seq<ContentScore> unloaded = new Seq<>();
     private final IntSet[] unloadedSet = new IntSet[ContentType.all.length];
@@ -50,6 +51,7 @@ public class ContentScoreProcess implements AsyncProcess{
                         case block -> handleBlock((Block)content);
                         case item -> handleItem((Item)content, false);
                         case liquid -> handleLiquid((Liquid)content, true);
+                        case bullet -> bulletScore((BulletType)content);
                         case sector, ammo, weather, planet, loadout_UNUSED, effect_UNUSED, mech_UNUSED, typeid_UNUSED, error -> unloadedSet[type.ordinal()] = null;
                         default -> {
                             ContentScore cs = new ContentScore(content);
@@ -64,7 +66,7 @@ public class ContentScoreProcess implements AsyncProcess{
             int l = 0;
             int e = 0;
             int er = 0;
-            while(unloaded.size > 0 && e < 4){
+            while(unloaded.size > 0 && e < iterationError){
                 if(l == unloaded.size){
                     e++;
                     er++;
@@ -93,10 +95,19 @@ public class ContentScoreProcess implements AsyncProcess{
                     out.append(score.content.toString()).append(": ")
                     .append("Score: ").append(score.loaded ? score.score : "unloaded")
                     .append(", Output Score: ").append(score.loaded ? score.outputScore : "unloaded")
-                    .append("\n");
+                    .append("\n")
+                    .append("Sources: ");
+                    if(score.origins != null){
+                        for(Content c : score.origins){
+                            out.append(c.toString()).append(":").append(get(c).loaded).append(",");
+                        }
+                    }else{
+                        out.append("No Origins");
+                    }
+                    out.append("\n");
                     v++;
                 }
-                out.append("Contents: ").append(v).append("\n");
+                out.append("Contents: ").append(v).append("\n\n");
                 s++;
             }
             String out2 = out.toString();
@@ -148,17 +159,19 @@ public class ContentScoreProcess implements AsyncProcess{
     }
 
     private void handleItem(Item item, boolean ore){
+        float energyScore = Mathf.sqr(item.charge + item.explosiveness + item.flammability);
+        float score = (float)Math.pow(Math.max(item.hardness + 1, 1), 1.5) * Math.max(item.cost + energyScore, 0.1f) * 1.5f;
+
         if(contains(item)){
             ContentScore s = get(item);
             if(ore && s.artificial){
+                s.score = score;
                 s.artificial = false;
                 s.loaded = true;
             }
             return;
         }
         //updateSize(item);
-        float energyScore = Mathf.sqr(item.charge + item.explosiveness + item.flammability);
-        float score = (float)Math.pow(Math.max(item.hardness + 1, 1), 1.5) * Math.max(item.cost + energyScore, 0.1f) * 1.5f;
 
         if(ore){
             ContentScore c = new ContentScore(item);
@@ -177,16 +190,18 @@ public class ContentScoreProcess implements AsyncProcess{
     }
 
     private void handleLiquid(Liquid liquid, boolean artificial){
+        float score = Mathf.sqr(liquid.flammability + liquid.explosiveness + Math.abs((liquid.temperature - 0.5f) * 2f)) + liquid.heatCapacity;
+
         if(contains(liquid)){
             ContentScore s = get(liquid);
             if(!artificial && s.artificial){
+                s.score = score;
                 s.artificial = false;
                 s.loaded = true;
             }
             return;
         }
         //updateSize(liquid);
-        float score = Mathf.sqr(liquid.flammability + liquid.explosiveness + liquid.temperature) + liquid.heatCapacity;
         ContentScore c = new ContentScore(liquid);
         c.score = artificial ? 0f : score;
         c.outputScore = score;
@@ -234,7 +249,7 @@ public class ContentScoreProcess implements AsyncProcess{
                     cs.addOrigin(re);
                 }
             }else if(block instanceof GenericCrafter gc){
-                if(gc.outputItem != null){
+                if(gc.outputItem != null && !Structs.contains(gc.requirements, st -> st.item == gc.outputItem.item)){
                     handleItem(gc.outputItem.item, false);
                     ContentScore cs = get(gc.outputItem.item);
                     cs.addOrigin(gc);
@@ -255,13 +270,6 @@ public class ContentScoreProcess implements AsyncProcess{
     public boolean shouldProcess(){
         return !processing;
     }
-
-    /*
-    @Override
-    public boolean shouldProcess(){
-        return init;
-    }
-    */
 
     float bulletScoreIndividual(BulletType b){
         float pierce = (!b.pierce || !b.collides || !b.collidesTiles) ? 1f : (b.pierceCap > 0 ? b.pierceCap / 3f : 3f),
@@ -315,18 +323,18 @@ public class ContentScoreProcess implements AsyncProcess{
         }
 
         void updateOutputScore(){
-            outputScore = 0f;
+            float outputScore = 0f;
             if(content instanceof UnitType type){
                 float size = ((type.hitSize * type.hitSize) / Mathf.PI) / 2f;
                 outputScore += ((type.health * (type.health / (type.health - type.armor))) / size) * ((type.speed / 2f) + 1f);
                 for(Weapon w : type.weapons){
                     outputScore += (bulletScore(w.bullet) / w.reload) * w.shots * (w.continuous ? w.bullet.lifetime / 5f : 1f);
                 }
-                outputScore /= (type.hitSize / 3f);
+                //outputScore /= (type.hitSize / 3f);
             }else if(content instanceof Block block){
                 outputScore += block.health / (float)(block.size * block.size);
                 if(content instanceof Wall wall){
-                    outputScore += (wall.chanceDeflect * block.health) + (wall.lightningDamage * (wall.lightningLength / 2f) * wall.lightningChance);
+                    outputScore += Math.max(wall.chanceDeflect * block.health, 0f) + Math.max(wall.lightningDamage * (wall.lightningLength / 2f) * wall.lightningChance, 0f);
                 }else if(content instanceof ItemTurret iTurret){
                     float ts = 0f;
                     for(Entry<Item, BulletType> type : iTurret.ammoTypes){
@@ -340,6 +348,7 @@ public class ContentScoreProcess implements AsyncProcess{
                     outputScore += (bulletScore(pTurret.shootType) / pTurret.rotateSpeed) * (!pTurret.alternate ? pTurret.shots : 1);
                 }
             }
+            this.outputScore = Math.max(this.outputScore, outputScore);
         }
 
         float fractScore(){
@@ -366,7 +375,8 @@ public class ContentScoreProcess implements AsyncProcess{
             for(ItemStack r : block.requirements){
                 score += get(r.item).score + Mathf.sqrt(r.amount);
             }
-            score /= 60f;
+            score *= block.size * block.size;
+            score /= 5f;
             for(Consume cons : block.consumes.all()){
                 if(cons.optional) continue;
                 if(cons instanceof ConsumePower c){
@@ -523,7 +533,7 @@ public class ContentScoreProcess implements AsyncProcess{
         }
 
         void updateScore(){
-            if(requiredLoaded() && blockLoaded() && !loaded){
+            if(!loaded && requiredLoaded() && blockLoaded()){
                 if(content instanceof Block){
                     generateBlockScore();
                 }else if(content instanceof Item){
