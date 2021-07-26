@@ -95,6 +95,7 @@ public class ContentScoreProcess implements AsyncProcess{
                     out.append(score.content.toString()).append(": ")
                     .append("Score: ").append(score.loaded ? score.score : "unloaded")
                     .append(", Output Score: ").append(score.loaded ? score.outputScore : "unloaded")
+                    .append(", Artificial: ").append(score.artificial)
                     .append("\n")
                     .append("Sources: ");
                     if(score.origins != null){
@@ -150,7 +151,7 @@ public class ContentScoreProcess implements AsyncProcess{
 
     private void addContent(ContentScore content){
         updateSize(content.content);
-        items[content.content.getContentType().ordinal()][content.content.id] = content;
+        if(items[content.content.getContentType().ordinal()][content.content.id] == null) items[content.content.getContentType().ordinal()][content.content.id] = content;
     }
 
     private boolean contains(Content c){
@@ -203,7 +204,7 @@ public class ContentScoreProcess implements AsyncProcess{
         }
         //updateSize(liquid);
         ContentScore c = new ContentScore(liquid);
-        c.score = artificial ? 0f : score;
+        c.score = score;
         c.outputScore = score;
         c.artificial = artificial;
         c.loaded = !artificial;
