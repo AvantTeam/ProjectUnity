@@ -32,6 +32,7 @@ public class ContentScoreProcess implements AsyncProcess{
     private final Seq<ContentScore> unloaded = new Seq<>();
     private final IntSet[] unloadedSet = new IntSet[ContentType.all.length];
     private ContentScore[][] items;
+    private final Seq<GenericCrafter> crafters = new Seq<>();
 
     public ContentScoreProcess(){
         Events.on(EventType.ContentInitEvent.class, event -> init = true);
@@ -286,6 +287,9 @@ public class ContentScoreProcess implements AsyncProcess{
             addContent(cs);
         }
          */
+        if(block instanceof GenericCrafter gc && gc.outputLiquid != null){
+            crafters.add(gc);
+        }
         Cons<ContentScore> run = cs2 -> {
             if(block instanceof Floor f){
                 if(f.itemDrop != null){
@@ -381,7 +385,7 @@ public class ContentScoreProcess implements AsyncProcess{
         Content content;
         int loadedc = 0, loadedLast = 0, skip;
         float score, outputScore, consumeScore;
-        boolean loaded = false, artificial = true;
+        boolean loaded = false, artificial = true, ffo = true;
         Content[] origins;
         Cons<ContentScore> update;
         short[] itemsRequired, liquidRequired;
@@ -629,10 +633,22 @@ public class ContentScoreProcess implements AsyncProcess{
             return true;
         }
 
+        void forceFindOrgin(){
+            for(GenericCrafter crafter : crafters){
+                if(crafter.outputLiquid != null && crafter.outputLiquid.liquid == content){
+                    addOrigin(crafter);
+                }
+            }
+        }
+
         void updateScore(){
             if(update != null){
                 update.get(this);
                 update = null;
+            }
+            if(artificial && ffo && origins == null && content instanceof Liquid){
+                forceFindOrgin();
+                ffo = false;
             }
             if(!loaded && requiredLoaded() && blockLoaded()){
                 if(content instanceof Block){
