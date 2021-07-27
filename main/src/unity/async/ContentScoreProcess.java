@@ -423,7 +423,7 @@ public class ContentScoreProcess implements AsyncProcess{
                 }else if(content instanceof ItemTurret iTurret){
                     float ts = 0f;
                     for(Entry<Item, BulletType> type : iTurret.ammoTypes){
-                        float ts2 = (bulletScore(type.value) / get(type.key).score) * 2f;
+                        float ts2 = (bulletScore(type.value) / Math.max(get(type.key).score, 0.5f));
                         ts = Math.max(ts2, ts);
                     }
                     ts /= iTurret.reloadTime;
