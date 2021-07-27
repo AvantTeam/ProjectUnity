@@ -31,8 +31,8 @@ public class ContentScoreProcess implements AsyncProcess{
     private boolean init = false, processing, finished = false;
     private final Seq<ContentScore> unloaded = new Seq<>();
     private final IntSet[] unloadedSet = new IntSet[ContentType.all.length];
+    private Seq<Content>[][] origins;
     private ContentScore[][] items;
-    private final Seq<GenericCrafter> crafters = new Seq<>();
 
     public ContentScoreProcess(){
         Events.on(EventType.ContentInitEvent.class, event -> init = true);
@@ -47,6 +47,13 @@ public class ContentScoreProcess implements AsyncProcess{
                 unloadedSet[i] = new IntSet(204);
             }
             items = new ContentScore[ContentType.all.length][0];
+            origins = new Seq[ContentType.all.length][0];
+            for(ContentType type : ContentType.all){
+                if(type != ContentType.sector
+                && type != ContentType.ammo
+                && type != ContentType.weather
+                && type != ContentType.planet) origins[type.ordinal()] = new Seq[content.getBy(type).size];
+            }
             for(ContentType type : ContentType.all){
                 items[type.ordinal()] = new ContentScore[content.getBy(type).size];
                 for(Content content : content.getBy(type)){
@@ -101,8 +108,8 @@ public class ContentScoreProcess implements AsyncProcess{
                     .append(", Artificial: ").append(score.artificial)
                     .append("\n")
                     .append("Sources: ");
-                    if(score.origins != null){
-                        for(Content c : score.origins){
+                    if(score.origins() != null){
+                        for(Content c : score.origins()){
                             out.append(c.toString()).append(":").append(get(c).loaded).append(",");
                         }
                     }else{
@@ -136,6 +143,20 @@ public class ContentScoreProcess implements AsyncProcess{
     public float getFractScore(Content content){
         if(!finished) return 0f;
         return get(content).fractScore();
+    }
+
+    private Seq<Content> getOrigins(Content content){
+        return origins[content.getContentType().ordinal()][content.id];
+    }
+
+    private void addOrigin(Content content, Content other){
+        if(origins[content.getContentType().ordinal()][content.id] == null){
+            origins[content.getContentType().ordinal()][content.id] = new Seq<>();
+        }
+        Seq<Content> origins = getOrigins(content);
+        if(!origins.contains(other)){
+            origins.add(other);
+        }
     }
 
     private ContentScore get(int id, ContentType type){
@@ -199,17 +220,12 @@ public class ContentScoreProcess implements AsyncProcess{
         addContent(c);
     }
 
-    private void handleLiquid(Liquid liquid, boolean artificial, Content... origins){
+    private void handleLiquid(Liquid liquid, boolean artificial){
         float score = Mathf.sqr(liquid.flammability + liquid.explosiveness + Math.abs((liquid.temperature - 0.5f) * 2f)) + liquid.heatCapacity;
 
         if(contains(liquid)){
             ContentScore s = get(liquid);
             if(!artificial && s.artificial){
-                if(origins != null){
-                    for(Content origin : origins){
-                        s.addOrigin(origin);
-                    }
-                }
                 s.score = score;
                 s.artificial = false;
                 s.loaded = true;
@@ -221,11 +237,6 @@ public class ContentScoreProcess implements AsyncProcess{
         c.outputScore = score;
         c.artificial = artificial;
         c.loaded = !artificial;
-        if(origins != null){
-            for(Content origin : origins){
-                c.addOrigin(origin);
-            }
-        }
         addContent(c);
         if(artificial) addUnloaded(c);
     }
@@ -233,7 +244,6 @@ public class ContentScoreProcess implements AsyncProcess{
     private void handleBlock(Block block){
         //updateSize(block);
 
-        /*
         if(block instanceof Floor f){
             if(f.itemDrop != null){
                 handleItem(f.itemDrop, true);
@@ -251,99 +261,22 @@ public class ContentScoreProcess implements AsyncProcess{
             }
             if(block instanceof UnitFactory uf){
                 for(UnitPlan plan : uf.plans){
-                    if(!contains(plan.unit)){
-                        ContentScore cs = new ContentScore(plan.unit);
-                        cs.addOrigin(block);
-                        addContent(cs);
-                    }else{
-                        ContentScore cs = get(plan.unit);
-                        cs.addOrigin(uf);
-                    }
+                    addOrigin(plan.unit, block);
                 }
             }else if(block instanceof Reconstructor re){
                 for(UnitType[] types : re.upgrades){
                     UnitType type = types[1];
-                    if(!contains(type)){
-                        ContentScore cs = new ContentScore(type);
-                        cs.addOrigin(block);
-                        addContent(cs);
-                    }else{
-                        ContentScore cs = get(type);
-                        cs.addOrigin(re);
-                    }
+                    addOrigin(type, block);
                 }
             }else if(block instanceof GenericCrafter gc){
                 if(gc.outputItem != null && !Structs.contains(gc.requirements, st -> st.item == gc.outputItem.item)){
-                    handleItem(gc.outputItem.item, false);
-                    ContentScore cs = get(gc.outputItem.item);
-                    cs.addOrigin(block);
+                    addOrigin(gc.outputItem.item, block);
                 }
                 if(gc.outputLiquid != null){
-                    handleLiquid(gc.outputLiquid.liquid, true, block);
+                    addOrigin(gc.outputLiquid.liquid, block);
                 }
             }
             ContentScore cs = new ContentScore(block);
-            addUnloaded(cs);
-            addContent(cs);
-        }
-         */
-        if(block instanceof GenericCrafter gc && gc.outputLiquid != null){
-            crafters.add(gc);
-        }
-        Cons<ContentScore> run = cs2 -> {
-            if(block instanceof Floor f){
-                if(f.itemDrop != null){
-                    handleItem(f.itemDrop, true);
-                }
-                if(f.liquidDrop != null){
-                    handleLiquid(f.liquidDrop, false);
-                }
-                return;
-            }
-            if(block.synthetic()){
-                if(block.requirements.length > 0){
-                    for(ItemStack req : block.requirements){
-                        handleItem(req.item, false);
-                    }
-                }
-                if(block instanceof UnitFactory uf){
-                    for(UnitPlan plan : uf.plans){
-                        if(!contains(plan.unit)){
-                            ContentScore cs = new ContentScore(plan.unit);
-                            cs.addOrigin(block);
-                            addContent(cs);
-                        }else{
-                            ContentScore cs = get(plan.unit);
-                            cs.addOrigin(uf);
-                        }
-                    }
-                }else if(block instanceof Reconstructor re){
-                    for(UnitType[] types : re.upgrades){
-                        UnitType type = types[1];
-                        if(!contains(type)){
-                            ContentScore cs = new ContentScore(type);
-                            cs.addOrigin(block);
-                            addContent(cs);
-                        }else{
-                            ContentScore cs = get(type);
-                            cs.addOrigin(re);
-                        }
-                    }
-                }else if(block instanceof GenericCrafter gc){
-                    if(gc.outputItem != null && !Structs.contains(gc.requirements, st -> st.item == gc.outputItem.item)){
-                        handleItem(gc.outputItem.item, false);
-                        ContentScore cs = get(gc.outputItem.item);
-                        cs.addOrigin(block);
-                    }
-                    if(gc.outputLiquid != null){
-                        handleLiquid(gc.outputLiquid.liquid, true, block);
-                    }
-                }
-            }
-        };
-        if((!(block instanceof Floor fl) || fl.itemDrop != null || fl.liquidDrop != null) && (block instanceof Floor || block.synthetic())){
-            ContentScore cs = new ContentScore(block);
-            cs.update = run;
             addUnloaded(cs);
             addContent(cs);
         }
@@ -385,8 +318,7 @@ public class ContentScoreProcess implements AsyncProcess{
         Content content;
         int loadedc = 0, loadedLast = 0, skip;
         float score, outputScore, consumeScore;
-        boolean loaded = false, artificial = true, ffo = true;
-        Content[] origins;
+        boolean loaded = false, artificial = true;
         Cons<ContentScore> update;
         short[] itemsRequired, liquidRequired;
 
@@ -396,15 +328,6 @@ public class ContentScoreProcess implements AsyncProcess{
 
         <T extends Content> T as(){
             return (T)content;
-        }
-
-        void addOrigin(Content con){
-            if(!artificial) return;
-            if(origins == null) origins = new Content[0];
-            if(!Structs.contains(origins, con)){
-                origins = Arrays.copyOf(origins, origins.length + 1);
-                origins[origins.length - 1] = con;
-            }
         }
 
         void updateOutputScore(){
@@ -442,8 +365,8 @@ public class ContentScoreProcess implements AsyncProcess{
         }
 
         void generateItemScore(){
-            if(origins != null){
-                for(Content origin : origins){
+            if(origins() != null){
+                for(Content origin : origins()){
                     if(get(origin).loaded && origin instanceof GenericCrafter gc){
                         score = Math.max(score, (get(origin).consumeScore / gc.outputItem.amount) * (gc.craftTime / 60f));
                     }
@@ -610,12 +533,12 @@ public class ContentScoreProcess implements AsyncProcess{
         }
 
         boolean requiredLoaded(){
-            if(origins != null){
+            if(origins() != null){
                 boolean b = true;
                 loadedLast = loadedc;
                 loadedc = 0;
                 int i = 0;
-                for(Content c : origins){
+                for(Content c : origins()){
                     loadedc |= Mathf.num(get(c).loaded) << i;
                     b &= get(c).loaded;
                     i++;
@@ -633,22 +556,14 @@ public class ContentScoreProcess implements AsyncProcess{
             return true;
         }
 
-        void forceFindOrgin(){
-            for(GenericCrafter crafter : crafters){
-                if(crafter.outputLiquid != null && crafter.outputLiquid.liquid == content){
-                    addOrigin(crafter);
-                }
-            }
+        Seq<Content> origins(){
+            return getOrigins(content);
         }
 
         void updateScore(){
             if(update != null){
                 update.get(this);
                 update = null;
-            }
-            if(artificial && ffo && origins == null && content instanceof Liquid){
-                forceFindOrgin();
-                ffo = false;
             }
             if(!loaded && requiredLoaded() && blockLoaded()){
                 if(content instanceof Block){
