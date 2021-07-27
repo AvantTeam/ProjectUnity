@@ -1,11 +1,11 @@
 package unity.async;
 
 import arc.*;
+import arc.func.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.struct.ObjectMap.*;
 import arc.util.*;
-import mindustry.*;
 import mindustry.async.*;
 import mindustry.ctype.*;
 import mindustry.entities.bullet.*;
@@ -23,9 +23,11 @@ import unity.*;
 
 import java.util.*;
 
+import static mindustry.Vars.*;
+
 @SuppressWarnings("unchecked")
 public class ContentScoreProcess implements AsyncProcess{
-    private static final int iterationError = 6;
+    private static final int iterationError = 5, skipIteration = 4;
     private boolean init = false, processing, finished = false;
     private final Seq<ContentScore> unloaded = new Seq<>();
     private final IntSet[] unloadedSet = new IntSet[ContentType.all.length];
@@ -45,8 +47,8 @@ public class ContentScoreProcess implements AsyncProcess{
             }
             items = new ContentScore[ContentType.all.length][0];
             for(ContentType type : ContentType.all){
-                items[type.ordinal()] = new ContentScore[Vars.content.getBy(type).size];
-                for(Content content : Vars.content.getBy(type)){
+                items[type.ordinal()] = new ContentScore[content.getBy(type).size];
+                for(Content content : content.getBy(type)){
                     switch(type){
                         case block -> handleBlock((Block)content);
                         case item -> handleItem((Item)content, false);
@@ -117,6 +119,14 @@ public class ContentScoreProcess implements AsyncProcess{
         }
     }
 
+    Seq<Liquid> liquids(){
+        return content.liquids();
+    }
+
+    Seq<Item> items(){
+        return content.items();
+    }
+
     public float getScore(Content content){
         if(!finished) return 0f;
         return get(content).score;
@@ -174,40 +184,47 @@ public class ContentScoreProcess implements AsyncProcess{
         }
         //updateSize(item);
 
+        ContentScore c = new ContentScore(item);
         if(ore){
-            ContentScore c = new ContentScore(item);
             c.score = score;
             c.outputScore = score;
             c.loaded = true;
             c.artificial = false;
-            addContent(c);
         }else{
-            ContentScore c = new ContentScore(item);
             c.outputScore = score;
             c.artificial = true;
             addUnloaded(c);
-            addContent(c);
         }
+        addContent(c);
     }
 
-    private void handleLiquid(Liquid liquid, boolean artificial){
+    private void handleLiquid(Liquid liquid, boolean artificial, Content... origins){
         float score = Mathf.sqr(liquid.flammability + liquid.explosiveness + Math.abs((liquid.temperature - 0.5f) * 2f)) + liquid.heatCapacity;
 
         if(contains(liquid)){
             ContentScore s = get(liquid);
             if(!artificial && s.artificial){
+                if(origins != null){
+                    for(Content origin : origins){
+                        s.addOrigin(origin);
+                    }
+                }
                 s.score = score;
                 s.artificial = false;
                 s.loaded = true;
             }
             return;
         }
-        //updateSize(liquid);
         ContentScore c = new ContentScore(liquid);
         c.score = score;
         c.outputScore = score;
         c.artificial = artificial;
         c.loaded = !artificial;
+        if(origins != null){
+            for(Content origin : origins){
+                c.addOrigin(origin);
+            }
+        }
         addContent(c);
         if(artificial) addUnloaded(c);
     }
@@ -215,6 +232,7 @@ public class ContentScoreProcess implements AsyncProcess{
     private void handleBlock(Block block){
         //updateSize(block);
 
+        /*
         if(block instanceof Floor f){
             if(f.itemDrop != null){
                 handleItem(f.itemDrop, true);
@@ -234,34 +252,94 @@ public class ContentScoreProcess implements AsyncProcess{
                 for(UnitPlan plan : uf.plans){
                     if(!contains(plan.unit)){
                         ContentScore cs = new ContentScore(plan.unit);
+                        cs.addOrigin(block);
                         addContent(cs);
+                    }else{
+                        ContentScore cs = get(plan.unit);
+                        cs.addOrigin(uf);
                     }
-                    ContentScore cs = get(plan.unit);
-                    cs.addOrigin(uf);
                 }
             }else if(block instanceof Reconstructor re){
                 for(UnitType[] types : re.upgrades){
                     UnitType type = types[1];
                     if(!contains(type)){
                         ContentScore cs = new ContentScore(type);
+                        cs.addOrigin(block);
                         addContent(cs);
+                    }else{
+                        ContentScore cs = get(type);
+                        cs.addOrigin(re);
                     }
-                    ContentScore cs = get(type);
-                    cs.addOrigin(re);
                 }
             }else if(block instanceof GenericCrafter gc){
                 if(gc.outputItem != null && !Structs.contains(gc.requirements, st -> st.item == gc.outputItem.item)){
                     handleItem(gc.outputItem.item, false);
                     ContentScore cs = get(gc.outputItem.item);
-                    cs.addOrigin(gc);
+                    cs.addOrigin(block);
                 }
                 if(gc.outputLiquid != null){
-                    handleLiquid(gc.outputLiquid.liquid, true);
-                    ContentScore cs = get(gc.outputLiquid.liquid);
-                    cs.addOrigin(gc);
+                    handleLiquid(gc.outputLiquid.liquid, true, block);
                 }
             }
             ContentScore cs = new ContentScore(block);
+            addUnloaded(cs);
+            addContent(cs);
+        }
+         */
+        Cons<ContentScore> run = cs2 -> {
+            if(block instanceof Floor f){
+                if(f.itemDrop != null){
+                    handleItem(f.itemDrop, true);
+                }
+                if(f.liquidDrop != null){
+                    handleLiquid(f.liquidDrop, false);
+                }
+                return;
+            }
+            if(block.synthetic()){
+                if(block.requirements.length > 0){
+                    for(ItemStack req : block.requirements){
+                        handleItem(req.item, false);
+                    }
+                }
+                if(block instanceof UnitFactory uf){
+                    for(UnitPlan plan : uf.plans){
+                        if(!contains(plan.unit)){
+                            ContentScore cs = new ContentScore(plan.unit);
+                            cs.addOrigin(block);
+                            addContent(cs);
+                        }else{
+                            ContentScore cs = get(plan.unit);
+                            cs.addOrigin(uf);
+                        }
+                    }
+                }else if(block instanceof Reconstructor re){
+                    for(UnitType[] types : re.upgrades){
+                        UnitType type = types[1];
+                        if(!contains(type)){
+                            ContentScore cs = new ContentScore(type);
+                            cs.addOrigin(block);
+                            addContent(cs);
+                        }else{
+                            ContentScore cs = get(type);
+                            cs.addOrigin(re);
+                        }
+                    }
+                }else if(block instanceof GenericCrafter gc){
+                    if(gc.outputItem != null && !Structs.contains(gc.requirements, st -> st.item == gc.outputItem.item)){
+                        handleItem(gc.outputItem.item, false);
+                        ContentScore cs = get(gc.outputItem.item);
+                        cs.addOrigin(block);
+                    }
+                    if(gc.outputLiquid != null){
+                        handleLiquid(gc.outputLiquid.liquid, true, block);
+                    }
+                }
+            }
+        };
+        if((!(block instanceof Floor fl) || fl.itemDrop != null || fl.liquidDrop != null) && (block instanceof Floor || block.synthetic())){
+            ContentScore cs = new ContentScore(block);
+            cs.update = run;
             addUnloaded(cs);
             addContent(cs);
         }
@@ -301,9 +379,11 @@ public class ContentScoreProcess implements AsyncProcess{
 
     private class ContentScore{
         Content content;
+        int loadedc = 0, loadedLast = 0, skip;
         float score, outputScore, consumeScore;
         boolean loaded = false, artificial = true;
         Content[] origins;
+        Cons<ContentScore> update;
         short[] itemsRequired, liquidRequired;
 
         ContentScore(Content c){
@@ -360,7 +440,7 @@ public class ContentScoreProcess implements AsyncProcess{
         void generateItemScore(){
             if(origins != null){
                 for(Content origin : origins){
-                    if(origin instanceof GenericCrafter gc){
+                    if(get(origin).loaded && origin instanceof GenericCrafter gc){
                         score = Math.max(score, (get(origin).consumeScore / gc.outputItem.amount) * (gc.craftTime / 60f));
                     }
                 }
@@ -374,10 +454,11 @@ public class ContentScoreProcess implements AsyncProcess{
             float score = 0f;
             float conScore = 0f;
             for(ItemStack r : block.requirements){
-                score += get(r.item).score + Mathf.sqrt(r.amount);
+                //score += get(r.item).score + Mathf.sqrt(r.amount);
+                score += get(r.item).score + (float)Math.pow(r.amount, 1f / 1.5f);
             }
-            score *= block.size * block.size;
-            score /= 5f;
+            //score *= block.size * block.size;
+            score /= 2f;
             for(Consume cons : block.consumes.all()){
                 if(cons.optional) continue;
                 if(cons instanceof ConsumePower c){
@@ -400,7 +481,7 @@ public class ContentScoreProcess implements AsyncProcess{
                             max = Math.max(max, get(i, ContentType.item).score);
                         }
                     }else{
-                        for(Item item : Vars.content.items()){
+                        for(Item item : items()){
                             if(c.filter.get(item)){
                                 max = Math.max(max, get(item).score);
                             }
@@ -423,7 +504,7 @@ public class ContentScoreProcess implements AsyncProcess{
                                 max = Math.max(max, get(i, ContentType.liquid).score);
                             }
                         }else{
-                            for(Liquid l : Vars.content.liquids()){
+                            for(Liquid l : liquids()){
                                 if(clf.filter.get(l)){
                                     max = Math.max(max, get(l).score);
                                 }
@@ -469,7 +550,7 @@ public class ContentScoreProcess implements AsyncProcess{
                     if(cons instanceof ConsumeItemFilter c){
                         if(itemsRequired == null){
                             ShortSeq seq = new ShortSeq(8);
-                            for(Item i : Vars.content.items()){
+                            for(Item i : items()){
                                 if(c.filter.get(i)){
                                     f &= get(i).loaded;
                                     seq.add(i.id);
@@ -490,7 +571,7 @@ public class ContentScoreProcess implements AsyncProcess{
                     if(cons instanceof ConsumeLiquidFilter c){
                         if(liquidRequired == null){
                             ShortSeq seq = new ShortSeq(8);
-                            for(Liquid l : Vars.content.liquids()){
+                            for(Liquid l : liquids()){
                                 if(c.filter.get(l)){
                                     f &= get(l).loaded;
                                     seq.add(l.id);
@@ -526,14 +607,33 @@ public class ContentScoreProcess implements AsyncProcess{
 
         boolean requiredLoaded(){
             if(origins != null){
+                boolean b = true;
+                loadedLast = loadedc;
+                loadedc = 0;
+                int i = 0;
                 for(Content c : origins){
-                    if(!get(c).loaded) return false;
+                    loadedc |= Mathf.num(get(c).loaded) << i;
+                    b &= get(c).loaded;
+                    i++;
                 }
+                if(loadedc == loadedLast && loadedc != 0){
+                    skip++;
+                }else{
+                    skip = 0;
+                }
+                if(skip >= skipIteration){
+                    return true;
+                }
+                return b;
             }
             return true;
         }
 
         void updateScore(){
+            if(update != null){
+                update.get(this);
+                update = null;
+            }
             if(!loaded && requiredLoaded() && blockLoaded()){
                 if(content instanceof Block){
                     generateBlockScore();
