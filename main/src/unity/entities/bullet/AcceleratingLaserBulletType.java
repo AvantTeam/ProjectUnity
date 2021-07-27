@@ -134,11 +134,11 @@ public class AcceleratingLaserBulletType extends BulletType{
                     data.pierceScore = 0f;
                     data.pierceOffset = 0f;
                 }
-                Utils.collideLineRawEnemy(b.team, b.x, b.y, Tmp.v1.x, Tmp.v1.y, collisionWidth, collisionWidth, (building, direct) -> {
+                Utils.collideLineRawEnemyRatio(b.team, b.x, b.y, Tmp.v1.x, Tmp.v1.y, collisionWidth, (building, ratio, direct) -> {
                     boolean h = buildingInsulator.get(b, building);
                     if(direct){
                         if(h){
-                            if(p) data.pierceScore += building.block.size * (building.block.absorbLasers ? 3f : 1f);
+                            if(p) data.pierceScore += building.block.size * (building.block.absorbLasers ? 3f : 1f) * ratio;
                             if(!p || data.pierceScore >= pierceCap){
                                 Tmp.v2.trns(b.rotation(), maxLength * 1.5f).add(b);
                                 float dst = Intersector.distanceLinePoint(b.x, b.y, Tmp.v2.x, Tmp.v2.y, building.x, building.y);
@@ -154,13 +154,13 @@ public class AcceleratingLaserBulletType extends BulletType{
                                 b.fdata = ((b.dst(building) - (building.block.size * Vars.tilesize / 2f)) + dst) + pierceAmount + (data.pierceOffsetSmooth * data.targetSize);
                             }
                         }
-                        building.damage(damage * buildingDamageMultiplier);
+                        building.damage(damage * buildingDamageMultiplier * ratio);
                     }
                     return !p ? h : data.pierceScore >= pierceCap;
-                }, unit -> {
+                }, (unit, ratio) -> {
                     boolean h = unitInsulator.get(b, unit);
                     if(h){
-                        if(p) data.pierceScore += ((unit.hitSize / Vars.tilesize) / 2f) + (unit.health / 4000f);
+                        if(p) data.pierceScore += (((unit.hitSize / Vars.tilesize) / 2f) + (unit.health / 4000f)) * ratio;
                         if(!p || data.pierceScore >= pierceCap){
                             Tmp.v2.trns(b.rotation(), maxLength * 1.5f).add(b);
                             float dst = Intersector.distanceLinePoint(b.x, b.y, Tmp.v2.x, Tmp.v2.y, unit.x, unit.y);
@@ -176,10 +176,19 @@ public class AcceleratingLaserBulletType extends BulletType{
                             b.fdata = ((b.dst(unit) - (unit.hitSize / 2f)) + dst) + pierceAmount + (data.pierceOffsetSmooth * data.targetSize);
                         }
                     }
-                    hitEntity(b, unit, unit.health);
+                    //hitEntity(b, unit, unit.health);
+                    hitEntityAlt(b, unit, b.damage * ratio);
                     return !p ? h : data.pierceScore >= pierceCap;
-                }, (ex, ey) -> hit(b, ex, ey), true);
+                }, (ex, ey) -> hit(b, ex, ey));
             }
         }
+    }
+
+    void hitEntityAlt(Bullet b, Unit unit, float damage){
+        unit.damage(damage);
+        Tmp.v3.set(unit).sub(b).nor().scl(knockback * 80f);
+        if(impact) Tmp.v3.setAngle(b.rotation() + (knockback < 0 ? 180f : 0f));
+        unit.impulse(Tmp.v3);
+        unit.apply(status, statusDuration);
     }
 }
