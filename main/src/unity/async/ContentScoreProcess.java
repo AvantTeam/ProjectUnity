@@ -1,7 +1,6 @@
 package unity.async;
 
 import arc.*;
-import arc.func.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.struct.ObjectMap.*;
@@ -27,7 +26,7 @@ import static mindustry.Vars.*;
 
 @SuppressWarnings("unchecked")
 public class ContentScoreProcess implements AsyncProcess{
-    private static final int iterationError = 5, skipIteration = 4;
+    private static final int iterationError = 5, skipIteration = 7;
     private boolean init = false, processing, finished = false;
     private final Seq<ContentScore> unloaded = new Seq<>();
     private final IntSet[] unloadedSet = new IntSet[ContentType.all.length];
@@ -233,12 +232,21 @@ public class ContentScoreProcess implements AsyncProcess{
             return;
         }
         ContentScore c = new ContentScore(liquid);
-        c.score = score;
-        c.outputScore = score;
-        c.artificial = artificial;
-        c.loaded = !artificial;
+        //c.score = score;
+        //c.outputScore = score;
+        //c.artificial = artificial;
+        //c.loaded = !artificial;
+        if(!artificial){
+            c.score = score;
+            c.outputScore = score;
+            c.loaded = true;
+            c.artificial = false;
+        }else{
+            c.outputScore = score;
+            c.artificial = true;
+            addUnloaded(c);
+        }
         addContent(c);
-        if(artificial) addUnloaded(c);
     }
 
     private void handleBlock(Block block){
@@ -319,7 +327,6 @@ public class ContentScoreProcess implements AsyncProcess{
         int loadedc = 0, loadedLast = 0, skip;
         float score, outputScore, consumeScore;
         boolean loaded = false, artificial = true;
-        Cons<ContentScore> update;
         short[] itemsRequired, liquidRequired;
 
         ContentScore(Content c){
@@ -340,7 +347,7 @@ public class ContentScoreProcess implements AsyncProcess{
                 }
                 //outputScore /= (type.hitSize / 3f);
             }else if(content instanceof Block block){
-                outputScore += block.health / (float)(block.size * block.size);
+                outputScore += (block.health / (float)(block.size * block.size)) + (block.absorbLasers ? 200f : 0f);
                 if(content instanceof Wall wall){
                     outputScore += Math.max(wall.chanceDeflect * block.health, 0f) + Math.max(wall.lightningDamage * (wall.lightningLength / 2f) * wall.lightningChance, 0f);
                 }else if(content instanceof ItemTurret iTurret){
@@ -353,7 +360,7 @@ public class ContentScoreProcess implements AsyncProcess{
                     ts *= (!iTurret.alternate ? iTurret.shots : 1);
                     outputScore += ts;
                 }else if(content instanceof PowerTurret pTurret){
-                    outputScore += (bulletScore(pTurret.shootType) / pTurret.rotateSpeed) * (!pTurret.alternate ? pTurret.shots : 1);
+                    outputScore += (bulletScore(pTurret.shootType) / pTurret.reloadTime) * (!pTurret.alternate ? pTurret.shots : 1);
                 }
             }
             this.outputScore = Math.max(this.outputScore, outputScore);
@@ -368,7 +375,11 @@ public class ContentScoreProcess implements AsyncProcess{
             if(origins() != null){
                 for(Content origin : origins()){
                     if(get(origin).loaded && origin instanceof GenericCrafter gc){
-                        score = Math.max(score, (get(origin).consumeScore / gc.outputItem.amount) * (gc.craftTime / 60f));
+                        if(content instanceof Item){
+                            score = Math.max(score, (get(origin).consumeScore / gc.outputItem.amount) * (gc.craftTime / 60f));
+                        }else{
+                            score = Math.max(score, (get(origin).consumeScore / gc.outputLiquid.amount));
+                        }
                     }
                 }
             }else{
@@ -382,10 +393,12 @@ public class ContentScoreProcess implements AsyncProcess{
             float conScore = 0f;
             for(ItemStack r : block.requirements){
                 //score += get(r.item).score + Mathf.sqrt(r.amount);
-                score += get(r.item).score + (float)Math.pow(r.amount, 1f / 1.5f);
+                score += get(r.item).score * (float)Math.pow(r.amount, 1f / 1.4f);
             }
+            score /= block.size * block.size;
+            score *= (block.requirements.length / 35f) + (1f - (1f / 35f)) + block.buildCostMultiplier;
             //score *= block.size * block.size;
-            score /= 2f;
+            //score /= 2f;
             for(Consume cons : block.consumes.all()){
                 if(cons.optional) continue;
                 if(cons instanceof ConsumePower c){
@@ -443,14 +456,20 @@ public class ContentScoreProcess implements AsyncProcess{
                 }
             }
             if(block instanceof UnitFactory uf){
+                float max = 0f;
                 for(UnitPlan plan : uf.plans){
+                    float ts = 0f;
                     for(ItemStack s : plan.requirements){
                         float sc = get(s.item).score;
-                        score += sc * s.amount;
-                        conScore += sc * s.amount;
+                        ts += sc * s.amount;
+                        //score += sc * s.amount;
+                        //conScore += sc * s.amount;
                     }
+                    max = Math.max(max, ts);
                     //ContentScore cs = get(plan.unit);
                 }
+                conScore += max;
+                score += max;
             }
             this.score = score;
             consumeScore = conScore;
@@ -557,18 +576,15 @@ public class ContentScoreProcess implements AsyncProcess{
         }
 
         Seq<Content> origins(){
+            if(!artificial) return null;
             return getOrigins(content);
         }
 
         void updateScore(){
-            if(update != null){
-                update.get(this);
-                update = null;
-            }
             if(!loaded && requiredLoaded() && blockLoaded()){
                 if(content instanceof Block){
                     generateBlockScore();
-                }else if(content instanceof Item){
+                }else if(content instanceof Item || content instanceof Liquid){
                     generateItemScore();
                 }
                 updateOutputScore();
