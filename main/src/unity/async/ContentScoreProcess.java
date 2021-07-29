@@ -42,32 +42,46 @@ public class ContentScoreProcess implements AsyncProcess{
         if(init){
             processing = true;
             Core.app.post(() -> Unity.print("Content Score Begin"));
-            for(int i = 0; i < unloadedSet.length; i++){
-                unloadedSet[i] = new IntSet(204);
-            }
             items = new ContentScore[ContentType.all.length][0];
             origins = new Seq[ContentType.all.length][0];
             for(ContentType type : ContentType.all){
-                if(type != ContentType.sector
-                && type != ContentType.ammo
-                && type != ContentType.weather
-                && type != ContentType.planet) origins[type.ordinal()] = new Seq[content.getBy(type).size];
+                switch(type){
+                    case sector, ammo, weather, planet, loadout_UNUSED, effect_UNUSED, mech_UNUSED, typeid_UNUSED, error -> {}
+                    case block -> {
+                        origins[type.ordinal()] = new Seq[content.getBy(type).size];
+                        items[type.ordinal()] = new ContentScore[content.getBy(type).size];
+                        for(Content c : content.getBy(type)){
+                            if(c instanceof Block b && b.synthetic()) addContent(new ContentScore(c));
+                        }
+                    }
+                    case bullet -> {
+                        origins[type.ordinal()] = new Seq[content.getBy(type).size];
+                        items[type.ordinal()] = new ContentScore[content.getBy(type).size];
+                        for(Content c : content.getBy(type)){
+                            bulletScore((BulletType)c);
+                        }
+                    }
+                    default -> {
+                        origins[type.ordinal()] = new Seq[content.getBy(type).size];
+                        items[type.ordinal()] = new ContentScore[content.getBy(type).size];
+                        for(Content c : content.getBy(type)){
+                            addContent(new ContentScore(c));
+                        }
+                    }
+                }
             }
             for(ContentType type : ContentType.all){
-                items[type.ordinal()] = new ContentScore[content.getBy(type).size];
+                //items[type.ordinal()] = new ContentScore[content.getBy(type).size];
                 for(Content content : content.getBy(type)){
                     switch(type){
                         case block -> handleBlock((Block)content);
                         case item -> handleItem((Item)content, false);
                         case liquid -> handleLiquid((Liquid)content, true);
-                        case bullet -> bulletScore((BulletType)content);
-                        case sector, ammo, weather, planet, loadout_UNUSED, effect_UNUSED, mech_UNUSED, typeid_UNUSED, error -> unloadedSet[type.ordinal()] = null;
+                        case bullet, sector, ammo, weather, planet, loadout_UNUSED, effect_UNUSED, mech_UNUSED, typeid_UNUSED, error -> {}
                         default -> {
-                            ContentScore cs = new ContentScore(content);
+                            ContentScore cs = get(content);
                             cs.loaded = false;
-                            //unloaded.add(cs);
                             addUnloaded(cs);
-                            addContent(cs);
                         }
                     }
                 }
@@ -175,6 +189,7 @@ public class ContentScoreProcess implements AsyncProcess{
 
     private void addUnloaded(ContentScore content){
         int key = content.content.id;
+        if(unloadedSet[content.content.getContentType().ordinal()] == null) unloadedSet[content.content.getContentType().ordinal()] = new IntSet(204);
         if(unloadedSet[content.content.getContentType().ordinal()].add(key)){
             unloaded.add(content);
         }
@@ -182,7 +197,7 @@ public class ContentScoreProcess implements AsyncProcess{
 
     private void addContent(ContentScore content){
         updateSize(content.content);
-        if(items[content.content.getContentType().ordinal()][content.content.id] == null) items[content.content.getContentType().ordinal()][content.content.id] = content;
+        items[content.content.getContentType().ordinal()][content.content.id] = content;
     }
 
     private boolean contains(Content c){
@@ -194,57 +209,38 @@ public class ContentScoreProcess implements AsyncProcess{
         float energyScore = Mathf.sqr(item.charge + item.explosiveness + item.flammability);
         float score = (float)Math.pow(Math.max(item.hardness + 1, 1), 1.5) * Math.max(item.cost + energyScore, 0.1f) * 1.5f;
 
-        if(contains(item)){
-            ContentScore s = get(item);
-            if(ore && s.artificial){
-                s.score = score;
-                s.artificial = false;
-                s.loaded = true;
+        ContentScore c = get(item);
+        if(c.artificial){
+            if(ore){
+                c.score = score;
+                c.outputScore = score;
+                c.loaded = true;
+                c.artificial = false;
+                if(getOrigins(item) != null) getOrigins(item).clear();
+            }else{
+                c.outputScore = score;
+                c.artificial = true;
+                addUnloaded(c);
             }
-            return;
         }
-        //updateSize(item);
-
-        ContentScore c = new ContentScore(item);
-        if(ore){
-            c.score = score;
-            c.outputScore = score;
-            c.loaded = true;
-            c.artificial = false;
-        }else{
-            c.outputScore = score;
-            c.artificial = true;
-            addUnloaded(c);
-        }
-        addContent(c);
     }
 
     private void handleLiquid(Liquid liquid, boolean artificial){
         float score = Mathf.sqr(liquid.flammability + liquid.explosiveness + Math.abs((liquid.temperature - 0.5f) * 2f)) + liquid.heatCapacity;
 
-        if(contains(liquid)){
-            ContentScore s = get(liquid);
-            if(!artificial && s.artificial){
-                s.score = score;
-                s.artificial = false;
-                s.loaded = true;
+        ContentScore c = get(liquid);
+
+        if(c.artificial){
+            if(!artificial){
+                c.score = score;
+                c.outputScore = score;
+                c.loaded = true;
+                c.artificial = false;
+            }else{
+                c.outputScore = score;
+                c.artificial = true;
+                addUnloaded(c);
             }
-            return;
-        }
-        ContentScore c = new ContentScore(liquid);
-        //c.score = score;
-        //c.outputScore = score;
-        //c.artificial = artificial;
-        //c.loaded = !artificial;
-        if(!artificial){
-            c.score = score;
-            c.outputScore = score;
-            c.loaded = true;
-            c.artificial = false;
-        }else{
-            c.outputScore = score;
-            c.artificial = true;
-            addUnloaded(c);
         }
         addContent(c);
     }
@@ -262,11 +258,6 @@ public class ContentScoreProcess implements AsyncProcess{
             return;
         }
         if(block.synthetic()){
-            if(block.requirements.length > 0){
-                for(ItemStack req : block.requirements){
-                    handleItem(req.item, false);
-                }
-            }
             if(block instanceof UnitFactory uf){
                 for(UnitPlan plan : uf.plans){
                     addOrigin(plan.unit, block);
@@ -284,9 +275,8 @@ public class ContentScoreProcess implements AsyncProcess{
                     addOrigin(gc.outputLiquid.liquid, block);
                 }
             }
-            ContentScore cs = new ContentScore(block);
+            ContentScore cs = get(block);
             addUnloaded(cs);
-            addContent(cs);
         }
     }
 
@@ -347,7 +337,7 @@ public class ContentScoreProcess implements AsyncProcess{
                 }
                 //outputScore /= (type.hitSize / 3f);
             }else if(content instanceof Block block){
-                outputScore += (block.health / (float)(block.size * block.size)) + (block.absorbLasers ? 200f : 0f);
+                outputScore += ((block.health / (float)(block.size * block.size)) + (block.absorbLasers ? 350f : 0f)) / 2f;
                 if(content instanceof Wall wall){
                     outputScore += Math.max(wall.chanceDeflect * block.health, 0f) + Math.max(wall.lightningDamage * (wall.lightningLength / 2f) * wall.lightningChance, 0f);
                 }else if(content instanceof ItemTurret iTurret){
@@ -372,6 +362,7 @@ public class ContentScoreProcess implements AsyncProcess{
         }
 
         void generateItemScore(){
+            if(!artificial) return;
             if(origins() != null){
                 for(Content origin : origins()){
                     if(get(origin).loaded && origin instanceof GenericCrafter gc){
@@ -393,9 +384,8 @@ public class ContentScoreProcess implements AsyncProcess{
             float conScore = 0f;
             for(ItemStack r : block.requirements){
                 //score += get(r.item).score + Mathf.sqrt(r.amount);
-                score += get(r.item).score * (float)Math.pow(r.amount, 1f / 1.4f);
+                score += get(r.item).score * (float)Math.pow(r.amount / (float)(block.size * block.size), 1f / 1.4f);
             }
-            score /= block.size * block.size;
             score *= (block.requirements.length / 35f) + (1f - (1f / 35f)) + block.buildCostMultiplier;
             //score *= block.size * block.size;
             //score /= 2f;
