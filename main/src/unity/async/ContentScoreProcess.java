@@ -46,7 +46,6 @@ public class ContentScoreProcess implements AsyncProcess{
             origins = new Seq[ContentType.all.length][0];
             for(ContentType type : ContentType.all){
                 switch(type){
-                    case sector, ammo, weather, planet, loadout_UNUSED, effect_UNUSED, mech_UNUSED, typeid_UNUSED, error -> {}
                     case block -> {
                         origins[type.ordinal()] = new Seq[content.getBy(type).size];
                         items[type.ordinal()] = new ContentScore[content.getBy(type).size];
@@ -61,7 +60,7 @@ public class ContentScoreProcess implements AsyncProcess{
                             bulletScore((BulletType)c);
                         }
                     }
-                    default -> {
+                    case item, status, liquid, unit -> {
                         origins[type.ordinal()] = new Seq[content.getBy(type).size];
                         items[type.ordinal()] = new ContentScore[content.getBy(type).size];
                         for(Content c : content.getBy(type)){
@@ -77,8 +76,7 @@ public class ContentScoreProcess implements AsyncProcess{
                         case block -> handleBlock((Block)content);
                         case item -> handleItem((Item)content, false);
                         case liquid -> handleLiquid((Liquid)content, true);
-                        case bullet, sector, ammo, weather, planet, loadout_UNUSED, effect_UNUSED, mech_UNUSED, typeid_UNUSED, error -> {}
-                        default -> {
+                        case unit, status -> {
                             ContentScore cs = get(content);
                             cs.loaded = false;
                             addUnloaded(cs);
