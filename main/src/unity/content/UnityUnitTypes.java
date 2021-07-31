@@ -15,6 +15,7 @@ import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.type.ammo.*;
 import mindustry.world.meta.*;
 import unity.ai.*;
 import unity.ai.AssistantAI.*;
@@ -493,7 +494,7 @@ public class UnityUnitTypes implements ContentList{
             drag = 0.01f;
             range = 40f;
             commandLimit = 0;
-            ammoType = AmmoTypes.power;
+            ammoType = new PowerAmmoType(1000);
             hitSize = 9f;
         }};
 
@@ -508,7 +509,7 @@ public class UnityUnitTypes implements ContentList{
             drag = 0.01f;
             range = 50f;
             commandLimit = 2;
-            ammoType = AmmoTypes.power;
+            ammoType = new PowerAmmoType(1000);
             hitSize = 10.5f * 1.7f;
             weapons.add(new Weapon("heal-weapon-mount"){{
                 rotate = true;
@@ -534,7 +535,7 @@ public class UnityUnitTypes implements ContentList{
             drag = 0.02f;
             hitSize = 11.5f;
             engineOffset = 7.25f;
-            ammoType = AmmoTypes.power;
+            ammoType = new PowerAmmoType(1000);
 
             weapons.add(new Weapon(){{
                 rotate = false;
@@ -569,7 +570,7 @@ public class UnityUnitTypes implements ContentList{
             drag = 0.06f;
             hitSize = 16.5f;
             engineOffset = 8.25f;
-            ammoType = AmmoTypes.power;
+            ammoType = new PowerAmmoType(1000);
 
             weapons.add(new Weapon(){{
                 rotate = false;
@@ -612,7 +613,7 @@ public class UnityUnitTypes implements ContentList{
             drag = 0.07f;
             hitSize = 24.5f;
             engineOffset = 3.75f;
-            ammoType = AmmoTypes.power;
+            ammoType = new PowerAmmoType(1000);
 
             weapons.add(new Weapon("unity-emp-launcher"){{
                 rotate = true;
@@ -684,7 +685,7 @@ public class UnityUnitTypes implements ContentList{
             drag = 0.07f;
             hitSize = 41.5f;
             engineOffset = 24.25f;
-            ammoType = AmmoTypes.powerHigh;
+            ammoType = new PowerAmmoType(2000);
 
             CloneableSetWeapon t = UnityWeaponTemplates.waveformSmallMount;
 
@@ -756,7 +757,7 @@ public class UnityUnitTypes implements ContentList{
             hitSize = 57.5f;
             engineOffset = 33.75f;
             engineSize = 3.5f;
-            ammoType = AmmoTypes.powerHigh;
+            ammoType = new PowerAmmoType(2000);
 
             CloneableSetWeapon t = UnityWeaponTemplates.ultravioletMount;
 
@@ -1000,7 +1001,7 @@ public class UnityUnitTypes implements ContentList{
             hovering = true;
             visualElevation = 0.23f;
             allowLegStep = true;
-            ammoType = AmmoTypes.powerHigh;
+            ammoType = new PowerAmmoType(2000);
             groundLayer = Layer.legUnit;
 
             weapons.add(new Weapon(){{
@@ -1132,7 +1133,7 @@ public class UnityUnitTypes implements ContentList{
             hovering = true;
             visualElevation = 0.23f;
             allowLegStep = true;
-            ammoType = AmmoTypes.powerHigh;
+            ammoType = new PowerAmmoType(2000);
             groundLayer = Layer.legUnit;
             drawShields = false;
 
@@ -1403,7 +1404,7 @@ public class UnityUnitTypes implements ContentList{
             flying = true;
             lowAltitude = true;
             destructibleWreck = false;
-            targetFlag = BlockFlag.reactor;
+            targetFlags = new BlockFlag[]{BlockFlag.reactor, null};
             hitSize = 80f;
             engineOffset = 42.75f;
             engineSize = 5.75f;
@@ -1478,7 +1479,7 @@ public class UnityUnitTypes implements ContentList{
             flying = true;
             lowAltitude = true;
             destructibleWreck = false;
-            targetFlag = BlockFlag.reactor;
+            targetFlags = new BlockFlag[]{BlockFlag.reactor, null};
             hitSize = 96f;
             engineOffset = 46.5f;
             engineSize = 6.75f;
@@ -1582,8 +1583,9 @@ public class UnityUnitTypes implements ContentList{
             commandLimit = 8;
             buildBeamOffset = 29.5f;
 
-            ammoCapacity = 1700;
-            ammoResupplyAmount = 30;
+            //ammo resupply mechanics removed in 129 until further notice; TODO remove or rework
+            //ammoCapacity = 1700;
+            //ammoResupplyAmount = 30;
 
             abilities.add(new ForceFieldAbility(190f, 6f, 8000f, 60f * 12), new RepairFieldAbility(180f, 60f * 2, 160f));
 
@@ -1630,8 +1632,9 @@ public class UnityUnitTypes implements ContentList{
             commandLimit = 12;
             buildBeamOffset = 47.75f;
 
-            ammoCapacity = 2000;
-            ammoResupplyAmount = 35;
+            //ammo resupply mechanics removed in 129 until further notice; TODO remove or rework
+            //ammoCapacity = 2000;
+            //ammoResupplyAmount = 35;
 
             weapons.add(new Weapon(name + "-heal-mount"){{
                 x = 33.5f;
@@ -3329,7 +3332,7 @@ public class UnityUnitTypes implements ContentList{
             engineSize = 5f;
             engineOffset = 10f;
 
-            ammoType = AmmoTypes.power;
+            ammoType = new PowerAmmoType(1000);
             outlineColor = UnityPal.darkOutline;
 
             weapons.add(
@@ -3387,7 +3390,7 @@ public class UnityUnitTypes implements ContentList{
             legTrns = 0.5f;
             legBaseOffset = 11f;
 
-            ammoType = AmmoTypes.powerHigh;
+            ammoType = new PowerAmmoType(2000);
             groundLayer = Layer.legUnit;
             outlineColor = UnityPal.darkOutline;
 
@@ -3450,7 +3453,7 @@ public class UnityUnitTypes implements ContentList{
             legSplashDamage = 64f;
             legSplashRange = 48f;
 
-            ammoType = AmmoTypes.powerHigh;
+            ammoType = new PowerAmmoType(2000);
             groundLayer = Layer.legUnit;
             outlineColor = UnityPal.darkOutline;
 
@@ -3526,7 +3529,7 @@ public class UnityUnitTypes implements ContentList{
             legSplashDamage = 84f;
             legSplashRange = 48f;
 
-            ammoType = AmmoTypes.powerHigh;
+            ammoType = new PowerAmmoType(2000);
             groundLayer = Layer.legUnit;
             outlineColor = UnityPal.darkOutline;
 
@@ -3586,7 +3589,7 @@ public class UnityUnitTypes implements ContentList{
             legSplashDamage = 140f;
             legSplashRange = 56f;
 
-            ammoType = AmmoTypes.powerHigh;
+            ammoType = new PowerAmmoType(2000);
             groundLayer = Layer.legUnit;
             outlineColor = UnityPal.darkOutline;
 
@@ -3713,7 +3716,7 @@ public class UnityUnitTypes implements ContentList{
             buildSpeed = 0.8f;
             circleTarget = false;
 
-            ammoType = AmmoTypes.powerLow;
+            ammoType = new PowerAmmoType(500);
             engineColor = UnityPal.monolith;
             outlineColor = UnityPal.darkOutline;
 
@@ -3752,7 +3755,7 @@ public class UnityUnitTypes implements ContentList{
             buildSpeed = 1.3f;
             circleTarget = false;
 
-            ammoType = AmmoTypes.powerLow;
+            ammoType = new PowerAmmoType(500);
             engineColor = UnityPal.monolith;
             outlineColor = UnityPal.darkOutline;
 
