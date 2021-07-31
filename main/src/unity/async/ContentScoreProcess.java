@@ -1,7 +1,6 @@
 package unity.async;
 
 import arc.*;
-import arc.func.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.struct.ObjectMap.*;
@@ -33,7 +32,6 @@ public class ContentScoreProcess implements AsyncProcess{
     private final IntSet[] unloadedSet = new IntSet[ContentType.all.length];
     private Seq<Content>[][] origins;
     private ContentScore[][] items;
-    private static float tmpF, tmpF2;
 
     public ContentScoreProcess(){
         Events.on(EventType.ContentInitEvent.class, event -> init = true);
@@ -330,7 +328,7 @@ public class ContentScoreProcess implements AsyncProcess{
         int loadedc = 0, loadedLast = 0, skip;
         float score, outputScore, liquidScore, itemScore, powerScore;
         boolean loaded = false, artificial = true;
-        short[] itemFilter, liquidFilter, inputItems;
+        short[] itemFilter, liquidFilter;
 
         ContentScore(Content c){
             content = c;
@@ -342,13 +340,6 @@ public class ContentScoreProcess implements AsyncProcess{
 
         float consumeScore(){
             return liquidScore + itemScore + powerScore;
-        }
-
-        void inputItemsEach(Intc2 cons){
-            if(inputItems == null) return;
-            for(int i = 0; i < inputItems.length; i += 2){
-                cons.get(inputItems[i], inputItems[i + 1]);
-            }
         }
 
         float energyScore(){
@@ -428,19 +419,7 @@ public class ContentScoreProcess implements AsyncProcess{
                 for(Content origin : origins()){
                     if(get(origin).loaded && origin instanceof GenericCrafter gc){
                         if(content instanceof Item){
-                            tmpF = 0f;
-                            //tmpF2 = 0f;
                             ContentScore other = get(origin);
-                            /*
-                            if(other.inputItems != null){
-                                other.inputItemsEach((id, amount) -> {
-                                    ContentScore oIt = get(id, ContentType.item);
-                                    float s = Math.min(0f, energyScore() - oIt.energyScore());
-                                    tmpF += Math.max((oIt.score + s) * amount, 0f);
-                                    //tmpF2 += oIt.energyScore() * amount;
-                                });
-                            }
-                            */
                             float s = other.consumeScore();
                             score = Math.max(score, (s / gc.outputItem.amount) + (gc.craftTime / 60f));
                         }else{
@@ -464,7 +443,6 @@ public class ContentScoreProcess implements AsyncProcess{
             score *= (block.requirements.length / 35f) + (1f - (1f / 35f)) + block.buildCostMultiplier;
             //score *= block.size * block.size;
             //score /= 2f;
-            ShortSeq shortSeq = new ShortSeq(16);
             for(Consume cons : block.consumes.all()){
                 if(cons.optional) continue;
                 if(cons instanceof ConsumePower c){
@@ -476,7 +454,6 @@ public class ContentScoreProcess implements AsyncProcess{
                 if(cons instanceof ConsumeItems c){
                     for(ItemStack s : c.items){
                         float sc = get(s.item).score;
-                        shortSeq.add(s.item.id, (short)s.amount);
                         score += sc * s.amount;
                         //conScore += sc * s.amount;
                         itemScore += sc * s.amount;
@@ -484,14 +461,12 @@ public class ContentScoreProcess implements AsyncProcess{
                     continue;
                 }
                 if(cons instanceof ConsumeItemFilter c){
-                    short m = -1;
                     float max = 0f;
                     if(itemFilter != null){
                         for(short i : itemFilter){
                             //shortSeq.add(i, (short)1);
                             float maxL = get(i, ContentType.item).score;
                             max = Math.max(max, maxL);
-                            if(maxL >= max) m = i;
                         }
                     }else{
                         for(Item item : items()){
@@ -499,12 +474,8 @@ public class ContentScoreProcess implements AsyncProcess{
                                 //shortSeq.add(item.id, (short)1);
                                 float maxL = get(item).score;
                                 max = Math.max(max, maxL);
-                                if(maxL >= max) m = item.id;
                             }
                         }
-                    }
-                    if(m != -1){
-                        shortSeq.add(m, (short)1);
                     }
                     score += max;
                     //conScore += max;
@@ -537,7 +508,6 @@ public class ContentScoreProcess implements AsyncProcess{
                     }
                 }
             }
-            inputItems = shortSeq.toArray();
             if(block instanceof UnitFactory uf){
                 float max = 0f;
                 for(UnitPlan plan : uf.plans){
@@ -656,7 +626,8 @@ public class ContentScoreProcess implements AsyncProcess{
                 }
                 return b;
             }
-            return true;
+            //return true;
+            return !artificial;
         }
 
         Seq<Content> origins(){

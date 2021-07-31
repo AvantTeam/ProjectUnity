@@ -3910,9 +3910,9 @@ public class UnityUnitTypes implements ContentList{
         devourer = new UnityUnitType("devourer-of-eldrich-gods"){{
             health = 1250000f;
             flying = true;
-            speed = 4f;
-            accel = 0.053f;
-            drag = 0.012f;
+            speed = 5f;
+            accel = 0.12f;
+            drag = 0.1f;
             defaultController = WormAI::new;
             circleTarget = counterDrag = true;
             rotateShooting = false;
