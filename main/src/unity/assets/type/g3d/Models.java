@@ -9,8 +9,10 @@ import arc.graphics.gl.*;
 import arc.struct.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
+import unity.assets.list.*;
 import unity.assets.list.UnityShaders.*;
 import unity.assets.type.g3d.attribute.*;
+import unity.assets.type.g3d.attribute.light.*;
 import unity.assets.type.g3d.attribute.type.*;
 import unity.mod.*;
 
