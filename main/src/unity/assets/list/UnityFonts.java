@@ -10,7 +10,7 @@ import unity.ui.*;
 import static mindustry.Vars.*;
 
 public class UnityFonts{
-    public static Font speech, speechtitle, koruh;
+    public static Font speech, speechtitle;
 
     public static void load(){
         if(headless) return;
@@ -31,14 +31,5 @@ public class UnityFonts{
             shadowOffsetX = -1;
             shadowOffsetY = 3;
         }})).loaded = f -> speechtitle = UnityStyles.speechtitlet.font = (Font)f;
-
-        Core.assets.load("unity-koruh", Font.class, new FreeTypeFontLoaderParameter("fonts/font.woff", new FreeTypeFontParameter(){{
-
-        }})).loaded = f -> {
-            koruh = (Font)f;
-            var data = koruh.getData();
-
-
-        };
     }
 }
