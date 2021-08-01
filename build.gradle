@@ -56,7 +56,7 @@ allprojects {
     tasks.withType(JavaCompile) {
         options.incremental = true
         options.encoding = 'UTF-8'
-        options.compilerArgs += '-Xlint:deprecation'
+        //options.compilerArgs += '-Xlint:deprecation'
 
         options.fork = true
         options.forkOptions.jvmArgs += [
