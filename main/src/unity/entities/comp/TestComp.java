@@ -83,10 +83,14 @@ public abstract class TestComp implements Unitc{
         destroy();
     }
 
-    /** Breaks the entire method block if condition is met, causing other component-specific implementations not to run */
+    /**
+     * Breaks the entire method block if condition is met, causing other component-specific implementations not to run.
+     * Also removes {@link Unitc#update()} from the specification.
+     */
     @Override
     @MethodPriority(-5)
     @BreakAll
+    @Remove(Unitc.class)
     public void update(){
         if(health < maxHealth / 2f){
             destroy();

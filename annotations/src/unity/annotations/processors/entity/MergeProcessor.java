@@ -349,7 +349,27 @@ public class MergeProcessor extends BaseProcessor{
         }
 
         EntityIO io = new EntityIO(simpleName(def), builder, serializer);
+        Seq<ExecutableElement> removal = new Seq<>();
+
         for(Entry<String, Seq<ExecutableElement>> entry : methods){
+            removal.clear();
+            for(ExecutableElement elem : entry.value){
+                Remove rem = annotation(elem, Remove.class);
+                if(rem != null){
+                    if(removal.contains(elem)){
+                        throw new IllegalStateException(elem + " is already @Remove'd by another method");
+                    }
+
+                    ExecutableElement removed = entry.value.find(m -> types.isSameType(
+                        m.getEnclosingElement().asType(),
+                        elements(rem::value).first().asType()
+                    ));
+
+                    if(removed != null) removal.add(removed);
+                }
+            }
+            entry.value.removeAll(removal);
+
             boolean superCall = true;
             if(entry.value.contains(m -> annotation(m, Replace.class) != null)){
                 if(entry.value.first().getReturnType().getKind() == VOID){

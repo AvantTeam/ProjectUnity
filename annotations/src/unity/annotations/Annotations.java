@@ -211,7 +211,9 @@ public class Annotations{
     /** Removes a component-specific method implementation */
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface Remove{}
+    public @interface Remove{
+        Class<?> value();
+    }
 
     /** Loads texture regions but does not assign them to their acquirers */
     @Retention(RetentionPolicy.SOURCE)

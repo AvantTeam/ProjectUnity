@@ -385,7 +385,9 @@ public class EntityProcessor extends BaseProcessor{
                 EntityIO io = new EntityIO(simpleName(def), builder, serializer);
                 boolean hasIO = ann.genio() && (defComps.contains(s -> simpleName(s).contains("Sync")) || ann.serialize());
 
+                Seq<ExecutableElement> removal = new Seq<>();
                 boolean serializeOverride = false;
+
                 for(Entry<String, Seq<ExecutableElement>> entry : methods){
                     if(entry.value.contains(m -> annotation(m, Replace.class) != null)){
                         if(entry.value.first().getReturnType().getKind() == VOID){
@@ -400,6 +402,24 @@ public class EntityProcessor extends BaseProcessor{
                             entry.value.add(base);
                         }
                     }
+
+                    removal.clear();
+                    for(ExecutableElement elem : entry.value){
+                        Remove rem = annotation(elem, Remove.class);
+                        if(rem != null){
+                            if(removal.contains(elem)){
+                                throw new IllegalStateException(elem + " is already @Remove'd by another method");
+                            }
+
+                            ExecutableElement removed = entry.value.find(m -> types.isSameType(
+                                m.getEnclosingElement().asType(),
+                                elements(rem::value).first().asType()
+                            ));
+
+                            if(removed != null) removal.add(removed);
+                        }
+                    }
+                    entry.value.removeAll(removal);
 
                     if(entry.value.count(m -> !is(m, Modifier.NATIVE, Modifier.ABSTRACT) && m.getReturnType().getKind() != VOID) > 1){
                         throw new IllegalStateException("Type " + simpleName(def) + " has multiple components implementing non-void method " + entry.key + ".");
@@ -558,7 +578,7 @@ public class EntityProcessor extends BaseProcessor{
                             .addAnnotation(cName(Override.class))
                             .returns(TypeName.BOOLEAN)
                             .addStatement("return " + ann.serialize())
-                            .build()
+                        .build()
                     );
                 }
 
