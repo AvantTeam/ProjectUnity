@@ -208,6 +208,11 @@ public class Annotations{
     @Retention(RetentionPolicy.SOURCE)
     public @interface BreakAll{}
 
+    /** Removes a component-specific method implementation */
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface Remove{}
+
     /** Loads texture regions but does not assign them to their acquirers */
     @Retention(RetentionPolicy.SOURCE)
     public @interface LoadRegs{
