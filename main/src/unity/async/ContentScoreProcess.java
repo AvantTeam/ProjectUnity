@@ -8,7 +8,7 @@ import arc.util.*;
 import mindustry.async.*;
 import mindustry.ctype.*;
 import mindustry.entities.bullet.*;
-import mindustry.game.*;
+import mindustry.game.EventType.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.defense.*;
@@ -27,14 +27,14 @@ import static mindustry.Vars.*;
 @SuppressWarnings("unchecked")
 public class ContentScoreProcess implements AsyncProcess{
     private static final int iterationError = 5, skipIteration = 7;
-    private boolean init = false, processing, finished = false;
+    private volatile boolean init = false, processing = false, finished = false;
     private final Seq<ContentScore> unloaded = new Seq<>();
     private final IntSet[] unloadedSet = new IntSet[ContentType.all.length];
     private Seq<Content>[][] origins;
     private ContentScore[][] items;
 
     public ContentScoreProcess(){
-        Events.on(EventType.ContentInitEvent.class, event -> init = true);
+        Events.on(ContentInitEvent.class, event -> init = true);
     }
 
     @Override
@@ -119,8 +119,10 @@ public class ContentScoreProcess implements AsyncProcess{
                     .append(", Artificial: ").append(score.artificial)
                     .append("\n")
                     .append("Sources: ");
-                    if(score.origins() != null){
-                        for(Content c : score.origins()){
+
+                    var origins = score.origins();
+                    if(origins != null){
+                        for(Content c : origins){
                             out.append(c.toString()).append(":").append(get(c).loaded).append(",");
                         }
                     }else{
@@ -384,9 +386,10 @@ public class ContentScoreProcess implements AsyncProcess{
         }
 
         void generateUnitScore(){
-            if(origins() != null){
+            var origins = origins();
+            if(origins != null){
                 float max = 0f;
-                for(Content origin : origins()){
+                for(Content origin : origins){
                     if(origin instanceof UnitFactory uf){
                         for(UnitPlan plan : uf.plans){
                             if(plan.unit == content){
@@ -413,8 +416,10 @@ public class ContentScoreProcess implements AsyncProcess{
 
         void generateItemScore(){
             if(!artificial) return;
-            if(origins() != null){
-                for(Content origin : origins()){
+
+            var origins = origins();
+            if(origins != null){
+                for(Content origin : origins){
                     if(get(origin).loaded && origin instanceof GenericCrafter gc){
                         if(content instanceof Item){
                             ContentScore other = get(origin);
@@ -604,12 +609,13 @@ public class ContentScoreProcess implements AsyncProcess{
         }
 
         boolean requiredLoaded(){
-            if(origins() != null){
+            var origins = origins();
+            if(origins != null){
                 boolean b = true;
                 loadedLast = loadedc;
                 loadedc = 0;
                 int i = 0;
-                for(Content c : origins()){
+                for(Content c : origins){
                     loadedc |= Mathf.num(get(c).loaded) << i;
                     b &= get(c).loaded;
                     i++;
