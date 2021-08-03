@@ -1,4 +1,4 @@
-package unity.world.meta.progression;
+package unity.world.meta;
 
 import arc.func.*;
 import arc.math.*;

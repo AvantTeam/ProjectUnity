@@ -9,7 +9,6 @@ import arc.math.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -24,7 +23,7 @@ import unity.gen.Expc.*;
 import unity.gen.*;
 import unity.type.exp.*;
 import unity.util.*;
-import unity.world.meta.progression.*;
+import unity.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -160,7 +159,7 @@ abstract class ExpComp extends Block implements Stemc{
                 return new Bar(
                     () -> build.exp() < maxExp
                     ?    Core.bundle.get("explib.exp")
-                    :   Core.bundle.get("explib.max"),
+                    :    Core.bundle.get("explib.max"),
                     () -> Tmp.c1.set(minExpColor).lerp(maxExpColor, build.expf()),
                     build::expf
                 );
