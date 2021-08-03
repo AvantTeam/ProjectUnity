@@ -30,6 +30,7 @@ import unity.gen.*;
 import unity.graphics.*;
 import unity.mod.*;
 import unity.type.*;
+import unity.type.decal.*;
 import unity.type.weapons.*;
 
 import static mindustry.Vars.*;
@@ -120,6 +121,8 @@ public class UnityUnitTypes implements ContentList{
     // koruh kami
     public static @FactionDef("koruh") @EntityPoint(Kami.class)
     UnitType kami;
+
+    public static @FactionDef("advance") @EntityDef({Unitc.class, Decorationc.class}) UnitType archimedes;
 
     // end
     public static @FactionDef("end") @EntityDef({Unitc.class, Endc.class}) UnitType voidVessel;
@@ -3813,9 +3816,34 @@ public class UnityUnitTypes implements ContentList{
             flying = true;
             drawCell = false;
             outlineColor = Color.valueOf("464a61");
-            clipSize = 1100f;
+            clipSize = 1200f;
 
             antiCheatType = new AntiCheatVariables(health / 15f, health / 1.5f, 10f, health / 20f, 0.2f, 6f * 60f, 3f * 60f, 5f, 1);
+        }};
+
+        //endregion
+        //region advance
+
+        archimedes = new UnityUnitType("archimedes"){{
+            health = 8000f;
+            speed = 2.7f;
+            accel = 0.07f;
+            drag = 0.04f;
+            hitSize = 96f;
+            engineOffset = 38f;
+            engineSize = 4.75f;
+            flying = true;
+            lowAltitude = true;
+            outlineColor = Color.valueOf("464a61");
+
+            decorations.add(new WingDecorationType(name + "-wing", 4){{
+                flapScl = 120f;
+                flapAnimation = new Interp.ExpOut(2, 2.5f);
+                wings.add(new Wing(0, 19f, -35.25f, 0.75f, 19f),
+                new Wing(1, 24.75f, -28.75f, 0.5f, 18f),
+                new Wing(2, 24.25f, -8f, 0.25f, 17f),
+                new Wing(3, 18f, 0.25f, 0f, 16f));
+            }});
         }};
 
         //endregion
