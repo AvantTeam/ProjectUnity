@@ -1731,8 +1731,6 @@ public class UnityBlocks implements ContentList{
                 enableUpgrade = true;
 
                 maxLevel = 1;
-
-                ioPrecision = 20f;
                 orbMultiplier = 0.07f;
 
                 progression.list(new Color[]{fromColor, toColor}, 1f, Interp.linear, val -> heatColor = val);

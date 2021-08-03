@@ -185,10 +185,6 @@ abstract class ExpComp extends Block implements Stemc{
         }});
     }
 
-    public void setExpStats(ExpBuildc e){
-        progression.apply(e.level());
-    }
-
     public abstract class ExpBuildComp extends Building implements StemBuildc{
         float exp;
         boolean checked = true;
@@ -375,7 +371,7 @@ abstract class ExpComp extends Block implements Stemc{
         @Override
         @MethodPriority(-1)
         public void update(){
-            setExpStats(self());
+            progression.apply(level());
         }
 
         @Override

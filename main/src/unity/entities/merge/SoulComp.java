@@ -1,7 +1,6 @@
 package unity.entities.merge;
 
 import arc.*;
-import arc.func.*;
 import arc.math.*;
 import arc.util.*;
 import mindustry.content.*;
@@ -14,12 +13,12 @@ import unity.ai.*;
 import unity.annotations.Annotations.*;
 import unity.entities.*;
 import unity.gen.*;
-import unity.gen.Soulc.*;
 import unity.world.blocks.defense.turrets.*;
+import unity.world.meta.*;
 
 import static mindustry.Vars.*;
 
-@SuppressWarnings({"unused", "unchecked"})
+@SuppressWarnings("unused")
 @MergeComponent
 abstract class SoulComp extends Block implements Stemc{
     int maxSouls = 3;
@@ -28,17 +27,13 @@ abstract class SoulComp extends Block implements Stemc{
 
     boolean requireSoul = true;
 
-    @ReadOnly Cons<SoulBuildc> joined = b -> {};
+    DynamicProgression progression = new DynamicProgression();
 
     public SoulComp(String name){
         super(name);
         update = true;
         destructible = true;
         sync = true;
-    }
-
-    public <T extends SoulBuildc> void joined(Cons<T> joined){
-        this.joined = (Cons<SoulBuildc>)joined;
     }
 
     @Override
@@ -49,7 +44,7 @@ abstract class SoulComp extends Block implements Stemc{
                 bt.left().defaults().padRight(3).left();
 
                 bt.row();
-                bt.add(Core.bundle.get(requireSoul ? "soul.require" : "soul.optional"));
+                bt.add(requireSoul ? "@soul.require" : "@soul.optional");
 
                 if(maxSouls > 0){
                     bt.row();
@@ -86,6 +81,12 @@ abstract class SoulComp extends Block implements Stemc{
                 unit = UnitTypes.block.create(team).as();
                 unit.tile(this);
             }
+        }
+
+        @Override
+        @MethodPriority(-1)
+        public void update(){
+            progression.apply(souls);
         }
 
         @Override
@@ -140,11 +141,6 @@ abstract class SoulComp extends Block implements Stemc{
 
         public boolean disabled(){
             return !hasSouls();
-        }
-
-        @Override
-        public void joined(){
-            joined.get(self());
         }
 
         @Override
