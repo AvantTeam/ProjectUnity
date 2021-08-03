@@ -8,7 +8,6 @@ import arc.graphics.*;
 import arc.math.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
-import arc.struct.ObjectMap.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.entities.*;
@@ -25,12 +24,11 @@ import unity.gen.Expc.*;
 import unity.gen.*;
 import unity.type.exp.*;
 import unity.util.*;
-
-import java.lang.reflect.*;
+import unity.world.meta.progression.*;
 
 import static mindustry.Vars.*;
 
-@SuppressWarnings({"rawtypes", "unchecked", "unused"})
+@SuppressWarnings({"unused"})
 @MergeComponent
 abstract class ExpComp extends Block implements Stemc{
     int maxLevel = 20;
@@ -43,42 +41,20 @@ abstract class ExpComp extends Block implements Stemc{
     Color maxExpColor = Color.valueOf("90ff00");
     Color upgradeColor = Color.green;
 
+    DynamicProgression progression = new DynamicProgression();
+
     Seq<ExpUpgrade> upgrades = new Seq<>();
     /** Maps {@link #upgrades} into 2D array. Do NOT modify */
-    ExpUpgrade[][] upgradesPerLevel;
+    @ReadOnly ExpUpgrade[][] upgradesPerLevel;
     boolean enableUpgrade;
     boolean hasUpgradeEffect = true;
+
     float sparkleChance = 0.08f;
     Effect sparkleEffect = UnityFx.sparkleFx;
     Effect upgradeEffect = UnityFx.upgradeBlockFx;
     Sound upgradeSound = Sounds.message;
 
-    /** The floating point in which exp will be multiplied on save and divided on load.
-     * Use only if you increment exp in floats */
-    float ioPrecision = 1f;
-
-    ObjectMap<ExpFieldType, Seq<ExpField>> expFields = new ObjectMap<>();
-    Entry<Class, Field>[] linearInc;
-    float[] linearIncStart;
-    float[] linearIncMul;
-
-    Entry<Class, Field>[] expInc;
-    float[] expIncStart;
-    float[] expIncMul;
-
-    Entry<Class, Field>[] rootInc;
-    float[] rootIncStart;
-    float[] rootIncMul;
-
-    Entry<Class, Field>[] boolInc;
-    boolean[] boolIncStart;
-    float[] boolIncMul;
-
-    Entry<Class, Field>[] listInc;
-    Entry<Class, Object[]>[] listIncMul;
-
     boolean hasExp = false;
-
     boolean hub = false;
     boolean conveyor = false;
     boolean noOrbCollision = true;
@@ -119,54 +95,6 @@ abstract class ExpComp extends Block implements Stemc{
             upgradesPerLevel.add(level.toArray());
         }
         this.upgradesPerLevel = upgradesPerLevel.toArray();
-
-        for(ExpFieldType type : ExpFieldType.all){
-            Seq<ExpField> fields = expFields.get(type, Seq::new);
-            int amount = fields.size;
-
-            if(type != ExpFieldType.list){
-                Field fInc = ReflectUtils.findField(getClass(), type.name() + "Inc", false);
-                Field fIncMul = ReflectUtils.findField(getClass(), type.name() + "IncMul", false);
-                Field fIncStart = ReflectUtils.findField(getClass(), type.name() + "IncStart", false);
-
-                ReflectUtils.setField(this, fInc, new Entry[amount]);
-                ReflectUtils.setField(this, fIncStart, type == ExpFieldType.bool ? new boolean[amount] : new float[amount]);
-                ReflectUtils.setField(this, fIncMul, new float[amount]);
-
-                for(int i = 0; i < amount; i++){
-                    ExpField field = fields.get(i);
-
-                    Entry<Class, Field> entry = (ReflectUtils.<Entry<Class, Field>[]>getField(this, fInc)[i] = new Entry<>());
-                    entry.key = field.classType;
-                    entry.value = field.field;
-
-                    if(type == ExpFieldType.bool){
-                        ReflectUtils.<boolean[]>getField(this, fIncStart)[i] = field.startBool;
-                    }else{
-                        ReflectUtils.<float[]>getField(this, fIncStart)[i] = field.startFloat;
-                    }
-
-                    ReflectUtils.<float[]>getField(this, fIncMul)[i] = field.intensity;
-                }
-            }else{
-                listInc = new Entry[amount];
-                listIncMul = new Entry[amount];
-
-                for(int i = 0; i < amount; i++){
-                    ExpField field = fields.get(i);
-
-                    listInc[i] = new Entry<>(){{
-                        key = field.classType;
-                        value = field.field;
-                    }};
-
-                    listIncMul[i] = new Entry<>(){{
-                        key = field.intensityType;
-                        value = field.intensityList;
-                    }};
-                }
-            }
-        }
 
         if(enableUpgrade){
             configurable = condConfig = true;
@@ -258,77 +186,8 @@ abstract class ExpComp extends Block implements Stemc{
         }});
     }
 
-    public void addField(ExpFieldType type, String field, float startFloat){
-        addField(type, field, startFloat, false, 1f, null, null);
-    }
-
-    public void addField(ExpFieldType type, String field, float startFloat, float intensity){
-        addField(type, field, startFloat, false, intensity, null, null);
-    }
-
-    public void addField(ExpFieldType type, String field, boolean startBool){
-        addField(type, field, 0f, startBool, 1f, null, null);
-    }
-
-    public void addField(ExpFieldType type, String field, boolean startBool, float intensity){
-        addField(type, field, 0f, startBool, intensity, null, null);
-    }
-
-    public <I> void addField(ExpFieldType type, String field, Class<I> intensityType, I[] intensity){
-        addField(type, field, 0f, false, 0f, intensityType, intensity);
-    }
-
-    public <I> void addField(ExpFieldType type, String field, float startFloat, boolean startBool, float intensity, Class<I> intensityType, I[] intensityList){
-        float f = startFloat;
-        boolean b = startBool;
-        float i = intensity;
-        I[] il = intensityList;
-
-        expFields.get(type, Seq::new).add(new ExpField(type, ReflectUtils.findClassf(getClass(), field), intensityType, ReflectUtils.findField(getClass(), field, true)){{
-            startFloat = f;
-            startBool = b;
-            intensity = i;
-            intensityList = il;
-        }});
-    }
-
     public void setExpStats(ExpBuildc e){
-        int level = e.level();
-        linearExp(level);
-        expExp(level);
-        rootExp(level);
-        boolExp(level);
-        listExp(level);
-    }
-
-    public void linearExp(int level){
-        for(int i = 0; i < linearInc.length; i++){
-            ReflectUtils.setField(linearInc[i].key.cast(this), linearInc[i].value, Math.max(linearIncStart[i] + linearIncMul[i] * level, 0f));
-        }
-    }
-
-    public void expExp(int level){
-        for(int i = 0; i < expInc.length; i++){
-            ReflectUtils.setField(expInc[i].key.cast(this), expInc[i].value, Math.max(expIncStart[i] * Mathf.pow(expIncMul[i], level), 0f));
-        }
-    }
-
-    public void rootExp(int level){
-        for(int i = 0; i < rootInc.length; i++){
-            ReflectUtils.setField(rootInc[i].key.cast(this), rootInc[i].value, Math.max(rootIncStart[i] + Mathf.sqrt(rootIncMul[i] * level), 0f));
-        }
-    }
-
-    public void boolExp(int level){
-        for(int i = 0; i < boolInc.length; i++){
-            ReflectUtils.setField(boolInc[i].key.cast(this), boolInc[i].value, boolIncStart[i] == (level < boolIncMul[i]));
-        }
-    }
-
-    public void listExp(int level){
-        for(int i = 0; i < listInc.length; i++){
-            ReflectUtils.setField(listInc[i].key.cast(this), listInc[i].value, listIncMul[i].key.cast(listIncMul[i].value[level]));
-        }
+        progression.apply(e.level());
     }
 
     public abstract class ExpBuildComp extends Building implements StemBuildc{
@@ -434,9 +293,7 @@ abstract class ExpComp extends Block implements Stemc{
 
         @Override
         public void buildConfiguration(Table table){
-            if(!enableUpgrade){
-                return;
-            }
+            if(!enableUpgrade) return;
 
             checked = true;
 
@@ -444,9 +301,7 @@ abstract class ExpComp extends Block implements Stemc{
             if(!condConfig){
                 upgradeTable(table, level);
             }else{
-                if(currentUpgrades(level).length == 0){
-                    return;
-                }
+                if(currentUpgrades(level).length == 0) return;
 
                 table.table(t -> upgradeTable(t, level));
                 table.row();
@@ -550,23 +405,11 @@ abstract class ExpComp extends Block implements Stemc{
         @Override
         @Replace
         public boolean configTapped(){
-            return
-                super.configTapped() &&
-                (
-                    !enableUpgrade ||
-                    condConfig ||
-                    !upgrades.isEmpty()
-                );
-        }
-
-        @Override
-        public void write(Writes write){
-            write.i((int)(exp * ioPrecision));
-        }
-
-        @Override
-        public void read(Reads read, byte revision){
-            exp = read.i() / ioPrecision;
+            return super.configTapped() && (
+                !enableUpgrade ||
+                condConfig ||
+                !upgrades.isEmpty()
+            );
         }
     }
 }
