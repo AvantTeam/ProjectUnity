@@ -1474,9 +1474,8 @@ public class UnityBlocks implements ContentList{
                 enableUpgrade = true;
 
                 maxLevel = 10;
-
-                addField(ExpFieldType.linear, "reloadTime", reloadTime, -2f);
-                addField(ExpFieldType.bool, "targetAir", false, 5f);
+                progression.linear(reloadTime, -2f, val -> reloadTime = val);
+                progression.bool(targetAir, 5f, val -> targetAir = val);
             }
 
             @Override
@@ -1522,7 +1521,7 @@ public class UnityBlocks implements ContentList{
 
                 maxLevel = 30;
 
-                addField(ExpFieldType.linear, "reloadTime", reloadTime, -1f);
+                progression.linear(reloadTime, -1f, val -> reloadTime = val);
             }
 
             @Override
@@ -1604,9 +1603,9 @@ public class UnityBlocks implements ContentList{
 
                 maxLevel = 30;
 
-                addField(ExpFieldType.linear, "reloadTime", reloadTime, -2f);
-                addField(ExpFieldType.linear, "range", range, 0.35f * 8f);
-                addField(ExpFieldType.linear, "basicFieldRadius", basicFieldRadius, 0.2f * 8f);
+                progression.linear(reloadTime, -2f, val -> reloadTime = val);
+                progression.linear(range, 0.25f * tilesize, val -> range = val);
+                progression.linear(basicFieldRadius, 0.2f * tilesize, val -> basicFieldRadius = val);
 
                 bulletCons((ExpLaserFieldBulletType type, Bullet b) -> type.basicFieldRadius = basicFieldRadius);
             }
@@ -1656,8 +1655,8 @@ public class UnityBlocks implements ContentList{
 
                 maxLevel = 30;
 
-                addField(ExpFieldType.linear, "reloadTime", reloadTime, -2f);
-                addField(ExpFieldType.linear, "range", range, 0.25f * 8f);
+                progression.linear(reloadTime, -2f, val -> reloadTime = val);
+                progression.linear(range, 0.25f * tilesize, val -> range = val);
             }
         };
 
@@ -1736,7 +1735,7 @@ public class UnityBlocks implements ContentList{
                 ioPrecision = 20f;
                 orbMultiplier = 0.07f;
 
-                addField(ExpFieldType.list, "heatColor", Color.class, new Color[]{fromColor, toColor});
+                progression.list(new Color[]{fromColor, toColor}, 1f, Interp.linear, val -> heatColor = val);
 
                 drawer = b -> {
                     if(b instanceof ExpTurretPowerTurretBuild tile){
@@ -1779,12 +1778,8 @@ public class UnityBlocks implements ContentList{
 
                 maxLevel = 10;
 
-                addField(ExpFieldType.list, "shots", Integer.class, new Integer[]{
-                    1, 1, 2, 2, 2, 3, 3, 4, 4, 5, 5
-                });
-                addField(ExpFieldType.list, "spread", Float.class, new Float[]{
-                    0f, 0f, 5f, 10f, 15f, 7f, 14f, 8f, 10f, 6f, 9f
-                });
+                progression.list(new Integer[]{1, 1, 2, 2, 2, 3, 3, 4, 4, 5, 5}, 1f, Interp.linear, val -> shots = val);
+                progression.list(new Float[]{0f, 0f, 5f, 10f, 15f, 7f, 14f, 8f, 10f, 6f, 9f}, 1f, Interp.linear, val -> spread = val);
             }
         };
 
