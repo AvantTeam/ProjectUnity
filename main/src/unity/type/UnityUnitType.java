@@ -25,6 +25,8 @@ import unity.*;
 import unity.entities.*;
 import unity.entities.units.*;
 import unity.gen.*;
+import unity.type.decal.*;
+import unity.type.decal.UnitDecorationType.*;
 import unity.type.weapons.*;
 import unity.util.*;
 
@@ -59,6 +61,9 @@ public class UnityUnitType extends UnitType{
         return floor.isLiquid && !(floor instanceof ShallowLiquid) ^ unit instanceof WaterMovec;
     };
     public float transformTime;
+
+    // Decoration
+    public Seq<UnitDecorationType> decorations = new Seq<>();
 
     // Tentacles
     public Seq<TentacleType> tentacles = new Seq<>();
@@ -145,6 +150,7 @@ public class UnityUnitType extends UnitType{
             abilityRegions[type.ordinal()] = atlas.find(name + "-" + type.name());
         }
 
+        decorations.each(UnitDecorationType::load);
         segWeapSeq.each(Weapon::load);
         tentacles.each(TentacleType::load);
     }
@@ -475,6 +481,16 @@ public class UnityUnitType extends UnitType{
     }
 
     @Override
+    public void drawOutline(Unit unit){
+        if(unit instanceof Decorationc d){
+            for(UnitDecoration decor : d.decors()){
+                if(!decor.type.top) decor.type.draw(unit, decor);
+            }
+        }
+        super.drawOutline(unit);
+    }
+
+    @Override
     public void drawBody(Unit unit){
         float z = Draw.z();
 
@@ -484,6 +500,12 @@ public class UnityUnitType extends UnitType{
             Draw.z(z);
         }
         super.drawBody(unit);
+
+        if(unit instanceof Decorationc d){
+            for(UnitDecoration decor : d.decors()){
+                if(decor.type.top) decor.type.draw(unit, decor);
+            }
+        }
         //worm
         if(unit instanceof WormDefaultUnit wormUnit){
             camera.bounds(viewport);
@@ -709,6 +731,10 @@ public class UnityUnitType extends UnitType{
                 icon.draw(GraphicUtils.get(packer, name), true);
             }
 
+            for(UnitDecorationType decoration : decorations){
+                if(!decoration.top) decoration.drawIcon(packer, icon, outliner);
+            }
+
             for(Weapon weapon : weapons){
                 if(weapon.name.isEmpty()) continue;
                 if(weapon instanceof MultiBarrelWeapon m && outlined.add(weapon.name + "-barrel")){
@@ -791,6 +817,10 @@ public class UnityUnitType extends UnitType{
                 }
 
                 pix.dispose();
+            }
+
+            for(UnitDecorationType decoration : decorations){
+                if(decoration.top) decoration.drawIcon(packer, icon, outliner);
             }
 
             if(unit instanceof Copterc){
