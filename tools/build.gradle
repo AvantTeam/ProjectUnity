@@ -1,0 +1,54 @@
+sourceSets.main {
+    java.srcDirs = ['src/']
+}
+
+final def dexedJar = (project(':main').tasks.deployDex as Jar).archiveFile.get().asFile
+final def distJar = (project(':main').tasks.deploy as Jar).archiveFile.get().asFile
+final def regularJar = (project(':main').tasks.deployDex as Jar).archiveFile.get().asFile
+
+final def cp = dexedJar.exists() ? dexedJar : distJar.exists() ? distJar : regularJar
+
+dependencies {
+    if(
+        !cp.exists() ||
+        toolRecompile ||
+        taskNames.contains('main:deploy') ||
+        taskNames.contains('main:deployDex')
+    ) {
+        implementation project(':main')
+    } else {
+        implementation files(cp)
+    }
+
+    implementation "com.github.Anuken.Mindustry:core:$mindustryVersion"
+    implementation "com.github.Anuken.Arc:natives-desktop:$arcVersion"
+}
+
+task proc(dependsOn: [classes, configurations.runtimeClasspath]) {
+    final def finalOutput = new File(new File(assetsDir, 'sprites'), 'gen')
+    doLast {
+        delete { delete finalOutput }
+        assert finalOutput.mkdir()
+
+        javaexec {
+            workingDir = assetsDir
+            main = 'unity.tools.Tools'
+            classpath = sourceSets.main.runtimeClasspath
+        }
+
+        final def dir = tasks.proc.getTemporaryDir()
+
+        delete { delete dir }
+        assert dir.mkdirs()
+
+        javaexec {
+            workingDir = dir
+            main = 'unity.tools.Appender'
+            classpath = sourceSets.main.runtimeClasspath
+
+            args = [assetsDir]
+            if(dexedJar.exists()) args += dexedJar
+            if(distJar.exists()) args += distJar
+        }
+    }
+}

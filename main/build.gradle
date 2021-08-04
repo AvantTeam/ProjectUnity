@@ -19,8 +19,6 @@ dependencies {
 }
 
 ext {
-    assetsDir = new File(rootDir, "main/assets/")
-
     fetchPackage = 'unity/fetched'
     fetchDir = new File("$projectDir/fetched/$fetchPackage")
 
@@ -28,7 +26,6 @@ ext {
     fetchRevision = 1
 }
 
-import arc.*
 import arc.files.*
 import arc.func.*
 import arc.struct.*
@@ -54,7 +51,7 @@ task deploy(type: Jar, dependsOn: configurations.runtimeClasspath) {
 task deployDex(type: Jar, dependsOn: deploy) {
     archiveFileName.set "${modName}.jar"
 
-    final def desktopJar = deploy.archiveFile.get()
+    final def desktopJar = deploy.archiveFile.get().asFile
     final def dexJar = new File(deployDex.getTemporaryDir(), 'Dexed.jar')
 
     doFirst {
