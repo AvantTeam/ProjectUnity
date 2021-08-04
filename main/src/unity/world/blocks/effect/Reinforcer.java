@@ -71,7 +71,7 @@ public class Reinforcer extends Block {
         @Override
         public void updateTile(){
             if(consValid()){
-                unit = Units.closest(this.team, x, y, range, u -> u != null && !u.hasEffect(UnityStatusEffects.plated));
+                unit = Units.closest(this.team, x, y, range, u -> u != null && !u.hasEffect(UnityStatusEffects.plated) && !u.spawnedByCore);
 
                 if(unit != null) {
                     prevUnit = unit;
