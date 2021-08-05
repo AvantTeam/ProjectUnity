@@ -59,8 +59,10 @@ public class Unity extends Mod{
     };
 
     public Unity(){
-        Core.assets.setLoader(Model.class, new ModelLoader(tree));
-        Core.assets.setLoader(WavefrontObject.class, new WavefrontObjectLoader(tree));
+        if(!headless){
+            Core.assets.setLoader(Model.class, new ModelLoader(tree));
+            Core.assets.setLoader(WavefrontObject.class, new WavefrontObjectLoader(tree));
+        }
 
         Events.on(ContentInitEvent.class, e -> {
             if(!headless){

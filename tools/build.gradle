@@ -59,11 +59,7 @@ task rearchive {
 task proc(dependsOn: [classes, configurations.runtimeClasspath]) {
     if(toolRearchive) finalizedBy rearchive
 
-    final def finalOutput = new File(new File(assetsDir, 'sprites'), 'gen')
     doLast {
-        delete { delete finalOutput }
-        assert finalOutput.mkdir()
-
         javaexec {
             workingDir = assetsDir
             main = 'unity.tools.Tools'
