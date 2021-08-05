@@ -30,7 +30,9 @@ task rearchive {
     task appendDexed(type: Jar) {
         archiveFileName.set dexedJar.getName()
         from zipTree(dexedJar)
+        from files(assetsDir)
 
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         doLast {
             new Fi(dexedJar).writeBytes(new Fi(file(archiveFile.get())).readBytes())
         }
@@ -39,7 +41,9 @@ task rearchive {
     task appendDist(type: Jar) {
         archiveFileName.set distJar.getName()
         from zipTree(distJar)
+        from files(assetsDir)
 
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         doLast {
             new Fi(distJar).writeBytes(new Fi(file(archiveFile.get())).readBytes())
         }

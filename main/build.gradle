@@ -40,7 +40,7 @@ task deploy(type: Jar, dependsOn: configurations.runtimeClasspath) {
     from files(sourceSets.main.output.classesDirs)
     from files(sourceSets.main.output.resourcesDir)
     from configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-    from files(project.assetsDir)
+    from files(assetsDir)
     from(rootDir) { include 'mod.json' }
 
     doFirst {
