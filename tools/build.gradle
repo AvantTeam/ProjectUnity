@@ -2,6 +2,8 @@ sourceSets.main {
     java.srcDirs = ['src/']
 }
 
+import arc.files.*
+
 final def dexedJar = (project(':main').tasks.deployDex as Jar).archiveFile.get().asFile
 final def distJar = (project(':main').tasks.deploy as Jar).archiveFile.get().asFile
 final def regularJar = (project(':main').tasks.deployDex as Jar).archiveFile.get().asFile
@@ -24,7 +26,35 @@ dependencies {
     implementation "com.github.Anuken.Arc:natives-desktop:$arcVersion"
 }
 
+task rearchive {
+    task appendDexed(type: Jar) {
+        archiveFileName.set dexedJar.getName()
+        from zipTree(dexedJar)
+
+        doLast {
+            new Fi(dexedJar).writeBytes(new Fi(file(archiveFile.get())).readBytes())
+        }
+    }
+
+    task appendDist(type: Jar) {
+        archiveFileName.set distJar.getName()
+        from zipTree(distJar)
+
+        doLast {
+            new Fi(distJar).writeBytes(new Fi(file(archiveFile.get())).readBytes())
+        }
+    }
+
+    def finalize = []
+    if(distJar.exists() || taskNames.contains('main:deploy')) finalize += appendDist
+    if(dexedJar.exists() || taskNames.contains('main:deployDex')) finalize += appendDexed
+
+    finalizedBy finalize
+}
+
 task proc(dependsOn: [classes, configurations.runtimeClasspath]) {
+    if(toolRearchive) finalizedBy rearchive
+
     final def finalOutput = new File(new File(assetsDir, 'sprites'), 'gen')
     doLast {
         delete { delete finalOutput }
@@ -34,21 +64,6 @@ task proc(dependsOn: [classes, configurations.runtimeClasspath]) {
             workingDir = assetsDir
             main = 'unity.tools.Tools'
             classpath = sourceSets.main.runtimeClasspath
-        }
-
-        final def dir = tasks.proc.getTemporaryDir()
-
-        delete { delete dir }
-        assert dir.mkdirs()
-
-        javaexec {
-            workingDir = dir
-            main = 'unity.tools.Appender'
-            classpath = sourceSets.main.runtimeClasspath
-
-            args = [assetsDir]
-            if(dexedJar.exists()) args += dexedJar
-            if(distJar.exists()) args += distJar
         }
     }
 }

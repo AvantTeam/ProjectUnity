@@ -203,4 +203,6 @@ tasks.withType(Jar) {
     exclude 'unity/entities/comp/**'
     exclude 'unity/entities/merge/**'
     if(!devBuild) exclude 'unity/mod/DevBuildImpl*'
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }

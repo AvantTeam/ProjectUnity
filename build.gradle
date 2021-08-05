@@ -30,8 +30,10 @@ allprojects {
         // `-Ptools.recompile` will force the :main project to recompile. Default is false
         toolRecompile = project.hasProperty('tools.recompile') && Boolean.parseBoolean(project.property('tools.recompile') as String)
 
-        // `-Ptools.rearch` will make the .jar file resulted from :main:deploy and/or :main:deployDex also include the generated assets. Default is true
-        toolArchive = !project.hasProperty('tools.rearch') || Boolean.parseBoolean(project.property('tools.rearch') as String)
+        // `-Ptools.rearch` will make the .jar file resulted from :main:deploy and/or :main:deployDex also include the generated
+        // assets, without recompiling. Default is true
+        // See also :tools:rearchive
+        toolRearchive = !project.hasProperty('tools.rearch') || Boolean.parseBoolean(project.property('tools.rearch') as String)
     }
 
     repositories {
