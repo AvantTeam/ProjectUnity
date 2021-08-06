@@ -20,6 +20,8 @@ import static unity.Unity.*;
 /** Main entry point of the tools module. This must only affect the main project's asset directory. */
 public class Tools{
     public static Unity unity;
+    public static LoadedMod mod;
+    public static ModMeta meta;
 
     public static final Fi
     assetsDir,
@@ -67,6 +69,7 @@ public class Tools{
         Core.app = new NoopApplication();
         Core.files = new NoopFiles();
         Core.assets = new AssetManager(tree = new FileTree());
+        Core.atlas = new GenAtlas();
 
         asyncCore = new AsyncCore();
         mods = new Mods();
@@ -77,8 +80,8 @@ public class Tools{
 
         unity = new Unity();
 
-        var meta = new ModMeta(){{ name = "unity"; }};
-        var mod = new LoadedMod(null, null, unity, Tools.class.getClassLoader(), meta);
+        meta = new ModMeta(){{ name = "unity"; }};
+        mod = new LoadedMod(null, null, unity, Tools.class.getClassLoader(), meta);
 
         Reflect.<Seq<LoadedMod>>get(Mods.class, mods, "mods").add(mod);
         Reflect.<ObjectMap<Class<?>, ModMeta>>get(Mods.class, mods, "metas").put(Unity.class, meta);
