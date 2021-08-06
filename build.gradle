@@ -42,7 +42,7 @@ allprojects {
     }
 
     task sourcesJar(type: Jar, dependsOn: classes) {
-        archiveClassifier.set('sources')
+        archiveClassifier.set 'sources'
         from sourceSets.main.allSource
     }
 

@@ -13,6 +13,7 @@ import mindustry.mod.Mods.*;
 import unity.*;
 
 import java.nio.file.*;
+import java.util.concurrent.*;
 
 import static mindustry.Vars.*;
 import static unity.Unity.*;
@@ -27,6 +28,8 @@ public class Tools{
     assetsDir,
     spritesDir, spritesGenDir;
 
+    public static GenAtlas atlas;
+
     static{
         assetsDir = new Fi(Paths.get("").toFile());
         spritesDir = assetsDir.child("sprites");
@@ -35,46 +38,18 @@ public class Tools{
 
     public static void main(String[] args){
         ArcNativesLoader.load();
-        Core.app = new Application(){
-            final Seq<ApplicationListener> listeners = new Seq<>();
-
-            @Override
-            public Seq<ApplicationListener> getListeners(){
-                return listeners;
-            }
-
-            @Override
-            public ApplicationType getType(){
-                return ApplicationType.headless;
-            }
-
-            @Override
-            public String getClipboardText(){
-                return null;
-            }
-
-            @Override
-            public void setClipboardText(String text){}
-
-            @Override
-            public void post(Runnable runnable){
-                runnable.run();
-            }
-
-            @Override
-            public void exit(){}
-        };
+        Log.logger = new NoopLogHandler();
 
         headless = true;
         Core.app = new NoopApplication();
         Core.files = new NoopFiles();
         Core.assets = new AssetManager(tree = new FileTree());
-        Core.atlas = new GenAtlas();
+        Core.settings = new Settings();
+        Core.atlas = atlas = new GenAtlas();
 
         asyncCore = new AsyncCore();
         mods = new Mods();
 
-        Log.logger = new NoopLogHandler();
         content = new ContentLoader();
         content.createBaseContent();
 
@@ -89,6 +64,43 @@ public class Tools{
         content.setCurrentMod(mod);
         unity.loadContent();
         content.setCurrentMod(null);
+
         Log.logger = new DefaultLogHandler();
+        loadLogger();
+
+        clear(spritesGenDir);
+        addRegions();
+
+        atlas.dispose();
+    }
+
+    private static void addRegions(){
+        print("Adding regions...");
+        Time.mark();
+
+        var exec = Executors.newCachedThreadPool();
+
+        spritesDir.walk(path -> {
+            if(!path.extEquals("png")) return;
+            exec.submit(() -> atlas.addRegion(path));
+        });
+
+        try{
+            exec.shutdown();
+
+            boolean executed = exec.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+            if(!executed) throw new IllegalStateException("Very strange things happened.");
+        }catch(InterruptedException e){
+            throw new RuntimeException(e);
+        }
+
+        print("Total time to add regions: " + Time.elapsed() + "ms");
+    }
+
+    public static void clear(Fi file){
+        file.mkdirs();
+        for(var child : file.list()){
+            child.deleteDirectory();
+        }
     }
 }
