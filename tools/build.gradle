@@ -6,7 +6,7 @@ import arc.files.*
 
 final def dexedJar = (project(':main').tasks.deployDex as Jar).archiveFile.get().asFile
 final def distJar = (project(':main').tasks.deploy as Jar).archiveFile.get().asFile
-final def regularJar = (project(':main').tasks.deployDex as Jar).archiveFile.get().asFile
+final def regularJar = (project(':main').tasks.jar as Jar).archiveFile.get().asFile
 
 final def cp = dexedJar.exists() ? dexedJar : distJar.exists() ? distJar : regularJar
 
@@ -18,7 +18,7 @@ dependencies {
         taskNames.contains('main:deployDex')
     ) {
         implementation project(':main')
-        if(taskNames.contains('tools:proc')) println 'Compiling main project before processing assets...'
+        if(taskNames.contains('tools:proc')) println 'Compiling :main project before processing assets...'
     } else {
         implementation files(cp)
     }
