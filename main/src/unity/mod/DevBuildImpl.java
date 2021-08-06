@@ -69,7 +69,7 @@ public class DevBuildImpl implements DevBuild{
     }
 
     private void initCommandLine(){
-        if(!headless){
+        if(!headless && !android){
             Threads.daemon("Command-Executor", () -> {
                 Scanner scan = new Scanner(System.in);
                 String line;
