@@ -285,4 +285,8 @@ public class Unity extends Mod{
 
         Log.log(level, "&lm&fb[unity]&fr @", builder.toString());
     }
+
+    public static void enforce(boolean cond, String message){
+        if(!cond) throw new IllegalArgumentException(message);
+    }
 }

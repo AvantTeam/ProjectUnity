@@ -18,6 +18,7 @@ dependencies {
         taskNames.contains('main:deployDex')
     ) {
         implementation project(':main')
+        if(taskNames.contains('tools:proc')) println 'Compiling main project before processing assets...'
     } else {
         implementation files(cp)
     }
@@ -57,7 +58,10 @@ task rearchive {
 }
 
 task proc(dependsOn: [classes, configurations.runtimeClasspath]) {
-    if(toolRearchive) finalizedBy rearchive
+    if(toolRearchive){
+        finalizedBy rearchive
+        if(taskNames.contains('tools:proc')) println '.jar files will be re-archived after processing sprites.'
+    }
 
     doLast {
         javaexec {
