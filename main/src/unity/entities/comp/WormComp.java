@@ -290,12 +290,16 @@ abstract class WormComp implements Unitc{
                 Tmp.v1.rotate(u.rotation).scl(0.1f * Time.delta);
                 u.vel.sub(Tmp.v1);
 
+                /*
                 float vl = vel().len();
                 Tmp.v1.trns(u.angleTo(last), vl).add(u.vel).setLength(vl);
                 u.vel.lerpDelta(Tmp.v1, type.accel * type.speed).limit(vl);
                 if(u.deltaLen() > last.vel().len()){
                     u.vel.scl(1f - Mathf.clamp(0.3f * Time.delta));
                 }
+                */
+
+                u.vel.setLength2(vel().len2());
 
                 float nextHealth = (last.health() + u.health()) / 2f;
                 if(!Mathf.equal(nextHealth, last.health(), 0.0001f)) last.health(Mathf.lerpDelta(last.health(), nextHealth, uType.healthDistribution));
@@ -319,6 +323,12 @@ abstract class WormComp implements Unitc{
                 scanTime = 0f;
             }
         }
+    }
+
+    @Replace
+    @Override
+    public void wobble(){
+        
     }
 
     @MethodPriority(-1)
