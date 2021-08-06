@@ -7,14 +7,11 @@ import arc.graphics.g2d.TextureAtlas.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.pooling.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
 import mindustry.type.*;
-
-import java.nio.*;
 
 import static arc.Core.*;
 
@@ -224,6 +221,10 @@ public final class GraphicUtils{
 
         if(!Structs.inBounds(xInt, yInt, pix.width, pix.height)) return ref.set(0, 0, 0, 0);
 
+        Color
+            c1 = new Color(),
+            c2 = new Color();
+
         // A lot of these booleans are commonly checked, so let's run each check just once
         boolean isXInt = x == xInt;
         boolean isYInt = y == yInt;
@@ -234,18 +235,18 @@ public final class GraphicUtils{
         if((isXInt && isYInt) || (xOverflow && yOverflow)) return ref.set(pix.get(xInt, yInt));
 
         if(isXInt || xOverflow){
-            return ref.set(colorLerp(Tmp.c1.set(getAlphaMedianColor(pix, ref, xInt, yInt)), getAlphaMedianColor(pix, ref, xInt, yInt + 1), y % 1));
+            return ref.set(colorLerp(c1.set(getAlphaMedianColor(pix, ref, xInt, yInt)), getAlphaMedianColor(pix, ref, xInt, yInt + 1), y % 1));
         }else if(isYInt || yOverflow){
-            return ref.set(colorLerp(Tmp.c1.set(getAlphaMedianColor(pix, ref, xInt, yInt)), getAlphaMedianColor(pix, ref, xInt + 1, yInt), x % 1));
+            return ref.set(colorLerp(c1.set(getAlphaMedianColor(pix, ref, xInt, yInt)), getAlphaMedianColor(pix, ref, xInt + 1, yInt), x % 1));
         }
 
         // Because Color is mutable, strictly 3 Color objects are effectively pooled; this sprite's color ("c0") and Temp's c1 & c2.
         // The first row sets color to c0, which is then set to c1. New color is set to c0, and #colorLerp() puts result of c1 and c0 onto c1.
         // The second row does the same thing, but with c2 in the place of c1. Finally on return line, the result between c1 and c2 is put onto c1, which is then set to c0
-        colorLerp(Tmp.c1.set(getAlphaMedianColor(pix, ref, xInt, yInt)), getAlphaMedianColor(pix, ref, xInt + 1, yInt), x % 1);
-        colorLerp(Tmp.c2.set(getAlphaMedianColor(pix, ref, xInt, yInt + 1)), getAlphaMedianColor(pix, ref, xInt + 1, yInt + 1), x % 1);
+        colorLerp(c1.set(getAlphaMedianColor(pix, ref, xInt, yInt)), getAlphaMedianColor(pix, ref, xInt + 1, yInt), x % 1);
+        colorLerp(c2.set(getAlphaMedianColor(pix, ref, xInt, yInt + 1)), getAlphaMedianColor(pix, ref, xInt + 1, yInt + 1), x % 1);
 
-        return ref.set(colorLerp(Tmp.c1, Tmp.c2, y % 1));
+        return ref.set(colorLerp(c1, c2, y % 1));
     }
 
     /** @author Drullkus */
@@ -254,34 +255,31 @@ public final class GraphicUtils{
         if(alpha >= 0.1f) return ref;
 
         Color
-            c1 = Pools.obtain(Color.class, Color::new).set(0f, 0f, 0f, 0f),
-            c2 = Pools.obtain(Color.class, Color::new).set(0f, 0f, 0f, 0f),
-            c3 = Pools.obtain(Color.class, Color::new).set(0f, 0f, 0f, 0f),
-            c4 = Pools.obtain(Color.class, Color::new).set(0f, 0f, 0f, 0f);
+            c1 = new Color(),
+            c2 = new Color(),
+            c3 = new Color(),
+            c4 = new Color();
 
-        Color out = alphaMedian(
+        return alphaMedian(
             ref.cpy(),
             c1.set(pix.get(x + 1, y)),
             c2.set(pix.get(x, y + 1)),
             c3.set(pix.get(x - 1, y)),
             c4.set(pix.get(x, y - 1))
         ).a(alpha);
-
-        Pools.free(c1);
-        Pools.free(c2);
-        Pools.free(c3);
-        Pools.free(c4);
-
-        return out;
     }
 
     /** @author Drullkus */
     public static Color alphaMedian(Color main, Color ref, Color... colors){
+        Color
+            c1 = new Color(),
+            c2 = new Color();
+
         ObjectIntMap<Color> matches = new ObjectIntMap<>();
         int count, primaryCount = -1, secondaryCount = -1;
 
-        Tmp.c3.set(main);
-        Tmp.c4.set(main);
+        c1.set(main);
+        c2.set(main);
 
         for(Color color : colors){
             if(color.a < 0.1f) continue;
@@ -290,22 +288,22 @@ public final class GraphicUtils{
 
             if(count > primaryCount){
                 secondaryCount = primaryCount;
-                Tmp.c4.set(Tmp.c3);
+                c2.set(c1);
 
                 primaryCount = count;
-                Tmp.c3.set(color);
+                c1.set(color);
             }else if(count > secondaryCount){
                 secondaryCount = count;
-                Tmp.c4.set(color);
+                c2.set(color);
             }
         }
 
         if(primaryCount > secondaryCount){
-            return ref.set(Tmp.c3);
+            return ref.set(c1);
         }else if(primaryCount == -1){
             return ref.set(main);
         }else{
-            return ref.set(averageColor(Tmp.c3, Tmp.c4));
+            return ref.set(averageColor(c1, c2));
         }
     }
 

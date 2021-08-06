@@ -30,6 +30,7 @@ public final class Processors{
                 throw new RuntimeException(e);
             }
 
+            process.finish();
             print(process.getClass().getSimpleName() + " executed for " + Time.elapsed() + "ms");
         }
     }

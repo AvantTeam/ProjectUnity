@@ -10,6 +10,8 @@ import static unity.Unity.*;
 public interface Processor{
     void process(ExecutorService exec);
 
+    default void finish(){}
+
     default void submit(ExecutorService exec, UnsafeRunnable run){
         exec.submit(() -> {
             try{

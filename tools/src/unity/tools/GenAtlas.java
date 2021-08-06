@@ -74,6 +74,13 @@ public class GenAtlas extends TextureAtlas{
     }
 
     @Override
+    public boolean has(String s){
+        synchronized(regions){
+            return regions.containsKey(s);
+        }
+    }
+
+    @Override
     public void dispose(){
         synchronized(regions){
             for(var pix : regions.values()){
@@ -92,6 +99,11 @@ public class GenAtlas extends TextureAtlas{
         public GenRegion(String name, Pixmap pixmap){
             this.name = name;
             this.pixmap = pixmap;
+
+            if(pixmap != null){
+                width = pixmap.width;
+                height = pixmap.height;
+            }
 
             u = v = 0f;
             u2 = v2 = 1f;
