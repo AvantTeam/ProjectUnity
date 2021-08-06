@@ -30,8 +30,8 @@ dependencies {
 task rearchive {
     task appendDexed(type: Jar) {
         archiveFileName.set dexedJar.getName()
-        from zipTree(dexedJar)
         from files(assetsDir)
+        from zipTree(dexedJar)
 
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         doLast {
@@ -41,8 +41,8 @@ task rearchive {
 
     task appendDist(type: Jar) {
         archiveFileName.set distJar.getName()
-        from zipTree(distJar)
         from files(assetsDir)
+        from zipTree(distJar)
 
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         doLast {

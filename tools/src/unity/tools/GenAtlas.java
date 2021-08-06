@@ -5,6 +5,8 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.struct.*;
 
+import static unity.tools.Tools.*;
+
 public class GenAtlas extends TextureAtlas{
     private final ObjectMap<String, GenRegion> regions = new ObjectMap<>();
 
@@ -50,9 +52,7 @@ public class GenAtlas extends TextureAtlas{
     public GenRegion find(String name){
         synchronized(regions){
             if(!regions.containsKey(name)){
-                var reg = new GenRegion(name, null);
-                reg.invalid = true;
-                return reg;
+                return new GenRegion(name, null);
             }
 
             return regions.get(name);
@@ -62,14 +62,14 @@ public class GenAtlas extends TextureAtlas{
     @Override
     public GenRegion find(String name, String def){
         synchronized(regions){
-            return regions.get(name, regions.get(def));
+            return regions.get(name, find(def));
         }
     }
 
     @Override
     public GenRegion find(String name, TextureRegion def){
         synchronized(regions){
-            return regions.get(name, (GenRegion) def);
+            return regions.get(name, (GenRegion)def);
         }
     }
 
@@ -85,7 +85,6 @@ public class GenAtlas extends TextureAtlas{
     }
 
     public static class GenRegion extends AtlasRegion{
-        public boolean invalid;
         public String relativePath = "";
 
         private final Pixmap pixmap;
@@ -93,11 +92,14 @@ public class GenAtlas extends TextureAtlas{
         public GenRegion(String name, Pixmap pixmap){
             this.name = name;
             this.pixmap = pixmap;
+
+            u = v = 0f;
+            u2 = v2 = 1f;
         }
 
         @Override
         public boolean found(){
-            return !invalid;
+            return pixmap != null;
         }
 
         /**
@@ -108,6 +110,22 @@ public class GenAtlas extends TextureAtlas{
         public Pixmap pixmap(){
             if(!found()) throw new IllegalArgumentException("Region does not exist: " + name);
             return pixmap;
+        }
+
+        public void save(){
+            save(true);
+        }
+
+        public void save(boolean add){
+            if(!found()) throw new IllegalArgumentException("Cannot save an invalid region: " + name);
+
+            var dir = spritesGenDir.child(relativePath);
+            dir.mkdirs();
+
+            var file = dir.child(name.replaceFirst("unity-", "") + ".png");
+            file.writePng(pixmap);
+
+            if(add) atlas.addRegion(name, this);
         }
     }
 }

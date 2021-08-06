@@ -8,9 +8,12 @@ import arc.util.*;
 import arc.util.Log.*;
 import mindustry.async.*;
 import mindustry.core.*;
+import mindustry.ctype.*;
 import mindustry.mod.*;
 import mindustry.mod.Mods.*;
 import unity.*;
+import unity.ai.kami.*;
+import unity.gen.*;
 
 import java.nio.file.*;
 import java.util.concurrent.*;
@@ -19,7 +22,7 @@ import static mindustry.Vars.*;
 import static unity.Unity.*;
 
 /** Main entry point of the tools module. This must only affect the main project's asset directory. */
-public class Tools{
+public final class Tools{
     public static Unity unity;
     public static LoadedMod mod;
     public static ModMeta meta;
@@ -30,11 +33,22 @@ public class Tools{
 
     public static GenAtlas atlas;
 
+    private static final IntSet[] initialized = new IntSet[ContentType.all.length];
+    private static final IntSet[] loaded = new IntSet[ContentType.all.length];
+
     static{
         assetsDir = new Fi(Paths.get("").toFile());
         spritesDir = assetsDir.child("sprites");
         spritesGenDir = spritesDir.child("gen");
+
+        for(var type : ContentType.all){
+            int i = type.ordinal();
+            initialized[i] = new IntSet();
+            loaded[i] = new IntSet();
+        }
     }
+
+    private Tools(){}
 
     public static void main(String[] args){
         ArcNativesLoader.load();
@@ -71,6 +85,11 @@ public class Tools{
         clear(spritesGenDir);
         addRegions();
 
+        Regions.load();
+        KamiRegions.load();
+
+        Processors.process();
+
         atlas.dispose();
     }
 
@@ -85,16 +104,32 @@ public class Tools{
             exec.submit(() -> atlas.addRegion(path));
         });
 
+        exec.shutdown();
         try{
-            exec.shutdown();
-
-            boolean executed = exec.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
-            if(!executed) throw new IllegalStateException("Very strange things happened.");
+            if(!exec.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS)) throw new IllegalStateException("Very strange things happened.");
         }catch(InterruptedException e){
             throw new RuntimeException(e);
         }
 
         print("Total time to add regions: " + Time.elapsed() + "ms");
+    }
+
+    public static boolean init(Content content){
+        synchronized(initialized){
+            boolean should = initialized[content.getContentType().ordinal()].add(content.id);
+            if(should) content.init();
+
+            return should;
+        }
+    }
+
+    public static boolean load(Content content){
+        synchronized(loaded){
+            boolean should = loaded[content.getContentType().ordinal()].add(content.id);
+            if(should) content.load();
+
+            return should;
+        }
     }
 
     public static void clear(Fi file){
