@@ -55,11 +55,11 @@ public class UnitProcessor implements Processor{
 
             Cons<TextureRegion> outliner = t -> {
                 if(t instanceof GenRegion at && opt.get(at) && outline(at.name)){
-                    replace(at);
-
                     var reg = new GenRegion(at.name, Pixmaps.outline(new PixmapRegion(at.pixmap()), type.outlineColor, type.outlineRadius));
                     reg.relativePath = at.relativePath;
                     reg.save();
+
+                    replace(at);
                 }
             };
 
@@ -93,7 +93,7 @@ public class UnitProcessor implements Processor{
 
             if(unit instanceof Copterc){
                 for(Rotor rotor : type.rotors){
-                    var region = (GenRegion)rotor.bladeRegion;
+                    var region = conv(rotor.bladeRegion);
 
                     outlSeparate.get(region, "outline");
                     outliner.get(rotor.topRegion);
@@ -142,6 +142,7 @@ public class UnitProcessor implements Processor{
             }
 
             Pixmap icon = Pixmaps.outline(new PixmapRegion(conv(type.region).pixmap()), type.outlineColor, type.outlineRadius);
+            add.get(conv(type.region), type.name + "-outline", icon.copy());
 
             if(unit instanceof Mechc){
                 GraphicUtils.drawCenter(icon, conv(type.baseRegion).pixmap());
