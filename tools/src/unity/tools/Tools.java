@@ -89,6 +89,7 @@ public final class Tools{
         clear(spritesGenDir);
         addRegions();
 
+        atlas.clear = atlas.find("clear");
         Regions.load();
         KamiRegions.load();
 

@@ -8,6 +8,7 @@ import arc.struct.*;
 import static unity.tools.Tools.*;
 
 public class GenAtlas extends TextureAtlas{
+    public GenRegion clear;
     private final ObjectMap<String, GenRegion> regions = new ObjectMap<>();
 
     /** The name should be prefixed with {@code unity-} */
