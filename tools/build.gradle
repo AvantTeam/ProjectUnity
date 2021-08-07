@@ -32,7 +32,7 @@ task rearchive {
         if(taskNames.contains('main:deployDex')) dependsOn project(':main').tasks.deployDex
 
         archiveFileName.set dexedJar.getName()
-        from files(assetsDir)
+        from files(assetsDir) { exclude 'sprites/vanilla/**' }
         from zipTree(dexedJar)
 
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
@@ -49,7 +49,7 @@ task rearchive {
         if(taskNames.contains('main:deploy')) dependsOn project(':main').tasks.deploy
 
         archiveFileName.set distJar.getName()
-        from files(assetsDir)
+        from files(assetsDir) { exclude 'sprites/vanilla/**' }
         from zipTree(distJar)
 
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE

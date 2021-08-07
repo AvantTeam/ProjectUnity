@@ -35,7 +35,7 @@ public class UnitProcessor implements Processor{
     @Override
     @SuppressWarnings("SuspiciousNameCombination")
     public void process(ExecutorService exec){
-        content.units().each(type -> type instanceof UnityUnitType, (UnityUnitType type) -> submit(exec, () -> {
+        content.units().each(type -> type instanceof UnityUnitType && !type.isHidden(), (UnityUnitType type) -> submit(exec, () -> {
             init(type);
             load(type);
 
@@ -349,6 +349,8 @@ public class UnitProcessor implements Processor{
             }
 
             add.get(conv(type.region), type.name + "-full", icon);
+
+
         }));
     }
 

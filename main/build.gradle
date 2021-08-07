@@ -40,7 +40,7 @@ task deploy(type: Jar, dependsOn: configurations.runtimeClasspath) {
     from files(sourceSets.main.output.classesDirs)
     from files(sourceSets.main.output.resourcesDir)
     from configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-    from files(assetsDir)
+    from files(assetsDir) { exclude 'sprites/vanilla/**' }
     from(rootDir) { include 'mod.json' }
 
     doFirst {
@@ -206,6 +206,7 @@ tasks.withType(Jar) {
     exclude 'unity/entities/merge/**'
     if(!devBuild) exclude 'unity/mod/DevBuildImpl*'
 
+    exclude 'sprites/vanilla/**'
     doFirst {
         exclude excludedFiles.readString().split(/\n/)
     }

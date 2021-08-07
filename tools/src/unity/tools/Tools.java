@@ -7,6 +7,7 @@ import arc.graphics.g2d.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
+import arc.util.async.*;
 import mindustry.async.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
@@ -113,17 +114,11 @@ public final class Tools{
         var exec = Executors.newCachedThreadPool();
 
         spritesDir.walk(path -> {
-            if(!path.extEquals("png") || path.path().contains("sprites/gen/")) return;
+            if(!path.extEquals("png")) return;
             exec.submit(() -> atlas.addRegion(path));
         });
 
-        exec.shutdown();
-        try{
-            if(!exec.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS)) throw new IllegalStateException("Very strange things happened.");
-        }catch(InterruptedException e){
-            throw new RuntimeException(e);
-        }
-
+        Threads.await(exec);
         print("Total time to add regions: " + Time.elapsed() + "ms");
     }
 

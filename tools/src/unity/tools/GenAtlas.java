@@ -12,7 +12,9 @@ public class GenAtlas extends TextureAtlas{
 
     /** The name should be prefixed with {@code unity-} */
     public GenRegion addRegion(Fi file){
-        var name = "unity-" + file.nameWithoutExtension();
+        var name = file.nameWithoutExtension();
+        if(!file.path().contains("sprites/vanilla/")) name = "unity-" + name;
+
         var reg = new GenRegion(name, new Pixmap(file));
 
         var path = file.path();

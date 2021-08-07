@@ -1,6 +1,7 @@
 package unity.tools;
 
 import arc.util.*;
+import arc.util.async.*;
 import unity.tools.proc.*;
 
 import java.util.concurrent.*;
@@ -22,13 +23,7 @@ public final class Processors{
             var exec = Executors.newCachedThreadPool();
 
             process.process(exec);
-            exec.shutdown();
-
-            try{
-                if(!exec.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS)) throw new IllegalStateException("Very strange things happened.");
-            }catch(InterruptedException e){
-                throw new RuntimeException(e);
-            }
+            Threads.await(exec);
 
             process.finish();
             print(process.getClass().getSimpleName() + " executed for " + Time.elapsed() + "ms");
