@@ -7,7 +7,6 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
 import mindustry.gen.*;
-import mindustry.graphics.*;
 import unity.util.*;
 
 public class WingDecorationType extends UnitDecorationType{
@@ -53,23 +52,22 @@ public class WingDecorationType extends UnitDecorationType{
     }
 
     @Override
-    public void drawIcon(MultiPacker packer, Pixmap icon, Cons<TextureRegion> outliner){
+    public void drawIcon(Func<TextureRegion, Pixmap> prov, Pixmap icon, Cons<TextureRegion> outliner){
         for(Wing w : wings){
             TextureRegion region = textures[w.textureIndex];
             outliner.get(region);
 
             float scl = Draw.scl / 4f;
-            PixmapRegion out = GraphicUtils.get(packer, region);
-            Pixmap pix = out.crop();
+            Pixmap pix = prov.get(region);
 
             icon.draw(pix,
-            (int)(w.x / scl + icon.width / 2f - out.width / 2f),
-            (int)(-w.y / scl + icon.height / 2f - out.height / 2f),
+            (int)(w.x / scl + icon.width / 2f - pix.width / 2f),
+            (int)(-w.y / scl + icon.height / 2f - pix.height / 2f),
             true);
 
             icon.draw(pix.flipX(),
-            (int)(-w.x / scl + icon.width / 2f - out.width / 2f),
-            (int)(-w.y / scl + icon.height / 2f - out.height / 2f),
+            (int)(-w.x / scl + icon.width / 2f - pix.width / 2f),
+            (int)(-w.y / scl + icon.height / 2f - pix.height / 2f),
             true);
         }
     }

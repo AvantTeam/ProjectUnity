@@ -10,8 +10,6 @@ public class KamiRegions{
     keikiSpirit = new TextureRegion[10], keikiTools = new TextureRegion[8];
 
     public static void load(){
-        if(headless) return;
-
         for(int i = 0; i < 16; i++){
             if(i <= 2) okuu[i] = Core.atlas.find("unity-okuu-" + i);
             if(i <= 7) marisaBroom[i] = Core.atlas.find("unity-marisa-broom-" + i);

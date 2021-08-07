@@ -16,26 +16,38 @@ import unity.assets.type.g3d.attribute.light.*;
 import unity.assets.type.g3d.attribute.type.*;
 import unity.mod.*;
 
+import static mindustry.Vars.*;
+
 public class Models{
-    public final Camera3D camera = new Camera3D();
-    public final RenderableSorter sorter = new RenderableSorter();
-    public final Environment environment = new Environment();
+    public final Camera3D camera;
+    public final RenderableSorter sorter;
+    public final Environment environment;
 
     protected FrameBuffer buffer;
     protected RenderPool pool = new RenderPool();
 
     public Models(){
-        camera.perspective = false;
-        camera.near = -10000f;
-        camera.far = 10000f;
+        if(!headless){
+            camera = new Camera3D();
+            sorter = new RenderableSorter();
+            environment = new Environment();
 
-        environment.set(ColorAttribute.createAmbientLight(0.4f, 0.4f, 0.4f, 1f));
-        environment.add(new DirectionalLight().set(0.56f, 0.56f, 0.56f, -1f, -1f, -0.3f));
+            camera.perspective = false;
+            camera.near = -10000f;
+            camera.far = 10000f;
 
-        Core.assets.loadRun("unity-models-init", Models.class, () -> {}, () -> buffer = new FrameBuffer(2, 2, true));
-        Triggers.listen(Trigger.preDraw, () -> {
-            if(buffer != null) buffer.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
-        });
+            environment.set(ColorAttribute.createAmbientLight(0.4f, 0.4f, 0.4f, 1f));
+            environment.add(new DirectionalLight().set(0.56f, 0.56f, 0.56f, -1f, -1f, -0.3f));
+
+            Core.assets.loadRun("unity-models-init", Models.class, () -> {}, () -> buffer = new FrameBuffer(2, 2, true));
+            Triggers.listen(Trigger.preDraw, () -> {
+                if(buffer != null) buffer.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
+            });
+        }else{
+            camera = null;
+            sorter = null;
+            environment = null;
+        }
     }
 
     public void render(RenderableProvider prov){

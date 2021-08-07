@@ -4,7 +4,6 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import mindustry.gen.*;
-import mindustry.graphics.*;
 
 public abstract class UnitDecorationType{
     public Func<UnitDecorationType, UnitDecoration> decalType = UnitDecoration::new;
@@ -16,7 +15,7 @@ public abstract class UnitDecorationType{
 
     public abstract void draw(Unit unit, UnitDecoration deco);
 
-    public void drawIcon(MultiPacker packer, Pixmap icon, Cons<TextureRegion> outliner){
+    public void drawIcon(Func<TextureRegion, Pixmap> prov, Pixmap icon, Cons<TextureRegion> outliner){
 
     }
 
