@@ -112,6 +112,7 @@ abstract class EndComp implements Unitc, Factionc{
     @MethodPriority(-1)
     @Override
     @BreakAll
+    @Remove(Shieldc.class)
     public void damagePierce(float amount, boolean withEffect){
         float pre = hitTime;
 
@@ -120,8 +121,7 @@ abstract class EndComp implements Unitc, Factionc{
         if(!withEffect){
             hitTime = pre;
         }
-        //TODO make new annotation
-        if(true) return;
+        //if(true) return;
     }
 
     @Replace

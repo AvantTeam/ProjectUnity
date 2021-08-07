@@ -59,8 +59,10 @@ public class Unity extends Mod{
     };
 
     public Unity(){
-        Core.assets.setLoader(Model.class, new ModelLoader(tree));
-        Core.assets.setLoader(WavefrontObject.class, new WavefrontObjectLoader(tree));
+        if(!headless){
+            Core.assets.setLoader(Model.class, new ModelLoader(tree));
+            Core.assets.setLoader(WavefrontObject.class, new WavefrontObjectLoader(tree));
+        }
 
         Events.on(ContentInitEvent.class, e -> {
             if(!headless){
@@ -153,68 +155,6 @@ public class Unity extends Mod{
         UnityEntityMapping.init();
 
         logContent();
-
-        //this internal implementation is used for loading Regions' outlines and such
-        new UnlockableContent("internal-implementation"){
-            @Override
-            public void loadIcon(){
-                fullIcon = Core.atlas.find("clear");
-                uiIcon = Core.atlas.find("clear");
-            }
-
-            @Override
-            public boolean isHidden(){
-                return false;
-            }
-
-            @Override
-            public boolean logicVisible(){
-                return false;
-            }
-
-            @Override
-            public void unlock(){
-                //does nothing
-            }
-
-            @Override
-            public void quietUnlock(){
-                //does nothing
-            }
-
-            @Override
-            public void createIcons(MultiPacker packer){
-                Regions.load(); //load shadowed regions first
-
-                var color = new Color();
-                for(var field : Regions.class.getDeclaredFields()){
-                    if(!TextureRegion.class.isAssignableFrom(field.getType()) || !field.getName().endsWith("OutlineRegion")) continue;
-
-                    var raw = ReflectUtils.findField(Regions.class, field.getName().replace("Outline", ""), false);
-                    AtlasRegion region = ReflectUtils.getField(null, raw);
-
-                    if(region.found()){
-                        var meta = raw.getAnnotation(Outline.class);
-                        var outlineColor = Color.valueOf(color, meta == null ? "464649" : meta.color());
-                        var outlineRadius = meta == null ? 4 : meta.radius();
-
-                        var pix = GraphicUtils.get(packer, region);
-                        var out = Pixmaps.outline(pix, outlineColor, outlineRadius);
-
-                        if(Core.settings.getBool("linear")){
-                            Pixmaps.bleed(out);
-                        }
-
-                        packer.add(PageType.main, region.name + "-outline", out);
-                    }
-                }
-            }
-
-            @Override
-            public ContentType getContentType(){
-                return ContentType.typeid_UNUSED;
-            }
-        };
     }
 
     public void logContent(){
@@ -282,5 +222,9 @@ public class Unity extends Mod{
         }
 
         Log.log(level, "&lm&fb[unity]&fr @", builder.toString());
+    }
+
+    public static void enforce(boolean cond, String message){
+        if(!cond) throw new IllegalArgumentException(message);
     }
 }

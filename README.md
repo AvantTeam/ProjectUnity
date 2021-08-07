@@ -12,7 +12,7 @@ _Relevant links_:
 
 ## Building
 
-Install JDK 15 or higher. Set `JAVA_HOME` environment variable to where it is located. Clone this repository then change your current working directory to where the cloned repository folder is. If you are compiling for Android, click [here](#Building-for-Android).
+Install JDK 16 or higher. Set `JAVA_HOME` environment variable to where it is located. Clone this repository then change your current working directory to where the cloned repository folder is. If you are compiling for Android, click [here](#Building-for-Android).
 
 ### Windows
 

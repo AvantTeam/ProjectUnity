@@ -19,8 +19,6 @@ dependencies {
 }
 
 ext {
-    assetsDir = new File(rootDir, "main/assets/")
-
     fetchPackage = 'unity/fetched'
     fetchDir = new File("$projectDir/fetched/$fetchPackage")
 
@@ -28,7 +26,6 @@ ext {
     fetchRevision = 1
 }
 
-import arc.*
 import arc.files.*
 import arc.func.*
 import arc.struct.*
@@ -43,7 +40,7 @@ task deploy(type: Jar, dependsOn: configurations.runtimeClasspath) {
     from files(sourceSets.main.output.classesDirs)
     from files(sourceSets.main.output.resourcesDir)
     from configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-    from files(project.assetsDir)
+    from files(assetsDir)
     from(rootDir) { include 'mod.json' }
 
     doFirst {
@@ -54,7 +51,7 @@ task deploy(type: Jar, dependsOn: configurations.runtimeClasspath) {
 task deployDex(type: Jar, dependsOn: deploy) {
     archiveFileName.set "${modName}.jar"
 
-    final def desktopJar = deploy.archiveFile.get()
+    final def desktopJar = deploy.archiveFile.get().asFile
     final def dexJar = new File(deployDex.getTemporaryDir(), 'Dexed.jar')
 
     doFirst {
@@ -175,7 +172,7 @@ task cleanFetched(type: Delete) {
 }
 
 task assetsJar(type: Jar) {
-    archiveClassifier.set('assets')
+    archiveClassifier.set 'assets'
     from files('assets/')
 }
 
@@ -202,8 +199,14 @@ tasks.withType(JavaCompile) {
 }
 
 tasks.withType(Jar) {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
     exclude 'unity/fetched/**'
     exclude 'unity/entities/comp/**'
     exclude 'unity/entities/merge/**'
     if(!devBuild) exclude 'unity/mod/DevBuildImpl*'
+
+    doFirst {
+        exclude excludedFiles.readString().split(/\n/)
+    }
 }

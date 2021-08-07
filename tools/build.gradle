@@ -1,0 +1,96 @@
+sourceSets.main {
+    java.srcDirs = ['src/']
+}
+
+import arc.files.*
+
+final def dexedJar = (project(':main').tasks.deployDex as Jar).archiveFile.get().asFile
+final def distJar = (project(':main').tasks.deploy as Jar).archiveFile.get().asFile
+final def regularJar = (project(':main').tasks.jar as Jar).archiveFile.get().asFile
+
+final def cp = dexedJar.exists() ? dexedJar : distJar.exists() ? distJar : regularJar
+
+dependencies {
+    if(
+        !cp.exists() ||
+        toolRecompile ||
+        taskNames.contains('main:deploy') ||
+        taskNames.contains('main:deployDex')
+    ) {
+        implementation project(':main')
+        if(taskNames.contains('tools:proc')) println 'Compiling :main project before processing assets...'
+    } else {
+        implementation files(cp)
+    }
+
+    implementation "com.github.Anuken.Mindustry:core:$mindustryVersion"
+    implementation "com.github.Anuken.Arc:natives-desktop:$arcVersion"
+}
+
+task rearchive {
+    task archDexed(type: Jar) {
+        if(taskNames.contains('main:deployDex')) dependsOn project(':main').tasks.deployDex
+
+        archiveFileName.set dexedJar.getName()
+        from files(assetsDir)
+        from zipTree(dexedJar)
+
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        doFirst {
+            exclude excludedFiles.readString().split(/\n/)
+        }
+
+        doLast {
+            new Fi(dexedJar).writeBytes(new Fi(file(archiveFile.get())).readBytes())
+        }
+    }
+
+    task archDist(type: Jar) {
+        if(taskNames.contains('main:deploy')) dependsOn project(':main').tasks.deploy
+
+        archiveFileName.set distJar.getName()
+        from files(assetsDir)
+        from zipTree(distJar)
+
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        doFirst {
+            exclude excludedFiles.readString().split(/\n/)
+        }
+
+        doLast {
+            new Fi(distJar).writeBytes(new Fi(file(archiveFile.get())).readBytes())
+        }
+    }
+
+    def finalize = []
+    if(distJar.exists() || taskNames.contains('main:deploy')) finalize += archDist
+    if(dexedJar.exists() || taskNames.contains('main:deployDex')) finalize += archDexed
+
+    finalizedBy finalize
+}
+
+task proc(dependsOn: [classes, configurations.runtimeClasspath]) {
+    if(toolRearchive){
+        finalizedBy rearchive
+        if(taskNames.contains('tools:proc')) println '.jar files will be re-archived after processing sprites.'
+    }
+
+    doLast {
+        javaexec {
+            workingDir = assetsDir
+            main = 'unity.tools.Tools'
+            classpath = sourceSets.main.runtimeClasspath
+            args = [excludedFiles]
+        }
+    }
+}
+
+clean {
+    delete "$assetsDir/sprites/gen"
+}
+
+final def list = new Fi(proc.getTemporaryDir()).child('excluded_list.txt')
+if(!list.exists()) list.writeString('')
+rootProject.allprojects {
+    ext.excludedFiles = list
+}
