@@ -11,6 +11,10 @@ import unity.tools.GenAtlas.*;
 import java.lang.invoke.*;
 import java.util.concurrent.*;
 
+/**
+ * A processor to outline certain regions in {@link Regions}.
+ * @author GlennFolker
+ */
 public class OutlineRegionProcessor implements Processor{
     @Override
     public void process(ExecutorService exec){

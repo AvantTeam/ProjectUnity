@@ -3,6 +3,10 @@ package unity.tools;
 import arc.*;
 import arc.struct.*;
 
+/**
+ * A no-operation implementation of {@link Application} just so that {@link Core#app} isn't {@code null}.
+ * @author GlennFolker
+ */
 public class NoopApplication implements Application{
     protected Seq<ApplicationListener> listeners;
     protected String clipboard;

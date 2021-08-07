@@ -5,6 +5,10 @@ import arc.files.*;
 
 import static mindustry.Vars.*;
 
+/**
+ * A no-operation implementation of {@link Files} just so that {@link Core#files} isn't {@code null}.
+ * @author GlennFolker
+ */
 public class NoopFiles implements Files{
     @Override
     public Fi get(String path, FileType type){

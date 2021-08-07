@@ -24,7 +24,10 @@ import java.util.concurrent.*;
 import static mindustry.Vars.*;
 import static unity.Unity.*;
 
-/** Main entry point of the tools module. This must only affect the main project's asset directory. */
+/**
+ * Main entry point of the tools module. This must only affect the main project's asset directory.
+ * @author GlennFolker
+ */
 public final class Tools{
     public static Unity unity;
     public static LoadedMod mod;

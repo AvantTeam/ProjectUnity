@@ -8,6 +8,10 @@ import java.util.concurrent.*;
 
 import static unity.Unity.*;
 
+/**
+ * Static class containing all processors. Call {@link #process()} to initiate asset processing.
+ * @author GlennFolker
+ */
 public final class Processors{
     private static final Processor[] processes = {
         new OutlineRegionProcessor(),

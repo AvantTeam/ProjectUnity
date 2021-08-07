@@ -24,6 +24,18 @@ import java.util.concurrent.*;
 import static mindustry.Vars.*;
 import static unity.tools.Tools.*;
 
+/**
+ * A processor to generate unit sprites such as:
+ * <ul>
+ *     <li> Separate outline regions. </li>
+ *     <li> Override outline regions, such as leg or joint sprites. </li>
+ *     <li> {@code -full} icons. </li>
+ *     <li> Weapons, rotors, tentacles, and other decoration outline regions. </li>
+ *     <li> Rotor shade and ghost sprites. </li>
+ *     <li> Wreck regions. </li>
+ * </ul>
+ * @author GlennFolker
+ */
 public class UnitProcessor implements Processor{
     private final ObjectSet<String> outlined = new ObjectSet<>();
 

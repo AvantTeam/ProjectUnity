@@ -7,6 +7,11 @@ import arc.struct.*;
 
 import static unity.tools.Tools.*;
 
+/**
+ * A specialized thread-safe texture atlas for generated texture regions. No {@link Texture}s are instantiated; use
+ * {@link GenRegion#pixmap()} instead.
+ * @author GlennFolker
+ */
 public class GenAtlas extends TextureAtlas{
     public GenRegion clear;
     private final ObjectMap<String, GenRegion> regions = new ObjectMap<>();
