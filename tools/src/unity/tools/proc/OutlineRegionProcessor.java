@@ -22,7 +22,7 @@ public class OutlineRegionProcessor implements Processor{
 
             GenRegion rawRegion = Reflect.get(Regions.class, name.replace("OutlineRegion", "Region"));
 
-            submit(exec, () -> {
+            submit(exec, "Regions.java", () -> {
                 var color = Color.valueOf(anno.color());
                 int rad = anno.radius();
 

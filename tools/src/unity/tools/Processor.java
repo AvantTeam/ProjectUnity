@@ -12,13 +12,13 @@ public interface Processor{
 
     default void finish(){}
 
-    default void submit(ExecutorService exec, UnsafeRunnable run){
+    default void submit(ExecutorService exec, String name, UnsafeRunnable run){
         exec.submit(() -> {
             try{
                 run.run();
             }catch(Throwable t){
                 var msg = Strings.getFinalMessage(t);
-                print(LogLevel.err, "", msg != null ? msg : Strings.getStackTrace(Strings.getFinalCause(t)));
+                print(LogLevel.err, " ", name + ":", msg != null ? msg : Strings.getStackTrace(Strings.getFinalCause(t)));
             }
         });
     }

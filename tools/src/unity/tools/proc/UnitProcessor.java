@@ -36,7 +36,7 @@ public class UnitProcessor implements Processor{
     @Override
     @SuppressWarnings("SuspiciousNameCombination")
     public void process(ExecutorService exec){
-        content.units().each(type -> type instanceof UnityUnitType && !type.isHidden(), (UnityUnitType type) -> submit(exec, () -> {
+        content.units().each(type -> type instanceof UnityUnitType && !type.isHidden(), (UnityUnitType type) -> submit(exec, type.name, () -> {
             init(type);
             load(type);
 
