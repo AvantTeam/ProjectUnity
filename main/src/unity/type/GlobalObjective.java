@@ -42,6 +42,6 @@ public enum GlobalObjective{
     }
 
     public long value(){
-        return 1 << ordinal();
+        return 1L << ordinal();
     }
 }

@@ -17,16 +17,11 @@ import static unity.content.UnityPlanets.*;
 
 @SuppressWarnings("unchecked")
 public class UnitySectorPresets implements ContentList{
-    public static SectorPreset imberlands;
-    public static @FactionDef("monolith") SectorPreset accretion;
+    public static @FactionDef("monolith") SectorPreset
+    accretion, salvagedLab;
 
     @Override
     public void load(){
-        /*imberlands = new SectorPreset("imberlands", electrode, 30){{
-            alwaysUnlocked = true;
-            captureWave = 15;
-        }};*/
-
         accretion = new ScriptedSector("accretion", megalith, 200){{
             alwaysUnlocked = true;
             addStartingItems = true;
@@ -73,6 +68,13 @@ public class UnitySectorPresets implements ContentList{
                     Events.on((Class<Trigger>)Trigger.newGame.getClass(), set[0]);
                 })
             );
+        }};
+
+        salvagedLab = new ScriptedSector("salvaged-laboratory", megalith, 100){{
+            difficulty = 5f;
+            captureWave = 30;
+
+            
         }};
     }
 }
