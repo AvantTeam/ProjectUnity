@@ -47,8 +47,8 @@ public final class Tools{
 
         for(var type : ContentType.all){
             int i = type.ordinal();
-            initialized[i] = new IntSet();
-            loaded[i] = new IntSet();
+            synchronized(initialized){ initialized[i] = new IntSet(); }
+            synchronized(loaded){ loaded[i] = new IntSet(); }
         }
     }
 
