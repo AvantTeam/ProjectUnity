@@ -172,7 +172,7 @@ task cleanFetched(type: Delete) {
 }
 
 task assetsJar(type: Jar) {
-    archiveClassifier.set('assets')
+    archiveClassifier.set 'assets'
     from files('assets/')
 }
 

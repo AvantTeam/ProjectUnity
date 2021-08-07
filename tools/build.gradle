@@ -85,6 +85,10 @@ task proc(dependsOn: [classes, configurations.runtimeClasspath]) {
     }
 }
 
+clean {
+    delete "$assetsDir/sprites/gen"
+}
+
 final def list = new Fi(proc.getTemporaryDir()).child('excluded_list.txt')
 if(!list.exists()) list.writeString('')
 rootProject.allprojects {
