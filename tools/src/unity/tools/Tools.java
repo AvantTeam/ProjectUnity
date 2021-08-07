@@ -94,6 +94,16 @@ public final class Tools{
         Processors.process();
 
         atlas.dispose();
+
+        if(args.length >= 1){
+            synchronized(replaced){
+                var list = Fi.get(args[0]);
+                list.writeString(replaced.asArray().toString("\n", reg ->
+                    "sprites/" + reg.relativePath + "/" +
+                    reg.name.replaceFirst("unity-", "") + ".png"
+                ));
+            }
+        }
     }
 
     private static void addRegions(){

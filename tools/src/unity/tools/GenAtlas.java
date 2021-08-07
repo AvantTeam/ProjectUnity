@@ -17,6 +17,7 @@ public class GenAtlas extends TextureAtlas{
 
         var path = file.path();
         path = path.substring(path.indexOf("sprites/") + "sprites/".length(), path.lastIndexOf("/"));
+
         reg.relativePath = path;
 
         synchronized(regions){

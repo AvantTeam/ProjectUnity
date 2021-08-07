@@ -199,10 +199,14 @@ tasks.withType(JavaCompile) {
 }
 
 tasks.withType(Jar) {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
     exclude 'unity/fetched/**'
     exclude 'unity/entities/comp/**'
     exclude 'unity/entities/merge/**'
     if(!devBuild) exclude 'unity/mod/DevBuildImpl*'
 
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    doFirst {
+        exclude excludedFiles.readString().split(/\n/)
+    }
 }

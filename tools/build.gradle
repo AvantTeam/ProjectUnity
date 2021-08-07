@@ -28,31 +28,43 @@ dependencies {
 }
 
 task rearchive {
-    task appendDexed(type: Jar) {
+    task archDexed(type: Jar) {
+        if(taskNames.contains('main:deployDex')) dependsOn project(':main').tasks.deployDex
+
         archiveFileName.set dexedJar.getName()
         from files(assetsDir)
         from zipTree(dexedJar)
 
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        doFirst {
+            exclude excludedFiles.readString().split(/\n/)
+        }
+
         doLast {
             new Fi(dexedJar).writeBytes(new Fi(file(archiveFile.get())).readBytes())
         }
     }
 
-    task appendDist(type: Jar) {
+    task archDist(type: Jar) {
+        if(taskNames.contains('main:deploy')) dependsOn project(':main').tasks.deploy
+
         archiveFileName.set distJar.getName()
         from files(assetsDir)
         from zipTree(distJar)
 
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        doFirst {
+            exclude excludedFiles.readString().split(/\n/)
+        }
+
         doLast {
             new Fi(distJar).writeBytes(new Fi(file(archiveFile.get())).readBytes())
         }
     }
 
     def finalize = []
-    if(distJar.exists() || taskNames.contains('main:deploy')) finalize += appendDist
-    if(dexedJar.exists() || taskNames.contains('main:deployDex')) finalize += appendDexed
+    if(distJar.exists() || taskNames.contains('main:deploy')) finalize += archDist
+    if(dexedJar.exists() || taskNames.contains('main:deployDex')) finalize += archDexed
 
     finalizedBy finalize
 }
@@ -68,6 +80,13 @@ task proc(dependsOn: [classes, configurations.runtimeClasspath]) {
             workingDir = assetsDir
             main = 'unity.tools.Tools'
             classpath = sourceSets.main.runtimeClasspath
+            args = [excludedFiles]
         }
     }
+}
+
+final def list = new Fi(proc.getTemporaryDir()).child('excluded_list.txt')
+if(!list.exists()) list.writeString('')
+rootProject.allprojects {
+    ext.excludedFiles = list
 }

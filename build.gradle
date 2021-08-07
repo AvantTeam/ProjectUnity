@@ -11,6 +11,8 @@ buildscript {
     }
 }
 
+import arc.files.*
+
 allprojects {
     apply plugin: 'java'
     apply plugin: 'maven-publish'
@@ -23,6 +25,7 @@ allprojects {
         windows = System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')
         taskNames = gradle.startParameter.getTaskNames()
         assetsDir = new File(project(':main').projectDir, 'assets/')
+        excludedFiles = null as Fi
 
         // `-Pmain.dev` will initiate a development build. Default is false
         devBuild = project.hasProperty('main.dev') && Boolean.parseBoolean(project.property('main.dev') as String)
