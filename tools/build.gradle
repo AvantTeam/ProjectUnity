@@ -28,6 +28,8 @@ dependencies {
 }
 
 task rearchive {
+    final def listStr = file(assetsDir).list()
+
     task archDexed(type: Jar) {
         if(taskNames.contains('main:deployDex')) dependsOn project(':main').tasks.deployDex
 
@@ -37,7 +39,9 @@ task rearchive {
             exclude 'sprites/gen/vanilla/**'
         }
 
-        from zipTree(dexedJar)
+        from(zipTree(dexedJar)) {
+            for(final def list : listStr) exclude "$list/**"
+        }
 
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         doFirst {
@@ -58,7 +62,9 @@ task rearchive {
             exclude 'sprites/gen/vanilla/**'
         }
 
-        from zipTree(distJar)
+        from(zipTree(distJar)) {
+            for(final def list : listStr) exclude "$list/**"
+        }
 
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         doFirst {

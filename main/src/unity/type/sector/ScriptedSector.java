@@ -19,8 +19,6 @@ public class ScriptedSector extends SectorPreset{
     protected final Cons<Trigger> updater = Triggers.cons(this::update);
     protected final Cons<Trigger> drawer = Triggers.cons(this::draw);
     protected final Cons<Trigger> starter = Triggers.cons(() -> {
-        if(!state.hasSector() || !state.getSector().hasBase()) reset();
-
         Triggers.listen(Trigger.update, updater);
         Triggers.listen(Trigger.draw, drawer);
 
@@ -43,14 +41,12 @@ public class ScriptedSector extends SectorPreset{
         });
 
         Events.on(DisposeEvent.class, e -> {
-            if(state.isPlaying()) saveState();
+            if(state.isPlaying() && canSave()) saveState();
         });
     }
 
     public void update(){
         if(!valid() && added){
-            // Save objective state when detaching
-            saveState();
             added = false;
 
             Triggers.detach(Trigger.update, updater);
@@ -60,7 +56,7 @@ public class ScriptedSector extends SectorPreset{
         }
 
         // Save objective state every 5 seconds
-        if(saveTimer.get(5f * Time.toSeconds)) saveState();
+        if(canSave() && saveTimer.get(5f * Time.toSeconds)) saveState();
 
         for(SectorObjective objective : objectives){
             if(objective.shouldUpdate()) objective.update();
@@ -74,18 +70,15 @@ public class ScriptedSector extends SectorPreset{
         }
     }
 
+    public boolean canSave(){
+        return control.saves.getCurrent() != null;
+    }
+
     public void draw(){
         for(SectorObjective objective : objectives){
             if(objective.shouldDraw()){
                 objective.draw();
             }
-        }
-    }
-
-    public void reset(){
-        for(SectorObjective objective : objectives){
-            objective.reset();
-            objective.execution = 0;
         }
     }
 

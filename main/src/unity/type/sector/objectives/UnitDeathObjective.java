@@ -36,9 +36,9 @@ public class UnitDeathObjective extends SectorObjective{
     }
 
     @Override
-    public void reset(){
-        super.reset();
-        ids.clear();
+    public void load(){
+        super.load();
+        ids.clear(); //TODO actual saving
     }
 
     @Override

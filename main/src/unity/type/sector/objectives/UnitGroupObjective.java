@@ -26,10 +26,10 @@ public class UnitGroupObjective extends SectorObjective{
     }
 
     @Override
-    public void reset(){
-        super.reset();
+    public void load(){
+        super.load();
         count = 0;
-        ids.clear();
+        ids.clear(); //TODO actual saving
     }
 
     @Override

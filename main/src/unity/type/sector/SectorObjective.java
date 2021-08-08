@@ -87,12 +87,7 @@ public abstract class SectorObjective{
         return this;
     }
 
-    public void reset(){
-        finalized = false;
-    }
-
     protected String saveEntry(){
-        unity.Unity.print("unity.sector-objective-" + name + "-" + control.saves.getCurrent().getName());
         return "unity.sector-objective-" + name + "-" + control.saves.getCurrent().getName();
     }
 
