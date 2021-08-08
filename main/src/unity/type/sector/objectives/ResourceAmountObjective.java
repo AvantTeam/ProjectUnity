@@ -114,6 +114,8 @@ public class ResourceAmountObjective extends SectorObjective{
 
     @Override
     public boolean completed(){
+        if(state.teams.cores(team).isEmpty()) return false;
+
         for(ItemStack item : items){
             if(state.teams.cores(team).sum(b -> b.items.get(item.item)) < item.amount){
                 return false;

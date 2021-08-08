@@ -30,7 +30,7 @@ public class UnitySectorPresets implements ContentList{
                     Items.lead, 5600,
                     Items.silicon, 3200,
                     UnityItems.monolite, 4800
-                ), state.rules.defaultTeam, this, name + "-resource", (ResourceAmountObjective objective) -> {
+                ), state.rules.defaultTeam, this, name + "-resource", objective -> {
                     int win = Math.max((state.wave / 5 + 1) * 5, captureWave);
 
                     state.rules.winWave = Math.max(captureWave, win);
