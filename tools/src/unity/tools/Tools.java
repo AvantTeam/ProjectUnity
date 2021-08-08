@@ -4,6 +4,7 @@ import arc.*;
 import arc.assets.*;
 import arc.files.*;
 import arc.graphics.g2d.*;
+import arc.mock.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
@@ -62,13 +63,19 @@ public final class Tools{
         Log.logger = new NoopLogHandler();
 
         headless = true;
-        Core.app = new NoopApplication();
-        Core.files = new NoopFiles();
+        Core.app = new MockApplication(){
+            @Override
+            public void post(Runnable runnable){
+                runnable.run();
+            }
+        };
+        Core.files = new MockFiles();
         Core.assets = new AssetManager(tree = new FileTree());
         Core.settings = new Settings();
         Core.atlas = atlas = new GenAtlas();
 
         asyncCore = new AsyncCore();
+        state = new GameState();
         mods = new Mods();
 
         content = new ContentLoader();
