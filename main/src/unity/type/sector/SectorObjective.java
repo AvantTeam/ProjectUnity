@@ -4,6 +4,8 @@ import arc.*;
 import arc.func.*;
 import arc.struct.*;
 
+import static mindustry.Vars.*;
+
 /** @author GlennFolker */
 @SuppressWarnings("unchecked")
 public abstract class SectorObjective{
@@ -89,21 +91,32 @@ public abstract class SectorObjective{
         finalized = false;
     }
 
-    protected void set(String key, String value){
-        Core.settings.put("unity.sector-objective-" + name + "." + key, value);
+    protected String saveEntry(){
+        unity.Unity.print("unity.sector-objective-" + name + "-" + control.saves.getCurrent().getName());
+        return "unity.sector-objective-" + name + "-" + control.saves.getCurrent().getName();
     }
 
-    protected String get(String key){
+    protected void set(String key, Object value){
+        Core.settings.put(saveEntry() + "." + key, value);
+    }
+
+    protected <T> T get(String key){
         return get(key, null);
     }
 
-    protected String get(String key, String def){
-        return Core.settings.getString("unity.sector-objective-" + name + "." + key, def);
+    protected <T> T get(String key, T def){
+        return (T)Core.settings.get(saveEntry() + "." + key, def);
     }
 
-    public void save(){}
+    public void save(){
+        set("execution", execution);
+        set("finalized", finalized);
+    }
 
-    public void load(){}
+    public void load(){
+        execution = get("execution", 0);
+        finalized = get("finalized", false);
+    }
 
     public void execute(){
         executor.get(this);

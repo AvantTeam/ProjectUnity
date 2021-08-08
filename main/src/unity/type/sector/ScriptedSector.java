@@ -41,6 +41,10 @@ public class ScriptedSector extends SectorPreset{
                 Triggers.listen(Trigger.newGame, starter);
             }
         });
+
+        Events.on(DisposeEvent.class, e -> {
+            if(state.isPlaying()) saveState();
+        });
     }
 
     public void update(){
