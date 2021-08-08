@@ -3,6 +3,7 @@ package unity.type.sector;
 import arc.*;
 import arc.func.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.core.GameState.*;
 import mindustry.game.EventType.*;
 import mindustry.type.*;
@@ -15,17 +16,21 @@ public class ScriptedSector extends SectorPreset{
     public Seq<SectorObjective> objectives = new Seq<>();
     protected boolean added = false;
 
-    protected Cons<Trigger> updater = Triggers.cons(this::update);
-    protected Cons<Trigger> drawer = Triggers.cons(this::draw);
-    protected Cons<Trigger> starter = Triggers.cons(() -> {
-        if(!state.hasSector() || !state.getSector().hasBase()){
-            reset();
-        }
+    protected final Cons<Trigger> updater = Triggers.cons(this::update);
+    protected final Cons<Trigger> drawer = Triggers.cons(this::draw);
+    protected final Cons<Trigger> starter = Triggers.cons(() -> {
+        if(!state.hasSector() || !state.getSector().hasBase()) reset();
 
-        updater = Triggers.listen(Trigger.update, this::update);
-        drawer = Triggers.listen(Trigger.draw, this::draw);
+        Triggers.listen(Trigger.update, updater);
+        Triggers.listen(Trigger.draw, drawer);
+
+        loadState();
+        objectives.each(SectorObjective::init);
+
         Triggers.detach(Trigger.newGame, this.starter);
     });
+
+    protected final Interval saveTimer = new Interval();
 
     public ScriptedSector(String name, Planet planet, int sector){
         super(name, planet, sector);
@@ -40,6 +45,8 @@ public class ScriptedSector extends SectorPreset{
 
     public void update(){
         if(!valid() && added){
+            // Save objective state when detaching
+            saveState();
             added = false;
 
             Triggers.detach(Trigger.update, updater);
@@ -48,22 +55,18 @@ public class ScriptedSector extends SectorPreset{
             return;
         }
 
+        // Save objective state every 5 seconds
+        if(saveTimer.get(5f * Time.toSeconds)) saveState();
+
         for(SectorObjective objective : objectives){
-            if(objective.shouldUpdate()){
-                if(!objective.isInitialized()){
-                    objective.init();
-                }
-                objective.update();
-            }
+            if(objective.shouldUpdate()) objective.update();
 
             if(objective.qualified()){
                 objective.execution++;
                 objective.execute();
             }
 
-            if(objective.isExecuted() && !objective.isFinalized()){
-                objective.doFinalize();
-            }
+            if(objective.isExecuted() && !objective.isFinalized()) objective.doFinalize();
         }
     }
 
@@ -89,5 +92,13 @@ public class ScriptedSector extends SectorPreset{
             state.map.mod != null && state.map.mod.name.equals("unity") &&
             (state.map.name().equals(generator.map.name()) || state.map.name().equals(localizedName))
         ));
+    }
+
+    public void saveState(){
+        objectives.each(SectorObjective::save);
+    }
+
+    public void loadState(){
+        objectives.each(SectorObjective::load);
     }
 }

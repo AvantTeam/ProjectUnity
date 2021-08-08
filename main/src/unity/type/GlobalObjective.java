@@ -31,10 +31,10 @@ public enum GlobalObjective{
         update();
         if(((currentStatus >>> objective.value()) & 1) == 1) return;
 
-        Events.fire(objective);
-
         currentStatus |= objective.value();
         Core.settings.put("unity.global-objective.status", currentStatus);
+
+        Events.fire(objective);
     }
 
     private static void update(){
