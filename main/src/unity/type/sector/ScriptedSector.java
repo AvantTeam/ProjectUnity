@@ -4,17 +4,24 @@ import arc.*;
 import arc.func.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.Log.*;
 import mindustry.core.GameState.*;
 import mindustry.game.EventType.*;
+import mindustry.io.*;
 import mindustry.type.*;
+import unity.cinematic.*;
 import unity.mod.*;
 
 import static mindustry.Vars.*;
+import static unity.Unity.*;
 
 /** @author GlennFolker */
+@SuppressWarnings("unchecked")
 public class ScriptedSector extends SectorPreset{
-    public Seq<SectorObjective> objectives = new Seq<>();
+    public final Seq<SectorObjective> objectives = new Seq<>();
     protected boolean added = false;
+
+    protected final Seq<StoryNode<?>> storyNodes = new Seq<>();
 
     protected final Cons<Trigger> updater = Triggers.cons(this::update);
     protected final Cons<Trigger> drawer = Triggers.cons(this::draw);
@@ -97,5 +104,16 @@ public class ScriptedSector extends SectorPreset{
 
     public void loadState(){
         objectives.each(SectorObjective::load);
+    }
+
+    @Override
+    public void init(){
+        super.init();
+
+        try{
+            storyNodes.addAll(JsonIO.json.fromJson(Seq.class, generator.map.tags.get("storyNodes", "[]")));
+        }catch(Throwable t){
+            print(LogLevel.err, "", "Failed to read story nodes in " + name);
+        }
     }
 }

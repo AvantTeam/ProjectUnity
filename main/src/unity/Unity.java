@@ -2,9 +2,6 @@ package unity;
 
 import arc.*;
 import arc.func.*;
-import arc.graphics.*;
-import arc.graphics.g2d.TextureAtlas.*;
-import arc.graphics.g2d.*;
 import arc.scene.*;
 import arc.struct.*;
 import arc.util.*;
@@ -12,8 +9,6 @@ import arc.util.Log.*;
 import mindustry.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
-import mindustry.graphics.*;
-import mindustry.graphics.MultiPacker.*;
 import mindustry.mod.*;
 import mindustry.world.blocks.environment.*;
 import unity.ai.kami.*;
@@ -23,8 +18,8 @@ import unity.assets.type.g3d.*;
 import unity.async.*;
 import unity.cinematic.*;
 import unity.content.*;
+import unity.editor.*;
 import unity.gen.*;
-import unity.gen.Regions.*;
 import unity.mod.*;
 import unity.sync.*;
 import unity.ui.*;
@@ -41,6 +36,8 @@ public class Unity extends Mod{
     public static AntiCheat antiCheat;
     public static DevBuild dev;
     public static Models model;
+
+    public static CinematicEditor cinematicEditor;
 
     private static final ContentList[] content = {
         new UnityItems(),
@@ -126,6 +123,8 @@ public class Unity extends Mod{
         tap = new TapHandler();
         antiCheat = new AntiCheat();
         model = new Models();
+
+        cinematicEditor = new CinematicEditor();
 
         asyncCore.processes.add(new LightProcess(), new ContentScoreProcess());
     }
@@ -222,9 +221,5 @@ public class Unity extends Mod{
         }
 
         Log.log(level, "&lm&fb[unity]&fr @", builder.toString());
-    }
-
-    public static void enforce(boolean cond, String message){
-        if(!cond) throw new IllegalArgumentException(message);
     }
 }
