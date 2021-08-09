@@ -2,16 +2,11 @@ package unity.cinematic;
 
 import arc.util.serialization.*;
 import mindustry.gen.*;
-import mindustry.io.*;
 
 import static mindustry.Vars.*;
 
 public class BlockStoryNode extends StoryNode<Building>{
     public Building bound;
-
-    static{
-        JsonIO.json.addClassTag(BlockStoryNode.class.getName(), BlockStoryNode.class);
-    }
 
     @Override
     public Building bound(){

@@ -37,39 +37,63 @@ public class CinematicEditor extends EditorListener{
     private Table pane;
     private final Seq<Table> tags = new Seq<>();
 
+    private boolean lock;
+
+    public CinematicEditor(){
+        JsonIO.json.addClassTag(BlockStoryNode.class.getName(), BlockStoryNode.class);
+    }
+
     @Override
     protected void registerEvents(){
         super.registerEvents();
 
         cont = new Table(Styles.black5);
-        cont.defaults().pad(3f);
         cont.setClip(true);
         cont.setTransform(true);
 
-        cont.setOrigin(Align.topLeft);
-        cont.setSize(200f, 400f);
+        cont.top().table(Styles.black5, table -> {
+            table.setClip(true);
+            table.setTransform(true);
 
-        cont.add("Name:").fill();
-        name = cont.field("", Styles.nodeField, s -> current(node -> node.name = s)).fillY().growX().get();
+            table.right().table(t -> {
+                t.left().add("Name:").fill();
+                name = t.field("", Styles.nodeField, s -> current(node -> node.name = s)).fillY().growX().get();
+            }).fillY().growX().pad(6f);
 
-        cont.row().pane(Styles.defaultPane, t -> {
-            pane = t.table(Styles.black5).fill().get();
-            t.row().center().button(Icon.add, Styles.defaulti, () -> addTag(null, null)).size(40f);
-        }).fill();
+            var scroll = table.row().center().pane(Styles.defaultPane, t -> {
+                pane = t.top().table(Styles.black5).fill().get().top();
+                pane.defaults().pad(6f);
+            }).update(p -> {
+                if(p.hasScroll()){
+                    Element result = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
+                    if(result == null || !result.isDescendantOf(p)){
+                        Core.scene.setScrollFocus(null);
+                    }
+                }
+            }).grow().pad(8f).get();
+            scroll.setScrollingDisabled(true, false);
+            scroll.setOverscroll(false, false);
 
-        cont.row().left();
-        cont.button(Icon.up, Styles.defaulti, this::hide).size(40f);
-        cont.button(Icon.trash, Styles.defaulti, () -> current(node -> {
-            nodes.remove(node);
-            hide();
-        })).size(40f);
+            table.row().left().table(t -> {
+                t.defaults().pad(6f);
+
+                t.left().button(Icon.up, Styles.defaulti, this::hide).size(40f);
+
+                t.right().button(Icon.trash, Styles.defaulti, () -> current(node -> {
+                    nodes.remove(node);
+                    hide();
+                })).size(40f);
+
+                t.button(Icon.add, Styles.defaulti, () -> addTag(null, null)).size(40f);
+            }).fillY().growX().pad(6f);
+        }).size(600f, 400f);
 
         ui.hudGroup.addChild(cont);
     }
 
     @Override
     public void begin(){
-        cont.setScale(1f, 0f);
+        cont.setScale(0f, 1f);
         cont.visible = false;
 
         try{
@@ -96,7 +120,6 @@ public class CinematicEditor extends EditorListener{
             var build = world.buildWorld(pos.x, pos.y);
 
             manualSave();
-
             selected = build;
             if(selected != null){
                 Sounds.click.play();
@@ -176,17 +199,27 @@ public class CinematicEditor extends EditorListener{
 
     protected void addTag(String key, String value){
         var cont = new Table();
+        cont.defaults().pad(4f);
 
         String[] keyStr = {key};
-        cont.left()
-            .field(keyStr[0], t -> {
+        cont.center().left();
+        cont.button(Icon.trash, Styles.defaulti, () -> {
+            tags.remove(cont);
+            cont.remove();
+
+            manualSave();
+            cont.pack();
+        }).size(40f);
+
+        cont.add("Key:");
+        cont.field(keyStr[0], Styles.nodeField, t -> {
                 if(!t.isEmpty()) current(node -> node.tags.remove(t));
             })
             .update(t -> keyStr[0] = t.getText())
             .name("key").fill();
 
-        cont.right()
-            .field(value, null)
+        cont.add("Value:");
+        cont.field(value, Styles.nodeField, null)
             .update(t -> {
                 var k = keyStr[0];
                 if(!t.getText().isEmpty() && k != null && !k.isEmpty()){
@@ -195,20 +228,30 @@ public class CinematicEditor extends EditorListener{
             })
             .name("value").fillY().growX();
 
-        pane.row().add(cont).fill();
+        pane.row().add(cont).fillY().growX();
         tags.add(cont);
     }
 
     protected void show(){
-        cont.visible = true;
+        if(cont.visible || lock) return;
 
-        cont.setScale(1f, 0f);
-        cont.actions(Actions.scaleTo(1f, 1f, 0.07f, Interp.pow3Out));
+        lock = true;
+
+        cont.visible = true;
+        cont.setScale(0f, 1f);
+        cont.actions(
+            Actions.scaleTo(1f, 1f, 0.12f, Interp.pow3Out),
+            Actions.run(() -> lock = false)
+        );
     }
 
     protected void hide(){
+        if(!cont.visible || lock) return;
+
+        lock = true;
         cont.actions(
-            Actions.scaleTo(1f, 0f, 0.06f, Interp.pow3Out),
+            Actions.scaleTo(0f, 1f, 0.12f, Interp.pow3Out),
+            Actions.run(() -> lock = false),
             Actions.visible(false)
         );
     }
