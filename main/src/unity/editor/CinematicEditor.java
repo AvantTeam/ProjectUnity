@@ -41,36 +41,41 @@ public class CinematicEditor extends EditorListener{
     protected void registerEvents(){
         super.registerEvents();
 
-        cont = new Table();
-        cont.setSize(200f, 600f);
+        cont = new Table(Styles.black5);
+        cont.defaults().pad(3f);
+        cont.setClip(true);
+        cont.setTransform(true);
+
+        cont.setOrigin(Align.topLeft);
+        cont.setSize(200f, 400f);
 
         cont.add("Name:").fill();
         name = cont.field("", Styles.nodeField, s -> current(node -> node.name = s)).fillY().growX().get();
 
         cont.row().pane(Styles.defaultPane, t -> {
             pane = t.table(Styles.black5).fill().get();
-            t.row().center().button(Icon.add, () -> addTag(null, null));
-        }).grow();
-
-        cont.row().left();
-        cont.button(Icon.up, Styles.clearTransi, this::hide).fill();
-        cont.button(Icon.trash, Styles.clearTransi, () -> {
-            var node = current();
-            if(node != null){
-                nodes.remove(node);
-                hide();
-            }
+            t.row().center().button(Icon.add, Styles.defaulti, () -> addTag(null, null)).size(40f);
         }).fill();
 
-        cont.actions(Actions.scaleTo(1f, 0f));
+        cont.row().left();
+        cont.button(Icon.up, Styles.defaulti, this::hide).size(40f);
+        cont.button(Icon.trash, Styles.defaulti, () -> current(node -> {
+            nodes.remove(node);
+            hide();
+        })).size(40f);
+
+        ui.hudGroup.addChild(cont);
     }
 
     @Override
     public void begin(){
+        cont.setScale(1f, 0f);
+        cont.visible = false;
+
         try{
             nodes.addAll(JsonIO.json.fromJson(Seq.class, editor.tags.get("storyNodes", "[]")));
         }catch(Throwable t){
-            Log.err(t);
+            ui.showException("Could not read existing story nodes", t);
         }
     }
 
@@ -78,40 +83,34 @@ public class CinematicEditor extends EditorListener{
     public void end(){
         try{
             editor.tags.put("storyNodes", JsonIO.json.toJson(nodes, Seq.class));
-            nodes.clear();
         }catch(Throwable t){
-            Log.err(t);
+            ui.showException("Could not write story nodes", t);
         }
+        nodes.clear();
     }
 
     @Override
     public void update(){
-        if(Core.input.keyDown(Binding.control)){
+        if(Core.input.keyDown(Binding.control) && Core.input.keyTap(KeyCode.altLeft)){
             var pos = Core.input.mouseWorld();
             var build = world.buildWorld(pos.x, pos.y);
 
-            if(Core.input.keyTap(KeyCode.altLeft)){
-                manualSave();
-                if(selected != build){
-                    selected = build;
-                    if(selected != null){
-                        Sounds.click.play();
+            manualSave();
 
-                        show();
-                        updateTable();
-                    }else{
-                        hide();
-                    }
-                }else{
-                    selected = null;
-                    hide();
-                }
+            selected = build;
+            if(selected != null){
+                Sounds.click.play();
+                
+                show();
+                updateTable();
+            }else{
+                hide();
             }
         }
 
-        if(selected != null && selected.isAdded()) updateTablePosition();
+        if(selected != null) updateTablePosition();
 
-        nodes.removeAll(node -> node.bound == null || !node.bound.isValid());
+        nodes.removeAll(node -> node.bound == null || world.build(node.bound.pos()) == null);
     }
 
     @Override
@@ -130,6 +129,8 @@ public class CinematicEditor extends EditorListener{
     }
 
     protected void updateTablePosition(){
+        if(!cont.visible) return;
+
         var v = Core.input.mouseScreen(selected.x - selected.block.size * tilesize / 2f, selected.y + selected.block.size * tilesize / 2f);
         cont.pack();
         cont.setPosition(v.x, v.y, Align.topRight);
@@ -181,25 +182,35 @@ public class CinematicEditor extends EditorListener{
             .field(keyStr[0], t -> {
                 if(!t.isEmpty()) current(node -> node.tags.remove(t));
             })
+            .update(t -> keyStr[0] = t.getText())
             .name("key").fill();
 
         cont.right()
             .field(value, null)
             .update(t -> {
-                if(!t.getText().isEmpty()) current(node -> node.tags.put(keyStr[0], t.getText()));
+                var k = keyStr[0];
+                if(!t.getText().isEmpty() && k != null && !k.isEmpty()){
+                    current(node -> node.tags.put(k, t.getText()));
+                }
             })
-            .name("value").grow();
+            .name("value").fillY().growX();
 
-        pane.row().add(cont).fillY().growX();
+        pane.row().add(cont).fill();
         tags.add(cont);
     }
 
     protected void show(){
-        cont.actions(Actions.scaleTo(1f, 1f, 0.2f, Interp.pow3Out));
+        cont.visible = true;
+
+        cont.setScale(1f, 0f);
+        cont.actions(Actions.scaleTo(1f, 1f, 0.07f, Interp.pow3Out));
     }
 
     protected void hide(){
-        cont.actions(Actions.scaleTo(1f, 0f, 0.2f, Interp.pow3In));
+        cont.actions(
+            Actions.scaleTo(1f, 0f, 0.06f, Interp.pow3Out),
+            Actions.visible(false)
+        );
     }
 
     public BlockStoryNode current(){
