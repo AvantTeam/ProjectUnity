@@ -29,7 +29,7 @@ abstract class WormComp implements Unitc{
     protected float waitTime = 0f;
 
     @Import UnitType type;
-    @Import float healthMultiplier, health;
+    @Import float healthMultiplier, health, x, y;
     @Import boolean dead;
     @Import WeaponMount[] mounts;
     @Import Team team;
@@ -264,42 +264,28 @@ abstract class WormComp implements Unitc{
             last = self();
             distributeActionBack(u -> {
                 if(u == self()) return;
+
                 float offset = self() == last ? uType.headOffset : 0f;
                 Tmp.v1.trns(last.rotation + 180f, (uType.segmentOffset / 2f) + offset).add(last);
-                u.rotation = u.angleTo(Tmp.v1);
-                float limit = Utils.angleDistSigned(last.rotation(), u.rotation(), uType.angleLimit);
-                float side = 1f - uType.anglePhysicsSide;
-                float smooth = 1f - uType.anglePhysicsSmooth;
-                last.rotation(last.rotation() - (limit * uType.anglePhysicsSide * smooth));
-                u.rotation(u.rotation() + (limit * side * smooth));
-                Tmp.v2.trns(u.rotation(), uType.segmentOffset / 2f).add(u);
-                Tmp.v1.trns(last.rotation() + 180f, (uType.segmentOffset / 2f) + offset).add(last);
+                u.rotation = u.angleTo(Tmp.v1) - (Utils.angleDistSigned(u.angleTo(Tmp.v1), last.rotation, uType.angleLimit) * (1f - uType.anglePhysicsSmooth));
+                //u.rotation = u.angleTo(last) - (Utils.angleDistSigned(u.angleTo(last), last.rotation, uType.angleLimit) * (1f - uType.anglePhysicsSmooth));
+                u.trns(Tmp.v3.trns(u.rotation, last.deltaLen()));
+                Tmp.v2.trns(u.rotation, uType.segmentOffset / 2f).add(u);
 
-                if(!u.within(Tmp.v1, uType.segmentOffset + 0.001f)){
-                    float dst = Mathf.clamp(Tmp.v2.dst(Tmp.v1) / 6f) / 2f;
-                    last.rotation = Mathf.slerp(last.rotation, u.angleTo(last), dst);
-                    Tmp.v1.trns(last.rotation() + 180f, (uType.segmentOffset / 2f) + offset).add(last);
+                Tmp.v2.sub(Tmp.v1).scl(Mathf.clamp(uType.jointStrength * Time.delta));
+
+                //u.set(u.x - Tmp.v2.x, u.y - Tmp.v2.y);
+                //u.updateLastPosition();
+
+                Unit n = u;
+                int cast = uType.segmentCast;
+                while(cast > 0 && n != null){
+                    float scl = cast / (float)uType.segmentCast;
+                    n.set(n.x - (Tmp.v2.x * scl), n.y - (Tmp.v2.y * scl));
+                    n.updateLastPosition();
+                    n = ((Wormc)n).child();
+                    cast--;
                 }
-
-                Tmp.v2.sub(Tmp.v1).scl(uType.jointStrength);
-
-                u.set(u.x - Tmp.v2.x, u.y - Tmp.v2.y);
-
-                Tmp.v1.set(u.vel).rotate(-u.rotation);
-                Tmp.v1.x = 0f;
-                Tmp.v1.rotate(u.rotation).scl(0.1f * Time.delta);
-                u.vel.sub(Tmp.v1);
-
-                /*
-                float vl = vel().len();
-                Tmp.v1.trns(u.angleTo(last), vl).add(u.vel).setLength(vl);
-                u.vel.lerpDelta(Tmp.v1, type.accel * type.speed).limit(vl);
-                if(u.deltaLen() > last.vel().len()){
-                    u.vel.scl(1f - Mathf.clamp(0.3f * Time.delta));
-                }
-                */
-
-                u.vel.setLength2(vel().len2());
 
                 float nextHealth = (last.health() + u.health()) / 2f;
                 if(!Mathf.equal(nextHealth, last.health(), 0.0001f)) last.health(Mathf.lerpDelta(last.health(), nextHealth, uType.healthDistribution));
