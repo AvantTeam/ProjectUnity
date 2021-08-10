@@ -22,6 +22,8 @@ import unity.type.sector.*;
 import unity.type.sector.objectives.*;
 import unity.util.*;
 
+import java.lang.reflect.*;
+
 import static mindustry.Vars.*;
 
 /**
@@ -341,11 +343,13 @@ public class CinematicEditor extends EditorListener{
             cont.clear();
 
             for(var entry : model.fields.entries()){
-                cont.add(entry.key);
+                if(Modifier.isPrivate(entry.value.field.getModifiers())) continue;
+
                 var meta = entry.value;
                 var type = meta.field.getType();
 
                 if((type.isArray() || Seq.class.isAssignableFrom(type)) && simple(meta.elementType)){
+                    cont.add(entry.key);
                     cont.row().table(Styles.black3, t -> {
                         Table[] table = {null};
                         Seq<String> values = (Seq<String>)model.setFields.get(entry.key, Seq::new);
@@ -389,8 +393,9 @@ public class CinematicEditor extends EditorListener{
                         }).align(Align.left).size(40f).pad(6f);
                     }).fillY().growX().pad(6f);
                 }else if(ObjectMap.class.isAssignableFrom(type) && simple(meta.keyType) && simple(meta.elementType)){
-
+                    cont.add(entry.key);
                 }else if(simple(type)){
+                    cont.add(entry.key);
                     cont.field((String)model.setFields.get(entry.key, () -> ""), str -> model.setFields.put(entry.key, str));
                 }
                 cont.row();
@@ -399,7 +404,7 @@ public class CinematicEditor extends EditorListener{
     }
 
     protected boolean simple(Class<?> type){
-        return type != null && Reflect.isWrapper(ReflectUtils.box(type));
+        return type != null && Reflect.isWrapper(ReflectUtils.box(type)) || type == String.class;
     }
 
     protected void show(){
