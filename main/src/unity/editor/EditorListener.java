@@ -2,16 +2,23 @@ package unity.editor;
 
 import arc.*;
 import mindustry.core.GameState.*;
+import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import unity.mod.*;
+import unity.type.sector.*;
 
 import static mindustry.Vars.*;
 
 /**
- * Base class for custom game editor listeners.
+ * Base class for custom game editor listeners. These listeners will only attach themselves if the edited map's name
+ * matches with one of the scripted sectors, e.g. the map {@code salvaged-laboratory} will trigger the listeners if
+ * a sector preset with the name {@code unity-salvaged-laboratory} exists and is an instance of {@link ScriptedSector}.
  * @author GlennFolker
  */
 public abstract class EditorListener{
+    private ScriptedSector sector;
+    private boolean attached;
+
     public EditorListener(){
         Events.on(ClientLoadEvent.class, c -> registerEvents());
     }
@@ -20,13 +27,28 @@ public abstract class EditorListener{
         Triggers.listen(Trigger.update, () -> valid(this::update));
         Triggers.listen(Trigger.draw, () -> valid(this::draw));
 
-        Events.on(StateChangeEvent.class, e -> valid(() -> {
-            if(e.from == State.menu && e.to == State.playing){
-                begin();
-            }else if(e.to == State.menu){
-                end();
+        Events.on(StateChangeEvent.class, e -> {
+            if(state.isEditor()){
+                if(e.from == State.menu && e.to == State.playing){
+                    var c = content.getByName(ContentType.sector, "unity-" + editor.tags.get("name"));
+                    if(c instanceof ScriptedSector sect){
+                        ui.showConfirm(
+                            "@editor.cinematic.title",
+                            "@editor.cinematic.confirm",
+                            () -> {
+                                attached = true;
+                                sector = sect;
+                                begin();
+                            }
+                        );
+                    }
+                }else if(attached && e.to == State.menu){
+                    end();
+                    attached = false;
+                    sector = null;
+                }
             }
-        }));
+        });
     }
 
     public void begin(){}
@@ -38,6 +60,10 @@ public abstract class EditorListener{
     public void draw(){}
 
     public void valid(Runnable run){
-        if(state.isEditor()) run.run();
+        if(attached && state.isEditor()) run.run();
+    }
+
+    public ScriptedSector sector(){
+        return sector;
     }
 }
