@@ -19,7 +19,16 @@ public class SectorObjectiveModel implements JsonSerializable{
 
     /** The field meta data of this objective. Do not modify directly, use {@link #set(Class)} instead. */
     public OrderedMap<String, FieldMetadata> fields = new OrderedMap<>();
-    /** The fields that is going to be used in objective instantiation. Modify the contents of this map. */
+    /**
+     * The fields that is going to be used in objective instantiation. Modify the contents of this map, with the following
+     * rule:
+     * <ul>
+     *     <li>{@link Seq}'s elements must be {@link String}s.</li>
+     *     <li>{@link ObjectMap} must always be {@link StringMap}.</li>
+     *     <li>Other types must be {@link String}s.</li>
+     * </ul>
+     * These will be parsed separately in each {@link SectorObjective} implementations.
+     */
     public ObjectMap<String, Object> setFields = new ObjectMap<>();
 
     public void set(Class<? extends SectorObjective> type){
@@ -33,14 +42,17 @@ public class SectorObjectiveModel implements JsonSerializable{
 
     @Override
     public void write(Json json){
-        json.writeValue("type", type.getName());
+        json.writeValue("type", type == null ? "null" : type.getName());
         json.writeValue("setFields", setFields, ObjectMap.class);
     }
 
     @Override
     public void read(Json json, JsonValue jsonData){
         try{
-            set((Class<? extends SectorObjective>)Class.forName(jsonData.getString("type"), true, mods.mainLoader()));
+            var typeName = jsonData.getString("type");
+            if(!typeName.equals("null")){
+                set((Class<? extends SectorObjective>)Class.forName(typeName, true, mods.mainLoader()));
+            }
 
             setFields.clear();
             setFields.putAll(json.readValue(ObjectMap.class, jsonData.get("setFields")));

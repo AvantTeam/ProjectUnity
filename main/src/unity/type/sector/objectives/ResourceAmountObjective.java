@@ -8,6 +8,7 @@ import arc.scene.*;
 import arc.scene.actions.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.game.*;
 import mindustry.type.*;
@@ -27,6 +28,9 @@ public class ResourceAmountObjective extends SectorObjective{
     public final Team team;
     public final Color from;
     public final Color to;
+
+    public String test;
+    public Seq<String> test2 = new Seq<>();
 
     public ResourceAmountObjective(ItemStack[] items, Team team, ScriptedSector sector, String name, Cons<ResourceAmountObjective> executor){
         this(items, team, Color.lightGray, Color.green, sector, name, executor);

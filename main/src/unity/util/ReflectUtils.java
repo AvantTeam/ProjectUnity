@@ -10,6 +10,18 @@ public final class ReflectUtils{
     public static final Object[] emptyObjects = new Object[0];
     public static final Class<?>[] emptyClasses = new Class[0];
 
+    public static Class<?> box(Class<?> type){
+        if(type == boolean.class) return Boolean.class;
+        if(type == byte.class) return Byte.class;
+        if(type == char.class) return Character.class;
+        if(type == short.class) return Short.class;
+        if(type == int.class) return Integer.class;
+        if(type == float.class) return Float.class;
+        if(type == long.class) return Long.class;
+        if(type == double.class) return Double.class;
+        return type;
+    }
+
     /** Finds a class from the parent classes that has a specific field. */
     public static Class<?> findClassf(Class<?> type, String field){
         for(type = type.isAnonymousClass() ? type.getSuperclass() : type; type != null; type = type.getSuperclass()){
