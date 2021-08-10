@@ -42,11 +42,12 @@ public class UnityUnitType extends UnitType{
     public ObjectSet<String> bottomWeapons = new ObjectSet<>();
     // Worms
     public int segmentLength = 9, maxSegments = -1;
+    //Should reduce the "Whip" effect.
+    public int segmentCast = 4;
     public float segmentOffset = 23f, headOffset = 0f;
     public float angleLimit = 30f;
     public float regenTime = -1f, healthDistribution = 0.1f;
     public float segmentDamageScl = 6f;
-    public float anglePhysicsSide = 0.25f;
     public float anglePhysicsSmooth = 0f;
     public float jointStrength = 1f;
     // Hopefully make segment movement more consistent
