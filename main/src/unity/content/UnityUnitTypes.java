@@ -3836,6 +3836,29 @@ public class UnityUnitTypes implements ContentList{
             lowAltitude = true;
             outlineColor = Color.valueOf("464a61");
 
+            weapons.add(new Weapon(name + "-mount"){{
+                x = 28f;
+                y = -17.5f;
+                shootY = 10.25f;
+                rotate = true;
+                rotateSpeed = 5f;
+                reload = 80f;
+                inaccuracy = 1f;
+
+                bullet = new LightningTurretBulletType(6f, 30f){{
+                    range = 120f;
+                    trailLength = 12;
+                    trailColor = color = lightningColor = Pal.lancerLaser;
+                    lightningDamage = 20f;
+                    lightning = 5;
+                    splashDamage = 20f;
+                    splashDamageRadius = 35f;
+                    status = StatusEffects.shocked;
+                    reload = 30f;
+                    duration = 5f * 60f;
+                }};
+            }});
+
             decorations.add(new WingDecorationType(name + "-wing", 4){{
                 flapScl = 120f;
                 flapAnimation = new Interp.ExpOut(2, 2.5f);

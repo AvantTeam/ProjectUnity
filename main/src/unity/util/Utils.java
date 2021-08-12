@@ -371,6 +371,20 @@ public final class Utils{
         return found && furthest != null ? Math.max(6f, Mathf.dst(wx, wy, furthest.worldx(), furthest.worldy())) : Mathf.dst(wx, wy, wx2, wy2);
     }
 
+    public static Seq<Healthc> nearbyEnemySorted(Team team, float x, float y, float radius, float variance){
+        tmpUnitSeq.clear();
+        Units.nearbyEnemies(team, x, y, radius, tmpUnitSeq::add);
+        indexer.allBuildings(x, y, radius, b -> {
+            if(b.team != team){
+                tmpUnitSeq.add(b);
+            }
+        });
+        return tmpUnitSeq.sort(h -> {
+            float r = Mathf.range(variance);
+            return h.dst2(x, y) + (r * r);
+        });
+    }
+
     public static void collideLineRawEnemyRatio(Team team, float x, float y, float x2, float y2, float width, Boolf3<Building, Float, Boolean> buildingCons, Boolf2<Unit, Float> unitCons, Floatc2 effectHandler){
         float minRatio = 0.05f;
         collideLineRawEnemy(team, x, y, x2, y2, width, (building, direct) -> {
