@@ -5,11 +5,13 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.util.*;
 import mindustry.graphics.*;
 
 public class UnityDrawf{
     private final static TextureRegion nRegion = new TextureRegion();
+    private final static Vec2 vector = new Vec2();
     public static final byte[] tileMap = {
         39, 36, 39, 36, 27, 16, 27, 24, 39, 36, 39, 36, 27, 16, 27, 24,
         38, 37, 38, 37, 17, 41, 17, 43, 38, 37, 38, 37, 26, 21, 26, 25,
@@ -28,6 +30,25 @@ public class UnityDrawf{
          3,  0,  3,  0, 15, 42, 15, 12,  3,  0,  3,  0, 15, 42, 15, 12,
          2,  1,  2,  1,  9, 45,  9, 19,  2,  1,  2,  1, 14, 18, 14, 13
     };
+
+    public static void dashCircleAngle(float x, float y, float radius, float rotation){
+        float scaleFactor = 0.6f;
+        int sides = 10 + (int)(radius * scaleFactor);
+        if(sides % 2 == 1) sides++;
+
+        vector.set(0, 0);
+
+        for(int i = 0; i < sides; i++){
+            if(i % 2 == 0) continue;
+            vector.set(radius, 0).setAngle((360f / sides * i + 90) + rotation);
+            float x1 = vector.x;
+            float y1 = vector.y;
+
+            vector.set(radius, 0).setAngle((360f / sides * (i + 1) + 90) + rotation);
+
+            Lines.line(x1 + x, y1 + y, vector.x + x, vector.y + y);
+        }
+    }
 
     public static void shiningCircle(int seed, float time, float x, float y, float radius, int spikes, float spikeDuration, float spikeWidth, float spikeHeight){
         shiningCircle(seed, time, x, y, radius, spikes, spikeDuration, spikeWidth, spikeHeight, 0f);

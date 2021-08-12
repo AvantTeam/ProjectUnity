@@ -87,9 +87,9 @@ public class WingDecorationType extends UnitDecorationType{
         float angDst = Utils.angleDistSigned(unit.rotation, wd.lastRot);
         if(Math.abs(angDst) > 0.0001f){
             if(angDst > 0){
-                wd.left += angDst;
+                wd.right += angDst;
             }else{
-                wd.right += -angDst;
+                wd.left += -angDst;
             }
         }else{
             //float mid = (((wd.left % 1f) + (wd.right % 1f)) / 2f);

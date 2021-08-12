@@ -309,6 +309,11 @@ public final class Utils{
 
     /** Iterates over all blocks in a radius. */
     public static void trueEachBlock(float wx, float wy, float range, Cons<Building> cons){
+        trueEachBlock(wx, wy, range, b -> true, cons);
+    }
+
+    /** Iterates over all blocks in a radius. */
+    public static void trueEachBlock(float wx, float wy, float range, Boolf<Building> boolf, Cons<Building> cons){
         collidedBlocks.clear();
 
         int tx = World.toTile(wx);
@@ -320,7 +325,7 @@ public final class Utils{
                 if(!Mathf.within(x * tilesize, y * tilesize, wx, wy, range)) continue;
                 Building other = world.build(x, y);
 
-                if(other == null) continue;
+                if(other == null || !boolf.get(other)) continue;
                 if(!collidedBlocks.contains(other.pos())){
                     cons.get(other);
                     collidedBlocks.add(other.pos());
@@ -369,6 +374,20 @@ public final class Utils{
         (x, y) -> (furthest = world.tile(x, y)) != null && pred.get(furthest));
 
         return found && furthest != null ? Math.max(6f, Mathf.dst(wx, wy, furthest.worldx(), furthest.worldy())) : Mathf.dst(wx, wy, wx2, wy2);
+    }
+
+    public static Seq<Healthc> nearbyEnemySorted(Team team, float x, float y, float radius, float variance){
+        tmpUnitSeq.clear();
+        Units.nearbyEnemies(team, x, y, radius, tmpUnitSeq::add);
+        indexer.allBuildings(x, y, radius, b -> {
+            if(b.team != team){
+                tmpUnitSeq.add(b);
+            }
+        });
+        return tmpUnitSeq.sort(h -> {
+            float r = Mathf.range(variance);
+            return h.dst2(x, y) + (r * r);
+        });
     }
 
     public static void collideLineRawEnemyRatio(Team team, float x, float y, float x2, float y2, float width, Boolf3<Building, Float, Boolean> buildingCons, Boolf2<Unit, Float> unitCons, Floatc2 effectHandler){
