@@ -309,6 +309,11 @@ public final class Utils{
 
     /** Iterates over all blocks in a radius. */
     public static void trueEachBlock(float wx, float wy, float range, Cons<Building> cons){
+        trueEachBlock(wx, wy, range, b -> true, cons);
+    }
+
+    /** Iterates over all blocks in a radius. */
+    public static void trueEachBlock(float wx, float wy, float range, Boolf<Building> boolf, Cons<Building> cons){
         collidedBlocks.clear();
 
         int tx = World.toTile(wx);
@@ -320,7 +325,7 @@ public final class Utils{
                 if(!Mathf.within(x * tilesize, y * tilesize, wx, wy, range)) continue;
                 Building other = world.build(x, y);
 
-                if(other == null) continue;
+                if(other == null || !boolf.get(other)) continue;
                 if(!collidedBlocks.contains(other.pos())){
                     cons.get(other);
                     collidedBlocks.add(other.pos());

@@ -238,7 +238,7 @@ public class EndGameTurret extends PowerTurret{
 
         void killTiles(){
             shouldLaser = 0;
-            Vars.indexer.eachBlock(null, x, y, range + 5f, build -> build.team != team, building -> {
+            Utils.trueEachBlock(x, y, range + 5f, build -> build.team != team, building -> {
                 if(!building.dead && building != this){
                     if(building.block.size >= 3) UnityFx.vapourizeTile.at(building.x, building.y, building.block.size, building);
                     if((shouldLaser % 5) == 0 || building.block.size >= 5){
@@ -265,7 +265,7 @@ public class EndGameTurret extends PowerTurret{
             float uy = unit.aimY();
             
             if(!Mathf.within(x, y, ux, uy, range * 1.5f)) return;
-            Vars.indexer.eachBlock(null, ux, uy, rnge, b -> b.team() != team && !b.dead(), building -> {
+            Utils.trueEachBlock(ux, uy, rnge, b -> b.team() != team && !b.dead(), building -> {
                 building.damage(490f);
                 Object[] data = {new Vec2(ux, uy), building, 0.525f};
                 UnityFx.endgameLaser.at(x, y, 0, data);
@@ -330,31 +330,12 @@ public class EndGameTurret extends PowerTurret{
             }
             updateThreats();
             if(timer.get(eyeTime, 15) && target != null && !isControlled()){
-                entitySeq.clear();
-                lowest = range + 999f;
-                dstC = range + 999f;
-                Vars.indexer.eachBlock(null, x, y, range, b -> b.team != team && !b.dead, build -> {
-                    float dstD = Mathf.dst(x, y, build.x, build.y);
-
-                    if(dstD < dstC){
-                        lowest = Math.min(lowest, dstD);
-                        dstC = dstD;
-                        if(entitySeq.size > 16) entitySeq.remove(0);
-                        entitySeq.add(build);
-                    }else if(Mathf.equal(lowest, dstD, 32)){
-                        if(entitySeq.size > 16) entitySeq.remove(0);
-                        entitySeq.add(build);
+                Seq<Healthc> nTargets = Utils.nearbyEnemySorted(team, x, y, range, 8f);
+                if(!nTargets.isEmpty()){
+                    for(int i = 0; i < targets.length; i++){
+                        targets[i] = nTargets.get(i % nTargets.size);
                     }
-                });
-                
-                for(int i = 0; i < 16; i++){
-                    Posc tmpTarget = Utils.targetUnique(team, x, y, range, targets);
-                    if(tmpTarget == null && entitySeq.size >= 1){
-                        tmpTarget = (Posc)entitySeq.random();
-                    }
-                    targets[i] = tmpTarget;
                 }
-                entitySeq.clear();
             }
         }
 
