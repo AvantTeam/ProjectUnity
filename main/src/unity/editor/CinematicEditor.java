@@ -43,6 +43,7 @@ public class CinematicEditor extends EditorListener{
     private Table objectivesPane;
     private final OrderedMap<SectorObjectiveModel, Table> objectives = new OrderedMap<>();
 
+    private final ObjectMap<Class<?>, Cons3<Table, String, Cons<String>>> interpreters = new ObjectMap<>();
     private final Seq<Class<? extends SectorObjective>> registered = new Seq<>();
 
     private boolean lock;
@@ -51,6 +52,17 @@ public class CinematicEditor extends EditorListener{
         JsonIO.json.addClassTag(BlockStoryNode.class.getName(), BlockStoryNode.class);
 
         registered.add(ResourceAmountObjective.class);
+
+        Cons3<Table, String, Cons<String>> def = (cont, v, str) -> cont.field(v, str).fillY().growX().pad(4f);
+        interpreters.put(Byte.class, def);
+        interpreters.put(Short.class, def);
+        interpreters.put(Integer.class, def);
+        interpreters.put(Long.class, def);
+        interpreters.put(Float.class, def);
+        interpreters.put(Double.class, def);
+        interpreters.put(Character.class, def);
+        interpreters.put(String.class, def);
+        interpreters.put(Boolean.class, (cont, v, str) -> cont.check(v, b -> str.get(String.valueOf(b))).fill().pad(4f));
     }
 
     @Override
@@ -68,7 +80,7 @@ public class CinematicEditor extends EditorListener{
             table.table(t -> {
                 t.add("Name:").fill();
                 name = t.field("", s -> current(node -> node.name = s)).fillY().growX().get();
-            }).align(Align.topLeft).fillY().growX().pad(6f);
+            }).top().left().fillY().growX().pad(6f);
 
             table.row().table(Styles.black3, tag -> {
                 tag.add("Tags").pad(4f);
@@ -78,7 +90,7 @@ public class CinematicEditor extends EditorListener{
                     .pad(4f);
 
                 var scroll = tag.row().pane(Styles.defaultPane, t -> {
-                    tagsPane = t.table(Styles.black3).fill().get().top();
+                    tagsPane = t.table(Styles.black3).fillY().growX().get().top();
                     tagsPane.defaults().pad(6f);
                 }).update(p -> {
                     if(p.hasScroll()){
@@ -87,13 +99,13 @@ public class CinematicEditor extends EditorListener{
                             Core.scene.setScrollFocus(null);
                         }
                     }
-                }).top().maxHeight(300f).grow().pad(6f).get();
+                }).maxHeight(300f).grow().pad(6f).get();
                 scroll.setScrollingDisabled(true, false);
                 scroll.setOverscroll(false, false);
 
                 tag.row()
                     .button(Icon.add, Styles.defaulti, () -> addTag(null, null))
-                    .align(Align.left).pad(6f).size(40f);
+                    .left().pad(6f).size(40f);
             }).fillY().growX().pad(6f);
 
             table.row().table(Styles.black3, model -> {
@@ -104,7 +116,7 @@ public class CinematicEditor extends EditorListener{
                     .pad(4f);
 
                 var scroll = model.row().pane(Styles.defaultPane, t -> {
-                    objectivesPane = t.table(Styles.black3).fill().get().top();
+                    objectivesPane = t.table(Styles.black3).fillY().growX().get().top();
                     objectivesPane.defaults().pad(6f);
                 }).update(p -> {
                     if(p.hasScroll()){
@@ -113,17 +125,17 @@ public class CinematicEditor extends EditorListener{
                             Core.scene.setScrollFocus(null);
                         }
                     }
-                }).top().maxHeight(600f).grow().pad(6f).get();
+                }).maxHeight(600f).grow().pad(6f).get();
                 scroll.setScrollingDisabled(true, false);
                 scroll.setOverscroll(false, false);
 
                 model.row()
                     .button(Icon.add, Styles.defaulti, () -> addObjective(new SectorObjectiveModel()))
-                    .align(Align.left).pad(6f).size(40f);
+                    .left().pad(6f).size(40f);
             }).fillY().growX().pad(6f);
 
             table.row().button(Icon.right, Styles.defaulti, this::hide)
-                .align(Align.bottomRight).pad(6f).size(40f);
+                .bottom().right().pad(6f).size(40f);
         }).update(p -> {
             if(p.hasScroll()){
                 Element result = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
@@ -131,7 +143,7 @@ public class CinematicEditor extends EditorListener{
                     Core.scene.setScrollFocus(null);
                 }
             }
-        }).size(600f, 400f).get();
+        }).size(600f, 360f).get();
         content.setScrollingDisabled(true, false);
         content.setOverscroll(false, false);
 
@@ -307,104 +319,126 @@ public class CinematicEditor extends EditorListener{
         cont.clear();
         cont.defaults().pad(4f);
 
-        cont.button(Icon.trash, Styles.defaulti, () -> {
-            objectives.remove(model);
+        cont.table(t -> {
+            t.button(Icon.trash, Styles.defaulti, () -> {
+                objectives.remove(model);
 
-            var cell = objectivesPane.getCell(cont);
-            if(cell != null){
-                cont.remove();
-                objectivesPane.getCells().remove(cell);
-                objectivesPane.invalidateHierarchy();
+                var cell = objectivesPane.getCell(cont);
+                if(cell != null){
+                    cont.remove();
+                    objectivesPane.getCells().remove(cell);
+                    objectivesPane.invalidateHierarchy();
 
-                manualSave();
-            }
-        }).size(40f).name("trash");
-        cont.add("Type:").fill().name("type name");
-        cont.field("", type -> {
-            var t = registered.find(c -> c.getSimpleName().equals(type));
-            if(t != null){
-                model.set(t);
-                updateFields(model);
+                    manualSave();
+                }
+            }).size(40f).name("trash");
 
-                manualSave();
-            }
-        }).fillY().growX().name("type field");
+            t.add("Type:").fill().name("type name");
+            t.field(model.type == null ? "" : model.type.getSimpleName(), type -> {
+                var c = registered.find(cl -> cl.getSimpleName().equals(type));
+                if(c != null){
+                    model.set(c);
+                    updateFields(model);
+
+                    manualSave();
+                }
+            }).fillY().growX().name("type field");
+        }).fillY().growX();
 
         cont.row().table(Styles.black3, t -> {}).grow().name("fields");
 
         objectivesPane.row().add(cont).fillY().growX();
         objectives.put(model, cont);
+
+        updateFields(model);
     }
 
     protected void updateFields(SectorObjectiveModel model){
-        var cont = objectives.get(model);
-        if(cont != null){
-            cont = cont.find("fields");
-            cont.clear();
+        var fieldCont = objectives.get(model);
+        if(fieldCont != null){
+            fieldCont = fieldCont.find("fields");
+            fieldCont.clear();
 
             for(var entry : model.fields.entries()){
-                if(Modifier.isPrivate(entry.value.field.getModifiers())) continue;
+                if(!Modifier.isPublic(entry.value.field.getModifiers())) continue;
 
+                var fieldName = entry.key;
                 var meta = entry.value;
-                var type = meta.field.getType();
+                var type = ReflectUtils.box(meta.field.getType());
+                var elem = ReflectUtils.box(meta.elementType);
+                var key = ReflectUtils.box(meta.keyType);
 
-                if((type.isArray() || Seq.class.isAssignableFrom(type)) && simple(meta.elementType)){
-                    cont.add(entry.key);
-                    cont.row().table(Styles.black3, t -> {
-                        Table[] table = {null};
-                        Seq<String> values = (Seq<String>)model.setFields.get(entry.key, Seq::new);
-                        Seq<Table> items = new Seq<>();
+                boolean handled = false;
 
-                        t.pane(c -> {
-                            table[0] = t.table(Styles.black3).fill().get().top();
-                            table[0].defaults().pad(6f);
-                        }).update(p -> {
-                            if(p.hasScroll()){
-                                Element result = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
-                                if(result == null || !result.isDescendantOf(p)){
-                                    Core.scene.setScrollFocus(null);
+                if((type.isArray() || Seq.class.isAssignableFrom(type)) && can(elem)){
+                    handled = true;
+                    fieldCont.table(cont -> {
+                        cont.add(fieldName).fillY().growX().pad(4f)
+                            .get().setAlignment(Align.left);
+                        cont.image(Tex.whiteui, Pal.accent)
+                            .height(4f).growX().pad(4f);
+
+                        cont.table(Styles.black3, t -> {
+                            Table[] table = {null};
+                            Seq<String> values = (Seq<String>)model.setFields.get(fieldName, Seq::new);
+                            Seq<Table> items = new Seq<>();
+
+                            t.pane(c -> {
+                                table[0] = t.table(Styles.black3).fill().get().top();
+                                table[0].defaults().pad(6f);
+                            }).update(p -> {
+                                if(p.hasScroll()){
+                                    Element result = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
+                                    if(result == null || !result.isDescendantOf(p)){
+                                        Core.scene.setScrollFocus(null);
+                                    }
                                 }
-                            }
-                        }).top().maxHeight(100f).grow().pad(4f).get();
+                            }).maxHeight(100f).grow().pad(4f).get();
 
-                        Cons<String> add = element -> items.add(table[0].row().table(f -> {
-                            f.button(Icon.trash, () -> {
-                                var cell = table[0].getCell(f);
-                                if(cell != null){
-                                    values.remove(items.indexOf(f));
-                                    items.remove(f);
+                            Cons<String> add = element -> items.add(table[0].row().table(f -> {
+                                f.button(Icon.trash, () -> {
+                                    var cell = table[0].getCell(f);
+                                    if(cell != null){
+                                        values.remove(items.indexOf(f));
+                                        items.remove(f);
 
-                                    f.remove();
-                                    table[0].getCells().remove(cell);
-                                    table[0].invalidateHierarchy();
+                                        f.remove();
+                                        table[0].getCells().remove(cell);
+                                        table[0].invalidateHierarchy();
 
-                                    manualSave();
-                                }
-                            }).size(40f).align(Align.left);
+                                        manualSave();
+                                    }
+                                }).size(40f).left().pad(6f);
 
-                            f.label(() -> String.valueOf(items.indexOf(f)));
-                            f.field(element, str -> values.set(items.indexOf(f), str)).fillY().growX();
-                        }).fillY().growX().get());
-                        values.each(add);
+                                f.label(() -> String.valueOf(items.indexOf(f))).size(30f).pad(4f);
+                                interpreters.get(elem).get(f, values.get(items.indexOf(f)), str -> values.set(items.indexOf(f), str));
+                            }).fillY().growX().pad(4f).get());
+                            values.each(add);
 
-                        t.row().button(Icon.add, Styles.defaulti, () -> {
-                            values.add("");
-                            add.get("");
-                        }).align(Align.left).size(40f).pad(6f);
-                    }).fillY().growX().pad(6f);
-                }else if(ObjectMap.class.isAssignableFrom(type) && simple(meta.keyType) && simple(meta.elementType)){
-                    cont.add(entry.key);
-                }else if(simple(type)){
-                    cont.add(entry.key);
-                    cont.field((String)model.setFields.get(entry.key, () -> ""), str -> model.setFields.put(entry.key, str));
+                            t.row().button(Icon.add, Styles.defaulti, () -> {
+                                values.add("");
+                                add.get("");
+                            }).left().size(40f).pad(6f);
+                        }).fillY().growX().pad(6f);
+                    }).fillY().growX();
+                }else if(ObjectMap.class.isAssignableFrom(type) && can(key) && can(elem)){
+                    handled = true;
+                    fieldCont.table(cont -> {}).fillY().growX();
+                }else if(can(type)){
+                    handled = true;
+                    fieldCont.table(cont -> {
+                        cont.add(fieldName).fill();
+                        interpreters.get(type).get(cont, (String)model.setFields.get(fieldName), str -> model.setFields.put(fieldName, str));
+                    }).fillY().growX();
                 }
-                cont.row();
+
+                if(handled) fieldCont.row();
             }
         }
     }
 
-    protected boolean simple(Class<?> type){
-        return type != null && Reflect.isWrapper(ReflectUtils.box(type)) || type == String.class;
+    protected boolean can(Class<?> type){
+        return type != null && interpreters.containsKey(type);
     }
 
     protected void show(){

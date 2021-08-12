@@ -23,8 +23,8 @@ public class SectorObjectiveModel implements JsonSerializable{
      * The fields that is going to be used in objective instantiation. Modify the contents of this map, with the following
      * rule:
      * <ul>
-     *     <li>{@link Seq}'s elements must be {@link String}s.</li>
-     *     <li>{@link ObjectMap} must always be {@link StringMap}.</li>
+     *     <li>{@link Seq}'s or array type's elements must be {@link String}s.</li>
+     *     <li>{@link ObjectMap}s must always be {@link StringMap}s.</li>
      *     <li>Other types must be {@link String}s.</li>
      * </ul>
      * These will be parsed separately in each {@link SectorObjective} implementations.
