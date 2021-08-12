@@ -10,12 +10,18 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.ctype.*;
 import mindustry.game.*;
+import mindustry.mod.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+import rhino.*;
 import unity.type.sector.*;
+import unity.type.sector.SectorObjectiveModel.*;
+import unity.util.*;
 
 import static mindustry.Vars.*;
+import static unity.Unity.*;
 
 /**
  * An objective that will complete once a team has gathered resources as described in {@link #items}.
@@ -32,6 +38,44 @@ public class ResourceAmountObjective extends SectorObjective{
     public String test;
     public Seq<String> test2 = new Seq<>();
 
+    static{
+        cinematicEditor.ignore(ResourceAmountObjective.class, ReflectUtils.findField(SectorObjective.class, "executions", true));
+
+        SectorObjectiveModel.constructors.put(ResourceAmountObjective.class, f -> {
+            ItemStack[] items = f.arrReq("items").map(v -> {
+                int itemOffset = v.indexOf(":");
+                int amountOffset = v.lastIndexOf(",");
+
+                if(itemOffset == -1 || amountOffset == -1) throw new IllegalArgumentException("Invalid string");
+                Item item = content.getByName(ContentType.item, v.substring(itemOffset + 1, amountOffset));
+                int amount = Integer.parseInt(v.substring(amountOffset + 1, v.lastIndexOf("}")));
+
+                return new ItemStack(item, amount);
+            }).toArray(ItemStack.class);
+
+            var team = Team.get(Integer.parseInt(f.valReq("team")));
+            var from = Color.lightGray;
+            var to = Color.green;
+
+            var name = f.valReq("name");
+
+            ImporterTopLevel scope = Reflect.get(Scripts.class, mods.getScripts(), "scope"); //TODO don't use top-level scope for safety reasons
+            var context = Context.enter();
+
+            var execFunc = compile(context, scope, name, "executor", f.valReq("executor"));
+            Object[] args = {null};
+            Cons<ResourceAmountObjective> executor = obj -> {
+                args[0] = obj;
+                execFunc.call(context, scope, scope, args);
+            };
+
+            var obj = new ResourceAmountObjective(items, team, from, to, cinematicEditor.sector(), name, executor);
+            obj.ext(f);
+
+            return obj;
+        });
+    }
+
     public ResourceAmountObjective(ItemStack[] items, Team team, ScriptedSector sector, String name, Cons<ResourceAmountObjective> executor){
         this(items, team, Color.lightGray, Color.green, sector, name, executor);
     }
@@ -42,6 +86,13 @@ public class ResourceAmountObjective extends SectorObjective{
         this.team = team;
         this.from = from;
         this.to = to;
+    }
+
+    @Override
+    public void ext(FieldTranslator f){
+        super.ext(f);
+        if(f.has("from")) from.set(Color.valueOf(Tmp.c1, f.val("from")));
+        if(f.has("to")) to.set(Color.valueOf(Tmp.c1, f.val("to")));
     }
 
     @Override
@@ -82,7 +133,7 @@ public class ResourceAmountObjective extends SectorObjective{
                                     int amount = Math.min(state.teams.playerCores().sum(b -> b.items.get(item.item)), item.amount);
                                     return
                                         "[#" + Tmp.c1.set(from).lerp(to, (float)amount / (float)item.amount).toString() + "]" + amount +
-                                            " []/ [accent]" + item.amount + "[]";
+                                        " []/ [accent]" + item.amount + "[]";
                                 })
                                     .grow()
                                     .get()

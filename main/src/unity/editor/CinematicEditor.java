@@ -9,13 +9,16 @@ import arc.math.*;
 import arc.scene.*;
 import arc.scene.actions.*;
 import arc.scene.ui.*;
+import arc.scene.ui.TextField.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
 import mindustry.io.*;
+import mindustry.type.*;
 import mindustry.ui.*;
 import unity.cinematic.*;
 import unity.type.sector.*;
@@ -25,6 +28,7 @@ import unity.util.*;
 import java.lang.reflect.*;
 
 import static mindustry.Vars.*;
+import static unity.Unity.*;
 
 /**
  * An editor listener to setup {@link BlockStoryNode}s.
@@ -45,6 +49,7 @@ public class CinematicEditor extends EditorListener{
 
     private final ObjectMap<Class<?>, Cons3<Table, String, Cons<String>>> interpreters = new ObjectMap<>();
     private final Seq<Class<? extends SectorObjective>> registered = new Seq<>();
+    private final ObjectMap<Class<? extends SectorObjective>, Seq<Field>> ignored = new ObjectMap<>();
 
     private boolean lock;
 
@@ -54,15 +59,66 @@ public class CinematicEditor extends EditorListener{
         registered.add(ResourceAmountObjective.class);
 
         Cons3<Table, String, Cons<String>> def = (cont, v, str) -> cont.field(v, str).fillY().growX().pad(4f);
-        interpreters.put(Byte.class, def);
-        interpreters.put(Short.class, def);
-        interpreters.put(Integer.class, def);
-        interpreters.put(Long.class, def);
-        interpreters.put(Float.class, def);
-        interpreters.put(Double.class, def);
+        Cons3<Table, String, Cons<String>> defInt = (cont, v, str) -> cont.field(v == null || v.isEmpty() ? "0" : v, str).fillY().growX().pad(4f).get().setFilter(TextFieldFilter.digitsOnly);
+        Cons3<Table, String, Cons<String>> defFloat = (cont, v, str) -> cont.field(v == null || v.isEmpty() ? "0.0" : v, str).fillY().growX().pad(4f).get().setFilter(TextFieldFilter.floatsOnly);
+        interpreters.put(Byte.class, defInt);
+        interpreters.put(Short.class, defInt);
+        interpreters.put(Integer.class, defInt);
+        interpreters.put(Long.class, defInt);
+        interpreters.put(Float.class, defFloat);
+        interpreters.put(Double.class, defFloat);
         interpreters.put(Character.class, def);
         interpreters.put(String.class, def);
-        interpreters.put(Boolean.class, (cont, v, str) -> cont.check(v, b -> str.get(String.valueOf(b))).fill().pad(4f));
+        interpreters.put(Boolean.class, (cont, v, str) -> cont.check(v == null || v.isEmpty() ? "false" : v, b -> str.get(String.valueOf(b))).left().size(40f).pad(4f));
+
+        interpreters.put(Team.class, defInt);
+
+        interpreters.put(ItemStack.class, (cont, v, str) -> cont.table(t -> {
+            String[] pair = {"copper", "0"};
+            if(v != null && !v.isEmpty()){
+                int itemOffset = v.indexOf(":");
+                int amountOffset = v.lastIndexOf(",");
+
+                if(itemOffset != -1 && amountOffset != -1){
+                    pair[0] = v.substring(itemOffset + 1, amountOffset);
+                    pair[1] = v.substring(amountOffset + 1, v.lastIndexOf("}"));
+                }
+            }
+
+            Runnable accept = () -> str.get("{item:" + pair[0] + ",amount:" + pair[1] + "}");
+
+            t.add("Item:").fillY().width(80f);
+            t.field(pair[0], val -> {
+                pair[0] = val;
+                accept.run();
+            }).fillY().growX();
+
+            t.add("Amount:").fillY().width(80f);
+            t.field("", val -> {
+                pair[1] = val;
+                accept.run();
+            }).fillY().growX().get().setFilter(TextFieldFilter.digitsOnly);
+        }).fillY().growX().pad(4f));
+
+        interpreters.put(Color.class, (cont, v, str) -> cont.button(Icon.pencil, () ->
+            ui.picker.show(Color.valueOf(Tmp.c1, v == null || v.isEmpty() ? "ffffffff" : v), false, res -> str.get(res.toString()))
+        ).left().size(40f).pad(4f));
+
+        interpreters.put(Cons.class, (cont, v, str) -> cont.button(Icon.pencil, () -> {
+            scriptsDialog.startup = (v == null || v.isEmpty())
+                ? """
+                /**
+                 * arg -- Argument passed by Cons
+                 */
+                function(arg) {
+                    
+                }
+                """
+                : v;
+
+            scriptsDialog.listener = str;
+            scriptsDialog.show();
+        }).left().size(40f).pad(4f));
     }
 
     @Override
@@ -143,7 +199,7 @@ public class CinematicEditor extends EditorListener{
                     Core.scene.setScrollFocus(null);
                 }
             }
-        }).size(600f, 360f).get();
+        }).size(600f, 350f).get();
         content.setScrollingDisabled(true, false);
         content.setOverscroll(false, false);
 
@@ -208,6 +264,11 @@ public class CinematicEditor extends EditorListener{
 
             Draw.reset();
         });
+    }
+
+    public void ignore(Class<? extends SectorObjective> type, Field field){
+        var arr = ignored.get(type, Seq::new);
+        if(!arr.contains(field)) arr.add(field);
     }
 
     protected void updateTablePosition(){
@@ -360,7 +421,7 @@ public class CinematicEditor extends EditorListener{
             fieldCont.clear();
 
             for(var entry : model.fields.entries()){
-                if(!Modifier.isPublic(entry.value.field.getModifiers())) continue;
+                if(ignored.get(model.type, Seq::new).contains(entry.value.field::equals) || !Modifier.isPublic(entry.value.field.getModifiers())) continue;
 
                 var fieldName = entry.key;
                 var meta = entry.value;
@@ -370,15 +431,17 @@ public class CinematicEditor extends EditorListener{
 
                 boolean handled = false;
 
-                if((type.isArray() || Seq.class.isAssignableFrom(type)) && can(elem)){
+                if((type.isArray() && can(ReflectUtils.box(type.getComponentType()))) || (Seq.class.isAssignableFrom(type) && can(elem))){
+                    var fType = type.isArray() ? ReflectUtils.box(type.getComponentType()) : elem;
+
                     handled = true;
                     fieldCont.table(cont -> {
                         cont.add(fieldName).fillY().growX().pad(4f)
                             .get().setAlignment(Align.left);
-                        cont.image(Tex.whiteui, Pal.accent)
+                        cont.row().image(Tex.whiteui, Pal.accent)
                             .height(4f).growX().pad(4f);
 
-                        cont.table(Styles.black3, t -> {
+                        cont.row().table(Styles.black3, t -> {
                             Table[] table = {null};
                             Seq<String> values = (Seq<String>)model.setFields.get(fieldName, Seq::new);
                             Seq<Table> items = new Seq<>();
@@ -411,7 +474,7 @@ public class CinematicEditor extends EditorListener{
                                 }).size(40f).left().pad(6f);
 
                                 f.label(() -> String.valueOf(items.indexOf(f))).size(30f).pad(4f);
-                                interpreters.get(elem).get(f, values.get(items.indexOf(f)), str -> values.set(items.indexOf(f), str));
+                                interpreters.get(fType).get(f, values.get(items.size), str -> values.set(items.indexOf(f), str));
                             }).fillY().growX().pad(4f).get());
                             values.each(add);
 
@@ -427,7 +490,7 @@ public class CinematicEditor extends EditorListener{
                 }else if(can(type)){
                     handled = true;
                     fieldCont.table(cont -> {
-                        cont.add(fieldName).fill();
+                        cont.add(fieldName).left().fillY().width(100f).pad(4f).get().setAlignment(Align.left);
                         interpreters.get(type).get(cont, (String)model.setFields.get(fieldName), str -> model.setFields.put(fieldName, str));
                     }).fillY().growX();
                 }

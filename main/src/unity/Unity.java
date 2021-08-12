@@ -39,6 +39,9 @@ public class Unity extends Mod{
 
     public static CinematicEditor cinematicEditor;
 
+    public static CreditsDialog creditsDialog;
+    public static JSScriptDialog scriptsDialog;
+
     private static final ContentList[] content = {
         new UnityItems(),
         new UnityStatusEffects(),
@@ -84,6 +87,9 @@ public class Unity extends Mod{
         });
 
         Events.on(ClientLoadEvent.class, e -> {
+            creditsDialog = new CreditsDialog();
+            scriptsDialog = new JSScriptDialog();
+
             addCredits();
 
             UnitySettings.init();
@@ -183,7 +189,6 @@ public class Unity extends Mod{
 
     protected void addCredits(){
         try{
-            CreditsDialog credits = new CreditsDialog();
             Group group = (Group)ui.menuGroup.getChildren().first();
 
             if(mobile){
@@ -191,7 +196,7 @@ public class Unity extends Mod{
             }else{
                 group.fill(c ->
                     c.bottom().left()
-                        .button("", UnityStyles.creditst, credits::show)
+                        .button("", UnityStyles.creditst, creditsDialog::show)
                         .size(84, 45)
                         .name("unity credits")
                 );

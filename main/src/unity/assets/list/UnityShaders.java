@@ -13,6 +13,7 @@ import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.Log.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -62,8 +63,6 @@ public class UnityShaders{
                 }
             }
         });
-
-        loaded = true;
     }
 
     public static void dispose(){

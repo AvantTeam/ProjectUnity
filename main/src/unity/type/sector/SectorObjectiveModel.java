@@ -31,6 +31,8 @@ public class SectorObjectiveModel implements JsonSerializable{
      */
     public ObjectMap<String, Object> setFields = new ObjectMap<>();
 
+    private final FieldTranslator translator = new FieldTranslator();
+
     public void set(Class<? extends SectorObjective> type){
         this.type = type;
 
@@ -67,10 +69,59 @@ public class SectorObjectiveModel implements JsonSerializable{
         var constructor = constructors.get(type);
         if(constructor == null) throw new IllegalArgumentException("No constructor setup for " + type.getSimpleName());
 
-        return (T)constructor.get(setFields);
+        translator.fields = setFields;
+        var obj = (T)constructor.get(translator);
+        translator.fields = null;
+
+        return obj;
     }
 
     public interface ObjectiveConstructor<T extends SectorObjective>{
-        T get(ObjectMap<String, Object> fields);
+        T get(FieldTranslator fields);
+    }
+
+    public static class FieldTranslator{
+        private ObjectMap<String, Object> fields;
+
+        public String val(String key){
+            return val(key, "");
+        }
+
+        public String val(String key, String def){
+            return (String)fields.get(key, def);
+        }
+
+        public String valReq(String key){
+            var val = val(key, null);
+            if(val == null) throw new IllegalArgumentException("'" + key + "' not found");
+
+            return val;
+        }
+
+        public Seq<String> arr(String key){
+            return (Seq<String>)fields.get(key);
+        }
+
+        public Seq<String> arrReq(String key){
+            var arr = (Seq<String>)fields.get(key);
+            if(arr == null) throw new IllegalArgumentException("'" + key + "' not found");
+
+            return arr;
+        }
+
+        public StringMap map(String key){
+            return (StringMap)fields.get(key);
+        }
+
+        public StringMap mapReq(String key){
+            var map = (StringMap)fields.get(key);
+            if(map == null) throw new IllegalArgumentException("'" + key + "' not found");
+
+            return map;
+        }
+
+        public boolean has(String key){
+            return fields.containsKey(key);
+        }
     }
 }

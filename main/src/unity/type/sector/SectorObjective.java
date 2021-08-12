@@ -3,16 +3,20 @@ package unity.type.sector;
 import arc.*;
 import arc.func.*;
 import arc.struct.*;
+import arc.util.*;
+import mindustry.mod.*;
+import rhino.*;
+import unity.type.sector.SectorObjectiveModel.*;
 
 import static mindustry.Vars.*;
 
 /** @author GlennFolker */
 @SuppressWarnings("unchecked")
 public abstract class SectorObjective{
-    private static final ObjectSet<String> usedNames = new ObjectSet<>();
+    /** The name of this objective. It is your responsibility to differ the name from other objectives. */
     public final String name;
 
-    private final Cons<SectorObjective> executor;
+    public final Cons<SectorObjective> executor;
     public final ScriptedSector sector;
 
     public final int executions;
@@ -22,20 +26,53 @@ public abstract class SectorObjective{
 
     private boolean finalized;
 
-    private Cons<SectorObjective> init = objective -> {};
-    private Cons<SectorObjective> update = objective -> {};
-    private Cons<SectorObjective> draw = objective -> {};
+    public Cons<SectorObjective> init = objective -> {};
+    public Cons<SectorObjective> update = objective -> {};
+    public Cons<SectorObjective> draw = objective -> {};
 
     public <T extends SectorObjective> SectorObjective(ScriptedSector sector, String name, int executions, Cons<T> executor){
-        if(usedNames.add(name)){
-            this.name = name;
-        }else{
-            throw new IllegalArgumentException("Sector objective with the name '" + name + "' already exists!");
-        }
-
+        this.name = name;
         this.sector = sector;
         this.executor = (Cons<SectorObjective>)executor;
         this.executions = executions;
+    }
+
+    protected static Function compile(Context context, Scriptable scope, String name, String sourceName, String source){
+        return context.compileFunction(scope, source, name + "-" + sourceName, 1);
+    }
+
+    protected Function compile(Context context, Scriptable scope, String sourceName, String source){
+        return compile(context, scope, name, sourceName, source);
+    }
+
+    public void ext(FieldTranslator f){
+        ImporterTopLevel scope = Reflect.get(Scripts.class, mods.getScripts(), "scope"); //TODO don't use top-level scope for safety reasons
+        var context = Context.enter();
+        Object[] args = {null};
+
+        if(f.has("init")){
+            var initFunc = compile(context, scope, "init", f.val("init"));
+            init = obj -> {
+                args[0] = obj;
+                initFunc.call(context, scope, scope, args);
+            };
+        }
+
+        if(f.has("update")){
+            var initFunc = compile(context, scope, "update", f.val("update"));
+            update = obj -> {
+                args[0] = obj;
+                initFunc.call(context, scope, scope, args);
+            };
+        }
+
+        if(f.has("draw")){
+            var initFunc = compile(context, scope, "draw", f.val("draw"));
+            draw = obj -> {
+                args[0] = obj;
+                initFunc.call(context, scope, scope, args);
+            };
+        }
     }
 
     public void init(){
@@ -133,9 +170,5 @@ public abstract class SectorObjective{
 
     public boolean dependencyCompleted(){
         return dependencies.find(obj -> !obj.isExecuted()) == null;
-    }
-
-    public int getExecution(){
-        return execution;
     }
 }
