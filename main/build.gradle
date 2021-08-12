@@ -45,7 +45,10 @@ task deploy(type: Jar, dependsOn: configurations.runtimeClasspath) {
         exclude 'sprites/gen/vanilla/**'
     }
 
-    from(rootDir) { include 'mod.json' }
+    from(rootDir) {
+        include 'mod.json'
+        include 'icon.png'
+    }
 
     doFirst {
         println "Deploying ${devBuild ? 'dev' : 'user'} build."
