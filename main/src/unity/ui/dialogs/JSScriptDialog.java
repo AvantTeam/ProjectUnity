@@ -30,7 +30,7 @@ public class JSScriptDialog extends BaseDialog{
             lines.setStyle(UnityStyles.codeLabel);
 
             area = cont.area("", UnityStyles.codeArea, this::set).grow().get();
-        }).center().width(Core.graphics.getWidth() - 40f).growY().pad(20f);
+        }).grow().pad(20f);
 
         hidden(() -> listener.get(content));
         shown(() -> area.setText(startup));

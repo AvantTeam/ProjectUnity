@@ -1,7 +1,8 @@
 package unity;
 
 import arc.*;
-import arc.assets.loaders.*;
+import arc.assets.*;
+import arc.files.*;
 import arc.freetype.*;
 import arc.func.*;
 import arc.graphics.g2d.*;
@@ -66,7 +67,29 @@ public class Unity extends Mod{
             Core.assets.setLoader(Model.class, new ModelLoader(tree));
             Core.assets.setLoader(WavefrontObject.class, new WavefrontObjectLoader(tree));
 
-            Core.assets.setLoader(FreeTypeFontGenerator.class, ".pu_ttf", new FreeTypeFontGeneratorLoader(tree));
+            var fontSuff = ".gen_pu";
+            Core.assets.setLoader(FreeTypeFontGenerator.class, fontSuff, new FreeTypeFontGeneratorLoader(tree){
+                @Override
+                public FreeTypeFontGenerator load(AssetManager assetManager, String fileName, Fi file, FreeTypeFontGeneratorParameters parameter){
+                    return new FreeTypeFontGenerator(tree.get(file.pathWithoutExtension()));
+                }
+            });
+
+            Core.assets.setLoader(Font.class, "-pu", new FreetypeFontLoader(tree){
+                @Override
+                public Font loadSync(AssetManager manager, String fileName, Fi file, FreeTypeFontLoaderParameter parameter){
+                    if(parameter == null) throw new IllegalArgumentException("parameter is null");
+
+                    var generator = manager.get(parameter.fontFileName + fontSuff, FreeTypeFontGenerator.class);
+                    return generator.generateFont(parameter.fontParameters);
+                }
+
+                @Override
+                @SuppressWarnings("rawtypes")
+                public Seq<AssetDescriptor> getDependencies(String fileName, Fi file, FreeTypeFontLoaderParameter parameter){
+                    return Seq.with(new AssetDescriptor<>(parameter.fontFileName + fontSuff, FreeTypeFontGenerator.class));
+                }
+            });
         }
 
         Events.on(ContentInitEvent.class, e -> {
