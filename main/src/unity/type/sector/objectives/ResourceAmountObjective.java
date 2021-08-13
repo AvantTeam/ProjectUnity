@@ -44,7 +44,7 @@ public class ResourceAmountObjective extends SectorObjective{
         SectorObjectiveModel.constructors.put(ResourceAmountObjective.class, f -> {
             ItemStack[] items = f.arrReq("items").map(v -> {
                 int itemOffset = v.indexOf(":");
-                int amountOffset = v.lastIndexOf(",");
+                int amountOffset = v.lastIndexOf(":");
 
                 if(itemOffset == -1 || amountOffset == -1) throw new IllegalArgumentException("Invalid string");
                 Item item = content.getByName(ContentType.item, v.substring(itemOffset + 1, amountOffset));

@@ -22,6 +22,28 @@ public final class ReflectUtils{
         return type;
     }
 
+    public static Class<?> unbox(Class<?> type){
+        if(type == Boolean.class) return boolean.class;
+        if(type == Byte.class) return byte.class;
+        if(type == Character.class) return char.class;
+        if(type == Short.class) return short.class;
+        if(type == Integer.class) return int.class;
+        if(type == Float.class) return float.class;
+        if(type == Long.class) return long.class;
+        if(type == Double.class) return double.class;
+        return type;
+    }
+
+    public static String def(Class<?> type){
+        var t = unbox(type).getSimpleName();
+        return switch(t){
+            case "boolean" -> "false";
+            case "byte", "char", "short", "int", "long" -> "0";
+            case "float", "double" -> "0.0";
+            default -> "null";
+        };
+    }
+
     /** Finds a class from the parent classes that has a specific field. */
     public static Class<?> findClassf(Class<?> type, String field){
         for(type = type.isAnonymousClass() ? type.getSuperclass() : type; type != null; type = type.getSuperclass()){

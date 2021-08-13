@@ -2,6 +2,7 @@ package unity.ui.dialogs;
 
 import arc.func.*;
 import arc.scene.ui.*;
+import arc.util.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 
@@ -22,7 +23,7 @@ public class JSScriptDialog extends BaseDialog{
                 area.getFirstLineShowing(),
                 area.getLinesShowing(),
                 area.getCursorLine()
-            )).width(40f).growY();
+            )).width(40f).growY().get().setAlignment(Align.right);
 
             area = cont.area("", this::set).grow().get();
         }).grow().pad(20f);

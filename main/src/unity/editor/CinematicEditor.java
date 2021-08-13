@@ -47,7 +47,7 @@ public class CinematicEditor extends EditorListener{
     private Table objectivesPane;
     private final OrderedMap<SectorObjectiveModel, Table> objectives = new OrderedMap<>();
 
-    private final ObjectMap<Class<?>, Cons3<Table, String, Cons<String>>> interpreters = new ObjectMap<>();
+    private final ObjectMap<Class<?>, Cons3<Table, Prov<String>, Cons<String>>> interpreters = new ObjectMap<>();
     private final Seq<Class<? extends SectorObjective>> registered = new Seq<>();
     private final ObjectMap<Class<? extends SectorObjective>, Seq<Field>> ignored = new ObjectMap<>();
 
@@ -58,9 +58,17 @@ public class CinematicEditor extends EditorListener{
 
         registered.add(ResourceAmountObjective.class);
 
-        Cons3<Table, String, Cons<String>> def = (cont, v, str) -> cont.field(v, str).fillY().growX().pad(4f);
-        Cons3<Table, String, Cons<String>> defInt = (cont, v, str) -> cont.field(v == null || v.isEmpty() ? "0" : v, str).fillY().growX().pad(4f).get().setFilter(TextFieldFilter.digitsOnly);
-        Cons3<Table, String, Cons<String>> defFloat = (cont, v, str) -> cont.field(v == null || v.isEmpty() ? "0.0" : v, str).fillY().growX().pad(4f).get().setFilter(TextFieldFilter.floatsOnly);
+        Cons3<Table, Prov<String>, Cons<String>> def = (cont, v, str) -> cont.field(v.get(), str).fillY().growX().pad(4f);
+        Cons3<Table, Prov<String>, Cons<String>> defInt = (cont, v, str) -> {
+            var s = v.get();
+            cont.field(s == null || s.isEmpty() ? "0" : s, str).fillY().growX().pad(4f).get().setFilter(TextFieldFilter.digitsOnly);
+        };
+
+        Cons3<Table, Prov<String>, Cons<String>> defFloat = (cont, v, str) -> {
+            var s = v.get();
+            cont.field(s == null || s.isEmpty() ? "0.0" : s, str).fillY().growX().pad(4f).get().setFilter(TextFieldFilter.floatsOnly);
+        };
+
         interpreters.put(Byte.class, defInt);
         interpreters.put(Short.class, defInt);
         interpreters.put(Integer.class, defInt);
@@ -69,19 +77,21 @@ public class CinematicEditor extends EditorListener{
         interpreters.put(Double.class, defFloat);
         interpreters.put(Character.class, def);
         interpreters.put(String.class, def);
-        interpreters.put(Boolean.class, (cont, v, str) -> cont.check(v == null || v.isEmpty() ? "false" : v, b -> str.get(String.valueOf(b))).left().size(40f).pad(4f));
+        interpreters.put(Boolean.class, (cont, v, str) -> cont.check("", b -> str.get(String.valueOf(b))).left().size(40f).pad(4f));
 
         interpreters.put(Team.class, defInt);
 
         interpreters.put(ItemStack.class, (cont, v, str) -> cont.table(t -> {
+            var s = v.get();
+
             String[] pair = {"copper", "0"};
-            if(v != null && !v.isEmpty()){
-                int itemOffset = v.indexOf(":");
-                int amountOffset = v.lastIndexOf(",");
+            if(s != null && !s.isEmpty()){
+                int itemOffset = s.indexOf(":");
+                int amountOffset = s.lastIndexOf(":");
 
                 if(itemOffset != -1 && amountOffset != -1){
-                    pair[0] = v.substring(itemOffset + 1, amountOffset);
-                    pair[1] = v.substring(amountOffset + 1, v.lastIndexOf("}"));
+                    pair[0] = s.substring(itemOffset + 1, amountOffset);
+                    pair[1] = s.substring(amountOffset + 1, s.lastIndexOf("}"));
                 }
             }
 
@@ -100,25 +110,71 @@ public class CinematicEditor extends EditorListener{
             }).fillY().growX().get().setFilter(TextFieldFilter.digitsOnly);
         }).fillY().growX().pad(4f));
 
-        interpreters.put(Color.class, (cont, v, str) -> cont.button(Icon.pencil, () ->
-            ui.picker.show(Color.valueOf(Tmp.c1, v == null || v.isEmpty() ? "ffffffff" : v), false, res -> str.get(res.toString()))
-        ).left().size(40f).pad(4f));
+        interpreters.put(Color.class, (cont, v, str) -> cont.button(Icon.pencil, () -> {
+            var s = v.get();
+            ui.picker.show(
+                Color.valueOf(Tmp.c1, s == null || s.isEmpty() ? "ffffffff" : s),
+                false,
+                res -> str.get(res.toString())
+            );
+        }).left().size(40f).pad(4f));
 
-        interpreters.put(Cons.class, (cont, v, str) -> cont.button(Icon.pencil, () -> {
-            scriptsDialog.startup = (v == null || v.isEmpty())
-                ? """
-                /**
-                 * arg -- Argument passed by Cons
-                 */
-                function(arg) {
-                    
+        interpreters.put(Runnable.class, funcInterface(Runnable.class));
+        interpreters.put(Cons.class, funcInterface(Cons.class));
+        interpreters.put(Cons2.class, funcInterface(Cons2.class));
+        interpreters.put(Func.class, funcInterface(Func.class));
+        interpreters.put(Func2.class, funcInterface(Func2.class));
+        interpreters.put(Func3.class, funcInterface(Func3.class));
+    }
+
+    protected Cons3<Table, Prov<String>, Cons<String>> funcInterface(Class<?> type){
+        if(!type.isInterface() || type.getMethods().length != 1) throw new IllegalArgumentException("Not a functional interface: '" + type + "'");
+
+        Method method = null;
+        for(var m : type.getMethods()){
+            if(Modifier.isAbstract(m.getModifiers()) || !m.isDefault()){
+                if(method == null){
+                    method = m;
+                }else{
+                    throw new IllegalArgumentException("Not a functional interface: '" + type + "'");
                 }
-                """
-                : v;
+            }
+        }
 
+        if(method == null) throw new IllegalArgumentException("Not a functional interface: '" + type + "'");
+
+        var ret = method.getReturnType();
+        var args = method.getParameters();
+
+        var exec = new StringBuilder("/**\n")
+            .append(" * ").append(type.getSimpleName());
+        for(var arg : args){
+            exec.append(" * ")
+                .append(arg.getName())
+                .append(" - Argument passed by ")
+                .append(type.getSimpleName())
+                .append("\n");
+        }
+        exec.append(" */\n")
+            .append("function(");
+        for(int i = 0; i < args.length; i++){
+            if(i > 0) exec.append(", ");
+            exec.append(args[i].getName());
+        }
+        exec.append("){\n")
+            .append("    ")
+            .append(ret == void.class ? "" : "return " + ReflectUtils.def(ret) + ";").append("\n")
+            .append("}");
+
+        var def = exec.toString();
+
+        return (cont, v, str) -> cont.button(Icon.pencil, () -> {
+            var s = v.get();
+
+            scriptsDialog.startup = (s == null || s.isEmpty()) ? def : s;
             scriptsDialog.listener = str;
             scriptsDialog.show();
-        }).left().size(40f).pad(4f));
+        }).left().size(40f).pad(4f);
     }
 
     @Override
@@ -181,7 +237,7 @@ public class CinematicEditor extends EditorListener{
                             Core.scene.setScrollFocus(null);
                         }
                     }
-                }).maxHeight(600f).grow().pad(6f).get();
+                }).maxHeight(800f).grow().pad(6f).get();
                 scroll.setScrollingDisabled(true, false);
                 scroll.setOverscroll(false, false);
 
@@ -199,7 +255,7 @@ public class CinematicEditor extends EditorListener{
                     Core.scene.setScrollFocus(null);
                 }
             }
-        }).size(600f, 350f).get();
+        }).size(800f, 350f).get();
         content.setScrollingDisabled(true, false);
         content.setOverscroll(false, false);
 
@@ -458,24 +514,29 @@ public class CinematicEditor extends EditorListener{
                                 }
                             }).maxHeight(100f).grow().pad(4f).get();
 
-                            Cons<String> add = element -> items.add(table[0].row().table(f -> {
-                                f.button(Icon.trash, () -> {
-                                    var cell = table[0].getCell(f);
-                                    if(cell != null){
-                                        values.remove(items.indexOf(f));
-                                        items.remove(f);
+                            Cons<String> add = element -> {
+                                Table[] c = {null};
+                                items.add(table[0].row().table(f -> {
+                                    c[0] = f;
+                                    f.button(Icon.trash, () -> {
+                                        var cell = table[0].getCell(f);
+                                        if(cell != null){
+                                            values.remove(items.indexOf(f));
+                                            items.remove(f);
 
-                                        f.remove();
-                                        table[0].getCells().remove(cell);
-                                        table[0].invalidateHierarchy();
+                                            f.remove();
+                                            table[0].getCells().remove(cell);
+                                            table[0].invalidateHierarchy();
 
-                                        manualSave();
-                                    }
-                                }).size(40f).left().pad(6f);
+                                            manualSave();
+                                        }
+                                    }).size(40f).left().pad(6f);
 
-                                f.label(() -> String.valueOf(items.indexOf(f))).size(30f).pad(4f);
-                                interpreters.get(fType).get(f, values.get(items.size), str -> values.set(items.indexOf(f), str));
-                            }).fillY().growX().pad(4f).get());
+                                    f.label(() -> String.valueOf(items.indexOf(f))).size(30f).pad(4f);
+                                }).fillY().growX().pad(4f).get());
+
+                                interpreters.get(fType).get(c[0], () -> values.get(items.indexOf(c[0])), str -> values.set(items.indexOf(c[0]), str));
+                            };
                             values.each(add);
 
                             t.row().button(Icon.add, Styles.defaulti, () -> {
@@ -483,16 +544,16 @@ public class CinematicEditor extends EditorListener{
                                 add.get("");
                             }).left().size(40f).pad(6f);
                         }).fillY().growX().pad(6f);
-                    }).fillY().growX();
+                    }).left().fillY().growX();
                 }else if(ObjectMap.class.isAssignableFrom(type) && can(key) && can(elem)){
                     handled = true;
-                    fieldCont.table(cont -> {}).fillY().growX();
+                    fieldCont.table(cont -> {}).left().fillY().growX();
                 }else if(can(type)){
                     handled = true;
                     fieldCont.table(cont -> {
                         cont.add(fieldName).left().fillY().width(100f).pad(4f).get().setAlignment(Align.left);
-                        interpreters.get(type).get(cont, (String)model.setFields.get(fieldName), str -> model.setFields.put(fieldName, str));
-                    }).fillY().growX();
+                        interpreters.get(type).get(cont, () -> (String)model.setFields.get(fieldName), str -> model.setFields.put(fieldName, str));
+                    }).left().fillY().growX();
                 }
 
                 if(handled) fieldCont.row();
