@@ -5,6 +5,7 @@ import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import unity.annotations.Annotations.*;
+import unity.cinematic.*;
 import unity.type.*;
 import unity.type.sector.*;
 import unity.type.sector.objectives.*;
@@ -24,37 +25,45 @@ public class UnitySectorPresets implements ContentList{
             difficulty = 3f;
             captureWave = 15;
 
-            objectives.addAll(
-                new ResourceAmountObjective(ItemStack.with(
-                    Items.copper, 6000,
-                    Items.lead, 5600,
-                    Items.silicon, 3200,
-                    UnityItems.monolite, 4800
-                ), state.rules.defaultTeam, this, name + "-resource", objective -> {
-                    int win = Math.max((state.wave / 5 + 1) * 5, captureWave);
+            var sector = this;
+            storyNodes.add(new StoryNode<>(){
+                {
+                    objectives.add(new ResourceAmountObjective(ItemStack.with(
+                        Items.copper, 6000,
+                        Items.lead, 5600,
+                        Items.silicon, 3200,
+                        UnityItems.monolite, 4800
+                    ), state.rules.defaultTeam, sector, this, sector.name + "-resource", objective -> {
+                        int win = Math.max((state.wave / 5 + 1) * 5, captureWave);
 
-                    state.rules.winWave = Math.max(captureWave, win);
-                    if(state.hasSector()){
-                        state.getSector().info.winWave = win;
-                        GlobalObjective.fire(GlobalObjective.sectorAccretionComplete);
-                    }
+                        state.rules.winWave = Math.max(captureWave, win);
+                        if(state.hasSector()){
+                            state.getSector().info.winWave = win;
+                            GlobalObjective.fire(GlobalObjective.sectorAccretionComplete);
+                        }
 
-                    Sounds.unlock.play();
-                }).init((ResourceAmountObjective objective) -> {
-                    if(state.getSector() != null){
-                        if(!GlobalObjective.reached(GlobalObjective.sectorAccretionComplete)){
-                            state.rules.winWave = -1;
-                            if(state.hasSector()){
-                                state.getSector().info.winWave = -1;
+                        Sounds.unlock.play();
+                    }).init((ResourceAmountObjective objective) -> {
+                        if(state.getSector() != null){
+                            if(!GlobalObjective.reached(GlobalObjective.sectorAccretionComplete)){
+                                state.rules.winWave = -1;
+                                if(state.hasSector()){
+                                    state.getSector().info.winWave = -1;
+                                }
+                            }else{
+                                objective.stop();
                             }
                         }else{
-                            objective.stop();
+                            state.rules.winWave = -1;
                         }
-                    }else{
-                        state.rules.winWave = -1;
-                    }
-                })
-            );
+                    }));
+                }
+
+                @Override
+                public Object bound(){
+                    return null;
+                }
+            });
         }};
 
         salvagedLab = new ScriptedSector("salvaged-laboratory", megalith, 100){{

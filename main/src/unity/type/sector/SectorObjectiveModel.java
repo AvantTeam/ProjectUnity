@@ -6,13 +6,14 @@ import arc.util.Log.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
 import mindustry.io.*;
+import unity.cinematic.*;
 
 import static mindustry.Vars.*;
 import static unity.Unity.*;
 
 @SuppressWarnings("unchecked")
 public class SectorObjectiveModel implements JsonSerializable{
-    public static ObjectMap<Class<? extends SectorObjective>, ObjectiveConstructor<? extends SectorObjective>> constructors = new ObjectMap<>();
+    public static ObjectMap<Class<? extends SectorObjective>, ObjectiveConstructor> constructors = new ObjectMap<>();
 
     /** The objective type that is going to be instantiated. Do not modify directly, use {@link #set(Class)} instead. */
     public Class<? extends SectorObjective> type;
@@ -63,21 +64,21 @@ public class SectorObjectiveModel implements JsonSerializable{
         }
     }
 
-    public <T extends SectorObjective> T create(){
+    public <T extends SectorObjective> T create(StoryNode<?> node){
         if(type == null) throw new IllegalArgumentException("type is null");
 
         var constructor = constructors.get(type);
         if(constructor == null) throw new IllegalArgumentException("No constructor setup for " + type.getSimpleName());
 
         translator.fields = setFields;
-        var obj = (T)constructor.get(translator);
+        var obj = (T)constructor.get(node, translator);
         translator.fields = null;
 
         return obj;
     }
 
-    public interface ObjectiveConstructor<T extends SectorObjective>{
-        T get(FieldTranslator fields);
+    public interface ObjectiveConstructor{
+        SectorObjective get(StoryNode<?> node, FieldTranslator fields);
     }
 
     public static class FieldTranslator{

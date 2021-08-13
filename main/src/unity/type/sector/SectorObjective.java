@@ -6,6 +6,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.mod.*;
 import rhino.*;
+import unity.cinematic.*;
 import unity.type.sector.SectorObjectiveModel.*;
 
 import static mindustry.Vars.*;
@@ -13,11 +14,12 @@ import static mindustry.Vars.*;
 /** @author GlennFolker */
 @SuppressWarnings("unchecked")
 public abstract class SectorObjective{
-    /** The name of this objective. It is your responsibility to differ the name from other objectives. */
+    /** The name of this objective. It is your responsibility to differ the name from other objectiveModels. */
     public final String name;
 
     public final Cons<SectorObjective> executor;
     public final ScriptedSector sector;
+    public final StoryNode<?> node;
 
     public final int executions;
     protected int execution;
@@ -30,8 +32,9 @@ public abstract class SectorObjective{
     public Cons<SectorObjective> update = objective -> {};
     public Cons<SectorObjective> draw = objective -> {};
 
-    public <T extends SectorObjective> SectorObjective(ScriptedSector sector, String name, int executions, Cons<T> executor){
+    public <T extends SectorObjective> SectorObjective(ScriptedSector sector, StoryNode<?> node, String name, int executions, Cons<T> executor){
         this.name = name;
+        this.node = node;
         this.sector = sector;
         this.executor = (Cons<SectorObjective>)executor;
         this.executions = executions;
@@ -151,6 +154,7 @@ public abstract class SectorObjective{
     }
 
     public void execute(){
+        execution++;
         executor.get(this);
     }
 

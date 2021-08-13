@@ -31,12 +31,12 @@ import static mindustry.Vars.*;
 import static unity.Unity.*;
 
 /**
- * An editor listener to setup {@link BlockStoryNode}s.
+ * An editor listener to setup {@link BuildStoryNode}s.
  * @author GlennFolker
  */
 @SuppressWarnings("unchecked")
 public class CinematicEditor extends EditorListener{
-    public final Seq<BlockStoryNode> nodes = new Seq<>();
+    public final Seq<BuildStoryNode> nodes = new Seq<>();
     public Building selected;
 
     public Table container;
@@ -54,23 +54,27 @@ public class CinematicEditor extends EditorListener{
     private boolean lock;
 
     public CinematicEditor(){
-        JsonIO.json.addClassTag(BlockStoryNode.class.getName(), BlockStoryNode.class);
+        JsonIO.json.addClassTag(BuildStoryNode.class.getName(), BuildStoryNode.class);
 
         registered.add(ResourceAmountObjective.class);
 
         Cons3<Table, Prov<String>, Cons<String>> def = (cont, v, str) -> cont.field(v.get(), str).fillY().growX().pad(4f).get().setAlignment(Align.left);
         Cons3<Table, Prov<String>, Cons<String>> defInt = (cont, v, str) -> {
             var s = v.get();
-            var text = cont.field(s == null || s.isEmpty() ? "0" : s, str).fillY().growX().pad(4f).get();
+            var text = cont.field("", str).fillY().growX().pad(4f).get();
             text.setFilter(TextFieldFilter.digitsOnly);
             text.setAlignment(Align.left);
+
+            text.setText(s == null || s.isEmpty() ? "0" : s);
         };
 
         Cons3<Table, Prov<String>, Cons<String>> defFloat = (cont, v, str) -> {
             var s = v.get();
-            var text = cont.field(s == null || s.isEmpty() ? "0.0" : s, str).fillY().growX().pad(4f).get();
+            var text = cont.field("", str).fillY().growX().pad(4f).get();
             text.setFilter(TextFieldFilter.floatsOnly);
             text.setAlignment(Align.left);
+
+            text.setText(s == null || s.isEmpty() ? "0.0" : s);
         };
 
         interpreters.put(Byte.class, defInt);
@@ -81,7 +85,10 @@ public class CinematicEditor extends EditorListener{
         interpreters.put(Double.class, defFloat);
         interpreters.put(Character.class, def);
         interpreters.put(String.class, def);
-        interpreters.put(Boolean.class, (cont, v, str) -> cont.check("", b -> str.get(String.valueOf(b))).left().size(40f).pad(4f));
+        interpreters.put(Boolean.class, (cont, v, str) -> {
+            var c = cont.check("", b -> str.get(String.valueOf(b))).left().size(40f).pad(4f).get();
+            str.get(String.valueOf(c.isChecked()));
+        });
 
         interpreters.put(Team.class, defInt);
 
@@ -110,6 +117,8 @@ public class CinematicEditor extends EditorListener{
                 pair[1] = val;
                 accept.run();
             }).fillY().growX().get().setFilter(TextFieldFilter.digitsOnly);
+
+            accept.run();
         }).fillY().growX().pad(4f));
 
         interpreters.put(Color.class, (cont, v, str) -> cont.button(Icon.pencil, () -> {
@@ -119,6 +128,8 @@ public class CinematicEditor extends EditorListener{
                 false,
                 res -> str.get(res.toString())
             );
+
+            str.get(s);
         }).size(40f).pad(4f));
 
         interpreters.put(Runnable.class, funcInterface(Runnable.class));
@@ -170,13 +181,18 @@ public class CinematicEditor extends EditorListener{
 
         var def = exec.toString();
 
-        return (cont, v, str) -> cont.button(Icon.pencil, () -> {
-            var s = v.get();
+        return (cont, v, str) -> {
+            var out = v.get();
+            cont.button(Icon.pencil, () -> {
+                var s = v.get();
 
-            scriptsDialog.startup = (s == null || s.isEmpty()) ? def : s;
-            scriptsDialog.listener = str;
-            scriptsDialog.show();
-        }).left().size(40f).pad(4f);
+                scriptsDialog.startup = (s == null || s.isEmpty()) ? def : s;
+                scriptsDialog.listener = str;
+                scriptsDialog.show();
+            }).left().size(40f).pad(4f);
+
+            str.get((out == null || out.isEmpty()) ? def : out);
+        };
     }
 
     @Override
@@ -350,8 +366,8 @@ public class CinematicEditor extends EditorListener{
                 node.tags.put(key, value);
             }
 
-            node.objectives.clear();
-            node.objectives.addAll(objectives.keys());
+            node.objectiveModels.clear();
+            node.objectiveModels.addAll(objectives.keys());
         });
     }
 
@@ -360,7 +376,7 @@ public class CinematicEditor extends EditorListener{
 
         var node = current();
         if(node == null){
-            node = new BlockStoryNode();
+            node = new BuildStoryNode();
             node.bound = selected;
 
             nodes.add(node);
@@ -396,7 +412,7 @@ public class CinematicEditor extends EditorListener{
             }
         });
         objectives.clear();
-        for(var objective : node.objectives){
+        for(var objective : node.objectiveModels){
             addObjective(objective);
         }
     }
@@ -588,11 +604,11 @@ public class CinematicEditor extends EditorListener{
         );
     }
 
-    public BlockStoryNode current(){
+    public BuildStoryNode current(){
         return nodes.find(n -> n.bound == selected);
     }
 
-    public void current(Cons<BlockStoryNode> cons){
+    public void current(Cons<BuildStoryNode> cons){
         var node = current();
         if(node != null) cons.get(node);
     }

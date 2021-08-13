@@ -5,7 +5,7 @@ import mindustry.gen.*;
 
 import static mindustry.Vars.*;
 
-public class BlockStoryNode extends StoryNode<Building>{
+public class BuildStoryNode extends StoryNode<Building>{
     public Building bound;
 
     @Override

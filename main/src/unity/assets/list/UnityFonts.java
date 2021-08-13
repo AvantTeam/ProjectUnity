@@ -32,7 +32,7 @@ public class UnityFonts{
             shadowOffsetY = 3;
         }})).loaded = f -> speechtitle = UnityStyles.speechtitlet.font = (Font)f;
 
-        Core.assets.load("unity-code-pu", Font.class, new FreeTypeFontLoaderParameter("fonts/code.pu_ttf", new FreeTypeFontParameter(){{
+        Core.assets.load("unity-code-pu", Font.class, new FreeTypeFontLoaderParameter("fonts/code.ttf", new FreeTypeFontParameter(){{
             size = 18;
             incremental = true;
         }})).loaded = f -> code = UnityStyles.codeArea.font = UnityStyles.codeLabel.font = (Font)f;

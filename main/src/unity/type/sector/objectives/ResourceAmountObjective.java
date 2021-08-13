@@ -16,6 +16,7 @@ import mindustry.mod.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import rhino.*;
+import unity.cinematic.*;
 import unity.type.sector.*;
 import unity.type.sector.SectorObjectiveModel.*;
 import unity.util.*;
@@ -41,7 +42,7 @@ public class ResourceAmountObjective extends SectorObjective{
     static{
         cinematicEditor.ignore(ResourceAmountObjective.class, ReflectUtils.findField(SectorObjective.class, "executions", true));
 
-        SectorObjectiveModel.constructors.put(ResourceAmountObjective.class, f -> {
+        SectorObjectiveModel.constructors.put(ResourceAmountObjective.class, (node, f) -> {
             ItemStack[] items = f.arrReq("items").map(v -> {
                 int separator = v.indexOf(",");
                 if(separator == -1) throw new IllegalArgumentException("Invalid string");
@@ -68,19 +69,19 @@ public class ResourceAmountObjective extends SectorObjective{
                 execFunc.call(context, scope, scope, args);
             };
 
-            var obj = new ResourceAmountObjective(items, team, from, to, cinematicEditor.sector(), name, executor);
+            var obj = new ResourceAmountObjective(items, team, from, to, cinematicEditor.sector(), node, name, executor);
             obj.ext(f);
 
             return obj;
         });
     }
 
-    public ResourceAmountObjective(ItemStack[] items, Team team, ScriptedSector sector, String name, Cons<ResourceAmountObjective> executor){
-        this(items, team, Color.lightGray, Color.green, sector, name, executor);
+    public ResourceAmountObjective(ItemStack[] items, Team team, ScriptedSector sector, StoryNode<?> node, String name, Cons<ResourceAmountObjective> executor){
+        this(items, team, Color.lightGray, Color.green, sector, node, name, executor);
     }
 
-    public ResourceAmountObjective(ItemStack[] items, Team team, Color from, Color to, ScriptedSector sector, String name, Cons<ResourceAmountObjective> executor){
-        super(sector, name, 1, executor);
+    public ResourceAmountObjective(ItemStack[] items, Team team, Color from, Color to, ScriptedSector sector, StoryNode<?> node,  String name, Cons<ResourceAmountObjective> executor){
+        super(sector, node, name, 1, executor);
         this.items = items;
         this.team = team;
         this.from = from;

@@ -18,7 +18,6 @@ import static unity.Unity.*;
 /** @author GlennFolker */
 @SuppressWarnings("unchecked")
 public class ScriptedSector extends SectorPreset{
-    public final Seq<SectorObjective> objectives = new Seq<>();
     protected boolean added = false;
 
     protected final Seq<StoryNode<?>> storyNodes = new Seq<>();
@@ -30,7 +29,7 @@ public class ScriptedSector extends SectorPreset{
         Triggers.listen(Trigger.draw, drawer);
 
         loadState();
-        objectives.each(SectorObjective::init);
+        storyNodes.each(StoryNode::init);
 
         Triggers.detach(Trigger.newGame, this.starter);
     });
@@ -65,16 +64,7 @@ public class ScriptedSector extends SectorPreset{
         // Save objective state every 5 seconds
         if(canSave() && saveTimer.get(5f * Time.toSeconds)) saveState();
 
-        for(SectorObjective objective : objectives){
-            if(objective.shouldUpdate()) objective.update();
-
-            if(objective.qualified()){
-                objective.execution++;
-                objective.execute();
-            }
-
-            if(objective.isExecuted() && !objective.isFinalized()) objective.doFinalize();
-        }
+        storyNodes.each(StoryNode::update);
     }
 
     public boolean canSave(){
@@ -82,11 +72,7 @@ public class ScriptedSector extends SectorPreset{
     }
 
     public void draw(){
-        for(SectorObjective objective : objectives){
-            if(objective.shouldDraw()){
-                objective.draw();
-            }
-        }
+        storyNodes.each(StoryNode::draw);
     }
 
     public boolean valid(){
@@ -98,13 +84,9 @@ public class ScriptedSector extends SectorPreset{
         ));
     }
 
-    public void saveState(){
-        objectives.each(SectorObjective::save);
-    }
+    public void saveState(){}
 
-    public void loadState(){
-        objectives.each(SectorObjective::load);
-    }
+    public void loadState(){}
 
     @Override
     public void init(){
@@ -112,6 +94,7 @@ public class ScriptedSector extends SectorPreset{
 
         try{
             storyNodes.addAll(JsonIO.json.fromJson(Seq.class, generator.map.tags.get("storyNodes", "[]")));
+            storyNodes.each(StoryNode::createObjectives);
         }catch(Throwable t){
             print(LogLevel.err, "", "Failed to read story nodes in " + name);
         }
