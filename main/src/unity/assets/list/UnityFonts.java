@@ -10,7 +10,7 @@ import unity.ui.*;
 import static mindustry.Vars.*;
 
 public class UnityFonts{
-    public static Font speech, speechtitle;
+    public static Font speech, speechtitle, code;
 
     public static void load(){
         if(headless) return;
@@ -31,5 +31,10 @@ public class UnityFonts{
             shadowOffsetX = -1;
             shadowOffsetY = 3;
         }})).loaded = f -> speechtitle = UnityStyles.speechtitlet.font = (Font)f;
+
+        Core.assets.load("unity-code", Font.class, new FreeTypeFontLoaderParameter("fonts/font.woff", new FreeTypeFontParameter(){{
+            size = 18;
+            incremental = true;
+        }})).loaded = f -> code = UnityStyles.codeArea.font = UnityStyles.codeLabel.font = (Font)f;
     }
 }

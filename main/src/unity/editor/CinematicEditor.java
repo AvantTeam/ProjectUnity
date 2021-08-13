@@ -58,15 +58,19 @@ public class CinematicEditor extends EditorListener{
 
         registered.add(ResourceAmountObjective.class);
 
-        Cons3<Table, Prov<String>, Cons<String>> def = (cont, v, str) -> cont.field(v.get(), str).fillY().growX().pad(4f);
+        Cons3<Table, Prov<String>, Cons<String>> def = (cont, v, str) -> cont.field(v.get(), str).fillY().growX().pad(4f).get().setAlignment(Align.left);
         Cons3<Table, Prov<String>, Cons<String>> defInt = (cont, v, str) -> {
             var s = v.get();
-            cont.field(s == null || s.isEmpty() ? "0" : s, str).fillY().growX().pad(4f).get().setFilter(TextFieldFilter.digitsOnly);
+            var text = cont.field(s == null || s.isEmpty() ? "0" : s, str).fillY().growX().pad(4f).get();
+            text.setFilter(TextFieldFilter.digitsOnly);
+            text.setAlignment(Align.left);
         };
 
         Cons3<Table, Prov<String>, Cons<String>> defFloat = (cont, v, str) -> {
             var s = v.get();
-            cont.field(s == null || s.isEmpty() ? "0.0" : s, str).fillY().growX().pad(4f).get().setFilter(TextFieldFilter.floatsOnly);
+            var text = cont.field(s == null || s.isEmpty() ? "0.0" : s, str).fillY().growX().pad(4f).get();
+            text.setFilter(TextFieldFilter.floatsOnly);
+            text.setAlignment(Align.left);
         };
 
         interpreters.put(Byte.class, defInt);
@@ -86,25 +90,23 @@ public class CinematicEditor extends EditorListener{
 
             String[] pair = {"copper", "0"};
             if(s != null && !s.isEmpty()){
-                int itemOffset = s.indexOf(":");
-                int amountOffset = s.lastIndexOf(":");
-
-                if(itemOffset != -1 && amountOffset != -1){
-                    pair[0] = s.substring(itemOffset + 1, amountOffset);
-                    pair[1] = s.substring(amountOffset + 1, s.lastIndexOf("}"));
+                int separator = s.indexOf(",");
+                if(separator != -1){
+                    pair[0] = s.substring(0, separator);
+                    pair[1] = s.substring(separator + 1);
                 }
             }
 
-            Runnable accept = () -> str.get("{item:" + pair[0] + ",amount:" + pair[1] + "}");
+            Runnable accept = () -> str.get(pair[0] + "," + pair[1]);
 
             t.add("Item:").fillY().width(80f);
             t.field(pair[0], val -> {
                 pair[0] = val;
                 accept.run();
-            }).fillY().growX();
+            }).fillY().growX().get().setFilter((text, c) -> c != ',');
 
             t.add("Amount:").fillY().width(80f);
-            t.field("", val -> {
+            t.field(pair[1], val -> {
                 pair[1] = val;
                 accept.run();
             }).fillY().growX().get().setFilter(TextFieldFilter.digitsOnly);
@@ -117,7 +119,7 @@ public class CinematicEditor extends EditorListener{
                 false,
                 res -> str.get(res.toString())
             );
-        }).left().size(40f).pad(4f));
+        }).size(40f).pad(4f));
 
         interpreters.put(Runnable.class, funcInterface(Runnable.class));
         interpreters.put(Cons.class, funcInterface(Cons.class));
@@ -147,7 +149,7 @@ public class CinematicEditor extends EditorListener{
         var args = method.getParameters();
 
         var exec = new StringBuilder("/**\n")
-            .append(" * ").append(type.getSimpleName());
+            .append(" * Function type - ").append(type.getSimpleName()).append("\n");
         for(var arg : args){
             exec.append(" * ")
                 .append(arg.getName())
@@ -337,23 +339,20 @@ public class CinematicEditor extends EditorListener{
     }
 
     protected void manualSave(){
-        if(selected == null) return;
+        current(node -> {
+            node.tags.clear();
+            for(var table : tags){
+                var key = table.<TextField>find("key").getText();
+                var value = table.<TextField>find("value").getText();
 
-        var node = current();
-        if(node == null) return;
+                if(key.isEmpty()) continue;
 
-        node.tags.clear();
-        for(var table : tags){
-            var key = table.<TextField>find("key").getText();
-            var value = table.<TextField>find("value").getText();
+                node.tags.put(key, value);
+            }
 
-            if(key.isEmpty()) continue;
-
-            node.tags.put(key, value);
-        }
-
-        node.objectives.clear();
-        node.objectives.addAll(objectives.keys());
+            node.objectives.clear();
+            node.objectives.addAll(objectives.keys());
+        });
     }
 
     protected void updateTable(){

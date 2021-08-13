@@ -1,7 +1,10 @@
 package unity;
 
 import arc.*;
+import arc.assets.loaders.*;
+import arc.freetype.*;
 import arc.func.*;
+import arc.graphics.g2d.*;
 import arc.scene.*;
 import arc.struct.*;
 import arc.util.*;
@@ -62,6 +65,8 @@ public class Unity extends Mod{
         if(!headless){
             Core.assets.setLoader(Model.class, new ModelLoader(tree));
             Core.assets.setLoader(WavefrontObject.class, new WavefrontObjectLoader(tree));
+
+            Core.assets.setLoader(FreeTypeFontGenerator.class, ".pu_ttf", new FreeTypeFontGeneratorLoader(tree));
         }
 
         Events.on(ContentInitEvent.class, e -> {

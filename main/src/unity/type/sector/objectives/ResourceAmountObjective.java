@@ -43,14 +43,13 @@ public class ResourceAmountObjective extends SectorObjective{
 
         SectorObjectiveModel.constructors.put(ResourceAmountObjective.class, f -> {
             ItemStack[] items = f.arrReq("items").map(v -> {
-                int itemOffset = v.indexOf(":");
-                int amountOffset = v.lastIndexOf(":");
+                int separator = v.indexOf(",");
+                if(separator == -1) throw new IllegalArgumentException("Invalid string");
 
-                if(itemOffset == -1 || amountOffset == -1) throw new IllegalArgumentException("Invalid string");
-                Item item = content.getByName(ContentType.item, v.substring(itemOffset + 1, amountOffset));
-                int amount = Integer.parseInt(v.substring(amountOffset + 1, v.lastIndexOf("}")));
-
-                return new ItemStack(item, amount);
+                return new ItemStack(
+                    content.getByName(ContentType.item, v.substring(0, separator)),
+                    Integer.parseInt(v.substring(separator + 1))
+                );
             }).toArray(ItemStack.class);
 
             var team = Team.get(Integer.parseInt(f.valReq("team")));

@@ -1,10 +1,12 @@
 package unity.ui.dialogs;
 
+import arc.*;
 import arc.func.*;
 import arc.scene.ui.*;
 import arc.util.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
+import unity.ui.*;
 
 public class JSScriptDialog extends BaseDialog{
     public String startup = "";
@@ -19,14 +21,16 @@ public class JSScriptDialog extends BaseDialog{
         addCloseButton();
 
         cont.table(Styles.black5, t -> {
-            cont.label(() -> linesStr(
+            var lines = cont.label(() -> linesStr(
                 area.getFirstLineShowing(),
                 area.getLinesShowing(),
                 area.getCursorLine()
-            )).width(40f).growY().get().setAlignment(Align.right);
+            )).width(40f).growY().get();
+            lines.setAlignment(Align.right);
+            lines.setStyle(UnityStyles.codeLabel);
 
-            area = cont.area("", this::set).grow().get();
-        }).grow().pad(20f);
+            area = cont.area("", UnityStyles.codeArea, this::set).grow().get();
+        }).center().width(Core.graphics.getWidth() - 40f).growY().pad(20f);
 
         hidden(() -> listener.get(content));
         shown(() -> area.setText(startup));
