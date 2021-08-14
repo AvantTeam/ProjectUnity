@@ -21,7 +21,7 @@ import unity.content.*;
 import unity.entities.*;
 import unity.gen.Expc.*;
 import unity.gen.*;
-import unity.type.exp.*;
+import unity.type.*;
 import unity.util.*;
 import unity.world.meta.*;
 

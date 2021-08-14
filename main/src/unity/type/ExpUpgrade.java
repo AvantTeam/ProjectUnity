@@ -1,4 +1,4 @@
-package unity.type.exp;
+package unity.type;
 
 import mindustry.world.*;
 

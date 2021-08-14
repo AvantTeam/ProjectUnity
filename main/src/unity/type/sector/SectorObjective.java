@@ -2,7 +2,6 @@ package unity.type.sector;
 
 import arc.*;
 import arc.func.*;
-import arc.struct.*;
 import arc.util.*;
 import mindustry.mod.*;
 import rhino.*;
@@ -23,8 +22,6 @@ public abstract class SectorObjective{
 
     public final int executions;
     protected int execution;
-
-    public Seq<SectorObjective> dependencies = new Seq<>();
 
     private boolean finalized;
 
@@ -100,7 +97,7 @@ public abstract class SectorObjective{
     }
 
     public boolean shouldUpdate(){
-        return !isExecuted() && !completed() && dependencyCompleted();
+        return !isExecuted() && !completed();
     }
 
     public boolean shouldDraw(){
@@ -119,11 +116,6 @@ public abstract class SectorObjective{
 
     public <T extends SectorObjective> SectorObjective draw(Cons<T> draw){
         this.draw = (Cons<SectorObjective>)draw;
-        return this;
-    }
-
-    public SectorObjective dependencies(SectorObjective... dependencies){
-        this.dependencies.addAll(dependencies);
         return this;
     }
 
@@ -169,10 +161,6 @@ public abstract class SectorObjective{
     }
 
     public boolean qualified(){
-        return !isExecuted() && completed() && dependencyCompleted();
-    }
-
-    public boolean dependencyCompleted(){
-        return dependencies.find(obj -> !obj.isExecuted()) == null;
+        return !isExecuted() && completed();
     }
 }

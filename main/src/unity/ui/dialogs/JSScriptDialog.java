@@ -31,7 +31,10 @@ public class JSScriptDialog extends BaseDialog{
         }).grow().pad(20f);
 
         hidden(this::broadcast);
-        shown(() -> area.setText(startup));
+        shown(() -> {
+            Log.infoList(startup, listener);
+            area.setText(startup);
+        });
     }
 
     public void broadcast(){

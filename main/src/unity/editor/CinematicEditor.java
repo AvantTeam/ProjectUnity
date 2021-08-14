@@ -182,15 +182,16 @@ public class CinematicEditor extends EditorListener{
         var def = exec.toString();
 
         return (cont, v, str) -> {
-            var out = v.get();
             cont.button(Icon.pencil, () -> {
                 var s = v.get();
 
+                Log.infoList(s, str);
                 scriptsDialog.startup = (s == null || s.isEmpty()) ? def : s;
                 scriptsDialog.listener = str;
                 scriptsDialog.show();
             }).left().size(40f).pad(4f);
 
+            var out = v.get();
             str.get((out == null || out.isEmpty()) ? def : out);
         };
     }

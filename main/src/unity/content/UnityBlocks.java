@@ -29,7 +29,6 @@ import unity.entities.bullet.exp.*;
 import unity.gen.*;
 import unity.graphics.*;
 import unity.mod.*;
-import unity.type.exp.*;
 import unity.util.*;
 import unity.world.blocks.*;
 import unity.world.blocks.defense.*;
