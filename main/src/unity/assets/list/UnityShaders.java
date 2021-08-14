@@ -21,6 +21,7 @@ import unity.assets.type.g3d.*;
 import unity.assets.type.g3d.attribute.*;
 import unity.assets.type.g3d.attribute.type.*;
 import unity.assets.type.g3d.attribute.type.light.*;
+import unity.mod.*;
 
 import static mindustry.Vars.*;
 import static unity.Unity.*;
@@ -50,7 +51,7 @@ public class UnityShaders{
             shader.layer = Layer.shields + 2f + i * ((1f / conds.length) - 0.01f);
         }
 
-        Events.run(Trigger.draw, () -> {
+        Events.run(Triggers.drawEnt, () -> {
             buffer.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
 
             float range = (1f / conds.length) / 2f;
