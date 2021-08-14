@@ -34,15 +34,12 @@ public class ResourceAmountObjective extends SectorObjective{
     public final Color from;
     public final Color to;
 
-    public String test;
-    public Seq<String> test2 = new Seq<>();
-
     static{
         cinematicEditor.ignore(ResourceAmountObjective.class, ReflectUtils.findField(SectorObjective.class, "executions", true));
 
         SectorObjectiveModel.constructors.put(ResourceAmountObjective.class, (node, f) -> {
             ItemStack[] items = f.arrReq("items").map(v -> {
-                int separator = v.indexOf(",");
+                int separator = v.indexOf("\n");
                 if(separator == -1) throw new IllegalArgumentException("Invalid string");
 
                 return new ItemStack(

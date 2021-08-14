@@ -23,6 +23,7 @@ import mindustry.ui.*;
 import unity.cinematic.*;
 import unity.type.sector.*;
 import unity.type.sector.objectives.*;
+import unity.ui.*;
 import unity.util.*;
 
 import java.lang.reflect.*;
@@ -31,9 +32,10 @@ import static mindustry.Vars.*;
 import static unity.Unity.*;
 
 /**
- * An editor listener to setup {@link BuildStoryNode}s.
+ * An editor listener to setup tile-based story nodes in maps.
  * @author GlennFolker
  */
+//TODO so many repetitions. might have to be reworked some day, preferably make interpreters return Cell<?> instead of whatever its doing
 @SuppressWarnings("unchecked")
 public class CinematicEditor extends EditorListener{
     public final Seq<BuildStoryNode> nodes = new Seq<>();
@@ -42,6 +44,8 @@ public class CinematicEditor extends EditorListener{
     public Table container;
     private TextField name;
 
+    private Table parentsPane;
+    private final Seq<Table> parents = new Seq<>();
     private Table tagsPane;
     private final Seq<Table> tags = new Seq<>();
     private Table objectivesPane;
@@ -97,26 +101,55 @@ public class CinematicEditor extends EditorListener{
 
             String[] pair = {"copper", "0"};
             if(s != null && !s.isEmpty()){
-                int separator = s.indexOf(",");
+                int separator = s.indexOf("\n");
                 if(separator != -1){
                     pair[0] = s.substring(0, separator);
                     pair[1] = s.substring(separator + 1);
                 }
             }
 
-            Runnable accept = () -> str.get(pair[0] + "," + pair[1]);
+            Runnable accept = () -> str.get(pair[0] + "\n" + pair[1]);
 
             t.add("Item:").fillY().width(80f);
             t.field(pair[0], val -> {
                 pair[0] = val;
                 accept.run();
-            }).fillY().growX().get().setFilter((text, c) -> c != ',');
+            }).fillY().growX();
 
             t.add("Amount:").fillY().width(80f);
             t.field(pair[1], val -> {
                 pair[1] = val;
                 accept.run();
             }).fillY().growX().get().setFilter(TextFieldFilter.digitsOnly);
+
+            accept.run();
+        }).fillY().growX().pad(4f));
+
+        interpreters.put(SectorObjective.class, (cont, v, str) -> cont.table(t -> {
+            var s = v.get();
+
+            String[] pair = {"", ""};
+            if(s != null && !s.isEmpty()){
+                int separator = s.indexOf("\n");
+                if(separator != -1){
+                    pair[0] = s.substring(0, separator);
+                    pair[1] = s.substring(separator + 1);
+                }
+            }
+
+            Runnable accept = () -> str.get(pair[0] + "\n" + pair[1]);
+
+            t.add("Node:").fillY().width(80f);
+            t.field(pair[0], val -> {
+                pair[0] = val;
+                accept.run();
+            }).fillY().growX();
+
+            t.add("Name:").fillY().width(80f);
+            t.field(pair[1], val -> {
+                pair[1] = val;
+                accept.run();
+            }).fillY().growX();
 
             accept.run();
         }).fillY().growX().pad(4f));
@@ -207,17 +240,46 @@ public class CinematicEditor extends EditorListener{
             table.setClip(true);
             table.setTransform(true);
 
-            table.table(t -> {
-                t.add("Name:").fill();
-                name = t.field("", s -> current(node -> node.name = s)).fillY().growX().get();
-            }).top().left().fillY().growX().pad(6f);
+            table.table(Styles.black3, t -> {
+                t.add("Metadata").pad(4f);
+                t.row().image(Tex.whiteui, Pal.accent)
+                    .height(4f).growX().pad(4f);
+
+                t.row().table(cont -> {
+                    cont.add("Name:").fill();
+                    name = cont.field("", s -> current(node -> node.name = s)).fillY().growX().get();
+                }).fillY().growX().pad(4f);
+
+                t.row().table(cont -> {
+                    cont.add("Parents").fillY().growX().pad(4f)
+                        .get().setAlignment(Align.left);
+                    cont.row().image(Tex.whiteui, Pal.accent)
+                        .height(4f).growX().pad(4f);
+
+                    var scroll = cont.row().pane(Styles.defaultPane, tt -> {
+                        parentsPane = tt.table(Styles.black3).fillY().growX().get().top();
+                        parentsPane.defaults().pad(6f);
+                    }).update(p -> {
+                        if(p.hasScroll()){
+                            Element result = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
+                            if(result == null || !result.isDescendantOf(p)){
+                                Core.scene.setScrollFocus(null);
+                            }
+                        }
+                    }).maxHeight(100f).grow().pad(6f).get();
+                    scroll.setScrollingDisabled(true, false);
+                    scroll.setOverscroll(false, false);
+
+                    cont.row()
+                        .button(Icon.add, Styles.defaulti, () -> addParent(null))
+                        .left().pad(6f).size(40f);
+                }).fillY().growX().pad(4f);
+            }).top().fillY().growX().pad(6f);
 
             table.row().table(Styles.black3, tag -> {
                 tag.add("Tags").pad(4f);
                 tag.row().image(Tex.whiteui, Pal.accent)
-                    .height(4f)
-                    .growX()
-                    .pad(4f);
+                    .height(4f).growX().pad(4f);
 
                 var scroll = tag.row().pane(Styles.defaultPane, t -> {
                     tagsPane = t.table(Styles.black3).fillY().growX().get().top();
@@ -241,13 +303,11 @@ public class CinematicEditor extends EditorListener{
             table.row().table(Styles.black3, model -> {
                 model.add("Objectives").pad(4f);
                 model.row().image(Tex.whiteui, Pal.accent)
-                    .height(4f)
-                    .growX()
-                    .pad(4f);
+                    .height(4f).growX().pad(4f);
 
                 var scroll = model.row().pane(Styles.defaultPane, t -> {
                     objectivesPane = t.table(Styles.black3).fillY().growX().get().top();
-                    objectivesPane.defaults().pad(6f);
+                    objectivesPane.defaults().pad(4f);
                 }).update(p -> {
                     if(p.hasScroll()){
                         Element result = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
@@ -273,7 +333,7 @@ public class CinematicEditor extends EditorListener{
                     Core.scene.setScrollFocus(null);
                 }
             }
-        }).size(800f, 350f).get();
+        }).size(800f, 500f).get();
         content.setScrollingDisabled(true, false);
         content.setOverscroll(false, false);
 
@@ -304,6 +364,8 @@ public class CinematicEditor extends EditorListener{
 
     @Override
     public void update(){
+        if(selected != null) selected = world.build(selected.pos());
+
         if(Core.input.keyDown(Binding.control) && Core.input.keyTap(KeyCode.altLeft)){
             var pos = Core.input.mouseWorld();
             var build = world.buildWorld(pos.x, pos.y);
@@ -330,10 +392,7 @@ public class CinematicEditor extends EditorListener{
         Draw.draw(Layer.blockOver, () -> {
             for(var node : nodes){
                 var b = node.bound;
-
-                Draw.color(b == selected ? Color.cyan : Color.blue);
-                Lines.stroke(1f);
-                Lines.square(b.x, b.y, (float)(b.block.size * tilesize) / 2f + 1f);
+                Drawf.square(b.x, b.y, b.block.size * tilesize / 2f + 1f, 0f, b == selected ? Pal.accent : Pal.place);
             }
 
             Draw.reset();
@@ -368,6 +427,11 @@ public class CinematicEditor extends EditorListener{
 
             node.objectiveModels.clear();
             node.objectiveModels.addAll(objectives.keys());
+
+            node.parentStrings.clear();
+            for(var parent : parents){
+                node.parentStrings.add(parent.<TextField>find("node").getText());
+            }
         });
     }
 
@@ -384,6 +448,22 @@ public class CinematicEditor extends EditorListener{
         }
 
         name.setText(node.name);
+
+        parents.each(e -> {
+            Table parent = (Table)e.parent;
+
+            var cell = parent.getCell(e);
+            if(cell != null){
+                e.remove();
+
+                parent.getCells().remove(cell);
+                parent.invalidateHierarchy();
+            }
+        });
+        parents.clear();
+        for(var parent : node.parentStrings){
+            addParent(parent);
+        }
 
         tags.each(e -> {
             Table parent = (Table)e.parent;
@@ -447,6 +527,31 @@ public class CinematicEditor extends EditorListener{
         tags.add(cont);
     }
 
+    protected void addParent(String parent){
+        var cont = new Table();
+        cont.defaults().pad(4f);
+
+        cont.button(Icon.trash, Styles.defaulti, () -> {
+            parents.remove(cont);
+
+            var cell = parentsPane.getCell(cont);
+            if(cell != null){
+                cont.remove();
+                parentsPane.getCells().remove(cell);
+                parentsPane.invalidateHierarchy();
+
+                manualSave();
+            }
+        }).size(40f);
+
+        cont.add("Node:");
+        cont.field(parent, t -> manualSave())
+            .name("node").fillY().growX();
+
+        parentsPane.row().add(cont).fillY().growX();
+        parents.add(cont);
+    }
+
     protected void addObjective(SectorObjectiveModel model){
         var cont = objectives.get(model, Table::new);
         cont.clear();
@@ -508,8 +613,10 @@ public class CinematicEditor extends EditorListener{
 
                     handled = true;
                     fieldCont.table(cont -> {
-                        cont.add(fieldName).fillY().growX().pad(4f)
-                            .get().setAlignment(Align.left);
+                        var field = cont.add(fieldName).fillY().growX().pad(4f).get();
+                        field.setAlignment(Align.left);
+                        field.setStyle(UnityStyles.codeLabel);
+
                         cont.row().image(Tex.whiteui, Pal.accent)
                             .height(4f).growX().pad(4f);
 
@@ -520,7 +627,7 @@ public class CinematicEditor extends EditorListener{
 
                             t.pane(c -> {
                                 table[0] = t.table(Styles.black3).fill().get().top();
-                                table[0].defaults().pad(6f);
+                                table[0].defaults().pad(4f);
                             }).update(p -> {
                                 if(p.hasScroll()){
                                     Element result = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
@@ -548,7 +655,11 @@ public class CinematicEditor extends EditorListener{
                                         }
                                     }).size(40f).left().pad(6f);
 
-                                    f.label(() -> String.valueOf(items.indexOf(f))).size(30f).pad(4f);
+                                    var index = f.label(() -> String.valueOf(items.indexOf(f)))
+                                        .size(30f).pad(4f)
+                                        .get();
+                                    index.setAlignment(Align.right);
+                                    index.setStyle(UnityStyles.codeLabel);
                                 }).fillY().growX().pad(4f).get());
 
                                 interpreters.get(fType).get(c[0], () -> values.get(items.indexOf(c[0])), str -> values.set(items.indexOf(c[0]), str));
@@ -563,11 +674,15 @@ public class CinematicEditor extends EditorListener{
                     }).left().fillY().growX();
                 }else if(ObjectMap.class.isAssignableFrom(type) && can(key) && can(elem)){
                     handled = true;
+                    //TODO handle maps
                     fieldCont.table(cont -> {}).left().fillY().growX();
                 }else if(can(type)){
                     handled = true;
                     fieldCont.table(cont -> {
-                        cont.add(fieldName).left().fillY().width(100f).pad(4f).get().setAlignment(Align.left);
+                        var field = cont.add(fieldName).left().fillY().width(100f).pad(4f).get();
+                        field.setAlignment(Align.left);
+                        field.setStyle(UnityStyles.codeLabel);
+
                         interpreters.get(type).get(cont, () -> (String)model.setFields.get(fieldName), str -> model.setFields.put(fieldName, str));
                     }).left().fillY().growX();
                 }

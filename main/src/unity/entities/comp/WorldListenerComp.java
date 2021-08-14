@@ -12,6 +12,8 @@ import unity.mod.Triggers.*;
 @EntityDef(value = {Unintersectablec.class, Drawc.class, WorldListenerc.class}, serialize = false)
 @EntityComponent
 abstract class WorldListenerComp implements Unintersectablec, Drawc{
+    static final WorldListener instance = WorldListener.create();
+
     @Override
     public void draw(){
         Events.fire(Triggers.drawEnt);

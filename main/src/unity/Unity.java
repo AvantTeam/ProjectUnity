@@ -11,6 +11,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
 import mindustry.*;
+import mindustry.core.GameState.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.mod.*;
@@ -137,6 +138,14 @@ public class Unity extends Mod{
 
             Core.settings.getBoolOnce("unity-install", () -> Time.runTask(5f, CreditsDialog::showList));
         });
+
+        Events.on(StateChangeEvent.class, e -> Core.app.post(() -> {
+            if(e.from == State.menu && e.to == State.playing){
+                WorldListener.instance.add();
+            }else if(e.to == State.menu){
+                WorldListener.instance.remove();
+            }
+        }));
 
         ContributorList.init();
 

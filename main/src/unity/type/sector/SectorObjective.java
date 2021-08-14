@@ -2,6 +2,7 @@ package unity.type.sector;
 
 import arc.*;
 import arc.func.*;
+import arc.struct.*;
 import unity.cinematic.*;
 import unity.type.sector.SectorObjectiveModel.*;
 import unity.util.*;
@@ -26,6 +27,9 @@ public abstract class SectorObjective{
     public Cons<SectorObjective> update = objective -> {};
     public Cons<SectorObjective> draw = objective -> {};
 
+    public Seq<SectorObjective> dependencies = new Seq<>();
+    private final Seq<String> depStrings = new Seq<>();
+
     public <T extends SectorObjective> SectorObjective(StoryNode<?> node, String name, int executions, Cons<T> executor){
         this.name = name;
         this.node = node;
@@ -33,31 +37,61 @@ public abstract class SectorObjective{
         this.executions = executions;
     }
 
+    public void resolveDependencies(){
+        dependencies.clear();
+        for(var dep : depStrings){
+            int separator = dep.indexOf("\n");
+            if(separator == -1) continue;
+
+            var otherNode = dep.substring(0, separator);
+            var otherDep = dep.substring(separator + 1);
+
+            var n = node.sector.storyNodes.find(e -> e.name.equals(otherNode));
+            if(n != null){
+                var o = n.objectives.find(e -> e.name.equals(otherDep));
+                if(o != null) depend(o);
+            }
+        }
+    }
+
+    public void depend(SectorObjective other){
+        if(!dependencies.contains(other) && !other.dependencies.contains(this)){
+            dependencies.add(other);
+        }
+    }
+
     public void ext(FieldTranslator f){
+        var c = JSBridge.context;
+        var s = JSBridge.unityScope;
         Object[] args = {null};
 
         if(f.has("init")){
-            var initFunc = JSBridge.compileFunc(JSBridge.unityScope, name + "-init.js", f.val("init"));
+            var initFunc = JSBridge.compileFunc(s, name + "-init.js", f.val("init"));
             init = obj -> {
                 args[0] = obj;
-                initFunc.call(JSBridge.context, JSBridge.unityScope, JSBridge.unityScope, args);
+                initFunc.call(c, s, s, args);
             };
         }
 
         if(f.has("update")){
-            var initFunc = JSBridge.compileFunc(JSBridge.unityScope, name + "-update.js", f.val("update"));
+            var initFunc = JSBridge.compileFunc(s, name + "-update.js", f.val("update"));
             update = obj -> {
                 args[0] = obj;
-                initFunc.call(JSBridge.context, JSBridge.unityScope, JSBridge.unityScope, args);
+                initFunc.call(c, s, s, args);
             };
         }
 
         if(f.has("draw")){
-            var initFunc = JSBridge.compileFunc(JSBridge.unityScope, name + "-draw.js", f.val("draw"));
+            var initFunc = JSBridge.compileFunc(s, name + "-draw.js", f.val("draw"));
             draw = obj -> {
                 args[0] = obj;
-                initFunc.call(JSBridge.context, JSBridge.unityScope, JSBridge.unityScope, args);
+                initFunc.call(c, s, s, args);
             };
+        }
+
+        if(f.has("dependencies")){
+            depStrings.clear();
+            depStrings.addAll(f.arr("dependencies"));
         }
     }
 
@@ -83,7 +117,7 @@ public abstract class SectorObjective{
     }
 
     public boolean shouldUpdate(){
-        return !isExecuted() && !completed();
+        return !isExecuted() && !completed() && dependencyFinished();
     }
 
     public boolean shouldDraw(){
@@ -147,6 +181,15 @@ public abstract class SectorObjective{
     }
 
     public boolean qualified(){
-        return !isExecuted() && completed();
+        return !isExecuted() && completed() && dependencyFinished();
+    }
+
+    public boolean dependencyFinished(){
+        if(dependencies.isEmpty()) return true;
+
+        for(var dep : dependencies){
+            if(!dep.isExecuted()) return false;
+        }
+        return true;
     }
 }
