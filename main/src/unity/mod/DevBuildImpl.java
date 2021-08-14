@@ -1,15 +1,10 @@
 package unity.mod;
 
-import arc.func.*;
-import arc.struct.*;
 import arc.util.*;
 import arc.util.async.*;
-import mindustry.mod.*;
-import rhino.*;
 import unity.*;
 import unity.util.*;
 
-import java.lang.reflect.*;
 import java.util.*;
 
 import static mindustry.Vars.*;
@@ -22,48 +17,11 @@ public class DevBuildImpl implements DevBuild{
         initCommandLine();
     }
 
-    public void importClass(String canonical) throws ClassNotFoundException{
-        importClass(Class.forName(canonical, true, mods.mainLoader()));
-    }
-
-    public void importClass(Class<?> type){
-        ImporterTopLevel scope = ReflectUtils.getField(mods.getScripts(), ReflectUtils.findField(Scripts.class, "scope", true));
-        NativeJavaClass nat = new NativeJavaClass(scope, type);
-        nat.setParentScope(scope);
-
-        ReflectUtils.invokeMethod(scope, ReflectUtils.findMethod(ImporterTopLevel.class, "importClass", true, NativeJavaClass.class), nat);
-    }
-
     private void initScripts(){
         Time.mark();
 
         enableConsole = true;
-        Scripts scripts = mods.getScripts();
-
-        ImporterTopLevel scope = ReflectUtils.getField(mods.getScripts(), ReflectUtils.findField(Scripts.class, "scope", true));
-        Constructor<NativeJavaPackage> constr = ReflectUtils.findConstructor(NativeJavaPackage.class, true,
-            boolean.class, String.class, ClassLoader.class
-        );
-        Method importPack = ReflectUtils.findMethod(ImporterTopLevel.class, "importPackage", true, NativeJavaPackage.class);
-        ClassLoader loader = getClass().getClassLoader();
-        Cons<String> importPackage = name -> {
-            NativeJavaPackage n = ReflectUtils.newInstance(constr, true, name, loader);
-            n.setParentScope(scope);
-
-            ReflectUtils.invokeMethod(scope, importPack, n);
-        };
-        Seq<String> permit = Seq.with(
-            "unity",
-            "rhino",
-            "java.lang",
-            "java.io",
-            "java.util"
-        );
-
-        for(Package pkg : Package.getPackages()){
-            if(!permit.contains(pkg.getName()::startsWith)) continue;
-            importPackage.get(pkg.getName());
-        }
+        JSBridge.importDefaults(JSBridge.defaultScope);
 
         Unity.print(Strings.format("Total time to import unity packages: @ms", Time.elapsed()));
     }

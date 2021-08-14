@@ -6,7 +6,9 @@ import mindustry.game.EventType.*;
 
 /** Convenient implementation of event listener attaching/detaching especially for {@link Trigger}s */
 @SuppressWarnings("unchecked")
-public final class Triggers{
+public enum Triggers{
+    drawEnt;
+
     public static <T> Cons<T> cons(Runnable run){
         return e -> run.run();
     }
@@ -25,4 +27,8 @@ public final class Triggers{
     public static <T> void detach(T trigger, Cons<T> run){
         Events.remove((Class<T>)trigger.getClass(), run);
     }
+
+    public static class SaveWriteEvent{}
+
+    public static class SaveReadEvent{}
 }

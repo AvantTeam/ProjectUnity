@@ -25,15 +25,16 @@ public class UnitySectorPresets implements ContentList{
             difficulty = 3f;
             captureWave = 15;
 
-            var sector = this;
+            var sect = this;
             storyNodes.add(new StoryNode<>(){
                 {
+                    this.sector = sect;
                     objectives.add(new ResourceAmountObjective(ItemStack.with(
                         Items.copper, 6000,
                         Items.lead, 5600,
                         Items.silicon, 3200,
                         UnityItems.monolite, 4800
-                    ), state.rules.defaultTeam, sector, this, sector.name + "-resource", objective -> {
+                    ), state.rules.defaultTeam, this, sector.name + "-resource", objective -> {
                         int win = Math.max((state.wave / 5 + 1) * 5, captureWave);
 
                         state.rules.winWave = Math.max(captureWave, win);

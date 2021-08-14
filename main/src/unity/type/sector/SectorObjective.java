@@ -2,11 +2,9 @@ package unity.type.sector;
 
 import arc.*;
 import arc.func.*;
-import arc.util.*;
-import mindustry.mod.*;
-import rhino.*;
 import unity.cinematic.*;
 import unity.type.sector.SectorObjectiveModel.*;
+import unity.util.*;
 
 import static mindustry.Vars.*;
 
@@ -17,7 +15,6 @@ public abstract class SectorObjective{
     public final String name;
 
     public final Cons<SectorObjective> executor;
-    public final ScriptedSector sector;
     public final StoryNode<?> node;
 
     public final int executions;
@@ -29,48 +26,37 @@ public abstract class SectorObjective{
     public Cons<SectorObjective> update = objective -> {};
     public Cons<SectorObjective> draw = objective -> {};
 
-    public <T extends SectorObjective> SectorObjective(ScriptedSector sector, StoryNode<?> node, String name, int executions, Cons<T> executor){
+    public <T extends SectorObjective> SectorObjective(StoryNode<?> node, String name, int executions, Cons<T> executor){
         this.name = name;
         this.node = node;
-        this.sector = sector;
         this.executor = (Cons<SectorObjective>)executor;
         this.executions = executions;
     }
 
-    protected static Function compile(Context context, Scriptable scope, String name, String sourceName, String source){
-        return context.compileFunction(scope, source, name + "-" + sourceName, 1);
-    }
-
-    protected Function compile(Context context, Scriptable scope, String sourceName, String source){
-        return compile(context, scope, name, sourceName, source);
-    }
-
     public void ext(FieldTranslator f){
-        ImporterTopLevel scope = Reflect.get(Scripts.class, mods.getScripts(), "scope"); //TODO don't use top-level scope for safety reasons
-        var context = Context.enter();
         Object[] args = {null};
 
         if(f.has("init")){
-            var initFunc = compile(context, scope, "init", f.val("init"));
+            var initFunc = JSBridge.compileFunc(JSBridge.unityScope, name + "-init.js", f.val("init"));
             init = obj -> {
                 args[0] = obj;
-                initFunc.call(context, scope, scope, args);
+                initFunc.call(JSBridge.context, JSBridge.unityScope, JSBridge.unityScope, args);
             };
         }
 
         if(f.has("update")){
-            var initFunc = compile(context, scope, "update", f.val("update"));
+            var initFunc = JSBridge.compileFunc(JSBridge.unityScope, name + "-update.js", f.val("update"));
             update = obj -> {
                 args[0] = obj;
-                initFunc.call(context, scope, scope, args);
+                initFunc.call(JSBridge.context, JSBridge.unityScope, JSBridge.unityScope, args);
             };
         }
 
         if(f.has("draw")){
-            var initFunc = compile(context, scope, "draw", f.val("draw"));
+            var initFunc = JSBridge.compileFunc(JSBridge.unityScope, name + "-draw.js", f.val("draw"));
             draw = obj -> {
                 args[0] = obj;
-                initFunc.call(context, scope, scope, args);
+                initFunc.call(JSBridge.context, JSBridge.unityScope, JSBridge.unityScope, args);
             };
         }
     }

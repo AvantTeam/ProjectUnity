@@ -8,14 +8,12 @@ import mindustry.ui.dialogs.*;
 import unity.ui.*;
 
 public class JSScriptDialog extends BaseDialog{
-    public String startup = "";
     public Cons<String> listener = str -> {};
 
-    private String content = "";
-    private TextArea area;
+    public TextArea area;
 
     public JSScriptDialog(){
-        super("@editor.cinematic.editscript");
+        super("@dialog.editscript");
 
         addCloseButton();
 
@@ -27,22 +25,8 @@ public class JSScriptDialog extends BaseDialog{
             lines.setAlignment(Align.right);
             lines.setStyle(UnityStyles.codeLabel);
 
-            area = t.area("", UnityStyles.codeArea, this::set).grow().get();
+            area = t.area("", UnityStyles.codeArea, str -> listener.get(str.replace("\r", "\n"))).grow().get();
         }).grow().pad(20f);
-
-        hidden(this::broadcast);
-        shown(() -> {
-            Log.infoList(startup, listener);
-            area.setText(startup);
-        });
-    }
-
-    public void broadcast(){
-        listener.get(content);
-    }
-
-    private void set(String content){
-        this.content = content.replace("\r", "\n");
     }
 
     /**

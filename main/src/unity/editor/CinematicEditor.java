@@ -185,9 +185,8 @@ public class CinematicEditor extends EditorListener{
             cont.button(Icon.pencil, () -> {
                 var s = v.get();
 
-                Log.infoList(s, str);
-                scriptsDialog.startup = (s == null || s.isEmpty()) ? def : s;
                 scriptsDialog.listener = str;
+                scriptsDialog.area.setText((s == null || s.isEmpty()) ? def : s);
                 scriptsDialog.show();
             }).left().size(40f).pad(4f);
 
@@ -378,6 +377,7 @@ public class CinematicEditor extends EditorListener{
         var node = current();
         if(node == null){
             node = new BuildStoryNode();
+            node.sector = sector();
             node.bound = selected;
 
             nodes.add(node);

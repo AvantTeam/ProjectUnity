@@ -14,7 +14,7 @@ import static unity.content.UnityUnitTypes.*;
 
 /** @author GlennFolker */
 public final class UnityWaves{
-    private static ObjectMap<Faction, Func3<Float, Rand, Boolean, Seq<SpawnGroup>>> generators = new ObjectMap<>();
+    private static final ObjectMap<Faction, Func3<Float, Rand, Boolean, Seq<SpawnGroup>>> generators = new ObjectMap<>();
 
     static{
         generators.put(Faction.monolith, (difficulty, rand, attack) -> {

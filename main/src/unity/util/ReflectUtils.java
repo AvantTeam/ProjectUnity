@@ -80,6 +80,14 @@ public final class ReflectUtils{
         return type;
     }
 
+    public static Class<?> findClass(String name){
+        try{
+            return Class.forName(name, true, mods.mainLoader());
+        }catch(ClassNotFoundException | NoClassDefFoundError e){
+            throw new RuntimeException(e);
+        }
+    }
+
     /** A utility function to find a field without throwing exceptions. */
     public static Field findField(Class<?> type, String field, boolean access){
         try{

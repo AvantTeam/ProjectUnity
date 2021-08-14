@@ -12,10 +12,8 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
-import mindustry.mod.*;
 import mindustry.type.*;
 import mindustry.ui.*;
-import rhino.*;
 import unity.cinematic.*;
 import unity.type.sector.*;
 import unity.type.sector.SectorObjectiveModel.*;
@@ -59,29 +57,26 @@ public class ResourceAmountObjective extends SectorObjective{
 
             var name = f.valReq("name");
 
-            ImporterTopLevel scope = Reflect.get(Scripts.class, mods.getScripts(), "scope"); //TODO don't use top-level scope for safety reasons
-            var context = Context.enter();
-
-            var execFunc = compile(context, scope, name, "executor", f.valReq("executor"));
+            var execFunc = JSBridge.compileFunc(JSBridge.unityScope, name + "-executor.js", f.valReq("executor"));
             Object[] args = {null};
             Cons<ResourceAmountObjective> executor = obj -> {
                 args[0] = obj;
-                execFunc.call(context, scope, scope, args);
+                execFunc.call(JSBridge.context, JSBridge.unityScope, JSBridge.unityScope, args);
             };
 
-            var obj = new ResourceAmountObjective(items, team, from, to, cinematicEditor.sector(), node, name, executor);
+            var obj = new ResourceAmountObjective(items, team, from, to, node, name, executor);
             obj.ext(f);
 
             return obj;
         });
     }
 
-    public ResourceAmountObjective(ItemStack[] items, Team team, ScriptedSector sector, StoryNode<?> node, String name, Cons<ResourceAmountObjective> executor){
-        this(items, team, Color.lightGray, Color.green, sector, node, name, executor);
+    public ResourceAmountObjective(ItemStack[] items, Team team, StoryNode<?> node, String name, Cons<ResourceAmountObjective> executor){
+        this(items, team, Color.lightGray, Color.green, node, name, executor);
     }
 
-    public ResourceAmountObjective(ItemStack[] items, Team team, Color from, Color to, ScriptedSector sector, StoryNode<?> node,  String name, Cons<ResourceAmountObjective> executor){
-        super(sector, node, name, 1, executor);
+    public ResourceAmountObjective(ItemStack[] items, Team team, Color from, Color to, StoryNode<?> node,  String name, Cons<ResourceAmountObjective> executor){
+        super(node, name, 1, executor);
         this.items = items;
         this.team = team;
         this.from = from;
@@ -162,7 +157,7 @@ public class ResourceAmountObjective extends SectorObjective{
                     .minSize(300f, 48f)
                     .maxSize(300f, 156f);
 
-                cell.visible(() -> ui.hudfrag.shown && sector.valid() && container == cell.get());
+                cell.visible(() -> ui.hudfrag.shown && node.sector.valid() && container == cell.get());
             });
         }
     }

@@ -25,22 +25,16 @@ public abstract class EditorListener{
 
     protected void registerEvents(){
         Triggers.listen(Trigger.update, () -> valid(this::update));
-        Triggers.listen(Trigger.draw, () -> valid(this::draw));
+        Triggers.listen(Triggers.drawEnt, () -> valid(this::draw));
 
         Events.on(StateChangeEvent.class, e -> {
             if(state.isEditor()){
                 if(e.from == State.menu && e.to == State.playing){
                     var c = content.getByName(ContentType.sector, "unity-" + editor.tags.get("name"));
                     if(c instanceof ScriptedSector sect){
-                        ui.showConfirm(
-                            "@editor.cinematic.title",
-                            "@editor.cinematic.confirm",
-                            () -> {
-                                attached = true;
-                                sector = sect;
-                                begin();
-                            }
-                        );
+                        attached = true;
+                        sector = sect;
+                        begin();
                     }
                 }else if(attached && e.to == State.menu){
                     end();

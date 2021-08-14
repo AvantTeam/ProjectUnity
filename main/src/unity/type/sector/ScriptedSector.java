@@ -3,7 +3,6 @@ package unity.type.sector;
 import arc.*;
 import arc.func.*;
 import arc.struct.*;
-import arc.util.*;
 import arc.util.Log.*;
 import mindustry.core.GameState.*;
 import mindustry.game.EventType.*;
@@ -11,6 +10,7 @@ import mindustry.io.*;
 import mindustry.type.*;
 import unity.cinematic.*;
 import unity.mod.*;
+import unity.mod.Triggers.*;
 
 import static mindustry.Vars.*;
 import static unity.Unity.*;
@@ -28,13 +28,10 @@ public class ScriptedSector extends SectorPreset{
         Triggers.listen(Trigger.update, updater);
         Triggers.listen(Trigger.draw, drawer);
 
-        loadState();
         storyNodes.each(StoryNode::init);
 
         Triggers.detach(Trigger.newGame, this.starter);
     });
-
-    protected final Interval saveTimer = new Interval();
 
     public ScriptedSector(String name, Planet planet, int sector){
         super(name, planet, sector);
@@ -46,9 +43,8 @@ public class ScriptedSector extends SectorPreset{
             }
         });
 
-        Events.on(DisposeEvent.class, e -> {
-            if(state.isPlaying() && canSave()) saveState();
-        });
+        Events.on(SaveWriteEvent.class, e -> saveState());
+        Events.on(SaveReadEvent.class, e -> loadState());
     }
 
     public void update(){
@@ -60,9 +56,6 @@ public class ScriptedSector extends SectorPreset{
 
             return;
         }
-
-        // Save objective state every 5 seconds
-        if(canSave() && saveTimer.get(5f * Time.toSeconds)) saveState();
 
         storyNodes.each(StoryNode::update);
     }

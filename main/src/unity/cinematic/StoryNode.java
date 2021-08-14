@@ -3,10 +3,15 @@ package unity.cinematic;
 import arc.struct.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
+import mindustry.ctype.*;
 import unity.type.sector.*;
+
+import static mindustry.Vars.*;
 
 @SuppressWarnings("unchecked")
 public abstract class StoryNode<T> implements JsonSerializable{
+    public ScriptedSector sector;
+
     public String name;
     public StringMap tags = new StringMap();
 
@@ -17,6 +22,7 @@ public abstract class StoryNode<T> implements JsonSerializable{
 
     @Override
     public void write(Json json){
+        json.writeValue("sector", sector.name);
         json.writeValue("name", name);
         json.writeValue("tags", tags);
         json.writeValue("objectiveModels", objectiveModels, Seq.class, SectorObjectiveModel.class);
@@ -24,6 +30,7 @@ public abstract class StoryNode<T> implements JsonSerializable{
 
     @Override
     public void read(Json json, JsonValue jsonData){
+        sector = content.getByName(ContentType.sector, jsonData.getString("sector"));
         name = jsonData.getString("name");
 
         tags.clear();

@@ -173,6 +173,7 @@ public class Unity extends Mod{
         BlockMovement.init();
 
         dev.init();
+        JSBridge.importDefaults(JSBridge.unityScope);
     }
 
     @Override
