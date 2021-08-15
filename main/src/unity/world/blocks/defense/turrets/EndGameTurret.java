@@ -8,11 +8,8 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
-import mindustry.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
-import mindustry.entities.units.*;
-import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.consumers.*;
@@ -27,18 +24,12 @@ import unity.util.*;
 
 public class EndGameTurret extends PowerTurret{
     private static int shouldLaser = 0;
-    private static float lowest;
-    private static float dstC;
     protected static float damageFull;
     protected static float damageB;
     protected static int totalFrags;
     private final static float[] ringProgresses = {0.013f, 0.035f, 0.024f};
     private final static int[] ringDirections = {1, -1, 1};
     private final static Seq<Entityc> entitySeq = new Seq<>(512);
-
-    private final static Seq<DeadUnitEntry> locked = new Seq<>(128);
-    private static boolean firstInit = false;
-    private final static Seq<DeadUnitEntry> toRemove = new Seq<>(128);
 
     protected int eyeTime = timers++;
     protected int bulletTime = timers++;
@@ -110,7 +101,7 @@ public class EndGameTurret extends PowerTurret{
         protected Vec2[] eyesVecArray = new Vec2[16];
 
         protected Posc[] targets = new Posc[16];
-        private final Seq<DeadUnitEntry> tmpArray = new Seq<>();
+        //private final Seq<DeadUnitEntry> tmpArray = new Seq<>();
 
         @Override
         protected void effects(){
@@ -224,19 +215,21 @@ public class EndGameTurret extends PowerTurret{
             Units.nearbyEnemies(team, x - range, y - range, range * 2f, range * 2f, e -> {
                 if(Mathf.within(x, y, e.x, e.y, range) && !e.dead){
                     Object[] data = {new Vec2(x + eyeOffset.x, y + eyeOffset.y), e, 1f};
-                    UnityFx.vapourizeUnit.at(e.x, e.y, 0, e);
                     UnityFx.endgameLaser.at(x, y, 0, data);
                     entitySeq.add(e);
                 }
             });
             entitySeq.each(e -> {
                 AntiCheat.annihilateEntity(e, true, false);
-                tmpArray.add(new DeadUnitEntry((Unit)e));
+                Unit u = (Unit)e;
+                SpecialFx.endgameVapourize.at(u.x, u.y, angleTo(u), new Object[]{this, u});
             });
             entitySeq.clear();
         }
 
         void killTiles(){
+            entitySeq.clear();
+            damageB = 0f;
             shouldLaser = 0;
             Utils.trueEachBlock(x, y, range + 5f, build -> build.team != team, building -> {
                 if(!building.dead && building != this){
@@ -250,7 +243,12 @@ public class EndGameTurret extends PowerTurret{
                     shouldLaser++;
                 }
             });
-            entitySeq.each(e -> AntiCheat.annihilateEntity(e, true, false));
+            entitySeq.each(e -> {
+                damageB = Math.max(((Posc)e).dst2(this), damageB);
+                AntiCheat.annihilateEntity(e, true, false);
+            });
+            damageB = Mathf.sqrt(damageB) * 2f;
+            SpecialFx.endgameVapourize.at(x, y, damageB, new Object[]{this, entitySeq.toArray(Building.class), hitSize() / 4f});
             entitySeq.clear();
         }
         
@@ -275,7 +273,7 @@ public class EndGameTurret extends PowerTurret{
                 if(e.within(ux, uy, rnge + e.hitSize) && !e.dead){
                     e.damage(490f * threatLevel);
                     if(e.dead){
-                        UnityFx.vapourizeUnit.at(e.x, e.y, 0, e);
+                        SpecialFx.endgameVapourize.at(e.x, e.y, angleTo(e), new Object[]{this, e});
                         //annihilate(e);
                         AntiCheat.annihilateEntity(e, true, false);
                     }
@@ -298,7 +296,7 @@ public class EndGameTurret extends PowerTurret{
                 e.damage(350f * threatLevel);
                 if(e.dead()){
                     //annihilate(targets[index]);
-                    if(e instanceof Unit ut) UnityFx.vapourizeUnit.at(ut.x, ut.y, ut.rotation, ut);
+                    if(e instanceof Unit ut) SpecialFx.endgameVapourize.at(ut.x, ut.y, angleTo(ut), new Object[]{this, ut});
                     if(e instanceof Building build) UnityFx.vapourizeTile.at(build.x, build.y, build.block.size);
                     AntiCheat.annihilateEntity(e, true, false);
                 }
@@ -450,28 +448,6 @@ public class EndGameTurret extends PowerTurret{
                 resistTime += Time.delta;
             }
             updateEyes();
-            boolean tmpB = true;
-            
-            for(DeadUnitEntry d : tmpArray){
-                boolean isModified = d.isModified();
-                d.time += Time.delta;
-                if(d.time >= 120f){
-                    toRemove.add(d);
-                    if(isModified){
-                        if(!locked.contains(d)) locked.add(d);
-                        if(!firstInit && tmpB){
-                            Events.run(Trigger.update, new AnnihilateRunnable());
-                            tmpB = false;
-                        }
-                    }
-                }
-            }
-            firstInit = false;
-            for(DeadUnitEntry d : toRemove){
-                tmpArray.remove(d);
-            }
-            
-            toRemove.clear();
             //super.updateTile();
             if(trueEfficiency() > 0.0001f){
                 float value = eyesAlpha > trueEfficiency() ? 1f : trueEfficiency();
@@ -576,97 +552,6 @@ public class EndGameTurret extends PowerTurret{
             }
             
             super.remove();
-        }
-    }
-
-    private static class AnnihilateRunnable implements Runnable{
-        boolean obsolete = false;
-        int layer = 0;
-        @Override
-        public void run(){
-            if(obsolete) return;
-            firstInit = true;
-            for(DeadUnitEntry d : locked){
-                for(int i = 0; i < Math.min(1 + layer, 3); i++){
-                    d.tryDestroy();
-                }
-                
-                if(layer > 4){
-                    d.entity.x = Float.NaN;
-                    d.entity.y = Float.NaN;
-                    d.entity.abilities.clear();
-                }
-                
-                if(d.isModified() && !obsolete){
-                    AnnihilateRunnable ar = new AnnihilateRunnable();
-                    ar.layer = layer + 1;
-                    Events.run(Trigger.update, ar);
-                    obsolete = true;
-                }
-                d.update();
-            }
-        }
-    }
-
-    /** @deprecated Duplication of {@link AntiCheat#annihilateEntity(Entityc, boolean, boolean)} */
-    private static class DeadUnitEntry{
-        Unit entity;
-        float lx;
-        float ly;
-        float lrot;
-        float time = 0f;
-
-        DeadUnitEntry(Unit unit){
-            entity = unit;
-            lx = unit.x;
-            ly = unit.y;
-            lrot = unit.rotation;
-        }
-
-        boolean isModified(){
-            return entity.x != lx || entity.y != ly || entity.rotation != lrot;
-        }
-
-        void update(){
-            lx = entity.x;
-            ly = entity.y;
-            lrot = entity.rotation;
-        }
-
-        void attemptRemoveAdd(Unit unit){
-            try{
-                unit.getClass().getField("added").setBoolean(unit, false);
-            }catch(Exception e){
-                throw new RuntimeException(e);
-            }
-        }
-
-        void tryDestroy(){
-            Groups.all.remove(entity);
-            attemptRemoveAdd(entity);
-            
-            UnityFx.vapourizeUnit.at(entity.x, entity.y, entity.rotation, entity);
-
-            entity.team.data().updateCount(entity.type, -1);
-            entity.clearCommand();
-            entity.controller().removed(entity);
-
-            Groups.unit.remove(entity);
-            Groups.draw.remove(entity);
-            Groups.sync.remove(entity);
-            if(Vars.net.client()){
-                Vars.netClient.addRemovedEntity(entity.id);
-            }
-            
-            for(WeaponMount mount : entity.mounts){
-                if(mount.bullet != null){
-                    mount.bullet.time = mount.bullet.lifetime - 10f;
-                    mount.bullet = null;
-                }
-                if(mount.sound != null){
-                    mount.sound.stop();
-                }
-            }
         }
     }
 }
