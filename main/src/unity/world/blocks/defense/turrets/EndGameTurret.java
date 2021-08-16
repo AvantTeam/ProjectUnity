@@ -517,7 +517,7 @@ public class EndGameTurret extends PowerTurret{
             killUnits();
             
             ShootFx.endGameShoot.at(x, y);
-            UnitySounds.endgameShoot.at(x, y);
+            UnitySounds.endgameShoot.at(x, y, 1f, 1.5f);
         }
 
         @Override
