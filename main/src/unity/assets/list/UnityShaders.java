@@ -28,6 +28,7 @@ public class UnityShaders{
     public static StencilShader stencilShader;
     public static MegalithRingShader megalithRingShader;
     public static Graphics3DShaderProvider graphics3DProvider;
+    public static VapourizeShader vapourizeShader;
 
     protected static FrameBuffer buffer;
     protected static boolean loaded;
@@ -39,6 +40,7 @@ public class UnityShaders{
         var conds = new CondShader[]{
             holoShield = new HolographicShieldShader()
         };
+        vapourizeShader = new VapourizeShader();
         stencilShader = new StencilShader();
         megalithRingShader = new MegalithRingShader();
         graphics3DProvider = new Graphics3DShaderProvider();
@@ -69,6 +71,7 @@ public class UnityShaders{
 
             holoShield.dispose();
             stencilShader.dispose();
+            vapourizeShader.dispose();
             megalithRingShader.dispose();
             graphics3DProvider.dispose();
         }
@@ -85,6 +88,48 @@ public class UnityShaders{
 
         public float getLayer(){
             return layer;
+        }
+    }
+
+    public static class VapourizeShader extends Shader{
+        public Texture noise;
+        public Vec2 windSource = new Vec2();
+        public FrameBuffer buffer = new FrameBuffer();
+        public Color toColor = new Color();
+        public float progress, colorProgress, fragProgress;
+
+        public VapourizeShader(){
+            super(
+            Core.files.internal("shaders/screenspace.vert"),
+            tree.get("shaders/vapourize.frag")
+            );
+            if(noise == null){
+                Fi path = tree.get("shaders/vapourizenoise.png");
+                noise = new Texture(path);
+                noise.setWrap(TextureWrap.mirroredRepeat);
+            }
+        }
+
+        @Override
+        public void apply(){
+            noise.bind(1);
+            buffer.getTexture().bind(0);
+
+            setUniformi("u_noise", 1);
+
+            setUniformf("position", windSource);
+
+            setUniformf("progress", progress);
+            setUniformf("fragprogress", fragProgress);
+
+            setUniformf("tocolor", toColor);
+            setUniformf("colorprog", colorProgress);
+
+            setUniformf("u_texsize", Core.camera.width, Core.camera.height);
+            setUniformf("u_invsize", 1f / Core.camera.width, 1f / Core.camera.height);
+            setUniformf("u_offset",
+            Core.camera.position.x - Core.camera.width / 2,
+            Core.camera.position.y - Core.camera.height / 2);
         }
     }
 
