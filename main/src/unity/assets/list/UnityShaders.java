@@ -10,11 +10,8 @@ import arc.graphics.g3d.*;
 import arc.graphics.gl.*;
 import arc.math.*;
 import arc.math.geom.*;
-import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.Log.*;
-import mindustry.game.EventType.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import unity.assets.type.g3d.*;
@@ -39,7 +36,7 @@ public class UnityShaders{
         if(headless) return;
 
         buffer = new FrameBuffer();
-        CondShader[] conds = new CondShader[]{
+        var conds = new CondShader[]{
             holoShield = new HolographicShieldShader()
         };
         stencilShader = new StencilShader();
@@ -51,10 +48,10 @@ public class UnityShaders{
             shader.layer = Layer.shields + 2f + i * ((1f / conds.length) - 0.01f);
         }
 
+        float range = (1f / conds.length) / 2f;
         Events.run(Triggers.drawEnt, () -> {
             buffer.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
 
-            float range = (1f / conds.length) / 2f;
             for(CondShader shader : conds){
                 if(shader.apply.get()){
                     Draw.drawRange(shader.getLayer() + range / 2f, range, () -> buffer.begin(Color.clear), () -> {
@@ -121,12 +118,7 @@ public class UnityShaders{
 
         @Override
         public void apply(){
-            setUniformf("u_time", Time.time / Scl.scl(1f));
-            setUniformf("u_scl", 1f / Core.camera.height);
-            setUniformf("u_offset",
-                Core.camera.position.x - Core.camera.width / 2f,
-                Core.camera.position.y - Core.camera.height / 2f
-            );
+            setUniformf("u_time", Time.time);
         }
     }
 

@@ -17,30 +17,14 @@ public class ExpSenseI implements LInstruction{
 
     @Override
     public void run(LExecutor exec){
-        int i = cont.ordinal();
         Object b = exec.obj(type);
 
         if(b instanceof ExpBuildc build){
-            switch(i){
-                case 0: {
-                    exec.setnum(res, build.exp());
-                    break;
-                }
-
-                case 1: {
-                    exec.setnum(res, build.level());
-                    break;
-                }
-
-                case 2: {
-                    exec.setnum(res, ((Expc)build.block()).maxExp());
-                    break;
-                }
-
-                case 3: {
-                    exec.setnum(res, build.maxLevel());
-                    break;
-                }
+            switch(cont){
+                case totalExp -> exec.setnum(res, build.exp());
+                case totalLevel -> exec.setnum(res, build.level());
+                case expCapacity -> exec.setnum(res, ((Expc)build.block()).maxExp());
+                case maxLevel -> exec.setnum(res, build.maxLevel());
             }
         }else{
             exec.setnum(res, 0d);

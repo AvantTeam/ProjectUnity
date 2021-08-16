@@ -187,9 +187,7 @@ public abstract class SectorObjective{
     public boolean dependencyFinished(){
         if(dependencies.isEmpty()) return true;
 
-        for(var dep : dependencies){
-            if(!dep.isExecuted()) return false;
-        }
+        for(var dep : dependencies) if(!dep.isExecuted()) return false;
         return true;
     }
 }

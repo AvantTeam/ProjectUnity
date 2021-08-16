@@ -3598,7 +3598,7 @@ public class UnityUnitTypes implements ContentList{
 
             abilities.add(new LightningSpawnAbility(12, 16f, 3f, 0.05f, 300f, 96f, 640f));
 
-            BulletType energy = new RicochetBulletType(6f, 50f, "shell"){
+            var energy = new RicochetBulletType(6f, 50f, "shell"){
                 {
                     width = 9f;
                     height = 11f;
