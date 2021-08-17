@@ -122,7 +122,7 @@ public class UnityUnitTypes implements ContentList{
     public static @FactionDef("koruh") @EntityPoint(Kami.class)
     UnitType kami;
 
-    public static @FactionDef("advance") @EntityDef({Unitc.class, Decorationc.class}) UnitType archimedes;
+    public static @FactionDef("advance") @EntityDef({Unitc.class, Decorationc.class}) UnitType deviation;
 
     // end
     public static @FactionDef("end") @EntityDef({Unitc.class, Endc.class}) UnitType voidVessel;
@@ -3822,7 +3822,7 @@ public class UnityUnitTypes implements ContentList{
         //endregion
         //region advance
 
-        archimedes = new UnityUnitType("archimedes"){{
+        deviation = new UnityUnitType("deviation"){{
             health = 8000f;
             speed = 2.7f;
             accel = 0.07f;
