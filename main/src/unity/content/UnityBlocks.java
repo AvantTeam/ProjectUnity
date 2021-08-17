@@ -3387,6 +3387,7 @@ public class UnityBlocks implements ContentList{
             coolantMultiplier = 0.6f;
             hasItems = true;
             itemCapacity = 10;
+            loopSoundVolume = 0.2f;
 
             shootType = new BulletType(){{
                 //damage = Float.MAX_VALUE;

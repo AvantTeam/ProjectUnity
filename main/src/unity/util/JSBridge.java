@@ -21,21 +21,17 @@ public final class JSBridge{
     public static final ImporterTopLevel defaultScope;
     public static final ImporterTopLevel unityScope;
 
-    private static final Constructor<NativeJavaPackage> packCtr = ReflectUtils.findConstructor(NativeJavaPackage.class, true, boolean.class, String.class, ClassLoader.class);
-    private static final Method importPack = ReflectUtils.findMethod(ImporterTopLevel.class, "importPackage", true, NativeJavaPackage.class);
-    private static final Method importClass = ReflectUtils.findMethod(ImporterTopLevel.class, "importClass", true, NativeJavaClass.class);
-
     private JSBridge(){}
 
     static{
-        context = Reflect.get(Scripts.class, mods.getScripts(), "context");
-        defaultScope = Reflect.get(Scripts.class, mods.getScripts(), "scope");
+        context = mods.getScripts().context;
+        defaultScope = (ImporterTopLevel)mods.getScripts().scope;
 
         unityScope = new ImporterTopLevel(context);
         context.evaluateString(unityScope, Core.files.internal("scripts/global.js").readString(), "global.js", 0);
     }
 
-    public static void importDefaults(Scriptable scope){
+    public static void importDefaults(ImporterTopLevel scope){
         Seq<String> permit = Seq.with(
             "unity",
             "rhino",
@@ -50,26 +46,26 @@ public final class JSBridge{
         }
     }
 
-    public static void importPackage(Scriptable scope, String packageName){
-        NativeJavaPackage p = ReflectUtils.newInstance(packCtr, true, packageName, mods.mainLoader());
+    public static void importPackage(ImporterTopLevel scope, String packageName){
+        NativeJavaPackage p = new NativeJavaPackage(packageName, mods.mainLoader());
         p.setParentScope(scope);
 
-        ReflectUtils.invokeMethod(scope, importPack, p);
+        scope.importPackage(p);
     }
 
-    public static void importPackage(Scriptable scope, Package pack){
+    public static void importPackage(ImporterTopLevel scope, Package pack){
         importPackage(scope, pack.getName());
     }
 
-    public static void importClass(Scriptable scope, String canonical){
+    public static void importClass(ImporterTopLevel scope, String canonical){
         importClass(scope, ReflectUtils.findClass(canonical));
     }
 
-    public static void importClass(Scriptable scope, Class<?> type){
+    public static void importClass(ImporterTopLevel scope, Class<?> type){
         NativeJavaClass nat = new NativeJavaClass(scope, type);
         nat.setParentScope(scope);
 
-        ReflectUtils.invokeMethod(scope, importClass, nat);
+        scope.importClass(nat);
     }
 
     public static Function compileFunc(Scriptable scope, String sourceName, String source){

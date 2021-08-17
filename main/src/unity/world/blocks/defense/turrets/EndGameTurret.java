@@ -11,6 +11,7 @@ import arc.util.io.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.consumers.*;
 import unity.*;
@@ -172,9 +173,9 @@ public class EndGameTurret extends PowerTurret{
             Draw.rect(ringBBottomRegion, x, y, ringProgress[1]);
             
             Draw.z(oz + 0.02f);
-            Draw.rect(ringARegion, x, y, ringProgress[0]);
-            Draw.rect(ringBRegion, x, y, ringProgress[1]);
-            Draw.rect(ringCRegion, x, y, ringProgress[2]);
+            Drawf.spinSprite(ringARegion, x, y, ringProgress[0]);
+            Drawf.spinSprite(ringBRegion, x, y, ringProgress[1]);
+            Drawf.spinSprite(ringCRegion, x, y, ringProgress[2]);
 
             Draw.blend(Blending.additive);
             
@@ -516,7 +517,7 @@ public class EndGameTurret extends PowerTurret{
             killUnits();
             
             ShootFx.endGameShoot.at(x, y);
-            UnitySounds.endgameShoot.at(x, y);
+            UnitySounds.endgameShoot.at(x, y, 1f, 1.5f);
         }
 
         @Override
