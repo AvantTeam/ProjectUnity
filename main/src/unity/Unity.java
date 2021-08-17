@@ -10,6 +10,7 @@ import arc.scene.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
+import arc.util.serialization.*;
 import mindustry.*;
 import mindustry.core.GameState.*;
 import mindustry.ctype.*;
@@ -65,7 +66,9 @@ public class Unity extends Mod{
 
     public Unity(){
         if(!headless){
-            Core.assets.setLoader(Model.class, new ModelLoader(tree));
+            Core.assets.setLoader(Model.class, ".g3dj", new ModelLoader(tree, new JsonReader()));
+            Core.assets.setLoader(Model.class, ".g3db", new ModelLoader(tree, new UBJsonReader()));
+
             Core.assets.setLoader(WavefrontObject.class, new WavefrontObjectLoader(tree));
 
             var fontSuff = ".gen_pu";
@@ -161,6 +164,8 @@ public class Unity extends Mod{
             print("Dev build class implementation not found; defaulting to regular user implementation.");
             dev = new DevBuild(){};
         }
+
+        if(dev.isDev()) Log.level = LogLevel.debug;
 
         music = new MusicHandler(){};
         tap = new TapHandler();

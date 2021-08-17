@@ -37,4 +37,9 @@ public class DevBuildImpl implements DevBuild{
             });
         }
     }
+
+    @Override
+    public boolean isDev(){
+        return true;
+    }
 }

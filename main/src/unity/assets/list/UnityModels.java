@@ -1,23 +1,25 @@
 package unity.assets.list;
 
 import arc.*;
+import arc.util.*;
+import arc.util.Log.*;
 import unity.assets.loaders.*;
 import unity.assets.loaders.ModelLoader.*;
 import unity.assets.type.g3d.*;
 
 import static mindustry.Vars.*;
+import static unity.Unity.*;
 
 public class UnityModels{
     public static Model
     //turrets
-    wavefront, cube, intersection,
+    wavefront, cube,
     //planet composites
     megalithRing;
 
     public static void load(){
         wavefront = load("wavefront");
         cube = load("cube");
-        intersection = load("intersection");
         megalithRing = load("megalithring");
     }
 
@@ -26,8 +28,6 @@ public class UnityModels{
         wavefront = null;
         cube.dispose();
         cube = null;
-        intersection.dispose();
-        intersection = null;
         megalithRing.dispose();
         megalithRing = null;
     }
@@ -35,19 +35,15 @@ public class UnityModels{
     protected static Model load(String modelName){
         if(headless) return new Model();
 
-        String name = "objects/" + modelName;
-        String path = tree.get(name + ".g3db").exists() ? name + ".g3db" : name + ".g3dj";
+        var name = "models/" + modelName;
+        var path = tree.get(name + ".g3db").exists() ? name + ".g3db" : name + ".g3dj";
         var model = new Model();
 
-        //AssetDescriptor<?> desc = Core.assets.load(path, Model.class, new ModelParameter(model));
-        //desc.errored = Log::err;
-
-        //i need these to be loaded before content load
         try{
-            ModelLoader loader = (ModelLoader)Core.assets.getLoader(Model.class);
+            var loader = (ModelLoader)Core.assets.getLoader(Model.class, path);
             loader.load(Core.assets, path, tree.get(path), new ModelParameter(model));
         }catch(Throwable t){
-            t.printStackTrace();
+            print(LogLevel.err, "", Strings.getStackTrace(Strings.getFinalCause(t)));
         }
 
         return model;

@@ -202,7 +202,7 @@ public class UnityShaders{
                 tree.get("shaders/megalithring.frag")
             );
 
-            texture = new Texture(tree.get("objects/megalithring.png"));
+            texture = new Texture(tree.get("models/megalithring.png"));
             texture.setFilter(TextureFilter.linear);
             texture.setWrap(TextureWrap.repeat);
         }

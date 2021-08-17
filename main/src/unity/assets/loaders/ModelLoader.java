@@ -16,14 +16,11 @@ public class ModelLoader extends SynchronousAssetLoader<Model, ModelLoader.Model
     public static final short versionHi = 0;
     public static final short versionLo = 1;
 
-    protected final UBJsonReader readerBin;
-    protected final JsonReader readerText;
-    protected final Quat tmpQuat = new Quat();
+    protected final BaseJsonReader reader;
 
-    public ModelLoader(FileHandleResolver tree){
+    public ModelLoader(FileHandleResolver tree, BaseJsonReader reader){
         super(tree);
-        readerBin = new UBJsonReader();
-        readerText = new JsonReader();
+        this.reader = reader;
     }
 
     @Override
@@ -40,9 +37,6 @@ public class ModelLoader extends SynchronousAssetLoader<Model, ModelLoader.Model
     }
 
     public ModelData parseModel(Fi handle){
-        BaseJsonReader reader = handle.extEquals("g3db") ? readerBin : (handle.extEquals("g3dj") ? readerText : null);
-        if(reader == null) throw new IllegalArgumentException("Unknown model type: " + handle.extension() + " (" + handle.name() + ")");
-
         JsonValue json = reader.parse(handle);
         ModelData model = new ModelData();
         JsonValue version = json.require("version");

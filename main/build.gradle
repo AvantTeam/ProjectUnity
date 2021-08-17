@@ -217,6 +217,6 @@ tasks.withType(Jar) {
     exclude 'sprites/vanilla/**'
     exclude 'sprites/gen/vanilla/**'
     doFirst {
-        exclude excludedFiles.readString().split(/\n/)
+        if(excludedFiles.exists()) exclude excludedFiles.readString().split(/\n/)
     }
 }

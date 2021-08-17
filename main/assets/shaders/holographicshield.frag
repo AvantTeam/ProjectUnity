@@ -21,7 +21,7 @@ float absincos(float t, float n) {
 
 void main() {
     vec4 base = texture2D(u_texture, v_texCoords);
-    
+
     float L = 2800.0 + 50.0 * cos(u_time / 5.0);
     float P = 20.0;
     float N = 22.0;
@@ -29,6 +29,6 @@ void main() {
     float x = v_texCoords.x;
     float y = v_texCoords.y;
     float a = absincos((x - 2.0 * y) / L + u_time * 0.15, P) * absincos(u_time * 0.3 + y / M, N);
-    
+
     gl_FragColor = base * a;
 }
