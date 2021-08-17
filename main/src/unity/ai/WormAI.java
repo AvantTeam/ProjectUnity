@@ -6,7 +6,11 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.ai.types.*;
 import mindustry.entities.units.*;
+import mindustry.gen.*;
+import mindustry.type.*;
 import mindustry.world.meta.*;
+import unity.gen.*;
+import unity.type.*;
 
 public class WormAI extends FlyingAI{
     public Vec2 pos = new Vec2();
@@ -16,7 +20,6 @@ public class WormAI extends FlyingAI{
 
     @Override
     public void updateMovement(){
-        //Position trgt = time <= 0f ? target : pos;
         if(target == null && time > 0){
             moveTo(pos, 0f);
         }
@@ -39,6 +42,24 @@ public class WormAI extends FlyingAI{
         rotateTime = Math.max(0f, rotateTime - Time.delta);
         if(time <= 0) score = 0f;
         time = Math.max(0f, time - Time.delta);
+    }
+
+    @Override
+    protected void updateWeapons(){
+        if(unit instanceof Wormc w && unit.type instanceof UnityUnitType uType
+        && w.head() != null && w.head().isShooting && w.head().controller() instanceof Player && unit.within(w.head(), uType.barrageRange + (unit.hitSize / 2f))){
+            Unit head = w.head();
+            for(WeaponMount mount : unit.mounts){
+                Weapon weapon = mount.weapon;
+                if(!weapon.controllable) continue;
+
+                mount.aimX = head.aimX;
+                mount.aimY = head.aimY;
+                mount.shoot = mount.rotate = true;
+            }
+        }else{
+            super.updateWeapons();
+        }
     }
 
     @Override

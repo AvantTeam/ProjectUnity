@@ -252,6 +252,7 @@ abstract class WormComp implements Unitc{
             ((Wormc)tail).head(head);
             ((Wormc)tail).parent(self());
             child = tail;
+            tail.setupWeapons(uType);
             tail.add();
         }
         return tail;
@@ -302,7 +303,7 @@ abstract class WormComp implements Unitc{
                 Tmp.v1.trns(rotation(), uType.segmentOffset / 2f).add(self());
                 Tmp.r1.setCentered(Tmp.v1.x, Tmp.v1.y, hitSize());
                 Units.nearby(Tmp.r1, u -> {
-                    if(u.team == team && u.type == type && u instanceof Wormc w && w.head() != self() && w.isTail() && w.waitTime() <= 0f && within(u, uType.segmentOffset) && Utils.angleDist(rotation(), angleTo(u)) < uType.angleLimit){
+                    if(u.team == team && u.type == type && u instanceof Wormc w && w.head() != self() && w.isTail() && w.countFoward() + countBackward() < uType.maxSegments && w.waitTime() <= 0f && within(u, uType.segmentOffset) && Utils.angleDist(rotation(), angleTo(u)) < uType.angleLimit){
                         connect(w);
                     }
                 });

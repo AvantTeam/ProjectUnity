@@ -3998,6 +3998,7 @@ public class UnityUnitTypes implements ContentList{
             headOffset = 27.75f;
             segmentLength = 60;
             segmentCast = 7;
+            barrageRange = 240f;
             lowAltitude = true;
             visualElevation = 2f;
             rotateSpeed = 2.2f;
