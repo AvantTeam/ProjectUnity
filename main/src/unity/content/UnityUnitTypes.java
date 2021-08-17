@@ -122,7 +122,7 @@ public class UnityUnitTypes implements ContentList{
     public static @FactionDef("koruh") @EntityPoint(Kami.class)
     UnitType kami;
 
-    public static @FactionDef("advance") @EntityDef({Unitc.class, Decorationc.class}) UnitType deviation;
+    public static @FactionDef("advance") @EntityDef({Unitc.class, Decorationc.class}) UnitType deviation, anomaly;
 
     // end
     public static @FactionDef("end") @EntityDef({Unitc.class, Endc.class}) UnitType voidVessel;
@@ -3864,6 +3864,30 @@ public class UnityUnitTypes implements ContentList{
                     new Wing(1, 24.75f, -28.75f, 0.5f, 18f),
                     new Wing(2, 24.25f, -8f, 0.25f, 17f),
                     new Wing(3, 18f, 0.25f, 0f, 16f));
+            }});
+        }};
+
+        anomaly = new UnityUnitType("anomaly"){{
+            health = 17000f;
+            speed = 2.1f;
+            rotateSpeed = 1f;
+            accel = 0.08f;
+            drag = 0.07f;
+            hitSize = 137.5f;
+            engineSize = -1f;
+            flying = true;
+            lowAltitude = true;
+            outlineColor = Color.valueOf("464a61");
+
+            decorations.add(new WingDecorationType(name + "-wing", 2){{
+                flapScl = 90f;
+                flapAnimation = new Interp.ExpOut(2, 2.5f);
+                wings.addAll(new Wing(0, 7.5f, -61f, 0f, 20f),
+                new Wing(0, 10.5f, -48.25f, 0.1666f, 20f),
+                new Wing(0, 13.5f, -35.5f, 0.3333f, 20f),
+                new Wing(1, 13.5f, -22.75f, 0.5f, 20f),
+                new Wing(1, 17.5f, -10f, 0.6666f, 20f),
+                new Wing(1, 21.25f, 2.75f, 0.8333f, 20f));
             }});
         }};
 
