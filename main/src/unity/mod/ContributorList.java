@@ -22,7 +22,8 @@ public final class ContributorList{
         ),
 
         ContributionType.contributor, Seq.with(
-            "Drullkus"
+            "Drullkus",
+            "Anuke"
         ),
 
         ContributionType.translator, Seq.with(
