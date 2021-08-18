@@ -21,7 +21,7 @@ public final class ContributorList{
             "ThirstyBoi",
             "Xusk",
             "Eldoofus",
-            "Gdeft",
+            "Evl",
             "Goobrr"
         ),
 
