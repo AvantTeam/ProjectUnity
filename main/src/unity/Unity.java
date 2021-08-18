@@ -150,8 +150,6 @@ public class Unity extends Mod{
             }
         }));
 
-        ContributorList.init();
-
         KamiPatterns.load();
         KamiBulletDatas.load();
 

@@ -4,15 +4,9 @@ import arc.struct.*;
 
 /** @deprecated There's got to be a better way to do this */
 public final class ContributorList{
-    private static final IntMap<Seq<String>> contributors = new IntMap<>(ContributionType.all.length);
-
-    public static void init(){
-        for(ContributionType type : ContributionType.all){
-            contributors.put(type.ordinal(), new Seq<>());
-        }
-
+    private static final ObjectMap<ContributionType, Seq<String>> contributors = ObjectMap.of(
         // DO NOT INSERT COLORS!
-        contributors.get(ContributionType.collaborator.ordinal()).addAll(
+        ContributionType.collaborator, Seq.with(
             "Eldoofus",
             "Gdeft",
             "GlennFolker",
@@ -26,20 +20,20 @@ public final class ContributorList{
             "Xusk",
             "younggam",
             "MEEP of Faith"
-        );
+        ),
 
-        contributors.get(ContributionType.contributor.ordinal()).addAll(
+        ContributionType.contributor, Seq.with(
             "Drullkus"
-        );
+        ),
 
-        contributors.get(ContributionType.translator.ordinal()).addAll(
+        ContributionType.translator, Seq.with(
             "sk7725 (Korean)",
             "Xusk (Russian)"
-        );
-    }
+        )
+    );
 
     public static Seq<String> getBy(ContributionType type){
-        return contributors.get(type.ordinal());
+        return contributors.get(type);
     }
 
     public enum ContributionType{
