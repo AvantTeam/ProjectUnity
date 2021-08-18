@@ -6,24 +6,23 @@ public final class ContributorList{
     private static final ObjectMap<ContributionType, Seq<String>> contributors = ObjectMap.of(
         // DO NOT INSERT COLORS!
         ContributionType.collaborator, Seq.with(
-            "Eldoofus",
-            "Gdeft",
             "GlennFolker",
-            "Goobrr",
             "JerichoFletcher",
             "sk7725",
-            "ThePythonGuy3",
-            "ThirstyBoi",
-            "Txar",
             "Xelo",
-            "Xusk",
             "younggam",
             "MEEP of Faith"
         ),
 
         ContributionType.contributor, Seq.with(
             "Drullkus",
-            "Anuke"
+            "Anuke",
+            "ThePythonGuy3",
+            "ThirstyBoi",
+            "Xusk",
+            "Eldoofus",
+            "Gdeft",
+            "Goobrr"
         ),
 
         ContributionType.translator, Seq.with(
