@@ -37,7 +37,6 @@ public abstract class BaseProcessor extends AbstractProcessor{
     public JavacTrees trees;
     public JavacTypes types;
     public JavacFiler filer;
-    public JavacMessager message;
     public static Fi rootDir;
 
     protected int round;
@@ -57,9 +56,6 @@ public abstract class BaseProcessor extends AbstractProcessor{
         trees = JavacTrees.instance(javacProcessingEnv);
         types = javacProcessingEnv.getTypeUtils();
         filer = javacProcessingEnv.getFiler();
-        message = (JavacMessager)javacProcessingEnv.getMessager();
-
-        Log.info("Initialized annotation processor '@'.", getClass().getSimpleName());
     }
 
     @Override
@@ -73,6 +69,7 @@ public abstract class BaseProcessor extends AbstractProcessor{
 
                 rootDir = Fi.get(path);
             }catch(IOException e){
+                Log.err(e);
                 throw new RuntimeException(e);
             }
         }
@@ -133,8 +130,6 @@ public abstract class BaseProcessor extends AbstractProcessor{
                 stream.write(out.getBytes());
                 stream.close();
             }
-
-            Log.info("Generated Java file '@' (round @).", spec.name, round);
         }catch(FilerException e){
             throw new Exception("Misbehaving files prevent annotation processing from being done. Try running `gradlew clean`", e);
         }

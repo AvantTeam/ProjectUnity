@@ -116,6 +116,8 @@ public class Unity extends Mod{
         Events.on(DisposeEvent.class, e -> {
             UnityModels.dispose();
             UnityShaders.dispose();
+            UnityObjs.dispose();
+            UnitySounds.dispose();
         });
 
         Events.on(ClientLoadEvent.class, e -> {

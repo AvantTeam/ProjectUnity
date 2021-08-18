@@ -52,7 +52,7 @@ public class EntityProcessor extends BaseProcessor{
     ClassSerializer serializer;
 
     {
-        rounds = 4;
+        rounds = 3;
     }
 
     @Override
@@ -773,10 +773,10 @@ public class EntityProcessor extends BaseProcessor{
                 .addMethod(init.build())
                 .build()
             );
-        }else if(round == 4){
-            ObjectSet<String> usedNames = new ObjectSet<>();
+
+            ObjectSet<String> usedCNames = new ObjectSet<>();
             for(EntityDefinition def : definitions){
-                if(!usedNames.add(Reflect.get(TypeSpec.Builder.class, def.builder, "name"))) continue;
+                if(!usedCNames.add(Reflect.get(TypeSpec.Builder.class, def.builder, "name"))) continue;
 
                 ObjectSet<String> methodNames = def.components.flatMap(type -> methods(type).map(BaseProcessor::simpleString)).<String>as().asSet();
 

@@ -12,8 +12,6 @@ import unity.annotations.Annotations.*;
 import unity.gen.*;
 import unity.gen.LightHoldc.*;
 
-import java.util.*;
-
 import static mindustry.Vars.*;
 
 /** @author GlennFolker */
@@ -154,7 +152,7 @@ abstract class LightComp implements Drawc, Rotc{
             }
         );
 
-        Iterator<Light> it = absorbs.iterator();
+        var it = absorbs.iterator();
         while(it.hasNext()){
             var next = it.next();
             if(overlaps(next)){

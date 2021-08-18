@@ -8,6 +8,7 @@ import mindustry.graphics.g3d.*;
 import mindustry.type.*;
 import unity.annotations.Annotations.*;
 import unity.assets.list.*;
+import unity.gen.*;
 import unity.graphics.*;
 import unity.graphics.CompositeMesh.*;
 import unity.planets.*;
@@ -28,7 +29,7 @@ public class UnityPlanets implements ContentList{
                 CompositeMesh.defShader(this),
 
                 //ring
-                GraphicUtils.copy(UnityModels.megalithRing.meshes.first()),
+                GraphicUtils.copy(UnityModels.megalithring.meshes.first()),
                 new ShaderRef<>(UnityShaders.megalithRingShader, UnityShaders.megalithRingShader.cons(this))
             );
 

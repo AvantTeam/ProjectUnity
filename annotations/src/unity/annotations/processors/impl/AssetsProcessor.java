@@ -1,9 +1,9 @@
 package unity.annotations.processors.impl;
 
 import arc.*;
-import arc.assets.*;
 import arc.assets.loaders.SoundLoader.*;
 import arc.audio.*;
+import arc.files.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
@@ -18,6 +18,8 @@ import javax.lang.model.element.*;
 @SuppressWarnings("unused")
 @SupportedAnnotationTypes("java.lang.Override")
 public class AssetsProcessor extends BaseProcessor{
+    Seq<Asset> assets = new Seq<>();
+
     {
         rounds = 2;
     }
@@ -25,154 +27,259 @@ public class AssetsProcessor extends BaseProcessor{
     @Override
     public void process(RoundEnvironment roundEnv) throws Exception{
         if(round == 1){
-            processSounds();
+            assets.clear().addAll(
+                // Sounds
+                new Asset(){
+                    @Override
+                    public TypeElement type(){
+                        return toType(Sound.class);
+                    }
+
+                    @Override
+                    public String directory(){
+                        return "sounds";
+                    }
+
+                    @Override
+                    public String name(){
+                        return "UnitySounds";
+                    }
+
+                    @Override
+                    public boolean valid(Fi file){
+                        return file.extEquals("ogg") || file.extEquals("mp3");
+                    }
+
+                    @Override
+                    public void load(MethodSpec.Builder builder){
+                        builder.beginControlFlow("if(!$T.headless)", cName(Vars.class))
+                            .addStatement("var n = $S + name", directory() + "/")
+                            .addStatement("var path = $T.tree.get(n + $S).exists() ? n + $S : n + $S", cName(Vars.class), ".ogg", ".ogg", ".mp3")
+                            .addCode(lnew())
+                            .addStatement("var sound = new $T()", cName(Sound.class))
+                            .addCode(lnew())
+                            .addStatement("var desc = $T.assets.load(path, $T.class, new $T(sound))", cName(Core.class), cName(Sound.class), cName(SoundParameter.class))
+                            .addStatement("desc.errored = e -> $T.err(($T)e)", cName(Log.class), cName(Throwable.class))
+                            .addCode(lnew())
+                            .addStatement("return sound")
+                        .nextControlFlow("else")
+                            .addStatement("return new $T()", cName(Sound.class))
+                        .endControlFlow();
+                    }
+                },
+
+                // Wavefront Objects
+                new Asset(){
+                    @Override
+                    public TypeElement type(){
+                        return elements.getTypeElement("unity.util.WavefrontObject");
+                    }
+
+                    @Override
+                    public String directory(){
+                        return "objects";
+                    }
+
+                    @Override
+                    public String name(){
+                        return "UnityObjs";
+                    }
+
+                    @Override
+                    public boolean valid(Fi file){
+                        return file.extEquals("obj");
+                    }
+
+                    @Override
+                    public void load(MethodSpec.Builder builder){
+                        builder.beginControlFlow("if(!$T.headless)", cName(Vars.class))
+                            .addStatement("var n = $S + name", directory() + "/")
+                            .addStatement("var path = n + $S", ".obj")
+                            .addCode(lnew())
+                            .addStatement("var object = new $T()", tName(type()))
+                            .addCode(lnew())
+                            .addStatement("var desc = $T.assets.load(path, $T.class, new $T(object))", cName(Core.class), tName(type()), tName(elements.getTypeElement("unity.util.WavefrontObjectLoader.WavefrontObjectParameters")))
+                            .addStatement("desc.errored = e -> $T.err(($T)e)", cName(Log.class), cName(Throwable.class))
+                            .addCode(lnew())
+                            .addStatement("return object")
+                        .nextControlFlow("else")
+                            .addStatement("return new $T()", tName(type()))
+                        .endControlFlow();
+                    }
+                },
+
+                // 3D Models
+                new Asset(){
+                    @Override
+                    public TypeElement type(){
+                        return elements.getTypeElement("unity.assets.type.g3d.Model");
+                    }
+
+                    @Override
+                    public String directory(){
+                        return "models";
+                    }
+
+                    @Override
+                    public String name(){
+                        return "UnityModels";
+                    }
+
+                    @Override
+                    public boolean valid(Fi file){
+                        return file.extEquals("g3db") || file.extEquals("g3dj");
+                    }
+
+                    @Override
+                    public void load(MethodSpec.Builder builder){
+                        builder.beginControlFlow("if(!$T.headless)", cName(Vars.class))
+                            .addStatement("var n = $S + name", directory() + "/")
+                            .addStatement("var path = $T.tree.get(n + $S).exists() ? n + $S : n + $S", cName(Vars.class), ".g3db", ".g3db", ".g3dj")
+                            .addCode(lnew())
+                            .addStatement("var model = new $T()", tName(type()))
+                            .addCode(lnew())
+                            .beginControlFlow("try")
+                                .addStatement("var loader = ($T)$T.assets.getLoader($T.class, path)", tName(elements.getTypeElement("unity.assets.loaders.ModelLoader")), tName(Core.class), tName(type()))
+                                .addStatement("loader.load($T.assets, path, $T.tree.get(path), new $T(model))", cName(Core.class), cName(Vars.class), tName(elements.getTypeElement("unity.assets.loaders.ModelLoader.ModelParameter")))
+                            .nextControlFlow("catch($T t)", cName(Throwable.class))
+                                .addStatement("$T.err(t)", cName(Log.class))
+                            .endControlFlow()
+                            .addCode(lnew())
+                            .addStatement("return model")
+                        .nextControlFlow("else")
+                            .addStatement("return new $T()", tName(type()))
+                        .endControlFlow();
+                    }
+
+                    @Override
+                    public void dispose(MethodSpec.Builder builder){
+
+                    }
+                }
+            );
         }else if(round == 2){
-            processObjects();
+            for(Asset a : assets){
+                TypeElement type = a.type();
+
+                TypeSpec.Builder spec = TypeSpec.classBuilder(a.name()).addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+                    .addMethod(
+                        MethodSpec.constructorBuilder().addModifiers(Modifier.PRIVATE)
+                            .addStatement("throw new $T()", cName(AssertionError.class))
+                        .build()
+                    );
+
+                MethodSpec.Builder specLoad = MethodSpec.methodBuilder("load").addModifiers(Modifier.PROTECTED, Modifier.STATIC)
+                    .returns(tName(type))
+                    .addParameter(cName(String.class), "name");
+
+                a.load(specLoad);
+                spec.addMethod(specLoad.build());
+
+                MethodSpec.Builder specDispose = MethodSpec.methodBuilder("dispose").addModifiers(Modifier.PROTECTED, Modifier.STATIC)
+                    .returns(tName(type))
+                    .addParameter(cName(String.class), "name")
+                    .addParameter(tName(type), "asset");
+
+                a.dispose(specDispose);
+                spec.addMethod(specDispose
+                    .addStatement("return null")
+                    .build()
+                );
+
+                MethodSpec.Builder globalLoad = MethodSpec.methodBuilder("load").addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                    .returns(TypeName.VOID);
+                MethodSpec.Builder globalDispose = MethodSpec.methodBuilder("dispose").addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                    .returns(TypeName.VOID);
+
+                boolean useProp = a.properties();
+
+                Fi propFile = rootDir.child("main/assets/" + a.directory() + "/" + a.propertyFile());
+                ObjectMap<String, String> temp = null;
+                if(useProp) PropertiesUtils.load(temp = new ObjectMap<>(), propFile.reader());
+
+                ObjectMap<String, String> properties = temp; // Implicitly final, for use in lambda statements
+
+                String dir = "main/assets/" + a.directory();
+                rootDir.child(dir).walk(path -> {
+                    if((a.properties() && path.equals(propFile)) || !a.valid(path)) return;
+
+                    String p = path.absolutePath();
+                    String name = p.substring(p.lastIndexOf(dir) + dir.length() + 1);
+                    String fieldName = Strings.kebabToCamel(path.nameWithoutExtension());
+                    int ex = path.extension().length() + 1;
+
+                    spec.addField(
+                        FieldSpec.builder(
+                            tName(type),
+                            fieldName,
+                            Modifier.PUBLIC, Modifier.STATIC
+                        ).build()
+                    );
+
+                    String stripped = name.substring(0, name.length() - ex);
+                    globalLoad.addStatement("$L = load($S)", fieldName, stripped);
+                    globalDispose.addStatement("$L = dispose($S, $L)", fieldName, stripped, fieldName);
+
+                    if(a.properties()){
+                        Seq<String> props = properties.keys().toSeq().select(prop -> prop.split("\\.")[1].equals(stripped));
+                        for(String prop : props){
+                            String field = prop.split("\\.")[2];
+                            String val = properties.get(prop);
+
+                            if(!val.startsWith("[")){
+                                globalLoad.addStatement("$L.$L = $L", fieldName, field, val);
+                            }else{
+                                Seq<String> rawargs = Seq.with(val.substring(1, val.length() - 1).split("\\s*,\\s*"));
+                                String format = rawargs.remove(0);
+
+                                Seq<Object> args = rawargs.map(elements::getTypeElement);
+                                args.insert(0, fieldName);
+                                args.insert(1, field);
+
+                                globalLoad.addStatement("$L.$L = " + format, args.toArray());
+                            }
+                        }
+                    }
+                });
+
+                spec.addMethod(globalLoad.build());
+                spec.addMethod(globalDispose.build());
+
+                write(spec.build());
+            }
         }
     }
 
-    void processSounds() throws Exception{
-        TypeSpec.Builder soundSpec = TypeSpec.classBuilder("UnitySounds").addModifiers(Modifier.PUBLIC)
-            .addJavadoc("Unity's {@link $T} effects", cName(Sound.class))
-            .addMethod(
-                MethodSpec.methodBuilder("loadSound").addModifiers(Modifier.PROTECTED, Modifier.STATIC)
-                    .addJavadoc(
-                        CodeBlock.builder()
-                            .add("Loads a {@link $T}" + lnew(), cName(Sound.class))
-                            .add("@param soundName The {@link $T} name" + lnew(), cName(Sound.class))
-                            .add("@return The {@link $T}", cName(Sound.class))
-                        .build()
-                    )
-                    .returns(cName(Sound.class))
-                    .addParameter(cName(String.class), "soundName")
-                    .beginControlFlow("if(!$T.headless)", cName(Vars.class))
-                        .addStatement("$T name = $S + soundName", cName(String.class), "sounds/")
-                        .addStatement("$T path = $T.tree.get(name + $S).exists() ? name + $S : name + $S", cName(String.class), cName(Vars.class), ".ogg", ".ogg", ".mp3")
-                        .addCode(lnew())
-                        .addStatement("var sound = new $T()", cName(Sound.class))
-                        .addCode(lnew())
-                        .addStatement("$T<?> desc = $T.assets.load(path, $T.class, new $T(sound))", cName(AssetDescriptor.class), cName(Core.class), cName(Sound.class), cName(SoundParameter.class))
-                        .addStatement("desc.errored = $T::printStackTrace", cName(Throwable.class))
-                        .addCode(lnew())
-                        .addStatement("return sound")
-                    .nextControlFlow("else")
-                        .addStatement("return new $T()", cName(Sound.class))
-                    .endControlFlow()
-                .build()
-            );
-        MethodSpec.Builder load = MethodSpec.methodBuilder("load").addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-            .addJavadoc("Loads all {@link $T}s", cName(Sound.class))
-            .returns(TypeName.VOID);
+    interface Asset{
+        /** @return The type of the asset */
+        TypeElement type();
 
-        String dir = "main/assets/sounds/";
-        rootDir.child(dir).walk(path -> {
-            String p = path.absolutePath();
-            String name = p.substring(p.lastIndexOf(dir) + dir.length());
-            String fname = path.nameWithoutExtension();
-            int ex = path.extension().length() + 1;
+        /** @return The asset directory, must not be surrounded with {@code /} */
+        String directory();
 
-            soundSpec.addField(
-                FieldSpec.builder(
-                    cName(Sound.class),
-                    Strings.kebabToCamel(fname),
-                    Modifier.PUBLIC, Modifier.STATIC
-                )
-                .build()
-            );
+        /** @return The class name */
+        String name();
 
-            String stripped = name.substring(0, name.length() - ex);
-            load.addStatement("$L = loadSound($S)", Strings.kebabToCamel(fname), stripped);
-        });
+        /** @return Whether to apply custom properties to the asset */
+        default boolean properties(){
+            return false;
+        }
 
-        soundSpec.addMethod(load.build());
-        write(soundSpec.build());
-    }
+        /**
+         * @return The property tile, looked up if {@link #properties()} is true. This file's path is relative to
+         * {@link #directory()} and must not be surrounded with {@code /}
+         */
+        default String propertyFile(){
+            return "";
+        }
 
-    void processObjects() throws Exception{
-        TypeElement wavefrontObject = elements.getTypeElement("unity.util.WavefrontObject");
+        /** File checker, use to prevent unrelated files getting parsed into assets */
+        boolean valid(Fi file);
 
-        TypeSpec.Builder objSpec = TypeSpec.classBuilder("UnityObjs").addModifiers(Modifier.PUBLIC)
-            .addJavadoc("Unity's wavefront objects")
-            .addMethod(
-                MethodSpec.methodBuilder("loadObject").addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                    .addJavadoc(
-                        CodeBlock.builder()
-                            .add("Loads a {@link $T}" + lnew(), tName(wavefrontObject))
-                            .add("@param objName The {@link $T} name" + lnew(), tName(wavefrontObject))
-                            .add("@return The {@link $T}", tName(wavefrontObject))
-                        .build()
-                    )
-                    .returns(tName(wavefrontObject))
-                    .addParameter(cName(String.class), "objName")
-                    .beginControlFlow("if(!$T.headless)", cName(Vars.class))
-                        .addStatement("$T name = $S + objName", cName(String.class), "objects/")
-                        .addStatement("$T path = name + $S", cName(String.class), ".obj")
-                        .addCode(lnew())
-                        .addStatement("var object = new $T()", tName(wavefrontObject))
-                        .addCode(lnew())
-                        .addStatement("$T<?> desc = $T.assets.load(path, $T.class, new $T(object))", cName(AssetDescriptor.class), cName(Core.class), tName(wavefrontObject), tName(elements.getTypeElement("unity.util.WavefrontObjectLoader.WavefrontObjectParameters")))
-                        .addStatement("desc.errored = $T::printStackTrace", cName(Throwable.class))
-                        .addCode(lnew())
-                        .addStatement("return object")
-                    .nextControlFlow("else")
-                        .addStatement("return new $T()", tName(wavefrontObject))
-                    .endControlFlow()
-                .build()
-            );
-        MethodSpec.Builder load = MethodSpec.methodBuilder("load").addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-            .addJavadoc("Loads all {@link $T}s", tName(wavefrontObject))
-            .returns(TypeName.VOID);
+        /** Method builder for asset loading */
+        void load(MethodSpec.Builder builder);
 
-        ObjectMap<String, String> objProp = new ObjectMap<>();
-        PropertiesUtils.load(objProp, rootDir.child("main/assets/objects/objects.properties").reader());
-
-        String dir = "main/assets/objects/";
-        boolean[] first = {true};
-        rootDir.child(dir).walk(path -> {
-            if(!path.extEquals("obj")) return;
-
-            String p = path.absolutePath();
-            String name = p.substring(p.lastIndexOf(dir) + dir.length());
-            String fname = path.nameWithoutExtension();
-            int ex = 4;
-
-            objSpec.addField(
-                FieldSpec.builder(
-                    tName(wavefrontObject),
-                    Strings.kebabToCamel(fname),
-                    Modifier.PUBLIC, Modifier.STATIC
-                )
-                .build()
-            );
-
-            if(!first[0]) load.addStatement(lnew());
-
-            String stripped = name.substring(0, name.length() - ex);
-            load.addStatement("$L = loadObject($S)", Strings.kebabToCamel(fname), stripped);
-
-            Seq<String> props = objProp.keys().toSeq().select(prop -> prop.split("\\.")[1].equals(stripped));
-            for(String prop : props){
-                String field = prop.split("\\.")[2];
-                String val = objProp.get(prop);
-
-                if(!val.startsWith("[")){
-                    load.addStatement("$L.$L = $L", Strings.kebabToCamel(fname), field, val);
-                }else{
-                    Seq<String> rawargs = Seq.with(val.substring(1, val.length() - 1).split("\\s*,\\s*"));
-                    String format = rawargs.remove(0);
-
-                    Seq<Object> args = rawargs.map(elements::getTypeElement);
-                    args.insert(0, Strings.kebabToCamel(fname));
-                    args.insert(1, field);
-
-                    load.addStatement("$L.$L = " + format, args.toArray());
-                }
-            }
-
-            first[0] = false;
-        });
-
-        objSpec.addMethod(load.build());
-        write(objSpec.build());
+        /** Method builder for asset disposing */
+        default void dispose(MethodSpec.Builder builder){}
     }
 }
