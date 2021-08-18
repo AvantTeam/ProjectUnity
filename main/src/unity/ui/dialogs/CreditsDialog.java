@@ -1,6 +1,7 @@
 package unity.ui.dialogs;
 
 import arc.*;
+import arc.flabel.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.scene.style.*;
@@ -108,7 +109,7 @@ public class CreditsDialog extends BaseDialog{
                     
                     t.pane(p -> {
                         for(String c : list){
-                            p.add("[lightgray]" + c).left().pad(3f).padLeft(6f).padRight(6f);
+                            p.add(new FLabel("{wave}{rainbow}[lightgray]" + c)).left().pad(3f).padLeft(6f).padRight(6f);
                             p.row();
                         }
                     });

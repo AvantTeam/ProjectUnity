@@ -2,7 +2,6 @@ package unity.mod;
 
 import arc.struct.*;
 
-/** @deprecated There's got to be a better way to do this */
 public final class ContributorList{
     private static final ObjectMap<ContributionType, Seq<String>> contributors = ObjectMap.of(
         // DO NOT INSERT COLORS!
