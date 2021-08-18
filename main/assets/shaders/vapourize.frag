@@ -14,6 +14,7 @@ uniform vec4 tocolor;
 uniform float progress;
 uniform float colorprog;
 uniform float fragprogress;
+uniform float size;
 
 varying vec2 v_texCoords;
 
@@ -22,7 +23,7 @@ const float mdist = 1.0;
 void main(){
     vec2 T = v_texCoords.xy;
     vec2 v = u_invsize.xy;
-    vec2 pos = ((T * u_texsize) + u_offset) / 100.0;
+    vec2 pos = ((T * u_texsize) + u_offset) / (100.0 + size);
 
     vec2 windpos = ((T * u_texsize) + u_offset - position) / 100.0;
     
@@ -35,10 +36,10 @@ void main(){
 
     vec4 noise = texture2D(u_noise, pos);
 
-    vec2 frag = noise.xy * -windpos * v;
+    vec2 frag = noise.xy * -windpos;
 
-    vec4 color = texture2D(u_texture, T + frag);
-    vec4 n = texture2D(u_noise, pos + ((frag / v) / 100.0));
+    vec4 color = texture2D(u_texture, T + (frag * v));
+    vec4 n = texture2D(u_noise, pos + (frag / (100.0 + size)));
 
     if(n.z - progress < 0.001){
         color.a = 0.0;
