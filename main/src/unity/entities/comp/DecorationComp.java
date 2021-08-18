@@ -9,7 +9,7 @@ import unity.type.decal.UnitDecorationType.*;
 @SuppressWarnings("unused")
 @EntityComponent
 abstract class DecorationComp implements Unitc{
-    UnitDecoration[] decors = {};
+    transient UnitDecoration[] decors = {};
 
     @Override
     @MethodPriority(1)

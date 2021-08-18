@@ -1,6 +1,7 @@
 package unity.entities.comp;
 
 import arc.math.*;
+import arc.math.geom.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.entities.units.*;
@@ -28,7 +29,7 @@ abstract class EndComp implements Unitc, Factionc{
     @Import UnitType type;
     @Import WeaponMount[] mounts;
     @Import Team team;
-    @Import float health, maxHealth, hitTime, healthMultiplier, shield, shieldAlpha, armor, x, y, elevation;
+    @Import float health, maxHealth, hitTime, healthMultiplier, speedMultiplier, shield, shieldAlpha, armor, x, y, elevation, rotation;
     @Import boolean dead;
 
     @Override
@@ -61,12 +62,6 @@ abstract class EndComp implements Unitc, Factionc{
         }else{
             Unity.antiCheat.removeUnit(self());
         }
-    }
-
-    @Override
-    @Replace
-    public float realSpeed(){
-        return Mathf.lerp(1f, type.canBoost ? type.boostMultiplier : 1f, elevation) * speed() * floorSpeedMultiplier() * (aggression + 1f);
     }
 
     @MethodPriority(-1)
@@ -106,6 +101,21 @@ abstract class EndComp implements Unitc, Factionc{
                 aggression = Mathf.lerpDelta(aggression, 0f, 0.1f);
             }
         }
+    }
+
+    @Override
+    @Replace
+    public void rotateMove(Vec2 vec){
+        moveAt(Tmp.v2.trns(rotation, vec.len()));
+
+        if(!vec.isZero()){
+            rotation = Angles.moveToward(rotation, vec.angle(), type.rotateSpeed * (aggression + 1f) * Math.max(Time.delta, 1));
+        }
+    }
+
+    @Insert(value = "update()", block = Statusc.class)
+    void updateAggroSpeed(){
+        speedMultiplier *= aggression + 1f;
     }
 
     @Replace

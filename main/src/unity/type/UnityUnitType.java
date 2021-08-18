@@ -43,6 +43,7 @@ public class UnityUnitType extends UnitType{
     public float segmentDamageScl = 6f;
     public float anglePhysicsSmooth = 0f;
     public float jointStrength = 1f;
+    public float barrageRange = 150f;
     // Hopefully make segment movement more consistent
     public boolean counterDrag = false;
     public boolean splittable = false, chainable = false;
@@ -247,7 +248,7 @@ public class UnityUnitType extends UnitType{
         drawOutline(unit);
         drawWeaponOutlines(unit);
 
-        if(unit.isTail()){
+        if(unit.isTail() && unit.layer() < maxSegments){
             Draw.draw(z, () -> {
                 Tmp.v1.trns(unit.rotation + 180f, segmentOffset).add(unit);
                 Drawf.construct(Tmp.v1.x, Tmp.v1.y, tailRegion, unit.rotation - 90f, unit.regenTime() / regenTime, 1f, unit.regenTime());

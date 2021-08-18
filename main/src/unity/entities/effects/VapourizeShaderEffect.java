@@ -138,6 +138,7 @@ public class VapourizeShaderEffect extends Effect{
                         s.progress = Interp.pow2In.apply(in);
                         s.windSource.set(datab instanceof Position p ? p : draw);
                         s.fragProgress = Interp.pow3In.apply(in) * c;
+                        s.size = c;
                         buffer.begin(Color.clear);
                         draw.draw();
                         buffer.end();
@@ -156,6 +157,7 @@ public class VapourizeShaderEffect extends Effect{
                     s.progress = Interp.pow2In.apply(in);
                     s.windSource.set((Position)datab);
                     s.fragProgress = Interp.pow3In.apply(in) * windScl;
+                    s.size = 0f;
                     buffer.begin(Color.clear);
 
                     for(Building d : drwA){

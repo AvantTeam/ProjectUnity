@@ -96,7 +96,7 @@ public class UnityShaders{
         public Vec2 windSource = new Vec2();
         public FrameBuffer buffer = new FrameBuffer();
         public Color toColor = new Color();
-        public float progress, colorProgress, fragProgress;
+        public float progress, colorProgress, fragProgress, size;
 
         public VapourizeShader(){
             super(
@@ -124,6 +124,7 @@ public class UnityShaders{
 
             setUniformf("tocolor", toColor);
             setUniformf("colorprog", colorProgress);
+            setUniformf("size", size);
 
             setUniformf("u_texsize", Core.camera.width, Core.camera.height);
             setUniformf("u_invsize", 1f / Core.camera.width, 1f / Core.camera.height);

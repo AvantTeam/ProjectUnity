@@ -3,6 +3,7 @@ package unity.util;
 import arc.*;
 import arc.func.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
@@ -23,20 +24,12 @@ import static mindustry.Vars.*;
 
 public class BlockMovement{
     //ported from Facdustrio
-    static class IntVec2{
-        int x, y;
-
-        public IntVec2(int x, int y){
-            this.x = x;
-            this.y = y;
-        }
-    }
 
     //directions
-    public static IntVec2[] dirs = {new IntVec2(1, 0), new IntVec2(0, 1), new IntVec2(-1, 0), new IntVec2(0, -1)};
+    public static Point2[] dirs = {new Point2(1, 0), new Point2(0, 1), new Point2(-1, 0), new Point2(0, -1)};
     //like starting points for locations based on the direction you want? hard to explain. You wouldnt need it
     // directly anyway.
-    public static IntVec2[][] origins = new IntVec2[16][];
+    public static Point2[][] origins = new Point2[16][];
 
     public static void init(){
         for(int size = 1; size <= 16; size++){
@@ -55,9 +48,9 @@ public class BlockMovement{
                     }
                 }
                 if(origins[size - 1] == null){
-                    origins[size - 1] = new IntVec2[4];
+                    origins[size - 1] = new Point2[4];
                 }
-                origins[size - 1][side] = new IntVec2(ogx, ogy);
+                origins[size - 1][side] = new Point2(ogx, ogy);
             }
         }
 
@@ -65,10 +58,10 @@ public class BlockMovement{
         Events.on(WorldLoadEvent.class, e -> BlockMovement.onMapLoad());
     }
 
-    public static IntVec2 getNearbyPosition(Block block, int direction, int index){
-        IntVec2 tangent = dirs[(direction + 1) % 4];
-        IntVec2 o = origins[block.size - 1][direction];
-        return new IntVec2(o.x + tangent.x * index + dirs[direction].x, o.y + tangent.y * index + dirs[direction].y);
+    public static Point2 getNearbyPosition(Block block, int direction, int index){
+        Point2 tangent = dirs[(direction + 1) % 4];
+        Point2 o = origins[block.size - 1][direction];
+        return new Point2(o.x + tangent.x * index + dirs[direction].x, o.y + tangent.y * index + dirs[direction].y);
     }
 
     //returns whether a building is allowed to be pushed.
@@ -103,8 +96,8 @@ public class BlockMovement{
         if(!pushable(build))
             return false;
 
-        IntVec2 tangent = dirs[(direction + 1) % 4];
-        IntVec2 o = origins[build.block.size - 1][direction];
+        Point2 tangent = dirs[(direction + 1) % 4];
+        Point2 o = origins[build.block.size - 1][direction];
         for(int i = 0; i < build.block.size; i++){ // iterate over forward edge.
             Tile t = build.tile.nearby(o.x + tangent.x * i + dirs[direction].x,
                 o.y + tangent.y * i + dirs[direction].y);
@@ -188,8 +181,8 @@ public class BlockMovement{
             }else{
                 contacts.add(next);
             }
-            IntVec2 tangent = dirs[(direction + 1) % 4];
-            IntVec2 o = origins[next.block.size - 1][direction];
+            Point2 tangent = dirs[(direction + 1) % 4];
+            Point2 o = origins[next.block.size - 1][direction];
             for(int i = 0; i < next.block.size; i++){ // iterate over forward edge.
                 Tile t = next.tile.nearby(o.x + tangent.x * i + dirs[direction].x,
                     o.y + tangent.y * i + dirs[direction].y);
@@ -293,12 +286,12 @@ public class BlockMovement{
     //however currently there are visual artifacts if its applied too quickly in succession.
     static class BlockMovementUpdater{
         Building build;
-        IntVec2 dir;
+        Point2 dir;
         float delay;
         float timer;
         float ox, oy;
 
-        public BlockMovementUpdater(Building building, IntVec2 dir, float delay, float timer, float ox, float oy){
+        public BlockMovementUpdater(Building building, Point2 dir, float delay, float timer, float ox, float oy){
             this.build = building;
             this.dir = dir;
             this.delay = delay;

@@ -2,44 +2,37 @@ package unity.mod;
 
 import arc.struct.*;
 
-/** @deprecated There's got to be a better way to do this */
 public final class ContributorList{
-    private static final IntMap<Seq<String>> contributors = new IntMap<>(ContributionType.all.length);
-
-    public static void init(){
-        for(ContributionType type : ContributionType.all){
-            contributors.put(type.ordinal(), new Seq<>());
-        }
-
+    private static final ObjectMap<ContributionType, Seq<String>> contributors = ObjectMap.of(
         // DO NOT INSERT COLORS!
-        contributors.get(ContributionType.collaborator.ordinal()).addAll(
-            "Eldoofus",
-            "Gdeft",
+        ContributionType.collaborator, Seq.with(
             "GlennFolker",
-            "Goobrr",
             "JerichoFletcher",
             "sk7725",
-            "ThePythonGuy3",
-            "ThirstyBoi",
-            "Txar",
             "Xelo",
-            "Xusk",
             "younggam",
             "MEEP of Faith"
-        );
+        ),
 
-        contributors.get(ContributionType.contributor.ordinal()).addAll(
-            "Drullkus"
-        );
+        ContributionType.contributor, Seq.with(
+            "Drullkus",
+            "Anuke",
+            "ThePythonGuy3",
+            "ThirstyBoi",
+            "Xusk",
+            "Eldoofus",
+            "Evl",
+            "Goobrr"
+        ),
 
-        contributors.get(ContributionType.translator.ordinal()).addAll(
+        ContributionType.translator, Seq.with(
             "sk7725 (Korean)",
             "Xusk (Russian)"
-        );
-    }
+        )
+    );
 
     public static Seq<String> getBy(ContributionType type){
-        return contributors.get(type.ordinal());
+        return contributors.get(type);
     }
 
     public enum ContributionType{
