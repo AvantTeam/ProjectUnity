@@ -3889,6 +3889,28 @@ public class UnityUnitTypes implements ContentList{
                 new Wing(1, 17.5f, -10f, 0.6666f, 20f),
                 new Wing(1, 21.25f, 2.75f, 0.8333f, 20f));
             }});
+
+            BulletType t = new BulletType(0f, 5f){{
+                status = StatusEffects.slow;
+                statusDuration = 20f;
+                maxRange = 290f;
+            }};
+
+            weapons.add(new TractorBeamWeapon(name + "-mount"){{
+                x = 18.75f;
+                y = 22.5f;
+                shootY = 8.75f + 2f;
+                pullStrength = 40f;
+                scaledForce = 50f;
+                bullet = t;
+            }}, new TractorBeamWeapon(name + "-mount"){{
+                x = 19.75f;
+                y = 63f;
+                shootY = 8.75f + 2f;
+                pullStrength = 40f;
+                scaledForce = 50f;
+                bullet = t;
+            }});
         }};
 
         //endregion
