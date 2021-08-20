@@ -24,7 +24,6 @@ import static mindustry.Vars.*;
 import static unity.Unity.*;
 
 public class UnityShaders{
-    public static HolographicShieldShader holoShield;
     public static StencilShader stencilShader;
     public static MegalithRingShader megalithRingShader;
     public static Graphics3DShaderProvider graphics3DProvider;
@@ -37,9 +36,8 @@ public class UnityShaders{
         if(headless) return;
 
         buffer = new FrameBuffer();
-        var conds = new CondShader[]{
-            holoShield = new HolographicShieldShader()
-        };
+        var conds = new CondShader[]{};
+
         vapourizeShader = new VapourizeShader();
         stencilShader = new StencilShader();
         megalithRingShader = new MegalithRingShader();
@@ -69,7 +67,6 @@ public class UnityShaders{
         if(!headless && loaded){
             if(buffer != null) buffer.dispose();
 
-            holoShield.dispose();
             stencilShader.dispose();
             vapourizeShader.dispose();
             megalithRingShader.dispose();
@@ -150,21 +147,6 @@ public class UnityShaders{
             setUniformf("stencilcolor", stencilColor);
             setUniformf("heatcolor", heatColor);
             setUniformf("u_invsize", 1f / Core.camera.width, 1f / Core.camera.height);
-        }
-    }
-
-    public static class HolographicShieldShader extends CondShader{
-        public HolographicShieldShader(){
-            super(
-                Core.files.internal("shaders/screenspace.vert"),
-                tree.get("shaders/holographicshield.frag"),
-                () -> renderer.animateShields
-            );
-        }
-
-        @Override
-        public void apply(){
-            setUniformf("u_time", Time.time);
         }
     }
 

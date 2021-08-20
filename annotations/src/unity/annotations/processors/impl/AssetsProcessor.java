@@ -153,7 +153,7 @@ public class AssetsProcessor extends BaseProcessor{
 
                     @Override
                     public void dispose(MethodSpec.Builder builder){
-
+                        builder.addStatement("asset.dispose()");
                     }
                 }
             );

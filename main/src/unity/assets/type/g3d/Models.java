@@ -39,9 +39,9 @@ public class Models{
             environment.set(ColorAttribute.createAmbientLight(0.4f, 0.4f, 0.4f, 1f));
             environment.add(new DirectionalLight().set(0.56f, 0.56f, 0.56f, -1f, -1f, -0.3f));
 
-            Core.assets.loadRun("unity-models-init", Models.class, () -> {}, () -> buffer = new FrameBuffer(2, 2, true));
-            Triggers.listen(Trigger.preDraw, () -> {
-                if(buffer != null) buffer.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
+            Core.app.post(() -> {
+                buffer = new FrameBuffer(2, 2, true);
+                Triggers.listen(Trigger.preDraw, () -> buffer.resize(Core.graphics.getWidth(), Core.graphics.getHeight()));
             });
         }else{
             camera = null;
@@ -85,6 +85,9 @@ public class Models{
         Gl.depthRangef(camera.near, camera.far);
         Gl.depthMask(true);
 
+        Gl.enable(Gl.blend);
+        Gl.blendFunc(Blending.normal.src, Blending.normal.dst);
+
         Gl.clear(Gl.colorBufferBit | Gl.depthBufferBit);
     }
 
@@ -94,6 +97,7 @@ public class Models{
 
         Gl.disable(Gl.cullFace);
         Gl.disable(Gl.depthTest);
+        Gl.disable(Gl.blend);
     }
 
     private static class RenderPool implements Prov<Renderable>{

@@ -22,14 +22,12 @@ import mindustry.world.consumers.*;
 import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 import unity.annotations.Annotations.*;
-import unity.assets.list.*;
 import unity.content.effects.*;
 import unity.entities.bullet.*;
 import unity.entities.bullet.exp.*;
 import unity.gen.*;
 import unity.graphics.*;
 import unity.mod.*;
-import unity.util.*;
 import unity.world.blocks.*;
 import unity.world.blocks.defense.*;
 import unity.world.blocks.defense.turrets.*;
@@ -177,7 +175,7 @@ public class UnityBlocks implements ContentList{
 
     //defense
     public static @FactionDef("monolith")
-    Block electrophobicWall, electrophobicWallLarge, deflectorAura;
+    Block electrophobicWall, electrophobicWallLarge;
 
     //turret
     public static @FactionDef("monolith")
@@ -208,6 +206,9 @@ public class UnityBlocks implements ContentList{
     Block oracle;
 
     public static @FactionDef("monolith")
+    Block prism;
+
+    public static @FactionDef("monolith")
     @LoadRegs(value = {
         "supernova-head",
         "supernova-core",
@@ -215,7 +216,6 @@ public class UnityBlocks implements ContentList{
         "supernova-wing-left-bottom", "supernova-wing-right-bottom",
         "supernova-bottom"
     }, outline = true)
-    @Merge(base = AttractLaserTurret.class, value = {Turretc.class, Soulc.class})
     Block supernova;
 
     //---------- youngcha faction ----------
@@ -1844,14 +1844,6 @@ public class UnityBlocks implements ContentList{
 
         loreMonolith = new LoreMessageBlock("lore-monolith", Faction.monolith);
 
-        deflectorAura = new DeflectProjector("deflector-aura"){{
-            requirements(Category.defense, with(Items.copper, 1));
-            size = 4;
-            radius = 20f * tilesize;
-
-            consumes.power(4f);
-        }};
-
         debrisExtractor = new SoulFloorExtractor("debris-extractor"){
             final int effectTimer = timers++;
 
@@ -2060,13 +2052,14 @@ public class UnityBlocks implements ContentList{
             inaccuracy = 2f;
             rotateSpeed = 12f;
             shootSound = UnitySounds.energyBolt;
-            shootType = UnityBullets.ricochetSmall;
+            shootType = UnityBullets.ricochetSmall.copy();
 
             requireSoul = false;
             efficiencyFrom = 0.8f;
             efficiencyTo = 1.5f;
 
-            damageMultiplier((SoulTurretPowerTurretBuild build) -> efficiencyFrom + (build.souls() / (float)maxSouls) * efficiencyTo);
+            float base = shootType.damage;
+            progression.linear(efficiencyFrom, (efficiencyTo - efficiencyFrom) / maxSouls, f -> shootType.damage = base * f);
         }};
 
         diviner = new SoulTurretPowerTurret("diviner"){{
@@ -2081,6 +2074,7 @@ public class UnityBlocks implements ContentList{
             targetGround = true;
             targetAir = false;
             shootSound = UnitySounds.energyBolt;
+
             shootType = new LaserBulletType(200f){{
                 length = 85f;
             }};
@@ -2089,7 +2083,8 @@ public class UnityBlocks implements ContentList{
             efficiencyFrom = 0.8f;
             efficiencyTo = 1.5f;
 
-            damageMultiplier((SoulTurretPowerTurretBuild build) -> efficiencyFrom + (build.souls() / (float)maxSouls) * efficiencyTo);
+            float base = shootType.damage;
+            progression.linear(efficiencyFrom, (efficiencyTo - efficiencyFrom) / maxSouls, f -> shootType.damage = base * f);
         }};
 
         lifeStealer = new SoulLifeStealerTurret("life-stealer"){{
@@ -2110,9 +2105,9 @@ public class UnityBlocks implements ContentList{
         recluse = new SoulTurretItemTurret("recluse"){{
             requirements(Category.turret, with(Items.lead, 15, UnityItems.monolite, 20));
             ammo(
-                Items.lead, UnityBullets.stopLead,
-                UnityItems.monolite, UnityBullets.stopMonolite,
-                Items.silicon, UnityBullets.stopSilicon
+                Items.lead, UnityBullets.stopLead.copy(),
+                UnityItems.monolite, UnityBullets.stopMonolite.copy(),
+                Items.silicon, UnityBullets.stopSilicon.copy()
             );
 
             size = 1;
@@ -2129,7 +2124,10 @@ public class UnityBlocks implements ContentList{
             efficiencyFrom = 0.8f;
             efficiencyTo = 1.5f;
 
-            damageMultiplier((SoulTurretItemTurretBuild build) -> efficiencyFrom + (build.souls() / (float)maxSouls) * efficiencyTo);
+            for(var b : ammoTypes.values()){
+                float base = b.damage;
+                progression.linear(efficiencyFrom, (efficiencyTo - efficiencyFrom) / maxSouls, f -> b.damage = base * f);
+            }
         }};
 
         absorberAura = new SoulAbsorberTurret("absorber-aura"){{
@@ -2173,7 +2171,8 @@ public class UnityBlocks implements ContentList{
             efficiencyFrom = 0.8f;
             efficiencyTo = 1.6f;
 
-            damageMultiplier((SoulTurretPowerTurretBuild build) -> efficiencyFrom + (build.souls() / (float)maxSouls) * efficiencyTo);
+            float base = shootType.damage;
+            progression.linear(efficiencyFrom, (efficiencyTo - efficiencyFrom) / maxSouls, f -> shootType.damage = base * f);
         }};
 
         blackout = new SoulTurretPowerTurret("blackout"){{
@@ -2220,7 +2219,8 @@ public class UnityBlocks implements ContentList{
             efficiencyFrom = 0.8f;
             efficiencyTo = 1.6f;
 
-            damageMultiplier((SoulTurretPowerTurretBuild build) -> efficiencyFrom + (build.souls() / (float)maxSouls) * efficiencyTo);
+            float base = shootType.damage;
+            progression.linear(efficiencyFrom, (efficiencyTo - efficiencyFrom) / maxSouls, f -> shootType.damage = base * f);
         }};
 
         shellshock = new SoulTurretPowerTurret("shellshock"){{
@@ -2235,7 +2235,7 @@ public class UnityBlocks implements ContentList{
             shootCone = 3f;
             ammoUseEffect = Fx.none;
             rotateSpeed = 10f;
-            shootType = UnityBullets.ricochetMedium;
+            shootType = UnityBullets.ricochetMedium.copy();
             shootSound = UnitySounds.energyBolt;
 
             requireSoul = false;
@@ -2243,7 +2243,8 @@ public class UnityBlocks implements ContentList{
             efficiencyFrom = 0.8f;
             efficiencyTo = 1.6f;
 
-            damageMultiplier((SoulTurretPowerTurretBuild build) -> efficiencyFrom + (build.souls() / (float)maxSouls) * efficiencyTo);
+            float base = shootType.damage;
+            progression.linear(efficiencyFrom, (efficiencyTo - efficiencyFrom) / maxSouls, f -> shootType.damage = base * f);
         }};
 
         heatRay = new SoulHeatRayTurret("heat-ray"){{
@@ -2306,7 +2307,8 @@ public class UnityBlocks implements ContentList{
             efficiencyFrom = 0.7f;
             efficiencyTo = 1.67f;
 
-            damageMultiplier((SoulTurretBurstPowerTurretBuild build) -> efficiencyFrom + (build.souls() / (float)maxSouls) * efficiencyTo);
+            float base = shootType.damage;
+            progression.linear(efficiencyFrom, (efficiencyTo - efficiencyFrom) / maxSouls, f -> shootType.damage = base * f);
         }};
 
         purge = new SoulTurretPowerTurret("purge"){{
@@ -2321,7 +2323,7 @@ public class UnityBlocks implements ContentList{
             shootCone = 3f;
             ammoUseEffect = Fx.none;
             rotateSpeed = 8f;
-            shootType = UnityBullets.ricochetBig;
+            shootType = UnityBullets.ricochetBig.copy();
             shootSound = UnitySounds.energyBolt;
 
             requireSoul = false;
@@ -2329,13 +2331,15 @@ public class UnityBlocks implements ContentList{
             efficiencyFrom = 0.7f;
             efficiencyTo = 1.67f;
 
-            damageMultiplier((SoulTurretPowerTurretBuild build) -> efficiencyFrom + (build.souls() / (float)maxSouls) * efficiencyTo);
+            float base = shootType.damage;
+            progression.linear(efficiencyFrom, (efficiencyTo - efficiencyFrom) / maxSouls, f -> shootType.damage = base * f);
         }};
 
         incandescence = new SoulHeatRayTurret("incandescence"){{
             requirements(Category.turret, with(UnityItems.monolite, 250, Items.phaseFabric, 45, UnityItems.monolithAlloy, 100));
 
             size = 3;
+            health = 1680;
             range = 180f;
             targetGround = true;
             targetAir = true;
@@ -2353,253 +2357,63 @@ public class UnityBlocks implements ContentList{
             laserAlpha((SoulHeatRayTurretBuild b) -> b.power.status * (0.7f + b.soulf() * 0.3f));
         }};
 
-        supernova = new SoulTurretAttractLaserTurret("supernova"){
-            /** Temporary vector array to be used in the drawing method */
-            final Vec2[] phases = {new Vec2(), new Vec2(), new Vec2(), new Vec2(), new Vec2(), new Vec2()};
-            final float starRadius;
-            final float starOffset;
+        prism = new PrismTurret("prism"){{
+            requirements(Category.turret, with(Items.copper, 1));
 
-            final int timerChargeStar = timers++;
-            final Effect starEffect;
-            final Effect chargeStarEffect;
-            final Effect chargeStar2Effect;
-            final Effect chargeBeginEffect;
-            final Effect starDecayEffect;
-            final Effect heatWaveEffect;
-            final Effect pullEffect;
+            size = 4;
+            health = 2800;
+            range = 320f;
+            targetGround = true;
+            targetAir = true;
 
-            {
-                requirements(Category.turret, with(Items.surgeAlloy, 500, Items.silicon, 650, UnityItems.archDebris, 350, UnityItems.monolithAlloy, 325));
+            shootSound = Sounds.shotgun;
+            model = UnityModels.prism;
+            powerUse = 8f;
 
-                size = 7;
-                health = 8100;
-                powerUse = 24f;
+            requireSoul = false;
+            maxSouls = 7;
+            efficiencyFrom = 0.7f;
+            efficiencyTo = 1.67f;
 
-                shootLength = size * tilesize / 2f - 8f;
-                rotateSpeed = 1f;
-                recoilAmount = 4f;
-                cooldown = 0.006f;
+            shootType = new BulletType(0.0001f, 240f);
 
-                shootCone = 15f;
-                range = 250f;
-                starRadius = 8f;
-                starOffset = -2.25f;
+            float base = shootType.damage;
+            progression.linear(efficiencyFrom, (efficiencyTo - efficiencyFrom) / maxSouls, f -> shootType.damage = base * f);
+        }};
 
-                chargeSound = UnitySounds.supernovaCharge;
-                chargeSoundVolume = 1f;
-                shootSound = UnitySounds.supernovaShoot;
-                loopSound = UnitySounds.supernovaActive;
-                loopSoundVolume = 1f;
+        supernova = new SupernovaTurret("supernova"){{
+            requirements(Category.turret, with(Items.surgeAlloy, 500, Items.silicon, 650, UnityItems.archDebris, 350, UnityItems.monolithAlloy, 325));
 
-                baseExplosiveness = 25f;
-                shootDuration = 480f;
-                shootType = UnityBullets.supernovaLaser;
+            size = 7;
+            health = 8100;
+            powerUse = 24f;
 
-                starEffect = UnityFx.supernovaStar;
-                chargeStarEffect = UnityFx.supernovaChargeStar;
-                chargeStar2Effect = UnityFx.supernovaChargeStar2;
-                chargeBeginEffect = UnityFx.supernovaChargeBegin;
-                starDecayEffect = UnityFx.supernovaStarDecay;
-                heatWaveEffect = UnityFx.supernovaStarHeatwave;
-                pullEffect = UnityFx.supernovaPullEffect;
+            shootLength = size * tilesize / 2f - 8f;
+            rotateSpeed = 1f;
+            recoilAmount = 4f;
+            cooldown = 0.006f;
 
-                requireSoul = false;
-                maxSouls = 12;
-                efficiencyFrom = 0.5f;
-                efficiencyTo = 1.9f;
+            shootCone = 15f;
+            range = 250f;
 
-                damageMultiplier((SoulTurretAttractLaserTurretBuild build) -> efficiencyFrom + (build.souls() / (float)maxSouls) * efficiencyTo);
+            shootSound = UnitySounds.supernovaShoot;
+            loopSound = UnitySounds.supernovaActive;
+            loopSoundVolume = 1f;
 
-                drawer = b -> {
-                    if(b instanceof SoulTurretAttractLaserTurretBuild tile){
-                        //core
-                        phases[0].trns(tile.rotation, -tile.recoil + Mathf.curve(tile.phase, 0f, 0.3f) * -2f);
-                        //left wing
-                        phases[1].trns(tile.rotation - 90,
-                            Mathf.curve(tile.phase, 0.2f, 0.5f) * -2f,
+            baseExplosiveness = 25f;
+            shootDuration = 480f;
+            shootType = UnityBullets.supernovaLaser.copy();
 
-                            -tile.recoil + Mathf.curve(tile.phase, 0.2f, 0.5f) * 2f +
-                            Mathf.curve(tile.phase, 0.5f, 0.8f) * 3f
-                        );
-                        //left bottom wing
-                        phases[2].trns(tile.rotation - 90,
-                            Mathf.curve(tile.phase, 0f, 0.3f) * -1.5f +
-                            Mathf.curve(tile.phase, 0.6f, 1f) * -2f,
+            chargeBeginEffect = UnityFx.supernovaChargeBegin;
 
-                            -tile.recoil + Mathf.curve(tile.phase, 0f, 0.3f) * 1.5f +
-                            Mathf.curve(tile.phase, 0.6f, 1f) * -1f
-                        );
-                        //bottom
-                        phases[3].trns(tile.rotation, -tile.recoil + Mathf.curve(tile.phase, 0f, 0.6f) * -4f);
-                        //right wing
-                        phases[4].trns(tile.rotation - 90,
-                            Mathf.curve(tile.phase, 0.2f, 0.5f) * 2f,
+            requireSoul = false;
+            maxSouls = 12;
+            efficiencyFrom = 0.5f;
+            efficiencyTo = 1.9f;
 
-                            -tile.recoil + Mathf.curve(tile.phase, 0.2f, 0.5f) * 2f +
-                            Mathf.curve(tile.phase, 0.5f, 0.8f) * 3f
-                        );
-                        //right bottom wing
-                        phases[5].trns(tile.rotation - 90,
-                            Mathf.curve(tile.phase, 0f, 0.3f) * 1.5f +
-                            Mathf.curve(tile.phase, 0.6f, 1f) * 2f,
-
-                            -tile.recoil + Mathf.curve(tile.phase, 0f, 0.3f) * 1.5f +
-                            Mathf.curve(tile.phase, 0.6f, 1f) * -1f
-                        );
-
-                        Draw.rect(Regions.supernovaWingLeftBottomOutlineRegion, tile.x + phases[2].x, tile.y + phases[2].y, tile.rotation - 90);
-                        Draw.rect(Regions.supernovaWingRightBottomOutlineRegion, tile.x + phases[5].x, tile.y + phases[5].y, tile.rotation - 90);
-                        Draw.rect(Regions.supernovaWingLeftOutlineRegion, tile.x + phases[1].x, tile.y + phases[1].y, tile.rotation - 90);
-                        Draw.rect(Regions.supernovaWingRightOutlineRegion, tile.x + phases[4].x, tile.y + phases[4].y, tile.rotation - 90);
-                        Draw.rect(Regions.supernovaBottomOutlineRegion, tile.x + phases[3].x, tile.y + phases[3].y, tile.rotation - 90);
-                        Draw.rect(Regions.supernovaHeadOutlineRegion, tile.x + tr2.x, tile.y + tr2.y, tile.rotation - 90);
-                        Draw.rect(Regions.supernovaCoreOutlineRegion, tile.x + phases[0].x, tile.y + phases[0].y, tile.rotation - 90);
-
-                        Draw.rect(Regions.supernovaWingLeftBottomRegion, tile.x + phases[2].x, tile.y + phases[2].y, tile.rotation - 90);
-                        Draw.rect(Regions.supernovaWingRightBottomRegion, tile.x + phases[5].x, tile.y + phases[5].y, tile.rotation - 90);
-                        Draw.rect(Regions.supernovaWingLeftRegion, tile.x + phases[1].x, tile.y + phases[1].y, tile.rotation - 90);
-                        Draw.rect(Regions.supernovaWingRightRegion, tile.x + phases[4].x, tile.y + phases[4].y, tile.rotation - 90);
-                        Draw.rect(Regions.supernovaBottomRegion, tile.x + phases[3].x, tile.y + phases[3].y, tile.rotation - 90);
-                        Draw.rect(Regions.supernovaHeadRegion, tile.x + tr2.x, tile.y + tr2.y, tile.rotation - 90);
-
-                        float z = Draw.z();
-                        Draw.z(z + 0.001f);
-
-                        Draw.rect(Regions.supernovaCoreRegion, tile.x + phases[0].x, tile.y + phases[0].y, tile.rotation - 90);
-                        Draw.z(z);
-                    }else{
-                        throw new IllegalStateException("building isn't an instance of AttractLaserTurretBuild");
-                    }
-                };
-
-                heatDrawer = tile -> {
-                    if(tile.heat <= 0.00001f) return;
-
-                    float r = Utils.pow6In.apply(tile.heat);
-                    float g = Interp.pow3In.apply(tile.heat);
-                    float b = Interp.pow2Out.apply(tile.heat);
-                    float a = Interp.pow2In.apply(tile.heat);
-
-                    Draw.color(Tmp.c1.set(r, g, b, a));
-                    Draw.blend(Blending.additive);
-
-                    Draw.rect(heatRegion, tile.x + tr2.x, tile.y + tr2.y, tile.rotation - 90f);
-
-                    Draw.color();
-                    Draw.blend();
-                };
-
-                draw((SoulTurretAttractLaserTurretBuild tile) -> {
-                    boolean notShooting = tile.bulletLife() <= 0f || tile.bullet() == null;
-                    Tmp.v1.trns(tile.rotation, -tile.recoil + starOffset + Mathf.curve(tile.phase, 0f, 0.3f) * -2f);
-
-                    float z = Draw.z();
-                    Draw.z(Layer.effect);
-
-                    float rad = tile.data().floatValue;
-                    Draw.color(UnityPal.monolith);
-                    UnityDrawf.shiningCircle(tile.id, Time.time,
-                        tile.x + Tmp.v1.x,
-                        tile.y + Tmp.v1.y,
-                        rad * starRadius,
-                        6, 20f,
-                        rad * starRadius, rad * starRadius * 1.5f,
-                        120f
-                    );
-
-                    if(notShooting){
-                        if(!Mathf.zero(tile.charge)){
-                            UnityDrawf.shiningCircle(tile.id + 1, Time.time,
-                                tile.x + Angles.trnsx(tile.rotation, -tile.recoil + shootLength),
-                                tile.y + Angles.trnsy(tile.rotation, -tile.recoil + shootLength),
-                                tile.charge * 4f,
-                                6, 12f,
-                                tile.charge * 4f, tile.charge * 8f,
-                                120f
-                            );
-                        }
-                    }
-
-                    Draw.reset();
-                    Draw.z(z);
-                });
-
-                update((SoulTurretAttractLaserTurretBuild tile) -> {
-                    boolean notShooting = tile.bulletLife() <= 0f || tile.bullet() == null;
-                    boolean tick = Mathf.chanceDelta(1f);
-                    boolean tickCharge = Mathf.chanceDelta(tile.charge);
-
-                    tile.data().floatValue = Mathf.approachDelta(tile.data().floatValue, notShooting ? tile.charge : 1f, chargeWarmup * 60f);
-
-                    Tmp.v1.trns(tile.rotation, -tile.recoil + starOffset + Mathf.curve(tile.phase, 0f, 0.3f) * -2f);
-                    if(notShooting){
-                        if(tile.charge > 0.1f && tile.timer(timerChargeStar, 20f)){
-                            chargeStarEffect.at(
-                                tile.x + Tmp.v1.x,
-                                tile.y + Tmp.v1.y,
-                                tile.rotation, tile.charge
-                            );
-                        }
-
-                        if(!Mathf.zero(tile.charge) && tickCharge){
-                            chargeStar2Effect.at(
-                                tile.x + Tmp.v1.x,
-                                tile.y + Tmp.v1.y,
-                                tile.rotation, tile.charge
-                            );
-                        }
-
-                        if(tickCharge){
-                            chargeBeginEffect.at(
-                                tile.x + Angles.trnsx(tile.rotation, -tile.recoil + shootLength),
-                                tile.y + Angles.trnsy(tile.rotation, -tile.recoil + shootLength),
-                                tile.rotation, tile.charge
-                            );
-                        }
-                    }else{
-                        if(tick){
-                            starDecayEffect.at(
-                                tile.x + Tmp.v1.x,
-                                tile.y + Tmp.v1.y,
-                                tile.rotation
-                            );
-                        }
-
-                        if(tile.timer(timerChargeStar, 20f)){
-                            heatWaveEffect.at(
-                                tile.x + Tmp.v1.x,
-                                tile.y + Tmp.v1.y,
-                                tile.rotation
-                            );
-                        }
-                    }
-
-                    if(Mathf.chanceDelta(notShooting ? tile.charge : 1f)){
-                        Tmp.v1
-                            .trns(tile.rotation, -tile.recoil + starOffset + Mathf.curve(tile.phase, 0f, 0.3f) * -2f)
-                            .add(tile);
-
-                        Lightning.create(
-                            tile.team,
-                            Pal.lancerLaser,
-                            60f, Tmp.v1.x, Tmp.v1.y,
-                            Mathf.randomSeed((long)(tile.id + Time.time), 360f),
-                            Mathf.round(Mathf.randomTriangular(12f, 18f) * (notShooting ? tile.charge : 1f))
-                        );
-                    }
-                });
-
-                attractUnit = (tile, unit) -> {
-                    if(Mathf.chanceDelta(0.1f)){
-                        Tmp.v1
-                            .trns(tile.rotation, -tile.recoil + starOffset + Mathf.curve(tile.phase, 0f, 0.3f) * -2f)
-                            .add(tile);
-
-                        pullEffect.at(tile.x, tile.y, tile.rotation, new Float[]{unit.x, unit.y, Tmp.v1.x, Tmp.v1.y, tile.charge * (3f + Mathf.range(0.2f))});
-                    }
-                };
-            }
-        };
+            float base = shootType.damage;
+            progression.linear(efficiencyFrom, (efficiencyTo - efficiencyFrom) / maxSouls, f -> shootType.damage = base * f);
+        }};
 
         //endregion
         //region youngcha

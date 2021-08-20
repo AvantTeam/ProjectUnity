@@ -18,7 +18,6 @@ import unity.entities.abilities.BaseAbility.*;
 import unity.entities.bullet.EphemeronBulletType.*;
 import unity.entities.bullet.*;
 import unity.entities.bullet.SingularityBulletType.*;
-import unity.entities.effects.*;
 import unity.graphics.*;
 import unity.type.*;
 import unity.util.*;
@@ -863,19 +862,6 @@ public class UnityFx{
         });
     }),
 
-    supernovaStar = new Effect(45f, e -> {
-        if(e.data instanceof Float data){
-            float a = Mathf.randomSeed(e.id, 360f);
-            float d = 0.5f + e.fout() * 0.5f;
-
-            float r = data;
-
-            color(Pal.lancerLaser);
-            alpha(0.6f * e.fout());
-            Fill.circle(e.x + trnsx(a, d), e.y + trnsy(a, d), r);
-        }
-    }),
-
     supernovaCharge = new Effect(20f, e -> {
         if(e.data instanceof Float data){
             float r = data;
@@ -1048,15 +1034,6 @@ public class UnityFx{
     plated = new Effect(30f, e -> {
         color(e.color);
         Fill.circle(e.x, e.y, e.fout() * (float) e.data);
-    }),
-
-    archaicEnergy = new Effect(60f, e -> {
-        randLenVectors(e.id, 3, 6f, (x, y) -> {
-            color(UnityPal.monolith, UnityPal.monolithDark, e.finpow());
-
-            float w = 1f + e.fout() * 3f;
-            Fill.rect(e.x + x, e.y + y, w, w, 45f);
-        });
     }),
 
     monolithSoul = new Effect(60f, e -> {

@@ -144,6 +144,10 @@ public class ModelInstance implements RenderableProvider{
         }
     }
 
+    public Material getMaterial(){
+        return materials.firstOpt();
+    }
+
     /**
      * @param id The ID of the material to fetch.
      * @return The {@link Material} with the specified id, or null if not available.
@@ -158,7 +162,7 @@ public class ModelInstance implements RenderableProvider{
      * @return The {@link Material} with the specified id, or null if not available.
      */
     public Material getMaterial(String id, boolean ignoreCase){
-        final int n = materials.size;
+        int n = materials.size;
         Material material;
         if(ignoreCase){
             for(int i = 0; i < n; i++){
