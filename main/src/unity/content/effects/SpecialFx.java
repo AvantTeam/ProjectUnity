@@ -53,5 +53,15 @@ public class SpecialFx{
         }
 
         Lines.endLine();
-    }).followParent(false);
+    }).followParent(false),
+
+    chargeTransfer = new Effect(20f, e -> {
+        if(!(e.data instanceof Position)) return;
+        Position to = e.data();
+        Tmp.v1.set(e.x, e.y).interpolate(Tmp.v2.set(to), e.fin(), Interp.pow3)
+        .add(Tmp.v2.sub(e.x, e.y).nor().rotate90(1).scl(Mathf.randomSeedRange(e.id, 1f) * e.fslope() * 10f));
+        float x = Tmp.v1.x, y = Tmp.v1.y, s = e.fslope() * 4f;
+        Draw.color(e.color);
+        Fill.square(x, y, s, 45f);
+    });
 }
