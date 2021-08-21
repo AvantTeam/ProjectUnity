@@ -8,11 +8,9 @@
     varying vec4 v_color;
 #endif
 
-#ifdef blendedFlag
-    varying float v_opacity;
-    #ifdef alphaTestFlag
-        varying float v_alphaTest;
-    #endif
+varying float v_opacity;
+#ifdef alphaTestFlag
+    varying float v_alphaTest;
 #endif
 
 #if defined(diffuseTextureFlag) || defined(specularTextureFlag) || defined(emissiveTextureFlag)
@@ -176,13 +174,9 @@ void main(){
         gl_FragColor = mix(gl_FragColor, u_fogColor, v_fog);
     #endif
 
-    #ifdef blendedFlag
-        gl_FragColor.a = diffuse.a * v_opacity;
-        #ifdef alphaTestFlag
-            if (gl_FragColor.a <= v_alphaTest)
-            discard;
-        #endif
-    #else
-        gl_FragColor.a = 1.0;
+    gl_FragColor.a = diffuse.a * v_opacity;
+    #ifdef alphaTestFlag
+        if (gl_FragColor.a <= v_alphaTest)
+        discard;
     #endif
 }

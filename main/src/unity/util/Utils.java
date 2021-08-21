@@ -18,8 +18,6 @@ import mindustry.graphics.*;
 import mindustry.world.*;
 import unity.graphics.*;
 
-import java.util.*;
-
 import static mindustry.Vars.*;
 
 public final class Utils{
@@ -74,8 +72,9 @@ public final class Utils{
 
         for(int i = offset; i < offset + bound; i++){
             for(int j = offset; j < offset + bound; j++){
-                if(Math.max(Math.abs(i), Math.abs(j)) < minScore && notSolid(tile, before, i, j)){
-                    minScore = Math.max(Math.abs(i), Math.abs(j));
+                int max = Math.max(Math.abs(i), Math.abs(j));
+                if(max < minScore && notSolid(tile, before, i, j)){
+                    minScore = max;
                     ctile = tile.nearby(i, j);
                 }
             }

@@ -86,6 +86,16 @@ public class AssetsProcessor extends BaseProcessor{
                     }
 
                     @Override
+                    public boolean properties(){
+                        return true;
+                    }
+
+                    @Override
+                    public String propertyFile(){
+                        return "objects.properties";
+                    }
+
+                    @Override
                     public boolean valid(Fi file){
                         return file.extEquals("obj");
                     }

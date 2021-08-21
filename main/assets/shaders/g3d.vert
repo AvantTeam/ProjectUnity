@@ -51,14 +51,12 @@ uniform mat4 u_trans;
     const float u_shininess = 20.0;
 #endif
 
-#ifdef blendedFlag
-    uniform float u_opacity;
-    varying float v_opacity;
+uniform float u_opacity;
+varying float v_opacity;
 
-    #ifdef alphaTestFlag
-        uniform float u_alphaTest;
-        varying float v_alphaTest;
-    #endif
+#ifdef alphaTestFlag
+    uniform float u_alphaTest;
+    varying float v_alphaTest;
 #endif
 
 #ifdef lightingFlag
@@ -136,11 +134,9 @@ void main(){
         v_color = a_color;
     #endif
 
-    #ifdef blendedFlag
-        v_opacity = u_opacity;
-        #ifdef alphaTestFlag
-            v_alphaTest = u_alphaTest;
-        #endif
+    v_opacity = u_opacity;
+    #ifdef alphaTestFlag
+        v_alphaTest = u_alphaTest;
     #endif
 
     gl_Position = u_proj * u_trans * a_position;

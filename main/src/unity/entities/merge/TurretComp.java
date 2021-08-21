@@ -34,16 +34,11 @@ abstract class TurretComp extends Turret implements Stemc{
 
     float basicFieldRadius = -1f;
 
-    @ReadOnly Floatf<TurretBuildc> damageMultiplier = b -> 1f;
     @ReadOnly Func<TurretBuildc, Object> bulletData = b -> null;
     @ReadOnly Cons2<BulletType, Bullet> bulletCons = (type, b) -> {};
 
     public TurretComp(String name){
         super(name);
-    }
-
-    public <T extends TurretBuildc> void damageMultiplier(Floatf<T> damageMultiplier){
-        this.damageMultiplier = (Floatf<TurretBuildc>)damageMultiplier;
     }
 
     public <T extends TurretBuildc> void bulletData(Func<T, Object> bulletData){
@@ -175,7 +170,7 @@ abstract class TurretComp extends Turret implements Stemc{
             Bullet bullet = type.create(
                 this, team,
                 x + tr.x, y + tr.y, angle,
-                type.damage * damageMultiplier(), 1f + Mathf.range(velocityInaccuracy),
+                type.damage, 1f + Mathf.range(velocityInaccuracy),
                 type.scaleVelocity ? Mathf.clamp(Mathf.dst(x + tr.x, y + tr.y, targetPos.x, targetPos.y) / type.range(), minRange / type.range(), range / type.range()) : 1f,
                 bulletData()
             );
@@ -185,10 +180,6 @@ abstract class TurretComp extends Turret implements Stemc{
                 ReflectUtils.setField(this, ReflectUtils.findField(LaserTurretBuild.class, "bullet", true), bullet);
                 ReflectUtils.setField(this, ReflectUtils.findField(LaserTurretBuild.class, "bulletLife", true), turret.shootDuration);
             }
-        }
-
-        public float damageMultiplier(){
-            return damageMultiplier.get(self());
         }
 
         public Object bulletData(){

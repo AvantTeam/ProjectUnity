@@ -206,17 +206,7 @@ public class UnityBlocks implements ContentList{
     Block oracle;
 
     public static @FactionDef("monolith")
-    Block prism;
-
-    public static @FactionDef("monolith")
-    @LoadRegs(value = {
-        "supernova-head",
-        "supernova-core",
-        "supernova-wing-left", "supernova-wing-right",
-        "supernova-wing-left-bottom", "supernova-wing-right-bottom",
-        "supernova-bottom"
-    }, outline = true)
-    Block supernova;
+    Block prism, supernova;
 
     //---------- youngcha faction ----------
     public static @FactionDef("youngcha") Block
@@ -2363,10 +2353,17 @@ public class UnityBlocks implements ContentList{
             size = 4;
             health = 2800;
             range = 320f;
+            reloadTime = 60f;
+            rotateSpeed = 20f;
+            recoilAmount = 6f;
+            prismOffset = 6f;
+            shootCone = 30f;
+
             targetGround = true;
             targetAir = true;
 
             shootSound = Sounds.shotgun;
+            shootEffect = Fx.hitLaserBlast;
             model = UnityModels.prism;
             powerUse = 8f;
 
@@ -2375,7 +2372,7 @@ public class UnityBlocks implements ContentList{
             efficiencyFrom = 0.7f;
             efficiencyTo = 1.67f;
 
-            shootType = new BulletType(0.0001f, 240f);
+            shootType = new BulletType(0.0001f, 320f);
 
             float base = shootType.damage;
             progression.linear(efficiencyFrom, (efficiencyTo - efficiencyFrom) / maxSouls, f -> shootType.damage = base * f);
@@ -2408,8 +2405,8 @@ public class UnityBlocks implements ContentList{
 
             requireSoul = false;
             maxSouls = 12;
-            efficiencyFrom = 0.5f;
-            efficiencyTo = 1.9f;
+            efficiencyFrom = 0.7f;
+            efficiencyTo = 1.8f;
 
             float base = shootType.damage;
             progression.linear(efficiencyFrom, (efficiencyTo - efficiencyFrom) / maxSouls, f -> shootType.damage = base * f);

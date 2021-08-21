@@ -8,7 +8,6 @@ import arc.util.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
-import mindustry.graphics.*;
 import mindustry.world.blocks.defense.turrets.*;
 import unity.annotations.Annotations.*;
 import unity.assets.type.g3d.*;
@@ -48,7 +47,7 @@ public class PrismTurret extends SoulPowerTurret{
         public float prismHeat = 0f;
         public float prismRotation = 0f;
 
-        protected Seq<Teamc> targets = new Seq<>(false);
+        protected Seq<Posc> targets = new Seq<>(false);
 
         @Override
         public void created(){
@@ -64,9 +63,12 @@ public class PrismTurret extends SoulPowerTurret{
             prismHeat = Mathf.lerpDelta(prismHeat, act ? efficiency() : 0f, act ? warmup : cooldown);
             prismRotation += prismHeat * prismRotateSpeed * Mathf.signs[id % 2];
 
-            tr2.trns(rotation, prismOffset - recoil);
             inst.transform.set(
-                Tmp.v31.set(x + tr2.x, y + tr2.y, 0f),
+                Tmp.v31.set(
+                    x + Angles.trnsx(rotation, prismOffset - recoil),
+                    y + Angles.trnsy(rotation, prismOffset - recoil),
+                    0f
+                ),
                 Utils.q1
                     .setFromAxis(0f, 0f, 1f, rotation - 90f)
                     .mul(Utils.q2.setFromAxis(0f, 1f, 0f, prismRotation)),
@@ -80,11 +82,11 @@ public class PrismTurret extends SoulPowerTurret{
         protected void findTarget(){
             super.findTarget();
 
-            targets.clear();
+            targets.clear().add(target);
             for(int i = 0; i < maxShots; i++){
                 var t = Units.closestTarget(team, targetPos.x, targetPos.y, sortRange,
-                    u -> u.checkTarget(targetAir, targetGround) && !targets.contains(u),
-                    b -> targetGround && !targets.contains(b)
+                    u -> u != target && u.checkTarget(targetAir, targetGround) && !targets.contains(u),
+                    b -> b != target && targetGround && !targets.contains(b)
                 );
 
                 if(t != null) targets.add(t);
@@ -107,7 +109,13 @@ public class PrismTurret extends SoulPowerTurret{
 
                     heat = 1f;
 
-                    damageEffect.at(x + tr2.x, y + tr2.y, 2f, color(), u);
+                    damageEffect.at(
+                        x + Angles.trnsx(rotation, prismOffset - recoil),
+                        y + Angles.trnsy(rotation, prismOffset - recoil),
+                        2f,
+                        color(), u
+                    );
+
                     type.hitEffect.at(u.x(), u.y(), angle);
 
                     effects();
@@ -117,10 +125,7 @@ public class PrismTurret extends SoulPowerTurret{
 
         @Override
         public void draw(){
-            Draw.z(Layer.turret);
-            Draw.rect(baseRegion, x, y);
-            Draw.rect(region, x, y, rotation - 90f);
-
+            super.draw();
             Draw.draw(Draw.z(), inst::render);
         }
     }

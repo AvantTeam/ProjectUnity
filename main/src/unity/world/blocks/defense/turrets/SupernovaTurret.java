@@ -22,6 +22,13 @@ import unity.util.*;
 import java.lang.reflect.*;
 
 @Merge(base = LaserTurret.class, value = Soulc.class)
+@LoadRegs(value = {
+    "supernova-head",
+    "supernova-core",
+    "supernova-wing-left", "supernova-wing-right",
+    "supernova-wing-left-bottom", "supernova-wing-right-bottom",
+    "supernova-bottom"
+}, outline = true)
 public class SupernovaTurret extends SoulLaserTurret{
     public float chargeWarmup = 0.002f;
     public float chargeCooldown = 0.01f;

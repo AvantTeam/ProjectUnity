@@ -235,7 +235,6 @@ public class UnityShaders{
                     prefix += defineRaw("numPointLights 0");
                 }
 
-                if((mask & BlendingAttribute.blend) != 0) prefix += define(BlendingAttribute.blendAlias);
                 if((mask & TextureAttribute.diffuse) != 0) prefix += define(TextureAttribute.diffuseAlias);
                 if((mask & ColorAttribute.diffuse) != 0) prefix += define(ColorAttribute.diffuseAlias);
                 if((mask & TextureAttribute.specular) != 0) prefix += define(TextureAttribute.specularAlias);
@@ -298,7 +297,7 @@ public class UnityShaders{
             setUniformMatrix("u_normalMatrix", Tmp.m1.inv().transpose());
 
             BlendingAttribute blend = material.get(BlendingAttribute.blend);
-            if(blend != null) setUniformf("u_opacity", blend.opacity);
+            setUniformf("u_opacity", blend != null ? blend.opacity : 1f);
 
             FloatAttribute shine = material.get(FloatAttribute.shininess);
             if(shine != null) setUniformf("u_shininess", shine.value);

@@ -11,6 +11,7 @@ import arc.struct.*;
  * This should be used for implementations like the EXP system and Monolith souls.
  * @author GlennFolker
  */
+//TODO <T>
 public class DynamicProgression{
     public final Seq<Floatc> listeners = new Seq<>();
 
