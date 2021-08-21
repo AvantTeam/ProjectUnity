@@ -7,6 +7,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.audio.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -18,6 +19,7 @@ import mindustry.type.*;
 public class TractorBeamWeapon extends Weapon{
     public float pullStrength = 10f, scaledForce = 1f;
     public float beamWidth = 0.75f;
+    public boolean includeDead = false;
 
     public TextureRegion laser, laserEnd, laserTop, laserTopEnd;
 
@@ -88,7 +90,7 @@ public class TractorBeamWeapon extends Weapon{
         }else{
             tm.scl = Mathf.lerpDelta(tm.scl, 0f, 0.07f);
         }
-        if(tm.scl > 0.01f){
+        if(tm.scl > 0.01f && !Vars.headless){
             if(mount.sound == null) mount.sound = new SoundLoop(shootSound, 1f);
             mount.sound.update(wx, wy, true);
         }else{
@@ -104,7 +106,7 @@ public class TractorBeamWeapon extends Weapon{
 
     @Override
     protected boolean checkTarget(Unit unit, Teamc target, float x, float y, float range){
-        return super.checkTarget(unit, target, x, y, range) || target instanceof Building;
+        return (super.checkTarget(unit, target, x, y, range) && (!(target instanceof Healthc h) || !target.isAdded() || (h.dead() && !includeDead))) || target instanceof Building;
     }
 
     @Override

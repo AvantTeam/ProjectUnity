@@ -3902,6 +3902,7 @@ public class UnityUnitTypes implements ContentList{
                 shootY = 8.75f + 2f;
                 pullStrength = 40f;
                 scaledForce = 50f;
+                includeDead = true;
                 bullet = t;
             }}, new TractorBeamWeapon(name + "-mount"){{
                 x = 19.75f;
@@ -3909,7 +3910,65 @@ public class UnityUnitTypes implements ContentList{
                 shootY = 8.75f + 2f;
                 pullStrength = 40f;
                 scaledForce = 50f;
+                includeDead = true;
                 bullet = t;
+            }}, new EnergyChargeWeapon(""){{
+                x = 0f;
+                y = 39.75f;
+                shootY = 0f;
+                mirror = false;
+                reload = 2f * 60f;
+
+                float rad = 70f;
+                drawCharge = (unit, mount, charge) -> {
+                    float rotation = unit.rotation - 90f,
+                    wx = unit.x + Angles.trnsx(rotation, x, y),
+                    wy = unit.y + Angles.trnsy(rotation, x, y),
+                    scl = Math.max(1f - (mount.reload / reload), 0f) / 2f;
+
+                    Draw.color(Pal.lancerLaser);
+                    UnityDrawf.shiningCircle(unit.id, Time.time, wx, wy, 10f * scl, 5, 70f, 15f, 4f * scl, 90f);
+                    Draw.color(Color.white);
+                    UnityDrawf.shiningCircle(unit.id, Time.time, wx, wy, 5f * scl, 5, 70f, 15f, 3f * scl, 90f);
+
+                    Lines.stroke(2f);
+                    Draw.color(Pal.lancerLaser);
+                    UnityDrawf.dashCircleAngle(wx, wy, rad, Mathf.sin(Time.time + Mathf.randomSeed(unit.id, 0f, 6f), 90f, 30f));
+                    Draw.reset();
+                };
+                chargeCondition = (unit, mount) -> {
+                    ChargeMount m = (ChargeMount)mount;
+                    if(mount.reload > 0f){
+                        mount.reload = Math.max(mount.reload - Time.delta * unit.reloadMultiplier, 0);
+                    }
+                    if((m.timer += Time.delta) >= 5f){
+                        float rotation = unit.rotation - 90f,
+                        wx = unit.x + Angles.trnsx(rotation, x, y),
+                        wy = unit.y + Angles.trnsy(rotation, x, y);
+
+                        Units.nearbyEnemies(unit.team, wx, wy, rad, u -> {
+                            u.damage(90f);
+                            if(u.dead){
+                                m.charge += (u.hitSize / 2f) * (u.isFlying() ? Mathf.clamp(u.type.fallSpeed * 5f) : 1f);
+                                for(int i = 0; i < 4; i++){
+                                    Time.run(i * 5f, () ->
+                                    SpecialFx.chargeTransfer.at(u.x, u.y, 0f, Pal.lancerLaser, unit));
+                                }
+                            }
+                        });
+
+                        m.timer = 0f;
+                    }
+                    if(m.charge > 0f){
+                        float v = Math.min(m.charge, Time.delta * 2f);
+                        m.charge -= v;
+                        mount.reload -= v;
+                    }
+                    if(mount.reload < -250f){
+                        mount.reload = -250f;
+                        m.charge = 0f;
+                    }
+                };
             }});
         }};
 
