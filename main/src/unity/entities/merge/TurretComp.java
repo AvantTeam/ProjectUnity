@@ -177,8 +177,8 @@ abstract class TurretComp extends Turret implements Stemc{
 
             bulletCons(type, bullet);
             if(self() instanceof LaserTurretBuild laser && block instanceof LaserTurret turret){
-                ReflectUtils.setField(this, ReflectUtils.findField(LaserTurretBuild.class, "bullet", true), bullet);
-                ReflectUtils.setField(this, ReflectUtils.findField(LaserTurretBuild.class, "bulletLife", true), turret.shootDuration);
+                laser.bullet = bullet;
+                laser.bulletLife = turret.shootDuration;
             }
         }
 

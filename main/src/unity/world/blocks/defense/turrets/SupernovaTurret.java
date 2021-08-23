@@ -51,9 +51,6 @@ public class SupernovaTurret extends SoulLaserTurret{
     public Effect heatWaveEffect = UnityFx.supernovaStarHeatwave;
     public Effect pullEffect = UnityFx.supernovaPullEffect;
 
-    private static final Field bulletf = ReflectUtils.findField(LaserTurretBuild.class, "bullet", true);
-    private static final Field bulletLifef = ReflectUtils.findField(LaserTurretBuild.class, "bulletLife", true);
-
     public SupernovaTurret(String name){
         super(name);
 
@@ -157,9 +154,9 @@ public class SupernovaTurret extends SoulLaserTurret{
                 charge = charge > 0.001f ? charge : 0f;
             }
 
-            if(isShooting() && (bulletLife() <= 0f && bullet() == null)) attractUnits();
+            if(isShooting() && (bulletLife <= 0f && bullet == null)) attractUnits();
 
-            if(isShooting() || (bulletLife() > 0f && bullet() != null)){
+            if(isShooting() || (bulletLife > 0f && bullet != null)){
                 phase = Mathf.clamp(phase + chargeWarmup * edelta(), 0f, 1f);
             }else{
                 phase = Mathf.lerpDelta(phase, 0f, chargeCooldown);
@@ -168,7 +165,7 @@ public class SupernovaTurret extends SoulLaserTurret{
 
             super.updateTile();
 
-            if(isShooting() && (bulletLife() <= 0f && bullet() == null)){
+            if(isShooting() && (bulletLife <= 0f && bullet == null)){
                 var liquid = liquids.current();
                 float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;
 
@@ -179,7 +176,7 @@ public class SupernovaTurret extends SoulLaserTurret{
             float prog = charge * 1.5f + 0.5f;
             sound.update(x, y, Mathf.curve(charge, 0f, 0.4f) * 1.2f, prog);
 
-            boolean notShooting = bulletLife() <= 0f || bullet() == null;
+            boolean notShooting = bulletLife <= 0f || bullet == null;
             boolean tick = Mathf.chanceDelta(1f);
             boolean tickCharge = Mathf.chanceDelta(charge);
 
@@ -247,7 +244,7 @@ public class SupernovaTurret extends SoulLaserTurret{
         public void draw(){
             super.draw();
 
-            boolean notShooting = bulletLife() <= 0f || bullet() == null;
+            boolean notShooting = bulletLife <= 0f || bullet == null;
             Tmp.v1.trns(rotation, -recoil + starOffset + Mathf.curve(phase, 0f, 0.3f) * -2f);
 
             float z = Draw.z();
@@ -287,7 +284,7 @@ public class SupernovaTurret extends SoulLaserTurret{
 
         @Override
         protected void updateShooting(){
-            if(bulletLife() > 0f && bullet() != null) return;
+            if(bulletLife > 0f && bullet != null) return;
 
             if(charge >= 1f && phase >= 1f && (consValid() || cheating())){
                 BulletType type = peekAmmo();
@@ -326,14 +323,6 @@ public class SupernovaTurret extends SoulLaserTurret{
                     }
                 }
             });
-        }
-
-        public float bulletLife(){
-            return ReflectUtils.getField(this, bulletLifef);
-        }
-
-        public Bullet bullet(){
-            return ReflectUtils.getField(this, bulletf);
         }
     }
 }

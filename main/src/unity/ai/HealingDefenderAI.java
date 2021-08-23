@@ -11,7 +11,7 @@ import mindustry.world.meta.*;
 
 public class HealingDefenderAI extends DefenderAI{
     @Override
-    protected void updateTargeting(){
+    public void updateTargeting(){
         if(unit.hasWeapons()){
             updateWeapons();
         }else{
@@ -20,7 +20,7 @@ public class HealingDefenderAI extends DefenderAI{
     }
 
     @Override
-    protected void updateWeapons(){
+    public void updateWeapons(){
         float rotation = unit.rotation - 90;
         boolean ret = retarget();
         if(ret){
@@ -64,12 +64,12 @@ public class HealingDefenderAI extends DefenderAI{
     }
 
     @Override
-    protected boolean checkTarget(Teamc target, float x, float y, float range){
+    public boolean checkTarget(Teamc target, float x, float y, float range){
         return target == null || target.team() != unit.team || (target instanceof Healthc h && (h.health() >= h.maxHealth() || h.dead())) || (range != Float.MAX_VALUE && !target.within(x, y, range + (target instanceof Sized hb ? hb.hitSize()/2f : 0f)));
     }
 
     @Override
-    protected boolean invalid(Teamc target){
+    public boolean invalid(Teamc target){
         return target == null || target.team() != unit.team || (target instanceof Healthc h && h.dead());
     }
 
@@ -86,7 +86,7 @@ public class HealingDefenderAI extends DefenderAI{
     }
 
     @Override
-    protected Teamc findTarget(float x, float y, float range, boolean air, boolean ground){
+    public Teamc findTarget(float x, float y, float range, boolean air, boolean ground){
         if(command() != UnitCommand.rally){
             Teamc trueResult;
             var blockResult = Units.findDamagedTile(unit.team, unit.x, unit.y);

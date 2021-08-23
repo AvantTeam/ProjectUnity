@@ -313,7 +313,7 @@ public class EndGameTurret extends PowerTurret{
             Units.nearbyEnemies(team, x - range, y - range, range * 2, range * 2, e -> {
                 if(within(e, range) && e.isAdded()){
                     threatLevel += Math.max(((e.maxHealth() + e.type.dpsEstimate) - 450f) / 1300f, 0f);
-                    if(e.realSpeed() >= 18f){
+                    if(e.speed() >= 18f){
                         e.vel.setLength(0f);
                         //e.apply(UnityStatusEffects.endgameDisable);
                     }

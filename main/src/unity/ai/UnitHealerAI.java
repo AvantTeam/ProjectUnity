@@ -11,7 +11,7 @@ public class UnitHealerAI extends FlyingAI{
     protected float score;
 
     @Override
-    protected boolean invalid(Teamc target){
+    public boolean invalid(Teamc target){
         boolean damaged = target instanceof Healthc t
         ?   !t.damaged() && !t.isValid()
         :   true;
@@ -23,14 +23,14 @@ public class UnitHealerAI extends FlyingAI{
     public void updateMovement(){
         if(target instanceof Unit temp){
             vec.trns(unit.angleTo(temp) + 180f, unit.type.range + temp.hitSize);
-            vec.add(target).sub(unit).scl(0.01f).limit(1f).scl(unit.realSpeed());
+            vec.add(target).sub(unit).scl(0.01f).limit(1f).scl(unit.speed());
             unit.moveAt(vec);
             unit.lookAt(target);
         }
     }
 
     @Override
-    protected void updateWeapons(){
+    public void updateWeapons(){
         if(target != null && (unit.ammo > 0.0001f || !state.rules.unitAmmo) && target instanceof Unit temp){
             if(timer.get(3, 5f) && unit.within(target, unit.type.range + temp.hitSize)){
                 if(state.rules.unitAmmo) unit.ammo--;
@@ -42,7 +42,7 @@ public class UnitHealerAI extends FlyingAI{
     }
 
     @Override
-    protected void updateTargeting(){
+    public void updateTargeting(){
         if(retarget()){
             score = 0f;
             target = null;

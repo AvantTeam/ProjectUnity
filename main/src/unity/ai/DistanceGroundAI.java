@@ -39,7 +39,7 @@ public class DistanceGroundAI extends GroundAI{
 
         if(lockTarget){
             if(target != null && target.team() != team && command() != UnitCommand.rally && unit.within(target, range / 1.72f))
-                unit.moveAt(vec.trns(unit.angleTo(target) + 180f, unit.realSpeed()));
+                unit.moveAt(vec.trns(unit.angleTo(target) + 180f, unit.speed()));
         }else{
             if((core == null || !unit.within(core, range * 0.5f)) && command() == UnitCommand.attack){
                 boolean move = true;
