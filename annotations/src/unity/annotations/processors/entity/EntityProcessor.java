@@ -137,7 +137,7 @@ public class EntityProcessor extends BaseProcessor{
                         .addAnnotation(cName(EntityInterface.class))
                         .addAnnotation(
                             AnnotationSpec.builder(cName(SuppressWarnings.class))
-                                .addMember("value", "$S", "all")
+                                .addMember("value", "{$S, $S}", "all", "deprecation")
                             .build()
                         );
 
@@ -291,7 +291,7 @@ public class EntityProcessor extends BaseProcessor{
                     .addModifiers(Modifier.PUBLIC)
                     .addAnnotation(
                         AnnotationSpec.builder(SuppressWarnings.class)
-                            .addMember("value", "$S", "all")
+                            .addMember("value", "{$S, $S}", "all", "deprecation")
                         .build()
                     );
 
