@@ -44,26 +44,14 @@ public class AssistantAI extends FlyingAI{
             if(fallback.unit() != unit) fallback.unit(unit);
 
             if(current != null){
-                ReflectUtils.invokeMethod(
-                fallback,
-                ReflectUtils.findMethod(fallback.getClass(), "updateTargeting", true, ReflectUtils.emptyClasses),
-                ReflectUtils.emptyObjects
-                );
+                fallback.updateTargeting();
 
                 if(current.preserveVisuals){
-                    ReflectUtils.invokeMethod(
-                    fallback,
-                    ReflectUtils.findMethod(fallback.getClass(), "updateVisuals", true, ReflectUtils.emptyClasses),
-                    ReflectUtils.emptyObjects
-                    );
+                    fallback.updateVisuals();
                 }
 
                 if(current.preserveMovement){
-                    ReflectUtils.invokeMethod(
-                    fallback,
-                    ReflectUtils.findMethod(fallback.getClass(), "updateMovement", true, ReflectUtils.emptyClasses),
-                    ReflectUtils.emptyObjects
-                    );
+                    fallback.updateMovement();
                 }
             }else{
                 fallback.updateUnit();
@@ -111,7 +99,7 @@ public class AssistantAI extends FlyingAI{
     }
 
     @Override
-    protected void updateVisuals(){
+    public void updateVisuals(){
         if(current != null && current.updateVisuals.get(this)){
             if(current.preserveVisuals){
                 unit.lookAt(unit.prefRotation());
@@ -123,7 +111,7 @@ public class AssistantAI extends FlyingAI{
     }
 
     @Override
-    protected void updateTargeting(){
+    public void updateTargeting(){
         super.updateTargeting();
         if(current != null && current.updateTargetting.get(this)){
             current.updateTargetting(this);
@@ -190,7 +178,7 @@ public class AssistantAI extends FlyingAI{
     }
 
     @Override
-    protected void init(){
+    public void init(){
         updateUser();
         if(!unit.dead()){
             displayMessage("service.init");
@@ -313,7 +301,7 @@ public class AssistantAI extends FlyingAI{
 
                 BuilderAI buildAI = (BuilderAI)ai.fallback;
                 if(ai.user instanceof Builderc builder){
-                    ReflectUtils.setField(buildAI, ReflectUtils.findField(buildAI.getClass(), "following", true), builder);
+                    buildAI.following = (Unit)builder;
                 }
             }
 
@@ -361,14 +349,14 @@ public class AssistantAI extends FlyingAI{
 
                 MinerAI minAI = (MinerAI)ai.fallback;
                 if(ai.user instanceof Minerc miner){
-                    ReflectUtils.setField(minAI, ReflectUtils.findField(MinerAI.class, "targetItem", true),
+                    minAI.targetItem =
                     ai.unit.stack.amount > 0
                     ?   ai.unit.stack.item
                     :   (
                     miner.mineTile() != null
                         ?   miner.mineTile().drop()
                         :   null
-                    ));
+                    );
                 }
             }
 

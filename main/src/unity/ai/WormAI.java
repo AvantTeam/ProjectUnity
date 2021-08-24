@@ -45,7 +45,7 @@ public class WormAI extends FlyingAI{
     }
 
     @Override
-    protected void updateWeapons(){
+    public void updateWeapons(){
         if(unit instanceof Wormc w && unit.type instanceof UnityUnitType uType
         && w.head() != null && w.head().isShooting && w.head().controller() instanceof Player && unit.within(w.head(), uType.barrageRange + (unit.hitSize / 2f))){
             Unit head = w.head();

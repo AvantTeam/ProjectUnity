@@ -41,7 +41,7 @@ public class MonolithSoulAI implements UnitController{
         if(target != null && !unit.dead){
             vec.set(target)
                 .sub(unit)
-                .setLength(unit.realSpeed());
+                .setLength(unit.speed());
 
             unit.moveAt(vec);
             unit.lookAt(unit.prefRotation());
