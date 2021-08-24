@@ -6,7 +6,6 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
@@ -17,8 +16,6 @@ import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.storage.*;
 import unity.mod.*;
 import unity.world.blocks.*;
-
-import java.util.*;
 
 import static mindustry.Vars.*;
 
@@ -138,11 +135,11 @@ public class BlockMovement{
         //scan forward tiles for blockage
         if(!Build.validPlace(build.block, build.team, bx + dirs[direction].x, by + dirs[direction].y, build.rotation,
             false)){
-            Vars.world.tile(bx, by).setBlock(build.block, build.team, build.rotation, () -> build);
+            world.tile(bx, by).setBlock(build.block, build.team, build.rotation, () -> build);
             return false;
         }
 
-        Vars.world.tile(bx + dirs[direction].x, by + dirs[direction].y).setBlock(build.block, build.team,
+        world.tile(bx + dirs[direction].x, by + dirs[direction].y).setBlock(build.block, build.team,
             build.rotation, () -> build);
         return true;
     }
@@ -168,32 +165,33 @@ public class BlockMovement{
     //this.global.facdustrio.functions.getAllContacted(Vars.world.tile(197,212).build,0,99,null).each(b=>{print(b
     // .x/8+","+b.y/8)})
     public static Seq<Building> getAllContacted(Building root, int direction, int max, Boolf<Building> bool){
-        PriorityQueue<Building> queue = new PriorityQueue<>(10, (a, b) -> {//require ordering to be projection of the
-            // block's leading edge along  push direction.
-            return Math.round(project(a, direction) - project(b, direction));
-        });
+        PQueue<Building> queue = new PQueue<>(10, (a, b) ->
+            // require ordering to be projection of the block's leading edge along  push direction.
+            Math.round(project(a, direction) - project(b, direction))
+        );
+
         queue.add(root);
         Seq<Building> contacts = null;
-        while(!queue.isEmpty() && (contacts == null || contacts.size <= max)){
-            Building next = queue.poll();
+        while(!queue.empty() && (contacts == null || contacts.size <= max)){
+            var next = queue.poll();
             if(contacts == null){
                 contacts = Seq.with(next);
             }else{
                 contacts.add(next);
             }
-            Point2 tangent = dirs[(direction + 1) % 4];
-            Point2 o = origins[next.block.size - 1][direction];
+
+            var tangent = dirs[(direction + 1) % 4];
+            var o = origins[next.block.size - 1][direction];
             for(int i = 0; i < next.block.size; i++){ // iterate over forward edge.
-                Tile t = next.tile.nearby(o.x + tangent.x * i + dirs[direction].x,
+                var t = next.tile.nearby(o.x + tangent.x * i + dirs[direction].x,
                     o.y + tangent.y * i + dirs[direction].y);
-                Building b = t.build;
-                if(b == null || queue.contains(b) || contacts.contains(b)){
-                    continue;
-                }
-                if(!pushable(b) || (bool != null && !bool.get(b))){
-                    return null; // if a single block cannot be pushed then the entire group cannot be pushed from
-                    // the root.
-                }
+                var b = t.build;
+
+                if(b == null || Structs.indexOf(queue.queue, b) >= 0 || contacts.contains(b)) continue;
+
+                // if a single block cannot be pushed then the entire group cannot be pushed from the root.
+                if(!pushable(b) || (bool != null && !bool.get(b))) return null;
+
                 queue.add(b);
 
                 if(next instanceof ConnectedBlock){
@@ -205,6 +203,7 @@ public class BlockMovement{
                 }
             }
         }
+
         if(contacts != null && contacts.size <= max){
             return contacts;
         }else{
@@ -244,9 +243,8 @@ public class BlockMovement{
     // similar to the above but it spawns in a block after the push, and takes into account payload accepting blocks
     // returns 2 if successful, 0 if not, and 1 if the forward tile is a payload acceptor and was unsuccesful... so
     // you can spam attempts to push.
-    public static int pushOut(Building build, int x, int y, int direction, float speed, int max, Boolf<Building> bool
-        , boolean waitPayload){
-        var tile = Vars.world.tile(x, y);
+    public static int pushOut(Building build, int x, int y, int direction, float speed, int max, Boolf<Building> bool, boolean waitPayload){
+        var tile = world.tile(x, y);
         if(tile.build == null){
             if(!tileAvalibleTo(tile, build.block)){
                 return 0;
@@ -320,7 +318,7 @@ public class BlockMovement{
     }
 
     static void addPushedBlock(Building build, int direction, float speed){
-        BlockMovementUpdater bmu = new BlockMovementUpdater(build, dirs[direction], 60.0f / speed, 0, 0, 0);
+        var bmu = new BlockMovementUpdater(build, dirs[direction], 60.0f / speed, 0, 0, 0);
         currentlyPushing.put(build, bmu);
         bmu.update();
     }
@@ -330,11 +328,10 @@ public class BlockMovement{
     public static void onUpdate(){
         currentlyPushing.each((b, animate) -> {
             animate.update();
-            if(animate.isDead()){
-                toRemove.add(b);
-            }
+            if(animate.isDead()) toRemove.add(b);
         });
-        toRemove.forEach(i -> currentlyPushing.remove(i));
+
+        toRemove.each(currentlyPushing::remove);
         toRemove.clear();
     }
 

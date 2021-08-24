@@ -5,6 +5,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.entities.units.*;
@@ -19,8 +20,6 @@ import unity.world.blocks.*;
 import unity.world.blocks.logic.LightGenerator.*;
 import unity.world.blocks.logic.LightReflector.*;
 import unity.world.meta.*;
-
-import java.util.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
@@ -91,9 +90,9 @@ public class LightSource extends GenericCrafter{
         protected float strength = 0f;
         protected boolean lightInit = false;
         protected int angle = 0, loops;
-        protected final ArrayList<Tile> ls = new ArrayList<>();
-        protected final ArrayList<LightData> lsData = new ArrayList<>();
-        protected final ArrayList<LightGeneratorBuild> lCons = new ArrayList<>();
+        protected final Seq<Tile> ls = new Seq<>();
+        protected final Seq<LightData> lsData = new Seq<>();
+        protected final Seq<LightGeneratorBuild> lCons = new Seq<>();
         protected LightData lightData = new LightData(lightLength, lightColor);
 
         {
@@ -194,7 +193,7 @@ public class LightSource extends GenericCrafter{
 
             final float w = 1 + Math.min(getStrength() / 1000f, 10f);
             Lines.stroke(w);
-            for(int i = 0, len = ls.size(); i < len; i++){
+            for(int i = 0, len = ls.size; i < len; i++){
                 LightData tempData = lsData.get(i);
                 if(tempData == null) continue;
                 Tile tempTile = ls.get(i);
@@ -221,7 +220,7 @@ public class LightSource extends GenericCrafter{
         }
 
         protected void clearCons(){
-            lCons.forEach(b -> b.removeSource(this));
+            lCons.each(b -> b.removeSource(this));
         }
 
         protected void lightMarchStart(int length, int maxLength){
