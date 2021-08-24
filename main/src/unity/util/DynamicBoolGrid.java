@@ -45,7 +45,7 @@ public class DynamicBoolGrid{
     }
 
     public boolean get(int x, int y){
-        if(!multiArray) return array[0][(x * width) + y];
+        if(!multiArray) return array[0][x + (y * width)];
         return array[x][y];
     }
 
@@ -61,7 +61,7 @@ public class DynamicBoolGrid{
         if(multiArray){
             array[x][y] = b;
         }else{
-            array[0][(x * width) + y] = b;
+            array[0][x + (y * width)] = b;
         }
     }
 }

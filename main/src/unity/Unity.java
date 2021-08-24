@@ -152,6 +152,8 @@ public class Unity extends Mod{
             }
         }));
 
+        Utils.init();
+
         KamiPatterns.load();
         KamiBulletDatas.load();
 
