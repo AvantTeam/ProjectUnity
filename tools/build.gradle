@@ -4,7 +4,7 @@ sourceSets.main {
 
 import arc.files.*
 
-final def dexedJar = (project(':main').tasks.deployDex as Jar).archiveFile.get().asFile
+final def dexedJar = (project(':main').tasks.dex as Jar).archiveFile.get().asFile
 final def distJar = (project(':main').tasks.deploy as Jar).archiveFile.get().asFile
 final def regularJar = (project(':main').tasks.jar as Jar).archiveFile.get().asFile
 
@@ -15,7 +15,7 @@ dependencies {
         !cp.exists() ||
         toolRecompile ||
         taskNames.contains('main:deploy') ||
-        taskNames.contains('main:deployDex')
+        taskNames.contains('main:dex')
     ) {
         implementation project(':main')
         if(taskNames.contains('tools:proc')) println 'Compiling :main project before processing assets...'
@@ -32,7 +32,7 @@ task rearchive {
     final def listStr = file(assetsDir).list()
 
     task archDexed(type: Jar) {
-        if(taskNames.contains('main:deployDex')) dependsOn project(':main').tasks.deployDex
+        if(!dexedJar.exists() || taskNames.contains('main:dex')) dependsOn project(':main').tasks.dex
 
         archiveFileName.set dexedJar.getName()
         from files(assetsDir) {
@@ -55,7 +55,7 @@ task rearchive {
     }
 
     task archDist(type: Jar) {
-        if(taskNames.contains('main:deploy')) dependsOn project(':main').tasks.deploy
+        if(!distJar.exists() || taskNames.contains('main:deploy')) dependsOn project(':main').tasks.deploy
 
         archiveFileName.set distJar.getName()
         from files(assetsDir) {
@@ -79,7 +79,7 @@ task rearchive {
 
     def finalize = []
     if(distJar.exists() || taskNames.contains('main:deploy')) finalize += archDist
-    if(dexedJar.exists() || taskNames.contains('main:deployDex')) finalize += archDexed
+    if(dexedJar.exists() || taskNames.contains('main:dex')) finalize += archDexed
 
     finalizedBy finalize
 }

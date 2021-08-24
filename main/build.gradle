@@ -56,25 +56,25 @@ task deploy(type: Jar, dependsOn: configurations.runtimeClasspath) {
     }
 }
 
-task deployDex(type: Jar, dependsOn: deploy) {
+task dex(type: Jar) {
     archiveFileName.set "${modName}.jar"
 
     final def desktopJar = deploy.archiveFile.get().asFile
-    final def dexJar = new File(deployDex.getTemporaryDir(), 'Dexed.jar')
+    final def dexJar = new File(dex.getTemporaryDir(), 'Dexed.jar')
 
+    if(!desktopJar.exists()) dependsOn deploy
     doFirst {
         println 'Dexifying...'
         exec {
             def command = ['d8', '--min-api', sdkAPI, '--output', dexJar, desktopJar]
             final File[] files =
                 configurations.compileClasspath.asList() +
-                configurations.runtimeClasspath.asList() +
-                file("$sdkRoot/platforms/android-$sdkVersion/android.jar")
+                configurations.runtimeClasspath.asList()
 
             for(def file : files) {
-                assert file.exists()
                 command += ['--classpath', file.path]
             }
+            command += ['--lib', file("$sdkRoot/platforms/android-$sdkVersion/android.jar")]
 
             if(System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
                 command = ['cmd', '/c'] + command
