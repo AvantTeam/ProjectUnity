@@ -121,6 +121,45 @@ public class Annotations{
     //end region
     //region utilities
 
+    /** Guaranteed range of a float value */
+    public @interface Range{
+        /** @return Whether the range is enabled */
+        boolean enabled() default true;
+
+        /** @return The minimum value */
+        float min();
+
+        /** @return The maximum value */
+        float max();
+    }
+
+    /** Generates value-type wrapper for this class */
+    @Target({ElementType.TYPE})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface Struct{}
+
+    /** Defines a size and optional float packer for a struct field */
+    @Target({ElementType.FIELD})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface StructField{
+        /** @return The size of this field. 0 marks it as default size */
+        int value() default 0;
+
+        /** @return The name of a struct-wrapper field. Must not be empty */
+        String name() default "";
+
+        /** @return The float packer of this field, if applicable */
+        Range range() default @Range(enabled = false, min = Float.MIN_VALUE, max = Float.MAX_VALUE);
+    }
+
+    /** Wraps an existing value class so that it can be packed into {@code int}s / {@code long}s */
+    @Target({ElementType.FIELD})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface StructWrap{
+        /** @return The fields that are taken into account */
+        StructField[] value();
+    }
+
     /** Indicates that a field will be interpolated when synced. */
     @Target({ElementType.FIELD})
     @Retention(RetentionPolicy.SOURCE)

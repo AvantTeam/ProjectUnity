@@ -139,7 +139,7 @@ public abstract class BaseProcessor extends AbstractProcessor{
         return (TypeElement)types.asElement(t);
     }
 
-    public Seq<Element> elements(Runnable run){
+    public Seq<TypeElement> elements(Runnable run){
         try{
             run.run();
         }catch(MirroredTypesException ex){
@@ -349,6 +349,10 @@ public abstract class BaseProcessor extends AbstractProcessor{
 
         String result = builder.toString();
         return result.substring(result.indexOf("{") + 1, result.lastIndexOf("}")).trim() + "\n";
+    }
+
+    public boolean isVoid(TypeElement e){
+        return types.isSameType(e.asType(), toType(Void.class).asType());
     }
 
     @Override

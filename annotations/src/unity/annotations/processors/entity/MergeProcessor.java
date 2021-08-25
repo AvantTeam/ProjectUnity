@@ -103,7 +103,6 @@ public class MergeProcessor extends BaseProcessor{
                 Merge ann = annotation(def, Merge.class);
 
                 Seq<TypeElement> defComps = elements(ann::value)
-                    .<TypeElement>as()
                     .map(t -> inters.find(i -> simpleName(i).equals(simpleName(t))))
                     .select(t -> t != null && t.getEnclosingElement() instanceof PackageElement)
                     .map(this::toComp);
@@ -228,7 +227,7 @@ public class MergeProcessor extends BaseProcessor{
         boolean isBuild = defComps.contains(t -> t.getEnclosingElement() instanceof TypeElement);
 
         Seq<TypeElement> naming = Seq.with(defComps);
-        TypeElement baseClass = (TypeElement)elements(annotation(def, Merge.class)::base).first();
+        TypeElement baseClass = elements(annotation(def, Merge.class)::base).first();
         if(!isBuild){
             naming.insert(0, baseClass);
         }else{
@@ -321,10 +320,7 @@ public class MergeProcessor extends BaseProcessor{
 
             Seq<ExecutableElement> inserts = ins.get("constructor", Seq::new);
 
-            Seq<ExecutableElement> noComp = inserts.select(e -> types.isSameType(
-                elements(annotation(e, Insert.class)::block).first().asType(),
-                elements.getTypeElement("java.lang.Void").asType()
-            ));
+            Seq<ExecutableElement> noComp = inserts.select(e -> isVoid(elements(annotation(e, Insert.class)::block).first()));
 
             Seq<ExecutableElement> noCompBefore = noComp.select(e -> !annotation(e, Insert.class).after());
             noCompBefore.sort(Structs.comps(Structs.comparingFloat(m -> annotation(m, MethodPriority.class) != null ? annotation(m, MethodPriority.class).value() : 0), Structs.comparing(BaseProcessor::simpleName)));
@@ -423,10 +419,7 @@ public class MergeProcessor extends BaseProcessor{
                 throw new IllegalStateException("Method " + entry.key + " is not void, therefore no methods can @Insert to it");
             }
 
-            Seq<ExecutableElement> noComp = inserts.select(e -> types.isSameType(
-                elements(annotation(e, Insert.class)::block).first().asType(),
-                elements.getTypeElement("java.lang.Void").asType()
-            ));
+            Seq<ExecutableElement> noComp = inserts.select(e -> isVoid(elements(annotation(e, Insert.class)::block).first()));
 
             Seq<ExecutableElement> noCompBefore = noComp.select(e -> !annotation(e, Insert.class).after());
             noCompBefore.sort(Structs.comps(Structs.comparingFloat(m -> annotation(m, MethodPriority.class) != null ? annotation(m, MethodPriority.class).value() : 0), Structs.comparing(BaseProcessor::simpleName)));
@@ -503,7 +496,7 @@ public class MergeProcessor extends BaseProcessor{
             }
         }
 
-        TypeElement block = (TypeElement)elements(annotation(def.naming, Merge.class)::base).first();
+        TypeElement block = elements(annotation(def.naming, Merge.class)::base).first();
         if(def.parent != null){
             def.builder.superclass(cName(findBuild(block)));
             def.parent.builder.addType(def.builder.build());
@@ -644,7 +637,7 @@ public class MergeProcessor extends BaseProcessor{
             String blockName = simpleName(elem.getEnclosingElement()).toLowerCase().replace("comp", "");
 
             Seq<ExecutableElement> insertComp = inserts.select(e ->
-                simpleName(toComp((TypeElement)elements(annotation(e, Insert.class)::block).first()))
+                simpleName(toComp(elements(annotation(e, Insert.class)::block).first()))
                     .toLowerCase().replace("comp", "")
                     .equals(blockName)
             );

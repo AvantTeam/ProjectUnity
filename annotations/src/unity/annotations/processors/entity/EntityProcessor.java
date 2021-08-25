@@ -235,7 +235,6 @@ public class EntityProcessor extends BaseProcessor{
                 EntityDef ann = annotation(def, EntityDef.class);
 
                 Seq<TypeElement> defComps = elements(ann::value)
-                    .<TypeElement>as()
                     .map(t -> inters.find(i -> simpleName(i).equals(simpleName(t))))
                     .select(Objects::nonNull)
                     .map(this::toComp);
@@ -269,7 +268,7 @@ public class EntityProcessor extends BaseProcessor{
                 defComps.addAll(defComps.copy().flatMap(this::getDependencies)).distinct();
                 Seq<TypeElement> empty = Seq.with();
                 Seq<TypeElement> excludeGroups = Seq.with(defComps)
-                    .flatMap(t -> annotation(t, ExcludeGroups.class) != null ? elements(annotation(t, ExcludeGroups.class)::value).as() : empty)
+                    .flatMap(t -> annotation(t, ExcludeGroups.class) != null ? elements(annotation(t, ExcludeGroups.class)::value) : empty)
                     .distinct()
                     .map(this::toComp);
 
@@ -778,7 +777,7 @@ public class EntityProcessor extends BaseProcessor{
             for(EntityDefinition def : definitions){
                 if(!usedCNames.add(Reflect.get(TypeSpec.Builder.class, def.builder, "name"))) continue;
 
-                ObjectSet<String> methodNames = def.components.flatMap(type -> methods(type).map(BaseProcessor::simpleString)).<String>as().asSet();
+                ObjectSet<String> methodNames = def.components.flatMap(type -> methods(type).map(BaseProcessor::simpleString)).asSet();
 
                 if(def.extend != null){
                     def.builder.superclass(def.extend);
@@ -858,13 +857,13 @@ public class EntityProcessor extends BaseProcessor{
             String blockName = simpleName(elem.getEnclosingElement()).toLowerCase().replace("comp", "");
 
             Seq<ExecutableElement> insertComp = inserts.select(e ->
-                simpleName(toComp((TypeElement)elements(annotation(e, Insert.class)::block).first()))
+                simpleName(toComp(elements(annotation(e, Insert.class)::block).first()))
                     .toLowerCase().replace("comp", "")
                     .equals(blockName)
             );
 
             Seq<ExecutableElement> wrapComp = wrappers.select(e ->
-                simpleName(toComp((TypeElement)elements(annotation(e, Wrap.class)::block).first()))
+                simpleName(toComp(elements(annotation(e, Wrap.class)::block).first()))
                     .toLowerCase().replace("comp", "")
                     .equals(blockName)
             );
