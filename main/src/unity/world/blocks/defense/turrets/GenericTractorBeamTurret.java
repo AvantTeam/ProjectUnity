@@ -16,7 +16,6 @@ import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.defense.turrets.*;
-import unity.entities.*;
 import unity.gen.*;
 import unity.graphics.*;
 
@@ -66,6 +65,7 @@ public abstract class GenericTractorBeamTurret<T extends Teamc> extends BaseTurr
     @Override
     public void init(){
         consumes.powerCond(powerUse, (GenericTractorBeamTurretBuild build) -> build.target != null);
+        clipSize = Math.max(clipSize, range * 2f + size * tilesize);
 
         super.init();
         if(shootLength < 0) shootLength = size * tilesize / 2f;
@@ -84,9 +84,8 @@ public abstract class GenericTractorBeamTurret<T extends Teamc> extends BaseTurr
         return new TextureRegion[]{baseRegion, region};
     }
 
-    public abstract class GenericTractorBeamTurretBuild extends BaseTurretBuild implements ExtensionHolder, ControlBlock, Senseable{
+    public abstract class GenericTractorBeamTurretBuild extends BaseTurretBuild implements ControlBlock, Senseable{
         public @Nullable BlockUnitc unit;
-        protected Extension ext;
 
         public T target;
         public Vec2 targetPos = new Vec2();
@@ -98,10 +97,6 @@ public abstract class GenericTractorBeamTurret<T extends Teamc> extends BaseTurr
         @Override
         public void created(){
             super.created();
-            ext = Extension.create();
-            ext.holder = this;
-            ext.set(x, y);
-            ext.add();
 
             unit = UnitTypes.block.create(team).as();
             unit.tile(this);
@@ -153,12 +148,6 @@ public abstract class GenericTractorBeamTurret<T extends Teamc> extends BaseTurr
         }
 
         @Override
-        public void onRemoved(){
-            super.onRemoved();
-            ext.remove();
-        }
-
-        @Override
         public void updateTile(){
             if(!validateTarget()) target = null;
 
@@ -206,7 +195,7 @@ public abstract class GenericTractorBeamTurret<T extends Teamc> extends BaseTurr
 
             if(shot){
                 strength = Mathf.lerpDelta(strength, Mathf.clamp(efficiency()), 0.1f);
-                if(strength > 0.1f) control.sound.loop(shootSound, this, shootSoundVolume);
+                if(strength > 0.1f && !headless) control.sound.loop(shootSound, this, shootSoundVolume);
             }else{
                 strength = Mathf.lerpDelta(strength, 0f, 0.1f);
             }
@@ -249,16 +238,7 @@ public abstract class GenericTractorBeamTurret<T extends Teamc> extends BaseTurr
             Draw.rect(baseRegion, x, y);
             Drawf.shadow(region, x - (size / 2f), y - (size / 2f), rotation - 90);
             Draw.rect(region, x, y, rotation - 90);
-        }
 
-        @Override
-        public float clipSizeExt(){
-            if(Float.isNaN(targetPos.x) || Float.isNaN(targetPos.y)) return 0f;
-            return dst(targetPos.x, targetPos.y) * 2f;
-        }
-
-        @Override
-        public void drawExt(){
             if(strength > 0.1f){
                 tr.trns(rotation, shootLength);
 
@@ -268,11 +248,11 @@ public abstract class GenericTractorBeamTurret<T extends Teamc> extends BaseTurr
                 Draw.alpha(laserAlpha());
 
                 Drawf.laser(team, laser, laserEnd,
-                    x + tr.x,
-                    y + tr.y,
-                    targetPos.x,
-                    targetPos.y,
-                    strength * laserWidth
+                x + tr.x,
+                y + tr.y,
+                targetPos.x,
+                targetPos.y,
+                strength * laserWidth
                 );
 
                 Draw.mixcol();
