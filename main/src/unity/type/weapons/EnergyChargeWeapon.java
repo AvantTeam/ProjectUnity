@@ -197,13 +197,11 @@ public class EnergyChargeWeapon extends Weapon{
 
     Bullet bulletC(Unit unit, float shootX, float shootY, float angle, float lifescl, float charge){
         float xr = Mathf.range(xRand);
-        Bullet b = bullet.create(unit, unit.team,
+
+        return bullet.create(unit, unit.team,
         shootX + Angles.trnsx(angle, 0, xr),
         shootY + Angles.trnsy(angle, 0, xr),
-        angle, (1f - velocityRnd) + Mathf.random(velocityRnd), lifescl);
-        b.damage += charge;
-
-        return b;
+        angle, bullet.damage + charge, (1f - velocityRnd) + Mathf.random(velocityRnd), lifescl, null);
     }
 
     public static class ChargeMount extends WeaponMount{

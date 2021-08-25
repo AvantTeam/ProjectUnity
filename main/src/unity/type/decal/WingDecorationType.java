@@ -34,6 +34,7 @@ public class WingDecorationType extends UnitDecorationType{
     @Override
     public void draw(Unit unit, UnitDecoration deco){
         WingDecoration wd = (WingDecoration)deco;
+        unit.type.applyColor(unit);
         for(Wing wing : wings){
             float l = slope(((wd.left / flapScl) + wing.offset) % 1f) * -wing.mag;
             float r = slope(((wd.right / flapScl) + wing.offset) % 1f) * -wing.mag;
@@ -49,6 +50,7 @@ public class WingDecorationType extends UnitDecorationType{
                 Draw.rect(region, x, y, region.width * s * Draw.scl, region.height * Draw.scl, wingAngle);
             }
         }
+        Draw.reset();
     }
 
     @Override

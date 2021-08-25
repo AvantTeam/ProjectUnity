@@ -3919,6 +3919,10 @@ public class UnityUnitTypes implements ContentList{
                 mirror = false;
                 reload = 2f * 60f;
 
+                bullet = new AnomalyLaserBulletType(400f){{
+                    lightningColor = Pal.lancerLaser;
+                }};
+
                 float rad = 70f;
                 drawCharge = (unit, mount, charge) -> {
                     float rotation = unit.rotation - 90f,
@@ -3949,7 +3953,7 @@ public class UnityUnitTypes implements ContentList{
                         Units.nearbyEnemies(unit.team, wx, wy, rad, u -> {
                             u.damage(90f);
                             if(u.dead){
-                                m.charge += (u.hitSize / 2f) * (u.isFlying() ? Mathf.clamp(u.type.fallSpeed * 5f) : 1f);
+                                m.charge += Mathf.sqrt(u.maxHealth) * (u.isFlying() ? Mathf.clamp(u.type.fallSpeed * 5f) : 1f);
                                 for(int i = 0; i < 4; i++){
                                     Time.run(i * 5f, () ->
                                     SpecialFx.chargeTransfer.at(u.x, u.y, 0f, Pal.lancerLaser, unit));
