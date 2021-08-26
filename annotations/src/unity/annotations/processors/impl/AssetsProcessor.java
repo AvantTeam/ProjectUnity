@@ -52,8 +52,7 @@ public class AssetsProcessor extends BaseProcessor{
 
                     @Override
                     public void load(MethodSpec.Builder builder){
-                        builder.beginControlFlow("if(!$T.headless)", cName(Vars.class))
-                            .addStatement("var n = $S + name", directory() + "/")
+                        builder.addStatement("var n = $S + name", directory() + "/")
                             .addStatement("var path = $T.tree.get(n + $S).exists() ? n + $S : n + $S", cName(Vars.class), ".ogg", ".ogg", ".mp3")
                             .addCode(lnew())
                             .addStatement("var sound = new $T()", cName(Sound.class))
@@ -61,10 +60,7 @@ public class AssetsProcessor extends BaseProcessor{
                             .addStatement("var desc = $T.assets.load(path, $T.class, new $T(sound))", cName(Core.class), cName(Sound.class), cName(SoundParameter.class))
                             .addStatement("desc.errored = e -> $T.err(($T)e)", cName(Log.class), cName(Throwable.class))
                             .addCode(lnew())
-                            .addStatement("return sound")
-                        .nextControlFlow("else")
-                            .addStatement("return new $T()", cName(Sound.class))
-                        .endControlFlow();
+                            .addStatement("return sound");
                     }
                 },
 
@@ -102,8 +98,7 @@ public class AssetsProcessor extends BaseProcessor{
 
                     @Override
                     public void load(MethodSpec.Builder builder){
-                        builder.beginControlFlow("if(!$T.headless)", cName(Vars.class))
-                            .addStatement("var n = $S + name", directory() + "/")
+                        builder.addStatement("var n = $S + name", directory() + "/")
                             .addStatement("var path = n + $S", ".obj")
                             .addCode(lnew())
                             .addStatement("var object = new $T()", tName(type()))
@@ -111,10 +106,7 @@ public class AssetsProcessor extends BaseProcessor{
                             .addStatement("var desc = $T.assets.load(path, $T.class, new $T(object))", cName(Core.class), tName(type()), tName(elements.getTypeElement("unity.util.WavefrontObjectLoader.WavefrontObjectParameters")))
                             .addStatement("desc.errored = e -> $T.err(($T)e)", cName(Log.class), cName(Throwable.class))
                             .addCode(lnew())
-                            .addStatement("return object")
-                        .nextControlFlow("else")
-                            .addStatement("return new $T()", tName(type()))
-                        .endControlFlow();
+                            .addStatement("return object");
                     }
                 },
 
@@ -142,8 +134,7 @@ public class AssetsProcessor extends BaseProcessor{
 
                     @Override
                     public void load(MethodSpec.Builder builder){
-                        builder.beginControlFlow("if(!$T.headless)", cName(Vars.class))
-                            .addStatement("var n = $S + name", directory() + "/")
+                        builder.addStatement("var n = $S + name", directory() + "/")
                             .addStatement("var path = $T.tree.get(n + $S).exists() ? n + $S : n + $S", cName(Vars.class), ".g3db", ".g3db", ".g3dj")
                             .addCode(lnew())
                             .addStatement("var model = new $T()", tName(type()))
@@ -155,15 +146,7 @@ public class AssetsProcessor extends BaseProcessor{
                                 .addStatement("$T.err(t)", cName(Log.class))
                             .endControlFlow()
                             .addCode(lnew())
-                            .addStatement("return model")
-                        .nextControlFlow("else")
-                            .addStatement("return new $T()", tName(type()))
-                        .endControlFlow();
-                    }
-
-                    @Override
-                    public void dispose(MethodSpec.Builder builder){
-                        builder.addStatement("asset.dispose()");
+                            .addStatement("return model");
                     }
                 }
             );
@@ -185,21 +168,9 @@ public class AssetsProcessor extends BaseProcessor{
                 a.load(specLoad);
                 spec.addMethod(specLoad.build());
 
-                MethodSpec.Builder specDispose = MethodSpec.methodBuilder("dispose").addModifiers(Modifier.PROTECTED, Modifier.STATIC)
-                    .returns(tName(type))
-                    .addParameter(cName(String.class), "name")
-                    .addParameter(tName(type), "asset");
-
-                a.dispose(specDispose);
-                spec.addMethod(specDispose
-                    .addStatement("return null")
-                    .build()
-                );
-
                 MethodSpec.Builder globalLoad = MethodSpec.methodBuilder("load").addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                    .returns(TypeName.VOID);
-                MethodSpec.Builder globalDispose = MethodSpec.methodBuilder("dispose").addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                    .returns(TypeName.VOID);
+                    .returns(TypeName.VOID)
+                    .addStatement("if($T.headless) return", cName(Vars.class));
 
                 boolean useProp = a.properties();
 
@@ -219,16 +190,14 @@ public class AssetsProcessor extends BaseProcessor{
                     int ex = path.extension().length() + 1;
 
                     spec.addField(
-                        FieldSpec.builder(
-                            tName(type),
-                            fieldName,
-                            Modifier.PUBLIC, Modifier.STATIC
-                        ).build()
+                        FieldSpec.builder(tName(type), fieldName)
+                            .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                            .initializer(a.initializer())
+                        .build()
                     );
 
                     String stripped = name.substring(0, name.length() - ex);
                     globalLoad.addStatement("$L = load($S)", fieldName, stripped);
-                    globalDispose.addStatement("$L = dispose($S, $L)", fieldName, stripped, fieldName);
 
                     if(a.properties()){
                         Seq<String> props = properties.keys().toSeq().select(prop -> prop.split("\\.")[1].equals(stripped));
@@ -253,8 +222,6 @@ public class AssetsProcessor extends BaseProcessor{
                 });
 
                 spec.addMethod(globalLoad.build());
-                spec.addMethod(globalDispose.build());
-
                 write(spec.build());
             }
         }
@@ -289,7 +256,8 @@ public class AssetsProcessor extends BaseProcessor{
         /** Method builder for asset loading */
         void load(MethodSpec.Builder builder);
 
-        /** Method builder for asset disposing */
-        default void dispose(MethodSpec.Builder builder){}
+        default CodeBlock initializer(){
+            return CodeBlock.builder().addStatement("new $T()", tName(type())).build();
+        }
     }
 }

@@ -41,7 +41,6 @@ public class Unity extends Mod{
     public static TapHandler tap;
     public static AntiCheat antiCheat;
     public static DevBuild dev;
-    public static Models model;
 
     public static CinematicEditor cinematicEditor;
 
@@ -113,13 +112,6 @@ public class Unity extends Mod{
             UnitySounds.load();
         }));
 
-        Events.on(DisposeEvent.class, e -> {
-            UnityModels.dispose();
-            UnityShaders.dispose();
-            UnityObjs.dispose();
-            UnitySounds.dispose();
-        });
-
         Events.on(ClientLoadEvent.class, e -> {
             creditsDialog = new CreditsDialog();
             scriptsDialog = new JSScriptDialog();
@@ -130,9 +122,10 @@ public class Unity extends Mod{
             SpeechDialog.init();
 
             Triggers.listen(Trigger.preDraw, () -> {
-                model.camera.position.set(Core.camera.position.x, Core.camera.position.y, 0f);
-                model.camera.resize(Core.camera.width, Core.camera.height);
-                model.camera.update();
+                var cam = Models.camera;
+                cam.position.set(Core.camera.position.x, Core.camera.position.y, 0f);
+                cam.resize(Core.camera.width, Core.camera.height);
+                cam.update();
             });
 
             var mod = mods.getMod(Unity.class);
@@ -172,7 +165,6 @@ public class Unity extends Mod{
         music = new MusicHandler(){};
         tap = new TapHandler();
         antiCheat = new AntiCheat();
-        model = new Models();
 
         cinematicEditor = new CinematicEditor();
 

@@ -6,7 +6,6 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
-import arc.graphics.g3d.*;
 import arc.graphics.gl.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -15,13 +14,11 @@ import arc.util.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import unity.assets.type.g3d.*;
-import unity.assets.type.g3d.attribute.*;
 import unity.assets.type.g3d.attribute.type.*;
 import unity.assets.type.g3d.attribute.type.light.*;
 import unity.mod.*;
 
 import static mindustry.Vars.*;
-import static unity.Unity.*;
 
 public class UnityShaders{
     public static StencilShader stencilShader;
@@ -30,7 +27,6 @@ public class UnityShaders{
     public static VapourizeShader vapourizeShader;
 
     protected static FrameBuffer buffer;
-    protected static boolean loaded;
 
     public static void load(){
         if(headless) return;
@@ -61,17 +57,6 @@ public class UnityShaders{
                 }
             }
         });
-    }
-
-    public static void dispose(){
-        if(!headless && loaded){
-            if(buffer != null) buffer.dispose();
-
-            stencilShader.dispose();
-            vapourizeShader.dispose();
-            megalithRingShader.dispose();
-            graphics3DProvider.dispose();
-        }
     }
 
     public static class CondShader extends Shader{
@@ -212,7 +197,7 @@ public class UnityShaders{
         }
 
         public Graphics3DShader get(Renderable render){
-            return get(render.material.mask() | model.environment.mask(), render.meshPart.mesh.attributes);
+            return get(render.material.mask() | Models.environment.mask(), render.meshPart.mesh.attributes);
         }
 
         public Graphics3DShader get(long mask, VertexAttribute[] attributes){
@@ -221,16 +206,16 @@ public class UnityShaders{
 
                 if(Structs.indexOf(attributes, VertexAttribute.color) != -1) prefix += define("color");
 
-                if(model.environment.mask() != 0) prefix += define("lighting");
+                if(Models.environment.mask() != 0) prefix += define("lighting");
                 if((mask & ColorAttribute.ambientLight) != 0) prefix += define("ambientLight");
                 if((mask & DirectionalLightsAttribute.light) != 0){
-                    prefix += defineRaw("numDirectionalLights " + model.environment.<DirectionalLightsAttribute>get(DirectionalLightsAttribute.light).lights.size);
+                    prefix += defineRaw("numDirectionalLights " + Models.environment.<DirectionalLightsAttribute>get(DirectionalLightsAttribute.light).lights.size);
                 }else{
                     prefix += defineRaw("numDirectionalLights 0");
                 }
 
                 if((mask & PointLightsAttribute.light) != 0){
-                    prefix += defineRaw("numPointLights " + model.environment.<PointLightsAttribute>get(PointLightsAttribute.light).lights.size);
+                    prefix += defineRaw("numPointLights " + Models.environment.<PointLightsAttribute>get(PointLightsAttribute.light).lights.size);
                 }else{
                     prefix += defineRaw("numPointLights 0");
                 }
@@ -273,9 +258,9 @@ public class UnityShaders{
         }
 
         public void apply(Renderable render){
-            Camera3D camera = model.camera;
-            Material material = render.material;
-            Environment env = model.environment;
+            var camera = Models.camera;
+            var material = render.material;
+            var env = Models.environment;
 
             setUniformMatrix4("u_proj", camera.combined.val);
             setUniformMatrix4("u_trans", render.worldTransform.val);
@@ -306,7 +291,7 @@ public class UnityShaders{
             ColorAttribute diffCol = material.get(ColorAttribute.diffuse);
             if(diffCol != null) setUniformf("u_diffuseColor", diffCol.color);
             if(diff != null){
-                setUniformi("u_diffuseTexture", model.bind(diff, 6));
+                setUniformi("u_diffuseTexture", Models.bind(diff, 6));
                 setUniformf("u_diffuseUVTransform", diff.offsetU, diff.offsetV, diff.scaleU, diff.scaleV);
             }
 
@@ -314,7 +299,7 @@ public class UnityShaders{
             ColorAttribute specCol = material.get(ColorAttribute.specular);
             if(specCol != null) setUniformf("u_specularColor", specCol.color);
             if(spec != null){
-                setUniformi("u_specularTexture", model.bind(spec, 5));
+                setUniformi("u_specularTexture", Models.bind(spec, 5));
                 setUniformf("u_specularUVTransform", spec.offsetU, spec.offsetV, spec.scaleU, spec.scaleV);
             }
 
@@ -322,7 +307,7 @@ public class UnityShaders{
             ColorAttribute emCol = material.get(ColorAttribute.emissive);
             if(emCol != null) setUniformf("u_emissiveColor", emCol.color);
             if(em != null){
-                setUniformi("u_emissiveTexture", model.bind(em, 4));
+                setUniformi("u_emissiveTexture", Models.bind(em, 4));
                 setUniformf("u_emissiveUVTransform", em.offsetU, em.offsetV, em.scaleU, em.scaleV);
             }
 
@@ -330,7 +315,7 @@ public class UnityShaders{
             ColorAttribute refCol = material.get(ColorAttribute.reflection);
             if(refCol != null) setUniformf("u_reflectionColor", refCol.color);
             if(ref != null){
-                setUniformi("u_reflectionTexture", model.bind(ref, 3));
+                setUniformi("u_reflectionTexture", Models.bind(ref, 3));
                 setUniformf("u_reflectionUVTransform", ref.offsetU, ref.offsetV, ref.scaleU, ref.scaleV);
             }
 
@@ -338,13 +323,13 @@ public class UnityShaders{
             ColorAttribute amCol = material.get(ColorAttribute.ambient);
             if(amCol != null) setUniformf("u_ambientColor", amCol.color);
             if(am != null){
-                setUniformi("u_ambientTexture", model.bind(am, 2));
+                setUniformi("u_ambientTexture", Models.bind(am, 2));
                 setUniformf("u_ambientUVTransform", am.offsetU, am.offsetV, am.scaleU, am.scaleV);
             }
 
             TextureAttribute nor = material.get(TextureAttribute.normal);
             if(nor != null){
-                setUniformi("u_normalTexture", model.bind(nor, 1));
+                setUniformi("u_normalTexture", Models.bind(nor, 1));
                 setUniformf("u_normalUVTransform", nor.offsetU, nor.offsetV, nor.scaleU, nor.scaleV);
             }
 

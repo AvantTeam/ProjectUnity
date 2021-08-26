@@ -16,41 +16,26 @@ import unity.assets.type.g3d.attribute.light.*;
 import unity.assets.type.g3d.attribute.type.*;
 import unity.mod.*;
 
-import static mindustry.Vars.*;
+public final class Models{
+    public static final Camera3D camera = new Camera3D();
+    public static final RenderableSorter sorter = new RenderableSorter();
+    public static final Environment environment = new Environment();
 
-public class Models{
-    public final Camera3D camera;
-    public final RenderableSorter sorter;
-    public final Environment environment;
+    protected static FrameBuffer buffer = new FrameBuffer();
+    protected static RenderPool pool = new RenderPool();
 
-    protected FrameBuffer buffer;
-    protected RenderPool pool = new RenderPool();
+    static{
+        camera.perspective = false;
+        camera.near = -10000f;
+        camera.far = 10000f;
 
-    public Models(){
-        if(!headless){
-            camera = new Camera3D();
-            sorter = new RenderableSorter();
-            environment = new Environment();
+        environment.set(ColorAttribute.createAmbientLight(0.4f, 0.4f, 0.4f, 1f));
+        environment.add(new DirectionalLight().set(0.56f, 0.56f, 0.56f, -1f, -1f, -0.3f));
 
-            camera.perspective = false;
-            camera.near = -10000f;
-            camera.far = 10000f;
-
-            environment.set(ColorAttribute.createAmbientLight(0.4f, 0.4f, 0.4f, 1f));
-            environment.add(new DirectionalLight().set(0.56f, 0.56f, 0.56f, -1f, -1f, -0.3f));
-
-            Core.app.post(() -> {
-                buffer = new FrameBuffer(2, 2, true);
-                Triggers.listen(Trigger.preDraw, () -> buffer.resize(Core.graphics.getWidth(), Core.graphics.getHeight()));
-            });
-        }else{
-            camera = null;
-            sorter = null;
-            environment = null;
-        }
+        Triggers.listen(Trigger.preDraw, () -> buffer.resize(Core.graphics.getWidth(), Core.graphics.getHeight()));
     }
 
-    public void render(RenderableProvider prov){
+    public static void render(RenderableProvider prov){
         prov.getRenderables(pool);
         sorter.sort(camera, pool.renders);
 
@@ -69,12 +54,12 @@ public class Models{
         pool.renders.size = 0;
     }
 
-    public int bind(TextureAttribute attr, int bind){
+    public static int bind(TextureAttribute attr, int bind){
         attr.texture.bind(bind);
         return bind;
     }
 
-    protected void begin(){
+    protected static void begin(){
         buffer.begin(Color.clear);
 
         Gl.enable(Gl.cullFace);
@@ -91,7 +76,7 @@ public class Models{
         Gl.clear(Gl.colorBufferBit | Gl.depthBufferBit);
     }
 
-    protected void end(){
+    protected static void end(){
         buffer.end();
         Draw.blit(buffer.getTexture(), Shaders.screenspace);
 

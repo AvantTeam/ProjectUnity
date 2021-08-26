@@ -8,6 +8,6 @@ public interface RenderableProvider{
     void getRenderables(Prov<Renderable> renders);
 
     default void render(){
-        model.render(this);
+        Models.render(this);
     }
 }
