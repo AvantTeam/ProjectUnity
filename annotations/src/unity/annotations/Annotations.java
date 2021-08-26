@@ -121,18 +121,6 @@ public class Annotations{
     //end region
     //region utilities
 
-    /** Guaranteed range of a float value */
-    public @interface Range{
-        /** @return Whether the range is enabled */
-        boolean enabled() default true;
-
-        /** @return The minimum value */
-        float min();
-
-        /** @return The maximum value */
-        float max();
-    }
-
     /** Generates value-type wrapper for this class */
     @Target({ElementType.TYPE})
     @Retention(RetentionPolicy.SOURCE)
@@ -142,14 +130,39 @@ public class Annotations{
     @Target({ElementType.FIELD})
     @Retention(RetentionPolicy.SOURCE)
     public @interface StructField{
-        /** @return The size of this field. 0 marks it as default size */
+        /** @return The size of this field. 0 marks it as default size. When dealing with floats, this is replaced with {@link FloatPacker#size} */
         int value() default 0;
 
         /** @return The name of a struct-wrapper field. Must not be empty */
         String name() default "";
 
         /** @return The float packer of this field, if applicable */
-        Range range() default @Range(enabled = false, min = Float.MIN_VALUE, max = Float.MAX_VALUE);
+        FloatPacker packer() default FloatPacker.def;
+
+        /** Float packers */
+        enum FloatPacker{
+            /** Default. Takes all 32 bits */
+            def(32,
+                f -> "Float.floatToIntBits(" + f + ")",
+                f -> "Float.intBitsToFloat(" + f + ")"
+            ),
+
+            /** RGBA8888 color format. Takes 8 bits for 4 floats each */
+            rgba8888(8,
+                f -> "(" + f + " * 255f)",
+                f -> "(" + f + " / 255f)"
+            );
+
+            public final int size;
+            public final Func<String, String> packer;
+            public final Func<String, String> unpacker;
+
+            FloatPacker(int size, Func<String, String> packer, Func<String, String> unpacker){
+                this.size = size;
+                this.packer = packer;
+                this.unpacker = unpacker;
+            }
+        }
     }
 
     /** Wraps an existing value class so that it can be packed into {@code int}s / {@code long}s */
@@ -158,6 +171,9 @@ public class Annotations{
     public @interface StructWrap{
         /** @return The fields that are taken into account */
         StructField[] value();
+
+        /** @return Whether the bits start from left-most */
+        boolean left() default false;
     }
 
     /** Indicates that a field will be interpolated when synced. */

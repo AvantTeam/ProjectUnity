@@ -69,16 +69,20 @@ public abstract class BaseProcessor extends AbstractProcessor{
 
                 rootDir = Fi.get(path);
             }catch(IOException e){
-                Log.err(e);
-                throw new RuntimeException(e);
+                Throwable finalCause = Strings.getFinalCause(e);
+
+                Log.err(finalCause);
+                throw new RuntimeException(finalCause);
             }
         }
 
         try{
             process(roundEnv);
         }catch(Exception e){
-            Log.err(e);
-            throw new RuntimeException(e);
+            Throwable finalCause = Strings.getFinalCause(e);
+
+            Log.err(finalCause);
+            throw new RuntimeException(finalCause);
         }
 
         return true;
