@@ -95,6 +95,8 @@ public class UnityUnitType extends UnitType{
     // End units
     public AntiCheatVariables antiCheatType;
 
+    boolean wormCreating = false;
+
     public UnityUnitType(String name){
         super(name);
         outlines = false;
@@ -114,6 +116,29 @@ public class UnityUnitType extends UnitType{
                     e.join();
                 }
             }
+        }
+
+        if(!wormCreating && unit instanceof Wormc w){
+            wormCreating = true;
+            Unit cur = unit;
+            int cid = unit.id;
+            //Tmp.v1.trns(unit.rotation + 180f, segmentOffset + headOffset).add(unit);
+            for(int i = 0; i < segmentLength; i++){
+                Unit t = create(team);
+                t.elevation = unit.elevation;
+
+                Wormc wt = (Wormc)t;
+                wt.layer(1f + i);
+                wt.head(unit);
+                wt.parent(cur);
+                ((Wormc)cur).child(t);
+                ((Wormc)cur).childId(cid);
+                ((Wormc)cur).headId(unit.id);
+                t.setupWeapons(this);
+                cid = t.id;
+                cur = t;
+            }
+            wormCreating = false;
         }
 
         return unit;

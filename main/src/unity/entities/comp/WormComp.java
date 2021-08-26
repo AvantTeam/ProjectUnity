@@ -28,6 +28,8 @@ abstract class WormComp implements Unitc{
     protected float regenTime = 0f;
     protected float waitTime = 0f;
 
+    @SyncLocal public int childId = -1, headId = -1;
+
     @Import UnitType type;
     @Import float healthMultiplier, health, x, y;
     @Import boolean dead;
@@ -341,6 +343,25 @@ abstract class WormComp implements Unitc{
     }
 
     @Override
+    public void afterSync(){
+        if(headId != -1 && head == null){
+            Unit h = Groups.unit.getByID(headId);
+            if(h instanceof Wormc wc){
+                head = h;
+                headId = -1;
+            }
+        }
+        if(childId != -1 && child == null){
+            Unit c = Groups.unit.getByID(childId);
+            if(c instanceof Wormc wc){
+                child = c;
+                wc.parent(self());
+                childId = -1;
+            }
+        }
+    }
+
+    @Override
     @BreakAll
     public void remove(){
         UnityUnitType uType = (UnityUnitType)type;
@@ -394,6 +415,7 @@ abstract class WormComp implements Unitc{
         UnityUnitType uType = (UnityUnitType)type;
         Unit current = self();
         if(isHead()){
+            /*
             if(child == null){
                 float rot = rotation() + uType.angleLimit;
                 Tmp.v1.trns(rot + 180f, uType.segmentOffset + uType.headOffset).add(self());
@@ -425,6 +447,23 @@ abstract class WormComp implements Unitc{
                     }
                 });
             }
+             */
+
+            float[] rot = {rotation() + uType.angleLimit};
+            Tmp.v1.trns(rot[0] + 180f, uType.segmentOffset + uType.headOffset).add(self());
+            distributeActionBack(u -> {
+                if(u != self()){
+                    u.x = Tmp.v1.x;
+                    u.y = Tmp.v1.y;
+                    u.rotation = rot[0];
+
+                    rot[0] += uType.angleLimit;
+                    Tmp.v2.trns(rot[0] + 180f, uType.segmentOffset);
+                    Tmp.v1.add(Tmp.v2);
+
+                    u.add();
+                }
+            });
         }
     }
 }
