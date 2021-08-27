@@ -15,7 +15,7 @@ public abstract class UnitDecorationType{
 
     public abstract void draw(Unit unit, UnitDecoration deco);
 
-    public void drawIcon(Func<TextureRegion, Pixmap> prov, Pixmap icon, Cons<TextureRegion> outliner){
+    public void drawIcon(Func<TextureRegion, Pixmap> prov, Pixmap icon, Func<TextureRegion, TextureRegion> outliner){
 
     }
 

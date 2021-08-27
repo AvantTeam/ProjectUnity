@@ -12,6 +12,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
 import mindustry.type.*;
+import unity.gen.*;
 
 import static arc.Core.*;
 
@@ -94,30 +95,26 @@ public final class GraphicUtils{
      * @author sk7725
      */
     public static TextureRegion blendSprites(TextureRegion a, TextureRegion b, float f, String name){
-        PixmapRegion r1 = atlas.getPixmap(a);
-        PixmapRegion r2 = atlas.getPixmap(b);
+        var r1 = atlas.getPixmap(a);
+        var r2 = atlas.getPixmap(b);
 
-        Pixmap out = new Pixmap(r1.width, r1.height);
-        Color color1 = new Color();
-        Color color2 = new Color();
+        var out = new Pixmap(r1.width, r1.height);
 
         for(int x = 0; x < r1.width; x++){
             for(int y = 0; y < r1.height; y++){
-                r1.get(x, y, color1);
-                r2.get(x, y, color2);
-                out.setRaw(x, y, color1.lerp(color2, f).rgba());
+                int c1 = r1.get(x, y);
+                int c2 = r2.get(x, y);
+                out.setRaw(x, y, SColor.lerp(c1, SColor.r(c2), SColor.g(c2), SColor.b(c2), SColor.a(c2), f));
             }
         }
 
-        Texture tex  = new Texture(out);
+        var tex  = new Texture(out);
         return atlas.addRegion(name + "-blended-" + (int)(f * 100), tex, 0, 0, tex.width, tex.height);
     }
 
     public static Pixmap outline(TextureRegion region, Color color, int width){
         var out = Pixmaps.outline(atlas.getPixmap(region), color, width);
-        if(Core.settings.getBool("linear")){
-            Pixmaps.bleed(out);
-        }
+        if(Core.settings.getBool("linear")) Pixmaps.bleed(out);
 
         return out;
     }
@@ -172,22 +169,22 @@ public final class GraphicUtils{
     }
 
     /** @author Drullkus */
-    public static Color colorLerp(Color a, Color b, float frac){
-        return a.set(
-            pythagoreanLerp(a.r, b.r, frac),
-            pythagoreanLerp(a.g, b.g, frac),
-            pythagoreanLerp(a.b, b.b, frac),
-            pythagoreanLerp(a.a, b.a, frac)
+    public static int colorLerp(int a, int b, float frac){
+        return SColor.construct(
+            pythagoreanLerp(SColor.r(a), SColor.r(b), frac),
+            pythagoreanLerp(SColor.g(a), SColor.g(b), frac),
+            pythagoreanLerp(SColor.b(a), SColor.b(b), frac),
+            pythagoreanLerp(SColor.a(a), SColor.a(b), frac)
         );
     }
 
     /** @author Drullkus */
-    public static Color averageColor(Color a, Color b){
-        return a.set(
-            pythagoreanAverage(a.r, b.r),
-            pythagoreanAverage(a.g, b.g),
-            pythagoreanAverage(a.b, b.b),
-            pythagoreanAverage(a.a, b.a)
+    public static int averageColor(int a, int b){
+        return SColor.construct(
+            pythagoreanAverage(SColor.r(a), SColor.r(b)),
+            pythagoreanAverage(SColor.g(a), SColor.g(b)),
+            pythagoreanAverage(SColor.b(a), SColor.b(b)),
+            pythagoreanAverage(SColor.a(a), SColor.a(b))
         );
     }
 
@@ -214,16 +211,12 @@ public final class GraphicUtils{
      * Almost Bilinear Interpolation except the underlying color interpolator uses {@link #pythagoreanLerp(float, float, float)}.
      * @author Drullkus
      */
-    public static Color getColor(PixmapRegion pix, Color ref, float x, float y){
+    public static int getColor(PixmapRegion pix, float x, float y){
         // Cast floats into ints twice instead of casting 20 times
         int xInt = (int)x;
         int yInt = (int)y;
 
-        if(!Structs.inBounds(xInt, yInt, pix.width, pix.height)) return ref.set(0, 0, 0, 0);
-
-        Color
-            c1 = new Color(),
-            c2 = new Color();
+        if(!Structs.inBounds(xInt, yInt, pix.width, pix.height)) return 0;
 
         // A lot of these booleans are commonly checked, so let's run each check just once
         boolean isXInt = x == xInt;
@@ -232,78 +225,68 @@ public final class GraphicUtils{
         boolean yOverflow = y + 1 > pix.height;
 
         // Remember: x & y values themselves are already checked if in-bounds
-        if((isXInt && isYInt) || (xOverflow && yOverflow)) return ref.set(pix.get(xInt, yInt));
+        if((isXInt && isYInt) || (xOverflow && yOverflow)) return pix.get(xInt, yInt);
 
         if(isXInt || xOverflow){
-            return ref.set(colorLerp(c1.set(getAlphaMedianColor(pix, ref, xInt, yInt)), getAlphaMedianColor(pix, ref, xInt, yInt + 1), y % 1));
+            return colorLerp(getAlphaMedianColor(pix, xInt, yInt), getAlphaMedianColor(pix, xInt, yInt + 1), y % 1);
         }else if(isYInt || yOverflow){
-            return ref.set(colorLerp(c1.set(getAlphaMedianColor(pix, ref, xInt, yInt)), getAlphaMedianColor(pix, ref, xInt + 1, yInt), x % 1));
+            return colorLerp(getAlphaMedianColor(pix, xInt, yInt), getAlphaMedianColor(pix, xInt + 1, yInt), x % 1);
         }
 
-        // Because Color is mutable, strictly 3 Color objects are effectively pooled; this sprite's color ("c0") and Temp's c1 & c2.
-        // The first row sets color to c0, which is then set to c1. New color is set to c0, and #colorLerp() puts result of c1 and c0 onto c1.
-        // The second row does the same thing, but with c2 in the place of c1. Finally on return line, the result between c1 and c2 is put onto c1, which is then set to c0
-        colorLerp(c1.set(getAlphaMedianColor(pix, ref, xInt, yInt)), getAlphaMedianColor(pix, ref, xInt + 1, yInt), x % 1);
-        colorLerp(c2.set(getAlphaMedianColor(pix, ref, xInt, yInt + 1)), getAlphaMedianColor(pix, ref, xInt + 1, yInt + 1), x % 1);
-
-        return ref.set(colorLerp(c1, c2, y % 1));
+        return colorLerp(
+            colorLerp(getAlphaMedianColor(pix, xInt, yInt), getAlphaMedianColor(pix, xInt + 1, yInt), x % 1),
+            colorLerp(getAlphaMedianColor(pix, xInt, yInt + 1), getAlphaMedianColor(pix, xInt + 1, yInt + 1), x % 1),
+            y % 1
+        );
     }
 
     /** @author Drullkus */
-    public static Color getAlphaMedianColor(PixmapRegion pix, Color ref, int x, int y){
-        float alpha = ref.set(pix.get(x, y)).a;
-        if(alpha >= 0.1f) return ref;
+    public static int getAlphaMedianColor(PixmapRegion pix, int x, int y){
+        int color = pix.get(x, y);
+        float alpha = SColor.a(color);
 
-        Color
-            c1 = new Color(),
-            c2 = new Color(),
-            c3 = new Color(),
-            c4 = new Color();
+        if(alpha >= 0.1f) return color;
 
-        return alphaMedian(
-            ref.cpy(),
-            c1.set(pix.get(x + 1, y)),
-            c2.set(pix.get(x, y + 1)),
-            c3.set(pix.get(x - 1, y)),
-            c4.set(pix.get(x, y - 1))
-        ).a(alpha);
+        return SColor.a(alphaMedian(
+            color,
+            pix.get(x + 1, y),
+            pix.get(x, y + 1),
+            pix.get(x - 1, y),
+            pix.get(x, y - 1)
+        ), alpha);
     }
 
     /** @author Drullkus */
-    public static Color alphaMedian(Color main, Color ref, Color... colors){
-        Color
-            c1 = new Color(),
-            c2 = new Color();
+    public static int alphaMedian(int main, int... colors){
+        int c1 = main,
+            c2 = main;
 
-        ObjectIntMap<Color> matches = new ObjectIntMap<>();
+        var matches = new IntIntMap();
         int count, primaryCount = -1, secondaryCount = -1;
 
-        c1.set(main);
-        c2.set(main);
-
-        for(Color color : colors){
-            if(color.a < 0.1f) continue;
+        for(int color : colors){
+            if(SColor.a(color) < 0.1f) continue;
 
             count = matches.increment(color) + 1;
 
             if(count > primaryCount){
                 secondaryCount = primaryCount;
-                c2.set(c1);
+                c2 = c1;
 
                 primaryCount = count;
-                c1.set(color);
+                c1 = color;
             }else if(count > secondaryCount){
                 secondaryCount = count;
-                c2.set(color);
+                c2 = color;
             }
         }
 
         if(primaryCount > secondaryCount){
-            return ref.set(c1);
+            return c1;
         }else if(primaryCount == -1){
-            return ref.set(main);
+            return main;
         }else{
-            return ref.set(averageColor(c1, c2));
+            return averageColor(c1, c2);
         }
     }
 

@@ -54,10 +54,9 @@ public class WingDecorationType extends UnitDecorationType{
     }
 
     @Override
-    public void drawIcon(Func<TextureRegion, Pixmap> prov, Pixmap icon, Cons<TextureRegion> outliner){
+    public void drawIcon(Func<TextureRegion, Pixmap> prov, Pixmap icon, Func<TextureRegion, TextureRegion> outliner){
         for(Wing w : wings){
-            TextureRegion region = textures[w.textureIndex];
-            outliner.get(region);
+            TextureRegion region = outliner.get(textures[w.textureIndex]);
 
             float scl = Draw.scl / 4f;
             Pixmap pix = prov.get(region);

@@ -8,14 +8,11 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.noise.*;
 import mindustry.gen.*;
-import mindustry.type.*;
-import unity.entities.*;
 import unity.entities.units.*;
 import unity.gen.*;
 import unity.tools.*;
 import unity.tools.GenAtlas.*;
 import unity.type.*;
-import unity.type.decal.*;
 import unity.type.weapons.*;
 import unity.util.*;
 
@@ -52,7 +49,6 @@ public class UnitProcessor implements Processor{
             init(type);
             load(type);
 
-            Color color = new Color();
             float scl = Draw.scl / 4f;
 
             var optional = Seq.with("-joint", "-joint-base", "-leg-back", "-leg-base-back", "-foot");
@@ -66,13 +62,18 @@ public class UnitProcessor implements Processor{
                 reg.save();
             };
 
-            Cons<TextureRegion> outliner = t -> {
-                if(t instanceof GenRegion at && opt.get(at) && outline(at.name)){
+            Func<TextureRegion, TextureRegion> outliner = t -> {
+                if(!(t instanceof GenRegion at)) return t;
+                if(opt.get(at) && outline(at.name)){
                     var reg = new GenRegion(at.name, Pixmaps.outline(new PixmapRegion(at.pixmap()), type.outlineColor, type.outlineRadius));
                     reg.relativePath = at.relativePath;
                     reg.save();
 
                     replace(at);
+
+                    return reg;
+                }else{
+                    return atlas.find(at.name);
                 }
             };
 
@@ -84,7 +85,7 @@ public class UnitProcessor implements Processor{
                 }
             };
 
-            Unit unit = type.constructor.get();
+            var unit = type.constructor.get();
 
             if(unit instanceof Legsc || unit instanceof TriJointLegsc){
                 outliner.get(type.jointRegion);
@@ -105,7 +106,7 @@ public class UnitProcessor implements Processor{
             }
 
             if(unit instanceof Copterc){
-                for(Rotor rotor : type.rotors){
+                for(var rotor : type.rotors){
                     var region = conv(rotor.bladeRegion);
 
                     outlSeparate.get(region, "outline");
@@ -145,16 +146,16 @@ public class UnitProcessor implements Processor{
                 outlSeparate.get(type.tailRegion, "outline");
             }
 
-            for(TextureRegion reg : type.abilityRegions){
+            for(var reg : type.abilityRegions){
                 if(reg.found()) outliner.get(reg);
             }
 
-            for(TentacleType tentacle : type.tentacles){
+            for(var tentacle : type.tentacles){
                 outliner.get(tentacle.region);
                 outliner.get(tentacle.tipRegion);
             }
 
-            Pixmap icon = Pixmaps.outline(new PixmapRegion(conv(type.region).pixmap()), type.outlineColor, type.outlineRadius);
+            var icon = Pixmaps.outline(new PixmapRegion(conv(type.region).pixmap()), type.outlineColor, type.outlineRadius);
             add.get(conv(type.region), type.name + "-outline", icon.copy());
 
             if(unit instanceof Mechc){
@@ -168,11 +169,11 @@ public class UnitProcessor implements Processor{
                 icon.draw(conv(type.region).pixmap(), true);
             }
 
-            for(UnitDecorationType decoration : type.decorations){
+            for(var decoration : type.decorations){
                 if(!decoration.top) decoration.drawIcon(r -> conv(r).pixmap(), icon, outliner);
             }
 
-            for(Weapon weapon : type.weapons){
+            for(var weapon : type.weapons){
                 if(weapon.name.isEmpty()) continue;
 
                 var reg = conv(weapon.region);
@@ -219,15 +220,15 @@ public class UnitProcessor implements Processor{
             }
 
             icon.draw(conv(type.region).pixmap(), true);
-            int baseColor = Color.valueOf(color, "ffa665").rgba();
+            int baseColor = Color.valueOf("ffa665").rgba();
 
-            Pixmap baseCell = conv(type.cellRegion).pixmap();
-            Pixmap cell = new Pixmap(type.cellRegion.width, type.cellRegion.height);
+            var baseCell = conv(type.cellRegion).pixmap();
+            var cell = new Pixmap(type.cellRegion.width, type.cellRegion.height);
             cell.each((x, y) -> cell.setRaw(x, y, Color.muli(baseCell.getRaw(x, y), baseColor)));
 
             icon.draw(cell, icon.width / 2 - cell.width / 2, icon.height / 2 - cell.height / 2, true);
 
-            for(Weapon weapon : type.weapons){
+            for(var weapon : type.weapons){
                 if(weapon.name.isEmpty()) continue;
 
                 var wepReg = weapon.top ? atlas.find(weapon.name + "-outline") : conv(weapon.region);
@@ -261,15 +262,15 @@ public class UnitProcessor implements Processor{
                 weapon.load();
             }
 
-            for(UnitDecorationType decoration : type.decorations){
+            for(var decoration : type.decorations){
                 if(decoration.top) decoration.drawIcon(r -> conv(r).pixmap(), icon, outliner);
             }
 
             if(unit instanceof Copterc){
-                Pixmap propellers = new Pixmap(icon.width, icon.height);
-                Pixmap tops = new Pixmap(icon.width, icon.height);
+                var propellers = new Pixmap(icon.width, icon.height);
+                var tops = new Pixmap(icon.width, icon.height);
 
-                for(Rotor rotor : type.rotors){
+                for(var rotor : type.rotors){
                     var bladeSprite = conv(rotor.bladeRegion).pixmap();
 
                     float bladeSeparation = 360f / rotor.bladeCount;
@@ -289,10 +290,10 @@ public class UnitProcessor implements Processor{
                                 float cos = Mathf.cosDeg(deg);
                                 float sin = Mathf.sinDeg(deg);
                                 int col = GraphicUtils.getColor(
-                                    new PixmapRegion(bladeSprite), color,
+                                    new PixmapRegion(bladeSprite),
                                     ((propXCenter - x) * cos + (propYCenter - y) * sin) / rotor.scale + bladeSpriteXCenter,
                                     ((propXCenter - x) * sin - (propYCenter - y) * cos) / rotor.scale + bladeSpriteYCenter
-                                ).rgba();
+                                );
 
                                 propellers.setRaw(x, y, Pixmap.blend(
                                     propellers.getRaw(x, y),
@@ -318,11 +319,12 @@ public class UnitProcessor implements Processor{
                                     float deg = blade * bladeSeparation;
                                     float cos = Mathf.cosDeg(deg);
                                     float sin = Mathf.sinDeg(deg);
+
                                     int col = GraphicUtils.getColor(
-                                        new PixmapRegion(bladeSprite), color,
+                                        new PixmapRegion(bladeSprite),
                                         ((propXCenter - x) * cos + (propYCenter - y) * sin) / rotor.scale + bladeSpriteXCenter,
                                         ((propXCenter - x) * sin - (propYCenter - y) * cos) / rotor.scale + bladeSpriteYCenter
-                                    ).rgba();
+                                    );
 
                                     propellers.setRaw(x, y, Pixmap.blend(
                                         propellers.getRaw(x, y),
@@ -353,8 +355,8 @@ public class UnitProcessor implements Processor{
                     int cellX = x - cellCenterX;
                     int cellY = y - cellCenterY;
 
-                    float alpha = color.set(propOutlined.get(cellX + propCenterX, cellY + propCenterY)).a;
-                    payloadCell.setRaw(x, y, color.set(baseCell.getRaw(x, y)).mul(1, 1, 1, 1 - alpha).rgba());
+                    float alpha = SColor.a(propOutlined.get(cellX + propCenterX, cellY + propCenterY));
+                    payloadCell.setRaw(x, y, SColor.mul(baseCell.getRaw(x, y), 1f, 1f, 1f, 1f - alpha));
                 });
 
                 propOutlined.dispose();
@@ -371,12 +373,12 @@ public class UnitProcessor implements Processor{
             float offsetRange = Math.max(icon.width, icon.height) * 0.15f;
             var offset = new Vec2(1, 1).rotate(rand.random(360f)).setLength(rand.random(0, offsetRange)).add(icon.width / 2f, icon.height / 2f);
 
-            Pixmap[] wrecks = new Pixmap[splits];
+            var wrecks = new Pixmap[splits];
             for(int i = 0; i < wrecks.length; i++){
                 wrecks[i] = new Pixmap(icon.width, icon.height);
             }
 
-            VoronoiNoise vn = new VoronoiNoise(type.id, true);
+            var vn = new VoronoiNoise(type.id, true);
 
             icon.each((x, y) -> {
                 boolean rValue = Math.max(Ridged.noise2d(1, x, y, 3, 1f / (20f + icon.width / 8f)), 0) > 0.16f;
@@ -395,58 +397,51 @@ public class UnitProcessor implements Processor{
     }
 
     private int populateColorArray(int[] heightAverageColors, Pixmap bladeSprite, int halfHeight){
-        Color
-            c1 = new Color(),
-            c2 = new Color(),
-            c3 = new Color();
-        float hits = 0;
+        int c1 = 0,
+            c2 = 0;
+
+        float hits = 0f;
         int length = 0;
 
         for(int y = halfHeight - 1; y >= 0; y--){
             for(int x = 0; x < bladeSprite.width; x++){
-                c2.set(bladeSprite.get(x, y));
+                int color = bladeSprite.get(x, y);
 
-                if(c2.a > 0){
+                if(SColor.a(color) > 0){
                     hits++;
-                    c1.r += c2.r;
-                    c1.g += c2.g;
-                    c1.b += c2.b;
+                    float prevhit = hits - 1;
+
+                    c1 = SColor.set(
+                        c1,
+                        ((SColor.r(c1) * prevhit) + SColor.r(color)) / hits,
+                        ((SColor.g(c1) * prevhit) + SColor.g(color)) / hits,
+                        ((SColor.b(c1) * prevhit) + SColor.b(color)) / hits
+                    );
                 }
             }
 
-            if(hits > 0){
-                c1.r = c1.r / hits;
-                c1.g = c1.g / hits;
-                c1.b = c1.b / hits;
-                c1.a = 1f;
-
+            if(hits > 0f){
+                c1 = SColor.a(c1, 1f);
                 length = Math.max(length, halfHeight - y);
 
-                c1.clamp();
-                c3.set(c1).a(0);
+                c2 = SColor.a(c1, 0f);
             }else{
                 // Use color from previous row with alpha 0. This avoids alpha bleeding when interpolating later
-                c1.set(c3);
+                c1 = c2;
             }
 
-            heightAverageColors[halfHeight - y] = c1.rgba();
-            c1.set(0f, 0f, 0f, 0f);
-
-            hits = 0;
+            heightAverageColors[halfHeight - y] = c1;
+            c1 = 0;
+            hits = 0f;
         }
 
-        heightAverageColors[length + 1] = heightAverageColors[length] & 0xFF_FF_FF_00; // Set final entry to be fully transparent
-
+        heightAverageColors[length + 1] = SColor.a(heightAverageColors[length], 0f); // Set final entry to be fully transparent
         return length;
     }
 
     // Instead of ACTUALLY accounting for the insanity that is the variation of rotor configurations
     // including counter-rotating propellers and that jazz, number 4 will be used instead.
     private void drawRadial(Pixmap sprite, int[] colorTable, int tableLimit){
-        Color
-            c1 = new Color(),
-            c2 = new Color();
-
         float spriteCenter = 0.5f - (sprite.height >> 1);
 
         sprite.each((x, y) -> {
@@ -455,17 +450,17 @@ public class UnitProcessor implements Processor{
 
             if(positionLength < tableLimit){
                 int arrayIndex = Mathf.clamp((int)positionLength, 0, tableLimit);
-                float a = Mathf.cos(Mathf.atan2(x + spriteCenter, y + spriteCenter) * (4 << 1)) * 0.05f + 0.95f;
+                float a = Mathf.cos(Mathf.atan2(x + spriteCenter, y + spriteCenter) * 8) * 0.05f + 0.95f;
                 a *= a;
 
-                sprite.set(x, y,
+                sprite.set(x, y, SColor.mul(
                     GraphicUtils.colorLerp(
-                        c1.rgba8888(colorTable[arrayIndex]),
-                        c2.rgba8888(colorTable[arrayIndex + 1]), positionLength % 1f
-                    ).mul(a, a, a, a * (1 - 0.5f / (tableLimit - positionLength + 0.5f)))
+                        colorTable[arrayIndex],
+                        colorTable[arrayIndex + 1], positionLength % 1f
+                    ), a, a, a, a * (1 - 0.5f / (tableLimit - positionLength + 0.5f)))
                 );
             }else{
-                sprite.set(x, y, c1.rgba8888(0x00_00_00_00));
+                sprite.set(x, y, 0);
             }
         });
     }
@@ -483,11 +478,9 @@ public class UnitProcessor implements Processor{
             // The output values of the noise functions from the noise class are awful that
             // every integer value always result in a 0. Offsetting by 0.5 results in delicious good noise.
             // The additional offset is only that the noise values close to origin make for bad output for the sprite.
-
-            offsets[i] = (float) Noise.rawNoise(i + 2.5f);
+            offsets[i] = (float)Noise.rawNoise(i + 2.5f);
         }
 
-        Color c1 = new Color();
         sprite.each((x, y) -> {
             float positionLength = Mathf.len(x + spriteCenter, y + spriteCenter);
 
@@ -498,8 +491,9 @@ public class UnitProcessor implements Processor{
             a *= a; // Square the sine wave to make it all positive values
             a *= a; // Square sine again to thin out intervals of value increases
             a *= a; // Sine to the 8th power - Perfection
+
             // To maintain the geometric-sharpness, the resulting alpha fractional is rounded to binary integer.
-            sprite.set(x, y, c1.rgb888(0xFF_FF_FF).a(Mathf.round(a) * Mathf.clamp(length - positionLength, 0f, 1f)));
+            sprite.set(x, y, SColor.a(SColor.construct(1f, 1f, 1f, 1f), Mathf.round(a) * Mathf.clamp(length - positionLength, 0f, 1f)));
         });
     }
 }
