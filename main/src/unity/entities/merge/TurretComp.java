@@ -17,7 +17,6 @@ import unity.annotations.Annotations.*;
 import unity.gen.Expc.*;
 import unity.gen.*;
 import unity.gen.Turretc.*;
-import unity.util.*;
 
 @SuppressWarnings({"unused", "unchecked"})
 @MergeComponent

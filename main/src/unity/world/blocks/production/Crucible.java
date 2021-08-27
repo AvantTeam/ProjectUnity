@@ -7,10 +7,10 @@ import arc.scene.ui.layout.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+import unity.gen.*;
 import unity.graphics.*;
 import unity.ui.dialogs.*;
 import unity.util.*;
-import unity.util.struct.*;
 import unity.world.blocks.*;
 import unity.world.graph.*;
 import unity.world.meta.*;
@@ -21,12 +21,12 @@ import static arc.Core.*;
 public class Crucible extends GraphBlock{
     CrucibleGraph viewPos;
     private static final long[] randomPos = new long[]{
-        Vec2Struct.get(0f, 0f),
-        Vec2Struct.get(-1.6f, 1.6f),
-        Vec2Struct.get(-1.6f, -1.6f),
-        Vec2Struct.get(1.6f, -1.6f),
-        Vec2Struct.get(-1.6f, -1.6f),
-        Vec2Struct.get(0f, 0f)
+        SVec2.construct(0f, 0f),
+        SVec2.construct(-1.6f, 1.6f),
+        SVec2.construct(-1.6f, -1.6f),
+        SVec2.construct(1.6f, -1.6f),
+        SVec2.construct(-1.6f, -1.6f),
+        SVec2.construct(0f, 0f)
     };
 
     public TextureRegion[] liquidRegions, baseRegions, roofRegions, solidItemStrips, heatRegions;
@@ -143,7 +143,7 @@ public class Crucible extends GraphBlock{
                         float siz = 8f * (ddd % 1f);
                         long pos = randomPos[Math.max(Mathf.floor(ddd), 5)];
                         
-                        Draw.rect(solidItem, Vec2Struct.x(pos) + x, Vec2Struct.y(pos) + y, siz, siz);
+                        Draw.rect(solidItem, SVec2.x(pos) + x, SVec2.y(pos) + y, siz, siz);
                     }
                 }
             }

@@ -226,7 +226,7 @@ public class Unity extends Mod{
 
     protected void addCredits(){
         try{
-            Group group = (Group)ui.menuGroup.getChildren().first();
+            var group = (Group)ui.menuGroup.getChildren().first();
 
             if(mobile){
                 //TODO button for mobile
@@ -252,7 +252,7 @@ public class Unity extends Mod{
     }
 
     public static void print(LogLevel level, String separator, Object... args){
-        StringBuilder builder = new StringBuilder();
+        var builder = new StringBuilder();
         if(args == null){
             builder.append("null");
         }else{

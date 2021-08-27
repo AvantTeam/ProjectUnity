@@ -224,6 +224,7 @@ public class StructProcessor extends BaseProcessor{
                     );
 
                     for(ExecutableElement m : methods(type)){
+                        Seq<? extends VariableElement> mparams = Seq.with(m.getParameters());
                         if(
                             isConstructor(m) ||
                             !is(m, Modifier.PUBLIC) ||
@@ -231,17 +232,24 @@ public class StructProcessor extends BaseProcessor{
 
                             // Try to avoid built-in getter/setters
                             params.contains(p ->
+                                // Like in Color, this will ignore r(float), g(float), or such
+                                // Or getX() and getY() in Vec2
                                 (
                                     simpleName(p).equals(simpleName(m)) ||
                                     ("get" + Strings.capitalize(simpleName(p))).equals(simpleName(m)) ||
                                     ("set" + Strings.capitalize(simpleName(p))).equals(simpleName(m))
                                 ) &&
-                                (m.getParameters().size() == 0 && types.isSameType(p.asType(), m.getReturnType())) ||
-                                (m.getParameters().size() == 1 && types.isSameType(p.asType(), m.getParameters().get(0).asType()))
+                                (
+                                    (m.getParameters().size() == 0 && types.isSameType(p.asType(), m.getReturnType())) ||
+                                    (m.getParameters().size() == 1 && types.isSameType(p.asType(), m.getParameters().get(0).asType()))
+                                )
                             ) ||
 
                             // Try to avoid copy function, value-types are copied between function passes anyway
-                            ((simpleName(m).equals("cpy") || simpleName(m).equals("copy")) && m.getParameters().size() == 0)
+                            ((simpleName(m).equals("cpy") || simpleName(m).equals("copy")) && m.getParameters().size() == 0) ||
+
+                            // Try to avoid functions with params as the declared type representative of this struct
+                            mparams.contains(p -> types.isSameType(type.asType(), compOf(p.asType())))
                         ) continue;
 
                         // Call construct() to recreate the struct type, if the return type is the actual type
@@ -261,7 +269,6 @@ public class StructProcessor extends BaseProcessor{
                             }
                         }
 
-                        Seq<? extends VariableElement> mparams = Seq.with(m.getParameters());
                         for(VariableElement p : mparams){
                             method.addParameter(tName(p), "p" + simpleName(p));
                         }

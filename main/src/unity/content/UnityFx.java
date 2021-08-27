@@ -18,10 +18,10 @@ import unity.entities.abilities.BaseAbility.*;
 import unity.entities.bullet.EphemeronBulletType.*;
 import unity.entities.bullet.*;
 import unity.entities.bullet.SingularityBulletType.*;
+import unity.gen.*;
 import unity.graphics.*;
 import unity.type.*;
 import unity.util.*;
-import unity.util.struct.*;
 
 import static arc.graphics.g2d.Draw.rect;
 import static arc.graphics.g2d.Draw.*;
@@ -201,11 +201,6 @@ public class UnityFx{
         Fill.circle(e.x + Tmp.v1.x, e.y + Tmp.v1.y, e.fout() * 2.7f);
     }).layer(Layer.bullet - 0.01f),
 
-    orbShootSmoke = new Effect(26f, e -> {
-        color(Pal.surge);
-        randLenVectors(e.id, 7, 80f, e.rotation, 0f, (x, y) -> Fill.circle(e.x + x, e.y + y, e.fout() * 4f));
-    }),
-
     orbCharge = new Effect(38f, e -> {
         color(Pal.surge);
         randLenVectors(e.id, 2, 1f + 20f * e.fout(), e.rotation, 120f, (x, y) -> lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fslope() * 3f + 1f));
@@ -350,7 +345,7 @@ public class UnityFx{
     }),
 
     pylonLaserCharge = new Effect(200f, 180f, e -> {
-        LaserBulletType laser = (LaserBulletType)pylonLaser;
+        var laser = (LaserBulletType)pylonLaser;
         e.scaled(100f, c -> {
             float cwidth = laser.width;
 
@@ -367,8 +362,7 @@ public class UnityFx{
             }
         });
 
-        shoot:
-        {
+        shoot: {
             if(e.fin() < 0.5f) break shoot;
 
             float fin = Mathf.curve(e.fin(), 0.5f, 1f);
@@ -395,12 +389,6 @@ public class UnityFx{
             color(Pal.lancerLaser, fout * 0.4f);
             Fill.circle(e.x, e.y, finpow * 180f);
         }
-    }),
-
-    tilePosIndicatorTest = new Effect(16f, e -> {
-        color(Color.white);
-        Lines.stroke(2f);
-        Lines.square(e.x, e.y, 8f);
     }),
 
     evaporateDeath = new Effect(64f, 800f, e -> {
@@ -586,12 +574,6 @@ public class UnityFx{
         mixcol();
         color();
     }).layer(Layer.flyingUnit + 1f),
-
-    lineTrail = new Effect(36f, e -> {
-        Draw.color(e.color);
-        Lines.stroke(1.5f);
-        Lines.lineAngleCenter(e.x, e.y, e.rotation, e.fslope() * 6f);
-    }),
 
     empShockwave = new Effect(30f, 800f, e -> {
         color(Pal.lancerLaser);
@@ -841,37 +823,6 @@ public class UnityFx{
         }
     }),
 
-    lightningSpawnShoot = new Effect(18f, e -> {
-        e.scaled(12f, i -> {
-            randLenVectors(e.id, 8, 4f + i.fin() * 18f, (x, y) -> {
-                color(Color.white, Pal.lancerLaser, e.fin());
-                Fill.square(e.x + x, e.y + y, 1f + i.fout() * 3f, 45f);
-            });
-            color(Color.white, Pal.lancerLaser, e.fin());
-            alpha(e.fout());
-            Fill.circle(e.x, e.y, e.finpow() * 8f);
-        });
-    }),
-
-    flareEffect = new Effect(18f, e -> {
-        color(Pal.lightFlame, Pal.darkFlame, e.fin());
-        Lines.stroke(e.fout());
-
-        randLenVectors(e.id, 6, 8f * e.finpow(), e.rotation, 18f, (x, y) -> {
-            Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 12f * e.fin());
-        });
-    }),
-
-    supernovaCharge = new Effect(20f, e -> {
-        if(e.data instanceof Float data){
-            float r = data;
-
-            color(Pal.lancerLaser);
-            alpha(0.6f * e.fout());
-            Fill.circle(e.x, e.y, Mathf.lerp(0.2f, 1f, e.fout()) * r);
-        }
-    }),
-
     supernovaChargeBegin = new Effect(27f, e -> {
         if(e.data instanceof Float data){
             float r = data;
@@ -899,12 +850,10 @@ public class UnityFx{
         }
     }),
 
-    supernovaStarDecay = new Effect(56f, e -> {
-        randLenVectors(e.id, 1, 36f * e.finpow(), (x, y) -> {
-            color(Pal.lancerLaser);
-            Fill.rect(e.x + x, e.y + y, 2.2f * e.fout(), 2.2f * e.fout(), 45f);
-        });
-    }),
+    supernovaStarDecay = new Effect(56f, e -> randLenVectors(e.id, 1, 36f * e.finpow(), (x, y) -> {
+        color(Pal.lancerLaser);
+        Fill.rect(e.x + x, e.y + y, 2.2f * e.fout(), 2.2f * e.fout(), 45f);
+    })),
 
     supernovaChargeStar2 = new Effect(27f, e -> {
         if(e.data instanceof Float data){
@@ -917,19 +866,15 @@ public class UnityFx{
     }),
 
     supernovaPullEffect = new Effect(30f, 500f, e -> {
-        if(e.data instanceof Float[] data){
-            if(data.length != 5) return;
+        if(e.data instanceof Long data){
+            float size = e.rotation;
 
-            long unit = Vec2Struct.get(data[0], data[1]);
-            long pos = Vec2Struct.get(data[2], data[3]);
-            float size = data[4];
-
-            float x = Vec2Struct.x(unit) + Mathf.randomSeedRange(e.id, 4f);
-            float y = Vec2Struct.y(unit) + Mathf.randomSeedRange(e.id + 1, 4f);
-            pos = Vec2Struct.scl(Vec2Struct.sub(pos, x, y), e.fin());
+            float x = e.x + Mathf.randomSeedRange(e.id, 4f);
+            float y = e.y + Mathf.randomSeedRange(e.id + 1, 4f);
+            long pos = SVec2.scl(SVec2.sub(data, x, y), e.fin());
 
             color(Pal.lancerLaser);
-            Fill.circle(x + Vec2Struct.x(pos), y + Vec2Struct.y(pos), size * (0.5f + e.fslope() * 0.5f));
+            Fill.circle(x + SVec2.x(pos), y + SVec2.y(pos), size * (0.5f + e.fslope() * 0.5f));
         }
     }),
 
@@ -1004,32 +949,26 @@ public class UnityFx{
         }
     }),
 
-    ricochetTrailSmall = new Effect(12f, e -> {
-        randLenVectors(e.id, 4, e.fout() * 3.5f, (x, y) -> {
-            float w = 0.3f + e.fout();
+    ricochetTrailSmall = new Effect(12f, e -> randLenVectors(e.id, 4, e.fout() * 3.5f, (x, y) -> {
+        float w = 0.3f + e.fout();
 
-            color(e.color);
-            Fill.rect(e.x + x, e.y + y, w, w, 45f);
-        });
-    }),
+        color(e.color);
+        Fill.rect(e.x + x, e.y + y, w, w, 45f);
+    })),
 
-    ricochetTrailMedium = new Effect(16f, e -> {
-        randLenVectors(e.id, 5, e.fout() * 5f, (x, y) -> {
-            float w = 0.3f + e.fout() * 1.3f;
+    ricochetTrailMedium = new Effect(16f, e -> randLenVectors(e.id, 5, e.fout() * 5f, (x, y) -> {
+        float w = 0.3f + e.fout() * 1.3f;
 
-            color(e.color);
-            Fill.rect(e.x + x, e.y + y, w, w, 45f);
-        });
-    }),
+        color(e.color);
+        Fill.rect(e.x + x, e.y + y, w, w, 45f);
+    })),
 
-    ricochetTrailBig = new Effect(20f, e -> {
-        randLenVectors(e.id, 6, e.fout() * 6.5f, (x, y) -> {
-            float w = 0.3f + e.fout() * 1.7f;
+    ricochetTrailBig = new Effect(20f, e -> randLenVectors(e.id, 6, e.fout() * 6.5f, (x, y) -> {
+        float w = 0.3f + e.fout() * 1.7f;
 
-            color(e.color);
-            Fill.rect(e.x + x, e.y + y, w, w, 45f);
-        });
-    }),
+        color(e.color);
+        Fill.rect(e.x + x, e.y + y, w, w, 45f);
+    })),
 
     plated = new Effect(30f, e -> {
         color(e.color);

@@ -359,6 +359,14 @@ public abstract class BaseProcessor extends AbstractProcessor{
         return types.isSameType(e.asType(), toType(Void.class).asType());
     }
 
+    public static TypeMirror compOf(TypeMirror type){
+        while(type instanceof ArrayType){
+            type = ((ArrayType)type).getComponentType();
+        }
+
+        return type;
+    }
+
     @Override
     public SourceVersion getSupportedSourceVersion(){
         return SourceVersion.RELEASE_8;

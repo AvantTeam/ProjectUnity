@@ -10,6 +10,7 @@ import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.world.meta.*;
 import unity.content.*;
+import unity.gen.*;
 import unity.graphics.*;
 
 import static mindustry.Vars.*;
@@ -86,7 +87,7 @@ public class LifeStealerTurret extends GenericTractorBeamTurret<Teamc>{
 
         protected void tryHeal(){
             boolean any = indexer.eachBlock(this, range, b -> b.health() < b.maxHealth(), b -> {
-                healTrnsEffect.at(x, y, rotation, new Float[]{x, y, b.x, b.y, 2.5f + Mathf.range(0.3f)});
+                healTrnsEffect.at(x, y, 2.5f + Mathf.range(0.3f), SVec2.construct(b.x, b.y));
                 Time.run(healEffect.lifetime, () -> {
                     if(b.isValid()){
                         healEffect.at(b.x, b.y, b.block.size, healColor);

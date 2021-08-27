@@ -8,8 +8,6 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.entities.*;
-import mindustry.entities.bullet.*;
-import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.consumers.*;
@@ -18,8 +16,6 @@ import unity.content.*;
 import unity.gen.*;
 import unity.graphics.*;
 import unity.util.*;
-
-import java.lang.reflect.*;
 
 @Merge(base = LaserTurret.class, value = Soulc.class)
 @LoadRegs(value = {
@@ -287,7 +283,7 @@ public class SupernovaTurret extends SoulLaserTurret{
             if(bulletLife > 0f && bullet != null) return;
 
             if(charge >= 1f && phase >= 1f && (consValid() || cheating())){
-                BulletType type = peekAmmo();
+                var type = peekAmmo();
 
                 shoot(type);
                 charge = 0f;
@@ -319,7 +315,7 @@ public class SupernovaTurret extends SoulLaserTurret{
                             .trns(rotation, -recoil + starOffset + Mathf.curve(phase, 0f, 0.3f) * -2f)
                             .add(this);
 
-                        pullEffect.at(x, y, rotation, new Float[]{unit.x, unit.y, Tmp.v1.x, Tmp.v1.y, charge * (3f + Mathf.range(0.2f))});
+                        pullEffect.at(unit.x, unit.y, charge * (3f + Mathf.range(0.2f)), SVec2.construct(Tmp.v1.x, Tmp.v1.y));
                     }
                 }
             });
