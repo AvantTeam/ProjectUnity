@@ -155,7 +155,7 @@ public class StructProcessor extends BaseProcessor{
                     if(ftype == TypeName.BOOLEAN){
                         cons.append(" | (").append(fname).append(" ? ").append("1L << ").append(offset).append("L : 0)");
 
-                        setter.beginControlFlow("if(value)")
+                        setter.beginControlFlow("if(!value)")
                             .addStatement("return ($T)(($L & ~(1L << $LL)))", structType, structParam, offset)
                         .nextControlFlow("else")
                             .addStatement("return ($T)(($L & ~(1L << $LL)) | (1L << $LL))", structType, structParam, offset, offset)
@@ -165,7 +165,7 @@ public class StructProcessor extends BaseProcessor{
                             .append(info.pack.packer.get(fname))
                             .append(" << ").append(offset).append("L)");
 
-                        setter.addStatement("return ($T)(($L & $L) | (($T)" + info.pack.packer.get("value") + " << $LL))", structType, structParam, bitString(offset, info.size, structTotalSize), structType, offset);
+                        setter.addStatement("return ($T)(($L & ~$L) | (($T)" + info.pack.packer.get("value") + " << $LL))", structType, structParam, bitString(offset, info.size, structTotalSize), structType, offset);
                     }else{
                         cons.append(" | (")
                             .append("(")
@@ -174,7 +174,7 @@ public class StructProcessor extends BaseProcessor{
                             .append(")").append(" & ").append(bitString(offset, info.size, structTotalSize))
                         .append(")");
 
-                        setter.addStatement("return ($T)(($L & $L) | (($T)value << $LL))", structType, structParam, bitString(offset, info.size, structTotalSize), structType, offset);
+                        setter.addStatement("return ($T)(($L & ~$L) | (($T)value << $LL))", structType, structParam, bitString(offset, info.size, structTotalSize), structType, offset);
                     }
 
                     builder.addMethod(getter.build());
