@@ -407,7 +407,7 @@ public class UnitProcessor implements Processor{
             for(int x = 0; x < bladeSprite.width; x++){
                 int color = bladeSprite.get(x, y);
 
-                if(SColor.a(color) > 0){
+                if(SColor.a(color) > 0.01f){
                     hits++;
                     float prevhit = hits - 1;
 
@@ -415,15 +415,14 @@ public class UnitProcessor implements Processor{
                         c1,
                         ((SColor.r(c1) * prevhit) + SColor.r(color)) / hits,
                         ((SColor.g(c1) * prevhit) + SColor.g(color)) / hits,
-                        ((SColor.b(c1) * prevhit) + SColor.b(color)) / hits
+                        ((SColor.b(c1) * prevhit) + SColor.b(color)) / hits,
+                        1f
                     );
                 }
             }
 
             if(hits > 0f){
-                c1 = SColor.a(c1, 1f);
                 length = Math.max(length, halfHeight - y);
-
                 c2 = SColor.a(c1, 0f);
             }else{
                 // Use color from previous row with alpha 0. This avoids alpha bleeding when interpolating later
@@ -493,7 +492,7 @@ public class UnitProcessor implements Processor{
             a *= a; // Sine to the 8th power - Perfection
 
             // To maintain the geometric-sharpness, the resulting alpha fractional is rounded to binary integer.
-            sprite.set(x, y, SColor.a(SColor.construct(1f, 1f, 1f, 1f), Mathf.round(a) * Mathf.clamp(length - positionLength, 0f, 1f)));
+            sprite.setRaw(x, y, SColor.construct(1f, 1f, 1f, Mathf.round(a) * Mathf.clamp(length - positionLength, 0f, 1f)));
         });
     }
 }
