@@ -25,6 +25,8 @@ public class NewTentacle{
         type = t;
         this.unit = unit;
         NewTentacleSegment child = null;
+        tv.trns(unit.rotation + type.rotationOffset + 180f, type.segmentLength);
+        Position pos = unitPosition();
         for(int i = 0; i < type.segments; i++){
             NewTentacleSegment seg = new NewTentacleSegment();
             seg.main = this;
@@ -37,6 +39,10 @@ public class NewTentacle{
             if(i >= type.segments - 1){
                 end = seg;
             }
+            int s = (i + 1);
+            seg.x = pos.getX() + (tv.x * s);
+            seg.y = pos.getY() + (tv.y * s);
+
             child = seg;
         }
     }
