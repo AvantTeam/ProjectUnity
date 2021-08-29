@@ -10,7 +10,7 @@ import unity.type.*;
 @SuppressWarnings("unused")
 @EntityComponent
 abstract class TentacleComp implements Unitc{
-    transient Seq<Tentacle> tentacles = new Seq<>();
+    transient Seq<NewTentacle> tentacles = new Seq<>();
 
     @Import UnitType type;
 
@@ -18,17 +18,17 @@ abstract class TentacleComp implements Unitc{
     public void add(){
         if(tentacles.isEmpty()){
             for(TentacleType tentacle : ((UnityUnitType)type).tentacles){
-                tentacles.add(new Tentacle().add(tentacle, self()));
+                tentacles.add(new NewTentacle(tentacle, self()));
             }
         }
     }
 
     public void drawTentacles(){
-        tentacles.each(Tentacle::draw);
+        tentacles.each(NewTentacle::draw);
     }
 
     @Override
     public void update(){
-        tentacles.each(Tentacle::update);
+        tentacles.each(NewTentacle::update);
     }
 }

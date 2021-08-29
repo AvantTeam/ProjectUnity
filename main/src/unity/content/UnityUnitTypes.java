@@ -4341,7 +4341,7 @@ public class UnityUnitTypes implements ContentList{
 
                 rotationSpeed = 3f;
                 accel = 0.2f;
-                speed = 4f;
+                speed = 4f * 2f;
 
                 segments = 15;
                 segmentLength = 37.25f;
@@ -4358,7 +4358,7 @@ public class UnityUnitTypes implements ContentList{
 
                 rotationSpeed = 3f;
                 accel = 0.2f;
-                speed = 4f;
+                speed = 4f * 2f;
 
                 segments = 10;
                 segmentLength = 37.25f;
@@ -4376,12 +4376,12 @@ public class UnityUnitTypes implements ContentList{
 
                 rotationSpeed = 3f;
                 accel = 0.15f;
-                speed = 5f;
+                speed = 5f * 2f;
 
                 segments = 20;
                 segmentLength = 28f;
                 swayOffset = 120f;
-                swayMag = 0.02f;
+                swayMag = 0.2f;
                 swayScl = 120f;
 
                 bullet = null;
@@ -4394,12 +4394,12 @@ public class UnityUnitTypes implements ContentList{
 
                 rotationSpeed = 3f;
                 accel = 0.15f;
-                speed = 5f;
+                speed = 5f * 2f;
 
                 segments = 23;
                 segmentLength = 28f;
                 swayOffset = 70f;
-                swayMag = 0.02f;
+                swayMag = 0.2f;
                 swayScl = 120f;
 
                 bullet = null;

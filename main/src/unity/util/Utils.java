@@ -30,7 +30,6 @@ public final class Utils{
 
     private static final Vec2 tV = new Vec2(), tV2 = new Vec2();
     private static final Seq<Healthc> tmpUnitSeq = new Seq<>();
-    private static final IntMap<Float[]> effectArray = new IntMap<>(204);
     private static final IntSet collidedBlocks = new IntSet();
     private static final Rect rect = new Rect(), rectAlt = new Rect(), hitRect = new Rect();
     private static Posc result;
@@ -41,7 +40,7 @@ public final class Utils{
     private static Unit tmpUnit;
     private static boolean hit, hitB;
 
-    private static final DynamicBoolGrid collideLineCollided = new DynamicBoolGrid(false);
+    private static final BoolGrid collideLineCollided = new BoolGrid();
     private static final Seq<Point2> collideLineCast = new Seq<>();
     private static final Seq<Point2> collideLineCastNext = new Seq<>();
 
