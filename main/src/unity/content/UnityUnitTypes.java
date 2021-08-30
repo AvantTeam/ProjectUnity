@@ -1681,13 +1681,13 @@ public class UnityUnitTypes implements ContentList{
                     Draw.color(Color.white);
                     UnityDrawf.shiningCircle(unit.id, Time.time, wx, wy, 6.5f * charge, 5, 70f, 15f, 4f * charge, 360f);
                 };
-
-                bullet = new HealingShockWaveBulletType(5f){{
-                    healPercent = 50f;
-                    lifetime = 3.1f * 60f;
-                    shockwaveSpeed = 3.2f;
+                
+                bullet = new HealingNukeBulletType(){{
+                    allyStatus = StatusEffects.overclock;
+                    allyStatusDuration = 15f * 60f;
                     status = UnityStatusEffects.disabled;
-                    statusDuration = 60f * 1.5f;
+                    statusDuration = 120f;
+                    healPercent = 20f;
                 }};
             }});
         }};

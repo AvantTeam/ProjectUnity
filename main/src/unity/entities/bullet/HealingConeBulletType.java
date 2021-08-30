@@ -127,6 +127,7 @@ public class HealingConeBulletType extends BulletType{
         
         Tmp.v1.trns(b.rotation() - cone, Math.min(Mathf.sqrt(data[0]), fout)).add(b);
         Draw.color(color);
+        if(!Vars.renderer.animateShields) Draw.alpha(0.3f);
         for(int i = 1; i < scanAccuracy; i++){
             float ang = Mathf.lerp(-cone, cone, i / (scanAccuracy - 1f)) + b.rotation();
             Tmp.v2.trns(ang, Math.min(Mathf.sqrt(data[i]), fout)).add(b);
