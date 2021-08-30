@@ -11,24 +11,40 @@ public final class ContributorList{
             "sk7725",
             "Xelo",
             "younggam",
+            "ThePythonGuy",
             "MEEP of Faith"
         ),
 
         ContributionType.contributor, Seq.with(
             "Drullkus",
             "Anuke",
-            "ThePythonGuy3",
             "ThirstyBoi",
             "Xusk",
             "Eldoofus",
             "Evl",
-            "Goobrr"
+            "Goober",
+            "BasedUser",
+            "Sharlotte"
         ),
 
         ContributionType.translator, Seq.with(
             "sk7725 (Korean)",
             "Xusk (Russian)"
+        ),
+
+        ContributionType.tester, Seq.with(
+            "BlueWolf"
         )
+    );
+
+    public static final ObjectMap<String, String> githubAliases = ObjectMap.of(
+            "Xelo", "XeloBoyo",
+            "MEEP of Faith", "MEEPofFaith",
+            "Anuke", "Anuken",
+            "ThePythonGuy", "ThePythonGuy3",
+            "Xusk", "Xusk947",
+            "Goober", "Goobrr",
+            "Sharlotte", "Sharlottes"
     );
 
     public static Seq<String> getBy(ContributionType type){
@@ -38,7 +54,8 @@ public final class ContributorList{
     public enum ContributionType{
         collaborator,
         contributor,
-        translator;
+        translator,
+        tester;
 
         public static ContributionType[] all = values();
     }

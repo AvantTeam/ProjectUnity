@@ -4,6 +4,7 @@ import arc.*;
 import arc.flabel.*;
 import arc.func.*;
 import arc.graphics.*;
+import arc.graphics.g2d.TextureRegion;
 import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
@@ -13,6 +14,7 @@ import mindustry.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.Links.*;
+import mindustry.ui.Styles;
 import mindustry.ui.dialogs.*;
 import unity.mod.*;
 import unity.mod.ContributorList.*;
@@ -86,13 +88,18 @@ public class CreditsDialog extends BaseDialog{
     }
 
     public static void showList(){
+        TextureRegion error = Core.atlas.find("error");
         BaseDialog dialog = new BaseDialog("@credits");
 
         dialog.cont.table(t -> {
             t.add("@mod.credits.text").fillX().pad(3f).wrap().get().setAlignment(Align.center);
             t.row();
 
-            t.add("@mod.credits.bottom-text").fillX().pad(3f).wrap().get().setAlignment(Align.center);
+            t.table(tb -> {
+                tb.add("@mod.credits.bottom-text-one");
+                tb.image(Core.atlas.find("unity-EyeOfDarkness")).padLeft(5f).padRight(3f);
+                tb.add("@mod.credits.bottom-text-two");
+            }).fillX().pad(3f);
             t.row();
         }).pad(3f);
 
@@ -103,17 +110,37 @@ public class CreditsDialog extends BaseDialog{
                 Seq<String> list = ContributorList.getBy(type);
                 if(list.size <= 0) continue;
 
-                b.table(t -> {
+                b.table(Tex.button, t -> {
                     t.add(stringf.get(type.name())).pad(3f).center();
                     t.row();
                     
                     t.pane(p -> {
                         for(String c : list){
-                            p.add(new FLabel("{wave}{rainbow}[lightgray]" + c)).left().pad(3f).padLeft(6f).padRight(6f);
+                            String noLang = c.replaceAll("\\(([^\\)]*)\\)", "").replace(" ", "");
+                            p.button(bt -> {
+                                TextureRegion icon = Core.atlas.find("unity-" + noLang);
+                                if(icon != error){
+                                    bt.image(icon).padRight(3f);
+                                }
+
+                                bt.add(new FLabel("{wave}{rainbow}[lightgray]" + c)).left().pad(3f).padLeft(6f).padRight(6f);
+                            }, Styles.transt, () -> {
+                                String name = noLang;
+                                if(ContributorList.githubAliases.containsKey(name)){
+                                    name = ContributorList.githubAliases.get(name);
+                                }
+
+                                if(c.equals("Evl")){
+                                    Core.app.openURI("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
+                                } else {
+                                    Core.app.openURI("https://github.com/" + name);
+                                }
+                            });
+
                             p.row();
                         }
                     });
-                }).pad(6f).top();
+                }).pad(6f).top().width(Math.max(Core.graphics.getWidth() / 5f, 320f));
             }
         }).fillX();
 
