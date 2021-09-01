@@ -19,6 +19,8 @@ import mindustry.graphics.*;
 import mindustry.world.*;
 import unity.graphics.*;
 
+import java.util.*;
+
 import static mindustry.Vars.*;
 
 public final class Utils{
@@ -30,7 +32,6 @@ public final class Utils{
 
     private static final Vec2 tV = new Vec2(), tV2 = new Vec2();
     private static final Seq<Healthc> tmpUnitSeq = new Seq<>();
-    private static final IntMap<Float[]> effectArray = new IntMap<>(204);
     private static final IntSet collidedBlocks = new IntSet();
     private static final Rect rect = new Rect(), rectAlt = new Rect(), hitRect = new Rect();
     private static Posc result;
@@ -41,7 +42,7 @@ public final class Utils{
     private static Unit tmpUnit;
     private static boolean hit, hitB;
 
-    private static final DynamicBoolGrid collideLineCollided = new DynamicBoolGrid(false);
+    private static final BoolGrid collideLineCollided = new BoolGrid();
     private static final Seq<Point2> collideLineCast = new Seq<>();
     private static final Seq<Point2> collideLineCastNext = new Seq<>();
 
@@ -194,6 +195,39 @@ public final class Utils{
             float in = Mathf.lerp(-range, range, i / (points - 1f));
             cons.get(in + angle);
         }
+    }
+
+    public static float[] castCircle(float wx, float wy, float range, int rays, Boolf<Building> filter, Cons<Building> cons, Boolf<Tile> insulator){
+        collidedBlocks.clear();
+        float[] cast = new float[rays];
+
+        for(int i = 0; i < cast.length; i++){
+            cast[i] = range;
+            float ang = i * (360f / cast.length);
+            tV.trns(ang, range).add(wx, wy);
+            int s = i;
+            world.raycastEachWorld(wx, wy, tV.x, tV.y, (cx, cy) -> {
+                Tile t = world.tile(cx, cy);
+                if(t != null && t.block() != null && insulator.get(t)){
+                    float dst = t.dst(wx, wy);
+                    cast[s] = dst;
+                    return true;
+                }
+
+                return false;
+            });
+        }
+        indexer.allBuildings(wx, wy, range, build -> {
+            if(!filter.get(build)) return;
+            float ang = Angles.angle(wx, wy, build.x, build.y);
+            float dst = build.dst2(wx, wy) - ((build.hitSize() * build.hitSize()) / 2f);
+            int idx = Mathf.mod(Mathf.round((ang % 360f) / (360f / cast.length)), cast.length);
+            float d = cast[idx];
+            if(dst <= d * d){
+                cons.get(build);
+            }
+        });
+        return cast;
     }
 
     public static float[] castConeTile(float wx, float wy, float range, float angle, float cone, int rays, Cons2<Building, Tile> consBuilding, Boolf<Tile> insulator){

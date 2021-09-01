@@ -1783,13 +1783,13 @@ public class UnityUnitTypes implements ContentList{
                     Draw.color(Color.white);
                     UnityDrawf.shiningCircle(unit.id, Time.time, wx, wy, 6.5f * charge, 5, 70f, 15f, 4f * charge, 360f);
                 };
-
-                bullet = new HealingShockWaveBulletType(5f){{
-                    healPercent = 50f;
-                    lifetime = 3.1f * 60f;
-                    shockwaveSpeed = 3.2f;
+                
+                bullet = new HealingNukeBulletType(){{
+                    allyStatus = StatusEffects.overclock;
+                    allyStatusDuration = 15f * 60f;
                     status = UnityStatusEffects.disabled;
-                    statusDuration = 60f * 1.5f;
+                    statusDuration = 120f;
+                    healPercent = 20f;
                 }};
             }});
         }};
@@ -4445,7 +4445,7 @@ public class UnityUnitTypes implements ContentList{
 
                 rotationSpeed = 3f;
                 accel = 0.2f;
-                speed = 4f;
+                speed = 4f * 2f;
 
                 segments = 15;
                 segmentLength = 37.25f;
@@ -4462,7 +4462,7 @@ public class UnityUnitTypes implements ContentList{
 
                 rotationSpeed = 3f;
                 accel = 0.2f;
-                speed = 4f;
+                speed = 4f * 2f;
 
                 segments = 10;
                 segmentLength = 37.25f;
@@ -4480,12 +4480,12 @@ public class UnityUnitTypes implements ContentList{
 
                 rotationSpeed = 3f;
                 accel = 0.15f;
-                speed = 5f;
+                speed = 5f * 2f;
 
                 segments = 20;
                 segmentLength = 28f;
                 swayOffset = 120f;
-                swayMag = 0.02f;
+                swayMag = 0.2f;
                 swayScl = 120f;
 
                 bullet = null;
@@ -4498,12 +4498,12 @@ public class UnityUnitTypes implements ContentList{
 
                 rotationSpeed = 3f;
                 accel = 0.15f;
-                speed = 5f;
+                speed = 5f * 2f;
 
                 segments = 23;
                 segmentLength = 28f;
                 swayOffset = 70f;
-                swayMag = 0.02f;
+                swayMag = 0.2f;
                 swayScl = 120f;
 
                 bullet = null;

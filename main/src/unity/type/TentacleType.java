@@ -14,7 +14,7 @@ public class TentacleType implements Cloneable{
     public boolean automatic = true;
     public boolean mirror = true, flipSprite;
 
-    public float swayScl = 110f, swayMag = 0.07f, swaySegmentOffset = 1.5f, swayOffset = 0f;
+    public float swayScl = 110f, swayMag = 0.6f, swaySegmentOffset = 1.5f, swayOffset = 0f;
 
     public BulletType bullet;
     public float tentacleDamage = -1f;
