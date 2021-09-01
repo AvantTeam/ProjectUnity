@@ -29,6 +29,4 @@ public enum Triggers{
     }
 
     public static class SaveWriteEvent{}
-
-    public static class SaveReadEvent{}
 }

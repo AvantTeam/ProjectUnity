@@ -7,15 +7,12 @@ import unity.content.*;
 
 import static mindustry.Vars.*;
 
-public class UnitHealerAI extends FlyingAI{
+public class HealerAI extends FlyingAI{
     protected float score;
 
     @Override
     public boolean invalid(Teamc target){
-        boolean damaged = target instanceof Healthc t
-        ?   !t.damaged() && !t.isValid()
-        :   true;
-
+        boolean damaged = !(target instanceof Healthc t) || !t.damaged() && !t.isValid();
         return target == null || target.team() != unit.team || damaged;
     }
 

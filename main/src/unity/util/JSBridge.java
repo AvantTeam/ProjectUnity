@@ -32,7 +32,7 @@ public final class JSBridge{
     }
 
     public static void importDefaults(ImporterTopLevel scope){
-        Seq<String> permit = Seq.with(
+        var permit = Seq.with(
             "unity",
             "rhino",
             "java.lang",
@@ -40,14 +40,14 @@ public final class JSBridge{
             "java.util"
         );
 
-        for(Package pkg : Package.getPackages()){
-            if(!permit.contains(pkg.getName()::startsWith)) continue;
+        for(var pkg : Package.getPackages()){
+            if(pkg == null || !permit.contains(pkg.getName()::startsWith)) continue;
             importPackage(scope, pkg);
         }
     }
 
     public static void importPackage(ImporterTopLevel scope, String packageName){
-        NativeJavaPackage p = new NativeJavaPackage(packageName, mods.mainLoader());
+        var p = new NativeJavaPackage(packageName, mods.mainLoader());
         p.setParentScope(scope);
 
         scope.importPackage(p);
@@ -62,7 +62,7 @@ public final class JSBridge{
     }
 
     public static void importClass(ImporterTopLevel scope, Class<?> type){
-        NativeJavaClass nat = new NativeJavaClass(scope, type);
+        var nat = new NativeJavaClass(scope, type);
         nat.setParentScope(scope);
 
         scope.importClass(nat);

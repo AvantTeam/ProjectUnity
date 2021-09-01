@@ -44,7 +44,7 @@ public class ScriptedSector extends SectorPreset{
         });
 
         Events.on(SaveWriteEvent.class, e -> saveState());
-        Events.on(SaveReadEvent.class, e -> loadState());
+        Events.on(SaveLoadEvent.class, e -> loadState());
     }
 
     public void update(){

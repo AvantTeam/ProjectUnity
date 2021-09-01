@@ -9,10 +9,10 @@ import unity.mod.*;
 import unity.mod.Triggers.*;
 
 @SuppressWarnings({"unused"})
-@EntityDef(value = {Unintersectablec.class, Drawc.class, WorldListenerc.class}, serialize = false)
+@EntityDef({Unintersectablec.class, Drawc.class, WorldListenerc.class})
 @EntityComponent
 abstract class WorldListenerComp implements Unintersectablec, Drawc{
-    static final WorldListener instance = WorldListener.create();
+    static WorldListener instance;
 
     @Override
     public void draw(){
@@ -20,13 +20,8 @@ abstract class WorldListenerComp implements Unintersectablec, Drawc{
     }
 
     @Override
-    public void write(Writes writes){
+    public void write(Writes write){
         Events.fire(new SaveWriteEvent());
-    }
-
-    @Override
-    public void read(Reads reads){
-        Events.fire(new SaveReadEvent());
     }
 
     @Override

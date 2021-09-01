@@ -24,7 +24,6 @@ import unity.content.effects.*;
 import unity.entities.*;
 import unity.entities.abilities.*;
 import unity.entities.bullet.*;
-import unity.entities.effects.*;
 import unity.entities.units.*;
 import unity.gen.*;
 import unity.graphics.*;
@@ -38,7 +37,7 @@ import static mindustry.Vars.*;
 public class UnityUnitTypes implements ContentList{
     // global unit + copter
     public static @EntityDef({Unitc.class, Copterc.class})
-    UnitType caelifera, schistocerca, anthophila, vespula, lepidoptera;
+    UnitType caelifera, schistocerca, anthophila, vespula, lepidoptera, mantodea;
 
     // global flying
     public static @EntityPoint(UnitEntity.class)
@@ -186,8 +185,9 @@ public class UnityUnitTypes implements ContentList{
             hitSize = 12f;
             range = 140f;
 
-            bottomWeapons.add(name + "-gun");
             weapons.add(new Weapon(name + "-gun"){{
+                bottomWeapons.add(this);
+
                 reload = 6f;
                 x = 5.25f;
                 y = 6.5f;
@@ -231,9 +231,11 @@ public class UnityUnitTypes implements ContentList{
             flying = true;
             hitSize = 13f;
             range = 165f;
+            rotateSpeed = 4.6f;
 
-            bottomWeapons.add(name + "-gun");
             weapons.add(new Weapon(name + "-gun"){{
+                bottomWeapons.add(this);
+
                 top = false;
                 x = 1.5f;
                 y = 11f;
@@ -278,6 +280,7 @@ public class UnityUnitTypes implements ContentList{
                     y = 6.5f;
                     bladeCount = 3;
                     ghostAlpha = 0.4f;
+                    shadowAlpha = 0.2f;
                     shadeSpeed = 3f * i;
                     speed = 29f * i;
                 }});
@@ -296,9 +299,11 @@ public class UnityUnitTypes implements ContentList{
             hitSize = 15f;
             range = 165f;
             fallRotateSpeed = 2f;
+            rotateSpeed = 3.8f;
 
-            bottomWeapons.add(name + "-gun");
             weapons.add(new Weapon(name + "-gun"){{
+                bottomWeapons.add(this);
+
                 x = 4.25f;
                 y = 14f;
                 shootX = -1f;
@@ -321,18 +326,18 @@ public class UnityUnitTypes implements ContentList{
             }});
 
             for(int i : Mathf.signs){
-                rotors.add(new Rotor(name + "-rotor"){{
+                rotors.add(new Rotor(name + "-rotor2"){{
                     x = 0f;
                     y = -13f;
-                    scale = 0.5f;
                     bladeCount = 2;
                     ghostAlpha = 0.4f;
+                    shadowAlpha = 0.2f;
                     shadeSpeed = 3f * i;
                     speed = 29f * i;
                 }});
             }
 
-            rotors.add(new Rotor(name + "-rotor"){{
+            rotors.add(new Rotor(name + "-rotor1"){{
                 mirror = true;
                 x = 13f;
                 y = 3f;
@@ -352,8 +357,8 @@ public class UnityUnitTypes implements ContentList{
             hitSize = 30f;
             range = 165f;
             lowAltitude = true;
+            rotateSpeed = 3.5f;
 
-            bottomWeapons.add(name + "-gun");
             weapons.add(new Weapon(name + "-gun-big"){{
                 x = 8.25f;
                 y = 9.5f;
@@ -363,6 +368,8 @@ public class UnityUnitTypes implements ContentList{
                 shootSound = Sounds.shootBig;
                 bullet = Bullets.standardDenseBig;
             }}, new Weapon(name + "-gun"){{
+                bottomWeapons.add(this);
+
                 x = 6.5f;
                 y = 21.5f;
                 shootX = -0.25f;
@@ -378,12 +385,10 @@ public class UnityUnitTypes implements ContentList{
                 shootY = 4.5f;
                 reload = 60f;
                 shootSound = Sounds.laser;
-                bullet = new LaserBulletType(240f){
-                    {
-                        sideAngle = 45f;
-                        length = 200f;
-                    }
-                };
+                bullet = new LaserBulletType(240f){{
+                    sideAngle = 45f;
+                    length = 200f;
+                }};
             }});
 
             for(int i : Mathf.signs){
@@ -391,9 +396,9 @@ public class UnityUnitTypes implements ContentList{
                     mirror = true;
                     x = 15f;
                     y = 6.75f;
-                    scale = 1.2f;
                     speed = 29f * i;
                     ghostAlpha = 0.4f;
+                    shadowAlpha = 0.2f;
                     shadeSpeed = 3f * i;
                 }});
             }
@@ -412,9 +417,11 @@ public class UnityUnitTypes implements ContentList{
             range = 300f;
             lowAltitude = true;
             fallRotateSpeed = 0.8f;
+            rotateSpeed = 2.7f;
 
-            bottomWeapons.add(name + "-gun");
             weapons.add(new Weapon(name + "-gun"){{
+                bottomWeapons.add(this);
+
                 x = 14f;
                 y = 27f;
                 shootY = 5.5f;
@@ -465,29 +472,120 @@ public class UnityUnitTypes implements ContentList{
             }});
 
             for(int i : Mathf.signs){
-                rotors.add(new Rotor(name + "-rotor"){{
+                rotors.add(new Rotor(name + "-rotor1"){{
                     mirror = true;
                     x = 22.5f;
                     y = 21.25f;
                     bladeCount = 3;
                     speed = 19f * i;
                     ghostAlpha = 0.4f;
+                    shadowAlpha = 0.2f;
                     shadeSpeed = 3f * i;
-                }}, new Rotor(name + "-rotor"){{
+                }}, new Rotor(name + "-rotor2"){{
                     mirror = true;
                     x = 17.25f;
                     y = 1f;
-                    scale = 0.8f;
                     bladeCount = 2;
                     speed = 23f * i;
                     ghostAlpha = 0.4f;
-                    shadeSpeed = 3f * i;
+                    shadowAlpha = 0.2f;
+                    shadeSpeed = 4f * i;
                 }});
             }
         }};
 
+        mantodea = new UnityUnitType("mantodea"){{
+            defaultController = CopterAI::new;
+            speed = 5f;
+            drag = 0.1f;
+            accel = 0.03f;
+            fallSpeed = 0.0025f;
+            health = 25000;
+            engineSize = 0f;
+            flying = true;
+            hitSize = 45f;
+            lowAltitude = true;
+            fallRotateSpeed = 0.8f;
+            rotateSpeed = 2.2f;
+
+            var flak = new FlakBulletType(8f, 20f){{
+                lifetime = 10f;
+                collidesGround = true;
+
+                lightning = 3;
+                lightningLength = 4;
+                lightningLengthRand = 2;
+                lightningDamage = 15f;
+                lightningColor = Pal.surge;
+            }};
+
+            weapons.add(new Weapon(name + "-gun"){{
+                bottomWeapons.add(this);
+
+                mirror = true;
+                rotate = false;
+                x = 14.25f;
+                y = 26.5f;
+                recoil = 2.5f;
+                shootY = 10f;
+
+                shootSound = Sounds.shoot;
+                shots = 3;
+                spacing = 0f;
+                shotDelay = 3f;
+                reload = 25f;
+
+                bullet = flak;
+            }}, new Weapon(name + "-gun"){{
+                bottomWeapons.add(this);
+
+                mirror = true;
+                rotate = false;
+                x = 26.25f;
+                y = 19.5f;
+                recoil = 2.5f;
+                shootY = 10f;
+
+                shootSound = Sounds.shoot;
+                shots = 2;
+                spacing = 0f;
+                shotDelay = 3f;
+                reload = 15f;
+
+                bullet = flak;
+            }});
+
+            for(int i : Mathf.signs){
+                rotors.add(new Rotor(name + "-rotor2"){{
+                    y = -31.25f;
+                    bladeCount = 4;
+                    speed = 19f * i;
+                    ghostAlpha = 0.4f;
+                    shadowAlpha = 0.2f;
+                    shadeSpeed = 4f * i;
+                }}, new Rotor(name + "-rotor3"){{
+                    mirror = true;
+                    x = 28.5f;
+                    y = -11.75f;
+                    bladeCount = 3;
+                    speed = 23f * i;
+                    ghostAlpha = 0.4f;
+                    shadowAlpha = 0.2f;
+                    shadeSpeed = 3f * i;
+                }});
+            }
+
+            rotors.add(new Rotor(name + "-rotor1"){{
+                y = 9.25f;
+                bladeCount = 3;
+                speed = 29f;
+                shadeSpeed = 5f;
+                bladeFade = 0.8f;
+            }});
+        }};
+
         angel = new UnityUnitType("angel"){{
-            defaultController = UnitHealerAI::new;
+            defaultController = HealerAI::new;
             buildSpeed = 10f;
             health = 90;
             engineOffset = 5.7f;
@@ -502,7 +600,7 @@ public class UnityUnitTypes implements ContentList{
         }};
 
         malakhim = new UnityUnitType("malakhim"){{
-            defaultController = UnitHealerAI::new;
+            defaultController = HealerAI::new;
             buildSpeed = 15f;
             health = 170;
             engineOffset = 11.7f;
@@ -927,8 +1025,9 @@ public class UnityUnitTypes implements ContentList{
             mechStride = (4f + (hitSize - 8f) / 2.1f) / 1.3f;
             immunities.addAll(StatusEffects.burning, StatusEffects.melting);
 
-            bottomWeapons.add(name + "-weapon");
             weapons.add(new LimitedAngleWeapon(name + "-weapon"){{
+                bottomWeapons.add(this);
+
                 x = 36.5f;
                 y = 2.75f;
                 shootY = 19.25f;
@@ -1203,71 +1302,71 @@ public class UnityUnitTypes implements ContentList{
             visualElevation = 0.95f;
 
             weapons.add(new Weapon("unity-araneidae-mount"){{
-                            x = 15f;
-                            y = -1.75f;
-                            shootY = 7.5f;
-                            reload = 30f;
-                            shake = 4f;
-                            rotateSpeed = 2f;
-                            rotate = true;
-                            shadow = 15f;
-                            shots = 3;
-                            spacing = 15f;
-                            shootSound = Sounds.laser;
+                x = 15f;
+                y = -1.75f;
+                shootY = 7.5f;
+                reload = 30f;
+                shake = 4f;
+                rotateSpeed = 2f;
+                rotate = true;
+                shadow = 15f;
+                shots = 3;
+                spacing = 15f;
+                shootSound = Sounds.laser;
 
-                            bullet = UnityBullets.sapLaser;
-                        }},
-                new MultiBarrelWeapon("unity-araneidae-cannon"){{
-                    mirror = false;
-                    x = 0f;
-                    y = -12.25f;
-                    shootY = 22f;
-                    reload = 120f;
-                    shake = 10f;
-                    recoil = 3f;
-                    rotateSpeed = 1f;
-                    ejectEffect = Fx.none;
-                    shootSound = Sounds.railgun;
-                    rotate = true;
-                    shadow = 40f;
-                    barrelSpacing = 11.25f;
-                    barrelOffset = 8.5f;
-                    barrelRecoil = 5f;
-                    barrels = 2;
+                bullet = UnityBullets.sapLaser;
+            }},
+            new MultiBarrelWeapon("unity-araneidae-cannon"){{
+                mirror = false;
+                x = 0f;
+                y = -12.25f;
+                shootY = 22f;
+                reload = 120f;
+                shake = 10f;
+                recoil = 3f;
+                rotateSpeed = 1f;
+                ejectEffect = Fx.none;
+                shootSound = Sounds.railgun;
+                rotate = true;
+                shadow = 40f;
+                barrelSpacing = 11.25f;
+                barrelOffset = 8.5f;
+                barrelRecoil = 5f;
+                barrels = 2;
 
-                    bullet = new SlowRailBulletType(15f, 95f){{
-                        lifetime = 20f;
-                        splashDamageRadius = 90f;
-                        splashDamage = 90f;
-                        hitEffect = Fx.sapExplosion;
-                        ammoMultiplier = 4f;
-                        trailEffect = TrailFx.coloredRailgunSmallTrail;
-                        trailSpacing = 15f;
-                        backColor = trailColor = Pal.sapBulletBack;
-                        frontColor = lightningColor = Pal.sapBullet;
-                        lightning = 3;
-                        lightningLength = 20;
-                        smokeEffect = Fx.shootBigSmoke2;
-                        hitShake = 10f;
-                        lightRadius = 40f;
-                        lightColor = Pal.sap;
-                        lightOpacity = 0.6f;
-                        width = 12f;
-                        height = 23f;
-                        shrinkY = 0f;
-                        collidesAir = false;
-                        scaleVelocity = true;
-                        pierceCap = 2;
+                bullet = new SlowRailBulletType(15f, 95f){{
+                    lifetime = 20f;
+                    splashDamageRadius = 90f;
+                    splashDamage = 90f;
+                    hitEffect = Fx.sapExplosion;
+                    ammoMultiplier = 4f;
+                    trailEffect = TrailFx.coloredRailgunSmallTrail;
+                    trailSpacing = 15f;
+                    backColor = trailColor = Pal.sapBulletBack;
+                    frontColor = lightningColor = Pal.sapBullet;
+                    lightning = 3;
+                    lightningLength = 20;
+                    smokeEffect = Fx.shootBigSmoke2;
+                    hitShake = 10f;
+                    lightRadius = 40f;
+                    lightColor = Pal.sap;
+                    lightOpacity = 0.6f;
+                    width = 12f;
+                    height = 23f;
+                    shrinkY = 0f;
+                    collidesAir = false;
+                    scaleVelocity = true;
+                    pierceCap = 2;
 
-                        status = StatusEffects.sapped;
-                        statusDuration = 60f * 10;
+                    status = StatusEffects.sapped;
+                    statusDuration = 60f * 10;
 
-                        fragLifeMin = 0.3f;
-                        fragBullets = 4;
+                    fragLifeMin = 0.3f;
+                    fragBullets = 4;
 
-                        fragBullet = UnityBullets.sapArtilleryFrag;
-                    }};
-                }});
+                    fragBullet = UnityBullets.sapArtilleryFrag;
+                }};
+            }});
         }};
 
         theraphosidae = new UnityUnitType("theraphosidae"){{
@@ -1293,108 +1392,110 @@ public class UnityUnitTypes implements ContentList{
             legSplashRange = 60f;
             targetAir = false;
             commandLimit = 5;
-            bottomWeapons.add(name + "-launcher");
+
             weapons.add(new LimitedAngleWeapon(name + "-launcher"){{
-                            x = 33f;
-                            y = 8.5f;
-                            shootY = 6.25f - 1f;
-                            reload = 7f;
-                            recoil = 1f;
-                            rotate = true;
-                            shootCone = 20f;
-                            angleCone = 60f;
-                            angleOffset = 45f;
-                            inaccuracy = 25f;
-                            xRand = 2.25f;
-                            shots = 2;
-                            shootSound = Sounds.missile;
+                bottomWeapons.add(this);
 
-                            bullet = new MissileBulletType(3.7f, 15f){{
-                                width = 10f;
-                                height = 12f;
-                                shrinkY = 0f;
-                                drag = -0.01f;
-                                splashDamageRadius = 30f;
-                                splashDamage = 55f;
-                                ammoMultiplier = 5f;
-                                hitEffect = Fx.blastExplosion;
-                                despawnEffect = Fx.blastExplosion;
-                                backColor = trailColor = Pal.sapBulletBack;
-                                frontColor = lightningColor = lightColor = Pal.sapBullet;
-                                trailLength = 13;
-                                homingRange = 80f;
-                                weaveScale = 8f;
-                                weaveMag = 2f;
-                                lightning = 2;
-                                lightningLength = 2;
-                                lightningLengthRand = 1;
-                                lightningCone = 15f;
+                x = 33f;
+                y = 8.5f;
+                shootY = 6.25f - 1f;
+                reload = 7f;
+                recoil = 1f;
+                rotate = true;
+                shootCone = 20f;
+                angleCone = 60f;
+                angleOffset = 45f;
+                inaccuracy = 25f;
+                xRand = 2.25f;
+                shots = 2;
+                shootSound = Sounds.missile;
 
-                                status = StatusEffects.blasted;
-                                statusDuration = 60f;
-                            }};
-                        }},
-                new LimitedAngleWeapon(name + "-mount"){{
-                    x = 26.75f;
-                    y = 7.5f;
-                    shootY = 10.25f - 5f;
-                    reload = 120f;
-                    angleCone = 60f;
-                    rotate = true;
-                    continuous = true;
-                    alternate = false;
-                    rotateSpeed = 1.5f;
-                    recoil = 5f;
-                    shootSound = UnitySounds.continuousLaserA;
+                bullet = new MissileBulletType(3.7f, 15f){{
+                    width = 10f;
+                    height = 12f;
+                    shrinkY = 0f;
+                    drag = -0.01f;
+                    splashDamageRadius = 30f;
+                    splashDamage = 55f;
+                    ammoMultiplier = 5f;
+                    hitEffect = Fx.blastExplosion;
+                    despawnEffect = Fx.blastExplosion;
+                    backColor = trailColor = Pal.sapBulletBack;
+                    frontColor = lightningColor = lightColor = Pal.sapBullet;
+                    trailLength = 13;
+                    homingRange = 80f;
+                    weaveScale = 8f;
+                    weaveMag = 2f;
+                    lightning = 2;
+                    lightningLength = 2;
+                    lightningLengthRand = 1;
+                    lightningCone = 15f;
 
-                    bullet = UnityBullets.continuousSapLaser;
-                }},
-                new Weapon(name + "-railgun"){{
-                    x = 20.5f;
-                    y = -10f;
-                    shootY = 20.5f - 4f;
-                    shootSound = Sounds.railgun;
-                    rotate = true;
-                    alternate = true;
-                    rotateSpeed = 0.9f;
-                    cooldownTime = 90f;
-                    reload = 90f;
-                    shake = 6f;
-                    recoil = 8f;
+                    status = StatusEffects.blasted;
+                    statusDuration = 60f;
+                }};
+            }},
+            new LimitedAngleWeapon(name + "-mount"){{
+                x = 26.75f;
+                y = 7.5f;
+                shootY = 10.25f - 5f;
+                reload = 120f;
+                angleCone = 60f;
+                rotate = true;
+                continuous = true;
+                alternate = false;
+                rotateSpeed = 1.5f;
+                recoil = 5f;
+                shootSound = UnitySounds.continuousLaserA;
 
-                    bullet = new SlowRailBulletType(15f, 95f){{
-                        lifetime = 23f;
-                        splashDamageRadius = 110f;
-                        splashDamage = 90f;
-                        hitEffect = Fx.sapExplosion;
-                        ammoMultiplier = 4f;
-                        trailEffect = TrailFx.coloredRailgunSmallTrail;
-                        trailSpacing = 15f;
-                        backColor = trailColor = Pal.sapBulletBack;
-                        frontColor = lightningColor = Pal.sapBullet;
-                        lightning = 3;
-                        lightningLength = 20;
-                        smokeEffect = Fx.shootBigSmoke2;
-                        hitShake = 10f;
-                        lightRadius = 40f;
-                        lightColor = Pal.sap;
-                        lightOpacity = 0.6f;
-                        width = 13f;
-                        height = 27f;
-                        shrinkY = 0f;
-                        collidesAir = false;
-                        scaleVelocity = true;
-                        pierceCap = 3;
+                bullet = UnityBullets.continuousSapLaser;
+            }},
+            new Weapon(name + "-railgun"){{
+                x = 20.5f;
+                y = -10f;
+                shootY = 20.5f - 4f;
+                shootSound = Sounds.railgun;
+                rotate = true;
+                alternate = true;
+                rotateSpeed = 0.9f;
+                cooldownTime = 90f;
+                reload = 90f;
+                shake = 6f;
+                recoil = 8f;
 
-                        status = StatusEffects.sapped;
-                        statusDuration = 60f * 10;
+                bullet = new SlowRailBulletType(15f, 95f){{
+                    lifetime = 23f;
+                    splashDamageRadius = 110f;
+                    splashDamage = 90f;
+                    hitEffect = Fx.sapExplosion;
+                    ammoMultiplier = 4f;
+                    trailEffect = TrailFx.coloredRailgunSmallTrail;
+                    trailSpacing = 15f;
+                    backColor = trailColor = Pal.sapBulletBack;
+                    frontColor = lightningColor = Pal.sapBullet;
+                    lightning = 3;
+                    lightningLength = 20;
+                    smokeEffect = Fx.shootBigSmoke2;
+                    hitShake = 10f;
+                    lightRadius = 40f;
+                    lightColor = Pal.sap;
+                    lightOpacity = 0.6f;
+                    width = 13f;
+                    height = 27f;
+                    shrinkY = 0f;
+                    collidesAir = false;
+                    scaleVelocity = true;
+                    pierceCap = 3;
 
-                        fragLifeMin = 0.3f;
-                        fragBullets = 4;
+                    status = StatusEffects.sapped;
+                    statusDuration = 60f * 10;
 
-                        fragBullet = UnityBullets.sapArtilleryFrag;
-                    }};
-                }});
+                    fragLifeMin = 0.3f;
+                    fragBullets = 4;
+
+                    fragBullet = UnityBullets.sapArtilleryFrag;
+                }};
+            }});
         }};
 
         mantle = new UnityUnitType("mantle"){{
@@ -1592,8 +1693,9 @@ public class UnityUnitTypes implements ContentList{
 
             abilities.add(new ForceFieldAbility(190f, 6f, 8000f, 60f * 12), new RepairFieldAbility(180f, 60f * 2, 160f));
 
-            bottomWeapons.add(name + "-laser");
             weapons.add(new Weapon(name + "-laser"){{
+                bottomWeapons.add(this);
+
                 x = 0f;
                 y = 0f;
                 shootY = 42f - 3f;
@@ -1783,152 +1885,154 @@ public class UnityUnitTypes implements ContentList{
 
             abilities.add(new UnitSpawnAbility(schistocerca, spawnTime, 24.75f, -29.5f), new UnitSpawnAbility(schistocerca, spawnTime, -24.75f, -29.5f));
 
-            bottomWeapons.add(name + "-side-silo");
-            bottomWeapons.add(name + "-front-cannon");
             weapons.addAll(new LimitedAngleWeapon(name + "-front-cannon"){{
-                               x = 22.25f;
-                               y = 30.25f;
-                               shootY = 9.5f;
-                               recoil = 5f;
-                               shots = 5;
-                               shotDelay = 3f;
-                               inaccuracy = 5f;
-                               shootCone = 15f;
-                               rotate = true;
-                               angleLimit = 3f;
-                               shootSound = Sounds.artillery;
-                               reload = 25f;
+                bottomWeapons.add(this);
 
-                               bullet = Bullets.standardThoriumBig;
-                           }},
-                new LimitedAngleWeapon(name + "-side-silo"){
-                    {
-                        x = 29.75f;
-                        y = -13f;
-                        shootY = 7f;
-                        xRand = 9f;
-                        defaultAngle = angleOffset = 90f;
-                        angleCone = 0f;
-                        shootCone = 125f;
-                        alternate = false;
-                        rotate = true;
-                        reload = 50f;
-                        shots = 12;
-                        shotDelay = 3f;
-                        inaccuracy = 5f;
-                        shootSound = Sounds.missile;
+                x = 22.25f;
+                y = 30.25f;
+                shootY = 9.5f;
+                recoil = 5f;
+                shots = 5;
+                shotDelay = 3f;
+                inaccuracy = 5f;
+                shootCone = 15f;
+                rotate = true;
+                angleLimit = 3f;
+                shootSound = Sounds.artillery;
+                reload = 25f;
 
-                        bullet = new GuidedMissileBulletType(3f, 20f){{
-                            homingPower = 0.09f;
-                            width = 8f;
-                            height = 8f;
-                            shrinkX = shrinkY = 0f;
-                            drag = -0.003f;
-                            keepVelocity = false;
-                            splashDamageRadius = 40f;
-                            splashDamage = 45f;
-                            lifetime = 65f;
-                            trailColor = Pal.missileYellowBack;
-                            hitEffect = Fx.blastExplosion;
-                            despawnEffect = Fx.blastExplosion;
-                        }};
-                    }
+                bullet = Bullets.standardThoriumBig;
+            }},
+            new LimitedAngleWeapon(name + "-side-silo"){
+                {
+                    bottomWeapons.add(this);
 
-                    @Override
-                    protected Bullet bullet(Unit unit, float shootX, float shootY, float angle, float lifescl){
-                        Bullet b = super.bullet(unit, shootX, shootY, angle, lifescl);
-                        if(b.type instanceof GuidedMissileBulletType){
-                            WeaponMount m = null;
-                            for(WeaponMount mount : unit.mounts){
-                                if(mount.weapon == this){
-                                    m = mount;
-                                    break;
-                                }
-                            }
-                            if(m != null){
-                                b.data = m;
+                    x = 29.75f;
+                    y = -13f;
+                    shootY = 7f;
+                    xRand = 9f;
+                    defaultAngle = angleOffset = 90f;
+                    angleCone = 0f;
+                    shootCone = 125f;
+                    alternate = false;
+                    rotate = true;
+                    reload = 50f;
+                    shots = 12;
+                    shotDelay = 3f;
+                    inaccuracy = 5f;
+                    shootSound = Sounds.missile;
+
+                    bullet = new GuidedMissileBulletType(3f, 20f){{
+                        homingPower = 0.09f;
+                        width = 8f;
+                        height = 8f;
+                        shrinkX = shrinkY = 0f;
+                        drag = -0.003f;
+                        keepVelocity = false;
+                        splashDamageRadius = 40f;
+                        splashDamage = 45f;
+                        lifetime = 65f;
+                        trailColor = Pal.missileYellowBack;
+                        hitEffect = Fx.blastExplosion;
+                        despawnEffect = Fx.blastExplosion;
+                    }};
+                }
+
+                @Override
+                protected Bullet bullet(Unit unit, float shootX, float shootY, float angle, float lifescl){
+                    Bullet b = super.bullet(unit, shootX, shootY, angle, lifescl);
+                    if(b.type instanceof GuidedMissileBulletType){
+                        WeaponMount m = null;
+                        for(WeaponMount mount : unit.mounts){
+                            if(mount.weapon == this){
+                                m = mount;
+                                break;
                             }
                         }
-                        return b;
+                        if(m != null){
+                            b.data = m;
+                        }
                     }
-                },
-                new LimitedAngleWeapon(fin.name + "-launcher"){{
-                    x = 0f;
-                    y = 21f;
-                    shootY = 8f;
-                    rotate = true;
-                    mirror = false;
-                    inaccuracy = 15f;
-                    reload = 7f;
-                    xRand = 2.25f;
-                    shootSound = Sounds.missile;
-                    angleCone = 135f;
+                    return b;
+                }
+            },
+            new LimitedAngleWeapon(fin.name + "-launcher"){{
+                x = 0f;
+                y = 21f;
+                shootY = 8f;
+                rotate = true;
+                mirror = false;
+                inaccuracy = 15f;
+                reload = 7f;
+                xRand = 2.25f;
+                shootSound = Sounds.missile;
+                angleCone = 135f;
 
-                    bullet = UnityBullets.basicMissile;
-                }},
-                new PointDefenceMultiBarrelWeapon(name + "-flak-turret"){{
-                    x = 26.5f;
-                    y = 15f;
-                    shootY = 15.75f;
-                    barrels = 2;
-                    barrelOffset = 5.25f;
-                    barrelSpacing = 6.5f;
-                    barrelRecoil = 4f;
-                    rotate = true;
-                    mirrorBarrels = true;
-                    alternate = false;
-                    reload = 6f;
-                    recoil = 0.5f;
-                    shootCone = 7f;
-                    shadow = 30f;
-                    targetInterval = 20f;
-                    autoTarget = true;
-                    controllable = false;
-                    bullet = new AntiBulletFlakBulletType(8f, 6f){{
-                        lifetime = 45f;
-                        splashDamage = 12f;
-                        splashDamageRadius = 60f;
-                        bulletRadius = 60f;
-                        explodeRange = 45f;
-                        bulletDamage = 18f;
-                        width = 8f;
-                        height = 12f;
-                        scaleVelocity = true;
-                        collidesGround = false;
-                        status = StatusEffects.blasted;
-                        statusDuration = 60f;
-                    }};
-                }}, new Weapon(name + "-railgun"){{
-                    x = 0f;
-                    y = 0f;
-                    shootY = 38.5f;
-                    mirror = false;
-                    rotate = true;
-                    rotateSpeed = 0.7f;
-                    shadow = 46f;
-                    reload = 60f * 2.5f;
-                    shootSound = Sounds.railgun;
+                bullet = UnityBullets.basicMissile;
+            }},
+            new PointDefenceMultiBarrelWeapon(name + "-flak-turret"){{
+                x = 26.5f;
+                y = 15f;
+                shootY = 15.75f;
+                barrels = 2;
+                barrelOffset = 5.25f;
+                barrelSpacing = 6.5f;
+                barrelRecoil = 4f;
+                rotate = true;
+                mirrorBarrels = true;
+                alternate = false;
+                reload = 6f;
+                recoil = 0.5f;
+                shootCone = 7f;
+                shadow = 30f;
+                targetInterval = 20f;
+                autoTarget = true;
+                controllable = false;
+                bullet = new AntiBulletFlakBulletType(8f, 6f){{
+                    lifetime = 45f;
+                    splashDamage = 12f;
+                    splashDamageRadius = 60f;
+                    bulletRadius = 60f;
+                    explodeRange = 45f;
+                    bulletDamage = 18f;
+                    width = 8f;
+                    height = 12f;
+                    scaleVelocity = true;
+                    collidesGround = false;
+                    status = StatusEffects.blasted;
+                    statusDuration = 60f;
+                }};
+            }}, new Weapon(name + "-railgun"){{
+                x = 0f;
+                y = 0f;
+                shootY = 38.5f;
+                mirror = false;
+                rotate = true;
+                rotateSpeed = 0.7f;
+                shadow = 46f;
+                reload = 60f * 2.5f;
+                shootSound = Sounds.railgun;
 
-                    bullet = new SlowRailBulletType(70f, 2100f){{
-                        lifetime = 10f;
-                        width = 20f;
-                        height = 38f;
-                        splashDamage = 50f;
-                        splashDamageRadius = 30f;
-                        pierceDamageFactor = 0.15f;
-                        pierceCap = -1;
-                        fragBullet = Bullets.standardDense;
-                        fragBullets = 2;
-                        fragCone = 20f;
-                        fragLifeMin = 0.4f;
-                        fragLifeMax = 0.7f;
-                        trailSpacing = 40f;
-                        trailEffect = TrailFx.coloredArrowTrail;
-                        backColor = trailColor = Pal.bulletYellowBack;
-                        frontColor = Pal.bulletYellow;
-                        collisionWidth = 12f;
-                    }};
-                }});
+                bullet = new SlowRailBulletType(70f, 2100f){{
+                    lifetime = 10f;
+                    width = 20f;
+                    height = 38f;
+                    splashDamage = 50f;
+                    splashDamageRadius = 30f;
+                    pierceDamageFactor = 0.15f;
+                    pierceCap = -1;
+                    fragBullet = Bullets.standardDense;
+                    fragBullets = 2;
+                    fragCone = 20f;
+                    fragLifeMin = 0.4f;
+                    fragLifeMax = 0.7f;
+                    trailSpacing = 40f;
+                    trailEffect = TrailFx.coloredArrowTrail;
+                    backColor = trailColor = Pal.bulletYellowBack;
+                    frontColor = Pal.bulletYellow;
+                    collisionWidth = 12f;
+                }};
+            }});
         }};
 
         amphibiNaval = new UnityUnitType("amphibi-naval"){
@@ -4466,8 +4570,9 @@ public class UnityUnitTypes implements ContentList{
             legSplashDamage = 1600f;
             outlineColor = UnityPal.darkerOutline;
 
-            bottomWeapons.add(name + "-nightmare");
             weapons.addAll(new Weapon(name + "-nightmare"){{
+                bottomWeapons.add(this);
+
                 x = 80.25f;
                 y = -7.75f;
                 shootY = 75f;

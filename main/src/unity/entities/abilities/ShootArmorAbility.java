@@ -11,8 +11,9 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import unity.type.*;
 
+//TODO bad codebase, doesn't use the potential of WeaponMounts
 public class ShootArmorAbility extends Ability{
-    /** How much the shooter's amror increases */
+    /** How much the shooter's armor increases */
     public float armorInc = 25f;
     /** How quickly the shield lerps */
     public float warmup = 0.06f;
@@ -26,7 +27,7 @@ public class ShootArmorAbility extends Ability{
     protected float shootHeat;
     protected Vec2 offset = new Vec2();
 
-    public ShootArmorAbility(){};
+    public ShootArmorAbility(){}
 
     public ShootArmorAbility(float armorInc, float warmup, float spread, float speedReduction, String armorRegion){
         this.armorInc = armorInc;
@@ -77,5 +78,5 @@ public class ShootArmorAbility extends Ability{
                 Drawf.construct(unit.x + offset.x, unit.y + offset.y, region, unit.team.color, unit.rotation - 90f, shootHeat, shootHeat, Time.time * 2 + unit.id());
             });
         }
-    };
+    }
 }

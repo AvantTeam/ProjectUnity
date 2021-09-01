@@ -7,9 +7,6 @@ import static mindustry.Vars.*;
 /** @author GlennFolker */
 @SuppressWarnings("unchecked")
 public final class ReflectUtils{
-    public static final Object[] emptyObjects = new Object[0];
-    public static final Class<?>[] emptyClasses = new Class[0];
-
     public static Class<?> box(Class<?> type){
         if(type == boolean.class) return Boolean.class;
         if(type == byte.class) return Byte.class;

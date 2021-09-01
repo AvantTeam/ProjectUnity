@@ -147,7 +147,7 @@ public class Annotations{
                 f -> "Float.intBitsToFloat(" + f + ")"
             ),
 
-            /** RGBA8888 color format. Takes 8 bits for 4 floats each */
+            /** RGBA8888 color format. Takes 8 bits for typically 4 floats each */
             rgba8888(8,
                 f -> "(" + f + " * 255f)",
                 f -> "(" + f + " / 255f)"

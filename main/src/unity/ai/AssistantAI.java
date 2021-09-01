@@ -13,7 +13,6 @@ import mindustry.type.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 import mindustry.world.meta.*;
 import unity.gen.*;
-import unity.util.*;
 
 import static mindustry.Vars.*;
 
@@ -396,7 +395,7 @@ public class AssistantAI extends FlyingAI{
 
             @Override
             protected void dispose(AssistantAI ai){
-                if(ai.fallback instanceof UnitHealerAI){
+                if(ai.fallback instanceof HealerAI){
                     ai.fallback = null;
                 }
 
@@ -407,8 +406,8 @@ public class AssistantAI extends FlyingAI{
 
             @Override
             protected void update(AssistantAI ai){
-                if(!(ai.fallback instanceof UnitHealerAI)){
-                    ai.fallback = new UnitHealerAI();
+                if(!(ai.fallback instanceof HealerAI)){
+                    ai.fallback = new HealerAI();
                 }
             }
         };

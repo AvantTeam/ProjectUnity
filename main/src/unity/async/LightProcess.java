@@ -13,6 +13,7 @@ import static mindustry.Vars.*;
  * thread, whose finalization will be done again synchronously.
  * @author GlennFolker
  */
+//TODO just. no.
 public class LightProcess implements AsyncProcess{
     private volatile boolean processing = false;
     private volatile boolean ending = false;

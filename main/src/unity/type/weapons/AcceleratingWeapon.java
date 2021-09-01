@@ -5,7 +5,6 @@ import arc.util.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
-import unity.type.weapons.MultiBarrelWeapon.*;
 
 public class AcceleratingWeapon extends Weapon{
     public float accelCooldownTime = 120f;

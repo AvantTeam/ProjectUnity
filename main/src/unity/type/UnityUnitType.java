@@ -10,7 +10,6 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.entities.*;
 import mindustry.entities.abilities.*;
-import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -32,7 +31,7 @@ public class UnityUnitType extends UnitType{
 
     public TextureRegion segmentRegion, tailRegion, segmentCellRegion, segmentOutline, tailOutline, legBackRegion, legBaseBackRegion, footBackRegion, legMiddleRegion, payloadCellRegion;
     public TextureRegion[] abilityRegions = new TextureRegion[AbilityTextures.values().length];
-    public ObjectSet<String> bottomWeapons = new ObjectSet<>();
+    public Seq<Weapon> bottomWeapons = new Seq<>();
     // Worms
     public int segmentLength = 9, maxSegments = -1;
     //Should reduce the "Whip" effect.
@@ -104,9 +103,9 @@ public class UnityUnitType extends UnitType{
 
     @Override
     public Unit create(Team team){
-        Unit unit = super.create(team);
+        var unit = super.create(team);
 
-        Class<?> caller = ReflectUtils.classCaller();
+        var caller = ReflectUtils.classCaller();
         boolean fromWave = caller != null && SpawnGroup.class.isAssignableFrom(caller);
 
         if(fromWave){
@@ -118,26 +117,28 @@ public class UnityUnitType extends UnitType{
             }
         }
 
-        if(!wormCreating && unit instanceof Wormc w){
+        if(!wormCreating && unit instanceof Wormc){
             wormCreating = true;
-            Unit cur = unit;
+            var cur = (Unit & Wormc)unit;
             int cid = unit.id;
             //Tmp.v1.trns(unit.rotation + 180f, segmentOffset + headOffset).add(unit);
             for(int i = 0; i < segmentLength; i++){
-                Unit t = create(team);
+                var t = (Unit & Wormc)create(team);
                 t.elevation = unit.elevation;
 
-                Wormc wt = (Wormc)t;
-                wt.layer(1f + i);
-                wt.head(unit);
-                wt.parent(cur);
-                ((Wormc)cur).child(t);
-                ((Wormc)cur).childId(cid);
-                ((Wormc)cur).headId(unit.id);
+                t.layer(1f + i);
+                t.head(unit);
+                t.parent(cur);
+
+                cur.child(t);
+                cur.childId(cid);
+                cur.headId(unit.id);
+
                 t.setupWeapons(this);
                 cid = t.id;
                 cur = t;
             }
+
             wormCreating = false;
         }
 
@@ -164,7 +165,7 @@ public class UnityUnitType extends UnitType{
         payloadCellRegion = atlas.find(name + "-cell-payload", cellRegion);
 
         //abilities
-        for(AbilityTextures type : AbilityTextures.values()){
+        for(var type : AbilityTextures.values()){
             abilityRegions[type.ordinal()] = atlas.find(name + "-" + type.name());
         }
 
@@ -183,7 +184,7 @@ public class UnityUnitType extends UnitType{
             mapped.add(rotor);
 
             if(rotor.mirror){
-                Rotor copy = rotor.copy();
+                var copy = rotor.copy();
                 copy.x *= -1f;
                 copy.speed *= -1f;
                 copy.shadeSpeed *= -1f;
@@ -200,25 +201,37 @@ public class UnityUnitType extends UnitType{
         rotors.set(mapped);
         //worm
         sortSegWeapons(segWeapSeq);
+
+        Seq<Weapon> addBottoms = new Seq<>();
+        for(var w : weapons){
+            if(bottomWeapons.contains(w) && w.otherSide != -1){
+                addBottoms.add(weapons.get(w.otherSide));
+            }
+        }
+
+        bottomWeapons.addAll(addBottoms.distinct());
     }
 
     public void sortSegWeapons(Seq<Weapon> weaponSeq){
         Seq<Weapon> mapped = new Seq<>();
         for(int i = 0, len = weaponSeq.size; i < len; i++){
-            Weapon w = weaponSeq.get(i);
+            var w = weaponSeq.get(i);
             mapped.add(w);
+
             if(w.mirror){
-                Weapon copy = w.copy();
+                var copy = w.copy();
                 copy.x *= -1;
                 copy.shootX *= -1;
                 copy.flipSprite = !copy.flipSprite;
                 mapped.add(copy);
+
                 w.reload *= 2;
                 copy.reload *= 2;
                 w.otherSide = mapped.size - 1;
                 copy.otherSide = mapped.size - 2;
             }
         }
+
         weaponSeq.set(mapped);
     }
 
@@ -564,20 +577,20 @@ public class UnityUnitType extends UnitType{
             float offset = engineOffset / 2f + engineOffset / 2f * scale;
 
             if(unit instanceof Trailc trail){
-                Trail t = trail.trail();
+                var t = trail.trail();
                 t.draw(engineColor, (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f) * scale) * trailScl);
             }
 
             Draw.color(engineColor);
             Fill.circle(
-                unit.x + Angles.trnsx(unit.rotation + 180, offset),
-                unit.y + Angles.trnsy(unit.rotation + 180, offset),
+                unit.x + Angles.trnsx(unit.rotation + 180f, offset),
+                unit.y + Angles.trnsy(unit.rotation + 180f, offset),
                 (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f)) * scale
             );
             Draw.color(Color.white);
             Fill.circle(
-                unit.x + Angles.trnsx(unit.rotation + 180, offset - 1f),
-                unit.y + Angles.trnsy(unit.rotation + 180, offset - 1f),
+                unit.x + Angles.trnsx(unit.rotation + 180f, offset - 1f),
+                unit.y + Angles.trnsy(unit.rotation + 180f, offset - 1f),
                 (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f)) / 2f  * scale
             );
             Draw.color();
@@ -590,11 +603,12 @@ public class UnityUnitType extends UnitType{
     public void drawWeapons(Unit unit){
         float z = Draw.z();
 
-        //super.drawWeapons(unit);
         applyColor(unit);
-        for(WeaponMount mount : unit.mounts){
-            if(bottomWeapons.contains(mount.weapon.name)) Draw.z(z - 0.0001f);
-            mount.weapon.draw(unit, mount);
+        for(var mount : unit.mounts){
+            var weapon = mount.weapon;
+            if(bottomWeapons.contains(weapon)) Draw.z(z - 0.0001f);
+
+            weapon.draw(unit, mount);
             Draw.z(z);
         }
 
@@ -602,54 +616,53 @@ public class UnityUnitType extends UnitType{
     }
 
     public <T extends Unit & Copterc> void drawRotors(T unit){
-        Draw.mixcol(Color.white, unit.hitTime);
+        applyColor(unit);
 
-        for(RotorMount mount : unit.rotors()){
-            Rotor rotor = mount.rotor;
-
-            float offX = Angles.trnsx(unit.rotation - 90, rotor.x, rotor.y);
-            float offY = Angles.trnsy(unit.rotation - 90, rotor.x, rotor.y);
+        var rotors = unit.rotors();
+        for(var mount : rotors){
+            var rotor = mount.rotor;
+            float x = unit.x + Angles.trnsx(unit.rotation - 90f, rotor.x, rotor.y);
+            float y = unit.y + Angles.trnsy(unit.rotation - 90f, rotor.x, rotor.y);
 
             float alpha = Mathf.curve(unit.rotorSpeedScl(), 0.2f, 1f);
+            Draw.color(0f, 0f, 0f, rotor.shadowAlpha);
+            float rad = 1.2f;
+            float size = Math.max(rotor.bladeRegion.width, rotor.bladeRegion.height) * Draw.scl;
+
+            Draw.rect(softShadowRegion, x, y, size * rad * Draw.xscl, size * rad * Draw.yscl);
+
+            Draw.color();
             Draw.alpha(alpha * rotor.ghostAlpha);
-            Draw.rect(rotor.bladeGhostRegion, unit.x + offX, unit.y + offY,
-                rotor.bladeGhostRegion.width * rotor.scale * Draw.scl,
-                rotor.bladeGhostRegion.height * rotor.scale * Draw.scl,
-                mount.rotorRot
-            );
 
-            Draw.rect(rotor.bladeShadeRegion, unit.x + offX, unit.y + offY,
-                rotor.bladeShadeRegion.width * rotor.scale * Draw.scl,
-                rotor.bladeShadeRegion.height * rotor.scale * Draw.scl,
-                mount.rotorShadeRot
-            );
+            Draw.rect(rotor.bladeGhostRegion, x, y, mount.rotorRot);
+            Draw.rect(rotor.bladeShadeRegion, x, y, mount.rotorShadeRot);
 
-            float z = Draw.z();
-
-            Draw.alpha(1f - alpha);
-            for(int i = 0; i < 2; i++){
-                Draw.z(z + i * 0.001f);
-                for(int j = 0; j < rotor.bladeCount; j++){
-                    float angle = (
-                        unit.rotation +
-                        (unit.id * 24f + mount.rotorRot +
-                        (360f / (float)rotor.bladeCount) * j)
-                    ) % 360;
-
-                    Draw.rect(i == 0 ? rotor.bladeOutlineRegion : rotor.bladeRegion, unit.x + offX, unit.y + offY,
-                        rotor.bladeRegion.width * rotor.scale * Draw.scl,
-                        rotor.bladeRegion.height * rotor.scale * Draw.scl,
-                    angle);
-                }
+            Draw.alpha(1f - alpha * rotor.bladeFade);
+            for(int j = 0; j < rotor.bladeCount; j++){
+                Draw.rect(rotor.bladeOutlineRegion, x, y, (unit.rotation + (
+                    unit.id * 24f + mount.rotorRot +
+                    (360f / rotor.bladeCount) * j
+                )) % 360);
             }
-
-            Draw.z(z + 0.002f);
-            Draw.alpha(1f);
-            Draw.rect(rotor.topRegion, unit.x + offX, unit.y + offY, unit.rotation - 90f);
-
-            Draw.z(z);
         }
 
-        Draw.mixcol();
+        for(var mount : rotors){
+            var rotor = mount.rotor;
+            float x = unit.x + Angles.trnsx(unit.rotation - 90f, rotor.x, rotor.y);
+            float y = unit.y + Angles.trnsy(unit.rotation - 90f, rotor.x, rotor.y);
+
+            Draw.alpha(1f - Mathf.curve(unit.rotorSpeedScl(), 0.2f, 1f) * rotor.bladeFade);
+            for(int j = 0; j < rotor.bladeCount; j++){
+                Draw.rect(rotor.bladeOutlineRegion, x, y, (unit.rotation + (
+                    unit.id * 24f + mount.rotorRot +
+                    (360f / rotor.bladeCount) * j
+                )) % 360);
+            }
+
+            Draw.alpha(1f);
+            Draw.rect(rotor.topRegion, x, y, unit.rotation - 90f);
+        }
+
+        Draw.reset();
     }
 }

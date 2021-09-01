@@ -158,6 +158,12 @@ public class UnitProcessor implements Processor{
             var icon = Pixmaps.outline(new PixmapRegion(conv(type.region).pixmap()), type.outlineColor, type.outlineRadius);
             add.get(conv(type.region), type.name + "-outline", icon.copy());
 
+            for(var decoration : type.decorations){
+                if(!decoration.top) decoration.drawIcon(r -> conv(r).pixmap(), icon, outliner);
+            }
+
+            icon.draw(Pixmaps.outline(new PixmapRegion(conv(type.region).pixmap()), type.outlineColor, type.outlineRadius), true);
+
             if(unit instanceof Mechc){
                 GraphicUtils.drawCenter(icon, conv(type.baseRegion).pixmap());
                 GraphicUtils.drawCenter(icon, conv(type.legRegion).pixmap());
@@ -167,10 +173,6 @@ public class UnitProcessor implements Processor{
                 flip.dispose();
 
                 icon.draw(conv(type.region).pixmap(), true);
-            }
-
-            for(var decoration : type.decorations){
-                if(!decoration.top) decoration.drawIcon(r -> conv(r).pixmap(), icon, outliner);
             }
 
             for(var weapon : type.weapons){
@@ -188,7 +190,7 @@ public class UnitProcessor implements Processor{
                     outliner.get(m.barrelEndRegion);
                 }
 
-                if((!weapon.top || type.bottomWeapons.contains(weapon.name))){
+                if(!weapon.top || type.bottomWeapons.contains(weapon)){
                     var out = atlas.find(weapon.name + "-outline");
                     var pix = out.pixmap().copy();
 
@@ -229,7 +231,7 @@ public class UnitProcessor implements Processor{
             icon.draw(cell, icon.width / 2 - cell.width / 2, icon.height / 2 - cell.height / 2, true);
 
             for(var weapon : type.weapons){
-                if(weapon.name.isEmpty()) continue;
+                if(weapon.name.isEmpty() || type.bottomWeapons.contains(weapon)) continue;
 
                 var wepReg = weapon.top ? atlas.find(weapon.name + "-outline") : conv(weapon.region);
                 var pix = wepReg.pixmap().copy();
@@ -291,8 +293,8 @@ public class UnitProcessor implements Processor{
                                 float sin = Mathf.sinDeg(deg);
                                 int col = GraphicUtils.getColor(
                                     new PixmapRegion(bladeSprite),
-                                    ((propXCenter - x) * cos + (propYCenter - y) * sin) / rotor.scale + bladeSpriteXCenter,
-                                    ((propXCenter - x) * sin - (propYCenter - y) * cos) / rotor.scale + bladeSpriteYCenter
+                                    ((propXCenter - x) * cos + (propYCenter - y) * sin) + bladeSpriteXCenter,
+                                    ((propXCenter - x) * sin - (propYCenter - y) * cos) + bladeSpriteYCenter
                                 );
 
                                 propellers.setRaw(x, y, Pixmap.blend(
@@ -322,8 +324,8 @@ public class UnitProcessor implements Processor{
 
                                     int col = GraphicUtils.getColor(
                                         new PixmapRegion(bladeSprite),
-                                        ((propXCenter - x) * cos + (propYCenter - y) * sin) / rotor.scale + bladeSpriteXCenter,
-                                        ((propXCenter - x) * sin - (propYCenter - y) * cos) / rotor.scale + bladeSpriteYCenter
+                                        ((propXCenter - x) * cos + (propYCenter - y) * sin) + bladeSpriteXCenter,
+                                        ((propXCenter - x) * sin - (propYCenter - y) * cos) + bladeSpriteYCenter
                                     );
 
                                     propellers.setRaw(x, y, Pixmap.blend(

@@ -94,10 +94,10 @@ public class UnityBullets implements ContentList{
     @Override
     public void load(){
         laser = new ExpLaserBulletType(150f, 30f){{
-                damageInc = 7f;
-                status = StatusEffects.shocked;
-                statusDuration = 3 * 60f;
-                hitUnitExpGain = hitBuildingExpGain = 2f;
+            damageInc = 7f;
+            status = StatusEffects.shocked;
+            statusDuration = 3 * 60f;
+            hitUnitExpGain = hitBuildingExpGain = 2f;
         }};
 
         shardLaserFrag = new LaserBoltBulletType(2f, 10f){
@@ -145,7 +145,7 @@ public class UnityBullets implements ContentList{
                     var a = b.rotation() + Mathf.randomSeed(b.id, 360f) + i * 360f/fragBullets;
                     var target = Damage.linecast(b, x, y, b.rotation(), length);
         
-                    Object data = getColor(b);
+                    var data = getColor(b);
                     b.data = target;
         
                     if(target instanceof Hitboxc hit){

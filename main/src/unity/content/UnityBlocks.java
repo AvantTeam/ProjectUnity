@@ -2775,7 +2775,7 @@ public class UnityBlocks implements ContentList{
             addGraph(new GraphFlux(200f).setAccept(1, 0, 0, 0));
         }};
 
-        smallThruster = new y.world.blocks.effect.UnityThruster("small-thruster"){{
+        smallThruster = new UnityThruster("small-thruster"){{
             requirements(Category.effect, with(Items.silicon, 20, Items.graphite, 30, UnityItems.nickel, 25));
             health = 400;
             acceleration = 0.2f;

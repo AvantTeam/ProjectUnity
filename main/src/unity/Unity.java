@@ -12,9 +12,9 @@ import arc.util.*;
 import arc.util.Log.*;
 import arc.util.serialization.*;
 import mindustry.*;
-import mindustry.core.GameState.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
+import mindustry.gen.*;
 import mindustry.mod.*;
 import mindustry.world.blocks.environment.*;
 import unity.ai.kami.*;
@@ -46,6 +46,9 @@ public class Unity extends Mod{
 
     public static CreditsDialog creditsDialog;
     public static JSScriptDialog scriptsDialog;
+
+    public static LightProcess lights;
+    public static ContentScoreProcess scoring;
 
     private static final ContentList[] content = {
         new UnityItems(),
@@ -137,13 +140,17 @@ public class Unity extends Mod{
             Core.settings.getBoolOnce("unity-install", () -> Time.runTask(5f, CreditsDialog::showList));
         });
 
-        Events.on(StateChangeEvent.class, e -> Core.app.post(() -> {
-            if(e.from == State.menu && e.to == State.playing){
-                WorldListener.instance.add();
-            }else if(e.to == State.menu){
-                WorldListener.instance.remove();
+        Events.on(SaveLoadEvent.class, s -> {
+            var ent = Groups.all.find(e -> e instanceof WorldListener);
+            if(ent instanceof WorldListener w){
+                WorldListener.instance = w;
+            }else{
+                var w = WorldListener.create();
+                w.add();
+
+                WorldListener.instance = w;
             }
-        }));
+        });
 
         Utils.init();
 
@@ -168,7 +175,10 @@ public class Unity extends Mod{
 
         cinematicEditor = new CinematicEditor();
 
-        asyncCore.processes.add(new LightProcess(), new ContentScoreProcess());
+        asyncCore.processes.add(
+            lights = new LightProcess(),
+            scoring = new ContentScoreProcess()
+        );
     }
 
     @Override

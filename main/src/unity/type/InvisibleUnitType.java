@@ -118,9 +118,9 @@ public class InvisibleUnitType extends UnityUnitType{
 
         //super.drawWeapons(unit);
         //applyColor(unit);
-        for(WeaponMount mount : unit.mounts){
-            Weapon weapon = mount.weapon;
-            boolean found = bottomWeapons.contains(weapon.name);
+        for(var mount : unit.mounts){
+            var weapon = mount.weapon;
+            boolean found = bottomWeapons.contains(weapon);
 
             float rotation = unit.rotation - 90;
             float weaponRotation  = rotation + (weapon.rotate ? mount.rotation : 0);

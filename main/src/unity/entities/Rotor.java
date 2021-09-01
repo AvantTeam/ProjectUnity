@@ -13,15 +13,16 @@ public class Rotor{
 
     public TextureRegion bladeRegion, bladeOutlineRegion, bladeGhostRegion, bladeShadeRegion, topRegion;
 
-    public boolean mirror = false;
-    public float x = 0f;
-    public float y = 0f;
-    public float scale = 1f;
+    public boolean mirror;
+    public float x;
+    public float y;
 
     public float rotOffset = 0f;
     public float speed = 29f;
     public float shadeSpeed = 3f;
     public float ghostAlpha = 0.6f;
+    public float shadowAlpha = 0.4f;
+    public float bladeFade = 1f;
 
     public int bladeCount = 4;
 
@@ -38,9 +39,6 @@ public class Rotor{
     }
 
     public Rotor copy(){
-        Rotor out = new Rotor(name);
-        JsonIO.json.copyFields(this, out);
-
-        return out;
+        return JsonIO.copy(this, new Rotor(name));
     }
 }
