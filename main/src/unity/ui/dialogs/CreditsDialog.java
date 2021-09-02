@@ -113,7 +113,10 @@ public class CreditsDialog extends BaseDialog{
                 b.table(Tex.button, t -> {
                     t.add(stringf.get(type.name())).pad(3f).center();
                     t.row();
-                    
+
+                    t.image().color(Pal.accent).fillX().growX().padBottom(5f);
+                    t.row();
+
                     t.pane(p -> {
                         for(String c : list){
                             String noLang = c.replaceAll("\\(([^\\)]*)\\)", "").replace(" ", "");
