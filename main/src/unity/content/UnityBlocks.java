@@ -3094,7 +3094,10 @@ public class UnityBlocks implements ContentList{
             };
         }};
 
-        endForge = new StemGenericCrafter("end-forge"){{
+        endForge = new StemGenericCrafter("end-forge"){
+            final int effectTimer = timers++;
+
+            {
             requirements(Category.crafting, with(Items.silicon, 2300, Items.phaseFabric, 650, Items.surgeAlloy, 1350, UnityItems.plagueAlloy, 510, UnityItems.darkAlloy, 510, UnityItems.lightAlloy, 510, UnityItems.advanceAlloy, 510, UnityItems.monolithAlloy, 510, UnityItems.sparkAlloy, 510, UnityItems.superAlloy, 510, UnityItems.terminationFragment, 230));
             size = 8;
             craftTime = 410f;
@@ -3105,8 +3108,13 @@ public class UnityBlocks implements ContentList{
             consumes.items(with(UnityItems.terminum, 3, UnityItems.darkAlloy, 5, UnityItems.lightAlloy, 5));
 
             update((StemGenericCrafterBuild e) -> {
-                if(e.consValid() && Mathf.chanceDelta(0.7f * e.warmup)){
-                    UnityFx.forgeAbsorbEffect.at(e.x, e.y, Mathf.random(360f));
+                if(e.consValid()){
+                    if(e.timer.get(effectTimer, 120f)){
+                        UnityFx.forgeAbsorbPulseEffect.at(e.x, e.y);
+                    }
+                    if(Mathf.chanceDelta(0.7f * e.warmup)){
+                        UnityFx.forgeAbsorbEffect.at(e.x, e.y, Mathf.random(360f));
+                    }
                 }
             });
 

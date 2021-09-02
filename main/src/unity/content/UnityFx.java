@@ -312,6 +312,21 @@ public class UnityFx{
         }
     }),
 
+    forgeAbsorbPulseEffect = new Effect(124f, e -> {
+        float rad = 110f * e.fout(Interp.pow5In);
+        int sides = Lines.circleVertices(rad);
+
+        z(Layer.effect + 1f);
+        blend(Blending.additive);
+        Tmp.c1.set(UnityPal.endColor);
+        Tmp.c1.a = e.fin(Interp.pow5Out);
+        Fill.light(e.x, e.y, sides, rad, Color.clear, Tmp.c1);
+
+        Tmp.c1.a = e.fin(Interp.pow10Out) * e.fout(Interp.pow10Out);
+        Fill.light(e.x, e.y, 27, 40f, Tmp.c1, Color.clear);
+        blend();
+    }),
+
     forgeAbsorbEffect = new Effect(124f, e -> {
         float angle = e.rotation;
         float slope = (0.5f - Math.abs(e.finpow() - 0.5f)) * 2f;
