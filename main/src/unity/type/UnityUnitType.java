@@ -96,6 +96,10 @@ public class UnityUnitType extends UnitType{
 
     boolean wormCreating = false;
 
+    // Imber units
+    public float laserRange = -1f;
+    public int maxConnections = -1;
+
     public UnityUnitType(String name){
         super(name);
         outlines = false;

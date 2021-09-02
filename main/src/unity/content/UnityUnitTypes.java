@@ -82,6 +82,10 @@ public class UnityUnitTypes implements ContentList{
     public static @FactionDef("imber") @EntityPoint(WormDefaultUnit.class)
     UnitType arcnelidia;
 
+    // imber
+    public static @FactionDef("imber") @EntityPoint(Unitc.class)
+    UnityUnitType rayTest;
+
     // imber... random stuff
     public static @FactionDef("imber") @EntityPoint(UnitEntity.class)
     UnityUnitType testLink, test;
