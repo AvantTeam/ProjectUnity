@@ -12,9 +12,9 @@ import unity.type.*;
 
 @EntityComponent
 abstract class ImberComp implements Unitc {
-    Seq<Unit> closeImberUnits = new Seq<>();
-    float laserRange;
-    int maxConnections;
+    transient Seq<Unit> closeImberUnits = new Seq<>();
+    transient float laserRange;
+    transient int maxConnections;
 
     @Import float x, y;
     @Import Team team;
