@@ -22,8 +22,8 @@ public final class ContributorList{
             "Xusk",
             "Eldoofus",
             "Evl",
+            "BlueWolf",
             "Goober",
-            "BasedUser",
             "Sharlotte"
         ),
 
@@ -33,7 +33,8 @@ public final class ContributorList{
         ),
 
         ContributionType.tester, Seq.with(
-            "BlueWolf"
+            "BasedUser",
+            "Prosta4ok_ua"
         )
     );
 
