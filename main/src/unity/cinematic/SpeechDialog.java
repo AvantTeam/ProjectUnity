@@ -204,7 +204,7 @@ public class SpeechDialog{
             if(index < content.length()){
                 float elapsed = Time.time - last;
                 if(elapsed >= speed){
-                    Sounds.click.play();
+                    sound.play();
                     index = speed <= 0f ? content.length() : Math.min(index + (int)(elapsed / speed), content.length());
 
                     last = Time.time;
