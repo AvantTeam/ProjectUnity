@@ -6,6 +6,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.ai.types.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
@@ -2848,6 +2849,19 @@ public class UnityUnitTypes implements ContentList{
                 minShootVelocity = 0.01f;
                 bullet = UnitTypes.horizon.weapons.first().bullet;
             }});
+        }};
+
+        rayTest = new UnityUnitType("ray-test"){{
+            defaultController = GroundAI::new;
+            flying = false;
+            health = 500;
+            speed = 1f;
+            accel = 0.035f;
+            drag = 0.007f;
+            rotateSpeed = 3.2f;
+            range = 210f;
+            laserRange = 30f;
+            maxConnections = 2;
         }};
 
         //endregion

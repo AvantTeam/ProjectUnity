@@ -2,23 +2,28 @@ package unity.entities.comp;
 
 import arc.graphics.g2d.*;
 import arc.struct.*;
+import mindustry.Vars;
 import mindustry.entities.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.world.blocks.power.*;
 import unity.annotations.Annotations.*;
+import unity.gen.*;
 import unity.type.*;
 
 @EntityComponent
 abstract class ImberComp implements Unitc {
-    Seq<Unit> closeImberUnits = new Seq<>();
-    float laserRange;
-    int maxConnections;
+    transient Seq<Unit> closeImberUnits = new Seq<>();
+    transient Seq<Building> closeNodes = new Seq<>();
+    transient float laserRange;
+    transient int maxConnections;
+    transient int connections;
 
     @Import float x, y;
     @Import Team team;
-    //git work please
+
     @Override
     public void setType(UnitType type){
         if(type instanceof UnityUnitType t){
@@ -30,10 +35,19 @@ abstract class ImberComp implements Unitc {
     @Override
     public void update() {
         closeImberUnits.clear();
+        closeNodes.clear();
+        connections = 0;
+
         Units.nearby(team, x, y, laserRange, laserRange, e -> {
-            if (e.type instanceof UnityUnitType unitType && unitType.maxConnections > 0 && closeImberUnits.size < maxConnections) {
+            if (connections < maxConnections && !e.dead && e.team == team && e.type instanceof UnityUnitType unitType && unitType.maxConnections > 0 && !((Imberc)e).closeImberUnits().contains(controller().unit())) {
                 closeImberUnits.add(e);
+                connections++;
             }
+        });
+
+        Vars.indexer.eachBlock(team, x, y, laserRange, e -> connections < maxConnections && e.team == team && !e.dead && e instanceof PowerNode.PowerNodeBuild, e -> {
+            closeNodes.add(e);
+            connections++;
         });
     }
 
