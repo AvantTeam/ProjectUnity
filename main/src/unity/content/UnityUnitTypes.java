@@ -319,8 +319,8 @@ public class UnityUnitTypes implements ContentList{
                 shootSound = Sounds.shootBig;
                 bullet = new BasicBulletType(6f, 60f){{
                     lifetime = 30f;
-                    width = 9f;
-                    height = 11f;
+                    width = 16f;
+                    height = 20f;
                     shootEffect = Fx.shootBig;
                     smokeEffect = Fx.shootBigSmoke;
                 }};
@@ -383,8 +383,8 @@ public class UnityUnitTypes implements ContentList{
                 shootSound = Sounds.shootBig;
                 bullet = new BasicBulletType(6f, 60f){{
                     lifetime = 30f;
-                    width = 9f;
-                    height = 11f;
+                    width = 16f;
+                    height = 20f;
                     shootEffect = Fx.shootBig;
                     smokeEffect = Fx.shootBigSmoke;
                 }};
@@ -453,8 +453,8 @@ public class UnityUnitTypes implements ContentList{
                 reload = 10f;
                 bullet = new BasicBulletType(7f, 80f){{
                     lifetime = 30f;
-                    width = 9f;
-                    height = 11f;
+                    width = 18f;
+                    height = 22f;
                     shootEffect = Fx.shootBig;
                     smokeEffect = Fx.shootBigSmoke;
                 }};
