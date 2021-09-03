@@ -147,6 +147,11 @@ public class SpeechDialog{
         return show(() -> title, content, Sounds.click, 1f, () -> draw, () -> color);
     }
 
+    // javascript's a bitch
+    public SpeechDialog show(String title, String content, Sound sound, float speed, Drawable image, Color color){
+        return show(() -> title, content, sound, speed, () -> image, () -> color);
+    }
+
     public SpeechDialog show(Prov<CharSequence> title, String content, Sound sound, float speed, Prov<Drawable> image, Prov<Color> color){
         return last().next = new SpeechDialog(this, title, content, sound, speed, image, color);
     }
@@ -199,7 +204,7 @@ public class SpeechDialog{
             if(index < content.length()){
                 float elapsed = Time.time - last;
                 if(elapsed >= speed){
-                    Sounds.click.play();
+                    sound.play();
                     index = speed <= 0f ? content.length() : Math.min(index + (int)(elapsed / speed), content.length());
 
                     last = Time.time;

@@ -657,7 +657,7 @@ public class UnityUnitType extends UnitType{
 
             Draw.alpha(1f - Mathf.curve(unit.rotorSpeedScl(), 0.2f, 1f) * rotor.bladeFade);
             for(int j = 0; j < rotor.bladeCount; j++){
-                Draw.rect(rotor.bladeOutlineRegion, x, y, (unit.rotation + (
+                Draw.rect(rotor.bladeRegion, x, y, (unit.rotation + (
                     unit.id * 24f + mount.rotorRot +
                     (360f / rotor.bladeCount) * j
                 )) % 360);

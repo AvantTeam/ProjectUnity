@@ -331,10 +331,47 @@ public class UnityFx{
         float angle = e.rotation;
         float slope = (0.5f - Math.abs(e.finpow() - 0.5f)) * 2f;
         Tmp.v1.trns(angle, (1 - e.finpow()) * 110f);
-        color(UnityPal.endColor);
-        stroke(1.5f);
+        stroke(1.5f, UnityPal.endColor);
         lineAngleCenter(e.x + Tmp.v1.x, e.y + Tmp.v1.y, angle, slope * 8f);
     }),
+
+    forgeFlameEffect = new Effect(84f, e -> { //Someone optimize this mess for me k thx
+        float fin = e.fin(Interp.pow5Out);
+        float alpha = 1f - Mathf.curve(fin, 0.5f, 1f);
+        for(int i = 0; i < 4; i++){
+            float a = 90f * i;
+            for(int j = 0; j < 2; j++){
+                float side = Mathf.signs[j];
+                float fa = a - 45f * side;
+
+                Tmp.v1.trns(a, (31f / 4f) * side, 76f / 4f);
+
+                float s = (float)Math.sqrt(72f) / 2f;
+                color(UnityPal.endColor);
+                alpha(alpha);
+                Tmp.v2.trns(fa, s, 0f);
+                Tmp.v3.trns(fa, -s, 0f);
+                Tmp.v4.trns(fa, 0f, fin * 20f);
+                Fill.circle(e.x + Tmp.v1.x, e.y + Tmp.v1.y, s);
+                Fill.tri(e.x + Tmp.v1.x + Tmp.v2.x, e.y + Tmp.v1.y + Tmp.v2.y,
+                    e.x + Tmp.v1.x + Tmp.v3.x, e.y + Tmp.v1.y + Tmp.v3.y,
+                    e.x + Tmp.v1.x + Tmp.v4.x, e.y + Tmp.v1.y + Tmp.v4.y
+                );
+
+                s = (float)Math.sqrt(18f) / 2f;
+                color(Color.white);
+                alpha(alpha);
+                Tmp.v2.trns(fa, s, 0f);
+                Tmp.v3.trns(fa, -s, 0f);
+                Tmp.v4.trns(fa, 0f, fin * 16f);
+                Fill.circle(e.x + Tmp.v1.x, e.y + Tmp.v1.y, s);
+                Fill.tri(e.x + Tmp.v1.x + Tmp.v2.x, e.y + Tmp.v1.y + Tmp.v2.y,
+                    e.x + Tmp.v1.x + Tmp.v3.x, e.y + Tmp.v1.y + Tmp.v3.y,
+                    e.x + Tmp.v1.x + Tmp.v4.x, e.y + Tmp.v1.y + Tmp.v4.y
+                );
+            }
+        }
+    }).layer(Layer.blockOver),
 
     imberSparkCraftingEffect = new Effect(70f, e -> {
         color(UnityPal.imberColor, Color.valueOf("ffc266"), e.finpow());
@@ -360,49 +397,61 @@ public class UnityFx{
     }),
 
     pylonLaserCharge = new Effect(200f, 180f, e -> {
-        var laser = (LaserBulletType)pylonLaser;
         e.scaled(100f, c -> {
-            float cwidth = laser.width;
+            float slope = Interp.pow3Out.apply(Mathf.mod(c.fout() * 3f, 1f));
+            float rot = Mathf.round(c.fout() * 4f);
 
-            for(int i = 0; i < laser.colors.length; i++){
-                cwidth *= laser.lengthFalloff;
+            color(UnityPal.monolithLight);
+            Fill.circle(c.x, c.y, 15f * c.fin());
 
-                color(laser.colors[i]);
-                Fill.circle(e.x, e.y, cwidth * c.fin());
+            z(Layer.effect+1f);
+            blend(Blending.additive);
 
-                for(int j = 0; j < 2; j++){
-                    stroke(c.fin() * 1.5f * i);
-                    square(e.x, e.y, c.fout() * laser.width * i, Time.time * 4f * Mathf.signs[j]);
-                }
-            }
+            Tmp.c1.set(UnityPal.monolithLight).a(c.fin(Interp.pow3Out));
+            Fill.light(c.x, c.y, 27, 40f * c.fout(Interp.pow10Out), Tmp.c1, Color.clear);
+
+            Tmp.c1.a((1f - slope) * 0.5f);
+            Fill.light(c.x, c.y, 4, 80f * slope, Color.clear, Tmp.c1);
+
+            blend();
         });
 
         shoot: {
             if(e.fin() < 0.5f) break shoot;
 
             float fin = Mathf.curve(e.fin(), 0.5f, 1f);
-            float finpow = Interp.pow3Out.apply(fin);
-            float fout = 1 - fin;
+            float finscaled = Mathf.curve(fin, 0f, 0.8f);
+            float fin5 = Interp.pow5Out.apply(fin);
+            float fin3 = Interp.pow3Out.apply(fin);
+            float fin2 = Interp.pow2Out.apply(fin);
+            float fout = 1f - fin;
 
-            for(int i = 0; i < laser.colors.length; i++){
-                color(laser.colors[i]);
+            float rot = 370f * fin5;
+            float rad = 160f * Interp.pow5Out.apply(finscaled);
 
-                for(int j = 0; j < 2; j++){
-                    stroke(fout * 1.5f * i);
+            Lines.stroke(3 * fout);
+            for(int i = 0; i < 2; i++){
+                color(UnityPal.monolithLight, UnityPal.monolith, fin);
+                Lines.square(e.x, e.y, 200f * fin3, rot * Mathf.signs[i]);
 
-                    float rot = Mathf.signs[j] * (Time.time + (fin * 720f));
-                    square(e.x, e.y, finpow * laser.width * 2f * i, rot);
-                }
-            }
+                Draw.color(UnityPal.monolith);
+                Lines.square(e.x, e.y, 100f * fin5, rot * Mathf.signs[i] + 45f);
+            };
 
-            randLenVectors(e.id, 48, finpow * 180f, (x, y) -> {
-                color(Color.white, Pal.lancerLaser, Color.cyan, fin);
-
-                Fill.circle(e.x + x, e.y + y, fout * 5f);
+            color(UnityPal.monolithLight, UnityPal.monolithDark, fin);
+            randLenVectors(e.id, 48, fin3 * 180f, (x, y) -> {
+                Fill.circle(e.x + x, e.y + y, 5f * fout);
             });
 
-            color(Pal.lancerLaser, fout * 0.4f);
-            Fill.circle(e.x, e.y, finpow * 180f);
+            z(Layer.effect + 1f);
+            blend(Blending.additive);
+
+            Tmp.c1.set(UnityPal.monolithLight).a(1f - fin3);
+            Fill.light(e.x, e.y, 27, 40f, Tmp.c1, Color.clear);
+
+            Tmp.c1.set(UnityPal.monolithDark).a((1f - fin2) * 0.8f);
+            Fill.light(e.x, e.y, 4, rad, Color.clear, Tmp.c1);
+            blend();
         }
     }),
 

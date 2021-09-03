@@ -146,6 +146,8 @@ public class UnityUnitTypes implements ContentList{
     @Override
     public void load(){
         //TODO delete when tested
+        rayTest = new UnityUnitType("raywr-test"); //oh no
+
         testLink = new UnityUnitType("test-link"){{
             defaultController = LinkedAI::new;
             rotationSpeed = 65f;
@@ -203,7 +205,8 @@ public class UnityUnitTypes implements ContentList{
                     lifetime = 30f;
                     shrinkY = 0.2f;
                 }};
-            }}, new Weapon(name + "-launcher"){{
+            }}, 
+            new Weapon(name + "-launcher"){{
                 reload = 30f;
                 x = 4.5f;
                 y = 0.5f;
@@ -212,9 +215,9 @@ public class UnityUnitTypes implements ContentList{
                 ejectEffect = Fx.casing2;
                 bullet = new MissileBulletType(3f, 1f){{
                     speed = 3f;
-                    lifetime = 50f;
+                    lifetime = 45f;
                     splashDamage = 40f;
-                    splashDamageRadius = 6f;
+                    splashDamageRadius = 8f;
                     drag = -0.01f;
                 }};
             }});
@@ -253,7 +256,8 @@ public class UnityUnitTypes implements ContentList{
                     lifetime = 36;
                     shrinkY = 0.2f;
                 }};
-            }}, new Weapon(name + "-gun"){{
+            }}, 
+            new Weapon(name + "-gun"){{
                 top = false;
                 x = 4f;
                 y = 8.75f;
@@ -268,15 +272,16 @@ public class UnityUnitTypes implements ContentList{
                     lifetime = 36f;
                     shrinkY = 0.2f;
                 }};
-            }}, new Weapon(name + "-gun-big"){{
+            }}, 
+            new Weapon(name + "-gun-big"){{
                 x = 6.75f;
                 y = 5.75f;
                 shootX = -0.5f;
                 shootY = 2f;
-                shootSound = Sounds.shootBig;
-                ejectEffect = Fx.casing2;
+                shootSound = Sounds.shootSnap;
+                ejectEffect = Fx.casing1;
                 reload = 30f;
-                bullet = Bullets.standardIncendiaryBig;
+                bullet = Bullets.standardIncendiary;
             }});
 
             for(int i : Mathf.signs){
@@ -315,7 +320,13 @@ public class UnityUnitTypes implements ContentList{
                 shootY = 2.75f;
                 reload = 15;
                 shootSound = Sounds.shootBig;
-                bullet = Bullets.standardThoriumBig;
+                bullet = new BasicBulletType(6f, 60f){{
+                    lifetime = 30f;
+                    width = 9f;
+                    height = 11f;
+                    shootEffect = Fx.shootBig;
+                    smokeEffect = Fx.shootBigSmoke;
+                }};
             }});
 
             weapons.add(new Weapon(name + "-tesla"){{
@@ -323,10 +334,12 @@ public class UnityUnitTypes implements ContentList{
                 y = 8.25f;
                 shootY = 5.25f;
                 reload = 30f;
-                shots = 5;
+                shots = 3;
                 shootSound = Sounds.spark;
                 bullet = new LightningBulletType(){{
                     damage = 15f;
+                    lightningLength = 12;
+                    lightningColor = Pal.surge;
                 }};
             }});
 
@@ -371,8 +384,15 @@ public class UnityUnitTypes implements ContentList{
                 shootY = 7.25f;
                 reload = 12f;
                 shootSound = Sounds.shootBig;
-                bullet = Bullets.standardDenseBig;
-            }}, new Weapon(name + "-gun"){{
+                bullet = new BasicBulletType(6f, 60f){{
+                    lifetime = 30f;
+                    width = 9f;
+                    height = 11f;
+                    shootEffect = Fx.shootBig;
+                    smokeEffect = Fx.shootBigSmoke;
+                }};
+            }},
+            new Weapon(name + "-gun"){{
                 bottomWeapons.add(this);
 
                 x = 6.5f;
@@ -384,7 +404,8 @@ public class UnityUnitTypes implements ContentList{
                 shotDelay = 2f;
                 shootSound = Sounds.shootSnap;
                 bullet = Bullets.standardThorium;
-            }}, new Weapon(name + "-laser-gun"){{
+            }}, 
+            new Weapon(name + "-laser-gun"){{
                 x = 13.5f;
                 y = 15.5f;
                 shootY = 4.5f;
@@ -433,8 +454,15 @@ public class UnityUnitTypes implements ContentList{
                 shootSound = Sounds.shootBig;
                 ejectEffect = Fx.casing3Double;
                 reload = 10f;
-                bullet = Bullets.standardThoriumBig;
-            }}, new Weapon(name + "-launcher"){{
+                bullet = new BasicBulletType(7f, 80f){{
+                    lifetime = 30f;
+                    width = 9f;
+                    height = 11f;
+                    shootEffect = Fx.shootBig;
+                    smokeEffect = Fx.shootBigSmoke;
+                }};
+            }}, 
+            new Weapon(name + "-launcher"){{
                 x = 17f;
                 y = 14f;
                 shootY = 5.75f;
@@ -449,14 +477,15 @@ public class UnityUnitTypes implements ContentList{
                     trailColor = UnityPal.monolith;
                     weaveScale = 2f;
                     weaveMag = -2f;
-                    lifetime = 50f;
+                    lifetime = 40f;
                     drag = -0.01f;
                     splashDamage = 48f;
                     splashDamageRadius = 12f;
                     frontColor = UnityPal.monolithLight;
                     backColor = UnityPal.monolith;
                 }};
-            }}, new Weapon(name + "-gun-big"){{
+            }}, 
+            new Weapon(name + "-gun-big"){{
                 rotate = true;
                 rotateSpeed = 3f;
                 x = 8f;
