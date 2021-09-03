@@ -3110,7 +3110,8 @@ public class UnityBlocks implements ContentList{
                 update((StemGenericCrafterBuild e) -> {
                     if(e.consValid()){
                         if(e.timer.get(effectTimer, 120f)){
-                            UnityFx.forgeAbsorbPulseEffect.at(e.x, e.y);
+                            UnityFx.forgeFlameEffect.at(e);
+                            UnityFx.forgeAbsorbPulseEffect.at(e);
                         }
                         if(Mathf.chanceDelta(0.7f * e.warmup)){
                             UnityFx.forgeAbsorbEffect.at(e.x, e.y, Mathf.random(360f));

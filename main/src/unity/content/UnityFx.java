@@ -331,10 +331,47 @@ public class UnityFx{
         float angle = e.rotation;
         float slope = (0.5f - Math.abs(e.finpow() - 0.5f)) * 2f;
         Tmp.v1.trns(angle, (1 - e.finpow()) * 110f);
-        color(UnityPal.endColor);
-        stroke(1.5f);
+        stroke(1.5f, UnityPal.endColor);
         lineAngleCenter(e.x + Tmp.v1.x, e.y + Tmp.v1.y, angle, slope * 8f);
     }),
+
+    forgeFlameEffect = new Effect(84f, e -> { //Someone optimize this mess for me k thx
+        float fin = e.fin(Interp.pow5Out);
+        float alpha = 1f - Mathf.curve(fin, 0.5f, 1f);
+        for(int i = 0; i < 4; i++){
+            float a = 90f * i;
+            for(int j = 0; j < 2; j++){
+                float side = Mathf.signs[j];
+                float fa = a - 45f * side;
+
+                Tmp.v1.trns(a, (31f / 4f) * side, 76f / 4f);
+
+                float s = (float)Math.sqrt(72f) / 2f;
+                color(UnityPal.endColor);
+                alpha(alpha);
+                Tmp.v2.trns(fa, s, 0f);
+                Tmp.v3.trns(fa, -s, 0f);
+                Tmp.v4.trns(fa, 0f, fin * 20f);
+                Fill.circle(e.x + Tmp.v1.x, e.y + Tmp.v1.y, s);
+                Fill.tri(e.x + Tmp.v1.x + Tmp.v2.x, e.y + Tmp.v1.y + Tmp.v2.y,
+                    e.x + Tmp.v1.x + Tmp.v3.x, e.y + Tmp.v1.y + Tmp.v3.y,
+                    e.x + Tmp.v1.x + Tmp.v4.x, e.y + Tmp.v1.y + Tmp.v4.y
+                );
+
+                s = (float)Math.sqrt(18f) / 2f;
+                color(Color.white);
+                alpha(alpha);
+                Tmp.v2.trns(fa, s, 0f);
+                Tmp.v3.trns(fa, -s, 0f);
+                Tmp.v4.trns(fa, 0f, fin * 16f);
+                Fill.circle(e.x + Tmp.v1.x, e.y + Tmp.v1.y, s);
+                Fill.tri(e.x + Tmp.v1.x + Tmp.v2.x, e.y + Tmp.v1.y + Tmp.v2.y,
+                    e.x + Tmp.v1.x + Tmp.v3.x, e.y + Tmp.v1.y + Tmp.v3.y,
+                    e.x + Tmp.v1.x + Tmp.v4.x, e.y + Tmp.v1.y + Tmp.v4.y
+                );
+            }
+        }
+    }).layer(Layer.blockOver),
 
     imberSparkCraftingEffect = new Effect(70f, e -> {
         color(UnityPal.imberColor, Color.valueOf("ffc266"), e.finpow());
