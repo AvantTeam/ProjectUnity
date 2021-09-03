@@ -18,7 +18,6 @@ public class AbsorberTurret extends GenericTractorBeamTurret<Teamc>{
     public float resistance = 0.4f;
     public float damageScale = 18f;
     public float damage = 0f;
-    public float force = 0f;
     public float speedScale = 3.5f;
 
     public StatusEffect status;
