@@ -3098,60 +3098,61 @@ public class UnityBlocks implements ContentList{
             final int effectTimer = timers++;
 
             {
-            requirements(Category.crafting, with(Items.silicon, 2300, Items.phaseFabric, 650, Items.surgeAlloy, 1350, UnityItems.plagueAlloy, 510, UnityItems.darkAlloy, 510, UnityItems.lightAlloy, 510, UnityItems.advanceAlloy, 510, UnityItems.monolithAlloy, 510, UnityItems.sparkAlloy, 510, UnityItems.superAlloy, 510, UnityItems.terminationFragment, 230));
-            size = 8;
-            craftTime = 410f;
-            ambientSoundVolume = 0.6f;
-            outputItem = new ItemStack(UnityItems.terminaAlloy, 2);
+                requirements(Category.crafting, with(Items.silicon, 2300, Items.phaseFabric, 650, Items.surgeAlloy, 1350, UnityItems.plagueAlloy, 510, UnityItems.darkAlloy, 510, UnityItems.lightAlloy, 510, UnityItems.advanceAlloy, 510, UnityItems.monolithAlloy, 510, UnityItems.sparkAlloy, 510, UnityItems.superAlloy, 510, UnityItems.terminationFragment, 230));
+                size = 8;
+                craftTime = 410f;
+                ambientSoundVolume = 0.6f;
+                outputItem = new ItemStack(UnityItems.terminaAlloy, 2);
 
-            consumes.power(86.7f);
-            consumes.items(with(UnityItems.terminum, 3, UnityItems.darkAlloy, 5, UnityItems.lightAlloy, 5));
+                consumes.power(86.7f);
+                consumes.items(with(UnityItems.terminum, 3, UnityItems.darkAlloy, 5, UnityItems.lightAlloy, 5));
 
-            update((StemGenericCrafterBuild e) -> {
-                if(e.consValid()){
-                    if(e.timer.get(effectTimer, 120f)){
-                        UnityFx.forgeAbsorbPulseEffect.at(e.x, e.y);
-                    }
-                    if(Mathf.chanceDelta(0.7f * e.warmup)){
-                        UnityFx.forgeAbsorbEffect.at(e.x, e.y, Mathf.random(360f));
-                    }
-                }
-            });
-
-            drawer = new DrawGlow(){
-                @Override
-                public void draw(GenericCrafterBuild build){
-                    Draw.rect(build.block.region, build.x, build.y);
-
-                    Draw.blend(Blending.additive);
-                    Draw.color(1f, Mathf.absin(5f, 0.5f) + 0.5f, Mathf.absin(Time.time + 90f * Mathf.radDeg, 5f, 0.5f) + 0.5f, build.warmup);
-
-                    Draw.rect(Regions.endForgeLightsRegion, build.x, build.y);
-                    float b = (Mathf.absin(8f, 0.25f) + 0.75f) * build.warmup;
-
-                    Draw.color(1f, b, b, b);
-                    Draw.rect(top, build.x, build.y);
-
-                    for(int i = 0; i < 4; i++){
-                        float ang = i * 90f;
-                        for(int s = 0; s < 2; s++){
-                            float offset = 360f / 8f * (i * 2 + s);
-                            TextureRegion reg = Regions.endForgeTopSmallRegion;
-                            int sign = Mathf.signs[s];
-
-                            float colA = (Mathf.absin(Time.time + offset * Mathf.radDeg, 8f, 0.25f) + 0.75f) * build.warmup;
-                            float colB = (Mathf.absin(Time.time + (90f + offset) * Mathf.radDeg, 8f, 0.25f) + 0.75f) * build.warmup;
-
-                            Draw.color(1, colA, colB, build.warmup);
-                            Draw.rect(reg, build.x, build.y, reg.width * sign * Draw.scl, reg.height * Draw.scl, -ang);
+                update((StemGenericCrafterBuild e) -> {
+                    if(e.consValid()){
+                        if(e.timer.get(effectTimer, 120f)){
+                            UnityFx.forgeAbsorbPulseEffect.at(e.x, e.y);
+                        }
+                        if(Mathf.chanceDelta(0.7f * e.warmup)){
+                            UnityFx.forgeAbsorbEffect.at(e.x, e.y, Mathf.random(360f));
                         }
                     }
+                });
 
-                    Draw.blend();
-                    Draw.color();
-                }
-            };
-        }};
+                drawer = new DrawGlow(){
+                    @Override
+                    public void draw(GenericCrafterBuild build){
+                        Draw.rect(build.block.region, build.x, build.y);
+
+                        Draw.blend(Blending.additive);
+                        Draw.color(1f, Mathf.absin(5f, 0.5f) + 0.5f, Mathf.absin(Time.time + 90f * Mathf.radDeg, 5f, 0.5f) + 0.5f, build.warmup);
+
+                        Draw.rect(Regions.endForgeLightsRegion, build.x, build.y);
+                        float b = (Mathf.absin(8f, 0.25f) + 0.75f) * build.warmup;
+
+                        Draw.color(1f, b, b, b);
+                        Draw.rect(top, build.x, build.y);
+
+                        for(int i = 0; i < 4; i++){
+                            float ang = i * 90f;
+                            for(int s = 0; s < 2; s++){
+                                float offset = 360f / 8f * (i * 2 + s);
+                                TextureRegion reg = Regions.endForgeTopSmallRegion;
+                                int sign = Mathf.signs[s];
+
+                                float colA = (Mathf.absin(Time.time + offset * Mathf.radDeg, 8f, 0.25f) + 0.75f) * build.warmup;
+                                float colB = (Mathf.absin(Time.time + (90f + offset) * Mathf.radDeg, 8f, 0.25f) + 0.75f) * build.warmup;
+
+                                Draw.color(1, colA, colB, build.warmup);
+                                Draw.rect(reg, build.x, build.y, reg.width * sign * Draw.scl, reg.height * Draw.scl, -ang);
+                            }
+                        }
+
+                        Draw.blend();
+                        Draw.color();
+                    }
+                };
+            }
+        };
 
         tenmeikiri = new EndLaserTurret("tenmeikiri"){{
             requirements(Category.turret, with(Items.phaseFabric, 3000, Items.surgeAlloy, 4000,
