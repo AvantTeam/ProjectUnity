@@ -145,9 +145,6 @@ public class UnityUnitTypes implements ContentList{
 
     @Override
     public void load(){
-        //TODO delete when tested
-        rayTest = new UnityUnitType("raywr-test"); //oh no
-
         testLink = new UnityUnitType("test-link"){{
             defaultController = LinkedAI::new;
             rotationSpeed = 65f;
