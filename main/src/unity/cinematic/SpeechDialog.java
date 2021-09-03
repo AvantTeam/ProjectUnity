@@ -147,6 +147,11 @@ public class SpeechDialog{
         return show(() -> title, content, Sounds.click, 1f, () -> draw, () -> color);
     }
 
+    // javascript's a bitch
+    public SpeechDialog show(String title, String content, Sound sound, float speed, Drawable image, Color color){
+        return show(() -> title, content, sound, speed, () -> image, () -> color);
+    }
+
     public SpeechDialog show(Prov<CharSequence> title, String content, Sound sound, float speed, Prov<Drawable> image, Prov<Color> color){
         return last().next = new SpeechDialog(this, title, content, sound, speed, image, color);
     }
