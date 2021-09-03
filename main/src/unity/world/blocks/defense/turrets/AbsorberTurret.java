@@ -1,11 +1,14 @@
 package unity.world.blocks.defense.turrets;
 
 import arc.*;
-import arc.math.Mathf;
+import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.*;
+import mindustry.Vars;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.meta.*;
 
@@ -18,9 +21,11 @@ public class AbsorberTurret extends GenericTractorBeamTurret<Teamc>{
     public float force = 0f;
     public float speedScale = 3.5f;
 
-    public boolean targetBullets = false;
-    public boolean targetUnits = true;
-    public boolean targetBuildings = false;
+    public StatusEffect status;
+
+    public boolean targetBullets, targetUnits, targetBuildings = false;
+
+    private Seq<Building> buildings = new Seq<>();
 
     public AbsorberTurret(String name){
         super(name);
@@ -87,9 +92,11 @@ public class AbsorberTurret extends GenericTractorBeamTurret<Teamc>{
             }
 
             if(targetBuildings) {
-                tempTarget = Groups.build
-                        .intersect(x - r, y - r, r * 2f, r * 2f)
-                        .min(b -> b.team != team && !b.dead, b -> b.dst2(x, y));
+                buildings.clear();
+
+                Vars.indexer.eachBlock(null, x, y, r, b -> b.team != team && !b.dead, buildings::add);
+
+                tempTarget = buildings.min(b -> b.dst2(x, y));
 
                 if (tempTarget != null) {
                     float d = Mathf.dst(x, y, tempTarget.x(), tempTarget.y());
@@ -110,6 +117,7 @@ public class AbsorberTurret extends GenericTractorBeamTurret<Teamc>{
             }
 
             if(target instanceof Unit unit && damage > 0f) {
+                unit.apply(status);
                 unit.damage(damage);
             }
 

@@ -47,6 +47,7 @@ public abstract class GenericTractorBeamTurret<T extends Teamc> extends BaseTurr
     public TextureRegion laserEnd;
 
     protected Vec2 tr = new Vec2();
+    protected Vec2 drawTargetPos = new Vec2();
     protected Floatf<GenericTractorBeamTurretBuild> laserAlpha = Building::efficiency;
 
     protected GenericTractorBeamTurret(String name){
@@ -150,6 +151,7 @@ public abstract class GenericTractorBeamTurret<T extends Teamc> extends BaseTurr
         @Override
         public void updateTile(){
             if(!validateTarget()) target = null;
+            if(target != null && !(target.x() == 0 && target.y() == 0)) drawTargetPos.set(target.x(), target.y());
 
             unit.health(health);
             unit.rotation(rotation);
@@ -250,8 +252,8 @@ public abstract class GenericTractorBeamTurret<T extends Teamc> extends BaseTurr
                 Drawf.laser(team, laser, laserEnd,
                 x + tr.x,
                 y + tr.y,
-                targetPos.x,
-                targetPos.y,
+                drawTargetPos.x,
+                drawTargetPos.y,
                 strength * laserWidth
                 );
 

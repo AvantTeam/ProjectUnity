@@ -1250,9 +1250,20 @@ public class UnityBlocks implements ContentList{
             });
         }};
 
-        absorber = new Absorber("absorber"){{
+        absorber = new AbsorberTurret("absorber"){{
             requirements(Category.power, with(UnityItems.imberium, 20, Items.lead, 20));
-            size = 2;
+
+            consumesPower = false;
+
+            powerProduction = 1.2f;
+            range = 50f;
+
+            targetUnits = true;
+            status = StatusEffects.slow;
+
+            rotateSpeed = 1.2f;
+            shootCone = 2f;
+            damage = 0.6f;
         }};
 
         electroTile = new Floor("electro-tile");
@@ -2128,6 +2139,8 @@ public class UnityBlocks implements ContentList{
             range = 150f;
             powerUse = 1f;
             resistance = 0.8f;
+
+            targetBullets = true;
 
             requireSoul = false;
             efficiencyFrom = 0.8f;
