@@ -53,14 +53,22 @@ abstract class ImberComp implements Unitc {
 
     @Override
     public void draw() {
+        float z = Draw.z();
         Draw.color(Pal.surge);
+        Draw.z(Layer.flyingUnit + 1);
+
         Lines.stroke(3);
 
         for(Unit unit : closeImberUnits){
             Lines.line(x, y, unit.x, unit.y);
         }
 
+        for(Building building : closeNodes){
+            Lines.line(x, y, building.x, building.y);
+        }
+
         Lines.stroke(1);
+        Draw.z(z);
         Draw.reset();
     }
 }

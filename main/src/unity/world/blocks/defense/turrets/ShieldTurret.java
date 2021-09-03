@@ -31,7 +31,7 @@ public class ShieldTurret extends PowerTurret{
 
         @Override
         public boolean validateTarget(){
-            return this.target != null;
+            return this.target != null || isControlled() || logicControlled();
         }
 
         public boolean targetShield(Building t, ShieldTurretBuild b, float radius){
