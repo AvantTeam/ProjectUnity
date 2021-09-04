@@ -44,39 +44,42 @@ public class SpeechDialog{
             .table(Tex.buttonRight, t -> {
                 t.setClip(true);
 
-                t.table(Styles.black3, cont -> cont.image()
-                    .update(i -> {
-                        if(dialog.next != null){
-                            i.setDrawable(dialog.next.image.get());
-                        }
-                    })
-                    .pad(5f).grow()
-                    .name("image")
-                ).align(Align.topLeft).size(iconXLarge + 10f);
-
-                t.table(Styles.black3, cont -> {
-                    cont.name = "content";
-
-                    cont.labelWrap(() -> dialog.next != null ? dialog.next.title.get() : "")
-                        .style(UnityStyles.speechtitlet)
-                        .align(Align.left).pad(5f)
-                        .fill().name("title")
-                        .get().setOrigin(Align.left);
-
-                    cont.row()
-                        .image(Tex.whiteui).update(i -> {
+                t.table(head -> {
+                    head.table(Styles.black3, cont -> cont.image()
+                        .update(i -> {
                             if(dialog.next != null){
-                                i.setColor(dialog.next.color.get());
+                                i.setDrawable(dialog.next.image.get());
                             }
                         })
-                        .growX().height(3f).pad(5f)
-                        .name("separator");
+                        .pad(5f).grow()
+                        .name("image")
+                    ).align(Align.topLeft).size(iconXLarge + 10f);
 
-                    cont.row().labelWrap(() -> dialog.next != null ? dialog.next.content.get() : "")
+                    head.table(Styles.black3, cont -> {
+                        cont.labelWrap(() -> dialog.next != null ? dialog.next.title.get() : "")
+                            .style(UnityStyles.speechtitlet)
+                            .align(Align.left).pad(5f)
+                            .name("title")
+                            .get().setOrigin(Align.left);
+
+                        cont.row()
+                            .image(Tex.whiteui).update(i -> {
+                                if(dialog.next != null){
+                                    i.setColor(dialog.next.color.get());
+                                }
+                            })
+                            .growX().pad(5f)
+                            .name("separator");
+                    }).growX();
+                }).growX();
+
+                t.row();
+                t.table(Styles.black3, cont -> {
+                        cont.labelWrap(() -> dialog.next != null ? dialog.next.content.get() : "")
                         .style(UnityStyles.speecht)
-                        .align(Align.topLeft).pad(5f)
+                        .align(Align.left).pad(5f)
                         .grow().name("content")
-                        .get().setOrigin(Align.topLeft);
+                        .get().setAlignment(Align.topLeft);
                 }).grow();
             })
             .size(320f, 200f).align(Align.topLeft)

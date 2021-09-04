@@ -16,11 +16,8 @@ public class UnityFonts{
         if(headless) return;
 
         Core.assets.load("unity-speech", Font.class, new FreeTypeFontLoaderParameter("fonts/font.woff", new FreeTypeFontParameter(){{
-            size = 12;
+            size = 14;
             incremental = true;
-
-            shadowColor = Color.darkGray;
-            shadowOffsetY = 1;
         }})).loaded = f -> speech = UnityStyles.speecht.font = f;
 
         Core.assets.load("unity-speechtitle", Font.class, new FreeTypeFontLoaderParameter("fonts/font.woff", new FreeTypeFontParameter(){{

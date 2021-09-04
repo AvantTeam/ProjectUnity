@@ -6,6 +6,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.ai.types.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
@@ -144,9 +145,6 @@ public class UnityUnitTypes implements ContentList{
 
     @Override
     public void load(){
-        //TODO delete when tested
-        rayTest = new UnityUnitType("raywr-test"); //oh no
-
         testLink = new UnityUnitType("test-link"){{
             defaultController = LinkedAI::new;
             rotationSpeed = 65f;
@@ -321,8 +319,8 @@ public class UnityUnitTypes implements ContentList{
                 shootSound = Sounds.shootBig;
                 bullet = new BasicBulletType(6f, 60f){{
                     lifetime = 30f;
-                    width = 9f;
-                    height = 11f;
+                    width = 16f;
+                    height = 20f;
                     shootEffect = Fx.shootBig;
                     smokeEffect = Fx.shootBigSmoke;
                 }};
@@ -385,8 +383,8 @@ public class UnityUnitTypes implements ContentList{
                 shootSound = Sounds.shootBig;
                 bullet = new BasicBulletType(6f, 60f){{
                     lifetime = 30f;
-                    width = 9f;
-                    height = 11f;
+                    width = 16f;
+                    height = 20f;
                     shootEffect = Fx.shootBig;
                     smokeEffect = Fx.shootBigSmoke;
                 }};
@@ -455,8 +453,8 @@ public class UnityUnitTypes implements ContentList{
                 reload = 10f;
                 bullet = new BasicBulletType(7f, 80f){{
                     lifetime = 30f;
-                    width = 9f;
-                    height = 11f;
+                    width = 18f;
+                    height = 22f;
                     shootEffect = Fx.shootBig;
                     smokeEffect = Fx.shootBigSmoke;
                 }};
@@ -2877,6 +2875,19 @@ public class UnityUnitTypes implements ContentList{
                 minShootVelocity = 0.01f;
                 bullet = UnitTypes.horizon.weapons.first().bullet;
             }});
+        }};
+
+        rayTest = new UnityUnitType("ray-test"){{
+            defaultController = GroundAI::new;
+            flying = false;
+            health = 500;
+            speed = 1f;
+            accel = 0.035f;
+            drag = 0.007f;
+            rotateSpeed = 3.2f;
+            range = 210f;
+            laserRange = 30f;
+            maxConnections = 2;
         }};
 
         //endregion

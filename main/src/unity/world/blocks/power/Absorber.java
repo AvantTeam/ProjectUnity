@@ -14,9 +14,9 @@ import mindustry.world.blocks.power.*;
 
 import static mindustry.Vars.*;
 
+//Go away
 public class Absorber extends PowerGenerator {
     public float range = 50f;
-    public int capacity = 5;
     public float powerProduction = 1.2f;
     public StatusEffect status = StatusEffects.slow;
     public TextureRegion laserRegion, laserEndRegion, baseRegion;
@@ -37,6 +37,11 @@ public class Absorber extends PowerGenerator {
         laserRegion = Core.atlas.find("laser");
         laserEndRegion = Core.atlas.find("laser-end");
         baseRegion = Core.atlas.find("block-" + size);
+    }
+
+    @Override
+    protected TextureRegion[] icons() {
+        return new TextureRegion[]{baseRegion, region};
     }
 
     @Override
