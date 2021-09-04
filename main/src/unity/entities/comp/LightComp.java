@@ -1,234 +1,181 @@
 package unity.entities.comp;
 
-import arc.graphics.*;
-import arc.graphics.g2d.*;
+import arc.func.*;
 import arc.math.*;
+import arc.math.geom.*;
+import arc.math.geom.QuadTree.*;
 import arc.struct.*;
-import arc.util.*;
 import mindustry.gen.*;
-import mindustry.graphics.*;
-import mindustry.world.*;
 import unity.annotations.Annotations.*;
 import unity.gen.*;
 import unity.gen.LightHoldc.*;
 
 import static mindustry.Vars.*;
+import static unity.Unity.*;
 
 /** @author GlennFolker */
 @SuppressWarnings("unused")
 @EntityDef(value = Lightc.class, serialize = false, pooled = true)
 @EntityComponent
-abstract class LightComp implements Drawc, Rotc{
-    /** A {@link #strength} with value {@code 1f} will make the light be able to travel this far. */
+abstract class LightComp implements Drawc, QuadTreeObject{
     static final float yield = 50f * tilesize;
-    /** A {@link #strength} with value {@code 1f} will make the light be this thick. */
-    static final float width = 5f;
+    static final float rotationInc = 22.5f;
 
-    transient int color = Color.whiteRgba;
+    @Import float x, y;
+    @ReadOnly transient volatile float endX, endY;
+
+    @ReadOnly transient volatile float strength = 0f;
+    transient volatile float queueStrength = 0f;
+
+    @ReadOnly transient volatile float rotation = 0f;
+    transient volatile byte queueRotation = 0;
+
+    transient final Seq<Light> parents = new Seq<>(2);
     /**
-     * Never, <b>ever</b>, forget to set this to the building source unless you want this light to
-     * endlessly {@link LightHoldBuildc#addSource(Light)} to its own source causing an out of memory
-     * error.
+     * Maps child rotation with the actual entity. Key ranges from [-7..7]. Value might be null if the
+     * child is a merged light
      */
-    transient volatile LightHoldBuildc source = null;
+    transient final IntMap<Light> children = new IntMap<>();
 
-    private volatile @Nullable Tile target = null;
-    private volatile @Nullable LightHoldBuildc before = null;
+    /** Called synchronously before {@link #cast()} is called */
+    public void snap(){
+        strength = queueStrength + recStrength();
+        rotation = queueRotation * rotationInc;
+    }
 
-    /** Decreases by {@code 1f} every {@link #yield}} distance. */
-    private transient volatile float strength;
-    transient float relX, relY;
-    volatile @ReadOnly float endX = 0f, endY = 0f;
+    /** Called asynchronously */
+    public void cast(){
+        long end = SVec2.add(SVec2.trns(0, rotation, strength * yield), this);
+        float
+            endX = SVec2.x(end),
+            endY = SVec2.y(end);
 
-    private final Seq<Light> absorbs = new Seq<>();
-    volatile @ReadOnly boolean absorbed = false;
+        world.raycastEachWorld(x, y, endX, endY, (tx, ty) -> {
+            var tile = world.tile(tx, ty);
+            if(tile == null){
+                this.endX = tx * tilesize;
+                this.endY = ty * tilesize;
+                lights.queuePoint(self(), null);
 
-    @Import int id;
-    @Import float x, y, rotation;
+                return true;
+            }
 
-    /** Called asynchronously. */
-    public void walk(Seq<Runnable> tasks){
-        if(absorbed) return;
+            var build = tile.build;
+            if(build instanceof LightHoldBuildc hold){
+                if(hold.acceptLight(self())){
+                    this.endX = tx * tilesize;
+                    this.endY = ty * tilesize;
+                    lights.queuePoint(self(), hold);
 
-        float targetX = x + Angles.trnsx(rotation, strength() * yield);
-        float targetY = y + Angles.trnsy(rotation, strength() * yield);
+                    return true;
+                }else if(tile.solid()){
+                    this.endX = tx * tilesize;
+                    this.endY = ty * tilesize;
+                    lights.queuePoint(self(), null);
 
-        target = null;
-        world.raycastEachWorld(x, y, targetX, targetY, (tx, ty) -> {
-            Tile tile = world.tile(tx, ty);
-            if(tile == null || tile.build == source) return false;
+                    return true;
+                }
+            }else if(tile.solid()){
+                this.endX = tx * tilesize;
+                this.endY = ty * tilesize;
+                lights.queuePoint(self(), null);
 
-            if(tile.solid() || (tile.build instanceof LightHoldBuildc hold && hold.acceptLight(self()))){
-                target = tile;
                 return true;
             }
 
             return false;
         });
 
-        if(target != null){
-            //this light just hit a solid tile
-            float dst = dst(target.worldx(), target.worldy());
-            float estimateX = x + Angles.trnsx(rotation, dst);
-            float estimateY = y + Angles.trnsy(rotation, dst);
+        var tile = world.tileWorld(endX, endY);
+        if(tile != null){
+            children(children -> {
+                for(var e : children.entries()){
+                    float rot = rotation + e.key * rotationInc;
 
-            endX = Mathf.round(estimateX / 4f) * 4f;
-            endY = Mathf.round(estimateY / 4f) * 4f;
+                    lights.quad(quad -> quad.intersect(tile.worldx() - tilesize / 2f, tile.worldy() - tilesize / 2f, tilesize, tilesize, l -> {
+                        if(Mathf.equal(rot, l.rotation())){
+                            if(e.value != null){
+                                e.value.detach(self());
+                                lights.queueRemove(e.value);
+                            }
 
-            if(target.build instanceof LightHoldBuildc hold){
-                tasks.add(() -> {
-                    if(before != hold){
-                        if(before != null) before.removeSource(self());
-                        if(hold.acceptLight(self())) hold.addSource(self());
+                            l.parent(self());
+                            e.value = l;
+                        }
+                    }));
+
+                    if(e.value == null || !Mathf.equal(rot, e.value.rotation())){
+                        if(e.value != null) e.value.detach(self());
+
+                        var l = Light.create();
+                        l.set(endX, endY);
+                        l.parent(self());
+
+                        e.value = l;
+                        lights.queueAdd(l);
                     }
-
-                    before = hold;
-                });
-            }else{
-                tasks.add(() -> {
-                    if(before != null) before.removeSource(self());
-                    before = null;
-                });
-            }
-        }else{
-            //just set the end position to the maximum travel distance
-            endX = Mathf.round(targetX / 4f) * 4f;
-            endY = Mathf.round(targetY / 4f) * 4f;
-        }
-    }
-
-    public boolean overlaps(Light other){
-        float r1 = realRotation();
-        return
-            self() != other &&
-            (
-                Mathf.equal(Angles.angle(x, y, other.x, other.y), r1) || (
-                    Mathf.equal(x, other.x) &&
-                    Mathf.equal(y, other.y)
-                )
-            ) &&
-            Mathf.equal(r1, other.realRotation());
-    }
-
-    /** Merges its strength to the other light. Call synchronously. */
-    public void absorb(){
-        if(absorbed) return;
-        absorbed = true;
-    }
-
-    /** Should be called to set {@link #absorbed} to {@code false}. */
-    public void release(){
-        absorbed = false;
-    }
-
-    public void strength(float strength){
-        this.strength = strength;
-    }
-
-    public float strength(){
-        return strength + absorbs.sumf(l -> l == null ? 0f : l.strength());
-    }
-
-    @Override
-    public void update(){
-        Groups.draw.each(
-            e ->
-                e instanceof Light light &&
-                !light.absorbed() &&
-                overlaps(light),
-
-            e -> {
-                if(
-                    isAdded() &&
-                    !absorbed &&
-                    e instanceof Light light &&
-                    light.isAdded() &&
-                    !light.absorbed() &&
-                    overlaps(light)
-                ){
-                    absorbs.add(light);
-                    light.absorb();
                 }
-            }
-        );
-
-        var it = absorbs.iterator();
-        while(it.hasNext()){
-            var next = it.next();
-            if(overlaps(next)){
-                next.release();
-                it.remove();
-            }
+            });
         }
+
+        children(children -> {
+            for(var e : children.entries()){
+                var l = e.value;
+                if(l.isParent(self())) l.queueRotation = (byte)(queueRotation + e.key);
+            }
+        });
     }
 
-    @Override
-    public void remove(){
-        absorbs.each(Light::release);
-    }
-
-    @Override
-    public void draw(){
-        if(absorbed) return;
-
-        float rotation = angleTo(endX, endY);
-        float s = Mathf.clamp(strength());
-        float cs = Mathf.clamp(endStrength());
-
-        float w = s * (width / 2f);
-        float w2 = cs * (width / 2f);
-
-        float
-            x1 = x + Angles.trnsx(rotation - 90f, w), y1 = y + Angles.trnsy(rotation - 90f, w),
-            x2 = x + Angles.trnsx(rotation + 90f, w), y2 = y + Angles.trnsy(rotation + 90f, w),
-            x3 = endX + Angles.trnsx(rotation + 90f, w2), y3 = endY + Angles.trnsy(rotation + 90f, w2),
-            x4 = endX + Angles.trnsx(rotation - 90f, w2), y4 = endY + Angles.trnsy(rotation - 90f, w2);
-
-        Tmp.c1.set(color);
-        float
-            c1 = Tmp.c1.a(Math.max(0.5f, s)).toFloatBits(),
-            c2 = Tmp.c1.a(Math.max(0.5f, cs)).toFloatBits();
-
-        float z = Draw.z();
-        Draw.z(Layer.effect);
-        Draw.blend(Blending.additive);
-
-        Fill.quad(x1, y1, c1, x2, y2, c1, x3, y3, c2, x4, y4, c2);
-
-        Draw.z(z);
-        Draw.blend();
+    public float recStrength(){
+        return parents.sumf(l -> l.endStrength() / l.children.size);
     }
 
     @Override
     @Replace
     public float clipSize(){
-        return absorbed ? 0f : length() * 2f + 2f * tilesize;
-    }
-
-    @Override
-    @Replace
-    public void set(float x, float y){
-        this.x = x + relX;
-        this.y = y + relY;
-    }
-
-    public float realRotation(){
-        return angleTo(endX, endY);
-    }
-
-    public float length(){
-        return dst(endX, endY);
+        return Mathf.dst(x, y, endX, endY) * 2f;
     }
 
     public float endStrength(){
-        return calcStrength(length());
+        return Mathf.dst(x, y, endX, endY) / yield;
     }
 
-    public float calcStrength(float endX, float endY){
-        return calcStrength(dst(endX, endY));
+    @Override
+    public void add(){
+        lights.quad.insert(self());
     }
 
-    public float calcStrength(float dst){
-        return strength() - dst / yield;
+    @Override
+    public void remove(){
+        lights.quad.remove(self());
+    }
+
+    @Override
+    public void hitbox(Rect out){
+        out.set(x, y, 0f, 0f);
+    }
+
+    public void children(Cons<IntMap<Light>> cons){
+        synchronized(children){
+            cons.get(children);
+        }
+    }
+
+    public boolean isParent(Light light){
+        synchronized(parents){
+            return parents.contains(light);
+        }
+    }
+
+    public void parent(Light light){
+        synchronized(parents){
+            if(!isParent(light)) parents.add(light);
+        }
+    }
+
+    public void detach(Light light){
+        synchronized(parents){
+            parents.remove(light);
+        }
     }
 }
