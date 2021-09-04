@@ -4234,6 +4234,7 @@ public class UnityUnitTypes implements ContentList{
             anglePhysicsSmooth = 0.5f;
             jointStrength = 1f;
             omniMovement = false;
+            preventDrifting = true;
             outlineColor = UnityPal.darkerOutline;
             envEnabled = Env.terrestrial | Env.space;
 

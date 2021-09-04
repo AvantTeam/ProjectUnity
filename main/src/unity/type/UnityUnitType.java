@@ -45,6 +45,8 @@ public class UnityUnitType extends UnitType{
     public float barrageRange = 150f;
     // Hopefully make segment movement more consistent
     public boolean counterDrag = false;
+    // Attempt to prevent angle drifting due to the inaccurate Atan2
+    public boolean preventDrifting = false;
     public boolean splittable = false, chainable = false;
     public Sound splitSound = Sounds.door, chainSound = Sounds.door;
 
