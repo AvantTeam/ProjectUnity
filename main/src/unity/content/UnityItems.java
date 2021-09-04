@@ -144,8 +144,8 @@ public class UnityItems implements ContentList{
         }};
 
         stone = new Item("stone", Color.valueOf("8a8a8a")){{
-            hardness = 3;
-            cost = 1f;
+            hardness = 1;
+            cost = 0.4f;
             lowPriority = true;
         }};
 
