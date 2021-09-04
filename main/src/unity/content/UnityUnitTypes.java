@@ -319,8 +319,8 @@ public class UnityUnitTypes implements ContentList{
                 shootSound = Sounds.shootBig;
                 bullet = new BasicBulletType(6f, 60f){{
                     lifetime = 30f;
-                    width = 9f;
-                    height = 11f;
+                    width = 16f;
+                    height = 20f;
                     shootEffect = Fx.shootBig;
                     smokeEffect = Fx.shootBigSmoke;
                 }};
@@ -383,8 +383,8 @@ public class UnityUnitTypes implements ContentList{
                 shootSound = Sounds.shootBig;
                 bullet = new BasicBulletType(6f, 60f){{
                     lifetime = 30f;
-                    width = 9f;
-                    height = 11f;
+                    width = 16f;
+                    height = 20f;
                     shootEffect = Fx.shootBig;
                     smokeEffect = Fx.shootBigSmoke;
                 }};
@@ -453,8 +453,8 @@ public class UnityUnitTypes implements ContentList{
                 reload = 10f;
                 bullet = new BasicBulletType(7f, 80f){{
                     lifetime = 30f;
-                    width = 9f;
-                    height = 11f;
+                    width = 18f;
+                    height = 22f;
                     shootEffect = Fx.shootBig;
                     smokeEffect = Fx.shootBigSmoke;
                 }};
@@ -471,15 +471,15 @@ public class UnityUnitTypes implements ContentList{
                 bullet = new MissileBulletType(6f, 1f){{
                     width = 8f;
                     height = 14f;
-                    trailColor = UnityPal.monolith;
+                    trailColor = Pal.missileYellowBack;
                     weaveScale = 2f;
-                    weaveMag = -2f;
-                    lifetime = 40f;
+                    weaveMag = 2f;
+                    lifetime = 35f;
                     drag = -0.01f;
                     splashDamage = 48f;
                     splashDamageRadius = 12f;
-                    frontColor = UnityPal.monolithLight;
-                    backColor = UnityPal.monolith;
+                    frontColor = Pal.missileYellow;
+                    backColor = Pal.missileYellowBack;
                 }};
             }}, 
             new Weapon(name + "-gun-big"){{
@@ -495,7 +495,7 @@ public class UnityUnitTypes implements ContentList{
                 shotDelay = 0f;
                 reload = 45f;
                 bullet = new ShrapnelBulletType(){{
-                    toColor = UnityPal.monolithLight;
+                    toColor = Pal.accent;
                     damage = 150f;
                     keepVelocity = false;
                     length = 150f;

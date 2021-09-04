@@ -1,62 +1,106 @@
 package unity.async;
 
+import arc.func.*;
+import arc.math.geom.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.async.*;
 import mindustry.gen.*;
 import unity.gen.*;
+import unity.gen.LightHoldc.*;
 
 import static mindustry.Vars.*;
 
-/**
- * An asynchronous task manager for processing {@link Light} ray-casting. First, it collects all lights synchronously,
- * which won't be done if it's still processing, then the collected lights will do their ray-casting in a separate
- * thread, whose finalization will be done again synchronously.
- * @author GlennFolker
- */
-//TODO just. no.
+/** @author GlennFolker */
 public class LightProcess implements AsyncProcess{
-    private volatile boolean processing = false;
-    private volatile boolean ending = false;
+    protected TaskQueue queue = new TaskQueue();
 
-    private final Seq<Light> toProcess = new Seq<>();
-    private final Seq<Runnable> toRun = new Seq<>();
+    public final Seq<Light> all = new Seq<>();
+    public final QuadTree<Light> quad = new QuadTree<>(new Rect());
+
+    protected volatile boolean
+        processing = false,
+        end = false;
 
     @Override
     public void begin(){
-        if(shouldProcess()){
-            toProcess.clear();
-            for(var e : Groups.draw){
-                if(e instanceof Light light){
-                    toProcess.add(light);
-                }
-            }
+        if(end){
+            queue.run();
+            end = false;
         }
+
+        all.size = 0; // avoid unnecessary iteration
+        Groups.draw.each(e -> e instanceof Light, e -> {
+            var l = (Light)e;
+
+            l.snap();
+            all.add(l);
+        });
+    }
+
+    @Override
+    public void init(){
+        queue.clear();
+
+        quad.clear();
+        quad.botLeft = null;
+        quad.botRight = null;
+        quad.topLeft = null;
+        quad.topRight = null;
+        quad.leaf = true;
+
+        quad.bounds.set(-finalWorldBounds, -finalWorldBounds, world.unitWidth() + finalWorldBounds * 2, world.unitHeight() + finalWorldBounds * 2);
+    }
+
+    @Override
+    public void reset(){
+        queue.clear();
+        quad.clear();
     }
 
     @Override
     public void process(){
         processing = true;
-        toProcess.each(l -> l.walk(toRun));
 
-        processing = false;
-        ending = true;
-    }
-
-    @Override
-    public void end(){
-        if(ending){
-            var it = toRun.iterator();
-            while(it.hasNext()){
-                it.next().run();
-                it.remove();
-            }
-
-            ending = false;
+        int size = all.size;
+        for(int i = 0; i < size; i++){
+            all.items[i].cast();
         }
+
+        end = true;
+        processing = false;
     }
 
     @Override
     public boolean shouldProcess(){
         return !processing && !state.isPaused();
+    }
+
+    public void quad(Cons<QuadTree<Light>> cons){
+        synchronized(quad){
+            cons.get(quad);
+        }
+    }
+
+    public void queuePoint(Light light, @Nullable LightHoldBuildc hold){
+        if(hold == null){
+            queue.post(() -> light.children(children -> {
+                for(var e : children.entries()){
+                    if(e.value != null && e.value.isParent(light)){
+                        e.value.remove();
+                    }
+                }
+
+                children.clear();
+            }));
+        }
+    }
+
+    public void queueAdd(Light light){
+        queue.post(light::add);
+    }
+
+    public void queueRemove(Light light){
+        queue.post(light::remove);
     }
 }
