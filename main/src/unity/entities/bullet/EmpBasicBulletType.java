@@ -14,22 +14,10 @@ public class EmpBasicBulletType extends BasicBulletType{
     public float empLogicDamage = 0f;
     public float empBatteryDamage = 7000f;
     public int powerGridIteration = 7;
-    public int trailLength = 7;
 
     public EmpBasicBulletType(float speed, float damage){
         super(speed, damage, "unity-electric-shell");
-    }
-
-    @Override
-    public void init(Bullet b){
-        super.init(b);
-        b.data = new Trail(trailLength);
-    }
-
-    @Override
-    public void update(Bullet b){
-        super.update(b);
-        if(b.data instanceof Trail t) t.update(b.x, b.y);
+        trailLength = 7;
     }
 
     @Override
@@ -39,11 +27,5 @@ public class EmpBasicBulletType extends BasicBulletType{
         UnityFx.empShockwave.at(b.x, b.y, empRange);
         if(Emp.hitDisconnect) UnityFx.empShockwave.at(b.x, b.y, empDisconnectRange);
         if(Emp.hitPowerGrid) UnityFx.empShockwave.at(b.x, b.y, empMaxRange);
-    }
-
-    @Override
-    public void draw(Bullet b){
-        if(b.data instanceof Trail t) t.draw(backColor, (width / 2f) / 2f);
-        super.draw(b);
     }
 }

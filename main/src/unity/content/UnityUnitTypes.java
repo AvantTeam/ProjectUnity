@@ -685,9 +685,10 @@ public class UnityUnitTypes implements ContentList{
                     shrinkY = 0f;
                     height = 14f;
                     width = 11f;
+                    trailWidth = (width / 2f) / 2f;
 
                     hitEffect = Fx.hitLancer;
-                    backColor = lightColor = hitColor = Pal.lancerLaser;
+                    trailColor = backColor = lightColor = hitColor = Pal.lancerLaser;
                     frontColor = Color.white;
                 }};
             }});
@@ -722,6 +723,7 @@ public class UnityUnitTypes implements ContentList{
                     shrinkY = 0f;
                     height = 16f;
                     width = 12f;
+                    trailWidth = (width / 2f) / 2f;
 
                     empRange = 120f;
                     empDisconnectRange = 40f;
@@ -729,7 +731,7 @@ public class UnityUnitTypes implements ContentList{
                     empLogicDamage = 5f;
 
                     hitEffect = Fx.hitLancer;
-                    backColor = lightColor = hitColor = Pal.lancerLaser;
+                    trailColor = backColor = lightColor = hitColor = Pal.lancerLaser;
                     frontColor = Color.white;
                     shootEffect = UnityFx.empCharge;
                 }};
@@ -763,6 +765,7 @@ public class UnityUnitTypes implements ContentList{
                     shrinkY = 0f;
                     height = 13f;
                     width = 10f;
+                    trailWidth = (width / 2f) / 2f;
 
                     powerGridIteration = 5;
                     empDuration = 15f;
@@ -770,7 +773,7 @@ public class UnityUnitTypes implements ContentList{
                     empRange = 90f;
 
                     hitEffect = Fx.hitLancer;
-                    backColor = lightColor = hitColor = Pal.lancerLaser;
+                    trailColor = backColor = lightColor = hitColor = Pal.lancerLaser;
                     frontColor = Color.white;
                 }};
             }}, new Weapon(){{
@@ -799,9 +802,10 @@ public class UnityUnitTypes implements ContentList{
                     empLogicDamage = 12f;
                     powerGridIteration = 15;
                     trailLength = 13;
+                    trailWidth = (width / 2f) / 2f;
 
                     hitEffect = Fx.hitLancer;
-                    backColor = lightColor = hitColor = Pal.lancerLaser;
+                    trailColor = backColor = lightColor = hitColor = Pal.lancerLaser;
                     frontColor = Color.white;
                     shootEffect = UnityFx.empCharge;
                 }};
@@ -871,9 +875,10 @@ public class UnityUnitTypes implements ContentList{
                     empLogicDamage = 12f;
                     powerGridIteration = 15;
                     trailLength = 15;
+                    trailWidth = (width / 2f) / 2f;
 
                     hitEffect = Fx.hitLancer;
-                    backColor = lightColor = hitColor = Pal.lancerLaser;
+                    trailColor = backColor = lightColor = hitColor = Pal.lancerLaser;
                     frontColor = Color.white;
                 }};
             }});
@@ -965,9 +970,10 @@ public class UnityUnitTypes implements ContentList{
                     empLogicDamage = 26f;
                     powerGridIteration = 15;
                     trailLength = 15;
+                    trailWidth = (width / 2f) / 2f;
 
                     hitEffect = Fx.hitLancer;
-                    backColor = lightColor = hitColor = Pal.lancerLaser;
+                    trailColor = backColor = lightColor = hitColor = Pal.lancerLaser;
                     frontColor = Color.white;
                 }};
             }});
@@ -3377,40 +3383,27 @@ public class UnityUnitTypes implements ContentList{
                     bullet = new BasicBulletType(3.5f, 6f){
                         {
                             lifetime = 60f;
-                            width = height = 2f;
+                            trailWidth = width = height = 2f;
                             weaveScale = 3f;
                             weaveMag = 5f;
                             homingPower = 0.7f;
 
                             shootEffect = Fx.hitLancer;
-                            frontColor = Pal.lancerLaser;
+                            trailColor = frontColor = Pal.lancerLaser;
                             backColor = Pal.lancerLaser.cpy().mul(0.7f);
-                        }
 
-                        @Override
-                        public void init(Bullet b){
-                            b.data = new Trail(6);
+                            trailLength = 6;
                         }
 
                         @Override
                         public void draw(Bullet b){
-                            if(b.data instanceof Trail t){
-                                t.draw(frontColor, width);
+                            drawTrail(b);
 
-                                Draw.color(frontColor);
-                                Fill.circle(b.x, b.y, width);
-                                Draw.color();
-                            }
+                            Draw.color(frontColor);
+                            Fill.circle(b.x, b.y, width);
+                            Draw.color();
                         }
-
-                        @Override
-                        public void update(Bullet b){
-                            super.update(b);
-                            if(b.data instanceof Trail t){
-                                t.update(b.x, b.y);
-                            }
-                        }
-                    };
+                    }
                 }}
             );
         }};

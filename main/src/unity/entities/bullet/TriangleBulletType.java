@@ -23,8 +23,6 @@ public class TriangleBulletType extends BulletType{
     public Sound castSound = Sounds.spark;
     public float castSoundVolume = 0.4f;
 
-    public float trailWidth = 0f;
-    public int trailLength = 0;
     public float length, width;
     public Color color = Pal.surge;
 
@@ -33,7 +31,7 @@ public class TriangleBulletType extends BulletType{
 
         this.length = length;
         this.width = width;
-        lightningColor = Pal.surge;
+        trailColor = lightningColor = Pal.surge;
         hitColor = Color.valueOf("f2e87b");
     }
 
@@ -49,13 +47,12 @@ public class TriangleBulletType extends BulletType{
     public void init(Bullet b){
         super.init(b);
 
-        b.data = new Trail(trailLength);
         b.lifetime = b.lifetime + Mathf.random(lifetimeRand);
     }
 
     @Override
     public void draw(Bullet b){
-        ((Trail)b.data).draw(lightningColor, trailWidth);
+        drawTrail(b);
 
         Draw.color(lightningColor);
         Drawf.tri(b.x, b.y, width, length, b.rotation());
@@ -67,7 +64,6 @@ public class TriangleBulletType extends BulletType{
 
         Teamc target = Units.closestTarget(b.team, b.x, b.y, castRadius * tilesize);
 
-        ((Trail)b.data).update(b.x, b.y);
         if(castsLightning && target != null && b.timer.get(1, castInterval)){
             castSound.at(b.x, b.y, 1, castSoundVolume);
             Lightning.create(b.team, lightningColor, damage, b.x, b.y, b.angleTo(target), (int)(b.dst(target) / tilesize + 2));
