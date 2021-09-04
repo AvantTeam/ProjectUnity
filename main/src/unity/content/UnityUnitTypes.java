@@ -471,15 +471,15 @@ public class UnityUnitTypes implements ContentList{
                 bullet = new MissileBulletType(6f, 1f){{
                     width = 8f;
                     height = 14f;
-                    trailColor = UnityPal.monolith;
+                    trailColor = Pal.missileYellowBack;
                     weaveScale = 2f;
-                    weaveMag = -2f;
-                    lifetime = 40f;
+                    weaveMag = 2f;
+                    lifetime = 35f;
                     drag = -0.01f;
                     splashDamage = 48f;
                     splashDamageRadius = 12f;
-                    frontColor = UnityPal.monolithLight;
-                    backColor = UnityPal.monolith;
+                    frontColor = Pal.missileYellow;
+                    backColor = Pal.missileYellowBack;
                 }};
             }}, 
             new Weapon(name + "-gun-big"){{
@@ -495,7 +495,7 @@ public class UnityUnitTypes implements ContentList{
                 shotDelay = 0f;
                 reload = 45f;
                 bullet = new ShrapnelBulletType(){{
-                    toColor = UnityPal.monolithLight;
+                    toColor = Pal.accent;
                     damage = 150f;
                     keepVelocity = false;
                     length = 150f;
