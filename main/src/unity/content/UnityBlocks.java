@@ -1171,7 +1171,7 @@ public class UnityBlocks implements ContentList{
             consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability <= 0.1f, 0.52f)).boost();
         }};
 
-        electrobomb = new ItemTurret("electrobomb"){            
+        electrobomb = new ItemTurret("electrobomb"){
             {
                 requirements(Category.turret, with(Items.titanium, 360, Items.thorium, 630, Items.silicon, 240, UnityItems.sparkAlloy, 420));
                 health = 3650;
