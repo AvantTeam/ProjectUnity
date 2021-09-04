@@ -7,9 +7,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.math.geom.QuadTree.*;
 import arc.struct.*;
-import arc.util.*;
 import mindustry.gen.*;
-import mindustry.graphics.*;
 import unity.annotations.Annotations.*;
 import unity.gen.*;
 import unity.gen.LightHoldc.*;
@@ -213,46 +211,8 @@ abstract class LightComp implements Drawc, QuadTreeObject{
 
     @Override
     public void draw(){
-        float z = Draw.z();
-        Draw.z(Layer.bullet);
-
-        Draw.blend(Blending.additive);
-
-        float
-            rot = realRotation(),
-            endOpaque = Math.max((strength - 1f) * yield, 0f);
-
-        if(endOpaque >= 0f){
-            Tmp.v1.trns(rot, endOpaque);
-            Tmp.v2.trns(rot - 90f, width);
-
-            float sx = Tmp.v2.x, sy = Tmp.v2.y;
-            float color = Color.whiteFloatBits;
-
-            Fill.quad(
-                x + sx, y + sy, color,
-                x + sx + Tmp.v1.x, y + sy + Tmp.v1.y, color,
-                x - sx + Tmp.v1.x, y - sy + Tmp.v1.y, color,
-                x - sx, y - sy, color
-            );
-        }
-
-        Tmp.v1.trns(rot, endOpaque);
-        Tmp.v2.trns(rot, endStrength() * yield - endOpaque);
-        Tmp.v3.trns(rot - 90f, width);
-
-        float sx = Tmp.v3.x, sy = Tmp.v3.y;
-        float color = Color.whiteFloatBits, ecolor = Color.clearFloatBits;
-
-        Fill.quad(
-            x + sx + Tmp.v1.x, y + sy + Tmp.v1.y, color,
-            x + sx + Tmp.v1.x + Tmp.v2.x, y + sy + Tmp.v1.y + Tmp.v2.y, ecolor,
-            x - sx + Tmp.v1.x + Tmp.v2.x, y - sy + Tmp.v1.y + Tmp.v2.y, ecolor,
-            x - sx + Tmp.v1.x, y - sy + Tmp.v1.y, color
-        );
-
-        Draw.blend();
-        Draw.z(z);
+        Lines.stroke(width * 2f, Color.white);
+        Lines.line(x, y, endX, endY);
     }
 
     public static byte packRot(float rotation){
