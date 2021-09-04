@@ -15,7 +15,7 @@ import static mindustry.Vars.*;
 public class LightProcess implements AsyncProcess{
     protected TaskQueue queue = new TaskQueue();
 
-    public final Seq<Light> all = new Seq<>();
+    public final Seq<Light> all = new Seq<>(Light.class);
     public final QuadTree<Light> quad = new QuadTree<>(new Rect());
 
     protected volatile boolean
@@ -84,15 +84,24 @@ public class LightProcess implements AsyncProcess{
 
     public void queuePoint(Light light, @Nullable LightHoldBuildc hold){
         if(hold == null){
-            queue.post(() -> light.children(children -> {
-                for(var e : children.entries()){
-                    if(e.value != null && e.value.isParent(light)){
-                        e.value.remove();
-                    }
-                }
+            queue.post(() -> {
+                light.clearChildren();
 
-                children.clear();
-            }));
+                if(light.pointed != null){
+                    light.pointed.sources().remove(light);
+                    light.pointed = null;
+                }
+            });
+        }else{
+            queue.post(() -> {
+                light.clearChildren();
+
+                if(light.pointed != null) light.pointed.sources().remove(light);
+                light.pointed = hold;
+                light.pointed.sources().add(light);
+
+                hold.interact(light);
+            });
         }
     }
 

@@ -1,11 +1,15 @@
 package unity.entities.comp;
 
 import arc.func.*;
+import arc.graphics.*;
+import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.math.geom.QuadTree.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import unity.annotations.Annotations.*;
 import unity.gen.*;
 import unity.gen.LightHoldc.*;
@@ -19,6 +23,7 @@ import static unity.Unity.*;
 @EntityComponent
 abstract class LightComp implements Drawc, QuadTreeObject{
     static final float yield = 50f * tilesize;
+    static final float width = 2f;
     static final float rotationInc = 22.5f;
 
     @Import float x, y;
@@ -29,57 +34,59 @@ abstract class LightComp implements Drawc, QuadTreeObject{
 
     @ReadOnly transient volatile float rotation = 0f;
     transient volatile byte queueRotation = 0;
+    transient volatile long queuePosition = 0;
 
+    @ReadOnly transient volatile LightHoldBuildc source;
+    transient volatile LightHoldBuildc queueSource;
+
+    transient volatile LightHoldBuildc pointed;
     transient final Seq<Light> parents = new Seq<>(2);
     /**
-     * Maps child rotation with the actual entity. Key ranges from [-7..7]. Value might be null if the
-     * child is a merged light
+     * Maps child rotation with the actual entity. Key ranges from [-7..7], which is a packed rotation relative to
+     * this light's rotation. Value might be null if the child is a merged light
      */
     transient final IntMap<Light> children = new IntMap<>();
 
     /** Called synchronously before {@link #cast()} is called */
     public void snap(){
         strength = queueStrength + recStrength();
-        rotation = queueRotation * rotationInc;
+        rotation = unpackRot(queueRotation);
+        source = queueSource;
+
+        x = SVec2.x(queuePosition);
+        y = SVec2.y(queuePosition);
     }
 
     /** Called asynchronously */
     public void cast(){
         long end = SVec2.add(SVec2.trns(0, rotation, strength * yield), this);
         float
-            endX = SVec2.x(end),
-            endY = SVec2.y(end);
+            endXf = SVec2.x(end),
+            endYf = SVec2.y(end);
 
-        world.raycastEachWorld(x, y, endX, endY, (tx, ty) -> {
+        world.raycastEachWorld(x, y, endXf, endYf, (tx, ty) -> {
+            endX = tx * tilesize;
+            endY = ty * tilesize;
+
             var tile = world.tile(tx, ty);
             if(tile == null){
-                this.endX = tx * tilesize;
-                this.endY = ty * tilesize;
                 lights.queuePoint(self(), null);
-
                 return true;
             }
 
             var build = tile.build;
             if(build instanceof LightHoldBuildc hold){
-                if(hold.acceptLight(self())){
-                    this.endX = tx * tilesize;
-                    this.endY = ty * tilesize;
-                    lights.queuePoint(self(), hold);
+                if(hold == source || parentsAny(p -> p.contains(l -> hold == l.pointed))) return false;
 
+                if(hold.acceptLight(self())){
+                    lights.queuePoint(self(), hold);
                     return true;
                 }else if(tile.solid()){
-                    this.endX = tx * tilesize;
-                    this.endY = ty * tilesize;
                     lights.queuePoint(self(), null);
-
                     return true;
                 }
             }else if(tile.solid()){
-                this.endX = tx * tilesize;
-                this.endY = ty * tilesize;
                 lights.queuePoint(self(), null);
-
                 return true;
             }
 
@@ -121,7 +128,10 @@ abstract class LightComp implements Drawc, QuadTreeObject{
         children(children -> {
             for(var e : children.entries()){
                 var l = e.value;
-                if(l.isParent(self())) l.queueRotation = (byte)(queueRotation + e.key);
+                if(l != null && l.isParent(self())){
+                    l.queuePosition = SVec2.construct(endX, endY);
+                    l.queueRotation = (byte)(queueRotation + e.key);
+                }
             }
         });
     }
@@ -137,7 +147,7 @@ abstract class LightComp implements Drawc, QuadTreeObject{
     }
 
     public float endStrength(){
-        return Mathf.dst(x, y, endX, endY) / yield;
+        return Math.max(strength - Mathf.dst(x, y, endX, endY) / yield, 0f);
     }
 
     @Override
@@ -155,9 +165,27 @@ abstract class LightComp implements Drawc, QuadTreeObject{
         out.set(x, y, 0f, 0f);
     }
 
+    public void clearChildren(){
+        children(children -> {
+            for(var e : children.entries()){
+                if(e.value != null && e.value.isParent(self())){
+                    e.value.remove();
+                }
+            }
+
+            children.clear();
+        });
+    }
+
     public void children(Cons<IntMap<Light>> cons){
         synchronized(children){
             cons.get(children);
+        }
+    }
+
+    public boolean parentsAny(Boolf<Seq<Light>> cons){
+        synchronized(parents){
+            return cons.get(parents);
         }
     }
 
@@ -177,5 +205,61 @@ abstract class LightComp implements Drawc, QuadTreeObject{
         synchronized(parents){
             parents.remove(light);
         }
+    }
+
+    public float realRotation(){
+        return Angles.angle(x, y, endX, endY);
+    }
+
+    @Override
+    public void draw(){
+        float z = Draw.z();
+        Draw.z(Layer.bullet);
+
+        Draw.blend(Blending.additive);
+
+        float
+            rot = realRotation(),
+            endOpaque = Math.max((strength - 1f) * yield, 0f);
+
+        if(endOpaque >= 0f){
+            Tmp.v1.trns(rot, endOpaque);
+            Tmp.v2.trns(rot - 90f, width);
+
+            float sx = Tmp.v2.x, sy = Tmp.v2.y;
+            float color = Color.whiteFloatBits;
+
+            Fill.quad(
+                x + sx, y + sy, color,
+                x + sx + Tmp.v1.x, y + sy + Tmp.v1.y, color,
+                x - sx + Tmp.v1.x, y - sy + Tmp.v1.y, color,
+                x - sx, y - sy, color
+            );
+        }
+
+        Tmp.v1.trns(rot, endOpaque);
+        Tmp.v2.trns(rot, endStrength() * yield - endOpaque);
+        Tmp.v3.trns(rot - 90f, width);
+
+        float sx = Tmp.v3.x, sy = Tmp.v3.y;
+        float color = Color.whiteFloatBits, ecolor = Color.clearFloatBits;
+
+        Fill.quad(
+            x + sx + Tmp.v1.x, y + sy + Tmp.v1.y, color,
+            x + sx + Tmp.v1.x + Tmp.v2.x, y + sy + Tmp.v1.y + Tmp.v2.y, ecolor,
+            x - sx + Tmp.v1.x + Tmp.v2.x, y - sy + Tmp.v1.y + Tmp.v2.y, ecolor,
+            x - sx + Tmp.v1.x, y - sy + Tmp.v1.y, color
+        );
+
+        Draw.blend();
+        Draw.z(z);
+    }
+
+    public static byte packRot(float rotation){
+        return (byte)Mathf.round(rotation / rotationInc);
+    }
+
+    public static float unpackRot(byte rotation){
+        return rotation * rotationInc;
     }
 }

@@ -6,6 +6,7 @@ import mindustry.world.*;
 import mindustry.world.blocks.production.GenericCrafter.*;
 import mindustry.world.consumers.*;
 import mindustry.world.draw.*;
+import unity.gen.*;
 
 import static arc.Core.*;
 
@@ -25,7 +26,7 @@ public class DrawLightBlock extends DrawBlock{
         }
 
         Draw.z(Layer.effect + 2f);
-        //Draw.rect(build.block.region, build.x, build.y, build.block instanceof LightHoldc hold && hold.hasRotation(build) ? (hold.getRotation(build) - 90f) : 0f);
+        Draw.rect(build.block.region, build.x, build.y, build.block instanceof LightHoldc hold  ? (hold.getRotation(build) - 90f) : 0f);
     }
 
     @Override

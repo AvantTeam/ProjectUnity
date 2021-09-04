@@ -1,16 +1,18 @@
 package unity.world.blocks.light;
 
+import arc.scene.ui.layout.*;
+import arc.util.io.*;
+import mindustry.gen.*;
 import mindustry.world.blocks.production.*;
 import unity.annotations.Annotations.*;
 import unity.gen.*;
+
+import static unity.Unity.*;
 
 /** @author GlennFolker */
 @Merge(base = GenericCrafter.class, value = LightHoldc.class)
 public class LightSource extends LightHoldGenericCrafter{
     public float lightProduction = 1f;
-
-    public float angleRange = 22.5f;
-    public float rotateSpeed = 5f;
 
     public LightSource(String name){
         super(name);
@@ -19,9 +21,64 @@ public class LightSource extends LightHoldGenericCrafter{
         acceptsLight = false;
         configurable = true;
         outlineIcon = true;
+
+        config(Boolean.class, (LightSourceBuild tile, Boolean value) -> tile.lightRot += value ? 1 : -1);
+    }
+
+    @Override
+    public float getRotation(Building build){
+        if(build instanceof LightSourceBuild b){
+            return Light.unpackRot(b.lightRot);
+        }else{
+            return super.getRotation(build);
+        }
     }
 
     public class LightSourceBuild extends LightHoldGenericCrafterBuild{
+        public Light light;
+        public byte lightRot = Light.packRot(90f);
 
+        @Override
+        public void created(){
+            light = Light.create();
+            light.queuePosition = SVec2.construct(x, y);
+            light.queueRotation = lightRot;
+            light.queueSource = this;
+
+            lights.queueAdd(light);
+        }
+
+        @Override
+        public void onRemoved(){
+            lights.queueRemove(light);
+        }
+
+        @Override
+        public void updateTile(){
+            super.updateTile();
+
+            light.queuePosition = SVec2.construct(x, y);
+            light.queueRotation = lightRot;
+            light.queueSource = this;
+            light.queueStrength = efficiency() * lightProduction;
+        }
+
+        @Override
+        public void buildConfiguration(Table table){
+            table.button(Icon.left, () -> configure(true)).size(40f);
+            table.button(Icon.right, () -> configure(false)).size(40f);
+        }
+
+        @Override
+        public void write(Writes write){
+            super.write(write);
+            write.b(lightRot);
+        }
+
+        @Override
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            lightRot = read.b();
+        }
     }
 }
