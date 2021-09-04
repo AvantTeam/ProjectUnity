@@ -1,8 +1,8 @@
 package unity.type.sector;
 
 import arc.struct.*;
-import arc.util.*;
 import arc.util.Log.*;
+import arc.util.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
 import mindustry.io.*;

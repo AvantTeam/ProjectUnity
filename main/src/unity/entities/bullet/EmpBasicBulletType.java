@@ -2,7 +2,6 @@ package unity.entities.bullet;
 
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
-import mindustry.graphics.*;
 import unity.content.*;
 import unity.entities.*;
 

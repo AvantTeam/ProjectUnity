@@ -3,8 +3,6 @@ package unity.ai.kami;
 import arc.*;
 import arc.graphics.g2d.*;
 
-import static mindustry.Vars.*;
-
 public class KamiRegions{
     public static TextureRegion[] okuu = new TextureRegion[3], marisaBroom = new TextureRegion[8], byakurenScroll = new TextureRegion[16],
     keikiSpirit = new TextureRegion[10], keikiTools = new TextureRegion[8];

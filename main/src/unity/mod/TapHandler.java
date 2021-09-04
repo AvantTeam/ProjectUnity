@@ -3,7 +3,6 @@ package unity.mod;
 import arc.*;
 import arc.input.*;
 import arc.input.GestureDetector.*;
-import arc.math.geom.*;
 import arc.scene.ui.*;
 import arc.struct.*;
 import mindustry.game.EventType.*;

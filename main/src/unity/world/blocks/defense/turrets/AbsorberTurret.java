@@ -5,7 +5,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.Vars;
+import mindustry.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;

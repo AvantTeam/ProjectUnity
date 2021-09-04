@@ -2,8 +2,8 @@ package unity.entities.comp;
 
 import arc.func.*;
 import arc.math.*;
-import arc.math.geom.*;
 import arc.math.geom.QuadTree.*;
+import arc.math.geom.*;
 import arc.struct.*;
 import mindustry.gen.*;
 import unity.annotations.Annotations.*;
