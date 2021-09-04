@@ -19,7 +19,6 @@ import unity.gen.*;
 import unity.type.*;
 
 import static arc.Core.*;
-import static mindustry.Vars.net;
 import static mindustry.Vars.*;
 
 @EntityPoint

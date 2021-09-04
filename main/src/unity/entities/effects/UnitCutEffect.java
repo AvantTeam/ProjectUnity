@@ -14,7 +14,6 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import unity.assets.list.*;
 import unity.content.*;
-import unity.graphics.*;
 
 public class UnitCutEffect extends EffectState{
     static Vec2 tmpPoint = new Vec2(), tmpPoint2 = new Vec2();

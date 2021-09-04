@@ -2,7 +2,7 @@ package unity.entities.comp;
 
 import arc.graphics.g2d.*;
 import arc.struct.*;
-import mindustry.Vars;
+import mindustry.*;
 import mindustry.entities.*;
 import mindustry.game.*;
 import mindustry.gen.*;

@@ -102,6 +102,7 @@ public class UnityWeaponTemplates implements ContentList{
                 shrinkY = 0f;
                 height = 12f;
                 width = 9f;
+                trailWidth = (width / 2f) / 2f;
 
                 powerGridIteration = 1;
                 empDuration = 0f;
@@ -109,7 +110,7 @@ public class UnityWeaponTemplates implements ContentList{
                 empRange = 90f;
 
                 hitEffect = Fx.hitLancer;
-                backColor = lightColor = hitColor = Pal.lancerLaser;
+                trailColor = backColor = lightColor = hitColor = Pal.lancerLaser;
                 frontColor = Color.white;
             }};
         }};
@@ -129,6 +130,7 @@ public class UnityWeaponTemplates implements ContentList{
                 shrinkY = 0f;
                 height = 14f;
                 width = 10f;
+                trailWidth = (width / 2f) / 2f;
 
                 powerGridIteration = 7;
                 empDuration = 20f;
@@ -136,7 +138,7 @@ public class UnityWeaponTemplates implements ContentList{
                 empRange = 120f;
 
                 hitEffect = Fx.hitLancer;
-                backColor = lightColor = hitColor = Pal.lancerLaser;
+                trailColor = backColor = lightColor = hitColor = Pal.lancerLaser;
                 frontColor = Color.white;
             }};
         }};

@@ -211,9 +211,9 @@ public class UnityBullets implements ContentList{
 
         branchLaserFrag = new BasicBulletType(3.5f, 15f){
             {
-                frontColor = Pal.lancerLaser;
+                trailColor = frontColor = Pal.lancerLaser;
                 backColor = Pal.lancerLaser.cpy().mul(0.7f);
-                width = height = 2f;
+                trailWidth = width = height = 2f;
                 weaveScale = 0.6f;
                 weaveMag = 0.5f;
                 homingPower = 0.4f;
@@ -226,12 +226,14 @@ public class UnityBullets implements ContentList{
                 splashDamage = 4f;
                 status = UnityStatusEffects.plasmaed;
                 statusDuration = 180f;
+
+                trailLength = 6;
             }
 
             @Override
             public void init(Bullet b){
                 b.fdata = (float)b.data;
-                b.data = new Trail(6);
+                super.init(b);
             }
 
             public Color getColor(Bullet b){
@@ -240,23 +242,11 @@ public class UnityBullets implements ContentList{
 
             @Override
             public void draw(Bullet b){
-                if(b.data instanceof Trail tr) tr.draw(frontColor, width);
-        
+                drawTrail(b);
+
                 Draw.color(getColor(b));
                 Fill.square(b.x, b.y, width, b.rotation() + 45);
                 Draw.color();
-            }
-        
-            @Override
-            public void update(Bullet b){
-                super.update(b);
-                if(b.data instanceof Trail tr) tr.update(b.x, b.y);
-            }
-        
-            @Override
-            public void hit(Bullet b, float x, float y){
-                super.hit(b, x, y);
-                if(b.data instanceof Trail tr) tr.clear();
             }
         };
 
@@ -1349,6 +1339,7 @@ public class UnityBullets implements ContentList{
             public void hit(Bullet b, float x, float y){
                 super.hit(b, x, y);
                 if(b.data instanceof FixedTrail trail){
+                    UnityFx.fixedTrailFade.at(b.x, b.y, width, frontColor, trail.copy());
                     trail.clear();
                 }
             }

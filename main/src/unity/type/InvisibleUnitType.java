@@ -6,10 +6,8 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import mindustry.*;
-import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.type.*;
 import unity.gen.*;
 
 public class InvisibleUnitType extends UnityUnitType{

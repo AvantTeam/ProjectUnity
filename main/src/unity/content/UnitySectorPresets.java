@@ -1,16 +1,10 @@
 package unity.content;
 
-import mindustry.content.*;
 import mindustry.ctype.*;
-import mindustry.gen.*;
 import mindustry.type.*;
 import unity.annotations.Annotations.*;
-import unity.cinematic.*;
-import unity.type.*;
 import unity.type.sector.*;
-import unity.type.sector.objectives.*;
 
-import static mindustry.Vars.*;
 import static unity.content.UnityPlanets.*;
 
 public class UnitySectorPresets implements ContentList{

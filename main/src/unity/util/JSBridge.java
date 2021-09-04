@@ -2,11 +2,7 @@ package unity.util;
 
 import arc.*;
 import arc.struct.*;
-import arc.util.*;
-import mindustry.mod.*;
 import rhino.*;
-
-import java.lang.reflect.*;
 
 import static mindustry.Vars.*;
 

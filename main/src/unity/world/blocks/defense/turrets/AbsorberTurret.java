@@ -5,14 +5,17 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.Vars;
+import mindustry.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.meta.*;
 
-/** @author GlennFolker */
+/**
+ * @author GlennFolker
+ * @author ThePythonGuy3
+*/
 public class AbsorberTurret extends GenericTractorBeamTurret<Teamc>{
     public float powerProduction = 2.5f;
     public float resistance = 0.4f;
