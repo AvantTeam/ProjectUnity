@@ -333,25 +333,25 @@ public class UnityBlocks implements ContentList{
         oreNickel = new UnityOreBlock(UnityItems.nickel){{
             oreScale = 24.77f;
             oreThreshold = 0.913f;
-            oreDefault = true;
+            oreDefault = false;
         }};
 
         oreUmbrium = new UnityOreBlock(UnityItems.umbrium){{
             oreScale = 23.77f;
             oreThreshold = 0.813f;
-            oreDefault = true;
+            oreDefault = false;
         }};
 
         oreLuminum = new UnityOreBlock(UnityItems.luminum){{
             oreScale = 23.77f;
             oreThreshold = 0.81f;
-            oreDefault = true;
+            oreDefault = false;
         }};
 
         oreImberium = new UnityOreBlock(UnityItems.imberium){{
             oreScale = 23.77f;
             oreThreshold = 0.807f;
-            oreDefault = true;
+            oreDefault = false;
         }};
 
         //endregion
@@ -1787,7 +1787,7 @@ public class UnityBlocks implements ContentList{
         oreMonolite = new UnityOreBlock(UnityItems.monolite){{
             oreScale = 23.77f;
             oreThreshold = 0.807f;
-            oreDefault = true;
+            oreDefault = false;
         }};
 
         sharpslate = new Floor("sharpslate"){{
