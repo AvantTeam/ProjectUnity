@@ -3403,7 +3403,7 @@ public class UnityUnitTypes implements ContentList{
                             Fill.circle(b.x, b.y, width);
                             Draw.color();
                         }
-                    }
+                    };
                 }}
             );
         }};
