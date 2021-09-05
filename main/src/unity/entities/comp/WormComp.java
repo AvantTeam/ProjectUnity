@@ -131,12 +131,19 @@ abstract class WormComp implements Unitc{
     public void write(Writes write){
         write.bool(isHead());
         if(isHead()){
-            write.s(countBackward());
-            distributeActionBack(u -> {
-                if(u != self()){
-                    u.write(write);
-                }
-            });
+            Wormc ch = (Wormc)child;
+            int amount = 0;
+            while(ch != null){
+                amount++;
+                ch = (Wormc)ch.child();
+            }
+            write.s(amount);
+
+            ch = (Wormc)child;
+            while(ch != null){
+                ch.write(write);
+                ch = (Wormc)ch.child();
+            }
         }
     }
 
@@ -277,7 +284,10 @@ abstract class WormComp implements Unitc{
 
                 float offset = self() == last ? uType.headOffset : 0f;
                 Tmp.v1.trns(last.rotation + 180f, (uType.segmentOffset / 2f) + offset).add(last);
-                u.rotation = u.angleTo(Tmp.v1) - (Utils.angleDistSigned(u.angleTo(Tmp.v1), last.rotation, uType.angleLimit) * (1f - uType.anglePhysicsSmooth));
+
+                float angTo = u.angleTo(Tmp.v1);
+
+                u.rotation = angTo - (Utils.angleDistSigned(angTo, last.rotation, uType.angleLimit) * (1f - uType.anglePhysicsSmooth));
                 //u.rotation = u.angleTo(last) - (Utils.angleDistSigned(u.angleTo(last), last.rotation, uType.angleLimit) * (1f - uType.anglePhysicsSmooth));
                 u.trns(Tmp.v3.trns(u.rotation, last.deltaLen()));
                 Tmp.v2.trns(u.rotation, uType.segmentOffset / 2f).add(u);

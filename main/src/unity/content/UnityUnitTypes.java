@@ -3389,6 +3389,7 @@ public class UnityUnitTypes implements ContentList{
                             homingPower = 0.7f;
 
                             shootEffect = Fx.hitLancer;
+                            hitEffect = despawnEffect = HitFx.monoHitSmall;
                             trailColor = frontColor = Pal.lancerLaser;
                             backColor = Pal.lancerLaser.cpy().mul(0.7f);
 
@@ -3447,6 +3448,7 @@ public class UnityUnitTypes implements ContentList{
 
                             trailEffect = UnityFx.ricochetTrailSmall;
                             shootEffect = Fx.lightningShoot;
+                            hitEffect = despawnEffect = HitFx.monoHitBig;
                         }
 
                         @Override
@@ -3752,7 +3754,7 @@ public class UnityUnitTypes implements ContentList{
                 trailColor = UnityPal.monolithDark;
                 shootEffect = Fx.lancerLaserShoot;
                 smokeEffect = Fx.hitLancer;
-                hitEffect = Fx.flakExplosion;
+                hitEffect = despawnEffect = HitFx.monoHitSmall;
 
                 splashDamage = 60f;
                 splashDamageRadius = 10f;
@@ -3825,7 +3827,8 @@ public class UnityUnitTypes implements ContentList{
                             backColor = UnityPal.monolithLight;
                             trailColor = UnityPal.monolith;
                             shootEffect = Fx.lancerLaserShoot;
-                            smokeEffect = hitEffect = Fx.hitLancer;
+                            smokeEffect = Fx.hitLancer;
+                            hitEffect = despawnEffect = HitFx.monoHitBig;
 
                             lightning = 3;
                             lightningDamage = 12f;
@@ -4234,6 +4237,7 @@ public class UnityUnitTypes implements ContentList{
             anglePhysicsSmooth = 0.5f;
             jointStrength = 1f;
             omniMovement = false;
+            preventDrifting = true;
             outlineColor = UnityPal.darkerOutline;
             envEnabled = Env.terrestrial | Env.space;
 

@@ -91,8 +91,16 @@ public class ShootFx{
     }).layer(Layer.effect + 0.99f),
 
     monumentShoot = new Effect(48f, e -> {
-        color(Color.white, Pal.lancerLaser, Color.cyan, e.fin());
-        randLenVectors(e.id, 12, e.finpow() * 64f, e.rotation, 16f, (x, y) -> Fill.circle(e.x + x, e.y + y, 1f + e.fout() * 5f));
+        color(UnityPal.monolithLight);
+        Drawf.tri(e.x, e.y, 10f * e.fout(), 175f - (20f * e.fin()), e.rotation);
+
+        for(int i = 0; i < 2; i++){
+            Drawf.tri(e.x, e.y, 10f * e.fout(), 50f, e.rotation + (45f + (e.fin(Interp.pow3Out) * 30f)) * Mathf.signs[i]);
+        };
+
+        Fill.square(e.x, e.y, 5f * e.fout(Interp.pow3Out), e.rotation + 45f);
+        color();
+        Fill.square(e.x, e.y, 2f * e.fout(Interp.pow3Out), e.rotation + 45f);
     }),
 
     coloredPlasmaShoot = new Effect(25f, e -> {

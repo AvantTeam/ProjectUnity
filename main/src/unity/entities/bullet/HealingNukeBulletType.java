@@ -50,7 +50,7 @@ public class HealingNukeBulletType extends BulletType{
             }else{
                 building.damage(damage * b.damageMultiplier() * buildingDamageMultiplier);
             }
-        }, tile -> tile.block().absorbLasers);
+        }, tile -> tile.block().absorbLasers && tile.team() != b.team);
 
         Units.nearby(Tmp.r1.setCentered(b.x, b.y, radius * 2f), u -> {
             float ang = b.angleTo(u);

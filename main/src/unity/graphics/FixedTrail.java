@@ -77,7 +77,7 @@ public class FixedTrail{
 
     /** Adds a new point to the trail at intervals. */
     public void update(float x, float y){
-        update(x, y, -Angles.angleRad(x, y, lastX, lastY));
+        update(x, y, Angles.angle(x, y, lastX, lastY));
     }
 
     /** Adds a new point to the trail at intervals. */
