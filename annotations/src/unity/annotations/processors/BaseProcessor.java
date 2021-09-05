@@ -135,7 +135,7 @@ public abstract class BaseProcessor extends AbstractProcessor{
                 stream.close();
             }
         }catch(FilerException e){
-            throw new Exception("Misbehaving files prevent annotation processing from being done. Try running `gradlew clean`", e);
+            throw new Exception("Misbehaving files prevent annotation processing from being done. Try running `gradlew clean`");
         }
     }
 
