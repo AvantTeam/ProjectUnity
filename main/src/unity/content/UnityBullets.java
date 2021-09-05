@@ -936,7 +936,7 @@ public class UnityBullets implements ContentList{
             trailSpacing = 35f;
             shootEffect = ShootFx.monumentShoot;
             despawnEffect = UnityFx.monumentDespawn;
-            smokeEffect = shootEffect = Fx.blastExplosion;
+            smokeEffect = Fx.blastExplosion;
             trailEffect = UnityFx.monumentTrail;
         }};
 

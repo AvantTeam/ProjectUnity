@@ -3,6 +3,7 @@ package unity.content.effects;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.util.*;
 import mindustry.entities.*;
 import mindustry.graphics.*;
 import unity.graphics.*;
@@ -188,5 +189,31 @@ public class HitFx{
 
         randLenVectors(e.id + 1, 14, 1f + 160f * e.finpow(), (x, y) ->
         lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1f + e.fout() * 3f));
+    }),
+
+    monoHitSmall = new Effect(14, e -> {
+        color(UnityPal.monolith);
+        e.scaled(7f, s -> {
+            Lines.stroke(s.fout());
+            Lines.square(s.x, s.y, 10f * s.fin(), 45f);
+        });
+        color(UnityPal.monolithLight);
+        Angles.randLenVectors(e.id, 5, e.fin() * 15f, (x, y) -> {
+            Fill.square(e.x + x, e.y + y, 2f * e.fout());
+        });
+    }),
+
+    monoHitBig = new Effect(13f, e -> {
+        color(UnityPal.monolithLight);
+        Angles.randLenVectors(e.id, 10, e.fin() * 20f, (x, y) -> {
+            Fill.square(e.x + x, e.y + y, 5f * e.fout());
+        });
+
+        Tmp.c1.set(UnityPal.monolith).a(e.fout(Interp.pow3In));
+
+        z(Layer.effect+1f);
+        blend(Blending.additive);
+        Fill.light(e.x, e.y, 4, 25f * e.fin(Interp.pow5Out), Color.clear, Tmp.c1);
+        blend();
     });
 }
