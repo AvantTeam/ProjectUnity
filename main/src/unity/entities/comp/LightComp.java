@@ -43,7 +43,9 @@ abstract class LightComp implements Drawc, QuadTreeObject{
      * Maps child rotation with the actual entity. Key ranges from [-7..7], which is a packed rotation relative to
      * this light's rotation. Value might be null if the child is a merged light
      */
-    transient final IntMap<Light> children = new IntMap<>();
+    transient final ObjectMap<Intf<Light>, Light> children = new ObjectMap<>();
+
+    private transient final ObjectMap<Intf<Light>, Light> tmp = new ObjectMap<>();
 
     /** Called synchronously before {@link #cast()} is called */
     public void snap(){
@@ -94,8 +96,11 @@ abstract class LightComp implements Drawc, QuadTreeObject{
         var tile = world.tileWorld(endX, endY);
         if(tile != null){
             children(children -> {
+                tmp.clear();
+
                 for(var e : children.entries()){
-                    float rot = rotation + e.key * rotationInc;
+                    var key = e.key;
+                    float rot = rotation + key.get(self()) * rotationInc;
 
                     lights.quad(quad -> quad.intersect(tile.worldx() - tilesize / 2f, tile.worldy() - tilesize / 2f, tilesize, tilesize, l -> {
                         if(Mathf.equal(rot, l.rotation())){
@@ -105,7 +110,7 @@ abstract class LightComp implements Drawc, QuadTreeObject{
                             }
 
                             l.parent(self());
-                            e.value = l;
+                            tmp.put(key, l);
                         }
                     }));
 
@@ -116,10 +121,12 @@ abstract class LightComp implements Drawc, QuadTreeObject{
                         l.set(endX, endY);
                         l.parent(self());
 
-                        e.value = l;
+                        tmp.put(key, l);
                         lights.queueAdd(l);
                     }
                 }
+
+                children.putAll(tmp);
             });
         }
 
@@ -128,7 +135,7 @@ abstract class LightComp implements Drawc, QuadTreeObject{
                 var l = e.value;
                 if(l != null && l.isParent(self())){
                     l.queuePosition = SVec2.construct(endX, endY);
-                    l.queueRotation = (byte)(queueRotation + e.key);
+                    l.queueRotation = (byte)(queueRotation + e.key.get(self()));
                 }
             }
         });
@@ -175,7 +182,7 @@ abstract class LightComp implements Drawc, QuadTreeObject{
         });
     }
 
-    public void children(Cons<IntMap<Light>> cons){
+    public void children(Cons<ObjectMap<Intf<Light>, Light>> cons){
         synchronized(children){
             cons.get(children);
         }
@@ -196,6 +203,12 @@ abstract class LightComp implements Drawc, QuadTreeObject{
     public void parent(Light light){
         synchronized(parents){
             if(!isParent(light)) parents.add(light);
+        }
+    }
+
+    public void child(Intf<Light> child){
+        synchronized(children){
+            children.put(child, null);
         }
     }
 
