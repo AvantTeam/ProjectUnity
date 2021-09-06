@@ -45,7 +45,7 @@ abstract class LightComp implements Drawc, QuadTreeObject{
      */
     transient final ObjectMap<Intf<Light>, Light> children = new ObjectMap<>();
 
-    private transient final ObjectMap<Intf<Light>, Light> tmp = new ObjectMap<>();
+    private static final ObjectMap<Intf<Light>, Light> tmp = new ObjectMap<>();
 
     /** Called synchronously before {@link #cast()} is called */
     public void snap(){
@@ -96,7 +96,9 @@ abstract class LightComp implements Drawc, QuadTreeObject{
         var tile = world.tileWorld(endX, endY);
         if(tile != null){
             children(children -> {
-                tmp.clear();
+                synchronized(tmp){
+                    tmp.clear();
+                }
 
                 for(var e : children.entries()){
                     var key = e.key;
@@ -110,7 +112,10 @@ abstract class LightComp implements Drawc, QuadTreeObject{
                             }
 
                             l.parent(self());
-                            tmp.put(key, l);
+                            synchronized(tmp){
+                                e.value = l;
+                                tmp.put(key, l);
+                            }
                         }
                     }));
 
@@ -121,12 +126,17 @@ abstract class LightComp implements Drawc, QuadTreeObject{
                         l.set(endX, endY);
                         l.parent(self());
 
-                        tmp.put(key, l);
+                        synchronized(tmp){
+                            tmp.put(key, l);
+                        }
+
                         lights.queueAdd(l);
                     }
                 }
 
-                children.putAll(tmp);
+                synchronized(tmp){
+                    children.putAll(tmp);
+                }
             });
         }
 
