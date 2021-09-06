@@ -17,6 +17,8 @@ import unity.gen.*;
 import static arc.Core.*;
 
 public final class GraphicUtils{
+    private static final IntIntMap matches = new IntIntMap();
+
     public static TextureRegion getRegionRect(TextureRegion region, float x, float y, int rw, int rh, int w, int h){
         TextureRegion reg = new TextureRegion(region);
         float tileW = (reg.u2 - reg.u) / w;
@@ -261,32 +263,34 @@ public final class GraphicUtils{
         int c1 = main,
             c2 = main;
 
-        var matches = new IntIntMap();
-        int count, primaryCount = -1, secondaryCount = -1;
+        synchronized(matches){
+            matches.clear();
+            int count, primaryCount = -1, secondaryCount = -1;
 
-        for(int color : colors){
-            if(SColor.a(color) < 0.1f) continue;
+            for(int color : colors){
+                if(SColor.a(color) < 0.1f) continue;
 
-            count = matches.increment(color) + 1;
+                count = matches.increment(color) + 1;
 
-            if(count > primaryCount){
-                secondaryCount = primaryCount;
-                c2 = c1;
+                if(count > primaryCount){
+                    secondaryCount = primaryCount;
+                    c2 = c1;
 
-                primaryCount = count;
-                c1 = color;
-            }else if(count > secondaryCount){
-                secondaryCount = count;
-                c2 = color;
+                    primaryCount = count;
+                    c1 = color;
+                }else if(count > secondaryCount){
+                    secondaryCount = count;
+                    c2 = color;
+                }
             }
-        }
 
-        if(primaryCount > secondaryCount){
-            return c1;
-        }else if(primaryCount == -1){
-            return main;
-        }else{
-            return averageColor(c1, c2);
+            if(primaryCount > secondaryCount){
+                return c1;
+            }else if(primaryCount == -1){
+                return main;
+            }else{
+                return averageColor(c1, c2);
+            }
         }
     }
 
@@ -297,7 +301,7 @@ public final class GraphicUtils{
         var origini = mesh.getIndicesBuffer();
         origini.clear();
 
-        Mesh out = new Mesh(true, mesh.getNumVertices(), mesh.getNumIndices(), mesh.attributes);
+        var out = new Mesh(true, mesh.getNumVertices(), mesh.getNumIndices(), mesh.attributes);
 
         var dstf = out.getVerticesBuffer();
         dstf.clear();

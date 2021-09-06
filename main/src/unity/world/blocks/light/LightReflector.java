@@ -2,6 +2,7 @@ package unity.world.blocks.light;
 
 import arc.*;
 import arc.graphics.g2d.*;
+import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.util.io.*;
@@ -14,9 +15,6 @@ import unity.gen.*;
 public class LightReflector extends LightHoldBlock{
     private static final Vec2 v1 = new Vec2(), v2 = new Vec2();
 
-    public float angleRange = 22.5f;
-    public float rotateSpeed = 5f;
-
     public TextureRegion baseRegion;
 
     public LightReflector(String name){
@@ -27,7 +25,7 @@ public class LightReflector extends LightHoldBlock{
         configurable = true;
         outlineIcon = true;
 
-        config(Boolean.class, (LightReflectorBuild tile, Boolean value) -> tile.lightRot += value ? 1 : -1);
+        config(Boolean.class, (LightReflectorBuild tile, Boolean value) -> tile.lightRot = Mathf.mod(tile.lightRot + (value ? Light.rotationInc : -Light.rotationInc), 360f));
     }
 
     @Override
@@ -38,11 +36,7 @@ public class LightReflector extends LightHoldBlock{
 
     @Override
     public float getRotation(Building build){
-        if(build instanceof LightReflectorBuild b){
-            return Light.unpackRot(b.lightRot);
-        }else{
-            return super.getRotation(build);
-        }
+        return build instanceof LightReflectorBuild b ? b.lightRot : 0f;
     }
 
     @Override
@@ -51,18 +45,17 @@ public class LightReflector extends LightHoldBlock{
     }
 
     public class LightReflectorBuild extends LightHoldBuild{
-        public byte lightRot = Light.packRot(90f);
+        public float lightRot = 90f;
 
         @Override
         public void interact(Light light){
             light.child(l -> {
                 synchronized(LightReflector.class){
-                    v1.trnsExact(Light.unpackRot(lightRot), 1f);
-                    return Light.packRot(v2
-                        .trnsExact(l.realRotation(), 1f)
+                    v1.trnsExact(lightRot, 1f);
+                    return v2
+                        .trnsExact(l.rotation(), 1f)
                         .sub(v1.scl(2 * v2.dot(v1)))
-                        .angle()
-                    );
+                        .angle();
                 }
             });
         }
@@ -76,19 +69,19 @@ public class LightReflector extends LightHoldBlock{
         @Override
         public void write(Writes write){
             super.write(write);
-            write.b(lightRot);
+            write.f(lightRot);
         }
 
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
-            lightRot = read.b();
+            lightRot = read.f();
         }
 
         @Override
         public void draw(){
-            super.draw();
-            Draw.rect(region, x, y, Light.unpackRot(lightRot));
+            Draw.rect(baseRegion, x, y);
+            Draw.rect(region, x, y, lightRot - 90f);
         }
     }
 }

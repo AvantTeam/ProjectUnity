@@ -94,6 +94,8 @@ public class LightProcess implements AsyncProcess{
             });
         }else{
             queue.post(() -> {
+                if(light.pointed == hold) return;
+
                 light.clearChildren();
 
                 if(light.pointed != null) light.pointed.sources().remove(light);

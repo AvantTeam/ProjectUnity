@@ -1,5 +1,6 @@
 package unity.world.blocks.light;
 
+import arc.math.*;
 import arc.scene.ui.layout.*;
 import arc.util.io.*;
 import mindustry.gen.*;
@@ -22,21 +23,17 @@ public class LightSource extends LightHoldGenericCrafter{
         configurable = true;
         outlineIcon = true;
 
-        config(Boolean.class, (LightSourceBuild tile, Boolean value) -> tile.lightRot += value ? 1 : -1);
+        config(Boolean.class, (LightSourceBuild tile, Boolean value) -> tile.lightRot = Mathf.mod(tile.lightRot + (value ? Light.rotationInc : -Light.rotationInc), 360f));
     }
 
     @Override
     public float getRotation(Building build){
-        if(build instanceof LightSourceBuild b){
-            return Light.unpackRot(b.lightRot);
-        }else{
-            return super.getRotation(build);
-        }
+        return build instanceof LightSourceBuild b ? b.lightRot : 0f;
     }
 
     public class LightSourceBuild extends LightHoldGenericCrafterBuild{
         public Light light;
-        public byte lightRot = Light.packRot(90f);
+        public float lightRot = 90f;
 
         @Override
         public void created(){
@@ -72,13 +69,13 @@ public class LightSource extends LightHoldGenericCrafter{
         @Override
         public void write(Writes write){
             super.write(write);
-            write.b(lightRot);
+            write.f(lightRot);
         }
 
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
-            lightRot = read.b();
+            lightRot = read.f();
         }
     }
 }
