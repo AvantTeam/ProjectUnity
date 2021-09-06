@@ -3,6 +3,7 @@ package unity.content.effects;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.util.*;
 import mindustry.entities.*;
 import mindustry.graphics.*;
 import unity.graphics.*;
@@ -98,9 +99,22 @@ public class ShootFx{
             Drawf.tri(e.x, e.y, 10f * e.fout(), 50f, e.rotation + (45f + (e.fin(Interp.pow3Out) * 30f)) * Mathf.signs[i]);
         };
 
+        randLenVectors(e.id, 15, e.fin(Interp.pow2Out) * 80f, e.rotation, 20f, (x, y) -> {
+            Fill.square(e.x + x, e.y + y, 3f * e.fout());
+        });
+
         Fill.square(e.x, e.y, 5f * e.fout(Interp.pow3Out), e.rotation + 45f);
         color();
         Fill.square(e.x, e.y, 2f * e.fout(Interp.pow3Out), e.rotation + 45f);
+
+        e.scaled(15f, s -> {
+            z(Layer.effect + 1f);
+            blend(Blending.additive);
+            Tmp.c1.set(UnityPal.monolithLight).a(s.fout(Interp.pow5In));
+
+            Fill.light(s.x, s.y, 4, 40f * s.fin(Interp.pow5Out), Color.clear, Tmp.c1);
+            blend();
+        });
     }),
 
     coloredPlasmaShoot = new Effect(25f, e -> {

@@ -141,7 +141,10 @@ public class UnityUnitTypes implements ContentList{
     public static @FactionDef("end") @EntityDef({Unitc.class, Endc.class, Invisiblec.class, Tentaclec.class}) UnitType apocalypse;
 
     // end legs
-    public static @FactionDef("end") @EntityPoint(EndLegsUnit.class) UnitType ravager;
+    public static @FactionDef("end") @EntityDef({Unitc.class, Endc.class, Legsc.class}) UnitType ravager;
+
+    // end naval
+    public static @FactionDef("end") @EntityDef({Unitc.class, Endc.class, WaterMovec.class, Decorationc.class}) UnitType thalassophobia;
 
     @Override
     public void load(){
@@ -4611,6 +4614,8 @@ public class UnityUnitTypes implements ContentList{
             legSplashDamage = 1600f;
             outlineColor = UnityPal.darkerOutline;
 
+            antiCheatType = new AntiCheatVariables(health / 610f, health / 190f, health / 560f, health / 120f, 0.6f, 7f * 60f, 8f * 60f, 35f, 4);
+
             weapons.addAll(new Weapon(name + "-nightmare"){{
                 bottomWeapons.add(this);
 
@@ -4681,6 +4686,25 @@ public class UnityUnitTypes implements ContentList{
                 immunities.addAll(content.getBy(ContentType.status));
             }
         };
+
+        thalassophobia = new UnityUnitType("thalassophobia"){{
+            health = 2750000;
+            hitSize = 242.5f;
+            speed = 1.9f;
+            accel = 0.2f;
+            drag = 0.16f;
+            rotateSpeed = 0.3f;
+            outlineColor = UnityPal.darkerOutline;
+
+            antiCheatType = new AntiCheatVariables(8000f, 16000f, health / 520f, health / 120f, 0.6f, 7f * 60f, 8f * 60f, 35f, 4);
+
+            decorations.add(new FlagellaDecorationType(name + "-tail", 3, 10, 119.6f){{
+                x = 0f;
+                y = -172f;
+                swayScl = hitSize / speed;
+                swayOffset = 87f;
+            }});
+        }};
 
         //endregion
     }
