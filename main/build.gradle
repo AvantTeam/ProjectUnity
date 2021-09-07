@@ -65,23 +65,17 @@ task dex(type: Jar) {
     if(!desktopJar.exists()) dependsOn deploy
     doFirst {
         println 'Dexifying...'
-        exec {
-            def command = ['d8', '--min-api', sdkAPI, '--output', dexJar, desktopJar]
-            final File[] files =
-                configurations.compileClasspath.asList() +
-                configurations.runtimeClasspath.asList()
+        def command = ['d8', '--min-api', sdkAPI, '--output', dexJar, desktopJar]
+        final File[] files =
+            configurations.compileClasspath.asList() +
+            configurations.runtimeClasspath.asList()
 
-            for(def file : files) {
-                command += ['--classpath', file.path]
-            }
-            command += ['--lib', file("$sdkRoot/platforms/android-$sdkVersion/android.jar")]
-
-            if(System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
-                command = ['cmd', '/c'] + command
-            }
-
-            commandLine(*command)
+        for(def file : files) {
+            command += ['--classpath', file.path]
         }
+        command += ['--lib', file("$sdkRoot/platforms/android-$sdkVersion/android.jar")]
+
+        command.join(" ").execute(null, new File("$buildDir/libs")).waitForProcessOutput(System.out, System.err)
     }
 
     from zipTree(desktopJar)
