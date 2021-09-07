@@ -11,6 +11,7 @@ import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import unity.*;
 import unity.content.effects.*;
 import unity.entities.effects.*;
 import unity.entities.units.*;
@@ -155,6 +156,7 @@ public class EndCutterLaserBulletType extends BulletType{
                 float trueDamage = damage + Mathf.clamp((unit.maxHealth + unit.type.dpsEstimate - minimumUnitScore) / 2f, 0f, 90000000f);
                 trueDamage += extraDamage * (damage / 3f);
                 unit.apply(status, statusDuration);
+                Unity.antiCheat.applyStatus(unit, 5f * 60f);
                 if(unit instanceof AntiCheatBase){
                     ((AntiCheatBase)unit).overrideAntiCheatDamage(damage * antiCheatScl);
                 }else{

@@ -114,14 +114,15 @@ public class UnityUnitType extends UnitType{
         var caller = ReflectUtils.classCaller();
         boolean fromWave = caller != null && SpawnGroup.class.isAssignableFrom(caller);
 
-        if(fromWave){
+        //if(fromWave){
             if(unit instanceof Monolithc e){
-                int count = Mathf.random(Mathf.clamp(e.maxSouls(), 0, 1), maxSouls);
-                for(int i = 0; i < count; i++){
-                    e.join();
-                }
+                //int count = Mathf.random(Mathf.clamp(e.maxSouls(), 0, 1), maxSouls);
+                //for(int i = 0; i < count; i++){
+                //    e.join();
+                //}
+                e.join();
             }
-        }
+        //}
 
         if(!wormCreating && unit instanceof Wormc){
             wormCreating = true;
