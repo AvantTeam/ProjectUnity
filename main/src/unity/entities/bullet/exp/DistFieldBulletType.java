@@ -1,4 +1,4 @@
-package unity.entities.bullet.misc;
+package unity.entities.bullet.exp;
 
 import arc.*;
 import arc.graphics.*;
@@ -13,7 +13,7 @@ import unity.entities.bullet.exp.*;
 import unity.gen.Expc.*;
 import unity.gen.*;
 
-public class DistFieldBulletType extends ExpBulletType {
+public class DistFieldBulletType extends ExpBulletType{
     public Color centerColor, edgeColor;
     public Effect distSplashFx, distStart;
     public StatusEffect distStatus;
