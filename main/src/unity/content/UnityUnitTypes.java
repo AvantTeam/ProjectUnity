@@ -4112,26 +4112,17 @@ public class UnityUnitTypes implements ContentList{
             outlineColor = UnityPal.darkerOutline;
 
             antiCheatType = new AntiCheatVariables(health / 20f, health / 1.25f, health / 15f, health / 25f, 0.2f, 6f * 60f, 3f * 60f, 15f, 4);
+
             weapons.add(new Weapon("unity-end-small-mount"){{
-                x = 5.75f;
-                y = -0.5f;
+                x = 8.5f;
+                y = -4.5f;
                 mirror = true;
                 rotate = true;
                 reload = 30f;
-                shots = 2;
-                spacing = 15f;
+                inaccuracy = 15f;
+                shootSound = UnitySounds.spaceFracture;
 
-                bullet = UnityBullets.endTentacleSmall;
-            }}, new Weapon("unity-end-small-mount"){{
-                x = 10.75f;
-                y = -5f;
-                mirror = true;
-                rotate = true;
-                reload = 30f;
-                shots = 2;
-                spacing = 20f;
-
-                bullet = UnityBullets.endTentacleSmall;
+                bullet = new VoidFractureBulletType(32f, 600f);
             }});
         }};
 
