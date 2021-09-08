@@ -193,8 +193,8 @@ public class EndCutterLaserBulletType extends BulletType{
         drawSize = maxLength * 2f;
     }
 
-    static class LaserData{
-        float lastLength, lightningTime, velocity, velocityTime, targetSize, pierceOffset, pierceOffsetSmooth, pierceScore, restartTime = 5f;
-        Position target;
+    public static class LaserData{
+        public float lastLength, lightningTime, velocity, velocityTime, targetSize, pierceOffset, pierceOffsetSmooth, pierceScore, restartTime = 5f;
+        public Position target;
     }
 }
