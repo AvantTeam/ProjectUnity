@@ -25,13 +25,7 @@ import unity.annotations.Annotations.*;
 import unity.content.effects.*;
 import unity.entities.*;
 import unity.entities.abilities.*;
-import unity.entities.bullet.advance.*;
-import unity.entities.bullet.dark.*;
-import unity.entities.bullet.end.*;
-import unity.entities.bullet.highTier.*;
-import unity.entities.bullet.monolith.*;
-import unity.entities.bullet.plague.*;
-import unity.entities.bullet.scar.*;
+import unity.entities.bullet.*;
 import unity.entities.units.*;
 import unity.gen.*;
 import unity.graphics.*;
@@ -1154,114 +1148,115 @@ public class UnityUnitTypes implements ContentList{
             groundLayer = Layer.legUnit;
 
             weapons.add(new Weapon(){{
-                x = 0f;
-                y = 8.25f;
-                mirror = false;
-                reload = 4f * 60f;
-                recoil = 0f;
-                shootStatus = StatusEffects.slow;
-                shootStatusDuration = 80f;
+                            x = 0f;
+                            y = 8.25f;
+                            mirror = false;
+                            reload = 4f * 60f;
+                            recoil = 0f;
+                            shootStatus = StatusEffects.slow;
+                            shootStatusDuration = 80f;
 
-                BulletType t = new CygnusBulletType(){{
-                    float rad = 170f;
+                            BulletType t = new CygnusBulletType(){{
+                                float rad = 170f;
 
-                    damage = 45f;
-                    speed = 4.3f;
-                    lifetime = 75f;
-                    shootEffect = Fx.hitEmpSpark;
-                    smokeEffect = Fx.shootBigSmoke2;
-                    healPercent = 12f;
-                    trailLength = 35;
-                    trailWidth = 9f;
-                    clipSize = (size + trailLength * speed) * 2.5f;
-                    scaleVelocity = true;
-                    unitDamageScl = 0.7f;
-                    hitShake = 7f;
-                    splashDamage = 95f;
-                    splashDamageRadius = rad;
-                    radius = rad;
-                    timeIncrease = 1.75f;
-                    timeDuration = 60f * 20f;
-                    powerDamageScl = 3f;
-                    allyStatusDuration = 60f * 15f;
-                    status = StatusEffects.electrified;
-                    lightning = 6;
-                    lightningLength = 10;
-                    lightningLengthRand = 4;
-                    lightningDamage = 35f;
-                    backColor = trailColor = lightningColor = Pal.heal;
-                    frontColor = Color.white;
+                                damage = 45f;
+                                speed = 4.3f;
+                                lifetime = 75f;
+                                shootEffect = Fx.hitEmpSpark;
+                                smokeEffect = Fx.shootBigSmoke2;
+                                healPercent = 12f;
+                                trailLength = 35;
+                                trailWidth = 9f;
+                                clipSize = (size + trailLength * speed) * 2.5f;
+                                scaleVelocity = true;
+                                unitDamageScl = 0.7f;
+                                hitShake = 7f;
+                                splashDamage = 95f;
+                                splashDamageRadius = rad;
+                                radius = rad;
+                                timeIncrease = 1.75f;
+                                timeDuration = 60f * 20f;
+                                powerDamageScl = 3f;
+                                allyStatusDuration = 60f * 15f;
+                                status = StatusEffects.electrified;
+                                lightning = 6;
+                                lightningLength = 10;
+                                lightningLengthRand = 4;
+                                lightningDamage = 35f;
+                                backColor = trailColor = lightningColor = Pal.heal;
+                                frontColor = Color.white;
 
-                    hitEffect = new Effect(50f, 100f, e -> {
-                        e.scaled(7f, b -> {
-                            Draw.color(Pal.heal, b.fout());
-                            Fill.circle(e.x, e.y, rad);
-                        });
+                                hitEffect = new Effect(50f, 100f, e -> {
+                                    e.scaled(7f, b -> {
+                                        Draw.color(Pal.heal, b.fout());
+                                        Fill.circle(e.x, e.y, rad);
+                                    });
 
-                        Draw.color(Pal.heal);
-                        Lines.stroke(e.fout() * 3f);
-                        Lines.circle(e.x, e.y, rad);
+                                    Draw.color(Pal.heal);
+                                    Lines.stroke(e.fout() * 3f);
+                                    Lines.circle(e.x, e.y, rad);
 
-                        int points = 10;
-                        float offset = Mathf.randomSeed(e.id, 360f);
-                        for(int i = 0; i < points; i++){
-                            float angle = i* 360f / points + offset;
-                            Drawf.tri(e.x + Angles.trnsx(angle, rad), e.y + Angles.trnsy(angle, rad), 6f, 50f * e.fout(), angle);
-                        }
+                                    int points = 10;
+                                    float offset = Mathf.randomSeed(e.id, 360f);
+                                    for(int i = 0; i < points; i++){
+                                        float angle = i* 360f / points + offset;
+                                        Drawf.tri(e.x + Angles.trnsx(angle, rad), e.y + Angles.trnsy(angle, rad), 6f, 50f * e.fout(), angle);
+                                    }
 
-                        Fill.circle(e.x, e.y, 12f * e.fout());
-                        Draw.color();
-                        Fill.circle(e.x, e.y, 6f * e.fout());
-                        Drawf.light(e.x, e.y, rad * 1.6f, Pal.heal, e.fout());
-                    });
-                }};
+                                    Fill.circle(e.x, e.y, 12f * e.fout());
+                                    Draw.color();
+                                    Fill.circle(e.x, e.y, 6f * e.fout());
+                                    Drawf.light(e.x, e.y, rad * 1.6f, Pal.heal, e.fout());
+                                });
+                            }};
 
-                bullet = new MultiBulletType(){{
-                    lifetime = ChargeFx.greenLaserChargeParent.lifetime;
-                    shootEffect = ChargeFx.greenLaserChargeParent;
-                    mirror = false;
-                    bullets = new MultiBulletData[]{
-                        new MultiBulletData(t, 0f, 0f, 0f)
-                    };
-                }};
-            }}, new Weapon(name + "-mount"){{
-                x = 22.5f;
-                y = -3f;
-                shootY = 8.75f;
-                rotate = true;
-                alternate = false;
-                rotateSpeed = 2f;
-                reload = 140f;
-                continuous = true;
-                chargeSound = Sounds.lasercharge2;
-                shootSound = Sounds.beam;
-                firstShotDelay = ChargeFx.greenLaserChargeSmallParent.lifetime - 1f;
-                cooldownTime = 130f;
+                            bullet = new MultiBulletType(){{
+                                lifetime = ChargeFx.greenLaserChargeParent.lifetime;
+                                shootEffect = ChargeFx.greenLaserChargeParent;
+                                mirror = false;
+                                bullets = new MultiBulletData[]{
+                                    new MultiBulletData(t, 0f, 0f, 0f)
+                                };
+                            }};
+                        }},
+                new Weapon(name + "-mount"){{
+                    x = 22.5f;
+                    y = -3f;
+                    shootY = 8.75f;
+                    rotate = true;
+                    alternate = false;
+                    rotateSpeed = 2f;
+                    reload = 140f;
+                    continuous = true;
+                    chargeSound = Sounds.lasercharge2;
+                    shootSound = Sounds.beam;
+                    firstShotDelay = ChargeFx.greenLaserChargeSmallParent.lifetime - 1f;
+                    cooldownTime = 130f;
 
-                bullet = new ContinuousLaserBulletType(){{
-                    damage = 45f;
-                    length = 150f;
-                    width = 5f;
-                    hitEffect = Fx.hitMeltHeal;
-                    drawSize = 420f;
-                    lifetime = 140f;
-                    shake = 1f;
-                    despawnEffect = Fx.smokeCloud;
-                    smokeEffect = Fx.none;
+                    bullet = new ContinuousLaserBulletType(){{
+                        damage = 45f;
+                        length = 150f;
+                        width = 5f;
+                        hitEffect = Fx.hitMeltHeal;
+                        drawSize = 420f;
+                        lifetime = 140f;
+                        shake = 1f;
+                        despawnEffect = Fx.smokeCloud;
+                        smokeEffect = Fx.none;
 
-                    shootEffect = ChargeFx.greenLaserChargeSmallParent;
+                        shootEffect = ChargeFx.greenLaserChargeSmallParent;
 
-                    incendChance = 0.1f;
-                    incendSpread = 5f;
-                    incendAmount = 1;
+                        incendChance = 0.1f;
+                        incendSpread = 5f;
+                        incendAmount = 1;
 
-                    healPercent = 1.2f;
-                    collidesTeam = true;
-                    largeHit = false;
+                        healPercent = 1.2f;
+                        collidesTeam = true;
+                        largeHit = false;
 
-                    colors = new Color[]{Pal.heal.cpy().a(0.2f), Pal.heal.cpy().a(0.5f), Pal.heal.cpy().mul(1.2f), Color.white};
-                }};
-            }});
+                        colors = new Color[]{Pal.heal.cpy().a(0.2f), Pal.heal.cpy().a(0.5f), Pal.heal.cpy().mul(1.2f), Color.white};
+                    }};
+                }});
         }};
 
         sagittarius = new UnityUnitType("sagittarius"){{
@@ -1948,7 +1943,8 @@ public class UnityUnitTypes implements ContentList{
                 reload = 25f;
 
                 bullet = Bullets.standardThoriumBig;
-            }}, new LimitedAngleWeapon(name + "-side-silo"){
+            }},
+            new LimitedAngleWeapon(name + "-side-silo"){
                 {
                     bottomWeapons.add(this);
 
@@ -2000,7 +1996,8 @@ public class UnityUnitTypes implements ContentList{
                     }
                     return b;
                 }
-            }, new LimitedAngleWeapon(fin.name + "-launcher"){{
+            },
+            new LimitedAngleWeapon(fin.name + "-launcher"){{
                 x = 0f;
                 y = 21f;
                 shootY = 8f;
@@ -2013,7 +2010,8 @@ public class UnityUnitTypes implements ContentList{
                 angleCone = 135f;
 
                 bullet = UnityBullets.basicMissile;
-            }}, new PointDefenceMultiBarrelWeapon(name + "-flak-turret"){{
+            }},
+            new PointDefenceMultiBarrelWeapon(name + "-flak-turret"){{
                 x = 26.5f;
                 y = 15f;
                 shootY = 15.75f;
