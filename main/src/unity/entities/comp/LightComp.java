@@ -42,7 +42,7 @@ abstract class LightComp implements Drawc, QuadTreeObject{
     @ReadOnly transient volatile LightHoldBuildc source = null;
     transient volatile LightHoldBuildc queueSource = null;
 
-    private transient volatile boolean valid = false;
+    @ReadOnly transient volatile boolean valid = false;
 
     transient volatile LightHoldBuildc pointed;
 
@@ -55,6 +55,7 @@ abstract class LightComp implements Drawc, QuadTreeObject{
 
     /** Called synchronously before {@link #cast()} is called */
     public void snap(){
+        // Values that are needed to stay as is in async process are snapped here
         strength = queueStrength + recStrength();
         rotation = queueRotation;
         source = queueSource;
@@ -65,8 +66,10 @@ abstract class LightComp implements Drawc, QuadTreeObject{
 
     /** Called asynchronously */
     public void cast(){
+        // If this doesn't come from a light source and it has no parents, remove
         if((source == null || !source.isValid()) && parentsAny(parents -> parents.size <= 0)){
-            lights.queueRemove(self());
+            queueRemove();
+            return;
         }
 
         float
@@ -75,7 +78,7 @@ abstract class LightComp implements Drawc, QuadTreeObject{
 
         boolean hit = world.raycast(World.toTile(x), World.toTile(y), World.toTile(targetX), World.toTile(targetY), (tx, ty) -> {
             var tile = world.tile(tx, ty);
-            if(tile == null){
+            if(tile == null){ // Out of map bounds, don't waste time
                 lights.queuePoint(self(), null);
                 endX = tx * tilesize;
                 endY = ty * tilesize;
@@ -85,6 +88,8 @@ abstract class LightComp implements Drawc, QuadTreeObject{
 
             var build = tile.build;
             if(build instanceof LightHoldBuildc hold){
+                // Only handle light holders if the holder isn't the source and there are no parents
+                // pointing at it
                 if(hold == source || parentsAny(p -> {
                     for(var l : p.keys()){
                         if(hold == l.pointed) return true;
@@ -92,13 +97,16 @@ abstract class LightComp implements Drawc, QuadTreeObject{
                     return false;
                 })) return false;
 
+                // Either stop if the holder accepts this light or the tile is solid
                 if(hold.acceptLight(self())){
+                    // Insert self to light holder
                     lights.queuePoint(self(), hold);
                     endX = tile.worldx();
                     endY = tile.worldy();
 
                     return true;
                 }else if(tile.solid()){
+                    // Stop ray-casting, no light holder is being handled
                     lights.queuePoint(self(), null);
                     endX = tile.worldx();
                     endY = tile.worldy();
@@ -116,6 +124,7 @@ abstract class LightComp implements Drawc, QuadTreeObject{
             return false;
         });
 
+        // Recalculate end position if didn't hit any tile
         if(!hit){
             endX = Mathf.round(targetX / tilesize) * tilesize;
             endY = Mathf.round(targetY / tilesize) * tilesize;
@@ -124,22 +133,32 @@ abstract class LightComp implements Drawc, QuadTreeObject{
         var tile = world.tileWorld(endX, endY);
         if(tile != null){
             children(children -> {
+                // Since querying and iterating at the same time is a horrible idea, use a temporary map
                 synchronized(tmp){
                     tmp.clear();
                 }
 
+                // Iterate through planned children:
+                // - Check for existing lights in the end position. If there are any light with the preferred amount
+                //   of rotation, add itself to it as its parent but don't add it as this child, as this light is
+                //   just temporarily using it
+                // - Otherwise pool a new light and directly link itself to this light as child and this light as
+                //   its parent
                 for(var e : children.entries()){
                     var key = e.key;
                     long res = key.get(self());
 
+                    // The rotation and strength data of the children are packed in a Float2 struct
                     float rot = Float2.x(res);
                     float str = Float2.y(res);
 
                     lights.quad(quad -> quad.intersect(tile.worldx() - tilesize / 2f, tile.worldy() - tilesize / 2f, tilesize, tilesize, l -> {
-                        if(e.value != l && Angles.near(rot, l.realRotation(), 1f)){
+                        // Only accept existing light if it isn't directly this child and has the preferred amount
+                        // of rotation
+                        if(l.valid() && e.value != l && Angles.near(rot, l.realRotation(), 1f)){
+                            // If this light already contains a preferred child, move on to the other one
                             if(e.value != null){
-                                e.value.detach(self());
-                                lights.queueRemove(e.value);
+                                e.value.queueRemove();
                             }
 
                             l.parent(self(), str);
@@ -151,8 +170,10 @@ abstract class LightComp implements Drawc, QuadTreeObject{
                     }));
 
                     if(e.value == null || !Angles.near(rot, e.value.rotation(), 1f)){
+                        // This means the previously indirectly linked child light is no longer valid; detach
                         if(e.value != null) e.value.detach(self());
 
+                        // Create a new directly linked child light
                         var l = Light.create();
                         l.set(endX, endY);
                         l.parent(self(), str);
@@ -161,10 +182,11 @@ abstract class LightComp implements Drawc, QuadTreeObject{
                             tmp.put(key, l);
                         }
 
-                        lights.queueAdd(l);
+                        l.queueAdd();
                     }
                 }
 
+                // Merge the used temporary map with the actual map
                 synchronized(tmp){
                     children.putAll(tmp);
                 }
@@ -172,11 +194,18 @@ abstract class LightComp implements Drawc, QuadTreeObject{
         }
 
         children(children -> {
+            // Assign position, rotation, and strength values to directly linked children
             for(var e : children.entries()){
                 var l = e.value;
                 if(l != null && l.isParent(self())){
                     l.queuePosition = SVec2.construct(endX, endY);
-                    l.queueRotation = e.key.get(self());
+
+                    long res = e.key.get(self());
+                    float rot = Float2.x(res);
+                    float str = Float2.y(res);
+
+                    l.queueRotation = rot;
+                    l.parent(self(), str);
                 }
             }
         });
@@ -210,11 +239,20 @@ abstract class LightComp implements Drawc, QuadTreeObject{
         lights.quad(quad -> quad.insert(self()));
     }
 
+    public void queueAdd(){
+        lights.queueAdd(self());
+    }
+
     @Override
     public void remove(){
         clearParents();
         clearChildren();
         lights.quad(quad -> quad.remove(self()));
+    }
+
+    public void queueRemove(){
+        valid = false;
+        lights.queueRemove(self());
     }
 
     @Override
@@ -296,6 +334,8 @@ abstract class LightComp implements Drawc, QuadTreeObject{
         Draw.z(Layer.bullet);
         Draw.blend(Blending.additive);
 
+        // Since vertex color interpolation is always linear, first draw an opaque line assuming the end of it
+        // is where strength == 1, hen do the gradually fading line later
         float
             stroke = width / 4f,
             rot = realRotation(),
@@ -337,30 +377,28 @@ abstract class LightComp implements Drawc, QuadTreeObject{
         Tmp.v1.trns(rot, Math.max(op, 0f) * yield).add(this);
         Tmp.v2.trns(rot, strength * yield).add(this);
 
-        float
-            x = Tmp.v1.x, y = Tmp.v1.y,
-            x2 = Tmp.v2.x, y2 = Tmp.v2.y;
+        float x2 = Tmp.v1.x, y2 = Tmp.v1.y;
 
         float
-            len = Mathf.len(x2 - x, y2 - y),
-            diffx = (x2 - x) / len * stroke,
-            diffy = (y2 - y) / len * stroke * 2f;
+            len = Mathf.len(endX - x2, endY - y2),
+            diffx = (endX - x2) / len * stroke,
+            diffy = (endY - y2) / len * stroke * 2f;
 
         Fill.quad(
-            x - diffx - diffy,
-            y - diffy + diffx,
+            x2 - diffx - diffy,
+            y2 - diffy + diffx,
             startc,
 
-            x - diffx + diffy,
-            y - diffy - diffx,
+            x2 - diffx + diffy,
+            y2 - diffy - diffx,
             startc,
 
-            x2 + diffx + diffy,
-            y2 + diffy - diffx,
+            endX + diffx + diffy,
+            endY + diffy - diffx,
             endc,
 
-            x2 + diffx - diffy,
-            y2 + diffy + diffx,
+            endX + diffx - diffy,
+            endY + diffy + diffx,
             endc
         );
 

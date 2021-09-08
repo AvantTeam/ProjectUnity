@@ -42,7 +42,7 @@ public class LightSource extends LightHoldGenericCrafter{
             light.queueRotation = lightRot;
             light.queueSource = this;
 
-            lights.queueAdd(light);
+            light.queueAdd();
         }
 
         @Override
