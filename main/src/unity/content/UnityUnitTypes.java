@@ -1,5 +1,6 @@
 package unity.content;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -4671,6 +4672,14 @@ public class UnityUnitTypes implements ContentList{
                 swayOffset = 87f;
             }});
         }
+
+            /*
+            @Override
+            public void load(){
+                super.load();
+                softShadowRegion = Core.atlas.find(name + "-soft-shadow");
+            }
+            */
 
             @Override
             public void init(){
