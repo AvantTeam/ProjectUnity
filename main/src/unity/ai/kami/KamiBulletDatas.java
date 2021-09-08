@@ -11,7 +11,7 @@ import unity.content.*;
 import unity.entities.bullet.*;
 import unity.entities.bullet.KamiAltLaserBulletType.*;
 import unity.gen.*;
-import unity.util.*;
+import unity.util.func.*;
 
 import java.util.*;
 

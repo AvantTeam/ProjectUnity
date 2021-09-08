@@ -1,11 +1,11 @@
-package unity.util;
+package unity;
 
 import arc.graphics.*;
 import arc.math.geom.*;
 import unity.annotations.Annotations.*;
 import unity.annotations.Annotations.StructField.*;
 
-@SuppressWarnings("unused")
+@SuppressWarnings("all")
 final class StructDefs{
     // SColor - Packs r, g, b, and a values into int from left-most bits to right, each taking 8 bits
     @StructWrap(value = {
@@ -22,4 +22,10 @@ final class StructDefs{
         @StructField(name = "y")
     })
     Vec2 vec2Struct = new Vec2();
+
+    @Struct
+    class Float2Struct{
+        float x;
+        float y;
+    }
 }

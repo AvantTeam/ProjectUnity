@@ -8,11 +8,13 @@ import arc.math.geom.QuadTree.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.core.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import unity.annotations.Annotations.*;
 import unity.gen.*;
 import unity.gen.LightHoldc.*;
+import unity.util.func.*;
 
 import static mindustry.Vars.*;
 import static unity.Unity.*;
@@ -37,15 +39,19 @@ abstract class LightComp implements Drawc, QuadTreeObject{
     transient volatile float queueRotation = 0f;
     transient volatile long queuePosition = 0;
 
-    @ReadOnly transient volatile LightHoldBuildc source;
-    transient volatile LightHoldBuildc queueSource;
+    @ReadOnly transient volatile LightHoldBuildc source = null;
+    transient volatile LightHoldBuildc queueSource = null;
+
+    private transient volatile boolean valid = false;
 
     transient volatile LightHoldBuildc pointed;
-    protected transient final Seq<Light> parents = new Seq<>(2);
-    /** Maps child rotation with the actual entity. Value might be null if the child is a merged light */
-    protected transient final ObjectMap<Floatf<Light>, Light> children = new ObjectMap<>();
 
-    private static final ObjectMap<Floatf<Light>, Light> tmp = new ObjectMap<>();
+    /** Maps parent with strength multipliers */
+    protected transient final ObjectFloatMap<Light> parents = new ObjectFloatMap<>(2);
+    /** Maps child data with the actual entity. Value might be null if the child is a merged light */
+    protected transient final ObjectMap<Longf<Light>, Light> children = new ObjectMap<>();
+
+    private static final ObjectMap<Longf<Light>, Light> tmp = new ObjectMap<>();
 
     /** Called synchronously before {@link #cast()} is called */
     public void snap(){
@@ -59,65 +65,84 @@ abstract class LightComp implements Drawc, QuadTreeObject{
 
     /** Called asynchronously */
     public void cast(){
-        if((source == null || !source.isValid()) && parentsAny(Seq::isEmpty)){
+        if((source == null || !source.isValid()) && parentsAny(parents -> parents.size <= 0)){
             lights.queueRemove(self());
         }
 
-        long end = SVec2.add(SVec2.trns(0, rotation, strength * yield), this);
         float
-            endXf = SVec2.x(end),
-            endYf = SVec2.y(end);
+            targetX = x + Angles.trnsx(rotation, strength * yield),
+            targetY = y + Angles.trnsy(rotation, strength * yield);
 
-        world.raycastEachWorld(x, y, endXf, endYf, (tx, ty) -> {
-            endX = tx * tilesize;
-            endY = ty * tilesize;
-
+        boolean hit = world.raycast(World.toTile(x), World.toTile(y), World.toTile(targetX), World.toTile(targetY), (tx, ty) -> {
             var tile = world.tile(tx, ty);
             if(tile == null){
                 lights.queuePoint(self(), null);
+                endX = tx * tilesize;
+                endY = ty * tilesize;
+
                 return true;
             }
 
             var build = tile.build;
             if(build instanceof LightHoldBuildc hold){
-                if(hold == source || parentsAny(p -> p.contains(l -> hold == l.pointed))) return false;
+                if(hold == source || parentsAny(p -> {
+                    for(var l : p.keys()){
+                        if(hold == l.pointed) return true;
+                    }
+                    return false;
+                })) return false;
 
                 if(hold.acceptLight(self())){
                     lights.queuePoint(self(), hold);
+                    endX = tile.worldx();
+                    endY = tile.worldy();
+
                     return true;
                 }else if(tile.solid()){
                     lights.queuePoint(self(), null);
+                    endX = tile.worldx();
+                    endY = tile.worldy();
+
                     return true;
                 }
             }else if(tile.solid()){
                 lights.queuePoint(self(), null);
+                endX = tile.worldx();
+                endY = tile.worldy();
+
                 return true;
             }
 
             return false;
         });
 
+        if(!hit){
+            endX = Mathf.round(targetX / tilesize) * tilesize;
+            endY = Mathf.round(targetY / tilesize) * tilesize;
+        }
+
         var tile = world.tileWorld(endX, endY);
         if(tile != null){
             children(children -> {
-                print(this + "\n" + children);
                 synchronized(tmp){
                     tmp.clear();
                 }
 
                 for(var e : children.entries()){
                     var key = e.key;
-                    float rot = key.get(self());
+                    long res = key.get(self());
+
+                    float rot = Float2.x(res);
+                    float str = Float2.y(res);
 
                     lights.quad(quad -> quad.intersect(tile.worldx() - tilesize / 2f, tile.worldy() - tilesize / 2f, tilesize, tilesize, l -> {
-                        print("Intersected light: " + l + ", " + l.rotation());
-                        if(e.value != l && Angles.near(rot, l.rotation(), 1f)){
+                        if(e.value != l && Angles.near(rot, l.realRotation(), 1f)){
                             if(e.value != null){
                                 e.value.detach(self());
                                 lights.queueRemove(e.value);
                             }
 
-                            l.parent(self());
+                            l.parent(self(), str);
                             synchronized(tmp){
                                 e.value = l;
                                 tmp.put(key, l);
@@ -128,10 +153,9 @@ abstract class LightComp implements Drawc, QuadTreeObject{
                     if(e.value == null || !Angles.near(rot, e.value.rotation(), 1f)){
                         if(e.value != null) e.value.detach(self());
 
-                        print("Creating new light", rot, e.value == null ? "null" : e.value.rotation());
                         var l = Light.create();
                         l.set(endX, endY);
-                        l.parent(self());
+                        l.parent(self(), str);
 
                         synchronized(tmp){
                             tmp.put(key, l);
@@ -156,10 +180,19 @@ abstract class LightComp implements Drawc, QuadTreeObject{
                 }
             }
         });
+
+        valid = true;
     }
 
     public float recStrength(){
-        return parents.sumf(l -> l.endStrength() / l.children.size);
+        float str = 0f;
+        synchronized(parents){
+            for(var p : parents.entries()){
+                str += p.key.endStrength() * p.value;
+            }
+        }
+
+        return str;
     }
 
     @Override
@@ -174,14 +207,14 @@ abstract class LightComp implements Drawc, QuadTreeObject{
 
     @Override
     public void add(){
-        lights.quad.insert(self());
+        lights.quad(quad -> quad.insert(self()));
     }
 
     @Override
     public void remove(){
         clearParents();
         clearChildren();
-        lights.quad.remove(self());
+        lights.quad(quad -> quad.remove(self()));
     }
 
     @Override
@@ -189,19 +222,19 @@ abstract class LightComp implements Drawc, QuadTreeObject{
         out.set(x, y, 0f, 0f);
     }
 
-    public void children(Cons<ObjectMap<Floatf<Light>, Light>> cons){
+    public void children(Cons<ObjectMap<Longf<Light>, Light>> cons){
         synchronized(children){
             cons.get(children);
         }
     }
 
-    public void parents(Cons<Seq<Light>> cons){
+    public void parents(Cons<ObjectFloatMap<Light>> cons){
         synchronized(parents){
             cons.get(parents);
         }
     }
 
-    public boolean parentsAny(Boolf<Seq<Light>> cons){
+    public boolean parentsAny(Boolf<ObjectFloatMap<Light>> cons){
         synchronized(parents){
             return cons.get(parents);
         }
@@ -222,8 +255,8 @@ abstract class LightComp implements Drawc, QuadTreeObject{
 
     public void clearParents(){
         parents(parents -> {
-            for(var l : parents){
-                l.children(children -> {
+            for(var l : parents.entries()){
+                l.key.children(children -> {
                     var key = children.findKey(this, true);
                     if(key != null) children.put(key, null);
                 });
@@ -234,21 +267,21 @@ abstract class LightComp implements Drawc, QuadTreeObject{
     }
 
     public boolean isParent(Light light){
-        return parentsAny(parents -> parents.contains(light));
+        return parentsAny(parents -> parents.containsKey(light));
     }
 
-    public void parent(Light light){
+    public void parent(Light light, float mult){
         parents(parents -> {
-            if(!isParent(light)) parents.add(light);
+            if(!isParent(light)) parents.put(light, mult);
         });
     }
 
-    public void child(Floatf<Light> child){
+    public void child(Longf<Light> child){
         children(children -> children.put(child, null));
     }
 
     public void detach(Light light){
-        parents(parents -> parents.remove(light));
+        parents(parents -> parents.remove(light, 0f));
     }
 
     public float realRotation(){
@@ -257,58 +290,25 @@ abstract class LightComp implements Drawc, QuadTreeObject{
 
     @Override
     public void draw(){
+        if(!valid) return;
+
         float z = Draw.z();
         Draw.z(Layer.bullet);
         Draw.blend(Blending.additive);
 
-        if(proper){
-            Lines.stroke(width, Tmp.c1.set(Color.white).a(strength));
-            Lines.line(x, y, endX, endY);
-        }else{
+        float
+            stroke = width / 4f,
+            rot = realRotation(),
+            op = strength - 1f,
+
+            startc = Tmp.c1.set(Color.white).a(Math.max(strength, 0.3f)).toFloatBits(),
+            endc = Tmp.c1.set(Color.white).a(Math.max(endStrength(), 0.3f)).toFloatBits();
+
+        if(op > 0f){
+            Tmp.v1.trns(rot, op * yield).add(this);
             float
-                stroke = width / 4f,
-                rot = realRotation(),
-                op = strength - 1f,
-
-                startc = Tmp.c1.set(Color.white).a(strength).toFloatBits(),
-                endc = Tmp.c1.set(Color.white).a(endStrength()).toFloatBits();
-
-            if(op > 0f){
-                Tmp.v1.trns(rot, op * yield).add(this);
-                float
-                    x2 = Tmp.v1.x,
-                    y2 = Tmp.v1.y;
-
-                float
-                    len = Mathf.len(x2 - x, y2 - y),
-                    diffx = (x2 - x) / len * stroke,
-                    diffy = (y2 - y) / len * stroke * 2f;
-
-                Fill.quad(
-                    x - diffx - diffy,
-                    y - diffy + diffx,
-                    startc,
-
-                    x - diffx + diffy,
-                    y - diffy - diffx,
-                    startc,
-
-                    x2 + diffx + diffy,
-                    y2 + diffy - diffx,
-                    startc,
-
-                    x2 + diffx - diffy,
-                    y2 + diffy + diffx,
-                    startc
-                );
-            }
-
-            Tmp.v1.trns(rot, Math.max(op, 0f) * yield).add(this);
-            Tmp.v2.trns(rot, strength * yield).add(this);
-
-            float
-                x = Tmp.v1.x, y = Tmp.v1.y,
-                x2 = Tmp.v2.x, y2 = Tmp.v2.y;
+                x2 = Tmp.v1.x,
+                y2 = Tmp.v1.y;
 
             float
                 len = Mathf.len(x2 - x, y2 - y),
@@ -326,13 +326,43 @@ abstract class LightComp implements Drawc, QuadTreeObject{
 
                 x2 + diffx + diffy,
                 y2 + diffy - diffx,
-                endc,
+                startc,
 
                 x2 + diffx - diffy,
                 y2 + diffy + diffx,
-                endc
+                startc
             );
         }
+
+        Tmp.v1.trns(rot, Math.max(op, 0f) * yield).add(this);
+        Tmp.v2.trns(rot, strength * yield).add(this);
+
+        float
+            x = Tmp.v1.x, y = Tmp.v1.y,
+            x2 = Tmp.v2.x, y2 = Tmp.v2.y;
+
+        float
+            len = Mathf.len(x2 - x, y2 - y),
+            diffx = (x2 - x) / len * stroke,
+            diffy = (y2 - y) / len * stroke * 2f;
+
+        Fill.quad(
+            x - diffx - diffy,
+            y - diffy + diffx,
+            startc,
+
+            x - diffx + diffy,
+            y - diffy - diffx,
+            startc,
+
+            x2 + diffx + diffy,
+            y2 + diffy - diffx,
+            endc,
+
+            x2 + diffx - diffy,
+            y2 + diffy + diffx,
+            endc
+        );
 
         Draw.blend();
         Draw.z(z);

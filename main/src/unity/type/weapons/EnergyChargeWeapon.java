@@ -11,7 +11,7 @@ import mindustry.entities.bullet.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
-import unity.util.*;
+import unity.util.func.*;
 
 public class EnergyChargeWeapon extends Weapon{
     public Cons3<Unit, WeaponMount, Float> drawCharge = (unit, mount, charge) -> {};

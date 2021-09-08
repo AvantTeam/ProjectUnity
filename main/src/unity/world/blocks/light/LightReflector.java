@@ -52,10 +52,11 @@ public class LightReflector extends LightHoldBlock{
             light.child(l -> {
                 synchronized(LightReflector.class){
                     v1.trnsExact(lightRot, 1f);
-                    return v2
+                    return Float2.construct(v2
                         .trnsExact(l.rotation(), 1f)
                         .sub(v1.scl(2 * v2.dot(v1)))
-                        .angle();
+                        .angle(), 1f
+                    );
                 }
             });
         }
