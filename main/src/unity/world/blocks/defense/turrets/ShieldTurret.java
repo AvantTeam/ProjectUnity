@@ -5,7 +5,7 @@ import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.world.blocks.defense.turrets.*;
-import unity.entities.bullet.*;
+import unity.entities.bullet.imber.*;
 
 public class ShieldTurret extends PowerTurret{
 
