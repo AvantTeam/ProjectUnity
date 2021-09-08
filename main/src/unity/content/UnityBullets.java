@@ -1178,6 +1178,7 @@ public class UnityBullets implements ContentList{
                 }else{
                     Unity.antiCheat.samplerAdd(unit, true);
                 }
+                Unity.antiCheat.applyStatus(unit, 10f * 60f);
             }
         };
 

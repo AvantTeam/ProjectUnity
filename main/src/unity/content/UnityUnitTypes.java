@@ -18,6 +18,7 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.type.ammo.*;
 import mindustry.world.meta.*;
+import unity.*;
 import unity.ai.*;
 import unity.ai.AssistantAI.*;
 import unity.annotations.Annotations.*;
@@ -4289,6 +4290,8 @@ public class UnityUnitTypes implements ContentList{
                             float extraDamage = (float)Math.pow(Mathf.clamp((unit.maxHealth + unit.type.dpsEstimate - 43000f) / 14000f, 0f, 8f), 2f);
                             float trueDamage = damage + Mathf.clamp((unit.maxHealth + unit.type.dpsEstimate - 32000f) / 2f, 0f, 90000000f);
                             trueDamage += extraDamage * (damage / 3f);
+
+                            Unity.antiCheat.applyStatus(unit, 10f * 60f);
 
                             if(!(other instanceof AntiCheatBase)) unit.damage(trueDamage);
                             if((Float.isInfinite(threat) || Float.isNaN(threat) || threat >= Float.MAX_VALUE) && !(other instanceof AntiCheatBase)) AntiCheat.annihilateEntity(other, false);

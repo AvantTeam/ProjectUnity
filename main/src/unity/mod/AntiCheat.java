@@ -1,14 +1,18 @@
 package unity.mod;
 
 import arc.*;
+import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.pooling.*;
+import arc.util.pooling.Pool.*;
 import mindustry.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.world.blocks.ConstructBlock.*;
 import unity.*;
+import unity.content.effects.*;
 import unity.entities.units.*;
 import unity.util.*;
 
@@ -21,6 +25,11 @@ public class AntiCheat{
     private final Seq<EntitySampler> sampler = new Seq<>(), samplerTmp = new Seq<>();
     private final IntSet exclude = new IntSet(204);
     private final IntMap<EntitySampler> samplerMap = new IntMap<>(409);
+
+    private final Seq<DisableRegenStatus> status = new Seq<>();
+    private final IntMap<DisableRegenStatus> statusMap = new IntMap<>(204);
+
+    private float lastTime = 0f;
 
     public void setup(){
         Triggers.listen(Trigger.update, this::update);
@@ -106,6 +115,7 @@ public class AntiCheat{
     }
 
     void update(){
+        if(Vars.state.isPaused()) return;
         if(timer.get(15f) && (!unitSeq.isEmpty() || !buildingSeq.isEmpty())){
             for(Entityc e : Groups.all){
                 if(e instanceof Unit){
@@ -146,6 +156,7 @@ public class AntiCheat{
                 if(es.duration <= 0f && es.excludeDuration <= 0f){
                     samplerTmp.add(es);
                     samplerMap.remove(es.entity.id());
+                    Pools.free(es);
                 }
                 es.excludeDuration -= 15f;
                 es.duration -= 15f;
@@ -153,8 +164,36 @@ public class AntiCheat{
             sampler.removeAll(samplerTmp);
             samplerTmp.clear();
         }
-        buildingSeq.each(b -> b.counter > 5, b -> b.build.update());
-        unitSeq.each(e -> e.counter > 5, e -> e.unit.update());
+        //something is updating this multiple times.
+        if(Time.time > lastTime){
+            buildingSeq.each(b -> b.counter > 10, b -> b.build.update());
+            unitSeq.each(e -> e.counter > 10, e -> e.unit.update());
+            for(DisableRegenStatus s : status){
+                s.update();
+                if(s.duration <= 0f || !s.unit.isValid()){
+                    status.remove(s);
+                    statusMap.remove(s.unit.id);
+                    Pools.free(s);
+                }
+            }
+            lastTime = Time.time;
+        }
+    }
+
+    public void applyStatus(Unit unit, float duration){
+        if(exclude.contains(unit.id)) return;
+        DisableRegenStatus status = statusMap.get(unit.id);
+
+        if(status != null){
+            status.duration = Math.max(status.duration, duration);
+        }else{
+            DisableRegenStatus s = Pools.obtain(DisableRegenStatus.class, DisableRegenStatus::new);
+            s.unit = unit;
+            s.lastHealth = unit.health;
+            s.duration = duration;
+            this.status.add(s);
+            statusMap.put(unit.id, s);
+        }
     }
 
     public void samplerAdd(Healthc entity){
@@ -176,7 +215,8 @@ public class AntiCheat{
                 }
                 return;
             }
-            EntitySampler s = new EntitySampler(entity);
+            EntitySampler s = Pools.obtain(EntitySampler.class, EntitySampler::new);
+            s.entity = entity;
             s.duration = 2f * 60f;
             s.lastHealth = entity.health();
             sampler.add(s);
@@ -186,7 +226,9 @@ public class AntiCheat{
             if(ent != null){
                 ent.excludeDuration = 2 * 60f;
             }else{
-                EntitySampler s = new EntitySampler(entity);
+                //EntitySampler s = new EntitySampler(entity);
+                EntitySampler s = Pools.obtain(EntitySampler.class, EntitySampler::new);
+                s.entity = entity;
                 s.excludeDuration = 2 * 60f;
                 s.duration = 0f;
                 sampler.add(s);
@@ -232,13 +274,20 @@ public class AntiCheat{
         return alt instanceof ConstructBuild && alt.team == building.team;
     }
 
-    static class EntitySampler{
+    static class EntitySampler implements Poolable{
         Healthc entity;
         float duration, excludeDuration = 0f, lastHealth;
         int penalty = 0;
 
-        EntitySampler(Healthc entity){
-            this.entity = entity;
+        EntitySampler(){
+
+        }
+
+        @Override
+        public void reset(){
+            entity = null;
+            duration = excludeDuration = lastHealth = 0f;
+            penalty = 0;
         }
     }
 
@@ -261,6 +310,37 @@ public class AntiCheat{
 
         BuildingQueue(Building build){
             this.build = build;
+        }
+    }
+
+    static class DisableRegenStatus implements Poolable{
+        Unit unit;
+        float lastHealth;
+        float duration;
+
+        void update(){
+            if(unit.health == Float.POSITIVE_INFINITY || Float.isNaN(unit.health)){
+                unit.health = unit.maxHealth == Float.POSITIVE_INFINITY || Float.isNaN(unit.maxHealth) ? 800000f : unit.maxHealth;
+            }
+            float delta = unit.health - lastHealth;
+            if(delta > 0){
+                unit.health -= delta;
+            }
+
+            if(Mathf.chanceDelta(0.19f)){
+                Tmp.v1.rnd(Mathf.range(unit.type.hitSize / 2f));
+                ParticleFx.endRegenDisable.at(unit.x + Tmp.v1.x, unit.y + Tmp.v1.y);
+            }
+
+            lastHealth = unit.health;
+            duration -= Time.delta;
+        }
+
+        @Override
+        public void reset(){
+            unit = null;
+            lastHealth = 0f;
+            duration = 0f;
         }
     }
 }
