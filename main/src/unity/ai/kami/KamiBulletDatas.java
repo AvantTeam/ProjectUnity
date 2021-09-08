@@ -8,8 +8,8 @@ import arc.util.*;
 import mindustry.gen.*;
 import unity.ai.*;
 import unity.content.*;
-import unity.entities.bullet.*;
-import unity.entities.bullet.KamiAltLaserBulletType.*;
+import unity.entities.bullet.kami.*;
+import unity.entities.bullet.kami.KamiAltLaserBulletType.*;
 import unity.gen.*;
 import unity.util.func.*;
 
