@@ -42,6 +42,9 @@ abstract class LightComp implements Drawc, QuadTreeObject{
     @ReadOnly transient volatile LightHoldBuildc source = null;
     transient volatile LightHoldBuildc queueSource = null;
 
+    @ReadOnly transient volatile int color = Color.whiteRgba;
+    transient volatile int queueColor = Color.whiteRgba;
+
     @ReadOnly transient volatile boolean valid = false;
 
     transient volatile LightHoldBuildc pointed;
@@ -51,7 +54,8 @@ abstract class LightComp implements Drawc, QuadTreeObject{
     /** Maps child data with the actual entity. Value might be null if the child is a merged light */
     protected transient final ObjectMap<Longf<Light>, Light> children = new ObjectMap<>();
 
-    private static final ObjectMap<Longf<Light>, Light> tmp = new ObjectMap<>();
+    private static final ObjectMap<Longf<Light>, Light> tmpMap = new ObjectMap<>();
+    private static final Color tmpCol = new Color();
 
     /** Called synchronously before {@link #cast()} is called */
     public void snap(){
@@ -59,6 +63,7 @@ abstract class LightComp implements Drawc, QuadTreeObject{
         strength = queueStrength + recStrength();
         rotation = queueRotation;
         source = queueSource;
+        color = queueColor;
 
         x = SVec2.x(queuePosition);
         y = SVec2.y(queuePosition);
@@ -134,8 +139,8 @@ abstract class LightComp implements Drawc, QuadTreeObject{
         if(tile != null){
             children(children -> {
                 // Since querying and iterating at the same time is a horrible idea, use a temporary map
-                synchronized(tmp){
-                    tmp.clear();
+                synchronized(tmpMap){
+                    tmpMap.clear();
                 }
 
                 // Iterate through planned children:
@@ -162,9 +167,9 @@ abstract class LightComp implements Drawc, QuadTreeObject{
                             }
 
                             l.parent(self(), str);
-                            synchronized(tmp){
+                            synchronized(tmpMap){
                                 e.value = l;
-                                tmp.put(key, l);
+                                tmpMap.put(key, l);
                             }
                         }
                     }));
@@ -178,8 +183,8 @@ abstract class LightComp implements Drawc, QuadTreeObject{
                         l.set(endX, endY);
                         l.parent(self(), str);
 
-                        synchronized(tmp){
-                            tmp.put(key, l);
+                        synchronized(tmpMap){
+                            tmpMap.put(key, l);
                         }
 
                         l.queueAdd();
@@ -187,8 +192,8 @@ abstract class LightComp implements Drawc, QuadTreeObject{
                 }
 
                 // Merge the used temporary map with the actual map
-                synchronized(tmp){
-                    children.putAll(tmp);
+                synchronized(tmpMap){
+                    children.putAll(tmpMap);
                 }
             });
         }
@@ -224,10 +229,33 @@ abstract class LightComp implements Drawc, QuadTreeObject{
         return str;
     }
 
+    public int recColor(){
+        synchronized(tmpCol){
+            tmpCol.set(color).a(1f);
+
+            parents(parents -> {
+                for(var p : parents.keys()){
+                    tmpCol.r += SColor.r(p.color());
+                    tmpCol.g += SColor.g(p.color());
+                    tmpCol.b += SColor.b(p.color());
+                }
+            });
+
+            int size;
+            synchronized(parents){ size = parents.size; }
+
+            tmpCol.r /= size;
+            tmpCol.g /= size;
+            tmpCol.b /= size;
+
+            return tmpCol.rgba();
+        }
+    }
+
     @Override
     @Replace
     public float clipSize(){
-        return Mathf.dst(x, y, endX, endY) * 2f;
+        return Mathf.dst(x, y, endX, endY) * 3f;
     }
 
     public float endStrength(){
@@ -341,11 +369,11 @@ abstract class LightComp implements Drawc, QuadTreeObject{
             rot = realRotation(),
             op = strength - 1f,
 
-            startc = Tmp.c1.set(Color.white).a(Math.max(strength, 0.3f)).toFloatBits(),
-            endc = Tmp.c1.set(Color.white).a(Math.max(endStrength(), 0.3f)).toFloatBits();
+            startc = Tmp.c1.set(Color.white).a(strength).toFloatBits(),
+            endc = Tmp.c1.set(Color.white).a(endStrength()).toFloatBits();
 
         if(op > 0f){
-            Tmp.v1.trns(rot, op * yield).add(this);
+            Tmp.v1.trns(rot, op * yield).limit2(dst2(endX, endY)).add(this);
             float
                 x2 = Tmp.v1.x,
                 y2 = Tmp.v1.y;
