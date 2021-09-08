@@ -49,6 +49,12 @@ public class VoidFractureBulletType extends BulletType{
     }
 
     @Override
+    public void init(){
+        super.init();
+        drawSize = (range() * 2f) + 30f;
+    }
+
+    @Override
     public void update(Bullet b){
         super.update(b);
         if(b.data instanceof FractureData data){
