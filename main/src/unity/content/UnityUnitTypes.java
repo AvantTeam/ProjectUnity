@@ -25,7 +25,10 @@ import unity.annotations.Annotations.*;
 import unity.content.effects.*;
 import unity.entities.*;
 import unity.entities.abilities.*;
-import unity.entities.bullet.*;
+import unity.entities.bullet.energy.*;
+import unity.entities.bullet.laser.*;
+import unity.entities.bullet.misc.*;
+import unity.entities.bullet.physical.*;
 import unity.entities.units.*;
 import unity.gen.*;
 import unity.graphics.*;
@@ -4707,7 +4710,14 @@ public class UnityUnitTypes implements ContentList{
                 swayScl = hitSize / speed;
                 swayOffset = 87f;
             }});
-        }};
+        }
+
+            @Override
+            public void init(){
+                super.init();
+                immunities.addAll(content.getBy(ContentType.status));
+            }
+        };
 
         //endregion
     }
