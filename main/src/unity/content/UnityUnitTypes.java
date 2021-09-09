@@ -4665,21 +4665,28 @@ public class UnityUnitTypes implements ContentList{
 
             antiCheatType = new AntiCheatVariables(8000f, 16000f, health / 520f, health / 120f, 0.6f, 7f * 60f, 8f * 60f, 35f, 4);
 
-            decorations.add(new FlagellaDecorationType(name + "-tail", 3, 10, 119.6f){{
+            decorations.add(new FlagellaDecorationType(name + "-tail", 4, 15, 45.75f){{
                 x = 0f;
                 y = -172f;
                 swayScl = hitSize / speed;
-                swayOffset = 87f;
+                swayOffset = 67f;
             }});
         }
 
-            /*
             @Override
             public void load(){
                 super.load();
                 softShadowRegion = Core.atlas.find(name + "-soft-shadow");
             }
-            */
+
+            @Override
+            public void drawSoftShadow(Unit unit){
+                Draw.color(0, 0, 0, 1f);
+                float rad = 1.6f;
+                float size = Math.max(region.width, region.height) * Draw.scl;
+                Draw.rect(softShadowRegion, unit, size * rad * Draw.xscl, size * rad * Draw.yscl, unit.rotation - 90f);
+                Draw.color();
+            }
 
             @Override
             public void init(){
