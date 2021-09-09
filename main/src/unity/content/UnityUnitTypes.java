@@ -39,6 +39,7 @@ import unity.type.decal.*;
 import unity.type.weapons.*;
 
 import static mindustry.Vars.*;
+import static unity.content.UnityWeaponTemplates.*;
 
 public class UnityUnitTypes implements ContentList{
     // global unit + copter
@@ -4123,7 +4124,9 @@ public class UnityUnitTypes implements ContentList{
                 inaccuracy = 15f;
                 shootSound = UnitySounds.spaceFracture;
 
-                bullet = new VoidFractureBulletType(32f, 600f);
+                bullet = new VoidFractureBulletType(32f, 600f){{
+                    shootEffect = ShootFx.voidShoot;
+                }};
             }});
         }};
 
@@ -4671,6 +4674,77 @@ public class UnityUnitTypes implements ContentList{
                 swayScl = hitSize / speed;
                 swayOffset = 67f;
             }});
+
+            Weapon w = new EnergyChargeWeapon("unity-void-fracture-turret"){{
+                mirror = false;
+                alternate = true;
+                shadow = 47f;
+                shots = 3;
+                shotDelay = 6f;
+                reload = 90f;
+                inaccuracy = 20f;
+                shootCone = 7f;
+                shootY = 0f;
+                rotate = true;
+                rotateSpeed = 2f;
+                shootSound = UnitySounds.spaceFracture;
+
+                drawCharge = (unit, mount, charge) -> {
+                    Weapon w = mount.weapon;
+                    float rotation = unit.rotation - 90f,
+                    wx = unit.x + Angles.trnsx(rotation, w.x, w.y),
+                    wy = unit.y + Angles.trnsy(rotation, w.x, w.y);
+
+                    Draw.color(Color.black);
+                    UnityDrawf.shiningCircle(unit.id * 321 + Math.max(0, w.otherSide * 41), Time.time, wx, wy, 3.5f * charge, 6, 60f, 17f, 3f * charge, 70f);
+                };
+
+                bullet = new VoidFractureBulletType(40f, 800f){{
+                    speed = 5f;
+                    delay = 50f;
+                    lifetime = 60f;
+                    drag = 0.09f;
+                    nextLifetime = 13f;
+                    length = 38f;
+                    spikesDamage = 310f;
+                    maxTargets = 20;
+                    shootEffect = ShootFx.voidShoot;
+                }};
+            }};
+
+            weapons.addAll(
+            clnW(w, y -> {
+                y.x = 79.5f;
+                y.y = -34f;
+                y.otherSide = 1;
+            }),
+            clnW(w, y -> {
+                y.x = 90.5f;
+                y.y = -71.5f;
+                y.otherSide = 2;
+            }),
+            clnW(w, y -> {
+                y.x = 91.25f;
+                y.y = -104f;
+                y.otherSide = 0;
+            }),
+
+            clnW(w, y -> {
+                y.x = -79.5f;
+                y.y = -34f;
+                y.otherSide = 4;
+            }),
+            clnW(w, y -> {
+                y.x = -90.5f;
+                y.y = -71.5f;
+                y.otherSide = 5;
+            }),
+            clnW(w, y -> {
+                y.x = -91.25f;
+                y.y = -104f;
+                y.otherSide = 3;
+            })
+            );
         }
 
             @Override

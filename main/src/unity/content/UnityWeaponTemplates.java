@@ -1,10 +1,12 @@
 package unity.content;
 
+import arc.func.*;
 import arc.graphics.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.entities.bullet.*;
 import mindustry.graphics.*;
+import mindustry.type.*;
 import unity.entities.bullet.energy.*;
 import unity.entities.bullet.physical.*;
 import unity.gen.*;
@@ -168,5 +170,11 @@ public class UnityWeaponTemplates implements ContentList{
                 despawnEffect = Fx.blastExplosion;
             }};
         }};
+    }
+
+    public static Weapon clnW(Weapon w, Cons<Weapon> cons){
+        Weapon c = w.copy();
+        cons.get(c);
+        return c;
     }
 }

@@ -20,6 +20,7 @@ import unity.gen.*;
 import unity.util.*;
 
 public class VoidFractureBulletType extends BulletType{
+    public float length = 28f;
     public float delay = 30f;
     public float targetingRange = 320f;
     public float trueSpeed;
@@ -41,6 +42,7 @@ public class VoidFractureBulletType extends BulletType{
         layer = Layer.effect + 0.03f;
 
         despawnEffect = Fx.none;
+        smokeEffect = Fx.none;
     }
 
     @Override
@@ -166,11 +168,11 @@ public class VoidFractureBulletType extends BulletType{
             Draw.color(Color.black);
             if(b.fdata <= 0f){
                 float in = Mathf.clamp(b.time / delay);
-                Drawf.tri(b.x, b.y, 12f * in, 28f, b.rotation());
-                Drawf.tri(b.x, b.y, 12f * in, 28f, b.rotation() + 180f);
+                Drawf.tri(b.x, b.y, 12f * in, length, b.rotation());
+                Drawf.tri(b.x, b.y, 12f * in, length, b.rotation() + 180f);
             }else{
-                Drawf.tri(b.x, b.y, 12f * b.fout(), 28f, b.rotation());
-                Drawf.tri(b.x, b.y, 12f * b.fout(), 14f, b.rotation() + 180f);
+                Drawf.tri(b.x, b.y, 12f * b.fout(), length, b.rotation());
+                Drawf.tri(b.x, b.y, 12f * b.fout(), length / 2f, b.rotation() + 180f);
 
                 for(int i = 0; i < 3; i++){
                     float f = Mathf.lerp(12f, 3f, i / 2f);
