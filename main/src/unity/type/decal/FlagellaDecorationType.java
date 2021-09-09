@@ -1,6 +1,8 @@
 package unity.type.decal;
 
 import arc.*;
+import arc.func.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
@@ -145,6 +147,14 @@ public class FlagellaDecorationType extends UnitDecorationType{
 
             last = c;
         }
+    }
+
+    @Override
+    public void drawIcon(Func<TextureRegion, Pixmap> prov, Pixmap icon, Func<TextureRegion, TextureRegion> outliner){
+        for(TextureRegion region : regions){
+            outliner.get(region);
+        }
+        outliner.get(end);
     }
 
     static class FlagellaDecoration extends UnitDecoration{
