@@ -4125,6 +4125,8 @@ public class UnityUnitTypes implements ContentList{
                 shootSound = UnitySounds.spaceFracture;
 
                 bullet = new VoidFractureBulletType(32f, 600f){{
+                    armorPierce = 2f;
+                    ratioDamage = 0.0005f;
                     shootEffect = ShootFx.voidShoot;
                 }};
             }});

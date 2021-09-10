@@ -26,6 +26,7 @@ public class VoidFractureBulletType extends BulletType{
     public float trueSpeed;
     public float nextLifetime = 10f;
     public int maxTargets = 15;
+    public float armorPierce = 100f, ratioDamage = 0.01f;
     public float spikesRange = 100f, spikesDamage = 200f, spikesRand = 8f;
     public Sound activeSound = UnitySounds.fractureShoot, spikesSound = UnitySounds.spaceFracture;
 
@@ -40,6 +41,7 @@ public class VoidFractureBulletType extends BulletType{
         collidesTiles = false;
         keepVelocity = false;
         layer = Layer.effect + 0.03f;
+        pierce = true;
 
         despawnEffect = Fx.none;
         smokeEffect = Fx.none;
@@ -110,10 +112,28 @@ public class VoidFractureBulletType extends BulletType{
                     }
                     return build.block.absorbLasers;
                 }, unit -> {
-                    if(data.collided.add(unit.id)) hitEntity(b, unit, unit.health);
+                    if(data.collided.add(unit.id)){
+                        unit.shield = Math.max(unit.shield - armorPierce, 0f);
+                        unit.armor = Math.max(unit.armor - armorPierce, 0f);
+                        hitEntity(b, unit, unit.health);
+                    }
                     return false;
                 }, (ex, ey) -> hit(b, ex, ey), true);
             }
+        }
+    }
+
+    @Override
+    public void hitEntity(Bullet b, Hitboxc entity, float health){
+        if(entity instanceof Healthc h){
+            h.damage(Math.max(b.damage, h.maxHealth() * ratioDamage));
+        }
+
+        if(entity instanceof Unit unit){
+            Tmp.v3.set(unit).sub(b).nor().scl(knockback * 80f);
+            if(impact) Tmp.v3.setAngle(b.rotation() + (knockback < 0 ? 180f : 0f));
+            unit.impulse(Tmp.v3);
+            unit.apply(status, statusDuration);
         }
     }
 
@@ -129,16 +149,15 @@ public class VoidFractureBulletType extends BulletType{
             d.y2 = b.y;
             d.b = this;
 
-            //tmp.clear();
             in = 0;
             if(!b.hit){
                 Utils.collideLineRawEnemy(b.team, d.x, d.y, d.x2, d.y2, spikesRange, (build, direct) -> {
                     if(direct && in < maxTargets){
                         float s = build.hitSize() / 2f;
                         in++;
-                        build.damage(spikesDamage);
+                        build.damagePierce(spikesDamage);
                         Vec2 v = Intersector.nearestSegmentPoint(d.x, d.y, d.x2, d.y2, build.x + Mathf.range(spikesRand), build.y + Mathf.range(spikesRand), Tmp.v1);
-                        Tmp.v2.set(build).sub(v).setLength2(Math.max(v.dst2(build) - (s * s), 0f)).add(v);
+                        Tmp.v2.set(v).sub(build).limit2(s * s).add(build);
                         hitEffect.at(Tmp.v2);
                         d.spikes.add(v.x, v.y, build.x, build.y);
                     }
@@ -147,10 +166,10 @@ public class VoidFractureBulletType extends BulletType{
                     if(in < maxTargets){
                         float s = unit.hitSize / 2f;
                         in++;
-                        unit.damage(spikesDamage);
+                        unit.damagePierce(spikesDamage);
                         unit.apply(status, statusDuration);
                         Vec2 v = Intersector.nearestSegmentPoint(d.x, d.y, d.x2, d.y2, unit.x + Mathf.range(spikesRand), unit.y + Mathf.range(spikesRand), Tmp.v1);
-                        Tmp.v2.set(unit).sub(v).setLength2(Math.max(v.dst2(unit) - (s * s), 0f)).add(v);
+                        Tmp.v2.set(v).sub(unit).limit2(s * s).add(unit);
                         hitEffect.at(Tmp.v2);
                         d.spikes.add(v.x, v.y, unit.x, unit.y);
                     }
