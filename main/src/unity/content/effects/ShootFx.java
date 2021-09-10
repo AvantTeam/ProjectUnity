@@ -144,7 +144,7 @@ public class ShootFx{
 
     voidShoot = new Effect(20f, e -> {
         color(Color.black);
-        randLenVectors(e.id, 14, e.finpow() * 20f, (x, y) -> {
+        randLenVectors(e.id, 14, e.finpow() * 20f, e.rotation, 20f * Mathf.curve(e.fin(), 0f, 0.2f), (x, y) -> {
             Fill.circle(e.x + x, e.y + y, e.fout() * 5f);
             Fill.circle(e.x + x / 2f, e.y + y / 2f, e.fout() * 3f);
         });

@@ -7,6 +7,8 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
+import mindustry.type.*;
 import unity.util.*;
 
 public class FlagellaDecorationType extends UnitDecorationType{
@@ -92,18 +94,34 @@ public class FlagellaDecorationType extends UnitDecorationType{
         Tmp.v1.trns(unit.rotation - 90f, x, y).add(unit);
         int regL = regions.length - 1;
         int idx = 0;
+        UnitType t = unit.type;
+        float z = Draw.z();
+        float sz = unit.elevation > 0.5f ? (t.lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit) : t.groundLayer + Mathf.clamp(t.hitSize / 4000f, 0, 0.01f);
+        sz = Math.min(sz - 0.01f, Layer.bullet - 1f);
+
         while(cur != null){
             int reg = Mathf.clamp(regL - Mathf.round((idx / (float)segments) * regL), 0, regL);
             TextureRegion region = cur == d.end ? end : regions[reg];
+            float ssize = Math.max(region.width, region.height) * Draw.scl * 1.6f;
 
             unit.type.applyColor(unit);
             Lines.stroke(region.height * Draw.scl);
             if(cur.prev == null){
                 Tmp.v2.set(cur.x, cur.y).sub(Tmp.v1).setLength(region.width * Draw.scl).add(Tmp.v1);
+
+                Draw.z(sz);
+                Drawf.shadow((Tmp.v1.x + Tmp.v2.x) / 2f, (Tmp.v1.y + Tmp.v2.y) / 2f, ssize, 0.6f);
+                Draw.z(z);
+
                 Lines.line(region, Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y, false);
             }else{
                 FlagellaSegment pr = cur.prev;
                 Tmp.v2.set(cur.x, cur.y).sub(pr.x, pr.y).setLength(region.width * Draw.scl).add(pr.x, pr.y);
+
+                Draw.z(sz);
+                Drawf.shadow((pr.x + Tmp.v2.x) / 2f, (pr.y + Tmp.v2.y) / 2f, ssize, 0.6f);
+                Draw.z(z);
+
                 Lines.line(region, pr.x, pr.y, Tmp.v2.x, Tmp.v2.y, false);
             }
 

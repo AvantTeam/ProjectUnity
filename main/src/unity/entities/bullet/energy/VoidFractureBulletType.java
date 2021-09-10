@@ -20,13 +20,13 @@ import unity.gen.*;
 import unity.util.*;
 
 public class VoidFractureBulletType extends BulletType{
-    public float length = 28f;
+    public float length = 28f, width = 12f, widthTo = 3f;
     public float delay = 30f;
     public float targetingRange = 320f;
     public float trueSpeed;
     public float nextLifetime = 10f;
     public int maxTargets = 15;
-    public float spikesRange = 100f, spikesDamage = 200f;
+    public float spikesRange = 100f, spikesDamage = 200f, spikesRand = 8f;
     public Sound activeSound = UnitySounds.fractureShoot, spikesSound = UnitySounds.spaceFracture;
 
     private static float s;
@@ -43,6 +43,7 @@ public class VoidFractureBulletType extends BulletType{
 
         despawnEffect = Fx.none;
         smokeEffect = Fx.none;
+        hitEffect = HitFx.voidHit;
     }
 
     @Override
@@ -126,6 +127,7 @@ public class VoidFractureBulletType extends BulletType{
             d.y = data.y;
             d.x2 = b.x;
             d.y2 = b.y;
+            d.b = this;
 
             //tmp.clear();
             in = 0;
@@ -135,7 +137,7 @@ public class VoidFractureBulletType extends BulletType{
                         float s = build.hitSize() / 2f;
                         in++;
                         build.damage(spikesDamage);
-                        Vec2 v = Intersector.nearestSegmentPoint(d.x, d.y, d.x2, d.y2, build.x + Mathf.range(8f), build.y + Mathf.range(8f), Tmp.v1);
+                        Vec2 v = Intersector.nearestSegmentPoint(d.x, d.y, d.x2, d.y2, build.x + Mathf.range(spikesRand), build.y + Mathf.range(spikesRand), Tmp.v1);
                         Tmp.v2.set(build).sub(v).setLength2(Math.max(v.dst2(build) - (s * s), 0f)).add(v);
                         hitEffect.at(Tmp.v2);
                         d.spikes.add(v.x, v.y, build.x, build.y);
@@ -147,7 +149,7 @@ public class VoidFractureBulletType extends BulletType{
                         in++;
                         unit.damage(spikesDamage);
                         unit.apply(status, statusDuration);
-                        Vec2 v = Intersector.nearestSegmentPoint(d.x, d.y, d.x2, d.y2, unit.x + Mathf.range(8f), unit.y + Mathf.range(8f), Tmp.v1);
+                        Vec2 v = Intersector.nearestSegmentPoint(d.x, d.y, d.x2, d.y2, unit.x + Mathf.range(spikesRand), unit.y + Mathf.range(spikesRand), Tmp.v1);
                         Tmp.v2.set(unit).sub(v).setLength2(Math.max(v.dst2(unit) - (s * s), 0f)).add(v);
                         hitEffect.at(Tmp.v2);
                         d.spikes.add(v.x, v.y, unit.x, unit.y);
@@ -168,21 +170,22 @@ public class VoidFractureBulletType extends BulletType{
             Draw.color(Color.black);
             if(b.fdata <= 0f){
                 float in = Mathf.clamp(b.time / delay);
-                Drawf.tri(b.x, b.y, 12f * in, length, b.rotation());
-                Drawf.tri(b.x, b.y, 12f * in, length, b.rotation() + 180f);
+                Drawf.tri(b.x, b.y, width * in, length, b.rotation());
+                Drawf.tri(b.x, b.y, width * in, length, b.rotation() + 180f);
             }else{
-                Drawf.tri(b.x, b.y, 12f * b.fout(), length, b.rotation());
-                Drawf.tri(b.x, b.y, 12f * b.fout(), length / 2f, b.rotation() + 180f);
+                Drawf.tri(b.x, b.y, width * b.fout(), length, b.rotation());
+                Drawf.tri(b.x, b.y, width * b.fout(), length / 2f, b.rotation() + 180f);
+                float ang = b.dst2(data.x, data.y) >= 0.0001f ? b.angleTo(data.x, data.y) : b.rotation() + 180f;
 
                 for(int i = 0; i < 3; i++){
-                    float f = Mathf.lerp(12f, 3f, i / 2f);
+                    float f = Mathf.lerp(width, widthTo, i / 2f);
                     float a = Mathf.lerp(0.25f, 1f, (i / 2f) * (i / 2f));
 
                     Draw.alpha(a);
                     Lines.stroke(f);
                     Lines.line(data.x, data.y, b.x, b.y, false);
-                    Drawf.tri(b.x, b.y, f * 1.22f, f * 2f, b.angleTo(data.x, data.y) + 180f);
-                    Drawf.tri(data.x, data.y, f * 1.22f, f * 2f, b.angleTo(data.x, data.y));
+                    Drawf.tri(b.x, b.y, f * 1.22f, f * 2f, ang + 180f);
+                    Drawf.tri(data.x, data.y, f * 1.22f, f * 2f, ang);
                 }
             }
         }

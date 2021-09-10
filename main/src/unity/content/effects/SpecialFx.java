@@ -10,6 +10,7 @@ import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.Effect.*;
 import mindustry.graphics.*;
+import unity.entities.bullet.energy.*;
 import unity.entities.effects.*;
 
 public class SpecialFx{
@@ -74,7 +75,7 @@ public class SpecialFx{
 
         Draw.color(Color.black);
         for(int i = 0; i < 3; i++){
-            float f = Mathf.lerp(12f, 3f, i / 2f);
+            float f = Mathf.lerp(data.b.width, data.b.widthTo, i / 2f);
             float a = Mathf.lerp(0.25f, 1f, (i / 2f) * (i / 2f));
 
             Draw.alpha(a);
@@ -88,14 +89,15 @@ public class SpecialFx{
         if(!s.isEmpty()){
             for(int i = 0; i < data.spikes.size; i += 4){
                 float x1 = s.get(i), y1 = s.get(i + 1), x2 = s.get(i + 2), y2 = s.get(i + 3);
-                Drawf.tri(x1, y1, 4f * e.fout(), Mathf.dst(x1, y1, x2, y2) * 2f * Mathf.curve(e.fin(), 0f, 0.2f), Angles.angle(x1, y1, x2, y2));
-                Fill.circle(x1, y1, (4f / 1.22f) * e.fout());
+                Drawf.tri(x1, y1, (data.b.widthTo + 1f) * e.fout(), Mathf.dst(x1, y1, x2, y2) * 2f * Mathf.curve(e.fin(), 0f, 0.2f), Angles.angle(x1, y1, x2, y2));
+                Fill.circle(x1, y1, ((data.b.widthTo + 1f) / 1.22f) * e.fout());
             }
         }
     }).layer(Layer.effect + 0.03f);
 
     public static class VoidFractureData{
         public float x, y, x2, y2;
+        public VoidFractureBulletType b;
         public FloatSeq spikes = new FloatSeq();
     }
 }

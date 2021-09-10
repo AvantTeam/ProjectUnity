@@ -4687,6 +4687,7 @@ public class UnityUnitTypes implements ContentList{
                 shootY = 0f;
                 rotate = true;
                 rotateSpeed = 2f;
+                velocityRnd = 0.1f;
                 shootSound = UnitySounds.spaceFracture;
 
                 drawCharge = (unit, mount, charge) -> {
@@ -4705,8 +4706,12 @@ public class UnityUnitTypes implements ContentList{
                     lifetime = 60f;
                     drag = 0.09f;
                     nextLifetime = 13f;
-                    length = 38f;
+                    length = 52f;
+                    width = 20f;
+                    widthTo = 8f;
+                    spikesRand = 16f;
                     spikesDamage = 310f;
+                    targetingRange = 400f;
                     maxTargets = 20;
                     shootEffect = ShootFx.voidShoot;
                 }};

@@ -147,6 +147,14 @@ public class HitFx{
         Lines.lineAngleCenter(e.x + x, e.y + y, angle, e.fslope() * 13f);
     })),
 
+    voidHit = new Effect(20f, e -> {
+        color(Color.black);
+        randLenVectors(e.id, 7, e.finpow() * 15f, (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, e.fout() * 5f);
+            Fill.circle(e.x + x / 2f, e.y + y / 2f, e.fout() * 3f);
+        });
+    }),
+
     hitMonolithLaser = new Effect(8, e -> {
         color(UnityPal.monolithLight, UnityPal.monolithDark, e.finpow());
         stroke(0.2f + e.fout() * 1.3f);
