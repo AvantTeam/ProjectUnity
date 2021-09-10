@@ -36,7 +36,6 @@ import unity.world.blocks.distribution.*;
 import unity.world.blocks.effect.*;
 import unity.world.blocks.environment.*;
 import unity.world.blocks.light.*;
-import unity.world.blocks.logic.*;
 import unity.world.blocks.power.*;
 import unity.world.blocks.production.*;
 import unity.world.blocks.sandbox.*;
@@ -94,10 +93,7 @@ public class UnityBlocks implements ContentList{
     //light
     lightLamp, oilLamp, lightLampInfi,
     lightReflector,
-    lightFilter, lightInvertedFilter,
-    lightDivisor, lightDivisor1,
-    lightRouter,
-    lightPanel, lightInfluencer,
+    lightDivisor,
 
     //defense
     metaglassWall, metaglassWallLarge;
@@ -1006,7 +1002,7 @@ public class UnityBlocks implements ContentList{
             }
         };
 
-        lightLamp = new unity.world.blocks.light.LightSource("light-lamp"){{
+        lightLamp = new LightSource("light-lamp"){{
             requirements(Category.crafting, with(Items.lead, 5, Items.metaglass, 10));
 
             lightProduction = 0.6f;
@@ -1015,7 +1011,7 @@ public class UnityBlocks implements ContentList{
             drawer = new DrawLightBlock();
         }};
 
-        oilLamp = new unity.world.blocks.light.LightSource("oil-lamp"){{
+        oilLamp = new LightSource("oil-lamp"){{
             requirements(Category.logic, with(Items.lead, 20, Items.metaglass, 20, Items.titanium, 15));
 
             size = 3;
@@ -1028,57 +1024,22 @@ public class UnityBlocks implements ContentList{
             drawer = new DrawLightBlock();
         }};
 
-        lightLampInfi = new unity.world.blocks.light.LightSource("light-lamp-infi"){{
+        lightLampInfi = new LightSource("light-lamp-infi"){{
             requirements(Category.logic, BuildVisibility.sandboxOnly, with());
 
             lightProduction = 600000f;
             drawer = new DrawLightBlock();
         }};
 
-        lightReflector = new unity.world.blocks.light.LightReflector("light-reflector"){{
+        lightReflector = new LightReflector("light-reflector"){{
             requirements(Category.logic, with(Items.metaglass, 10, Items.silicon, 5));
         }};
 
-        lightFilter = new LightFilter("light-filter"){{
-            health = 60;
-            requirements(Category.logic, with(Items.graphite, 10, Items.metaglass, 10));
-        }};
-
-        lightInvertedFilter = new LightFilter("light-inverted-filter", true){{
-            health = 60;
-            requirements(Category.logic, with(Items.graphite, 10, Items.metaglass, 10));
-        }};
-
-        lightDivisor = new LightDivisor("light-divisor"){{
-            health = 80;
+        lightDivisor = new LightReflector("light-divisor"){{
             requirements(Category.logic, with(Items.metaglass, 10, Items.titanium, 2));
-        }};
 
-        lightDivisor1 = new LightDivisor("light-divisor-1"){{
-            diagonal = false;
             health = 80;
-            requirements(Category.logic, with(Items.metaglass, 10, Items.titanium, 2));
-        }};
-
-        lightRouter = new LightDiffractor("light-item-filter"){{
-            health = 60;
-            requirements(Category.logic, with(Items.graphite, 5, Items.metaglass, 20, Items.silicon, 10));
-        }};
-
-        lightPanel = new LightGenerator("light-panel"){{
-            health = 100;
-            lightStrength = 80f;
-            scaleStatus = true;
-            powerProduction = 1f;
-            requirements(Category.logic, with(Items.copper, 15, Items.graphite, 10, Items.silicon, 15));
-        }};
-
-        lightInfluencer = new LightInfluencer("light-influencer"){{
-            health = 60;
-            lightStrength = 1f;
-            scaleStatus = true;
-            powerProduction = 1f;
-            requirements(Category.logic, with(Items.lead, 15, Items.metaglass, 10, Items.silicon, 5));
+            fallthrough = 0.5f;
         }};
 
         metaglassWall = new LightWall("metaglass-wall"){{

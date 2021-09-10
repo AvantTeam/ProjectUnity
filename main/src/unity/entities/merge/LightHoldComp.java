@@ -38,7 +38,10 @@ abstract class LightHoldComp extends Block implements Stemc{
             return acceptsLight;
         }
 
-        /** Called synchronously when a light ray touches this building */
+        /**
+         * Called synchronously when a light ray touches this building. Used typically for querying a new
+         * child for this light ray
+         */
         public void interact(Light light){}
 
         public float lightStatus(){
@@ -52,8 +55,13 @@ abstract class LightHoldComp extends Block implements Stemc{
         @Override
         @Replace
         public float efficiency(){
-            float eff = super.efficiency();
-            return eff * (requiresLight ? Math.min(lightf(), 1f) : 1f);
+            return super.efficiency() * (requiresLight ? Math.min(lightf(), 1f) : 1f);
+        }
+
+        @Override
+        @Replace
+        public boolean consValid(){
+            return super.consValid() && (!requiresLight || lightStatus() >= requiredLight);
         }
     }
 }

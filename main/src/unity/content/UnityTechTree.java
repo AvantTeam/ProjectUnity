@@ -38,17 +38,8 @@ public class UnityTechTree implements ContentList{
 
         attach(Blocks.powerNode, () -> {
             node(lightLamp, () -> {
-                node(lightFilter, () -> {
-                    node(lightInvertedFilter);
-                });
-
-                node(lightPanel);
                 node(lightReflector, () -> {
-                    node(lightDivisor, () -> {
-                        node(lightDivisor1, () -> {
-                            node(lightInfluencer);
-                        });
-                    });
+                    node(lightDivisor);
                 });
 
                 node(oilLamp);

@@ -27,7 +27,6 @@ abstract class LightComp implements Drawc, QuadTreeObject{
     static final float yield = 50f * tilesize;
     static final float width = 1.5f;
     static final float rotationInc = 22.5f;
-    static boolean proper = false;
 
     @Import float x, y;
     @ReadOnly transient volatile float endX, endY;
@@ -63,7 +62,7 @@ abstract class LightComp implements Drawc, QuadTreeObject{
         strength = queueStrength + recStrength();
         rotation = queueRotation;
         source = queueSource;
-        color = queueColor;
+        color = combinedCol(queueColor);
 
         x = SVec2.x(queuePosition);
         y = SVec2.y(queuePosition);
@@ -71,6 +70,9 @@ abstract class LightComp implements Drawc, QuadTreeObject{
 
     /** Called asynchronously */
     public void cast(){
+        // Clear out all invalid parents and children
+        clearInvalid();
+
         // If this doesn't come from a light source and it has no parents, remove
         if((source == null || !source.isValid()) && parentsAny(parents -> parents.size <= 0)){
             queueRemove();
@@ -218,6 +220,33 @@ abstract class LightComp implements Drawc, QuadTreeObject{
         valid = true;
     }
 
+    public void clearInvalid(){
+        parents(parents -> {
+            var it = parents.iterator();
+            while(it.hasNext){
+                var l = it.next().key;
+                if(l != null && !l.valid()){
+                    it.remove();
+                }
+            }
+        });
+
+        children(children -> {
+            synchronized(tmpMap){
+                tmpMap.clear();
+
+                for(var e : children){
+                    var l = e.value;
+                    if(l != null && !l.valid()){
+                        tmpMap.put(e.key, l);
+                    }
+                }
+
+                children.putAll(tmpMap);
+            }
+        });
+    }
+
     public float recStrength(){
         float str = 0f;
         synchronized(parents){
@@ -229,20 +258,20 @@ abstract class LightComp implements Drawc, QuadTreeObject{
         return str;
     }
 
-    public int recColor(){
+    public int combinedCol(int baseCol){
         synchronized(tmpCol){
-            tmpCol.set(color).a(1f);
-
-            parents(parents -> {
-                for(var p : parents.keys()){
-                    tmpCol.r += SColor.r(p.color());
-                    tmpCol.g += SColor.g(p.color());
-                    tmpCol.b += SColor.b(p.color());
-                }
-            });
+            tmpCol.set(baseCol).a(1f);
 
             int size;
-            synchronized(parents){ size = parents.size; }
+            synchronized(parents){
+                size = parents.size;
+                for(var p : parents.keys()){
+                    int col = p.color();
+                    tmpCol.r += SColor.r(col);
+                    tmpCol.g += SColor.g(col);
+                    tmpCol.b += SColor.b(col);
+                }
+            }
 
             tmpCol.r /= size;
             tmpCol.g /= size;
@@ -363,17 +392,18 @@ abstract class LightComp implements Drawc, QuadTreeObject{
         Draw.blend(Blending.additive);
 
         // Since vertex color interpolation is always linear, first draw an opaque line assuming the end of it
-        // is where strength == 1, hen do the gradually fading line later
+        // is where strength == 1, then do the gradually fading line later
         float
             stroke = width / 4f,
             rot = realRotation(),
             op = strength - 1f,
+            dst2 = dst2(endX, endY),
 
-            startc = Tmp.c1.set(Color.white).a(strength).toFloatBits(),
-            endc = Tmp.c1.set(Color.white).a(endStrength()).toFloatBits();
+            startc = Tmp.c1.set(color).a(Mathf.clamp(strength)).toFloatBits(),
+            endc = Tmp.c1.set(color).a(Mathf.clamp(endStrength())).toFloatBits();
 
         if(op > 0f){
-            Tmp.v1.trns(rot, op * yield).limit2(dst2(endX, endY)).add(this);
+            Tmp.v1.trns(rot, op * yield).limit2(dst2).add(this);
             float
                 x2 = Tmp.v1.x,
                 y2 = Tmp.v1.y;
@@ -402,12 +432,11 @@ abstract class LightComp implements Drawc, QuadTreeObject{
             );
         }
 
-        Tmp.v1.trns(rot, Math.max(op, 0f) * yield).add(this);
-        Tmp.v2.trns(rot, strength * yield).add(this);
-
-        float x2 = Tmp.v1.x, y2 = Tmp.v1.y;
-
+        Tmp.v1.trns(rot, Math.max(op, 0f) * yield).limit2(dst2).add(this);
         float
+            x2 = Tmp.v1.x,
+            y2 = Tmp.v1.y,
+
             len = Mathf.len(endX - x2, endY - y2),
             diffx = (endX - x2) / len * stroke,
             diffy = (endY - y2) / len * stroke * 2f;

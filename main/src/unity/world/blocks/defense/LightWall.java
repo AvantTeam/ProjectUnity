@@ -1,17 +1,22 @@
 package unity.world.blocks.defense;
 
 import mindustry.world.blocks.defense.*;
-import unity.world.blocks.*;
+import unity.annotations.Annotations.*;
+import unity.gen.*;
 
-/** @deprecated Just don't use it. */
-public class LightWall extends Wall{
+@Merge(base = Wall.class, value = LightHoldc.class)
+public class LightWall extends LightHoldWall{
+    public float suppression = 0.8f;
+
     public LightWall(String name){
         super(name);
-        update = true;
-        absorbLasers = true;
+        acceptsLight = true;
     }
 
-    public class LightWallBuild extends WallBuild implements LightRepeaterBuildBase{
-
+    public class LightWallBuild extends LightHoldWallBuild{
+        @Override
+        public void interact(Light light){
+            light.child(l -> Float2.construct(l.realRotation(), suppression));
+        }
     }
 }
