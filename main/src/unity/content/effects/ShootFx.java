@@ -97,11 +97,10 @@ public class ShootFx{
 
         for(int i = 0; i < 2; i++){
             Drawf.tri(e.x, e.y, 10f * e.fout(), 50f, e.rotation + (45f + (e.fin(Interp.pow3Out) * 30f)) * Mathf.signs[i]);
-        };
+        }
 
-        randLenVectors(e.id, 15, e.fin(Interp.pow2Out) * 80f, e.rotation, 20f, (x, y) -> {
-            Fill.square(e.x + x, e.y + y, 3f * e.fout());
-        });
+        randLenVectors(e.id, 15, e.fin(Interp.pow2Out) * 80f, e.rotation, 20f, (x, y) ->
+        Fill.square(e.x + x, e.y + y, 3f * e.fout()));
 
         Fill.square(e.x, e.y, 5f * e.fout(Interp.pow3Out), e.rotation + 45f);
         color();
@@ -141,5 +140,13 @@ public class ShootFx{
 
         color(Color.white);
         Fill.circle(e.x, e.y, e.fout() * 9f);
+    }),
+
+    voidShoot = new Effect(20f, e -> {
+        color(Color.black);
+        randLenVectors(e.id, 14, e.finpow() * 20f, (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, e.fout() * 5f);
+            Fill.circle(e.x + x / 2f, e.y + y / 2f, e.fout() * 3f);
+        });
     });
 }

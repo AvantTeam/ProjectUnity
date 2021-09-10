@@ -4,10 +4,12 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.Effect.*;
+import mindustry.graphics.*;
 import unity.entities.effects.*;
 
 public class SpecialFx{
@@ -63,5 +65,37 @@ public class SpecialFx{
         float x = Tmp.v1.x, y = Tmp.v1.y, s = e.fslope() * 4f;
         Draw.color(e.color);
         Fill.square(x, y, s, 45f);
-    });
+    }),
+
+    voidFractureEffect = new Effect(30f, 700f, e -> {
+        if(!(e.data instanceof VoidFractureData)) return;
+        VoidFractureData data = (VoidFractureData)e.data;
+        float rot = Angles.angle(data.x, data.y, data.x2, data.y2);
+
+        Draw.color(Color.black);
+        for(int i = 0; i < 3; i++){
+            float f = Mathf.lerp(12f, 3f, i / 2f);
+            float a = Mathf.lerp(0.25f, 1f, (i / 2f) * (i / 2f));
+
+            Draw.alpha(a);
+            Lines.stroke(f * e.fout());
+            Lines.line(data.x, data.y, data.x2, data.y2, false);
+            Drawf.tri(data.x2, data.y2, f * 1.22f * e.fout(), f * 2f, rot);
+            Drawf.tri(data.x, data.y, f * 1.22f * e.fout(), f * 2f, rot + 180f);
+        }
+
+        FloatSeq s = data.spikes;
+        if(!s.isEmpty()){
+            for(int i = 0; i < data.spikes.size; i += 4){
+                float x1 = s.get(i), y1 = s.get(i + 1), x2 = s.get(i + 2), y2 = s.get(i + 3);
+                Drawf.tri(x1, y1, 4f * e.fout(), Mathf.dst(x1, y1, x2, y2) * 2f * Mathf.curve(e.fin(), 0f, 0.2f), Angles.angle(x1, y1, x2, y2));
+                Fill.circle(x1, y1, (4f / 1.22f) * e.fout());
+            }
+        }
+    }).layer(Layer.effect + 0.03f);
+
+    public static class VoidFractureData{
+        public float x, y, x2, y2;
+        public FloatSeq spikes = new FloatSeq();
+    }
 }

@@ -1,5 +1,6 @@
 package unity.content;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -38,6 +39,7 @@ import unity.type.decal.*;
 import unity.type.weapons.*;
 
 import static mindustry.Vars.*;
+import static unity.content.UnityWeaponTemplates.*;
 
 public class UnityUnitTypes implements ContentList{
     // global unit + copter
@@ -4112,26 +4114,19 @@ public class UnityUnitTypes implements ContentList{
             outlineColor = UnityPal.darkerOutline;
 
             antiCheatType = new AntiCheatVariables(health / 20f, health / 1.25f, health / 15f, health / 25f, 0.2f, 6f * 60f, 3f * 60f, 15f, 4);
+
             weapons.add(new Weapon("unity-end-small-mount"){{
-                x = 5.75f;
-                y = -0.5f;
+                x = 8.5f;
+                y = -4.5f;
                 mirror = true;
                 rotate = true;
                 reload = 30f;
-                shots = 2;
-                spacing = 15f;
+                inaccuracy = 15f;
+                shootSound = UnitySounds.spaceFracture;
 
-                bullet = UnityBullets.endTentacleSmall;
-            }}, new Weapon("unity-end-small-mount"){{
-                x = 10.75f;
-                y = -5f;
-                mirror = true;
-                rotate = true;
-                reload = 30f;
-                shots = 2;
-                spacing = 20f;
-
-                bullet = UnityBullets.endTentacleSmall;
+                bullet = new VoidFractureBulletType(32f, 600f){{
+                    shootEffect = ShootFx.voidShoot;
+                }};
             }});
         }};
 
@@ -4673,13 +4668,99 @@ public class UnityUnitTypes implements ContentList{
 
             antiCheatType = new AntiCheatVariables(8000f, 16000f, health / 520f, health / 120f, 0.6f, 7f * 60f, 8f * 60f, 35f, 4);
 
-            decorations.add(new FlagellaDecorationType(name + "-tail", 3, 10, 119.6f){{
+            decorations.add(new FlagellaDecorationType(name + "-tail", 4, 15, 45.75f){{
                 x = 0f;
                 y = -172f;
                 swayScl = hitSize / speed;
-                swayOffset = 87f;
+                swayOffset = 67f;
             }});
+
+            Weapon w = new EnergyChargeWeapon("unity-void-fracture-turret"){{
+                mirror = false;
+                alternate = true;
+                shadow = 47f;
+                shots = 3;
+                shotDelay = 6f;
+                reload = 90f;
+                inaccuracy = 20f;
+                shootCone = 7f;
+                shootY = 0f;
+                rotate = true;
+                rotateSpeed = 2f;
+                shootSound = UnitySounds.spaceFracture;
+
+                drawCharge = (unit, mount, charge) -> {
+                    Weapon w = mount.weapon;
+                    float rotation = unit.rotation - 90f,
+                    wx = unit.x + Angles.trnsx(rotation, w.x, w.y),
+                    wy = unit.y + Angles.trnsy(rotation, w.x, w.y);
+
+                    Draw.color(Color.black);
+                    UnityDrawf.shiningCircle(unit.id * 321 + Math.max(0, w.otherSide * 41), Time.time, wx, wy, 3.5f * charge, 6, 60f, 17f, 3f * charge, 70f);
+                };
+
+                bullet = new VoidFractureBulletType(40f, 800f){{
+                    speed = 5f;
+                    delay = 50f;
+                    lifetime = 60f;
+                    drag = 0.09f;
+                    nextLifetime = 13f;
+                    length = 38f;
+                    spikesDamage = 310f;
+                    maxTargets = 20;
+                    shootEffect = ShootFx.voidShoot;
+                }};
+            }};
+
+            weapons.addAll(
+            clnW(w, y -> {
+                y.x = 79.5f;
+                y.y = -34f;
+                y.otherSide = 1;
+            }),
+            clnW(w, y -> {
+                y.x = 90.5f;
+                y.y = -71.5f;
+                y.otherSide = 2;
+            }),
+            clnW(w, y -> {
+                y.x = 91.25f;
+                y.y = -104f;
+                y.otherSide = 0;
+            }),
+
+            clnW(w, y -> {
+                y.x = -79.5f;
+                y.y = -34f;
+                y.otherSide = 4;
+            }),
+            clnW(w, y -> {
+                y.x = -90.5f;
+                y.y = -71.5f;
+                y.otherSide = 5;
+            }),
+            clnW(w, y -> {
+                y.x = -91.25f;
+                y.y = -104f;
+                y.otherSide = 3;
+            })
+            );
         }
+
+            @Override
+            public void load(){
+                super.load();
+                softShadowRegion = Core.atlas.find(name + "-soft-shadow");
+            }
+
+            @Override
+            public void drawSoftShadow(Unit unit){
+                Draw.color(0, 0, 0, 1f);
+                float rad = 1.6f;
+                float size = Math.max(region.width, region.height) * Draw.scl;
+                Draw.rect(softShadowRegion, unit, size * rad * Draw.xscl, size * rad * Draw.yscl, unit.rotation - 90f);
+                Draw.color();
+            }
 
             @Override
             public void init(){
