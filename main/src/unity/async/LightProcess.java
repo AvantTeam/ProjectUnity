@@ -87,20 +87,22 @@ public class LightProcess implements AsyncProcess{
             queue.post(() -> {
                 light.clearChildren();
 
-                if(light.pointed != null){
-                    light.pointed.sources().remove(light);
+                var pointed = light.pointed;
+                if(pointed != null){
+                    pointed.sources().remove(light);
                     light.pointed = null;
                 }
             });
         }else{
             queue.post(() -> {
-                if(light.pointed == hold) return;
+                var pointed = light.pointed;
+                if(pointed == hold && !hold.needsReinteract()) return;
 
                 light.clearChildren();
 
-                if(light.pointed != null) light.pointed.sources().remove(light);
+                if(pointed != null) pointed.sources().remove(light);
                 light.pointed = hold;
-                light.pointed.sources().add(light);
+                hold.sources().add(light);
 
                 hold.interact(light);
             });

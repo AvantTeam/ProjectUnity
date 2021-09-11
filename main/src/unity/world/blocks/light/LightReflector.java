@@ -51,14 +51,21 @@ public class LightReflector extends LightHoldBlock{
         public float lightRot = 90f;
 
         @Override
+        public Float config(){
+            return lightRot;
+        }
+
+        @Override
         public void interact(Light light){
+            super.interact(light);
+
             light.child(l -> {
                 synchronized(LightReflector.class){
                     v1.trnsExact(lightRot, 1f);
-                    return Float2.construct(v2
+                    return Float2.construct(Light.fixRot(v2
                         .trnsExact(l.rotation(), 1f)
                         .sub(v1.scl(2 * v2.dot(v1)))
-                        .angle(), 1f - fallthrough
+                        .angle()), 1f - fallthrough
                     );
                 }
             });

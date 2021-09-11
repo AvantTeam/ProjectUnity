@@ -7,7 +7,7 @@ import unity.annotations.Annotations.*;
 import unity.gen.*;
 
 /**
- * A component that defines a type of block that holds "light lasers". These lasers acts like some type of consumer,
+ * A component that defines a type of block that holds light lasers. These lasers acts like some type of consumer;
  * affects {@link Building#efficiency()} and {@link Building#consValid()}.
  * @author GlennFolker
  */
@@ -34,6 +34,9 @@ abstract class LightHoldComp extends Block implements Stemc{
         /** Don't modify directly, it's just here to store references to lights pointing this building */
         transient Seq<Light> sources = new Seq<>();
 
+        /** If true, lights pointing to this block will re-trigger {@link #interact(Light)} */
+        @ReadOnly boolean needsReinteract;
+
         public boolean acceptLight(Light light){
             return acceptsLight;
         }
@@ -42,7 +45,9 @@ abstract class LightHoldComp extends Block implements Stemc{
          * Called synchronously when a light ray touches this building. Used typically for querying a new
          * child for this light ray
          */
-        public void interact(Light light){}
+        public void interact(Light light){
+            needsReinteract = false;
+        }
 
         public float lightStatus(){
             return sources.sumf(Light::endStrength);

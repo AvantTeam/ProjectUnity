@@ -23,9 +23,18 @@ final class StructDefs{
     })
     Vec2 vec2Struct = new Vec2();
 
+    // Float2 - Stores 2 floats in a long integer
     @Struct
     class Float2Struct{
         float x;
         float y;
+    }
+
+    // Bool3 - Stores 3 booleans in a byte
+    @Struct
+    class Bool3Struct{
+        boolean x;
+        boolean y;
+        boolean z;
     }
 }

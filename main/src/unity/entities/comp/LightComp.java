@@ -45,6 +45,7 @@ abstract class LightComp implements Drawc, QuadTreeObject{
     @ReadOnly transient volatile int color = Color.whiteRgba;
     transient volatile int queueColor = SColor.a(Color.whiteRgba, 0f);
 
+    @ReadOnly transient volatile boolean casted = false;
     @ReadOnly transient volatile boolean valid = false;
 
     transient volatile LightHoldBuildc pointed;
@@ -81,7 +82,7 @@ abstract class LightComp implements Drawc, QuadTreeObject{
     public void snap(){
         // Values that are needed to stay as is in async process are snapped here
         strength = queueStrength + recStrength();
-        rotation = queueRotation;
+        rotation = fixRot(queueRotation);
         source = queueSource;
         color = combinedCol(queueColor);
 
@@ -91,6 +92,8 @@ abstract class LightComp implements Drawc, QuadTreeObject{
 
     /** Called asynchronously */
     public void cast(){
+        clearInvalid();
+
         // If this doesn't come from a light source and it has no parents, remove
         if((source == null || !source.isValid()) && parentsAny(parents -> parents.size <= 0)){
             queueRemove();
@@ -237,15 +240,16 @@ abstract class LightComp implements Drawc, QuadTreeObject{
             }
         });
 
+        casted = true;
         valid = true;
     }
 
-    /*public void clearInvalid(){
+    public void clearInvalid(){
         parents(parents -> {
             var it = parentEntries();
             while(it.hasNext){
                 var l = it.next().key;
-                if(l != null && !l.valid()){
+                if(l != null && l.casted() && !l.valid()){
                     it.remove();
                 }
             }
@@ -258,7 +262,7 @@ abstract class LightComp implements Drawc, QuadTreeObject{
 
             for(var e : childEntries()){
                 var l = e.value;
-                if(l != null && !l.valid()){
+                if(l != null && l.casted() && !l.valid()){
                     synchronized(tmpMap){
                         tmpMap.put(e.key, null);
                     }
@@ -271,7 +275,7 @@ abstract class LightComp implements Drawc, QuadTreeObject{
                 }
             }
         });
-    }*/
+    }
 
     public float recStrength(){
         float str = 0f;
@@ -514,5 +518,9 @@ abstract class LightComp implements Drawc, QuadTreeObject{
 
         Draw.blend();
         Draw.z(z);
+    }
+
+    public static float fixRot(float rotation){
+        return Mathf.mod(Mathf.round(rotation / rotationInc) * rotationInc, 360f);
     }
 }
