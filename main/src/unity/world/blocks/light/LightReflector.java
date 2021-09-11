@@ -3,8 +3,8 @@ package unity.world.blocks.light;
 import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.scene.ui.layout.*;
-import arc.util.*;
 import arc.util.io.*;
 import mindustry.gen.*;
 import unity.annotations.Annotations.*;
@@ -13,6 +13,8 @@ import unity.gen.*;
 /** @author GlennFolker */
 @Merge(LightHoldc.class)
 public class LightReflector extends LightHoldBlock{
+    private static final Vec2 v1 = new Vec2(), v2 = new Vec2();
+
     /** Strength scale of lights that can fall through the mirror. >=0 disables light division */
     public float fallthrough = 0f;
 
@@ -51,16 +53,18 @@ public class LightReflector extends LightHoldBlock{
         @Override
         public void interact(Light light){
             light.child(l -> {
-                Tmp.v1.trnsExact(lightRot, 1f);
-                return Float2.construct(Tmp.v2
-                    .trnsExact(l.realRotation(), 1f)
-                    .sub(Tmp.v1.scl(2 * Tmp.v2.dot(Tmp.v1)))
-                    .angle(), 1f - fallthrough
-                );
+                synchronized(LightReflector.class){
+                    v1.trnsExact(lightRot, 1f);
+                    return Float2.construct(v2
+                        .trnsExact(l.rotation(), 1f)
+                        .sub(v1.scl(2 * v2.dot(v1)))
+                        .angle(), 1f - fallthrough
+                    );
+                }
             });
 
             if(!Mathf.zero(fallthrough)){
-                light.child(l -> Float2.construct(l.realRotation(), fallthrough));
+                light.child(l -> Float2.construct(l.rotation(), fallthrough));
             }
         }
 

@@ -16,7 +16,7 @@ public class LightWall extends LightHoldWall{
     public class LightWallBuild extends LightHoldWallBuild{
         @Override
         public void interact(Light light){
-            light.child(l -> Float2.construct(l.realRotation(), suppression));
+            light.child(l -> Float2.construct(l.rotation(), suppression));
         }
     }
 }
