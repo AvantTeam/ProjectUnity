@@ -15,6 +15,7 @@ import mindustry.graphics.*;
 import unity.annotations.Annotations.*;
 import unity.gen.*;
 import unity.gen.LightHoldc.*;
+import unity.util.*;
 import unity.util.func.*;
 
 import static mindustry.Vars.*;
@@ -60,19 +61,11 @@ abstract class LightComp implements Drawc, QuadTreeObject{
     };
 
     /** Maps child data with the actual entity. Value might be null if the child is a merged light */
-    private transient final ObjectMap<Longf<Light>, Light> children = new ObjectMap<>(2);
-    private transient final ThreadLocal<Entries<Longf<Light>, Light>> childEntries = new ThreadLocal<>(){
+    private transient final ObjectMap<Longf<Light>, AtomicPair<Light, Light>> children = new ObjectMap<>(2);
+    private transient final ThreadLocal<Entries<Longf<Light>, AtomicPair<Light, Light>>> childEntries = new ThreadLocal<>(){
         @Override
-        protected Entries<Longf<Light>, Light> initialValue(){
+        protected Entries<Longf<Light>, AtomicPair<Light, Light>> initialValue(){
             return new Entries<>(children);
-        }
-    };
-
-    private static final ObjectMap<Longf<Light>, Light> tmpMap = new ObjectMap<>(2);
-    private static final ThreadLocal<Entries<Longf<Light>, Light>> tmpEntries = new ThreadLocal<>(){
-        @Override
-        protected Entries<Longf<Light>, Light> initialValue(){
-            return new Entries<>(tmpMap);
         }
     };
 
@@ -116,8 +109,7 @@ abstract class LightComp implements Drawc, QuadTreeObject{
 
             var build = tile.build;
             if(build instanceof LightHoldBuildc hold){
-                // Only handle light holders if the holder isn't the source and there are no parents
-                // pointing at it
+                // Only handle light holders if the holder isn't the source and there are no parents pointing at it
                 if(hold == source || parentsAny(p -> {
                     for(var l : p.keys()){
                         if(hold == l.pointed) return true;
@@ -161,17 +153,16 @@ abstract class LightComp implements Drawc, QuadTreeObject{
         var tile = world.tileWorld(endX, endY);
         if(tile != null){
             children(children -> {
-                // Since querying and iterating at the same time is a horrible idea, use a temporary map
-                synchronized(tmpMap){
-                    tmpMap.clear();
-                }
-
                 // Iterate through planned children:
                 // - Check for existing lights in the end position. If there are any light with the preferred amount
-                //   of rotation, remove own child and switch to said other light
-                // - Otherwise pool a new light as child
+                //   of rotation, remove own direct child and set said light's parent as this, but don't refer said
+                //   light as this light's children directly
+                // - Otherwise pool a new light as child and directly link it
                 for(var e : childEntries()){
                     var key = e.key;
+
+                    // The pair's key is direct child, value is indirect child
+                    var pair = e.value;
                     long res = key.get(self());
 
                     // The rotation and strength data of the children are packed in a Float2 struct
@@ -179,45 +170,39 @@ abstract class LightComp implements Drawc, QuadTreeObject{
                     float str = Float2.y(res);
 
                     lights.quad(quad -> quad.intersect(tile.worldx() - tilesize / 2f, tile.worldy() - tilesize / 2f, tilesize, tilesize, l -> {
-                        // Only accept existing light if it isn't directly this child and has the preferred amount
-                        // of rotation
-                        var val = e.value;
-                        if(l.valid() && val != l && !l.isParent(self()) && Angles.near(rot, l.rotation(), 1f)){
+                        // Only accept existing light if:
+                        // - It isn't already this child, for obvious reasons
+                        // - It isn't this light's parent
+                        // - Has the preferred amount of rotation
+                        if(l.valid() && pair.key != l && pair.value != l && !isParent(l) && Angles.near(rot, l.rotation(), 1f)){
                             // If already contains a preferred child, move on to the other one
-                            if(val != null){
-                                val.queueRemove();
+                            if(pair.key != null){
+                                pair.key.queueRemove();
+                                pair.key = null;
                             }
 
-                            l.parent(self(), str);
-                            synchronized(tmpMap){
-                                e.value = l; // Replace the entry value temporarily
-                                tmpMap.put(key, l);
-                            }
+                            if(pair.value != null) pair.value.detachParent(self());
+                            pair.value = l;
+                            pair.value.parent(self(), str);
                         }
                     }));
 
-                    var val = e.value;
-                    if(val == null || !Angles.near(rot, val.rotation(), 1f)){
-                        // This means the previously linked child light is no longer valid; detach
-                        if(val != null) val.detach(self());
+                    // If it was using an indirect child yet it does not meed the criteria anymore, pool a new direct
+                    // child light
+                    if(pair.key == null && (pair.value == null || !Angles.near(rot, pair.value.rotation(), 1f))){
+                        // Dispose indirect child
+                        if(pair.value != null){
+                            pair.value.detachParent(self());
+                            pair.value = null;
+                        }
 
-                        // Create a new light child
+                        Log.info("Creating new light for @: direct: @, indirect: @, indirectRot: @", this, pair.key, pair.value, pair.value == null ? 0f : pair.value.rotation());
                         var l = Light.create();
                         l.set(endX, endY);
                         l.parent(self(), str);
-
-                        synchronized(tmpMap){
-                            tmpMap.put(key, l);
-                        }
-
                         l.queueAdd();
-                    }
-                }
 
-                // Merge the used temporary map with the actual map
-                synchronized(tmpMap){
-                    for(var e : tmpEntries()){
-                        children.put(e.key, e.value);
+                        pair.key = l;
                     }
                 }
             });
@@ -226,7 +211,7 @@ abstract class LightComp implements Drawc, QuadTreeObject{
         children(children -> {
             // Assign position, rotation, and strength values
             for(var e : childEntries()){
-                var l = e.value;
+                var l = e.value.key;
                 if(l != null){
                     l.queuePosition = SVec2.construct(endX, endY);
 
@@ -242,39 +227,6 @@ abstract class LightComp implements Drawc, QuadTreeObject{
 
         casted = true;
         valid = true;
-    }
-
-    public void clearInvalid(){
-        parents(parents -> {
-            var it = parentEntries();
-            while(it.hasNext){
-                var l = it.next().key;
-                if(l != null && l.casted() && !l.valid()){
-                    it.remove();
-                }
-            }
-        });
-
-        children(children -> {
-            synchronized(tmpMap){
-                tmpMap.clear();
-            }
-
-            for(var e : childEntries()){
-                var l = e.value;
-                if(l != null && l.casted() && !l.valid()){
-                    synchronized(tmpMap){
-                        tmpMap.put(e.key, null);
-                    }
-                }
-            }
-
-            synchronized(tmpMap){
-                for(var e : tmpEntries()){
-                    children.put(e.key, e.value);
-                }
-            }
-        });
     }
 
     public float recStrength(){
@@ -354,13 +306,13 @@ abstract class LightComp implements Drawc, QuadTreeObject{
         out.set(x, y, 0f, 0f);
     }
 
-    public void children(Cons<ObjectMap<Longf<Light>, Light>> cons){
+    public void children(Cons<ObjectMap<Longf<Light>, AtomicPair<Light, Light>>> cons){
         synchronized(children){
             cons.get(children);
         }
     }
 
-    public Entries<Longf<Light>, Light> childEntries(){
+    public Entries<Longf<Light>, AtomicPair<Light, Light>> childEntries(){
         var e = childEntries.get();
         e.reset();
 
@@ -380,13 +332,6 @@ abstract class LightComp implements Drawc, QuadTreeObject{
         return e;
     }
 
-    private static Entries<Longf<Light>, Light> tmpEntries(){
-        var e = tmpEntries.get();
-        e.reset();
-
-        return e;
-    }
-
     public boolean parentsAny(Boolf<ObjectFloatMap<Light>> cons){
         synchronized(parents){
             return cons.get(parents);
@@ -396,10 +341,18 @@ abstract class LightComp implements Drawc, QuadTreeObject{
     public void clearChildren(){
         children(children -> {
             for(var e : childEntries()){
-                var l = e.value;
-                if(l != null){
-                    if(l.isParent(self())) l.queueRemove();
-                    l.detach(self());
+                var pair = e.value;
+                var direct = pair.key;
+                var indirect = pair.value;
+
+                if(direct != null){
+                    direct.queueRemove();
+                    pair.key = null;
+                }
+                
+                if(indirect != null){
+                    indirect.detachParent(self());
+                    pair.value = null;
                 }
             }
 
@@ -410,13 +363,33 @@ abstract class LightComp implements Drawc, QuadTreeObject{
     public void clearParents(){
         parents(parents -> {
             for(var l : parentEntries()){
-                l.key.children(children -> {
-                    var key = children.findKey(this, true);
-                    if(key != null) children.put(key, null);
-                });
+                l.key.detachChild(self());
             }
 
             parents.clear();
+        });
+    }
+
+    public void clearInvalid(){
+        parents(parents -> {
+            var it = parentEntries();
+            while(it.hasNext){
+                var l = it.next().key;
+                if(l != null && l.casted() && !l.valid()){
+                    it.remove();
+                }
+            }
+        });
+
+        children(children -> {
+            for(var e : childEntries()){
+                var pair = e.value;
+                var direct = pair.key;
+                var indirect = pair.value;
+
+                if(direct != null && direct.casted() && !direct.valid()) pair.key = null;
+                if(indirect != null && indirect.casted() && !indirect.valid()) pair.value = null;
+            }
         });
     }
 
@@ -429,10 +402,20 @@ abstract class LightComp implements Drawc, QuadTreeObject{
     }
 
     public void child(Longf<Light> child){
-        children(children -> children.put(child, null));
+        children(children -> children.get(child, AtomicPair::new).reset());
     }
 
-    public void detach(Light light){
+    public void detachChild(Light light){
+        children(children -> {
+            for(var e : childEntries()){
+                var pair = e.value;
+                if(pair.key == light) pair.key = null;
+                if(pair.value == light) pair.value = null;
+            }
+        });
+    }
+
+    public void detachParent(Light light){
         parents(parents -> parents.remove(light, 0f));
     }
 

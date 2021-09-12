@@ -20,7 +20,8 @@ public class LightProcess implements AsyncProcess{
 
     protected volatile boolean
         processing = false,
-        end = false;
+        end = false,
+        ready = false;
 
     @Override
     public void begin(){
@@ -50,12 +51,16 @@ public class LightProcess implements AsyncProcess{
         quad.leaf = true;
 
         quad.bounds.set(-finalWorldBounds, -finalWorldBounds, world.unitWidth() + finalWorldBounds * 2, world.unitHeight() + finalWorldBounds * 2);
+
+        ready = true;
     }
 
     @Override
     public void reset(){
         queue.clear();
         quad.clear();
+
+        ready = false;
     }
 
     @Override
@@ -110,10 +115,18 @@ public class LightProcess implements AsyncProcess{
     }
 
     public void queueAdd(Light light){
-        queue.post(light::add);
+        if(ready){
+            queue.post(light::add);
+        }else{
+            light.add();
+        }
     }
 
     public void queueRemove(Light light){
-        queue.post(light::remove);
+        if(ready){
+            queue.post(light::remove);
+        }else{
+            light.remove();
+        }
     }
 }
