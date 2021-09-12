@@ -366,6 +366,7 @@ public class UnityBlocks implements ContentList{
                 inaccuracy = 3f;
                 spread = 12f;
                 shots = 2;
+                shootSound = Sounds.shootBig;
                 alternate = true;
                 recoilAmount = 3f;
                 rotateSpeed = 4.5f;
@@ -389,6 +390,7 @@ public class UnityBlocks implements ContentList{
             restitution = 0.08f;
             inaccuracy = 3f;
             shots = 2;
+            shootSound = Sounds.shootBig;
             alternate = true;
             recoilAmount = 5.5f;
             rotateSpeed = 3.5f;
@@ -407,6 +409,7 @@ public class UnityBlocks implements ContentList{
             restitution = 0.08f;
             inaccuracy = 3f;
             shots = 2;
+            shootSound = Sounds.shootBig;
             alternate = true;
             recoilAmount = 5.5f;
             rotateSpeed = 3.5f;
