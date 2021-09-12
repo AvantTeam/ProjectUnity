@@ -5,6 +5,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.async.*;
+import mindustry.core.*;
 import mindustry.gen.*;
 import unity.gen.*;
 import unity.gen.LightHoldc.*;
@@ -94,22 +95,23 @@ public class LightProcess implements AsyncProcess{
 
                 var pointed = light.pointed;
                 if(pointed != null){
-                    pointed.sources().remove(light);
+                    pointed.remove(light);
                     light.pointed = null;
                 }
             });
         }else{
             queue.post(() -> {
                 var pointed = light.pointed;
-                if(pointed == hold && !hold.needsReinteract()) return;
+                if(light.rotationChanged || pointed != hold || hold.needsReinteract()){
+                    light.clearChildren();
 
-                light.clearChildren();
+                    if(pointed != null) pointed.remove(light);
+                    light.pointed = hold;
+                    hold.add(light, World.toTile(light.endX()), World.toTile(light.endY()));
 
-                if(pointed != null) pointed.sources().remove(light);
-                light.pointed = hold;
-                hold.sources().add(light);
-
-                hold.interact(light);
+                    hold.interact(light);
+                    light.rotationChanged = false;
+                }
             });
         }
     }
@@ -124,7 +126,10 @@ public class LightProcess implements AsyncProcess{
 
     public void queueRemove(Light light){
         if(ready){
-            queue.post(light::remove);
+            queue.post(() -> {
+                if(light.pointed != null) light.pointed.remove(light);
+                light.remove();
+            });
         }else{
             light.remove();
         }

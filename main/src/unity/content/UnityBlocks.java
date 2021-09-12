@@ -29,6 +29,7 @@ import unity.entities.bullet.laser.*;
 import unity.gen.*;
 import unity.graphics.*;
 import unity.mod.*;
+import unity.world.*;
 import unity.world.blocks.*;
 import unity.world.blocks.defense.*;
 import unity.world.blocks.defense.turrets.*;
@@ -97,6 +98,17 @@ public class UnityBlocks implements ContentList{
 
     //defense
     metaglassWall, metaglassWallLarge;
+
+    //crafting
+    public static @FactionDef("light")
+    @Merge(base = GenericCrafter.class, value = LightHoldc.class)
+    @LoadRegs({
+        "light-forge-top1",
+        "light-forge-top2",
+        "light-forge-top3",
+        "light-forge-top4"
+    })
+    Block lightForge;
 
     //---------- imber faction ----------
     public static @FactionDef("imber") Block
@@ -986,11 +998,13 @@ public class UnityBlocks implements ContentList{
                     shootEffect = Fx.lightningShoot;
                     hitEffect = Fx.hitLancer;
                     despawnEffect = smokeEffect = Fx.none;
+
                     positive = new EphemeronPairBulletType(4f){{
                         positive = true;
                         frontColor = Pal.lancerLaser;
                         backColor = Color.white;
                     }};
+
                     negative = new EphemeronPairBulletType(4f){{
                         frontColor = Color.white;
                         backColor = Pal.lancerLaser;
@@ -1046,14 +1060,79 @@ public class UnityBlocks implements ContentList{
         }};
 
         metaglassWall = new LightWall("metaglass-wall"){{
-            health = 350;
             requirements(Category.defense, with(Items.lead, 6, Items.metaglass, 6));
+            health = 350;
         }};
 
         metaglassWallLarge = new LightWall("metaglass-wall-large"){{
+            requirements(Category.defense, with(Items.lead, 24, Items.metaglass, 24));
+
             size = 2;
             health = 1400;
-            requirements(Category.defense, with(Items.lead, 24, Items.metaglass, 24));
+        }};
+
+        lightForge = new LightHoldGenericCrafter("light-forge"){{
+            requirements(Category.crafting, with(Items.copper, 1));
+
+            size = 4;
+            outputItem = new ItemStack(UnityItems.lightAlloy, 3);
+
+            consumes.items(with(Items.copper, 2, Items.silicon, 5, Items.plastanium, 2, UnityItems.luminum, 2));
+            consumes.power(3.5f);
+
+            drawer = new DrawSmelter(UnityPal.lightDark){{
+                flameRadius = 7f;
+                flameRadiusIn = 3.5f;
+                flameRadiusMag = 3f;
+                flameRadiusInMag = 1.8f;
+            }};
+
+            float req = 4f;
+            acceptors.add(
+                new LightAcceptorType(0, 0, req / 4f)
+                    .update((LightHoldGenericCrafterBuild b, LightAcceptor s) -> s.data.floatValue = Mathf.lerpDelta(s.data.floatValue, Mathf.clamp(s.status()), warmupSpeed))
+                    .draw((LightHoldGenericCrafterBuild b, LightAcceptor s) -> {
+                        Draw.z(Layer.block + 0.01f);
+
+                        Draw.alpha(s.data.floatValue);
+                        Draw.blend(Blending.additive);
+                        Draw.rect(Regions.lightForgeTop1Region, b.x, b.y);
+                        Draw.blend();
+                    }),
+
+                new LightAcceptorType(size - 1, 0, req / 4f)
+                    .update((LightHoldGenericCrafterBuild b, LightAcceptor s) -> s.data.floatValue = Mathf.lerpDelta(s.data.floatValue, Mathf.clamp(s.status()), warmupSpeed))
+                    .draw((LightHoldGenericCrafterBuild b, LightAcceptor s) -> {
+                        Draw.z(Layer.block + 0.01f);
+
+                        Draw.alpha(s.data.floatValue);
+                        Draw.blend(Blending.additive);
+                        Draw.rect(Regions.lightForgeTop2Region, b.x, b.y);
+                        Draw.blend();
+                    }),
+
+                new LightAcceptorType(size - 1, size - 1, req / 4f)
+                    .update((LightHoldGenericCrafterBuild b, LightAcceptor s) -> s.data.floatValue = Mathf.lerpDelta(s.data.floatValue, Mathf.clamp(s.status()), warmupSpeed))
+                    .draw((LightHoldGenericCrafterBuild b, LightAcceptor s) -> {
+                        Draw.z(Layer.block + 0.01f);
+
+                        Draw.alpha(s.data.floatValue);
+                        Draw.blend(Blending.additive);
+                        Draw.rect(Regions.lightForgeTop3Region, b.x, b.y);
+                        Draw.blend();
+                    }),
+
+                new LightAcceptorType(0, size - 1, req / 4f)
+                    .update((LightHoldGenericCrafterBuild b, LightAcceptor s) -> s.data.floatValue = Mathf.lerpDelta(s.data.floatValue, Mathf.clamp(s.status()), warmupSpeed))
+                    .draw((LightHoldGenericCrafterBuild b, LightAcceptor s) -> {
+                        Draw.z(Layer.block + 0.01f);
+
+                        Draw.alpha(s.data.floatValue);
+                        Draw.blend(Blending.additive);
+                        Draw.rect(Regions.lightForgeTop4Region, b.x, b.y);
+                        Draw.blend();
+                    })
+            );
         }};
 
         //endregion

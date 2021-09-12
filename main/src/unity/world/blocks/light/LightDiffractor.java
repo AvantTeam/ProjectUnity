@@ -13,8 +13,6 @@ public class LightDiffractor extends LightHoldBlock{
     public LightDiffractor(String name){
         super(name);
         solid = true;
-        requiresLight = false;
-        acceptsLight = true;
         configurable = true;
     }
 

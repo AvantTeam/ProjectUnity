@@ -7,8 +7,6 @@ import mindustry.world.blocks.production.*;
 import unity.annotations.Annotations.*;
 import unity.gen.*;
 
-import static unity.Unity.*;
-
 /** @author GlennFolker */
 @Merge(base = GenericCrafter.class, value = LightHoldc.class)
 public class LightSource extends LightHoldGenericCrafter{
@@ -17,8 +15,6 @@ public class LightSource extends LightHoldGenericCrafter{
     public LightSource(String name){
         super(name);
         solid = true;
-        requiresLight = false;
-        acceptsLight = false;
         configurable = true;
         outlineIcon = true;
 
@@ -41,6 +37,8 @@ public class LightSource extends LightHoldGenericCrafter{
 
         @Override
         public void created(){
+            super.created();
+
             light = Light.create();
             light.queuePosition = SVec2.construct(x, y);
             light.queueRotation = lightRot;
@@ -51,7 +49,7 @@ public class LightSource extends LightHoldGenericCrafter{
 
         @Override
         public void onRemoved(){
-            lights.queueRemove(light);
+            light.queueRemove();
         }
 
         @Override

@@ -9,6 +9,7 @@ import arc.util.io.*;
 import mindustry.gen.*;
 import unity.annotations.Annotations.*;
 import unity.gen.*;
+import unity.world.*;
 
 /** @author GlennFolker */
 @Merge(LightHoldc.class)
@@ -23,10 +24,18 @@ public class LightReflector extends LightHoldBlock{
     public LightReflector(String name){
         super(name);
         solid = true;
-        requiresLight = false;
-        acceptsLight = true;
         configurable = true;
         outlineIcon = true;
+
+        // I'm aware that this will only be valid for 1x1 reflectors, but what kind of a psychopath that needs a
+        // larger reflectors
+        acceptors.add(new LightAcceptorType(){{
+            x = 0;
+            y = 0;
+            width = 1;
+            height = 1;
+            required = -1f;
+        }});
 
         config(Boolean.class, (LightReflectorBuild tile, Boolean value) -> tile.lightRot = Mathf.mod(tile.lightRot + (value ? Light.rotationInc : -Light.rotationInc) / 2f, 360f));
     }

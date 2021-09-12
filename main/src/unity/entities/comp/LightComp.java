@@ -50,6 +50,7 @@ abstract class LightComp implements Drawc, QuadTreeObject{
     @ReadOnly transient volatile boolean valid = false;
 
     transient volatile LightHoldBuildc pointed;
+    transient volatile boolean rotationChanged = false;
 
     /** Maps parent with strength multipliers */
     private transient final ObjectFloatMap<Light> parents = new ObjectFloatMap<>(2);
@@ -75,9 +76,12 @@ abstract class LightComp implements Drawc, QuadTreeObject{
     public void snap(){
         // Values that are needed to stay as is in async process are snapped here
         strength = queueStrength + recStrength();
-        rotation = fixRot(queueRotation);
         source = queueSource;
         color = combinedCol(queueColor);
+
+        float rot = fixRot(queueRotation);
+        if(!Mathf.equal(rotation, rot)) rotationChanged = true;
+        rotation = rot;
 
         x = SVec2.x(queuePosition);
         y = SVec2.y(queuePosition);
@@ -141,7 +145,7 @@ abstract class LightComp implements Drawc, QuadTreeObject{
                 }
 
                 // Either stop if the holder accepts this light or the tile is solid
-                if(hold.acceptLight(self())){
+                if(hold.acceptLight(self(), tx, ty)){
                     // Insert self to light holder
                     lights.queuePoint(self(), hold);
                     endX = tile.worldx();
@@ -463,7 +467,7 @@ abstract class LightComp implements Drawc, QuadTreeObject{
         // Since vertex color interpolation is always linear, first draw an opaque line assuming the end of it
         // is where strength == 1, then do the gradually fading line later
         float
-            stroke = width / 4f,
+            stroke = width / 2f,
             rot = visualRot(),
             op = strength - 1f,
             dst2 = dst2(endX, endY),
@@ -480,7 +484,7 @@ abstract class LightComp implements Drawc, QuadTreeObject{
             float
                 len = Mathf.len(x2 - x, y2 - y),
                 diffx = (x2 - x) / len * stroke,
-                diffy = (y2 - y) / len * stroke * 2f;
+                diffy = (y2 - y) / len * stroke;
 
             Fill.quad(
                 x - diffx - diffy,
@@ -502,31 +506,33 @@ abstract class LightComp implements Drawc, QuadTreeObject{
         }
 
         Tmp.v1.trns(rot, Math.max(op, 0f) * yield).limit2(dst2).add(this);
-        float
-            x2 = Tmp.v1.x,
-            y2 = Tmp.v1.y,
+        if(!Mathf.zero(Tmp.v1.len2())){
+            float
+                x2 = Tmp.v1.x,
+                y2 = Tmp.v1.y,
 
-            len = Mathf.len(endX - x2, endY - y2),
-            diffx = (endX - x2) / len * stroke,
-            diffy = (endY - y2) / len * stroke * 2f;
+                len = Mathf.len(endX - x2, endY - y2),
+                diffx = (endX - x2) / len * stroke,
+                diffy = (endY - y2) / len * stroke;
 
-        Fill.quad(
-            x2 - diffx - diffy,
-            y2 - diffy + diffx,
-            startc,
+            Fill.quad(
+                x2 - diffx - diffy,
+                y2 - diffy + diffx,
+                startc,
 
-            x2 - diffx + diffy,
-            y2 - diffy - diffx,
-            startc,
+                x2 - diffx + diffy,
+                y2 - diffy - diffx,
+                startc,
 
-            endX + diffx + diffy,
-            endY + diffy - diffx,
-            endc,
+                endX + diffx + diffy,
+                endY + diffy - diffx,
+                endc,
 
-            endX + diffx - diffy,
-            endY + diffy + diffx,
-            endc
-        );
+                endX + diffx - diffy,
+                endY + diffy + diffx,
+                endc
+            );
+        }
 
         Draw.blend();
         Draw.z(z);
