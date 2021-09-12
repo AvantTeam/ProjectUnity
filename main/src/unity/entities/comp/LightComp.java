@@ -109,13 +109,36 @@ abstract class LightComp implements Drawc, QuadTreeObject{
 
             var build = tile.build;
             if(build instanceof LightHoldBuildc hold){
-                // Only handle light holders if the holder isn't the source and there are no parents pointing at it
-                if(hold == source || parentsAny(p -> {
-                    for(var l : p.keys()){
-                        if(hold == l.pointed) return true;
+                // If this build is the source or there are parents pointing at it, continue casting
+                if(hold == source || parentsAny(parents -> {
+                    for(var e : parentEntries()){
+                        if(hold == e.key.pointed) return true;
                     }
+
                     return false;
                 })) return false;
+
+                // If this is one of the parent's source, stop casting but don't handle
+                if(parentsAny(parents -> {
+                    for(var e : parentEntries()){
+                        var l = e.key;
+                        if(l.parentsAny(p -> {
+                            for(var f : l.parentEntries()){
+                                if(hold == f.key.pointed) return true;
+                            }
+
+                            return false;
+                        })) return true;
+                    }
+
+                    return false;
+                })){
+                    lights.queuePoint(self(), null);
+                    endX = tx * tilesize;
+                    endY = ty * tilesize;
+
+                    return true;
+                }
 
                 // Either stop if the holder accepts this light or the tile is solid
                 if(hold.acceptLight(self())){
@@ -196,7 +219,6 @@ abstract class LightComp implements Drawc, QuadTreeObject{
                             pair.value = null;
                         }
 
-                        Log.info("Creating new light for @: direct: @, indirect: @, indirectRot: @", this, pair.key, pair.value, pair.value == null ? 0f : pair.value.rotation());
                         var l = Light.create();
                         l.set(endX, endY);
                         l.parent(self(), str);
@@ -289,15 +311,14 @@ abstract class LightComp implements Drawc, QuadTreeObject{
 
     @Override
     public void remove(){
-        clearParents();
-        clearChildren();
         lights.quad(quad -> quad.remove(self()));
     }
 
     public void queueRemove(){
-        if(!valid) return;
-
         valid = false;
+
+        clearParents();
+        clearChildren();
         lights.queueRemove(self());
     }
 
@@ -375,7 +396,8 @@ abstract class LightComp implements Drawc, QuadTreeObject{
             var it = parentEntries();
             while(it.hasNext){
                 var l = it.next().key;
-                if(l != null && l.casted() && !l.valid()){
+                if(l != null && ((l.casted() && !l.valid()) || !(Mathf.equal(x, l.endX()) && Mathf.equal(y, l.endY())))){
+                    l.detachChild(self());
                     it.remove();
                 }
             }
@@ -387,8 +409,15 @@ abstract class LightComp implements Drawc, QuadTreeObject{
                 var direct = pair.key;
                 var indirect = pair.value;
 
-                if(direct != null && direct.casted() && !direct.valid()) pair.key = null;
-                if(indirect != null && indirect.casted() && !indirect.valid()) pair.value = null;
+                if(direct != null && direct.casted() && !direct.valid()){
+                    direct.detachParent(self());
+                    pair.key = null;
+                }
+
+                if(indirect != null && indirect.casted() && !indirect.valid()){
+                    indirect.detachParent(self());
+                    pair.value = null;
+                }
             }
         });
     }
