@@ -59,7 +59,6 @@ public final class Tools{
     private Tools(){}
 
     public static void main(String[] args){
-        ArcNativesLoader.load();
         Log.logger = new NoopLogHandler();
 
         headless = true;
