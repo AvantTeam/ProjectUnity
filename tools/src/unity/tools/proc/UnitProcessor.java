@@ -15,7 +15,6 @@ import unity.tools.GenAtlas.*;
 import unity.type.*;
 import unity.type.weapons.*;
 import unity.util.*;
-import unity.util.func.*;
 
 import java.util.concurrent.*;
 

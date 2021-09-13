@@ -16,7 +16,6 @@ import unity.annotations.Annotations.*;
 import unity.gen.*;
 import unity.gen.LightHoldc.*;
 import unity.util.*;
-import unity.util.func.*;
 
 import static mindustry.Vars.*;
 import static unity.Unity.*;

@@ -9,7 +9,8 @@ import unity.world.meta.*;
 import static mindustry.Vars.*;
 
 /**
- * A representation of a light slot. Can accept light if said light is within the slot's boundaries
+ * A representation of a light slot. Can accept light if said light is within the slot's boundaries. Slots must be
+ * adjacent to one or more of the building's edges, otherwise no light will be able to point to it
  * @author GlennFolker
  */
 public class LightAcceptor{
@@ -36,6 +37,7 @@ public class LightAcceptor{
         return type.required > 0f;
     }
 
+    /** Called typically asynchronously. Treat with caution */
     public boolean accepts(Light light, int x, int y){
         int dx = World.toTile((x * tilesize) - (hold.x() - hold.block().size * tilesize / 2f + tilesize / 2f)),
             dy = -World.toTile((y * tilesize) - (hold.y() + hold.block().size * tilesize / 2f - tilesize / 2f));

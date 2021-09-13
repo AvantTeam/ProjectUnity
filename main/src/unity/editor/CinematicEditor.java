@@ -25,7 +25,6 @@ import unity.type.sector.*;
 import unity.type.sector.objectives.*;
 import unity.ui.*;
 import unity.util.*;
-import unity.util.func.*;
 
 import java.lang.reflect.*;
 

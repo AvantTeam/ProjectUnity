@@ -18,7 +18,6 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 import unity.graphics.*;
-import unity.util.func.*;
 
 import static mindustry.Vars.*;
 
