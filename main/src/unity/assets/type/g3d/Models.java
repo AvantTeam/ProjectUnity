@@ -21,8 +21,8 @@ public final class Models{
     public static final RenderableSorter sorter = new RenderableSorter();
     public static final Environment environment = new Environment();
 
-    protected static FrameBuffer buffer = new FrameBuffer();
-    protected static RenderPool pool = new RenderPool();
+    private static FrameBuffer buffer = new FrameBuffer(2, 2, true);
+    private static RenderPool pool = new RenderPool();
 
     static{
         camera.perspective = false;
@@ -57,21 +57,18 @@ public final class Models{
         return bind;
     }
 
-    protected static void begin(){
+    static void begin(){
         buffer.begin(Color.clear);
 
-        Gl.enable(Gl.depthTest);
-        Gl.depthFunc(Gl.lequal);
         Gl.depthMask(true);
-        Gl.depthRangef(camera.near, camera.far);
+        Gl.clear(Gl.depthBufferBit);
 
+        Gl.enable(Gl.depthTest);
         Gl.enable(Gl.cullFace);
         Gl.cullFace(Gl.back);
-
-        Gl.clear(Gl.colorBufferBit | Gl.depthBufferBit);
     }
 
-    protected static void end(){
+    static void end(){
         Gl.disable(Gl.depthTest);
         Gl.disable(Gl.cullFace);
 
