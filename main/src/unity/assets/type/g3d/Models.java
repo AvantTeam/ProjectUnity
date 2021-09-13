@@ -24,8 +24,6 @@ public final class Models{
     protected static FrameBuffer buffer = new FrameBuffer();
     protected static RenderPool pool = new RenderPool();
 
-    public static int type;
-
     static{
         camera.perspective = false;
 
@@ -60,77 +58,25 @@ public final class Models{
     }
 
     protected static void begin(){
-        switch(type){
-            case 0 -> {
-                buffer.begin(Color.clear);
+        buffer.begin(Color.clear);
 
-                Gl.enable(Gl.cullFace);
-                Gl.cullFace(Gl.back);
+        Gl.enable(Gl.depthTest);
+        Gl.depthFunc(Gl.lequal);
+        Gl.depthMask(true);
+        Gl.depthRangef(camera.near, camera.far);
 
-                Gl.enable(Gl.depthTest);
-                Gl.depthFunc(Gl.lequal);
-                Gl.depthRangef(camera.near, camera.far);
-                Gl.depthMask(true);
+        Gl.enable(Gl.cullFace);
+        Gl.cullFace(Gl.back);
 
-                Gl.clear(Gl.colorBufferBit | Gl.depthBufferBit);
-            }
-
-            case 1 -> {
-                buffer.begin(Color.clear);
-
-                Gl.clear(Gl.colorBufferBit | Gl.depthBufferBit);
-
-                Gl.enable(Gl.depthTest);
-                Gl.depthFunc(Gl.lequal);
-                Core.gl.glDepthMask(true);
-                Gl.depthRangef(camera.near, camera.far);
-
-                Gl.enable(Gl.cullFace);
-                Gl.cullFace(Gl.back);
-            }
-
-            case 2, 3 -> {
-                buffer.begin(Color.clear);
-
-                Gl.clear(Gl.colorBufferBit | Gl.depthBufferBit);
-
-                Gl.enable(Gl.depthTest);
-                Gl.depthFunc(Gl.lequal);
-                Gl.depthMask(true);
-                Gl.depthRangef(camera.near, camera.far);
-
-                Gl.enable(Gl.cullFace);
-                Gl.cullFace(Gl.back);
-            }
-        }
+        Gl.clear(Gl.colorBufferBit | Gl.depthBufferBit);
     }
 
     protected static void end(){
-        switch(type){
-            case 0 -> {
-                buffer.end();
-                Draw.blit(buffer.getTexture(), Shaders.screenspace);
+        Gl.disable(Gl.depthTest);
+        Gl.disable(Gl.cullFace);
 
-                Gl.disable(Gl.cullFace);
-                Gl.disable(Gl.depthTest);
-            }
-
-            case 1, 2 -> {
-                buffer.end();
-                Draw.blit(buffer.getTexture(), Shaders.screenspace);
-
-                Gl.disable(Gl.depthTest);
-                Gl.disable(Gl.cullFace);
-            }
-
-            case 3 -> {
-                Gl.disable(Gl.depthTest);
-                Gl.disable(Gl.cullFace);
-
-                buffer.end();
-                Draw.blit(buffer.getTexture(), Shaders.screenspace);
-            }
-        }
+        buffer.end();
+        Draw.blit(buffer.getTexture(), Shaders.screenspace);
     }
 
     private static class RenderPool implements Prov<Renderable>{
