@@ -26,8 +26,6 @@ public final class Models{
 
     static{
         camera.perspective = false;
-        camera.near = -10000f;
-        camera.far = 10000f;
 
         environment.set(ColorAttribute.createAmbientLight(0.4f, 0.4f, 0.4f, 1f));
         environment.add(new DirectionalLight().set(0.56f, 0.56f, 0.56f, -1f, -1f, -0.3f));
@@ -70,9 +68,6 @@ public final class Models{
         Gl.depthRangef(camera.near, camera.far);
         Gl.depthMask(true);
 
-        Gl.enable(Gl.blend);
-        Gl.blendFunc(Blending.normal.src, Blending.normal.dst);
-
         Gl.clear(Gl.colorBufferBit | Gl.depthBufferBit);
     }
 
@@ -82,7 +77,6 @@ public final class Models{
 
         Gl.disable(Gl.cullFace);
         Gl.disable(Gl.depthTest);
-        Gl.disable(Gl.blend);
     }
 
     private static class RenderPool implements Prov<Renderable>{

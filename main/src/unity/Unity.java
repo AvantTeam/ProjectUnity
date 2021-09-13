@@ -126,7 +126,7 @@ public class Unity extends Mod{
 
             Triggers.listen(Trigger.preDraw, () -> {
                 var cam = Models.camera;
-                cam.position.set(Core.camera.position.x, Core.camera.position.y, 0f);
+                cam.position.set(Core.camera.position.x, Core.camera.position.y, cam.far / 2f);
                 cam.resize(Core.camera.width, Core.camera.height);
                 cam.update();
             });
@@ -210,7 +210,7 @@ public class Unity extends Mod{
     }
 
     public void logContent(){
-        for(Faction faction : Faction.all){
+        for(var faction : Faction.all){
             var array = FactionMeta.getByFaction(faction, Object.class);
             print(Strings.format("Faction @ has @ contents.", faction, array.size));
         }
