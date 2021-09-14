@@ -38,8 +38,4 @@ Install JDK 16 or higher. Set `JAVA_HOME` environment variable to where it is lo
 ---
 
 - Build output should be located in `main/build/libs/`.
-- If the command returns `Permission Denied` on Linux, run `chmod +x gradlew`. Furthermore, run this if `./gradlew tools:proc` errors with the denied permission message:
-  ```bash
-    $ chmod +x ./main/alpha-bleed
-    $ chmod +x ./main/alpha-bleeding-linux.exe
-  ```
+- If the command returns `Permission Denied` on Linux, run `chmod +x gradlew`.
