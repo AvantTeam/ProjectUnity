@@ -10,7 +10,6 @@ import arc.struct.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
 import unity.assets.list.*;
-import unity.assets.list.UnityShaders.*;
 import unity.assets.type.g3d.attribute.*;
 import unity.assets.type.g3d.attribute.light.*;
 import unity.assets.type.g3d.attribute.type.*;
@@ -21,12 +20,10 @@ public final class Models{
     public static final RenderableSorter sorter = new RenderableSorter();
     public static final Environment environment = new Environment();
 
-    private static FrameBuffer buffer = new FrameBuffer(2, 2, true);
-    private static RenderPool pool = new RenderPool();
+    private static final FrameBuffer buffer = new FrameBuffer(2, 2, true);
+    private static final RenderPool pool = new RenderPool();
 
     static{
-        camera.perspective = false;
-
         environment.set(ColorAttribute.createAmbientLight(0.4f, 0.4f, 0.4f, 1f));
         environment.add(new DirectionalLight().set(0.56f, 0.56f, 0.56f, -1f, -1f, -0.3f));
 
@@ -41,9 +38,10 @@ public final class Models{
         for(int i = 0; i < pool.renders.size; i++){
             var r = pool.renders.items[i];
 
-            Graphics3DShader shader = UnityShaders.graphics3DProvider.get(r);
+            var shader = UnityShaders.graphics3DProvider.get(r);
             shader.bind();
             shader.apply(r);
+
             r.meshPart.render(shader);
         }
         end();
@@ -77,7 +75,7 @@ public final class Models{
     }
 
     private static class RenderPool implements Prov<Renderable>{
-        private final Seq<Renderable> available = new Seq<>(10000);
+        private final Seq<Renderable> available = new Seq<>(10);
         private final Seq<Renderable> renders = new Seq<>(Renderable.class);
 
         @Override

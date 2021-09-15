@@ -125,10 +125,12 @@ public class Unity extends Mod{
             SpeechDialog.init();
 
             Triggers.listen(Trigger.preDraw, () -> {
-                var cam = Models.camera;
-                cam.position.set(Core.camera.position.x, Core.camera.position.y, cam.far / 2f);
-                cam.resize(Core.camera.width, Core.camera.height);
-                cam.update();
+                var cam = Core.camera;
+                var cam3D = Models.camera;
+
+                cam3D.position.set(cam.position.x, cam.position.y, 50f);
+                cam3D.resize(cam.width, cam.height);
+                cam3D.update();
             });
 
             var mod = mods.getMod(Unity.class);

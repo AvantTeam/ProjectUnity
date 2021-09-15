@@ -265,20 +265,26 @@ public class UnityShaders{
             setUniformMatrix4("u_proj", camera.combined.val);
             setUniformMatrix4("u_trans", render.worldTransform.val);
 
-            setUniformf("u_cameraPosition", camera.position.x, camera.position.y, camera.position.z, 1.1881f / (camera.far * camera.far));
-            setUniformf("u_cameraDirection", camera.direction);
-            setUniformf("u_cameraUp", camera.up);
-            setUniformf("u_cameraNearFar", camera.near, camera.far);
+            setUniformf("u_camPos", camera.position.x, camera.position.y, camera.position.z, 1.1881f / (camera.far * camera.far));
+            setUniformf("u_res", camera.width, camera.height);
+            setUniformf("u_scl", Core.graphics.getWidth() / camera.width);
+            renderer.dispose();
 
-            Tmp.m1.val[Mat.M00] = render.worldTransform.val[Mat3D.M00];
-            Tmp.m1.val[Mat.M10] = render.worldTransform.val[Mat3D.M10];
-            Tmp.m1.val[Mat.M20] = render.worldTransform.val[Mat3D.M20];
-            Tmp.m1.val[Mat.M01] = render.worldTransform.val[Mat3D.M01];
-            Tmp.m1.val[Mat.M11] = render.worldTransform.val[Mat3D.M11];
-            Tmp.m1.val[Mat.M21] = render.worldTransform.val[Mat3D.M21];
-            Tmp.m1.val[Mat.M02] = render.worldTransform.val[Mat3D.M02];
-            Tmp.m1.val[Mat.M12] = render.worldTransform.val[Mat3D.M12];
-            Tmp.m1.val[Mat.M22] = render.worldTransform.val[Mat3D.M22];
+            // I don't know where this value came from. I literally just did trial-and-error so many times that I came
+            // up with this value because some positions misbehaved, or maybe I just suck at math, or both. I don't
+            // really care, if it works it works.
+            setUniformf("u_zscl", 2.0415f);
+
+            float[] mval = Tmp.m1.val, wval = render.worldTransform.val;
+            mval[Mat.M00] = wval[Mat3D.M00];
+            mval[Mat.M10] = wval[Mat3D.M10];
+            mval[Mat.M20] = wval[Mat3D.M20];
+            mval[Mat.M01] = wval[Mat3D.M01];
+            mval[Mat.M11] = wval[Mat3D.M11];
+            mval[Mat.M21] = wval[Mat3D.M21];
+            mval[Mat.M02] = wval[Mat3D.M02];
+            mval[Mat.M12] = wval[Mat3D.M12];
+            mval[Mat.M22] = wval[Mat3D.M22];
             setUniformMatrix("u_normalMatrix", Tmp.m1.inv().transpose());
 
             BlendingAttribute blend = material.get(BlendingAttribute.blend);

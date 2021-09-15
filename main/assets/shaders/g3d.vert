@@ -8,21 +8,23 @@
     #define specularFlag
 #endif
 
-#if defined(specularFlag) || defined(fogFlag)
-    #define cameraPositionFlag
-#endif
-
 attribute vec4 a_position;
 uniform mat4 u_proj;
 
 #if defined(colorFlag)
-    varying vec4 v_color;
     attribute vec4 a_color;
+    varying vec4 v_color;
 #endif
 
 attribute vec3 a_normal;
 uniform mat3 u_normalMatrix;
 varying vec3 v_normal;
+
+uniform vec4 u_camPos;
+uniform vec2 u_res;
+
+uniform float u_scl;
+uniform float u_zscl;
 
 #ifdef textureFlag
     attribute vec2 a_texCoord0;
@@ -76,10 +78,6 @@ varying float v_opacity;
 
     #ifdef specularFlag
         varying vec4 v_lightSpecular;
-    #endif
-
-    #ifdef cameraPositionFlag
-        uniform vec4 u_cameraPosition;
     #endif
 
     #ifdef fogFlag
@@ -139,7 +137,18 @@ void main(){
         v_alphaTest = u_alphaTest;
     #endif
 
-    gl_Position = u_proj * u_trans * a_position;
+    mat4 trns = u_trans;
+    vec4 translation = vec4(trns[3][0], trns[3][1], trns[3][2], 0.0);
+
+    trns[3][0] = u_camPos.x;
+    trns[3][1] = u_camPos.y;
+
+    vec2 diff = u_camPos.xy - translation.xy;
+    vec4 pos = u_proj * trns * a_position;
+    pos.xy *= u_scl;
+
+    pos -= vec4(diff * pos.z * u_zscl / u_res, 0.0, 0.0);
+    gl_Position = pos;
 
     #ifdef shadowMapFlag
         vec4 spos = u_shadowMapProjViewTrans * a_position;
@@ -150,8 +159,8 @@ void main(){
     v_normal = normalize(u_normalMatrix * a_normal);
 
     #ifdef fogFlag
-        vec3 flen = u_cameraPosition.xyz - a_position.xyz;
-        float fog = dot(flen, flen) * u_cameraPosition.w;
+        vec3 flen = u_camPos.xyz - a_position.xyz;
+        float fog = dot(flen, flen) * u_camPos.w;
         v_fog = min(fog, 1.0);
     #endif
 
@@ -195,7 +204,7 @@ void main(){
 
         #ifdef specularFlag
             v_lightSpecular = vec4(0.0);
-            vec3 viewVec = normalize(u_cameraPosition.xyz - a_position.xyz);
+            vec3 viewVec = normalize(u_camPos.xyz - a_position.xyz);
         #endif
 
         #if(numDirectionalLights > 0)
