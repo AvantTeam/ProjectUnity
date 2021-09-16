@@ -3627,12 +3627,10 @@ public class UnityUnitTypes implements ContentList{
             }}, new Weapon("unity-monolith-railgun-big"){{
                 mirror = false;
                 x = 0f;
-                y = 12f;
+                y = -12f;
                 shootY = 35f;
                 shadow = 30f;
 
-                rotate = true;
-                rotateSpeed = 1.2f;
                 reload = 200f;
                 recoil = shake = 8f;
                 shootCone = 2f;
