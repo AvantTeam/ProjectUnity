@@ -71,7 +71,7 @@ abstract class EndComp implements Unitc, Factionc{
         AntiCheatVariables aType = utype.antiCheatType;
 
         if(aType != null){
-            if(team != trueTeam && trueHealth >= Math.min(trueMaxHealth / 100f, 150f)) team = trueTeam;
+            if(team != trueTeam && trueHealth >= Math.max(trueMaxHealth / 100f, 150f)) team = trueTeam;
             if(health < trueHealth) health = trueHealth;
             trueHealth = health;
             if(maxHealth < trueMaxHealth) maxHealth = trueMaxHealth;

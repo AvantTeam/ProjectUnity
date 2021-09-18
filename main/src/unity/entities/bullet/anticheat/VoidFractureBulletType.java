@@ -1,4 +1,4 @@
-package unity.entities.bullet.energy;
+package unity.entities.bullet.anticheat;
 
 import arc.audio.*;
 import arc.func.*;
@@ -11,7 +11,6 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
-import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import unity.content.effects.*;
@@ -19,14 +18,13 @@ import unity.content.effects.SpecialFx.*;
 import unity.gen.*;
 import unity.util.*;
 
-public class VoidFractureBulletType extends BulletType{
+public class VoidFractureBulletType extends AntiCheatBulletTypeBase{
     public float length = 28f, width = 12f, widthTo = 3f;
     public float delay = 30f;
     public float targetingRange = 320f;
     public float trueSpeed;
     public float nextLifetime = 10f;
     public int maxTargets = 15;
-    public float armorPierce = 100f, ratioDamage = 0.01f;
     public float spikesRange = 100f, spikesDamage = 200f, spikesRand = 8f;
     public Sound activeSound = UnitySounds.fractureShoot, spikesSound = UnitySounds.spaceFracture;
 
@@ -102,7 +100,10 @@ public class VoidFractureBulletType extends BulletType{
             }else{
                 Utils.collideLineRawEnemy(b.team, b.lastX, b.lastY, b.x, b.y, 3f, (build, direct) -> {
                     if(direct){
-                        if(data.collided.add(build.id)) build.damage(damage * b.damageMultiplier() * buildingDamageMultiplier);
+                        if(data.collided.add(build.id)){
+                            hitBuildingAnticheat(b, build);
+                            //build.damage(damage * b.damageMultiplier() * buildingDamageMultiplier);
+                        }
                         if(build.block.absorbLasers){
                             Tmp.v1.set(b.x, b.y).sub(b.lastX, b.lastY).setLength2(build.dst2(b.lastX, b.lastY)).add(b.lastX, b.lastY);
                             b.x = Tmp.v1.x;
@@ -113,9 +114,7 @@ public class VoidFractureBulletType extends BulletType{
                     return build.block.absorbLasers;
                 }, unit -> {
                     if(data.collided.add(unit.id)){
-                        unit.shield = Math.max(unit.shield - armorPierce, 0f);
-                        unit.armor = Math.max(unit.armor - armorPierce, 0f);
-                        hitEntity(b, unit, unit.health);
+                        hitUnitAntiCheat(b, unit);
                     }
                     return false;
                 }, (ex, ey) -> hit(b, ex, ey), true);

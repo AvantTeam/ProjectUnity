@@ -11,7 +11,6 @@ import mindustry.content.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import unity.entities.bullet.laser.EndCutterLaserBulletType.*;
 import unity.util.*;
 
 public class AcceleratingLaserBulletType extends BulletType{
@@ -190,5 +189,10 @@ public class AcceleratingLaserBulletType extends BulletType{
         if(impact) Tmp.v3.setAngle(b.rotation() + (knockback < 0 ? 180f : 0f));
         unit.impulse(Tmp.v3);
         unit.apply(status, statusDuration);
+    }
+
+    public static class LaserData{
+        public float lastLength, lightningTime, velocity, velocityTime, targetSize, pierceOffset, pierceOffsetSmooth, pierceScore, restartTime = 5f;
+        public Position target;
     }
 }

@@ -26,6 +26,8 @@ import unity.annotations.Annotations.*;
 import unity.content.effects.*;
 import unity.entities.*;
 import unity.entities.abilities.*;
+import unity.entities.bullet.anticheat.*;
+import unity.entities.bullet.anticheat.modules.*;
 import unity.entities.bullet.energy.*;
 import unity.entities.bullet.laser.*;
 import unity.entities.bullet.misc.*;
@@ -4124,9 +4126,12 @@ public class UnityUnitTypes implements ContentList{
                 shootSound = UnitySounds.spaceFracture;
 
                 bullet = new VoidFractureBulletType(32f, 600f){{
-                    armorPierce = 2f;
                     ratioDamage = 0.0005f;
                     shootEffect = ShootFx.voidShoot;
+
+                    modules = new AntiCheatBulletModule[]{
+                        new ArmorDestroyer(1f, 2f, 0f)
+                    };
                 }};
             }});
         }};
@@ -4445,9 +4450,9 @@ public class UnityUnitTypes implements ContentList{
                     lightningDamage = 55f;
                     lightningLength = 13;
 
-                    minimumPower = 64000f;
-                    powerFade = 19000f;
-                    minimumUnitScore = 43000f;
+                    bleedDuration = 5f * 60f;
+                    overDamage = 400000f;
+                    ratioDamage = 0.001f;
                 }};
             }});
 
@@ -4727,6 +4732,7 @@ public class UnityUnitTypes implements ContentList{
                     lifetime = 60f;
                     drag = 0.09f;
                     nextLifetime = 13f;
+                    ratioDamage = 0.01f;
                     length = 52f;
                     width = 20f;
                     widthTo = 8f;
@@ -4735,6 +4741,10 @@ public class UnityUnitTypes implements ContentList{
                     targetingRange = 400f;
                     maxTargets = 20;
                     shootEffect = ShootFx.voidShoot;
+
+                    modules = new AntiCheatBulletModule[]{
+                        new ArmorDestroyer(50f, 50f, 2f)
+                    };
                 }};
             }};
 

@@ -1,4 +1,4 @@
-package unity.entities.bullet.laser;
+package unity.entities.bullet.anticheat;
 
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -8,18 +8,16 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
-import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import unity.*;
 import unity.content.effects.*;
+import unity.entities.bullet.laser.AcceleratingLaserBulletType.*;
 import unity.entities.effects.*;
-import unity.entities.units.*;
 import unity.graphics.*;
 import unity.mod.*;
 import unity.util.*;
 
-public class EndCutterLaserBulletType extends BulletType{
+public class EndCutterLaserBulletType extends AntiCheatBulletTypeBase{
     public float maxLength = 1000f;
     public float laserSpeed = 15f;
     public float accel = 25f;
@@ -28,10 +26,6 @@ public class EndCutterLaserBulletType extends BulletType{
     public float fadeTime = 60f;
     public float fadeInTime = 8f;
     public Color[] colors = {UnityPal.scarColorAlpha, UnityPal.scarColor, UnityPal.endColor, Color.white};
-
-    public float minimumPower = 43000f;
-    public float powerFade = 14000f;
-    public float minimumUnitScore = 32000f;
 
     private boolean hit = false;
 
@@ -125,11 +119,11 @@ public class EndCutterLaserBulletType extends BulletType{
                         for(int i = 0; i < 2; i++){
                             HitFx.tenmeikiriTipHit.at(Tmp.v2.x + Mathf.range(4f), Tmp.v2.y + Mathf.range(4f), b.rotation() + 180f);
                         }
-                        building.damage(damage * buildingDamageMultiplier);
+                        hitBuildingAnticheat(b, building);
                         hit = true;
                         return true;
                     }
-                    building.damage(damage * buildingDamageMultiplier);
+                    hitBuildingAnticheat(b, building);
                 }
                 return false;
             }, unit -> {
@@ -151,19 +145,9 @@ public class EndCutterLaserBulletType extends BulletType{
                     hit = true;
                 }
 
-                float lastHealth = unit.health;
-                float extraDamage = (float)Math.pow(Mathf.clamp((unit.maxHealth + unit.type.dpsEstimate - minimumPower) / powerFade, 0f, 8f), 2f);
-                float trueDamage = damage + Mathf.clamp((unit.maxHealth + unit.type.dpsEstimate - minimumUnitScore) / 2f, 0f, 90000000f);
-                trueDamage += extraDamage * (damage / 3f);
-                unit.apply(status, statusDuration);
-                Unity.antiCheat.applyStatus(unit, 5f * 60f);
-                if(unit instanceof AntiCheatBase){
-                    ((AntiCheatBase)unit).overrideAntiCheatDamage(damage * antiCheatScl);
-                }else{
-                    unit.damage(trueDamage);
-                }
+                hitUnitAntiCheat(b, unit);
 
-                if((unit.dead || unit.health >= Float.MAX_VALUE || (lastHealth - trueDamage < 0f && !(unit instanceof AntiCheatBase))) && (unit.hitSize >= 30f || unit.health >= Float.MAX_VALUE)){
+                if((unit.dead || unit.health >= Float.MAX_VALUE) && (unit.hitSize >= 30f || unit.health >= Float.MAX_VALUE)){
                     AntiCheat.annihilateEntity(unit, true);
                     Tmp.v2.trns(b.rotation(), maxLength * 1.5f).add(b);
                     UnitCutEffect.createCut(unit, b.x, b.y, Tmp.v2.x, Tmp.v2.y);
@@ -191,10 +175,5 @@ public class EndCutterLaserBulletType extends BulletType{
     public void init(){
         super.init();
         drawSize = maxLength * 2f;
-    }
-
-    public static class LaserData{
-        public float lastLength, lightningTime, velocity, velocityTime, targetSize, pierceOffset, pierceOffsetSmooth, pierceScore, restartTime = 5f;
-        public Position target;
     }
 }

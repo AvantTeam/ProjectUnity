@@ -16,8 +16,9 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
-import unity.*;
 import unity.content.effects.*;
+import unity.entities.bullet.anticheat.*;
+import unity.entities.bullet.anticheat.modules.*;
 import unity.entities.bullet.energy.*;
 import unity.entities.bullet.exp.*;
 import unity.entities.bullet.kami.*;
@@ -28,7 +29,6 @@ import unity.entities.units.*;
 import unity.gen.Expc.*;
 import unity.gen.*;
 import unity.graphics.*;
-import unity.mod.*;
 
 import static mindustry.Vars.*;
 import static unity.content.UnityStatusEffects.*;
@@ -1141,7 +1141,7 @@ public class UnityBullets implements ContentList{
             }
         };
 
-        ravagerLaser = new PointBlastLaserBulletType(1210f){
+        ravagerLaser = new EndPointBlastLaserBulletType(1210f){
             {
                 length = 460f;
                 width = 26.1f;
@@ -1150,39 +1150,12 @@ public class UnityBullets implements ContentList{
                 auraWidthReduction = 4f;
                 damageRadius = 110f;
                 auraDamage = 9000f;
-                overrideDamage = true;
+
+                overDamage = 400000f;
+                ratioDamage = 0.001f;
+                bleedDuration = 10f * 60f;
 
                 laserColors = new Color[]{UnityPal.scarColorAlpha, UnityPal.scarColor, UnityPal.endColor, Color.black};
-            }
-
-            @Override
-            public void handleBuilding(Bullet b, Building build, float initialHealth){
-                float damage = auraDamage / (Math.max(3500f - Math.max(initialHealth - 150000f, 0f), 0f) / 3500f);
-                if((damage >= Float.MAX_VALUE || Float.isInfinite(damage))){
-                    build.health = 0f;
-                    AntiCheat.annihilateEntity(build, false);
-                }else{
-                    build.damage(damage);
-                }
-            }
-
-            @Override
-            public void handleUnit(Bullet b, Unit unit, float initialHealth){
-                float damage = auraDamage / (Math.max(4500f - Math.max(initialHealth - 350000f, 0f), 0f) / 4500f);
-                if((damage >= Float.MAX_VALUE || Float.isInfinite(damage)) && !(unit instanceof AntiCheatBase)){
-                    unit.health = 0f;
-                    AntiCheat.annihilateEntity(unit, false);
-                }else{
-                    unit.damage(damage);
-                }
-                if(unit instanceof AntiCheatBase) ((AntiCheatBase)unit).overrideAntiCheatDamage(auraDamage, 1);
-
-                if(unit.health >= initialHealth){
-                    Unity.antiCheat.samplerAdd(unit);
-                }else{
-                    Unity.antiCheat.samplerAdd(unit, true);
-                }
-                Unity.antiCheat.applyStatus(unit, 10f * 60f);
             }
         };
 
@@ -1233,47 +1206,17 @@ public class UnityBullets implements ContentList{
             frontColor = UnityPal.endColor;
         }};
 
-        endLaserSmall = new ContinuousLaserBulletType(85f){{
+        endLaserSmall = new EndContinuousLaserBulletType(85f){{
             lifetime = 2f * 60;
             length = 230f;
             for(int i = 0; i < strokes.length; i++){
                 strokes[i] *= 0.4f;
             }
+            ratioDamage = 0.00001f;
+            overDamage = 700000f;
             colors = new Color[]{UnityPal.scarColorAlpha, UnityPal.scarColor, UnityPal.endColor, Color.white};
-        }
-
-            @Override
-            public void hitEntity(Bullet b, Hitboxc other, float initialHealth){
-                super.hitEntity(b, other, initialHealth);
-                if(other instanceof Unit unit){
-                    for(Ability ability : unit.abilities){
-                        if(ability instanceof ForceFieldAbility force){
-                            if(force.max >= 10000){
-                                force.max -= force.max / 35f;
-                                unit.shield = Math.min(force.max, unit.shield);
-                            }
-                            if(force.radius > unit.hitSize * 4f){
-                                force.radius -= force.radius / 20f;
-                            }
-                            if(force.regen > 2700f / 5f) force.regen /= 1.2f;
-                            continue;
-                        }
-                        if(ability instanceof RepairFieldAbility repair){
-                            if(repair.amount > unit.maxHealth / 7f) repair.amount *= 0.9f;
-                            continue;
-                        }
-                        if(ability instanceof StatusFieldAbility status){
-                            if((status.effect.damage < -unit.maxHealth / 20f || status.effect.reloadMultiplier > 8f) && status.duration > 20f){
-                                statusDuration -= statusDuration / 15f;
-                            }
-                        }
-                    }
-                    unit.shield -= damage * 0.4f;
-                    if(unit.armor > unit.hitSize) unit.armor -= Math.max(damage, unit.armor / 20f);
-                }
-                if(other instanceof AntiCheatBase) ((AntiCheatBase)other).overrideAntiCheatDamage(damage * 6f, 3);
-            }
-        };
+            modules = new AntiCheatBulletModule[]{new ArmorDestroyer(0.1f, 30f, 30f, 0.4f)};
+        }};
 
         endTentacleSmall = new TentacleBulletType(120f){{
             fromColor = Color.red;

@@ -180,6 +180,14 @@ public class AntiCheat{
         }
     }
 
+    public void notifyDamage(int unitId, float delta){
+        if(delta > 0) return;
+        DisableRegenStatus status = statusMap.get(unitId);
+        if(status != null){
+            status.lastHealth += delta;
+        }
+    }
+
     public void applyStatus(Unit unit, float duration){
         if(exclude.contains(unit.id)) return;
         DisableRegenStatus status = statusMap.get(unit.id);

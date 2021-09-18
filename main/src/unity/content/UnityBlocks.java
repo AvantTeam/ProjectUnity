@@ -23,6 +23,7 @@ import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 import unity.annotations.Annotations.*;
 import unity.content.effects.*;
+import unity.entities.bullet.anticheat.*;
 import unity.entities.bullet.energy.*;
 import unity.entities.bullet.exp.*;
 import unity.entities.bullet.laser.*;
