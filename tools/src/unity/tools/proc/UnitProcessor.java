@@ -7,9 +7,11 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.noise.*;
+import mindustry.content.*;
 import mindustry.gen.*;
 import unity.entities.units.*;
 import unity.gen.*;
+import unity.mod.*;
 import unity.tools.*;
 import unity.tools.GenAtlas.*;
 import unity.type.*;
@@ -367,33 +369,39 @@ public class UnitProcessor implements Processor{
 
             add.get(conv(type.region), type.name + "-full", icon);
 
-            var rand = new Rand();
-            rand.setSeed(type.name.hashCode());
+            // Only generate wreck regions if it is larger than zenith and does not come from End faction
+            if(
+                type.hitSize > UnitTypes.zenith.hitSize &&
+                FactionMeta.map(type) != Faction.end
+            ){
+                var rand = new Rand();
+                rand.setSeed(type.name.hashCode());
 
-            int splits = 3;
-            float degrees = rand.random(360f);
-            float offsetRange = Math.max(icon.width, icon.height) * 0.15f;
-            var offset = new Vec2(1, 1).rotate(rand.random(360f)).setLength(rand.random(0, offsetRange)).add(icon.width / 2f, icon.height / 2f);
+                int splits = 3;
+                float degrees = rand.random(360f);
+                float offsetRange = Math.max(icon.width, icon.height) * 0.15f;
+                var offset = new Vec2(1, 1).rotate(rand.random(360f)).setLength(rand.random(0, offsetRange)).add(icon.width / 2f, icon.height / 2f);
 
-            var wrecks = new Pixmap[splits];
-            for(int i = 0; i < wrecks.length; i++){
-                wrecks[i] = new Pixmap(icon.width, icon.height);
-            }
+                var wrecks = new Pixmap[splits];
+                for(int i = 0; i < wrecks.length; i++){
+                    wrecks[i] = new Pixmap(icon.width, icon.height);
+                }
 
-            var vn = new VoronoiNoise(type.id, true);
+                var vn = new VoronoiNoise(type.id, true);
 
-            icon.each((x, y) -> {
-                boolean rValue = Math.max(Ridged.noise2d(1, x, y, 3, 1f / (20f + icon.width / 8f)), 0) > 0.16f;
-                boolean vval = vn.noise(x, y, 1f / (14f + icon.width/40f)) > 0.47;
+                icon.each((x, y) -> {
+                    boolean rValue = Math.max(Ridged.noise2d(1, x, y, 3, 1f / (20f + icon.width / 8f)), 0) > 0.16f;
+                    boolean vval = vn.noise(x, y, 1f / (14f + icon.width/40f)) > 0.47;
 
-                float dst =  offset.dst(x, y);
-                float noise = (float)Noise.rawNoise(dst / (9f + icon.width / 70f)) * (60 + icon.width / 30f);
-                int section = (int)Mathf.clamp(Mathf.mod(offset.angleTo(x, y) + noise + degrees, 360f) / 360f * splits, 0, splits - 1);
-                if(!vval) wrecks[section].setRaw(x, y, Color.muli(icon.getRaw(x, y), rValue ? 0.7f : 1f));
-            });
+                    float dst =  offset.dst(x, y);
+                    float noise = (float)Noise.rawNoise(dst / (9f + icon.width / 70f)) * (60 + icon.width / 30f);
+                    int section = (int)Mathf.clamp(Mathf.mod(offset.angleTo(x, y) + noise + degrees, 360f) / 360f * splits, 0, splits - 1);
+                    if(!vval) wrecks[section].setRaw(x, y, Color.muli(icon.getRaw(x, y), rValue ? 0.7f : 1f));
+                });
 
-            for(int i = 0; i < wrecks.length; i++){
-                add.get(conv(type.region), type.name + "-wreck" + i, wrecks[i]);
+                for(int i = 0; i < wrecks.length; i++){
+                    add.get(conv(type.region), type.name + "-wreck" + i, wrecks[i]);
+                }
             }
         }));
     }
