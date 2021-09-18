@@ -57,5 +57,5 @@ public class UnityPal{
 
     outline = Pal.darkerMetal,
     darkOutline = valueOf("38383d"),
-    darkerOutline = valueOf("2e2c2c");
+    darkerOutline = valueOf("2e3142");
 }

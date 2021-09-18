@@ -268,7 +268,6 @@ public class UnityShaders{
             setUniformf("u_camPos", camera.position.x, camera.position.y, camera.position.z, 1.1881f / (camera.far * camera.far));
             setUniformf("u_res", camera.width, camera.height);
             setUniformf("u_scl", Core.graphics.getWidth() / camera.width);
-            renderer.dispose();
 
             // I don't know where this value came from. I literally just did trial-and-error so many times that I came
             // up with this value because some positions misbehaved, or maybe I just suck at math, or both. I don't

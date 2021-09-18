@@ -148,6 +148,7 @@ public class UnityUnitTypes implements ContentList{
 
     // end legs
     public static @FactionDef("end") @EntityDef({Unitc.class, Endc.class, Legsc.class}) UnitType ravager;
+    public static @FactionDef("end") @EntityDef({Unitc.class, Endc.class, Legsc.class, Tentaclec.class}) UnitType desolation;
 
     // end naval
     public static @FactionDef("end") @EntityDef({Unitc.class, Endc.class, WaterMovec.class, Decorationc.class}) UnitType thalassophobia;
@@ -3627,12 +3628,10 @@ public class UnityUnitTypes implements ContentList{
             }}, new Weapon("unity-monolith-railgun-big"){{
                 mirror = false;
                 x = 0f;
-                y = 12f;
+                y = -12f;
                 shootY = 35f;
                 shadow = 30f;
 
-                rotate = true;
-                rotateSpeed = 1.2f;
                 reload = 200f;
                 recoil = shake = 8f;
                 shootCone = 2f;
@@ -4213,6 +4212,8 @@ public class UnityUnitTypes implements ContentList{
             outlineColor = UnityPal.darkerOutline;
             envEnabled = Env.terrestrial | Env.space;
 
+            immuneAll = true;
+
             antiCheatType = new AntiCheatVariables(health / 600f, health / 190f, health / 610f, health / 100f, 0.6f, 7f * 60f, 8f * 60f, 35f, 4);
 
             BulletType t = new AntiCheatBasicBulletType(9.2f, 325f){{
@@ -4341,13 +4342,7 @@ public class UnityUnitTypes implements ContentList{
 
                 bullet = UnityBullets.endLaserSmall;
             }});
-        }
-            @Override
-            public void init(){
-                super.init();
-                immunities.addAll(content.getBy(ContentType.status));
-            }
-        };
+        }};
 
         apocalypse = new InvisibleUnitType("apocalypse"){{
             health = 1725000f;
@@ -4364,6 +4359,8 @@ public class UnityUnitTypes implements ContentList{
             flying = true;
             lowAltitude = true;
             outlineColor = UnityPal.darkerOutline;
+
+            immuneAll = true;
 
             antiCheatType = new AntiCheatVariables(health / 600f, health / 200f, health / 600f, health / 100f, 0.6f, 7f * 60f, 8f * 60f, 35f, 4);
 
@@ -4529,12 +4526,6 @@ public class UnityUnitTypes implements ContentList{
         }
 
             @Override
-            public void init(){
-                super.init();
-                immunities.addAll(content.getBy(ContentType.status));
-            }
-
-            @Override
             public void drawEngine(Unit unit){
                 if(!unit.isFlying()) return;
 
@@ -4567,6 +4558,8 @@ public class UnityUnitTypes implements ContentList{
             hitSize = 138f;
             rotateSpeed = 1.1f;
 
+            immuneAll = true;
+
             allowLegStep = true;
             hovering = true;
             groundLayer = Layer.legUnit + 6f;
@@ -4582,8 +4575,8 @@ public class UnityUnitTypes implements ContentList{
             legTrns = 0.2f;
             rippleScale = 7f;
 
-            legSplashRange = 120f;
-            legSplashDamage = 1600f;
+            legSplashRange = 90f;
+            legSplashDamage = 1400f;
             outlineColor = UnityPal.darkerOutline;
 
             antiCheatType = new AntiCheatVariables(health / 610f, health / 190f, health / 560f, health / 120f, 0.6f, 7f * 60f, 8f * 60f, 35f, 4);
@@ -4651,13 +4644,37 @@ public class UnityUnitTypes implements ContentList{
 
                 bullet = UnityBullets.missileAntiCheat;
             }});
-        }
-            @Override
-            public void init(){
-                super.init();
-                immunities.addAll(content.getBy(ContentType.status));
-            }
-        };
+        }};
+
+        desolation = new UnityUnitType("desolation"){{
+            health = 307300f;
+            speed = 0.7f;
+            drag = 0.16f;
+            armor = 35f;
+            hitSize = 257f;
+            rotateSpeed = 0.9f;
+
+            visualElevation = 8f;
+            groundLayer = Layer.flyingUnitLow + 1f;
+
+            allowLegStep = legShadows = hovering = true;
+
+            legTrns = 0.3f;
+            legLength = 672f * (1f - (legTrns * 0.85f * 0.5f));
+            legExtension = -48f;
+            legCount = 8;
+            legGroupSize = 2;
+            legPairOffset = 1f;
+            legMoveSpace = 0.2f;
+            legBaseOffset = 61.25f;
+            rippleScale = 12f;
+
+            legSplashRange = 120f;
+            legSplashDamage = 1700f;
+
+            outlineColor = UnityPal.darkerOutline;
+            antiCheatType = new AntiCheatVariables(6000f, 12000f, health / 560f, health / 120f, 0.6f, 7f * 60f, 8f * 60f, 35f, 4);
+        }};
 
         thalassophobia = new UnityUnitType("thalassophobia"){{
             health = 2750000;
@@ -4667,6 +4684,8 @@ public class UnityUnitTypes implements ContentList{
             drag = 0.16f;
             rotateSpeed = 0.3f;
             outlineColor = UnityPal.darkerOutline;
+
+            immuneAll = true;
 
             antiCheatType = new AntiCheatVariables(8000f, 16000f, health / 520f, health / 120f, 0.6f, 7f * 60f, 8f * 60f, 35f, 4);
 
@@ -4767,12 +4786,6 @@ public class UnityUnitTypes implements ContentList{
                 float size = Math.max(region.width, region.height) * Draw.scl;
                 Draw.rect(softShadowRegion, unit, size * rad * Draw.xscl, size * rad * Draw.yscl, unit.rotation - 90f);
                 Draw.color();
-            }
-
-            @Override
-            public void init(){
-                super.init();
-                immunities.addAll(content.getBy(ContentType.status));
             }
         };
 
