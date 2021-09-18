@@ -16,8 +16,10 @@ abstract class TentacleComp implements Unitc{
 
     @Override
     public void add(){
-        if(tentacles.isEmpty()){
-            for(TentacleType tentacle : ((UnityUnitType)type).tentacles){
+        UnityUnitType uType = (UnityUnitType)type;
+
+        if(tentacles.isEmpty() && !uType.tentacles.isEmpty()){
+            for(TentacleType tentacle : uType.tentacles){
                 tentacles.add(new NewTentacle(tentacle, self()));
             }
         }

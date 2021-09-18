@@ -8,6 +8,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.abilities.*;
 import mindustry.game.*;
@@ -23,13 +24,16 @@ import unity.type.decal.UnitDecorationType.*;
 import unity.util.*;
 
 import static arc.Core.*;
+import static mindustry.Vars.content;
 
 /*unit.entities.units might be gradually deleted.
 note that as classes are integrated, inner classes are extracted.*/
 public class UnityUnitType extends UnitType{
     public final Seq<Weapon> segWeapSeq = new Seq<>();
 
-    public TextureRegion segmentRegion, tailRegion, segmentCellRegion, segmentOutline, tailOutline, legBackRegion, legBaseBackRegion, footBackRegion, legMiddleRegion, payloadCellRegion;
+    public TextureRegion segmentRegion, tailRegion, segmentCellRegion, segmentOutline, tailOutline,
+    legBackRegion, legBaseBackRegion, footBackRegion, legMiddleRegion, legShadowRegion, legShadowBaseRegion,
+    payloadCellRegion;
     public TextureRegion[] abilityRegions = new TextureRegion[AbilityTextures.values().length];
     public Seq<Weapon> bottomWeapons = new Seq<>();
     // Worms
@@ -80,6 +84,7 @@ public class UnityUnitType extends UnitType{
     protected static float[][] jointOffsets = new float[2][2];
 
     public boolean customBackLegs = false;
+    public boolean legShadows = false;
 
     // Worm Rendering
     private final static Rect viewport = new Rect(), viewport2 = new Rect();
@@ -95,6 +100,7 @@ public class UnityUnitType extends UnitType{
 
     // End units
     public AntiCheatVariables antiCheatType;
+    protected boolean immuneAll = false;
 
     boolean wormCreating = false;
 
@@ -169,6 +175,10 @@ public class UnityUnitType extends UnitType{
         legBaseBackRegion = atlas.find(name + "-leg-base-back");
         footBackRegion = atlas.find(name + "-foot-back");
         legMiddleRegion = atlas.find(name + "-leg-middle", legRegion);
+
+        legShadowRegion = atlas.find(name + "-leg-shadow", legRegion);
+        legShadowBaseRegion = atlas.find(name + "-leg-base-shadow", legBaseRegion);
+
         payloadCellRegion = atlas.find(name + "-cell-payload", cellRegion);
 
         //abilities
@@ -217,6 +227,10 @@ public class UnityUnitType extends UnitType{
         }
 
         bottomWeapons.addAll(addBottoms.distinct());
+
+        if(immuneAll){
+            immunities.addAll(content.getBy(ContentType.status));
+        }
     }
 
     public void sortSegWeapons(Seq<Weapon> weaponSeq){
@@ -426,6 +440,42 @@ public class UnityUnitType extends UnitType{
     @Override
     public <T extends Unit & Legsc> void drawLegs(T unit){
         if(!customBackLegs){
+            if(legShadows && visualElevation > 0){
+                float z = Draw.z();
+                float rotation = unit.baseRotation();
+                Draw.z(Math.min(Layer.darkness, z - 0.98f));
+                Draw.color(Pal.shadow);
+
+                Leg[] legs = unit.legs();
+
+                for(int j = legs.length - 1; j >= 0; j--){
+                    int i = (j % 2 == 0 ? j / 2 : legs.length - 1 - j / 2);
+                    Leg leg = legs[i];
+                    float angle = unit.legAngle(rotation, i);
+                    boolean flip = i >= legs.length / 2f;
+                    int flips = Mathf.sign(flip);
+
+                    Vec2 position = legOffsetB.trns(angle, legBaseOffset).add(unit),
+                    v1 = Tmp.v1.set(leg.base).sub(leg.joint).inv().setLength(legExtension).add(leg.joint);
+
+                    float elev = 0f;
+                    if(leg.moving){
+                        elev = Mathf.slope(1f - leg.stage);
+                    }
+                    float mid = (elev / 2f) + 0.5f;
+                    float scl = visualElevation;
+
+                    Lines.stroke(legShadowRegion.height * Draw.scl * flips);
+                    Lines.line(legShadowRegion, position.x + (shadowTX * scl), position.y + (shadowTY * scl), leg.joint.x + (shadowTX * mid * scl), leg.joint.y + (shadowTY * mid * scl), false);
+
+                    Lines.stroke(legShadowBaseRegion.height * Draw.scl * flips);
+                    Lines.line(legShadowBaseRegion, v1.x + (shadowTX * mid * scl), v1.y + (shadowTY * mid * scl), leg.base.x + (shadowTX * elev * scl), leg.base.y + (shadowTY * elev * scl), false);
+                }
+
+                Draw.color();
+                Draw.z(z);
+            }
+
             super.drawLegs(unit);
         }else{
             applyColor(unit);
