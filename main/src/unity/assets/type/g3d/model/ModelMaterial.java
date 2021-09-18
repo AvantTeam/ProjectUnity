@@ -4,14 +4,7 @@ import arc.graphics.*;
 import arc.struct.*;
 
 public class ModelMaterial{
-    public enum MaterialType{
-        lambert,
-        phong
-    }
-
     public String id;
-
-    public MaterialType type;
 
     public Color ambient;
     public Color diffuse;

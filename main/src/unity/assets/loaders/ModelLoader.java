@@ -4,6 +4,7 @@ import arc.assets.*;
 import arc.assets.loaders.*;
 import arc.files.*;
 import arc.graphics.*;
+import arc.graphics.gl.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
@@ -13,9 +14,6 @@ import unity.assets.type.g3d.model.*;
 
 @SuppressWarnings("rawtypes")
 public class ModelLoader extends SynchronousAssetLoader<Model, ModelLoader.ModelParameter>{
-    public static final short versionHi = 0;
-    public static final short versionLo = 1;
-
     protected final BaseJsonReader reader;
 
     public ModelLoader(FileHandleResolver tree, BaseJsonReader reader){
@@ -37,82 +35,74 @@ public class ModelLoader extends SynchronousAssetLoader<Model, ModelLoader.Model
     }
 
     public ModelData parseModel(Fi handle){
-        JsonValue json = reader.parse(handle);
-        ModelData model = new ModelData();
-        JsonValue version = json.require("version");
-
-        model.version[0] = version.getShort(0);
-        model.version[1] = version.getShort(1);
-        if(model.version[0] != versionHi || model.version[1] != versionLo){
-            throw new IllegalStateException("Model version not supported");
-        }
+        var json = reader.parse(handle);
+        var model = new ModelData();
 
         model.id = json.getString("id", "");
         parseMeshes(model, json);
         parseMaterials(model, json, handle.parent().path());
         parseNodes(model, json);
+        parseAnimations(model, json);
 
         return model;
     }
 
     protected void parseMeshes(ModelData model, JsonValue json){
-        JsonValue meshes = json.get("meshes");
+        var meshes = json.get("meshes");
         if(meshes != null){
             model.meshes.ensureCapacity(meshes.size);
-            for(JsonValue mesh = meshes.child; mesh != null; mesh = mesh.next){
-                ModelMesh jsonMesh = new ModelMesh();
+            for(var mesh = meshes.child; mesh != null; mesh = mesh.next){
+                var data = new ModelMesh();
 
-                jsonMesh.id = mesh.getString("id", "");
+                data.id = mesh.getString("id", "");
 
-                JsonValue attributes = mesh.require("attributes");
-                jsonMesh.attributes = parseAttributes(attributes);
-                jsonMesh.vertices = mesh.require("vertices").asFloatSeq();
+                var attributes = mesh.require("attributes");
+                data.attributes = parseAttributes(attributes);
+                data.vertices = mesh.require("vertices").asFloatSeq();
 
-                JsonValue meshParts = mesh.require("parts");
-                Seq<ModelMeshPart> parts = new Seq<>();
-                for(JsonValue meshPart = meshParts.child; meshPart != null; meshPart = meshPart.next){
-                    ModelMeshPart jsonPart = new ModelMeshPart();
-                    String partId = meshPart.getString("id", null);
+                var meshParts = mesh.require("parts");
+                var parts = Seq.of(ModelMeshPart.class);
+                for(var meshPart = meshParts.child; meshPart != null; meshPart = meshPart.next){
+                    var part = new ModelMeshPart();
+                    var partId = meshPart.require("id").asString();
 
-                    if(partId == null) throw new IllegalArgumentException("Not id given for mesh part");
+                    if(parts.contains(other -> other.id.equals(partId))) throw new IllegalArgumentException("Mesh part with id '" + partId + "' already in defined");
 
-                    for(ModelMeshPart other : parts){
-                        if(other.id.equals(partId)) throw new IllegalArgumentException("Mesh part with id '" + partId + "' already in defined");
-                    }
+                    part.id = partId;
 
-                    jsonPart.id = partId;
+                    part.primitiveType = parseType(meshPart.require("type").asString());
+                    part.indices = meshPart.require("indices").asShortArray();
 
-                    String type = meshPart.getString("type", null);
-                    if(type == null) throw new IllegalArgumentException("No primitive type given for mesh part '" + partId + "'");
-
-                    jsonPart.primitiveType = parseType(type);
-                    jsonPart.indices = meshPart.require("indices").asShortArray();
-
-                    parts.add(jsonPart);
+                    parts.add(part);
                 }
 
-                jsonMesh.parts = parts.toArray(ModelMeshPart.class);
-                model.meshes.add(jsonMesh);
+                data.parts = parts.toArray();
+                model.meshes.add(data);
             }
         }
     }
 
     protected int parseType(String type){
         return switch(type){
-            case "TRIANGLES" -> GL20.GL_TRIANGLES;
-            case "LINES" -> GL20.GL_LINES;
-            case "POINTS" -> GL20.GL_POINTS;
-            case "TRIANGLE_STRIP" -> GL20.GL_TRIANGLE_STRIP;
-            case "LINE_STRIP" -> GL20.GL_LINE_STRIP;
-            default -> throw new IllegalArgumentException("Unknown primitive type '" + type + "', should be one of triangle, " + "trianglestrip, line, linestrip, lineloop or point");
+            case "POINTS" -> Gl.points;
+            case "LINES" -> Gl.lines;
+            case "LINE_LOOP" -> Gl.lineLoop;
+            case "LINE_STRIP" -> Gl.lineStrip;
+            case "TRIANGLES" -> Gl.triangles;
+            case "TRIANGLE_FAN" -> Gl.triangleFan;
+            case "TRIANGLE_STRIP" -> Gl.triangleStrip;
+            default -> throw new IllegalArgumentException("Unknown primitive type '" + type + "'");
         };
     }
 
     protected VertexAttribute[] parseAttributes(JsonValue attributes){
-        Seq<VertexAttribute> vertexAttributes = new Seq<>();
+        var vertexAttributes = Seq.of(VertexAttribute.class);
 
-        for(JsonValue value = attributes.child; value != null; value = value.next){
-            String attr = value.asString();
+        int texUnit = 0,
+            blendUnit = 0;
+
+        for(var value = attributes.child; value != null; value = value.next){
+            var attr = value.asString();
             if(attr.equals("POSITION")){
                 vertexAttributes.add(VertexAttribute.position3);
             }else if(attr.equals("NORMAL")){
@@ -120,109 +110,88 @@ public class ModelLoader extends SynchronousAssetLoader<Model, ModelLoader.Model
             }else if(attr.equals("COLORPACKED")){
                 vertexAttributes.add(VertexAttribute.color);
             }else if(attr.startsWith("TEXCOORD")){
-                vertexAttributes.add(VertexAttribute.texCoords);
+                vertexAttributes.add(new VertexAttribute(2, Shader.texcoordAttribute + texUnit++));
+            }else if(attr.startsWith("BLENDWEIGHT")){
+                vertexAttributes.add(new VertexAttribute(2, "a_blendWeight" + blendUnit++));
             }else{
-                throw new IllegalArgumentException("Unknown vertex attribute '" + attr + "', should be one of position, normal, or uv");
+                throw new IllegalArgumentException("Unknown vertex attribute '" + attr + "'");
             }
         }
 
-        return vertexAttributes.toArray(VertexAttribute.class);
+        return vertexAttributes.toArray();
     }
 
-    protected void parseMaterials(ModelData model, JsonValue json, String materialDir){
-        JsonValue materials = json.get("materials");
+    protected void parseMaterials(ModelData model, JsonValue json, String dir){
+        var materials = json.get("materials");
         if(materials != null){
             model.materials.ensureCapacity(materials.size);
-            for(JsonValue material = materials.child; material != null; material = material.next){
-                ModelMaterial jsonMaterial = new ModelMaterial();
+            for(var material = materials.child; material != null; material = material.next){
+                var data = new ModelMaterial();
+                data.id = material.require("id").asString();
 
-                String id = material.getString("id", null);
-                if(id == null) throw new IllegalArgumentException("Material needs an id.");
+                var diffuse = material.get("diffuse");
+                if(diffuse != null) data.diffuse = parseColor(diffuse);
 
-                jsonMaterial.id = id;
+                var ambient = material.get("ambient");
+                if(ambient != null) data.ambient = parseColor(ambient);
 
-                JsonValue diffuse = material.get("diffuse");
-                if(diffuse != null) jsonMaterial.diffuse = parseColor(diffuse);
+                var emissive = material.get("emissive");
+                if(emissive != null) data.emissive = parseColor(emissive);
 
-                JsonValue ambient = material.get("ambient");
-                if(ambient != null) jsonMaterial.ambient = parseColor(ambient);
+                var specular = material.get("specular");
+                if(specular != null) data.specular = parseColor(specular);
 
-                JsonValue emissive = material.get("emissive");
-                if(emissive != null) jsonMaterial.emissive = parseColor(emissive);
+                var reflection = material.get("reflection");
+                if(reflection != null) data.reflection = parseColor(reflection);
 
-                JsonValue specular = material.get("specular");
-                if(specular != null) jsonMaterial.specular = parseColor(specular);
+                data.shininess = material.getFloat("shininess", 0.0f);
+                data.opacity = material.getFloat("opacity", 1.0f);
 
-                JsonValue reflection = material.get("reflection");
-                if(reflection != null) jsonMaterial.reflection = parseColor(reflection);
-
-                jsonMaterial.shininess = material.getFloat("shininess", 0.0f);
-                jsonMaterial.opacity = material.getFloat("opacity", 1.0f);
-
-                JsonValue textures = material.get("textures");
+                var textures = material.get("textures");
                 if(textures != null){
-                    for(JsonValue texture = textures.child; texture != null; texture = texture.next){
-                        ModelTexture jsonTexture = new ModelTexture();
+                    for(var texture = textures.child; texture != null; texture = texture.next){
+                        var tex = new ModelTexture();
+                        tex.id = texture.require("id").asString();
 
-                        String textureId = texture.getString("id", null);
-                        if(textureId == null) throw new IllegalArgumentException("Texture has no id.");
-                        jsonTexture.id = textureId;
+                        var fileName = texture.require("filename").asString();
+                        tex.fileName = dir + (dir.length() == 0 || dir.endsWith("/") ? "" : "/") + fileName;
 
-                        String fileName = texture.getString("filename", null);
-                        if(fileName == null) throw new IllegalArgumentException("Texture needs filename.");
+                        tex.uvTranslation = readVec2(texture.get("uvTranslation"), 0f, 0f);
+                        tex.uvScaling = readVec2(texture.get("uvScaling"), 1f, 1f);
 
-                        jsonTexture.fileName = materialDir + (materialDir.length() == 0 || materialDir.endsWith("/") ? "" : "/") + fileName;
+                        tex.usage = parseTextureUsage(texture.require("type").asString());
 
-                        jsonTexture.uvTranslation = readVec2(texture.get("uvTranslation"), 0f, 0f);
-                        jsonTexture.uvScaling = readVec2(texture.get("uvScaling"), 1f, 1f);
-
-                        String textureType = texture.getString("type", null);
-                        if(textureType == null) throw new IllegalArgumentException("Texture needs type.");
-
-                        jsonTexture.usage = parseTextureUsage(textureType);
-
-                        if(jsonMaterial.textures == null)
-                            jsonMaterial.textures = new Seq<>();
-                        jsonMaterial.textures.add(jsonTexture);
+                        if(data.textures == null) data.textures = new Seq<>(textures.size);
+                        data.textures.add(tex);
                     }
                 }
 
-                model.materials.add(jsonMaterial);
+                model.materials.add(data);
             }
         }
     }
 
     protected int parseTextureUsage(String value){
-        if(value.equalsIgnoreCase("AMBIENT")){
-            return ModelTexture.usageAmbient;
-        }else if(value.equalsIgnoreCase("BUMP")){
-            return ModelTexture.usageBump;
-        }else if(value.equalsIgnoreCase("DIFFUSE")){
-            return ModelTexture.usageDiffuse;
-        }else if(value.equalsIgnoreCase("EMISSIVE")){
-            return ModelTexture.usageEmissive;
-        }else if(value.equalsIgnoreCase("NONE")){
-            return ModelTexture.usageNone;
-        }else if(value.equalsIgnoreCase("NORMAL")){
-            return ModelTexture.usageNormal;
-        }else if(value.equalsIgnoreCase("REFLECTION")){
-            return ModelTexture.usageReflection;
-        }else if(value.equalsIgnoreCase("SHININESS")){
-            return ModelTexture.usageShininess;
-        }else if(value.equalsIgnoreCase("SPECULAR")){
-            return ModelTexture.usageSpecular;
-        }else if(value.equalsIgnoreCase("TRANSPARENCY")){
-            return ModelTexture.usageTransparency;
-        }
-
-        return ModelTexture.usageUnknown;
+        return switch(value.toUpperCase()){
+            case "AMBIENT" -> ModelTexture.ambient;
+            case "BUMP" -> ModelTexture.bump;
+            case "DIFFUSE" -> ModelTexture.diffuse;
+            case "EMISSIVE" -> ModelTexture.emissive;
+            case "NONE" -> ModelTexture.none;
+            case "NORMAL" -> ModelTexture.normal;
+            case "REFLECTION" -> ModelTexture.reflection;
+            case "SHININESS" -> ModelTexture.shininess;
+            case "SPECULAR" -> ModelTexture.specular;
+            case "TRANSPARENCY" -> ModelTexture.transparency;
+            default -> ModelTexture.unknown;
+        };
     }
 
-    protected Color parseColor(JsonValue colorArray){
-        if(colorArray.size >= 3){
-            return new Color(colorArray.getFloat(0), colorArray.getFloat(1), colorArray.getFloat(2), 1.0f);
+    protected Color parseColor(JsonValue col){
+        if(col.size >= 3){
+            return new Color(col.getFloat(0), col.getFloat(1), col.getFloat(2), 1.0f);
         }else{
-            throw new IllegalArgumentException("Expected Color values <> than three.");
+            throw new IllegalArgumentException("Expected Color values < 3");
         }
     }
 
@@ -232,72 +201,137 @@ public class ModelLoader extends SynchronousAssetLoader<Model, ModelLoader.Model
         }else if(vectorArray.size == 2){
             return new Vec2(vectorArray.getFloat(0), vectorArray.getFloat(1));
         }else{
-            throw new IllegalArgumentException("Expected Vector2 values <> than two.");
+            throw new IllegalArgumentException("Expected Vector2 values < 2");
         }
     }
 
     protected void parseNodes(ModelData model, JsonValue json){
-        JsonValue nodes = json.get("nodes");
+        var nodes = json.get("nodes");
         if(nodes != null){
             model.nodes.ensureCapacity(nodes.size);
-            for(JsonValue node = nodes.child; node != null; node = node.next){
+            for(var node = nodes.child; node != null; node = node.next){
                 model.nodes.add(parseNodesRecurse(node));
             }
         }
     }
 
     protected ModelNode parseNodesRecurse(JsonValue json){
-        ModelNode jsonNode = new ModelNode();
+        var data = new ModelNode();
+        data.id = json.require("id").asString();
 
-        String id = json.getString("id", null);
-        if(id == null) throw new IllegalArgumentException("Node id missing.");
-        jsonNode.id = id;
+        var trns = json.get("translation");
+        data.translation = trns == null ? null : new Vec3(trns.getFloat(0), trns.getFloat(1), trns.getFloat(2));
 
-        JsonValue translation = json.get("translation");
-        if(translation != null && translation.size != 3) throw new IllegalArgumentException("Node translation incomplete");
-        jsonNode.translation = translation == null ? null : new Vec3(translation.getFloat(0), translation.getFloat(1), translation.getFloat(2));
+        var rot = json.get("rotation");
+        data.rotation = rot == null ? null : new Quat(rot.getFloat(0), rot.getFloat(1), rot.getFloat(2), rot.getFloat(3));
 
-        JsonValue rotation = json.get("rotation");
-        if(rotation != null && rotation.size != 4) throw new IllegalArgumentException("Node rotation incomplete");
-        jsonNode.rotation = rotation == null ? null : new Quat(rotation.getFloat(0), rotation.getFloat(1), rotation.getFloat(2), rotation.getFloat(3));
+        var scl = json.get("scale");
+        data.scale = scl == null ? null : new Vec3(scl.getFloat(0), scl.getFloat(1), scl.getFloat(2));
 
-        JsonValue scale = json.get("scale");
-        if(scale != null && scale.size != 3) throw new IllegalArgumentException("Node scale incomplete");
-        jsonNode.scale = scale == null ? null : new Vec3(scale.getFloat(0), scale.getFloat(1), scale.getFloat(2));
+        var meshId = json.getString("mesh", null);
+        if(meshId != null) data.meshId = meshId;
 
-        String meshId = json.getString("mesh", null);
-        if(meshId != null) jsonNode.meshId = meshId;
+        var parts = json.get("parts");
+        if(parts != null){
+            data.parts = new ModelNodePart[parts.size];
 
-        JsonValue materials = json.get("parts");
-        if(materials != null){
-            jsonNode.parts = new ModelNodePart[materials.size];
             int i = 0;
-            for(JsonValue material = materials.child; material != null; material = material.next, i++){
-                ModelNodePart nodePart = new ModelNodePart();
+            for(var material = parts.child; material != null; material = material.next, i++){
+                var part = new ModelNodePart();
 
-                String meshPartId = material.getString("meshpartid", null);
-                String materialId = material.getString("materialid", null);
-                if(meshPartId == null || materialId == null){
-                    throw new IllegalArgumentException("Node " + id + " part is missing meshPartId or materialId");
-                }
-                nodePart.materialId = materialId;
-                nodePart.meshPartId = meshPartId;
+                part.materialId = material.require("materialid").asString();
+                part.meshPartId = material.require("meshpartid").asString();
 
-                jsonNode.parts[i] = nodePart;
+                data.parts[i] = part;
             }
         }
 
-        JsonValue children = json.get("children");
+        var children = json.get("children");
         if(children != null){
-            jsonNode.children = new ModelNode[children.size];
+            data.children = new ModelNode[children.size];
 
             int i = 0;
-            for(JsonValue child = children.child; child != null; child = child.next, i++){
-                jsonNode.children[i] = parseNodesRecurse(child);
+            for(var child = children.child; child != null; child = child.next, i++){
+                data.children[i] = parseNodesRecurse(child);
             }
         }
 
-        return jsonNode;
+        return data;
+    }
+
+    protected void parseAnimations(ModelData model, JsonValue json){
+        var animations = json.get("animations");
+        if(animations == null) return;
+
+        model.animations.ensureCapacity(animations.size);
+        for(var anim = animations.child; anim != null; anim = anim.next){
+            var nodes = anim.get("bones");
+            if(nodes == null) continue;
+
+            var animation = new ModelAnimation();
+            model.animations.add(animation);
+
+            animation.nodeAnimations.ensureCapacity(nodes.size);
+            animation.id = anim.getString("id");
+            for(var node = nodes.child; node != null; node = node.next){
+                var nodeAnim = new ModelNodeAnimation();
+                animation.nodeAnimations.add(nodeAnim);
+                nodeAnim.nodeId = node.getString("boneId");
+
+                var keyframes = node.get("keyframes");
+                if(keyframes != null && keyframes.isArray()){
+                    for(var keyframe = keyframes.child; keyframe != null; keyframe = keyframe.next){
+                        float keytime = keyframe.getFloat("keytime", 0f) / (100f / 3f);
+
+                        var translation = keyframe.get("translation");
+                        if(translation != null && translation.size == 3){
+                            if(nodeAnim.translation == null) nodeAnim.translation = new Seq<>();
+
+                            ModelNodeKeyframe<Vec3> tkf = new ModelNodeKeyframe<>();
+                            tkf.keytime = keytime;
+                            tkf.value = new Vec3(
+                                translation.getFloat(0),
+                                translation.getFloat(1),
+                                translation.getFloat(2)
+                            );
+
+                            nodeAnim.translation.add(tkf);
+                        }
+
+                        var rotation = keyframe.get("rotation");
+                        if(rotation != null && rotation.size == 4){
+                            if(nodeAnim.rotation == null) nodeAnim.rotation = new Seq<>();
+
+                            ModelNodeKeyframe<Quat> rkf = new ModelNodeKeyframe<>();
+                            rkf.keytime = keytime;
+                            rkf.value = new Quat(
+                                rotation.getFloat(0),
+                                rotation.getFloat(1),
+                                rotation.getFloat(2),
+                                rotation.getFloat(3)
+                            );
+
+                            nodeAnim.rotation.add(rkf);
+                        }
+
+                        var scale = keyframe.get("scale");
+                        if(scale != null && scale.size == 3){
+                            if(nodeAnim.scaling == null) nodeAnim.scaling = new Seq<>();
+
+                            ModelNodeKeyframe<Vec3> skf = new ModelNodeKeyframe<>();
+                            skf.keytime = keytime;
+                            skf.value = new Vec3(
+                                scale.getFloat(0),
+                                scale.getFloat(1),
+                                scale.getFloat(2)
+                            );
+
+                            nodeAnim.scaling.add(skf);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @Override

@@ -1,9 +1,9 @@
 package unity.assets.type.g3d;
 
 import arc.graphics.*;
+import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import unity.assets.loaders.*;
 import unity.assets.type.g3d.attribute.*;
 import unity.assets.type.g3d.attribute.type.*;
 import unity.assets.type.g3d.model.*;
@@ -13,7 +13,7 @@ import static mindustry.Vars.*;
 
 /**
  * A 3-dimensional model model representing a {@code .g3d[b|j]} files. Implementation is heavily based
- * on libGDX. Animations and bones are not supported yet. Normal and bump texture maps are yet to be
+ * on libGDX. Normal and bump texture maps are yet to be
  * implemented.
  * @author Xoppa
  * @author badlogic
@@ -21,34 +21,91 @@ import static mindustry.Vars.*;
 public class Model implements Disposable{
     public final Seq<Material> materials = new Seq<>();
     public final Seq<Node> nodes = new Seq<>();
+    public final Seq<Animation> animations = new Seq<>();
     public final Seq<Mesh> meshes = new Seq<>();
     public final Seq<MeshPart> meshParts = new Seq<>();
 
-    protected final Seq<Disposable> disposables = new Seq<>();
-
-    /**
-     * Constructs an empty model. Manually created models do not manage their resources by default. Use
-     * {@link #manageDisposable(Disposable)} to add resources to be managed by this model.
-     */
     public Model(){}
 
-    /**
-     * Constructs a new Model based on the {@link ModelData}.
-     * @param modelData the {@link ModelData} got from e.g. {@link ModelLoader}
-     */
     public Model(ModelData modelData){
         load(modelData);
     }
 
-    public void load(ModelData modelData){
-        loadMeshes(modelData.meshes);
-        loadMaterials(modelData.materials);
-        loadNodes(modelData.nodes);
+    public void load(ModelData data){
+        loadMeshes(data.meshes);
+        loadMaterials(data.materials);
+        loadNodes(data.nodes);
+        loadAnimations(data.animations);
+
         calculateTransforms();
     }
 
-    protected void loadNodes(Seq<ModelNode> modelNodes){
-        for(ModelNode node : modelNodes){
+    protected void loadAnimations(Iterable<ModelAnimation> modelAnimations){
+        for(var anim : modelAnimations){
+            var animation = new Animation();
+            animation.id = anim.id;
+
+            for(var nanim : anim.nodeAnimations){
+                var node = getNode(nanim.nodeId);
+                if(node == null)  continue;
+
+                var nodeAnim = new NodeAnimation();
+                nodeAnim.node = node;
+
+                if(nanim.translation != null){
+                    nodeAnim.translation = new Seq<>();
+                    nodeAnim.translation.ensureCapacity(nanim.translation.size);
+
+                    for(var kf : nanim.translation){
+                        if(kf.keytime > animation.duration) animation.duration = kf.keytime;
+                        nodeAnim.translation.add(new NodeKeyframe<>(
+                            kf.keytime,
+                            new Vec3(kf.value == null ? node.translation : kf.value)
+                        ));
+                    }
+                }
+
+                if(nanim.rotation != null){
+                    nodeAnim.rotation = new Seq<>();
+                    nodeAnim.rotation.ensureCapacity(nanim.rotation.size);
+
+                    for(var kf : nanim.rotation){
+                        if(kf.keytime > animation.duration)  animation.duration = kf.keytime;
+                        nodeAnim.rotation.add(new NodeKeyframe<>(
+                            kf.keytime,
+                            new Quat(kf.value == null ? node.rotation : kf.value)
+                        ));
+                    }
+                }
+
+                if(nanim.scaling != null){
+                    nodeAnim.scaling = new Seq<>();
+                    nodeAnim.scaling.ensureCapacity(nanim.scaling.size);
+
+                    for(var kf : nanim.scaling){
+                        if(kf.keytime > animation.duration) animation.duration = kf.keytime;
+                        nodeAnim.scaling.add(new NodeKeyframe<>(
+                            kf.keytime,
+                            new Vec3(kf.value == null ? node.scale : kf.value)
+                        ));
+                    }
+                }
+
+                if(
+                    (nodeAnim.translation != null && nodeAnim.translation.any()) ||
+                    (nodeAnim.rotation != null && nodeAnim.rotation.any()) ||
+                    (nodeAnim.scaling != null && nodeAnim.scaling.any())
+                ){
+                    animation.nodeAnimations.add(nodeAnim);
+                }
+            }
+
+            if(animation.nodeAnimations.size > 0) animations.add(animation);
+        }
+    }
+
+    protected void loadNodes(Iterable<ModelNode> modelNodes){
+        for(var node : modelNodes){
             nodes.add(loadNode(node));
         }
     }
@@ -125,7 +182,6 @@ public class Model implements Disposable{
 
         Mesh mesh = new Mesh(true, numVertices, numIndices, modelMesh.attributes);
         meshes.add(mesh);
-        disposables.add(mesh);
 
         Buffers.copy(modelMesh.vertices, mesh.getVerticesBuffer(), modelMesh.vertices.length, 0);
         int offset = 0;
@@ -180,13 +236,13 @@ public class Model implements Disposable{
 
                 result.set(new TextureAttribute(
                     switch(tex.usage){
-                        case ModelTexture.usageDiffuse -> TextureAttribute.diffuse;
-                        case ModelTexture.usageSpecular -> TextureAttribute.specular;
-                        case ModelTexture.usageBump -> TextureAttribute.bump;
-                        case ModelTexture.usageNormal -> TextureAttribute.normal;
-                        case ModelTexture.usageAmbient -> TextureAttribute.ambient;
-                        case ModelTexture.usageEmissive -> TextureAttribute.emissive;
-                        case ModelTexture.usageReflection -> TextureAttribute.reflection;
+                        case ModelTexture.diffuse -> TextureAttribute.diffuse;
+                        case ModelTexture.specular -> TextureAttribute.specular;
+                        case ModelTexture.bump -> TextureAttribute.bump;
+                        case ModelTexture.normal -> TextureAttribute.normal;
+                        case ModelTexture.ambient -> TextureAttribute.ambient;
+                        case ModelTexture.emissive -> TextureAttribute.emissive;
+                        case ModelTexture.reflection -> TextureAttribute.reflection;
                         default -> throw new IllegalArgumentException("Unknown usage: " + tex.usage);
                     },
                     texture,
@@ -198,42 +254,14 @@ public class Model implements Disposable{
         return result;
     }
 
-    /**
-     * Adds a {@link Disposable} to be managed and disposed by this Model. Can be used to keep track of manually
-     * loaded textures for {@link ModelInstance}.
-     * @param disposable the Disposable
-     */
-    public void manageDisposable(Disposable disposable){
-        if(!disposables.contains(disposable, true)){
-            disposables.add(disposable);
-        }
-    }
-
-    /** @return the {@link Disposable} objects that will be disposed when the {@link #dispose()} method is called. */
-    public Seq<Disposable> getManagedDisposables(){
-        return disposables;
-    }
-
     @Override
     public void dispose(){
         materials.clear();
         nodes.clear();
         meshes.clear();
         meshParts.clear();
-        for(Disposable disposable : disposables){
-            disposable.dispose();
-        }
     }
 
-    /**
-     * Calculates the local and world transform of all {@link Node} instances in this model, recursively. First each
-     * {@link Node#localTransform} transform is calculated based on the translation, rotation and scale of each Node.
-     * Then each {@link Node#calculateWorldTransform()} is calculated, based on the parent's world transform and the
-     * local transform of each Node
-     * <p>
-     * This method can be used to recalculate all transforms if any of the Node's local properties (translation,
-     * rotation, scale) was modified.
-     */
     public void calculateTransforms(){
         int n = nodes.size;
         for(int i = 0; i < n; i++){
@@ -241,19 +269,10 @@ public class Model implements Disposable{
         }
     }
 
-    /**
-     * @param id The ID of the material to fetch.
-     * @return The {@link Material} with the specified id, or null if not available.
-     */
-    public Material getMaterial(final String id){
+    public Material getMaterial(String id){
         return getMaterial(id, true);
     }
 
-    /**
-     * @param id The ID of the material to fetch.
-     * @param ignoreCase whether to use case sensitivity when comparing the material id.
-     * @return The {@link Material} with the specified id, or null if not available.
-     */
     public Material getMaterial(String id, boolean ignoreCase){
         int n = materials.size;
         Material material;
@@ -274,29 +293,14 @@ public class Model implements Disposable{
         return null;
     }
 
-    /**
-     * @param id The ID of the node to fetch.
-     * @return The {@link Node} with the specified id, or null if not found.
-     */
     public Node getNode(String id){
         return getNode(id, true);
     }
 
-    /**
-     * @param id The ID of the node to fetch.
-     * @param recursive false to fetch a root node only, true to search the entire node tree for the specified node.
-     * @return The {@link Node} with the specified id, or null if not found.
-     */
     public Node getNode(String id, boolean recursive){
         return getNode(id, recursive, false);
     }
 
-    /**
-     * @param id The ID of the node to fetch.
-     * @param recursive false to fetch a root node only, true to search the entire node tree for the specified node.
-     * @param ignoreCase whether to use case sensitivity when comparing the node id.
-     * @return The {@link Node} with the specified id, or null if not found.
-     */
     public Node getNode(String id, boolean recursive, boolean ignoreCase){
         return Node.getNode(nodes, id, recursive, ignoreCase);
     }

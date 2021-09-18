@@ -3,17 +3,17 @@ package unity.assets.type.g3d.model;
 import arc.math.geom.*;
 
 public class ModelTexture{
-    public final static int usageUnknown = 0;
-    public final static int usageNone = 1;
-    public final static int usageDiffuse = 2;
-    public final static int usageEmissive = 3;
-    public final static int usageAmbient = 4;
-    public final static int usageSpecular = 5;
-    public final static int usageShininess = 6;
-    public final static int usageNormal = 7;
-    public final static int usageBump = 8;
-    public final static int usageTransparency = 9;
-    public final static int usageReflection = 10;
+    public final static int unknown = 0;
+    public final static int none = 1;
+    public final static int diffuse = 2;
+    public final static int emissive = 3;
+    public final static int ambient = 4;
+    public final static int specular = 5;
+    public final static int shininess = 6;
+    public final static int normal = 7;
+    public final static int bump = 8;
+    public final static int transparency = 9;
+    public final static int reflection = 10;
 
     public String id;
     public String fileName;

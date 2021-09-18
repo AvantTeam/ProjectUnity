@@ -8,6 +8,7 @@ import unity.assets.type.g3d.attribute.*;
 public class ModelInstance implements RenderableProvider{
     public final Seq<Material> materials = new Seq<>();
     public final Seq<Node> nodes = new Seq<>();
+    public final Seq<Animation> animations = new Seq<>();
 
     public final Model model;
     public Mat3D transform;
@@ -24,19 +25,24 @@ public class ModelInstance implements RenderableProvider{
     public ModelInstance(Model model, Mat3D transform, String... rootNodeIds){
         this.model = model;
         this.transform = transform == null ? new Mat3D() : transform;
+
         if(rootNodeIds == null){
             copyNodes(model.nodes);
         }else{
             copyNodes(model.nodes, rootNodeIds);
         }
 
+        copyAnimations(model.animations);
         calculateTransforms();
     }
 
-    public ModelInstance(ModelInstance copyFrom, Mat3D transform){
-        this.model = copyFrom.model;
+    public ModelInstance(ModelInstance inst, Mat3D transform){
+        this.model = inst.model;
         this.transform = transform == null ? new Mat3D() : transform;
-        copyNodes(copyFrom.nodes);
+
+        copyNodes(inst.nodes);
+        copyAnimations(inst.animations);
+
         calculateTransforms();
     }
 
@@ -50,28 +56,93 @@ public class ModelInstance implements RenderableProvider{
 
     private void copyNodes(Seq<Node> nodes){
         for(int i = 0, n = nodes.size; i < n; ++i){
-            Node node = nodes.get(i);
+            var node = nodes.get(i);
             this.nodes.add(node.copy());
         }
+
         invalidate();
     }
 
     private void copyNodes(Seq<Node> nodes, String... nodeIds){
         for(int i = 0, n = nodes.size; i < n; ++i){
-            Node node = nodes.get(i);
-            for(String nodeId : nodeIds){
+            var node = nodes.get(i);
+            for(var nodeId : nodeIds){
                 if(nodeId.equals(node.id)){
                     this.nodes.add(node.copy());
                     break;
                 }
             }
         }
+
         invalidate();
+    }
+
+    public void copyAnimations(Iterable<Animation> source){
+        for(var anim : source){
+            copyAnimation(anim, true);
+        }
+    }
+
+    public void copyAnimations(Iterable<Animation> source, boolean shareKeyframes){
+        for(var anim : source){
+            copyAnimation(anim, shareKeyframes);
+        }
+    }
+
+    public void copyAnimation(Animation sourceAnim){
+        copyAnimation(sourceAnim, true);
+    }
+
+    public void copyAnimation(Animation sourceAnim, boolean shareKeyframes){
+        var animation = new Animation();
+        animation.id = sourceAnim.id;
+        animation.duration = sourceAnim.duration;
+
+        for(var nanim : sourceAnim.nodeAnimations){
+            var node = getNode(nanim.node.id);
+            if(node == null) continue;
+
+            var nodeAnim = new NodeAnimation();
+            nodeAnim.node = node;
+
+            if(shareKeyframes){
+                nodeAnim.translation = nanim.translation;
+                nodeAnim.rotation = nanim.rotation;
+                nodeAnim.scaling = nanim.scaling;
+            }else{
+                if(nanim.translation != null){
+                    nodeAnim.translation = new Seq<>();
+                    for(var kf : nanim.translation){
+                        nodeAnim.translation.add(new NodeKeyframe<>(kf.keytime, kf.value));
+                    }
+                }
+
+                if(nanim.rotation != null){
+                    nodeAnim.rotation = new Seq<>();
+                    for(var kf : nanim.rotation){
+                        nodeAnim.rotation.add(new NodeKeyframe<>(kf.keytime, kf.value));
+                    }
+                }
+
+                if(nanim.scaling != null){
+                    nodeAnim.scaling = new Seq<>();
+                    for(var kf : nanim.scaling){
+                        nodeAnim.scaling.add(new NodeKeyframe<>(kf.keytime, kf.value));
+                    }
+                }
+            }
+
+            if(nodeAnim.translation != null || nodeAnim.rotation != null || nodeAnim.scaling != null){
+                animation.nodeAnimations.add(nodeAnim);
+            }
+        }
+
+        if(animation.nodeAnimations.size > 0) animations.add(animation);
     }
 
     private void invalidate(Node node){
         for(int i = 0, n = node.parts.size; i < n; ++i){
-            NodePart part = node.parts.get(i);
+            var part = node.parts.get(i);
 
             if(!materials.contains(part.material, true)){
                 int midx = materials.indexOf(part.material, false);
@@ -82,6 +153,7 @@ public class ModelInstance implements RenderableProvider{
                 }
             }
         }
+
         for(int i = 0, n = node.getChildCount(); i < n; ++i){
             invalidate(node.getChild(i));
         }
@@ -95,7 +167,7 @@ public class ModelInstance implements RenderableProvider{
 
     @Override
     public void getRenderables(Prov<Renderable> renders){
-        for(Node node : nodes){
+        for(var node : nodes){
             getRenderables(node, renders);
         }
     }
@@ -113,30 +185,18 @@ public class ModelInstance implements RenderableProvider{
 
     protected void getRenderables(Node node, Prov<Renderable> renders){
         if(node.parts.size > 0){
-            for(NodePart nodePart : node.parts){
+            for(var nodePart : node.parts){
                 if(nodePart.enabled){
                     getRenderable(renders.get(), nodePart);
                 }
             }
         }
 
-        for(Node child : node.getChildren()){
+        for(var child : node.getChildren()){
             getRenderables(child, renders);
         }
     }
 
-    /**
-     * Calculates the local and world transform of all {@link Node} instances in this model, recursively. First each
-     * {@link Node#localTransform} transform is calculated based on the translation, rotation and scale of each Node.
-     * Then each
-     * {@link Node#calculateWorldTransform()} is calculated, based on the parent's world transform and the local 
-     * transform of each
-     * Node. Finally, the animation bone matrices are updated accordingly.</p>
-     * <p>
-     * This method can be used to recalculate all transforms if any of the Node's local properties (translation, 
-     * rotation, scale)
-     * was modified.
-     */
     public void calculateTransforms(){
         int n = nodes.size;
         for(int i = 0; i < n; i++){
@@ -148,19 +208,10 @@ public class ModelInstance implements RenderableProvider{
         return materials.firstOpt();
     }
 
-    /**
-     * @param id The ID of the material to fetch.
-     * @return The {@link Material} with the specified id, or null if not available.
-     */
     public Material getMaterial(String id){
         return getMaterial(id, true);
     }
 
-    /**
-     * @param id The ID of the material to fetch.
-     * @param ignoreCase whether to use case sensitivity when comparing the material id.
-     * @return The {@link Material} with the specified id, or null if not available.
-     */
     public Material getMaterial(String id, boolean ignoreCase){
         int n = materials.size;
         Material material;
@@ -181,30 +232,40 @@ public class ModelInstance implements RenderableProvider{
         return null;
     }
 
-    /**
-     * @param id The ID of the node to fetch.
-     * @return The {@link Node} with the specified id, or null if not found.
-     */
     public Node getNode(String id){
         return getNode(id, true);
     }
 
-    /**
-     * @param id The ID of the node to fetch.
-     * @param recursive false to fetch a root node only, true to search the entire node tree for the specified node.
-     * @return The {@link Node} with the specified id, or null if not found.
-     */
     public Node getNode(String id, boolean recursive){
         return getNode(id, recursive, false);
     }
 
-    /**
-     * @param id The ID of the node to fetch.
-     * @param recursive  false to fetch a root node only, true to search the entire node tree for the specified node.
-     * @param ignoreCase whether to use case sensitivity when comparing the node id.
-     * @return The {@link Node} with the specified id, or null if not found.
-     */
     public Node getNode(String id, boolean recursive, boolean ignoreCase){
         return Node.getNode(nodes, id, recursive, ignoreCase);
+    }
+
+    public Animation getAnimation(String id){
+        return getAnimation(id, false);
+    }
+
+    public Animation getAnimation(String id, boolean ignoreCase){
+        int n = animations.size;
+        Animation animation;
+
+        if(ignoreCase){
+            for(int i = 0; i < n; i++){
+                if((animation = animations.get(i)).id.equalsIgnoreCase(id)){
+                    return animation;
+                }
+            }
+        }else{
+            for(int i = 0; i < n; i++){
+                if((animation = animations.get(i)).id.equals(id)){
+                    return animation;
+                }
+            }
+        }
+
+        return null;
     }
 }
