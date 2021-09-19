@@ -148,7 +148,7 @@ public class UnityUnitTypes implements ContentList{
 
     // end legs
     public static @FactionDef("end") @EntityDef({Unitc.class, Endc.class, Legsc.class}) UnitType ravager;
-    public static @FactionDef("end") @EntityDef({Unitc.class, Endc.class, Legsc.class, Tentaclec.class}) UnitType desolation;
+    public static @FactionDef("end") @EntityDef({Unitc.class, Endc.class, Legsc.class, Tentaclec.class, Tallc.class}) UnitType desolation;
 
     // end naval
     public static @FactionDef("end") @EntityDef({Unitc.class, Endc.class, WaterMovec.class, Decorationc.class}) UnitType thalassophobia;
