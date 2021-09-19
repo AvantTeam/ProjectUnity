@@ -1196,6 +1196,7 @@ public class UnityBullets implements ContentList{
 
             overDamage = 900000f;
             ratioDamage = 1f / 1500f;
+            ratioStart = 2000f;
 
             hitEffect = Fx.blastExplosion;
             despawnEffect = Fx.blastExplosion;

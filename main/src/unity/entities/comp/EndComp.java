@@ -118,11 +118,10 @@ abstract class EndComp implements Unitc, Factionc{
         speedMultiplier *= aggression + 1f;
     }
 
-    @Replace
+    @Replace(100)
     @MethodPriority(-1)
     @Override
     @BreakAll
-    @Remove(Shieldc.class)
     public void damagePierce(float amount, boolean withEffect){
         float pre = hitTime;
 
