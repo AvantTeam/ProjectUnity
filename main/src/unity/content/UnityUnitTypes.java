@@ -19,13 +19,14 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.type.ammo.*;
 import mindustry.world.meta.*;
-import unity.*;
 import unity.ai.*;
 import unity.ai.AssistantAI.*;
 import unity.annotations.Annotations.*;
 import unity.content.effects.*;
 import unity.entities.*;
 import unity.entities.abilities.*;
+import unity.entities.bullet.anticheat.*;
+import unity.entities.bullet.anticheat.modules.*;
 import unity.entities.bullet.energy.*;
 import unity.entities.bullet.laser.*;
 import unity.entities.bullet.misc.*;
@@ -33,7 +34,6 @@ import unity.entities.bullet.physical.*;
 import unity.entities.units.*;
 import unity.gen.*;
 import unity.graphics.*;
-import unity.mod.*;
 import unity.type.*;
 import unity.type.decal.*;
 import unity.type.weapons.*;
@@ -4124,9 +4124,13 @@ public class UnityUnitTypes implements ContentList{
                 shootSound = UnitySounds.spaceFracture;
 
                 bullet = new VoidFractureBulletType(32f, 600f){{
-                    armorPierce = 2f;
-                    ratioDamage = 0.0005f;
+                    ratioDamage = 1f / 200f;
+                    ratioStart = damage * 20f;
                     shootEffect = ShootFx.voidShoot;
+
+                    modules = new AntiCheatBulletModule[]{
+                        new ArmorDamageModule(1f, 2f, 0f)
+                    };
                 }};
             }});
         }};
@@ -4216,13 +4220,17 @@ public class UnityUnitTypes implements ContentList{
 
             antiCheatType = new AntiCheatVariables(health / 600f, health / 190f, health / 610f, health / 100f, 0.6f, 7f * 60f, 8f * 60f, 35f, 4);
 
-            BulletType t = new AntiCheatBasicBulletType(9.2f, 325f){{
+            BulletType t = new EndBasicBulletType(9.2f, 325f){{
                 hitSize = 8f;
                 shrinkY = 0f;
                 width = 19f;
                 height = 25f;
-                otherAntiCheatScl = 4.75f;
-                priority = 1;
+
+                overDamage = 800000f;
+                ratioDamage = 1f / 800f;
+                ratioStart = 15000;
+                bleedDuration = 20f;
+
                 backColor = hitColor = lightColor = UnityPal.scarColor;
                 frontColor = UnityPal.endColor;
             }};
@@ -4238,36 +4246,7 @@ public class UnityUnitTypes implements ContentList{
                 firstShotDelay = 41f;
                 chargeSound = UnitySounds.devourerMainLaser;
                 shootSound = UnitySounds.continuousLaserA;
-                bullet = new SparkingContinuousLaserBulletType(2400f){{
-                    length = 340f;
-                    lifetime = 5f * 60f;
-                    incendChance = -1f;
-                    fromBlockAmount = 1;
-                    fromBlockChance = 0.4f;
-                    fromBlockDamage = 80f;
-                    shootEffect = ChargeFx.devourerChargeEffect;
-                    keepVelocity = true;
-                    lightColor = lightningColor = hitColor = UnityPal.scarColor;
-                    colors = new Color[]{UnityPal.scarColorAlpha, UnityPal.scarColor, UnityPal.endColor, Color.white};
-                }
-
-                    @Override
-                    public void hitEntity(Bullet b, Hitboxc other, float initialHealth){
-                        super.hitEntity(b, other, initialHealth);
-                        if(other instanceof Unit unit){
-                            float threat = unit.maxHealth + unit.type.dpsEstimate;
-                            float extraDamage = (float)Math.pow(Mathf.clamp((unit.maxHealth + unit.type.dpsEstimate - 43000f) / 14000f, 0f, 8f), 2f);
-                            float trueDamage = damage + Mathf.clamp((unit.maxHealth + unit.type.dpsEstimate - 32000f) / 2f, 0f, 90000000f);
-                            trueDamage += extraDamage * (damage / 3f);
-
-                            Unity.antiCheat.applyStatus(unit, 10f * 60f);
-
-                            if(!(other instanceof AntiCheatBase)) unit.damage(trueDamage);
-                            if((Float.isInfinite(threat) || Float.isNaN(threat) || threat >= Float.MAX_VALUE) && !(other instanceof AntiCheatBase)) AntiCheat.annihilateEntity(other, false);
-                        }
-                        if(other instanceof AntiCheatBase) ((AntiCheatBase)other).overrideAntiCheatDamage(damage * 4f, 2);
-                    }
-                };
+                bullet = UnityBullets.endLaser;
             }}, new Weapon("unity-doeg-destroyer"){{
                 mirror = true;
                 ignoreRotation = true;
@@ -4299,7 +4278,7 @@ public class UnityUnitTypes implements ContentList{
                 xRand = 12f;
                 shootSound = Sounds.missile;
 
-                bullet = new AntiCheatBasicBulletType(6f, 100f, "missile"){{
+                bullet = new EndBasicBulletType(6f, 100f, "missile"){{
                     width = 9f;
                     height = 11f;
                     shrinkY = 0f;
@@ -4311,6 +4290,11 @@ public class UnityUnitTypes implements ContentList{
                     splashDamageRadius = 45f;
                     weaveMag = 18f;
                     weaveScale = 1.6f;
+
+                    overDamage = 900000f;
+                    ratioDamage = 1f / 2500f;
+                    ratioStart = 1000f;
+
                     backColor = trailColor = hitColor = lightColor = UnityPal.scarColor;
                     frontColor = UnityPal.endColor;
                 }};
@@ -4445,9 +4429,9 @@ public class UnityUnitTypes implements ContentList{
                     lightningDamage = 55f;
                     lightningLength = 13;
 
-                    minimumPower = 64000f;
-                    powerFade = 19000f;
-                    minimumUnitScore = 43000f;
+                    bleedDuration = 5f * 60f;
+                    overDamage = 500000f;
+                    ratioDamage = 0.001f;
                 }};
             }});
 
@@ -4727,6 +4711,8 @@ public class UnityUnitTypes implements ContentList{
                     lifetime = 60f;
                     drag = 0.09f;
                     nextLifetime = 13f;
+                    ratioDamage = 0.01f;
+                    ratioStart = 1000f;
                     length = 52f;
                     width = 20f;
                     widthTo = 8f;
@@ -4735,6 +4721,10 @@ public class UnityUnitTypes implements ContentList{
                     targetingRange = 400f;
                     maxTargets = 20;
                     shootEffect = ShootFx.voidShoot;
+
+                    modules = new AntiCheatBulletModule[]{
+                        new ArmorDamageModule(50f, 50f, 2f)
+                    };
                 }};
             }};
 

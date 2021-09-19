@@ -23,6 +23,7 @@ import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 import unity.annotations.Annotations.*;
 import unity.content.effects.*;
+import unity.entities.bullet.anticheat.*;
 import unity.entities.bullet.energy.*;
 import unity.entities.bullet.exp.*;
 import unity.entities.bullet.laser.*;
@@ -3246,6 +3247,10 @@ public class UnityBlocks implements ContentList{
                 lightningColor = UnityPal.scarColor;
                 lightningDamage = 85f;
                 lightningLength = 15;
+
+                ratioDamage = 0.001f;
+                overDamage = 350000f;
+                bleedDuration = 5f * 60f;
             }};
 
             consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.25f && liquid.flammability < 0.1f, 3.1f)).update(false);

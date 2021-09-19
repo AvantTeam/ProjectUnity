@@ -10,8 +10,11 @@ import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.Effect.*;
 import mindustry.graphics.*;
-import unity.entities.bullet.energy.*;
+import unity.entities.bullet.anticheat.*;
+import unity.entities.bullet.laser.*;
 import unity.entities.effects.*;
+
+import static arc.graphics.g2d.Draw.color;
 
 public class SpecialFx{
     private static final Rand rand = new Rand();
@@ -93,7 +96,22 @@ public class SpecialFx{
                 Fill.circle(x1, y1, ((data.b.widthTo + 1f) / 1.22f) * e.fout());
             }
         }
-    }).layer(Layer.effect + 0.03f);
+    }).layer(Layer.effect + 0.03f),
+
+    pointBlastLaserEffect = new Effect(23f, 600f, e -> {
+        if(!(e.data instanceof PointBlastInterface data)) return;
+
+        for(int i = 0; i < data.colors().length; i++){
+            color(data.colors()[i]);
+            Fill.circle(e.x, e.y, (e.rotation - (data.widthReduction() * i)) * e.fout());
+        }
+        Drawf.light(e.x, e.y, e.rotation * e.fout() * 3f, data.colors()[0], 0.66f);
+    });
+
+    public interface PointBlastInterface{
+        Color[] colors();
+        float widthReduction();
+    }
 
     public static class VoidFractureData{
         public float x, y, x2, y2;

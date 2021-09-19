@@ -180,6 +180,14 @@ public class AntiCheat{
         }
     }
 
+    public void notifyDamage(int unitId, float delta){
+        if(delta > 0) return;
+        DisableRegenStatus status = statusMap.get(unitId);
+        if(status != null){
+            status.lastHealth += delta;
+        }
+    }
+
     public void applyStatus(Unit unit, float duration){
         if(exclude.contains(unit.id)) return;
         DisableRegenStatus status = statusMap.get(unit.id);
@@ -256,16 +264,14 @@ public class AntiCheat{
     }
 
     public void addBuilding(Building build){
-        if(!buildingSeq.contains(bq -> bq.build == build)){
+        if(exclude.add(build.id)){
             buildingSeq.add(new BuildingQueue(build));
-            exclude.add(build.id);
         }
     }
 
     public void addUnit(Unit unit){
-        if(!unitSeq.contains(uq -> uq.unit == unit)){
+        if(exclude.add(unit.id)){
             unitSeq.add(new UnitQueue(unit));
-            exclude.add(unit.id);
         }
     }
 

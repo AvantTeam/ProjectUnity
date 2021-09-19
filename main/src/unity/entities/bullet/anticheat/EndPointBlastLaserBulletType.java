@@ -1,4 +1,4 @@
-package unity.entities.bullet.laser;
+package unity.entities.bullet.anticheat;
 
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -6,26 +6,24 @@ import arc.math.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
-import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import unity.content.effects.*;
 import unity.content.effects.SpecialFx.*;
 import unity.util.*;
 
-public class PointBlastLaserBulletType extends BulletType implements PointBlastInterface{
+public class EndPointBlastLaserBulletType extends AntiCheatBulletTypeBase implements PointBlastInterface{
     public float damageRadius = 20f;
     public float auraDamage = 10f;
     public float length = 100f;
     public float width = 12f;
     public float widthReduction = 2f;
     public float auraWidthReduction = 3f;
-    public boolean overrideDamage = false;
     public Color[] laserColors = {Color.white};
 
     private static boolean available = false;
 
-    public PointBlastLaserBulletType(float damage){
+    public EndPointBlastLaserBulletType(float damage){
         speed = 0f;
         this.damage = damage;
 
@@ -69,55 +67,39 @@ public class PointBlastLaserBulletType extends BulletType implements PointBlastI
         drawSize = Math.max(drawSize, length + damageRadius * 2f);
     }
 
-    public void handleUnit(Bullet b, Unit unit, float initialHealth){
-
-    }
-
-    //new function instead of hitTile, to avoid hit() function
-    public void handleBuilding(Bullet b, Building build, float initialHealth){
-        build.damage(auraDamage);
-    }
-
     @Override
     public void init(Bullet b){
         super.init(b);
-        
+
         b.fdata = length;
-        Tmp.v1.trns(b.rotation(), length);
-        Tmp.v1.add(b);
+        Tmp.v1.trns(b.rotation(), length).add(b);
         available = false;
-        Utils.collideLineRawEnemy(b.team, b.x, b.y, Tmp.v1.x, Tmp.v1.y, (building, direct) -> {
+
+        Utils.collideLineRawEnemy(b.team, b.x, b.y, Tmp.v1.x, Tmp.v1.y, width / 3f, (bd, direct) -> {
             if(direct){
-                building.damage(b.damage);
                 available = true;
-                b.fdata = b.dst(building);
-                Tmp.v2.trns(b.rotation(), b.dst(building));
-                Tmp.v2.add(b.x, b.y);
+                b.fdata = b.dst(bd);
+                Tmp.v2.trns(b.rotation(), b.fdata).add(b.x, b.y);
+                hitBuildingAntiCheat(b, bd);
             }
-            return building.block.absorbLasers;
-        }, unit -> {
+            return bd.block.absorbLasers;
+        }, u -> {
             available = true;
-            Tmp.v2.trns(b.rotation(), b.dst(unit));
-            Tmp.v2.add(b.x, b.y);
-            unit.damage(b.damage);
-            unit.apply(status, statusDuration);
-        }, entity -> (b.dst(entity) / 2f) - entity.health(), (ex, ey) -> hitEffect.at(ex, ey, b.rotation()));
+            Tmp.v2.trns(b.rotation(), b.dst(u)).add(b.x, b.y);
+            hitUnitAntiCheat(b, u);
+            return false;
+        }, entity -> (b.dst(entity) / 2f) - entity.health(), (ex, ey) -> hitEffect.at(ex, ey, b.rotation()), true);
 
         if(available){
             b.fdata = b.dst(Tmp.v2);
-            //Vars.indexer.eachBlock(null, Tmp.v2.x, Tmp.v2.y, damageRadius, building -> building.team != b.team, building -> handleBuilding(b, building, building.health));
             Utils.trueEachBlock(Tmp.v2.x, Tmp.v2.y, damageRadius, building -> {
                 if(building.team != b.team){
-                    handleBuilding(b, building, building.health);
+                    hitBuildingAntiCheat(b, building, auraDamage * (b.damage / damage));
                 }
             });
             Units.nearby(Tmp.v2.x - damageRadius, Tmp.v2.y - damageRadius, damageRadius * 2f, damageRadius * 2f, unit -> {
                 if(unit.team != b.team && unit.within(Tmp.v2.x, Tmp.v2.y, damageRadius)){
-                    float ratio = b.damage / damage;
-                    float health = unit.health;
-                    if(!overrideDamage) unit.damage(auraDamage * ratio);
-                    handleUnit(b, unit, health);
-                    unit.apply(status, statusDuration);
+                    hitUnitAntiCheat(b, unit, auraDamage * (b.damage / damage));
                 }
             });
             SpecialFx.pointBlastLaserEffect.at(Tmp.v2.x, Tmp.v2.y, damageRadius, this);

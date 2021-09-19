@@ -10,25 +10,21 @@ import mindustry.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
-import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
-import unity.*;
 import unity.content.effects.*;
+import unity.entities.bullet.anticheat.*;
+import unity.entities.bullet.anticheat.modules.*;
 import unity.entities.bullet.energy.*;
 import unity.entities.bullet.exp.*;
 import unity.entities.bullet.kami.*;
 import unity.entities.bullet.laser.*;
-import unity.entities.bullet.misc.*;
-import unity.entities.bullet.physical.*;
-import unity.entities.units.*;
 import unity.gen.Expc.*;
 import unity.gen.*;
 import unity.graphics.*;
-import unity.mod.*;
 
 import static mindustry.Vars.*;
 import static unity.content.UnityStatusEffects.*;
@@ -65,7 +61,7 @@ public class UnityBullets implements ContentList{
 
         supernovaLaser,
 
-        ravagerLaser, ravagerArtillery, missileAntiCheat, endLaserSmall, endTentacleSmall,
+        ravagerLaser, ravagerArtillery, missileAntiCheat, endLaserSmall, endLaser,
 
         laserZap,
 
@@ -1141,7 +1137,7 @@ public class UnityBullets implements ContentList{
             }
         };
 
-        ravagerLaser = new PointBlastLaserBulletType(1210f){
+        ravagerLaser = new EndPointBlastLaserBulletType(1210f){
             {
                 length = 460f;
                 width = 26.1f;
@@ -1150,39 +1146,12 @@ public class UnityBullets implements ContentList{
                 auraWidthReduction = 4f;
                 damageRadius = 110f;
                 auraDamage = 9000f;
-                overrideDamage = true;
+
+                overDamage = 400000f;
+                ratioDamage = 0.001f;
+                bleedDuration = 10f * 60f;
 
                 laserColors = new Color[]{UnityPal.scarColorAlpha, UnityPal.scarColor, UnityPal.endColor, Color.black};
-            }
-
-            @Override
-            public void handleBuilding(Bullet b, Building build, float initialHealth){
-                float damage = auraDamage / (Math.max(3500f - Math.max(initialHealth - 150000f, 0f), 0f) / 3500f);
-                if((damage >= Float.MAX_VALUE || Float.isInfinite(damage))){
-                    build.health = 0f;
-                    AntiCheat.annihilateEntity(build, false);
-                }else{
-                    build.damage(damage);
-                }
-            }
-
-            @Override
-            public void handleUnit(Bullet b, Unit unit, float initialHealth){
-                float damage = auraDamage / (Math.max(4500f - Math.max(initialHealth - 350000f, 0f), 0f) / 4500f);
-                if((damage >= Float.MAX_VALUE || Float.isInfinite(damage)) && !(unit instanceof AntiCheatBase)){
-                    unit.health = 0f;
-                    AntiCheat.annihilateEntity(unit, false);
-                }else{
-                    unit.damage(damage);
-                }
-                if(unit instanceof AntiCheatBase) ((AntiCheatBase)unit).overrideAntiCheatDamage(auraDamage, 1);
-
-                if(unit.health >= initialHealth){
-                    Unity.antiCheat.samplerAdd(unit);
-                }else{
-                    Unity.antiCheat.samplerAdd(unit, true);
-                }
-                Unity.antiCheat.applyStatus(unit, 10f * 60f);
             }
         };
 
@@ -1199,33 +1168,35 @@ public class UnityBullets implements ContentList{
 
             fragBullets = 7;
             fragLifeMin = 0.9f;
-            fragBullet = new AntiCheatBasicBulletType(5.6f, 180f){{
-                lifetime = 30f;
+
+            fragBullet = new EndBasicBulletType(5.6f, 180f){{
+                lifetime = 20f;
                 pierce = pierceBuilding = true;
                 pierceCap = 5;
                 backColor = lightColor = UnityPal.scarColor;
                 frontColor = UnityPal.endColor;
                 width = height = 16f;
-                shrinkY = 0f;
-                tolerance = 12000f;
-                fade = 40f;
+
+                overDamage = 950000f;
+                ratioDamage = 1f / 2000f;
             }};
         }};
 
-        missileAntiCheat = new AntiCheatBasicBulletType(4f, 330f, "missile"){{
+        missileAntiCheat = new EndBasicBulletType(4f, 330f, "missile"){{
             lifetime = 60f;
             width = height = 12f;
             shrinkY = 0f;
             drag = -0.013f;
-            tolerance = 12000f;
-            fade = 45f;
             splashDamageRadius = 45f;
             splashDamage = 220f;
             homingPower = 0.08f;
             trailChance = 0.2f;
             weaveScale = 6f;
             weaveMag = 1f;
-            priority = 2;
+
+            overDamage = 900000f;
+            ratioDamage = 1f / 1500f;
+
             hitEffect = Fx.blastExplosion;
             despawnEffect = Fx.blastExplosion;
 
@@ -1233,57 +1204,44 @@ public class UnityBullets implements ContentList{
             frontColor = UnityPal.endColor;
         }};
 
-        endLaserSmall = new ContinuousLaserBulletType(85f){{
+        endLaserSmall = new EndContinuousLaserBulletType(85f){{
             lifetime = 2f * 60;
             length = 230f;
             for(int i = 0; i < strokes.length; i++){
                 strokes[i] *= 0.4f;
             }
+            overDamage = 800000f;
+            ratioDamage = 0.01f;
+            ratioStart = 1000000f;
             colors = new Color[]{UnityPal.scarColorAlpha, UnityPal.scarColor, UnityPal.endColor, Color.white};
-        }
+            modules = new AntiCheatBulletModule[]{new ArmorDamageModule(0.1f, 30f, 30f, 0.4f)};
+        }};
 
-            @Override
-            public void hitEntity(Bullet b, Hitboxc other, float initialHealth){
-                super.hitEntity(b, other, initialHealth);
-                if(other instanceof Unit unit){
-                    for(Ability ability : unit.abilities){
-                        if(ability instanceof ForceFieldAbility force){
-                            if(force.max >= 10000){
-                                force.max -= force.max / 35f;
-                                unit.shield = Math.min(force.max, unit.shield);
-                            }
-                            if(force.radius > unit.hitSize * 4f){
-                                force.radius -= force.radius / 20f;
-                            }
-                            if(force.regen > 2700f / 5f) force.regen /= 1.2f;
-                            continue;
-                        }
-                        if(ability instanceof RepairFieldAbility repair){
-                            if(repair.amount > unit.maxHealth / 7f) repair.amount *= 0.9f;
-                            continue;
-                        }
-                        if(ability instanceof StatusFieldAbility status){
-                            if((status.effect.damage < -unit.maxHealth / 20f || status.effect.reloadMultiplier > 8f) && status.duration > 20f){
-                                statusDuration -= statusDuration / 15f;
-                            }
-                        }
-                    }
-                    unit.shield -= damage * 0.4f;
-                    if(unit.armor > unit.hitSize) unit.armor -= Math.max(damage, unit.armor / 20f);
-                }
-                if(other instanceof AntiCheatBase) ((AntiCheatBase)other).overrideAntiCheatDamage(damage * 6f, 3);
-            }
-        };
+        endLaser = new EndContinuousLaserBulletType(2400f){{
+            length = 340f;
+            lifetime = 5f * 60f;
+            incendChance = -1f;
+            shootEffect = ChargeFx.devourerChargeEffect;
+            keepVelocity = true;
+            lightColor = lightningColor = hitColor = UnityPal.scarColor;
+            colors = new Color[]{UnityPal.scarColorAlpha, UnityPal.scarColor, UnityPal.endColor, Color.white};
 
-        endTentacleSmall = new TentacleBulletType(120f){{
-            fromColor = Color.red;
-            toColor = Color.black;
-            length = 290f;
-            width = 6f;
-            segments = 13;
-            lifetime = 35f;
-            angleVelocity = 6.5f;
-            angleDrag = 0.16f;
+            lightningDamage = 80f;
+            lightningChance = 0.8f;
+            lightningLength = (int)(length / 8f);
+            lightningLengthRand = 5;
+
+            overDamage = 650000f;
+            overDamagePower = 3f;
+            ratioDamage = 0.001f;
+            ratioStart = 19000f;
+            bleedDuration = 10f * 60f;
+            pierceShields = true;
+
+            modules = new AntiCheatBulletModule[]{
+                new ArmorDamageModule(0.001f, 3f, 15f, 2f),
+                new AbilityDamageModule(50f, 300f, 4f, 0.001f, 3f)
+            };
         }};
 
         laserZap = new LaserBulletType(90f){{
