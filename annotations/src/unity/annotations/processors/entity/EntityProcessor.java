@@ -393,10 +393,13 @@ public class EntityProcessor extends BaseProcessor{
                             entry.value = entry.value.select(m -> annotation(m, Replace.class) != null);
                         }else{
                             if(entry.value.count(m -> annotation(m, Replace.class) != null) > 1){
-                                throw new IllegalStateException("Type " + simpleName(def) + " has multiple components replacing non-void method " + entry.key + ".");
+                                int max = annotation(entry.value.max(m -> annotation(m, Replace.class) == null ? 0 : annotation(m, Replace.class).value()), Replace.class).value();
+                                if(entry.value.count(m -> annotation(m, Replace.class) != null && annotation(m, Replace.class).value() == max) != 1){
+                                    throw new IllegalStateException("Type " + simpleName(def) + " has multiple components replacing non-void method " + entry.key + " with similar priorities. Use `value=<priority>` to bypass this.");
+                                }
                             }
-    
-                            ExecutableElement base = entry.value.find(m -> annotation(m, Replace.class) != null);
+
+                            ExecutableElement base = entry.value.max(m -> annotation(m, Replace.class) == null ? 0 : annotation(m, Replace.class).value());
                             entry.value.clear();
                             entry.value.add(base);
                         }

@@ -205,7 +205,10 @@ public class Annotations{
     /** Whether this method replaces the actual method in the base class */
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface Replace{}
+    public @interface Replace{
+        /** @return The priority of this replacer, in case of non-void methods */
+        int value() default 0;
+    }
 
     /** Whether this method is implemented in annotation-processing time */
     @Target(ElementType.METHOD)

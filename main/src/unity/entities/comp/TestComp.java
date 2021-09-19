@@ -15,21 +15,17 @@ import unity.gen.*;
  * <ol>
  * <li> Getter:
  *   <ol>
- *
- *   <li> Has no {@link Import}.
- *   <li> Must have no modifiers <i>(implicitly {@code public})</i>.
- *   <li> Is not {@code private}.
- *
+ *     <li> Has no {@link Import}.
+ *     <li> Must have no modifiers <i>(implicitly {@code public})</i>.
+ *     <li> Is not {@code private}.
  *   </ol>
  * <li> Setter:
  *   <ol>
- *
- *   <li> Has no {@link Import}.
- *   <li> Must have no modifiers <i>(implicitly {@code public})</i>.
- *   <li> Is not {@code private}.
- *   <li> Has no {@link ReadOnly}. If this is the case, the generated field in future entity class(es) will be
+ *     <li> Has no {@link Import}.
+ *     <li> Must have no modifiers <i>(implicitly {@code public})</i>.
+ *     <li> Is not {@code private}.
+ *     <li> Has no {@link ReadOnly}. If this is the case, the generated field in future entity class(es) will be
  *     {@code protected}.
- *
  *   </ol>
  * </ol>
  */
@@ -132,5 +128,12 @@ public abstract class TestComp implements Unitc{
     @Wrap(value = "update()", block = Unitc.class)
     public boolean shouldUpdateUnitB(){
         return false;
+    }
+
+    /** Since {@link Unitc#clipSize()} is also annotation with {@link Replace}, use higher priority to bypass it */
+    @Replace(5)
+    @Override
+    public float clipSize(){
+        return Float.POSITIVE_INFINITY;
     }
 }
