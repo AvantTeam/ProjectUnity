@@ -101,7 +101,7 @@ public class VoidFractureBulletType extends AntiCheatBulletTypeBase{
                 Utils.collideLineRawEnemy(b.team, b.lastX, b.lastY, b.x, b.y, 3f, (build, direct) -> {
                     if(direct){
                         if(data.collided.add(build.id)){
-                            hitBuildingAnticheat(b, build);
+                            hitBuildingAntiCheat(b, build);
                             //build.damage(damage * b.damageMultiplier() * buildingDamageMultiplier);
                         }
                         if(build.block.absorbLasers){

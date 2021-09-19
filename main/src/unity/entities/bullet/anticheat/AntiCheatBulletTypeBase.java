@@ -6,12 +6,13 @@ import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import unity.*;
 import unity.entities.bullet.anticheat.modules.*;
-import unity.gen.*;
 import unity.mod.*;
 
 abstract class AntiCheatBulletTypeBase extends BulletType{
     /** 0-1 */
     protected float ratioDamage = 0f;
+    /** Ratio Damage starts if health is higher than this value */
+    protected float ratioStart = 25000f;
     /** Prevents regeneration */
     protected float bleedDuration = -1f;
     /** If the targets health exceeds this value, damage starts increasing */
@@ -41,8 +42,10 @@ abstract class AntiCheatBulletTypeBase extends BulletType{
             return;
         }
         float lh = unit.health, ls = unit.shield;
-        float pow = unit.health > overDamage ? Mathf.pow((unit.health - overDamage) / overDamageScl, overDamagePower) : 0f;
-        float damage = Math.max(ratioDamage * unit.maxHealth, (b.damage * b.damageMultiplier()) + extraDamage + pow);
+        float score = unit.health + unit.type.dpsEstimate;
+        float pow = score > overDamage ? Mathf.pow((score - overDamage) / overDamageScl, overDamagePower) : 0f;
+        float ratio = unit.health > ratioStart ? ratioDamage * Math.max(unit.maxHealth, unit.health) : 0f;
+        float damage = Math.max(ratio, (b.damage * b.damageMultiplier()) + extraDamage + pow);
         if(bleedDuration > 0){
             Unity.antiCheat.applyStatus(unit, bleedDuration);
         }
@@ -67,19 +70,20 @@ abstract class AntiCheatBulletTypeBase extends BulletType{
         unit.apply(status, statusDuration);
     }
 
-    public void hitBuildingAnticheat(Bullet b, Building building){
-        hitBuildingAnticheat(b, building, 0f);
+    public void hitBuildingAntiCheat(Bullet b, Building building){
+        hitBuildingAntiCheat(b, building, 0f);
     }
 
-    public void hitBuildingAnticheat(Bullet b, Building building, float extraDamage){
+    public void hitBuildingAntiCheat(Bullet b, Building building, float extraDamage){
         if(building.health >= Float.MAX_VALUE || Float.isNaN(building.health) || building.health >= Float.POSITIVE_INFINITY){
             AntiCheat.annihilateEntity(building, true);
             return;
         }
         boolean col = !(collidesTiles && collides);
         float pow = building.health > overDamage ? Mathf.pow((building.health - overDamage) / overDamageScl, overDamagePower) : 0f;
-        if(col || pow > 0f){
-            float damage = Math.max(ratioDamage * building.maxHealth, (col ? ((b.damage * b.damageMultiplier()) + extraDamage) * buildingDamageMultiplier : 0f) + pow);
+        if(col || pow > 0f || ratioDamage > 0f){
+            float ratio = building.health > ratioStart ? ratioDamage * Math.max(building.maxHealth, building.health) : 0f;
+            float damage = Math.max(ratio, (col ? ((b.damage * b.damageMultiplier()) + extraDamage) * buildingDamageMultiplier : 0f) + pow);
             building.damage(damage);
         }
     }
@@ -95,7 +99,7 @@ abstract class AntiCheatBulletTypeBase extends BulletType{
 
     @Override
     public void hitTile(Bullet b, Building build, float initialHealth, boolean direct){
-        hitBuildingAnticheat(b, build);
+        hitBuildingAntiCheat(b, build);
         super.hitTile(b, build, initialHealth, direct);
     }
 }

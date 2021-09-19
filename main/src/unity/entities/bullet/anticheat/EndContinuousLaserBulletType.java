@@ -87,7 +87,7 @@ public class EndContinuousLaserBulletType extends AntiCheatBulletTypeBase{
                 }
                 if(ent instanceof Building bd){
                     if(direct){
-                        hitBuildingAnticheat(b, bd);
+                        hitBuildingAntiCheat(b, bd);
                     }
                     hit = bd.block.absorbLasers;
                 }

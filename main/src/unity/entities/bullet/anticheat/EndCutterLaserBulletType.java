@@ -119,11 +119,11 @@ public class EndCutterLaserBulletType extends AntiCheatBulletTypeBase{
                         for(int i = 0; i < 2; i++){
                             HitFx.tenmeikiriTipHit.at(Tmp.v2.x + Mathf.range(4f), Tmp.v2.y + Mathf.range(4f), b.rotation() + 180f);
                         }
-                        hitBuildingAnticheat(b, building);
+                        hitBuildingAntiCheat(b, building);
                         hit = true;
                         return true;
                     }
-                    hitBuildingAnticheat(b, building);
+                    hitBuildingAntiCheat(b, building);
                 }
                 return false;
             }, unit -> {

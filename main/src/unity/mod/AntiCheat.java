@@ -264,16 +264,14 @@ public class AntiCheat{
     }
 
     public void addBuilding(Building build){
-        if(!buildingSeq.contains(bq -> bq.build == build)){
+        if(exclude.add(build.id)){
             buildingSeq.add(new BuildingQueue(build));
-            exclude.add(build.id);
         }
     }
 
     public void addUnit(Unit unit){
-        if(!unitSeq.contains(uq -> uq.unit == unit)){
+        if(exclude.add(unit.id)){
             unitSeq.add(new UnitQueue(unit));
-            exclude.add(unit.id);
         }
     }
 

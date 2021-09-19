@@ -10,7 +10,6 @@ import mindustry.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
-import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -23,9 +22,6 @@ import unity.entities.bullet.energy.*;
 import unity.entities.bullet.exp.*;
 import unity.entities.bullet.kami.*;
 import unity.entities.bullet.laser.*;
-import unity.entities.bullet.misc.*;
-import unity.entities.bullet.physical.*;
-import unity.entities.units.*;
 import unity.gen.Expc.*;
 import unity.gen.*;
 import unity.graphics.*;
@@ -65,7 +61,7 @@ public class UnityBullets implements ContentList{
 
         supernovaLaser,
 
-        ravagerLaser, ravagerArtillery, missileAntiCheat, endLaserSmall, endTentacleSmall,
+        ravagerLaser, ravagerArtillery, missileAntiCheat, endLaserSmall, endLaser,
 
         laserZap,
 
@@ -1172,33 +1168,35 @@ public class UnityBullets implements ContentList{
 
             fragBullets = 7;
             fragLifeMin = 0.9f;
-            fragBullet = new AntiCheatBasicBulletType(5.6f, 180f){{
-                lifetime = 30f;
+
+            fragBullet = new EndBasicBulletType(5.6f, 180f){{
+                lifetime = 20f;
                 pierce = pierceBuilding = true;
                 pierceCap = 5;
                 backColor = lightColor = UnityPal.scarColor;
                 frontColor = UnityPal.endColor;
                 width = height = 16f;
-                shrinkY = 0f;
-                tolerance = 12000f;
-                fade = 40f;
+
+                overDamage = 950000f;
+                ratioDamage = 1f / 2000f;
             }};
         }};
 
-        missileAntiCheat = new AntiCheatBasicBulletType(4f, 330f, "missile"){{
+        missileAntiCheat = new EndBasicBulletType(4f, 330f, "missile"){{
             lifetime = 60f;
             width = height = 12f;
             shrinkY = 0f;
             drag = -0.013f;
-            tolerance = 12000f;
-            fade = 45f;
             splashDamageRadius = 45f;
             splashDamage = 220f;
             homingPower = 0.08f;
             trailChance = 0.2f;
             weaveScale = 6f;
             weaveMag = 1f;
-            priority = 2;
+
+            overDamage = 900000f;
+            ratioDamage = 1f / 1500f;
+
             hitEffect = Fx.blastExplosion;
             despawnEffect = Fx.blastExplosion;
 
@@ -1212,21 +1210,38 @@ public class UnityBullets implements ContentList{
             for(int i = 0; i < strokes.length; i++){
                 strokes[i] *= 0.4f;
             }
-            ratioDamage = 0.00001f;
-            overDamage = 700000f;
+            overDamage = 800000f;
+            ratioDamage = 0.01f;
+            ratioStart = 1000000f;
             colors = new Color[]{UnityPal.scarColorAlpha, UnityPal.scarColor, UnityPal.endColor, Color.white};
-            modules = new AntiCheatBulletModule[]{new ArmorDestroyer(0.1f, 30f, 30f, 0.4f)};
+            modules = new AntiCheatBulletModule[]{new ArmorDamageModule(0.1f, 30f, 30f, 0.4f)};
         }};
 
-        endTentacleSmall = new TentacleBulletType(120f){{
-            fromColor = Color.red;
-            toColor = Color.black;
-            length = 290f;
-            width = 6f;
-            segments = 13;
-            lifetime = 35f;
-            angleVelocity = 6.5f;
-            angleDrag = 0.16f;
+        endLaser = new EndContinuousLaserBulletType(2400f){{
+            length = 340f;
+            lifetime = 5f * 60f;
+            incendChance = -1f;
+            shootEffect = ChargeFx.devourerChargeEffect;
+            keepVelocity = true;
+            lightColor = lightningColor = hitColor = UnityPal.scarColor;
+            colors = new Color[]{UnityPal.scarColorAlpha, UnityPal.scarColor, UnityPal.endColor, Color.white};
+
+            lightningDamage = 80f;
+            lightningChance = 0.8f;
+            lightningLength = (int)(length / 8f);
+            lightningLengthRand = 5;
+
+            overDamage = 650000f;
+            overDamagePower = 3f;
+            ratioDamage = 0.001f;
+            ratioStart = 19000f;
+            bleedDuration = 10f * 60f;
+            pierceShields = true;
+
+            modules = new AntiCheatBulletModule[]{
+                new ArmorDamageModule(0.001f, 3f, 15f, 2f),
+                new AbilityDamageModule(50f, 300f, 4f, 0.001f, 3f)
+            };
         }};
 
         laserZap = new LaserBulletType(90f){{

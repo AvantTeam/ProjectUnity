@@ -80,7 +80,7 @@ public class EndPointBlastLaserBulletType extends AntiCheatBulletTypeBase implem
                 available = true;
                 b.fdata = b.dst(bd);
                 Tmp.v2.trns(b.rotation(), b.fdata).add(b.x, b.y);
-                hitBuildingAnticheat(b, bd);
+                hitBuildingAntiCheat(b, bd);
             }
             return bd.block.absorbLasers;
         }, u -> {
@@ -94,7 +94,7 @@ public class EndPointBlastLaserBulletType extends AntiCheatBulletTypeBase implem
             b.fdata = b.dst(Tmp.v2);
             Utils.trueEachBlock(Tmp.v2.x, Tmp.v2.y, damageRadius, building -> {
                 if(building.team != b.team){
-                    hitBuildingAnticheat(b, building, auraDamage * (b.damage / damage));
+                    hitBuildingAntiCheat(b, building, auraDamage * (b.damage / damage));
                 }
             });
             Units.nearby(Tmp.v2.x - damageRadius, Tmp.v2.y - damageRadius, damageRadius * 2f, damageRadius * 2f, unit -> {

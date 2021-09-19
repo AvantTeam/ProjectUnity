@@ -3,25 +3,25 @@ package unity.entities.bullet.anticheat.modules;
 import mindustry.entities.abilities.*;
 import mindustry.gen.*;
 
-public class ArmorDestroyer implements AntiCheatBulletModule{
+public class ArmorDamageModule implements AntiCheatBulletModule{
     private final float armorDamage, shieldDamage, efficiencyDamage, ratioDamage;
     private float minimumArmorShield = 20f, minimumEfficiency = 2f;
 
-    public ArmorDestroyer(float armorDamage, float shieldDamage, float efficiencyDamage){
+    public ArmorDamageModule(float armorDamage, float shieldDamage, float efficiencyDamage){
         this.armorDamage = armorDamage;
         this.shieldDamage = shieldDamage;
         this.efficiencyDamage = efficiencyDamage;
         ratioDamage = 0f;
     }
 
-    public ArmorDestroyer(float ratioDamage, float armorDamage, float shieldDamage, float efficiencyDamage){
+    public ArmorDamageModule(float ratioDamage, float armorDamage, float shieldDamage, float efficiencyDamage){
         this.armorDamage = armorDamage;
         this.shieldDamage = shieldDamage;
         this.ratioDamage = ratioDamage;
         this.efficiencyDamage = efficiencyDamage;
     }
 
-    public ArmorDestroyer set(float minAS, float minE){
+    public ArmorDamageModule set(float minAS, float minE){
         minimumArmorShield = minAS;
         minimumEfficiency = minE;
         return this;

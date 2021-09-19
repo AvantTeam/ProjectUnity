@@ -72,9 +72,9 @@ abstract class EndComp implements Unitc, Factionc{
 
         if(aType != null){
             if(team != trueTeam && trueHealth >= Math.max(trueMaxHealth / 100f, 150f)) team = trueTeam;
-            if(health < trueHealth) health = trueHealth;
+            if(health < trueHealth || Float.isNaN(health)) health = trueHealth;
             trueHealth = health;
-            if(maxHealth < trueMaxHealth) maxHealth = trueMaxHealth;
+            if(maxHealth < trueMaxHealth || Float.isNaN(maxHealth)) maxHealth = trueMaxHealth;
             trueMaxHealth = maxHealth;
             if(trueHealth > 0f) dead = false;
             if(resistTime <= 0f){

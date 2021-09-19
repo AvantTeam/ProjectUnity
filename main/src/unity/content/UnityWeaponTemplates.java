@@ -7,8 +7,8 @@ import mindustry.ctype.*;
 import mindustry.entities.bullet.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import unity.entities.bullet.anticheat.*;
 import unity.entities.bullet.energy.*;
-import unity.entities.bullet.physical.*;
 import unity.gen.*;
 import unity.graphics.*;
 import unity.type.*;
@@ -29,15 +29,18 @@ public class UnityWeaponTemplates implements ContentList{
             alternate = true;
             rotate = true;
 
-            bullet = new AntiCheatBasicBulletType(6f, 140f){{
+            bullet = new EndBasicBulletType(6f, 140f){{
                 lifetime = 70f;
                 width = 15f;
                 height = 19f;
                 shrinkY = 0f;
                 backColor = hitColor = lightColor = UnityPal.scarColor;
                 frontColor = UnityPal.endColor;
-                tolerance = 21000f;
-                fade = 400f;
+                ratioStart = 90000f;
+                ratioDamage = 1f / 200f;
+                overDamage = 900000f;
+                //tolerance = 21000f;
+                //fade = 400f;
             }};
         }};
 
@@ -54,7 +57,7 @@ public class UnityWeaponTemplates implements ContentList{
             alternate = true;
             rotate = true;
 
-            bullet = new AntiCheatBasicBulletType(6f, 220f, "missile"){{
+            bullet = new EndBasicBulletType(6f, 220f, "missile"){{
                 lifetime = 80f;
                 width = 15f;
                 height = 17f;
@@ -68,11 +71,12 @@ public class UnityWeaponTemplates implements ContentList{
                 homingPower = 0.08f;
                 weaveScale = 6f;
                 weaveMag = 1.2f;
-                priority = 2;
                 hitEffect = Fx.blastExplosion;
                 despawnEffect = Fx.blastExplosion;
-                tolerance = 19000f;
-                fade = 200f;
+
+                ratioStart = 56000f;
+                ratioDamage = 1f / 150f;
+                overDamage = 850000f;
             }};
         }};
 
