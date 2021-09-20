@@ -1,17 +1,16 @@
 package unity.entities.comp;
 
 import arc.math.*;
+import arc.util.*;
 import mindustry.gen.*;
 import unity.annotations.Annotations.*;
 import unity.gen.*;
 
 /**
  * A test component whose purpose is to test out annotation implementations. Do not use directly!
- *
  * <p>This component will generate {@link Testc} interface of which declared methods are all methods in this comp
  * that aren't {@code protected}/{@code private} and has no {@link Override}, <i>and</i> getter/setters of which
  * requirements are:
- *
  * <ol>
  * <li> Getter:
  *   <ol>
@@ -30,9 +29,9 @@ import unity.gen.*;
  * </ol>
  */
 @SuppressWarnings({"unused", "UnnecessaryReturnStatement"})
-@EntityDef({Unitc.class, Testc.class})
+@EntityDef({Unitc.class, Testc.class, Test2c.class, Test3c.class})
 @EntityComponent
-public abstract class TestComp implements Unitc{
+abstract class TestComp implements Unitc, Test4c{
     /** Import fields from another component */
     @Import float health, maxHealth;
 
@@ -130,10 +129,17 @@ public abstract class TestComp implements Unitc{
         return false;
     }
 
-    /** Since {@link Unitc#clipSize()} is also annotation with {@link Replace}, use higher priority to bypass it */
+    /** Since {@link Unitc#clipSize()} is also annotated with {@link Replace}, use higher priority to bypass it */
     @Replace(5)
     @Override
     public float clipSize(){
         return Float.POSITIVE_INFINITY;
+    }
+
+    /** Annotate it with {@link Replace} and use priority 5 */
+    @Replace(5)
+    @Override
+    public void yourThing(){
+        Log.info("All of those, give them to me.");
     }
 }
