@@ -27,6 +27,7 @@ public class VoidFractureBulletType extends AntiCheatBulletTypeBase{
     public int maxTargets = 15;
     public float spikesRange = 100f, spikesDamage = 200f, spikesRand = 8f;
     public Sound activeSound = UnitySounds.fractureShoot, spikesSound = UnitySounds.spaceFracture;
+    public Effect spikeEffect = HitFx.voidHit;
 
     private static float s;
     private static int in;
@@ -158,6 +159,7 @@ public class VoidFractureBulletType extends AntiCheatBulletTypeBase{
                         Vec2 v = Intersector.nearestSegmentPoint(d.x, d.y, d.x2, d.y2, build.x + Mathf.range(spikesRand), build.y + Mathf.range(spikesRand), Tmp.v1);
                         Tmp.v2.set(v).sub(build).limit2(s * s).add(build);
                         hitEffect.at(Tmp.v2);
+                        spikeEffect.at(v, v.angleTo(build));
                         d.spikes.add(v.x, v.y, build.x, build.y);
                     }
                     return false;
@@ -170,6 +172,7 @@ public class VoidFractureBulletType extends AntiCheatBulletTypeBase{
                         Vec2 v = Intersector.nearestSegmentPoint(d.x, d.y, d.x2, d.y2, unit.x + Mathf.range(spikesRand), unit.y + Mathf.range(spikesRand), Tmp.v1);
                         Tmp.v2.set(v).sub(unit).limit2(s * s).add(unit);
                         hitEffect.at(Tmp.v2);
+                        spikeEffect.at(v, v.angleTo(unit));
                         d.spikes.add(v.x, v.y, unit.x, unit.y);
                     }
                     return false;

@@ -4837,7 +4837,83 @@ public class UnityUnitTypes implements ContentList{
                 y.y = 6.25f;
                 y.otherSide = 9;
                 y.flipSprite = true;
-            })
+            }),
+            new EnergyChargeWeapon(""){
+                TextureRegion r;
+                TextureRegion[] rs;
+                final Color[] colors = {UnityPal.scarColor, UnityPal.endColor, Color.white, Color.black};
+
+                {
+                    mirror = false;
+                    x = 0f;
+                    y = 41.25f;
+                    reload = 15f * 60f;
+                    continuous = true;
+
+                    bullet = new ContinuousSingularityLaserBulletType(1600f){{
+                        lifetime = 5f * 60f;
+                        width = 40f;
+                        widthReduction = 6f;
+                        collisionWidth = 17f;
+                        accel = 15f;
+                        laserSpeed = 45f;
+                        pierceAmount = 20;
+                        gravityStrength = 20f * 80f;
+                        baseTriangleSize = 210f;
+                        oscScl = 5f;
+
+                        overDamage = 600000f;
+                        overDamagePower = 4f;
+                        ratioDamage = 1f / 200f;
+                        bleedDuration = 600f;
+                    }};
+
+                    drawCharge = (unit, mount, charge) -> {
+                        float len = 32.25f, rr = unit.rotation;
+                        float wx = Angles.trnsx(rr, y) + unit.x,
+                        wy = Angles.trnsy(rr, y) + unit.y;
+
+                        float tx = Angles.trnsx(rr, len),
+                        ty = Angles.trnsy(rr, len);
+
+                        for(int i = 0; i < colors.length; i++){
+                            float w = 1f - ((6f * i) / 50f);
+
+                            Draw.color(colors[i]);
+                            UnityDrawf.shiningCircle(unit.id, Time.time, wx + Mathf.range(charge), wy + Mathf.range(charge), (35f + Mathf.absin(40f, 5f)) * w * charge, 5, 90f, 15f, 15f * charge, 45f);
+                        }
+
+                        Draw.color(UnityPal.scarColor);
+                        Draw.blend(Blending.additive);
+
+                        Draw.alpha(charge);
+                        Draw.rect(r, wx + tx + Mathf.range(charge * 3f), wy + ty + Mathf.range(charge * 3f), rr - 90f);
+
+                        for(int i = 0; i < rs.length; i++){
+                            float f = i / (float)rs.length,
+                            t = (i + 1f) / rs.length;
+                            float a = Mathf.curve(charge, f, t), inv = (1f - a) * 3f;
+                            Draw.alpha(Mathf.clamp(a * 2f));
+                            Draw.rect(rs[i], wx + (tx * (1f + inv)) + Mathf.range(a * 2f),
+                            wy + (ty * (1f + inv)) + Mathf.range(a * 2f),
+                            rr - 90f);
+                        }
+
+                        Draw.blend();
+                        Draw.reset();
+                    };
+                }
+
+                @Override
+                public void load(){
+                    super.load();
+                    r = Core.atlas.find("unity-thalassophobia-cannon");
+                    rs = new TextureRegion[4];
+                    for(int i = 0; i < 4; i++){
+                        rs[i] = Core.atlas.find("unity-thalassophobia-cannon-" + i);
+                    }
+                }
+            }
             );
         }
 
