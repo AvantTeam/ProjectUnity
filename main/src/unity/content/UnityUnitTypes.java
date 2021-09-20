@@ -148,7 +148,7 @@ public class UnityUnitTypes implements ContentList{
 
     // end legs
     public static @FactionDef("end") @EntityDef({Unitc.class, Endc.class, Legsc.class}) UnitType ravager;
-    public static @FactionDef("end") @EntityDef({Unitc.class, Endc.class, Legsc.class, Tentaclec.class}) UnitType desolation;
+    public static @FactionDef("end") @EntityDef({Unitc.class, Endc.class, Legsc.class, Tentaclec.class, Tallc.class}) UnitType desolation;
 
     // end naval
     public static @FactionDef("end") @EntityDef({Unitc.class, Endc.class, WaterMovec.class, Decorationc.class}) UnitType thalassophobia;
@@ -4686,7 +4686,7 @@ public class UnityUnitTypes implements ContentList{
                 shadow = 47f;
                 shots = 3;
                 shotDelay = 6f;
-                reload = 90f;
+                reload = 120f;
                 inaccuracy = 20f;
                 shootCone = 7f;
                 shootY = 0f;
@@ -4703,6 +4703,7 @@ public class UnityUnitTypes implements ContentList{
 
                     Draw.color(Color.black);
                     UnityDrawf.shiningCircle(unit.id * 321 + Math.max(0, w.otherSide * 41), Time.time, wx, wy, 3.5f * charge, 6, 60f, 17f, 3f * charge, 70f);
+                    Draw.color();
                 };
 
                 bullet = new VoidFractureBulletType(40f, 800f){{
@@ -4726,39 +4727,116 @@ public class UnityUnitTypes implements ContentList{
                         new ArmorDamageModule(50f, 50f, 2f)
                     };
                 }};
+            }},
+            m = new Weapon("unity-end-missile-launcher"){{
+                shootY = 7.25f;
+                reload = 50f;
+                alternate = true;
+                mirror = false;
+                shotDelay = 3f;
+                shots = 5;
+                xRand = 5.75f;
+                rotate = true;
+                rotateSpeed = 4f;
+                inaccuracy = 7f;
+                shootSound = Sounds.missile;
+
+                bullet = new EndBasicBulletType(4f, 210f, "missile"){{
+                    lifetime = 75f;
+                    width = height = 12f;
+                    shrinkY = 0f;
+                    drag = -0.01f;
+                    splashDamageRadius = 45f;
+                    splashDamage = 220f;
+                    homingPower = 0.08f;
+                    homingRange = 100f;
+                    trailChance = 0.3f;
+                    weaveScale = 6f;
+                    weaveMag = 1f;
+
+                    overDamage = 950000f;
+                    ratioDamage = 1f / 1500f;
+                    ratioStart = 2000f;
+
+                    hitEffect = Fx.blastExplosion;
+                    despawnEffect = Fx.blastExplosion;
+
+                    backColor = lightColor = trailColor = UnityPal.scarColor;
+                    frontColor = UnityPal.endColor;
+                }};
             }};
 
             weapons.addAll(
-            clnW(w, y -> {
+            clnW(w, y -> {//0
                 y.x = 79.5f;
                 y.y = -34f;
                 y.otherSide = 1;
             }),
-            clnW(w, y -> {
+            clnW(w, y -> {//1
                 y.x = 90.5f;
                 y.y = -71.5f;
                 y.otherSide = 2;
+                y.flipSprite = true;
             }),
-            clnW(w, y -> {
+            clnW(w, y -> {//2
                 y.x = 91.25f;
                 y.y = -104f;
                 y.otherSide = 0;
+                y.flipSprite = true;
             }),
 
-            clnW(w, y -> {
+            clnW(w, y -> {//3
                 y.x = -79.5f;
                 y.y = -34f;
                 y.otherSide = 4;
             }),
-            clnW(w, y -> {
+            clnW(w, y -> {//4
                 y.x = -90.5f;
                 y.y = -71.5f;
                 y.otherSide = 5;
+                y.flipSprite = true;
             }),
-            clnW(w, y -> {
+            clnW(w, y -> {//5
                 y.x = -91.25f;
                 y.y = -104f;
                 y.otherSide = 3;
+                y.flipSprite = true;
+            }),
+
+            clnW(m, y -> {//6
+                y.x = 73.5f;
+                y.y = 69.5f;
+                y.otherSide = 7;
+            }),
+            clnW(m, y -> {//7
+                y.x = 84f;
+                y.y = 40f;
+                y.otherSide = 8;
+                y.flipSprite = true;
+            }),
+            clnW(m, y -> {//8
+                y.x = 72.5f;
+                y.y = 6.25f;
+                y.otherSide = 6;
+                y.flipSprite = true;
+            }),
+
+            clnW(m, y -> {//9
+                y.x = -73.5f;
+                y.y = 69.5f;
+                y.otherSide = 10;
+            }),
+            clnW(m, y -> {//10
+                y.x = -84f;
+                y.y = 40f;
+                y.otherSide = 11;
+                y.flipSprite = true;
+            }),
+            clnW(m, y -> {//11
+                y.x = -72.5f;
+                y.y = 6.25f;
+                y.otherSide = 9;
+                y.flipSprite = true;
             })
             );
         }

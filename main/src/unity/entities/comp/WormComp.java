@@ -1,6 +1,7 @@
 package unity.entities.comp;
 
 import arc.func.*;
+import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
@@ -15,7 +16,6 @@ import unity.gen.*;
 import unity.type.*;
 import unity.util.*;
 
-//TODO custom saving
 @SuppressWarnings({"unused", "UnnecessaryReturnStatement"})
 @EntityComponent
 abstract class WormComp implements Unitc{
@@ -49,9 +49,18 @@ abstract class WormComp implements Unitc{
         return child == null;
     }
 
+    @Override
+    @Replace
+    public TextureRegion icon(){
+        UnityUnitType uType = (UnityUnitType)type;
+        if(isTail()) return uType.tailOutline;
+        if(!isHead()) return uType.segmentOutline;
+        return type.fullIcon;
+    }
+
     private void connect(Wormc other){
         if(isHead() && other.isTail()){
-            int z = other.countFoward() + 1;
+            float z = other.layer() + 1f;
             distributeActionBack(u -> {
                 u.layer(u.layer() + z);
                 u.head(other.head());
@@ -121,6 +130,7 @@ abstract class WormComp implements Unitc{
                 current.child(u);
                 w.parent((Unit)current);
                 w.head(self());
+                w.layer(i);
                 current = w;
             }
         }
@@ -261,7 +271,7 @@ abstract class WormComp implements Unitc{
         Unit tail = type.create(team);
         UnityUnitType uType = (UnityUnitType)type;
         if(tail instanceof Wormc){
-            int z = countFoward() + 1;
+            float z = layer + 1f;
             Tmp.v1.trns(rotation() + 180f, uType.segmentOffset).add(self());
             tail.set(Tmp.v1);
             ((Wormc)tail).layer(z);
