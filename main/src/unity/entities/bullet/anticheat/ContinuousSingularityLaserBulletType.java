@@ -106,7 +106,7 @@ public class ContinuousSingularityLaserBulletType extends AntiCheatBulletTypeBas
                     boolean h = (building.health > damage / 100f) || building.block.absorbLasers;
                     if(direct){
                         if(h){
-                            if(p) data.pierceScore += building.block.size * (building.block.absorbLasers ? 15f : 5f) * ratio;
+                            if(p) data.pierceScore += building.block.size * (building.block.absorbLasers ? 10f : 1f) * ratio;
                             if(!p || data.pierceScore >= pierceCap){
                                 Tmp.v2.trns(b.rotation(), maxLength * 1.5f).add(b);
                                 float dst = Intersector.distanceLinePoint(b.x, b.y, Tmp.v2.x, Tmp.v2.y, building.x, building.y);

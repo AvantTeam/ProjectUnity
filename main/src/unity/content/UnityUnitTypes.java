@@ -4861,7 +4861,7 @@ public class UnityUnitTypes implements ContentList{
                         gravityStrength = 20f * 80f;
                         baseTriangleSize = 210f;
                         oscScl = 5f;
-                        buildingDamageMultiplier = 0.4f;
+                        buildingDamageMultiplier = 0.7f;
 
                         overDamage = 600000f;
                         overDamagePower = 4f;
