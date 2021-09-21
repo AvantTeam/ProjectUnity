@@ -397,7 +397,7 @@ public class EntityProcessor extends BaseProcessor{
                                 throw new IllegalStateException("Type " + simpleName(def) + " has multiple components replacing non-void method " + entry.key + " with similar priorities. Use `value=<priority>` to bypass this.");
                             }
 
-                            ExecutableElement base = entry.value.max(m -> annotation(m, Replace.class) == null ? 0 : annotation(m, Replace.class).value());
+                            ExecutableElement base = entry.value.max(m -> annotation(m, Replace.class) == null ? -1 : annotation(m, Replace.class).value());
                             entry.value.clear();
                             entry.value.add(base);
                         }
