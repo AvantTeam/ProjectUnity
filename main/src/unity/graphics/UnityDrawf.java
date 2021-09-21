@@ -30,6 +30,7 @@ public class UnityDrawf{
          3,  0,  3,  0, 15, 42, 15, 12,  3,  0,  3,  0, 15, 42, 15, 12,
          2,  1,  2,  1,  9, 45,  9, 19,  2,  1,  2,  1, 14, 18, 14, 13
     };
+    private final static float[] v = new float[6];
 
     public static void dashCircleAngle(float x, float y, float radius, float rotation){
         float scaleFactor = 0.6f;
@@ -55,15 +56,19 @@ public class UnityDrawf{
     }
 
     public static void shiningCircle(int seed, float time, float x, float y, float radius, int spikes, float spikeDuration, float spikeWidth, float spikeHeight, float angleDrift){
+        shiningCircle(seed, time, x, y, radius, spikes, spikeDuration, 0f, spikeWidth, spikeHeight, angleDrift);
+    }
+
+    public static void shiningCircle(int seed, float time, float x, float y, float radius, int spikes, float spikeDuration, float durationRange, float spikeWidth, float spikeHeight, float angleDrift){
         Fill.circle(x, y, radius);
         spikeWidth = Math.min(spikeWidth, 90f);
-        float[] v = new float[6];
-        int idx = 0;
+        int idx;
 
         for(int i = 0; i < spikes; i++){
-            float timeOffset = Mathf.randomSeed((seed + i) * 314L, 0f, spikeDuration);
-            int timeSeed = Mathf.floor((time + timeOffset) / spikeDuration);
-            float fin = ((time + timeOffset) % spikeDuration) / spikeDuration;
+            float d = spikeDuration * (durationRange > 0f ? Mathf.randomSeed((seed + i) * 41L, 1f - durationRange, 1f + durationRange) : 1f);
+            float timeOffset = Mathf.randomSeed((seed + i) * 314L, 0f, d);
+            int timeSeed = Mathf.floor((time + timeOffset) / d);
+            float fin = ((time + timeOffset) % d) / d;
             float fslope = (0.5f - Math.abs(fin - 0.5f)) * 2f;
             float angle = Mathf.randomSeed(Math.max(timeSeed, 1) + ((i + seed) * 245L), 360f);
             if(fslope > 0.0001f){

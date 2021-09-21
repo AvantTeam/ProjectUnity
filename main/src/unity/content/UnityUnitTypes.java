@@ -4861,10 +4861,12 @@ public class UnityUnitTypes implements ContentList{
                         gravityStrength = 20f * 80f;
                         baseTriangleSize = 210f;
                         oscScl = 5f;
+                        buildingDamageMultiplier = 0.4f;
 
                         overDamage = 600000f;
                         overDamagePower = 4f;
                         ratioDamage = 1f / 200f;
+                        ratioStart = 8000f;
                         bleedDuration = 600f;
                     }};
 
@@ -4877,10 +4879,14 @@ public class UnityUnitTypes implements ContentList{
                         ty = Angles.trnsy(rr, len);
 
                         for(int i = 0; i < colors.length; i++){
-                            float w = 1f - ((6f * i) / 50f);
+                            float w = 1f - ((6f * i) / 50f),
+                            rx = Mathf.range(charge),
+                            ry = Mathf.range(charge),
+                            s = Mathf.absin(40f, 5f);
 
                             Draw.color(colors[i]);
-                            UnityDrawf.shiningCircle(unit.id, Time.time, wx + Mathf.range(charge), wy + Mathf.range(charge), (35f + Mathf.absin(40f, 5f)) * w * charge, 5, 90f, 15f, 15f * charge, 45f);
+                            Drawf.tri(wx + rx, wy + ry, (35f + s) * w * charge * 2f * 1.22f, charge * charge * w * (160f + Mathf.absin(Time.time + i * 8f, 15f, 12f)), unit.rotation);
+                            UnityDrawf.shiningCircle(unit.id, Time.time, wx + rx, wy + ry, (35f + s) * w * charge, 5, 90f, 0.5f, 25f, 15f * charge, 45f);
                         }
 
                         Draw.color(UnityPal.scarColor);
@@ -4892,7 +4898,7 @@ public class UnityUnitTypes implements ContentList{
                         for(int i = 0; i < rs.length; i++){
                             float f = i / (float)rs.length,
                             t = (i + 1f) / rs.length;
-                            float a = Mathf.curve(charge, f, t), inv = (1f - a) * 3f;
+                            float a = Mathf.curve(charge, f, t), inv = Interp.pow2In.apply(1f - a) * 3f;
                             Draw.alpha(Mathf.clamp(a * 2f));
                             Draw.rect(rs[i], wx + (tx * (1f + inv)) + Mathf.range(a * 2f),
                             wy + (ty * (1f + inv)) + Mathf.range(a * 2f),
