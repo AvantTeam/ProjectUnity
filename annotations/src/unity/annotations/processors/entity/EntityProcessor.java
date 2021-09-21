@@ -393,10 +393,7 @@ public class EntityProcessor extends BaseProcessor{
                         if(entry.value.first().getReturnType().getKind() == VOID){
                             entry.value = entry.value.select(m -> annotation(m, Replace.class) != null && annotation(m, Replace.class).value() == max);
                         }else{
-                            if(
-                                entry.value.count(m -> annotation(m, Replace.class) != null) > 1 &&
-                                entry.value.count(m -> annotation(m, Replace.class) != null && annotation(m, Replace.class).value() == max) != 1
-                            ){
+                            if(entry.value.count(m -> annotation(m, Replace.class) != null && annotation(m, Replace.class).value() == max) != 1){
                                 throw new IllegalStateException("Type " + simpleName(def) + " has multiple components replacing non-void method " + entry.key + " with similar priorities. Use `value=<priority>` to bypass this.");
                             }
 
