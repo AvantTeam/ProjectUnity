@@ -3249,7 +3249,8 @@ public class UnityBlocks implements ContentList{
                 lightningDamage = 85f;
                 lightningLength = 15;
 
-                ratioDamage = 0.001f;
+                ratioDamage = 1f / 60f;
+                ratioStart = 30000f;
                 overDamage = 350000f;
                 bleedDuration = 5f * 60f;
             }};
