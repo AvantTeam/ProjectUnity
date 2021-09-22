@@ -138,15 +138,18 @@ public class NewTentacle{
         Position pos = unitPosition();
         if(Units.invalidateTarget(target, unit.team, pos.getX(), pos.getY(), rootRange()) || (player && !type.automatic)) target = null;
 
+        if(bullet == null && type.bullet != null) reload += Time.delta * unit.reloadMultiplier;
+
         if(target != null || (player && unit.isShooting)){
             attacking = true;
-            if(type.bullet != null && Angles.within(end.rotation, Angles.angle(end.x, end.y, targetX, targetY), type.shootCone)){
-                reload += Time.delta * unit.reloadMultiplier;
-                if(reload >= type.reload){
-                    Bullet b = type.bullet.create(unit, unit.team, end.x, end.y, end.rotation);
-                    if(type.continuous) bullet = b;
-                    reload = 0f;
+            if(type.bullet != null && reload >= type.reload && Angles.within(end.rotation, Angles.angle(end.x, end.y, targetX, targetY), type.shootCone)){
+                Bullet b = type.bullet.create(unit, unit.team, end.x, end.y, end.rotation);
+                if(type.shootSound != null) type.shootSound.at(end.x, end.y, Mathf.random(0.9f, 1.1f));
+                if(type.continuous){
+                    if(type.bulletDuration > 0) b.lifetime = type.bulletDuration;
+                    bullet = b;
                 }
+                reload = 0f;
             }
         }
         if(type.continuous){
@@ -250,8 +253,10 @@ public class NewTentacle{
     }
 
     public void draw(){
+        float z = Draw.z();
         NewTentacleSegment cur = root;
         while(cur != null){
+            if(type.top && cur != root) Draw.z(z + 0.01001f);
             TextureRegion region = cur.parent == null ? type.tipRegion : type.region;
             Position prev = cur.prevPos();
             tv.set(cur.x, cur.y).sub(prev).setLength(region.width * Draw.scl).add(prev);
@@ -262,6 +267,7 @@ public class NewTentacle{
             cur = cur.parent;
         }
         Draw.reset();
+        Draw.z(z);
     }
 
     Position unitPosition(){

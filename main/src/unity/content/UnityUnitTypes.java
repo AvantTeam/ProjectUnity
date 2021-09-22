@@ -4660,6 +4660,108 @@ public class UnityUnitTypes implements ContentList{
 
             outlineColor = UnityPal.darkerOutline;
             antiCheatType = new AntiCheatVariables(6000f, 12000f, health / 560f, health / 120f, 0.6f, 7f * 60f, 8f * 60f, 35f, 4);
+
+            tentacles.addAll(new TentacleType(name + "-tentacle"){{
+                x = 139f;
+                y = -13.5f;
+                rotationSpeed = 2.5f;
+                accel = 0.2f;
+                speed = 6f;
+                top = true;
+
+                firstSegmentAngleLimit = 17f;
+                angleLimit = 30f;
+                automatic = false;
+                segmentLength = 44.5f;
+                segments = 15;
+                swayMag = 0.2f;
+                swayScl = 120f;
+
+                rotationOffset = 40f;
+
+                reload = 3f * 60f;
+                shootCone = 4f;
+                shootSound = UnitySounds.ravagerNightmareShoot;
+                bullet = new EndPointBlastLaserBulletType(250f){{
+                    length = 320f;
+                    width = 17f;
+                    lifetime = 20f;
+                    widthReduction = 3f;
+                    auraWidthReduction = 4f;
+                    damageRadius = 60f;
+                    auraDamage = 1000f;
+
+                    overDamage = 900000f;
+                    ratioDamage = 1f / 1500f;
+                    ratioStart = 11000f;
+                    bleedDuration = 10f * 60f;
+
+                    laserColors = new Color[]{UnityPal.scarColorAlpha, UnityPal.scarColor, UnityPal.endColor, Color.black};
+                }};
+                range = bullet.range();
+            }},
+            new TentacleType("unity-apocalypse-tentacle"){{
+                x = 122.75f;
+                y = -41f;
+                rotationOffset = 35f;
+                firstSegmentAngleLimit = 20f;
+                top = true;
+
+                rotationSpeed = 3f;
+                accel = 0.2f;
+                speed = 4f * 2f;
+
+                segments = 17;
+                segmentLength = 37.25f;
+
+                bullet = UnityBullets.endLaserSmall;
+                bulletDuration = 1.5f * 60f;
+                automatic = false;
+                continuous = true;
+                reload = 4f * 60f;
+            }},
+            new TentacleType("unity-apocalypse-tentacle"){{
+                x = 111.5f;
+                y = -57.5f;
+                rotationOffset = 30f;
+                firstSegmentAngleLimit = 18f;
+                top = true;
+
+                rotationSpeed = 3f;
+                accel = 0.2f;
+                speed = 4f * 2f;
+
+                segments = 14;
+                segmentLength = 37.25f;
+                swayOffset = 45f;
+
+                bullet = UnityBullets.endLaserSmall;
+                bulletDuration = 1.5f * 60f;
+                automatic = false;
+                continuous = true;
+                reload = 4f * 60f;
+            }},
+            new TentacleType("unity-apocalypse-tentacle"){{
+                x = 95.25f;
+                y = -63f;
+                rotationOffset = 25f;
+                firstSegmentAngleLimit = 16f;
+                top = true;
+
+                rotationSpeed = 3f;
+                accel = 0.2f;
+                speed = 4f * 2f;
+
+                segments = 9;
+                segmentLength = 37.25f;
+                swayOffset = 90f;
+
+                bullet = UnityBullets.endLaserSmall;
+                bulletDuration = 1.5f * 60f;
+                automatic = false;
+                continuous = true;
+                reload = 4f * 60f;
+            }});
         }};
 
         thalassophobia = new UnityUnitType("thalassophobia"){{

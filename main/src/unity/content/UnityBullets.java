@@ -1149,6 +1149,7 @@ public class UnityBullets implements ContentList{
 
                 overDamage = 400000f;
                 ratioDamage = 0.001f;
+                ratioStart = 8000f;
                 bleedDuration = 10f * 60f;
 
                 laserColors = new Color[]{UnityPal.scarColorAlpha, UnityPal.scarColor, UnityPal.endColor, Color.black};
@@ -1179,6 +1180,7 @@ public class UnityBullets implements ContentList{
 
                 overDamage = 950000f;
                 ratioDamage = 1f / 2000f;
+                ratioStart = 3000f;
             }};
         }};
 
