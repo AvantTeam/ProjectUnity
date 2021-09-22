@@ -21,7 +21,9 @@ abstract class MonolithComp implements Unitc, Factionc, Soul{
     @Import UnitController controller;
     @Import Team team;
     @Import float x, y, hitSize, maxHealth;
+
     @Import UnitType type;
+    @Import boolean spawnedByCore;
 
     private int souls;
     private transient int maxSouls;
@@ -33,8 +35,20 @@ abstract class MonolithComp implements Unitc, Factionc, Soul{
 
     @Override
     public void setType(UnitType type){
-        if(type instanceof UnityUnitType def){
+        // Spawned-by-core units can't have souls
+        if(!spawnedByCore && type instanceof UnityUnitType def){
             maxSouls = def.maxSouls;
+        }else{
+            maxSouls = 0;
+            souls = 0;
+        }
+    }
+
+    @Override
+    public void add(){
+        if(spawnedByCore){
+            maxSouls = 0;
+            souls = 0;
         }
     }
 
@@ -72,7 +86,7 @@ abstract class MonolithComp implements Unitc, Factionc, Soul{
     }
 
     public boolean disabled(){
-        return !hasSouls();
+        return !spawnedByCore && !hasSouls();
     }
 
     @Override
@@ -87,21 +101,11 @@ abstract class MonolithComp implements Unitc, Factionc, Soul{
 
     @Override
     public void join(){
-        if(canJoin()) souls++;
+        souls++;
     }
 
     @Override
     public void unjoin(){
-        if(souls > 0) souls--;
-    }
-
-    public boolean canControl(){
-        return canJoin() && (headless || acceptSoul(player.unit()) > 0);
-    }
-
-    @Override
-    @Replace
-    public boolean isAI(){
-        return controller instanceof AIController && canControl();
-    }
+        souls--;
+    } // Could've named it "join't"
 }

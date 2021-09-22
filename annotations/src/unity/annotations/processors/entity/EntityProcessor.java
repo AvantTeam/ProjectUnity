@@ -370,8 +370,6 @@ public class EntityProcessor extends BaseProcessor{
                     }
                 }
 
-                syncedFields.sortComparing(BaseProcessor::simpleName);
-
                 builder.addMethod(
                     MethodSpec.methodBuilder("toString")
                         .addAnnotation(cName(Override.class))
@@ -517,6 +515,9 @@ public class EntityProcessor extends BaseProcessor{
                     for(ExecutableElement e : noCompBefore){
                         mbuilder.addStatement("this.$L()", simpleName(e));
                     }
+
+                    allFields.sortComparing(BaseProcessor::simpleName);
+                    syncedFields.sortComparing(BaseProcessor::simpleName);
 
                     if(hasIO){
                         if(simpleName(first).equals("read") || simpleName(first).equals("write")){

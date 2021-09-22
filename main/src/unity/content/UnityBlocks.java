@@ -1957,6 +1957,7 @@ public class UnityBlocks implements ContentList{
                 craftTime = 60f;
                 updateEffect = Fx.smeltsmoke;
                 craftEffect = Fx.producesmoke;
+                requireSoul = false;
 
                 consumes.power(3.2f);
                 consumes.liquid(Liquids.cryofluid, 0.2f);

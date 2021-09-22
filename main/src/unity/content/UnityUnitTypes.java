@@ -124,8 +124,8 @@ public class UnityUnitTypes implements ContentList{
     public static @FactionDef("monolith") @EntityDef({Unitc.class, Legsc.class, Monolithc.class})
     UnitType pylon, monument, colossus, bastion;
 
-    // monolith unit + trail + assistant
-    public static @FactionDef("monolith") @EntityDef({Unitc.class, Trailc.class, Assistantc.class, Monolithc.class})
+    // monolith unit + assistant
+    public static @FactionDef("monolith") @EntityDef({Unitc.class, Assistantc.class, Monolithc.class})
     UnitType adsect, comitate/*, praesid*/;
 
     // koruh kami
@@ -3353,7 +3353,9 @@ public class UnityUnitTypes implements ContentList{
                 Draw.z(Layer.effect);
 
                 Draw.color(UnityPal.monolithLight);
-                Lines.polySeg(48, 0, (int)(48f * unit.healthf()), unit.x, unit.y, unit.hitSize + 8f, 0f);
+
+                float rad = unit.hitSize + 8f;
+                Lines.polySeg(Lines.circleVertices(rad), 0, (int)(48f * unit.healthf()), unit.x, unit.y, rad, 0f);
                 Draw.color();
 
                 Draw.z(z);

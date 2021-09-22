@@ -31,7 +31,7 @@ public class EntityIO{
             !f.getModifiers().contains(Modifier.TRANSIENT) &&
                 !f.getModifiers().contains(Modifier.STATIC) &&
                 !f.getModifiers().contains(Modifier.FINAL)
-        );
+        ).sortComparing(BaseProcessor::simpleName);
     }
 
     public void write(BaseProcessor proc, MethodSpec.Builder method, boolean write, Seq<VariableElement> fields){

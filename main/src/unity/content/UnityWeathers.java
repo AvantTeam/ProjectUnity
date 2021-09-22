@@ -20,8 +20,10 @@ public class UnityWeathers implements ContentList{
 
     @Override
     public void load(){
-        timeStorm = new ParticleWeather("time-anomoly"){
-            public float spawnChance = 0.02f, minDistSize = 2f * tilesize, maxDistSize = 6f * tilesize;
+        timeStorm = new ParticleWeather("time-anomoly"){ // I wonder who spelt this
+            public final float spawnChance = 0.02f;
+            public final float minDistSize = 2f * tilesize;
+            public final float maxDistSize = 6f * tilesize;
 
             {
                 duration = 1.5f * Time.toMinutes;

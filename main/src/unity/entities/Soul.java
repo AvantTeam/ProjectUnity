@@ -20,12 +20,8 @@ public interface Soul extends Teamc, Healthc, Sized{
     }
 
     default int acceptSoul(Entityc other){
-        Soul soul = toSoul(other);
-        if(soul != null){
-            return acceptSoul(soul);
-        }else{
-            return 0;
-        }
+        var soul = toSoul(other);
+        return soul != null ? acceptSoul(soul) : 0;
     }
 
     default int acceptSoul(Soul other){
@@ -37,14 +33,16 @@ public interface Soul extends Teamc, Healthc, Sized{
     }
 
     void join();
+
     void unjoin();
+
     default void joined(){}
 
     default float soulf(){
         return souls() / (float)maxSouls();
     }
 
-    /** Spreads the nesting souls in this soul holder, typically at death. Called server-sidedly. */
+    /** Spreads the nesting souls in this soul holder, typically at death. Called server-side */
     default void spreadSouls(){
         boolean transferred = false;
 

@@ -57,18 +57,12 @@ abstract class SoulComp extends Block implements Stemc{
     public abstract class SoulBuildComp extends Building implements StemBuildc, ControlBlock, Soul{
         @Nullable transient BlockUnitc unit;
 
-        @ReadOnly boolean wasPlayer;
         private int souls;
 
         @Override
         @Replace
         public Unit unit(){
             return unit.as();
-        }
-
-        @Override
-        public boolean canControl(){
-            return canJoin() && (headless || acceptSoul(player.unit()) > 0);
         }
 
         @Override
@@ -84,22 +78,9 @@ abstract class SoulComp extends Block implements Stemc{
         }
 
         @Override
-        @MethodPriority(-1)
+        @MethodPriority(-100)
         public void update(){
             progression.apply(souls);
-        }
-
-        @Override
-        public void updateTile(){
-            if(!wasPlayer && unit.isPlayer()){
-                join();
-                wasPlayer = true;
-            }
-
-            if(wasPlayer && !unit.isPlayer()){
-                unjoin();
-                wasPlayer = false;
-            }
         }
 
         @Override
