@@ -4247,7 +4247,7 @@ public class UnityUnitTypes implements ContentList{
                 shake = 4f;
                 firstShotDelay = 41f;
                 chargeSound = UnitySounds.devourerMainLaser;
-                shootSound = UnitySounds.continuousLaserA;
+                shootSound = UnitySounds.continuousLaserB;
                 bullet = UnityBullets.endLaser;
             }}, new Weapon("unity-doeg-destroyer"){{
                 mirror = true;
@@ -4323,7 +4323,7 @@ public class UnityUnitTypes implements ContentList{
                 y = 16.5f;
                 reload = 2f * 60;
                 shadow = 14f;
-                shootSound = UnitySounds.continuousLaserB;
+                shootSound = UnitySounds.continuousLaserA;
                 continuous = true;
 
                 bullet = UnityBullets.endLaserSmall;
@@ -4851,6 +4851,7 @@ public class UnityUnitTypes implements ContentList{
                     y = 41.25f;
                     reload = 15f * 60f;
                     continuous = true;
+                    shootSound = UnitySounds.thalassophobiaLaser;
 
                     bullet = new ContinuousSingularityLaserBulletType(1600f){{
                         lifetime = 5f * 60f;
@@ -4863,7 +4864,7 @@ public class UnityUnitTypes implements ContentList{
                         gravityStrength = 20f * 80f;
                         baseTriangleSize = 210f;
                         oscScl = 5f;
-                        buildingDamageMultiplier = 0.4f;
+                        buildingDamageMultiplier = 0.7f;
 
                         overDamage = 600000f;
                         overDamagePower = 4f;
