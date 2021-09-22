@@ -1147,9 +1147,9 @@ public class UnityBullets implements ContentList{
                 damageRadius = 110f;
                 auraDamage = 9000f;
 
-                overDamage = 400000f;
-                ratioDamage = 0.001f;
-                ratioStart = 8000f;
+                overDamage = 500000f;
+                ratioDamage = 1f / 30f;
+                ratioStart = 12000f;
                 bleedDuration = 10f * 60f;
 
                 laserColors = new Color[]{UnityPal.scarColorAlpha, UnityPal.scarColor, UnityPal.endColor, Color.black};
@@ -1179,7 +1179,7 @@ public class UnityBullets implements ContentList{
                 width = height = 16f;
 
                 overDamage = 950000f;
-                ratioDamage = 1f / 2000f;
+                ratioDamage = 1f / 400f;
                 ratioStart = 3000f;
             }};
         }};
@@ -1197,7 +1197,7 @@ public class UnityBullets implements ContentList{
             weaveMag = 1f;
 
             overDamage = 900000f;
-            ratioDamage = 1f / 1500f;
+            ratioDamage = 1f / 150f;
             ratioStart = 2000f;
 
             hitEffect = Fx.blastExplosion;
@@ -1214,7 +1214,7 @@ public class UnityBullets implements ContentList{
                 strokes[i] *= 0.4f;
             }
             overDamage = 800000f;
-            ratioDamage = 0.01f;
+            ratioDamage = 1f / 40f;
             ratioStart = 1000000f;
             colors = new Color[]{UnityPal.scarColorAlpha, UnityPal.scarColor, UnityPal.endColor, Color.white};
             modules = new AntiCheatBulletModule[]{new ArmorDamageModule(0.1f, 30f, 30f, 0.4f)};
@@ -1236,7 +1236,7 @@ public class UnityBullets implements ContentList{
 
             overDamage = 650000f;
             overDamagePower = 3f;
-            ratioDamage = 0.001f;
+            ratioDamage = 1f / 80f;
             ratioStart = 19000f;
             bleedDuration = 10f * 60f;
             pierceShields = true;

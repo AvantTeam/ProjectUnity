@@ -4126,7 +4126,7 @@ public class UnityUnitTypes implements ContentList{
                 shootSound = UnitySounds.spaceFracture;
 
                 bullet = new VoidFractureBulletType(32f, 600f){{
-                    ratioDamage = 1f / 200f;
+                    ratioDamage = 1f / 50f;
                     ratioStart = damage * 20f;
                     shootEffect = ShootFx.voidShoot;
 
@@ -4229,7 +4229,7 @@ public class UnityUnitTypes implements ContentList{
                 height = 25f;
 
                 overDamage = 800000f;
-                ratioDamage = 1f / 800f;
+                ratioDamage = 1f / 300f;
                 ratioStart = 15000;
                 bleedDuration = 20f;
 
@@ -4294,8 +4294,8 @@ public class UnityUnitTypes implements ContentList{
                     weaveScale = 1.6f;
 
                     overDamage = 900000f;
-                    ratioDamage = 1f / 2500f;
-                    ratioStart = 1000f;
+                    ratioDamage = 1f / 200f;
+                    ratioStart = 17000f;
 
                     backColor = trailColor = hitColor = lightColor = UnityPal.scarColor;
                     frontColor = UnityPal.endColor;
@@ -4433,7 +4433,8 @@ public class UnityUnitTypes implements ContentList{
 
                     bleedDuration = 5f * 60f;
                     overDamage = 500000f;
-                    ratioDamage = 0.001f;
+                    ratioDamage = 1f / 100f;
+                    ratioStart = 7000f;
                 }};
             }});
 
@@ -4692,7 +4693,7 @@ public class UnityUnitTypes implements ContentList{
                     auraDamage = 1000f;
 
                     overDamage = 900000f;
-                    ratioDamage = 1f / 1500f;
+                    ratioDamage = 1f / 200f;
                     ratioStart = 11000f;
                     bleedDuration = 10f * 60f;
 
@@ -4816,8 +4817,9 @@ public class UnityUnitTypes implements ContentList{
                     lifetime = 60f;
                     drag = 0.09f;
                     nextLifetime = 13f;
-                    ratioDamage = 0.01f;
-                    ratioStart = 1000f;
+                    ratioDamage = 1f / 170f;
+                    ratioStart = 30000f;
+                    bleedDuration = 40f;
                     length = 52f;
                     width = 20f;
                     widthTo = 8f;
@@ -4859,7 +4861,7 @@ public class UnityUnitTypes implements ContentList{
                     weaveMag = 1f;
 
                     overDamage = 950000f;
-                    ratioDamage = 1f / 1500f;
+                    ratioDamage = 1f / 400f;
                     ratioStart = 2000f;
 
                     hitEffect = Fx.blastExplosion;
@@ -4969,7 +4971,7 @@ public class UnityUnitTypes implements ContentList{
                         buildingDamageMultiplier = 0.7f;
 
                         overDamage = 600000f;
-                        overDamagePower = 4f;
+                        overDamagePower = 3f;
                         ratioDamage = 1f / 200f;
                         ratioStart = 8000f;
                         bleedDuration = 600f;

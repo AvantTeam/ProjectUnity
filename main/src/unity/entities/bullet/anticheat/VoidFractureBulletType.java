@@ -141,7 +141,7 @@ public class VoidFractureBulletType extends AntiCheatBulletTypeBase{
     public void removed(Bullet b){
         super.removed(b);
 
-        if(b.data instanceof FractureData data){
+        if(b.fdata >= 1f && b.data instanceof FractureData data){
             VoidFractureData d = new VoidFractureData();
             d.x = data.x;
             d.y = data.y;
