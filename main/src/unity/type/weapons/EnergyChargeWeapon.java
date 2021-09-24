@@ -16,7 +16,7 @@ public class EnergyChargeWeapon extends Weapon{
     public Cons3<Unit, WeaponMount, Float> drawCharge = (unit, mount, charge) -> {};
     /**Uses reload as charge*/
     public Cons2<Unit, WeaponMount> chargeCondition;
-    public boolean drawTop = true, startUncharged = true;
+    public boolean drawTop = true, startUncharged = true, drawRegion = true;
     private int sequenceNum;
 
     public EnergyChargeWeapon(String name){
@@ -29,11 +29,16 @@ public class EnergyChargeWeapon extends Weapon{
     }
 
     @Override
+    public void drawOutline(Unit unit, WeaponMount mount){
+        if(drawRegion) super.drawOutline(unit, mount);
+    }
+
+    @Override
     public void draw(Unit unit, WeaponMount mount){
         float tmp = mount.reload;
         mount.reload = Mathf.clamp(mount.reload, 0f, reload);
         if(!drawTop) drawCharge.get(unit, mount, 1f - Mathf.clamp(mount.reload / reload));
-        super.draw(unit, mount);
+        if(drawRegion) super.draw(unit, mount);
         mount.reload = tmp;
         if(drawTop) drawCharge.get(unit, mount, 1f - Mathf.clamp(mount.reload / reload));
     }

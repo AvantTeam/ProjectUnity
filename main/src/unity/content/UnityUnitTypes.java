@@ -4662,6 +4662,50 @@ public class UnityUnitTypes implements ContentList{
             outlineColor = UnityPal.darkerOutline;
             antiCheatType = new AntiCheatVariables(6000f, 12000f, health / 560f, health / 120f, 0.6f, 7f * 60f, 8f * 60f, 35f, 4);
 
+            weapons.add(new EnergyChargeWeapon(name + "-main"){{
+                drawRegion = false;
+                mirror = false;
+                x = 0f;
+                y = 80f;
+                shootY = 36.5f;
+                reload = 15f * 60f;
+
+                bullet = new DesolationBulletType(1.75f, 2500f){{
+                    lifetime = 8f * 60f;
+                    overDamage = 900000f;
+                    overDamagePower = 3f;
+                    overDamageScl = 3500f;
+                    ratioDamage = 1f / 50f;
+                    ratioStart = 200000f;
+                    bleedDuration = 10f * 60f;
+
+                    modules = new AntiCheatBulletModule[]{
+                    new ArmorDamageModule(0.01f, 15f, 30f, 5f),
+                    new AbilityDamageModule(50f, 10f * 60f, 10f, 0.01f, 15f)
+                    };
+                }};
+
+                drawCharge = (unit, mount, charge) -> {
+                    float r = unit.rotation - 90f,
+                    wx = Angles.trnsx(r, x, y) + unit.x,
+                    wy = Angles.trnsy(r, x, y) + unit.y;
+
+                    for(int i = 0; i < 4; i++){
+                        float in = Mathf.curve(charge, i / 4f, (i + 1f) / 4f);
+                        if(in > 0.0001f){
+                            Draw.color(UnityPal.scarColor);
+                            Draw.alpha(in);
+                            Draw.blend(Blending.additive);
+
+                            Draw.rect(heatRegion, wx + Mathf.range(12f - (in * 11.3f)), wy + Mathf.range(12f - (in * 11.3f)), r);
+
+                            Draw.blend();
+                            Draw.reset();
+                        }
+                    }
+                };
+            }});
+
             tentacles.addAll(new TentacleType(name + "-tentacle"){{
                 x = 139f;
                 y = -13.5f;
@@ -4957,7 +5001,7 @@ public class UnityUnitTypes implements ContentList{
                     continuous = true;
                     shootSound = UnitySounds.thalassophobiaLaser;
 
-                    bullet = new ContinuousSingularityLaserBulletType(1600f){{
+                    bullet = new ContinuousSingularityLaserBulletType(3500f){{
                         lifetime = 5f * 60f;
                         width = 40f;
                         widthReduction = 6f;
@@ -4972,9 +5016,15 @@ public class UnityUnitTypes implements ContentList{
 
                         overDamage = 600000f;
                         overDamagePower = 3f;
+                        overDamageScl = 7000f;
                         ratioDamage = 1f / 200f;
-                        ratioStart = 8000f;
+                        ratioStart = 20000f;
                         bleedDuration = 600f;
+
+                        modules = new AntiCheatBulletModule[]{
+                        new ArmorDamageModule(0.01f, 3f, 40f, 5f),
+                        new AbilityDamageModule(50f, 300f, 20f, 0.002f, 3f)
+                        };
                     }};
 
                     drawCharge = (unit, mount, charge) -> {

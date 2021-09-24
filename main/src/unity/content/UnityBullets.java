@@ -1235,7 +1235,8 @@ public class UnityBullets implements ContentList{
             lightningLengthRand = 5;
 
             overDamage = 650000f;
-            overDamagePower = 3f;
+            overDamagePower = 2.7f;
+            overDamageScl = 4000f;
             ratioDamage = 1f / 80f;
             ratioStart = 19000f;
             bleedDuration = 10f * 60f;

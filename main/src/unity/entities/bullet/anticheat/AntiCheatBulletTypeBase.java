@@ -17,7 +17,7 @@ abstract class AntiCheatBulletTypeBase extends BulletType{
     protected float bleedDuration = -1f;
     /** If the targets health exceeds this value, damage starts increasing */
     protected float overDamage = 1000000f;
-    protected float overDamageScl = 350f;
+    protected float overDamageScl = 2000f;
     protected float overDamagePower = 2f;
 
     protected boolean pierceShields = false;

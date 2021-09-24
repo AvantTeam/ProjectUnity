@@ -14,6 +14,7 @@ import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.game.*;
+import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
@@ -426,6 +427,71 @@ public final class Utils{
             float r = Mathf.range(variance);
             return h.dst2(x, y) + (r * r);
         });
+    }
+
+    //there has to be an efficient version
+    public static boolean inTriangleCircle(float x1, float y1, float x2, float y2, float x3, float y3, float cx, float cy, float radius){
+        if(Intersector.isInTriangle(cx, cy, x1, y1, x2, y2, x3, y3)) return true;
+        if(radius <= 0f) return false;
+        if(Intersector.distanceSegmentPoint(x1, y1, x2, y2, cx, cy) <= radius) return true;
+        if(Intersector.distanceSegmentPoint(x2, y2, x3, y3, cx, cy) <= radius) return true;
+        return Intersector.distanceSegmentPoint(x3, y3, x1, y1, cx, cy) <= radius;
+    }
+
+    public static boolean inTriangleRect(float x1, float y1, float x2, float y2, float x3, float y3, Rect rect){
+        float cx = rect.x + (rect.width / 2f), cy = rect.y + (rect.height / 2f);
+        if(Intersector.isInTriangle(cx, cy, x1, y1, x2, y2, x3, y3)) return true;
+        if(rect.width <= 0f && rect.height <= 0f) return false;
+        if(rect.contains(x1, y1) || rect.contains(x2, y2) || rect.contains(x3, y3)) return true;
+        if(Geometry.raycastRect(x1, y1, x2, y2, rect) != null) return true;
+        if(Geometry.raycastRect(x2, y2, x3, y3, rect) != null) return true;
+        return Geometry.raycastRect(x3, y3, x1, y1, rect) != null;
+    }
+
+    public static <T extends Posc> void inTriangle(EntityGroup<T> group, float x1, float y1, float x2, float y2, float x3, float y3, Boolf<T> filter, Cons<T> cons){
+        Rect r = rect.setCentered(x1, y1, 0f);
+        r.merge(x2, y2);
+        r.merge(x3, y3);
+        group.intersect(r.x, r.y, r.width + r.x, r.height + r.y, g -> {
+            if(filter.get(g) && inTriangleCircle(x1, y1, x2, y2, x3, y3, g.x(), g.y(), (g instanceof Hitboxc ? ((Hitboxc)g).hitSize() / 2f : 0f))){
+                cons.get(g);
+            }
+        });
+    }
+
+    public static void inTriangleBuilding(Team team, boolean enemy, float x1, float y1, float x2, float y2, float x3, float y3, Boolf<Building> filter, Cons<Building> cons){
+        if(team != null && !enemy){
+            if(team.data().buildings != null){
+                Rect r = rect.setCentered(x1, y1, 0f);
+                r.merge(x2, y2);
+                r.merge(x3, y3);
+
+                team.data().buildings.intersect(r, b -> {
+                    if(filter.get(b)){
+                        b.hitbox(rectAlt);
+                        int sz = b.block.size;
+                        boolean hit = sz > 3 ? inTriangleRect(x1, y1, x2, y2, x3, y3, rectAlt) : inTriangleCircle(x1, y1, x2, y2, x3, y3, b.x, b.y, sz * tilesize / 2f);
+                        if(hit) cons.get(b);
+                    }
+                });
+            }
+        }else{
+            Rect r = rect.setCentered(x1, y1, 0f);
+            r.merge(x2, y2);
+            r.merge(x3, y3);
+            for(TeamData data : state.teams.active){
+                if(data.team != team && data.buildings != null){
+                    data.buildings.intersect(r, b -> {
+                        if(filter.get(b)){
+                            b.hitbox(rectAlt);
+                            int sz = b.block.size;
+                            boolean hit = sz > 3 ? inTriangleRect(x1, y1, x2, y2, x3, y3, rectAlt) : inTriangleCircle(x1, y1, x2, y2, x3, y3, b.x, b.y, sz * tilesize / 2f);
+                            if(hit) cons.get(b);
+                        }
+                    });
+                }
+            }
+        }
     }
 
     public static void collideLineRawEnemyRatio(Team team, float x, float y, float x2, float y2, float width, Boolf3<Building, Float, Boolean> buildingCons, Boolf2<Unit, Float> unitCons, Floatc2 effectHandler){
