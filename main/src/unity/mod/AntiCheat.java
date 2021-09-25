@@ -332,6 +332,7 @@ public class AntiCheat{
             if(delta > 0){
                 unit.health -= delta;
             }
+            if(unit.health <= 0f) unit.damage(0f);
 
             if(Mathf.chanceDelta(0.19f)){
                 Tmp.v1.rnd(Mathf.range(unit.type.hitSize / 2f));

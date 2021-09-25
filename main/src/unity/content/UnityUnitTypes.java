@@ -4645,6 +4645,7 @@ public class UnityUnitTypes implements ContentList{
             groundLayer = Layer.flyingUnitLow + 1f;
 
             allowLegStep = legShadows = hovering = true;
+            immuneAll = true;
 
             legTrns = 0.3f;
             legLength = 672f * (1f - (legTrns * 0.85f * 0.5f));
