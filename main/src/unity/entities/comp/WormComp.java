@@ -22,7 +22,7 @@ abstract class WormComp implements Unitc{
     private static Unit last;
     transient Unit head, parent, child;
     transient float layer = 0f, scanTime = 0f;
-    transient boolean removing = false;
+    transient boolean removing = false, saveAdd = false;
 
     protected float splitHealthDiv = 1f;
     protected float regenTime = 0f;
@@ -121,16 +121,17 @@ abstract class WormComp implements Unitc{
     @Override
     public void read(Reads read){
         if(read.bool()){
+            saveAdd = true;
             int seg = read.s();
             Wormc current = self();
             for(int i = 0; i < seg; i++){
                 Unit u = type.constructor.get();
                 Wormc w = (Wormc)u;
-                u.read(read);
                 current.child(u);
                 w.parent((Unit)current);
                 w.head(self());
                 w.layer(i);
+                u.read(read);
                 current = w;
             }
         }
@@ -435,40 +436,15 @@ abstract class WormComp implements Unitc{
         UnityUnitType uType = (UnityUnitType)type;
         Unit current = self();
         if(isHead()){
-            /*
-            if(child == null){
-                float rot = rotation() + uType.angleLimit;
-                Tmp.v1.trns(rot + 180f, uType.segmentOffset + uType.headOffset).add(self());
-                for(int i = 0; i < uType.segmentLength; i++){
-                    Unit t = uType.create(team());
-                    t.x = Tmp.v1.x;
-                    t.y = Tmp.v1.y;
-                    t.rotation = rot;
-                    t.elevation = elevation();
-
-                    rot += uType.angleLimit;
-                    Tmp.v2.trns(rot + 180f, uType.segmentOffset);
-                    Tmp.v1.add(Tmp.v2);
-
-                    Wormc wt = (Wormc)t;
-                    wt.layer(i + 1f);
-                    wt.head(self());
-                    wt.parent(current);
-                    ((Wormc)current).child(t);
-                    t.setupWeapons(uType);
-                    t.heal();
-                    t.add();
-                    current = t;
+            if(saveAdd){
+                var seg = (Unit & Wormc)child;
+                if(seg != null){
+                    seg.add();
+                    seg = (Unit & Wormc)seg.child();
                 }
-            }else{
-                distributeActionBack(u -> {
-                    if(u != self()){
-                        u.add();
-                    }
-                });
+                saveAdd = false;
+                return;
             }
-             */
-
             float[] rot = {rotation() + uType.angleLimit};
             Tmp.v1.trns(rot[0] + 180f, uType.segmentOffset + uType.headOffset).add(self());
             distributeActionBack(u -> {
