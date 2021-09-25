@@ -37,12 +37,14 @@ public class ArmorDamageModule implements AntiCheatBulletModule{
             unit.shield = Math.max(unit.shield - Math.max(shieldDamage, unit.shield * ratioDamage), 0f);
             if(unit.shield < minimumArmorShield) unit.shield = minimumArmorShield;
         }
-        for(Ability ability : unit.abilities){
-            if(ability instanceof ShieldRegenFieldAbility s){
-                if(s.max > minimumEfficiency){
-                    s.max = Math.max(s.max - Math.max(efficiencyDamage, s.max * ratioDamage), 0f);
-                    if(s.max < minimumEfficiency) s.max = minimumEfficiency;
-                }
+    }
+
+    @Override
+    public void handleAbility(Ability ability, Unit unit){
+        if(ability instanceof ShieldRegenFieldAbility s){
+            if(s.max > minimumEfficiency){
+                s.max = Math.max(s.max - Math.max(efficiencyDamage, s.max * ratioDamage), 0f);
+                if(s.max < minimumEfficiency) s.max = minimumEfficiency;
             }
         }
     }

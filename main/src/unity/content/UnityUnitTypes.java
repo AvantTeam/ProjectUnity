@@ -4680,8 +4680,9 @@ public class UnityUnitTypes implements ContentList{
                     bleedDuration = 10f * 60f;
 
                     modules = new AntiCheatBulletModule[]{
-                    new ArmorDamageModule(0.01f, 15f, 30f, 5f),
-                    new AbilityDamageModule(50f, 10f * 60f, 10f, 0.01f, 15f)
+                    new ArmorDamageModule(1f / 30f, 15f, 30f, 5f),
+                    new AbilityDamageModule(50f, 10f * 60f, 10f, 1f / 60f, 15f),
+                    new ForceFieldDamageModule(5f, 15f, 200f, 7f, 1f / 40f)
                     };
                 }};
 
@@ -4874,7 +4875,8 @@ public class UnityUnitTypes implements ContentList{
                     shootEffect = ShootFx.voidShoot;
 
                     modules = new AntiCheatBulletModule[]{
-                        new ArmorDamageModule(50f, 50f, 2f)
+                        new ArmorDamageModule(50f, 50f, 2f),
+                        new ForceFieldDamageModule(2f, 20f, 220f, 7f, 1f / 50f)
                     };
                 }};
             }},

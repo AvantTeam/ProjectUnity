@@ -2,6 +2,7 @@ package unity.entities.bullet.anticheat;
 
 import arc.math.*;
 import arc.util.*;
+import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import unity.*;
@@ -52,6 +53,11 @@ abstract class AntiCheatBulletTypeBase extends BulletType{
         if(modules != null){
             for(AntiCheatBulletModule mod : modules){
                 mod.hitUnit(unit);
+            }
+            for(Ability ability : unit.abilities){
+                for(AntiCheatBulletModule mod : modules){
+                    mod.handleAbility(ability, unit);
+                }
             }
         }
 

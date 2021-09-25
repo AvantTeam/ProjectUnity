@@ -1153,6 +1153,12 @@ public class UnityBullets implements ContentList{
                 bleedDuration = 10f * 60f;
 
                 laserColors = new Color[]{UnityPal.scarColorAlpha, UnityPal.scarColor, UnityPal.endColor, Color.black};
+
+                modules = new AntiCheatBulletModule[]{
+                new ArmorDamageModule(1f / 15f, 5f, 70f, 8f),
+                new AbilityDamageModule(50f, 400f, 4f, 1f / 25f, 5f),
+                new ForceFieldDamageModule(10f, 30f, 230f, 8f, 1f / 40f)
+                };
             }
         };
 
@@ -1244,7 +1250,8 @@ public class UnityBullets implements ContentList{
 
             modules = new AntiCheatBulletModule[]{
                 new ArmorDamageModule(0.001f, 3f, 15f, 2f),
-                new AbilityDamageModule(50f, 300f, 4f, 0.001f, 3f)
+                new AbilityDamageModule(50f, 300f, 4f, 0.001f, 3f),
+                new ForceFieldDamageModule(4f, 20f, 230f, 8f, 1f / 40f)
             };
         }};
 

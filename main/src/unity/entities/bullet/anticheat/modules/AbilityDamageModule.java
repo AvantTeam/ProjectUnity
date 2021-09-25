@@ -14,24 +14,21 @@ public class AbilityDamageModule implements AntiCheatBulletModule{
         ratioDamage = rd;
         reloadDamage = reD;
     }
-
     @Override
-    public void hitUnit(Unit unit){
-        for(Ability a : unit.abilities){
-            if(a instanceof StatusFieldAbility s){
-                if(s.duration > minimumEfficiency){
-                    s.duration = Math.max(minimumEfficiency, s.duration - Math.max(efficiencyDamage, s.duration * ratioDamage));
-                }
-                if(s.reload < maximumReload){
-                    s.reload = Math.min(s.reload + Math.max(reloadDamage, ratioDamage * s.reload), maximumReload);
-                }
-            }else if(a instanceof RepairFieldAbility r){
-                if(r.amount > minimumEfficiency){
-                    r.amount = Math.max(minimumEfficiency, r.amount - Math.max(efficiencyDamage, r.amount * ratioDamage));
-                }
-                if(r.reload < maximumReload){
-                    r.reload = Math.min(r.reload + Math.max(reloadDamage, ratioDamage * r.reload), maximumReload);
-                }
+    public void handleAbility(Ability ability, Unit unit){
+        if(ability instanceof StatusFieldAbility s){
+            if(s.duration > minimumEfficiency){
+                s.duration = Math.max(minimumEfficiency, s.duration - Math.max(efficiencyDamage, s.duration * ratioDamage));
+            }
+            if(s.reload < maximumReload){
+                s.reload = Math.min(s.reload + Math.max(reloadDamage, ratioDamage * s.reload), maximumReload);
+            }
+        }else if(ability instanceof RepairFieldAbility r){
+            if(r.amount > minimumEfficiency){
+                r.amount = Math.max(minimumEfficiency, r.amount - Math.max(efficiencyDamage, r.amount * ratioDamage));
+            }
+            if(r.reload < maximumReload){
+                r.reload = Math.min(r.reload + Math.max(reloadDamage, ratioDamage * r.reload), maximumReload);
             }
         }
     }

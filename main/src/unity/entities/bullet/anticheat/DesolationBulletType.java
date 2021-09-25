@@ -14,9 +14,9 @@ import unity.util.*;
 public class DesolationBulletType extends AntiCheatBulletTypeBase{
     protected float health = 1500000f, maxDamage = 5000f;
     protected float bulletDamage = 43f;
-    protected float length = 70f, width = 180f, offset = 1.75f;
+    protected float length = 70f, widthFrom = 180f, widthTo = 230f, offset = 1.75f;
     protected float startingScl = 1.4f, scaleReduction = 0.8f;
-    protected float fadeOutTime = 20f;
+    protected float fadeOutTime = 20f, fadeInTime = 40f;
     public Color[] colors = {UnityPal.scarColorAlpha, UnityPal.scarColor, UnityPal.endColor, Color.white};
 
     public DesolationBulletType(float speed, float damage){
@@ -60,6 +60,7 @@ public class DesolationBulletType extends AntiCheatBulletTypeBase{
         if(b.timer(1, 5f) && b.data instanceof DesolationBulletData){
             DesolationBulletData d = (DesolationBulletData)b.data;
             d.collided.clear();
+            float width = Mathf.lerp(widthFrom, widthTo, Mathf.clamp(b.time / fadeInTime));
             float in = d.health / health;
             float out = Mathf.clamp(b.time > b.lifetime - fadeOutTime ? 1f - (b.time - (lifetime - fadeOutTime)) / fadeOutTime : 1f);
             Vec2 v1 = Tmp.v1.trns(b.rotation(), length / 2f);
@@ -97,6 +98,7 @@ public class DesolationBulletType extends AntiCheatBulletTypeBase{
     public void draw(Bullet b){
         if(b.data instanceof DesolationBulletData){
             DesolationBulletData d = (DesolationBulletData)b.data;
+            float width = Mathf.lerp(widthFrom, widthTo, Mathf.clamp(b.time / fadeInTime));
             float in = d.health / health;
             Vec2 v1 = Tmp.v1.trns(b.rotation(), length / 2f);
             float scl = startingScl;
