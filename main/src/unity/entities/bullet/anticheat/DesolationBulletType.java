@@ -68,7 +68,7 @@ public class DesolationBulletType extends AntiCheatBulletTypeBase{
                 Vec2 v2 = Tmp.v2.trns(b.rotation() - 90f, width * in * s * out, -(length / 2f) * offset).add(b);
                 float x1 = b.x + v1.x, x2 = b.x - v1.x,
                 y1 = b.y + v1.y, y2 = b.y - v1.y;
-                Utils.inTriangle(Groups.unit, x1, y1, x2, y2, v2.x, v2.y, u -> u.team != b.team && d.collided.add(u.id), u -> {
+                Utils.inTriangle(Groups.unit, x1, y1, x2, y2, v2.x, v2.y, u -> u.team != b.team && !u.dead && d.collided.add(u.id), u -> {
                     d.health -= Math.min(u.health, maxDamage);
                     hitUnitAntiCheat(b, u);
                     Vec2 p = Intersector.nearestSegmentPoint(x2, y2, v2.x, v2.y, u.x, u.y, Tmp.v3);
@@ -77,7 +77,7 @@ public class DesolationBulletType extends AntiCheatBulletTypeBase{
                 });
                 Utils.inTriangle(Groups.bullet, x1, y1, x2, y2, v2.x, v2.y, bb -> bb.team != b.team && bb.type.hittable && d.collided.add(bb.id), bb -> {
                     bb.time = Mathf.clamp(bb.time + (bulletDamage / bb.type.damage), 0f, bb.lifetime);
-                    Tmp.v3.trns(Mathf.slerp(b.rotation(), b.angleTo(bb), 0.5f), knockback / (bb.hitSize / 2f)).add(bb.vel).limit(bb.type.speed);
+                    Tmp.v3.trns(Mathf.slerp(b.rotation(), b.angleTo(bb), 0.5f), knockback / (bb.hitSize / 2f)).add(bb.vel).scl(Mathf.clamp(1f / (bulletDamage / bb.type.damage), 0f, 0.9f)).limit(bb.type.speed);
                     bb.vel.set(Tmp.v3);
                 });
                 Utils.inTriangleBuilding(b.team, true, x1, y1, x2, y2, v2.x, v2.y, build -> d.collided.add(build.id), build -> {

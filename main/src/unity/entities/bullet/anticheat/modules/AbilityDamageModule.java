@@ -15,7 +15,7 @@ public class AbilityDamageModule implements AntiCheatBulletModule{
         reloadDamage = reD;
     }
     @Override
-    public void handleAbility(Ability ability, Unit unit){
+    public void handleAbility(Ability ability, Unit unit, Bullet bullet){
         if(ability instanceof StatusFieldAbility s){
             if(s.duration > minimumEfficiency){
                 s.duration = Math.max(minimumEfficiency, s.duration - Math.max(efficiencyDamage, s.duration * ratioDamage));

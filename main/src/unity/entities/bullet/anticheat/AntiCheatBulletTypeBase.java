@@ -9,7 +9,7 @@ import unity.*;
 import unity.entities.bullet.anticheat.modules.*;
 import unity.mod.*;
 
-abstract class AntiCheatBulletTypeBase extends BulletType{
+public abstract class AntiCheatBulletTypeBase extends BulletType{
     /** 0-1 */
     protected float ratioDamage = 0f;
     /** Ratio Damage starts if health is higher than this value */
@@ -24,6 +24,7 @@ abstract class AntiCheatBulletTypeBase extends BulletType{
     protected boolean pierceShields = false;
 
     protected AntiCheatBulletModule[] modules;
+    private float[] moduleDataTmp;
 
     public AntiCheatBulletTypeBase(float speed, float damage){
         super(speed, damage);
@@ -31,6 +32,12 @@ abstract class AntiCheatBulletTypeBase extends BulletType{
 
     public AntiCheatBulletTypeBase(){
 
+    }
+
+    @Override
+    public void init(){
+        super.init();
+        if(modules != null) moduleDataTmp = new float[modules.length];
     }
 
     public void hitUnitAntiCheat(Bullet b, Unit unit){
@@ -51,12 +58,15 @@ abstract class AntiCheatBulletTypeBase extends BulletType{
             Unity.antiCheat.applyStatus(unit, bleedDuration);
         }
         if(modules != null){
+            int i = 0;
             for(AntiCheatBulletModule mod : modules){
-                mod.hitUnit(unit);
+                moduleDataTmp[i] = mod.getUnitData(unit);
+                mod.hitUnit(unit, b);
+                i++;
             }
             for(Ability ability : unit.abilities){
                 for(AntiCheatBulletModule mod : modules){
-                    mod.handleAbility(ability, unit);
+                    mod.handleAbility(ability, unit, b);
                 }
             }
         }
@@ -74,6 +84,12 @@ abstract class AntiCheatBulletTypeBase extends BulletType{
         if(impact) Tmp.v3.setAngle(b.rotation() + (knockback < 0 ? 180f : 0f));
         unit.impulse(Tmp.v3);
         unit.apply(status, statusDuration);
+
+        if(modules != null){
+            for(int i = 0; i < modules.length; i++){
+                modules[i].handleUnitPost(unit, b, moduleDataTmp[i]);
+            }
+        }
     }
 
     public void hitBuildingAntiCheat(Bullet b, Building building){

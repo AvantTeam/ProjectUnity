@@ -269,7 +269,13 @@ abstract class WormComp implements Unitc{
 
     Unit addTail(){
         if(!isTail()) return null;
-        Unit tail = type.create(team);
+        Unit tail = type.constructor.get();
+        tail.team = team;
+        tail.setType(type);
+        tail.ammo = type.ammoCapacity;
+        tail.elevation = type.flying ? 1f : 0;
+        tail.heal();
+
         UnityUnitType uType = (UnityUnitType)type;
         if(tail instanceof Wormc){
             float z = layer + 1f;
@@ -389,19 +395,15 @@ abstract class WormComp implements Unitc{
         if(uType.splittable){
             if(child != null && parent != null) uType.splitSound.at(x(), y());
             if(child != null){
-                Wormc wc = ((Wormc)child);
-                wc.head(null);
-                float z = countFoward() + 1f;
-                distributeActionBack(u -> {
-                    if(u != self()){
-                        u.layer(u.layer() - z);
-                        u.splitHealthDiv(u.splitHealthDiv() * 2f);
-                        u.head(child);
-                        if(u.isTail()) u.waitTime(5f * 60f);
-                    }
-                });
-                wc.parent(null);
-                child.setupWeapons(type);
+                var wc = (Unit & Wormc)child;
+                float z = 0f;
+                while(wc != null){
+                    wc.layer(z++);
+                    wc.splitHealthDiv(wc.splitHealthDiv() * 2f);
+                    wc.head(child);
+                    if(wc.isTail()) wc.waitTime(5f * 60f);
+                    wc = (Unit & Wormc)wc.child();
+                }
             }
             if(parent != null){
                 Wormc wp = ((Wormc)parent);
