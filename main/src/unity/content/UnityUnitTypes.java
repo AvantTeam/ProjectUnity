@@ -4663,7 +4663,11 @@ public class UnityUnitTypes implements ContentList{
             outlineColor = UnityPal.darkerOutline;
             antiCheatType = new AntiCheatVariables(6000f, 12000f, health / 560f, health / 120f, 0.6f, 7f * 60f, 8f * 60f, 35f, 4);
 
-            weapons.add(new EnergyChargeWeapon(name + "-main"){{
+            BulletType bRange = new BulletType(0f, 220f){{
+                maxRange = 280f;
+            }};
+
+            weapons.addAll(new EnergyChargeWeapon(name + "-main"){{
                 drawRegion = false;
                 mirror = false;
                 x = 0f;
@@ -4692,20 +4696,41 @@ public class UnityUnitTypes implements ContentList{
                     wx = Angles.trnsx(r, x, y) + unit.x,
                     wy = Angles.trnsy(r, x, y) + unit.y;
 
+                    Draw.color(UnityPal.scarColor);
+                    Draw.blend(Blending.additive);
                     for(int i = 0; i < 4; i++){
                         float in = Mathf.curve(charge, i / 4f, (i + 1f) / 4f);
                         if(in > 0.0001f){
-                            Draw.color(UnityPal.scarColor);
                             Draw.alpha(in);
-                            Draw.blend(Blending.additive);
 
                             Draw.rect(heatRegion, wx + Mathf.range(12f - (in * 11.3f)), wy + Mathf.range(12f - (in * 11.3f)), r);
-
-                            Draw.blend();
-                            Draw.reset();
                         }
                     }
+                    Draw.blend();
+                    Draw.color();
                 };
+            }}, new MultiTargetPointDefenceWeapon("unity-end-point-defence"){{
+                x = 96.75f;
+                y = 9f;
+                alternate = false;
+                reload = 15f;
+                shots = 7;
+                shootCone = 20f;
+                rotationSpeed = 15f;
+                beamEffect = LineFx.endPointDefence;
+                color = UnityPal.scarColor;
+                bullet = bRange;
+            }}, new MultiTargetPointDefenceWeapon("unity-end-point-defence"){{
+                x = 82f;
+                y = 20.5f;
+                alternate = false;
+                reload = 10f;
+                shots = 5;
+                shootCone = 20f;
+                rotationSpeed = 15f;
+                beamEffect = LineFx.endPointDefence;
+                color = UnityPal.scarColor;
+                bullet = bRange;
             }});
 
             tentacles.addAll(new TentacleType(name + "-tentacle"){{

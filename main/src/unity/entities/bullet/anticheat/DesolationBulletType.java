@@ -45,6 +45,7 @@ public class DesolationBulletType extends AntiCheatBulletTypeBase{
     public void init(){
         super.init();
         despawnHit = false;
+        drawSize = Math.max(Math.max(widthTo, widthFrom), length) * 2f * startingScl;
     }
 
     @Override
