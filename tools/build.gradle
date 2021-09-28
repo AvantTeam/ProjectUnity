@@ -31,7 +31,7 @@ task rearchive{
     final def listStr = file(assetsDir).list()
 
     task archDexed(type: Jar){
-        if(!dexedJar.exists() || taskNames.contains('main:dex')) dependsOn project(':main').tasks.dex
+        if(!dexedJar.exists() || taskNames.contains('main:dex')) ':main:dex'
 
         archiveFileName.set dexedJar.getName()
         from files(assetsDir){ exclude 'sprites/vanilla/**' }
@@ -47,7 +47,7 @@ task rearchive{
     }
 
     task archDist(type: Jar){
-        if(!distJar.exists() || taskNames.contains('main:deploy')) dependsOn project(':main').tasks.deploy
+        if(!distJar.exists() || taskNames.contains('main:deploy')) ':main:deploy'
 
         archiveFileName.set distJar.getName()
         from files(assetsDir){ exclude 'sprites/vanilla/**' }
@@ -71,7 +71,7 @@ task rearchive{
 
 task proc(dependsOn: [classes, configurations.runtimeClasspath]){
     if(toolRearchive){
-        finalizedBy rearchive
+        finalizedBy tasks.rearchive
         if(taskNames.contains('tools:proc')) println '.jar files will be re-archived after processing sprites.'
     }
 
