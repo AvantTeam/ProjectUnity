@@ -94,7 +94,7 @@ class Fetcher{
 
     @SuppressWarnings('all')
     void execute(){
-        Boolf<UnsafeRunnable> exec ={ final UnsafeRunnable run ->
+        Boolf<UnsafeRunnable> exec = { final UnsafeRunnable run ->
             try{
                 run.run()
                 error = null
