@@ -71,8 +71,6 @@ public class UnitProcessor implements Processor{
                     reg.relativePath = at.relativePath;
                     reg.save();
 
-                    replace(at);
-
                     return reg;
                 }else{
                     return atlas.find(at.name);

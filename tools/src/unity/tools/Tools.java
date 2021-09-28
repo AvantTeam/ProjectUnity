@@ -35,19 +35,16 @@ public final class Tools{
     public static ModMeta meta;
 
     public static final Fi
-    assetsDir,
-    spritesDir, spritesGenDir;
+    assetsDir, spritesDir;
 
     public static GenAtlas atlas;
 
-    private static final ObjectSet<GenRegion> replaced = new ObjectSet<>();
     private static final IntSet[] initialized = new IntSet[ContentType.all.length];
     private static final IntSet[] loaded = new IntSet[ContentType.all.length];
 
     static{
         assetsDir = new Fi(Paths.get("").toFile());
         spritesDir = assetsDir.child("sprites");
-        spritesGenDir = spritesDir.child("gen");
 
         for(var type : ContentType.all){
             int i = type.ordinal();
@@ -95,7 +92,6 @@ public final class Tools{
         Log.logger = new DefaultLogHandler();
         loadLogger();
 
-        clear(spritesGenDir);
         addRegions();
 
         atlas.clear = atlas.find("clear");
@@ -105,16 +101,6 @@ public final class Tools{
         Processors.process();
 
         atlas.dispose();
-
-        if(args.length >= 1){
-            synchronized(replaced){
-                var list = Fi.get(args[0]);
-                list.writeString(replaced.asArray().toString("\n", reg ->
-                    "sprites/" + reg.relativePath + "/" +
-                    reg.name.replaceFirst("unity-", "") + ".png"
-                ));
-            }
-        }
     }
 
     private static void addRegions(){
@@ -152,20 +138,7 @@ public final class Tools{
         }
     }
 
-    public static void replace(GenRegion region){
-        synchronized(replaced){
-            replaced.add(region);
-        }
-    }
-
     public static GenRegion conv(TextureRegion region){
         return (GenRegion)region;
-    }
-
-    public static void clear(Fi file){
-        file.mkdirs();
-        for(var child : file.list()){
-            child.deleteDirectory();
-        }
     }
 }

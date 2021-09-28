@@ -140,7 +140,7 @@ public class GenAtlas extends TextureAtlas{
         public void save(boolean add){
             if(!found()) throw new IllegalArgumentException("Cannot save an invalid region: " + name);
 
-            var dir = spritesGenDir.child(relativePath);
+            var dir = spritesDir.child(relativePath);
             dir.mkdirs();
 
             var file = dir.child(name.replaceFirst("unity-", "") + ".png");
