@@ -4696,6 +4696,7 @@ public class UnityUnitTypes implements ContentList{
                     fragBullets = 3;
                     fragVelocityMax = 1.2f;
                     fragVelocityMin = 0.5f;
+                    fragCone = 45f;
                     fragBullet = new VoidFractureBulletType(15f, 100f){{
                         width = 9.5f;
                         widthTo = 2f;
