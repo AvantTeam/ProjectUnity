@@ -1,10 +1,12 @@
 package unity.content.effects;
 
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import mindustry.entities.*;
 import mindustry.graphics.*;
+import unity.graphics.*;
 
 import static arc.graphics.g2d.Draw.*;
 
@@ -32,5 +34,12 @@ public class TrailFx{
             Tmp.v2.trns(e.rotation - 90f, 9f * s * ((e.fout() + 2f) / 3f), -20f);
             Fill.tri(Tmp.v1.x + e.x, Tmp.v1.y + e.y, -Tmp.v1.x + e.x, -Tmp.v1.y + e.y, Tmp.v2.x + e.x, Tmp.v2.y + e.y);
         }
+    }),
+
+    endTrail = new Effect(50f, e -> {
+        Draw.color(Color.black, UnityPal.scarColor, Mathf.curve(e.fin(), 0f, 0.3f));
+        Angles.randLenVectors(e.id, 2, e.finpow() * 7f, (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, 3f * e.fout());
+        });
     });
 }
