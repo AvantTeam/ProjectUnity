@@ -1,4 +1,4 @@
-sourceSets.main {
+sourceSets.main{
     java.srcDirs = [
         'src/',
         "$projectDir/fetched",
@@ -9,7 +9,7 @@ sourceSets.main {
 sourceCompatibility = 16
 targetCompatibility = 8
 
-dependencies {
+dependencies{
     compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
     compileOnly "com.github.Anuken.Arc:arc-core:$arcVersion"
 
@@ -18,7 +18,7 @@ dependencies {
     annotationProcessor "com.github.Anuken:jabel:$jabelVersion"
 }
 
-ext {
+ext{
     fetchPackage = 'unity/fetched'
     fetchDir = new File("$projectDir/fetched/$fetchPackage")
 
@@ -34,47 +34,49 @@ import arc.util.serialization.*
 
 import java.util.concurrent.*
 
-task deploy(type: Jar, dependsOn: configurations.runtimeClasspath) {
+task deploy(type: Jar, dependsOn: configurations.runtimeClasspath){
+    if(spritesDir.exists()){
+        dependsOn project(':tools').tasks.proc
+        if(taskNames.contains('main:deploy')) println 'Sprites folder not found; automatically generating sprites...'
+    }
+
     archiveFileName.set "${modName}Desktop.jar"
 
     from files(sourceSets.main.output.classesDirs)
     from files(sourceSets.main.output.resourcesDir)
-    from configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-    from files(assetsDir) {
-        exclude 'sprites/vanilla/**'
-        exclude 'sprites/gen/vanilla/**'
-    }
+    from configurations.runtimeClasspath.collect{ it.isDirectory() ? it : zipTree(it) }
+    from files(assetsDir){ exclude 'sprites/vanilla/**' }
 
-    from(rootDir) {
+    from(rootDir){
         include 'mod.json'
         include 'icon.png'
     }
 
-    doFirst {
+    doFirst{
         println "Deploying ${devBuild ? 'dev' : 'user'} build."
     }
 }
 
-task dex(type: Jar) {
+task dex(type: Jar){
     archiveFileName.set "${modName}.jar"
 
     final def desktopJar = deploy.archiveFile.get().asFile
     final def dexJar = new File(dex.getTemporaryDir(), 'Dexed.jar')
 
-    if(!desktopJar.exists()) dependsOn deploy
-    doFirst {
+    if(!desktopJar.exists() || taskNames.contains('main:deploy')) dependsOn deploy
+    doFirst{
         println 'Dexifying...'
         def command = ['d8', '--min-api', sdkAPI, '--output', dexJar, desktopJar]
         final File[] files =
             configurations.compileClasspath.asList() +
             configurations.runtimeClasspath.asList()
 
-        for(def file : files) {
+        for(def file : files){
             command += ['--classpath', file.path]
         }
         command += ['--lib', file("$sdkRoot/platforms/android-$sdkVersion/android.jar")]
 
-        if(OS.isWindows) {
+        if(OS.isWindows){
             command = ['cmd', '/c'] + command
         }
 
@@ -85,47 +87,47 @@ task dex(type: Jar) {
     from zipTree(dexJar)
 }
 
-class Fetcher {
+class Fetcher{
     UnsafeRunnable run
 
     private volatile Throwable error = null
 
     @SuppressWarnings('all')
-    void execute() {
-        Boolf<UnsafeRunnable> exec = { final UnsafeRunnable run ->
-            try {
+    void execute(){
+        Boolf<UnsafeRunnable> exec ={ final UnsafeRunnable run ->
+            try{
                 run.run()
                 error = null
-            } catch(Throwable e) {
+            }catch(Throwable e){
                 error = e
             }
 
             return error != null
         }
 
-        while(exec.get(run)) {}
+        while(exec.get(run)){}
     }
 }
 
-task fetchComps {
-    doFirst {
-        delete { delete fetchDir }
+task fetchComps{
+    doFirst{
+        delete{ delete fetchDir }
         fetchDir.mkdir()
 
         final CopyOnWriteArrayList<Fetcher> fetches = new CopyOnWriteArrayList<>()
 
-        UnsafeRunnable mainRun = {
+        UnsafeRunnable mainRun ={
         Http.get("https://api.github.com/repos/Anuken/Mindustry/contents/core/src/mindustry/entities/comp?ref=$mindustryVersion")
             .error({ final t -> throw new RuntimeException(t) })
             .block({ final res ->
                 final def list = Jval.read(res.getResultAsString()).asArray()
                 println "Found $list.size entity components."
 
-                for(final Jval val : list) {
+                for(final Jval val : list){
                     final def filename = val.get('name').asString()
                     final def fileurl = val.get('download_url').asString()
 
-                    final UnsafeRunnable run = {
+                    final UnsafeRunnable run ={
                     Http.get(fileurl)
                         .error({ final t -> throw new RuntimeException(t) })
                         .block({ final comp ->
@@ -157,7 +159,7 @@ task fetchComps {
 
         Seq<Thread> threads = Seq.with(fetches).map({ final Fetcher fetch -> new Thread({
             fetch.execute()
-            synchronized(fetches) {
+            synchronized(fetches){
                 fetches.remove(fetch)
                 print '\b'
             }
@@ -171,29 +173,29 @@ task fetchComps {
     }
 }
 
-task cleanFetched(type: Delete) {
+task cleanFetched(type: Delete){
     delete "$projectDir/fetched"
     delete "$fetchTemp"
 }
 
-task assetsJar(type: Jar) {
+task assetsJar(type: Jar){
     archiveClassifier.set 'assets'
     from files('assets/')
 }
 
-artifacts {
+artifacts{
     archives assetsJar
 }
 
-tasks.withType(JavaCompile) {
-    if(!fetchDir.exists() || !fetchTemp.exists()) {
+tasks.withType(JavaCompile){
+    if(!fetchDir.exists() || !fetchTemp.exists()){
         dependsOn fetchComps
-    } else {
+    }else{
         String[] content = fetchTemp.text.split('/')
         String ver = content[0]
         String rev = content[1]
 
-        if(ver != "$mindustryVersion" as String || rev != Integer.toString(fetchRevision as int)) {
+        if(ver != "$mindustryVersion" as String || rev != Integer.toString(fetchRevision as int)){
             dependsOn fetchComps
         }
     }
@@ -201,7 +203,7 @@ tasks.withType(JavaCompile) {
     options.compilerArgs += ['--release', '8']
 }
 
-tasks.withType(Jar) {
+tasks.withType(Jar){
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
     exclude 'unity/fetched/**'
@@ -210,8 +212,4 @@ tasks.withType(Jar) {
     if(!devBuild) exclude 'unity/mod/DevBuildImpl*'
 
     exclude 'sprites/vanilla/**'
-    exclude 'sprites/gen/vanilla/**'
-    doFirst {
-        if(excludedFiles.exists()) exclude excludedFiles.readString().split(/\n/)
-    }
 }

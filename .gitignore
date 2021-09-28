@@ -1,4 +1,4 @@
-# Gradle / Java
+# Build settings
 bin/
 build/
 .gradle/
@@ -7,7 +7,7 @@ build/
 .classpath
 
 # Project
-main/assets/sprites/gen/
+main/assets/sprites/
 main/fetched
 main/fetch.txt
 

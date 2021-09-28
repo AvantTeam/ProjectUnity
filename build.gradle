@@ -1,31 +1,32 @@
-buildscript {
-    dependencies {
+buildscript{
+    dependencies{
         classpath "com.github.Anuken.Mindustry:core:$mindustryVersion"
         classpath "com.squareup:javapoet:$javapoetVersion"
         classpath "com.github.Anuken:jabel:$jabelVersion"
     }
 
-    repositories {
+    repositories{
         mavenCentral()
-        maven { url 'https://jitpack.io' }
+        maven{ url 'https://jitpack.io' }
     }
 }
 
-import arc.files.*
-
-allprojects {
+allprojects{
     apply plugin: 'java'
     apply plugin: 'maven-publish'
 
     group = 'com.github.AvantTeam'
     version = modVersion
 
-    ext {
+    ext{
         sdkRoot = System.getenv('ANDROID_HOME') ?: System.getenv('ANDROID_SDK_ROOT')
         windows = System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')
         taskNames = gradle.startParameter.getTaskNames()
+
         assetsDir = new File(project(':main').projectDir, 'assets/')
-        excludedFiles = null as Fi
+        assetsRawDir = new File(project(':main').projectDir, 'assets-raw/')
+        spritesDir = new File(assetsDir, 'sprites/')
+        spritesRawDir = new File(assetsRawDir, 'sprites/')
 
         // `-Pmain.dev` will initiate a development build. Default is false
         devBuild = project.hasProperty('main.dev') && Boolean.parseBoolean(project.property('main.dev') as String)
@@ -39,34 +40,34 @@ allprojects {
         toolRearchive = !project.hasProperty('tools.rearch') || Boolean.parseBoolean(project.property('tools.rearch') as String)
     }
 
-    repositories {
+    repositories{
         mavenCentral()
-        maven { url "https://jitpack.io" }
+        maven{ url "https://jitpack.io" }
     }
 
-    task sourcesJar(type: Jar, dependsOn: classes) {
+    task sourcesJar(type: Jar, dependsOn: classes){
         archiveClassifier.set 'sources'
         from sourceSets.main.allSource
     }
 
-    artifacts {
+    artifacts{
         archives sourcesJar
     }
 
-    java {
+    java{
         withJavadocJar()
         withSourcesJar()
     }
 
-    publishing {
-        publications {
-            maven(MavenPublication) {
+    publishing{
+        publications{
+            maven(MavenPublication){
                 from components.java
             }
         }
     }
 
-    tasks.withType(JavaCompile) {
+    tasks.withType(JavaCompile){
         options.incremental = true
         options.encoding = 'UTF-8'
         //options.compilerArgs += '-Xlint:deprecation'
@@ -84,7 +85,7 @@ allprojects {
         ]
     }
 
-    tasks.withType(Javadoc) {
+    tasks.withType(Javadoc){
         options.addStringOption('Xdoclint:none', '-quiet')
         options.addStringOption('-release', '16')
     }
