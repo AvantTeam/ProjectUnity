@@ -76,6 +76,14 @@ task proc(dependsOn: [classes, configurations.runtimeClasspath]){
     }
 
     doLast{
+        delete{ delete spritesDir }
+        spritesDir.mkdirs()
+
+        copy{
+            from spritesRawDir
+            into spritesDir
+        }
+
         javaexec{
             workingDir = assetsDir
             main = 'unity.tools.Tools'
