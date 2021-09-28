@@ -28,8 +28,6 @@ import java.util.Map.Entry;
 
 /** @author GlennFolker */
 public class Annotations{
-    //region definitions
-
     /** Indicates that this content belongs to a specific faction */
     @Target(ElementType.FIELD)
     @Retention(RetentionPolicy.SOURCE)
@@ -110,6 +108,16 @@ public class Annotations{
     @Retention(RetentionPolicy.SOURCE)
     public @interface EntityInterface{}
 
+    /** Fills a {@code Seq.<String>with()}'s arg with the list of compiled classes with their qualified names. */
+    @Target({ElementType.FIELD, ElementType.LOCAL_VARIABLE})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface ListClasses{}
+
+    /** Fills a {@code Seq.<String>with()}'s arg with the list of compiled packages. */
+    @Target({ElementType.FIELD, ElementType.LOCAL_VARIABLE})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface ListPackages{}
+
     /** Prevents this component from getting added into an entity group, specified by the group's element type */
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.SOURCE)
@@ -117,9 +125,6 @@ public class Annotations{
         /** @return The excluded group's element type */
         Class<?>[] value();
     }
-
-    //end region
-    //region utilities
 
     /** Generates value-type wrapper for this class */
     @Target({ElementType.TYPE})
@@ -288,8 +293,6 @@ public class Annotations{
         /** @return The outline radius, only valid if {@link #outline()} is true */
         int outlineRadius() default 4;
     }
-
-    //end region
 
     //anuke's implementation of annotation proxy maker, to replace the broken one from oracle
     //thanks, anuke

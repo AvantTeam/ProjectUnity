@@ -2,7 +2,7 @@ buildscript {
     dependencies {
         classpath "com.github.Anuken.Mindustry:core:$mindustryVersion"
         classpath "com.squareup:javapoet:$javapoetVersion"
-        classpath "com.github.bsideup.jabel:jabel-javac-plugin:$jabelVersion"
+        classpath "com.github.Anuken:jabel:$jabelVersion"
     }
 
     repositories {

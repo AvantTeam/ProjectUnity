@@ -15,8 +15,7 @@ dependencies {
 
     compileOnly project(':annotations')
     annotationProcessor project(':annotations')
-
-    annotationProcessor "com.github.bsideup.jabel:jabel-javac-plugin:$jabelVersion"
+    annotationProcessor "com.github.Anuken:jabel:$jabelVersion"
 }
 
 ext {

@@ -1,10 +1,10 @@
 package unity.util;
 
 import arc.*;
-import arc.struct.*;
 import rhino.*;
 
 import static mindustry.Vars.*;
+import static unity.Unity.*;
 
 /**
  * Utility class for transition between Java and JS scripts, as well as providing a custom top level scope for the sake of
@@ -24,21 +24,12 @@ public final class JSBridge{
         defaultScope = (ImporterTopLevel)mods.getScripts().scope;
 
         unityScope = new ImporterTopLevel(context);
-        context.evaluateString(unityScope, Core.files.internal("scripts/global.js").readString(), "global.js", 0);
+        context.evaluateString(unityScope, Core.files.internal("scripts/global.js").readString(), "global.js", 1);
     }
 
     public static void importDefaults(ImporterTopLevel scope){
-        var permit = Seq.with(
-            "unity",
-            "rhino",
-            "java.lang",
-            "java.io",
-            "java.util"
-        );
-
-        for(var pkg : Package.getPackages()){
-            if(pkg == null || !permit.contains(pkg.getName()::startsWith)) continue;
-            importPackage(scope, pkg);
+        for(var pack : packages){
+            importPackage(scope, pack);
         }
     }
 

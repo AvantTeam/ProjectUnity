@@ -18,6 +18,7 @@ import mindustry.gen.*;
 import mindustry.mod.*;
 import mindustry.world.blocks.environment.*;
 import unity.ai.kami.*;
+import unity.annotations.Annotations.*;
 import unity.assets.list.*;
 import unity.assets.loaders.*;
 import unity.assets.type.g3d.*;
@@ -49,6 +50,11 @@ public class Unity extends Mod{
 
     public static LightProcess lights;
     public static ContentScoreProcess scoring;
+
+    @ListClasses
+    public static final Seq<String> classes = Seq.with();
+    @ListPackages
+    public static final Seq<String> packages = Seq.with();
 
     private static final ContentList[] content = {
         new UnityItems(),
