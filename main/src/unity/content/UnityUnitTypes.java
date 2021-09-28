@@ -4659,6 +4659,8 @@ public class UnityUnitTypes implements ContentList{
 
             legSplashRange = 120f;
             legSplashDamage = 1700f;
+            
+            aimDst = hitSize / 2f;
 
             outlineColor = UnityPal.darkerOutline;
             antiCheatType = new AntiCheatVariables(6000f, 12000f, health / 560f, health / 120f, 0.6f, 7f * 60f, 8f * 60f, 35f, 4);
@@ -4667,7 +4669,49 @@ public class UnityUnitTypes implements ContentList{
                 maxRange = 280f;
             }};
 
-            weapons.addAll(new EnergyChargeWeapon(name + "-main"){{
+            Weapon w = new Weapon("unity-end-mount"){{
+                reload = 35f;
+                shootY = 9f;
+                inaccuracy = 3f;
+                shots = 3;
+                shotDelay = 5f;
+                rotate = true;
+                rotateSpeed = 15f;
+                mirror = false;
+                alternate = true;
+                bullet = new EndBasicBulletType(5f, 260f){{
+                    lifetime = 70f;
+                    width = 19f;
+                    height = 27f;
+                    backColor = lightColor = UnityPal.scarColor;
+                    frontColor = Color.black;
+                    trailEffect = TrailFx.endTrail;
+                    trailChance = 0.4f;
+                    hitSound = UnitySounds.spaceFracture;
+
+                    overDamage = 2200000f;
+                    ratioDamage = 1f / 170f;
+                    ratioStart = 4000f;
+
+                    fragBullets = 3;
+                    fragVelocityMax = 1.2f;
+                    fragVelocityMin = 0.5f;
+                    fragBullet = new VoidFractureBulletType(15f, 100f){{
+                        width = 9.5f;
+                        widthTo = 2f;
+                        overDamage = 1800000f;
+                        ratioDamage = 1f / 50f;
+                        ratioStart = 50000f;
+                        shootEffect = ShootFx.voidShoot;
+
+                        modules = new AntiCheatBulletModule[]{
+                        new ArmorDamageModule(1f, 20f, 2f)
+                        };
+                    }};
+                }};
+            }};
+
+            weapons.addAll(new EnergyChargeWeapon(name + "-main"){{//0
                 drawRegion = false;
                 mirror = false;
                 x = 0f;
@@ -4709,7 +4753,7 @@ public class UnityUnitTypes implements ContentList{
                     Draw.blend();
                     Draw.color();
                 };
-            }}, new MultiTargetPointDefenceWeapon("unity-end-point-defence"){{
+            }}, new MultiTargetPointDefenceWeapon("unity-end-point-defence"){{//1 2
                 x = 96.75f;
                 y = 9f;
                 alternate = false;
@@ -4720,7 +4764,7 @@ public class UnityUnitTypes implements ContentList{
                 beamEffect = LineFx.endPointDefence;
                 color = UnityPal.scarColor;
                 bullet = bRange;
-            }}, new MultiTargetPointDefenceWeapon("unity-end-point-defence"){{
+            }}, new MultiTargetPointDefenceWeapon("unity-end-point-defence"){{//3 4
                 x = 82f;
                 y = 20.5f;
                 alternate = false;
@@ -4731,7 +4775,49 @@ public class UnityUnitTypes implements ContentList{
                 beamEffect = LineFx.endPointDefence;
                 color = UnityPal.scarColor;
                 bullet = bRange;
-            }});
+            }},
+
+            clnW(w, c -> {//5
+                c.x = 62.25f;
+                c.y = 6.75f;
+                c.otherSide = 6;
+            }), clnW(w, c -> {//6
+                c.x = 57f;
+                c.y = -16.25f;
+                c.otherSide = 7;
+                c.flipSprite = true;
+            }), clnW(w, c -> {//7
+                c.x = 52f;
+                c.y = -39f;
+                c.otherSide = 8;
+                c.flipSprite = true;
+            }), clnW(w, c -> {//8
+                c.x = 46.75f;
+                c.y = -61.75f;
+                c.otherSide = 5;
+                c.flipSprite = true;
+            }),
+
+            clnW(w, c -> {//9
+                c.x = -62.25f;
+                c.y = 6.75f;
+                c.otherSide = 10;
+            }), clnW(w, c -> {//10
+                c.x = -57f;
+                c.y = -16.25f;
+                c.otherSide = 11;
+                c.flipSprite = true;
+            }), clnW(w, c -> {//11
+                c.x = -52f;
+                c.y = -39f;
+                c.otherSide = 12;
+                c.flipSprite = true;
+            }), clnW(w, c -> {//12
+                c.x = -46.75f;
+                c.y = -61.75f;
+                c.otherSide = 9;
+                c.flipSprite = true;
+            }));
 
             tentacles.addAll(new TentacleType(name + "-tentacle"){{
                 x = 139f;
