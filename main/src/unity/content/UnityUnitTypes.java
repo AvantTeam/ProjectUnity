@@ -4672,7 +4672,7 @@ public class UnityUnitTypes implements ContentList{
             Weapon w = new Weapon("unity-end-mount"){{
                 reload = 35f;
                 shootY = 9f;
-                inaccuracy = 3f;
+                inaccuracy = 5f;
                 shots = 3;
                 shotDelay = 5f;
                 rotate = true;
@@ -4696,10 +4696,13 @@ public class UnityUnitTypes implements ContentList{
                     fragBullets = 3;
                     fragVelocityMax = 1.2f;
                     fragVelocityMin = 0.5f;
-                    fragCone = 45f;
+                    fragCone = 120f;
                     fragBullet = new VoidFractureBulletType(15f, 100f){{
                         width = 9.5f;
                         widthTo = 2f;
+                        maxTargets = 5;
+                        spikesRange = 90f;
+                        spikesDamage = 50f;
                         overDamage = 1800000f;
                         ratioDamage = 1f / 50f;
                         ratioStart = 50000f;
@@ -4709,6 +4712,39 @@ public class UnityUnitTypes implements ContentList{
                         new ArmorDamageModule(1f, 20f, 2f)
                         };
                     }};
+                }};
+            }}, w2 = new Weapon("unity-end-mount-2"){{
+                shootY = 12f;
+                reload = 100f;
+                rotate = true;
+                rotateSpeed = 5f;
+                alternate = true;
+                mirror = false;
+                shots = 2;
+                shotDelay = 5;
+
+                bullet = new EndBasicBulletType(7f, 380f, "shell"){{
+                    lifetime = 95f;
+                    pierceShields = pierce = pierceBuilding = true;
+                    pierceCap = 3;
+                    hitShake = 1f;
+                    shootEffect = Fx.shootBig;
+
+                    shrinkY = 0f;
+
+                    backColor = lightningColor = lightColor = UnityPal.scarColor;
+                    frontColor = UnityPal.endColor;
+
+                    lightning = 3;
+                    lightningLength = 8;
+                    lightningLengthRand = 4;
+                    lightningDamage = 80f;
+                    lightningType = UnityBullets.endLightning;
+
+                    splashDamage = 220f;
+                    splashDamageRadius = 80f;
+                    width = 15f;
+                    height = 21f;
                 }};
             }};
 
@@ -4817,6 +4853,50 @@ public class UnityUnitTypes implements ContentList{
                 c.x = -46.75f;
                 c.y = -61.75f;
                 c.otherSide = 9;
+                c.flipSprite = true;
+            }),
+
+            clnW(w2, c -> {//13
+                c.x = 100.75f;
+                c.y = -13f;
+                c.otherSide = 14;
+            }), clnW(w2, c -> {//14
+                c.x = 79f;
+                c.y = -23.5f;
+                c.otherSide = 13;
+                c.flipSprite = true;
+            }),
+
+            clnW(w2, c -> {//15
+                c.x = -100.75f;
+                c.y = -13f;
+                c.otherSide = 16;
+            }), clnW(w2, c -> {//16
+                c.x = -79f;
+                c.y = -23.5f;
+                c.otherSide = 15;
+                c.flipSprite = true;
+            }),
+
+            clnW(w2, c -> {//17
+                c.x = 85f;
+                c.y = -48.25f;
+                c.otherSide = 18;
+            }), clnW(w2, c -> {//18
+                c.x = 68.75f;
+                c.y = -65.75f;
+                c.otherSide = 17;
+                c.flipSprite = true;
+            }),
+
+            clnW(w2, c -> {//19
+                c.x = -85f;
+                c.y = -48.25f;
+                c.otherSide = 20;
+            }), clnW(w2, c -> {//20
+                c.x = -68.75f;
+                c.y = -65.75f;
+                c.otherSide = 19;
                 c.flipSprite = true;
             }));
 

@@ -61,6 +61,8 @@ public class UnityBullets implements ContentList{
 
         supernovaLaser,
 
+        endLightning,
+
         ravagerLaser, ravagerArtillery, missileAntiCheat, endLaserSmall, endLaser,
 
         laserZap,
@@ -1136,6 +1138,19 @@ public class UnityBullets implements ContentList{
                 }
             }
         };
+
+        endLightning = new AntiCheatBulletTypeBase(0f, 0f){{
+            lifetime = Fx.lightning.lifetime;
+            hitColor = UnityPal.scarColor;
+            hitEffect = HitFx.coloredHitSmall;
+            despawnEffect = Fx.none;
+            status = StatusEffects.shocked;
+            statusDuration = 10f;
+            hittable = false;
+
+            ratioStart = 15000f;
+            ratioDamage = 1 / 60f;
+        }};
 
         ravagerLaser = new EndPointBlastLaserBulletType(1210f){
             {
