@@ -128,7 +128,7 @@ public class CinematicCanvas extends WidgetGroup{
 
                 t.add().growX();
                 t.button(Icon.pencil, Styles.logici, () -> {}).padRight(4f).get().tapped(() -> {});
-                t.button(Icon.cancel, Styles.logici, () -> {}).get().tapped(() -> ui.showConfirm("@dialog.cinematic.node-delete.title", "dialog.cinematic.node-delete.content", () -> {
+                t.button(Icon.cancel, Styles.logici, () -> {}).get().tapped(() -> ui.showConfirm("@dialog.cinematic.node-delete.title", "!dialog.cinematic.node-delete.content", () -> {
                     remove();
 
                     var it = cinematicEditor.nodes.iterator();
