@@ -5,6 +5,7 @@ import arc.assets.*;
 import arc.files.*;
 import arc.graphics.g2d.*;
 import arc.mock.*;
+import arc.scene.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;

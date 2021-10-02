@@ -1,4 +1,4 @@
-package unity.planets;
+package unity.map.planets;
 
 import arc.graphics.*;
 import arc.math.*;

@@ -3,7 +3,7 @@ package unity.content;
 import mindustry.ctype.*;
 import mindustry.type.*;
 import unity.annotations.Annotations.*;
-import unity.type.sector.*;
+import unity.map.*;
 
 import static unity.content.UnityPlanets.*;
 

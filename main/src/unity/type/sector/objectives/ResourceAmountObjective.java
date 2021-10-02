@@ -19,7 +19,6 @@ import unity.type.sector.SectorObjectiveModel.*;
 import unity.util.*;
 
 import static mindustry.Vars.*;
-import static unity.Unity.*;
 
 /**
  * An objective that will complete once a team has gathered resources as described in {@link #items}.
@@ -34,8 +33,6 @@ public class ResourceAmountObjective extends SectorObjective{
     public final Color to;
 
     static{
-        cinematicEditor.ignore(ResourceAmountObjective.class, ReflectUtils.findField(SectorObjective.class, "executions", true));
-
         SectorObjectiveModel.constructors.put(ResourceAmountObjective.class, (node, f) -> {
             ItemStack[] items = f.arrReq("items").map(v -> {
                 int separator = v.indexOf("\n");
@@ -67,11 +64,11 @@ public class ResourceAmountObjective extends SectorObjective{
         });
     }
 
-    public ResourceAmountObjective(ItemStack[] items, Team team, StoryNode<?> node, String name, Cons<ResourceAmountObjective> executor){
+    public ResourceAmountObjective(ItemStack[] items, Team team, StoryNode node, String name, Cons<ResourceAmountObjective> executor){
         this(items, team, Color.lightGray, Color.green, node, name, executor);
     }
 
-    public ResourceAmountObjective(ItemStack[] items, Team team, Color from, Color to, StoryNode<?> node,  String name, Cons<ResourceAmountObjective> executor){
+    public ResourceAmountObjective(ItemStack[] items, Team team, Color from, Color to, StoryNode node, String name, Cons<ResourceAmountObjective> executor){
         super(node, name, 1, executor);
         this.items = items;
         this.team = team;

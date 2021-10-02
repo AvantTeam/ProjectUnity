@@ -64,7 +64,7 @@ public class SectorObjectiveModel implements JsonSerializable{
         }
     }
 
-    public <T extends SectorObjective> T create(StoryNode<?> node){
+    public <T extends SectorObjective> T create(StoryNode node){
         if(type == null) throw new IllegalArgumentException("type is null");
 
         var constructor = constructors.get(type);
@@ -78,7 +78,7 @@ public class SectorObjectiveModel implements JsonSerializable{
     }
 
     public interface ObjectiveConstructor{
-        SectorObjective get(StoryNode<?> node, FieldTranslator fields);
+        SectorObjective get(StoryNode node, FieldTranslator fields);
     }
 
     public static class FieldTranslator{

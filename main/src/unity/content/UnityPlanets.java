@@ -11,7 +11,7 @@ import unity.assets.list.*;
 import unity.gen.*;
 import unity.graphics.*;
 import unity.graphics.CompositeMesh.*;
-import unity.planets.*;
+import unity.map.planets.*;
 import unity.util.*;
 
 public class UnityPlanets implements ContentList{

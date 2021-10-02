@@ -11,7 +11,6 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
 import arc.util.serialization.*;
-import mindustry.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
@@ -47,6 +46,7 @@ public class Unity extends Mod{
 
     public static CreditsDialog creditsDialog;
     public static JSScriptDialog scriptsDialog;
+    public static CinematicDialog cinematicDialog;
 
     public static LightProcess lights;
     public static ContentScoreProcess scoring;
@@ -56,7 +56,7 @@ public class Unity extends Mod{
     @ListPackages
     public static final Seq<String> packages = Seq.with();
 
-    private static final ContentList[] content = {
+    private static final ContentList[] contents = {
         new UnityItems(),
         new UnityStatusEffects(),
         new UnityWeathers(),
@@ -166,7 +166,7 @@ public class Unity extends Mod{
         KamiBulletDatas.load();
 
         try{
-            Class<? extends DevBuild> impl = (Class<? extends DevBuild>)Class.forName("unity.mod.DevBuildImpl");
+            var impl = (Class<? extends DevBuild>)Class.forName("unity.mod.DevBuildImpl");
             dev = impl.getDeclaredConstructor().newInstance();
 
             print("Dev build class implementation found and instantiated.");
@@ -206,9 +206,9 @@ public class Unity extends Mod{
     public void loadContent(){
         Faction.init();
 
-        for(ContentList list : content){
+        for(ContentList list : contents){
             list.load();
-            print("Loaded content list: " + list.getClass().getSimpleName());
+            print("Loaded contents list: " + list.getClass().getSimpleName());
         }
 
         FactionMeta.init();
@@ -224,19 +224,19 @@ public class Unity extends Mod{
         }
 
         Seq<Class<?>> ignored = Seq.with(Floor.class, Prop.class);
-        for(var content : Vars.content.getContentMap()){
+        for(var content : content.getContentMap()){
             content.each(c -> {
                 if(
-                    !(c instanceof UnlockableContent cont) ||
-                    (c.minfo.mod == null || c.minfo.mod.main == null || c.minfo.mod.main.getClass() != Unity.class)
+                    (c.minfo.mod == null || c.minfo.mod.main != this) ||
+                    !(c instanceof UnlockableContent cont)
                 ) return;
 
                 if(Core.bundle.getOrNull(cont.getContentType() + "." + cont.name + ".name") == null){
-                    print(Strings.format("@ has no bundle entry for name", cont));
+                    print(LogLevel.debug, "", Strings.format("@ has no bundle entry for name", cont));
                 }
 
                 if(!ignored.contains(t -> t.isAssignableFrom(cont.getClass())) && Core.bundle.getOrNull(cont.getContentType() + "." + cont.name + ".description") == null){
-                    print(Strings.format("@ has no bundle entry for description", cont));
+                    print(LogLevel.debug, "", Strings.format("@ has no bundle entry for description", cont));
                 }
             });
         }

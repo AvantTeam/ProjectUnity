@@ -16,7 +16,7 @@ public abstract class SectorObjective{
     public final String name;
 
     public final Cons<SectorObjective> executor;
-    public final StoryNode<?> node;
+    public final StoryNode node;
 
     public final int executions;
     protected int execution;
@@ -30,7 +30,7 @@ public abstract class SectorObjective{
     public Seq<SectorObjective> dependencies = new Seq<>();
     private final Seq<String> depStrings = new Seq<>();
 
-    public <T extends SectorObjective> SectorObjective(StoryNode<?> node, String name, int executions, Cons<T> executor){
+    public <T extends SectorObjective> SectorObjective(StoryNode node, String name, int executions, Cons<T> executor){
         this.name = name;
         this.node = node;
         this.executor = (Cons<SectorObjective>)executor;

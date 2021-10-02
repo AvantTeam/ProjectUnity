@@ -1,9 +1,9 @@
-package unity.type.sector;
+package unity.map;
 
 import arc.*;
 import arc.func.*;
 import arc.struct.*;
-import arc.util.Log.*;
+import arc.util.*;
 import mindustry.core.GameState.*;
 import mindustry.game.EventType.*;
 import mindustry.io.*;
@@ -11,16 +11,16 @@ import mindustry.type.*;
 import unity.cinematic.*;
 import unity.mod.*;
 import unity.mod.Triggers.*;
+import unity.type.sector.*;
 
 import static mindustry.Vars.*;
-import static unity.Unity.*;
 
 /** @author GlennFolker */
 @SuppressWarnings("unchecked")
 public class ScriptedSector extends SectorPreset{
     protected boolean added = false;
 
-    public final Seq<StoryNode<?>> storyNodes = new Seq<>();
+    public final Seq<StoryNode> storyNodes = new Seq<>();
 
     protected final Cons<Trigger> updater = Triggers.cons(this::update);
     protected final Cons<Triggers> drawer = Triggers.cons(this::draw);
@@ -57,9 +57,7 @@ public class ScriptedSector extends SectorPreset{
             return;
         }
 
-        for(var node : storyNodes){
-            if(node.shouldUpdate()) node.update();
-        }
+        for(var node : storyNodes) if(node.shouldUpdate()) node.update();
     }
 
     public void draw(){
@@ -84,13 +82,20 @@ public class ScriptedSector extends SectorPreset{
         super.init();
         Core.app.post(() -> {
             try{
-                storyNodes.addAll(JsonIO.json.fromJson(Seq.class, generator.map.tags.get("storyNodes", "[]")));
-
-                storyNodes.each(StoryNode::createObjectives);
-                storyNodes.each(e -> e.objectives.each(SectorObjective::resolveDependencies));
+                setNodes(JsonIO.json.fromJson(Seq.class, generator.map.tags.get("storyNodes", "[]")));
             }catch(Throwable t){
-                print(LogLevel.err, "", "Failed to read story nodes in " + name);
+                if(ui == null){
+                    Log.err(t);
+                }else{
+                    Events.on(ClientLoadEvent.class, e -> Time.runTask(6f, () -> ui.showException("Failed to load the story nodes of '" + localizedName + "'", t)));
+                }
             }
         });
+    }
+
+    public void setNodes(Seq<StoryNode> nodes){
+        storyNodes.set(nodes);
+        storyNodes.each(StoryNode::createObjectives);
+        storyNodes.each(e -> e.objectives.each(SectorObjective::resolveDependencies));
     }
 }

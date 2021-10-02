@@ -1,53 +1,60 @@
 package unity.cinematic;
 
+import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
 import mindustry.ctype.*;
+import unity.gen.*;
+import unity.map.*;
 import unity.type.sector.*;
+import unity.ui.dialogs.canvas.CinematicCanvas.*;
 
 import static mindustry.Vars.*;
 
 @SuppressWarnings("unchecked")
-public abstract class StoryNode<T> implements JsonSerializable{
-    public Seq<StoryNode<?>> parents = new Seq<>();
-    public Seq<String> parentStrings = new Seq<>();
+public class StoryNode implements JsonSerializable{
+    /** This node's position in the cinematic editor's dialog. */
+    public final Vec2 position = new Vec2();
+    /** The UI element of this node to be used in cinematic editor. */
+    public NodeElem elem;
+
+    private final Seq<String> parentAliases = new Seq<>();
+    public Seq<StoryNode> parents = new Seq<>();
 
     public ScriptedSector sector;
 
     public String name;
-    public StringMap tags = new StringMap();
 
     public Seq<SectorObjectiveModel> objectiveModels = new Seq<>();
     public Seq<SectorObjective> objectives = new Seq<>();
 
-    public abstract T bound();
-
     @Override
     public void write(Json json){
         json.writeValue("sector", sector.name);
-        json.writeValue("parents", parentStrings, Seq.class, String.class);
+        json.writeValue("parents", parents.map(n -> n.name), Seq.class, String.class);
         json.writeValue("name", name);
-        json.writeValue("tags", tags);
+        json.writeValue("position", Float2.construct(position.x, position.y));
         json.writeValue("objectiveModels", objectiveModels, Seq.class, SectorObjectiveModel.class);
     }
 
     @Override
-    public void read(Json json, JsonValue jsonData){
-        sector = content.getByName(ContentType.sector, jsonData.getString("sector"));
-        name = jsonData.getString("name");
+    public void read(Json json, JsonValue data){
+        sector = content.getByName(ContentType.sector, data.getString("sector"));
+        name = data.getString("name");
 
-        parentStrings.clear();
-        var readParents = json.readValue(Seq.class, String.class, jsonData.get("parents"));
-        if(readParents != null) parentStrings.addAll(readParents);
+        parentAliases.clear();
+        var jParents = json.readValue(Seq.class, String.class, data.require("parents"));
+        if(jParents != null) parentAliases.addAll(jParents);
 
-        tags.clear();
-        var readTags = json.readValue(StringMap.class, jsonData.get("tags"));
-        if(readTags != null) tags.putAll(readTags);
+        if(data.has("position")){
+            long pos = data.getLong("position");
+            position.set(Float2.x(pos), Float2.y(pos));
+        }
 
         objectiveModels.clear();
-        var readObjects = json.readValue(Seq.class, SectorObjectiveModel.class, jsonData.get("objectiveModels"));
-        if(readObjects != null) objectiveModels.addAll(readObjects);
+        var jObjects = json.readValue(Seq.class, SectorObjectiveModel.class, data.require("objectiveModels"));
+        if(jObjects != null) objectiveModels.addAll(jObjects);
     }
 
     public void createObjectives(){
@@ -57,7 +64,7 @@ public abstract class StoryNode<T> implements JsonSerializable{
 
     public void init(){
         parents.clear();
-        for(var p : parentStrings){
+        for(var p : parentAliases){
             var other = sector.storyNodes.find(e -> e.name.equals(p));
             if(other != null) parent(other);
         }
@@ -90,12 +97,10 @@ public abstract class StoryNode<T> implements JsonSerializable{
     }
 
     public void draw(){
-        for(var o : objectives){
-            if(o.shouldDraw()) o.draw();
-        }
+        for(var o : objectives) if(o.shouldDraw()) o.draw();
     }
 
-    public void parent(StoryNode<?> other){
+    public void parent(StoryNode other){
         if(!parents.contains(other) && !other.parents.contains(this)) parents.add(other);
     }
 }

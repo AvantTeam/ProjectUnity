@@ -4,8 +4,8 @@ import arc.*;
 import mindustry.core.GameState.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
+import unity.map.*;
 import unity.mod.*;
-import unity.type.sector.*;
 
 import static mindustry.Vars.*;
 
