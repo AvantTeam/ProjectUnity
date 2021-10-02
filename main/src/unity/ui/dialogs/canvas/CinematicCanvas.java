@@ -84,7 +84,7 @@ public class CinematicCanvas extends WidgetGroup{
     private void drawCurve(float x, float y, float x2, float y2){
         Lines.stroke(4f, Tmp.c1.set(connection).a(connection.a * parentAlpha));
         float dist = Math.abs(x - x2) / 2f;
-        Lines.curve(x, y, x + dist, y, x2 - dist, y2, x2, y2, Math.max(3, (int) (Mathf.dst(x, y, x2, y2) / 5f)));
+        Lines.curve(x, y, x + dist, y, x2 - dist, y2, x2, y2, Math.max(3, (int)(Mathf.dst(x, y, x2, y2) / 5f)));
 
         Draw.reset();
     }
@@ -93,7 +93,6 @@ public class CinematicCanvas extends WidgetGroup{
         var elem = new NodeElem(node);
         var pos = localToStageCoordinates(node.position);
         elem.setPosition(pos.x, pos.y, Align.center);
-        elem.setSize(4f * spacing, 2f * spacing);
 
         addChild(elem);
         elem.pack();
