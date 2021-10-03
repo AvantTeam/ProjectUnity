@@ -47,6 +47,7 @@ public class Unity extends Mod{
     public static CreditsDialog creditsDialog;
     public static JSScriptDialog scriptsDialog;
     public static CinematicDialog cinematicDialog;
+    public static ObjectivesDialog objectivesDialog;
 
     public static LightProcess lights;
     public static ContentScoreProcess scoring;
@@ -124,6 +125,8 @@ public class Unity extends Mod{
         Events.on(ClientLoadEvent.class, e -> {
             creditsDialog = new CreditsDialog();
             scriptsDialog = new JSScriptDialog();
+            cinematicDialog = new CinematicDialog();
+            objectivesDialog = new ObjectivesDialog();
 
             addCredits();
 

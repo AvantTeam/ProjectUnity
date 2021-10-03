@@ -20,7 +20,7 @@ public class CinematicDialog extends BaseDialog{
         add(titleTable).growX().fillY().row();
         add(canvas = new CinematicCanvas()).grow().row();
 
-        buttons.button("@back", Icon.left, this::hide).size(100f, 64f);
+        buttons.button("@back", Icon.left, this::hide).size(210f, 64f);
         buttons.button("@add", Icon.add, () -> {
             var node = new StoryNode();
             node.sector = cinematicEditor.sector();
@@ -32,7 +32,7 @@ public class CinematicDialog extends BaseDialog{
 
             cinematicEditor.nodes.add(node);
             canvas.add(node);
-        }).size(100f, 64f);
+        }).size(210f, 64f);
 
         add(buttons).fillX();
     }

@@ -16,12 +16,6 @@ public class CinematicEditor extends EditorListener{
     public final Seq<StoryNode> nodes = new Seq<>();
 
     @Override
-    protected void registerEvents(){
-        super.registerEvents();
-        cinematicDialog = new CinematicDialog();
-    }
-
-    @Override
     public void begin(){
         nodes.set(sector().storyNodes);
         sector().storyNodes.clear();

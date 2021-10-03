@@ -125,9 +125,33 @@ public class CinematicCanvas extends WidgetGroup{
                 field.setValidator(str -> !cinematicEditor.nodes.contains(n -> n.name.equals(str)));
                 field.getStyle().font = Fonts.outline;
 
+                // Specialized button that cancels touch if dragged, to avoid hard-locks while dragging the node element.
+                class DragButton extends ImageButton{
+                    DragButton(Drawable drawable, ImageButtonStyle style, Runnable listener){
+                        super(drawable, style);
+
+                        resizeImage(drawable.imageSize());
+                        addListener(new ClickListener(){
+                            {
+                                setButton(KeyCode.mouseLeft);
+                            }
+
+                            @Override
+                            public void clicked(InputEvent event, float x, float y){
+                                if(listener != null && !isDisabled()) listener.run();
+                            }
+
+                            @Override
+                            public void touchDragged(InputEvent event, float x, float y, int pointer){
+                                if(pointer == pressedPointer && !cancelled) cancel();
+                            }
+                        });
+                    }
+                }
+
                 t.add().growX();
-                t.button(Icon.pencil, Styles.logici, () -> {}).padRight(4f).get().tapped(() -> {});
-                t.button(Icon.cancel, Styles.logici, () -> {}).get().tapped(() -> ui.showConfirm("@dialog.cinematic.node-delete.title", "!dialog.cinematic.node-delete.content", () -> {
+                t.add(new DragButton(Icon.pencil, Styles.logici, () -> {})).padRight(4f);
+                t.add(new DragButton(Icon.cancel, Styles.logici, () -> ui.showConfirm("@dialog.cinematic.node-delete.title", "@dialog.cinematic.node-delete.content", () -> {
                     remove();
 
                     var it = cinematicEditor.nodes.iterator();
@@ -137,7 +161,7 @@ public class CinematicCanvas extends WidgetGroup{
 
                         if(e == node) it.remove();
                     }
-                }));
+                })));
 
                 t.addListener(new MoveDragListener(this));
             }).growX().fillY();
