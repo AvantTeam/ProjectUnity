@@ -1,21 +1,21 @@
-package unity.type.sector;
+package unity.map.objectives;
 
 import arc.*;
 import arc.func.*;
 import arc.struct.*;
-import unity.cinematic.*;
-import unity.type.sector.SectorObjectiveModel.*;
+import unity.map.cinematic.*;
+import unity.map.objectives.ObjectiveModel.*;
 import unity.util.*;
 
 import static mindustry.Vars.*;
 
 /** @author GlennFolker */
 @SuppressWarnings("unchecked")
-public abstract class SectorObjective{
+public abstract class Objective{
     /** The name of this objective. It is your responsibility to differ the name from other objectiveModels. */
     public final String name;
 
-    public final Cons<SectorObjective> executor;
+    public final Cons<Objective> executor;
     public final StoryNode node;
 
     public final int executions;
@@ -23,17 +23,17 @@ public abstract class SectorObjective{
 
     private boolean finalized;
 
-    public Cons<SectorObjective> init = objective -> {};
-    public Cons<SectorObjective> update = objective -> {};
-    public Cons<SectorObjective> draw = objective -> {};
+    public Cons<Objective> init = objective -> {};
+    public Cons<Objective> update = objective -> {};
+    public Cons<Objective> draw = objective -> {};
 
-    public Seq<SectorObjective> dependencies = new Seq<>();
+    public Seq<Objective> dependencies = new Seq<>();
     private final Seq<String> depStrings = new Seq<>();
 
-    public <T extends SectorObjective> SectorObjective(StoryNode node, String name, int executions, Cons<T> executor){
+    public <T extends Objective> Objective(StoryNode node, String name, int executions, Cons<T> executor){
         this.name = name;
         this.node = node;
-        this.executor = (Cons<SectorObjective>)executor;
+        this.executor = (Cons<Objective>)executor;
         this.executions = executions;
     }
 
@@ -54,7 +54,7 @@ public abstract class SectorObjective{
         }
     }
 
-    public void depend(SectorObjective other){
+    public void depend(Objective other){
         if(!dependencies.contains(other) && !other.dependencies.contains(this)){
             dependencies.add(other);
         }
@@ -124,18 +124,18 @@ public abstract class SectorObjective{
         return shouldUpdate();
     }
 
-    public <T extends SectorObjective> SectorObjective init(Cons<T> init){
-        this.init = (Cons<SectorObjective>)init;
+    public <T extends Objective> Objective init(Cons<T> init){
+        this.init = (Cons<Objective>)init;
         return this;
     }
 
-    public <T extends SectorObjective> SectorObjective update(Cons<T> update){
-        this.update = (Cons<SectorObjective>)update;
+    public <T extends Objective> Objective update(Cons<T> update){
+        this.update = (Cons<Objective>)update;
         return this;
     }
 
-    public <T extends SectorObjective> SectorObjective draw(Cons<T> draw){
-        this.draw = (Cons<SectorObjective>)draw;
+    public <T extends Objective> Objective draw(Cons<T> draw){
+        this.draw = (Cons<Objective>)draw;
         return this;
     }
 

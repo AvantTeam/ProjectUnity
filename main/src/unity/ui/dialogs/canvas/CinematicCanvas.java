@@ -14,7 +14,7 @@ import arc.util.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
-import unity.cinematic.*;
+import unity.map.cinematic.*;
 import unity.ui.*;
 
 import static mindustry.Vars.*;
@@ -150,7 +150,7 @@ public class CinematicCanvas extends WidgetGroup{
                 }
 
                 t.add().growX();
-                t.add(new DragButton(Icon.pencil, Styles.logici, () -> {})).padRight(4f);
+                t.add(new DragButton(Icon.pencil, Styles.logici, () -> objectivesDialog.show(node))).padRight(4f);
                 t.add(new DragButton(Icon.cancel, Styles.logici, () -> ui.showConfirm("@dialog.cinematic.node-delete.title", "@dialog.cinematic.node-delete.content", () -> {
                     remove();
 

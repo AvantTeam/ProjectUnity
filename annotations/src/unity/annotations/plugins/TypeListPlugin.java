@@ -21,7 +21,7 @@ import unity.annotations.Annotations.*;
 public class TypeListPlugin implements Plugin{
     Seq<JCMethodInvocation> classes = new Seq<>(), packages = new Seq<>();
     Seq<String> classDefs = new Seq<>(), packDefs = new Seq<>();
-    ObjectMap<List<JCExpression>, List<JCExpression>> classArgs = new ObjectMap<>(), packArgs = new ObjectMap<>();
+    ObjectMap<JCMethodInvocation, List<JCExpression>> classArgs = new ObjectMap<>(), packArgs = new ObjectMap<>();
 
     @Override
     public void init(JavacTask task, String... args){
@@ -76,8 +76,8 @@ public class TypeListPlugin implements Plugin{
             @Override
             public void started(TaskEvent event){
                 if(event.getKind() == Kind.ANALYZE){
-                    classes.each(e -> e.args = classArgs.get(e.args, () -> List.from(Seq.with(e.args).addAll(classDefs.map(maker::Literal)))));
-                    packages.each(e -> e.args = packArgs.get(e.args, () -> List.from(Seq.with(e.args).addAll(packDefs.map(maker::Literal)))));
+                    classes.each(e -> e.args = classArgs.get(e, () -> List.from(Seq.with(e.args).addAll(classDefs.map(maker::Literal)))));
+                    packages.each(e -> e.args = packArgs.get(e, () -> List.from(Seq.with(e.args).addAll(packDefs.map(maker::Literal)))));
                 }
             }
         });

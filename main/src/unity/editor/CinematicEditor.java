@@ -1,9 +1,10 @@
 package unity.editor;
 
+import arc.*;
+import arc.input.*;
 import arc.struct.*;
 import mindustry.io.*;
-import unity.cinematic.*;
-import unity.ui.dialogs.*;
+import unity.map.cinematic.*;
 
 import static mindustry.Vars.*;
 import static unity.Unity.*;
@@ -14,6 +15,13 @@ import static unity.Unity.*;
  */
 public class CinematicEditor extends EditorListener{
     public final Seq<StoryNode> nodes = new Seq<>();
+
+    @Override
+    public void update(){
+        if(!cinematicDialog.isShown() && Core.input.keyTap(KeyCode.f4)){
+            cinematicDialog.show();
+        }
+    }
 
     @Override
     public void begin(){

@@ -1,4 +1,4 @@
-package unity.cinematic;
+package unity.map.cinematic;
 
 import arc.*;
 import arc.audio.*;

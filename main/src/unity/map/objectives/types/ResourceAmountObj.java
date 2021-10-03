@@ -1,4 +1,4 @@
-package unity.type.sector.objectives;
+package unity.map.objectives.types;
 
 import arc.*;
 import arc.func.*;
@@ -11,11 +11,13 @@ import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
+import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
-import unity.cinematic.*;
-import unity.type.sector.*;
-import unity.type.sector.SectorObjectiveModel.*;
+import unity.map.cinematic.*;
+import unity.map.objectives.*;
+import unity.map.objectives.ObjectiveModel.*;
 import unity.util.*;
 
 import static mindustry.Vars.*;
@@ -24,7 +26,7 @@ import static mindustry.Vars.*;
  * An objective that will complete once a team has gathered resources as described in {@link #items}.
  * @author GlennFolker
  */
-public class ResourceAmountObjective extends SectorObjective{
+public class ResourceAmountObj extends Objective{
     protected Table container;
     public final ItemStack[] items;
 
@@ -33,7 +35,7 @@ public class ResourceAmountObjective extends SectorObjective{
     public final Color to;
 
     static{
-        SectorObjectiveModel.constructors.put(ResourceAmountObjective.class, (node, f) -> {
+        ObjectiveModel.setup(ResourceAmountObj.class, Pal.accent, () -> Tex.clear, (node, f) -> {
             ItemStack[] items = f.arrReq("items").map(v -> {
                 int separator = v.indexOf("\n");
                 if(separator == -1) throw new IllegalArgumentException("Invalid string");
@@ -52,23 +54,23 @@ public class ResourceAmountObjective extends SectorObjective{
 
             var execFunc = JSBridge.compileFunc(JSBridge.unityScope, name + "-executor.js", f.valReq("executor"));
             Object[] args = {null};
-            Cons<ResourceAmountObjective> executor = obj -> {
+            Cons<ResourceAmountObj> executor = obj -> {
                 args[0] = obj;
                 execFunc.call(JSBridge.context, JSBridge.unityScope, JSBridge.unityScope, args);
             };
 
-            var obj = new ResourceAmountObjective(items, team, from, to, node, name, executor);
+            var obj = new ResourceAmountObj(items, team, from, to, node, name, executor);
             obj.ext(f);
 
             return obj;
         });
     }
 
-    public ResourceAmountObjective(ItemStack[] items, Team team, StoryNode node, String name, Cons<ResourceAmountObjective> executor){
+    public ResourceAmountObj(ItemStack[] items, Team team, StoryNode node, String name, Cons<ResourceAmountObj> executor){
         this(items, team, Color.lightGray, Color.green, node, name, executor);
     }
 
-    public ResourceAmountObjective(ItemStack[] items, Team team, Color from, Color to, StoryNode node, String name, Cons<ResourceAmountObjective> executor){
+    public ResourceAmountObj(ItemStack[] items, Team team, Color from, Color to, StoryNode node, String name, Cons<ResourceAmountObj> executor){
         super(node, name, 1, executor);
         this.items = items;
         this.team = team;

@@ -4,7 +4,7 @@ import arc.*;
 import arc.util.*;
 import mindustry.gen.*;
 import mindustry.ui.dialogs.*;
-import unity.cinematic.*;
+import unity.map.cinematic.*;
 import unity.ui.dialogs.canvas.*;
 
 import static unity.Unity.*;
@@ -20,7 +20,7 @@ public class CinematicDialog extends BaseDialog{
         add(titleTable).growX().fillY().row();
         add(canvas = new CinematicCanvas()).grow().row();
 
-        buttons.button("@back", Icon.left, this::hide).size(210f, 64f);
+        addCloseButton();
         buttons.button("@add", Icon.add, () -> {
             var node = new StoryNode();
             node.sector = cinematicEditor.sector();

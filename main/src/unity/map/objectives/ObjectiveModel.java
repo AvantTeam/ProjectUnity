@@ -1,22 +1,26 @@
-package unity.type.sector;
+package unity.map.objectives;
 
+import arc.func.*;
+import arc.graphics.*;
+import arc.scene.style.*;
 import arc.struct.*;
 import arc.util.Log.*;
 import arc.util.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
+import mindustry.graphics.*;
 import mindustry.io.*;
-import unity.cinematic.*;
+import unity.map.cinematic.*;
 
 import static mindustry.Vars.*;
 import static unity.Unity.*;
 
 @SuppressWarnings("unchecked")
-public class SectorObjectiveModel implements JsonSerializable{
-    public static ObjectMap<Class<? extends SectorObjective>, ObjectiveConstructor> constructors = new ObjectMap<>();
+public class ObjectiveModel implements JsonSerializable{
+    public static ObjectMap<Class<? extends Objective>, ObjectiveData> datas = new ObjectMap<>();
 
     /** The objective type that is going to be instantiated. Do not modify directly, use {@link #set(Class)} instead. */
-    public Class<? extends SectorObjective> type;
+    public Class<? extends Objective> type;
 
     /** The field meta data of this objective. Do not modify directly, use {@link #set(Class)} instead. */
     public OrderedMap<String, FieldMetadata> fields = new OrderedMap<>();
@@ -28,13 +32,13 @@ public class SectorObjectiveModel implements JsonSerializable{
      *     <li>{@link ObjectMap}s must always be {@link StringMap}s.</li>
      *     <li>Other types must be {@link String}s.</li>
      * </ul>
-     * These will be parsed separately in each {@link SectorObjective} implementations.
+     * These will be parsed separately in each {@link Objective} implementations.
      */
     public ObjectMap<String, Object> setFields = new ObjectMap<>();
 
     private final FieldTranslator translator = new FieldTranslator();
 
-    public void set(Class<? extends SectorObjective> type){
+    public void set(Class<? extends Objective> type){
         this.type = type;
 
         fields.clear();
@@ -54,7 +58,7 @@ public class SectorObjectiveModel implements JsonSerializable{
         try{
             var typeName = jsonData.getString("type");
             if(!typeName.equals("null")){
-                set((Class<? extends SectorObjective>)Class.forName(typeName, true, mods.mainLoader()));
+                set((Class<? extends Objective>)Class.forName(typeName, true, mods.mainLoader()));
             }
 
             setFields.clear();
@@ -64,21 +68,27 @@ public class SectorObjectiveModel implements JsonSerializable{
         }
     }
 
-    public <T extends SectorObjective> T create(StoryNode node){
-        if(type == null) throw new IllegalArgumentException("type is null");
-
-        var constructor = constructors.get(type);
-        if(constructor == null) throw new IllegalArgumentException("No constructor setup for " + type.getSimpleName());
+    public <T extends Objective> T create(StoryNode node){
+        var data = data(type);
 
         translator.fields = setFields;
-        var obj = (T)constructor.get(node, translator);
+        var obj = (T)data.constructor.get(node, translator);
         translator.fields = null;
 
         return obj;
     }
 
-    public interface ObjectiveConstructor{
-        SectorObjective get(StoryNode node, FieldTranslator fields);
+    public static void setup(Class<? extends Objective> type, Color color, Prov<Drawable> icon, ObjConstructor constructor){
+        datas.put(type, new ObjectiveData(color, icon, constructor));
+    }
+
+    public static ObjectiveData data(Class<? extends Objective> type){
+        if(type == null) throw new IllegalArgumentException("type can't be null");
+        return datas.getThrow(type, () -> new IllegalArgumentException("No data registered for " + type.getSimpleName()));
+    }
+
+    public interface ObjConstructor{
+        Objective get(StoryNode node, FieldTranslator fields);
     }
 
     public static class FieldTranslator{
@@ -123,6 +133,18 @@ public class SectorObjectiveModel implements JsonSerializable{
 
         public boolean has(String key){
             return fields.containsKey(key);
+        }
+    }
+
+    public static class ObjectiveData{
+        public final Color color = Pal.accent.cpy();
+        public final ObjConstructor constructor;
+        public final Prov<Drawable> icon;
+
+        public ObjectiveData(Color color, Prov<Drawable> icon, ObjConstructor constructor){
+            this.color.set(color);
+            this.constructor = constructor;
+            this.icon = icon;
         }
     }
 }

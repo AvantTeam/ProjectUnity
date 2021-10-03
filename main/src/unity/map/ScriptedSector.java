@@ -8,10 +8,10 @@ import mindustry.core.GameState.*;
 import mindustry.game.EventType.*;
 import mindustry.io.*;
 import mindustry.type.*;
-import unity.cinematic.*;
+import unity.map.cinematic.*;
+import unity.map.objectives.*;
 import unity.mod.*;
 import unity.mod.Triggers.*;
-import unity.type.sector.*;
 
 import static mindustry.Vars.*;
 
@@ -96,6 +96,6 @@ public class ScriptedSector extends SectorPreset{
     public void setNodes(Seq<StoryNode> nodes){
         storyNodes.set(nodes);
         storyNodes.each(StoryNode::createObjectives);
-        storyNodes.each(e -> e.objectives.each(SectorObjective::resolveDependencies));
+        storyNodes.each(e -> e.objectives.each(Objective::resolveDependencies));
     }
 }

@@ -1,4 +1,4 @@
-package unity.cinematic;
+package unity.map.cinematic;
 
 import arc.math.geom.*;
 import arc.struct.*;
@@ -7,7 +7,7 @@ import arc.util.serialization.Json.*;
 import mindustry.ctype.*;
 import unity.gen.*;
 import unity.map.*;
-import unity.type.sector.*;
+import unity.map.objectives.*;
 import unity.ui.dialogs.canvas.CinematicCanvas.*;
 
 import static mindustry.Vars.*;
@@ -26,8 +26,8 @@ public class StoryNode implements JsonSerializable{
 
     public String name;
 
-    public Seq<SectorObjectiveModel> objectiveModels = new Seq<>();
-    public Seq<SectorObjective> objectives = new Seq<>();
+    public Seq<ObjectiveModel> objectiveModels = new Seq<>();
+    public Seq<Objective> objectives = new Seq<>();
 
     @Override
     public void write(Json json){
@@ -35,7 +35,7 @@ public class StoryNode implements JsonSerializable{
         json.writeValue("parents", parents.map(n -> n.name), Seq.class, String.class);
         json.writeValue("name", name);
         json.writeValue("position", Float2.construct(position.x, position.y));
-        json.writeValue("objectiveModels", objectiveModels, Seq.class, SectorObjectiveModel.class);
+        json.writeValue("objectiveModels", objectiveModels, Seq.class, ObjectiveModel.class);
     }
 
     @Override
@@ -53,7 +53,7 @@ public class StoryNode implements JsonSerializable{
         }
 
         objectiveModels.clear();
-        var jObjects = json.readValue(Seq.class, SectorObjectiveModel.class, data.require("objectiveModels"));
+        var jObjects = json.readValue(Seq.class, ObjectiveModel.class, data.require("objectiveModels"));
         if(jObjects != null) objectiveModels.addAll(jObjects);
     }
 
@@ -69,7 +69,7 @@ public class StoryNode implements JsonSerializable{
             if(other != null) parent(other);
         }
 
-        objectives.each(SectorObjective::init);
+        objectives.each(Objective::init);
     }
 
     public boolean shouldUpdate(){
