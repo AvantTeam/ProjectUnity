@@ -55,7 +55,7 @@ public class Unity extends Mod{
     @ListClasses
     public static final Seq<String> classes = Seq.with();
     @ListPackages
-    public static final Seq<String> packages = Seq.with();
+    public static final Seq<String> packages = Seq.with("java.lang", "java.util", "java.io", "rhino");
 
     private static final ContentList[] contents = {
         new UnityItems(),
