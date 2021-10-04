@@ -117,6 +117,10 @@ public class SmartGroundAI extends AIController{
                 aimX = tx;
                 aimY = ty;
                 set = true;
+            }else{
+                for(WeaponMount m : mainMounts){
+                    m.rotate = m.shoot = false;
+                }
             }
         }
         retarget = Math.max(retarget - Time.delta, 0f);
@@ -164,6 +168,7 @@ public class SmartGroundAI extends AIController{
         for(WeaponMount m : unit.mounts){
             Weapon w = m.weapon;
             if(!w.rotate || w.rotateSpeed <= 1f) continue;
+            m.rotate = m.shoot = false;
             float
             mountX = unit.x + Angles.trnsx(unit.rotation - 90, w.x, w.y),
             mountY = unit.y + Angles.trnsy(unit.rotation - 90, w.x, w.y);
