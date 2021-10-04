@@ -4634,6 +4634,7 @@ public class UnityUnitTypes implements ContentList{
         }};
 
         desolation = new UnityUnitType("desolation"){{
+            defaultController = SmartGroundAI::new;
             health = 307300f;
             speed = 0.7f;
             drag = 0.16f;
@@ -4661,6 +4662,7 @@ public class UnityUnitTypes implements ContentList{
             legSplashDamage = 1700f;
             
             aimDst = hitSize / 2f;
+            bulletWidth = 190f;
 
             outlineColor = UnityPal.darkerOutline;
             antiCheatType = new AntiCheatVariables(6000f, 12000f, health / 560f, health / 120f, 0.6f, 7f * 60f, 8f * 60f, 35f, 4);
