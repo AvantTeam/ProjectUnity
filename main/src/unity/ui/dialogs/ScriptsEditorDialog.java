@@ -6,12 +6,12 @@ import arc.util.*;
 import mindustry.ui.dialogs.*;
 import unity.ui.*;
 
-public class JSScriptDialog extends BaseDialog{
+public class ScriptsEditorDialog extends BaseDialog{
     public Cons<String> listener = str -> {};
 
     public TextArea area;
 
-    public JSScriptDialog(){
+    public ScriptsEditorDialog(){
         super("@dialog.editscript");
 
         addCloseButton();
@@ -26,6 +26,8 @@ public class JSScriptDialog extends BaseDialog{
 
         area = cont.area("", UnityStyles.codeArea, str -> listener.get(str.replace("\r", "\n"))).grow().get();
         area.setFocusTraversal(false);
+
+        hidden(() -> listener.get(area.getText()));
     }
 
     /**

@@ -55,7 +55,9 @@ public class Unity extends Mod{
     /** Credits dialog. Hey we made this mod we deserve it. */
     public static CreditsDialog creditsDialog;
     /** JS scripts dialog for editing JS scripts in-game. */
-    public static JSScriptDialog scriptsDialog;
+    public static ScriptsEditorDialog jsEditDialog;
+    /** JS scripts dictionary dialog, for creating a collection of named JS scripts. */
+    public static ScriptsDictionaryDialog jsDictDialog;
     /** Cinematic dialog, for editing {@link StoryNode}s bound to a {@link ScriptedSector}. */
     public static CinematicDialog cinematicDialog;
     /** Heavily relies on {@link #cinematicDialog}, this dialog edits {@link ObjectiveModel} bound to a {@link StoryNode}. */
@@ -130,7 +132,8 @@ public class Unity extends Mod{
         // These are irrelevant in servers.
         Events.on(ClientLoadEvent.class, e -> {
             creditsDialog = new CreditsDialog();
-            scriptsDialog = new JSScriptDialog();
+            jsEditDialog = new ScriptsEditorDialog();
+            jsDictDialog = new ScriptsDictionaryDialog();
             cinematicDialog = new CinematicDialog();
             objectivesDialog = new ObjectivesDialog();
 
@@ -200,7 +203,10 @@ public class Unity extends Mod{
             scoring = new ContentScoreProcess()
         );
 
-        Core.app.post(JSBridge::init);
+        Core.app.post(() -> {
+            JSBridge.init();
+            JSBridge.importDefaults(JSBridge.unityScope);
+        });
     }
 
     @Override
@@ -213,7 +219,6 @@ public class Unity extends Mod{
         BlockMovement.init();
 
         dev.init();
-        JSBridge.importDefaults(JSBridge.unityScope);
     }
 
     @Override

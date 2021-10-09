@@ -31,7 +31,7 @@ public class ObjectiveModel implements JsonSerializable{
     public String init;
 
     /** Objective model fields. Elements of this map must be serializable. */
-    public ObjectMap<String, Object> setFields = new ObjectMap<>();
+    public ObjectMap<String, Object> fields = new ObjectMap<>();
 
     private static final String env = "\\$\\{{2}.*}{2}";
     private static final Pattern replacer = Pattern.compile(env);
@@ -43,7 +43,7 @@ public class ObjectiveModel implements JsonSerializable{
 
     public void set(Class<? extends Objective> type){
         this.type = type;
-        setFields.clear();
+        fields.clear();
     }
 
     @Override
@@ -51,7 +51,7 @@ public class ObjectiveModel implements JsonSerializable{
         json.writeValue("type", type == null ? "null" : type.getName());
         json.writeValue("name", name);
         json.writeValue("init", init);
-        json.writeValue("setFields", setFields, ObjectMap.class);
+        json.writeValue("fields", fields, ObjectMap.class);
     }
 
     @Override
@@ -65,8 +65,8 @@ public class ObjectiveModel implements JsonSerializable{
             name = data.getString("name");
             init = data.getString("init");
 
-            setFields.clear();
-            setFields.putAll(json.readValue(ObjectMap.class, data.get("setFields")));
+            fields.clear();
+            fields.putAll(json.readValue(ObjectMap.class, data.get("fields")));
         }catch(Exception e){
             print(LogLevel.err, "", Strings.getStackTrace(Strings.getFinalCause(e)));
         }
@@ -75,7 +75,7 @@ public class ObjectiveModel implements JsonSerializable{
     public <T extends Objective> T create(StoryNode node){
         var data = data(type);
 
-        setFields.clear();
+        fields.clear();
         if(init != null){
             var source = init;
             var matcher = replacer.matcher(init);
@@ -86,15 +86,15 @@ public class ObjectiveModel implements JsonSerializable{
                 var f = occur; // Finalize, for use in lambda statements.
                 var script = node.scripts.getThrow(f, () -> new IllegalArgumentException("No such script: '" + f + "'"));
 
-                source = source.replaceFirst(env, script.replace("\r", "\n").replace("\n", "\\n"));
+                source = source.replaceFirst(env, script.replace('\r', '\n').replace('\n', ';'));
             }
 
             var func = JSBridge.compileFunc(JSBridge.unityScope, name + "-init.js", source);
-            func.call(JSBridge.context, JSBridge.unityScope, JSBridge.unityScope, new Object[]{setFields});
+            func.call(JSBridge.context, JSBridge.unityScope, JSBridge.unityScope, new Object[]{fields});
         }
 
         translator.fields.clear();
-        translator.fields.putAll(setFields);
+        translator.fields.putAll(fields);
         translator.name = name;
 
         var obj = (T)data.constructor.get(node, translator);

@@ -44,9 +44,9 @@ public class CinematicDialog extends BaseDialog{
             }
 
             if(thrown != null){
-                ui.showException("[scarlet]There were misbehaving story nodes[]", thrown);
+                ui.showException("@dialog.cinematic.misbehave", thrown);
             }else{
-                ui.showInfo("No story nodes are misconstructed, safe to proceed");
+                ui.showInfo("@dialog.cinematic.proceed");
             }
         }).size(210f, 64f);
 
@@ -61,10 +61,7 @@ public class CinematicDialog extends BaseDialog{
             cinematicEditor.apply();
             super.hide();
         }catch(Exception e){
-            ui.showException("""
-                [scarlet]Couldn't exit this dialog as there were misconstructed story nodes[]
-                Fix these nodes before proceeding
-                """, e
+            ui.showException("@dialog.cinematic.misbehave", e
             );
         }
     }
@@ -72,8 +69,8 @@ public class CinematicDialog extends BaseDialog{
     private String lastName(){
         int i = 0;
         for(var node : cinematicEditor.nodes){
-            if(node.name.startsWith("node") && Character.isDigit(node.name.codePointAt(4))){
-                int index = Character.digit(node.name.charAt(4), 10);
+            if(node.name.startsWith("node") && Character.isDigit(node.name.codePointAt("node".length()))){
+                int index = Character.digit(node.name.charAt("node".length()), 10);
                 if(index > i) i = index;
             }
         }

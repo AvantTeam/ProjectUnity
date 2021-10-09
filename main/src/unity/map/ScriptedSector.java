@@ -82,7 +82,7 @@ public class ScriptedSector extends SectorPreset{
         super.init();
         Core.app.post(() -> {
             try{
-                setNodes(JsonIO.json.fromJson(Seq.class, generator.map.tags.get("storyNodes", "[]")));
+                setNodes(JsonIO.json.fromJson(Seq.class, StoryNode.class, generator.map.tags.get("storyNodes", "[]")));
             }catch(Throwable t){
                 if(ui == null){
                     Log.err(t);

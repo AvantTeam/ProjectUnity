@@ -12,6 +12,7 @@ import unity.map.objectives.*;
 
 import java.lang.reflect.*;
 
+import static mindustry.Vars.*;
 import static unity.Unity.*;
 import static unity.map.objectives.ObjectiveModel.*;
 
@@ -29,6 +30,7 @@ public class ObjectivesDialog extends BaseDialog{
         cont.pane(Styles.nonePane, t -> content = t).growY().width(750f);
         buttons.button("@add", Icon.add, () -> {
             var model = new ObjectiveModel();
+            model.name = lastName();
 
             models.add(model);
             add(model);
@@ -45,6 +47,18 @@ public class ObjectivesDialog extends BaseDialog{
             node.objectiveModels.set(models);
             node = null;
         });
+    }
+
+    private String lastName(){
+        int i = 0;
+        for(var m : models){
+            if(m.name.startsWith("objective") && Character.isDigit(m.name.codePointAt("objective".length()))){
+                int index = Character.digit(m.name.charAt("objective".length()), 10);
+                if(index > i) i = index;
+            }
+        }
+
+        return "objective" + (i + 1);
     }
 
     @Override
@@ -80,19 +94,19 @@ public class ObjectivesDialog extends BaseDialog{
             table(t -> {
                 t.add("Name: ").style(Styles.outlineLabel).padLeft(8f);
 
-                var field = t.field(model.name, Styles.defaultField, str -> model.name = str).padRight(8f).get();
-                field.setValidator(str -> !models.contains(m -> m.setFields.get("name", "").equals("")));
+                var field = t.field(model.name, Styles.defaultField, str -> model.name = str).get();
+                field.setValidator(str -> !models.contains(m -> m.name.equals(str)));
                 field.getStyle().font = Fonts.outline;
 
                 t.add().growX();
-                t.button(Icon.cancel, Styles.logici, this::remove).padRight(8f);
+                t.button(Icon.trash, Styles.logici, () -> ui.showConfirm("@dialog.cinematic.objectives.delete.title", "@dialog.cinematic.objectives.delete.content", this::remove)).padRight(8f);
             }).growX().fillY().pad(4f);
 
             row().table(Styles.black5, t -> {
                 t.defaults().pad(4f);
 
                 t.table(ts -> {
-                    var typeSelect = ts.label(() -> "Type: " + (model.type == null ? "..." : model.type.getSimpleName())).width(100f).padLeft(8f).get();
+                    var typeSelect = ts.label(() -> "Type: " + (model.type == null ? "..." : model.type.getSimpleName())).fillX().padLeft(8f).get();
                     typeSelect.setAlignment(Align.left);
 
                     ts.add().growX();
@@ -105,12 +119,11 @@ public class ObjectivesDialog extends BaseDialog{
                             for(var type : datas.keys()){
                                 var data = data(type);
 
-                                s.button(type.getSimpleName(), data.icon.get(), Styles.clearPartialt, () -> {
+                                s.button(type.getSimpleName(), data.icon.get(), Styles.defaultt, () -> {
                                     model.set(model.type == type ? null : type);
                                     rebuild();
                                 })
-                                    .size(350f, 64f).color(data.color)
-                                    .pad(8f).get().getLabel().setStyle(Styles.outlineLabel);
+                                    .size(350f, 64f).color(data.color).pad(8f);
                             }
                         }).width(500f).growY();
 
@@ -118,9 +131,11 @@ public class ObjectivesDialog extends BaseDialog{
                     }).padRight(8f);
 
                     ts.button(Icon.pencil, Styles.logici, () -> {
-                        scriptsDialog.listener = str -> model.init = str;
-                        if(scriptsDialog.area.getText().isEmpty()){
-                            scriptsDialog.area.setText("""
+                        jsEditDialog.listener = str -> model.init = str;
+                        jsEditDialog.area.setText(model.init);
+
+                        if(jsEditDialog.area.getText().isEmpty()){
+                            jsEditDialog.area.setText("""
                             function(fields){
                                 
                             }
@@ -128,8 +143,8 @@ public class ObjectivesDialog extends BaseDialog{
                             );
                         }
 
-                        scriptsDialog.show();
-                    }).padRight(8f);
+                        jsEditDialog.show();
+                    });
                 }).growX().fillY();
 
                 t.row().table(c -> {
@@ -147,8 +162,7 @@ public class ObjectivesDialog extends BaseDialog{
                 fields.add("...", Styles.outlineLabel).grow();
             }else{
                 fields.table(t -> {
-                    t.add("Fields", Styles.outlineLabel);
-                    t.add().growX();
+                    t.add("Fields", Styles.outlineLabel).get().setAlignment(Align.left);
                     t.row().image(Tex.whiteui).growX().height(3f).color(Tmp.c1.set(color).mul(0.5f));
                 }).growX().fillY().padLeft(8f).padRight(8f).padBottom(8f);
 
