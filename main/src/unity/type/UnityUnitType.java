@@ -36,6 +36,8 @@ public class UnityUnitType extends UnitType{
     payloadCellRegion;
     public TextureRegion[] abilityRegions = new TextureRegion[AbilityTextures.values().length];
     public Seq<Weapon> bottomWeapons = new Seq<>();
+    // AI
+    public float bulletWidth = 2f;
     // Worms
     public int segmentLength = 9, maxSegments = -1;
     //Should reduce the "Whip" effect.
