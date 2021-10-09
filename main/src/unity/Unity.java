@@ -40,6 +40,9 @@ import static mindustry.Vars.*;
 
 @SuppressWarnings("unchecked")
 public class Unity extends Mod{
+    /** Whether the mod is in an asset-processing context. */
+    public static boolean tools = false;
+
     /** Abstract music handler; will be overridden in the separate music mod. */
     public static MusicHandler music;
     /** Answers listeners for tapping. {@link Binding#boost} for desktop, screen taps for mobile. */ //TODO static-ify
@@ -76,6 +79,12 @@ public class Unity extends Mod{
     public static final Seq<String> packages = Seq.with("java.lang", "java.util", "java.io", "rhino");
 
     public Unity(){
+        this(false);
+    }
+
+    public Unity(boolean tools){
+        Unity.tools = tools;
+
         // Setup several asset loader bindings to clients.
         if(!headless){
             Core.assets.setLoader(Model.class, ".g3dj", new ModelLoader(tree, new JsonReader()));

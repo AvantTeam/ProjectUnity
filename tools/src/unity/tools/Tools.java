@@ -78,7 +78,7 @@ public final class Tools{
         content = new ContentLoader();
         content.createBaseContent();
 
-        unity = new Unity();
+        unity = new Unity(true);
 
         meta = new ModMeta(){{ name = "unity"; }};
         mod = new LoadedMod(null, null, unity, Tools.class.getClassLoader(), meta);

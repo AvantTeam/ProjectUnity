@@ -21,22 +21,24 @@ public final class JSBridge{
 
     // Main thread only!
     public static void init(){
-        try{
-            context = mods.getScripts().context;
-            defaultScope = (ImporterTopLevel)mods.getScripts().scope;
+        if(tools) return;
 
-            unityScope = new ImporterTopLevel(context);
-            context.evaluateString(unityScope, Core.files.internal("scripts/global.js").readString(), "global.js", 1);
-        }catch(Throwable ignored){} // Happens in sprite generation - ignore, since irrelevant anyway.
+        context = mods.getScripts().context;
+        defaultScope = (ImporterTopLevel)mods.getScripts().scope;
+
+        unityScope = new ImporterTopLevel(context);
+        context.evaluateString(unityScope, Core.files.internal("scripts/global.js").readString(), "global.js", 1);
     }
 
     public static void importDefaults(ImporterTopLevel scope){
+        if(tools) return;
         for(var pack : packages){
             importPackage(scope, pack);
         }
     }
 
     public static void importPackage(ImporterTopLevel scope, String packageName){
+        if(tools) return;
         var p = new NativeJavaPackage(packageName, mods.mainLoader());
         p.setParentScope(scope);
 
@@ -44,14 +46,18 @@ public final class JSBridge{
     }
 
     public static void importPackage(ImporterTopLevel scope, Package pack){
+        if(tools) return;
         importPackage(scope, pack.getName());
     }
 
     public static void importClass(ImporterTopLevel scope, String canonical){
+        if(tools) return;
         importClass(scope, ReflectUtils.findClass(canonical));
     }
 
     public static void importClass(ImporterTopLevel scope, Class<?> type){
+        if(tools) return;
+
         var nat = new NativeJavaClass(scope, type);
         nat.setParentScope(scope);
 
@@ -59,10 +65,12 @@ public final class JSBridge{
     }
 
     public static Function compileFunc(Scriptable scope, String sourceName, String source){
+        if(tools) return null;
         return compileFunc(scope, sourceName, source, 1);
     }
 
     public static Function compileFunc(Scriptable scope, String sourceName, String source, int lineNum){
+        if(tools) return null;
         return context.compileFunction(scope, source, sourceName, lineNum);
     }
 }
