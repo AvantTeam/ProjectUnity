@@ -105,14 +105,12 @@ public class ObjectivesDialog extends BaseDialog{
                             for(var type : datas.keys()){
                                 var data = data(type);
 
-                                var b = s.button(type.getSimpleName(), data.icon.get(), Styles.cleart, () -> {
+                                s.button(type.getSimpleName(), data.icon.get(), Styles.clearPartialt, () -> {
                                     model.set(model.type == type ? null : type);
                                     rebuild();
                                 })
-                                    .size(210f, 64f)
-                                    .pad(8f).get();
-                                b.getStyle().fontColor.set(data.color);
-                                b.getStyle().font = Fonts.outline;
+                                    .size(350f, 64f).color(data.color)
+                                    .pad(8f).get().getLabel().setStyle(Styles.outlineLabel);
                             }
                         }).width(500f).growY();
 
@@ -148,9 +146,11 @@ public class ObjectivesDialog extends BaseDialog{
             if(model.type == null){
                 fields.add("...", Styles.outlineLabel).grow();
             }else{
-                fields.add("Fields", Styles.outlineLabel).padLeft(8f);
-                fields.add().growX();
-                fields.row().image(Tex.whiteui).growX().height(3f).color(Tmp.c1.set(color).mul(0.5f)).padBottom(8f);
+                fields.table(t -> {
+                    t.add("Fields", Styles.outlineLabel);
+                    t.add().growX();
+                    t.row().image(Tex.whiteui).growX().height(3f).color(Tmp.c1.set(color).mul(0.5f));
+                }).growX().fillY().padLeft(8f).padRight(8f).padBottom(8f);
 
                 fields.row().table(t -> {
                     for(var f : model.type.getDeclaredFields()){

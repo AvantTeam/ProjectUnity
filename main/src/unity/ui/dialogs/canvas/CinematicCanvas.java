@@ -26,11 +26,7 @@ import static unity.Unity.*;
  * @author Anuke
  */
 public class CinematicCanvas extends WidgetGroup{
-    private static final float spacing = Scl.scl(50f);
-    private static final Color
-        gridCol = Pal.place.cpy().lerp(Pal.darkerMetal, 0.5f).mula(0.75f),
-        base = Pal.accent,
-        connection = Pal.place;
+    private static final Color base = Pal.accent, connection = Pal.place;
 
     private static TextureRegionDrawable
         acceptor,
@@ -47,22 +43,6 @@ public class CinematicCanvas extends WidgetGroup{
 
     @Override
     public void draw(){
-        Draw.color(gridCol, gridCol.a * parentAlpha);
-        int xbars = (int)(width / spacing) + 1, ybars = (int)(width / spacing) + 1;
-
-        Lines.stroke(Scl.scl(3f));
-
-        for(int i = 0; i < xbars; i++){
-            float cx = x + width / 2f + (i - xbars / 2f) * spacing;
-            Lines.line(cx, y, cx, y + height);
-        }
-
-        for(int i = 0; i < ybars; i++){
-            float cy = y + height / 2f + (i - ybars / 2f) * spacing;
-            Lines.line(0, cy, x + width, cy);
-        }
-
-        Draw.reset();
         super.draw();
 
         Draw.alpha(parentAlpha);
@@ -82,7 +62,7 @@ public class CinematicCanvas extends WidgetGroup{
     }
 
     private void drawCurve(float x, float y, float x2, float y2){
-        Lines.stroke(4f, Tmp.c1.set(connection).a(connection.a * parentAlpha * 0.5f));
+        Lines.stroke(4f, Tmp.c1.set(connection).a(connection.a * parentAlpha));
         float dist = Math.abs(x - x2) / 2f;
         Lines.curve(x, y, x + dist, y, x2 - dist, y2, x2, y2, Math.max(3, (int)(Mathf.dst(x, y, x2, y2) / 5f)));
 
@@ -115,7 +95,7 @@ public class CinematicCanvas extends WidgetGroup{
 
             connection(true);
             table(Tex.whiteui, t -> {
-                t.update(() -> t.setColor(base));
+                t.setColor(base);
 
                 t.margin(8f);
                 t.touchable = Touchable.enabled;

@@ -33,7 +33,7 @@ public class ResourceAmountObj extends Objective{
     public final Color to;
 
     public static void setup(){
-        ObjectiveModel.setup(ResourceAmountObj.class, Pal.accent, () -> Tex.clear, (node, f) -> {
+        ObjectiveModel.setup(ResourceAmountObj.class, Pal.accent, () -> Icon.crafting, (node, f) -> {
             var items = f.get("items", ItemStack.with());
             var team = f.get("team", Team.sharded);
 
