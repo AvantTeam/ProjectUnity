@@ -64,7 +64,7 @@ public class ModularTurret extends Turret implements GraphBlockBase{
     @Override
     public void init(){
         super.init();
-        partInfo = Parts.getPartList();
+        partInfo = UnityParts.getPartList();
     }
 
     @Override

@@ -14,13 +14,12 @@ import unity.graphics.CompositeMesh.*;
 import unity.map.planets.*;
 import unity.util.*;
 
-public class UnityPlanets implements ContentList{
+public class UnityPlanets{
     public static @FactionDef("imber") Planet electrode, inert;
 
     public static @FactionDef("monolith") Planet megalith;
 
-    @Override
-    public void load(){
+    public static void load(){
         megalith = new Planet("megalith", Planets.sun, 3, 1){{
             generator = new MegalithPlanetGenerator();
             meshLoader = () -> new CompositeMesh(this,
@@ -33,6 +32,7 @@ public class UnityPlanets implements ContentList{
                 new ShaderRef<>(UnityShaders.megalithRingShader, UnityShaders.megalithRingShader.cons(this))
             );
 
+            accessible = true;
             atmosphereColor = UnityPal.monolithAtmosphere;
             startSector = 200;
             atmosphereRadIn = 0.04f;
@@ -42,6 +42,7 @@ public class UnityPlanets implements ContentList{
         electrode = new Planet("electrode", Planets.sun, 3, 1){{
             generator = new ElectrodePlanetGenerator();
             meshLoader = () -> new HexMesh(this, 6);
+            accessible = true;
             atmosphereColor = Pal.surge;
             startSector = 30;
         }};

@@ -29,7 +29,7 @@ import unity.graphics.*;
 import static mindustry.Vars.*;
 import static unity.content.UnityStatusEffects.*;
 
-public class UnityBullets implements ContentList{
+public class UnityBullets{
     public static BulletType
         laser, shardLaserFrag, shardLaser, frostLaser, branchLaserFrag, branchLaser, distField, fractalLaser, kelvinWaterLaser,
         kelvinSlagLaser, kelvinOilLaser, kelvinCryofluidLaser, kelvinLiquidLaser, celsiusSmoke, kelvinSmoke,
@@ -77,14 +77,14 @@ public class UnityBullets implements ContentList{
     public static ArtilleryBulletType artilleryExplosiveT2;
 
     @SuppressWarnings("unchecked")
-    private <T extends BulletType> T copy(BulletType from, Cons<T> setter){
+    private static <T extends BulletType> T copy(BulletType from, Cons<T> setter){
         T bullet = (T)from.copy();
         setter.get(bullet);
         return bullet;
     }
 
     @SuppressWarnings("unchecked")
-    private <T extends BulletType> T deepCopy(BulletType from, Cons<T> setter){
+    private static <T extends BulletType> T deepCopy(BulletType from, Cons<T> setter){
         T bullet = (T)from.copy();
         if(from.fragBullet != null){
             bullet.fragBullet = deepCopy(bullet.fragBullet, b -> {});
@@ -93,8 +93,7 @@ public class UnityBullets implements ContentList{
         return bullet;
     }
 
-    @Override
-    public void load(){
+    public static void load(){
         laser = new ExpLaserBulletType(150f, 30f){{
             damageInc = 7f;
             status = StatusEffects.shocked;
@@ -139,20 +138,20 @@ public class UnityBullets implements ContentList{
             public void hit(Bullet b, float x, float y){
                 hitEffect.at(x, y, b.rotation(), hitColor);
                 hitSound.at(x, y, hitSoundPitch, hitSoundVolume);
-        
+
                 Effect.shake(hitShake, hitShake, b);
 
                 for(var i = 0; i < fragBullets; i++){
                     var len = Mathf.random(1f, 7f);
                     var a = b.rotation() + Mathf.randomSeed(b.id, 360f) + i * 360f/fragBullets;
                     var target = Damage.linecast(b, x, y, b.rotation(), length);
-        
+
                     var data = getColor(b);
                     b.data = target;
-        
+
                     if(target instanceof Hitboxc hit){
                         fragBullet.create(b.owner, b.team, hit.x() + Angles.trnsx(a, len), hit.y() + Angles.trnsy(a, len), a, -1f, 1f, 1f, data);
-        
+
                     }else if(target instanceof Building tile){
                         if(tile.collide(b)){
                             fragBullet.create(b.owner, b.team, tile.x() + Angles.trnsx(a, len), tile.y() + Angles.trnsy(a, len), a, -1f, 1f, 1f, data);
@@ -181,7 +180,7 @@ public class UnityBullets implements ContentList{
                 float rad = 3.5f;
                 if(!Vars.headless) UnityFx.freezeEffect.at(x, y, lvl / rad + 10f, getColor(b));
                 if(!Vars.headless) UnitySounds.laserFreeze.at(x, y, 1f, 0.6f);
-        
+
                 Damage.status(b.team, x, y, 10f + lvl / rad, status, 60f + lvl * 6f, true, true);
                 Damage.status(b.team, x, y, 10f + lvl / rad, UnityStatusEffects.disabled, 2f * lvl, true, true);
             }
@@ -284,7 +283,7 @@ public class UnityBullets implements ContentList{
             public void hit(Bullet b, float x, float y){
                 hitEffect.at(x, y, b.rotation(), hitColor);
                 hitSound.at(b);
-        
+
                 Effect.shake(hitShake, hitShake, b);
             }
         };
@@ -410,7 +409,7 @@ public class UnityBullets implements ContentList{
                 float rad = 4.5f;
                 if(!Vars.headless) UnityFx.freezeEffect.at(x, y, lvl / rad + 10f, getColor(b));
                 if(!Vars.headless) UnitySounds.laserFreeze.at(x, y, 1f, 0.6f);
-        
+
                 Damage.status(b.team, x, y, 10f + lvl / rad, status, 60f + lvl * 7.5f, true, true);
                 Damage.status(b.team, x, y, 10f + lvl / rad, UnityStatusEffects.disabled, 4.5f * lvl, true, true);
             }
@@ -468,7 +467,7 @@ public class UnityBullets implements ContentList{
                 float rad = 4.5f;
                 if(!Vars.headless) UnityFx.freezeEffect.at(x, y, lvl / rad + 10f, getColor(b));
                 if(!Vars.headless) UnitySounds.laserFreeze.at(x, y, 1f, 0.6f);
-        
+
                 Damage.status(b.team, x, y, 10f + lvl / rad, status, 60f + lvl * 8f, true, true);
                 Damage.status(b.team, x, y, 10f + lvl / rad, UnityStatusEffects.disabled, 3f * lvl, true, true);
             }
@@ -888,7 +887,7 @@ public class UnityBullets implements ContentList{
             fragLifeMax = 1.1f;
             scaleVelocity = true;
             fragBullet = plasmaFragTriangle;
-            
+
             shocks = 10;
             shockDamage = 680f / 5f;
             shockLength = 20;
@@ -964,7 +963,7 @@ public class UnityBullets implements ContentList{
             pierceBuilding = true;
             pierceCap = 3;
         }};
-        
+
         celsiusSmoke = new SmokeBulletType(4.7f, 32f){{
             drag = 0.034f;
             lifetime = 18f;
@@ -980,7 +979,7 @@ public class UnityBullets implements ContentList{
             statusDuration = 770f;
             status = UnityStatusEffects.blueBurn;
         }};
-        
+
         kelvinSmoke = new SmokeBulletType(4.7f, 16f){{
             drag = 0.016f;
             lifetime = 32f;

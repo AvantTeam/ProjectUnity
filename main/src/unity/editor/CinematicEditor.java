@@ -33,12 +33,19 @@ public class CinematicEditor extends EditorListener{
 
     @Override
     public void end(){
+        try{
+            apply();
+        }catch(Exception e){
+            ui.showException("Failed to parse story nodes", e);
+        }finally{
+            cinematicDialog.end();
+            nodes.each(node -> node.elem = null);
+            nodes.clear();
+        }
+    }
+
+    public void apply() throws Exception{
         editor.tags.put("storyNodes", JsonIO.json.toJson(nodes, Seq.class, StoryNode.class));
-
         sector().setNodes(nodes);
-
-        cinematicDialog.end();
-        nodes.each(node -> node.elem = null);
-        nodes.clear();
     }
 }

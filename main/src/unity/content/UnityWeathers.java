@@ -3,7 +3,6 @@ package unity.content;
 import arc.graphics.*;
 import arc.math.*;
 import arc.util.*;
-import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -13,13 +12,12 @@ import unity.type.*;
 
 import static mindustry.Vars.*;
 
-public class UnityWeathers implements ContentList{
-    public Weather
+public class UnityWeathers{
+    public static Weather
     timeStorm,
     debrisStorm;
 
-    @Override
-    public void load(){
+    public static void load(){
         timeStorm = new ParticleWeather("time-anomoly"){ // I wonder who spelt this
             public final float spawnChance = 0.02f;
             public final float minDistSize = 2f * tilesize;

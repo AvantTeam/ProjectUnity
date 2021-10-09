@@ -1,7 +1,5 @@
 package unity.ui.dialogs;
 
-import arc.scene.actions.*;
-import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
@@ -12,6 +10,9 @@ import mindustry.ui.dialogs.*;
 import unity.map.cinematic.*;
 import unity.map.objectives.*;
 
+import java.lang.reflect.*;
+
+import static unity.Unity.*;
 import static unity.map.objectives.ObjectiveModel.*;
 
 public class ObjectivesDialog extends BaseDialog{
@@ -25,7 +26,7 @@ public class ObjectivesDialog extends BaseDialog{
 
         addCloseButton();
 
-        cont.pane(Styles.defaultPane, t -> content = t).growY().width(500f);
+        cont.pane(Styles.nonePane, t -> content = t).growY().width(750f);
         buttons.button("@add", Icon.add, () -> {
             var model = new ObjectiveModel();
 
@@ -62,12 +63,12 @@ public class ObjectivesDialog extends BaseDialog{
     }
 
     private void add(ObjectiveModel model){
-        content.add(new ObjectiveElem(model)).grow().padTop(8f).padBottom(8f).row();
+        content.add(new ObjectiveElem(model)).growX().fillY().padTop(8f).padBottom(8f).row();
     }
 
     private class ObjectiveElem extends Table{
         private final ObjectiveModel model;
-        private ScrollPane selection;
+        private Table fields;
 
         private ObjectiveElem(ObjectiveModel model){
             this.model = model;
@@ -76,48 +77,102 @@ public class ObjectivesDialog extends BaseDialog{
             update(() -> setColor(model.type == null ? Pal.darkerMetal : data(model.type).color));
             margin(0f);
 
-            table(Styles.black9, t -> {
-                var typeSelect = t.add("Type:", Styles.defaultLabel).width(100f).get();
-                typeSelect.setAlignment(Align.left);
+            table(t -> {
+                t.add("Name: ").style(Styles.outlineLabel).padLeft(8f);
 
-                t.table(select -> {
-                    var typePref = select.label(() -> model.type == null ? "" : model.type.getSimpleName()).growX().get();
-                    selection = new ScrollPane(new Table(){{
-                        for(var type : datas.keys()){
-                            button(type.getSimpleName(), data(type).icon.get(), () -> {
-                                model.set(type);
+                var field = t.field(model.name, Styles.defaultField, str -> model.name = str).padRight(8f).get();
+                field.setValidator(str -> !models.contains(m -> m.setFields.get("name", "").equals("")));
+                field.getStyle().font = Fonts.outline;
 
-                                if(selection.visible){
-                                    selection.actions(Actions.scaleTo(1f, 0f, 0.06f), Actions.visible(false));
-                                }else{
-                                    selection.visible = true;
-                                    selection.actions(Actions.scaleTo(1f, 1f));
-                                }
-                            }).growX().fillY().get().setStyle(Styles.clearPartialt);
+                t.add().growX();
+                t.button(Icon.cancel, Styles.logici, this::remove).padRight(8f);
+            }).growX().fillY().pad(4f);
+
+            row().table(Styles.black5, t -> {
+                t.defaults().pad(4f);
+
+                t.table(ts -> {
+                    var typeSelect = ts.label(() -> "Type: " + (model.type == null ? "..." : model.type.getSimpleName())).width(100f).padLeft(8f).get();
+                    typeSelect.setAlignment(Align.left);
+
+                    ts.add().growX();
+
+                    ts.button(Icon.downOpen, Styles.logici, () -> {
+                        var dialog = new BaseDialog("@dialog.cinematic.objectives.select");
+                        dialog.addCloseButton();
+
+                        dialog.cont.pane(Styles.nonePane, s -> {
+                            for(var type : datas.keys()){
+                                var data = data(type);
+
+                                var b = s.button(type.getSimpleName(), data.icon.get(), Styles.cleart, () -> {
+                                    model.set(model.type == type ? null : type);
+                                    rebuild();
+                                })
+                                    .size(210f, 64f)
+                                    .pad(8f).get();
+                                b.getStyle().fontColor.set(data.color);
+                                b.getStyle().font = Fonts.outline;
+                            }
+                        }).width(500f).growY();
+
+                        dialog.show();
+                    }).padRight(8f);
+
+                    ts.button(Icon.pencil, Styles.logici, () -> {
+                        scriptsDialog.listener = str -> model.init = str;
+                        if(scriptsDialog.area.getText().isEmpty()){
+                            scriptsDialog.area.setText("""
+                            function(fields){
+                                
+                            }
+                            """
+                            );
                         }
-                    }}){
-                        {
-                            update(() -> setPosition(typePref.x, typePref.y + typePref.getWidth(), Align.topLeft));
-                        }
 
-                        @Override
-                        public float getPrefWidth(){
-                            return typePref.getWidth();
-                        }
-                    };
+                        scriptsDialog.show();
+                    }).padRight(8f);
+                }).growX().fillY();
 
-                    t.addChild(selection);
-                    selection.pack();
-                }).width(300f).fillY();
-            }).grow().pad(4f).padTop(8f);
+                t.row().table(c -> {
+                    fields = c;
+                    rebuild();
+                }).growX().fillY().padTop(8f);
+            }).grow().pad(8f).padTop(16f);
+        }
+
+        private void rebuild(){
+            fields.clearChildren();
+            fields.defaults().pad(4f);
+
+            if(model.type == null){
+                fields.add("...", Styles.outlineLabel).grow();
+            }else{
+                fields.add("Fields", Styles.outlineLabel).padLeft(8f);
+                fields.add().growX();
+                fields.row().image(Tex.whiteui).growX().height(3f).color(Tmp.c1.set(color).mul(0.5f)).padBottom(8f);
+
+                fields.row().table(t -> {
+                    for(var f : model.type.getDeclaredFields()){
+                        if(f.isAnnotationPresent(Ignore.class) || Modifier.isStatic(f.getModifiers())) continue;
+
+                        t.add(f.getName(), Styles.outlineLabel).growX();
+                        t.add(" | ", Styles.outlineLabel);
+                        t.add(f.getGenericType().getTypeName(), Styles.outlineLabel).growX();
+                        t.row();
+                    }
+                }).grow().padLeft(8f).padRight(8f);
+            }
         }
 
         @Override
         public boolean remove(){
-            var cell = content.getCells().find(c -> c.get() == this);
+            var cell = content.getCell(this);
 
             boolean succeed = super.remove();
-            if(succeed){
+            if(succeed && cell != null){
+                models.remove(model);
+
                 content.getCells().remove(cell);
                 content.invalidate();
             }

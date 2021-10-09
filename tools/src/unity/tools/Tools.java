@@ -5,7 +5,6 @@ import arc.assets.*;
 import arc.files.*;
 import arc.graphics.g2d.*;
 import arc.mock.*;
-import arc.scene.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
@@ -40,6 +39,7 @@ public final class Tools{
 
     public static GenAtlas atlas;
 
+    private static final TaskQueue runs = new TaskQueue();
     private static final IntSet[] initialized = new IntSet[ContentType.all.length];
     private static final IntSet[] loaded = new IntSet[ContentType.all.length];
 
@@ -63,7 +63,7 @@ public final class Tools{
         Core.app = new MockApplication(){
             @Override
             public void post(Runnable runnable){
-                runnable.run();
+                runs.post(runnable);
             }
         };
         Core.files = new MockFiles();
@@ -99,7 +99,9 @@ public final class Tools{
         Regions.load();
         KamiRegions.load();
 
+        runs.run();
         Processors.process();
+        runs.run();
 
         atlas.dispose();
     }

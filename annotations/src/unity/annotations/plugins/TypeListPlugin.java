@@ -50,15 +50,31 @@ public class TypeListPlugin implements Plugin{
                         @Override
                         public Void visitClass(ClassTree node, Void unused){
                             ClassSymbol sym = ((JCClassDecl)node).sym;
-                            if(sym != null && !sym.isAnonymous()){
-                                String cname = sym.getQualifiedName().toString();
-                                if(!classDefs.contains(cname)){
-                                    classDefs.add(cname);
-                                }
+                            if(
+                                sym != null &&
+                                !sym.isAnonymous() &&
+                                !(
+                                    sym.getQualifiedName().toString().startsWith("unity.entities.comp") ||
+                                    sym.getQualifiedName().toString().startsWith("unity.entities.merge") ||
+                                    sym.getQualifiedName().toString().startsWith("unity.fetched")
+                                )
+                            ){
+                                StringBuilder builder = new StringBuilder(sym.getSimpleName().toString());
 
                                 Symbol current = sym;
                                 while(!(current instanceof PackageSymbol)){
                                     current = current.getEnclosingElement();
+
+                                    if(current instanceof PackageSymbol){
+                                        builder.insert(0, current.getQualifiedName().toString() + ".");
+                                    }else{
+                                        builder.insert(0, current.getSimpleName().toString() + "$");
+                                    }
+                                }
+
+                                String cname = builder.toString();
+                                if(!classDefs.contains(cname)){
+                                    classDefs.add(cname);
                                 }
 
                                 String pname = current.getQualifiedName().toString();

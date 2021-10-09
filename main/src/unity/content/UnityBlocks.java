@@ -53,7 +53,7 @@ import static arc.Core.*;
 import static mindustry.Vars.*;
 import static mindustry.type.ItemStack.*;
 
-public class UnityBlocks implements ContentList{
+public class UnityBlocks{
     //---------- global ----------
     public static Block
     //production
@@ -228,14 +228,14 @@ public class UnityBlocks implements ContentList{
     smallTurret, medTurret, chopper,
 
     //production
-    augerDrill, mechanicalExtractor, sporeFarm, 
-    
+    augerDrill, mechanicalExtractor, sporeFarm,
+
     //distribution
     mechanicalConveyor, heatPipe, driveShaft, inlineGearbox, shaftRouter, simpleTransmission,
 
     //crafting
-    crucible, holdingCrucible, cruciblePump, castingMold, sporePyrolyser, 
-    
+    crucible, holdingCrucible, cruciblePump, castingMold, sporePyrolyser,
+
     //power
     smallRadiator, thermalHeater, combustionHeater, solarCollector, solarReflector, nickelStator, nickelStatorLarge,
     nickelElectromagnet, electricRotorSmall, electricRotor, handCrank, windTurbine, waterTurbine, electricMotor,
@@ -277,8 +277,7 @@ public class UnityBlocks implements ContentList{
     }, outline = true)
     Block endGame, tenmeikiri;
 
-    @Override
-    public void load(){
+    public static void load(){
         //region global
 
         distributionDrill = new DistributionDrill("distribution-drill"){{
@@ -386,7 +385,7 @@ public class UnityBlocks implements ContentList{
                 ammo(Items.graphite, UnityBullets.standardDenseLarge, Items.silicon, UnityBullets.standardHomingLarge, Items.pyratite, UnityBullets.standardIncendiaryLarge, Items.thorium, UnityBullets.standardThoriumLarge);
             }
 
-            
+
             @Override
             public void load(){
                 super.load();
@@ -458,7 +457,7 @@ public class UnityBlocks implements ContentList{
                 shootType = UnityBullets.falloutLaser;
                 consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.58f)).update(false);
             }
- 
+
             @Override
             public void load(){
                 super.load();
@@ -689,7 +688,7 @@ public class UnityBlocks implements ContentList{
                 }
             };
         }};
-        
+
         neutron = new PowerTurret("neutron"){{
             requirements(Category.turret, with(Items.lead, 110, Items.silicon, 75, UnityItems.luminum, 165, Items.titanium, 135));
             size = 4;
@@ -790,7 +789,7 @@ public class UnityBlocks implements ContentList{
                             frontColor = Color.white;
                             hittable = false;
                         }
-    
+
                         @Override
                         public void draw(Bullet b){
                             Draw.color(backColor);
@@ -866,7 +865,7 @@ public class UnityBlocks implements ContentList{
                     hittable = false;
                 }};
             }
-            
+
             @Override
             public void load(){
                 super.load();
@@ -901,7 +900,7 @@ public class UnityBlocks implements ContentList{
                     shootEffect = smokeEffect = Fx.none;
                 }};
             }
-            
+
             @Override
             public void load(){
                 super.load();
@@ -964,7 +963,7 @@ public class UnityBlocks implements ContentList{
                     smokeEffect = Fx.none;
                 }};
             }
-            
+
             @Override
             public void load(){
                 super.load();
@@ -989,7 +988,7 @@ public class UnityBlocks implements ContentList{
                 cooldown = 0.009f;
                 chargeTime = 80f;
                 chargeBeginEffect = ChargeFx.ephmeronCharge;
-                
+
                 shootType = new EphemeronBulletType(7.7f, 10f){{
                     lifetime = 70f;
                     hitSize = 12f;
@@ -1012,7 +1011,7 @@ public class UnityBlocks implements ContentList{
                     }};
                 }};
             }
-            
+
             @Override
             public void load(){
                 super.load();
@@ -1235,7 +1234,7 @@ public class UnityBlocks implements ContentList{
                 smokeEffect = Fx.none;
                 consumes.powerCond(10f, TurretBuild::isActive);
             }
-            
+
             @Override
             public void load(){
                 super.load();
@@ -1449,7 +1448,7 @@ public class UnityBlocks implements ContentList{
             displayedSpeed = 20f;
             drawMultiplier = 1.3f;
         }};
-        
+
         bufferPad = new MechPad("buffer-pad"){{
             requirements(Category.units, with(UnityItems.stone, 120, Items.copper, 170, Items.lead, 150, Items.titanium, 150, Items.silicon, 180));
             size = 2;
@@ -1465,7 +1464,7 @@ public class UnityBlocks implements ContentList{
             consumes.power(1.2f);
             unitType = UnityUnitTypes.omega;
         }};
-        
+
         cachePad = new MechPad("cache-pad"){{
             requirements(Category.units, with(UnityItems.stone, 150, Items.lead, 160, Items.silicon, 100, Items.titanium, 60, Items.plastanium, 120, Items.phaseFabric, 60));
             size = 2;
@@ -1662,7 +1661,7 @@ public class UnityBlocks implements ContentList{
 
                 size = 3;
                 health = 2400;
-                
+
                 reloadTime = 90f;
                 coolantMultiplier = 2.25f;
                 powerUse = 15f;
@@ -2568,7 +2567,7 @@ public class UnityBlocks implements ContentList{
             size = 3;
             health = 1000;
             pumpAmount = 0.4f;
-            
+
             addGraph(new GraphTorqueConsume(45f, 8f, 0.06f, 0.3f).setAccept(0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0));
         }};
 

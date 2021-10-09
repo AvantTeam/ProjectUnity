@@ -4,17 +4,15 @@ import arc.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.util.*;
-import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.type.*;
 import unity.graphics.*;
 
-public class UnityLiquids implements ContentList{
+public class UnityLiquids{
     private static final Color temp = new Color(0f, 0f, 0f, 1f), temp2 = temp.cpy();
     public static Liquid lava;
 
-    @Override
-    public void load(){
+    public static void load(){
         lava = new Liquid("lava", UnityPal.lavaColor){{
             heatCapacity = 0f;
             viscosity = 0.7f;

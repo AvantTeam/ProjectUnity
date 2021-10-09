@@ -6,10 +6,8 @@ import arc.graphics.*;
 import arc.math.*;
 import arc.scene.*;
 import arc.scene.actions.*;
-import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
-import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -27,39 +25,26 @@ import static mindustry.Vars.*;
  * @author GlennFolker
  */
 public class ResourceAmountObj extends Objective{
-    protected Table container;
+    protected @Ignore Table container;
     public final ItemStack[] items;
 
     public final Team team;
     public final Color from;
     public final Color to;
 
-    static{
+    public static void setup(){
         ObjectiveModel.setup(ResourceAmountObj.class, Pal.accent, () -> Tex.clear, (node, f) -> {
-            ItemStack[] items = f.arrReq("items").map(v -> {
-                int separator = v.indexOf("\n");
-                if(separator == -1) throw new IllegalArgumentException("Invalid string");
+            var items = f.get("items", ItemStack.with());
+            var team = f.get("team", Team.sharded);
 
-                return new ItemStack(
-                    content.getByName(ContentType.item, v.substring(0, separator)),
-                    Integer.parseInt(v.substring(separator + 1))
-                );
-            }).toArray(ItemStack.class);
+            var exec = f.get("executor", "function(objective){}");
+            var func = JSBridge.compileFunc(JSBridge.unityScope, f.name() + "-executor.js", exec, 1);
 
-            var team = Team.get(Integer.parseInt(f.valReq("team")));
-            var from = Color.lightGray;
-            var to = Color.green;
-
-            var name = f.valReq("name");
-
-            var execFunc = JSBridge.compileFunc(JSBridge.unityScope, name + "-executor.js", f.valReq("executor"));
             Object[] args = {null};
-            Cons<ResourceAmountObj> executor = obj -> {
-                args[0] = obj;
-                execFunc.call(JSBridge.context, JSBridge.unityScope, JSBridge.unityScope, args);
-            };
-
-            var obj = new ResourceAmountObj(items, team, from, to, node, name, executor);
+            var obj = new ResourceAmountObj(items, team, node, f.name(), e -> {
+                args[0] = e;
+                func.call(JSBridge.context, JSBridge.unityScope, JSBridge.unityScope, args);
+            });
             obj.ext(f);
 
             return obj;
@@ -81,8 +66,8 @@ public class ResourceAmountObj extends Objective{
     @Override
     public void ext(FieldTranslator f){
         super.ext(f);
-        if(f.has("from")) from.set(Color.valueOf(Tmp.c1, f.val("from")));
-        if(f.has("to")) to.set(Color.valueOf(Tmp.c1, f.val("to")));
+        if(f.has("from")) from.set(f.<Color>get("from"));
+        if(f.has("to")) from.set(f.<Color>get("to"));
     }
 
     @Override
@@ -104,13 +89,13 @@ public class ResourceAmountObj extends Objective{
                 var cell = table.table(Styles.black6, t -> {
                     container = t;
 
-                    ScrollPane pane = t.pane(Styles.defaultPane, cont -> {
+                    var pane = t.pane(Styles.defaultPane, cont -> {
                         cont.defaults().pad(4f);
 
                         for(int i = 0; i < items.length; i++){
                             if(i > 0) cont.row();
 
-                            ItemStack item = items[i];
+                            var item = items[i];
                             cont.table(Styles.black3, hold -> {
                                 hold.defaults().pad(4f);
 
@@ -136,7 +121,7 @@ public class ResourceAmountObj extends Objective{
                     })
                         .update(p -> {
                             if(p.hasScroll()){
-                                Element result = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
+                                var result = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
                                 if(result == null || !result.isDescendantOf(p)){
                                     Core.scene.setScrollFocus(null);
                                 }
@@ -161,7 +146,7 @@ public class ResourceAmountObj extends Objective{
     public boolean completed(){
         if(state.teams.cores(team).isEmpty()) return false;
 
-        for(ItemStack item : items){
+        for(var item : items){
             if(state.teams.cores(team).sum(b -> b.items.get(item.item)) < item.amount){
                 return false;
             }

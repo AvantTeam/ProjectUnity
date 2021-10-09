@@ -7,6 +7,7 @@ import mindustry.ui.dialogs.*;
 import unity.map.cinematic.*;
 import unity.ui.dialogs.canvas.*;
 
+import static mindustry.Vars.*;
 import static unity.Unity.*;
 
 public class CinematicDialog extends BaseDialog{
@@ -34,7 +35,38 @@ public class CinematicDialog extends BaseDialog{
             canvas.add(node);
         }).size(210f, 64f);
 
+        buttons.button("@dialog.cinematic.test", Icon.downOpen, () -> {
+            Exception thrown = null;
+            try{
+                cinematicEditor.apply();
+            }catch(Exception e){
+                thrown = e;
+            }
+
+            if(thrown != null){
+                ui.showException("[scarlet]There were misbehaving story nodes[]", thrown);
+            }else{
+                ui.showInfo("No story nodes are misconstructed, safe to proceed");
+            }
+        }).size(210f, 64f);
+
         add(buttons).fillX();
+    }
+
+    @Override
+    public void hide(){
+        if(!isShown()) return;
+
+        try{
+            cinematicEditor.apply();
+            super.hide();
+        }catch(Exception e){
+            ui.showException("""
+                [scarlet]Couldn't exit this dialog as there were misconstructed story nodes[]
+                Fix these nodes before proceeding
+                """, e
+            );
+        }
     }
 
     private String lastName(){
@@ -51,6 +83,7 @@ public class CinematicDialog extends BaseDialog{
 
     public void begin(){
         canvas.clearChildren();
+        cinematicEditor.nodes.each(canvas::add);
     }
 
     public void end(){

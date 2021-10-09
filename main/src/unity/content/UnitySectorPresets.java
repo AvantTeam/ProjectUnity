@@ -1,18 +1,16 @@
 package unity.content;
 
-import mindustry.ctype.*;
 import mindustry.type.*;
 import unity.annotations.Annotations.*;
 import unity.map.*;
 
 import static unity.content.UnityPlanets.*;
 
-public class UnitySectorPresets implements ContentList{
+public class UnitySectorPresets{
     public static @FactionDef("monolith") SectorPreset
     accretion, salvagedLab;
 
-    @Override
-    public void load(){
+    public static void load(){
         accretion = new ScriptedSector("accretion", megalith, 200){{
             alwaysUnlocked = true;
             addStartingItems = true;

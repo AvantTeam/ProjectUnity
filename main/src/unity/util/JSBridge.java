@@ -13,18 +13,21 @@ import static unity.Unity.*;
  * @author GlennFolker
  */
 public final class JSBridge{
-    public static final Context context;
-    public static final ImporterTopLevel defaultScope;
-    public static final ImporterTopLevel unityScope;
+    public static Context context;
+    public static ImporterTopLevel defaultScope;
+    public static ImporterTopLevel unityScope;
 
     private JSBridge(){}
 
-    static{
-        context = mods.getScripts().context;
-        defaultScope = (ImporterTopLevel)mods.getScripts().scope;
+    // Main thread only!
+    public static void init(){
+        try{
+            context = mods.getScripts().context;
+            defaultScope = (ImporterTopLevel)mods.getScripts().scope;
 
-        unityScope = new ImporterTopLevel(context);
-        context.evaluateString(unityScope, Core.files.internal("scripts/global.js").readString(), "global.js", 1);
+            unityScope = new ImporterTopLevel(context);
+            context.evaluateString(unityScope, Core.files.internal("scripts/global.js").readString(), "global.js", 1);
+        }catch(Throwable ignored){} // Happens in sprite generation - ignore, since irrelevant anyway.
     }
 
     public static void importDefaults(ImporterTopLevel scope){
@@ -56,7 +59,7 @@ public final class JSBridge{
     }
 
     public static Function compileFunc(Scriptable scope, String sourceName, String source){
-        return compileFunc(scope, sourceName, source, 0);
+        return compileFunc(scope, sourceName, source, 1);
     }
 
     public static Function compileFunc(Scriptable scope, String sourceName, String source, int lineNum){

@@ -28,7 +28,7 @@ public abstract class Objective{
     public Cons<Objective> draw = objective -> {};
 
     public Seq<Objective> dependencies = new Seq<>();
-    private final Seq<String> depStrings = new Seq<>();
+    private final Seq<String> depAliases = new Seq<>();
 
     public <T extends Objective> Objective(StoryNode node, String name, int executions, Cons<T> executor){
         this.name = name;
@@ -39,7 +39,7 @@ public abstract class Objective{
 
     public void resolveDependencies(){
         dependencies.clear();
-        for(var dep : depStrings){
+        for(var dep : depAliases){
             int separator = dep.indexOf("\n");
             if(separator == -1) continue;
 
@@ -66,7 +66,7 @@ public abstract class Objective{
         Object[] args = {null};
 
         if(f.has("init")){
-            var initFunc = JSBridge.compileFunc(s, name + "-init.js", f.val("init"));
+            var initFunc = JSBridge.compileFunc(s, name + "-init.js", f.get("init"));
             init = obj -> {
                 args[0] = obj;
                 initFunc.call(c, s, s, args);
@@ -74,24 +74,24 @@ public abstract class Objective{
         }
 
         if(f.has("update")){
-            var initFunc = JSBridge.compileFunc(s, name + "-update.js", f.val("update"));
+            var updateFunc = JSBridge.compileFunc(s, name + "-update.js", f.get("update"));
             update = obj -> {
                 args[0] = obj;
-                initFunc.call(c, s, s, args);
+                updateFunc.call(c, s, s, args);
             };
         }
 
         if(f.has("draw")){
-            var initFunc = JSBridge.compileFunc(s, name + "-draw.js", f.val("draw"));
+            var drawFunc = JSBridge.compileFunc(s, name + "-draw.js", f.get("draw"));
             draw = obj -> {
                 args[0] = obj;
-                initFunc.call(c, s, s, args);
+                drawFunc.call(c, s, s, args);
             };
         }
 
         if(f.has("dependencies")){
-            depStrings.clear();
-            depStrings.addAll(f.arr("dependencies"));
+            depAliases.clear();
+            depAliases.addAll(f.<Iterable<String>>get("dependencies"));
         }
     }
 
@@ -99,7 +99,7 @@ public abstract class Objective{
         init.get(this);
     }
 
-    //using 'do' because method name clash
+    // Using 'do' because method name clash.
     public void doFinalize(){
         finalized = true;
     }

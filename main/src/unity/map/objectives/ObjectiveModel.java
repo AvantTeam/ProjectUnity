@@ -9,8 +9,12 @@ import arc.util.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
 import mindustry.graphics.*;
-import mindustry.io.*;
 import unity.map.cinematic.*;
+import unity.map.objectives.types.*;
+import unity.util.*;
+
+import java.lang.annotation.*;
+import java.util.regex.*;
 
 import static mindustry.Vars.*;
 import static unity.Unity.*;
@@ -21,48 +25,48 @@ public class ObjectiveModel implements JsonSerializable{
 
     /** The objective type that is going to be instantiated. Do not modify directly, use {@link #set(Class)} instead. */
     public Class<? extends Objective> type;
+    /** The name of this objective model. */
+    public String name;
+    /** The JS function to be called in instantiation. */
+    public String init;
 
-    /** The field meta data of this objective. Do not modify directly, use {@link #set(Class)} instead. */
-    public OrderedMap<String, FieldMetadata> fields = new OrderedMap<>();
-    /**
-     * The fields that is going to be used in objective instantiation. Modify the contents of this map, with the following
-     * rule:
-     * <ul>
-     *     <li>{@link Seq}'s or array type's elements must be {@link String}s.</li>
-     *     <li>{@link ObjectMap}s must always be {@link StringMap}s.</li>
-     *     <li>Other types must be {@link String}s.</li>
-     * </ul>
-     * These will be parsed separately in each {@link Objective} implementations.
-     */
+    /** Objective model fields. Elements of this map must be serializable. */
     public ObjectMap<String, Object> setFields = new ObjectMap<>();
 
-    private final FieldTranslator translator = new FieldTranslator();
+    private static final String env = "\\$\\{{2}.*}{2}";
+    private static final Pattern replacer = Pattern.compile(env);
+    private static final FieldTranslator translator = new FieldTranslator();
+
+    static{
+        ResourceAmountObj.setup();
+    }
 
     public void set(Class<? extends Objective> type){
         this.type = type;
-
-        fields.clear();
-        if(type != null) fields.putAll(JsonIO.json.getFields(type));
-
         setFields.clear();
     }
 
     @Override
     public void write(Json json){
         json.writeValue("type", type == null ? "null" : type.getName());
+        json.writeValue("name", name);
+        json.writeValue("init", init);
         json.writeValue("setFields", setFields, ObjectMap.class);
     }
 
     @Override
-    public void read(Json json, JsonValue jsonData){
+    public void read(Json json, JsonValue data){
         try{
-            var typeName = jsonData.getString("type");
+            var typeName = data.getString("type");
             if(!typeName.equals("null")){
                 set((Class<? extends Objective>)Class.forName(typeName, true, mods.mainLoader()));
             }
 
+            name = data.getString("name");
+            init = data.getString("init");
+
             setFields.clear();
-            setFields.putAll(json.readValue(ObjectMap.class, jsonData.get("setFields")));
+            setFields.putAll(json.readValue(ObjectMap.class, data.get("setFields")));
         }catch(Exception e){
             print(LogLevel.err, "", Strings.getStackTrace(Strings.getFinalCause(e)));
         }
@@ -71,9 +75,30 @@ public class ObjectiveModel implements JsonSerializable{
     public <T extends Objective> T create(StoryNode node){
         var data = data(type);
 
-        translator.fields = setFields;
+        setFields.clear();
+        if(init != null){
+            var source = init;
+            var matcher = replacer.matcher(init);
+            while(matcher.find()){
+                var occur = init.substring(matcher.start(), matcher.end());
+                occur = occur.substring(3, occur.length() - 2).trim();
+
+                var f = occur; // Finalize, for use in lambda statements.
+                var script = node.scripts.getThrow(f, () -> new IllegalArgumentException("No such script: '" + f + "'"));
+
+                source = source.replaceFirst(env, script.replace("\r", "\n").replace("\n", "\\n"));
+            }
+
+            var func = JSBridge.compileFunc(JSBridge.unityScope, name + "-init.js", source);
+            func.call(JSBridge.context, JSBridge.unityScope, JSBridge.unityScope, new Object[]{setFields});
+        }
+
+        translator.fields.clear();
+        translator.fields.putAll(setFields);
+        translator.name = name;
+
         var obj = (T)data.constructor.get(node, translator);
-        translator.fields = null;
+        translator.fields.clear();
 
         return obj;
     }
@@ -92,47 +117,23 @@ public class ObjectiveModel implements JsonSerializable{
     }
 
     public static class FieldTranslator{
-        private ObjectMap<String, Object> fields;
+        private String name;
+        private final ObjectMap<String, Object> fields = new ObjectMap<>();
 
-        public String val(String key){
-            return val(key, "");
+        public String name(){
+            return name;
         }
 
-        public String val(String key, String def){
-            return (String)fields.get(key, def);
+        public <T> T get(String name){
+            return (T)fields.getThrow(name, () -> new IllegalArgumentException("'" + name + "' not found"));
         }
 
-        public String valReq(String key){
-            var val = val(key, null);
-            if(val == null) throw new IllegalArgumentException("'" + key + "' not found");
-
-            return val;
+        public <T> T get(String name, T def){
+            return (T)fields.get(name, def);
         }
 
-        public Seq<String> arr(String key){
-            return (Seq<String>)fields.get(key);
-        }
-
-        public Seq<String> arrReq(String key){
-            var arr = (Seq<String>)fields.get(key);
-            if(arr == null) throw new IllegalArgumentException("'" + key + "' not found");
-
-            return arr;
-        }
-
-        public StringMap map(String key){
-            return (StringMap)fields.get(key);
-        }
-
-        public StringMap mapReq(String key){
-            var map = (StringMap)fields.get(key);
-            if(map == null) throw new IllegalArgumentException("'" + key + "' not found");
-
-            return map;
-        }
-
-        public boolean has(String key){
-            return fields.containsKey(key);
+        public boolean has(String name){
+            return fields.containsKey(name);
         }
     }
 
@@ -147,4 +148,8 @@ public class ObjectiveModel implements JsonSerializable{
             this.icon = icon;
         }
     }
+
+    @Target(ElementType.FIELD)
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface Ignore{}
 }

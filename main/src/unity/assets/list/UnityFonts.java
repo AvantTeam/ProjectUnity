@@ -5,6 +5,7 @@ import arc.freetype.FreeTypeFontGenerator.*;
 import arc.freetype.FreetypeFontLoader.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.scene.ui.layout.*;
 import unity.ui.*;
 
 import static mindustry.Vars.*;
@@ -32,6 +33,9 @@ public class UnityFonts{
         Core.assets.load("unity-code-pu", Font.class, new FreeTypeFontLoaderParameter("fonts/code.ttf", new FreeTypeFontParameter(){{
             size = 18;
             incremental = true;
-        }})).loaded = f -> code = UnityStyles.codeArea.font = UnityStyles.codeLabel.font = f;
+        }})).loaded = f -> {
+            code = UnityStyles.codeArea.font = UnityStyles.codeLabel.font = f;
+            code.getData().markupEnabled = true;
+        };
     }
 }

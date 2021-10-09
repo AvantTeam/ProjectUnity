@@ -12,11 +12,10 @@ import static unity.content.UnityItems.*;
 import static unity.content.UnityUnitTypes.*;
 
 @SuppressWarnings("all")
-public class UnityTechTree implements ContentList{
+public class UnityTechTree{
     private static TechNode context = null;
 
-    @Override
-    public void load(){
+    public static void load(){
         //region blocks
 
         attach(Blocks.surgeSmelter, () -> {
@@ -162,7 +161,7 @@ public class UnityTechTree implements ContentList{
     private static void node(UnlockableContent content, ItemStack[] requirements, Seq<Objective> objectives, Runnable children){
         TechNode node = new TechNode(context, content, requirements);
         if(objectives != null) node.objectives = objectives;
-        
+
         TechNode prev = context;
         context = node;
         children.run();
@@ -207,7 +206,7 @@ public class UnityTechTree implements ContentList{
     private static void nodeProduce(UnlockableContent content, Runnable children){
         nodeProduce(content, Seq.with(), children);
     }
-    
+
     private static void nodeProduce(UnlockableContent content){
         nodeProduce(content, Seq.with(), () -> {});
     }

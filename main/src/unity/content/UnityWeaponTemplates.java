@@ -3,7 +3,6 @@ package unity.content;
 import arc.func.*;
 import arc.graphics.*;
 import mindustry.content.*;
-import mindustry.ctype.*;
 import mindustry.entities.bullet.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -13,11 +12,10 @@ import unity.gen.*;
 import unity.graphics.*;
 import unity.type.*;
 
-public class UnityWeaponTemplates implements ContentList{
+public class UnityWeaponTemplates{
     public static CloneableSetWeapon apocalypseSmall, apocalypseLauncher, apocalypseLaser, waveformSmallMount, ultravioletMount, plagueSmallMount;
 
-    @Override
-    public void load(){
+    public static void load(){
         apocalypseSmall = new CloneableSetWeapon("unity-ravager-small-turret"){{
             reload = 2f * 60f;
             shootY = 6.5f;

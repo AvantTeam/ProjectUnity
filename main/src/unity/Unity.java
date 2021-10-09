@@ -14,6 +14,7 @@ import arc.util.serialization.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
+import mindustry.input.*;
 import mindustry.mod.*;
 import mindustry.world.blocks.environment.*;
 import unity.ai.kami.*;
@@ -25,7 +26,9 @@ import unity.async.*;
 import unity.content.*;
 import unity.editor.*;
 import unity.gen.*;
+import unity.map.*;
 import unity.map.cinematic.*;
+import unity.map.objectives.*;
 import unity.mod.*;
 import unity.sync.*;
 import unity.ui.*;
@@ -37,49 +40,48 @@ import static mindustry.Vars.*;
 
 @SuppressWarnings("unchecked")
 public class Unity extends Mod{
+    /** Abstract music handler; will be overridden in the separate music mod. */
     public static MusicHandler music;
+    /** Answers listeners for tapping. {@link Binding#boost} for desktop, screen taps for mobile. */ //TODO static-ify
     public static TapHandler tap;
+    /** Shared anti-cheat utilities, heavily based around content scoring system. */ //TODO why isn't this static h
     public static AntiCheat antiCheat;
+    /** Abstract developer build specification; dev builds allow users to have various developer accessibility. */
     public static DevBuild dev;
 
+    /** Editor listener that revolves around cinematic and sector objectives. */
     public static CinematicEditor cinematicEditor;
 
+    /** Credits dialog. Hey we made this mod we deserve it. */
     public static CreditsDialog creditsDialog;
+    /** JS scripts dialog for editing JS scripts in-game. */
     public static JSScriptDialog scriptsDialog;
+    /** Cinematic dialog, for editing {@link StoryNode}s bound to a {@link ScriptedSector}. */
     public static CinematicDialog cinematicDialog;
+    /** Heavily relies on {@link #cinematicDialog}, this dialog edits {@link ObjectiveModel} bound to a {@link StoryNode}. */
     public static ObjectivesDialog objectivesDialog;
 
+    /** Asynchronous process revolving around {@link Light} processing. */
     public static LightProcess lights;
+    /** Asynchronous process revolving around content scoring system. */
     public static ContentScoreProcess scoring;
 
+    /** All Unity's defined non-anonymous classes; the elements of this array will be generated. */
     @ListClasses
     public static final Seq<String> classes = Seq.with();
+    /** All Unity's defined packages; the elements of this array will be generated. */
     @ListPackages
     public static final Seq<String> packages = Seq.with("java.lang", "java.util", "java.io", "rhino");
 
-    private static final ContentList[] contents = {
-        new UnityItems(),
-        new UnityStatusEffects(),
-        new UnityWeathers(),
-        new UnityLiquids(),
-        new UnityBullets(),
-        new UnityWeaponTemplates(),
-        new UnityUnitTypes(),
-        new UnityBlocks(),
-        new UnityPlanets(),
-        new UnitySectorPresets(),
-        new UnityTechTree(),
-        new Parts(),
-        new Overwriter()
-    };
-
     public Unity(){
+        // Setup several asset loader bindings to clients.
         if(!headless){
             Core.assets.setLoader(Model.class, ".g3dj", new ModelLoader(tree, new JsonReader()));
             Core.assets.setLoader(Model.class, ".g3db", new ModelLoader(tree, new UBJsonReader()));
 
             Core.assets.setLoader(WavefrontObject.class, new WavefrontObjectLoader(tree));
 
+            // Differ the extension to use different asset loader, as mods have to use Vars.tree.
             var fontSuff = ".gen_pu";
             Core.assets.setLoader(FreeTypeFontGenerator.class, fontSuff, new FreeTypeFontGeneratorLoader(tree){
                 @Override
@@ -105,6 +107,8 @@ public class Unity extends Mod{
             });
         }
 
+        // Load several assets revolving around textures and fonts.
+        // Uses ContentInitEvent as it is practically equivalent to Content#load().
         Events.on(ContentInitEvent.class, e -> {
             if(!headless){
                 Regions.load();
@@ -115,6 +119,7 @@ public class Unity extends Mod{
             UnityStyles.load();
         });
 
+        // Load all assets once they're added into Vars.tree
         Events.on(FileTreeInitEvent.class, e -> Core.app.post(() -> {
             UnityShaders.load();
             UnityObjs.load();
@@ -122,6 +127,7 @@ public class Unity extends Mod{
             UnitySounds.load();
         }));
 
+        // These are irrelevant in servers.
         Events.on(ClientLoadEvent.class, e -> {
             creditsDialog = new CreditsDialog();
             scriptsDialog = new JSScriptDialog();
@@ -133,6 +139,7 @@ public class Unity extends Mod{
             UnitySettings.init();
             SpeechDialog.init();
 
+            // Recalibrate 3D camera transform before drawing.
             Triggers.listen(Trigger.preDraw, () -> {
                 var cam = Core.camera;
                 var cam3D = Models.camera;
@@ -142,6 +149,7 @@ public class Unity extends Mod{
                 cam3D.update();
             });
 
+            // Localize mod display name and description.
             var mod = mods.getMod(Unity.class);
 
             Func<String, String> stringf = value -> Core.bundle.get("mod." + mod.name + "." + value);
@@ -151,6 +159,7 @@ public class Unity extends Mod{
             Core.settings.getBoolOnce("unity-install", () -> Time.runTask(5f, CreditsDialog::showList));
         });
 
+        // Bind a world listener to the game every save. I wish there was specific events for game save, load, and entity draw.
         Events.on(SaveLoadEvent.class, s -> {
             var ent = Groups.all.find(e -> e instanceof WorldListener);
             if(ent instanceof WorldListener w){
@@ -190,6 +199,8 @@ public class Unity extends Mod{
             lights = new LightProcess(),
             scoring = new ContentScoreProcess()
         );
+
+        Core.app.post(JSBridge::init);
     }
 
     @Override
@@ -209,10 +220,20 @@ public class Unity extends Mod{
     public void loadContent(){
         Faction.init();
 
-        for(ContentList list : contents){
-            list.load();
-            print("Loaded contents list: " + list.getClass().getSimpleName());
-        }
+        // I don't see a reason to use ContentList[] here, creates unnecessary array and iteration and takes more lines of codes.
+        UnityItems.load();
+        UnityStatusEffects.load();
+        UnityWeathers.load();
+        UnityLiquids.load();
+        UnityBullets.load();
+        UnityWeaponTemplates.load();
+        UnityUnitTypes.load();
+        UnityBlocks.load();
+        UnityPlanets.load();
+        UnitySectorPresets.load();
+        UnityTechTree.load();
+        UnityParts.load();
+        Overwriter.load();
 
         FactionMeta.init();
         UnityEntityMapping.init();
@@ -223,7 +244,7 @@ public class Unity extends Mod{
     public void logContent(){
         for(var faction : Faction.all){
             var array = FactionMeta.getByFaction(faction, Object.class);
-            print(Strings.format("Faction @ has @ contents.", faction, array.size));
+            print(LogLevel.debug, "", Strings.format("Faction @ has @ contents.", faction, array.size));
         }
 
         Seq<Class<?>> ignored = Seq.with(Floor.class, Prop.class);

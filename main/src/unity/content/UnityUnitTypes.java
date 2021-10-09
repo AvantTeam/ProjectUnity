@@ -41,7 +41,7 @@ import unity.type.weapons.*;
 import static mindustry.Vars.*;
 import static unity.content.UnityWeaponTemplates.*;
 
-public class UnityUnitTypes implements ContentList{
+public class UnityUnitTypes{
     // global unit + copter
     public static @EntityDef({Unitc.class, Copterc.class})
     UnitType caelifera, schistocerca, anthophila, vespula, lepidoptera, mantodea;
@@ -153,8 +153,7 @@ public class UnityUnitTypes implements ContentList{
     // end naval
     public static @FactionDef("end") @EntityDef({Unitc.class, Endc.class, WaterMovec.class, Decorationc.class}) UnitType thalassophobia;
 
-    @Override
-    public void load(){
+    public static void load(){
         testLink = new UnityUnitType("test-link"){{
             defaultController = LinkedAI::new;
             rotationSpeed = 65f;
@@ -212,7 +211,7 @@ public class UnityUnitTypes implements ContentList{
                     lifetime = 30f;
                     shrinkY = 0.2f;
                 }};
-            }}, 
+            }},
             new Weapon(name + "-launcher"){{
                 reload = 30f;
                 x = 4.5f;
@@ -263,7 +262,7 @@ public class UnityUnitTypes implements ContentList{
                     lifetime = 36;
                     shrinkY = 0.2f;
                 }};
-            }}, 
+            }},
             new Weapon(name + "-gun"){{
                 top = false;
                 x = 4f;
@@ -279,7 +278,7 @@ public class UnityUnitTypes implements ContentList{
                     lifetime = 36f;
                     shrinkY = 0.2f;
                 }};
-            }}, 
+            }},
             new Weapon(name + "-gun-big"){{
                 x = 6.75f;
                 y = 5.75f;
@@ -411,7 +410,7 @@ public class UnityUnitTypes implements ContentList{
                 shotDelay = 2f;
                 shootSound = Sounds.shootSnap;
                 bullet = Bullets.standardThorium;
-            }}, 
+            }},
             new Weapon(name + "-laser-gun"){{
                 x = 13.5f;
                 y = 15.5f;
@@ -468,7 +467,7 @@ public class UnityUnitTypes implements ContentList{
                     shootEffect = Fx.shootBig;
                     smokeEffect = Fx.shootBigSmoke;
                 }};
-            }}, 
+            }},
             new Weapon(name + "-launcher"){{
                 x = 17f;
                 y = 14f;
@@ -491,7 +490,7 @@ public class UnityUnitTypes implements ContentList{
                     frontColor = Pal.missileYellow;
                     backColor = Pal.missileYellowBack;
                 }};
-            }}, 
+            }},
             new Weapon(name + "-gun-big"){{
                 rotate = true;
                 rotateSpeed = 3f;
@@ -1827,7 +1826,7 @@ public class UnityUnitTypes implements ContentList{
                     Draw.color(Color.white);
                     UnityDrawf.shiningCircle(unit.id, Time.time, wx, wy, 6.5f * charge, 5, 70f, 15f, 4f * charge, 360f);
                 };
-                
+
                 bullet = new HealingNukeBulletType(){{
                     allyStatus = StatusEffects.overclock;
                     allyStatusDuration = 15f * 60f;
@@ -4659,7 +4658,7 @@ public class UnityUnitTypes implements ContentList{
 
             legSplashRange = 120f;
             legSplashDamage = 1700f;
-            
+
             aimDst = hitSize / 2f;
 
             outlineColor = UnityPal.darkerOutline;

@@ -2,18 +2,17 @@ package younggamExperimental;
 
 import arc.struct.*;
 import mindustry.content.*;
-import mindustry.ctype.*;
 import unity.content.*;
 
 import static mindustry.type.ItemStack.*;
 
-public class Parts implements ContentList{
+public class UnityParts{
     public static final ObjectMap<String,PartInfo> parts = new ObjectMap<>();
 
     public static PartInfo
     gunBase, rotaryGunBase, gunBreach, grenadeBreach;
 
-    public void load(){
+    public static void load(){
         gunBase = new PartInfo("Gun base", "A basic gun base, very extendable", PartType.base, 0, 2, 1, 1,
             with(UnityItems.nickel, 10, Items.titanium, 5), new byte[]{5, 2, 5, 0}, new byte[]{0, 0, 0, 1},
             new PartStat(PartStatType.hp, 10), new PartStat(PartStatType.support, "[accent]1x [white]small turret"), new PartStat(PartStatType.reload, 10), new PartStat(PartStatType.heatAccumMult, 1f)

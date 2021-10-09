@@ -2,25 +2,22 @@ package unity.content;
 
 import arc.graphics.*;
 import mindustry.content.*;
-import mindustry.ctype.*;
 import mindustry.type.*;
 import unity.graphics.*;
 import unity.type.*;
 import unity.world.meta.*;
 import unity.world.meta.CrucibleRecipe.*;
 
-public class UnityItems implements ContentList{
-    public static Item//@formatter:off
+public class UnityItems{
+    public static Item
     //faction-alloys
     advanceAlloy, cupronickel, darkAlloy, dirium, lightAlloy, monolithAlloy, archDebris, plagueAlloy, sparkAlloy, superAlloy, terminaAlloy,
     terminationFragment, terminum,
-    //@formatter:on
     //faction items
     contagium, denseAlloy, imberium, irradiantSurge, luminum, monolite, nickel, steel, stone, umbrium, xenium;
 
-    @Override
-    public void load(){
-        //region faction-alloys     TODO separating these makes load order differ from js version. rearrange this?
+    public static void load(){
+        //region faction-alloys
 
         advanceAlloy = new Item("advance-alloy", Color.valueOf("748096")){{
             cost = 1.4f;

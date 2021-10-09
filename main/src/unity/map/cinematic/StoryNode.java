@@ -23,18 +23,19 @@ public class StoryNode implements JsonSerializable{
     public Seq<StoryNode> parents = new Seq<>();
 
     public ScriptedSector sector;
-
     public String name;
 
+    public StringMap scripts = new StringMap();
     public Seq<ObjectiveModel> objectiveModels = new Seq<>();
     public Seq<Objective> objectives = new Seq<>();
 
     @Override
     public void write(Json json){
         json.writeValue("sector", sector.name);
-        json.writeValue("parents", parents.map(n -> n.name), Seq.class, String.class);
         json.writeValue("name", name);
         json.writeValue("position", Float2.construct(position.x, position.y));
+        json.writeValue("scripts", scripts, ObjectMap.class, String.class);
+        json.writeValue("parents", parents.map(n -> n.name), Seq.class);
         json.writeValue("objectiveModels", objectiveModels, Seq.class, ObjectiveModel.class);
     }
 
@@ -43,18 +44,14 @@ public class StoryNode implements JsonSerializable{
         sector = content.getByName(ContentType.sector, data.getString("sector"));
         name = data.getString("name");
 
-        parentAliases.clear();
-        var jParents = json.readValue(Seq.class, String.class, data.require("parents"));
-        if(jParents != null) parentAliases.addAll(jParents);
+        long pos = data.getLong("position");
+        position.set(Float2.x(pos), Float2.y(pos));
 
-        if(data.has("position")){
-            long pos = data.getLong("position");
-            position.set(Float2.x(pos), Float2.y(pos));
-        }
+        scripts.clear();
+        scripts.putAll(json.readValue(ObjectMap.class, String.class, data.require("scripts"), String.class));
 
-        objectiveModels.clear();
-        var jObjects = json.readValue(Seq.class, ObjectiveModel.class, data.require("objectiveModels"));
-        if(jObjects != null) objectiveModels.addAll(jObjects);
+        parentAliases.set(json.readValue(Seq.class, String.class, data.require("parents")));
+        objectiveModels.set(json.readValue(Seq.class, ObjectiveModel.class, data.require("objectiveModels")));
     }
 
     public void createObjectives(){

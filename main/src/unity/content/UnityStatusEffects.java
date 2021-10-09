@@ -4,7 +4,6 @@ import arc.graphics.*;
 import arc.math.*;
 import arc.util.*;
 import mindustry.content.*;
-import mindustry.ctype.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -13,11 +12,10 @@ import unity.graphics.*;
 
 import static unity.content.UnityFx.*;
 
-public class UnityStatusEffects implements ContentList{
+public class UnityStatusEffects{
     public static StatusEffect disabled, weaken, plasmaed, radiation, reloadFatigue, blueBurn, molten, tpCoolDown, teamConverted, boosted, distort, plated;
 
-    @Override
-    public void load(){
+    public static void load(){
         disabled = new StatusEffect("disabled"){{
             reloadMultiplier = 0f;
             speedMultiplier = 0f;
