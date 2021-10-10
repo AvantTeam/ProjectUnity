@@ -25,8 +25,8 @@ public class CinematicEditor extends EditorListener{
 
     @Override
     public void begin(){
-        nodes.set(sector().storyNodes);
-        sector().storyNodes.clear();
+        nodes.set(sector().nodes);
+        sector().nodes.clear();
 
         cinematicDialog.begin();
     }
@@ -45,7 +45,7 @@ public class CinematicEditor extends EditorListener{
     }
 
     public void apply() throws Exception{
-        editor.tags.put("storyNodes", JsonIO.json.toJson(nodes, Seq.class, StoryNode.class));
+        editor.tags.put("nodes", JsonIO.json.toJson(nodes, Seq.class, StoryNode.class));
         sector().setNodes(nodes);
     }
 }

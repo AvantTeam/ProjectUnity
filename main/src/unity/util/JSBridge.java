@@ -65,12 +65,12 @@ public final class JSBridge{
     }
 
     public static Function compileFunc(Scriptable scope, String sourceName, String source){
-        if(tools) return null;
+        if(tools) throw new IllegalStateException();
         return compileFunc(scope, sourceName, source, 1);
     }
 
     public static Function compileFunc(Scriptable scope, String sourceName, String source, int lineNum){
-        if(tools) return null;
+        if(tools) throw new IllegalStateException();
         return context.compileFunction(scope, source, sourceName, lineNum);
     }
 }

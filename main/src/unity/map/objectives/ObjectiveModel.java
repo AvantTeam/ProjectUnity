@@ -151,5 +151,8 @@ public class ObjectiveModel implements JsonSerializable{
 
     @Target(ElementType.FIELD)
     @Retention(RetentionPolicy.RUNTIME)
-    public @interface Ignore{}
+    public @interface Ignore{
+        /** @return The children objectives in which this field will be ignored in. */
+        Class<?>[] value() default {};
+    }
 }

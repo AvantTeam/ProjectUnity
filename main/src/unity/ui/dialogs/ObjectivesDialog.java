@@ -21,6 +21,7 @@ public class ObjectivesDialog extends BaseDialog{
     private final Seq<ObjectiveModel> models = new Seq<>();
 
     private Table content;
+    private final ObjectMap<Class<? extends Objective>, Seq<Field>> fields = new ObjectMap<>();
 
     public ObjectivesDialog(){
         super("@dialog.cinematic.objectives");
@@ -59,6 +60,35 @@ public class ObjectivesDialog extends BaseDialog{
         }
 
         return "objective" + (i + 1);
+    }
+
+    private Seq<Field> getFields(Class<? extends Objective> type){
+        return fields.get(type, () -> {
+            Seq<Field> all = new Seq<>();
+
+            Class<?> current = type;
+            while(true){
+                for(var f : current.getDeclaredFields()){
+                    if(Modifier.isStatic(f.getModifiers())) continue;
+
+                    var anno = f.getAnnotation(Ignore.class);
+                    if(anno != null){
+                        var descend = anno.value();
+                        if(descend.length == 0 || Structs.contains(descend, c -> c.isAssignableFrom(type))) continue;
+                    }
+
+                    all.add(f);
+                }
+
+                if(current == Objective.class){
+                    break;
+                }else{
+                    current = current.getSuperclass();
+                }
+            }
+
+            return all;
+        });
     }
 
     @Override
@@ -163,19 +193,17 @@ public class ObjectivesDialog extends BaseDialog{
             }else{
                 fields.table(t -> {
                     t.add("Fields", Styles.outlineLabel).get().setAlignment(Align.left);
-                    t.row().image(Tex.whiteui).growX().height(3f).color(Tmp.c1.set(color).mul(0.5f));
+                    t.row().image(Tex.whiteui).growX().height(3f).color(Tmp.c1.set(color).mul(0.5f)).padTop(8f);
                 }).growX().fillY().padLeft(8f).padRight(8f).padBottom(8f);
 
                 fields.row().table(t -> {
-                    for(var f : model.type.getDeclaredFields()){
-                        if(f.isAnnotationPresent(Ignore.class) || Modifier.isStatic(f.getModifiers())) continue;
-
+                    for(var f : getFields(model.type)){
                         t.add(f.getName(), Styles.outlineLabel).growX();
                         t.add(" | ", Styles.outlineLabel);
                         t.add(f.getGenericType().getTypeName(), Styles.outlineLabel).growX();
                         t.row();
                     }
-                }).grow().padLeft(8f).padRight(8f);
+                }).grow().padLeft(8f).padRight(8f).padTop(8f);
             }
         }
 

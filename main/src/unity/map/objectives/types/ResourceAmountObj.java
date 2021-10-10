@@ -35,7 +35,7 @@ public class ResourceAmountObj extends Objective{
     public static void setup(){
         ObjectiveModel.setup(ResourceAmountObj.class, Pal.accent, () -> Icon.crafting, (node, f) -> {
             var items = f.get("items", ItemStack.with());
-            var team = f.get("team", Team.sharded);
+            var team = f.get("team", state.rules.defaultTeam);
 
             var exec = f.get("executor", "function(objective){}");
             var func = JSBridge.compileFunc(JSBridge.unityScope, f.name() + "-executor.js", exec, 1);
@@ -74,85 +74,85 @@ public class ResourceAmountObj extends Objective{
     public void init(){
         super.init();
 
-        if(!headless){
-            ui.hudGroup.fill(table -> {
-                table.name = name;
+        if(headless) return;
+        ui.hudGroup.fill(table -> {
+            table.name = name;
 
-                table.actions(
-                    Actions.scaleTo(0f, 1f),
-                    Actions.visible(true),
-                    Actions.scaleTo(1f, 1f, 0.07f, Interp.pow3Out)
-                );
+            table.actions(
+                Actions.scaleTo(0f, 1f),
+                Actions.visible(true),
+                Actions.scaleTo(1f, 1f, 0.07f, Interp.pow3Out)
+            );
 
-                table.center().left();
+            table.center().left();
 
-                var cell = table.table(Styles.black6, t -> {
-                    container = t;
+            var cell = table.table(Styles.black6, t -> {
+                container = t;
 
-                    var pane = t.pane(Styles.defaultPane, cont -> {
-                        cont.defaults().pad(4f);
+                var pane = t.pane(Styles.defaultPane, cont -> {
+                    cont.defaults().pad(4f);
 
-                        for(int i = 0; i < items.length; i++){
-                            if(i > 0) cont.row();
+                    for(int i = 0; i < items.length; i++){
+                        if(i > 0) cont.row();
 
-                            var item = items[i];
-                            cont.table(Styles.black3, hold -> {
-                                hold.defaults().pad(4f);
+                        var item = items[i];
+                        cont.table(Styles.black3, hold -> {
+                            hold.defaults().pad(4f);
 
-                                hold.left();
-                                hold.image(() -> item.item.uiIcon)
-                                    .size(iconMed);
+                            hold.left();
+                            hold.image(() -> item.item.uiIcon)
+                                .size(iconMed);
 
-                                hold.right();
-                                hold.labelWrap(() -> {
-                                    int amount = Math.min(state.teams.playerCores().sum(b -> b.items.get(item.item)), item.amount);
-                                    return
-                                        "[#" + Tmp.c1.set(from).lerp(to, (float)amount / (float)item.amount).toString() + "]" + amount +
-                                        " []/ [accent]" + item.amount + "[]";
-                                })
-                                    .grow()
-                                    .get()
-                                    .setAlignment(Align.right);
+                            hold.right();
+                            hold.labelWrap(() -> {
+                                int amount = Math.min(state.teams.playerCores().sum(b -> b.items.get(item.item)), item.amount);
+                                return
+                                    "[#" + Tmp.c1.set(from).lerp(to, (float)amount / (float)item.amount).toString() + "]" + amount +
+                                    " []/ [accent]" + item.amount + "[]";
                             })
-                                .height(40f)
-                                .growX()
-                                .left();
+                                .grow()
+                                .get()
+                                .setAlignment(Align.right);
+                        })
+                            .height(40f)
+                            .growX()
+                            .left();
+                    }
+                })
+                    .update(p -> {
+                        if(p.hasScroll()){
+                            var result = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
+                            if(result == null || !result.isDescendantOf(p)){
+                                Core.scene.setScrollFocus(null);
+                            }
                         }
                     })
-                        .update(p -> {
-                            if(p.hasScroll()){
-                                var result = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
-                                if(result == null || !result.isDescendantOf(p)){
-                                    Core.scene.setScrollFocus(null);
-                                }
-                            }
-                        })
-                        .grow()
-                        .pad(4f, 0f, 4f, 4f)
-                        .get();
+                    .grow()
+                    .pad(4f, 0f, 4f, 4f)
+                    .get();
 
-                    pane.setScrollingDisabled(true, false);
-                    pane.setOverscroll(false, false);
-                })
-                    .minSize(300f, 48f)
-                    .maxSize(300f, 156f);
+                pane.setScrollingDisabled(true, false);
+                pane.setOverscroll(false, false);
+            })
+                .minSize(300f, 48f)
+                .maxSize(300f, 156f);
 
-                cell.visible(() -> ui.hudfrag.shown && node.sector.valid() && container == cell.get());
-            });
-        }
+            cell.visible(() -> ui.hudfrag.shown && node.sector.valid() && container == cell.get());
+        });
     }
 
     @Override
-    public boolean completed(){
-        if(state.teams.cores(team).isEmpty()) return false;
+    public void update(){
+        super.update();
 
+        var core = state.teams.cores(team).firstOpt();
+        if(core == null || !core.isValid()) return;
+
+        completed = true;
         for(var item : items){
-            if(state.teams.cores(team).sum(b -> b.items.get(item.item)) < item.amount){
-                return false;
-            }
+            completed = core.items.get(item.item) >= item.amount;
+            if(!completed) break;
         }
-
-        return true;
     }
 
     @Override

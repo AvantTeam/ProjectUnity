@@ -4,6 +4,7 @@ import arc.*;
 import arc.func.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.io.*;
 import mindustry.core.GameState.*;
 import mindustry.game.EventType.*;
 import mindustry.io.*;
@@ -13,6 +14,9 @@ import unity.map.objectives.*;
 import unity.mod.*;
 import unity.mod.Triggers.*;
 
+import java.io.*;
+import java.nio.charset.*;
+
 import static mindustry.Vars.*;
 
 /** @author GlennFolker */
@@ -20,7 +24,7 @@ import static mindustry.Vars.*;
 public class ScriptedSector extends SectorPreset{
     protected boolean added = false;
 
-    public final Seq<StoryNode> storyNodes = new Seq<>();
+    public final Seq<StoryNode> nodes = new Seq<>();
 
     protected final Cons<Trigger> updater = Triggers.cons(this::update);
     protected final Cons<Triggers> drawer = Triggers.cons(this::draw);
@@ -28,10 +32,16 @@ public class ScriptedSector extends SectorPreset{
         Triggers.listen(Trigger.update, updater);
         Triggers.listen(Triggers.drawEnt, drawer);
 
-        storyNodes.each(StoryNode::init);
+        nodes.each(StoryNode::init);
 
         Triggers.detach(Trigger.newGame, this.starter);
     });
+
+    private static final ReusableByteInStream ins = new ReusableByteInStream();
+    private static final Reads read = new Reads(new DataInputStream(ins));
+
+    private static final ReusableByteOutStream outs = new ReusableByteOutStream();
+    private static final Writes write = new Writes(new DataOutputStream(outs));
 
     public ScriptedSector(String name, Planet planet, int sector){
         super(name, planet, sector);
@@ -57,11 +67,11 @@ public class ScriptedSector extends SectorPreset{
             return;
         }
 
-        for(var node : storyNodes) if(node.shouldUpdate()) node.update();
+        for(var node : nodes) if(node.shouldUpdate()) node.update();
     }
 
     public void draw(){
-        storyNodes.each(StoryNode::draw);
+        nodes.each(StoryNode::draw);
     }
 
     public boolean valid(){
@@ -73,16 +83,39 @@ public class ScriptedSector extends SectorPreset{
         ));
     }
 
-    public void saveState(){}
+    public void saveState(){
+        var map = new StringMap();
+        for(var node : nodes){
+            outs.reset();
 
-    public void loadState(){}
+            write.b(node.revision());
+            node.save(write);
+
+            map.put(node.name, new String(outs.getBytes(), 0, outs.size(), StandardCharsets.UTF_8));
+        }
+
+        state.rules.tags.put(name + "-nodes", JsonIO.json.toJson(map, StringMap.class, String.class));
+    }
+
+    public void loadState(){
+        var map = JsonIO.json.fromJson(StringMap.class, String.class, state.rules.tags.get(name + "-nodes", "{}"));
+        for(var e : map.entries()){
+            var node = nodes.find(n -> n.name.equals(e.key));
+            if(node == null) throw new IllegalStateException("'" + e.key + "' node not found!");
+
+            ins.setBytes(e.value.getBytes(StandardCharsets.UTF_8));
+
+            byte rev = read.b();
+            node.load(read, rev);
+        }
+    }
 
     @Override
     public void init(){
         super.init();
         Core.app.post(() -> {
             try{
-                setNodes(JsonIO.json.fromJson(Seq.class, StoryNode.class, generator.map.tags.get("storyNodes", "[]")));
+                setNodes(JsonIO.json.fromJson(Seq.class, StoryNode.class, generator.map.tags.get("nodes", "[]")));
             }catch(Throwable t){
                 if(ui == null){
                     Log.err(t);
@@ -94,8 +127,8 @@ public class ScriptedSector extends SectorPreset{
     }
 
     public void setNodes(Seq<StoryNode> nodes){
-        storyNodes.set(nodes);
-        storyNodes.each(StoryNode::createObjectives);
-        storyNodes.each(e -> e.objectives.each(Objective::resolveDependencies));
+        this.nodes.set(nodes);
+        this.nodes.each(StoryNode::createObjectives);
+        this.nodes.each(e -> e.objectives.each(Objective::resolveDependencies));
     }
 }

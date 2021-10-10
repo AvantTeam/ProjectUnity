@@ -1,34 +1,34 @@
 package unity.map.objectives;
 
-import arc.*;
 import arc.func.*;
 import arc.struct.*;
+import arc.util.io.*;
 import unity.map.cinematic.*;
 import unity.map.objectives.ObjectiveModel.*;
+import unity.map.objectives.types.*;
 import unity.util.*;
-
-import static mindustry.Vars.*;
 
 /** @author GlennFolker */
 @SuppressWarnings("unchecked")
 public abstract class Objective{
     /** The name of this objective. It is your responsibility to differ the name from other objectiveModels. */
-    public final String name;
+    public final @Ignore String name;
 
     public final Cons<Objective> executor;
-    public final StoryNode node;
+    public final @Ignore StoryNode node;
 
-    public final int executions;
-    protected int execution;
+    public final @Ignore(ResourceAmountObj.class) int executions;
+    protected @Ignore int execution;
+    protected @Ignore boolean completed;
 
-    private boolean finalized;
+    private @Ignore boolean finalized;
 
     public Cons<Objective> init = objective -> {};
     public Cons<Objective> update = objective -> {};
     public Cons<Objective> draw = objective -> {};
 
-    public Seq<Objective> dependencies = new Seq<>();
-    private final Seq<String> depAliases = new Seq<>();
+    public final @Ignore Seq<Objective> dependencies = new Seq<>();
+    public final Seq<String> depAliases = new Seq<>();
 
     public <T extends Objective> Objective(StoryNode node, String name, int executions, Cons<T> executor){
         this.name = name;
@@ -46,7 +46,7 @@ public abstract class Objective{
             var otherNode = dep.substring(0, separator);
             var otherDep = dep.substring(separator + 1);
 
-            var n = node.sector.storyNodes.find(e -> e.name.equals(otherNode));
+            var n = node.sector.nodes.find(e -> e.name.equals(otherNode));
             if(n != null){
                 var o = n.objectives.find(e -> e.name.equals(otherDep));
                 if(o != null) depend(o);
@@ -89,9 +89,9 @@ public abstract class Objective{
             };
         }
 
-        if(f.has("dependencies")){
+        if(f.has("depAliases")){
             depAliases.clear();
-            depAliases.addAll(f.<Iterable<String>>get("dependencies"));
+            depAliases.addAll(f.<Iterable<String>>get("depAliases"));
         }
     }
 
@@ -139,30 +139,20 @@ public abstract class Objective{
         return this;
     }
 
-    protected String saveEntry(){
-        return "unity.sector-objective-" + name + "-" + control.saves.getCurrent().getName();
+    public void save(Writes write){
+        write.i(execution);
+        write.bool(completed);
+        write.bool(finalized);
     }
 
-    protected void set(String key, Object value){
-        Core.settings.put(saveEntry() + "." + key, value);
+    public void load(Reads read, byte revision){
+        execution = read.i();
+        completed = read.bool();
+        finalized = read.bool();
     }
 
-    protected <T> T get(String key){
-        return get(key, null);
-    }
-
-    protected <T> T get(String key, T def){
-        return (T)Core.settings.get(saveEntry() + "." + key, def);
-    }
-
-    public void save(){
-        set("execution", execution);
-        set("finalized", finalized);
-    }
-
-    public void load(){
-        execution = get("execution", 0);
-        finalized = get("finalized", false);
+    public byte revision(){
+        return 0;
     }
 
     public void execute(){
@@ -170,7 +160,9 @@ public abstract class Objective{
         executor.get(this);
     }
 
-    public abstract boolean completed();
+    public boolean completed(){
+        return completed;
+    }
 
     public boolean isExecuted(){
         return execution >= executions;
