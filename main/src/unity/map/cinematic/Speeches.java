@@ -20,8 +20,8 @@ import unity.ui.*;
 
 import static mindustry.Vars.*;
 
-public class SpeechDialog{
-    public static SpeechDialog dialog;
+public class Speeches{
+    public static Speeches dialog;
     private static boolean shown;
     private static boolean initialized;
 
@@ -30,15 +30,15 @@ public class SpeechDialog{
     public final Prov<Drawable> image;
     public final Prov<Color> color;
 
-    protected SpeechDialog parent;
-    protected SpeechDialog next;
+    protected Speeches parent;
+    protected Speeches next;
     private boolean done;
 
     public static void init(){
         if(initialized) return;
         initialized = true;
 
-        dialog = new SpeechDialog();
+        dialog = new Speeches();
 
         placement().row()
             .table(Tex.buttonRight, t -> {
@@ -102,7 +102,7 @@ public class SpeechDialog{
 
                 if(dialog.next != null && dialog.next.done){
                     if(dialog.next.next != null){
-                        SpeechDialog child = dialog.next.next;
+                        Speeches child = dialog.next.next;
                         dialog.next.parent = null;
                         dialog.next.next = null;
 
@@ -122,14 +122,14 @@ public class SpeechDialog{
             .name("speechdialog");
     }
 
-    private SpeechDialog(){
+    private Speeches(){
         title = null;
         content = null;
         image = null;
         color = null;
     }
 
-    protected SpeechDialog(SpeechDialog parent, Prov<CharSequence> title, String content, Sound sound, float speed, Prov<Drawable> image, Prov<Color> color){
+    protected Speeches(Speeches parent, Prov<CharSequence> title, String content, Sound sound, float speed, Prov<Drawable> image, Prov<Color> color){
         this.parent = parent;
         this.title = title;
         this.content = new SpeechProvider(content, sound, speed);
@@ -137,30 +137,30 @@ public class SpeechDialog{
         this.color = color;
     }
 
-    public SpeechDialog show(String title, String content){
+    public Speeches show(String title, String content){
         return show(() -> title, content, Sounds.click, 1f, () -> Core.atlas.drawable("clear"), () -> Pal.accent);
     }
 
-    public SpeechDialog show(String title, String content, Drawable image, Color color){
+    public Speeches show(String title, String content, Drawable image, Color color){
         return show(() -> title, content, Sounds.click, 1f, () -> image, () -> color);
     }
 
-    public SpeechDialog show(String title, String content, TextureRegion image, Color color){
+    public Speeches show(String title, String content, TextureRegion image, Color color){
         Drawable draw = new TextureRegionDrawable(image);
         return show(() -> title, content, Sounds.click, 1f, () -> draw, () -> color);
     }
 
     // javascript's a bitch
-    public SpeechDialog show(String title, String content, Sound sound, float speed, Drawable image, Color color){
+    public Speeches show(String title, String content, Sound sound, float speed, Drawable image, Color color){
         return show(() -> title, content, sound, speed, () -> image, () -> color);
     }
 
-    public SpeechDialog show(Prov<CharSequence> title, String content, Sound sound, float speed, Prov<Drawable> image, Prov<Color> color){
-        return last().next = new SpeechDialog(this, title, content, sound, speed, image, color);
+    public Speeches show(Prov<CharSequence> title, String content, Sound sound, float speed, Prov<Drawable> image, Prov<Color> color){
+        return last().next = new Speeches(this, title, content, sound, speed, image, color);
     }
 
-    public SpeechDialog last(){
-        SpeechDialog current = this;
+    public Speeches last(){
+        Speeches current = this;
         while(current.next != null){
             current = current.next;
         }
@@ -231,7 +231,7 @@ public class SpeechDialog{
     }
 
     protected static class SpeechUpdateAction extends Action{
-        protected SpeechDialog dialog;
+        protected Speeches dialog;
 
         @Override
         public boolean act(float delta){
@@ -249,7 +249,7 @@ public class SpeechDialog{
             dialog = null;
         }
 
-        protected SpeechUpdateAction dialog(SpeechDialog dialog){
+        protected SpeechUpdateAction dialog(Speeches dialog){
             this.dialog = dialog;
             return this;
         }

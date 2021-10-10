@@ -149,7 +149,7 @@ public class Unity extends Mod{
             addCredits();
 
             UnitySettings.init();
-            SpeechDialog.init();
+            Speeches.init();
             Cutscene.init();
 
             // Recalibrate 3D camera transform before drawing.
