@@ -150,6 +150,7 @@ public class Unity extends Mod{
 
             UnitySettings.init();
             SpeechDialog.init();
+            Cutscene.init();
 
             // Recalibrate 3D camera transform before drawing.
             Triggers.listen(Trigger.preDraw, () -> {
@@ -172,7 +173,7 @@ public class Unity extends Mod{
         });
 
         // Bind a world listener to the game every save. I wish there was specific events for game save, load, and entity draw.
-        // TODO obsolete, this should be removed after my pr is merged. that is if it will be merged.
+        // TODO obsolete, this should be removed
         Events.on(SaveLoadEvent.class, s -> {
             var ent = Groups.all.find(e -> e instanceof WorldListener);
             if(ent instanceof WorldListener w){
