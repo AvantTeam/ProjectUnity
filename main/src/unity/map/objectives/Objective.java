@@ -2,11 +2,12 @@ package unity.map.objectives;
 
 import arc.func.*;
 import arc.struct.*;
-import arc.util.io.*;
 import unity.map.cinematic.*;
 import unity.map.objectives.ObjectiveModel.*;
 import unity.map.objectives.types.*;
 import unity.util.*;
+
+import static java.lang.String.*;
 
 /** @author GlennFolker */
 @SuppressWarnings("unchecked")
@@ -137,20 +138,16 @@ public abstract class Objective{
         return this;
     }
 
-    public void save(Writes write){
-        write.i(execution);
-        write.bool(completed);
-        write.bool(finalized);
+    public void save(StringMap map){
+        map.put("execution", valueOf(execution));
+        map.put("completed", valueOf(completed));
+        map.put("finalized", valueOf(finalized));
     }
 
-    public void load(Reads read, byte revision){
-        execution = read.i();
-        completed = read.bool();
-        finalized = read.bool();
-    }
-
-    public byte revision(){
-        return 0;
+    public void load(StringMap map){
+        execution = map.getInt("execution");
+        completed = map.getBool("completed");
+        finalized = map.getBool("finalized");
     }
 
     public void execute(){

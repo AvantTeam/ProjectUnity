@@ -74,7 +74,7 @@ public class ResourceAmountObj extends Objective{
     public void init(){
         super.init();
 
-        if(headless) return;
+        if(headless || completed()) return;
         ui.hudGroup.fill(table -> {
             table.name = name;
 

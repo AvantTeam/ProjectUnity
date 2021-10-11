@@ -2,7 +2,6 @@ package unity.map.cinematic;
 
 import arc.math.geom.*;
 import arc.struct.*;
-import arc.util.io.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
 import mindustry.ctype.*;
@@ -11,9 +10,6 @@ import unity.gen.*;
 import unity.map.*;
 import unity.map.objectives.*;
 import unity.ui.dialogs.canvas.CinematicCanvas.*;
-
-import java.io.*;
-import java.nio.charset.*;
 
 import static mindustry.Vars.*;
 
@@ -35,12 +31,6 @@ public class StoryNode implements JsonSerializable{
     public Seq<Objective> objectives = new Seq<>();
 
     protected boolean update = false, completed = false;
-
-    private static final ReusableByteInStream ins = new ReusableByteInStream();
-    private static final Reads read = new Reads(new DataInputStream(ins));
-
-    private static final ReusableByteOutStream outs = new ReusableByteOutStream();
-    private static final Writes write = new Writes(new DataOutputStream(outs));
 
     @Override
     public void write(Json json){
@@ -127,34 +117,21 @@ public class StoryNode implements JsonSerializable{
         if(!parents.contains(other) && !other.parents.contains(this)) parents.add(other);
     }
 
-    public void save(Writes w){
-        var map = new StringMap();
+    public void save(StringMap map){
         for(var obj : objectives){
-            outs.reset();
+            var child = new StringMap();
+            obj.save(child);
 
-            write.b(obj.revision());
-            obj.save(write);
-
-            map.put(obj.name, new String(outs.getBytes(), 0, outs.size(), StandardCharsets.UTF_8));
+            map.put(obj.name, JsonIO.json.toJson(child, StringMap.class, String.class));
         }
-
-        w.str(JsonIO.json.toJson(map, StringMap.class, String.class));
     }
 
-    public void load(Reads r, byte revision){
-        var map = JsonIO.json.fromJson(StringMap.class, String.class, r.str());
+    public void load(StringMap map){
         for(var e : map.entries()){
             var obj = objectives.find(o -> o.name.equals(e.key));
-            if(obj == null) throw new IllegalStateException("'" + e.key + "' objective not found!");
+            if(obj == null) throw new IllegalStateException("Objective '" + e.key + "' not found!");
 
-            ins.setBytes(e.value.getBytes(StandardCharsets.UTF_8));
-
-            byte rev = read.b();
-            obj.load(read, rev);
+            obj.load(map);
         }
-    }
-
-    public byte revision(){
-        return 0;
     }
 }

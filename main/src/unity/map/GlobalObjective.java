@@ -1,4 +1,4 @@
-package unity.type;
+package unity.map;
 
 import arc.*;
 
@@ -20,7 +20,7 @@ public enum GlobalObjective{
         update();
 
         long value = 0;
-        for(GlobalObjective objective : objectives){
+        for(var objective : objectives){
             value |= objective.value();
         }
 

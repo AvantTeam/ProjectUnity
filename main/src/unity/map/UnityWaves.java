@@ -1,4 +1,4 @@
-package unity.type.sector;
+package unity.map;
 
 import arc.func.*;
 import arc.math.*;
@@ -39,7 +39,7 @@ public final class UnityWaves{
                 for(int i = start; i < cap;){
                     int f = i;
                     int next = rand.random(8, 16) + (int)Mathf.lerp(5f, 0f, difficulty) + curTier * 4;
-    
+
                     float shieldAmount = Math.max((i - shieldStart) * shieldsPerWave, 0);
                     int space = start == 0 ? 1 : rand.random(1, 2);
                     int ctier = curTier;
@@ -114,7 +114,7 @@ public final class UnityWaves{
                 shieldScaling = shieldsPerWave;
                 effect = StatusEffects.boss;
             }});
-    
+
             int finalBossStart = 120 + rand.random(30);
 
             out.add(new SpawnGroup(Structs.random(species)[bossTier]){{
@@ -141,7 +141,7 @@ public final class UnityWaves{
 
             if(attack && difficulty >= 0.5){
                 int amount = Mathf.random(1, 3 + (int)(difficulty*2));
-    
+
                 for(int i = 0; i < amount; i++){
                     int wave = Mathf.random(3, 20);
                     out.add(new SpawnGroup(mega){{

@@ -16,8 +16,8 @@ import mindustry.world.*;
 import unity.*;
 import unity.content.*;
 import unity.graphics.*;
+import unity.map.*;
 import unity.mod.*;
-import unity.type.sector.*;
 import unity.world.blocks.LoreMessageBlock.*;
 
 import static mindustry.Vars.*;

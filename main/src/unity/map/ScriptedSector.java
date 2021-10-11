@@ -4,16 +4,13 @@ import arc.*;
 import arc.func.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
+import mindustry.core.GameState.*;
 import mindustry.game.EventType.*;
 import mindustry.io.*;
 import mindustry.type.*;
 import unity.map.cinematic.*;
 import unity.map.objectives.*;
 import unity.mod.*;
-
-import java.io.*;
-import java.nio.charset.*;
 
 import static mindustry.Vars.*;
 
@@ -26,31 +23,19 @@ public class ScriptedSector extends SectorPreset{
     protected final Cons<Trigger> updater = Triggers.cons(this::update);
     protected final Cons<Trigger> drawer = Triggers.cons(this::draw);
 
-    private static final ReusableByteInStream ins = new ReusableByteInStream();
-    private static final Reads read = new Reads(new DataInputStream(ins));
-
-    private static final ReusableByteOutStream outs = new ReusableByteOutStream();
-    private static final Writes write = new Writes(new DataOutputStream(outs));
-
     public ScriptedSector(String name, Planet planet, int sector){
         super(name, planet, sector);
 
-        Events.on(SaveWriteEvent.class, e -> {
-            if(added && valid()) saveState();
-        });
+        Events.on(SaveWriteEvent.class, e -> saveState());
+        Events.on(SaveLoadEvent.class, e -> loadState());
 
-        Events.on(SaveLoadEvent.class, e -> {
-            boolean valid = valid();
-            if(!added && valid){
+        Events.on(StateChangeEvent.class, e -> {
+            if(!added && e.to == State.playing && valid()){
                 added = true;
                 Triggers.listen(Trigger.update, updater);
                 Triggers.listen(Trigger.drawOver, drawer);
 
                 nodes.each(StoryNode::init);
-            }
-
-            if(valid){
-                loadState();
             }
         });
     }
@@ -81,29 +66,28 @@ public class ScriptedSector extends SectorPreset{
     }
 
     public void saveState(){
+        if(!added || !valid()) return;
+
         var map = new StringMap();
         for(var node : nodes){
-            outs.reset();
+            var child = new StringMap();
+            node.save(child);
 
-            write.b(node.revision());
-            node.save(write);
-
-            map.put(node.name, new String(outs.getBytes(), 0, outs.size(), StandardCharsets.UTF_8));
+            map.put(node.name, JsonIO.json.toJson(child, StringMap.class, String.class));
         }
 
+        Log.info(map);
         state.rules.tags.put(name + "-nodes", JsonIO.json.toJson(map, StringMap.class, String.class));
     }
 
     public void loadState(){
         var map = JsonIO.json.fromJson(StringMap.class, String.class, state.rules.tags.get(name + "-nodes", "{}"));
+        Log.info(map);
         for(var e : map.entries()){
             var node = nodes.find(n -> n.name.equals(e.key));
-            if(node == null) throw new IllegalStateException("'" + e.key + "' node not found!");
+            if(node == null) throw new IllegalStateException("Node '" + e.key + "' not found!");
 
-            ins.setBytes(e.value.getBytes(StandardCharsets.UTF_8));
-
-            byte rev = read.b();
-            node.load(read, rev);
+            node.load(JsonIO.json.fromJson(StringMap.class, String.class, e.value));
         }
     }
 
