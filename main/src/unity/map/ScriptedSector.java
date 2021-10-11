@@ -5,7 +5,6 @@ import arc.func.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
-import mindustry.core.GameState.*;
 import mindustry.game.EventType.*;
 import mindustry.io.*;
 import mindustry.type.*;
@@ -21,20 +20,11 @@ import static mindustry.Vars.*;
 /** @author GlennFolker */
 @SuppressWarnings("unchecked")
 public class ScriptedSector extends SectorPreset{
-    protected boolean added = false;
-
     public final Seq<StoryNode> nodes = new Seq<>();
 
+    protected boolean added = false;
     protected final Cons<Trigger> updater = Triggers.cons(this::update);
     protected final Cons<Trigger> drawer = Triggers.cons(this::draw);
-    protected final Cons<Trigger> starter = Triggers.cons(() -> {
-        Triggers.listen(Trigger.update, updater);
-        Triggers.listen(Trigger.drawOver, drawer);
-
-        nodes.each(StoryNode::init);
-
-        Triggers.detach(Trigger.newGame, this.starter);
-    });
 
     private static final ReusableByteInStream ins = new ReusableByteInStream();
     private static final Reads read = new Reads(new DataInputStream(ins));
@@ -45,21 +35,25 @@ public class ScriptedSector extends SectorPreset{
     public ScriptedSector(String name, Planet planet, int sector){
         super(name, planet, sector);
 
-        Events.on(StateChangeEvent.class, e -> {
-            if(e.to == State.playing && !added && valid()){
-                added = true;
-                Triggers.listen(Trigger.newGame, starter);
-            }
+        Events.on(SaveWriteEvent.class, e -> {
+            if(valid()) saveState();
         });
 
-        Events.on(SaveWriteEvent.class, e -> saveState());
-        Events.on(SaveLoadEvent.class, e -> loadState());
+        Events.on(SaveLoadEvent.class, e -> {
+            if(!added && valid()){
+                added = true;
+                Triggers.listen(Trigger.update, updater);
+                Triggers.listen(Trigger.drawOver, drawer);
+
+                nodes.each(StoryNode::init);
+                loadState();
+            }
+        });
     }
 
     public void update(){
         if(!valid() && added){
             added = false;
-
             Triggers.detach(Trigger.update, updater);
             Triggers.detach(Trigger.drawOver, drawer);
 
@@ -78,7 +72,7 @@ public class ScriptedSector extends SectorPreset{
         ?   state.getSector().id == sector.id
         :   (state.map != null && (
             state.map.mod != null && state.map.mod.name.equals("unity") &&
-            (state.map.name().equals(generator.map.name()) || state.map.name().equals(localizedName))
+            (state.map.name().equals(generator.map.name()) || state.map.name().equals(name))
         ));
     }
 

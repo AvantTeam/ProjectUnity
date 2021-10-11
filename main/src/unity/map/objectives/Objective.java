@@ -19,9 +19,7 @@ public abstract class Objective{
 
     public final @Ignore(ResourceAmountObj.class) int executions;
     protected @Ignore int execution;
-    protected @Ignore boolean completed;
-
-    private @Ignore boolean finalized;
+    protected @Ignore boolean completed = false, finishedDep = false, finalized = false;
 
     public Cons<Objective> init = objective -> {};
     public Cons<Objective> update = objective -> {};
@@ -177,9 +175,15 @@ public abstract class Objective{
     }
 
     public boolean dependencyFinished(){
-        if(dependencies.isEmpty()) return true;
+        if(finishedDep || (finishedDep = dependencies.isEmpty())) return true;
 
-        for(var dep : dependencies) if(!dep.isExecuted()) return false;
+        finishedDep = true;
+        for(var dep : dependencies){
+            if(!dep.isExecuted()){
+                return finishedDep = false;
+            }
+        }
+
         return true;
     }
 }

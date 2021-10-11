@@ -34,6 +34,8 @@ public class StoryNode implements JsonSerializable{
     public Seq<ObjectiveModel> objectiveModels = new Seq<>();
     public Seq<Objective> objectives = new Seq<>();
 
+    protected boolean update = false, completed = false;
+
     private static final ReusableByteInStream ins = new ReusableByteInStream();
     private static final Reads read = new Reads(new DataInputStream(ins));
 
@@ -81,20 +83,33 @@ public class StoryNode implements JsonSerializable{
     }
 
     public boolean shouldUpdate(){
-        if(parents.isEmpty()) return true;
+        if(update || (update = parents.isEmpty())) return true;
 
-        for(var p : parents) if(!p.completed()) return false;
+        update = true;
+        for(var p : parents){
+            if(!p.completed()){
+                return update = false;
+            }
+        }
+
         return true;
     }
 
     public boolean completed(){
-        if(objectives.isEmpty()) return true;
+        if(completed || (completed = objectives.isEmpty())) return true;
 
-        for(var o : objectives) if(!o.isExecuted()) return false;
+        completed = true;
+        for(var o : objectives){
+            if(!o.isFinalized()){
+                return completed = false;
+            }
+        }
+
         return true;
     }
 
     public void update(){
+        if(completed) return;
         for(var o : objectives){
             if(o.isFinalized()) continue;
 
