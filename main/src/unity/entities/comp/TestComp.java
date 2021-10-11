@@ -99,7 +99,7 @@ abstract class TestComp implements Unitc, Test4c{
         return Mathf.chance(chance);
     }
 
-    /** Wraps {@link #update()} with {@code if(this.update())} */
+    /** Wraps {@link #update()} with {@code if(this.shouldUpdate())} */
     @Wrap(value = "update()")
     public boolean shouldUpdate(){
         return false;

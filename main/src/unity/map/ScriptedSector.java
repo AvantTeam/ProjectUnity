@@ -36,16 +36,20 @@ public class ScriptedSector extends SectorPreset{
         super(name, planet, sector);
 
         Events.on(SaveWriteEvent.class, e -> {
-            if(valid()) saveState();
+            if(added && valid()) saveState();
         });
 
         Events.on(SaveLoadEvent.class, e -> {
-            if(!added && valid()){
+            boolean valid = valid();
+            if(!added && valid){
                 added = true;
                 Triggers.listen(Trigger.update, updater);
                 Triggers.listen(Trigger.drawOver, drawer);
 
                 nodes.each(StoryNode::init);
+            }
+
+            if(valid){
                 loadState();
             }
         });
