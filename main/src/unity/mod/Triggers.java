@@ -7,7 +7,7 @@ import mindustry.game.EventType.*;
 /** Convenient implementation of event listener attaching/detaching especially for {@link Trigger}s */
 @SuppressWarnings("unchecked")
 public enum Triggers{
-    drawEnt;
+    ; // This is an enum as it acts as a "buffer", all triggers and event classes listen here should be PRd into Mindustry itself.
 
     public static <T> Cons<T> cons(Runnable run){
         return e -> run.run();
@@ -27,6 +27,4 @@ public enum Triggers{
     public static <T> void detach(T trigger, Cons<T> run){
         Events.remove((Class<T>)trigger.getClass(), run);
     }
-
-    public static class SaveWriteEvent{}
 }

@@ -11,12 +11,12 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.game.EventType.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import unity.assets.type.g3d.*;
 import unity.assets.type.g3d.attribute.type.*;
 import unity.assets.type.g3d.attribute.type.light.*;
-import unity.mod.*;
 
 import static mindustry.Vars.*;
 
@@ -39,16 +39,17 @@ public class UnityShaders{
         megalithRingShader = new MegalithRingShader();
         graphics3DProvider = new Graphics3DShaderProvider();
 
+        if(conds.length == 0) return;
         for(int i = 0; i < conds.length; i++){
-            CondShader shader = conds[i];
+            var shader = conds[i];
             shader.layer = Layer.shields + 2f + i * ((1f / conds.length) - 0.01f);
         }
 
         float range = (1f / conds.length) / 2f;
-        Events.run(Triggers.drawEnt, () -> {
+        Events.run(Trigger.drawOver, () -> {
             buffer.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
 
-            for(CondShader shader : conds){
+            for(var shader : conds){
                 if(shader.apply.get()){
                     Draw.drawRange(shader.getLayer() + range / 2f, range, () -> buffer.begin(Color.clear), () -> {
                         buffer.end();

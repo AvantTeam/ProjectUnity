@@ -41,11 +41,11 @@ abstract class WormComp implements Unitc{
         return isHead();
     }
 
-    public boolean isHead(){
+    boolean isHead(){
         return parent == null || head == null || head == self();
     }
 
-    public boolean isTail(){
+    boolean isTail(){
         return child == null;
     }
 
@@ -79,7 +79,7 @@ abstract class WormComp implements Unitc{
         }
     }
 
-    public int countFoward(){
+    int countFoward(){
         Wormc current = self();
         int num = 0;
         while(current != null && current.parent() != null){
@@ -93,7 +93,7 @@ abstract class WormComp implements Unitc{
         return num;
     }
 
-    public int countBackward(){
+    int countBackward(){
         Wormc current = self();
         int num = 0;
         while(current != null && current.child() != null){
@@ -186,7 +186,7 @@ abstract class WormComp implements Unitc{
         }
     }
 
-    protected <T extends Unit & Wormc> void distributeActionBack(Cons<T> cons){
+    <T extends Unit & Wormc> void distributeActionBack(Cons<T> cons){
         T current = as();
         cons.get(current);
         while(current.child() != null){
@@ -195,7 +195,7 @@ abstract class WormComp implements Unitc{
         }
     }
 
-    protected <T extends Unit & Wormc> void distributeActionForward(Cons<T> cons){
+    <T extends Unit & Wormc> void distributeActionForward(Cons<T> cons){
         T current = as();
         cons.get(current);
         while(current.parent() != null){
@@ -258,7 +258,7 @@ abstract class WormComp implements Unitc{
     }
 
     @Wrap(value = "update()", block = Boundedc.class)
-    public boolean updateBounded(){
+    boolean updateBounded(){
         return isHead();
     }
 
@@ -351,7 +351,7 @@ abstract class WormComp implements Unitc{
     @Replace
     @Override
     public void wobble(){
-        
+
     }
 
     @MethodPriority(-1)

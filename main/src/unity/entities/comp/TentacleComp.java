@@ -25,7 +25,7 @@ abstract class TentacleComp implements Unitc{
         }
     }
 
-    public void drawTentacles(){
+    void drawTentacles(){
         tentacles.each(NewTentacle::draw);
     }
 

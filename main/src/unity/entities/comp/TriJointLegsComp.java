@@ -49,7 +49,7 @@ abstract class TriJointLegsComp implements Unitc{
         }
     }
 
-    public float legAngle(float rotation, int index){
+    float legAngle(float rotation, int index){
         return rotation + (360f / legs.length * index + (360f / legs.length / 2f));
     }
 

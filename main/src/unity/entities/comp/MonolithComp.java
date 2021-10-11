@@ -85,7 +85,7 @@ abstract class MonolithComp implements Unitc, Factionc, Soul{
         return transferred;
     }
 
-    public boolean disabled(){
+    boolean disabled(){
         return !spawnedByCore && !hasSouls();
     }
 

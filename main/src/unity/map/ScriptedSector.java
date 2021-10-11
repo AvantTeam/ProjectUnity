@@ -12,7 +12,6 @@ import mindustry.type.*;
 import unity.map.cinematic.*;
 import unity.map.objectives.*;
 import unity.mod.*;
-import unity.mod.Triggers.*;
 
 import java.io.*;
 import java.nio.charset.*;
@@ -27,10 +26,10 @@ public class ScriptedSector extends SectorPreset{
     public final Seq<StoryNode> nodes = new Seq<>();
 
     protected final Cons<Trigger> updater = Triggers.cons(this::update);
-    protected final Cons<Triggers> drawer = Triggers.cons(this::draw);
+    protected final Cons<Trigger> drawer = Triggers.cons(this::draw);
     protected final Cons<Trigger> starter = Triggers.cons(() -> {
         Triggers.listen(Trigger.update, updater);
-        Triggers.listen(Triggers.drawEnt, drawer);
+        Triggers.listen(Trigger.drawOver, drawer);
 
         nodes.each(StoryNode::init);
 
@@ -62,7 +61,7 @@ public class ScriptedSector extends SectorPreset{
             added = false;
 
             Triggers.detach(Trigger.update, updater);
-            Triggers.detach(Triggers.drawEnt, drawer);
+            Triggers.detach(Trigger.drawOver, drawer);
 
             return;
         }

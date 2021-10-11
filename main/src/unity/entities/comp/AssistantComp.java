@@ -21,7 +21,7 @@ abstract class AssistantComp implements Unitc{
 
     @Import float x, y;
 
-    public void display(String text){
+    void display(String text){
         lastText = text;
         textFadeTime = 1f;
     }

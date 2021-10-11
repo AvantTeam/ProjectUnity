@@ -13,7 +13,6 @@ import arc.util.Log.*;
 import arc.util.serialization.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
-import mindustry.gen.*;
 import mindustry.input.*;
 import mindustry.mod.*;
 import mindustry.world.blocks.environment.*;
@@ -170,20 +169,6 @@ public class Unity extends Mod{
             mod.meta.description = stringf.get("description");
 
             Core.settings.getBoolOnce("unity-install", () -> Time.runTask(5f, CreditsDialog::showList));
-        });
-
-        // Bind a world listener to the game every save. I wish there was specific events for game save, load, and entity draw.
-        // TODO obsolete, this should be removed
-        Events.on(SaveLoadEvent.class, s -> {
-            var ent = Groups.all.find(e -> e instanceof WorldListener);
-            if(ent instanceof WorldListener w){
-                WorldListener.instance = w;
-            }else{
-                var w = WorldListener.create();
-                w.add();
-
-                WorldListener.instance = w;
-            }
         });
 
         Utils.init();

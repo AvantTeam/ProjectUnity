@@ -8,14 +8,14 @@ import unity.util.*;
 
 @SuppressWarnings({"unused", "UnnecessaryReturnStatement"})
 @EntityComponent
-abstract class UnintersectableComp implements Hitboxc{
+abstract class UnintersectableComp implements Hitboxc, Healthc{
+    @Import boolean added, dead;
     @Import float x, y, hitSize;
 
     @Override
     @MethodPriority(-10)
     public void update(){
-        if(this instanceof Physicsc){
-            var e = (Physicsc)this;
+        if(self() instanceof Physicsc e){
             if(e.physref() == null) return;
 
             if(intersects()){
@@ -24,7 +24,7 @@ abstract class UnintersectableComp implements Hitboxc{
                 }
                 e.physref().body.radius = Mathf.lerpDelta(e.physref().body.radius, hitSize() / 2f, 0.2f);
             }else{
-                e.physref().body.radius = -Float.MAX_VALUE;
+                e.physref().body.radius = Float.NEGATIVE_INFINITY;
             }
         }
     }
@@ -42,5 +42,11 @@ abstract class UnintersectableComp implements Hitboxc{
         }
     }
 
-    public abstract boolean intersects();
+    @Override
+    @Replace(1)
+    public boolean isValid(){
+        return !dead && added && intersects();
+    }
+
+    abstract boolean intersects();
 }

@@ -72,7 +72,7 @@ abstract class LightComp implements Drawc, QuadTreeObject{
     private static final Color tmpCol = new Color();
 
     /** Called synchronously before {@link #cast()} is called */
-    public void snap(){
+    void snap(){
         // Values that are needed to stay as is in async process are snapped here
         strength = queueStrength + recStrength();
         source = queueSource;
@@ -87,7 +87,7 @@ abstract class LightComp implements Drawc, QuadTreeObject{
     }
 
     /** Called asynchronously */
-    public void cast(){
+    void cast(){
         clearInvalid();
 
         // If this doesn't come from a light source and it has no parents, remove
@@ -254,7 +254,7 @@ abstract class LightComp implements Drawc, QuadTreeObject{
         valid = true;
     }
 
-    public float recStrength(){
+    float recStrength(){
         float str = 0f;
         synchronized(parents){
             for(var p : parentEntries()){
@@ -265,7 +265,7 @@ abstract class LightComp implements Drawc, QuadTreeObject{
         return str;
     }
 
-    public int combinedCol(int baseCol){
+    int combinedCol(int baseCol){
         synchronized(tmpCol){
             tmpCol.set(1f, 1f, 1f, 1f);
             parents(parents -> {
@@ -299,7 +299,7 @@ abstract class LightComp implements Drawc, QuadTreeObject{
         return Mathf.dst(x, y, endX, endY) * 3f;
     }
 
-    public float endStrength(){
+    float endStrength(){
         return Math.max(strength - Mathf.dst(x, y, endX, endY) / yield, 0f);
     }
 
@@ -308,7 +308,7 @@ abstract class LightComp implements Drawc, QuadTreeObject{
         lights.quad(quad -> quad.insert(self()));
     }
 
-    public void queueAdd(){
+    void queueAdd(){
         lights.queueAdd(self());
     }
 
@@ -317,7 +317,7 @@ abstract class LightComp implements Drawc, QuadTreeObject{
         lights.quad(quad -> quad.remove(self()));
     }
 
-    public void queueRemove(){
+    void queueRemove(){
         valid = false;
 
         clearParents();
@@ -330,39 +330,39 @@ abstract class LightComp implements Drawc, QuadTreeObject{
         out.set(x, y, 0f, 0f);
     }
 
-    public void children(Cons<ObjectMap<Longf<Light>, AtomicPair<Light, Light>>> cons){
+    void children(Cons<ObjectMap<Longf<Light>, AtomicPair<Light, Light>>> cons){
         synchronized(children){
             cons.get(children);
         }
     }
 
-    public Entries<Longf<Light>, AtomicPair<Light, Light>> childEntries(){
+    Entries<Longf<Light>, AtomicPair<Light, Light>> childEntries(){
         var e = childEntries.get();
         e.reset();
 
         return e;
     }
 
-    public void parents(Cons<ObjectFloatMap<Light>> cons){
+    void parents(Cons<ObjectFloatMap<Light>> cons){
         synchronized(parents){
             cons.get(parents);
         }
     }
 
-    public ObjectFloatMap.Entries<Light> parentEntries(){
+    ObjectFloatMap.Entries<Light> parentEntries(){
         var e = parentEntries.get();
         e.reset();
 
         return e;
     }
 
-    public boolean parentsAny(Boolf<ObjectFloatMap<Light>> cons){
+    boolean parentsAny(Boolf<ObjectFloatMap<Light>> cons){
         synchronized(parents){
             return cons.get(parents);
         }
     }
 
-    public void clearChildren(){
+    void clearChildren(){
         children(children -> {
             for(var e : childEntries()){
                 var pair = e.value;
@@ -373,7 +373,7 @@ abstract class LightComp implements Drawc, QuadTreeObject{
                     direct.queueRemove();
                     pair.key = null;
                 }
-                
+
                 if(indirect != null){
                     indirect.detachParent(self());
                     pair.value = null;
@@ -384,7 +384,7 @@ abstract class LightComp implements Drawc, QuadTreeObject{
         });
     }
 
-    public void clearParents(){
+    void clearParents(){
         parents(parents -> {
             for(var l : parentEntries()){
                 l.key.detachChild(self());
@@ -394,7 +394,7 @@ abstract class LightComp implements Drawc, QuadTreeObject{
         });
     }
 
-    public void clearInvalid(){
+    void clearInvalid(){
         parents(parents -> {
             var it = parentEntries();
             while(it.hasNext){
@@ -425,19 +425,19 @@ abstract class LightComp implements Drawc, QuadTreeObject{
         });
     }
 
-    public boolean isParent(Light light){
+    boolean isParent(Light light){
         return parentsAny(parents -> parents.containsKey(light));
     }
 
-    public void parent(Light light, float mult){
+    void parent(Light light, float mult){
         parents(parents -> parents.put(light, mult));
     }
 
-    public void child(Longf<Light> child){
+    void child(Longf<Light> child){
         children(children -> children.get(child, AtomicPair::new).reset());
     }
 
-    public void detachChild(Light light){
+    void detachChild(Light light){
         children(children -> {
             for(var e : childEntries()){
                 var pair = e.value;
@@ -447,11 +447,11 @@ abstract class LightComp implements Drawc, QuadTreeObject{
         });
     }
 
-    public void detachParent(Light light){
+    void detachParent(Light light){
         parents(parents -> parents.remove(light, 0f));
     }
 
-    public float visualRot(){
+    float visualRot(){
         return Angles.angle(x, y, endX, endY);
     }
 
@@ -537,7 +537,7 @@ abstract class LightComp implements Drawc, QuadTreeObject{
         Draw.z(z);
     }
 
-    public static float fixRot(float rotation){
+    static float fixRot(float rotation){
         return Mathf.mod(Mathf.round(rotation / rotationInc) * rotationInc, 360f);
     }
 }

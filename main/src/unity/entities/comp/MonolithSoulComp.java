@@ -100,11 +100,11 @@ abstract class MonolithSoulComp implements Unitc, Unintersectablec, Factionc{
         return Integer.MAX_VALUE;
     }
 
-    public <T extends Entityc> void invoke(T ent){
+    <T extends Entityc> void invoke(T ent){
         UnityCall.soulJoin(self(), ent);
     }
 
-    public static <T extends Entityc> void soulJoin(MonolithSoul soul, T ent){
+    static <T extends Entityc> void soulJoin(MonolithSoul soul, T ent){
         float remain = 0f;
         if(ent instanceof Healthc h){
             remain = h.health() + soul.healAmount - h.maxHealth();

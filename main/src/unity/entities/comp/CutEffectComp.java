@@ -25,7 +25,7 @@ abstract class CutEffectComp implements Drawc, Rotc, Hitboxc, Timedc{
 
     @Import float x, y, rotation;
 
-    public float z(){
+    float z(){
         if(other instanceof Unit u){
             UnitType type = u.type;
             return u.elevation > 0.5f ? (type.lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit) : type.groundLayer + Mathf.clamp(u.hitSize / 4000f, 0, 0.01f);

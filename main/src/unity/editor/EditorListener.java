@@ -25,7 +25,7 @@ public abstract class EditorListener{
 
     protected void registerEvents(){
         Triggers.listen(Trigger.update, () -> valid(this::update));
-        Triggers.listen(Triggers.drawEnt, () -> valid(this::draw));
+        Triggers.listen(Trigger.drawOver, () -> valid(this::draw));
 
         Events.on(StateChangeEvent.class, e -> {
             if(state.isEditor()){
