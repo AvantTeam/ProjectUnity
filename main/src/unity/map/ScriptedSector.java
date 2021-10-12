@@ -76,13 +76,11 @@ public class ScriptedSector extends SectorPreset{
             map.put(node.name, JsonIO.json.toJson(child, StringMap.class, String.class));
         }
 
-        Log.info(map);
         state.rules.tags.put(name + "-nodes", JsonIO.json.toJson(map, StringMap.class, String.class));
     }
 
     public void loadState(){
         var map = JsonIO.json.fromJson(StringMap.class, String.class, state.rules.tags.get(name + "-nodes", "{}"));
-        Log.info(map);
         for(var e : map.entries()){
             var node = nodes.find(n -> n.name.equals(e.key));
             if(node == null) throw new IllegalStateException("Node '" + e.key + "' not found!");

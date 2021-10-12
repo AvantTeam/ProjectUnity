@@ -15,21 +15,20 @@ public enum GlobalObjective{
         update();
     }
 
-    public static boolean reached(GlobalObjective... objectives){
-        if(objectives == null || objectives.length <= 0) return true;
+    public static boolean reached(GlobalObjective objective){
         update();
+        return (currentStatus & objective.value()) == objective.value();
+    }
 
-        long value = 0;
-        for(var objective : objectives){
-            value |= objective.value();
+    public static boolean reached(GlobalObjective... objectives){
+        for(var o : objectives){
+            if(!reached(o)) return false;
         }
-
-        return value == currentStatus;
+        return true;
     }
 
     public static void fire(GlobalObjective objective){
-        update();
-        if(((currentStatus >>> objective.value()) & 1) == 1) return;
+        if(reached(objective)) return;
 
         currentStatus |= objective.value();
         Core.settings.put("unity.global-objective.status", currentStatus);
