@@ -7,6 +7,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.*;
+import arc.scene.actions.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import unity.gen.*;
@@ -20,8 +21,8 @@ import static mindustry.Vars.*;
  */
 public class Cutscene{
     public static Cutscene root;
-    public static float stripe = Scl.scl(50f);
-    private static float progress;
+    public static float stripe = Scl.scl(56f);
+    private float progress;
 
     private final boolean isRoot;
     private boolean acting;
@@ -32,6 +33,8 @@ public class Cutscene{
     private Cons<Cutscene> start;
     private Cons<Cutscene> end;
 
+    private Vec2 endPos;
+    private float endTime = -1f;
     private float startTime = -1f;
 
     public static void init(){
@@ -68,16 +71,19 @@ public class Cutscene{
     }
 
     public Cutscene then(Cutscene next){
-        if(child != null) throw new IllegalArgumentException("Already has a child!");
+        var target = this;
+        while(target.child != null){
+            target = target.child;
+        }
 
-        next.parent = this;
-        var cur = this;
+        next.parent = target;
+        var cur = target;
         while(cur != null && cur != root){
             if(cur == next) throw new IllegalArgumentException("Can't invoke then() to a parent cutscene!");
             cur = cur.parent;
         }
 
-        child = next;
+        target.child = next;
         return next;
     }
 
@@ -125,8 +131,13 @@ public class Cutscene{
                 // This will only work if other mods do the same thing...
                 return;
             }else{
+                if(!acting) ui.hudGroup.actions(Actions.alpha(0f, 0.17f));
                 acting = true;
             }
+
+            endPos = null;
+            endTime = -1f;
+            progress = Mathf.approachDelta(progress, 1f, 1f / 60f);
 
             if(child.startTime < 0f) child.startTime = Time.time;
 
@@ -144,10 +155,22 @@ public class Cutscene{
                 child = child.child;
             }
         }else{
-            acting = false;
-        }
+            progress = Mathf.approachDelta(progress, 0f, 1f / 60f);
+            if(acting){
+                if(endPos == null){
+                    endPos = new Vec2(Core.camera.position);
+                    endTime = Time.time;
+                }
 
-        progress = Mathf.approachDelta(progress, acting ? 1f : 0f, 1f / 60f);
+                float endProgress = Time.time - endTime;
+
+                Core.camera.position.set(endPos).lerp(player, Interp.smoother.apply(Mathf.clamp(endProgress / 52f)));
+                if(endProgress >= 52f){
+                    ui.hudGroup.actions(Actions.alpha(1f, 0.17f));
+                    acting = false;
+                }
+            }
+        }
     }
 
     /**
