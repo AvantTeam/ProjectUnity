@@ -278,6 +278,13 @@ public class Annotations{
         Class<?> value();
     }
 
+    /** States that this method is only relevant on types with a certain entity component */
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface Extend{
+        Class<?> value();
+    }
+
     /** Loads texture regions but does not assign them to their acquirers */
     @Retention(RetentionPolicy.SOURCE)
     public @interface LoadRegs{

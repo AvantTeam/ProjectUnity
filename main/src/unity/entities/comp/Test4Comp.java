@@ -2,9 +2,11 @@ package unity.entities.comp;
 
 import mindustry.gen.*;
 import unity.annotations.Annotations.*;
+import unity.gen.*;
 
 /** See {@link TestComp} for docs */
 @SuppressWarnings("unused")
+@EntityDef({Test4c.class, Test3c.class})
 @EntityComponent
 abstract class Test4Comp implements Entityc{
     transient int thing;

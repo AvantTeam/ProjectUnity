@@ -451,12 +451,12 @@ public class EntityProcessor extends BaseProcessor{
                         throw new IllegalStateException(simpleName(entry.value.first().getEnclosingElement()) + "#" + entry.value.first() + " is an abstract method and must be implemented in some component");
                     }
 
-                    Seq<ExecutableElement> inserts = ins.get(entry.key, Seq::new);
+                    Seq<ExecutableElement> inserts = ins.get(entry.key, Seq::new).select(e -> ext(e, defComps));
                     if(first.getReturnType().getKind() != VOID && !inserts.isEmpty()){
                         throw new IllegalStateException("Method " + entry.key + " is not void, therefore no methods can @Insert to it");
                     }
 
-                    Seq<ExecutableElement> methodWrappers = wraps.get(entry.key, Seq::new);
+                    Seq<ExecutableElement> methodWrappers = wraps.get(entry.key, Seq::new).select(e -> ext(e, defComps));
                     if(first.getReturnType().getKind() != VOID && !methodWrappers.isEmpty()){
                         throw new IllegalStateException("Method " + entry.key + " is not void, therefore no methods can @Wrap it");
                     }
@@ -465,7 +465,7 @@ public class EntityProcessor extends BaseProcessor{
                         Seq<ExecutableElement> bypass = entry.value.select(m -> annotation(m, BypassGroupCheck.class) != null);
                         entry.value.removeAll(bypass);
 
-                        boolean firstc = append(mbuilder, bypass, inserts, methodWrappers, writeBlock);
+                        boolean firstc = append(mbuilder, defComps, bypass, inserts, methodWrappers, writeBlock);
                         if(!firstc) mbuilder.addCode(lnew());
 
                         mbuilder.addStatement("if($Ladded) return", simpleName(first).equals("add") ? "" : "!");
@@ -555,7 +555,7 @@ public class EntityProcessor extends BaseProcessor{
                         }
                     }
 
-                    boolean firstc = append(mbuilder, entry.value, inserts, methodWrappers, writeBlock);
+                    boolean firstc = append(mbuilder, defComps, entry.value, inserts, methodWrappers, writeBlock);
 
                     if(!firstc && !noCompAfter.isEmpty()) mbuilder.addCode(lnew());
                     for(ExecutableElement e : noCompAfter){
@@ -852,9 +852,18 @@ public class EntityProcessor extends BaseProcessor{
         }
     }
 
-    boolean append(MethodSpec.Builder mbuilder, Seq<ExecutableElement> values, Seq<ExecutableElement> inserts, Seq<ExecutableElement> wrappers, boolean writeBlock){
+    boolean ext(ExecutableElement e, Seq<TypeElement> defComps){
+        Extend ext = annotation(e, Extend.class);
+        if(ext == null) return true;
+
+        return defComps.contains(toComp(elements(ext::value).first()));
+    }
+
+    boolean append(MethodSpec.Builder mbuilder, Seq<TypeElement> defComps, Seq<ExecutableElement> values, Seq<ExecutableElement> inserts, Seq<ExecutableElement> wrappers, boolean writeBlock){
         boolean firstc = true;
         for(ExecutableElement elem : values){
+            if(!ext(elem, defComps)) continue;
+
             String descStr = descString(elem);
             String blockName = simpleName(elem.getEnclosingElement()).toLowerCase().replace("comp", "");
 

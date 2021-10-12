@@ -14,4 +14,16 @@ abstract class Test3Comp implements Test4c{
     public void yourThing(){
         Log.info(5 + ", and no, it's a local variable so you can't change it.");
     }
+
+    @Insert("update()")
+    @Extend(Test2c.class)
+    void insertUpdateIfInheritsFromTest2(){
+        Log.info("don't make me feel left out dad");
+    }
+
+    @Override
+    @Extend(Test2c.class)
+    public void update(){
+        Log.info("uwu update me dad");
+    }
 }

@@ -7,7 +7,7 @@ import unity.annotations.Annotations.*;
 import unity.gen.*;
 
 /**
- * A test component whose purpose is to test out annotation implementations. Do not use directly!
+ * A test component whose sole purpose is to test out annotation implementations. Do not use directly!
  * <p>This component will generate {@link Testc} interface of which declared methods are all methods in this comp
  * that aren't {@code protected}/{@code private} and has no {@link Override}, <i>and</i> getter/setters of which
  * requirements are:

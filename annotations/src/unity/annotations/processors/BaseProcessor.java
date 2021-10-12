@@ -255,7 +255,7 @@ public abstract class BaseProcessor extends AbstractProcessor{
         });
     }
 
-    boolean paramEquals(List<? extends VariableElement> first, List<? extends VariableElement> second){
+    public boolean paramEquals(List<? extends VariableElement> first, List<? extends VariableElement> second){
         if(first.size() != second.size()) return false;
 
         boolean same = true;
