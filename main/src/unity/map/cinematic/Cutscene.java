@@ -22,12 +22,12 @@ import static mindustry.Vars.*;
 public class Cutscene{
     public static Cutscene root;
     public static float stripe = Scl.scl(56f);
-    private float progress;
+    private float progress, zoomProgress;
 
     private final boolean isRoot;
     private boolean acting;
 
-    protected float zoom = Scl.scl(4f);
+    protected Floatf<Cutscene> zoom = c -> Scl.scl(4f);
     protected Cutscene parent;
     protected Cutscene child;
 
@@ -36,6 +36,7 @@ public class Cutscene{
 
     private Vec2 endPos;
     private float endTime = -1f;
+    private float firstZoom = -1f, lastZoom = -1f;
     private float startTime = -1f;
 
     public static void init(){
@@ -98,8 +99,8 @@ public class Cutscene{
         return (T)this;
     }
 
-    public <T extends Cutscene> T zoom(float zoom){
-        this.zoom = zoom;
+    public <T extends Cutscene> T zoom(Floatf<T> zoom){
+        this.zoom = (Floatf<Cutscene>)zoom;
         return (T)this;
     }
 
@@ -138,12 +139,19 @@ public class Cutscene{
                 return;
             }else{
                 if(!acting) ui.hudGroup.actions(Actions.alpha(0f, 0.17f));
+                if(firstZoom < 0f) firstZoom = renderer.getScale();
+                if(lastZoom < 0f) lastZoom = renderer.getScale();
                 acting = true;
             }
 
             endPos = null;
             endTime = -1f;
+
             progress = Mathf.approachDelta(progress, 1f, 1f / 60f);
+            zoomProgress = Mathf.approachDelta(zoomProgress, 1f, 1f / 48f);
+
+            float targetZoom = child.zoom();
+            renderer.setScale(Mathf.lerp(lastZoom, targetZoom, zoomProgress));
 
             if(child.startTime < 0f) child.startTime = Time.time;
 
@@ -158,10 +166,23 @@ public class Cutscene{
                     child.end = null;
                 }
 
+                lastZoom = targetZoom;
+                zoomProgress = 0f;
                 child = child.child;
             }
         }else{
             progress = Mathf.approachDelta(progress, 0f, 1f / 60f);
+            zoomProgress = Mathf.approachDelta(zoomProgress, 0f, 1f / 60f);
+
+            if(firstZoom > 0f){
+                renderer.setScale(Mathf.lerp(firstZoom, renderer.getScale(), zoomProgress));
+                if(Mathf.equal(firstZoom, renderer.getScale())){
+                    firstZoom = -1f;
+                    lastZoom = -1f;
+                    zoomProgress = 0f;
+                }
+            }
+
             if(acting){
                 if(endPos == null){
                     endPos = new Vec2(Core.camera.position);
@@ -173,6 +194,10 @@ public class Cutscene{
                 Core.camera.position.set(endPos).lerp(player, Interp.smoother.apply(Mathf.clamp(endProgress / 52f)));
                 if(endProgress >= 52f){
                     ui.hudGroup.actions(Actions.alpha(1f, 0.17f));
+
+                    zoomProgress = 0f;
+                    firstZoom = -1f;
+                    lastZoom = -1f;
                     acting = false;
                 }
             }
@@ -193,6 +218,10 @@ public class Cutscene{
 
     public boolean acting(){
         return root.acting;
+    }
+
+    public float zoom(){
+        return zoom.get(this);
     }
 
     public interface Pos{
