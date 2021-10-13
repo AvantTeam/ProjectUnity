@@ -10,7 +10,6 @@ import arc.scene.*;
 import arc.scene.actions.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
-import unity.gen.*;
 
 import static mindustry.Vars.*;
 
@@ -19,6 +18,7 @@ import static mindustry.Vars.*;
  * used as a startup, as {@link #then(Cutscene)} itself returns the given cutscene, allowing for chained operations.
  * @author GlennFolker
  */
+@SuppressWarnings("unchecked")
 public class Cutscene{
     public static Cutscene root;
     public static float stripe = Scl.scl(56f);
@@ -27,8 +27,9 @@ public class Cutscene{
     private final boolean isRoot;
     private boolean acting;
 
-    private Cutscene parent;
-    private Cutscene child;
+    protected float zoom = Scl.scl(4f);
+    protected Cutscene parent;
+    protected Cutscene child;
 
     private Cons<Cutscene> start;
     private Cons<Cutscene> end;
@@ -70,7 +71,7 @@ public class Cutscene{
         this(false);
     }
 
-    public Cutscene then(Cutscene next){
+    public <T extends Cutscene> T then(T next){
         var target = this;
         while(target.child != null){
             target = target.child;
@@ -87,14 +88,19 @@ public class Cutscene{
         return next;
     }
 
-    public Cutscene start(Cons<Cutscene> start){
-        this.start = start;
-        return this;
+    public <T extends Cutscene> T start(Cons<T> start){
+        this.start = (Cons<Cutscene>)start;
+        return (T)this;
     }
 
-    public Cutscene end(Cons<Cutscene> end){
-        this.end = end;
-        return this;
+    public <T extends Cutscene> T end(Cons<T> end){
+        this.end = (Cons<Cutscene>)end;
+        return (T)this;
+    }
+
+    public <T extends Cutscene> T zoom(float zoom){
+        this.zoom = zoom;
+        return (T)this;
     }
 
     private void drawStripes(){
@@ -187,103 +193,6 @@ public class Cutscene{
 
     public boolean acting(){
         return root.acting;
-    }
-
-    public static PanCutscene pan(Pos pos){
-        return pan(pos, 15f, 90f, 60f, Interp.smoother);
-    }
-
-    public static PanCutscene pan(Position pos){
-        return pan(() -> Float2.construct(pos.getX(), pos.getY()));
-    }
-
-    public static PanCutscene pan(Pos pos, float panDuration){
-        return pan(pos, 15f, panDuration, 60f, Interp.smooth2);
-    }
-
-    public static PanCutscene pan(Position pos, float panDuration){
-        return pan(() -> Float2.construct(pos.getX(), pos.getY()), 15f, panDuration, 60f, Interp.smooth2);
-    }
-
-    public static PanCutscene pan(Pos pos, float panDuration, Interp interp){
-        return pan(pos, 15f, panDuration, 60f, interp);
-    }
-
-    public static PanCutscene pan(Position pos, float panDuration, Interp interp){
-        return pan(() -> Float2.construct(pos.getX(), pos.getY()), 15f, panDuration, 60f, interp);
-    }
-
-    public static PanCutscene pan(Pos pos, float delay, float panDuration, float endDelay, Interp interp){
-        return new PanCutscene(pos, delay, panDuration, endDelay, interp);
-    }
-
-    public static PanCutscene pan(Position pos, float delay, float panDuration, float endDelay, Interp interp){
-        return pan(() -> Float2.construct(pos.getX(), pos.getY()), delay, panDuration, endDelay, interp);
-    }
-
-    public static class PanCutscene extends Cutscene{
-        public final Pos pos;
-        public final Interp interp;
-        public final float delay, panDuration, endDelay;
-
-        private Vec2 initPos;
-        private float initTime = -1f;
-
-        private Cons<Cutscene> moved;
-        private Cons<Cutscene> arrived;
-        private float movedThreshold = 5f, arrivedThreshold = 8f;
-
-        public PanCutscene(Pos pos, float delay, float panDuration, float endDelay, Interp interp){
-            this.pos = pos;
-            this.interp = interp;
-            this.delay = delay;
-            this.panDuration = panDuration;
-            this.endDelay = endDelay;
-        }
-
-        public PanCutscene moved(Cons<Cutscene> moved, float threshold){
-            this.moved = moved;
-            movedThreshold = threshold;
-
-            return this;
-        }
-
-        public PanCutscene arrived(Cons<Cutscene> arrived, float threshold){
-            this.arrived = arrived;
-            arrivedThreshold = threshold;
-
-            return this;
-        }
-
-        @Override
-        public boolean update(){
-            float elapsed = Time.time - startTime();
-            if(moved != null && elapsed >= delay - movedThreshold){
-                moved.get(this);
-                moved = null;
-            }
-
-            if(elapsed >= delay && initPos == null){
-                initPos = new Vec2(Core.camera.position);
-                initTime = Time.time;
-            }
-
-            float progress = Time.time - initTime;
-            if(initPos != null){
-                long pos = this.pos.get();
-                Core.camera.position.set(initPos).lerp(
-                    Float2.x(pos), Float2.y(pos),
-                    interp.apply(Mathf.clamp(progress / panDuration))
-                );
-
-                if(arrived != null && progress >= panDuration - arrivedThreshold){
-                    arrived.get(this);
-                    arrived = null;
-                }
-            }
-
-            return initTime > -1f && progress > panDuration + endDelay;
-        }
     }
 
     public interface Pos{
