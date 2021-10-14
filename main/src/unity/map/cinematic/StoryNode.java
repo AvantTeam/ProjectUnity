@@ -65,7 +65,7 @@ public class StoryNode implements JsonSerializable{
     public void init(){
         parents.clear();
         for(var p : parentAliases){
-            var other = sector.nodes.find(e -> e.name.equals(p));
+            var other = sector.cinematic.nodes.find(e -> e.name.equals(p));
             if(other != null) parent(other);
         }
 
@@ -90,7 +90,7 @@ public class StoryNode implements JsonSerializable{
 
         completed = true;
         for(var o : objectives){
-            if(!o.isFinalized()){
+            if(!o.executed()){
                 return completed = false;
             }
         }
@@ -99,13 +99,12 @@ public class StoryNode implements JsonSerializable{
     }
 
     public void update(){
-        if(completed) return;
+        if(completed()) return;
         for(var o : objectives){
-            if(o.isFinalized()) continue;
+            if(o.executed()) continue;
 
             if(o.shouldUpdate()) o.update();
             if(o.qualified()) o.execute();
-            if(o.isExecuted() && !o.isFinalized()) o.doFinalize();
         }
     }
 

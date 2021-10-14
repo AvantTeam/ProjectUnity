@@ -4,7 +4,6 @@ import arc.func.*;
 import arc.struct.*;
 import unity.map.cinematic.*;
 import unity.map.objectives.ObjectiveModel.*;
-import unity.map.objectives.types.*;
 import unity.util.*;
 
 import static java.lang.String.*;
@@ -18,9 +17,10 @@ public abstract class Objective{
     public final Cons<Objective> executor;
     public final @Ignore StoryNode node;
 
-    public final @Ignore(ResourceAmountObj.class) int executions;
-    protected @Ignore int execution;
-    protected @Ignore boolean completed = false, finishedDep = false, finalized = false;
+    protected @Ignore boolean
+        executed = false,
+        completed = false,
+        finishedDep = false;
 
     public Cons<Objective> init = objective -> {};
     public Cons<Objective> update = objective -> {};
@@ -29,11 +29,10 @@ public abstract class Objective{
     public final @Ignore Seq<Objective> dependencies = new Seq<>();
     public final Seq<String> depAliases = new Seq<>();
 
-    public <T extends Objective> Objective(StoryNode node, String name, int executions, Cons<T> executor){
+    public <T extends Objective> Objective(StoryNode node, String name, Cons<T> executor){
         this.name = name;
         this.node = node;
         this.executor = (Cons<Objective>)executor;
-        this.executions = executions;
     }
 
     public void resolveDependencies(){
@@ -45,7 +44,7 @@ public abstract class Objective{
             var otherNode = dep.substring(0, separator);
             var otherDep = dep.substring(separator + 1);
 
-            var n = node.sector.nodes.find(e -> e.name.equals(otherNode));
+            var n = node.sector.cinematic.nodes.find(e -> e.name.equals(otherNode));
             if(n != null){
                 var o = n.objectives.find(e -> e.name.equals(otherDep));
                 if(o != null) depend(o);
@@ -98,15 +97,6 @@ public abstract class Objective{
         init.get(this);
     }
 
-    // Using 'do' because method name clash.
-    public void doFinalize(){
-        finalized = true;
-    }
-
-    public boolean isFinalized(){
-        return finalized;
-    }
-
     public void update(){
         update.get(this);
     }
@@ -116,59 +106,58 @@ public abstract class Objective{
     }
 
     public boolean shouldUpdate(){
-        return !isExecuted() && !completed() && dependencyFinished();
+        return !executed && !completed && dependencyFinished();
     }
 
     public boolean shouldDraw(){
         return shouldUpdate();
     }
 
-    public <T extends Objective> Objective init(Cons<T> init){
+    public <T extends Objective> T init(Cons<T> init){
         this.init = (Cons<Objective>)init;
-        return this;
+        return (T)this;
     }
 
-    public <T extends Objective> Objective update(Cons<T> update){
+    public <T extends Objective> T update(Cons<T> update){
         this.update = (Cons<Objective>)update;
-        return this;
+        return (T)this;
     }
 
-    public <T extends Objective> Objective draw(Cons<T> draw){
+    public <T extends Objective> T draw(Cons<T> draw){
         this.draw = (Cons<Objective>)draw;
-        return this;
+        return (T)this;
     }
 
     public void save(StringMap map){
-        map.put("execution", valueOf(execution));
+        map.put("executed", valueOf(executed));
         map.put("completed", valueOf(completed));
-        map.put("finalized", valueOf(finalized));
     }
 
     public void load(StringMap map){
-        execution = map.getInt("execution");
+        executed = map.getBool("executed");
         completed = map.getBool("completed");
-        finalized = map.getBool("finalized");
     }
 
     public void execute(){
-        execution++;
         executor.get(this);
+        stop();
     }
 
     public boolean completed(){
         return completed;
     }
 
-    public boolean isExecuted(){
-        return execution >= executions;
+    public boolean executed(){
+        return executed;
     }
 
     public void stop(){
-        execution = executions;
+        completed = true;
+        executed = true;
     }
 
     public boolean qualified(){
-        return !isExecuted() && completed() && dependencyFinished();
+        return !executed && completed && dependencyFinished();
     }
 
     public boolean dependencyFinished(){
@@ -176,7 +165,7 @@ public abstract class Objective{
 
         finishedDep = true;
         for(var dep : dependencies){
-            if(!dep.isExecuted()){
+            if(!dep.executed){
                 return finishedDep = false;
             }
         }

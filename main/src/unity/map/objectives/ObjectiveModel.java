@@ -39,6 +39,7 @@ public class ObjectiveModel implements JsonSerializable{
 
     static{
         ResourceAmountObj.setup();
+        UnitPosObj.setup();
     }
 
     public void set(Class<? extends Objective> type){

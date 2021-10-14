@@ -153,7 +153,7 @@ public class ObjectivesDialog extends BaseDialog{
                                     model.set(model.type == type ? null : type);
                                     rebuild();
                                 })
-                                    .size(350f, 64f).color(data.color).pad(8f);
+                                    .size(350f, 64f).color(data.color).pad(8f).row();
                             }
                         }).width(500f).growY();
 

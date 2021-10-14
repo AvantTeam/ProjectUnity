@@ -106,7 +106,7 @@ public class ScriptsDictionaryDialog extends BaseDialog{
 
             add("Name: ").padLeft(8f);
 
-            var field = field(name, Styles.defaultField, str -> this.name = str).growX().get();
+            var field = field(name, str -> this.name = str).growX().get();
             field.setValidator(str -> !elems.contains(e -> e.name.equals(str)));
 
             add().growX();

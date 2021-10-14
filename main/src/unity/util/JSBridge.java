@@ -1,6 +1,7 @@
 package unity.util;
 
 import arc.*;
+import arc.func.*;
 import rhino.*;
 
 import static mindustry.Vars.*;
@@ -12,6 +13,7 @@ import static unity.Unity.*;
  * does not support the {@code require()} function.
  * @author GlennFolker
  */
+@SuppressWarnings("unchecked")
 public final class JSBridge{
     public static Context context;
     public static ImporterTopLevel defaultScope;
@@ -72,5 +74,17 @@ public final class JSBridge{
     public static Function compileFunc(Scriptable scope, String sourceName, String source, int lineNum){
         if(tools) throw new IllegalStateException();
         return context.compileFunction(scope, source, sourceName, lineNum);
+    }
+
+    public static <T> Func<Object[], T> requireType(Function func, Context context, Scriptable scope, Class<T> returnType){
+        var type = ReflectUtils.box(returnType);
+        return args -> {
+            var res = func.call(context, scope, scope, args);
+            if(type == void.class || type == Void.class) return null;
+
+            if(res instanceof Wrapper w) res = w.unwrap();
+            if(!type.isAssignableFrom(res.getClass())) throw new IllegalStateException("Incompatible return type: Expected '" + returnType + "', but got '" + res.getClass() + "'!");
+            return (T)type.cast(res);
+        };
     }
 }
