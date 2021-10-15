@@ -64,6 +64,25 @@ abstract class EndComp implements Unitc, Factionc{
         }
     }
 
+    float trueHealth(){
+        return trueHealth;
+    }
+
+    float trueMaxHealth(){
+        return trueMaxHealth;
+    }
+
+    @Insert(value = "update()", after = false)
+    @Extend(Wormc.class)
+    private void updateHealthWorm(){
+        Wormc h = self();
+        if(!h.isHead() && h.head() != null){
+            Endc e = h.head().as();
+            health = trueHealth = e.trueHealth();
+            maxHealth = trueMaxHealth = e.trueMaxHealth();
+        }
+    }
+
     @MethodPriority(-1)
     @Override
     public void update(){
