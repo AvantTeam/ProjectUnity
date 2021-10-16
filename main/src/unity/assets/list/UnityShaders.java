@@ -147,7 +147,9 @@ public class UnityShaders{
 
         @Override
         public void apply(){
-            camDir.set(renderer.planets.cam.direction).rotate(Vec3.Y, renderer.planets.planet.getRotation());
+            //TODO hacky; should use 'public Planet planet;' and assign the planet before rendering.
+            //I would fix this myself but I don't want to mess with the ShaderRef stuff - anuke
+            camDir.set(renderer.planets.cam.direction).rotate(Vec3.Y, ui.planet.state.planet.getRotation());
 
             setUniformf("u_lightdir", lightDir);
             setUniformf("u_ambientColor", ambientColor.r, ambientColor.g, ambientColor.b);

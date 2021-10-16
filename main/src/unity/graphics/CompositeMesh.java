@@ -39,15 +39,11 @@ public class CompositeMesh extends PlanetMesh{
     }
 
     @Override
-    public void preRender(){
+    public void render(PlanetParams params, Mat3D projection, Mat3D transform){
         for(var e : comps){
             e.shader.apply();
         }
-    }
 
-    @Override
-    public void render(Mat3D projection, Mat3D transform){
-        preRender();
         for(var e : comps){
             var s = e.shader.shader;
             s.bind();
@@ -56,13 +52,6 @@ public class CompositeMesh extends PlanetMesh{
             s.apply();
 
             e.mesh.render(s, Gl.triangles);
-        }
-    }
-
-    @Override
-    public void dispose(){
-        for(var e : comps){
-            e.mesh.dispose();
         }
     }
 

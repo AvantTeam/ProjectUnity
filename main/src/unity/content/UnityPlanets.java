@@ -20,7 +20,7 @@ public class UnityPlanets{
     public static @FactionDef("monolith") Planet megalith;
 
     public static void load(){
-        megalith = new Planet("megalith", Planets.sun, 3, 1){{
+        megalith = new Planet("megalith", Planets.sun, 1f, 3){{
             generator = new MegalithPlanetGenerator();
             meshLoader = () -> new CompositeMesh(this,
                 //planet
@@ -39,7 +39,7 @@ public class UnityPlanets{
             atmosphereRadOut = 0.35f;
         }};
 
-        electrode = new Planet("electrode", Planets.sun, 3, 1){{
+        electrode = new Planet("electrode", Planets.sun, 1f, 3){{
             generator = new ElectrodePlanetGenerator();
             meshLoader = () -> new HexMesh(this, 6);
             accessible = true;
@@ -47,7 +47,7 @@ public class UnityPlanets{
             startSector = 30;
         }};
 
-        inert = new Planet("inert", electrode, 0, 0.5f){{
+        inert = new Planet("inert", electrode, 0.5f){{
             atmosphereColor = Color.white.cpy();
             accessible = false;
             meshLoader = () -> new ColorMesh(
