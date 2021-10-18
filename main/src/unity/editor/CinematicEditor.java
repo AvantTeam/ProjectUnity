@@ -111,6 +111,8 @@ public class CinematicEditor extends EditorListener{
         var core = sector().cinematic;
         core.setNodes(nodes);
         core.setTags(tags);
-        core.save(editor.tags);
+
+        editor.tags.put("nodes", JsonIO.json.toJson(core.nodes, Seq.class, StoryNode.class));
+        editor.tags.put("object-tags", JsonIO.json.toJson(core.saveTags(), Seq.class, String.class));
     }
 }

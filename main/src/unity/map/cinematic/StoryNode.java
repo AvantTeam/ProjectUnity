@@ -76,6 +76,11 @@ public class StoryNode implements JsonSerializable{
         objectives.each(Objective::init);
     }
 
+    public void reset(){
+        initialized = false;
+        children.each(StoryNode::reset);
+    }
+
     public boolean completed(){
         // Assume checked on same frame, if that's the case then don't bother recalculating.
         if(Mathf.equal(checkComplete, Time.time)) return completed;

@@ -32,7 +32,7 @@ public class ObjectiveModel implements JsonSerializable{
     /** Objective model fields. Elements of this map must be serializable. */
     public ObjectMap<String, Object> fields = new ObjectMap<>();
 
-    private static final String env = "\\$\\{{2}.*}{2}";
+    private static final String env = "\\$\\{{2}.*\\}{2}";
     private static final Pattern replacer = Pattern.compile(env);
     private static final FieldTranslator translator = new FieldTranslator();
 

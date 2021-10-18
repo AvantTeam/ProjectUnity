@@ -46,6 +46,8 @@ public class Cinematics{
         bound = false;
         Triggers.detach(Trigger.update, updater);
         Triggers.detach(Trigger.drawOver, drawer);
+
+        nodes.each(StoryNode::reset);
     }
 
     public void update(){
