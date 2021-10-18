@@ -69,14 +69,8 @@ public class ObjectivesDialog extends BaseDialog{
             Class<?> current = type;
             while(true){
                 for(var f : current.getDeclaredFields()){
-                    if(Modifier.isStatic(f.getModifiers())) continue;
-
-                    var anno = f.getAnnotation(Ignore.class);
-                    if(anno != null){
-                        var descend = anno.value();
-                        if(descend.length == 0 || Structs.contains(descend, c -> c.isAssignableFrom(type))) continue;
-                    }
-
+                    int mod = f.getModifiers();
+                    if(Modifier.isStatic(mod) || Modifier.isTransient(mod)) continue;
                     all.add(f);
                 }
 

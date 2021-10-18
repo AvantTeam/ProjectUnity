@@ -21,6 +21,7 @@ import static mindustry.Vars.*;
 @SuppressWarnings("unchecked")
 public class Cinematics{
     public final Boolp validator;
+    /** The root (no parents) nodes of the cinematic core. */
     public final Seq<StoryNode> nodes = new Seq<>();
 
     private boolean bound = false;
@@ -53,7 +54,7 @@ public class Cinematics{
             return;
         }
 
-        for(var node : nodes) if(node.shouldUpdate()) node.update();
+        nodes.each(StoryNode::update);
     }
 
     public boolean valid(){
@@ -61,22 +62,20 @@ public class Cinematics{
     }
 
     public void save(StringMap map){
-        if(!bound || !valid()) return;
-
         map.put("nodes", JsonIO.json.toJson(saveNodes(), StringMap.class, String.class));
         map.put("object-tags", JsonIO.json.toJson(saveTags(), Seq.class, String.class));
     }
 
     public StringMap saveNodes(){
-        var nodeMap = new StringMap();
+        var map = new StringMap();
         for(var node : nodes){
             var child = new StringMap();
             node.save(child);
 
-            nodeMap.put(node.name, JsonIO.json.toJson(child, StringMap.class, String.class));
+            map.put(node.name, JsonIO.json.toJson(child, StringMap.class, String.class));
         }
 
-        return nodeMap;
+        return map;
     }
 
     public Seq<String> saveTags(){
@@ -84,6 +83,8 @@ public class Cinematics{
         var valueMap = StringMap.of("type", 0, "value", null, "tags", "[]");
 
         for(var e : objectToTag.entries()){
+            if(e.value.isEmpty()) continue;
+
             var obj = e.key;
             var type = obj.getClass();
             if(type.isAnonymousClass()) type = type.getSuperclass();
@@ -182,7 +183,7 @@ public class Cinematics{
     }
 
     public void setNodes(Seq<StoryNode> nodes){
-        this.nodes.set(nodes);
+        this.nodes.set(nodes.select(node -> node.parent == null));
         this.nodes.each(StoryNode::createObjectives);
         this.nodes.each(e -> e.objectives.each(Objective::resolveDependencies));
     }
@@ -191,6 +192,7 @@ public class Cinematics{
         objectToTag.clear();
         tagToObject.clear();
         for(var e : tags.entries()){
+            if(e.value.isEmpty()) continue;
             for(var str : e.value){
                 tag(e.key, str);
             }

@@ -12,12 +12,12 @@ import static java.lang.String.*;
 @SuppressWarnings("unchecked")
 public abstract class Objective{
     /** The name of this objective. It is your responsibility to differ the name from other objectiveModels. */
-    public final @Ignore String name;
+    public final transient String name;
 
     public final Cons<Objective> executor;
-    public final @Ignore StoryNode node;
+    public final transient StoryNode node;
 
-    protected @Ignore boolean
+    protected transient boolean
         executed = false,
         completed = false,
         finishedDep = false;
@@ -26,7 +26,7 @@ public abstract class Objective{
     public Cons<Objective> update = objective -> {};
     public Cons<Objective> draw = objective -> {};
 
-    public final @Ignore Seq<Objective> dependencies = new Seq<>();
+    public final transient Seq<Objective> dependencies = new Seq<>();
     public final Seq<String> depAliases = new Seq<>();
 
     public <T extends Objective> Objective(StoryNode node, String name, Cons<T> executor){

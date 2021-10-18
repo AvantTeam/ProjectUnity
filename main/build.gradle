@@ -22,7 +22,7 @@ ext{
     fetchPackage = 'unity/fetched'
     fetchDir = new File("$projectDir/fetched/$fetchPackage")
 
-    fetchTemp = new File("$projectDir/fetch.txt")
+    fetchTemp = new File("$projectDir/fetch.txt") //TODO use temporary dir in :compileJava
     fetchRevision = 1
 }
 

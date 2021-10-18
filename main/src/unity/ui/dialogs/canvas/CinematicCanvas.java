@@ -138,7 +138,7 @@ public class CinematicCanvas extends WidgetGroup{
                     var it = cinematicEditor.nodes.iterator();
                     while(it.hasNext()){
                         var e = it.next();
-                        e.parents.remove(node);
+                        e.children.remove(node);
 
                         if(e == node) it.remove();
                     }
@@ -177,7 +177,7 @@ public class CinematicCanvas extends WidgetGroup{
                     public void touchUp(InputEvent event, float x, float y, int pointer, KeyCode code){
                         var e = entered;
                         if(e != null && e.userObject instanceof NodeElem elem && elem != NodeElem.this && e == elem.acceptCont){
-                            elem.node.parent(node);
+                            node.child(elem.node);
                         }
 
                         if(selected == button) selected = null;
@@ -199,17 +199,17 @@ public class CinematicCanvas extends WidgetGroup{
         }
 
         private void drawConnection(){
-            for(var parent : node.parents){
-                var elem = parent.elem;
+            for(var child : node.children){
+                var elem = child.elem;
                 if(elem == null) continue;
 
-                var from = elem.distCont.localToStageCoordinates(Tmp.v1.set(
-                    elem.distCont.getWidth() / 2f,
-                    elem.distCont.getHeight() / 2f
+                var from = distCont.localToStageCoordinates(Tmp.v1.set(
+                    distCont.getWidth() / 2f,
+                    distCont.getHeight() / 2f
                 ));
-                var to = acceptCont.localToStageCoordinates(Tmp.v2.set(
-                    acceptCont.getWidth() / 2f,
-                    acceptCont.getHeight() / 2f
+                var to = elem.acceptCont.localToStageCoordinates(Tmp.v2.set(
+                    elem.acceptCont.getWidth() / 2f,
+                    elem.acceptCont.getHeight() / 2f
                 ));
 
                 drawCurve(from.x, from.y, to.x, to.y);

@@ -62,6 +62,8 @@ public class Unity extends Mod{
     public static ScriptsDictionaryDialog jsDictDialog;
     /** Cinematic dialog, for editing {@link StoryNode}s bound to a {@link ScriptedSector}. */
     public static CinematicDialog cinematicDialog;
+    /** Used to edit object "tags" that is bound to certain objects. */
+    public static TagsDialog tagsDialog;
     /** Heavily relies on {@link #cinematicDialog}, this dialog edits {@link ObjectiveModel} bound to a {@link StoryNode}. */
     public static ObjectivesDialog objectivesDialog;
 
@@ -143,6 +145,7 @@ public class Unity extends Mod{
             jsEditDialog = new ScriptsEditorDialog();
             jsDictDialog = new ScriptsDictionaryDialog();
             cinematicDialog = new CinematicDialog();
+            tagsDialog = new TagsDialog();
             objectivesDialog = new ObjectivesDialog();
 
             addCredits();

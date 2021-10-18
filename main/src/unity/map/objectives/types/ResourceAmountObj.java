@@ -24,7 +24,7 @@ import static mindustry.Vars.*;
  * @author GlennFolker
  */
 public class ResourceAmountObj extends Objective{
-    protected @Ignore Table container;
+    protected transient Table container;
 
     public ItemStack[] items;
     public Team team;

@@ -3,16 +3,12 @@ package unity.editor;
 import arc.*;
 import arc.graphics.g2d.*;
 import arc.input.*;
-import arc.math.*;
-import arc.math.geom.*;
-import arc.scene.actions.*;
-import arc.scene.ui.layout.*;
+import arc.scene.ui.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.io.*;
-import mindustry.ui.*;
 import mindustry.world.*;
 import unity.map.cinematic.*;
 
@@ -25,35 +21,7 @@ import static unity.Unity.*;
  */
 public class CinematicEditor extends EditorListener{
     public final Seq<StoryNode> nodes = new Seq<>();
-
-    public TagElem elem;
     public final ObjectMap<Object, ObjectSet<String>> tags = new ObjectMap<>();
-
-    @Override
-    protected void registerEvents(){
-        super.registerEvents();
-
-        ui.hudGroup.fill(t -> {
-            elem = new TagElem();
-            elem.visible = false;
-            elem.update(() -> {
-                Vec2 vec;
-                if(elem.bound instanceof Building build){
-                    vec = Tmp.v1.set(build.getX(), build.getY() + build.block.size * tilesize / 2f);
-                }else if(elem.bound instanceof Tile tile){
-                    vec = Tmp.v1.set(tile.worldx(), tile.worldy() + tile.block().size * tilesize / 2f);
-                }else{
-                    hideTag();
-                    return;
-                }
-
-                vec = Core.input.mouseScreen(vec.x, vec.y);
-                elem.setPosition(vec.x, vec.y, Align.topRight);
-            });
-
-            t.addChild(elem);
-        });
-    }
 
     @Override
     public void update(){
@@ -68,9 +36,24 @@ public class CinematicEditor extends EditorListener{
             var tile = world.tileWorld(pos.x, pos.y);
 
             if(tile != null){
-                showTag(tile.build == null ? tile : tile.build);
-            }else{
-                hideTag();
+                if(tile.build != null){
+                    new Dialog(""){{
+                        clear();
+
+                        addCloseButton();
+                        buttons.row().button("@building", () -> {
+                            showTag(tile.build);
+                            hide();
+                        }).size(210f, 64f);
+                        buttons.row().button("@tile", () -> {
+                            showTag(tile);
+                            hide();
+                        }).size(210f, 64f);
+                        add(buttons).grow();
+                    }}.show();
+                }else{
+                    showTag(tile);
+                }
             }
         }
     }
@@ -81,61 +64,22 @@ public class CinematicEditor extends EditorListener{
             for(var obj : tags.keys()){
                 var data = Tmp.v31;
                 if(obj instanceof Building b){
-                    data.set(b.getX(), b.getY(), b.block.size * tilesize);
+                    data.set(b.getX(), b.getY(), b.block.size * tilesize / 2f);
                 }else if(obj instanceof Tile tile){
-                    data.set(tile.worldx(), tile.worldy(), tile.block().size * tilesize);
+                    data.set(tile.worldx(), tile.worldy(), tile.floor().size * tilesize / 2f);
                 }else{
                     continue;
                 }
 
-                float x = data.x, y = data.y, rad = data.z;
-                Lines.stroke(3f, Pal.darkerMetal);
-                Lines.rect(x, y, rad, rad);
-
-                Lines.stroke(1.5f, elem.bound == obj ? Pal.accent : Pal.place);
-                Lines.rect(x, y, rad, rad);
+                Lines.stroke(1f, Pal.place);
+                Lines.square(data.x, data.y, data.z);
             }
         });
     }
 
-    private String lastName(){
-        int i = 0;
-        for(var set : tags.values()){
-            for(var tag : set){
-                if(tag.startsWith("tag") && Character.isDigit(tag.codePointAt("tag".length()))){
-                    int index = Character.digit(tag.charAt("tag".length()), 10);
-                    if(index > i) i = index;
-                }
-            }
-        }
-
-        return "tag" + (i + 1);
-    }
-
     protected void showTag(Object target){
-        if(elem.bound() == target){
-            hideTag();
-            return;
-        }
-
-        showTag();
-        if(!tags.containsKey(target)) tags.get(target, ObjectSet::new).add(lastName());
-        elem.set(target);
-    }
-
-    protected void hideTag(){
-        if(!elem.visible) return;
-        elem.actions(Actions.scaleTo(0f, 1f, 0.06f, Interp.pow3Out), Actions.run(() -> elem.set(null)), Actions.visible(false));
-    }
-
-    protected void showTag(){
-        if(elem.visible) return;
-
-        elem.visible = true;
-        elem.clearActions();
-        elem.pack();
-        elem.setTransform(true);
-        elem.actions(Actions.scaleTo(0f, 1f), Actions.scaleTo(1f, 1f, 0.07f, Interp.pow3Out));
+        if(!tags.containsKey(target)) tags.put(target, new ObjectSet<>());
+        tagsDialog.show(tags, target);
     }
 
     @Override
@@ -160,72 +104,13 @@ public class CinematicEditor extends EditorListener{
             cinematicDialog.end();
             nodes.each(node -> node.elem = null);
             nodes.clear();
-
-            elem.visible = false;
-            elem.set(null);
         }
     }
 
     public void apply() throws Exception{
-        sector().cinematic.setNodes(nodes);
-        sector().cinematic.setTags(tags);
-
-        editor.tags.put("nodes", JsonIO.json.toJson(sector().cinematic.saveNodes(), StringMap.class, String.class));
-        editor.tags.put("object-tags", JsonIO.json.toJson(sector().cinematic.saveTags(), Seq.class, String.class));
-    }
-
-    public class TagElem extends Table{
-        private Object bound;
-        private Table content;
-        private final Seq<String> def = new Seq<>();
-
-        public TagElem(){
-            background(Tex.button);
-            margin(0f);
-
-            setSize(400f, 300f);
-            add("Tags").padTop(8f);
-            row().image(Tex.whiteui).color(Pal.accent).width(3f).growX().pad(4f);
-            row().pane(t -> content = t).grow().pad(4f).padTop(8f);
-
-            row().button(Icon.trash, Styles.emptyi, () -> ui.showConfirm("@dialog.cinematic.tag-delete.title", "@dialog.cinematic.tag-delete.content", () -> {
-                tags.remove(bound);
-                hideTag();
-            })).left().pad(4f);
-
-            update(() -> {
-                if(bound != null){
-                    var set = tags.get(bound);
-                    if(set == null) return;
-
-                    set.clear();
-                    set.addAll(def);
-                }
-            });
-        }
-
-        public Object bound(){
-            return bound;
-        }
-
-        public void set(Object bound){
-            this.bound = bound;
-
-            content.clear();
-            def.clear();
-            if(bound != null){
-                var set = tags.get(bound, ObjectSet::new);
-                def.setSize(set.size);
-
-                int i = 0;
-                for(var tag : set){
-                    int index = i++;
-
-                    content.add("Tag: ");
-                    content.field(tag, str -> def.set(index, str)).grow();
-                    content.row();
-                }
-            }
-        }
+        var core = sector().cinematic;
+        core.setNodes(nodes);
+        core.setTags(tags);
+        core.save(editor.tags);
     }
 }

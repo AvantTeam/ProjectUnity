@@ -13,7 +13,6 @@ import unity.map.cinematic.*;
 import unity.map.objectives.types.*;
 import unity.util.*;
 
-import java.lang.annotation.*;
 import java.util.regex.*;
 
 import static mindustry.Vars.*;
@@ -87,7 +86,8 @@ public class ObjectiveModel implements JsonSerializable{
                 var f = occur; // Finalize, for use in lambda statements.
                 var script = node.scripts.getThrow(f, () -> new IllegalArgumentException("No such script: '" + f + "'"));
 
-                source = source.replaceFirst(env, script.replace('\r', '\n').replace('\n', ';'));
+                // Remove new-lines, note that every script must have `;` as the statement separator!
+                source = source.replaceFirst(env, script.replace("\r", "\n").replace("\n", ""));
             }
 
             var func = JSBridge.compileFunc(JSBridge.unityScope, name + "-init.js", source);
@@ -148,12 +148,5 @@ public class ObjectiveModel implements JsonSerializable{
             this.constructor = constructor;
             this.icon = icon;
         }
-    }
-
-    @Target(ElementType.FIELD)
-    @Retention(RetentionPolicy.RUNTIME)
-    public @interface Ignore{
-        /** @return The children objectives in which this field will be ignored in. */
-        Class<?>[] value() default {};
     }
 }

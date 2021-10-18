@@ -20,7 +20,7 @@ public class ScriptedSector extends SectorPreset{
         super(name, planet, sector);
 
         Events.on(SaveWriteEvent.class, e -> {
-            if(valid()){
+            if(cinematic.bound() && valid()){
                 var map = new StringMap();
                 cinematic.save(map);
 
@@ -59,7 +59,7 @@ public class ScriptedSector extends SectorPreset{
                 if(ui == null){
                     Log.err(t);
                 }else{
-                    Events.on(ClientLoadEvent.class, e -> Time.runTask(6f, () -> ui.showException("Failed to load the story nodes of '" + localizedName + "'", t)));
+                    Events.on(ClientLoadEvent.class, e -> Time.runTask(6f, () -> ui.showException("Failed to load cinematic metadata of '" + localizedName + "'", t)));
                 }
             }
         });
