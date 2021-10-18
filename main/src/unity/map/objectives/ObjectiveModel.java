@@ -63,7 +63,7 @@ public class ObjectiveModel implements JsonSerializable{
             }
 
             name = data.getString("name");
-            init = data.getString("init");
+            init = data.getString("init", "");
 
             fields.clear();
             fields.putAll(json.readValue(ObjectMap.class, data.get("fields")));

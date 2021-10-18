@@ -187,7 +187,6 @@ public class Cinematics{
     public void setNodes(Seq<StoryNode> nodes){
         this.nodes.set(nodes.select(node -> node.parent == null));
         this.nodes.each(StoryNode::createObjectives);
-        this.nodes.each(e -> e.objectives.each(Objective::resolveDependencies));
     }
 
     public void setTags(ObjectMap<Object, ObjectSet<String>> tags){

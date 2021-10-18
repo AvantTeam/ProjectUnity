@@ -19,43 +19,16 @@ public abstract class Objective{
 
     protected transient boolean
         executed = false,
-        completed = false,
-        finishedDep = false;
+        completed = false;
 
     public Cons<Objective> init = objective -> {};
     public Cons<Objective> update = objective -> {};
     public Cons<Objective> draw = objective -> {};
 
-    public final transient Seq<Objective> dependencies = new Seq<>();
-    public final Seq<String> depAliases = new Seq<>();
-
     public <T extends Objective> Objective(StoryNode node, String name, Cons<T> executor){
         this.name = name;
         this.node = node;
         this.executor = (Cons<Objective>)executor;
-    }
-
-    public void resolveDependencies(){
-        dependencies.clear();
-        for(var dep : depAliases){
-            int separator = dep.indexOf("\n");
-            if(separator == -1) continue;
-
-            var otherNode = dep.substring(0, separator);
-            var otherDep = dep.substring(separator + 1);
-
-            var n = node.sector.cinematic.nodes.find(e -> e.name.equals(otherNode));
-            if(n != null){
-                var o = n.objectives.find(e -> e.name.equals(otherDep));
-                if(o != null) depend(o);
-            }
-        }
-    }
-
-    public void depend(Objective other){
-        if(!dependencies.contains(other) && !other.dependencies.contains(this)){
-            dependencies.add(other);
-        }
     }
 
     public void ext(FieldTranslator f){
@@ -86,11 +59,6 @@ public abstract class Objective{
                 drawFunc.call(c, s, s, args);
             };
         }
-
-        if(f.has("depAliases")){
-            depAliases.clear();
-            depAliases.addAll(f.<Iterable<String>>get("depAliases"));
-        }
     }
 
     public void init(){
@@ -106,7 +74,11 @@ public abstract class Objective{
     }
 
     public boolean shouldUpdate(){
-        return !executed && !completed && dependencyFinished();
+        return !executed && !completed;
+    }
+
+    public boolean qualified(){
+        return !executed && completed;
     }
 
     public boolean shouldDraw(){
@@ -154,22 +126,5 @@ public abstract class Objective{
     public void stop(){
         completed = true;
         executed = true;
-    }
-
-    public boolean qualified(){
-        return !executed && completed && dependencyFinished();
-    }
-
-    public boolean dependencyFinished(){
-        if(finishedDep || (finishedDep = dependencies.isEmpty())) return true;
-
-        finishedDep = true;
-        for(var dep : dependencies){
-            if(!dep.executed){
-                return finishedDep = false;
-            }
-        }
-
-        return true;
     }
 }
