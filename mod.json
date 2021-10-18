@@ -4,11 +4,7 @@
     "author": "Avant Team",
     "description": "A big-collaboration Mindustry mod created by many authors from the Mindustry modding community.",
     "version": "0.1",
-<<<<<<< HEAD
     "minGameVersion": 132.0,
-=======
-    "minGameVersion": 132,
->>>>>>> d17b01166c548e56021eea61e00f321e9be22d20
     "main": "unity.Unity",
     "java": true
 }
