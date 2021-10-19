@@ -19,34 +19,34 @@ public class StackedBarChart extends Element{
     @Override
     public void draw(){
         Font font = Fonts.outline;
-        var lay = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
-        
+        GlyphLayout lay = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
+
         float totalWeight = 0f;
-        var data = barStats.get();
-        
-        for(var i : data) totalWeight += i.weight;
-        
+        BarStat[] data = barStats.get();
+
+        for(BarStat i : data) totalWeight += i.weight;
+
         float yPos = y;
-        
-        for(var i : data){
+
+        for(BarStat i : data){
             float ah = height * i.weight / totalWeight;
             float aw = width * i.filled;
-            
+
             String text = i.name;
-            
+
             Draw.color(i.dark);
             Fill.rect(x + width * 0.5f, yPos + ah * 0.5f, width, ah);
-            
+
             Draw.color(i.color);
             Fill.rect(x + aw * 0.5f, yPos + ah * 0.5f, aw, ah);
-            
+
             lay.setText(font, text);
             font.setColor(Color.white);
             font.draw(text, x + width / 2f - lay.width / 2f, yPos + ah / 2f + lay.height / 2f + 1f);
-            
+
             yPos += ah;
         }
-        
+
         Pools.free(lay);
     }
 
@@ -70,7 +70,7 @@ public class StackedBarChart extends Element{
             this.weight = weight;
             this.filled = filled;
             this.color = color;
-            
+
             dark = color.cpy().mul(0.5f);
         }
     }

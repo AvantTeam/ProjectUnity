@@ -22,22 +22,22 @@ public class OutlineRegionProcessor implements Processor{
             Outline anno = field.getAnnotation(Outline.class);
             if(anno == null) continue;
 
-            var name = field.getName();
+            String name = field.getName();
 
             GenRegion rawRegion = Reflect.get(Regions.class, name.replace("OutlineRegion", "Region"));
 
             submit(exec, "Regions.java", () -> {
-                var color = Color.valueOf(anno.color());
+                Color color = Color.valueOf(anno.color());
                 int rad = anno.radius();
 
-                var region = new PixmapRegion(rawRegion.pixmap());
-                var out = Pixmaps.outline(region, color, rad);
+                PixmapRegion region = new PixmapRegion(rawRegion.pixmap());
+                Pixmap out = Pixmaps.outline(region, color, rad);
 
-                var outlineRegion = new GenRegion(rawRegion.name + "-outline", out);
+                GenRegion outlineRegion = new GenRegion(rawRegion.name + "-outline", out);
                 outlineRegion.relativePath = rawRegion.relativePath;
                 outlineRegion.save();
 
-                var handle = MethodHandles.publicLookup().unreflectVarHandle(field);
+                VarHandle handle = MethodHandles.publicLookup().unreflectVarHandle(field);
                 handle.setVolatile(outlineRegion);
             });
         }

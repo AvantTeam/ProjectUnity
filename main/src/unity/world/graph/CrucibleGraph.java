@@ -50,12 +50,12 @@ public class CrucibleGraph extends BaseGraph<GraphCrucibleModule, CrucibleGraph>
     public boolean addMeltItem(MeltInfo meltProd, float am, boolean liquid){
         CrucibleData avalslot = null;
         int totalContained = 0;
-        
+
         for(var i : contains){
             if(i.id == meltProd.id) avalslot = i;
             totalContained += i.volume;
         }
-        
+
         if(totalContained + am > totalCapacity) return false;
         if(avalslot != null){
             if(liquid) addLiquidToSlot(avalslot, am);
@@ -64,7 +64,7 @@ public class CrucibleGraph extends BaseGraph<GraphCrucibleModule, CrucibleGraph>
         }else{
             contains.add(new CrucibleData(meltProd.id, am, liquid ? 1f : 0f, meltProd.item));
         }
-        
+
         containChanged = true;
         return true;
     }
@@ -81,7 +81,7 @@ public class CrucibleGraph extends BaseGraph<GraphCrucibleModule, CrucibleGraph>
         float melted = slot.meltedRatio * slot.volume;
         slot.volume += am;
         slot.meltedRatio = melted / slot.volume;
-        
+
         if(slot.volume <= 0f || slot.meltedRatio <= 0f) slot.meltedRatio = 0f;
         containChanged = true;
     }
@@ -90,7 +90,7 @@ public class CrucibleGraph extends BaseGraph<GraphCrucibleModule, CrucibleGraph>
         float melted = slot.meltedRatio * slot.volume + am;
         slot.volume += am;
         slot.meltedRatio = melted / slot.volume;
-        
+
         if(slot.volume <= 0f || slot.meltedRatio <= 0f) slot.meltedRatio = 0f;
         containChanged = true;
     }
@@ -102,7 +102,7 @@ public class CrucibleGraph extends BaseGraph<GraphCrucibleModule, CrucibleGraph>
     void updateOnGraphChanged(){
         totalCapacity = 0f;
         crafts = false;
-        
+
         for(var module : connected){ //building
             int bitmask = 0;
             if(!module.initialized()){
@@ -112,25 +112,25 @@ public class CrucibleGraph extends BaseGraph<GraphCrucibleModule, CrucibleGraph>
             int directNeighbour = 0;
             for(int i = 0; i < 8; i++){
                 Tile tile = module.parent.build.tile().nearby(Geometry.d8(i));
-                
+
                 if(tile == null || !(tile.build instanceof GraphBuildBase build)) continue;
-                
+
                 GraphCrucibleModule conModule = build.crucible(); //crucible building
                 if(conModule == null || conModule.dead() || !canConnect(module, conModule)) continue;
                 if(i % 2 == 0) directNeighbour++;
-                
+
                 bitmask += 1 << i;
             }
 
             module.tilingIndex = bitmask;
             module.liquidCap = (module.parent.build.block().size == 1 ? capacityMul[directNeighbour] : 1f) * module.graph.baseLiquidCapcity;
-            
+
             totalCapacity += module.liquidCap;
             crafts |= module.graph.doesCrafting;
         }
         if(getVolumeContained() > totalCapacity){
             float decRatio = totalCapacity / getVolumeContained();
-            
+
             for(int i = 0, len = contains.size; i < len; i++) contains.get(i).volume *= decRatio;
             containChanged = true;
         }
@@ -139,7 +139,7 @@ public class CrucibleGraph extends BaseGraph<GraphCrucibleModule, CrucibleGraph>
     public float getAverageTemp(){
         float speed = 0f;
         int count = 0;
-        
+
         for(var module : connected){ //building
             if(!module.graph.doesCrafting) continue;
             speed += module.parent.build.heat().getTemp();
@@ -152,21 +152,21 @@ public class CrucibleGraph extends BaseGraph<GraphCrucibleModule, CrucibleGraph>
     float getAverageTempDecay(float meltPoint, float meltSpeed, float tmpDep, float coolDep){
         float speed = 0f;
         int count = 0;
-        
+
         for(var module : connected){ //building
             if(!module.graph.doesCrafting) continue;
-            
+
             float temp = module.parent.build.heat().getTemp();
-            
+
             if(temp > meltPoint){
                 speed += (1f + temp / meltPoint * tmpDep) * meltSpeed;
             }else{
                 speed -= (1f - temp / meltPoint) * coolDep * meltSpeed;
-            }    
+            }
             count++;
         }
         if(count == 0) return 0;
-        
+
         return speed / count;
     }
 
@@ -181,7 +181,7 @@ public class CrucibleGraph extends BaseGraph<GraphCrucibleModule, CrucibleGraph>
     public void updateColor(){
         color.set(0f, 0f, 0f);
         float tLiquid = 0f;
-        
+
         for(var i : contains){
             if(i.meltedRatio > 0f){
                 float liquidVol = i.meltedRatio * i.volume;
@@ -205,17 +205,17 @@ public class CrucibleGraph extends BaseGraph<GraphCrucibleModule, CrucibleGraph>
             updateColor();
             return;
         }
-        
+
         float capcityMul = Mathf.sqrt(totalCapacity / 15f);
-        
+
         for(var i : contains){
             float meltMul = Time.delta / i.volume;
-            
+
             if(i.id < MeltInfo.all.length){
                 MeltInfo m = MeltInfo.all[i.id];
                 i.meltedRatio += meltMul * getAverageMeltSpeed(m, 0.002f, 0.5f) * 0.4f * capcityMul;
                 i.meltedRatio = Mathf.clamp(i.meltedRatio);
-                
+
                 if(m.evaporationTemp >= 0f){
                     float evap = getAverageTempDecay(m.evaporationTemp, m.evaporation, 0f, 1f);
                     if(evap > 0f){
@@ -230,7 +230,7 @@ public class CrucibleGraph extends BaseGraph<GraphCrucibleModule, CrucibleGraph>
             float maxCraftable = 9999999f;
             int len = z.input.length;
             int[] inputSlots = new int[len];
-            
+
             for(int r = 0; r < len; r++){
                 boolean found = false;
                 for(var ingre : contains){
@@ -250,7 +250,7 @@ public class CrucibleGraph extends BaseGraph<GraphCrucibleModule, CrucibleGraph>
             if(valid && maxCraftable > 0f){
                 float craftAm = Math.min(maxCraftable, z.alloySpeed * Time.delta * 0.2f * capcityMul);
                 if(craftAm <= 0f) return;
-                
+
                 for(int r = 0; r < len; r++){
                     InputRecipe alyInput = z.input[r];
                     if(alyInput.needsLiquid){
@@ -276,7 +276,7 @@ public class CrucibleGraph extends BaseGraph<GraphCrucibleModule, CrucibleGraph>
         for(var module : connected){ //building
             Seq<CrucibleData> nc = new Seq<>();
             float ratio = module.liquidCap / totalCapacity;
-            
+
             for(var i : contains) nc.add(new CrucibleData(i.id, i.volume * ratio, i.meltedRatio, i.item));
             module.propsList.put(module.getPortOfNetwork(this), nc);
         }
@@ -290,11 +290,11 @@ public class CrucibleGraph extends BaseGraph<GraphCrucibleModule, CrucibleGraph>
     void addMergeStats(GraphCrucibleModule module){
         int port = module.getPortOfNetwork(this);
         totalCapacity += module.liquidCap;
-        
-        var cc = module.propsList.get(port);
+
+        Seq<CrucibleData> cc = module.propsList.get(port);
         if(cc == null || cc.isEmpty()) return;
         MeltInfo[] melts = MeltInfo.all;
-        
+
         for(var i : cc){
             addMeltItem(melts[i.id], i.volume * (1f - i.meltedRatio), false);
             addMeltItem(melts[i.id], i.volume * i.meltedRatio, true);
@@ -305,7 +305,7 @@ public class CrucibleGraph extends BaseGraph<GraphCrucibleModule, CrucibleGraph>
     void mergeStats(CrucibleGraph graph){
         MeltInfo[] melts = MeltInfo.all;
         totalCapacity += graph.totalCapacity;
-        
+
         for(var i : graph.contains){
             addMeltItem(melts[i.id], i.volume * (1f - i.meltedRatio), false);
             addMeltItem(melts[i.id], i.volume * i.meltedRatio, true);

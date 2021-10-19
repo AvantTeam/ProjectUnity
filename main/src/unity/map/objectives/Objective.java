@@ -2,6 +2,7 @@ package unity.map.objectives;
 
 import arc.func.*;
 import arc.struct.*;
+import rhino.*;
 import unity.map.cinematic.*;
 import unity.map.objectives.ObjectiveModel.*;
 import unity.util.*;
@@ -32,12 +33,12 @@ public abstract class Objective{
     }
 
     public void ext(FieldTranslator f){
-        var c = JSBridge.context;
-        var s = JSBridge.unityScope;
+        Context c = JSBridge.context;
+        ImporterTopLevel s = JSBridge.unityScope;
         Object[] args = {null};
 
         if(f.has("init")){
-            var initFunc = JSBridge.compileFunc(s, name + "-init.js", f.get("init"));
+            Function initFunc = JSBridge.compileFunc(s, name + "-init.js", f.get("init"));
             init = obj -> {
                 args[0] = obj;
                 initFunc.call(c, s, s, args);
@@ -45,7 +46,7 @@ public abstract class Objective{
         }
 
         if(f.has("update")){
-            var updateFunc = JSBridge.compileFunc(s, name + "-update.js", f.get("update"));
+            Function updateFunc = JSBridge.compileFunc(s, name + "-update.js", f.get("update"));
             update = obj -> {
                 args[0] = obj;
                 updateFunc.call(c, s, s, args);
@@ -53,7 +54,7 @@ public abstract class Objective{
         }
 
         if(f.has("draw")){
-            var drawFunc = JSBridge.compileFunc(s, name + "-draw.js", f.get("draw"));
+            Function drawFunc = JSBridge.compileFunc(s, name + "-draw.js", f.get("draw"));
             draw = obj -> {
                 args[0] = obj;
                 drawFunc.call(c, s, s, args);

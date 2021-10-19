@@ -61,7 +61,7 @@ public class TapHandler{
     }
 
     public void tap(Player player, float x, float y){
-        for(var listener : listeners){
+        for(TapListener listener : listeners){
             listener.tap(player, x, y);
         }
     }

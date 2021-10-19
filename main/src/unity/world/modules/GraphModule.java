@@ -29,7 +29,7 @@ public abstract class GraphModule<T extends Graph, M extends GraphModule<T, M, G
     boolean dead, needsNetworkUpdate = true, networkSaveState, multi;
 
     private boolean initialized;
-    
+
     GraphData getConnectSidePos(int index){
         return parent.getConnectSidePos(index);
     }
@@ -176,7 +176,7 @@ public abstract class GraphModule<T extends Graph, M extends GraphModule<T, M, G
     abstract void displayBars(Table table);
 
     void drawSelect(){
-        var net = networks.get(0);
+        G net = networks.get(0);
         if(net != null) net.connected.each(module -> Drawf.selected(module.parent.build.<Building>self(), Pal.accent));
     }
 

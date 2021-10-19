@@ -16,9 +16,12 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
+import mindustry.world.modules.*;
 import unity.graphics.*;
 import unity.util.*;
 import unity.world.blocks.*;
+import unity.world.modules.*;
 import younggamExperimental.Segment;
 import younggamExperimental.*;
 
@@ -120,7 +123,7 @@ public class Chopper extends GraphBlock{
         }
 
         TextureRegion getBufferRegion(){
-            var tex = Draw.wrap(buffer.getTexture());
+            TextureRegion tex = Draw.wrap(buffer.getTexture());
             tex.v = tex.v2;
             tex.v2 = tex.u;
             return tex;
@@ -157,9 +160,9 @@ public class Chopper extends GraphBlock{
                 return;
             }
             if(timer(timerDump, autoBuildDelay)){
-                var core = team.core();
+                CoreBuild core = team.core();
                 if(core == null) return;
-                var cItems = core.items;
+                ItemModule cItems = core.items;
                 for(var i : blueprintRemainingCost){
                     if((i.value >>> 16) < (i.value & mask) && cItems.get(i.key) > 0){
                         cItems.remove(i.key, 1);
@@ -219,7 +222,7 @@ public class Chopper extends GraphBlock{
         }
 
         void onIntCollider(int cx, int cy, float rot){
-            var build = Vars.world.build(cx, cy);
+            Building build = Vars.world.build(cx, cy);
             boolean collide = build != null && collidedBlocks.add(tile.pos());
             if(collide && build.team != team){
                 float k = getHitDamage((cx - tileX()) * Vars.tilesize, (cy - tileY()) * Vars.tilesize, rot);
@@ -248,14 +251,14 @@ public class Chopper extends GraphBlock{
         }
 
         void accumStats(PartInfo part, int x, int y, int[][] grid){
-            var iner = part.stats.get(PartStatType.mass);
+            PartStat iner = part.stats.get(PartStatType.mass);
             if(iner != null) currentStats.inertia += iner.asInt() * x;
-            var hp = part.stats.get(PartStatType.hp);
+            PartStat hp = part.stats.get(PartStatType.hp);
             if(hp != null) currentStats.hpinc += hp.asInt();
 
-            var collides = part.stats.get(PartStatType.collides);
+            PartStat collides = part.stats.get(PartStatType.collides);
             if(collides != null && collides.asBool()){
-                var damage = part.stats.get(PartStatType.damage);
+                PartStat damage = part.stats.get(PartStatType.damage);
                 int dmg = damage != null ? damage.asInt() : 0;
                 if(currentStats.segments.isEmpty()) currentStats.segments.add(new Segment(x, x + part.tw, dmg));
                 else{
@@ -280,9 +283,9 @@ public class Chopper extends GraphBlock{
         @Override
         public void buildConfiguration(Table table){
             table.button(Tex.whiteui, Styles.clearTransi, 50f, () -> {
-                var dialog = new BaseDialog("Edit Blueprint");
+                BaseDialog dialog = new BaseDialog("Edit Blueprint");
                 dialog.setFillParent(false);
-                var mtd = ModularConstructorUI.applyModularConstructorUI(dialog.cont, partsRegion, Math.round(partsRegion.width / 32f), Math.round(partsRegion.height / 32f),
+                ModularConstructorUI mtd = ModularConstructorUI.applyModularConstructorUI(dialog.cont, partsRegion, Math.round(partsRegion.width / 32f), Math.round(partsRegion.height / 32f),
                     partInfo, gridW, gridH, bluePrint, getPartsCategories(), partCostAccum
                 );
                 dialog.buttons.button("@ok", () -> {
@@ -308,7 +311,7 @@ public class Chopper extends GraphBlock{
             for(int p = 0; p < len; p++){
                 int temp = bluePrint.get(p);
                 if(temp != 0){
-                    var partL = partInfo[temp - 1];
+                    PartInfo partL = partInfo[temp - 1];
                     cstMult += partCostAccum * partL.tw * partL.th;
                 }
             }
@@ -319,8 +322,8 @@ public class Chopper extends GraphBlock{
             for(int p = 0; p < len; p++){
                 int temp = bluePrint.get(p);
                 if(temp != 0){
-                    var partL = partInfo[temp - 1];
-                    var prtTmp = partL.cost;
+                    PartInfo partL = partInfo[temp - 1];
+                    ItemStack[] prtTmp = partL.cost;
                     for(var cstItem : prtTmp){
                         int cur = blueprintRemainingCost.get(cstItem.item, 0);
                         int increment = Mathf.floor(cstItem.amount * cstMult);
@@ -369,7 +372,7 @@ public class Chopper extends GraphBlock{
                 write.i(0);
                 return;
             }
-            var tmp = IntPacker.packArray(bluePrint).packed;
+            IntSeq tmp = IntPacker.packArray(bluePrint).packed;
             int len = tmp.size;
             write.s(len);
             for(int i = 0; i < len; i++) write.i(tmp.get(i));
@@ -407,7 +410,7 @@ public class Chopper extends GraphBlock{
 
         @Override
         public void updatePre(){
-            var tGraph = torque();
+            GraphTorqueModule<?> tGraph = torque();
             tGraph.setInertia(inertia);
             tGraph.force = -knockbackTorque;
             knockbackTorque = 0;
@@ -433,7 +436,7 @@ public class Chopper extends GraphBlock{
         public void draw(){
             float rot = torque().getRotation();
             Draw.rect(baseRegions[rotation], x, y);
-            var blades = getBufferRegion();
+            TextureRegion blades = getBufferRegion();
             if(blades != null){
                 Draw.z(Layer.turret);
                 if(getPaidRatio() < 1f){
@@ -446,4 +449,3 @@ public class Chopper extends GraphBlock{
         }
     }
 }
-

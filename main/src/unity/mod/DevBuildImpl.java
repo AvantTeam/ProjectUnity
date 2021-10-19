@@ -17,13 +17,13 @@ public class DevBuildImpl implements DevBuild{
 
         if(!headless && !android){
             Threads.daemon("Command-Executor", () -> {
-                var scan = new Scanner(System.in);
+                Scanner scan = new Scanner(System.in);
                 String line;
 
                 while((line = scan.nextLine()) != null){
-                    var split = line.split("\\s+");
+                    String[] split = line.split("\\s+");
                     if(OS.isWindows){
-                        var args = new String[split.length + 2];
+                        String[] args = new String[split.length + 2];
                         args[0] = "cmd";
                         args[1] = "/c";
 

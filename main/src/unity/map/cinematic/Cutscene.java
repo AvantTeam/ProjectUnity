@@ -73,13 +73,13 @@ public class Cutscene{
     }
 
     public <T extends Cutscene> T then(T next){
-        var target = this;
+        Cutscene target = this;
         while(target.child != null){
             target = target.child;
         }
 
         next.parent = target;
-        var cur = target;
+        Cutscene cur = target;
         while(cur != null && cur != root){
             if(cur == next) throw new IllegalArgumentException("Can't invoke then() to a parent cutscene!");
             cur = cur.parent;
@@ -107,7 +107,7 @@ public class Cutscene{
     private void drawStripes(){
         Draw.color(Color.black);
 
-        var pos = Core.scene.screenToStageCoordinates(Tmp.v1.set(0f, Core.graphics.getHeight()));
+        Vec2 pos = Core.scene.screenToStageCoordinates(Tmp.v1.set(0f, Core.graphics.getHeight()));
         float
             x = pos.x,
             y = pos.y,

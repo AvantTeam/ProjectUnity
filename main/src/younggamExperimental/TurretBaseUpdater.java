@@ -2,6 +2,7 @@ package younggamExperimental;
 
 import arc.scene.ui.layout.*;
 import mindustry.type.*;
+import unity.world.modules.*;
 import younggamExperimental.blocks.ModularTurret.*;
 
 //I'm sad.
@@ -23,7 +24,7 @@ public class TurretBaseUpdater{
     }
 
     void updateShooting(){
-        var hgraph = build.heat();
+        GraphHeatModule hgraph = build.heat();
         float temp = hgraph.getTemp();
         if(reload >= reloadTime){
             //TODO

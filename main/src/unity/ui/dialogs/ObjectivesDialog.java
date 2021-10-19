@@ -1,5 +1,6 @@
 package unity.ui.dialogs;
 
+import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
@@ -16,6 +17,7 @@ import static mindustry.Vars.*;
 import static unity.Unity.*;
 import static unity.map.objectives.ObjectiveModel.*;
 
+@SuppressWarnings("unchecked")
 public class ObjectivesDialog extends BaseDialog{
     private StoryNode node;
     private final Seq<ObjectiveModel> models = new Seq<>();
@@ -30,7 +32,7 @@ public class ObjectivesDialog extends BaseDialog{
 
         cont.pane(Styles.nonePane, t -> content = t).growY().width(750f);
         buttons.button("@add", Icon.add, () -> {
-            var model = new ObjectiveModel();
+            ObjectiveModel model = new ObjectiveModel();
             model.name = lastName();
 
             models.add(model);
@@ -52,7 +54,7 @@ public class ObjectivesDialog extends BaseDialog{
 
     private String lastName(){
         int i = 0;
-        for(var m : models){
+        for(ObjectiveModel m : models){
             if(m.name.startsWith("objective") && Character.isDigit(m.name.codePointAt("objective".length()))){
                 int index = Character.digit(m.name.charAt("objective".length()), 10);
                 if(index > i) i = index;
@@ -68,7 +70,7 @@ public class ObjectivesDialog extends BaseDialog{
 
             Class<?> current = type;
             while(true){
-                for(var f : current.getDeclaredFields()){
+                for(Field f : current.getDeclaredFields()){
                     int mod = f.getModifiers();
                     if(Modifier.isStatic(mod) || Modifier.isTransient(mod)) continue;
                     all.add(f);
@@ -118,7 +120,7 @@ public class ObjectivesDialog extends BaseDialog{
             table(t -> {
                 t.add("Name: ").style(Styles.outlineLabel).padLeft(8f);
 
-                var field = t.field(model.name, Styles.defaultField, str -> model.name = str).get();
+                TextField field = t.field(model.name, Styles.defaultField, str -> model.name = str).get();
                 field.setValidator(str -> !models.contains(m -> m.name.equals(str)));
                 field.getStyle().font = Fonts.outline;
 
@@ -130,18 +132,18 @@ public class ObjectivesDialog extends BaseDialog{
                 t.defaults().pad(4f);
 
                 t.table(ts -> {
-                    var typeSelect = ts.label(() -> "Type: " + (model.type == null ? "..." : model.type.getSimpleName())).fillX().padLeft(8f).get();
+                    Label typeSelect = ts.label(() -> "Type: " + (model.type == null ? "..." : model.type.getSimpleName())).fillX().padLeft(8f).get();
                     typeSelect.setAlignment(Align.left);
 
                     ts.add().growX();
 
                     ts.button(Icon.downOpen, Styles.logici, () -> {
-                        var dialog = new BaseDialog("@dialog.cinematic.objectives.select");
+                        BaseDialog dialog = new BaseDialog("@dialog.cinematic.objectives.select");
                         dialog.addCloseButton();
 
                         dialog.cont.pane(Styles.nonePane, s -> {
-                            for(var type : datas.keys()){
-                                var data = data(type);
+                            for(Class<? extends Objective> type : datas.keys()){
+                                ObjectiveData data = data(type);
 
                                 s.button(type.getSimpleName(), data.icon.get(), Styles.defaultt, () -> {
                                     model.set(model.type == type ? null : type);
@@ -191,7 +193,7 @@ public class ObjectivesDialog extends BaseDialog{
                 }).growX().fillY().padLeft(8f).padRight(8f).padBottom(8f);
 
                 fields.row().table(t -> {
-                    for(var f : getFields(model.type)){
+                    for(Field f : getFields(model.type)){
                         t.add(f.getName(), Styles.outlineLabel).growX();
                         t.add(" | ", Styles.outlineLabel);
                         t.add(f.getGenericType().getTypeName(), Styles.outlineLabel).growX();
@@ -203,7 +205,7 @@ public class ObjectivesDialog extends BaseDialog{
 
         @Override
         public boolean remove(){
-            var cell = content.getCell(this);
+            Cell<ObjectiveElem> cell = (Cell<ObjectiveElem>)content.getCell(this);
 
             boolean succeed = super.remove();
             if(succeed && cell != null){

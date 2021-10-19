@@ -41,16 +41,15 @@ public class IntPacker{
     }
 
     public String toStringPack(){
-        var str = new StringBuilder("");
+        StringBuilder str = new StringBuilder("");
         for(int i = 0, len = raw.size; i < len; i++) str.append((char)raw.get(i));
         return str.toString();
     }
 
     public static IntPacker packArray(IntSeq a){
-        var packer = new IntPacker();
+        IntPacker packer = new IntPacker();
         for(int i = 0, len = a.size; i < len; i++) packer.add(a.get(i));
         packer.end();
         return packer;
     }
 }
-

@@ -78,7 +78,7 @@ public class UnityFx{
     laserChargeBegin = new Effect(60f, e -> {
         color(e.color);
         Fill.square(e.x, e.y, e.fin() * 3f, 45f);
-    
+
         color();
         Fill.square(e.x, e.y, e.fin() * 2f, 45f);
     }),
@@ -123,7 +123,7 @@ public class UnityFx{
         randLenVectors(e.id, 20, 50f * e.fout(), (x, y) ->
             Fill.circle(e.x + x, e.y + y, e.fin() * 6f)
         );
-    
+
         color();
         Fill.circle(e.x, e.y, e.fin() * 13);
     }),
@@ -139,12 +139,12 @@ public class UnityFx{
     }),
 
     whirl = new Effect(65f, e -> {
-        for(var i = 0; i < 2; i++){
-            var h = i * 2;
-            var r1 = Interp.exp5In.apply((Mathf.randomSeedRange(e.id + h, 1f) + 1f) / 2f);
-            var r2 = (Mathf.randomSeedRange(e.id * 2L + h, 360) + 360f) / 2f;
-            var r3 = (Mathf.randomSeedRange(e.id * 4L + h, 5) + 5f) / 2f;
-            var a = r2 + ((180f + r3) * e.fin());
+        for(int i = 0; i < 2; i++){
+            int h = i * 2;
+            float r1 = Interp.exp5In.apply((Mathf.randomSeedRange(e.id + h, 1f) + 1f) / 2f);
+            float r2 = (Mathf.randomSeedRange(e.id * 2L + h, 360) + 360f) / 2f;
+            float r3 = (Mathf.randomSeedRange(e.id * 4L + h, 5) + 5f) / 2f;
+            float a = r2 + ((180f + r3) * e.fin());
 
             Tmp.v1.trns(a, r1 * 70f * e.fout());
 
@@ -253,7 +253,7 @@ public class UnityFx{
         color(Pal.surge, Color.white, e.fin());
         Drawf.tri(e.x, e.y, e.fout() * 10f, e.fout() * 11f, e.rotation);
     }).layer(Layer.bullet - 0.01f),
-    
+
     surgeSplash = new Effect(40f, 100f, e -> {
         color(Pal.surge);
         stroke(e.fout() * 2);
@@ -261,13 +261,13 @@ public class UnityFx{
 
         color(Pal.surge);
 
-        for(var i = 0; i < 4; i++){
+        for(int i = 0; i < 4; i++){
             Drawf.tri(e.x, e.y, 6, 100 * e.fout(), i*90);
         }
 
         color();
 
-        for(var i = 0; i < 4; i++){
+        for(int i = 0; i < 4; i++){
             Drawf.tri(e.x, e.y, 3, 35 * e.fout(), i*90);
         }
     }),
@@ -509,7 +509,7 @@ public class UnityFx{
         stroke(e.fslope());
         circle(e.x, e.y, e.fin() * 20f);
     }),
-    
+
     waitFx = new Effect(30f, e -> {
         // if(!isArray(e.data)) return; (I don't know how to translate this)
         Object[] data = (Object[])e.data;
@@ -693,7 +693,7 @@ public class UnityFx{
 
     arcSmoke = new Effect(27f, e -> {
         color(Color.valueOf("6c8fc7"), Color.valueOf("606571"), e.fin());
-        
+
         Angles.randLenVectors(e.id, 3, e.finpow() * 20f, e.rotation, 180f, (x, y) -> {
             Fill.poly(e.x + x, e.y + y, 6, e.fout() * 9f, e.rotation);
         });
@@ -701,7 +701,7 @@ public class UnityFx{
 
     arcSmoke2 = new Effect(27f, e -> {
         color(Color.valueOf("6c8fc7"), Color.valueOf("606571"), e.fin());
-        
+
         Tmp.v1.trns(e.rotation, e.fin() * 4.6f * 15f);
         Fill.poly(e.x + Tmp.v1.x, e.y + Tmp.v1.y, 6, e.fout() * 16f, e.rotation);
     }),

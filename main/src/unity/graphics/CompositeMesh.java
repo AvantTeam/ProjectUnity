@@ -45,7 +45,7 @@ public class CompositeMesh extends PlanetMesh{
         }
 
         for(var e : comps){
-            var s = e.shader.shader;
+            Shader s = e.shader.shader;
             s.bind();
             s.setUniformMatrix4("u_proj", projection.val);
             s.setUniformMatrix4("u_trans", transform.val);

@@ -42,14 +42,14 @@ public class Model implements Disposable{
 
     protected void loadAnimations(Iterable<ModelAnimation> modelAnimations){
         for(var anim : modelAnimations){
-            var animation = new Animation();
+            Animation animation = new Animation();
             animation.id = anim.id;
 
             for(var nanim : anim.nodeAnimations){
-                var node = getNode(nanim.nodeId);
+                Node node = getNode(nanim.nodeId);
                 if(node == null)  continue;
 
-                var nodeAnim = new NodeAnimation();
+                NodeAnimation nodeAnim = new NodeAnimation();
                 nodeAnim.node = node;
 
                 if(nanim.translation != null){

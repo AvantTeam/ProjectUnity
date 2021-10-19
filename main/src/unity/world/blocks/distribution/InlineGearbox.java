@@ -33,7 +33,7 @@ public class InlineGearbox extends GraphBlock{
             float fixedRot = (rotdeg() + 90f) % 180f - 90f;
             Draw.rect(baseRegion, x, y);
             Draw.rect(mbaseRegion, x, y, fixedRot);
-            var offset = Geometry.d4(rotation + 1);
+            Point2 offset = Geometry.d4(rotation + 1);
             float ox = offset.x * 4f;
             float oy = offset.y * 4f;
             UnityDrawf.drawRotRect(movingRegion, x + ox, y + oy, 16f, 3.5f, 8f, fixedRot, shaftRot, shaftRot + 90f);

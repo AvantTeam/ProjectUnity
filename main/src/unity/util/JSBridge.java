@@ -41,7 +41,7 @@ public final class JSBridge{
 
     public static void importPackage(ImporterTopLevel scope, String packageName){
         if(tools) return;
-        var p = new NativeJavaPackage(packageName, mods.mainLoader());
+        NativeJavaPackage p = new NativeJavaPackage(packageName, mods.mainLoader());
         p.setParentScope(scope);
 
         scope.importPackage(p);
@@ -60,7 +60,7 @@ public final class JSBridge{
     public static void importClass(ImporterTopLevel scope, Class<?> type){
         if(tools) return;
 
-        var nat = new NativeJavaClass(scope, type);
+        NativeJavaClass nat = new NativeJavaClass(scope, type);
         nat.setParentScope(scope);
 
         scope.importClass(nat);
@@ -77,9 +77,9 @@ public final class JSBridge{
     }
 
     public static <T> Func<Object[], T> requireType(Function func, Context context, Scriptable scope, Class<T> returnType){
-        var type = ReflectUtils.box(returnType);
+        Class<?> type = ReflectUtils.box(returnType);
         return args -> {
-            var res = func.call(context, scope, scope, args);
+            Object res = func.call(context, scope, scope, args);
             if(type == void.class || type == Void.class) return null;
 
             if(res instanceof Wrapper w) res = w.unwrap();

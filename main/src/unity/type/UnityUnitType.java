@@ -11,6 +11,7 @@ import arc.util.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.abilities.*;
+import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -80,7 +81,7 @@ public class UnityUnitType extends UnitType{
 
     // For shoot armor ability
     public FloatSeq weaponXs = new FloatSeq();
-    
+
     // Legs extra
     protected static Vec2 legOffsetB = new Vec2();
     protected static float[][] jointOffsets = new float[2][2];
@@ -117,9 +118,9 @@ public class UnityUnitType extends UnitType{
 
     @Override
     public Unit create(Team team){
-        var unit = super.create(team);
+        Unit unit = super.create(team);
 
-        var caller = ReflectUtils.classCaller();
+        Class<?> caller = ReflectUtils.classCaller();
         boolean fromWave = caller != null && SpawnGroup.class.isAssignableFrom(caller);
 
         //if(fromWave){
@@ -184,7 +185,7 @@ public class UnityUnitType extends UnitType{
         payloadCellRegion = atlas.find(name + "-cell-payload", cellRegion);
 
         //abilities
-        for(var type : AbilityTextures.values()){
+        for(AbilityTextures type : AbilityTextures.values()){
             abilityRegions[type.ordinal()] = atlas.find(name + "-" + type.name());
         }
 
@@ -203,7 +204,7 @@ public class UnityUnitType extends UnitType{
             mapped.add(rotor);
 
             if(rotor.mirror){
-                var copy = rotor.copy();
+                Rotor copy = rotor.copy();
                 copy.x *= -1f;
                 copy.speed *= -1f;
                 copy.shadeSpeed *= -1f;
@@ -222,7 +223,7 @@ public class UnityUnitType extends UnitType{
         sortSegWeapons(segWeapSeq);
 
         Seq<Weapon> addBottoms = new Seq<>();
-        for(var w : weapons){
+        for(Weapon w : weapons){
             if(bottomWeapons.contains(w) && w.otherSide != -1){
                 addBottoms.add(weapons.get(w.otherSide));
             }
@@ -238,11 +239,11 @@ public class UnityUnitType extends UnitType{
     public void sortSegWeapons(Seq<Weapon> weaponSeq){
         Seq<Weapon> mapped = new Seq<>();
         for(int i = 0, len = weaponSeq.size; i < len; i++){
-            var w = weaponSeq.get(i);
+            Weapon w = weaponSeq.get(i);
             mapped.add(w);
 
             if(w.mirror){
-                var copy = w.copy();
+                Weapon copy = w.copy();
                 copy.x *= -1;
                 copy.shootX *= -1;
                 copy.flipSprite = !copy.flipSprite;
@@ -636,7 +637,7 @@ public class UnityUnitType extends UnitType{
             float offset = engineOffset / 2f + engineOffset / 2f * scale;
 
             if(unit instanceof Trailc trail){
-                var t = trail.trail();
+                Trail t = trail.trail();
                 t.draw(engineColor, (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f) * scale) * trailScl);
             }
 
@@ -663,8 +664,8 @@ public class UnityUnitType extends UnitType{
         float z = Draw.z();
 
         applyColor(unit);
-        for(var mount : unit.mounts){
-            var weapon = mount.weapon;
+        for(WeaponMount mount : unit.mounts){
+            Weapon weapon = mount.weapon;
             if(bottomWeapons.contains(weapon)) Draw.z(z - 0.0001f);
 
             weapon.draw(unit, mount);
@@ -677,9 +678,9 @@ public class UnityUnitType extends UnitType{
     public <T extends Unit & Copterc> void drawRotors(T unit){
         applyColor(unit);
 
-        var rotors = unit.rotors();
-        for(var mount : rotors){
-            var rotor = mount.rotor;
+        RotorMount[] rotors = unit.rotors();
+        for(RotorMount mount : rotors){
+            Rotor rotor = mount.rotor;
             float x = unit.x + Angles.trnsx(unit.rotation - 90f, rotor.x, rotor.y);
             float y = unit.y + Angles.trnsy(unit.rotation - 90f, rotor.x, rotor.y);
 
@@ -705,8 +706,8 @@ public class UnityUnitType extends UnitType{
             }
         }
 
-        for(var mount : rotors){
-            var rotor = mount.rotor;
+        for(RotorMount mount : rotors){
+            Rotor rotor = mount.rotor;
             float x = unit.x + Angles.trnsx(unit.rotation - 90f, rotor.x, rotor.y);
             float y = unit.y + Angles.trnsy(unit.rotation - 90f, rotor.x, rotor.y);
 

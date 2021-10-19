@@ -5,6 +5,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.input.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.scene.*;
 import arc.scene.event.*;
 import arc.scene.style.*;
@@ -16,6 +17,8 @@ import mindustry.graphics.*;
 import mindustry.ui.*;
 import unity.map.cinematic.*;
 import unity.ui.*;
+
+import java.util.*;
 
 import static mindustry.Vars.*;
 import static unity.Unity.*;
@@ -46,16 +49,14 @@ public class CinematicCanvas extends WidgetGroup{
         super.draw();
 
         Draw.alpha(parentAlpha);
-        for(var e : getChildren()){
-            if(e instanceof NodeElem elem) elem.drawConnection();
-        }
+        getChildren().each(e -> e instanceof NodeElem, NodeElem::drawConnection);
 
         if(selected != null){
-            var dest = selected.localToStageCoordinates(Tmp.v1.set(
+            Vec2 dest = selected.localToStageCoordinates(Tmp.v1.set(
                 selected.getWidth() / 2f,
                 selected.getHeight() / 2f
             ));
-            var mouse = Core.input.mouse();
+            Vec2 mouse = Core.input.mouse();
 
             drawCurve(dest.x, dest.y, mouse.x, mouse.y);
         }
@@ -70,8 +71,8 @@ public class CinematicCanvas extends WidgetGroup{
     }
 
     public void add(StoryNode node){
-        var elem = new NodeElem(node);
-        var pos = localToStageCoordinates(node.position);
+        NodeElem elem = new NodeElem(node);
+        Vec2 pos = localToStageCoordinates(node.position);
         elem.setPosition(pos.x, pos.y, Align.center);
 
         addChild(elem);
@@ -101,7 +102,7 @@ public class CinematicCanvas extends WidgetGroup{
                 t.touchable = Touchable.enabled;
 
                 t.add("Name: ").style(Styles.outlineLabel);
-                var field = t.field(node.name, Styles.defaultField, str -> node.name = str).padRight(8f).get();
+                TextField field = t.field(node.name, Styles.defaultField, str -> node.name = str).padRight(8f).get();
                 field.setValidator(str -> !cinematicEditor.nodes.contains(n -> n.name.equals(str)));
                 field.getStyle().font = Fonts.outline;
 
@@ -135,9 +136,9 @@ public class CinematicCanvas extends WidgetGroup{
                 t.add(new DragButton(Icon.trash, Styles.logici, () -> ui.showConfirm("@dialog.cinematic.node-delete.title", "@dialog.cinematic.node-delete.content", () -> {
                     remove();
 
-                    var it = cinematicEditor.nodes.iterator();
+                    Iterator<StoryNode> it = cinematicEditor.nodes.iterator();
                     while(it.hasNext()){
-                        var e = it.next();
+                        StoryNode e = it.next();
                         e.children.remove(node);
 
                         if(e == node) it.remove();
@@ -151,9 +152,9 @@ public class CinematicCanvas extends WidgetGroup{
 
         private void connection(boolean accept){
             float size = 30f, pad = size / 2f - 3f;
-            var c = button(accept ? acceptor : distributor, Styles.colori, () -> {}).size(size);
+            Cell<ImageButton> c = button(accept ? acceptor : distributor, Styles.colori, () -> {}).size(size);
 
-            var button = c.get();
+            ImageButton button = c.get();
             if(accept){
                 acceptCont = button;
                 c.padLeft(-pad);
@@ -175,7 +176,7 @@ public class CinematicCanvas extends WidgetGroup{
 
                     @Override
                     public void touchUp(InputEvent event, float x, float y, int pointer, KeyCode code){
-                        var e = entered;
+                        ImageButton e = entered;
                         if(e != null && e.userObject instanceof NodeElem elem && elem != NodeElem.this && e == elem.acceptCont){
                             node.child(elem.node);
                         }
@@ -199,15 +200,15 @@ public class CinematicCanvas extends WidgetGroup{
         }
 
         private void drawConnection(){
-            for(var child : node.children){
-                var elem = child.elem;
+            for(StoryNode child : node.children){
+                NodeElem elem = child.elem;
                 if(elem == null) continue;
 
-                var from = distCont.localToStageCoordinates(Tmp.v1.set(
+                Vec2 from = distCont.localToStageCoordinates(Tmp.v1.set(
                     distCont.getWidth() / 2f,
                     distCont.getHeight() / 2f
                 ));
-                var to = elem.acceptCont.localToStageCoordinates(Tmp.v2.set(
+                Vec2 to = elem.acceptCont.localToStageCoordinates(Tmp.v2.set(
                     elem.acceptCont.getWidth() / 2f,
                     elem.acceptCont.getHeight() / 2f
                 ));

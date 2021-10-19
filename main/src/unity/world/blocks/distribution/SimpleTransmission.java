@@ -4,6 +4,7 @@ import arc.graphics.g2d.*;
 import arc.math.geom.*;
 import unity.graphics.*;
 import unity.world.blocks.*;
+import unity.world.modules.*;
 
 import static arc.Core.*;
 
@@ -31,7 +32,7 @@ public class SimpleTransmission extends GraphBlock{
     public class SimpleTransmissionBuild extends GraphBuild{
         @Override
         public void draw(){
-            var torqueGraph = torque();
+            GraphTorqueModule<?> torqueGraph = torque();
             float graphRot0 = torqueGraph.getRotationOf(0);
             float graphRot1 = torqueGraph.getRotationOf(1);
             float fixedRot = (rotdeg() + 90f) % 180f - 90f;
@@ -39,7 +40,7 @@ public class SimpleTransmission extends GraphBlock{
             Draw.rect(bottomRegion, x, y);
             Draw.rect(mbaseRegion, x, y, rotdeg());
 
-            var offset = Geometry.d4(rotation + 1);
+            Point2 offset = Geometry.d4(rotation + 1);
             float ox = offset.x * 4f;
             float oy = offset.y * 4f;
             //xelo..

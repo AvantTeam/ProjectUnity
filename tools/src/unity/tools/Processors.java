@@ -24,7 +24,7 @@ public final class Processors{
         for(var process : processes){
             Time.mark();
 
-            var exec = Executors.newCachedThreadPool();
+            ExecutorService exec = Executors.newCachedThreadPool();
 
             process.process(exec);
             Threads.await(exec);

@@ -23,7 +23,7 @@ public class CinematicDialog extends BaseDialog{
 
         addCloseButton();
         buttons.button("@add", Icon.add, () -> {
-            var node = new StoryNode();
+            StoryNode node = new StoryNode();
             node.sector = cinematicEditor.sector();
             node.name = lastName();
             node.position.set(canvas.stageToLocalCoordinates(Tmp.v1.set(
@@ -68,7 +68,7 @@ public class CinematicDialog extends BaseDialog{
 
     private String lastName(){
         int i = 0;
-        for(var node : cinematicEditor.nodes){
+        for(StoryNode node : cinematicEditor.nodes){
             if(node.name.startsWith("node") && Character.isDigit(node.name.codePointAt("node".length()))){
                 int index = Character.digit(node.name.charAt("node".length()), 10);
                 if(index > i) i = index;

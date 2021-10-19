@@ -232,7 +232,7 @@ public class AssistantAI extends FlyingAI{
 
             @Override
             protected void updateVisuals(AssistantAI ai){
-                var tile = tile(ai);
+                CoreBuild tile = tile(ai);
                 if(tile != null){
                     ai.unit.lookAt(tile);
                 }
@@ -240,7 +240,7 @@ public class AssistantAI extends FlyingAI{
 
             @Override
             protected void updateMovement(AssistantAI ai){
-                var tile = tile(ai);
+                CoreBuild tile = tile(ai);
                 if(tile != null){
                     ai.moveTo(tile, ai.unit.type.range * 0.9f);
                 }
@@ -248,7 +248,7 @@ public class AssistantAI extends FlyingAI{
 
             @Override
             protected void updateTargetting(AssistantAI ai){
-                var tile = tile(ai);
+                CoreBuild tile = tile(ai);
                 for(WeaponMount mount : ai.unit.mounts){
                     Weapon weapon = mount.weapon;
                     if(weapon.bullet.healPercent <= 0f) continue;

@@ -4,7 +4,9 @@ import arc.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
+import arc.scene.*;
 import arc.scene.actions.*;
+import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.game.*;
@@ -12,6 +14,8 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
+import rhino.*;
 import unity.map.cinematic.*;
 import unity.map.objectives.*;
 import unity.map.objectives.ObjectiveModel.*;
@@ -37,11 +41,11 @@ public class ResourceAmountObj extends Objective{
 
     public static void setup(){
         ObjectiveModel.setup(ResourceAmountObj.class, Pal.accent, () -> Icon.crafting, (node, f) -> {
-            var exec = f.get("executor", "function(objective){}");
-            var func = JSBridge.compileFunc(JSBridge.unityScope, f.name() + "-executor.js", exec, 1);
+            String exec = f.get("executor", "function(objective){}");
+            Function func = JSBridge.compileFunc(JSBridge.unityScope, f.name() + "-executor.js", exec, 1);
 
             Object[] args = {null};
-            var obj = new ResourceAmountObj(node, f.name(), e -> {
+            ResourceAmountObj obj = new ResourceAmountObj(node, f.name(), e -> {
                 args[0] = e;
                 func.call(JSBridge.context, JSBridge.unityScope, JSBridge.unityScope, args);
             });
@@ -77,16 +81,16 @@ public class ResourceAmountObj extends Objective{
 
             table.center().left();
 
-            var cell = table.table(Tex.pane, t -> {
+            Cell<Table> cell = table.table(Tex.pane, t -> {
                 container = t;
 
-                var pane = t.pane(Styles.defaultPane, cont -> {
+                ScrollPane pane = t.pane(Styles.defaultPane, cont -> {
                     cont.defaults().pad(4f);
 
                     for(int i = 0; i < items.length; i++){
                         if(i > 0) cont.row();
 
-                        var item = items[i];
+                        ItemStack item = items[i];
                         cont.table(hold -> {
                             hold.defaults().pad(4f);
 
@@ -106,7 +110,7 @@ public class ResourceAmountObj extends Objective{
                 })
                     .update(p -> {
                         if(p.hasScroll()){
-                            var result = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
+                            Element result = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
                             if(result == null || !result.isDescendantOf(p)){
                                 Core.scene.setScrollFocus(null);
                             }
@@ -131,14 +135,14 @@ public class ResourceAmountObj extends Objective{
         super.update();
 
         completed = true;
-        for(var item : items){
+        for(ItemStack item : items){
             completed = count(item.item) >= item.amount;
             if(!completed) break;
         }
     }
 
     protected int count(Item item){
-        var core = state.teams.cores(team).firstOpt();
+        CoreBuild core = state.teams.cores(team).firstOpt();
         if(core == null) return 0;
 
         return core.items.get(item);

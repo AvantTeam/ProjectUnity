@@ -21,7 +21,7 @@ public enum GlobalObjective{
     }
 
     public static boolean reached(GlobalObjective... objectives){
-        for(var o : objectives){
+        for(GlobalObjective o : objectives){
             if(!reached(o)) return false;
         }
         return true;

@@ -14,7 +14,9 @@ import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
 import unity.graphics.*;
 import unity.world.blocks.*;
+import unity.world.graph.*;
 import unity.world.meta.*;
+import unity.world.modules.*;
 
 import static mindustry.Vars.*;
 
@@ -25,7 +27,7 @@ public class CruciblePump extends GraphBlock{
 
     public CruciblePump(String name){
         super(name);
-        
+
         rotate = solid = configurable = true;
         config(Item.class, (CruciblePumpBuild build, Item item) -> build.filterItem = item);
         config(Integer.class, (CruciblePumpBuild build, Integer value) -> {
@@ -39,7 +41,7 @@ public class CruciblePump extends GraphBlock{
     @Override
     public void load(){
         super.load();
-        
+
         for(int i = 0; i < 4; i++) topRegions[i] = Core.atlas.find(name + "-top" + (i + 1));
         bottomRegion = Core.atlas.find(name + "-bottom");
     }
@@ -57,7 +59,7 @@ public class CruciblePump extends GraphBlock{
                 bt.button("50%", Styles.clearPartialt, () -> configure(1)).left().size(50f).disabled(b -> pumpMode == 1);
                 bt.button("25%", Styles.clearPartialt, () -> configure(2)).left().size(50f).disabled(b -> pumpMode == 2);
             }).row();
-            
+
             table.labelWrap("Pump:").growX().pad(5f).center().row();
             ItemSelection.buildTable(table, Vars.content.items(), () -> filterItem, this::configure);
             table.setBackground(Styles.black5);
@@ -82,27 +84,27 @@ public class CruciblePump extends GraphBlock{
         @Override
         public void updatePost(){
             float rate = 0.08f;
-            var dex = crucible();
+            GraphCrucibleModule dex = crucible();
             flowRate /= 2f;
-            
+
             if(filterItem != null){
-                var fromNet = dex.getNetworkFromSet(1);
-                var toNet = dex.getNetworkFromSet(0);
-                
+                CrucibleGraph fromNet = dex.getNetworkFromSet(1);
+                CrucibleGraph toNet = dex.getNetworkFromSet(0);
+
                 if(fromNet != null && toNet != null){
                     for(var fnc : fromNet.contains()){
                         if(fnc.item != filterItem) continue;
-                        
+
                         float transfer = Math.min(toNet.getRemainingSpace(), Math.min(rate * edelta(), fnc.volume * fnc.meltedRatio));
-                        var toG = toNet.getMeltFromID(fnc.id);
-                        
+                        CrucibleData toG = toNet.getMeltFromID(fnc.id);
+
                         if(toG != null) transfer = Math.min(toNet.totalCapacity() * fillAm[pumpMode] - toG.volume, transfer);
                         if(transfer <= 0f) break;
-                        
+
                         fromNet.addLiquidToSlot(fnc, -transfer);
                         toNet.addMeltItem(MeltInfo.all[fnc.id], transfer, true);
                         flowRate = transfer;
-                        
+
                         break;
                     }
                 }
@@ -116,13 +118,13 @@ public class CruciblePump extends GraphBlock{
             if(filterItem != null){
                 Draw.color(filterItem.color, Mathf.clamp(flowRate * 60f));
                 UnityDrawf.drawSlideRect(liquidRegion, x, y, 16f, 16f, 32f, 16f, rotdeg() + 180f, 16, flowAnimation);
-                
+
                 Draw.color();
             }
-            
+
             UnityDrawf.drawHeat(heatRegion, x, y, rotdeg(), heat().getTemp());
             Draw.rect(topRegions[rotation], x, y);
-            
+
             drawTeamTop();
         }
 

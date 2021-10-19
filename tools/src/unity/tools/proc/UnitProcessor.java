@@ -53,13 +53,13 @@ public class UnitProcessor implements Processor{
 
             float scl = Draw.scl / 4f;
 
-            var optional = Seq.with("-joint", "-joint-base", "-leg-back", "-leg-base-back", "-foot");
+            Seq<String> optional = Seq.with("-joint", "-joint-base", "-leg-back", "-leg-base-back", "-foot");
             Boolf<GenRegion> opt = r -> !optional.contains(e -> r.name.contains(e)) || r.found();
 
             Cons3<GenRegion, String, Pixmap> add = (relative, name, pixmap) -> {
                 if(!relative.found()) throw new IllegalArgumentException("Cannot use a non-existent region as a relative point: " + relative);
 
-                var reg = new GenRegion(name, pixmap);
+                GenRegion reg = new GenRegion(name, pixmap);
                 reg.relativePath = relative.relativePath;
                 reg.save();
             };
@@ -67,7 +67,7 @@ public class UnitProcessor implements Processor{
             Func<TextureRegion, TextureRegion> outliner = t -> {
                 if(!(t instanceof GenRegion at)) return t;
                 if(opt.get(at) && outline(at.name)){
-                    var reg = new GenRegion(at.name, Pixmaps.outline(new PixmapRegion(at.pixmap()), type.outlineColor, type.outlineRadius));
+                    GenRegion reg = new GenRegion(at.name, Pixmaps.outline(new PixmapRegion(at.pixmap()), type.outlineColor, type.outlineRadius));
                     reg.relativePath = at.relativePath;
                     reg.save();
 
@@ -79,13 +79,13 @@ public class UnitProcessor implements Processor{
 
             Cons2<TextureRegion, String> outlSeparate = (t, suffix) -> {
                 if(t instanceof GenRegion at && opt.get(at)){
-                    var reg = new GenRegion(at.name + "-" + suffix, Pixmaps.outline(new PixmapRegion(at.pixmap()), type.outlineColor, type.outlineRadius));
+                    GenRegion reg = new GenRegion(at.name + "-" + suffix, Pixmaps.outline(new PixmapRegion(at.pixmap()), type.outlineColor, type.outlineRadius));
                     reg.relativePath = at.relativePath;
                     reg.save();
                 }
             };
 
-            var unit = type.constructor.get();
+            Unit unit = type.constructor.get();
 
             if(unit instanceof Legsc || unit instanceof TriJointLegsc){
                 outliner.get(type.jointRegion);
@@ -107,7 +107,7 @@ public class UnitProcessor implements Processor{
 
             if(unit instanceof Copterc){
                 for(var rotor : type.rotors){
-                    var region = conv(rotor.bladeRegion);
+                    GenRegion region = conv(rotor.bladeRegion);
 
                     outlSeparate.get(region, "outline");
                     outliner.get(rotor.topRegion);
@@ -117,14 +117,14 @@ public class UnitProcessor implements Processor{
                         continue;
                     }
 
-                    var bladeSprite = region.pixmap();
+                    Pixmap bladeSprite = region.pixmap();
 
                     // This array is to be written in the order where colors at index 0 are located towards the center,
                     // and colors at the end of the array is located towards at the edge.
                     int[] heightAverageColors = new int[(bladeSprite.height >> 1) + 1]; // Go one extra so it becomes transparent especially if blade is full length
                     int bladeLength = populateColorArray(heightAverageColors, bladeSprite, bladeSprite.height >> 1);
 
-                    var ghostSprite = new Pixmap(bladeSprite.height, bladeSprite.height);
+                    Pixmap ghostSprite = new Pixmap(bladeSprite.height, bladeSprite.height);
                     drawRadial(ghostSprite, heightAverageColors, bladeLength);
                     add.get(region, rotor.name + "-blade-ghost", ghostSprite);
 
@@ -133,7 +133,7 @@ public class UnitProcessor implements Processor{
                         continue;
                     }
 
-                    var shadeSprite = new Pixmap(bladeSprite.height, bladeSprite.height);
+                    Pixmap shadeSprite = new Pixmap(bladeSprite.height, bladeSprite.height);
                     drawShade(shadeSprite, bladeLength);
                     add.get(region, rotor.name + "-blade-shade", shadeSprite);
 
@@ -155,7 +155,7 @@ public class UnitProcessor implements Processor{
                 outliner.get(tentacle.tipRegion);
             }
 
-            var icon = Pixmaps.outline(new PixmapRegion(conv(type.region).pixmap()), type.outlineColor, type.outlineRadius);
+            Pixmap icon = Pixmaps.outline(new PixmapRegion(conv(type.region).pixmap()), type.outlineColor, type.outlineRadius);
             add.get(conv(type.region), type.name + "-outline", icon.copy());
 
             for(var decoration : type.decorations){
@@ -168,7 +168,7 @@ public class UnitProcessor implements Processor{
                 GraphicUtils.drawCenter(icon, conv(type.baseRegion).pixmap());
                 GraphicUtils.drawCenter(icon, conv(type.legRegion).pixmap());
 
-                var flip = conv(type.legRegion).pixmap().flipX();
+                Pixmap flip = conv(type.legRegion).pixmap().flipX();
                 GraphicUtils.drawCenter(icon, flip);
                 flip.dispose();
 
@@ -178,7 +178,7 @@ public class UnitProcessor implements Processor{
             for(var weapon : type.weapons){
                 if(weapon.name.isEmpty()) continue;
 
-                var reg = conv(weapon.region);
+                GenRegion reg = conv(weapon.region);
                 add.get(reg, weapon.name + "-outline", Pixmaps.outline(new PixmapRegion(reg.pixmap()), type.outlineColor, type.outlineRadius));
 
                 if(weapon instanceof MultiBarrelWeapon m && outline(weapon.name + "-barrel")){
@@ -191,11 +191,11 @@ public class UnitProcessor implements Processor{
                 }
 
                 if(!weapon.top || type.bottomWeapons.contains(weapon)){
-                    var out = atlas.find(weapon.name + "-outline");
-                    var pix = out.pixmap().copy();
+                    GenRegion out = atlas.find(weapon.name + "-outline");
+                    Pixmap pix = out.pixmap().copy();
 
                     if(weapon.flipSprite){
-                        var newPix = pix.flipX();
+                        Pixmap newPix = pix.flipX();
                         pix.dispose();
                         pix = newPix;
                     }
@@ -207,7 +207,7 @@ public class UnitProcessor implements Processor{
                     );
 
                     if(weapon.mirror){
-                        var mirror = pix.flipX();
+                        Pixmap mirror = pix.flipX();
 
                         icon.draw(mirror,
                             (int)(-weapon.x / scl + icon.width / 2f - out.width / 2f),
@@ -224,8 +224,8 @@ public class UnitProcessor implements Processor{
             icon.draw(conv(type.region).pixmap(), true);
             int baseColor = Color.valueOf("ffa665").rgba();
 
-            var baseCell = conv(type.cellRegion).pixmap();
-            var cell = new Pixmap(type.cellRegion.width, type.cellRegion.height);
+            Pixmap baseCell = conv(type.cellRegion).pixmap();
+            Pixmap cell = new Pixmap(type.cellRegion.width, type.cellRegion.height);
             cell.each((x, y) -> cell.setRaw(x, y, Color.muli(baseCell.getRaw(x, y), baseColor)));
 
             icon.draw(cell, icon.width / 2 - cell.width / 2, icon.height / 2 - cell.height / 2, true);
@@ -233,11 +233,11 @@ public class UnitProcessor implements Processor{
             for(var weapon : type.weapons){
                 if(weapon.name.isEmpty() || type.bottomWeapons.contains(weapon)) continue;
 
-                var wepReg = weapon.top ? atlas.find(weapon.name + "-outline") : conv(weapon.region);
-                var pix = wepReg.pixmap().copy();
+                GenRegion wepReg = weapon.top ? atlas.find(weapon.name + "-outline") : conv(weapon.region);
+                Pixmap pix = wepReg.pixmap().copy();
 
                 if(weapon.flipSprite){
-                    var newPix = pix.flipX();
+                    Pixmap newPix = pix.flipX();
                     pix.dispose();
                     pix = newPix;
                 }
@@ -249,7 +249,7 @@ public class UnitProcessor implements Processor{
                 );
 
                 if(weapon.mirror){
-                    var mirror = pix.flipX();
+                    Pixmap mirror = pix.flipX();
 
                     icon.draw(mirror,
                         (int)(-weapon.x / scl + icon.width / 2f - weapon.region.width / 2f),
@@ -269,11 +269,11 @@ public class UnitProcessor implements Processor{
             }
 
             if(unit instanceof Copterc){
-                var propellers = new Pixmap(icon.width, icon.height);
-                var tops = new Pixmap(icon.width, icon.height);
+                Pixmap propellers = new Pixmap(icon.width, icon.height);
+                Pixmap tops = new Pixmap(icon.width, icon.height);
 
                 for(var rotor : type.rotors){
-                    var bladeSprite = conv(rotor.bladeRegion).pixmap();
+                    Pixmap bladeSprite = conv(rotor.bladeRegion).pixmap();
 
                     float bladeSeparation = 360f / rotor.bladeCount;
 
@@ -305,7 +305,7 @@ public class UnitProcessor implements Processor{
                         }
                     }
 
-                    var topSprite = conv(rotor.topRegion).pixmap();
+                    Pixmap topSprite = conv(rotor.topRegion).pixmap();
                     int topXCenter = (int)(rotor.x / scl + icon.width / 2f - topSprite.width / 2f);
                     int topYCenter = (int)(-rotor.y / scl + icon.height / 2f - topSprite.height / 2f);
 
@@ -340,14 +340,14 @@ public class UnitProcessor implements Processor{
                     }
                 }
 
-                var propOutlined = Pixmaps.outline(new PixmapRegion(propellers), type.outlineColor, type.outlineRadius);
+                Pixmap propOutlined = Pixmaps.outline(new PixmapRegion(propellers), type.outlineColor, type.outlineRadius);
                 icon.draw(propOutlined, true);
                 icon.draw(tops, true);
 
                 propellers.dispose();
                 tops.dispose();
 
-                var payloadCell = new Pixmap(baseCell.width, baseCell.height);
+                Pixmap payloadCell = new Pixmap(baseCell.width, baseCell.height);
                 int cellCenterX = payloadCell.width / 2;
                 int cellCenterY = payloadCell.height / 2;
                 int propCenterX = propOutlined.width / 2;
@@ -372,20 +372,20 @@ public class UnitProcessor implements Processor{
                 type.hitSize > UnitTypes.zenith.hitSize &&
                 FactionMeta.map(type) != Faction.end
             ){
-                var rand = new Rand();
+                Rand rand = new Rand();
                 rand.setSeed(type.name.hashCode());
 
                 int splits = 3;
                 float degrees = rand.random(360f);
                 float offsetRange = Math.max(icon.width, icon.height) * 0.15f;
-                var offset = new Vec2(1, 1).rotate(rand.random(360f)).setLength(rand.random(0, offsetRange)).add(icon.width / 2f, icon.height / 2f);
+                Vec2 offset = new Vec2(1, 1).rotate(rand.random(360f)).setLength(rand.random(0, offsetRange)).add(icon.width / 2f, icon.height / 2f);
 
-                var wrecks = new Pixmap[splits];
+                Pixmap[] wrecks = new Pixmap[splits];
                 for(int i = 0; i < wrecks.length; i++){
                     wrecks[i] = new Pixmap(icon.width, icon.height);
                 }
 
-                var vn = new VoronoiNoise(type.id, true);
+                VoronoiNoise vn = new VoronoiNoise(type.id, true);
 
                 icon.each((x, y) -> {
                     boolean rValue = Math.max(Ridged.noise2d(1, x, y, 3, 1f / (20f + icon.width / 8f)), 0) > 0.16f;

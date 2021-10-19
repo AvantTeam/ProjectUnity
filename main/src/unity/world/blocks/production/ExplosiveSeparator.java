@@ -84,7 +84,7 @@ public class ExplosiveSeparator extends Separator{
                 productionEfficiency = 0f;
             }
 
-            var liquid = cliquid.liquid;
+            Liquid liquid = cliquid.liquid;
 
             if(heat > 0 && enabled){
                 float maxUsed = Math.min(liquids.get(liquid), heat / coolantPower);
@@ -151,7 +151,7 @@ public class ExplosiveSeparator extends Separator{
         public void draw(){
             super.draw();
             Draw.rect(topRegion, x, y);
-            
+
             Draw.color(coolColor, hotColor, heat);
             Fill.rect(x, y, size * tilesize, size * tilesize);
 

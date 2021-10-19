@@ -2,12 +2,14 @@ package unity.world.blocks.power;
 
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.entities.units.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.world.*;
 import mindustry.world.blocks.liquid.*;
 import unity.world.blocks.*;
 import unity.world.graphs.*;
@@ -24,7 +26,7 @@ public class WaterTurbine extends ArmoredConduit implements GraphBlockBase{
 
     public WaterTurbine(String name){
         super(name);
-        
+
         solid = true;
         noUpdateDisabled = false;
     }
@@ -32,9 +34,9 @@ public class WaterTurbine extends ArmoredConduit implements GraphBlockBase{
     @Override
     public void load(){
         super.load();
-        
+
         rotorRegion = atlas.find(name + "-rotor");
-        
+
         for(int i = 0; i < 4; i++) topRegions[i] = atlas.find(name + "-top" + (i + 1));
         for(int i = 0; i < 2; i++){
             bottomRegions[i] = atlas.find(name + "-bottom" + (i + 1));
@@ -45,7 +47,7 @@ public class WaterTurbine extends ArmoredConduit implements GraphBlockBase{
     @Override
     public void setStats(){
         super.setStats();
-        
+
         graphs.setStats(stats);
         setStatsExt(stats);
     }
@@ -53,7 +55,7 @@ public class WaterTurbine extends ArmoredConduit implements GraphBlockBase{
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         graphs.drawPlace(x, y, size, rotation, valid);
-        
+
         super.drawPlace(x, y, rotation, valid);
     }
 
@@ -93,7 +95,7 @@ public class WaterTurbine extends ArmoredConduit implements GraphBlockBase{
         public void onRemoved(){
             gms.updateGraphRemovals();
             onDelete();
-            
+
             super.onRemoved();
             onDeletePost();
         }
@@ -101,10 +103,10 @@ public class WaterTurbine extends ArmoredConduit implements GraphBlockBase{
         @Override
         public void updateTile(){
             if(graphs.useOriginalUpdate()) super.updateTile();
-            
+
             updatePre();
             gms.updateTile();
-            
+
             updatePost();
             gms.prevTileRotation(rotation);
         }
@@ -112,7 +114,7 @@ public class WaterTurbine extends ArmoredConduit implements GraphBlockBase{
         @Override
         public void onProximityUpdate(){
             super.onProximityUpdate();
-            
+
             gms.onProximityUpdate();
             proxUpdate();
         }
@@ -120,7 +122,7 @@ public class WaterTurbine extends ArmoredConduit implements GraphBlockBase{
         @Override
         public void display(Table table){
             super.display(table);
-            
+
             gms.display(table);
             displayExt(table);
         }
@@ -128,7 +130,7 @@ public class WaterTurbine extends ArmoredConduit implements GraphBlockBase{
         @Override
         public void displayBars(Table table){
             super.displayBars(table);
-            
+
             gms.displayBars(table);
             displayBarsExt(table);
         }
@@ -136,7 +138,7 @@ public class WaterTurbine extends ArmoredConduit implements GraphBlockBase{
         @Override
         public void write(Writes write){
             super.write(write);
-            
+
             gms.write(write);
             writeExt(write);
         }
@@ -144,7 +146,7 @@ public class WaterTurbine extends ArmoredConduit implements GraphBlockBase{
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
-            
+
             gms.read(read, revision);
             readExt(read, revision);
         }
@@ -157,7 +159,7 @@ public class WaterTurbine extends ArmoredConduit implements GraphBlockBase{
         @Override
         public void drawSelect(){
             super.drawSelect();
-            
+
             gms.drawSelect();
         }
 
@@ -186,8 +188,8 @@ public class WaterTurbine extends ArmoredConduit implements GraphBlockBase{
 
         @Override
         public float moveLiquidForward(boolean leaks, Liquid liquid){
-            var rPos = GraphData.getConnectSidePos(1, 3, rotation).toPos;
-            var next = tile.nearby(rPos);
+            Point2 rPos = GraphData.getConnectSidePos(1, 3, rotation).toPos;
+            Tile next = tile.nearby(rPos);
             if(next == null) return 0f;
             if(next.build != null) return moveLiquid(next.build, liquid);
             return 0f;

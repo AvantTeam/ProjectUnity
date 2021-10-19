@@ -110,7 +110,7 @@ public final class Tools{
         print("Adding regions...");
         Time.mark();
 
-        var exec = Executors.newCachedThreadPool();
+        ExecutorService exec = Executors.newCachedThreadPool();
 
         spritesDir.walk(path -> {
             if(!path.extEquals("png")) return;

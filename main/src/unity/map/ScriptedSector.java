@@ -21,7 +21,7 @@ public class ScriptedSector extends SectorPreset{
 
         Events.on(SaveWriteEvent.class, e -> {
             if(cinematic.bound() && valid()){
-                var map = new StringMap();
+                StringMap map = new StringMap();
                 cinematic.save(map);
 
                 state.rules.tags.put(name + "-nodes", JsonIO.json.toJson(map, StringMap.class, String.class));

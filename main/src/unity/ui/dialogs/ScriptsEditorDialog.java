@@ -35,8 +35,8 @@ public class ScriptsEditorDialog extends BaseDialog{
      * @author sk7725
      */
     private String linesStr(int first, int len, int now){
-        var str = new StringBuilder("[lightgray]");
-        for(var i = 0; i < len; i++){
+        StringBuilder str = new StringBuilder("[lightgray]");
+        for(int i = 0; i < len; i++){
             if(i > 0) str.append("\n");
 
             if(i + first == now) str.append("[accent]");

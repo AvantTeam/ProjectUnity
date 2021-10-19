@@ -44,9 +44,9 @@ public class AnimControl{
 
         time = Mathf.clamp(time, 0f, animation.duration);
         for(var anim : animation.nodeAnimations){
-            var trns = Tmp.v31.setZero();
-            var quat = Utils.q1.idt();
-            var scl = Tmp.v32.set(1f, 1f, 1f);
+            Vec3 trns = Tmp.v31.setZero();
+            Quat quat = Utils.q1.idt();
+            Vec3 scl = Tmp.v32.set(1f, 1f, 1f);
 
             if(anim.translation != null && anim.translation.any()) trns.set(anim.translation.get(index(anim.translation, time)).value);
             if(anim.rotation != null && anim.rotation.any()) quat.set(anim.rotation.get(index(anim.rotation, time)).value);

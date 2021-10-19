@@ -16,14 +16,14 @@ public class SolarCollector extends HeatGenerator{
 
     public SolarCollector(String name){
         super(name);
-        
+
         rotate = solid = true;
     }
 
     @Override
     public void load(){
         super.load();
-        
+
         lightRegion = atlas.find(name + "-light");
         for(int i = 0; i < 4; i++) regions[i] = atlas.find(name + (i + 1));
     }
@@ -34,15 +34,15 @@ public class SolarCollector extends HeatGenerator{
 
         float getThermalPowerCoeff(SolarReflectorBuild ref){
             float dst = Mathf.dst(ref.x, ref.y, x, y);
-            
+
             Point2 dir = Geometry.d4(rotation);
-            
+
             return Mathf.clamp((dir.x * (ref.x - x) / dst + dir.y * (ref.y - y) / dst) * 1.5f);
         }
 
         void recalcThermalPwr(){
             thermalPwr = 0f;
-            
+
             if(linkedReflect.isEmpty()) return;
             for(var i : linkedReflect) thermalPwr += getThermalPowerCoeff(i);
         }
@@ -58,8 +58,8 @@ public class SolarCollector extends HeatGenerator{
 
         @Override
         public void onDelete(){
-            var items = linkedReflect.orderedItems();
-            
+            Seq<SolarReflectorBuild> items = linkedReflect.orderedItems();
+
             while(!items.isEmpty()) items.first().setLink(-1);
         }
 
@@ -72,14 +72,14 @@ public class SolarCollector extends HeatGenerator{
         public void draw(){
             Draw.rect(regions[rotation], x, y);
             UnityDrawf.drawHeat(heatRegion, x, y, rotdeg(), heat().getTemp());
-            
+
             if(thermalPwr > 0f){
                 Draw.z(Layer.effect);
                 Draw.color(thermalPwr, thermalPwr, thermalPwr);
                 Draw.rect(lightRegion, x, y, rotdeg());
                 Draw.z();
             }
-            
+
             drawTeamTop();
         }
     }

@@ -19,23 +19,23 @@ public class RotorBlock extends PowerGenerator implements GraphBlockBase{
     protected final Graphs graphs = new Graphs();
     protected float baseTopSpeed = 20f, baseTorque = 5f, torqueEfficiency = 1f, fluxEfficiency = 1f, rotPowerEfficiency = 1f;
     protected boolean big;
-    
+
     public final TextureRegion[] topRegions = new TextureRegion[4];
     public TextureRegion overlayRegion, rotorRegion, bottomRegion, topRegion, overRegion, spinRegion;
 
     public RotorBlock(String name){
         super(name);
-        
+
         rotate = consumesPower = outputsPower = true;
     }
 
     @Override
     public void load(){
         super.load();
-        
+
         if(big){
             for(int i = 0; i < 4; i++) topRegions[i] = atlas.find(name + "-top" + (i + 1));
-            
+
             overlayRegion = atlas.find(name + "-overlay");
             rotorRegion = atlas.find(name + "-rotor");
             bottomRegion = atlas.find(name + "-bottom");
@@ -49,7 +49,7 @@ public class RotorBlock extends PowerGenerator implements GraphBlockBase{
     @Override
     public void setStats(){
         super.setStats();
-        
+
         graphs.setStats(stats);
         setStatsExt(stats);
     }
@@ -57,7 +57,7 @@ public class RotorBlock extends PowerGenerator implements GraphBlockBase{
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         graphs.drawPlace(x, y, size, rotation, valid);
-        
+
         super.drawPlace(x, y, rotation, valid);
     }
 
@@ -86,7 +86,7 @@ public class RotorBlock extends PowerGenerator implements GraphBlockBase{
         public void onRemoved(){
             gms.updateGraphRemovals();
             onDelete();
-        
+
             super.onRemoved();
             onDeletePost();
         }
@@ -94,10 +94,10 @@ public class RotorBlock extends PowerGenerator implements GraphBlockBase{
         @Override
         public void updateTile(){
             if(graphs.useOriginalUpdate()) super.updateTile();
-            
+
             updatePre();
             gms.updateTile();
-            
+
             updatePost();
             gms.prevTileRotation(rotation);
         }
@@ -105,7 +105,7 @@ public class RotorBlock extends PowerGenerator implements GraphBlockBase{
         @Override
         public void onProximityUpdate(){
             super.onProximityUpdate();
-            
+
             gms.onProximityUpdate();
             proxUpdate();
         }
@@ -113,7 +113,7 @@ public class RotorBlock extends PowerGenerator implements GraphBlockBase{
         @Override
         public void display(Table table){
             super.display(table);
-            
+
             gms.display(table);
             displayExt(table);
         }
@@ -121,7 +121,7 @@ public class RotorBlock extends PowerGenerator implements GraphBlockBase{
         @Override
         public void displayBars(Table table){
             super.displayBars(table);
-            
+
             gms.displayBars(table);
             displayBarsExt(table);
         }
@@ -129,7 +129,7 @@ public class RotorBlock extends PowerGenerator implements GraphBlockBase{
         @Override
         public void write(Writes write){
             super.write(write);
-            
+
             gms.write(write);
             writeExt(write);
         }
@@ -137,7 +137,7 @@ public class RotorBlock extends PowerGenerator implements GraphBlockBase{
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
-            
+
             gms.read(read, revision);
             readExt(read, revision);
         }
@@ -150,13 +150,13 @@ public class RotorBlock extends PowerGenerator implements GraphBlockBase{
         @Override
         public void drawSelect(){
             super.drawSelect();
-            
+
             gms.drawSelect();
         }
 
         @Override
         public void displayBarsExt(Table table){
-            var tGraph = torque();
+            GraphTorqueModule<?> tGraph = torque();
             float mTorque = flux().getNetwork().flux() * torqueEfficiency * baseTorque;
 
             table.add(new Bar(
@@ -182,12 +182,12 @@ public class RotorBlock extends PowerGenerator implements GraphBlockBase{
             topSpeed = baseTopSpeed / (1f + flux / fluxEfficiency);
             float breakEven = consumes.getPower().usage / powerProduction;
 
-            var tGraph = torque();
+            GraphTorqueModule<?> tGraph = torque();
             float rotNeg = Mathf.clamp(tGraph.getNetwork().lastVelocity / topSpeed, 0f, 2f / breakEven);
-            
+
             productionEfficiency = Mathf.clamp(rotNeg * breakEven, 0f, 2f);
             productionEfficiency *= rotPowerEfficiency;
-            
+
             tGraph.force = flux * baseTorque * (efficiency() - rotNeg) * delta();
         }
 
@@ -195,24 +195,24 @@ public class RotorBlock extends PowerGenerator implements GraphBlockBase{
         public void draw(){
             float fixedRot = (rotdeg() + 90f) % 180f - 90f;
             float shaftRot = (rotation + 1) % 4 >= 2 ? 360f - torque().getRotation() : torque().getRotation();
-            
+
             if(big){
                 Draw.rect(bottomRegion, x, y, fixedRot);
-                
+
                 UnityDrawf.drawRotRect(rotorRegion, x, y, 24f, 15f, 24f, rotdeg(), shaftRot, shaftRot + 90f);
                 UnityDrawf.drawRotRect(rotorRegion, x, y, 24f, 15f, 24f, rotdeg(), shaftRot + 120f, shaftRot + 210f);
                 UnityDrawf.drawRotRect(rotorRegion, x, y, 24f, 15f, 24f, rotdeg(), shaftRot + 240f, shaftRot + 330f);
-                
+
                 Draw.rect(overlayRegion, x, y, fixedRot);
                 Draw.rect(topRegions[rotation], x, y);
             }else{
                 UnityDrawf.drawRotRect(spinRegion, x, y, 8f, 3.5f, 8f, rotdeg(), shaftRot, shaftRot + 180f);
                 UnityDrawf.drawRotRect(spinRegion, x, y, 8f, 3.5f, 8f, rotdeg(), shaftRot + 180f, shaftRot + 360f);
-                
+
                 Draw.rect(overRegion, x, y, fixedRot);
                 Draw.rect(topRegion, x, y, fixedRot);
             }
-            
+
             drawTeamTop();
         }
     }

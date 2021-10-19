@@ -89,8 +89,8 @@ public class HealingDefenderAI extends DefenderAI{
     public Teamc findTarget(float x, float y, float range, boolean air, boolean ground){
         if(command() != UnitCommand.rally){
             Teamc trueResult;
-            var blockResult = Units.findDamagedTile(unit.team, unit.x, unit.y);
-            var result = Units.closest(unit.team, x, y, Math.max(range, 400f), u -> !u.dead() && u.type != unit.type, (u, tx, ty) -> -u.maxHealth + Mathf.dst2(u.x, u.y, tx, ty) / 6400f);
+            Building blockResult = Units.findDamagedTile(unit.team, unit.x, unit.y);
+            Unit result = Units.closest(unit.team, x, y, Math.max(range, 400f), u -> !u.dead() && u.type != unit.type, (u, tx, ty) -> -u.maxHealth + Mathf.dst2(u.x, u.y, tx, ty) / 6400f);
             if(result == null || (blockResult != null && (result.dst2(unit) / 6400f) + result.health > (blockResult.dst2(unit) / 6400f) + blockResult.health)){
                 trueResult = blockResult;
             }else{
@@ -99,7 +99,7 @@ public class HealingDefenderAI extends DefenderAI{
             if(trueResult != null) return trueResult;
         }
 
-        var block = targetFlag(unit.x, unit.y, BlockFlag.rally, false);
+        Teamc block = targetFlag(unit.x, unit.y, BlockFlag.rally, false);
         if(block != null) return block;
         return unit.closestCore();
     }

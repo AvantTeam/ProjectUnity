@@ -12,6 +12,7 @@ import arc.util.*;
 import mindustry.core.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.world.*;
 import unity.annotations.Annotations.*;
 import unity.gen.*;
 import unity.gen.LightHoldc.*;
@@ -101,7 +102,7 @@ abstract class LightComp implements Drawc, QuadTreeObject{
             targetY = y + Angles.trnsy(rotation, strength * yield);
 
         boolean hit = world.raycast(World.toTile(x), World.toTile(y), World.toTile(targetX), World.toTile(targetY), (tx, ty) -> {
-            var tile = world.tile(tx, ty);
+            Tile tile = world.tile(tx, ty);
             if(tile == null){ // Out of map bounds, don't waste time
                 lights.queuePoint(self(), null);
                 endX = tx * tilesize;
@@ -110,7 +111,7 @@ abstract class LightComp implements Drawc, QuadTreeObject{
                 return true;
             }
 
-            var build = tile.build;
+            Building build = tile.build;
             if(build instanceof LightHoldBuildc hold){
                 // If this build is the source or there are parents pointing at it, continue casting
                 if(hold == source || parentsAny(parents -> {
@@ -124,7 +125,7 @@ abstract class LightComp implements Drawc, QuadTreeObject{
                 // If this is one of the parent's source, stop casting but don't handle
                 if(parentsAny(parents -> {
                     for(var e : parentEntries()){
-                        var l = e.key;
+                        Light l = e.key;
                         if(l.parentsAny(p -> {
                             for(var f : l.parentEntries()){
                                 if(hold == f.key.pointed) return true;
@@ -176,7 +177,7 @@ abstract class LightComp implements Drawc, QuadTreeObject{
             endY = Mathf.round(targetY / tilesize) * tilesize;
         }
 
-        var tile = world.tileWorld(endX, endY);
+        Tile tile = world.tileWorld(endX, endY);
         if(tile != null){
             children(children -> {
                 // Iterate through planned children:
@@ -185,10 +186,10 @@ abstract class LightComp implements Drawc, QuadTreeObject{
                 //   light as this light's children directly
                 // - Otherwise pool a new light as child and directly link it
                 for(var e : childEntries()){
-                    var key = e.key;
+                    Longf<Light> key = e.key;
 
                     // The pair's key is direct child, value is indirect child
-                    var pair = e.value;
+                    AtomicPair<Light, Light> pair = e.value;
                     long res = key.get(self());
 
                     // The rotation and strength data of the children are packed in a Float2 struct
@@ -222,7 +223,7 @@ abstract class LightComp implements Drawc, QuadTreeObject{
                             pair.value = null;
                         }
 
-                        var l = Light.create();
+                        Light l = Light.create();
                         l.set(endX, endY);
                         l.parent(self(), str);
                         l.queueAdd();
@@ -236,7 +237,7 @@ abstract class LightComp implements Drawc, QuadTreeObject{
         children(children -> {
             // Assign position, rotation, and strength values
             for(var e : childEntries()){
-                var l = e.value.key;
+                Light l = e.value.key;
                 if(l != null){
                     l.queuePosition = SVec2.construct(endX, endY);
 
@@ -337,7 +338,7 @@ abstract class LightComp implements Drawc, QuadTreeObject{
     }
 
     Entries<Longf<Light>, AtomicPair<Light, Light>> childEntries(){
-        var e = childEntries.get();
+        Entries<Longf<Light>, AtomicPair<Light, Light>> e = childEntries.get();
         e.reset();
 
         return e;
@@ -350,7 +351,7 @@ abstract class LightComp implements Drawc, QuadTreeObject{
     }
 
     ObjectFloatMap.Entries<Light> parentEntries(){
-        var e = parentEntries.get();
+        ObjectFloatMap.Entries<Light> e = parentEntries.get();
         e.reset();
 
         return e;
@@ -365,9 +366,9 @@ abstract class LightComp implements Drawc, QuadTreeObject{
     void clearChildren(){
         children(children -> {
             for(var e : childEntries()){
-                var pair = e.value;
-                var direct = pair.key;
-                var indirect = pair.value;
+                AtomicPair<Light, Light> pair = e.value;
+                Light direct = pair.key;
+                Light indirect = pair.value;
 
                 if(direct != null){
                     direct.queueRemove();
@@ -396,9 +397,9 @@ abstract class LightComp implements Drawc, QuadTreeObject{
 
     void clearInvalid(){
         parents(parents -> {
-            var it = parentEntries();
+            ObjectFloatMap.Entries<Light> it = parentEntries();
             while(it.hasNext){
-                var l = it.next().key;
+                Light l = it.next().key;
                 if(l != null && ((l.casted() && !l.valid()) || !(Mathf.equal(x, l.endX()) && Mathf.equal(y, l.endY())))){
                     l.detachChild(self());
                     it.remove();
@@ -408,9 +409,9 @@ abstract class LightComp implements Drawc, QuadTreeObject{
 
         children(children -> {
             for(var e : childEntries()){
-                var pair = e.value;
-                var direct = pair.key;
-                var indirect = pair.value;
+                AtomicPair<Light, Light> pair = e.value;
+                Light direct = pair.key;
+                Light indirect = pair.value;
 
                 if(direct != null && direct.casted() && !direct.valid()){
                     direct.detachParent(self());
@@ -440,7 +441,7 @@ abstract class LightComp implements Drawc, QuadTreeObject{
     void detachChild(Light light){
         children(children -> {
             for(var e : childEntries()){
-                var pair = e.value;
+                AtomicPair<Light, Light> pair = e.value;
                 if(pair.key == light) pair.key = null;
                 if(pair.value == light) pair.value = null;
             }

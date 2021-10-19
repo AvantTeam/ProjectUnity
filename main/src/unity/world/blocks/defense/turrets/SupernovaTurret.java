@@ -8,7 +8,9 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.entities.*;
+import mindustry.entities.bullet.*;
 import mindustry.graphics.*;
+import mindustry.type.*;
 import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.consumers.*;
 import unity.annotations.Annotations.*;
@@ -162,7 +164,7 @@ public class SupernovaTurret extends SoulLaserTurret{
             super.updateTile();
 
             if(isShooting() && (bulletLife <= 0f && bullet == null)){
-                var liquid = liquids.current();
+                Liquid liquid = liquids.current();
                 float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;
 
                 float used = baseReloadSpeed() * ((cheating() ? maxUsed : Math.min(liquids.get(liquid), maxUsed * Time.delta)) * liquid.heatCapacity * coolantMultiplier);
@@ -283,7 +285,7 @@ public class SupernovaTurret extends SoulLaserTurret{
             if(bulletLife > 0f && bullet != null) return;
 
             if(charge >= 1f && phase >= 1f && (consValid() || cheating())){
-                var type = peekAmmo();
+                BulletType type = peekAmmo();
 
                 shoot(type);
                 charge = 0f;

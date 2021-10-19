@@ -2,6 +2,7 @@ package unity.assets.type.g3d;
 
 import arc.math.geom.*;
 import arc.struct.*;
+import unity.graphics.*;
 
 /**
  * @author badlogic
@@ -58,9 +59,9 @@ public class Node{
     public BoundingBox extendBoundingBox(BoundingBox out, boolean transform){
         int partCount = parts.size;
         for(int i = 0; i < partCount; i++){
-            var part = parts.get(i);
+            NodePart part = parts.get(i);
             if(part.enabled){
-                var meshPart = part.meshPart;
+                MeshPart meshPart = part.meshPart;
                 meshPart.extendBoundingBox(transform ? globalTransform : null);
             }
         }
@@ -115,7 +116,7 @@ public class Node{
             }
         }
 
-        var p = child.getParent();
+        Node p = child.getParent();
         if(p != null && !p.removeChild(child)){
             throw new IllegalArgumentException("Could not remove child from its current parent");
         }

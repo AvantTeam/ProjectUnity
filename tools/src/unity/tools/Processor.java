@@ -28,7 +28,7 @@ public interface Processor{
             try{
                 run.run();
             }catch(Throwable t){
-                var msg = Strings.getFinalMessage(t);
+                String msg = Strings.getFinalMessage(t);
                 print(LogLevel.err, " ", name + ":", msg != null ? msg : Strings.getStackTrace(Strings.getFinalCause(t)));
             }
         });

@@ -5,7 +5,9 @@ import arc.assets.*;
 import arc.files.*;
 import arc.freetype.*;
 import arc.func.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.graphics.g3d.*;
 import arc.scene.*;
 import arc.struct.*;
 import arc.util.*;
@@ -15,6 +17,7 @@ import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.input.*;
 import mindustry.mod.*;
+import mindustry.mod.Mods.*;
 import mindustry.world.blocks.environment.*;
 import unity.ai.kami.*;
 import unity.annotations.Annotations.*;
@@ -94,7 +97,7 @@ public class Unity extends Mod{
             Core.assets.setLoader(WavefrontObject.class, new WavefrontObjectLoader(tree));
 
             // Differ the extension to use different asset loader, as mods have to use Vars.tree.
-            var fontSuff = ".gen_pu";
+            String fontSuff = ".gen_pu";
             Core.assets.setLoader(FreeTypeFontGenerator.class, fontSuff, new FreeTypeFontGeneratorLoader(tree){
                 @Override
                 public FreeTypeFontGenerator load(AssetManager assetManager, String fileName, Fi file, FreeTypeFontGeneratorParameters parameter){
@@ -107,7 +110,7 @@ public class Unity extends Mod{
                 public Font loadSync(AssetManager manager, String fileName, Fi file, FreeTypeFontLoaderParameter parameter){
                     if(parameter == null) throw new IllegalArgumentException("parameter is null");
 
-                    var generator = manager.get(parameter.fontFileName + fontSuff, FreeTypeFontGenerator.class);
+                    FreeTypeFontGenerator generator = manager.get(parameter.fontFileName + fontSuff, FreeTypeFontGenerator.class);
                     return generator.generateFont(parameter.fontParameters);
                 }
 
@@ -156,8 +159,8 @@ public class Unity extends Mod{
 
             // Recalibrate 3D camera transform before drawing.
             Triggers.listen(Trigger.preDraw, () -> {
-                var cam = Core.camera;
-                var cam3D = Models.camera;
+                Camera cam = Core.camera;
+                Camera3D cam3D = Models.camera;
 
                 cam3D.position.set(cam.position.x, cam.position.y, 50f);
                 cam3D.resize(cam.width, cam.height);
@@ -165,7 +168,7 @@ public class Unity extends Mod{
             });
 
             // Localize mod display name and description.
-            var mod = mods.getMod(Unity.class);
+            LoadedMod mod = mods.getMod(Unity.class);
 
             Func<String, String> stringf = value -> Core.bundle.get("mod." + mod.name + "." + value);
             mod.meta.displayName = stringf.get("name");
@@ -180,7 +183,7 @@ public class Unity extends Mod{
         KamiBulletDatas.load();
 
         try{
-            var impl = (Class<? extends DevBuild>)Class.forName("unity.mod.DevBuildImpl");
+            Class<? extends DevBuild> impl = (Class<? extends DevBuild>)Class.forName("unity.mod.DevBuildImpl");
             dev = impl.getDeclaredConstructor().newInstance();
 
             print("Dev build class implementation found and instantiated.");
@@ -246,13 +249,13 @@ public class Unity extends Mod{
     }
 
     public void logContent(){
-        for(var faction : Faction.all){
-            var array = FactionMeta.getByFaction(faction, Object.class);
+        for(Faction faction : Faction.all){
+            Seq<Object> array = FactionMeta.getByFaction(faction, Object.class);
             print(LogLevel.debug, "", Strings.format("Faction @ has @ contents.", faction, array.size));
         }
 
         Seq<Class<?>> ignored = Seq.with(Floor.class, Prop.class);
-        for(var content : content.getContentMap()){
+        for(Seq<Content> content : content.getContentMap()){
             content.each(c -> {
                 if(
                     (c.minfo.mod == null || c.minfo.mod.main != this) ||
@@ -272,7 +275,7 @@ public class Unity extends Mod{
 
     protected void addCredits(){
         try{
-            var group = (Group)ui.menuGroup.getChildren().first();
+            Group group = (Group)ui.menuGroup.getChildren().first();
 
             if(mobile){
                 //TODO button for mobile
@@ -298,7 +301,7 @@ public class Unity extends Mod{
     }
 
     public static void print(LogLevel level, String separator, Object... args){
-        var builder = new StringBuilder();
+        StringBuilder builder = new StringBuilder();
         if(args == null){
             builder.append("null");
         }else{

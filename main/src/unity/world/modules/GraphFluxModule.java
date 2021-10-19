@@ -25,10 +25,10 @@ public class GraphFluxModule extends GraphModule<GraphFlux, GraphFluxModule, Flu
 
     @Override
     void display(Table table){
-        var net = networks.get(0);
+        FluxGraph net = networks.get(0);
         if(net == null) return;
         String ps = " Wb";
-        
+
         table.row();
         table.table(sub -> {
             sub.clearChildren();

@@ -3,6 +3,7 @@ package unity.editor;
 import arc.*;
 import arc.graphics.g2d.*;
 import arc.input.*;
+import arc.math.geom.*;
 import arc.scene.ui.*;
 import arc.struct.*;
 import arc.util.*;
@@ -32,8 +33,8 @@ public class CinematicEditor extends EditorListener{
 
         // Alt + Right Click to edit tile/building tags.
         if(Core.scene.getScrollFocus() == null && Core.input.alt() && Core.input.keyTap(KeyCode.mouseRight)){
-            var pos = Core.input.mouseWorld();
-            var tile = world.tileWorld(pos.x, pos.y);
+            Vec2 pos = Core.input.mouseWorld();
+            Tile tile = world.tileWorld(pos.x, pos.y);
 
             if(tile != null){
                 if(tile.build != null){
@@ -62,7 +63,7 @@ public class CinematicEditor extends EditorListener{
     public void draw(){
         Draw.draw(Layer.blockOver, () -> {
             for(var obj : tags.keys()){
-                var data = Tmp.v31;
+                Vec3 data = Tmp.v31;
                 if(obj instanceof Building b){
                     data.set(b.getX(), b.getY(), b.block.size * tilesize / 2f);
                 }else if(obj instanceof Tile tile){
@@ -109,6 +110,9 @@ public class CinematicEditor extends EditorListener{
 
     public void apply() throws Exception{
         var core = sector().cinematic;
+        core.nodes.clear();
+        core.clearTags();
+
         core.setNodes(nodes);
         core.setTags(tags);
 

@@ -15,28 +15,28 @@ import static arc.Core.*;
 
 public class MechanicalExtractor extends SolidPump implements GraphBlockBase{
     protected final Graphs graphs = new Graphs();
-    
+
     public final TextureRegion[] bottomRegions = new TextureRegion[2], topRegions = new TextureRegion[2], liquidRegions = new TextureRegion[2];
     public TextureRegion rotorRegion, mbaseRegion, wormDrive, gearRegion, rotateRegion, overlayRegion;
 
     public MechanicalExtractor(String name){
         super(name);
-        
+
         rotate = true;
     }
 
     @Override
     public void load(){
         super.load();
-        
+
         rotorRegion = atlas.find(name + "-rotor");
         mbaseRegion = atlas.find(name + "-mbase");
         gearRegion = atlas.find(name + "-gear");
-        
+
         overlayRegion = atlas.find(name + "-overlay");
         rotateRegion = atlas.find(name + "-moving");
         wormDrive = atlas.find(name + "-rotate");
-        
+
         for(int i = 0; i < 2; i++){
             bottomRegions[i] = atlas.find(name + "-bottom" + (i + 1));
             topRegions[i] = atlas.find(name + "-top" + (i + 1));
@@ -47,11 +47,11 @@ public class MechanicalExtractor extends SolidPump implements GraphBlockBase{
     @Override
     public void setStats(){
         super.setStats();
-        
+
         graphs.setStats(stats);
         setStatsExt(stats);
     }
-    
+
     @Override
     public TextureRegion[] icons(){
         return new TextureRegion[]{atlas.find(name)};
@@ -60,7 +60,7 @@ public class MechanicalExtractor extends SolidPump implements GraphBlockBase{
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         graphs.drawPlace(x, y, size, rotation, valid);
-        
+
         super.drawPlace(x, y, rotation, valid);
     }
 
@@ -88,7 +88,7 @@ public class MechanicalExtractor extends SolidPump implements GraphBlockBase{
         public void onRemoved(){
             gms.updateGraphRemovals();
             onDelete();
-            
+
             super.onRemoved();
             onDeletePost();
         }
@@ -96,7 +96,7 @@ public class MechanicalExtractor extends SolidPump implements GraphBlockBase{
         @Override
         public void updateTile(){
             if(graphs.useOriginalUpdate()) super.updateTile();
-            
+
             updatePre();
             gms.updateTile();
             updatePost();
@@ -106,7 +106,7 @@ public class MechanicalExtractor extends SolidPump implements GraphBlockBase{
         @Override
         public void onProximityUpdate(){
             super.onProximityUpdate();
-            
+
             gms.onProximityUpdate();
             proxUpdate();
         }
@@ -114,7 +114,7 @@ public class MechanicalExtractor extends SolidPump implements GraphBlockBase{
         @Override
         public void display(Table table){
             super.display(table);
-            
+
             gms.display(table);
             displayExt(table);
         }
@@ -122,7 +122,7 @@ public class MechanicalExtractor extends SolidPump implements GraphBlockBase{
         @Override
         public void displayBars(Table table){
             super.displayBars(table);
-            
+
             gms.displayBars(table);
             displayBarsExt(table);
         }
@@ -130,7 +130,7 @@ public class MechanicalExtractor extends SolidPump implements GraphBlockBase{
         @Override
         public void write(Writes write){
             super.write(write);
-            
+
             gms.write(write);
             writeExt(write);
         }
@@ -138,7 +138,7 @@ public class MechanicalExtractor extends SolidPump implements GraphBlockBase{
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
-            
+
             gms.read(read, revision);
             readExt(read, revision);
         }
@@ -151,7 +151,7 @@ public class MechanicalExtractor extends SolidPump implements GraphBlockBase{
         @Override
         public void drawSelect(){
             super.drawSelect();
-            
+
             gms.drawSelect();
         }
 
@@ -164,38 +164,38 @@ public class MechanicalExtractor extends SolidPump implements GraphBlockBase{
         public void draw(){
             float rot = torque().getRotation();
             float fixedRot = (rotdeg() + 90f) % 180f - 90f;
-            
+
             int variant = rotation % 2;
-            
+
             float deg = rotation == 0 || rotation == 3 ? rot : -rot;
             float rev = rotation == 0 || rotation == 3 ? 24 : -24;
             float shaftRot = rot * 2f;
-            
-            var offset = Geometry.d4(rotation + 1);
-            
+
+            Point2 offset = Geometry.d4(rotation + 1);
+
             Draw.rect(bottomRegions[variant], x, y);
-            
+
             //liquid
             Drawf.liquid(liquidRegions[variant], x, y, liquids.total() / liquidCapacity, liquids.current().color);
-            
+
             //bottom rotors
             Draw.rect(rotorRegion, x + offset.x * 4f, y + offset.y * 4f, rev, 24,-deg/2);
             Draw.rect(rotorRegion, x - offset.x * 4f, y - offset.y * 4f, -rev, 24, deg/2 + 90);
-            
+
 
             //shaft
             Draw.rect(mbaseRegion, x, y, fixedRot);
-            
+
             UnityDrawf.drawRotRect(wormDrive, x, y, 24f, 3.5f, 3.5f, fixedRot, rot, rot + 180f);
             UnityDrawf.drawRotRect(wormDrive, x, y, 24f, 3.5f, 3.5f, fixedRot, rot + 180f, rot + 360f);
             UnityDrawf.drawRotRect(rotateRegion, x, y, 24f, 3.5f, 3.5f, fixedRot, rot, rot + 180f);
-            
+
             Draw.rect(overlayRegion, x, y, fixedRot);
-            
+
             //gears
             Draw.rect(gearRegion, x + offset.x * 4f, y + offset.y * 4f, -deg/2);
             Draw.rect(gearRegion, x - offset.x * 4f, y - offset.y * 4f, deg/2);
-            
+
             Draw.rect(topRegions[variant], x, y);
             drawTeamTop();
         }

@@ -117,7 +117,7 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
     }
 
     protected Block getBlock(Vec3 position){
-        var set = getBlockset(position);
+        Block[] set = getBlockset(position);
 
         int i = Mathf.clamp((int)(Mathf.clamp(rawHeight(position) * 1.2f) * set.length), 0, set.length - 1);
         if(withinCrater(position, 0.1f)){
@@ -326,7 +326,7 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
 
                 if(found){
                     for(Point2 p : Geometry.d4){
-                        var tile = tiles.get(x + p.x, y + p.y);
+                        Tile tile = tiles.get(x + p.x, y + p.y);
                         if(tile != null && tile.floor() == target && rand.chance(1f / Geometry.d4.length)){
                             tile.setOverlay(over);
                         }

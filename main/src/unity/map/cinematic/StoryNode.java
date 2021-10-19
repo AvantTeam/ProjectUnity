@@ -1,17 +1,21 @@
 package unity.map.cinematic;
 
+import arc.func.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
+import arc.struct.ObjectMap.*;
 import arc.util.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
 import mindustry.ctype.*;
 import mindustry.io.*;
+import rhino.*;
 import unity.gen.*;
 import unity.map.*;
 import unity.map.objectives.*;
 import unity.ui.dialogs.canvas.CinematicCanvas.*;
+import unity.util.*;
 
 import static mindustry.Vars.*;
 
@@ -28,6 +32,12 @@ public class StoryNode implements JsonSerializable{
     public ScriptedSector sector;
     public String name;
 
+    //TODO ui
+    public String dataScript;
+    public Object data;
+    public Func3<StoryNode, Object, Json, String> dataSerializer = (node, data, json) -> json.toJson(data);
+    public Func3<StoryNode, String, Json, Object> dataDeserializer = (node, data, json) -> json.fromJson(Object.class, data);
+
     public StringMap scripts = new StringMap();
     public Seq<ObjectiveModel> objectiveModels = new Seq<>();
     public Seq<Objective> objectives = new Seq<>();
@@ -39,6 +49,7 @@ public class StoryNode implements JsonSerializable{
     public void write(Json json){
         json.writeValue("sector", sector.name);
         json.writeValue("name", name);
+        json.writeValue("dataScript", dataScript);
         json.writeValue("position", Float2.construct(position.x, position.y));
         json.writeValue("scripts", scripts, StringMap.class, String.class);
         json.writeValue("objectiveModels", objectiveModels, Seq.class, ObjectiveModel.class);
@@ -53,13 +64,13 @@ public class StoryNode implements JsonSerializable{
         long pos = data.getLong("position");
         position.set(Float2.x(pos), Float2.y(pos));
 
+        dataScript = data.getString("dataScript", null);
+
         scripts.clear();
         scripts.putAll(json.readValue(StringMap.class, String.class, data.require("scripts"), String.class));
 
-        if(data.has("children")){
-            children.set(json.readValue(Seq.class, StoryNode.class, data.require("children")));
-            children.each(c -> c.parent = this);
-        }
+        children.set(json.readValue(Seq.class, StoryNode.class, data.require("children")));
+        children.each(c -> c.parent = this);
 
         objectiveModels.set(json.readValue(Seq.class, ObjectiveModel.class, data.require("objectiveModels")));
     }
@@ -73,6 +84,11 @@ public class StoryNode implements JsonSerializable{
         if(initialized) return;
         initialized = true;
 
+        if(dataScript != null){
+            Function func = JSBridge.compileFunc(JSBridge.unityScope, dataScript, name + "-metadata.js");
+            data = func.call(JSBridge.context, JSBridge.unityScope, JSBridge.unityScope, new Object[]{this});
+        }
+
         objectives.each(Objective::init);
     }
 
@@ -82,14 +98,14 @@ public class StoryNode implements JsonSerializable{
     }
 
     public boolean completed(){
-        // Assume checked on same frame, if that's the case then don't bother recalculating.
-        if(Mathf.equal(checkComplete, Time.time)) return completed;
-        checkComplete = Time.time;
-
         if(completed || (completed = objectives.isEmpty())) return true;
 
+        // Assume checked on same frame, if that's the case then don't bother recalculating.
+        if(Mathf.equal(checkComplete, Time.time)) return false;
+        checkComplete = Time.time;
+
         completed = true;
-        for(var o : objectives){
+        for(Objective o : objectives){
             if(!o.executed()) return completed = false;
         }
 
@@ -104,7 +120,7 @@ public class StoryNode implements JsonSerializable{
             return;
         }
 
-        for(var o : objectives){
+        for(Objective o : objectives){
             if(o.executed()) continue;
 
             if(o.shouldUpdate()) o.update();
@@ -118,7 +134,7 @@ public class StoryNode implements JsonSerializable{
             return;
         }
 
-        for(var o : objectives) if(o.shouldDraw()) o.draw();
+        for(Objective o : objectives) if(o.shouldDraw()) o.draw();
     }
 
     public void child(StoryNode other){
@@ -130,9 +146,11 @@ public class StoryNode implements JsonSerializable{
     }
 
     public void save(StringMap map){
-        var objMap = new StringMap();
-        for(var obj : objectives){
-            var child = new StringMap();
+        map.put("data", dataSerializer.get(this, data, JsonIO.json));
+
+        StringMap objMap = new StringMap();
+        for(Objective obj : objectives){
+            StringMap child = new StringMap();
             obj.save(child);
 
             objMap.put(obj.name, JsonIO.json.toJson(child, StringMap.class, String.class));
@@ -140,9 +158,9 @@ public class StoryNode implements JsonSerializable{
 
         map.put("objectives", JsonIO.json.toJson(objMap, StringMap.class, String.class));
 
-        var childMap = new StringMap();
-        for(var child : children){
-            var m = new StringMap();
+        StringMap childMap = new StringMap();
+        for(StoryNode child : children){
+            StringMap m = new StringMap();
             child.save(m);
 
             childMap.put(child.name, JsonIO.json.toJson(m, StringMap.class, String.class));
@@ -152,17 +170,19 @@ public class StoryNode implements JsonSerializable{
     }
 
     public void load(StringMap map){
-        var objMap = JsonIO.json.fromJson(StringMap.class, String.class, map.get("objectives", "{}"));
-        for(var e : objMap.entries()){
-            var obj = objectives.find(o -> o.name.equals(e.key));
+        data = dataDeserializer.get(this, map.get("data", ""), JsonIO.json);
+
+        StringMap objMap = JsonIO.json.fromJson(StringMap.class, String.class, map.get("objectives", "{}"));
+        for(Entry<String, String> e : objMap.entries()){
+            Objective obj = objectives.find(o -> o.name.equals(e.key));
             if(obj == null) throw new IllegalStateException("Objective '" + e.key + "' not found!");
 
             obj.load(JsonIO.json.fromJson(StringMap.class, String.class, e.value));
         }
 
-        var nodes = JsonIO.json.fromJson(StringMap.class, String.class, map.get("children", "[]"));
-        for(var e : nodes.entries()){
-            var node = children.find(n -> n.name.equals(e.key));
+        StringMap nodes = JsonIO.json.fromJson(StringMap.class, String.class, map.get("children", "[]"));
+        for(Entry<String, String> e : nodes.entries()){
+            StoryNode node = children.find(n -> n.name.equals(e.key));
             if(node == null) throw new IllegalStateException("Node '" + e.key + "' not found!");
 
             node.load(JsonIO.json.fromJson(StringMap.class, String.class, e.value));

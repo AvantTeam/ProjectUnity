@@ -56,7 +56,7 @@ public class ModelInstance implements RenderableProvider{
 
     private void copyNodes(Seq<Node> nodes){
         for(int i = 0, n = nodes.size; i < n; ++i){
-            var node = nodes.get(i);
+            Node node = nodes.get(i);
             this.nodes.add(node.copy());
         }
 
@@ -65,8 +65,8 @@ public class ModelInstance implements RenderableProvider{
 
     private void copyNodes(Seq<Node> nodes, String... nodeIds){
         for(int i = 0, n = nodes.size; i < n; ++i){
-            var node = nodes.get(i);
-            for(var nodeId : nodeIds){
+            Node node = nodes.get(i);
+            for(String nodeId : nodeIds){
                 if(nodeId.equals(node.id)){
                     this.nodes.add(node.copy());
                     break;
@@ -78,13 +78,13 @@ public class ModelInstance implements RenderableProvider{
     }
 
     public void copyAnimations(Iterable<Animation> source){
-        for(var anim : source){
+        for(Animation anim : source){
             copyAnimation(anim, true);
         }
     }
 
     public void copyAnimations(Iterable<Animation> source, boolean shareKeyframes){
-        for(var anim : source){
+        for(Animation anim : source){
             copyAnimation(anim, shareKeyframes);
         }
     }
@@ -94,15 +94,15 @@ public class ModelInstance implements RenderableProvider{
     }
 
     public void copyAnimation(Animation sourceAnim, boolean shareKeyframes){
-        var animation = new Animation();
+        Animation animation = new Animation();
         animation.id = sourceAnim.id;
         animation.duration = sourceAnim.duration;
 
-        for(var nanim : sourceAnim.nodeAnimations){
-            var node = getNode(nanim.node.id);
+        for(NodeAnimation nanim : sourceAnim.nodeAnimations){
+            Node node = getNode(nanim.node.id);
             if(node == null) continue;
 
-            var nodeAnim = new NodeAnimation();
+            NodeAnimation nodeAnim = new NodeAnimation();
             nodeAnim.node = node;
 
             if(shareKeyframes){
@@ -112,21 +112,21 @@ public class ModelInstance implements RenderableProvider{
             }else{
                 if(nanim.translation != null){
                     nodeAnim.translation = new Seq<>();
-                    for(var kf : nanim.translation){
+                    for(NodeKeyframe<Vec3> kf : nanim.translation){
                         nodeAnim.translation.add(new NodeKeyframe<>(kf.keytime, kf.value));
                     }
                 }
 
                 if(nanim.rotation != null){
                     nodeAnim.rotation = new Seq<>();
-                    for(var kf : nanim.rotation){
+                    for(NodeKeyframe<Quat> kf : nanim.rotation){
                         nodeAnim.rotation.add(new NodeKeyframe<>(kf.keytime, kf.value));
                     }
                 }
 
                 if(nanim.scaling != null){
                     nodeAnim.scaling = new Seq<>();
-                    for(var kf : nanim.scaling){
+                    for(NodeKeyframe<Vec3> kf : nanim.scaling){
                         nodeAnim.scaling.add(new NodeKeyframe<>(kf.keytime, kf.value));
                     }
                 }
@@ -142,7 +142,7 @@ public class ModelInstance implements RenderableProvider{
 
     private void invalidate(Node node){
         for(int i = 0, n = node.parts.size; i < n; ++i){
-            var part = node.parts.get(i);
+            NodePart part = node.parts.get(i);
 
             if(!materials.contains(part.material, true)){
                 int midx = materials.indexOf(part.material, false);
@@ -167,7 +167,7 @@ public class ModelInstance implements RenderableProvider{
 
     @Override
     public void getRenderables(Prov<Renderable> renders){
-        for(var node : nodes){
+        for(Node node : nodes){
             getRenderables(node, renders);
         }
     }
@@ -185,14 +185,14 @@ public class ModelInstance implements RenderableProvider{
 
     protected void getRenderables(Node node, Prov<Renderable> renders){
         if(node.parts.size > 0){
-            for(var nodePart : node.parts){
+            for(NodePart nodePart : node.parts){
                 if(nodePart.enabled){
                     getRenderable(renders.get(), nodePart);
                 }
             }
         }
 
-        for(var child : node.getChildren()){
+        for(Node child : node.getChildren()){
             getRenderables(child, renders);
         }
     }

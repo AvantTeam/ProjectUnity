@@ -14,6 +14,8 @@ import mindustry.graphics.MultiPacker.*;
 import mindustry.type.*;
 import unity.gen.*;
 
+import java.nio.*;
+
 import static arc.Core.*;
 
 public final class GraphicUtils{
@@ -97,10 +99,10 @@ public final class GraphicUtils{
      * @author sk7725
      */
     public static TextureRegion blendSprites(TextureRegion a, TextureRegion b, float f, String name){
-        var r1 = atlas.getPixmap(a);
-        var r2 = atlas.getPixmap(b);
+        PixmapRegion r1 = atlas.getPixmap(a);
+        PixmapRegion r2 = atlas.getPixmap(b);
 
-        var out = new Pixmap(r1.width, r1.height);
+        Pixmap out = new Pixmap(r1.width, r1.height);
 
         for(int x = 0; x < r1.width; x++){
             for(int y = 0; y < r1.height; y++){
@@ -110,19 +112,19 @@ public final class GraphicUtils{
             }
         }
 
-        var tex  = new Texture(out);
+        Texture tex  = new Texture(out);
         return atlas.addRegion(name + "-blended-" + (int)(f * 100), tex, 0, 0, tex.width, tex.height);
     }
 
     public static Pixmap outline(TextureRegion region, Color color, int width){
-        var out = Pixmaps.outline(atlas.getPixmap(region), color, width);
+        Pixmap out = Pixmaps.outline(atlas.getPixmap(region), color, width);
         if(Core.settings.getBool("linear")) Pixmaps.bleed(out);
 
         return out;
     }
 
     public static Pixmap outline(Pixmap pixmap, Color color, int width){
-        var out = Pixmaps.outline(new PixmapRegion(pixmap), color, width);
+        Pixmap out = Pixmaps.outline(new PixmapRegion(pixmap), color, width);
         if(Core.settings.getBool("linear")){
             Pixmaps.bleed(out);
         }
@@ -147,14 +149,14 @@ public final class GraphicUtils{
     }
 
     public static void drawCenter(Pixmap pix, PixmapRegion other){
-        var copy = other.crop();
+        Pixmap copy = other.crop();
         drawCenter(pix, copy);
         copy.dispose();
     }
 
     public static PixmapRegion get(MultiPacker packer, TextureRegion region){
         if(region instanceof AtlasRegion at){
-            var reg = packer.get(at.name);
+            PixmapRegion reg = packer.get(at.name);
             if(reg != null) return reg;
 
             return atlas.getPixmap(at.name);
@@ -164,7 +166,7 @@ public final class GraphicUtils{
     }
 
     public static PixmapRegion get(MultiPacker packer, String name){
-        var reg = packer.get(name);
+        PixmapRegion reg = packer.get(name);
         if(reg != null) return reg;
 
         return atlas.getPixmap(name);
@@ -295,21 +297,21 @@ public final class GraphicUtils{
     }
 
     public static Mesh copy(Mesh mesh){
-        var originf = mesh.getVerticesBuffer();
+        FloatBuffer originf = mesh.getVerticesBuffer();
         originf.clear();
 
-        var origini = mesh.getIndicesBuffer();
+        ShortBuffer origini = mesh.getIndicesBuffer();
         origini.clear();
 
-        var out = new Mesh(true, mesh.getNumVertices(), mesh.getNumIndices(), mesh.attributes);
+        Mesh out = new Mesh(true, mesh.getNumVertices(), mesh.getNumIndices(), mesh.attributes);
 
-        var dstf = out.getVerticesBuffer();
+        FloatBuffer dstf = out.getVerticesBuffer();
         dstf.clear();
         dstf.put(originf);
         originf.clear();
         dstf.clear();
 
-        var dsti = out.getIndicesBuffer();
+        ShortBuffer dsti = out.getIndicesBuffer();
         dsti.clear();
         dsti.put(origini);
         origini.clear();

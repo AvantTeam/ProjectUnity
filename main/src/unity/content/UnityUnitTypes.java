@@ -548,7 +548,7 @@ public class UnityUnitTypes{
             fallRotateSpeed = 0.8f;
             rotateSpeed = 2.2f;
 
-            var flak = new FlakBulletType(8f, 20f){{
+            BulletType flak = new FlakBulletType(8f, 20f){{
                 lifetime = 10f;
                 collidesGround = true;
 
@@ -3729,7 +3729,7 @@ public class UnityUnitTypes{
 
             abilities.add(new LightningSpawnAbility(12, 16f, 3f, 0.05f, 300f, 96f, 640f));
 
-            var energy = new RicochetBulletType(6f, 50f, "shell"){{
+            BulletType energy = new RicochetBulletType(6f, 50f, "shell"){{
                 width = 9f;
                 height = 11f;
                 shrinkY = 0.3f;

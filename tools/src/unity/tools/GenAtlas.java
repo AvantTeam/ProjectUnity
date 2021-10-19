@@ -18,12 +18,12 @@ public class GenAtlas extends TextureAtlas{
 
     /** The name should be prefixed with {@code unity-} */
     public GenRegion addRegion(Fi file){
-        var name = file.nameWithoutExtension();
+        String name = file.nameWithoutExtension();
         if(!file.path().contains("sprites/vanilla/")) name = "unity-" + name;
 
-        var reg = new GenRegion(name, new Pixmap(file));
+        GenRegion reg = new GenRegion(name, new Pixmap(file));
 
-        var path = file.path();
+        String path = file.path();
         path = path.substring(path.indexOf("sprites/") + "sprites/".length(), path.lastIndexOf("/"));
 
         reg.relativePath = path;
@@ -38,7 +38,7 @@ public class GenAtlas extends TextureAtlas{
     @Override
     public GenRegion addRegion(String name, TextureRegion textureRegion){
         synchronized(regions){
-            var reg = (GenRegion)textureRegion;
+            GenRegion reg = (GenRegion)textureRegion;
 
             regions.put(name, reg);
             return reg;
@@ -48,8 +48,8 @@ public class GenAtlas extends TextureAtlas{
     /** @inheritDocs. The name should be prefixed with {@code unity-} */
     @Override
     public GenRegion addRegion(String name, Texture texture, int x, int y, int width, int height){
-        var pixmap = texture.getTextureData().getPixmap();
-        var reg = new GenRegion(name, Pixmaps.crop(pixmap, x, y, width, height));
+        Pixmap pixmap = texture.getTextureData().getPixmap();
+        GenRegion reg = new GenRegion(name, Pixmaps.crop(pixmap, x, y, width, height));
 
         synchronized(regions){
             regions.put(name, reg);
@@ -140,10 +140,10 @@ public class GenAtlas extends TextureAtlas{
         public void save(boolean add){
             if(!found()) throw new IllegalArgumentException("Cannot save an invalid region: " + name);
 
-            var dir = spritesDir.child(relativePath);
+            Fi dir = spritesDir.child(relativePath);
             dir.mkdirs();
 
-            var file = dir.child(name.replaceFirst("unity-", "") + ".png");
+            Fi file = dir.child(name.replaceFirst("unity-", "") + ".png");
             file.writePng(pixmap);
 
             if(add) atlas.addRegion(name, this);

@@ -1,6 +1,7 @@
 package unity.ui;
 
 import arc.input.*;
+import arc.math.geom.*;
 import arc.scene.*;
 import arc.scene.event.*;
 import arc.util.*;
@@ -15,7 +16,7 @@ public class MoveDragListener extends InputListener{
 
     @Override
     public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
-        var v = element.localToStageCoordinates(Tmp.v1.set(x, y));
+        Vec2 v = element.localToStageCoordinates(Tmp.v1.set(x, y));
         lastx = v.x;
         lasty = v.y;
 
@@ -25,7 +26,7 @@ public class MoveDragListener extends InputListener{
 
     @Override
     public void touchDragged(InputEvent event, float x, float y, int pointer){
-        var v = element.localToStageCoordinates(Tmp.v1.set(x, y));
+        Vec2 v = element.localToStageCoordinates(Tmp.v1.set(x, y));
 
         element.moveBy(v.x - lastx, v.y - lasty);
         lastx = v.x;

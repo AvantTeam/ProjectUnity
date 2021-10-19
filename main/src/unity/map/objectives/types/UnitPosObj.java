@@ -7,6 +7,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import rhino.*;
 import unity.map.cinematic.*;
 import unity.map.objectives.*;
 import unity.map.objectives.ObjectiveModel.*;
@@ -41,11 +42,11 @@ public class UnitPosObj extends Objective{
 
     public static void setup(){
         ObjectiveModel.setup(UnitPosObj.class, Color.sky, () -> Icon.units, (node, f) -> {
-            var exec = f.get("executor", "function(objective){}");
-            var func = JSBridge.compileFunc(JSBridge.unityScope, f.name() + "-executor.js", exec, 1);
+            String exec = f.get("executor", "function(objective){}");
+            Function func = JSBridge.compileFunc(JSBridge.unityScope, f.name() + "-executor.js", exec, 1);
 
             Object[] args = {null};
-            var obj = new UnitPosObj(node, f.name(), e -> {
+            UnitPosObj obj = new UnitPosObj(node, f.name(), e -> {
                 args[0] = e;
                 func.call(JSBridge.context, JSBridge.unityScope, JSBridge.unityScope, args);
             });
@@ -65,12 +66,12 @@ public class UnitPosObj extends Objective{
         pos = f.get("pos", pos);
         radius = f.get("radius", radius);
 
-        var c = JSBridge.context;
-        var s = JSBridge.unityScope;
+        Context c = JSBridge.context;
+        ImporterTopLevel s = JSBridge.unityScope;
         Object[] args = {null, null};
 
         if(f.has("spotted")){
-            var spottedFunc = JSBridge.compileFunc(s, name + "-spotted.js", f.get("spotted"));
+            Function spottedFunc = JSBridge.compileFunc(s, name + "-spotted.js", f.get("spotted"));
             spotted = (obj, u) -> {
                 args[0] = obj;
                 args[1] = u;
@@ -79,7 +80,7 @@ public class UnitPosObj extends Objective{
         }
 
         if(f.has("released")){
-            var releasedFunc = JSBridge.compileFunc(s, name + "-released.js", f.get("released"));
+            Function releasedFunc = JSBridge.compileFunc(s, name + "-released.js", f.get("released"));
             released = (obj, u) -> {
                 args[0] = obj;
                 args[1] = u;
@@ -88,7 +89,7 @@ public class UnitPosObj extends Objective{
         }
 
         if(f.has("valid")){
-            var validFunc = JSBridge.requireType(JSBridge.compileFunc(s, name + "-valid.js", f.get("valid")), c, s, boolean.class);
+            Func<Object[], Boolean> validFunc = JSBridge.requireType(JSBridge.compileFunc(s, name + "-valid.js", f.get("valid")), c, s, boolean.class);
             valid = (obj, u) -> {
                 args[0] = obj;
                 args[1] = u;
@@ -127,7 +128,7 @@ public class UnitPosObj extends Objective{
         if(continuous){
             for(var it = tmp.iterator(); it.hasNext;){
                 int id = it.next();
-                var u = Groups.unit.getByID(id);
+                Unit u = Groups.unit.getByID(id);
 
                 u.hitbox(Tmp.r1);
                 if(!valid(u) || !Intersector.overlaps(Tmp.cr1.set(pos, radius), Tmp.r1)){

@@ -43,7 +43,7 @@ public class PartInfo{
     public static void preCalcConnection(PartInfo[] partsConfig){
         for(int i = 0, len = partsConfig.length; i < len; i++){
             int id = i;
-            var pInfo = partsConfig[i];
+            PartInfo pInfo = partsConfig[i];
             if(pInfo.connInList.isEmpty()){
                 for(int j = 0, iLen = pInfo.connectIn.length; j < iLen; j++){
                     if(pInfo.connectIn[j] != 0) pInfo.connInList.add(ConnectData.getConnectSidePos(j, pInfo.tw, pInfo.th).id(pInfo.connectIn[j]));
@@ -59,7 +59,7 @@ public class PartInfo{
 
     public static void assignPartSprites(PartInfo[] partsConfig, TextureRegion partsSprite, int spriteW, int spriteH){
         for(int i = 0, len = partsConfig.length; i < len; i++){
-            var pinfo = partsConfig[i];
+            PartInfo pinfo = partsConfig[i];
             pinfo.id = i;
             pinfo.texRegion = GraphicUtils.getRegionRect(partsSprite, pinfo.tx, pinfo.ty, pinfo.tw, pinfo.th, spriteW, spriteH);
         }

@@ -6,8 +6,10 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.type.*;
 import unity.gen.*;
 
 public class InvisibleUnitType extends UnityUnitType{
@@ -116,8 +118,8 @@ public class InvisibleUnitType extends UnityUnitType{
 
         //super.drawWeapons(unit);
         //applyColor(unit);
-        for(var mount : unit.mounts){
-            var weapon = mount.weapon;
+        for(WeaponMount mount : unit.mounts){
+            Weapon weapon = mount.weapon;
             boolean found = bottomWeapons.contains(weapon);
 
             float rotation = unit.rotation - 90;

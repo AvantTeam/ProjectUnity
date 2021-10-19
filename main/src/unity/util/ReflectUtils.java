@@ -32,7 +32,7 @@ public final class ReflectUtils{
     }
 
     public static String def(Class<?> type){
-        var t = unbox(type).getSimpleName();
+        String t = unbox(type).getSimpleName();
         return switch(t){
             case "boolean" -> "false";
             case "byte", "char", "short", "int", "long" -> "0";
@@ -88,7 +88,7 @@ public final class ReflectUtils{
     /** A utility function to find a field without throwing exceptions. */
     public static Field findField(Class<?> type, String field, boolean access){
         try{
-            var f = findClassf(type, field).getDeclaredField(field);
+            Field f = findClassf(type, field).getDeclaredField(field);
             if(access) f.setAccessible(true);
 
             return f;
@@ -118,7 +118,7 @@ public final class ReflectUtils{
     /** A utility function to find a method without throwing exceptions. */
     public static Method findMethod(Class<?> type, String methodName, boolean access, Class<?>... args){
         try{
-            var m = findClassm(type, methodName, args).getDeclaredMethod(methodName, args);
+            Method m = findClassm(type, methodName, args).getDeclaredMethod(methodName, args);
             if(access) m.setAccessible(true);
 
             return m;
@@ -139,7 +139,7 @@ public final class ReflectUtils{
     /** A utility function to find a constructor without throwing exceptions. */
     public static <T> Constructor<T> findConstructor(Class<T> type, boolean access, Class<?>... args){
         try{
-            var c = ((Class<T>)findClassc(type, args)).getDeclaredConstructor(args);
+            Constructor<T> c = ((Class<T>)findClassc(type, args)).getDeclaredConstructor(args);
             if(access) c.setAccessible(true);
 
             return c;
@@ -158,8 +158,8 @@ public final class ReflectUtils{
     }
 
     public static Class<?> classCaller(){
-        var thread = Thread.currentThread();
-        var trace = thread.getStackTrace();
+        Thread thread = Thread.currentThread();
+        StackTraceElement[] trace = thread.getStackTrace();
         try{
             return Class.forName(trace[3].getClassName(), false, mods.mainLoader());
         }catch(ClassNotFoundException e){

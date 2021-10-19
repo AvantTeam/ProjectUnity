@@ -120,7 +120,7 @@ public class ContentScoreProcess implements AsyncProcess{
                     .append("\n")
                     .append("Sources: ");
 
-                    var origins = score.origins();
+                    Seq<Content> origins = score.origins();
                     if(origins != null){
                         for(Content c : origins){
                             out.append(c.toString()).append(":").append(get(c).loaded).append(",");
@@ -386,7 +386,7 @@ public class ContentScoreProcess implements AsyncProcess{
         }
 
         void generateUnitScore(){
-            var origins = origins();
+            Seq<Content> origins = origins();
             if(origins != null){
                 float max = 0f;
                 for(Content origin : origins){
@@ -417,7 +417,7 @@ public class ContentScoreProcess implements AsyncProcess{
         void generateItemScore(){
             if(!artificial) return;
 
-            var origins = origins();
+            Seq<Content> origins = origins();
             if(origins != null){
                 for(Content origin : origins){
                     if(get(origin).loaded && origin instanceof GenericCrafter gc){
@@ -609,7 +609,7 @@ public class ContentScoreProcess implements AsyncProcess{
         }
 
         boolean requiredLoaded(){
-            var origins = origins();
+            Seq<Content> origins = origins();
             if(origins != null){
                 boolean b = true;
                 loadedLast = loadedc;

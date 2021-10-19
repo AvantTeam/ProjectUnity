@@ -129,8 +129,8 @@ public class BlockMovement{
         if(build.block instanceof CoreBlock){
             return false;
         }
-        var bx = build.tile.x;
-        var by = build.tile.y;
+        short bx = build.tile.x;
+        short by = build.tile.y;
         build.tile.remove();
         //scan forward tiles for blockage
         if(!Build.validPlace(build.block, build.team, bx + dirs[direction].x, by + dirs[direction].y, build.rotation,
@@ -173,19 +173,21 @@ public class BlockMovement{
         queue.add(root);
         Seq<Building> contacts = null;
         while(!queue.empty() && (contacts == null || contacts.size <= max)){
-            var next = queue.poll();
+            Building next = queue.poll();
             if(contacts == null){
                 contacts = Seq.with(next);
             }else{
                 contacts.add(next);
             }
 
-            var tangent = dirs[(direction + 1) % 4];
-            var o = origins[next.block.size - 1][direction];
+            Point2 tangent = dirs[(direction + 1) % 4];
+            Point2 o = origins[next.block.size - 1][direction];
+
+            outer:
             for(int i = 0; i < next.block.size; i++){ // iterate over forward edge.
-                var t = next.tile.nearby(o.x + tangent.x * i + dirs[direction].x,
+                Tile t = next.tile.nearby(o.x + tangent.x * i + dirs[direction].x,
                     o.y + tangent.y * i + dirs[direction].y);
-                var b = t.build;
+                Building b = t.build;
 
                 if(b == null || Structs.indexOf(queue.queue, b) >= 0 || contacts.contains(b)) continue;
 
@@ -196,9 +198,7 @@ public class BlockMovement{
 
                 if(next instanceof ConnectedBlock){
                     for(int dir = 0; dir < 4; dir++){
-                        if(dir == direction){
-                            continue;
-                        }
+                        if(dir == direction) continue outer;
                     }
                 }
             }
@@ -221,7 +221,7 @@ public class BlockMovement{
     */
     //usage: BlockMovement.pushBlock(Vars.world.tile(203,208).build,0,99,1)
     public static boolean pushBlock(Building build, int direction, int maxBlocks, float speed, Boolf<Building> bool){
-        var pushing = getAllContacted(build, direction, maxBlocks, bool);
+        Seq<Building> pushing = getAllContacted(build, direction, maxBlocks, bool);
         if(pushing == null){
             return false;
         }
@@ -244,7 +244,7 @@ public class BlockMovement{
     // returns 2 if successful, 0 if not, and 1 if the forward tile is a payload acceptor and was unsuccesful... so
     // you can spam attempts to push.
     public static int pushOut(Building build, int x, int y, int direction, float speed, int max, Boolf<Building> bool, boolean waitPayload){
-        var tile = world.tile(x, y);
+        Tile tile = world.tile(x, y);
         if(tile.build == null){
             if(!tileAvalibleTo(tile, build.block)){
                 return 0;
@@ -254,7 +254,7 @@ public class BlockMovement{
             return 2;
         }else{
             if(waitPayload && isPayloadBlock(tile.build)){
-                var bp = new BuildPayload(build);
+                BuildPayload bp = new BuildPayload(build);
                 bp.set((x - dirs[direction].x) * 8, (y - dirs[direction].y) * 8, 0);
                 if(tile.build.acceptPayload(build, bp)){
                     tile.build.handlePayload(build, bp);
@@ -306,7 +306,7 @@ public class BlockMovement{
                 this.oy = this.build.y;
             }
             this.timer += Time.delta;
-            var progress = Math.min(1, this.timer / this.delay);
+            float progress = Math.min(1, this.timer / this.delay);
 
             this.build.x = this.ox + this.dir.x * tilesize * progress;
             this.build.y = this.oy + this.dir.y * tilesize * progress;
@@ -318,7 +318,7 @@ public class BlockMovement{
     }
 
     static void addPushedBlock(Building build, int direction, float speed){
-        var bmu = new BlockMovementUpdater(build, dirs[direction], 60.0f / speed, 0, 0, 0);
+        BlockMovementUpdater bmu = new BlockMovementUpdater(build, dirs[direction], 60.0f / speed, 0, 0, 0);
         currentlyPushing.put(build, bmu);
         bmu.update();
     }

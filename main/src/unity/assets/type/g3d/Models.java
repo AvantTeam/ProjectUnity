@@ -10,6 +10,7 @@ import arc.struct.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
 import unity.assets.list.*;
+import unity.assets.list.UnityShaders.*;
 import unity.assets.type.g3d.attribute.*;
 import unity.assets.type.g3d.attribute.light.*;
 import unity.assets.type.g3d.attribute.type.*;
@@ -36,9 +37,9 @@ public final class Models{
 
         begin();
         for(int i = 0; i < pool.renders.size; i++){
-            var r = pool.renders.items[i];
+            Renderable r = pool.renders.items[i];
 
-            var shader = UnityShaders.graphics3DProvider.get(r);
+            Graphics3DShader shader = UnityShaders.graphics3DProvider.get(r);
             shader.bind();
             shader.apply(r);
 
@@ -80,7 +81,7 @@ public final class Models{
 
         @Override
         public Renderable get(){
-            var r = available.any() ? available.pop() : new Renderable();
+            Renderable r = available.any() ? available.pop() : new Renderable();
             renders.add(r);
 
             return r;

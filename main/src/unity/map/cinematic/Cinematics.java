@@ -9,7 +9,6 @@ import mindustry.gen.*;
 import mindustry.io.*;
 import mindustry.world.*;
 import unity.map.*;
-import unity.map.objectives.*;
 import unity.mod.*;
 
 import static mindustry.Vars.*;
@@ -69,9 +68,9 @@ public class Cinematics{
     }
 
     public StringMap saveNodes(){
-        var map = new StringMap();
+        StringMap map = new StringMap();
         for(var node : nodes){
-            var child = new StringMap();
+            StringMap child = new StringMap();
             node.save(child);
 
             map.put(node.name, JsonIO.json.toJson(child, StringMap.class, String.class));
@@ -82,13 +81,13 @@ public class Cinematics{
 
     public Seq<String> saveTags(){
         Seq<String> tagArray = new Seq<>();
-        var valueMap = StringMap.of("type", 0, "value", null, "tags", "[]");
+        StringMap valueMap = StringMap.of("type", 0, "value", null, "tags", "[]");
 
         for(var e : objectToTag.entries()){
             if(e.value.isEmpty()) continue;
 
-            var obj = e.key;
-            var type = obj.getClass();
+            Object obj = e.key;
+            Class<?> type = obj.getClass();
             if(type.isAnonymousClass()) type = type.getSuperclass();
 
             if(obj instanceof JsonSerializable || JsonIO.json.getSerializer(type) != null){
@@ -121,7 +120,7 @@ public class Cinematics{
 
     public void loadNodes(StringMap map){
         for(var e : map.entries()){
-            var node = nodes.find(n -> n.name.equals(e.key));
+            StoryNode node = nodes.find(n -> n.name.equals(e.key));
             if(node == null) throw new IllegalStateException("Node '" + e.key + "' not found!");
 
             node.load(JsonIO.json.fromJson(StringMap.class, String.class, e.value));
@@ -132,7 +131,7 @@ public class Cinematics{
         objectToTag.clear();
         tagToObject.clear();
         for(var e : array){
-            var valueMap = JsonIO.json.fromJson(StringMap.class, String.class, e);
+            StringMap valueMap = JsonIO.json.fromJson(StringMap.class, String.class, e);
             ObjectSet<String> tagsArray = JsonIO.json.fromJson(ObjectSet.class, String.class, valueMap.get("tags", "[]"));
 
             int type = valueMap.getInt("type");
@@ -141,7 +140,7 @@ public class Cinematics{
                 case 1 -> world.build(valueMap.getInt("value"));
                 case 2 -> world.tile(valueMap.getInt("value"));
                 case 3 -> {
-                    var pos = JsonIO.json.fromJson(float[].class, valueMap.get("value"));
+                    float[] pos = JsonIO.json.fromJson(float[].class, valueMap.get("value"));
                     yield Groups.all.find(ent -> ent instanceof Posc p && Mathf.equal(p.getX(), pos[0]) && Mathf.equal(p.getY(), pos[1]));
                 }
                 default -> throw new IllegalArgumentException("Unknown tagged object type: " + type);
@@ -155,7 +154,7 @@ public class Cinematics{
 
     public void tag(Object object, String tag){
         if(object == null) throw new IllegalArgumentException("Object to be tagged cannot be null!");
-        if(tagToObject.get(tag) != object) throw new IllegalArgumentException("'" + tag + "' tag is already taken!");
+        if(byTag(tag) != null && byTag(tag) != object) throw new IllegalArgumentException("'" + tag + "' tag is already taken!");
 
         objectToTag.get(object, ObjectSet::new).add(tag);
         tagToObject.put(tag, object);

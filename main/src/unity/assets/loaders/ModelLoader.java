@@ -35,8 +35,8 @@ public class ModelLoader extends SynchronousAssetLoader<Model, ModelLoader.Model
     }
 
     public ModelData parseModel(Fi handle){
-        var json = reader.parse(handle);
-        var model = new ModelData();
+        JsonValue json = reader.parse(handle);
+        ModelData model = new ModelData();
 
         model.id = json.getString("id", "");
         parseMeshes(model, json);
@@ -48,23 +48,23 @@ public class ModelLoader extends SynchronousAssetLoader<Model, ModelLoader.Model
     }
 
     protected void parseMeshes(ModelData model, JsonValue json){
-        var meshes = json.get("meshes");
+        JsonValue meshes = json.get("meshes");
         if(meshes != null){
             model.meshes.ensureCapacity(meshes.size);
             for(var mesh = meshes.child; mesh != null; mesh = mesh.next){
-                var data = new ModelMesh();
+                ModelMesh data = new ModelMesh();
 
                 data.id = mesh.getString("id", "");
 
-                var attributes = mesh.require("attributes");
+                JsonValue attributes = mesh.require("attributes");
                 data.attributes = parseAttributes(attributes);
                 data.vertices = mesh.require("vertices").asFloatSeq();
 
-                var meshParts = mesh.require("parts");
-                var parts = Seq.of(ModelMeshPart.class);
+                JsonValue meshParts = mesh.require("parts");
+                Seq<ModelMeshPart> parts = Seq.of(ModelMeshPart.class);
                 for(var meshPart = meshParts.child; meshPart != null; meshPart = meshPart.next){
-                    var part = new ModelMeshPart();
-                    var partId = meshPart.require("id").asString();
+                    ModelMeshPart part = new ModelMeshPart();
+                    String partId = meshPart.require("id").asString();
 
                     if(parts.contains(other -> other.id.equals(partId))) throw new IllegalArgumentException("Mesh part with id '" + partId + "' already in defined");
 
@@ -96,13 +96,13 @@ public class ModelLoader extends SynchronousAssetLoader<Model, ModelLoader.Model
     }
 
     protected VertexAttribute[] parseAttributes(JsonValue attributes){
-        var vertexAttributes = Seq.of(VertexAttribute.class);
+        Seq<VertexAttribute> vertexAttributes = Seq.of(VertexAttribute.class);
 
         int texUnit = 0,
             blendUnit = 0;
 
         for(var value = attributes.child; value != null; value = value.next){
-            var attr = value.asString();
+            String attr = value.asString();
             if(attr.equals("POSITION")){
                 vertexAttributes.add(VertexAttribute.position3);
             }else if(attr.equals("NORMAL")){
@@ -122,38 +122,38 @@ public class ModelLoader extends SynchronousAssetLoader<Model, ModelLoader.Model
     }
 
     protected void parseMaterials(ModelData model, JsonValue json, String dir){
-        var materials = json.get("materials");
+        JsonValue materials = json.get("materials");
         if(materials != null){
             model.materials.ensureCapacity(materials.size);
             for(var material = materials.child; material != null; material = material.next){
-                var data = new ModelMaterial();
+                ModelMaterial data = new ModelMaterial();
                 data.id = material.require("id").asString();
 
-                var diffuse = material.get("diffuse");
+                JsonValue diffuse = material.get("diffuse");
                 if(diffuse != null) data.diffuse = parseColor(diffuse);
 
-                var ambient = material.get("ambient");
+                JsonValue ambient = material.get("ambient");
                 if(ambient != null) data.ambient = parseColor(ambient);
 
-                var emissive = material.get("emissive");
+                JsonValue emissive = material.get("emissive");
                 if(emissive != null) data.emissive = parseColor(emissive);
 
-                var specular = material.get("specular");
+                JsonValue specular = material.get("specular");
                 if(specular != null) data.specular = parseColor(specular);
 
-                var reflection = material.get("reflection");
+                JsonValue reflection = material.get("reflection");
                 if(reflection != null) data.reflection = parseColor(reflection);
 
                 data.shininess = material.getFloat("shininess", 0.0f);
                 data.opacity = material.getFloat("opacity", 1.0f);
 
-                var textures = material.get("textures");
+                JsonValue textures = material.get("textures");
                 if(textures != null){
                     for(var texture = textures.child; texture != null; texture = texture.next){
-                        var tex = new ModelTexture();
+                        ModelTexture tex = new ModelTexture();
                         tex.id = texture.require("id").asString();
 
-                        var fileName = texture.require("filename").asString();
+                        String fileName = texture.require("filename").asString();
                         tex.fileName = dir + (dir.length() == 0 || dir.endsWith("/") ? "" : "/") + fileName;
 
                         tex.uvTranslation = readVec2(texture.get("uvTranslation"), 0f, 0f);
@@ -206,7 +206,7 @@ public class ModelLoader extends SynchronousAssetLoader<Model, ModelLoader.Model
     }
 
     protected void parseNodes(ModelData model, JsonValue json){
-        var nodes = json.get("nodes");
+        JsonValue nodes = json.get("nodes");
         if(nodes != null){
             model.nodes.ensureCapacity(nodes.size);
             for(var node = nodes.child; node != null; node = node.next){
@@ -216,28 +216,28 @@ public class ModelLoader extends SynchronousAssetLoader<Model, ModelLoader.Model
     }
 
     protected ModelNode parseNodesRecurse(JsonValue json){
-        var data = new ModelNode();
+        ModelNode data = new ModelNode();
         data.id = json.require("id").asString();
 
-        var trns = json.get("translation");
+        JsonValue trns = json.get("translation");
         data.translation = trns == null ? null : new Vec3(trns.getFloat(0), trns.getFloat(1), trns.getFloat(2));
 
-        var rot = json.get("rotation");
+        JsonValue rot = json.get("rotation");
         data.rotation = rot == null ? null : new Quat(rot.getFloat(0), rot.getFloat(1), rot.getFloat(2), rot.getFloat(3));
 
-        var scl = json.get("scale");
+        JsonValue scl = json.get("scale");
         data.scale = scl == null ? null : new Vec3(scl.getFloat(0), scl.getFloat(1), scl.getFloat(2));
 
-        var meshId = json.getString("mesh", null);
+        String meshId = json.getString("mesh", null);
         if(meshId != null) data.meshId = meshId;
 
-        var parts = json.get("parts");
+        JsonValue parts = json.get("parts");
         if(parts != null){
             data.parts = new ModelNodePart[parts.size];
 
             int i = 0;
             for(var material = parts.child; material != null; material = material.next, i++){
-                var part = new ModelNodePart();
+                ModelNodePart part = new ModelNodePart();
 
                 part.materialId = material.require("materialid").asString();
                 part.meshPartId = material.require("meshpartid").asString();
@@ -246,7 +246,7 @@ public class ModelLoader extends SynchronousAssetLoader<Model, ModelLoader.Model
             }
         }
 
-        var children = json.get("children");
+        JsonValue children = json.get("children");
         if(children != null){
             data.children = new ModelNode[children.size];
 
@@ -260,30 +260,30 @@ public class ModelLoader extends SynchronousAssetLoader<Model, ModelLoader.Model
     }
 
     protected void parseAnimations(ModelData model, JsonValue json){
-        var animations = json.get("animations");
+        JsonValue animations = json.get("animations");
         if(animations == null) return;
 
         model.animations.ensureCapacity(animations.size);
         for(var anim = animations.child; anim != null; anim = anim.next){
-            var nodes = anim.get("bones");
+            JsonValue nodes = anim.get("bones");
             if(nodes == null) continue;
 
-            var animation = new ModelAnimation();
+            ModelAnimation animation = new ModelAnimation();
             model.animations.add(animation);
 
             animation.nodeAnimations.ensureCapacity(nodes.size);
             animation.id = anim.getString("id");
             for(var node = nodes.child; node != null; node = node.next){
-                var nodeAnim = new ModelNodeAnimation();
+                ModelNodeAnimation nodeAnim = new ModelNodeAnimation();
                 animation.nodeAnimations.add(nodeAnim);
                 nodeAnim.nodeId = node.getString("boneId");
 
-                var keyframes = node.get("keyframes");
+                JsonValue keyframes = node.get("keyframes");
                 if(keyframes != null && keyframes.isArray()){
                     for(var keyframe = keyframes.child; keyframe != null; keyframe = keyframe.next){
                         float keytime = keyframe.getFloat("keytime", 0f) / (100f / 3f);
 
-                        var translation = keyframe.get("translation");
+                        JsonValue translation = keyframe.get("translation");
                         if(translation != null && translation.size == 3){
                             if(nodeAnim.translation == null) nodeAnim.translation = new Seq<>();
 
@@ -298,7 +298,7 @@ public class ModelLoader extends SynchronousAssetLoader<Model, ModelLoader.Model
                             nodeAnim.translation.add(tkf);
                         }
 
-                        var rotation = keyframe.get("rotation");
+                        JsonValue rotation = keyframe.get("rotation");
                         if(rotation != null && rotation.size == 4){
                             if(nodeAnim.rotation == null) nodeAnim.rotation = new Seq<>();
 
@@ -314,7 +314,7 @@ public class ModelLoader extends SynchronousAssetLoader<Model, ModelLoader.Model
                             nodeAnim.rotation.add(rkf);
                         }
 
-                        var scale = keyframe.get("scale");
+                        JsonValue scale = keyframe.get("scale");
                         if(scale != null && scale.size == 3){
                             if(nodeAnim.scaling == null) nodeAnim.scaling = new Seq<>();
 

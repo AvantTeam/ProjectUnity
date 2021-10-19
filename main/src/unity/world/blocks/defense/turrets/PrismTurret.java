@@ -84,7 +84,7 @@ public class PrismTurret extends SoulPowerTurret{
 
             targets.clear().add(target);
             for(int i = 0; i < maxShots; i++){
-                var t = Units.closestTarget(team, targetPos.x, targetPos.y, sortRange,
+                Teamc t = Units.closestTarget(team, targetPos.x, targetPos.y, sortRange,
                     u -> u != target && u.checkTarget(targetAir, targetGround) && !targets.contains(u),
                     b -> b != target && targetGround && !targets.contains(b)
                 );
@@ -100,7 +100,7 @@ public class PrismTurret extends SoulPowerTurret{
         @Override
         protected void shoot(BulletType type){
             for(int i = 0; i < targets.size; i++){
-                var u = targets.get(i);
+                Posc u = targets.get(i);
                 Time.run(i / shootRate, () -> {
                     if(!isValid() || u == null || !(u instanceof Healthc h ? h.isValid() : u.isAdded())) return;
 

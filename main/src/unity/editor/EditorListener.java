@@ -28,19 +28,17 @@ public abstract class EditorListener{
         Triggers.listen(Trigger.drawOver, () -> valid(this::draw));
 
         Events.on(StateChangeEvent.class, e -> {
-            if(state.isEditor()){
-                if(e.from == State.menu && e.to == State.playing){
-                    var c = content.getByName(ContentType.sector, "unity-" + editor.tags.get("name"));
-                    if(c instanceof ScriptedSector sect){
-                        attached = true;
-                        sector = sect;
-                        begin();
-                    }
-                }else if(attached && e.to == State.menu){
-                    end();
-                    attached = false;
-                    sector = null;
+            if(e.from == State.menu && e.to == State.playing && state.isEditor()){
+                MappableContent c = content.getByName(ContentType.sector, "unity-" + editor.tags.get("name"));
+                if(c instanceof ScriptedSector sect){
+                    attached = true;
+                    sector = sect;
+                    begin();
                 }
+            }else if(attached && e.to == State.menu){
+                end();
+                attached = false;
+                sector = null;
             }
         });
     }

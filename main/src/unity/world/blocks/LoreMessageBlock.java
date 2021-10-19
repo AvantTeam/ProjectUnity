@@ -5,6 +5,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.*;
+import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.io.*;
@@ -99,7 +100,7 @@ public class LoreMessageBlock extends Block{
                     .pad(6f);
 
                 cont.row();
-                var scrl = cont.pane(Styles.defaultPane, pane -> {
+                ScrollPane scrl = cont.pane(Styles.defaultPane, pane -> {
                     pane.setBackground(Tex.scroll);
                     pane.labelWrap(() -> Core.bundle.get(message, "..."))
                         .grow()

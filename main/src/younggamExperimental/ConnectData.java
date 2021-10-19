@@ -29,7 +29,7 @@ public class ConnectData{
         int gx = sizeW - 1;
         int gy = 0;
         int side = 0;
-        var forwardDir = Geometry.d4(3);
+        Point2 forwardDir = Geometry.d4(3);
         while(cind >= 0){
             side++;
             gx += forwardDir.x * (lastSub - 1);

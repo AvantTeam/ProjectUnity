@@ -14,7 +14,7 @@ import unity.gen.*;
 
 import static mindustry.Vars.*;
 
-public class Press extends GenericCrafter {
+public class Press extends GenericCrafter{
     public float movementSize = 10f;
     public float fxYVariation = 15f / tilesize;
     public Sound clangSound = UnitySounds.clang;
@@ -40,7 +40,7 @@ public class Press extends GenericCrafter {
         return new TextureRegion[]{region, leftRegion, rightRegion};
     }
 
-    public class PressBuild extends GenericCrafterBuild {
+    public class PressBuild extends GenericCrafterBuild{
         public float realMovementSize = movementSize / tilesize;
         public float alphaValueMax = 0.4f;
         public float alphaValue = 0f;
@@ -49,15 +49,17 @@ public class Press extends GenericCrafter {
         public void draw(){
             Draw.rect(baseRegion, x, y);
             Draw.color(Team.crux.color);
-            if(alphaValue > 0f) {
+            if(alphaValue > 0f){
                 Draw.alpha(alphaValue);
-                for (var i = 0; i < 10; i++) {
+                for(int i = 0; i < 10; i++){
                     Fill.circle(x, y, i * 0.6f + Mathf.sin((totalProgress + Time.time) / 16f) / 3f);
                 }
             }
             Draw.color();
-            Draw.rect(leftRegion, x - Math.abs(Mathf.sin(Mathf.clamp(progress * 1.2f - 0.2f, 0, 1) / 2 * 360 * Mathf.degreesToRadians)) * realMovementSize, y);
-            Draw.rect(rightRegion, x + Math.abs(Mathf.sin(Mathf.clamp(progress * 1.2f - 0.2f, 0, 1) / 2 * 360 * Mathf.degreesToRadians)) * realMovementSize, y);
+            Draw.rect(leftRegion,
+                x - Math.abs(Mathf.sin(Mathf.clamp(progress * 1.2f - 0.2f, 0, 1) / 2 * 360 * Mathf.degreesToRadians)) * realMovementSize, y);
+            Draw.rect(rightRegion,
+                x + Math.abs(Mathf.sin(Mathf.clamp(progress * 1.2f - 0.2f, 0, 1) / 2 * 360 * Mathf.degreesToRadians)) * realMovementSize, y);
             Draw.rect(region, x, y);
         }
 
@@ -67,7 +69,7 @@ public class Press extends GenericCrafter {
 
             if(efficiency() > 0.001f){
                 alphaValue += 0.01f;
-            } else {
+            }else{
                 alphaValue -= 0.01f;
             }
             alphaValue = Mathf.clamp(alphaValue, 0f, alphaValueMax);
@@ -80,7 +82,8 @@ public class Press extends GenericCrafter {
             clangSound.at(x, y, Mathf.random(0.6f, 0.8f));
 
             for(int i = 0; i < 8; i++){
-                sparkEffect.at(x,  y + Mathf.range(fxYVariation), Mathf.random() * 360, Items.surgeAlloy.color, Mathf.random() + 0.5f);
+                sparkEffect.at(x, y + Mathf.range(fxYVariation), Mathf.random() * 360, Items.surgeAlloy.color,
+                    Mathf.random() + 0.5f);
             }
         }
     }

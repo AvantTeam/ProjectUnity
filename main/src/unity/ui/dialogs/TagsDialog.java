@@ -2,10 +2,12 @@ package unity.ui.dialogs;
 
 import arc.scene.ui.layout.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.gen.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 
+@SuppressWarnings("unchecked")
 public class TagsDialog extends BaseDialog{
     private Table content;
     private final Seq<TagElem> elems = new Seq<>();
@@ -19,13 +21,16 @@ public class TagsDialog extends BaseDialog{
         cont.pane(t -> content = t).growY().width(500f);
 
         addCloseButton();
-        buttons.button("@add", Icon.add, () -> add(new TagElem(lastName()))).size(210f, 64f);
+        buttons.button("@add", Icon.add, () -> {
+            add(new TagElem(lastName()));
+            refresh();
+        }).size(210f, 64f);
         buttons.button("Remove", Icon.trash, () -> {
-            var tags = this.tags;
-            var bound = this.bound;
+            tags.remove(bound);
+            tags = null;
+            bound = null;
 
             hide();
-            tags.remove(bound);
         }).size(210f, 64f);
 
         shown(() -> {
@@ -33,6 +38,8 @@ public class TagsDialog extends BaseDialog{
             for(var tag : set){
                 add(new TagElem(tag));
             }
+
+            refresh();
         });
 
         hidden(() -> {
@@ -43,8 +50,6 @@ public class TagsDialog extends BaseDialog{
     }
 
     private String lastName(){
-        refresh();
-
         int i = 0;
         for(var set : tags.values()){
             for(var tag : set){
@@ -61,8 +66,6 @@ public class TagsDialog extends BaseDialog{
     private void add(TagElem elem){
         elems.add(elem);
         content.add(elem).growX().fillY().row();
-
-        refresh();
     }
 
     private void refresh(){
@@ -70,7 +73,7 @@ public class TagsDialog extends BaseDialog{
 
         var set = tags.get(bound, ObjectSet::new);
         set.clear();
-        elems.each(e -> set.add(e.tag));
+        elems.each(e -> set.add(e.tag()));
     }
 
     @Override
@@ -84,14 +87,18 @@ public class TagsDialog extends BaseDialog{
     }
 
     public TagsDialog show(ObjectMap<Object, ObjectSet<String>> tags, Object bound){
+        this.tags = null;
+        this.bound = null;
+        elems.clear();
+        content.clear();
+
         this.tags = tags;
         this.bound = bound;
-        content.clear();
         return show();
     }
 
     private class TagElem extends Table{
-        private String tag;
+        private String tag = "";
 
         private TagElem(String init){
             tag = init;
@@ -99,13 +106,13 @@ public class TagsDialog extends BaseDialog{
             background(Tex.button);
 
             add("Tag: ").padLeft(4f);
-            field(init, str -> {
+            field(tag, str -> {
                 tag = str;
                 refresh();
             }).valid(str -> {
-                if(elems.contains(e -> e.tag.equals(tag))) return false;
+                if(elems.contains(e -> e.tag().equals(str))) return false;
                 for(var set : tags.values()){
-                    if(set.contains(tag)) return false;
+                    if(set.contains(str)) return false;
                 }
 
                 return true;
@@ -114,9 +121,13 @@ public class TagsDialog extends BaseDialog{
             button(Icon.trash, Styles.emptyi, this::remove).padRight(8f);
         }
 
+        private String tag(){
+            return tag == null ? "" : tag;
+        }
+
         @Override
         public boolean remove(){
-            var cell = content.getCell(this);
+            Cell<TagElem> cell = (Cell<TagElem>)content.getCell(this);
 
             boolean succeed = super.remove();
             if(succeed && cell != null){

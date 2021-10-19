@@ -20,7 +20,7 @@ public interface Soul extends Teamc, Healthc, Sized{
     }
 
     default int acceptSoul(Entityc other){
-        var soul = toSoul(other);
+        Soul soul = toSoul(other);
         return soul != null ? acceptSoul(soul) : 0;
     }
 

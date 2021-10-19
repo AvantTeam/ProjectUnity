@@ -142,11 +142,11 @@ public class UnityBullets{
                 Effect.shake(hitShake, hitShake, b);
 
                 for(var i = 0; i < fragBullets; i++){
-                    var len = Mathf.random(1f, 7f);
-                    var a = b.rotation() + Mathf.randomSeed(b.id, 360f) + i * 360f/fragBullets;
-                    var target = Damage.linecast(b, x, y, b.rotation(), length);
+                    float len = Mathf.random(1f, 7f);
+                    float a = b.rotation() + Mathf.randomSeed(b.id, 360f) + i * 360f / fragBullets;
+                    Healthc target = Damage.linecast(b, x, y, b.rotation(), length);
 
-                    var data = getColor(b);
+                    Color data = getColor(b);
                     b.data = target;
 
                     if(target instanceof Hitboxc hit){
@@ -176,7 +176,7 @@ public class UnityBullets{
             }
 
             public void freezePos(Bullet b, float x, float y){
-                var lvl = getLevel(b);
+                int lvl = getLevel(b);
                 float rad = 3.5f;
                 if(!Vars.headless) UnityFx.freezeEffect.at(x, y, lvl / rad + 10f, getColor(b));
                 if(!Vars.headless) UnitySounds.laserFreeze.at(x, y, 1f, 0.6f);
@@ -405,7 +405,7 @@ public class UnityBullets{
             }
 
             public void freezePos(Bullet b, float x, float y){
-                var lvl = getLevel(b);
+                int lvl = getLevel(b);
                 float rad = 4.5f;
                 if(!Vars.headless) UnityFx.freezeEffect.at(x, y, lvl / rad + 10f, getColor(b));
                 if(!Vars.headless) UnitySounds.laserFreeze.at(x, y, 1f, 0.6f);
@@ -463,7 +463,7 @@ public class UnityBullets{
             }
 
             void freezePos(Bullet b, float x, float y){
-                var lvl = getLevel(b);
+                int lvl = getLevel(b);
                 float rad = 4.5f;
                 if(!Vars.headless) UnityFx.freezeEffect.at(x, y, lvl / rad + 10f, getColor(b));
                 if(!Vars.headless) UnitySounds.laserFreeze.at(x, y, 1f, 0.6f);

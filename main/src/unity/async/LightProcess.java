@@ -33,7 +33,7 @@ public class LightProcess implements AsyncProcess{
 
         all.size = 0; // avoid unnecessary iteration
         Groups.draw.each(e -> e instanceof Light, e -> {
-            var l = (Light)e;
+            Light l = (Light)e;
 
             l.snap();
             all.add(l);
@@ -93,7 +93,7 @@ public class LightProcess implements AsyncProcess{
             queue.post(() -> {
                 light.clearChildren();
 
-                var pointed = light.pointed;
+                LightHoldBuildc pointed = light.pointed;
                 if(pointed != null){
                     pointed.remove(light);
                     light.pointed = null;
@@ -101,7 +101,7 @@ public class LightProcess implements AsyncProcess{
             });
         }else{
             queue.post(() -> {
-                var pointed = light.pointed;
+                LightHoldBuildc pointed = light.pointed;
                 if(light.rotationChanged || pointed != hold || hold.needsReinteract()){
                     light.clearChildren();
 

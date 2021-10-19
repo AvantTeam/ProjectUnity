@@ -9,6 +9,7 @@ import arc.util.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
 import mindustry.graphics.*;
+import rhino.*;
 import unity.map.cinematic.*;
 import unity.map.objectives.types.*;
 import unity.util.*;
@@ -20,7 +21,7 @@ import static unity.Unity.*;
 
 @SuppressWarnings("unchecked")
 public class ObjectiveModel implements JsonSerializable{
-    public static ObjectMap<Class<? extends Objective>, ObjectiveData> datas = new ObjectMap<>();
+    public static OrderedMap<Class<? extends Objective>, ObjectiveData> datas = new OrderedMap<>();
 
     /** The objective type that is going to be instantiated. Do not modify directly, use {@link #set(Class)} instead. */
     public Class<? extends Objective> type;
@@ -39,6 +40,7 @@ public class ObjectiveModel implements JsonSerializable{
     static{
         ResourceAmountObj.setup();
         UnitPosObj.setup();
+        CustomObj.setup();
     }
 
     public void set(Class<? extends Objective> type){
@@ -57,7 +59,7 @@ public class ObjectiveModel implements JsonSerializable{
     @Override
     public void read(Json json, JsonValue data){
         try{
-            var typeName = data.getString("type");
+            String typeName = data.getString("type");
             if(!typeName.equals("null")){
                 set((Class<? extends Objective>)Class.forName(typeName, true, mods.mainLoader()));
             }
@@ -73,24 +75,24 @@ public class ObjectiveModel implements JsonSerializable{
     }
 
     public <T extends Objective> T create(StoryNode node){
-        var data = data(type);
+        ObjectiveData data = data(type);
 
         fields.clear();
         if(init != null){
-            var source = init;
-            var matcher = replacer.matcher(init);
+            String source = init;
+            Matcher matcher = replacer.matcher(init);
             while(matcher.find()){
-                var occur = init.substring(matcher.start(), matcher.end());
+                String occur = init.substring(matcher.start(), matcher.end());
                 occur = occur.substring(3, occur.length() - 2).trim();
 
-                var f = occur; // Finalize, for use in lambda statements.
-                var script = node.scripts.getThrow(f, () -> new IllegalArgumentException("No such script: '" + f + "'"));
+                String f = occur; // Finalize, for use in lambda statements.
+                String script = node.scripts.getThrow(f, () -> new IllegalArgumentException("No such script: '" + f + "'"));
 
                 // Remove new-lines, note that every script must have `;` as the statement separator!
                 source = source.replaceFirst(env, script.replace("\r", "\n").replace("\n", ""));
             }
 
-            var func = JSBridge.compileFunc(JSBridge.unityScope, name + "-init.js", source);
+            Function func = JSBridge.compileFunc(JSBridge.unityScope, name + "-init.js", source);
             func.call(JSBridge.context, JSBridge.unityScope, JSBridge.unityScope, new Object[]{fields});
         }
 
@@ -98,7 +100,7 @@ public class ObjectiveModel implements JsonSerializable{
         translator.fields.putAll(fields);
         translator.name = name;
 
-        var obj = (T)data.constructor.get(node, translator);
+        T obj = (T)data.constructor.get(node, translator);
         translator.fields.clear();
 
         return obj;

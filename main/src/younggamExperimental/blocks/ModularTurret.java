@@ -18,7 +18,9 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.blocks.defense.turrets.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
 import mindustry.world.meta.*;
+import mindustry.world.modules.*;
 import unity.graphics.*;
 import unity.util.*;
 import unity.world.blocks.*;
@@ -138,7 +140,7 @@ public class ModularTurret extends Turret implements GraphBlockBase{
         }
 
         TextureRegion getBufferRegion(){
-            var tex = Draw.wrap(buffer.getTexture());
+            TextureRegion tex = Draw.wrap(buffer.getTexture());
             tex.v = tex.v2;
             tex.v2 = tex.u;
             return tex;
@@ -175,9 +177,9 @@ public class ModularTurret extends Turret implements GraphBlockBase{
                 return;
             }
             if(timer(timerDump, autoBuildDelay)){
-                var core = team.core();
+                CoreBuild core = team.core();
                 if(core == null) return;
-                var cItems = core.items;
+                ItemModule cItems = core.items;
                 for(var i : blueprintRemainingCost){
                     if((i.value >>> 16) < (i.value & mask) && cItems.get(i.key) > 0){
                         cItems.remove(i.key, 1);
@@ -265,10 +267,10 @@ public class ModularTurret extends Turret implements GraphBlockBase{
         }
 
         void accumStats(PartInfo part, int x, int y, int[][] grid){
-            var hp = part.stats.get(PartStatType.hp);
+            PartStat hp = part.stats.get(PartStatType.hp);
             if(hp != null) currentStats.hpinc += hp.asInt();
             //TODO
-            var range = part.stats.get(PartStatType.rangeinc);
+            PartStat range = part.stats.get(PartStatType.rangeinc);
             if(range != null) currentStats.rangeInc += range.asInt();
             if(part.category == PartType.base){
                 //TODO
@@ -296,9 +298,9 @@ public class ModularTurret extends Turret implements GraphBlockBase{
         @Override
         public void buildConfiguration(Table table){
             table.button(Tex.whiteui, Styles.clearTransi, 50f, () -> {
-                var dialog = new BaseDialog("Edit Blueprint");
+                BaseDialog dialog = new BaseDialog("Edit Blueprint");
                 dialog.setFillParent(false);
-                var mtd = ModularConstructorUI.applyModularConstructorUI(dialog.cont, partsRegion, Math.round(partsRegion.width / 32f), Math.round(partsRegion.height / 32f),
+                ModularConstructorUI mtd = ModularConstructorUI.applyModularConstructorUI(dialog.cont, partsRegion, Math.round(partsRegion.width / 32f), Math.round(partsRegion.height / 32f),
                     partInfo, gridW, gridH, bluePrint, getPartsCategories(), partCostAccum
                 );
                 dialog.buttons.button("@ok", () -> {
@@ -324,7 +326,7 @@ public class ModularTurret extends Turret implements GraphBlockBase{
             for(int p = 0; p < len; p++){
                 int temp = bluePrint.get(p);
                 if(temp != 0){
-                    var partL = partInfo[temp - 1];
+                    PartInfo partL = partInfo[temp - 1];
                     cstMult += partCostAccum * partL.tw * partL.th;
                 }
             }
@@ -335,8 +337,8 @@ public class ModularTurret extends Turret implements GraphBlockBase{
             for(int p = 0; p < len; p++){
                 int temp = bluePrint.get(p);
                 if(temp != 0){
-                    var partL = partInfo[temp - 1];
-                    var prtTmp = partL.cost;
+                    PartInfo partL = partInfo[temp - 1];
+                    ItemStack[] prtTmp = partL.cost;
                     for(var cstItem : prtTmp){
                         int cur = blueprintRemainingCost.get(cstItem.item, 0);
                         int increment = Mathf.floor(cstItem.amount * cstMult);
@@ -385,7 +387,7 @@ public class ModularTurret extends Turret implements GraphBlockBase{
                 write.i(0);
                 return;
             }
-            var tmp = IntPacker.packArray(bluePrint).packed;
+            IntSeq tmp = IntPacker.packArray(bluePrint).packed;
             int len = tmp.size;
             write.s(len);
             for(int i = 0; i < len; i++) write.i(tmp.get(i));
@@ -460,7 +462,7 @@ public class ModularTurret extends Turret implements GraphBlockBase{
                 aniSpeed = 0f;
             }
             drawExt();
-            var turretSprite = getBufferRegion();
+            TextureRegion turretSprite = getBufferRegion();
             if(turretSprite != null){
                 Draw.z(Layer.turret);
                 if(getPaidRatio() < 1f){

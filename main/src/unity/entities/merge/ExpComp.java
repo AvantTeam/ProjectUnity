@@ -241,7 +241,7 @@ abstract class ExpComp extends Block implements Stemc{
         }
 
         public void upgrade(int index){
-            var upgrade = upgrades.get(index);
+            ExpUpgrade upgrade = upgrades.get(index);
             if(level() >= upgrade.min && level() <= upgrade.max){
                 upgradeBlock(upgrade.type);
             }
@@ -306,12 +306,12 @@ abstract class ExpComp extends Block implements Stemc{
         }
 
         private void upgradeTable(Table table, int level){
-            var upgrades = currentUpgrades(level);
+            ExpUpgrade[] upgrades = currentUpgrades(level);
             if(upgrades.length == 0) return;
 
             int[] i = {0};
             for(; i[0] < upgrades.length; i[0]++){
-                var block = upgrades[i[0]].type;
+                Block block = upgrades[i[0]].type;
                 table.table(t -> {
                     t.background(Tex.button);
                     t.image(block.uiIcon).size(38).padRight(2);

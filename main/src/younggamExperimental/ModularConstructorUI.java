@@ -43,7 +43,7 @@ public class ModularConstructorUI extends Element{
     }
 
     public static ModularConstructorUI getModularConstructorUI(float pHeight, TextureRegion partsSprite, PartInfo[] partsConfig, IntSeq preConfig, int maxW, int maxH, float cstacc){
-        var pp = new ModularConstructorUI();
+        ModularConstructorUI pp = new ModularConstructorUI();
         pp.init();
         pp.prefHeight = pHeight;
         pp.partsSprite = partsSprite;
@@ -61,7 +61,7 @@ public class ModularConstructorUI extends Element{
     public static ModularConstructorUI applyModularConstructorUI(Table table, TextureRegion partsSprite, int spriteW, int spriteH, PartInfo[] partsConfig, int maxW, int maxH, IntSeq preConfig, PartType[] categories, float cstaccum){
         PartInfo.preCalcConnection(partsConfig);
         PartInfo.assignPartSprites(partsConfig, partsSprite, spriteW, spriteH);
-        var modElement = getModularConstructorUI(400f, partsSprite, partsConfig, preConfig, maxW, maxH, cstaccum);
+        ModularConstructorUI modElement = getModularConstructorUI(400f, partsSprite, partsConfig, preConfig, maxW, maxH, cstaccum);
         currentCat = null;
         Cons<Table> partSelectCons = scrollTable -> {
             float costInc = modElement.costAccum;
@@ -117,7 +117,7 @@ public class ModularConstructorUI extends Element{
             cstTable.clearChildren();
             cstTable.add("[accent]Total Cost").padBottom(4).row();
             cstTable.table(botTable -> {
-                var csTot = modElement.getTotalCost();
+                OrderedMap<Item, Integer> csTot = modElement.getTotalCost();
                 for(var cost : csTot){
                     botTable.image(cost.key.uiIcon).size(iconSmall).left();
                     botTable.add("[gray]" + cost.value).padLeft(2f).left().padRight(4f).row();
@@ -148,7 +148,7 @@ public class ModularConstructorUI extends Element{
     static void displayPartInfo(PartInfo part){
         BaseDialog dialog = new BaseDialog("Part:" + part.name);
         dialog.setFillParent(false);
-        var cont = dialog.cont;
+        Table cont = dialog.cont;
         cont.add("[lightgray]Name:[white]" + part.name).left().row();
         cont.add("[lightgray]Description:").left().row();
         cont.add("[white]" + part.desc).wrap().fillX().left().width(500f).maxWidth(500f).get().setWrap(true);
@@ -254,12 +254,12 @@ public class ModularConstructorUI extends Element{
         if(chkConnection){
             boolean hasConnection = partType.connInList.isEmpty();
             for(var i : partType.connInList){
-                var fromPart = getPartAt(x + i.x + i.dir.x, y + i.y + i.dir.y);
+                PartPlaceObj fromPart = getPartAt(x + i.x + i.dir.x, y + i.y + i.dir.y);
                 if(fromPart != null) hasConnection |= partCanConnectOut(fromPart, i.x + x, i.y + y, i.id);
             }
             if(!hasConnection){
                 for(var i : partType.connOutList){
-                    var fromPart = getPartAt(x + i.x + i.dir.x, y + i.y + i.dir.y);
+                    PartPlaceObj fromPart = getPartAt(x + i.x + i.dir.x, y + i.y + i.dir.y);
                     if(fromPart != null) hasConnection |= partCanConnectIn(fromPart, i.x + x, i.y + y, i.id);
                 }
             }
@@ -276,7 +276,7 @@ public class ModularConstructorUI extends Element{
         for(var i : part.children) toVisit.add(i);
         int index = 0;
         while(index < toVisit.size){
-            var cPart = toVisit.get(index);
+            PartPlaceObj cPart = toVisit.get(index);
             visited.add(cPart);
             for(var i : cPart.parents){
                 if(!visited.contains(i)) toVisit.add(i);
@@ -293,14 +293,14 @@ public class ModularConstructorUI extends Element{
         for(int i = 0, len = partList.size; i < len; i++) partList.get(i).valid = false;
         for(int i = 0, len = rootList.size; i < len; i++){
             //massive iterating wtf xelo
-            var k = floodFrom(rootList.get(i));
+            OrderedSet<PartPlaceObj> k = floodFrom(rootList.get(i));
             for(var part : k) part.valid = true;
         }
     }
 
     boolean removeTile(PartPlaceObj part){
         if(part == null) return false;
-        var prt = part.part;
+        PartInfo prt = part.part;
         if(prt.isRoot) return false;
         for(var i : part.parents){
             i.children.remove(part);
@@ -331,14 +331,14 @@ public class ModularConstructorUI extends Element{
     boolean placeTileDirect(PartInfo partType, int x, int y){
         PartPlaceObj partPlaceObj = new PartPlaceObj(x, y, partType);
         for(var i : partType.connInList){
-            var fromPart = getPartAt(x + i.x + i.dir.x, y + i.y + i.dir.y);
+            PartPlaceObj fromPart = getPartAt(x + i.x + i.dir.x, y + i.y + i.dir.y);
             if(fromPart != null && partCanConnectOut(fromPart, i.x + x, i.y + y, i.id)){
                 partPlaceObj.parents.add(fromPart);
                 fromPart.children.add(partPlaceObj);
             }
         }
         for(var i : partType.connOutList){
-            var fromPart = getPartAt(x + i.x + i.dir.x, y + i.y + i.dir.y);
+            PartPlaceObj fromPart = getPartAt(x + i.x + i.dir.x, y + i.y + i.dir.y);
             if(fromPart != null && partCanConnectOut(fromPart, i.x + x, i.y + y, i.id)){
                 partPlaceObj.children.add(fromPart);
                 fromPart.parents.add(partPlaceObj);
@@ -368,7 +368,7 @@ public class ModularConstructorUI extends Element{
 
     void onIsDragged(InputEvent event, float x, float y, int point){
         if(isClickedRN){
-            var gPos = uiToGridPos(x, y);
+            Point2 gPos = uiToGridPos(x, y);
             boolean success;
             if(dragButton == KeyCode.mouseRight) success = removeTile(getPartAt(gPos.x, gPos.y));
             else success = placeTile(partsSelect, gPos.x, gPos.y);
@@ -453,7 +453,7 @@ public class ModularConstructorUI extends Element{
         IntPacker packer = new IntPacker();
         for(int px = 0; px < gridW; px++){
             for(int py = 0; py < gridH; py++){
-                var p = getPartAt(px, py);
+                PartPlaceObj p = getPartAt(px, py);
                 if(p != null && p.x == px && p.y == py && p.valid) packer.add(p.part.id + 1);
                 else packer.add(0);
             }
@@ -486,4 +486,3 @@ public class ModularConstructorUI extends Element{
         }
     }
 }
-

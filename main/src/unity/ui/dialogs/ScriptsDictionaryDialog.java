@@ -1,7 +1,9 @@
 package unity.ui.dialogs;
 
+import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
+import arc.struct.ObjectMap.*;
 import mindustry.gen.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
@@ -23,7 +25,7 @@ public class ScriptsDictionaryDialog extends BaseDialog{
 
         addCloseButton();
         buttons.button("@add", Icon.add, () -> {
-            var e = new ScriptElem(lastName(), "");
+            ScriptElem e = new ScriptElem(lastName(), "");
             elems.add(e);
 
             put(e);
@@ -33,8 +35,8 @@ public class ScriptsDictionaryDialog extends BaseDialog{
             content.clearChildren();
 
             elems.clear();
-            for(var e : dictionary.entries()){
-                var elem = new ScriptElem(e.key, e.value);
+            for(Entry<String, String> e : dictionary.entries()){
+                ScriptElem elem = new ScriptElem(e.key, e.value);
                 elems.add(elem);
             }
 
@@ -43,7 +45,7 @@ public class ScriptsDictionaryDialog extends BaseDialog{
 
         hidden(() -> {
             dictionary.clear();
-            for(var e : elems){
+            for(ScriptElem e : elems){
                 dictionary.put(e.name, e.script);
             }
 
@@ -54,7 +56,7 @@ public class ScriptsDictionaryDialog extends BaseDialog{
 
     private String lastName(){
         int i = 0;
-        for(var e : elems){
+        for(ScriptElem e : elems){
             if(e.name.startsWith("script") && Character.isDigit(e.name.codePointAt("script".length()))){
                 int index = Character.digit(e.name.charAt("script".length()), 10);
                 if(index > i) i = index;
@@ -81,7 +83,7 @@ public class ScriptsDictionaryDialog extends BaseDialog{
 
     private void rebuild(){
         content.clearChildren();
-        for(var e : elems){
+        for(ScriptElem e : elems){
             put(e);
         }
     }
@@ -106,7 +108,7 @@ public class ScriptsDictionaryDialog extends BaseDialog{
 
             add("Name: ").padLeft(8f);
 
-            var field = field(name, str -> this.name = str).growX().get();
+            TextField field = field(name, str -> this.name = str).growX().get();
             field.setValidator(str -> !elems.contains(e -> e.name.equals(str)));
 
             add().growX();

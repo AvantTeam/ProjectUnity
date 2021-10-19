@@ -6,6 +6,7 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
+import arc.graphics.g3d.*;
 import arc.graphics.gl.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -15,6 +16,8 @@ import mindustry.game.EventType.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import unity.assets.type.g3d.*;
+import unity.assets.type.g3d.attribute.*;
+import unity.assets.type.g3d.attribute.light.*;
 import unity.assets.type.g3d.attribute.type.*;
 import unity.assets.type.g3d.attribute.type.light.*;
 
@@ -32,7 +35,7 @@ public class UnityShaders{
         if(headless) return;
 
         buffer = new FrameBuffer();
-        var conds = new CondShader[]{};
+        CondShader[] conds = new CondShader[]{};
 
         vapourizeShader = new VapourizeShader();
         stencilShader = new StencilShader();
@@ -41,7 +44,7 @@ public class UnityShaders{
 
         if(conds.length == 0) return;
         for(int i = 0; i < conds.length; i++){
-            var shader = conds[i];
+            CondShader shader = conds[i];
             shader.layer = Layer.shields + 2f + i * ((1f / conds.length) - 0.01f);
         }
 
@@ -261,9 +264,9 @@ public class UnityShaders{
         }
 
         public void apply(Renderable render){
-            var camera = Models.camera;
-            var material = render.material;
-            var env = Models.environment;
+            Camera3D camera = Models.camera;
+            Material material = render.material;
+            Environment env = Models.environment;
 
             setUniformMatrix4("u_proj", camera.combined.val);
             setUniformMatrix4("u_trans", render.worldTransform.val);
@@ -349,7 +352,7 @@ public class UnityShaders{
             DirectionalLightsAttribute dirl = env.get(DirectionalLightsAttribute.light);
             if(dirl != null){
                 for(int i = 0; i < dirl.lights.size; i++){
-                    var light = dirl.lights.get(i);
+                    DirectionalLight light = dirl.lights.get(i);
                     setUniformf("u_dirLights[" + i + "].color", light.color);
                     setUniformf("u_dirLights[" + i + "].direction", light.direction);
                 }

@@ -62,7 +62,7 @@ public class LightningSpawnAbility extends Ability{
             if(can){
                 timer = 0f;
 
-                var t = Units.closestTarget(unit.team, x, y, lightningRange);
+                Teamc t = Units.closestTarget(unit.team, x, y, lightningRange);
                 if(t instanceof Healthc h){
                     h.damage(lightningDamage);
 
@@ -87,7 +87,7 @@ public class LightningSpawnAbility extends Ability{
         float z = Draw.z();
         Draw.z(Layer.bullet);
 
-        var shade = atlas.find("circle-shadow");
+        TextureRegion shade = atlas.find("circle-shadow");
         for(int i = 0; i < lightningCount; i++){
             Tmp.v1.trns(
                 (Time.time + rotateSpeed + 360f * i / (float)lightningCount + Mathf.randomSeed(unit.id)) * Mathf.signs[unit.id % 2],
