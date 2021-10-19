@@ -2,12 +2,10 @@ package unity.ui.dialogs;
 
 import arc.scene.ui.layout.*;
 import arc.struct.*;
-import arc.util.*;
 import mindustry.gen.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 
-@SuppressWarnings("unchecked")
 public class TagsDialog extends BaseDialog{
     private Table content;
     private final Seq<TagElem> elems = new Seq<>();
@@ -65,7 +63,7 @@ public class TagsDialog extends BaseDialog{
 
     private void add(TagElem elem){
         elems.add(elem);
-        content.add(elem).growX().fillY().row();
+        content.add(elem).growX().fillY().pad(4f).row();
     }
 
     private void refresh(){
@@ -98,7 +96,7 @@ public class TagsDialog extends BaseDialog{
     }
 
     private class TagElem extends Table{
-        private String tag = "";
+        private String tag;
 
         private TagElem(String init){
             tag = init;
@@ -127,7 +125,7 @@ public class TagsDialog extends BaseDialog{
 
         @Override
         public boolean remove(){
-            Cell<TagElem> cell = (Cell<TagElem>)content.getCell(this);
+            var cell = content.getCell(this);
 
             boolean succeed = super.remove();
             if(succeed && cell != null){

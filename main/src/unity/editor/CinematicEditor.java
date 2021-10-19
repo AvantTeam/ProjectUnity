@@ -88,6 +88,7 @@ public class CinematicEditor extends EditorListener{
         nodes.set(sector().cinematic.nodes);
         sector().cinematic.nodes.clear();
 
+        sector().initTags();
         tags.clear();
         tags.putAll(sector().cinematic.objectToTag);
         sector().cinematic.clearTags();

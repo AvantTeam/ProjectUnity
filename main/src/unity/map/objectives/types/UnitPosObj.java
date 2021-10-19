@@ -60,11 +60,11 @@ public class UnitPosObj extends Objective{
     public void ext(FieldTranslator f){
         super.ext(f);
 
-        count = f.get("count");
+        count = (int)num(f.get("count"));
         continuous = f.get("continuous");
         team = f.get("team", state.rules.defaultTeam);
         pos = f.get("pos", pos);
-        radius = f.get("radius", radius);
+        radius = num(f.get("radius", radius));
 
         Context c = JSBridge.context;
         ImporterTopLevel s = JSBridge.unityScope;

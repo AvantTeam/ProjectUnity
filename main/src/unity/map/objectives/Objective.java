@@ -12,7 +12,7 @@ import static java.lang.String.*;
 /** @author GlennFolker */
 @SuppressWarnings("unchecked")
 public abstract class Objective{
-    /** The name of this objective. It is your responsibility to differ the name from other objectiveModels. */
+    /** The name of this objective. */
     public final transient String name;
 
     public final Cons<Objective> executor;
@@ -30,6 +30,11 @@ public abstract class Objective{
         this.name = name;
         this.node = node;
         this.executor = (Cons<Objective>)executor;
+    }
+
+    public static float num(Object object){
+        if(!(object instanceof Number num)) throw new IllegalArgumentException("Must be a number");
+        return num.floatValue();
     }
 
     public void ext(FieldTranslator f){

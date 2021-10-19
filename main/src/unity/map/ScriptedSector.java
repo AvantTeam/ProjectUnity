@@ -24,13 +24,15 @@ public class ScriptedSector extends SectorPreset{
                 StringMap map = new StringMap();
                 cinematic.save(map);
 
-                state.rules.tags.put(name + "-nodes", JsonIO.json.toJson(map, StringMap.class, String.class));
+                state.rules.tags.put(name + "-cinematic", JsonIO.json.toJson(map, StringMap.class, String.class));
             }
         });
 
         Events.on(SaveLoadEvent.class, e -> cinematic.load(JsonIO.json.fromJson(
             StringMap.class, String.class,
-            state.rules.tags.get(name + "-nodes", "{}")
+            state.rules.tags.get(name + "-cinematic", JsonIO.json.toJson(StringMap.of(
+                "object-tags", generator.map.tags.get("object-tags", "[]")
+            ), StringMap.class, String.class))
         )));
 
         Events.on(StateChangeEvent.class, e -> {
@@ -54,14 +56,23 @@ public class ScriptedSector extends SectorPreset{
         super.init();
         Core.app.post(() -> {
             try{
-                cinematic.setNodes(JsonIO.json.fromJson(Seq.class, StoryNode.class, generator.map.tags.get("nodes", "[]")));
+                initNodes();
             }catch(Throwable t){
-                if(ui == null){
+                if(headless){
                     Log.err(t);
                 }else{
                     Events.on(ClientLoadEvent.class, e -> Time.runTask(6f, () -> ui.showException("Failed to load cinematic metadata of '" + localizedName + "'", t)));
                 }
             }
         });
+    }
+
+    public void initNodes(){
+        cinematic.setNodes(JsonIO.json.fromJson(Seq.class, StoryNode.class, generator.map.tags.get("nodes", "[]")));
+    }
+
+    public void initTags(){
+        cinematic.clearTags();
+        cinematic.loadTags(JsonIO.json.fromJson(Seq.class, String.class, generator.map.tags.get("object-tags", "[]")));
     }
 }

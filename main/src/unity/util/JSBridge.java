@@ -30,6 +30,14 @@ public final class JSBridge{
 
         unityScope = new ImporterTopLevel(context);
         context.evaluateString(unityScope, Core.files.internal("scripts/global.js").readString(), "global.js", 1);
+        context.evaluateString(unityScope, """
+            function apply(map, object){
+                for(let key in object){
+                    map.put(key, object[key]);
+                }
+            }
+            """, "apply.js", 1
+        );
     }
 
     public static void importDefaults(ImporterTopLevel scope){
