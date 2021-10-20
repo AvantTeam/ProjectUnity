@@ -116,6 +116,11 @@ public abstract class Objective{
         completed = map.getBool("completed");
     }
 
+    public void reset(){
+        completed = false;
+        executed = false;
+    }
+
     public void execute(){
         executor.get(this);
         stop();

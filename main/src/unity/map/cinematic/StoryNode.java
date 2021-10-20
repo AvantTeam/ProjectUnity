@@ -1,11 +1,9 @@
 package unity.map.cinematic;
 
 import arc.func.*;
-import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.struct.ObjectMap.*;
-import arc.util.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
 import mindustry.ctype.*;
@@ -42,7 +40,6 @@ public class StoryNode implements JsonSerializable{
     public Seq<ObjectiveModel> objectiveModels = new Seq<>();
     public Seq<Objective> objectives = new Seq<>();
 
-    protected float checkComplete = -1f;
     protected boolean initialized = false, completed = false;
 
     @Override
@@ -94,15 +91,13 @@ public class StoryNode implements JsonSerializable{
 
     public void reset(){
         initialized = false;
+        completed = false;
+        objectives.each(Objective::reset);
         children.each(StoryNode::reset);
     }
 
     public boolean completed(){
         if(completed || (completed = objectives.isEmpty())) return true;
-
-        // Assume checked on same frame, if that's the case then don't bother recalculating.
-        if(Mathf.equal(checkComplete, Time.time)) return false;
-        checkComplete = Time.time;
 
         completed = true;
         for(Objective o : objectives){
@@ -122,7 +117,6 @@ public class StoryNode implements JsonSerializable{
 
         for(Objective o : objectives){
             if(o.executed()) continue;
-
             if(o.shouldUpdate()) o.update();
             if(o.qualified()) o.execute();
         }
@@ -147,6 +141,7 @@ public class StoryNode implements JsonSerializable{
 
     public void save(StringMap map){
         map.put("data", dataSerializer.get(this, data, JsonIO.json));
+        map.put("completed", String.valueOf(completed));
 
         StringMap objMap = new StringMap();
         for(Objective obj : objectives){
@@ -171,6 +166,7 @@ public class StoryNode implements JsonSerializable{
 
     public void load(StringMap map){
         data = dataDeserializer.get(this, map.get("data", ""), JsonIO.json);
+        completed = map.getBool("completed");
 
         StringMap objMap = JsonIO.json.fromJson(StringMap.class, String.class, map.get("objectives", "{}"));
         for(Entry<String, String> e : objMap.entries()){

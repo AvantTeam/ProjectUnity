@@ -89,7 +89,10 @@ public class ObjectiveModel implements JsonSerializable{
                 String script = node.scripts.getThrow(f, () -> new IllegalArgumentException("No such script: '" + f + "'"));
 
                 // Remove new-lines, note that every script must have `;` as the statement separator!
-                source = source.replaceFirst(env, script.replace("\r", "\n").replace("\n", ""));
+                source = source.replaceFirst(env, script
+                    .replace("\r", "\n").replace("\n", "")
+                    .replace("\\", "\\\\").replace("\"", "\\\\\"")
+                );
             }
 
             Function func = JSBridge.compileFunc(JSBridge.unityScope, name + "-init.js", source);

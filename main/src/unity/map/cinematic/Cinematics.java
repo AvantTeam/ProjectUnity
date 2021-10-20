@@ -114,6 +114,7 @@ public class Cinematics{
     }
 
     public void load(StringMap map){
+        nodes.each(StoryNode::createObjectives);
         loadNodes(JsonIO.json.fromJson(StringMap.class, String.class, map.get("nodes", "{}")));
         loadTags(JsonIO.json.fromJson(Seq.class, String.class, map.get("object-tags", "[]")));
     }
@@ -153,7 +154,7 @@ public class Cinematics{
     }
 
     public void tag(Object object, String tag){
-        if(object == null) throw new IllegalArgumentException("Object to be tagged cannot be null!");
+        if(object == null) return;
         if(byTag(tag) != null && byTag(tag) != object) throw new IllegalArgumentException("'" + tag + "' tag is already taken!");
 
         objectToTag.get(object, ObjectSet::new).add(tag);

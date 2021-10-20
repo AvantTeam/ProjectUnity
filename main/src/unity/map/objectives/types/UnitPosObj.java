@@ -2,17 +2,21 @@ package unity.map.objectives.types;
 
 import arc.func.*;
 import arc.graphics.*;
+import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.io.*;
 import rhino.*;
+import unity.gen.*;
 import unity.map.cinematic.*;
 import unity.map.objectives.*;
 import unity.map.objectives.ObjectiveModel.*;
 import unity.util.*;
 
+import static java.lang.String.*;
 import static mindustry.Vars.*;
 
 /**
@@ -21,6 +25,7 @@ import static mindustry.Vars.*;
  * decremented.
  * @author GlennFolker
  */
+@SuppressWarnings("unchecked")
 public class UnitPosObj extends Objective{
     public int count;
     public boolean continuous;
@@ -129,6 +134,10 @@ public class UnitPosObj extends Objective{
             for(var it = tmp.iterator(); it.hasNext;){
                 int id = it.next();
                 Unit u = Groups.unit.getByID(id);
+                if(u == null){
+                    within.remove(id);
+                    continue;
+                }
 
                 u.hitbox(Tmp.r1);
                 if(!valid(u) || !Intersector.overlaps(Tmp.cr1.set(pos, radius), Tmp.r1)){
@@ -139,6 +148,57 @@ public class UnitPosObj extends Objective{
         }
 
         completed = within.size >= count;
+    }
+
+    @Override
+    public void reset(){
+        super.reset();
+        within.clear();
+    }
+
+    @Override
+    public void save(StringMap map){
+        super.save(map);
+        map.put("pos", valueOf(Float2.construct(pos.x, pos.y)));
+        map.put("radius", valueOf(radius));
+        map.put("team", valueOf(team.id));
+        map.put("count", valueOf(count));
+        map.put("continuous", valueOf(continuous));
+
+        Seq<Unit> units = new Seq<>(within.size);
+        for(var it = within.iterator(); it.hasNext;){
+            var unit = Groups.unit.getByID(it.next());
+            if(unit != null && valid(unit)) units.add(unit);
+        }
+
+        map.put("within", JsonIO.json.toJson(units.map(u -> valueOf(Float2.construct(u.x, u.y))), Seq.class, String.class));
+    }
+
+    @Override
+    public void load(StringMap map){
+        super.load(map);
+        if(map.containsKey("pos")){
+            long saved = map.getLong("pos");
+            pos.set(Float2.x(saved), Float2.y(saved));
+        }
+
+        radius = map.getFloat("radius", radius);
+        team = Team.get(map.getInt("team", team.id));
+        count = map.getInt("count", count);
+        continuous = !map.containsKey("continuous") ? continuous : map.getBool("continuous");
+
+        within.clear();
+        Seq<String> units = JsonIO.json.fromJson(Seq.class, String.class, map.get("within", "[]"));
+        for(String str : units){
+            long pos = Long.parseLong(str);
+            var unit = Groups.unit.find(u ->
+                u != null &&
+                Mathf.equal(u.x, Float2.x(pos)) &&
+                Mathf.equal(u.y, Float2.y(pos))
+            );
+
+            if(unit != null) within.add(unit.id);
+        }
     }
 
     public boolean valid(Unit unit){
