@@ -40,6 +40,7 @@ public class UnityUnitType extends UnitType{
     // AI
     public float bulletWidth = 2f;
     // Worms
+    public WormDecal wormDecal;
     public int segmentLength = 9, maxSegments = -1;
     //Should reduce the "Whip" effect.
     public int segmentCast = 4;
@@ -168,7 +169,7 @@ public class UnityUnitType extends UnitType{
         //copter
         rotors.each(Rotor::load);
         //worm
-
+        if(wormDecal != null) wormDecal.load();
         segmentRegion = atlas.find(name + "-segment");
         segmentCellRegion = atlas.find(name + "-segment-cell", cellRegion);
         tailRegion = atlas.find(name + "-tail");
@@ -319,6 +320,7 @@ public class UnityUnitType extends UnitType{
 
         drawBody(unit);
         if(drawCell && !unit.isTail()) drawCell(unit);
+        if(wormDecal != null) wormDecal.draw(unit, unit.parent());
 
         cellRegion = tmpCell;
         region = tmp;
