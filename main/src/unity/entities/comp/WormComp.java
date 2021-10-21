@@ -305,14 +305,10 @@ abstract class WormComp implements Unitc{
                 float angTo = u.angleTo(Tmp.v1);
 
                 u.rotation = angTo - (Utils.angleDistSigned(angTo, last.rotation, uType.angleLimit) * (1f - uType.anglePhysicsSmooth));
-                //u.rotation = u.angleTo(last) - (Utils.angleDistSigned(u.angleTo(last), last.rotation, uType.angleLimit) * (1f - uType.anglePhysicsSmooth));
                 u.trns(Tmp.v3.trns(u.rotation, last.deltaLen()));
                 Tmp.v2.trns(u.rotation, uType.segmentOffset / 2f).add(u);
 
                 Tmp.v2.sub(Tmp.v1).scl(Mathf.clamp(uType.jointStrength * Time.delta));
-
-                //u.set(u.x - Tmp.v2.x, u.y - Tmp.v2.y);
-                //u.updateLastPosition();
 
                 Unit n = u;
                 int cast = uType.segmentCast;
@@ -334,8 +330,8 @@ abstract class WormComp implements Unitc{
                 if(!Mathf.equal(nextHealth, u.splitHealthDiv(), 0.0001f)) u.splitHealthDiv(Mathf.lerpDelta(u.splitHealthDiv(), nextHealthDv, uType.healthDistribution));
                 last = u;
             });
-            if(isHead()) scanTime += Time.delta;
-            if(scanTime >= 5f && uType.chainable && isHead()){
+            scanTime += Time.delta;
+            if(scanTime >= 5f && uType.chainable){
                 Tmp.v1.trns(rotation(), uType.segmentOffset / 2f).add(self());
                 Tmp.r1.setCentered(Tmp.v1.x, Tmp.v1.y, hitSize());
                 Units.nearby(Tmp.r1, u -> {
@@ -440,7 +436,7 @@ abstract class WormComp implements Unitc{
         if(isHead()){
             if(saveAdd){
                 var seg = (Unit & Wormc)child;
-                if(seg != null){
+                while(seg != null){
                     seg.add();
                     seg = (Unit & Wormc)seg.child();
                 }

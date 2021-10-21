@@ -144,6 +144,15 @@ public class UnitProcessor implements Processor{
             if(unit instanceof WormDefaultUnit || unit instanceof Wormc){
                 outlSeparate.get(type.segmentRegion, "outline");
                 outlSeparate.get(type.tailRegion, "outline");
+                
+                if(type.wormDecal != null){
+                    var wd = type.wormDecal;
+                    outliner.get(wd.baseRegion);
+                    outliner.get(wd.endRegion);
+                    for(var reg : wd.segmentRegions){
+                        outliner.get(reg);
+                    }
+                }
             }
 
             for(var reg : type.abilityRegions){
