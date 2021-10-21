@@ -27,6 +27,7 @@ import unity.util.*;
 import static arc.Core.*;
 import static mindustry.Vars.content;
 
+@SuppressWarnings("unchecked")
 public class UnityUnitType extends UnitType{
     public final Seq<Weapon> segWeapSeq = new Seq<>();
 
@@ -55,6 +56,11 @@ public class UnityUnitType extends UnitType{
     public boolean preventDrifting = false;
     public boolean splittable = false, chainable = false;
     public Sound splitSound = Sounds.door, chainSound = Sounds.door;
+    /**
+     * Weapons for each segment.
+     * Last item of the array is the tail's weapon.
+     */
+    public Seq<Weapon>[] segmentWeapons;
 
     // Transforms
     public Func<Unit, UnitType> toTrans;
@@ -149,6 +155,9 @@ public class UnityUnitType extends UnitType{
                 cur.childId(cid);
                 cur.headId(unit.id);
 
+                int idx = i >= segmentLength - 1 ? segmentWeapons.length - 1 : i % Math.max(1, segmentWeapons.length - 1);
+
+                t.weaponIdx((byte)idx);
                 t.setupWeapons(this);
                 cid = t.id;
                 cur = t;
@@ -189,7 +198,13 @@ public class UnityUnitType extends UnitType{
         }
 
         decorations.each(UnitDecorationType::load);
-        segWeapSeq.each(Weapon::load);
+        if(segmentWeapons == null){
+            segWeapSeq.each(Weapon::load);
+        }else{
+            for(Seq<Weapon> seq : segmentWeapons){
+                seq.each(Weapon::load);
+            }
+        }
         tentacles.each(TentacleType::load);
     }
 
@@ -219,7 +234,14 @@ public class UnityUnitType extends UnitType{
 
         rotors.set(mapped);
         //worm
-        sortSegWeapons(segWeapSeq);
+        if(segmentWeapons == null){
+            sortSegWeapons(segWeapSeq);
+            segmentWeapons = new Seq[]{segWeapSeq};
+        }else{
+            for(Seq<Weapon> seq : segmentWeapons){
+                sortSegWeapons(seq);
+            }
+        }
 
         Seq<Weapon> addBottoms = new Seq<>();
         for(Weapon w : weapons){

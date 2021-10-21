@@ -22,6 +22,7 @@ abstract class WormComp implements Unitc{
     private static Unit last;
     transient Unit head, parent, child;
     transient float layer = 0f, scanTime = 0f;
+    transient byte weaponIdx = 0;
     transient boolean removing = false, saveAdd = false;
 
     protected float splitHealthDiv = 1f;
@@ -131,6 +132,7 @@ abstract class WormComp implements Unitc{
                 w.parent((Unit)current);
                 w.head(self());
                 w.layer(i);
+                w.weaponIdx(read.b());
                 u.read(read);
                 current = w;
             }
@@ -152,6 +154,7 @@ abstract class WormComp implements Unitc{
 
             ch = (Wormc)child;
             while(ch != null){
+                write.b(weaponIdx);
                 ch.write(write);
                 ch = (Wormc)ch.child();
             }
@@ -356,7 +359,8 @@ abstract class WormComp implements Unitc{
     public void setupWeapons(UnitType def){
         UnityUnitType uType = (UnityUnitType)def;
         if(!isHead()){
-            Seq<Weapon> seq = uType.segWeapSeq;
+            //Seq<Weapon> seq = uType.segWeapSeq;
+            Seq<Weapon> seq = uType.segmentWeapons[weaponIdx];
             mounts = new WeaponMount[seq.size];
             for(int i = 0; i < mounts.length; i++){
                 mounts[i] = seq.get(i).mountType.get(seq.get(i));
