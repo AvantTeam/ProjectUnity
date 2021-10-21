@@ -153,6 +153,9 @@ public class UnityUnitTypes{
     // end naval
     public static @FactionDef("end") @EntityDef({Unitc.class, Endc.class, WaterMovec.class, Decorationc.class}) UnitType thalassophobia;
 
+    // monolith characters
+    public static @FactionDef("monolith") @EntityDef({Unitc.class, Mechc.class, Decorationc.class}) UnitType charShadowcape;
+
     public static void load(){
         testLink = new UnityUnitType("test-link"){{
             defaultController = LinkedAI::new;
@@ -5293,5 +5296,9 @@ public class UnityUnitTypes{
         };
 
         //endregion
+
+        charShadowcape = new UnityUnitType("shadowcape"){{
+
+        }};
     }
 }

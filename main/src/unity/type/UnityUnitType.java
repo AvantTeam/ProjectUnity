@@ -27,8 +27,6 @@ import unity.util.*;
 import static arc.Core.*;
 import static mindustry.Vars.content;
 
-/*unit.entities.units might be gradually deleted.
-note that as classes are integrated, inner classes are extracted.*/
 public class UnityUnitType extends UnitType{
     public final Seq<Weapon> segWeapSeq = new Seq<>();
 
