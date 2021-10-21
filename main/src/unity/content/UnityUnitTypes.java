@@ -141,7 +141,7 @@ public class UnityUnitTypes{
     public static @FactionDef("end") @EntityDef({Unitc.class, Endc.class, Invisiblec.class}) UnitType opticaecus;
 
     // end worm
-    public static @FactionDef("end") @EntityDef({Unitc.class, Endc.class, Wormc.class}) UnitType devourer;
+    public static @FactionDef("end") @EntityDef({Unitc.class, Endc.class, Wormc.class}) UnitType devourer, oppression;
 
     // end apocalypse
     public static @FactionDef("end") @EntityDef({Unitc.class, Endc.class, Invisiblec.class, Tentaclec.class}) UnitType apocalypse;
@@ -4330,6 +4330,49 @@ public class UnityUnitTypes{
 
                 bullet = UnityBullets.endLaserSmall;
             }});
+        }};
+
+        oppression = new UnityUnitType("oppression"){{
+            health = 2500000f;
+            flying = true;
+            speed = 4.5f;
+            accel = 0.13f;
+            drag = 0.12f;
+            defaultController = WormAI::new;
+            circleTarget = counterDrag = true;
+            rotateShooting = false;
+            wormDecal = new WormDecal(name + "-hydraulics"){{
+                lineWidth = 11.5f;
+                lineColor = UnityPal.scarColor;
+                baseX = 41.25f;
+                baseY = 40.25f;
+                endX = 81.75f;
+                endY = -71.75f;
+                baseOffset = 19.5f;
+                segments = 2;
+            }};
+            splittable = chainable = false;
+            hitSize = (114f * 2f) - 6f;
+            angleLimit = 35f;
+            segmentOffset = 114f * 2f;
+            segmentLength = 60;
+            segmentCast = 11;
+            barrageRange = 340f;
+            lowAltitude = true;
+            visualElevation = 3f;
+            rotateSpeed = 2.2f;
+            engineSize = -1f;
+            armor = 30f;
+            anglePhysicsSmooth = 0.5f;
+            jointStrength = 1f;
+            omniMovement = false;
+            preventDrifting = true;
+            outlineColor = UnityPal.darkerOutline;
+            envEnabled = Env.terrestrial | Env.space;
+
+            immuneAll = true;
+
+            antiCheatType = new AntiCheatVariables(health / 600f, health / 190f, health / 610f, health / 100f, 0.6f, 7f * 60f, 8f * 60f, 35f, 4);
         }};
 
         apocalypse = new InvisibleUnitType("apocalypse"){{
