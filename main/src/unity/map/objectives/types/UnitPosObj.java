@@ -38,7 +38,7 @@ public class UnitPosObj extends Objective{
     public Vec2 pos = new Vec2();
     public float radius = 4f * tilesize;
 
-    protected final transient IntSet within = new IntSet();
+    public final transient IntSet within = new IntSet();
     private static final IntSet tmp = new IntSet();
 
     public UnitPosObj(StoryNode node, String name, Cons<UnitPosObj> executor){

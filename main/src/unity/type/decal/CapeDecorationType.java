@@ -22,7 +22,8 @@ public class CapeDecorationType extends UnitDecorationType{
         x, y,
         swayAmount = -45f, swaySpeed = 0.1f,
         shakeAmount = 2.5f, shakeScl = 5f,
-        alphaFrom = 0f, alphaTo = 0.8f, alphaShake = 0.2f, alphaScl = 2f;
+        alphaFrom = 0f, alphaTo = 0.8f, alphaShake = 0.2f, alphaScl = 2f,
+        rotCone = 60f, rotSpeed = 0.1f;
 
     public CapeDecorationType(String name){
         this.name = name;
@@ -46,8 +47,9 @@ public class CapeDecorationType extends UnitDecorationType{
 
         cape.alpha = Mathf.clamp(alphaFrom + val * (alphaTo - alphaFrom) + Mathf.sin(alphaScl, alphaShake * val));
         cape.sway = sway;
+        cape.rotation = Angles.clampRange(Angles.moveToward(cape.rotation, unit.rotation, rotSpeed), unit.rotation, rotCone / 2f);
 
-        trailEffect.at(unit.x, unit.y, unit.rotation, new CapeEffectData(this, cape.alpha * 0.25f, cape.sway));
+        trailEffect.at(unit.x, unit.y, cape.rotation, new CapeEffectData(this, cape.alpha * 0.25f, cape.sway));
     }
 
     @Override
@@ -59,21 +61,27 @@ public class CapeDecorationType extends UnitDecorationType{
         Draw.blend(Blending.additive);
 
         for(int sign : Mathf.signs){
-            Tmp.v1.trns(unit.rotation - 90f, x * sign, y);
+            Tmp.v1.trns(cape.rotation - 90f, x * sign, y);
             Draw.rect(
                 region,
                 unit.x + Tmp.v1.x, unit.y + Tmp.v1.y,
                 region.width * scl * sign,
                 region.height * scl,
-                unit.rotation + cape.sway * sign - 90f
+                cape.rotation + cape.sway * sign - 90f
             );
         }
 
         Draw.blend(Blending.normal);
     }
 
+    @Override
+    public void added(Unit unit, UnitDecoration deco){
+        if(!(deco instanceof CapeDecoration cape)) return;
+        cape.rotation = unit.rotation;
+    }
+
     public static class CapeDecoration extends UnitDecoration{
-        public float alpha, sway;
+        public float alpha, sway, rotation;
 
         public CapeDecoration(UnitDecorationType type){
             super(type);

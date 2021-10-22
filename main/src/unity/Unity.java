@@ -45,6 +45,8 @@ public class Unity extends Mod{
     /** Whether the mod is in an asset-processing context. */
     public static boolean tools = false;
 
+    /** The current cinematic module that is ran. */
+    public static Cinematics cinematic;
     /** Abstract music handler; will be overridden in the separate music mod. */
     public static MusicHandler music;
     /** Answers listeners for tapping. {@link Binding#boost} for desktop, screen taps for mobile. */ //TODO static-ify
@@ -57,17 +59,17 @@ public class Unity extends Mod{
     /** Editor listener that revolves around cinematic and sector objectives. */
     public static CinematicEditor cinematicEditor;
 
-    /** Credits dialog. Hey we made this mod we deserve it. */
+    /** Credits root. Hey we made this mod we deserve it. */
     public static CreditsDialog creditsDialog;
-    /** JS scripts dialog for editing JS scripts in-game. */
+    /** JS scripts root for editing JS scripts in-game. */
     public static ScriptsEditorDialog jsEditDialog;
-    /** JS scripts dictionary dialog, for creating a collection of named JS scripts. */
+    /** JS scripts dictionary root, for creating a collection of named JS scripts. */
     public static ScriptsDictionaryDialog jsDictDialog;
-    /** Cinematic dialog, for editing {@link StoryNode}s bound to a {@link ScriptedSector}. */
+    /** Cinematic root, for editing {@link StoryNode}s bound to a {@link ScriptedSector}. */
     public static CinematicDialog cinematicDialog;
     /** Used to edit object "tags" that is bound to certain objects. */
     public static TagsDialog tagsDialog;
-    /** Heavily relies on {@link #cinematicDialog}, this dialog edits {@link ObjectiveModel} bound to a {@link StoryNode}. */
+    /** Heavily relies on {@link #cinematicDialog}, this root edits {@link ObjectiveModel} bound to a {@link StoryNode}. */
     public static ObjectivesDialog objectivesDialog;
 
     /** Asynchronous process revolving around {@link Light} processing. */

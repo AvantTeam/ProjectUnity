@@ -12,6 +12,7 @@ import unity.map.*;
 import unity.mod.*;
 
 import static mindustry.Vars.*;
+import static unity.Unity.*;
 
 /**
  * Main cinematic module bound to a {@link ScriptedSector}. Handles all contained cinematic nodes and tagged objects.
@@ -34,6 +35,9 @@ public class Cinematics{
     }
 
     public void bind(){
+        if(cinematic != null) throw new IllegalStateException("There is already a cinematic core ran!");
+        cinematic = this;
+
         bound = true;
         Triggers.listen(Trigger.update, updater);
         Triggers.listen(Trigger.drawOver, drawer);
@@ -42,6 +46,8 @@ public class Cinematics{
     }
 
     public void detach(){
+        if(cinematic == this) cinematic = null;
+
         bound = false;
         Triggers.detach(Trigger.update, updater);
         Triggers.detach(Trigger.drawOver, drawer);

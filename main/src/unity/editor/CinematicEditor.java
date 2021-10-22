@@ -26,7 +26,7 @@ public class CinematicEditor extends EditorListener{
 
     @Override
     public void update(){
-        // Press F4 to show cinematic dialog.
+        // Press F4 to show cinematic root.
         if(!cinematicDialog.isShown() && Core.input.keyTap(KeyCode.f4)){
             cinematicDialog.show();
         }

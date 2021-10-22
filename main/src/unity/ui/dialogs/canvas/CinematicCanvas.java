@@ -133,7 +133,7 @@ public class CinematicCanvas extends WidgetGroup{
                 t.add().growX();
                 t.add(new DragButton(Icon.book, Styles.logici, () -> jsDictDialog.show(node.scripts))).padRight(4f);
                 t.add(new DragButton(Icon.pencil, Styles.logici, () -> objectivesDialog.show(node))).padRight(4f);
-                t.add(new DragButton(Icon.trash, Styles.logici, () -> ui.showConfirm("@dialog.cinematic.node-delete.title", "@dialog.cinematic.node-delete.content", () -> {
+                t.add(new DragButton(Icon.trash, Styles.logici, () -> ui.showConfirm("@root.cinematic.node-delete.title", "@root.cinematic.node-delete.content", () -> {
                     remove();
 
                     Iterator<StoryNode> it = cinematicEditor.nodes.iterator();

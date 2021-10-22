@@ -14,7 +14,7 @@ public class TagsDialog extends BaseDialog{
     public Object bound;
 
     public TagsDialog(){
-        super("@dialog.cinematic.tag");
+        super("@root.cinematic.tag");
 
         cont.pane(t -> content = t).growY().width(500f);
 

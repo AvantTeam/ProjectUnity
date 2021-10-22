@@ -14,7 +14,7 @@ public class CinematicDialog extends BaseDialog{
     private final CinematicCanvas canvas;
 
     public CinematicDialog(){
-        super("@dialog.cinematic");
+        super("@root.cinematic");
 
         clearChildren();
 
@@ -35,7 +35,7 @@ public class CinematicDialog extends BaseDialog{
             canvas.add(node);
         }).size(210f, 64f);
 
-        buttons.button("@dialog.cinematic.test", Icon.downOpen, () -> {
+        buttons.button("@root.cinematic.test", Icon.downOpen, () -> {
             Exception thrown = null;
             try{
                 cinematicEditor.apply();
@@ -44,9 +44,9 @@ public class CinematicDialog extends BaseDialog{
             }
 
             if(thrown != null){
-                ui.showException("@dialog.cinematic.misbehave", thrown);
+                ui.showException("@root.cinematic.misbehave", thrown);
             }else{
-                ui.showInfo("@dialog.cinematic.proceed");
+                ui.showInfo("@root.cinematic.proceed");
             }
         }).size(210f, 64f);
 
@@ -61,7 +61,7 @@ public class CinematicDialog extends BaseDialog{
             cinematicEditor.apply();
             super.hide();
         }catch(Exception e){
-            ui.showException("@dialog.cinematic.misbehave", e
+            ui.showException("@root.cinematic.misbehave", e
             );
         }
     }

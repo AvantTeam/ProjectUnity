@@ -12,7 +12,7 @@ public class ScriptsEditorDialog extends BaseDialog{
     public TextArea area;
 
     public ScriptsEditorDialog(){
-        super("@dialog.editscript");
+        super("@root.editscript");
 
         addCloseButton();
 

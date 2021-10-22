@@ -19,7 +19,7 @@ import static mindustry.Vars.*;
 
 @SuppressWarnings("unchecked")
 public class StoryNode implements JsonSerializable{
-    /** This node's position in the cinematic editor's dialog. */
+    /** This node's position in the cinematic editor's root. */
     public final Vec2 position = new Vec2();
     /** The UI element of this node to be used in cinematic editor. */
     public NodeElem elem;

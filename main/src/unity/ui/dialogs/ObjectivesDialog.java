@@ -26,7 +26,7 @@ public class ObjectivesDialog extends BaseDialog{
     private final ObjectMap<Class<? extends Objective>, Seq<Field>> fields = new ObjectMap<>();
 
     public ObjectivesDialog(){
-        super("@dialog.cinematic.objectives");
+        super("@root.cinematic.objectives");
 
         addCloseButton();
 
@@ -125,7 +125,7 @@ public class ObjectivesDialog extends BaseDialog{
                 field.getStyle().font = Fonts.outline;
 
                 t.add().growX();
-                t.button(Icon.trash, Styles.logici, () -> ui.showConfirm("@dialog.cinematic.objectives.delete.title", "@dialog.cinematic.objectives.delete.content", this::remove)).padRight(8f);
+                t.button(Icon.trash, Styles.logici, () -> ui.showConfirm("@root.cinematic.objectives.delete.title", "@root.cinematic.objectives.delete.content", this::remove)).padRight(8f);
             }).growX().fillY().pad(4f);
 
             row().table(Styles.black5, t -> {
@@ -138,7 +138,7 @@ public class ObjectivesDialog extends BaseDialog{
                     ts.add().growX();
 
                     ts.button(Icon.downOpen, Styles.logici, () -> {
-                        BaseDialog dialog = new BaseDialog("@dialog.cinematic.objectives.select");
+                        BaseDialog dialog = new BaseDialog("@root.cinematic.objectives.select");
                         dialog.addCloseButton();
 
                         dialog.cont.pane(Styles.nonePane, s -> {

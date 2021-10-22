@@ -17,7 +17,7 @@ public class ScriptsDictionaryDialog extends BaseDialog{
     private Table content;
 
     public ScriptsDictionaryDialog(){
-        super("@dialog.cinematic.scripts");
+        super("@root.cinematic.scripts");
         cont.pane(Styles.nonePane, t -> {
             content = t;
             content.defaults().pad(3f);
@@ -119,7 +119,7 @@ public class ScriptsDictionaryDialog extends BaseDialog{
                 jsEditDialog.show();
             });
 
-            button(Icon.trash, Styles.emptyi, () -> ui.showConfirm("@dialog.scripts-dictionary.delete.title", "@dialog.scripts-dictionary.delete.content", () -> {
+            button(Icon.trash, Styles.emptyi, () -> ui.showConfirm("@root.scripts-dictionary.delete.title", "@root.scripts-dictionary.delete.content", () -> {
                 elems.remove(this);
                 rebuild();
             })).padRight(8f);
