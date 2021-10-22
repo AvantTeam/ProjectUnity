@@ -9,19 +9,15 @@ public abstract class UnitDecorationType{
     public Func<UnitDecorationType, UnitDecoration> decalType = UnitDecoration::new;
     public boolean top = false;
 
-    public abstract void update(Unit unit, UnitDecoration deco);
+    public void update(Unit unit, UnitDecoration deco){}
 
-    public abstract void added(Unit unit, UnitDecoration deco);
+    public void added(Unit unit, UnitDecoration deco){}
 
-    public abstract void draw(Unit unit, UnitDecoration deco);
+    public void draw(Unit unit, UnitDecoration deco){}
 
-    public void drawIcon(Func<TextureRegion, Pixmap> prov, Pixmap icon, Func<TextureRegion, TextureRegion> outliner){
+    public void drawIcon(Func<TextureRegion, Pixmap> prov, Pixmap icon, Func<TextureRegion, TextureRegion> outliner){}
 
-    }
-
-    public void load(){
-
-    }
+    public void load(){}
 
     public static class UnitDecoration{
         public UnitDecorationType type;

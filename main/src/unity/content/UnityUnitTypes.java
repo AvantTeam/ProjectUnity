@@ -9,7 +9,6 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.ai.types.*;
 import mindustry.content.*;
-import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
@@ -154,7 +153,7 @@ public class UnityUnitTypes{
     public static @FactionDef("end") @EntityDef({Unitc.class, Endc.class, WaterMovec.class, Decorationc.class}) UnitType thalassophobia;
 
     // monolith characters
-    public static @FactionDef("monolith") @EntityDef({Unitc.class, Mechc.class, Decorationc.class}) UnitType charShadowcape;
+    public static @FactionDef("monolith") @EntityDef({Unitc.class, Mechc.class, Decorationc.class, Monolithc.class}) UnitType charShadowcape;
 
     public static void load(){
         testLink = new UnityUnitType("test-link"){{
@@ -5341,7 +5340,27 @@ public class UnityUnitTypes{
         //endregion
 
         charShadowcape = new UnityUnitType("shadowcape"){{
+            canBoost = true;
 
+            decorations.add(
+            new CapeDecorationType(name + "-cape-1"){{
+                x = 8.25f;
+                y = 0.5f;
+                swayAmount = -30f;
+                swaySpeed = 0.5f;
+                alphaTo = 0.6f;
+                alphaScl = 3f;
+                shakeAmount = 1.5f;
+                shakeScl = 2f;
+            }},
+
+            new CapeDecorationType(name + "-cape-2"){{
+                x = 3f;
+                y = -7f;
+                swayAmount = -15f;
+                shakeScl = 3f;
+            }}
+            );
         }};
     }
 }

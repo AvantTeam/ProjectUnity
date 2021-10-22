@@ -7,6 +7,7 @@ import arc.util.*;
 import mindustry.entities.*;
 import mindustry.graphics.*;
 import unity.graphics.*;
+import unity.type.decal.CapeDecorationType.*;
 
 import static arc.graphics.g2d.Draw.*;
 
@@ -41,5 +42,25 @@ public class TrailFx{
         Angles.randLenVectors(e.id, 2, e.finpow() * 7f, (x, y) -> {
             Fill.circle(e.x + x, e.y + y, 3f * e.fout());
         });
+    }),
+
+    capeTrail = new Effect(30f, e -> {
+        CapeEffectData data = e.data();
+        TextureRegion reg = data.type.region;
+
+        Draw.alpha(data.alpha * e.fout());
+        Draw.blend(Blending.additive);
+        for(int sign : Mathf.signs){
+            Tmp.v1.trns(e.rotation - 90f, data.type.x * sign, data.type.y);
+            Draw.rect(
+                reg,
+                e.x + Tmp.v1.x, e.y + Tmp.v1.y,
+                reg.width * scl * sign,
+                reg.height * scl,
+                e.rotation + data.sway * sign - 90f
+            );
+        }
+
+        Draw.blend(Blending.normal);
     });
 }
