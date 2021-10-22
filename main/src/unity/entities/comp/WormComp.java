@@ -22,6 +22,7 @@ abstract class WormComp implements Unitc{
     private static Unit last;
     transient Unit head, parent, child;
     transient float layer = 0f, scanTime = 0f;
+    transient byte weaponIdx = 0;
     transient boolean removing = false, saveAdd = false;
 
     protected float splitHealthDiv = 1f;
@@ -131,6 +132,7 @@ abstract class WormComp implements Unitc{
                 w.parent((Unit)current);
                 w.head(self());
                 w.layer(i);
+                w.weaponIdx(read.b());
                 u.read(read);
                 current = w;
             }
@@ -152,6 +154,7 @@ abstract class WormComp implements Unitc{
 
             ch = (Wormc)child;
             while(ch != null){
+                write.b(weaponIdx);
                 ch.write(write);
                 ch = (Wormc)ch.child();
             }
@@ -305,14 +308,10 @@ abstract class WormComp implements Unitc{
                 float angTo = u.angleTo(Tmp.v1);
 
                 u.rotation = angTo - (Utils.angleDistSigned(angTo, last.rotation, uType.angleLimit) * (1f - uType.anglePhysicsSmooth));
-                //u.rotation = u.angleTo(last) - (Utils.angleDistSigned(u.angleTo(last), last.rotation, uType.angleLimit) * (1f - uType.anglePhysicsSmooth));
                 u.trns(Tmp.v3.trns(u.rotation, last.deltaLen()));
                 Tmp.v2.trns(u.rotation, uType.segmentOffset / 2f).add(u);
 
                 Tmp.v2.sub(Tmp.v1).scl(Mathf.clamp(uType.jointStrength * Time.delta));
-
-                //u.set(u.x - Tmp.v2.x, u.y - Tmp.v2.y);
-                //u.updateLastPosition();
 
                 Unit n = u;
                 int cast = uType.segmentCast;
@@ -334,8 +333,8 @@ abstract class WormComp implements Unitc{
                 if(!Mathf.equal(nextHealth, u.splitHealthDiv(), 0.0001f)) u.splitHealthDiv(Mathf.lerpDelta(u.splitHealthDiv(), nextHealthDv, uType.healthDistribution));
                 last = u;
             });
-            if(isHead()) scanTime += Time.delta;
-            if(scanTime >= 5f && uType.chainable && isHead()){
+            scanTime += Time.delta;
+            if(scanTime >= 5f && uType.chainable){
                 Tmp.v1.trns(rotation(), uType.segmentOffset / 2f).add(self());
                 Tmp.r1.setCentered(Tmp.v1.x, Tmp.v1.y, hitSize());
                 Units.nearby(Tmp.r1, u -> {
@@ -360,7 +359,8 @@ abstract class WormComp implements Unitc{
     public void setupWeapons(UnitType def){
         UnityUnitType uType = (UnityUnitType)def;
         if(!isHead()){
-            Seq<Weapon> seq = uType.segWeapSeq;
+            //Seq<Weapon> seq = uType.segWeapSeq;
+            Seq<Weapon> seq = uType.segmentWeapons[weaponIdx];
             mounts = new WeaponMount[seq.size];
             for(int i = 0; i < mounts.length; i++){
                 mounts[i] = seq.get(i).mountType.get(seq.get(i));
@@ -440,7 +440,7 @@ abstract class WormComp implements Unitc{
         if(isHead()){
             if(saveAdd){
                 var seg = (Unit & Wormc)child;
-                if(seg != null){
+                while(seg != null){
                     seg.add();
                     seg = (Unit & Wormc)seg.child();
                 }

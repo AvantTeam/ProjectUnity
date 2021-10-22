@@ -15,8 +15,8 @@ public class WormDecal{
     public Color lineColor = Color.white;
     public float lineWidth = 2f;
     String name;
-    TextureRegion baseRegion, endRegion;
-    TextureRegion[] segmentRegions;
+    public TextureRegion baseRegion, endRegion;
+    public TextureRegion[] segmentRegions;
 
     public WormDecal(String name){
         this.name = name;
