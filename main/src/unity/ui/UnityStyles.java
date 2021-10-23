@@ -31,12 +31,10 @@ public class UnityStyles{
 
         speecht = new LabelStyle(){{
             fontColor = Color.white;
-            background = Styles.black6;
         }};
 
         speechtitlet = new LabelStyle(){{
             fontColor = Color.white;
-            background = Styles.black6;
         }};
 
         codeLabel = new LabelStyle(){{
