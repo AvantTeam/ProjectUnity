@@ -4371,7 +4371,24 @@ public class UnityUnitTypes{
 
             immuneAll = true;
 
-            antiCheatType = new AntiCheatVariables(health / 600f, health / 190f, health / 610f, health / 100f, 0.6f, 7f * 60f, 8f * 60f, 35f, 4);
+            antiCheatType = new AntiCheatVariables(8000, health / 190f, 10000f, health / 100f, 0.6f, 7f * 60f, 8f * 60f, 35f, 3);
+
+            weapons.add(new Weapon(name + "-destroyer-1"){{
+                x = 81.75f;
+                y = -71.5f;
+                shootY = 9.75f;
+                
+                rotate = true;
+                rotateSpeed = 1.75f;
+
+                reload = 2.3f * 60f;
+                shots = 5;
+                shotDelay = 9f;
+                inaccuracy = 2f;
+                spacing = 15f;
+
+                bullet = UnityBullets.oppressionShell;
+            }});
         }};
 
         apocalypse = new InvisibleUnitType("apocalypse"){{

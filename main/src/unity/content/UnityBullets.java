@@ -63,7 +63,13 @@ public class UnityBullets{
 
         endLightning,
 
-        ravagerLaser, ravagerArtillery, missileAntiCheat, endLaserSmall, endLaser,
+        ravagerLaser, ravagerArtillery,
+
+        oppressionArea, oppressionShell,
+
+        missileAntiCheat,
+
+        endLaserSmall, endLaser,
 
         laserZap,
 
@@ -1203,6 +1209,42 @@ public class UnityBullets{
                 ratioStart = 3000f;
             }};
         }};
+
+        oppressionArea = new VoidAreaBulletType(95f){{
+            lifetime = 5f * 60f;
+            bleedDuration = 30f;
+            ratioDamage = 1f / 200f;
+            ratioStart = 600000f;
+            status = weaken;
+            statusDuration = 30f;
+        }};
+
+        oppressionShell = new EndBasicBulletType(7f, 410f, "shell"){{
+            lifetime = 95f;
+            splashDamage = 125f;
+            splashDamageRadius = 70f;
+            width = 18f;
+            height = 23f;
+            backColor = lightColor = trailColor = UnityPal.scarColor;
+            frontColor = lightningColor = UnityPal.endColor;
+            lightning = 5;
+            lightningLength = 10;
+            lightningLengthRand = 5;
+            lightningType = endLightning;
+
+            pierceCap = 3;
+            pierce = pierceBuilding = true;
+            bleedDuration = 5f * 60f;
+        }
+
+            @Override
+            public void hit(Bullet b, float x, float y){
+                super.hit(b, x, y);
+                if(b.timer(1, 40f)){
+                    oppressionArea.create(b, b.x, b.y, b.rotation());
+                }
+            }
+        };
 
         missileAntiCheat = new EndBasicBulletType(4f, 330f, "missile"){{
             lifetime = 60f;
