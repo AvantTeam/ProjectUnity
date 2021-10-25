@@ -20,11 +20,7 @@ public class LimitedAngleWeapon extends Weapon{
 
     public LimitedAngleWeapon(String name){
         super(name);
-        mountType = weapon -> {
-            WeaponMount mount = new WeaponMount(weapon);
-            mount.rotation = defaultAngle * Mathf.sign(flipSprite);
-            return mount;
-        };
+        mountType = LimitedAngleMount::new;
     }
 
     @Override
@@ -143,5 +139,13 @@ public class LimitedAngleWeapon extends Weapon{
     @Override
     protected boolean checkTarget(Unit unit, Teamc target, float x, float y, float range){
         return super.checkTarget(unit, target, x, y, range) || Utils.angleDist(unit.rotation + (angleOffset * Mathf.sign(flipSprite)), unit.angleTo(target)) > angleCone;
+    }
+
+    public static class LimitedAngleMount extends WeaponMount{
+        public LimitedAngleMount(Weapon weapon){
+            super(weapon);
+            LimitedAngleWeapon aWeapon = (LimitedAngleWeapon)weapon;
+            rotation = aWeapon.defaultAngle * Mathf.sign(aWeapon.flipSprite);
+        }
     }
 }

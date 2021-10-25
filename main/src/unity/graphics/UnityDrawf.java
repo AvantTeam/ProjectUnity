@@ -8,6 +8,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.graphics.*;
+import unity.assets.list.*;
 
 public class UnityDrawf{
     private final static TextureRegion nRegion = new TextureRegion();
@@ -197,5 +198,23 @@ public class UnityDrawf{
                 );
             }
         }
+    }
+
+    public static void vConstruct(float x, float y, TextureRegion region, float rotation, float progress, float speed, float time){
+        vConstruct(x, y, region, Pal.accent, rotation, progress, speed, time);
+    }
+
+    public static void vConstruct(float x, float y, TextureRegion region, Color color, float rotation, float progress, float speed, float time){
+        UnityShaders.vBuild.region = region;
+        UnityShaders.vBuild.progress = progress;
+        UnityShaders.vBuild.color.set(color);
+        UnityShaders.vBuild.color.a = speed;
+        UnityShaders.vBuild.time = -time / 20f;
+
+        Draw.shader(UnityShaders.vBuild);
+        Draw.rect(region, x, y, rotation);
+        Draw.shader();
+
+        Draw.reset();
     }
 }
