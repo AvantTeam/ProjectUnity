@@ -14,7 +14,6 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
-import mindustry.graphics.Shaders.*;
 import mindustry.type.*;
 import unity.assets.type.g3d.*;
 import unity.assets.type.g3d.attribute.*;
@@ -29,7 +28,6 @@ public class UnityShaders{
     public static MegalithRingShader megalithRingShader;
     public static Graphics3DShaderProvider graphics3DProvider;
     public static VapourizeShader vapourizeShader;
-    public static VerticalBuildShader vBuild;
 
     protected static FrameBuffer buffer;
 
@@ -41,7 +39,6 @@ public class UnityShaders{
 
         vapourizeShader = new VapourizeShader();
         stencilShader = new StencilShader();
-        vBuild = new VerticalBuildShader();
         megalithRingShader = new MegalithRingShader();
         graphics3DProvider = new Graphics3DShaderProvider();
 
@@ -167,29 +164,6 @@ public class UnityShaders{
                 s.lightDir.set(planet.solarSystem.position).sub(planet.position).rotate(Vec3.Y, planet.getRotation()).nor();
                 s.ambientColor.set(planet.solarSystem.lightColor);
             };
-        }
-    }
-
-    public static class VerticalBuildShader extends Shader{
-        public float progress, time;
-        public Color color = new Color();
-        public TextureRegion region;
-
-        public VerticalBuildShader(){
-            super(
-                Core.files.internal("shaders/default.vert"),
-                tree.get("shaders/vertbuild.frag")
-            );
-        }
-
-        @Override
-        public void apply(){
-            setUniformf("u_time", time);
-            setUniformf("u_color", color);
-            setUniformf("u_progress", progress);
-            setUniformf("u_uv", region.u, region.v);
-            setUniformf("u_uv2", region.u2, region.v2);
-            setUniformf("u_texsize", region.texture.width, region.texture.height);
         }
     }
 
