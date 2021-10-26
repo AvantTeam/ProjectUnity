@@ -603,11 +603,13 @@ public class UnityUnitTypes{
                 x = 152f / 4f;
                 y = -49f / 4f;
 
-                bullet = new RocketBulletType(14f, 23f, name){{
+                bullet = new RocketBulletType(8f, 23f, name){{
                     lifetime = 4f * 60f;
-                    layer = Layer.flyingUnitLow - 1;
                     splashDamage = 72f;
                     splashDamageRadius = 14f;
+                    thrusterOffset = 13f;
+                    thrusterSize = 1.25f;
+                    layer = Layer.flyingUnitLow - 1;
                 }};
             }});
 
