@@ -561,7 +561,21 @@ public class UnityUnitTypes{
                 lightningColor = Pal.surge;
             }};
 
-            weapons.add(new Weapon(name + "-gun"){{
+            weapons.add(new RocketWeapon(name + "-rocket"){{
+                bottomWeapons.add(this);
+                mirror = true;
+                alternate = false;
+                reload = 2f * 60f;
+                x = 152f / 4f;
+                y = -49f / 4f;
+
+                bullet = new RocketBulletType(14f, 23f, name){{
+                    lifetime = 4f * 60f;
+                    layer = Layer.flyingUnitLow - 1;
+                    splashDamage = 72f;
+                    splashDamageRadius = 14f;
+                }};
+            }}, new Weapon(name + "-gun"){{
                 bottomWeapons.add(this);
 
                 mirror = true;
@@ -595,20 +609,6 @@ public class UnityUnitTypes{
                 reload = 15f;
 
                 bullet = flak;
-            }}, new RocketWeapon(name + "-rocket"){{
-                bottomWeapons.add(this);
-                mirror = true;
-                alternate = false;
-                reload = 2f * 60f;
-                x = 152f / 4f;
-                y = -49f / 4f;
-
-                bullet = new RocketBulletType(14f, 23f, name){{
-                    lifetime = 4f * 60f;
-                    layer = Layer.flyingUnitLow - 1;
-                    splashDamage = 72f;
-                    splashDamageRadius = 14f;
-                }};
             }});
 
             for(int i : Mathf.signs){
