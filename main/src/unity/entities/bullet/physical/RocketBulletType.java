@@ -5,7 +5,6 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
-import mindustry.content.*;
 import mindustry.entities.bullet.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -21,7 +20,6 @@ public class RocketBulletType extends BasicBulletType{
         super(speed, damage, sprite); //Speed means nothing
         layer = Layer.effect + 1;
         keepVelocity = false;
-        shootEffect = smokeEffect = Fx.none;
     }
 
     @Override
