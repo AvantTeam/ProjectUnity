@@ -1,7 +1,6 @@
 package unity.entities.bullet.physical;
 
 import arc.*;
-import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
@@ -12,12 +11,10 @@ import mindustry.graphics.*;
 
 public class RocketBulletType extends BasicBulletType{
     public float backSpeed = 1f;
-    public float fallDrag = 0.05f, thrustDelay = 20f;
-    public float thrusterSize = 4f, thrusterOffset = 8f, thrusterGrowth = 5f;
-    public float acceleration = 0.15f;
+    public float accel = 1.01f;
 
-    public RocketBulletType(float speed, float damage, String sprite){
-        super(speed, damage, sprite); //Speed means nothing
+    public RocketBulletType(float maxSpeed,float damage, String sprite){
+        super(maxSpeed, damage, sprite); //Speed means nothing
         layer = Layer.effect + 1;
         keepVelocity = false;
     }
@@ -38,14 +35,11 @@ public class RocketBulletType extends BasicBulletType{
         super.update(b);
 
         if(b.data instanceof RocketData r){
-            if(b.time < thrustDelay){
-                b.vel.scl(Math.max(1f - fallDrag * Time.delta, 0));
-            }else{
-                if(!r.thrust){
-                    b.vel.setAngle(r.angle);
-                    b.vel.setLength(speed);
-                }
-                b.vel.scl(Math.max(1f + acceleration * Time.delta, 0));
+            r.scl *= accel * Time.delta;
+            Tmp.v1.trns(r.angle, r.scl - 1f);
+            b.vel.add(Tmp.v1);
+            if(speed > 0 && Angles.within(b.vel.angle(), r.angle, 90)){
+                b.vel.limit(speed);
             }
         }
     }
@@ -53,25 +47,6 @@ public class RocketBulletType extends BasicBulletType{
     @Override
     public void draw(Bullet b){
         if(b.data instanceof RocketData r){
-            if(b.time >= thrustDelay){ //Engine draw code stolen from units
-                float scale = Mathf.curve(b.time, thrustDelay, thrustDelay + thrusterGrowth);
-                float offset = thrusterOffset / 2f + thrusterOffset / 2f * scale;
-
-                Draw.color(b.team.color);
-                Fill.circle(
-                    b.x + Angles.trnsx(r.angle + 180, offset),
-                    b.y + Angles.trnsy(r.angle + 180, offset),
-                    (thrusterSize + Mathf.absin(Time.time, 2f, thrusterSize / 4f)) * scale
-                );
-                Draw.color(Color.white);
-                Fill.circle(
-                    b.x + Angles.trnsx(r.angle + 180, offset - thrusterSize / 2f),
-                    b.y + Angles.trnsy(r.angle + 180, offset - thrusterSize / 2f),
-                    (thrusterSize + Mathf.absin(Time.time, 2f, thrusterSize / 4f)) / 2f  * scale
-                );
-                Draw.color();
-            }
-
             Draw.z(layer - 0.01f);
             Draw.rect(backRegion, b.x, b.y, r.angle - 90f);
             Draw.z(layer);
@@ -90,15 +65,16 @@ public class RocketBulletType extends BasicBulletType{
             bullet.set(x, y);
         }
         if(keepVelocity && owner instanceof Velc v) bullet.vel.add(v.vel());
-        bullet.data = new RocketData(angle);
+        bullet.data = new RocketData(-bullet.vel.len(), angle);
         return bullet;
     }
 
-    public static class RocketData{ //I could use data for lock and fdata for angle, but this looks nicer
+    public static class RocketData{
         float angle;
-        boolean thrust;
+        float vel, scl = 1f;
 
-        public RocketData(float angle){
+        public RocketData(float vel, float angle){
+            this.vel = vel;
             this.angle = angle;
         }
     }
