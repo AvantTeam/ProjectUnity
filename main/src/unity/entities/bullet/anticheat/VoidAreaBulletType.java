@@ -24,6 +24,12 @@ public class VoidAreaBulletType extends AntiCheatBulletTypeBase{
     }
 
     @Override
+    public void init(){
+        super.init();
+        drawSize = radius * 2f;
+    }
+
+    @Override
     public void update(Bullet b){
         if(b.timer(1, 5f)){
             float fin = Mathf.clamp(b.time / fadeInTime) * Mathf.clamp(b.time > b.lifetime - fadeOutTime ? 1f - (b.time - (lifetime - fadeOutTime)) / fadeOutTime : 1f);

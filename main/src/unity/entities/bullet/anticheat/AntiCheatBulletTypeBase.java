@@ -53,7 +53,7 @@ public abstract class AntiCheatBulletTypeBase extends BulletType{
         float score = unit.health + unit.type.dpsEstimate;
         float pow = score > overDamage ? Mathf.pow((score - overDamage) / overDamageScl, overDamagePower) : 0f;
         float ratio = unit.health > ratioStart ? ratioDamage * Math.max(unit.maxHealth, unit.health) : 0f;
-        float damage = Math.max(ratio, (b.damage * b.damageMultiplier()) + extraDamage + pow);
+        float damage = Math.max(ratio, ((b.damage + extraDamage) * b.damageMultiplier()) + pow);
         if(bleedDuration > 0){
             Unity.antiCheat.applyStatus(unit, bleedDuration);
         }
@@ -78,7 +78,7 @@ public abstract class AntiCheatBulletTypeBase extends BulletType{
         }
         float hd = unit.health - lh, sd = unit.shield - ls;
         Unity.antiCheat.notifyDamage(unit.id, hd);
-        Unity.antiCheat.samplerAdd(unit, (hd + sd) < 0.00001f);
+        Unity.antiCheat.samplerAdd(unit, (hd + sd) < 0.00001f && damage < Float.MAX_VALUE);
 
         Tmp.v3.set(unit).sub(b).nor().scl(knockback * 80f);
         if(impact) Tmp.v3.setAngle(b.rotation() + (knockback < 0 ? 180f : 0f));
@@ -105,8 +105,12 @@ public abstract class AntiCheatBulletTypeBase extends BulletType{
         float pow = building.health > overDamage ? Mathf.pow((building.health - overDamage) / overDamageScl, overDamagePower) : 0f;
         if(col || pow > 0f || ratioDamage > 0f){
             float ratio = building.health > ratioStart ? ratioDamage * Math.max(building.maxHealth, building.health) : 0f;
-            float damage = Math.max(ratio, (col ? ((b.damage * b.damageMultiplier()) + extraDamage) * buildingDamageMultiplier : 0f) + pow);
+            float damage = Math.max(ratio, (col ? (b.damage + extraDamage) * b.damageMultiplier() * buildingDamageMultiplier : 0f) + pow);
+            float lh = building.health;
             building.damage(damage);
+            if(building.health >= lh && damage >= Float.MAX_VALUE){
+                AntiCheat.annihilateEntity(building, true);
+            }
         }
     }
 

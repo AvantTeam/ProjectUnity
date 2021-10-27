@@ -21,6 +21,8 @@ public class SpecialFx{
 
     public static Effect
 
+    fragmentation = new FragmentationShaderEffect(3.5f * 60f),
+
     endgameVapourize = new VapourizeShaderEffect(3f * 60f, 900f).updateVel(false),
 
     /** {@link Fx#chainLightning} but uses {@link EffectContainer#rotation} as blinking scale */

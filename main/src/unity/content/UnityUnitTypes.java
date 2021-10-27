@@ -40,6 +40,7 @@ import unity.type.weapons.*;
 import static mindustry.Vars.*;
 import static unity.content.UnityWeaponTemplates.*;
 
+@SuppressWarnings("unchecked")
 public class UnityUnitTypes{
     // global unit + copter
     public static @EntityDef({Unitc.class, Copterc.class})
@@ -4389,6 +4390,29 @@ public class UnityUnitTypes{
 
                 bullet = UnityBullets.oppressionShell;
             }});
+
+            segmentWeapons = new Seq[]{
+                new Seq<Weapon>().addAll(new Weapon(name + "-destroyer-2"){{
+                    x = 81.75f;
+                    y = -71.5f;
+                    shootY = 22f;
+
+                    rotate = true;
+                    rotateSpeed = 1.75f;
+
+                    reload = 4f * 60f;
+
+                    bullet = new EndRailBulletType(){{
+                        damage = 8500f;
+                        length = 790f;
+                        updateEffectSeg = 50f;
+                        pierceDamageFactor = 0.0001f;
+                        ratioStart = 11000f;
+                        ratioDamage = 1 / 10f;
+                    }};
+                }}),
+                new Seq<Weapon>()
+            };
         }};
 
         apocalypse = new InvisibleUnitType("apocalypse"){{
