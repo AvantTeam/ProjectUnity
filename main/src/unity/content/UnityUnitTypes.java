@@ -4403,10 +4403,10 @@ public class UnityUnitTypes{
                     reload = 4f * 60f;
 
                     bullet = new EndRailBulletType(){{
-                        damage = 8500f;
+                        damage = 12200f;
                         length = 790f;
                         updateEffectSeg = 50f;
-                        pierceDamageFactor = 0.0001f;
+                        pierceDamageFactor = 0.001f;
                         ratioStart = 11000f;
                         ratioDamage = 1 / 10f;
                     }};

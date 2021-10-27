@@ -12,7 +12,7 @@ import unity.util.*;
 
 public class EndRailBulletType extends AntiCheatBulletTypeBase{
     public float length = 340f;
-    public float collisionWidth = 6f;
+    public float collisionWidth = 4f;
     public Effect updateEffect = TrailFx.endRailTrail;
     public float updateEffectSeg = 20f;
     public float pierceDamageFactor = 1f;
@@ -49,8 +49,8 @@ public class EndRailBulletType extends AntiCheatBulletTypeBase{
             if(direct && dam > 0f){
                 float lh = build.health;
                 hitBuildingAntiCheat(b, build, dam - damage);
-                len = b.dst(build);
                 dam -= lh * pierceDamageFactor;
+                if(dam <= 0f) len = b.dst(build);
             }
             return dam <= 0f;
         }, unit -> {
@@ -67,8 +67,8 @@ public class EndRailBulletType extends AntiCheatBulletTypeBase{
                     }
                     if(unit.isAdded()) AntiCheat.annihilateEntity(unit, false);
                 }
-                len = b.dst(unit);
                 dam -= lh * pierceDamageFactor;
+                if(dam <= 0f) len = b.dst(unit);
             }
             return dam <= 0f;
         }, (ex, ey) -> hit(b, ex, ey), true);
