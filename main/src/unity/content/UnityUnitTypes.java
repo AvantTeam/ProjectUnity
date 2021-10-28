@@ -4396,6 +4396,7 @@ public class UnityUnitTypes{
                     x = 81.75f;
                     y = -71.5f;
                     shootY = 22f;
+                    shootCone = 0.5f;
 
                     rotate = true;
                     rotateSpeed = 1.75f;

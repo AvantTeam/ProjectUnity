@@ -46,7 +46,7 @@ vec4 draw(vec4 color, float j, vec2 blastpos, vec2 pos, vec2 v){
     float prog = curve(fragprogress, (j / frags) * delayScl, (((j + 1.0) / frags) * delayScl) + (1.0 - delayScl));
     
     vec2 blst = u_blastforce * prog;
-    vec2 blstb = (-blastpos * 50.0 * prog) / size;
+    vec2 blstb = (-blastpos * 100.0 * prog) / size;
     
     vec2 trns = pos + ((blst + blstb) / (100.0 + size));
     vec2 trnst = T + ((blst + blstb) * v);
