@@ -18,8 +18,8 @@ import unity.gen.*;
 import unity.world.blocks.defense.turrets.*;
 import unity.world.blocks.environment.*;
 
-import static arc.Core.atlas;
-import static mindustry.type.ItemStack.with;
+import static arc.Core.*;
+import static mindustry.type.ItemStack.*;
 
 public class DarkBlocks implements ContentList{
     public static @FactionDef("dark")

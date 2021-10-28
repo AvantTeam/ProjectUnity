@@ -24,8 +24,8 @@ import unity.world.blocks.defense.turrets.*;
 import unity.world.blocks.environment.*;
 import unity.world.blocks.power.*;
 
-import static arc.Core.atlas;
-import static mindustry.type.ItemStack.with;
+import static arc.Core.*;
+import static mindustry.type.ItemStack.*;
 
 public class ImberBlocks implements ContentList{
     public static @FactionDef("imber")

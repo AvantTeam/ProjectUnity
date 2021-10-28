@@ -21,7 +21,7 @@ import unity.gen.*;
 import unity.graphics.*;
 import unity.world.blocks.defense.turrets.*;
 
-import static mindustry.type.ItemStack.with;
+import static mindustry.type.ItemStack.*;
 
 public class EndBlocks implements ContentList{
     public static @FactionDef("end")

@@ -18,9 +18,9 @@ import unity.graphics.*;
 import unity.world.blocks.defense.turrets.*;
 import unity.world.blocks.units.*;
 
-import static arc.Core.atlas;
-import static mindustry.Vars.tilesize;
-import static mindustry.type.ItemStack.with;
+import static arc.Core.*;
+import static mindustry.Vars.*;
+import static mindustry.type.ItemStack.*;
 
 public class AdvanceBlocks implements ContentList{
     public static @FactionDef("advance")

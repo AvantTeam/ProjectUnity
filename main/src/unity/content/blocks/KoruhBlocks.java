@@ -13,9 +13,7 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.defense.turrets.*;
-import mindustry.world.blocks.defense.turrets.Turret.*;
 import mindustry.world.blocks.production.*;
-import mindustry.world.blocks.production.GenericCrafter.*;
 import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 import unity.annotations.Annotations.*;
@@ -30,9 +28,8 @@ import unity.world.blocks.production.*;
 import unity.world.blocks.units.*;
 import unity.world.consumers.*;
 
-import static mindustry.Vars.tilesize;
-import static mindustry.type.ItemStack.empty;
-import static mindustry.type.ItemStack.with;
+import static mindustry.Vars.*;
+import static mindustry.type.ItemStack.*;
 
 public class KoruhBlocks implements ContentList{
     public static @FactionDef("koruh")

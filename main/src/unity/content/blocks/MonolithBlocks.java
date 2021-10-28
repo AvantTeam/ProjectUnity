@@ -28,8 +28,8 @@ import unity.world.blocks.environment.*;
 import unity.world.blocks.production.*;
 import unity.world.meta.*;
 
-import static mindustry.Vars.tilesize;
-import static mindustry.type.ItemStack.with;
+import static mindustry.Vars.*;
+import static mindustry.type.ItemStack.*;
 
 public class MonolithBlocks implements ContentList{
     public static @FactionDef("monolith")

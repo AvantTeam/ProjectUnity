@@ -29,9 +29,9 @@ import unity.world.blocks.environment.*;
 import unity.world.blocks.light.*;
 import unity.world.draw.*;
 
-import static arc.Core.atlas;
-import static mindustry.Vars.tilesize;
-import static mindustry.type.ItemStack.with;
+import static arc.Core.*;
+import static mindustry.Vars.*;
+import static mindustry.type.ItemStack.*;
 
 public class LightBlocks implements ContentList{
     public static @FactionDef("light")
