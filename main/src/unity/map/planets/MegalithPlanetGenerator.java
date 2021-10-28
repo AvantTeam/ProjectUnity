@@ -22,7 +22,7 @@ import unity.world.blocks.LoreMessageBlock.*;
 
 import static mindustry.Vars.*;
 import static mindustry.content.Blocks.*;
-import static unity.content.blocks.UnityBlocks.*;
+import static unity.content.blocks.MonolithBlocks.*;
 
 /** @author GlennFolker */
 public class MegalithPlanetGenerator extends PlanetGenerator{
@@ -336,7 +336,7 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
         });
 
         //generate ore frequencies
-        Seq<Block> ores = Seq.with(Blocks.oreCopper, Blocks.oreLead, UnityBlocks.oreMonolite);
+        Seq<Block> ores = Seq.with(Blocks.oreCopper, Blocks.oreLead, oreMonolite);
 
         float poles = Math.abs(sector.tile.v.y);
         float nmag = 0.5f;

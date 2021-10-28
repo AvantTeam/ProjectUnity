@@ -10,6 +10,7 @@ import mindustry.type.*;
 import static unity.content.blocks.DarkBlocks.*;
 import static unity.content.blocks.LightBlocks.*;
 import static unity.content.blocks.ImberBlocks.*;
+import static unity.content.blocks.MonolithBlocks.*;
 import static unity.content.blocks.UnityBlocks.*;
 import static unity.content.UnityItems.*;
 import static unity.content.UnityUnitTypes.*;
