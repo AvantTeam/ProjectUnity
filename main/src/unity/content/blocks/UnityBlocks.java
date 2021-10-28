@@ -102,7 +102,9 @@ public class UnityBlocks{
         new DarkBlocks(),
         new LightBlocks(),
         new ImberBlocks(),
-        new KoruhBlocks()
+        new KoruhBlocks(),
+        new MonolithBlocks(),
+        new YoungchaBlocks()
     };
 
     public static void load(){
