@@ -15,7 +15,7 @@ import mindustry.world.*;
 
 import static mindustry.Vars.*;
 import static mindustry.content.Blocks.*;
-import static unity.content.blocks.UnityBlocks.*;
+import static unity.content.blocks.ImberBlocks.*;
 
 public class ElectrodePlanetGenerator extends PlanetGenerator{
     BaseGenerator basegen = new BaseGenerator();

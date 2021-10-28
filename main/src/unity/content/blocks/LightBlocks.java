@@ -645,5 +645,7 @@ public class LightBlocks implements ContentList{
                     })
             );
         }};
+
+        //endregion
     }
 }
