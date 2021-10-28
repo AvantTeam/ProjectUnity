@@ -4352,12 +4352,12 @@ public class UnityUnitTypes{
                 segments = 2;
             }};
             splittable = chainable = false;
-            hitSize = (114f * 2f) - 6f;
+            hitSize = (114f * 2f) - 10f;
             angleLimit = 35f;
             segmentOffset = 114f * 2f;
             segmentLength = 60;
             segmentCast = 11;
-            barrageRange = 340f;
+            barrageRange = 390f;
             lowAltitude = true;
             visualElevation = 3f;
             rotateSpeed = 2.2f;
@@ -4393,24 +4393,51 @@ public class UnityUnitTypes{
 
             segmentWeapons = new Seq[]{
                 new Seq<Weapon>().addAll(new Weapon(name + "-destroyer-2"){{
-                    x = 81.75f;
-                    y = -71.5f;
+                    x = 98f;
+                    y = -26.25f;
                     shootY = 22f;
                     shootCone = 0.5f;
 
                     rotate = true;
                     rotateSpeed = 1.75f;
 
-                    reload = 4f * 60f;
+                    reload = 4.5f * 60f;
 
                     bullet = new EndRailBulletType(){{
-                        damage = 12200f;
+                        damage = 12700f;
                         length = 790f;
                         updateEffectSeg = 50f;
                         pierceDamageFactor = 0.001f;
                         ratioStart = 11000f;
                         ratioDamage = 1 / 10f;
+
+                        modules = new AntiCheatBulletModule[]{
+                            new ForceFieldDamageModule(150f, 10f, 500f, 0.5f, 1f / 20f, 10f * 60f),
+                            new ArmorDamageModule(1f / 20f, 20f, 25f, 40f).set(10f, 2f)
+                        };
                     }};
+                }}),
+                new Seq<Weapon>().addAll(new Weapon(name + "-destroyer-3"){{
+                    x = 98f;
+                    y = -26.25f;
+                    shootY = 6f;
+
+                    shootSound = Sounds.missile;
+
+                    rotate = true;
+                    rotateSpeed = 4f;
+                    inaccuracy = 3f;
+                    xRand = 10.25f;
+
+                    shots = 13;
+                    shotDelay = 5f;
+
+                    reload = 3f * 60f;
+
+                    bullet = UnityBullets.missileAntiCheat.copy();
+                    bullet.drag = -0.01f;
+                    bullet.lifetime = 90f;
+                    bullet.homingRange = 90f;
                 }}),
                 new Seq<Weapon>()
             };

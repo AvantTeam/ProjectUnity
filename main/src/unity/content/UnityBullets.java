@@ -1217,6 +1217,11 @@ public class UnityBullets{
             ratioStart = 600000f;
             status = weaken;
             statusDuration = 30f;
+
+            modules = new AntiCheatBulletModule[]{
+                new ForceFieldDamageModule(5f, 10f, 1000f, 1f, 1f / 50f, 3f * 60f),
+                new AbilityDamageModule(10f, 5f * 60f, 10f, 1f / 60f, 2f)
+            };
         }};
 
         oppressionShell = new EndBasicBulletType(7f, 410f, "shell"){{

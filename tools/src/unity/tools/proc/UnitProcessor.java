@@ -9,6 +9,7 @@ import arc.struct.*;
 import arc.util.noise.*;
 import mindustry.content.*;
 import mindustry.gen.*;
+import mindustry.type.*;
 import unity.entities.units.*;
 import unity.gen.*;
 import unity.mod.*;
@@ -144,7 +145,13 @@ public class UnitProcessor implements Processor{
             if(unit instanceof WormDefaultUnit || unit instanceof Wormc){
                 outlSeparate.get(type.segmentRegion, "outline");
                 outlSeparate.get(type.tailRegion, "outline");
-                
+
+                for(Seq<Weapon> seq : type.segmentWeapons){
+                    for(Weapon w : seq){
+                        outlSeparate.get(w.region, "outline");
+                    }
+                }
+
                 if(type.wormDecal != null){
                     var wd = type.wormDecal;
                     outliner.get(wd.baseRegion);
