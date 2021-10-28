@@ -1,4 +1,4 @@
-package unity.content;
+package unity.content.blocks;
 
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -22,6 +22,7 @@ import mindustry.world.consumers.*;
 import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 import unity.annotations.Annotations.*;
+import unity.content.*;
 import unity.content.effects.*;
 import unity.entities.bullet.anticheat.*;
 import unity.entities.bullet.energy.*;

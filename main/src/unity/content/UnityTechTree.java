@@ -7,7 +7,7 @@ import mindustry.ctype.*;
 import mindustry.game.Objectives.*;
 import mindustry.type.*;
 
-import static unity.content.UnityBlocks.*;
+import static unity.content.blocks.UnityBlocks.*;
 import static unity.content.UnityItems.*;
 import static unity.content.UnityUnitTypes.*;
 

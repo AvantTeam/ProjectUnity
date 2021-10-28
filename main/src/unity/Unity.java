@@ -26,6 +26,7 @@ import unity.assets.loaders.*;
 import unity.assets.type.g3d.*;
 import unity.async.*;
 import unity.content.*;
+import unity.content.blocks.*;
 import unity.editor.*;
 import unity.gen.*;
 import unity.map.*;

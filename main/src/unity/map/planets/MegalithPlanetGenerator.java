@@ -14,7 +14,7 @@ import mindustry.maps.generators.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import unity.*;
-import unity.content.*;
+import unity.content.blocks.*;
 import unity.graphics.*;
 import unity.map.*;
 import unity.mod.*;
@@ -22,7 +22,7 @@ import unity.world.blocks.LoreMessageBlock.*;
 
 import static mindustry.Vars.*;
 import static mindustry.content.Blocks.*;
-import static unity.content.UnityBlocks.*;
+import static unity.content.blocks.UnityBlocks.*;
 
 /** @author GlennFolker */
 public class MegalithPlanetGenerator extends PlanetGenerator{
