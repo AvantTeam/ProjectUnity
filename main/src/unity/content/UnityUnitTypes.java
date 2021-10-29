@@ -4392,31 +4392,68 @@ public class UnityUnitTypes{
             }});
 
             segmentWeapons = new Seq[]{
-                new Seq<Weapon>().addAll(new Weapon(name + "-destroyer-2"){{
-                    x = 98f;
-                    y = -26.25f;
-                    shootY = 22f;
-                    shootCone = 0.5f;
+                new Seq<Weapon>().addAll(
+                    new Weapon(name + "-soul-destroyer"){{
+                        mirror = false;
 
-                    rotate = true;
-                    rotateSpeed = 1.75f;
+                        x = 0f;
+                        y = 72f;
+                        shootY = 0f;
 
-                    reload = 4.5f * 60f;
+                        rotate = true;
+                        rotateSpeed = 1.5f;
 
-                    bullet = new EndRailBulletType(){{
-                        damage = 12700f;
-                        length = 790f;
-                        updateEffectSeg = 50f;
-                        pierceDamageFactor = 0.001f;
-                        ratioStart = 11000f;
-                        ratioDamage = 1 / 10f;
+                        reload = 4.75f * 60f;
 
-                        modules = new AntiCheatBulletModule[]{
+                        bullet = new EndRailBulletType(){{
+                            damage = 15000f;
+                            length = 820f;
+                            updateEffectSeg = 50f;
+                            pierceDamageFactor = 0.001f;
+
+                            overDamage = 640000f;
+                            overDamagePower = 2.7f;
+                            overDamageScl = 4000f;
+
+                            ratioStart = 14000f;
+                            ratioDamage = 1 / 10f;
+
+                            modules = new AntiCheatBulletModule[]{
                             new ForceFieldDamageModule(150f, 10f, 500f, 0.5f, 1f / 20f, 10f * 60f),
                             new ArmorDamageModule(1f / 20f, 20f, 25f, 40f).set(10f, 2f)
-                        };
-                    }};
-                }}),
+                            };
+                        }};
+                    }},
+                    new Weapon(name + "-destroyer-2"){{
+                        x = 98f;
+                        y = -26.25f;
+                        shootY = 22f;
+                        shootCone = 0.5f;
+                        alternate = false;
+
+                        rotate = true;
+                        rotateSpeed = 1.75f;
+                        continuous = true;
+
+                        reload = 3.5f * 60f;
+
+                        bullet = new EndContinuousLaserBulletType(550f){{
+                            lifetime = 1.5f * 60;
+                            length = 370f;
+                            for(int i = 0; i < strokes.length; i++){
+                                strokes[i] *= 0.7f;
+                            }
+                            overDamage = 800000f;
+                            ratioDamage = 1f / 45f;
+                            ratioStart = 800000f;
+                            colors = new Color[]{UnityPal.scarColorAlpha, UnityPal.scarColor, UnityPal.endColor, Color.white};
+                            modules = new AntiCheatBulletModule[]{
+                            new ForceFieldDamageModule(40f, 20f, 2000f, 1f, 1f / 40f, 3f * 60f),
+                            new ArmorDamageModule(0.1f, 30f, 30f, 0.4f)
+                            };
+                        }};
+                    }}
+                ),
                 new Seq<Weapon>().addAll(new Weapon(name + "-destroyer-3"){{
                     x = 98f;
                     y = -26.25f;

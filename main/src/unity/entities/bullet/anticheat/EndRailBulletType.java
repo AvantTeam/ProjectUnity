@@ -1,16 +1,21 @@
 package unity.entities.bullet.anticheat;
 
+import arc.graphics.*;
+import arc.graphics.g2d.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import unity.content.effects.*;
+import unity.graphics.*;
 import unity.mod.*;
 import unity.util.*;
 
 public class EndRailBulletType extends AntiCheatBulletTypeBase{
+    public Color[] colors = new Color[]{UnityPal.scarColorAlpha, UnityPal.scarColor, UnityPal.endColor, Color.black};
     public float length = 340f;
     public float collisionWidth = 4f;
     public Effect updateEffect = TrailFx.endRailTrail;
@@ -29,12 +34,18 @@ public class EndRailBulletType extends AntiCheatBulletTypeBase{
         hitEffect = Fx.none;
         despawnEffect = Fx.none;
         collides = false;
-        lifetime = 1f;
+        lifetime = 20f;
     }
 
     @Override
     public float range(){
         return length;
+    }
+
+    @Override
+    public void init(){
+        super.init();
+        drawSize = length * 2f;
     }
 
     @Override
@@ -77,5 +88,27 @@ public class EndRailBulletType extends AntiCheatBulletTypeBase{
         for(float i = 0; i <= len; i += updateEffectSeg){
             updateEffect.at(b.x + nor.x * i, b.y + nor.y * i, b.rotation());
         }
+        b.fdata = len;
+    }
+
+    @Override
+    public void drawLight(Bullet b){
+
+    }
+
+    @Override
+    public void draw(Bullet b){
+        float stroke = 2f * 1.5f * b.fout();
+        Vec2 v = Tmp.v1.trns(b.rotation(), b.fdata).add(b);
+
+        for(Color c : colors){
+            Draw.color(c);
+            Drawf.tri(b.x, b.y, stroke * collisionWidth, stroke * 1.22f * length * 0.02f, b.rotation() + 180f);
+            Lines.stroke(stroke * collisionWidth);
+            Lines.line(b.x, b.y, v.x, v.y);
+            Drawf.tri(v.x, v.y, stroke * collisionWidth, stroke * 1.22f * length * 0.07f, b.rotation());
+            stroke /= 1.5f;
+        }
+        Draw.reset();
     }
 }
