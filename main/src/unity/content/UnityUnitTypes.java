@@ -4426,7 +4426,7 @@ public class UnityUnitTypes{
                             ratioStart = 14000f;
                             ratioDamage = 1 / 10f;
 
-                            hitEffect = HitFx.endHitRedSmall;
+                            hitEffect = HitFx.endHitRail;
 
                             modules = new AntiCheatBulletModule[]{
                             new ForceFieldDamageModule(150f, 10f, 500f, 0.5f, 1f / 20f, 10f * 60f),

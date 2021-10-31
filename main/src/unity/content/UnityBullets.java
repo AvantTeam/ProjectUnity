@@ -1273,7 +1273,7 @@ public class UnityBullets{
             ratioDamage = 1f / 150f;
             ratioStart = 2000f;
 
-            hitEffect = HitFx.endHitRedSmall;
+            hitEffect = HitFx.endHitRedSmoke;
 
             backColor = lightColor = trailColor = UnityPal.scarColor;
             frontColor = UnityPal.endColor;

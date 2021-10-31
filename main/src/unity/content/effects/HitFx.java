@@ -176,12 +176,13 @@ public class HitFx{
     }),
 
     endHitRedSmall = new Effect(15f, e -> {
-        color(UnityPal.endColor, UnityPal.scarColor, e.fin());
-
-        e.scaled(e.lifetime/2f, s -> {
+        e.scaled(e.lifetime / 2f, s -> {
+            color(UnityPal.scarColor, UnityPal.endColor, s.fin());
             Lines.stroke(2f * s.fout());
-            Lines.circle(e.x, e.y, 10f * e.fin());
+            Lines.circle(e.x, e.y, 10f * s.fin());
         });
+
+        color(UnityPal.endColor, UnityPal.scarColor, e.fin());
 
         Angles.randLenVectors(e.id, 7, e.fin(Interp.pow3Out) * 20f, (x, y) -> {
             float ang = Mathf.angle(x, y);
@@ -190,14 +191,52 @@ public class HitFx{
         });
     }),
 
+    endHitRedSmoke = new Effect(25f, e -> {
+        color(UnityPal.scarColor, Color.darkGray, Color.gray, e.fin());
+        Angles.randLenVectors(e.id * 451L, 7, e.fin(Interp.pow3Out) * 35f, (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, e.fout() * 4f);
+        });
+
+        e.scaled(15f, s -> {
+            color(UnityPal.endColor, UnityPal.scarColor, e.fin());
+            Angles.randLenVectors(e.id, 7, e.fin(Interp.pow3Out) * 20f, (x, y) -> {
+                float ang = Mathf.angle(x, y);
+                Lines.stroke(s.fout());
+                Lines.lineAngle(e.x + x, e.y + y, ang, s.fout(Interp.pow5In) * 12f);
+            });
+        });
+    }),
+
     endHitRedBig = new Effect(15f, e -> {
         color(UnityPal.endColor, UnityPal.scarColor, e.fin());
-
-        Angles.randLenVectors(e.id, 7, e.fin(Interp.pow3Out) * 45, e.rotation, 45, (x, y) -> {
+        Angles.randLenVectors(e.id, 7, e.fin(Interp.pow3Out) * 45f, e.rotation, 45, (x, y) -> {
             float ang = Mathf.angle(x, y);
             Lines.stroke(e.fout() * 2);
-            Lines.lineAngle(e.x + x, e.y + y, ang, e.fout(Interp.pow3In) * 24);
+            Lines.lineAngle(e.x + x, e.y + y, ang, e.fout(Interp.pow3In) * 24f);
         });
+    }),
+
+    endHitRail = new Effect(25f, e -> {
+        e.scaled(15f, s -> {
+            color(UnityPal.endColor, UnityPal.scarColor, e.fin());
+            Angles.randLenVectors(e.id, 7, s.fin(Interp.pow3Out) * 45f, e.rotation, 47f, (x, y) -> {
+                float ang = Mathf.angle(x, y);
+                Lines.stroke(s.fout() * 2);
+                Lines.lineAngle(e.x + x, e.y + y, ang, s.fout(Interp.pow3In) * 24f);
+            });
+        });
+
+        float scl = 0.3f;
+        int spikes = Mathf.randomSeed(e.id * 13L, 3, 5);
+        color(UnityPal.scarColor);
+        for(int i = 0; i < spikes; i++){
+            float fin = Mathf.curve(e.fin(), (i / (float)spikes) * scl, (((i + 1f) / spikes) * scl) + (1f - scl));
+            float fin2 = Mathf.curve(fin, 0f, 0.3f);
+            float fout = 1f - fin;
+            float angle = Mathf.randomSeed(e.id * 53L + i * 31L, -25f, 25f) + e.rotation;
+            Drawf.tri(e.x, e.y, fout * 20f, fin2 * (80f + Mathf.randomSeed((e.id + i) * 73L, 40f)), angle);
+            Drawf.tri(e.x, e.y, fout * 20f, fin2 * 20f, angle + 180f);
+        }
     }),
 
     // perhape
