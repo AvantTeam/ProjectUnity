@@ -155,6 +155,66 @@ public class HitFx{
         });
     }),
 
+    voidHitBig = new Effect(30f, e -> {
+        color(Color.black);
+        e.scaled(e.lifetime / 2, s -> {
+            for(int i = 0; i < 3; i++){
+                float f = Mathf.lerp(10, 5, i / 2f);
+                Draw.alpha(Mathf.lerp(0.45f, 1, (i / 2f) * (i / 2f)));
+
+                Drawf.tri(e.x, e.y,  f * 1.22f * s.fout(Interp.pow5Out), 1 + 7 * f * s.fin(Interp.pow5Out), e.rotation);
+                Drawf.tri(e.x, e.y,  f * 1.22f * s.fout(Interp.pow5Out), 3 * f * s.fout(Interp.pow5Out), e.rotation - 180f);
+            }
+        });
+
+        if(e.fin() > 0.45f){
+            float l2 = Mathf.curve(e.fin(), 0.45f, 1);
+            Angles.randLenVectors(e.id, 20, 35 * Interp.pow2Out.apply(l2), e.rotation, 45, (x, y) -> {
+                Fill.circle(e.x + x, e.y + y, 4 * Interp.pow2Out.apply(1 - l2));
+            });
+        }
+    }),
+
+    endHitRedSmall = new Effect(15f, e -> {
+        color(UnityPal.endColor, UnityPal.scarColor, e.fin());
+
+        e.scaled(e.lifetime/2f, s -> {
+            Lines.stroke(2f * s.fout());
+            Lines.circle(e.x, e.y, 10f * e.fin());
+        });
+
+        Angles.randLenVectors(e.id, 7, e.fin(Interp.pow3Out) * 20f, (x, y) -> {
+            float ang = Mathf.angle(x, y);
+            Lines.stroke(e.fout());
+            Lines.lineAngle(e.x + x, e.y + y, ang, e.fout(Interp.pow5In) * 12f);
+        });
+    }),
+
+    endHitRedBig = new Effect(15f, e -> {
+        color(UnityPal.endColor, UnityPal.scarColor, e.fin());
+
+        Angles.randLenVectors(e.id, 7, e.fin(Interp.pow3Out) * 45, e.rotation, 45, (x, y) -> {
+            float ang = Mathf.angle(x, y);
+            Lines.stroke(e.fout() * 2);
+            Lines.lineAngle(e.x + x, e.y + y, ang, e.fout(Interp.pow3In) * 24);
+        });
+    }),
+
+    // perhape
+    endFlash = new Effect(7f, e -> {
+        Tmp.c1.set(UnityPal.scarColor).a(e.fout());
+        color(UnityPal.scarColor);
+
+        blend(Blending.additive);
+        for(int i = 0; i < 4; i++){
+            Drawf.tri(e.x, e.y, 5 * e.fout(Interp.pow3In), 40f * e.fout(), 90f * i);
+        }
+
+        Fill.light(e.x, e.y, 15, 16, Tmp.c1, Color.clear);
+
+        blend();
+    }).layer(Layer.effect + 1),
+
     hitMonolithLaser = new Effect(8, e -> {
         color(UnityPal.monolithLight, UnityPal.monolithDark, e.finpow());
         stroke(0.2f + e.fout() * 1.3f);

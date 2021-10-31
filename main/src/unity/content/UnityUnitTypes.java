@@ -4166,6 +4166,8 @@ public class UnityUnitTypes{
                     width = 30f;
                     length = 390f;
                     largeHit = true;
+
+                    hitEffect = HitFx.endHitRedBig;
                 }};
             }}, new Weapon("unity-doeg-launcher"){{
                 x = 24.75f;
@@ -4187,6 +4189,8 @@ public class UnityUnitTypes{
                     weaveMag = 2f;
                     width *= 1.6f;
                     height *= 2.1f;
+
+                    hitEffect = HitFx.endHitRedSmall;
                 }};
             }});
         }};
@@ -4237,6 +4241,8 @@ public class UnityUnitTypes{
 
                 backColor = hitColor = lightColor = UnityPal.scarColor;
                 frontColor = UnityPal.endColor;
+
+                hitEffect = HitFx.endHitRedSmall;
             }};
 
             weapons.add(new Weapon(){{
@@ -4301,6 +4307,8 @@ public class UnityUnitTypes{
 
                     backColor = trailColor = hitColor = lightColor = UnityPal.scarColor;
                     frontColor = UnityPal.endColor;
+
+                    hitEffect = HitFx.endHitRedSmall;
                 }};
             }}, new Weapon("unity-doeg-destroyer"){{
                 mirror = true;
@@ -4417,6 +4425,8 @@ public class UnityUnitTypes{
 
                             ratioStart = 14000f;
                             ratioDamage = 1 / 10f;
+
+                            hitEffect = HitFx.endHitRedSmall;
 
                             modules = new AntiCheatBulletModule[]{
                             new ForceFieldDamageModule(150f, 10f, 500f, 0.5f, 1f / 20f, 10f * 60f),
@@ -4585,6 +4595,8 @@ public class UnityUnitTypes{
                     overDamage = 500000f;
                     ratioDamage = 1f / 100f;
                     ratioStart = 7000f;
+
+                    hitEffect = HitFx.endHitRedBig;
                 }};
             }});
 
@@ -4849,6 +4861,9 @@ public class UnityUnitTypes{
                     fragVelocityMax = 1.2f;
                     fragVelocityMin = 0.5f;
                     fragCone = 120f;
+
+                    hitEffect = HitFx.endHitRedSmall;
+
                     fragBullet = new VoidFractureBulletType(15f, 100f){{
                         width = 9.5f;
                         widthTo = 2f;
@@ -4897,6 +4912,8 @@ public class UnityUnitTypes{
                     splashDamageRadius = 80f;
                     width = 15f;
                     height = 21f;
+
+                    hitEffect = HitFx.endHitRedSmall;
                 }};
             }};
 
@@ -5087,6 +5104,8 @@ public class UnityUnitTypes{
                     ratioStart = 11000f;
                     bleedDuration = 10f * 60f;
 
+                    hitEffect = HitFx.endHitRedSmall;
+
                     laserColors = new Color[]{UnityPal.scarColorAlpha, UnityPal.scarColor, UnityPal.endColor, Color.black};
                 }};
                 range = bullet.range();
@@ -5219,6 +5238,9 @@ public class UnityUnitTypes{
                     maxTargets = 20;
                     shootEffect = ShootFx.voidShoot;
 
+                    hitEffect = HitFx.voidHitBig;
+                    smokeEffect = HitFx.voidHit;
+
                     modules = new AntiCheatBulletModule[]{
                         new ArmorDamageModule(50f, 50f, 2f),
                         new ForceFieldDamageModule(2f, 20f, 220f, 7f, 1f / 50f, 2f * 60f)
@@ -5255,8 +5277,8 @@ public class UnityUnitTypes{
                     ratioDamage = 1f / 400f;
                     ratioStart = 2000f;
 
-                    hitEffect = Fx.blastExplosion;
-                    despawnEffect = Fx.blastExplosion;
+                    hitEffect = HitFx.endHitRedSmall;
+                    despawnEffect = HitFx.endHitRedSmall;
 
                     backColor = lightColor = trailColor = UnityPal.scarColor;
                     frontColor = UnityPal.endColor;
@@ -5367,6 +5389,8 @@ public class UnityUnitTypes{
                         ratioDamage = 1f / 200f;
                         ratioStart = 20000f;
                         bleedDuration = 600f;
+
+                        hitEffect = HitFx.endHitRedBig;
 
                         modules = new AntiCheatBulletModule[]{
                         new ArmorDamageModule(0.01f, 3f, 40f, 5f),

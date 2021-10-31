@@ -1172,6 +1172,8 @@ public class UnityBullets{
                 ratioStart = 12000f;
                 bleedDuration = 10f * 60f;
 
+                hitEffect = HitFx.voidHit;
+
                 laserColors = new Color[]{UnityPal.scarColorAlpha, UnityPal.scarColor, UnityPal.endColor, Color.black};
 
                 modules = new AntiCheatBulletModule[]{
@@ -1195,6 +1197,8 @@ public class UnityBullets{
 
             fragBullets = 7;
             fragLifeMin = 0.9f;
+
+            hitEffect = HitFx.endHitRedBig;
 
             fragBullet = new EndBasicBulletType(5.6f, 180f){{
                 lifetime = 20f;
@@ -1237,6 +1241,8 @@ public class UnityBullets{
             lightningLengthRand = 5;
             lightningType = endLightning;
 
+            despawnEffect = HitFx.endHitRedBig;
+
             pierceCap = 3;
             pierce = pierceBuilding = true;
             bleedDuration = 5f * 60f;
@@ -1267,8 +1273,7 @@ public class UnityBullets{
             ratioDamage = 1f / 150f;
             ratioStart = 2000f;
 
-            hitEffect = Fx.blastExplosion;
-            despawnEffect = Fx.blastExplosion;
+            hitEffect = HitFx.endHitRedSmall;
 
             backColor = lightColor = trailColor = UnityPal.scarColor;
             frontColor = UnityPal.endColor;
@@ -1285,6 +1290,8 @@ public class UnityBullets{
             ratioStart = 1000000f;
             colors = new Color[]{UnityPal.scarColorAlpha, UnityPal.scarColor, UnityPal.endColor, Color.white};
             modules = new AntiCheatBulletModule[]{new ArmorDamageModule(0.1f, 30f, 30f, 0.4f)};
+
+            hitEffect = HitFx.endHitRedSmall;
         }};
 
         endLaser = new EndContinuousLaserBulletType(2400f){{
@@ -1308,6 +1315,8 @@ public class UnityBullets{
             ratioStart = 19000f;
             bleedDuration = 10f * 60f;
             pierceShields = true;
+
+            hitEffect = HitFx.endHitRedBig;
 
             modules = new AntiCheatBulletModule[]{
                 new ArmorDamageModule(0.001f, 3f, 15f, 2f),
