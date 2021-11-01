@@ -4407,6 +4407,7 @@ public class UnityUnitTypes{
                         x = 0f;
                         y = 72f;
                         shootY = 0f;
+                        layerOffset = 0.0001f;
 
                         rotate = true;
                         rotateSpeed = 1.5f;
@@ -4415,7 +4416,7 @@ public class UnityUnitTypes{
 
                         bullet = new EndRailBulletType(){{
                             damage = 15000f;
-                            length = 820f;
+                            length = 850f;
                             updateEffectSeg = 50f;
                             pierceDamageFactor = 0.001f;
 
