@@ -40,17 +40,35 @@ float curve(float f, float from, float to){
 
 vec4 draw(vec4 color, float j, vec2 blastpos, vec2 pos, vec2 v){
     vec2 T = v_texCoords.xy;
-    
+
     float idx = j / (frags - 1.0);
-    
+
     float prog = curve(fragprogress, (j / frags) * delayScl, (((j + 1.0) / frags) * delayScl) + (1.0 - delayScl));
-    
+    float side = mod(j, 2.0) == 0.0 ? -1.0 : 1.0;
+
     vec2 blst = u_blastforce * prog;
     vec2 blstb = (-blastpos * 100.0 * prog) / size;
-    
+
+    if(prog >= 0.0001){
+        float scl = (100.0 / size);
+        float rscl = 1.0;
+        float len = length(blastpos) * 100.0;
+        
+        if(len > size * 2.0){
+            float s = (((len - (size * 2.0)) / 60.0) + 1.0);
+            rscl = 1.0 / (s * s);
+        }
+        
+        float newX = blstb.x + (blstb.x * prog * rscl * scl * 0.5) - (blstb.y * prog * side * scl * rscl);
+        float newY = blstb.y + (blstb.y * prog * rscl * scl * 0.5) + (blstb.x * prog * side * scl * rscl);
+        
+        blstb.x = newX;
+        blstb.y = newY;
+    }
+
     vec2 trns = pos + ((blst + blstb) / (100.0 + size));
     vec2 trnst = T + ((blst + blstb) * v);
-    
+
     vec4 noise = texture2D(u_noise, trns);
 
     if(equal(idx, noise.r)){
@@ -98,7 +116,7 @@ void main(){
     vec2 v = u_invsize.xy;
     vec2 pos = ((T * u_texsize) + u_campos) / (100.0 + size);
     vec2 blastpos = ((T * u_texsize) + u_campos - u_blastpos) / 100.0;
-    
+
     vec4 color = vec4(0.0, 0.0, 0.0, 0.0);
 
     color = draw(color, 4.0, blastpos, pos, v);
