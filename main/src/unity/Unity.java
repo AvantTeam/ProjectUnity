@@ -75,7 +75,7 @@ public class Unity extends Mod{
     /** Asynchronous process revolving around {@link Light} processing. */
     public static LightProcess lights;
     /** Asynchronous process revolving around content scoring system. */
-    public static NewContentScoreProcess scoring;
+    public static ContentScoreProcess scoring;
 
     /** All Unity's defined non-anonymous classes; the elements of this array will be generated. */
     @ListClasses
@@ -204,7 +204,7 @@ public class Unity extends Mod{
 
         asyncCore.processes.add(
             lights = new LightProcess(),
-            scoring = new NewContentScoreProcess()
+            scoring = new ContentScoreProcess()
         );
 
         Core.app.post(() -> {
