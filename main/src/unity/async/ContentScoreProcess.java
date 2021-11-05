@@ -588,6 +588,7 @@ public class ContentScoreProcess implements AsyncProcess{
                 if(gc.outputLiquid != null){
                     score += get(gc.outputLiquid.liquid).loadScore();
                 }
+                consTime = gc.craftTime;
             }
             score /= (conScore / consTime) + 1f;
             loaded = depthLoaded;
