@@ -1221,6 +1221,7 @@ public class UnityBullets{
             ratioStart = 600000f;
             status = weaken;
             statusDuration = 30f;
+            radius = 120f;
 
             modules = new AntiCheatBulletModule[]{
                 new ForceFieldDamageModule(5f, 10f, 1000f, 1f, 1f / 50f, 3f * 60f),
@@ -1246,16 +1247,7 @@ public class UnityBullets{
             pierceCap = 3;
             pierce = pierceBuilding = true;
             bleedDuration = 5f * 60f;
-        }
-
-            @Override
-            public void hit(Bullet b, float x, float y){
-                super.hit(b, x, y);
-                if(b.timer(1, 40f)){
-                    oppressionArea.create(b, b.x, b.y, b.rotation());
-                }
-            }
-        };
+        }};
 
         missileAntiCheat = new EndBasicBulletType(4f, 330f, "missile"){{
             lifetime = 60f;

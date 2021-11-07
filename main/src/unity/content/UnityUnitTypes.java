@@ -4392,9 +4392,8 @@ public class UnityUnitTypes{
 
                 reload = 2.3f * 60f;
                 shots = 5;
-                shotDelay = 9f;
+                shotDelay = 6f;
                 inaccuracy = 2f;
-                spacing = 15f;
 
                 bullet = UnityBullets.oppressionShell;
             }});
@@ -4465,28 +4464,61 @@ public class UnityUnitTypes{
                         }};
                     }}
                 ),
-                new Seq<Weapon>().addAll(new Weapon(name + "-destroyer-3"){{
-                    x = 98f;
-                    y = -26.25f;
-                    shootY = 6f;
+                new Seq<Weapon>().addAll(
+                    new SweepWeapon(name + "-oppressor"){{
+                        mirror = false;
 
-                    shootSound = Sounds.missile;
+                        x = 0f;
+                        y = 72f;
+                        shootY = 21f;
+                        layerOffset = 0.0001f;
 
-                    rotate = true;
-                    rotateSpeed = 4f;
-                    inaccuracy = 3f;
-                    xRand = 10.25f;
+                        rotateSpeed = 2f;
 
-                    shots = 13;
-                    shotDelay = 5f;
+                        reload = 4f * 60f;
 
-                    reload = 3f * 60f;
+                        bullet = new EndSweepLaser(7000f){{
+                            lifetime = 130f;
+                            length = 850f;
+                            overDamage = 640000f;
+                            overDamagePower = 2.7f;
+                            overDamageScl = 4000f;
+                            width = 25f;
+                            collisionWidth = (width / 2f) * widthLoss;
+                            distance = 220f;
 
-                    bullet = UnityBullets.missileAntiCheat.copy();
-                    bullet.drag = -0.01f;
-                    bullet.lifetime = 90f;
-                    bullet.homingRange = 90f;
-                }}),
+                            ratioStart = 14000f;
+                            ratioDamage = 1 / 10f;
+
+                            hitEffect = HitFx.endHitRedBig;
+                            hitBullet = UnityBullets.oppressionArea;
+                            pierce = true;
+                            pierceCap = 3;
+                        }};
+                    }},
+                    new Weapon(name + "-destroyer-3"){{
+                        x = 98f;
+                        y = -26.25f;
+                        shootY = 6f;
+
+                        shootSound = Sounds.missile;
+
+                        rotate = true;
+                        rotateSpeed = 4f;
+                        inaccuracy = 3f;
+                        xRand = 10.25f;
+
+                        shots = 13;
+                        shotDelay = 5f;
+
+                        reload = 3f * 60f;
+
+                        bullet = UnityBullets.missileAntiCheat.copy();
+                        bullet.drag = -0.01f;
+                        bullet.lifetime = 90f;
+                        bullet.homingRange = 90f;
+                    }}
+                ),
                 new Seq<Weapon>()
             };
         }};
