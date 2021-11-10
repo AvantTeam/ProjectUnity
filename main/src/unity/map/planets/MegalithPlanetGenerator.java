@@ -30,6 +30,12 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
     protected float scl = 4.5f;
     protected float waterOffset = 0.1f;
 
+    // 2D array of blocks, mapped like this:
+    //        | equator
+    //        |
+    // low ------------- high
+    //        |
+    //        | pole
     protected Block[][] blocks = {
         {deepwater, water, water, water, darksandWater, darksandWater, darksand, basalt, sharpslate, darksand},
         {deepwater, water, water, darksandWater, darksand, sharpslate, sharpslate, basalt, sharpslate, dacite},
@@ -47,20 +53,25 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
         {dacite, snow, snow, snow, sharpslate, snow, snow, iceSnow, ice, ice}
     };
 
+    // Clamp the lower height to this value, to avoid making the ground be lower than the water.
     protected float waterHeight = 2f / blocks[0].length;
 
+    // Crater center position.
     protected Vec3 crater = new Vec3(-0.023117876f, 0.36916345f, -0.9290769f);
+    // The radius of the crater.
     protected float craterRadius = 0.36f;
+    // The height bump of the crater.
     protected float craterDepth = 1f;
 
     protected boolean withinCrater(Vec3 position){
         return withinCrater(position, 0f);
     }
 
-    protected boolean withinCrater(Vec3 position, float excess){
-        return position.within(crater, craterRadius + excess);
+    protected boolean withinCrater(Vec3 position, float epsilon){
+        return position.within(crater, craterRadius + epsilon);
     }
 
+    // Gets a raw height from 3D simplex noise.
     protected float rawHeight(Vec3 position){
         Tmp.v33.set(position).scl(scl);
         float res = (Mathf.pow(Simplex.noise3d(0, 6d, 0.5d, 1d / 3d, Tmp.v33.x, Tmp.v33.y, Tmp.v33.z), 2.3f) + waterOffset) / (1f + waterOffset);
@@ -75,12 +86,14 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
         return res;
     }
 
+    // Gets the actual height of the mesh vertex, and clamp it to water height if not within crater.
     @Override
     public float getHeight(Vec3 position){
         float height = rawHeight(position);
         return withinCrater(position) ? height : Math.max(height, waterHeight);
     }
 
+    // The vertex color attribute, obtained from the block in the specific position.
     @Override
     public Color getColor(Vec3 position){
         Block block = getBlock(position);
@@ -104,6 +117,7 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
         }
     }
 
+    // Gets the block array in the planet ball position, sorted by their height.
     Block[] getBlockset(Vec3 position){
         position = Tmp.v33.set(position).scl(scl);
 
@@ -116,6 +130,7 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
         return blocks[Mathf.clamp((int)(temp * blocks.length), 0, blocks.length - 1)];
     }
 
+    // Gets the block from the block set at the specific position, and avoids returning a liquid block if is within the crater.
     protected Block getBlock(Vec3 position){
         Block[] set = getBlockset(position);
 
@@ -135,12 +150,14 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
         return Simplex.noise3d(0, octaves, falloff, 1f / scl, v.x, v.y, v.z) * (float)mag;
     }
 
+    // I hate repetitions.
     protected void clamp(Vec2 vec){
         float margin = width / 16f;
         vec.x = Math.max(Math.min(vec.x, width - margin), margin);
         vec.y = Math.max(Math.min(vec.y, width - margin), margin);
     }
 
+    // Since every sector whose (id % 10 == 0) in Megalith has a lore message block, avoid said sector from generating enemy base.
     @Override
     public void generateSector(Sector sector){
         if(sector.id % 10 == 0){
@@ -151,13 +168,14 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
         super.generateSector(sector);
     }
 
+    // Does the actual sector tiles generation.
     @Override
     protected void generate(){
-        //temporary "room" class, used for opening up spaces in the tile set
+        // Temporary "room" class, used for opening up spaces in the tile set.
         class Room{
             final String name;
-            final int x;
-            final int y;
+            final int x; // Tile X.
+            final int y; // Tile Y.
             final int radius;
 
             final ObjectSet<Room> connected = new ObjectSet<>();
@@ -165,6 +183,7 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
             Room(String name, int x, int y, int radius){
                 this.name = name;
 
+                // Ensure the room is within bounds.
                 if((x < 0 || x >= width) || (y < 0 || y >= height)){
                     throw new IllegalArgumentException(Strings.format("'@' out of bounds: (@, @) must be between (@, @) and exclusive (@, @)", name, x, y, 0, 0, width, height));
                 }
@@ -183,6 +202,8 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
                 float nscl = rand.random(12f, 48f);
                 int stroke = rand.random(4, 12);
 
+                // brush(): Brushes the map tiles with walls. This will be inverse-floodfilled later.
+                // pathfind(): Finds the path from this room to the other, with the cost of tile solidity and a little noising for naturality.
                 brush(pathfind(x, y, to.x, to.y, tile -> (tile.solid() ? 5f : 0f) + noise(tile.x, tile.y, 1, 1, 1f / nscl) * 32f, Astar.manhattan), stroke);
             }
         }
@@ -190,7 +211,7 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
         cells(4);
         distort(10f, 12f);
 
-        //generate empty rooms
+        // Generate empty rooms.
         float roomPos = width / 2f / Mathf.sqrt3;
         int roomMin = 4, roomMax = 8, roomCount = rand.random(roomMin, roomMax);
         Seq<Room> rooms = new Seq<>();
@@ -206,7 +227,7 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
             rooms.add(new Room("Room-" + i, (int)Tmp.v2.x, (int)Tmp.v2.y, (int)rad));
         }
 
-        //generate spawn and enemy rooms
+        // Generate spawn and enemy rooms.
         Room[] spawn = {null};
         Seq<Room> enemies = new Seq<>();
         int enemySpawns = rand.random(2, Math.max((int)(sector.threat * 4), 2));
@@ -257,24 +278,24 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
             }
         }
 
+        // Clear out openings for each rooms.
         Unity.print(LogLevel.debug, Strings.format("Generated @ rooms", rooms.size));
         for(Room room : rooms){
             Unity.print(LogLevel.debug, Strings.format("Generated room @", room.name));
             erase(room.x, room.y, room.radius);
         }
 
-        //connect random rooms
+        // Connect random rooms.
         int connections = rand.random(Math.max(roomCount - 1, 1), roomCount + 3);
         for(int i = 0; i < connections; i++){
             rooms.random(rand).connect(rooms.random(rand));
         }
 
-        //connect all rooms to the spawn room
+        // Connect all rooms to the spawn room.
         for(Room r : rooms){
             spawn[0].connect(r);
         }
 
-        //room post-processing
         cells(1);
         distort(10f, 6f);
 
@@ -282,13 +303,13 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
 
         float difficulty = sector.threat;
 
-        //replace sand with dark sand
+        // Replace sand with dark sand.
         pass((x, y) -> {
             if(floor == sand) floor = darksand;
             if(block == sandWall) block = duneWall;
         });
 
-        //noise archaic and infused sharpslates
+        // Noise archaic and infused sharpslates.
         pass((x, y) -> {
             if(floor == sharpslate){
                 float sel = noise(x, y, 4d, 17d, 460d, 0.84d);
@@ -309,7 +330,7 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
             }
         });
 
-        //scatter archaic energies on top of archaic sharpslates
+        // Scatter archaic energies on top of archaic sharpslates.
         Block target = archSharpslate;
         Block over = archEnergy;
         pass((x, y) -> {
@@ -335,35 +356,26 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
             }
         });
 
-        //generate ore frequencies
+        // Generate ore frequencies.
         Seq<Block> ores = Seq.with(Blocks.oreCopper, Blocks.oreLead, UnityBlocks.oreMonolite);
 
         float poles = Math.abs(sector.tile.v.y);
         float nmag = 0.5f;
         float addscl = 1.3f;
 
-        if(Simplex.noise3d(0, 2d, 0.5d, 1d, sector.tile.v.x, sector.tile.v.y, sector.tile.v.z) * nmag + poles > 0.25d * addscl){
-            ores.add(Blocks.oreCoal);
-        }
+        // Put ore existence based on sector position.
+        if(Simplex.noise3d(0, 2d, 0.5d, 1d, sector.tile.v.x, sector.tile.v.y, sector.tile.v.z) * nmag + poles > 0.25d * addscl) ores.add(Blocks.oreCoal);
+        if(Simplex.noise3d(0, 2d, 0.5d, 1d, sector.tile.v.x + 1f, sector.tile.v.y, sector.tile.v.z) * nmag + poles > 0.5d * addscl) ores.add(Blocks.oreTitanium);
+        if(Simplex.noise3d(0, 2d, 0.5d, 1d, sector.tile.v.x + 2f, sector.tile.v.y, sector.tile.v.z) * nmag + poles > 0.7d * addscl) ores.add(Blocks.oreThorium);
+        if(rand.chance(0.3f)) ores.add(Blocks.oreScrap);
 
-        if(Simplex.noise3d(0, 2d, 0.5d, 1d, sector.tile.v.x + 1f, sector.tile.v.y, sector.tile.v.z) * nmag + poles > 0.5d * addscl){
-            ores.add(Blocks.oreTitanium);
-        }
-
-        if(Simplex.noise3d(0, 2d, 0.5d, 1d, sector.tile.v.x + 2f, sector.tile.v.y, sector.tile.v.z) * nmag + poles > 0.7d * addscl){
-            ores.add(Blocks.oreThorium);
-        }
-
-        if(rand.chance(0.3f)){
-            ores.add(Blocks.oreScrap);
-        }
-
+        // The actual ore frequencies.
         FloatSeq frequencies = new FloatSeq();
         for(int i = 0; i < ores.size; i++){
             frequencies.add(rand.random(-0.09f, 0.01f) - i * 0.01f);
         }
 
-        //generate ores in tile set
+        // Generate ore tiles in the map.
         pass((x, y) -> {
             if(floor.asFloor().isLiquid) return;
 
@@ -384,10 +396,11 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
             }
         });
 
+        // Post-processing.
         trimDark();
         inverseFloodFill(tiles.getn(spawn[0].x, spawn[0].y));
 
-        //generate random lore message block
+        // Generate random lore message block.
         if(!sector.hasEnemyBase()){
             Seq<Room> msgRoom = rooms.select(r ->
                 r != spawn[0] &&
@@ -455,11 +468,11 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
             }
         }
 
-        //place launch loadout + enemy spawn point
+        // Place launch loadout + enemy spawn point.
         Schematics.placeLaunchLoadout(spawn[0].x, spawn[0].y);
         enemies.each(espawn -> tiles.getn(espawn.x, espawn.y).setOverlay(Blocks.spawn));
 
-        //generate enemy base if necessary
+        // Generate enemy base if necessary.
         if(sector.hasEnemyBase()){
             basegen.generate(tiles, enemies.map(r -> tiles.getn(r.x, r.y)), tiles.getn(spawn[0].x, spawn[0].y), state.rules.waveTeam, sector, difficulty);
 
@@ -468,7 +481,7 @@ public class MegalithPlanetGenerator extends PlanetGenerator{
             state.rules.winWave = sector.info.winWave = 15 * (int)Math.max(difficulty * 5f, 1f);
         }
 
-        //rules applications
+        // Rules applications.
         float waveTimeDec = 0.3f;
 
         state.rules.waveSpacing = Mathf.lerp(Time.toSeconds * 50f * 2f, Time.toSeconds * 40f, Math.max(difficulty - waveTimeDec, 0) / 0.8f);
