@@ -11,7 +11,6 @@ import mindustry.entities.*;
 import mindustry.entities.Effect.*;
 import mindustry.graphics.*;
 import unity.entities.bullet.anticheat.*;
-import unity.entities.bullet.laser.*;
 import unity.entities.effects.*;
 
 import static arc.graphics.g2d.Draw.color;
@@ -22,6 +21,11 @@ public class SpecialFx{
     public static Effect
 
     fragmentation = new FragmentationShaderEffect(3.5f * 60f),
+
+    fragmentationFast = new FragmentationShaderEffect(1.5f * 60f){{
+        fragOffset = 0f;
+        heatOffset = 0f;
+    }},
 
     endgameVapourize = new VapourizeShaderEffect(3f * 60f, 900f).updateVel(false),
 

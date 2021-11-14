@@ -4365,7 +4365,7 @@ public class UnityUnitTypes{
             segmentOffset = 114f * 2f;
             segmentLength = 60;
             segmentCast = 11;
-            barrageRange = 390f;
+            barrageRange = 490f;
             lowAltitude = true;
             visualElevation = 3f;
             rotateSpeed = 2.2f;
@@ -4517,6 +4517,31 @@ public class UnityUnitTypes{
                         bullet.drag = -0.01f;
                         bullet.lifetime = 90f;
                         bullet.homingRange = 90f;
+                    }}
+                ),
+                new Seq<Weapon>().addAll(
+                    new Weapon(name + "-void"){{
+                        mirror = false;
+
+                        x = 0f;
+                        y = 72f;
+                        shootY = 21f;
+                        layerOffset = 0.0001f;
+
+                        rotate = true;
+                        rotateSpeed = 1.3f;
+
+                        reload = 6f * 60f;
+
+                        bullet = new VoidPortalBulletType(1300f){{
+                            hitEffect = HitFx.voidHit;
+                            shootEffect = ShootFx.voidShoot;
+                            bleedDuration = 180f;
+                            modules = new AntiCheatBulletModule[]{
+                            new ForceFieldDamageModule(200f, 40f, 1500f, 1f, 1f / 50f, 4f * 60f),
+                            new ArmorDamageModule(0.1f, 70f, 30f, 0.9f)
+                            };
+                        }};
                     }}
                 ),
                 new Seq<Weapon>()

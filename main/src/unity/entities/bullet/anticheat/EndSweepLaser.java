@@ -80,8 +80,8 @@ public class EndSweepLaser extends AntiCheatBulletTypeBase{
             Vec2 v = Tmp.v1.trns(b.rotation(), len).add(b);
             Utils.collideLineRawEnemy(b.team, b.x, b.y, v.x, v.y, collisionWidth, (building, direct) -> {
                 if(direct){
-                    if(pierceIdx <= 0) pierceIdx--;
-                    len = b.dst(building);
+                    pierceIdx--;
+                    if(pierceIdx <= 0) len = b.dst(building);
                     hitBuildingAntiCheat(b, building);
                 }
                 return pierceIdx <= 0;
