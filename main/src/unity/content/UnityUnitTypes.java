@@ -137,6 +137,8 @@ public class UnityUnitTypes{
     // end
     public static @FactionDef("end") @EntityDef({Unitc.class, Endc.class}) UnitType voidVessel;
 
+    public static @FactionDef("end") @EntityDef({Unitc.class, Endc.class, TimeStopVelc.class}) UnitType chronos;
+
     // end invisible
     public static @FactionDef("end") @EntityDef({Unitc.class, Endc.class, Invisiblec.class}) UnitType opticaecus;
 
@@ -4137,6 +4139,23 @@ public class UnityUnitTypes{
                     };
                 }};
             }});
+        }};
+
+        chronos = new UnityUnitType("chronos"){{
+            health = 17000f;
+            speed = 2f;
+            accel = 0.1f;
+            drag = 0.08f;
+            hitSize = 36f;
+            engineOffset = 19f;
+            engineSize = 4f;
+            flying = true;
+            lowAltitude = true;
+            outlineColor = UnityPal.darkerOutline;
+
+            antiCheatType = new AntiCheatVariables(health / 20f, health / 1.25f, health / 15f, health / 25f, 0.2f, 6f * 60f, 3f * 60f, 15f, 4);
+
+            abilities.add(new TimeStopAbility(unit -> false, 15f * 60, 10f * 60));
         }};
 
         opticaecus = new InvisibleUnitType("opticaecus"){{

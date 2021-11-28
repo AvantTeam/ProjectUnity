@@ -5,6 +5,7 @@ import arc.graphics.*;
 import arc.util.*;
 import mindustry.entities.*;
 import mindustry.entities.abilities.*;
+import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
@@ -49,26 +50,13 @@ public abstract class BaseAbility extends Ability implements TapListener{
     public Effect delayEffect = UnityFx.smallRingFx;
 
     protected Boolf<Unit> able;
-    protected boolean waited;
+    protected boolean waited, added = false;
+    protected UnitController controller;
 
     protected BaseAbility(Boolf<Unit> able, boolean interactive, boolean useTap){
         this.able = able;
         this.interactive = interactive;
         this.useTap = useTap;
-    }
-
-    @Override
-    public Ability copy(){
-        try{
-			BaseAbility ability = (BaseAbility)clone();
-            if(ability.interactive && ability.useTap){
-                Unity.tap.addListener(ability);
-            }
-
-            return ability;
-		}catch(CloneNotSupportedException e){
-			throw new RuntimeException(e);
-		}
     }
 
     public boolean able(Unit unit){
@@ -82,9 +70,7 @@ public abstract class BaseAbility extends Ability implements TapListener{
     @Override
     public void tap(Player player, float x, float y){
         Unit unit = player.unit();
-        if(!unit.isValid() || !unit.abilities.contains(this)){
-            Unity.tap.removeListener(this);
-        }else{
+        if(unit.isValid() && unit.controller() == controller){
             if(useSlots && delayProgress >= delayTime){
                 use(unit, x, y);
                 return;
@@ -119,6 +105,18 @@ public abstract class BaseAbility extends Ability implements TapListener{
 
     @Override
     public void update(Unit unit){
+        if(useTap && controller != unit.controller()){
+            if(unit.getPlayer() == player){
+                if(!added){
+                    Unity.tap.addListener(this);
+                    added = true;
+                }
+            }else if(added){
+                Unity.tap.removeListener(this);
+                added = false;
+            }
+            controller = unit.controller();
+        }
         if(interactive){
             updateInteractive(unit);
         }else{
@@ -129,7 +127,7 @@ public abstract class BaseAbility extends Ability implements TapListener{
     public void updateInteractive(Unit unit){
         if(useSlots){
             if(slot >= slots){
-                rechargeProgress = Math.min(rechargeProgress + Time.delta, rechargeTime);
+                if(shouldRecharge(unit)) rechargeProgress = Math.min(rechargeProgress + Time.delta, rechargeTime);
                 if(rechargeProgress >= rechargeTime){
                     delayProgress = delayTime;
                     rechargeProgress = 0f;
@@ -156,7 +154,7 @@ public abstract class BaseAbility extends Ability implements TapListener{
                 }
             }
         }else{
-            rechargeProgress = Math.min(rechargeProgress + Time.delta, rechargeTime);
+            if(shouldRecharge(unit)) rechargeProgress = Math.min(rechargeProgress + Time.delta, rechargeTime);
             if(rechargeProgress >= rechargeTime && able(unit)){
                 rechargeProgress = 0f;
                 use(unit);
@@ -165,6 +163,10 @@ public abstract class BaseAbility extends Ability implements TapListener{
     }
 
     public void updatePassive(Unit unit){}
+
+    protected boolean shouldRecharge(Unit unit){
+        return true;
+    }
 
     public class WaitEffectData{
         protected Unit unit;
