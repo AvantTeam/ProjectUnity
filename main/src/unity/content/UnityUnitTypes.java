@@ -4156,6 +4156,16 @@ public class UnityUnitTypes{
             antiCheatType = new AntiCheatVariables(health / 20f, health / 1.25f, health / 15f, health / 25f, 0.2f, 6f * 60f, 3f * 60f, 15f, 4);
 
             abilities.add(new TimeStopAbility(unit -> false, 15f * 60, 10f * 60));
+
+            weapons.add(new Weapon("unity-end-point-defence"){{
+                x = 12f;
+                y = -7.5f;
+                reload = 12f;
+                rotate = true;
+                rotateSpeed = 5f;
+
+                bullet = new TimeStopBulletType(6f, 510f);
+            }});
         }};
 
         opticaecus = new InvisibleUnitType("opticaecus"){{

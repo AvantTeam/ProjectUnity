@@ -19,7 +19,7 @@ import unity.util.*;
 
 public class TimeStop{
     private final static float lerpTime = 20f, error = 0.000002f * lerpTime;
-    private final static float slowDownTime = 60f;
+    private final static float slowDownTime = 30f;
     private final static Seq<TimeStopEntity> entities = new Seq<>();
     private final static IntMap<TimeStopEntity> map = new IntMap<>(102);
     private final static BasicPool<TimeStopEntity> pool = new BasicPool<>(8, 200, TimeStopEntity::new);
@@ -112,13 +112,13 @@ public class TimeStop{
 
                 if(valid){
                     float d = delta * Mathf.clamp(te.time / slowDownTime);
-                    boolean isLocal = te.entity.isLocal();
+                    boolean isPlayer = te.entity instanceof Unit && ((Unit)te.entity).controller() == Vars.player;
                     te.fakeTime += d;
                     Time.delta = d;
                     //TODO fix Intervals
                     Time.time = te.fakeTime;
 
-                    if(isLocal){
+                    if(isPlayer){
                         Unit u = (Unit)te.entity;
                         if(Vars.mobile){
                             updateMovementMobile(u);
@@ -129,7 +129,7 @@ public class TimeStop{
 
                     te.entity.update();
 
-                    if(isLocal){
+                    if(isPlayer){
                         Position p = (Position)te.entity;
                         Core.camera.position.set(p);
                     }
