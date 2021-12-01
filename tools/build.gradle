@@ -8,14 +8,17 @@ final def dexedJar = (project(':main').tasks.dex as Jar).archiveFile.get().asFil
 final def distJar = (project(':main').tasks.deploy as Jar).archiveFile.get().asFile
 final def regularJar = (project(':main').tasks.jar as Jar).archiveFile.get().asFile
 
-final def cp = dexedJar.exists() ? dexedJar : distJar.exists() ? distJar : regularJar
+final def cp =
+    taskNames.contains('main:dex') ? dexedJar :
+    taskNames.contains('main:deploy') ? distJar :
+    dexedJar.exists() ? dexedJar :
+    distJar.exists() ? distJar :
+    regularJar
 
 dependencies{
     if(
-        !cp.exists() ||
-        toolRecompile ||
-        taskNames.contains('main:deploy') ||
-        taskNames.contains('main:dex')
+        !cp.exists() || toolRecompile ||
+        taskNames.contains('main:deploy') || taskNames.contains('main:dex')
     ){
         implementation project(':main')
         if(taskNames.contains('tools:proc')) println 'Compiling :main project before processing assets...'
