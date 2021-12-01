@@ -40,6 +40,7 @@ import unity.type.weapons.*;
 import static mindustry.Vars.*;
 import static unity.content.UnityWeaponTemplates.*;
 
+@SuppressWarnings("unchecked")
 public class UnityUnitTypes{
     // global unit + copter
     public static @EntityDef({Unitc.class, Copterc.class})
@@ -135,6 +136,8 @@ public class UnityUnitTypes{
 
     // end
     public static @FactionDef("end") @EntityDef({Unitc.class, Endc.class}) UnitType voidVessel;
+
+    public static @FactionDef("end") @EntityDef({Unitc.class, Endc.class, TimeStopVelc.class}) UnitType chronos;
 
     // end invisible
     public static @FactionDef("end") @EntityDef({Unitc.class, Endc.class, Invisiblec.class}) UnitType opticaecus;
@@ -4138,6 +4141,33 @@ public class UnityUnitTypes{
             }});
         }};
 
+        chronos = new UnityUnitType("chronos"){{
+            health = 17000f;
+            speed = 2f;
+            accel = 0.1f;
+            drag = 0.08f;
+            hitSize = 36f;
+            engineOffset = 19f;
+            engineSize = 4f;
+            flying = true;
+            lowAltitude = true;
+            outlineColor = UnityPal.darkerOutline;
+
+            antiCheatType = new AntiCheatVariables(health / 20f, health / 1.25f, health / 15f, health / 25f, 0.2f, 6f * 60f, 3f * 60f, 15f, 4);
+
+            abilities.add(new TimeStopAbility(unit -> false, 15f * 60, 10f * 60));
+
+            weapons.add(new Weapon("unity-end-point-defence"){{
+                x = 12f;
+                y = -7.5f;
+                reload = 12f;
+                rotate = true;
+                rotateSpeed = 5f;
+
+                bullet = new TimeStopBulletType(6f, 510f);
+            }});
+        }};
+
         opticaecus = new InvisibleUnitType("opticaecus"){{
             health = 60000f;
             speed = 1.8f;
@@ -4165,6 +4195,8 @@ public class UnityUnitTypes{
                     width = 30f;
                     length = 390f;
                     largeHit = true;
+
+                    hitEffect = HitFx.endHitRedBig;
                 }};
             }}, new Weapon("unity-doeg-launcher"){{
                 x = 24.75f;
@@ -4186,6 +4218,8 @@ public class UnityUnitTypes{
                     weaveMag = 2f;
                     width *= 1.6f;
                     height *= 2.1f;
+
+                    hitEffect = HitFx.endHitRedSmall;
                 }};
             }});
         }};
@@ -4236,6 +4270,8 @@ public class UnityUnitTypes{
 
                 backColor = hitColor = lightColor = UnityPal.scarColor;
                 frontColor = UnityPal.endColor;
+
+                hitEffect = HitFx.endHitRedSmall;
             }};
 
             weapons.add(new Weapon(){{
@@ -4300,6 +4336,8 @@ public class UnityUnitTypes{
 
                     backColor = trailColor = hitColor = lightColor = UnityPal.scarColor;
                     frontColor = UnityPal.endColor;
+
+                    hitEffect = HitFx.endHitRedSmall;
                 }};
             }}, new Weapon("unity-doeg-destroyer"){{
                 mirror = true;
@@ -4351,12 +4389,12 @@ public class UnityUnitTypes{
                 segments = 2;
             }};
             splittable = chainable = false;
-            hitSize = (114f * 2f) - 6f;
+            hitSize = (114f * 2f) - 10f;
             angleLimit = 35f;
             segmentOffset = 114f * 2f;
             segmentLength = 60;
             segmentCast = 11;
-            barrageRange = 340f;
+            barrageRange = 490f;
             lowAltitude = true;
             visualElevation = 3f;
             rotateSpeed = 2.2f;
@@ -4371,7 +4409,172 @@ public class UnityUnitTypes{
 
             immuneAll = true;
 
-            antiCheatType = new AntiCheatVariables(health / 600f, health / 190f, health / 610f, health / 100f, 0.6f, 7f * 60f, 8f * 60f, 35f, 4);
+            antiCheatType = new AntiCheatVariables(8000, health / 190f, 10000f, health / 100f, 0.6f, 7f * 60f, 8f * 60f, 35f, 3);
+
+            weapons.add(new Weapon(name + "-destroyer-1"){{
+                x = 81.75f;
+                y = -71.5f;
+                shootY = 9.75f;
+                
+                rotate = true;
+                rotateSpeed = 1.75f;
+
+                reload = 2.3f * 60f;
+                shots = 5;
+                shotDelay = 6f;
+                inaccuracy = 2f;
+
+                bullet = UnityBullets.oppressionShell;
+            }});
+
+            segmentWeapons = new Seq[]{
+                new Seq<Weapon>().addAll(
+                    new Weapon(name + "-soul-destroyer"){{
+                        mirror = false;
+
+                        x = 0f;
+                        y = 72f;
+                        shootY = 0f;
+                        layerOffset = 0.0001f;
+
+                        rotate = true;
+                        rotateSpeed = 1.5f;
+
+                        reload = 4.75f * 60f;
+
+                        bullet = new EndRailBulletType(){{
+                            damage = 15000f;
+                            length = 850f;
+                            updateEffectSeg = 50f;
+                            pierceDamageFactor = 0.001f;
+
+                            overDamage = 640000f;
+                            overDamagePower = 2.7f;
+                            overDamageScl = 4000f;
+
+                            ratioStart = 14000f;
+                            ratioDamage = 1 / 10f;
+
+                            hitEffect = HitFx.endHitRail;
+
+                            modules = new AntiCheatBulletModule[]{
+                            new ForceFieldDamageModule(150f, 10f, 500f, 0.5f, 1f / 20f, 10f * 60f),
+                            new ArmorDamageModule(1f / 20f, 20f, 25f, 40f).set(10f, 2f)
+                            };
+                        }};
+                    }},
+                    new Weapon(name + "-destroyer-2"){{
+                        x = 98f;
+                        y = -26.25f;
+                        shootY = 22f;
+                        shootCone = 0.5f;
+                        alternate = false;
+
+                        rotate = true;
+                        rotateSpeed = 1.75f;
+                        continuous = true;
+
+                        reload = 3.5f * 60f;
+
+                        bullet = new EndContinuousLaserBulletType(550f){{
+                            lifetime = 1.5f * 60;
+                            length = 370f;
+                            for(int i = 0; i < strokes.length; i++){
+                                strokes[i] *= 0.7f;
+                            }
+                            overDamage = 800000f;
+                            ratioDamage = 1f / 45f;
+                            ratioStart = 800000f;
+                            colors = new Color[]{UnityPal.scarColorAlpha, UnityPal.scarColor, UnityPal.endColor, Color.white};
+                            modules = new AntiCheatBulletModule[]{
+                            new ForceFieldDamageModule(40f, 20f, 2000f, 1f, 1f / 40f, 3f * 60f),
+                            new ArmorDamageModule(0.1f, 30f, 30f, 0.4f)
+                            };
+                        }};
+                    }}
+                ),
+                new Seq<Weapon>().addAll(
+                    new SweepWeapon(name + "-oppressor"){{
+                        mirror = false;
+
+                        x = 0f;
+                        y = 72f;
+                        shootY = 21f;
+                        layerOffset = 0.0001f;
+
+                        rotateSpeed = 2f;
+
+                        reload = 4f * 60f;
+
+                        bullet = new EndSweepLaser(7000f){{
+                            lifetime = 130f;
+                            length = 850f;
+                            overDamage = 640000f;
+                            overDamagePower = 2.7f;
+                            overDamageScl = 4000f;
+                            width = 25f;
+                            collisionWidth = (width / 2f) * widthLoss;
+                            distance = 220f;
+
+                            ratioStart = 14000f;
+                            ratioDamage = 1 / 10f;
+
+                            hitEffect = HitFx.endHitRedBig;
+                            hitBullet = UnityBullets.oppressionArea;
+                            pierce = true;
+                            pierceCap = 3;
+                        }};
+                    }},
+                    new Weapon(name + "-destroyer-3"){{
+                        x = 98f;
+                        y = -26.25f;
+                        shootY = 6f;
+
+                        shootSound = Sounds.missile;
+
+                        rotate = true;
+                        rotateSpeed = 4f;
+                        inaccuracy = 3f;
+                        xRand = 10.25f;
+
+                        shots = 13;
+                        shotDelay = 5f;
+
+                        reload = 3f * 60f;
+
+                        bullet = UnityBullets.missileAntiCheat.copy();
+                        bullet.drag = -0.01f;
+                        bullet.lifetime = 90f;
+                        bullet.homingRange = 90f;
+                    }}
+                ),
+                new Seq<Weapon>().addAll(
+                    new Weapon(name + "-void"){{
+                        mirror = false;
+
+                        x = 0f;
+                        y = 72f;
+                        shootY = 21f;
+                        layerOffset = 0.0001f;
+
+                        rotate = true;
+                        rotateSpeed = 1.3f;
+
+                        reload = 6f * 60f;
+
+                        bullet = new VoidPortalBulletType(1300f){{
+                            hitEffect = HitFx.voidHit;
+                            shootEffect = ShootFx.voidShoot;
+                            bleedDuration = 180f;
+                            modules = new AntiCheatBulletModule[]{
+                            new ForceFieldDamageModule(200f, 40f, 1500f, 1f, 1f / 50f, 4f * 60f),
+                            new ArmorDamageModule(0.1f, 70f, 30f, 0.9f)
+                            };
+                        }};
+                    }}
+                ),
+                new Seq<Weapon>()
+            };
         }};
 
         apocalypse = new InvisibleUnitType("apocalypse"){{
@@ -4479,6 +4682,8 @@ public class UnityUnitTypes{
                     overDamage = 500000f;
                     ratioDamage = 1f / 100f;
                     ratioStart = 7000f;
+
+                    hitEffect = HitFx.endHitRedBig;
                 }};
             }});
 
@@ -4743,6 +4948,9 @@ public class UnityUnitTypes{
                     fragVelocityMax = 1.2f;
                     fragVelocityMin = 0.5f;
                     fragCone = 120f;
+
+                    hitEffect = HitFx.endHitRedSmall;
+
                     fragBullet = new VoidFractureBulletType(15f, 100f){{
                         width = 9.5f;
                         widthTo = 2f;
@@ -4791,6 +4999,8 @@ public class UnityUnitTypes{
                     splashDamageRadius = 80f;
                     width = 15f;
                     height = 21f;
+
+                    hitEffect = HitFx.endHitRedSmall;
                 }};
             }};
 
@@ -4981,6 +5191,8 @@ public class UnityUnitTypes{
                     ratioStart = 11000f;
                     bleedDuration = 10f * 60f;
 
+                    hitEffect = HitFx.endHitRedSmall;
+
                     laserColors = new Color[]{UnityPal.scarColorAlpha, UnityPal.scarColor, UnityPal.endColor, Color.black};
                 }};
                 range = bullet.range();
@@ -5113,6 +5325,9 @@ public class UnityUnitTypes{
                     maxTargets = 20;
                     shootEffect = ShootFx.voidShoot;
 
+                    hitEffect = HitFx.voidHitBig;
+                    smokeEffect = HitFx.voidHit;
+
                     modules = new AntiCheatBulletModule[]{
                         new ArmorDamageModule(50f, 50f, 2f),
                         new ForceFieldDamageModule(2f, 20f, 220f, 7f, 1f / 50f, 2f * 60f)
@@ -5149,8 +5364,8 @@ public class UnityUnitTypes{
                     ratioDamage = 1f / 400f;
                     ratioStart = 2000f;
 
-                    hitEffect = Fx.blastExplosion;
-                    despawnEffect = Fx.blastExplosion;
+                    hitEffect = HitFx.endHitRedSmall;
+                    despawnEffect = HitFx.endHitRedSmall;
 
                     backColor = lightColor = trailColor = UnityPal.scarColor;
                     frontColor = UnityPal.endColor;
@@ -5261,6 +5476,8 @@ public class UnityUnitTypes{
                         ratioDamage = 1f / 200f;
                         ratioStart = 20000f;
                         bleedDuration = 600f;
+
+                        hitEffect = HitFx.endHitRedBig;
 
                         modules = new AntiCheatBulletModule[]{
                         new ArmorDamageModule(0.01f, 3f, 40f, 5f),

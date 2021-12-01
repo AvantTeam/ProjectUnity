@@ -305,7 +305,10 @@ abstract class WormComp implements Unitc{
                 float offset = self() == last ? uType.headOffset : 0f;
                 Tmp.v1.trns(last.rotation + 180f, (uType.segmentOffset / 2f) + offset).add(last);
 
-                float angTo = u.angleTo(Tmp.v1);
+                float rdx = u.deltaX - last.deltaX;
+                float rdy = u.deltaY - last.deltaY;
+
+                float angTo = !uType.preventDrifting || (last.deltaLen() > 0.001f && (rdx * rdx) + (rdy * rdy) > 0.00001f) ? u.angleTo(Tmp.v1) : u.rotation;
 
                 u.rotation = angTo - (Utils.angleDistSigned(angTo, last.rotation, uType.angleLimit) * (1f - uType.anglePhysicsSmooth));
                 u.trns(Tmp.v3.trns(u.rotation, last.deltaLen()));

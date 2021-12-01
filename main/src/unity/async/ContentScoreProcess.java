@@ -1,656 +1,640 @@
 package unity.async;
 
 import arc.*;
+import arc.func.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.struct.ObjectMap.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.async.*;
+import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.bullet.*;
-import mindustry.game.EventType.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 import mindustry.world.blocks.defense.*;
 import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.blocks.environment.*;
+import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.blocks.units.*;
 import mindustry.world.blocks.units.UnitFactory.*;
 import mindustry.world.consumers.*;
 import unity.*;
 
-import java.util.*;
-
 import static mindustry.Vars.*;
+import static mindustry.ctype.ContentType.*;
 
 @SuppressWarnings("unchecked")
 public class ContentScoreProcess implements AsyncProcess{
-    private static final int iterationError = 5, skipIteration = 7;
-    private volatile boolean init = false, processing = false, finished = false;
-    private final Seq<ContentScore> unloaded = new Seq<>();
-    private final IntSet[] unloadedSet = new IntSet[ContentType.all.length];
-    private Seq<Content>[][] origins;
-    private ContentScore[][] items;
-
-    public ContentScoreProcess(){
-        Events.on(ContentInitEvent.class, event -> init = true);
-    }
+    static final float stackConstant = 2.5f;
+    static final int maxDepth = 128;
+    final Seq<ContentScore> unloaded = new Seq<>(), allScores = new Seq<>();
+    final Seq<Floor> ores = new Seq<>();
+    volatile boolean processing = false, finished = false;
+    EnumSet<ContentType> blackListed = EnumSet.of(mech_UNUSED, weather, effect_UNUSED, sector, loadout_UNUSED, typeid_UNUSED, error, planet, ammo_UNUSED);
+    ContentScore[][] scores;
+    int depth;
+    boolean depthLoaded;
 
     @Override
     public void process(){
-        if(init){
+        if(!finished){
             processing = true;
-            Core.app.post(() -> Unity.print("Content Score Begin"));
-            items = new ContentScore[ContentType.all.length][0];
-            origins = new Seq[ContentType.all.length][0];
-            for(ContentType type : ContentType.all){
-                switch(type){
-                    case block -> {
-                        origins[type.ordinal()] = new Seq[content.getBy(type).size];
-                        items[type.ordinal()] = new ContentScore[content.getBy(type).size];
-                        for(Content c : content.getBy(type)){
-                            if(c instanceof Block b && b.synthetic()) addContent(new ContentScore(c));
-                        }
-                    }
-                    case bullet -> {
-                        origins[type.ordinal()] = new Seq[content.getBy(type).size];
-                        items[type.ordinal()] = new ContentScore[content.getBy(type).size];
-                        for(Content c : content.getBy(type)){
-                            bulletScore((BulletType)c);
-                        }
-                    }
-                    case item, status, liquid, unit -> {
-                        origins[type.ordinal()] = new Seq[content.getBy(type).size];
-                        items[type.ordinal()] = new ContentScore[content.getBy(type).size];
-                        for(Content c : content.getBy(type)){
-                            addContent(new ContentScore(c));
-                        }
-                    }
-                }
-            }
-            for(ContentType type : ContentType.all){
-                //items[type.ordinal()] = new ContentScore[content.getBy(type).size];
-                for(Content content : content.getBy(type)){
-                    switch(type){
-                        case block -> handleBlock((Block)content);
-                        case item -> handleItem((Item)content, false);
-                        case liquid -> handleLiquid((Liquid)content, true);
-                        case unit, status -> {
-                            ContentScore cs = get(content);
-                            cs.loaded = false;
-                            addUnloaded(cs);
-                        }
-                    }
-                }
-            }
-            int l = 0;
-            int e = 0;
-            int er = 0;
-            while(unloaded.size > 0 && e < iterationError){
-                if(l == unloaded.size){
-                    e++;
-                    er++;
-                }else{
-                    e = 0;
-                }
-                l = unloaded.size;
-                unloaded.removeAll(cs -> {
-                    cs.updateScore();
-                    return cs.loaded;
-                });
-            }
-            int er2 = er;
+            long lt = System.nanoTime();
 
-            init = false;
-            finished = true;
-            Core.app.post(() -> Unity.print("Content Score Complete: " + er2));
-            StringBuilder out = new StringBuilder(64);
-            int s = 0;
-            int v;
-            for(ContentScore[] i : items){
-                v = 0;
-                out.append(ContentType.all[s].name()).append(":\n");
-                for(ContentScore score : i){
-                    if(score == null) continue;
-                    out.append(score.content.toString()).append(": ")
-                    .append("Score: ").append(score.loaded ? score.score : "unloaded")
-                    .append(", Output Score: ").append(score.loaded ? score.outputScore : "unloaded")
-                    .append(", Artificial: ").append(score.artificial)
-                    .append("\n")
-                    .append("Sources: ");
+            ContentLoader l = content;
 
-                    Seq<Content> origins = score.origins();
-                    if(origins != null){
-                        for(Content c : origins){
-                            out.append(c.toString()).append(":").append(get(c).loaded).append(",");
+            Core.app.post(() -> Unity.print("Content Scoring Begin"));
+
+            scores = new ContentScore[all.length][0];
+            for(int i = 0; i < all.length; i++){
+                if(blackListed.contains(all[i])) continue;
+                Seq<Content> c = l.getContentMap()[i];
+                scores[i] = new ContentScore[c.size];
+                for(Content cs : c){
+                    if(all[i] == block && (!((Block)cs).synthetic() || cs instanceof ConstructBlock)){
+                        if(cs instanceof Floor && (((Floor)cs).itemDrop != null || ((Floor)cs).liquidDrop != null)){
+                            ores.add(((Floor)cs));
                         }
-                    }else{
-                        out.append("No Origins");
+                        continue;
                     }
-                    out.append("\n");
-                    v++;
+                    scores[i][cs.id] = new ContentScore(cs);
                 }
-                out.append("Contents: ").append(v).append("\n\n");
-                s++;
             }
-            String out2 = out.toString();
-            Core.app.post(() -> Unity.print(out2));
+
+            for(Floor ore : ores){
+                if(ore.itemDrop != null){
+                    ContentScore cs = get(ore.itemDrop);
+                    cs.artificial = false;
+                }
+                if(ore.liquidDrop != null){
+                    ContentScore cs = get(ore.liquidDrop);
+                    cs.artificial = false;
+                }
+            }
+
+            Core.app.post(() -> Unity.print("Content Score Processing Begin"));
+
+            for(ContentScore score : allScores){
+                if(score.artificial) processContent(score);
+            }
+            unloaded.removeAll(cs -> {
+                if(!cs.loaded){
+                    resetDepth();
+                    cs.loadScore();
+                }
+
+                return cs.loaded;
+            });
+            clear();
+
+            float time = Time.nanosToMillis(System.nanoTime() - lt);
+            StringBuilder builder = new StringBuilder(64);
+
+            for(ContentType type : all){
+                if(!blackListed.contains(type)){
+                    builder.append(type.toString()).append(":\n\n");
+                    for(Content c : content.getContentMap()[type.ordinal()]){
+                        ContentScore cs = get(c);
+                        if(cs == null) continue;
+                        builder.append("  ").append(cs.toString()).append("\n");
+                    }
+                }
+            }
+            builder.append("Content Processed in: ").append(time);
+            String out = builder.toString();
+            Core.app.post(() -> Unity.print(out));
+
             processing = false;
+            finished = true;
         }
     }
 
-    Seq<Liquid> liquids(){
-        return content.liquids();
-    }
-
-    Seq<Item> items(){
-        return content.items();
-    }
-
-    public float getScore(Content content){
-        if(!finished) return 0f;
-        return get(content).score;
-    }
-
-    public float getFractScore(Content content){
-        if(!finished) return 0f;
-        return get(content).fractScore();
-    }
-
-    private Seq<Content> getOrigins(Content content){
-        return origins[content.getContentType().ordinal()][content.id];
-    }
-
-    private void addOrigin(Content content, Content other){
-        if(origins[content.getContentType().ordinal()][content.id] == null){
-            origins[content.getContentType().ordinal()][content.id] = new Seq<>();
-        }
-        Seq<Content> origins = getOrigins(content);
-        if(!origins.contains(other)){
-            origins.add(other);
+    void clear(){
+        for(ContentScore sc : allScores){
+            sc.consumesScore = null;
+            sc.crafterRequirements = null;
+            sc.outputs = null;
         }
     }
 
-    private ContentScore get(int id, ContentType type){
-        return items[type.ordinal()][id];
+    void resetDepth(){
+        depth = 0;
+        depthLoaded = true;
     }
 
-    private ContentScore get(Content content){
-        return get(content.id, content.getContentType());
+    ContentScore get(Content content){
+        return scores[content.getContentType().ordinal()][content.id];
     }
 
-    private void updateSize(Content content){
-        int a = content.id + 1, i = content.getContentType().ordinal();
-        if(a >= items[i].length){
-            items[i] = Arrays.copyOf(items[i], a);
-        }
+    ContentScore get(ContentType type, short id){
+        return scores[type.ordinal()][id];
     }
 
-    private void addUnloaded(ContentScore content){
-        int key = content.content.id;
-        if(unloadedSet[content.content.getContentType().ordinal()] == null) unloadedSet[content.content.getContentType().ordinal()] = new IntSet(204);
-        if(unloadedSet[content.content.getContentType().ordinal()].add(key)){
-            unloaded.add(content);
-        }
+    <T extends Content> T getc(int type, short id){
+        return (T)content.getContentMap()[type].get(id);
     }
 
-    private void addContent(ContentScore content){
-        updateSize(content.content);
-        items[content.content.getContentType().ordinal()][content.content.id] = content;
-    }
-
-    private boolean contains(Content c){
-        if(c.id >= items[c.getContentType().ordinal()].length) return false;
-        return items[c.getContentType().ordinal()][c.id] != null;
-    }
-
-    private void handleItem(Item item, boolean ore){
+    float getItemScore(Item item){
         float energyScore = Mathf.sqr(item.charge + item.explosiveness + item.flammability + item.radioactivity);
-        float score = (float)Math.pow(Math.max(item.hardness + 1, 1), 1.5) * Math.max(item.cost + energyScore, 0.1f) * 1.5f;
-
-        ContentScore c = get(item);
-        if(c.artificial){
-            if(ore){
-                c.score = score;
-                c.outputScore = score;
-                c.loaded = true;
-                c.artificial = false;
-                if(getOrigins(item) != null) getOrigins(item).clear();
-            }else{
-                c.outputScore = score;
-                c.artificial = true;
-                addUnloaded(c);
-            }
-        }
+        return (float)Math.pow(Math.max(item.hardness + 1, 1), 1.5) * Math.max(item.cost + energyScore, 0.1f) * 1.5f;
     }
 
-    private void handleLiquid(Liquid liquid, boolean artificial){
-        float score = Mathf.sqr(liquid.flammability + liquid.explosiveness + Math.abs((liquid.temperature - 0.5f) * 2f)) + liquid.heatCapacity;
-
-        ContentScore c = get(liquid);
-
-        if(c.artificial){
-            if(!artificial){
-                c.score = score;
-                c.outputScore = score;
-                c.loaded = true;
-                c.artificial = false;
-            }else{
-                c.outputScore = score;
-                c.artificial = true;
-                addUnloaded(c);
-            }
-        }
-        addContent(c);
+    float getLiquidScore(Liquid liquid){
+        return Mathf.sqr(liquid.flammability + liquid.explosiveness + Math.abs((liquid.temperature - 0.5f) * 2f)) + liquid.heatCapacity;
     }
 
-    private void handleBlock(Block block){
-        //updateSize(block);
-
-        if(block instanceof Floor f){
-            if(f.itemDrop != null){
-                handleItem(f.itemDrop, true);
-            }
-            if(f.liquidDrop != null){
-                handleLiquid(f.liquidDrop, false);
-            }
-            return;
-        }
-        if(block.synthetic()){
-            if(block instanceof UnitFactory uf){
-                for(UnitPlan plan : uf.plans){
-                    addOrigin(plan.unit, block);
-                }
-            }else if(block instanceof Reconstructor re){
-                for(UnitType[] types : re.upgrades){
-                    UnitType type = types[1];
-                    addOrigin(type, block);
-                    addOrigin(type, types[0]);
-                }
-            }else if(block instanceof GenericCrafter gc){
-                if(gc.outputItem != null && !Structs.contains(gc.requirements, st -> st.item == gc.outputItem.item)){
-                    addOrigin(gc.outputItem.item, block);
-                }
-                if(gc.outputLiquid != null){
-                    addOrigin(gc.outputLiquid.liquid, block);
-                }
-            }
-            ContentScore cs = get(block);
-            addUnloaded(cs);
-        }
+    float getItemStackScore(ItemStack stack){
+        return get(stack.item).loadScore() * Mathf.pow(stack.amount, 1f / stackConstant);
     }
 
-    float getItemRequirementsScore(ItemStack[] stacks, float loss){
-        float s = 0f;
-        for(ItemStack stack : stacks){
-            if(get(stack.item).loaded) s += get(stack.item).score * (loss == 1f ? stack.amount : (float)Math.pow(stack.amount, 1f / loss));
+    float getItemStackScore(ItemStack stack, int size){
+        return get(stack.item).loadScore() * Mathf.pow(stack.amount, 1f / (stackConstant / size));
+    }
+
+    float getItemStackScore(short id, short amount){
+        return get(content.getByID(item, id)).loadScore() * Mathf.pow(amount, 1f / stackConstant);
+    }
+
+    Item getMaxFilter(ShortSeq seq){
+        Item tmp = null;
+        float last = 0f;
+
+        for(int i = 0; i < seq.size; i++){
+            ContentScore cs = get(item, seq.get(i));
+            if(cs.loadScore() > last){
+                tmp = cs.as();
+                last = cs.score;
+            }
         }
-        return s;
+
+        return tmp;
+    }
+
+    Liquid getMaxFilterLiquid(ShortSeq seq){
+        Liquid tmp = null;
+        float last = 0f;
+
+        for(int i = 0; i < seq.size; i++){
+            ContentScore cs = get(liquid, seq.get(i));
+            if(cs.loadScore() > last){
+                tmp = cs.as();
+                last = cs.score;
+            }
+        }
+
+        return tmp;
+    }
+
+    void processContent(ContentScore c){
+        if(c.content instanceof Block){
+            Block b = (Block)c.content;
+            c.outputs.add(new BlockOutput(b));
+
+            if(b.consumes.has(ConsumeType.item)){
+                Consume con = b.consumes.get(ConsumeType.item);
+                if(con instanceof ConsumeItemFilter){
+                    ConsumeItemFilter cons = (ConsumeItemFilter)con;
+                    c.itemFilter(cons.filter);
+                }else if(con instanceof ConsumeItems){
+                    ConsumeItems cons = (ConsumeItems)con;
+                    for(ItemStack stack : cons.items){
+                        c.addItemConsumes(stack.item, stack.amount);
+                    }
+                }
+                if(c.consumesScore != null) c.consumesScore.optional |= con.optional ? 1 : 0;
+            }
+            if(b.consumes.has(ConsumeType.liquid)){
+                Consume con = b.consumes.get(ConsumeType.liquid);
+                if(con instanceof ConsumeLiquidFilter){
+                    c.liquidFilter(((ConsumeLiquidFilter)con).filter, ((ConsumeLiquidFilter)con).amount);
+                }else if(con instanceof ConsumeLiquid){
+                    ConsumeLiquid cons = (ConsumeLiquid)con;
+                    c.addLiquidConsume(cons.liquid, cons.amount);
+                }
+                if(c.consumesScore != null) c.consumesScore.optional |= con.optional ? 2 : 0;
+            }
+            if(b.consumes.has(ConsumeType.power)){
+                Consume con = b.consumes.get(ConsumeType.power);
+                if(con instanceof ConsumePower){
+                    c.setPower(((ConsumePower)con).usage);
+                }
+                if(c.consumesScore != null) c.consumesScore.optional |= con.optional ? 4 : 0;
+            }
+
+            if(c.content instanceof GenericCrafter){
+                GenericCrafter g = (GenericCrafter)c.content;
+                float output = 0;
+
+                if(g.outputItems != null){
+                    for(ItemStack stack : g.outputItems){
+                        output += stack.amount;
+                    }
+                }
+                if(g.outputLiquid != null){
+                    output += g.outputLiquid.amount;
+                }
+
+                if(g.outputItems != null){
+                    for(ItemStack stack : g.outputItems){
+                        ContentScore cs = get(stack.item);
+
+                        CrafterRequirements req = new CrafterRequirements(g);
+                        req.outputAmount = output;
+                        req.setConsumes(c.consumesScore);
+
+                        cs.crafterRequirements.add(req);
+                    }
+                }
+                if(g.outputLiquid != null){
+                    ContentScore cs = get(g.outputLiquid.liquid);
+
+                    CrafterRequirements req = new CrafterRequirements(g);
+                    req.outputAmount = output;
+                    req.setConsumes(c.consumesScore);
+
+                    cs.crafterRequirements.add(req);
+                }
+            }else if(c.content instanceof UnitFactory){
+                UnitFactory f = c.as();
+                for(int i = 0; i < f.plans.size; i++){
+                    UnitPlan p = f.plans.get(i);
+                    ContentScore cs = get(p.unit);
+
+                    UnitRequirements ur = new UnitRequirements(f);
+                    ur.time = p.time;
+                    ur.setConsumes(c.consumesScore);
+                    for(ItemStack stack : p.requirements){
+                        ur.addItems(stack.item, (short)stack.amount);
+                    }
+
+                    cs.crafterRequirements.add(ur);
+                }
+            }else if(c.content instanceof Reconstructor){
+                Reconstructor r = c.as();
+                for(UnitType[] upgrade : r.upgrades){
+                    ContentScore cs = get(upgrade[1]);
+
+                    UnitRequirements ur = new UnitRequirements(r);
+                    ur.prev = upgrade[0];
+                    ur.time = r.constructTime;
+                    ur.setConsumes(c.consumesScore);
+
+                    cs.crafterRequirements.add(ur);
+                }
+            }
+        }
     }
 
     @Override
     public boolean shouldProcess(){
-        return !processing;
-    }
-
-    float bulletScoreIndividual(BulletType b){
-        float pierce = (!b.pierce || !b.collides || !b.collidesTiles) ? 1f : (b.pierceCap > 0 ? b.pierceCap / 3f : 3f),
-        lightning = (b.lightningDamage > 0 ? b.lightningDamage : b.damage) * b.lightning * (b.lightningLength / 2f) * (1f - Mathf.clamp(b.lightningCone / 360f, 0f, 0.5f)),
-        damage = b.damage + (b.splashDamage * (b.splashDamageRadius / 15f)),
-        heal = (b.healPercent / 100f) * damage;
-        return (damage + heal + lightning + b.range()) * pierce;
-    }
-
-    float bulletScore(BulletType b){
-        if(contains(b)){
-            return get(b).outputScore;
-        }
-        float sum = bulletScoreIndividual(b);
-        BulletType frag = b.fragBullet, last = b;
-        float frags = b.fragBullets * (1f - Mathf.clamp((b.fragCone / 360f), 0f, 0.5f));
-        while(frag != null){
-            float p = ((!last.pierce || !last.collides || !last.collidesTiles) ? 1f : (last.pierceCap > 0 ? last.pierceCap : 10f));
-            sum += bulletScoreIndividual(frag) * p * frags;
-            frags *= frag.fragBullets * (1f - Mathf.clamp((frag.fragCone / 360f), 0f, 0.5f));
-            last = frag;
-            frag = frag.fragBullet;
-        }
-        ContentScore cs = new ContentScore(b);
-        cs.outputScore = sum;
-        cs.loaded = true;
-        addContent(cs);
-        return sum;
+        return !processing && !finished;
     }
 
     private class ContentScore{
         Content content;
-        int loadedc = 0, loadedLast = 0, skip;
-        float score, outputScore, liquidScore, itemScore, powerScore;
-        boolean loaded = false, artificial = true;
-        short[] itemFilter, liquidFilter;
+        boolean loaded = false, outputLoaded = false, artificial = true, processing = false;
+        float score, outputScore;
 
-        ContentScore(Content c){
-            content = c;
+        Seq<CrafterScore> crafterRequirements = new Seq<>();
+        Seq<OutputHandler> outputs = new Seq<>();
+        ConsumesScore consumesScore;
+
+        ContentScore(Content content){
+            this.content = content;
+            unloaded.add(this);
+            allScores.add(this);
         }
 
         <T extends Content> T as(){
             return (T)content;
         }
 
-        float consumeScore(){
-            return liquidScore + itemScore + powerScore;
-        }
+        void liquidFilter(Boolf<Liquid> filter, float amount){
+            if(consumesScore != null && consumesScore.liquidFilter != null) return;
+            if(consumesScore == null) consumesScore = new ConsumesScore();
+            consumesScore.liquidFilter = new ShortSeq();
+            consumesScore.liquidAmount = amount;
+            ShortSeq liquidFilter = consumesScore.liquidFilter;
 
-        float energyScore(){
-            if(content instanceof Item i){
-                return Mathf.sqr(i.flammability + i.radioactivity + i.explosiveness + i.charge);
-            }else if(content instanceof Liquid l){
-                return Mathf.sqr(l.explosiveness + l.flammability + (Math.abs(l.temperature - 0.5f) * 2f));
-            }
-            return 0f;
-        }
-
-        void updateOutputScore(){
-            float outputScore = 0f;
-            if(content instanceof UnitType type){
-                float size = ((type.hitSize * type.hitSize) / Mathf.PI) / 2f;
-                outputScore += ((type.health * (type.health / (type.health - type.armor))) / size) * ((type.speed / 2f) + 1f);
-                for(Weapon w : type.weapons){
-                    outputScore += (bulletScore(w.bullet) / w.reload) * w.shots * (w.continuous ? w.bullet.lifetime / 5f : 1f);
-                }
-                //outputScore /= (type.hitSize / 3f);
-            }else if(content instanceof Block block){
-                outputScore += ((block.health / (float)(block.size * block.size)) + (block.absorbLasers ? 350f : 0f)) / 2f;
-                if(content instanceof Wall wall){
-                    outputScore += Math.max(wall.chanceDeflect * block.health, 0f) + Math.max(wall.lightningDamage * (wall.lightningLength / 2f) * wall.lightningChance, 0f);
-                }else if(content instanceof ItemTurret iTurret){
-                    float ts = 0f;
-                    for(Entry<Item, BulletType> type : iTurret.ammoTypes){
-                        float ts2 = (bulletScore(type.value) / Math.max(get(type.key).score, 0.5f));
-                        ts = Math.max(ts2, ts);
-                    }
-                    ts /= iTurret.reloadTime;
-                    ts *= (!iTurret.alternate ? iTurret.shots : 1);
-                    outputScore += ts;
-                }else if(content instanceof PowerTurret pTurret){
-                    outputScore += (bulletScore(pTurret.shootType) / pTurret.reloadTime) * (!pTurret.alternate ? pTurret.shots : 1);
-                }
-            }
-            this.outputScore = Math.max(this.outputScore, outputScore);
-        }
-
-        float fractScore(){
-            float f = outputScore / score;
-            return (Float.isNaN(f) || Float.isInfinite(f)) ? Float.MAX_VALUE : f;
-        }
-
-        void generateUnitScore(){
-            Seq<Content> origins = origins();
-            if(origins != null){
-                float max = 0f;
-                for(Content origin : origins){
-                    if(origin instanceof UnitFactory uf){
-                        for(UnitPlan plan : uf.plans){
-                            if(plan.unit == content){
-                                float time = ((plan.time / 60f) / 10f) + (1f - (1f / 10f));
-                                max = Math.max(((getItemRequirementsScore(plan.requirements, 2.5f) + get(uf).consumeScore()) / 15f) * time, max);
-                                break;
-                            }
-                        }
-                    }else if(origin instanceof Reconstructor re){
-                        float time = ((re.constructTime / 60f) / 10f) + (1f - (1f / 10f));
-                        float score = (float)Math.pow(get(re).consumeScore() / 10f, 1f / 2.5f) * time;
-                        for(UnitType[] types : re.upgrades){
-                            if(types[1] == content){
-                                score += get(types[0]).score;
-                                break;
-                            }
-                        }
-                        max = Math.max(max, score);
-                    }
-                }
-                score = max;
+            for(Liquid liquid : Vars.content.liquids()){
+                if(filter.get(liquid)) liquidFilter.add(liquid.id);
             }
         }
 
-        void generateItemScore(){
-            if(!artificial) return;
+        void itemFilter(Boolf<Item> filter){
+            if(consumesScore != null && consumesScore.itemFilter != null) return;
+            if(consumesScore == null) consumesScore = new ConsumesScore();
+            consumesScore.itemFilter = new ShortSeq();
+            ShortSeq itemFilter = consumesScore.itemFilter;
 
-            Seq<Content> origins = origins();
-            if(origins != null){
-                for(Content origin : origins){
-                    if(get(origin).loaded && origin instanceof GenericCrafter gc){
-                        if(content instanceof Item){
-                            ContentScore other = get(origin);
-                            float s = other.consumeScore();
-                            score = Math.max(score, (s / gc.outputItem.amount) + (gc.craftTime / 60f));
-                        }else{
-                            ContentScore og = get(origin);
-                            score = Math.max(score, (og.liquidScore + og.powerScore + (og.itemScore / (gc.craftTime / 60f))) / gc.outputLiquid.amount);
-                        }
+            for(Item item : Vars.content.items()){
+                if(filter.get(item)) itemFilter.add(item.id);
+            }
+        }
+
+        void addItemConsumes(Item item, int amount){
+            if(consumesScore == null) consumesScore = new ConsumesScore();
+            if(consumesScore.itemConsumes == null) consumesScore.itemConsumes = new ShortSeq();
+            consumesScore.itemConsumes.add(item.id, (short)amount);
+        }
+
+        void addLiquidConsume(Liquid liquid, float amount){
+            if(consumesScore == null) consumesScore = new ConsumesScore();
+            consumesScore.liquid = liquid.id;
+            consumesScore.liquidAmount = amount;
+        }
+
+        void setPower(float amount){
+            if(consumesScore == null) consumesScore = new ConsumesScore();
+            consumesScore.power = amount;
+        }
+
+        float loadOutputScore(){
+            if(outputLoaded) return outputScore;
+            if(!outputs.isEmpty()){
+                for(OutputHandler output : outputs){
+                    outputScore = Math.max(outputScore, output.calculateOutput());
+                }
+            }
+            outputLoaded = depthLoaded;
+            return outputScore;
+        }
+
+        float loadScore(){
+            if(processing) return 0f;
+            if(loaded) return score;
+
+            depth++;
+            if(depth > maxDepth || !depthLoaded){
+                depthLoaded = false;
+                loaded = false;
+                return 0f;
+            }
+
+            processing = true;
+
+            if(artificial){
+                float ns = 0f;
+                if(content instanceof Block){
+                    Block block = (Block)content;
+                    for(ItemStack stack : block.requirements){
+                        ns += getItemStackScore(stack, block.size);
                     }
+                    ns *= block.buildCostMultiplier;
+                }else if(!crafterRequirements.isEmpty()){
+                    for(CrafterScore s : crafterRequirements){
+                        ns = Math.max(ns, s.calculateScore());
+                    }
+                }
+                score = ns;
+            }else{
+                if(content instanceof Item){
+                    score = outputScore = getItemScore((Item)content);
+                }else if(content instanceof Liquid){
+                    score = outputScore = getLiquidScore((Liquid)content);
+                }
+            }
+            loadOutputScore();
+
+            loaded = depthLoaded;
+            processing = false;
+
+            return score;
+        }
+
+        @Override
+        public String toString(){
+            return content.toString() + ": Score: " + score + ", Output Score: " + outputScore;
+        }
+    }
+
+    private class CrafterRequirements extends CrafterScore{
+        GenericCrafter crafter;
+        float outputAmount = 1f;
+
+        CrafterRequirements(GenericCrafter crafter){
+            this.crafter = crafter;
+        }
+
+        @Override
+        float calculateScore(){
+            if(score == -1f){
+                score = 0f;
+                if(itemStacks != null){
+                    for(int i = 0; i < itemStacks.size; i += 2){
+                        score += getItemStackScore(itemStacks.get(i), itemStacks.get(i + 1));
+                    }
+                }
+                if(liquid != null){
+                    score += get(liquid).loadScore() * liquidAmount;
+                }
+                score += power;
+                score /= outputAmount;
+                score += get(crafter).loadScore() / 110f;
+                score *= Mathf.sqrt(Math.max(crafter.craftTime, 0.1f) / 60f);
+            }
+
+            return score;
+        }
+    }
+
+    private class UnitRequirements extends CrafterScore{
+        UnitBlock block;
+        UnitType prev;
+        float time = 0f;
+
+        UnitRequirements(UnitBlock block){
+            this.block = block;
+        }
+
+        @Override
+        float calculateScore(){
+            if(score == -1f){
+                score = 0f;
+                if(itemStacks != null){
+                    for(int i = 0; i < itemStacks.size; i += 2){
+                        score += getItemStackScore(itemStacks.get(i), itemStacks.get(i + 1));
+                    }
+                }
+                if(liquid != null){
+                    score += get(liquid).loadScore() * liquidAmount;
+                }
+                score += power;
+
+                if(prev != null){
+                    score += get(prev).loadScore();
+                }
+                score *= Mathf.sqrt(Math.max(time, 0.1f) / 60f);
+
+                score += get(block).loadScore() / 110f;
+            }
+            return score;
+        }
+    }
+
+    abstract class CrafterScore{
+        float score = -1f;
+        ShortSeq itemStacks;
+        Liquid liquid;
+        float liquidAmount;
+        float power;
+
+        abstract float calculateScore();
+
+        void addItems(Item item, short amount){
+            if(itemStacks == null) itemStacks = new ShortSeq();
+            itemStacks.add(item.id, amount);
+        }
+
+        void setConsumes(ConsumesScore cons){
+            if(cons == null) return;
+
+            if(cons.itemFilter != null && !cons.itemFilter.isEmpty()){
+                Item i = getMaxFilter(cons.itemFilter);
+                if(i != null){
+                    itemStacks = new ShortSeq();
+                    itemStacks.add(i.id, (short)1);
                 }
             }else{
-                score = 0f;
+                itemStacks = cons.itemConsumes;
             }
+
+            if(cons.liquidFilter != null && !cons.liquidFilter.isEmpty()){
+                liquid = getMaxFilterLiquid(cons.liquidFilter);
+            }else if(cons.liquid != -1){
+                liquid = getc(ContentType.liquid.ordinal(), cons.liquid);
+            }
+            liquidAmount = cons.liquidAmount;
+
+            power = cons.power;
+        }
+    }
+
+    class BlockOutput implements OutputHandler{
+        Block block;
+        float score;
+        boolean loaded;
+
+        public BlockOutput(Block b){
+            block = b;
         }
 
-        void generateBlockScore(){
-            Block block = as();
-            float score = 0f;
-            for(ItemStack r : block.requirements){
-                //score += get(r.item).score + Mathf.sqrt(r.amount);
-                score += get(r.item).score * (float)Math.pow(r.amount / (float)(block.size * block.size), 1f / 1.4f);
+        @Override
+        public float calculateOutput(){
+            if(loaded) return this.score;
+            ContentScore cs = get(block);
+            float conScore = (cs.consumesScore != null ? cs.consumesScore.score() : 0f);
+            float consTime = 5f;
+            float score = (block.health / (float)block.size);
+
+            if(block.hasItems){
+                score += block.itemCapacity * (1f + block.baseExplosiveness);
             }
-            score *= (block.requirements.length / 35f) + (1f - (1f / 35f)) + block.buildCostMultiplier;
-            //score *= block.size * block.size;
-            //score /= 2f;
-            for(Consume cons : block.consumes.all()){
-                if(cons.optional) continue;
-                if(cons instanceof ConsumePower c){
-                    score += c.usage;
-                    //conScore += c.usage;
-                    powerScore += c.usage;
-                    continue;
-                }
-                if(cons instanceof ConsumeItems c){
-                    for(ItemStack s : c.items){
-                        float sc = get(s.item).score;
-                        score += sc * s.amount;
-                        //conScore += sc * s.amount;
-                        itemScore += sc * s.amount;
-                    }
-                    continue;
-                }
-                if(cons instanceof ConsumeItemFilter c){
-                    float max = 0f;
-                    if(itemFilter != null){
-                        for(short i : itemFilter){
-                            //shortSeq.add(i, (short)1);
-                            float maxL = get(i, ContentType.item).score;
-                            max = Math.max(max, maxL);
-                        }
-                    }else{
-                        for(Item item : items()){
-                            if(c.filter.get(item)){
-                                //shortSeq.add(item.id, (short)1);
-                                float maxL = get(item).score;
-                                max = Math.max(max, maxL);
-                            }
-                        }
-                    }
-                    score += max;
-                    //conScore += max;
-                    itemScore += max;
-                    continue;
-                }
-                if(cons instanceof ConsumeLiquidBase c){
-                    float amount = c.amount;
-                    if(cons instanceof ConsumeLiquid cl){
-                        float s = get(cl.liquid).score * amount;
-                        score += s;
-                        //conScore += s;
-                        liquidScore += s;
-                    }else if(cons instanceof ConsumeLiquidFilter clf){
-                        float max = 0f;
-                        if(liquidFilter != null){
-                            for(short i : liquidFilter){
-                                max = Math.max(max, get(i, ContentType.liquid).score);
-                            }
-                        }else{
-                            for(Liquid l : liquids()){
-                                if(clf.filter.get(l)){
-                                    max = Math.max(max, get(l).score);
-                                }
-                            }
-                        }
-                        score += max * amount;
-                        //conScore += max * amount;
-                        liquidScore += max * amount;
-                    }
-                }
+            if(block.hasLiquids){
+                score += block.liquidCapacity * block.liquidPressure * (1f + block.baseExplosiveness);
             }
-            if(block instanceof UnitFactory uf){
-                float max = 0f;
-                for(UnitPlan plan : uf.plans){
-                    float ts = 0f;
-                    for(ItemStack s : plan.requirements){
-                        float sc = get(s.item).score;
-                        ts += sc * s.amount;
-                        //score += sc * s.amount;
-                        //conScore += sc * s.amount;
+
+            if(block instanceof Wall){
+                Wall w = (Wall)block;
+                float ls = score;
+                score /= 4f;
+                if(w.chanceDeflect > 0f) score += ls * w.chanceDeflect;
+                if(w.lightningChance > 0f) score += w.lightningChance * (w.lightningLength / 4f) * w.lightningDamage;
+            }else if(block instanceof Turret){
+                Turret t = (Turret)block;
+                int shots = t.alternate ? 1 : t.shots;
+                float inaccuracy = 1f - ((t.inaccuracy / 180f) / (shots * shots));
+
+                if(block instanceof ItemTurret){
+                    ItemTurret it = (ItemTurret)block;
+                    float bs = 0f;
+                    for(Entry<Item, BulletType> entry : it.ammoTypes){
+                        bs = Math.max(bs, get(entry.value).loadOutputScore());
                     }
-                    max = Math.max(max, ts);
-                    //ContentScore cs = get(plan.unit);
+                    score += (bs * shots * inaccuracy) / t.reloadTime;
+                }else if(block instanceof PowerTurret){
+                    PowerTurret pt = (PowerTurret)block;
+                    score += (get(pt.shootType).loadOutputScore() * shots * inaccuracy) / t.reloadTime;
                 }
-                itemScore += max;
-                //conScore += max;
-                score += max;
+            }else if(block instanceof MendProjector){
+                MendProjector mp = (MendProjector)block;
+                float rr = (mp.range + mp.phaseRangeBoost) / 8f;
+
+                score += ((((mp.healPercent + mp.phaseBoost) / 100f) * score) * rr * rr) / mp.reload;
+            }else if(block instanceof OverdriveProjector){
+                OverdriveProjector op = (OverdriveProjector)block;
+                float rr = (op.range + op.phaseRangeBoost) / 8f;
+
+                score += ((((op.speedBoostPhase + op.speedBoostPhase) / 100f) * score) * rr * rr) / op.reload;
+            }else if(block instanceof PowerGenerator){
+                float power = ((PowerGenerator)block).powerProduction;
+
+                if(block instanceof ItemLiquidGenerator){
+                    ItemLiquidGenerator ilg = (ItemLiquidGenerator)block;
+                    consTime = (ilg.itemDuration + ilg.maxLiquidGenerate);
+                }
+                score += power;
+            }else if(block instanceof GenericCrafter){
+                GenericCrafter gc = (GenericCrafter)block;
+                if(gc.outputItems != null){
+                    for(ItemStack item : gc.outputItems){
+                        score += get(item.item).loadScore();
+                    }
+                }
+                if(gc.outputLiquid != null){
+                    score += get(gc.outputLiquid.liquid).loadScore();
+                }
+                consTime = gc.craftTime;
             }
+            score /= (conScore / consTime) + 1f;
+            loaded = depthLoaded;
             this.score = score;
-            //consumeScore = conScore;
+
+            return score;
         }
+    }
 
-        boolean blockLoaded(){
-            if(!(content instanceof Block) || loaded) return true;
-            boolean f = true;
-            Block block = as();
+    interface OutputHandler{
+        float calculateOutput();
+    }
 
-            for(ItemStack r : block.requirements){
-                f = get(r.item).loaded;
-                if(!f) break;
+    private class ConsumesScore{
+        ShortSeq itemConsumes, itemFilter, liquidFilter;
+        short liquid = -1;
+        float liquidAmount = 0f, power, score = -1f;
+        byte optional = 0;
+
+        float score(){
+            if(score == -1f){
+                float is = 0f, ls = 0f;
+                if(itemConsumes != null){
+                    for(int i = 0; i < itemConsumes.size; i += 2){
+                        is += getItemStackScore(itemConsumes.get(i), itemConsumes.get(i + 1));
+                    }
+                }else if(itemFilter != null){
+                    is += get(getMaxFilter(itemFilter)).loadScore();
+                }
+                if((optional & 1) != 0){
+                    is /= 10f;
+                }
+
+                if(liquid != -1){
+                    ls += get(ContentType.liquid, liquid).loadScore() * liquidAmount;
+                }else if(liquidFilter != null){
+                    ls += get(getMaxFilterLiquid(liquidFilter)).loadScore() * liquidAmount;
+                }
+                if((optional & 2) != 0){
+                    ls /= 10f;
+                }
+                float p = (optional & 4) != 0 ? power / 10f : power;
+
+                score = is + ls + p;
             }
-
-            if(f){
-                for(Consume cons : block.consumes.all()){
-                    if(cons instanceof ConsumeItems c){
-                        for(ItemStack i : c.items){
-                            f &= get(i.item).loaded;
-                        }
-                        continue;
-                    }
-                    if(cons instanceof ConsumeItemFilter c){
-                        if(itemFilter == null){
-                            ShortSeq seq = new ShortSeq(8);
-                            for(Item i : items()){
-                                if(c.filter.get(i)){
-                                    f &= get(i).loaded;
-                                    seq.add(i.id);
-                                }
-                            }
-                            itemFilter = seq.toArray();
-                        }else{
-                            for(short i : itemFilter){
-                                f &= get(i, ContentType.item).loaded;
-                            }
-                        }
-                        continue;
-                    }
-                    if(cons instanceof ConsumeLiquid c){
-                        f &= get(c.liquid).loaded;
-                        continue;
-                    }
-                    if(cons instanceof ConsumeLiquidFilter c){
-                        if(liquidFilter == null){
-                            ShortSeq seq = new ShortSeq(8);
-                            for(Liquid l : liquids()){
-                                if(c.filter.get(l)){
-                                    f &= get(l).loaded;
-                                    seq.add(l.id);
-                                }
-                            }
-                            liquidFilter = seq.toArray();
-                        }else{
-                            for(short i : liquidFilter){
-                                f &= get(i, ContentType.liquid).loaded;
-                            }
-                        }
-                    }
-                }
-                if(f){
-                    if(block instanceof ItemTurret iTurret){
-                        for(Entry<Item, BulletType> entry : iTurret.ammoTypes){
-                            f = get(entry.key).loaded;
-                            if(!f) break;
-                        }
-                    }else if(block instanceof UnitFactory uFac){
-                        for(UnitPlan plan : uFac.plans){
-                            for(ItemStack stack : plan.requirements){
-                                f = get(stack.item).loaded;
-                                if(!f) break;
-                            }
-                        }
-                    }
-                }
-            }
-
-            return f;
-        }
-
-        boolean requiredLoaded(){
-            Seq<Content> origins = origins();
-            if(origins != null){
-                boolean b = true;
-                loadedLast = loadedc;
-                loadedc = 0;
-                int i = 0;
-                for(Content c : origins){
-                    loadedc |= Mathf.num(get(c).loaded) << i;
-                    b &= get(c).loaded;
-                    i++;
-                }
-                if(loadedc == loadedLast && loadedc != 0){
-                    skip++;
-                }else{
-                    skip = 0;
-                }
-                if(skip >= skipIteration){
-                    return true;
-                }
-                return b;
-            }
-            //return true;
-            return !artificial;
-        }
-
-        Seq<Content> origins(){
-            if(!artificial) return null;
-            return getOrigins(content);
-        }
-
-        void updateScore(){
-            if(!loaded && requiredLoaded() && blockLoaded()){
-                if(content instanceof UnitType){
-                    generateUnitScore();
-                }else if(content instanceof Block){
-                    generateBlockScore();
-                }else if(content instanceof Item || content instanceof Liquid){
-                    generateItemScore();
-                }
-                updateOutputScore();
-                loaded = true;
-            }
+            return score;
         }
     }
 }

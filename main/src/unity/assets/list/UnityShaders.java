@@ -28,6 +28,10 @@ public class UnityShaders{
     public static MegalithRingShader megalithRingShader;
     public static Graphics3DShaderProvider graphics3DProvider;
     public static VapourizeShader vapourizeShader;
+    public static FragmentationShader fragmentShader;
+
+    /** use this buffer if the begin() and end() is in the same function */
+    public static FrameBuffer bufferAlt;
 
     protected static FrameBuffer buffer;
 
@@ -35,9 +39,11 @@ public class UnityShaders{
         if(headless) return;
 
         buffer = new FrameBuffer();
+        bufferAlt = new FrameBuffer();
         CondShader[] conds = new CondShader[]{};
 
         vapourizeShader = new VapourizeShader();
+        fragmentShader = new FragmentationShader();
         stencilShader = new StencilShader();
         megalithRingShader = new MegalithRingShader();
         graphics3DProvider = new Graphics3DShaderProvider();
@@ -77,10 +83,51 @@ public class UnityShaders{
         }
     }
 
+    public static class FragmentationShader extends Shader{
+        public Texture noise;
+        public Vec2 source = new Vec2(), direction = new Vec2();
+        public Color heatColor = new Color();
+        public float heatProgress, fragProgress, size;
+
+        public FragmentationShader(){
+            super(
+            Core.files.internal("shaders/screenspace.vert"),
+            tree.get("shaders/fragmentation.frag")
+            );
+            if(noise == null){
+                Fi path = tree.get("shaders/fragmentnoise.png");
+                noise = new Texture(path);
+                noise.setFilter(TextureFilter.linear);
+                noise.setWrap(TextureWrap.repeat);
+            }
+        }
+
+        @Override
+        public void apply(){
+            noise.bind(1);
+            bufferAlt.getTexture().bind(0);
+
+            setUniformi("u_noise", 1);
+
+            setUniformf("u_texsize", Core.camera.width, Core.camera.height);
+            setUniformf("u_invsize", 1f / Core.camera.width, 1f / Core.camera.height);
+            setUniformf("u_campos",
+            Core.camera.position.x - Core.camera.width / 2,
+            Core.camera.position.y - Core.camera.height / 2);
+
+            setUniformf("u_blastpos", source);
+            setUniformf("u_blastforce", direction);
+            setUniformf("heatcolor", heatColor);
+
+            setUniformf("heatprogress", heatProgress);
+            setUniformf("fragprogress", fragProgress);
+            setUniformf("size", size);
+        }
+    }
+
     public static class VapourizeShader extends Shader{
         public Texture noise;
         public Vec2 windSource = new Vec2();
-        public FrameBuffer buffer = new FrameBuffer();
         public Color toColor = new Color();
         public float progress, colorProgress, fragProgress, size;
 
@@ -99,7 +146,7 @@ public class UnityShaders{
         @Override
         public void apply(){
             noise.bind(1);
-            buffer.getTexture().bind(0);
+            bufferAlt.getTexture().bind(0);
 
             setUniformi("u_noise", 1);
 

@@ -131,7 +131,7 @@ public class VapourizeShaderEffect extends Effect{
                         float in = Mathf.clamp(fin() * 2f);
 
                         VapourizeShader s = UnityShaders.vapourizeShader;
-                        FrameBuffer buffer = s.buffer;
+                        FrameBuffer buffer = UnityShaders.bufferAlt;
                         buffer.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
                         s.toColor.set(Pal.rubble);
                         s.colorProgress = Interp.pow2In.apply(Mathf.clamp(in * 1.25f));
@@ -150,8 +150,7 @@ public class VapourizeShaderEffect extends Effect{
                     float in = fin();
 
                     VapourizeShader s = UnityShaders.vapourizeShader;
-                    FrameBuffer buffer = s.buffer;
-                    buffer.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
+                    FrameBuffer buffer = UnityShaders.bufferAlt;
                     s.toColor.set(Pal.rubble);
                     s.colorProgress = Interp.pow2In.apply(Mathf.clamp(in * 1.25f));
                     s.progress = Interp.pow2In.apply(in);

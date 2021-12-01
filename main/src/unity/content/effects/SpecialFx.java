@@ -9,10 +9,12 @@ import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.Effect.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import unity.entities.bullet.anticheat.*;
-import unity.entities.bullet.laser.*;
 import unity.entities.effects.*;
+import unity.graphics.*;
+import unity.mod.*;
 
 import static arc.graphics.g2d.Draw.color;
 
@@ -20,6 +22,13 @@ public class SpecialFx{
     private static final Rand rand = new Rand();
 
     public static Effect
+
+    fragmentation = new FragmentationShaderEffect(3.5f * 60f),
+
+    fragmentationFast = new FragmentationShaderEffect(1.5f * 60f){{
+        fragOffset = 0f;
+        heatOffset = 0f;
+    }},
 
     endgameVapourize = new VapourizeShaderEffect(3f * 60f, 900f).updateVel(false),
 
@@ -69,6 +78,20 @@ public class SpecialFx{
         float x = Tmp.v1.x, y = Tmp.v1.y, s = e.fslope() * 4f;
         Draw.color(e.color);
         Fill.square(x, y, s, 45f);
+    }),
+
+    timeStop = new CustomStateEffect(() -> {
+        EffectState s = EffectState.create();
+        if(TimeStop.inTimeStop()) TimeStop.addEntity(s, (3.5f * 60) + 60f);
+        return s;
+    }, 3.5f * 60f, 2f * 500, e -> {
+        float s = Interp.pow2.apply(e.fslope()) * 500f;
+        Draw.blend(UnityBlending.invert);
+        Fill.poly(e.x, e.y, (int)(s / 5) + 24, s);
+        Draw.blend(UnityBlending.multiply);
+        Draw.color(Color.red);
+        Fill.poly(e.x, e.y, (int)(s / 5) + 24, s);
+        Draw.blend();
     }),
 
     voidFractureEffect = new Effect(30f, 700f, e -> {

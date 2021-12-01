@@ -452,7 +452,7 @@ public final class Utils{
         Rect r = rect.setCentered(x1, y1, 0f);
         r.merge(x2, y2);
         r.merge(x3, y3);
-        group.intersect(r.x, r.y, r.width + r.x, r.height + r.y, g -> {
+        group.intersect(r.x, r.y, r.width, r.height, g -> {
             if(filter.get(g) && inTriangleCircle(x1, y1, x2, y2, x3, y3, g.x(), g.y(), (g instanceof Hitboxc ? ((Hitboxc)g).hitSize() / 2f : 0f))){
                 cons.get(g);
             }
@@ -479,7 +479,7 @@ public final class Utils{
             Rect r = rect.setCentered(x1, y1, 0f);
             r.merge(x2, y2);
             r.merge(x3, y3);
-            for(TeamData data : state.teams.active){
+            for(TeamData data : state.teams.present){
                 if(data.team != team && data.buildings != null){
                     data.buildings.intersect(r, b -> {
                         if(filter.get(b)){

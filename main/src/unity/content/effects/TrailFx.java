@@ -37,6 +37,12 @@ public class TrailFx{
         }
     }),
 
+    endRailTrail = new Effect(50f, e -> {
+        Draw.color(UnityPal.scarColor, UnityPal.endColor, e.fin());
+        Drawf.tri(e.x, e.y, 13f * e.fout(), 29f, e.rotation);
+        Drawf.tri(e.x, e.y, 13f * e.fout(), 29f, e.rotation + 180f);
+    }),
+
     endTrail = new Effect(50f, e -> {
         Draw.color(Color.black, UnityPal.scarColor, Mathf.curve(e.fin(), 0f, 0.3f));
         Angles.randLenVectors(e.id, 2, e.finpow() * 7f, (x, y) -> {

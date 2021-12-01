@@ -261,6 +261,9 @@ public class UnityUnitType extends UnitType{
         Seq<Weapon> mapped = new Seq<>();
         for(int i = 0, len = weaponSeq.size; i < len; i++){
             Weapon w = weaponSeq.get(i);
+            if(w.recoilTime < 0f){
+                w.recoilTime = w.reload;
+            }
             mapped.add(w);
 
             if(w.mirror){
@@ -272,6 +275,8 @@ public class UnityUnitType extends UnitType{
 
                 w.reload *= 2;
                 copy.reload *= 2;
+                w.recoilTime *= 2;
+                copy.recoilTime *= 2;
                 w.otherSide = mapped.size - 1;
                 copy.otherSide = mapped.size - 2;
             }

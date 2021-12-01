@@ -7,12 +7,12 @@ public class AbilityDamageModule implements AntiCheatBulletModule{
     private final float minimumEfficiency, maximumReload;
     private final float efficiencyDamage, ratioDamage, reloadDamage;
 
-    public AbilityDamageModule(float mE, float mR, float eD, float rd, float reD){
-        minimumEfficiency = mE;
-        maximumReload = mR;
-        efficiencyDamage = eD;
-        ratioDamage = rd;
-        reloadDamage = reD;
+    public AbilityDamageModule(float minimumEfficiency, float maximumReload, float efficiencyDamage, float ratioDamage, float reloadDamage){
+        this.minimumEfficiency = minimumEfficiency;
+        this.maximumReload = maximumReload;
+        this.efficiencyDamage = efficiencyDamage;
+        this.ratioDamage = ratioDamage;
+        this.reloadDamage = reloadDamage;
     }
     @Override
     public void handleAbility(Ability ability, Unit unit, Bullet bullet){

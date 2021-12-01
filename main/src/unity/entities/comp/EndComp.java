@@ -166,6 +166,7 @@ abstract class EndComp implements Unitc, Factionc{
                 if(amount > aType.resistStart){
                     float a = amount - aType.resistStart;
                     resist += a;
+                    if(Float.isInfinite(resist)) resist = Float.MAX_VALUE;
                     resistMax = Math.max(resistMax, resist);
                     resistTime = aType.resistTime;
                     aggression += Math.min(a / (trueMaxHealth / 5f), 1.5f);
