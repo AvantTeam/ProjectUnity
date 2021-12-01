@@ -39,8 +39,8 @@ public class ExtraEffect{
         });
     }
 
-    public static SlowLightning createSlowLightning(float x, float y, float rotation, float lifetime){
-        SlowLightning l = Pools.obtain(SlowLightning.class, SlowLightning::new);
+    public static OldSlowLightning createSlowLightning(float x, float y, float rotation, float lifetime){
+        OldSlowLightning l = Pools.obtain(OldSlowLightning.class, OldSlowLightning::new);
         l.x = x;
         l.y = y;
         l.rotation = rotation;

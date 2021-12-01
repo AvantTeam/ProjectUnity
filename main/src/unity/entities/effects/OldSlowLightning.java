@@ -15,7 +15,7 @@ import mindustry.graphics.*;
 import unity.content.effects.*;
 import unity.util.*;
 
-public class SlowLightning extends EffectState{
+public class OldSlowLightning extends EffectState{
     public Seq<SlowLightningNode> nodes = new Seq<>();
     public Color colorFrom = Pal.lancerLaser;
     public Color colorTo = Color.white;
@@ -94,7 +94,7 @@ public class SlowLightning extends EffectState{
         public Vec2 fromPos;
         public Vec2 toPos;
         public float rotation;
-        public SlowLightning origin;
+        public OldSlowLightning origin;
         public float score = 0f;
         public float visualTime = 0f;
         public float altTime = 0f;

@@ -1,6 +1,7 @@
 package unity.mod;
 
 import arc.*;
+import arc.audio.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -15,11 +16,12 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
 import mindustry.type.*;
+import unity.gen.*;
 import unity.util.*;
 
 public class TimeStop{
     private final static float lerpTime = 20f, error = 0.000002f * lerpTime;
-    private final static float slowDownTime = 30f;
+    private final static float slowDownTime = 30f, continueTimeDuration = 89f;
     private final static Seq<TimeStopEntity> entities = new Seq<>();
     private final static IntMap<TimeStopEntity> map = new IntMap<>(102);
     private final static BasicPool<TimeStopEntity> pool = new BasicPool<>(8, 200, TimeStopEntity::new);
@@ -28,6 +30,7 @@ public class TimeStop{
     private static float time = 0f, lastTime = 0f;
     private static boolean set = false;
     private static boolean reseting = false;
+    private static Sound continueTimeSound;
 
     private final static Floatp defaultDelta = () -> Math.min(Core.graphics.getDeltaTime() * 60f, 3f);
     private final static Floatp timeStopDelta = () -> Math.min(Core.graphics.getDeltaTime() * 60f * Mathf.sqrt(time / lerpTime), 3f);
@@ -90,6 +93,7 @@ public class TimeStop{
     }
 
     static void update(){
+        if(continueTimeSound == null) continueTimeSound = UnitySounds.continueTime;
         if(!Vars.state.isGame() || Vars.state.isPaused()) return;
         float tDelta = defaultDelta.get();
         time = Mathf.approach(time, reseting ? lerpTime - error : 0f, tDelta);
@@ -107,6 +111,7 @@ public class TimeStop{
             float delta = timeStopDelta.get();
             reseting = false;
             entities.removeAll(te -> {
+                float lastT = te.time;
                 te.time -= tDelta;
                 boolean valid = te.entity.isAdded() && te.entity.id() == te.id;
 
@@ -132,6 +137,9 @@ public class TimeStop{
                     if(isPlayer){
                         Position p = (Position)te.entity;
                         Core.camera.position.set(p);
+                        if(te.time < continueTimeDuration && lastT >= continueTimeDuration){
+                            continueTimeSound.at(p);
+                        }
                     }
                 }
 

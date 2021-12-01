@@ -486,7 +486,7 @@ public class EndGameTurret extends PowerTurret{
                 Tmp.v1.add(x, y);
                 
                 if(Mathf.chanceDelta(0.75 * chance)){
-                    SlowLightning l = ExtraEffect.createSlowLightning(Tmp.v1.x, Tmp.v1.y, randomAngle, 110f);
+                    OldSlowLightning l = ExtraEffect.createSlowLightning(Tmp.v1.x, Tmp.v1.y, randomAngle, 110f);
                     l.team = team;
                     l.colorFrom = Color.red;
                     l.colorTo = Color.black;
