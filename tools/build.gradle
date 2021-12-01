@@ -8,7 +8,7 @@ final def dexedJar = (project(':main').tasks.dex as Jar).archiveFile.get().asFil
 final def distJar = (project(':main').tasks.deploy as Jar).archiveFile.get().asFile
 final def regularJar = (project(':main').tasks.jar as Jar).archiveFile.get().asFile
 
-final def cp =
+final def usedClasspath =
     taskNames.contains('main:dex') ? dexedJar :
     taskNames.contains('main:deploy') ? distJar :
     dexedJar.exists() ? dexedJar :
@@ -17,13 +17,13 @@ final def cp =
 
 dependencies{
     if(
-        !cp.exists() || toolRecompile ||
+        !usedClasspath.exists() || toolRecompile ||
         taskNames.contains('main:deploy') || taskNames.contains('main:dex')
     ){
         implementation project(':main')
         if(taskNames.contains('tools:proc')) println 'Compiling :main project before processing assets...'
     }else{
-        implementation files(cp)
+        implementation files(usedClasspath)
     }
 
     implementation "com.github.Anuken.Mindustry:core:$mindustryVersion"
