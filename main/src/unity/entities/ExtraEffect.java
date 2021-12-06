@@ -4,7 +4,6 @@ import arc.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.pooling.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.game.*;
@@ -37,17 +36,6 @@ public class ExtraEffect{
                 return b;
             });
         });
-    }
-
-    public static OldSlowLightning createSlowLightning(float x, float y, float rotation, float lifetime){
-        OldSlowLightning l = Pools.obtain(OldSlowLightning.class, OldSlowLightning::new);
-        l.x = x;
-        l.y = y;
-        l.rotation = rotation;
-        l.lifetime = lifetime;
-        l.lightningLength = 43f;
-        //l.add();
-        return l;
     }
 
     public static void addMoltenBlock(Building build){

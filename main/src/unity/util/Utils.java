@@ -41,6 +41,8 @@ public final class Utils{
     private static Unit tmpUnit;
     private static boolean hit, hitB;
 
+    private static int randSeed = 1;
+
     private static final BoolGrid collideLineCollided = new BoolGrid();
     private static final Seq<Point2> collideLineCast = new Seq<>();
     private static final Seq<Point2> collideLineCastNext = new Seq<>();
@@ -423,8 +425,9 @@ public final class Utils{
                 tmpUnitSeq.add(b);
             }
         });
+        randSeed++;
         return tmpUnitSeq.sort(h -> {
-            float r = Mathf.range(variance);
+            float r = Mathf.randomSeedRange(randSeed + h.id(), variance);
             return h.dst2(x, y) + (r * r);
         });
     }

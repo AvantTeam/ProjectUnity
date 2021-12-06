@@ -17,7 +17,6 @@ import mindustry.world.consumers.*;
 import unity.*;
 import unity.content.*;
 import unity.content.effects.*;
-import unity.entities.*;
 import unity.entities.effects.*;
 import unity.gen.*;
 import unity.mod.*;
@@ -34,6 +33,13 @@ public class EndGameTurret extends PowerTurret{
 
     protected int eyeTime = timers++;
     protected int bulletTime = timers++;
+    private final SlowLightningType lightning = new SlowLightningType(){{
+        colorFrom = Color.red;
+        colorTo = Color.black;
+        damage = 520f;
+        splitChance = 0.045f;
+        range = 810f;
+    }};
 
     public TextureRegion
     
@@ -486,16 +492,7 @@ public class EndGameTurret extends PowerTurret{
                 Tmp.v1.add(x, y);
                 
                 if(Mathf.chanceDelta(0.75 * chance)){
-                    OldSlowLightning l = ExtraEffect.createSlowLightning(Tmp.v1.x, Tmp.v1.y, randomAngle, 110f);
-                    l.team = team;
-                    l.colorFrom = Color.red;
-                    l.colorTo = Color.black;
-                    l.splitChance = 0.045f;
-                    //l.damage = 520f * power.status;
-                    l.liveDamage = () -> 520f * trueEfficiency();
-                    l.range = 790f;
-                    l.influence = targetPos;
-                    l.add();
+                    lightning.create(team, Tmp.v1.x, Tmp.v1.y, randomAngle, () -> 520f * trueEfficiency(), null, targetPos);
                 }
 
             }else{
