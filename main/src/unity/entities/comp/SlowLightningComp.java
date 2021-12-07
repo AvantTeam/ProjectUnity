@@ -26,10 +26,11 @@ abstract class SlowLightningComp implements Drawc, Childc{
     float x, y, rotation;
     Team team = Team.derelict;
     Position target;
+    Bullet bullet;
     Floatp liveDamage;
     SlowLightningType type;
     Seq<SlowLightningNode> nodes = new Seq<>(SlowLightningNode.class);
-    int layer = 0, seed = 1;
+    int layer = 0, seed = 1, bulletId = -1;
     float time, distance, timer;
     float lastX, lastY;
     boolean ended = false, passed = false;
@@ -46,6 +47,9 @@ abstract class SlowLightningComp implements Drawc, Childc{
     public void add(){
         lastX = x;
         lastY = y;
+        if(bullet != null){
+            bulletId = bullet.id;
+        }
 
         end(null);
     }
@@ -54,7 +58,7 @@ abstract class SlowLightningComp implements Drawc, Childc{
         boolean split = nextBoolean(type.splitChance);
         for(int i = 0; i < (split ? 2 : 1); i++){
             float r = nextRange(split ? type.splitRandSpacing : type.randSpacing);
-            float tr = node != null ? node.rotation : rotation;
+            float tr = node != null ? node.rotation + node.rotRand : rotation;
             if(target != null){
                 float scl = 1f - Mathf.clamp(dst(target) / type.rotationDistance);
                 tr = Angles.moveToward(tr, angleTo(target), ((type.maxRotationSpeed - type.minRotationSpeed) * scl) + type.minRotationSpeed);
@@ -100,6 +104,15 @@ abstract class SlowLightningComp implements Drawc, Childc{
             for(SlowLightningNode n : nodes){
                 n.move(layer, dx, dy);
             }
+        }
+        if(bullet != null && bullet.id != bulletId){
+            bullet = null;
+        }
+        if(type.continuous && (timer += Time.delta) >= 5f){
+            for(SlowLightningNode n : nodes){
+                n.collide();
+            }
+            timer = 0f;
         }
         for(int i = 0; i < nodes.size; i++){
             nodes.items[i].update();

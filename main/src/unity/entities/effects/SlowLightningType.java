@@ -31,10 +31,15 @@ public class SlowLightningType{
     public Effect hitEffect = HitFx.coloredHitSmall;
 
     public SlowLightning create(Team team, float x, float y, float rotation, Floatp liveDamage, Posc parent, Position target){
+        return create(team, null, x, y, rotation, liveDamage, parent, target);
+    }
+
+    public SlowLightning create(Team team, Bullet b, float x, float y, float rotation, Floatp liveDamage, Posc parent, Position target){
         SlowLightning s = SlowLightning.create();
         s.seed = seed;
         s.type = this;
         s.team = team;
+        s.bullet = b;
         s.set(x, y);
         s.rotation = rotation;
         s.liveDamage = liveDamage;
@@ -114,6 +119,16 @@ public class SlowLightningType{
             }
             if(!ended && main.distance < type.range && main.nodes.size < maxNodes){
                 main.end(this);
+            }
+        }
+
+        public void collide(){
+            Position p = getLast();
+            if(time >= 1f){
+                line(p.getX(), p.getY(), x, y);
+            }else{
+                Vec2 v = Tmp.v1.set(this).sub(p).scl(time).add(p);
+                line(p.getX(), p.getY(), v.x, v.y);
             }
         }
 

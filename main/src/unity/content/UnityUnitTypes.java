@@ -4571,7 +4571,25 @@ public class UnityUnitTypes{
                             new ArmorDamageModule(0.1f, 70f, 30f, 0.9f)
                             };
                         }};
-                    }}
+                    }},
+                new Weapon(name + "-destroyer-4"){{
+                    x = 98f;
+                    y = -26.25f;
+                    shootY = 17.5f;
+
+                    shootSound = UnitySounds.oppressionLightning;
+
+                    rotate = true;
+                    rotateSpeed = 3f;
+                    inaccuracy = 15f;
+                    xRand = 6f;
+
+                    shots = 5;
+
+                    reload = 4f * 60f;
+
+                    bullet = new SlowLightningBulletType(120f);
+                }}
                 ),
                 new Seq<Weapon>()
             };
