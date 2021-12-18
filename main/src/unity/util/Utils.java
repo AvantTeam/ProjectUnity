@@ -23,7 +23,7 @@ import unity.graphics.*;
 import static mindustry.Vars.*;
 
 public final class Utils{
-    public static final PowIn pow6In = new PowIn(6);
+    public static final PowIn pow6In = new PowIn(6f);
 
     public static final float sqrtHalf = Mathf.sqrt(0.5f);
 
