@@ -30,6 +30,8 @@ import unity.entities.bullet.energy.*;
 import unity.entities.bullet.laser.*;
 import unity.entities.bullet.misc.*;
 import unity.entities.bullet.physical.*;
+import unity.entities.legs.*;
+import unity.entities.legs.BasicLeg.*;
 import unity.entities.units.*;
 import unity.gen.*;
 import unity.graphics.*;
@@ -100,6 +102,9 @@ public class UnityUnitTypes{
     // plague unit + trijointleg
     public static @FactionDef("plague") @EntityDef({Unitc.class, TriJointLegsc.class})
     UnitType exowalker;
+
+    public static @FactionDef("plague") @EntityDef({Unitc.class, CLegc.class})
+    UnitType toxoswarmer;
 
     // plague unit + worm
     public static @FactionDef("plague") @EntityDef({Unitc.class, Wormc.class})
@@ -2961,6 +2966,72 @@ public class UnityUnitTypes{
                     toColor = UnityPal.plague;
                 }};
             }});
+        }};
+
+        toxoswarmer = new UnityUnitType("toxoswarmer"){{
+            health = 7000f;
+            speed = 1.1f;
+            drag = 0.1f;
+            hitSize = 22.25f;
+
+            rotateSpeed = 3f;
+
+            hovering = true;
+            allowLegStep = true;
+            visualElevation = 0.7f;
+            groundLayer = Layer.legUnit + 0.01f;
+            outlineColor = UnityPal.darkerOutline;
+
+            legGroup.add(CLegType.createGroup(name + "-base", g -> {
+                g.baseRotateSpeed = 4f;
+                g.moveSpacing = 0.8f;
+            },
+            new BasicLegType(name + "-leg-small"){{
+                x = 6.25f;
+                y = 10.75f;
+                targetX = 31f;
+                targetY = 53.5f;
+                baseLength = endLength = 32f;
+                legTrns = 0.8f;
+            }},
+            new BasicLegType(name + "-leg-small"){{
+                x = 12.5f;
+                y = 0f;
+                targetX = 61.75f;
+                targetY = 0f;
+                baseLength = endLength = 32f;
+                legTrns = 0.8f;
+            }},
+            new BasicLegType(name + "-leg-small"){{
+                x = 6.25f;
+                y = -10.75f;
+                targetX = 31f;
+                targetY = -53.5f;
+                baseLength = endLength = 32f;
+                legTrns = 0.8f;
+                flipped = true;
+            }}),
+            CLegType.createGroup(name + "-base", g -> {
+                g.baseRotateSpeed = 1f;
+                g.moveSpacing = 0.9f;
+            },
+            new BasicLegType(name + "-leg-large"){{
+                x = y = 11.25f;
+                targetX = targetY = 77.5f;
+                baseLength = 55f;
+                endLength = 71f;
+                legTrns = 0.7f;
+            }},
+            new BasicLegType(name + "-leg-large"){{
+                x = 11.25f;
+                y = -11.25f;
+                targetX = 77.5f;
+                targetY = -77.5f;
+                baseLength = 55f;
+                endLength = 71f;
+                legTrns = 0.7f;
+                flipped = true;
+            }}));
         }};
 
         toxobyte = new UnityUnitType("toxobyte"){{

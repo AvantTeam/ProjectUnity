@@ -18,6 +18,8 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.blocks.environment.*;
 import unity.entities.*;
+import unity.entities.legs.*;
+import unity.entities.legs.CLegType.*;
 import unity.entities.units.*;
 import unity.gen.*;
 import unity.type.decal.*;
@@ -90,6 +92,8 @@ public class UnityUnitType extends UnitType{
     // Legs extra
     protected static Vec2 legOffsetB = new Vec2();
     protected static float[][] jointOffsets = new float[2][2];
+
+    public Seq<ClegGroupType> legGroup = new Seq<>();
 
     public boolean customBackLegs = false;
     public boolean legShadows = false;
@@ -206,6 +210,7 @@ public class UnityUnitType extends UnitType{
             }
         }
         tentacles.each(TentacleType::load);
+        legGroup.each(ClegGroupType::load);
     }
 
     @Override
@@ -582,6 +587,11 @@ public class UnityUnitType extends UnitType{
             Draw.z(oz - 0.01f);
             drawTriLegs((Unit & TriJointLegsc)unit);
             Draw.z(oz);
+        }
+        if(unit instanceof CLegc){
+            for(CLegGroup group : ((CLegc)unit).legGroups()){
+                group.draw(unit);
+            }
         }
 
         super.drawSoftShadow(unit);
