@@ -83,8 +83,6 @@ public class UnityUnitType extends UnitType{
     public float rotorDeathSlowdown = 0.01f;
     public float fallRotateSpeed = 2.5f;
 
-    // Mech pad units
-    public Color engineColor;
 
     // For shoot armor ability
     public FloatSeq weaponXs = new FloatSeq();
@@ -663,37 +661,6 @@ public class UnityUnitType extends UnitType{
         }
 
         Draw.z(z);
-    }
-
-    @Override
-    public void drawEngine(Unit unit){
-        if(engineColor != null){
-            if(!unit.isFlying()) return;
-
-            float scale = unit.elevation;
-            float offset = engineOffset / 2f + engineOffset / 2f * scale;
-
-            if(unit instanceof Trailc trail){
-                Trail t = trail.trail();
-                t.draw(engineColor, (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f) * scale) * trailScl);
-            }
-
-            Draw.color(engineColor);
-            Fill.circle(
-                unit.x + Angles.trnsx(unit.rotation + 180f, offset),
-                unit.y + Angles.trnsy(unit.rotation + 180f, offset),
-                (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f)) * scale
-            );
-            Draw.color(Color.white);
-            Fill.circle(
-                unit.x + Angles.trnsx(unit.rotation + 180f, offset - 1f),
-                unit.y + Angles.trnsy(unit.rotation + 180f, offset - 1f),
-                (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f)) / 2f  * scale
-            );
-            Draw.color();
-        }else{
-            super.drawEngine(unit);
-        }
     }
 
     @Override
