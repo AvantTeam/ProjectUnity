@@ -3,10 +3,12 @@ package unity.content.effects;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.util.*;
 import mindustry.entities.*;
 import mindustry.graphics.*;
 import unity.graphics.*;
+import unity.util.*;
 
 import static arc.graphics.g2d.Draw.*;
 import static arc.graphics.g2d.Lines.circle;
@@ -64,6 +66,23 @@ public class ShootFx{
         stroke(e.fout() * 1.2f + 0.5f);
 
         randLenVectors(e.id, 10, 30f * e.finpow(), e.rotation, 50f, (x, y) -> lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fin() * 5f + 2f));
+    }),
+
+    plagueShootSmokeLarge = new Effect(35f, e -> {
+        Draw.color(UnityPal.plagueDark, Color.gray, Color.darkGray, e.fin());
+        for(int i = 0; i < 12; i++){
+            float r = (Utils.randomTriangularSeed((e.id * 191L) + i) * 90f) + e.rotation;
+            Vec2 v = Tmp.v1.trns(r, e.finpow() * 20f * Mathf.randomSeed(e.id * 81L + i)).add(e.x, e.y);
+            Fill.circle(v.x, v.y, 5f * Mathf.curve(e.fout(), 0f, 0.7f) * Mathf.randomSeed(e.id * 9L + i, 0.8f, 1.1f));
+        }
+        e.scaled(20f, s -> {
+            Lines.stroke(1.5f);
+            Draw.color(UnityPal.plague, Color.white, s.fin());
+            Angles.randLenVectors(e.id, 5, 25f * s.finpow() + 0.1f, e.rotation, 20f, (x, y) -> {
+                float r = Mathf.angle(x, y);
+                Lines.lineAngle(e.x + x, e.y + y, r, 5f * s.fout());
+            });
+        });
     }),
 
     scarRailShoot = new Effect(24f, e -> {

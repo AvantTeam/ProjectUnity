@@ -3032,6 +3032,45 @@ public class UnityUnitTypes{
                 legTrns = 0.7f;
                 flipped = true;
             }}));
+
+            weapons.add(new Weapon("unity-toxo-launcher"){{
+                x = 17f;
+                y = -8.25f;
+
+                reload = 3f * 60f;
+                shots = 8;
+                shotDelay = 2f;
+                inaccuracy = 16f;
+                rotate = true;
+                rotateSpeed = 3f;
+
+                bullet = new ShootingBulletType("unity-toxo-missile", 4f, 200f){{
+                    lifetime = 4f * 60f;
+                    reloadTime = 4f;
+                    minTargetRange = 60f;
+                    maxRange = 220f;
+                    trailColor = lightColor = lightningColor = UnityPal.plagueDark;
+                    lightning = 3;
+                    lightningLength = 3;
+                    lightningDamage = 15f;
+                    shootInaccuracy = 4f;
+
+                    shootSound = Sounds.flame;
+                    shootBullet = new FlameBulletType(5f, 15f){{
+                        lifetime = 20f;
+                        colors = new Color[]{UnityPal.plague, UnityPal.plagueDark, Color.darkGray, Color.gray};
+                        pierceBuilding = pierce = true;
+                        collidesAir = true;
+                        knockback = 0.001f;
+                        pierceCap = 2;
+                        statusDuration = 60f;
+                        splashDamage = 4f;
+                        splashDamageRadius = 25f;
+                        particleSizeScl = 2.25f;
+                        particleSpread = 4f;
+                    }};
+                }};
+            }});
         }};
 
         toxobyte = new UnityUnitType("toxobyte"){{

@@ -29,6 +29,8 @@ public final class Utils{
 
     public static final Quat q1 = new Quat(), q2 = new Quat();
 
+    public static final Rand seedr = new Rand();
+
     private static final Vec2 tV = new Vec2(), tV2 = new Vec2();
     private static final Seq<Healthc> tmpUnitSeq = new Seq<>();
     private static final IntSet collidedBlocks = new IntSet();
@@ -185,6 +187,11 @@ public final class Utils{
             return (angle - val) % 360f;
         }
         return angle;
+    }
+
+    public static float randomTriangularSeed(long seed){
+        seedr.setSeed(seed * 9999L);
+        return seedr.nextFloat() - seedr.nextFloat();
     }
 
     public static void shotgunRange(int points, float range, float angle, Floatc cons){
