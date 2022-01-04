@@ -129,8 +129,8 @@ public class UnityUnitTypes{
     public static @FactionDef("monolith") @EntityDef({Unitc.class, Legsc.class, Monolithc.class})
     UnitType pylon, monument, colossus, bastion;
 
-    // monolith unit + assistant
-    public static @FactionDef("monolith") @EntityDef({Unitc.class, Assistantc.class, Monolithc.class})
+    // monolith unit + assistant + trail
+    public static @FactionDef("monolith") @EntityDef({Unitc.class, Assistantc.class, Trailc.class, Monolithc.class})
     UnitType adsect, comitate/*, praesid*/;
 
     // koruh kami
@@ -4486,7 +4486,7 @@ public class UnityUnitTypes{
                 x = 81.75f;
                 y = -71.5f;
                 shootY = 9.75f;
-                
+
                 rotate = true;
                 rotateSpeed = 1.75f;
 
