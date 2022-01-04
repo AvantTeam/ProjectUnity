@@ -3,10 +3,12 @@ package unity.content.effects;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.util.*;
 import mindustry.entities.*;
 import mindustry.graphics.*;
 import unity.graphics.*;
+import unity.util.*;
 
 import static arc.graphics.g2d.Draw.*;
 import static arc.graphics.g2d.Lines.circle;
@@ -122,6 +124,44 @@ public class HitFx{
         });
         stroke(0.5f + e.fout());
         randLenVectors(e.id, 6, e.fin() * 35f, e.rotation + 180f, 45f, (x, y) -> lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fout() * 7f + 1f));
+    }),
+
+    plagueLargeHit = new Effect(80f, e -> {
+        float fOffset = 0.1f;
+        float fOffsetA = 0.05f;
+        Rand r = Utils.seedr;
+        r.setSeed(e.id * 99999L);
+
+        for(int i = 0; i < 9; i++){
+            float f = r.nextFloat() * fOffset;
+            float fin = Mathf.curve(e.fin(), f, f + 1 - fOffset);
+            float ex = Interp.pow3Out.apply(fin) * 35f * r.nextFloat();
+            Vec2 v = Tmp.v1.trns(r.random(360f), ex);
+
+            Draw.color(Color.gray, Color.darkGray, fin);
+            Fill.circle(e.x + v.x, e.y + v.y, 9f * Mathf.curve(1f - fin, 0f, 0.7f));
+            Fill.circle(e.x + v.x * 0.5f, e.y + v.y * 0.5f, 5f * Mathf.curve(1f - fin, 0f, 0.7f));
+        }
+
+        e.scaled(40f, s -> {
+            Draw.color(UnityPal.plague);
+            for(int i = 0; i < 6; i++){
+                float f = r.nextFloat() * fOffsetA;
+                float fin = Mathf.curve(s.fin(), f, f + 1 - fOffsetA);
+                float ifin = Interp.pow3Out.apply(fin);
+                float scl = r.nextFloat();
+                float ex = ifin * 50f * scl;
+                float slope = Interp.pow3Out.apply(Mathf.slope(ifin));
+                Vec2 v = Tmp.v1.trns(r.random(360f), ex, Mathf.sin(ifin * Mathf.PI, 1f / r.random(1f, 5f), slope * scl * r.random(6f, 11f))).add(e.x, e.y);
+                Fill.circle(v.x, v.y, 6f * s.fout());
+            }
+        });
+
+        e.scaled(15f, s -> {
+            Draw.color(UnityPal.plague);
+            Lines.stroke(2f * s.fout());
+            Lines.circle(e.x, e.y, 50f * s.finpow());
+        });
     }),
 
     eclipseHit = new Effect(15f, e -> {
