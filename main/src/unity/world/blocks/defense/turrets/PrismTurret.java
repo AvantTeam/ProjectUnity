@@ -22,9 +22,9 @@ import static mindustry.Vars.*;
 @Merge(base = PowerTurret.class, value = Soulc.class)
 public class PrismTurret extends SoulPowerTurret{
     public Model model;
-    public float prismOffset = 8f;
+    public float prismOffset = 10f;
     public float prismRotateSpeed = 20f;
-    public float scale = 8f;
+    public float scale = 0.6f;
 
     public Color fromColor = UnityPal.monolithDark;
     public Color toColor = UnityPal.monolith;

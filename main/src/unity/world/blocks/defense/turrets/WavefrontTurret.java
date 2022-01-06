@@ -12,7 +12,7 @@ import unity.util.*;
 
 public class WavefrontTurret extends PowerTurret{
     public Model model;
-    public float scale = 4f;
+    public float scale = 2.4f;
 
     public float objectRotationSpeed = 7f;
 
