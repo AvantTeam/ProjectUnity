@@ -43,7 +43,6 @@ public class EntityProcessor extends BaseProcessor{
     ObjectMap<TypeElement, Seq<TypeElement>> componentDependencies = new ObjectMap<>();
     ObjectMap<TypeElement, ObjectMap<String, Seq<ExecutableElement>>> inserters = new ObjectMap<>();
     ObjectMap<TypeElement, ObjectMap<String, Seq<ExecutableElement>>> wrappers = new ObjectMap<>();
-    Seq<VariableElement> combineResolvers = new Seq<>();
     Seq<TypeElement> inters = new Seq<>();
     Seq<Element> defs = new Seq<>();
     Seq<EntityDefinition> definitions = new Seq<>();
@@ -65,7 +64,6 @@ public class EntityProcessor extends BaseProcessor{
         inters.addAll((Set<TypeElement>)roundEnv.getElementsAnnotatedWith(EntityInterface.class));
         defs.addAll(roundEnv.getElementsAnnotatedWith(EntityDef.class));
         pointers.addAll(roundEnv.getElementsAnnotatedWith(EntityPoint.class));
-        combineResolvers.addAll((Set<VariableElement>)roundEnv.getElementsAnnotatedWith(Resolve.class));
 
         for(ExecutableElement e : (Set<ExecutableElement>)roundEnv.getElementsAnnotatedWith(Insert.class)){
             if(!e.getParameters().isEmpty()) throw new IllegalStateException("All @Insert methods must not have parameters");
