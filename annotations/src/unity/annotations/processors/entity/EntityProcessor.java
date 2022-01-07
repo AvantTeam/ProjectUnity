@@ -874,7 +874,6 @@ public class EntityProcessor extends BaseProcessor{
         boolean firstc = true;
         if(values.contains(m -> annotation(m, Combine.class) != null)){
             ExecutableElement base = values.find(m -> annotation(m, Combine.class) != null);
-            values.remove(base);
 
             CodeBlock.Builder cbuilder = CodeBlock.builder();
             for(JCStatement stat : trees.getTree(base).getBody().getStatements()){
@@ -909,40 +908,41 @@ public class EntityProcessor extends BaseProcessor{
                             cbuilder.addStatement("$L $L = $L", type, var.name.toString(), var.init.toString());
                         }else{
                             cbuilder.addStatement("$L $L", type, var.name.toString());
-                        }
+                            cbuilder.beginControlFlow(simpleName(base) + "_" + var.name.toString() + "_RESOLVER_:");
 
-                        cbuilder.beginControlFlow(simpleName(base) + "_" + var.name.toString() + "_RESOLVER_:");
+                            Seq<String> varNames = new Seq<>();
+                            if((isNumeric(type) && !method.bool) || (isBool(type) && method.bool)){
+                                for(ExecutableElement elem : values){
+                                    if(elem == base) continue;
 
-                        Seq<String> varNames = new Seq<>();
-                        if((isNumeric(type) && !method.bool) || (isBool(type) && method.bool)){
-                            for(ExecutableElement elem : values){
-                                String blockName = simpleName(elem.getEnclosingElement()).toLowerCase().replace("comp", "");
-                                String varName = blockName + "_" + simpleName(base) + "_";
-                                varNames.add(varName);
+                                    String blockName = simpleName(elem.getEnclosingElement()).toLowerCase().replace("comp", "");
+                                    String varName = blockName + "_" + simpleName(base) + "_";
+                                    varNames.add(varName);
 
-                                List<JCStatement> rstats = trees.getTree(elem).getBody().getStatements();
-                                if(rstats.size() == 1){
-                                    cbuilder.addStatement("$L $L = $L", type, varName, ((JCReturn)rstats.get(0)).expr.toString());
-                                }else{
-                                    cbuilder.addStatement("$L $L", type, varName);
+                                    List<JCStatement> rstats = trees.getTree(elem).getBody().getStatements();
+                                    if(rstats.size() == 1){
+                                        cbuilder.addStatement("$L $L = $L", type, varName, ((JCReturn)rstats.get(0)).expr.toString());
+                                    }else{
+                                        cbuilder.addStatement("$L $L", type, varName);
 
-                                    cbuilder.beginControlFlow("$L:", blockName);
-                                    for(JCStatement istate : trees.getTree(elem).getBody().getStatements()){
-                                        if(istate instanceof JCReturn){
-                                            cbuilder.addStatement("$L = $L", varName, ((JCReturn)istate).expr.toString());
-                                        }else{
-                                            cbuilder.addStatement(istate.toString());
+                                        cbuilder.beginControlFlow("$L:", blockName);
+                                        for(JCStatement istate : trees.getTree(elem).getBody().getStatements()){
+                                            if(istate instanceof JCReturn){
+                                                cbuilder.addStatement("$L = $L", varName, ((JCReturn)istate).expr.toString());
+                                            }else{
+                                                cbuilder.addStatement(istate.toString());
+                                            }
                                         }
+                                        cbuilder.endControlFlow();
                                     }
-                                    cbuilder.endControlFlow();
                                 }
+                            }else{
+                                throw new IllegalStateException("Invalid use of @Resolve: " + type + " is incompatible with Method#" + method.name());
                             }
-                        }else{
-                            throw new IllegalStateException("Invalid use of @Resolve: " + type + " is incompatible with Method#" + method.name());
-                        }
 
-                        method.compute.get(varNames, (format, args) -> cbuilder.addStatement(var.name.toString() + " = " + format, args.toArray()));
-                        cbuilder.endControlFlow();
+                            method.compute.get(varNames, (format, args) -> cbuilder.addStatement(var.name.toString() + " = " + format, args.toArray()));
+                            cbuilder.endControlFlow();
+                        }
                     }
                 }else{
                     cbuilder.add(stat.toString() + lnew());
@@ -1003,14 +1003,10 @@ public class EntityProcessor extends BaseProcessor{
                 }
 
                 if(!firstc && !newlined && !compBefore.isEmpty()) mbuilder.addCode(lnew());
-                for(ExecutableElement e : compBefore){
-                    mbuilder.addStatement("this.$L()", simpleName(e));
-                }
+                for(ExecutableElement e : compBefore) mbuilder.addStatement("this.$L()", simpleName(e));
 
                 if(writeBlock){
-                    if(annotation(elem, BreakAll.class) == null){
-                        str = str.replace("return;", "break " + blockName + ";");
-                    }
+                    if(annotation(elem, BreakAll.class) == null) str = str.replace("return;", "break " + blockName + ";");
 
                     if(str
                         .replaceAll("\\s+", "")
@@ -1027,16 +1023,11 @@ public class EntityProcessor extends BaseProcessor{
                 }
 
                 mbuilder.addCode(str);
+
                 if(writeBlock) mbuilder.endControlFlow();
+                for(ExecutableElement e : compAfter) mbuilder.addStatement("this.$L()", simpleName(e));
 
-                for(ExecutableElement e : compAfter){
-                    mbuilder.addStatement("this.$L()", simpleName(e));
-                }
-
-                if(!wrapComp.isEmpty()){
-                    mbuilder.endControlFlow();
-                }
-
+                if(!wrapComp.isEmpty()) mbuilder.endControlFlow();
                 firstc = false;
             }
         }

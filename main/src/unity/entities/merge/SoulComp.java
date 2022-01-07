@@ -11,6 +11,7 @@ import mindustry.world.blocks.defense.turrets.Turret.*;
 import mindustry.world.meta.*;
 import unity.ai.*;
 import unity.annotations.Annotations.*;
+import unity.annotations.Annotations.Resolve.*;
 import unity.entities.*;
 import unity.gen.*;
 import unity.world.blocks.defense.turrets.*;
@@ -97,17 +98,17 @@ abstract class SoulComp extends Block implements Stemc{
                 transferred = true;
             }
 
-            if(soul.controller() instanceof MonolithSoulAI ai){
-                ai.empty = false;
-            }
-
+            if(soul.controller() instanceof MonolithSoulAI ai) ai.empty = false;
             return transferred;
         }
 
         @Override
-        @Replace
+        @Combine
         public float efficiency(){
-            return (requireSoul && disabled()) ? 0f : (super.efficiency() * ((souls / (float)maxSouls) * (efficiencyTo - efficiencyFrom) + efficiencyFrom));
+            @Resolve(Method.average)
+            float result = 1f;
+
+            return (requireSoul && disabled()) ? 0f : (super.efficiency() * result * ((souls / (float)maxSouls) * (efficiencyTo - efficiencyFrom) + efficiencyFrom));
         }
 
         @Override

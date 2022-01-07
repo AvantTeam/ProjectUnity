@@ -302,12 +302,34 @@ public class Annotations{
         enum Method{
             // Numeric values.
             add(false, (vars, cons) -> {
+                if(vars.size == 1){
+                    cons.get("$L", Seq.with(vars.first()));
+                    return;
+                }
+
                 StringBuilder format = new StringBuilder();
                 for(int i = 0; i < vars.size; i++) format.append(format.length() == 0 ? "$L" : " + $L");
 
                 cons.get(format.toString(), vars);
             }),
+            average(false, (vars, cons) -> {
+                if(vars.size == 1){
+                    cons.get("$L", Seq.with(vars.first()));
+                    return;
+                }
+
+                StringBuilder format = new StringBuilder();
+                for(int i = 0; i < vars.size; i++) format.append(format.length() == 0 ? "$L" : " + $L");
+
+                format.insert(0, "(").append(") / $L");
+                cons.get(format.toString(), Seq.with(vars).and(String.valueOf(vars.size)));
+            }),
             multiply(false, (vars, cons) -> {
+                if(vars.size == 1){
+                    cons.get("$L", Seq.with(vars.first()));
+                    return;
+                }
+
                 StringBuilder format = new StringBuilder();
                 for(int i = 0; i < vars.size; i++) format.append(format.length() == 0 ? "$L" : " + $L");
 
@@ -368,12 +390,22 @@ public class Annotations{
 
             // Boolean values.
             and(true, (vars, cons) -> {
+                if(vars.size == 1){
+                    cons.get("$L", Seq.with(vars.first()));
+                    return;
+                }
+
                 StringBuilder format = new StringBuilder();
                 for(int i = 0; i < vars.size; i++) format.append(format.length() == 0 ? "$L" : " && $L");
 
                 cons.get(format.toString(), vars);
             }),
             or(true, (vars, cons) -> {
+                if(vars.size == 1){
+                    cons.get("$L", Seq.with(vars.first()));
+                    return;
+                }
+
                 StringBuilder format = new StringBuilder();
                 for(int i = 0; i < vars.size; i++) format.append(format.length() == 0 ? "$L" : " || $L");
 
