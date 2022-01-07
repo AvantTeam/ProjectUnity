@@ -25,6 +25,8 @@ import java.lang.reflect.*;
 import java.util.*;
 import java.util.regex.*;
 
+import static javax.lang.model.type.TypeKind.*;
+
 /**
  * @author Anuke
  * @author GlennFolker
@@ -299,6 +301,40 @@ public abstract class BaseProcessor extends AbstractProcessor{
     public static boolean isPrimitive(String type){
         return type.equals("boolean") || type.equals("byte") || type.equals("short") || type.equals("int")
             || type.equals("long") || type.equals("float") || type.equals("double") || type.equals("char");
+    }
+
+    public boolean isNumeric(TypeMirror type){
+        try{
+            switch(types.unboxedType(type).getKind()){
+                case BYTE:
+                case SHORT:
+                case INT:
+                case FLOAT:
+                case LONG:
+                case DOUBLE: return true;
+                default: return false;
+            }
+        }catch(IllegalArgumentException t){
+            return false;
+        }
+    }
+
+    public boolean isNumeric(String type){
+        return type.equals("byte") || type.equals("short") || type.equals("int") || type.equals("float")
+            || type.equals("long") || type.equals("double") || type.equals("Byte") || type.equals("Short")
+            || type.equals("Integer") || type.equals("Float") || type.equals("Long") || type.equals("Double");
+    }
+
+    public boolean isBool(TypeMirror type){
+        try{
+            return types.unboxedType(type).getKind() == BOOLEAN;
+        }catch(IllegalArgumentException t){
+            return false;
+        }
+    }
+
+    public boolean isBool(String type){
+        return type.equals("boolean") || type.equals("Boolean");
     }
 
     public static <A extends Annotation> A annotation(Element e, Class<A> annotation){

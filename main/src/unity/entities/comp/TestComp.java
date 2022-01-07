@@ -4,6 +4,7 @@ import arc.math.*;
 import arc.util.*;
 import mindustry.gen.*;
 import unity.annotations.Annotations.*;
+import unity.annotations.Annotations.Resolve.*;
 import unity.gen.*;
 
 /**
@@ -91,6 +92,32 @@ abstract class TestComp implements Unitc, Test4c{
             destroy();
             return;
         }
+    }
+
+    @Override
+    @Combine
+    public float speed(){
+        @Resolve(Method.add)
+        float result = 0f;
+
+        /*
+        Resulting codes:
+
+        float result = 0f;
+        speed_result_RESOLVER_: {
+            float test4_speed_;
+            test4: {
+                // ...
+                test4_speed_ = // value, replacing `return` with `test4_speed_ = `.
+            }
+
+            // other components...
+
+            result = test4_speed_; // + othercomponent_speed_...
+        }
+        */
+
+        return result;
     }
 
     /** Replaces default serialization method */

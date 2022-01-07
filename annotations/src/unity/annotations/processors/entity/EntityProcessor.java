@@ -7,9 +7,11 @@ import arc.util.*;
 import arc.util.pooling.Pool.*;
 import com.squareup.javapoet.*;
 import com.sun.source.tree.*;
+import com.sun.tools.javac.tree.JCTree.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import unity.annotations.Annotations.*;
+import unity.annotations.Annotations.Resolve.*;
 import unity.annotations.processors.*;
 import unity.annotations.processors.util.*;
 import unity.annotations.processors.util.TypeIOResolver.*;
@@ -41,6 +43,7 @@ public class EntityProcessor extends BaseProcessor{
     ObjectMap<TypeElement, Seq<TypeElement>> componentDependencies = new ObjectMap<>();
     ObjectMap<TypeElement, ObjectMap<String, Seq<ExecutableElement>>> inserters = new ObjectMap<>();
     ObjectMap<TypeElement, ObjectMap<String, Seq<ExecutableElement>>> wrappers = new ObjectMap<>();
+    Seq<VariableElement> combineResolvers = new Seq<>();
     Seq<TypeElement> inters = new Seq<>();
     Seq<Element> defs = new Seq<>();
     Seq<EntityDefinition> definitions = new Seq<>();
@@ -62,6 +65,7 @@ public class EntityProcessor extends BaseProcessor{
         inters.addAll((Set<TypeElement>)roundEnv.getElementsAnnotatedWith(EntityInterface.class));
         defs.addAll(roundEnv.getElementsAnnotatedWith(EntityDef.class));
         pointers.addAll(roundEnv.getElementsAnnotatedWith(EntityPoint.class));
+        combineResolvers.addAll((Set<VariableElement>)roundEnv.getElementsAnnotatedWith(Resolve.class));
 
         for(ExecutableElement e : (Set<ExecutableElement>)roundEnv.getElementsAnnotatedWith(Insert.class)){
             if(!e.getParameters().isEmpty()) throw new IllegalStateException("All @Insert methods must not have parameters");
@@ -386,6 +390,15 @@ public class EntityProcessor extends BaseProcessor{
                 boolean serializeOverride = false;
 
                 for(Entry<String, Seq<ExecutableElement>> entry : methods){
+                    boolean hasCombiner = entry.value.contains(m -> annotation(m, Combine.class) != null);
+                    if(hasCombiner && entry.value.first().getReturnType().getKind() == VOID){
+                        throw new IllegalStateException("Void method cannot have @Combine.");
+                    }
+
+                    if(hasCombiner && entry.value.count(m -> annotation(m, Combine.class) != null) != 1){
+                        throw new IllegalStateException("Multiple @Combine methods.");
+                    }
+
                     if(entry.value.contains(m -> annotation(m, Replace.class) != null)){
                         int max = annotation(entry.value.max(m -> annotation(m, Replace.class) == null ? -1 : annotation(m, Replace.class).value()), Replace.class).value();
                         if(entry.value.first().getReturnType().getKind() == VOID){
@@ -419,7 +432,7 @@ public class EntityProcessor extends BaseProcessor{
                     }
                     entry.value.removeAll(removal);
 
-                    if(entry.value.count(m -> !is(m, Modifier.NATIVE, Modifier.ABSTRACT) && m.getReturnType().getKind() != VOID) > 1){
+                    if(!hasCombiner && entry.value.count(m -> !is(m, Modifier.NATIVE, Modifier.ABSTRACT) && m.getReturnType().getKind() != VOID) > 1){
                         throw new IllegalStateException("Type " + simpleName(def) + " has multiple components implementing non-void method " + entry.key + ".");
                     }
 
@@ -861,92 +874,172 @@ public class EntityProcessor extends BaseProcessor{
 
     boolean append(MethodSpec.Builder mbuilder, Seq<TypeElement> defComps, Seq<ExecutableElement> values, Seq<ExecutableElement> inserts, Seq<ExecutableElement> wrappers, boolean writeBlock){
         boolean firstc = true;
-        for(ExecutableElement elem : values){
-            if(!ext(elem, defComps)) continue;
+        if(values.contains(m -> annotation(m, Combine.class) != null)){
+            ExecutableElement base = values.find(m -> annotation(m, Combine.class) != null);
+            values.remove(base);
 
-            String descStr = descString(elem);
-            String blockName = simpleName(elem.getEnclosingElement()).toLowerCase().replace("comp", "");
+            CodeBlock.Builder cbuilder = CodeBlock.builder();
+            for(JCStatement stat : trees.getTree(base).getBody().getStatements()){
+                if(stat instanceof JCVariableDecl){
+                    JCVariableDecl var = (JCVariableDecl)stat;
+                    Seq<? extends AnnotationTree> annos = Seq.with(var.getModifiers().getAnnotations());
 
-            Seq<ExecutableElement> insertComp = inserts.select(e ->
-                simpleName(toComp(elements(annotation(e, Insert.class)::block).first()))
-                    .toLowerCase().replace("comp", "")
-                    .equals(blockName)
-            );
+                    AnnotationTree anno = annos.find(a -> a.getAnnotationType().toString().equals(Resolve.class.getSimpleName()));
+                    if(anno == null){
+                        cbuilder.add(stat.toString() + lnew());
+                    }else{
+                        String type = var.vartype.toString();
 
-            Seq<ExecutableElement> wrapComp = wrappers.select(e ->
-                simpleName(toComp(elements(annotation(e, Wrap.class)::block).first()))
-                    .toLowerCase().replace("comp", "")
-                    .equals(blockName)
-            );
+                        JCExpression value = (JCExpression)anno.getArguments().get(0);
+                        if(value instanceof JCAssign){
+                            JCAssign assign = (JCAssign)value;
+                            if(assign.lhs.toString().equals("value")) value = assign.rhs;
+                        }
 
-            if(is(elem, Modifier.ABSTRACT) || is(elem, Modifier.NATIVE) || (!methodBlocks.containsKey(descStr) && insertComp.isEmpty())) continue;
-            firstc = false;
+                        Name name;
+                        if(value instanceof JCFieldAccess){
+                            name = ((JCFieldAccess)value).name;
+                        }else if(value instanceof JCIdent){
+                            name = ((JCIdent)value).name;
+                        }else{
+                            throw new IllegalArgumentException(value.getClass().getSimpleName());
+                        }
 
-            Seq<ExecutableElement> compBefore = insertComp.select(e -> !annotation(e, Insert.class).after());
-            compBefore.sort(Structs.comps(Structs.comparingFloat(m -> annotation(m, MethodPriority.class) != null ? annotation(m, MethodPriority.class).value() : 0), Structs.comparing(BaseProcessor::simpleName)));
+                        Method method = Method.valueOf(name.toString());
 
-            Seq<ExecutableElement> compAfter = insertComp.select(e -> annotation(e, Insert.class).after());
-            compAfter.sort(Structs.comps(Structs.comparingFloat(m -> annotation(m, MethodPriority.class) != null ? annotation(m, MethodPriority.class).value() : 0), Structs.comparing(BaseProcessor::simpleName)));
+                        if(values.size == 1){
+                            cbuilder.addStatement("$L $L = $L", type, var.name.toString(), var.init.toString());
+                        }else{
+                            cbuilder.addStatement("$L $L", type, var.name.toString());
+                        }
 
-            String str = methodBlocks.get(descStr);
+                        cbuilder.beginControlFlow(simpleName(base) + "_" + var.name.toString() + "_RESOLVER_:");
 
-            boolean newlined = false;
-            if(!wrapComp.isEmpty()){
-                if(!firstc){
-                    mbuilder.addCode(lnew());
-                    newlined = true;
+                        Seq<String> varNames = new Seq<>();
+                        if((isNumeric(type) && !method.bool) || (isBool(type) && method.bool)){
+                            for(ExecutableElement elem : values){
+                                String blockName = simpleName(elem.getEnclosingElement()).toLowerCase().replace("comp", "");
+                                String varName = blockName + "_" + simpleName(base) + "_";
+                                varNames.add(varName);
+
+                                List<JCStatement> rstats = trees.getTree(elem).getBody().getStatements();
+                                if(rstats.size() == 1){
+                                    cbuilder.addStatement("$L $L = $L", type, varName, ((JCReturn)rstats.get(0)).expr.toString());
+                                }else{
+                                    cbuilder.addStatement("$L $L", type, varName);
+
+                                    cbuilder.beginControlFlow("$L:", blockName);
+                                    for(JCStatement istate : trees.getTree(elem).getBody().getStatements()){
+                                        if(istate instanceof JCReturn){
+                                            cbuilder.addStatement("$L = $L", varName, ((JCReturn)istate).expr.toString());
+                                        }else{
+                                            cbuilder.addStatement(istate.toString());
+                                        }
+                                    }
+                                    cbuilder.endControlFlow();
+                                }
+                            }
+                        }else{
+                            throw new IllegalStateException("Invalid use of @Resolve: " + type + " is incompatible with Method#" + method.name());
+                        }
+
+                        method.compute.get(varNames, (format, args) -> cbuilder.addStatement(var.name.toString() + " = " + format, args.toArray()));
+                        cbuilder.endControlFlow();
+                    }
+                }else{
+                    cbuilder.add(stat.toString() + lnew());
                 }
-
-                StringBuilder format = new StringBuilder("if(");
-                Seq<Object> args = new Seq<>();
-
-                for(int i = 0; i < wrapComp.size; i++){
-                    ExecutableElement e = wrapComp.get(i);
-
-                    format.append("this.$L()");
-                    args.add(simpleName(e));
-
-                    if(i < wrapComp.size - 1) format.append(" && ");
-                }
-
-                format.append(")");
-                mbuilder.beginControlFlow(format.toString(), args.toArray());
             }
 
-            if(!firstc && !newlined && !compBefore.isEmpty()) mbuilder.addCode(lnew());
-            for(ExecutableElement e : compBefore){
-                mbuilder.addStatement("this.$L()", simpleName(e));
-            }
+            mbuilder.addCode(procBlock("{" + cbuilder.build() + "}"));
+        }else{
+            for(ExecutableElement elem : values){
+                if(!ext(elem, defComps)) continue;
 
-            if(writeBlock){
-                if(annotation(elem, BreakAll.class) == null){
-                    str = str.replace("return;", "break " + blockName + ";");
+                String descStr = descString(elem);
+                String blockName = simpleName(elem.getEnclosingElement()).toLowerCase().replace("comp", "");
+
+                Seq<ExecutableElement> insertComp = inserts.select(e ->
+                    simpleName(toComp(elements(annotation(e, Insert.class)::block).first()))
+                        .toLowerCase().replace("comp", "")
+                        .equals(blockName)
+                );
+
+                Seq<ExecutableElement> wrapComp = wrappers.select(e ->
+                    simpleName(toComp(elements(annotation(e, Wrap.class)::block).first()))
+                        .toLowerCase().replace("comp", "")
+                        .equals(blockName)
+                );
+
+                if(is(elem, Modifier.ABSTRACT) || is(elem, Modifier.NATIVE) || (!methodBlocks.containsKey(descStr) && insertComp.isEmpty())) continue;
+
+                Seq<ExecutableElement> compBefore = insertComp.select(e -> !annotation(e, Insert.class).after());
+                compBefore.sort(Structs.comps(Structs.comparingFloat(m -> annotation(m, MethodPriority.class) != null ? annotation(m, MethodPriority.class).value() : 0), Structs.comparing(BaseProcessor::simpleName)));
+
+                Seq<ExecutableElement> compAfter = insertComp.select(e -> annotation(e, Insert.class).after());
+                compAfter.sort(Structs.comps(Structs.comparingFloat(m -> annotation(m, MethodPriority.class) != null ? annotation(m, MethodPriority.class).value() : 0), Structs.comparing(BaseProcessor::simpleName)));
+
+                String str = methodBlocks.get(descStr);
+
+                boolean newlined = false;
+                if(!wrapComp.isEmpty()){
+                    if(!firstc){
+                        mbuilder.addCode(lnew());
+                        newlined = true;
+                    }
+
+                    StringBuilder format = new StringBuilder("if(");
+                    Seq<Object> args = new Seq<>();
+
+                    for(int i = 0; i < wrapComp.size; i++){
+                        ExecutableElement e = wrapComp.get(i);
+
+                        format.append("this.$L()");
+                        args.add(simpleName(e));
+
+                        if(i < wrapComp.size - 1) format.append(" && ");
+                    }
+
+                    format.append(")");
+                    mbuilder.beginControlFlow(format.toString(), args.toArray());
                 }
 
-                if(str
-                    .replaceAll("\\s+", "")
-                    .replace("\n", "")
-                    .isEmpty()
-                ) continue;
-
-                if(!firstc && !newlined){
-                    mbuilder.addCode(lnew());
-                    newlined = true;
+                if(!firstc && !newlined && !compBefore.isEmpty()) mbuilder.addCode(lnew());
+                for(ExecutableElement e : compBefore){
+                    mbuilder.addStatement("this.$L()", simpleName(e));
                 }
 
-                mbuilder.beginControlFlow("$L:", blockName);
-            }
+                if(writeBlock){
+                    if(annotation(elem, BreakAll.class) == null){
+                        str = str.replace("return;", "break " + blockName + ";");
+                    }
 
-            mbuilder.addCode(str);
+                    if(str
+                        .replaceAll("\\s+", "")
+                        .replace("\n", "")
+                        .isEmpty()
+                    ) continue;
 
-            if(writeBlock) mbuilder.endControlFlow();
+                    if(!firstc && !newlined){
+                        mbuilder.addCode(lnew());
+                        newlined = true;
+                    }
 
-            for(ExecutableElement e : compAfter){
-                mbuilder.addStatement("this.$L()", simpleName(e));
-            }
+                    mbuilder.beginControlFlow("$L:", blockName);
+                }
 
-            if(!wrapComp.isEmpty()){
-                mbuilder.endControlFlow();
+                mbuilder.addCode(str);
+                if(writeBlock) mbuilder.endControlFlow();
+
+                for(ExecutableElement e : compAfter){
+                    mbuilder.addStatement("this.$L()", simpleName(e));
+                }
+
+                if(!wrapComp.isEmpty()){
+                    mbuilder.endControlFlow();
+                }
+
+                firstc = false;
             }
         }
 

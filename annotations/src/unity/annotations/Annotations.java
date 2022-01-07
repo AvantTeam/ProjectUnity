@@ -1,6 +1,8 @@
 package unity.annotations;
 
 import arc.func.*;
+import arc.struct.*;
+import com.squareup.javapoet.*;
 import com.sun.tools.javac.code.*;
 import com.sun.tools.javac.code.Attribute.Array;
 import com.sun.tools.javac.code.Attribute.Enum;
@@ -16,6 +18,7 @@ import com.sun.tools.javac.util.Name;
 import com.sun.tools.javac.util.*;
 import mindustry.world.*;
 import sun.reflect.annotation.*;
+import unity.annotations.processors.*;
 
 import javax.lang.model.element.*;
 import javax.lang.model.type.*;
@@ -283,6 +286,108 @@ public class Annotations{
     @Retention(RetentionPolicy.SOURCE)
     public @interface Extend{
         Class<?> value();
+    }
+
+    /** Resolves how to handle multiple non-void method specifications. */
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface Combine{}
+
+    /** To be used with {@link Combine}. */
+    @Target(ElementType.LOCAL_VARIABLE)
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface Resolve{
+        Method value();
+
+        enum Method{
+            // Numeric values.
+            add(false, (vars, cons) -> {
+                StringBuilder format = new StringBuilder();
+                for(int i = 0; i < vars.size; i++) format.append(format.length() == 0 ? "$L" : " + $L");
+
+                cons.get(format.toString(), vars);
+            }),
+            multiply(false, (vars, cons) -> {
+                StringBuilder format = new StringBuilder();
+                for(int i = 0; i < vars.size; i++) format.append(format.length() == 0 ? "$L" : " + $L");
+
+                cons.get(format.toString(), vars);
+            }),
+            max(false, (vars, cons) -> {
+                if(vars.size == 1){
+                    cons.get("$L", Seq.with(vars.first()));
+                    return;
+                }
+
+                StringBuilder format = new StringBuilder();
+                Seq<Object> args = new Seq<>();
+
+                ClassName cname = BaseProcessor.cName(Math.class);
+                for(int i = 0; i < vars.size; i++){
+                    if(i == 0){
+                        format.append("$T.max($L, $L)");
+                        args.add(cname, vars.get(0), vars.get(1));
+
+                        i++;
+                    }else{
+                        format.insert(0, "$T.max($L, ").append(")");
+
+                        args.insert(0, cname);
+                        args.insert(1, vars.get(i));
+                    }
+                }
+
+                cons.get(format.toString(), args);
+            }),
+            min(false, (vars, cons) -> {
+                if(vars.size == 1){
+                    cons.get("$L", Seq.with(vars.first()));
+                    return;
+                }
+
+                StringBuilder format = new StringBuilder();
+                Seq<Object> args = new Seq<>();
+
+                ClassName cname = BaseProcessor.cName(Math.class);
+                for(int i = 0; i < vars.size; i++){
+                    if(i == 0){
+                        format.append("$T.min($L, $L)");
+                        args.add(cname, vars.get(0), vars.get(1));
+
+                        i++;
+                    }else{
+                        format.insert(0, "$T.min($L, ").append(")");
+
+                        args.insert(0, cname);
+                        args.insert(1, vars.get(i));
+                    }
+                }
+
+                cons.get(format.toString(), args);
+            }),
+
+            // Boolean values.
+            and(true, (vars, cons) -> {
+                StringBuilder format = new StringBuilder();
+                for(int i = 0; i < vars.size; i++) format.append(format.length() == 0 ? "$L" : " && $L");
+
+                cons.get(format.toString(), vars);
+            }),
+            or(true, (vars, cons) -> {
+                StringBuilder format = new StringBuilder();
+                for(int i = 0; i < vars.size; i++) format.append(format.length() == 0 ? "$L" : " || $L");
+
+                cons.get(format.toString(), vars);
+            });
+
+            public final boolean bool;
+            public final Cons2<Seq<String>, Cons2<String, Seq<?>>> compute;
+
+            Method(boolean bool, Cons2<Seq<String>, Cons2<String, Seq<?>>> compute){
+                this.bool = bool;
+                this.compute = compute;
+            }
+        }
     }
 
     /** Loads texture regions but does not assign them to their acquirers */
