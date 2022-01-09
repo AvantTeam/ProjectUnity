@@ -498,6 +498,14 @@ public class EntityProcessor extends BaseProcessor{
 
                         bypass.sort(Structs.comps(Structs.comparingFloat(m -> annotation(m, MethodPriority.class) != null ? annotation(m, MethodPriority.class).value() : 0), Structs.comparing(BaseProcessor::simpleName)));
 
+                        Seq<ExecutableElement> noCompBeforeBypass = noCompBefore.select(m -> annotation(m, BypassGroupCheck.class) != null);
+                        if(noCompBeforeBypass.any()){
+                            noCompBefore.removeAll(noCompBeforeBypass);
+                            for(ExecutableElement e : noCompBeforeBypass){
+                                mbuilder.addStatement("this.$L()", simpleName(e));
+                            }
+                        }
+
                         boolean firstc = append(mbuilder, defComps, bypass, inserts, methodWrappers, writeBlock);
                         if(!firstc) mbuilder.addCode(lnew());
 

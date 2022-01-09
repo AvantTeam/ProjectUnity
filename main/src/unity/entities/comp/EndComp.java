@@ -99,6 +99,7 @@ abstract class EndComp implements Unitc, Factionc{
 
     @Insert(value = "remove()", after = false)
     @Extend(Wormc.class)
+    @BypassGroupCheck
     private void removeWorm(){
         UnityUnitType utype = (UnityUnitType)type;
         Wormc h = self();
