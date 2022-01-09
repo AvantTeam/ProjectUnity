@@ -15,7 +15,7 @@ import static mindustry.Vars.*;
 
 /** @author GlennFolker */
 public class TeleportAbility<T extends Teamc & Hitboxc> extends BaseAbility{
-    private static Vec2 vec = new Vec2();
+    private static final Vec2 vec = new Vec2();
 
     public float teleportDistance;
 

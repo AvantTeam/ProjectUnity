@@ -64,6 +64,8 @@ public class UnityUnitType extends UnitType{
      */
     public Seq<Weapon>[] segmentWeapons;
 
+    public Prov<Trail> trailType = () -> new Trail(trailLength);
+
     // Transforms
     public Func<Unit, UnitType> toTrans;
     public Boolf<Unit> transPred = unit -> {
@@ -82,7 +84,6 @@ public class UnityUnitType extends UnitType{
     public final Seq<Rotor> rotors = new Seq<>(4);
     public float rotorDeathSlowdown = 0.01f;
     public float fallRotateSpeed = 2.5f;
-
 
     // For shoot armor ability
     public FloatSeq weaponXs = new FloatSeq();
@@ -129,6 +130,17 @@ public class UnityUnitType extends UnitType{
 
         Class<?> caller = ReflectUtils.classCaller();
         boolean fromWave = caller != null && SpawnGroup.class.isAssignableFrom(caller);
+
+        if(unit instanceof Trailc e){
+            e.trail(trailType.get());
+        }
+
+        if(unit instanceof WaterMovec e){
+            try{
+                ReflectUtils.setField(unit, ReflectUtils.findField(unit.getClass(), "tleft", true), trailType.get());
+                ReflectUtils.setField(unit, ReflectUtils.findField(unit.getClass(), "tright", true), trailType.get());
+            }catch(Throwable ignored){}
+        }
 
         //if(fromWave){
             if(unit instanceof Monolithc e){

@@ -18,6 +18,7 @@ import unity.gen.Expc.*;
 import unity.gen.*;
 import unity.gen.Turretc.*;
 
+//this is as if disappointment is interpreted through codes
 @SuppressWarnings({"unused", "unchecked"})
 @MergeComponent
 abstract class TurretComp extends Turret implements Stemc{

@@ -35,6 +35,7 @@ import unity.entities.legs.BasicLeg.*;
 import unity.entities.units.*;
 import unity.gen.*;
 import unity.graphics.*;
+import unity.graphics.MultiTrail.*;
 import unity.type.*;
 import unity.type.decal.*;
 import unity.type.weapons.*;
@@ -129,9 +130,13 @@ public class UnityUnitTypes{
     public static @FactionDef("monolith") @EntityDef({Unitc.class, Legsc.class, Monolithc.class})
     UnitType pylon, monument, colossus, bastion;
 
-    // monolith unit + assistant + trail
-    public static @FactionDef("monolith") @EntityDef({Unitc.class, Assistantc.class, Trailc.class, Monolithc.class})
+    // monolith unit + assistant
+    public static @FactionDef("monolith") @EntityDef({Unitc.class, Assistantc.class, Monolithc.class})
     UnitType adsect, comitate/*, praesid*/;
+
+    // monolith unit + trail
+    public static @FactionDef("monolith") @EntityDef({Unitc.class, Trailc.class, Monolithc.class})
+    UnitType stray, tendence, liminality, calenture, hallucination, escapism, fantasy;
 
     // koruh kami
     public static @FactionDef("koruh") @EntityPoint(Kami.class)
@@ -4041,6 +4046,40 @@ public class UnityUnitTypes{
                     smokeEffect = hitEffect = despawnEffect = HitFx.hitMonolithLaser;
                 }};
             }});
+        }};
+
+        stray = new UnityUnitType("stray"){{
+            trailType = () -> new MultiTrail(
+                new TrailHold(new TexturedTrail(Core.atlas.find("phantasmal-trail"), 6)),
+                new TrailHold(new Trail(12), -2f, 0f),
+                new TrailHold(new Trail(12), 2f, 0f)
+            );
+
+            trailLength = trailType.get().length;
+        }};
+
+        tendence = new UnityUnitType("tendence"){{
+
+        }};
+
+        liminality = new UnityUnitType("liminality"){{
+
+        }};
+
+        calenture = new UnityUnitType("calenture"){{
+
+        }};
+
+        hallucination = new UnityUnitType("hallucination"){{
+
+        }};
+
+        escapism = new UnityUnitType("escapism"){{
+
+        }};
+
+        fantasy = new UnityUnitType("fantasy"){{
+
         }};
 
         kami = new RainbowUnitType("kami-mkii"){{
