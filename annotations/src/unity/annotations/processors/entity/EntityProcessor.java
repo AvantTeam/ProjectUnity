@@ -467,26 +467,6 @@ public class EntityProcessor extends BaseProcessor{
                         throw new IllegalStateException("Method " + entry.key + " is not void, therefore no methods can @Insert to it");
                     }
 
-                    Seq<ExecutableElement> methodWrappers = wraps.get(entry.key, Seq::new).select(e -> ext(e, defComps));
-                    if(first.getReturnType().getKind() != VOID && !methodWrappers.isEmpty()){
-                        throw new IllegalStateException("Method " + entry.key + " is not void, therefore no methods can @Wrap it");
-                    }
-
-                    if(simpleName(first).equals("add") || simpleName(first).equals("remove")){
-                        Seq<ExecutableElement> bypass = entry.value.select(m -> annotation(m, BypassGroupCheck.class) != null);
-                        entry.value.removeAll(bypass);
-
-                        boolean firstc = append(mbuilder, defComps, bypass, inserts, methodWrappers, writeBlock);
-                        if(!firstc) mbuilder.addCode(lnew());
-
-                        mbuilder.addStatement("if($Ladded) return", simpleName(first).equals("add") ? "" : "!");
-
-                        for(String group : defGroups){
-                            mbuilder.addStatement("Groups.$L.$L(this)", group, simpleName(first));
-                        }
-                        mbuilder.addCode(lnew());
-                    }
-
                     Seq<ExecutableElement> noCompInserts = inserts.select(e -> types.isSameType(
                         elements(annotation(e, Insert.class)::block).first().asType(),
                         toType(Void.class).asType()
@@ -498,13 +478,36 @@ public class EntityProcessor extends BaseProcessor{
                     Seq<ExecutableElement> noCompAfter = noCompInserts.select(e -> annotation(e, Insert.class).after());
                     noCompAfter.sort(Structs.comps(Structs.comparingFloat(m -> annotation(m, MethodPriority.class) != null ? annotation(m, MethodPriority.class).value() : 0), Structs.comparing(BaseProcessor::simpleName)));
 
+                    inserts = inserts.select(e -> !noCompInserts.contains(e));
+
+                    Seq<ExecutableElement> methodWrappers = wraps.get(entry.key, Seq::new).select(e -> ext(e, defComps));
+                    if(first.getReturnType().getKind() != VOID && !methodWrappers.isEmpty()){
+                        throw new IllegalStateException("Method " + entry.key + " is not void, therefore no methods can @Wrap it");
+                    }
+
                     Seq<ExecutableElement> noCompWrappers = methodWrappers.select(e -> types.isSameType(
                         elements(annotation(e, Wrap.class)::block).first().asType(),
                         toType(Void.class).asType()
                     ));
 
                     methodWrappers = methodWrappers.select(e -> !noCompWrappers.contains(e));
-                    inserts = inserts.select(e -> !noCompInserts.contains(e));
+
+                    if(simpleName(first).equals("add") || simpleName(first).equals("remove")){
+                        Seq<ExecutableElement> bypass = entry.value.select(m -> annotation(m, BypassGroupCheck.class) != null);
+                        entry.value.removeAll(bypass);
+
+                        bypass.sort(Structs.comps(Structs.comparingFloat(m -> annotation(m, MethodPriority.class) != null ? annotation(m, MethodPriority.class).value() : 0), Structs.comparing(BaseProcessor::simpleName)));
+
+                        boolean firstc = append(mbuilder, defComps, bypass, inserts, methodWrappers, writeBlock);
+                        if(!firstc) mbuilder.addCode(lnew());
+
+                        mbuilder.addStatement("if($Ladded) return", simpleName(first).equals("add") ? "" : "!");
+
+                        for(String group : defGroups){
+                            mbuilder.addStatement("Groups.$L.$L(this)", group, simpleName(first));
+                        }
+                        mbuilder.addCode(lnew());
+                    }
 
                     if(!noCompWrappers.isEmpty()){
                         StringBuilder format = new StringBuilder("if(");
