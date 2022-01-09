@@ -10,6 +10,7 @@ import mindustry.gen.*;
 import mindustry.type.*;
 import unity.*;
 import unity.annotations.Annotations.*;
+import unity.content.effects.*;
 import unity.gen.*;
 import unity.mod.*;
 import unity.type.*;
@@ -58,9 +59,22 @@ abstract class EndComp implements Unitc, Factionc{
         if(trueHealth > 0){
             aggression = 4f;
             aggressionTime = 10f * 60f;
+            SpecialFx.endDeny.at(x, y, rotation, self());
             return;
         }else{
             Unity.antiCheat.removeUnit(self());
+        }
+    }
+
+    @MethodPriority(-2)
+    @Override
+    @BreakAll
+    public void destroy(){
+        if(trueHealth > 0f){
+            aggression = 4f;
+            aggressionTime = 10f * 60f;
+            SpecialFx.endDeny.at(x, y, rotation, self());
+            return;
         }
     }
 
@@ -80,6 +94,16 @@ abstract class EndComp implements Unitc, Factionc{
             Endc e = h.head().as();
             health = trueHealth = e.trueHealth();
             maxHealth = trueMaxHealth = e.trueMaxHealth();
+        }
+    }
+
+    @Insert(value = "remove()", after = false)
+    @Extend(Wormc.class)
+    private void removeWorm(){
+        UnityUnitType utype = (UnityUnitType)type;
+        Wormc h = self();
+        if(isAdded() && !utype.splittable && !h.isHead() && h.head() != null && !h.head().isAdded()){
+            trueHealth = 0f;
         }
     }
 

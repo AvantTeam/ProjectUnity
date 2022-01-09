@@ -23,6 +23,34 @@ public class SpecialFx{
 
     public static Effect
 
+    endDeny = new Effect(80f, 1200f, e -> {
+        if(!(e.data instanceof Unit u)) return;
+        Draw.blend(Blending.additive);
+        e.scaled(40f, s -> {
+            Draw.color(UnityPal.scarColor);
+            Interp in = Interp.pow3Out;
+            float f1 = in.apply(Mathf.curve(s.fin(), 0f, 0.8f)),
+            f2 = in.apply(Mathf.curve(s.fin(), 0.2f, 1f)),
+            hs = u.hitSize / 2f;
+            rand.setSeed(e.id * 99999L);
+            for(int i = 0; i < 7; i++){
+                float len = (hs * rand.random(0.75f, 1f));
+                float r = rand.range(360f), scl = rand.random(0.75f, 1.5f);
+                Vec2 v = Tmp.v1.trns(r, len + hs * f1 * scl).add(e.x, e.y),
+                v2 = Tmp.v2.trns(r, len + hs * f2 * scl).add(e.x, e.y);
+                Lines.stroke(1.5f);
+                Lines.line(v.x, v.y, v2.x, v2.y);
+            }
+        });
+        Draw.alpha(e.fout());
+        Draw.mixcol(UnityPal.scarColor, 1f);
+
+        Draw.rect(u.icon(), u.x + Mathf.range(e.fin() * 2f), u.y + Mathf.range(e.fin() * 2f), u.rotation - 90f);
+
+        Draw.blend();
+        Draw.reset();
+    }),
+
     fragmentation = new FragmentationShaderEffect(3.5f * 60f),
 
     fragmentationFast = new FragmentationShaderEffect(1.5f * 60f){{
