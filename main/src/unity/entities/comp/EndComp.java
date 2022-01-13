@@ -97,14 +97,38 @@ abstract class EndComp implements Unitc, Factionc{
         }
     }
 
+    @MethodPriority(-2)
+    @Override
+    public void impulse(float x, float y){
+        AntiCheatVariables a = ((UnityUnitType)type).antiCheatType;
+        float mass = mass();
+        float len = Tmp.v1.set(x, y).len();
+        float scl = 1f / resist;
+        if(len > mass * 3f){
+            float l = (len - (mass * 3f)) + 1f;
+            scl *= 1f / (l * l);
+        }
+        Tmp.v1.set(x, y).scl(scl).limit(mass * 8);
+        x = Tmp.v1.x;
+        y = Tmp.v1.y;
+        if(len > mass * 8){
+            float l = (len - (mass * 8)) / (mass / 2f);
+            resist += l;
+            resistMax = Math.max(resistMax, resist);
+            resistTime = Math.max(resistTime, a.resistTime / 2f);
+            SpecialFx.endDeny.at(this.x, this.y, rotation, Tmp.c1.a(Mathf.clamp(l / (mass * 15f))), self());
+        }
+    }
+
     @Insert(value = "remove()", after = false)
     @Extend(Wormc.class)
     @BypassGroupCheck
     private void removeWorm(){
         UnityUnitType utype = (UnityUnitType)type;
         Wormc h = self();
-        if(isAdded() && !utype.splittable && !h.isHead() && h.head() != null && !h.head().isAdded()){
+        if(isAdded() && !utype.splittable && !h.isHead() && h.head() != null && !h.head().isAdded() && ((Endc)h.head()).trueHealth() <= 0f){
             trueHealth = 0f;
+            health = 0f;
         }
     }
 

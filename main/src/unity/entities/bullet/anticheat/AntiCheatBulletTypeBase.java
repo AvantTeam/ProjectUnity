@@ -4,9 +4,11 @@ import arc.math.*;
 import arc.util.*;
 import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import unity.*;
 import unity.entities.bullet.anticheat.modules.*;
+import unity.gen.*;
 import unity.mod.*;
 
 public abstract class AntiCheatBulletTypeBase extends BulletType{
@@ -127,5 +129,33 @@ public abstract class AntiCheatBulletTypeBase extends BulletType{
     public void hitTile(Bullet b, Building build, float initialHealth, boolean direct){
         hitBuildingAntiCheat(b, build);
         super.hitTile(b, build, initialHealth, direct);
+    }
+
+    @Override
+    public Bullet create(Entityc owner, Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl, Object data){
+        EndBullet bullet = EndBullet.create();
+        bullet.type = this;
+        bullet.owner = owner;
+        bullet.team = team;
+        bullet.time = 0f;
+        if(owner instanceof Teamc) bullet.setTrueOwner((Teamc)owner);
+        bullet.initVel(angle, speed * velocityScl);
+        if(backMove){
+            bullet.set(x - bullet.vel.x * Time.delta, y - bullet.vel.y * Time.delta);
+        }else{
+            bullet.set(x, y);
+        }
+        bullet.lifetime = lifetime * lifetimeScl;
+        bullet.data = data;
+        bullet.drag = drag;
+        bullet.hitSize = hitSize;
+        bullet.damage = (damage < 0 ? this.damage : damage) * bullet.damageMultiplier();
+        if(bullet.trail != null){
+            bullet.trail.clear();
+        }
+        bullet.add();
+
+        if(keepVelocity && owner instanceof Velc) bullet.vel.add(((Velc)owner).vel());
+        return bullet;
     }
 }

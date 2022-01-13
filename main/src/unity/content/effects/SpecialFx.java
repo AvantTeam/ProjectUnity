@@ -26,6 +26,7 @@ public class SpecialFx{
     endDeny = new Effect(80f, 1200f, e -> {
         if(!(e.data instanceof Unit u)) return;
         Draw.blend(Blending.additive);
+        float a = (e.color.a / 2f) + 0.5f;
         e.scaled(40f, s -> {
             Draw.color(UnityPal.scarColor);
             Interp in = Interp.pow3Out;
@@ -33,7 +34,7 @@ public class SpecialFx{
             f2 = in.apply(Mathf.curve(s.fin(), 0.2f, 1f)),
             hs = u.hitSize / 2f;
             rand.setSeed(e.id * 99999L);
-            for(int i = 0; i < 7; i++){
+            for(int i = 0; i < (int)(7f * a); i++){
                 float len = (hs * rand.random(0.75f, 1f));
                 float r = rand.range(360f), scl = rand.random(0.75f, 1.5f);
                 Vec2 v = Tmp.v1.trns(r, len + hs * f1 * scl).add(e.x, e.y),
@@ -43,7 +44,7 @@ public class SpecialFx{
             }
         });
         Draw.alpha(e.fout());
-        Draw.mixcol(UnityPal.scarColor, 1f);
+        Draw.mixcol(UnityPal.scarColor, a);
 
         Draw.rect(u.icon(), u.x + Mathf.range(e.fin() * 2f), u.y + Mathf.range(e.fin() * 2f), u.rotation - 90f);
 
