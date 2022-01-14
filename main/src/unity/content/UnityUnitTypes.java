@@ -17,6 +17,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.type.ammo.*;
+import mindustry.type.weapons.*;
 import mindustry.world.meta.*;
 import unity.ai.*;
 import unity.ai.AssistantAI.*;
@@ -51,8 +52,8 @@ public class UnityUnitTypes{
 
     // global flying
     public static @EntityPoint(UnitEntity.class)
-    UnitType angel, malakhim,
-        discharge, pulse, emission, waveform, ultraviolet;
+    UnitType cherub, malakhim,
+    discharge, pulse, emission, waveform, ultraviolet;
 
     // global T6/7 units
 
@@ -639,46 +640,55 @@ public class UnityUnitTypes{
             }});
         }};
 
-        angel = new UnityUnitType("angel"){{
-            defaultController = HealerAI::new;
-            buildSpeed = 10f;
-            health = 90;
-            engineOffset = 5.7f;
+        cherub = new UnityUnitType("cherub"){{
+            defaultController = NewHealerAI::new;
             flying = true;
-            speed = 4.3f;
-            accel = 0.08f;
-            drag = 0.01f;
-            range = 40f;
-            commandLimit = 0;
-            ammoType = new PowerAmmoType(1000);
-            hitSize = 9f;
+            hitSize = 13f;
+            health = 70f;
+            drag = 0.07f;
+            accel = 0.1f;
+            speed = 3f;
+            engineOffset = 5.75f;
+            engineSize = 1.75f;
+            isCounted = false;
+
+            weapons.add(new RepairBeamWeapon(""){{
+                x = 0f;
+                y = 0f;
+                shootY = 0f;
+                beamWidth = 0.75f;
+                mirror = false;
+                repairSpeed = 0.5f;
+
+                bullet = new BulletType(){{
+                    maxRange = 85f;
+                }};
+            }});
         }};
 
         malakhim = new UnityUnitType("malakhim"){{
-            defaultController = HealerAI::new;
-            buildSpeed = 15f;
-            health = 170;
-            engineOffset = 11.7f;
+            defaultController = NewHealerAI::new;
             flying = true;
-            speed = 3.9f;
-            accel = 0.08f;
-            drag = 0.01f;
-            range = 50f;
-            commandLimit = 2;
-            ammoType = new PowerAmmoType(1000);
-            hitSize = 10.5f * 1.7f;
+            lowAltitude = true;
+            hitSize = 19.5f;
+            health = 220f;
+            drag = 0.08f;
+            accel = 0.09f;
+            speed = 2.2f;
+            engineOffset = 9.25f;
+            engineSize = 3f;
+            isCounted = false;
 
-            weapons.add(new Weapon("heal-weapon-mount"){{
-                rotate = true;
-                x = 11f;
-                y = -7f;
-                reload = 10f;
-                bullet = new LaserBoltBulletType(5.2f, 10f){{
-                    lifetime = 35f;
-                    healPercent = 5.5f;
-                    collidesTeam = true;
-                    backColor = Pal.heal;
-                    frontColor = Color.white;
+            weapons.add(new RepairBeamWeapon("repair-beam-weapon-center-large"){{
+                x = 0f;
+                y = -3f;
+                shootY = 6f;
+                beamWidth = 1f;
+                mirror = false;
+                repairSpeed = 1.5f;
+
+                bullet = new BulletType(){{
+                    maxRange = 130f;
                 }};
             }});
         }};
