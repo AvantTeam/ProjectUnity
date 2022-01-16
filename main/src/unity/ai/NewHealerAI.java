@@ -5,6 +5,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.ai.types.*;
+import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.weapons.*;
@@ -18,7 +19,7 @@ public class NewHealerAI extends FlyingAI{
     @Override
     public void init(){
         super.init();
-        findTile = false;
+        findTile = unit.type.canHeal;
         for(WeaponMount mount : unit.mounts){
             findTile |= mount.weapon instanceof RepairBeamWeapon && ((RepairBeamWeapon)mount.weapon).targetBuildings;
         }
@@ -33,13 +34,28 @@ public class NewHealerAI extends FlyingAI{
     @Override
     public void updateMovement(){
         if(target != null){
+            float range = unit.type.range * 0.8f;
+            if(target instanceof Sized) range += ((Sized)target).hitSize() / 4f;
             if(!unit.type.circleTarget){
-                moveTo(target, unit.type.range * 0.8f);
+                moveTo(target, range, 40f);
                 unit.lookAt(target);
             }else{
-                attack(120f);
+                circle(range);
             }
         }
+    }
+
+    void circle(float range){
+        vec.set(target).sub(unit);
+
+        if(vec.len() < range){
+            float side = Mathf.randomSeed(unit.id, 0, 1) == 0 ? -1 : 1;
+            vec.rotate(((range - vec.len()) / range * 180f) * side);
+        }
+
+        vec.setLength(unit.speed());
+
+        unit.moveAt(vec);
     }
 
     @Override
@@ -53,13 +69,15 @@ public class NewHealerAI extends FlyingAI{
 
     @Override
     public Teamc findMainTarget(float x, float y, float range, boolean air, boolean ground){
+        float sd = unit.speed() / 3f;
+
         Building build = null;
         float buildScore = -Float.MAX_VALUE;
         if(ground && findTile){
             Seq<Building> buildings = Vars.indexer.getDamaged(unit.team);
             int len = Math.min(buildings.size, depth);
             for(int i = 0; i < len; i++){
-                float s = calculateScore(buildings.get(i));
+                float s = calculateScore(buildings.get(i), sd);
                 if(s > buildScore){
                     buildScore = s;
                     build = buildings.get(i);
@@ -71,8 +89,8 @@ public class NewHealerAI extends FlyingAI{
         Unit un = null;
         float score = -Float.MAX_VALUE;
         for(Unit u : units){
-            if(!u.dead && u.damaged() && u.checkTarget(air, ground)){
-                float sc = calculateScore(u);
+            if(!u.dead && u != unit && u.damaged() && u.checkTarget(air, ground)){
+                float sc = calculateScore(u, sd);
                 if(sc > score){
                     score = sc;
                     un = u;
@@ -92,8 +110,9 @@ public class NewHealerAI extends FlyingAI{
         return switchTime <= 0f && super.retarget();
     }
 
-    float calculateScore(Healthc target){
+    float calculateScore(Healthc target, float s){
         float h = Mathf.sqrt(Math.max(target.maxHealth() - target.health(), 0f)) * 500f;
-        return (-unit.dst2(target) / 5000f) + h;
+
+        return ((-unit.dst2(target) / (s * s)) / 2000f) + h;
     }
 }

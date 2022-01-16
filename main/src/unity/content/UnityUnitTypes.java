@@ -52,7 +52,7 @@ public class UnityUnitTypes{
 
     // global flying
     public static @EntityPoint(UnitEntity.class)
-    UnitType cherub, malakhim,
+    UnitType cherub, malakhim, seraphim,
     discharge, pulse, emission, waveform, ultraviolet;
 
     // global T6/7 units
@@ -647,8 +647,8 @@ public class UnityUnitTypes{
             health = 70f;
             drag = 0.07f;
             accel = 0.1f;
-            speed = 3f;
-            engineOffset = 5.75f;
+            speed = 3.5f;
+            engineOffset = 6.75f;
             engineSize = 1.75f;
             isCounted = false;
 
@@ -662,6 +662,7 @@ public class UnityUnitTypes{
 
                 bullet = new BulletType(){{
                     maxRange = 85f;
+                    drag = 1f;
                 }};
             }});
         }};
@@ -674,8 +675,8 @@ public class UnityUnitTypes{
             health = 220f;
             drag = 0.08f;
             accel = 0.09f;
-            speed = 2.2f;
-            engineOffset = 9.25f;
+            speed = 2.5f;
+            engineOffset = 10.25f;
             engineSize = 3f;
             isCounted = false;
 
@@ -689,8 +690,61 @@ public class UnityUnitTypes{
 
                 bullet = new BulletType(){{
                     maxRange = 130f;
+                    drag = 1f;
                 }};
             }});
+        }};
+
+        seraphim = new UnityUnitType("seraphim"){{
+            defaultController = NewHealerAI::new;
+            flying = true;
+            lowAltitude = true;
+            hitSize = 34f;
+            health = 670f;
+            drag = 0.09f;
+            accel = 0.095f;
+            speed = 2f;
+            engineOffset = 15.75f;
+            engineSize = 3.5f;
+            circleTarget = true;
+
+            BulletType r = new BulletType(){{
+                maxRange = 210f;
+                drag = 1f;
+            }};
+
+            weapons.add(
+            new RepairBeamWeapon("repair-beam-weapon"){{
+                x = 8f;
+                y = 8.25f;
+                shootY = 6f;
+                beamWidth = 0.8f;
+                mirror = true;
+                repairSpeed = 0.65f;
+
+                bullet = r;
+            }},
+            new RepairBeamWeapon("repair-beam-weapon"){{
+                x = 14.25f;
+                y = -3f;
+                shootY = 6f;
+                beamWidth = 0.8f;
+                mirror = true;
+                repairSpeed = 0.65f;
+
+                bullet = r;
+            }},
+            new RepairBeamWeapon("repair-beam-weapon"){{
+                x = 11.75f;
+                y = -12f;
+                shootY = 6f;
+                beamWidth = 0.8f;
+                mirror = true;
+                repairSpeed = 0.65f;
+
+                bullet = r;
+            }}
+            );
         }};
 
         discharge = new UnityUnitType("discharge"){{
