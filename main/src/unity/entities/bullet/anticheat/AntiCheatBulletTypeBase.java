@@ -47,14 +47,15 @@ public abstract class AntiCheatBulletTypeBase extends BulletType{
     }
 
     public void hitUnitAntiCheat(Bullet b, Unit unit, float extraDamage){
-        if(unit.health >= Float.MAX_VALUE || Float.isNaN(unit.health) || unit.health >= Float.POSITIVE_INFINITY){
+        float health = unit.health * unit.healthMultiplier;
+        if(health >= Float.MAX_VALUE || Float.isNaN(health) || health >= Float.POSITIVE_INFINITY){
             AntiCheat.annihilateEntity(unit, true);
             return;
         }
         float lh = unit.health, ls = unit.shield;
-        float score = unit.health + unit.type.dpsEstimate;
+        float score = health + unit.type.dpsEstimate;
         float pow = score > overDamage ? Mathf.pow((score - overDamage) / overDamageScl, overDamagePower) : 0f;
-        float ratio = unit.health > ratioStart ? ratioDamage * Math.max(unit.maxHealth, unit.health) : 0f;
+        float ratio = health > ratioStart ? ratioDamage * Math.max(unit.maxHealth, unit.health) : 0f;
         float damage = Math.max(ratio, ((b.damage + extraDamage) * b.damageMultiplier()) + pow);
         if(bleedDuration > 0){
             Unity.antiCheat.applyStatus(unit, bleedDuration);

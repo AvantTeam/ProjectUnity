@@ -155,6 +155,13 @@ public final class Utils{
         return (Bullet)result;
     }
 
+    public static Vec2 addLength(Vec2 vec, float add){
+        float len = vec.len();
+        vec.x += add * (vec.x / len);
+        vec.y += add * (vec.y / len);
+        return vec;
+    }
+
     public static float angleDistSigned(float a, float b){
         a += 360f;
         a %= 360f;
@@ -517,6 +524,10 @@ public final class Utils{
         }, effectHandler, true);
     }
 
+    public static void collideLineRawEnemy(Team team, float x, float y, float x2, float y2, float width, boolean hitTiles, boolean hitUnits, boolean stopSort, HitHandler handler){
+        collideLineRawNew(x, y, x2, y2, width, width, b -> b.team != team, u -> u.team != team, hitTiles, hitUnits, h -> h.dst2(x, y), handler, stopSort);
+    }
+
     public static void collideLineRawEnemy(Team team, float x, float y, float x2, float y2, Boolf2<Building, Boolean> buildingCons, Cons<Unit> unitCons, Floatc2 effectHandler, boolean stopSort){
         collideLineRaw(x, y, x2, y2, 3f, b -> b.team != team, u -> u.team != team, buildingCons, unitCons, healthc -> healthc.dst2(x, y), effectHandler, stopSort);
     }
@@ -568,7 +579,7 @@ public final class Utils{
             if(buildingCons != null && ent instanceof Building){
                 hit = buildingCons.get((Building)ent, direct);
             }
-            if(effectHandler != null) effectHandler.get(ex, ey);
+            if(effectHandler != null && direct) effectHandler.get(ex, ey);
             return hit;
         }, stopSort);
     }

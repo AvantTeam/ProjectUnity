@@ -1238,107 +1238,55 @@ public class UnityUnitTypes{
                 mirror = false;
                 reload = 4f * 60f;
                 recoil = 0f;
+                shootSound = Sounds.lasershoot;
                 shootStatus = StatusEffects.slow;
                 shootStatusDuration = 80f;
+                firstShotDelay = ChargeFx.greenLaserChargeParent.lifetime;
 
-                BulletType t = new CygnusBulletType(){{
-                    float rad = 170f;
-
-                    damage = 45f;
-                    speed = 4.3f;
-                    lifetime = 75f;
-                    shootEffect = Fx.hitEmpSpark;
-                    smokeEffect = Fx.shootBigSmoke2;
-                    healPercent = 12f;
-                    trailLength = 35;
-                    trailWidth = 9f;
-                    clipSize = (size + trailLength * speed) * 2.5f;
-                    scaleVelocity = true;
-                    unitDamageScl = 0.7f;
-                    hitShake = 7f;
-                    splashDamage = 95f;
-                    splashDamageRadius = rad;
-                    radius = rad;
-                    timeIncrease = 1.75f;
-                    timeDuration = 60f * 20f;
-                    powerDamageScl = 3f;
-                    allyStatusDuration = 60f * 15f;
-                    status = StatusEffects.electrified;
-                    lightning = 6;
-                    lightningLength = 10;
-                    lightningLengthRand = 4;
-                    lightningDamage = 35f;
-                    backColor = trailColor = lightningColor = Pal.heal;
-                    frontColor = Color.white;
-
-                    hitEffect = new Effect(50f, 100f, e -> {
-                        e.scaled(7f, b -> {
-                            Draw.color(Pal.heal, b.fout());
-                            Fill.circle(e.x, e.y, rad);
-                        });
-
-                        Draw.color(Pal.heal);
-                        Lines.stroke(e.fout() * 3f);
-                        Lines.circle(e.x, e.y, rad);
-
-                        int points = 10;
-                        float offset = Mathf.randomSeed(e.id, 360f);
-                        for(int i = 0; i < points; i++){
-                            float angle = i* 360f / points + offset;
-                            Drawf.tri(e.x + Angles.trnsx(angle, rad), e.y + Angles.trnsy(angle, rad), 6f, 50f * e.fout(), angle);
-                        }
-
-                        Fill.circle(e.x, e.y, 12f * e.fout());
-                        Draw.color();
-                        Fill.circle(e.x, e.y, 6f * e.fout());
-                        Drawf.light(e.x, e.y, rad * 1.6f, Pal.heal, e.fout());
-                    });
-                }};
-
-                bullet = new MultiBulletType(){{
-                    lifetime = ChargeFx.greenLaserChargeParent.lifetime;
+                bullet = new ReflectingLaserBulletType(500f){{
+                    lifetime = 65f;
                     shootEffect = ChargeFx.greenLaserChargeParent;
-                    mirror = false;
-                    bullets = new MultiBulletData[]{
-                        new MultiBulletData(t, 0f, 0f, 0f)
-                    };
+                    healPercent = 6f;
+                    splashDamage = 70f;
+                    splashDamageRadius = 30f;
+                    lightningDamage = 80f;
+                    hitEffect = HitFx.coloredHitLarge;
+                    hitColor = lightningColor = Pal.heal;
+                    pierceCap = 3;
+                    collidesTeam = true;
+                    lightningLength = 8;
+                    colors = new Color[]{Pal.heal.cpy().a(0.2f), Pal.heal.cpy().a(0.5f), Pal.heal.cpy().mul(1.2f), Color.white};
                 }};
             }}, new Weapon(name + "-mount"){{
                 x = 22.5f;
                 y = -3f;
                 shootY = 8.75f;
                 rotate = true;
-                alternate = false;
-                rotateSpeed = 2f;
-                reload = 140f;
-                continuous = true;
-                chargeSound = Sounds.lasercharge2;
-                shootSound = Sounds.beam;
-                firstShotDelay = ChargeFx.greenLaserChargeSmallParent.lifetime - 1f;
-                cooldownTime = 130f;
+                alternate = true;
+                rotateSpeed = 5f;
+                reload = 25f;
+                heatColor = Pal.heal;
+                inaccuracy = 5f;
 
-                bullet = new ContinuousLaserBulletType(){{
-                    damage = 45f;
-                    length = 150f;
-                    width = 5f;
-                    hitEffect = Fx.hitMeltHeal;
-                    drawSize = 420f;
-                    lifetime = 140f;
-                    shake = 1f;
-                    despawnEffect = Fx.smokeCloud;
-                    smokeEffect = Fx.none;
+                bullet = new CygnusBulletType(){{
+                    speed = 6f;
+                    damage = 20f;
+                    radius = 70f;
+                    hitEffect = HitFx.empHit;
+                    splashDamage = 5f;
+                    splashDamageRadius = 70f;
+                    backColor = Pal.heal;
 
-                    shootEffect = ChargeFx.greenLaserChargeSmallParent;
+                    shootEffect = Fx.hitEmpSpark;
+                    smokeEffect = Fx.shootBigSmoke2;
 
-                    incendChance = 0.1f;
-                    incendSpread = 5f;
-                    incendAmount = 1;
-
-                    healPercent = 1.2f;
-                    collidesTeam = true;
-                    largeHit = false;
-
-                    colors = new Color[]{Pal.heal.cpy().a(0.2f), Pal.heal.cpy().a(0.5f), Pal.heal.cpy().mul(1.2f), Color.white};
+                    trailLength = 15;
+                    trailWidth = 6f;
+                    trailColor = Pal.heal;
+                    status = StatusEffects.electrified;
+                    lightColor = Pal.heal;
+                    powerSclDecrease = 0.5f;
+                    timeIncrease = 1.25f;
                 }};
             }});
         }};
@@ -4511,7 +4459,7 @@ public class UnityUnitTypes{
                 inaccuracy = 1.4f;
                 shots = 6;
                 shotDelay = 4f;
-                shootSound = Sounds.shootBig;
+                shootSound = UnitySounds.endBasic;
 
                 bullet = t;
             }});
@@ -4528,7 +4476,7 @@ public class UnityUnitTypes{
                 shots = 8;
                 shotDelay = 3f;
                 xRand = 12f;
-                shootSound = Sounds.missile;
+                shootSound = UnitySounds.endMissile;
 
                 bullet = new EndBasicBulletType(6f, 100f, "missile"){{
                     width = 9f;
@@ -4564,7 +4512,7 @@ public class UnityUnitTypes{
                 inaccuracy = 1.4f;
                 shots = 6;
                 shotDelay = 4f;
-                shootSound = Sounds.shootBig;
+                shootSound = UnitySounds.endBasic;
 
                 bullet = t;
             }}, new Weapon("unity-doeg-small-laser"){{
@@ -4636,6 +4584,7 @@ public class UnityUnitTypes{
                 shots = 5;
                 shotDelay = 6f;
                 inaccuracy = 2f;
+                shootSound = UnitySounds.endBasic;
 
                 bullet = UnityBullets.oppressionShell;
             }});
@@ -4743,7 +4692,7 @@ public class UnityUnitTypes{
                         y = -26.25f;
                         shootY = 6f;
 
-                        shootSound = Sounds.missile;
+                        shootSound = UnitySounds.endMissile;
 
                         rotate = true;
                         rotateSpeed = 4f;
@@ -5071,7 +5020,7 @@ public class UnityUnitTypes{
                 rotateSpeed = 2f;
                 velocityRnd = 0.2f;
                 reload = 2f * 50f;
-                shootSound = Sounds.artillery;
+                shootSound = UnitySounds.endBasicLarge;
                 bullet = UnityBullets.ravagerArtillery;
             }}, new Weapon(name + "-artillery"){{
                 shootY = 11f;
@@ -5084,7 +5033,7 @@ public class UnityUnitTypes{
                 rotateSpeed = 2f;
                 velocityRnd = 0.2f;
                 reload = 2.25f * 50f;
-                shootSound = Sounds.artillery;
+                shootSound = UnitySounds.endBasicLarge;
                 bullet = UnityBullets.ravagerArtillery;
             }}, new Weapon(name + "-small-turret"){{
                 shootY = 7f;
@@ -5095,7 +5044,7 @@ public class UnityUnitTypes{
                 rotate = true;
                 xRand = 2f;
                 reload = 7f;
-                shootSound = Sounds.missile;
+                shootSound = UnitySounds.endMissile;
 
                 bullet = UnityBullets.missileAntiCheat;
             }}, new Weapon(name + "-small-turret"){{
@@ -5107,7 +5056,7 @@ public class UnityUnitTypes{
                 rotate = true;
                 xRand = 2f;
                 reload = 7f;
-                shootSound = Sounds.missile;
+                shootSound = UnitySounds.endMissile;
 
                 bullet = UnityBullets.missileAntiCheat;
             }});
