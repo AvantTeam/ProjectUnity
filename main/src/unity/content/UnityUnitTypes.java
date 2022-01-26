@@ -69,9 +69,9 @@ public class UnityUnitTypes{
     // oct
     public static @EntityPoint(PayloadUnit.class)
     UnitType sedec, trigintaduo;
-    // omura
+    // omura + navanax
     public static @EntityPoint(UnitWaterMove.class)
-    UnitType fin, blue;
+    UnitType fin, blue, philinopsis, chelidonura;
 
     // global unit + watermove + transform
     public static @EntityDef({Unitc.class, WaterMovec.class, Transc.class})
@@ -2099,6 +2099,71 @@ public class UnityUnitTypes{
                     collisionWidth = 12f;
                 }};
             }});
+        }};
+
+        philinopsis = new UnityUnitType("philinopsis"){{
+            health = 38000f;
+            speed = 0.5f;
+            drag = 0.18f;
+            hitSize = 77.5f;
+            armor = 17f;
+            accel = 0.19f;
+            rotateSpeed = 0.86f;
+            rotateShooting = false;
+
+            weapons.add(new Weapon("aaa"){{
+                rotate = true;
+
+                //temporary stats copied over from Navanax just to test my new bullet
+                reload = 65f;
+                shake = 3f;
+                rotateSpeed = 2f;
+                shadow = 30f;
+                shootY = 7f;
+                recoil = 4f;
+                cooldownTime = reload - 10f;
+                shootSound = Sounds.laser;
+
+                bullet = new TrailingEmpBulletType(){{
+                    scaleVelocity = true;
+                    lightOpacity = 0.7f;
+                    unitDamageScl = 0.8f;
+                    healPercent = 20f;
+                    timeIncrease = 3f;
+                    timeDuration = 60f * 20f;
+                    powerDamageScl = 3f;
+                    damage = 60;
+                    hitColor = lightColor = Pal.heal;
+                    lightRadius = 70f;
+                    clipSize = 250f;
+                    shootEffect = Fx.hitEmpSpark;
+                    smokeEffect = Fx.shootBigSmoke2;
+                    lifetime = 60f;
+                    sprite = "circle-bullet";
+                    backColor = Pal.heal;
+                    frontColor = Color.white;
+                    width = height = 12f;
+                    speed = 5f;
+                    trailEffect = TrailFx.spikedEnergyTrail;
+                    trailLength = 20;
+                    trailWidth = 6f;
+                    trailColor = Pal.heal;
+                    trailInterval = 3f;
+                    trailRotation = true;
+                    splashDamage = 70f;
+                    radius = splashDamageRadius = 124f;
+                    empRadius = 68f;
+                    hitShake = 4f;
+                    status = StatusEffects.electrified;
+                    hitSound = Sounds.plasmaboom;
+                    hitEffect = HitFx.philinopsisEmpHit;
+                    zapEffect = HitFx.philinopsisEmpZap;
+                }};
+            }});
+        }};
+
+        chelidonura = new UnityUnitType("chelidonura"){{
+
         }};
 
         amphibiNaval = new UnityUnitType("amphibi-naval"){

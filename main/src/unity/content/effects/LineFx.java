@@ -13,9 +13,10 @@ import static arc.graphics.g2d.Draw.*;
  * Any effect that use 1 or 2 Position class data.
  */
 public class LineFx{
-    public static Effect endPointDefence = new Effect(17f, 300f * 2f, e -> {
-        if(!(e.data instanceof Position)) return;
-        Position data = (Position)e.data;
+    public static Effect
+
+    endPointDefence = new Effect(17f, 300f * 2f, e -> {
+        if(!(e.data instanceof Position data)) return;
 
         for(int i = 0; i < 2; i++){
             float width = (2 - i) * 2.2f * e.fout();

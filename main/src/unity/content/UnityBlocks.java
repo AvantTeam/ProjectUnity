@@ -7,7 +7,6 @@ import arc.math.geom.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
-import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
@@ -770,7 +769,7 @@ public class UnityBlocks{
                     backColor = trailColor = hitColor = lightColor = Pal.lancerLaser;
                     shootEffect = smokeEffect = Fx.none;
                     hitEffect = Fx.hitLancer;
-                    despawnEffect = HitFx.LightHitLarge;
+                    despawnEffect = HitFx.lightHitLarge;
                     frontColor = Color.white;
                     decayEffect = UnityFx.wBosonEffectLong;
                     height = 13f;

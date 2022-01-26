@@ -52,7 +52,7 @@ public class EphemeronPairBulletType extends BasicBulletType{
 
                 Tmp.v1.set((b.x + n.x) / 2f, (b.y + n.y) / 2f);
 
-                HitFx.LightHitLarge.at(Tmp.v1);
+                HitFx.lightHitLarge.at(Tmp.v1);
                 Damage.damage(b.team, Tmp.v1.x, Tmp.v1.y, 40f, 80f);
             }
         }else{

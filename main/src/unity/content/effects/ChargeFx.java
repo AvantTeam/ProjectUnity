@@ -15,6 +15,7 @@ import static arc.math.Angles.*;
 
 public class ChargeFx{
     public static Effect
+
     greenLaserChargeSmallParent = new ParentEffect(40f, 100f, e -> {
         color(Pal.heal);
         stroke(e.fin() * 2f);

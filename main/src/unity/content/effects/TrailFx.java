@@ -12,7 +12,9 @@ import unity.type.decal.CapeDecorationType.*;
 import static arc.graphics.g2d.Draw.*;
 
 public class TrailFx{
-    public static Effect coloredRailgunTrail = new Effect(30f, e -> {
+    public static Effect
+
+    coloredRailgunTrail = new Effect(30f, e -> {
         for(int i = 0; i < 2; i++){
             int sign = Mathf.signs[i];
             color(e.color);
@@ -34,6 +36,13 @@ public class TrailFx{
         for(int s : Mathf.signs){
             Tmp.v2.trns(e.rotation - 90f, 9f * s * ((e.fout() + 2f) / 3f), -20f);
             Fill.tri(Tmp.v1.x + e.x, Tmp.v1.y + e.y, -Tmp.v1.x + e.x, -Tmp.v1.y + e.y, Tmp.v2.x + e.x, Tmp.v2.y + e.y);
+        }
+    }),
+
+    spikedEnergyTrail = new Effect(16f, e -> {
+        color(e.color);
+        for(int s : Mathf.signs){
+            Drawf.tri(e.x, e.y, 4f, 30f * e.fslope(), e.rotation + 90f*s);
         }
     }),
 
