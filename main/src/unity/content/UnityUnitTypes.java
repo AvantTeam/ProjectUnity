@@ -1249,12 +1249,12 @@ public class UnityUnitTypes{
                     healPercent = 6f;
                     splashDamage = 70f;
                     splashDamageRadius = 30f;
-                    lightningDamage = 80f;
+                    lightningDamage = 75f;
                     hitEffect = HitFx.coloredHitLarge;
                     hitColor = lightningColor = Pal.heal;
                     pierceCap = 3;
                     collidesTeam = true;
-                    lightningLength = 8;
+                    lightningLength = 12;
                     colors = new Color[]{Pal.heal.cpy().a(0.2f), Pal.heal.cpy().a(0.5f), Pal.heal.cpy().mul(1.2f), Color.white};
                 }};
             }}, new Weapon(name + "-mount"){{
@@ -1292,13 +1292,13 @@ public class UnityUnitTypes{
         }};
 
         sagittarius = new UnityUnitType("sagittarius"){{
-            speed = 0.2f;
+            speed = 0.25f;
             health = 43750;
             hitSize = 55f;
             armor = 12f;
             landShake = 2f;
             commandLimit = 8;
-            rotateSpeed = 1.2f;
+            rotateSpeed = 0.8f;
 
             legCount = 4;
             legLength = 34.36f;
@@ -1314,7 +1314,34 @@ public class UnityUnitTypes{
 
             abilities.add(new ForceFieldAbility(130f, 3f, 3500f, 60f * 7));
 
-            weapons.add(new AcceleratingWeapon(name + "-mount"){{
+            weapons.add(
+            new Weapon(name + "-laser"){{
+                mirror = false;
+                x = 0f;
+                y = 0f;
+                shootY = 16.75f;
+                reload = 12f * 60f;
+                firstShotDelay = ChargeFx.sagittariusCharge.lifetime;
+                shootStatus = UnityStatusEffects.sagittariusFatigue;
+                shootStatusDuration = 10f * 60f + ChargeFx.sagittariusCharge.lifetime;
+                continuous = true;
+                cooldownTime = 280f;
+
+                bullet = new SagittariusLaserBulletType(35f){{
+                    shootEffect = ChargeFx.sagittariusCharge;
+                    lifetime = 10f * 60f;
+                    collidesTeam = true;
+                    healPercent = 0.4f;
+                    splashDamage = 4f;
+                    splashDamageRadius = 25f;
+                    knockback = 3f;
+                    buildingDamageMultiplier = 0.6f;
+
+                    status = StatusEffects.electrified;
+                    statusDuration = 30f;
+                }};
+            }},
+            new AcceleratingWeapon(name + "-mount"){{
                 x = 28.25f;
                 y = -9.25f;
                 shootY = 17f;
