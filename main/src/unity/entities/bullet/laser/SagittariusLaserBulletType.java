@@ -33,6 +33,11 @@ public class SagittariusLaserBulletType extends BulletType{
     }
 
     @Override
+    public float range(){
+        return length;
+    }
+
+    @Override
     public void init(){
         super.init();
         despawnHit = false;
