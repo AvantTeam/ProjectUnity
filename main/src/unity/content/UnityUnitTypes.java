@@ -1075,8 +1075,8 @@ public class UnityUnitTypes{
             speed = 0.3f;
             hitSize = 49f;
             rotateSpeed = 1.5f;
-            health = 48750f;
-            armor = 15f;
+            health = 60000f;
+            armor = 16f;
             mechStepParticles = true;
             mechStepShake = 0.8f;
             canDrown = false;
@@ -1138,11 +1138,11 @@ public class UnityUnitTypes{
         }};
 
         empire = new UnityUnitType("empire"){{
-            speed = 0.25f;
+            speed = 0.2f;
             hitSize = 49f;
             rotateSpeed = 1.25f;
-            health = 65000f;
-            armor = 16f;
+            health = 140000f;
+            armor = 20f;
             mechStepParticles = true;
             mechStepShake = 0.83f;
             canDrown = false;
@@ -1170,20 +1170,66 @@ public class UnityUnitTypes{
                 shootSound = Sounds.flame;
                 cooldownTime = 180f;
 
-                bullet = new FlameBulletType(6.6f, 63f){{
-                    lifetime = 33f;
+                bullet = new FlameBulletType(6.6f, 75f){{
+                    lifetime = 42f;
                     pierceCap = 6;
                     pierceBuilding = true;
                     collidesAir = true;
+                    reflectable = false;
                     incendChance = 0.2f;
                     incendAmount = 1;
                     particleAmount = 23;
                     particleSizeScl = 8f;
                     particleSpread = 11f;
                     hitSize = 9f;
+                    layer = Layer.bullet - 0.001f;
                     status = StatusEffects.melting;
                     smokeColors = new Color[]{Pal.darkFlame, Color.darkGray, Color.gray};
                     colors = new Color[]{Color.white, Color.valueOf("fff4ac"), Pal.lightFlame, Pal.darkFlame, Color.gray};
+                }};
+            }}, new LimitedAngleWeapon(name + "-mount"){{
+                x = 20.75f;
+                y = 10f;
+                shootY = 6.25f;
+                rotate = true;
+                rotateSpeed = 7f;
+                angleCone = 60f;
+                reload = 60f;
+                shootCone = 30f;
+                shootSound = Sounds.missile;
+
+                bullet = new MissileBulletType(2.5f, 22f){{
+                    lifetime = 40f;
+                    drag = -0.005f;
+                    width = 14f;
+                    height = 15f;
+                    shrinkY = 0f;
+
+                    splashDamageRadius = 55f;
+                    splashDamage = 85f;
+                    homingRange = 90f;
+                    weaveMag = 2f;
+                    weaveScale = 8f;
+
+                    hitEffect = despawnEffect = HitFx.hitExplosionLarge;
+
+                    status = StatusEffects.blasted;
+                    statusDuration = 60f;
+
+                    fragBullets = 5;
+                    fragLifeMin = 0.9f;
+                    fragLifeMax = 1.1f;
+                    fragBullet = new ShrapnelBulletType(){{
+                        damage = 200f;
+                        length = 60f;
+                        width = 12f;
+                        toColor = Pal.missileYellow;
+                        hitColor = Pal.bulletYellow;
+                        hitEffect = HitFx.coloredHitSmall;
+                        serrationLenScl = 5f;
+                        serrationSpaceOffset = 45f;
+                        serrationSpacing = 5f;
+                    }};
                 }};
             }}, new Weapon(name + "-cannon"){{
                 x = 20.75f;
@@ -1200,7 +1246,7 @@ public class UnityUnitTypes{
                 bullet = new ArtilleryBulletType(3f, 15, "shell"){{
                     hitEffect = Fx.blastExplosion;
                     knockback = 0.8f;
-                    lifetime = 110f;
+                    lifetime = 125f;
                     width = height = 14f;
                     collides = true;
                     collidesTiles = true;
