@@ -14,6 +14,7 @@ import unity.util.*;
 
 public class ReflectingLaserBulletType extends BulletType{
     private static int p = 0;
+    private final static Vec2 vec = new Vec2();
 
     public Color[] colors = {};
     public float length = 500f, reflectLength = 200f;
@@ -38,6 +39,7 @@ public class ReflectingLaserBulletType extends BulletType{
     public void init(){
         super.init();
         drawSize = length * 2f;
+        despawnHit = false;
     }
 
     @Override
@@ -54,7 +56,7 @@ public class ReflectingLaserBulletType extends BulletType{
         if(b.data instanceof ReflectLaserData){
             ReflectLaserData data = (ReflectLaserData)b.data;
             float length = b.fdata;
-            Vec2 pos = Tmp.v1.trns(b.rotation(), length).add(b);
+            Vec2 pos = vec.trns(b.rotation(), length).add(b);
             p = 0;
             Utils.collideLineRawEnemy(collidesTeam ? null : b.team, b.x, b.y, pos.x, pos.y, width / 3f, collidesTiles, true, true, (x, y, h, direct) -> {
                 boolean hit = p > pierceCap;
@@ -65,7 +67,9 @@ public class ReflectingLaserBulletType extends BulletType{
                             data.hitX = x;
                             data.hitY = y;
                             data.hit = true;
-                            h.damage(b.damage);
+                            if(h instanceof Hitboxc){
+                                hitEntity(b, (Hitboxc)h, h.health());
+                            }
                             hit(b, x, y);
                             if(!b.within(h, minimumTargetLength)) p++;
                         }else{

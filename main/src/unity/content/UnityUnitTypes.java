@@ -1075,8 +1075,8 @@ public class UnityUnitTypes{
             speed = 0.3f;
             hitSize = 49f;
             rotateSpeed = 1.5f;
-            health = 48750f;
-            armor = 15f;
+            health = 60000f;
+            armor = 16f;
             mechStepParticles = true;
             mechStepShake = 0.8f;
             canDrown = false;
@@ -1138,11 +1138,11 @@ public class UnityUnitTypes{
         }};
 
         empire = new UnityUnitType("empire"){{
-            speed = 0.25f;
+            speed = 0.2f;
             hitSize = 49f;
             rotateSpeed = 1.25f;
-            health = 65000f;
-            armor = 16f;
+            health = 140000f;
+            armor = 20f;
             mechStepParticles = true;
             mechStepShake = 0.83f;
             canDrown = false;
@@ -1170,20 +1170,66 @@ public class UnityUnitTypes{
                 shootSound = Sounds.flame;
                 cooldownTime = 180f;
 
-                bullet = new FlameBulletType(6.6f, 63f){{
-                    lifetime = 33f;
+                bullet = new FlameBulletType(6.6f, 75f){{
+                    lifetime = 42f;
                     pierceCap = 6;
                     pierceBuilding = true;
                     collidesAir = true;
+                    reflectable = false;
                     incendChance = 0.2f;
                     incendAmount = 1;
                     particleAmount = 23;
                     particleSizeScl = 8f;
                     particleSpread = 11f;
                     hitSize = 9f;
+                    layer = Layer.bullet - 0.001f;
                     status = StatusEffects.melting;
                     smokeColors = new Color[]{Pal.darkFlame, Color.darkGray, Color.gray};
                     colors = new Color[]{Color.white, Color.valueOf("fff4ac"), Pal.lightFlame, Pal.darkFlame, Color.gray};
+                }};
+            }}, new LimitedAngleWeapon(name + "-mount"){{
+                x = 20.75f;
+                y = 10f;
+                shootY = 6.25f;
+                rotate = true;
+                rotateSpeed = 7f;
+                angleCone = 60f;
+                reload = 60f;
+                shootCone = 30f;
+                shootSound = Sounds.missile;
+
+                bullet = new MissileBulletType(2.5f, 22f){{
+                    lifetime = 40f;
+                    drag = -0.005f;
+                    width = 14f;
+                    height = 15f;
+                    shrinkY = 0f;
+
+                    splashDamageRadius = 55f;
+                    splashDamage = 85f;
+                    homingRange = 90f;
+                    weaveMag = 2f;
+                    weaveScale = 8f;
+
+                    hitEffect = despawnEffect = HitFx.hitExplosionLarge;
+
+                    status = StatusEffects.blasted;
+                    statusDuration = 60f;
+
+                    fragBullets = 5;
+                    fragLifeMin = 0.9f;
+                    fragLifeMax = 1.1f;
+                    fragBullet = new ShrapnelBulletType(){{
+                        damage = 200f;
+                        length = 60f;
+                        width = 12f;
+                        toColor = Pal.missileYellow;
+                        hitColor = Pal.bulletYellow;
+                        hitEffect = HitFx.coloredHitSmall;
+                        serrationLenScl = 5f;
+                        serrationSpaceOffset = 45f;
+                        serrationSpacing = 5f;
+                    }};
                 }};
             }}, new Weapon(name + "-cannon"){{
                 x = 20.75f;
@@ -1200,7 +1246,7 @@ public class UnityUnitTypes{
                 bullet = new ArtilleryBulletType(3f, 15, "shell"){{
                     hitEffect = Fx.blastExplosion;
                     knockback = 0.8f;
-                    lifetime = 110f;
+                    lifetime = 125f;
                     width = height = 14f;
                     collides = true;
                     collidesTiles = true;
@@ -1249,12 +1295,12 @@ public class UnityUnitTypes{
                     healPercent = 6f;
                     splashDamage = 70f;
                     splashDamageRadius = 30f;
-                    lightningDamage = 80f;
+                    lightningDamage = 75f;
                     hitEffect = HitFx.coloredHitLarge;
                     hitColor = lightningColor = Pal.heal;
                     pierceCap = 3;
                     collidesTeam = true;
-                    lightningLength = 8;
+                    lightningLength = 12;
                     colors = new Color[]{Pal.heal.cpy().a(0.2f), Pal.heal.cpy().a(0.5f), Pal.heal.cpy().mul(1.2f), Color.white};
                 }};
             }}, new Weapon(name + "-mount"){{
@@ -1292,13 +1338,13 @@ public class UnityUnitTypes{
         }};
 
         sagittarius = new UnityUnitType("sagittarius"){{
-            speed = 0.2f;
+            speed = 0.25f;
             health = 43750;
             hitSize = 55f;
             armor = 12f;
             landShake = 2f;
             commandLimit = 8;
-            rotateSpeed = 1.2f;
+            rotateSpeed = 0.8f;
 
             legCount = 4;
             legLength = 34.36f;
@@ -1314,7 +1360,34 @@ public class UnityUnitTypes{
 
             abilities.add(new ForceFieldAbility(130f, 3f, 3500f, 60f * 7));
 
-            weapons.add(new AcceleratingWeapon(name + "-mount"){{
+            weapons.add(
+            new Weapon(name + "-laser"){{
+                mirror = false;
+                x = 0f;
+                y = 0f;
+                shootY = 16.75f;
+                reload = 12f * 60f;
+                firstShotDelay = ChargeFx.sagittariusCharge.lifetime;
+                shootStatus = UnityStatusEffects.sagittariusFatigue;
+                shootStatusDuration = 10f * 60f + ChargeFx.sagittariusCharge.lifetime;
+                continuous = true;
+                cooldownTime = 280f;
+
+                bullet = new SagittariusLaserBulletType(35f){{
+                    shootEffect = ChargeFx.sagittariusCharge;
+                    lifetime = 10f * 60f;
+                    collidesTeam = true;
+                    healPercent = 0.4f;
+                    splashDamage = 4f;
+                    splashDamageRadius = 25f;
+                    knockback = 3f;
+                    buildingDamageMultiplier = 0.6f;
+
+                    status = StatusEffects.electrified;
+                    statusDuration = 30f;
+                }};
+            }},
+            new AcceleratingWeapon(name + "-mount"){{
                 x = 28.25f;
                 y = -9.25f;
                 shootY = 17f;

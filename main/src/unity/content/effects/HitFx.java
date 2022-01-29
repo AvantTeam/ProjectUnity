@@ -385,6 +385,28 @@ public class HitFx{
         Lines.circle(e.x, e.y, e.fin() * 6f);
     }),
 
+    hitExplosionLarge = new Effect(30f, 200f, e -> {
+        color(Pal.missileYellow);
+        e.scaled(12f, s -> {
+            stroke(s.fout() * 2f + 0.5f);
+            Lines.circle(e.x, e.y, s.fin() * 60f);
+        });
+
+        color(Color.gray);
+        randLenVectors(e.id, 8, 2f + 42f * e.finpow(), (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, e.fout() * 5f + 0.5f);
+        });
+
+        color(Pal.missileYellowBack);
+        stroke(e.fout() * 1.5f);
+
+        randLenVectors(e.id + 1, 5, 1f + 56f * e.finpow(), (x, y) -> {
+            lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1f + e.fout() * 5f);
+        });
+
+        Drawf.light(e.x, e.y, 60f, Pal.missileYellowBack, 0.8f * e.fout());
+    }),
+
     hitExplosionMassive = new Effect(70f, 370f, e -> {
         e.scaled(17f, s -> {
             Draw.color(Color.white, Color.lightGray, e.fin());

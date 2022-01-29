@@ -103,14 +103,20 @@ abstract class EndComp implements Unitc, Factionc{
         AntiCheatVariables a = ((UnityUnitType)type).antiCheatType;
         float mass = mass();
         float len = Tmp.v1.set(x, y).len();
-        float scl = 1f / resist;
+        float scl = 1f / ((resist * a.resistScl) + 1f);
         if(len > mass * 3f){
             float l = (len - (mass * 3f)) + 1f;
             scl *= 1f / (l * l);
         }
         Tmp.v1.set(x, y).scl(scl).limit(mass * 8);
-        x = Tmp.v1.x;
-        y = Tmp.v1.y;
+        if(!Tmp.v1.isNaN()){
+            x = Tmp.v1.x;
+            y = Tmp.v1.y;
+        }else{
+            x = 0f;
+            y = 0f;
+        }
+        
         if(len > mass * 8){
             float l = (len - (mass * 8)) / (mass / 2f);
             resist += l;
