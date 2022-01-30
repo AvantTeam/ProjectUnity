@@ -1260,7 +1260,7 @@ public class UnityUnitTypes{
 
         cygnus = new UnityUnitType("cygnus"){{
             speed = 0.26f;
-            health = 26250;
+            health = 45000f;
             hitSize = 37f;
             armor = 10f;
             landShake = 1.5f;
@@ -1339,7 +1339,7 @@ public class UnityUnitTypes{
 
         sagittarius = new UnityUnitType("sagittarius"){{
             speed = 0.25f;
-            health = 43750;
+            health = 102500;
             hitSize = 55f;
             armor = 12f;
             landShake = 2f;
@@ -1424,7 +1424,7 @@ public class UnityUnitTypes{
             drag = 0.1f;
             speed = 0.42f;
             hitSize = 35.5f;
-            health = 30000;
+            health = 52000;
             rotateSpeed = 1.3f;
 
             legCount = 8;
@@ -1520,7 +1520,7 @@ public class UnityUnitTypes{
             hitSize = 49f;
             hovering = true;
             allowLegStep = true;
-            health = 38750;
+            health = 125000;
             armor = 16f;
             rotateSpeed = 1.3f;
             legCount = 8;
@@ -1642,7 +1642,7 @@ public class UnityUnitTypes{
         }};
 
         mantle = new UnityUnitType("mantle"){{
-            health = 41250f;
+            health = 54000f;
             armor = 17f;
             speed = 0.45f;
             accel = 0.04f;
@@ -1717,7 +1717,7 @@ public class UnityUnitTypes{
         }};
 
         aphelion = new UnityUnitType("aphelion"){{
-            health = 50000f;
+            health = 130000f;
             armor = 16f;
             speed = 0.44f;
             accel = 0.04f;
