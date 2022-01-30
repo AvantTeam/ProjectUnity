@@ -71,19 +71,6 @@ public class SlowRailBulletType extends BasicBulletType{
             }
             hit(b, x, y);
         }, true);
-        /*
-        float len = b.deltaLen();
-        b.fdata += Mathf.dst(b.lastX, b.lastY, b.x, b.y);
-        if(b.fdata >= trailSpacing){
-            while(b.fdata >= trailSpacing){
-                Tmp.v1.trns(b.rotation(), speed).add(b.lastX, b.lastY);
-                float ex = Mathf.lerp(b.lastX, Tmp.v1.x, 1f - (b.fdata / len));
-                float ey = Mathf.lerp(b.lastY, Tmp.v1.y, 1f - (b.fdata / len));
-                trailEffect.at(ex, ey, b.rotation(), trailColor);
-                b.fdata -= trailSpacing;
-            }
-        }
-         */
         if(b.data instanceof RailData){
             RailData data = (RailData)b.data;
             data.lastLen += Mathf.dst(b.lastX, b.lastY, b.x, b.y);
