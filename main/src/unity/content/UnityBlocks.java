@@ -129,8 +129,7 @@ public class UnityBlocks{
     //---------- koruh faction ----------
     public static @FactionDef("koruh") Block
     //crafting
-    solidifier, steelSmelter, liquifier,
-
+    solidifier, steelSmelter, liquifier, titaniumExtractor,
     //defense
     stoneWall, denseWall, steelWall, steelWallLarge, diriumWall, diriumWallLarge,
 
@@ -1387,6 +1386,31 @@ public class UnityBlocks{
                     Draw.rect(top, build.x, build.y);
                     Draw.color();
 
+                    Draw.reset();
+                }
+            };
+        }};
+
+        titaniumExtractor = new GenericCrafter("titanium-extractor"){{
+            requirements(Category.crafting, with(Items.lead, 20, Items.metaglass, 10, UnityItems.denseAlloy, 30));
+
+            health = 160;
+            hasLiquids = true;
+            updateEffect = UnityFx.craftFx;
+            itemCapacity = 10;
+            craftTime = 360f;
+            outputItem = new ItemStack(Items.titanium, 1);
+
+            consumes.power(1f);
+            consumes.items(with(UnityItems.denseAlloy, 2));
+            consumes.liquid(Liquids.water, 0.3f);
+
+            drawer = new DrawGlow(){
+                @Override
+                public void draw(GenericCrafterBuild build){
+                    Draw.rect(build.block.region, build.x, build.y);
+                    Draw.color(UnityItems.denseAlloy.color, Items.titanium.color, build.progress);
+                    Draw.rect(top, build.x, build.y);
                     Draw.reset();
                 }
             };
