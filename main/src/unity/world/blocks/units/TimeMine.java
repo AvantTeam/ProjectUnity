@@ -73,7 +73,7 @@ public class TimeMine extends Block {
 
             if(connected() && unitCount(team) >= 3){
                 Units.nearbyEnemies(team, x, y, range, e -> {
-                    e.impulseNet(Tmp.v1.trns(e.angleTo(this), e.dst(this) - e.vel.len()).scl(Time.delta * Mathf.floor(Mathf.pow(e.mass(), 0.4f))));
+                    e.impulseNet(Tmp.v1.trns(e.angleTo(this), e.dst(this) - e.vel.len()).scl(Time.delta * Mathf.floor(Mathf.pow(e.mass(), Mathf.lerpDelta(0.2f, 0.5f, 0.3f / lifeTime)))));
                     e.disarmed = true;
                     if (e.dst(this) <= 4f){
                         e.set(this);
