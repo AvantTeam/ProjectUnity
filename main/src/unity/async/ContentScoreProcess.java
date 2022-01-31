@@ -558,7 +558,7 @@ public class ContentScoreProcess implements AsyncProcess{
                     score += (bs * shots * inaccuracy) / t.reloadTime;
                 }else if(block instanceof PowerTurret){
                     PowerTurret pt = (PowerTurret)block;
-                    score += (get(pt.shootType).loadOutputScore() * shots * inaccuracy) / t.reloadTime;
+                    if(pt.shootType != null) score += (get(pt.shootType).loadOutputScore() * shots * inaccuracy) / t.reloadTime;
                 }
             }else if(block instanceof MendProjector){
                 MendProjector mp = (MendProjector)block;
