@@ -17,6 +17,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.type.ammo.*;
+import mindustry.type.weapons.*;
 import mindustry.world.meta.*;
 import unity.ai.*;
 import unity.ai.AssistantAI.*;
@@ -51,8 +52,8 @@ public class UnityUnitTypes{
 
     // global flying
     public static @EntityPoint(UnitEntity.class)
-    UnitType angel, malakhim,
-        discharge, pulse, emission, waveform, ultraviolet;
+    UnitType cherub, malakhim, seraphim,
+    discharge, pulse, emission, waveform, ultraviolet;
 
     // global T6/7 units
 
@@ -68,9 +69,9 @@ public class UnityUnitTypes{
     // oct
     public static @EntityPoint(PayloadUnit.class)
     UnitType sedec, trigintaduo;
-    // omura
+    // omura + navanax
     public static @EntityPoint(UnitWaterMove.class)
-    UnitType fin, blue;
+    UnitType fin, blue, philinopsis, chelidonura;
 
     // global unit + watermove + transform
     public static @EntityDef({Unitc.class, WaterMovec.class, Transc.class})
@@ -639,48 +640,111 @@ public class UnityUnitTypes{
             }});
         }};
 
-        angel = new UnityUnitType("angel"){{
-            defaultController = HealerAI::new;
-            buildSpeed = 10f;
-            health = 90;
-            engineOffset = 5.7f;
+        cherub = new UnityUnitType("cherub"){{
+            defaultController = NewHealerAI::new;
             flying = true;
-            speed = 4.3f;
-            accel = 0.08f;
-            drag = 0.01f;
-            range = 40f;
-            commandLimit = 0;
-            ammoType = new PowerAmmoType(1000);
-            hitSize = 9f;
+            hitSize = 13f;
+            health = 70f;
+            drag = 0.07f;
+            accel = 0.1f;
+            speed = 3.5f;
+            engineOffset = 6.75f;
+            engineSize = 1.75f;
+            isCounted = false;
+
+            weapons.add(new RepairBeamWeapon(""){{
+                x = 0f;
+                y = 0f;
+                shootY = 0f;
+                beamWidth = 0.75f;
+                mirror = false;
+                repairSpeed = 0.5f;
+
+                bullet = new BulletType(){{
+                    maxRange = 85f;
+                    drag = 1f;
+                }};
+            }});
         }};
 
         malakhim = new UnityUnitType("malakhim"){{
-            defaultController = HealerAI::new;
-            buildSpeed = 15f;
-            health = 170;
-            engineOffset = 11.7f;
+            defaultController = NewHealerAI::new;
             flying = true;
-            speed = 3.9f;
-            accel = 0.08f;
-            drag = 0.01f;
-            range = 50f;
-            commandLimit = 2;
-            ammoType = new PowerAmmoType(1000);
-            hitSize = 10.5f * 1.7f;
+            lowAltitude = true;
+            hitSize = 19.5f;
+            health = 220f;
+            drag = 0.08f;
+            accel = 0.09f;
+            speed = 2.5f;
+            engineOffset = 10.25f;
+            engineSize = 3f;
+            isCounted = false;
 
-            weapons.add(new Weapon("heal-weapon-mount"){{
-                rotate = true;
-                x = 11f;
-                y = -7f;
-                reload = 10f;
-                bullet = new LaserBoltBulletType(5.2f, 10f){{
-                    lifetime = 35f;
-                    healPercent = 5.5f;
-                    collidesTeam = true;
-                    backColor = Pal.heal;
-                    frontColor = Color.white;
+            weapons.add(new RepairBeamWeapon("repair-beam-weapon-center-large"){{
+                x = 0f;
+                y = -3f;
+                shootY = 6f;
+                beamWidth = 1f;
+                mirror = false;
+                repairSpeed = 1.5f;
+
+                bullet = new BulletType(){{
+                    maxRange = 130f;
+                    drag = 1f;
                 }};
             }});
+        }};
+
+        seraphim = new UnityUnitType("seraphim"){{
+            defaultController = NewHealerAI::new;
+            flying = true;
+            lowAltitude = true;
+            hitSize = 34f;
+            health = 670f;
+            drag = 0.09f;
+            accel = 0.095f;
+            speed = 2f;
+            engineOffset = 15.75f;
+            engineSize = 3.5f;
+            circleTarget = true;
+
+            BulletType r = new BulletType(){{
+                maxRange = 210f;
+                drag = 1f;
+            }};
+
+            weapons.add(
+            new RepairBeamWeapon("repair-beam-weapon"){{
+                x = 8f;
+                y = 8.25f;
+                shootY = 6f;
+                beamWidth = 0.8f;
+                mirror = true;
+                repairSpeed = 0.65f;
+
+                bullet = r;
+            }},
+            new RepairBeamWeapon("repair-beam-weapon"){{
+                x = 14.25f;
+                y = -3f;
+                shootY = 6f;
+                beamWidth = 0.8f;
+                mirror = true;
+                repairSpeed = 0.65f;
+
+                bullet = r;
+            }},
+            new RepairBeamWeapon("repair-beam-weapon"){{
+                x = 11.75f;
+                y = -12f;
+                shootY = 6f;
+                beamWidth = 0.8f;
+                mirror = true;
+                repairSpeed = 0.65f;
+
+                bullet = r;
+            }}
+            );
         }};
 
         discharge = new UnityUnitType("discharge"){{
@@ -1011,8 +1075,8 @@ public class UnityUnitTypes{
             speed = 0.3f;
             hitSize = 49f;
             rotateSpeed = 1.5f;
-            health = 48750f;
-            armor = 15f;
+            health = 60000f;
+            armor = 16f;
             mechStepParticles = true;
             mechStepShake = 0.8f;
             canDrown = false;
@@ -1074,11 +1138,11 @@ public class UnityUnitTypes{
         }};
 
         empire = new UnityUnitType("empire"){{
-            speed = 0.25f;
+            speed = 0.2f;
             hitSize = 49f;
             rotateSpeed = 1.25f;
-            health = 65000f;
-            armor = 16f;
+            health = 140000f;
+            armor = 20f;
             mechStepParticles = true;
             mechStepShake = 0.83f;
             canDrown = false;
@@ -1106,20 +1170,66 @@ public class UnityUnitTypes{
                 shootSound = Sounds.flame;
                 cooldownTime = 180f;
 
-                bullet = new FlameBulletType(6.6f, 63f){{
-                    lifetime = 33f;
+                bullet = new FlameBulletType(6.6f, 75f){{
+                    lifetime = 42f;
                     pierceCap = 6;
                     pierceBuilding = true;
                     collidesAir = true;
+                    reflectable = false;
                     incendChance = 0.2f;
                     incendAmount = 1;
                     particleAmount = 23;
                     particleSizeScl = 8f;
                     particleSpread = 11f;
                     hitSize = 9f;
+                    layer = Layer.bullet - 0.001f;
                     status = StatusEffects.melting;
                     smokeColors = new Color[]{Pal.darkFlame, Color.darkGray, Color.gray};
                     colors = new Color[]{Color.white, Color.valueOf("fff4ac"), Pal.lightFlame, Pal.darkFlame, Color.gray};
+                }};
+            }}, new LimitedAngleWeapon(name + "-mount"){{
+                x = 20.75f;
+                y = 10f;
+                shootY = 6.25f;
+                rotate = true;
+                rotateSpeed = 7f;
+                angleCone = 60f;
+                reload = 60f;
+                shootCone = 30f;
+                shootSound = Sounds.missile;
+
+                bullet = new MissileBulletType(2.5f, 22f){{
+                    lifetime = 40f;
+                    drag = -0.005f;
+                    width = 14f;
+                    height = 15f;
+                    shrinkY = 0f;
+
+                    splashDamageRadius = 55f;
+                    splashDamage = 85f;
+                    homingRange = 90f;
+                    weaveMag = 2f;
+                    weaveScale = 8f;
+
+                    hitEffect = despawnEffect = HitFx.hitExplosionLarge;
+
+                    status = StatusEffects.blasted;
+                    statusDuration = 60f;
+
+                    fragBullets = 5;
+                    fragLifeMin = 0.9f;
+                    fragLifeMax = 1.1f;
+                    fragBullet = new ShrapnelBulletType(){{
+                        damage = 200f;
+                        length = 60f;
+                        width = 12f;
+                        toColor = Pal.missileYellow;
+                        hitColor = Pal.bulletYellow;
+                        hitEffect = HitFx.coloredHitSmall;
+                        serrationLenScl = 5f;
+                        serrationSpaceOffset = 45f;
+                        serrationSpacing = 5f;
+                    }};
                 }};
             }}, new Weapon(name + "-cannon"){{
                 x = 20.75f;
@@ -1136,7 +1246,7 @@ public class UnityUnitTypes{
                 bullet = new ArtilleryBulletType(3f, 15, "shell"){{
                     hitEffect = Fx.blastExplosion;
                     knockback = 0.8f;
-                    lifetime = 110f;
+                    lifetime = 125f;
                     width = height = 14f;
                     collides = true;
                     collidesTiles = true;
@@ -1150,7 +1260,7 @@ public class UnityUnitTypes{
 
         cygnus = new UnityUnitType("cygnus"){{
             speed = 0.26f;
-            health = 26250;
+            health = 45000f;
             hitSize = 37f;
             armor = 10f;
             landShake = 1.5f;
@@ -1174,119 +1284,67 @@ public class UnityUnitTypes{
                 mirror = false;
                 reload = 4f * 60f;
                 recoil = 0f;
+                shootSound = Sounds.lasershoot;
                 shootStatus = StatusEffects.slow;
                 shootStatusDuration = 80f;
+                firstShotDelay = ChargeFx.greenLaserChargeParent.lifetime;
 
-                BulletType t = new CygnusBulletType(){{
-                    float rad = 170f;
-
-                    damage = 45f;
-                    speed = 4.3f;
-                    lifetime = 75f;
-                    shootEffect = Fx.hitEmpSpark;
-                    smokeEffect = Fx.shootBigSmoke2;
-                    healPercent = 12f;
-                    trailLength = 35;
-                    trailWidth = 9f;
-                    clipSize = (size + trailLength * speed) * 2.5f;
-                    scaleVelocity = true;
-                    unitDamageScl = 0.7f;
-                    hitShake = 7f;
-                    splashDamage = 95f;
-                    splashDamageRadius = rad;
-                    radius = rad;
-                    timeIncrease = 1.75f;
-                    timeDuration = 60f * 20f;
-                    powerDamageScl = 3f;
-                    allyStatusDuration = 60f * 15f;
-                    status = StatusEffects.electrified;
-                    lightning = 6;
-                    lightningLength = 10;
-                    lightningLengthRand = 4;
-                    lightningDamage = 35f;
-                    backColor = trailColor = lightningColor = Pal.heal;
-                    frontColor = Color.white;
-
-                    hitEffect = new Effect(50f, 100f, e -> {
-                        e.scaled(7f, b -> {
-                            Draw.color(Pal.heal, b.fout());
-                            Fill.circle(e.x, e.y, rad);
-                        });
-
-                        Draw.color(Pal.heal);
-                        Lines.stroke(e.fout() * 3f);
-                        Lines.circle(e.x, e.y, rad);
-
-                        int points = 10;
-                        float offset = Mathf.randomSeed(e.id, 360f);
-                        for(int i = 0; i < points; i++){
-                            float angle = i* 360f / points + offset;
-                            Drawf.tri(e.x + Angles.trnsx(angle, rad), e.y + Angles.trnsy(angle, rad), 6f, 50f * e.fout(), angle);
-                        }
-
-                        Fill.circle(e.x, e.y, 12f * e.fout());
-                        Draw.color();
-                        Fill.circle(e.x, e.y, 6f * e.fout());
-                        Drawf.light(e.x, e.y, rad * 1.6f, Pal.heal, e.fout());
-                    });
-                }};
-
-                bullet = new MultiBulletType(){{
-                    lifetime = ChargeFx.greenLaserChargeParent.lifetime;
+                bullet = new ReflectingLaserBulletType(500f){{
+                    lifetime = 65f;
                     shootEffect = ChargeFx.greenLaserChargeParent;
-                    mirror = false;
-                    bullets = new MultiBulletData[]{
-                        new MultiBulletData(t, 0f, 0f, 0f)
-                    };
+                    healPercent = 6f;
+                    splashDamage = 70f;
+                    splashDamageRadius = 30f;
+                    lightningDamage = 75f;
+                    hitEffect = HitFx.coloredHitLarge;
+                    hitColor = lightningColor = Pal.heal;
+                    pierceCap = 3;
+                    collidesTeam = true;
+                    lightningLength = 12;
+                    colors = new Color[]{Pal.heal.cpy().a(0.2f), Pal.heal.cpy().a(0.5f), Pal.heal.cpy().mul(1.2f), Color.white};
                 }};
             }}, new Weapon(name + "-mount"){{
                 x = 22.5f;
                 y = -3f;
                 shootY = 8.75f;
                 rotate = true;
-                alternate = false;
-                rotateSpeed = 2f;
-                reload = 140f;
-                continuous = true;
-                chargeSound = Sounds.lasercharge2;
-                shootSound = Sounds.beam;
-                firstShotDelay = ChargeFx.greenLaserChargeSmallParent.lifetime - 1f;
-                cooldownTime = 130f;
+                alternate = true;
+                rotateSpeed = 5f;
+                reload = 25f;
+                heatColor = Pal.heal;
+                inaccuracy = 5f;
 
-                bullet = new ContinuousLaserBulletType(){{
-                    damage = 45f;
-                    length = 150f;
-                    width = 5f;
-                    hitEffect = Fx.hitMeltHeal;
-                    drawSize = 420f;
-                    lifetime = 140f;
-                    shake = 1f;
-                    despawnEffect = Fx.smokeCloud;
-                    smokeEffect = Fx.none;
+                bullet = new CygnusBulletType(){{
+                    speed = 6f;
+                    damage = 20f;
+                    radius = 70f;
+                    hitEffect = HitFx.empHit;
+                    splashDamage = 5f;
+                    splashDamageRadius = 70f;
+                    backColor = Pal.heal;
 
-                    shootEffect = ChargeFx.greenLaserChargeSmallParent;
+                    shootEffect = Fx.hitEmpSpark;
+                    smokeEffect = Fx.shootBigSmoke2;
 
-                    incendChance = 0.1f;
-                    incendSpread = 5f;
-                    incendAmount = 1;
-
-                    healPercent = 1.2f;
-                    collidesTeam = true;
-                    largeHit = false;
-
-                    colors = new Color[]{Pal.heal.cpy().a(0.2f), Pal.heal.cpy().a(0.5f), Pal.heal.cpy().mul(1.2f), Color.white};
+                    trailLength = 15;
+                    trailWidth = 6f;
+                    trailColor = Pal.heal;
+                    status = StatusEffects.electrified;
+                    lightColor = Pal.heal;
+                    powerSclDecrease = 0.5f;
+                    timeIncrease = 1.25f;
                 }};
             }});
         }};
 
         sagittarius = new UnityUnitType("sagittarius"){{
-            speed = 0.2f;
-            health = 43750;
+            speed = 0.25f;
+            health = 102500;
             hitSize = 55f;
             armor = 12f;
             landShake = 2f;
             commandLimit = 8;
-            rotateSpeed = 1.2f;
+            rotateSpeed = 0.8f;
 
             legCount = 4;
             legLength = 34.36f;
@@ -1302,7 +1360,34 @@ public class UnityUnitTypes{
 
             abilities.add(new ForceFieldAbility(130f, 3f, 3500f, 60f * 7));
 
-            weapons.add(new AcceleratingWeapon(name + "-mount"){{
+            weapons.add(
+            new Weapon(name + "-laser"){{
+                mirror = false;
+                x = 0f;
+                y = 0f;
+                shootY = 16.75f;
+                reload = 12f * 60f;
+                firstShotDelay = ChargeFx.sagittariusCharge.lifetime;
+                shootStatus = UnityStatusEffects.sagittariusFatigue;
+                shootStatusDuration = 10f * 60f + ChargeFx.sagittariusCharge.lifetime;
+                continuous = true;
+                cooldownTime = 280f;
+
+                bullet = new SagittariusLaserBulletType(35f){{
+                    shootEffect = ChargeFx.sagittariusCharge;
+                    lifetime = 10f * 60f;
+                    collidesTeam = true;
+                    healPercent = 0.4f;
+                    splashDamage = 4f;
+                    splashDamageRadius = 25f;
+                    knockback = 3f;
+                    buildingDamageMultiplier = 0.6f;
+
+                    status = StatusEffects.electrified;
+                    statusDuration = 30f;
+                }};
+            }},
+            new AcceleratingWeapon(name + "-mount"){{
                 x = 28.25f;
                 y = -9.25f;
                 shootY = 17f;
@@ -1339,7 +1424,7 @@ public class UnityUnitTypes{
             drag = 0.1f;
             speed = 0.42f;
             hitSize = 35.5f;
-            health = 30000;
+            health = 52000;
             rotateSpeed = 1.3f;
 
             legCount = 8;
@@ -1435,7 +1520,7 @@ public class UnityUnitTypes{
             hitSize = 49f;
             hovering = true;
             allowLegStep = true;
-            health = 38750;
+            health = 125000;
             armor = 16f;
             rotateSpeed = 1.3f;
             legCount = 8;
@@ -1557,7 +1642,7 @@ public class UnityUnitTypes{
         }};
 
         mantle = new UnityUnitType("mantle"){{
-            health = 41250f;
+            health = 54000f;
             armor = 17f;
             speed = 0.45f;
             accel = 0.04f;
@@ -1632,7 +1717,7 @@ public class UnityUnitTypes{
         }};
 
         aphelion = new UnityUnitType("aphelion"){{
-            health = 50000f;
+            health = 130000f;
             armor = 16f;
             speed = 0.44f;
             accel = 0.04f;
@@ -2087,6 +2172,71 @@ public class UnityUnitTypes{
                     collisionWidth = 12f;
                 }};
             }});
+        }};
+
+        philinopsis = new UnityUnitType("philinopsis"){{
+            health = 38000f;
+            speed = 0.5f;
+            drag = 0.18f;
+            hitSize = 77.5f;
+            armor = 17f;
+            accel = 0.19f;
+            rotateSpeed = 0.86f;
+            rotateShooting = false;
+
+            weapons.add(new Weapon("aaa"){{
+                rotate = true;
+
+                //temporary stats copied over from Navanax just to test my new bullet
+                reload = 65f;
+                shake = 3f;
+                rotateSpeed = 2f;
+                shadow = 30f;
+                shootY = 7f;
+                recoil = 4f;
+                cooldownTime = reload - 10f;
+                shootSound = Sounds.laser;
+
+                bullet = new TrailingEmpBulletType(){{
+                    scaleVelocity = true;
+                    lightOpacity = 0.7f;
+                    unitDamageScl = 0.8f;
+                    healPercent = 20f;
+                    timeIncrease = 3f;
+                    timeDuration = 60f * 20f;
+                    powerDamageScl = 3f;
+                    damage = 60;
+                    hitColor = lightColor = Pal.heal;
+                    lightRadius = 70f;
+                    clipSize = 250f;
+                    shootEffect = Fx.hitEmpSpark;
+                    smokeEffect = Fx.shootBigSmoke2;
+                    lifetime = 60f;
+                    sprite = "circle-bullet";
+                    backColor = Pal.heal;
+                    frontColor = Color.white;
+                    width = height = 12f;
+                    speed = 5f;
+                    trailEffect = TrailFx.spikedEnergyTrail;
+                    trailLength = 20;
+                    trailWidth = 6f;
+                    trailColor = Pal.heal;
+                    trailInterval = 3f;
+                    trailRotation = true;
+                    splashDamage = 70f;
+                    radius = splashDamageRadius = 124f;
+                    empRadius = 68f;
+                    hitShake = 4f;
+                    status = StatusEffects.electrified;
+                    hitSound = Sounds.plasmaboom;
+                    hitEffect = HitFx.philinopsisEmpHit;
+                    zapEffect = HitFx.philinopsisEmpZap;
+                }};
+            }});
+        }};
+
+        chelidonura = new UnityUnitType("chelidonura"){{
+
         }};
 
         amphibiNaval = new UnityUnitType("amphibi-naval"){
@@ -4461,7 +4611,7 @@ public class UnityUnitTypes{
                 inaccuracy = 1.4f;
                 shots = 6;
                 shotDelay = 4f;
-                shootSound = Sounds.shootBig;
+                shootSound = UnitySounds.endBasic;
 
                 bullet = t;
             }});
@@ -4478,7 +4628,7 @@ public class UnityUnitTypes{
                 shots = 8;
                 shotDelay = 3f;
                 xRand = 12f;
-                shootSound = Sounds.missile;
+                shootSound = UnitySounds.endMissile;
 
                 bullet = new EndBasicBulletType(6f, 100f, "missile"){{
                     width = 9f;
@@ -4514,7 +4664,7 @@ public class UnityUnitTypes{
                 inaccuracy = 1.4f;
                 shots = 6;
                 shotDelay = 4f;
-                shootSound = Sounds.shootBig;
+                shootSound = UnitySounds.endBasic;
 
                 bullet = t;
             }}, new Weapon("unity-doeg-small-laser"){{
@@ -4586,6 +4736,7 @@ public class UnityUnitTypes{
                 shots = 5;
                 shotDelay = 6f;
                 inaccuracy = 2f;
+                shootSound = UnitySounds.endBasic;
 
                 bullet = UnityBullets.oppressionShell;
             }});
@@ -4693,7 +4844,7 @@ public class UnityUnitTypes{
                         y = -26.25f;
                         shootY = 6f;
 
-                        shootSound = Sounds.missile;
+                        shootSound = UnitySounds.endMissile;
 
                         rotate = true;
                         rotateSpeed = 4f;
@@ -5021,7 +5172,7 @@ public class UnityUnitTypes{
                 rotateSpeed = 2f;
                 velocityRnd = 0.2f;
                 reload = 2f * 50f;
-                shootSound = Sounds.artillery;
+                shootSound = UnitySounds.endBasicLarge;
                 bullet = UnityBullets.ravagerArtillery;
             }}, new Weapon(name + "-artillery"){{
                 shootY = 11f;
@@ -5034,7 +5185,7 @@ public class UnityUnitTypes{
                 rotateSpeed = 2f;
                 velocityRnd = 0.2f;
                 reload = 2.25f * 50f;
-                shootSound = Sounds.artillery;
+                shootSound = UnitySounds.endBasicLarge;
                 bullet = UnityBullets.ravagerArtillery;
             }}, new Weapon(name + "-small-turret"){{
                 shootY = 7f;
@@ -5045,7 +5196,7 @@ public class UnityUnitTypes{
                 rotate = true;
                 xRand = 2f;
                 reload = 7f;
-                shootSound = Sounds.missile;
+                shootSound = UnitySounds.endMissile;
 
                 bullet = UnityBullets.missileAntiCheat;
             }}, new Weapon(name + "-small-turret"){{
@@ -5057,7 +5208,7 @@ public class UnityUnitTypes{
                 rotate = true;
                 xRand = 2f;
                 reload = 7f;
-                shootSound = Sounds.missile;
+                shootSound = UnitySounds.endMissile;
 
                 bullet = UnityBullets.missileAntiCheat;
             }});

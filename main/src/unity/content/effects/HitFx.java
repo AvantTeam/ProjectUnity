@@ -16,7 +16,9 @@ import static arc.graphics.g2d.Lines.*;
 import static arc.math.Angles.*;
 
 public class HitFx{
-    public static Effect electronHit = new Effect(12f, e -> {
+    public static Effect
+
+    electronHit = new Effect(12f, e -> {
         color(Pal.lancerLaser, UnityPal.lightEffect, e.fin());
         stroke(e.fout() * 3f);
         Lines.circle(e.x, e.y, e.fin() * 90f);
@@ -57,7 +59,49 @@ public class HitFx{
         });
     }),
 
-    LightHitLarge = new Effect(15f, e -> {
+    philinopsisEmpZap = new Effect(50f, 100f, e -> {
+        float rad = 68f;
+
+        e.scaled(7f, b -> {
+            color(Pal.heal, b.fout());
+            UnityDrawf.arcFill(e.x, e.y, rad, 36f, e.rotation);
+        });
+
+        color(Pal.heal);
+        stroke(e.fout() * 3f);
+        UnityDrawf.arcLine(e.x, e.y, rad, 36f, e.rotation);
+
+        Drawf.tri(e.x + Angles.trnsx(e.rotation, rad), e.y + Angles.trnsy(e.rotation, rad), 6f, 50f * e.fout(), e.rotation);
+    }),
+
+    philinopsisEmpHit = new Effect(50f, 100f, e -> {
+        float rad = 124f;
+
+        e.scaled(7f, b -> {
+            color(Pal.heal, b.fout());
+            Fill.circle(e.x, e.y, rad);
+        });
+
+        color(Pal.heal);
+        stroke(e.fout() * 3f);
+        Lines.circle(e.x, e.y, rad);
+
+        int points = 10;
+        float offset = Mathf.randomSeed(e.id, 360f);
+        for(int i = 0; i < points; i++){
+            float angle = i* 360f / points + offset;
+            //for(int s : Mathf.zeroOne){
+            Drawf.tri(e.x + Angles.trnsx(angle, rad), e.y + Angles.trnsy(angle, rad), 6f, 50f * e.fout(), angle/* + s*180f*/);
+            //}
+        }
+
+        Fill.circle(e.x, e.y, 12f * e.fout());
+        color();
+        Fill.circle(e.x, e.y, 6f * e.fout());
+        Drawf.light(e.x, e.y, rad * 1.6f, Pal.heal, e.fout());
+    }),
+
+    lightHitLarge = new Effect(15f, e -> {
         color(Pal.lancerLaser, UnityPal.lightEffect, e.fin());
         stroke(0.5f + e.fout());
 
@@ -124,6 +168,30 @@ public class HitFx{
         });
         stroke(0.5f + e.fout());
         randLenVectors(e.id, 6, e.fin() * 35f, e.rotation + 180f, 45f, (x, y) -> lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fout() * 7f + 1f));
+    }),
+
+    empHit = new Effect(50f, 100f, e -> {
+        float rad = 70f;
+        e.scaled(7f, b -> {
+            color(Pal.heal, b.fout());
+            Fill.circle(e.x, e.y, rad);
+        });
+
+        color(Pal.heal);
+        stroke(e.fout() * 3f);
+        Lines.circle(e.x, e.y, rad);
+
+        int points = 10;
+        float offset = Mathf.randomSeed(e.id, 360f);
+        for(int i = 0; i < points; i++){
+            float angle = i* 360f / points + offset;
+            Drawf.tri(e.x + Angles.trnsx(angle, rad), e.y + Angles.trnsy(angle, rad), 6f, 50f * e.fout(), angle);
+        }
+
+        Fill.circle(e.x, e.y, 12f * e.fout());
+        color();
+        Fill.circle(e.x, e.y, 6f * e.fout());
+        Drawf.light(e.x, e.y, rad * 1.6f, Pal.heal, e.fout());
     }),
 
     plagueLargeHit = new Effect(80f, e -> {
@@ -315,6 +383,28 @@ public class HitFx{
 
         stroke(e.fout());
         Lines.circle(e.x, e.y, e.fin() * 6f);
+    }),
+
+    hitExplosionLarge = new Effect(30f, 200f, e -> {
+        color(Pal.missileYellow);
+        e.scaled(12f, s -> {
+            stroke(s.fout() * 2f + 0.5f);
+            Lines.circle(e.x, e.y, s.fin() * 60f);
+        });
+
+        color(Color.gray);
+        randLenVectors(e.id, 8, 2f + 42f * e.finpow(), (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, e.fout() * 5f + 0.5f);
+        });
+
+        color(Pal.missileYellowBack);
+        stroke(e.fout() * 1.5f);
+
+        randLenVectors(e.id + 1, 5, 1f + 56f * e.finpow(), (x, y) -> {
+            lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1f + e.fout() * 5f);
+        });
+
+        Drawf.light(e.x, e.y, 60f, Pal.missileYellowBack, 0.8f * e.fout());
     }),
 
     hitExplosionMassive = new Effect(70f, 370f, e -> {

@@ -13,7 +13,7 @@ import unity.graphics.*;
 import static unity.content.UnityFx.*;
 
 public class UnityStatusEffects{
-    public static StatusEffect disabled, weaken, plasmaed, radiation, reloadFatigue, blueBurn, molten, tpCoolDown, teamConverted, boosted, distort, plated;
+    public static StatusEffect disabled, weaken, plasmaed, radiation, reloadFatigue, speedFatigue, sagittariusFatigue, blueBurn, molten, tpCoolDown, teamConverted, boosted, distort, plated;
 
     public static void load(){
         disabled = new StatusEffect("disabled"){{
@@ -71,6 +71,16 @@ public class UnityStatusEffects{
 
         reloadFatigue = new StatusEffect("reload-fatigue"){{
             reloadMultiplier = 0.75f;
+        }};
+
+        speedFatigue = new StatusEffect("speed-fatigue"){{
+            speedMultiplier = 0.6f;
+        }};
+
+        sagittariusFatigue = new StatusEffect("sagittarius-fatigue"){{
+            speedMultiplier = 0.1f;
+            healthMultiplier = 0.6f;
+            color = Color.valueOf("62ae7f");
         }};
 
         molten = new StatusEffect("molten"){{

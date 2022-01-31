@@ -16,7 +16,9 @@ import static arc.graphics.g2d.Lines.*;
 import static arc.math.Angles.*;
 
 public class ShootFx{
-    public static Effect laserChargeShoot = new Effect(21f, e -> {
+    public static Effect
+
+    laserChargeShoot = new Effect(21f, e -> {
         color(e.color, Color.white, e.fout());
 
         for(int i = 0; i < 4; i++){

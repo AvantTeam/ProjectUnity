@@ -7,6 +7,7 @@ import unity.content.*;
 
 import static mindustry.Vars.*;
 
+@Deprecated
 public class HealerAI extends FlyingAI{
     protected float score;
 
