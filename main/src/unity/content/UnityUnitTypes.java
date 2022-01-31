@@ -1402,7 +1402,7 @@ public class UnityUnitTypes{
                 rotate = true;
                 alternate = false;
                 shots = 2;
-                shootSound = Sounds.energyBolt;
+                shootSound = UnitySounds.energyBolt;
 
                 bullet = new ArrowBulletType(7f, 25f){{
                     lifetime = 60f;
