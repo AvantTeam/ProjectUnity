@@ -132,6 +132,7 @@ public class UnityUnitType extends UnitType{
         boolean fromWave = caller != null && SpawnGroup.class.isAssignableFrom(caller);
 
         if(unit instanceof Trailc e){
+            Log.info("set.");
             e.trail(trailType.get());
         }
 

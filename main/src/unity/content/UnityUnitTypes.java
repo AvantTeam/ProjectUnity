@@ -4049,11 +4049,25 @@ public class UnityUnitTypes{
         }};
 
         stray = new UnityUnitType("stray"){{
+            health = 300f;
+            speed = 4.5f;
+            accel = 0.16f;
+            drag = 0.09f;
+            rotateSpeed = 7.5f;
+            flying = true;
+
             trailType = () -> new MultiTrail(
                 new TrailHold(new TexturedTrail(Core.atlas.find("phantasmal-trail"), 6)),
-                new TrailHold(new Trail(12), -2f, 0f),
-                new TrailHold(new Trail(12), 2f, 0f)
-            );
+                new TrailHold(new Trail(12), -4f, 0f, 0.5f),
+                new TrailHold(new Trail(12), 4f, 0f, 0.5f)
+            ){
+                @Override
+                public void update(float x, float y, float width){
+                    super.update(x, y, width);
+
+                    //funny effects
+                }
+            };
 
             trailLength = trailType.get().length;
         }};

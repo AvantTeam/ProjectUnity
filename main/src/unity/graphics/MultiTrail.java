@@ -1,6 +1,8 @@
 package unity.graphics;
 
 import arc.graphics.*;
+import arc.math.*;
+import arc.util.*;
 import mindustry.graphics.*;
 
 /**
@@ -9,6 +11,8 @@ import mindustry.graphics.*;
  */
 public class MultiTrail extends Trail{
     public TrailHold[] trails;
+
+    protected float lastX, lastY;
 
     public MultiTrail(TrailHold... trails){
         super(0);
@@ -37,12 +41,12 @@ public class MultiTrail extends Trail{
 
     @Override
     public void drawCap(Color color, float width){
-        for(TrailHold trail : trails) trail.trail.drawCap(color, width);
+        for(TrailHold trail : trails) trail.trail.drawCap(color, width * trail.width);
     }
 
     @Override
     public void draw(Color color, float width){
-        for(TrailHold trail : trails) trail.trail.draw(color, width);
+        for(TrailHold trail : trails) trail.trail.draw(color, width * trail.width);
     }
 
     @Override
@@ -52,22 +56,35 @@ public class MultiTrail extends Trail{
 
     @Override
     public void update(float x, float y, float width){
-        for(TrailHold trail : trails) trail.trail.update(x + trail.x, y + trail.y, width);
+        float angle = Angles.angle(lastX, lastY, x, y);
+        for(TrailHold trail : trails){
+            Tmp.v1.trns(angle - 90f, trail.x, trail.y);
+            trail.trail.update(x + Tmp.v1.x, y + Tmp.v1.y, width * trail.width);
+        }
+
+        lastX = x;
+        lastY = y;
     }
 
     public static class TrailHold{
         public Trail trail;
         public float x;
         public float y;
+        public float width;
 
         public TrailHold(Trail trail){
-            this(trail, 0f, 0f);
+            this(trail, 0f, 0f, 1f);
         }
 
         public TrailHold(Trail trail, float x, float y){
+            this(trail, x, y, 1f);
+        }
+
+        public TrailHold(Trail trail, float x, float y, float width){
             this.trail = trail;
             this.x = x;
             this.y = y;
+            this.width = width;
         }
     }
 }
