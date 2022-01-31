@@ -1311,6 +1311,7 @@ public class UnityUnitTypes{
                 alternate = true;
                 rotateSpeed = 5f;
                 reload = 25f;
+                shootSound = UnitySounds.energyBolt;
                 heatColor = Pal.heal;
                 inaccuracy = 5f;
 
@@ -1367,6 +1368,7 @@ public class UnityUnitTypes{
                 y = 0f;
                 shootY = 16.75f;
                 reload = 12f * 60f;
+                shootSound = Sounds.beam;
                 firstShotDelay = ChargeFx.sagittariusCharge.lifetime;
                 shootStatus = UnityStatusEffects.sagittariusFatigue;
                 shootStatusDuration = 10f * 60f + ChargeFx.sagittariusCharge.lifetime;
@@ -1400,6 +1402,8 @@ public class UnityUnitTypes{
                 rotate = true;
                 alternate = false;
                 shots = 2;
+                shootSound = Sounds.energyBolt;
+
                 bullet = new ArrowBulletType(7f, 25f){{
                     lifetime = 60f;
                     pierce = true;
