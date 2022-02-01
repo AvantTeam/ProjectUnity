@@ -16,13 +16,13 @@ import mindustry.world.Block;
 import static mindustry.Vars.tilesize;
 import static mindustry.Vars.world;
 
-public class TimeMine extends Block {
+public class TimeMineTp extends Block {
     public float range = 2 * tilesize;
     public float reload = 30f, teleportRange = 500f;
     public Effect tpEffect;
     public float lifeTime = 180f;
 
-    public TimeMine(String name) {
+    public TimeMineTp(String name) {
         super(name);
 
         update = sync = configurable = true;
@@ -31,9 +31,9 @@ public class TimeMine extends Block {
         hasPower = hasItems = hasLiquids = false;
         timers = 2;
 
-        config(Integer.class, (TimeMineBuild entity, Integer value) -> {
+        config(Integer.class, (TimeMineTpBuild entity, Integer value) -> {
             Building other = world.build(value);
-            TimeMineBuild otherB = (TimeMineBuild) other;
+            TimeMineTpBuild otherB = (TimeMineTpBuild) other;
             if (entity.teleporter == value){
                 entity.teleporter = -1;
                 otherB.fromPos = -1;
@@ -61,7 +61,7 @@ public class TimeMine extends Block {
         Draw.reset();
     }
 
-    public class TimeMineBuild extends Building{
+    public class TimeMineTpBuild extends Building{
         public Building dest, from;
         public Seq<Unit> teleportUnit = new Seq<>();
         public int teleporter = -1, fromPos = -1;
@@ -130,7 +130,7 @@ public class TimeMine extends Block {
         }
 
         public boolean tpValid(Building tile, Building link){
-            return tile != link && tile.dst(link) <= teleportRange && link != null && tile.team == link.team && !link.dead() && link instanceof TimeMine.TimeMineBuild;
+            return tile != link && tile.dst(link) <= teleportRange && link != null && tile.team == link.team && !link.dead() && link instanceof TimeMineTp.TimeMineTpBuild;
         }
 
         public int unitCount(Team t){
