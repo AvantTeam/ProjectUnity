@@ -81,6 +81,9 @@ public class UnityUnitTypes{
     public static @EntityDef({Unitc.class, Legsc.class, Transc.class})
     UnitType craberNaval, craber;
 
+    public static @FactionDef("scar") @EntityDef({Unitc.class, Worldc.class})
+    UnitType terra;
+
     // scar legs
     public static @FactionDef("scar") @EntityPoint(LegsUnit.class)
     UnitType hovos, ryzer, zena, sundown, rex, excelsus;
@@ -2395,6 +2398,13 @@ public class UnityUnitTypes{
 
         //endregion
         //region scar
+
+        terra = new UnityUnitType("terra"){{
+            speed = 0.2f;
+            health = 900000f;
+            worldWidth = 8;
+            worldHeight = 18;
+        }};
 
         hovos = new UnityUnitType("hovos"){{
             defaultController = DistanceGroundAI::new;
