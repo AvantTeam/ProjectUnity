@@ -29,6 +29,7 @@ import static mindustry.Vars.*;
 
 @SuppressWarnings({"unused"})
 @MergeComponent
+@Deprecated
 abstract class ExpComp extends Block implements Stemc{
     int maxLevel = 20;
     float maxExp;

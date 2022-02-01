@@ -13,6 +13,7 @@ import unity.content.*;
 import unity.gen.Expc.*;
 import unity.graphics.*;
 import unity.util.*;
+import unity.world.blocks.defense.turrets.exp.*;
 
 public class ExpLaserBulletType extends BulletType {
     /** Color of laser. Shifts to second color as the turret levels up. */
@@ -26,7 +27,7 @@ public class ExpLaserBulletType extends BulletType {
     /** Widths of each color */
     public float[] strokes = {2.9f, 1.8f, 1};
     /** Exp gained on hit */
-    public float hitUnitExpGain, hitBuildingExpGain;
+    public int hitUnitExpGain, hitBuildingExpGain;
 
     public ExpLaserBulletType(float length, float damage){
         super(0.01f, damage);
@@ -50,7 +51,7 @@ public class ExpLaserBulletType extends BulletType {
     }
 
     public int getLevel(Bullet b){
-        if(b.owner instanceof ExpBuildc exp){
+        if(b.owner instanceof ExpTurret.ExpTurretBuild exp){
             return exp.level();
         }else{
             return 0;
@@ -58,7 +59,7 @@ public class ExpLaserBulletType extends BulletType {
     }
 
     public float getLevelf(Bullet b){
-        if(b.owner instanceof ExpBuildc exp){
+        if(b.owner instanceof ExpTurret.ExpTurretBuild exp){
             return exp.levelf();
         }else{
             return 0f;
@@ -94,24 +95,24 @@ public class ExpLaserBulletType extends BulletType {
         if(target instanceof Hitboxc hit){
             hit.collision(b, hit.x(), hit.y());
             b.collision(hit, hit.x(), hit.y());
-            if(b.owner instanceof ExpBuildc exp){
-                if(exp.levelf() < 1 && Core.settings.getBool("hitexpeffect")){
+            if(b.owner instanceof ExpTurret.ExpTurretBuild exp){
+                if(exp.level() < exp.maxLevel() && Core.settings.getBool("hitexpeffect")){
                     for(int i = 0; i < Math.ceil(hitUnitExpGain); i++){
                         UnityFx.expGain.at(hit.x(), hit.y(), 0f, (Position)b.owner);
                     }
                 }
-                exp.incExp(hitUnitExpGain);
+                exp.handleExp(hitUnitExpGain);
             }
         }else if(target instanceof Building tile && tile.collide(b)){
             tile.collision(b);
             hit(b, tile.x, tile.y);
-            if(b.owner instanceof ExpBuildc exp){
-                if(exp.levelf() < 1 && Core.settings.getBool("hitexpeffect")){
+            if(b.owner instanceof ExpTurret.ExpTurretBuild exp){
+                if(exp.level() < exp.maxLevel() && Core.settings.getBool("hitexpeffect")){
                     for(int i = 0; i < Math.ceil(hitBuildingExpGain); i++){
                         UnityFx.expGain.at(tile.x, tile.y, 0f, (Position)b.owner);
                     }
                 }
-                exp.incExp(hitBuildingExpGain);
+                exp.handleExp(hitBuildingExpGain);
             }
         }else{
             b.data = new Vec2().trns(b.rotation(), getLength(b)).add(b.x, b.y);

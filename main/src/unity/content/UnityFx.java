@@ -68,6 +68,13 @@ public class UnityFx{
         for(int i = 0; i < 4; i++) Drawf.tri(Tmp.v1.x, Tmp.v1.y, 4f, 4 + 1.5f * Mathf.sin(Time.time * 0.12f + e.id * 4f), i * 90f + Mathf.sin(Time.time * 0.04f + e.id * 5f) * 28f);
     }),
 
+    placeShine = new Effect(30f, e -> {
+        color(e.color);
+        stroke(e.fout());
+        square(e.x, e.y, e.rotation / 2f + e.fin() * 3f);
+        UnityDrawf.spark(e.x, e.y, 25f, 15f * e.fout(), e.finpow() * 90f);
+    }),
+
     laserCharge = new Effect(38f, e -> {
         color(e.color);
         randLenVectors(e.id, e.id % 3 + 1, 1f + 20f * e.fout(), e.rotation, 120f, (x, y) ->
