@@ -130,6 +130,7 @@ public class UnityBlocks{
     public static @FactionDef("koruh") Block
     //crafting
     solidifier, steelSmelter, liquifier, titaniumExtractor,
+
     //defense
     stoneWall, denseWall, steelWall, steelWallLarge, diriumWall, diriumWallLarge,
 
