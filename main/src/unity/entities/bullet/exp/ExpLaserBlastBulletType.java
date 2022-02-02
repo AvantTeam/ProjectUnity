@@ -14,6 +14,7 @@ import mindustry.graphics.*;
 import unity.content.*;
 import unity.gen.Expc.*;
 import unity.graphics.*;
+import unity.world.blocks.exp.*;
 
 public class ExpLaserBlastBulletType extends LaserBulletType{
     /** Color of laser. Shifts to second color as the turret levels up. */
@@ -28,7 +29,7 @@ public class ExpLaserBlastBulletType extends LaserBulletType{
     /** Color of lightning. Shifts to second color as the turret levels up. */
     public Color lightningFromColor = Pal.lancerLaser, lightningToColor = UnityPal.exp;
     /** Exp gained on hit */
-    public float hitUnitExpGain, hitBuildingExpGain;
+    public int hitUnitExpGain, hitBuildingExpGain;
 
     public ExpLaserBlastBulletType(float length, float damage){
         super(damage);
@@ -50,8 +51,19 @@ public class ExpLaserBlastBulletType extends LaserBulletType{
         this(120f, 1f);
     }
 
+    public void handleExp(Bullet b, float x, float y, int amount){
+        if(b.owner instanceof ExpTurret.ExpTurretBuild exp){
+            if(exp.level() < exp.maxLevel() && Core.settings.getBool("hitexpeffect")){
+                for(int i = 0; i < Math.ceil(amount); i++){
+                    UnityFx.expGain.at(x, y, 0f, b.owner);
+                }
+            }
+            exp.handleExp(amount);
+        }
+    }
+
     public int getLevel(Bullet b){
-        if(b.owner instanceof ExpBuildc exp){
+        if(b.owner instanceof ExpTurret.ExpTurretBuild exp){
             return exp.level();
         }else{
             return 0;
@@ -59,7 +71,7 @@ public class ExpLaserBlastBulletType extends LaserBulletType{
     }
 
     public float getLevelf(Bullet b){
-        if(b.owner instanceof ExpBuildc exp){
+        if(b.owner instanceof ExpTurret.ExpTurretBuild exp){
             return exp.levelf();
         }else{
             return 0f;
@@ -71,7 +83,8 @@ public class ExpLaserBlastBulletType extends LaserBulletType{
     }
 
     public void setColors(Bullet b){
-        Color[] data = {Tmp.c1.set(fromColors[0]).lerp(toColors[0], getLevelf(b)).cpy(), Tmp.c2.set(fromColors[1]).lerp(toColors[1], getLevelf(b)).cpy(), Tmp.c3.set(fromColors[2]).lerp(toColors[2], getLevelf(b)).cpy()};
+        float f = getLevelf(b);
+        Color[] data = {Tmp.c1.set(fromColors[0]).lerp(toColors[0], f).cpy(), Tmp.c2.set(fromColors[1]).lerp(toColors[1], f).cpy(), Tmp.c3.set(fromColors[2]).lerp(toColors[2], f).cpy()};
         b.data = data;
     }
 
@@ -132,27 +145,13 @@ public class ExpLaserBlastBulletType extends LaserBulletType{
 
     @Override
     public void hitTile(Bullet b, Building build, float initialHealth, boolean direct){
-        if(build.team != b.team && b.owner instanceof ExpBuildc exp){
-            if(exp.levelf() < 1 && Core.settings.getBool("hitexpeffect")){
-                for(int i = 0; i < Math.ceil(hitBuildingExpGain); i++){
-                    UnityFx.expGain.at(build.x(), build.y(), 0f, (Position)b.owner);
-                }
-            }
-            exp.incExp(hitBuildingExpGain);
-        }
+        handleExp(b, build.x, build.y, hitBuildingExpGain);
         super.hitTile(b, build, initialHealth, direct);
     }
 
     @Override
     public void hitEntity(Bullet b, Hitboxc other, float initialHealth){
-        if(b.owner instanceof ExpBuildc exp){
-            if(exp.levelf() < 1 && Core.settings.getBool("hitexpeffect")){
-                for(int i = 0; i < Math.ceil(hitUnitExpGain); i++){
-                    UnityFx.expGain.at(other.x(), other.y(), 0f, (Position)b.owner);
-                }
-            }
-            exp.incExp(hitUnitExpGain);
-        }
+        handleExp(b, other.x(), other.y(), hitUnitExpGain);
         super.hitEntity(b, other, initialHealth);
     }
 
