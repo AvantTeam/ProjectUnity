@@ -18,7 +18,7 @@ import unity.graphics.*;
 public class ExpLaserBlastBulletType extends LaserBulletType{
     /** Color of laser. Shifts to second color as the turret levels up. */
     public Color[] fromColors = {Pal.lancerLaser.cpy().mul(1f, 1f, 1f, 0.4f), Pal.lancerLaser, Color.white},
-        toColors = {UnityPal.expColor.cpy().mul(1f, 1f, 1f, 0.4f), UnityPal.expColor, Color.white};
+        toColors = {UnityPal.exp.cpy().mul(1f, 1f, 1f, 0.4f), UnityPal.exp, Color.white};
     /** Damage increase per owner level, if the owner can level up. */
     public float damageInc;
     /** Size increase per owner level, if the owner can level up. */
@@ -26,7 +26,7 @@ public class ExpLaserBlastBulletType extends LaserBulletType{
     /** You can guess by now. */
     public float lightningSpacingInc, lightningDamageInc;
     /** Color of lightning. Shifts to second color as the turret levels up. */
-    public Color lightningFromColor = Pal.lancerLaser, lightningToColor = UnityPal.expColor;
+    public Color lightningFromColor = Pal.lancerLaser, lightningToColor = UnityPal.exp;
     /** Exp gained on hit */
     public float hitUnitExpGain, hitBuildingExpGain;
 

@@ -10,15 +10,14 @@ import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import unity.content.*;
-import unity.gen.Expc.*;
 import unity.graphics.*;
 import unity.util.*;
-import unity.world.blocks.defense.turrets.exp.*;
+import unity.world.blocks.exp.*;
 
 public class ExpLaserBulletType extends BulletType {
     /** Color of laser. Shifts to second color as the turret levels up. */
     public Color fromColor = Pal.lancerLaser, toColor = UnityPal.expLaser;
-    /** Dimentions of laser */
+    /** Dimensions of laser */
     public float width = 1f, length;
     /** Damage increase per owner level, if the owner can level up. */
     public float damageInc;
@@ -71,7 +70,7 @@ public class ExpLaserBulletType extends BulletType {
     }
 
     public Color getColor(Bullet b){
-        return Tmp.c1.set(fromColor).lerp(toColor, getLevelf(b)).cpy();
+        return Tmp.c2.set(fromColor).lerp(toColor, getLevelf(b));
     }
 
     public float getLength(Bullet b){

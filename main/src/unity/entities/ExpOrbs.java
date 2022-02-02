@@ -16,10 +16,12 @@ import mindustry.world.blocks.production.*;
 import mindustry.world.blocks.production.Incinerator.*;
 import unity.gen.*;
 import unity.gen.Expc.*;
+import unity.world.blocks.exp.*;
 
 import static mindustry.Vars.*;
 
-/** @author GlennFolker */
+/** @author GlennFolker
+ * @author sunny */
 public class ExpOrbs{
     public static final float expAmount = 10f;
 
@@ -88,50 +90,39 @@ public class ExpOrbs{
             Tile tile = world.tileWorld(b.x, b.y);
             if(tile == null || tile.build == null) return;
 
-            Expc block = null;
-            ExpBuildc build = null;
-            if(tile.build instanceof ExpBuildc exp){
-                build = exp;
-                block = (Expc)build.block();
+            if(tile.build instanceof ExpHolder exp && exp.acceptOrb() && exp.handleOrb((int)expAmount)){
+                b.remove();
             }
-
-            if(block != null && block.hasExp() && build.consumesOrb()){
-                //TODO make the building absorb the orb
-                b.remove();
-            }else if(tile.block() instanceof Conveyor){
-                if(block != null && block.conveyor()){
-                    expConveyor(b, block, build);
+            else if(tile.block() instanceof Conveyor conv){
+                if(conv.absorbLasers){ //this will be used as a flag for exp conveyors
+                    expConveyor(b, conv, (ConveyorBuild)tile.build);
                 }else{
-                    conveyor(b, (Conveyor)tile.block(), (ConveyorBuild)tile.build);
+                    conveyor(b, conv, (ConveyorBuild)tile.build);
                 }
-            }else if(block != null && block.noOrbCollision()){
-                return;
-            }else if(tile.block() instanceof Incinerator && ((IncineratorBuild)tile.build).heat > 0.5f){
-                //TODO the effect, glenn
+            }
+            else if(tile.block() instanceof Incinerator && ((IncineratorBuild)tile.build).heat > 0.5f){
+                //TODO the effect
                 b.remove();
-            }else if(tile.solid()){
+            }
+            else if(tile.solid()){
                 b.trns(-1.1f * b.vel.x, -1.1f * b.vel.y);
                 b.vel.scl(0f);
             }
         }
 
-        protected void conveyor(Bullet b, Conveyor block, ConveyorBuild build){
-            var cBuild = (ConveyorBuild & ExpBuildc)build;
-            if(cBuild.clogHeat > 0.5f || !cBuild.enabled) return;
+        private void conveyor(Bullet b, Conveyor block, ConveyorBuild build){
+            if(build.clogHeat > 0.5f || !build.enabled) return;
 
             float speed = block.speed / 3f;
             b.vel.add(d4x[build.rotation] * speed * build.delta(), d4y[build.rotation] * speed * build.delta());
         }
 
-        protected void expConveyor(Bullet b, Expc block, ExpBuildc build){
-            Conveyor conv = (Conveyor)block;
-            ConveyorBuild convBuild = (ConveyorBuild)build;
+        private void expConveyor(Bullet b, Conveyor block, ConveyorBuild build){
+            if(build.clogHeat > 0.5f || !build.enabled) return;
 
-            if(convBuild.clogHeat > 0.5f || !convBuild.enabled) return;
-
-            float speed = conv.speed * 2f;
+            float speed = block.speed * 2f;
             b.vel.scl(0.7f);
-            b.vel.add(d4x[convBuild.rotation] * speed * build.delta(), d4y[convBuild.rotation] * speed * build.delta());
+            b.vel.add(d4x[build.rotation] * speed * build.delta(), d4y[build.rotation] * speed * build.delta());
         }
     }
 }

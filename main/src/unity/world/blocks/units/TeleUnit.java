@@ -72,7 +72,7 @@ public class TeleUnit extends Block{
             Draw.rect(topRegion, x, y);
             if(warmup >= 0.001f){
                 Draw.z(Layer.bullet);
-                Draw.color(UnityPal.diriumColor, team.color, Mathf.absin(19f, 1f));
+                Draw.color(UnityPal.dirium, team.color, Mathf.absin(19f, 1f));
                 Lines.stroke((Mathf.absin(62f, 0.5f) + 0.5f) * warmup);
                 Lines.square(x, y, 10.5f, 45f);
                 if(warmup2 >= 0.001f){
@@ -86,7 +86,7 @@ public class TeleUnit extends Block{
 
         @Override
         public void drawSelect(){
-            Draw.color(consValid() ? inRange(player) ? UnityPal.diriumColor : Pal.accent : Pal.darkMetal);
+            Draw.color(consValid() ? inRange(player) ? UnityPal.dirium : Pal.accent : Pal.darkMetal);
             float length = tilesize * size / 2f + 3f + Mathf.absin(5f, 2f);
             Draw.rect(arrowRegion, x + length, y, 180f);
             Draw.rect(arrowRegion, x, y + length, 270f);

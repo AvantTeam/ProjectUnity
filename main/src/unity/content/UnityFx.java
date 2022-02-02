@@ -62,7 +62,7 @@ public class UnityFx{
         Tmp.v1.trns(a, Mathf.randomSeed(e.id * 2L, -spread, spread) * fslope, d * sfin);
         Tmp.v1.add(e.x, e.y);
 
-        color(UnityPal.expColor, Color.white, 0.1f + 0.1f * Mathf.sin(Time.time * 0.03f + e.id * 3f));
+        color(UnityPal.exp, Color.white, 0.1f + 0.1f * Mathf.sin(Time.time * 0.03f + e.id * 3f));
         Fill.circle(Tmp.v1.x, Tmp.v1.y, 1.5f);
         stroke(0.5f);
         for(int i = 0; i < 4; i++) Drawf.tri(Tmp.v1.x, Tmp.v1.y, 4f, 4 + 1.5f * Mathf.sin(Time.time * 0.12f + e.id * 4f), i * 90f + Mathf.sin(Time.time * 0.04f + e.id * 5f) * 28f);
@@ -595,12 +595,12 @@ public class UnityFx{
 
     expAbsorb = new Effect(15f, e -> {
         stroke(e.fout() * 1.5f);
-        color(UnityPal.expColor);
+        color(UnityPal.exp);
         circle(e.x, e.y, e.fin() * 2.5f + 1f);
     }),
 
     expDespawn = new Effect(15f, e -> {
-        color(UnityPal.expColor);
+        color(UnityPal.exp);
         randLenVectors(e.id, 7, 2f + 5 * e.fin(), (x, y) -> Fill.circle(e.x + x, e.y + y, e.fout()));
     }),
 
@@ -619,18 +619,18 @@ public class UnityFx{
     ahhimaLiquidNow = new Effect(45f, e -> {
         color(Color.gray, Color.clear, e.fin());
         randLenVectors(e.id, 3, 2.5f + e.fin() * 6f, (x, y) -> Fill.circle(e.x + x, e.y + y, 0.2f + e.fin() * 3f));
-        color(UnityPal.lavaColor, UnityPal.lavaColor2, e.fout());
+        color(UnityPal.lava, UnityPal.lava2, e.fout());
         randLenVectors(e.id + 1, 4, 1 + e.fin() * 4f, (x, y) -> Fill.circle(e.x + x, e.y + y, 0.2f + e.fout() * 1.3f));
     }),
 
     blinkFx = new Effect(30f, e -> {
-        color(Color.white, UnityPal.diriumColor, e.fin());
+        color(Color.white, UnityPal.dirium, e.fin());
         stroke(3f * e.rotation * e.fout());
         square(e.x, e.y, e.rotation * 4f * e.finpow());
     }),
 
     tpOut = new Effect(30f, e -> {
-        color(UnityPal.diriumColor);
+        color(UnityPal.dirium);
         stroke(3f * e.fout());
         square(e.x, e.y, e.finpow() * e.rotation, 45f);
         stroke(5f * e.fout());
@@ -642,7 +642,7 @@ public class UnityFx{
         if(!(e.data instanceof UnitType type)) return;
         TextureRegion region = type.fullIcon;
         color();
-        mixcol(UnityPal.diriumColor, 1f);
+        mixcol(UnityPal.dirium, 1f);
         rect(region, e.x, e.y, region.width * scl * e.fout(), region.height * scl * e.fout(), e.rotation);
         mixcol();
     }),
@@ -650,7 +650,7 @@ public class UnityFx{
     tpFlash = new Effect(30f, e -> {
         if(!(e.data instanceof Unit unit) || !unit.isValid()) return;
         TextureRegion region = unit.type.fullIcon;
-        mixcol(UnityPal.diriumColor2, 1f);
+        mixcol(UnityPal.diriumLight, 1f);
         alpha(e.fout());
         rect(region, unit.x, unit.y, unit.rotation - 90f);
         mixcol();

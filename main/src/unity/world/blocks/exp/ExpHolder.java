@@ -1,4 +1,4 @@
-package unity.world.blocks.defense.turrets.exp;
+package unity.world.blocks.exp;
 
 public interface ExpHolder {
     int getExp();

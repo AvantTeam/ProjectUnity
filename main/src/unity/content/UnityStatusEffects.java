@@ -84,7 +84,7 @@ public class UnityStatusEffects{
         }};
 
         molten = new StatusEffect("molten"){{
-            color = UnityPal.lavaColor;
+            color = UnityPal.lava;
             speedMultiplier = 0.6f;
             healthMultiplier = 0.5f;
             damage = 1f;
@@ -92,7 +92,7 @@ public class UnityStatusEffects{
         }};
 
         tpCoolDown = new StatusEffect("tpcooldonw"){{
-            color = UnityPal.diriumColor2;
+            color = UnityPal.diriumLight;
             effect = Fx.none;
         }};
 

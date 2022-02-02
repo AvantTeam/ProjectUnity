@@ -1,11 +1,12 @@
-package unity.world.blocks.defense.turrets.exp;
+package unity.world.blocks.exp.turrets;
 
 import arc.struct.*;
 import mindustry.entities.bullet.*;
 import mindustry.logic.*;
 import mindustry.world.meta.*;
+import unity.world.blocks.exp.*;
 
-public class ExpPowerTurret extends ExpTurret{
+public class ExpPowerTurret extends ExpTurret {
     public BulletType shootType;
     public float powerUse = 1f;
 

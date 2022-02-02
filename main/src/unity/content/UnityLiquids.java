@@ -13,18 +13,18 @@ public class UnityLiquids{
     public static Liquid lava;
 
     public static void load(){
-        lava = new Liquid("lava", UnityPal.lavaColor){{
+        lava = new Liquid("lava", UnityPal.lava){{
             heatCapacity = 0f;
             viscosity = 0.7f;
             temperature = 1.5f;
             effect = UnityStatusEffects.molten;
-            lightColor = UnityPal.lavaColor2.cpy().mul(1f, 1f, 1f, 0.55f);
+            lightColor = UnityPal.lava2.cpy().mul(1f, 1f, 1f, 0.55f);
         }};
 
         //endregion
         if(!mindustry.Vars.headless){
             Events.run(Trigger.update, () -> {
-                lava.color = temp.set(UnityPal.lavaColor).lerp(UnityPal.lavaColor2, Mathf.absin(Time.globalTime, 25f, 1f));
+                lava.color = temp.set(UnityPal.lava).lerp(UnityPal.lava2, Mathf.absin(Time.globalTime, 25f, 1f));
                 lava.lightColor = temp2.set(temp).mul(1, 1, 1, 0.55f);
             });
         }

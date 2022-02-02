@@ -62,7 +62,7 @@ public class ExpSensorStatement extends LStatement{
 
     @Override
     public Color color(){
-        return UnityPal.expColor;
+        return UnityPal.exp;
     }
 
     @Override

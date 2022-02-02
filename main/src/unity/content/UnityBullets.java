@@ -8,7 +8,6 @@ import arc.math.geom.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
-import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
@@ -22,10 +21,9 @@ import unity.entities.bullet.energy.*;
 import unity.entities.bullet.exp.*;
 import unity.entities.bullet.kami.*;
 import unity.entities.bullet.laser.*;
-import unity.gen.Expc.*;
 import unity.gen.*;
 import unity.graphics.*;
-import unity.world.blocks.defense.turrets.exp.*;
+import unity.world.blocks.exp.*;
 
 import static mindustry.Vars.*;
 import static unity.content.UnityStatusEffects.*;
@@ -106,6 +104,8 @@ public class UnityBullets{
             status = StatusEffects.shocked;
             statusDuration = 3 * 60f;
             hitUnitExpGain = hitBuildingExpGain = 2;
+            fromColor = Pal.accent;
+            toColor = Pal.lancerLaser;
         }};
 
         shardLaserFrag = new LaserBoltBulletType(2f, 10f){
@@ -138,6 +138,7 @@ public class UnityBullets{
                 statusDuration = 3 * 60f;
                 hitUnitExpGain = hitBuildingExpGain = 2;
                 fragBullet = shardLaserFrag;
+                fromColor = Pal.lancerLaser;
                 toColor = Pal.sapBullet;
             }
 
