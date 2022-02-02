@@ -8,6 +8,8 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
+import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.abilities.*;
@@ -16,6 +18,7 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.world.blocks.defense.turrets.BaseTurret.*;
 import mindustry.world.blocks.environment.*;
 import unity.entities.*;
 import unity.entities.legs.*;
@@ -118,6 +121,9 @@ public class UnityUnitType extends UnitType{
     // Imber units
     public float laserRange = -1f;
     public int maxConnections = -1;
+
+    // World units
+    public int worldWidth, worldHeight;
 
     public UnityUnitType(String name){
         super(name);
@@ -671,6 +677,34 @@ public class UnityUnitType extends UnitType{
                     drawWeapons(wormUnit.segmentUnits[i]);
                 }
             }
+        }
+
+        if(unit instanceof Worldc){
+            var w = (Unit & Worldc)unit;
+            Draw.draw(z + 0.0001f, () -> {
+                Seq<Building> build = w.buildings();
+                World world = w.unitWorld();
+                float cx = world.width() * Vars.tilesize / 2f, cy = world.height() * Vars.tilesize / 2f;
+                float r = w.rotation - 90f;
+                for(int i = 0; i < build.size; i++){
+                    Building b = build.get(i);
+                    BaseTurretBuild bt = b instanceof BaseTurretBuild ? (BaseTurretBuild)b : null;
+                    float lx = b.x;
+                    float ly = b.y;
+                    float lr = 0f;
+                    legOffsetB.set(b.x - cx, b.y - cy).rotate(r).add(w);
+                    b.set(legOffsetB);
+                    if(bt != null){
+                        lr = bt.rotation;
+                        bt.rotation += r;
+                    }
+                    b.draw();
+                    b.set(lx, ly);
+                    if(bt != null){
+                        bt.rotation = lr;
+                    }
+                }
+            });
         }
 
         Draw.z(z);

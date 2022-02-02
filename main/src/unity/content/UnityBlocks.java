@@ -112,6 +112,8 @@ public class UnityBlocks{
     })
     Block lightForge;
 
+    public static @FactionDef("scar") Block terraCore;
+
     //---------- imber faction ----------
     public static @FactionDef("imber") Block
     //environment
@@ -1131,6 +1133,14 @@ public class UnityBlocks{
                         Draw.blend();
                     })
             );
+        }};
+
+        //endregion
+        //region scar
+
+        terraCore = new TerraCore("terra-core"){{
+            requirements(Category.units, with(Items.copper, 1));
+            size = 2;
         }};
 
         //endregion
