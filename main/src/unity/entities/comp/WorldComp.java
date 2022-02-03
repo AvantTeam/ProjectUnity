@@ -175,11 +175,11 @@ abstract class WorldComp implements Unitc{
     }
 
     int conX(int x){
-        return (x - (int)(this.x / Vars.tilesize)) + (unitWorld.width() / 2);
+        return (x - (int)(this.x / Vars.tilesize)) + (unitWorld.width() / 2) - 1;
     }
 
     int conY(int y){
-        return (y - (int)(this.y / Vars.tilesize)) + (unitWorld.height() / 2);
+        return (y - (int)(this.y / Vars.tilesize)) + (unitWorld.height() / 2) - 1;
     }
 
     boolean validPlace(Tile tile){
