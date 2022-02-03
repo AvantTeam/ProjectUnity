@@ -14,6 +14,7 @@ import mindustry.world.blocks.distribution.*;
 import mindustry.world.blocks.distribution.Conveyor.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.blocks.production.Incinerator.*;
+import unity.content.*;
 import unity.gen.*;
 import unity.gen.Expc.*;
 import unity.world.blocks.exp.*;
@@ -65,7 +66,7 @@ public class ExpOrbs{
             lightColor = expColor;
             hitEffect = Fx.none;
             shootEffect = Fx.none;
-            //despawnEffect = expDespawn;
+            despawnEffect = UnityFx.orbDespawn;
         }
 
         private ExpOrb(){}

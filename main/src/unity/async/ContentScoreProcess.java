@@ -127,6 +127,11 @@ public class ContentScoreProcess implements AsyncProcess{
     }
 
     ContentScore get(Content content){
+        if(content.id >= scores[content.getContentType().ordinal()].length){
+            Log.warn("[scarlet]Array out of bounds for "+content.toString()+"![]");
+            Log.warn("[scarlet]Bad mod: " + (content.minfo != null && content.minfo.mod != null ? content.minfo.mod.name : "VANILLA") + "[]");
+            return scores[content.getContentType().ordinal()][0]; //okay this is horrible but this is far better than a crash
+        }
         return scores[content.getContentType().ordinal()][content.id];
     }
 

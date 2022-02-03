@@ -38,7 +38,7 @@ public class ExpTurret extends Turret {
 
     public float orbScale = 0.8f;
     public int expScale = 1;
-    public Effect upgradeEffect = UnityFx.upgradeBlockFx;
+    public Effect upgradeEffect = UnityFx.expPoof, upgradeBlockEffect = UnityFx.expShineRegion;
     public Sound upgradeSound = Sounds.message;
     public Color fromColor = Pal.lancerLaser, toColor = UnityPal.exp;
 
@@ -172,6 +172,7 @@ public class ExpTurret extends Turret {
         @Override
         public int handleExp(int amount){
             int e = Math.min(amount, maxExp - exp);
+            if(e == 0) return 0;
             int before = level();
             exp += e;
             int after = level();
@@ -180,6 +181,13 @@ public class ExpTurret extends Turret {
             if(exp < 0) exp = 0;
 
             if(after > before) levelup();
+            return e;
+        }
+
+        @Override
+        public int unloadExp(int amount){
+            int e = Math.min(amount, exp);
+            exp -= e;
             return e;
         }
 
@@ -218,7 +226,8 @@ public class ExpTurret extends Turret {
 
         public void levelup(){
             upgradeSound.at(this);
-            upgradeEffect.at(this, size);
+            upgradeEffect.at(this);
+            if(upgradeBlockEffect != Fx.none) upgradeBlockEffect.at(x, y, rotation - 90, Color.white, region);
         }
 
         public Color shootColor(Color tmp){

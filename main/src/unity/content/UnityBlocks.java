@@ -24,6 +24,7 @@ import unity.annotations.Annotations.*;
 import unity.content.effects.*;
 import unity.entities.bullet.anticheat.*;
 import unity.entities.bullet.energy.*;
+import unity.entities.bullet.exp.*;
 import unity.entities.bullet.laser.*;
 import unity.gen.*;
 import unity.graphics.*;
@@ -142,10 +143,10 @@ public class UnityBlocks{
     steelConveyor, diriumConveyor, teleporter, teleunit,
 
     //unit
-    bufferPad, omegaPad, cachePad, convertPad;
+    bufferPad, omegaPad, cachePad, convertPad,
 
     //TODO
-    //expOutput, expUnloader, expTank, expChest, expFountain, expVoid;
+    expFountain, expVoid;//expOutput, expUnloader, expTank, expChest;
 
     //turret
     public static @FactionDef("koruh")
@@ -1548,7 +1549,7 @@ public class UnityBlocks{
             maxLevel = 10;
             expFields = new EField[]{
                     new LinearReloadTime(v -> reloadTime = v, 45f, -2f),
-                    new ELinear(v -> range = v, 120f, 2f, Stat.shootRange, v -> Strings.autoFixed(v / tilesize, 1) + " blocks"),
+                    new ELinear(v -> range = v, 120f, 2f, Stat.shootRange, v -> Strings.autoFixed(v / tilesize, 2) + " blocks"),
                     new EBool(v -> targetAir = v, false, 5, Stat.targetsAir)
             };
         }};
@@ -1584,7 +1585,7 @@ public class UnityBlocks{
             maxLevel = 30;
             expFields = new EField[]{
                     new LinearReloadTime(v -> reloadTime = v, 60f, -1f),
-                    new ELinear(v -> range = v, 140f, 0.5f, Stat.shootRange, v -> Strings.autoFixed(v / tilesize, 1) + " blocks")
+                    new ELinear(v -> range = v, 140f, 0.5f, Stat.shootRange, v -> Strings.autoFixed(v / tilesize, 2) + " blocks")
             };
             pregrade = (ExpTurret) laser;
         }};
@@ -1599,6 +1600,7 @@ public class UnityBlocks{
             reloadTime = 80f;
             targetAir = true;
             liquidCapacity = 10f;
+            shootSound = Sounds.laser;
 
             maxLevel = 30;
 
@@ -1643,7 +1645,7 @@ public class UnityBlocks{
             maxLevel = 30;
             expFields = new EField[]{
                     new LinearReloadTime(v -> reloadTime = v, UnityBullets.distField.lifetime / 3f, -2f),
-                    new ELinear(v -> range = v, 140f, 0.25f * tilesize, Stat.shootRange, v -> Strings.autoFixed(v / tilesize, 1) + " blocks")
+                    new ELinear(v -> range = v, 140f, 0.25f * tilesize, Stat.shootRange, v -> Strings.autoFixed(v / tilesize, 2) + " blocks")
             };
             //progression.linear(basicFieldRadius, 0.2f * tilesize, val -> basicFieldRadius = val);
 
@@ -1652,7 +1654,7 @@ public class UnityBlocks{
             pregradeLevel = 15;
         }};
 
-        laserBranch = new ExpPowerTurret("swarm-laser-turret"){{
+        laserBranch = new BurstChargePowerTurret("swarm-laser-turret"){{
             requirements(Category.turret, with(UnityItems.steel, 50, Items.silicon, 90, Items.thorium, 95));
 
             size = 3;
@@ -1671,9 +1673,9 @@ public class UnityBlocks{
 
             cooldown = 0.03f;
             shootShake = 2f;
-            shootEffect = ShootFx.laserChargeShoot;
+            shootEffect = ShootFx.laserChargeShootShort;
             smokeEffect = Fx.none;
-            chargeEffect = UnityFx.laserCharge;
+            chargeEffect = UnityFx.laserChargeShort;
             chargeBeginEffect = UnityFx.laserChargeBegin;
             heatColor = Color.red;
             fromColor = Pal.lancerLaser.cpy().lerp(Pal.sapBullet, 0.5f);
@@ -1682,27 +1684,23 @@ public class UnityBlocks{
 
             shootLength = size * tilesize / 2.7f;
             shots = 4;
-            burstSpacing = 5f;
-            inaccuracy = 10f;
+            burstSpacing = 20f;
+            inaccuracy = 1f;
+            spread = 0f;
             xRand = 6f;
 
             maxLevel = 30;
             expFields = new EField[]{
-                    new LinearReloadTime(v -> reloadTime = v, 90f, -2f),
-                    new ELinear(v -> range = v, 150f, 0.25f * tilesize, Stat.shootRange, v -> Strings.autoFixed(v / tilesize, 1) + " blocks")
+                    new ELinearCap(v -> shots = (int)v, 2, 0.35f, 15, Stat.shots),
+                    new ELinearCap(v -> inaccuracy = v, 1f, 0.25f, 10, Stat.inaccuracy, v -> Strings.autoFixed(v, 1) + " degrees"),
+                    new ELinear(v -> burstSpacing = v, 20f, -0.5f, null),
+                    new ELinear(v -> range = v, 150f, 2f, Stat.shootRange, v -> Strings.autoFixed(v / tilesize, 2) + " blocks")
             };
             pregrade = (ExpTurret) laserCharge;
             pregradeLevel = 15;
         }};
 
-        laserKelvin = new ExpLiquidTurret("kelvin-laser-turret"){{
-            ammo(
-                Liquids.water, UnityBullets.kelvinWaterLaser,
-                Liquids.slag, UnityBullets.kelvinSlagLaser,
-                Liquids.oil, UnityBullets.kelvinOilLaser,
-                Liquids.cryofluid, UnityBullets.kelvinCryofluidLaser
-            );
-
+        laserKelvin = new OmniLiquidTurret("kelvin-laser-turret"){{
             requirements(Category.turret, with(Items.phaseFabric, 50, Items.metaglass, 90, Items.thorium, 95));
             size = 3;
             health = 2100;
@@ -1711,9 +1709,14 @@ public class UnityBlocks{
             reloadTime = 120f;
             targetAir = true;
             liquidCapacity = 15f;
+            shootAmount = 3f;
 
-            //omni = true;//todo omni liquid laser
-            //defaultBullet = UnityBullets.kelvinLiquidLaser;
+            shootType = new GeyserLaserBulletType(185f, 30f){{
+                fragBullets = 1;
+                fragBullet = UnityBullets.laserGeyser;
+                damageInc = 5f;
+                maxRange = 185f;
+            }};
 
             consumes.powerCond(2.5f, TurretBuild::isActive);
 
@@ -1795,6 +1798,14 @@ public class UnityBlocks{
                     new EList<>(v -> shots = v, new Integer[]{1, 1, 2, 2, 2, 3, 3, 4, 4, 5, 5}, Stat.shots),
                     new EList<>(v -> spread = v, new Float[]{0f, 0f, 5f, 10f, 15f, 7f, 14f, 8f, 10f, 6f, 9f}, null)
             };
+        }};
+
+        expFountain = new ExpSource("exp-fountain"){{
+            requirements(Category.distribution, BuildVisibility.sandboxOnly, with());
+        }};
+
+        expVoid = new ExpVoid("exp-void"){{
+            requirements(Category.distribution, BuildVisibility.sandboxOnly, with());
         }};
 
         //endregion

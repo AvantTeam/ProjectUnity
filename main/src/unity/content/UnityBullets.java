@@ -32,7 +32,7 @@ public class UnityBullets{
     public static BulletType
         laser, shardLaserFrag, shardLaser, frostLaser, branchLaserFrag, branchLaser, distField, fractalLaser, kelvinWaterLaser,
         kelvinSlagLaser, kelvinOilLaser, kelvinCryofluidLaser, kelvinLiquidLaser, celsiusSmoke, kelvinSmoke,
-        breakthroughLaser,
+        breakthroughLaser, laserGeyser,
 
         basicMissile, citadelFlame,
 
@@ -103,126 +103,87 @@ public class UnityBullets{
             damageInc = 7f;
             status = StatusEffects.shocked;
             statusDuration = 3 * 60f;
-            hitUnitExpGain = hitBuildingExpGain = 2;
+            expGain = buildingExpGain = 2;
             fromColor = Pal.accent;
             toColor = Pal.lancerLaser;
         }};
 
-        shardLaserFrag = new LaserBoltBulletType(2f, 10f){
+        shardLaserFrag = new ExpBasicBulletType(2f, 10f){
             {
                 lifetime = 20f;
                 pierceCap = 10;
                 pierceBuilding = true;
                 backColor = Color.white.cpy().lerp(Pal.lancerLaser, 0.1f);
                 frontColor = Color.white;
-                hitEffect = Fx.hitLancer;
-                despawnEffect = Fx.hitLancer;
-            }
+                hitEffect = Fx.none;
+                despawnEffect = Fx.none;
+                smokeEffect = Fx.hitLaser;
+                hittable = false;
+                reflectable = false;
+                lightColor = Color.white;
+                lightOpacity = 0.6f;
 
-            @Override
-            public void draw(Bullet b){
-                Draw.color((Color)b.data);
-                Lines.stroke(2f);
-                Lines.lineAngleCenter(b.x, b.y, b.rotation(), 7f);
-                Lines.stroke(1.3f);
-                Draw.color(frontColor);
-                Lines.lineAngleCenter(b.x, b.y, b.rotation(), 4f);
-                Draw.reset();
-            }
-        };
-
-        shardLaser = new ExpLaserBulletType(150f, 30f){
-            {
-                damageInc = 5f;
-                status = StatusEffects.shocked;
-                statusDuration = 3 * 60f;
-                hitUnitExpGain = hitBuildingExpGain = 2;
-                fragBullet = shardLaserFrag;
+                expChance = 0.15f;
                 fromColor = Pal.lancerLaser;
                 toColor = Pal.sapBullet;
             }
 
             @Override
-            public void hit(Bullet b, float x, float y){
-                hitEffect.at(x, y, b.rotation(), hitColor);
-                hitSound.at(x, y, hitSoundPitch, hitSoundVolume);
-
-                Effect.shake(hitShake, hitShake, b);
-
-                for(var i = 0; i < fragBullets; i++){
-                    float len = Mathf.random(1f, 7f);
-                    float a = b.rotation() + Mathf.randomSeed(b.id, 360f) + i * 360f / fragBullets;
-                    Healthc target = Damage.linecast(b, x, y, b.rotation(), length);
-
-                    Color data = getColor(b);
-                    b.data = target;
-
-                    if(target instanceof Hitboxc hit){
-                        fragBullet.create(b.owner, b.team, hit.x() + Angles.trnsx(a, len), hit.y() + Angles.trnsy(a, len), a, -1f, 1f, 1f, data);
-
-                    }else if(target instanceof Building tile){
-                        if(tile.collide(b)){
-                            fragBullet.create(b.owner, b.team, tile.x() + Angles.trnsx(a, len), tile.y() + Angles.trnsy(a, len), a, -1f, 1f, 1f, data);
-                        }
-                    }else{
-                        b.data = new Vec2().trns(b.rotation(), length).add(b.x, b.y);
-                    }
-                }
+            public void draw(Bullet b){
+                Draw.color(getColor(b));
+                Lines.stroke(2f * b.fout(0.7f) + 0.01f);
+                Lines.lineAngleCenter(b.x, b.y, b.rotation(), 8f);
+                Lines.stroke(1.3f * b.fout(0.7f) + 0.01f);
+                Draw.color(frontColor);
+                Lines.lineAngleCenter(b.x, b.y, b.rotation(), 5f);
+                Draw.reset();
             }
         };
 
+        shardLaser = new ExpLaserBulletType(150f, 30f){{
+            status = StatusEffects.shocked;
+            statusDuration = 3 * 60f;
+            fragBullet = shardLaserFrag;
+
+            expGain = buildingExpGain = 2;
+            damageInc = 5f;
+            fromColor = Pal.lancerLaser;
+            toColor = Pal.sapBullet;
+        }};
+
         frostLaser = new ExpLaserBulletType(170f, 130f){
             {
-                damageInc = 2.5f;
                 status = StatusEffects.freezing;
                 statusDuration = 3 * 60f;
-                hitUnitExpGain = 2;
-                hitBuildingExpGain = 3;
                 shootEffect = UnityFx.shootFlake;
+
+                expGain = 2;
+                buildingExpGain = 3;
+                damageInc = 2.5f;
                 fromColor = Liquids.cryofluid.color;
                 toColor = Color.cyan;
+            }
+
+            @Override
+            public void handleExp(Bullet b, float x, float y, int amount){
+                super.handleExp(b, x, y, amount);
+                freezePos(b, x, y);
             }
 
             public void freezePos(Bullet b, float x, float y){
                 int lvl = getLevel(b);
                 float rad = 3.5f;
-                if(!Vars.headless) UnityFx.freezeEffect.at(x, y, lvl / rad + 10f, getColor(b));
-                if(!Vars.headless) UnitySounds.laserFreeze.at(x, y, 1f, 0.6f);
+                UnityFx.freezeEffect.at(x, y, lvl / rad + 10f, getColor(b));
+                UnitySounds.laserFreeze.at(x, y);
 
                 Damage.status(b.team, x, y, 10f + lvl / rad, status, 60f + lvl * 6f, true, true);
                 Damage.status(b.team, x, y, 10f + lvl / rad, UnityStatusEffects.disabled, 2f * lvl, true, true);
             }
-
-            @Override
-            public void init(Bullet b){
-                super.init(b);
-
-                setDamage(b);
-
-                Healthc target = Damage.linecast(b, b.x, b.y, b.rotation(), getLength(b));
-                b.data = target;
-
-                if(target instanceof Hitboxc hit){
-                    hit.collision(b, hit.x(), hit.y());
-                    b.collision(hit, hit.x(), hit.y());
-                    freezePos(b, hit.x(), hit.y());
-                    if(b.owner instanceof ExpTurret.ExpTurretBuild exp) exp.handleExp(hitUnitExpGain);
-                }else if(target instanceof Building tile && tile.collide(b)){
-                    tile.collision(b);
-                    hit(b, tile.x, tile.y);
-                    freezePos(b, tile.x, tile.y);
-                    if(b.owner instanceof ExpTurret.ExpTurretBuild exp) exp.handleExp(hitBuildingExpGain);
-                }else{
-                    b.data = new Vec2().trns(b.rotation(), length).add(b.x, b.y);
-                }
-            }
         };
 
-        branchLaserFrag = new BasicBulletType(3.5f, 15f){
+        branchLaserFrag = new ExpBulletType(3.5f, 15f){
             {
-                trailColor = frontColor = Pal.lancerLaser;
-                backColor = Pal.lancerLaser.cpy().mul(0.7f);
-                trailWidth = width = height = 2f;
+                trailWidth = 2f;
                 weaveScale = 0.6f;
                 weaveMag = 0.5f;
                 homingPower = 0.4f;
@@ -235,18 +196,13 @@ public class UnityBullets{
                 splashDamage = 4f;
                 status = UnityStatusEffects.plasmaed;
                 statusDuration = 180f;
-
                 trailLength = 6;
-            }
+                trailColor = Color.white;
 
-            @Override
-            public void init(Bullet b){
-                b.fdata = (float)b.data;
-                super.init(b);
-            }
-
-            public Color getColor(Bullet b){
-                return Tmp.c1.set(Pal.lancerLaser.cpy().lerp(Pal.sapBullet, 0.5f)).lerp(Pal.sapBullet, b.fdata).cpy();
+                fromColor = Pal.lancerLaser.cpy().lerp(Pal.sapBullet, 0.5f);
+                toColor = Pal.sapBullet;
+                expGain = 1;
+                expOnHit = true;
             }
 
             @Override
@@ -254,47 +210,25 @@ public class UnityBullets{
                 drawTrail(b);
 
                 Draw.color(getColor(b));
-                Fill.square(b.x, b.y, width, b.rotation() + 45);
+                Fill.square(b.x, b.y, trailWidth, b.rotation() + 45);
                 Draw.color();
             }
         };
 
-        branchLaser = new ExpLaserBulletType(140f, 20f){
-            {
-                damageInc = 6f;
-                lengthInc = 2f;
-                status = StatusEffects.shocked;
-                statusDuration = 3 * 60f;
-                hitUnitExpGain = hitBuildingExpGain = 1;
-                fragBullet = shardLaserFrag;
-                fromColor = Pal.lancerLaser.cpy().lerp(Pal.sapBullet, 0.5f);
-                toColor = Pal.sapBullet;
-                fragBullets = 3;
-                fragBullet = branchLaserFrag;
-                maxRange = 150f + 2f * 30f; //Account for range increase
-            }
+        branchLaser = new ExpLaserBulletType(140f, 20f){{
+            status = StatusEffects.shocked;
+            statusDuration = 3 * 60f;
+            fragBullets = 3;
+            fragBullet = branchLaserFrag;
+            maxRange = 150f + 2f * 30f; //Account for range increase
 
-            public void makeFrag(Bullet b, float x, float y, Object color){
-                for(int i = 0; i < fragBullets; i++){
-                    fragBullet.create(b.owner, b.team, x, y, b.rotation() + Mathf.randomSeed(b.id, 360f) + i * 360f/fragBullets, -1f, 1f, 1f, color);
-                }
-            }
-
-            @Override
-            public void init(Bullet b){
-                super.init(b);
-
-                if(b.data instanceof Position point) makeFrag(b, point.getX(), point.getY(), getLevelf(b));
-            }
-
-            @Override
-            public void hit(Bullet b, float x, float y){
-                hitEffect.at(x, y, b.rotation(), hitColor);
-                hitSound.at(b);
-
-                Effect.shake(hitShake, hitShake, b);
-            }
-        };
+            expGain = buildingExpGain = 1;
+            damageInc = 6f;
+            lengthInc = 2f;
+            fromColor = Pal.lancerLaser.cpy().lerp(Pal.sapBullet, 0.5f);
+            toColor = Pal.sapBullet;
+            hitMissed = true;
+        }};
 
         distField = new DistFieldBulletType(0, -1){{
             centerColor = Pal.lancerLaser.cpy().a(0);
@@ -311,7 +245,7 @@ public class UnityBullets{
             keepVelocity = false;
 
             bulletSlowMultiplier = 0.94f; //nerfed
-            expGain = 0.01f; // 0.6 exp per sec for unit. 0.05 exp per sec for one bullet
+            expGain = 1; // 0.6 exp per sec for unit. 0.05 exp per sec for one bullet
             damageLimit = 200f; //too strong damage cannot be slow
             distDamage = 0.1f; //6 damage per sec
         }};
@@ -319,7 +253,7 @@ public class UnityBullets{
         fractalLaser = new ExpLaserFieldBulletType(170f, 130f){{
             damageInc = 6f;
             lengthInc = 2f;
-            hitUnitExpGain = hitBuildingExpGain = 1;
+            expGain = buildingExpGain = 1;
             fromColor = Pal.lancerLaser.cpy().lerp(Pal.place, 0.5f);
             toColor = Pal.place;
             maxRange = 150f + 2f * 30f; //Account for range increase
@@ -328,13 +262,17 @@ public class UnityBullets{
             basicFieldRadius = 85;
         }};
 
+        laserGeyser = new GeyserBulletType(){{
+            damageInc = 2f;
+        }};
+
         kelvinWaterLaser = new ExpLaserBulletType(170f, 130f){{
             damageInc = 7f;
             status = StatusEffects.wet;
             statusDuration = 3 * 60f;
             knockback = 10f;
-            hitUnitExpGain = 2;
-            hitBuildingExpGain = 3;
+            expGain = 2;
+            buildingExpGain = 3;
             fromColor = Liquids.water.color;
             toColor = Color.sky;
         }};
@@ -344,8 +282,8 @@ public class UnityBullets{
                 damageInc = 7f;
                 status = StatusEffects.burning;
                 statusDuration = 3 * 60f;
-                hitUnitExpGain = 2;
-                hitBuildingExpGain = 3;
+                expGain = 2;
+                buildingExpGain = 3;
                 puddles = 10;
                 puddleRange = 4f;
                 puddleAmount = 15f;
@@ -375,8 +313,8 @@ public class UnityBullets{
                 damageInc = 7f;
                 status = StatusEffects.burning;
                 statusDuration = 3 * 60f;
-                hitUnitExpGain = 2;
-                hitBuildingExpGain = 3;
+                expGain = 2;
+                buildingExpGain = 3;
                 puddles = 10;
                 puddleRange = 4f;
                 puddleAmount = 15f;
@@ -405,8 +343,8 @@ public class UnityBullets{
                 damageInc = 3f;
                 status = StatusEffects.freezing;
                 statusDuration = 3 * 60f;
-                hitUnitExpGain = 2;
-                hitBuildingExpGain = 3;
+                expGain = 2;
+                buildingExpGain = 3;
                 shootEffect = UnityFx.shootFlake;
                 fromColor = Liquids.cryofluid.color;
                 toColor = Color.cyan;
@@ -435,12 +373,12 @@ public class UnityBullets{
                     hit.collision(b, hit.x(), hit.y());
                     b.collision(hit, hit.x(), hit.y());
                     freezePos(b, hit.x(), hit.y());
-                    if(b.owner instanceof ExpTurret.ExpTurretBuild exp) exp.handleExp(hitUnitExpGain);
+                    if(b.owner instanceof ExpTurret.ExpTurretBuild exp) exp.handleExp(expGain);
                 }else if(target instanceof Building tile && tile.collide(b)){
                     tile.collision(b);
                     hit(b, tile.x, tile.y);
                     freezePos(b, tile.x, tile.y);
-                    if(b.owner instanceof ExpTurret.ExpTurretBuild exp) exp.handleExp(hitBuildingExpGain);
+                    if(b.owner instanceof ExpTurret.ExpTurretBuild exp) exp.handleExp(buildingExpGain);
                 }else{
                     b.data = new Vec2().trns(b.rotation(), length).add(b.x, b.y);
                 }
@@ -455,8 +393,8 @@ public class UnityBullets{
             {
                 status = StatusEffects.freezing;
                 statusDuration = 3 * 60f;
-                hitUnitExpGain = 2;
-                hitBuildingExpGain = 3;
+                expGain = 2;
+                buildingExpGain = 3;
                 shootEffect = UnityFx.shootFlake;
                 fromColor = Liquids.cryofluid.color;
                 toColor = Color.cyan;
@@ -493,12 +431,12 @@ public class UnityBullets{
                     hit.collision(b, hit.x(), hit.y());
                     b.collision(hit, hit.x(), hit.y());
                     freezePos(b, hit.x(), hit.y());
-                    if(b.owner instanceof ExpTurret.ExpTurretBuild exp) exp.handleExp(hitUnitExpGain);
+                    if(b.owner instanceof ExpTurret.ExpTurretBuild exp) exp.handleExp(expGain);
                 }else if(target instanceof Building tile && tile.collide(b)){
                     tile.collision(b);
                     hit(b, tile.x, tile.y);
                     freezePos(b, tile.x, tile.y);
-                    if(b.owner instanceof ExpTurret.ExpTurretBuild exp) exp.handleExp(hitBuildingExpGain);
+                    if(b.owner instanceof ExpTurret.ExpTurretBuild exp) exp.handleExp(buildingExpGain);
                 }else{
                     b.data = new Vec2().trns(b.rotation(), length).add(b.x, b.y);
                 }
@@ -514,8 +452,8 @@ public class UnityBullets{
             lifetime = 65f;
             lightningSpacingInc = -5f;
             lightningDamageInc = 30f;
-            hitUnitExpGain = 0.005f;
-            hitBuildingExpGain = 0.008f;
+            hitUnitExpGain = 1;
+            hitBuildingExpGain = 1;
             sideLength = 0f;
             sideWidth = 0f;
         }};
@@ -532,7 +470,9 @@ public class UnityBullets{
             status = StatusEffects.burning;
             keepVelocity = true;
             hittable = false;
-            expGain = 0.5f;
+
+            expOnHit = true;
+            expChance = 0.5f;
         }};
 
         pyraBlaze = new ExpBulletType(3.35f, 46f){{
@@ -547,7 +487,9 @@ public class UnityBullets{
             status = StatusEffects.burning;
             keepVelocity = false;
             hittable = false;
-            expGain = 0.6f;
+
+            expOnHit = true;
+            expChance = 0.6f;
         }};
 
         basicMissile = new MissileBulletType(4.2f, 15){{
