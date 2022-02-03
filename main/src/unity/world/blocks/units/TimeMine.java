@@ -1,6 +1,8 @@
 package unity.world.blocks.units;
 
+import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
+import arc.graphics.g2d.Fill;
 import mindustry.entities.Effect;
 import mindustry.entities.Units;
 import mindustry.gen.Building;
@@ -41,14 +43,14 @@ public class TimeMine extends Block {
 
         @Override
         public void updateTile(){
-            pulling = nearCount() > 0 && !dead;
+            pulling = Units.count(x, y, 24f, u -> !u.dead() && u.team != team && u.dst(this) <= range) > 0 && !dead;
 
             if (pulling){
                 Units.nearbyEnemies(team, x, y, range, u -> {
                     u.vel.trns(u.angleTo(this), u.dst(this));
                     u.vel.limit(0.2f);
                 });
-                Effect.shake(shake, shake, this);
+                Effect.shake(shake * 2, shake, this);
             }else{
                 timer.reset(0,0);
             }
@@ -56,8 +58,14 @@ public class TimeMine extends Block {
             if (timer(0, pullTime)) kill();
         }
 
-        public int nearCount(){
-            return Units.count(x, y, 24f, u -> !u.dead() && u.team != team);
+        @Override
+        public void draw(){
+            super.draw();
+
+            if (pulling){
+                Draw.color(Color.black, Pal.darkerMetal, 0.2f);
+                Fill.circle(x, y, timer.getTime(0)/25);
+            }
         }
     }
 }

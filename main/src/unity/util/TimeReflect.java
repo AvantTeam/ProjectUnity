@@ -61,7 +61,7 @@ public class TimeReflect{
                 delay.setFloat(run, time);
             }
         }catch(Exception e){
-            Unity.print(e);
+            Log.err(e);
         }
     }
 }
