@@ -54,6 +54,12 @@ public class UnityPal{
     deepRed = Color.valueOf("f25555"),
     deepBlue = Color.valueOf("554deb"),
 
+    lancerSap1 = Pal.lancerLaser.cpy().lerp(Pal.sapBullet, 0.167f),
+    lancerSap2 = Pal.lancerLaser.cpy().lerp(Pal.sapBullet, 0.333f),
+    lancerSap3 = Pal.lancerLaser.cpy().lerp(Pal.sapBullet, 0.5f),
+    lancerSap4 = Pal.lancerLaser.cpy().lerp(Pal.sapBullet, 0.667f),
+    lancerSap5 = Pal.lancerLaser.cpy().lerp(Pal.sapBullet, 0.833f),
+
     youngchaGray = valueOf("555555"),
 
     blueprintCol = valueOf("354654"),

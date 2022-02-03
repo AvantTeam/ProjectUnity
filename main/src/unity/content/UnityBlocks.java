@@ -146,7 +146,7 @@ public class UnityBlocks{
     bufferPad, omegaPad, cachePad, convertPad,
 
     //TODO
-    expFountain, expVoid;//expOutput, expUnloader, expTank, expChest;
+    expFountain, expVoid, expTank, expChest;//expOutput, expUnloader;
 
     //turret
     public static @FactionDef("koruh")
@@ -1588,6 +1588,7 @@ public class UnityBlocks{
                     new ELinear(v -> range = v, 140f, 0.5f, Stat.shootRange, v -> Strings.autoFixed(v / tilesize, 2) + " blocks")
             };
             pregrade = (ExpTurret) laser;
+            effectColors = new Color[]{Pal.lancerLaser, UnityPal.lancerSap1, UnityPal.lancerSap2, UnityPal.lancerSap3, UnityPal.lancerSap4, UnityPal.lancerSap5, Pal.sapBullet};
         }};
 
         laserFrost = new ExpLiquidTurret("frost-laser-turret"){{
@@ -1601,6 +1602,7 @@ public class UnityBlocks{
             targetAir = true;
             liquidCapacity = 10f;
             shootSound = Sounds.laser;
+            extinguish = false;
 
             maxLevel = 30;
 
@@ -1634,7 +1636,7 @@ public class UnityBlocks{
             heatColor = Color.red;
             shootSound = Sounds.laser;
 
-            fromColor = Pal.lancerLaser.cpy().lerp(Pal.sapBullet, 0.5f);
+            fromColor = UnityPal.lancerSap3;
             toColor = Pal.place;
 
             shootType = UnityBullets.fractalLaser;
@@ -1652,6 +1654,7 @@ public class UnityBlocks{
             //bulletCons((ExpLaserFieldBulletType type, Bullet b) -> type.basicFieldRadius = basicFieldRadius);
             pregrade = (ExpTurret) laserCharge;
             pregradeLevel = 15;
+            effectColors = new Color[]{fromColor, Pal.lancerLaser.cpy().lerp(Pal.sapBullet, 0.75f), Pal.sapBullet};
         }};
 
         laserBranch = new BurstChargePowerTurret("swarm-laser-turret"){{
@@ -1678,8 +1681,8 @@ public class UnityBlocks{
             chargeEffect = UnityFx.laserChargeShort;
             chargeBeginEffect = UnityFx.laserChargeBegin;
             heatColor = Color.red;
-            fromColor = Pal.lancerLaser.cpy().lerp(Pal.sapBullet, 0.5f);
-            shootSound = Sounds.laser;
+            fromColor = UnityPal.lancerSap3;
+            shootSound = Sounds.plasmaboom;
             shootType = UnityBullets.branchLaser;
 
             shootLength = size * tilesize / 2.7f;
@@ -1698,6 +1701,7 @@ public class UnityBlocks{
             };
             pregrade = (ExpTurret) laserCharge;
             pregradeLevel = 15;
+            effectColors = new Color[]{UnityPal.lancerSap3, UnityPal.lancerSap4, UnityPal.lancerSap5, Pal.sapBullet};
         }};
 
         laserKelvin = new OmniLiquidTurret("kelvin-laser-turret"){{
@@ -1710,10 +1714,10 @@ public class UnityBlocks{
             targetAir = true;
             liquidCapacity = 15f;
             shootAmount = 3f;
+            shootSound = Sounds.laser;
 
             shootType = new GeyserLaserBulletType(185f, 30f){{
-                fragBullets = 1;
-                fragBullet = UnityBullets.laserGeyser;
+                geyser = UnityBullets.laserGeyser;
                 damageInc = 5f;
                 maxRange = 185f;
             }};
@@ -1756,9 +1760,13 @@ public class UnityBlocks{
             shootType = UnityBullets.breakthroughLaser;
 
             maxLevel = 1;
-            expScale = 20;
+            expScale = 30;
             pregrade = (ExpTurret) laserCharge;
             pregradeLevel = 30;
+            expFields = new EField[]{
+                    new EList<>(v -> chargeBeginEffect = v, new Effect[]{UnityFx.laserBreakthroughChargeBegin, UnityFx.laserBreakthroughChargeBegin2}, null)
+            };
+            effectColors = new Color[]{Pal.lancerLaser, UnityPal.exp};
 
             drawer = b -> {
                 if(b instanceof ExpPowerTurretBuild tile){
@@ -1800,12 +1808,26 @@ public class UnityBlocks{
             };
         }};
 
+        expTank = new ExpTank("exp-tank"){{
+            requirements(Category.effect, with(Items.copper, 100, UnityItems.denseAlloy, 100, Items.graphite, 30));
+            expCapacity = 600;
+            health = 300;
+            size = 2;
+        }};
+
+        expChest = new ExpTank("exp-chest"){{
+            requirements(Category.effect, with(Items.copper, 400, UnityItems.steel, 250, Items.phaseFabric, 120));
+            expCapacity = 3200;
+            health = 1200;
+            size = 4;
+        }};
+
         expFountain = new ExpSource("exp-fountain"){{
-            requirements(Category.distribution, BuildVisibility.sandboxOnly, with());
+            requirements(Category.effect, BuildVisibility.sandboxOnly, with());
         }};
 
         expVoid = new ExpVoid("exp-void"){{
-            requirements(Category.distribution, BuildVisibility.sandboxOnly, with());
+            requirements(Category.effect, BuildVisibility.sandboxOnly, with());
         }};
 
         //endregion

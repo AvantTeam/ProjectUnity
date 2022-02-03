@@ -112,7 +112,7 @@ public class UnityFx{
     laserChargeShort = new Effect(18f, e -> {
         color(e.color);
         randLenVectors(e.id, 1, 1f + 20f * e.fout(), e.rotation, 120f, (x, y) ->
-            Fill.square(e.x + x, e.y + y, e.fslope() * 3f + 0.1f, 45f)
+            Fill.square(e.x + x, e.y + y, e.fslope() * 1.5f + 0.1f, 45f)
         );
     }),
 
@@ -151,22 +151,22 @@ public class UnityFx{
         });
     }),
 
-    hotSteam = new Effect(120f, e -> {
-        color(e.color, e.fout() * 0.3f);
+    hotSteam = new Effect(150f, e -> {
+        color(e.color, e.fout() * 0.9f);
         integer = 0;
-        randLenVectors(e.id, 2, 7f + 20f * e.fin(), (x, y) -> {
+        randLenVectors(e.id, 2, 10f + 20f * e.fin(), (x, y) -> {
             integer++;
             Fill.circle(e.x + x, e.y + y, e.fin() * Mathf.randomSeed(e.id + integer, 15f, 19f) + 0.1f);
         });
-    }),
+    }).layer(Layer.flyingUnit + 1f),
 
-    iceSheet = new Effect(140f, e -> {
+    iceSheet = new Effect(540f, e -> {
         color(Color.white, e.color, 0.3f);
         integer = 0;
-        float fin2 = Mathf.clamp(e.fin() * 3f);
-        randLenVectors(e.id, 3, 15f + 6f * fin2, (x, y) -> {
+        float fin2 = Mathf.clamp(e.fin() * 5f);
+        randLenVectors(e.id, 1, 15f + 6f * fin2, (x, y) -> {
             integer++;
-            Fill.poly(e.x + x, e.y + y, 6, fin2 * Mathf.randomSeed(e.id + integer, 15f, 19f) * e.fout(0.7f) + 0.1f);
+            Fill.poly(e.x + x, e.y + y, 6, fin2 * Mathf.randomSeed(e.id + integer, 15f, 19f) * Mathf.clamp(9f * e.fout()) + 0.1f);
         });
     }).layer(Layer.debris - 1.1f),
 
@@ -185,7 +185,7 @@ public class UnityFx{
     }),
 
     laserBreakthroughChargeBegin = new Effect(100f, 100f, e -> {
-        color(e.color);
+        color(Pal.lancerLaser);
         stroke(e.fin() * 3f);
 
         Lines.circle(e.x, e.y, 4f + e.fout() * 120f);
@@ -193,6 +193,21 @@ public class UnityFx{
 
         randLenVectors(e.id, 20, 50f * e.fout(), (x, y) ->
             Fill.circle(e.x + x, e.y + y, e.fin() * 6f)
+        );
+
+        color();
+        Fill.circle(e.x, e.y, e.fin() * 13);
+    }),
+
+    laserBreakthroughChargeBegin2 = new Effect(100f, 100f, e -> {
+        color(UnityPal.exp);
+        stroke(e.fin() * 3f);
+
+        Lines.circle(e.x, e.y, 4f + e.fout() * 120f);
+        Fill.circle(e.x, e.y, e.fin() * 23.5f);
+
+        randLenVectors(e.id, 20, 50f * e.fout(), (x, y) ->
+                Fill.circle(e.x + x, e.y + y, e.fin() * 6f)
         );
 
         color();

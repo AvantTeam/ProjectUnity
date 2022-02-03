@@ -26,6 +26,7 @@ import static mindustry.Vars.*;
  * @apiNote This block serves as the direct parent of a purposed block class (i.e. the original block class should extend off of Block); for blocks that have {@link Block} as its grandparent or more, create a new class like {@link ExpTurret}!
  * @author sunny
  */
+//todo make the methods static to make it add-on-able to extended classes (so ExpOverdriveProjector is an instanceof OverdriveProjector)
 public class ExpBase extends Block {
     public int maxLevel = 10; //must be below 200
     public int maxExp;

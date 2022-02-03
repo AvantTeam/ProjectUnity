@@ -24,6 +24,7 @@ public class ExpLaserBulletType extends ExpBulletType {
     /** Exp gained on hit */
     public int buildingExpGain;
     public boolean hitMissed = false;
+    public boolean blip = false;
 
     public ExpLaserBulletType(float length, float damage){
         super(0.01f, damage);
@@ -99,6 +100,11 @@ public class ExpLaserBulletType extends ExpBulletType {
             Draw.color(Color.white);
             Lines.stroke(b.fout() * width * strokes[2]);
             Lines.line(b.x, b.y, Tmp.v1.x, Tmp.v1.y);
+
+            if(blip){
+                Draw.color(Color.white, Tmp.c2, b.fin());
+                Lines.circle(Tmp.v1.x, Tmp.v1.y, b.finpow() * width * 5f);
+            }
             Draw.reset();
 
             Drawf.light(b.team, b.x, b.y, Tmp.v1.x, Tmp.v1.y, width * 10 * b.fout(), Color.white, 0.6f);

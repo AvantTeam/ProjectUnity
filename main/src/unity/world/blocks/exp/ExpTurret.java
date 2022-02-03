@@ -13,6 +13,7 @@ import mindustry.entities.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.defense.turrets.*;
@@ -41,6 +42,7 @@ public class ExpTurret extends Turret {
     public Effect upgradeEffect = UnityFx.expPoof, upgradeBlockEffect = UnityFx.expShineRegion;
     public Sound upgradeSound = Sounds.message;
     public Color fromColor = Pal.lancerLaser, toColor = UnityPal.exp;
+    public Color[] effectColors;
 
     protected @Nullable EField<Float> rangeField = null;//special field, it is special because it's the only one used for drawing stuff
     protected float rangeStart, rangeEnd;
@@ -116,7 +118,7 @@ public class ExpTurret extends Turret {
 
     @Override
     public boolean canReplace(Block other){
-        return super.canReplace(other) || (pregrade != null && other == pregrade);
+        return super.canReplace(other) || (pregrade != null && other == pregrade); //todo fix 2x2->4x4 placement
     }
 
     @Override
@@ -142,7 +144,7 @@ public class ExpTurret extends Turret {
     }
 
     public int expLevel(int e){
-        return Math.min(maxLevel, (int)(Mathf.sqrt(e / (25f * expScale))));
+        return Math.min(maxLevel, (int)(Mathf.sqrt(e / (5f * expScale))));
     }
 
     public float expCap(int l){
@@ -152,7 +154,7 @@ public class ExpTurret extends Turret {
     }
 
     public int requiredExp(int l){
-        return l * l * 25 * expScale;
+        return l * l * 5 * expScale;
     }
 
     public void setEFields(int l){
@@ -234,11 +236,36 @@ public class ExpTurret extends Turret {
             return tmp.set(fromColor).lerp(toColor, exp / (float)maxExp);
         }
 
+        /**
+         * @return a color picked from effectColors[]. Cannot be modified.
+         */
+        public Color effectColor(){
+            if(effectColors == null) return Color.white;
+            return effectColors[Math.min((int)(levelf() * effectColors.length), effectColors.length - 1)];
+        }
+
         //updateTile is untouched
         @Override
         public void update(){
             setEFields(level());
             super.update();
+        }
+
+        @Override
+        protected void effects(){
+            Effect fshootEffect = shootEffect == Fx.none ? peekAmmo().shootEffect : shootEffect;
+            Effect fsmokeEffect = smokeEffect == Fx.none ? peekAmmo().smokeEffect : smokeEffect;
+            Color effectc = effectColor();
+
+            fshootEffect.at(x + tr.x, y + tr.y, rotation, effectc);
+            fsmokeEffect.at(x + tr.x, y + tr.y, rotation, effectc);
+            shootSound.at(x + tr.x, y + tr.y, Mathf.random(0.9f, 1.1f));
+
+            if(shootShake > 0){
+                Effect.shake(shootShake, shootShake, this);
+            }
+
+            recoil = recoilAmount;
         }
 
         @Override

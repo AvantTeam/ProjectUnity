@@ -1,11 +1,14 @@
 package unity.world.blocks.exp.turrets;
 
+import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.core.*;
+import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
@@ -14,6 +17,7 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
+import unity.entities.bullet.exp.*;
 import unity.world.blocks.exp.*;
 
 import static arc.Core.atlas;
@@ -40,7 +44,7 @@ public class OmniLiquidTurret extends ExpTurret {
     @Override
     public void setStats(){
         super.setStats();
-        stats.add(Stat.ammo, StatValues.ammo(ObjectMap.of(this, shootType)));
+        stats.add(Stat.ammo, ammo(0));
     }
 
     @Override
@@ -54,6 +58,59 @@ public class OmniLiquidTurret extends ExpTurret {
     public TextureRegion[] icons(){
         if(topRegion.found()) return new TextureRegion[]{baseRegion, region, topRegion};
         return super.icons();
+    }
+
+    public static boolean friendly(Liquid l){
+        return l.effect != StatusEffects.none && l.effect.damage <= 0.1f && (l.effect.damage < -0.01f || l.effect.healthMultiplier > 1.01f || l.effect.damageMultiplier > 1.01f);
+    }
+
+    public StatValue ammo(int indent){
+        if(!(shootType instanceof GeyserLaserBulletType g)) return table -> {};
+        GeyserBulletType type = (GeyserBulletType) g.geyser;
+        return table -> {
+            table.row();
+
+            for(Liquid t : content.liquids()){
+                boolean compact = indent > 0;
+
+                table.image(t.uiIcon).size(3 * 8).padRight(4).right().top();
+                table.add(t.localizedName).padRight(10).left().top();
+
+                table.table(bt -> {
+                    bt.left().defaults().padRight(3).left();
+
+                    //damage of geyser
+                    float damage = type.damage * GeyserBulletType.damageScale(t);
+                    if(damage > 0f) sep(bt, Core.bundle.format("bullet.splashdamage", Strings.autoFixed(damage, 1), Strings.fixed(type.radius / tilesize, 1)));
+                    else sep(bt, Core.bundle.format("bullet.splashheal", Strings.autoFixed(-damage, 1), Strings.fixed(type.radius / tilesize, 1)));
+
+                    float kn = GeyserBulletType.knockbackScale(t) * type.knockback;
+                    if(kn > 0){
+                        sep(bt, Core.bundle.format("bullet.knockback", Strings.autoFixed(kn, 2)));
+                    }
+
+                    if(t.temperature > 0.8f){
+                        sep(bt, "@bullet.incendiary");
+                    }
+
+                    if(GeyserBulletType.hasLightning(t)){
+                        sep(bt, Core.bundle.format("bullet.lightning", (int)(1 + t.heatCapacity * 5), damage * 0.5f));
+                    }
+
+                    if(t.effect != StatusEffects.none){
+                        sep(bt, (t.effect.minfo.mod == null ? t.effect.emoji() : "") + "[stat]" + t.effect.localizedName);
+                    }
+                }).padTop(compact ? 0 : -9).padLeft(indent * 8).left().get().background(compact ? null : Tex.underline);
+
+                table.row();
+            }
+        };
+    }
+
+    //for AmmoListValue
+    private static void sep(Table table, String text){
+        table.row();
+        table.add(text);
     }
 
     public class OmniLiquidTurretBuild extends ExpTurretBuild{
@@ -107,6 +164,11 @@ public class OmniLiquidTurret extends ExpTurret {
             }
 
             super.findTarget();
+        }
+
+        @Override
+        protected boolean canHeal(){
+            return liquids.current() != null && friendly(liquids.current());
         }
 
         @Override

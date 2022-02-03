@@ -92,6 +92,8 @@ public class ExpBulletType extends BulletType{
         b.damage += damageInc * getLevel(b) * b.damageMultiplier();
     }
 
+    /** @return Tmp.c2 set to the color of the bullet
+     */
     public Color getColor(Bullet b){
         return Tmp.c2.set(fromColor).lerp(toColor, getLevelf(b));
     }

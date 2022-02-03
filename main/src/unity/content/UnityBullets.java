@@ -162,6 +162,7 @@ public class UnityBullets{
                 damageInc = 2.5f;
                 fromColor = Liquids.cryofluid.color;
                 toColor = Color.cyan;
+                blip = true;
             }
 
             @Override
@@ -385,7 +386,6 @@ public class UnityBullets{
             }
         };
 
-        //TODO Implement SK's any liquid idea.
         kelvinLiquidLaser = new ExpLaserBulletType(170f, 130f){
             final float damageMultiplier = 150f; //Multiply the liquid's heat capacity
             final float damageMultiplierInc = 10f;
