@@ -713,6 +713,11 @@ public class UnityUnitType extends UnitType{
                     b.draw();
                 }
 
+                //Should fix the blending bug.
+                Draw.z(9999f);
+                Draw.color(Color.clear);
+                Fill.rect(0, 0, 0, 0);
+
                 Draw.reset();
                 Draw.flush();
                 Draw.sort(false);
