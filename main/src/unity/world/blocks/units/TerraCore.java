@@ -21,6 +21,8 @@ public class TerraCore extends Block{
         configurable = true;
         hasItems = true;
         itemCapacity = 150;
+        separateItemCapacity = true;
+        highUnloadPriority = true;
     }
 
     public class TerraCoreBuild extends Building{
@@ -29,7 +31,6 @@ public class TerraCore extends Block{
         @Override
         public void buildConfiguration(Table table){
             table.button(Icon.units, Styles.clearTransi, () -> {
-                //UnitTypes.dagger.spawn(team, x, y);
                 Unit u = type.create(team);
                 if(u instanceof Worldc){
                     u.x = x;

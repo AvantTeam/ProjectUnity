@@ -25,6 +25,7 @@ import unity.entities.legs.*;
 import unity.entities.legs.CLegType.*;
 import unity.entities.units.*;
 import unity.gen.*;
+import unity.graphics.*;
 import unity.type.decal.*;
 import unity.type.decal.UnitDecorationType.*;
 import unity.util.*;
@@ -690,76 +691,35 @@ public class UnityUnitType extends UnitType{
                 Mat proj = Tmp.m1.set(Draw.proj());
                 Vec2 cam = camera.position;
                 float camX = cam.x, camY = cam.y;
-                //float camX = camera.position.x, camY = camera.position.y;
-                //camera.position.set(cx, cy);
-                //camera.update();
-                //Draw.trans(Tmp.m2.set(trns).rotate(r));
                 float cw = camera.width / 2f, ch = camera.height / 2f;
-                //float wscl = camera.width / graphics.getWidth(), hscl = camera.height / graphics.getHeight();
-                
-                //Tmp.v1.set(-cx * wscl, -cy * hscl).rotate(r).add(unit).sub(camX - cw, camY - ch).rotate(-r);
-                //camera.project(Tmp.v1).add(cw, ch);
-
-                //Tmp.v2.set(Tmp.v1).sub(camX, camY);
-                
-                //Tmp.v1.set(unit.x - cx, unit.y - cy);
-                //camera.project(Tmp.v1);
                 Tmp.v2.set(-cx, -cy).rotate(r);
-                
+
                 Tmp.v1.set(unit).sub(camX, camY).add(cw, ch).add(Tmp.v2);
-                
-                //Tmp.v1.set(unit.x - cx, unit.y - cy);
-                //camera.unproject(Tmp.v1);
-                
-                //cam.set(cw, ch);
+
                 cam.set(cw - Tmp.v1.x, ch - Tmp.v1.y);
                 camera.update();
+                //Draw.flush();
+                Batch old = batch;
+                batch = UnityDrawf.altBatch;
+
                 Draw.proj(camera);
-                
+
                 Draw.proj().rotate(r);
+                Draw.sort(true);
 
                 for(int i = 0; i < build.size; i++){
                     Building b = build.get(i);
-                    float lx = b.x;
-                    float ly = b.y;
-                    //b.x += cam.x - (camera.width / 2f);
-                    //b.y += cam.y - (camera.height / 2f);
                     b.draw();
-                    //b.x = lx;
-                    //b.y = ly;
                 }
+
+                Draw.reset();
+                Draw.flush();
+                Draw.sort(false);
 
                 cam.set(camX, camY);
                 camera.update();
                 Draw.proj(proj);
-                //camera.position.set(camX, camY);
-                //camera.update();
-
-                /*
-                for(int i = 0; i < build.size; i++){
-                    Building b = build.get(i);
-                    b.draw();
-                }
-
-                for(int i = 0; i < build.size; i++){
-                    Building b = build.get(i);
-                    BaseTurretBuild bt = b instanceof BaseTurretBuild ? (BaseTurretBuild)b : null;
-                    float lx = b.x;
-                    float ly = b.y;
-                    float lr = 0f;
-                    legOffsetB.set(b.x - cx, b.y - cy).rotate(r).add(w);
-                    b.set(legOffsetB);
-                    if(bt != null){
-                        lr = bt.rotation;
-                        bt.rotation += r;
-                    }
-                    b.draw();
-                    b.set(lx, ly);
-                    if(bt != null){
-                        bt.rotation = lr;
-                    }
-                }
-                 */
+                batch = old;
             });
         }
 

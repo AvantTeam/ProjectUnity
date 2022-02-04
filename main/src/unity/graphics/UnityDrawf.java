@@ -32,6 +32,8 @@ public class UnityDrawf{
     };
     private final static float[] v = new float[6];
 
+    public final static Batch altBatch = new SortedSpriteBatch();
+
     public static void dashCircleAngle(float x, float y, float radius, float rotation){
         float scaleFactor = 0.6f;
         int sides = 10 + (int)(radius * scaleFactor);
