@@ -25,6 +25,7 @@ abstract class WorldComp implements Unitc{
     final static Seq<Building> tmp = new Seq<>();
     final static Seq<Runnable> tmpr = new Seq<>();
     final static IntMap<IntSeq> tmpLinks = new IntMap<>(102);
+    final static IntSet tmpAdded = new IntSet(102);
 
     @Import float rotation, x, y;
     @Import UnitType type;
@@ -106,8 +107,9 @@ abstract class WorldComp implements Unitc{
         }
 
         tmpLinks.clear();
+        tmpAdded.clear();
         for(Building building : tmp){
-            if(validPlace(building.tile)){
+            if(validPlace(building.tile) && tmpAdded.add(building.id)){
                 int tx = conX(building.tile.x);
                 int ty = conY(building.tile.y);
 
