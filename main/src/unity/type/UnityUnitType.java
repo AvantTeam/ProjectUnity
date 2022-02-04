@@ -698,7 +698,7 @@ public class UnityUnitType extends UnitType{
 
                 cam.set(cw - Tmp.v1.x, ch - Tmp.v1.y);
                 camera.update();
-                //Draw.flush();
+                Draw.flush();
                 Batch old = batch;
                 batch = UnityDrawf.altBatch;
 
@@ -709,6 +709,7 @@ public class UnityUnitType extends UnitType{
 
                 for(int i = 0; i < build.size; i++){
                     Building b = build.get(i);
+                    Draw.z(Layer.block);
                     b.draw();
                 }
 
