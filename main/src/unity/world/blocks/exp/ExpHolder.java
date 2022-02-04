@@ -15,4 +15,8 @@ public interface ExpHolder {
     default boolean acceptOrb(){
         return false;
     }
+
+    default int handleTower(int amount, float angle){
+        return handleExp(amount);
+    }
 }

@@ -17,7 +17,7 @@ public class ExpSource extends Block {
     public int produceTimer = timers++;
 
     public float reload = 60f;
-    public float amount = 100;
+    public int amount = 100;
     public TextureRegion topRegion;
 
     public ExpSource(String name){

@@ -377,7 +377,7 @@ abstract class ExpComp extends Block implements Stemc{
 
         @Override
         public void killed(){
-            ExpOrbs.spreadExp(x, y, exp * orbRefund, spreadAmount());
+            ExpOrbs.spreadExp(x, y, (int)(exp * orbRefund), spreadAmount());
         }
 
         @Override

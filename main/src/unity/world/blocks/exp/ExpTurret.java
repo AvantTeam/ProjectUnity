@@ -299,6 +299,7 @@ public class ExpTurret extends Turret {
         public void read(Reads read, byte revision){
             super.read(read, revision);
             exp = read.i();
+            if(exp > maxExp) exp = maxExp;
         }
     }
 

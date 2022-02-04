@@ -24,26 +24,61 @@ import static mindustry.Vars.*;
 /** @author GlennFolker
  * @author sunny */
 public class ExpOrbs{
-    public static final float expAmount = 10f;
+    public static final int expAmount = 10;
 
     private static final Color expColor = Color.valueOf("84ff00");
     private static final int[] d4x = new int[]{1, 0, -1, 0};
     private static final int[] d4y = new int[]{0, 1, 0, -1};
     private static final ExpOrb expOrb = new ExpOrb();
 
-    public static void spreadExp(float x, float y, float amount){
+    public static void spreadExp(float x, float y, int amount){
         spreadExp(x, y, amount, 4f);
     }
 
-    public static void spreadExp(float x, float y, float amount, float v){
+    public static void spreadExp(float x, float y, int amount, float v){
         if(net.server() || !net.active()){
             v *= 1000f;
 
-            int n = Mathf.floorPositive(amount / expAmount);
+            int n = amount / expAmount;
             for(int i = 0; i < n; i++){
                 expOrb.createNet(Team.derelict, x, y, Mathf.random() * 360f, 0f, v, 1f);
             }
         }
+    }
+
+    public static void spreadExp(float x, float y, float amount, float v){
+        spreadExp(x, y, Mathf.ceilPositive(amount), v);
+    }
+
+    public static void dropExp(float x, float y, float rotation){
+        dropExp(x, y, rotation, 4f, expAmount);
+    }
+
+    public static void dropExp(float x, float y, float rotation, float v, int amount){
+        if(net.server() || !net.active()){
+            v *= 1000f;
+
+            int n = amount / expAmount;
+            for(int i = 0; i < n; i++){
+                expOrb.createNet(Team.derelict, x, y, rotation, 0f, v, 1f);
+            }
+        }
+    }
+
+    //these would actually be useful when different sized orbs are implemented
+    public static int orbs(int exp){
+        return exp / expAmount;
+    }
+
+    public static int convertedExp(int exp){
+        return (exp / expAmount) * expAmount;
+    }
+
+    /** @param exp maximum exp given
+     * @return returns the amount of exp that can fit in one orb
+     */
+    public static int oneOrb(int exp){
+        return exp < expAmount ? 0 : expAmount;
     }
 
     public static final class ExpOrb extends BulletType{
@@ -91,7 +126,7 @@ public class ExpOrbs{
             Tile tile = world.tileWorld(b.x, b.y);
             if(tile == null || tile.build == null) return;
 
-            if(tile.build instanceof ExpHolder exp && exp.acceptOrb() && exp.handleOrb((int)expAmount)){
+            if(tile.build instanceof ExpHolder exp && exp.acceptOrb() && exp.handleOrb(expAmount)){
                 b.remove();
             }
             else if(tile.block() instanceof Conveyor conv){
@@ -102,7 +137,6 @@ public class ExpOrbs{
                 }
             }
             else if(tile.block() instanceof Incinerator && ((IncineratorBuild)tile.build).heat > 0.5f){
-                //TODO the effect
                 b.remove();
             }
             else if(tile.solid()){
