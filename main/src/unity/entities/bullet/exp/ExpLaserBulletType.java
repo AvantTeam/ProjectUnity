@@ -10,23 +10,21 @@ import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import unity.content.*;
-import unity.gen.Expc.*;
 import unity.graphics.*;
 import unity.util.*;
+import unity.world.blocks.exp.*;
 
-public class ExpLaserBulletType extends BulletType {
-    /** Color of laser. Shifts to second color as the turret levels up. */
-    public Color fromColor = Pal.lancerLaser, toColor = UnityPal.expLaser;
-    /** Dimentions of laser */
+public class ExpLaserBulletType extends ExpBulletType {
+    /** Dimensions of laser */
     public float width = 1f, length;
-    /** Damage increase per owner level, if the owner can level up. */
-    public float damageInc;
     /** Length increase per owner level, if the owner can level up. */
     public float lengthInc;
     /** Widths of each color */
     public float[] strokes = {2.9f, 1.8f, 1};
     /** Exp gained on hit */
-    public float hitUnitExpGain, hitBuildingExpGain;
+    public int buildingExpGain;
+    public boolean hitMissed = false;
+    public boolean blip = false;
 
     public ExpLaserBulletType(float length, float damage){
         super(0.01f, damage);
@@ -43,34 +41,11 @@ public class ExpLaserBulletType extends BulletType {
         pierce = true;
         hittable = false;
         absorbable = false;
+        expOnHit = false;
     }
 
     public ExpLaserBulletType(){
         this(120f, 1f);
-    }
-
-    public int getLevel(Bullet b){
-        if(b.owner instanceof ExpBuildc exp){
-            return exp.level();
-        }else{
-            return 0;
-        }
-    }
-
-    public float getLevelf(Bullet b){
-        if(b.owner instanceof ExpBuildc exp){
-            return exp.levelf();
-        }else{
-            return 0f;
-        }
-    }
-
-    public void setDamage(Bullet b){
-        b.damage += damageInc * getLevel(b) * b.damageMultiplier();
-    }
-
-    public Color getColor(Bullet b){
-        return Tmp.c1.set(fromColor).lerp(toColor, getLevelf(b)).cpy();
     }
 
     public float getLength(Bullet b){
@@ -85,6 +60,7 @@ public class ExpLaserBulletType extends BulletType {
     @Override
     public void init(Bullet b){
         super.init(b);
+        despawnHit = false;
 
         setDamage(b);
 
@@ -94,27 +70,15 @@ public class ExpLaserBulletType extends BulletType {
         if(target instanceof Hitboxc hit){
             hit.collision(b, hit.x(), hit.y());
             b.collision(hit, hit.x(), hit.y());
-            if(b.owner instanceof ExpBuildc exp){
-                if(exp.levelf() < 1 && Core.settings.getBool("hitexpeffect")){
-                    for(int i = 0; i < Math.ceil(hitUnitExpGain); i++){
-                        UnityFx.expGain.at(hit.x(), hit.y(), 0f, (Position)b.owner);
-                    }
-                }
-                exp.incExp(hitUnitExpGain);
-            }
+            handleExp(b, hit.x(), hit.y(), expGain);
         }else if(target instanceof Building tile && tile.collide(b)){
             tile.collision(b);
             hit(b, tile.x, tile.y);
-            if(b.owner instanceof ExpBuildc exp){
-                if(exp.levelf() < 1 && Core.settings.getBool("hitexpeffect")){
-                    for(int i = 0; i < Math.ceil(hitBuildingExpGain); i++){
-                        UnityFx.expGain.at(tile.x, tile.y, 0f, (Position)b.owner);
-                    }
-                }
-                exp.incExp(hitBuildingExpGain);
-            }
+            handleExp(b, tile.x, tile.y, expGain);
         }else{
-            b.data = new Vec2().trns(b.rotation(), getLength(b)).add(b.x, b.y);
+            Vec2 v = new Vec2().trns(b.rotation(), getLength(b)).add(b.x, b.y);
+            b.data = v;
+            if(hitMissed) hit(b, v.x, v.y);
         }
     }
 
@@ -136,6 +100,11 @@ public class ExpLaserBulletType extends BulletType {
             Draw.color(Color.white);
             Lines.stroke(b.fout() * width * strokes[2]);
             Lines.line(b.x, b.y, Tmp.v1.x, Tmp.v1.y);
+
+            if(blip){
+                Draw.color(Color.white, Tmp.c2, b.fin());
+                Lines.circle(Tmp.v1.x, Tmp.v1.y, b.finpow() * width * 5f);
+            }
             Draw.reset();
 
             Drawf.light(b.team, b.x, b.y, Tmp.v1.x, Tmp.v1.y, width * 10 * b.fout(), Color.white, 0.6f);

@@ -33,28 +33,28 @@ public class ExpLaserFieldBulletType extends ExpLaserBulletType{
             b.collision(hit, hit.x(), hit.y());
             if(b.owner instanceof ExpBuildc exp){
                 if(exp.levelf() < 1 && Core.settings.getBool("hitexpeffect")){
-                    for(int i = 0; i < Math.ceil(hitUnitExpGain); i++) UnityFx.expGain.at(hit.x(), hit.y(), 0f, b.owner);
+                    for(int i = 0; i < Math.ceil(expGain); i++) UnityFx.expGain.at(hit.x(), hit.y(), 0f, b.owner);
                 }
                 Sounds.spark.at(hit.x(), hit.y(),0.4f);
                 Sounds.spray.at(hit.x(), hit.y(),0.4f);
 
                 distField.create(b, b.team, hit.x(), hit.y(), 0f, 1f, 1f);
 
-                exp.incExp(hitUnitExpGain);
+                exp.incExp(expGain);
             }
         }else if(target instanceof Building tile && tile.collide(b)){
             tile.collision(b);
             hit(b, tile.x, tile.y);
             if(b.owner instanceof ExpBuildc exp){
                 if(exp.levelf() < 1 && Core.settings.getBool("hitexpeffect")){
-                    for(int i = 0; i < Math.ceil(hitBuildingExpGain); i++) UnityFx.expGain.at(tile.x, tile.y, 0f, b.owner);
+                    for(int i = 0; i < Math.ceil(buildingExpGain); i++) UnityFx.expGain.at(tile.x, tile.y, 0f, b.owner);
                 }
                 Sounds.spark.at(tile.x(), tile.y(),0.4f);
                 Sounds.spray.at(tile.x(), tile.y(),0.4f);
 
                 distField.create(b, b.team, tile.x(), tile.y(), 0f, -1f, 1f, 1f, basicFieldRadius / 2);
 
-                exp.incExp(hitBuildingExpGain);
+                exp.incExp(buildingExpGain);
             }
         }
         else{

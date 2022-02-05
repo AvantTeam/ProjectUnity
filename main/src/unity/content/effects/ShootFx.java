@@ -26,6 +26,12 @@ public class ShootFx{
         }
     }),
 
+    laserChargeShootShort = new Effect(15f, e -> {
+        color(e.color, Color.white, e.fout());
+        stroke(2f * e.fout());
+        Lines.square(e.x, e.y, 0.1f + 20f * e.finpow(), 45f);
+    }),
+
     laserBreakthroughShoot = new Effect(40f, e -> {
         color(e.color);
 

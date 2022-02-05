@@ -181,6 +181,7 @@ public class Unity extends Mod{
 
         Utils.init();
         TimeStop.init();
+        TimeReflect.init();
 
         KamiPatterns.load();
         KamiBulletDatas.load();

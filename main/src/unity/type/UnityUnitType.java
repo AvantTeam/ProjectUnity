@@ -8,6 +8,8 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
+import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.abilities.*;
@@ -16,12 +18,14 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.world.blocks.defense.turrets.BaseTurret.*;
 import mindustry.world.blocks.environment.*;
 import unity.entities.*;
 import unity.entities.legs.*;
 import unity.entities.legs.CLegType.*;
 import unity.entities.units.*;
 import unity.gen.*;
+import unity.graphics.*;
 import unity.type.decal.*;
 import unity.type.decal.UnitDecorationType.*;
 import unity.util.*;
@@ -118,6 +122,9 @@ public class UnityUnitType extends UnitType{
     // Imber units
     public float laserRange = -1f;
     public int maxConnections = -1;
+
+    // World units
+    public int worldWidth, worldHeight;
 
     public UnityUnitType(String name){
         super(name);
@@ -671,6 +678,55 @@ public class UnityUnitType extends UnitType{
                     drawWeapons(wormUnit.segmentUnits[i]);
                 }
             }
+        }
+
+        if(unit instanceof Worldc){
+            var w = (Unit & Worldc)unit;
+            Draw.draw(z + 0.0001f, () -> {
+                Seq<Building> build = w.buildings();
+                World world = w.unitWorld();
+                float cx = world.width() * Vars.tilesize / 2f, cy = world.height() * Vars.tilesize / 2f;
+                float r = w.rotation - 90f;
+
+                Mat proj = Tmp.m1.set(Draw.proj());
+                Vec2 cam = camera.position;
+                float camX = cam.x, camY = cam.y;
+                float cw = camera.width / 2f, ch = camera.height / 2f;
+                Tmp.v2.set(-cx, -cy).rotate(r);
+
+                Tmp.v1.set(unit).sub(camX, camY).add(cw, ch).add(Tmp.v2);
+
+                cam.set(cw - Tmp.v1.x, ch - Tmp.v1.y);
+                camera.update();
+                Draw.flush();
+                Batch old = batch;
+                batch = UnityDrawf.altBatch;
+
+                Draw.proj(camera);
+
+                Draw.proj().rotate(r);
+                Draw.sort(true);
+
+                for(int i = 0; i < build.size; i++){
+                    Building b = build.get(i);
+                    Draw.z(Layer.block);
+                    b.draw();
+                }
+
+                //Should fix the blending bug.
+                Draw.z(9999f);
+                Draw.color(Color.clear);
+                Fill.rect(0, 0, 0, 0);
+
+                Draw.reset();
+                Draw.flush();
+                Draw.sort(false);
+
+                cam.set(camX, camY);
+                camera.update();
+                Draw.proj(proj);
+                batch = old;
+            });
         }
 
         Draw.z(z);

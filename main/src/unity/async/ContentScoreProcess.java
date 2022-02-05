@@ -127,6 +127,11 @@ public class ContentScoreProcess implements AsyncProcess{
     }
 
     ContentScore get(Content content){
+        if(content.id >= scores[content.getContentType().ordinal()].length){
+            Log.warn("[scarlet]Array out of bounds for "+content.toString()+"![]");
+            Log.warn("[scarlet]Bad mod: " + (content.minfo != null && content.minfo.mod != null ? content.minfo.mod.name : "VANILLA") + "[]");
+            return scores[content.getContentType().ordinal()][0]; //okay this is horrible but this is far better than a crash
+        }
         return scores[content.getContentType().ordinal()][content.id];
     }
 
@@ -558,7 +563,7 @@ public class ContentScoreProcess implements AsyncProcess{
                     score += (bs * shots * inaccuracy) / t.reloadTime;
                 }else if(block instanceof PowerTurret){
                     PowerTurret pt = (PowerTurret)block;
-                    score += (get(pt.shootType).loadOutputScore() * shots * inaccuracy) / t.reloadTime;
+                    if(pt.shootType != null) score += (get(pt.shootType).loadOutputScore() * shots * inaccuracy) / t.reloadTime;
                 }
             }else if(block instanceof MendProjector){
                 MendProjector mp = (MendProjector)block;

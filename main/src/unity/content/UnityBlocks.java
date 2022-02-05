@@ -36,6 +36,8 @@ import unity.world.blocks.defense.turrets.*;
 import unity.world.blocks.distribution.*;
 import unity.world.blocks.effect.*;
 import unity.world.blocks.environment.*;
+import unity.world.blocks.exp.*;
+import unity.world.blocks.exp.turrets.*;
 import unity.world.blocks.light.*;
 import unity.world.blocks.power.*;
 import unity.world.blocks.production.*;
@@ -51,6 +53,7 @@ import younggamExperimental.blocks.*;
 import static arc.Core.*;
 import static mindustry.Vars.*;
 import static mindustry.type.ItemStack.*;
+import static unity.world.blocks.exp.EField.*;
 
 public class UnityBlocks{
     //---------- global ----------
@@ -110,6 +113,8 @@ public class UnityBlocks{
     })
     Block lightForge;
 
+    public static @FactionDef("scar") Block terraCore;
+
     //---------- imber faction ----------
     public static @FactionDef("imber") Block
     //environment
@@ -130,6 +135,7 @@ public class UnityBlocks{
     public static @FactionDef("koruh") Block
     //crafting
     solidifier, steelSmelter, liquifier, titaniumExtractor,
+
     //defense
     stoneWall, denseWall, steelWall, steelWallLarge, diriumWall, diriumWallLarge,
 
@@ -137,23 +143,20 @@ public class UnityBlocks{
     steelConveyor, diriumConveyor, teleporter, teleunit,
 
     //unit
-    bufferPad, omegaPad, cachePad, convertPad;
+    bufferPad, omegaPad, cachePad, convertPad,
 
     //TODO
-    //expOutput, expUnloader, expTank, expChest, expFountain, expVoid;
+    expFountain, expVoid, expTank, expChest, expRouter, expTower, expTowerDiagonal;// expOutput, expUnloader;
 
     //turret
     public static @FactionDef("koruh")
     @LoadRegs("bt-laser-turret-top")
-    @Merge(base = PowerTurret.class, value = {Turretc.class, Expc.class})
     Block laser, laserCharge, laserBranch, laserFractal, laserBreakthrough;
 
     public static @FactionDef("koruh")
-    @Merge(base = LiquidTurret.class, value = {Turretc.class, Expc.class})
     Block laserFrost, laserKelvin;
 
     public static @FactionDef("koruh")
-    @Merge(base = ItemTurret.class, value = {Turretc.class, Expc.class})
     Block inferno;
 
     //---------- monolith faction ----------
@@ -1134,6 +1137,14 @@ public class UnityBlocks{
         }};
 
         //endregion
+        //region scar
+
+        terraCore = new TerraCore("terra-core"){{
+            requirements(Category.units, with(Items.copper, 1));
+            size = 2;
+        }};
+
+        //endregion
         //region imber
 
         orb = new PowerTurret("orb"){{
@@ -1521,332 +1532,318 @@ public class UnityBlocks{
             consumes.power(3f);
         }};
 
-        laser = new ExpTurretPowerTurret("laser-turret"){
-            {
-                requirements(Category.turret, with(Items.copper, 190, Items.silicon, 110, Items.titanium, 15));
-                size = 2;
-                health = 800;
+        laser = new ExpPowerTurret("laser-turret"){{
+            requirements(Category.turret, with(Items.copper, 90, Items.silicon, 40, Items.titanium, 15));
+            size = 2;
+            health = 600;
 
-                reloadTime = 35f;
-                coolantMultiplier = 2f;
-                range = 140f;
-                targetAir = false;
-                shootSound = Sounds.laser;
+            reloadTime = 35f;
+            coolantMultiplier = 2f;
+            range = 140f;
+            targetAir = false;
+            shootSound = Sounds.laser;
 
-                powerUse = 7f;
-                shootType = UnityBullets.laser;
+            powerUse = 7f;
+            shootType = UnityBullets.laser;
 
-                hasExp = true;
-                condConfig = true;
-                enableUpgrade = true;
+            maxLevel = 10;
+            expFields = new EField[]{
+                    new LinearReloadTime(v -> reloadTime = v, 45f, -2f),
+                    new ELinear(v -> range = v, 120f, 2f, Stat.shootRange, v -> Strings.autoFixed(v / tilesize, 2) + " blocks"),
+                    new EBool(v -> targetAir = v, false, 5, Stat.targetsAir)
+            };
+        }};
 
-                maxLevel = 10;
-                progression.linear(reloadTime, -2f, val -> reloadTime = val);
-                progression.bool(targetAir, 5f, val -> targetAir = val);
-            }
+        laserCharge = new ExpPowerTurret("charge-laser-turret"){{
+            requirements(Category.turret, with(UnityItems.denseAlloy, 60, Items.graphite, 15));
+            size = 2;
+            health = 1400;
 
-            @Override
-            public void setUpgrades(){
-                addUpgrade(laserCharge, 10, false);
-                addUpgrade(laserFrost, 10, false);
-            }
-        };
+            reloadTime = 60f;
+            coolantMultiplier = 2f;
+            range = 140f;
 
-        laserCharge = new ExpTurretPowerTurret("charge-laser-turret"){
-            {
-                category = Category.turret;
-                size = 2;
-                health = 1400;
+            chargeTime = 50f;
+            chargeMaxDelay = 30f;
+            chargeEffects = 4;
+            recoilAmount = 2f;
+            cooldown = 0.03f;
+            targetAir = true;
+            shootShake = 2f;
 
-                reloadTime = 60f;
-                coolantMultiplier = 2f;
-                range = 140f;
+            powerUse = 7f;
 
-                chargeTime = 50f;
-                chargeMaxDelay = 30f;
-                chargeEffects = 4;
-                recoilAmount = 2f;
-                cooldown = 0.03f;
-                targetAir = true;
-                shootShake = 2f;
+            shootEffect = ShootFx.laserChargeShoot;
+            smokeEffect = Fx.none;
+            chargeEffect = UnityFx.laserCharge;
+            chargeBeginEffect = UnityFx.laserChargeBegin;
+            heatColor = Color.red;
+            shootSound = Sounds.laser;
 
-                powerUse = 7f;
+            shootType = UnityBullets.shardLaser;
 
-                shootEffect = ShootFx.laserChargeShoot;
-                smokeEffect = Fx.none;
-                chargeEffect = UnityFx.laserCharge;
-                chargeBeginEffect = UnityFx.laserChargeBegin;
-                heatColor = Color.red;
-                shootSound = Sounds.laser;
+            maxLevel = 30;
+            expFields = new EField[]{
+                    new LinearReloadTime(v -> reloadTime = v, 60f, -1f),
+                    new ELinear(v -> range = v, 140f, 0.5f, Stat.shootRange, v -> Strings.autoFixed(v / tilesize, 2) + " blocks")
+            };
+            pregrade = (ExpTurret) laser;
+            effectColors = new Color[]{Pal.lancerLaser, UnityPal.lancerSap1, UnityPal.lancerSap2, UnityPal.lancerSap3, UnityPal.lancerSap4, UnityPal.lancerSap5, Pal.sapBullet};
+        }};
 
-                shootType = UnityBullets.shardLaser;
-                buildVisibility = BuildVisibility.sandboxOnly;
+        laserFrost = new ExpLiquidTurret("frost-laser-turret"){{
+            ammo(Liquids.cryofluid, UnityBullets.frostLaser);
+            requirements(Category.turret, with(UnityItems.denseAlloy, 60, Items.metaglass, 15));
+            size = 2;
+            health = 1000;
 
-                hasExp = true;
-                condConfig = true;
-                enableUpgrade = true;
+            range = 160f;
+            reloadTime = 80f;
+            targetAir = true;
+            liquidCapacity = 10f;
+            shootSound = Sounds.laser;
+            extinguish = false;
 
-                maxLevel = 30;
+            maxLevel = 30;
 
-                progression.linear(reloadTime, -1f, val -> reloadTime = val);
-            }
+            consumes.powerCond(1f, TurretBuild::isActive);
+            pregrade = (ExpTurret) laser;
+        }};
 
-            @Override
-            public void setUpgrades(){
-                addUpgrade(laserBranch, 15, false);
-                addUpgrade(laserFractal, 15, false);
-                addUpgrade(laserBreakthrough, 30, true);
-            }
-        };
+        laserFractal = new ExpPowerTurret("fractal-laser-turret"){{
+            requirements(Category.turret, with(UnityItems.steel, 50, Items.graphite, 90, Items.thorium, 95));
+            size = 3;
+            health = 2000;
 
-        laserFrost = new ExpTurretLiquidTurret("frost-laser-turret"){
-            {
-                ammo(Liquids.cryofluid, UnityBullets.frostLaser);
+            reloadTime = UnityBullets.distField.lifetime / 3f;
+            coolantMultiplier = 2f;
+            range = 140f;
 
-                category = Category.turret;
-                size = 2;
-                health = 1000;
+            chargeTime = 50f;
+            chargeMaxDelay = 40f;
+            chargeEffects = 5;
+            recoilAmount = 4f;
 
-                range = 160f;
-                reloadTime = 80f;
-                targetAir = true;
-                liquidCapacity = 10f;
-                buildVisibility = BuildVisibility.sandboxOnly;
+            cooldown = 0.03f;
+            targetAir = true;
+            shootShake = 5f;
+            powerUse = 13f;
 
-                hasExp = true;
-                condConfig = true;
-                enableUpgrade = true;
+            shootEffect = ShootFx.laserChargeShoot;
+            smokeEffect = Fx.none;
+            chargeEffect = UnityFx.laserCharge;
+            chargeBeginEffect = UnityFx.laserChargeBegin;
+            heatColor = Color.red;
+            shootSound = Sounds.laser;
 
-                maxLevel = 30;
+            fromColor = UnityPal.lancerSap3;
+            toColor = Pal.place;
 
-                consumes.powerCond(1f, TurretBuild::isActive);
-            }
+            shootType = UnityBullets.fractalLaser;
 
-            @Override
-            public void setUpgrades(){
-                addUpgrade(laserKelvin, 15, false);
-                addUpgrade(laserBreakthrough, 30, true);
-            }
-        };
+            //todo fractal laser (handle radius on the bullet's side
+            //basicFieldRadius = 85f;
 
-        laserFractal = new ExpTurretPowerTurret("fractal-laser-turret"){
-            {
-                category = Category.turret;
-                size = 3;
-                health = 2000;
+            maxLevel = 30;
+            expFields = new EField[]{
+                    new LinearReloadTime(v -> reloadTime = v, UnityBullets.distField.lifetime / 3f, -2f),
+                    new ELinear(v -> range = v, 140f, 0.25f * tilesize, Stat.shootRange, v -> Strings.autoFixed(v / tilesize, 2) + " blocks")
+            };
+            //progression.linear(basicFieldRadius, 0.2f * tilesize, val -> basicFieldRadius = val);
 
-                reloadTime = UnityBullets.distField.lifetime / 3f;
-                coolantMultiplier = 2f;
-                range = 140f;
+            //bulletCons((ExpLaserFieldBulletType type, Bullet b) -> type.basicFieldRadius = basicFieldRadius);
+            pregrade = (ExpTurret) laserCharge;
+            pregradeLevel = 15;
+            effectColors = new Color[]{fromColor, Pal.lancerLaser.cpy().lerp(Pal.sapBullet, 0.75f), Pal.sapBullet};
+        }};
 
-                chargeTime = 50f;
-                chargeMaxDelay = 40f;
-                chargeEffects = 5;
-                recoilAmount = 4f;
+        laserBranch = new BurstChargePowerTurret("swarm-laser-turret"){{
+            requirements(Category.turret, with(UnityItems.steel, 50, Items.silicon, 90, Items.thorium, 95));
 
-                cooldown = 0.03f;
-                targetAir = true;
-                shootShake = 5f;
-                powerUse = 13f;
+            size = 3;
+            health = 2400;
 
-                shootEffect = ShootFx.laserChargeShoot;
-                smokeEffect = Fx.none;
-                chargeEffect = UnityFx.laserCharge;
-                chargeBeginEffect = UnityFx.laserChargeBegin;
-                heatColor = Color.red;
-                shootSound = Sounds.laser;
+            reloadTime = 90f;
+            coolantMultiplier = 2.25f;
+            powerUse = 15f;
+            targetAir = true;
+            range = 150f;
 
-                lerpColor = true;
-                fromColor = Pal.lancerLaser.cpy().lerp(Pal.sapBullet, 0.5f);
-                toColor = Pal.place;
+            chargeTime = 50f;
+            chargeMaxDelay = 30f;
+            chargeEffects = 4;
+            recoilAmount = 2f;
 
-                shootType = UnityBullets.fractalLaser;
+            cooldown = 0.03f;
+            shootShake = 2f;
+            shootEffect = ShootFx.laserChargeShootShort;
+            smokeEffect = Fx.none;
+            chargeEffect = UnityFx.laserChargeShort;
+            chargeBeginEffect = UnityFx.laserChargeBegin;
+            heatColor = Color.red;
+            fromColor = UnityPal.lancerSap3;
+            shootSound = Sounds.plasmaboom;
+            shootType = UnityBullets.branchLaser;
 
-                basicFieldRadius = 85f;
+            shootLength = size * tilesize / 2.7f;
+            shots = 4;
+            burstSpacing = 20f;
+            inaccuracy = 1f;
+            spread = 0f;
+            xRand = 6f;
 
-                hasExp = true;
-                condConfig = true;
-                enableUpgrade = true;
+            maxLevel = 30;
+            expFields = new EField[]{
+                    new ELinearCap(v -> shots = (int)v, 2, 0.35f, 15, Stat.shots),
+                    new ELinearCap(v -> inaccuracy = v, 1f, 0.25f, 10, Stat.inaccuracy, v -> Strings.autoFixed(v, 1) + " degrees"),
+                    new ELinear(v -> burstSpacing = v, 20f, -0.5f, null),
+                    new ELinear(v -> range = v, 150f, 2f, Stat.shootRange, v -> Strings.autoFixed(v / tilesize, 2) + " blocks")
+            };
+            pregrade = (ExpTurret) laserCharge;
+            pregradeLevel = 15;
+            effectColors = new Color[]{UnityPal.lancerSap3, UnityPal.lancerSap4, UnityPal.lancerSap5, Pal.sapBullet};
+        }};
 
-                maxLevel = 30;
+        laserKelvin = new OmniLiquidTurret("kelvin-laser-turret"){{
+            requirements(Category.turret, with(Items.phaseFabric, 50, Items.metaglass, 90, Items.thorium, 95));
+            size = 3;
+            health = 2100;
 
-                progression.linear(reloadTime, -2f, val -> reloadTime = val);
-                progression.linear(range, 0.25f * tilesize, val -> range = val);
-                progression.linear(basicFieldRadius, 0.2f * tilesize, val -> basicFieldRadius = val);
+            range = 180f;
+            reloadTime = 120f;
+            targetAir = true;
+            liquidCapacity = 15f;
+            shootAmount = 3f;
+            shootSound = Sounds.laser;
 
-                bulletCons((ExpLaserFieldBulletType type, Bullet b) -> type.basicFieldRadius = basicFieldRadius);
-            }
-        };
+            shootType = new GeyserLaserBulletType(185f, 30f){{
+                geyser = UnityBullets.laserGeyser;
+                damageInc = 5f;
+                maxRange = 185f;
+            }};
 
-        laserBranch = new ExpTurretPowerTurret("swarm-laser-turret"){
-            {
-                category = Category.turret;
+            consumes.powerCond(2.5f, TurretBuild::isActive);
 
-                size = 3;
-                health = 2400;
+            maxLevel = 30;
+            pregrade = (ExpTurret) laserFrost;
+            pregradeLevel = 15;
+        }};
 
-                reloadTime = 90f;
-                coolantMultiplier = 2.25f;
-                powerUse = 15f;
-                targetAir = true;
-                range = 150f;
-                rangeColor = UnityPal.expColor;
+        laserBreakthrough = new ExpPowerTurret("bt-laser-turret"){{
+            requirements(Category.turret, with(UnityItems.dirium, 190, Items.silicon, 230, Items.thorium, 450, UnityItems.steel, 230));
+            size = 4;
+            health = 2800;
 
-                chargeTime = 50f;
-                chargeMaxDelay = 30f;
-                chargeEffects = 4;
-                recoilAmount = 2f;
+            range = 500f;
+            coolantMultiplier = 1.5f;
+            targetAir = true;
+            reloadTime = 500f;
 
-                cooldown = 0.03f;
-                shootShake = 2f;
-                shootEffect = ShootFx.laserChargeShoot;
-                smokeEffect = Fx.none;
-                chargeEffect = UnityFx.laserCharge;
-                chargeBeginEffect = UnityFx.laserChargeBegin;
-                heatColor = Color.red;
-                lerpColor = true;
-                fromColor = Pal.lancerLaser.cpy().lerp(Pal.sapBullet, 0.5f);
-                shootSound = Sounds.laser;
-                shootType = UnityBullets.branchLaser;
-                buildVisibility = BuildVisibility.sandboxOnly;
+            chargeTime = 100f;
+            chargeMaxDelay = 100f;
+            chargeEffects = 0;
 
-                shootLength = size * tilesize / 2.7f;
-                shots = 4;
-                burstSpacing = 5f;
-                inaccuracy = 10f;
-                xRand = 6f;
+            recoilAmount = 5f;
+            cooldown = 0.03f;
+            powerUse = 17f;
 
-                hasExp = true;
-                condConfig = true;
-                enableUpgrade = true;
+            shootShake = 4f;
+            shootEffect = ShootFx.laserBreakthroughShoot;
+            smokeEffect = Fx.none;
+            chargeEffect = Fx.none;
+            chargeBeginEffect = UnityFx.laserBreakthroughChargeBegin;
 
-                maxLevel = 30;
+            heatColor = fromColor = Pal.lancerLaser;
+            toColor = UnityPal.exp;
+            shootSound = Sounds.laserblast;
+            chargeSound = Sounds.lasercharge;
+            shootType = UnityBullets.breakthroughLaser;
 
-                progression.linear(reloadTime, -2f, val -> reloadTime = val);
-                progression.linear(range, 0.25f * tilesize, val -> range = val);
-            }
-        };
+            maxLevel = 1;
+            expScale = 30;
+            pregrade = (ExpTurret) laserCharge;
+            pregradeLevel = 30;
+            expFields = new EField[]{
+                    new EList<>(v -> chargeBeginEffect = v, new Effect[]{UnityFx.laserBreakthroughChargeBegin, UnityFx.laserBreakthroughChargeBegin2}, null)
+            };
+            effectColors = new Color[]{Pal.lancerLaser, UnityPal.exp};
 
-        laserKelvin = new ExpTurretLiquidTurret("kelvin-laser-turret"){
-            {
-                ammo(
-                    Liquids.water, UnityBullets.kelvinWaterLaser,
-                    Liquids.slag, UnityBullets.kelvinSlagLaser,
-                    Liquids.oil, UnityBullets.kelvinOilLaser,
-                    Liquids.cryofluid, UnityBullets.kelvinCryofluidLaser
-                );
-
-                category = Category.turret;
-                size = 3;
-                health = 2100;
-
-                range = 180f;
-                reloadTime = 120f;
-                targetAir = true;
-                liquidCapacity = 15f;
-
-                omni = true;
-                defaultBullet = UnityBullets.kelvinLiquidLaser;
-
-                buildVisibility = BuildVisibility.sandboxOnly;
-
-                consumes.powerCond(2.5f, TurretBuild::isActive);
-
-                hasExp = true;
-                condConfig = true;
-                enableUpgrade = true;
-
-                maxLevel = 30;
-            }
-        };
-
-        laserBreakthrough = new ExpTurretPowerTurret("bt-laser-turret"){
-            {
-                category = Category.turret;
-                size = 4;
-                health = 2800;
-
-                range = 500f;
-                coolantMultiplier = 1.5f;
-                targetAir = true;
-                reloadTime = 500f;
-
-                chargeTime = 100f;
-                chargeMaxDelay = 100f;
-                chargeEffects = 0;
-
-                recoilAmount = 5f;
-                cooldown = 0.03f;
-                powerUse = 17f;
-
-                shootShake = 4f;
-                shootEffect = ShootFx.laserBreakthroughShoot;
-                smokeEffect = Fx.none;
-                chargeEffect = Fx.none;
-                chargeBeginEffect = UnityFx.laserBreakthroughChargeBegin;
-
-                heatColor = Pal.lancerLaser;
-                lerpColor = true;
-                toColor = UnityPal.expColor;
-                shootSound = Sounds.laserblast;
-                chargeSound = Sounds.lasercharge;
-                shootType = UnityBullets.breakthroughLaser;
-                buildVisibility = BuildVisibility.sandboxOnly;
-
-                hasExp = true;
-                condConfig = true;
-                enableUpgrade = true;
-
-                maxLevel = 1;
-                orbMultiplier = 0.07f;
-
-                progression.list(new Color[]{fromColor, toColor}, 1f, Interp.linear, val -> heatColor = val);
-
-                drawer = b -> {
-                    if(b instanceof ExpTurretPowerTurretBuild tile){
-                        Draw.rect(region, tile.x + tr2.x, tile.y + tr2.y, tile.rotation - 90f);
-                        if(tile.level() >= tile.maxLevel()){
-                            //Draw.blend(Blending.additive);
-                            Draw.color(tile.getShootColor(tile.levelf()));
-                            Draw.alpha(Mathf.absin(Time.time, 20f, 0.6f));
-                            Draw.rect(Regions.btLaserTurretTopRegion, tile.x + tr2.x, tile.y + tr2.y, tile.rotation - 90f);
-                            Draw.color();
-                            //Draw.blend();
-                        }
-                    }else{
-                        throw new IllegalStateException("building isn't an instance of ExpTurretPowerTurretBuild");
+            drawer = b -> {
+                if(b instanceof ExpPowerTurretBuild tile){
+                    Draw.rect(region, tile.x + tr2.x, tile.y + tr2.y, tile.rotation - 90f);
+                    if(tile.level() >= tile.maxLevel()){
+                        //Draw.blend(Blending.additive);
+                        Draw.color(tile.shootColor(Tmp.c2));
+                        Draw.alpha(Mathf.absin(Time.time, 20f, 0.6f));
+                        Draw.rect(Regions.btLaserTurretTopRegion, tile.x + tr2.x, tile.y + tr2.y, tile.rotation - 90f);
+                        Draw.color();
+                        //Draw.blend();
                     }
-                };
-            }
-        };
+                }else{
+                    throw new IllegalStateException("building isn't an instance of ExpPowerTurretBuild");
+                }
+            };
+        }};
 
-        inferno = new ExpTurretItemTurret("inferno"){
-            {
-                requirements(Category.turret, with(Items.copper, 150, Items.lead, 165, Items.graphite, 60));
-                ammo(
-                    Items.scrap, Bullets.slagShot,
-                    Items.coal, UnityBullets.coalBlaze,
-                    Items.pyratite, UnityBullets.pyraBlaze
-                );
+        inferno = new ExpItemTurret("inferno"){{
+            requirements(Category.turret, with(UnityItems.stone, 150, UnityItems.denseAlloy, 65, Items.graphite, 60));
+            ammo(
+                Items.scrap, Bullets.slagShot,
+                Items.coal, UnityBullets.coalBlaze,
+                Items.pyratite, UnityBullets.pyraBlaze
+            );
 
-                size = 3;
-                range = 80f;
-                reloadTime = 6f;
-                coolantMultiplier = 2f;
-                recoilAmount = 0f;
-                shootCone = 5f;
-                shootSound = Sounds.flame;
+            size = 3;
+            range = 80f;
+            reloadTime = 6f;
+            coolantMultiplier = 2f;
+            recoilAmount = 0f;
+            shootCone = 5f;
+            shootSound = Sounds.flame;
 
-                hasExp = true;
-                condConfig = true;
-                enableUpgrade = true;
+            maxLevel = 10;
+            expFields = new EField[]{
+                    new EList<>(v -> shots = v, new Integer[]{1, 1, 2, 2, 2, 3, 3, 4, 4, 5, 5}, Stat.shots),
+                    new EList<>(v -> spread = v, new Float[]{0f, 0f, 5f, 10f, 15f, 7f, 14f, 8f, 10f, 6f, 9f}, null)
+            };
+        }};
 
-                maxLevel = 10;
+        expRouter = new ExpRouter("exp-router"){{
+            requirements(Category.effect, with(UnityItems.stone, 5));
+        }};
 
-                progression.list(new Integer[]{1, 1, 2, 2, 2, 3, 3, 4, 4, 5, 5}, 1f, Interp.linear, val -> shots = val);
-                progression.list(new Float[]{0f, 0f, 5f, 10f, 15f, 7f, 14f, 8f, 10f, 6f, 9f}, 1f, Interp.linear, val -> spread = val);
-            }
-        };
+        expTower = new ExpTower("exp-tower"){{
+            requirements(Category.effect, with(UnityItems.denseAlloy, 10, Items.silicon, 5));
+            expCapacity = 100;
+        }};
+
+        expTowerDiagonal = new DiagonalTower("diagonal-tower"){{
+            requirements(Category.effect, with(UnityItems.denseAlloy, 10, Items.silicon, 5));
+            range = 7;
+            expCapacity = 150;
+        }};
+
+        expTank = new ExpTank("exp-tank"){{
+            requirements(Category.effect, with(Items.copper, 100, UnityItems.denseAlloy, 100, Items.graphite, 30));
+            expCapacity = 600;
+            health = 300;
+            size = 2;
+        }};
+
+        expChest = new ExpTank("exp-chest"){{
+            requirements(Category.effect, with(Items.copper, 400, UnityItems.steel, 250, Items.phaseFabric, 120));
+            expCapacity = 3200;
+            health = 1200;
+            size = 4;
+        }};
+
+        expFountain = new ExpSource("exp-fountain"){{
+            requirements(Category.effect, BuildVisibility.sandboxOnly, with());
+        }};
+
+        expVoid = new ExpVoid("exp-void"){{
+            requirements(Category.effect, BuildVisibility.sandboxOnly, with());
+        }};
 
         //endregion
         //region monolith

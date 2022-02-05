@@ -62,16 +62,57 @@ public class UnityFx{
         Tmp.v1.trns(a, Mathf.randomSeed(e.id * 2L, -spread, spread) * fslope, d * sfin);
         Tmp.v1.add(e.x, e.y);
 
-        color(UnityPal.expColor, Color.white, 0.1f + 0.1f * Mathf.sin(Time.time * 0.03f + e.id * 3f));
+        color(UnityPal.exp, Color.white, 0.1f + 0.1f * Mathf.sin(Time.time * 0.03f + e.id * 3f));
         Fill.circle(Tmp.v1.x, Tmp.v1.y, 1.5f);
         stroke(0.5f);
         for(int i = 0; i < 4; i++) Drawf.tri(Tmp.v1.x, Tmp.v1.y, 4f, 4 + 1.5f * Mathf.sin(Time.time * 0.12f + e.id * 4f), i * 90f + Mathf.sin(Time.time * 0.04f + e.id * 5f) * 28f);
+    }),
+
+    expPoof = new Effect(60f, e -> {
+        color(Pal.accent, UnityPal.exp, e.fin());
+        integer = 0;
+        randLenVectors(e.id, 9, 1f + 30f * e.finpow(), (x, y) -> {
+            integer++;
+            Fill.circle(e.x + x, e.y + y, 1.7f * e.fout());
+            UnityDrawf.spark(e.x + x, e.y + y, 5f, (5 + 1.5f * Mathf.sin(Time.time * 0.12f + integer * 4f)) * e.fout(), e.finpow() * 90f + integer * 69f);
+        });
+    }),
+
+    expShineRegion = new Effect(25f, e -> {
+        color();
+        Tmp.c1.set(Pal.accent).lerp(UnityPal.exp, e.fin());
+        mixcol(Tmp.c1, 1f);
+        alpha(1f - e.fin() * e.fin());
+
+        if(e.data instanceof TextureRegion region){
+            Draw.rect(region, e.x, e.y, e.rotation);
+        }
+    }),
+
+    orbDespawn = new Effect(15f, e -> {
+        color(UnityPal.exp);
+        stroke(e.fout() * 1.2f + 0.01f);
+        Lines.circle(e.x, e.y, 4f * e.finpow());
+    }),
+
+    placeShine = new Effect(30f, e -> {
+        color(e.color);
+        stroke(e.fout());
+        square(e.x, e.y, e.rotation / 2f + e.fin() * 3f);
+        UnityDrawf.spark(e.x, e.y, 25f, 15f * e.fout(), e.finpow() * 90f);
     }),
 
     laserCharge = new Effect(38f, e -> {
         color(e.color);
         randLenVectors(e.id, e.id % 3 + 1, 1f + 20f * e.fout(), e.rotation, 120f, (x, y) ->
             lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fslope() * 3f + 1f)
+        );
+    }),
+
+    laserChargeShort = new Effect(18f, e -> {
+        color(e.color);
+        randLenVectors(e.id, 1, 1f + 20f * e.fout(), e.rotation, 120f, (x, y) ->
+            Fill.square(e.x + x, e.y + y, e.fslope() * 1.5f + 0.1f, 45f)
         );
     }),
 
@@ -99,6 +140,36 @@ public class UnityFx{
         });
     }),
 
+    giantSplash = new Effect(30f, e -> {
+        color(Color.white, e.color, e.fin());
+        stroke(2f * e.fout());
+        circle(e.x, e.y, e.finpow() * 20f);
+        integer = 0;
+        randLenVectors(e.id, 11, 4f + 40f * e.finpow(), (x, y) -> {
+            integer++;
+            Fill.circle(e.x + x, e.y + y, e.fslope() * Mathf.randomSeed(e.id + integer, 5f, 9f) + 0.1f);
+        });
+    }),
+
+    hotSteam = new Effect(150f, e -> {
+        color(e.color, e.fout() * 0.9f);
+        integer = 0;
+        randLenVectors(e.id, 2, 10f + 20f * e.fin(), (x, y) -> {
+            integer++;
+            Fill.circle(e.x + x, e.y + y, e.fin() * Mathf.randomSeed(e.id + integer, 15f, 19f) + 0.1f);
+        });
+    }).layer(Layer.flyingUnit + 1f),
+
+    iceSheet = new Effect(540f, e -> {
+        color(Color.white, e.color, 0.3f);
+        integer = 0;
+        float fin2 = Mathf.clamp(e.fin() * 5f);
+        randLenVectors(e.id, 1, 15f + 6f * fin2, (x, y) -> {
+            integer++;
+            Fill.poly(e.x + x, e.y + y, 6, fin2 * Mathf.randomSeed(e.id + integer, 15f, 19f) * Mathf.clamp(9f * e.fout()) + 0.1f);
+        });
+    }).layer(Layer.debris - 1.1f),
+
     shootFlake = new Effect(21f, e -> {
         color(e.color, Color.white, e.fout());
 
@@ -114,7 +185,7 @@ public class UnityFx{
     }),
 
     laserBreakthroughChargeBegin = new Effect(100f, 100f, e -> {
-        color(e.color);
+        color(Pal.lancerLaser);
         stroke(e.fin() * 3f);
 
         Lines.circle(e.x, e.y, 4f + e.fout() * 120f);
@@ -122,6 +193,21 @@ public class UnityFx{
 
         randLenVectors(e.id, 20, 50f * e.fout(), (x, y) ->
             Fill.circle(e.x + x, e.y + y, e.fin() * 6f)
+        );
+
+        color();
+        Fill.circle(e.x, e.y, e.fin() * 13);
+    }),
+
+    laserBreakthroughChargeBegin2 = new Effect(100f, 100f, e -> {
+        color(UnityPal.exp);
+        stroke(e.fin() * 3f);
+
+        Lines.circle(e.x, e.y, 4f + e.fout() * 120f);
+        Fill.circle(e.x, e.y, e.fin() * 23.5f);
+
+        randLenVectors(e.id, 20, 50f * e.fout(), (x, y) ->
+                Fill.circle(e.x + x, e.y + y, e.fin() * 6f)
         );
 
         color();
@@ -588,12 +674,12 @@ public class UnityFx{
 
     expAbsorb = new Effect(15f, e -> {
         stroke(e.fout() * 1.5f);
-        color(UnityPal.expColor);
+        color(UnityPal.exp);
         circle(e.x, e.y, e.fin() * 2.5f + 1f);
     }),
 
     expDespawn = new Effect(15f, e -> {
-        color(UnityPal.expColor);
+        color(UnityPal.exp);
         randLenVectors(e.id, 7, 2f + 5 * e.fin(), (x, y) -> Fill.circle(e.x + x, e.y + y, e.fout()));
     }),
 
@@ -612,18 +698,18 @@ public class UnityFx{
     ahhimaLiquidNow = new Effect(45f, e -> {
         color(Color.gray, Color.clear, e.fin());
         randLenVectors(e.id, 3, 2.5f + e.fin() * 6f, (x, y) -> Fill.circle(e.x + x, e.y + y, 0.2f + e.fin() * 3f));
-        color(UnityPal.lavaColor, UnityPal.lavaColor2, e.fout());
+        color(UnityPal.lava, UnityPal.lava2, e.fout());
         randLenVectors(e.id + 1, 4, 1 + e.fin() * 4f, (x, y) -> Fill.circle(e.x + x, e.y + y, 0.2f + e.fout() * 1.3f));
     }),
 
     blinkFx = new Effect(30f, e -> {
-        color(Color.white, UnityPal.diriumColor, e.fin());
+        color(Color.white, UnityPal.dirium, e.fin());
         stroke(3f * e.rotation * e.fout());
         square(e.x, e.y, e.rotation * 4f * e.finpow());
     }),
 
     tpOut = new Effect(30f, e -> {
-        color(UnityPal.diriumColor);
+        color(UnityPal.dirium);
         stroke(3f * e.fout());
         square(e.x, e.y, e.finpow() * e.rotation, 45f);
         stroke(5f * e.fout());
@@ -635,7 +721,7 @@ public class UnityFx{
         if(!(e.data instanceof UnitType type)) return;
         TextureRegion region = type.fullIcon;
         color();
-        mixcol(UnityPal.diriumColor, 1f);
+        mixcol(UnityPal.dirium, 1f);
         rect(region, e.x, e.y, region.width * scl * e.fout(), region.height * scl * e.fout(), e.rotation);
         mixcol();
     }),
@@ -643,7 +729,7 @@ public class UnityFx{
     tpFlash = new Effect(30f, e -> {
         if(!(e.data instanceof Unit unit) || !unit.isValid()) return;
         TextureRegion region = unit.type.fullIcon;
-        mixcol(UnityPal.diriumColor2, 1f);
+        mixcol(UnityPal.diriumLight, 1f);
         alpha(e.fout());
         rect(region, unit.x, unit.y, unit.rotation - 90f);
         mixcol();

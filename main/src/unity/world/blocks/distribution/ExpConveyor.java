@@ -7,6 +7,7 @@ public class ExpConveyor extends Conveyor{
 
     public ExpConveyor(String name){
         super(name);
+        absorbLasers = true; //an internal flag telling expconveyors apart, also makes lasers less viable against koruh
     }
 
     @Override
