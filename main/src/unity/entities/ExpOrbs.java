@@ -102,6 +102,7 @@ public class ExpOrbs{
             hitEffect = Fx.none;
             shootEffect = Fx.none;
             despawnEffect = UnityFx.orbDespawn;
+            layer = Layer.bullet - 0.01f;
         }
 
         private ExpOrb(){}
@@ -117,6 +118,7 @@ public class ExpOrbs{
             for(var i = 0; i < 4; i++){
                 Drawf.tri(b.x, b.y, 4f, 4f + 1.5f * Mathf.sin(Time.time * 0.12f + b.id * 3f), i * 90 + Mathf.sin(Time.time * 0.04f + b.id * 5f) * 28f);
             }
+            Draw.color();
         }
 
         @Override

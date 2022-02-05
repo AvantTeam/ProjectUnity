@@ -68,10 +68,9 @@ public class ExpTower extends ExpTank {
     }
 
     @Override
-    public void drawRequestConfig(BuildPlan req, Eachable<BuildPlan> list){
-        if(!req.worldContext) return;
-        Draw.mixcol();
-        drawPlaceDash(req.x, req.y, req.rotation);
+    public void drawPlace(int x, int y, int rotation, boolean valid){
+        super.drawPlace(x, y, rotation, valid);
+        drawPlaceDash(x, y, rotation);
     }
 
     @Override

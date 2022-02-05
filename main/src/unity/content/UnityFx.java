@@ -214,6 +214,41 @@ public class UnityFx{
         Fill.circle(e.x, e.y, e.fin() * 13);
     }),
 
+    craft = new Effect(10, e -> {
+        color(Pal.accent, Color.gray, e.fin());
+        stroke(1);
+        spikes(e.x, e.y, e.fin() * 4, 1.5f, 6);
+    }),
+
+    denseCraft = new Effect(10, e -> {
+        color(UnityPal.dense, Color.gray, e.fin());
+        stroke(1);
+        spikes(e.x, e.y, e.finpow() * 4.5f, 1f, 6);
+    }),
+
+    diriumCraft = new Effect(10, e -> {
+        color(Color.white, UnityPal.dirium, e.fin());
+        stroke(1);
+        spikes(e.x, e.y, e.fin() * 4, 1.5f, 6);
+    }),
+
+    longSmoke = new Effect(80f, e -> {
+        color(Color.gray, Color.clear, e.fin());
+        randLenVectors(e.id, 2, 4 + e.fin() * 4, (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, 0.2f + e.fin() * 4);
+        });
+    }).layer(Layer.flyingUnit - 1f),
+
+    blockMelt = new Effect(400f, e -> {
+        color(Color.coral, Color.orange, Mathf.absin(3f, 1f));
+        integer = 0;
+        float f = Mathf.clamp(e.finpow() * 5f);
+        randLenVectors(e.id, 15, 2 + f * f * 6f, (x, y) -> {
+            integer++;
+            Fill.circle(e.x + x, e.y + y, 0.01f + e.fout() * Mathf.randomSeed(e.id + integer, 3f, 5f));
+        });
+    }),
+
     craftingEffect = new Effect(67f, 35f, e -> {
         float value = Mathf.randomSeed(e.id);
 

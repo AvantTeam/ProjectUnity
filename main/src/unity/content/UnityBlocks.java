@@ -134,7 +134,7 @@ public class UnityBlocks{
     //---------- koruh faction ----------
     public static @FactionDef("koruh") Block
     //crafting
-    solidifier, steelSmelter, liquifier, titaniumExtractor,
+    denseSmelter, solidifier, steelSmelter, liquifier, titaniumExtractor, lavaSmelter, diriumCrucible,
 
     //defense
     stoneWall, denseWall, steelWall, steelWallLarge, diriumWall, diriumWallLarge,
@@ -1324,6 +1324,26 @@ public class UnityBlocks{
         //endregion
         //region koruh
 
+        denseSmelter = new KoruhCrafter("dense-smelter"){{
+            requirements(Category.crafting, with(Items.copper, 30, Items.lead, 20, UnityItems.stone, 35));
+
+            health = 70;
+            hasItems = true;
+            craftTime = 46.2f;
+            craftEffect = UnityFx.denseCraft;
+            itemCapacity = 10;
+
+            outputItem = new ItemStack(UnityItems.denseAlloy, 1);
+            consumes.items(with(Items.copper, 1, Items.lead, 2, Items.coal, 1));
+
+            expUse = 2;
+            expCapacity = 24;
+            drawer = new DrawExp(){{
+                flame = Color.orange;
+                glowAmount = 1f;
+            }};
+        }};
+
         solidifier = new LiquidsSmelter("solidifier"){{
             requirements(Category.crafting, with(Items.copper, 20, UnityItems.denseAlloy, 30));
 
@@ -1352,7 +1372,8 @@ public class UnityBlocks{
             requirements(Category.crafting, with(Items.lead, 45, Items.silicon, 20, UnityItems.denseAlloy, 30));
             health = 140;
             itemCapacity = 10;
-            craftEffect = UnityFx.craftFx;
+            craftEffect = UnityFx.craft;
+            updateEffect = Fx.fuelburn;
             craftTime = 300f;
             outputItem = new ItemStack(UnityItems.steel, 1);
 
@@ -1368,6 +1389,27 @@ public class UnityBlocks{
                     Draw.reset();
                 }
             };
+        }};
+
+        lavaSmelter = new MeltingCrafter("lava-smelter"){{
+            requirements(Category.crafting, with(Items.silicon, 70, UnityItems.denseAlloy, 60, UnityItems.steel, 40));
+
+            health = 190;
+            hasLiquids = true;
+            hasItems = true;
+            craftTime = 70f;
+            updateEffect = Fx.fuelburn;
+            craftEffect = UnityFx.craft;
+            itemCapacity = 21;
+
+            outputItem = new ItemStack(UnityItems.steel, 5);
+            consumes.items(with(Items.graphite, 7, UnityItems.denseAlloy, 7));
+            consumes.power(2f);
+            consumes.liquid(UnityLiquids.lava, 0.4f);
+
+            expUse = 10;
+            expCapacity = 60;
+            drawer = new DrawLiquid();
         }};
 
         liquifier = new BurnerSmelter("liquifier"){{
@@ -1425,6 +1467,28 @@ public class UnityBlocks{
                     Draw.reset();
                 }
             };
+        }};
+
+        diriumCrucible = new KoruhCrafter("dirium-crucible"){{
+            requirements(Category.crafting, with(Items.plastanium, 60, UnityItems.stone, 90, UnityItems.denseAlloy, 90, UnityItems.steel, 150));
+
+            health = 320;
+            hasItems = true;
+            craftTime = 250f;
+            craftEffect = UnityFx.diriumCraft;
+            itemCapacity = 40;
+            ambientSound = Sounds.techloop;
+            ambientSoundVolume = 0.02f;
+
+            outputItem = new ItemStack(UnityItems.dirium, 1);
+            consumes.items(with(Items.titanium, 6, Items.pyratite, 3, Items.surgeAlloy, 3, UnityItems.steel, 9));
+            consumes.power(8.28f);
+
+            expUse = 40;
+            expCapacity = 160;
+            ignoreExp = false;
+            craftDamage = 0;
+            drawer = new DrawExp();
         }};
 
         stoneWall = new LimitWall("ustone-wall"){{
@@ -1818,7 +1882,7 @@ public class UnityBlocks{
         }};
 
         expTowerDiagonal = new DiagonalTower("diagonal-tower"){{
-            requirements(Category.effect, with(UnityItems.denseAlloy, 10, Items.silicon, 5));
+            requirements(Category.effect, with(UnityItems.steel, 10, Items.silicon, 5));
             range = 7;
             expCapacity = 150;
         }};

@@ -6,6 +6,7 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.content.*;
@@ -46,6 +47,7 @@ public class ExpTurret extends Turret {
 
     protected @Nullable EField<Float> rangeField = null;//special field, it is special because it's the only one used for drawing stuff
     protected float rangeStart, rangeEnd;
+    private Seq<Building> seqs = new Seq<>();//uwagh
 
     public ExpTurret(String name){
         super(name);
@@ -118,7 +120,7 @@ public class ExpTurret extends Turret {
 
     @Override
     public boolean canReplace(Block other){
-        return super.canReplace(other) || (pregrade != null && other == pregrade); //todo fix 2x2->4x4 placement
+        return super.canReplace(other) || (pregrade != null && other == pregrade);
     }
 
     @Override
@@ -129,7 +131,14 @@ public class ExpTurret extends Turret {
         CoreBlock.CoreBuild core = team.core();
         //must have all requirements
         if(core == null || (!state.rules.infiniteResources && !core.items.has(requirements, state.rules.buildCostMultiplier))) return false;
-        return (tile.block() == pregrade && ((ExpTurretBuild) tile.build).level() >= pregradeLevel);
+
+        //check is there is ONLY a single pregrade block INSIDE all the tiles it will replace - by tracking SEQS. This protocol is also known as UWAGH standard.
+        seqs.clear();
+        tile.getLinkedTilesAs(this, inside -> {
+            if(inside.build == null || seqs.contains(inside.build) || seqs.size > 1) return; //no point of checking if there are already two in seqs
+            if(tile.block() == pregrade && ((ExpTurretBuild) tile.build).level() >= pregradeLevel) seqs.add(tile.build);
+        });
+        return seqs.size == 1; //no more, no less; a healthy monogamous relationship.
     }
 
     @Override
@@ -165,6 +174,7 @@ public class ExpTurret extends Turret {
 
     public class ExpTurretBuild extends TurretBuild implements ExpHolder {
         public int exp;
+        public @Nullable ExpOutput.ExpOutputBuild hub = null;
 
         @Override
         public int getExp(){
@@ -300,6 +310,11 @@ public class ExpTurret extends Turret {
             super.read(read, revision);
             exp = read.i();
             if(exp > maxExp) exp = maxExp;
+        }
+
+        //hub methods
+        public boolean hubValid(){
+            return hub != null && !hub.dead; //todo hub.links.contains this
         }
     }
 
