@@ -21,12 +21,12 @@ import unity.graphics.*;
 
 import static mindustry.Vars.*;
 
+//TODO is there REALLY no other way than to copy & paste ExpTurret's code here? What if we use annos to generate ExpTurret using this code?
 /** Serves as a base fore EXP producers that also level up and receives stat bonuses.
  * @implNote Replaces {@link Block}
  * @apiNote This block serves as the direct parent of a purposed block class (i.e. the original block class should extend off of Block); for blocks that have {@link Block} as its grandparent or more, create a new class like {@link ExpTurret}!
  * @author sunny
  */
-//todo make the methods static to make it add-on-able to extended classes (so ExpOverdriveProjector is an instanceof OverdriveProjector)
 public class ExpBase extends Block {
     public int maxLevel = 10; //must be below 200
     public int maxExp;
@@ -49,7 +49,7 @@ public class ExpBase extends Block {
         super.init();
         if(expFields == null) expFields = new EField[]{};
         maxExp = requiredExp(maxLevel);
-        if(expLevel(maxExp) < maxLevel) maxLevel++; //floating point error
+        if(expLevel(maxExp) < maxLevel) maxExp++; //floating point error
 
         setEFields(0);
 
@@ -141,6 +141,8 @@ public class ExpBase extends Block {
 
     public class ExpBaseBuild extends Building implements ExpHolder {
         public int exp;
+        public @Nullable
+        ExpHub.ExpHubBuild hub = null;
 
         @Override
         public int getExp(){
@@ -232,6 +234,11 @@ public class ExpBase extends Block {
         public void read(Reads read, byte revision){
             super.read(read, revision);
             exp = read.i();
+        }
+
+        //hub methods
+        public boolean hubValid(){
+            return hub != null && !hub.dead && hub.links.contains(pos());
         }
     }
 }

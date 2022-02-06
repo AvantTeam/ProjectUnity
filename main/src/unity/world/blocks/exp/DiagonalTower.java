@@ -35,6 +35,7 @@ public class DiagonalTower extends ExpTower{
     @Override
     public void drawRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
         Draw.rect(topRegion, req.drawx(), req.drawy());
+        drawRequestConfig(req, list);
     }
 
     @Override
@@ -47,17 +48,19 @@ public class DiagonalTower extends ExpTower{
         if(!req.worldContext) return;
         Draw.rect(region, req.drawx(), req.drawy(), req.rotation * 90 - 90 + (req.config instanceof Boolean b && b ? 45 : 0));
         Draw.mixcol();
-        if(req.config instanceof Boolean b && b){
-            int dx = d8edge(req.rotation).x, dy = d8edge(req.rotation).y;
+        if(req.config instanceof Boolean b){
+            if(b){
+                int dx = d8edge(req.rotation).x, dy = d8edge(req.rotation).y;
 
-            Drawf.dashLine(UnityPal.exp,
-                    req.x * tilesize + dx * (tilesize / 2f + 2),
-                    req.y * tilesize + dy * (tilesize / 2f + 2),
-                    req.x * tilesize + dx * range * tilesize,
-                    req.y * tilesize + dy * range * tilesize
-            );
+                Drawf.dashLine(UnityPal.exp,
+                        req.x * tilesize + dx * (tilesize / 2f + 2),
+                        req.y * tilesize + dy * (tilesize / 2f + 2),
+                        req.x * tilesize + dx * range * tilesize,
+                        req.y * tilesize + dy * range * tilesize
+                );
+            }
+            else drawPlaceDash(req.x, req.y, req.rotation);
         }
-        else drawPlaceDash(req.x, req.y, req.rotation);
     }
 
     public class DiagonalTowerBuild extends ExpTowerBuild{

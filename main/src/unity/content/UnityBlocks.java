@@ -146,7 +146,7 @@ public class UnityBlocks{
     bufferPad, omegaPad, cachePad, convertPad,
 
     //TODO
-    expFountain, expVoid, expTank, expChest, expRouter, expTower, expTowerDiagonal;// expOutput, expUnloader;
+    expFountain, expVoid, expTank, expChest, expRouter, expTower, expTowerDiagonal, bufferTower;// expOutput, expUnloader;
 
     //turret
     public static @FactionDef("koruh")
@@ -1887,16 +1887,24 @@ public class UnityBlocks{
             expCapacity = 150;
         }};
 
+        bufferTower = new ExpTower("buffer-tower"){{
+            requirements(Category.effect, with(Items.thorium, 5, Items.graphite, 10));
+            manualReload = reloadTime = 20f;
+            expCapacity = 180;
+            buffer = true;
+            health = 300;
+        }};
+
         expTank = new ExpTank("exp-tank"){{
             requirements(Category.effect, with(Items.copper, 100, UnityItems.denseAlloy, 100, Items.graphite, 30));
-            expCapacity = 600;
+            expCapacity = 800;
             health = 300;
             size = 2;
         }};
 
         expChest = new ExpTank("exp-chest"){{
             requirements(Category.effect, with(Items.copper, 400, UnityItems.steel, 250, Items.phaseFabric, 120));
-            expCapacity = 3200;
+            expCapacity = 3600;
             health = 1200;
             size = 4;
         }};

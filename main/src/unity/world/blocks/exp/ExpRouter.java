@@ -19,6 +19,7 @@ public class ExpRouter extends Junction {
 
     public ExpRouter(String name){
         super(name);
+        noUpdateDisabled = false;
     }
 
     @Override
@@ -48,7 +49,7 @@ public class ExpRouter extends Junction {
 
         @Override
         public boolean acceptOrb(){
-            return reload >= reloadTime;
+            return enabled && reload >= reloadTime;
         }
 
         @Override
@@ -68,7 +69,7 @@ public class ExpRouter extends Junction {
 
         @Override
         public int handleTower(int amount, float angle){
-            if(ExpOrbs.orbs(amount) <= 0) return 0;
+            if(!enabled || ExpOrbs.orbs(amount) <= 0) return 0;
             int a = ExpOrbs.oneOrb(amount);
 
             int dir;

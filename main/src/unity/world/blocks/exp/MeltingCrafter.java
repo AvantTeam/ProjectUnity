@@ -54,7 +54,7 @@ public class MeltingCrafter extends KoruhCrafter{
                 melt -= delta() * cooldown;
                 if(melt < 0) melt = 0;
             }
-            if(Mathf.chance(Mathf.clamp(melt) * 0.3f)) smokeEffect.at(x + Mathf.range(size * 2f), y + Mathf.range(size * 2f));
+            if(Mathf.chance(Mathf.clamp(melt) * 0.1f)) smokeEffect.at(x + Mathf.range(size * 2f), y + Mathf.range(size * 2f));
             if(melt >= 1f && (liquids == null || liquids.get(lava) > 0.1f * liquidCapacity)) kill();
         }
 

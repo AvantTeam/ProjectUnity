@@ -240,12 +240,12 @@ public class UnityFx{
     }).layer(Layer.flyingUnit - 1f),
 
     blockMelt = new Effect(400f, e -> {
-        color(Color.coral, Color.orange, Mathf.absin(3f, 1f));
+        color(Color.coral, Color.orange, Mathf.absin(9f, 1f));
         integer = 0;
         float f = Mathf.clamp(e.finpow() * 5f);
-        randLenVectors(e.id, 15, 2 + f * f * 6f, (x, y) -> {
+        randLenVectors(e.id, 15, 2 + f * f * 16f, (x, y) -> {
             integer++;
-            Fill.circle(e.x + x, e.y + y, 0.01f + e.fout() * Mathf.randomSeed(e.id + integer, 3f, 5f));
+            Fill.circle(e.x + x, e.y + y, 0.01f + e.fout() * Mathf.randomSeed(e.id + integer, 2f, 6f));
         });
     }),
 
