@@ -18,7 +18,6 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
-import mindustry.world.blocks.defense.turrets.BaseTurret.*;
 import mindustry.world.blocks.environment.*;
 import unity.entities.*;
 import unity.entities.legs.*;
@@ -68,7 +67,7 @@ public class UnityUnitType extends UnitType{
      */
     public Seq<Weapon>[] segmentWeapons;
 
-    public Prov<Trail> trailType = () -> new Trail(trailLength);
+    public Func<Unit, Trail> trailType = unit -> new Trail(trailLength);
 
     // Transforms
     public Func<Unit, UnitType> toTrans;
@@ -138,15 +137,16 @@ public class UnityUnitType extends UnitType{
         Class<?> caller = ReflectUtils.classCaller();
         boolean fromWave = caller != null && SpawnGroup.class.isAssignableFrom(caller);
 
-        if(unit instanceof Trailc e){
-            Log.info("set.");
-            e.trail(trailType.get());
+        if(unit instanceof Trailc){
+            try{
+                ReflectUtils.setField(unit, ReflectUtils.findField(unit.getClass(), "trail", true), trailType.get(unit));
+            }catch(Throwable ignored){}
         }
 
-        if(unit instanceof WaterMovec e){
+        if(unit instanceof WaterMovec){
             try{
-                ReflectUtils.setField(unit, ReflectUtils.findField(unit.getClass(), "tleft", true), trailType.get());
-                ReflectUtils.setField(unit, ReflectUtils.findField(unit.getClass(), "tright", true), trailType.get());
+                ReflectUtils.setField(unit, ReflectUtils.findField(unit.getClass(), "tleft", true), trailType.get(unit));
+                ReflectUtils.setField(unit, ReflectUtils.findField(unit.getClass(), "tright", true), trailType.get(unit));
             }catch(Throwable ignored){}
         }
 

@@ -1,4 +1,4 @@
-sourceSets.main {
+sourceSets.main{
     java.srcDirs = ['src/']
     resources.srcDirs = ['assets/']
 }
@@ -6,12 +6,12 @@ sourceSets.main {
 sourceCompatibility = 8
 targetCompatibility = 8
 
-dependencies {
+dependencies{
     implementation "com.github.Anuken.Mindustry:core:$mindustryVersion"
     implementation "com.squareup:javapoet:$javapoetVersion"
 }
 
-tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile){
     sourceCompatibility = 8
     targetCompatibility = 8
 }

@@ -1,5 +1,6 @@
 package unity.graphics;
 
+import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.util.*;
@@ -11,6 +12,7 @@ import mindustry.graphics.*;
  */
 public class MultiTrail extends Trail{
     public TrailHold[] trails;
+    public Floatp rotation;
 
     protected float lastX, lastY;
 
@@ -41,12 +43,12 @@ public class MultiTrail extends Trail{
 
     @Override
     public void drawCap(Color color, float width){
-        for(TrailHold trail : trails) trail.trail.drawCap(color, width * trail.width);
+        for(TrailHold trail : trails) trail.trail.drawCap(trail.color == null ? color : trail.color, width * trail.width);
     }
 
     @Override
     public void draw(Color color, float width){
-        for(TrailHold trail : trails) trail.trail.draw(color, width * trail.width);
+        for(TrailHold trail : trails) trail.trail.draw(trail.color == null ? color : trail.color, width * trail.width);
     }
 
     @Override
@@ -56,9 +58,9 @@ public class MultiTrail extends Trail{
 
     @Override
     public void update(float x, float y, float width){
-        float angle = Angles.angle(lastX, lastY, x, y);
+        float angle = (rotation == null ? Angles.angle(lastX, lastY, x, y) : rotation.get()) - 90f;
         for(TrailHold trail : trails){
-            Tmp.v1.trns(angle - 90f, trail.x, trail.y);
+            Tmp.v1.trns(angle, trail.x, trail.y);
             trail.trail.update(x + Tmp.v1.x, y + Tmp.v1.y, width * trail.width);
         }
 
@@ -71,13 +73,14 @@ public class MultiTrail extends Trail{
         public float x;
         public float y;
         public float width;
+        public Color color;
 
         public TrailHold(Trail trail){
-            this(trail, 0f, 0f, 1f);
+            this(trail, 0f, 0f, 1f, null);
         }
 
         public TrailHold(Trail trail, float x, float y){
-            this(trail, x, y, 1f);
+            this(trail, x, y, 1f, null);
         }
 
         public TrailHold(Trail trail, float x, float y, float width){
@@ -85,6 +88,14 @@ public class MultiTrail extends Trail{
             this.x = x;
             this.y = y;
             this.width = width;
+        }
+
+        public TrailHold(Trail trail, float x, float y, float width, Color color){
+            this.trail = trail;
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.color = color;
         }
     }
 }

@@ -8,11 +8,8 @@ build/
 
 # Project
 main/assets/sprites/
-main/fetched
-main/fetch.txt
 
 # IDE-specific
 .idea/
 .vscode/
 .kateproject
-launch

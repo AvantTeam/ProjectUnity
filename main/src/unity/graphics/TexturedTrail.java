@@ -19,10 +19,12 @@ public class TexturedTrail extends Trail{
     public TextureRegion capRegion;
     /** The trail's width shrink as it goes, in percentage. `1f` makes the trail triangle-shaped. */
     public float shrink = 1f;
+    /** The trail's alpha as it goes, in percentage. `1f` makes the trail's tail completely invisible. */
+    public float fadeAlpha;
     /** The trail's mix color alpha, used in {@link #draw(Color, float)}. Fades as the trail goes. */
     public float mixAlpha = 0.5f;
-    /** If the updated position does not make a range beyond this value, a new point will not be added. */
-    public float minDist = 1.5f;
+    /** The trail's blending. */
+    public Blending blend = Blending.normal;
 
     private static final float[] vertices = new float[24];
 
@@ -73,7 +75,7 @@ public class TexturedTrail extends Trail{
 
     @Override
     public void drawCap(Color color, float width){
-        if(capRegion == null) capRegion = Core.atlas.find("circle-shadow");
+        if(capRegion == null) capRegion = Core.atlas.find("circle");
 
         int psize = points.size;
         if(psize > 0){
@@ -100,8 +102,9 @@ public class TexturedTrail extends Trail{
         float
             endAngle = this.lastAngle, lastAngle = endAngle,
             size = width / (psize / 4f), fracOffset = psize - psize * shrink, fracStride = 1f - fracOffset / psize,
-            u = region.u, v = region.v, u2 = region.u2, v2 = region.v2, col = Draw.getColor().toFloatBits();
+            u = region.u, v = region.v, u2 = region.u2, v2 = region.v2;
 
+        Draw.blend(blend);
         for(int i = 0; i < psize; i += 4){
             float
                 x1 = items[i], y1 = items[i + 1], w1 = items[i + 2], rv1 = items[i + 3],
@@ -120,8 +123,7 @@ public class TexturedTrail extends Trail{
             }
 
             float
-                z2 = i == psize - 4 ? endAngle :
- -Angles.angleRad(x1, y1, x2, y2), z1 = i == 0 ? z2 : lastAngle,
+                z2 = i == psize - 4 ? endAngle : -Angles.angleRad(x1, y1, x2, y2), z1 = i == 0 ? z2 : lastAngle,
                 fs1 = ((fracOffset + i * fracStride) / 4f) * size * w1,
                 fs2 = ((fracOffset + (i + 4f) * fracStride) / 4f) * size * w2,
 
@@ -129,33 +131,35 @@ public class TexturedTrail extends Trail{
                 nx = Mathf.sin(z2) * fs2, ny = Mathf.cos(z2) * fs2,
 
                 mv1 = Mathf.lerp(v2, v, rv1), mv2 = Mathf.lerp(v2, v, rv2),
+                col1 = Tmp.c1.set(Draw.getColor()).a(rv1 * fadeAlpha + (1f - fadeAlpha)).toFloatBits(),
+                col2 = Tmp.c1.set(Draw.getColor()).a(rv2 * fadeAlpha + (1f - fadeAlpha)).toFloatBits(),
                 mix1 = Tmp.c1.set(color).a(rv1 * mixAlpha).toFloatBits(),
                 mix2 = Tmp.c1.set(color).a(rv2 * mixAlpha).toFloatBits();
 
             vertices[0] = x1 - cx;
             vertices[1] = y1 - cy;
-            vertices[2] = col;
+            vertices[2] = col1;
             vertices[3] = u;
             vertices[4] = mv1;
             vertices[5] = mix1;
 
             vertices[6] = x1 + cx;
             vertices[7] = y1 + cy;
-            vertices[8] = col;
+            vertices[8] = col1;
             vertices[9] = u2;
             vertices[10] = mv1;
             vertices[11] = mix1;
 
             vertices[12] = x2 + nx;
             vertices[13] = y2 + ny;
-            vertices[14] = col;
+            vertices[14] = col2;
             vertices[15] = u2;
             vertices[16] = mv2;
             vertices[17] = mix2;
 
             vertices[18] = x2 - nx;
             vertices[19] = y2 - ny;
-            vertices[20] = col;
+            vertices[20] = col2;
             vertices[21] = u;
             vertices[22] = mv2;
             vertices[23] = mix2;
@@ -163,6 +167,7 @@ public class TexturedTrail extends Trail{
             Draw.vert(region.texture, vertices, 0, 24);
             lastAngle = z2;
         }
+        Draw.blend();
     }
 
     @Override
@@ -171,6 +176,8 @@ public class TexturedTrail extends Trail{
             if(points.size >= 4) points.removeRange(0, 3);
             counter %= 1f;
         }
+
+        calcProgress();
     }
 
     @Override
@@ -179,7 +186,7 @@ public class TexturedTrail extends Trail{
             if(points.size > length * 4) points.removeRange(0, 3);
 
             counter %= 1f;
-            if(Mathf.dst(lastX, lastY, x, y) >= minDist) points.add(x, y, width, 0f);
+            points.add(x, y, width, 0f);
         }
 
         lastAngle = -Angles.angleRad(x, y, lastX, lastY);
@@ -187,6 +194,10 @@ public class TexturedTrail extends Trail{
         lastY = y;
         lastW = width;
 
+        calcProgress();
+    }
+
+    public void calcProgress(){
         int psize = points.size;
         if(psize > 0){
             float[] items = points.items;
