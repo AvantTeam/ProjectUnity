@@ -124,7 +124,10 @@ public class UnityBlocks{
     orb, shockwire, current, plasma, electrobomb, shielder,
 
     //power
-    powerPlant, absorber;
+    powerPlant, absorber,
+
+    //yes
+    piper;
 
     //crafting
     public static @FactionDef("imber")
@@ -1320,6 +1323,12 @@ public class UnityBlocks{
         }};
 
         electroTile = new Floor("electro-tile");
+
+        piper = new UnderPiper("piper", 80){{
+            requirements(Category.distribution, with(Items.copper, 1));
+
+            size = 4;
+        }};
 
         //endregion
         //region koruh

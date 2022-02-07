@@ -33,6 +33,7 @@ import unity.map.cinematic.*;
 import unity.map.objectives.*;
 import unity.mod.*;
 import unity.sync.*;
+import unity.type.UnderworldBlock;
 import unity.ui.*;
 import unity.ui.dialogs.*;
 import unity.util.*;
