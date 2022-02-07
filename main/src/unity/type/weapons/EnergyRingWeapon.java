@@ -51,7 +51,8 @@ public class EnergyRingWeapon extends LimitedAngleWeapon{
         Tmp.v1.trns(rot, x, y).add(unit);
 
         for(Ring ring : rings){
-            float rotation = ring.rotate ? (m.time * Mathf.signs[ring.flip ^ unit.id % 2 == 0 ? 0 : 1]) : (rot + mount.rotation);
+            int sign = Mathf.sign(ring.flip ^ unit.id % 2 == 0);
+            float rotation = ring.angleOffset * sign + (ring.rotate ? (m.time * sign) : (rot + mount.rotation));
 
             Lines.stroke(ring.thickness, ring.color);
             for(int i = 0; i < ring.divisions; i++){
@@ -87,6 +88,7 @@ public class EnergyRingWeapon extends LimitedAngleWeapon{
         /** If false, the ring uses the weapon mount rotation instead. */
         public boolean rotate = true;
         public float rotateSpeed = 2f;
+        public float angleOffset = 0f;
         public boolean flip;
 
         public int divisions = 1;

@@ -4230,6 +4230,7 @@ public class UnityUnitTypes{
                 blend = Blending.additive;
                 shrink = 0f;
                 fadeAlpha = 1f;
+                layer = Layer.flyingUnitLow;
             }};
 
             engineColor = UnityPal.monolithLight;
@@ -4271,6 +4272,7 @@ public class UnityUnitTypes{
                     thickness = 1f;
                     divisions = 2;
                     divisionSeparation = 30f;
+                    angleOffset = 90f;
                     color = UnityPal.monolith;
                 }});
 
@@ -4286,28 +4288,28 @@ public class UnityUnitTypes{
                 eyeRadius = 1.5f;
 
                 shootSound = UnitySounds.energyBolt;
-                bullet = new BasicBulletType(1f, 6f, "circle"){
+                bullet = new BasicBulletType(1f, 6f, "shell"){
                     {
                         drag = -0.08f;
                         lifetime = 35f;
-                        width = 4f;
-                        height = 6f;
-                        trailWidth = 2f;
-                        trailLength = 6;
-                        frontColor = trailColor = UnityPal.monolith;
+                        width = 8f;
+                        height = 13f;
+
                         homingDelay = 6f;
                         homingPower = 0.09f;
                         homingRange = 160f;
                         weaveMag = 6f;
                         keepVelocity = false;
+
+                        frontColor = trailColor = UnityPal.monolith;
+                        backColor = UnityPal.monolithDark;
+                        trailChance = 0.3f;
+                        trailParam = 1.5f;
+                        trailWidth = 2f;
+                        trailLength = 6;
+
                         shootEffect = Fx.lightningShoot;
                         hitEffect = despawnEffect = Fx.hitLancer;
-                    }
-
-                    @Override
-                    public void load(){
-                        super.load();
-                        backRegion = Core.atlas.find("clear");
                     }
 
                     @Override
