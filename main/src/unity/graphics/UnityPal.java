@@ -61,6 +61,10 @@ public class UnityPal{
     lancerSap4 = Pal.lancerLaser.cpy().lerp(Pal.sapBullet, 0.667f),
     lancerSap5 = Pal.lancerLaser.cpy().lerp(Pal.sapBullet, 0.833f),
 
+    lancerDir1 = Pal.lancerLaser.cpy().lerp(diriumLight, 0.25f),
+    lancerDir2 = Pal.lancerLaser.cpy().lerp(diriumLight, 0.5f),
+    lancerDir3 = Pal.lancerLaser.cpy().lerp(diriumLight, 0.75f),
+
     youngchaGray = valueOf("555555"),
 
 

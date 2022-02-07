@@ -21,12 +21,12 @@ import unity.graphics.*;
 
 import static mindustry.Vars.*;
 
-//TODO is there REALLY no other way than to copy & paste ExpTurret's code here? What if we use annos to generate ExpTurret using this code?
 /** Serves as a base fore EXP producers that also level up and receives stat bonuses.
  * @implNote Replaces {@link Block}
  * @apiNote This block serves as the direct parent of a purposed block class (i.e. the original block class should extend off of Block); for blocks that have {@link Block} as its grandparent or more, create a new class like {@link ExpTurret}!
  * @author sunny
  */
+@Deprecated
 public class ExpBase extends Block {
     public int maxLevel = 10; //must be below 200
     public int maxExp;

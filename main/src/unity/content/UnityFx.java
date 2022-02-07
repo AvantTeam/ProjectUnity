@@ -249,6 +249,39 @@ public class UnityFx{
         });
     }),
 
+    absorb = new Effect(12, e -> {
+        color(e.color);
+        stroke(2f * e.fout());
+        Lines.circle(e.x, e.y, 5f * e.fout());
+    }),
+
+    deflect = new Effect(12, e -> {
+        color(Color.white, e.color, e.fin());
+        stroke(2f * e.fout());
+        randLenVectors(e.id, 4, 0.1f + 8f * e.fout(), e.rotation, 60f, (x, y) ->
+                lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fout() * 3f + 1f)
+        );
+    }),
+
+    forceShrink = new Effect(20, e -> {
+        color(e.color, e.fout());
+        if(Vars.renderer.animateShields){
+            Fill.poly(e.x, e.y, circleVertices(e.rotation * e.fout()), e.rotation * e.fout());
+        }else{
+            stroke(1.5f);
+            alpha(0.09f);
+            Fill.circle(e.x, e.y, e.rotation * e.fout());
+            alpha(1f);
+            Lines.circle(e.x, e.y,e.rotation * e.fout());
+        }
+    }).layer(Layer.shields),
+
+    shieldBreak = new Effect(40, e -> {
+        color(e.color);
+        stroke(3f * e.fout());
+        Lines.circle(e.x, e.y, e.rotation + e.fin());
+    }).followParent(true),
+
     craftingEffect = new Effect(67f, 35f, e -> {
         float value = Mathf.randomSeed(e.id);
 

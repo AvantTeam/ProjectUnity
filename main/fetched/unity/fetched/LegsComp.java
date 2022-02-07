@@ -1,0 +1,188 @@
+package unity.fetched;
+
+import arc.math.*;
+import arc.math.geom.*;
+import arc.util.*;
+import mindustry.*;
+import mindustry.ai.*;
+import unity.annotations.Annotations.*;
+import mindustry.content.*;
+import mindustry.entities.*;
+import mindustry.entities.EntityCollisions.*;
+import mindustry.game.*;
+import mindustry.gen.*;
+import mindustry.graphics.*;
+import mindustry.type.*;
+import mindustry.world.blocks.environment.*;
+
+@EntityComponent(write = false)
+abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
+    @Import float x, y;
+    @Import UnitType type;
+    @Import Team team;
+
+    transient Leg[] legs = {};
+    transient float totalLength;
+    transient float moveSpace;
+    transient float baseRotation;
+    transient Floor lastDeepFloor;
+
+    @Replace
+    @Override
+    public SolidPred solidity(){
+        return type.allowLegStep ? EntityCollisions::legsSolid : EntityCollisions::solid;
+    }
+
+    @Override
+    @Replace
+    public int pathType(){
+        return type.allowLegStep ? Pathfinder.costLegs : Pathfinder.costGround;
+    }
+
+    @Override
+    @Replace
+    public Floor drownFloor(){
+        return lastDeepFloor;
+    }
+
+    @Override
+    public void add(){
+        resetLegs();
+    }
+
+    @Override
+    public void unloaded(){
+        resetLegs(1f);
+    }
+
+    public void resetLegs(){
+        resetLegs(type.legLength);
+    }
+
+    public void resetLegs(float legLength){
+        float rot = baseRotation;
+        int count = type.legCount;
+
+        this.legs = new Leg[count];
+
+        float spacing = 360f / count;
+
+        for(int i = 0; i < legs.length; i++){
+            Leg l = new Leg();
+
+            l.joint.trns(i * spacing + rot, legLength/2f + type.legBaseOffset).add(x, y);
+            l.base.trns(i * spacing + rot, legLength + type.legBaseOffset).add(x, y);
+
+            legs[i] = l;
+        }
+    }
+
+    @Override
+    public void update(){
+        if(Mathf.dst(deltaX(), deltaY()) > 0.001f){
+            baseRotation = Angles.moveToward(baseRotation, Mathf.angle(deltaX(), deltaY()), type.rotateSpeed);
+        }
+
+        float rot = baseRotation;
+        float legLength = type.legLength;
+
+        //set up initial leg positions
+        if(legs.length != type.legCount){
+            resetLegs();
+        }
+
+        float moveSpeed = type.legSpeed;
+        int div = Math.max(legs.length / type.legGroupSize, 2);
+        moveSpace = legLength / 1.6f / (div / 2f) * type.legMoveSpace;
+        totalLength += Mathf.dst(deltaX(), deltaY());
+
+        float trns = moveSpace * 0.85f * type.legTrns;
+
+        //rotation + offset vector
+        Vec2 moveOffset = Tmp.v4.trns(rot, trns);
+        boolean moving = moving();
+
+        lastDeepFloor = null;
+        int deeps = 0;
+
+        for(int i = 0; i < legs.length; i++){
+            float dstRot = legAngle(rot, i);
+            Vec2 baseOffset = Tmp.v5.trns(dstRot, type.legBaseOffset).add(x, y);
+            Leg l = legs[i];
+
+            l.joint.sub(baseOffset).limit(type.maxStretch * legLength/2f).add(baseOffset);
+            l.base.sub(baseOffset).limit(type.maxStretch * legLength).add(baseOffset);
+
+            float stageF = (totalLength + i*type.legPairOffset) / moveSpace;
+            int stage = (int)stageF;
+            int group = stage % div;
+            boolean move = i % div == group;
+            boolean side = i < legs.length/2;
+            //back legs have reversed directions
+            boolean backLeg = Math.abs((i + 0.5f) - legs.length/2f) <= 0.501f;
+            if(backLeg && type.flipBackLegs) side = !side;
+
+            l.moving = move;
+            l.stage = moving ? stageF % 1f : Mathf.lerpDelta(l.stage, 0f, 0.1f);
+
+            Floor floor = Vars.world.floorWorld(l.base.x, l.base.y);
+            if(floor.isDeep()){
+                deeps ++;
+                lastDeepFloor = floor;
+            }
+
+            if(l.group != group){
+
+                //create effect when transitioning to a group it can't move in
+                if(!move && i % div == l.group){
+                    if(floor.isLiquid){
+                        floor.walkEffect.at(l.base.x, l.base.y, type.rippleScale, floor.mapColor);
+                        floor.walkSound.at(x, y, 1f, floor.walkSoundVolume);
+                    }else{
+                        Fx.unitLandSmall.at(l.base.x, l.base.y, type.rippleScale, floor.mapColor);
+                    }
+
+                    //shake when legs contact ground
+                    if(type.landShake > 0){
+                        Effect.shake(type.landShake, type.landShake, l.base);
+                    }
+
+                    if(type.legSplashDamage > 0){
+                        Damage.damage(team, l.base.x, l.base.y, type.legSplashRange, type.legSplashDamage, false, true);
+                    }
+                }
+
+                l.group = group;
+            }
+
+            //leg destination
+            Vec2 legDest = Tmp.v1.trns(dstRot, legLength * type.legLengthScl).add(baseOffset).add(moveOffset);
+            //join destination
+            Vec2 jointDest = Tmp.v2;//.trns(rot2, legLength / 2f + type.legBaseOffset).add(moveOffset);
+            InverseKinematics.solve(legLength/2f, legLength/2f, Tmp.v6.set(l.base).sub(baseOffset), side, jointDest);
+            jointDest.add(baseOffset);
+            //lerp between kinematic and linear
+            jointDest.lerp(Tmp.v6.set(baseOffset).lerp(l.base, 0.5f), 1f - type.kinematicScl);
+
+            if(move){
+                float moveFract = stageF % 1f;
+
+                l.base.lerpDelta(legDest, moveFract);
+                l.joint.lerpDelta(jointDest, moveFract / 2f);
+            }
+
+            l.joint.lerpDelta(jointDest, moveSpeed / 4f);
+        }
+
+        //when at least 1 leg is touching land, it can't drown
+        if(deeps != legs.length){
+            lastDeepFloor = null;
+        }
+    }
+
+    /** @return outwards facing angle of leg at the specified index. */
+    float legAngle(float rotation, int index){
+        return rotation + 360f / legs.length * index + (360f / legs.length / 2f);
+    }
+
+}

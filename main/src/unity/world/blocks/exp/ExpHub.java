@@ -2,6 +2,7 @@ package unity.world.blocks.exp;
 
 import arc.*;
 import arc.graphics.g2d.*;
+import arc.math.*;
 import arc.struct.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -38,7 +39,7 @@ public class ExpHub extends ExpTank{
             else{
                 return;
             }
-            //entity.sanitize();
+            entity.sanitize();
         });
         configClear((ExpHubBuild entity) -> {
             entity.links.clear();
@@ -60,9 +61,8 @@ public class ExpHub extends ExpTank{
     public boolean linkValid(Building tile, Building link){
         if(tile == link || link == null || tile.team != link.team || link.dead) return false;
 
-        return tile.dst2(link) <= range * range && (
-                (link instanceof ExpTurret.ExpTurretBuild e && (e.hubValid() == (e.hub == tile)))
-                || (link instanceof ExpBase.ExpBaseBuild e2 && (e2.hubValid() == (e2.hub == tile))));
+        return tile.dst2(link) <= range * range &&
+                (link instanceof ExpHolder e && e.hubbable() && e.canHub(tile));
     }
 
     @Override
@@ -73,10 +73,29 @@ public class ExpHub extends ExpTank{
     public class ExpHubBuild extends ExpTankBuild {
         public IntSeq links = new IntSeq();
 
+        public int takeAmount(int e){
+            if(e <= 0) return 0;
+            int prefa = Mathf.ceilPositive(ratio * e);
+            return handleExp(prefa);
+        }
+
+        public void sanitize(){
+            for(int i = 0; i < links.size; i++){
+                Building b = world.build(links.get(i));
+
+                if(!linkValid(this, b) || links.get(i) != b.pos()){
+                    links.removeIndex(i);
+                    i--;
+                }
+                else if(b instanceof ExpHolder e && e.hubbable() && e.canHub(this)) e.setHub(this);
+            }
+        }
+
+
         @Override
         public void onProximityUpdate(){
             super.onProximityUpdate();
-
+            sanitize();
         }
     }
 }
