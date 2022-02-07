@@ -25,7 +25,12 @@ public class MultiTrail extends Trail{
 
     @Override
     public MultiTrail copy(){
-        return new MultiTrail(trails);
+        TrailHold[] mapped = new TrailHold[trails.length];
+        for(int i = 0; i < mapped.length; i++){
+            mapped[i] = new TrailHold(trails[i].copy());
+        }
+
+        return new MultiTrail(mapped);
     }
 
     @Override
@@ -96,6 +101,10 @@ public class MultiTrail extends Trail{
             this.y = y;
             this.width = width;
             this.color = color;
+        }
+
+        public TrailHold copy(){
+            return new TrailHold(trail.copy(), x, y, width, color);
         }
     }
 }

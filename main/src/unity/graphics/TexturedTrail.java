@@ -56,7 +56,10 @@ public class TexturedTrail extends Trail{
     public TexturedTrail copy(){
         TexturedTrail out = new TexturedTrail(region, capRegion, length);
         out.shrink = shrink;
+        out.fadeAlpha = fadeAlpha;
         out.mixAlpha = mixAlpha;
+        out.blend = blend;
+        out.layer = layer;
         out.points.addAll(points);
         out.lastX = lastX;
         out.lastY = lastY;
