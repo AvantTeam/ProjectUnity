@@ -25,6 +25,8 @@ public class TexturedTrail extends Trail{
     public float mixAlpha = 0.5f;
     /** The trail's blending. */
     public Blending blend = Blending.normal;
+    /** The trail's Z layer. */
+    public float layer = Layer.flyingUnit;
 
     private static final float[] vertices = new float[24];
 
@@ -54,7 +56,10 @@ public class TexturedTrail extends Trail{
     public TexturedTrail copy(){
         TexturedTrail out = new TexturedTrail(region, capRegion, length);
         out.shrink = shrink;
+        out.fadeAlpha = fadeAlpha;
         out.mixAlpha = mixAlpha;
+        out.blend = blend;
+        out.layer = layer;
         out.points.addAll(points);
         out.lastX = lastX;
         out.lastY = lastY;
@@ -79,6 +84,9 @@ public class TexturedTrail extends Trail{
 
         int psize = points.size;
         if(psize > 0){
+            float z = Draw.z();
+            Draw.z(layer);
+
             float[] items = points.items;
 
             int i = psize - 4;
@@ -88,6 +96,8 @@ public class TexturedTrail extends Trail{
             Draw.mixcol(color, mixAlpha);
             Draw.rect(capRegion, x1, y1, w, w, -Mathf.radDeg * lastAngle + 180f);
             Draw.mixcol();
+
+            Draw.z(z);
         }
     }
 
@@ -96,13 +106,16 @@ public class TexturedTrail extends Trail{
         if(region == null) region = Core.atlas.find("white");
         if(points.isEmpty()) return;
 
+        float z = Draw.z();
+        Draw.z(layer);
+
         float[] items = points.items;
         int psize = points.size;
 
         float
             endAngle = this.lastAngle, lastAngle = endAngle,
             size = width / (psize / 4f), fracOffset = psize - psize * shrink, fracStride = 1f - fracOffset / psize,
-            u = region.u, v = region.v, u2 = region.u2, v2 = region.v2;
+            u = region.u2, v = region.v, u2 = region.u, v2 = region.v2;
 
         Draw.blend(blend);
         for(int i = 0; i < psize; i += 4){
@@ -167,7 +180,9 @@ public class TexturedTrail extends Trail{
             Draw.vert(region.texture, vertices, 0, 24);
             lastAngle = z2;
         }
+
         Draw.blend();
+        Draw.z(z);
     }
 
     @Override
@@ -212,13 +227,14 @@ public class TexturedTrail extends Trail{
                 items[i + 3] = dst;
             }
 
+            float frac = length / (points.size / 4f);
             float first = items[3];
 
             float last = 0f;
             for(int i = 0; i < psize; i += 4){
                 float v = items[i + 3];
 
-                items[i + 3] = (v + last - first) / maxDist;
+                items[i + 3] = (v + last - first) / maxDist * frac;
                 last += v;
             }
         }
