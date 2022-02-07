@@ -146,7 +146,7 @@ public class UnityBlocks{
     bufferPad, omegaPad, cachePad, convertPad,
 
     //TODO
-    expFountain, expVoid, expTank, expChest, expRouter, expTower, expTowerDiagonal, bufferTower;// expOutput, expUnloader;
+    expFountain, expVoid, expTank, expChest, expRouter, expTower, expTowerDiagonal, bufferTower, expHub;// expOutput, expUnloader;
 
     //turret
     public static @FactionDef("koruh")
@@ -1914,6 +1914,11 @@ public class UnityBlocks{
                     new EList<>(v -> shots = v, new Integer[]{1, 1, 2, 2, 2, 3, 3, 4, 4, 5, 5}, Stat.shots),
                     new EList<>(v -> spread = v, new Float[]{0f, 0f, 5f, 10f, 15f, 7f, 14f, 8f, 10f, 6f, 9f}, null)
             };
+        }};
+
+        expHub = new ExpHub("exp-output"){{
+            requirements(Category.effect, with(UnityItems.stone, 30, Items.copper, 15));
+            expCapacity = 100;
         }};
 
         expRouter = new ExpRouter("exp-router"){{
