@@ -61,12 +61,11 @@ public class UnderPiper extends Block {
                 t.center().bottom();
 
                 t.pane(p -> {
-                    p.setWidth(Core.scene.getWidth() - p.parent.getChildren().get(1).getWidth() - 10f);
                     UnderworldMap map = new UnderworldMap();
                     map.reset();
                     map.updateAll();
                     p.add(map).grow();
-                }).width(600f).height(600f);
+                }).fill().padRight(5f);
 
                 t.table(tl -> {
                     tl.center().top();
