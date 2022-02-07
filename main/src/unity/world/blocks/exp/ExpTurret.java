@@ -342,7 +342,7 @@ public class ExpTurret extends Turret {
 
         @Override
         public boolean canHub(Building build){
-            return !hubValid() || build == hub;
+            return !hubValid() || (build != null && build == hub);
         }
 
         @Override

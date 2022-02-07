@@ -136,7 +136,7 @@ public class ExpHub extends ExpTank{
                     if(xx == x && yy == y) continue;
                     Building link = world.build(xx, yy);
 
-                    if(link != null && link.team == player.team() && !tmpe.contains(link) && link.dst2(Tmp.v1.set(x * tilesize + offset, y * tilesize + offset)) <= range * range && link instanceof ExpHolder e && e.hubbable()){
+                    if(link != null && link.team == player.team() && !tmpe.contains(link) && link.dst2(Tmp.v1.set(x * tilesize + offset, y * tilesize + offset)) <= range * range && link instanceof ExpHolder e && e.hubbable() && e.canHub(null)){
                         tmpe.add(link);
                         Drawf.square(link.x, link.y, link.block.size * tilesize / 2f + 2f, Pal.place);
                     }
@@ -341,6 +341,11 @@ public class ExpHub extends ExpTank{
         @Override
         public boolean acceptOrb(){
             return false;
+        }
+
+        @Override
+        public int handleTower(int amount, float angle){
+            return 0;
         }
     }
 }
