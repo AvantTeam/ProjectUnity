@@ -1,0 +1,111 @@
+package unity.type.weapons;
+
+import arc.graphics.*;
+import arc.graphics.g2d.*;
+import arc.math.*;
+import arc.struct.*;
+import arc.util.*;
+import mindustry.entities.units.*;
+import mindustry.gen.*;
+import mindustry.graphics.*;
+import unity.graphics.*;
+
+/**
+ * Sprite-less weapon composed of revolving energy rings.
+ * @author GlennFolker
+ */
+public class EnergyRingWeapon extends LimitedAngleWeapon{
+    public final Seq<Ring> rings = new Seq<>(4);
+
+    public float aggressionScale = 3f;
+    public float aggressionSpeed = 0.2f;
+    public float cooldownSpeed = 0.08f;
+
+    public Color eyeColor = UnityPal.monolithLight;
+    public float eyeRadius = 2.5f;
+
+    public EnergyRingWeapon(){
+        super("");
+        mountType = weapon -> new EnergyRingMount((EnergyRingWeapon)weapon);
+    }
+
+    @Override
+    public void update(Unit unit, WeaponMount mount){
+        super.update(unit, mount);
+
+        EnergyRingMount m = (EnergyRingMount)mount;
+        m.aggression = (m.target != null || m.shoot)
+            ? Mathf.lerpDelta(m.aggression, 1f, aggressionSpeed)
+            : Mathf.lerpDelta(m.aggression, 0f, cooldownSpeed);
+        m.time += Time.delta + m.aggression * Time.delta * aggressionScale;
+    }
+
+    @Override
+    public void draw(Unit unit, WeaponMount mount){
+        float z = Draw.z();
+        Draw.z(z + layerOffset);
+
+        EnergyRingMount m = (EnergyRingMount)mount;
+
+        float rot = unit.rotation - 90f;
+        Tmp.v1.trns(rot, x, y).add(unit);
+
+        for(Ring ring : rings){
+            float rotation = ring.rotate ? (m.time * Mathf.signs[ring.flip ^ unit.id % 2 == 0 ? 0 : 1]) : (rot + mount.rotation);
+
+            Lines.stroke(ring.thickness, ring.color);
+            for(int i = 0; i < ring.divisions; i++){
+                float angleStep = 360f / ring.divisions;
+                UnityDrawf.arcLine(Tmp.v1.x, Tmp.v1.y, ring.radius, ring.divisions == 1 ? 360f : angleStep - ring.divisionSeparation, rotation + angleStep * i);
+            }
+
+            for(int i = 0; i < ring.spikes; i++){
+                float spikeRotation = rotation + ring.spikeRotOffset + 360f / ring.spikes * i;
+
+                Tmp.v2.trns(spikeRotation, 0f, ring.radius + ring.spikeOffset).add(Tmp.v1);
+                Drawf.tri(Tmp.v2.x, Tmp.v2.y, ring.spikeWidth, ring.spikeLength, spikeRotation + 90f);
+            }
+        }
+
+        rot += m.rotation;
+        Tmp.v1.add(Tmp.v2.trns(rot, shootX, shootY));
+
+        Draw.color(eyeColor);
+        Fill.circle(Tmp.v1.x, Tmp.v1.y, eyeRadius);
+
+        Draw.z(z);
+    }
+
+    @Override
+    public void drawOutline(Unit unit, WeaponMount mount){}
+
+    public static class Ring{
+        public Color color = UnityPal.monolithLight;
+
+        public float thickness = 1.5f;
+        public float radius = 4.5f;
+        /** If false, the ring uses the weapon mount rotation instead. */
+        public boolean rotate = true;
+        public float rotateSpeed = 2f;
+        public boolean flip;
+
+        public int divisions = 1;
+        public float divisionSeparation = 12f;
+
+        public int spikes = 0;
+        public float spikeOffset = 1f;
+        public float spikeRotOffset;
+        public float spikeWidth = 1.5f;
+        public float spikeLength = 3f;
+    }
+
+    public static class EnergyRingMount extends WeaponMount{
+        public float time;
+        public float aggression;
+
+        public EnergyRingMount(EnergyRingWeapon weapon){
+            super(weapon);
+            rotation = weapon.defaultAngle * Mathf.sign(weapon.flipSprite);
+        }
+    }
+}
