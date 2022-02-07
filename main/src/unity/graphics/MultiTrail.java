@@ -27,7 +27,7 @@ public class MultiTrail extends Trail{
     public MultiTrail copy(){
         TrailHold[] mapped = new TrailHold[trails.length];
         for(int i = 0; i < mapped.length; i++){
-            mapped[i] = new TrailHold(trails[i].copy());
+            mapped[i] = trails[i].copy();
         }
 
         return new MultiTrail(mapped);
