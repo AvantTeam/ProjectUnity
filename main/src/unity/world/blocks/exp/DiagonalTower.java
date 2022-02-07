@@ -15,7 +15,6 @@ import static arc.math.geom.Geometry.*;
 import static mindustry.Vars.tilesize;
 import static mindustry.Vars.world;
 
-//todo make "scrolling" change the config too
 public class DiagonalTower extends ExpTower{
     public DiagonalTower(String name){
         super(name);
@@ -36,24 +35,32 @@ public class DiagonalTower extends ExpTower{
     @Override
     public void drawRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
         Draw.rect(topRegion, req.drawx(), req.drawy());
-        Draw.rect(region, req.drawx(), req.drawy(), req.rotation * 90 - 90 + (req.config instanceof Boolean b && b ? 45 : 0));
+        drawRequestConfig(req, list);
+    }
+
+    @Override
+    public void drawPlace(int x, int y, int rotation, boolean valid){
+        //nope
     }
 
     @Override
     public void drawRequestConfig(BuildPlan req, Eachable<BuildPlan> list){
         if(!req.worldContext) return;
+        Draw.rect(region, req.drawx(), req.drawy(), req.rotation * 90 - 90 + (req.config instanceof Boolean b && b ? 45 : 0));
         Draw.mixcol();
-        if(req.config instanceof Boolean b && b){
-            int dx = d8edge(req.rotation).x, dy = d8edge(req.rotation).y;
+        if(req.config instanceof Boolean b){
+            if(b){
+                int dx = d8edge(req.rotation).x, dy = d8edge(req.rotation).y;
 
-            Drawf.dashLine(UnityPal.exp,
-                    req.x * tilesize + dx * (tilesize / 2f + 2),
-                    req.y * tilesize + dy * (tilesize / 2f + 2),
-                    req.x * tilesize + dx * range * tilesize,
-                    req.y * tilesize + dy * range * tilesize
-            );
+                Drawf.dashLine(UnityPal.exp,
+                        req.x * tilesize + dx * (tilesize / 2f + 2),
+                        req.y * tilesize + dy * (tilesize / 2f + 2),
+                        req.x * tilesize + dx * range * tilesize,
+                        req.y * tilesize + dy * range * tilesize
+                );
+            }
+            else drawPlaceDash(req.x, req.y, req.rotation);
         }
-        else drawPlaceDash(req.x, req.y, req.rotation);
     }
 
     public class DiagonalTowerBuild extends ExpTowerBuild{

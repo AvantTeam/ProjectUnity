@@ -47,6 +47,7 @@ public class UnityPal{
     expBack = valueOf("4d8f07"),
     lava = valueOf("ff2a00"),
     lava2 = valueOf("ffcc00"),
+    dense = valueOf("ffbeb8"),
     dirium = valueOf("96f7c3"),
     diriumLight = valueOf("ccffe4"),
     coldColor = valueOf("6bc7ff"),
