@@ -10,6 +10,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.pooling.Pool.*;
 import arc.util.pooling.*;
+import arc.util.serialization.JsonValue;
 import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
@@ -989,4 +990,17 @@ public final class Utils{
     public interface HitHandler{
         boolean get(float x, float y, Healthc ent, boolean direct);
     }
+
+    public static void add(ValueMap o,String key, float f){
+        if(!o.has(key)){
+            o.put(key,f);
+            return;
+        }
+        o.put(key,o.getFloat(key)+f);
+    }
+    public static float getFloat(ValueMap o,String key, float defaultVal){
+        if(!o.has(key)){return defaultVal;}
+        return o.getFloat(key);
+    }
+
 }

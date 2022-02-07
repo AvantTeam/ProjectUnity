@@ -114,6 +114,23 @@ public final class ReflectUtils{
             throw new RuntimeException(e);
         }
     }
+    /** Gets a field of an model without throwing exceptions. */
+   public static Field getField(Object object, String field){
+       try{
+           return object.getClass().getDeclaredField(field);
+       }catch(Exception e){
+           throw new RuntimeException(e);
+       }
+   }
+    /** Gets a value from a field of an model without throwing exceptions. */
+    public static <T> T getFieldValue(Object object, Field field){
+        try{
+            field.setAccessible(true);
+            return (T)field.get(object);
+        }catch(Exception e){
+            throw new RuntimeException(e);
+        }
+    }
 
     /** A utility function to find a method without throwing exceptions. */
     public static Method findMethod(Class<?> type, String methodName, boolean access, Class<?>... args){

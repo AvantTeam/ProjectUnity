@@ -25,6 +25,8 @@ import unity.entities.legs.CLegType.*;
 import unity.entities.units.*;
 import unity.gen.*;
 import unity.graphics.*;
+import unity.parts.ModularConstruct;
+import unity.parts.types.ModularWheelType;
 import unity.type.decal.*;
 import unity.type.decal.UnitDecorationType.*;
 import unity.util.*;
@@ -797,5 +799,65 @@ public class UnityUnitType extends UnitType{
         }
 
         Draw.reset();
+    }
+
+    @Override
+    public void drawBody(Unit unit){
+        if(unit instanceof ModularUnitc){
+            drawModularBody((Unit & ModularUnitc)unit);
+            return;
+        }
+        super.drawBody(unit);
+    }
+    @Override
+    public void drawSoftShadow(Unit unit, float alpha){
+        if(unit instanceof ModularUnitc){
+            drawModularBodySoftShadow((Unit & ModularUnitc)unit,alpha);
+            return;
+        }
+        super.drawSoftShadow(unit,alpha);
+
+    }
+
+    public <T extends Unit & ModularUnitc> void drawModularBodySoftShadow(T unit, float alpha){
+        Draw.color(0, 0, 0, 0.4f * alpha);
+        float rad = 1.6f;
+        float size = unit.hitSize;
+        Draw.rect(softShadowRegion, unit, size * rad * Draw.xscl, size * rad * Draw.yscl, unit.rotation - 90);
+        Draw.color();
+    }
+
+    public <T extends Unit & ModularUnitc> void drawModularBody(T unit){
+        applyColor(unit);
+        DrawTransform dt = new DrawTransform(new Vec2(unit.x,unit.y),unit.rotation);
+        var construct = unit.construct();
+        if(construct!=null){
+            ModularWheelType.rollDistance = unit.driveDist();
+            unit.doodadlist().each(d->{
+                d.drawOutline(dt);
+            });
+            construct.partlist.each((p) -> {
+                p.type.drawOutline(dt, p);
+            });
+            construct.partlist.each((p) -> {
+                p.type.draw(dt, p);
+            });
+            unit.doodadlist().each(d->{
+                d.drawTop(dt);
+            });
+            construct.partlist.each((p) -> {
+                p.type.drawTop(dt, p);
+            });
+        }
+        Draw.reset();
+    }
+
+
+    public Unit spawn(Team t, float x, float y,byte[] data){
+        var unit = this.create(t);
+        unit.set(x, y);
+        ModularConstruct.cache.put(unit,data);
+        unit.add();
+        return unit;
     }
 }

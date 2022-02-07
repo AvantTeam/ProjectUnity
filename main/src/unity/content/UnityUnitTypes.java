@@ -172,6 +172,10 @@ public class UnityUnitTypes{
     // monolith characters
     public static @FactionDef("monolith") @EntityDef({Unitc.class, Mechc.class, Decorationc.class, Monolithc.class}) UnitType charShadowcape;
 
+    // Youngcha {unit, modular}.
+    public static @EntityDef({Unitc.class, ModularUnitc.class})
+    UnitType modularUnit;
+
     public static void load(){
         testLink = new UnityUnitType("test-link"){{
             defaultController = LinkedAI::new;
@@ -6007,6 +6011,11 @@ public class UnityUnitTypes{
                 shakeScl = 3f;
             }}
             );
+        }};
+        modularUnit = new UnityUnitType("modularUnit"){{
+            rotateShooting = false;
+            omniMovement = false;
+            //stats? what stats? :D
         }};
     }
 }

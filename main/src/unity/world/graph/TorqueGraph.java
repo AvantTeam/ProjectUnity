@@ -1,67 +1,91 @@
 package unity.world.graph;
 
 import arc.util.*;
-import unity.world.graphs.*;
-import unity.world.modules.*;
+import arc.util.io.*;
 
 //rotGraph
-public class TorqueGraph<T extends GraphTorque> extends BaseGraph<GraphTorqueModule<T>, TorqueGraph<T>>{
+public class TorqueGraph extends Graph<TorqueGraph>{
     public float lastInertia, lastGrossForceApplied, lastNetForceApplied, lastVelocity, lastFrictionCoefficient;
-
+    public float rotation = 0;
     @Override
-    public TorqueGraph<T> create(){
-        return new TorqueGraph<>();
+    public TorqueGraph copy(){
+        var t = new TorqueGraph();
+        t.lastVelocity = lastVelocity;
+        t.rotation = rotation;
+        return t;
+    }
+
+    @Override public void onMergeBegin(TorqueGraph graph){
+        float momentumA = lastVelocity * lastInertia;
+        float mementumB = graph.lastVelocity * graph.lastInertia;
+        lastVelocity = (momentumA + mementumB) / (lastInertia + graph.lastInertia);
     }
 
     @Override
-    void copyGraphStatsFrom(TorqueGraph<T> graph){
-        lastVelocity = graph.lastVelocity;
+    public void authoritativeOverride(TorqueGraph g){
+        g.lastVelocity = lastVelocity;
+        g.rotation = rotation;
     }
 
     @Override
-    boolean canConnect(GraphTorqueModule<T> b1, GraphTorqueModule<T> b2){
-        return b1.parent.build.team() == b2.parent.build.team();
+    public boolean canConnect(GraphConnector v1, GraphConnector v2){
+        return v1.getNode().build().team ==  v2.getNode().build().team;
     }
 
     @Override
-    void updateOnGraphChanged(){}
-
-    @Override
-    void updateGraph(){
-        float netForce = lastGrossForceApplied - lastFrictionCoefficient;
-        lastNetForceApplied = netForce;
-        float acceleration = lastInertia == 0f ? 0f : netForce / lastInertia;
-        lastVelocity += acceleration * Time.delta;
-        lastVelocity = Math.max(0f, lastVelocity);
+    public void onGraphChanged(){
+        refreshGraphStats();
     }
 
-    @Override
-    void updateDirect(){
+
+    public void refreshGraphStats(){
         float forceApply = 0f;
         float fricCoeff = 0f;
         float iner = 0f;
-        for(var module : connected){//building, GraphTorqueModule
-            forceApply += module.force;
-            fricCoeff += module.friction();
-            iner += module.inertia;
+        for(var module : vertexes){//building, GraphTorqueModule
+            if(module.getNode() instanceof TorqueGraphNode torqueNode){
+                forceApply += torqueNode.getForce();
+                fricCoeff += torqueNode.getFriction();
+                iner += torqueNode.getInertia();
+            }
         }
         lastFrictionCoefficient = fricCoeff;
         lastGrossForceApplied = forceApply;
         lastInertia = iner;
     }
 
+    ///this is on vertex added...
     @Override
-    void addMergeStats(GraphTorqueModule<T> module){}
-
-    @Override
-    void mergeStats(TorqueGraph<T> graph){
-        float momentumA = lastVelocity * lastInertia;
-        float mementumB = graph.lastVelocity * graph.lastInertia;
-        lastVelocity = (momentumA + mementumB) / (lastInertia + graph.lastInertia);
+    public void onUpdate(){
+        refreshGraphStats();
+        float netForce = lastGrossForceApplied;
+        netForce -= lastFrictionCoefficient;
+        netForce -= lastFrictionCoefficient*lastVelocity*0.15;
+        lastNetForceApplied = netForce;
+        float acceleration = lastInertia == 0f ? 0f : netForce / lastInertia;
+        lastVelocity += acceleration * Time.delta;
+        lastVelocity = Math.max(0f, lastVelocity);
+        rotation += lastVelocity * Time.delta;
+        if(rotation>360*2520){
+            rotation-=360*2520;
+        }
     }
 
     public void injectInertia(float iner){
         float inerSum = lastInertia + iner;
         lastVelocity *= inerSum == 0f ? 0f : lastInertia / inerSum;
+    }
+
+    @Override
+    public void read(Reads read){
+        super.read(read);
+        lastVelocity = read.f();
+        rotation = read.f();
+    }
+
+    @Override
+    public void write(Writes write){
+        write.f(lastVelocity);
+        write.f(rotation);
     }
 }

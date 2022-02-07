@@ -63,9 +63,12 @@ public class UnityPal{
 
     youngchaGray = valueOf("555555"),
 
-    blueprintCol = valueOf("354654"),
 
     outline = Pal.darkerMetal,
     darkOutline = valueOf("38383d"),
-    darkerOutline = valueOf("2e3142");
+    darkerOutline = valueOf("2e3142"),
+
+    //modular parts ui
+    blueprintCol = valueOf("649fb7"),
+    blueprintColAccent = valueOf("a6cad9");
 }

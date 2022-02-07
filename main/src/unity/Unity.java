@@ -13,6 +13,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
 import arc.util.serialization.*;
+import mindustry.Vars;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.input.*;
@@ -26,17 +27,19 @@ import unity.assets.loaders.*;
 import unity.assets.type.g3d.*;
 import unity.async.*;
 import unity.content.*;
+import unity.content.UnityParts;
 import unity.editor.*;
 import unity.gen.*;
 import unity.map.*;
 import unity.map.cinematic.*;
 import unity.map.objectives.*;
 import unity.mod.*;
+import unity.parts.ModularPartType;
 import unity.sync.*;
 import unity.ui.*;
 import unity.ui.dialogs.*;
 import unity.util.*;
-import younggamExperimental.*;
+
 
 import static mindustry.Vars.*;
 
@@ -71,6 +74,8 @@ public class Unity extends Mod{
     public static TagsDialog tagsDialog;
     /** Heavily relies on {@link #cinematicDialog}, this root edits {@link ObjectiveModel} bound to a {@link StoryNode}. */
     public static ObjectivesDialog objectivesDialog;
+    /** ui. */
+    public static UnityUI unityUI = new UnityUI();
 
     /** Asynchronous process revolving around {@link Light} processing. */
     public static LightProcess lights;
@@ -177,6 +182,16 @@ public class Unity extends Mod{
             mod.meta.description = stringf.get("description");
 
             Core.settings.getBoolOnce("unity-install", () -> Time.runTask(5f, CreditsDialog::showList));
+
+            //bc they are not a contentType
+            ModularPartType.loadStatic();
+            for(var en: ModularPartType.partMap){
+                en.value.load();
+            }
+            for(Faction faction : Faction.all){
+                faction.load();
+            }
+            UnityParts.loadDoodads();
         });
 
         Utils.init();
@@ -225,6 +240,7 @@ public class Unity extends Mod{
         BlockMovement.init();
 
         dev.init();
+        unityUI.init();
     }
 
     @Override
@@ -243,6 +259,7 @@ public class Unity extends Mod{
         UnityPlanets.load();
         UnitySectorPresets.load();
         UnityTechTree.load();
+        UnityBlocksYoungcha.load();
         UnityParts.load();
         Overwriter.load();
 
@@ -279,7 +296,7 @@ public class Unity extends Mod{
 
     protected void addCredits(){
         try{
-            Group group = (Group)ui.menuGroup.getChildren().first();
+            Group group = (Group)Vars.ui.menuGroup.getChildren().first();
 
             if(mobile){
                 //TODO button for mobile

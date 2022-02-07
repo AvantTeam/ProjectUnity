@@ -1,14 +1,15 @@
 package unity.world.blocks.distribution;
 
 import arc.graphics.g2d.*;
+import arc.math.*;
 import arc.math.geom.*;
 import unity.graphics.*;
 import unity.world.blocks.*;
-import unity.world.modules.*;
+import unity.world.graph.*;
 
-import static arc.Core.*;
+import static arc.Core.atlas;
 
-public class SimpleTransmission extends GraphBlock{
+public class SimpleTransmission extends GenericGraphBlock{
     final TextureRegion[] topRegions = new TextureRegion[2], overlayRegions = new TextureRegion[2], movingRegions = new TextureRegion[3];//topsprite,overlaysprite,moving
     TextureRegion bottomRegion, mbaseRegion;//base,mbase
 
@@ -29,12 +30,48 @@ public class SimpleTransmission extends GraphBlock{
         mbaseRegion = atlas.find(name + "-mbase");
     }
 
-    public class SimpleTransmissionBuild extends GraphBuild{
+    public static class TransmissionTorqueGraphNode extends TorqueGraphNode{
+        float ratio = 2;
+        public TransmissionTorqueGraphNode(float friction, float inertia, GraphBuild build){
+            super(friction, inertia, build);
+        }
+
+        public TransmissionTorqueGraphNode(GraphBuild build){
+            super(build);
+        }
+
+        @Override
+        public void update(){
+            if(connector.size!=2){return;}
+            TorqueGraph t1 = connector.get(0).getGraph();
+            TorqueGraph t2 = connector.get(1).getGraph();
+            if(t1.authoritative || t2.authoritative){
+                //in middle of save flood
+                return;
+            }
+            if(t1==t2){
+                var build = t1.randomVertex().getNode().build();
+                build.damage(Mathf.random(t1.lastVelocity*50));
+                this.build().damage(Mathf.random(t1.lastVelocity*20));
+                t1.lastVelocity*=0.8;
+                return;
+            }
+            float totalmomentum = t1.lastInertia*t1.lastVelocity +t2.lastInertia*t2.lastVelocity;
+            float totalinertia = t1.lastInertia+ ratio*t2.lastInertia;
+            float v1 = totalmomentum/totalinertia;
+            t1.lastVelocity = v1;
+            t2.lastVelocity = v1*ratio;
+
+
+        }
+    }
+
+    public class SimpleTransmissionBuildGeneric extends GenericGraphBuild{
         @Override
         public void draw(){
-            GraphTorqueModule<?> torqueGraph = torque();
-            float graphRot0 = torqueGraph.getRotationOf(0);
-            float graphRot1 = torqueGraph.getRotationOf(1);
+            TorqueGraphNode torqueNode = (TorqueGraphNode)getGraphNode(TorqueGraph.class);
+            float graphRot0 = torqueNode.connector.get(0).getGraph().rotation;
+            float graphRot1 = torqueNode.connector.get(1).getGraph().rotation;
             float fixedRot = (rotdeg() + 90f) % 180f - 90f;
             int variant = (rotation + 1) % 4 >= 2 ? 1 : 0;
             Draw.rect(bottomRegion, x, y);
