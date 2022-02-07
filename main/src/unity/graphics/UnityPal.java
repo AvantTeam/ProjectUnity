@@ -47,6 +47,7 @@ public class UnityPal{
     expBack = valueOf("4d8f07"),
     lava = valueOf("ff2a00"),
     lava2 = valueOf("ffcc00"),
+    dense = valueOf("ffbeb8"),
     dirium = valueOf("96f7c3"),
     diriumLight = valueOf("ccffe4"),
     coldColor = valueOf("6bc7ff"),
@@ -59,6 +60,10 @@ public class UnityPal{
     lancerSap3 = Pal.lancerLaser.cpy().lerp(Pal.sapBullet, 0.5f),
     lancerSap4 = Pal.lancerLaser.cpy().lerp(Pal.sapBullet, 0.667f),
     lancerSap5 = Pal.lancerLaser.cpy().lerp(Pal.sapBullet, 0.833f),
+
+    lancerDir1 = Pal.lancerLaser.cpy().lerp(diriumLight, 0.25f),
+    lancerDir2 = Pal.lancerLaser.cpy().lerp(diriumLight, 0.5f),
+    lancerDir3 = Pal.lancerLaser.cpy().lerp(diriumLight, 0.75f),
 
     youngchaGray = valueOf("555555"),
 

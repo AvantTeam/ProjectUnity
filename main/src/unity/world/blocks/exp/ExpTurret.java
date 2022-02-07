@@ -6,6 +6,7 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.content.*;
@@ -13,22 +14,22 @@ import mindustry.entities.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.logic.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.blocks.storage.*;
 import mindustry.world.meta.*;
+import unity.annotations.Annotations.*;
 import unity.content.*;
 import unity.entities.*;
 import unity.graphics.*;
 
 import static mindustry.Vars.*;
 
-/** Identical to {@link ExpBase} but repurposed as a base for turrets.
- * @implNote Replaces {@link Turret}
+/** Identical to {@link Turret} but repurposed as a base for exp.
  * @author sunny
  */
+@Dupe(base = ExpTurret.class, parent = Block.class, name = "ExpLBase")
 public class ExpTurret extends Turret {
     public int maxLevel = 10; //must be below 200
     public int maxExp;
@@ -46,6 +47,7 @@ public class ExpTurret extends Turret {
 
     protected @Nullable EField<Float> rangeField = null;//special field, it is special because it's the only one used for drawing stuff
     protected float rangeStart, rangeEnd;
+    private final Seq<Building> seqs = new Seq<>();//uwagh
 
     public ExpTurret(String name){
         super(name);
@@ -56,17 +58,17 @@ public class ExpTurret extends Turret {
         super.init();
         if(expFields == null) expFields = new EField[]{};
         maxExp = requiredExp(maxLevel);
-        if(expLevel(maxExp) < maxLevel) maxLevel++; //floating point error
+        if(expLevel(maxExp) < maxLevel) maxExp++; //floating point error
 
         //check for range field
         for(EField<?> f : expFields){
-            if(f.stat == Stat.shootRange){
+            if(f.stat == Stat.shootRange || f.stat == Stat.range){
                 rangeField = (EField<Float>) f;
                 break;
             }
         }
         if(rangeField == null){
-            rangeStart = rangeEnd = range;
+            rangeStart = rangeEnd = getRange();
         }
         else{
             rangeEnd = rangeField.fromLevel(maxLevel);
@@ -75,6 +77,11 @@ public class ExpTurret extends Turret {
         setEFields(0);
 
         if(pregrade != null && pregradeLevel < 0) pregradeLevel = pregrade.maxLevel;
+    }
+
+    @Actually("return 0;")
+    public float getRange(){
+        return range;
     }
 
     //setStats is untouched
@@ -107,6 +114,7 @@ public class ExpTurret extends Turret {
     }
 
     @Override
+    @Ignore
     public void drawPlace(int x, int y, int rotation, boolean valid){
         drawPotentialLinks(x, y);
 
@@ -118,7 +126,7 @@ public class ExpTurret extends Turret {
 
     @Override
     public boolean canReplace(Block other){
-        return super.canReplace(other) || (pregrade != null && other == pregrade); //todo fix 2x2->4x4 placement
+        return super.canReplace(other) || (pregrade != null && other == pregrade);
     }
 
     @Override
@@ -129,7 +137,14 @@ public class ExpTurret extends Turret {
         CoreBlock.CoreBuild core = team.core();
         //must have all requirements
         if(core == null || (!state.rules.infiniteResources && !core.items.has(requirements, state.rules.buildCostMultiplier))) return false;
-        return (tile.block() == pregrade && ((ExpTurretBuild) tile.build).level() >= pregradeLevel);
+
+        //check is there is ONLY a single pregrade block INSIDE all the tiles it will replace - by tracking SEQS. This protocol is also known as UWAGH standard.
+        seqs.clear();
+        tile.getLinkedTilesAs(this, inside -> {
+            if(inside.build == null || seqs.contains(inside.build) || seqs.size > 1) return; //no point of checking if there are already two in seqs
+            if(inside.block() == pregrade && ((ExpTurretBuild) inside.build).level() >= pregradeLevel) seqs.add(inside.build);
+        });
+        return seqs.size == 1; //no more, no less; a healthy monogamous relationship.
     }
 
     @Override
@@ -165,16 +180,15 @@ public class ExpTurret extends Turret {
 
     public class ExpTurretBuild extends TurretBuild implements ExpHolder {
         public int exp;
+        public @Nullable
+        ExpHub.ExpHubBuild hub = null;
 
-        @Override
-        public int getExp(){
-            return exp;
-        }
+        public int incExp(int amount, boolean hub){
+            int ehub = (hub && hubValid()) ? this.hub.takeAmount(amount, this) : 0;
 
-        @Override
-        public int handleExp(int amount){
-            int e = Math.min(amount, maxExp - exp);
+            int e = Math.min(amount - ehub, maxExp - exp);
             if(e == 0) return 0;
+
             int before = level();
             exp += e;
             int after = level();
@@ -184,6 +198,16 @@ public class ExpTurret extends Turret {
 
             if(after > before) levelup();
             return e;
+        }
+
+        @Override
+        public int getExp(){
+            return exp;
+        }
+
+        @Override
+        public int handleExp(int amount){
+            return incExp(amount, true);
         }
 
         @Override
@@ -202,8 +226,13 @@ public class ExpTurret extends Turret {
         public boolean handleOrb(int orbExp){
             int a = (int)(orbScale * orbExp);
             if(a < 1) return false;
-            handleExp(a);
+            incExp(a, false);
             return true;
+        }
+
+        @Override
+        public int handleTower(int amount, float angle){
+            return incExp(amount, false);
         }
 
         public int level(){
@@ -252,6 +281,7 @@ public class ExpTurret extends Turret {
         }
 
         @Override
+        @Ignore
         protected void effects(){
             Effect fshootEffect = shootEffect == Fx.none ? peekAmmo().shootEffect : shootEffect;
             Effect fsmokeEffect = smokeEffect == Fx.none ? peekAmmo().smokeEffect : smokeEffect;
@@ -269,6 +299,7 @@ public class ExpTurret extends Turret {
         }
 
         @Override
+        @Ignore
         public void drawSelect(){
             Drawf.dashCircle(x, y, rangeField == null ? range : rangeField.fromLevel(level()), team.color);
         }
@@ -300,6 +331,29 @@ public class ExpTurret extends Turret {
             super.read(read, revision);
             exp = read.i();
             if(exp > maxExp) exp = maxExp;
+        }
+
+        //hub methods
+
+        @Override
+        public boolean hubbable(){
+            return true;
+        }
+
+        @Override
+        public boolean canHub(Building build){
+            return !hubValid() || build == hub;
+        }
+
+        @Override
+        public void setHub(ExpHub.ExpHubBuild hub){
+            this.hub = hub;
+        }
+
+        public boolean hubValid(){
+            boolean val = hub != null && hub.isValid() && !hub.dead && hub.links.contains(pos());
+            if(!val) hub = null;
+            return val;
         }
     }
 

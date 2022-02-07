@@ -1,5 +1,6 @@
 package unity.content;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -29,6 +30,7 @@ import static arc.graphics.g2d.Draw.*;
 import static arc.graphics.g2d.Lines.circle;
 import static arc.graphics.g2d.Lines.*;
 import static arc.math.Angles.*;
+import static mindustry.Vars.tilesize;
 import static unity.content.UnityBullets.*;
 
 //deprecate the deprecation ^-^
@@ -93,6 +95,16 @@ public class UnityFx{
         color(UnityPal.exp);
         stroke(e.fout() * 1.2f + 0.01f);
         Lines.circle(e.x, e.y, 4f * e.finpow());
+    }),
+
+    expLaser = new Effect(15f, e -> {
+        if(e.data instanceof Building b && !b.dead){
+            Tmp.v2.set(b);
+            Tmp.v1.set(Tmp.v2).sub(e.x, e.y).nor().scl(tilesize / 2f);
+            Tmp.v2.sub(Tmp.v1);
+            Tmp.v1.add(e.x, e.y);
+            Drawf.laser(null, Core.atlas.find("unity-exp-laser"), Core.atlas.find("unity-exp-laser-end"), Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y, 0.4f * e.fout());
+        }
     }),
 
     placeShine = new Effect(30f, e -> {
@@ -213,6 +225,74 @@ public class UnityFx{
         color();
         Fill.circle(e.x, e.y, e.fin() * 13);
     }),
+
+    craft = new Effect(10, e -> {
+        color(Pal.accent, Color.gray, e.fin());
+        stroke(1);
+        spikes(e.x, e.y, e.fin() * 4, 1.5f, 6);
+    }),
+
+    denseCraft = new Effect(10, e -> {
+        color(UnityPal.dense, Color.gray, e.fin());
+        stroke(1);
+        spikes(e.x, e.y, e.finpow() * 4.5f, 1f, 6);
+    }),
+
+    diriumCraft = new Effect(10, e -> {
+        color(Color.white, UnityPal.dirium, e.fin());
+        stroke(1);
+        spikes(e.x, e.y, e.fin() * 4, 1.5f, 6);
+    }),
+
+    longSmoke = new Effect(80f, e -> {
+        color(Color.gray, Color.clear, e.fin());
+        randLenVectors(e.id, 2, 4 + e.fin() * 4, (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, 0.2f + e.fin() * 4);
+        });
+    }).layer(Layer.flyingUnit - 1f),
+
+    blockMelt = new Effect(400f, e -> {
+        color(Color.coral, Color.orange, Mathf.absin(9f, 1f));
+        integer = 0;
+        float f = Mathf.clamp(e.finpow() * 5f);
+        randLenVectors(e.id, 15, 2 + f * f * 16f, (x, y) -> {
+            integer++;
+            Fill.circle(e.x + x, e.y + y, 0.01f + e.fout() * Mathf.randomSeed(e.id + integer, 2f, 6f));
+        });
+    }),
+
+    absorb = new Effect(12, e -> {
+        color(e.color);
+        stroke(2f * e.fout());
+        Lines.circle(e.x, e.y, 5f * e.fout());
+    }),
+
+    deflect = new Effect(12, e -> {
+        color(Color.white, e.color, e.fin());
+        stroke(2f * e.fout());
+        randLenVectors(e.id, 4, 0.1f + 8f * e.fout(), e.rotation, 60f, (x, y) ->
+                lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fout() * 3f + 1f)
+        );
+    }),
+
+    forceShrink = new Effect(20, e -> {
+        color(e.color, e.fout());
+        if(Vars.renderer.animateShields){
+            Fill.poly(e.x, e.y, circleVertices(e.rotation * e.fout()), e.rotation * e.fout());
+        }else{
+            stroke(1.5f);
+            alpha(0.09f);
+            Fill.circle(e.x, e.y, e.rotation * e.fout());
+            alpha(1f);
+            Lines.circle(e.x, e.y,e.rotation * e.fout());
+        }
+    }).layer(Layer.shields),
+
+    shieldBreak = new Effect(40, e -> {
+        color(e.color);
+        stroke(3f * e.fout());
+        Lines.circle(e.x, e.y, e.rotation + e.fin());
+    }).followParent(true),
 
     craftingEffect = new Effect(67f, 35f, e -> {
         float value = Mathf.randomSeed(e.id);

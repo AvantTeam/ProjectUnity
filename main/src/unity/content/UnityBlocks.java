@@ -137,10 +137,10 @@ public class UnityBlocks{
     //---------- koruh faction ----------
     public static @FactionDef("koruh") Block
     //crafting
-    solidifier, steelSmelter, liquifier, titaniumExtractor,
+    denseSmelter, solidifier, steelSmelter, liquifier, titaniumExtractor, lavaSmelter, diriumCrucible,
 
     //defense
-    stoneWall, denseWall, steelWall, steelWallLarge, diriumWall, diriumWallLarge,
+    stoneWall, denseWall, steelWall, steelWallLarge, diriumWall, diriumWallLarge, shieldProjector, diriumProjector,
 
     //distribution
     steelConveyor, diriumConveyor, teleporter, teleunit,
@@ -149,7 +149,7 @@ public class UnityBlocks{
     bufferPad, omegaPad, cachePad, convertPad,
 
     //TODO
-    expFountain, expVoid, expTank, expChest, expRouter, expTower, expTowerDiagonal;// expOutput, expUnloader;
+    expFountain, expVoid, expTank, expChest, expRouter, expTower, expTowerDiagonal, bufferTower, expHub;// expOutput, expUnloader;
 
     //turret
     public static @FactionDef("koruh")
@@ -1333,6 +1333,26 @@ public class UnityBlocks{
         //endregion
         //region koruh
 
+        denseSmelter = new KoruhCrafter("dense-smelter"){{
+            requirements(Category.crafting, with(Items.copper, 30, Items.lead, 20, UnityItems.stone, 35));
+
+            health = 70;
+            hasItems = true;
+            craftTime = 46.2f;
+            craftEffect = UnityFx.denseCraft;
+            itemCapacity = 10;
+
+            outputItem = new ItemStack(UnityItems.denseAlloy, 1);
+            consumes.items(with(Items.copper, 1, Items.lead, 2, Items.coal, 1));
+
+            expUse = 2;
+            expCapacity = 24;
+            drawer = new DrawExp(){{
+                flame = Color.orange;
+                glowAmount = 1f;
+            }};
+        }};
+
         solidifier = new LiquidsSmelter("solidifier"){{
             requirements(Category.crafting, with(Items.copper, 20, UnityItems.denseAlloy, 30));
 
@@ -1361,7 +1381,8 @@ public class UnityBlocks{
             requirements(Category.crafting, with(Items.lead, 45, Items.silicon, 20, UnityItems.denseAlloy, 30));
             health = 140;
             itemCapacity = 10;
-            craftEffect = UnityFx.craftFx;
+            craftEffect = UnityFx.craft;
+            updateEffect = Fx.fuelburn;
             craftTime = 300f;
             outputItem = new ItemStack(UnityItems.steel, 1);
 
@@ -1377,6 +1398,27 @@ public class UnityBlocks{
                     Draw.reset();
                 }
             };
+        }};
+
+        lavaSmelter = new MeltingCrafter("lava-smelter"){{
+            requirements(Category.crafting, with(Items.silicon, 70, UnityItems.denseAlloy, 60, UnityItems.steel, 40));
+
+            health = 190;
+            hasLiquids = true;
+            hasItems = true;
+            craftTime = 70f;
+            updateEffect = Fx.fuelburn;
+            craftEffect = UnityFx.craft;
+            itemCapacity = 21;
+
+            outputItem = new ItemStack(UnityItems.steel, 5);
+            consumes.items(with(Items.graphite, 7, UnityItems.denseAlloy, 7));
+            consumes.power(2f);
+            consumes.liquid(UnityLiquids.lava, 0.4f);
+
+            expUse = 10;
+            expCapacity = 60;
+            drawer = new DrawLiquid();
         }};
 
         liquifier = new BurnerSmelter("liquifier"){{
@@ -1436,6 +1478,28 @@ public class UnityBlocks{
             };
         }};
 
+        diriumCrucible = new KoruhCrafter("dirium-crucible"){{
+            requirements(Category.crafting, with(Items.plastanium, 60, UnityItems.stone, 90, UnityItems.denseAlloy, 90, UnityItems.steel, 150));
+
+            health = 320;
+            hasItems = true;
+            craftTime = 250f;
+            craftEffect = UnityFx.diriumCraft;
+            itemCapacity = 40;
+            ambientSound = Sounds.techloop;
+            ambientSoundVolume = 0.02f;
+
+            outputItem = new ItemStack(UnityItems.dirium, 1);
+            consumes.items(with(Items.titanium, 6, Items.pyratite, 3, Items.surgeAlloy, 3, UnityItems.steel, 9));
+            consumes.power(8.28f);
+
+            expUse = 40;
+            expCapacity = 160;
+            ignoreExp = false;
+            craftDamage = 0;
+            drawer = new DrawExp();
+        }};
+
         stoneWall = new LimitWall("ustone-wall"){{
             requirements(Category.defense, with(UnityItems.stone, 6));
             maxDamage = 40f;
@@ -1474,6 +1538,50 @@ public class UnityBlocks{
             blinkFrame = 30f;
             health = 3040;
             size = 2;
+        }};
+
+        shieldProjector = new ClassicProjector("shield-generator"){{
+            requirements(Category.effect, with(Items.silicon, 50, Items.titanium, 35, UnityItems.steel, 15));
+            health = 200;
+            cooldownNormal = 1f;
+            cooldownBrokenBase = 0.3f;
+            phaseRadiusBoost = 10f;
+            phaseShieldBoost = 200;
+            hasItems = hasLiquids = false;
+
+            consumes.power(1.5f);
+
+            maxLevel = 15;
+            expFields = new EField[]{
+                    new ELinear(v -> radius = v, 40f, 0.5f, Stat.range, v -> Strings.autoFixed(v / tilesize, 2) + " blocks"),
+                    new ELinear(v -> shieldHealth = v, 500f, 25f, Stat.shieldHealth)
+            };
+            fromColor = toColor = Pal.lancerLaser;
+        }};
+
+        diriumProjector = new ClassicProjector("deflect-generator"){{
+            requirements(Category.effect, with(Items.silicon, 50, Items.titanium, 30, UnityItems.steel, 30, UnityItems.dirium, 8));
+            health = 800;
+            size = 2;
+            cooldownNormal = 1.5f;
+            cooldownLiquid = 1.2f;
+            cooldownBrokenBase = 0.35f;
+            phaseRadiusBoost = 40f;
+
+            consumes.item(Items.phaseFabric).boost();
+            consumes.power(5f);
+
+            fromColor = Pal.lancerLaser;
+            toColor = UnityPal.diriumLight;
+            maxLevel = 30;
+            expFields = new EField[]{
+                    new ELinear(v -> radius = v, 60f, 0.75f, Stat.range, v -> Strings.autoFixed(v / tilesize, 2) + " blocks"),
+                    new ELinear(v -> shieldHealth = v, 820f, 35f, Stat.shieldHealth),
+                    new ELinear(v -> deflectChance = v, 0f, 0.1f, Stat.baseDeflectChance, v -> Strings.autoFixed(v * 100, 1) + "%")
+            };
+            pregrade = (ClassicProjector) shieldProjector;
+            pregradeLevel = 5;
+            effectColors = new Color[]{Pal.lancerLaser, UnityPal.lancerDir1, UnityPal.lancerDir2, UnityPal.lancerDir3, UnityPal.diriumLight};
         }};
 
         steelConveyor = new ExpConveyor("steel-conveyor"){{
@@ -1817,6 +1925,11 @@ public class UnityBlocks{
             };
         }};
 
+        expHub = new ExpHub("exp-output"){{
+            requirements(Category.effect, with(UnityItems.stone, 30, Items.copper, 15));
+            expCapacity = 100;
+        }};
+
         expRouter = new ExpRouter("exp-router"){{
             requirements(Category.effect, with(UnityItems.stone, 5));
         }};
@@ -1827,21 +1940,29 @@ public class UnityBlocks{
         }};
 
         expTowerDiagonal = new DiagonalTower("diagonal-tower"){{
-            requirements(Category.effect, with(UnityItems.denseAlloy, 10, Items.silicon, 5));
+            requirements(Category.effect, with(UnityItems.steel, 10, Items.silicon, 5));
             range = 7;
             expCapacity = 150;
         }};
 
+        bufferTower = new ExpTower("buffer-tower"){{
+            requirements(Category.effect, with(Items.thorium, 5, Items.graphite, 10));
+            manualReload = reloadTime = 20f;
+            expCapacity = 180;
+            buffer = true;
+            health = 300;
+        }};
+
         expTank = new ExpTank("exp-tank"){{
             requirements(Category.effect, with(Items.copper, 100, UnityItems.denseAlloy, 100, Items.graphite, 30));
-            expCapacity = 600;
+            expCapacity = 800;
             health = 300;
             size = 2;
         }};
 
         expChest = new ExpTank("exp-chest"){{
             requirements(Category.effect, with(Items.copper, 400, UnityItems.steel, 250, Items.phaseFabric, 120));
-            expCapacity = 3200;
+            expCapacity = 3600;
             health = 1200;
             size = 4;
         }};

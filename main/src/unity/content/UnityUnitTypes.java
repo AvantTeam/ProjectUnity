@@ -4215,25 +4215,110 @@ public class UnityUnitTypes{
         stray = new UnityUnitType("stray"){{
             health = 300f;
             speed = 4.5f;
-            accel = 0.16f;
-            drag = 0.09f;
-            rotateSpeed = 7.5f;
+            accel = 0.08f;
+            drag = 0.045f;
+            rotateSpeed = 8f;
             flying = true;
+            lowAltitude = true;
 
-            trailType = () -> new MultiTrail(
-                new TrailHold(new TexturedTrail(Core.atlas.find("phantasmal-trail"), 6)),
-                new TrailHold(new Trail(12), -4f, 0f, 0.5f),
-                new TrailHold(new Trail(12), 4f, 0f, 0.5f)
+            // just to show you how much I hate boxed types
+            interface FuncI<T>{
+                T get(int arg);
+            }
+
+            FuncI<TexturedTrail> trail = length -> new TexturedTrail(Core.atlas.find("unity-phantasmal-trail"), length){{
+                blend = Blending.additive;
+                shrink = 0f;
+                fadeAlpha = 1f;
+                layer = Layer.flyingUnitLow;
+            }};
+
+            engineColor = UnityPal.monolithLight;
+            engineOffset = 11f;
+            trailType = unit -> new MultiTrail(
+                new TrailHold(trail.get(8), 0f, 0f, 1f, UnityPal.monolithLight),
+                new TrailHold(trail.get(12), -4.5f, 2.5f, 0.6f, UnityPal.monolithLight),
+                new TrailHold(trail.get(12), 4.5f, 2.5f, 0.6f, UnityPal.monolithLight)
             ){
+                {
+                    rotation = () -> unit.rotation;
+                }
+
                 @Override
                 public void update(float x, float y, float width){
                     super.update(x, y, width);
-
-                    //funny effects
+                    for(TrailHold trail : trails){
+                        if(Mathf.chanceDelta(0.3f)){
+                            Tmp.v1.trns(unit.rotation - 90f, trail.x, trail.y);
+                            Fx.missileTrail.at(x + Tmp.v1.x, y + Tmp.v1.y, trail.width * 1.3f, engineColor);
+                        }
+                    }
                 }
             };
+            trailLength = 12;
 
-            trailLength = trailType.get().length;
+            weapons.add(new EnergyRingWeapon(){{
+                rings.add(new Ring(){{
+                    radius = 5.5f;
+                    thickness = 1f;
+                    spikes = 4;
+                    spikeOffset = 1.5f;
+                    spikeWidth = 2f;
+                    spikeLength = 4f;
+                    color = UnityPal.monolithDark.cpy().lerp(UnityPal.monolith, 0.5f);
+                }}, new Ring(){{
+                    shootY = radius = 2.5f;
+                    rotate = false;
+                    thickness = 1f;
+                    divisions = 2;
+                    divisionSeparation = 30f;
+                    angleOffset = 90f;
+                    color = UnityPal.monolith;
+                }});
+
+                x = y = 0f;
+                mirror = false;
+                rotate = true;
+                reload = 60f;
+                shots = 6;
+                shotDelay = 1f;
+                inaccuracy = 30f;
+                layerOffset = 10f;
+                angleCone = 120f;
+                eyeRadius = 1.5f;
+
+                shootSound = UnitySounds.energyBolt;
+                bullet = new BasicBulletType(1f, 6f, "shell"){
+                    {
+                        drag = -0.08f;
+                        lifetime = 35f;
+                        width = 8f;
+                        height = 13f;
+
+                        homingDelay = 6f;
+                        homingPower = 0.09f;
+                        homingRange = 160f;
+                        weaveMag = 6f;
+                        keepVelocity = false;
+
+                        frontColor = trailColor = UnityPal.monolith;
+                        backColor = UnityPal.monolithDark;
+                        trailChance = 0.3f;
+                        trailParam = 1.5f;
+                        trailWidth = 2f;
+                        trailLength = 6;
+
+                        shootEffect = Fx.lightningShoot;
+                        hitEffect = despawnEffect = Fx.hitLancer;
+                    }
+
+                    @Override
+                    public void updateTrail(Bullet b){
+                        if(!headless && trailLength > 0 && b.trail == null) b.trail = trail.get(trailLength);
+                        super.updateTrail(b);
+                    }
+                };
+            }});
         }};
 
         tendence = new UnityUnitType("tendence"){{

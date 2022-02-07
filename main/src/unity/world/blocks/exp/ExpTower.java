@@ -1,7 +1,7 @@
 package unity.world.blocks.exp;
 
+import arc.*;
 import arc.audio.*;
-import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
@@ -10,6 +10,7 @@ import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
+import mindustry.world.meta.*;
 import unity.graphics.*;
 
 import static arc.Core.atlas;
@@ -19,21 +20,24 @@ import static mindustry.Vars.*;
 
 public class ExpTower extends ExpTank {
     public int range = 5;
-    public float reloadTime = 15f;
+    public float reloadTime = 10f;
     public float manualReload = 20f;
+    public boolean buffer = false;
+    public int bufferExp = 20;
 
     public float laserWidth = 0.5f;
     public TextureRegion laser, laserEnd;
     public float elevation = -1f;
 
     public Sound shootSound = Sounds.plasmadrop;
-    public float shootSoundVolume = 0.25f;
+    public float shootSoundVolume = 0.05f;
 
     public ExpTower(String name){
         super(name);
         rotate = true;
         outlineIcon = true;
         drawArrow = false;
+        noUpdateDisabled = false;
     }
 
     @Override
@@ -48,6 +52,14 @@ public class ExpTower extends ExpTank {
         laser = atlas.find(name + "laser", "unity-exp-laser");
         laserEnd = atlas.find(name + "laser-end", "unity-exp-laser-end");
         topRegion = atlas.find(name + "-base", "block-"+size); //topRegion serves as the base region
+    }
+
+    @Override
+    public void setStats(){
+        super.setStats();
+        if(buffer){
+            stats.add(Stat.output, "@ [lightgray]@[]", Core.bundle.format("explib.expAmount", (bufferExp / manualReload) * 60), StatUnit.perSecond.localized());
+        }
     }
 
     public void drawPlaceDash(int x, int y, int rotation){
@@ -68,10 +80,9 @@ public class ExpTower extends ExpTank {
     }
 
     @Override
-    public void drawRequestConfig(BuildPlan req, Eachable<BuildPlan> list){
-        if(!req.worldContext) return;
-        Draw.mixcol();
-        drawPlaceDash(req.x, req.y, req.rotation);
+    public void drawPlace(int x, int y, int rotation, boolean valid){
+        super.drawPlace(x, y, rotation, valid);
+        drawPlaceDash(x, y, rotation);
     }
 
     @Override
@@ -101,7 +112,7 @@ public class ExpTower extends ExpTank {
         public boolean handleOrb(int orbExp){
             int a = handleExp(orbExp);
             if(a <= 0) return false;
-            if(reload >= reloadTime) shoot();
+            if(reload >= manualReload) shoot();
             return true;
         }
 
@@ -109,7 +120,8 @@ public class ExpTower extends ExpTank {
         public void updateTile(){
             super.updateTile();
 
-            reload += edelta();
+            if(!buffer || exp > 0) reload += edelta();
+            else reload = 0;
             if(heat > 0) heat -= edelta();
 
             if(reload >= manualReload && exp > 0) shoot();
@@ -166,10 +178,11 @@ public class ExpTower extends ExpTank {
         }
 
         public void shoot(){
+            if(!enabled) return;
             reload = 0;
             if(exp <= 0) return;
 
-            int a = shootExp(exp);
+            int a = shootExp(buffer ? bufferExp : exp);
             if(a > 0){
                 exp -= a;
                 heat = manualReload;
