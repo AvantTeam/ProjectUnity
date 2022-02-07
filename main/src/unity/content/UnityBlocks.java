@@ -137,7 +137,7 @@ public class UnityBlocks{
     denseSmelter, solidifier, steelSmelter, liquifier, titaniumExtractor, lavaSmelter, diriumCrucible,
 
     //defense
-    stoneWall, denseWall, steelWall, steelWallLarge, diriumWall, diriumWallLarge,
+    stoneWall, denseWall, steelWall, steelWallLarge, diriumWall, diriumWallLarge, shieldProjector, diriumProjector,
 
     //distribution
     steelConveyor, diriumConveyor, teleporter, teleunit,
@@ -1529,6 +1529,50 @@ public class UnityBlocks{
             blinkFrame = 30f;
             health = 3040;
             size = 2;
+        }};
+
+        shieldProjector = new ClassicProjector("shield-generator"){{
+            requirements(Category.effect, with(Items.silicon, 50, Items.titanium, 35, UnityItems.steel, 15));
+            health = 200;
+            cooldownNormal = 1f;
+            cooldownBrokenBase = 0.3f;
+            phaseRadiusBoost = 10f;
+            phaseShieldBoost = 200;
+            hasItems = hasLiquids = false;
+
+            consumes.power(1.5f);
+
+            maxLevel = 15;
+            expFields = new EField[]{
+                    new ELinear(v -> radius = v, 40f, 0.5f, Stat.range, v -> Strings.autoFixed(v / tilesize, 2) + " blocks"),
+                    new ELinear(v -> shieldHealth = v, 500f, 25f, Stat.shieldHealth)
+            };
+            fromColor = toColor = Pal.lancerLaser;
+        }};
+
+        diriumProjector = new ClassicProjector("deflect-generator"){{
+            requirements(Category.effect, with(Items.silicon, 50, Items.titanium, 30, UnityItems.steel, 30, UnityItems.dirium, 8));
+            health = 800;
+            size = 2;
+            cooldownNormal = 1.5f;
+            cooldownLiquid = 1.2f;
+            cooldownBrokenBase = 0.35f;
+            phaseRadiusBoost = 40f;
+
+            consumes.item(Items.phaseFabric).boost();
+            consumes.power(5f);
+
+            fromColor = Pal.lancerLaser;
+            toColor = UnityPal.diriumLight;
+            maxLevel = 30;
+            expFields = new EField[]{
+                    new ELinear(v -> radius = v, 60f, 0.75f, Stat.range, v -> Strings.autoFixed(v / tilesize, 2) + " blocks"),
+                    new ELinear(v -> shieldHealth = v, 820f, 35f, Stat.shieldHealth),
+                    new ELinear(v -> deflectChance = v, 0f, 0.1f, Stat.baseDeflectChance, v -> Strings.autoFixed(v * 100, 1) + "%")
+            };
+            pregrade = (ClassicProjector) shieldProjector;
+            pregradeLevel = 5;
+            effectColors = new Color[]{Pal.lancerLaser, UnityPal.lancerDir1, UnityPal.lancerDir2, UnityPal.lancerDir3, UnityPal.diriumLight};
         }};
 
         steelConveyor = new ExpConveyor("steel-conveyor"){{

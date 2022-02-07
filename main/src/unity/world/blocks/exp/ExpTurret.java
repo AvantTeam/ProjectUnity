@@ -62,7 +62,7 @@ public class ExpTurret extends Turret {
 
         //check for range field
         for(EField<?> f : expFields){
-            if(f.stat == Stat.shootRange){
+            if(f.stat == Stat.shootRange || f.stat == Stat.range){
                 rangeField = (EField<Float>) f;
                 break;
             }
@@ -79,7 +79,7 @@ public class ExpTurret extends Turret {
         if(pregrade != null && pregradeLevel < 0) pregradeLevel = pregrade.maxLevel;
     }
 
-    @Actually(code="return 0;")
+    @Actually("return 0;")
     public float getRange(){
         return range;
     }
@@ -183,15 +183,12 @@ public class ExpTurret extends Turret {
         public @Nullable
         ExpHub.ExpHubBuild hub = null;
 
-        @Override
-        public int getExp(){
-            return exp;
-        }
+        public int incExp(int amount, boolean hub){
+            int ehub = (hub && hubValid()) ? this.hub.takeAmount(amount) : 0;
 
-        @Override
-        public int handleExp(int amount){
-            int e = Math.min(amount, maxExp - exp);
+            int e = Math.min(amount - ehub, maxExp - exp);
             if(e == 0) return 0;
+
             int before = level();
             exp += e;
             int after = level();
@@ -201,6 +198,16 @@ public class ExpTurret extends Turret {
 
             if(after > before) levelup();
             return e;
+        }
+
+        @Override
+        public int getExp(){
+            return exp;
+        }
+
+        @Override
+        public int handleExp(int amount){
+            return incExp(amount, true);
         }
 
         @Override
@@ -219,8 +226,13 @@ public class ExpTurret extends Turret {
         public boolean handleOrb(int orbExp){
             int a = (int)(orbScale * orbExp);
             if(a < 1) return false;
-            handleExp(a);
+            incExp(a, false);
             return true;
+        }
+
+        @Override
+        public int handleTower(int amount, float angle){
+            return incExp(amount, false);
         }
 
         public int level(){
@@ -322,6 +334,22 @@ public class ExpTurret extends Turret {
         }
 
         //hub methods
+
+        @Override
+        public boolean hubbable(){
+            return true;
+        }
+
+        @Override
+        public boolean canHub(Building build){
+            return !hubValid() || build == hub;
+        }
+
+        @Override
+        public void setHub(ExpHub.ExpHubBuild hub){
+            this.hub = hub;
+        }
+
         public boolean hubValid(){
             return hub != null && !hub.dead && hub.links.contains(pos());
         }

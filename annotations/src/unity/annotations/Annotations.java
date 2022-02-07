@@ -124,7 +124,7 @@ public class Annotations{
     @Retention(RetentionPolicy.SOURCE)
     public @interface Actually{
         /** @return The replacement */
-        String code() default "";
+        String value() default "";
     }
 
     /** Indicates that this class is an entity component */
