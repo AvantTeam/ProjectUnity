@@ -16,7 +16,7 @@ import static mindustry.Vars.tilesize;
 public class TimeMine extends Block {
     public float range = 1.5f * tilesize;
     public float pullTime = 300f;
-    public float shake = 2f;
+    public float shake = 4f;
 
     public TimeMine(String name) {
         super(name);
@@ -50,7 +50,7 @@ public class TimeMine extends Block {
                     u.vel.trns(u.angleTo(this), u.dst(this));
                     u.vel.limit(0.2f);
                 });
-                Effect.shake(shake * 2, shake, this);
+                Effect.shake(shake, shake, this);
             }else{
                 timer.reset(0,0);
             }
@@ -63,7 +63,8 @@ public class TimeMine extends Block {
             super.draw();
 
             if (pulling){
-                Draw.color(Color.black, Pal.darkerMetal, 0.2f);
+                Draw.color(Color.black, Pal.darkerMetal, 0.4f);
+                Draw.alpha(0.7f);
                 Fill.circle(x, y, timer.getTime(0)/25);
             }
         }

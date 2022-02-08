@@ -5,6 +5,7 @@ import arc.audio.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
+import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
@@ -23,6 +24,7 @@ import unity.annotations.Annotations.*;
 import unity.content.*;
 import unity.entities.*;
 import unity.graphics.*;
+import unity.ui.*;
 
 import static mindustry.Vars.*;
 
@@ -34,6 +36,7 @@ public class ExpTurret extends Turret {
     public int maxLevel = 10; //must be below 200
     public int maxExp;
     public EField<?>[] expFields;
+    public boolean passive = false;
 
     public @Nullable ExpTurret pregrade = null;
     public int pregradeLevel = -1;
@@ -48,6 +51,9 @@ public class ExpTurret extends Turret {
     protected @Nullable EField<Float> rangeField = null;//special field, it is special because it's the only one used for drawing stuff
     protected float rangeStart, rangeEnd;
     private final Seq<Building> seqs = new Seq<>();//uwagh
+
+    //damage resist feature for all blocks
+    public EField<Float> damageReduction;
 
     public ExpTurret(String name){
         super(name);
@@ -77,6 +83,7 @@ public class ExpTurret extends Turret {
         setEFields(0);
 
         if(pregrade != null && pregradeLevel < 0) pregradeLevel = pregrade.maxLevel;
+        if(damageReduction == null) damageReduction = new EField.EExpoZero(f -> {}, 0.1f, Mathf.pow(4f + size, 1f / maxLevel), true, null, v -> Strings.autoFixed(v * 100, 2) + "%");
     }
 
     @Actually("return 0;")
@@ -99,18 +106,48 @@ public class ExpTurret extends Turret {
         for(EField<?> f : expFields){
             if(f.stat == null) continue;
             if(map.containsKey(f.stat.category) && map.get(f.stat.category).containsKey(f.stat)) stats.remove(f.stat);
-            stats.add(f.stat, f.toString());
+            if(f.hasTable){
+                stats.add(f.stat, t -> {
+                    buildGraphTable(t, f);
+                });
+            }
+            else stats.add(f.stat, f.toString());
         }
 
         if(pregrade != null){
             stats.add(Stat.buildCost, "[#84ff00]" + Iconc.up + Core.bundle.format("exp.upgradefrom", pregradeLevel, pregrade.localizedName) + "[]");
             stats.add(Stat.buildCost, t -> {
-                t.button(Icon.infoSmall, Styles.cleari, 20f, () -> ui.content.show(pregrade)).size(26);
+                t.button(Icon.infoCircleSmall, Styles.clearTransi, 20f, () -> ui.content.show(pregrade)).size(26).color(UnityPal.exp);
             });
         }
 
-        stats.add(Stat.itemCapacity, "@", Core.bundle.format("exp.lvlAmount", maxLevel));
+        //stats.add(Stat.itemCapacity, "@", Core.bundle.format(passive ? "exp.lvlAmountP" : "exp.lvlAmount", maxLevel));
         stats.add(Stat.itemCapacity, "@", Core.bundle.format("exp.expAmount", maxExp));
+        stats.add(Stat.itemCapacity, t -> {
+            t.add(Core.bundle.format(passive ? "exp.lvlAmountP" : "exp.lvlAmount", maxLevel)).tooltip(Core.bundle.get("exp.tooltip"));
+        });
+        stats.add(Stat.armor, t -> buildGraphTable(t, damageReduction));
+    }
+
+    protected void buildGraphTable(Table t, EField<?> f){
+        Label l = t.add(f.toString()).get();
+        Collapser c = new Collapser(tc -> {
+            f.buildTable(tc, maxLevel);
+        }, true);
+
+        Runnable toggle = () -> {
+            c.toggle(false);
+        };
+        l.clicked(toggle);
+        t.button(Icon.downOpenSmall, Styles.clearToggleTransi, 20f, toggle).size(26f).color(UnityPal.exp).padLeft(8);
+        t.row();
+        t.add(c).colspan(2).left(); //label + button
+    }
+
+    @Override
+    public void setBars(){
+        super.setBars();
+        bars.remove("health");
     }
 
     @Override
@@ -212,6 +249,7 @@ public class ExpTurret extends Turret {
 
         @Override
         public int unloadExp(int amount){
+            if(passive) return 0;
             int e = Math.min(amount, exp);
             exp -= e;
             return e;
@@ -219,7 +257,7 @@ public class ExpTurret extends Turret {
 
         @Override
         public boolean acceptOrb(){
-            return exp < maxExp;
+            return !passive && exp < maxExp;
         }
 
         @Override
@@ -232,6 +270,7 @@ public class ExpTurret extends Turret {
 
         @Override
         public int handleTower(int amount, float angle){
+            if(passive) return 0;
             return incExp(amount, false);
         }
 
@@ -306,18 +345,47 @@ public class ExpTurret extends Turret {
 
         @Override
         public void displayBars(Table table){
+            table.table(this::buildHBar).pad(0).growX().padTop(8).padBottom(4);
+            table.row();
+
             super.displayBars(table);
+
             table.table(t -> {
                 t.defaults().height(18f).pad(4);
-                t.label(() -> "Lv " + level()).color(Pal.accent).width(65f);
+                t.label(() -> "Lv " + level()).color(passive ? UnityPal.passive : Pal.accent).width(65f);
                 t.add(new Bar(() -> level() >= maxLevel ? "MAX" : Core.bundle.format("bar.expp", (int)(expf() * 100f)), () -> UnityPal.exp, this::expf)).growX();
             }).pad(0).growX().padTop(4).padBottom(4);
             table.row();
         }
 
+        protected void buildHBar(Table t){
+            t.clearChildren();
+            t.defaults().height(18f).pad(4);
+            final int l = level();
+            if(damageReduction.fromLevel(level()) >= 0.01f){
+                Image ii = new Image(Icon.defense, Pal.health);
+                ii.setSize(14f);
+                Label ll = new Label(() -> Mathf.roundPositive(damageReduction.fromLevel(level()) * 100) + "");
+                ll.setStyle(new Label.LabelStyle(Styles.outlineLabel));
+                //ll.setColor(UnityPal.armor);
+                ll.setSize(26f, 18f);
+                ll.setAlignment(Align.center);
+                t.stack(ii, ll).size(26f, 18f).pad(4).padRight(8).center();
+            }
+            else t.update(() -> {
+                if(level() != l) buildHBar(t);
+            });
+            t.add(new Bar("stat.health", Pal.health, this::healthf).blink(Color.white)).growX();
+        }
+
         @Override
         public void killed(){
             ExpOrbs.spreadExp(x, y, exp * 0.3f, 3f * size);
+        }
+
+        @Override
+        public float handleDamage(float amount){
+            return super.handleDamage(amount) * Mathf.clamp(1f - damageReduction.fromLevel(level()));
         }
 
         @Override
@@ -334,15 +402,14 @@ public class ExpTurret extends Turret {
         }
 
         //hub methods
-
         @Override
         public boolean hubbable(){
-            return true;
+            return !passive;
         }
 
         @Override
         public boolean canHub(Building build){
-            return !hubValid() || build == hub;
+            return !hubValid() || (build != null && build == hub);
         }
 
         @Override
@@ -381,7 +448,16 @@ public class ExpTurret extends Turret {
 
         @Override
         public String toString(){
-            return Core.bundle.format("field.linearreload", Strings.autoFixed(start, 2), Strings.autoFixed(start + scale * maxLevel, 2));
+            return Core.bundle.format("field.linearreload", Strings.autoFixed(shots * 60f / start, 2), Strings.autoFixed(shots * 60f / (start + scale * maxLevel), 2));
+        }
+
+        @Override
+        public void buildTable(Table table, int end){
+            table.left();
+            Graph g = new Graph(i -> shots * 60f / fromLevel(i), end, UnityPal.exp);
+            table.add(g).size(graphWidth, graphHeight);
+            table.row();
+            table.label(() -> g.lastMouseOver ? Core.bundle.format("ui.graph.label", g.lastMouseStep, Strings.autoFixed(g.mouseValue(), 2) + "/s") : Core.bundle.get("ui.graph.hover"));
         }
     }
 }

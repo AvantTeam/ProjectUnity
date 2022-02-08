@@ -36,6 +36,12 @@ public class ExpBasicBulletType extends ExpBulletType {
     }
 
     @Override
+    public void init(){
+        super.init();
+        despawnHit = !expOnHit;
+    }
+
+    @Override
     public void load(){
         backRegion = Core.atlas.find(sprite + "-back");
         frontRegion = Core.atlas.find(sprite);

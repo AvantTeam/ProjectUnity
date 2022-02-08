@@ -16,7 +16,7 @@ public enum Faction{
     advance("advance", Color.sky),
     imber("imber", Pal.surge),
     plague("plague", Color.valueOf("a3f080")),
-    koruh("koruh", Color.valueOf("61caff")),
+    koruh("koruh", Color.valueOf("96f7c3")),
     light("light", Color.valueOf("fffde8")),
     monolith("monolith", UnityPal.monolith),
     youngcha("youngcha", Color.valueOf("a69f95")),

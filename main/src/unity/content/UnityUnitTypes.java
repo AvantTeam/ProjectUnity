@@ -4230,7 +4230,6 @@ public class UnityUnitTypes{
                 blend = Blending.additive;
                 shrink = 0f;
                 fadeAlpha = 1f;
-                layer = Layer.flyingUnitLow;
             }};
 
             engineColor = UnityPal.monolithLight;
