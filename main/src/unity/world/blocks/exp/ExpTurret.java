@@ -83,7 +83,7 @@ public class ExpTurret extends Turret {
         setEFields(0);
 
         if(pregrade != null && pregradeLevel < 0) pregradeLevel = pregrade.maxLevel;
-        if(damageReduction == null) damageReduction = new EField.EExpoZero(f -> {}, 0.1f, Mathf.pow(6f, 1f / maxLevel), true, null, v -> Strings.autoFixed(v * 100, 2) + "%");
+        if(damageReduction == null) damageReduction = new EField.EExpoZero(f -> {}, 0.1f, Mathf.pow(4f + size, 1f / maxLevel), true, null, v -> Strings.autoFixed(v * 100, 2) + "%");
     }
 
     @Actually("return 0;")
@@ -363,11 +363,11 @@ public class ExpTurret extends Turret {
             t.defaults().height(18f).pad(4);
             final int l = level();
             if(damageReduction.fromLevel(level()) >= 0.01f){
-                Image ii = new Image(Icon.defense, UnityPal.armor);
-                ii.setSize(18f);
+                Image ii = new Image(Icon.defense, Pal.health);
+                ii.setSize(14f);
                 Label ll = new Label(() -> Mathf.roundPositive(damageReduction.fromLevel(level()) * 100) + "");
                 ll.setStyle(new Label.LabelStyle(Styles.outlineLabel));
-                ll.setColor(UnityPal.armor);
+                //ll.setColor(UnityPal.armor);
                 ll.setSize(26f, 18f);
                 ll.setAlignment(Align.center);
                 t.stack(ii, ll).size(26f, 18f).pad(4).padRight(8).center();
@@ -454,10 +454,10 @@ public class ExpTurret extends Turret {
         @Override
         public void buildTable(Table table, int end){
             table.left();
-            Graph g = new Graph(this::fromLevel, end, UnityPal.exp);
+            Graph g = new Graph(i -> shots * 60f / fromLevel(i), end, UnityPal.exp);
             table.add(g).size(graphWidth, graphHeight);
             table.row();
-            table.label(() -> g.lastMouseOver ? Core.bundle.format("ui.graph.label", g.lastMouseStep, Strings.autoFixed(shots * 60f / g.mouseValue(), 2) + "/s") : Core.bundle.get("ui.graph.hover"));
+            table.label(() -> g.lastMouseOver ? Core.bundle.format("ui.graph.label", g.lastMouseStep, Strings.autoFixed(g.mouseValue(), 2) + "/s") : Core.bundle.get("ui.graph.hover"));
         }
     }
 }

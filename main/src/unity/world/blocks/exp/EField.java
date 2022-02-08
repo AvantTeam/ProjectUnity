@@ -130,7 +130,7 @@ public abstract class EField<T> {
 
         @Override
         public String toString(){
-            return Core.bundle.format("field.exponent", format.get(start), format.get(scale));
+            return Core.bundle.format("field.exponent", format.get(start), scale);
         }
 
         @Override
@@ -161,7 +161,7 @@ public abstract class EField<T> {
 
         @Override
         public String toString(){
-            return Core.bundle.format("field.exponentzero", format.get(start), format.get(scale));
+            return Core.bundle.format("field.exponentzero", format.get(start), scale);
         }
     }
 

@@ -1727,7 +1727,7 @@ public class UnityBlocks{
             maxLevel = 30;
             expFields = new EField[]{
                     new LinearReloadTime(v -> reloadTime = v, 60f, -1f),
-                    new ELinear(v -> range = v, 140f, 0.5f, Stat.shootRange, v -> Strings.autoFixed(v / tilesize, 2) + " blocks")
+                    new ELinear(v -> range = v, 140f, 1.3f, Stat.shootRange, v -> Strings.autoFixed(v / tilesize, 2) + " blocks")
             };
             pregrade = (ExpTurret) laser;
             effectColors = new Color[]{Pal.lancerLaser, UnityPal.lancerSap1, UnityPal.lancerSap2, UnityPal.lancerSap3, UnityPal.lancerSap4, UnityPal.lancerSap5, Pal.sapBullet};
