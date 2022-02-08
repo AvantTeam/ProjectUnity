@@ -137,7 +137,7 @@ public class UnityBlocks{
     //---------- koruh faction ----------
     public static @FactionDef("koruh") Block
     //crafting
-    denseSmelter, solidifier, steelSmelter, liquifier, titaniumExtractor, lavaSmelter, diriumCrucible,
+    denseSmelter, solidifier, steelSmelter, liquifier, titaniumExtractor, lavaSmelter, diriumCrucible, coalExtractor,
 
     //defense
     stoneWall, denseWall, steelWall, steelWallLarge, diriumWall, diriumWallLarge, shieldProjector, diriumProjector,
@@ -1464,7 +1464,7 @@ public class UnityBlocks{
             outputItem = new ItemStack(Items.titanium, 1);
 
             consumes.power(1f);
-            consumes.items(with(UnityItems.denseAlloy, 2));
+            consumes.items(with(UnityItems.denseAlloy, 3, UnityItems.steel, 2));
             consumes.liquid(Liquids.water, 0.3f);
 
             drawer = new DrawGlow(){
@@ -1472,6 +1472,7 @@ public class UnityBlocks{
                 public void draw(GenericCrafterBuild build){
                     Draw.rect(build.block.region, build.x, build.y);
                     Draw.color(UnityItems.denseAlloy.color, Items.titanium.color, build.progress);
+                    Draw.alpha(0.6f);
                     Draw.rect(top, build.x, build.y);
                     Draw.reset();
                 }
@@ -1498,6 +1499,30 @@ public class UnityBlocks{
             ignoreExp = false;
             craftDamage = 0;
             drawer = new DrawExp();
+        }};
+
+        coalExtractor = new KoruhCrafter("coal-extractor"){{
+            requirements(Category.crafting, with(Items.silicon, 80, UnityItems.stone, 100, UnityItems.steel, 150));
+
+            health = 250;
+            hasItems = true;
+            craftTime = 240f;
+            craftEffect = UnityFx.craftFx;
+            itemCapacity = 50;
+
+            consumes.items(with(UnityItems.stone, 6, Items.scrap, 2));
+            consumes.liquid(Liquids.water, 0.5f);
+            consumes.power(6f);
+            outputItem = new ItemStack(Items.coal, 1);
+
+            expUse = 30;
+            expCapacity = 120;
+            craftDamage = 0;
+            drawer = new DrawExp();
+            ignoreExp = false;
+
+            ambientSound = Sounds.techloop;
+            ambientSoundVolume = 0.01f;
         }};
 
         stoneWall = new LimitWall("ustone-wall"){{
