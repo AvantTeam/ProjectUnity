@@ -25,8 +25,6 @@ public class TexturedTrail extends Trail{
     public float mixAlpha = 0.5f;
     /** The trail's blending. */
     public Blending blend = Blending.normal;
-    /** The trail's Z layer. */
-    public float layer = Layer.flyingUnit;
 
     private static final float[] vertices = new float[24];
 
@@ -59,7 +57,6 @@ public class TexturedTrail extends Trail{
         out.fadeAlpha = fadeAlpha;
         out.mixAlpha = mixAlpha;
         out.blend = blend;
-        out.layer = layer;
         out.points.addAll(points);
         out.lastX = lastX;
         out.lastY = lastY;
@@ -84,9 +81,6 @@ public class TexturedTrail extends Trail{
 
         int psize = points.size;
         if(psize > 0){
-            float z = Draw.z();
-            Draw.z(layer);
-
             float[] items = points.items;
 
             int i = psize - 4;
@@ -96,8 +90,6 @@ public class TexturedTrail extends Trail{
             Draw.mixcol(color, mixAlpha);
             Draw.rect(capRegion, x1, y1, w, w, -Mathf.radDeg * lastAngle + 180f);
             Draw.mixcol();
-
-            Draw.z(z);
         }
     }
 
@@ -105,9 +97,6 @@ public class TexturedTrail extends Trail{
     public void draw(Color color, float width){
         if(region == null) region = Core.atlas.find("white");
         if(points.isEmpty()) return;
-
-        float z = Draw.z();
-        Draw.z(layer);
 
         float[] items = points.items;
         int psize = points.size;
@@ -180,9 +169,7 @@ public class TexturedTrail extends Trail{
             Draw.vert(region.texture, vertices, 0, 24);
             lastAngle = z2;
         }
-
         Draw.blend();
-        Draw.z(z);
     }
 
     @Override
