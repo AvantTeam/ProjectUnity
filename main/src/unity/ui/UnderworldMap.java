@@ -3,12 +3,20 @@ package unity.ui;
 import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.math.*;
+import arc.graphics.gl.Shader;
+import arc.math.Mathf;
 import arc.scene.*;
+import arc.scene.event.InputEvent;
+import arc.scene.event.InputListener;
 import arc.util.*;
+import mindustry.Vars;
+import mindustry.content.Blocks;
 import mindustry.game.*;
-import mindustry.io.*;
+import mindustry.graphics.Pal;
+import mindustry.graphics.Shaders;
 import mindustry.world.*;
+import mindustry.world.blocks.environment.*;
+import mindustry.world.meta.Stat;
 
 import static mindustry.Vars.*;
 
@@ -18,31 +26,47 @@ public class UnderworldMap extends Element {
     private Pixmap pixmap;
     private Texture texture;
     private TextureRegion region;
+    private Pixmap shadowPixmap;
+    private Texture shadowTexture;
+    private TextureRegion shadowRegion;
+    private float mouseX = -1, mouseY = -1;
 
     @Override
     public float getMinWidth() {
-        return world.width() * 4f;
+        return world.width() * 32f;
     }
 
     @Override
     public float getMinHeight() {
-        return world.height() * 4f;
+        return world.height() * 32f;
     }
 
     public UnderworldMap(){
-        Events.on(EventType.WorldLoadEvent.class, event -> {
-            reset();
-            updateAll();
-        });
+        addListener(new InputListener(){
+            @Override
+            public void enter(InputEvent event, float x, float y, int pointer, Element fromActor) {
+                mouseX = x;
+                mouseY = y;
 
-        Events.on(EventType.TileChangeEvent.class, event -> {
-            //TODO don't update when the minimap is off?
-            if(!ui.editor.isShown()){
-                updateTile(event.tile);
+                super.enter(event, x, y, pointer, fromActor);
+            }
+
+            @Override
+            public boolean mouseMoved(InputEvent event, float x, float y) {
+                mouseX = x;
+                mouseY = y;
+
+                return super.mouseMoved(event, x, y);
+            }
+
+            @Override
+            public void exit(InputEvent event, float x, float y, int pointer, Element toActor) {
+                mouseX = -1;
+                mouseY = -1;
+
+                super.exit(event, x, y, pointer, toActor);
             }
         });
-
-        Events.on(EventType.BuildTeamChangeEvent.class, event -> updateTile(event.build.tile));
     }
 
     public Pixmap getPixmap(){
@@ -54,53 +78,86 @@ public class UnderworldMap extends Element {
         return texture;
     }
 
-    private int colorFor(Tile tile){
-        if(tile == null) return 0;
-        int bc = tile.block().minimapColor(tile);
-        Color color = Tmp.c1.set(bc == 0 ? MapIO.colorFor(tile.block(), tile.floor(), tile.overlay(), tile.team()) : bc);
-        color.mul(1f - Mathf.clamp(world.getDarkness(tile.x, tile.y) / 4f));
-
-        return color.rgba();
-    }
-
     public void reset(){
-
         if(pixmap != null){
             pixmap.dispose();
             texture.dispose();
         }
 
-        pixmap = new Pixmap(world.width(), world.height());
-        texture = new Texture(pixmap);
-        region = new TextureRegion(texture);
-    }
-
-    public void updateTile(Tile tile){
-        if(world.isGenerating() || !state.isGame()) return;
-
-        if(tile.build != null && tile.isCenter()){
-            tile.getLinkedTiles(other -> {
-                if(!other.isCenter()){
-                    updateTile(other);
-                }
-            });
+        if(shadowPixmap != null){
+            shadowPixmap.dispose();
+            shadowTexture.dispose();
         }
 
-        int color = colorFor(tile);
-        pixmap.set(tile.x, pixmap.height - 1 - tile.y, color);
+        pixmap = new Pixmap(world.width() * 32, world.height() * 32);
+        texture = new Texture(pixmap);
+        region = new TextureRegion(texture);
 
-        Pixmaps.drawPixel(texture, tile.x, pixmap.height - 1 - tile.y, color);
+        shadowPixmap = new Pixmap(world.width() * 32, world.height() * 32);
+        shadowTexture = new Texture(shadowPixmap);
+        shadowRegion = new TextureRegion(shadowTexture);
+    }
+
+    public boolean isFree(Tile tile, int x, int y){
+        Tile nearby = tile.nearby(x, y);
+
+        if(nearby == null){
+            return false;
+        } else {
+            return !(nearby.block() != null && nearby.block() instanceof StaticWall);
+        }
+    }
+
+    public boolean checkSquare(Tile tile, int radius){
+        boolean has = false;
+        for(int i = -radius; i <= radius; i++){
+            for(int j = -radius; j <= radius; j++) {
+                if(i == 0 && j == 0) continue;
+
+                if (isFree(tile, i, j)){
+                    has = true;
+                    break;
+                }
+            }
+            if(has) break;
+        }
+
+        return has;
     }
 
     public void updateAll(){
+        // TODO performance sucks
         for(Tile tile : world.tiles){
-            pixmap.set(tile.x, pixmap.height - 1 - tile.y, colorFor(tile));
+            if(tile != null) {
+                if (!(tile.block() != null && tile.block() instanceof StaticWall) && tile.floor() != null && tile.floor().region != null) {
+                    if(tile.floor().isLiquid){
+                        pixmap.draw(Core.atlas.getPixmap(Blocks.darksand.variantRegions[Mathf.random(0, 2)]), tile.x * 32, (world.height() - tile.y) * 32);
+                    } else {
+                        pixmap.draw(Core.atlas.getPixmap(Blocks.craters.variantRegions[Mathf.random(0, 2)]), tile.x * 32, (world.height() - tile.y) * 32);
+                    }
+                } else {
+                    if (checkSquare(tile, 2)) {
+                        pixmap.draw(Core.atlas.getPixmap(Blocks.duneWall.variantRegions[Mathf.random(0, 1)]), tile.x * 32, (world.height() - tile.y) * 32);
+                    } else {
+                        if (checkSquare(tile, 4)) {
+                            shadowPixmap.fillRect(tile.x * 32, (world.height() - tile.y) * 32, 32, 32, Color.black.rgba());
+                        }
+
+                        pixmap.fillRect(tile.x * 32, (world.height() - tile.y) * 32, 32, 32, Color.black.rgba());
+                    }
+                }
+            }
         }
 
         texture.draw(pixmap);
+        shadowTexture.draw(shadowPixmap);
     }
 
     public void rectCorner(TextureRegion tr, float w, float h){
+        Draw.rect(tr,x + w*0.5f, y + h*0.5f, w, h);
+    }
+
+    public void rectCorner(TextureRegion tr, float x, float y, float w, float h){
         Draw.rect(tr,x + w*0.5f, y + h*0.5f, w, h);
     }
 
@@ -109,11 +166,25 @@ public class UnderworldMap extends Element {
         super.draw();
         Draw.color(Color.white);
 
-        if(region != null) {
-            rectCorner(region, region.width * 4f, region.height * 4f);
+        if(region != null && shadowRegion != null) {
+            rectCorner(region, region.width, region.height);
+            Draw.alpha(0.1f);
+            for(int i = -4; i < 5; i++) {
+                for(int j = -4; j < 5; j++) {
+                    rectCorner(shadowRegion, (float)(x + Math.pow(i / 4f, 2) * i * 2f), (float)(y + Math.pow(j / 4f, 2) * j * 2f), shadowRegion.width, shadowRegion.height);
+                }
+            }
+            Draw.alpha(1f);
         } else {
             reset();
             updateAll();
+        }
+
+        if(mouseX != -1 && mouseY != -1){
+            Draw.color(Pal.accent);
+            Draw.alpha(0.2f);
+            Fill.rect(x + (int)(mouseX / 32f) * 32f + 16f, y + (int)(mouseY / 32f) * 32f + 16f, 32, 32);
+            Draw.reset();
         }
     }
 }

@@ -1,10 +1,9 @@
 package unity.world.blocks.distribution;
 
 import arc.Core;
-import arc.graphics.g2d.*;
+import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
-import mindustry.Vars;
 import mindustry.game.Team;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -60,12 +59,15 @@ public class UnderPiper extends Block {
             piping.cont.table(t -> {
                 t.center().bottom();
 
-                t.pane(p -> {
+                ScrollPane pane = t.pane(p -> {
                     UnderworldMap map = new UnderworldMap();
                     map.reset();
                     map.updateAll();
                     p.add(map).grow();
-                }).fill().padRight(5f);
+                }).fill().padRight(5f).get();
+
+                pane.setScrollX((tile.x + 2) * 32f - 16f);
+                pane.setScrollY((tile.y + 2) * 32f - 16f);
 
                 t.table(tl -> {
                     tl.center().top();
@@ -101,7 +103,7 @@ public class UnderPiper extends Block {
                             }
                         });
                     }).height(215f);
-                }).growY();
+                }).growY().width(205f);
             }).grow();
 
             piping.show();
