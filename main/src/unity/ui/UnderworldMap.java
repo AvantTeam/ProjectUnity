@@ -171,7 +171,7 @@ public class UnderworldMap extends Element {
             Draw.alpha(0.1f);
             for(int i = -4; i < 5; i++) {
                 for(int j = -4; j < 5; j++) {
-                    rectCorner(shadowRegion, (float)(x + Math.pow(i / 4f, 2) * i * 2f), (float)(y + Math.pow(j / 4f, 2) * j * 2f), shadowRegion.width, shadowRegion.height);
+                    rectCorner(shadowRegion, (float)(x + Math.pow(i / 4f, 2) * i * 8f), (float)(y + Math.pow(j / 4f, 2) * j * 8f), shadowRegion.width, shadowRegion.height);
                 }
             }
             Draw.alpha(1f);
