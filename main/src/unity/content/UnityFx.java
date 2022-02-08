@@ -1,5 +1,6 @@
 package unity.content;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -29,6 +30,7 @@ import static arc.graphics.g2d.Draw.*;
 import static arc.graphics.g2d.Lines.circle;
 import static arc.graphics.g2d.Lines.*;
 import static arc.math.Angles.*;
+import static mindustry.Vars.tilesize;
 import static unity.content.UnityBullets.*;
 
 //deprecate the deprecation ^-^
@@ -93,6 +95,16 @@ public class UnityFx{
         color(UnityPal.exp);
         stroke(e.fout() * 1.2f + 0.01f);
         Lines.circle(e.x, e.y, 4f * e.finpow());
+    }),
+
+    expLaser = new Effect(15f, e -> {
+        if(e.data instanceof Building b && !b.dead){
+            Tmp.v2.set(b);
+            Tmp.v1.set(Tmp.v2).sub(e.x, e.y).nor().scl(tilesize / 2f);
+            Tmp.v2.sub(Tmp.v1);
+            Tmp.v1.add(e.x, e.y);
+            Drawf.laser(null, Core.atlas.find("unity-exp-laser"), Core.atlas.find("unity-exp-laser-end"), Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y, 0.4f * e.fout());
+        }
     }),
 
     placeShine = new Effect(30f, e -> {

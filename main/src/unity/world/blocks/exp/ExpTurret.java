@@ -184,7 +184,7 @@ public class ExpTurret extends Turret {
         ExpHub.ExpHubBuild hub = null;
 
         public int incExp(int amount, boolean hub){
-            int ehub = (hub && hubValid()) ? this.hub.takeAmount(amount) : 0;
+            int ehub = (hub && hubValid()) ? this.hub.takeAmount(amount, this) : 0;
 
             int e = Math.min(amount - ehub, maxExp - exp);
             if(e == 0) return 0;
@@ -342,7 +342,7 @@ public class ExpTurret extends Turret {
 
         @Override
         public boolean canHub(Building build){
-            return !hubValid() || build == hub;
+            return !hubValid() || (build != null && build == hub);
         }
 
         @Override
@@ -351,7 +351,9 @@ public class ExpTurret extends Turret {
         }
 
         public boolean hubValid(){
-            return hub != null && !hub.dead && hub.links.contains(pos());
+            boolean val = hub != null && hub.isValid() && !hub.dead && hub.links.contains(pos());
+            if(!val) hub = null;
+            return val;
         }
     }
 

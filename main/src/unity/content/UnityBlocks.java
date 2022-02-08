@@ -124,7 +124,10 @@ public class UnityBlocks{
     orb, shockwire, current, plasma, electrobomb, shielder,
 
     //power
-    powerPlant, absorber;
+    powerPlant, absorber,
+
+    //yes
+    piper;
 
     //crafting
     public static @FactionDef("imber")
@@ -134,7 +137,7 @@ public class UnityBlocks{
     //---------- koruh faction ----------
     public static @FactionDef("koruh") Block
     //crafting
-    denseSmelter, solidifier, steelSmelter, liquifier, titaniumExtractor, lavaSmelter, diriumCrucible,
+    denseSmelter, solidifier, steelSmelter, liquifier, titaniumExtractor, lavaSmelter, diriumCrucible, coalExtractor,
 
     //defense
     stoneWall, denseWall, steelWall, steelWallLarge, diriumWall, diriumWallLarge, shieldProjector, diriumProjector,
@@ -146,7 +149,7 @@ public class UnityBlocks{
     bufferPad, omegaPad, cachePad, convertPad,
 
     //TODO
-    expFountain, expVoid, expTank, expChest, expRouter, expTower, expTowerDiagonal, bufferTower;// expOutput, expUnloader;
+    expFountain, expVoid, expTank, expChest, expRouter, expTower, expTowerDiagonal, bufferTower, expHub;// expOutput, expUnloader;
 
     //turret
     public static @FactionDef("koruh")
@@ -1321,6 +1324,12 @@ public class UnityBlocks{
 
         electroTile = new Floor("electro-tile");
 
+        piper = new UnderPiper("piper", 80){{
+            requirements(Category.distribution, with(Items.copper, 1));
+
+            size = 4;
+        }};
+
         //endregion
         //region koruh
 
@@ -1455,7 +1464,7 @@ public class UnityBlocks{
             outputItem = new ItemStack(Items.titanium, 1);
 
             consumes.power(1f);
-            consumes.items(with(UnityItems.denseAlloy, 2));
+            consumes.items(with(UnityItems.denseAlloy, 3, UnityItems.steel, 2));
             consumes.liquid(Liquids.water, 0.3f);
 
             drawer = new DrawGlow(){
@@ -1463,6 +1472,7 @@ public class UnityBlocks{
                 public void draw(GenericCrafterBuild build){
                     Draw.rect(build.block.region, build.x, build.y);
                     Draw.color(UnityItems.denseAlloy.color, Items.titanium.color, build.progress);
+                    Draw.alpha(0.6f);
                     Draw.rect(top, build.x, build.y);
                     Draw.reset();
                 }
@@ -1489,6 +1499,30 @@ public class UnityBlocks{
             ignoreExp = false;
             craftDamage = 0;
             drawer = new DrawExp();
+        }};
+
+        coalExtractor = new KoruhCrafter("coal-extractor"){{
+            requirements(Category.crafting, with(Items.silicon, 80, UnityItems.stone, 100, UnityItems.steel, 150));
+
+            health = 250;
+            hasItems = true;
+            craftTime = 240f;
+            craftEffect = UnityFx.craftFx;
+            itemCapacity = 50;
+
+            consumes.items(with(UnityItems.stone, 6, Items.scrap, 2));
+            consumes.liquid(Liquids.water, 0.5f);
+            consumes.power(6f);
+            outputItem = new ItemStack(Items.coal, 1);
+
+            expUse = 30;
+            expCapacity = 120;
+            craftDamage = 0;
+            drawer = new DrawExp();
+            ignoreExp = false;
+
+            ambientSound = Sounds.techloop;
+            ambientSoundVolume = 0.01f;
         }};
 
         stoneWall = new LimitWall("ustone-wall"){{
@@ -1914,6 +1948,11 @@ public class UnityBlocks{
                     new EList<>(v -> shots = v, new Integer[]{1, 1, 2, 2, 2, 3, 3, 4, 4, 5, 5}, Stat.shots),
                     new EList<>(v -> spread = v, new Float[]{0f, 0f, 5f, 10f, 15f, 7f, 14f, 8f, 10f, 6f, 9f}, null)
             };
+        }};
+
+        expHub = new ExpHub("exp-output"){{
+            requirements(Category.effect, with(UnityItems.stone, 30, Items.copper, 15));
+            expCapacity = 100;
         }};
 
         expRouter = new ExpRouter("exp-router"){{

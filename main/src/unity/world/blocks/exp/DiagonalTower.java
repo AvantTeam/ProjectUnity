@@ -19,6 +19,7 @@ public class DiagonalTower extends ExpTower{
     public DiagonalTower(String name){
         super(name);
         configurable = saveConfig = true;
+        lastConfig = false;
 
         config(Boolean.class, (DiagonalTowerBuild build, Boolean value) -> {
             build.diagonal = value;
