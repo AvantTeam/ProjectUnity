@@ -49,7 +49,7 @@ public class GeyserBulletType extends ExpBulletType{
     }
 
     public GeyserBulletType(){
-        this(400f, 20f);
+        this(400f, 10f);
     }
 
     @Override

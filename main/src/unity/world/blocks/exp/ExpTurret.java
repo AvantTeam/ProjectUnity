@@ -28,7 +28,7 @@ import unity.ui.*;
 
 import static mindustry.Vars.*;
 
-/** Identical to {@link Turret} but repurposed as a base for exp.
+/** Identical to {@link Turret} but repurposed as a base for exp. Used to generate other exp blocks via @Dupe.
  * @author sunny
  */
 @Dupe(base = ExpTurret.class, parent = Block.class, name = "ExpLBase")
@@ -37,6 +37,7 @@ public class ExpTurret extends Turret {
     public int maxExp;
     public EField<?>[] expFields;
     public boolean passive = false;
+    public boolean updateExpFields = true;
 
     public @Nullable ExpTurret pregrade = null;
     public int pregradeLevel = -1;
@@ -83,7 +84,7 @@ public class ExpTurret extends Turret {
         setEFields(0);
 
         if(pregrade != null && pregradeLevel < 0) pregradeLevel = pregrade.maxLevel;
-        if(damageReduction == null) damageReduction = new EField.EExpoZero(f -> {}, 0.1f, Mathf.pow(4f + size, 1f / maxLevel), true, null, v -> Strings.autoFixed(v * 100, 2) + "%");
+        if(damageReduction == null) damageReduction = new EField.EExpoZero(f -> {}, 0.1f, Mathf.pow(4f + size, 1f / maxLevel), true, null, v -> Strings.autoFixed(Mathf.roundPositive(v * 10000) / 100f, 2)+ "%");
     }
 
     @Actually("return 0;")
@@ -103,9 +104,20 @@ public class ExpTurret extends Turret {
 
     public void addExpStats(){
         var map = stats.toMap();
+        boolean removeAbil = false;
         for(EField<?> f : expFields){
             if(f.stat == null) continue;
-            if(map.containsKey(f.stat.category) && map.get(f.stat.category).containsKey(f.stat)) stats.remove(f.stat);
+            if(map.containsKey(f.stat.category) && map.get(f.stat.category).containsKey(f.stat)){
+                if(f.stat == Stat.abilities){
+                    if(!removeAbil){
+                        stats.remove(f.stat);
+                        removeAbil = true;
+                    }
+                }
+                else{
+                    stats.remove(f.stat);
+                }
+            }
             if(f.hasTable){
                 stats.add(f.stat, t -> {
                     buildGraphTable(t, f);
@@ -315,7 +327,7 @@ public class ExpTurret extends Turret {
         //updateTile is untouched
         @Override
         public void update(){
-            setEFields(level());
+            if(updateExpFields) setEFields(level());
             super.update();
         }
 
@@ -455,7 +467,7 @@ public class ExpTurret extends Turret {
         public void buildTable(Table table, int end){
             table.left();
             Graph g = new Graph(i -> shots * 60f / fromLevel(i), end, UnityPal.exp);
-            table.add(g).size(graphWidth, graphHeight);
+            table.add(g).size(graphWidth, graphHeight).left();
             table.row();
             table.label(() -> g.lastMouseOver ? Core.bundle.format("ui.graph.label", g.lastMouseStep, Strings.autoFixed(g.mouseValue(), 2) + "/s") : Core.bundle.get("ui.graph.hover"));
         }

@@ -1537,32 +1537,42 @@ public class UnityBlocks{
             health = 560;
         }};
 
-        steelWall = new LimitWall("steel-wall"){{
+        steelWall = new LevelLimitWall("steel-wall"){{
             requirements(Category.defense, with(UnityItems.steel, 6));
             maxDamage = 24f;
             health = 810;
+
+            expFields = new EField[]{
+                    new ERational(v -> maxDamage = v, 48f, 24f, -3f, Stat.abilities, v -> bundle.format("stat.unity.maxdamage", v)).formatAll(false)
+            };
         }};
 
-        steelWallLarge = new LimitWall("steel-wall-large"){{
+        steelWallLarge = new LevelLimitWall("steel-wall-large"){{
             requirements(Category.defense, with(UnityItems.steel, 24));
             maxDamage = 48f;
             health = 3240;
             size = 2;
+
+            expFields = new EField[]{
+                    new ERational(v -> maxDamage = v, 72f, 24f, -3f, Stat.abilities, v -> bundle.format("stat.unity.maxdamage", v)).formatAll(false)
+            };
         }};
 
-        diriumWall = new LimitWall("dirium-wall"){{
+        diriumWall = new LevelLimitWall("dirium-wall"){{
             requirements(Category.defense, with(UnityItems.dirium, 6));
             maxDamage = 76f;
             blinkFrame = 30f;
             health = 760;
+            maxLevel = 12;
         }};
 
-        diriumWallLarge = new LimitWall("dirium-wall-large"){{
+        diriumWallLarge = new LevelLimitWall("dirium-wall-large"){{
             requirements(Category.defense, with(UnityItems.dirium, 24));
             maxDamage = 152f;
             blinkFrame = 30f;
             health = 3040;
             size = 2;
+            maxLevel = 12;
         }};
 
         shieldProjector = new ClassicProjector("shield-generator"){{
