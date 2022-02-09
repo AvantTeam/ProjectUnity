@@ -25,10 +25,18 @@ public class BeamBulletType extends BulletType{
     public float castInterval = 5f;
     public float minLightningDamage, maxLightningDamage;
 
+    public String name;
+    public TextureRegion region, endRegion;
+
     public BeamBulletType(float length, float damage){
+        this(length, damage, "laser");
+    }
+
+    public BeamBulletType(float length, float damage, String name){
         super(0.01f, damage);
-        
+
         this.length = length;
+        this.name = name;
         keepVelocity = false;
         collides = false;
         pierce = true;
@@ -45,12 +53,18 @@ public class BeamBulletType extends BulletType{
     }
 
     @Override
+    public void load(){
+        region = Core.atlas.find(name);
+        endRegion = Core.atlas.find(name + "-end");
+    }
+
+    @Override
     public void update(Bullet b){
         super.update(b);
-        
+
         Healthc target = Damage.linecast(b, b.x, b.y, b.rotation(), this.length);
         b.data = target;
-        
+
         if(target instanceof Hitboxc hit){
             if(b.timer.get(1, castInterval)){
                 hit.collision(b, target.x(), target.y());
@@ -72,7 +86,7 @@ public class BeamBulletType extends BulletType{
         }else{
             b.data = new Vec2().trns(b.rotation(), this.length).add(b.x, b.y);
             if(b.timer.get(1, castInterval) && castsLightning){
-                Vec2 point = (Vec2) b.data;
+                Vec2 point = (Vec2)b.data;
                 Lightning.create(b.team, color, Mathf.random(minLightningDamage, maxLightningDamage), b.x, b.y, b.angleTo(point.x, point.y), Mathf.floorPositive(b.dst(point.x, point.y) / Vars.tilesize + 3));
             }
         }
@@ -89,15 +103,7 @@ public class BeamBulletType extends BulletType{
             Tmp.v1.set(data);
 
             Draw.color(color);
-            Drawf.laser(b.team, Core.atlas.find("laser"), Core.atlas.find("laser-end"), b.x, b.y, Tmp.v1.x, Tmp.v1.y, beamWidth * b.fout());
-            Draw.reset();
-
-            Drawf.light(b.team, b.x, b.y, Tmp.v1.x, Tmp.v1.y, lightWidth * b.fout(), color, 0.6f);
-        }else if(b.data instanceof Vec2 data){
-            Tmp.v1.set(data);
-
-            Draw.color(color);
-            Drawf.laser(b.team, Core.atlas.find("laser"), Core.atlas.find("laser-end"), b.x, b.y, Tmp.v1.x, Tmp.v1.y, beamWidth * b.fout());
+            Drawf.laser(b.team, region, endRegion, b.x, b.y, Tmp.v1.x, Tmp.v1.y, beamWidth * b.fout());
             Draw.reset();
 
             Drawf.light(b.team, b.x, b.y, Tmp.v1.x, Tmp.v1.y, lightWidth * b.fout(), color, 0.6f);
