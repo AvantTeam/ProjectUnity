@@ -51,16 +51,16 @@ public class UnderworldMap extends Element {
         addListener(new InputListener(){
             @Override
             public void enter(InputEvent event, float x, float y, int pointer, Element fromActor) {
-                mouseX = x;
-                mouseY = y;
+                mouseX = (int)(x / 32f);
+                mouseY = (int)(y / 32f);
 
                 super.enter(event, x, y, pointer, fromActor);
             }
 
             @Override
             public boolean mouseMoved(InputEvent event, float x, float y) {
-                mouseX = x;
-                mouseY = y;
+                mouseX = (int)(x / 32f);
+                mouseY = (int)(y / 32f);
 
                 return super.mouseMoved(event, x, y);
             }
@@ -213,7 +213,7 @@ public class UnderworldMap extends Element {
         if(mouseX != -1 && mouseY != -1){
             Draw.color(Pal.accent);
             Draw.alpha(0.2f);
-            Fill.rect(x + (int)(mouseX / 32f) * 32f + 16f, y + (int)(mouseY / 32f) * 32f + 16f, 32, 32);
+            Fill.rect(x + mouseX * 32f + 16f, y + mouseY * 32f + 16f, 32, 32);
             Draw.reset();
         }
     }
