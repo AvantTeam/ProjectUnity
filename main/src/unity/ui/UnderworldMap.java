@@ -200,7 +200,7 @@ public class UnderworldMap extends Element {
         super.draw();
         Draw.color(Color.white);
 
-        if(region != null && darknessRegion != null) {
+        if(region != null && wallRegion != null && shadowRegion != null && darknessRegion != null) {
             rectCorner(region, region.width, region.height);
             rectCorner(shadowRegion, shadowRegion.width * 32f, shadowRegion.height * 32f);
             rectCorner(wallRegion, wallRegion.width, wallRegion.height);
