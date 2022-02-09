@@ -79,7 +79,7 @@ public class ClassicProjector extends ExpForceProjector{
                 if(Angles.near(a, rb, 90f)){
                     //deflect angle
                     b.trns(-b.vel.x, -b.vel.y);
-                    b.rotation(rb + 2 * (a - rb));
+                    b.rotation(rb + 2 * (a - rb) + 180f);
                 }
                 b.owner = this;
                 b.team = team;

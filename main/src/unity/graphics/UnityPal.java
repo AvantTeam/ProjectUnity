@@ -54,6 +54,8 @@ public class UnityPal{
     bgCol = valueOf("323232"),
     deepRed = Color.valueOf("f25555"),
     deepBlue = Color.valueOf("554deb"),
+    passive = valueOf("61caff"),
+    armor = valueOf("e09e75"),
 
     lancerSap1 = Pal.lancerLaser.cpy().lerp(Pal.sapBullet, 0.167f),
     lancerSap2 = Pal.lancerLaser.cpy().lerp(Pal.sapBullet, 0.333f),

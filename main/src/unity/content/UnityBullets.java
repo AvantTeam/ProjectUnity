@@ -207,6 +207,12 @@ public class UnityBullets{
             }
 
             @Override
+            public void init(){
+                super.init();
+                despawnHit = false;
+            }
+
+            @Override
             public void draw(Bullet b){
                 drawTrail(b);
 
