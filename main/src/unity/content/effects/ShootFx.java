@@ -143,6 +143,10 @@ public class ShootFx{
         });
     }),
 
+    tendenceShoot = new Effect(84f, e -> {
+
+    }),
+
     coloredPlasmaShoot = new Effect(25f, e -> {
         color(Color.white, e.color, e.fin());
         randLenVectors(e.id, 13, e.finpow() * 20f, e.rotation, 23f, (x, y) -> {
@@ -150,7 +154,7 @@ public class ShootFx{
             Fill.circle(e.x + x / 1.2f, e.y + y / 1.2f, e.fout() * 3f);
         });
     }),
-    
+
     sapPlasmaShoot = new Effect(25f, e -> {
         color(Color.white, Pal.sapBullet, e.fin());
         randLenVectors(e.id, 13, e.finpow() * 20f, e.rotation, 23f, (x, y) -> {

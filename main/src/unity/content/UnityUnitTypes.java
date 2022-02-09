@@ -4214,7 +4214,7 @@ public class UnityUnitTypes{
 
         stray = new UnityUnitType("stray"){{
             health = 300f;
-            speed = 4.5f;
+            speed = 5f;
             accel = 0.08f;
             drag = 0.045f;
             rotateSpeed = 8f;
@@ -4226,7 +4226,11 @@ public class UnityUnitTypes{
                 T get(int arg);
             }
 
-            FuncI<TexturedTrail> trail = length -> new TexturedTrail(Core.atlas.find("unity-phantasmal-trail"), length){{
+            FuncI<TexturedTrail> trail = length -> new TexturedTrail(
+                Core.atlas.find("unity-phantasmal-trail"),
+                Core.atlas.find("unity-phantasmal-trail-cap"),
+                length
+            ){{
                 blend = Blending.additive;
                 shrink = 0f;
                 fadeAlpha = 1f;
@@ -4247,7 +4251,7 @@ public class UnityUnitTypes{
                 public void update(float x, float y, float width){
                     super.update(x, y, width);
                     for(TrailHold trail : trails){
-                        if(Mathf.chanceDelta(0.3f)){
+                        if(Mathf.chanceDelta(0.33f)){
                             Tmp.v1.trns(unit.rotation - 90f, trail.x, trail.y);
                             Fx.missileTrail.at(x + Tmp.v1.x, y + Tmp.v1.y, trail.width * 1.3f, engineColor);
                         }
@@ -4284,7 +4288,7 @@ public class UnityUnitTypes{
                 inaccuracy = 30f;
                 layerOffset = 10f;
                 angleCone = 120f;
-                eyeRadius = 1.5f;
+                eyeRadius = 1.8f;
 
                 shootSound = UnitySounds.energyBolt;
                 bullet = new BasicBulletType(1f, 6f, "shell"){
@@ -4321,7 +4325,99 @@ public class UnityUnitTypes{
         }};
 
         tendence = new UnityUnitType("tendence"){{
+            health = 1200f;
+            speed = 4.2f;
+            accel = 0.08f;
+            drag = 0.045f;
+            rotateSpeed = 8f;
+            flying = true;
+            lowAltitude = true;
 
+            // again, i hate boxed types
+            interface FuncI<T>{
+                T get(int arg);
+            }
+
+            FuncI<TexturedTrail> trail = length -> new TexturedTrail(
+                Core.atlas.find("unity-phantasmal-trail"),
+                Core.atlas.find("unity-phantasmal-trail-cap"),
+                length
+            ){{
+                blend = Blending.additive;
+                shrink = 0f;
+                fadeAlpha = 1f;
+            }};
+
+            engineColor = engineColorInner = Color.clear;
+            engineOffset = 14f;
+            trailType = unit -> new MultiTrail(
+                new TrailHold(trail.get(12), -5f, 6f, 1f, UnityPal.monolithLight),
+                new TrailHold(trail.get(12), 5f, 6f, 1f, UnityPal.monolithLight)
+            ){
+                {
+                    rotation = () -> unit.rotation;
+                }
+
+                @Override
+                public void update(float x, float y, float width){
+                    super.update(x, y, width);
+                    for(TrailHold trail : trails){
+                        if(Mathf.chanceDelta(0.5f)){
+                            Tmp.v1.trns(unit.rotation - 90f, trail.x, trail.y);
+                            Fx.missileTrail.at(x + Tmp.v1.x, y + Tmp.v1.y, trail.width * 1.3f, engineColor);
+                        }
+                    }
+                }
+            };
+            trailLength = 12;
+
+            weapons.add(new EnergyRingWeapon(){{
+                rings.add(new Ring(){{
+                    radius = 6.5f;
+                    thickness = 1f;
+                    spikes = 8;
+                    spikeOffset = 1.5f;
+                    spikeWidth = 2f;
+                    spikeLength = 5f;
+                    color = UnityPal.monolithDark.cpy().lerp(UnityPal.monolith, 0.5f);
+                }}, new Ring(){{
+                    shootY = radius = 3f;
+                    rotate = false;
+                    thickness = 1f;
+                    divisions = 2;
+                    divisionSeparation = 30f;
+                    angleOffset = 90f;
+                    color = UnityPal.monolith;
+                }});
+
+                x = 0f;
+                y = 1f;
+                mirror = false;
+                rotate = true;
+                reload = 72f;
+                firstShotDelay = 24f;
+                shootStatus = StatusEffects.slow;
+                shootStatusDuration = 1f;
+                inaccuracy = 30f;
+                layerOffset = 10f;
+                angleCone = 120f;
+                eyeRadius = 1.8f;
+                parentizeEffects = true;
+
+                //chargeSound = ...
+                //shootSound = ...
+                bullet = new BeamBulletType(135f, 48f){{
+                    color = UnityPal.monolith;
+                    beamWidth = 1f;
+                    castsLightning = true;
+                    minLightningDamage = 7f;
+                    maxLightningDamage = 15f;
+
+                    chargeShootEffect = ChargeFx.tendenceCharge;
+                    shootEffect = ShootFx.tendenceShoot;
+                    hitEffect = Fx.hitLancer;
+                }};
+            }});
         }};
 
         liminality = new UnityUnitType("liminality"){{
