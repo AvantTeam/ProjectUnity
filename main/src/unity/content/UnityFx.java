@@ -176,9 +176,9 @@ public class UnityFx{
         color(Color.white, e.color, 0.3f);
         integer = 0;
         float fin2 = Mathf.clamp(e.fin() * 5f);
-        randLenVectors(e.id, 1, 15f + 6f * fin2, (x, y) -> {
+        randLenVectors(e.id, 1, 16f + 2f * fin2, (x, y) -> {
             integer++;
-            Fill.poly(e.x + x, e.y + y, 6, fin2 * Mathf.randomSeed(e.id + integer, 15f, 19f) * Mathf.clamp(9f * e.fout()) + 0.1f);
+            Fill.poly(e.x + x, e.y + y, 6, fin2 * Mathf.randomSeed(e.id + integer, 6f, 13f) * Mathf.clamp(9f * e.fout()) + 0.1f);
         });
     }).layer(Layer.debris - 1.1f),
 

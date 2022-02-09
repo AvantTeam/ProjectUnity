@@ -87,9 +87,13 @@ public class TexturedTrail extends Trail{
             float x1 = items[i], y1 = items[i + 1], w1 = items[i + 2], w = w1 * width / (psize / 4f) * i / 4f * 2f;
             if(w1 <= 0.001f) return;
 
+            Draw.blend(blend);
             Draw.mixcol(color, mixAlpha);
+
             Draw.rect(capRegion, x1, y1, w, w, -Mathf.radDeg * lastAngle + 180f);
+
             Draw.mixcol();
+            Draw.blend();
         }
     }
 

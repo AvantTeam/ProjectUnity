@@ -1,18 +1,24 @@
 package unity.content.effects;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
+import arc.util.pooling.*;
+import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import unity.entities.effects.*;
 import unity.graphics.*;
+import unity.graphics.MultiTrail.*;
 import unity.util.*;
 
 import static arc.graphics.g2d.Draw.*;
 import static arc.graphics.g2d.Lines.*;
 import static arc.math.Angles.*;
+import static mindustry.Vars.*;
 
 public class ChargeFx{
     public static Effect
@@ -122,5 +128,97 @@ public class ChargeFx{
         UnityDrawf.shiningCircle(e.id, Time.time, e.x, e.y, e.fin() * 9.5f, 6, 25f, 20f, 3f * e.fin());
         color(Color.white);
         UnityDrawf.shiningCircle(e.id, Time.time, e.x, e.y, e.fin() * 7.5f, 6, 25f, 20f, 2.5f * e.fin());
-    });
+    }),
+
+    tendenceCharge = new Effect(32f, e -> {
+        if(!(e.data instanceof TrailHold[] data)) return;
+
+        color(UnityPal.monolithDark, UnityPal.monolith, e.fin());
+        alpha(e.fin());
+        randLenVectors(e.id, 8, e.foutpow() * 20f, (x, y) ->
+            Fill.circle(e.x + x, e.y + y, 1.5f + e.fin() * 4.5f)
+        );
+
+        color();
+        for(TrailHold hold : data){
+            Tmp.v1.set(hold.x, hold.y).sub(e.x, e.y);
+            Tmp.v2.trns(Tmp.v1.angle(), Mathf.sin(hold.width * 0.3f, hold.width * 4f * e.fin()));
+
+            Tmp.v1.setLength(1f - e.finpowdown()).add(Tmp.v2);
+            float x = e.x + Tmp.v1.x, y = e.y + Tmp.v1.y;
+
+            if(!state.isPaused()) hold.trail.update(x, y, hold.width);
+            hold.trail.draw(UnityPal.monolithLight, hold.width);
+        }
+
+        stroke(e.fin(), UnityPal.monolithLight);
+        Lines.circle(e.x, e.y, e.fout() * 32f);
+    }){
+        boolean initialized;
+        final int trailAmount = 12;
+        final int trailLength = 12;
+
+        @Override
+        public void at(float x, float y, float rotation, Color color){
+            create(x, y, rotation, color, null);
+        }
+
+        @Override
+        public void at(float x, float y, float rotation, Color color, Object data){
+            create(x, y, rotation, color, data);
+        }
+
+        void create(float x, float y, float rotation, Color color, Object data){
+            if(headless || !Core.settings.getBool("effects")) return;
+
+            if(Core.camera.bounds(Tmp.r1).overlaps(Tmp.r2.setCentered(x, y, clip))){
+                if(!initialized){
+                    initialized = true;
+                    init();
+                }
+
+                if(startDelay <= 0f){
+                    inst(x, y, rotation, color, data);
+                }else{
+                    Time.runTask(startDelay, () -> inst(x, y, rotation, color, data));
+                }
+            }
+        }
+
+        void inst(float x, float y, float rotation, Color color, Object data){
+            CustomEffectState entity = Pools.obtain(CustomEffectState.class, CustomEffectState::new);
+            entity.effect = this;
+            entity.rotation = baseRotation + rotation;
+            entity.data = createTrails();
+            entity.lifetime = lifetime;
+            entity.set(x, y);
+            entity.color.set(color);
+            if(followParent && data instanceof Posc p){
+                entity.parent = p;
+                entity.rotWithParent = rotWithParent;
+            }
+
+            entity.add();
+        }
+
+        TrailHold[] createTrails(){
+            TrailHold[] trails = new TrailHold[trailAmount];
+            for(int i = 0; i < trails.length; i++){
+                Tmp.v1.setLength(Mathf.random(16f, 32f)).setToRandomDirection();
+                trails[i] = new TrailHold(new TexturedTrail(Core.atlas.find("unity-phantasmal-trail"), trailLength){{
+                    fadeAlpha = 0.5f;
+                    blend = Blending.additive;
+                }}, Tmp.v1.x, Tmp.v1.y, Mathf.random(1f, 2f));
+            }
+            return trails;
+        }
+
+        static class CustomEffectState extends EffectState{
+            @Override
+            public void remove(){
+                if(data instanceof TrailHold[] data) for(TrailHold trail : data) Fx.trailFade.at(x, y, trail.width, trail.trail);
+                super.remove();
+            }
+        }
+    }.followParent(true);
 }

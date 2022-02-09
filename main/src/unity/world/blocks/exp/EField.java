@@ -14,6 +14,7 @@ public abstract class EField<T> {
     public @Nullable
     Stat stat;
     public boolean hasTable = true;
+    public boolean formatAll = true;
     public EField(Stat stat){
         this.stat = stat;
     }
@@ -21,6 +22,11 @@ public abstract class EField<T> {
     public abstract T fromLevel(int l);
     public abstract void setLevel(int l);
     public void buildTable(Table table, int end){}
+
+    public EField<T> formatAll(boolean f){
+        this.formatAll = f;
+        return this;
+    }
 
     @Override
     public String toString(){
@@ -58,16 +64,16 @@ public abstract class EField<T> {
         @Override
         public String toString(){
             //return Strings.autoFixed(start, 1) + " + " + "[#84ff00]" + Strings.autoFixed(scale, 1) + " per level[]";
-            return Core.bundle.format("field.linear", format.get(start), format.get(scale));
+            return Core.bundle.format("field.linear", format.get(start), formatAll ? format.get(scale) : Strings.autoFixed(scale, 2));
         }
 
         @Override
         public void buildTable(Table table, int end){
             table.left();
             Graph g = new Graph(this::fromLevel, end, UnityPal.exp);
-            table.add(g).size(graphWidth, graphHeight);
+            table.add(g).size(graphWidth, graphHeight).left();
             table.row();
-            table.label(() -> g.lastMouseOver ? Core.bundle.format("ui.graph.label", g.lastMouseStep, format.get(g.mouseValue())) : Core.bundle.get("ui.graph.hover"));
+            table.label(() -> g.lastMouseOver ? (Core.bundle.format("ui.graph.label", g.lastMouseStep, formatAll ? format.get(g.mouseValue()) : Strings.autoFixed(g.mouseValue(), 2))) : Core.bundle.get("ui.graph.hover"));
         }
     }
 
@@ -95,8 +101,7 @@ public abstract class EField<T> {
 
         @Override
         public String toString(){
-            //return Strings.autoFixed(start, 1) + " + " + "[#84ff00]" + Strings.autoFixed(scale, 1) + " per level[]";
-            return Core.bundle.format("field.linearcap", format.get(start), format.get(scale), cap);
+            return Core.bundle.format("field.linearcap", format.get(start), formatAll ? format.get(scale) : Strings.autoFixed(scale, 2), cap);
         }
     }
 
@@ -137,9 +142,9 @@ public abstract class EField<T> {
         public void buildTable(Table table, int end){
             table.left();
             Graph g = new Graph(this::fromLevel, end, UnityPal.exp);
-            table.add(g).size(graphWidth, graphHeight);
+            table.add(g).size(graphWidth, graphHeight).left();
             table.row();
-            table.label(() -> g.lastMouseOver ? Core.bundle.format("ui.graph.label", g.lastMouseStep, format.get(g.mouseValue())) : Core.bundle.get("ui.graph.hover"));
+            table.label(() -> g.lastMouseOver ? (Core.bundle.format("ui.graph.label", g.lastMouseStep, formatAll ? format.get(g.mouseValue()) : Strings.autoFixed(g.mouseValue(), 2))) : Core.bundle.get("ui.graph.hover"));
         }
     }
 
@@ -202,16 +207,16 @@ public abstract class EField<T> {
 
         @Override
         public String toString(){
-            return Core.bundle.format("field.rational", format.get(start), format.get(end));
+            return Core.bundle.format("field.rational", format.get(start), formatAll ? format.get(end) : Strings.autoFixed(end, 2));
         }
 
         @Override
         public void buildTable(Table table, int end){
             table.left();
             Graph g = new Graph(this::fromLevel, end, UnityPal.exp);
-            table.add(g).size(graphWidth, graphHeight);
+            table.add(g).size(graphWidth, graphHeight).left();
             table.row();
-            table.label(() -> g.lastMouseOver ? Core.bundle.format("ui.graph.label", g.lastMouseStep, format.get(g.mouseValue())) : Core.bundle.get("ui.graph.hover"));
+            table.label(() -> g.lastMouseOver ? (Core.bundle.format("ui.graph.label", g.lastMouseStep, formatAll ? format.get(g.mouseValue()) : Strings.autoFixed(g.mouseValue(), 2))) : Core.bundle.get("ui.graph.hover"));
         }
     }
 
