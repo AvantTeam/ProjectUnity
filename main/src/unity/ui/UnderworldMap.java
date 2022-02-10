@@ -13,6 +13,8 @@ import mindustry.graphics.Pal;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 
+import java.util.stream.Stream;
+
 import static mindustry.Vars.*;
 
 /* ThePythonGuy3 */
@@ -157,7 +159,12 @@ public class UnderworldMap extends Element {
                     if(tile.floor().isLiquid){
                         pixmap.draw(Core.atlas.getPixmap(Blocks.darksand.variantRegions[Mathf.random(0, 2)]), tile.x * 32, (world.height() - tile.y) * 32);
                     } else {
-                        pixmap.draw(Core.atlas.getPixmap(Blocks.craters.variantRegions[Mathf.random(0, 2)]), tile.x * 32, (world.height() - tile.y) * 32);
+                        TextureRegion tex = Blocks.stone.variantRegions[Mathf.random(0, 2)];
+                        if (Mathf.chance(0.2f)) {
+                            tex = Blocks.craters.variantRegions[Mathf.random(0, 2)];
+                        }
+
+                        pixmap.draw(Core.atlas.getPixmap(tex), tile.x * 32, (world.height() - tile.y) * 32);
                     }
                 } else {
                     wallPixmap.draw(Core.atlas.getPixmap(Blocks.duneWall.variantRegions[Mathf.random(0, 1)]), tile.x * 32, (world.height() - tile.y) * 32);

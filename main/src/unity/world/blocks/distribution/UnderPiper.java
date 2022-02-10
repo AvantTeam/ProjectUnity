@@ -32,7 +32,7 @@ public class UnderPiper extends Block {
     @Override
     public void load() {
         super.load();
-        Time.run(30, UnderworldBlocks::load);
+        Time.runTask(30, UnderworldBlocks::load);
     }
 
     public class UnderPiperBuild extends Building {
