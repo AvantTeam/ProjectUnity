@@ -13,8 +13,6 @@ import mindustry.graphics.Pal;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 
-import java.util.stream.Stream;
-
 import static mindustry.Vars.*;
 
 /* ThePythonGuy3 */
