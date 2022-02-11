@@ -1,10 +1,8 @@
 package unity.world.blocks.distribution;
 
-import arc.Core;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
-import mindustry.game.Team;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.Styles;
@@ -32,7 +30,7 @@ public class UnderPiper extends Block {
     @Override
     public void load() {
         super.load();
-        Time.run(30, UnderworldBlocks::load);
+        Time.runTask(30, UnderworldBlocks::load);
     }
 
     public class UnderPiperBuild extends Building {
@@ -59,7 +57,7 @@ public class UnderPiper extends Block {
             piping.cont.table(t -> {
                 t.center().bottom();
 
-                ScrollPane pane = t.pane(p -> {
+                ScrollPane pane = t.pane(Styles.nonePane, p -> {
                     UnderworldMap map = new UnderworldMap();
                     map.reset();
                     map.updateAll();
@@ -78,6 +76,7 @@ public class UnderPiper extends Block {
                         tt.row();
                         tt.image().color(Pal.accent).height(4f).growX().marginLeft(5).marginRight(5).growX();
                         tt.row();
+                        tt.labelWrap("Planet: ???").growX().labelAlign(Align.center);
                     }).padBottom(5f).grow();
 
                     tl.row();
@@ -90,6 +89,8 @@ public class UnderPiper extends Block {
                         tt.row();
 
                         tt.pane(p -> {
+                            p.left().top();
+
                             for (int i = 0; i < UnderworldBlocks.blocks.size; i++) {
                                 UnderworldBlock bloc = UnderworldBlocks.blocks.get(i);
 
@@ -101,8 +102,8 @@ public class UnderPiper extends Block {
 
                                 if ((i + 1) % 4 == 0) p.row();
                             }
-                        });
-                    }).height(215f);
+                        }).grow();
+                    }).height(215f).growX();
                 }).growY().width(205f);
             }).grow();
 

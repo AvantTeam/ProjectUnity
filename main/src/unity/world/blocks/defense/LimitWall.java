@@ -19,9 +19,9 @@ public class LimitWall extends Wall{
     @Override
     public void setStats(){
         super.setStats();
-        if(maxDamage > 0f && blinkFrame > 0f) stats.add(Stat.abilities, "@\n@", bundle.format("stat.unity.maxdamage", maxDamage), bundle.format("stat.unity.blinkframe", blinkFrame));
-        else if(maxDamage > 0f) stats.add(Stat.abilities, "@", bundle.format("stat.unity.maxdamage", maxDamage));
-        else if(blinkFrame > 0f) stats.add(Stat.abilities, "@", bundle.format("stat.unity.blinkframe", blinkFrame));
+        //if(maxDamage > 0f && blinkFrame > 0f) stats.add(Stat.abilities, "@\n@", bundle.format("stat.unity.maxdamage", maxDamage), bundle.format("stat.unity.blinkframe", blinkFrame));
+        if(maxDamage > 0f) stats.add(Stat.abilities, "@", bundle.format("stat.unity.maxdamage", maxDamage));
+        if(blinkFrame > 0f) stats.add(Stat.abilities, "@", bundle.format("stat.unity.blinkframe", blinkFrame));
     }
 
     public class LimitWallBuild extends WallBuild{

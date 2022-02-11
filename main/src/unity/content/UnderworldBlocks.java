@@ -6,22 +6,12 @@ import mindustry.type.*;
 import unity.type.*;
 
 public class UnderworldBlocks {
+    public static boolean loaded = false;
     public static Seq<UnderworldBlock> blocks = new Seq<>();
 
     public static void load() {
-            blocks.add(new UnderworldBlock("pipe-straight", ItemStack.with(Items.copper, 1), 10));
-            blocks.add(new UnderworldBlock("pipe-straight", ItemStack.with(Items.copper, 1), 10));
-            blocks.add(new UnderworldBlock("pipe-straight", ItemStack.with(Items.copper, 1), 10));
-            blocks.add(new UnderworldBlock("pipe-straight", ItemStack.with(Items.copper, 1), 10));
-            blocks.add(new UnderworldBlock("pipe-straight", ItemStack.with(Items.copper, 1), 10));
-            blocks.add(new UnderworldBlock("pipe-straight", ItemStack.with(Items.copper, 1), 10));
-            blocks.add(new UnderworldBlock("pipe-straight", ItemStack.with(Items.copper, 1), 10));
-            blocks.add(new UnderworldBlock("pipe-straight", ItemStack.with(Items.copper, 1), 10));
-            blocks.add(new UnderworldBlock("pipe-straight", ItemStack.with(Items.copper, 1), 10));
-            blocks.add(new UnderworldBlock("pipe-straight", ItemStack.with(Items.copper, 1), 10));
-            blocks.add(new UnderworldBlock("pipe-straight", ItemStack.with(Items.copper, 1), 10));
-            blocks.add(new UnderworldBlock("pipe-straight", ItemStack.with(Items.copper, 1), 10));
-            blocks.add(new UnderworldBlock("pipe-straight", ItemStack.with(Items.copper, 1), 10));
-            blocks.add(new UnderworldBlock("pipe-straight", ItemStack.with(Items.copper, 1), 10));
+        if(loaded) return;
+        blocks.add(new UnderworldBlock("pipe-straight", ItemStack.with(Items.copper, 1), 10));
+        loaded = true;
     }
 }

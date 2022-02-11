@@ -14,7 +14,7 @@ public class UnityItems{
     advanceAlloy, cupronickel, darkAlloy, dirium, lightAlloy, monolithAlloy, archDebris, plagueAlloy, sparkAlloy, superAlloy, terminaAlloy,
     terminationFragment, terminum,
     //faction items
-    contagium, denseAlloy, imberium, irradiantSurge, luminum, monolite, nickel, steel, stone, umbrium, xenium;
+    contagium, denseAlloy, imberium, irradiantSurge, luminum, monolite, nickel, steel, stone, umbrium, xenium, uranium;
 
     public static void load(){
         //region faction-alloys
@@ -156,6 +156,12 @@ public class UnityItems{
             cost = 1.2f;
             hardness = 3;
             radioactivity = 0.6f;
+        }};
+
+        uranium = new Item("uranium", Color.valueOf("ace284")){{
+            cost = 2f;
+            hardness = 3;
+            radioactivity = 1f;
         }};
 
         //endregion

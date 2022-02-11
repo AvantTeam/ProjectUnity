@@ -3,33 +3,39 @@ package unity.ui;
 import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.graphics.gl.Shader;
 import arc.math.Mathf;
 import arc.scene.*;
 import arc.scene.event.InputEvent;
 import arc.scene.event.InputListener;
 import arc.util.*;
-import mindustry.Vars;
 import mindustry.content.Blocks;
-import mindustry.game.*;
 import mindustry.graphics.Pal;
-import mindustry.graphics.Shaders;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
-import mindustry.world.meta.Stat;
 
 import static mindustry.Vars.*;
 
-/* Most code comes from MinimapRenderer.java by Anuke */
+/* ThePythonGuy3 */
+/* Some code comes from MinimapRenderer.java by Anuke */
 public class UnderworldMap extends Element {
-    private static final float baseSize = 16f;
     private Pixmap pixmap;
     private Texture texture;
     private TextureRegion region;
+
+    private Pixmap wallPixmap;
+    private Texture wallTexture;
+    private TextureRegion wallRegion;
+
     private Pixmap shadowPixmap;
     private Texture shadowTexture;
     private TextureRegion shadowRegion;
+
+    private Pixmap darknessPixmap;
+    private Texture darknessTexture;
+    private TextureRegion darknessRegion;
     private float mouseX = -1, mouseY = -1;
+
+    private final Color darknessColor = Color.white.cpy().lerp(Color.black, 0.71f), realDarknessColor = new Color(0f, 0f, 0f, darknessColor.a);
 
     @Override
     public float getMinWidth() {
@@ -45,16 +51,16 @@ public class UnderworldMap extends Element {
         addListener(new InputListener(){
             @Override
             public void enter(InputEvent event, float x, float y, int pointer, Element fromActor) {
-                mouseX = x;
-                mouseY = y;
+                mouseX = (int)(x / 32f);
+                mouseY = (int)(y / 32f);
 
                 super.enter(event, x, y, pointer, fromActor);
             }
 
             @Override
             public boolean mouseMoved(InputEvent event, float x, float y) {
-                mouseX = x;
-                mouseY = y;
+                mouseX = (int)(x / 32f);
+                mouseY = (int)(y / 32f);
 
                 return super.mouseMoved(event, x, y);
             }
@@ -84,18 +90,36 @@ public class UnderworldMap extends Element {
             texture.dispose();
         }
 
+        if(wallPixmap != null){
+            wallPixmap.dispose();
+            wallTexture.dispose();
+        }
+
         if(shadowPixmap != null){
             shadowPixmap.dispose();
             shadowTexture.dispose();
+        }
+
+        if(darknessPixmap != null){
+            darknessPixmap.dispose();
+            darknessTexture.dispose();
         }
 
         pixmap = new Pixmap(world.width() * 32, world.height() * 32);
         texture = new Texture(pixmap);
         region = new TextureRegion(texture);
 
-        shadowPixmap = new Pixmap(world.width() * 32, world.height() * 32);
+        wallPixmap = new Pixmap(world.width() * 32, world.height() * 32);
+        wallTexture = new Texture(wallPixmap);
+        wallRegion = new TextureRegion(wallTexture);
+
+        shadowPixmap = new Pixmap(world.width(), world.height());
         shadowTexture = new Texture(shadowPixmap);
         shadowRegion = new TextureRegion(shadowTexture);
+
+        darknessPixmap = new Pixmap(world.width(), world.height());
+        darknessTexture = new Texture(darknessPixmap);
+        darknessRegion = new TextureRegion(darknessTexture);
     }
 
     public boolean isFree(Tile tile, int x, int y){
@@ -133,24 +157,39 @@ public class UnderworldMap extends Element {
                     if(tile.floor().isLiquid){
                         pixmap.draw(Core.atlas.getPixmap(Blocks.darksand.variantRegions[Mathf.random(0, 2)]), tile.x * 32, (world.height() - tile.y) * 32);
                     } else {
-                        pixmap.draw(Core.atlas.getPixmap(Blocks.craters.variantRegions[Mathf.random(0, 2)]), tile.x * 32, (world.height() - tile.y) * 32);
-                    }
-                } else {
-                    if (checkSquare(tile, 2)) {
-                        pixmap.draw(Core.atlas.getPixmap(Blocks.duneWall.variantRegions[Mathf.random(0, 1)]), tile.x * 32, (world.height() - tile.y) * 32);
-                    } else {
-                        if (checkSquare(tile, 4)) {
-                            shadowPixmap.fillRect(tile.x * 32, (world.height() - tile.y) * 32, 32, 32, Color.black.rgba());
+                        TextureRegion tex = Blocks.stone.variantRegions[Mathf.random(0, 2)];
+                        if (Mathf.chance(0.2f)) {
+                            tex = Blocks.craters.variantRegions[Mathf.random(0, 2)];
                         }
 
-                        pixmap.fillRect(tile.x * 32, (world.height() - tile.y) * 32, 32, 32, Color.black.rgba());
+                        pixmap.draw(Core.atlas.getPixmap(tex), tile.x * 32, (world.height() - tile.y) * 32);
                     }
+                } else {
+                    wallPixmap.draw(Core.atlas.getPixmap(Blocks.duneWall.variantRegions[Mathf.random(0, 1)]), tile.x * 32, (world.height() - tile.y) * 32);
+                    if (checkSquare(tile, 1)) {
+                        shadowPixmap.fillRect(tile.x, world.height() - tile.y, 1, 1, realDarknessColor.rgba());
+                    }
+
+                    float dark = world.getDarkness(tile.x, tile.y);
+                    dark = dark <= 0f ? 1f : 1f - Math.min((dark + 0.5f) / 4f, 1f);
+
+                    darknessPixmap.fillRect(tile.x, world.height() - tile.y, 1, 1, new Color(0f, 0f, 0f, 1f - dark).rgba());
                 }
             }
         }
 
         texture.draw(pixmap);
+        wallTexture.draw(wallPixmap);
         shadowTexture.draw(shadowPixmap);
+        darknessTexture.draw(darknessPixmap);
+
+        shadowTexture.setFilter(Texture.TextureFilter.linear, Texture.TextureFilter.linear);
+        darknessTexture.setFilter(Texture.TextureFilter.linear, Texture.TextureFilter.linear);
+        
+        pixmap.dispose();
+        wallPixmap.dispose();
+        shadowPixmap.dispose();
+        darknessPixmap.dispose();
     }
 
     public void rectCorner(TextureRegion tr, float w, float h){
@@ -166,15 +205,11 @@ public class UnderworldMap extends Element {
         super.draw();
         Draw.color(Color.white);
 
-        if(region != null && shadowRegion != null) {
+        if(region != null && wallRegion != null && shadowRegion != null && darknessRegion != null) {
             rectCorner(region, region.width, region.height);
-            Draw.alpha(0.1f);
-            for(int i = -4; i < 5; i++) {
-                for(int j = -4; j < 5; j++) {
-                    rectCorner(shadowRegion, (float)(x + Math.pow(i / 4f, 2) * i * 8f), (float)(y + Math.pow(j / 4f, 2) * j * 8f), shadowRegion.width, shadowRegion.height);
-                }
-            }
-            Draw.alpha(1f);
+            rectCorner(shadowRegion, shadowRegion.width * 32f, shadowRegion.height * 32f);
+            rectCorner(wallRegion, wallRegion.width, wallRegion.height);
+            rectCorner(darknessRegion, darknessRegion.width * 32f, darknessRegion.height * 32f);
         } else {
             reset();
             updateAll();
@@ -183,7 +218,7 @@ public class UnderworldMap extends Element {
         if(mouseX != -1 && mouseY != -1){
             Draw.color(Pal.accent);
             Draw.alpha(0.2f);
-            Fill.rect(x + (int)(mouseX / 32f) * 32f + 16f, y + (int)(mouseY / 32f) * 32f + 16f, 32, 32);
+            Fill.rect(x + mouseX * 32f + 16f, y + mouseY * 32f + 16f, 32, 32);
             Draw.reset();
         }
     }

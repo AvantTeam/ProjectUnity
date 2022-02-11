@@ -149,6 +149,9 @@ public class UnityBlocks{
     //unit
     bufferPad, omegaPad, cachePad, convertPad,
 
+    //power
+    uraniumReactor,
+
     //TODO
     expFountain, expVoid, expTank, expChest, expRouter, expTower, expTowerDiagonal, bufferTower, expHub;// expOutput, expUnloader;
 
@@ -1538,32 +1541,42 @@ public class UnityBlocks{
             health = 560;
         }};
 
-        steelWall = new LimitWall("steel-wall"){{
+        steelWall = new LevelLimitWall("steel-wall"){{
             requirements(Category.defense, with(UnityItems.steel, 6));
             maxDamage = 24f;
             health = 810;
+
+            expFields = new EField[]{
+                    new ERational(v -> maxDamage = v, 48f, 24f, -3f, Stat.abilities, v -> bundle.format("stat.unity.maxdamage", v)).formatAll(false)
+            };
         }};
 
-        steelWallLarge = new LimitWall("steel-wall-large"){{
+        steelWallLarge = new LevelLimitWall("steel-wall-large"){{
             requirements(Category.defense, with(UnityItems.steel, 24));
             maxDamage = 48f;
             health = 3240;
             size = 2;
+
+            expFields = new EField[]{
+                    new ERational(v -> maxDamage = v, 72f, 24f, -3f, Stat.abilities, v -> bundle.format("stat.unity.maxdamage", v)).formatAll(false)
+            };
         }};
 
-        diriumWall = new LimitWall("dirium-wall"){{
+        diriumWall = new LevelLimitWall("dirium-wall"){{
             requirements(Category.defense, with(UnityItems.dirium, 6));
             maxDamage = 76f;
             blinkFrame = 30f;
             health = 760;
+            maxLevel = 12;
         }};
 
-        diriumWallLarge = new LimitWall("dirium-wall-large"){{
+        diriumWallLarge = new LevelLimitWall("dirium-wall-large"){{
             requirements(Category.defense, with(UnityItems.dirium, 24));
             maxDamage = 152f;
             blinkFrame = 30f;
             health = 3040;
             size = 2;
+            maxLevel = 12;
         }};
 
         shieldProjector = new ClassicProjector("shield-generator"){{
@@ -1661,6 +1674,20 @@ public class UnityBlocks{
                 new UnitType[]{UnityUnitTypes.cache, UnityUnitTypes.dijkstra},
                 new UnitType[]{UnityUnitTypes.omega, UnitTypes.reign}
             );
+        }};
+
+        uraniumReactor = new KoruhReactor("uranium-reactor"){{
+                requirements(Category.power, with(Items.plastanium, 80, Items.surgeAlloy, 100, Items.lead, 150, UnityItems.steel, 200));
+                size = 3;
+
+                itemDuration = 200f;
+                consumes.item(UnityItems.uranium, 2);
+                consumes.liquid(Liquids.cryofluid, 0.7f);
+                consumes.power(20f);
+
+                itemCapacity = 20;
+                powerProduction = 150f;
+                health = 1000;
         }};
 
         teleporter = new Teleporter("teleporter"){{

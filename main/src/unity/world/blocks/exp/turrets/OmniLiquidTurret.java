@@ -80,7 +80,7 @@ public class OmniLiquidTurret extends ExpTurret {
                     bt.left().defaults().padRight(3).left();
 
                     //damage of geyser
-                    float damage = type.damage * GeyserBulletType.damageScale(t);
+                    float damage = type.damage * GeyserBulletType.damageScale(t) * 60f;
                     if(damage > 0f) sep(bt, Core.bundle.format("bullet.splashdamage", Strings.autoFixed(damage, 1), Strings.fixed(type.radius / tilesize, 1)));
                     else sep(bt, Core.bundle.format("bullet.splashheal", Strings.autoFixed(-damage, 1), Strings.fixed(type.radius / tilesize, 1)));
 
