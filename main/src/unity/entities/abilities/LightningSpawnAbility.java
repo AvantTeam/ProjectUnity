@@ -10,7 +10,6 @@ import mindustry.entities.*;
 import mindustry.entities.abilities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import unity.content.*;
 import unity.content.effects.*;
 import unity.graphics.*;
 
@@ -32,7 +31,7 @@ public class LightningSpawnAbility extends Ability{
     protected boolean useAmmo = true;
     protected Sound shootSound = Sounds.spark;
     protected Color backColor = UnityPal.monolithDark.cpy().a(0.5f), frontColor = UnityPal.monolithLight.cpy().a(0.5f);
-    protected Effect damageEffect = SpecialFx.chainLightningActive, hitEffect = Fx.hitLaserBlast, trailEffect = UnityFx.monolithSoul;
+    protected Effect damageEffect = SpecialFx.chainLightningActive, hitEffect = Fx.hitLaserBlast, trailEffect = ParticleFx.monolithSpark;
 
     protected float timer, reload;
 

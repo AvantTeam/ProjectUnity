@@ -22,6 +22,7 @@ import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 import unity.annotations.Annotations.*;
 import unity.content.effects.*;
+import unity.content.units.*;
 import unity.entities.bullet.anticheat.*;
 import unity.entities.bullet.energy.*;
 import unity.entities.bullet.exp.*;
@@ -147,6 +148,9 @@ public class UnityBlocks{
 
     //unit
     bufferPad, omegaPad, cachePad, convertPad,
+
+    //power
+    uraniumReactor,
 
     //TODO
     expFountain, expVoid, expTank, expChest, expRouter, expTower, expTowerDiagonal, bufferTower, expHub;// expOutput, expUnloader;
@@ -309,14 +313,14 @@ public class UnityBlocks{
 
                 new UnitType[]{UnityUnitTypes.rex, UnityUnitTypes.excelsus},
 
-                new UnitType[]{UnityUnitTypes.monument, UnityUnitTypes.colossus}
+                new UnitType[]{MonolithUnitTypes.monument, MonolithUnitTypes.colossus}
             );
             otherUpgrades.add(
                 new UnitType[]{UnityUnitTypes.citadel, UnityUnitTypes.empire},
 
                 new UnitType[]{UnityUnitTypes.araneidae, UnityUnitTypes.theraphosidae},
 
-                new UnitType[]{UnityUnitTypes.colossus, UnityUnitTypes.bastion}
+                new UnitType[]{MonolithUnitTypes.colossus, MonolithUnitTypes.bastion}
             );
             consumes.power(5f);
             consumes.items(with(Items.silicon, 1200, Items.metaglass, 800, Items.thorium, 700, Items.surgeAlloy, 400, Items.plastanium, 600, Items.phaseFabric, 350));
@@ -1670,6 +1674,20 @@ public class UnityBlocks{
                 new UnitType[]{UnityUnitTypes.cache, UnityUnitTypes.dijkstra},
                 new UnitType[]{UnityUnitTypes.omega, UnitTypes.reign}
             );
+        }};
+
+        uraniumReactor = new KoruhReactor("uranium-reactor"){{
+                requirements(Category.power, with(Items.plastanium, 80, Items.surgeAlloy, 100, Items.lead, 150, UnityItems.steel, 200));
+                size = 3;
+
+                itemDuration = 200f;
+                consumes.item(UnityItems.uranium, 2);
+                consumes.liquid(Liquids.cryofluid, 0.7f);
+                consumes.power(20f);
+
+                itemCapacity = 20;
+                powerProduction = 150f;
+                health = 1000;
         }};
 
         teleporter = new Teleporter("teleporter"){{

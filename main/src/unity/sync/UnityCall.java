@@ -27,7 +27,7 @@ public class UnityCall{
 
     public static void soulJoin(MonolithSoul soul, Entityc ent){
         if(net.server() || !net.active()){
-            MonolithSoul.soulJoin(soul, ent);
+            //MonolithSoul.soulJoin(soul, ent);
         }
     }
 }
