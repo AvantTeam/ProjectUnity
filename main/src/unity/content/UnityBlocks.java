@@ -22,6 +22,7 @@ import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 import unity.annotations.Annotations.*;
 import unity.content.effects.*;
+import unity.content.units.*;
 import unity.entities.bullet.anticheat.*;
 import unity.entities.bullet.energy.*;
 import unity.entities.bullet.exp.*;
@@ -309,14 +310,14 @@ public class UnityBlocks{
 
                 new UnitType[]{UnityUnitTypes.rex, UnityUnitTypes.excelsus},
 
-                new UnitType[]{UnityUnitTypes.monument, UnityUnitTypes.colossus}
+                new UnitType[]{MonolithUnitTypes.monument, MonolithUnitTypes.colossus}
             );
             otherUpgrades.add(
                 new UnitType[]{UnityUnitTypes.citadel, UnityUnitTypes.empire},
 
                 new UnitType[]{UnityUnitTypes.araneidae, UnityUnitTypes.theraphosidae},
 
-                new UnitType[]{UnityUnitTypes.colossus, UnityUnitTypes.bastion}
+                new UnitType[]{MonolithUnitTypes.colossus, MonolithUnitTypes.bastion}
             );
             consumes.power(5f);
             consumes.items(with(Items.silicon, 1200, Items.metaglass, 800, Items.thorium, 700, Items.surgeAlloy, 400, Items.plastanium, 600, Items.phaseFabric, 350));

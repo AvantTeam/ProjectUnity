@@ -98,7 +98,6 @@ abstract class SoulComp extends Block implements Stemc{
                 transferred = true;
             }
 
-            if(soul.controller() instanceof MonolithSoulAI ai) ai.empty = false;
             return transferred;
         }
 

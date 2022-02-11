@@ -1,18 +1,24 @@
 package unity.graphics;
 
-import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.util.*;
+import mindustry.content.*;
+import mindustry.entities.*;
 import mindustry.graphics.*;
 
 /**
- * Holds multiple trails.
+ * Holds multiple trails with additional offsets, width multiplier, and color override.
  * @author GlennFolker
  */
 public class MultiTrail extends Trail{
     public TrailHold[] trails;
-    public Floatp rotation;
+    public RotationHandler rotation = MultiTrail::calcRot;
+
+    public Effect trailEffect = Fx.missileTrail;
+    public float trailChance = 0f;
+    public float trailWidth = 1f;
+    public Color trailColor = Pal.engine.cpy();
 
     protected float lastX, lastY;
 
@@ -26,11 +32,17 @@ public class MultiTrail extends Trail{
     @Override
     public MultiTrail copy(){
         TrailHold[] mapped = new TrailHold[trails.length];
-        for(int i = 0; i < mapped.length; i++){
-            mapped[i] = trails[i].copy();
-        }
+        for(int i = 0; i < mapped.length; i++) mapped[i] = trails[i].copy();
 
-        return new MultiTrail(mapped);
+        MultiTrail out = new MultiTrail(mapped);
+        out.lastX = lastX;
+        out.lastY = lastY;
+        out.rotation = rotation;
+        out.trailEffect = trailEffect;
+        out.trailChance = trailChance;
+        out.trailWidth = trailWidth;
+        out.trailColor.set(trailColor);
+        return out;
     }
 
     @Override
@@ -63,14 +75,22 @@ public class MultiTrail extends Trail{
 
     @Override
     public void update(float x, float y, float width){
-        float angle = (rotation == null ? Angles.angle(lastX, lastY, x, y) : rotation.get()) - 90f;
+        float angle = rotation.get(this, x, y) - 90f;
         for(TrailHold trail : trails){
             Tmp.v1.trns(angle, trail.x, trail.y);
+
             trail.trail.update(x + Tmp.v1.x, y + Tmp.v1.y, width * trail.width);
+            if(trailChance > 0f && Mathf.chanceDelta(trailChance)){
+                trailEffect.at(x + Tmp.v1.x, y + Tmp.v1.y, trail.width * trailWidth, trailColor);
+            }
         }
 
         lastX = x;
         lastY = y;
+    }
+
+    public float calcRot(float x, float y){
+        return Angles.angle(lastX, lastY);
     }
 
     public static class TrailHold{
@@ -82,6 +102,10 @@ public class MultiTrail extends Trail{
 
         public TrailHold(Trail trail){
             this(trail, 0f, 0f, 1f, null);
+        }
+
+        public TrailHold(Trail trail, Color color){
+            this(trail, 0f, 0f, 1f, color);
         }
 
         public TrailHold(Trail trail, float x, float y){
@@ -106,5 +130,9 @@ public class MultiTrail extends Trail{
         public TrailHold copy(){
             return new TrailHold(trail.copy(), x, y, width, color);
         }
+    }
+
+    public interface RotationHandler{
+        float get(MultiTrail trail, float x, float y);
     }
 }

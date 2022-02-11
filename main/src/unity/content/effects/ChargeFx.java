@@ -4,6 +4,7 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.util.*;
 import arc.util.pooling.*;
 import mindustry.content.*;
@@ -144,7 +145,7 @@ public class ChargeFx{
             Tmp.v1.set(hold.x, hold.y).sub(e.x, e.y);
             Tmp.v2.trns(Tmp.v1.angle(), Mathf.sin(hold.width * 0.3f, hold.width * 4f * e.fin()));
 
-            Tmp.v1.setLength(1f - e.finpowdown()).add(Tmp.v2);
+            Tmp.v1.setLength2((1f - e.finpowdown()) * Tmp.v1.len2()).add(Tmp.v2);
             float x = e.x + Tmp.v1.x, y = e.y + Tmp.v1.y;
 
             if(!state.isPaused()) hold.trail.update(x, y, hold.width);
@@ -158,14 +159,50 @@ public class ChargeFx{
         final int trailAmount = 12;
         final int trailLength = 12;
 
+        // Why must `#create` be a static method...
+        @Override
+        public void at(Position pos){
+            create(pos.getX(), pos.getY(), 0, Color.white, null);
+        }
+
+        @Override
+        public void at(Position pos, boolean parentize){
+            create(pos.getX(), pos.getY(), 0, Color.white, parentize ? pos : null);
+        }
+
+        @Override
+        public void at(Position pos, float rotation){
+            create(pos.getX(), pos.getY(), rotation, Color.white, null);
+        }
+
+        @Override
+        public void at(float x, float y){
+            create(x, y, 0, Color.white, null);
+        }
+
+        @Override
+        public void at(float x, float y, float rotation){
+            create(x, y, rotation, Color.white, null);
+        }
+
         @Override
         public void at(float x, float y, float rotation, Color color){
             create(x, y, rotation, color, null);
         }
 
         @Override
+        public void at(float x, float y, Color color){
+            create(x, y, 0, color, null);
+        }
+
+        @Override
         public void at(float x, float y, float rotation, Color color, Object data){
             create(x, y, rotation, color, data);
+        }
+
+        @Override
+        public void at(float x, float y, float rotation, Object data){
+            create(x, y, rotation, Color.white, data);
         }
 
         void create(float x, float y, float rotation, Color color, Object data){

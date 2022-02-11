@@ -3,6 +3,7 @@ package unity.graphics;
 import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.graphics.g2d.TextureAtlas.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
@@ -41,6 +42,7 @@ public class TexturedTrail extends Trail{
     public TexturedTrail(TextureRegion region, int length){
         this(length);
         this.region = region;
+        if(region instanceof AtlasRegion reg) capRegion = Core.atlas.find(reg.name + "-cap", "circle");
     }
 
     public TexturedTrail(int length){
