@@ -148,6 +148,9 @@ public class UnityBlocks{
     //unit
     bufferPad, omegaPad, cachePad, convertPad,
 
+    //power
+    uraniumReactor,
+
     //TODO
     expFountain, expVoid, expTank, expChest, expRouter, expTower, expTowerDiagonal, bufferTower, expHub;// expOutput, expUnloader;
 
@@ -1670,6 +1673,20 @@ public class UnityBlocks{
                 new UnitType[]{UnityUnitTypes.cache, UnityUnitTypes.dijkstra},
                 new UnitType[]{UnityUnitTypes.omega, UnitTypes.reign}
             );
+        }};
+
+        uraniumReactor = new KoruhReactor("uranium-reactor"){{
+                requirements(Category.power, with(Items.plastanium, 80, Items.surgeAlloy, 100, Items.lead, 150, UnityItems.steel, 200));
+                size = 3;
+
+                itemDuration = 200f;
+                consumes.item(UnityItems.uranium, 2);
+                consumes.liquid(Liquids.cryofluid, 0.7f);
+                consumes.power(20f);
+
+                itemCapacity = 20;
+                powerProduction = 150f;
+                health = 1000;
         }};
 
         teleporter = new Teleporter("teleporter"){{
