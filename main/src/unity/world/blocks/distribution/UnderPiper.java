@@ -1,10 +1,8 @@
 package unity.world.blocks.distribution;
 
-import arc.Core;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
-import mindustry.game.Team;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.Styles;
@@ -32,7 +30,7 @@ public class UnderPiper extends Block {
     @Override
     public void load() {
         super.load();
-        Time.run(30, UnderworldBlocks::load);
+        Time.runTask(30, UnderworldBlocks::load);
     }
 
     public class UnderPiperBuild extends Building {
