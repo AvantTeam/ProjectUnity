@@ -2,6 +2,7 @@ package unity.type.weapons;
 
 import arc.*;
 import arc.func.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -51,7 +52,7 @@ public class MultiBarrelWeapon extends Weapon{
             recoil = -((mount.reload) / reload * this.recoil),
             wx = unit.x + Angles.trnsx(rotation, x, y) + Angles.trnsx(weaponRotation, 0, recoil),
             wy = unit.y + Angles.trnsy(rotation, x, y) + Angles.trnsy(weaponRotation, 0, recoil);
-            
+
             int barrels = mMount.recoils.length;
 
             Intc drawBarrel = i -> {
@@ -81,6 +82,9 @@ public class MultiBarrelWeapon extends Weapon{
 
     @Override
     public void draw(Unit unit, WeaponMount mount){
+        float z = Draw.z();
+        Draw.z(z + layerOffset);
+
         MultiBarrelMount mMount = ((MultiBarrelMount)mount);
 
         float
@@ -89,7 +93,7 @@ public class MultiBarrelWeapon extends Weapon{
         recoil = -((mount.reload) / reload * this.recoil),
         wx = unit.x + Angles.trnsx(rotation, x, y) + Angles.trnsx(weaponRotation, 0, recoil),
         wy = unit.y + Angles.trnsy(rotation, x, y) + Angles.trnsy(weaponRotation, 0, recoil);
-        
+
         int barrels = mMount.recoils.length;
 
         if(shadow > 0){
@@ -114,12 +118,27 @@ public class MultiBarrelWeapon extends Weapon{
                 barrelOutlineRegion.width * Draw.scl * -Mathf.sign(flipSprite) * s,
                 barrelOutlineRegion.height * Draw.scl,
                 weaponRotation);
+            }else{
+                Draw.rect(barrelRegion,
+                tv.x, tv.y,
+                barrelRegion.width * Draw.scl * -Mathf.sign(flipSprite) * s,
+                barrelRegion.height * Draw.scl,
+                weaponRotation);
             }
-            Draw.rect(barrelRegion,
-            tv.x, tv.y,
-            barrelRegion.width * Draw.scl * -Mathf.sign(flipSprite) * s,
-            barrelRegion.height * Draw.scl,
-            weaponRotation);
+
+            if(heatRegion.found() && mount.heat > 0f){
+                Draw.color(heatColor, mount.heat);
+                Draw.blend(Blending.additive);
+
+                Draw.rect(heatRegion,
+                tv.x, tv.y,
+                heatRegion.width * Draw.scl * -Mathf.sign(flipSprite) * s,
+                heatRegion.height * Draw.scl,
+                weaponRotation);
+
+                Draw.blend();
+                Draw.color();
+            }
         };
 
         if(!flipSprite){
@@ -137,6 +156,8 @@ public class MultiBarrelWeapon extends Weapon{
         region.width * Draw.scl * -Mathf.sign(flipSprite),
         region.height * Draw.scl,
         weaponRotation);
+
+        Draw.z(z);
     }
 
     @Override
