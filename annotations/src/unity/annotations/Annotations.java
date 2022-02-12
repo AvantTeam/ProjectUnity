@@ -102,9 +102,6 @@ public class Annotations{
 
         /** @return The duped target name */
         String name() default "";
-
-        /** @return An optional class addition */
-        Class<?> add() default Void.class;
     }
 
     /** Notifies that this class is a component class; an interface will be generated out of this */
@@ -129,11 +126,6 @@ public class Annotations{
         /** @return The replacement */
         String value() default "";
     }
-
-    /** Indicates that {@link Dupe} should consider a field or method as belonging to the block, valid for @Dupe#add */
-    @Target({ElementType.FIELD, ElementType.METHOD})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface Blocc{}
 
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.SOURCE)

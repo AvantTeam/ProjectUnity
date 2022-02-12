@@ -25,6 +25,7 @@ import unity.content.*;
 import unity.entities.*;
 import unity.graphics.*;
 import unity.ui.*;
+import unity.world.draw.*;
 
 import static mindustry.Vars.*;
 
@@ -55,6 +56,8 @@ public class ExpTurret extends Turret {
 
     //damage resist feature for all blocks
     public EField<Float> damageReduction;
+    //optional drawer
+    public @Nullable DrawLevel draw = null;
 
     public ExpTurret(String name){
         super(name);
@@ -85,6 +88,12 @@ public class ExpTurret extends Turret {
 
         if(pregrade != null && pregradeLevel < 0) pregradeLevel = pregrade.maxLevel;
         if(damageReduction == null) damageReduction = new EField.EExpoZero(f -> {}, 0.1f, Mathf.pow(4f + size, 1f / maxLevel), true, null, v -> Strings.autoFixed(Mathf.roundPositive(v * 10000) / 100f, 2)+ "%");
+    }
+
+    @Override
+    public void load(){
+        super.load();
+        if(draw != null) draw.load(this);
     }
 
     @Actually("return 0;")
@@ -227,7 +236,7 @@ public class ExpTurret extends Turret {
         }
     }
 
-    public class ExpTurretBuild extends TurretBuild implements ExpHolder {
+    public class ExpTurretBuild extends TurretBuild implements ExpHolder, LevelHolder {
         public int exp;
         public @Nullable
         ExpHub.ExpHubBuild hub = null;
@@ -286,10 +295,12 @@ public class ExpTurret extends Turret {
             return incExp(amount, false);
         }
 
+        @Override
         public int level(){
             return expLevel(exp);
         }
 
+        @Override
         public int maxLevel(){
             return maxLevel;
         }
@@ -302,6 +313,7 @@ public class ExpTurret extends Turret {
             return ((float) exp - lb) / (lc - lb);
         }
 
+        @Override
         public float levelf(){
             return level() / (float)maxLevel;
         }
@@ -329,6 +341,18 @@ public class ExpTurret extends Turret {
         public void update(){
             if(updateExpFields) setEFields(level());
             super.update();
+        }
+
+        @Override
+        public void draw(){
+            if(draw != null) draw.draw(this);
+            super.draw();
+        }
+
+        @Override
+        public void drawLight(){
+            if(draw != null) draw.drawLight(this);
+            super.drawLight();
         }
 
         @Override

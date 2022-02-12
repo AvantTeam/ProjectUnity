@@ -11,7 +11,9 @@ public class UnderworldBlocks {
 
     public static void load() {
         if(loaded) return;
-        blocks.add(new UnderworldBlock("pipe-straight", ItemStack.with(Items.copper, 1), 10));
+        for(int i = 0; i < 99; i++){
+            blocks.add(new UnderworldBlock("pipe-straight", ItemStack.with(Items.copper, 1), 10));
+        }
         loaded = true;
     }
 }

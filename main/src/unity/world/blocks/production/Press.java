@@ -18,7 +18,7 @@ public class Press extends GenericCrafter{
     public float movementSize = 10f;
     public float fxYVariation = 15f / tilesize;
     public Sound clangSound = UnitySounds.clang;
-    public Effect sparkEffect = UnityFx.spark;
+    public Effect sparkEffect = UnityFx.sparkBoi;
     public TextureRegion leftRegion, rightRegion, baseRegion;
 
     public Press(String name){
