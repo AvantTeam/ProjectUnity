@@ -10,6 +10,7 @@ import mindustry.type.*;
 import static unity.content.UnityBlocks.*;
 import static unity.content.UnityItems.*;
 import static unity.content.UnityUnitTypes.*;
+import static unity.content.units.MonolithUnitTypes.*;
 
 @SuppressWarnings("all")
 public class UnityTechTree{

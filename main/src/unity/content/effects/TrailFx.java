@@ -10,9 +10,19 @@ import unity.graphics.*;
 import unity.type.decal.CapeDecorationType.*;
 
 import static arc.graphics.g2d.Draw.*;
+import static mindustry.Vars.*;
 
 public class TrailFx{
     public static Effect
+
+    trailFadeLow = new Effect(400f, e -> {
+        if(!(e.data instanceof Trail trail)) return;
+        e.lifetime = trail.length * 1.4f;
+
+        if(!state.isPaused()) trail.shorten();
+        trail.drawCap(e.color, e.rotation);
+        trail.draw(e.color, e.rotation);
+    }).layer(Layer.flyingUnitLow - 0.001f),
 
     coloredRailgunTrail = new Effect(30f, e -> {
         for(int i = 0; i < 2; i++){

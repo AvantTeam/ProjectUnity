@@ -1,10 +1,11 @@
 package unity.world.blocks.distribution;
 
-import arc.Core;
+import arc.Events;
+import arc.graphics.g2d.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
-import mindustry.game.Team;
+import mindustry.game.EventType;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.Styles;
@@ -18,6 +19,8 @@ import static arc.Core.*;
 
 @SuppressWarnings("unused")
 public class UnderPiper extends Block {
+    private TextureRegion pencil, eraser, move;
+
     public UnderPiper(String name, int itemCapacity){
         super(name);
 
@@ -32,7 +35,17 @@ public class UnderPiper extends Block {
     @Override
     public void load() {
         super.load();
-        Time.run(30, UnderworldBlocks::load);
+        pencil = atlas.find("unity-pencil");
+        eraser = atlas.find("unity-eraser");
+        move = atlas.find("unity-move");
+
+        Events.on(EventType.WorldLoadEvent.class, e -> {
+            // TODO add electrode planet check
+            UnderworldMap.reset();
+            UnderworldMap.updateAll();
+        });
+
+        Time.runTask(30, UnderworldBlocks::load);
     }
 
     public class UnderPiperBuild extends Building {
@@ -59,10 +72,8 @@ public class UnderPiper extends Block {
             piping.cont.table(t -> {
                 t.center().bottom();
 
-                ScrollPane pane = t.pane(p -> {
+                ScrollPane pane = t.pane(Styles.nonePane, p -> {
                     UnderworldMap map = new UnderworldMap();
-                    map.reset();
-                    map.updateAll();
                     p.add(map).grow();
                 }).fill().padRight(5f).get();
 
@@ -78,6 +89,7 @@ public class UnderPiper extends Block {
                         tt.row();
                         tt.image().color(Pal.accent).height(4f).growX().marginLeft(5).marginRight(5).growX();
                         tt.row();
+                        tt.labelWrap("Planet: ???").growX().labelAlign(Align.center);
                     }).padBottom(5f).grow();
 
                     tl.row();
@@ -90,19 +102,30 @@ public class UnderPiper extends Block {
                         tt.row();
 
                         tt.pane(p -> {
+                            p.center().top();
+
                             for (int i = 0; i < UnderworldBlocks.blocks.size; i++) {
                                 UnderworldBlock bloc = UnderworldBlocks.blocks.get(i);
 
-                                p.button(b -> {
-                                    b.image(bloc.region).width(32).height(32);
-                                }, () -> {
+                                p.button(b -> b.image(bloc.region).size(32), () -> {
 
-                                }).width(35).height(35).pad(2f).style(Styles.clearTransi).tooltip(bloc.localizedName);
+                                }).size(34f).pad(2f).style(Styles.clearTransi).tooltip(bloc.localizedName);
 
                                 if ((i + 1) % 4 == 0) p.row();
                             }
-                        });
-                    }).height(215f);
+                        }).grow();
+
+                        tt.row();
+                        tt.image().color(Pal.accent).height(4f).growX().marginLeft(5).marginRight(5).padBottom(2f).growX();
+                        tt.row();
+
+                        tt.table(ttt -> {
+                            ttt.left();
+                            ttt.button(b -> b.image(pencil), Styles.cleari, () -> { }).size(32f).padRight(5f);
+                            ttt.button(b -> b.image(eraser), Styles.cleari, () -> { }).size(32f).padRight(5f);
+                            ttt.button(b -> b.image(move), Styles.cleari, () -> { }).size(32f);
+                        }).growX();
+                    }).height(240f).growX();
                 }).growY().width(205f);
             }).grow();
 

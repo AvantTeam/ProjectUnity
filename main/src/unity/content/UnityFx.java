@@ -1213,18 +1213,7 @@ public class UnityFx{
 
     plated = new Effect(30f, e -> {
         color(e.color);
-        Fill.circle(e.x, e.y, e.fout() * (float) e.data);
-    }),
-
-    monolithSoul = new Effect(60f, e -> {
-        if(!(e.data instanceof Float data)) return;
-
-        randLenVectors(e.id, 2, data, (x, y) -> {
-            color(UnityPal.monolith, UnityPal.monolithDark, e.fin());
-
-            float w = 1f + e.fout() * 4f;
-            Fill.rect(e.x + x, e.y + y, w, w, 45f);
-        });
+        Fill.circle(e.x, e.y, e.fout() * (float)e.data);
     }),
 
     spark = new Effect(15f, e -> {
