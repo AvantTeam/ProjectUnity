@@ -39,7 +39,7 @@ public class ParticleFx{
 
         float time = Time.time - e.rotation, vx = data.x * time, vy = data.y * time;
         randLenVectors(e.id, 1, 5f + e.finpowdown() * 8f, (x, y) -> {
-            float fin = 1f + (1f - e.fin(Interp.pow2In));
+            float fin = 1f - e.fin(Interp.pow2In);
 
             alpha(1f);
             Fill.circle(e.x + x + vx, e.y + y + vy, fin * 2f);
@@ -49,5 +49,5 @@ public class ParticleFx{
         });
 
         blend();
-    }).layer(Layer.flyingUnit);
+    }).layer(Layer.flyingUnit - 0.01f);
 }

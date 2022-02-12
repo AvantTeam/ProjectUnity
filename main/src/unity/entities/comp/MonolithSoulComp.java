@@ -1,17 +1,24 @@
 package unity.entities.comp;
 
+import arc.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.entities.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
+import mindustry.input.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import unity.annotations.Annotations.*;
+import unity.content.effects.*;
 import unity.content.units.*;
 import unity.entities.*;
 import unity.gen.*;
 import unity.mod.*;
+
+import static mindustry.Vars.*;
 
 @SuppressWarnings("unused")
 @EntityDef({Unitc.class, MonolithSoulc.class, Trailc.class, Factionc.class})
@@ -19,12 +26,14 @@ import unity.mod.*;
 abstract class MonolithSoulComp implements Unitc, Trailc, Factionc{
     @Import UnitType type;
     @Import Team team;
-    @Import float x, y, health, maxHealth;
+    @Import float x, y, health, maxHealth, elevation;
+    @Import Trail trail;
 
     @ReadOnly transient boolean corporeal;
     @ReadOnly transient float joinTime;
     @ReadOnly transient Teamc joinTarget;
     @ReadOnly transient Seq<Tile> forms = new Seq<>(5);
+    @ReadOnly transient float formProgress;
 
     @Override
     public Faction faction(){
@@ -40,21 +49,49 @@ abstract class MonolithSoulComp implements Unitc, Trailc, Factionc{
     @MethodPriority(-1)
     public void update(){
         if(!corporeal){
-            health = Mathf.clamp(health + lifeDelta() * Time.delta, 0f, maxHealth);
-            joinTime = (joinTarget == null || !joinTarget.isAdded()) ? Mathf.lerpDelta(joinTime, 0f, 0.2f) : Mathf.approachDelta(joinTime, 1f, 0.08f);
+            health = Mathf.clamp(health + (joining() ? -0.2f : lifeDelta()) * Time.delta, 0f, maxHealth);
+            joinTime = (joinTarget == null || !joinTarget.isAdded()) ? Mathf.lerpDelta(joinTime, 0f, 0.2f) : Mathf.approachDelta(joinTime, 1f, 0.008f);
+            formProgress = Mathf.lerpDelta(formProgress, forms.any() ? (health / maxHealth) : 0f, 0.17f);
 
             if(!joinValid(joinTarget)) joinTarget = null;
             forms.removeAll(t -> !formValid(t));
+
+            if(isLocal()){
+                //TODO input handling for mobile users :c
+                if(!mobile){
+                    float mx = Core.input.mouseWorldX(), my = Core.input.mouseWorldY();
+
+                    if(Core.input.keyTap(Binding.select)){
+                        Tile tile = world.tileWorld(mx, my);
+                        if(tile != null) form(tile);
+                    }else if(Core.input.keyTap(Binding.break_block)){
+                        Teamc target = Units.closest(team, mx, my, 1f, this::joinValid);
+                        if(target == null) target = world.buildWorld(mx, my);
+
+                        if(target != null && target.team() == team) join(target);
+                    }
+                }
+            }
         }else if(health <= maxHealth * 0.5f){
             corporeal = false;
+            joinTarget = null;
+            forms.clear();
+            formProgress = 0f;
         }
 
         if(Mathf.equal(joinTime, 1f)){
-            // join the target
+            //TODO join the target
+            kill();
         }else if(!corporeal && Mathf.equal(health, maxHealth)){
             corporeal = true;
             joinTime = 0f;
         }
+    }
+
+    @Override
+    public void destroy(){
+        if(!isAdded()) return;
+        TrailFx.trailFadeLow.at(x, y, (type.engineSize + Mathf.absin(Time.time, 2f, type.engineSize / 4f) * elevation) * type.trailScl, trail.copy());
     }
 
     void join(Teamc other){
@@ -79,7 +116,7 @@ abstract class MonolithSoulComp implements Unitc, Trailc, Factionc{
 
     boolean joinValid(Teamc other){
         Soul soul = Soul.toSoul(other);
-        return soul != null && other.isAdded() && soul.acceptSoul(this) > 1 && within(other, type.range);
+        return soul != null && other.isAdded() && soul.acceptSoul(1) >= 1 && within(other, type.range + (other instanceof Unit unit ? (unit.hitSize / 2f) : other instanceof Building build ? (build.hitSize() / 2f) : 0f));
     }
 
     boolean formValid(Tile tile){
@@ -96,7 +133,7 @@ abstract class MonolithSoulComp implements Unitc, Trailc, Factionc{
     }
 
     float lifeDelta(){
-        return (forms.size - 2.5f) * 0.35f;
+        return (forms.size - 2.5f) * 0.18f;
     }
 
     static MonolithSoul create(Team team){

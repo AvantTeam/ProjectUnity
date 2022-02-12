@@ -13,6 +13,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.type.ammo.*;
+import mindustry.world.*;
 import unity.ai.*;
 import unity.ai.AssistantAI.*;
 import unity.annotations.Annotations.*;
@@ -25,6 +26,7 @@ import unity.graphics.*;
 import unity.graphics.MultiTrail.*;
 import unity.type.*;
 import unity.type.weapons.*;
+import unity.util.*;
 
 import static mindustry.Vars.*;
 
@@ -68,6 +70,8 @@ public final class MonolithUnitTypes{
                 omniMovement = false;
                 engineColor = UnityPal.monolithLight;
                 trailLength = 12;
+                deathExplosionEffect = DeathFx.monolithSoulDeath;
+                forceWreckRegion = true;
 
                 trailType = unit -> new MultiTrail(new TrailHold(new TexturedTrail(Core.atlas.find("unity-phantasmal-trail"), 25){{
                     shrink = 1f;
@@ -101,8 +105,8 @@ public final class MonolithUnitTypes{
 
                         TrailFx.trailFadeLow.at(soul.x, soul.y, width, engineColor, copy);
                         soul.trail = new MultiTrail(new TrailHold(new TexturedTrail(Core.atlas.find("unity-phantasmal-trail"), trailLength){{
-                            shrink = 0f;
-                            fadeAlpha = 1f;
+                            shrink = 1f;
+                            fadeAlpha = 0.5f;
                             blend = Blending.additive;
                         }}, UnityPal.monolithLight)){{
                             trailChance = 0.67f;
@@ -117,7 +121,15 @@ public final class MonolithUnitTypes{
                         soul.trail = trailType.get(soul);
                     }
 
-                    if(!soul.corporeal()) ParticleFx.monolithSoul.at(soul.x, soul.y, Time.time, new Vec2(soul.vel).scl(-0.3f));
+                    if(!soul.corporeal()){
+                        if(Mathf.chance(Time.delta)) ParticleFx.monolithSoul.at(soul.x, soul.y, Time.time, new Vec2(soul.vel).scl(-0.3f));
+                        if(soul.forming()){
+                            for(Tile form : soul.forms()){
+                                if(Mathf.chanceDelta(0.17f)) ParticleFx.monolithSpark.at(form.drawx(), form.drawy(), 0f, 4f);
+                                if(Mathf.chanceDelta(0.67f)) LineFx.monolithSoulAbsorb.at(form.drawx(), form.drawy(), 0f, soul);
+                            }
+                        }
+                    }
                 }
 
                 super.update(unit);
@@ -129,6 +141,7 @@ public final class MonolithUnitTypes{
                 if(!soul.corporeal()){
                     float z = Draw.z();
                     Draw.z(Layer.flyingUnitLow);
+
                     soul.trail.draw(engineColor, (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f) * soul.elevation) * trailScl);
 
                     Draw.z(Layer.effect - 0.01f);
@@ -139,8 +152,59 @@ public final class MonolithUnitTypes{
 
                     Draw.color(UnityPal.monolithDark);
                     Draw.rect(softShadowRegion, soul.x, soul.y, 10f, 10f);
-                    Draw.blend();
 
+                    Draw.blend();
+                    Lines.stroke(1f, UnityPal.monolithDark);
+
+                    float rotation = Time.time * 3f * Mathf.sign(unit.id % 2 == 0);
+                    for(int i = 0; i < 5; i++){
+                        float r = rotation + 72f * i;
+                        UnityDrawf.arcLine(soul.x, soul.y, 12f, 60f, r);
+
+                        Tmp.v1.trns(r, 12f).add(soul);
+                        Drawf.tri(Tmp.v1.x, Tmp.v1.y, 2.5f, 6f, r);
+                    }
+
+                    Draw.z(Layer.flyingUnit);
+                    Draw.reset();
+
+                    for(int i = 0; i < wreckRegions.length; i++){
+                        float off = (360f / wreckRegions.length) * i;
+                        float fin = soul.formProgress(), fout = 1f - fin;
+
+                        Tmp.v1.trns(soul.rotation + off, fout * 24f)
+                            .add(Tmp.v2.trns((Time.time + off) * 4f, fout * 3f))
+                            .add(soul);
+
+                        Draw.alpha(fin);
+                        Draw.rect(wreckRegions[i], Tmp.v1.x, Tmp.v1.y, soul.rotation - 90f);
+                    }
+
+                    Lines.stroke(1.5f, UnityPal.monolith);
+
+                    TextureRegion reg = Core.atlas.find("unity-monolith-chain");
+                    Quat rot = Utils.q1.set(Vec3.Z, soul.rotation + 90f).mul(Utils.q2.set(Vec3.X, 75f));
+                    float t = Interp.pow3Out.apply(soul.joinTime()), w = reg.width * Draw.scl * 0.5f * t, h = reg.height * Draw.scl * 0.5f * t,
+                        rad = t * 25f, a = Mathf.curve(t, 0.33f);
+
+                    Draw.alpha(a);
+                    UnityDrawf.panningCircle(reg,
+                        soul.x, soul.y, w, h,
+                        rad, 360f, Time.time * 6f * Mathf.sign(unit.id % 2 == 0) + soul.id * 30f,
+                        rot, Layer.flyingUnitLow - 0.01f, Layer.flyingUnit
+                    );
+
+                    Draw.color(Color.black, UnityPal.monolithDark, 0.5f);
+                    Draw.alpha(a);
+
+                    Draw.blend(Blending.additive);
+                    UnityDrawf.panningCircle(Core.atlas.find("circle-mid"),
+                        soul.x, soul.y, w + 6f, h + 6f,
+                        rad, 360f, 0f,
+                        rot, true, Layer.flyingUnitLow - 0.01f, Layer.flyingUnit
+                    );
+
+                    Draw.blend();
                     Draw.z(z);
                 }else{
                     super.draw(unit);

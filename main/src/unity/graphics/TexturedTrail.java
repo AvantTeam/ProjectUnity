@@ -92,7 +92,7 @@ public class TexturedTrail extends Trail{
             Draw.blend(blend);
             Draw.mixcol(color, mixAlpha);
 
-            Draw.rect(capRegion, x1, y1, w, w, -Mathf.radDeg * lastAngle + 180f);
+            Draw.rect(capRegion, x1, y1, w, w, -Mathf.radDeg * lastAngle + 90f);
 
             Draw.mixcol();
             Draw.blend();

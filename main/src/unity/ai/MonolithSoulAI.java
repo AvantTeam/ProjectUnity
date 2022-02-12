@@ -72,12 +72,11 @@ public class MonolithSoulAI implements UnitController{
         // No point in finding life support if it's already corporeal.
         if(unit.corporeal()) return;
 
-        // Only contemplate their life choices when they're not already joining another vessel or already gaining positive outcome
-        // from forming.
+        // Only contemplate their life choices when they're not already joining another vessel or already gaining positive
+        // outcome from forming.
         float delta = unit.lifeDelta();
         if(!unit.joining() && !(unit.forming() && delta > 0f)){
-            float range = Float.MAX_VALUE;
-            if(delta < 0f) range = (unit.type.speed - unit.type.drag + unit.type.accel) * (unit.health / -delta); // Maximum range.
+            float range = unit.type.speed * (unit.health / -delta); // Maximum range.
 
             Unit vesselUnit = Units.closest(unit.team, unit.x, unit.y, range, this::accept);
             Building vesselBuild = Units.findAllyTile(unit.team, unit.x, unit.y, Float.MAX_VALUE, this::accept);
@@ -89,13 +88,13 @@ public class MonolithSoulAI implements UnitController{
             // If it can't find any vessels to join, it'll start finding forming locations.
             if(joinTarget == null){
                 float r = range * range;
-                formTarget = monolithWorld.nearest(unit.x, unit.y, range * 1.5f, c -> Math.max(c.monolithTiles.size, 5) * (r / unit.dst2(c.centerX, c.centerY)));
+                formTarget = monolithWorld.nearest(unit.x, unit.y, range, c -> Math.max(c.monolithTiles.size, 5) * (r / unit.dst2(c.centerX, c.centerY)));
             }
         }
     }
 
     public <T extends Teamc & Healthc> boolean accept(T other){
         Soul soul = Soul.toSoul(other);
-        return soul != null && other.isValid() && soul.acceptSoul(unit) > 0;
+        return soul != null && other.isValid() && soul.acceptSoul(1) >= 1;
     }
 }

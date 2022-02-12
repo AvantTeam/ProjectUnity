@@ -62,12 +62,17 @@ public class MonolithWorld{
     }
 
     public void intersect(int x, int y, int width, int height, Cons<Chunk> cons){
-        int tx = Math.max(x / chunkSize, 0), ty = Math.max(y / chunkSize, 0),
-            tw = Math.min(Mathf.ceilPositive((x + width) / (float)chunkSize) * chunkSize, width),
-            th = Math.min(Mathf.ceilPositive((y + height) / (float)chunkSize) * chunkSize, chunks.length / width);
+        width = Math.min(width, this.width - x);
+        height = Math.min(height, (chunks.length / this.width) - y);
+        x = Math.max(x, 0);
+        y = Math.max(y, 0);
+
+        int tx = x / chunkSize, ty = y / chunkSize,
+            tw = Math.min(Mathf.ceilPositive((x + width) / (float)chunkSize) * chunkSize, this.width),
+            th = Math.min(Mathf.ceilPositive((y + height) / (float)chunkSize) * chunkSize, chunks.length / this.width);
 
         for(int cy = ty; cy < th; cy++){
-            int pos = cy * width;
+            int pos = cy * this.width;
             for(int cx = tx; cx < tw; cx++){
                 cons.get(chunks[cx + pos]);
             }
