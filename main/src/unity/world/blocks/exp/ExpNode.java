@@ -84,7 +84,7 @@ public class ExpNode extends ExpTank {
         public void shoot(){
             tmps.clear();
             tmpm = -1;
-            Geometry.circle(tile.x, tile.y, range + 1, (x, y) -> {
+            Geometry.circle(tile.x, tile.y, range, (x, y) -> {
                 Building other = world.build(x, y);
                 if(other != null && other.team == team && other instanceof ExpHolder exp && !exp.hubbable() && (tmpm == -1 ||exp.getExp() <= tmpm)){
                     if(exp.getExp() < tmpm) tmps.clear(); //previous blocks are all invalid
@@ -96,7 +96,7 @@ public class ExpNode extends ExpTank {
             if(tmps.isEmpty()) return;
             int amount = Mathf.ceilPositive(exp / (float)tmps.size);
             for(ExpHolder e : tmps){
-                if(exp <= 0) continue;
+                if(exp < amount) continue;
                 int a = e.handleExp(amount);
                 exp -= a;
             }
@@ -107,9 +107,12 @@ public class ExpNode extends ExpTank {
             super.draw();
 
             if(shooting){
-                Draw.z(Layer.effect + 0.011f);
+                Draw.z(Layer.power + 1f);
                 float r = range * tilesize * fin();
                 Fill.light(x, y, Lines.circleVertices(r), r, lightClearColor, tmpc.set(lightColor).a(Mathf.clamp(2f * (1 - fin()))));
+                Draw.z(Layer.effect + 0.0011f);
+                Lines.stroke((0.5f + Mathf.absin(Time.globalTime, 3f, 1.5f)) * (1 - fin()), lightColor);
+                Lines.circle(x, y, r);
             }
         }
 
