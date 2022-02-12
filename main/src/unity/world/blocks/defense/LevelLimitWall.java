@@ -6,9 +6,11 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import mindustry.content.*;
+import mindustry.entities.*;
 import mindustry.graphics.*;
 import unity.annotations.Annotations.*;
 import unity.gen.*;
+import unity.graphics.*;
 import unity.world.blocks.exp.*;
 
 import static arc.Core.atlas;
@@ -21,13 +23,21 @@ public class LevelLimitWall extends ExpLimitWall {
     public float damageExp = 1 / 20f;
     public float shieldZ = Layer.buildBeam;
 
+    public Effect updateEffect = Fx.none;
+    public float updateChance = 0.01f;
+
     public LevelLimitWall(String name){
         super(name);
         maxLevel = 6;
         passive = true;
         updateExpFields = false;
         upgradeEffect = Fx.none;
+    }
+
+    @Override
+    public void init(){
         damageReduction = new EField.EExpoZero(f -> {}, 0.1f, Mathf.pow(8f, 1f / maxLevel), true, null, v -> Strings.autoFixed(Mathf.roundPositive(v * 10000) / 100f, 2) + "%");
+        super.init();
     }
 
     @Override
@@ -68,6 +78,7 @@ public class LevelLimitWall extends ExpLimitWall {
                 //Draw.rect(top, x, y);
                 Draw.z(Layer.blockUnder - 0.01f);
                 if(edgeRegion.found()) Draw.rect(top == levelRegions[levelRegions.length - 1] ? edgeMaxRegion : edgeRegion, x, y);
+                if(!state.isPaused() && updateEffect != Fx.none && top == levelRegions[levelRegions.length - 1] && Mathf.chanceDelta(updateChance)) updateEffect.at(x + Mathf.range(size * 4f), y + Mathf.range(size * 4f), UnityPal.exp);
             }
 
             if(flashHit && hit > 0.0001f){

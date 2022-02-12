@@ -157,7 +157,7 @@ public class UnityBlocks{
     uraniumReactor,
 
     //TODO
-    expFountain, expVoid, expTank, expChest, expRouter, expTower, expTowerDiagonal, bufferTower, expHub;// expOutput, expUnloader;
+    expFountain, expVoid, expTank, expChest, expRouter, expTower, expTowerDiagonal, bufferTower, expHub, expNode;// expOutput, expUnloader;
 
     //turret
     public static @FactionDef("koruh")
@@ -1550,6 +1550,7 @@ public class UnityBlocks{
             maxDamage = 24f;
             health = 810;
 
+            maxLevel = 6;
             expFields = new EField[]{
                     new ERational(v -> maxDamage = v, 48f, 24f, -3f, Stat.abilities, v -> bundle.format("stat.unity.maxdamage", v)).formatAll(false)
             };
@@ -1561,6 +1562,7 @@ public class UnityBlocks{
             health = 3240;
             size = 2;
 
+            maxLevel = 12;
             expFields = new EField[]{
                     new ERational(v -> maxDamage = v, 72f, 24f, -3f, Stat.abilities, v -> bundle.format("stat.unity.maxdamage", v)).formatAll(false)
             };
@@ -1571,7 +1573,13 @@ public class UnityBlocks{
             maxDamage = 76f;
             blinkFrame = 30f;
             health = 760;
-            maxLevel = 12;
+            updateEffect = UnityFx.sparkle;
+
+            maxLevel = 6;
+            expFields = new EField[]{
+                    new ERational(v -> maxDamage = v, 152f, 50f, -3f, Stat.abilities, v -> bundle.format("stat.unity.maxdamage", v)).formatAll(false),
+                    new ELinearCap(v -> blinkFrame = v, 10f, 10f, 2, Stat.abilities, v -> bundle.format("stat.unity.blinkframe", v)).formatAll(false)
+            };
         }};
 
         diriumWallLarge = new LevelLimitWall("dirium-wall-large"){{
@@ -1580,7 +1588,13 @@ public class UnityBlocks{
             blinkFrame = 30f;
             health = 3040;
             size = 2;
+            updateEffect = UnityFx.sparkle;
+
             maxLevel = 12;
+            expFields = new EField[]{
+                    new ERational(v -> maxDamage = v, 304f, 50f, -2f, Stat.abilities, v -> bundle.format("stat.unity.maxdamage", v)).formatAll(false),
+                    new ELinearCap(v -> blinkFrame = v, 10f, 5f, 4, Stat.abilities, v -> bundle.format("stat.unity.blinkframe", v)).formatAll(false)
+            };
         }};
 
         shieldProjector = new ClassicProjector("shield-generator"){{
@@ -2010,6 +2024,11 @@ public class UnityBlocks{
             expCapacity = 180;
             buffer = true;
             health = 300;
+        }};
+
+        expNode = new ExpNode("exp-node"){{
+            requirements(Category.effect, with(UnityItems.denseAlloy, 30, Items.silicon, 30, UnityItems.steel, 8));
+            expCapacity = 200;
         }};
 
         expTank = new ExpTank("exp-tank"){{
