@@ -1,6 +1,7 @@
 package unity.type.weapons;
 
 import arc.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
@@ -11,7 +12,7 @@ import mindustry.type.*;
 public class MortarWeapon extends Weapon{
     public float inclineOffset = 5f, maxIncline = 85f;
     public float barrelSpeed = 5f, barrelOffset = 0f;
-    public TextureRegion barrelRegion, barrelEndRegion;
+    public TextureRegion barrelRegion, barrelEndRegion, barrelEndHeatRegion;
 
     public MortarWeapon(String name){
         super(name);
@@ -23,27 +24,58 @@ public class MortarWeapon extends Weapon{
         super.load();
         barrelRegion = Core.atlas.find(name + "-barrel");
         barrelEndRegion = Core.atlas.find(name + "-barrel-end");
+        barrelEndHeatRegion = Core.atlas.find(name + "-barrel-end-heat");
     }
 
     @Override
     public void draw(Unit unit, WeaponMount mount){
         super.draw(unit, mount);
+        float z = Draw.z();
+        Draw.z(z + layerOffset);
+
         MortarMount mMount = (MortarMount)mount;
         float incline = -Mathf.sinDeg(Mathf.lerp(inclineOffset, maxIncline, mMount.incline)) * barrelRegion.width * Draw.scl;
-        float endIncline = -Mathf.cosDeg(Mathf.lerp(inclineOffset, maxIncline, mMount.incline)) * barrelEndRegion.height;
+        float endIncline = -Mathf.cosDeg(Mathf.lerp(inclineOffset, maxIncline, mMount.incline));
         float rotation = unit.rotation - 90f,
         weaponRotation  = rotation + (rotate ? mount.rotation : 0),
         recoil = -((mount.reload) / reload * this.recoil),
         wx = unit.x + Angles.trnsx(rotation, x, y) + Angles.trnsx(weaponRotation, 0, recoil),
         wy = unit.y + Angles.trnsy(rotation, x, y) + Angles.trnsy(weaponRotation, 0, recoil);
 
-
         Tmp.v1.trns(weaponRotation - 90f, incline + barrelOffset).add(wx, wy);
         Tmp.v2.trns(weaponRotation - 90f, barrelOffset).add(wx, wy);
 
         Lines.stroke(barrelRegion.width * Draw.scl * 0.5f);
         Lines.line(barrelRegion, Tmp.v2.x, Tmp.v2.y, Tmp.v1.x, Tmp.v1.y, false);
-        Draw.rect(barrelEndRegion, Tmp.v1, barrelEndRegion.width * Draw.scl, endIncline * Draw.scl, weaponRotation);
+        if(heatRegion.found() && mount.heat > 0f){
+            Draw.color(heatColor, mount.heat);
+            Draw.blend(Blending.additive);
+
+            Lines.stroke(heatRegion.width * Draw.scl * 0.5f);
+            Lines.line(heatRegion, Tmp.v2.x, Tmp.v2.y, Tmp.v1.x, Tmp.v1.y, false);
+
+            Draw.blend();
+            Draw.color();
+        }
+
+        Draw.rect(barrelEndRegion, Tmp.v1,
+        barrelEndRegion.width * Draw.scl,
+        barrelEndRegion.height * endIncline * Draw.scl,
+        weaponRotation);
+        if(barrelEndHeatRegion.found() && mount.heat > 0f){
+            Draw.color(heatColor, mount.heat);
+            Draw.blend(Blending.additive);
+
+            Draw.rect(barrelEndHeatRegion, Tmp.v1,
+            barrelEndHeatRegion.width * Draw.scl,
+            barrelEndHeatRegion.height * endIncline * Draw.scl,
+            weaponRotation);
+
+            Draw.blend();
+            Draw.color();
+        }
+
+        Draw.z(z);
     }
 
     @Override
