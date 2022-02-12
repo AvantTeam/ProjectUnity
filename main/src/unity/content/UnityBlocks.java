@@ -143,10 +143,14 @@ public class UnityBlocks{
     stoneWall, denseWall, steelWall, steelWallLarge, diriumWall, diriumWallLarge, shieldProjector, diriumProjector,
 
     //distribution
-    steelConveyor, diriumConveyor, teleporter, teleunit,
+    steelConveyor, teleporter, teleunit;
+
+    public static @FactionDef("koruh")
+    @Dupe(base = ExpTurret.class, parent = KoruhConveyor.class)
+    Block diriumConveyor;
 
     //unit
-    bufferPad, omegaPad, cachePad, convertPad,
+    public static @FactionDef("koruh") Block bufferPad, omegaPad, cachePad, convertPad,
 
     //TODO
     expFountain, expVoid, expTank, expChest, expRouter, expTower, expTowerDiagonal, bufferTower, expHub;// expOutput, expUnloader;
@@ -1619,7 +1623,7 @@ public class UnityBlocks{
             effectColors = new Color[]{Pal.lancerLaser, UnityPal.lancerDir1, UnityPal.lancerDir2, UnityPal.lancerDir3, UnityPal.diriumLight};
         }};
 
-        steelConveyor = new ExpConveyor("steel-conveyor"){{
+        steelConveyor = new KoruhConveyor("steel-conveyor"){{
             requirements(Category.distribution, with(UnityItems.stone, 1, UnityItems.denseAlloy, 1, UnityItems.steel, 1));
             health = 140;
             speed = 0.1f;
@@ -1627,12 +1631,14 @@ public class UnityBlocks{
             drawMultiplier = 1.9f;
         }};
 
-        diriumConveyor = new ExpConveyor("dirium-conveyor"){{
+        diriumConveyor = new ExpKoruhConveyor("dirium-conveyor"){{
             requirements(Category.distribution, with(UnityItems.steel, 1, Items.phaseFabric, 1, UnityItems.dirium, 1));
             health = 150;
             speed = 0.16f;
             displayedSpeed = 20f;
             drawMultiplier = 1.3f;
+
+            draw = new DrawOver();
         }};
 
         bufferPad = new MechPad("buffer-pad"){{

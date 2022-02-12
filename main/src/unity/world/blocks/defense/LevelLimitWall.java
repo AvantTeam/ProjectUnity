@@ -17,7 +17,7 @@ import static mindustry.Vars.*;
 @Dupe(base = ExpTurret.class, parent = LimitWall.class, name = "ExpLimitWall")
 public class LevelLimitWall extends ExpLimitWall {
     public TextureRegion[] levelRegions; //level top regions
-    public TextureRegion edgeRegion, shieldRegion;
+    public TextureRegion edgeRegion, shieldRegion, edgeMaxRegion;
     public float damageExp = 1 / 20f;
     public float shieldZ = Layer.buildBeam;
 
@@ -34,6 +34,7 @@ public class LevelLimitWall extends ExpLimitWall {
     public void load(){
         super.load();
         edgeRegion = atlas.find(name + "-under");
+        edgeMaxRegion = atlas.find(name + "-under-max", name + "-under");
         shieldRegion = atlas.find(name + "-shield");
         int n = 1;
         while(n <= 100){ //worst-case scenario
@@ -66,7 +67,7 @@ public class LevelLimitWall extends ExpLimitWall {
             if(top != region){
                 //Draw.rect(top, x, y);
                 Draw.z(Layer.blockUnder - 0.01f);
-                if(edgeRegion.found()) Draw.rect(edgeRegion, x, y);
+                if(edgeRegion.found()) Draw.rect(top == levelRegions[levelRegions.length - 1] ? edgeMaxRegion : edgeRegion, x, y);
             }
 
             if(flashHit && hit > 0.0001f){
@@ -90,7 +91,7 @@ public class LevelLimitWall extends ExpLimitWall {
             }
 
 
-            if(shieldZ > 0 && shieldRegion.found() && level() == maxLevel){
+            /*if(shieldZ > 0 && shieldRegion.found() && level() == maxLevel){
                 Draw.z(shieldZ);
                 if(Core.settings.getBool("animatedshields")){
                     Draw.rect(shieldRegion, x, y);
@@ -100,7 +101,7 @@ public class LevelLimitWall extends ExpLimitWall {
                     Draw.rect(shieldRegion, x, y);
                     Draw.blend();
                 }
-            }
+            }*/
         }
 
         @Override
