@@ -9,6 +9,7 @@ import mindustry.entities.*;
 import mindustry.graphics.*;
 import unity.graphics.*;
 
+import static arc.math.Angles.*;
 import static arc.graphics.g2d.Lines.*;
 import static arc.graphics.g2d.Draw.*;
 
@@ -48,8 +49,32 @@ public class LineFx{
         Fill.circle(Tmp.v3.x, Tmp.v3.y, fin);
 
         alpha(0.67f);
-        Draw.rect("circle-shadow", Tmp.v3.x, Tmp.v3.y, fin + 7.5f, fin + 7.5f);
+        Draw.rect("circle-shadow", Tmp.v3.x, Tmp.v3.y, fin + 6f, fin + 6f);
 
         blend();
-    }).layer(Layer.flyingUnitLow);
+    }).layer(Layer.flyingUnitLow),
+
+    monolithSoulTransfer = new Effect(32f, e -> {
+        if(!(e.data instanceof Position data)) return;
+
+        e.scaled(25f, i -> {
+            Tmp.v2.set(data).sub(e.x, e.y).scl(i.fin(Interp.pow2In)).add(e.x, e.y);
+
+            color(UnityPal.monolithDark, UnityPal.monolithLight, UnityPal.monolith, i.fin());
+            randLenVectors(e.id, 13, Interp.pow3Out.apply(i.fslope()), 360f, 0f, 6f, (x, y) ->
+                Fill.circle(Tmp.v2.x + x, Tmp.v2.y + y, 1.5f + i.fslope() * 2.7f)
+            );
+        });
+
+        Tmp.v1.set(data).sub(e.x, e.y).scl(e.fin(Interp.pow2In)).add(e.x, e.y);
+        float size = e.fin(Interp.pow10Out) * e.foutpowdown();
+
+        color(UnityPal.monolithDark);
+        Fill.circle(Tmp.v1.x, Tmp.v1.y, size * 4.8f);
+
+        color(UnityPal.monolithLight);
+        for(int i = 0; i < 4; i++){
+            Drawf.tri(Tmp.v1.x, Tmp.v1.y, size * 6.4f, size * 27f, e.rotation + 90f * i + e.finpow() * 45f * Mathf.sign(e.id % 2 == 0));
+        }
+    });
 }

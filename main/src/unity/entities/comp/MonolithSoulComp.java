@@ -26,12 +26,13 @@ import static mindustry.Vars.*;
 abstract class MonolithSoulComp implements Unitc, Trailc, Factionc{
     @Import UnitType type;
     @Import Team team;
-    @Import float x, y, health, maxHealth, elevation;
+    @Import float x, y, rotation, health, maxHealth, elevation;
     @Import Trail trail;
 
     @ReadOnly transient boolean corporeal;
     @ReadOnly transient float joinTime;
     @ReadOnly transient Teamc joinTarget;
+    @ReadOnly transient float ringRotation;
     @ReadOnly transient Seq<Tile> forms = new Seq<>(5);
     @ReadOnly transient float formProgress;
 
@@ -52,6 +53,7 @@ abstract class MonolithSoulComp implements Unitc, Trailc, Factionc{
             health = Mathf.clamp(health + (joining() ? -0.2f : lifeDelta()) * Time.delta, 0f, maxHealth);
             joinTime = (joinTarget == null || !joinTarget.isAdded()) ? Mathf.lerpDelta(joinTime, 0f, 0.2f) : Mathf.approachDelta(joinTime, 1f, 0.008f);
             formProgress = Mathf.lerpDelta(formProgress, forms.any() ? (health / maxHealth) : 0f, 0.17f);
+            ringRotation = Mathf.slerp(ringRotation, joinTarget == null ? rotation : angleTo(joinTarget), 0.08f);
 
             if(!joinValid(joinTarget)) joinTarget = null;
             forms.removeAll(t -> !formValid(t));
@@ -73,15 +75,20 @@ abstract class MonolithSoulComp implements Unitc, Trailc, Factionc{
                 }
             }
         }else if(health <= maxHealth * 0.5f){
+            DeathFx.monolithSoulCrack.at(x, y, rotation);
+
             corporeal = false;
             joinTarget = null;
             forms.clear();
             formProgress = 0f;
         }
 
-        if(Mathf.equal(joinTime, 1f)){
-            //TODO join the target
+        if(Mathf.equal(joinTime, 1f) && joinValid(joinTarget)){
             kill();
+            DeathFx.monolithSoulJoin.at(x, y, ringRotation, this);
+
+            LineFx.monolithSoulTransfer.at(x, y, rotation, joinTarget);
+            Time.run(LineFx.monolithSoulTransfer.lifetime, Soul.toSoul(joinTarget)::join);
         }else if(!corporeal && Mathf.equal(health, maxHealth)){
             corporeal = true;
             joinTime = 0f;

@@ -128,6 +128,8 @@ public final class MonolithUnitTypes{
                                 if(Mathf.chanceDelta(0.17f)) ParticleFx.monolithSpark.at(form.drawx(), form.drawy(), 0f, 4f);
                                 if(Mathf.chanceDelta(0.67f)) LineFx.monolithSoulAbsorb.at(form.drawx(), form.drawy(), 0f, soul);
                             }
+                        }else if(soul.joining() && Mathf.chanceDelta(0.33f)){
+                            LineFx.monolithSoulAbsorb.at(soul.x + Mathf.range(6f), soul.y + Mathf.range(6f), 0f, soul.joinTarget());
                         }
                     }
                 }
@@ -159,9 +161,9 @@ public final class MonolithUnitTypes{
                     float rotation = Time.time * 3f * Mathf.sign(unit.id % 2 == 0);
                     for(int i = 0; i < 5; i++){
                         float r = rotation + 72f * i;
-                        UnityDrawf.arcLine(soul.x, soul.y, 12f, 60f, r);
+                        UnityDrawf.arcLine(soul.x, soul.y, 10f, 60f, r);
 
-                        Tmp.v1.trns(r, 12f).add(soul);
+                        Tmp.v1.trns(r, 10f).add(soul);
                         Drawf.tri(Tmp.v1.x, Tmp.v1.y, 2.5f, 6f, r);
                     }
 
@@ -183,14 +185,14 @@ public final class MonolithUnitTypes{
                     Lines.stroke(1.5f, UnityPal.monolith);
 
                     TextureRegion reg = Core.atlas.find("unity-monolith-chain");
-                    Quat rot = Utils.q1.set(Vec3.Z, soul.rotation + 90f).mul(Utils.q2.set(Vec3.X, 75f));
+                    Quat rot = Utils.q1.set(Vec3.Z, soul.ringRotation() + 90f).mul(Utils.q2.set(Vec3.X, 75f));
                     float t = Interp.pow3Out.apply(soul.joinTime()), w = reg.width * Draw.scl * 0.5f * t, h = reg.height * Draw.scl * 0.5f * t,
                         rad = t * 25f, a = Mathf.curve(t, 0.33f);
 
                     Draw.alpha(a);
                     UnityDrawf.panningCircle(reg,
                         soul.x, soul.y, w, h,
-                        rad, 360f, Time.time * 6f * Mathf.sign(unit.id % 2 == 0) + soul.id * 30f,
+                        rad, 360f, Time.time * 6f * Mathf.sign(soul.id % 2 == 0) + soul.id * 30f,
                         rot, Layer.flyingUnitLow - 0.01f, Layer.flyingUnit
                     );
 
@@ -207,7 +209,7 @@ public final class MonolithUnitTypes{
                     Draw.blend();
                     Draw.z(z);
                 }else{
-                    super.draw(unit);
+                    super.draw(soul);
                 }
             }
         };

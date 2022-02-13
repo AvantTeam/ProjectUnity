@@ -142,8 +142,8 @@ public class MonolithWorld{
         }
 
         public void updateAll(){
-            centerX = width / 2f - x;
-            centerY = height / 2f - y;
+            centerX = World.unconv(x) + World.unconv(width) / 2f;
+            centerY = World.unconv(y) + World.unconv(height) / 2f;
 
             monolithTiles.clear();
             monolithTilePos.clear();
