@@ -7,7 +7,6 @@ import arc.util.*;
 import mindustry.entities.bullet.*;
 import mindustry.game.*;
 import mindustry.gen.*;
-import unity.ai.kami.KamiBulletDatas.*;
 import unity.entities.*;
 
 public class CircleBulletType extends BulletType{
@@ -21,7 +20,6 @@ public class CircleBulletType extends BulletType{
     @Override
     public void update(Bullet b){
         super.update(b);
-        if(b.data instanceof KamiBulletData kd) kd.update(b);
     }
 
     @Override

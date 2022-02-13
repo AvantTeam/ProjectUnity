@@ -141,6 +141,21 @@ public final class Utils{
         return any;
     }
 
+    public static <T extends Entityc> T bestEntity(EntityGroup<T> group, Boolf<T> pred, Floatf<T> comp){
+        T best = null;
+        float last = -Float.MAX_VALUE;
+        float s = 0f;
+
+        for(T t : group){
+            if(pred.get(t) && (best == null || last > (s = comp.get(t)))){
+                best = t;
+                last = s;
+            }
+        }
+
+        return best;
+    }
+
     public static Bullet nearestBullet(float x, float y, float range, Boolf<Bullet> boolf){
         result = null;
         cdist = range;

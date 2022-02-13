@@ -52,7 +52,7 @@ public class UnityBullets{
 
         scarShrapnel, scarMissile,
 
-        kamiBullet1, kamiLaser, kamiVariableLaser, kamiSmallLaser,
+        kamiBullet1, kamiBullet2, kamiBullet3, kamiLaser, kamiVariableLaser, kamiSmallLaser,
 
         ricochetSmall, ricochetMedium, ricochetBig,
 
@@ -959,6 +959,19 @@ public class UnityBullets{
             pierce = true;
             keepVelocity = false;
             color = b -> Tmp.c1.set(Color.red).shiftHue(b.time * 3f).cpy();
+        }};
+
+        kamiBullet2 = new KamiBulletType(){{
+            lifetime = 240f;
+            hitSize = 6f;
+            despawnEffect = Fx.none;
+            trailLength = 12;
+        }};
+
+        kamiBullet3 = new KamiBulletType(){{
+            lifetime = 240f;
+            hitSize = 6f;
+            despawnEffect = Fx.none;
         }};
 
         kamiLaser = new KamiLaserBulletType(230f){{

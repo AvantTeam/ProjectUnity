@@ -187,9 +187,6 @@ public class Unity extends Mod{
         TimeStop.init();
         TimeReflect.init();
 
-        KamiPatterns.load();
-        KamiBulletDatas.load();
-
         try{
             Class<? extends DevBuild> impl = (Class<? extends DevBuild>)Class.forName("unity.mod.DevBuildImpl");
             dev = impl.getDeclaredConstructor().newInstance();

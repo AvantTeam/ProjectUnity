@@ -3,7 +3,7 @@ package unity.entities.comp;
 import arc.graphics.g2d.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import unity.ai.*;
+import unity.ai.kami.*;
 import unity.annotations.Annotations.*;
 import unity.gen.*;
 import unity.mod.*;
@@ -15,25 +15,24 @@ abstract class KamiComp implements Unitc, Factionc{
     transient Bullet laser;
     @SyncField(true) float laserRotation = 0f;
 
-    @ReadOnly transient KamiAI trueController;
+    @ReadOnly transient KamiAI newAI;
 
     @Override
     public void update(){
         if(laser != null){
             laser.rotation(laserRotation);
         }
-
-        if(trueController.unit == self()){
-            trueController.updateUnit();
+        if(newAI.unit == self()){
+            newAI.updateUnit();
         }
     }
 
     @Override
     public void draw(){
-        if(trueController != null){
+        if(newAI != null){
             float z = Draw.z();
             Draw.z(Layer.flyingUnit);
-            trueController.draw();
+            newAI.draw();
             Draw.z(z);
             Draw.reset();
         }
@@ -41,19 +40,18 @@ abstract class KamiComp implements Unitc, Factionc{
 
     @Override
     public void add(){
-        trueController = new KamiAI();
-        trueController.unit(self());
-    }
-
-    @Override
-    public void damage(float amount){
-        if(trueController.unit == self() && !trueController.waiting){
-            trueController.stageDamage += amount;
-        }
+        newAI = new KamiAI();
+        newAI.unit(self());
     }
 
     @Override
     public Faction faction(){
         return Faction.koruh;
+    }
+
+    @Replace(2)
+    @Override
+    public float clipSize(){
+        return Float.MAX_VALUE;
     }
 }
