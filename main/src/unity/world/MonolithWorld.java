@@ -41,7 +41,7 @@ public class MonolithWorld{
         for(int y = 0; y < h; y++){
             for(int x = 0; x < width; x++){
                 chunks[x + y * width] = new Chunk(
-                    x, y,
+                    x * chunkSize, y * chunkSize,
                     Math.min(world.width() - x * chunkSize, chunkSize),
                     Math.min(world.height() - y * chunkSize, chunkSize)
                 );
@@ -61,13 +61,15 @@ public class MonolithWorld{
         return chunks[x / chunkSize + y / chunkSize * width];
     }
 
+    public Chunk getChunk(float x, float y){
+        return getChunk(World.toTile(x), World.toTile(y));
+    }
+
     public void intersect(int x, int y, int width, int height, Cons<Chunk> cons){
         width = Math.min(width, this.width - x);
         height = Math.min(height, (chunks.length / this.width) - y);
-        x = Math.max(x, 0);
-        y = Math.max(y, 0);
 
-        int tx = x / chunkSize, ty = y / chunkSize,
+        int tx = Math.max(x / chunkSize, 0), ty = Math.max(y / chunkSize, 0),
             tw = Math.min(Mathf.ceilPositive((x + width) / (float)chunkSize) * chunkSize, this.width),
             th = Math.min(Mathf.ceilPositive((y + height) / (float)chunkSize) * chunkSize, chunks.length / this.width);
 
@@ -85,7 +87,11 @@ public class MonolithWorld{
 
         int r = World.toTile(range) * 2;
         intersect(World.toTile(x), World.toTile(y), r, r, c -> {
-            if(lastChunk == null || lastPriority < priority.get(c)) lastChunk = c;
+            float p = priority.get(c);
+            if(lastChunk == null || lastPriority < priority.get(c)){
+                lastPriority = p;
+                lastChunk = c;
+            }
         });
 
         return lastChunk;
@@ -116,8 +122,8 @@ public class MonolithWorld{
 
         public boolean within(float x, float y){
             return
-                x >= World.unconv(this.x) && x <= World.unconv(this.width) &&
-                y >= World.unconv(this.y) && y <= World.unconv(this.height);
+                x >= World.unconv(this.x) && x <= World.unconv(width) &&
+                y >= World.unconv(this.y) && y <= World.unconv(height);
         }
 
         public void addMonolithTile(Tile tile){

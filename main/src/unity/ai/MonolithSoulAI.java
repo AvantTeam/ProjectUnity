@@ -53,7 +53,7 @@ public class MonolithSoulAI implements UnitController{
             unit.moveAt(vec);
             unit.lookAt(unit.prefRotation());
 
-            if(timer.get(1, 5f)){
+            if(timer.get(1, 3f)){
                 Chunk in = formTarget.within(unit) ? formTarget : monolithWorld.getChunk(World.toTile(unit.x), World.toTile(unit.y));
                 if(in != null){
                     Tile tile = in.monolithTiles.random();
@@ -82,11 +82,10 @@ public class MonolithSoulAI implements UnitController{
                     ? vesselUnit : vesselBuild)
                 : null;
 
-            Log.infoList(range, vesselUnit, vesselBuild, joinTarget);
             // If it can't find any vessels to join, it'll start finding forming locations.
             if(joinTarget == null){
                 float r = range * range;
-                formTarget = monolithWorld.nearest(unit.x, unit.y, range, c -> Math.max(c.monolithTiles.size, 5) * (r / unit.dst2(c.centerX, c.centerY)));
+                formTarget = monolithWorld.nearest(unit.x, unit.y, range, c -> Math.min(c.monolithTiles.size, 5) * (r / unit.dst2(c.centerX, c.centerY)));
             }else{
                 formTarget = null;
             }

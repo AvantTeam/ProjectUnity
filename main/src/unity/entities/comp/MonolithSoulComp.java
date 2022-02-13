@@ -51,7 +51,7 @@ abstract class MonolithSoulComp implements Unitc, Trailc, Factionc{
     public void update(){
         if(!corporeal){
             health = Mathf.clamp(health + (joining() ? -0.2f : lifeDelta()) * Time.delta, 0f, maxHealth);
-            joinTime = (joinTarget == null || !joinTarget.isAdded()) ? Mathf.lerpDelta(joinTime, 0f, 0.2f) : Mathf.approachDelta(joinTime, 1f, 0.008f);
+            joinTime = (joinTarget == null || !joinTarget.isAdded()) ? Mathf.lerpDelta(joinTime, 0f, 0.1f) : Mathf.approachDelta(joinTime, 1f, 0.008f);
             formProgress = Mathf.lerpDelta(formProgress, forms.any() ? (health / maxHealth) : 0f, 0.17f);
             ringRotation = Mathf.slerp(ringRotation, joinTarget == null ? rotation : angleTo(joinTarget), 0.08f);
 
@@ -83,15 +83,17 @@ abstract class MonolithSoulComp implements Unitc, Trailc, Factionc{
             formProgress = 0f;
         }
 
-        if(Mathf.equal(joinTime, 1f) && joinValid(joinTarget)){
-            kill();
-            DeathFx.monolithSoulJoin.at(x, y, ringRotation, this);
+        if(isValid()){
+            if(Mathf.equal(joinTime, 1f) && joinValid(joinTarget)){
+                kill();
+                DeathFx.monolithSoulJoin.at(x, y, ringRotation, this);
 
-            LineFx.monolithSoulTransfer.at(x, y, rotation, joinTarget);
-            Time.run(LineFx.monolithSoulTransfer.lifetime, Soul.toSoul(joinTarget)::join);
-        }else if(!corporeal && Mathf.equal(health, maxHealth)){
-            corporeal = true;
-            joinTime = 0f;
+                LineFx.monolithSoulTransfer.at(x, y, rotation, joinTarget);
+                Time.run(LineFx.monolithSoulTransfer.lifetime, Soul.toSoul(joinTarget)::join);
+            }else if(!corporeal && Mathf.equal(health, maxHealth)){
+                corporeal = true;
+                joinTime = 0f;
+            }
         }
     }
 

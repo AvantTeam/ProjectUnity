@@ -54,22 +54,19 @@ public class LineFx{
         blend();
     }).layer(Layer.flyingUnitLow),
 
-    monolithSoulTransfer = new Effect(32f, e -> {
+    monolithSoulTransfer = new Effect(64f, e -> {
         if(!(e.data instanceof Position data)) return;
 
-        e.scaled(25f, i -> {
-            Tmp.v2.set(data).sub(e.x, e.y).scl(i.fin(Interp.pow2In)).add(e.x, e.y);
-
-            color(UnityPal.monolithDark, UnityPal.monolithLight, UnityPal.monolith, i.fin());
-            randLenVectors(e.id, 13, Interp.pow3Out.apply(i.fslope()), 360f, 0f, 6f, (x, y) ->
-                Fill.circle(Tmp.v2.x + x, Tmp.v2.y + y, 1.5f + i.fslope() * 2.7f)
-            );
-        });
-
         Tmp.v1.set(data).sub(e.x, e.y).scl(e.fin(Interp.pow2In)).add(e.x, e.y);
+
+        color(UnityPal.monolithDark, UnityPal.monolith, e.fslope());
+        randLenVectors(e.id, 5, Interp.pow3Out.apply(e.fslope()) * 8f, 360f, 0f, 8f, (x, y) ->
+            Fill.circle(Tmp.v1.x + x, Tmp.v1.y + y, 0.5f + e.fslope() * 2.7f)
+        );
+
         float size = e.fin(Interp.pow10Out) * e.foutpowdown();
 
-        color(UnityPal.monolithDark);
+        color(UnityPal.monolith);
         Fill.circle(Tmp.v1.x, Tmp.v1.y, size * 4.8f);
 
         color(UnityPal.monolithLight);

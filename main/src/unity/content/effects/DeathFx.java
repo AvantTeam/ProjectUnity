@@ -25,7 +25,7 @@ public final class DeathFx{
     monolithSoulDeath = new Effect(64f, e -> {
         color(UnityPal.monolith, UnityPal.monolithDark, e.fin());
         randLenVectors(e.id, 27, e.finpow() * 56f, (x, y) ->
-            Fill.circle(e.x + x, e.y + y, 1f + e.fout() * 2f)
+            Fill.circle(e.x + x, e.y + y, 0.5f + e.fout() * 2.5f)
         );
 
         e.scaled(48f, i -> {
@@ -50,7 +50,7 @@ public final class DeathFx{
 
             Tmp.v1.trns(e.rotation + off, e.finpow() * 24f).add(e.x, e.y);
 
-            alpha(e.fout());
+            alpha(e.foutpowdown());
             Draw.rect(type.wreckRegions[i], Tmp.v1.x, Tmp.v1.y, e.rotation - 90f);
         }
     }).layer(Layer.flyingUnit),
