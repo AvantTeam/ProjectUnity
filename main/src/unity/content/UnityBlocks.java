@@ -141,7 +141,7 @@ public class UnityBlocks{
     denseSmelter, solidifier, steelSmelter, liquifier, titaniumExtractor, lavaSmelter, diriumCrucible, coalExtractor,
 
     //defense
-    stoneWall, denseWall, steelWall, steelWallLarge, diriumWall, diriumWallLarge, shieldProjector, diriumProjector,
+    stoneWall, denseWall, steelWall, steelWallLarge, diriumWall, diriumWallLarge, shieldProjector, diriumProjector, timeMine,
 
     //distribution
     steelConveyor, teleporter, teleunit;
@@ -1639,6 +1639,13 @@ public class UnityBlocks{
             pregrade = (ClassicProjector) shieldProjector;
             pregradeLevel = 5;
             effectColors = new Color[]{Pal.lancerLaser, UnityPal.lancerDir1, UnityPal.lancerDir2, UnityPal.lancerDir3, UnityPal.diriumLight};
+        }};
+
+        timeMine = new TimeMine("time-mine"){{
+            requirements(Category.effect, with(Items.lead, 25, Items.silicon, 12));
+            hasShadow = false;
+            health = 45;
+            pullTime = 6 * 60f;
         }};
 
         steelConveyor = new KoruhConveyor("steel-conveyor"){{
