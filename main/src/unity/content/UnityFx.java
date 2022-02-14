@@ -25,9 +25,7 @@ import unity.graphics.*;
 import unity.type.*;
 import unity.util.*;
 
-import static arc.graphics.g2d.Draw.rect;
 import static arc.graphics.g2d.Draw.*;
-import static arc.graphics.g2d.Lines.circle;
 import static arc.graphics.g2d.Lines.*;
 import static arc.math.Angles.*;
 import static mindustry.Vars.tilesize;
@@ -38,6 +36,7 @@ import static unity.graphics.UnityDrawf.spark;
 //** @deprecated These fields will eventually all be interpreted in the classes in {@link unity.content.effects} package. */
 public class UnityFx{
     private static int integer;
+    private static final Rand rand = new Rand();
 
     public static final Effect
         //@formatter:off
@@ -1199,6 +1198,82 @@ public class UnityFx{
             float py3 = Angles.trnsy(space * (i + 2), (float)e.data);
             Fill.quad(e.x, e.y, centerf, e.x + px, e.y + py, edgef, e.x + px2, e.y + py2, edgef, e.x + px3, e.y + py3, edgef);
         }
+    }),
+
+    smallChainLightning = new Effect(40f, 300f, e -> {
+        if(!(e.data instanceof Position p)) return;
+
+        float tx = p.getX(), ty = p.getY(), dst = Mathf.dst(e.x, e.y, tx, ty);
+        Tmp.v1.set(p).sub(e.x, e.y).nor();
+
+        float normx = Tmp.v1.x, normy = Tmp.v1.y;
+        float range = 6f;
+        int links = Mathf.ceil(dst / range);
+        float spacing = dst / links;
+
+        Lines.stroke(2.5f * e.fout());
+        Draw.color(Color.white, e.color, e.fin());
+
+        Lines.beginLine();
+
+        Lines.linePoint(e.x, e.y);
+
+        rand.setSeed(e.id);
+
+        for(int i = 0; i < links; i++){
+            float nx, ny;
+            if(i == links - 1){
+                nx = tx;
+                ny = ty;
+            }else{
+                float len = (i + 1) * spacing;
+                Tmp.v1.setToRandomDirection(rand).scl(range/2f);
+                nx = e.x + normx * len + Tmp.v1.x;
+                ny = e.y + normy * len + Tmp.v1.y;
+            }
+
+            Lines.linePoint(nx, ny);
+        }
+
+        Lines.endLine();
+    }),
+
+    chainLightning = new Effect(30f, 300f, e -> {
+        if(!(e.data instanceof Position p)) return;
+
+        float tx = p.getX(), ty = p.getY(), dst = Mathf.dst(e.x, e.y, tx, ty);
+        Tmp.v1.set(p).sub(e.x, e.y).nor();
+
+        float normx = Tmp.v1.x, normy = Tmp.v1.y;
+        float range = 6f;
+        int links = Mathf.ceil(dst / range);
+        float spacing = dst / links;
+
+        Lines.stroke(4f * e.fout());
+        Draw.color(Color.white, e.color, e.fin());
+
+        Lines.beginLine();
+
+        Lines.linePoint(e.x, e.y);
+
+        rand.setSeed(e.id);
+
+        for(int i = 0; i < links; i++){
+            float nx, ny;
+            if(i == links - 1){
+                nx = tx;
+                ny = ty;
+            }else{
+                float len = (i + 1) * spacing;
+                Tmp.v1.setToRandomDirection(rand).scl(range/2f);
+                nx = e.x + normx * len + Tmp.v1.x;
+                ny = e.y + normy * len + Tmp.v1.y;
+            }
+
+            Lines.linePoint(nx, ny);
+        }
+
+        Lines.endLine();
     }),
 
     ricochetTrailSmall = new Effect(12f, e -> randLenVectors(e.id, 4, e.fout() * 3.5f, (x, y) -> {
