@@ -100,9 +100,9 @@ public class KamiAI implements UnitController{
         }
         int id = Mathf.random(0, patternSeq.size - 1);
         pattern = KamiPattern.all.get(patternSeq.get(id));
+        if(pattern.data != null) patternData = pattern.data.get();
         pattern.init(this);
         patternTime = pattern.time;
-        if(pattern.data != null) patternData = pattern.data.get();
         patternSeq.removeIndex(id);
     }
 
@@ -117,10 +117,14 @@ public class KamiAI implements UnitController{
     }
 
     public boolean shoot(int i, float time){
-        reloads[i] += Time.delta;
-        boolean s = reloads[i] > time;
-        if(s) reloads[i] -= time;
+        boolean s = reloads[i] <= 0f;
+        if(s) reloads[i] += time;
+        reloads[i] -= Time.delta;
         return s;
+    }
+
+    public float targetAngle(){
+        return unit.angleTo(target);
     }
 
     @Override
