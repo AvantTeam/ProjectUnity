@@ -6,7 +6,7 @@ import mindustry.gen.Building;
 import mindustry.gen.Bullet;
 
 public class BlockStatusEffectBulletType extends BasicBulletType{
-    public float strength;
+    public float strength = 2f;
 
     public BlockStatusEffectBulletType(float speed, float damage){
         super(speed, damage);
@@ -23,6 +23,7 @@ public class BlockStatusEffectBulletType extends BasicBulletType{
 
         if (b.x == target.x && b.y == target.y){
             target.applyBoost(strength, 60f);
+
             if (target.health < target.maxHealth){
                 target.heal(strength);
             }

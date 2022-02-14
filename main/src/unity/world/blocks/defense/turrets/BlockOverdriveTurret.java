@@ -1,5 +1,6 @@
 package unity.world.blocks.defense.turrets;
 
+import arc.Core;
 import arc.graphics.Color;
 import arc.graphics.g2d.*;
 import arc.math.Mathf;
@@ -11,17 +12,25 @@ import mindustry.world.blocks.defense.turrets.ReloadTurret;
 import unity.entities.bullet.misc.BlockStatusEffectBulletType;
 
 public class BlockOverdriveTurret extends ReloadTurret {
+    TextureRegion buffRegion;
+
     public final int timerBuff = timers++;
     public float buffRange = 50f;
     public float buffReload = 180f;
-    public BlockStatusEffectBulletType bullet;
 
-    public @Load("@-buff") TextureRegion buffRegion;
+    public BlockStatusEffectBulletType bullet;
 
     public BlockOverdriveTurret(String name) {
         super(name);
 
         hasPower = update = sync = solid = outlineIcon = true;
+    }
+
+    @Override
+    public void load(){
+        super.load();
+
+        buffRegion = Core.atlas.find(name+"-buff");
     }
 
     @Override
@@ -32,18 +41,16 @@ public class BlockOverdriveTurret extends ReloadTurret {
     }
 
     public class BlockOverdriveTurretBuild extends ReloadTurretBuild{
-        public Building target, lastTarget;
-        float buffIntensity = 0;
+        public Building target;
         float buffingTime;
         boolean buffing;
 
         @Override
         public void drawSelect(){
-            super.drawSelect();
-
             Drawf.circles(x, y, buffRange, Pal.accent);
+
             if (target != null) {
-                Draw.color(Pal.heal, Color.valueOf("feb380"), Mathf.absin(4f, 1f));
+                Draw.color(Pal.heal, Color.valueOf("cf352e"), Mathf.absin(4f, 1f));
                 Draw.rect(buffRegion, target.x, target.y);
             }
         }
@@ -59,8 +66,6 @@ public class BlockOverdriveTurret extends ReloadTurret {
                     bullet.create(this, target.x, target.y, 0f);
                     buffing = true;
                 }
-
-                buffIntensity = Mathf.lerpDelta(buffIntensity, buffing ? 1f : 0f, 0.08f * Time.delta);
             }
 
             if (cons.optionalValid() && efficiency() > 0){
@@ -72,12 +77,12 @@ public class BlockOverdriveTurret extends ReloadTurret {
             }
 
             if (timer(timerBuff, 60f)){
-                target = Units.closestBuilding(team, x, y, buffRange, this::targetValid);
+                target = Units.closestBuilding(team, x, y, buffRange, b -> targetValid(b) && b != this);
             }
         }
 
         public boolean targetValid(Building target){
-            return !target.dead && target.dst(tile) <= buffRange && target.block.canOverdrive && target.health < target.maxHealth;
+            return !target.dead && target.dst(tile) <= buffRange && target.block.canOverdrive;
         }
     }
 
