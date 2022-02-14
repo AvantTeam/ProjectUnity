@@ -9,8 +9,11 @@ import unity.ai.kami.KamiPattern.StagePattern.*;
 import unity.content.*;
 import unity.gen.*;
 
+import static unity.ai.kami.KamiBulletPresets.*;
+
 public class KamiPatterns{
-    public static KamiPattern basicPattern1, basicPattern2, expandPattern;
+    private final static int[] zero = {0};
+    public static KamiPattern basicPattern1, basicPattern2, expandPattern, flowerPattern;
     public static void load(){
         basicPattern1 = new KamiPattern(20f * 60f){
             @Override
@@ -108,14 +111,59 @@ public class KamiPatterns{
                 ai.reloads[0] += 1f + ai.difficulty * 0.5f;
                 ai.reloads[3] += 1f;
             }
-        }, (ai, data) -> {
-            ai.reloads[5] *= -1f;
-        })){
+        }, (ai, data) -> ai.reloads[5] *= -1f)){
             @Override
             public void init(KamiAI ai){
                 super.init(ai);
                 ai.reloads[4] = ai.reloads[5] = 1f;
             }
         };
+
+        flowerPattern = new StagePattern(-3, new Stage(3.5f * 60f, 2, (ai, d) -> {
+            Unit u = ai.unit;
+            if(d.time < 120f && ai.shoot(2, 7f)){
+                int petals = Mathf.clamp(3 + ai.difficulty, 0, 8),
+                amount = 4 + ai.difficulty, len = ai.difficulty;
+                float spacing = ((180f / petals) / (120f / 7f));
+                for(int i = 0; i < petals; i++){
+                    float ang = i * 360f / petals + ai.reloads[0];
+                    int[] sign = ai.reloads[1] <= 0f ? zero : Mathf.signs;
+                    for(int s : sign){
+                        shootLine(3f - len / 16f, 6f + len / 4f, amount, v -> {
+                            KamiBullet b = (KamiBullet)UnityBullets.kamiBullet3.create(u, u.team, u.x, u.y, ang + ai.reloads[1] * s);
+                            b.width = b.length = 12f;
+                            b.lifetime = 8f * 60f;
+                            b.vel.scl(v);
+                        });
+                    }
+                }
+                ai.reloads[1] += spacing;
+            }
+        }, (ai, d) -> {
+            ai.reloads[0] = ai.targetAngle();
+            ai.reloads[1] = 0f;
+        }), new Stage(4.5f * 60f, (ai, d) -> {
+            Unit u = ai.unit;
+            if(d.time < 190f && ai.shoot(1, 15f)){
+                int diff = 3 + ai.difficulty / 3, amount = 4 + ai.difficulty;
+                for(int i = 0; i < diff; i++){
+                    float ang = i * 360f / diff + ai.reloads[0];
+                    for(int s : Mathf.signs){
+                        shootLine(3f, 5.5f, 4 + amount, (v, j) -> {
+                            KamiBullet b = (KamiBullet)UnityBullets.kamiBullet2.create(u, u.team, u.x, u.y, ang + ai.reloads[2] * s);
+                            b.width = b.length = 12f;
+                            b.lifetime = 7f * 60f;
+                            b.vel.scl(v);
+                            b.turn = (0.2f + (1f - j / amount) * 0.3f) * s * (1f - ai.reloads[3]);
+                        });
+                    }
+                }
+                ai.reloads[2] += 15f;
+                ai.reloads[3] += 1f / 20f;
+            }
+        }, (ai, d) -> {
+            ai.reloads[0] = ai.targetAngle();
+            ai.reloads[1] = ai.reloads[2] = ai.reloads[3] = 0f;
+        }));
     }
 }

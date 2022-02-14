@@ -18,6 +18,7 @@ import java.util.*;
 public class KamiAI implements UnitController{
     public static final float minRange = 350f, barrierRange = 800f;
     private static final Vec2 vec = new Vec2();
+    private static KamiPattern testPattern;
 
     public Unit unit;
     public Unit target;
@@ -32,6 +33,7 @@ public class KamiAI implements UnitController{
 
     static{
         KamiPatterns.load();
+        //testPattern = KamiPatterns.flowerPattern;
     }
 
     public void draw(){
@@ -100,6 +102,7 @@ public class KamiAI implements UnitController{
         }
         int id = Mathf.random(0, patternSeq.size - 1);
         pattern = KamiPattern.all.get(patternSeq.get(id));
+        if(testPattern != null) pattern = testPattern;
         if(pattern.data != null) patternData = pattern.data.get();
         pattern.init(this);
         patternTime = pattern.time;

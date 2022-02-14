@@ -10,14 +10,19 @@ import mindustry.gen.*;
 public class KamiBulletPresets{
     private static final Vec2 vec = new Vec2();
 
-    public static void shootLine(BulletType type, Entityc owner, Team team, float x, float y, float rotation, float from, float to, int density, Cons<Bullet> cons){
+    public static void shootLine(float from, float to, int density, Floatc c){
         for(int i = 0; i < density; i++){
             float fin = Mathf.lerp(from, to, i / ((float)density - 1f));
             if(Float.isNaN(fin)) fin = to;
-            Bullet b = type.create(owner, team, x, y, rotation);
-            b.vel.setLength(fin);
-            b.lifetime = Mathf.clamp(b.lifetime / (fin / to), 0f, 15f * 60f);
-            if(cons != null) cons.get(b);
+            c.get(fin);
+        }
+    }
+
+    public static void shootLine(float from, float to, int density, Floatc2 c){
+        for(int i = 0; i < density; i++){
+            float fin = Mathf.lerp(from, to, i / ((float)density - 1f));
+            if(Float.isNaN(fin)) fin = to;
+            c.get(fin, i);
         }
     }
 
