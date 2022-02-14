@@ -19,6 +19,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 import unity.graphics.*;
+import unity.world.*;
 
 import static mindustry.Vars.*;
 
@@ -66,7 +67,6 @@ public final class Utils{
     public static void init(){
         Events.on(EventType.WorldLoadEvent.class, event -> {
             collideLineCollided.updateSize(world.width(), world.height());
-            //Unity.print(collideLineCollided.width + ", " + collideLineCollided.height);
         });
     }
 
@@ -139,6 +139,21 @@ public final class Utils{
         }
 
         return any;
+    }
+
+    public static <T extends Entityc> T bestEntity(EntityGroup<T> group, Boolf<T> pred, Floatf<T> comp){
+        T best = null;
+        float last = -Float.MAX_VALUE;
+        float s = 0f;
+
+        for(T t : group){
+            if(pred.get(t) && (best == null || last > (s = comp.get(t)))){
+                best = t;
+                last = s;
+            }
+        }
+
+        return best;
     }
 
     public static Bullet nearestBullet(float x, float y, float range, Boolf<Bullet> boolf){
@@ -861,7 +876,7 @@ public final class Utils{
 
     public static float linear(float current, float target, float maxTorque, float coefficient){
         current = Math.min(target, current);
-        
+
         return Math.min(coefficient * (target - current) * maxTorque / target, 99999f);
     }
 
@@ -911,7 +926,7 @@ public final class Utils{
      */
     public static Healthc linecast(Bullet hitter, float x, float y, float angle, float length){
         tV.trns(angle, length);
-        
+
         tmpBuilding = null;
 
         if(hitter.type.collidesGround){

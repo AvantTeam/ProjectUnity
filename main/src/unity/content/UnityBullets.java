@@ -30,7 +30,7 @@ import static unity.content.UnityStatusEffects.*;
 
 public class UnityBullets{
     public static BulletType
-        laser, shardLaserFrag, shardLaser, frostLaser, branchLaserFrag, branchLaser, distField, fractalLaser, kelvinWaterLaser,
+        laser, shardLaserFrag, shardLaser, frostLaser, branchLaserFrag, branchLaser, distField, smallDistField, fractalLaser, kelvinWaterLaser,
         kelvinSlagLaser, kelvinOilLaser, kelvinCryofluidLaser, kelvinLiquidLaser, celsiusSmoke, kelvinSmoke,
         breakthroughLaser, laserGeyser,
 
@@ -52,7 +52,7 @@ public class UnityBullets{
 
         scarShrapnel, scarMissile,
 
-        kamiBullet1, kamiLaser, kamiVariableLaser, kamiSmallLaser,
+        kamiBullet1, kamiBullet2, kamiBullet3, kamiLaser, kamiVariableLaser, kamiSmallLaser,
 
         ricochetSmall, ricochetMedium, ricochetBig,
 
@@ -243,18 +243,38 @@ public class UnityBullets{
             distSplashFx = UnityFx.distSplashFx;
             distStart = UnityFx.distStart;
             distStatus = distort;
-            fieldRadius = 85;
+            radius = 85;
 
-            lifetime = 10 * 60;
+            lifetime = 6 * 60;
             collidesTiles = false;
             collides = false;
             collidesAir = false;
             keepVelocity = false;
 
-            bulletSlowMultiplier = 0.94f; //nerfed
-            expGain = 1; // 0.6 exp per sec for unit. 0.05 exp per sec for one bullet
-            damageLimit = 200f; //too strong damage cannot be slow
-            distDamage = 0.1f; //6 damage per sec
+            bulletSlowMultiplier = 0.9f;
+            expGain = 1;
+            damageLimit = 100f;
+            distDamage = 0.1f;
+        }};
+
+        smallDistField = new DistFieldBulletType(0, -1){{
+            centerColor = Pal.lancerLaser.cpy().a(0);
+            edgeColor = Pal.place;
+            distSplashFx = UnityFx.distSplashFx;
+            distStart = UnityFx.distStart;
+            distStatus = distort;
+            radius = 40;
+
+            lifetime = 2.5f * 60;
+            collidesTiles = false;
+            collides = false;
+            collidesAir = false;
+            keepVelocity = false;
+
+            bulletSlowMultiplier = 0.65f;
+            expGain = 1;
+            damageLimit = 50f;
+            distDamage = 0.05f;
         }};
 
         fractalLaser = new ExpLaserFieldBulletType(170f, 130f){{
@@ -266,7 +286,7 @@ public class UnityBullets{
             maxRange = 150f + 2f * 30f; //Account for range increase
 
             distField = UnityBullets.distField;
-            basicFieldRadius = 85;
+            smallDistField = UnityBullets.smallDistField;
         }};
 
         laserGeyser = new GeyserBulletType(){{
@@ -959,6 +979,19 @@ public class UnityBullets{
             pierce = true;
             keepVelocity = false;
             color = b -> Tmp.c1.set(Color.red).shiftHue(b.time * 3f).cpy();
+        }};
+
+        kamiBullet2 = new KamiBulletType(){{
+            lifetime = 240f;
+            hitSize = 6f;
+            despawnEffect = Fx.none;
+            trailLength = 12;
+        }};
+
+        kamiBullet3 = new KamiBulletType(){{
+            lifetime = 240f;
+            hitSize = 6f;
+            despawnEffect = Fx.none;
         }};
 
         kamiLaser = new KamiLaserBulletType(230f){{

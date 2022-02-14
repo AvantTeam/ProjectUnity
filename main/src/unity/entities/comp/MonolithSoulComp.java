@@ -1,139 +1,151 @@
 package unity.entities.comp;
 
-import arc.func.*;
+import arc.*;
 import arc.math.*;
-import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.entities.*;
-import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
+import mindustry.input.*;
 import mindustry.type.*;
+import mindustry.world.*;
 import unity.annotations.Annotations.*;
-import unity.content.*;
+import unity.content.effects.*;
+import unity.content.units.*;
+import unity.entities.*;
 import unity.gen.*;
-import unity.gen.Soulc.*;
 import unity.mod.*;
-import unity.sync.*;
 
 import static mindustry.Vars.*;
 
-@SuppressWarnings({"unused"})
-@EntityDef({Unitc.class, MonolithSoulc.class, Factionc.class})
+@SuppressWarnings("unused")
+@EntityDef({Unitc.class, MonolithSoulc.class, Trailc.class, Factionc.class})
 @EntityComponent
-abstract class MonolithSoulComp implements Unitc, Unintersectablec, Factionc{
-    static final Rect rec1 = new Rect();
-    static final Rect rec2 = new Rect();
-
-    static final Prov<UnitType> defaultType = () -> UnityUnitTypes.monolithSoul;
-
-    float healAmount;
-
+abstract class MonolithSoulComp implements Unitc, Trailc, Factionc{
     @Import UnitType type;
-    @Import UnitController controller;
     @Import Team team;
-    @Import float x, y, rotation, health, maxHealth, hitSize;
-    @Import boolean dead;
-    @Import int id;
+    @Import float x, y, rotation, health, maxHealth, elevation;
+    @Import Trail trail;
+
+    @ReadOnly transient boolean corporeal;
+    @ReadOnly transient float joinTime;
+    @ReadOnly transient Teamc joinTarget;
+    @ReadOnly transient float ringRotation;
+    @ReadOnly transient Seq<Tile> forms = new Seq<>(5);
+    @ReadOnly transient float formProgress;
 
     @Override
     public Faction faction(){
-        return FactionMeta.map(type);
+        return Faction.monolith;
     }
 
     @Override
+    public void add(){
+        health = Math.min(maxHealth / 2f, health);
+    }
+
+    @Override
+    @MethodPriority(-1)
     public void update(){
-        if(controller == null){
-            kill();
-        }else{
-            health -= maxHealth / (5f * Time.toSeconds) * Time.delta;
+        if(!corporeal){
+            health = Mathf.clamp(health + (joining() ? -0.2f : lifeDelta()) * Time.delta, 0f, maxHealth);
+            joinTime = (joinTarget == null || !joinTarget.isAdded()) ? Mathf.lerpDelta(joinTime, 0f, 0.1f) : Mathf.approachDelta(joinTime, 1f, 0.008f);
+            formProgress = Mathf.lerpDelta(formProgress, forms.any() ? (health / maxHealth) : 0f, 0.17f);
+            ringRotation = Mathf.slerp(ringRotation, joinTarget == null ? rotation : angleTo(joinTarget), 0.08f);
 
-            if(!dead && (net.server() || !net.active())){
-                boolean[] invoked = {false};
-                Units.nearby(team, x, y, hitSize, unit -> {
-                    if(!invoked[0] && !dead && !unit.dead && unit instanceof Monolithc soul && soul.canJoin() && isSameFaction(unit)){
-                        hitbox(rec1);
-                        unit.hitbox(rec2);
+            if(!joinValid(joinTarget)) joinTarget = null;
+            forms.removeAll(t -> !formValid(t));
 
-                        if(rec1.overlaps(rec2)){
-                            invoked[0] = true;
-                            invoke(unit);
+            if(isLocal()){
+                //TODO input handling for mobile users :c
+                if(!mobile){
+                    float mx = Core.input.mouseWorldX(), my = Core.input.mouseWorldY();
 
-                            if(isPlayer() && !unit.isPlayer()){
-                                getPlayer().unit(unit);
-                            }
-                        }
+                    if(Core.input.keyTap(Binding.select)){
+                        Tile tile = world.tileWorld(mx, my);
+                        if(tile != null) form(tile);
+                    }else if(Core.input.keyTap(Binding.break_block)){
+                        Teamc target = Units.closest(team, mx, my, 1f, this::joinValid);
+                        if(target == null) target = world.buildWorld(mx, my);
+
+                        if(target != null && target.team() == team) join(target);
                     }
-                });
-
-                if(!invoked[0]){
-                    indexer.eachBlock(this, hitSize, b -> {
-                        if(!invoked[0] && b instanceof SoulBuildc soul && soul.canJoin()){
-                            hitbox(rec1);
-                            b.hitbox(rec2);
-                            return rec1.overlaps(rec2);
-                        }else{
-                            return false;
-                        }
-                    }, b -> {
-                        if(!invoked[0]){
-                            invoked[0] = true;
-                            invoke(b);
-
-                            if(isPlayer() && b instanceof SoulBuildc cont && (cont.canControl() && !cont.isControlled())){
-                                getPlayer().unit(cont.unit());
-                            }
-                        }
-                    });
                 }
             }
+        }else if(health <= maxHealth * 0.5f){
+            DeathFx.monolithSoulCrack.at(x, y, rotation);
+
+            corporeal = false;
+            joinTarget = null;
+            forms.clear();
+            formProgress = 0f;
         }
 
-        if(Mathf.chanceDelta(0.5f)){
-            UnityFx.monolithSoul.at(x, y, rotation, hitSize * 1.5f);
+        if(isValid()){
+            if(Mathf.equal(joinTime, 1f) && joinValid(joinTarget)){
+                kill();
+                DeathFx.monolithSoulJoin.at(x, y, ringRotation, this);
+
+                LineFx.monolithSoulTransfer.at(x, y, rotation, joinTarget);
+                Time.run(LineFx.monolithSoulTransfer.lifetime, Soul.toSoul(joinTarget)::join);
+            }else if(!corporeal && Mathf.equal(health, maxHealth)){
+                corporeal = true;
+                joinTime = 0f;
+            }
         }
     }
 
     @Override
-    @Replace
-    public int cap(){
-        return Integer.MAX_VALUE;
+    public void destroy(){
+        if(!isAdded()) return;
+        TrailFx.trailFadeLow.at(x, y, (type.engineSize + Mathf.absin(Time.time, 2f, type.engineSize / 4f) * elevation) * type.trailScl, trail.copy());
     }
 
-    <T extends Entityc> void invoke(T ent){
-        UnityCall.soulJoin(self(), ent);
+    void join(Teamc other){
+        if(!joinValid(other)) return;
+
+        if(forms.any()) forms.clear();
+        joinTarget = other;
     }
 
-    static <T extends Entityc> void soulJoin(MonolithSoul soul, T ent){
-        float remain = 0f;
-        if(ent instanceof Healthc h){
-            remain = h.health() + soul.healAmount - h.maxHealth();
-            h.heal(soul.healAmount);
+    void form(Tile tile){
+        if(forms.contains(tile)){
+            forms.remove(tile);
+            return;
         }
 
-        if(ent instanceof Shieldc s){
-            s.armor(s.armor() + Math.max(remain / 60f, 0f));
-        }
+        if(!formValid(tile)) return;
+        if(forms.size >= 5) forms.remove(0);
 
-        if(ent instanceof Monolithc e){
-            e.join();
-            if(soul.isPlayer()){
-                soul.getPlayer().unit((Unit)e);
-            }
-        }
-
-        if(ent instanceof SoulBuildc b){
-            b.join();
-            if(soul.isPlayer()){
-                soul.getPlayer().unit(b.unit());
-            }
-        }
-
-        Units.unitDeath(soul.id);
+        joinTarget = null;
+        forms.add(tile);
     }
 
-    @Override
-    public boolean intersects(){
-        return false;
+    boolean joinValid(Teamc other){
+        Soul soul = Soul.toSoul(other);
+        return soul != null && other.isAdded() && soul.acceptSoul(1) >= 1 && within(other, type.range + (other instanceof Unit unit ? (unit.hitSize / 2f) : other instanceof Building build ? (build.hitSize() / 2f) : 0f));
+    }
+
+    boolean formValid(Tile tile){
+        if(tile.synthetic() || Mathf.dst(x, y, tile.getX(), tile.getY()) > type.range) return false;
+        return FactionMeta.map(tile.solid() ? tile.block() : tile.floor()) == Faction.monolith;
+    }
+
+    boolean joining(){
+        return joinTarget != null && joinTarget.isAdded();
+    }
+
+    boolean forming(){
+        return forms.any();
+    }
+
+    float lifeDelta(){
+        return (forms.size - 2.5f) * 0.18f;
+    }
+
+    static MonolithSoul create(Team team){
+        return (MonolithSoul)MonolithUnitTypes.monolithSoul.create(team);
     }
 }

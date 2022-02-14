@@ -10,7 +10,7 @@ import mindustry.type.*;
 import unity.mod.*;
 
 import static mindustry.content.UnitTypes.*;
-import static unity.content.UnityUnitTypes.*;
+import static unity.content.units.MonolithUnitTypes.*;
 
 /** @author GlennFolker */
 public final class UnityWaves{

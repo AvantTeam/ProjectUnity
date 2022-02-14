@@ -13,6 +13,7 @@ import unity.logic.*;
 
 import static mindustry.content.Blocks.*;
 import static unity.content.UnityUnitTypes.*;
+import static unity.content.units.MonolithUnitTypes.*;
 
 /**
  * <p> An overwriter class designed to easily modify vanilla contents. This has to be used with <em>huge

@@ -384,10 +384,7 @@ public class UnitProcessor implements Processor{
             add.get(conv(type.region), type.name + "-full", icon);
 
             // Only generate wreck regions if it is larger than zenith and does not come from End faction
-            if(
-                type.hitSize > UnitTypes.zenith.hitSize &&
-                FactionMeta.map(type) != Faction.end
-            ){
+            if(type.forceWreckRegion || (type.hitSize > UnitTypes.zenith.hitSize && FactionMeta.map(type) != Faction.end)){
                 Rand rand = new Rand();
                 rand.setSeed(type.name.hashCode());
 

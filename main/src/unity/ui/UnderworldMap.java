@@ -18,24 +18,24 @@ import static mindustry.Vars.*;
 /* ThePythonGuy3 */
 /* Some code comes from MinimapRenderer.java by Anuke */
 public class UnderworldMap extends Element {
-    private Pixmap pixmap;
-    private Texture texture;
-    private TextureRegion region;
+    private static Pixmap pixmap;
+    private static Texture texture;
+    private static TextureRegion region;
 
-    private Pixmap wallPixmap;
-    private Texture wallTexture;
-    private TextureRegion wallRegion;
+    private static Pixmap wallPixmap;
+    private static Texture wallTexture;
+    private static TextureRegion wallRegion;
 
-    private Pixmap shadowPixmap;
-    private Texture shadowTexture;
-    private TextureRegion shadowRegion;
+    private static Pixmap shadowPixmap;
+    private static Texture shadowTexture;
+    private static TextureRegion shadowRegion;
 
-    private Pixmap darknessPixmap;
-    private Texture darknessTexture;
-    private TextureRegion darknessRegion;
-    private float mouseX = -1, mouseY = -1;
+    private static Pixmap darknessPixmap;
+    private static Texture darknessTexture;
+    private static TextureRegion darknessRegion;
+    private static float mouseX = -1, mouseY = -1;
 
-    private final Color darknessColor = Color.white.cpy().lerp(Color.black, 0.71f), realDarknessColor = new Color(0f, 0f, 0f, darknessColor.a);
+    private static final Color darknessColor = Color.white.cpy().lerp(Color.black, 0.71f), realDarknessColor = new Color(0f, 0f, 0f, darknessColor.a);
 
     @Override
     public float getMinWidth() {
@@ -84,7 +84,7 @@ public class UnderworldMap extends Element {
         return texture;
     }
 
-    public void reset(){
+    public static void reset(){
         if(pixmap != null){
             pixmap.dispose();
             texture.dispose();
@@ -105,24 +105,25 @@ public class UnderworldMap extends Element {
             darknessTexture.dispose();
         }
 
-        pixmap = new Pixmap(world.width() * 32, world.height() * 32);
+        pixmap = wallPixmap = shadowPixmap = darknessPixmap = new Pixmap(1, 1);
+        //pixmap = new Pixmap(world.width() * 32, world.height() * 32);
         texture = new Texture(pixmap);
         region = new TextureRegion(texture);
 
-        wallPixmap = new Pixmap(world.width() * 32, world.height() * 32);
+        //wallPixmap = new Pixmap(world.width() * 32, world.height() * 32);
         wallTexture = new Texture(wallPixmap);
         wallRegion = new TextureRegion(wallTexture);
 
-        shadowPixmap = new Pixmap(world.width(), world.height());
+        //shadowPixmap = new Pixmap(world.width(), world.height());
         shadowTexture = new Texture(shadowPixmap);
         shadowRegion = new TextureRegion(shadowTexture);
 
-        darknessPixmap = new Pixmap(world.width(), world.height());
+        //darknessPixmap = new Pixmap(world.width(), world.height());
         darknessTexture = new Texture(darknessPixmap);
         darknessRegion = new TextureRegion(darknessTexture);
     }
 
-    public boolean isFree(Tile tile, int x, int y){
+    public static boolean isFree(Tile tile, int x, int y){
         Tile nearby = tile.nearby(x, y);
 
         if(nearby == null){
@@ -132,7 +133,7 @@ public class UnderworldMap extends Element {
         }
     }
 
-    public boolean checkSquare(Tile tile, int radius){
+    public static boolean checkSquare(Tile tile, int radius){
         boolean has = false;
         for(int i = -radius; i <= radius; i++){
             for(int j = -radius; j <= radius; j++) {
@@ -149,8 +150,9 @@ public class UnderworldMap extends Element {
         return has;
     }
 
-    public void updateAll(){
+    public static void updateAll(){
         // TODO performance sucks
+        if(true) return;
         for(Tile tile : world.tiles){
             if(tile != null) {
                 if (!(tile.block() != null && tile.block() instanceof StaticWall) && tile.floor() != null && tile.floor().region != null) {
@@ -185,7 +187,7 @@ public class UnderworldMap extends Element {
 
         shadowTexture.setFilter(Texture.TextureFilter.linear, Texture.TextureFilter.linear);
         darknessTexture.setFilter(Texture.TextureFilter.linear, Texture.TextureFilter.linear);
-        
+
         pixmap.dispose();
         wallPixmap.dispose();
         shadowPixmap.dispose();
@@ -193,10 +195,6 @@ public class UnderworldMap extends Element {
     }
 
     public void rectCorner(TextureRegion tr, float w, float h){
-        Draw.rect(tr,x + w*0.5f, y + h*0.5f, w, h);
-    }
-
-    public void rectCorner(TextureRegion tr, float x, float y, float w, float h){
         Draw.rect(tr,x + w*0.5f, y + h*0.5f, w, h);
     }
 

@@ -10,8 +10,11 @@ import arc.util.*;
 import mindustry.graphics.*;
 
 public class UnityDrawf{
-    private final static TextureRegion nRegion = new TextureRegion();
-    private final static Vec2 vector = new Vec2();
+    private static final TextureRegion nRegion = new TextureRegion();
+    private static final Vec2 vector = new Vec2();
+    private static final Vec3 v31 = new Vec3();
+    private static final Mat3D m41 = new Mat3D();
+
     public static final byte[] tileMap = {
         39, 36, 39, 36, 27, 16, 27, 24, 39, 36, 39, 36, 27, 16, 27, 24,
         38, 37, 38, 37, 17, 41, 17, 43, 38, 37, 38, 37, 26, 21, 26, 25,
@@ -30,9 +33,10 @@ public class UnityDrawf{
          3,  0,  3,  0, 15, 42, 15, 12,  3,  0,  3,  0, 15, 42, 15, 12,
          2,  1,  2,  1,  9, 45,  9, 19,  2,  1,  2,  1, 14, 18, 14, 13
     };
-    private final static float[] v = new float[6];
 
-    public final static Batch altBatch = new SortedSpriteBatch();
+    private static final float[] v = new float[6];
+
+    public static final Batch altBatch = new SortedSpriteBatch();
 
     public static void dashCircleAngle(float x, float y, float radius, float rotation){
         float scaleFactor = 0.6f;
@@ -87,6 +91,60 @@ public class UnityDrawf{
         }
     }
 
+    public static void panningCircle(TextureRegion region, float x, float y, float radius, float arcCone, float arcRotation, Quat rotation){
+        panningCircle(region, x, y, region.width * Draw.scl, region.height * Draw.scl, radius, arcCone, arcRotation, rotation, false, Draw.z(), Draw.z(), 150f);
+    }
+
+    public static void panningCircle(TextureRegion region, float x, float y, float w, float h, float radius, float arcCone, float arcRotation, Quat rotation, float layerLow, float layerHigh){
+        panningCircle(region, x, y, w, h, radius, arcCone, arcRotation, rotation, false, layerLow, layerHigh, 150f);
+    }
+
+    public static void panningCircle(TextureRegion region, float x, float y, float w, float h, float radius, float arcCone, float arcRotation, Quat rotation, boolean useLinePrecision, float layerLow, float layerHigh){
+        panningCircle(region, x, y, w, h, radius, arcCone, arcRotation, rotation, useLinePrecision, layerLow, layerHigh, 150f);
+    }
+
+    public static void panningCircle(TextureRegion region, float x, float y, float w, float h, float radius, float arcCone, float arcRotation, Quat rotation, boolean useLinePrecision, float layerLow, float layerHigh, float perspectiveDst){
+        float z = Draw.z();
+
+        float arc = arcCone / 360f;
+        int sides = useLinePrecision ? (int)(Lines.circleVertices(radius) * arc) : (int)((Mathf.PI2 * radius * arc) / w);
+        float space = arcCone / sides;
+        float hstep = (Lines.getStroke() * h / 2f) / Mathf.cosDeg(space / 2f);
+        float r1 = radius - hstep, r2 = radius + hstep;
+
+        for(int i = 0; i < sides; i++){
+            float a = arcRotation - arcCone / 2f + space * i,
+                cos = Mathf.cosDeg(a), sin = Mathf.sinDeg(a),
+                cos2 = Mathf.cosDeg(a + space), sin2 = Mathf.sinDeg(a + space);
+            m41.idt().rotate(rotation);
+
+            Mat3D.rot(v31.set(r1 * cos, r1 * sin, 0f), m41).scl((perspectiveDst + v31.z) / perspectiveDst);
+            float x1 = x + v31.x;
+            float y1 = y + v31.y;
+            float sumZ = v31.z;
+
+            Mat3D.rot(v31.set(r1 * cos2, r1 * sin2, 0f), m41).scl((perspectiveDst + v31.z) / perspectiveDst);
+            float x2 = x + v31.x;
+            float y2 = y + v31.y;
+            sumZ += v31.z;
+
+            Mat3D.rot(v31.set(r2 * cos2, r2 * sin2, 0f), m41).scl((perspectiveDst + v31.z) / perspectiveDst);
+            float x3 = x + v31.x;
+            float y3 = y + v31.y;
+            sumZ += v31.z;
+
+            Mat3D.rot(v31.set(r2 * cos, r2 * sin, 0f), m41).scl((perspectiveDst + v31.z) / perspectiveDst);
+            float x4 = x + v31.x;
+            float y4 = y + v31.y;
+            sumZ = (sumZ + v31.z) / 4f;
+
+            Draw.z(sumZ >= 0f ? layerHigh : layerLow);
+            Fill.quad(region, x3, y3, x2, y2, x1, y1, x4, y4);
+        }
+
+        Draw.z(z);
+    }
+
     public static void arcLine(float x, float y, float radius, float arcAngle, float angle){
         float arc = arcAngle / 360f;
         int sides = (int)(Lines.circleVertices(radius) * arc);
@@ -99,10 +157,10 @@ public class UnityDrawf{
                 cos = Mathf.cosDeg(a), sin = Mathf.sinDeg(a),
                 cos2 = Mathf.cosDeg(a + space), sin2 = Mathf.sinDeg(a + space);
             Fill.quad(
-                x + r1*cos, y + r1*sin,
-                x + r1*cos2, y + r1*sin2,
-                x + r2*cos2, y + r2*sin2,
-                x + r2*cos, y + r2*sin
+                x + r1 * cos, y + r1 * sin,
+                x + r1 * cos2, y + r1 * sin2,
+                x + r2 * cos2, y + r2 * sin2,
+                x + r2 * cos, y + r2 * sin
             );
         }
     }
@@ -124,7 +182,7 @@ public class UnityDrawf{
         }
     }
 
-    public static void snowFlake(float x, float y, float r, float s){ 
+    public static void snowFlake(float x, float y, float r, float s){
         for(int i = 0; i < 3; i++){
             Lines.lineAngleCenter(x, y, r + 60 * i, s);
         }
@@ -162,10 +220,10 @@ public class UnityDrawf{
     public static void drawSlideRect(TextureRegion region, float x, float y, float w, float h, float tw, float th, float rot, int step, float offset){
         if(region == null) return;
         nRegion.set(region);
-        
+
         float scaleX = w / tw;
         float texW = nRegion.u2 - nRegion.u;
-        
+
         nRegion.u += Mathf.map(offset % 1, 0f, 1f, 0f, texW * step / tw);
         nRegion.u2 = nRegion.u + scaleX * texW;
         Draw.rect(nRegion, x, y, w, h, w * 0.5f, h * 0.5f, rot);
@@ -216,7 +274,7 @@ public class UnityDrawf{
         });
     }
 
-    /** An alternate version of {@link Fill.poly(float[], int)}, allows triangles. */
+    /** An alternate version of {@link Fill#poly(float[], int)}, allows triangles. */
     public static void drawPolygon(float[] vertices){
         if(vertices.length < 6) return;
         for(int i = 2; i < vertices.length; i += 6){

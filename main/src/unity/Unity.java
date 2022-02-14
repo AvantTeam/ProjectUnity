@@ -37,6 +37,7 @@ import unity.type.UnderworldBlock;
 import unity.ui.*;
 import unity.ui.dialogs.*;
 import unity.util.*;
+import unity.world.*;
 import younggamExperimental.*;
 
 import static mindustry.Vars.*;
@@ -54,6 +55,8 @@ public class Unity extends Mod{
     public static TapHandler tap;
     /** Shared anti-cheat utilities, heavily based around content scoring system. */ //TODO why isn't this static h
     public static AntiCheat antiCheat;
+    /** World context binding mostly handling monolith block indexing. */
+    public static MonolithWorld monolithWorld;
     /** Abstract developer build specification; dev builds allow users to have various developer accessibility. */
     public static DevBuild dev;
 
@@ -184,9 +187,6 @@ public class Unity extends Mod{
         TimeStop.init();
         TimeReflect.init();
 
-        KamiPatterns.load();
-        KamiBulletDatas.load();
-
         try{
             Class<? extends DevBuild> impl = (Class<? extends DevBuild>)Class.forName("unity.mod.DevBuildImpl");
             dev = impl.getDeclaredConstructor().newInstance();
@@ -202,6 +202,7 @@ public class Unity extends Mod{
         music = new MusicHandler(){};
         tap = new TapHandler();
         antiCheat = new AntiCheat();
+        monolithWorld = new MonolithWorld();
 
         cinematicEditor = new CinematicEditor();
 

@@ -22,6 +22,7 @@ import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 import unity.annotations.Annotations.*;
 import unity.content.effects.*;
+import unity.content.units.*;
 import unity.entities.bullet.anticheat.*;
 import unity.entities.bullet.energy.*;
 import unity.entities.bullet.exp.*;
@@ -140,19 +141,23 @@ public class UnityBlocks{
     denseSmelter, solidifier, steelSmelter, liquifier, titaniumExtractor, lavaSmelter, diriumCrucible, coalExtractor,
 
     //defense
-    stoneWall, denseWall, steelWall, steelWallLarge, diriumWall, diriumWallLarge, shieldProjector, diriumProjector,
+    stoneWall, denseWall, steelWall, steelWallLarge, diriumWall, diriumWallLarge, shieldProjector, diriumProjector, timeMine,
 
     //distribution
-    steelConveyor, diriumConveyor, teleporter, teleunit,
+    steelConveyor, teleporter, teleunit;
+
+    public static @FactionDef("koruh")
+    @Dupe(base = ExpTurret.class, parent = KoruhConveyor.class)
+    Block diriumConveyor;
 
     //unit
-    bufferPad, omegaPad, cachePad, convertPad,
+    public static @FactionDef("koruh") Block bufferPad, omegaPad, cachePad, convertPad,
 
     //power
     uraniumReactor,
 
     //TODO
-    expFountain, expVoid, expTank, expChest, expRouter, expTower, expTowerDiagonal, bufferTower, expHub;// expOutput, expUnloader;
+    expFountain, expVoid, expTank, expChest, expRouter, expTower, expTowerDiagonal, bufferTower, expHub, expNode;// expOutput, expUnloader;
 
     //turret
     public static @FactionDef("koruh")
@@ -312,14 +317,14 @@ public class UnityBlocks{
 
                 new UnitType[]{UnityUnitTypes.rex, UnityUnitTypes.excelsus},
 
-                new UnitType[]{UnityUnitTypes.monument, UnityUnitTypes.colossus}
+                new UnitType[]{MonolithUnitTypes.monument, MonolithUnitTypes.colossus}
             );
             otherUpgrades.add(
                 new UnitType[]{UnityUnitTypes.citadel, UnityUnitTypes.empire},
 
                 new UnitType[]{UnityUnitTypes.araneidae, UnityUnitTypes.theraphosidae},
 
-                new UnitType[]{UnityUnitTypes.colossus, UnityUnitTypes.bastion}
+                new UnitType[]{MonolithUnitTypes.colossus, MonolithUnitTypes.bastion}
             );
             consumes.power(5f);
             consumes.items(with(Items.silicon, 1200, Items.metaglass, 800, Items.thorium, 700, Items.surgeAlloy, 400, Items.plastanium, 600, Items.phaseFabric, 350));
@@ -1545,6 +1550,7 @@ public class UnityBlocks{
             maxDamage = 24f;
             health = 810;
 
+            maxLevel = 6;
             expFields = new EField[]{
                     new ERational(v -> maxDamage = v, 48f, 24f, -3f, Stat.abilities, v -> bundle.format("stat.unity.maxdamage", v)).formatAll(false)
             };
@@ -1556,6 +1562,7 @@ public class UnityBlocks{
             health = 3240;
             size = 2;
 
+            maxLevel = 12;
             expFields = new EField[]{
                     new ERational(v -> maxDamage = v, 72f, 24f, -3f, Stat.abilities, v -> bundle.format("stat.unity.maxdamage", v)).formatAll(false)
             };
@@ -1566,7 +1573,13 @@ public class UnityBlocks{
             maxDamage = 76f;
             blinkFrame = 30f;
             health = 760;
-            maxLevel = 12;
+            updateEffect = UnityFx.sparkle;
+
+            maxLevel = 6;
+            expFields = new EField[]{
+                    new ERational(v -> maxDamage = v, 152f, 50f, -3f, Stat.abilities, v -> bundle.format("stat.unity.maxdamage", v)).formatAll(false),
+                    new ELinearCap(v -> blinkFrame = v, 10f, 10f, 2, Stat.abilities, v -> bundle.format("stat.unity.blinkframe", v)).formatAll(false)
+            };
         }};
 
         diriumWallLarge = new LevelLimitWall("dirium-wall-large"){{
@@ -1575,7 +1588,13 @@ public class UnityBlocks{
             blinkFrame = 30f;
             health = 3040;
             size = 2;
+            updateEffect = UnityFx.sparkle;
+
             maxLevel = 12;
+            expFields = new EField[]{
+                    new ERational(v -> maxDamage = v, 304f, 50f, -2f, Stat.abilities, v -> bundle.format("stat.unity.maxdamage", v)).formatAll(false),
+                    new ELinearCap(v -> blinkFrame = v, 10f, 5f, 4, Stat.abilities, v -> bundle.format("stat.unity.blinkframe", v)).formatAll(false)
+            };
         }};
 
         shieldProjector = new ClassicProjector("shield-generator"){{
@@ -1622,7 +1641,14 @@ public class UnityBlocks{
             effectColors = new Color[]{Pal.lancerLaser, UnityPal.lancerDir1, UnityPal.lancerDir2, UnityPal.lancerDir3, UnityPal.diriumLight};
         }};
 
-        steelConveyor = new ExpConveyor("steel-conveyor"){{
+        timeMine = new TimeMine("time-mine"){{
+            requirements(Category.effect, with(Items.lead, 25, Items.silicon, 12));
+            hasShadow = false;
+            health = 45;
+            pullTime = 6 * 60f;
+        }};
+
+        steelConveyor = new KoruhConveyor("steel-conveyor"){{
             requirements(Category.distribution, with(UnityItems.stone, 1, UnityItems.denseAlloy, 1, UnityItems.steel, 1));
             health = 140;
             speed = 0.1f;
@@ -1630,12 +1656,14 @@ public class UnityBlocks{
             drawMultiplier = 1.9f;
         }};
 
-        diriumConveyor = new ExpConveyor("dirium-conveyor"){{
+        diriumConveyor = new ExpKoruhConveyor("dirium-conveyor"){{
             requirements(Category.distribution, with(UnityItems.steel, 1, Items.phaseFabric, 1, UnityItems.dirium, 1));
             health = 150;
             speed = 0.16f;
             displayedSpeed = 20f;
             drawMultiplier = 1.3f;
+
+            draw = new DrawOver();
         }};
 
         bufferPad = new MechPad("buffer-pad"){{
@@ -2003,6 +2031,11 @@ public class UnityBlocks{
             expCapacity = 180;
             buffer = true;
             health = 300;
+        }};
+
+        expNode = new ExpNode("exp-node"){{
+            requirements(Category.effect, with(UnityItems.denseAlloy, 30, Items.silicon, 30, UnityItems.steel, 8));
+            expCapacity = 200;
         }};
 
         expTank = new ExpTank("exp-tank"){{

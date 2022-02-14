@@ -32,6 +32,7 @@ import static arc.graphics.g2d.Lines.*;
 import static arc.math.Angles.*;
 import static mindustry.Vars.tilesize;
 import static unity.content.UnityBullets.*;
+import static unity.graphics.UnityDrawf.spark;
 
 //deprecate the deprecation ^-^
 //** @deprecated These fields will eventually all be interpreted in the classes in {@link unity.content.effects} package. */
@@ -48,6 +49,16 @@ public class UnityFx{
         trail.shorten();
         trail.drawCap(e.color, e.rotation);
         trail.draw(e.color, e.rotation);
+    }),
+
+    //shamelessly stolen from BetaMindy
+    sparkle = new Effect(55f, e -> {
+        color(e.color);
+        integer = 0;
+        Angles.randLenVectors(e.id, e.id % 3 + 1, 8f, (x, y) -> {
+            integer++;
+            spark(e.x+x, e.y+y, e.fout()*2.5f, 0.5f+e.fout(), e.id * integer);
+        });
     }),
 
     expGain = new Effect(75f, 400f, e -> {
@@ -76,7 +87,7 @@ public class UnityFx{
         randLenVectors(e.id, 9, 1f + 30f * e.finpow(), (x, y) -> {
             integer++;
             Fill.circle(e.x + x, e.y + y, 1.7f * e.fout());
-            UnityDrawf.spark(e.x + x, e.y + y, 5f, (5 + 1.5f * Mathf.sin(Time.time * 0.12f + integer * 4f)) * e.fout(), e.finpow() * 90f + integer * 69f);
+            spark(e.x + x, e.y + y, 5f, (5 + 1.5f * Mathf.sin(Time.time * 0.12f + integer * 4f)) * e.fout(), e.finpow() * 90f + integer * 69f);
         });
     }),
 
@@ -111,7 +122,7 @@ public class UnityFx{
         color(e.color);
         stroke(e.fout());
         square(e.x, e.y, e.rotation / 2f + e.fin() * 3f);
-        UnityDrawf.spark(e.x, e.y, 25f, 15f * e.fout(), e.finpow() * 90f);
+        spark(e.x, e.y, 25f, 15f * e.fout(), e.finpow() * 90f);
     }),
 
     laserCharge = new Effect(38f, e -> {
@@ -654,7 +665,7 @@ public class UnityFx{
         color(Color.white, e.color, e.fin());
         integer = 1;
         randLenVectors(e.id, e.id % 3 + 1, e.rotation * 4f + 4f, (x, y) -> {
-            UnityDrawf.spark(e.x + x, e.y + y, e.fout() * 4f, 0.5f + e.fout() * 2.2f, e.id * integer);
+            spark(e.x + x, e.y + y, e.fout() * 4f, 0.5f + e.fout() * 2.2f, e.id * integer);
             integer++;
         });
     }),
@@ -665,7 +676,7 @@ public class UnityFx{
         square(e.x, e.y, (e.fin() * 4f + 2f) * e.rotation, 0f);
         integer = 1;
         randLenVectors(e.id, e.id % 3 + 7, e.rotation * 4f + 4f + 8f * e.finpow(), (x, y) -> {
-            UnityDrawf.spark(e.x + x, e.y + y, e.fout() * 5f, e.fout() * 3.5f, e.id * integer);
+            spark(e.x + x, e.y + y, e.fout() * 5f, e.fout() * 3.5f, e.id * integer);
             integer++;
         });
     }),
@@ -1213,21 +1224,10 @@ public class UnityFx{
 
     plated = new Effect(30f, e -> {
         color(e.color);
-        Fill.circle(e.x, e.y, e.fout() * (float) e.data);
+        Fill.circle(e.x, e.y, e.fout() * (float)e.data);
     }),
 
-    monolithSoul = new Effect(60f, e -> {
-        if(!(e.data instanceof Float data)) return;
-
-        randLenVectors(e.id, 2, data, (x, y) -> {
-            color(UnityPal.monolith, UnityPal.monolithDark, e.fin());
-
-            float w = 1f + e.fout() * 4f;
-            Fill.rect(e.x + x, e.y + y, w, w, 45f);
-        });
-    }),
-
-    spark = new Effect(15f, e -> {
+    sparkBoi = new Effect(15f, e -> {
         Draw.color(e.color);
         for (int j = 0; j < 4; j++) {
             Drawf.tri(e.x, e.y, (float) e.data - e.fin(), (float) e.data + 1 - e.fin() * ((float) e.data + 1), 90 * j + e.rotation);
