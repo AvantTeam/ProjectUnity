@@ -92,15 +92,15 @@ public class UnityDrawf{
     }
 
     public static void panningCircle(TextureRegion region, float x, float y, float radius, float arcCone, float arcRotation, Quat rotation){
-        panningCircle(region, x, y, region.width * Draw.scl, region.height * Draw.scl, radius, arcCone, arcRotation, rotation, false, Draw.z(), Draw.z(), 250f);
+        panningCircle(region, x, y, region.width * Draw.scl, region.height * Draw.scl, radius, arcCone, arcRotation, rotation, false, Draw.z(), Draw.z(), 150f);
     }
 
     public static void panningCircle(TextureRegion region, float x, float y, float w, float h, float radius, float arcCone, float arcRotation, Quat rotation, float layerLow, float layerHigh){
-        panningCircle(region, x, y, w, h, radius, arcCone, arcRotation, rotation, false, layerLow, layerHigh, 250f);
+        panningCircle(region, x, y, w, h, radius, arcCone, arcRotation, rotation, false, layerLow, layerHigh, 150f);
     }
 
     public static void panningCircle(TextureRegion region, float x, float y, float w, float h, float radius, float arcCone, float arcRotation, Quat rotation, boolean useLinePrecision, float layerLow, float layerHigh){
-        panningCircle(region, x, y, w, h, radius, arcCone, arcRotation, rotation, useLinePrecision, layerLow, layerHigh, 250f);
+        panningCircle(region, x, y, w, h, radius, arcCone, arcRotation, rotation, useLinePrecision, layerLow, layerHigh, 150f);
     }
 
     public static void panningCircle(TextureRegion region, float x, float y, float w, float h, float radius, float arcCone, float arcRotation, Quat rotation, boolean useLinePrecision, float layerLow, float layerHigh, float perspectiveDst){

@@ -39,7 +39,7 @@ public class MonolithSoulAI implements UnitController{
     @Override
     public void updateUnit(){
         // Avoid dying.
-        if(timer.get(0, 5f)) contemplate();
+        if(timer.get(0, 12f)) contemplate();
 
         // If it found a fitting vessel to join, move towards it and join.
         if(joinTarget != null){
@@ -53,7 +53,7 @@ public class MonolithSoulAI implements UnitController{
             unit.moveAt(vec);
             unit.lookAt(unit.prefRotation());
 
-            if(timer.get(1, 3f)){
+            if(timer.get(1, 5f)){
                 Chunk in = formTarget.within(unit) ? formTarget : monolithWorld.getChunk(World.toTile(unit.x), World.toTile(unit.y));
                 if(in != null){
                     Tile tile = in.monolithTiles.random();

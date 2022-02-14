@@ -68,6 +68,7 @@ public final class MonolithUnitTypes{
                 lowAltitude = true;
                 fallSpeed = 1f;
                 range = maxRange = miningRange = 96f;
+                hitSize = 12f;
                 omniMovement = false;
                 engineColor = UnityPal.monolithLight;
                 trailLength = 12;
