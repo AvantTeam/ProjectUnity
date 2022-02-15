@@ -1,5 +1,6 @@
 package unity.content.effects;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -143,9 +144,30 @@ public class ShootFx{
         });
     }),
 
-    tendenceShoot = new Effect(84f, e -> {
+    tendenceShoot = new Effect(32f, e -> {
+        TextureRegion reg = Core.atlas.find("unity-monolith-chain");
+        Utils.q1.set(Vec3.Z, e.rotation + 90f).mul(Utils.q2.set(Vec3.X, 75f));
+        float t = e.finpow(), w = reg.width * scl * 0.4f * t, h = reg.height * scl * 0.4f * t, rad = 9f + t * 8f;
 
-    }),
+        alpha(e.foutpowdown());
+        UnityDrawf.panningCircle(reg,
+            e.x, e.y, w, h,
+            rad, 360f, e.fin(Interp.pow2Out) * 90f * Mathf.sign(e.id % 2 == 0) + e.id * 30f,
+            Utils.q1, Layer.flyingUnitLow - 0.01f, Layer.flyingUnit
+        );
+
+        color(Color.black, UnityPal.monolithDark, 0.5f);
+        alpha(e.foutpowdown());
+
+        blend(Blending.additive);
+        UnityDrawf.panningCircle(Core.atlas.find("circle-mid"),
+            e.x, e.y, w + 6f, h + 6f,
+            rad, 360f, 0f,
+            Utils.q1, true, Layer.flyingUnitLow - 0.01f, Layer.flyingUnit
+        );
+
+        blend();
+    }).layer(Layer.flyingUnit),
 
     coloredPlasmaShoot = new Effect(25f, e -> {
         color(Color.white, e.color, e.fin());

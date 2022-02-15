@@ -118,22 +118,22 @@ public class UnityDrawf{
                 cos2 = Mathf.cosDeg(a + space), sin2 = Mathf.sinDeg(a + space);
             m41.idt().rotate(rotation);
 
-            Mat3D.rot(v31.set(r1 * cos, r1 * sin, 0f), m41).scl((perspectiveDst + v31.z) / perspectiveDst);
+            Mat3D.rot(v31.set(r1 * cos, r1 * sin, 0f), m41).scl(Math.max((perspectiveDst + v31.z) / perspectiveDst, 0f));
             float x1 = x + v31.x;
             float y1 = y + v31.y;
             float sumZ = v31.z;
 
-            Mat3D.rot(v31.set(r1 * cos2, r1 * sin2, 0f), m41).scl((perspectiveDst + v31.z) / perspectiveDst);
+            Mat3D.rot(v31.set(r1 * cos2, r1 * sin2, 0f), m41).scl(Math.max((perspectiveDst + v31.z) / perspectiveDst, 0f));
             float x2 = x + v31.x;
             float y2 = y + v31.y;
             sumZ += v31.z;
 
-            Mat3D.rot(v31.set(r2 * cos2, r2 * sin2, 0f), m41).scl((perspectiveDst + v31.z) / perspectiveDst);
+            Mat3D.rot(v31.set(r2 * cos2, r2 * sin2, 0f), m41).scl(Math.max((perspectiveDst + v31.z) / perspectiveDst, 0f));
             float x3 = x + v31.x;
             float y3 = y + v31.y;
             sumZ += v31.z;
 
-            Mat3D.rot(v31.set(r2 * cos, r2 * sin, 0f), m41).scl((perspectiveDst + v31.z) / perspectiveDst);
+            Mat3D.rot(v31.set(r2 * cos, r2 * sin, 0f), m41).scl(Math.max((perspectiveDst + v31.z) / perspectiveDst, 0f));
             float x4 = x + v31.x;
             float y4 = y + v31.y;
             sumZ = (sumZ + v31.z) / 4f;

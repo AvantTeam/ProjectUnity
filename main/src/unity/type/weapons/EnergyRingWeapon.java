@@ -8,13 +8,14 @@ import arc.util.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.type.*;
 import unity.graphics.*;
 
 /**
  * Sprite-less weapon composed of revolving energy rings.
  * @author GlennFolker
  */
-public class EnergyRingWeapon extends LimitedAngleWeapon{
+public class EnergyRingWeapon extends Weapon{
     public final Seq<Ring> rings = new Seq<>(4);
 
     public float aggressionScale = 3f;
@@ -107,7 +108,6 @@ public class EnergyRingWeapon extends LimitedAngleWeapon{
 
         public EnergyRingMount(EnergyRingWeapon weapon){
             super(weapon);
-            rotation = weapon.defaultAngle * Mathf.sign(weapon.flipSprite);
         }
     }
 }

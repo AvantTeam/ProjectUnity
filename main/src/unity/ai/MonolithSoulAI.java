@@ -1,5 +1,6 @@
 package unity.ai;
 
+import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.core.*;
@@ -43,13 +44,20 @@ public class MonolithSoulAI implements UnitController{
 
         // If it found a fitting vessel to join, move towards it and join.
         if(joinTarget != null){
-            MathU.addLength(vec.set(joinTarget).sub(unit), -unit.type.range * 0.8f).limit(unit.type.speed);
-
+            MathU.addLength(vec
+                .set(joinTarget).sub(unit),
+                -unit.type.range * 0.8f
+            ).limit(unit.type.speed);
             unit.moveAt(vec);
             unit.lookAt(unit.prefRotation());
             unit.join(joinTarget);
         }else if(formTarget != null){ // Otherwise, proceed to the most fitting forming location and pick up tiles.
-            MathU.addLength(vec.set(formTarget.centerX, formTarget.centerY).sub(unit), -unit.type.range * 0.8f).limit(unit.type.speed);
+            MathU.addLength(vec
+                .set(formTarget.centerX, formTarget.centerY)
+                .add(Mathf.randomSeedRange(unit.id, 24f), Mathf.randomSeedRange(unit.id + 1, 24f))
+                .sub(unit),
+                -unit.type.range * 0.8f
+            ).limit(unit.type.speed);
             unit.moveAt(vec);
             unit.lookAt(unit.prefRotation());
 
@@ -71,7 +79,7 @@ public class MonolithSoulAI implements UnitController{
         // outcome from forming.
         float delta = unit.lifeDelta();
         if(!unit.joining() && !(unit.forming() && delta > 0f)){
-            float range = unit.type.speed * (unit.health / -delta); // Maximum range.
+            float range = unit.type.speed * (unit.health / -delta) / 2f;
 
             Unit vesselUnit = Units.closest(unit.team, unit.x, unit.y, range, this::accept);
             Building vesselBuild = Units.findAllyTile(unit.team, unit.x, unit.y, range, this::accept);

@@ -75,7 +75,7 @@ public class LightningSpawnAbility extends Ability{
                 }
             }
 
-            if(Mathf.chanceDelta(trailChance)) trailEffect.at(x, y, unit.rotation, lightningRadius);
+            if(Mathf.chanceDelta(trailChance)) trailEffect.at(x, y, lightningRadius);
         }
 
         phase = Mathf.lerpDelta(phase, useAmmo && state.rules.unitAmmo ? unit.ammof() : 1f, phaseSpeed);

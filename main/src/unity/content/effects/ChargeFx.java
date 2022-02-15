@@ -22,6 +22,8 @@ import static arc.math.Angles.*;
 import static mindustry.Vars.*;
 
 public class ChargeFx{
+    private static final Color tmpCol = new Color();
+
     public static Effect
 
     greenLaserChargeSmallParent = new ParentEffect(40f, 100f, e -> {
@@ -134,30 +136,31 @@ public class ChargeFx{
     tendenceCharge = new Effect(32f, e -> {
         if(!(e.data instanceof TrailHold[] data)) return;
 
-        color(UnityPal.monolithDark, UnityPal.monolith, e.fin());
-        alpha(e.fin());
-        randLenVectors(e.id, 8, e.foutpow() * 20f, (x, y) ->
-            Fill.circle(e.x + x, e.y + y, 1.5f + e.fin() * 4.5f)
+        color(UnityPal.monolith, UnityPal.monolithLight, e.fin());
+        randLenVectors(e.id, 8, 8f + e.foutpow() * 32f, (x, y) ->
+            Fill.circle(e.x + x, e.y + y, 0.5f + e.fin() * 2.5f)
         );
 
         color();
         for(TrailHold hold : data){
-            Tmp.v1.set(hold.x, hold.y).sub(e.x, e.y);
-            Tmp.v2.trns(Tmp.v1.angle(), Mathf.sin(hold.width * 0.3f, hold.width * 4f * e.fin()));
+            Tmp.v1.set(hold.x, hold.y);
+            Tmp.v2.trns(Tmp.v1.angle() - 90f, Mathf.sin(hold.width * 2.6f, hold.width * 8f * Interp.pow2Out.apply(e.fslope())));
+            Tmp.v1.scl(e.foutpowdown()).add(Tmp.v2).add(e.x, e.y);
 
-            Tmp.v1.setLength2((1f - e.finpowdown()) * Tmp.v1.len2()).add(Tmp.v2);
-            float x = e.x + Tmp.v1.x, y = e.y + Tmp.v1.y;
+            float w = hold.width * e.fin();
+            if(!state.isPaused()) hold.trail.update(Tmp.v1.x, Tmp.v1.y, w);
 
-            if(!state.isPaused()) hold.trail.update(x, y, hold.width);
-            hold.trail.draw(UnityPal.monolithLight, hold.width);
+            tmpCol.set(UnityPal.monolith).lerp(UnityPal.monolithLight, e.finpowdown());
+            hold.trail.drawCap(tmpCol, w);
+            hold.trail.draw(tmpCol, w);
         }
 
-        stroke(e.fin(), UnityPal.monolithLight);
-        Lines.circle(e.x, e.y, e.fout() * 32f);
+        stroke(Mathf.curve(e.fin(), 0.5f) * 1.4f, UnityPal.monolithLight);
+        Lines.circle(e.x, e.y, e.fout() * 64f);
     }){
         boolean initialized;
         final int trailAmount = 12;
-        final int trailLength = 12;
+        final int trailLength = 8;
 
         // Why must `#create` be a static method...
         @Override
@@ -241,8 +244,9 @@ public class ChargeFx{
         TrailHold[] createTrails(){
             TrailHold[] trails = new TrailHold[trailAmount];
             for(int i = 0; i < trails.length; i++){
-                Tmp.v1.setLength(Mathf.random(16f, 32f)).setToRandomDirection();
+                Tmp.v1.trns(Mathf.random(360f), Mathf.random(24f, 64f));
                 trails[i] = new TrailHold(new TexturedTrail(Core.atlas.find("unity-phantasmal-trail"), trailLength){{
+                    shrink = 1f;
                     fadeAlpha = 0.5f;
                     blend = Blending.additive;
                 }}, Tmp.v1.x, Tmp.v1.y, Mathf.random(1f, 2f));
@@ -253,7 +257,7 @@ public class ChargeFx{
         static class CustomEffectState extends EffectState{
             @Override
             public void remove(){
-                if(data instanceof TrailHold[] data) for(TrailHold trail : data) Fx.trailFade.at(x, y, trail.width, trail.trail);
+                if(data instanceof TrailHold[] data) for(TrailHold trail : data) Fx.trailFade.at(x, y, trail.width, UnityPal.monolithLight, trail.trail.copy());
                 super.remove();
             }
         }
