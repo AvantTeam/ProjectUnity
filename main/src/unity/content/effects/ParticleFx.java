@@ -20,16 +20,12 @@ public class ParticleFx{
         Fill.square(e.x, e.y, 2.5f * Interp.pow2In.apply(e.fslope()), 45f);
     }),
 
-    monolithSpark = new Effect(60f, e -> {
-        if(!(e.data instanceof Float data)) return;
+    monolithSpark = new Effect(60f, e -> randLenVectors(e.id, 2, e.rotation, (x, y) -> {
+        color(UnityPal.monolith, UnityPal.monolithDark, e.fin());
 
-        randLenVectors(e.id, 2, data, (x, y) -> {
-            color(UnityPal.monolith, UnityPal.monolithDark, e.fin());
-
-            float w = 1f + e.fout() * 4f;
-            Fill.rect(e.x + x, e.y + y, w, w, 45f);
-        });
-    }),
+        float w = 1f + e.fout() * 4f;
+        Fill.rect(e.x + x, e.y + y, w, w, 45f);
+    })),
 
     monolithSoul = new Effect(48f, e -> {
         if(!(e.data instanceof Vec2 data)) return;

@@ -157,7 +157,7 @@ public class UnityBlocks{
     uraniumReactor,
 
     //TODO
-    expFountain, expVoid, expTank, expChest, expRouter, expTower, expTowerDiagonal, bufferTower, expHub, expNode;// expOutput, expUnloader;
+    expFountain, expVoid, expTank, expChest, expRouter, expTower, expTowerDiagonal, bufferTower, expHub, expNode, expNodeLarge;// expOutput, expUnloader;
 
     //turret
     public static @FactionDef("koruh")
@@ -2031,6 +2031,16 @@ public class UnityBlocks{
         expNode = new ExpNode("exp-node"){{
             requirements(Category.effect, with(UnityItems.denseAlloy, 30, Items.silicon, 30, UnityItems.steel, 8));
             expCapacity = 200;
+            consumes.power(0.6f);
+        }};
+
+        expNodeLarge = new ExpNode("exp-node-large"){{
+            requirements(Category.effect, with(UnityItems.denseAlloy, 120, Items.silicon, 120, UnityItems.steel, 24));
+            expCapacity = 600;
+            range = 10;
+            health = 200;
+            size = 2;
+            consumes.power(1.4f);
         }};
 
         expTank = new ExpTank("exp-tank"){{
