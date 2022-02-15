@@ -72,7 +72,7 @@ public class ExpLaserFieldBulletType extends ExpLaserBulletType{
 
         Position finalVec = vec;
         for(int i = 0; i < getFields(b); i++) {
-            Time.runTask(0.1f * 60 * i + 1 + UnityFx.smallChainLightning.lifetime*0.5f, () ->{
+            Time.run(0.1f * 60 * i + 1 + UnityFx.smallChainLightning.lifetime*0.5f, () ->{
                 float tx = finalVec.getX() + Mathf.range(8) * Vars.tilesize;
                 float ty = finalVec.getY() + Mathf.range(8) * Vars.tilesize;
                 UnityFx.smallChainLightning.at(finalVec.getX(), finalVec.getY(), 0, getColor(b), new Vec2(tx, ty));

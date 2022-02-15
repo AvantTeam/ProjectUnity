@@ -1816,9 +1816,9 @@ public class UnityBlocks{
             coolantMultiplier = 2f;
             range = 140f;
 
-            chargeTime = 50f;
-            chargeMaxDelay = 40f;
-            chargeEffects = 5;
+            chargeTime = 80f;
+            chargeMaxDelay = 20f;
+            chargeEffects = 8;
             recoilAmount = 4f;
 
             cooldown = 0.03f;
@@ -1826,29 +1826,24 @@ public class UnityBlocks{
             shootShake = 5f;
             powerUse = 13f;
 
-            shootEffect = ShootFx.laserChargeShoot;
+            shootEffect = ShootFx.laserFractalShoot;
             smokeEffect = Fx.none;
-            chargeEffect = UnityFx.laserCharge;
-            chargeBeginEffect = UnityFx.laserChargeBegin;
-            heatColor = Color.red;
+            chargeEffect = UnityFx.laserFractalCharge;
+            chargeBeginEffect = UnityFx.laserFractalChargeBegin;
             shootSound = Sounds.laser;
 
+            heatColor = Color.red;
             fromColor = UnityPal.lancerSap3;
             toColor = Pal.place;
 
             shootType = UnityBullets.fractalLaser;
-
-            //todo fractal laser (handle radius on the bullet's side
-            //basicFieldRadius = 85f;
 
             maxLevel = 30;
             expFields = new EField[]{
                     new LinearReloadTime(v -> reloadTime = v, UnityBullets.distField.lifetime / 3f, -2f),
                     new ELinear(v -> range = v, 140f, 0.25f * tilesize, Stat.shootRange, v -> Strings.autoFixed(v / tilesize, 2) + " blocks")
             };
-            //progression.linear(basicFieldRadius, 0.2f * tilesize, val -> basicFieldRadius = val);
 
-            //bulletCons((ExpLaserFieldBulletType type, Bullet b) -> type.basicFieldRadius = basicFieldRadius);
             pregrade = (ExpTurret) laserCharge;
             pregradeLevel = 15;
             effectColors = new Color[]{fromColor, Pal.lancerLaser.cpy().lerp(Pal.sapBullet, 0.75f), Pal.sapBullet};

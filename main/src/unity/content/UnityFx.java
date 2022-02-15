@@ -138,6 +138,39 @@ public class UnityFx{
         );
     }),
 
+    laserFractalCharge = new Effect(120f, e -> {
+        float radius = 10 * 8;
+        float[] p = {0, 0};
+
+        Angles.randLenVectors(e.id, 3, radius/2 + Interp.pow3Out.apply(1 - e.fout(0.5f)) * radius * 1.25f, (x, y) -> {
+            e.scaled(60, ee -> {
+                ee.scaled(30, e1 ->{
+                    p[0] = Mathf.lerp(x, 0, e1.fin(Interp.pow2));
+                    p[1] = Mathf.lerp(y, 0, e1.fin(Interp.pow2));
+                });
+
+                Lines.stroke(ee.fout(0.5f), Pal.lancerLaser.cpy().lerp(Pal.sapBullet, 0.5f).a(ee.fout(0.5f)));
+                Lines.line(e.x+x, e.y+y, e.x+p[0], e.y+p[1]);
+            });
+        });
+    }),
+
+    laserFractalChargeBegin = new Effect(90f, e -> {
+        int[] r = {9, 10, 11, 12};
+
+        e.scaled(60, ee -> r[0] *= ee.fin());
+        e.scaled(40, ee -> r[1] *= ee.fin());
+        e.scaled(40, ee -> r[2] *= ee.fin());
+        e.scaled(60, ee -> r[3] *= ee.fin());
+
+        Draw.color(UnityPal.lancerSap3.cpy().a(0.1f+0.55f * e.fslope()));
+        Lines.swirl(e.x, e.y, r[0], 0.6f, Time.time*8-60);
+        Lines.swirl(e.x, e.y, r[1], 0.6f, Time.time*5);
+        Draw.color(Pal.lancerLaser.cpy().lerp(Pal.sapBullet, 0.5f+0.5f*Mathf.sin(16*e.fin())).a(0.25f+0.8f * e.fslope()));
+        Lines.swirl(e.x, e.y, r[2], 0.4f, Time.time*-6+121);
+        Lines.swirl(e.x, e.y, r[3], 0.4f, Time.time*-4+91);
+    }),
+
     laserChargeBegin = new Effect(60f, e -> {
         color(e.color);
         Fill.square(e.x, e.y, e.fin() * 3f, 45f);
