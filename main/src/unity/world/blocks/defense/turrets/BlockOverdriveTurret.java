@@ -4,10 +4,9 @@ import arc.Core;
 import arc.graphics.Color;
 import arc.graphics.g2d.*;
 import arc.math.Mathf;
-import arc.util.Time;
+import mindustry.graphics.*;
 import mindustry.entities.Units;
 import mindustry.gen.Building;
-import mindustry.graphics.*;
 import mindustry.world.blocks.defense.turrets.ReloadTurret;
 import unity.entities.bullet.misc.BlockStatusEffectBulletType;
 
@@ -50,8 +49,8 @@ public class BlockOverdriveTurret extends ReloadTurret {
             Drawf.circles(x, y, buffRange, Pal.accent);
 
             if (target != null) {
-                Draw.color(Pal.heal, Color.valueOf("cf352e"), Mathf.absin(4f, 1f));
-                Draw.rect(buffRegion, target.x, target.y);
+                Draw.color(Pal.heal, Color.valueOf("feb380"), Mathf.absin(12f, 1f));
+                Draw.rect(buffRegion, target.x, target.y, 8 * target.block.size, 8 * target.block.size);
             }
         }
 
