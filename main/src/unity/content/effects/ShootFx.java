@@ -45,7 +45,7 @@ public class ShootFx{
             //float rot = h * 180f + Mathf.randomSeedRange(e.id, 360) + e.finpow() * 262;
             float mul = h % 2;
             float rm = 1 + mul * 0.5f;
-            float rot = 90 + (1 - e.finpow()) * Mathf.randomSeed(e.id, 210 * rm, 360 * rm);
+            float rot = 90 + (1 - e.finpow()) * Mathf.randomSeed(e.id + (long)(mul * 2f), 210 * rm, 360 * rm);
             for(int i = 0; i < 2; i++){
                 float m = i == 0 ? 1 : 0.5f;
                 float w = 8 * e.fout() * m;
