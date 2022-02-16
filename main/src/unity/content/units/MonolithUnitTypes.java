@@ -942,24 +942,27 @@ public final class MonolithUnitTypes{
                 mirror = false;
                 rotate = true;
                 reload = 72f;
-                firstShotDelay = 30f;
-                inaccuracy = 30f;
+                firstShotDelay = 35f;
+                inaccuracy = 15f;
                 layerOffset = 10f;
                 eyeRadius = 1.8f;
                 parentizeEffects = true;
 
+                chargeSound = UnitySounds.energyCharge;
+                shootSound = UnitySounds.energyBlast;
                 bullet = new BasicBulletType(4.8f, 72f, "shell"){
                     {
                         lifetime = 48f;
                         width = 16f;
                         height = 25f;
+                        keepVelocity = false;
                         homingPower = 0.03f;
                         homingRange = range() * 2f;
 
                         lightning = 3;
                         lightningColor = UnityPal.monolithLight;
                         lightningDamage = 12f;
-                        lightningLength = 6;
+                        lightningLength = 12;
 
                         frontColor = trailColor = UnityPal.monolith;
                         backColor = UnityPal.monolithDark;
