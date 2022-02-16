@@ -41,23 +41,26 @@ public class ShootFx{
             Drawf.tri(e.x, e.y, 4f * e.fout(), 29f, e.rotation + 90f * i + e.finpow() * 112f);
         }
 
-        for (var h = 1; h <= 5; h++) for(var i = 0; i < 2; i++){
-            float m = i == 0 ? 1 : 0.5f;
-            float w = 8 * e.fout() * m;
-            float length = 8 * 3;
-            Vec2 fxPos = new Vec2(e.x, e.y);
-            float rot = Angles.angle(fxPos.x, fxPos.y, e.x, e.y) + h * 180f + Mathf.randomSeedRange(e.id, 360) + e.finpow() * 262;
+        for(int h = 1; h <= 5; h++){
+            //float rot = h * 180f + Mathf.randomSeedRange(e.id, 360) + e.finpow() * 262;
+            float mul = h % 2;
+            float rm = 1 + mul * 0.5f;
+            float rot = 90 + (1 - e.finpow()) * Mathf.randomSeed(e.id, 210 * rm, 360 * rm);
+            for(int i = 0; i < 2; i++){
+                float m = i == 0 ? 1 : 0.5f;
+                float w = 8 * e.fout() * m;
+                float length = 8 * 3 / (2 - mul);
+                Vec2 fxPos = Tmp.v1.trns(rot, length - 4);
+                length *= Utils.pow25Out.apply(e.fout());
 
-            fxPos.trns(rot, length - 4);
-            length *= new Interp.PowOut(25).apply(e.fout());
+                Drawf.tri(fxPos.x + e.x, fxPos.y + e.y, w, length * m, rot + 180);
+                Drawf.tri(fxPos.x + e.x, fxPos.y + e.y, w , length / 3f * m, rot);
 
-            Drawf.tri(fxPos.x + e.x, fxPos.y + e.y, w, length * m, rot + 180);
-            Drawf.tri(fxPos.x + e.x, fxPos.y + e.y, w , length / 3f * m, rot);
-
-            Draw.alpha(0.5f);
-            Drawf.tri(e.x, e.y, w, length * m,  rot + 360);
-            Drawf.tri(e.x, e.y, w, length/3 * m, rot);
-            Fill.square(fxPos.x + e.x, fxPos.y + e.y, 3 * e.fout(), rot + 45);
+                Draw.alpha(0.5f);
+                Drawf.tri(e.x, e.y, w, length * m,  rot + 360);
+                Drawf.tri(e.x, e.y, w, length/3 * m, rot);
+                Fill.square(fxPos.x + e.x, fxPos.y + e.y, 3 * e.fout(), rot + 45);
+            }
         }
     }),
 
