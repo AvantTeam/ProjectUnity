@@ -371,7 +371,7 @@ public class HitFx{
     tendenceHit = new Effect(52f, e -> {
         color(UnityPal.monolithLight, UnityPal.monolith, UnityPal.monolithDark, e.fout());
         for(int sign : Mathf.signs){
-            randLenVectors(e.id, 3, e.fin(Interp.pow5Out) * 32f, e.rotation, 30f, 16f, (x, y) ->
+            randLenVectors(e.id + sign, 3, e.fin(Interp.pow5Out) * 32f, e.rotation, 30f, 16f, (x, y) ->
                 Fill.square(e.x + x, e.y + y, e.foutpowdown() * 2.5f, e.id * 30f + e.finpow() * 90f * sign)
             );
         }

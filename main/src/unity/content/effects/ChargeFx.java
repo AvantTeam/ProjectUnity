@@ -133,7 +133,7 @@ public class ChargeFx{
         UnityDrawf.shiningCircle(e.id, Time.time, e.x, e.y, e.fin() * 7.5f, 6, 25f, 20f, 2.5f * e.fin());
     }),
 
-    tendenceCharge = new Effect(32f, e -> {
+    tendenceCharge = new Effect(40f, e -> {
         if(!(e.data instanceof TrailHold[] data)) return;
 
         color(UnityPal.monolith, UnityPal.monolithLight, e.fin());
