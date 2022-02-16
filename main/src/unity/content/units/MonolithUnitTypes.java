@@ -942,7 +942,7 @@ public final class MonolithUnitTypes{
                 mirror = false;
                 rotate = true;
                 reload = 72f;
-                firstShotDelay = 34f;
+                firstShotDelay = 35f;
                 inaccuracy = 15f;
                 layerOffset = 10f;
                 eyeRadius = 1.8f;
