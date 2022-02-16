@@ -243,18 +243,21 @@ public class UnityBullets{
             distSplashFx = UnityFx.distSplashFx;
             distStart = UnityFx.distStart;
             distStatus = distort;
-            radius = 85;
 
-            lifetime = 6 * 60;
             collidesTiles = false;
             collides = false;
             collidesAir = false;
             keepVelocity = false;
 
-            bulletSlowMultiplier = 0.9f;
-            expGain = 1;
+            lifetime = 6 * 60;
+            radius = 3f*8;
+            radiusInc = 0.1f*8;
+            bulletSlow = 0.1f;
+            bulletSlowInc = 0.025f;
             damageLimit = 100f;
             distDamage = 0.1f;
+            expChance = 0.2f/60;
+            expGain = 1;
         }};
 
         smallDistField = new DistFieldBulletType(0, -1){{
@@ -263,23 +266,29 @@ public class UnityBullets{
             distSplashFx = UnityFx.distSplashFx;
             distStart = UnityFx.distStart;
             distStatus = distort;
-            radius = 40;
 
-            lifetime = 2.5f * 60;
             collidesTiles = false;
             collides = false;
             collidesAir = false;
             keepVelocity = false;
 
-            bulletSlowMultiplier = 0.65f;
-            expGain = 1;
+            lifetime = 2.5f * 60;
+            radius = 1.5f*8;
+            radiusInc = 0.05f*8;
+            bulletSlow = 0.05f;
+            bulletSlowInc = 0.015f;
             damageLimit = 50f;
             distDamage = 0.05f;
+            expChance = 0.1f/60;
+            expGain = 1;
         }};
 
         fractalLaser = new ExpLaserFieldBulletType(170f, 130f){{
             damageInc = 6f;
             lengthInc = 2f;
+            fields = 2;
+            fieldInc = 0.15f;
+            width = 2;
             expGain = buildingExpGain = 1;
             fromColor = Pal.lancerLaser.cpy().lerp(Pal.place, 0.5f);
             toColor = Pal.place;

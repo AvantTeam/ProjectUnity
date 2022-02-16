@@ -25,9 +25,7 @@ import unity.graphics.*;
 import unity.type.*;
 import unity.util.*;
 
-import static arc.graphics.g2d.Draw.rect;
 import static arc.graphics.g2d.Draw.*;
-import static arc.graphics.g2d.Lines.circle;
 import static arc.graphics.g2d.Lines.*;
 import static arc.math.Angles.*;
 import static mindustry.Vars.tilesize;
@@ -38,6 +36,7 @@ import static unity.graphics.UnityDrawf.spark;
 //** @deprecated These fields will eventually all be interpreted in the classes in {@link unity.content.effects} package. */
 public class UnityFx{
     private static int integer;
+    private static final Rand rand = new Rand();
 
     public static final Effect
         //@formatter:off
@@ -137,6 +136,39 @@ public class UnityFx{
         randLenVectors(e.id, 1, 1f + 20f * e.fout(), e.rotation, 120f, (x, y) ->
             Fill.square(e.x + x, e.y + y, e.fslope() * 1.5f + 0.1f, 45f)
         );
+    }),
+
+    laserFractalCharge = new Effect(120f, e -> {
+        float radius = 10 * 8;
+        float[] p = {0, 0};
+
+        Angles.randLenVectors(e.id, 3, radius/2 + Interp.pow3Out.apply(1 - e.fout(0.5f)) * radius * 1.25f, (x, y) -> {
+            e.scaled(60, ee -> {
+                ee.scaled(30, e1 ->{
+                    p[0] = Mathf.lerp(x, 0, e1.fin(Interp.pow2));
+                    p[1] = Mathf.lerp(y, 0, e1.fin(Interp.pow2));
+                });
+
+                Lines.stroke(ee.fout(0.5f), Pal.lancerLaser.cpy().lerp(Pal.sapBullet, 0.5f).a(ee.fout(0.5f)));
+                Lines.line(e.x+x, e.y+y, e.x+p[0], e.y+p[1]);
+            });
+        });
+    }),
+
+    laserFractalChargeBegin = new Effect(90f, e -> {
+        int[] r = {9, 10, 11, 12};
+
+        e.scaled(60, ee -> r[0] *= ee.fin());
+        e.scaled(40, ee -> r[1] *= ee.fin());
+        e.scaled(40, ee -> r[2] *= ee.fin());
+        e.scaled(60, ee -> r[3] *= ee.fin());
+
+        Draw.color(UnityPal.lancerSap3.cpy().a(0.1f+0.55f * e.fslope()));
+        Lines.swirl(e.x, e.y, r[0], 0.6f, Time.time*8-60);
+        Lines.swirl(e.x, e.y, r[1], 0.6f, Time.time*5);
+        Draw.color(Pal.lancerLaser.cpy().lerp(Pal.sapBullet, 0.5f+0.5f*Mathf.sin(16*e.fin())).a(0.25f+0.8f * e.fslope()));
+        Lines.swirl(e.x, e.y, r[2], 0.4f, Time.time*-6+121);
+        Lines.swirl(e.x, e.y, r[3], 0.4f, Time.time*-4+91);
     }),
 
     laserChargeBegin = new Effect(60f, e -> {
@@ -1199,6 +1231,82 @@ public class UnityFx{
             float py3 = Angles.trnsy(space * (i + 2), (float)e.data);
             Fill.quad(e.x, e.y, centerf, e.x + px, e.y + py, edgef, e.x + px2, e.y + py2, edgef, e.x + px3, e.y + py3, edgef);
         }
+    }),
+
+    smallChainLightning = new Effect(40f, 300f, e -> {
+        if(!(e.data instanceof Position p)) return;
+
+        float tx = p.getX(), ty = p.getY(), dst = Mathf.dst(e.x, e.y, tx, ty);
+        Tmp.v1.set(p).sub(e.x, e.y).nor();
+
+        float normx = Tmp.v1.x, normy = Tmp.v1.y;
+        float range = 6f;
+        int links = Mathf.ceil(dst / range);
+        float spacing = dst / links;
+
+        Lines.stroke(2.5f * e.fout());
+        Draw.color(Color.white, e.color, e.fin());
+
+        Lines.beginLine();
+
+        Lines.linePoint(e.x, e.y);
+
+        rand.setSeed(e.id);
+
+        for(int i = 0; i < links; i++){
+            float nx, ny;
+            if(i == links - 1){
+                nx = tx;
+                ny = ty;
+            }else{
+                float len = (i + 1) * spacing;
+                Tmp.v1.setToRandomDirection(rand).scl(range/2f);
+                nx = e.x + normx * len + Tmp.v1.x;
+                ny = e.y + normy * len + Tmp.v1.y;
+            }
+
+            Lines.linePoint(nx, ny);
+        }
+
+        Lines.endLine();
+    }),
+
+    chainLightning = new Effect(30f, 300f, e -> {
+        if(!(e.data instanceof Position p)) return;
+
+        float tx = p.getX(), ty = p.getY(), dst = Mathf.dst(e.x, e.y, tx, ty);
+        Tmp.v1.set(p).sub(e.x, e.y).nor();
+
+        float normx = Tmp.v1.x, normy = Tmp.v1.y;
+        float range = 6f;
+        int links = Mathf.ceil(dst / range);
+        float spacing = dst / links;
+
+        Lines.stroke(4f * e.fout());
+        Draw.color(Color.white, e.color, e.fin());
+
+        Lines.beginLine();
+
+        Lines.linePoint(e.x, e.y);
+
+        rand.setSeed(e.id);
+
+        for(int i = 0; i < links; i++){
+            float nx, ny;
+            if(i == links - 1){
+                nx = tx;
+                ny = ty;
+            }else{
+                float len = (i + 1) * spacing;
+                Tmp.v1.setToRandomDirection(rand).scl(range/2f);
+                nx = e.x + normx * len + Tmp.v1.x;
+                ny = e.y + normy * len + Tmp.v1.y;
+            }
+
+            Lines.linePoint(nx, ny);
+        }
+
+        Lines.endLine();
     }),
 
     ricochetTrailSmall = new Effect(12f, e -> randLenVectors(e.id, 4, e.fout() * 3.5f, (x, y) -> {

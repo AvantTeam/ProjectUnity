@@ -57,6 +57,17 @@ public class ExpNode extends ExpTank {
         bars.add("links", (ExpNodeBuild entity) -> new Bar(() -> Core.bundle.format("bar.reloading", (int)(100 * Mathf.clamp(entity.reload / reloadTime))), () -> Pal.accent, () -> Mathf.clamp(entity.reload / reloadTime)));
     }
 
+    @Override
+    public void drawPlace(int x, int y, int rotation, boolean valid){
+        super.drawPlace(x, y, rotation, valid);
+        Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range * tilesize, UnityPal.exp);
+    }
+
+    @Override
+    protected TextureRegion[] icons(){
+        return new TextureRegion[]{region};
+    }
+
     public class ExpNodeBuild extends ExpTankBuild{
         public float reload = 0;
         public float warmup = 0f;
@@ -72,7 +83,7 @@ public class ExpNode extends ExpTank {
                     reload = 0f;
                 }
             }
-            else reload += delta();
+            else reload += edelta();
 
             if(reload >= reloadTime && !shooting && exp >= minExp){
                 reload = warmup = 0f;
@@ -83,19 +94,33 @@ public class ExpNode extends ExpTank {
 
         public void shoot(){
             tmps.clear();
-            tmpm = -1;
+            tmpm = 0; //max exp
             Geometry.circle(tile.x, tile.y, range, (x, y) -> {
                 Building other = world.build(x, y);
-                if(other != null && other.team == team && other instanceof ExpHolder exp && !exp.hubbable() && (tmpm == -1 ||exp.getExp() <= tmpm)){
+                /*if(other != null && other != this && other.team == team && other instanceof ExpHolder exp && !exp.hubbable() && other instanceof LevelHolder && (tmpm == -1 ||exp.getExp() <= tmpm)){
                     if(exp.getExp() < tmpm) tmps.clear(); //previous blocks are all invalid
                     tmps.add(exp);
                     tmpm = exp.getExp();
+                }*/
+                if(other != null && other != this && other.team == team && other instanceof ExpHolder exp && !exp.hubbable() && other instanceof LevelHolder){
+                    tmps.add(exp);
+                    if(exp.getExp() + 1 > tmpm) tmpm = exp.getExp() + 1;
                 }
             });
 
             if(tmps.isEmpty()) return;
-            int amount = Mathf.ceilPositive(exp / (float)tmps.size);
+            //int amount = Mathf.ceilPositive(exp / (float)tmps.size);
+            float scoresum = 0;
             for(ExpHolder e : tmps){
+                float score = (1f - (e.getExp() + 1) / (float)(tmpm));
+                if(score == 0) score = 0.1f;
+                scoresum += score;
+            }
+            int expm = exp;
+            for(ExpHolder e : tmps){
+                float score = (1f - (e.getExp() + 1) / (float)(tmpm + 1));
+                if(score == 0) score = 0.1f;
+                int amount = Mathf.ceilPositive(score / scoresum * expm);
                 if(exp < amount) continue;
                 int a = e.handleExp(amount);
                 exp -= a;
@@ -104,9 +129,18 @@ public class ExpNode extends ExpTank {
 
         @Override
         public void draw(){
-            super.draw();
+            Draw.rect(region, x, y);
+            Draw.color(UnityPal.exp, Color.white, Mathf.absin(20, 0.6f));
+            Draw.alpha(expf());
+            Draw.rect(expRegion, x, y);
+            Draw.color();
 
             if(shooting){
+                Draw.blend(Blending.additive);
+                Draw.color(lightColor, 1f - fin());
+                Draw.rect(topRegion, x, y);
+                Draw.blend();
+                Draw.color();
                 Draw.z(Layer.power + 1f);
                 float r = range * tilesize * fin();
                 Fill.light(x, y, Lines.circleVertices(r), r, lightClearColor, tmpc.set(lightColor).a(Mathf.clamp(2f * (1 - fin()))));
@@ -124,6 +158,11 @@ public class ExpNode extends ExpTank {
                 float r = range * tilesize * fin();
                 Drawf.light(x, y, r, lightColor, Mathf.clamp(2f * (1 - fin())));
             }
+        }
+
+        @Override
+        public void drawSelect(){
+            Drawf.dashCircle(x, y, range * tilesize, UnityPal.exp);
         }
 
         public float fin(){

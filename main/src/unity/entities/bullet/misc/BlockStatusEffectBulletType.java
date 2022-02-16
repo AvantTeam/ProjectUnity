@@ -1,5 +1,6 @@
 package unity.entities.bullet.misc;
 
+import arc.math.Mathf;
 import unity.world.blocks.defense.turrets.BlockOverdriveTurret;
 import mindustry.entities.bullet.BasicBulletType;
 import mindustry.gen.Building;
@@ -20,13 +21,18 @@ public class BlockStatusEffectBulletType extends BasicBulletType{
     @Override
     public void update(Bullet b){
         Building target = ((BlockOverdriveTurret.BlockOverdriveTurretBuild) b.owner).target;
+        boolean buffing = ((BlockOverdriveTurret.BlockOverdriveTurretBuild) b.owner).buffing;
 
-        if (b.x == target.x && b.y == target.y){
-            target.applyBoost(strength, 60f);
-
-            if (target.health < target.maxHealth){
-                target.heal(strength);
+        if (buffing){
+            strength = Mathf.lerpDelta(strength, 3f, 0.03f);
+            if (b.x == target.x && b.y == target.y){
+                target.applyBoost(strength, 180f);
+                if (target.health < target.maxHealth){
+                    target.heal(strength);
+                }
             }
+        }else{
+            strength = 1f;
         }
     }
 }

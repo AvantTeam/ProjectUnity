@@ -8,6 +8,7 @@ import arc.math.geom.*;
 import arc.util.*;
 import mindustry.entities.*;
 import mindustry.graphics.*;
+import unity.content.UnityFx;
 import unity.graphics.*;
 import unity.util.*;
 
@@ -31,6 +32,33 @@ public class ShootFx{
         color(e.color, Color.white, e.fout());
         stroke(2f * e.fout());
         Lines.square(e.x, e.y, 0.1f + 20f * e.finpow(), 45f);
+    }),
+
+    laserFractalShoot = new Effect(40f, e -> {
+        color(Tmp.c1.set(e.color).lerp(Color.white, e.fout()));
+
+        for(int i = 0; i < 4; i++){
+            Drawf.tri(e.x, e.y, 4f * e.fout(), 29f, e.rotation + 90f * i + e.finpow() * 112f);
+        }
+
+        for (var h = 1; h <= 5; h++) for(var i = 0; i < 2; i++){
+            float m = i == 0 ? 1 : 0.5f;
+            float w = 8 * e.fout() * m;
+            float length = 8 * 3;
+            Vec2 fxPos = new Vec2(e.x, e.y);
+            float rot = Angles.angle(fxPos.x, fxPos.y, e.x, e.y) + h * 180f + Mathf.randomSeedRange(e.id, 360) + e.finpow() * 262;
+
+            fxPos.trns(rot, length - 4);
+            length *= new Interp.PowOut(25).apply(e.fout());
+
+            Drawf.tri(fxPos.x + e.x, fxPos.y + e.y, w, length * m, rot + 180);
+            Drawf.tri(fxPos.x + e.x, fxPos.y + e.y, w , length / 3f * m, rot);
+
+            Draw.alpha(0.5f);
+            Drawf.tri(e.x, e.y, w, length * m,  rot + 360);
+            Drawf.tri(e.x, e.y, w, length/3 * m, rot);
+            Fill.square(fxPos.x + e.x, fxPos.y + e.y, 3 * e.fout(), rot + 45);
+        }
     }),
 
     laserBreakthroughShoot = new Effect(40f, e -> {

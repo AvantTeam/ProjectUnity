@@ -21,7 +21,8 @@ public class DistFieldBulletType extends ExpBulletType{
     public StatusEffect distStatus;
     public float radius, radiusInc;
     public float damageLimit, distDamage;
-    public float bulletSlowMultiplier;
+    public float bulletSlow, bulletSlowInc;
+    public float expChance;
 
     public DistFieldBulletType(float speed, float damage){
         super(speed, damage);
@@ -66,6 +67,9 @@ public class DistFieldBulletType extends ExpBulletType{
     float getRadius(Bullet b){
         return radius + radiusInc * getLevel(b) * b.damageMultiplier();
     }
+    float getBulletSlow(Bullet b){
+        return bulletSlow + bulletSlowInc * getLevel(b) * b.damageMultiplier();
+    }
 
     @Override
     public void update(Bullet b){
@@ -77,10 +81,10 @@ public class DistFieldBulletType extends ExpBulletType{
         }
 
         Units.nearbyEnemies(b.team, b.x, b.y, radius, e -> {
-            if(b.owner instanceof ExpBuildc block){
-                if(block.levelf() < 1 && Core.settings.getBool("hitexpeffect"))
-                    for(int i = 0; i < Math.ceil(expGain); i++) UnityFx.expGain.at(e.x, e.y, 0f, block);
-                block.incExp(expGain);
+            if(b.owner instanceof ExpTurret.ExpTurretBuild block && block.levelf() < 1 && Mathf.randomBoolean(expChance)){
+                if(Core.settings.getBool("hitexpeffect"))
+                    for(int i = 0; i < expGain; i++) UnityFx.expGain.at(e.x, e.y, 0f, block);
+                block.handleExp(expGain);
             }
 
             e.apply(distStatus, 2);
@@ -89,12 +93,12 @@ public class DistFieldBulletType extends ExpBulletType{
 
         Groups.bullet.intersect(b.x - radius, b.y - radius, radius * 2f, radius * 2f, e ->{
             if(e.team != b.team && e.damage() <= damageLimit && !(e.owner instanceof Kami)){ //slow down bullets which is not from kami
-                if(b.owner instanceof ExpBuildc block){
-                    if(block.levelf() < 1 && Core.settings.getBool("hitexpeffect"))
-                        for(int i = 0; i < Math.ceil(expGain); i++) UnityFx.expGain.at(e.x, e.y, 0f, block);
-                    block.incExp(expGain / 30f);
+                if(b.owner instanceof ExpTurret.ExpTurretBuild block && block.levelf() < 1 && Mathf.randomBoolean(expChance/2)){
+                    if(Core.settings.getBool("hitexpeffect"))
+                        for(int i = 0; i < expGain; i++) UnityFx.expGain.at(e.x, e.y, 0f, block);
+                    block.handleExp(expGain);
                 }
-                e.vel.scl(bulletSlowMultiplier);
+                e.vel.scl(getBulletSlow(b));
             }
         });
 
