@@ -21,15 +21,18 @@ public class BlockStatusEffectBulletType extends BasicBulletType{
     @Override
     public void update(Bullet b){
         Building target = ((BlockOverdriveTurret.BlockOverdriveTurretBuild) b.owner).target;
+        boolean buffing = ((BlockOverdriveTurret.BlockOverdriveTurretBuild) b.owner).buffing;
 
-        if (target != null){
+        if (buffing){
+            strength = Mathf.lerpDelta(strength, 3f, 0.03f);
             if (b.x == target.x && b.y == target.y){
-                strength = Mathf.lerpDelta(1f, strength, 0.08f);
-                target.applyBoost(strength, 60f);
+                target.applyBoost(strength, 180f);
                 if (target.health < target.maxHealth){
                     target.heal(strength);
                 }
             }
+        }else{
+            strength = 1f;
         }
     }
 }
