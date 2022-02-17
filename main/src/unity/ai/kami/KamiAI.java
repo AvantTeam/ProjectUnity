@@ -6,6 +6,8 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.pooling.*;
+import arc.util.pooling.Pool.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -29,11 +31,12 @@ public class KamiAI implements UnitController{
     public float x, y;
     public float patternTime, waitTime = 2f * 60f;
 
+    protected Seq<KamiDelay> delays = new Seq<>();
     protected IntSeq patternSeq = new IntSeq(false, 16);
 
     static{
         KamiPatterns.load();
-        //testPattern = KamiPatterns.flowerPattern;
+        //testPattern = KamiPatterns.flowerPattern2;
     }
 
     public void draw(){
@@ -79,6 +82,17 @@ public class KamiAI implements UnitController{
                     unit.lookAt(target);
                 }
                 pattern.update(this);
+
+                delays.removeAll(k -> {
+                    k.delay -= Time.delta;
+                    boolean b = k.delay <= 0f;
+                    if(b){
+                        k.run.run();
+                        Pools.free(k);
+                    }
+                    return b;
+                });
+
                 patternTime -= Time.delta;
                 if(patternTime <= 0f){
                     waitTime = pattern.waitTime;
@@ -95,6 +109,10 @@ public class KamiAI implements UnitController{
 
     void reset(){
         Arrays.fill(reloads, 0f);
+        for(KamiDelay delay : delays){
+            Pools.free(delay);
+        }
+        delays.clear();
         if(patternSeq.isEmpty()){
             for(KamiPattern p : KamiPattern.all){
                 patternSeq.add(p.id);
@@ -119,6 +137,32 @@ public class KamiAI implements UnitController{
         }
     }
 
+    public boolean burst(int i, float time, int bursts, float burstSpacing, Runnable begin){
+        boolean s = shoot(i, burstSpacing);
+        if(s){
+            if(reloads[i + 1] <= 0f){
+                begin.run();
+            }
+            reloads[i + 1] += 1f;
+            if(reloads[i + 1] >= bursts){
+                reloads[i] += time;
+                reloads[i + 1] = 0f;
+            }
+        }
+        return s;
+    }
+
+    public boolean burst(int i, float time, int bursts, float burstSpacing){
+        boolean s = shoot(i, burstSpacing);
+        if(s){
+            reloads[i + 1] += 1f;
+            if(reloads[i + 1] >= bursts){
+                reloads[i] += time;
+            }
+        }
+        return s;
+    }
+
     public boolean shoot(int i, float time){
         boolean s = reloads[i] <= 0f;
         if(s) reloads[i] += time;
@@ -128,6 +172,17 @@ public class KamiAI implements UnitController{
 
     public float targetAngle(){
         return unit.angleTo(target);
+    }
+
+    public void run(float delay, Runnable run){
+        if(delay <= 0f){
+            run.run();
+            return;
+        }
+        KamiDelay k = Pools.obtain(KamiDelay.class, KamiDelay::new);
+        k.delay = delay;
+        k.run = run;
+        delays.add(k);
     }
 
     @Override
@@ -140,5 +195,16 @@ public class KamiAI implements UnitController{
     @Override
     public Unit unit(){
         return unit;
+    }
+
+    static class KamiDelay implements Poolable{
+        Runnable run;
+        float delay;
+
+        @Override
+        public void reset(){
+            run = null;
+            delay = 0f;
+        }
     }
 }

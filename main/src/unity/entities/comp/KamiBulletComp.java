@@ -16,8 +16,8 @@ import unity.gen.*;
 abstract class KamiBulletComp implements Bulletc{
     private static final Ellipse e = new Ellipse();
     private static final Vec2 vec = new Vec2();
-    float turn, width, length, resetTime;
-    NewBulletData bdata;
+    float turn, width, length, resetTime, fdata2;
+    KamiBulletData bdata;
 
     @Import IntSeq collided;
     @Import float x, y;

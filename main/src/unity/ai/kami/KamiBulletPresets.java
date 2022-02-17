@@ -26,6 +26,19 @@ public class KamiBulletPresets{
         }
     }
 
+    public static void petal(KamiAI ai, float angleCone, float time, int amount, FloatFloatf spacingF, Floatc2 cons){
+        for(int i = 0; i < amount; i++){
+            float fin = i / (amount - 1f);
+            int[] sign = i <= 0 ? KamiPatterns.zero : Mathf.signs;
+            float delay = fin * time, angle = spacingF.get(fin) * angleCone;
+            ai.run(delay, () -> {
+                for(int s : sign){
+                    cons.get(angle * s, delay);
+                }
+            });
+        }
+    }
+
     public static void square(BulletType type, Entityc owner, Team team, float x, float y, float rotation, float speed, int density, Cons<Bullet> cons){
         for(int i = 0; i < 4; i++){
             for(int s = 0; s < density; s++){
