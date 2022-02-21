@@ -21,6 +21,7 @@ import unity.entities.bullet.energy.*;
 import unity.entities.bullet.exp.*;
 import unity.entities.bullet.kami.*;
 import unity.entities.bullet.laser.*;
+import unity.entities.bullet.misc.BlockStatusEffectBulletType;
 import unity.gen.*;
 import unity.graphics.*;
 import unity.world.blocks.exp.*;
@@ -74,7 +75,9 @@ public class UnityBullets{
 
         plasmaBullet, phantasmalBullet,
 
-        teleportLightning;
+        teleportLightning,
+
+        statusEffect;
 
     //only enhanced
     public static BasicBulletType standardDenseLarge, standardHomingLarge, standardIncendiaryLarge, standardThoriumLarge, standardDenseHeavy, standardHomingHeavy, standardIncendiaryHeavy, standardThoriumHeavy, standardDenseMassive, standardHomingMassive,
@@ -1506,6 +1509,12 @@ public class UnityBullets{
             t.splashDamageRadius *= 1.3f;
             t.splashDamage *= 3f;
         });
+
+        statusEffect = new BlockStatusEffectBulletType(0f, 0){{
+            hitEffect = despawnEffect = Fx.none;
+            lifetime = 180f;
+            width = height = 1f;
+        }};
 
         //endregion
     }

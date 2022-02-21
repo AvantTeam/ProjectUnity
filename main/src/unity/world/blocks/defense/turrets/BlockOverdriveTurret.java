@@ -4,26 +4,26 @@ import arc.Core;
 import arc.graphics.Color;
 import arc.graphics.g2d.*;
 import arc.math.Mathf;
+import unity.content.UnityBullets;
 import unity.entities.bullet.misc.BlockStatusEffectBulletType;
+import unity.world.blocks.exp.ExpHolder;
 import mindustry.entities.Units;
 import mindustry.gen.Building;
 import mindustry.graphics.*;
 import mindustry.world.blocks.defense.turrets.ReloadTurret;
 
 public class BlockOverdriveTurret extends ReloadTurret {
-    public final int timerBullet = timers;
-    public final int timerBuff = timers++;
+    public final int timerBullet = timers++;
 
     public float buffRange = 50f;
     public float buffReload = 180f;
 
     TextureRegion buffRegion;
-    public BlockStatusEffectBulletType bullet;
+    public BlockStatusEffectBulletType bullet = (BlockStatusEffectBulletType) UnityBullets.statusEffect;
 
     public BlockOverdriveTurret(String name) {
         super(name);
 
-        timers = 2;
         hasPower = update = sync = solid = outlineIcon = true;
     }
 
@@ -50,10 +50,13 @@ public class BlockOverdriveTurret extends ReloadTurret {
         public void drawSelect(){
             Drawf.circles(x, y, buffRange, Pal.accent);
 
-            if (buffing && target != null) {
+            if (buffing){
                 Draw.color(Pal.heal, Color.valueOf("feb380"), Mathf.absin(12f, 1f));
-                Draw.alpha(0.4f);
+                Draw.alpha(target instanceof ExpHolder? 0.3f : 0.4f);
                 Draw.rect(buffRegion, target.x, target.y, 8 * target.block.size, 8 * target.block.size);
+                if (target instanceof ExpHolder){
+                    //exp effect sth
+                }
             }
         }
 
@@ -81,7 +84,7 @@ public class BlockOverdriveTurret extends ReloadTurret {
                 }
             }
 
-            if (timer(timerBuff, buffReload)){
+            if (timer(0, buffReload)){
                 target = Units.closestBuilding(team, x, y, buffRange, this::targetValid);
             }
         }

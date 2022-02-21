@@ -170,6 +170,9 @@ public class UnityBlocks{
     public static @FactionDef("koruh")
     Block inferno;
 
+    public static @FactionDef("koruh")
+    Block buffTurret;
+
     //---------- monolith faction ----------
     public static @FactionDef("monolith") Block
     //environments
@@ -2063,6 +2066,10 @@ public class UnityBlocks{
 
         expVoid = new ExpVoid("exp-void"){{
             requirements(Category.effect, BuildVisibility.sandboxOnly, with());
+        }};
+
+        buffTurret = new BlockOverdriveTurret("buff-turret"){{
+            requirements(Category.effect, with());
         }};
 
         //endregion

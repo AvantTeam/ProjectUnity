@@ -2,9 +2,9 @@ package unity.entities.bullet.misc;
 
 import arc.math.Mathf;
 import unity.world.blocks.defense.turrets.BlockOverdriveTurret;
+import unity.world.blocks.exp.ExpHolder;
 import mindustry.entities.bullet.BasicBulletType;
-import mindustry.gen.Building;
-import mindustry.gen.Bullet;
+import mindustry.gen.*;
 
 public class BlockStatusEffectBulletType extends BasicBulletType{
     public float strength = 2f;
@@ -29,6 +29,10 @@ public class BlockStatusEffectBulletType extends BasicBulletType{
                 target.applyBoost(strength, 180f);
                 if (target.health < target.maxHealth){
                     target.heal(strength);
+                }else if (target instanceof ExpHolder exp){
+                    if (b.timer(0, 179f)){
+                        exp.handleExp(exp.getExp() / 100);
+                    }
                 }
             }
         }else{
