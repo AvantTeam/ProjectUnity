@@ -1,11 +1,14 @@
 package unity.ai.kami;
 
+import arc.math.*;
+import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.gen.*;
 import unity.gen.*;
 
 public class KamiBulletDatas{
-    public static Seq<KamiBulletData> all = new Seq<>();
+    public static Seq<KamiBulletDataBase<?>> all = new Seq<>();
     public static KamiBulletData turnDelay1 = new KamiBulletData(){
         @Override
         public void update(KamiBullet b){
@@ -41,21 +44,59 @@ public class KamiBulletDatas{
                 }
             }
         }
+    },
+
+    positionLock = new KamiBulletData(){
+        @Override
+        public void update(KamiBullet b){
+            if(b.owner instanceof Position){
+                b.set((Position)b.owner);
+            }
+        }
     };
 
-    public static class KamiBulletData{
+    public static KamiLaserData hyperSpeedLaser1 = new KamiLaserData(){
+        @Override
+        public void update(KamiLaser b){
+            if(b.data instanceof Position){
+                Position p = (Position)b.data;
+                if(b.time <= 7f){
+                    b.x = p.getX();
+                    b.y = p.getY();
+                    b.fdata = Mathf.dst(b.x, b.y, b.x2, b.y2);
+                }else{
+                    Tmp.v1.set(b.x2, b.y2).approachDelta(Tmp.v2.set(b.x, b.y), b.fdata / (16f - 7f));
+                    b.x2 = Tmp.v1.x;
+                    b.y2 = Tmp.v1.y;
+                    if(b.within(b.x2, b.y2, 2f)){
+                        b.remove();
+                    }
+                }
+            }
+        }
+    };
+
+    public static class KamiBulletData extends KamiBulletDataBase<KamiBullet>{
+
+    }
+
+    public static class KamiLaserData extends KamiBulletDataBase<KamiLaser>{
+
+    }
+
+    private static abstract class KamiBulletDataBase<T extends Bullet>{
         public int id;
 
-        public KamiBulletData(){
+        KamiBulletDataBase(){
             id = all.size;
             all.add(this);
         }
 
-        public void update(KamiBullet b){
+        public void update(T b){
 
         }
 
-        public void removed(KamiBullet b){
+        public void removed(T b){
 
         }
     }

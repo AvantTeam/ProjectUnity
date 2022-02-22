@@ -1,8 +1,13 @@
 package unity.ai.kami;
 
 import arc.func.*;
+import arc.graphics.*;
+import arc.graphics.g2d.*;
+import arc.math.*;
+import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import unity.type.*;
 
 public class KamiPattern{
     public static final Seq<KamiPattern> all = new Seq<>();
@@ -12,6 +17,7 @@ public class KamiPattern{
     public boolean lootAtTarget = true, followTarget;
     public Cons<KamiAI> cons;
     public Prov<PatternData> data;
+    public PatternType type = PatternType.basic;
 
     public KamiPattern(float time){
         this(time, 3f * 60f);
@@ -37,7 +43,25 @@ public class KamiPattern{
     }
 
     public void draw(KamiAI ai){
+        if(type == PatternType.bossBasic){
+            float z = Draw.z();
+            RainbowUnitType rt = (RainbowUnitType)ai.unit.type;
+            TextureRegion r = rt.trailRegion;
+            float fin = Mathf.clamp(ai.pTime() / 80f);
+            Draw.z(z - 0.01f);
+            for(int i = 0; i < 3; i++){
+                float ang = i * 360f / 3f + (ai.patternTime * 2f);
+                Draw.color(Tmp.c1.set(Color.red).shiftHue(Time.time + ang));
+                Vec2 v = Tmp.v1.trns(ang, fin * 45f).add(ai.unit.x, ai.unit.y);
+                Draw.rect(r, v.x, v.y, ai.unit.rotation - 90f);
+            }
+            Draw.z(z);
+        }
+    }
 
+    @Override
+    public String toString(){
+        return "KamiPattern: " + id + "priority: " + type.priority;
     }
 
     /*
@@ -50,6 +74,34 @@ public class KamiPattern{
     }
     */
 
+    public enum PatternType{
+        permanent(ai -> true),
+        basic(ai -> {
+            int s = ai.stages;
+            int ms = 10;
+            float chance = 1f - ((s - ms) / 5f);
+            return s < ms || (chance > 0f && ai.rand.chance(chance));
+        }),
+        bossBasic(ai -> ai.stages > 5 && ai.stages % 3 == 2, 1, 2),
+        advance(ai -> {
+            return ai.stages > 10;
+        }, 5, 1);
+
+        public final Boolf<KamiAI> able;
+        public final int limit;
+        public final int priority;
+
+        PatternType(Boolf<KamiAI> able){
+            this(able, 10, 0);
+        }
+
+        PatternType(Boolf<KamiAI> able, int limit, int priority){
+            this.able = able;
+            this.limit = limit;
+            this.priority = priority;
+        }
+    }
+
     public static class PatternData{
 
     }
@@ -58,8 +110,13 @@ public class KamiPattern{
         Stage[] stages;
 
         public StagePattern(float time, Stage... stages){
+            this(time, PatternType.basic, stages);
+        }
+
+        public StagePattern(float time, PatternType type, Stage... stages){
             super(time);
             this.stages = stages;
+            this.type = type;
             data = StageData::new;
             if(time < 0f){
                 float t = 0f;
