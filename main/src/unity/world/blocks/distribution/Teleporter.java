@@ -145,7 +145,7 @@ public class Teleporter extends Block{
 
         protected TeleporterBuild findLink(int value){
             ObjectSet<TeleporterBuild> teles = teleporters[team.id][value];
-            Seq<TeleporterBuild> entries = teles.asArray();
+            Seq<TeleporterBuild> entries = teles.toSeq();
             if(entry >= entries.size) entry = 0;
             if(entry == entries.size - 1){
                 TeleporterBuild other = teles.get(entries.get(entry));
