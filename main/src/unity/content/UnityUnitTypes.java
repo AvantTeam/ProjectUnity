@@ -131,6 +131,8 @@ public class UnityUnitTypes{
     public static @FactionDef("advance") @EntityDef({Unitc.class, Decorationc.class}) UnitType deviation, anomaly;
 
     // end
+    public static @FactionDef("end") @EntityDef({Unitc.class, Endc.class, Boostc.class}) UnitType enigma;
+
     public static @FactionDef("end") @EntityDef({Unitc.class, Endc.class}) UnitType voidVessel;
 
     public static @FactionDef("end") @EntityDef({Unitc.class, Endc.class, TimeStopVelc.class}) UnitType chronos;
@@ -3759,6 +3761,19 @@ public class UnityUnitTypes{
 
         //endregion
         //region end
+
+        enigma = new UnityUnitType("enigma"){{
+            health = 2000f;
+            speed = 4f;
+            drag = 0.4f;
+            accel = 0.5f;
+            boostMultiplier = 0.5f;
+            flying = true;
+            lowAltitude = true;
+            outlineColor = UnityPal.darkerOutline;
+
+            antiCheatType = new AntiCheatVariables(900f, 1000f, health / 10f, 1000f, 0.2f, 6f * 60f, 3f * 60f, 15f, 1);
+        }};
 
         voidVessel = new UnityUnitType("void-vessel"){{
             health = 10000f;
