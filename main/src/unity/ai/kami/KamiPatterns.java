@@ -85,9 +85,9 @@ public class KamiPatterns{
             }
         };
 
-        expandPattern = new StagePattern(-4, bossBasic, new Stage(2.5f * 60f, 2, (ai, data) -> {
+        expandPattern = new StagePattern(-4, bossBasic, new Stage(4f * 60f, 2, (ai, data) -> {
             Unit u = ai.unit;
-            if(data.time < 1.75f * 60f && ai.shoot(2, 8f)){
+            if(data.time < 2.5f * 60f && ai.shoot(2, 8f)){
                 int amount = (ai.difficulty * 2) + (int)(ai.reloads[0]) + 1;
                 float spread = 18f / (1f + ai.difficulty / 3f);
                 Angles.shotgun(amount, spread, ai.reloads[1] + Mathf.sin(ai.reloads[3], 3.5f, spread / 1.5f) * ai.reloads[4], f -> {
@@ -128,9 +128,9 @@ public class KamiPatterns{
             }
         };
 
-        flowerPattern = new StagePattern(-3, new Stage(4.5f * 60f, 2, (ai, d) -> {
+        flowerPattern = new StagePattern(-3, new Stage(3.5f * 60f, 2, (ai, d) -> {
             Unit u = ai.unit;
-            if(d.time < 170f && ai.shoot(2, 7f)){
+            if(d.time < 120f && ai.shoot(2, 7f)){
                 int petals = Mathf.clamp(3 + ai.difficulty, 0, 8),
                 amount = 4 + ai.difficulty, len = ai.difficulty;
                 float spacing = ((180f / petals) / (120f / 7f));
