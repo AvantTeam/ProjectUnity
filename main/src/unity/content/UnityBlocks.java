@@ -1712,7 +1712,7 @@ public class UnityBlocks{
 
                 itemDuration = 200f;
                 consumes.item(UnityItems.uranium, 2);
-                consumes.liquid(Liquids.cryofluid, 0.7f);
+                consumes.liquid(Liquids.water, 0.7f);
                 consumes.power(20f);
 
                 itemCapacity = 20;
