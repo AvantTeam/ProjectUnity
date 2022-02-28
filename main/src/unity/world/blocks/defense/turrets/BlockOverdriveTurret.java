@@ -4,13 +4,16 @@ import arc.Core;
 import arc.graphics.Color;
 import arc.graphics.g2d.*;
 import arc.math.Mathf;
+import arc.struct.Seq;
+import arc.util.io.*;
+import mindustry.Vars;
+import mindustry.gen.*;
+import mindustry.entities.Units;
+import mindustry.graphics.*;
+import mindustry.world.blocks.defense.turrets.ReloadTurret;
 import unity.content.UnityBullets;
 import unity.entities.bullet.misc.BlockStatusEffectBulletType;
 import unity.world.blocks.exp.ExpHolder;
-import mindustry.entities.Units;
-import mindustry.gen.Building;
-import mindustry.graphics.*;
-import mindustry.world.blocks.defense.turrets.ReloadTurret;
 
 public class BlockOverdriveTurret extends ReloadTurret {
     public final int timerBullet = timers++;
@@ -89,13 +92,38 @@ public class BlockOverdriveTurret extends ReloadTurret {
             }
         }
 
-        public boolean targetValid(Building b){
-            return b.isValid() && b.dst(tile) <= buffRange && b.block.canOverdrive && b != this && !proximity.contains(b);
-        }
-
         @Override
         public boolean shouldConsume(){
             return target != null && enabled;
+        }
+
+        public boolean targetValid(Building b){
+            return b.isValid() && b.dst(tile) <= buffRange && b.block.canOverdrive && b != this && !proximity.contains(b) && !isBeingBuffed(b);
+        }
+
+        public boolean isBeingBuffed(Building b){
+            Seq<Bullet> bullets = Groups.bullet.intersect(b.x, b.y, b.block.size * 8, b.block.size * 8);
+            int num1 = bullets.size;
+
+            if (num1 > 0){
+                return bullets.get(0).owner != this;
+            }else{
+                return false;
+            }
+        }
+
+        @Override
+        public void read(Reads read){
+            super.read(read);
+
+            target = Vars.world.build(read.i());
+        }
+
+        @Override
+        public void write(Writes write){
+            super.write(write);
+
+            if (target != null) write.i(target.pos());
         }
     }
 }

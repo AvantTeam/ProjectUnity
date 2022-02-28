@@ -2070,6 +2070,10 @@ public class UnityBlocks{
 
         buffTurret = new BlockOverdriveTurret("buff-turret"){{
             requirements(Category.effect, with());
+
+            health = 200;
+            size = 1;
+            buffRange = 100f;
         }};
 
         //endregion
