@@ -3,6 +3,7 @@ package unity.entities.bullet.misc;
 import arc.math.Mathf;
 import unity.entities.ExpOrbs;
 import unity.world.blocks.defense.turrets.BlockOverdriveTurret;
+import unity.world.blocks.defense.turrets.BlockOverdriveTurret.*;
 import unity.world.blocks.exp.ExpHolder;
 import mindustry.entities.bullet.BasicBulletType;
 import mindustry.gen.*;
@@ -23,17 +24,31 @@ public class BlockStatusEffectBulletType extends BasicBulletType{
 
     @Override
     public void update(Bullet b){
-        Building target = ((BlockOverdriveTurret.BlockOverdriveTurretBuild) b.owner).target;
-        boolean buffing = ((BlockOverdriveTurret.BlockOverdriveTurretBuild) b.owner).buffing;
+        Building target = null;
+        boolean buffing = false;
+        float phaseHeat = 0;
+        float phaseBoost = 0;
+        float phaseExpBoost = 0;
+
+        if (b.owner instanceof BlockOverdriveTurretBuild bb){
+            target = bb.target;
+            buffing = bb.buffing;
+            phaseHeat = bb.phaseHeat;
+            phaseBoost = ((BlockOverdriveTurret) bb.block).phaseBoost;
+            phaseExpBoost = ((BlockOverdriveTurret) bb.block).phaseExpBoost;
+        }
+
 
         if (buffing){
             if (b.x == target.x && b.y == target.y){
-                strength = Mathf.lerpDelta(strength, 3f, 0.02f);
+                strength = Mathf.lerpDelta(strength, 3f + phaseHeat * phaseBoost, 0.02f);
                 if (b.timer(0, 179f)) {
-                    if (upgrade) addExp(target, 5, true);
-                    else buff(target, strength);
+                    if (upgrade) addExp(target, 5 + phaseBoost * phaseExpBoost, true);
+                    else buff(target, strength + phaseHeat * phaseBoost);
                 }
             }
+        }else{
+            strength = 1f;
         }
     }
 
@@ -43,9 +58,9 @@ public class BlockStatusEffectBulletType extends BasicBulletType{
         else addExp(b, 1, false);
     }
 
-    public void addExp(Building b, int intensity, boolean spread){
-        if (b instanceof ExpHolder) {
-            ((ExpHolder) b).handleExp(Mathf.round(((ExpHolder) b).getExp() / 10) / 10 * intensity);
+    public void addExp(Building b, float intensity, boolean spread){
+        if (b instanceof ExpHolder exp) {
+            exp.handleExp(Mathf.round(exp.getExp() * 0.1f) / 10 * Mathf.round(intensity));
             if (spread) ExpOrbs.spreadExp(b.x, b.y, amount);
         }
     }
