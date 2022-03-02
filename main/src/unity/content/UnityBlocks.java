@@ -1718,6 +1718,9 @@ public class UnityBlocks{
                 itemCapacity = 20;
                 powerProduction = 150f;
                 health = 1000;
+
+                plasma1 = Color.valueOf("a5e1a2");
+                plasma2 = Color.valueOf("869B84");
         }};
 
         teleporter = new Teleporter("teleporter"){{

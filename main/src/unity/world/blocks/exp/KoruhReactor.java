@@ -82,17 +82,29 @@ public class KoruhReactor extends ImpactReactor{
         @Override
         public void updateTile() {
             super.updateTile();
-
-            if(exp >= expUse) {
-                if (productionEfficiency >= 0.8f && Mathf.randomBoolean(0.05f)) {
-                    float dir = Mathf.random(360f);
-                    Vec2 vec = new Vec2();
-                    vec.trns(dir, (size + Mathf.random(0.5f, 1.5f)) * Vars.tilesize).add(x, y);
-                    UnityFx.expDump.at(x, y, 0, vec);
-                    Time.run(UnityFx.expDump.lifetime, () -> ExpOrbs.spreadExp(vec.x, vec.y, 10, 0));
+            if(consValid()) {
+                if (exp >= expUse) {
+                    if (productionEfficiency >= 0.8f && Mathf.randomBoolean(0.001f)) {
+                        float dir = Mathf.random(360f);
+                        Vec2 vec = new Vec2();
+                        vec.trns(dir, (size + Mathf.random(0.5f, 1.5f)) * Vars.tilesize).add(x, y);
+                        UnityFx.expDump.at(x, y, 0, vec);
+                        Time.run(UnityFx.expDump.lifetime, () -> ExpOrbs.spreadExp(vec.x, vec.y, 10, 0));
+                    }
+                } else {
+                    damage(1);
+                    if(health<=0) {
+                        for(int i = 0, m = Mathf.ceilPositive(exp*1.5f); i < m; i++) {
+                            Time.run(i*10, () -> {
+                                float dir = Mathf.random(360f);
+                                Vec2 vec = new Vec2();
+                                vec.trns(dir, (size + Mathf.random(0.5f, 1.5f)) * Vars.tilesize).add(x, y);
+                                UnityFx.expDump.at(x, y, 0, vec);
+                                Time.run(UnityFx.expDump.lifetime, () -> ExpOrbs.spreadExp(vec.x, vec.y, 10, 0));
+                            });
+                        }
+                    }
                 }
-            } else {
-                damage(1);
             }
         }
 
@@ -104,14 +116,7 @@ public class KoruhReactor extends ImpactReactor{
         }
 
         @Override
-        public void drawSelect(){
-            super.drawSelect();
-            drawPlaceText(exp + "/" + expCapacity, tile.x, tile.y, exp >= expUse);
-        }
-
-        @Override
         public void onDestroyed(){
-            ExpOrbs.spreadExp(x, y, exp*0.3f*ExpOrbs.expAmount, 3 * size);
             super.onDestroyed();
         }
 
