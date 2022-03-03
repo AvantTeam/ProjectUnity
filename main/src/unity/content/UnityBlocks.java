@@ -171,7 +171,7 @@ public class UnityBlocks{
     Block inferno;
 
     public static @FactionDef("koruh")
-    Block buffTurret;
+    Block buffTurret, upgradeTurret;
 
     //---------- monolith faction ----------
     public static @FactionDef("monolith") Block
@@ -2072,10 +2072,19 @@ public class UnityBlocks{
         }};
 
         buffTurret = new BlockOverdriveTurret("buff-turret"){{
-            requirements(Category.effect, with());
+            requirements(Category.effect, with(Items.thorium, 60, Items.plastanium, 90, UnityItems.stone, 100, UnityItems.denseAlloy, 70));
             health = 200;
             size = 1;
             buffRange = 100f;
+            consumes.item(UnityItems.steel).boost();
+        }};
+
+        upgradeTurret = new BlockOverdriveTurret("upgrade-turret"){{
+            requirements(Category.effect, with(Items.surgeAlloy, 80, UnityItems.steel, 120, UnityItems.dirium, 70));
+            health = 300;
+            size = 1;
+            buffRange = 100f;
+            consumes.item(UnityItems.dirium).boost();
         }};
 
         //endregion

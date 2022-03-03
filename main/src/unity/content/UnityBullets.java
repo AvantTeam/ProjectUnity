@@ -77,7 +77,7 @@ public class UnityBullets{
 
         teleportLightning,
 
-        statusEffect;
+        statusEffect, upgradeEffect;
 
     //only enhanced
     public static BasicBulletType standardDenseLarge, standardHomingLarge, standardIncendiaryLarge, standardThoriumLarge, standardDenseHeavy, standardHomingHeavy, standardIncendiaryHeavy, standardThoriumHeavy, standardDenseMassive, standardHomingMassive,
@@ -1407,6 +1407,20 @@ public class UnityBullets{
             keepVelocity = false;
         }};
 
+        statusEffect = new BlockStatusEffectBulletType(0f, 0){{
+            hitEffect = despawnEffect = Fx.none;
+            lifetime = 180f;
+            width = height = 1f;
+        }};
+
+        upgradeEffect = new BlockStatusEffectBulletType(0f, 0){{
+            hitEffect = Fx.none;
+            despawnEffect = UnityFx.expPoof;
+            lifetime = 180f;
+            width = height = 1f;
+            upgrade = true;
+        }};
+
         //only enhanced
 
         standardDenseLarge = copy(Bullets.standardDenseBig, (BasicBulletType t) -> {
@@ -1514,12 +1528,6 @@ public class UnityBullets{
             t.splashDamageRadius *= 1.3f;
             t.splashDamage *= 3f;
         });
-
-        statusEffect = new BlockStatusEffectBulletType(0f, 0){{
-            hitEffect = despawnEffect = Fx.none;
-            lifetime = 180f;
-            width = height = 1f;
-        }};
 
         //endregion
     }

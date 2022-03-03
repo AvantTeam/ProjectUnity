@@ -5,6 +5,7 @@ import arc.graphics.Color;
 import arc.graphics.g2d.*;
 import arc.math.Angles;
 import arc.math.Mathf;
+import arc.struct.EnumSet;
 import arc.struct.Seq;
 import arc.util.Tmp;
 import mindustry.gen.*;
@@ -29,9 +30,6 @@ public class BlockOverdriveTurret extends ReloadTurret {
     public float phaseBoost = 3f;
     public float phaseRangeBoost = 1.5f;
     public float phaseExpBoost = 2f;
-    public float laserWidth = 1f;
-
-    public ItemStack[] phaseItems = with(UnityItems.denseAlloy, 1);
 
     public TextureRegion baseRegion, laserRegion, laserEndRegion;
     public BlockStatusEffectBulletType bullet = (BlockStatusEffectBulletType) UnityBullets.statusEffect;
@@ -39,15 +37,18 @@ public class BlockOverdriveTurret extends ReloadTurret {
     public BlockOverdriveTurret(String name) {
         super(name);
 
-        hasPower = update = sync = solid = outlineIcon = true;
+        hasPower = hasItems = update = solid = outlineIcon = true;
+        flags = EnumSet.of(BlockFlag.turret);
+        group = BlockGroup.projectors;
+        canOverdrive = false;
     }
 
     @Override
     public void load(){
         super.load();
         baseRegion = Core.atlas.find(name + "-base");
-        laserRegion = Core.atlas.find(name + "-laser");
-        laserEndRegion = Core.atlas.find(name + "-laser-end");
+        laserRegion = Core.atlas.find("exp-laser");
+        laserEndRegion = Core.atlas.find("exp-laser-end");
     }
 
     @Override
@@ -63,48 +64,48 @@ public class BlockOverdriveTurret extends ReloadTurret {
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
-        super.drawPlace(x, y, rotation, valid);
-
         Drawf.dashCircle(x * tilesize, y * tilesize, buffRange, Pal.accent);
         Draw.reset();
     }
 
     public class BlockOverdriveTurretBuild extends ReloadTurretBuild{
         public Building target;
-        public float buffingTime, phaseHeat;
-        public boolean buffing;
+        public float buffingTime, phaseHeat, targetTime;
+        public boolean buffing, isExp;
 
         @Override
         public void drawSelect(){
             Drawf.circles(x, y, buffRange, Pal.accent);
 
-            if (buffing) Drawf.selected(target, target instanceof ExpHolder ? UnityPal.exp.a(Mathf.absin(6f, 1f)) : Tmp.c1.set(Pal.heal).lerp(Color.valueOf("feb380"), Mathf.absin(9f, 1f)).a(Mathf.absin(6f, 1f)));
+            if (buffing) Drawf.selected(target, isExp ? UnityPal.exp.a(Mathf.absin(6f, 1f)) : Tmp.c1.set(Pal.heal).lerp(Color.valueOf("feb380"), Mathf.absin(9f, 1f)).a(Mathf.absin(6f, 1f)));
         }
 
         @Override
         public void draw(){
             Draw.rect(baseRegion, x, y);
             Draw.z(Layer.turret);
-            Drawf.shadow(region, x - (size/2f), y - (size/2f), 0);
-            Draw.rect(region, x, y, 0);
+            Drawf.shadow(region, x - (size/2f), y - (size/2f), rotation - 90);
+            Draw.rect(region, x, y, rotation - 90);
 
             if (buffing){
                 float angle = angleTo(target);
                 float len = 5;
-                Draw.color(target instanceof ExpHolder ? UnityPal.exp : Tmp.c2.set(Color.valueOf("feb380")).lerp(Pal.heal, Mathf.absin(10f, 1f)));
+                Draw.color(isExp ? UnityPal.exp : Tmp.c2.set(Color.valueOf("feb380")).lerp(Pal.heal, Mathf.absin(10f, 1f)));
+                Draw.alpha(1f);
                 Draw.z(Layer.block + 1);
-                Drawf.laser(team, laserRegion, laserEndRegion, x + Angles.trnsx(angle, len), y + Angles.trnsy(angle, len), target.x, target.y, bullet.strength);
+                Drawf.laser(team, laserRegion, laserEndRegion, x + Angles.trnsx(angle, len), y + Angles.trnsy(angle, len), target.x, target.y, bullet.strength / 4f);
                 Draw.color();
             }
         }
 
         @Override
         public void updateTile(){
-            phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(hasItems && !items.empty() && items.has(phaseItems)), 0.1f);
+            phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(hasItems && !items.empty()), 0.1f);
             float radius = buffRange + phaseHeat * phaseRangeBoost;
             buffing = false;
 
             if (target != null){
+                isExp = target instanceof ExpHolder;
                 if (!targetValid(target)){
                     target = null;
                 }else if (consValid() && enabled){
@@ -115,18 +116,23 @@ public class BlockOverdriveTurret extends ReloadTurret {
                     rotation = Mathf.slerpDelta(rotation, angleTo(target), 0.5f);
                     buffing = true;
                 }
+                targetTime = 0f;
             }
 
             if (cons.optionalValid() && efficiency() > 0){
                 buffingTime += edelta();
-                if (buffingTime >= buffReload){
+                if (buffingTime >= buffReload) {
                     consume();
                     buffingTime = 0f;
                 }
             }
 
-            if (timer(0, buffReload)){
-                target = Units.closestBuilding(team, x, y, radius, this::targetValid);
+            if (consValid()){
+                targetTime += edelta();
+                if (targetTime >= buffReload){
+                    target = Units.closestBuilding(team, x, y, radius, this::targetValid);
+                    targetTime = 0f;
+                }
             }
         }
 
@@ -136,7 +142,7 @@ public class BlockOverdriveTurret extends ReloadTurret {
         }
 
         public boolean targetValid(Building b){
-            return b.isValid() && b.block.canOverdrive && b != this && !proximity.contains(b) && !isBeingBuffed(b);
+            return b.isValid() && b.block.canOverdrive && b != this && !proximity.contains(b) && !isBeingBuffed(b) && b.enabled;
         }
 
         public boolean isBeingBuffed(Building b){
