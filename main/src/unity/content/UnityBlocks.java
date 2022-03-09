@@ -141,7 +141,7 @@ public class UnityBlocks{
     denseSmelter, solidifier, steelSmelter, liquifier, titaniumExtractor, lavaSmelter, diriumCrucible, coalExtractor,
 
     //defense
-    stoneWall, denseWall, steelWall, steelWallLarge, diriumWall, diriumWallLarge, shieldProjector, diriumProjector, timeMine,
+    stoneWall, denseWall, steelWall, steelWallLarge, diriumWall, diriumWallLarge, shieldProjector, diriumProjector, timeMine, shieldWall,
 
     //distribution
     steelConveyor, teleporter, teleunit;
@@ -2085,6 +2085,15 @@ public class UnityBlocks{
             size = 1;
             buffRange = 100f;
             consumes.item(UnityItems.dirium).boost();
+        }};
+
+        shieldWall = new ShieldWall("shield-wall"){{
+            requirements(Category.defense, with());
+
+            health = 500;
+            shieldHealth = 500;
+            repair = 0.3f;
+            size = 2;
         }};
 
         //endregion
