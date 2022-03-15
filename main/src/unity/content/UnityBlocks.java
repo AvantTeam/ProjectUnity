@@ -141,7 +141,7 @@ public class UnityBlocks{
     denseSmelter, solidifier, steelSmelter, liquifier, titaniumExtractor, lavaSmelter, diriumCrucible, coalExtractor,
 
     //defense
-    stoneWall, denseWall, steelWall, steelWallLarge, diriumWall, diriumWallLarge, shieldProjector, diriumProjector, timeMine, shieldWall,
+    stoneWall, denseWall, steelWall, steelWallLarge, diriumWall, diriumWallLarge, shieldProjector, diriumProjector, timeMine, shieldWall, shieldWallLarge,
 
     //distribution
     steelConveyor, teleporter, teleunit;
@@ -2092,8 +2092,29 @@ public class UnityBlocks{
 
             health = 500;
             shieldHealth = 500;
-            repair = 0.3f;
+            size = 1;
+            maxLevel = 10;
+
+            expFields = new EField[]{
+                    new ERational(v -> maxDamage = v, 48f, 24f, -3f, Stat.abilities, v -> bundle.format("stat.unity.maxdamage", v)).formatAll(false),
+                    new ELinear(v -> repair = v, 0.3f, 0.05f, Stat.repairSpeed),
+                    new ELinear(v -> shieldHealth = v, 500, 25, Stat.shieldHealth)
+            };
+        }};
+
+        shieldWallLarge = new ShieldWall("shield-wall-large"){{
+            requirements(Category.defense, with());
+
+            health = 2000;
+            shieldHealth = 2000;
             size = 2;
+            maxLevel = 25;
+
+            expFields = new EField[]{
+                    new ERational(v -> maxDamage = v, 72f, 24f, -3f, Stat.abilities, v -> bundle.format("stat.unity.maxdamage", v)).formatAll(false),
+                    new ELinear(v -> repair = v, 0.4f, 0.08f, Stat.repairSpeed),
+                    new ELinear(v -> shieldHealth = v, 800, 30, Stat.shieldHealth)
+            };
         }};
 
         //endregion

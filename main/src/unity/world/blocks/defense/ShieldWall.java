@@ -6,17 +6,19 @@ import arc.graphics.g2d.*;
 import arc.math.Mathf;
 import arc.util.Time;
 import mindustry.entities.Effect;
+import mindustry.entities.bullet.BulletType;
+import mindustry.gen.Bullet;
 import mindustry.graphics.*;
 import mindustry.ui.Bar;
-import mindustry.world.blocks.defense.Wall;
 import mindustry.world.meta.Stat;
 
 import static arc.graphics.g2d.Draw.color;
 import static arc.graphics.g2d.Lines.stroke;
 import static mindustry.Vars.tilesize;
 
-public class ShieldWall extends Wall{
-    public float shieldHealth, repair;
+public class ShieldWall extends LevelLimitWall{
+    public float shieldHealth;
+    public float repair = 0.3f;
     public TextureRegion topRegion;
 
     public Effect shieldGen = new Effect(20, e -> {
@@ -51,10 +53,10 @@ public class ShieldWall extends Wall{
         }
     }).layer(Layer.shields);
 
-    //TODO: public Efield<Float> damageReduction;
     public ShieldWall(String name) {
         super(name);
         update = true;
+        flashHit = false;
     }
 
     @Override
@@ -77,7 +79,7 @@ public class ShieldWall extends Wall{
         bars.add("shield", (ShieldWallBuild e) -> new Bar("stat.shieldhealth", Pal.accent, () -> e.shieldBroke ? 0f : 1f - e.gotDamage / shieldHealth));
     }
 
-    public class ShieldWallBuild extends WallBuild{
+    public class ShieldWallBuild extends LevelLimitWallBuild{
         public boolean shieldBroke = true;
         public float gotDamage = 0;
 
@@ -121,12 +123,22 @@ public class ShieldWall extends Wall{
         }
 
         @Override
-        public float handleDamage(float damage){
-            if (!shieldBroke){
-                gotDamage += damage;
+        public boolean collide(Bullet b){
+            if (b.team != team && b.type.absorbable){
+                b.hit = true;
+                b.type.despawnEffect.at(x, y, b.rotation(), b.type.hitColor);
+
+                if (shieldBroke){
+                    gotDamage += b.damage;
+                }else{
+                    damage(b.damage);
+                }
+
+                b.remove();
+                return false;
             }
 
-            return damage > shieldHealth - gotDamage/*wave spawn damage*/ ? super.handleDamage(damage - (shieldHealth - gotDamage)) : 0;
+            return super.collide(b);
         }
 
         @Override
