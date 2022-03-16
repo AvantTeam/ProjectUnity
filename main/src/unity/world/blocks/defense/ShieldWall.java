@@ -17,8 +17,9 @@ import static arc.graphics.g2d.Lines.stroke;
 import static mindustry.Vars.tilesize;
 
 public class ShieldWall extends LevelLimitWall{
+    private final int timerHeal = timers++;
     public float shieldHealth;
-    public float repair = 0.3f;
+    public float repair = 40f;
     public TextureRegion topRegion;
 
     public Effect shieldGen = new Effect(20, e -> {
@@ -76,7 +77,7 @@ public class ShieldWall extends LevelLimitWall{
     @Override
     public void setBars(){
         super.setBars();
-        bars.add("shield", (ShieldWallBuild e) -> new Bar("stat.shieldhealth", Pal.accent, () -> e.shieldBroke ? 0f : 1f - e.gotDamage / shieldHealth));
+        bars.add("shield", (ShieldWallBuild e) -> new Bar("stat.shieldhealth", Pal.accent, () -> e.gotDamage > shieldHealth ? 0f : 1f - e.gotDamage / shieldHealth));
     }
 
     public class ShieldWallBuild extends LevelLimitWallBuild{
@@ -94,7 +95,9 @@ public class ShieldWall extends LevelLimitWall{
         public void updateTile(){
             super.updateTile();
 
-            if (gotDamage > 0) gotDamage -= repair * delta();
+            if (timer(timerHeal, 90f)){
+                if (gotDamage > 0) gotDamage -= repair * delta();
+            }
 
             if (gotDamage >= shieldHealth && !shieldBroke){
                 shieldBroke = true;
@@ -102,7 +105,10 @@ public class ShieldWall extends LevelLimitWall{
                 shieldBreak.at(x, y);
             }
 
-            if (shieldBroke && gotDamage <= 0) shieldBroke = false;
+            if (shieldBroke && gotDamage <= 0){
+                shieldBroke = false;
+                gotDamage = 0;
+            }
 
             if (this.hit > 0) this.hit -= 0.2f * Time.delta;
         }
@@ -124,20 +130,20 @@ public class ShieldWall extends LevelLimitWall{
 
         @Override
         public boolean collide(Bullet b){
-            if (b.team != team && b.type.absorbable){
+            if (b.team != team/* && b.type.absorbable */){
                 b.hit = true;
                 b.type.despawnEffect.at(x, y, b.rotation(), b.type.hitColor);
 
-                if (shieldBroke){
+                if (!shieldBroke){
                     gotDamage += b.damage;
                 }else{
                     damage(b.damage);
                 }
+                hit = 1f;
 
                 b.remove();
                 return false;
             }
-
             return super.collide(b);
         }
 
