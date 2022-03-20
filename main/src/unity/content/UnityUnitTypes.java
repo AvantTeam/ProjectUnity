@@ -1864,7 +1864,7 @@ public class UnityUnitTypes{
             engineOffset = 41.25f;
             engineSize = 6.5f;
             rotateShooting = false;
-            hitSize = 105.5f;
+            hitSize = 92.5f;
             payloadCapacity = (8.1f * 8.1f) * tilePayload;
             buildSpeed = 6f;
             drawShields = false;
@@ -3773,6 +3773,18 @@ public class UnityUnitTypes{
             outlineColor = UnityPal.darkerOutline;
 
             antiCheatType = new AntiCheatVariables(900f, 1000f, health / 10f, 1000f, 0.2f, 6f * 60f, 3f * 60f, 15f, 1);
+
+            weapons.add(new Weapon(""){{
+                x = 4.25f;
+                y = -3.75f;
+                rotate = true;
+                reload = 4f;
+
+                bullet = new VoidPelletBulletType(5.5f, 200f){{
+                    ratioDamage = 1f / 60f;
+                    ratioStart = damage * 30f;
+                }};
+            }});
         }};
 
         voidVessel = new UnityUnitType("void-vessel"){{
@@ -4061,7 +4073,7 @@ public class UnityUnitTypes{
             hitSize = (114f * 2f) - 10f;
             angleLimit = 35f;
             segmentOffset = 114f * 2f;
-            segmentLength = 60;
+            segmentLength = 55;
             segmentCast = 11;
             barrageRange = 490f;
             lowAltitude = true;
@@ -4080,7 +4092,19 @@ public class UnityUnitTypes{
 
             antiCheatType = new AntiCheatVariables(8000, health / 190f, 10000f, health / 100f, 0.6f, 7f * 60f, 8f * 60f, 35f, 3);
 
-            weapons.add(new Weapon(name + "-destroyer-1"){{
+            weapons.add(new Weapon(""){{
+                x = 0f;
+                y = 0f;
+                shootY = 47.25f;
+                mirror = false;
+                continuous = true;
+
+                reload = 25f * 60f;
+                //firstShotDelay = 5f * 60f;
+
+                bullet = new OppressionLaserBulletType();
+            }},
+            new Weapon(name + "-destroyer-1"){{
                 x = 81.75f;
                 y = -71.5f;
                 shootY = 9.75f;
