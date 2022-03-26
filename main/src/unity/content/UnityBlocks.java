@@ -2097,8 +2097,9 @@ public class UnityBlocks{
 
             expFields = new EField[]{
                     new ERational(v -> maxDamage = v, 48f, 24f, -3f, Stat.abilities, v -> bundle.format("stat.unity.maxdamage", v)).formatAll(false),
-                    new ELinear(v -> repair = v, 40f, 5f, Stat.repairSpeed),
-                    new ELinear(v -> shieldHealth = v, 500, 25, Stat.shieldHealth)
+                    new ELinear(v -> repair = v, 5f, 7f, Stat.repairSpeed),
+                    new ELinear(v -> shieldHealth = v, 500, 25, Stat.shieldHealth),
+                    new ELinear(v -> shieldArmor = v, 0, 0.02f, Stat.abilities, v -> bundle.format("stat.shieldarmor", v)).formatAll(true)
             };
         }};
 
@@ -2112,7 +2113,7 @@ public class UnityBlocks{
 
             expFields = new EField[]{
                     new ERational(v -> maxDamage = v, 72f, 24f, -3f, Stat.abilities, v -> bundle.format("stat.unity.maxdamage", v)).formatAll(false),
-                    new ELinear(v -> repair = v, 50f, 7f, Stat.repairSpeed),
+                    new ELinear(v -> repair = v, 5f, 10f, Stat.repairSpeed),
                     new ELinear(v -> shieldHealth = v, 800, 30, Stat.shieldHealth)
             };
         }};

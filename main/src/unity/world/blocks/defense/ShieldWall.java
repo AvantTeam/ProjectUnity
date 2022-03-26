@@ -5,6 +5,8 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.Mathf;
 import arc.util.Time;
+import arc.util.io.Reads;
+import arc.util.io.Writes;
 import mindustry.entities.Effect;
 import mindustry.entities.bullet.BulletType;
 import mindustry.gen.Bullet;
@@ -18,8 +20,8 @@ import static mindustry.Vars.tilesize;
 
 public class ShieldWall extends LevelLimitWall{
     private final int timerHeal = timers++;
-    public float shieldHealth;
-    public float repair = 40f;
+    protected float shieldHealth, shieldArmor;
+    protected float repair = 50f;
     public TextureRegion topRegion;
 
     public Effect shieldGen = new Effect(20, e -> {
@@ -83,6 +85,7 @@ public class ShieldWall extends LevelLimitWall{
     public class ShieldWallBuild extends LevelLimitWallBuild{
         public boolean shieldBroke = true;
         public float gotDamage = 0;
+        public float warmup = 0;
 
         @Override
         public void created(){
@@ -95,7 +98,9 @@ public class ShieldWall extends LevelLimitWall{
         public void updateTile(){
             super.updateTile();
 
-            if (timer(timerHeal, 90f)){
+            warmup = Mathf.lerpDelta(warmup, 1f, 0.05f);
+
+            if (timer(timerHeal, 120f)){
                 if (gotDamage > 0) gotDamage -= repair * delta();
             }
 
@@ -109,6 +114,8 @@ public class ShieldWall extends LevelLimitWall{
                 shieldBroke = false;
                 gotDamage = 0;
             }
+
+            if (gotDamage < 0) gotDamage = 0;
 
             if (this.hit > 0) this.hit -= 0.2f * Time.delta;
         }
@@ -130,14 +137,16 @@ public class ShieldWall extends LevelLimitWall{
 
         @Override
         public boolean collide(Bullet b){
-            if (b.team != team/* && b.type.absorbable */){
+            if (b.team != team && b.type.speed > 0.001f && b.type.absorbable){
                 b.hit = true;
                 b.type.despawnEffect.at(x, y, b.rotation(), b.type.hitColor);
 
+                float damage = b.damage * Mathf.clamp(1.0f - shieldArmor);
+
                 if (!shieldBroke){
-                    gotDamage += b.damage;
+                    gotDamage += damage;
                 }else{
-                    damage(b.damage);
+                    damage(damage);
                 }
                 hit = 1f;
 
@@ -159,7 +168,7 @@ public class ShieldWall extends LevelLimitWall{
                 Draw.z(Layer.shields);
                 color(team.color, Color.white, Mathf.clamp(hit));
 
-                float radius = this.block.size * tilesize;
+                float radius = this.block.size * tilesize * warmup;
 
                 if(Core.settings.getBool("animatedshields")){
                     Fill.rect(x, y, radius, radius);
@@ -174,6 +183,22 @@ public class ShieldWall extends LevelLimitWall{
             }
 
             Draw.reset();
+        }
+
+        @Override
+        public void write(Writes write){
+            super.write(write);
+            write.bool(shieldBroke);
+            write.f(gotDamage);
+            write.f(warmup);
+        }
+
+        @Override
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            shieldBroke = read.bool();
+            gotDamage = read.f();
+            warmup = read.f();
         }
     }
 }
