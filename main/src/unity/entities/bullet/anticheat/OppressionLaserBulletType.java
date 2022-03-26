@@ -1,6 +1,7 @@
 package unity.entities.bullet.anticheat;
 
 import arc.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -13,8 +14,10 @@ import unity.graphics.*;
 import unity.util.*;
 
 public class OppressionLaserBulletType extends AntiCheatBulletTypeBase{
-    private static final float[] quad = new float[8];
-    protected float length = 1400f, width = 140f, cone = 380f;
+    private static final int detail = 24;
+    private static final float[] quad = new float[8], shape = new float[4 * detail], ltmp = new float[38], ltmp2 = new float[38];
+    private static final Rand rand = new Rand(), rand2 = new Rand();
+    protected float length = 2150f, width = 150f, cone = 380f;
     protected TextureRegion gradientRegion;
 
     public OppressionLaserBulletType(){
@@ -38,6 +41,22 @@ public class OppressionLaserBulletType extends AntiCheatBulletTypeBase{
             new AbilityDamageModule(40f, 350f, 6f, 0.001f, 4f),
             new ForceFieldDamageModule(8f, 20f, 220f, 6f, 1f / 40f)
         };
+    }
+
+    static{
+        int sign = 1;
+        for(int i = 0; i < detail; i++){
+            int id = i * 4;
+            float de = detail - 1f;
+            float f = Interp.circleIn.apply(i / de),
+            w = Interp.circleOut.apply(f);
+            for(int s : Mathf.signs){
+                shape[id] = w * s * sign;
+                shape[id + 1] = f;
+                id += 2;
+            }
+            sign *= -1f;
+        }
     }
 
     @Override
@@ -84,7 +103,7 @@ public class OppressionLaserBulletType extends AntiCheatBulletTypeBase{
             float fow = Mathf.clamp((b.lifetime - b.time) / 120f);
             float width = this.width * fw * fow;
             Tmp.v1.trns(b.rotation(), length).add(b);
-            Utils.collideLineLarge(b.team, b.x, b.y, Tmp.v1.x, Tmp.v1.y, width, 18, false, (e, v) -> {
+            Utils.collideLineLarge(b.team, b.x, b.y, Tmp.v1.x, Tmp.v1.y, width, 24, false, (e, v) -> {
                 float dst = b.dst(v);
                 float w = dst >= cone ? width : Interp.circleOut.apply((dst / cone)) * width;
                 if(e.within(v, w + e.hitSize() / 2f)){
@@ -117,61 +136,101 @@ public class OppressionLaserBulletType extends AntiCheatBulletTypeBase{
 
     @Override
     public void draw(Bullet b){
+        boolean bloom = Core.settings.getBool("bloom");
         float fw = b.time < 50f ? Interp.pow2Out.apply(b.time / 50f) : 1f;
         float fow = Mathf.clamp((b.lifetime - b.time) / 120f);
-        float fwr = 1f - fw;
-        float width = this.width * fw * fow + Mathf.absin(Time.time, 5f, 2f * fw * fow);
-        Draw.color(UnityPal.scarColor);
-        for(int i = 0; i < 24; i++){
-            float fin1 = Interp.circleIn.apply(i / 24f), fin2 = Interp.circleIn.apply(((i + 1f) / 24f));
-            float w1 = Interp.circleOut.apply(fin1) * width,
-            w2 = Interp.circleOut.apply(fin2) * width;
-            int q = 0;
-            for(int j = 0; j < 2; j++){
-                for(int s : Mathf.signs){
-                    if(j == 1){
-                        s *= -1;
-                        Vec2 v = Tmp.v1.trns(b.rotation(), fin2 * cone, w2 * s).add(b);
-                        quad[q] = v.x;
-                        quad[q + 1] = v.y;
-                    }else{
-                        Vec2 v = Tmp.v1.trns(b.rotation(), fin1 * cone, w1 * s).add(b);
-                        quad[q] = v.x;
-                        quad[q + 1] = v.y;
-                    }
-                    q += 2;
+        float inout = fw * fow;
+        float width = this.width * inout + Mathf.absin(Time.time, 5f, 2f * inout);
+        Draw.color(bloom ? Color.black : UnityPal.scarColor);
+        if(!bloom) Draw.blend(UnityBlending.shadowRealm);
+        for(int i = 0; i < shape.length; i += 4){
+            if(i < shape.length - 4){
+                for(int j = 0; j < quad.length; j += 2){
+                    Vec2 v = Tmp.v1.trns(b.rotation(), shape[i + j + 1] * cone, shape[i + j] * width).add(b);
+                    quad[j] = v.x;
+                    quad[j + 1] = v.y;
                 }
+                Fill.quad(quad[0], quad[1],
+                quad[2], quad[3],
+                quad[4], quad[5],
+                quad[6], quad[7]);
+            }else{
+                Vec2 v = Tmp.v1.trns(b.rotation(), length).add(b), v2 = Tmp.v2.trns(b.rotation(), cone).add(b);
+                Lines.stroke(width * 2f);
+                Lines.line(v2.x, v2.y, v.x, v.y, false);
             }
-            Draw.blend(UnityBlending.shadowRealm);
-            Fill.quad(quad[0], quad[1],
-            quad[2], quad[3],
-            quad[4], quad[5],
-            quad[6], quad[7]);
-            if(fwr > 0.0001f){
-                float z = Draw.z();
-                Draw.blend();
-                Draw.z(z + 0.0001f);
-                Lines.stroke(fwr * 3f);
+        }
+        float sin = Mathf.absin(Time.time, 3f, 1f);
+        Draw.color(UnityPal.scarColor, UnityPal.endColor, sin);
+        Draw.blend();
+        for(int i = 0; i < shape.length; i += 4){
+            if(i < shape.length - 4){
+                for(int j = 0; j < quad.length; j += 2){
+                    Vec2 v = Tmp.v1.trns(b.rotation(), shape[i + j + 1] * cone, shape[i + j] * width).add(b);
+                    quad[j] = v.x;
+                    quad[j + 1] = v.y;
+                }
+                Lines.stroke((2f + sin) * 1.5f * fow);
                 Lines.line(quad[0], quad[1], quad[6], quad[7], false);
                 Lines.line(quad[2], quad[3], quad[4], quad[5], false);
-                Draw.z(z);
+            }else{
+                for(int s : Mathf.signs){
+                    Vec2 v = Tmp.v1.trns(b.rotation(), length, width * s).add(b), v2 = Tmp.v2.trns(b.rotation(), cone, width * s).add(b);
+                    Lines.stroke((2f + sin) * 1.5f * fow);
+                    Lines.line(v2.x, v2.y, v.x, v.y, false);
+                }
             }
         }
-        Vec2 v = Tmp.v1.trns(b.rotation(), length).add(b), v2 = Tmp.v2.trns(b.rotation(), cone).add(b);
-        Draw.blend(UnityBlending.shadowRealm);
-        Lines.stroke(width * 2f);
-        Lines.line(v2.x, v2.y, v.x, v.y, false);
-        float z = Draw.z();
-        Draw.z(z + 0.0001f);
-        Draw.blend();
-        if(fwr > 0.0001f){
-            Vec2 v3 = Tmp.v3.trns(b.rotation() + 90f, width);
-            Lines.stroke(fwr * 3f);
-            Lines.line(v2.x + v3.x, v2.y + v3.y, v.x + v3.x, v.y + v3.y);
-            Lines.line(v2.x - v3.x, v2.y - v3.y, v.x - v3.x, v.y - v3.y);
+        float time = b.time;
+        rand.setSeed(b.id * 9999L);
+        for(int i = 0; i < 5; i++){
+            float d = rand.random(90f, 60 * 6f);
+            float timeOffset = rand.random(d);
+            int timeSeed = Mathf.floor((time + timeOffset) / d) + rand.nextInt();
+            float fin = ((time + timeOffset) % d) / d;
+            drawLightning(b, timeSeed, fin, fow, width);
         }
-        Draw.z(z);
         Draw.blend();
         Draw.reset();
+    }
+
+    void drawLightning(Bullet b, int seed, float fin, float fout, float width){
+        float time = b.time / 3f;
+        float f2 = time % 1f;
+        int timeSeed = (int)time;
+        float pos = 0f, max = 0f;
+        float pos2 = 0, max2 = 0f;
+
+        for(int i = 0; i < ltmp.length; i++){
+            rand2.setSeed(seed + Mathf.mod((timeSeed - i), 999999) * 9999L);
+            float r = rand2.range(1.5f);
+            rand2.setSeed(seed + Mathf.mod((timeSeed - (i + 1)), 999999) * 9999L);
+            float r2 = rand2.range(1.5f);
+            pos += r;
+            pos2 += r2;
+            ltmp[i] = pos;
+            ltmp2[i] = pos2;
+        }
+        float delta = (pos / ltmp.length) * 2f;
+        float delta2 = (pos2 / ltmp.length) * 2f;
+        for(int i = 0; i < ltmp.length; i++){
+            float v = ltmp[i] - delta * i;
+            float v2 = ltmp2[i] - delta2 * i;
+            ltmp[i] = v;
+            ltmp2[i] = v2;
+            max = Math.max(max, Math.abs(v));
+            max2 = Math.max(max2, Math.abs(v2));
+        }
+        float lx = b.x, ly = b.y;
+        Lines.stroke((1f - fin) * 6f * fout);
+        for(int i = 1; i < ltmp.length; i++){
+            float v = (ltmp[i] / max) * width;
+            float v2 = (ltmp2[i] / max2) * width;
+            float w = Mathf.lerp(v, v2, 1f - f2);
+            Vec2 nv = Tmp.v1.trns(b.rotation(), (i / (ltmp.length - 1f)) * length, w).add(b);
+            Lines.line(lx, ly, nv.x, nv.y, false);
+            lx = nv.x;
+            ly = nv.y;
+        }
     }
 }

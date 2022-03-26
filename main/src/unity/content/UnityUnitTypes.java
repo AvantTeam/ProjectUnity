@@ -141,7 +141,9 @@ public class UnityUnitTypes{
     public static @FactionDef("end") @EntityDef({Unitc.class, Endc.class, Invisiblec.class}) UnitType opticaecus;
 
     // end worm
-    public static @FactionDef("end") @EntityDef({Unitc.class, Endc.class, Wormc.class}) UnitType devourer, oppression;
+    public static @FactionDef("end") @EntityDef({Unitc.class, Endc.class, Wormc.class}) UnitType devourer;
+    public static @FactionDef("end") @EntityPoint(Oppression.class)
+    UnitType oppression;
 
     // end apocalypse
     public static @FactionDef("end") @EntityDef({Unitc.class, Endc.class, Invisiblec.class, Tentaclec.class}) UnitType apocalypse;
