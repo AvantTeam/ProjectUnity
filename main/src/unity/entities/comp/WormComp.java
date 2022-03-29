@@ -32,7 +32,7 @@ abstract class WormComp implements Unitc{
     @SyncLocal public int childId = -1, headId = -1;
 
     @Import UnitType type;
-    @Import float healthMultiplier, health, x, y;
+    @Import float healthMultiplier, health, x, y, minFormationSpeed, elevation, rotation;
     @Import boolean dead;
     @Import WeaponMount[] mounts;
     @Import Team team;
@@ -218,8 +218,9 @@ abstract class WormComp implements Unitc{
     @Override
     public float speed(){
         if(!isHead()) return 0f;
-        float strafePenalty = isGrounded() || !isPlayer() ? 1f : Mathf.lerp(1f, type.strafePenalty, Angles.angleDist(vel().angle(), rotation()) / 180f);
-        return (isCommanding() ? minFormationSpeed() * 0.98f : type.speed) * strafePenalty;
+        float strafePenalty = isGrounded() || !isPlayer() ? 1f : Mathf.lerp(1f, type.strafePenalty, Angles.angleDist(vel().angle(), rotation) / 180f);
+        float boost = Mathf.lerp(1f, type.canBoost ? type.boostMultiplier : 1f, elevation);
+        return (isCommanding() ? minFormationSpeed * 0.98f : type.speed) * strafePenalty * boost * floorSpeedMultiplier();
     }
 
     @Override

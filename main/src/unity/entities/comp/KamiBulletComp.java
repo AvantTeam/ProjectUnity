@@ -16,16 +16,66 @@ import unity.gen.*;
 abstract class KamiBulletComp implements Bulletc{
     private static final Ellipse e = new Ellipse();
     private static final Vec2 vec = new Vec2();
-    float turn, width, length, resetTime;
-    NewBulletData bdata;
+    private static float lastDelta;
+    float turn, width, length, resetTime, lastTime, fdata2;
+    int telegraph;
+    FloatSeq lastPositions;
+    KamiBulletData bdata;
 
     @Import IntSeq collided;
     @Import float x, y;
     @Import BulletType type;
     @Import Team team;
+    @Import Entityc owner;
+
+    @Insert(value = "update()", after = false)
+    private void updatePre(){
+        if(isTelegraph()){
+            lastDelta = Time.delta;
+            Time.delta = 3f * lastDelta;
+        }
+    }
+
+    @Insert(value = "update()")
+    private void updatePost(){
+        if(isTelegraph()) Time.delta = lastDelta;
+    }
+
+    @Insert(value = "update()", block = Timedc.class, after = false)
+    private void updateLastTime(){
+        lastTime = time();
+    }
 
     @Override
     public void update(){
+        if(lastPositions != null){
+            lastPositions.add(x, y);
+            if(lastPositions.size > telegraph * 4){
+                lastPositions.removeRange(0, 1);
+            }
+        }
+        if(telegraph > 0 && lastPositions == null){
+            KamiBullet b = KamiBullet.create();
+            b.x = x;
+            b.y = y;
+            b.type = type;
+            b.team = team;
+            b.owner = owner;
+            b.vel.set(vel());
+            b.lifetime = lifetime();
+            b.time = time();
+            b.drag = drag();
+            b.fdata = fdata();
+            b.fdata2 = fdata2;
+            b.bdata = bdata;
+            b.width = width;
+            b.length = length;
+            b.hitSize = hitSize();
+            b.lastPositions = new FloatSeq();
+            b.telegraph = telegraph;
+            b.add();
+            telegraph = -1;
+        }
         if(resetTime >= 60f){
             collided.clear();
             resetTime = 0f;
@@ -42,6 +92,10 @@ abstract class KamiBulletComp implements Bulletc{
     @Override
     public void remove(){
         if(bdata != null) bdata.removed(self());
+    }
+
+    boolean isTelegraph(){
+        return lastPositions != null;
     }
 
     /*
@@ -68,7 +122,7 @@ abstract class KamiBulletComp implements Bulletc{
     @Replace(2)
     @Override
     public boolean collides(Hitboxc other){
-        boolean base = type.collides && (other instanceof Teamc && ((Teamc)other).team() != team)
+        boolean base = lastPositions == null && type.collides && (other instanceof Teamc && ((Teamc)other).team() != team)
         && !(other instanceof Flyingc && !((Flyingc)other).checkTarget(type.collidesAir, type.collidesGround))
         && !(type.pierce && hasCollided(other.id()));
 

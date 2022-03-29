@@ -141,7 +141,7 @@ public class UnityBlocks{
     denseSmelter, solidifier, steelSmelter, liquifier, titaniumExtractor, lavaSmelter, diriumCrucible, coalExtractor,
 
     //defense
-    stoneWall, denseWall, steelWall, steelWallLarge, diriumWall, diriumWallLarge, shieldProjector, diriumProjector, timeMine,
+    stoneWall, denseWall, steelWall, steelWallLarge, diriumWall, diriumWallLarge, shieldProjector, diriumProjector, timeMine, shieldWall, shieldWallLarge,
 
     //distribution
     steelConveyor, teleporter, teleunit;
@@ -169,6 +169,9 @@ public class UnityBlocks{
 
     public static @FactionDef("koruh")
     Block inferno;
+
+    public static @FactionDef("koruh")
+    Block buffTurret, upgradeTurret;
 
     //---------- monolith faction ----------
     public static @FactionDef("monolith") Block
@@ -1709,12 +1712,15 @@ public class UnityBlocks{
 
                 itemDuration = 200f;
                 consumes.item(UnityItems.uranium, 2);
-                consumes.liquid(Liquids.cryofluid, 0.7f);
+                consumes.liquid(Liquids.water, 0.7f);
                 consumes.power(20f);
 
                 itemCapacity = 20;
                 powerProduction = 150f;
                 health = 1000;
+
+                plasma1 = Color.valueOf("a5e1a2");
+                plasma2 = Color.valueOf("869B84");
         }};
 
         teleporter = new Teleporter("teleporter"){{
@@ -2063,6 +2069,53 @@ public class UnityBlocks{
 
         expVoid = new ExpVoid("exp-void"){{
             requirements(Category.effect, BuildVisibility.sandboxOnly, with());
+        }};
+
+        buffTurret = new BlockOverdriveTurret("buff-turret"){{
+            requirements(Category.effect, with(Items.thorium, 60, Items.plastanium, 90, UnityItems.stone, 100, UnityItems.denseAlloy, 70));
+            health = 200;
+            size = 1;
+            buffRange = 100f;
+            consumes.item(UnityItems.steel).boost();
+        }};
+
+        upgradeTurret = new BlockOverdriveTurret("upgrade-turret"){{
+            requirements(Category.effect, with(Items.surgeAlloy, 80, UnityItems.steel, 120, UnityItems.dirium, 70));
+            health = 300;
+            size = 1;
+            buffRange = 100f;
+            consumes.item(UnityItems.dirium).boost();
+        }};
+
+        shieldWall = new ShieldWall("shield-wall"){{
+            requirements(Category.defense, with());
+
+            health = 500;
+            shieldHealth = 500;
+            size = 1;
+            maxLevel = 10;
+
+            expFields = new EField[]{
+                    new ERational(v -> maxDamage = v, 48f, 24f, -3f, Stat.abilities, v -> bundle.format("stat.unity.maxdamage", v)).formatAll(false),
+                    new ELinear(v -> repair = v, 5f, 7f, Stat.repairSpeed),
+                    new ELinear(v -> shieldHealth = v, 500, 25, Stat.shieldHealth),
+                    new ELinear(v -> shieldArmor = v, 0, 0.02f, Stat.abilities, v -> bundle.format("stat.shieldarmor", v)).formatAll(true)
+            };
+        }};
+
+        shieldWallLarge = new ShieldWall("shield-wall-large"){{
+            requirements(Category.defense, with());
+
+            health = 2000;
+            shieldHealth = 2000;
+            size = 2;
+            maxLevel = 25;
+
+            expFields = new EField[]{
+                    new ERational(v -> maxDamage = v, 72f, 24f, -3f, Stat.abilities, v -> bundle.format("stat.unity.maxdamage", v)).formatAll(false),
+                    new ELinear(v -> repair = v, 5f, 10f, Stat.repairSpeed),
+                    new ELinear(v -> shieldHealth = v, 800, 30, Stat.shieldHealth)
+            };
         }};
 
         //endregion

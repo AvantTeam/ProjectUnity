@@ -6,6 +6,8 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.pooling.*;
+import arc.util.pooling.Pool.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -17,23 +19,27 @@ import java.util.*;
 
 public class KamiAI implements UnitController{
     public static final float minRange = 350f, barrierRange = 800f;
+    protected static boolean allPatterns = true;
     private static final Vec2 vec = new Vec2();
     private static KamiPattern testPattern;
+    private static final int[] limit = new int[PatternType.values().length];
 
     public Unit unit;
     public Unit target;
     public KamiPattern pattern;
     public PatternData patternData;
     public float[] reloads = new float[16];
-    public int difficulty = 0;
+    public int difficulty = 0, stages = 0;
     public float x, y;
     public float patternTime, waitTime = 2f * 60f;
+    public Rand rand = new Rand();
 
-    protected IntSeq patternSeq = new IntSeq(false, 16);
+    protected Seq<KamiDelay> delays = new Seq<>();
+    protected Seq<KamiPattern> patterns = new Seq<>();
 
     static{
         KamiPatterns.load();
-        //testPattern = KamiPatterns.flowerPattern;
+        //testPattern = KamiPatterns.hyperSpeedPattern;
     }
 
     public void draw(){
@@ -41,11 +47,21 @@ public class KamiAI implements UnitController{
         Draw.z(Layer.flyingUnit);
         Lines.stroke(3f + Mathf.absin(12f, 1f));
         Draw.color(Tmp.c1.set(Color.red).shiftHue(Time.time));
+        Draw.blend(Blending.additive);
         Lines.circle(x, y, barrierRange);
         if(pattern != null && waitTime <= 0f){
             pattern.draw(this);
         }
+        Draw.blend();
+        Draw.reset();
         Draw.z(z);
+    }
+
+    public void updateFollowing(){
+        float range = pattern != null && pattern.followTarget ? pattern.followRange : minRange;
+        vec.trns(target.angleTo(unit), range).add(target).sub(unit).scl(0.05f * Time.delta);
+        unit.move(vec);
+        unit.lookAt(target);
     }
 
     @Override
@@ -61,7 +77,7 @@ public class KamiAI implements UnitController{
         if((waitTime > 0f || (pattern != null && pattern.followTarget)) && target != null){
             float speed = patternTime <= 0f ? Mathf.clamp(waitTime / 40f) : 1f;
             float range = pattern != null && pattern.followTarget ? pattern.followRange : minRange;
-            vec.trns(target.angleTo(unit), range).add(target).sub(unit).scl(0.05f * speed);
+            vec.trns(target.angleTo(unit), range).add(target).sub(unit).scl(0.05f * speed * Time.delta);
             unit.move(vec);
             unit.lookAt(target);
             if(patternTime <= 0f){
@@ -79,6 +95,17 @@ public class KamiAI implements UnitController{
                     unit.lookAt(target);
                 }
                 pattern.update(this);
+
+                delays.removeAll(k -> {
+                    k.delay -= Time.delta;
+                    boolean b = k.delay <= 0f;
+                    if(b){
+                        k.run.run();
+                        Pools.free(k);
+                    }
+                    return b;
+                });
+
                 patternTime -= Time.delta;
                 if(patternTime <= 0f){
                     waitTime = pattern.waitTime;
@@ -93,20 +120,43 @@ public class KamiAI implements UnitController{
         updateBarrier();
     }
 
+    public float pTime(){
+        return pattern == null ? 0f : pattern.time - patternTime;
+    }
+
     void reset(){
         Arrays.fill(reloads, 0f);
-        if(patternSeq.isEmpty()){
-            for(KamiPattern p : KamiPattern.all){
-                patternSeq.add(p.id);
-            }
+        for(KamiDelay delay : delays){
+            Pools.free(delay);
         }
-        int id = Mathf.random(0, patternSeq.size - 1);
-        pattern = KamiPattern.all.get(patternSeq.get(id));
-        if(testPattern != null) pattern = testPattern;
+        delays.clear();
+        if(testPattern == null){
+            if(patterns.isEmpty()){
+                Arrays.fill(limit, 0);
+                for(KamiPattern p : KamiPattern.all){
+                    if(allPatterns || p.type.able.get(this)) patterns.add(p);
+                }
+                patterns.shuffle();
+                if(!allPatterns) patterns.removeAll(p -> limit[p.type.ordinal()]++ >= p.type.limit);
+                patterns.sort(p -> p.type.priority);
+                /*
+                StringBuilder sp = new StringBuilder();
+                for(KamiPattern p : patterns){
+                    sp.append(p.toString()).append("\n");
+                }
+                Unity.print(sp.toString());
+                */
+            }
+            pattern = patterns.first();
+            patterns.remove(0);
+        }else{
+            pattern = testPattern;
+        }
         if(pattern.data != null) patternData = pattern.data.get();
         pattern.init(this);
         patternTime = pattern.time;
-        patternSeq.removeIndex(id);
+
+        stages++;
     }
 
     void updateBarrier(){
@@ -117,6 +167,32 @@ public class KamiAI implements UnitController{
                 u.set(vec);
             }
         }
+    }
+
+    public boolean burst(int i, float time, int bursts, float burstSpacing, Runnable begin){
+        boolean s = shoot(i, burstSpacing);
+        if(s){
+            if(reloads[i + 1] <= 0f){
+                begin.run();
+            }
+            reloads[i + 1] += 1f;
+            if(reloads[i + 1] >= bursts){
+                reloads[i] += time;
+                reloads[i + 1] = 0f;
+            }
+        }
+        return s;
+    }
+
+    public boolean burst(int i, float time, int bursts, float burstSpacing){
+        boolean s = shoot(i, burstSpacing);
+        if(s){
+            reloads[i + 1] += 1f;
+            if(reloads[i + 1] >= bursts){
+                reloads[i] += time;
+            }
+        }
+        return s;
     }
 
     public boolean shoot(int i, float time){
@@ -130,15 +206,38 @@ public class KamiAI implements UnitController{
         return unit.angleTo(target);
     }
 
+    public void run(float delay, Runnable run){
+        if(delay <= 0f){
+            run.run();
+            return;
+        }
+        KamiDelay k = Pools.obtain(KamiDelay.class, KamiDelay::new);
+        k.delay = delay;
+        k.run = run;
+        delays.add(k);
+    }
+
     @Override
     public void unit(Unit unit){
         this.unit = unit;
         x = unit.x;
         y = unit.y;
+        rand.setSeed(unit.id * 9999L);
     }
 
     @Override
     public Unit unit(){
         return unit;
+    }
+
+    static class KamiDelay implements Poolable{
+        Runnable run;
+        float delay;
+
+        @Override
+        public void reset(){
+            run = null;
+            delay = 0f;
+        }
     }
 }

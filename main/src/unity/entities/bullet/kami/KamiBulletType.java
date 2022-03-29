@@ -4,8 +4,8 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.struct.*;
 import arc.util.*;
-import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -35,14 +35,33 @@ public class KamiBulletType extends BulletType{
     @Override
     public void draw(Bullet b){
         KamiBullet kb = (KamiBullet)b;
-        float time = (b.time * 2f) + (Time.time / 2f);
-        float st = Mathf.clamp(Math.max(kb.width, kb.length) / 10f + 1.2f, 1.5f, 4f) * (1f + Mathf.absin(time, 10f, 0.33f));
-        Tmp.c1.set(Color.red).shiftHue(time);
-        drawTrail(b);
-        Draw.color(Tmp.c1);
-        Draw.rect(region, b.x, b.y, (kb.width * 2f) + st, (kb.length * 2f) + st, b.rotation());
-        Draw.color(Color.white);
-        Draw.rect(region, b.x, b.y, kb.width * 2f, kb.length * 2f, b.rotation());
+        if(!kb.isTelegraph()){
+            float time = (b.time * 2f) + (Time.time / 2f);
+            float st = Mathf.clamp(Math.max(kb.width, kb.length) / 10f + 1.2f, 1.5f, 4f) * (1f + Mathf.absin(time, 10f, 0.33f));
+            Tmp.c1.set(Color.red).shiftHue(time);
+            drawTrail(b);
+            Draw.color(Tmp.c1);
+            Draw.rect(region, b.x, b.y, (kb.width * 2f) + st, (kb.length * 2f) + st, b.rotation());
+            Draw.color(Color.white);
+            Draw.rect(region, b.x, b.y, kb.width * 2f, kb.length * 2f, b.rotation());
+        }else{
+            Draw.blend(Blending.additive);
+            FloatSeq seq = kb.lastPositions;
+            float time = Time.time / 2f;
+            float fout = 1f - Mathf.clamp(b.time - (b.lifetime - 40f)) / 40f;
+            int max = (seq.size / 2) - 1;
+            for(int i = 0; i < seq.size - 2; i += 2){
+                int s = i / 2;
+                float fin = (s + 1f) / max;
+                float x1 = seq.get(i), y1 = seq.get(i + 1), x2 = seq.get(i + 2), y2 = seq.get(i + 3);
+                Tmp.c1.set(Color.red).shiftHue(time).a(fin);
+                Draw.color(Tmp.c1);
+                Lines.stroke(3f);
+                Lines.line(x1, y1, x2, y2, false);
+                time += b.time * 2 / 3f;
+            }
+            Draw.blend();
+        }
     }
 
     @Override

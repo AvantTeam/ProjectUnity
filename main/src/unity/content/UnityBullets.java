@@ -21,6 +21,7 @@ import unity.entities.bullet.energy.*;
 import unity.entities.bullet.exp.*;
 import unity.entities.bullet.kami.*;
 import unity.entities.bullet.laser.*;
+import unity.entities.bullet.misc.BlockStatusEffectBulletType;
 import unity.gen.*;
 import unity.graphics.*;
 import unity.world.blocks.exp.*;
@@ -52,7 +53,7 @@ public class UnityBullets{
 
         scarShrapnel, scarMissile,
 
-        kamiBullet1, kamiBullet2, kamiBullet3, kamiLaser, kamiVariableLaser, kamiSmallLaser,
+        kamiBullet1, kamiBullet2, kamiBullet3, kamiLaser, kamiLaser2, kamiVariableLaser, kamiSmallLaser,
 
         ricochetSmall, ricochetMedium, ricochetBig,
 
@@ -74,7 +75,9 @@ public class UnityBullets{
 
         plasmaBullet, phantasmalBullet,
 
-        teleportLightning;
+        teleportLightning,
+
+        statusEffect, upgradeEffect;
 
     //only enhanced
     public static BasicBulletType standardDenseLarge, standardHomingLarge, standardIncendiaryLarge, standardThoriumLarge, standardDenseHeavy, standardHomingHeavy, standardIncendiaryHeavy, standardThoriumHeavy, standardDenseMassive, standardHomingMassive,
@@ -1011,6 +1014,11 @@ public class UnityBullets{
             drawSize = (length + (width * 2f)) * 2f;
         }};
 
+        kamiLaser2 = new NewKamiLaserBulletType(){{
+           damage = 200f;
+           despawnEffect = Fx.none;
+        }};
+
         kamiVariableLaser = new KamiAltLaserBulletType(60f);
 
         kamiSmallLaser = new KamiLaserBulletType(230f){{
@@ -1397,6 +1405,20 @@ public class UnityBullets{
             despawnEffect = Fx.none;
             hitEffect = Fx.hitLancer;
             keepVelocity = false;
+        }};
+
+        statusEffect = new BlockStatusEffectBulletType(0f, 0){{
+            hitEffect = despawnEffect = Fx.none;
+            lifetime = 180f;
+            width = height = 1f;
+        }};
+
+        upgradeEffect = new BlockStatusEffectBulletType(0f, 0){{
+            hitEffect = Fx.none;
+            despawnEffect = UnityFx.expPoof;
+            lifetime = 180f;
+            width = height = 1f;
+            upgrade = true;
         }};
 
         //only enhanced

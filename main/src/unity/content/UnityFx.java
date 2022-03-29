@@ -80,6 +80,26 @@ public class UnityFx{
         for(int i = 0; i < 4; i++) Drawf.tri(Tmp.v1.x, Tmp.v1.y, 4f, 4 + 1.5f * Mathf.sin(Time.time * 0.12f + e.id * 4f), i * 90f + Mathf.sin(Time.time * 0.04f + e.id * 5f) * 28f);
     }),
 
+    expDump = new Effect(75f, 400f, e -> {
+        if(!(e.data instanceof Position pos)) return;
+
+        float fin = Mathf.curve(e.fin(), 0, Mathf.randomSeed(e.id, 0.25f, 1f));
+        if(fin >= 1) return;
+
+        float a = angle(e.x, e.y, pos.getX(), pos.getY()) - 90;
+        float d = Mathf.dst(e.x, e.y, pos.getX(), pos.getY());
+        float fslope = fin * (1f - fin) * 4f;
+        float sfin = Interp.pow2In.apply(fin);
+        float spread = d / 4f;
+        Tmp.v1.trns(a, Mathf.randomSeed(e.id * 2L, -spread, spread) * fslope, d * sfin);
+        Tmp.v1.add(e.x, e.y);
+
+        color(UnityPal.exp, Color.white, 0.1f + 0.1f * Mathf.sin(Time.time * 0.03f + e.id * 3f));
+        Fill.circle(Tmp.v1.x, Tmp.v1.y, 1.5f);
+        stroke(0.5f);
+        for(int i = 0; i < 4; i++) Drawf.tri(Tmp.v1.x, Tmp.v1.y, 4f, 4 + 1.5f * Mathf.cos(Time.time * 0.12f + e.id * 4f), i * 90f + Mathf.sin(Time.time * 0.04f + e.id * 5f) * 28f);
+    }),
+
     expPoof = new Effect(60f, e -> {
         color(Pal.accent, UnityPal.exp, e.fin());
         integer = 0;
@@ -164,11 +184,11 @@ public class UnityFx{
         e.scaled(60, ee -> r[3] *= ee.fin());
 
         Draw.color(UnityPal.lancerSap3.cpy().a(0.1f+0.55f * e.fslope()));
-        Lines.swirl(e.x, e.y, r[0], 0.6f, Time.time*8-60);
-        Lines.swirl(e.x, e.y, r[1], 0.6f, Time.time*5);
+        Lines.arc(e.x, e.y, r[0], 0.6f, Time.time*8-60);
+        Lines.arc(e.x, e.y, r[1], 0.6f, Time.time*5);
         Draw.color(Pal.lancerLaser.cpy().lerp(Pal.sapBullet, 0.5f+0.5f*Mathf.sin(16*e.fin())).a(0.25f+0.8f * e.fslope()));
-        Lines.swirl(e.x, e.y, r[2], 0.4f, Time.time*-6+121);
-        Lines.swirl(e.x, e.y, r[3], 0.4f, Time.time*-4+91);
+        Lines.arc(e.x, e.y, r[2], 0.4f, Time.time*-6+121);
+        Lines.arc(e.x, e.y, r[3], 0.4f, Time.time*-4+91);
     }),
 
     laserChargeBegin = new Effect(60f, e -> {
