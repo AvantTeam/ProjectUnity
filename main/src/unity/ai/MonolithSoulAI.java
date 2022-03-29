@@ -45,7 +45,9 @@ public class MonolithSoulAI implements UnitController{
         // If it found a fitting vessel to join, move towards it and join.
         if(joinTarget != null){
             MathU.addLength(vec
-                .set(joinTarget).sub(unit),
+                .set(joinTarget)
+                .add(Mathf.randomSeedRange(unit.id, 24f), Mathf.randomSeedRange(unit.id + 1, 24f))
+                .sub(unit),
                 -unit.type.range * 0.8f
             ).limit(unit.type.speed);
             unit.moveAt(vec);
@@ -64,8 +66,13 @@ public class MonolithSoulAI implements UnitController{
             if(timer.get(1, 5f)){
                 Chunk in = formTarget.within(unit) ? formTarget : monolithWorld.getChunk(World.toTile(unit.x), World.toTile(unit.y));
                 if(in != null){
-                    Tile tile = in.monolithTiles.random();
-                    if(tile != null && !unit.forms().contains(tile) && unit.forms().size < 5) unit.form(tile);
+                    for(int i = 0; i < 3; i++){ // Try finding 3 times.
+                        Tile tile = in.monolithTiles.random();
+                        if(tile != null && !unit.forms().contains(tile) && unit.forms().size < 5){
+                            unit.form(tile);
+                            break;
+                        }
+                    }
                 }
             }
         }
