@@ -6,7 +6,7 @@ import mindustry.graphics.*;
 import static arc.graphics.Color.*;
 
 public class UnityPal{
-    public static Color
+    public static final Color
 
     plague = valueOf("a3f080"),
     plagueDark = valueOf("54de3b"),

@@ -20,7 +20,7 @@ import unity.annotations.Annotations.*;
 import unity.content.*;
 import unity.content.effects.*;
 import unity.entities.abilities.*;
-import unity.entities.bullet.energy.*;
+import unity.entities.bullet.monolith.energy.*;
 import unity.gen.*;
 import unity.graphics.*;
 import unity.graphics.MultiTrail.*;

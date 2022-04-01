@@ -22,6 +22,7 @@ import unity.entities.bullet.exp.*;
 import unity.entities.bullet.kami.*;
 import unity.entities.bullet.laser.*;
 import unity.entities.bullet.misc.BlockStatusEffectBulletType;
+import unity.entities.bullet.monolith.energy.*;
 import unity.gen.*;
 import unity.graphics.*;
 import unity.world.blocks.exp.*;

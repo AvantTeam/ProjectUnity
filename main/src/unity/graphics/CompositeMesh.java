@@ -10,6 +10,9 @@ import mindustry.graphics.Shaders.*;
 import mindustry.graphics.g3d.*;
 import mindustry.type.*;
 
+/**
+ * @author GlennFolker
+ */
 public class CompositeMesh extends PlanetMesh{
     public Seq<MeshComp> comps = new Seq<>();
 
