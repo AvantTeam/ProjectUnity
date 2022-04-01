@@ -8,6 +8,7 @@ import arc.math.geom.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import unity.content.effects.*;
 import unity.entities.bullet.anticheat.modules.*;
 import unity.graphics.*;
@@ -75,29 +76,8 @@ public class OppressionLaserBulletType extends AntiCheatBulletTypeBase{
         drawSize = length * 2f;
     }
 
-    /*
-    @Override
-    public void init(Bullet b){
-        super.init(b);
-        if(b.owner instanceof Unit){
-            Unit u = (Unit)b.owner;
-            b.data = new Vec3(u.x, u.y, u.rotation);
-        }
-    }
-     */
-
     @Override
     public void update(Bullet b){
-        /*
-        if(b.data instanceof Vec3 && b.owner instanceof Unit){
-            Unit u = (Unit)b.owner;
-            Vec3 v = (Vec3)b.data;
-            Tmp.v1.set(u).lerpDelta(v.x, v.y, 0.2f);
-            u.set(Tmp.v1);
-            v.z = Angles.moveToward(v.z, u.rotation, 0.75f);
-            u.rotation = v.z;
-        }
-        */
         if(b.timer(1, 5f)){
             float fw = b.time < 50f ? Interp.pow2Out.apply(b.time / 50f) : 1f;
             float fow = Mathf.clamp((b.lifetime - b.time) / 120f);
@@ -137,6 +117,7 @@ public class OppressionLaserBulletType extends AntiCheatBulletTypeBase{
     @Override
     public void draw(Bullet b){
         boolean bloom = Core.settings.getBool("bloom");
+        float wid = this.width / 4f;
         float fw = b.time < 50f ? Interp.pow2Out.apply(b.time / 50f) : 1f;
         float fow = Mathf.clamp((b.lifetime - b.time) / 120f);
         float inout = fw * fow;
@@ -155,9 +136,10 @@ public class OppressionLaserBulletType extends AntiCheatBulletTypeBase{
                 quad[4], quad[5],
                 quad[6], quad[7]);
             }else{
-                Vec2 v = Tmp.v1.trns(b.rotation(), length).add(b), v2 = Tmp.v2.trns(b.rotation(), cone).add(b);
+                Vec2 v = Tmp.v1.trns(b.rotation(), length + wid).add(b), v2 = Tmp.v2.trns(b.rotation(), cone).add(b);
                 Lines.stroke(width * 2f);
                 Lines.line(v2.x, v2.y, v.x, v.y, false);
+                drawEndVoid(b, v.x, v.y, width);
             }
         }
         float sin = Mathf.absin(Time.time, 3f, 1f);
@@ -174,11 +156,17 @@ public class OppressionLaserBulletType extends AntiCheatBulletTypeBase{
                 Lines.line(quad[0], quad[1], quad[6], quad[7], false);
                 Lines.line(quad[2], quad[3], quad[4], quad[5], false);
             }else{
+                long seed = b.id * 9999L + 7813;
                 for(int s : Mathf.signs){
-                    Vec2 v = Tmp.v1.trns(b.rotation(), length, width * s).add(b), v2 = Tmp.v2.trns(b.rotation(), cone, width * s).add(b);
-                    Lines.stroke((2f + sin) * 1.5f * fow);
+                    float stroke = (2f + sin) * 1.5f * fow;
+                    Vec2 v = Tmp.v1.trns(b.rotation(), length + wid, width * s).add(b), v2 = Tmp.v2.trns(b.rotation(), cone, width * s).add(b);
+                    Lines.stroke(stroke);
                     Lines.line(v2.x, v2.y, v.x, v.y, false);
+                    drawEndEdge(b, seed, v.x, v.y, width * s, stroke);
+                    seed += rand.nextInt();
                 }
+                Vec2 v = Tmp.v1.trns(b.rotation(), length + wid).add(b);
+                drawEndRed(b, v.x, v.y, width);
             }
         }
         float time = b.time;
@@ -194,12 +182,106 @@ public class OppressionLaserBulletType extends AntiCheatBulletTypeBase{
         Draw.reset();
     }
 
+    void drawEndEdge(Bullet b, long seed, float x, float y, float width, float stroke){
+        float spikeLength = this.width * 2.5f;
+        float time = Time.time;
+        rand.setSeed(b.id * 9999L + seed);
+        Drawf.tri(x, y, stroke * 1.22f, Math.abs(width) / 4f, b.rotation());
+        for(int i = 0; i < 14; i++){
+            float d = rand.random(30f, 60 * 2f);
+            float timeOffset = rand.random(d);
+            int timeSeed = Mathf.floor((time + timeOffset) / d) + rand.nextInt();
+            float fin = ((time + timeOffset) % d) / d;
+
+            rand2.setSeed(timeSeed);
+            float w = rand2.random(stroke * 3f, stroke * 5f);
+            float ofRand = rand2.random(0.5f, 0.8f);
+            float of = -width * Interp.pow3In.apply(fin) * ofRand;
+            float l = w * 5f * rand2.random(1f, 2f) * Interp.pow3Out.apply(fin);
+            float w2 = w * Mathf.slope(fin);
+            float trns = (spikeLength * ofRand) + rand2.random(60f, 110f);
+            Vec2 v = Tmp.v3.trns(b.rotation(), fin * fin * trns, of).add(x, y);
+            drawDiamond(v.x, v.y, w2, l, b.rotation());
+        }
+    }
+
+    void drawEndRed(Bullet b, float x, float y, float width){
+        float spikeLength = this.width * 3f;
+        rand.setSeed(b.id * 9999L + 17231);
+        float time = Time.time;
+        for(int i = 0; i < 27; i++){
+            float d = rand.random(40f, 60 * 3f);
+            float timeOffset = rand.random(d);
+            int timeSeed = Mathf.floor((time + timeOffset) / d) + rand.nextInt();
+            float fin = ((time + timeOffset) % d) / d;
+            float fr = 1f - fin;
+
+            rand2.setSeed(timeSeed);
+
+            float w = rand2.random(width / 8f, width / 5f);
+            float fr2 = Mathf.lerp(fr, 1f, rand2.random(0.1f, 0.6f));
+            float w2 = w * Mathf.curve(fr, 0f, 0.7f) * Mathf.curve(fin, 0f, 0.3f);
+            float l = w * 2f * rand2.random(2f, 2f) * Interp.pow3Out.apply(fin) + w * 2f * rand2.random(1f, 2f);
+            float pos1 = rand2.range(1f);
+            float pos = pos1 * Math.max(width - w2 / 2.2f, 0f);
+            float sclL = 1 + Math.abs(pos1) * 0.25f;
+            float trns = rand2.random(190f, 390f);
+            float offset = ((1f - Math.abs(pos1)) * spikeLength) + rand2.random(-8f, 42f) - (trns * 0.3f * 0.3f);
+            Vec2 v = Tmp.v3.trns(b.rotation(), fin * fin * sclL * trns + offset, pos * fr2).add(x, y);
+            drawDiamond(v.x, v.y, w2, l, b.rotation());
+        }
+    }
+
+    void drawEndVoid(Bullet b, float x, float y, float width){
+        float spikeLength = this.width * 2.5f;
+        float tx1 = Angles.trnsx(b.rotation() + 90f, width),
+        ty1 = Angles.trnsy(b.rotation() + 90f, width),
+        tx2 = Angles.trnsx(b.rotation(), spikeLength) + x,
+        ty2 = Angles.trnsy(b.rotation(), spikeLength) + y;
+        Fill.tri(x + tx1, y + ty1, x - tx1, y - ty1, tx2, ty2);
+
+        rand.setSeed(b.id * 9999L + 1411);
+        float time = Time.time;
+        for(int i = 0; i < 22; i++){
+            float d = rand.random(40f, 60 * 3f);
+            float timeOffset = rand.random(d);
+            int timeSeed = Mathf.floor((time + timeOffset) / d) + rand.nextInt();
+            float fin = ((time + timeOffset) % d) / d;
+            float fr = 1f - fin;
+
+            rand2.setSeed(timeSeed);
+
+            float w = rand2.random(width / 5f, width / 1.75f);
+            float fr2 = Mathf.lerp(fr, 1f, rand2.random(0.1f, 0.6f));
+            float w2 = w * Mathf.curve(fr, 0f, 0.8f) * Mathf.curve(fin, 0f, 0.2f);
+            float l = w * 2f * rand2.random(0.8f, 2f) * Interp.pow3Out.apply(fin);
+            float pos1 = rand2.range(1f);
+            float pos = pos1 * Math.max(width - w2 / 2.05f, 0f);
+            float sclL = 1 + Math.abs(pos1) * 0.25f;
+            float trns = rand2.random(220f, 380f);
+            float offset = ((1f - Math.abs(pos1)) * spikeLength) + rand2.random(-34f, 4f) - (trns * 0.2f * 0.2f);
+            Vec2 v = Tmp.v3.trns(b.rotation(), fin * fin * sclL * trns + offset, pos * fr2).add(x, y);
+            drawDiamond(v.x, v.y, w2, l, b.rotation());
+        }
+    }
+
+    void drawDiamond(float x, float y, float w, float h, float r){
+        float tx1 = Angles.trnsx(r + 90f, w), ty1 = Angles.trnsy(r + 90f, w),
+        tx2 = Angles.trnsx(r, h), ty2 = Angles.trnsy(r, h);
+        Fill.quad(x + tx1, y + ty1,
+        x + tx2, y + ty2,
+        x - tx1, y - ty1,
+        x - tx2, y - ty2);
+    }
+
     void drawLightning(Bullet b, int seed, float fin, float fout, float width){
+        rand2.setSeed(seed * 2L + 856387231L);
         float time = b.time / 3f;
         float f2 = time % 1f;
         int timeSeed = (int)time;
         float pos = 0f, max = 0f;
         float pos2 = 0, max2 = 0f;
+        float length = this.length + (this.width * 2f * rand2.nextFloat());
 
         for(int i = 0; i < ltmp.length; i++){
             rand2.setSeed(seed + Mathf.mod((timeSeed - i), 999999) * 9999L);
