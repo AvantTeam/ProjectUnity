@@ -6,18 +6,25 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
+import arc.util.pooling.*;
+import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
-import unity.content.UnityFx;
+import unity.entities.effects.*;
 import unity.graphics.*;
+import unity.graphics.MultiTrail.*;
 import unity.util.*;
 
 import static arc.graphics.g2d.Draw.*;
 import static arc.graphics.g2d.Lines.circle;
 import static arc.graphics.g2d.Lines.*;
 import static arc.math.Angles.*;
+import static mindustry.Vars.*;
 
 public class ShootFx{
+    private static final Color tmpCol = new Color();
+
     public static Effect
 
     laserChargeShoot = new Effect(21f, e -> {
@@ -175,6 +182,29 @@ public class ShootFx{
         });
     }),
 
+    soulConcentrateShoot = new Effect(60f, e -> {
+        int id = e.id;
+        for(int sign : Mathf.signs){
+            float r = e.foutpow() * 2f;
+
+            color(UnityPal.monolithGreen, UnityPal.monolithGreenDark, e.finpowdown());
+            for(int rsign : Mathf.signs){
+                randLenVectors(id++, 2, e.finpow() * 20f, e.rotation + sign * 90f, 30f, (x, y) ->
+                    Fill.rect(e.x + x, e.y + y, r, r, e.foutpow() * 135f * rsign)
+                );
+            }
+        }
+
+        float r = e.fout(Interp.pow5Out) * 2.4f;
+
+        color(UnityPal.monolithGreenLight, UnityPal.monolithGreen, e.fin(Interp.pow5In));
+        for(int rsign : Mathf.signs){
+            randLenVectors(id++, 3, e.fin(Interp.pow5Out) * 32f, e.rotation, 45f, (x, y) ->
+                Fill.rect(e.x + x, e.y + y, r, r, e.foutpow() * 180f * rsign)
+            );
+        }
+    }),
+
     tendenceShoot = new Effect(32f, e -> {
         TextureRegion reg = Core.atlas.find("unity-monolith-chain");
         Utils.q1.set(Vec3.Z, e.rotation + 90f).mul(Utils.q2.set(Vec3.X, 75f));
@@ -191,7 +221,7 @@ public class ShootFx{
         alpha(e.foutpowdown());
 
         blend(Blending.additive);
-        UnityDrawf.panningCircle(Core.atlas.find("circle-mid"),
+        UnityDrawf.panningCircle(Core.atlas.find("unity-line-shade"),
             e.x, e.y, w + 6f, h + 6f,
             rad, 360f, 0f,
             Utils.q1, true, Layer.flyingUnitLow - 0.01f, Layer.flyingUnit
@@ -199,6 +229,55 @@ public class ShootFx{
 
         blend();
     }).layer(Layer.flyingUnit),
+
+    pedestalShootAdd = new CustomStateEffect(() -> {
+        class State extends EffectState{
+            @Override
+            public void remove(){
+                if(data instanceof TrailHold[] data) for(TrailHold trail : data) Fx.trailFade.at(x, y, trail.width, UnityPal.monolithLight, trail.trail.copy());
+                super.remove();
+            }
+        } return Pools.obtain(State.class, State::new);
+    }, 24f, e -> {
+        if(!(e.data instanceof TexturedTrail[] data)) return;
+
+        float initAngle = Mathf.randomSeed(e.id, 360f);
+        for(int i = 0; i < data.length; i++){
+            TexturedTrail trail = data[i];
+            if(!state.isPaused()){
+                Tmp.v1
+                    .trns(initAngle + 360f / data.length * i + Time.time * 6f, 4f + e.foutpowdown() * 12f)
+                    .add(e.x, e.y);
+
+                trail.update(Tmp.v1.x, Tmp.v1.y, e.fin());
+            }
+
+            tmpCol.set(UnityPal.monolith).lerp(UnityPal.monolithLight, e.finpowdown());
+            trail.drawCap(tmpCol, 1.4f);
+            trail.draw(tmpCol, 1.4f);
+        }
+
+        color(UnityPal.monolithDark, UnityPal.monolith, e.fin());
+        randLenVectors(e.id + 1, 3, e.foutpow() * 8f, 360f, 0f, 4f, (x, y) ->
+            Fill.circle(e.x + x, e.y + y, 0.4f + e.fin() * 1.6f)
+        );
+    }){
+        @Override
+        protected EffectState inst(float x, float y, float rotation, Color color, Object data){
+            TexturedTrail[] trails = new TexturedTrail[5];
+            for(int i = 0; i < trails.length; i++){
+                trails[i] = new TexturedTrail(Core.atlas.find("unity-phantasmal-trail"), 16){{
+                    shrink = 0f;
+                    fadeAlpha = 1f;
+                    blend = Blending.additive;
+                }};
+            }
+
+            EffectState state = super.inst(x, y, rotation, color, data);
+            state.data = trails;
+            return state;
+        }
+    }.followParent(true).rotWithParent(true),
 
     coloredPlasmaShoot = new Effect(25f, e -> {
         color(Color.white, e.color, e.fin());

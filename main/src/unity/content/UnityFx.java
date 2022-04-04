@@ -1332,21 +1332,21 @@ public class UnityFx{
     ricochetTrailSmall = new Effect(12f, e -> randLenVectors(e.id, 4, e.fout() * 3.5f, (x, y) -> {
         float w = 0.3f + e.fout();
 
-        color(e.color);
+        color(UnityPal.monolith, UnityPal.monolithDark, e.fin());
         Fill.rect(e.x + x, e.y + y, w, w, 45f);
     })),
 
     ricochetTrailMedium = new Effect(16f, e -> randLenVectors(e.id, 5, e.fout() * 5f, (x, y) -> {
         float w = 0.3f + e.fout() * 1.3f;
 
-        color(e.color);
+        color(UnityPal.monolith, UnityPal.monolithDark, e.fin());
         Fill.rect(e.x + x, e.y + y, w, w, 45f);
     })),
 
     ricochetTrailBig = new Effect(20f, e -> randLenVectors(e.id, 6, e.fout() * 6.5f, (x, y) -> {
         float w = 0.3f + e.fout() * 1.7f;
 
-        color(e.color);
+        color(UnityPal.monolith, UnityPal.monolithDark, e.fin());
         Fill.rect(e.x + x, e.y + y, w, w, 45f);
     })),
 

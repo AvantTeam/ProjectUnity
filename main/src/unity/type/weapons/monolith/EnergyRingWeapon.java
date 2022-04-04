@@ -1,4 +1,4 @@
-package unity.type.weapons;
+package unity.type.weapons.monolith;
 
 import arc.graphics.*;
 import arc.graphics.g2d.*;

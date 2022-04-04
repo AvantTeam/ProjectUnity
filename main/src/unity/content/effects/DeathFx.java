@@ -76,7 +76,7 @@ public final class DeathFx{
         alpha(a);
 
         blend(Blending.additive);
-        UnityDrawf.panningCircle(Core.atlas.find("circle-mid"),
+        UnityDrawf.panningCircle(Core.atlas.find("unity-line-shade"),
             e.x, e.y, w + 6f, h + 6f,
             rad, 360f, 0f,
             rot, true, Layer.flyingUnitLow - 0.01f, Layer.flyingUnit

@@ -7,6 +7,7 @@ import arc.math.geom.*;
 import arc.util.*;
 import mindustry.entities.*;
 import mindustry.graphics.*;
+import unity.gen.*;
 import unity.graphics.*;
 import unity.util.*;
 
@@ -437,29 +438,43 @@ public class HitFx{
         lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1f + e.fout() * 3f));
     }),
 
-    monoHitSmall = new Effect(14, e -> {
+    monolithHitSmall = new Effect(14, e -> {
         color(UnityPal.monolith);
         e.scaled(7f, s -> {
             Lines.stroke(s.fout());
             Lines.square(s.x, s.y, 10f * s.fin(), 45f);
         });
+
         color(UnityPal.monolithLight);
-        Angles.randLenVectors(e.id, 5, e.fin() * 15f, (x, y) -> {
-            Fill.square(e.x + x, e.y + y, 2f * e.fout());
-        });
+        Angles.randLenVectors(e.id, 5, e.fin() * 15f, (x, y) -> Fill.square(e.x + x, e.y + y, 2f * e.fout()));
     }),
 
-    monoHitBig = new Effect(13f, e -> {
+    monolithHitBig = new Effect(13f, e -> {
         color(UnityPal.monolithLight);
-        Angles.randLenVectors(e.id, 10, e.fin() * 20f, (x, y) -> {
-            Fill.square(e.x + x, e.y + y, 5f * e.fout());
-        });
+        Angles.randLenVectors(e.id, 10, e.fin() * 20f, (x, y) -> Fill.square(e.x + x, e.y + y, 5f * e.fout()));
 
         Tmp.c1.set(UnityPal.monolith).a(e.fout(Interp.pow3In));
 
-        z(Layer.effect+1f);
+        z(Layer.effect + 1f);
         blend(Blending.additive);
         Fill.light(e.x, e.y, 4, 25f * e.fin(Interp.pow5Out), Color.clear, Tmp.c1);
         blend();
+    }),
+
+    soulConcentrateHit = new Effect(30f, e -> {
+        if(!(e.data instanceof Long data)) return;
+        float initRad = Float2.x(data), scl = Float2.y(data), radius = initRad * scl;
+
+        e.lifetime = 30f * scl;
+
+        color(UnityPal.monolithGreen, e.fout(Interp.pow5In));
+        Fill.circle(e.x, e.y, radius + e.fin(Interp.pow10Out) * 6f * scl);
+
+        stroke(e.fout() * 2f * scl, UnityPal.monolithGreenLight);
+        Lines.circle(e.x, e.y, radius + e.fin(Interp.pow10Out) * 6f * scl);
+
+        randLenVectors(e.id, (int)(8f * scl), e.finpow() * 15f * scl, (x, y) ->
+            lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fout(Interp.pow4Out) * 8f * scl)
+        );
     });
 }

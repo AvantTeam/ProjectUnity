@@ -17,16 +17,14 @@ public class CompositeMesh extends PlanetMesh{
     public Seq<MeshComp> comps = new Seq<>();
 
     /**
-     * Note that the {@link #mesh} won't be actually used.
-     * @param objects Pair of Mesh and ShaderRef. Note that all the meshes will be disposed after usage no matter what.
+     * Note that the superclass' {@link #mesh} won't be actually used.
+     * @param objects Triple of Mesh, ShaderRef, and Blending. Note that all the meshes will be disposed after usage no matter what.
      *                See {@link unity.util.GraphicUtils#copy(Mesh)}.
      */
     public CompositeMesh(Planet planet, Object... objects){
         super(planet, null, null);
-
-        ObjectMap<Mesh, ShaderRef<?>> pair = ObjectMap.of(objects);
-        for(var e : pair.entries()){
-            comps.add(new MeshComp(e.key, e.value));
+        for(int i = 0; i < objects.length - 2; i += 3){
+            comps.add(new MeshComp((Mesh)objects[i], (ShaderRef<?>)objects[i + 1], (Blending)objects[i + 2]));
         }
     }
 
@@ -43,28 +41,35 @@ public class CompositeMesh extends PlanetMesh{
 
     @Override
     public void render(PlanetParams params, Mat3D projection, Mat3D transform){
-        for(var e : comps){
-            e.shader.apply();
-        }
-
-        for(var e : comps){
-            Shader s = e.shader.shader;
-            s.bind();
-            s.setUniformMatrix4("u_proj", projection.val);
-            s.setUniformMatrix4("u_trans", transform.val);
-            s.apply();
-
-            e.mesh.render(s, Gl.triangles);
-        }
+        for(MeshComp e : comps) e.preRender();
+        for(MeshComp e : comps) e.render(projection, transform);
+        Blending.normal.apply();
     }
 
     public static class MeshComp{
         public final Mesh mesh;
         public final ShaderRef<?> shader;
+        public final Blending blend;
 
-        MeshComp(Mesh mesh, ShaderRef<?> shader){
+        MeshComp(Mesh mesh, ShaderRef<?> shader, Blending blend){
             this.mesh = mesh;
             this.shader = shader;
+            this.blend = blend;
+        }
+
+        public void preRender(){
+            shader.apply();
+        }
+
+        public void render(Mat3D projection, Mat3D transform){
+            Shader s = shader.shader;
+            s.bind();
+            s.setUniformMatrix4("u_proj", projection.val);
+            s.setUniformMatrix4("u_trans", transform.val);
+            s.apply();
+
+            blend.apply();
+            mesh.render(s, Gl.triangles);
         }
     }
 

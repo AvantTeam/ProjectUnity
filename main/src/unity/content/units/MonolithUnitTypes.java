@@ -25,7 +25,7 @@ import unity.gen.*;
 import unity.graphics.*;
 import unity.graphics.MultiTrail.*;
 import unity.type.*;
-import unity.type.weapons.*;
+import unity.type.weapons.monolith.*;
 import unity.util.*;
 
 import static mindustry.Vars.*;
@@ -202,7 +202,7 @@ public final class MonolithUnitTypes{
                     Draw.alpha(a);
 
                     Draw.blend(Blending.additive);
-                    UnityDrawf.panningCircle(Core.atlas.find("circle-mid"),
+                    UnityDrawf.panningCircle(Core.atlas.find("unity-line-shade"),
                         soul.x, soul.y, w + 6f, h + 6f,
                         rad, 360f, 0f,
                         rot, true, Layer.flyingUnitLow - 0.01f, Layer.flyingUnit
@@ -227,44 +227,32 @@ public final class MonolithUnitTypes{
             outlineColor = UnityPal.darkOutline;
 
             weapons.add(new Weapon(name + "-shotgun"){{
+                layerOffset = -0.01f;
                 top = false;
                 x = 5.25f;
                 y = -0.25f;
+                shootY = 5f;
 
                 reload = 60f;
                 recoil = 2.5f;
-                shots = 12;
-                shotDelay = 0f;
-                spacing = 0.3f;
                 inaccuracy = 0.5f;
-                velocityRnd = 0.2f;
                 shootSound = Sounds.shootBig;
 
-                bullet = new BasicBulletType(3.5f, 6f){
-                    {
-                        lifetime = 60f;
-                        trailWidth = width = height = 2f;
-                        weaveScale = 3f;
-                        weaveMag = 5f;
-                        homingPower = 0.7f;
+                bullet = new JoiningBulletType(3.5f, 36f){{
+                    lifetime = 60f;
+                    radius = 10f;
+                    weaveScale = 5f;
+                    weaveMag = 2f;
+                    homingPower = 0.07f;
+                    homingRange = range();
+                    sensitivity = 0.5f;
 
-                        shootEffect = Fx.hitLancer;
-                        hitEffect = despawnEffect = HitFx.monoHitSmall;
-                        trailColor = frontColor = Pal.lancerLaser;
-                        backColor = Pal.lancerLaser.cpy().mul(0.7f);
-
-                        trailLength = 6;
-                    }
-
-                    @Override
-                    public void draw(Bullet b){
-                        drawTrail(b);
-
-                        Draw.color(frontColor);
-                        Fill.circle(b.x, b.y, width);
-                        Draw.color();
-                    }
-                };
+                    trailInterval = 3f;
+                    trailColor = UnityPal.monolithGreen;
+                    hitEffect = despawnEffect = HitFx.soulConcentrateHit;
+                    shootEffect = ShootFx.soulConcentrateShoot;
+                    smokeEffect = Fx.lightningShoot;
+                }};
             }});
         }};
 
@@ -297,28 +285,80 @@ public final class MonolithUnitTypes{
 
                 bullet = new RicochetBulletType(3f, 72f, "shell"){
                     {
-                        width = 20f;
+                        width = 16f;
                         height = 20f;
                         lifetime = 60f;
                         frontColor = UnityPal.monolithLight;
                         backColor = UnityPal.monolith.cpy().mul(0.75f);
                         trailColor = UnityPal.monolithDark.cpy().mul(0.5f);
 
-                        trailEffect = UnityFx.ricochetTrailSmall;
+                        trailChance = 0.25f;
+                        trailEffect = UnityFx.ricochetTrailBig;
                         shootEffect = Fx.lightningShoot;
-                        hitEffect = despawnEffect = HitFx.monoHitBig;
+                        hitEffect = despawnEffect = HitFx.monolithHitBig;
                     }
 
                     @Override
                     public void init(Bullet b){
                         super.init(b);
                         for(int i = 0; i < 3; i++){
-                            subBullet.create(b, b.x, b.y, b.vel.angle());
+                            subBullet.create(b, b.x, b.y, b.rotation());
                             Sounds.spark.at(b.x, b.y, Mathf.random(0.6f, 0.8f));
                         }
                     }
                 };
-            }});
+            }}, new ChargeShotgunWeapon(""){
+                {
+                    mirror = false;
+                    rotate = true;
+                    rotateSpeed = 8f;
+                    x = 0f;
+                    y = 4f;
+                    shootX = 0f;
+                    shootY = 24f;
+                    shots = 5;
+                    shotDelay = 3f;
+                    reload = 72f;
+                    addSequenceTime = 25f;
+                    shootCone = 90f;
+
+                    addEffect = ShootFx.pedestalShootAdd;
+                    addedEffect = HitFx.monolithHitBig;
+                    shootSound = UnitySounds.chainyShot;
+
+                    bullet = new BasicBulletType(6f, 32f, "unity-twisting-shell"){{
+                        width = 12f;
+                        height = 16f;
+                        shrinkY = 0f;
+                        lifetime = 36f;
+                        homingPower = 0.14f;
+                        homingRange = range();
+
+                        frontColor = UnityPal.monolith;
+                        backColor = UnityPal.monolithDark;
+
+                        trailChance = 0.25f;
+                        trailEffect = UnityFx.ricochetTrailBig;
+                        shootEffect = Fx.lightningShoot;
+                        hitEffect = despawnEffect = HitFx.monolithHitBig;
+                    }};
+                }
+
+                @Override
+                public void drawCharge(float x, float y, float rotation, float shootAngle, Unit unit, ChargeShotgunMount mount){
+                    if(bullet instanceof BasicBulletType b){
+                        float z = Draw.z();
+                        Draw.z(Layer.bullet);
+
+                        Draw.color(b.backColor);
+                        Draw.rect(b.backRegion, x, y, b.width, b.height, shootAngle - 90f);
+                        Draw.color(b.frontColor);
+                        Draw.rect(b.frontRegion, x, y, b.width, b.height, shootAngle - 90f);
+
+                        Draw.z(z);
+                    }
+                }
+            });
         }};
 
         pilaster = new UnityUnitType("pilaster"){{
@@ -597,7 +637,7 @@ public final class MonolithUnitTypes{
                 trailColor = UnityPal.monolithDark;
                 shootEffect = Fx.lancerLaserShoot;
                 smokeEffect = Fx.hitLancer;
-                hitEffect = despawnEffect = HitFx.monoHitSmall;
+                hitEffect = despawnEffect = HitFx.monolithHitSmall;
 
                 splashDamage = 60f;
                 splashDamageRadius = 10f;
@@ -668,7 +708,7 @@ public final class MonolithUnitTypes{
                         trailColor = UnityPal.monolith;
                         shootEffect = Fx.lancerLaserShoot;
                         smokeEffect = Fx.hitLancer;
-                        hitEffect = despawnEffect = HitFx.monoHitBig;
+                        hitEffect = despawnEffect = HitFx.monolithHitBig;
 
                         lightning = 3;
                         lightningDamage = 12f;
@@ -878,6 +918,12 @@ public final class MonolithUnitTypes{
                         if(!headless && trailLength > 0 && b.trail == null) b.trail = trail.get(trailLength);
                         super.updateTrail(b);
                     }
+
+                    @Override
+                    public void removed(Bullet b){
+                        super.removed(b);
+                        b.trail = null;
+                    }
                 };
             }});
         }};
@@ -980,7 +1026,7 @@ public final class MonolithUnitTypes{
                     public void draw(Bullet b){
                         super.draw(b);
 
-                        TextureRegion reg = Core.atlas.white(), light = Core.atlas.find("circle-mid");
+                        TextureRegion reg = Core.atlas.white(), light = Core.atlas.find("unity-line-shade");
 
                         Lines.stroke(2f);
                         for(int i = 0; i < 2; i++){
@@ -1013,6 +1059,12 @@ public final class MonolithUnitTypes{
                     public void updateTrail(Bullet b){
                         if(!headless && trailLength > 0 && b.trail == null) b.trail = trail.get(trailLength);
                         super.updateTrail(b);
+                    }
+
+                    @Override
+                    public void removed(Bullet b){
+                        super.removed(b);
+                        b.trail = null;
                     }
                 };
             }});

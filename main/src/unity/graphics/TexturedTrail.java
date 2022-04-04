@@ -21,7 +21,7 @@ public class TexturedTrail extends Trail{
     /** The trail's width shrink as it goes, in percentage. `1f` makes the trail triangle-shaped. */
     public float shrink = 1f;
     /** The trail's alpha as it goes, in percentage. `1f` makes the trail's tail completely invisible. */
-    public float fadeAlpha;
+    public float fadeAlpha = 0f;
     /** The trail's mix color alpha, used in {@link #draw(Color, float)}. Fades as the trail goes. */
     public float mixAlpha = 0.5f;
     /** The trail's blending. */

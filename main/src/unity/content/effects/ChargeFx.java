@@ -4,7 +4,6 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.math.geom.*;
 import arc.util.*;
 import arc.util.pooling.*;
 import mindustry.content.*;
@@ -133,7 +132,15 @@ public class ChargeFx{
         UnityDrawf.shiningCircle(e.id, Time.time, e.x, e.y, e.fin() * 7.5f, 6, 25f, 20f, 2.5f * e.fin());
     }),
 
-    tendenceCharge = new Effect(40f, e -> {
+    tendenceCharge = new CustomStateEffect(() -> {
+        class State extends EffectState{
+            @Override
+            public void remove(){
+                if(data instanceof TrailHold[] data) for(TrailHold trail : data) Fx.trailFade.at(x, y, trail.width, UnityPal.monolithLight, trail.trail.copy());
+                super.remove();
+            }
+        } return Pools.obtain(State.class, State::new);
+    }, 40f, e -> {
         if(!(e.data instanceof TrailHold[] data)) return;
 
         color(UnityPal.monolith, UnityPal.monolithLight, e.fin());
@@ -158,108 +165,21 @@ public class ChargeFx{
         stroke(Mathf.curve(e.fin(), 0.5f) * 1.4f, UnityPal.monolithLight);
         Lines.circle(e.x, e.y, e.fout() * 64f);
     }){
-        boolean initialized;
-        final int trailAmount = 12;
-        final int trailLength = 8;
-
-        // Why must `#create` be a static method...
         @Override
-        public void at(Position pos){
-            create(pos.getX(), pos.getY(), 0, Color.white, null);
-        }
-
-        @Override
-        public void at(Position pos, boolean parentize){
-            create(pos.getX(), pos.getY(), 0, Color.white, parentize ? pos : null);
-        }
-
-        @Override
-        public void at(Position pos, float rotation){
-            create(pos.getX(), pos.getY(), rotation, Color.white, null);
-        }
-
-        @Override
-        public void at(float x, float y){
-            create(x, y, 0, Color.white, null);
-        }
-
-        @Override
-        public void at(float x, float y, float rotation){
-            create(x, y, rotation, Color.white, null);
-        }
-
-        @Override
-        public void at(float x, float y, float rotation, Color color){
-            create(x, y, rotation, color, null);
-        }
-
-        @Override
-        public void at(float x, float y, Color color){
-            create(x, y, 0, color, null);
-        }
-
-        @Override
-        public void at(float x, float y, float rotation, Color color, Object data){
-            create(x, y, rotation, color, data);
-        }
-
-        @Override
-        public void at(float x, float y, float rotation, Object data){
-            create(x, y, rotation, Color.white, data);
-        }
-
-        void create(float x, float y, float rotation, Color color, Object data){
-            if(headless || !Core.settings.getBool("effects")) return;
-
-            if(Core.camera.bounds(Tmp.r1).overlaps(Tmp.r2.setCentered(x, y, clip))){
-                if(!initialized){
-                    initialized = true;
-                    init();
-                }
-
-                if(startDelay <= 0f){
-                    inst(x, y, rotation, color, data);
-                }else{
-                    Time.runTask(startDelay, () -> inst(x, y, rotation, color, data));
-                }
-            }
-        }
-
-        void inst(float x, float y, float rotation, Color color, Object data){
-            CustomEffectState entity = Pools.obtain(CustomEffectState.class, CustomEffectState::new);
-            entity.effect = this;
-            entity.rotation = baseRotation + rotation;
-            entity.data = createTrails();
-            entity.lifetime = lifetime;
-            entity.set(x, y);
-            entity.color.set(color);
-            if(followParent && data instanceof Posc p){
-                entity.parent = p;
-                entity.rotWithParent = rotWithParent;
-            }
-
-            entity.add();
-        }
-
-        TrailHold[] createTrails(){
-            TrailHold[] trails = new TrailHold[trailAmount];
+        protected EffectState inst(float x, float y, float rotation, Color color, Object data){
+            TrailHold[] trails = new TrailHold[12];
             for(int i = 0; i < trails.length; i++){
                 Tmp.v1.trns(Mathf.random(360f), Mathf.random(24f, 64f));
-                trails[i] = new TrailHold(new TexturedTrail(Core.atlas.find("unity-phantasmal-trail"), trailLength){{
+                trails[i] = new TrailHold(new TexturedTrail(Core.atlas.find("unity-phantasmal-trail"), 8){{
                     shrink = 1f;
                     fadeAlpha = 0.5f;
                     blend = Blending.additive;
                 }}, Tmp.v1.x, Tmp.v1.y, Mathf.random(1f, 2f));
             }
-            return trails;
-        }
 
-        static class CustomEffectState extends EffectState{
-            @Override
-            public void remove(){
-                if(data instanceof TrailHold[] data) for(TrailHold trail : data) Fx.trailFade.at(x, y, trail.width, UnityPal.monolithLight, trail.trail.copy());
-                super.remove();
-            }
+            EffectState state = super.inst(x, y, rotation, color, data);
+            state.data = trails;
+            return state;
         }
     }.followParent(true);
 }

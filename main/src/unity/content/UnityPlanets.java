@@ -23,13 +23,15 @@ public class UnityPlanets{
         megalith = new Planet("megalith", Planets.sun, 1f, 3){{
             generator = new MegalithPlanetGenerator();
             meshLoader = () -> new CompositeMesh(this,
-                //planet
+                // Planet.
                 CompositeMesh.defMesh(this, 6),
                 CompositeMesh.defShader(this),
+                Blending.normal,
 
-                //ring
+                // Ring.
                 GraphicUtils.copy(UnityModels.megalithring.meshes.first()),
-                new ShaderRef<>(UnityShaders.megalithRingShader, UnityShaders.megalithRingShader.cons(this))
+                new ShaderRef<>(UnityShaders.megalithRingShader, UnityShaders.megalithRingShader.cons(this)),
+                Blending.additive
             );
 
             accessible = true;

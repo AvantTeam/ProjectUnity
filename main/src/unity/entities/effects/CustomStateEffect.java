@@ -10,7 +10,11 @@ import mindustry.entities.*;
 import mindustry.gen.*;
 
 public class CustomStateEffect extends Effect{
-    Prov<? extends EffectState> stateProvider;
+    public Prov<? extends EffectState> stateProvider;
+
+    public CustomStateEffect(float lifetime, Cons<EffectContainer> container){
+        this(EffectState::create, lifetime, container);
+    }
 
     public CustomStateEffect(Prov<? extends EffectState> prov, float lifetime, Cons<EffectContainer> container){
         this(prov, lifetime, 50f, container);
@@ -66,22 +70,27 @@ public class CustomStateEffect extends Effect{
         create(x, y, rotation, Color.white, data);
     }
 
-    void create(float x, float y, float rotation, Color color, Object data){
+    protected void create(float x, float y, float rotation, Color color, Object data){
         if(Vars.headless || !Core.settings.getBool("effects")) return;
 
         if(Core.camera.bounds(Tmp.r1).overlaps(Tmp.r2.setCentered(x, y, clip))){
-            var entity = stateProvider.get();
-            entity.effect = this;
-            entity.rotation = baseRotation + rotation;
-            entity.data = data;
-            entity.lifetime = lifetime;
-            entity.set(x, y);
-            entity.color.set(color);
-            if(followParent && data instanceof Posc p){
-                entity.parent = p;
-                entity.rotWithParent = rotWithParent;
-            }
-            entity.add();
+            inst(x, y, rotation, color, data).add();
         }
+    }
+
+    protected EffectState inst(float x, float y, float rotation, Color color, Object data){
+        EffectState e = stateProvider.get();
+        e.effect = this;
+        e.rotation = baseRotation + rotation;
+        e.data = data;
+        e.lifetime = lifetime;
+        e.set(x, y);
+        e.color.set(color);
+        if(followParent && data instanceof Posc p){
+            e.parent = p;
+            e.rotWithParent = rotWithParent;
+        }
+
+        return e;
     }
 }
