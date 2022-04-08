@@ -10,6 +10,7 @@ import mindustry.graphics.*;
 import unity.graphics.*;
 
 import static arc.graphics.g2d.Draw.*;
+import static arc.graphics.g2d.Lines.*;
 import static arc.math.Angles.*;
 
 public class ParticleFx{
@@ -45,5 +46,12 @@ public class ParticleFx{
         });
 
         blend();
-    }).layer(Layer.flyingUnit - 0.01f);
+    }).layer(Layer.flyingUnit - 0.01f),
+
+    lightningPivot = new Effect(36f, e -> {
+        stroke(2f, e.color);
+        randLenVectors(e.id, 3, e.foutpowdown() * 32f, (x, y) ->
+            lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fin() * 6f)
+        );
+    });
 }

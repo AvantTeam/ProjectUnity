@@ -28,6 +28,7 @@ public class TexturedTrail extends Trail{
     public Blending blend = Blending.normal;
 
     private static final float[] vertices = new float[24];
+    private static final Color tmp = new Color();
 
     // sigh.
     protected final FloatSeq points;
@@ -83,18 +84,16 @@ public class TexturedTrail extends Trail{
 
         int psize = points.size;
         if(psize > 0){
-            float[] items = points.items;
-
-            int i = psize - 4;
-            float x1 = items[i], y1 = items[i + 1], w1 = items[i + 2], w = w1 * width / (psize / 4f) * i / 4f * 2f;
-            if(w1 <= 0.001f) return;
+            float v = points.items[psize - 1], w = lastW * width / (psize / 4f) * (psize - 4) / 4f * 2f;
+            if(w <= 0.001f) return;
 
             Draw.blend(blend);
             Draw.mixcol(color, mixAlpha);
 
-            Draw.rect(capRegion, x1, y1, w, w, -Mathf.radDeg * lastAngle + 90f);
+            Draw.alpha(v * fadeAlpha + (1f - fadeAlpha));
+            Draw.rect(capRegion, lastX, lastY, w, w, -Mathf.radDeg * lastAngle - 90f);
 
-            Draw.mixcol();
+            Draw.reset();
             Draw.blend();
         }
     }
@@ -139,10 +138,10 @@ public class TexturedTrail extends Trail{
                 nx = Mathf.sin(z2) * fs2, ny = Mathf.cos(z2) * fs2,
 
                 mv1 = Mathf.lerp(v2, v, rv1), mv2 = Mathf.lerp(v2, v, rv2),
-                col1 = Tmp.c1.set(Draw.getColor()).a(rv1 * fadeAlpha + (1f - fadeAlpha)).toFloatBits(),
-                col2 = Tmp.c1.set(Draw.getColor()).a(rv2 * fadeAlpha + (1f - fadeAlpha)).toFloatBits(),
-                mix1 = Tmp.c1.set(color).a(rv1 * mixAlpha).toFloatBits(),
-                mix2 = Tmp.c1.set(color).a(rv2 * mixAlpha).toFloatBits();
+                col1 = tmp.set(Draw.getColor()).a(rv1 * fadeAlpha + (1f - fadeAlpha)).clamp().toFloatBits(),
+                col2 = tmp.set(Draw.getColor()).a(rv2 * fadeAlpha + (1f - fadeAlpha)).clamp().toFloatBits(),
+                mix1 = tmp.set(color).a(rv1 * mixAlpha).clamp().toFloatBits(),
+                mix2 = tmp.set(color).a(rv2 * mixAlpha).clamp().toFloatBits();
 
             vertices[0] = x1 - cx;
             vertices[1] = y1 - cy;
@@ -197,7 +196,7 @@ public class TexturedTrail extends Trail{
             points.add(x, y, width, 0f);
         }
 
-        lastAngle = -Angles.angleRad(x, y, lastX, lastY);
+        lastAngle = -Angles.angleRad(x, y, lastX, lastY) + Mathf.pi;
         lastX = x;
         lastY = y;
         lastW = width;
@@ -210,24 +209,24 @@ public class TexturedTrail extends Trail{
         if(psize > 0){
             float[] items = points.items;
 
-            float maxDist = 0f;
+            float maxDst = 0f;
             for(int i = 0; i < psize; i += 4){
                 float
                     x1 = items[i], y1 = items[i + 1],
                     dst = i < psize - 4 ? Mathf.dst(x1, y1, items[i + 4], items[i + 5]) : Mathf.dst(x1, y1, lastX, lastY);
 
-                maxDist += dst;
+                maxDst += dst;
                 items[i + 3] = dst;
             }
 
-            float frac = length / (points.size / 4f);
+            float frac = (points.size / 4f) / length;
             float first = items[3];
 
             float last = 0f;
             for(int i = 0; i < psize; i += 4){
                 float v = items[i + 3];
 
-                items[i + 3] = (v + last - first) / maxDist * frac;
+                items[i + 3] = Mathf.clamp((v + last - first) / maxDst * frac);
                 last += v;
             }
         }

@@ -217,7 +217,7 @@ public class ShootFx{
             Utils.q1, Layer.flyingUnitLow - 0.01f, Layer.flyingUnit
         );
 
-        color(Color.black, UnityPal.monolithDark, 0.5f);
+        color(Color.black, UnityPal.monolithDark, 0.67f);
         alpha(e.foutpowdown());
 
         blend(Blending.additive);

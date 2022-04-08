@@ -1,10 +1,12 @@
 package unity.content.units;
 
 import arc.*;
+import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -198,7 +200,7 @@ public final class MonolithUnitTypes{
                         rot, Layer.flyingUnitLow - 0.01f, Layer.flyingUnit
                     );
 
-                    Draw.color(Color.black, UnityPal.monolithDark, 0.5f);
+                    Draw.color(Color.black, UnityPal.monolithDark, 0.67f);
                     Draw.alpha(a);
 
                     Draw.blend(Blending.additive);
@@ -239,12 +241,12 @@ public final class MonolithUnitTypes{
                 shootSound = Sounds.shootBig;
 
                 bullet = new JoiningBulletType(3.5f, 36f){{
-                    lifetime = 60f;
+                    lifetime = 48f;
                     radius = 10f;
                     weaveScale = 5f;
                     weaveMag = 2f;
                     homingPower = 0.07f;
-                    homingRange = range();
+                    homingRange = range() * 2f;
                     sensitivity = 0.5f;
 
                     trailInterval = 3f;
@@ -287,14 +289,15 @@ public final class MonolithUnitTypes{
                     {
                         width = 16f;
                         height = 20f;
-                        lifetime = 60f;
+                        lifetime = 36f;
                         frontColor = UnityPal.monolithLight;
                         backColor = UnityPal.monolith.cpy().mul(0.75f);
                         trailColor = UnityPal.monolithDark.cpy().mul(0.5f);
 
                         trailChance = 0.25f;
                         trailEffect = UnityFx.ricochetTrailBig;
-                        shootEffect = Fx.lightningShoot;
+                        shootEffect = Fx.hitLaserBlast;
+                        smokeEffect = Fx.lightningShoot;
                         hitEffect = despawnEffect = HitFx.monolithHitBig;
                     }
 
@@ -331,15 +334,16 @@ public final class MonolithUnitTypes{
                         height = 16f;
                         shrinkY = 0f;
                         lifetime = 36f;
-                        homingPower = 0.14f;
-                        homingRange = range();
+                        homingPower = 0.07f;
+                        homingRange = range() * 2f;
 
                         frontColor = UnityPal.monolith;
                         backColor = UnityPal.monolithDark;
 
                         trailChance = 0.25f;
                         trailEffect = UnityFx.ricochetTrailBig;
-                        shootEffect = Fx.lightningShoot;
+                        shootEffect = Fx.hitLaserBlast;
+                        smokeEffect = Fx.lightningShoot;
                         hitEffect = despawnEffect = HitFx.monolithHitBig;
                     }};
                 }
@@ -385,15 +389,14 @@ public final class MonolithUnitTypes{
                 shootY = 6f;
 
                 rotate = true;
-                recoil = 2.5f;
-                reload = 25f;
-                shots = 3;
-                spacing = 3f;
-                shootSound = Sounds.spark;
+                recoil = 3f;
+                reload = 40f;
+                shootSound = Sounds.laser;
 
-                bullet = new LightningBulletType(){{
-                    damage = 30f;
-                    lightningLength = 18;
+                bullet = new LaserBulletType(160f){{
+                    lifetime = 27f;
+                    width = 20f;
+                    smokeEffect = ShootFx.tendenceShoot;
                 }};
             }}, new Weapon("unity-monolith-large-weapon-mount"){{
                 top = false;
@@ -403,11 +406,179 @@ public final class MonolithUnitTypes{
 
                 rotate = true;
                 rotateSpeed = 10f;
-                recoil = 3f;
-                reload = 40f;
-                shootSound = Sounds.laser;
+                recoil = 2.5f;
+                reload = 120f;
+                shootSound = UnitySounds.chainyShot;
 
-                bullet = new LaserBulletType(160f);
+                bullet = new BasicBulletType(2.7f, 32f, "unity-twisting-shell"){
+                    {
+                        width = 16f;
+                        height = 20f;
+                        lifetime = 54f;
+                        scaleVelocity = true;
+
+                        frontColor = UnityPal.monolith;
+                        backColor = UnityPal.monolithDark;
+                        trailColor = UnityPal.monolithLight;
+                        trailLength = 16;
+                        trailWidth = 1f;
+                        trailChance = 0.33f;
+
+                        shootEffect = Fx.hitLaserBlast;
+                        smokeEffect = ShootFx.tendenceShoot;
+
+                        fragBullets = 1;
+                        fragVelocityMin = fragVelocityMax = 0f;
+                        fragBullet = new BulletType(0f, 16f){
+                            private final Seq<Healthc> all = new Seq<>();
+
+                            {
+                                lifetime = 96f;
+                                absorbable = hittable = collides = false;
+                                keepVelocity = false;
+                                hitSound = Sounds.spark;
+                            }
+
+                            float frac(Bullet b){
+                                return Interp.pow5Out.apply(Mathf.curve(b.fin(), 0f, 0.1f)) * Interp.pow3Out.apply(1f - Mathf.curve(b.fin(), 0.8f, 1f));
+                            }
+
+                            float radius(Bullet b){
+                                float s = frac(b);
+                                return 26f * s + Mathf.absin(6f, 3f) * s;
+                            }
+
+                            @Override
+                            public void update(Bullet b){
+                                updateTrail(b);
+
+                                float r = radius(b);
+                                if(Mathf.chanceDelta(0.17f)){
+                                    Tmp.v1.trns(Mathf.random(360f), Mathf.random(r)).add(b);
+                                    ParticleFx.monolithSpark.at(Tmp.v1.x, Tmp.v1.y, 0f);
+                                }
+
+                                if(Mathf.chanceDelta(0.33f)){
+                                    ParticleFx.lightningPivot.at(b.x, b.y, UnityPal.monolith);
+                                }
+
+                                if(b.timer(0, 60f)){
+                                    UnityFx.monolithRingEffect.at(b.x, b.y, 0f, 1f);
+                                }
+
+                                if(b.timer(1, 16f)){
+                                    all.clear();
+                                    Units.nearbyEnemies(b.team, b.x, b.y, 96f, all::add);
+                                    Units.nearbyBuildings(b.x, b.y, 96f, e -> {
+                                        if(e.isValid() && e.team != b.team) all.add(e);
+                                    });
+
+                                    all.sort((Floatf<Healthc>)b::dst2);
+
+                                    int len = Math.min(all.size, 3);
+                                    for(int i = 0; i < len; i++){
+                                        Healthc target = all.get(i);
+                                        target.damage(damage);
+
+                                        Fx.chainLightning.at(b.x, b.y, 0f, UnityPal.monolithLight, target);
+                                        Fx.hitLancer.at(target);
+                                    }
+
+                                    if(len > 0) hitSound.at(b);
+                                }
+                            }
+
+                            @Override
+                            public void draw(Bullet b){
+                                float r = radius(b);
+
+                                Fill.light(b.x, b.y, Lines.circleVertices(r), r, Tmp.c1.set(UnityPal.monolithDark).a(0f), Tmp.c2.set(UnityPal.monolith).a(0.8f));
+                                Lines.stroke(2f, UnityPal.monolithLight);
+                                Lines.circle(b.x, b.y, r);
+
+                                float ir = r / 4f;
+                                Draw.color(Tmp.c1.set(UnityPal.monolithDark).a(0.67f));
+                                UnityDrawf.shiningCircle(b.id, Time.time * 0.67f, b.x, b.y, ir, 4, 16f, 30f, ir * 2f, 90f);
+
+                                ir *= 0.8f;
+                                Draw.color(Tmp.c1.set(UnityPal.monolith).a(0.84f));
+                                UnityDrawf.shiningCircle(b.id, Time.time * 0.67f, b.x, b.y, ir, 4, 16f, 30f, ir * 2f, 90f);
+
+                                ir *= 0.8f;
+                                Draw.color(UnityPal.monolithLight);
+                                UnityDrawf.shiningCircle(b.id, Time.time * 0.67f, b.x, b.y, ir, 4, 16f, 30f, ir * 2f, 90f);
+
+                                Draw.reset();
+                            }
+                        };
+                    }
+
+                    TexturedTrail createTrail(){
+                        return new TexturedTrail(Core.atlas.find("unity-phantasmal-trail"), trailLength){{
+                            blend = Blending.additive;
+                            shrink = 0f;
+                            fadeAlpha = 1f;
+                        }};
+                    }
+
+                    @Override
+                    public void updateTrail(Bullet b){
+                        if(!headless && trailLength > 0 && b.trail == null) b.trail = new MultiTrail(new TrailHold(createTrail()), new TrailHold(createTrail()), new TrailHold(createTrail())){
+                            boolean dead;
+                            float time = Time.time;
+
+                            {
+                                trailChance = 0.25f;
+                                trailColor = UnityPal.monolithLight;
+                            }
+
+                            @Override
+                            public void update(float x, float y, float width){
+                                if(!dead){
+                                    time += Time.delta * 7.5f;
+                                    if(!b.isAdded()) dead = true;
+                                }
+
+                                for(int i = 0; i < trails.length; i++){
+                                    TrailHold trail = trails[i];
+                                    Tmp.v1.trns(b.id * 56f + Time.time * 4f + 360f / trails.length * i, 6f).add(x, y);
+
+                                    trail.trail.update(Tmp.v1.x, Tmp.v1.y, width * trail.width);
+                                    if(trailChance > 0f && Mathf.chanceDelta(trailChance)){
+                                        trailEffect.at(Tmp.v1.x, Tmp.v1.y, trail.width * trailWidth, trailColor);
+                                    }
+                                }
+
+                                lastX = x;
+                                lastY = y;
+                            }
+
+                            @Override
+                            public void drawCap(Color color, float width){}
+
+                            @Override
+                            public void draw(Color color, float width){
+                                for(TrailHold trail : trails){
+                                    Trail t = trail.trail;
+
+                                    Color col = trail.color == null ? color : trail.color;
+                                    float w = width * trail.width;
+
+                                    t.draw(col, w);
+                                    t.drawCap(col, w);
+                                }
+                            }
+                        };
+
+                        super.updateTrail(b);
+                    }
+
+                    @Override
+                    public void removed(Bullet b){
+                        super.removed(b);
+                        b.trail = null;
+                    }
+                };
             }});
         }};
 
@@ -835,11 +1006,11 @@ public final class MonolithUnitTypes{
             outlineColor = UnityPal.darkOutline;
 
             // just to show you how much I hate boxed types
-            interface FuncI<T>{
-                T get(int arg);
+            interface TrailType{
+                TexturedTrail get(int arg);
             }
 
-            FuncI<TexturedTrail> trail = length -> new TexturedTrail(Core.atlas.find("unity-phantasmal-trail"), length){{
+            TrailType trail = length -> new TexturedTrail(Core.atlas.find("unity-phantasmal-trail"), length){{
                 blend = Blending.additive;
                 shrink = 0f;
                 fadeAlpha = 1f;
@@ -940,11 +1111,11 @@ public final class MonolithUnitTypes{
             outlineColor = UnityPal.darkOutline;
 
             // again, i hate boxed types
-            interface FuncI<T>{
-                T get(int arg);
+            interface TrailType{
+                TexturedTrail get(int arg);
             }
 
-            FuncI<TexturedTrail> trail = length -> new TexturedTrail(Core.atlas.find("unity-phantasmal-trail"), length){{
+            TrailType trail = length -> new TexturedTrail(Core.atlas.find("unity-phantasmal-trail"), length){{
                 blend = Blending.additive;
                 shrink = 1f;
                 fadeAlpha = 0.5f;

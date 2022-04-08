@@ -21,7 +21,6 @@ import static mindustry.Vars.*;
  * Joins another bullet of the same identifier if within reach. Similar velocity is put to higher priority.
  * @author GlennFolker
  */
-//TODO maximum target damage, damage multiplier, etc etc
 public class JoiningBulletType extends BulletType{
     /** Similar to {@link #homingPower}, but used when attracting to join target. */
     public float sensitivity = 0.2f;
@@ -29,6 +28,10 @@ public class JoiningBulletType extends BulletType{
     public float joinDelay = 0f;
     /** The maximum speed of the attraction. */
     public float attractMaxSpeed = -1f;
+    /** The maximum joint damage. */
+    public float maxDamage = -1f;
+    /** The scale of damage yielded when joining. */
+    public float yieldScl = 1.25f;
     /** The join target must be within this angle cone. */
     public float joinCone = 60f;
     /** How far can the bullet sense other joining bullets. */
@@ -38,6 +41,7 @@ public class JoiningBulletType extends BulletType{
 
     public float radius = 10f;
     public Color[] colors = {UnityPal.monolithGreenLight, UnityPal.monolithGreen, UnityPal.monolithGreenDark};
+    public Color edgeColor = UnityPal.monolithGreenLight.cpy().a(0.8f);
 
     public Effect joinEffect = Fx.none;
 
@@ -52,22 +56,40 @@ public class JoiningBulletType extends BulletType{
         super(speed, damage);
         identifier = lastID++;
     }
-    
+
     public float bulletRadius(Bullet b){
-        return 0.6f + 0.4f * (b.damage / damage);
+        return 0.84f + 0.16f * (b.damage / damage);
+    }
+
+    @Override
+    public void init(){
+        if(attractMaxSpeed == -1f) attractMaxSpeed = speed * 2.5f;
+        if(maxDamage == -1f) maxDamage = damage * 4f;
+        super.init();
+    }
+
+    @Override
+    public void init(Bullet b){
+        super.init(b);
+
+        JoinData data = new JoinData();
+        data.bullet = b;
+        b.data = data;
     }
 
     @Override
     public void draw(Bullet b){
         drawTrail(b);
 
-        float r = radius * bulletRadius(b), stroke = 2f;
+        float r = radius * bulletRadius(b), start = radius * 0.8f, stroke = 2f, z = Layer.flyingUnitLow - 0.01f;
 
         Lines.stroke(stroke);
         TextureRegion reg = Core.atlas.white(), light = Core.atlas.find("unity-line-shade");
 
-        int amount = Mathf.round(r / stroke);
-        for(int i = 0; i < amount; i++){
+        int startAmount = Math.max(Mathf.round((r - start) / stroke), 0),
+            amount = Math.max(Mathf.round(r / stroke), 1);
+
+        for(int i = startAmount; i < amount; i++){
             Draw.color(colors[Mathf.randomSeed(b.id - i, 0, colors.length - 1)]);
             float sr = stroke + i * stroke;
 
@@ -81,50 +103,22 @@ public class JoiningBulletType extends BulletType{
             UnityDrawf.panningCircle(reg,
                 b.x, b.y, 1f, 1f,
                 sr, 360f, 0f,
-                Utils.q1, true, Layer.flyingUnitLow - 0.01f, Layer.flyingUnit
+                Utils.q1, true, z, z
             );
 
-            Draw.color(Draw.getColor(), Color.black, 0.67f);
+            Draw.color(Draw.getColor(), Color.black, 0.33f);
             Draw.blend(Blending.additive);
             UnityDrawf.panningCircle(light,
                 b.x, b.y, 5f, 5f,
                 sr, 360f, 0f,
-                Utils.q1, true, Layer.flyingUnitLow - 0.01f, Layer.flyingUnit
+                Utils.q1, true, z, z
             );
 
             Draw.blend();
         }
 
+        Fill.light(b.x, b.y, Lines.circleVertices(r), r, Color.clear, edgeColor);
         Draw.reset();
-    }
-
-    @Override
-    public void drawTrail(Bullet b){
-        if(trailLength > 0 && b.trail != null){
-            float z = Draw.z();
-            Draw.z(z - 0.0001f);
-
-            float r = radius * bulletRadius(b);
-            b.trail.draw(trailColor, r);
-            b.trail.drawCap(trailColor, r);
-
-            Draw.z(z);
-        }
-    }
-
-    @Override
-    public void init(){
-        if(attractMaxSpeed == -1f) attractMaxSpeed = speed * 2.5f;
-        super.init();
-    }
-
-    @Override
-    public void init(Bullet b){
-        super.init(b);
-
-        JoinData data = new JoinData();
-        data.bullet = b;
-        b.data = data;
     }
 
     @Override
@@ -155,7 +149,7 @@ public class JoiningBulletType extends BulletType{
             if(!e.isAdded() || e == b) return;
 
             float dot = 0f;
-            if(e.team == b.team && (lastBullet == null || (
+            if(e.damage < maxDamage && e.team == b.team && (lastBullet == null || (
                 e.type instanceof JoiningBulletType type && type.identifier == identifier &&
                 Angles.within(b.rotation(), e.rotation(), joinCone)
             ) && (dot = b.vel.dot(e.vel)) >= minDot && lastScore < dot)){
@@ -196,10 +190,10 @@ public class JoiningBulletType extends BulletType{
                     b.owner == null ? t.owner : b.owner, b.team,
                     (b.x + t.x) / 2f, (b.y + t.y) / 2f,
                     Mathf.slerp(data.rotation, other != null ? other.rotation : t.rotation(), Mathf.clamp(t.vel.len() / b.vel.len() / 2f)),
-                    b.damage + t.damage,
+                    Math.max(b.damage, t.damage) + Math.min(b.damage, t.damage) * yieldScl,
                     1f, Math.max(bt, tt) + Math.min(bt, tt) / 2f, null
                 );
-                n.hitSize *= 0.4f + 0.6f * (n.damage / damage);
+                n.hitSize *= bulletRadius(n);
             }
 
             if(b.time >= joinDelay){

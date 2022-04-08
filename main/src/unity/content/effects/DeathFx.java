@@ -72,7 +72,7 @@ public final class DeathFx{
             rot, Layer.flyingUnitLow - 0.01f, Layer.flyingUnit
         );
 
-        color(Color.black, UnityPal.monolithDark, 0.5f);
+        color(Color.black, UnityPal.monolithDark, 0.67f);
         alpha(a);
 
         blend(Blending.additive);
@@ -84,8 +84,4 @@ public final class DeathFx{
 
         blend();
     }).layer(Layer.flyingUnit);
-
-    private DeathFx(){
-        throw new AssertionError();
-    }
 }

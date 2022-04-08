@@ -110,18 +110,20 @@ public class ChargeShotgunWeapon extends Weapon{
 
                 addedEffect.at(bulletX, bulletY, weaponRotation, m.transform);
             }
-
-            for(int i = 0; i < m.added.size - 1; i += 2){
-                Vec2 current = m.added.get(i), target = m.added.get(i + 1);
-                target.setAngle(Mathf.sin(Time.time + Mathf.randomSeed(unit.id, Mathf.pi * 2f * weaveScale) + (Mathf.pi * 2f * weaveScale) * ((float)i / m.added.size), weaveScale, weaveAmount / 2f * m.loaded()) + 90f);
-
-                if(!Float.isNaN(current.x) && !Float.isNaN(current.y)){
-                    current.setAngle(Mathf.slerpDelta(current.angle(), target.angle(), 0.08f));
-                }
-            }
         }else{
             m.adding = false;
             m.add = m.addSequence = 0f;
+        }
+
+        for(int i = 0; i < m.added.size - 1; i += 2){
+            Vec2 current = m.added.get(i), target = m.added.get(i + 1);
+            if(!m.releasing){
+                target.setAngle(Mathf.sin(Time.time + Mathf.randomSeed(unit.id, Mathf.pi * 2f * weaveScale) + (Mathf.pi * 2f * weaveScale) * ((float) i / m.added.size), weaveScale, weaveAmount / 2f * m.loaded()) + 90f);
+            }
+
+            if(!Float.isNaN(current.x) && !Float.isNaN(current.y)){
+                current.setAngle(Mathf.slerpDelta(current.angle(), target.angle(), 0.08f));
+            }
         }
 
         boolean can = unit.canShoot();
@@ -255,7 +257,7 @@ public class ChargeShotgunWeapon extends Weapon{
 
                 releaseEffect.at(pos.x, pos.y, rot, parentize ? m.transform : null);
             }
-            
+
             Time.run((m.loaded() - 1) * shotDelay + firstShotDelay, () -> {
                 m.releasing = false;
                 m.added.clear();
