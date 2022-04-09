@@ -13,7 +13,6 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import unity.entities.effects.*;
 import unity.graphics.*;
-import unity.graphics.MultiTrail.*;
 import unity.util.*;
 
 import static arc.graphics.g2d.Draw.*;
@@ -210,7 +209,9 @@ public class ShootFx{
         Utils.q1.set(Vec3.Z, e.rotation + 90f).mul(Utils.q2.set(Vec3.X, 75f));
         float t = e.finpow(), w = reg.width * scl * 0.4f * t, h = reg.height * scl * 0.4f * t, rad = 9f + t * 8f;
 
+        color(UnityPal.monolithLight);
         alpha(e.foutpowdown());
+
         UnityDrawf.panningCircle(reg,
             e.x, e.y, w, h,
             rad, 360f, e.fin(Interp.pow2Out) * 90f * Mathf.sign(e.id % 2 == 0) + e.id * 30f,
@@ -234,7 +235,7 @@ public class ShootFx{
         class State extends EffectState{
             @Override
             public void remove(){
-                if(data instanceof TrailHold[] data) for(TrailHold trail : data) Fx.trailFade.at(x, y, trail.width, UnityPal.monolithLight, trail.trail.copy());
+                if(data instanceof TexturedTrail[] data) for(TexturedTrail trail : data) Fx.trailFade.at(x, y, 1f, UnityPal.monolithLight, trail.copy());
                 super.remove();
             }
         } return Pools.obtain(State.class, State::new);
@@ -278,6 +279,48 @@ public class ShootFx{
             return state;
         }
     }.followParent(true).rotWithParent(true),
+
+    phantasmalLaserShoot = new Effect(36f, e -> {
+        float
+            radius = e.data instanceof Float data ? data : 9f,
+
+            fin = e.fin(),
+            f1 = Mathf.curve(fin, 0f, 0.76f),
+            f2 = Mathf.curve(fin, 0.12f, 0.88f),
+            f3 = Mathf.curve(fin, 0.24f, 1f);
+
+        TextureRegion reg = Core.atlas.white();
+        Utils.q1.set(Vec3.Z, e.rotation + 90f).mul(Utils.q2.set(Vec3.X, 75f));
+
+        stroke(2f);
+
+        color(UnityPal.monolithLight, Interp.pow3Out.apply(f1) * Interp.pow10Out.apply(1f - f1));
+        Tmp.v1.trns(e.rotation, -8f + Interp.bounceOut.apply(f1) * 8f - Interp.pow3In.apply(Mathf.curve(f1, 0.67f, 1f)) * 4f).add(e.x, e.y);
+
+        UnityDrawf.panningCircle(reg,
+            Tmp.v1.x, Tmp.v1.y, 1f, 1f,
+            radius, 360f, 0f, Utils.q1,
+            true, Layer.bullet - 0.001f, Layer.bullet + 0.001f
+        );
+
+        color(UnityPal.monolith, Interp.pow3Out.apply(f2) * Interp.pow10Out.apply(1f - f2));
+        Tmp.v1.trns(e.rotation, -2f + Interp.bounceOut.apply(f2) * 8f - Interp.pow3In.apply(Mathf.curve(f2, 0.67f, 1f)) * 4f).add(e.x, e.y);
+
+        UnityDrawf.panningCircle(reg,
+            Tmp.v1.x, Tmp.v1.y, 1f, 1f,
+            radius * 0.75f, 360f, 0f, Utils.q1,
+            true, Layer.bullet - 0.001f, Layer.bullet + 0.001f
+        );
+
+        color(UnityPal.monolithDark, Interp.pow3Out.apply(f3) * Interp.pow10Out.apply(1f - f3));
+        Tmp.v1.trns(e.rotation, 4f + Interp.bounceOut.apply(f3) * 8f - Interp.pow3In.apply(Mathf.curve(f3, 0.67f, 1f)) * 4f).add(e.x, e.y);
+
+        UnityDrawf.panningCircle(reg,
+            Tmp.v1.x, Tmp.v1.y, 1f, 1f,
+            radius * 0.5f, 360f, 0f, Utils.q1,
+            true, Layer.bullet - 0.001f, Layer.bullet + 0.001f
+        );
+    }),
 
     coloredPlasmaShoot = new Effect(25f, e -> {
         color(Color.white, e.color, e.fin());

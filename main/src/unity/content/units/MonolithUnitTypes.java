@@ -396,7 +396,8 @@ public final class MonolithUnitTypes{
                 bullet = new LaserBulletType(160f){{
                     lifetime = 27f;
                     width = 20f;
-                    smokeEffect = ShootFx.tendenceShoot;
+                    sideAngle = 60f;
+                    smokeEffect = ShootFx.phantasmalLaserShoot;
                 }};
             }}, new Weapon("unity-monolith-large-weapon-mount"){{
                 top = false;
@@ -414,6 +415,7 @@ public final class MonolithUnitTypes{
                     {
                         width = 16f;
                         height = 20f;
+                        shrinkY = 0f;
                         lifetime = 54f;
                         scaleVelocity = true;
 
@@ -426,6 +428,7 @@ public final class MonolithUnitTypes{
 
                         shootEffect = Fx.hitLaserBlast;
                         smokeEffect = ShootFx.tendenceShoot;
+                        hitEffect = despawnEffect = HitFx.monolithHitBig;
 
                         fragBullets = 1;
                         fragVelocityMin = fragVelocityMax = 0f;
@@ -437,6 +440,7 @@ public final class MonolithUnitTypes{
                                 absorbable = hittable = collides = false;
                                 keepVelocity = false;
                                 hitSound = Sounds.spark;
+                                hitEffect = despawnEffect = Fx.none;
                             }
 
                             float frac(Bullet b){
@@ -497,15 +501,15 @@ public final class MonolithUnitTypes{
                                 Lines.circle(b.x, b.y, r);
 
                                 float ir = r / 4f;
-                                Draw.color(Tmp.c1.set(UnityPal.monolithDark).a(0.67f));
+                                Draw.color(Tmp.c1.set(Pal.lancerLaser).a(0.4f));
                                 UnityDrawf.shiningCircle(b.id, Time.time * 0.67f, b.x, b.y, ir, 4, 16f, 30f, ir * 2f, 90f);
 
-                                ir *= 0.8f;
-                                Draw.color(Tmp.c1.set(UnityPal.monolith).a(0.84f));
+                                ir *= 0.5f;
+                                Draw.color(Tmp.c1.set(Pal.lancerLaser));
                                 UnityDrawf.shiningCircle(b.id, Time.time * 0.67f, b.x, b.y, ir, 4, 16f, 30f, ir * 2f, 90f);
 
-                                ir *= 0.8f;
-                                Draw.color(UnityPal.monolithLight);
+                                ir *= 0.5f;
+                                Draw.color();
                                 UnityDrawf.shiningCircle(b.id, Time.time * 0.67f, b.x, b.y, ir, 4, 16f, 30f, ir * 2f, 90f);
 
                                 Draw.reset();
@@ -535,13 +539,13 @@ public final class MonolithUnitTypes{
                             @Override
                             public void update(float x, float y, float width){
                                 if(!dead){
-                                    time += Time.delta * 7.5f;
+                                    time += Time.delta * 10f * (Mathf.randomSeed(b.id, 0, 1) * 2 - 1);
                                     if(!b.isAdded()) dead = true;
                                 }
 
                                 for(int i = 0; i < trails.length; i++){
                                     TrailHold trail = trails[i];
-                                    Tmp.v1.trns(b.id * 56f + Time.time * 4f + 360f / trails.length * i, 6f).add(x, y);
+                                    Tmp.v1.trns(b.id * 56f + Time.time * 4f + 360f / trails.length * i, 8f).add(x, y);
 
                                     trail.trail.update(Tmp.v1.x, Tmp.v1.y, width * trail.width);
                                     if(trailChance > 0f && Mathf.chanceDelta(trailChance)){
@@ -1005,7 +1009,6 @@ public final class MonolithUnitTypes{
             rotateShooting = false;
             outlineColor = UnityPal.darkOutline;
 
-            // just to show you how much I hate boxed types
             interface TrailType{
                 TexturedTrail get(int arg);
             }
@@ -1110,7 +1113,6 @@ public final class MonolithUnitTypes{
             rotateShooting = false;
             outlineColor = UnityPal.darkOutline;
 
-            // again, i hate boxed types
             interface TrailType{
                 TexturedTrail get(int arg);
             }
