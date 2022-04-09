@@ -852,9 +852,9 @@ public class UnityBullets{
             fragBullets = 8;
         }};
 
-        surgeBomb = new SurgeBulletType(7f, 100f){{
+        surgeBomb = new BasicBulletType(7f, 100f){{
             width = height = 30f;
-            maxRange = 30f;
+            sprite = "large-bomb";
             backColor = Pal.surge;
             frontColor = Color.white;
             mixColorTo = Color.white;
@@ -877,9 +877,9 @@ public class UnityBullets{
             scaleVelocity = true;
             fragBullet = plasmaFragTriangle;
 
-            shocks = 10;
-            shockDamage = 680f / 5f;
-            shockLength = 20;
+            lightning = 10;
+            lightningDamage = 680f / 5f;
+            lightningLength = 20;
         }};
 
         pylonLightning = new LightningBulletType(){{
