@@ -41,7 +41,7 @@ public class JoiningBulletType extends BulletType{
 
     public float radius = 10f;
     public Color[] colors = {UnityPal.monolithGreenLight, UnityPal.monolithGreen, UnityPal.monolithGreenDark};
-    public Color edgeColor = UnityPal.monolithGreenLight.cpy().a(0.8f);
+    public Color edgeColor = UnityPal.monolithGreenLight.cpy().a(0.8f), centerColor = UnityPal.monolithGreenDark.cpy().a(0f);
 
     public Effect joinEffect = Fx.none;
 
@@ -86,6 +86,8 @@ public class JoiningBulletType extends BulletType{
         Lines.stroke(stroke);
         TextureRegion reg = Core.atlas.white(), light = Core.atlas.find("unity-line-shade");
 
+        Fill.light(b.x, b.y, Lines.circleVertices(r), r, centerColor, edgeColor);
+
         int startAmount = Math.max(Mathf.round((r - start) / stroke), 0),
             amount = Math.max(Mathf.round(r / stroke), 1);
 
@@ -117,7 +119,6 @@ public class JoiningBulletType extends BulletType{
             Draw.blend();
         }
 
-        Fill.light(b.x, b.y, Lines.circleVertices(r), r, Color.clear, edgeColor);
         Draw.reset();
     }
 

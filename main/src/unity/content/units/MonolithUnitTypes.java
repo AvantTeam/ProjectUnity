@@ -32,6 +32,7 @@ import unity.util.*;
 
 import static mindustry.Vars.*;
 
+/** @author GlennFolker */
 public final class MonolithUnitTypes{
     public static @FactionDef("monolith") @EntityPoint(MonolithSoul.class)
     UnitType monolithSoul;
@@ -77,24 +78,35 @@ public final class MonolithUnitTypes{
                 deathExplosionEffect = DeathFx.monolithSoulDeath;
                 forceWreckRegion = true;
 
-                trailType = unit -> new MultiTrail(new TrailHold(new TexturedTrail(Core.atlas.find("unity-phantasmal-trail"), 25){{
+                trailType = unit -> new MultiTrail(new TrailHold(new TexturedTrail(Core.atlas.find("unity-soul-trail"), 25){{
                     shrink = 1f;
                     fadeAlpha = 0.5f;
                     blend = Blending.additive;
-                }}, engineColor), new TrailHold(new TexturedTrail(Core.atlas.find("unity-phantasmal-trail"), 32){{
+                }}, engineColor), new TrailHold(new TexturedTrail(Core.atlas.find("unity-soul-trail"), 32){{
                     shrink = 1f;
                     fadeAlpha = 0.5f;
                     blend = Blending.additive;
-                }}, -4.8f, 6f, 0.75f, engineColor), new TrailHold(new TexturedTrail(Core.atlas.find("unity-phantasmal-trail"), 32){{
+                }}, -4.8f, 6f, 0.75f, engineColor), new TrailHold(new TexturedTrail(Core.atlas.find("unity-soul-trail"), 32){{
                     shrink = 1f;
                     fadeAlpha = 0.5f;
                     blend = Blending.additive;
-                }}, 4.8f, 6f, 0.75f, engineColor)){{
-                    rotation = (trail, x, y) -> unit.isValid() ? unit.rotation : trail.calcRot(x, y);
-                    trailChance = 0.33f;
-                    trailWidth = 1.8f;
-                    trailColor = engineColor;
-                }};
+                }}, 4.8f, 6f, 0.75f, engineColor)){
+                    {
+                        rotation = (trail, x, y) -> unit.isValid() ? unit.rotation : trail.calcRot(x, y);
+                        trailChance = 0.33f;
+                        trailWidth = 1.8f;
+                        trailColor = engineColor;
+                    }
+
+                    @Override
+                    public void drawCap(Color color, float width){}
+
+                    @Override
+                    public void draw(Color color, float width){
+                        super.draw(color, width);
+                        super.drawCap(color, width);
+                    }
+                };
             }
 
             @Override
@@ -108,7 +120,7 @@ public final class MonolithUnitTypes{
                         copy.rotation = MultiTrail::calcRot;
 
                         TrailFx.trailFadeLow.at(soul.x, soul.y, width, engineColor, copy);
-                        soul.trail = new MultiTrail(new TrailHold(new TexturedTrail(Core.atlas.find("unity-phantasmal-trail"), trailLength){{
+                        soul.trail = new MultiTrail(new TrailHold(new TexturedTrail(Core.atlas.find("unity-soul-trail"), trailLength){{
                             shrink = 1f;
                             fadeAlpha = 0.5f;
                             blend = Blending.additive;
@@ -518,7 +530,7 @@ public final class MonolithUnitTypes{
                     }
 
                     TexturedTrail createTrail(){
-                        return new TexturedTrail(Core.atlas.find("unity-phantasmal-trail"), trailLength){{
+                        return new TexturedTrail(Core.atlas.find("unity-soul-trail"), trailLength){{
                             blend = Blending.additive;
                             shrink = 0f;
                             fadeAlpha = 1f;
@@ -1011,9 +1023,7 @@ public final class MonolithUnitTypes{
 
             interface TrailType{
                 TexturedTrail get(int arg);
-            }
-
-            TrailType trail = length -> new TexturedTrail(Core.atlas.find("unity-phantasmal-trail"), length){{
+            } TrailType trail = length -> new TexturedTrail(Core.atlas.find("unity-phantasmal-trail"), length){{
                 blend = Blending.additive;
                 shrink = 0f;
                 fadeAlpha = 1f;
@@ -1115,9 +1125,7 @@ public final class MonolithUnitTypes{
 
             interface TrailType{
                 TexturedTrail get(int arg);
-            }
-
-            TrailType trail = length -> new TexturedTrail(Core.atlas.find("unity-phantasmal-trail"), length){{
+            } TrailType trail = length -> new TexturedTrail(Core.atlas.find("unity-phantasmal-trail"), length){{
                 blend = Blending.additive;
                 shrink = 1f;
                 fadeAlpha = 0.5f;

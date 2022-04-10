@@ -905,7 +905,6 @@ public class UnityBullets{
                 for(int i = 0; i < 24; i++){
                     Time.run(2f * i, () -> {
                         pylonLightning.create(b, b.x, b.y, b.vel().angle());
-
                         Sounds.spark.at(b.x, b.y, Mathf.random(0.6f, 0.9f));
                     });
                 }
@@ -913,8 +912,11 @@ public class UnityBullets{
         };
 
         pylonLaserSmall = new LaserBulletType(192f){{
+            lifetime = 24f;
             length = 180f;
             width = 24f;
+            sideAngle = 60f;
+            shootEffect = ShootFx.phantasmalLaserShoot;
         }};
 
         monumentRailBullet = new PointBulletType(){{
