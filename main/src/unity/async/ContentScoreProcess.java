@@ -170,7 +170,7 @@ public class ContentScoreProcess implements AsyncProcess{
 
         for(int i = 0; i < seq.size; i++){
             ContentScore cs = get(item, seq.get(i));
-            if(cs.loadScore() > last){
+            if(cs.loadScore() > last || tmp == null){
                 tmp = cs.as();
                 last = cs.score;
             }
@@ -185,7 +185,7 @@ public class ContentScoreProcess implements AsyncProcess{
 
         for(int i = 0; i < seq.size; i++){
             ContentScore cs = get(liquid, seq.get(i));
-            if(cs.loadScore() > last){
+            if(cs.loadScore() > last || tmp == null){
                 tmp = cs.as();
                 last = cs.score;
             }
@@ -620,7 +620,7 @@ public class ContentScoreProcess implements AsyncProcess{
                     for(int i = 0; i < itemConsumes.size; i += 2){
                         is += getItemStackScore(itemConsumes.get(i), itemConsumes.get(i + 1));
                     }
-                }else if(itemFilter != null){
+                }else if(itemFilter != null && itemFilter.size > 0){
                     is += get(getMaxFilter(itemFilter)).loadScore();
                 }
                 if((optional & 1) != 0){
@@ -629,7 +629,7 @@ public class ContentScoreProcess implements AsyncProcess{
 
                 if(liquid != -1){
                     ls += get(ContentType.liquid, liquid).loadScore() * liquidAmount;
-                }else if(liquidFilter != null){
+                }else if(liquidFilter != null && liquidFilter.size > 0){
                     ls += get(getMaxFilterLiquid(liquidFilter)).loadScore() * liquidAmount;
                 }
                 if((optional & 2) != 0){
