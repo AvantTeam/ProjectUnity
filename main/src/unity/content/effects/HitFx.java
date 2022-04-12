@@ -325,6 +325,35 @@ public class HitFx{
         });
     }),
 
+    endDeathLaserHit = new Effect(35f, e -> {
+        if(!(e.data instanceof Float)) return;
+        Rand r = Utils.seedr;
+        float rad = Math.max(20f, (Float)e.data);
+        int smokeAmount = 8 + (int)(rad / 9);
+        int sparkAmount = 2 + (int)(rad / 25);
+
+        r.setSeed(e.id * 9999L);
+        color(UnityPal.scarColor, Color.darkGray, e.fin());
+        for(int i = 0; i < smokeAmount; i++){
+            float rot = e.rotation + r.range(4f);
+            float f = e.fin(Interp.pow3In);
+            float w = r.range(rad) * Interp.circleOut.apply(f);
+            float l = (rad * r.random(1.5f, 3.25f) * f);
+            Vec2 v = Tmp.v1.trns(rot, l, w).add(e.x, e.y);
+            Fill.circle(v.x, v.y, (6f + rad / 7f) * e.fout());
+        }
+        e.scaled(15f, s -> {
+            color(UnityPal.scarColor, Color.white, s.fin());
+            Lines.stroke(2f);
+            for(int i = 0; i < sparkAmount; i++){
+                float range = Mathf.sign(r.chance(0.5f)) * r.random(60f, 93f);
+                float rot = e.rotation + range;
+                Vec2 v = Tmp.v1.trns(rot, s.finpow() * rad / 2f);
+                Lines.lineAngle(v.x + e.x, v.y + e.y, v.angle(), (7f + rad / 12f) * s.fout(), false);
+            }
+        });
+    }),
+
     endHitRail = new Effect(25f, e -> {
         e.scaled(15f, s -> {
             color(UnityPal.endColor, UnityPal.scarColor, e.fin());

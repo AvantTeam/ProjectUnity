@@ -8,6 +8,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
+import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import unity.content.effects.*;
@@ -96,7 +97,7 @@ public class OppressionLaserBulletType extends AntiCheatBulletTypeBase{
                     Vec2 hv = Geometry.raycastRect(b.x, b.y, Tmp.v1.x, Tmp.v1.y, Tmp.r1);
                     if(hv != null){
                         float hs = e.hitSize() / 2f;
-                        float scl = Math.max((hs - width) / hs, hs / width);
+                        float scl = Math.max((hs - width) / hs, Math.min(hs / width, 1f));
                         hv.sub(e).scl(scl).add(e);
                         v.set(hv);
                         return true;
@@ -105,6 +106,9 @@ public class OppressionLaserBulletType extends AntiCheatBulletTypeBase{
                 return false;
             }, (x, y, e, d) -> {
                 hit(b, x, y);
+                if(e instanceof Sized){
+                    HitFx.endDeathLaserHit.at(x, y, b.angleTo(e), ((Sized)e).hitSize());
+                }
                 if(e instanceof Unit){
                     hitUnitAntiCheat(b, (Unit)e);
                 }else if(e instanceof Building){
