@@ -329,27 +329,38 @@ public class HitFx{
         if(!(e.data instanceof Float)) return;
         Rand r = Utils.seedr;
         float rad = Math.max(20f, (Float)e.data);
-        int smokeAmount = 8 + (int)(rad / 9);
+        float maxOffset = 5f / 35f;
+        float maxOffset2 = 5f / 15f;
+        int smokeAmount = 9 + (int)(rad / 8);
         int sparkAmount = 2 + (int)(rad / 25);
 
         r.setSeed(e.id * 9999L);
-        color(UnityPal.scarColor, Color.darkGray, e.fin());
+        //color(UnityPal.scarColor, Color.darkGray, e.fin());
         for(int i = 0; i < smokeAmount; i++){
+            float cf = (i / (smokeAmount - 1f)) * maxOffset;
+            float nf = Mathf.curve(e.fin(), cf, (1f + cf) - maxOffset);
+
+            color(UnityPal.scarColor, Color.darkGray, Color.gray, nf);
             float rot = e.rotation + r.range(4f);
-            float f = e.fin(Interp.pow3In);
+            float f = Interp.pow3In.apply(nf);
+            //float f = e.fin(Interp.pow3In);
             float w = r.range(rad) * Interp.circleOut.apply(f);
             float l = (rad * r.random(1.5f, 3.25f) * f);
             Vec2 v = Tmp.v1.trns(rot, l, w).add(e.x, e.y);
-            Fill.circle(v.x, v.y, (6f + rad / 7f) * e.fout());
+            Fill.circle(v.x, v.y, (9f + rad / 7f) * (1f - nf));
         }
         e.scaled(15f, s -> {
             color(UnityPal.scarColor, Color.white, s.fin());
             Lines.stroke(2f);
             for(int i = 0; i < sparkAmount; i++){
+                float cf = (i / (sparkAmount - 1f)) * maxOffset2;
+                float nf = Mathf.curve(s.fin(), cf, (1f + cf) - maxOffset2);
+                float f = Interp.pow2Out.apply(nf);
+                
                 float range = Mathf.sign(r.chance(0.5f)) * r.random(60f, 93f);
                 float rot = e.rotation + range;
-                Vec2 v = Tmp.v1.trns(rot, s.finpow() * rad / 2f);
-                Lines.lineAngle(v.x + e.x, v.y + e.y, v.angle(), (7f + rad / 12f) * s.fout(), false);
+                Vec2 v = Tmp.v1.trns(rot, (f * (rad / 2f) * r.random(0.5f, 1.2f)) + 0.001f);
+                Lines.lineAngle(v.x + e.x, v.y + e.y, v.angle(), (7f + rad / 12f) * (1f - f), false);
             }
         });
     }),

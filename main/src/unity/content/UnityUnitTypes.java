@@ -4102,7 +4102,8 @@ public class UnityUnitTypes{
                 continuous = true;
 
                 reload = 25f * 60f;
-                //firstShotDelay = 5f * 60f;
+                firstShotDelay = ChargeFx.oppressionCharge.lifetime;
+                parentizeEffects = true;
 
                 bullet = new OppressionLaserBulletType();
             }},

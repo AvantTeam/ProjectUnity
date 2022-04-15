@@ -16,6 +16,8 @@ import unity.entities.bullet.anticheat.modules.*;
 import unity.graphics.*;
 import unity.util.*;
 
+import static unity.graphics.UnityDrawf.*;
+
 public class OppressionLaserBulletType extends AntiCheatBulletTypeBase{
     private static final int detail = 24;
     private static final float timeMul = 4f;
@@ -23,7 +25,7 @@ public class OppressionLaserBulletType extends AntiCheatBulletTypeBase{
     private static final Rand rand = new Rand(), rand2 = new Rand();
     private static final FloatSeq lines = new FloatSeq();
     private static final Color[] lightningColors = {Color.white, UnityPal.scarColor, Color.black};
-    protected float length = 2150f, width = 150f, cone = 380f, endLength = 450f;
+    protected float length = 2150f, width = 140f, cone = 380f, endLength = 450f;
     protected TextureRegion gradientRegion;
 
     public OppressionLaserBulletType(){
@@ -40,7 +42,9 @@ public class OppressionLaserBulletType extends AntiCheatBulletTypeBase{
         hittable = collides = absorbable = keepVelocity = false;
         impact = true;
         pierceShields = pierce = true;
-        lifetime = 5f * 60f;
+        lifetime = 8f * 60f;
+        knockback = 7f;
+        shootEffect = ChargeFx.oppressionCharge;
 
         modules = new AntiCheatBulletModule[]{
             new ArmorDamageModule(0.002f, 4f, 20f, 4f),
@@ -125,12 +129,12 @@ public class OppressionLaserBulletType extends AntiCheatBulletTypeBase{
 
     @Override
     public void draw(Bullet b){
-        float wid = this.width / 4f;
+        float wid = this.width * 0.125f;
         float fw = b.time < 50f ? Interp.pow2Out.apply(b.time / 50f) : 1f;
         float fow = Mathf.clamp((b.lifetime - b.time) / 120f);
         float inout = fw * fow;
         float width = this.width * inout + Mathf.absin(Time.time, 5f, 2f * inout);
-        float sin = Mathf.absin(Time.time, 3f, 0.2f);
+        float sin = Mathf.absin(Time.time, 3f, 0.35f);
         Color col = Tmp.c1.set(UnityPal.scarColor).mul(1f + sin);
         Draw.color(col);
         Draw.blend();
@@ -154,7 +158,7 @@ public class OppressionLaserBulletType extends AntiCheatBulletTypeBase{
         }
         long seed = b.id * 9999L + 7813;
         for(int s : Mathf.signs){
-            float stroke = (2f + (sin / 0.2f)) * 1.5f * fow;
+            float stroke = (2f + (sin / 0.35f)) * 1.5f * fow;
             Vec2 v = Tmp.v1.trns(b.rotation(), length + wid, width * s).add(b);
             drawEndEdge(b, seed, v.x, v.y, width * s, stroke);
             seed += rand.nextInt();
@@ -210,7 +214,7 @@ public class OppressionLaserBulletType extends AntiCheatBulletTypeBase{
             float wScl = getWidth(yps, 1f);
             Interp p = Interp.pow2In;
             Tmp.v1.trns(b.rotation(), trns * p.apply(fin) + yps, xps * wScl).add(b);
-            drawDiamond(Tmp.v1.x + Mathf.range(6f) * fin, Tmp.v1.y + Mathf.range(6f) * fin, w, l, b.rotation());
+            diamond(Tmp.v1.x + Mathf.range(6f) * fin, Tmp.v1.y + Mathf.range(6f) * fin, w, l, b.rotation());
         }
 
         for(int i = 0; i < 20; i++){
@@ -320,7 +324,7 @@ public class OppressionLaserBulletType extends AntiCheatBulletTypeBase{
             float w2 = w * Mathf.slope(fin);
             float trns = (spikeLength * ofRand) + rand2.random(60f, 110f);
             Vec2 v = Tmp.v3.trns(b.rotation(), fin * fin * trns, of).add(x, y);
-            drawDiamond(v.x, v.y, w2, l, b.rotation());
+            diamond(v.x, v.y, w2, l, b.rotation());
         }
     }
 
@@ -353,17 +357,8 @@ public class OppressionLaserBulletType extends AntiCheatBulletTypeBase{
             float trns = rand2.random(220f, 380f);
             float offset = ((1f - Math.abs(pos1)) * spikeLength) + rand2.random(-34f, 4f) - (trns * 0.2f * 0.2f);
             Vec2 v = Tmp.v3.trns(b.rotation(), fin * fin * sclL * trns + offset, pos * fr2).add(x, y);
-            drawDiamond(v.x + Mathf.range(6f) * fin, v.y + Mathf.range(6f) * fin, w2, l, b.rotation());
+            diamond(v.x + Mathf.range(6f) * fin, v.y + Mathf.range(6f) * fin, w2, l, b.rotation());
         }
-    }
-
-    void drawDiamond(float x, float y, float w, float h, float r){
-        float tx1 = Angles.trnsx(r + 90f, w), ty1 = Angles.trnsy(r + 90f, w),
-        tx2 = Angles.trnsx(r, h), ty2 = Angles.trnsy(r, h);
-        Fill.quad(x + tx1, y + ty1,
-        x + tx2, y + ty2,
-        x - tx1, y - ty1,
-        x - tx2, y - ty2);
     }
 
     void drawLightning(Bullet b, int seed, float fin, float fout, float width){

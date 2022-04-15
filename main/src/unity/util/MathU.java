@@ -21,6 +21,10 @@ public class MathU{
         }
     }
 
+    public static float slope(float fin, float bias){
+        return (fin < bias ? (fin / bias) : 1f - (fin - bias) / (1f - bias));
+    }
+
     public static Vec2 addLength(Vec2 vec, float add){
         float len = vec.len();
         vec.x += add * (vec.x / len);
