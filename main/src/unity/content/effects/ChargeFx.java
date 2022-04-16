@@ -117,7 +117,6 @@ public class ChargeFx{
 
         float fin1 = e.time >= 150f ? 1f : e.time / 150f;
         float fin2 = e.time >= 60f ? 1f : e.time / 60f;
-        //float fin3 = e.time < 145 ? 0f : (e.time - 145f >= 140f ? 1f : (e.time - 145f) / 140f);
 
         float time = Time.time;
         color(UnityPal.scarColor);

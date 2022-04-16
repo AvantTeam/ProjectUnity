@@ -26,11 +26,13 @@ public class OppressionLaserBulletType extends AntiCheatBulletTypeBase{
     private static final FloatSeq lines = new FloatSeq();
     private static final Color[] lightningColors = {Color.white, UnityPal.scarColor, Color.black};
     protected float length = 2150f, width = 140f, cone = 380f, endLength = 450f;
+    protected float fadeInTime = 15f;
     protected TextureRegion gradientRegion;
 
     public OppressionLaserBulletType(){
         speed = 0f;
-        damage = 4000f;
+        damage = 9000f;
+        buildingDamageMultiplier = 0.4f;
         ratioStart = 100000f;
         ratioDamage = 1f / 60f;
         overDamage = 650000f;
@@ -43,7 +45,7 @@ public class OppressionLaserBulletType extends AntiCheatBulletTypeBase{
         impact = true;
         pierceShields = pierce = true;
         lifetime = 8f * 60f;
-        knockback = 7f;
+        knockback = 9f;
         shootEffect = ChargeFx.oppressionCharge;
 
         modules = new AntiCheatBulletModule[]{
@@ -88,7 +90,7 @@ public class OppressionLaserBulletType extends AntiCheatBulletTypeBase{
     @Override
     public void update(Bullet b){
         if(b.timer(1, 5f)){
-            float fw = b.time < 50f ? Interp.pow2Out.apply(b.time / 50f) : 1f;
+            float fw = b.time < fadeInTime ? Interp.pow2Out.apply(b.time / fadeInTime) : 1f;
             float fow = Mathf.clamp((b.lifetime - b.time) / 120f);
             float width = this.width * fw * fow;
             Tmp.v1.trns(b.rotation(), length + endLength).add(b);
@@ -130,7 +132,7 @@ public class OppressionLaserBulletType extends AntiCheatBulletTypeBase{
     @Override
     public void draw(Bullet b){
         float wid = this.width * 0.125f;
-        float fw = b.time < 50f ? Interp.pow2Out.apply(b.time / 50f) : 1f;
+        float fw = b.time < fadeInTime ? Interp.pow2Out.apply(b.time / fadeInTime) : 1f;
         float fow = Mathf.clamp((b.lifetime - b.time) / 120f);
         float inout = fw * fow;
         float width = this.width * inout + Mathf.absin(Time.time, 5f, 2f * inout);
@@ -167,6 +169,26 @@ public class OppressionLaserBulletType extends AntiCheatBulletTypeBase{
         rand.setSeed(b.id * 9999L + 8957324);
         float spikeLength = endLength;
         float time = Time.time;
+
+        Lines.stroke(3f);
+        for(int i = 0; i < 45; i++){
+            float d = rand.random(14f, 22f);
+            float timeOffset = rand.random(d);
+            int timeSeed = Mathf.floor((time + timeOffset) / d) + rand.nextInt();
+            float fin = ((time + timeOffset) % d) / d;
+
+            rand2.setSeed(timeSeed);
+            float trns = rand2.random(90f, 270f) * Interp.pow2Out.apply(fin) * inout;
+            float rot = (rand2.chance(0.5f) ? 1f : -1f) * rand2.random(50f, 85f) + b.rotation();
+            Tmp.v1.trns(rot, trns).add(b);
+            if(rand2.chance(0.75f)){
+                float l = rand2.random(10f, 35f) * (1f - fin) * inout;
+                Lines.lineAngle(Tmp.v1.x, Tmp.v1.y, rot, l, false);
+            }else{
+                float scl = rand2.random(6f, 12f) * (1f - fin) * inout;
+                Fill.square(Tmp.v1.x, Tmp.v1.y, scl, 45f);
+            }
+        }
 
         for(int i = 0; i < 18; i++){
             boolean alt = i < 8;
