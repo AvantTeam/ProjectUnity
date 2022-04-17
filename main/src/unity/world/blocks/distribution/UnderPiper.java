@@ -39,11 +39,11 @@ public class UnderPiper extends Block {
         eraser = atlas.find("unity-eraser");
         move = atlas.find("unity-move");
 
-        Events.on(EventType.WorldLoadEvent.class, e -> {
+        /*Events.on(EventType.WorldLoadEvent.class, e -> {
             // TODO add electrode planet check
             UnderworldMap.reset();
             UnderworldMap.updateAll();
-        });
+        });*/
 
         Time.runTask(30, UnderworldBlocks::load);
     }
