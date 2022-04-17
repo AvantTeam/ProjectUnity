@@ -61,7 +61,7 @@ public class ModelLoader extends SynchronousAssetLoader<Model, ModelLoader.Model
                 data.vertices = mesh.require("vertices").asFloatSeq();
 
                 JsonValue meshParts = mesh.require("parts");
-                Seq<ModelMeshPart> parts = Seq.of(ModelMeshPart.class);
+                Seq<ModelMeshPart> parts = new Seq<>(ModelMeshPart.class);
                 for(var meshPart = meshParts.child; meshPart != null; meshPart = meshPart.next){
                     ModelMeshPart part = new ModelMeshPart();
                     String partId = meshPart.require("id").asString();
@@ -96,7 +96,7 @@ public class ModelLoader extends SynchronousAssetLoader<Model, ModelLoader.Model
     }
 
     protected VertexAttribute[] parseAttributes(JsonValue attributes){
-        Seq<VertexAttribute> vertexAttributes = Seq.of(VertexAttribute.class);
+        Seq<VertexAttribute> vertexAttributes = new Seq<>(VertexAttribute.class);
 
         int texUnit = 0,
             blendUnit = 0;

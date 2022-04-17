@@ -7,6 +7,7 @@ import arc.math.geom.*;
 import arc.util.*;
 import mindustry.entities.*;
 import mindustry.graphics.*;
+import unity.gen.*;
 import unity.graphics.*;
 import unity.util.*;
 
@@ -324,6 +325,46 @@ public class HitFx{
         });
     }),
 
+    endDeathLaserHit = new Effect(35f, e -> {
+        if(!(e.data instanceof Float)) return;
+        Rand r = Utils.seedr;
+        float rad = Math.max(20f, (Float)e.data);
+        float maxOffset = 5f / 35f;
+        float maxOffset2 = 5f / 15f;
+        int smokeAmount = 9 + (int)(rad / 8);
+        int sparkAmount = 2 + (int)(rad / 25);
+
+        r.setSeed(e.id * 9999L);
+        //color(UnityPal.scarColor, Color.darkGray, e.fin());
+        for(int i = 0; i < smokeAmount; i++){
+            float cf = (i / (smokeAmount - 1f)) * maxOffset;
+            float nf = Mathf.curve(e.fin(), cf, (1f + cf) - maxOffset);
+
+            color(UnityPal.scarColor, Color.darkGray, Color.gray, nf);
+            float rot = e.rotation + r.range(4f);
+            float f = Interp.pow3In.apply(nf);
+            //float f = e.fin(Interp.pow3In);
+            float w = r.range(rad) * Interp.circleOut.apply(f);
+            float l = (rad * r.random(1.5f, 3.25f) * f);
+            Vec2 v = Tmp.v1.trns(rot, l, w).add(e.x, e.y);
+            Fill.circle(v.x, v.y, (9f + rad / 7f) * (1f - nf));
+        }
+        e.scaled(15f, s -> {
+            color(UnityPal.scarColor, Color.white, s.fin());
+            Lines.stroke(2f);
+            for(int i = 0; i < sparkAmount; i++){
+                float cf = (i / (sparkAmount - 1f)) * maxOffset2;
+                float nf = Mathf.curve(s.fin(), cf, (1f + cf) - maxOffset2);
+                float f = Interp.pow2Out.apply(nf);
+                
+                float range = Mathf.sign(r.chance(0.5f)) * r.random(60f, 93f);
+                float rot = e.rotation + range;
+                Vec2 v = Tmp.v1.trns(rot, (f * (rad / 2f) * r.random(0.5f, 1.2f)) + 0.001f);
+                Lines.lineAngle(v.x + e.x, v.y + e.y, v.angle(), (7f + rad / 12f) * (1f - f), false);
+            }
+        });
+    }),
+
     endHitRail = new Effect(25f, e -> {
         e.scaled(15f, s -> {
             color(UnityPal.endColor, UnityPal.scarColor, e.fin());
@@ -366,6 +407,15 @@ public class HitFx{
         color(UnityPal.monolithLight, UnityPal.monolithDark, e.finpow());
         stroke(0.2f + e.fout() * 1.3f);
         Lines.circle(e.x, e.y, e.fin() * 5f);
+    }),
+
+    tendenceHit = new Effect(52f, e -> {
+        color(UnityPal.monolithLight, UnityPal.monolith, UnityPal.monolithDark, e.fout());
+        for(int sign : Mathf.signs){
+            randLenVectors(e.id + sign, 3, e.fin(Interp.pow5Out) * 32f, e.rotation, 30f, 16f, (x, y) ->
+                Fill.square(e.x + x, e.y + y, e.foutpowdown() * 2.5f, e.id * 30f + e.finpow() * 90f * sign)
+            );
+        }
     }),
 
     hitAdvanceFlame = new Effect(15f, e -> {
@@ -428,29 +478,43 @@ public class HitFx{
         lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1f + e.fout() * 3f));
     }),
 
-    monoHitSmall = new Effect(14, e -> {
+    monolithHitSmall = new Effect(14, e -> {
         color(UnityPal.monolith);
         e.scaled(7f, s -> {
             Lines.stroke(s.fout());
             Lines.square(s.x, s.y, 10f * s.fin(), 45f);
         });
+
         color(UnityPal.monolithLight);
-        Angles.randLenVectors(e.id, 5, e.fin() * 15f, (x, y) -> {
-            Fill.square(e.x + x, e.y + y, 2f * e.fout());
-        });
+        Angles.randLenVectors(e.id, 5, e.fin() * 15f, (x, y) -> Fill.square(e.x + x, e.y + y, 2f * e.fout()));
     }),
 
-    monoHitBig = new Effect(13f, e -> {
+    monolithHitBig = new Effect(13f, e -> {
         color(UnityPal.monolithLight);
-        Angles.randLenVectors(e.id, 10, e.fin() * 20f, (x, y) -> {
-            Fill.square(e.x + x, e.y + y, 5f * e.fout());
-        });
+        Angles.randLenVectors(e.id, 10, e.fin() * 20f, (x, y) -> Fill.square(e.x + x, e.y + y, 5f * e.fout()));
 
         Tmp.c1.set(UnityPal.monolith).a(e.fout(Interp.pow3In));
 
-        z(Layer.effect+1f);
+        z(Layer.effect + 1f);
         blend(Blending.additive);
         Fill.light(e.x, e.y, 4, 25f * e.fin(Interp.pow5Out), Color.clear, Tmp.c1);
         blend();
+    }),
+
+    soulConcentrateHit = new Effect(30f, e -> {
+        if(!(e.data instanceof Long data)) return;
+        float initRad = Float2.x(data), scl = Float2.y(data), radius = initRad * scl;
+
+        e.lifetime = 30f * scl;
+
+        color(UnityPal.monolithGreen, e.fout(Interp.pow5In));
+        Fill.circle(e.x, e.y, radius + e.fin(Interp.pow10Out) * 6f * scl);
+
+        stroke(e.fout() * 2f * scl, UnityPal.monolithGreenLight);
+        Lines.circle(e.x, e.y, radius + e.fin(Interp.pow10Out) * 6f * scl);
+
+        randLenVectors(e.id, (int)(8f * scl), e.finpow() * 15f * scl, (x, y) ->
+            lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fout(Interp.pow4Out) * 8f * scl)
+        );
     });
 }

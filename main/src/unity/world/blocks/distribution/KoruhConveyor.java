@@ -2,10 +2,10 @@ package unity.world.blocks.distribution;
 
 import mindustry.world.blocks.distribution.*;
 
-public class ExpConveyor extends Conveyor{
+public class KoruhConveyor extends Conveyor{
     protected float realSpeed, drawMultiplier;
 
-    public ExpConveyor(String name){
+    public KoruhConveyor(String name){
         super(name);
         absorbLasers = true; //an internal flag telling expconveyors apart, also makes lasers less viable against koruh
     }

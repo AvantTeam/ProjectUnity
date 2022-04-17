@@ -145,7 +145,7 @@ public class Teleporter extends Block{
 
         protected TeleporterBuild findLink(int value){
             ObjectSet<TeleporterBuild> teles = teleporters[team.id][value];
-            Seq<TeleporterBuild> entries = teles.asArray();
+            Seq<TeleporterBuild> entries = teles.toSeq();
             if(entry >= entries.size) entry = 0;
             if(entry == entries.size - 1){
                 TeleporterBuild other = teles.get(entries.get(entry));
@@ -166,7 +166,7 @@ public class Teleporter extends Block{
             if(toggle == -1) return false;
             target = findLink(toggle);
             if(target == null) return false;
-            return source != this && cons.valid() && Mathf.zero(1 - efficiency()) && target.items.total() < target.getMaximumAccepted(item);
+            return source != this && consValid() && Mathf.zero(1 - efficiency()) && target.items.total() < target.getMaximumAccepted(item);
         }
 
         @Override

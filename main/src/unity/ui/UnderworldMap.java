@@ -107,19 +107,20 @@ public class UnderworldMap extends Element {
             darknessTexture.dispose();
         }
 
-        pixmap = new Pixmap(world.width() * 32, world.height() * 32);
+        pixmap = wallPixmap = shadowPixmap = darknessPixmap = new Pixmap(1, 1);
+        //pixmap = new Pixmap(world.width() * 32, world.height() * 32);
         texture = new Texture(pixmap);
         region = new TextureRegion(texture);
 
-        wallPixmap = new Pixmap(world.width() * 32, world.height() * 32);
+        //wallPixmap = new Pixmap(world.width() * 32, world.height() * 32);
         wallTexture = new Texture(wallPixmap);
         wallRegion = new TextureRegion(wallTexture);
 
-        shadowPixmap = new Pixmap(world.width(), world.height());
+        //shadowPixmap = new Pixmap(world.width(), world.height());
         shadowTexture = new Texture(shadowPixmap);
         shadowRegion = new TextureRegion(shadowTexture);
 
-        darknessPixmap = new Pixmap(world.width(), world.height());
+        //darknessPixmap = new Pixmap(world.width(), world.height());
         darknessTexture = new Texture(darknessPixmap);
         darknessRegion = new TextureRegion(darknessTexture);
     }
@@ -153,6 +154,7 @@ public class UnderworldMap extends Element {
 
     public static void updateAll(){
         // TODO performance sucks
+        if(true) return;
         for(Tile tile : world.tiles){
             if(tile != null) {
                 if (!(tile.block() != null && tile.block() instanceof StaticWall) && tile.floor() != null && tile.floor().region != null) {
@@ -187,7 +189,7 @@ public class UnderworldMap extends Element {
 
         shadowTexture.setFilter(Texture.TextureFilter.linear, Texture.TextureFilter.linear);
         darknessTexture.setFilter(Texture.TextureFilter.linear, Texture.TextureFilter.linear);
-        
+
         pixmap.dispose();
         wallPixmap.dispose();
         shadowPixmap.dispose();

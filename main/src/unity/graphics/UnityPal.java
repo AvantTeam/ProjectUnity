@@ -6,7 +6,7 @@ import mindustry.graphics.*;
 import static arc.graphics.Color.*;
 
 public class UnityPal{
-    public static Color
+    public static final Color
 
     plague = valueOf("a3f080"),
     plagueDark = valueOf("54de3b"),
@@ -14,10 +14,13 @@ public class UnityPal{
     scarColor = valueOf("f53036"),
     scarColorAlpha = valueOf("f5303690"),
 
-    monolithLight = valueOf("c0ecff"),
+    monolithLight = valueOf("c0ecff"), // my palette
     monolith = valueOf("87ceeb"),
     monolithDark = valueOf("6586b0"),
     monolithAtmosphere = valueOf("001e6360"),
+    monolithGreenLight = valueOf("8cf7dd"), // my palette
+    monolithGreen = valueOf("4dcfc8"),
+    monolithGreenDark = valueOf("358697"),
 
     advance = valueOf("a3e3ff"),
     advanceDark = valueOf("59a7ff"),
@@ -52,8 +55,8 @@ public class UnityPal{
     diriumLight = valueOf("ccffe4"),
     coldColor = valueOf("6bc7ff"),
     bgCol = valueOf("323232"),
-    deepRed = Color.valueOf("f25555"),
-    deepBlue = Color.valueOf("554deb"),
+    deepRed = valueOf("f25555"),
+    deepBlue = valueOf("554deb"),
     passive = valueOf("61caff"),
     armor = valueOf("e09e75"),
 

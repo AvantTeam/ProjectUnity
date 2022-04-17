@@ -103,6 +103,7 @@ public class ExpTower extends ExpTank {
 
         @Override
         public int handleTower(int amount, float angle){
+            if(buffer && exp > 0) return 0;
             int a = handleExp(amount);
             if(a > 0 && reload >= reloadTime && !Angles.near(angle + 180, laserRotation(), 1f)) shoot();
             return a;
@@ -120,9 +121,9 @@ public class ExpTower extends ExpTank {
         public void updateTile(){
             super.updateTile();
 
-            if(!buffer || exp > 0) reload += edelta();
+            if(!buffer || exp > 0) reload += delta();
             else reload = 0;
-            if(heat > 0) heat -= edelta();
+            if(heat > 0) heat -= delta();
 
             if(reload >= manualReload && exp > 0) shoot();
         }

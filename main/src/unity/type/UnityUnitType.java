@@ -124,6 +124,7 @@ public class UnityUnitType extends UnitType{
 
     // World units
     public int worldWidth, worldHeight;
+    public boolean forceWreckRegion;
 
     public UnityUnitType(String name){
         super(name);

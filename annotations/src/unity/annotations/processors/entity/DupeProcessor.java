@@ -84,11 +84,12 @@ public class DupeProcessor extends BaseProcessor{
         Seq<TypeElement> naming = Seq.with();
         TypeElement baseClass = elements(annotation(def, Dupe.class)::base).first();
         TypeElement parentClass = elements(annotation(def, Dupe.class)::parent).first();
-        if(!isBuild){
-            naming.add(parentClass, baseClass);
+        /*if(!isBuild){
+            naming.add(baseClass, parentClass);
         }else{
-            naming.add(findBuild(parentClass), findBuild(baseClass));
-        }
+            naming.add(findBuild(baseClass), findBuild(parentClass));
+        }*/
+        naming.add(baseClass, parentClass);
 
         String customName = annotation(def, Dupe.class).name();
         String name = customName.equals("") ? createName(naming) : customName;
@@ -383,7 +384,7 @@ public class DupeProcessor extends BaseProcessor{
             }
 
             out.remove(component);
-            componentDependencies.put(component, result.asArray());
+            componentDependencies.put(component, result.toSeq());
         }
 
         return componentDependencies.get(component);
@@ -391,15 +392,16 @@ public class DupeProcessor extends BaseProcessor{
 
     String createName(Seq<TypeElement> comps){
         Seq<TypeElement> rev = comps.copy();
-        rev.reverse();
-
-        return rev.toString("", s -> {
+        String p = simpleName(rev.pop());
+        if(p.endsWith("Building")) p = p.substring(0, p.length() - 8);
+        if(p.endsWith("Build")) p = p.substring(0, p.length() - 5);
+        String bef = rev.toString("", s -> {
             String name = simpleName(s);
-            if(name.endsWith("Comp")) name = name.substring(0, name.length() - 4);
             if(name.endsWith("Building")) name = name.substring(0, name.length() - 8);
             if(name.endsWith("Build")) name = name.substring(0, name.length() - 5);
-            return name;
+            return name.split("(?<=[a-z])([A-Z])", 2)[0];
         });
+        return bef + p;
     }
 
     boolean append(MethodSpec.Builder mbuilder, Seq<ExecutableElement> values, Seq<ExecutableElement> inserts, boolean writeBlock, boolean superCall, boolean isBuild){

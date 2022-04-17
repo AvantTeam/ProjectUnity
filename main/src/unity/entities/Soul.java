@@ -48,8 +48,7 @@ public interface Soul extends Teamc, Healthc, Sized{
 
         float start = Mathf.random(360f);
         for(int i = 0; i < souls(); i++){
-            /*MonolithSoul soul = MonolithSoul.defaultType.get().create(team()).as();
-            soul.resetController();
+            MonolithSoul soul = MonolithSoul.create(team());
 
             Tmp.v1.trns(Mathf.random(360f), Mathf.random(hitSize()));
             soul.set(x() + Tmp.v1.x, y() + Tmp.v1.y);
@@ -57,10 +56,10 @@ public interface Soul extends Teamc, Healthc, Sized{
             Tmp.v1.trns(start + 360f / souls() * i, Mathf.random(6f, 12f));
             soul.rotation = Tmp.v1.angle();
             soul.vel.set(Tmp.v1.x, Tmp.v1.y);
-            soul.healAmount = maxHealth() / 10f / souls();
+            //soul.healAmount = maxHealth() / 10f / souls();
 
             transferred = apply(soul, i, transferred);
-            soul.add();*/
+            soul.add();
         }
     }
 

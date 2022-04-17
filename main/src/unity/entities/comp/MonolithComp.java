@@ -97,11 +97,11 @@ abstract class MonolithComp implements Unitc, Factionc, Soul{
 
     @Override
     public void join(){
-        souls++;
+        if(canJoin()) souls++;
     }
 
     @Override
     public void unjoin(){
-        souls--;
-    } // Could've named it "join't"
+        if(souls > 0) souls--;
+    }
 }

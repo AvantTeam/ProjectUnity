@@ -75,7 +75,7 @@ public class LightningSpawnAbility extends Ability{
                 }
             }
 
-            if(Mathf.chanceDelta(trailChance)) trailEffect.at(x, y, unit.rotation, lightningRadius);
+            if(Mathf.chanceDelta(trailChance)) trailEffect.at(x, y, lightningRadius);
         }
 
         phase = Mathf.lerpDelta(phase, useAmmo && state.rules.unitAmmo ? unit.ammof() : 1f, phaseSpeed);
@@ -106,12 +106,12 @@ public class LightningSpawnAbility extends Ability{
 
             Lines.stroke((2f + Mathf.absin(15f, 0.7f)), Tmp.c1.set(backColor).lerp(frontColor, 0.7f));
             for(int s = 0; s < sectors; s++){
-                Lines.swirl(x, y, bet - 2f, 0.1f, s * 360f / sectors + Time.time * rotateSpeed * Mathf.signs[unit.id % 2]);
+                Lines.arc(x, y, bet - 2f, 0.1f, s * 360f / sectors + Time.time * rotateSpeed * Mathf.signs[unit.id % 2]);
             }
 
             Lines.stroke(Lines.getStroke() - 1f, frontColor);
             for(int s = 0; s < sectors; s++){
-                Lines.swirl(x, y, bet, 0.14f, s * 360f / sectors + Time.time * rotateSpeed * Mathf.signs[(unit.id + 1) % 2]);
+                Lines.arc(x, y, bet, 0.14f, s * 360f / sectors + Time.time * rotateSpeed * Mathf.signs[(unit.id + 1) % 2]);
             }
 
             Drawf.light(x, y, lightningOuterRadius * 2f, frontColor, phase);

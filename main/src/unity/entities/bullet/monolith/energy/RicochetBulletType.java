@@ -1,4 +1,4 @@
-package unity.entities.bullet.energy;
+package unity.entities.bullet.monolith.energy;
 
 import arc.math.geom.*;
 import mindustry.entities.*;
@@ -6,7 +6,11 @@ import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 
-/** @author GlennFolker */
+/**
+ * @author GlennFolker
+ * @deprecated It's broken due to a certain PR and I'm now too lazy to fix it so I'll just recreate, thanks MEEP.
+ */
+@Deprecated
 public class RicochetBulletType extends BasicBulletType{
     public int trailLength = 6;
 

@@ -21,6 +21,8 @@ import unity.entities.bullet.energy.*;
 import unity.entities.bullet.exp.*;
 import unity.entities.bullet.kami.*;
 import unity.entities.bullet.laser.*;
+import unity.entities.bullet.misc.BlockStatusEffectBulletType;
+import unity.entities.bullet.monolith.energy.*;
 import unity.gen.*;
 import unity.graphics.*;
 import unity.world.blocks.exp.*;
@@ -30,7 +32,7 @@ import static unity.content.UnityStatusEffects.*;
 
 public class UnityBullets{
     public static BulletType
-        laser, shardLaserFrag, shardLaser, frostLaser, branchLaserFrag, branchLaser, distField, fractalLaser, kelvinWaterLaser,
+        laser, shardLaserFrag, shardLaser, frostLaser, branchLaserFrag, branchLaser, distField, smallDistField, fractalLaser, kelvinWaterLaser,
         kelvinSlagLaser, kelvinOilLaser, kelvinCryofluidLaser, kelvinLiquidLaser, celsiusSmoke, kelvinSmoke,
         breakthroughLaser, laserGeyser,
 
@@ -52,7 +54,7 @@ public class UnityBullets{
 
         scarShrapnel, scarMissile,
 
-        kamiBullet1, kamiLaser, kamiVariableLaser, kamiSmallLaser,
+        kamiBullet1, kamiBullet2, kamiBullet3, kamiLaser, kamiLaser2, kamiVariableLaser, kamiSmallLaser,
 
         ricochetSmall, ricochetMedium, ricochetBig,
 
@@ -74,7 +76,9 @@ public class UnityBullets{
 
         plasmaBullet, phantasmalBullet,
 
-        teleportLightning;
+        teleportLightning,
+
+        statusEffect, upgradeEffect;
 
     //only enhanced
     public static BasicBulletType standardDenseLarge, standardHomingLarge, standardIncendiaryLarge, standardThoriumLarge, standardDenseHeavy, standardHomingHeavy, standardIncendiaryHeavy, standardThoriumHeavy, standardDenseMassive, standardHomingMassive,
@@ -243,30 +247,59 @@ public class UnityBullets{
             distSplashFx = UnityFx.distSplashFx;
             distStart = UnityFx.distStart;
             distStatus = distort;
-            fieldRadius = 85;
 
-            lifetime = 10 * 60;
             collidesTiles = false;
             collides = false;
             collidesAir = false;
             keepVelocity = false;
 
-            bulletSlowMultiplier = 0.94f; //nerfed
-            expGain = 1; // 0.6 exp per sec for unit. 0.05 exp per sec for one bullet
-            damageLimit = 200f; //too strong damage cannot be slow
-            distDamage = 0.1f; //6 damage per sec
+            lifetime = 6 * 60;
+            radius = 3f*8;
+            radiusInc = 0.1f*8;
+            bulletSlow = 0.1f;
+            bulletSlowInc = 0.025f;
+            damageLimit = 100f;
+            distDamage = 0.1f;
+            expChance = 0.2f/60;
+            expGain = 1;
+        }};
+
+        smallDistField = new DistFieldBulletType(0, -1){{
+            centerColor = Pal.lancerLaser.cpy().a(0);
+            edgeColor = Pal.place;
+            distSplashFx = UnityFx.distSplashFx;
+            distStart = UnityFx.distStart;
+            distStatus = distort;
+
+            collidesTiles = false;
+            collides = false;
+            collidesAir = false;
+            keepVelocity = false;
+
+            lifetime = 2.5f * 60;
+            radius = 1.5f*8;
+            radiusInc = 0.05f*8;
+            bulletSlow = 0.05f;
+            bulletSlowInc = 0.015f;
+            damageLimit = 50f;
+            distDamage = 0.05f;
+            expChance = 0.1f/60;
+            expGain = 1;
         }};
 
         fractalLaser = new ExpLaserFieldBulletType(170f, 130f){{
             damageInc = 6f;
             lengthInc = 2f;
+            fields = 2;
+            fieldInc = 0.15f;
+            width = 2;
             expGain = buildingExpGain = 1;
             fromColor = Pal.lancerLaser.cpy().lerp(Pal.place, 0.5f);
             toColor = Pal.place;
             maxRange = 150f + 2f * 30f; //Account for range increase
 
             distField = UnityBullets.distField;
-            basicFieldRadius = 85;
+            smallDistField = UnityBullets.smallDistField;
         }};
 
         laserGeyser = new GeyserBulletType(){{
@@ -819,9 +852,9 @@ public class UnityBullets{
             fragBullets = 8;
         }};
 
-        surgeBomb = new SurgeBulletType(7f, 100f){{
+        surgeBomb = new BasicBulletType(7f, 100f){{
             width = height = 30f;
-            maxRange = 30f;
+            sprite = "large-bomb";
             backColor = Pal.surge;
             frontColor = Color.white;
             mixColorTo = Color.white;
@@ -844,9 +877,9 @@ public class UnityBullets{
             scaleVelocity = true;
             fragBullet = plasmaFragTriangle;
 
-            shocks = 10;
-            shockDamage = 680f / 5f;
-            shockLength = 20;
+            lightning = 10;
+            lightningDamage = 680f / 5f;
+            lightningLength = 20;
         }};
 
         pylonLightning = new LightningBulletType(){{
@@ -961,12 +994,30 @@ public class UnityBullets{
             color = b -> Tmp.c1.set(Color.red).shiftHue(b.time * 3f).cpy();
         }};
 
+        kamiBullet2 = new KamiBulletType(){{
+            lifetime = 240f;
+            hitSize = 6f;
+            despawnEffect = Fx.none;
+            trailLength = 12;
+        }};
+
+        kamiBullet3 = new KamiBulletType(){{
+            lifetime = 240f;
+            hitSize = 6f;
+            despawnEffect = Fx.none;
+        }};
+
         kamiLaser = new KamiLaserBulletType(230f){{
             lifetime = 4f * 60f;
             length = 760f;
             width = 140f;
             fadeInTime = 60f;
             drawSize = (length + (width * 2f)) * 2f;
+        }};
+
+        kamiLaser2 = new NewKamiLaserBulletType(){{
+           damage = 200f;
+           despawnEffect = Fx.none;
         }};
 
         kamiVariableLaser = new KamiAltLaserBulletType(60f);
@@ -1355,6 +1406,20 @@ public class UnityBullets{
             despawnEffect = Fx.none;
             hitEffect = Fx.hitLancer;
             keepVelocity = false;
+        }};
+
+        statusEffect = new BlockStatusEffectBulletType(0f, 0){{
+            hitEffect = despawnEffect = Fx.none;
+            lifetime = 180f;
+            width = height = 1f;
+        }};
+
+        upgradeEffect = new BlockStatusEffectBulletType(0f, 0){{
+            hitEffect = Fx.none;
+            despawnEffect = UnityFx.expPoof;
+            lifetime = 180f;
+            width = height = 1f;
+            upgrade = true;
         }};
 
         //only enhanced

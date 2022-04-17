@@ -12,7 +12,9 @@ import mindustry.entities.Effect.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import unity.entities.bullet.anticheat.*;
+import unity.entities.bullet.kami.*;
 import unity.entities.effects.*;
+import unity.gen.*;
 import unity.graphics.*;
 import unity.mod.*;
 
@@ -22,6 +24,21 @@ public class SpecialFx{
     private static final Rand rand = new Rand();
 
     public static Effect
+
+    kamiBulletSpawn = new Effect(30f, 300f, e -> {
+        if(!(e.data instanceof KamiBullet kb)) return;
+        KamiBulletType type = (KamiBulletType)kb.type;
+        TextureRegion r = KamiBulletType.region;
+        e.lifetime = type.delay;
+        float time = (Time.time / 2f) + (e.time - type.delay) * 2f;
+        float scl = 1f + (e.fout() * 5f);
+        float st = Mathf.clamp(Math.max(kb.width, kb.length) / 10f + 1.2f, 1.5f, 4f) * (1f + Mathf.absin(time, 10f, 0.33f));
+        Tmp.c1.set(Color.red).shiftHue(time).a(e.fin());
+        Draw.color(Tmp.c1);
+        Draw.rect(r, kb.x, kb.y, ((kb.width * 2f) + st) * scl, ((kb.length * 2f) + st) * scl, kb.rotation());
+        Draw.color(Color.white);
+        Draw.rect(r, kb.x, kb.y, kb.width * 2f * e.fin(), kb.length * 2f * e.fin(), kb.rotation());
+    }),
 
     endDeny = new Effect(80f, 1200f, e -> {
         if(!(e.data instanceof Unit u)) return;

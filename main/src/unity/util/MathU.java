@@ -5,8 +5,8 @@ import arc.math.*;
 import arc.math.geom.*;
 
 public class MathU{
-    private final static Vec2 vec = new Vec2();
-    private final static Rand seedr = new Rand();
+    private static final Vec2 vec = new Vec2();
+    private static final Rand seedr = new Rand();
 
     public static void randLenVectors(long seed, int amount, float in, float inRandMin, float inRandMax, float lengthRand, FloatFloatf length, UParticleConsumer cons){
         seedr.setSeed(seed);
@@ -19,6 +19,10 @@ public class MathU{
             vec.trns(seedr.random(360f), f);
             cons.get(vec.x, vec.y, fin);
         }
+    }
+
+    public static float slope(float fin, float bias){
+        return (fin < bias ? (fin / bias) : 1f - (fin - bias) / (1f - bias));
     }
 
     public static Vec2 addLength(Vec2 vec, float add){

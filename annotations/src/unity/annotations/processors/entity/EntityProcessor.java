@@ -1068,7 +1068,7 @@ public class EntityProcessor extends BaseProcessor{
             }
 
             out.remove(component);
-            componentDependencies.put(component, result.asArray());
+            componentDependencies.put(component, result.toSeq());
         }
 
         return componentDependencies.get(component);

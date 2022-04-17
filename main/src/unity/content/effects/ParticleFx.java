@@ -10,6 +10,7 @@ import mindustry.graphics.*;
 import unity.graphics.*;
 
 import static arc.graphics.g2d.Draw.*;
+import static arc.graphics.g2d.Lines.*;
 import static arc.math.Angles.*;
 
 public class ParticleFx{
@@ -20,16 +21,12 @@ public class ParticleFx{
         Fill.square(e.x, e.y, 2.5f * Interp.pow2In.apply(e.fslope()), 45f);
     }),
 
-    monolithSpark = new Effect(60f, e -> {
-        if(!(e.data instanceof Float data)) return;
+    monolithSpark = new Effect(60f, e -> randLenVectors(e.id, 2, e.rotation, (x, y) -> {
+        color(UnityPal.monolith, UnityPal.monolithDark, e.fin());
 
-        randLenVectors(e.id, 2, data, (x, y) -> {
-            color(UnityPal.monolith, UnityPal.monolithDark, e.fin());
-
-            float w = 1f + e.fout() * 4f;
-            Fill.rect(e.x + x, e.y + y, w, w, 45f);
-        });
-    }),
+        float w = 1f + e.fout() * 4f;
+        Fill.rect(e.x + x, e.y + y, w, w, 45f);
+    })),
 
     monolithSoul = new Effect(48f, e -> {
         if(!(e.data instanceof Vec2 data)) return;
@@ -39,7 +36,7 @@ public class ParticleFx{
 
         float time = Time.time - e.rotation, vx = data.x * time, vy = data.y * time;
         randLenVectors(e.id, 1, 5f + e.finpowdown() * 8f, (x, y) -> {
-            float fin = 1f + (1f - e.fin(Interp.pow2In));
+            float fin = 1f - e.fin(Interp.pow2In);
 
             alpha(1f);
             Fill.circle(e.x + x + vx, e.y + y + vy, fin * 2f);
@@ -49,5 +46,12 @@ public class ParticleFx{
         });
 
         blend();
-    }).layer(Layer.flyingUnit);
+    }).layer(Layer.flyingUnit - 0.01f),
+
+    lightningPivot = new Effect(36f, e -> {
+        stroke(2f, e.color);
+        randLenVectors(e.id, 3, e.foutpowdown() * 32f, (x, y) ->
+            lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fin() * 6f)
+        );
+    });
 }

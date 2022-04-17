@@ -141,19 +141,23 @@ public class UnityBlocks{
     denseSmelter, solidifier, steelSmelter, liquifier, titaniumExtractor, lavaSmelter, diriumCrucible, coalExtractor,
 
     //defense
-    stoneWall, denseWall, steelWall, steelWallLarge, diriumWall, diriumWallLarge, shieldProjector, diriumProjector,
+    stoneWall, denseWall, steelWall, steelWallLarge, diriumWall, diriumWallLarge, shieldProjector, diriumProjector, timeMine, shieldWall, shieldWallLarge,
 
     //distribution
-    steelConveyor, diriumConveyor, teleporter, teleunit,
+    steelConveyor, teleporter, teleunit;
+
+    public static @FactionDef("koruh")
+    @Dupe(base = ExpTurret.class, parent = KoruhConveyor.class)
+    Block diriumConveyor;
 
     //unit
-    bufferPad, omegaPad, cachePad, convertPad,
+    public static @FactionDef("koruh") Block bufferPad, omegaPad, cachePad, convertPad,
 
     //power
     uraniumReactor,
 
     //TODO
-    expFountain, expVoid, expTank, expChest, expRouter, expTower, expTowerDiagonal, bufferTower, expHub;// expOutput, expUnloader;
+    expFountain, expVoid, expTank, expChest, expRouter, expTower, expTowerDiagonal, bufferTower, expHub, expNode, expNodeLarge;// expOutput, expUnloader;
 
     //turret
     public static @FactionDef("koruh")
@@ -165,6 +169,9 @@ public class UnityBlocks{
 
     public static @FactionDef("koruh")
     Block inferno;
+
+    public static @FactionDef("koruh")
+    Block buffTurret, upgradeTurret;
 
     //---------- monolith faction ----------
     public static @FactionDef("monolith") Block
@@ -1546,6 +1553,7 @@ public class UnityBlocks{
             maxDamage = 24f;
             health = 810;
 
+            maxLevel = 6;
             expFields = new EField[]{
                     new ERational(v -> maxDamage = v, 48f, 24f, -3f, Stat.abilities, v -> bundle.format("stat.unity.maxdamage", v)).formatAll(false)
             };
@@ -1557,6 +1565,7 @@ public class UnityBlocks{
             health = 3240;
             size = 2;
 
+            maxLevel = 12;
             expFields = new EField[]{
                     new ERational(v -> maxDamage = v, 72f, 24f, -3f, Stat.abilities, v -> bundle.format("stat.unity.maxdamage", v)).formatAll(false)
             };
@@ -1567,7 +1576,13 @@ public class UnityBlocks{
             maxDamage = 76f;
             blinkFrame = 30f;
             health = 760;
-            maxLevel = 12;
+            updateEffect = UnityFx.sparkle;
+
+            maxLevel = 6;
+            expFields = new EField[]{
+                    new ERational(v -> maxDamage = v, 152f, 50f, -3f, Stat.abilities, v -> bundle.format("stat.unity.maxdamage", v)).formatAll(false),
+                    new ELinearCap(v -> blinkFrame = v, 10f, 10f, 2, Stat.abilities, v -> bundle.format("stat.unity.blinkframe", v)).formatAll(false)
+            };
         }};
 
         diriumWallLarge = new LevelLimitWall("dirium-wall-large"){{
@@ -1576,7 +1591,13 @@ public class UnityBlocks{
             blinkFrame = 30f;
             health = 3040;
             size = 2;
+            updateEffect = UnityFx.sparkle;
+
             maxLevel = 12;
+            expFields = new EField[]{
+                    new ERational(v -> maxDamage = v, 304f, 50f, -2f, Stat.abilities, v -> bundle.format("stat.unity.maxdamage", v)).formatAll(false),
+                    new ELinearCap(v -> blinkFrame = v, 10f, 5f, 4, Stat.abilities, v -> bundle.format("stat.unity.blinkframe", v)).formatAll(false)
+            };
         }};
 
         shieldProjector = new ClassicProjector("shield-generator"){{
@@ -1623,7 +1644,14 @@ public class UnityBlocks{
             effectColors = new Color[]{Pal.lancerLaser, UnityPal.lancerDir1, UnityPal.lancerDir2, UnityPal.lancerDir3, UnityPal.diriumLight};
         }};
 
-        steelConveyor = new ExpConveyor("steel-conveyor"){{
+        timeMine = new TimeMine("time-mine"){{
+            requirements(Category.effect, with(Items.lead, 25, Items.silicon, 12));
+            hasShadow = false;
+            health = 45;
+            pullTime = 6 * 60f;
+        }};
+
+        steelConveyor = new KoruhConveyor("steel-conveyor"){{
             requirements(Category.distribution, with(UnityItems.stone, 1, UnityItems.denseAlloy, 1, UnityItems.steel, 1));
             health = 140;
             speed = 0.1f;
@@ -1631,12 +1659,14 @@ public class UnityBlocks{
             drawMultiplier = 1.9f;
         }};
 
-        diriumConveyor = new ExpConveyor("dirium-conveyor"){{
+        diriumConveyor = new ExpKoruhConveyor("dirium-conveyor"){{
             requirements(Category.distribution, with(UnityItems.steel, 1, Items.phaseFabric, 1, UnityItems.dirium, 1));
             health = 150;
             speed = 0.16f;
             displayedSpeed = 20f;
             drawMultiplier = 1.3f;
+
+            draw = new DrawOver();
         }};
 
         bufferPad = new MechPad("buffer-pad"){{
@@ -1682,12 +1712,15 @@ public class UnityBlocks{
 
                 itemDuration = 200f;
                 consumes.item(UnityItems.uranium, 2);
-                consumes.liquid(Liquids.cryofluid, 0.7f);
+                consumes.liquid(Liquids.water, 0.7f);
                 consumes.power(20f);
 
                 itemCapacity = 20;
                 powerProduction = 150f;
                 health = 1000;
+
+                plasma1 = Color.valueOf("a5e1a2");
+                plasma2 = Color.valueOf("869B84");
         }};
 
         teleporter = new Teleporter("teleporter"){{
@@ -1789,9 +1822,9 @@ public class UnityBlocks{
             coolantMultiplier = 2f;
             range = 140f;
 
-            chargeTime = 50f;
-            chargeMaxDelay = 40f;
-            chargeEffects = 5;
+            chargeTime = 80f;
+            chargeMaxDelay = 20f;
+            chargeEffects = 8;
             recoilAmount = 4f;
 
             cooldown = 0.03f;
@@ -1799,29 +1832,24 @@ public class UnityBlocks{
             shootShake = 5f;
             powerUse = 13f;
 
-            shootEffect = ShootFx.laserChargeShoot;
+            shootEffect = ShootFx.laserFractalShoot;
             smokeEffect = Fx.none;
-            chargeEffect = UnityFx.laserCharge;
-            chargeBeginEffect = UnityFx.laserChargeBegin;
-            heatColor = Color.red;
+            chargeEffect = UnityFx.laserFractalCharge;
+            chargeBeginEffect = UnityFx.laserFractalChargeBegin;
             shootSound = Sounds.laser;
 
+            heatColor = Color.red;
             fromColor = UnityPal.lancerSap3;
             toColor = Pal.place;
 
             shootType = UnityBullets.fractalLaser;
-
-            //todo fractal laser (handle radius on the bullet's side
-            //basicFieldRadius = 85f;
 
             maxLevel = 30;
             expFields = new EField[]{
                     new LinearReloadTime(v -> reloadTime = v, UnityBullets.distField.lifetime / 3f, -2f),
                     new ELinear(v -> range = v, 140f, 0.25f * tilesize, Stat.shootRange, v -> Strings.autoFixed(v / tilesize, 2) + " blocks")
             };
-            //progression.linear(basicFieldRadius, 0.2f * tilesize, val -> basicFieldRadius = val);
 
-            //bulletCons((ExpLaserFieldBulletType type, Bullet b) -> type.basicFieldRadius = basicFieldRadius);
             pregrade = (ExpTurret) laserCharge;
             pregradeLevel = 15;
             effectColors = new Color[]{fromColor, Pal.lancerLaser.cpy().lerp(Pal.sapBullet, 0.75f), Pal.sapBullet};
@@ -2006,6 +2034,21 @@ public class UnityBlocks{
             health = 300;
         }};
 
+        expNode = new ExpNode("exp-node"){{
+            requirements(Category.effect, with(UnityItems.denseAlloy, 30, Items.silicon, 30, UnityItems.steel, 8));
+            expCapacity = 200;
+            consumes.power(0.6f);
+        }};
+
+        expNodeLarge = new ExpNode("exp-node-large"){{
+            requirements(Category.effect, with(UnityItems.denseAlloy, 120, Items.silicon, 120, UnityItems.steel, 24));
+            expCapacity = 600;
+            range = 10;
+            health = 200;
+            size = 2;
+            consumes.power(1.4f);
+        }};
+
         expTank = new ExpTank("exp-tank"){{
             requirements(Category.effect, with(Items.copper, 100, UnityItems.denseAlloy, 100, Items.graphite, 30));
             expCapacity = 800;
@@ -2026,6 +2069,53 @@ public class UnityBlocks{
 
         expVoid = new ExpVoid("exp-void"){{
             requirements(Category.effect, BuildVisibility.sandboxOnly, with());
+        }};
+
+        buffTurret = new BlockOverdriveTurret("buff-turret"){{
+            requirements(Category.effect, with(Items.thorium, 60, Items.plastanium, 90, UnityItems.stone, 100, UnityItems.denseAlloy, 70));
+            health = 200;
+            size = 1;
+            buffRange = 100f;
+            consumes.item(UnityItems.steel).boost();
+        }};
+
+        upgradeTurret = new BlockOverdriveTurret("upgrade-turret"){{
+            requirements(Category.effect, with(Items.surgeAlloy, 80, UnityItems.steel, 120, UnityItems.dirium, 70));
+            health = 300;
+            size = 1;
+            buffRange = 100f;
+            consumes.item(UnityItems.dirium).boost();
+        }};
+
+        shieldWall = new ShieldWall("shield-wall"){{
+            requirements(Category.defense, with());
+
+            health = 500;
+            shieldHealth = 500;
+            size = 1;
+            maxLevel = 10;
+
+            expFields = new EField[]{
+                    new ERational(v -> maxDamage = v, 48f, 24f, -3f, Stat.abilities, v -> bundle.format("stat.unity.maxdamage", v)).formatAll(false),
+                    new ELinear(v -> repair = v, 5f, 7f, Stat.repairSpeed),
+                    new ELinear(v -> shieldHealth = v, 500, 25, Stat.shieldHealth),
+                    new ELinear(v -> shieldArmor = v, 0, 0.02f, Stat.abilities, v -> bundle.format("stat.shieldarmor", v)).formatAll(true)
+            };
+        }};
+
+        shieldWallLarge = new ShieldWall("shield-wall-large"){{
+            requirements(Category.defense, with());
+
+            health = 2000;
+            shieldHealth = 2000;
+            size = 2;
+            maxLevel = 25;
+
+            expFields = new EField[]{
+                    new ERational(v -> maxDamage = v, 72f, 24f, -3f, Stat.abilities, v -> bundle.format("stat.unity.maxdamage", v)).formatAll(false),
+                    new ELinear(v -> repair = v, 5f, 10f, Stat.repairSpeed),
+                    new ELinear(v -> shieldHealth = v, 800, 30, Stat.shieldHealth)
+            };
         }};
 
         //endregion

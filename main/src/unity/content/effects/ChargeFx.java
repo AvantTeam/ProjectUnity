@@ -22,6 +22,8 @@ import static arc.math.Angles.*;
 import static mindustry.Vars.*;
 
 public class ChargeFx{
+    private static final Color tmpCol = new Color();
+
     public static Effect
 
     greenLaserChargeSmallParent = new ParentEffect(40f, 100f, e -> {
@@ -106,6 +108,147 @@ public class ChargeFx{
         }
     }),
 
+    oppressionCharge = new Effect(5f * 60f, 2530f * 2f, e -> {
+        Rand r = Utils.seedr, r2 = Utils.seedr2, r3 = Utils.seedr3;
+        r.setSeed(e.id * 9999L);
+
+        float off = 140f / e.lifetime;
+        float off2 = 70f / e.lifetime;
+
+        float fin1 = e.time >= 150f ? 1f : e.time / 150f;
+        float fin2 = e.time >= 60f ? 1f : e.time / 60f;
+
+        float time = Time.time;
+        color(UnityPal.scarColor);
+        for(int i = 0; i < 11; i++){
+            float f = (i / 10f) * off2;
+            float cf = Mathf.curve(e.fin(), f, (1f - off2) + f);
+            float cfo = 1f - cf;
+            float rot = e.rotation + (r.nextFloat() - r.nextFloat()) * 6f;
+            float len = r.random(75f, 210f) * Interp.pow2Out.apply(MathU.slope(cf, 0.75f));
+            float wid = (len / 15f) * cf * 2f * r.random(0.8f, 1.2f);
+            float trns = r.random(2530f - len * 2f) + len;
+            if(cf <= 0f || cf >= 1f) continue;
+            Vec2 v = Tmp.v1.trns(rot, trns * Interp.pow3In.apply(cfo)).add(e.x, e.y);
+            UnityDrawf.diamond(v.x + Mathf.range(4f) * cf, v.y + Mathf.range(4f) * cf, wid, len, rot);
+        }
+        if(e.time > 145f){
+            float fin3 = e.time - 145f >= 140f ? 1f : (e.time - 145f) / 140f;
+            r3.setSeed(e.id * 9999L + 781);
+            float spikef = Mathf.clamp((e.time - 145f) / 20f, 0f, 13f);
+            int spikei = Mathf.ceil(spikef);
+            for(int i = 0; i < spikei; i++){
+                float spikem = spikef >= 13f || i < spikei - 1 ? 1f : (spikef % 1f);
+                float d = r3.random(25f, 45f);
+                float timeOffset = r3.random(d);
+                float f = ((time + timeOffset) % d) / d;
+                float fo = 1f - f;
+                int timeSeed = Mathf.floor((time + timeOffset) / d) + r3.nextInt();
+                float offs = 0.33f;
+                float lt = f < offs ? Interp.pow2In.apply(f / offs) : 1f - (f - offs) / (1f - offs);
+
+                r2.setSeed(timeSeed);
+                float rot = r2.random(360f) + r2.range(5f) * f;
+                float trns = (r2.random(8f, 13f) + r2.random(5f, 10f) * e.fin());
+                float w = r2.random(17f, 30f) + r2.random(8f) * fin3 * Mathf.curve(fo, 0f, 0.5f);
+                float l = r2.random(75f, 180f) * lt * spikem;
+                Tmp.v1.trns(rot, trns).add(e.x, e.y);
+                UnityDrawf.diamond(Tmp.v1.x, Tmp.v1.y, w, l, 0.4f, rot);
+            }
+            float fin4 = (e.time - 145f) / (e.lifetime - 145f);
+            UnityDrawf.diamond(e.x, e.y, 17f * Interp.pow2Out.apply(Mathf.curve(fin4, 0f, 0.2f)), (160f + Mathf.absin(8f, 6f)) * Interp.pow2.apply(fin4), e.rotation + 90f);
+        }
+        for(int i = 0; i < 35; i++){
+            float d = r.random(10f, 30f);
+            float timeOffset = r.random(d);
+            int timeSeed = Mathf.floor((time + timeOffset) / d) + r.nextInt();
+            float f = ((time + timeOffset) % d) / d;
+            float fo = 1f - f;
+            float trv = 1f - (f < 0.75f ? Interp.pow3Out.apply(f / 0.75f) * 0.75f : Interp.pow2In.apply((f - 0.75f) / 0.25f) * 0.25f + 0.75f);
+
+            r2.setSeed(timeSeed);
+            float rot = r2.random(360f);
+            float trns = (r2.random(15f, 65f) + r2.random(15f, 75f) * e.fin()) * trv;
+            float trns2 = r2.random(200f, 900f) * fo * (1f - fin1);
+            float rad = (r2.random(10f, 22f) + 11f * e.fin()) * fin2 * Interp.pow2Out.apply(MathU.slope(f, 0.75f));
+            if(trns2 > 0){
+                Tmp.v1.trns(e.rotation + r2.range(4f), trns2).add(e.x, e.y);
+            }else{
+                Tmp.v1.set(e.x, e.y);
+            }
+            color(UnityPal.scarColor, Color.black, Mathf.curve(f, 0.35f, 0.75f));
+            Vec2 v = Tmp.v2.trns(rot, trns).add(Tmp.v1);
+            Fill.square(v.x, v.y, rad, 45f);
+        }
+
+        color(UnityPal.scarColor);
+        for(int i = 0; i < 22; i++){
+            float f = (i / 21f) * off;
+            float cf = Mathf.curve(e.fin(), f, (1f - off) + f);
+            float cfo = 1f - cf;
+            float rot = e.rotation + (r.nextFloat() - r.nextFloat()) * 20f;
+            float len = r.random(300f, 800f);
+            float trns = r.random(2530f - len) * cfo * cfo;
+            if(cf <= 0f || cf >= 1f) continue;
+            Vec2 v = Tmp.v1.trns(rot, trns).add(e.x, e.y);
+            stroke(3f);
+            lineAngle(v.x, v.y, rot, len * Mathf.slope(cfo * cfo), false);
+        }
+        float t = e.time < 3.75f * 60f ? 0f : Mathf.clamp((e.time - 3.75f * 60f) / 30f);
+        float length = Interp.pow3.apply(Mathf.clamp(e.time / 20f)) * 2530f;
+        color(UnityPal.scarColor, Color.black, t);
+        stroke(5f);
+        lineAngle(e.x, e.y, e.rotation, length);
+        if(t > 0f){
+            r3.setSeed(e.id * 9999L + 613);
+            float dr = 3.75f * 60f;
+            float partf = Mathf.clamp((e.time - dr) / (e.lifetime - dr)) * 9f;
+            int parti = Mathf.ceil(partf);
+
+            for(int j = 0; j < parti; j++){
+                float partm = partf >= 9f || j < parti - 1 ? 1f : (partf % 1f);
+
+                for(int i = 0; i < 9; i++){
+                    float d = r3.random(7f, 11f);
+                    float timeOffset = r3.random(d);
+                    int timeSeed = Mathf.floor((time + timeOffset) / d) + r3.nextInt();
+                    float f = ((time + timeOffset) % d) / d;
+
+                    r2.setSeed(timeSeed);
+                    float l = r2.random(100f, 200f) * Interp.pow2Out.apply(Mathf.curve(f, 0f, 0.5f)) * partm;
+                    float w = r2.random(9f, 19f) * MathU.slope(f, 0.8f) * partm * t;
+
+                    float trns = r2.random(2530f - l * 2f) + l + r2.range(3f) * f;
+                    float of = (r2.nextFloat() - r2.nextFloat()) * 35f * Interp.pow3Out.apply(1f - f) * (0.5f + t * 0.5f);
+                    //float scl = r2.random(5f, 10f) * t * partm * MathU.slope(f, 0.8f);
+                    Tmp.v1.trns(e.rotation, trns, of).add(e.x, e.y);
+                    color(UnityPal.scarColor, Color.black, Mathf.curve(f, 0.2f, 0.75f));
+                    UnityDrawf.diamond(Tmp.v1.x, Tmp.v1.y, w, l, e.rotation);
+                    //Fill.square(Tmp.v1.x, Tmp.v1.y, scl, 45f);
+                }
+            }
+        }
+        if(e.time < 3.75f * 60f){
+            float t2 = Mathf.clamp((3.75f * 60f - e.time) / 30f);
+
+            r3.setSeed(e.id * 9999L + 613);
+            color(UnityPal.scarColor);
+            for(int i = 0; i < 30; i++){
+                float d = r3.random(18f, 24f);
+                float timeOffset = r3.random(d);
+                int timeSeed = Mathf.floor((time + timeOffset) / d) + r3.nextInt();
+                float f = ((time + timeOffset) % d) / d;
+
+                r2.setSeed(timeSeed);
+                float trns = r2.random(length) + r2.range(2f) * f;
+                float of = (r2.nextFloat() - r2.nextFloat()) * 65f * Interp.pow3In.apply(f) * (0.5f + t2 * 0.5f);
+                float scl = r2.random(3f, 8f) * t2 * MathU.slope(f, 0.25f);
+                Tmp.v1.trns(e.rotation, trns, of).add(e.x, e.y);
+                Fill.square(Tmp.v1.x, Tmp.v1.y, scl, 45f);
+            }
+        }
+    }).followParent(true).rotWithParent(true),
+
     wBosonChargeBeginEffect = new Effect(38f, e -> {
         color(UnityPal.lightEffect, Pal.lancerLaser, e.fin());
         Fill.circle(e.x, e.y, 3f + e.fin() * 6f);
@@ -131,131 +274,54 @@ public class ChargeFx{
         UnityDrawf.shiningCircle(e.id, Time.time, e.x, e.y, e.fin() * 7.5f, 6, 25f, 20f, 2.5f * e.fin());
     }),
 
-    tendenceCharge = new Effect(32f, e -> {
+    tendenceCharge = new CustomStateEffect(() -> {
+        class State extends EffectState{
+            @Override
+            public void remove(){
+                if(data instanceof TrailHold[] data) for(TrailHold trail : data) Fx.trailFade.at(x, y, trail.width, UnityPal.monolithLight, trail.trail.copy());
+                super.remove();
+            }
+        } return Pools.obtain(State.class, State::new);
+    }, 40f, e -> {
         if(!(e.data instanceof TrailHold[] data)) return;
 
-        color(UnityPal.monolithDark, UnityPal.monolith, e.fin());
-        alpha(e.fin());
-        randLenVectors(e.id, 8, e.foutpow() * 20f, (x, y) ->
-            Fill.circle(e.x + x, e.y + y, 1.5f + e.fin() * 4.5f)
+        color(UnityPal.monolith, UnityPal.monolithLight, e.fin());
+        randLenVectors(e.id, 8, 8f + e.foutpow() * 32f, (x, y) ->
+            Fill.circle(e.x + x, e.y + y, 0.5f + e.fin() * 2.5f)
         );
 
         color();
         for(TrailHold hold : data){
-            Tmp.v1.set(hold.x, hold.y).sub(e.x, e.y);
-            Tmp.v2.trns(Tmp.v1.angle(), Mathf.sin(hold.width * 0.3f, hold.width * 4f * e.fin()));
+            Tmp.v1.set(hold.x, hold.y);
+            Tmp.v2.trns(Tmp.v1.angle() - 90f, Mathf.sin(hold.width * 2.6f, hold.width * 8f * Interp.pow2Out.apply(e.fslope())));
+            Tmp.v1.scl(e.foutpowdown()).add(Tmp.v2).add(e.x, e.y);
 
-            Tmp.v1.setLength2((1f - e.finpowdown()) * Tmp.v1.len2()).add(Tmp.v2);
-            float x = e.x + Tmp.v1.x, y = e.y + Tmp.v1.y;
+            float w = hold.width * e.fin();
+            if(!state.isPaused()) hold.trail.update(Tmp.v1.x, Tmp.v1.y, w);
 
-            if(!state.isPaused()) hold.trail.update(x, y, hold.width);
-            hold.trail.draw(UnityPal.monolithLight, hold.width);
+            tmpCol.set(UnityPal.monolith).lerp(UnityPal.monolithLight, e.finpowdown());
+            hold.trail.drawCap(tmpCol, w);
+            hold.trail.draw(tmpCol, w);
         }
 
-        stroke(e.fin(), UnityPal.monolithLight);
-        Lines.circle(e.x, e.y, e.fout() * 32f);
+        stroke(Mathf.curve(e.fin(), 0.5f) * 1.4f, UnityPal.monolithLight);
+        Lines.circle(e.x, e.y, e.fout() * 64f);
     }){
-        boolean initialized;
-        final int trailAmount = 12;
-        final int trailLength = 12;
-
-        // Why must `#create` be a static method...
         @Override
-        public void at(Position pos){
-            create(pos.getX(), pos.getY(), 0, Color.white, null);
-        }
-
-        @Override
-        public void at(Position pos, boolean parentize){
-            create(pos.getX(), pos.getY(), 0, Color.white, parentize ? pos : null);
-        }
-
-        @Override
-        public void at(Position pos, float rotation){
-            create(pos.getX(), pos.getY(), rotation, Color.white, null);
-        }
-
-        @Override
-        public void at(float x, float y){
-            create(x, y, 0, Color.white, null);
-        }
-
-        @Override
-        public void at(float x, float y, float rotation){
-            create(x, y, rotation, Color.white, null);
-        }
-
-        @Override
-        public void at(float x, float y, float rotation, Color color){
-            create(x, y, rotation, color, null);
-        }
-
-        @Override
-        public void at(float x, float y, Color color){
-            create(x, y, 0, color, null);
-        }
-
-        @Override
-        public void at(float x, float y, float rotation, Color color, Object data){
-            create(x, y, rotation, color, data);
-        }
-
-        @Override
-        public void at(float x, float y, float rotation, Object data){
-            create(x, y, rotation, Color.white, data);
-        }
-
-        void create(float x, float y, float rotation, Color color, Object data){
-            if(headless || !Core.settings.getBool("effects")) return;
-
-            if(Core.camera.bounds(Tmp.r1).overlaps(Tmp.r2.setCentered(x, y, clip))){
-                if(!initialized){
-                    initialized = true;
-                    init();
-                }
-
-                if(startDelay <= 0f){
-                    inst(x, y, rotation, color, data);
-                }else{
-                    Time.runTask(startDelay, () -> inst(x, y, rotation, color, data));
-                }
-            }
-        }
-
-        void inst(float x, float y, float rotation, Color color, Object data){
-            CustomEffectState entity = Pools.obtain(CustomEffectState.class, CustomEffectState::new);
-            entity.effect = this;
-            entity.rotation = baseRotation + rotation;
-            entity.data = createTrails();
-            entity.lifetime = lifetime;
-            entity.set(x, y);
-            entity.color.set(color);
-            if(followParent && data instanceof Posc p){
-                entity.parent = p;
-                entity.rotWithParent = rotWithParent;
-            }
-
-            entity.add();
-        }
-
-        TrailHold[] createTrails(){
-            TrailHold[] trails = new TrailHold[trailAmount];
+        protected EffectState inst(float x, float y, float rotation, Color color, Object data){
+            TrailHold[] trails = new TrailHold[12];
             for(int i = 0; i < trails.length; i++){
-                Tmp.v1.setLength(Mathf.random(16f, 32f)).setToRandomDirection();
-                trails[i] = new TrailHold(new TexturedTrail(Core.atlas.find("unity-phantasmal-trail"), trailLength){{
+                Tmp.v1.trns(Mathf.random(360f), Mathf.random(24f, 64f));
+                trails[i] = new TrailHold(new TexturedTrail(Core.atlas.find("unity-phantasmal-trail"), 8){{
+                    shrink = 1f;
                     fadeAlpha = 0.5f;
                     blend = Blending.additive;
                 }}, Tmp.v1.x, Tmp.v1.y, Mathf.random(1f, 2f));
             }
-            return trails;
-        }
 
-        static class CustomEffectState extends EffectState{
-            @Override
-            public void remove(){
-                if(data instanceof TrailHold[] data) for(TrailHold trail : data) Fx.trailFade.at(x, y, trail.width, trail.trail);
-                super.remove();
-            }
+            EffectState state = super.inst(x, y, rotation, color, data);
+            state.data = trails;
+            return state;
         }
     }.followParent(true);
 }

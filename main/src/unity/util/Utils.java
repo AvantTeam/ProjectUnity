@@ -25,16 +25,17 @@ import static mindustry.Vars.*;
 
 public final class Utils{
     public static final PowIn pow6In = new PowIn(6f);
+    public static final PowOut pow25Out = new PowOut(25);
 
     public static final float sqrtHalf = Mathf.sqrt(0.5f);
 
     public static final Quat q1 = new Quat(), q2 = new Quat();
 
-    public static final Rand seedr = new Rand();
+    public static final Rand seedr = new Rand(), seedr2 = new Rand(), seedr3 = new Rand();
 
     private static final Vec2 tV = new Vec2(), tV2 = new Vec2();
     private static final Seq<Healthc> tmpUnitSeq = new Seq<>();
-    private static final IntSet collidedBlocks = new IntSet();
+    private static final IntSet collidedBlocks = new IntSet(), collidedEntities = new IntSet(204);
     private static final Rect rect = new Rect(), rectAlt = new Rect(), hitRect = new Rect();
     private static Posc result;
     private static float cdist;
@@ -47,8 +48,6 @@ public final class Utils{
     private static int randSeed = 1;
 
     private static final BoolGrid collideLineCollided = new BoolGrid();
-    private static final Seq<Point2> collideLineCast = new Seq<>();
-    private static final Seq<Point2> collideLineCastNext = new Seq<>();
 
     private static final IntSeq lineCast = new IntSeq(), lineCastNext = new IntSeq();
     private static final Seq<Hit> hitEffects = new Seq<>();
@@ -139,6 +138,21 @@ public final class Utils{
         }
 
         return any;
+    }
+
+    public static <T extends Entityc> T bestEntity(EntityGroup<T> group, Boolf<T> pred, Floatf<T> comp){
+        T best = null;
+        float last = -Float.MAX_VALUE;
+        float s = 0f;
+
+        for(T t : group){
+            if(pred.get(t) && (best == null || last > (s = comp.get(t)))){
+                best = t;
+                last = s;
+            }
+        }
+
+        return best;
     }
 
     public static Bullet nearestBullet(float x, float y, float range, Boolf<Bullet> boolf){
@@ -502,6 +516,84 @@ public final class Utils{
                 }
             }
         }
+    }
+
+    /**
+     * Used for very large collisions
+     * @param segments Reduces intersection to quad trees that's not within the line.
+     */
+    public static void collideLineLarge(Team team, float x, float y, float x2, float y2, float width, int segments, boolean sort, Boolf2<Sized, Vec2> within, HitHandler handler){
+        collidedEntities.clear();
+        hitEffects.clear();
+        for(TeamData data : state.teams.present){
+            if(data.team != team && data.buildings != null){
+                for(int i = 0; i < segments; i++){
+                    float ofs = 1f / segments;
+                    float f = i / (float)segments;
+                    float sx = Mathf.lerp(x, x2, f), sy = Mathf.lerp(y, y2, f);
+                    float sx2 = Mathf.lerp(x, x2, f + ofs), sy2 = Mathf.lerp(y, y2, f + ofs);
+                    rect.set(sx, sy, 0f, 0f).merge(sx2, sy2).grow(width * 2f);
+                    rectAlt.set(sx2, sy2, 0f, 0f).merge(Mathf.lerp(x, x2, f + ofs * 2f), Mathf.lerp(y, y2, f + ofs * 2f)).grow(width * 2f);
+                    data.buildings.intersect(rect, b -> {
+                        Vec2 v = Intersector.nearestSegmentPoint(x, y, x2, y2, b.x, b.y, tV);
+                        if(within.get(b, v) && !collidedEntities.contains(b.id)){
+                            if(sort){
+                                Hit h = Pools.obtain(Hit.class, Hit::new);
+                                h.ent = b;
+                                h.x = v.x;
+                                h.y = v.y;
+                                hitEffects.add(h);
+                            }else{
+                                handler.get(v.x, v.y, b, true);
+                            }
+                            b.hitbox(hitRect);
+                            if(rectAlt.overlaps(hitRect)){
+                                collidedEntities.add(b.id);
+                            }
+                        }
+                    });
+                }
+            }
+        }
+        for(int i = 0; i < segments; i++){
+            float ofs = 1f / segments;
+            float f = i / (float)segments;
+            float sx = Mathf.lerp(x, x2, f), sy = Mathf.lerp(y, y2, f);
+            float sx2 = Mathf.lerp(x, x2, f + ofs), sy2 = Mathf.lerp(y, y2, f + ofs);
+            rect.set(sx, sy, 0f, 0f).merge(sx2, sy2).grow(width * 2f);
+            rectAlt.set(sx2, sy2, 0f, 0f).merge(Mathf.lerp(x, x2, f + ofs * 2f), Mathf.lerp(y, y2, f + ofs * 2f)).grow(width * 2f);
+            Groups.unit.intersect(rect.x, rect.y, rect.width, rect.height, u -> {
+                if(u.team == team) return;
+                Vec2 v = Intersector.nearestSegmentPoint(x, y, x2, y2, u.x, u.y, tV);
+                if(within.get(u, v) && !collidedEntities.contains(u.id)){
+                    if(sort){
+                        Hit h = Pools.obtain(Hit.class, Hit::new);
+                        h.ent = u;
+                        h.x = v.x;
+                        h.y = v.y;
+                        hitEffects.add(h);
+                    }else{
+                        handler.get(v.x, v.y, u, true);
+                    }
+                    u.hitbox(hitRect);
+                    if(rectAlt.overlaps(hitRect)){
+                        collidedEntities.add(u.id);
+                    }
+                }
+            });
+        }
+        if(sort){
+            hit = false;
+            hitEffects.sort(h -> h.ent.dst2(x, y));
+            hitEffects.removeAll(h -> {
+                if(!hit){
+                    hit = handler.get(h.x, h.y, h.ent, true);
+                }
+                Pools.free(h);
+                return true;
+            });
+        }
+        collidedEntities.clear();
     }
 
     public static void collideLineRawEnemyRatio(Team team, float x, float y, float x2, float y2, float width, Boolf3<Building, Float, Boolean> buildingCons, Boolf2<Unit, Float> unitCons, Floatc2 effectHandler){

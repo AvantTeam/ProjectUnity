@@ -25,18 +25,18 @@ import unity.graphics.*;
 import unity.type.*;
 import unity.util.*;
 
-import static arc.graphics.g2d.Draw.rect;
 import static arc.graphics.g2d.Draw.*;
-import static arc.graphics.g2d.Lines.circle;
 import static arc.graphics.g2d.Lines.*;
 import static arc.math.Angles.*;
 import static mindustry.Vars.tilesize;
 import static unity.content.UnityBullets.*;
+import static unity.graphics.UnityDrawf.spark;
 
 //deprecate the deprecation ^-^
 //** @deprecated These fields will eventually all be interpreted in the classes in {@link unity.content.effects} package. */
 public class UnityFx{
     private static int integer;
+    private static final Rand rand = new Rand();
 
     public static final Effect
         //@formatter:off
@@ -48,6 +48,16 @@ public class UnityFx{
         trail.shorten();
         trail.drawCap(e.color, e.rotation);
         trail.draw(e.color, e.rotation);
+    }),
+
+    //shamelessly stolen from BetaMindy
+    sparkle = new Effect(55f, e -> {
+        color(e.color);
+        integer = 0;
+        Angles.randLenVectors(e.id, e.id % 3 + 1, 8f, (x, y) -> {
+            integer++;
+            spark(e.x+x, e.y+y, e.fout()*2.5f, 0.5f+e.fout(), e.id * integer);
+        });
     }),
 
     expGain = new Effect(75f, 400f, e -> {
@@ -70,13 +80,33 @@ public class UnityFx{
         for(int i = 0; i < 4; i++) Drawf.tri(Tmp.v1.x, Tmp.v1.y, 4f, 4 + 1.5f * Mathf.sin(Time.time * 0.12f + e.id * 4f), i * 90f + Mathf.sin(Time.time * 0.04f + e.id * 5f) * 28f);
     }),
 
+    expDump = new Effect(75f, 400f, e -> {
+        if(!(e.data instanceof Position pos)) return;
+
+        float fin = Mathf.curve(e.fin(), 0, Mathf.randomSeed(e.id, 0.25f, 1f));
+        if(fin >= 1) return;
+
+        float a = angle(e.x, e.y, pos.getX(), pos.getY()) - 90;
+        float d = Mathf.dst(e.x, e.y, pos.getX(), pos.getY());
+        float fslope = fin * (1f - fin) * 4f;
+        float sfin = Interp.pow2In.apply(fin);
+        float spread = d / 4f;
+        Tmp.v1.trns(a, Mathf.randomSeed(e.id * 2L, -spread, spread) * fslope, d * sfin);
+        Tmp.v1.add(e.x, e.y);
+
+        color(UnityPal.exp, Color.white, 0.1f + 0.1f * Mathf.sin(Time.time * 0.03f + e.id * 3f));
+        Fill.circle(Tmp.v1.x, Tmp.v1.y, 1.5f);
+        stroke(0.5f);
+        for(int i = 0; i < 4; i++) Drawf.tri(Tmp.v1.x, Tmp.v1.y, 4f, 4 + 1.5f * Mathf.cos(Time.time * 0.12f + e.id * 4f), i * 90f + Mathf.sin(Time.time * 0.04f + e.id * 5f) * 28f);
+    }),
+
     expPoof = new Effect(60f, e -> {
         color(Pal.accent, UnityPal.exp, e.fin());
         integer = 0;
         randLenVectors(e.id, 9, 1f + 30f * e.finpow(), (x, y) -> {
             integer++;
             Fill.circle(e.x + x, e.y + y, 1.7f * e.fout());
-            UnityDrawf.spark(e.x + x, e.y + y, 5f, (5 + 1.5f * Mathf.sin(Time.time * 0.12f + integer * 4f)) * e.fout(), e.finpow() * 90f + integer * 69f);
+            spark(e.x + x, e.y + y, 5f, (5 + 1.5f * Mathf.sin(Time.time * 0.12f + integer * 4f)) * e.fout(), e.finpow() * 90f + integer * 69f);
         });
     }),
 
@@ -111,7 +141,7 @@ public class UnityFx{
         color(e.color);
         stroke(e.fout());
         square(e.x, e.y, e.rotation / 2f + e.fin() * 3f);
-        UnityDrawf.spark(e.x, e.y, 25f, 15f * e.fout(), e.finpow() * 90f);
+        spark(e.x, e.y, 25f, 15f * e.fout(), e.finpow() * 90f);
     }),
 
     laserCharge = new Effect(38f, e -> {
@@ -126,6 +156,39 @@ public class UnityFx{
         randLenVectors(e.id, 1, 1f + 20f * e.fout(), e.rotation, 120f, (x, y) ->
             Fill.square(e.x + x, e.y + y, e.fslope() * 1.5f + 0.1f, 45f)
         );
+    }),
+
+    laserFractalCharge = new Effect(120f, e -> {
+        float radius = 10 * 8;
+        float[] p = {0, 0};
+
+        Angles.randLenVectors(e.id, 3, radius/2 + Interp.pow3Out.apply(1 - e.fout(0.5f)) * radius * 1.25f, (x, y) -> {
+            e.scaled(60, ee -> {
+                ee.scaled(30, e1 ->{
+                    p[0] = Mathf.lerp(x, 0, e1.fin(Interp.pow2));
+                    p[1] = Mathf.lerp(y, 0, e1.fin(Interp.pow2));
+                });
+
+                Lines.stroke(ee.fout(0.5f), Pal.lancerLaser.cpy().lerp(Pal.sapBullet, 0.5f).a(ee.fout(0.5f)));
+                Lines.line(e.x+x, e.y+y, e.x+p[0], e.y+p[1]);
+            });
+        });
+    }),
+
+    laserFractalChargeBegin = new Effect(90f, e -> {
+        int[] r = {9, 10, 11, 12};
+
+        e.scaled(60, ee -> r[0] *= ee.fin());
+        e.scaled(40, ee -> r[1] *= ee.fin());
+        e.scaled(40, ee -> r[2] *= ee.fin());
+        e.scaled(60, ee -> r[3] *= ee.fin());
+
+        Draw.color(UnityPal.lancerSap3.cpy().a(0.1f+0.55f * e.fslope()));
+        Lines.arc(e.x, e.y, r[0], 0.6f, Time.time*8-60);
+        Lines.arc(e.x, e.y, r[1], 0.6f, Time.time*5);
+        Draw.color(Pal.lancerLaser.cpy().lerp(Pal.sapBullet, 0.5f+0.5f*Mathf.sin(16*e.fin())).a(0.25f+0.8f * e.fslope()));
+        Lines.arc(e.x, e.y, r[2], 0.4f, Time.time*-6+121);
+        Lines.arc(e.x, e.y, r[3], 0.4f, Time.time*-4+91);
     }),
 
     laserChargeBegin = new Effect(60f, e -> {
@@ -654,7 +717,7 @@ public class UnityFx{
         color(Color.white, e.color, e.fin());
         integer = 1;
         randLenVectors(e.id, e.id % 3 + 1, e.rotation * 4f + 4f, (x, y) -> {
-            UnityDrawf.spark(e.x + x, e.y + y, e.fout() * 4f, 0.5f + e.fout() * 2.2f, e.id * integer);
+            spark(e.x + x, e.y + y, e.fout() * 4f, 0.5f + e.fout() * 2.2f, e.id * integer);
             integer++;
         });
     }),
@@ -665,7 +728,7 @@ public class UnityFx{
         square(e.x, e.y, (e.fin() * 4f + 2f) * e.rotation, 0f);
         integer = 1;
         randLenVectors(e.id, e.id % 3 + 7, e.rotation * 4f + 4f + 8f * e.finpow(), (x, y) -> {
-            UnityDrawf.spark(e.x + x, e.y + y, e.fout() * 5f, e.fout() * 3.5f, e.id * integer);
+            spark(e.x + x, e.y + y, e.fout() * 5f, e.fout() * 3.5f, e.id * integer);
             integer++;
         });
     }),
@@ -1190,24 +1253,100 @@ public class UnityFx{
         }
     }),
 
+    smallChainLightning = new Effect(40f, 300f, e -> {
+        if(!(e.data instanceof Position p)) return;
+
+        float tx = p.getX(), ty = p.getY(), dst = Mathf.dst(e.x, e.y, tx, ty);
+        Tmp.v1.set(p).sub(e.x, e.y).nor();
+
+        float normx = Tmp.v1.x, normy = Tmp.v1.y;
+        float range = 6f;
+        int links = Mathf.ceil(dst / range);
+        float spacing = dst / links;
+
+        Lines.stroke(2.5f * e.fout());
+        Draw.color(Color.white, e.color, e.fin());
+
+        Lines.beginLine();
+
+        Lines.linePoint(e.x, e.y);
+
+        rand.setSeed(e.id);
+
+        for(int i = 0; i < links; i++){
+            float nx, ny;
+            if(i == links - 1){
+                nx = tx;
+                ny = ty;
+            }else{
+                float len = (i + 1) * spacing;
+                Tmp.v1.setToRandomDirection(rand).scl(range/2f);
+                nx = e.x + normx * len + Tmp.v1.x;
+                ny = e.y + normy * len + Tmp.v1.y;
+            }
+
+            Lines.linePoint(nx, ny);
+        }
+
+        Lines.endLine();
+    }),
+
+    chainLightning = new Effect(30f, 300f, e -> {
+        if(!(e.data instanceof Position p)) return;
+
+        float tx = p.getX(), ty = p.getY(), dst = Mathf.dst(e.x, e.y, tx, ty);
+        Tmp.v1.set(p).sub(e.x, e.y).nor();
+
+        float normx = Tmp.v1.x, normy = Tmp.v1.y;
+        float range = 6f;
+        int links = Mathf.ceil(dst / range);
+        float spacing = dst / links;
+
+        Lines.stroke(4f * e.fout());
+        Draw.color(Color.white, e.color, e.fin());
+
+        Lines.beginLine();
+
+        Lines.linePoint(e.x, e.y);
+
+        rand.setSeed(e.id);
+
+        for(int i = 0; i < links; i++){
+            float nx, ny;
+            if(i == links - 1){
+                nx = tx;
+                ny = ty;
+            }else{
+                float len = (i + 1) * spacing;
+                Tmp.v1.setToRandomDirection(rand).scl(range/2f);
+                nx = e.x + normx * len + Tmp.v1.x;
+                ny = e.y + normy * len + Tmp.v1.y;
+            }
+
+            Lines.linePoint(nx, ny);
+        }
+
+        Lines.endLine();
+    }),
+
     ricochetTrailSmall = new Effect(12f, e -> randLenVectors(e.id, 4, e.fout() * 3.5f, (x, y) -> {
         float w = 0.3f + e.fout();
 
-        color(e.color);
+        color(UnityPal.monolith, UnityPal.monolithDark, e.fin());
         Fill.rect(e.x + x, e.y + y, w, w, 45f);
     })),
 
     ricochetTrailMedium = new Effect(16f, e -> randLenVectors(e.id, 5, e.fout() * 5f, (x, y) -> {
         float w = 0.3f + e.fout() * 1.3f;
 
-        color(e.color);
+        color(UnityPal.monolith, UnityPal.monolithDark, e.fin());
         Fill.rect(e.x + x, e.y + y, w, w, 45f);
     })),
 
     ricochetTrailBig = new Effect(20f, e -> randLenVectors(e.id, 6, e.fout() * 6.5f, (x, y) -> {
         float w = 0.3f + e.fout() * 1.7f;
 
-        color(e.color);
+        color(UnityPal.monolith, UnityPal.monolithDark, e.fin());
         Fill.rect(e.x + x, e.y + y, w, w, 45f);
     })),
 
@@ -1216,7 +1355,7 @@ public class UnityFx{
         Fill.circle(e.x, e.y, e.fout() * (float)e.data);
     }),
 
-    spark = new Effect(15f, e -> {
+    sparkBoi = new Effect(15f, e -> {
         Draw.color(e.color);
         for (int j = 0; j < 4; j++) {
             Drawf.tri(e.x, e.y, (float) e.data - e.fin(), (float) e.data + 1 - e.fin() * ((float) e.data + 1), 90 * j + e.rotation);
