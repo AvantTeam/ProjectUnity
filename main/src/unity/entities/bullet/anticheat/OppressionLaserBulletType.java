@@ -21,7 +21,8 @@ import static unity.graphics.UnityDrawf.*;
 public class OppressionLaserBulletType extends AntiCheatBulletTypeBase{
     private static final int detail = 24;
     private static final float timeMul = 4f;
-    private static final float[] quad = new float[8], shape = new float[4 * detail], ltmp = new float[25], ltmp2 = new float[25];
+    public static final float[] shape = new float[4 * detail], quad = new float[8];
+    private static final float[] ltmp = new float[25], ltmp2 = new float[25];
     private static final Rand rand = new Rand(), rand2 = new Rand();
     private static final FloatSeq lines = new FloatSeq();
     private static final Color[] lightningColors = {Color.white, UnityPal.scarColor, Color.black};
@@ -85,6 +86,14 @@ public class OppressionLaserBulletType extends AntiCheatBulletTypeBase{
     public void init(){
         super.init();
         drawSize = length * 2f;
+    }
+
+    @Override
+    public void init(Bullet b){
+        super.init(b);
+        if(b.owner instanceof Rotc){
+            ShootFx.oppressionShoot.at(b.x, b.y, ((Rotc)b.owner).rotation(), b.owner);
+        }
     }
 
     @Override

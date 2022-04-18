@@ -11,6 +11,7 @@ import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import unity.entities.bullet.anticheat.*;
 import unity.entities.effects.*;
 import unity.graphics.*;
 import unity.graphics.MultiTrail.*;
@@ -156,6 +157,61 @@ public class ShootFx{
         Fill.poly(e.x, e.y, Lines.circleVertices(curve), curve);
         blend();
     }).layer(Layer.effect + 0.99f),
+
+    oppressionShoot = new Effect(170f, 2530f * 2f, e -> {
+        Rand r = Utils.seedr, r2 = Utils.seedr2;
+        float[] shape = OppressionLaserBulletType.shape, q = OppressionLaserBulletType.quad;
+        float fin1 = e.time / 25f;
+        color(UnityPal.endColor);
+        UnityDrawf.diamond(e.x, e.y, 17f * e.fout(), 160f + Mathf.absin(8f, 6f) + 90f * e.finpow(), e.rotation + 90f);
+        if(e.time < 25f){
+            float width = 280f * Interp.pow3Out.apply(fin1);
+            stroke(5f * (1f - fin1));
+            for(int i = 0; i < shape.length; i += 4){
+                if(i < shape.length - 4){
+                    for(int j = 0; j < q.length; j += 2){
+                        Vec2 v = Tmp.v1.trns(e.rotation, shape[i + j + 1] * 380f, shape[i + j] * width).add(e.x, e.y);
+                        q[j] = v.x;
+                        q[j + 1] = v.y;
+                    }
+                    line(q[0], q[1], q[6], q[7], false);
+                    line(q[2], q[3], q[4], q[5], false);
+                }else{
+                    for(int s : Mathf.signs){
+                        Vec2 v = Tmp.v1.trns(e.rotation, 380f, width * s).add(e.x, e.y);
+                        UnityDrawf.tri(v.x, v.y, getStroke(), 1000f, e.rotation);
+                    }
+                }
+            }
+        }
+        stroke(11f * e.fout());
+        for(int i = 0; i < 2; i++){
+            float fin2 = Mathf.clamp(e.time / 15f) + e.fin() * 0.25f;
+            float trns = i == 0 ? 60f : 130f;
+            float w = Interp.circleOut.apply((trns / 380f)) * 140f + 250f * fin2;
+
+            Vec2 v = Tmp.v1.trns(e.rotation, trns).add(e.x, e.y);
+            lineAngleCenter(v.x, v.y, e.rotation + 90f, w * 2f, false);
+        }
+
+        r.setSeed(e.id * 9999L);
+        for(int i = 0; i < 75; i++){
+            float maxOff = 0.2f + r.random(0.1f);
+            float off = r.nextFloat() * maxOff;
+            float fin = Mathf.curve(e.fin(), off, (1f - maxOff) + off);
+            float rot = r.random(360f);
+            float trns1 = r.random(195f) * Interp.pow3Out.apply(fin) + r.random(20f);
+            float trns2 = r.random(190f, 610f) * Interp.pow2In.apply(fin);
+            float scl = Interp.pow3Out.apply(MathU.slope(fin, 0.09f)) * r.random(9f, 14f);
+
+            Vec2 v = Tmp.v1.trns(rot, trns1);
+            Vec2 v2 = Tmp.v2.trns(e.rotation, -trns2).add(e.x, e.y);
+
+            color(UnityPal.scarColor, Color.darkGray, Color.gray, fin);
+            Fill.circle(v2.x + v.x, v2.y + v.y, scl);
+            Fill.circle(v2.x + v.x / 2f, v2.y + v.y / 2f, scl / 2f);
+        }
+    }).followParent(true).rotWithParent(true),
 
     monumentShoot = new Effect(48f, e -> {
         color(UnityPal.monolithLight);
