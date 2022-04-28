@@ -41,6 +41,8 @@ public class UnityUnitType extends UnitType{
     payloadCellRegion;
     public TextureRegion[] abilityRegions = new TextureRegion[AbilityTextures.values().length];
     public Seq<Weapon> bottomWeapons = new Seq<>();
+    public Engine engine;
+
     // AI
     public float bulletWidth = 2f;
     // Worms
@@ -406,6 +408,16 @@ public class UnityUnitType extends UnitType{
         // copter
         if(unit instanceof Copterc){
             drawRotors((Unit & Copterc)unit);
+        }
+    }
+
+    @Override
+    public void drawEngine(Unit unit){
+        if(!unit.isFlying()) return;
+        if(engine != null){
+            engine.draw(unit);
+        }else{
+            super.drawEngine(unit);
         }
     }
 

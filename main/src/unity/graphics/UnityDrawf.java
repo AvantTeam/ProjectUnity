@@ -181,6 +181,21 @@ public class UnityDrawf{
         Draw.vert(texture, vertices, 0, 24);
     }
 
+    /** A saner version of {@link Drawf#tri(float, float, float, float, float)}. */
+    public static void tri(float x, float y, float width, float length, float rotation){
+        float
+            ax = Angles.trnsx(rotation - 90f, width / 2f),
+            ay = Angles.trnsy(rotation - 90f, width / 2f),
+            tx = Angles.trnsx(rotation, length),
+            ty = Angles.trnsy(rotation, length);
+
+        Fill.tri(
+            x + ax, y + ay,
+            x + tx, y + ty,
+            x - ax, y - ay
+        );
+    }
+
     public static void quad(Texture texture, Position pos1, float u1, float v1, Position pos2, float u2, float v2, Position pos3, float u3, float v3, Position pos4, float u4, float v4){
         quad(texture, pos1.getX(), pos1.getY(), u1, v1, pos2.getX(), pos2.getY(), u2, v2, pos3.getX(), pos3.getY(), u3, v3, pos4.getX(), pos4.getY(), u4, v4);
     }

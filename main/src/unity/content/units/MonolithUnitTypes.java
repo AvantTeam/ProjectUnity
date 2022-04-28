@@ -11,6 +11,7 @@ import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
+import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -27,6 +28,8 @@ import unity.gen.*;
 import unity.graphics.*;
 import unity.graphics.MultiTrail.*;
 import unity.type.*;
+import unity.type.Engine.*;
+import unity.type.Engine.MultiEngine.*;
 import unity.type.weapons.monolith.*;
 import unity.util.*;
 
@@ -1017,6 +1020,7 @@ public final class MonolithUnitTypes{
             drag = 0.045f;
             rotateSpeed = 8f;
             flying = true;
+            hitSize = 12f;
             lowAltitude = true;
             rotateShooting = false;
             outlineColor = UnityPal.darkOutline;
@@ -1025,16 +1029,21 @@ public final class MonolithUnitTypes{
                 TexturedTrail get(int arg);
             } TrailType trail = length -> new TexturedTrail(Core.atlas.find("unity-phantasmal-trail"), length){{
                 blend = Blending.additive;
+                fadeInterp = Interp.pow3In;
                 shrink = 0f;
                 fadeAlpha = 1f;
+                mixAlpha = 1f;
+                shrink = 0.2f;
             }};
 
-            engineColor = UnityPal.monolithLight;
-            engineOffset = 11f;
+            engine = new Engine(){{
+                color = UnityPal.monolithLight;
+                offset = 11f;
+            }}.apply(this);
             trailType = unit -> new MultiTrail(
-                new TrailHold(trail.get(8), engineColor),
-                new TrailHold(trail.get(12), -4.5f, 2.5f, 0.6f, engineColor),
-                new TrailHold(trail.get(12), 4.5f, 2.5f, 0.6f, engineColor)
+                new TrailHold(trail.get(16), engineColor),
+                new TrailHold(trail.get(24), -4.5f, 2.5f, 0.6f, engineColor),
+                new TrailHold(trail.get(24), 4.5f, 2.5f, 0.6f, engineColor)
             ){{
                 rotation = (trail, x, y) -> unit.isValid() ? unit.rotation : trail.calcRot(x, y);
                 trailChance = 0.33f;
@@ -1091,7 +1100,7 @@ public final class MonolithUnitTypes{
                         trailChance = 0.3f;
                         trailParam = 1.5f;
                         trailWidth = 2f;
-                        trailLength = 6;
+                        trailLength = 12;
 
                         shootEffect = Fx.lightningShoot;
                         hitEffect = despawnEffect = Fx.hitLancer;
@@ -1117,32 +1126,46 @@ public final class MonolithUnitTypes{
             speed = 4.2f;
             accel = 0.08f;
             drag = 0.045f;
-            rotateSpeed = 8f;
+            rotateSpeed = 7.2f;
             flying = true;
+            hitSize = 16f;
             lowAltitude = true;
             rotateShooting = false;
+            maxSouls = 4;
             outlineColor = UnityPal.darkOutline;
 
+            Prov<Engine> etype = () -> new Engine(){{
+                offset = 10f;
+                size = 2.5f;
+                color = UnityPal.monolith;
+            }};
             interface TrailType{
                 TexturedTrail get(int arg);
-            } TrailType trail = length -> new TexturedTrail(Core.atlas.find("unity-phantasmal-trail"), length){{
+            } TrailType trail = length -> new TexturedTrail(Core.atlas.find("unity-soul-trail"), length){{
                 blend = Blending.additive;
+                fadeInterp = Interp.pow5In;
                 shrink = 1f;
                 fadeAlpha = 0.5f;
             }};
 
-            engineColor = engineColorInner = Color.clear;
-            engineOffset = 14f;
+            engine = new MultiEngine(
+                new EngineHold(etype.get(), -5f),
+                new EngineHold(etype.get(), 5f)
+            ){{
+                offset = 10f;
+                size = 2.5f;
+                color = UnityPal.monolith;
+            }}.apply(this);
             trailType = unit -> new MultiTrail(
-                new TrailHold(trail.get(12), -5f, 6f, 1f, engineColor),
-                new TrailHold(trail.get(12), 5f, 6f, 1f, engineColor)
+                new TrailHold(trail.get(24), -5f, 0f, 1f, UnityPal.monolithLight),
+                new TrailHold(trail.get(24), 5f, 0f, 1f, UnityPal.monolithLight)
             ){{
                 rotation = (trail, x, y) -> unit.isValid() ? unit.rotation : trail.calcRot(x, y);
                 trailChance = 0.5f;
                 trailWidth = 1.3f;
-                trailColor = UnityPal.monolithLight;
+                trailColor = UnityPal.monolith;
             }};
-            trailLength = 12;
+            trailLength = 24;
 
             weapons.add(new EnergyRingWeapon(){{
                 rings.add(new Ring(){{
@@ -1196,7 +1219,7 @@ public final class MonolithUnitTypes{
                         trailChance = 0.5f;
                         trailParam = 6f;
                         trailWidth = 4f;
-                        trailLength = 12;
+                        trailLength = 24;
 
                         hitEffect = despawnEffect = HitFx.tendenceHit;
                         chargeShootEffect = ShootFx.tendenceShoot;
@@ -1252,7 +1275,107 @@ public final class MonolithUnitTypes{
         }};
 
         liminality = new UnityUnitType("liminality"){{
+            health = 2000f;
+            rotateShooting = false;
+            lowAltitude = true;
+            flying = true;
 
+            strafePenalty = 0.1f;
+            hitSize = 36f;
+            speed = 3.5f;
+            rotateSpeed = 3.6f;
+            drag = 0.06f;
+            accel = 0.08f;
+
+            outlineColor = UnityPal.darkOutline;
+            ammoType = new PowerAmmoType(2000f);
+
+            Prov<Engine> etype = () -> new Engine(){{
+                offset = 65f / 4f;
+                size = 3f;
+                color = UnityPal.monolith;
+            }};
+            interface TrailType{
+                TexturedTrail get(int arg);
+            } TrailType trail = length -> new TexturedTrail(Core.atlas.find("unity-soul-trail"), length){{
+                blend = Blending.additive;
+                fadeInterp = Interp.pow5In;
+                shrink = 1f;
+                fadeAlpha = 0.5f;
+            }};
+
+            engine = new MultiEngine(
+                new EngineHold(new Engine(){{
+                    offset = 89f / 4f;
+                    size = 4f;
+                    color = UnityPal.monolithLight;
+                }}, 0f),
+                new EngineHold(etype.get(), -71f / 4f),
+                new EngineHold(etype.get(), 71f / 4f)
+            ){{
+                offset = 85f / 4f;
+                size = 4f;
+                color = UnityPal.monolithLight;
+            }}.apply(this);
+            trailType = unit -> new MultiTrail(
+                new TrailHold(new TexturedTrail(Core.atlas.find("unity-phantasmal-trail"), 32){{
+                    blend = Blending.additive;
+                    fadeInterp = Interp.pow3In;
+                    shrink = 0f;
+                    fadeAlpha = 1f;
+                    mixAlpha = 1f;
+                    shrink = 0.3f;
+                }}, engineColor),
+                new TrailHold(trail.get(48), -71f / 4f, (89f - 65f) / 4f, 0.875f, UnityPal.monolithLight),
+                new TrailHold(trail.get(48), 71f / 4f, (89f - 65f) / 4f, 0.875f, UnityPal.monolithLight)
+            ){{
+                rotation = (trail, x, y) -> unit.isValid() ? unit.rotation : trail.calcRot(x, y);
+                trailChance = 0.5f;
+                trailWidth = 1.6f;
+                trailColor = UnityPal.monolithLight;
+            }};
+            trailLength = 24;
+
+            decals.add(new UnitDecal(name + "-top", 0f, 0f, 0f, Layer.flyingUnit - 1f, Color.white));
+            weapons.add(new EnergyRingWeapon(){{
+                rings.add(new Ring(){{
+                    radius = 9f;
+                    thickness = 1f;
+                    spikes = 6;
+                    spikeOffset = 1.5f;
+                    spikeWidth = 2f;
+                    spikeLength = 4f;
+                    color = UnityPal.monolithDark.cpy().lerp(UnityPal.monolith, 0.5f);
+                }}, new Ring(){{
+                    shootY = radius = 5.6f;
+                    rotate = false;
+                    thickness = 1f;
+                    divisions = 2;
+                    divisionSeparation = 30f;
+                    angleOffset = 90f;
+                    color = UnityPal.monolith;
+                }}, new Ring(){{
+                    radius = 1.5f;
+                    thickness = 1f;
+                    spikes = 4;
+                    spikeOffset = 1.5f;
+                    spikeWidth = 2f;
+                    spikeLength = 2f;
+                    flip = true;
+                    color = UnityPal.monolithDark;
+                }});
+
+                x = 0f;
+                y = 5f;
+                mirror = false;
+                rotate = true;
+                reload = 72f;
+                inaccuracy = 15f;
+                layerOffset = 10f;
+                eyeRadius = 2f;
+
+                shootSound = Sounds.spark;
+            }});
         }};
 
         calenture = new UnityUnitType("calenture"){{

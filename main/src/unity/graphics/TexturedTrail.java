@@ -9,6 +9,8 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.graphics.*;
 
+import static mindustry.Vars.*;
+
 /**
  * A texture-able trail.
  * @author GlennFolker
@@ -24,6 +26,10 @@ public class TexturedTrail extends Trail{
     public float fadeAlpha = 0f;
     /** The trail's mix color alpha, used in {@link #draw(Color, float)}. Fades as the trail goes. */
     public float mixAlpha = 0.5f;
+    /** The trail's alpha interpolation. */
+    public Interp fadeInterp = Interp.linear;
+    /** The trail's mix color interpolation. */
+    public Interp mixInterp = Interp.linear;
     /** The trail's blending. */
     public Blending blend = Blending.normal;
 
@@ -43,7 +49,7 @@ public class TexturedTrail extends Trail{
     public TexturedTrail(TextureRegion region, int length){
         this(length);
         this.region = region;
-        if(region instanceof AtlasRegion reg) capRegion = Core.atlas.find(reg.name + "-cap", "circle");
+        if(!headless && region instanceof AtlasRegion reg) capRegion = Core.atlas.find(reg.name + "-cap", "circle");
     }
 
     public TexturedTrail(int length){
@@ -59,6 +65,8 @@ public class TexturedTrail extends Trail{
         out.shrink = shrink;
         out.fadeAlpha = fadeAlpha;
         out.mixAlpha = mixAlpha;
+        out.fadeInterp = fadeInterp;
+        out.mixInterp = mixInterp;
         out.blend = blend;
         out.points.addAll(points);
         out.lastX = lastX;
@@ -138,10 +146,10 @@ public class TexturedTrail extends Trail{
                 nx = Mathf.sin(z2) * fs2, ny = Mathf.cos(z2) * fs2,
 
                 mv1 = Mathf.lerp(v2, v, rv1), mv2 = Mathf.lerp(v2, v, rv2),
-                col1 = tmp.set(Draw.getColor()).a(rv1 * fadeAlpha + (1f - fadeAlpha)).clamp().toFloatBits(),
-                col2 = tmp.set(Draw.getColor()).a(rv2 * fadeAlpha + (1f - fadeAlpha)).clamp().toFloatBits(),
-                mix1 = tmp.set(color).a(rv1 * mixAlpha).clamp().toFloatBits(),
-                mix2 = tmp.set(color).a(rv2 * mixAlpha).clamp().toFloatBits();
+                col1 = tmp.set(Draw.getColor()).a(fadeInterp.apply(rv1 * fadeAlpha + (1f - fadeAlpha))).clamp().toFloatBits(),
+                col2 = tmp.set(Draw.getColor()).a(fadeInterp.apply(rv2 * fadeAlpha + (1f - fadeAlpha))).clamp().toFloatBits(),
+                mix1 = tmp.set(color).a(mixInterp.apply(rv1 * mixAlpha)).clamp().toFloatBits(),
+                mix2 = tmp.set(color).a(mixInterp.apply(rv2 * mixAlpha)).clamp().toFloatBits();
 
             vertices[0] = x1 - cx;
             vertices[1] = y1 - cy;
@@ -200,7 +208,6 @@ public class TexturedTrail extends Trail{
         lastX = x;
         lastY = y;
         lastW = width;
-
         calcProgress();
     }
 
