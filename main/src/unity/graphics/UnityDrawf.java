@@ -59,12 +59,6 @@ public class UnityDrawf{
         }
     }
 
-    public static void tri(float x, float y, float width, float length, float rotation){
-        float tx1 = Angles.trnsx(rotation + 90f, width / 2f), ty1 = Angles.trnsy(rotation + 90f, width / 2f),
-        tx2 = Angles.trnsx(rotation, length), ty2 = Angles.trnsy(rotation, length);
-        Fill.tri(x + tx1, y + ty1, x - tx1, y - ty1, x + tx2, y + ty2);
-    }
-
     public static void diamond(float x, float y, float width, float length, float backLengthScl, float rotation){
         float tx1 = Angles.trnsx(rotation + 90f, width), ty1 = Angles.trnsy(rotation + 90f, width),
         tx2 = Angles.trnsx(rotation, length), ty2 = Angles.trnsy(rotation, length);
