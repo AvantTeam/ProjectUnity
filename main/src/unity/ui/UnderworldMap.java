@@ -3,6 +3,7 @@ package unity.ui;
 import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.input.KeyCode;
 import arc.math.Mathf;
 import arc.scene.*;
 import arc.scene.event.InputEvent;
@@ -12,6 +13,7 @@ import mindustry.content.Blocks;
 import mindustry.graphics.Pal;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
+import unity.type.*;
 
 import static mindustry.Vars.*;
 
@@ -33,9 +35,11 @@ public class UnderworldMap extends Element {
     private static Pixmap darknessPixmap;
     private static Texture darknessTexture;
     private static TextureRegion darknessRegion;
-    private static float mouseX = -1, mouseY = -1;
+    private static int mouseX = -1, mouseY = -1;
 
     private static final Color darknessColor = Color.white.cpy().lerp(Color.black, 0.71f), realDarknessColor = new Color(0f, 0f, 0f, darknessColor.a);
+
+    public UnderworldBlock placing;
 
     @Override
     public float getMinWidth() {
@@ -72,16 +76,14 @@ public class UnderworldMap extends Element {
 
                 super.exit(event, x, y, pointer, toActor);
             }
+
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button) {
+                // TODO make map storage
+                Log.info("Clicked at x:" + mouseX + " y:" + mouseY);
+                return super.touchDown(event, x, y, pointer, button);
+            }
         });
-    }
-
-    public Pixmap getPixmap(){
-        return pixmap;
-    }
-
-    public @Nullable
-    Texture getTexture(){
-        return texture;
     }
 
     public static void reset(){
@@ -195,7 +197,7 @@ public class UnderworldMap extends Element {
     }
 
     public void rectCorner(TextureRegion tr, float w, float h){
-        Draw.rect(tr,x + w*0.5f, y + h*0.5f, w, h);
+        Draw.rect(tr,x + w*0.5f, y + h*0.5f + 32f, w, h);
     }
 
     @Override
@@ -213,7 +215,7 @@ public class UnderworldMap extends Element {
             updateAll();
         }
 
-        if(mouseX != -1 && mouseY != -1){
+        if(mouseX != -1 && mouseY != -1 && !(world.tile(mouseX, mouseY).block() instanceof StaticWall)){
             Draw.color(Pal.accent);
             Draw.alpha(0.2f);
             Fill.rect(x + mouseX * 32f + 16f, y + mouseY * 32f + 16f, 32, 32);

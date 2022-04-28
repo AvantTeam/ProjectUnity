@@ -11,11 +11,7 @@ import mindustry.graphics.*;
 
 public class UnityDrawf{
     private static final TextureRegion nRegion = new TextureRegion();
-    private static final Vec2
-        vec1 = new Vec2(), vec2 = new Vec2(), vec3 = new Vec2(), vec4 = new Vec2(),
-        vec5 = new Vec2(), vec6 = new Vec2(), vec7 = new Vec2(), vec8 = new Vec2(),
-        vec9 = new Vec2(), vec10 = new Vec2(), vec11 = new Vec2(), vec12 = new Vec2(),
-        vec13 = new Vec2(), vec14 = new Vec2(), vec15 = new Vec2(), vec16 = new Vec2();
+    private static final Vec2 vec1 = new Vec2();
 
     private static final Vec3 v31 = new Vec3();
     private static final Mat3D m41 = new Mat3D();
@@ -61,6 +57,30 @@ public class UnityDrawf{
 
             Lines.line(x1 + x, y1 + y, vec1.x + x, vec1.y + y);
         }
+    }
+
+    public static void tri(float x, float y, float width, float length, float rotation){
+        float tx1 = Angles.trnsx(rotation + 90f, width / 2f), ty1 = Angles.trnsy(rotation + 90f, width / 2f),
+        tx2 = Angles.trnsx(rotation, length), ty2 = Angles.trnsy(rotation, length);
+        Fill.tri(x + tx1, y + ty1, x - tx1, y - ty1, x + tx2, y + ty2);
+    }
+
+    public static void diamond(float x, float y, float width, float length, float backLengthScl, float rotation){
+        float tx1 = Angles.trnsx(rotation + 90f, width), ty1 = Angles.trnsy(rotation + 90f, width),
+        tx2 = Angles.trnsx(rotation, length), ty2 = Angles.trnsy(rotation, length);
+        Fill.quad(x + tx1, y + ty1,
+        x + tx2, y + ty2,
+        x - tx1, y - ty1,
+        x - tx2 * backLengthScl, y - ty2 * backLengthScl);
+    }
+
+    public static void diamond(float x, float y, float width, float length, float rotation){
+        float tx1 = Angles.trnsx(rotation + 90f, width), ty1 = Angles.trnsy(rotation + 90f, width),
+        tx2 = Angles.trnsx(rotation, length), ty2 = Angles.trnsy(rotation, length);
+        Fill.quad(x + tx1, y + ty1,
+        x + tx2, y + ty2,
+        x - tx1, y - ty1,
+        x - tx2, y - ty2);
     }
 
     public static void shiningCircle(int seed, float time, float x, float y, float radius, int spikes, float spikeDuration, float spikeWidth, float spikeHeight){

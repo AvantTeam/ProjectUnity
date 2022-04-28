@@ -4,6 +4,7 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.util.*;
 import arc.util.pooling.*;
 import mindustry.content.*;
@@ -106,6 +107,147 @@ public class ChargeFx{
             UnityDrawf.shiningCircle(e.id * 241, Time.time + (i * 3f), e.x, e.y, scl * e.fin(), 9, 12f, width, spikeIn);
         }
     }),
+
+    oppressionCharge = new Effect(5f * 60f, 2530f * 2f, e -> {
+        Rand r = Utils.seedr, r2 = Utils.seedr2, r3 = Utils.seedr3;
+        r.setSeed(e.id * 9999L);
+
+        float off = 140f / e.lifetime;
+        float off2 = 70f / e.lifetime;
+
+        float fin1 = e.time >= 150f ? 1f : e.time / 150f;
+        float fin2 = e.time >= 60f ? 1f : e.time / 60f;
+
+        float time = Time.time;
+        color(UnityPal.scarColor);
+        for(int i = 0; i < 11; i++){
+            float f = (i / 10f) * off2;
+            float cf = Mathf.curve(e.fin(), f, (1f - off2) + f);
+            float cfo = 1f - cf;
+            float rot = e.rotation + (r.nextFloat() - r.nextFloat()) * 6f;
+            float len = r.random(75f, 210f) * Interp.pow2Out.apply(MathU.slope(cf, 0.75f));
+            float wid = (len / 15f) * cf * 2f * r.random(0.8f, 1.2f);
+            float trns = r.random(2530f - len * 2f) + len;
+            if(cf <= 0f || cf >= 1f) continue;
+            Vec2 v = Tmp.v1.trns(rot, trns * Interp.pow3In.apply(cfo)).add(e.x, e.y);
+            UnityDrawf.diamond(v.x + Mathf.range(4f) * cf, v.y + Mathf.range(4f) * cf, wid, len, rot);
+        }
+        if(e.time > 145f){
+            float fin3 = e.time - 145f >= 140f ? 1f : (e.time - 145f) / 140f;
+            r3.setSeed(e.id * 9999L + 781);
+            float spikef = Mathf.clamp((e.time - 145f) / 20f, 0f, 13f);
+            int spikei = Mathf.ceil(spikef);
+            for(int i = 0; i < spikei; i++){
+                float spikem = spikef >= 13f || i < spikei - 1 ? 1f : (spikef % 1f);
+                float d = r3.random(25f, 45f);
+                float timeOffset = r3.random(d);
+                float f = ((time + timeOffset) % d) / d;
+                float fo = 1f - f;
+                int timeSeed = Mathf.floor((time + timeOffset) / d) + r3.nextInt();
+                float offs = 0.33f;
+                float lt = f < offs ? Interp.pow2In.apply(f / offs) : 1f - (f - offs) / (1f - offs);
+
+                r2.setSeed(timeSeed);
+                float rot = r2.random(360f) + r2.range(5f) * f;
+                float trns = (r2.random(8f, 13f) + r2.random(5f, 10f) * e.fin());
+                float w = r2.random(17f, 30f) + r2.random(8f) * fin3 * Mathf.curve(fo, 0f, 0.5f);
+                float l = r2.random(75f, 180f) * lt * spikem;
+                Tmp.v1.trns(rot, trns).add(e.x, e.y);
+                UnityDrawf.diamond(Tmp.v1.x, Tmp.v1.y, w, l, 0.4f, rot);
+            }
+            float fin4 = (e.time - 145f) / (e.lifetime - 145f);
+            UnityDrawf.diamond(e.x, e.y, 17f * Interp.pow2Out.apply(Mathf.curve(fin4, 0f, 0.2f)), (160f + Mathf.absin(8f, 6f)) * Interp.pow2.apply(fin4), e.rotation + 90f);
+        }
+        for(int i = 0; i < 35; i++){
+            float d = r.random(10f, 30f);
+            float timeOffset = r.random(d);
+            int timeSeed = Mathf.floor((time + timeOffset) / d) + r.nextInt();
+            float f = ((time + timeOffset) % d) / d;
+            float fo = 1f - f;
+            float trv = 1f - (f < 0.75f ? Interp.pow3Out.apply(f / 0.75f) * 0.75f : Interp.pow2In.apply((f - 0.75f) / 0.25f) * 0.25f + 0.75f);
+
+            r2.setSeed(timeSeed);
+            float rot = r2.random(360f);
+            float trns = (r2.random(15f, 65f) + r2.random(15f, 75f) * e.fin()) * trv;
+            float trns2 = r2.random(200f, 900f) * fo * (1f - fin1);
+            float rad = (r2.random(10f, 22f) + 11f * e.fin()) * fin2 * Interp.pow2Out.apply(MathU.slope(f, 0.75f));
+            if(trns2 > 0){
+                Tmp.v1.trns(e.rotation + r2.range(4f), trns2).add(e.x, e.y);
+            }else{
+                Tmp.v1.set(e.x, e.y);
+            }
+            color(UnityPal.scarColor, Color.black, Mathf.curve(f, 0.35f, 0.75f));
+            Vec2 v = Tmp.v2.trns(rot, trns).add(Tmp.v1);
+            Fill.square(v.x, v.y, rad, 45f);
+        }
+
+        color(UnityPal.scarColor);
+        for(int i = 0; i < 22; i++){
+            float f = (i / 21f) * off;
+            float cf = Mathf.curve(e.fin(), f, (1f - off) + f);
+            float cfo = 1f - cf;
+            float rot = e.rotation + (r.nextFloat() - r.nextFloat()) * 20f;
+            float len = r.random(300f, 800f);
+            float trns = r.random(2530f - len) * cfo * cfo;
+            if(cf <= 0f || cf >= 1f) continue;
+            Vec2 v = Tmp.v1.trns(rot, trns).add(e.x, e.y);
+            stroke(3f);
+            lineAngle(v.x, v.y, rot, len * Mathf.slope(cfo * cfo), false);
+        }
+        float t = e.time < 3.75f * 60f ? 0f : Mathf.clamp((e.time - 3.75f * 60f) / 30f);
+        float length = Interp.pow3.apply(Mathf.clamp(e.time / 20f)) * 2530f;
+        color(UnityPal.scarColor, Color.black, t);
+        stroke(5f);
+        lineAngle(e.x, e.y, e.rotation, length);
+        if(t > 0f){
+            r3.setSeed(e.id * 9999L + 613);
+            float dr = 3.75f * 60f;
+            float partf = Mathf.clamp((e.time - dr) / (e.lifetime - dr)) * 9f;
+            int parti = Mathf.ceil(partf);
+
+            for(int j = 0; j < parti; j++){
+                float partm = partf >= 9f || j < parti - 1 ? 1f : (partf % 1f);
+
+                for(int i = 0; i < 9; i++){
+                    float d = r3.random(7f, 11f);
+                    float timeOffset = r3.random(d);
+                    int timeSeed = Mathf.floor((time + timeOffset) / d) + r3.nextInt();
+                    float f = ((time + timeOffset) % d) / d;
+
+                    r2.setSeed(timeSeed);
+                    float l = r2.random(100f, 200f) * Interp.pow2Out.apply(Mathf.curve(f, 0f, 0.5f)) * partm;
+                    float w = r2.random(9f, 19f) * MathU.slope(f, 0.8f) * partm * t;
+
+                    float trns = r2.random(2530f - l * 2f) + l + r2.range(3f) * f;
+                    float of = (r2.nextFloat() - r2.nextFloat()) * 35f * Interp.pow3Out.apply(1f - f) * (0.5f + t * 0.5f);
+                    //float scl = r2.random(5f, 10f) * t * partm * MathU.slope(f, 0.8f);
+                    Tmp.v1.trns(e.rotation, trns, of).add(e.x, e.y);
+                    color(UnityPal.scarColor, Color.black, Mathf.curve(f, 0.2f, 0.75f));
+                    UnityDrawf.diamond(Tmp.v1.x, Tmp.v1.y, w, l, e.rotation);
+                    //Fill.square(Tmp.v1.x, Tmp.v1.y, scl, 45f);
+                }
+            }
+        }
+        if(e.time < 3.75f * 60f){
+            float t2 = Mathf.clamp((3.75f * 60f - e.time) / 30f);
+
+            r3.setSeed(e.id * 9999L + 613);
+            color(UnityPal.scarColor);
+            for(int i = 0; i < 30; i++){
+                float d = r3.random(18f, 24f);
+                float timeOffset = r3.random(d);
+                int timeSeed = Mathf.floor((time + timeOffset) / d) + r3.nextInt();
+                float f = ((time + timeOffset) % d) / d;
+
+                r2.setSeed(timeSeed);
+                float trns = r2.random(length) + r2.range(2f) * f;
+                float of = (r2.nextFloat() - r2.nextFloat()) * 65f * Interp.pow3In.apply(f) * (0.5f + t2 * 0.5f);
+                float scl = r2.random(3f, 8f) * t2 * MathU.slope(f, 0.25f);
+                Tmp.v1.trns(e.rotation, trns, of).add(e.x, e.y);
+                Fill.square(Tmp.v1.x, Tmp.v1.y, scl, 45f);
+            }
+        }
+    }).followParent(true).rotWithParent(true),
 
     wBosonChargeBeginEffect = new Effect(38f, e -> {
         color(UnityPal.lightEffect, Pal.lancerLaser, e.fin());

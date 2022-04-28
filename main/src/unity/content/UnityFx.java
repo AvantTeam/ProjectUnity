@@ -1361,5 +1361,11 @@ public class UnityFx{
             Drawf.tri(e.x, e.y, (float) e.data - e.fin(), (float) e.data + 1 - e.fin() * ((float) e.data + 1), 90 * j + e.rotation);
         }
         Draw.color();
+    }),
+
+    orbShot = new Effect(20f, e -> {
+        Draw.color(e.color);
+        Draw.alpha(e.fout());
+        Lines.circle(e.x, e.y, 4+e.fin()*2);
     });
 }

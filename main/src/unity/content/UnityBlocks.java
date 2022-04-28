@@ -122,7 +122,7 @@ public class UnityBlocks{
     oreImberium, electroTile,
 
     //turret
-    orb, shockwire, current, plasma, electrobomb, shielder,
+    orb, shockwire, current, plasma, electrobomb, shielder, orbTurret,
 
     //power
     powerPlant, absorber,
@@ -1284,6 +1284,38 @@ public class UnityBlocks{
             });
             chargeBeginEffect = Fx.none;
             consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability <= 0.1f, 0.4f)).update(false);
+        }};
+
+        orbTurret = new OrbTurret("orb-turret"){{
+            requirements(Category.turret, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
+
+            size = 3;
+
+            powerUse = 0.3f;
+            shootType = new BasicBulletType(){
+                @Override
+                public void draw(Bullet b){
+                    Draw.color(((Color[])b.data)[0]);
+                    b.trail.draw(((Color[])b.data)[1], 1f);
+                    ((TexturedTrail)b.trail).drawCap(((Color[])b.data)[1], 1f);
+                }
+
+                @Override
+                public void update(Bullet b) {
+                    super.update(b);
+                    ((TexturedTrail)b.trail).update(b.x, b.y);
+                }
+
+                @Override
+                public void removed(Bullet b) {
+                    b.trail = null;
+                    super.removed(b);
+                }
+
+                {
+                    damage = 20f;
+                }
+            };
         }};
 
         powerPlant = new PowerPlant("power-plant"){{

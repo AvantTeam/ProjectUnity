@@ -31,7 +31,7 @@ public final class Utils{
 
     public static final Quat q1 = new Quat(), q2 = new Quat();
 
-    public static final Rand seedr = new Rand();
+    public static final Rand seedr = new Rand(), seedr2 = new Rand(), seedr3 = new Rand();
 
     private static final Vec2 tV = new Vec2(), tV2 = new Vec2();
     private static final Seq<Healthc> tmpUnitSeq = new Seq<>();

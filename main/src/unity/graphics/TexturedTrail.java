@@ -32,6 +32,8 @@ public class TexturedTrail extends Trail{
     public Interp mixInterp = Interp.linear;
     /** The trail's blending. */
     public Blending blend = Blending.normal;
+    /** The trail's base width, multiplied by draw's width **/
+    public float baseWidth = 1f;
 
     private static final float[] vertices = new float[24];
     private static final Color tmp = new Color();
@@ -87,7 +89,8 @@ public class TexturedTrail extends Trail{
     }
 
     @Override
-    public void drawCap(Color color, float width){
+    public void drawCap(Color color, float widthMultiplier){
+        float width = baseWidth * widthMultiplier;
         if(capRegion == null) capRegion = Core.atlas.find("circle");
 
         int psize = points.size;
@@ -107,7 +110,9 @@ public class TexturedTrail extends Trail{
     }
 
     @Override
-    public void draw(Color color, float width){
+    public void draw(Color color, float widthMultiplier){
+        float width = baseWidth * widthMultiplier;
+
         if(region == null) region = Core.atlas.find("white");
         if(points.isEmpty()) return;
 
@@ -196,7 +201,8 @@ public class TexturedTrail extends Trail{
     }
 
     @Override
-    public void update(float x, float y, float width){
+    public void update(float x, float y, float widthMultiplier){
+        float width = baseWidth * widthMultiplier;
         if((counter += Time.delta) >= 1f){
             if(points.size > length * 4) points.removeRange(0, 3);
 
