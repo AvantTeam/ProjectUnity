@@ -20,7 +20,7 @@ import static mindustry.Vars.tilesize;
 
 public class ShieldWall extends LevelLimitWall{
     private final int timerHeal = timers++;
-    protected float shieldHealth, shieldArmor;
+    protected float shieldHealth;
     protected float repair = 50f;
     public TextureRegion topRegion;
 
@@ -79,13 +79,12 @@ public class ShieldWall extends LevelLimitWall{
     @Override
     public void setBars(){
         super.setBars();
-        bars.add("shield", (ShieldWallBuild e) -> new Bar("stat.shieldhealth", Pal.accent, () -> e.gotDamage > shieldHealth ? 0f : 1f - e.gotDamage / shieldHealth));
+        bars.add("shield", (ShieldWallBuild e) -> new Bar("stat.shieldhealth", Pal.accent, () -> e.shieldBroke ? 0f : 1f - e.gotDamage / shieldHealth));
     }
 
     public class ShieldWallBuild extends LevelLimitWallBuild{
         public boolean shieldBroke = true;
-        public float gotDamage = 0;
-        public float warmup = 0;
+        public float gotDamage, warmup, scl = 0;
 
         @Override
         public void created(){
@@ -99,9 +98,10 @@ public class ShieldWall extends LevelLimitWall{
             super.updateTile();
 
             warmup = Mathf.lerpDelta(warmup, 1f, 0.05f);
+            scl = Mathf.lerpDelta(scl, shieldBroke ? 0f : 1f, 0.05f);
 
-            if (timer(timerHeal, 120f)){
-                if (gotDamage > 0) gotDamage -= repair * delta();
+            if (timer(timerHeal, 60f) && shieldBroke && gotDamage > 0){
+                gotDamage -= repair * delta();
             }
 
             if (gotDamage >= shieldHealth && !shieldBroke){
@@ -141,12 +141,12 @@ public class ShieldWall extends LevelLimitWall{
                 b.hit = true;
                 b.type.despawnEffect.at(x, y, b.rotation(), b.type.hitColor);
 
-                float damage = b.damage * Mathf.clamp(1.0f - shieldArmor);
-
-                if (!shieldBroke){
-                    gotDamage += damage;
+                if (shieldBroke){
+                    damage(b.damage);
                 }else{
-                    damage(damage);
+                    handleExp((int) (b.damage * damageExp));
+                    setEFields(level());
+                    gotDamage += b.damage;
                 }
                 hit = 1f;
 
@@ -168,7 +168,7 @@ public class ShieldWall extends LevelLimitWall{
                 Draw.z(Layer.shields);
                 color(team.color, Color.white, Mathf.clamp(hit));
 
-                float radius = this.block.size * tilesize * warmup;
+                float radius = this.block.size * tilesize * warmup * scl;
 
                 if(Core.settings.getBool("animatedshields")){
                     Fill.rect(x, y, radius, radius);
