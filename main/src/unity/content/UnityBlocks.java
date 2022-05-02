@@ -2124,14 +2124,14 @@ public class UnityBlocks{
 
             health = 500;
             shieldHealth = 500;
+            maxDamage = 50f;
             size = 1;
             maxLevel = 10;
 
             expFields = new EField[]{
-                    new ERational(v -> maxDamage = v, 48f, 24f, -3f, Stat.abilities, v -> bundle.format("stat.unity.maxdamage", v)).formatAll(false),
-                    new ELinear(v -> repair = v, 5f, 7f, Stat.repairSpeed),
-                    new ELinear(v -> shieldHealth = v, 500, 25, Stat.shieldHealth),
-                    new ELinear(v -> shieldArmor = v, 0, 0.02f, Stat.abilities, v -> bundle.format("stat.shieldarmor", v)).formatAll(true)
+                    new ERational(v -> maxDamage = v, 100f, 25f, -3f, Stat.abilities, v -> bundle.format("stat.unity.maxdamage", v)).formatAll(false),
+                    new ELinear(v -> repair = v, 50f, 10f, Stat.repairSpeed, v -> bundle.format("stat.unity.repairspeed", v)).formatAll(false),
+                    new ELinear(v -> shieldHealth = v, 500, 25, Stat.shieldHealth)
             };
         }};
 
@@ -2139,14 +2139,15 @@ public class UnityBlocks{
             requirements(Category.defense, with());
 
             health = 2000;
+            maxDamage = 100f;
             shieldHealth = 2000;
             size = 2;
-            maxLevel = 25;
+            maxLevel = 20;
 
             expFields = new EField[]{
-                    new ERational(v -> maxDamage = v, 72f, 24f, -3f, Stat.abilities, v -> bundle.format("stat.unity.maxdamage", v)).formatAll(false),
-                    new ELinear(v -> repair = v, 5f, 10f, Stat.repairSpeed),
-                    new ELinear(v -> shieldHealth = v, 800, 30, Stat.shieldHealth)
+                    new ERational(v -> maxDamage = v, 200f, 50f, -3f, Stat.abilities, v -> bundle.format("stat.unity.maxdamage", v)).formatAll(false),
+                    new ELinear(v -> repair = v, 200f, 20f, Stat.repairSpeed, v -> bundle.format("stat.unity.repairspeed", v)).formatAll(false),
+                    new ELinear(v -> shieldHealth = v, 2000, 50, Stat.shieldHealth)
             };
         }};
 
