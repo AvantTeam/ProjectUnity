@@ -3,8 +3,7 @@ package unity.graphics;
 import arc.graphics.*;
 import arc.math.*;
 import arc.util.*;
-import mindustry.content.*;
-import mindustry.entities.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 
 /**
@@ -15,12 +14,12 @@ public class MultiTrail extends Trail{
     public TrailHold[] trails;
     public RotationHandler rotation = MultiTrail::calcRot;
 
-    public Effect trailEffect = Fx.missileTrail;
-    public float trailChance = 0f;
-    public float trailWidth = 1f;
-    public Color trailColor = Pal.engine.cpy();
-
     protected float lastX, lastY;
+
+    public MultiTrail(RotationHandler rotation, TrailHold... trails){
+        this(trails);
+        this.rotation = rotation;
+    }
 
     public MultiTrail(TrailHold... trails){
         super(0);
@@ -29,19 +28,18 @@ public class MultiTrail extends Trail{
         for(TrailHold trail : trails) length = Math.max(length, trail.trail.length);
     }
 
+    public static RotationHandler rot(Rotc e){
+        return (trail, x, y) -> e.isAdded() ? e.rotation() : trail.calcRot(x, y);
+    }
+
     @Override
     public MultiTrail copy(){
         TrailHold[] mapped = new TrailHold[trails.length];
         for(int i = 0; i < mapped.length; i++) mapped[i] = trails[i].copy();
 
-        MultiTrail out = new MultiTrail(mapped);
+        MultiTrail out = new MultiTrail(rotation, mapped);
         out.lastX = lastX;
         out.lastY = lastY;
-        out.rotation = rotation;
-        out.trailEffect = trailEffect;
-        out.trailChance = trailChance;
-        out.trailWidth = trailWidth;
-        out.trailColor.set(trailColor);
         return out;
     }
 
@@ -60,12 +58,12 @@ public class MultiTrail extends Trail{
 
     @Override
     public void drawCap(Color color, float width){
-        for(TrailHold trail : trails) trail.trail.drawCap(trail.color == null ? color : trail.color, width * trail.width);
+        for(TrailHold trail : trails) trail.trail.drawCap(trail.color == null ? color : trail.color, width);
     }
 
     @Override
     public void draw(Color color, float width){
-        for(TrailHold trail : trails) trail.trail.draw(trail.color == null ? color : trail.color, width * trail.width);
+        for(TrailHold trail : trails) trail.trail.draw(trail.color == null ? color : trail.color, width);
     }
 
     @Override
@@ -78,11 +76,7 @@ public class MultiTrail extends Trail{
         float angle = rotation.get(this, x, y) - 90f;
         for(TrailHold trail : trails){
             Tmp.v1.trns(angle, trail.x, trail.y);
-
             trail.trail.update(x + Tmp.v1.x, y + Tmp.v1.y, width * trail.width);
-            if(trailChance > 0f && Mathf.chanceDelta(trailChance)){
-                trailEffect.at(x + Tmp.v1.x, y + Tmp.v1.y, trail.width * trailWidth, trailColor);
-            }
         }
 
         lastX = x;
@@ -90,7 +84,7 @@ public class MultiTrail extends Trail{
     }
 
     public float calcRot(float x, float y){
-        return Angles.angle(lastX, lastY);
+        return Angles.angle(lastX, lastY, x, y);
     }
 
     public static class TrailHold{

@@ -21,9 +21,9 @@ import unity.mod.*;
 import static mindustry.Vars.*;
 
 @SuppressWarnings("unused")
-@EntityDef({Unitc.class, MonolithSoulc.class, Trailc.class, Factionc.class})
+@EntityDef({Unitc.class, MonolithSoulc.class, CTrailc.class, Factionc.class})
 @EntityComponent
-abstract class MonolithSoulComp implements Unitc, Trailc, Factionc{
+abstract class MonolithSoulComp implements Unitc, CTrailc, Factionc{
     @Import UnitType type;
     @Import Team team;
     @Import float x, y, rotation, health, maxHealth, elevation;

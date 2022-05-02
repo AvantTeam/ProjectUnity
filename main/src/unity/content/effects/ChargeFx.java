@@ -11,6 +11,7 @@ import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import unity.content.*;
 import unity.entities.effects.*;
 import unity.graphics.*;
 import unity.graphics.MultiTrail.*;
@@ -312,11 +313,11 @@ public class ChargeFx{
             TrailHold[] trails = new TrailHold[12];
             for(int i = 0; i < trails.length; i++){
                 Tmp.v1.trns(Mathf.random(360f), Mathf.random(24f, 64f));
-                trails[i] = new TrailHold(new TexturedTrail(Core.atlas.find("unity-phantasmal-trail"), 8){{
-                    shrink = 1f;
-                    fadeAlpha = 0.5f;
-                    blend = Blending.additive;
-                }}, Tmp.v1.x, Tmp.v1.y, Mathf.random(1f, 2f));
+                trails[i] = new TrailHold(Utils.with(Trails.soul(26), t -> {
+                    if(t.trails[t.trails.length - 1].trail instanceof TexturedTrail tr){
+                        tr.trailChance = 0.1f;
+                    }
+                }), Tmp.v1.x, Tmp.v1.y, Mathf.random(1f, 2f));
             }
 
             EffectState state = super.inst(x, y, rotation, color, data);

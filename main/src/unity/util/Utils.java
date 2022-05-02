@@ -69,6 +69,11 @@ public final class Utils{
         });
     }
 
+    public static <T> T with(T inst, Cons<T> cons){
+        cons.get(inst);
+        return inst;
+    }
+
     public static <T extends Buildingc> Tile getBestTile(T build, int before, int after){
         Tile tile = build.tile();
         int bound = before - after + 1;

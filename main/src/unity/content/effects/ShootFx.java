@@ -11,6 +11,7 @@ import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import unity.content.*;
 import unity.entities.bullet.anticheat.*;
 import unity.entities.effects.*;
 import unity.graphics.*;
@@ -291,27 +292,26 @@ public class ShootFx{
         class State extends EffectState{
             @Override
             public void remove(){
-                if(data instanceof TexturedTrail[] data) for(TexturedTrail trail : data) Fx.trailFade.at(x, y, 1f, UnityPal.monolithLight, trail.copy());
+                if(data instanceof Trail[] data) for(Trail trail : data) Fx.trailFade.at(x, y, 1f, UnityPal.monolithLight, trail.copy());
                 super.remove();
             }
         } return Pools.obtain(State.class, State::new);
-    }, 24f, e -> {
-        if(!(e.data instanceof TexturedTrail[] data)) return;
+    }, 25f, e -> {
+        if(!(e.data instanceof Trail[] data)) return;
 
         float initAngle = Mathf.randomSeed(e.id, 360f);
         for(int i = 0; i < data.length; i++){
-            TexturedTrail trail = data[i];
+            Trail trail = data[i];
             if(!state.isPaused()){
                 Tmp.v1
-                    .trns(initAngle + 360f / data.length * i + Time.time * 6f, 4f + e.foutpowdown() * 12f)
+                    .trns(initAngle + 360f / data.length * i + Time.time * 6f, 4f + e.foutpowdown() * 16f)
                     .add(e.x, e.y);
 
-                trail.update(Tmp.v1.x, Tmp.v1.y, e.fin());
+                trail.update(Tmp.v1.x, Tmp.v1.y, e.fin() * 1.4f);
             }
 
-            tmpCol.set(UnityPal.monolith).lerp(UnityPal.monolithLight, e.finpowdown());
-            trail.drawCap(tmpCol, 1.4f);
-            trail.draw(tmpCol, 1.4f);
+            trail.drawCap(UnityPal.monolithLight, 1f);
+            trail.draw(UnityPal.monolithLight, 1f);
         }
 
         color(UnityPal.monolithDark, UnityPal.monolith, e.fin());
@@ -321,13 +321,9 @@ public class ShootFx{
     }){
         @Override
         protected EffectState inst(float x, float y, float rotation, Color color, Object data){
-            TexturedTrail[] trails = new TexturedTrail[5];
+            Trail[] trails = new Trail[5];
             for(int i = 0; i < trails.length; i++){
-                trails[i] = new TexturedTrail(Core.atlas.find("unity-phantasmal-trail"), 16){{
-                    shrink = 0f;
-                    fadeAlpha = 1f;
-                    blend = Blending.additive;
-                }};
+                trails[i] = Trails.soul(24);
             }
 
             EffectState state = super.inst(x, y, rotation, color, data);

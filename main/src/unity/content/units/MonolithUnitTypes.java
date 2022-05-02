@@ -53,7 +53,7 @@ public final class MonolithUnitTypes{
     UnitType adsect, comitate/*, praesid*/;
 
     // monolith unit + trail
-    public static @FactionDef("monolith") @EntityDef({Unitc.class, Trailc.class, Monolithc.class})
+    public static @FactionDef("monolith") @EntityDef({Unitc.class, CTrailc.class, Monolithc.class})
     UnitType stray, tendence, liminality, calenture, hallucination, escapism, fantasy;
 
     private MonolithUnitTypes(){
@@ -77,39 +77,15 @@ public final class MonolithUnitTypes{
                 hitSize = 12f;
                 omniMovement = false;
                 engineColor = UnityPal.monolithLight;
-                trailLength = 12;
+                trailLength = 24;
                 deathExplosionEffect = DeathFx.monolithSoulDeath;
                 forceWreckRegion = true;
 
-                trailType = unit -> new MultiTrail(new TrailHold(new TexturedTrail(Core.atlas.find("unity-soul-trail"), 25){{
-                    shrink = 1f;
-                    fadeAlpha = 0.5f;
-                    blend = Blending.additive;
-                }}, engineColor), new TrailHold(new TexturedTrail(Core.atlas.find("unity-soul-trail"), 32){{
-                    shrink = 1f;
-                    fadeAlpha = 0.5f;
-                    blend = Blending.additive;
-                }}, -4.8f, 6f, 0.75f, engineColor), new TrailHold(new TexturedTrail(Core.atlas.find("unity-soul-trail"), 32){{
-                    shrink = 1f;
-                    fadeAlpha = 0.5f;
-                    blend = Blending.additive;
-                }}, 4.8f, 6f, 0.75f, engineColor)){
-                    {
-                        rotation = (trail, x, y) -> unit.isValid() ? unit.rotation : trail.calcRot(x, y);
-                        trailChance = 0.33f;
-                        trailWidth = 1.8f;
-                        trailColor = engineColor;
-                    }
-
-                    @Override
-                    public void drawCap(Color color, float width){}
-
-                    @Override
-                    public void draw(Color color, float width){
-                        super.draw(color, width);
-                        super.drawCap(color, width);
-                    }
-                };
+                trailType = unit -> new MultiTrail(MultiTrail.rot(unit),
+                    new TrailHold(Trails.soul(MultiTrail.rot(unit), 50), engineColor),
+                    new TrailHold(Trails.soul(MultiTrail.rot(unit), 64), -4.8f, 6f, 0.56f, engineColor),
+                    new TrailHold(Trails.soul(MultiTrail.rot(unit), 64), 4.8f, 6f, 0.56f, engineColor)
+                );
             }
 
             @Override
@@ -123,15 +99,7 @@ public final class MonolithUnitTypes{
                         copy.rotation = MultiTrail::calcRot;
 
                         TrailFx.trailFadeLow.at(soul.x, soul.y, width, engineColor, copy);
-                        soul.trail = new MultiTrail(new TrailHold(new TexturedTrail(Core.atlas.find("unity-soul-trail"), trailLength){{
-                            shrink = 1f;
-                            fadeAlpha = 0.5f;
-                            blend = Blending.additive;
-                        }}, UnityPal.monolithLight)){{
-                            trailChance = 0.67f;
-                            trailWidth = 1.3f;
-                            trailColor = engineColor;
-                        }};
+                        soul.trail = new MultiTrail(new TrailHold(Trails.soul(MultiTrail.rot(unit), trailLength), engineColor));
                     }else if(trail.trails.length == 1 && !soul.corporeal()){
                         MultiTrail copy = trail.copy();
                         copy.rotation = MultiTrail::calcRot;
@@ -163,7 +131,9 @@ public final class MonolithUnitTypes{
                     float z = Draw.z();
                     Draw.z(Layer.flyingUnitLow);
 
-                    soul.trail.draw(engineColor, (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f) * soul.elevation) * trailScl);
+                    float trailSize = (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f) * soul.elevation) * trailScl;
+                    soul.trail.drawCap(engineColor, trailSize);
+                    soul.trail.draw(engineColor, trailSize);
 
                     Draw.z(Layer.effect - 0.01f);
 
@@ -437,7 +407,7 @@ public final class MonolithUnitTypes{
                         frontColor = UnityPal.monolith;
                         backColor = UnityPal.monolithDark;
                         trailColor = UnityPal.monolithLight;
-                        trailLength = 16;
+                        trailLength = 32;
                         trailWidth = 1f;
                         trailChance = 0.33f;
 
@@ -532,17 +502,13 @@ public final class MonolithUnitTypes{
                         };
                     }
 
-                    TexturedTrail createTrail(){
-                        return new TexturedTrail(Core.atlas.find("unity-soul-trail"), trailLength){{
-                            blend = Blending.additive;
-                            shrink = 0f;
-                            fadeAlpha = 1f;
-                        }};
-                    }
-
                     @Override
                     public void updateTrail(Bullet b){
-                        if(!headless && trailLength > 0 && b.trail == null) b.trail = new MultiTrail(new TrailHold(createTrail()), new TrailHold(createTrail()), new TrailHold(createTrail())){
+                        if(!headless && trailLength > 0 && b.trail == null) b.trail = new MultiTrail(
+                            new TrailHold(Trails.phantasmal(trailLength)),
+                            new TrailHold(Trails.phantasmal(trailLength)),
+                            new TrailHold(Trails.phantasmal(trailLength)))
+                        {
                             boolean dead;
                             float time = Time.time;
 
@@ -583,8 +549,8 @@ public final class MonolithUnitTypes{
                                     Color col = trail.color == null ? color : trail.color;
                                     float w = width * trail.width;
 
-                                    t.draw(col, w);
                                     t.drawCap(col, w);
+                                    t.draw(col, w);
                                 }
                             }
                         };
@@ -1025,32 +991,37 @@ public final class MonolithUnitTypes{
             rotateShooting = false;
             outlineColor = UnityPal.darkOutline;
 
-            interface TrailType{
-                TexturedTrail get(int arg);
-            } TrailType trail = length -> new TexturedTrail(Core.atlas.find("unity-phantasmal-trail"), length){{
-                blend = Blending.additive;
-                fadeInterp = Interp.pow3In;
-                shrink = 0f;
-                fadeAlpha = 1f;
-                mixAlpha = 1f;
-                shrink = 0.2f;
+            interface EngineType{
+                Engine get(float size, float offsetY);
+            } EngineType etype = (s, offsetY) -> new Engine(){{
+                color = UnityPal.monolithLight;
+                offset = 11f - offsetY;
+                size = s;
             }};
 
-            engine = new Engine(){{
+            engine = new MultiEngine(
+                new EngineHold(etype.get(2.5f, 0f), 0f),
+                new EngineHold(etype.get(2.5f * 0.6f, 2.5f), -4.5f),
+                new EngineHold(etype.get(2.5f * 0.6f, 2.5f), 4.5f)
+            ){{
                 color = UnityPal.monolithLight;
+                size = 2.5f;
                 offset = 11f;
             }}.apply(this);
-            trailType = unit -> new MultiTrail(
-                new TrailHold(trail.get(16), engineColor),
-                new TrailHold(trail.get(24), -4.5f, 2.5f, 0.6f, engineColor),
-                new TrailHold(trail.get(24), 4.5f, 2.5f, 0.6f, engineColor)
-            ){{
-                rotation = (trail, x, y) -> unit.isValid() ? unit.rotation : trail.calcRot(x, y);
-                trailChance = 0.33f;
-                trailWidth = 1.3f;
-                trailColor = engineColor;
-            }};
-            trailLength = 12;
+            trailType = unit -> new MultiTrail(MultiTrail.rot(unit),
+                new TrailHold(Trails.phantasmal(MultiTrail.rot(unit), 16, 3.6f, 6f, 2f), engineColor),
+                new TrailHold(Utils.with(Trails.singlePhantasmal(24), t -> {
+                    t.trailChance = 0f;
+                    t.fadeInterp = e -> (1f - Interp.pow10In.apply(e)) * Interp.pow2In.apply(e);
+                    t.sideFadeInterp = e -> (1f - Interp.pow5In.apply(e)) * Interp.pow3In.apply(e);
+                }), -4.5f, 2.5f, 0.44f, UnityPal.monolithLight),
+                new TrailHold(Utils.with(Trails.singlePhantasmal(24), t -> {
+                    t.trailChance = 0f;
+                    t.fadeInterp = e -> (1f - Interp.pow10In.apply(e)) * Interp.pow2In.apply(e);
+                    t.sideFadeInterp = e -> (1f - Interp.pow5In.apply(e)) * Interp.pow3In.apply(e);
+                }), 4.5f, 2.5f, 0.44f, UnityPal.monolithLight)
+            );
+            trailLength = 24;
 
             weapons.add(new EnergyRingWeapon(){{
                 rings.add(new Ring(){{
@@ -1108,7 +1079,7 @@ public final class MonolithUnitTypes{
 
                     @Override
                     public void updateTrail(Bullet b){
-                        if(!headless && trailLength > 0 && b.trail == null) b.trail = trail.get(trailLength);
+                        if(!headless && trailLength > 0 && b.trail == null) b.trail = Trails.singlePhantasmal(trailLength);
                         super.updateTrail(b);
                     }
 
@@ -1139,14 +1110,6 @@ public final class MonolithUnitTypes{
                 size = 2.5f;
                 color = UnityPal.monolith;
             }};
-            interface TrailType{
-                TexturedTrail get(int arg);
-            } TrailType trail = length -> new TexturedTrail(Core.atlas.find("unity-soul-trail"), length){{
-                blend = Blending.additive;
-                fadeInterp = Interp.pow5In;
-                shrink = 1f;
-                fadeAlpha = 0.5f;
-            }};
 
             engine = new MultiEngine(
                 new EngineHold(etype.get(), -5f),
@@ -1156,15 +1119,10 @@ public final class MonolithUnitTypes{
                 size = 2.5f;
                 color = UnityPal.monolith;
             }}.apply(this);
-            trailType = unit -> new MultiTrail(
-                new TrailHold(trail.get(24), -5f, 0f, 1f, UnityPal.monolithLight),
-                new TrailHold(trail.get(24), 5f, 0f, 1f, UnityPal.monolithLight)
-            ){{
-                rotation = (trail, x, y) -> unit.isValid() ? unit.rotation : trail.calcRot(x, y);
-                trailChance = 0.5f;
-                trailWidth = 1.3f;
-                trailColor = UnityPal.monolith;
-            }};
+            trailType = unit -> new MultiTrail(MultiTrail.rot(unit),
+                new TrailHold(Trails.soul(MultiTrail.rot(unit), 24), -5f, 0f, 1f, UnityPal.monolithLight),
+                new TrailHold(Trails.soul(MultiTrail.rot(unit), 24), 5f, 0f, 1f, UnityPal.monolithLight)
+            );
             trailLength = 24;
 
             weapons.add(new EnergyRingWeapon(){{
@@ -1216,10 +1174,10 @@ public final class MonolithUnitTypes{
                         frontColor = trailColor = UnityPal.monolith;
                         backColor = UnityPal.monolithDark;
                         trailEffect = ParticleFx.monolithSpark;
-                        trailChance = 0.5f;
+                        trailChance = 0.4f;
                         trailParam = 6f;
-                        trailWidth = 4f;
-                        trailLength = 24;
+                        trailWidth = 5f;
+                        trailLength = 32;
 
                         hitEffect = despawnEffect = HitFx.tendenceHit;
                         chargeShootEffect = ShootFx.tendenceShoot;
@@ -1229,13 +1187,17 @@ public final class MonolithUnitTypes{
                     @Override
                     public void draw(Bullet b){
                         super.draw(b);
+                        long seed = Mathf.rand.getState(0);
 
                         TextureRegion reg = Core.atlas.white(), light = Core.atlas.find("unity-line-shade");
 
                         Lines.stroke(2f);
                         for(int i = 0; i < 2; i++){
+                            Mathf.rand.setSeed(b.id);
+                            Tmp.v31.set(1f, 0f, 0f).setToRandomDirection();
+
                             float r = b.id * 20f + Time.time * 6f * Mathf.sign(b.id % 2 == 0);
-                            Utils.q1.set(i == 0 ? Vec3.X : Vec3.Y, r).mul(Utils.q2.set(Tmp.v31.set(Tmp.v1.trns(b.rotation(), 1f), 0f), r * Mathf.signs[i]));
+                            Utils.q1.set(i == 0 ? Vec3.X : Vec3.Y, r).mul(Utils.q2.set(Tmp.v31, r * Mathf.signs[i]));
 
                             Draw.color(i == 0 ? UnityPal.monolith : UnityPal.monolithDark);
                             UnityDrawf.panningCircle(reg,
@@ -1257,11 +1219,16 @@ public final class MonolithUnitTypes{
                         }
 
                         Draw.reset();
+                        Mathf.rand.setSeed(seed);
                     }
 
                     @Override
                     public void updateTrail(Bullet b){
-                        if(!headless && trailLength > 0 && b.trail == null) b.trail = trail.get(trailLength);
+                        if(!headless && trailLength > 0 && b.trail == null){
+                            b.trail = Trails.soul(trailLength, 6f, trailWidth - 0.3f);
+                            for(int i = 0; i < b.trail.length; i++) b.trail.update(b.x, b.y, 0f); // Give a head start.
+                        }
+
                         super.updateTrail(b);
                     }
 
@@ -1295,14 +1262,6 @@ public final class MonolithUnitTypes{
                 size = 3f;
                 color = UnityPal.monolith;
             }};
-            interface TrailType{
-                TexturedTrail get(int arg);
-            } TrailType trail = length -> new TexturedTrail(Core.atlas.find("unity-soul-trail"), length){{
-                blend = Blending.additive;
-                fadeInterp = Interp.pow5In;
-                shrink = 1f;
-                fadeAlpha = 0.5f;
-            }};
 
             engine = new MultiEngine(
                 new EngineHold(new Engine(){{
@@ -1317,24 +1276,12 @@ public final class MonolithUnitTypes{
                 size = 4f;
                 color = UnityPal.monolithLight;
             }}.apply(this);
-            trailType = unit -> new MultiTrail(
-                new TrailHold(new TexturedTrail(Core.atlas.find("unity-phantasmal-trail"), 32){{
-                    blend = Blending.additive;
-                    fadeInterp = Interp.pow3In;
-                    shrink = 0f;
-                    fadeAlpha = 1f;
-                    mixAlpha = 1f;
-                    shrink = 0.3f;
-                }}, engineColor),
-                new TrailHold(trail.get(48), -71f / 4f, (89f - 65f) / 4f, 0.875f, UnityPal.monolithLight),
-                new TrailHold(trail.get(48), 71f / 4f, (89f - 65f) / 4f, 0.875f, UnityPal.monolithLight)
-            ){{
-                rotation = (trail, x, y) -> unit.isValid() ? unit.rotation : trail.calcRot(x, y);
-                trailChance = 0.5f;
-                trailWidth = 1.6f;
-                trailColor = UnityPal.monolithLight;
-            }};
-            trailLength = 24;
+            trailType = unit -> new MultiTrail(MultiTrail.rot(unit),
+                new TrailHold(Trails.phantasmal(MultiTrail.rot(unit), 32), engineColor),
+                new TrailHold(Trails.soul(MultiTrail.rot(unit), 48), -71f / 4f, (89f - 65f) / 4f, 0.75f, UnityPal.monolithLight),
+                new TrailHold(Trails.soul(MultiTrail.rot(unit), 48), 71f / 4f, (89f - 65f) / 4f, 0.75f, UnityPal.monolithLight)
+            );
+            trailLength = 48;
 
             decals.add(new UnitDecal(name + "-top", 0f, 0f, 0f, Layer.flyingUnit - 1f, Color.white));
             weapons.add(new EnergyRingWeapon(){{

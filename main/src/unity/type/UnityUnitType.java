@@ -140,19 +140,6 @@ public class UnityUnitType extends UnitType{
         Class<?> caller = ReflectUtils.classCaller();
         boolean fromWave = caller != null && SpawnGroup.class.isAssignableFrom(caller);
 
-        if(unit instanceof Trailc){
-            try{
-                ReflectUtils.setField(unit, ReflectUtils.findField(unit.getClass(), "trail", true), trailType.get(unit));
-            }catch(Throwable ignored){}
-        }
-
-        if(unit instanceof WaterMovec){
-            try{
-                ReflectUtils.setField(unit, ReflectUtils.findField(unit.getClass(), "tleft", true), trailType.get(unit));
-                ReflectUtils.setField(unit, ReflectUtils.findField(unit.getClass(), "tright", true), trailType.get(unit));
-            }catch(Throwable ignored){}
-        }
-
         //if(fromWave){
             if(unit instanceof Monolithc e){
                 //int count = Mathf.random(Mathf.clamp(e.maxSouls(), 0, 1), maxSouls);
