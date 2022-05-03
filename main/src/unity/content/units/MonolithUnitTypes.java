@@ -24,6 +24,7 @@ import unity.content.*;
 import unity.content.effects.*;
 import unity.entities.abilities.*;
 import unity.entities.bullet.monolith.energy.*;
+import unity.entities.bullet.monolith.laser.*;
 import unity.gen.*;
 import unity.graphics.*;
 import unity.graphics.MultiTrail.*;
@@ -1125,6 +1126,7 @@ public final class MonolithUnitTypes{
             );
             trailLength = 24;
 
+            decals.add(new UnitDecal(name + "-top", 0f, 0f, 0f, Layer.effect - 0.02f, Color.white));
             weapons.add(new EnergyRingWeapon(){{
                 rings.add(new Ring(){{
                     radius = 6.5f;
@@ -1277,13 +1279,13 @@ public final class MonolithUnitTypes{
                 color = UnityPal.monolithLight;
             }}.apply(this);
             trailType = unit -> new MultiTrail(MultiTrail.rot(unit),
-                new TrailHold(Trails.phantasmal(MultiTrail.rot(unit), 32), engineColor),
-                new TrailHold(Trails.soul(MultiTrail.rot(unit), 48), -71f / 4f, (89f - 65f) / 4f, 0.75f, UnityPal.monolithLight),
-                new TrailHold(Trails.soul(MultiTrail.rot(unit), 48), 71f / 4f, (89f - 65f) / 4f, 0.75f, UnityPal.monolithLight)
+                new TrailHold(Trails.phantasmal(MultiTrail.rot(unit), 32, 5.6f, 8f, 0f), engineColor),
+                new TrailHold(Trails.soul(MultiTrail.rot(unit), 48, 6f, 3.2f), -71f / 4f, (89f - 65f) / 4f, 0.75f, engineColor),
+                new TrailHold(Trails.soul(MultiTrail.rot(unit), 48, 6f, 3.2f), 71f / 4f, (89f - 65f) / 4f, 0.75f, engineColor)
             );
             trailLength = 48;
 
-            decals.add(new UnitDecal(name + "-top", 0f, 0f, 0f, Layer.flyingUnit - 1f, Color.white));
+            decals.add(new UnitDecal(name + "-top", 0f, 0f, 0f, Layer.effect - 0.02f, Color.white));
             weapons.add(new EnergyRingWeapon(){{
                 rings.add(new Ring(){{
                     radius = 9f;
@@ -1317,11 +1319,14 @@ public final class MonolithUnitTypes{
                 mirror = false;
                 rotate = true;
                 reload = 72f;
-                inaccuracy = 15f;
                 layerOffset = 10f;
                 eyeRadius = 2f;
 
-                shootSound = Sounds.spark;
+                shootSound = Sounds.laser;
+                bullet = new HelixLaserBulletType(240f){{
+                    sideWidth = 1.4f;
+                    sideAngle = 30f;
+                }};
             }});
         }};
 
