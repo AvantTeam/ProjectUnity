@@ -45,6 +45,8 @@ public class TexturedTrail extends Trail{
 
     /** Whether to force drawing the trail's cap or not. */
     public boolean forceCap;
+    /** Minimum trail speed to update the points. */
+    public float minDst = -1f;
 
     /** The trail's particle effect. */
     public Effect trailEffect = Fx.missileTrail;
@@ -97,6 +99,7 @@ public class TexturedTrail extends Trail{
         out.mixInterp = mixInterp;
         out.blend = blend;
         out.forceCap = forceCap;
+        out.minDst = minDst;
         out.trailEffect = trailEffect;
         out.trailChance = trailChance;
         out.trailWidth = trailWidth;
@@ -123,7 +126,7 @@ public class TexturedTrail extends Trail{
 
     @Override
     public void drawCap(Color color, float widthMultiplier){
-        if(forceCap) return;
+        if(forceCap || capRegion == Core.atlas.find("clear")) return;
 
         float width = baseWidth * widthMultiplier;
         if(capRegion == null) capRegion = Core.atlas.find("unity-hcircle");
@@ -131,23 +134,26 @@ public class TexturedTrail extends Trail{
         int psize = points.size;
         if(psize > 0){
             float
-                rv = Mathf.clamp(points.items[psize - 1]),
+                //rv = Mathf.clamp(points.items[psize - 1]),
+                rv = psize / 4f / length,
                 alpha = rv * fadeAlpha + (1f - fadeAlpha),
-                w = lastW * width / (psize / 4f) * ((psize - 4f) / 4f) * 2f,
+                //w = lastW * width / (psize / 4f) * ((psize - 4f) / 4f) * 2f,
+                w = Mathf.map(rv, 1f - shrink, 1f) * width * lastW * 2f,
                 h = ((float)capRegion.height / capRegion.width) * w,
 
                 angle = -Mathf.radDeg * lastAngle - 90f,
                 u = capRegion.u, v = capRegion.v2, u2 = capRegion.u2, v2 = capRegion.v, uh = Mathf.lerp(u, u2, 0.5f),
                 cx = Mathf.cosDeg(angle) * w / 2f, cy = Mathf.sinDeg(angle) * w / 2f,
                 x1 = lastX, y1 = lastY,
+                //x2 = lastX + Mathf.cosDeg(angle + 90f) * h, y2 = lastY + Mathf.sinDeg(angle + 90f) * h,
                 x2 = lastX + Mathf.cosDeg(angle + 90f) * h, y2 = lastY + Mathf.sinDeg(angle + 90f) * h,
 
-                col1 = tmp.set(Draw.getColor()).lerp(fadeColor, gradientInterp.apply(1f - rv)).a(fadeInterp.apply(alpha)).toFloatBits(),
-                col1h = tmp.set(Draw.getColor()).lerp(fadeColor, gradientInterp.apply(1f - rv)).a(sideFadeInterp.apply(alpha)).toFloatBits(),
-                col2 = tmp.set(Draw.getColor()).lerp(fadeColor, gradientInterp.apply(1f - rv)).a(fadeInterp.apply(alpha)).toFloatBits(),
-                col2h = tmp.set(Draw.getColor()).lerp(fadeColor, gradientInterp.apply(1f - rv)).a(sideFadeInterp.apply(alpha)).toFloatBits(),
-                mix1 = tmp.set(color).a(mixInterp.apply(rv * mixAlpha)).toFloatBits(),
-                mix2 = tmp.set(color).a(mixInterp.apply(rv * mixAlpha)).toFloatBits();
+                col1 = tmp.set(Draw.getColor()).lerp(fadeColor, gradientInterp.apply(1f - rv)).a(fadeInterp.apply(alpha)).clamp().toFloatBits(),
+                col1h = tmp.set(Draw.getColor()).lerp(fadeColor, gradientInterp.apply(1f - rv)).a(sideFadeInterp.apply(alpha)).clamp().toFloatBits(),
+                col2 = tmp.set(Draw.getColor()).lerp(fadeColor, gradientInterp.apply(1f - rv)).a(fadeInterp.apply(alpha)).clamp().toFloatBits(),
+                col2h = tmp.set(Draw.getColor()).lerp(fadeColor, gradientInterp.apply(1f - rv)).a(sideFadeInterp.apply(alpha)).clamp().toFloatBits(),
+                mix1 = tmp.set(color).a(mixInterp.apply(rv * mixAlpha)).clamp().toFloatBits(),
+                mix2 = tmp.set(color).a(mixInterp.apply(rv * mixAlpha)).clamp().toFloatBits();
 
             Draw.blend(blend);
             vertices[0] = x1 - cx;
@@ -243,25 +249,29 @@ public class TexturedTrail extends Trail{
                 x2 = lastX;
                 y2 = lastY;
                 w2 = lastW;
-                rv2 = points.items[psize - 1];
+                //rv2 = points.items[psize - 1];
+                rv2 = psize / 4f / length;
             }
 
             float
                 z2 = i == psize - 4 ? endAngle : -Angles.angleRad(x1, y1, x2, y2), z1 = i == 0 ? z2 : lastAngle,
-                fs1 = Mathf.map(i, 0f, psize, 1f - shrink, 1f) * width * w1,
-                fs2 = Mathf.map(Math.min(i + 4f, psize - 4f), 0f, psize, 1f - shrink, 1f) * width * w2,
+                //fs1 = Mathf.map(i, 0f, psize, 1f - shrink, 1f) * width * w1,
+                //fs2 = Mathf.map(Math.min(i + 4f, psize - 4f), 0f, psize, 1f - shrink, 1f) * width * w2,
+                //fs2 = Mathf.map(i + 4f, 0f, psize, 1f - shrink, 1f) * width * w2,
+                fs1 = Mathf.map(rv1, 1f - shrink, 1f) * width * w1,
+                fs2 = Mathf.map(rv2, 1f - shrink, 1f) * width * w2,
 
                 cx = Mathf.sin(z1) * fs1, cy = Mathf.cos(z1) * fs1,
                 nx = Mathf.sin(z2) * fs2, ny = Mathf.cos(z2) * fs2,
 
                 mv1 = Mathf.lerp(v, v2, rv1), mv2 = Mathf.lerp(v, v2, rv2),
                 cv1 = rv1 * fadeAlpha + (1f - fadeAlpha), cv2 = rv2 * fadeAlpha + (1f - fadeAlpha),
-                col1 = tmp.set(Draw.getColor()).lerp(fadeColor, gradientInterp.apply(1f - rv1)).a(fadeInterp.apply(cv1)).toFloatBits(),
-                col1h = tmp.set(Draw.getColor()).lerp(fadeColor, gradientInterp.apply(1f - rv1)).a(sideFadeInterp.apply(cv1)).toFloatBits(),
-                col2 = tmp.set(Draw.getColor()).lerp(fadeColor, gradientInterp.apply(1f - rv2)).a(fadeInterp.apply(cv2)).toFloatBits(),
-                col2h = tmp.set(Draw.getColor()).lerp(fadeColor, gradientInterp.apply(1f - rv2)).a(sideFadeInterp.apply(cv2)).toFloatBits(),
-                mix1 = tmp.set(color).a(mixInterp.apply(rv1 * mixAlpha)).toFloatBits(),
-                mix2 = tmp.set(color).a(mixInterp.apply(rv2 * mixAlpha)).toFloatBits();
+                col1 = tmp.set(Draw.getColor()).lerp(fadeColor, gradientInterp.apply(1f - rv1)).a(fadeInterp.apply(cv1)).clamp().toFloatBits(),
+                col1h = tmp.set(Draw.getColor()).lerp(fadeColor, gradientInterp.apply(1f - rv1)).a(sideFadeInterp.apply(cv1)).clamp().toFloatBits(),
+                col2 = tmp.set(Draw.getColor()).lerp(fadeColor, gradientInterp.apply(1f - rv2)).a(fadeInterp.apply(cv2)).clamp().toFloatBits(),
+                col2h = tmp.set(Draw.getColor()).lerp(fadeColor, gradientInterp.apply(1f - rv2)).a(sideFadeInterp.apply(cv2)).clamp().toFloatBits(),
+                mix1 = tmp.set(color).a(mixInterp.apply(rv1 * mixAlpha)).clamp().toFloatBits(),
+                mix2 = tmp.set(color).a(mixInterp.apply(rv2 * mixAlpha)).clamp().toFloatBits();
 
             vertices[0] = x1 - cx;
             vertices[1] = y1 - cy;
@@ -340,24 +350,33 @@ public class TexturedTrail extends Trail{
 
     @Override
     public void update(float x, float y, float widthMultiplier){
-        float dst = Mathf.dst(lastX, lastY, x, y);
-        float speed = dst / Time.delta;
-
+        float dst = Mathf.dst(lastX, lastY, x, y) / Time.delta;
         float width = baseWidth * widthMultiplier;
-        if((counter += Time.delta) >= 0.96f){
+        /*if((counter += Time.delta) >= 0.96f){
             if(points.size > length * 4) points.removeRange(0, 3);
 
             counter = 0f;
             points.add(x, y, width, 0f);
+        }*/
+        if((counter += Time.delta) >= 0.96f){
+            if(dst >= minDst){
+                if(points.size > length * 4 - 4) points.removeRange(0, 3);
+                points.add(x, y, width, 0f);
+            }else if(points.size >= 4){
+                points.removeRange(0, 3);
+            }
+
+            counter = 0f;
         }
 
-        lastAngle = Mathf.zero(dst, 0.4f) ? lastAngle : (-Angles.angleRad(x, y, lastX, lastY) + Mathf.pi);
+        //lastAngle = Mathf.zero(dst, 0.4f) ? lastAngle : (-Angles.angleRad(x, y, lastX, lastY) + Mathf.pi);
+        lastAngle = Mathf.zero(dst) ? lastAngle : -Angles.angleRad(lastX, lastY, x, y);
         lastX = x;
         lastY = y;
         lastW = width;
         calcProgress();
 
-        if(points.size > 0 && trailChance > 0f && Mathf.chanceDelta(trailChance * Mathf.clamp(speed / trailThreshold))){
+        if(points.size > 0 && trailChance > 0f && Mathf.chanceDelta(trailChance * Mathf.clamp(dst / trailThreshold))){
             trailEffect.at(
                 x, y, width * trailWidth,
                 tmp.set(trailColor).a(fadeInterp.apply(
@@ -376,23 +395,28 @@ public class TexturedTrail extends Trail{
             float maxDst = 0f;
             for(int i = 0; i < psize; i += 4){
                 float
-                    x1 = items[i], y1 = items[i + 1],
-                    dst = i < psize - 4 ? Mathf.dst(x1, y1, items[i + 4], items[i + 5]) : Mathf.dst(x1, y1, lastX, lastY);
+                    x = items[i], y = items[i + 1],
+                    dst = i < psize - 4 ? Mathf.dst(x, y, items[i + 4], items[i + 5]) : Mathf.dst(x, y, lastX, lastY);
 
+                items[i + 3] = maxDst;
                 maxDst += dst;
-                items[i + 3] = dst;
+                //items[i + 3] = dst;
             }
 
-            float frac = (points.size / 4f) / length;
-            float first = items[3];
+            float frac = psize / 4f / length;
+            for(int i = 0; i < psize; i += 4){
+                items[i + 3] = Mathf.clamp((items[i + 3] / maxDst) * frac);
+            }
 
-            float last = 0f;
+            /*float
+                frac = psize / 4f / length,
+                first = items[3], last = 0f;
             for(int i = 0; i < psize; i += 4){
                 float v = items[i + 3];
 
                 items[i + 3] = Mathf.clamp((v + last - first) / maxDst * frac);
                 last += v;
-            }
+            }*/
         }
     }
 }

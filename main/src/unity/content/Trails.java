@@ -28,6 +28,8 @@ public final class Trails{
 
     public static TexturedTrail phantasmalExhaust(int length){
         return Utils.with(singlePhantasmal(length), t -> {
+            t.capRegion = Core.atlas.find("clear");
+            t.minDst = 0.4f;
             t.fadeInterp = Interp.pow3In;
             t.sideFadeInterp = Interp.pow5In;
             t.mixAlpha = 0f;
@@ -54,7 +56,7 @@ public final class Trails{
         TrailHold[] trails = new TrailHold[strandsAmount + 2];
         for(int i = 0; i < strandsAmount; i++) trails[i] = new TrailHold(Utils.with(singlePhantasmal(Mathf.round(length * 1.5f)), t -> t.trailWidth = 4.8f), 0f, 0f, 0.16f);
         trails[strandsAmount] = new TrailHold(singlePhantasmal(length));
-        trails[strandsAmount + 1] = new TrailHold(phantasmalExhaust(Mathf.round(length * 0.5f)), 0f, 1.6f, 1f);
+        trails[strandsAmount + 1] = new TrailHold(phantasmalExhaust(Mathf.round(length * 0.5f)), 0f, 1.6f);
 
         float offset = Mathf.random(Mathf.PI2 * scale);
         return new MultiTrail(rot, trails){
