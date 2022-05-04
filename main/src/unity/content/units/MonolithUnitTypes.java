@@ -83,9 +83,9 @@ public final class MonolithUnitTypes{
                 forceWreckRegion = true;
 
                 trailType = unit -> new MultiTrail(MultiTrail.rot(unit),
-                    new TrailHold(Trails.soul(MultiTrail.rot(unit), 50), engineColor),
-                    new TrailHold(Trails.soul(MultiTrail.rot(unit), 64), -4.8f, 6f, 0.56f, engineColor),
-                    new TrailHold(Trails.soul(MultiTrail.rot(unit), 64), 4.8f, 6f, 0.56f, engineColor)
+                    new TrailHold(Trails.soul(MultiTrail.rot(unit), 50, speed), engineColor),
+                    new TrailHold(Trails.soul(MultiTrail.rot(unit), 64, speed), -4.8f, 6f, 0.56f, engineColor),
+                    new TrailHold(Trails.soul(MultiTrail.rot(unit), 64, speed), 4.8f, 6f, 0.56f, engineColor)
                 );
             }
 
@@ -100,7 +100,7 @@ public final class MonolithUnitTypes{
                         copy.rotation = MultiTrail::calcRot;
 
                         TrailFx.trailFadeLow.at(soul.x, soul.y, width, engineColor, copy);
-                        soul.trail = new MultiTrail(new TrailHold(Trails.soul(MultiTrail.rot(unit), trailLength), engineColor));
+                        soul.trail = new MultiTrail(new TrailHold(Trails.soul(MultiTrail.rot(unit), trailLength, speed), engineColor));
                     }else if(trail.trails.length == 1 && !soul.corporeal()){
                         MultiTrail copy = trail.copy();
                         copy.rotation = MultiTrail::calcRot;
@@ -1010,16 +1010,16 @@ public final class MonolithUnitTypes{
                 offset = 11f;
             }}.apply(this);
             trailType = unit -> new MultiTrail(MultiTrail.rot(unit),
-                new TrailHold(Trails.phantasmal(MultiTrail.rot(unit), 16, 3.6f, 6f, 2f), engineColor),
+                new TrailHold(Trails.phantasmal(MultiTrail.rot(unit), 16, 3.6f, 6f, speed, 2f), engineColor),
                 new TrailHold(Utils.with(Trails.singlePhantasmal(24), t -> {
                     t.trailChance = 0f;
-                    t.fadeInterp = e -> (1f - Interp.pow10In.apply(e)) * Interp.pow2In.apply(e);
-                    t.sideFadeInterp = e -> (1f - Interp.pow5In.apply(e)) * Interp.pow3In.apply(e);
+                    t.fadeInterp = e -> (1f - Interp.pow5In.apply(e)) * Interp.pow2In.apply(e);
+                    t.sideFadeInterp = e -> (1f - Interp.pow4In.apply(e)) * Interp.pow3In.apply(e);
                 }), -4.5f, 2.5f, 0.44f, UnityPal.monolithLight),
                 new TrailHold(Utils.with(Trails.singlePhantasmal(24), t -> {
                     t.trailChance = 0f;
-                    t.fadeInterp = e -> (1f - Interp.pow10In.apply(e)) * Interp.pow2In.apply(e);
-                    t.sideFadeInterp = e -> (1f - Interp.pow5In.apply(e)) * Interp.pow3In.apply(e);
+                    t.fadeInterp = e -> (1f - Interp.pow5In.apply(e)) * Interp.pow2In.apply(e);
+                    t.sideFadeInterp = e -> (1f - Interp.pow4In.apply(e)) * Interp.pow3In.apply(e);
                 }), 4.5f, 2.5f, 0.44f, UnityPal.monolithLight)
             );
             trailLength = 24;
@@ -1121,8 +1121,8 @@ public final class MonolithUnitTypes{
                 color = UnityPal.monolith;
             }}.apply(this);
             trailType = unit -> new MultiTrail(MultiTrail.rot(unit),
-                new TrailHold(Trails.soul(MultiTrail.rot(unit), 24), -5f, 0f, 1f, UnityPal.monolithLight),
-                new TrailHold(Trails.soul(MultiTrail.rot(unit), 24), 5f, 0f, 1f, UnityPal.monolithLight)
+                new TrailHold(Trails.soul(MultiTrail.rot(unit), 24, speed), -5f, 0f, 1f, UnityPal.monolithLight),
+                new TrailHold(Trails.soul(MultiTrail.rot(unit), 24, speed), 5f, 0f, 1f, UnityPal.monolithLight)
             );
             trailLength = 24;
 
@@ -1227,7 +1227,7 @@ public final class MonolithUnitTypes{
                     @Override
                     public void updateTrail(Bullet b){
                         if(!headless && trailLength > 0 && b.trail == null){
-                            b.trail = Trails.soul(trailLength, 6f, trailWidth - 0.3f);
+                            b.trail = Utils.with(Trails.soul(trailLength, 6f, trailWidth - 0.3f, speed), t -> t.each((TexturedTrail tt) -> tt.forceCap = true));
                             for(int i = 0; i < b.trail.length; i++) b.trail.update(b.x, b.y, 0f); // Give a head start.
                         }
 
@@ -1279,9 +1279,9 @@ public final class MonolithUnitTypes{
                 color = UnityPal.monolithLight;
             }}.apply(this);
             trailType = unit -> new MultiTrail(MultiTrail.rot(unit),
-                new TrailHold(Trails.phantasmal(MultiTrail.rot(unit), 32, 5.6f, 8f, 0f), engineColor),
-                new TrailHold(Trails.soul(MultiTrail.rot(unit), 48, 6f, 3.2f), -71f / 4f, (89f - 65f) / 4f, 0.75f, engineColor),
-                new TrailHold(Trails.soul(MultiTrail.rot(unit), 48, 6f, 3.2f), 71f / 4f, (89f - 65f) / 4f, 0.75f, engineColor)
+                new TrailHold(Trails.phantasmal(MultiTrail.rot(unit), 32, 5.6f, 8f, speed, 0f), engineColor),
+                new TrailHold(Trails.soul(MultiTrail.rot(unit), 48, 6f, 3.2f, speed), -71f / 4f, (89f - 65f) / 4f, 0.75f, engineColor),
+                new TrailHold(Trails.soul(MultiTrail.rot(unit), 48, 6f, 3.2f, speed), 71f / 4f, (89f - 65f) / 4f, 0.75f, engineColor)
             );
             trailLength = 48;
 

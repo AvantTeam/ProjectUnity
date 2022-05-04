@@ -134,10 +134,8 @@ public class TexturedTrail extends Trail{
         int psize = points.size;
         if(psize > 0){
             float
-                //rv = Mathf.clamp(points.items[psize - 1]),
                 rv = psize / 4f / length,
                 alpha = rv * fadeAlpha + (1f - fadeAlpha),
-                //w = lastW * width / (psize / 4f) * ((psize - 4f) / 4f) * 2f,
                 w = Mathf.map(rv, 1f - shrink, 1f) * width * lastW * 2f,
                 h = ((float)capRegion.height / capRegion.width) * w,
 
@@ -145,7 +143,6 @@ public class TexturedTrail extends Trail{
                 u = capRegion.u, v = capRegion.v2, u2 = capRegion.u2, v2 = capRegion.v, uh = Mathf.lerp(u, u2, 0.5f),
                 cx = Mathf.cosDeg(angle) * w / 2f, cy = Mathf.sinDeg(angle) * w / 2f,
                 x1 = lastX, y1 = lastY,
-                //x2 = lastX + Mathf.cosDeg(angle + 90f) * h, y2 = lastY + Mathf.sinDeg(angle + 90f) * h,
                 x2 = lastX + Mathf.cosDeg(angle + 90f) * h, y2 = lastY + Mathf.sinDeg(angle + 90f) * h,
 
                 col1 = tmp.set(Draw.getColor()).lerp(fadeColor, gradientInterp.apply(1f - rv)).a(fadeInterp.apply(alpha)).clamp().toFloatBits(),
@@ -249,15 +246,11 @@ public class TexturedTrail extends Trail{
                 x2 = lastX;
                 y2 = lastY;
                 w2 = lastW;
-                //rv2 = points.items[psize - 1];
                 rv2 = psize / 4f / length;
             }
 
             float
                 z2 = i == psize - 4 ? endAngle : -Angles.angleRad(x1, y1, x2, y2), z1 = i == 0 ? z2 : lastAngle,
-                //fs1 = Mathf.map(i, 0f, psize, 1f - shrink, 1f) * width * w1,
-                //fs2 = Mathf.map(Math.min(i + 4f, psize - 4f), 0f, psize, 1f - shrink, 1f) * width * w2,
-                //fs2 = Mathf.map(i + 4f, 0f, psize, 1f - shrink, 1f) * width * w2,
                 fs1 = Mathf.map(rv1, 1f - shrink, 1f) * width * w1,
                 fs2 = Mathf.map(rv2, 1f - shrink, 1f) * width * w2,
 
@@ -352,12 +345,7 @@ public class TexturedTrail extends Trail{
     public void update(float x, float y, float widthMultiplier){
         float dst = Mathf.dst(lastX, lastY, x, y) / Time.delta;
         float width = baseWidth * widthMultiplier;
-        /*if((counter += Time.delta) >= 0.96f){
-            if(points.size > length * 4) points.removeRange(0, 3);
 
-            counter = 0f;
-            points.add(x, y, width, 0f);
-        }*/
         if((counter += Time.delta) >= 0.96f){
             if(dst >= minDst){
                 if(points.size > length * 4 - 4) points.removeRange(0, 3);
@@ -369,20 +357,17 @@ public class TexturedTrail extends Trail{
             counter = 0f;
         }
 
-        //lastAngle = Mathf.zero(dst, 0.4f) ? lastAngle : (-Angles.angleRad(x, y, lastX, lastY) + Mathf.pi);
         lastAngle = Mathf.zero(dst) ? lastAngle : -Angles.angleRad(lastX, lastY, x, y);
         lastX = x;
         lastY = y;
         lastW = width;
         calcProgress();
 
-        if(points.size > 0 && trailChance > 0f && Mathf.chanceDelta(trailChance * Mathf.clamp(dst / trailThreshold))){
+        int psize = points.size;
+        if(psize > 0 && trailChance > 0f && Mathf.chanceDelta(trailChance * Mathf.clamp(dst / trailThreshold))){
             trailEffect.at(
                 x, y, width * trailWidth,
-                tmp.set(trailColor).a(fadeInterp.apply(
-                    Mathf.clamp(points.items[points.size - 1]) *
-                    fadeAlpha + (1f - fadeAlpha)
-                ))
+                tmp.set(trailColor).a(fadeInterp.apply(Mathf.clamp((psize / 4f / length) * fadeAlpha + (1f - fadeAlpha))))
             );
         }
     }
@@ -400,23 +385,12 @@ public class TexturedTrail extends Trail{
 
                 items[i + 3] = maxDst;
                 maxDst += dst;
-                //items[i + 3] = dst;
             }
 
             float frac = psize / 4f / length;
             for(int i = 0; i < psize; i += 4){
                 items[i + 3] = Mathf.clamp((items[i + 3] / maxDst) * frac);
             }
-
-            /*float
-                frac = psize / 4f / length,
-                first = items[3], last = 0f;
-            for(int i = 0; i < psize; i += 4){
-                float v = items[i + 3];
-
-                items[i + 3] = Mathf.clamp((v + last - first) / maxDst * frac);
-                last += v;
-            }*/
         }
     }
 }

@@ -1,5 +1,6 @@
 package unity.graphics;
 
+import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.util.*;
@@ -10,6 +11,7 @@ import mindustry.graphics.*;
  * Holds multiple trails with additional offsets, width multiplier, and color override.
  * @author GlennFolker
  */
+@SuppressWarnings("unchecked")
 public class MultiTrail extends Trail{
     public TrailHold[] trails;
     public RotationHandler rotation = MultiTrail::calcRot;
@@ -30,6 +32,17 @@ public class MultiTrail extends Trail{
 
     public static RotationHandler rot(Rotc e){
         return (trail, x, y) -> e.isAdded() ? e.rotation() : trail.calcRot(x, y);
+    }
+
+    public <T extends Trail> void each(Cons<T> cons){
+        for(TrailHold hold : trails){
+            Trail t = hold.trail;
+            if(t instanceof MultiTrail m){
+                m.each(cons);
+            }else{
+                cons.get((T)t);
+            }
+        }
     }
 
     @Override

@@ -39,18 +39,18 @@ public final class Trails{
     }
 
     public static MultiTrail phantasmal(int length){
-        return phantasmal(length, 3.6f, 3.5f, 0f);
+        return phantasmal(length, 3.6f, 3.5f, -1f, 0f);
     }
 
     public static MultiTrail phantasmal(RotationHandler rot, int length){
-        return phantasmal(rot, length, 3.6f, 3.5f, 0f);
+        return phantasmal(rot, length, 3.6f, 3.5f, -1f, 0f);
     }
 
-    public static MultiTrail phantasmal(int length, float scale, float magnitude, float offsetY){
-        return phantasmal(MultiTrail::calcRot, length, scale, magnitude, offsetY);
+    public static MultiTrail phantasmal(int length, float scale, float magnitude, float speedThreshold, float offsetY){
+        return phantasmal(MultiTrail::calcRot, length, scale, magnitude, speedThreshold, offsetY);
     }
 
-    public static MultiTrail phantasmal(RotationHandler rot, int length, float scale, float magnitude, float offsetY){
+    public static MultiTrail phantasmal(RotationHandler rot, int length, float scale, float magnitude, float speedThreshold, float offsetY){
         int strandsAmount = 2;
 
         TrailHold[] trails = new TrailHold[strandsAmount + 2];
@@ -62,9 +62,11 @@ public final class Trails{
         return new MultiTrail(rot, trails){
             @Override
             public void update(float x, float y, float width){
+                float scl = speedThreshold == -1f ? 1f : Mathf.clamp(Mathf.dst(x, y, lastX, lastY) / Time.delta / speedThreshold);
                 float angle = rotation.get(this, x, y) - 90f;
+
                 for(int i = 0; i < strandsAmount; i++){
-                    Tmp.v1.trns(angle, Mathf.sin((Time.time + offset + (Mathf.PI2 * scale) * ((float)i / strandsAmount)), scale, magnitude * width), offsetY);
+                    Tmp.v1.trns(angle, Mathf.sin(Time.time + offset + (Mathf.PI2 * scale) * ((float)i / strandsAmount), scale, magnitude * width * scl), offsetY);
 
                     TrailHold trail = trails[i];
                     trail.trail.update(x + Tmp.v1.x, y + Tmp.v1.y, width * trail.width);
@@ -99,18 +101,26 @@ public final class Trails{
     }
 
     public static MultiTrail soul(int length){
-        return soul(length, 6f, 2.2f);
+        return soul(length, 6f, 2.2f, -1f);
     }
 
     public static MultiTrail soul(RotationHandler rot, int length){
-        return soul(rot, length, 6f, 2.2f);
+        return soul(rot, length, 6f, 2.2f, -1f);
     }
 
-    public static MultiTrail soul(int length, float scale, float magnitude){
-        return soul(MultiTrail::calcRot, length, scale, magnitude);
+    public static MultiTrail soul(int length, float speedThreshold){
+        return soul(length, 6f, 2.2f, speedThreshold);
     }
 
-    public static MultiTrail soul(RotationHandler rot, int length, float scale, float magnitude){
+    public static MultiTrail soul(RotationHandler rot, int length, float speedThreshold){
+        return soul(rot, length, 6f, 2.2f, speedThreshold);
+    }
+
+    public static MultiTrail soul(int length, float scale, float magnitude, float speedThreshold){
+        return soul(MultiTrail::calcRot, length, scale, magnitude, speedThreshold);
+    }
+
+    public static MultiTrail soul(RotationHandler rot, int length, float scale, float magnitude, float speedThreshold){
         int strandsAmount = 3;
 
         TrailHold[] trails = new TrailHold[strandsAmount + 1];
@@ -118,13 +128,16 @@ public final class Trails{
         trails[strandsAmount] = new TrailHold(singlePhantasmal(length), UnityPal.monolith);
 
         float dir = Mathf.sign(Mathf.chance(0.5f));
-        float offset = Mathf.random(Mathf.PI2 * scale);
         return new MultiTrail(rot, trails){
+            float time = Time.time + Mathf.random(Mathf.PI2 * scale);
+
             @Override
             public void update(float x, float y, float width){
                 float angle = rotation.get(this, x, y) - 90f;
+
+                time += (speedThreshold == -1f ? 1f : Mathf.clamp(Mathf.dst(x, y, lastX, lastY) / Time.delta / speedThreshold)) * Time.delta;
                 for(int i = 0; i < strandsAmount; i++){
-                    float rad = (Time.time + offset + (Mathf.PI2 * scale) * ((float)i / strandsAmount)) * dir;
+                    float rad = (time + (Mathf.PI2 * scale) * ((float)i / strandsAmount)) * dir;
                     float scl = Mathf.map(Mathf.sin(rad, scale, 1f), -1f, 1f, 0.2f, 1f);
                     Tmp.v1.trns(angle, Mathf.cos(rad, scale, magnitude * width));
 
@@ -136,7 +149,6 @@ public final class Trails{
                 Tmp.v1.trns(angle, main.x, main.y);
 
                 main.trail.update(x + Tmp.v1.x, y + Tmp.v1.y, width * main.width);
-
                 lastX = x;
                 lastY = y;
             }
