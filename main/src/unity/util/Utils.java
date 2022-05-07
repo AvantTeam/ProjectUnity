@@ -24,8 +24,8 @@ import unity.world.*;
 import static mindustry.Vars.*;
 
 public final class Utils{
-    public static final PowIn pow6In = new PowIn(6f);
-    public static final PowOut pow25Out = new PowOut(25);
+    public static final PowIn pow6In = new PowIn(6f), pow25In = new PowIn(25f);
+    public static final PowOut pow25Out = new PowOut(25f);
 
     public static final float sqrtHalf = Mathf.sqrt(0.5f);
 

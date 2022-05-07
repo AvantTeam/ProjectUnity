@@ -65,7 +65,7 @@ public class EnergyRingWeapon extends Weapon{
                 float spikeRotation = rotation + ring.spikeRotOffset + 360f / ring.spikes * i;
 
                 Tmp.v2.trns(spikeRotation, 0f, ring.radius + ring.spikeOffset).add(Tmp.v1);
-                Drawf.tri(Tmp.v2.x, Tmp.v2.y, ring.spikeWidth, ring.spikeLength, spikeRotation + 90f);
+                UnityDrawf.tri(Tmp.v2.x, Tmp.v2.y, ring.spikeWidth, ring.spikeLength, spikeRotation + 90f);
             }
         }
 
@@ -100,6 +100,11 @@ public class EnergyRingWeapon extends Weapon{
         public float spikeRotOffset;
         public float spikeWidth = 1.5f;
         public float spikeLength = 3f;
+
+        @Override
+        public String toString(){
+            return "Ring{" + "color=" + color + ", thickness=" + thickness + ", radius=" + radius + ", rotate=" + rotate + ", rotateSpeed=" + rotateSpeed + ", angleOffset=" + angleOffset + ", flip=" + flip + ", divisions=" + divisions + ", divisionSeparation=" + divisionSeparation + ", spikes=" + spikes + ", spikeOffset=" + spikeOffset + ", spikeRotOffset=" + spikeRotOffset + ", spikeWidth=" + spikeWidth + ", spikeLength=" + spikeLength + '}';
+        }
     }
 
     public static class EnergyRingMount extends WeaponMount{

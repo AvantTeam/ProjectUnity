@@ -154,7 +154,7 @@ public final class MonolithUnitTypes{
                         UnityDrawf.arcLine(soul.x, soul.y, 10f, 60f, r);
 
                         Tmp.v1.trns(r, 10f).add(soul);
-                        Drawf.tri(Tmp.v1.x, Tmp.v1.y, 2.5f, 6f, r);
+                        UnityDrawf.tri(Tmp.v1.x, Tmp.v1.y, 2.5f, 6f, r);
                     }
 
                     Draw.z(Layer.flyingUnit);
@@ -1095,16 +1095,19 @@ public final class MonolithUnitTypes{
 
         tendence = new UnityUnitType("tendence"){{
             health = 1200f;
-            speed = 4.2f;
-            accel = 0.08f;
-            drag = 0.045f;
-            rotateSpeed = 7.2f;
-            flying = true;
-            hitSize = 16f;
-            lowAltitude = true;
             rotateShooting = false;
+            lowAltitude = true;
+            flying = true;
             maxSouls = 4;
+
+            hitSize = 16f;
+            speed = 4.2f;
+            rotateSpeed = 7.2f;
+            drag = 0.045f;
+            accel = 0.08f;
+
             outlineColor = UnityPal.darkOutline;
+            ammoType = new PowerAmmoType(1000f);
 
             Prov<Engine> etype = () -> new Engine(){{
                 offset = 10f;
@@ -1126,7 +1129,7 @@ public final class MonolithUnitTypes{
             );
             trailLength = 24;
 
-            decals.add(new UnitDecal(name + "-top", 0f, 0f, 0f, Layer.effect - 0.02f, Color.white));
+            decals.add(new UnitDecal(name + "-top", 0f, 0f, 0f, Layer.bullet - 0.02f, Color.white));
             weapons.add(new EnergyRingWeapon(){{
                 rings.add(new Ring(){{
                     radius = 6.5f;
@@ -1134,7 +1137,7 @@ public final class MonolithUnitTypes{
                     spikes = 8;
                     spikeOffset = 1.5f;
                     spikeWidth = 2f;
-                    spikeLength = 5f;
+                    spikeLength = 4f;
                     color = UnityPal.monolithDark.cpy().lerp(UnityPal.monolith, 0.5f);
                 }}, new Ring(){{
                     shootY = radius = 3f;
@@ -1248,6 +1251,7 @@ public final class MonolithUnitTypes{
             rotateShooting = false;
             lowAltitude = true;
             flying = true;
+            maxSouls = 5;
 
             strafePenalty = 0.1f;
             hitSize = 36f;
@@ -1285,7 +1289,11 @@ public final class MonolithUnitTypes{
             );
             trailLength = 48;
 
-            decals.add(new UnitDecal(name + "-top", 0f, 0f, 0f, Layer.effect - 0.02f, Color.white));
+            decals.add(
+                new UnitDecal(name + "-middle", 0f, 0f, 0f, Layer.bullet - 0.02f, Color.white),
+                new UnitDecal(name + "-top", 0f, 0f, 0f, Layer.effect + 0.0199f, Color.white)
+            );
+
             weapons.add(new EnergyRingWeapon(){{
                 rings.add(new Ring(){{
                     radius = 9f;
@@ -1304,12 +1312,12 @@ public final class MonolithUnitTypes{
                     angleOffset = 90f;
                     color = UnityPal.monolith;
                 }}, new Ring(){{
-                    radius = 1.5f;
+                    radius = 2f;
                     thickness = 1f;
                     spikes = 4;
-                    spikeOffset = 1.5f;
-                    spikeWidth = 2f;
-                    spikeLength = 2f;
+                    spikeOffset = 0.4f;
+                    spikeWidth = 1f;
+                    spikeLength = 1.5f;
                     flip = true;
                     color = UnityPal.monolithDark;
                 }});
@@ -1331,7 +1339,70 @@ public final class MonolithUnitTypes{
         }};
 
         calenture = new UnityUnitType("calenture"){{
+            health = 14400f;
+            rotateShooting = false;
+            lowAltitude = true;
+            flying = true;
+            maxSouls = 7;
 
+            strafePenalty = 0.3f;
+            hitSize = 48f;
+            speed = 3.5f;
+            rotateSpeed = 3.6f;
+            drag = 0.06f;
+            accel = 0.08f;
+
+            outlineColor = UnityPal.darkOutline;
+            ammoType = new PowerAmmoType(3000f);
+
+            decals.add(
+                new UnitDecal(name + "-middle", 0f, 0f, 0f, Layer.bullet - 0.02f, Color.white),
+                new UnitDecal(name + "-top", 0f, 0f, 0f, Layer.effect + 0.0199f, Color.white)
+            );
+
+            weapons.add(new EnergyRingWeapon(){{
+                rings.add(new Ring(){{
+                    color = UnityPal.monolithLight;
+                    radius = 14f;
+                    rotateSpeed = 4f;
+                    spikes = 8;
+                    spikeOffset = 2f;
+                    spikeWidth = 3f;
+                    spikeLength = 4.5f;
+                }}, new Ring(){{
+                    color = UnityPal.monolithDark.cpy().lerp(UnityPal.monolith, 0.5f);
+                    thickness = 1f;
+                    radius = 12f;
+                    rotateSpeed = 3.2f;
+                    flip = true;
+                    divisions = 2;
+                    divisionSeparation = 30f;
+                }}, new Ring(){{
+                    color = UnityPal.monolith;
+                    shootY = radius = 8.5f;
+                    rotate = false;
+                    angleOffset  = 90f;
+                    divisions = 2;
+                    divisionSeparation = 30f;
+                }}, new Ring(){{
+                    color = UnityPal.monolithDark;
+                    thickness = 1f;
+                    radius = 4f;
+                    rotateSpeed = 2.4f;
+                    spikes = 6;
+                    spikeOffset = 0.4f;
+                    spikeWidth = 2f;
+                    spikeLength = 2f;
+                }});
+
+                x = 0f;
+                y = 10f;
+                mirror = false;
+                rotate = true;
+                reload = 120f;
+                layerOffset = 10f;
+                eyeRadius = 2f;
+            }});
         }};
 
         hallucination = new UnityUnitType("hallucination"){{

@@ -30,7 +30,7 @@ public final class Trails{
         return Utils.with(singlePhantasmal(length), t -> {
             t.capRegion = Core.atlas.find("clear");
             t.minDst = 0.4f;
-            t.fadeInterp = Interp.pow3In;
+            t.fadeInterp = e -> (1f - Utils.pow25In.apply(e)) * Interp.pow3In.apply(e);
             t.sideFadeInterp = Interp.pow5In;
             t.mixAlpha = 0f;
             t.trailChance = 0f;

@@ -356,7 +356,7 @@ public class HitFx{
                 float cf = (i / (sparkAmount - 1f)) * maxOffset2;
                 float nf = Mathf.curve(s.fin(), cf, (1f + cf) - maxOffset2);
                 float f = Interp.pow2Out.apply(nf);
-                
+
                 float range = Mathf.sign(r.chance(0.5f)) * r.random(60f, 93f);
                 float rot = e.rotation + range;
                 Vec2 v = Tmp.v1.trns(rot, (f * (rad / 2f) * r.random(0.5f, 1.2f)) + 0.001f);
@@ -410,7 +410,7 @@ public class HitFx{
     }),
 
     tendenceHit = new Effect(52f, e -> {
-        color(UnityPal.monolithLight, UnityPal.monolith, UnityPal.monolithDark, e.fout());
+        color(UnityPal.monolithLight, UnityPal.monolith, UnityPal.monolithDark, e.fin());
         for(int sign : Mathf.signs){
             randLenVectors(e.id + sign, 3, e.fin(Interp.pow5Out) * 32f, e.rotation, 30f, 16f, (x, y) ->
                 Fill.square(e.x + x, e.y + y, e.foutpowdown() * 2.5f, e.id * 30f + e.finpow() * 90f * sign)
